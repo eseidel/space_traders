@@ -1,0 +1,22 @@
+# Configuration options:
+# https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/dart.md
+# Also:
+# openapi-generator config-help -g dart
+
+# These names I inferred from https://github.com/OpenAPITools/openapi-generator/blob/master/docs/configuration.md
+# but they seem to work:
+inputSpec: https://raw.githubusercontent.com/SpaceTradersAPI/api-docs/b52734a2cdb63e796174310ebac89f5009df3b9f/reference/SpaceTraders.json
+outputDir: packages/api
+generatorName: dart
+
+# Dart specific config:
+pubAuthor: Eric Seidel
+pubAuthorEmail: eric@shorebird.dev
+pubDescription: SpaceTraders API (v2)
+pubRepository: https://github.com/eseidel/space_traders
+pubLibrary: space_traders_api
+pubPublishTo: none
+
+# Tests just generate as empty tests with #TODO
+apiTests: false
+modelTests: false
