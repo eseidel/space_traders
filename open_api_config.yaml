@@ -1,8 +1,3 @@
-# Configuration options:
-# https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/dart.md
-# Also:
-# openapi-generator config-help -g dart
-
 # These names I inferred from https://github.com/OpenAPITools/openapi-generator/blob/master/docs/configuration.md
 # but they seem to work:
 inputSpec: https://raw.githubusercontent.com/SpaceTradersAPI/api-docs/b52734a2cdb63e796174310ebac89f5009df3b9f/reference/SpaceTraders.json
@@ -10,6 +5,10 @@ outputDir: packages/space_traders_api
 generatorName: dart
 
 # Dart specific config:
+# https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/dart.md
+# Also:
+# openapi-generator config-help -g dart
+pubName: space_traders_api
 pubAuthor: Eric Seidel
 pubAuthorEmail: eric@shorebird.dev
 pubDescription: SpaceTraders API (v2)
