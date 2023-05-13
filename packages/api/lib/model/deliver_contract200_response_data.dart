@@ -22,23 +22,25 @@ class DeliverContract200ResponseData {
   ShipCargo cargo;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is DeliverContract200ResponseData &&
-     other.contract == contract &&
-     other.cargo == cargo;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DeliverContract200ResponseData &&
+          other.contract == contract &&
+          other.cargo == cargo;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (contract.hashCode) +
-    (cargo.hashCode);
+      // ignore: unnecessary_parenthesis
+      (contract.hashCode) + (cargo.hashCode);
 
   @override
-  String toString() => 'DeliverContract200ResponseData[contract=$contract, cargo=$cargo]';
+  String toString() =>
+      'DeliverContract200ResponseData[contract=$contract, cargo=$cargo]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'contract'] = this.contract;
-      json[r'cargo'] = this.cargo;
+    json[r'contract'] = this.contract;
+    json[r'cargo'] = this.cargo;
     return json;
   }
 
@@ -54,8 +56,10 @@ class DeliverContract200ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "DeliverContract200ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "DeliverContract200ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "DeliverContract200ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "DeliverContract200ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -68,7 +72,10 @@ class DeliverContract200ResponseData {
     return null;
   }
 
-  static List<DeliverContract200ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<DeliverContract200ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <DeliverContract200ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -96,12 +103,18 @@ class DeliverContract200ResponseData {
   }
 
   // maps a json object with a list of DeliverContract200ResponseData-objects as value to a dart map
-  static Map<String, List<DeliverContract200ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<DeliverContract200ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<DeliverContract200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = DeliverContract200ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = DeliverContract200ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,4 +129,3 @@ class DeliverContract200ResponseData {
     'cargo',
   };
 }
-

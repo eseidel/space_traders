@@ -22,23 +22,25 @@ class CreateShipWaypointScan201ResponseData {
   List<ScannedWaypoint> waypoints;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is CreateShipWaypointScan201ResponseData &&
-     other.cooldown == cooldown &&
-     other.waypoints == waypoints;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateShipWaypointScan201ResponseData &&
+          other.cooldown == cooldown &&
+          other.waypoints == waypoints;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (cooldown.hashCode) +
-    (waypoints.hashCode);
+      // ignore: unnecessary_parenthesis
+      (cooldown.hashCode) + (waypoints.hashCode);
 
   @override
-  String toString() => 'CreateShipWaypointScan201ResponseData[cooldown=$cooldown, waypoints=$waypoints]';
+  String toString() =>
+      'CreateShipWaypointScan201ResponseData[cooldown=$cooldown, waypoints=$waypoints]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'cooldown'] = this.cooldown;
-      json[r'waypoints'] = this.waypoints;
+    json[r'cooldown'] = this.cooldown;
+    json[r'waypoints'] = this.waypoints;
     return json;
   }
 
@@ -54,8 +56,10 @@ class CreateShipWaypointScan201ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "CreateShipWaypointScan201ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "CreateShipWaypointScan201ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "CreateShipWaypointScan201ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "CreateShipWaypointScan201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -68,7 +72,10 @@ class CreateShipWaypointScan201ResponseData {
     return null;
   }
 
-  static List<CreateShipWaypointScan201ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<CreateShipWaypointScan201ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <CreateShipWaypointScan201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -81,12 +88,14 @@ class CreateShipWaypointScan201ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, CreateShipWaypointScan201ResponseData> mapFromJson(dynamic json) {
+  static Map<String, CreateShipWaypointScan201ResponseData> mapFromJson(
+      dynamic json) {
     final map = <String, CreateShipWaypointScan201ResponseData>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = CreateShipWaypointScan201ResponseData.fromJson(entry.value);
+        final value =
+            CreateShipWaypointScan201ResponseData.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -96,12 +105,19 @@ class CreateShipWaypointScan201ResponseData {
   }
 
   // maps a json object with a list of CreateShipWaypointScan201ResponseData-objects as value to a dart map
-  static Map<String, List<CreateShipWaypointScan201ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<CreateShipWaypointScan201ResponseData>>
+      mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<CreateShipWaypointScan201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = CreateShipWaypointScan201ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = CreateShipWaypointScan201ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,4 +132,3 @@ class CreateShipWaypointScan201ResponseData {
     'waypoints',
   };
 }
-

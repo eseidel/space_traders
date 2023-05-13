@@ -19,20 +19,21 @@ class SellCargo201Response {
   SellCargo201ResponseData data;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is SellCargo201Response &&
-     other.data == data;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SellCargo201Response && other.data == data;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (data.hashCode);
+      // ignore: unnecessary_parenthesis
+      (data.hashCode);
 
   @override
   String toString() => 'SellCargo201Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'data'] = this.data;
+    json[r'data'] = this.data;
     return json;
   }
 
@@ -48,8 +49,10 @@ class SellCargo201Response {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "SellCargo201Response[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "SellCargo201Response[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "SellCargo201Response[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "SellCargo201Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class SellCargo201Response {
     return null;
   }
 
-  static List<SellCargo201Response>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<SellCargo201Response>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <SellCargo201Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -89,12 +95,18 @@ class SellCargo201Response {
   }
 
   // maps a json object with a list of SellCargo201Response-objects as value to a dart map
-  static Map<String, List<SellCargo201Response>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<SellCargo201Response>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<SellCargo201Response>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = SellCargo201Response.listFromJson(entry.value, growable: growable,);
+        final value = SellCargo201Response.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,4 +120,3 @@ class SellCargo201Response {
     'data',
   };
 }
-

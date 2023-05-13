@@ -20,20 +20,21 @@ class JumpShipRequest {
   String systemSymbol;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is JumpShipRequest &&
-     other.systemSymbol == systemSymbol;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JumpShipRequest && other.systemSymbol == systemSymbol;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (systemSymbol.hashCode);
+      // ignore: unnecessary_parenthesis
+      (systemSymbol.hashCode);
 
   @override
   String toString() => 'JumpShipRequest[systemSymbol=$systemSymbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'systemSymbol'] = this.systemSymbol;
+    json[r'systemSymbol'] = this.systemSymbol;
     return json;
   }
 
@@ -49,8 +50,10 @@ class JumpShipRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "JumpShipRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "JumpShipRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "JumpShipRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "JumpShipRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -62,7 +65,10 @@ class JumpShipRequest {
     return null;
   }
 
-  static List<JumpShipRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<JumpShipRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <JumpShipRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -90,12 +96,18 @@ class JumpShipRequest {
   }
 
   // maps a json object with a list of JumpShipRequest-objects as value to a dart map
-  static Map<String, List<JumpShipRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<JumpShipRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<JumpShipRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = JumpShipRequest.listFromJson(entry.value, growable: growable,);
+        final value = JumpShipRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -109,4 +121,3 @@ class JumpShipRequest {
     'systemSymbol',
   };
 }
-

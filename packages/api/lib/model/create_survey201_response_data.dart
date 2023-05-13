@@ -22,23 +22,25 @@ class CreateSurvey201ResponseData {
   List<Survey> surveys;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is CreateSurvey201ResponseData &&
-     other.cooldown == cooldown &&
-     other.surveys == surveys;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateSurvey201ResponseData &&
+          other.cooldown == cooldown &&
+          other.surveys == surveys;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (cooldown.hashCode) +
-    (surveys.hashCode);
+      // ignore: unnecessary_parenthesis
+      (cooldown.hashCode) + (surveys.hashCode);
 
   @override
-  String toString() => 'CreateSurvey201ResponseData[cooldown=$cooldown, surveys=$surveys]';
+  String toString() =>
+      'CreateSurvey201ResponseData[cooldown=$cooldown, surveys=$surveys]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'cooldown'] = this.cooldown;
-      json[r'surveys'] = this.surveys;
+    json[r'cooldown'] = this.cooldown;
+    json[r'surveys'] = this.surveys;
     return json;
   }
 
@@ -54,8 +56,10 @@ class CreateSurvey201ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "CreateSurvey201ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "CreateSurvey201ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "CreateSurvey201ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "CreateSurvey201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -68,7 +72,10 @@ class CreateSurvey201ResponseData {
     return null;
   }
 
-  static List<CreateSurvey201ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<CreateSurvey201ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <CreateSurvey201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -96,12 +103,18 @@ class CreateSurvey201ResponseData {
   }
 
   // maps a json object with a list of CreateSurvey201ResponseData-objects as value to a dart map
-  static Map<String, List<CreateSurvey201ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<CreateSurvey201ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<CreateSurvey201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = CreateSurvey201ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = CreateSurvey201ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,4 +129,3 @@ class CreateSurvey201ResponseData {
     'surveys',
   };
 }
-

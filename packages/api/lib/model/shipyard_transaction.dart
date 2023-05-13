@@ -38,32 +38,35 @@ class ShipyardTransaction {
   DateTime timestamp;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipyardTransaction &&
-     other.waypointSymbol == waypointSymbol &&
-     other.shipSymbol == shipSymbol &&
-     other.price == price &&
-     other.agentSymbol == agentSymbol &&
-     other.timestamp == timestamp;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipyardTransaction &&
+          other.waypointSymbol == waypointSymbol &&
+          other.shipSymbol == shipSymbol &&
+          other.price == price &&
+          other.agentSymbol == agentSymbol &&
+          other.timestamp == timestamp;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (waypointSymbol.hashCode) +
-    (shipSymbol.hashCode) +
-    (price.hashCode) +
-    (agentSymbol.hashCode) +
-    (timestamp.hashCode);
+      // ignore: unnecessary_parenthesis
+      (waypointSymbol.hashCode) +
+      (shipSymbol.hashCode) +
+      (price.hashCode) +
+      (agentSymbol.hashCode) +
+      (timestamp.hashCode);
 
   @override
-  String toString() => 'ShipyardTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, price=$price, agentSymbol=$agentSymbol, timestamp=$timestamp]';
+  String toString() =>
+      'ShipyardTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, price=$price, agentSymbol=$agentSymbol, timestamp=$timestamp]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'waypointSymbol'] = this.waypointSymbol;
-      json[r'shipSymbol'] = this.shipSymbol;
-      json[r'price'] = this.price;
-      json[r'agentSymbol'] = this.agentSymbol;
-      json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
+    json[r'waypointSymbol'] = this.waypointSymbol;
+    json[r'shipSymbol'] = this.shipSymbol;
+    json[r'price'] = this.price;
+    json[r'agentSymbol'] = this.agentSymbol;
+    json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
     return json;
   }
 
@@ -79,8 +82,10 @@ class ShipyardTransaction {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipyardTransaction[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipyardTransaction[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipyardTransaction[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipyardTransaction[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -96,7 +101,10 @@ class ShipyardTransaction {
     return null;
   }
 
-  static List<ShipyardTransaction>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipyardTransaction>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipyardTransaction>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -124,12 +132,18 @@ class ShipyardTransaction {
   }
 
   // maps a json object with a list of ShipyardTransaction-objects as value to a dart map
-  static Map<String, List<ShipyardTransaction>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipyardTransaction>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipyardTransaction>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipyardTransaction.listFromJson(entry.value, growable: growable,);
+        final value = ShipyardTransaction.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -147,4 +161,3 @@ class ShipyardTransaction {
     'timestamp',
   };
 }
-

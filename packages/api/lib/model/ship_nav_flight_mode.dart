@@ -36,9 +36,13 @@ class ShipNavFlightMode {
     BURN,
   ];
 
-  static ShipNavFlightMode? fromJson(dynamic value) => ShipNavFlightModeTypeTransformer().decode(value);
+  static ShipNavFlightMode? fromJson(dynamic value) =>
+      ShipNavFlightModeTypeTransformer().decode(value);
 
-  static List<ShipNavFlightMode>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipNavFlightMode>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipNavFlightMode>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -55,7 +59,8 @@ class ShipNavFlightMode {
 /// Transformation class that can [encode] an instance of [ShipNavFlightMode] to String,
 /// and [decode] dynamic data back to [ShipNavFlightMode].
 class ShipNavFlightModeTypeTransformer {
-  factory ShipNavFlightModeTypeTransformer() => _instance ??= const ShipNavFlightModeTypeTransformer._();
+  factory ShipNavFlightModeTypeTransformer() =>
+      _instance ??= const ShipNavFlightModeTypeTransformer._();
 
   const ShipNavFlightModeTypeTransformer._();
 
@@ -72,10 +77,14 @@ class ShipNavFlightModeTypeTransformer {
   ShipNavFlightMode? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'DRIFT': return ShipNavFlightMode.DRIFT;
-        case r'STEALTH': return ShipNavFlightMode.STEALTH;
-        case r'CRUISE': return ShipNavFlightMode.CRUISE;
-        case r'BURN': return ShipNavFlightMode.BURN;
+        case r'DRIFT':
+          return ShipNavFlightMode.DRIFT;
+        case r'STEALTH':
+          return ShipNavFlightMode.STEALTH;
+        case r'CRUISE':
+          return ShipNavFlightMode.CRUISE;
+        case r'BURN':
+          return ShipNavFlightMode.BURN;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -88,4 +97,3 @@ class ShipNavFlightModeTypeTransformer {
   /// Singleton [ShipNavFlightModeTypeTransformer] instance.
   static ShipNavFlightModeTypeTransformer? _instance;
 }
-

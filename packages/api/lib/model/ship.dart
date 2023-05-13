@@ -50,50 +50,53 @@ class Ship {
   ShipFuel fuel;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Ship &&
-     other.symbol == symbol &&
-     other.registration == registration &&
-     other.nav == nav &&
-     other.crew == crew &&
-     other.frame == frame &&
-     other.reactor == reactor &&
-     other.engine == engine &&
-     other.modules == modules &&
-     other.mounts == mounts &&
-     other.cargo == cargo &&
-     other.fuel == fuel;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Ship &&
+          other.symbol == symbol &&
+          other.registration == registration &&
+          other.nav == nav &&
+          other.crew == crew &&
+          other.frame == frame &&
+          other.reactor == reactor &&
+          other.engine == engine &&
+          other.modules == modules &&
+          other.mounts == mounts &&
+          other.cargo == cargo &&
+          other.fuel == fuel;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (registration.hashCode) +
-    (nav.hashCode) +
-    (crew.hashCode) +
-    (frame.hashCode) +
-    (reactor.hashCode) +
-    (engine.hashCode) +
-    (modules.hashCode) +
-    (mounts.hashCode) +
-    (cargo.hashCode) +
-    (fuel.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (registration.hashCode) +
+      (nav.hashCode) +
+      (crew.hashCode) +
+      (frame.hashCode) +
+      (reactor.hashCode) +
+      (engine.hashCode) +
+      (modules.hashCode) +
+      (mounts.hashCode) +
+      (cargo.hashCode) +
+      (fuel.hashCode);
 
   @override
-  String toString() => 'Ship[symbol=$symbol, registration=$registration, nav=$nav, crew=$crew, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, cargo=$cargo, fuel=$fuel]';
+  String toString() =>
+      'Ship[symbol=$symbol, registration=$registration, nav=$nav, crew=$crew, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, cargo=$cargo, fuel=$fuel]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'registration'] = this.registration;
-      json[r'nav'] = this.nav;
-      json[r'crew'] = this.crew;
-      json[r'frame'] = this.frame;
-      json[r'reactor'] = this.reactor;
-      json[r'engine'] = this.engine;
-      json[r'modules'] = this.modules;
-      json[r'mounts'] = this.mounts;
-      json[r'cargo'] = this.cargo;
-      json[r'fuel'] = this.fuel;
+    json[r'symbol'] = this.symbol;
+    json[r'registration'] = this.registration;
+    json[r'nav'] = this.nav;
+    json[r'crew'] = this.crew;
+    json[r'frame'] = this.frame;
+    json[r'reactor'] = this.reactor;
+    json[r'engine'] = this.engine;
+    json[r'modules'] = this.modules;
+    json[r'mounts'] = this.mounts;
+    json[r'cargo'] = this.cargo;
+    json[r'fuel'] = this.fuel;
     return json;
   }
 
@@ -109,8 +112,10 @@ class Ship {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Ship[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Ship[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Ship[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Ship[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -132,7 +137,10 @@ class Ship {
     return null;
   }
 
-  static List<Ship>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Ship>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Ship>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -160,12 +168,18 @@ class Ship {
   }
 
   // maps a json object with a list of Ship-objects as value to a dart map
-  static Map<String, List<Ship>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Ship>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Ship>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Ship.listFromJson(entry.value, growable: growable,);
+        final value = Ship.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -189,4 +203,3 @@ class Ship {
     'fuel',
   };
 }
-

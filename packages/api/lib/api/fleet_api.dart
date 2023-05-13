@@ -10,7 +10,6 @@
 
 part of space_traders_api;
 
-
 class FleetApi {
   FleetApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
@@ -26,10 +25,12 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<Response> createChartWithHttpInfo(String shipSymbol,) async {
+  Future<Response> createChartWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/chart'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/chart'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -39,7 +40,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -60,17 +60,24 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<CreateChart201Response?> createChart(String shipSymbol,) async {
-    final response = await createChartWithHttpInfo(shipSymbol,);
+  Future<CreateChart201Response?> createChart(
+    String shipSymbol,
+  ) async {
+    final response = await createChartWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CreateChart201Response',) as CreateChart201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'CreateChart201Response',
+      ) as CreateChart201Response;
     }
     return null;
   }
@@ -84,10 +91,12 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<Response> createShipShipScanWithHttpInfo(String shipSymbol,) async {
+  Future<Response> createShipShipScanWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/scan/ships'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -97,7 +106,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -117,17 +125,24 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<CreateShipShipScan201Response?> createShipShipScan(String shipSymbol,) async {
-    final response = await createShipShipScanWithHttpInfo(shipSymbol,);
+  Future<CreateShipShipScan201Response?> createShipShipScan(
+    String shipSymbol,
+  ) async {
+    final response = await createShipShipScanWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CreateShipShipScan201Response',) as CreateShipShipScan201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'CreateShipShipScan201Response',
+      ) as CreateShipShipScan201Response;
     }
     return null;
   }
@@ -141,10 +156,12 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<Response> createShipSystemScanWithHttpInfo(String shipSymbol,) async {
+  Future<Response> createShipSystemScanWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/scan/systems'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -154,7 +171,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -174,17 +190,24 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<CreateShipSystemScan201Response?> createShipSystemScan(String shipSymbol,) async {
-    final response = await createShipSystemScanWithHttpInfo(shipSymbol,);
+  Future<CreateShipSystemScan201Response?> createShipSystemScan(
+    String shipSymbol,
+  ) async {
+    final response = await createShipSystemScanWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CreateShipSystemScan201Response',) as CreateShipSystemScan201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'CreateShipSystemScan201Response',
+      ) as CreateShipSystemScan201Response;
     }
     return null;
   }
@@ -198,10 +221,12 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<Response> createShipWaypointScanWithHttpInfo(String shipSymbol,) async {
+  Future<Response> createShipWaypointScanWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/scan/waypoints'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -211,7 +236,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -231,17 +255,24 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<CreateShipWaypointScan201Response?> createShipWaypointScan(String shipSymbol,) async {
-    final response = await createShipWaypointScanWithHttpInfo(shipSymbol,);
+  Future<CreateShipWaypointScan201Response?> createShipWaypointScan(
+    String shipSymbol,
+  ) async {
+    final response = await createShipWaypointScanWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CreateShipWaypointScan201Response',) as CreateShipWaypointScan201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'CreateShipWaypointScan201Response',
+      ) as CreateShipWaypointScan201Response;
     }
     return null;
   }
@@ -256,10 +287,12 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<Response> createSurveyWithHttpInfo(String shipSymbol,) async {
+  Future<Response> createSurveyWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/survey'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/survey'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -269,7 +302,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -290,17 +322,24 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<CreateSurvey201Response?> createSurvey(String shipSymbol,) async {
-    final response = await createSurveyWithHttpInfo(shipSymbol,);
+  Future<CreateSurvey201Response?> createSurvey(
+    String shipSymbol,
+  ) async {
+    final response = await createSurveyWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CreateSurvey201Response',) as CreateSurvey201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'CreateSurvey201Response',
+      ) as CreateSurvey201Response;
     }
     return null;
   }
@@ -315,10 +354,12 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<Response> dockShipWithHttpInfo(String shipSymbol,) async {
+  Future<Response> dockShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/dock'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/dock'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -328,7 +369,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -349,17 +389,24 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<DockShip200Response?> dockShip(String shipSymbol,) async {
-    final response = await dockShipWithHttpInfo(shipSymbol,);
+  Future<DockShip200Response?> dockShip(
+    String shipSymbol,
+  ) async {
+    final response = await dockShipWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'DockShip200Response',) as DockShip200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'DockShip200Response',
+      ) as DockShip200Response;
     }
     return null;
   }
@@ -376,10 +423,13 @@ class FleetApi {
   ///   The ship symbol
   ///
   /// * [ExtractResourcesRequest] extractResourcesRequest:
-  Future<Response> extractResourcesWithHttpInfo(String shipSymbol, { ExtractResourcesRequest? extractResourcesRequest, }) async {
+  Future<Response> extractResourcesWithHttpInfo(
+    String shipSymbol, {
+    ExtractResourcesRequest? extractResourcesRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/extract'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = extractResourcesRequest;
@@ -390,7 +440,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -412,17 +461,26 @@ class FleetApi {
   ///   The ship symbol
   ///
   /// * [ExtractResourcesRequest] extractResourcesRequest:
-  Future<ExtractResources201Response?> extractResources(String shipSymbol, { ExtractResourcesRequest? extractResourcesRequest, }) async {
-    final response = await extractResourcesWithHttpInfo(shipSymbol,  extractResourcesRequest: extractResourcesRequest, );
+  Future<ExtractResources201Response?> extractResources(
+    String shipSymbol, {
+    ExtractResourcesRequest? extractResourcesRequest,
+  }) async {
+    final response = await extractResourcesWithHttpInfo(
+      shipSymbol,
+      extractResourcesRequest: extractResourcesRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ExtractResources201Response',) as ExtractResources201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ExtractResources201Response',
+      ) as ExtractResources201Response;
     }
     return null;
   }
@@ -436,10 +494,12 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<Response> getMyShipWithHttpInfo(String shipSymbol,) async {
+  Future<Response> getMyShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -449,7 +509,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -469,17 +528,24 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<GetMyShip200Response?> getMyShip(String shipSymbol,) async {
-    final response = await getMyShipWithHttpInfo(shipSymbol,);
+  Future<GetMyShip200Response?> getMyShip(
+    String shipSymbol,
+  ) async {
+    final response = await getMyShipWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetMyShip200Response',) as GetMyShip200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMyShip200Response',
+      ) as GetMyShip200Response;
     }
     return null;
   }
@@ -494,10 +560,12 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<Response> getMyShipCargoWithHttpInfo(String shipSymbol,) async {
+  Future<Response> getMyShipCargoWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/cargo'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/cargo'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -507,7 +575,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -528,17 +595,24 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<GetMyShipCargo200Response?> getMyShipCargo(String shipSymbol,) async {
-    final response = await getMyShipCargoWithHttpInfo(shipSymbol,);
+  Future<GetMyShipCargo200Response?> getMyShipCargo(
+    String shipSymbol,
+  ) async {
+    final response = await getMyShipCargoWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetMyShipCargo200Response',) as GetMyShipCargo200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMyShipCargo200Response',
+      ) as GetMyShipCargo200Response;
     }
     return null;
   }
@@ -556,7 +630,10 @@ class FleetApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<Response> getMyShipsWithHttpInfo({ int? page, int? limit, }) async {
+  Future<Response> getMyShipsWithHttpInfo({
+    int? page,
+    int? limit,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships';
 
@@ -576,7 +653,6 @@ class FleetApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'GET',
@@ -599,17 +675,26 @@ class FleetApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<GetMyShips200Response?> getMyShips({ int? page, int? limit, }) async {
-    final response = await getMyShipsWithHttpInfo( page: page, limit: limit, );
+  Future<GetMyShips200Response?> getMyShips({
+    int? page,
+    int? limit,
+  }) async {
+    final response = await getMyShipsWithHttpInfo(
+      page: page,
+      limit: limit,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetMyShips200Response',) as GetMyShips200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMyShips200Response',
+      ) as GetMyShips200Response;
     }
     return null;
   }
@@ -623,10 +708,12 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<Response> getShipCooldownWithHttpInfo(String shipSymbol,) async {
+  Future<Response> getShipCooldownWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/cooldown'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -636,7 +723,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -656,17 +742,24 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<GetShipCooldown200Response?> getShipCooldown(String shipSymbol,) async {
-    final response = await getShipCooldownWithHttpInfo(shipSymbol,);
+  Future<GetShipCooldown200Response?> getShipCooldown(
+    String shipSymbol,
+  ) async {
+    final response = await getShipCooldownWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetShipCooldown200Response',) as GetShipCooldown200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetShipCooldown200Response',
+      ) as GetShipCooldown200Response;
     }
     return null;
   }
@@ -681,10 +774,12 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The ship symbol
-  Future<Response> getShipNavWithHttpInfo(String shipSymbol,) async {
+  Future<Response> getShipNavWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/nav'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/nav'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -694,7 +789,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -715,17 +809,24 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The ship symbol
-  Future<GetShipNav200Response?> getShipNav(String shipSymbol,) async {
-    final response = await getShipNavWithHttpInfo(shipSymbol,);
+  Future<GetShipNav200Response?> getShipNav(
+    String shipSymbol,
+  ) async {
+    final response = await getShipNavWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetShipNav200Response',) as GetShipNav200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetShipNav200Response',
+      ) as GetShipNav200Response;
     }
     return null;
   }
@@ -741,10 +842,13 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [JettisonRequest] jettisonRequest:
-  Future<Response> jettisonWithHttpInfo(String shipSymbol, { JettisonRequest? jettisonRequest, }) async {
+  Future<Response> jettisonWithHttpInfo(
+    String shipSymbol, {
+    JettisonRequest? jettisonRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/jettison'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = jettisonRequest;
@@ -755,7 +859,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -776,17 +879,26 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [JettisonRequest] jettisonRequest:
-  Future<Jettison200Response?> jettison(String shipSymbol, { JettisonRequest? jettisonRequest, }) async {
-    final response = await jettisonWithHttpInfo(shipSymbol,  jettisonRequest: jettisonRequest, );
+  Future<Jettison200Response?> jettison(
+    String shipSymbol, {
+    JettisonRequest? jettisonRequest,
+  }) async {
+    final response = await jettisonWithHttpInfo(
+      shipSymbol,
+      jettisonRequest: jettisonRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Jettison200Response',) as Jettison200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'Jettison200Response',
+      ) as Jettison200Response;
     }
     return null;
   }
@@ -802,10 +914,13 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [JumpShipRequest] jumpShipRequest:
-  Future<Response> jumpShipWithHttpInfo(String shipSymbol, { JumpShipRequest? jumpShipRequest, }) async {
+  Future<Response> jumpShipWithHttpInfo(
+    String shipSymbol, {
+    JumpShipRequest? jumpShipRequest,
+  }) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/jump'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/jump'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = jumpShipRequest;
@@ -816,7 +931,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -837,17 +951,26 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [JumpShipRequest] jumpShipRequest:
-  Future<JumpShip200Response?> jumpShip(String shipSymbol, { JumpShipRequest? jumpShipRequest, }) async {
-    final response = await jumpShipWithHttpInfo(shipSymbol,  jumpShipRequest: jumpShipRequest, );
+  Future<JumpShip200Response?> jumpShip(
+    String shipSymbol, {
+    JumpShipRequest? jumpShipRequest,
+  }) async {
+    final response = await jumpShipWithHttpInfo(
+      shipSymbol,
+      jumpShipRequest: jumpShipRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'JumpShip200Response',) as JumpShip200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'JumpShip200Response',
+      ) as JumpShip200Response;
     }
     return null;
   }
@@ -864,11 +987,14 @@ class FleetApi {
   ///   The ship symbol
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
-  ///   
-  Future<Response> navigateShipWithHttpInfo(String shipSymbol, { NavigateShipRequest? navigateShipRequest, }) async {
+  ///
+  Future<Response> navigateShipWithHttpInfo(
+    String shipSymbol, {
+    NavigateShipRequest? navigateShipRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/navigate'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = navigateShipRequest;
@@ -879,7 +1005,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -901,18 +1026,27 @@ class FleetApi {
   ///   The ship symbol
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
-  ///   
-  Future<NavigateShip200Response?> navigateShip(String shipSymbol, { NavigateShipRequest? navigateShipRequest, }) async {
-    final response = await navigateShipWithHttpInfo(shipSymbol,  navigateShipRequest: navigateShipRequest, );
+  ///
+  Future<NavigateShip200Response?> navigateShip(
+    String shipSymbol, {
+    NavigateShipRequest? navigateShipRequest,
+  }) async {
+    final response = await navigateShipWithHttpInfo(
+      shipSymbol,
+      navigateShipRequest: navigateShipRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'NavigateShip200Response',) as NavigateShip200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'NavigateShip200Response',
+      ) as NavigateShip200Response;
     }
     return null;
   }
@@ -927,10 +1061,12 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<Response> orbitShipWithHttpInfo(String shipSymbol,) async {
+  Future<Response> orbitShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/orbit'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/orbit'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -940,7 +1076,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -961,17 +1096,24 @@ class FleetApi {
   ///
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship
-  Future<OrbitShip200Response?> orbitShip(String shipSymbol,) async {
-    final response = await orbitShipWithHttpInfo(shipSymbol,);
+  Future<OrbitShip200Response?> orbitShip(
+    String shipSymbol,
+  ) async {
+    final response = await orbitShipWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'OrbitShip200Response',) as OrbitShip200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'OrbitShip200Response',
+      ) as OrbitShip200Response;
     }
     return null;
   }
@@ -988,10 +1130,13 @@ class FleetApi {
   ///   The ship symbol
   ///
   /// * [PatchShipNavRequest] patchShipNavRequest:
-  Future<Response> patchShipNavWithHttpInfo(String shipSymbol, { PatchShipNavRequest? patchShipNavRequest, }) async {
+  Future<Response> patchShipNavWithHttpInfo(
+    String shipSymbol, {
+    PatchShipNavRequest? patchShipNavRequest,
+  }) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/nav'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/nav'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = patchShipNavRequest;
@@ -1001,7 +1146,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>['application/json'];
-
 
     return apiClient.invokeAPI(
       path,
@@ -1024,17 +1168,26 @@ class FleetApi {
   ///   The ship symbol
   ///
   /// * [PatchShipNavRequest] patchShipNavRequest:
-  Future<GetShipNav200Response?> patchShipNav(String shipSymbol, { PatchShipNavRequest? patchShipNavRequest, }) async {
-    final response = await patchShipNavWithHttpInfo(shipSymbol,  patchShipNavRequest: patchShipNavRequest, );
+  Future<GetShipNav200Response?> patchShipNav(
+    String shipSymbol, {
+    PatchShipNavRequest? patchShipNavRequest,
+  }) async {
+    final response = await patchShipNavWithHttpInfo(
+      shipSymbol,
+      patchShipNavRequest: patchShipNavRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetShipNav200Response',) as GetShipNav200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetShipNav200Response',
+      ) as GetShipNav200Response;
     }
     return null;
   }
@@ -1050,10 +1203,13 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [PurchaseCargoRequest] purchaseCargoRequest:
-  Future<Response> purchaseCargoWithHttpInfo(String shipSymbol, { PurchaseCargoRequest? purchaseCargoRequest, }) async {
+  Future<Response> purchaseCargoWithHttpInfo(
+    String shipSymbol, {
+    PurchaseCargoRequest? purchaseCargoRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/purchase'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = purchaseCargoRequest;
@@ -1063,7 +1219,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>['application/json'];
-
 
     return apiClient.invokeAPI(
       path,
@@ -1085,17 +1240,26 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [PurchaseCargoRequest] purchaseCargoRequest:
-  Future<PurchaseCargo201Response?> purchaseCargo(String shipSymbol, { PurchaseCargoRequest? purchaseCargoRequest, }) async {
-    final response = await purchaseCargoWithHttpInfo(shipSymbol,  purchaseCargoRequest: purchaseCargoRequest, );
+  Future<PurchaseCargo201Response?> purchaseCargo(
+    String shipSymbol, {
+    PurchaseCargoRequest? purchaseCargoRequest,
+  }) async {
+    final response = await purchaseCargoWithHttpInfo(
+      shipSymbol,
+      purchaseCargoRequest: purchaseCargoRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PurchaseCargo201Response',) as PurchaseCargo201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'PurchaseCargo201Response',
+      ) as PurchaseCargo201Response;
     }
     return null;
   }
@@ -1109,7 +1273,9 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [PurchaseShipRequest] purchaseShipRequest:
-  Future<Response> purchaseShipWithHttpInfo({ PurchaseShipRequest? purchaseShipRequest, }) async {
+  Future<Response> purchaseShipWithHttpInfo({
+    PurchaseShipRequest? purchaseShipRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships';
 
@@ -1122,7 +1288,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -1141,17 +1306,24 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [PurchaseShipRequest] purchaseShipRequest:
-  Future<PurchaseShip201Response?> purchaseShip({ PurchaseShipRequest? purchaseShipRequest, }) async {
-    final response = await purchaseShipWithHttpInfo( purchaseShipRequest: purchaseShipRequest, );
+  Future<PurchaseShip201Response?> purchaseShip({
+    PurchaseShipRequest? purchaseShipRequest,
+  }) async {
+    final response = await purchaseShipWithHttpInfo(
+      purchaseShipRequest: purchaseShipRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PurchaseShip201Response',) as PurchaseShip201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'PurchaseShip201Response',
+      ) as PurchaseShip201Response;
     }
     return null;
   }
@@ -1165,10 +1337,12 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<Response> refuelShipWithHttpInfo(String shipSymbol,) async {
+  Future<Response> refuelShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/refuel'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/refuel'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -1179,7 +1353,6 @@ class FleetApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -1198,17 +1371,24 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  Future<RefuelShip200Response?> refuelShip(String shipSymbol,) async {
-    final response = await refuelShipWithHttpInfo(shipSymbol,);
+  Future<RefuelShip200Response?> refuelShip(
+    String shipSymbol,
+  ) async {
+    final response = await refuelShipWithHttpInfo(
+      shipSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'RefuelShip200Response',) as RefuelShip200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'RefuelShip200Response',
+      ) as RefuelShip200Response;
     }
     return null;
   }
@@ -1224,10 +1404,13 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [SellCargoRequest] sellCargoRequest:
-  Future<Response> sellCargoWithHttpInfo(String shipSymbol, { SellCargoRequest? sellCargoRequest, }) async {
+  Future<Response> sellCargoWithHttpInfo(
+    String shipSymbol, {
+    SellCargoRequest? sellCargoRequest,
+  }) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/sell'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/sell'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = sellCargoRequest;
@@ -1238,7 +1421,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -1259,17 +1441,26 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [SellCargoRequest] sellCargoRequest:
-  Future<SellCargo201Response?> sellCargo(String shipSymbol, { SellCargoRequest? sellCargoRequest, }) async {
-    final response = await sellCargoWithHttpInfo(shipSymbol,  sellCargoRequest: sellCargoRequest, );
+  Future<SellCargo201Response?> sellCargo(
+    String shipSymbol, {
+    SellCargoRequest? sellCargoRequest,
+  }) async {
+    final response = await sellCargoWithHttpInfo(
+      shipSymbol,
+      sellCargoRequest: sellCargoRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SellCargo201Response',) as SellCargo201Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'SellCargo201Response',
+      ) as SellCargo201Response;
     }
     return null;
   }
@@ -1286,10 +1477,13 @@ class FleetApi {
   ///   The symbol of the ship
   ///
   /// * [ShipRefineRequest] shipRefineRequest:
-  Future<Response> shipRefineWithHttpInfo(String shipSymbol, { ShipRefineRequest? shipRefineRequest, }) async {
+  Future<Response> shipRefineWithHttpInfo(
+    String shipSymbol, {
+    ShipRefineRequest? shipRefineRequest,
+  }) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/refine'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/refine'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = shipRefineRequest;
@@ -1300,7 +1494,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -1322,17 +1515,26 @@ class FleetApi {
   ///   The symbol of the ship
   ///
   /// * [ShipRefineRequest] shipRefineRequest:
-  Future<ShipRefine200Response?> shipRefine(String shipSymbol, { ShipRefineRequest? shipRefineRequest, }) async {
-    final response = await shipRefineWithHttpInfo(shipSymbol,  shipRefineRequest: shipRefineRequest, );
+  Future<ShipRefine200Response?> shipRefine(
+    String shipSymbol, {
+    ShipRefineRequest? shipRefineRequest,
+  }) async {
+    final response = await shipRefineWithHttpInfo(
+      shipSymbol,
+      shipRefineRequest: shipRefineRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ShipRefine200Response',) as ShipRefine200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ShipRefine200Response',
+      ) as ShipRefine200Response;
     }
     return null;
   }
@@ -1348,10 +1550,13 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [TransferCargoRequest] transferCargoRequest:
-  Future<Response> transferCargoWithHttpInfo(String shipSymbol, { TransferCargoRequest? transferCargoRequest, }) async {
+  Future<Response> transferCargoWithHttpInfo(
+    String shipSymbol, {
+    TransferCargoRequest? transferCargoRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/transfer'
-      .replaceAll('{shipSymbol}', shipSymbol);
+        .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = transferCargoRequest;
@@ -1362,7 +1567,6 @@ class FleetApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -1383,17 +1587,26 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [TransferCargoRequest] transferCargoRequest:
-  Future<TransferCargo200Response?> transferCargo(String shipSymbol, { TransferCargoRequest? transferCargoRequest, }) async {
-    final response = await transferCargoWithHttpInfo(shipSymbol,  transferCargoRequest: transferCargoRequest, );
+  Future<TransferCargo200Response?> transferCargo(
+    String shipSymbol, {
+    TransferCargoRequest? transferCargoRequest,
+  }) async {
+    final response = await transferCargoWithHttpInfo(
+      shipSymbol,
+      transferCargoRequest: transferCargoRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'TransferCargo200Response',) as TransferCargo200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'TransferCargo200Response',
+      ) as TransferCargo200Response;
     }
     return null;
   }
@@ -1409,11 +1622,14 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
-  ///   
-  Future<Response> warpShipWithHttpInfo(String shipSymbol, { NavigateShipRequest? navigateShipRequest, }) async {
+  ///
+  Future<Response> warpShipWithHttpInfo(
+    String shipSymbol, {
+    NavigateShipRequest? navigateShipRequest,
+  }) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/ships/{shipSymbol}/warp'
-      .replaceAll('{shipSymbol}', shipSymbol);
+    final path =
+        r'/my/ships/{shipSymbol}/warp'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody = navigateShipRequest;
@@ -1423,7 +1639,6 @@ class FleetApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>['application/json'];
-
 
     return apiClient.invokeAPI(
       path,
@@ -1445,18 +1660,27 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
-  ///   
-  Future<NavigateShip200Response?> warpShip(String shipSymbol, { NavigateShipRequest? navigateShipRequest, }) async {
-    final response = await warpShipWithHttpInfo(shipSymbol,  navigateShipRequest: navigateShipRequest, );
+  ///
+  Future<NavigateShip200Response?> warpShip(
+    String shipSymbol, {
+    NavigateShipRequest? navigateShipRequest,
+  }) async {
+    final response = await warpShipWithHttpInfo(
+      shipSymbol,
+      navigateShipRequest: navigateShipRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'NavigateShip200Response',) as NavigateShip200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'NavigateShip200Response',
+      ) as NavigateShip200Response;
     }
     return null;
   }

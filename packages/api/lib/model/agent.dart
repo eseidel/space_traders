@@ -30,29 +30,32 @@ class Agent {
   int credits;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Agent &&
-     other.accountId == accountId &&
-     other.symbol == symbol &&
-     other.headquarters == headquarters &&
-     other.credits == credits;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Agent &&
+          other.accountId == accountId &&
+          other.symbol == symbol &&
+          other.headquarters == headquarters &&
+          other.credits == credits;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (accountId.hashCode) +
-    (symbol.hashCode) +
-    (headquarters.hashCode) +
-    (credits.hashCode);
+      // ignore: unnecessary_parenthesis
+      (accountId.hashCode) +
+      (symbol.hashCode) +
+      (headquarters.hashCode) +
+      (credits.hashCode);
 
   @override
-  String toString() => 'Agent[accountId=$accountId, symbol=$symbol, headquarters=$headquarters, credits=$credits]';
+  String toString() =>
+      'Agent[accountId=$accountId, symbol=$symbol, headquarters=$headquarters, credits=$credits]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'accountId'] = this.accountId;
-      json[r'symbol'] = this.symbol;
-      json[r'headquarters'] = this.headquarters;
-      json[r'credits'] = this.credits;
+    json[r'accountId'] = this.accountId;
+    json[r'symbol'] = this.symbol;
+    json[r'headquarters'] = this.headquarters;
+    json[r'credits'] = this.credits;
     return json;
   }
 
@@ -68,8 +71,10 @@ class Agent {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Agent[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Agent[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Agent[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Agent[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -84,7 +89,10 @@ class Agent {
     return null;
   }
 
-  static List<Agent>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Agent>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Agent>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -112,12 +120,18 @@ class Agent {
   }
 
   // maps a json object with a list of Agent-objects as value to a dart map
-  static Map<String, List<Agent>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Agent>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Agent>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Agent.listFromJson(entry.value, growable: growable,);
+        final value = Agent.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -134,4 +148,3 @@ class Agent {
     'credits',
   };
 }
-

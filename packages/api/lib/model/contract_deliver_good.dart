@@ -32,29 +32,32 @@ class ContractDeliverGood {
   int unitsFulfilled;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ContractDeliverGood &&
-     other.tradeSymbol == tradeSymbol &&
-     other.destinationSymbol == destinationSymbol &&
-     other.unitsRequired == unitsRequired &&
-     other.unitsFulfilled == unitsFulfilled;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ContractDeliverGood &&
+          other.tradeSymbol == tradeSymbol &&
+          other.destinationSymbol == destinationSymbol &&
+          other.unitsRequired == unitsRequired &&
+          other.unitsFulfilled == unitsFulfilled;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (tradeSymbol.hashCode) +
-    (destinationSymbol.hashCode) +
-    (unitsRequired.hashCode) +
-    (unitsFulfilled.hashCode);
+      // ignore: unnecessary_parenthesis
+      (tradeSymbol.hashCode) +
+      (destinationSymbol.hashCode) +
+      (unitsRequired.hashCode) +
+      (unitsFulfilled.hashCode);
 
   @override
-  String toString() => 'ContractDeliverGood[tradeSymbol=$tradeSymbol, destinationSymbol=$destinationSymbol, unitsRequired=$unitsRequired, unitsFulfilled=$unitsFulfilled]';
+  String toString() =>
+      'ContractDeliverGood[tradeSymbol=$tradeSymbol, destinationSymbol=$destinationSymbol, unitsRequired=$unitsRequired, unitsFulfilled=$unitsFulfilled]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'tradeSymbol'] = this.tradeSymbol;
-      json[r'destinationSymbol'] = this.destinationSymbol;
-      json[r'unitsRequired'] = this.unitsRequired;
-      json[r'unitsFulfilled'] = this.unitsFulfilled;
+    json[r'tradeSymbol'] = this.tradeSymbol;
+    json[r'destinationSymbol'] = this.destinationSymbol;
+    json[r'unitsRequired'] = this.unitsRequired;
+    json[r'unitsFulfilled'] = this.unitsFulfilled;
     return json;
   }
 
@@ -70,8 +73,10 @@ class ContractDeliverGood {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ContractDeliverGood[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ContractDeliverGood[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ContractDeliverGood[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ContractDeliverGood[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -86,7 +91,10 @@ class ContractDeliverGood {
     return null;
   }
 
-  static List<ContractDeliverGood>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ContractDeliverGood>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ContractDeliverGood>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -114,12 +122,18 @@ class ContractDeliverGood {
   }
 
   // maps a json object with a list of ContractDeliverGood-objects as value to a dart map
-  static Map<String, List<ContractDeliverGood>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ContractDeliverGood>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ContractDeliverGood>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ContractDeliverGood.listFromJson(entry.value, growable: growable,);
+        final value = ContractDeliverGood.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -136,4 +150,3 @@ class ContractDeliverGood {
     'unitsFulfilled',
   };
 }
-

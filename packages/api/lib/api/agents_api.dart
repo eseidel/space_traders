@@ -10,7 +10,6 @@
 
 part of space_traders_api;
 
-
 class AgentsApi {
   AgentsApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
@@ -34,7 +33,6 @@ class AgentsApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'GET',
@@ -57,9 +55,12 @@ class AgentsApi {
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetMyAgent200Response',) as GetMyAgent200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMyAgent200Response',
+      ) as GetMyAgent200Response;
     }
     return null;
   }

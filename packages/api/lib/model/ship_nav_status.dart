@@ -34,9 +34,13 @@ class ShipNavStatus {
     DOCKED,
   ];
 
-  static ShipNavStatus? fromJson(dynamic value) => ShipNavStatusTypeTransformer().decode(value);
+  static ShipNavStatus? fromJson(dynamic value) =>
+      ShipNavStatusTypeTransformer().decode(value);
 
-  static List<ShipNavStatus>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipNavStatus>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipNavStatus>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -53,7 +57,8 @@ class ShipNavStatus {
 /// Transformation class that can [encode] an instance of [ShipNavStatus] to String,
 /// and [decode] dynamic data back to [ShipNavStatus].
 class ShipNavStatusTypeTransformer {
-  factory ShipNavStatusTypeTransformer() => _instance ??= const ShipNavStatusTypeTransformer._();
+  factory ShipNavStatusTypeTransformer() =>
+      _instance ??= const ShipNavStatusTypeTransformer._();
 
   const ShipNavStatusTypeTransformer._();
 
@@ -70,9 +75,12 @@ class ShipNavStatusTypeTransformer {
   ShipNavStatus? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'IN_TRANSIT': return ShipNavStatus.IN_TRANSIT;
-        case r'IN_ORBIT': return ShipNavStatus.IN_ORBIT;
-        case r'DOCKED': return ShipNavStatus.DOCKED;
+        case r'IN_TRANSIT':
+          return ShipNavStatus.IN_TRANSIT;
+        case r'IN_ORBIT':
+          return ShipNavStatus.IN_ORBIT;
+        case r'DOCKED':
+          return ShipNavStatus.DOCKED;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -85,4 +93,3 @@ class ShipNavStatusTypeTransformer {
   /// Singleton [ShipNavStatusTypeTransformer] instance.
   static ShipNavStatusTypeTransformer? _instance;
 }
-

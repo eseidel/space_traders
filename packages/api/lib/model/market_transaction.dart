@@ -54,41 +54,44 @@ class MarketTransaction {
   DateTime timestamp;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is MarketTransaction &&
-     other.waypointSymbol == waypointSymbol &&
-     other.shipSymbol == shipSymbol &&
-     other.tradeSymbol == tradeSymbol &&
-     other.type == type &&
-     other.units == units &&
-     other.pricePerUnit == pricePerUnit &&
-     other.totalPrice == totalPrice &&
-     other.timestamp == timestamp;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MarketTransaction &&
+          other.waypointSymbol == waypointSymbol &&
+          other.shipSymbol == shipSymbol &&
+          other.tradeSymbol == tradeSymbol &&
+          other.type == type &&
+          other.units == units &&
+          other.pricePerUnit == pricePerUnit &&
+          other.totalPrice == totalPrice &&
+          other.timestamp == timestamp;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (waypointSymbol.hashCode) +
-    (shipSymbol.hashCode) +
-    (tradeSymbol.hashCode) +
-    (type.hashCode) +
-    (units.hashCode) +
-    (pricePerUnit.hashCode) +
-    (totalPrice.hashCode) +
-    (timestamp.hashCode);
+      // ignore: unnecessary_parenthesis
+      (waypointSymbol.hashCode) +
+      (shipSymbol.hashCode) +
+      (tradeSymbol.hashCode) +
+      (type.hashCode) +
+      (units.hashCode) +
+      (pricePerUnit.hashCode) +
+      (totalPrice.hashCode) +
+      (timestamp.hashCode);
 
   @override
-  String toString() => 'MarketTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, tradeSymbol=$tradeSymbol, type=$type, units=$units, pricePerUnit=$pricePerUnit, totalPrice=$totalPrice, timestamp=$timestamp]';
+  String toString() =>
+      'MarketTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, tradeSymbol=$tradeSymbol, type=$type, units=$units, pricePerUnit=$pricePerUnit, totalPrice=$totalPrice, timestamp=$timestamp]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'waypointSymbol'] = this.waypointSymbol;
-      json[r'shipSymbol'] = this.shipSymbol;
-      json[r'tradeSymbol'] = this.tradeSymbol;
-      json[r'type'] = this.type;
-      json[r'units'] = this.units;
-      json[r'pricePerUnit'] = this.pricePerUnit;
-      json[r'totalPrice'] = this.totalPrice;
-      json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
+    json[r'waypointSymbol'] = this.waypointSymbol;
+    json[r'shipSymbol'] = this.shipSymbol;
+    json[r'tradeSymbol'] = this.tradeSymbol;
+    json[r'type'] = this.type;
+    json[r'units'] = this.units;
+    json[r'pricePerUnit'] = this.pricePerUnit;
+    json[r'totalPrice'] = this.totalPrice;
+    json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
     return json;
   }
 
@@ -104,8 +107,10 @@ class MarketTransaction {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "MarketTransaction[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "MarketTransaction[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "MarketTransaction[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "MarketTransaction[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -124,7 +129,10 @@ class MarketTransaction {
     return null;
   }
 
-  static List<MarketTransaction>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<MarketTransaction>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <MarketTransaction>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -152,12 +160,18 @@ class MarketTransaction {
   }
 
   // maps a json object with a list of MarketTransaction-objects as value to a dart map
-  static Map<String, List<MarketTransaction>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<MarketTransaction>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<MarketTransaction>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = MarketTransaction.listFromJson(entry.value, growable: growable,);
+        final value = MarketTransaction.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -201,9 +215,13 @@ class MarketTransactionTypeEnum {
     SELL,
   ];
 
-  static MarketTransactionTypeEnum? fromJson(dynamic value) => MarketTransactionTypeEnumTypeTransformer().decode(value);
+  static MarketTransactionTypeEnum? fromJson(dynamic value) =>
+      MarketTransactionTypeEnumTypeTransformer().decode(value);
 
-  static List<MarketTransactionTypeEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<MarketTransactionTypeEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <MarketTransactionTypeEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -220,7 +238,8 @@ class MarketTransactionTypeEnum {
 /// Transformation class that can [encode] an instance of [MarketTransactionTypeEnum] to String,
 /// and [decode] dynamic data back to [MarketTransactionTypeEnum].
 class MarketTransactionTypeEnumTypeTransformer {
-  factory MarketTransactionTypeEnumTypeTransformer() => _instance ??= const MarketTransactionTypeEnumTypeTransformer._();
+  factory MarketTransactionTypeEnumTypeTransformer() =>
+      _instance ??= const MarketTransactionTypeEnumTypeTransformer._();
 
   const MarketTransactionTypeEnumTypeTransformer._();
 
@@ -237,8 +256,10 @@ class MarketTransactionTypeEnumTypeTransformer {
   MarketTransactionTypeEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'PURCHASE': return MarketTransactionTypeEnum.PURCHASE;
-        case r'SELL': return MarketTransactionTypeEnum.SELL;
+        case r'PURCHASE':
+          return MarketTransactionTypeEnum.PURCHASE;
+        case r'SELL':
+          return MarketTransactionTypeEnum.SELL;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -251,5 +272,3 @@ class MarketTransactionTypeEnumTypeTransformer {
   /// Singleton [MarketTransactionTypeEnumTypeTransformer] instance.
   static MarketTransactionTypeEnumTypeTransformer? _instance;
 }
-
-

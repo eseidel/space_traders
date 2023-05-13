@@ -47,31 +47,34 @@ class ShipMount {
   ShipRequirements requirements;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipMount &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description &&
-     other.strength == strength &&
-     other.deposits == deposits &&
-     other.requirements == requirements;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipMount &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description &&
+          other.strength == strength &&
+          other.deposits == deposits &&
+          other.requirements == requirements;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description == null ? 0 : description!.hashCode) +
-    (strength == null ? 0 : strength!.hashCode) +
-    (deposits.hashCode) +
-    (requirements.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (name.hashCode) +
+      (description == null ? 0 : description!.hashCode) +
+      (strength == null ? 0 : strength!.hashCode) +
+      (deposits.hashCode) +
+      (requirements.hashCode);
 
   @override
-  String toString() => 'ShipMount[symbol=$symbol, name=$name, description=$description, strength=$strength, deposits=$deposits, requirements=$requirements]';
+  String toString() =>
+      'ShipMount[symbol=$symbol, name=$name, description=$description, strength=$strength, deposits=$deposits, requirements=$requirements]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
     if (this.description != null) {
       json[r'description'] = this.description;
     } else {
@@ -82,8 +85,8 @@ class ShipMount {
     } else {
       json[r'strength'] = null;
     }
-      json[r'deposits'] = this.deposits;
-      json[r'requirements'] = this.requirements;
+    json[r'deposits'] = this.deposits;
+    json[r'requirements'] = this.requirements;
     return json;
   }
 
@@ -99,8 +102,10 @@ class ShipMount {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipMount[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipMount[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipMount[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipMount[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -110,14 +115,18 @@ class ShipMount {
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description'),
         strength: mapValueOfType<int>(json, r'strength'),
-        deposits: ShipMountDepositsEnum.listFromJson(json[r'deposits']) ?? const [],
+        deposits:
+            ShipMountDepositsEnum.listFromJson(json[r'deposits']) ?? const [],
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
       );
     }
     return null;
   }
 
-  static List<ShipMount>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipMount>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipMount>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -145,12 +154,18 @@ class ShipMount {
   }
 
   // maps a json object with a list of ShipMount-objects as value to a dart map
-  static Map<String, List<ShipMount>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipMount>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipMount>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipMount.listFromJson(entry.value, growable: growable,);
+        final value = ShipMount.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -166,7 +181,6 @@ class ShipMount {
     'requirements',
   };
 }
-
 
 class ShipMountSymbolEnum {
   /// Instantiate a new enum with the provided [value].
@@ -187,13 +201,18 @@ class ShipMountSymbolEnum {
   static const SURVEYOR_II = ShipMountSymbolEnum._(r'MOUNT_SURVEYOR_II');
   static const SURVEYOR_III = ShipMountSymbolEnum._(r'MOUNT_SURVEYOR_III');
   static const SENSOR_ARRAY_I = ShipMountSymbolEnum._(r'MOUNT_SENSOR_ARRAY_I');
-  static const SENSOR_ARRAY_II = ShipMountSymbolEnum._(r'MOUNT_SENSOR_ARRAY_II');
-  static const SENSOR_ARRAY_III = ShipMountSymbolEnum._(r'MOUNT_SENSOR_ARRAY_III');
+  static const SENSOR_ARRAY_II =
+      ShipMountSymbolEnum._(r'MOUNT_SENSOR_ARRAY_II');
+  static const SENSOR_ARRAY_III =
+      ShipMountSymbolEnum._(r'MOUNT_SENSOR_ARRAY_III');
   static const MINING_LASER_I = ShipMountSymbolEnum._(r'MOUNT_MINING_LASER_I');
-  static const MINING_LASER_II = ShipMountSymbolEnum._(r'MOUNT_MINING_LASER_II');
-  static const MINING_LASER_III = ShipMountSymbolEnum._(r'MOUNT_MINING_LASER_III');
+  static const MINING_LASER_II =
+      ShipMountSymbolEnum._(r'MOUNT_MINING_LASER_II');
+  static const MINING_LASER_III =
+      ShipMountSymbolEnum._(r'MOUNT_MINING_LASER_III');
   static const LASER_CANNON_I = ShipMountSymbolEnum._(r'MOUNT_LASER_CANNON_I');
-  static const MISSILE_LAUNCHER_I = ShipMountSymbolEnum._(r'MOUNT_MISSILE_LAUNCHER_I');
+  static const MISSILE_LAUNCHER_I =
+      ShipMountSymbolEnum._(r'MOUNT_MISSILE_LAUNCHER_I');
   static const TURRET_I = ShipMountSymbolEnum._(r'MOUNT_TURRET_I');
 
   /// List of all possible values in this [enum][ShipMountSymbolEnum].
@@ -215,9 +234,13 @@ class ShipMountSymbolEnum {
     TURRET_I,
   ];
 
-  static ShipMountSymbolEnum? fromJson(dynamic value) => ShipMountSymbolEnumTypeTransformer().decode(value);
+  static ShipMountSymbolEnum? fromJson(dynamic value) =>
+      ShipMountSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipMountSymbolEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipMountSymbolEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipMountSymbolEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -234,7 +257,8 @@ class ShipMountSymbolEnum {
 /// Transformation class that can [encode] an instance of [ShipMountSymbolEnum] to String,
 /// and [decode] dynamic data back to [ShipMountSymbolEnum].
 class ShipMountSymbolEnumTypeTransformer {
-  factory ShipMountSymbolEnumTypeTransformer() => _instance ??= const ShipMountSymbolEnumTypeTransformer._();
+  factory ShipMountSymbolEnumTypeTransformer() =>
+      _instance ??= const ShipMountSymbolEnumTypeTransformer._();
 
   const ShipMountSymbolEnumTypeTransformer._();
 
@@ -251,21 +275,36 @@ class ShipMountSymbolEnumTypeTransformer {
   ShipMountSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'MOUNT_GAS_SIPHON_I': return ShipMountSymbolEnum.GAS_SIPHON_I;
-        case r'MOUNT_GAS_SIPHON_II': return ShipMountSymbolEnum.GAS_SIPHON_II;
-        case r'MOUNT_GAS_SIPHON_III': return ShipMountSymbolEnum.GAS_SIPHON_III;
-        case r'MOUNT_SURVEYOR_I': return ShipMountSymbolEnum.SURVEYOR_I;
-        case r'MOUNT_SURVEYOR_II': return ShipMountSymbolEnum.SURVEYOR_II;
-        case r'MOUNT_SURVEYOR_III': return ShipMountSymbolEnum.SURVEYOR_III;
-        case r'MOUNT_SENSOR_ARRAY_I': return ShipMountSymbolEnum.SENSOR_ARRAY_I;
-        case r'MOUNT_SENSOR_ARRAY_II': return ShipMountSymbolEnum.SENSOR_ARRAY_II;
-        case r'MOUNT_SENSOR_ARRAY_III': return ShipMountSymbolEnum.SENSOR_ARRAY_III;
-        case r'MOUNT_MINING_LASER_I': return ShipMountSymbolEnum.MINING_LASER_I;
-        case r'MOUNT_MINING_LASER_II': return ShipMountSymbolEnum.MINING_LASER_II;
-        case r'MOUNT_MINING_LASER_III': return ShipMountSymbolEnum.MINING_LASER_III;
-        case r'MOUNT_LASER_CANNON_I': return ShipMountSymbolEnum.LASER_CANNON_I;
-        case r'MOUNT_MISSILE_LAUNCHER_I': return ShipMountSymbolEnum.MISSILE_LAUNCHER_I;
-        case r'MOUNT_TURRET_I': return ShipMountSymbolEnum.TURRET_I;
+        case r'MOUNT_GAS_SIPHON_I':
+          return ShipMountSymbolEnum.GAS_SIPHON_I;
+        case r'MOUNT_GAS_SIPHON_II':
+          return ShipMountSymbolEnum.GAS_SIPHON_II;
+        case r'MOUNT_GAS_SIPHON_III':
+          return ShipMountSymbolEnum.GAS_SIPHON_III;
+        case r'MOUNT_SURVEYOR_I':
+          return ShipMountSymbolEnum.SURVEYOR_I;
+        case r'MOUNT_SURVEYOR_II':
+          return ShipMountSymbolEnum.SURVEYOR_II;
+        case r'MOUNT_SURVEYOR_III':
+          return ShipMountSymbolEnum.SURVEYOR_III;
+        case r'MOUNT_SENSOR_ARRAY_I':
+          return ShipMountSymbolEnum.SENSOR_ARRAY_I;
+        case r'MOUNT_SENSOR_ARRAY_II':
+          return ShipMountSymbolEnum.SENSOR_ARRAY_II;
+        case r'MOUNT_SENSOR_ARRAY_III':
+          return ShipMountSymbolEnum.SENSOR_ARRAY_III;
+        case r'MOUNT_MINING_LASER_I':
+          return ShipMountSymbolEnum.MINING_LASER_I;
+        case r'MOUNT_MINING_LASER_II':
+          return ShipMountSymbolEnum.MINING_LASER_II;
+        case r'MOUNT_MINING_LASER_III':
+          return ShipMountSymbolEnum.MINING_LASER_III;
+        case r'MOUNT_LASER_CANNON_I':
+          return ShipMountSymbolEnum.LASER_CANNON_I;
+        case r'MOUNT_MISSILE_LAUNCHER_I':
+          return ShipMountSymbolEnum.MISSILE_LAUNCHER_I;
+        case r'MOUNT_TURRET_I':
+          return ShipMountSymbolEnum.TURRET_I;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -278,8 +317,6 @@ class ShipMountSymbolEnumTypeTransformer {
   /// Singleton [ShipMountSymbolEnumTypeTransformer] instance.
   static ShipMountSymbolEnumTypeTransformer? _instance;
 }
-
-
 
 class ShipMountDepositsEnum {
   /// Instantiate a new enum with the provided [value].
@@ -326,9 +363,13 @@ class ShipMountDepositsEnum {
     MERITIUM_ORE,
   ];
 
-  static ShipMountDepositsEnum? fromJson(dynamic value) => ShipMountDepositsEnumTypeTransformer().decode(value);
+  static ShipMountDepositsEnum? fromJson(dynamic value) =>
+      ShipMountDepositsEnumTypeTransformer().decode(value);
 
-  static List<ShipMountDepositsEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipMountDepositsEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipMountDepositsEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -345,7 +386,8 @@ class ShipMountDepositsEnum {
 /// Transformation class that can [encode] an instance of [ShipMountDepositsEnum] to String,
 /// and [decode] dynamic data back to [ShipMountDepositsEnum].
 class ShipMountDepositsEnumTypeTransformer {
-  factory ShipMountDepositsEnumTypeTransformer() => _instance ??= const ShipMountDepositsEnumTypeTransformer._();
+  factory ShipMountDepositsEnumTypeTransformer() =>
+      _instance ??= const ShipMountDepositsEnumTypeTransformer._();
 
   const ShipMountDepositsEnumTypeTransformer._();
 
@@ -362,20 +404,34 @@ class ShipMountDepositsEnumTypeTransformer {
   ShipMountDepositsEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'QUARTZ_SAND': return ShipMountDepositsEnum.QUARTZ_SAND;
-        case r'SILICON_CRYSTALS': return ShipMountDepositsEnum.SILICON_CRYSTALS;
-        case r'PRECIOUS_STONES': return ShipMountDepositsEnum.PRECIOUS_STONES;
-        case r'ICE_WATER': return ShipMountDepositsEnum.ICE_WATER;
-        case r'AMMONIA_ICE': return ShipMountDepositsEnum.AMMONIA_ICE;
-        case r'IRON_ORE': return ShipMountDepositsEnum.IRON_ORE;
-        case r'COPPER_ORE': return ShipMountDepositsEnum.COPPER_ORE;
-        case r'SILVER_ORE': return ShipMountDepositsEnum.SILVER_ORE;
-        case r'ALUMINUM_ORE': return ShipMountDepositsEnum.ALUMINUM_ORE;
-        case r'GOLD_ORE': return ShipMountDepositsEnum.GOLD_ORE;
-        case r'PLATINUM_ORE': return ShipMountDepositsEnum.PLATINUM_ORE;
-        case r'DIAMONDS': return ShipMountDepositsEnum.DIAMONDS;
-        case r'URANITE_ORE': return ShipMountDepositsEnum.URANITE_ORE;
-        case r'MERITIUM_ORE': return ShipMountDepositsEnum.MERITIUM_ORE;
+        case r'QUARTZ_SAND':
+          return ShipMountDepositsEnum.QUARTZ_SAND;
+        case r'SILICON_CRYSTALS':
+          return ShipMountDepositsEnum.SILICON_CRYSTALS;
+        case r'PRECIOUS_STONES':
+          return ShipMountDepositsEnum.PRECIOUS_STONES;
+        case r'ICE_WATER':
+          return ShipMountDepositsEnum.ICE_WATER;
+        case r'AMMONIA_ICE':
+          return ShipMountDepositsEnum.AMMONIA_ICE;
+        case r'IRON_ORE':
+          return ShipMountDepositsEnum.IRON_ORE;
+        case r'COPPER_ORE':
+          return ShipMountDepositsEnum.COPPER_ORE;
+        case r'SILVER_ORE':
+          return ShipMountDepositsEnum.SILVER_ORE;
+        case r'ALUMINUM_ORE':
+          return ShipMountDepositsEnum.ALUMINUM_ORE;
+        case r'GOLD_ORE':
+          return ShipMountDepositsEnum.GOLD_ORE;
+        case r'PLATINUM_ORE':
+          return ShipMountDepositsEnum.PLATINUM_ORE;
+        case r'DIAMONDS':
+          return ShipMountDepositsEnum.DIAMONDS;
+        case r'URANITE_ORE':
+          return ShipMountDepositsEnum.URANITE_ORE;
+        case r'MERITIUM_ORE':
+          return ShipMountDepositsEnum.MERITIUM_ORE;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -388,5 +444,3 @@ class ShipMountDepositsEnumTypeTransformer {
   /// Singleton [ShipMountDepositsEnumTypeTransformer] instance.
   static ShipMountDepositsEnumTypeTransformer? _instance;
 }
-
-

@@ -31,32 +31,35 @@ class Faction {
   List<FactionTrait> traits;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Faction &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description &&
-     other.headquarters == headquarters &&
-     other.traits == traits;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Faction &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description &&
+          other.headquarters == headquarters &&
+          other.traits == traits;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description.hashCode) +
-    (headquarters.hashCode) +
-    (traits.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (name.hashCode) +
+      (description.hashCode) +
+      (headquarters.hashCode) +
+      (traits.hashCode);
 
   @override
-  String toString() => 'Faction[symbol=$symbol, name=$name, description=$description, headquarters=$headquarters, traits=$traits]';
+  String toString() =>
+      'Faction[symbol=$symbol, name=$name, description=$description, headquarters=$headquarters, traits=$traits]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
-      json[r'headquarters'] = this.headquarters;
-      json[r'traits'] = this.traits;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
+    json[r'headquarters'] = this.headquarters;
+    json[r'traits'] = this.traits;
     return json;
   }
 
@@ -72,8 +75,10 @@ class Faction {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Faction[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Faction[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Faction[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Faction[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -89,7 +94,10 @@ class Faction {
     return null;
   }
 
-  static List<Faction>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Faction>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Faction>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -117,12 +125,18 @@ class Faction {
   }
 
   // maps a json object with a list of Faction-objects as value to a dart map
-  static Map<String, List<Faction>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Faction>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Faction>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Faction.listFromJson(entry.value, growable: growable,);
+        final value = Faction.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -140,4 +154,3 @@ class Faction {
     'traits',
   };
 }
-

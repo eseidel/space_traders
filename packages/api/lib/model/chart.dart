@@ -43,20 +43,23 @@ class Chart {
   DateTime? submittedOn;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Chart &&
-     other.waypointSymbol == waypointSymbol &&
-     other.submittedBy == submittedBy &&
-     other.submittedOn == submittedOn;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Chart &&
+          other.waypointSymbol == waypointSymbol &&
+          other.submittedBy == submittedBy &&
+          other.submittedOn == submittedOn;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (waypointSymbol == null ? 0 : waypointSymbol!.hashCode) +
-    (submittedBy == null ? 0 : submittedBy!.hashCode) +
-    (submittedOn == null ? 0 : submittedOn!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (waypointSymbol == null ? 0 : waypointSymbol!.hashCode) +
+      (submittedBy == null ? 0 : submittedBy!.hashCode) +
+      (submittedOn == null ? 0 : submittedOn!.hashCode);
 
   @override
-  String toString() => 'Chart[waypointSymbol=$waypointSymbol, submittedBy=$submittedBy, submittedOn=$submittedOn]';
+  String toString() =>
+      'Chart[waypointSymbol=$waypointSymbol, submittedBy=$submittedBy, submittedOn=$submittedOn]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -90,8 +93,10 @@ class Chart {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Chart[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Chart[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Chart[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Chart[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -105,7 +110,10 @@ class Chart {
     return null;
   }
 
-  static List<Chart>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Chart>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Chart>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -133,12 +141,18 @@ class Chart {
   }
 
   // maps a json object with a list of Chart-objects as value to a dart map
-  static Map<String, List<Chart>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Chart>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Chart>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Chart.listFromJson(entry.value, growable: growable,);
+        final value = Chart.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -148,7 +162,5 @@ class Chart {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-  };
+  static const requiredKeys = <String>{};
 }
-

@@ -24,23 +24,24 @@ class RegisterRequest {
   String symbol;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is RegisterRequest &&
-     other.faction == faction &&
-     other.symbol == symbol;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RegisterRequest &&
+          other.faction == faction &&
+          other.symbol == symbol;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (faction.hashCode) +
-    (symbol.hashCode);
+      // ignore: unnecessary_parenthesis
+      (faction.hashCode) + (symbol.hashCode);
 
   @override
   String toString() => 'RegisterRequest[faction=$faction, symbol=$symbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'faction'] = this.faction;
-      json[r'symbol'] = this.symbol;
+    json[r'faction'] = this.faction;
+    json[r'symbol'] = this.symbol;
     return json;
   }
 
@@ -56,8 +57,10 @@ class RegisterRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "RegisterRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "RegisterRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "RegisterRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "RegisterRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -70,7 +73,10 @@ class RegisterRequest {
     return null;
   }
 
-  static List<RegisterRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<RegisterRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <RegisterRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -98,12 +104,18 @@ class RegisterRequest {
   }
 
   // maps a json object with a list of RegisterRequest-objects as value to a dart map
-  static Map<String, List<RegisterRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<RegisterRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<RegisterRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = RegisterRequest.listFromJson(entry.value, growable: growable,);
+        final value = RegisterRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -147,9 +159,13 @@ class RegisterRequestFactionEnum {
     DOMINION,
   ];
 
-  static RegisterRequestFactionEnum? fromJson(dynamic value) => RegisterRequestFactionEnumTypeTransformer().decode(value);
+  static RegisterRequestFactionEnum? fromJson(dynamic value) =>
+      RegisterRequestFactionEnumTypeTransformer().decode(value);
 
-  static List<RegisterRequestFactionEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<RegisterRequestFactionEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <RegisterRequestFactionEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -166,7 +182,8 @@ class RegisterRequestFactionEnum {
 /// Transformation class that can [encode] an instance of [RegisterRequestFactionEnum] to String,
 /// and [decode] dynamic data back to [RegisterRequestFactionEnum].
 class RegisterRequestFactionEnumTypeTransformer {
-  factory RegisterRequestFactionEnumTypeTransformer() => _instance ??= const RegisterRequestFactionEnumTypeTransformer._();
+  factory RegisterRequestFactionEnumTypeTransformer() =>
+      _instance ??= const RegisterRequestFactionEnumTypeTransformer._();
 
   const RegisterRequestFactionEnumTypeTransformer._();
 
@@ -183,11 +200,16 @@ class RegisterRequestFactionEnumTypeTransformer {
   RegisterRequestFactionEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'COSMIC': return RegisterRequestFactionEnum.COSMIC;
-        case r'VOID': return RegisterRequestFactionEnum.VOID;
-        case r'GALACTIC': return RegisterRequestFactionEnum.GALACTIC;
-        case r'QUANTUM': return RegisterRequestFactionEnum.QUANTUM;
-        case r'DOMINION': return RegisterRequestFactionEnum.DOMINION;
+        case r'COSMIC':
+          return RegisterRequestFactionEnum.COSMIC;
+        case r'VOID':
+          return RegisterRequestFactionEnum.VOID;
+        case r'GALACTIC':
+          return RegisterRequestFactionEnum.GALACTIC;
+        case r'QUANTUM':
+          return RegisterRequestFactionEnum.QUANTUM;
+        case r'DOMINION':
+          return RegisterRequestFactionEnum.DOMINION;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -200,5 +222,3 @@ class RegisterRequestFactionEnumTypeTransformer {
   /// Singleton [RegisterRequestFactionEnumTypeTransformer] instance.
   static RegisterRequestFactionEnumTypeTransformer? _instance;
 }
-
-

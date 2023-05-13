@@ -19,20 +19,21 @@ class GetWaypoint200Response {
   Waypoint data;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is GetWaypoint200Response &&
-     other.data == data;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GetWaypoint200Response && other.data == data;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (data.hashCode);
+      // ignore: unnecessary_parenthesis
+      (data.hashCode);
 
   @override
   String toString() => 'GetWaypoint200Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'data'] = this.data;
+    json[r'data'] = this.data;
     return json;
   }
 
@@ -48,8 +49,10 @@ class GetWaypoint200Response {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "GetWaypoint200Response[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "GetWaypoint200Response[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "GetWaypoint200Response[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "GetWaypoint200Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class GetWaypoint200Response {
     return null;
   }
 
-  static List<GetWaypoint200Response>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<GetWaypoint200Response>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <GetWaypoint200Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -89,12 +95,18 @@ class GetWaypoint200Response {
   }
 
   // maps a json object with a list of GetWaypoint200Response-objects as value to a dart map
-  static Map<String, List<GetWaypoint200Response>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<GetWaypoint200Response>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<GetWaypoint200Response>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = GetWaypoint200Response.listFromJson(entry.value, growable: growable,);
+        final value = GetWaypoint200Response.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,4 +120,3 @@ class GetWaypoint200Response {
     'data',
   };
 }
-

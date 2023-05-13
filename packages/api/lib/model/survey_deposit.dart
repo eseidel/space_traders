@@ -20,20 +20,21 @@ class SurveyDeposit {
   String symbol;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is SurveyDeposit &&
-     other.symbol == symbol;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SurveyDeposit && other.symbol == symbol;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode);
 
   @override
   String toString() => 'SurveyDeposit[symbol=$symbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
+    json[r'symbol'] = this.symbol;
     return json;
   }
 
@@ -49,8 +50,10 @@ class SurveyDeposit {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "SurveyDeposit[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "SurveyDeposit[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "SurveyDeposit[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "SurveyDeposit[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -62,7 +65,10 @@ class SurveyDeposit {
     return null;
   }
 
-  static List<SurveyDeposit>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<SurveyDeposit>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <SurveyDeposit>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -90,12 +96,18 @@ class SurveyDeposit {
   }
 
   // maps a json object with a list of SurveyDeposit-objects as value to a dart map
-  static Map<String, List<SurveyDeposit>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<SurveyDeposit>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<SurveyDeposit>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = SurveyDeposit.listFromJson(entry.value, growable: growable,);
+        final value = SurveyDeposit.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -109,4 +121,3 @@ class SurveyDeposit {
     'symbol',
   };
 }
-

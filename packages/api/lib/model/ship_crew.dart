@@ -45,35 +45,38 @@ class ShipCrew {
   int wages;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipCrew &&
-     other.current == current &&
-     other.required_ == required_ &&
-     other.capacity == capacity &&
-     other.rotation == rotation &&
-     other.morale == morale &&
-     other.wages == wages;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipCrew &&
+          other.current == current &&
+          other.required_ == required_ &&
+          other.capacity == capacity &&
+          other.rotation == rotation &&
+          other.morale == morale &&
+          other.wages == wages;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (current.hashCode) +
-    (required_.hashCode) +
-    (capacity.hashCode) +
-    (rotation.hashCode) +
-    (morale.hashCode) +
-    (wages.hashCode);
+      // ignore: unnecessary_parenthesis
+      (current.hashCode) +
+      (required_.hashCode) +
+      (capacity.hashCode) +
+      (rotation.hashCode) +
+      (morale.hashCode) +
+      (wages.hashCode);
 
   @override
-  String toString() => 'ShipCrew[current=$current, required_=$required_, capacity=$capacity, rotation=$rotation, morale=$morale, wages=$wages]';
+  String toString() =>
+      'ShipCrew[current=$current, required_=$required_, capacity=$capacity, rotation=$rotation, morale=$morale, wages=$wages]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'current'] = this.current;
-      json[r'required'] = this.required_;
-      json[r'capacity'] = this.capacity;
-      json[r'rotation'] = this.rotation;
-      json[r'morale'] = this.morale;
-      json[r'wages'] = this.wages;
+    json[r'current'] = this.current;
+    json[r'required'] = this.required_;
+    json[r'capacity'] = this.capacity;
+    json[r'rotation'] = this.rotation;
+    json[r'morale'] = this.morale;
+    json[r'wages'] = this.wages;
     return json;
   }
 
@@ -89,8 +92,10 @@ class ShipCrew {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipCrew[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipCrew[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipCrew[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipCrew[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -107,7 +112,10 @@ class ShipCrew {
     return null;
   }
 
-  static List<ShipCrew>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipCrew>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipCrew>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -135,12 +143,18 @@ class ShipCrew {
   }
 
   // maps a json object with a list of ShipCrew-objects as value to a dart map
-  static Map<String, List<ShipCrew>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipCrew>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipCrew>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipCrew.listFromJson(entry.value, growable: growable,);
+        final value = ShipCrew.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -182,9 +196,13 @@ class ShipCrewRotationEnum {
     RELAXED,
   ];
 
-  static ShipCrewRotationEnum? fromJson(dynamic value) => ShipCrewRotationEnumTypeTransformer().decode(value);
+  static ShipCrewRotationEnum? fromJson(dynamic value) =>
+      ShipCrewRotationEnumTypeTransformer().decode(value);
 
-  static List<ShipCrewRotationEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipCrewRotationEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipCrewRotationEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -201,7 +219,8 @@ class ShipCrewRotationEnum {
 /// Transformation class that can [encode] an instance of [ShipCrewRotationEnum] to String,
 /// and [decode] dynamic data back to [ShipCrewRotationEnum].
 class ShipCrewRotationEnumTypeTransformer {
-  factory ShipCrewRotationEnumTypeTransformer() => _instance ??= const ShipCrewRotationEnumTypeTransformer._();
+  factory ShipCrewRotationEnumTypeTransformer() =>
+      _instance ??= const ShipCrewRotationEnumTypeTransformer._();
 
   const ShipCrewRotationEnumTypeTransformer._();
 
@@ -218,8 +237,10 @@ class ShipCrewRotationEnumTypeTransformer {
   ShipCrewRotationEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'STRICT': return ShipCrewRotationEnum.STRICT;
-        case r'RELAXED': return ShipCrewRotationEnum.RELAXED;
+        case r'STRICT':
+          return ShipCrewRotationEnum.STRICT;
+        case r'RELAXED':
+          return ShipCrewRotationEnum.RELAXED;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -232,5 +253,3 @@ class ShipCrewRotationEnumTypeTransformer {
   /// Singleton [ShipCrewRotationEnumTypeTransformer] instance.
   static ShipCrewRotationEnumTypeTransformer? _instance;
 }
-
-

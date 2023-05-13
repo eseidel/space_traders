@@ -32,32 +32,35 @@ class Register201ResponseData {
   String token;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Register201ResponseData &&
-     other.agent == agent &&
-     other.contract == contract &&
-     other.faction == faction &&
-     other.ship == ship &&
-     other.token == token;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Register201ResponseData &&
+          other.agent == agent &&
+          other.contract == contract &&
+          other.faction == faction &&
+          other.ship == ship &&
+          other.token == token;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (agent.hashCode) +
-    (contract.hashCode) +
-    (faction.hashCode) +
-    (ship.hashCode) +
-    (token.hashCode);
+      // ignore: unnecessary_parenthesis
+      (agent.hashCode) +
+      (contract.hashCode) +
+      (faction.hashCode) +
+      (ship.hashCode) +
+      (token.hashCode);
 
   @override
-  String toString() => 'Register201ResponseData[agent=$agent, contract=$contract, faction=$faction, ship=$ship, token=$token]';
+  String toString() =>
+      'Register201ResponseData[agent=$agent, contract=$contract, faction=$faction, ship=$ship, token=$token]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'agent'] = this.agent;
-      json[r'contract'] = this.contract;
-      json[r'faction'] = this.faction;
-      json[r'ship'] = this.ship;
-      json[r'token'] = this.token;
+    json[r'agent'] = this.agent;
+    json[r'contract'] = this.contract;
+    json[r'faction'] = this.faction;
+    json[r'ship'] = this.ship;
+    json[r'token'] = this.token;
     return json;
   }
 
@@ -73,8 +76,10 @@ class Register201ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Register201ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Register201ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Register201ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Register201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -90,7 +95,10 @@ class Register201ResponseData {
     return null;
   }
 
-  static List<Register201ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Register201ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Register201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -118,12 +126,18 @@ class Register201ResponseData {
   }
 
   // maps a json object with a list of Register201ResponseData-objects as value to a dart map
-  static Map<String, List<Register201ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Register201ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Register201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Register201ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = Register201ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -141,4 +155,3 @@ class Register201ResponseData {
     'token',
   };
 }
-

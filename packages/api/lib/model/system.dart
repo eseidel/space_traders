@@ -37,38 +37,41 @@ class System {
   List<SystemFaction> factions;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is System &&
-     other.symbol == symbol &&
-     other.sectorSymbol == sectorSymbol &&
-     other.type == type &&
-     other.x == x &&
-     other.y == y &&
-     other.waypoints == waypoints &&
-     other.factions == factions;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is System &&
+          other.symbol == symbol &&
+          other.sectorSymbol == sectorSymbol &&
+          other.type == type &&
+          other.x == x &&
+          other.y == y &&
+          other.waypoints == waypoints &&
+          other.factions == factions;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (sectorSymbol.hashCode) +
-    (type.hashCode) +
-    (x.hashCode) +
-    (y.hashCode) +
-    (waypoints.hashCode) +
-    (factions.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (sectorSymbol.hashCode) +
+      (type.hashCode) +
+      (x.hashCode) +
+      (y.hashCode) +
+      (waypoints.hashCode) +
+      (factions.hashCode);
 
   @override
-  String toString() => 'System[symbol=$symbol, sectorSymbol=$sectorSymbol, type=$type, x=$x, y=$y, waypoints=$waypoints, factions=$factions]';
+  String toString() =>
+      'System[symbol=$symbol, sectorSymbol=$sectorSymbol, type=$type, x=$x, y=$y, waypoints=$waypoints, factions=$factions]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'sectorSymbol'] = this.sectorSymbol;
-      json[r'type'] = this.type;
-      json[r'x'] = this.x;
-      json[r'y'] = this.y;
-      json[r'waypoints'] = this.waypoints;
-      json[r'factions'] = this.factions;
+    json[r'symbol'] = this.symbol;
+    json[r'sectorSymbol'] = this.sectorSymbol;
+    json[r'type'] = this.type;
+    json[r'x'] = this.x;
+    json[r'y'] = this.y;
+    json[r'waypoints'] = this.waypoints;
+    json[r'factions'] = this.factions;
     return json;
   }
 
@@ -84,8 +87,10 @@ class System {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "System[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "System[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "System[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "System[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -103,7 +108,10 @@ class System {
     return null;
   }
 
-  static List<System>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<System>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <System>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -131,12 +139,18 @@ class System {
   }
 
   // maps a json object with a list of System-objects as value to a dart map
-  static Map<String, List<System>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<System>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<System>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = System.listFromJson(entry.value, growable: growable,);
+        final value = System.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -156,4 +170,3 @@ class System {
     'factions',
   };
 }
-

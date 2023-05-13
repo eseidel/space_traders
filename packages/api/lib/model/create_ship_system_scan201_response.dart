@@ -19,20 +19,21 @@ class CreateShipSystemScan201Response {
   CreateShipSystemScan201ResponseData data;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is CreateShipSystemScan201Response &&
-     other.data == data;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateShipSystemScan201Response && other.data == data;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (data.hashCode);
+      // ignore: unnecessary_parenthesis
+      (data.hashCode);
 
   @override
   String toString() => 'CreateShipSystemScan201Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'data'] = this.data;
+    json[r'data'] = this.data;
     return json;
   }
 
@@ -48,8 +49,10 @@ class CreateShipSystemScan201Response {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "CreateShipSystemScan201Response[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "CreateShipSystemScan201Response[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "CreateShipSystemScan201Response[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "CreateShipSystemScan201Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class CreateShipSystemScan201Response {
     return null;
   }
 
-  static List<CreateShipSystemScan201Response>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<CreateShipSystemScan201Response>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <CreateShipSystemScan201Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -74,7 +80,8 @@ class CreateShipSystemScan201Response {
     return result.toList(growable: growable);
   }
 
-  static Map<String, CreateShipSystemScan201Response> mapFromJson(dynamic json) {
+  static Map<String, CreateShipSystemScan201Response> mapFromJson(
+      dynamic json) {
     final map = <String, CreateShipSystemScan201Response>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
@@ -89,12 +96,18 @@ class CreateShipSystemScan201Response {
   }
 
   // maps a json object with a list of CreateShipSystemScan201Response-objects as value to a dart map
-  static Map<String, List<CreateShipSystemScan201Response>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<CreateShipSystemScan201Response>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<CreateShipSystemScan201Response>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = CreateShipSystemScan201Response.listFromJson(entry.value, growable: growable,);
+        final value = CreateShipSystemScan201Response.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,4 +121,3 @@ class CreateShipSystemScan201Response {
     'data',
   };
 }
-

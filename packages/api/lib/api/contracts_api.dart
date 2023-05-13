@@ -10,9 +10,9 @@
 
 part of space_traders_api;
 
-
 class ContractsApi {
-  ContractsApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+  ContractsApi([ApiClient? apiClient])
+      : apiClient = apiClient ?? defaultApiClient;
 
   final ApiClient apiClient;
 
@@ -25,10 +25,12 @@ class ContractsApi {
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  Future<Response> acceptContractWithHttpInfo(String contractId,) async {
+  Future<Response> acceptContractWithHttpInfo(
+    String contractId,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/contracts/{contractId}/accept'
-      .replaceAll('{contractId}', contractId);
+        .replaceAll('{contractId}', contractId);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -38,7 +40,6 @@ class ContractsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -58,17 +59,24 @@ class ContractsApi {
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  Future<AcceptContract200Response?> acceptContract(String contractId,) async {
-    final response = await acceptContractWithHttpInfo(contractId,);
+  Future<AcceptContract200Response?> acceptContract(
+    String contractId,
+  ) async {
+    final response = await acceptContractWithHttpInfo(
+      contractId,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AcceptContract200Response',) as AcceptContract200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'AcceptContract200Response',
+      ) as AcceptContract200Response;
     }
     return null;
   }
@@ -85,10 +93,13 @@ class ContractsApi {
   ///   The ID of the contract
   ///
   /// * [DeliverContractRequest] deliverContractRequest:
-  Future<Response> deliverContractWithHttpInfo(String contractId, { DeliverContractRequest? deliverContractRequest, }) async {
+  Future<Response> deliverContractWithHttpInfo(
+    String contractId, {
+    DeliverContractRequest? deliverContractRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/contracts/{contractId}/deliver'
-      .replaceAll('{contractId}', contractId);
+        .replaceAll('{contractId}', contractId);
 
     // ignore: prefer_final_locals
     Object? postBody = deliverContractRequest;
@@ -99,7 +110,6 @@ class ContractsApi {
 
     const contentTypes = <String>['application/json'];
 
-
     return apiClient.invokeAPI(
       path,
       'POST',
@@ -121,17 +131,26 @@ class ContractsApi {
   ///   The ID of the contract
   ///
   /// * [DeliverContractRequest] deliverContractRequest:
-  Future<DeliverContract200Response?> deliverContract(String contractId, { DeliverContractRequest? deliverContractRequest, }) async {
-    final response = await deliverContractWithHttpInfo(contractId,  deliverContractRequest: deliverContractRequest, );
+  Future<DeliverContract200Response?> deliverContract(
+    String contractId, {
+    DeliverContractRequest? deliverContractRequest,
+  }) async {
+    final response = await deliverContractWithHttpInfo(
+      contractId,
+      deliverContractRequest: deliverContractRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'DeliverContract200Response',) as DeliverContract200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'DeliverContract200Response',
+      ) as DeliverContract200Response;
     }
     return null;
   }
@@ -146,10 +165,12 @@ class ContractsApi {
   ///
   /// * [String] contractId (required):
   ///   The ID of the contract
-  Future<Response> fulfillContractWithHttpInfo(String contractId,) async {
+  Future<Response> fulfillContractWithHttpInfo(
+    String contractId,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/contracts/{contractId}/fulfill'
-      .replaceAll('{contractId}', contractId);
+        .replaceAll('{contractId}', contractId);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -159,7 +180,6 @@ class ContractsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -180,17 +200,24 @@ class ContractsApi {
   ///
   /// * [String] contractId (required):
   ///   The ID of the contract
-  Future<FulfillContract200Response?> fulfillContract(String contractId,) async {
-    final response = await fulfillContractWithHttpInfo(contractId,);
+  Future<FulfillContract200Response?> fulfillContract(
+    String contractId,
+  ) async {
+    final response = await fulfillContractWithHttpInfo(
+      contractId,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'FulfillContract200Response',) as FulfillContract200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'FulfillContract200Response',
+      ) as FulfillContract200Response;
     }
     return null;
   }
@@ -205,10 +232,12 @@ class ContractsApi {
   ///
   /// * [String] contractId (required):
   ///   The contract ID
-  Future<Response> getContractWithHttpInfo(String contractId,) async {
+  Future<Response> getContractWithHttpInfo(
+    String contractId,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/my/contracts/{contractId}'
-      .replaceAll('{contractId}', contractId);
+    final path =
+        r'/my/contracts/{contractId}'.replaceAll('{contractId}', contractId);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -218,7 +247,6 @@ class ContractsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -239,17 +267,24 @@ class ContractsApi {
   ///
   /// * [String] contractId (required):
   ///   The contract ID
-  Future<GetContract200Response?> getContract(String contractId,) async {
-    final response = await getContractWithHttpInfo(contractId,);
+  Future<GetContract200Response?> getContract(
+    String contractId,
+  ) async {
+    final response = await getContractWithHttpInfo(
+      contractId,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetContract200Response',) as GetContract200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetContract200Response',
+      ) as GetContract200Response;
     }
     return null;
   }
@@ -267,7 +302,10 @@ class ContractsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<Response> getContractsWithHttpInfo({ int? page, int? limit, }) async {
+  Future<Response> getContractsWithHttpInfo({
+    int? page,
+    int? limit,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/my/contracts';
 
@@ -287,7 +325,6 @@ class ContractsApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'GET',
@@ -310,17 +347,26 @@ class ContractsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<GetContracts200Response?> getContracts({ int? page, int? limit, }) async {
-    final response = await getContractsWithHttpInfo( page: page, limit: limit, );
+  Future<GetContracts200Response?> getContracts({
+    int? page,
+    int? limit,
+  }) async {
+    final response = await getContractsWithHttpInfo(
+      page: page,
+      limit: limit,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetContracts200Response',) as GetContracts200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetContracts200Response',
+      ) as GetContracts200Response;
     }
     return null;
   }

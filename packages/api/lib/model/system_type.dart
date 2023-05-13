@@ -48,9 +48,13 @@ class SystemType {
     UNSTABLE,
   ];
 
-  static SystemType? fromJson(dynamic value) => SystemTypeTypeTransformer().decode(value);
+  static SystemType? fromJson(dynamic value) =>
+      SystemTypeTypeTransformer().decode(value);
 
-  static List<SystemType>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<SystemType>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <SystemType>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -67,7 +71,8 @@ class SystemType {
 /// Transformation class that can [encode] an instance of [SystemType] to String,
 /// and [decode] dynamic data back to [SystemType].
 class SystemTypeTypeTransformer {
-  factory SystemTypeTypeTransformer() => _instance ??= const SystemTypeTypeTransformer._();
+  factory SystemTypeTypeTransformer() =>
+      _instance ??= const SystemTypeTypeTransformer._();
 
   const SystemTypeTypeTransformer._();
 
@@ -84,16 +89,26 @@ class SystemTypeTypeTransformer {
   SystemType? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'NEUTRON_STAR': return SystemType.NEUTRON_STAR;
-        case r'RED_STAR': return SystemType.RED_STAR;
-        case r'ORANGE_STAR': return SystemType.ORANGE_STAR;
-        case r'BLUE_STAR': return SystemType.BLUE_STAR;
-        case r'YOUNG_STAR': return SystemType.YOUNG_STAR;
-        case r'WHITE_DWARF': return SystemType.WHITE_DWARF;
-        case r'BLACK_HOLE': return SystemType.BLACK_HOLE;
-        case r'HYPERGIANT': return SystemType.HYPERGIANT;
-        case r'NEBULA': return SystemType.NEBULA;
-        case r'UNSTABLE': return SystemType.UNSTABLE;
+        case r'NEUTRON_STAR':
+          return SystemType.NEUTRON_STAR;
+        case r'RED_STAR':
+          return SystemType.RED_STAR;
+        case r'ORANGE_STAR':
+          return SystemType.ORANGE_STAR;
+        case r'BLUE_STAR':
+          return SystemType.BLUE_STAR;
+        case r'YOUNG_STAR':
+          return SystemType.YOUNG_STAR;
+        case r'WHITE_DWARF':
+          return SystemType.WHITE_DWARF;
+        case r'BLACK_HOLE':
+          return SystemType.BLACK_HOLE;
+        case r'HYPERGIANT':
+          return SystemType.HYPERGIANT;
+        case r'NEBULA':
+          return SystemType.NEBULA;
+        case r'UNSTABLE':
+          return SystemType.UNSTABLE;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -106,4 +121,3 @@ class SystemTypeTypeTransformer {
   /// Singleton [SystemTypeTypeTransformer] instance.
   static SystemTypeTypeTransformer? _instance;
 }
-

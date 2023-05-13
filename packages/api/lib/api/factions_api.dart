@@ -10,9 +10,9 @@
 
 part of space_traders_api;
 
-
 class FactionsApi {
-  FactionsApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+  FactionsApi([ApiClient? apiClient])
+      : apiClient = apiClient ?? defaultApiClient;
 
   final ApiClient apiClient;
 
@@ -26,10 +26,12 @@ class FactionsApi {
   ///
   /// * [String] factionSymbol (required):
   ///   The faction symbol
-  Future<Response> getFactionWithHttpInfo(String factionSymbol,) async {
+  Future<Response> getFactionWithHttpInfo(
+    String factionSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/factions/{factionSymbol}'
-      .replaceAll('{factionSymbol}', factionSymbol);
+        .replaceAll('{factionSymbol}', factionSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -39,7 +41,6 @@ class FactionsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -60,17 +61,24 @@ class FactionsApi {
   ///
   /// * [String] factionSymbol (required):
   ///   The faction symbol
-  Future<GetFaction200Response?> getFaction(String factionSymbol,) async {
-    final response = await getFactionWithHttpInfo(factionSymbol,);
+  Future<GetFaction200Response?> getFaction(
+    String factionSymbol,
+  ) async {
+    final response = await getFactionWithHttpInfo(
+      factionSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetFaction200Response',) as GetFaction200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetFaction200Response',
+      ) as GetFaction200Response;
     }
     return null;
   }
@@ -88,7 +96,10 @@ class FactionsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<Response> getFactionsWithHttpInfo({ int? page, int? limit, }) async {
+  Future<Response> getFactionsWithHttpInfo({
+    int? page,
+    int? limit,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/factions';
 
@@ -108,7 +119,6 @@ class FactionsApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'GET',
@@ -131,17 +141,26 @@ class FactionsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<GetFactions200Response?> getFactions({ int? page, int? limit, }) async {
-    final response = await getFactionsWithHttpInfo( page: page, limit: limit, );
+  Future<GetFactions200Response?> getFactions({
+    int? page,
+    int? limit,
+  }) async {
+    final response = await getFactionsWithHttpInfo(
+      page: page,
+      limit: limit,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetFactions200Response',) as GetFactions200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetFactions200Response',
+      ) as GetFactions200Response;
     }
     return null;
   }

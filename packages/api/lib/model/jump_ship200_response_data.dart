@@ -28,22 +28,23 @@ class JumpShip200ResponseData {
   ShipNav? nav;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is JumpShip200ResponseData &&
-     other.cooldown == cooldown &&
-     other.nav == nav;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JumpShip200ResponseData &&
+          other.cooldown == cooldown &&
+          other.nav == nav;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (cooldown.hashCode) +
-    (nav == null ? 0 : nav!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (cooldown.hashCode) + (nav == null ? 0 : nav!.hashCode);
 
   @override
   String toString() => 'JumpShip200ResponseData[cooldown=$cooldown, nav=$nav]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'cooldown'] = this.cooldown;
+    json[r'cooldown'] = this.cooldown;
     if (this.nav != null) {
       json[r'nav'] = this.nav;
     } else {
@@ -64,8 +65,10 @@ class JumpShip200ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "JumpShip200ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "JumpShip200ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "JumpShip200ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "JumpShip200ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -78,7 +81,10 @@ class JumpShip200ResponseData {
     return null;
   }
 
-  static List<JumpShip200ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<JumpShip200ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <JumpShip200ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -106,12 +112,18 @@ class JumpShip200ResponseData {
   }
 
   // maps a json object with a list of JumpShip200ResponseData-objects as value to a dart map
-  static Map<String, List<JumpShip200ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<JumpShip200ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<JumpShip200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = JumpShip200ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = JumpShip200ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -125,4 +137,3 @@ class JumpShip200ResponseData {
     'cooldown',
   };
 }
-

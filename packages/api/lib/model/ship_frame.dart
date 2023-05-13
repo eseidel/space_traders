@@ -53,45 +53,48 @@ class ShipFrame {
   ShipRequirements requirements;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipFrame &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description &&
-     other.condition == condition &&
-     other.moduleSlots == moduleSlots &&
-     other.mountingPoints == mountingPoints &&
-     other.fuelCapacity == fuelCapacity &&
-     other.requirements == requirements;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipFrame &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description &&
+          other.condition == condition &&
+          other.moduleSlots == moduleSlots &&
+          other.mountingPoints == mountingPoints &&
+          other.fuelCapacity == fuelCapacity &&
+          other.requirements == requirements;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description.hashCode) +
-    (condition == null ? 0 : condition!.hashCode) +
-    (moduleSlots.hashCode) +
-    (mountingPoints.hashCode) +
-    (fuelCapacity.hashCode) +
-    (requirements.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (name.hashCode) +
+      (description.hashCode) +
+      (condition == null ? 0 : condition!.hashCode) +
+      (moduleSlots.hashCode) +
+      (mountingPoints.hashCode) +
+      (fuelCapacity.hashCode) +
+      (requirements.hashCode);
 
   @override
-  String toString() => 'ShipFrame[symbol=$symbol, name=$name, description=$description, condition=$condition, moduleSlots=$moduleSlots, mountingPoints=$mountingPoints, fuelCapacity=$fuelCapacity, requirements=$requirements]';
+  String toString() =>
+      'ShipFrame[symbol=$symbol, name=$name, description=$description, condition=$condition, moduleSlots=$moduleSlots, mountingPoints=$mountingPoints, fuelCapacity=$fuelCapacity, requirements=$requirements]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
     if (this.condition != null) {
       json[r'condition'] = this.condition;
     } else {
       json[r'condition'] = null;
     }
-      json[r'moduleSlots'] = this.moduleSlots;
-      json[r'mountingPoints'] = this.mountingPoints;
-      json[r'fuelCapacity'] = this.fuelCapacity;
-      json[r'requirements'] = this.requirements;
+    json[r'moduleSlots'] = this.moduleSlots;
+    json[r'mountingPoints'] = this.mountingPoints;
+    json[r'fuelCapacity'] = this.fuelCapacity;
+    json[r'requirements'] = this.requirements;
     return json;
   }
 
@@ -107,8 +110,10 @@ class ShipFrame {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipFrame[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipFrame[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipFrame[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipFrame[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -127,7 +132,10 @@ class ShipFrame {
     return null;
   }
 
-  static List<ShipFrame>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipFrame>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipFrame>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -155,12 +163,18 @@ class ShipFrame {
   }
 
   // maps a json object with a list of ShipFrame-objects as value to a dart map
-  static Map<String, List<ShipFrame>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipFrame>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipFrame>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipFrame.listFromJson(entry.value, growable: growable,);
+        final value = ShipFrame.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -180,7 +194,6 @@ class ShipFrame {
     'requirements',
   };
 }
-
 
 class ShipFrameSymbolEnum {
   /// Instantiate a new enum with the provided [value].
@@ -203,8 +216,10 @@ class ShipFrameSymbolEnum {
   static const SHUTTLE = ShipFrameSymbolEnum._(r'FRAME_SHUTTLE');
   static const EXPLORER = ShipFrameSymbolEnum._(r'FRAME_EXPLORER');
   static const MINER = ShipFrameSymbolEnum._(r'FRAME_MINER');
-  static const LIGHT_FREIGHTER = ShipFrameSymbolEnum._(r'FRAME_LIGHT_FREIGHTER');
-  static const HEAVY_FREIGHTER = ShipFrameSymbolEnum._(r'FRAME_HEAVY_FREIGHTER');
+  static const LIGHT_FREIGHTER =
+      ShipFrameSymbolEnum._(r'FRAME_LIGHT_FREIGHTER');
+  static const HEAVY_FREIGHTER =
+      ShipFrameSymbolEnum._(r'FRAME_HEAVY_FREIGHTER');
   static const TRANSPORT = ShipFrameSymbolEnum._(r'FRAME_TRANSPORT');
   static const DESTROYER = ShipFrameSymbolEnum._(r'FRAME_DESTROYER');
   static const CRUISER = ShipFrameSymbolEnum._(r'FRAME_CRUISER');
@@ -229,9 +244,13 @@ class ShipFrameSymbolEnum {
     CARRIER,
   ];
 
-  static ShipFrameSymbolEnum? fromJson(dynamic value) => ShipFrameSymbolEnumTypeTransformer().decode(value);
+  static ShipFrameSymbolEnum? fromJson(dynamic value) =>
+      ShipFrameSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipFrameSymbolEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipFrameSymbolEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipFrameSymbolEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -248,7 +267,8 @@ class ShipFrameSymbolEnum {
 /// Transformation class that can [encode] an instance of [ShipFrameSymbolEnum] to String,
 /// and [decode] dynamic data back to [ShipFrameSymbolEnum].
 class ShipFrameSymbolEnumTypeTransformer {
-  factory ShipFrameSymbolEnumTypeTransformer() => _instance ??= const ShipFrameSymbolEnumTypeTransformer._();
+  factory ShipFrameSymbolEnumTypeTransformer() =>
+      _instance ??= const ShipFrameSymbolEnumTypeTransformer._();
 
   const ShipFrameSymbolEnumTypeTransformer._();
 
@@ -265,21 +285,36 @@ class ShipFrameSymbolEnumTypeTransformer {
   ShipFrameSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'FRAME_PROBE': return ShipFrameSymbolEnum.PROBE;
-        case r'FRAME_DRONE': return ShipFrameSymbolEnum.DRONE;
-        case r'FRAME_INTERCEPTOR': return ShipFrameSymbolEnum.INTERCEPTOR;
-        case r'FRAME_RACER': return ShipFrameSymbolEnum.RACER;
-        case r'FRAME_FIGHTER': return ShipFrameSymbolEnum.FIGHTER;
-        case r'FRAME_FRIGATE': return ShipFrameSymbolEnum.FRIGATE;
-        case r'FRAME_SHUTTLE': return ShipFrameSymbolEnum.SHUTTLE;
-        case r'FRAME_EXPLORER': return ShipFrameSymbolEnum.EXPLORER;
-        case r'FRAME_MINER': return ShipFrameSymbolEnum.MINER;
-        case r'FRAME_LIGHT_FREIGHTER': return ShipFrameSymbolEnum.LIGHT_FREIGHTER;
-        case r'FRAME_HEAVY_FREIGHTER': return ShipFrameSymbolEnum.HEAVY_FREIGHTER;
-        case r'FRAME_TRANSPORT': return ShipFrameSymbolEnum.TRANSPORT;
-        case r'FRAME_DESTROYER': return ShipFrameSymbolEnum.DESTROYER;
-        case r'FRAME_CRUISER': return ShipFrameSymbolEnum.CRUISER;
-        case r'FRAME_CARRIER': return ShipFrameSymbolEnum.CARRIER;
+        case r'FRAME_PROBE':
+          return ShipFrameSymbolEnum.PROBE;
+        case r'FRAME_DRONE':
+          return ShipFrameSymbolEnum.DRONE;
+        case r'FRAME_INTERCEPTOR':
+          return ShipFrameSymbolEnum.INTERCEPTOR;
+        case r'FRAME_RACER':
+          return ShipFrameSymbolEnum.RACER;
+        case r'FRAME_FIGHTER':
+          return ShipFrameSymbolEnum.FIGHTER;
+        case r'FRAME_FRIGATE':
+          return ShipFrameSymbolEnum.FRIGATE;
+        case r'FRAME_SHUTTLE':
+          return ShipFrameSymbolEnum.SHUTTLE;
+        case r'FRAME_EXPLORER':
+          return ShipFrameSymbolEnum.EXPLORER;
+        case r'FRAME_MINER':
+          return ShipFrameSymbolEnum.MINER;
+        case r'FRAME_LIGHT_FREIGHTER':
+          return ShipFrameSymbolEnum.LIGHT_FREIGHTER;
+        case r'FRAME_HEAVY_FREIGHTER':
+          return ShipFrameSymbolEnum.HEAVY_FREIGHTER;
+        case r'FRAME_TRANSPORT':
+          return ShipFrameSymbolEnum.TRANSPORT;
+        case r'FRAME_DESTROYER':
+          return ShipFrameSymbolEnum.DESTROYER;
+        case r'FRAME_CRUISER':
+          return ShipFrameSymbolEnum.CRUISER;
+        case r'FRAME_CARRIER':
+          return ShipFrameSymbolEnum.CARRIER;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -292,5 +327,3 @@ class ShipFrameSymbolEnumTypeTransformer {
   /// Singleton [ShipFrameSymbolEnumTypeTransformer] instance.
   static ShipFrameSymbolEnumTypeTransformer? _instance;
 }
-
-

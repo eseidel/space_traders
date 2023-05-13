@@ -49,32 +49,35 @@ class ShipyardShip {
   List<ShipMount> mounts;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipyardShip &&
-     other.type == type &&
-     other.name == name &&
-     other.description == description &&
-     other.purchasePrice == purchasePrice &&
-     other.frame == frame &&
-     other.reactor == reactor &&
-     other.engine == engine &&
-     other.modules == modules &&
-     other.mounts == mounts;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipyardShip &&
+          other.type == type &&
+          other.name == name &&
+          other.description == description &&
+          other.purchasePrice == purchasePrice &&
+          other.frame == frame &&
+          other.reactor == reactor &&
+          other.engine == engine &&
+          other.modules == modules &&
+          other.mounts == mounts;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (type == null ? 0 : type!.hashCode) +
-    (name.hashCode) +
-    (description.hashCode) +
-    (purchasePrice.hashCode) +
-    (frame.hashCode) +
-    (reactor.hashCode) +
-    (engine.hashCode) +
-    (modules.hashCode) +
-    (mounts.hashCode);
+      // ignore: unnecessary_parenthesis
+      (type == null ? 0 : type!.hashCode) +
+      (name.hashCode) +
+      (description.hashCode) +
+      (purchasePrice.hashCode) +
+      (frame.hashCode) +
+      (reactor.hashCode) +
+      (engine.hashCode) +
+      (modules.hashCode) +
+      (mounts.hashCode);
 
   @override
-  String toString() => 'ShipyardShip[type=$type, name=$name, description=$description, purchasePrice=$purchasePrice, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts]';
+  String toString() =>
+      'ShipyardShip[type=$type, name=$name, description=$description, purchasePrice=$purchasePrice, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -83,14 +86,14 @@ class ShipyardShip {
     } else {
       json[r'type'] = null;
     }
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
-      json[r'purchasePrice'] = this.purchasePrice;
-      json[r'frame'] = this.frame;
-      json[r'reactor'] = this.reactor;
-      json[r'engine'] = this.engine;
-      json[r'modules'] = this.modules;
-      json[r'mounts'] = this.mounts;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
+    json[r'purchasePrice'] = this.purchasePrice;
+    json[r'frame'] = this.frame;
+    json[r'reactor'] = this.reactor;
+    json[r'engine'] = this.engine;
+    json[r'modules'] = this.modules;
+    json[r'mounts'] = this.mounts;
     return json;
   }
 
@@ -106,8 +109,10 @@ class ShipyardShip {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipyardShip[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipyardShip[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipyardShip[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipyardShip[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -127,7 +132,10 @@ class ShipyardShip {
     return null;
   }
 
-  static List<ShipyardShip>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipyardShip>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipyardShip>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -155,12 +163,18 @@ class ShipyardShip {
   }
 
   // maps a json object with a list of ShipyardShip-objects as value to a dart map
-  static Map<String, List<ShipyardShip>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipyardShip>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipyardShip>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipyardShip.listFromJson(entry.value, growable: growable,);
+        final value = ShipyardShip.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -181,4 +195,3 @@ class ShipyardShip {
     'mounts',
   };
 }
-

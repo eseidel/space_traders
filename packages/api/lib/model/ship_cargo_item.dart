@@ -34,29 +34,32 @@ class ShipCargoItem {
   int units;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipCargoItem &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description &&
-     other.units == units;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipCargoItem &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description &&
+          other.units == units;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description.hashCode) +
-    (units.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (name.hashCode) +
+      (description.hashCode) +
+      (units.hashCode);
 
   @override
-  String toString() => 'ShipCargoItem[symbol=$symbol, name=$name, description=$description, units=$units]';
+  String toString() =>
+      'ShipCargoItem[symbol=$symbol, name=$name, description=$description, units=$units]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
-      json[r'units'] = this.units;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
+    json[r'units'] = this.units;
     return json;
   }
 
@@ -72,8 +75,10 @@ class ShipCargoItem {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipCargoItem[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipCargoItem[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipCargoItem[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipCargoItem[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -88,7 +93,10 @@ class ShipCargoItem {
     return null;
   }
 
-  static List<ShipCargoItem>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipCargoItem>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipCargoItem>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -116,12 +124,18 @@ class ShipCargoItem {
   }
 
   // maps a json object with a list of ShipCargoItem-objects as value to a dart map
-  static Map<String, List<ShipCargoItem>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipCargoItem>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipCargoItem>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipCargoItem.listFromJson(entry.value, growable: growable,);
+        final value = ShipCargoItem.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -138,4 +152,3 @@ class ShipCargoItem {
     'units',
   };
 }
-

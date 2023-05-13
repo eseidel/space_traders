@@ -25,26 +25,27 @@ class SellCargo201ResponseData {
   MarketTransaction transaction;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is SellCargo201ResponseData &&
-     other.agent == agent &&
-     other.cargo == cargo &&
-     other.transaction == transaction;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SellCargo201ResponseData &&
+          other.agent == agent &&
+          other.cargo == cargo &&
+          other.transaction == transaction;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (agent.hashCode) +
-    (cargo.hashCode) +
-    (transaction.hashCode);
+      // ignore: unnecessary_parenthesis
+      (agent.hashCode) + (cargo.hashCode) + (transaction.hashCode);
 
   @override
-  String toString() => 'SellCargo201ResponseData[agent=$agent, cargo=$cargo, transaction=$transaction]';
+  String toString() =>
+      'SellCargo201ResponseData[agent=$agent, cargo=$cargo, transaction=$transaction]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'agent'] = this.agent;
-      json[r'cargo'] = this.cargo;
-      json[r'transaction'] = this.transaction;
+    json[r'agent'] = this.agent;
+    json[r'cargo'] = this.cargo;
+    json[r'transaction'] = this.transaction;
     return json;
   }
 
@@ -60,8 +61,10 @@ class SellCargo201ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "SellCargo201ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "SellCargo201ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "SellCargo201ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "SellCargo201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -75,7 +78,10 @@ class SellCargo201ResponseData {
     return null;
   }
 
-  static List<SellCargo201ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<SellCargo201ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <SellCargo201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -103,12 +109,18 @@ class SellCargo201ResponseData {
   }
 
   // maps a json object with a list of SellCargo201ResponseData-objects as value to a dart map
-  static Map<String, List<SellCargo201ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<SellCargo201ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<SellCargo201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = SellCargo201ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = SellCargo201ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -124,4 +136,3 @@ class SellCargo201ResponseData {
     'transaction',
   };
 }
-

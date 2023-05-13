@@ -164,7 +164,6 @@ part 'model/waypoint_orbital.dart';
 part 'model/waypoint_trait.dart';
 part 'model/waypoint_type.dart';
 
-
 const _delimiters = {'csv': ',', 'ssv': ' ', 'tsv': '\t', 'pipes': '|'};
 const _dateEpochMarker = 'epoch';
 final _dateFormatter = DateFormat('yyyy-MM-dd');

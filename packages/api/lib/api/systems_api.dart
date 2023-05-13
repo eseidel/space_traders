@@ -10,9 +10,9 @@
 
 part of space_traders_api;
 
-
 class SystemsApi {
-  SystemsApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+  SystemsApi([ApiClient? apiClient])
+      : apiClient = apiClient ?? defaultApiClient;
 
   final ApiClient apiClient;
 
@@ -29,11 +29,14 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<Response> getJumpGateWithHttpInfo(String systemSymbol, String waypointSymbol,) async {
+  Future<Response> getJumpGateWithHttpInfo(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/systems/{systemSymbol}/waypoints/{waypointSymbol}/jump-gate'
-      .replaceAll('{systemSymbol}', systemSymbol)
-      .replaceAll('{waypointSymbol}', waypointSymbol);
+        .replaceAll('{systemSymbol}', systemSymbol)
+        .replaceAll('{waypointSymbol}', waypointSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -43,7 +46,6 @@ class SystemsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -67,17 +69,26 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<GetJumpGate200Response?> getJumpGate(String systemSymbol, String waypointSymbol,) async {
-    final response = await getJumpGateWithHttpInfo(systemSymbol, waypointSymbol,);
+  Future<GetJumpGate200Response?> getJumpGate(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
+    final response = await getJumpGateWithHttpInfo(
+      systemSymbol,
+      waypointSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetJumpGate200Response',) as GetJumpGate200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetJumpGate200Response',
+      ) as GetJumpGate200Response;
     }
     return null;
   }
@@ -95,11 +106,14 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<Response> getMarketWithHttpInfo(String systemSymbol, String waypointSymbol,) async {
+  Future<Response> getMarketWithHttpInfo(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/systems/{systemSymbol}/waypoints/{waypointSymbol}/market'
-      .replaceAll('{systemSymbol}', systemSymbol)
-      .replaceAll('{waypointSymbol}', waypointSymbol);
+        .replaceAll('{systemSymbol}', systemSymbol)
+        .replaceAll('{waypointSymbol}', waypointSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -109,7 +123,6 @@ class SystemsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -133,17 +146,26 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<GetMarket200Response?> getMarket(String systemSymbol, String waypointSymbol,) async {
-    final response = await getMarketWithHttpInfo(systemSymbol, waypointSymbol,);
+  Future<GetMarket200Response?> getMarket(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
+    final response = await getMarketWithHttpInfo(
+      systemSymbol,
+      waypointSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetMarket200Response',) as GetMarket200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMarket200Response',
+      ) as GetMarket200Response;
     }
     return null;
   }
@@ -161,11 +183,14 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<Response> getShipyardWithHttpInfo(String systemSymbol, String waypointSymbol,) async {
+  Future<Response> getShipyardWithHttpInfo(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/systems/{systemSymbol}/waypoints/{waypointSymbol}/shipyard'
-      .replaceAll('{systemSymbol}', systemSymbol)
-      .replaceAll('{waypointSymbol}', waypointSymbol);
+        .replaceAll('{systemSymbol}', systemSymbol)
+        .replaceAll('{waypointSymbol}', waypointSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -175,7 +200,6 @@ class SystemsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -199,17 +223,26 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<GetShipyard200Response?> getShipyard(String systemSymbol, String waypointSymbol,) async {
-    final response = await getShipyardWithHttpInfo(systemSymbol, waypointSymbol,);
+  Future<GetShipyard200Response?> getShipyard(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
+    final response = await getShipyardWithHttpInfo(
+      systemSymbol,
+      waypointSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetShipyard200Response',) as GetShipyard200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetShipyard200Response',
+      ) as GetShipyard200Response;
     }
     return null;
   }
@@ -224,10 +257,12 @@ class SystemsApi {
   ///
   /// * [String] systemSymbol (required):
   ///   The system symbol
-  Future<Response> getSystemWithHttpInfo(String systemSymbol,) async {
+  Future<Response> getSystemWithHttpInfo(
+    String systemSymbol,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/systems/{systemSymbol}'
-      .replaceAll('{systemSymbol}', systemSymbol);
+    final path =
+        r'/systems/{systemSymbol}'.replaceAll('{systemSymbol}', systemSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -237,7 +272,6 @@ class SystemsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -258,17 +292,24 @@ class SystemsApi {
   ///
   /// * [String] systemSymbol (required):
   ///   The system symbol
-  Future<GetSystem200Response?> getSystem(String systemSymbol,) async {
-    final response = await getSystemWithHttpInfo(systemSymbol,);
+  Future<GetSystem200Response?> getSystem(
+    String systemSymbol,
+  ) async {
+    final response = await getSystemWithHttpInfo(
+      systemSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetSystem200Response',) as GetSystem200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetSystem200Response',
+      ) as GetSystem200Response;
     }
     return null;
   }
@@ -289,10 +330,14 @@ class SystemsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<Response> getSystemWaypointsWithHttpInfo(String systemSymbol, { int? page, int? limit, }) async {
+  Future<Response> getSystemWaypointsWithHttpInfo(
+    String systemSymbol, {
+    int? page,
+    int? limit,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/systems/{systemSymbol}/waypoints'
-      .replaceAll('{systemSymbol}', systemSymbol);
+        .replaceAll('{systemSymbol}', systemSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -310,7 +355,6 @@ class SystemsApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'GET',
@@ -336,17 +380,28 @@ class SystemsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<GetSystemWaypoints200Response?> getSystemWaypoints(String systemSymbol, { int? page, int? limit, }) async {
-    final response = await getSystemWaypointsWithHttpInfo(systemSymbol,  page: page, limit: limit, );
+  Future<GetSystemWaypoints200Response?> getSystemWaypoints(
+    String systemSymbol, {
+    int? page,
+    int? limit,
+  }) async {
+    final response = await getSystemWaypointsWithHttpInfo(
+      systemSymbol,
+      page: page,
+      limit: limit,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetSystemWaypoints200Response',) as GetSystemWaypoints200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetSystemWaypoints200Response',
+      ) as GetSystemWaypoints200Response;
     }
     return null;
   }
@@ -364,7 +419,10 @@ class SystemsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<Response> getSystemsWithHttpInfo({ int? page, int? limit, }) async {
+  Future<Response> getSystemsWithHttpInfo({
+    int? page,
+    int? limit,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/systems';
 
@@ -384,7 +442,6 @@ class SystemsApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'GET',
@@ -407,17 +464,26 @@ class SystemsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
-  Future<GetSystems200Response?> getSystems({ int? page, int? limit, }) async {
-    final response = await getSystemsWithHttpInfo( page: page, limit: limit, );
+  Future<GetSystems200Response?> getSystems({
+    int? page,
+    int? limit,
+  }) async {
+    final response = await getSystemsWithHttpInfo(
+      page: page,
+      limit: limit,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetSystems200Response',) as GetSystems200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetSystems200Response',
+      ) as GetSystems200Response;
     }
     return null;
   }
@@ -435,11 +501,14 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<Response> getWaypointWithHttpInfo(String systemSymbol, String waypointSymbol,) async {
+  Future<Response> getWaypointWithHttpInfo(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/systems/{systemSymbol}/waypoints/{waypointSymbol}'
-      .replaceAll('{systemSymbol}', systemSymbol)
-      .replaceAll('{waypointSymbol}', waypointSymbol);
+        .replaceAll('{systemSymbol}', systemSymbol)
+        .replaceAll('{waypointSymbol}', waypointSymbol);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -449,7 +518,6 @@ class SystemsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -473,17 +541,26 @@ class SystemsApi {
   ///
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
-  Future<GetWaypoint200Response?> getWaypoint(String systemSymbol, String waypointSymbol,) async {
-    final response = await getWaypointWithHttpInfo(systemSymbol, waypointSymbol,);
+  Future<GetWaypoint200Response?> getWaypoint(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
+    final response = await getWaypointWithHttpInfo(
+      systemSymbol,
+      waypointSymbol,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetWaypoint200Response',) as GetWaypoint200Response;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetWaypoint200Response',
+      ) as GetWaypoint200Response;
     }
     return null;
   }

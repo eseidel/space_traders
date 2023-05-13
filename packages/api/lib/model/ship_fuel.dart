@@ -37,25 +37,28 @@ class ShipFuel {
   ShipFuelConsumed? consumed;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipFuel &&
-     other.current == current &&
-     other.capacity == capacity &&
-     other.consumed == consumed;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipFuel &&
+          other.current == current &&
+          other.capacity == capacity &&
+          other.consumed == consumed;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (current.hashCode) +
-    (capacity.hashCode) +
-    (consumed == null ? 0 : consumed!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (current.hashCode) +
+      (capacity.hashCode) +
+      (consumed == null ? 0 : consumed!.hashCode);
 
   @override
-  String toString() => 'ShipFuel[current=$current, capacity=$capacity, consumed=$consumed]';
+  String toString() =>
+      'ShipFuel[current=$current, capacity=$capacity, consumed=$consumed]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'current'] = this.current;
-      json[r'capacity'] = this.capacity;
+    json[r'current'] = this.current;
+    json[r'capacity'] = this.capacity;
     if (this.consumed != null) {
       json[r'consumed'] = this.consumed;
     } else {
@@ -76,8 +79,10 @@ class ShipFuel {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipFuel[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipFuel[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipFuel[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipFuel[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -91,7 +96,10 @@ class ShipFuel {
     return null;
   }
 
-  static List<ShipFuel>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipFuel>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipFuel>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -119,12 +127,18 @@ class ShipFuel {
   }
 
   // maps a json object with a list of ShipFuel-objects as value to a dart map
-  static Map<String, List<ShipFuel>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipFuel>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipFuel>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipFuel.listFromJson(entry.value, growable: growable,);
+        final value = ShipFuel.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -139,4 +153,3 @@ class ShipFuel {
     'capacity',
   };
 }
-

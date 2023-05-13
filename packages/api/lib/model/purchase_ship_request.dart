@@ -23,23 +23,25 @@ class PurchaseShipRequest {
   String waypointSymbol;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is PurchaseShipRequest &&
-     other.shipType == shipType &&
-     other.waypointSymbol == waypointSymbol;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PurchaseShipRequest &&
+          other.shipType == shipType &&
+          other.waypointSymbol == waypointSymbol;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (shipType.hashCode) +
-    (waypointSymbol.hashCode);
+      // ignore: unnecessary_parenthesis
+      (shipType.hashCode) + (waypointSymbol.hashCode);
 
   @override
-  String toString() => 'PurchaseShipRequest[shipType=$shipType, waypointSymbol=$waypointSymbol]';
+  String toString() =>
+      'PurchaseShipRequest[shipType=$shipType, waypointSymbol=$waypointSymbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'shipType'] = this.shipType;
-      json[r'waypointSymbol'] = this.waypointSymbol;
+    json[r'shipType'] = this.shipType;
+    json[r'waypointSymbol'] = this.waypointSymbol;
     return json;
   }
 
@@ -55,8 +57,10 @@ class PurchaseShipRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "PurchaseShipRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "PurchaseShipRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "PurchaseShipRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "PurchaseShipRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -69,7 +73,10 @@ class PurchaseShipRequest {
     return null;
   }
 
-  static List<PurchaseShipRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<PurchaseShipRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <PurchaseShipRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -97,12 +104,18 @@ class PurchaseShipRequest {
   }
 
   // maps a json object with a list of PurchaseShipRequest-objects as value to a dart map
-  static Map<String, List<PurchaseShipRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<PurchaseShipRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<PurchaseShipRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = PurchaseShipRequest.listFromJson(entry.value, growable: growable,);
+        final value = PurchaseShipRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -117,4 +130,3 @@ class PurchaseShipRequest {
     'waypointSymbol',
   };
 }
-

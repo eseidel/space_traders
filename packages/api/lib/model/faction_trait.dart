@@ -28,26 +28,27 @@ class FactionTrait {
   String description;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is FactionTrait &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FactionTrait &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) + (name.hashCode) + (description.hashCode);
 
   @override
-  String toString() => 'FactionTrait[symbol=$symbol, name=$name, description=$description]';
+  String toString() =>
+      'FactionTrait[symbol=$symbol, name=$name, description=$description]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
     return json;
   }
 
@@ -63,8 +64,10 @@ class FactionTrait {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "FactionTrait[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "FactionTrait[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "FactionTrait[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "FactionTrait[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -78,7 +81,10 @@ class FactionTrait {
     return null;
   }
 
-  static List<FactionTrait>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<FactionTrait>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <FactionTrait>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -106,12 +112,18 @@ class FactionTrait {
   }
 
   // maps a json object with a list of FactionTrait-objects as value to a dart map
-  static Map<String, List<FactionTrait>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<FactionTrait>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<FactionTrait>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = FactionTrait.listFromJson(entry.value, growable: growable,);
+        final value = FactionTrait.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -181,7 +193,8 @@ class FactionTraitSymbolEnum {
   static const COLLABORATIVE = FactionTraitSymbolEnum._(r'COLLABORATIVE');
   static const PROGRESSIVE = FactionTraitSymbolEnum._(r'PROGRESSIVE');
   static const MILITARISTIC = FactionTraitSymbolEnum._(r'MILITARISTIC');
-  static const TECHNOLOGICALLY_ADVANCED = FactionTraitSymbolEnum._(r'TECHNOLOGICALLY_ADVANCED');
+  static const TECHNOLOGICALLY_ADVANCED =
+      FactionTraitSymbolEnum._(r'TECHNOLOGICALLY_ADVANCED');
   static const AGGRESSIVE = FactionTraitSymbolEnum._(r'AGGRESSIVE');
   static const IMPERIALISTIC = FactionTraitSymbolEnum._(r'IMPERIALISTIC');
   static const TREASURE_HUNTERS = FactionTraitSymbolEnum._(r'TREASURE_HUNTERS');
@@ -264,9 +277,13 @@ class FactionTraitSymbolEnum {
     ENTREPRENEURIAL,
   ];
 
-  static FactionTraitSymbolEnum? fromJson(dynamic value) => FactionTraitSymbolEnumTypeTransformer().decode(value);
+  static FactionTraitSymbolEnum? fromJson(dynamic value) =>
+      FactionTraitSymbolEnumTypeTransformer().decode(value);
 
-  static List<FactionTraitSymbolEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<FactionTraitSymbolEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <FactionTraitSymbolEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -283,7 +300,8 @@ class FactionTraitSymbolEnum {
 /// Transformation class that can [encode] an instance of [FactionTraitSymbolEnum] to String,
 /// and [decode] dynamic data back to [FactionTraitSymbolEnum].
 class FactionTraitSymbolEnumTypeTransformer {
-  factory FactionTraitSymbolEnumTypeTransformer() => _instance ??= const FactionTraitSymbolEnumTypeTransformer._();
+  factory FactionTraitSymbolEnumTypeTransformer() =>
+      _instance ??= const FactionTraitSymbolEnumTypeTransformer._();
 
   const FactionTraitSymbolEnumTypeTransformer._();
 
@@ -300,65 +318,124 @@ class FactionTraitSymbolEnumTypeTransformer {
   FactionTraitSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'BUREAUCRATIC': return FactionTraitSymbolEnum.BUREAUCRATIC;
-        case r'SECRETIVE': return FactionTraitSymbolEnum.SECRETIVE;
-        case r'CAPITALISTIC': return FactionTraitSymbolEnum.CAPITALISTIC;
-        case r'INDUSTRIOUS': return FactionTraitSymbolEnum.INDUSTRIOUS;
-        case r'PEACEFUL': return FactionTraitSymbolEnum.PEACEFUL;
-        case r'DISTRUSTFUL': return FactionTraitSymbolEnum.DISTRUSTFUL;
-        case r'WELCOMING': return FactionTraitSymbolEnum.WELCOMING;
-        case r'SMUGGLERS': return FactionTraitSymbolEnum.SMUGGLERS;
-        case r'SCAVENGERS': return FactionTraitSymbolEnum.SCAVENGERS;
-        case r'REBELLIOUS': return FactionTraitSymbolEnum.REBELLIOUS;
-        case r'EXILES': return FactionTraitSymbolEnum.EXILES;
-        case r'PIRATES': return FactionTraitSymbolEnum.PIRATES;
-        case r'RAIDERS': return FactionTraitSymbolEnum.RAIDERS;
-        case r'CLAN': return FactionTraitSymbolEnum.CLAN;
-        case r'GUILD': return FactionTraitSymbolEnum.GUILD;
-        case r'DOMINION': return FactionTraitSymbolEnum.DOMINION;
-        case r'FRINGE': return FactionTraitSymbolEnum.FRINGE;
-        case r'FORSAKEN': return FactionTraitSymbolEnum.FORSAKEN;
-        case r'ISOLATED': return FactionTraitSymbolEnum.ISOLATED;
-        case r'LOCALIZED': return FactionTraitSymbolEnum.LOCALIZED;
-        case r'ESTABLISHED': return FactionTraitSymbolEnum.ESTABLISHED;
-        case r'NOTABLE': return FactionTraitSymbolEnum.NOTABLE;
-        case r'DOMINANT': return FactionTraitSymbolEnum.DOMINANT;
-        case r'INESCAPABLE': return FactionTraitSymbolEnum.INESCAPABLE;
-        case r'INNOVATIVE': return FactionTraitSymbolEnum.INNOVATIVE;
-        case r'BOLD': return FactionTraitSymbolEnum.BOLD;
-        case r'VISIONARY': return FactionTraitSymbolEnum.VISIONARY;
-        case r'CURIOUS': return FactionTraitSymbolEnum.CURIOUS;
-        case r'DARING': return FactionTraitSymbolEnum.DARING;
-        case r'EXPLORATORY': return FactionTraitSymbolEnum.EXPLORATORY;
-        case r'RESOURCEFUL': return FactionTraitSymbolEnum.RESOURCEFUL;
-        case r'FLEXIBLE': return FactionTraitSymbolEnum.FLEXIBLE;
-        case r'COOPERATIVE': return FactionTraitSymbolEnum.COOPERATIVE;
-        case r'UNITED': return FactionTraitSymbolEnum.UNITED;
-        case r'STRATEGIC': return FactionTraitSymbolEnum.STRATEGIC;
-        case r'INTELLIGENT': return FactionTraitSymbolEnum.INTELLIGENT;
-        case r'RESEARCH_FOCUSED': return FactionTraitSymbolEnum.RESEARCH_FOCUSED;
-        case r'COLLABORATIVE': return FactionTraitSymbolEnum.COLLABORATIVE;
-        case r'PROGRESSIVE': return FactionTraitSymbolEnum.PROGRESSIVE;
-        case r'MILITARISTIC': return FactionTraitSymbolEnum.MILITARISTIC;
-        case r'TECHNOLOGICALLY_ADVANCED': return FactionTraitSymbolEnum.TECHNOLOGICALLY_ADVANCED;
-        case r'AGGRESSIVE': return FactionTraitSymbolEnum.AGGRESSIVE;
-        case r'IMPERIALISTIC': return FactionTraitSymbolEnum.IMPERIALISTIC;
-        case r'TREASURE_HUNTERS': return FactionTraitSymbolEnum.TREASURE_HUNTERS;
-        case r'DEXTEROUS': return FactionTraitSymbolEnum.DEXTEROUS;
-        case r'UNPREDICTABLE': return FactionTraitSymbolEnum.UNPREDICTABLE;
-        case r'BRUTAL': return FactionTraitSymbolEnum.BRUTAL;
-        case r'FLEETING': return FactionTraitSymbolEnum.FLEETING;
-        case r'ADAPTABLE': return FactionTraitSymbolEnum.ADAPTABLE;
-        case r'SELF_SUFFICIENT': return FactionTraitSymbolEnum.SELF_SUFFICIENT;
-        case r'DEFENSIVE': return FactionTraitSymbolEnum.DEFENSIVE;
-        case r'PROUD': return FactionTraitSymbolEnum.PROUD;
-        case r'DIVERSE': return FactionTraitSymbolEnum.DIVERSE;
-        case r'INDEPENDENT': return FactionTraitSymbolEnum.INDEPENDENT;
-        case r'SELF_INTERESTED': return FactionTraitSymbolEnum.SELF_INTERESTED;
-        case r'FRAGMENTED': return FactionTraitSymbolEnum.FRAGMENTED;
-        case r'COMMERCIAL': return FactionTraitSymbolEnum.COMMERCIAL;
-        case r'FREE_MARKETS': return FactionTraitSymbolEnum.FREE_MARKETS;
-        case r'ENTREPRENEURIAL': return FactionTraitSymbolEnum.ENTREPRENEURIAL;
+        case r'BUREAUCRATIC':
+          return FactionTraitSymbolEnum.BUREAUCRATIC;
+        case r'SECRETIVE':
+          return FactionTraitSymbolEnum.SECRETIVE;
+        case r'CAPITALISTIC':
+          return FactionTraitSymbolEnum.CAPITALISTIC;
+        case r'INDUSTRIOUS':
+          return FactionTraitSymbolEnum.INDUSTRIOUS;
+        case r'PEACEFUL':
+          return FactionTraitSymbolEnum.PEACEFUL;
+        case r'DISTRUSTFUL':
+          return FactionTraitSymbolEnum.DISTRUSTFUL;
+        case r'WELCOMING':
+          return FactionTraitSymbolEnum.WELCOMING;
+        case r'SMUGGLERS':
+          return FactionTraitSymbolEnum.SMUGGLERS;
+        case r'SCAVENGERS':
+          return FactionTraitSymbolEnum.SCAVENGERS;
+        case r'REBELLIOUS':
+          return FactionTraitSymbolEnum.REBELLIOUS;
+        case r'EXILES':
+          return FactionTraitSymbolEnum.EXILES;
+        case r'PIRATES':
+          return FactionTraitSymbolEnum.PIRATES;
+        case r'RAIDERS':
+          return FactionTraitSymbolEnum.RAIDERS;
+        case r'CLAN':
+          return FactionTraitSymbolEnum.CLAN;
+        case r'GUILD':
+          return FactionTraitSymbolEnum.GUILD;
+        case r'DOMINION':
+          return FactionTraitSymbolEnum.DOMINION;
+        case r'FRINGE':
+          return FactionTraitSymbolEnum.FRINGE;
+        case r'FORSAKEN':
+          return FactionTraitSymbolEnum.FORSAKEN;
+        case r'ISOLATED':
+          return FactionTraitSymbolEnum.ISOLATED;
+        case r'LOCALIZED':
+          return FactionTraitSymbolEnum.LOCALIZED;
+        case r'ESTABLISHED':
+          return FactionTraitSymbolEnum.ESTABLISHED;
+        case r'NOTABLE':
+          return FactionTraitSymbolEnum.NOTABLE;
+        case r'DOMINANT':
+          return FactionTraitSymbolEnum.DOMINANT;
+        case r'INESCAPABLE':
+          return FactionTraitSymbolEnum.INESCAPABLE;
+        case r'INNOVATIVE':
+          return FactionTraitSymbolEnum.INNOVATIVE;
+        case r'BOLD':
+          return FactionTraitSymbolEnum.BOLD;
+        case r'VISIONARY':
+          return FactionTraitSymbolEnum.VISIONARY;
+        case r'CURIOUS':
+          return FactionTraitSymbolEnum.CURIOUS;
+        case r'DARING':
+          return FactionTraitSymbolEnum.DARING;
+        case r'EXPLORATORY':
+          return FactionTraitSymbolEnum.EXPLORATORY;
+        case r'RESOURCEFUL':
+          return FactionTraitSymbolEnum.RESOURCEFUL;
+        case r'FLEXIBLE':
+          return FactionTraitSymbolEnum.FLEXIBLE;
+        case r'COOPERATIVE':
+          return FactionTraitSymbolEnum.COOPERATIVE;
+        case r'UNITED':
+          return FactionTraitSymbolEnum.UNITED;
+        case r'STRATEGIC':
+          return FactionTraitSymbolEnum.STRATEGIC;
+        case r'INTELLIGENT':
+          return FactionTraitSymbolEnum.INTELLIGENT;
+        case r'RESEARCH_FOCUSED':
+          return FactionTraitSymbolEnum.RESEARCH_FOCUSED;
+        case r'COLLABORATIVE':
+          return FactionTraitSymbolEnum.COLLABORATIVE;
+        case r'PROGRESSIVE':
+          return FactionTraitSymbolEnum.PROGRESSIVE;
+        case r'MILITARISTIC':
+          return FactionTraitSymbolEnum.MILITARISTIC;
+        case r'TECHNOLOGICALLY_ADVANCED':
+          return FactionTraitSymbolEnum.TECHNOLOGICALLY_ADVANCED;
+        case r'AGGRESSIVE':
+          return FactionTraitSymbolEnum.AGGRESSIVE;
+        case r'IMPERIALISTIC':
+          return FactionTraitSymbolEnum.IMPERIALISTIC;
+        case r'TREASURE_HUNTERS':
+          return FactionTraitSymbolEnum.TREASURE_HUNTERS;
+        case r'DEXTEROUS':
+          return FactionTraitSymbolEnum.DEXTEROUS;
+        case r'UNPREDICTABLE':
+          return FactionTraitSymbolEnum.UNPREDICTABLE;
+        case r'BRUTAL':
+          return FactionTraitSymbolEnum.BRUTAL;
+        case r'FLEETING':
+          return FactionTraitSymbolEnum.FLEETING;
+        case r'ADAPTABLE':
+          return FactionTraitSymbolEnum.ADAPTABLE;
+        case r'SELF_SUFFICIENT':
+          return FactionTraitSymbolEnum.SELF_SUFFICIENT;
+        case r'DEFENSIVE':
+          return FactionTraitSymbolEnum.DEFENSIVE;
+        case r'PROUD':
+          return FactionTraitSymbolEnum.PROUD;
+        case r'DIVERSE':
+          return FactionTraitSymbolEnum.DIVERSE;
+        case r'INDEPENDENT':
+          return FactionTraitSymbolEnum.INDEPENDENT;
+        case r'SELF_INTERESTED':
+          return FactionTraitSymbolEnum.SELF_INTERESTED;
+        case r'FRAGMENTED':
+          return FactionTraitSymbolEnum.FRAGMENTED;
+        case r'COMMERCIAL':
+          return FactionTraitSymbolEnum.COMMERCIAL;
+        case r'FREE_MARKETS':
+          return FactionTraitSymbolEnum.FREE_MARKETS;
+        case r'ENTREPRENEURIAL':
+          return FactionTraitSymbolEnum.ENTREPRENEURIAL;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -371,5 +448,3 @@ class FactionTraitSymbolEnumTypeTransformer {
   /// Singleton [FactionTraitSymbolEnumTypeTransformer] instance.
   static FactionTraitSymbolEnumTypeTransformer? _instance;
 }
-
-

@@ -45,39 +45,42 @@ class ShipEngine {
   ShipRequirements requirements;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipEngine &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description &&
-     other.condition == condition &&
-     other.speed == speed &&
-     other.requirements == requirements;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipEngine &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description &&
+          other.condition == condition &&
+          other.speed == speed &&
+          other.requirements == requirements;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description.hashCode) +
-    (condition == null ? 0 : condition!.hashCode) +
-    (speed.hashCode) +
-    (requirements.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (name.hashCode) +
+      (description.hashCode) +
+      (condition == null ? 0 : condition!.hashCode) +
+      (speed.hashCode) +
+      (requirements.hashCode);
 
   @override
-  String toString() => 'ShipEngine[symbol=$symbol, name=$name, description=$description, condition=$condition, speed=$speed, requirements=$requirements]';
+  String toString() =>
+      'ShipEngine[symbol=$symbol, name=$name, description=$description, condition=$condition, speed=$speed, requirements=$requirements]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
     if (this.condition != null) {
       json[r'condition'] = this.condition;
     } else {
       json[r'condition'] = null;
     }
-      json[r'speed'] = this.speed;
-      json[r'requirements'] = this.requirements;
+    json[r'speed'] = this.speed;
+    json[r'requirements'] = this.requirements;
     return json;
   }
 
@@ -93,8 +96,10 @@ class ShipEngine {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipEngine[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipEngine[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipEngine[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipEngine[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -111,7 +116,10 @@ class ShipEngine {
     return null;
   }
 
-  static List<ShipEngine>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipEngine>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipEngine>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -139,12 +147,18 @@ class ShipEngine {
   }
 
   // maps a json object with a list of ShipEngine-objects as value to a dart map
-  static Map<String, List<ShipEngine>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipEngine>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipEngine>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipEngine.listFromJson(entry.value, growable: growable,);
+        final value = ShipEngine.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -163,7 +177,6 @@ class ShipEngine {
   };
 }
 
-
 class ShipEngineSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipEngineSymbolEnum._(this.value);
@@ -176,7 +189,8 @@ class ShipEngineSymbolEnum {
 
   String toJson() => value;
 
-  static const IMPULSE_DRIVE_I = ShipEngineSymbolEnum._(r'ENGINE_IMPULSE_DRIVE_I');
+  static const IMPULSE_DRIVE_I =
+      ShipEngineSymbolEnum._(r'ENGINE_IMPULSE_DRIVE_I');
   static const ION_DRIVE_I = ShipEngineSymbolEnum._(r'ENGINE_ION_DRIVE_I');
   static const ION_DRIVE_II = ShipEngineSymbolEnum._(r'ENGINE_ION_DRIVE_II');
   static const HYPER_DRIVE_I = ShipEngineSymbolEnum._(r'ENGINE_HYPER_DRIVE_I');
@@ -189,9 +203,13 @@ class ShipEngineSymbolEnum {
     HYPER_DRIVE_I,
   ];
 
-  static ShipEngineSymbolEnum? fromJson(dynamic value) => ShipEngineSymbolEnumTypeTransformer().decode(value);
+  static ShipEngineSymbolEnum? fromJson(dynamic value) =>
+      ShipEngineSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipEngineSymbolEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipEngineSymbolEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipEngineSymbolEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -208,7 +226,8 @@ class ShipEngineSymbolEnum {
 /// Transformation class that can [encode] an instance of [ShipEngineSymbolEnum] to String,
 /// and [decode] dynamic data back to [ShipEngineSymbolEnum].
 class ShipEngineSymbolEnumTypeTransformer {
-  factory ShipEngineSymbolEnumTypeTransformer() => _instance ??= const ShipEngineSymbolEnumTypeTransformer._();
+  factory ShipEngineSymbolEnumTypeTransformer() =>
+      _instance ??= const ShipEngineSymbolEnumTypeTransformer._();
 
   const ShipEngineSymbolEnumTypeTransformer._();
 
@@ -225,10 +244,14 @@ class ShipEngineSymbolEnumTypeTransformer {
   ShipEngineSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'ENGINE_IMPULSE_DRIVE_I': return ShipEngineSymbolEnum.IMPULSE_DRIVE_I;
-        case r'ENGINE_ION_DRIVE_I': return ShipEngineSymbolEnum.ION_DRIVE_I;
-        case r'ENGINE_ION_DRIVE_II': return ShipEngineSymbolEnum.ION_DRIVE_II;
-        case r'ENGINE_HYPER_DRIVE_I': return ShipEngineSymbolEnum.HYPER_DRIVE_I;
+        case r'ENGINE_IMPULSE_DRIVE_I':
+          return ShipEngineSymbolEnum.IMPULSE_DRIVE_I;
+        case r'ENGINE_ION_DRIVE_I':
+          return ShipEngineSymbolEnum.ION_DRIVE_I;
+        case r'ENGINE_ION_DRIVE_II':
+          return ShipEngineSymbolEnum.ION_DRIVE_II;
+        case r'ENGINE_HYPER_DRIVE_I':
+          return ShipEngineSymbolEnum.HYPER_DRIVE_I;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -241,5 +264,3 @@ class ShipEngineSymbolEnumTypeTransformer {
   /// Singleton [ShipEngineSymbolEnumTypeTransformer] instance.
   static ShipEngineSymbolEnumTypeTransformer? _instance;
 }
-
-

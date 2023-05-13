@@ -56,9 +56,13 @@ class ShipRole {
     REFINERY,
   ];
 
-  static ShipRole? fromJson(dynamic value) => ShipRoleTypeTransformer().decode(value);
+  static ShipRole? fromJson(dynamic value) =>
+      ShipRoleTypeTransformer().decode(value);
 
-  static List<ShipRole>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipRole>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipRole>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -75,7 +79,8 @@ class ShipRole {
 /// Transformation class that can [encode] an instance of [ShipRole] to String,
 /// and [decode] dynamic data back to [ShipRole].
 class ShipRoleTypeTransformer {
-  factory ShipRoleTypeTransformer() => _instance ??= const ShipRoleTypeTransformer._();
+  factory ShipRoleTypeTransformer() =>
+      _instance ??= const ShipRoleTypeTransformer._();
 
   const ShipRoleTypeTransformer._();
 
@@ -92,20 +97,34 @@ class ShipRoleTypeTransformer {
   ShipRole? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'FABRICATOR': return ShipRole.FABRICATOR;
-        case r'HARVESTER': return ShipRole.HARVESTER;
-        case r'HAULER': return ShipRole.HAULER;
-        case r'INTERCEPTOR': return ShipRole.INTERCEPTOR;
-        case r'EXCAVATOR': return ShipRole.EXCAVATOR;
-        case r'TRANSPORT': return ShipRole.TRANSPORT;
-        case r'REPAIR': return ShipRole.REPAIR;
-        case r'SURVEYOR': return ShipRole.SURVEYOR;
-        case r'COMMAND': return ShipRole.COMMAND;
-        case r'CARRIER': return ShipRole.CARRIER;
-        case r'PATROL': return ShipRole.PATROL;
-        case r'SATELLITE': return ShipRole.SATELLITE;
-        case r'EXPLORER': return ShipRole.EXPLORER;
-        case r'REFINERY': return ShipRole.REFINERY;
+        case r'FABRICATOR':
+          return ShipRole.FABRICATOR;
+        case r'HARVESTER':
+          return ShipRole.HARVESTER;
+        case r'HAULER':
+          return ShipRole.HAULER;
+        case r'INTERCEPTOR':
+          return ShipRole.INTERCEPTOR;
+        case r'EXCAVATOR':
+          return ShipRole.EXCAVATOR;
+        case r'TRANSPORT':
+          return ShipRole.TRANSPORT;
+        case r'REPAIR':
+          return ShipRole.REPAIR;
+        case r'SURVEYOR':
+          return ShipRole.SURVEYOR;
+        case r'COMMAND':
+          return ShipRole.COMMAND;
+        case r'CARRIER':
+          return ShipRole.CARRIER;
+        case r'PATROL':
+          return ShipRole.PATROL;
+        case r'SATELLITE':
+          return ShipRole.SATELLITE;
+        case r'EXPLORER':
+          return ShipRole.EXPLORER;
+        case r'REFINERY':
+          return ShipRole.REFINERY;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -118,4 +137,3 @@ class ShipRoleTypeTransformer {
   /// Singleton [ShipRoleTypeTransformer] instance.
   static ShipRoleTypeTransformer? _instance;
 }
-

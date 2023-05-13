@@ -26,23 +26,24 @@ class ShipFuelConsumed {
   DateTime timestamp;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipFuelConsumed &&
-     other.amount == amount &&
-     other.timestamp == timestamp;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipFuelConsumed &&
+          other.amount == amount &&
+          other.timestamp == timestamp;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (amount.hashCode) +
-    (timestamp.hashCode);
+      // ignore: unnecessary_parenthesis
+      (amount.hashCode) + (timestamp.hashCode);
 
   @override
   String toString() => 'ShipFuelConsumed[amount=$amount, timestamp=$timestamp]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'amount'] = this.amount;
-      json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
+    json[r'amount'] = this.amount;
+    json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
     return json;
   }
 
@@ -58,8 +59,10 @@ class ShipFuelConsumed {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipFuelConsumed[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipFuelConsumed[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipFuelConsumed[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipFuelConsumed[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -72,7 +75,10 @@ class ShipFuelConsumed {
     return null;
   }
 
-  static List<ShipFuelConsumed>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipFuelConsumed>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipFuelConsumed>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -100,12 +106,18 @@ class ShipFuelConsumed {
   }
 
   // maps a json object with a list of ShipFuelConsumed-objects as value to a dart map
-  static Map<String, List<ShipFuelConsumed>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipFuelConsumed>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipFuelConsumed>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipFuelConsumed.listFromJson(entry.value, growable: growable,);
+        final value = ShipFuelConsumed.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -120,4 +132,3 @@ class ShipFuelConsumed {
     'timestamp',
   };
 }
-

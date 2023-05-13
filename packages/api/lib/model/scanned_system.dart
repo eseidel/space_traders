@@ -34,35 +34,38 @@ class ScannedSystem {
   int distance;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ScannedSystem &&
-     other.symbol == symbol &&
-     other.sectorSymbol == sectorSymbol &&
-     other.type == type &&
-     other.x == x &&
-     other.y == y &&
-     other.distance == distance;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ScannedSystem &&
+          other.symbol == symbol &&
+          other.sectorSymbol == sectorSymbol &&
+          other.type == type &&
+          other.x == x &&
+          other.y == y &&
+          other.distance == distance;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (sectorSymbol.hashCode) +
-    (type.hashCode) +
-    (x.hashCode) +
-    (y.hashCode) +
-    (distance.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (sectorSymbol.hashCode) +
+      (type.hashCode) +
+      (x.hashCode) +
+      (y.hashCode) +
+      (distance.hashCode);
 
   @override
-  String toString() => 'ScannedSystem[symbol=$symbol, sectorSymbol=$sectorSymbol, type=$type, x=$x, y=$y, distance=$distance]';
+  String toString() =>
+      'ScannedSystem[symbol=$symbol, sectorSymbol=$sectorSymbol, type=$type, x=$x, y=$y, distance=$distance]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'sectorSymbol'] = this.sectorSymbol;
-      json[r'type'] = this.type;
-      json[r'x'] = this.x;
-      json[r'y'] = this.y;
-      json[r'distance'] = this.distance;
+    json[r'symbol'] = this.symbol;
+    json[r'sectorSymbol'] = this.sectorSymbol;
+    json[r'type'] = this.type;
+    json[r'x'] = this.x;
+    json[r'y'] = this.y;
+    json[r'distance'] = this.distance;
     return json;
   }
 
@@ -78,8 +81,10 @@ class ScannedSystem {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ScannedSystem[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ScannedSystem[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ScannedSystem[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ScannedSystem[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -96,7 +101,10 @@ class ScannedSystem {
     return null;
   }
 
-  static List<ScannedSystem>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ScannedSystem>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ScannedSystem>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -124,12 +132,18 @@ class ScannedSystem {
   }
 
   // maps a json object with a list of ScannedSystem-objects as value to a dart map
-  static Map<String, List<ScannedSystem>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ScannedSystem>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ScannedSystem>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ScannedSystem.listFromJson(entry.value, growable: growable,);
+        final value = ScannedSystem.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -148,4 +162,3 @@ class ScannedSystem {
     'distance',
   };
 }
-

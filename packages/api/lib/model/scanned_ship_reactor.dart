@@ -19,20 +19,21 @@ class ScannedShipReactor {
   String symbol;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ScannedShipReactor &&
-     other.symbol == symbol;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ScannedShipReactor && other.symbol == symbol;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode);
 
   @override
   String toString() => 'ScannedShipReactor[symbol=$symbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
+    json[r'symbol'] = this.symbol;
     return json;
   }
 
@@ -48,8 +49,10 @@ class ScannedShipReactor {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ScannedShipReactor[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ScannedShipReactor[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ScannedShipReactor[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ScannedShipReactor[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class ScannedShipReactor {
     return null;
   }
 
-  static List<ScannedShipReactor>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ScannedShipReactor>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ScannedShipReactor>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -89,12 +95,18 @@ class ScannedShipReactor {
   }
 
   // maps a json object with a list of ScannedShipReactor-objects as value to a dart map
-  static Map<String, List<ScannedShipReactor>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ScannedShipReactor>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ScannedShipReactor>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ScannedShipReactor.listFromJson(entry.value, growable: growable,);
+        final value = ScannedShipReactor.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,4 +120,3 @@ class ScannedShipReactor {
     'symbol',
   };
 }
-

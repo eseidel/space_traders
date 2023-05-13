@@ -25,13 +25,14 @@ class ShipyardShipTypesInner {
   ShipType? type;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipyardShipTypesInner &&
-     other.type == type;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipyardShipTypesInner && other.type == type;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (type == null ? 0 : type!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (type == null ? 0 : type!.hashCode);
 
   @override
   String toString() => 'ShipyardShipTypesInner[type=$type]';
@@ -58,8 +59,10 @@ class ShipyardShipTypesInner {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipyardShipTypesInner[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipyardShipTypesInner[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipyardShipTypesInner[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipyardShipTypesInner[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -71,7 +74,10 @@ class ShipyardShipTypesInner {
     return null;
   }
 
-  static List<ShipyardShipTypesInner>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipyardShipTypesInner>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipyardShipTypesInner>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -99,12 +105,18 @@ class ShipyardShipTypesInner {
   }
 
   // maps a json object with a list of ShipyardShipTypesInner-objects as value to a dart map
-  static Map<String, List<ShipyardShipTypesInner>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipyardShipTypesInner>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipyardShipTypesInner>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipyardShipTypesInner.listFromJson(entry.value, growable: growable,);
+        final value = ShipyardShipTypesInner.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -114,7 +126,5 @@ class ShipyardShipTypesInner {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-  };
+  static const requiredKeys = <String>{};
 }
-

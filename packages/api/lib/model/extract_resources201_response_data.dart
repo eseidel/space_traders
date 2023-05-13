@@ -25,26 +25,27 @@ class ExtractResources201ResponseData {
   ShipCargo cargo;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ExtractResources201ResponseData &&
-     other.cooldown == cooldown &&
-     other.extraction == extraction &&
-     other.cargo == cargo;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExtractResources201ResponseData &&
+          other.cooldown == cooldown &&
+          other.extraction == extraction &&
+          other.cargo == cargo;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (cooldown.hashCode) +
-    (extraction.hashCode) +
-    (cargo.hashCode);
+      // ignore: unnecessary_parenthesis
+      (cooldown.hashCode) + (extraction.hashCode) + (cargo.hashCode);
 
   @override
-  String toString() => 'ExtractResources201ResponseData[cooldown=$cooldown, extraction=$extraction, cargo=$cargo]';
+  String toString() =>
+      'ExtractResources201ResponseData[cooldown=$cooldown, extraction=$extraction, cargo=$cargo]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'cooldown'] = this.cooldown;
-      json[r'extraction'] = this.extraction;
-      json[r'cargo'] = this.cargo;
+    json[r'cooldown'] = this.cooldown;
+    json[r'extraction'] = this.extraction;
+    json[r'cargo'] = this.cargo;
     return json;
   }
 
@@ -60,8 +61,10 @@ class ExtractResources201ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ExtractResources201ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ExtractResources201ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ExtractResources201ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ExtractResources201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -75,7 +78,10 @@ class ExtractResources201ResponseData {
     return null;
   }
 
-  static List<ExtractResources201ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ExtractResources201ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ExtractResources201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -88,7 +94,8 @@ class ExtractResources201ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, ExtractResources201ResponseData> mapFromJson(dynamic json) {
+  static Map<String, ExtractResources201ResponseData> mapFromJson(
+      dynamic json) {
     final map = <String, ExtractResources201ResponseData>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
@@ -103,12 +110,18 @@ class ExtractResources201ResponseData {
   }
 
   // maps a json object with a list of ExtractResources201ResponseData-objects as value to a dart map
-  static Map<String, List<ExtractResources201ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ExtractResources201ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ExtractResources201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ExtractResources201ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = ExtractResources201ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -124,4 +137,3 @@ class ExtractResources201ResponseData {
     'cargo',
   };
 }
-

@@ -19,20 +19,21 @@ class CreateShipShipScan201Response {
   CreateShipShipScan201ResponseData data;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is CreateShipShipScan201Response &&
-     other.data == data;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateShipShipScan201Response && other.data == data;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (data.hashCode);
+      // ignore: unnecessary_parenthesis
+      (data.hashCode);
 
   @override
   String toString() => 'CreateShipShipScan201Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'data'] = this.data;
+    json[r'data'] = this.data;
     return json;
   }
 
@@ -48,8 +49,10 @@ class CreateShipShipScan201Response {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "CreateShipShipScan201Response[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "CreateShipShipScan201Response[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "CreateShipShipScan201Response[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "CreateShipShipScan201Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class CreateShipShipScan201Response {
     return null;
   }
 
-  static List<CreateShipShipScan201Response>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<CreateShipShipScan201Response>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <CreateShipShipScan201Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -89,12 +95,18 @@ class CreateShipShipScan201Response {
   }
 
   // maps a json object with a list of CreateShipShipScan201Response-objects as value to a dart map
-  static Map<String, List<CreateShipShipScan201Response>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<CreateShipShipScan201Response>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<CreateShipShipScan201Response>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = CreateShipShipScan201Response.listFromJson(entry.value, growable: growable,);
+        final value = CreateShipShipScan201Response.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,4 +120,3 @@ class CreateShipShipScan201Response {
     'data',
   };
 }
-

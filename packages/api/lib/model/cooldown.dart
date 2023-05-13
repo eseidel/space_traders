@@ -36,29 +36,32 @@ class Cooldown {
   DateTime expiration;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Cooldown &&
-     other.shipSymbol == shipSymbol &&
-     other.totalSeconds == totalSeconds &&
-     other.remainingSeconds == remainingSeconds &&
-     other.expiration == expiration;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Cooldown &&
+          other.shipSymbol == shipSymbol &&
+          other.totalSeconds == totalSeconds &&
+          other.remainingSeconds == remainingSeconds &&
+          other.expiration == expiration;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (shipSymbol.hashCode) +
-    (totalSeconds.hashCode) +
-    (remainingSeconds.hashCode) +
-    (expiration.hashCode);
+      // ignore: unnecessary_parenthesis
+      (shipSymbol.hashCode) +
+      (totalSeconds.hashCode) +
+      (remainingSeconds.hashCode) +
+      (expiration.hashCode);
 
   @override
-  String toString() => 'Cooldown[shipSymbol=$shipSymbol, totalSeconds=$totalSeconds, remainingSeconds=$remainingSeconds, expiration=$expiration]';
+  String toString() =>
+      'Cooldown[shipSymbol=$shipSymbol, totalSeconds=$totalSeconds, remainingSeconds=$remainingSeconds, expiration=$expiration]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'shipSymbol'] = this.shipSymbol;
-      json[r'totalSeconds'] = this.totalSeconds;
-      json[r'remainingSeconds'] = this.remainingSeconds;
-      json[r'expiration'] = this.expiration.toUtc().toIso8601String();
+    json[r'shipSymbol'] = this.shipSymbol;
+    json[r'totalSeconds'] = this.totalSeconds;
+    json[r'remainingSeconds'] = this.remainingSeconds;
+    json[r'expiration'] = this.expiration.toUtc().toIso8601String();
     return json;
   }
 
@@ -74,8 +77,10 @@ class Cooldown {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Cooldown[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Cooldown[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Cooldown[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Cooldown[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -90,7 +95,10 @@ class Cooldown {
     return null;
   }
 
-  static List<Cooldown>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Cooldown>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Cooldown>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -118,12 +126,18 @@ class Cooldown {
   }
 
   // maps a json object with a list of Cooldown-objects as value to a dart map
-  static Map<String, List<Cooldown>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Cooldown>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Cooldown>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Cooldown.listFromJson(entry.value, growable: growable,);
+        final value = Cooldown.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -140,4 +154,3 @@ class Cooldown {
     'expiration',
   };
 }
-

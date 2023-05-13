@@ -36,32 +36,35 @@ class Survey {
   SurveySizeEnum size;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Survey &&
-     other.signature == signature &&
-     other.symbol == symbol &&
-     other.deposits == deposits &&
-     other.expiration == expiration &&
-     other.size == size;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Survey &&
+          other.signature == signature &&
+          other.symbol == symbol &&
+          other.deposits == deposits &&
+          other.expiration == expiration &&
+          other.size == size;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (signature.hashCode) +
-    (symbol.hashCode) +
-    (deposits.hashCode) +
-    (expiration.hashCode) +
-    (size.hashCode);
+      // ignore: unnecessary_parenthesis
+      (signature.hashCode) +
+      (symbol.hashCode) +
+      (deposits.hashCode) +
+      (expiration.hashCode) +
+      (size.hashCode);
 
   @override
-  String toString() => 'Survey[signature=$signature, symbol=$symbol, deposits=$deposits, expiration=$expiration, size=$size]';
+  String toString() =>
+      'Survey[signature=$signature, symbol=$symbol, deposits=$deposits, expiration=$expiration, size=$size]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'signature'] = this.signature;
-      json[r'symbol'] = this.symbol;
-      json[r'deposits'] = this.deposits;
-      json[r'expiration'] = this.expiration.toUtc().toIso8601String();
-      json[r'size'] = this.size;
+    json[r'signature'] = this.signature;
+    json[r'symbol'] = this.symbol;
+    json[r'deposits'] = this.deposits;
+    json[r'expiration'] = this.expiration.toUtc().toIso8601String();
+    json[r'size'] = this.size;
     return json;
   }
 
@@ -77,8 +80,10 @@ class Survey {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Survey[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Survey[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Survey[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Survey[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -94,7 +99,10 @@ class Survey {
     return null;
   }
 
-  static List<Survey>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Survey>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Survey>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -122,12 +130,18 @@ class Survey {
   }
 
   // maps a json object with a list of Survey-objects as value to a dart map
-  static Map<String, List<Survey>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Survey>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Survey>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Survey.listFromJson(entry.value, growable: growable,);
+        final value = Survey.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -170,9 +184,13 @@ class SurveySizeEnum {
     LARGE,
   ];
 
-  static SurveySizeEnum? fromJson(dynamic value) => SurveySizeEnumTypeTransformer().decode(value);
+  static SurveySizeEnum? fromJson(dynamic value) =>
+      SurveySizeEnumTypeTransformer().decode(value);
 
-  static List<SurveySizeEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<SurveySizeEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <SurveySizeEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -189,7 +207,8 @@ class SurveySizeEnum {
 /// Transformation class that can [encode] an instance of [SurveySizeEnum] to String,
 /// and [decode] dynamic data back to [SurveySizeEnum].
 class SurveySizeEnumTypeTransformer {
-  factory SurveySizeEnumTypeTransformer() => _instance ??= const SurveySizeEnumTypeTransformer._();
+  factory SurveySizeEnumTypeTransformer() =>
+      _instance ??= const SurveySizeEnumTypeTransformer._();
 
   const SurveySizeEnumTypeTransformer._();
 
@@ -206,9 +225,12 @@ class SurveySizeEnumTypeTransformer {
   SurveySizeEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'SMALL': return SurveySizeEnum.SMALL;
-        case r'MODERATE': return SurveySizeEnum.MODERATE;
-        case r'LARGE': return SurveySizeEnum.LARGE;
+        case r'SMALL':
+          return SurveySizeEnum.SMALL;
+        case r'MODERATE':
+          return SurveySizeEnum.MODERATE;
+        case r'LARGE':
+          return SurveySizeEnum.LARGE;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -221,5 +243,3 @@ class SurveySizeEnumTypeTransformer {
   /// Singleton [SurveySizeEnumTypeTransformer] instance.
   static SurveySizeEnumTypeTransformer? _instance;
 }
-
-

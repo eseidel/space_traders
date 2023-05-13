@@ -45,39 +45,42 @@ class ShipReactor {
   ShipRequirements requirements;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipReactor &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description &&
-     other.condition == condition &&
-     other.powerOutput == powerOutput &&
-     other.requirements == requirements;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipReactor &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description &&
+          other.condition == condition &&
+          other.powerOutput == powerOutput &&
+          other.requirements == requirements;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description.hashCode) +
-    (condition == null ? 0 : condition!.hashCode) +
-    (powerOutput.hashCode) +
-    (requirements.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (name.hashCode) +
+      (description.hashCode) +
+      (condition == null ? 0 : condition!.hashCode) +
+      (powerOutput.hashCode) +
+      (requirements.hashCode);
 
   @override
-  String toString() => 'ShipReactor[symbol=$symbol, name=$name, description=$description, condition=$condition, powerOutput=$powerOutput, requirements=$requirements]';
+  String toString() =>
+      'ShipReactor[symbol=$symbol, name=$name, description=$description, condition=$condition, powerOutput=$powerOutput, requirements=$requirements]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
     if (this.condition != null) {
       json[r'condition'] = this.condition;
     } else {
       json[r'condition'] = null;
     }
-      json[r'powerOutput'] = this.powerOutput;
-      json[r'requirements'] = this.requirements;
+    json[r'powerOutput'] = this.powerOutput;
+    json[r'requirements'] = this.requirements;
     return json;
   }
 
@@ -93,8 +96,10 @@ class ShipReactor {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipReactor[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipReactor[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipReactor[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipReactor[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -111,7 +116,10 @@ class ShipReactor {
     return null;
   }
 
-  static List<ShipReactor>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipReactor>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipReactor>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -139,12 +147,18 @@ class ShipReactor {
   }
 
   // maps a json object with a list of ShipReactor-objects as value to a dart map
-  static Map<String, List<ShipReactor>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipReactor>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipReactor>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipReactor.listFromJson(entry.value, growable: growable,);
+        final value = ShipReactor.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -162,7 +176,6 @@ class ShipReactor {
     'requirements',
   };
 }
-
 
 class ShipReactorSymbolEnum {
   /// Instantiate a new enum with the provided [value].
@@ -191,9 +204,13 @@ class ShipReactorSymbolEnum {
     ANTIMATTER_I,
   ];
 
-  static ShipReactorSymbolEnum? fromJson(dynamic value) => ShipReactorSymbolEnumTypeTransformer().decode(value);
+  static ShipReactorSymbolEnum? fromJson(dynamic value) =>
+      ShipReactorSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipReactorSymbolEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipReactorSymbolEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipReactorSymbolEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -210,7 +227,8 @@ class ShipReactorSymbolEnum {
 /// Transformation class that can [encode] an instance of [ShipReactorSymbolEnum] to String,
 /// and [decode] dynamic data back to [ShipReactorSymbolEnum].
 class ShipReactorSymbolEnumTypeTransformer {
-  factory ShipReactorSymbolEnumTypeTransformer() => _instance ??= const ShipReactorSymbolEnumTypeTransformer._();
+  factory ShipReactorSymbolEnumTypeTransformer() =>
+      _instance ??= const ShipReactorSymbolEnumTypeTransformer._();
 
   const ShipReactorSymbolEnumTypeTransformer._();
 
@@ -227,11 +245,16 @@ class ShipReactorSymbolEnumTypeTransformer {
   ShipReactorSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'REACTOR_SOLAR_I': return ShipReactorSymbolEnum.SOLAR_I;
-        case r'REACTOR_FUSION_I': return ShipReactorSymbolEnum.FUSION_I;
-        case r'REACTOR_FISSION_I': return ShipReactorSymbolEnum.FISSION_I;
-        case r'REACTOR_CHEMICAL_I': return ShipReactorSymbolEnum.CHEMICAL_I;
-        case r'REACTOR_ANTIMATTER_I': return ShipReactorSymbolEnum.ANTIMATTER_I;
+        case r'REACTOR_SOLAR_I':
+          return ShipReactorSymbolEnum.SOLAR_I;
+        case r'REACTOR_FUSION_I':
+          return ShipReactorSymbolEnum.FUSION_I;
+        case r'REACTOR_FISSION_I':
+          return ShipReactorSymbolEnum.FISSION_I;
+        case r'REACTOR_CHEMICAL_I':
+          return ShipReactorSymbolEnum.CHEMICAL_I;
+        case r'REACTOR_ANTIMATTER_I':
+          return ShipReactorSymbolEnum.ANTIMATTER_I;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -244,5 +267,3 @@ class ShipReactorSymbolEnumTypeTransformer {
   /// Singleton [ShipReactorSymbolEnumTypeTransformer] instance.
   static ShipReactorSymbolEnumTypeTransformer? _instance;
 }
-
-

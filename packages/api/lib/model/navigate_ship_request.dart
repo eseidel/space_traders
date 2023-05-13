@@ -20,20 +20,21 @@ class NavigateShipRequest {
   String waypointSymbol;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is NavigateShipRequest &&
-     other.waypointSymbol == waypointSymbol;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NavigateShipRequest && other.waypointSymbol == waypointSymbol;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (waypointSymbol.hashCode);
+      // ignore: unnecessary_parenthesis
+      (waypointSymbol.hashCode);
 
   @override
   String toString() => 'NavigateShipRequest[waypointSymbol=$waypointSymbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'waypointSymbol'] = this.waypointSymbol;
+    json[r'waypointSymbol'] = this.waypointSymbol;
     return json;
   }
 
@@ -49,8 +50,10 @@ class NavigateShipRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "NavigateShipRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "NavigateShipRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "NavigateShipRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "NavigateShipRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -62,7 +65,10 @@ class NavigateShipRequest {
     return null;
   }
 
-  static List<NavigateShipRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<NavigateShipRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <NavigateShipRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -90,12 +96,18 @@ class NavigateShipRequest {
   }
 
   // maps a json object with a list of NavigateShipRequest-objects as value to a dart map
-  static Map<String, List<NavigateShipRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<NavigateShipRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<NavigateShipRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = NavigateShipRequest.listFromJson(entry.value, growable: growable,);
+        final value = NavigateShipRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -109,4 +121,3 @@ class NavigateShipRequest {
     'waypointSymbol',
   };
 }
-

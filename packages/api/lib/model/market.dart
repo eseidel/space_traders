@@ -40,35 +40,38 @@ class Market {
   List<MarketTradeGood> tradeGoods;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Market &&
-     other.symbol == symbol &&
-     other.exports == exports &&
-     other.imports == imports &&
-     other.exchange == exchange &&
-     other.transactions == transactions &&
-     other.tradeGoods == tradeGoods;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Market &&
+          other.symbol == symbol &&
+          other.exports == exports &&
+          other.imports == imports &&
+          other.exchange == exchange &&
+          other.transactions == transactions &&
+          other.tradeGoods == tradeGoods;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (exports.hashCode) +
-    (imports.hashCode) +
-    (exchange.hashCode) +
-    (transactions.hashCode) +
-    (tradeGoods.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (exports.hashCode) +
+      (imports.hashCode) +
+      (exchange.hashCode) +
+      (transactions.hashCode) +
+      (tradeGoods.hashCode);
 
   @override
-  String toString() => 'Market[symbol=$symbol, exports=$exports, imports=$imports, exchange=$exchange, transactions=$transactions, tradeGoods=$tradeGoods]';
+  String toString() =>
+      'Market[symbol=$symbol, exports=$exports, imports=$imports, exchange=$exchange, transactions=$transactions, tradeGoods=$tradeGoods]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'exports'] = this.exports;
-      json[r'imports'] = this.imports;
-      json[r'exchange'] = this.exchange;
-      json[r'transactions'] = this.transactions;
-      json[r'tradeGoods'] = this.tradeGoods;
+    json[r'symbol'] = this.symbol;
+    json[r'exports'] = this.exports;
+    json[r'imports'] = this.imports;
+    json[r'exchange'] = this.exchange;
+    json[r'transactions'] = this.transactions;
+    json[r'tradeGoods'] = this.tradeGoods;
     return json;
   }
 
@@ -84,8 +87,10 @@ class Market {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Market[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Market[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Market[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Market[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -95,14 +100,19 @@ class Market {
         exports: TradeGood.listFromJson(json[r'exports'])!,
         imports: TradeGood.listFromJson(json[r'imports'])!,
         exchange: TradeGood.listFromJson(json[r'exchange'])!,
-        transactions: MarketTransaction.listFromJson(json[r'transactions']) ?? const [],
-        tradeGoods: MarketTradeGood.listFromJson(json[r'tradeGoods']) ?? const [],
+        transactions:
+            MarketTransaction.listFromJson(json[r'transactions']) ?? const [],
+        tradeGoods:
+            MarketTradeGood.listFromJson(json[r'tradeGoods']) ?? const [],
       );
     }
     return null;
   }
 
-  static List<Market>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Market>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Market>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -130,12 +140,18 @@ class Market {
   }
 
   // maps a json object with a list of Market-objects as value to a dart map
-  static Map<String, List<Market>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Market>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Market>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Market.listFromJson(entry.value, growable: growable,);
+        final value = Market.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -152,4 +168,3 @@ class Market {
     'exchange',
   };
 }
-

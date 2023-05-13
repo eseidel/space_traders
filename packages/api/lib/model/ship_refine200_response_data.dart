@@ -28,29 +28,32 @@ class ShipRefine200ResponseData {
   List<ShipRefine200ResponseDataProducedInner> consumed;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipRefine200ResponseData &&
-     other.cargo == cargo &&
-     other.cooldown == cooldown &&
-     other.produced == produced &&
-     other.consumed == consumed;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipRefine200ResponseData &&
+          other.cargo == cargo &&
+          other.cooldown == cooldown &&
+          other.produced == produced &&
+          other.consumed == consumed;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (cargo.hashCode) +
-    (cooldown.hashCode) +
-    (produced.hashCode) +
-    (consumed.hashCode);
+      // ignore: unnecessary_parenthesis
+      (cargo.hashCode) +
+      (cooldown.hashCode) +
+      (produced.hashCode) +
+      (consumed.hashCode);
 
   @override
-  String toString() => 'ShipRefine200ResponseData[cargo=$cargo, cooldown=$cooldown, produced=$produced, consumed=$consumed]';
+  String toString() =>
+      'ShipRefine200ResponseData[cargo=$cargo, cooldown=$cooldown, produced=$produced, consumed=$consumed]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'cargo'] = this.cargo;
-      json[r'cooldown'] = this.cooldown;
-      json[r'produced'] = this.produced;
-      json[r'consumed'] = this.consumed;
+    json[r'cargo'] = this.cargo;
+    json[r'cooldown'] = this.cooldown;
+    json[r'produced'] = this.produced;
+    json[r'consumed'] = this.consumed;
     return json;
   }
 
@@ -66,8 +69,10 @@ class ShipRefine200ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipRefine200ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipRefine200ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipRefine200ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipRefine200ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -75,14 +80,19 @@ class ShipRefine200ResponseData {
       return ShipRefine200ResponseData(
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
-        produced: ShipRefine200ResponseDataProducedInner.listFromJson(json[r'produced'])!,
-        consumed: ShipRefine200ResponseDataProducedInner.listFromJson(json[r'consumed'])!,
+        produced: ShipRefine200ResponseDataProducedInner.listFromJson(
+            json[r'produced'])!,
+        consumed: ShipRefine200ResponseDataProducedInner.listFromJson(
+            json[r'consumed'])!,
       );
     }
     return null;
   }
 
-  static List<ShipRefine200ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipRefine200ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipRefine200ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -110,12 +120,18 @@ class ShipRefine200ResponseData {
   }
 
   // maps a json object with a list of ShipRefine200ResponseData-objects as value to a dart map
-  static Map<String, List<ShipRefine200ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipRefine200ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipRefine200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipRefine200ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = ShipRefine200ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -132,4 +148,3 @@ class ShipRefine200ResponseData {
     'consumed',
   };
 }
-

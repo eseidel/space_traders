@@ -19,20 +19,21 @@ class ShipRefineRequest {
   ShipRefineRequestProduceEnum produce;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipRefineRequest &&
-     other.produce == produce;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipRefineRequest && other.produce == produce;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (produce.hashCode);
+      // ignore: unnecessary_parenthesis
+      (produce.hashCode);
 
   @override
   String toString() => 'ShipRefineRequest[produce=$produce]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'produce'] = this.produce;
+    json[r'produce'] = this.produce;
     return json;
   }
 
@@ -48,8 +49,10 @@ class ShipRefineRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipRefineRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipRefineRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipRefineRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipRefineRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class ShipRefineRequest {
     return null;
   }
 
-  static List<ShipRefineRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipRefineRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipRefineRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -89,12 +95,18 @@ class ShipRefineRequest {
   }
 
   // maps a json object with a list of ShipRefineRequest-objects as value to a dart map
-  static Map<String, List<ShipRefineRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipRefineRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipRefineRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipRefineRequest.listFromJson(entry.value, growable: growable,);
+        final value = ShipRefineRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,7 +120,6 @@ class ShipRefineRequest {
     'produce',
   };
 }
-
 
 class ShipRefineRequestProduceEnum {
   /// Instantiate a new enum with the provided [value].
@@ -145,9 +156,13 @@ class ShipRefineRequestProduceEnum {
     FUEL,
   ];
 
-  static ShipRefineRequestProduceEnum? fromJson(dynamic value) => ShipRefineRequestProduceEnumTypeTransformer().decode(value);
+  static ShipRefineRequestProduceEnum? fromJson(dynamic value) =>
+      ShipRefineRequestProduceEnumTypeTransformer().decode(value);
 
-  static List<ShipRefineRequestProduceEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipRefineRequestProduceEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipRefineRequestProduceEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -164,7 +179,8 @@ class ShipRefineRequestProduceEnum {
 /// Transformation class that can [encode] an instance of [ShipRefineRequestProduceEnum] to String,
 /// and [decode] dynamic data back to [ShipRefineRequestProduceEnum].
 class ShipRefineRequestProduceEnumTypeTransformer {
-  factory ShipRefineRequestProduceEnumTypeTransformer() => _instance ??= const ShipRefineRequestProduceEnumTypeTransformer._();
+  factory ShipRefineRequestProduceEnumTypeTransformer() =>
+      _instance ??= const ShipRefineRequestProduceEnumTypeTransformer._();
 
   const ShipRefineRequestProduceEnumTypeTransformer._();
 
@@ -181,15 +197,24 @@ class ShipRefineRequestProduceEnumTypeTransformer {
   ShipRefineRequestProduceEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'IRON': return ShipRefineRequestProduceEnum.IRON;
-        case r'COPPER': return ShipRefineRequestProduceEnum.COPPER;
-        case r'SILVER': return ShipRefineRequestProduceEnum.SILVER;
-        case r'GOLD': return ShipRefineRequestProduceEnum.GOLD;
-        case r'ALUMINUM': return ShipRefineRequestProduceEnum.ALUMINUM;
-        case r'PLATINUM': return ShipRefineRequestProduceEnum.PLATINUM;
-        case r'URANITE': return ShipRefineRequestProduceEnum.URANITE;
-        case r'MERITIUM': return ShipRefineRequestProduceEnum.MERITIUM;
-        case r'FUEL': return ShipRefineRequestProduceEnum.FUEL;
+        case r'IRON':
+          return ShipRefineRequestProduceEnum.IRON;
+        case r'COPPER':
+          return ShipRefineRequestProduceEnum.COPPER;
+        case r'SILVER':
+          return ShipRefineRequestProduceEnum.SILVER;
+        case r'GOLD':
+          return ShipRefineRequestProduceEnum.GOLD;
+        case r'ALUMINUM':
+          return ShipRefineRequestProduceEnum.ALUMINUM;
+        case r'PLATINUM':
+          return ShipRefineRequestProduceEnum.PLATINUM;
+        case r'URANITE':
+          return ShipRefineRequestProduceEnum.URANITE;
+        case r'MERITIUM':
+          return ShipRefineRequestProduceEnum.MERITIUM;
+        case r'FUEL':
+          return ShipRefineRequestProduceEnum.FUEL;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -202,5 +227,3 @@ class ShipRefineRequestProduceEnumTypeTransformer {
   /// Singleton [ShipRefineRequestProduceEnumTypeTransformer] instance.
   static ShipRefineRequestProduceEnumTypeTransformer? _instance;
 }
-
-

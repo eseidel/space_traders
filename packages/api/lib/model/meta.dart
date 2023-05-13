@@ -25,26 +25,26 @@ class Meta {
   int limit;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Meta &&
-     other.total == total &&
-     other.page == page &&
-     other.limit == limit;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Meta &&
+          other.total == total &&
+          other.page == page &&
+          other.limit == limit;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (total.hashCode) +
-    (page.hashCode) +
-    (limit.hashCode);
+      // ignore: unnecessary_parenthesis
+      (total.hashCode) + (page.hashCode) + (limit.hashCode);
 
   @override
   String toString() => 'Meta[total=$total, page=$page, limit=$limit]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'total'] = this.total;
-      json[r'page'] = this.page;
-      json[r'limit'] = this.limit;
+    json[r'total'] = this.total;
+    json[r'page'] = this.page;
+    json[r'limit'] = this.limit;
     return json;
   }
 
@@ -60,8 +60,10 @@ class Meta {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Meta[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Meta[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Meta[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Meta[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -75,7 +77,10 @@ class Meta {
     return null;
   }
 
-  static List<Meta>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Meta>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Meta>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -103,12 +108,18 @@ class Meta {
   }
 
   // maps a json object with a list of Meta-objects as value to a dart map
-  static Map<String, List<Meta>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Meta>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Meta>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Meta.listFromJson(entry.value, growable: growable,);
+        final value = Meta.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -124,4 +135,3 @@ class Meta {
     'limit',
   };
 }
-

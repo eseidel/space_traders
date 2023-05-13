@@ -41,38 +41,41 @@ class Contract {
   DateTime expiration;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Contract &&
-     other.id == id &&
-     other.factionSymbol == factionSymbol &&
-     other.type == type &&
-     other.terms == terms &&
-     other.accepted == accepted &&
-     other.fulfilled == fulfilled &&
-     other.expiration == expiration;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Contract &&
+          other.id == id &&
+          other.factionSymbol == factionSymbol &&
+          other.type == type &&
+          other.terms == terms &&
+          other.accepted == accepted &&
+          other.fulfilled == fulfilled &&
+          other.expiration == expiration;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (id.hashCode) +
-    (factionSymbol.hashCode) +
-    (type.hashCode) +
-    (terms.hashCode) +
-    (accepted.hashCode) +
-    (fulfilled.hashCode) +
-    (expiration.hashCode);
+      // ignore: unnecessary_parenthesis
+      (id.hashCode) +
+      (factionSymbol.hashCode) +
+      (type.hashCode) +
+      (terms.hashCode) +
+      (accepted.hashCode) +
+      (fulfilled.hashCode) +
+      (expiration.hashCode);
 
   @override
-  String toString() => 'Contract[id=$id, factionSymbol=$factionSymbol, type=$type, terms=$terms, accepted=$accepted, fulfilled=$fulfilled, expiration=$expiration]';
+  String toString() =>
+      'Contract[id=$id, factionSymbol=$factionSymbol, type=$type, terms=$terms, accepted=$accepted, fulfilled=$fulfilled, expiration=$expiration]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'id'] = this.id;
-      json[r'factionSymbol'] = this.factionSymbol;
-      json[r'type'] = this.type;
-      json[r'terms'] = this.terms;
-      json[r'accepted'] = this.accepted;
-      json[r'fulfilled'] = this.fulfilled;
-      json[r'expiration'] = this.expiration.toUtc().toIso8601String();
+    json[r'id'] = this.id;
+    json[r'factionSymbol'] = this.factionSymbol;
+    json[r'type'] = this.type;
+    json[r'terms'] = this.terms;
+    json[r'accepted'] = this.accepted;
+    json[r'fulfilled'] = this.fulfilled;
+    json[r'expiration'] = this.expiration.toUtc().toIso8601String();
     return json;
   }
 
@@ -88,8 +91,10 @@ class Contract {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Contract[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Contract[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Contract[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Contract[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -107,7 +112,10 @@ class Contract {
     return null;
   }
 
-  static List<Contract>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Contract>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Contract>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -135,12 +143,18 @@ class Contract {
   }
 
   // maps a json object with a list of Contract-objects as value to a dart map
-  static Map<String, List<Contract>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Contract>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Contract>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Contract.listFromJson(entry.value, growable: growable,);
+        final value = Contract.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -160,7 +174,6 @@ class Contract {
     'expiration',
   };
 }
-
 
 class ContractTypeEnum {
   /// Instantiate a new enum with the provided [value].
@@ -185,9 +198,13 @@ class ContractTypeEnum {
     SHUTTLE,
   ];
 
-  static ContractTypeEnum? fromJson(dynamic value) => ContractTypeEnumTypeTransformer().decode(value);
+  static ContractTypeEnum? fromJson(dynamic value) =>
+      ContractTypeEnumTypeTransformer().decode(value);
 
-  static List<ContractTypeEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ContractTypeEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ContractTypeEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -204,7 +221,8 @@ class ContractTypeEnum {
 /// Transformation class that can [encode] an instance of [ContractTypeEnum] to String,
 /// and [decode] dynamic data back to [ContractTypeEnum].
 class ContractTypeEnumTypeTransformer {
-  factory ContractTypeEnumTypeTransformer() => _instance ??= const ContractTypeEnumTypeTransformer._();
+  factory ContractTypeEnumTypeTransformer() =>
+      _instance ??= const ContractTypeEnumTypeTransformer._();
 
   const ContractTypeEnumTypeTransformer._();
 
@@ -221,9 +239,12 @@ class ContractTypeEnumTypeTransformer {
   ContractTypeEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'PROCUREMENT': return ContractTypeEnum.PROCUREMENT;
-        case r'TRANSPORT': return ContractTypeEnum.TRANSPORT;
-        case r'SHUTTLE': return ContractTypeEnum.SHUTTLE;
+        case r'PROCUREMENT':
+          return ContractTypeEnum.PROCUREMENT;
+        case r'TRANSPORT':
+          return ContractTypeEnum.TRANSPORT;
+        case r'SHUTTLE':
+          return ContractTypeEnum.SHUTTLE;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -236,5 +257,3 @@ class ContractTypeEnumTypeTransformer {
   /// Singleton [ContractTypeEnumTypeTransformer] instance.
   static ContractTypeEnumTypeTransformer? _instance;
 }
-
-

@@ -19,20 +19,21 @@ class Jettison200ResponseData {
   ShipCargo cargo;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Jettison200ResponseData &&
-     other.cargo == cargo;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Jettison200ResponseData && other.cargo == cargo;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (cargo.hashCode);
+      // ignore: unnecessary_parenthesis
+      (cargo.hashCode);
 
   @override
   String toString() => 'Jettison200ResponseData[cargo=$cargo]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'cargo'] = this.cargo;
+    json[r'cargo'] = this.cargo;
     return json;
   }
 
@@ -48,8 +49,10 @@ class Jettison200ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Jettison200ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Jettison200ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Jettison200ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Jettison200ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class Jettison200ResponseData {
     return null;
   }
 
-  static List<Jettison200ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Jettison200ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Jettison200ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -89,12 +95,18 @@ class Jettison200ResponseData {
   }
 
   // maps a json object with a list of Jettison200ResponseData-objects as value to a dart map
-  static Map<String, List<Jettison200ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Jettison200ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Jettison200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Jettison200ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = Jettison200ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,4 +120,3 @@ class Jettison200ResponseData {
     'cargo',
   };
 }
-

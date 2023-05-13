@@ -22,23 +22,24 @@ class Extraction {
   ExtractionYield yield_;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Extraction &&
-     other.shipSymbol == shipSymbol &&
-     other.yield_ == yield_;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Extraction &&
+          other.shipSymbol == shipSymbol &&
+          other.yield_ == yield_;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (shipSymbol.hashCode) +
-    (yield_.hashCode);
+      // ignore: unnecessary_parenthesis
+      (shipSymbol.hashCode) + (yield_.hashCode);
 
   @override
   String toString() => 'Extraction[shipSymbol=$shipSymbol, yield_=$yield_]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'shipSymbol'] = this.shipSymbol;
-      json[r'yield'] = this.yield_;
+    json[r'shipSymbol'] = this.shipSymbol;
+    json[r'yield'] = this.yield_;
     return json;
   }
 
@@ -54,8 +55,10 @@ class Extraction {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "Extraction[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "Extraction[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "Extraction[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "Extraction[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -68,7 +71,10 @@ class Extraction {
     return null;
   }
 
-  static List<Extraction>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<Extraction>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <Extraction>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -96,12 +102,18 @@ class Extraction {
   }
 
   // maps a json object with a list of Extraction-objects as value to a dart map
-  static Map<String, List<Extraction>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<Extraction>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<Extraction>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Extraction.listFromJson(entry.value, growable: growable,);
+        final value = Extraction.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,4 +128,3 @@ class Extraction {
     'yield',
   };
 }
-

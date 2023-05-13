@@ -10,7 +10,7 @@
 
 part of space_traders_api;
 
-/// 
+///
 class ShipType {
   /// Instantiate a new enum with the provided [value].
   const ShipType._(this.value);
@@ -48,9 +48,13 @@ class ShipType {
     REFINING_FREIGHTER,
   ];
 
-  static ShipType? fromJson(dynamic value) => ShipTypeTypeTransformer().decode(value);
+  static ShipType? fromJson(dynamic value) =>
+      ShipTypeTypeTransformer().decode(value);
 
-  static List<ShipType>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipType>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipType>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -67,7 +71,8 @@ class ShipType {
 /// Transformation class that can [encode] an instance of [ShipType] to String,
 /// and [decode] dynamic data back to [ShipType].
 class ShipTypeTypeTransformer {
-  factory ShipTypeTypeTransformer() => _instance ??= const ShipTypeTypeTransformer._();
+  factory ShipTypeTypeTransformer() =>
+      _instance ??= const ShipTypeTypeTransformer._();
 
   const ShipTypeTypeTransformer._();
 
@@ -84,16 +89,26 @@ class ShipTypeTypeTransformer {
   ShipType? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'SHIP_PROBE': return ShipType.PROBE;
-        case r'SHIP_MINING_DRONE': return ShipType.MINING_DRONE;
-        case r'SHIP_INTERCEPTOR': return ShipType.INTERCEPTOR;
-        case r'SHIP_LIGHT_HAULER': return ShipType.LIGHT_HAULER;
-        case r'SHIP_COMMAND_FRIGATE': return ShipType.COMMAND_FRIGATE;
-        case r'SHIP_EXPLORER': return ShipType.EXPLORER;
-        case r'SHIP_HEAVY_FREIGHTER': return ShipType.HEAVY_FREIGHTER;
-        case r'SHIP_LIGHT_SHUTTLE': return ShipType.LIGHT_SHUTTLE;
-        case r'SHIP_ORE_HOUND': return ShipType.ORE_HOUND;
-        case r'SHIP_REFINING_FREIGHTER': return ShipType.REFINING_FREIGHTER;
+        case r'SHIP_PROBE':
+          return ShipType.PROBE;
+        case r'SHIP_MINING_DRONE':
+          return ShipType.MINING_DRONE;
+        case r'SHIP_INTERCEPTOR':
+          return ShipType.INTERCEPTOR;
+        case r'SHIP_LIGHT_HAULER':
+          return ShipType.LIGHT_HAULER;
+        case r'SHIP_COMMAND_FRIGATE':
+          return ShipType.COMMAND_FRIGATE;
+        case r'SHIP_EXPLORER':
+          return ShipType.EXPLORER;
+        case r'SHIP_HEAVY_FREIGHTER':
+          return ShipType.HEAVY_FREIGHTER;
+        case r'SHIP_LIGHT_SHUTTLE':
+          return ShipType.LIGHT_SHUTTLE;
+        case r'SHIP_ORE_HOUND':
+          return ShipType.ORE_HOUND;
+        case r'SHIP_REFINING_FREIGHTER':
+          return ShipType.REFINING_FREIGHTER;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -106,4 +121,3 @@ class ShipTypeTypeTransformer {
   /// Singleton [ShipTypeTypeTransformer] instance.
   static ShipTypeTypeTransformer? _instance;
 }
-

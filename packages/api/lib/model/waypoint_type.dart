@@ -46,9 +46,13 @@ class WaypointType {
     GRAVITY_WELL,
   ];
 
-  static WaypointType? fromJson(dynamic value) => WaypointTypeTypeTransformer().decode(value);
+  static WaypointType? fromJson(dynamic value) =>
+      WaypointTypeTypeTransformer().decode(value);
 
-  static List<WaypointType>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<WaypointType>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <WaypointType>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -65,7 +69,8 @@ class WaypointType {
 /// Transformation class that can [encode] an instance of [WaypointType] to String,
 /// and [decode] dynamic data back to [WaypointType].
 class WaypointTypeTypeTransformer {
-  factory WaypointTypeTypeTransformer() => _instance ??= const WaypointTypeTypeTransformer._();
+  factory WaypointTypeTypeTransformer() =>
+      _instance ??= const WaypointTypeTypeTransformer._();
 
   const WaypointTypeTypeTransformer._();
 
@@ -82,15 +87,24 @@ class WaypointTypeTypeTransformer {
   WaypointType? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'PLANET': return WaypointType.PLANET;
-        case r'GAS_GIANT': return WaypointType.GAS_GIANT;
-        case r'MOON': return WaypointType.MOON;
-        case r'ORBITAL_STATION': return WaypointType.ORBITAL_STATION;
-        case r'JUMP_GATE': return WaypointType.JUMP_GATE;
-        case r'ASTEROID_FIELD': return WaypointType.ASTEROID_FIELD;
-        case r'NEBULA': return WaypointType.NEBULA;
-        case r'DEBRIS_FIELD': return WaypointType.DEBRIS_FIELD;
-        case r'GRAVITY_WELL': return WaypointType.GRAVITY_WELL;
+        case r'PLANET':
+          return WaypointType.PLANET;
+        case r'GAS_GIANT':
+          return WaypointType.GAS_GIANT;
+        case r'MOON':
+          return WaypointType.MOON;
+        case r'ORBITAL_STATION':
+          return WaypointType.ORBITAL_STATION;
+        case r'JUMP_GATE':
+          return WaypointType.JUMP_GATE;
+        case r'ASTEROID_FIELD':
+          return WaypointType.ASTEROID_FIELD;
+        case r'NEBULA':
+          return WaypointType.NEBULA;
+        case r'DEBRIS_FIELD':
+          return WaypointType.DEBRIS_FIELD;
+        case r'GRAVITY_WELL':
+          return WaypointType.GRAVITY_WELL;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -103,4 +117,3 @@ class WaypointTypeTypeTransformer {
   /// Singleton [WaypointTypeTypeTransformer] instance.
   static WaypointTypeTypeTransformer? _instance;
 }
-

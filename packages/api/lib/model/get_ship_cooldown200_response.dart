@@ -19,20 +19,21 @@ class GetShipCooldown200Response {
   Cooldown data;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is GetShipCooldown200Response &&
-     other.data == data;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GetShipCooldown200Response && other.data == data;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (data.hashCode);
+      // ignore: unnecessary_parenthesis
+      (data.hashCode);
 
   @override
   String toString() => 'GetShipCooldown200Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'data'] = this.data;
+    json[r'data'] = this.data;
     return json;
   }
 
@@ -48,8 +49,10 @@ class GetShipCooldown200Response {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "GetShipCooldown200Response[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "GetShipCooldown200Response[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "GetShipCooldown200Response[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "GetShipCooldown200Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -61,7 +64,10 @@ class GetShipCooldown200Response {
     return null;
   }
 
-  static List<GetShipCooldown200Response>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<GetShipCooldown200Response>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <GetShipCooldown200Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -89,12 +95,18 @@ class GetShipCooldown200Response {
   }
 
   // maps a json object with a list of GetShipCooldown200Response-objects as value to a dart map
-  static Map<String, List<GetShipCooldown200Response>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<GetShipCooldown200Response>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<GetShipCooldown200Response>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = GetShipCooldown200Response.listFromJson(entry.value, growable: growable,);
+        final value = GetShipCooldown200Response.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,4 +120,3 @@ class GetShipCooldown200Response {
     'data',
   };
 }
-

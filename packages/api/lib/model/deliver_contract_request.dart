@@ -25,26 +25,27 @@ class DeliverContractRequest {
   int units;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is DeliverContractRequest &&
-     other.shipSymbol == shipSymbol &&
-     other.tradeSymbol == tradeSymbol &&
-     other.units == units;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DeliverContractRequest &&
+          other.shipSymbol == shipSymbol &&
+          other.tradeSymbol == tradeSymbol &&
+          other.units == units;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (shipSymbol.hashCode) +
-    (tradeSymbol.hashCode) +
-    (units.hashCode);
+      // ignore: unnecessary_parenthesis
+      (shipSymbol.hashCode) + (tradeSymbol.hashCode) + (units.hashCode);
 
   @override
-  String toString() => 'DeliverContractRequest[shipSymbol=$shipSymbol, tradeSymbol=$tradeSymbol, units=$units]';
+  String toString() =>
+      'DeliverContractRequest[shipSymbol=$shipSymbol, tradeSymbol=$tradeSymbol, units=$units]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'shipSymbol'] = this.shipSymbol;
-      json[r'tradeSymbol'] = this.tradeSymbol;
-      json[r'units'] = this.units;
+    json[r'shipSymbol'] = this.shipSymbol;
+    json[r'tradeSymbol'] = this.tradeSymbol;
+    json[r'units'] = this.units;
     return json;
   }
 
@@ -60,8 +61,10 @@ class DeliverContractRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "DeliverContractRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "DeliverContractRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "DeliverContractRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "DeliverContractRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -75,7 +78,10 @@ class DeliverContractRequest {
     return null;
   }
 
-  static List<DeliverContractRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<DeliverContractRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <DeliverContractRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -103,12 +109,18 @@ class DeliverContractRequest {
   }
 
   // maps a json object with a list of DeliverContractRequest-objects as value to a dart map
-  static Map<String, List<DeliverContractRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<DeliverContractRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<DeliverContractRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = DeliverContractRequest.listFromJson(entry.value, growable: growable,);
+        final value = DeliverContractRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -124,4 +136,3 @@ class DeliverContractRequest {
     'units',
   };
 }
-

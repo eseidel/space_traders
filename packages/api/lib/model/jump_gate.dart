@@ -34,30 +34,33 @@ class JumpGate {
   List<ConnectedSystem> connectedSystems;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is JumpGate &&
-     other.jumpRange == jumpRange &&
-     other.factionSymbol == factionSymbol &&
-     other.connectedSystems == connectedSystems;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JumpGate &&
+          other.jumpRange == jumpRange &&
+          other.factionSymbol == factionSymbol &&
+          other.connectedSystems == connectedSystems;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (jumpRange.hashCode) +
-    (factionSymbol == null ? 0 : factionSymbol!.hashCode) +
-    (connectedSystems.hashCode);
+      // ignore: unnecessary_parenthesis
+      (jumpRange.hashCode) +
+      (factionSymbol == null ? 0 : factionSymbol!.hashCode) +
+      (connectedSystems.hashCode);
 
   @override
-  String toString() => 'JumpGate[jumpRange=$jumpRange, factionSymbol=$factionSymbol, connectedSystems=$connectedSystems]';
+  String toString() =>
+      'JumpGate[jumpRange=$jumpRange, factionSymbol=$factionSymbol, connectedSystems=$connectedSystems]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'jumpRange'] = this.jumpRange;
+    json[r'jumpRange'] = this.jumpRange;
     if (this.factionSymbol != null) {
       json[r'factionSymbol'] = this.factionSymbol;
     } else {
       json[r'factionSymbol'] = null;
     }
-      json[r'connectedSystems'] = this.connectedSystems;
+    json[r'connectedSystems'] = this.connectedSystems;
     return json;
   }
 
@@ -73,8 +76,10 @@ class JumpGate {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "JumpGate[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "JumpGate[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "JumpGate[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "JumpGate[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -82,13 +87,17 @@ class JumpGate {
       return JumpGate(
         jumpRange: num.parse(json[r'jumpRange'].toString()),
         factionSymbol: mapValueOfType<String>(json, r'factionSymbol'),
-        connectedSystems: ConnectedSystem.listFromJson(json[r'connectedSystems'])!,
+        connectedSystems:
+            ConnectedSystem.listFromJson(json[r'connectedSystems'])!,
       );
     }
     return null;
   }
 
-  static List<JumpGate>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<JumpGate>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <JumpGate>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -116,12 +125,18 @@ class JumpGate {
   }
 
   // maps a json object with a list of JumpGate-objects as value to a dart map
-  static Map<String, List<JumpGate>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<JumpGate>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<JumpGate>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = JumpGate.listFromJson(entry.value, growable: growable,);
+        final value = JumpGate.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -136,4 +151,3 @@ class JumpGate {
     'connectedSystems',
   };
 }
-

@@ -22,23 +22,25 @@ class CreateChart201ResponseData {
   Waypoint waypoint;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is CreateChart201ResponseData &&
-     other.chart == chart &&
-     other.waypoint == waypoint;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateChart201ResponseData &&
+          other.chart == chart &&
+          other.waypoint == waypoint;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (chart.hashCode) +
-    (waypoint.hashCode);
+      // ignore: unnecessary_parenthesis
+      (chart.hashCode) + (waypoint.hashCode);
 
   @override
-  String toString() => 'CreateChart201ResponseData[chart=$chart, waypoint=$waypoint]';
+  String toString() =>
+      'CreateChart201ResponseData[chart=$chart, waypoint=$waypoint]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'chart'] = this.chart;
-      json[r'waypoint'] = this.waypoint;
+    json[r'chart'] = this.chart;
+    json[r'waypoint'] = this.waypoint;
     return json;
   }
 
@@ -54,8 +56,10 @@ class CreateChart201ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "CreateChart201ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "CreateChart201ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "CreateChart201ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "CreateChart201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -68,7 +72,10 @@ class CreateChart201ResponseData {
     return null;
   }
 
-  static List<CreateChart201ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<CreateChart201ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <CreateChart201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -96,12 +103,18 @@ class CreateChart201ResponseData {
   }
 
   // maps a json object with a list of CreateChart201ResponseData-objects as value to a dart map
-  static Map<String, List<CreateChart201ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<CreateChart201ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<CreateChart201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = CreateChart201ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = CreateChart201ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,4 +129,3 @@ class CreateChart201ResponseData {
     'waypoint',
   };
 }
-

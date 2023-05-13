@@ -50,34 +50,37 @@ class ScannedShip {
   List<ScannedShipMountsInner> mounts;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ScannedShip &&
-     other.symbol == symbol &&
-     other.registration == registration &&
-     other.nav == nav &&
-     other.frame == frame &&
-     other.reactor == reactor &&
-     other.engine == engine &&
-     other.mounts == mounts;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ScannedShip &&
+          other.symbol == symbol &&
+          other.registration == registration &&
+          other.nav == nav &&
+          other.frame == frame &&
+          other.reactor == reactor &&
+          other.engine == engine &&
+          other.mounts == mounts;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (registration.hashCode) +
-    (nav.hashCode) +
-    (frame == null ? 0 : frame!.hashCode) +
-    (reactor == null ? 0 : reactor!.hashCode) +
-    (engine.hashCode) +
-    (mounts.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (registration.hashCode) +
+      (nav.hashCode) +
+      (frame == null ? 0 : frame!.hashCode) +
+      (reactor == null ? 0 : reactor!.hashCode) +
+      (engine.hashCode) +
+      (mounts.hashCode);
 
   @override
-  String toString() => 'ScannedShip[symbol=$symbol, registration=$registration, nav=$nav, frame=$frame, reactor=$reactor, engine=$engine, mounts=$mounts]';
+  String toString() =>
+      'ScannedShip[symbol=$symbol, registration=$registration, nav=$nav, frame=$frame, reactor=$reactor, engine=$engine, mounts=$mounts]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'registration'] = this.registration;
-      json[r'nav'] = this.nav;
+    json[r'symbol'] = this.symbol;
+    json[r'registration'] = this.registration;
+    json[r'nav'] = this.nav;
     if (this.frame != null) {
       json[r'frame'] = this.frame;
     } else {
@@ -88,8 +91,8 @@ class ScannedShip {
     } else {
       json[r'reactor'] = null;
     }
-      json[r'engine'] = this.engine;
-      json[r'mounts'] = this.mounts;
+    json[r'engine'] = this.engine;
+    json[r'mounts'] = this.mounts;
     return json;
   }
 
@@ -105,8 +108,10 @@ class ScannedShip {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ScannedShip[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ScannedShip[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ScannedShip[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ScannedShip[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -118,13 +123,17 @@ class ScannedShip {
         frame: ScannedShipFrame.fromJson(json[r'frame']),
         reactor: ScannedShipReactor.fromJson(json[r'reactor']),
         engine: ScannedShipEngine.fromJson(json[r'engine'])!,
-        mounts: ScannedShipMountsInner.listFromJson(json[r'mounts']) ?? const [],
+        mounts:
+            ScannedShipMountsInner.listFromJson(json[r'mounts']) ?? const [],
       );
     }
     return null;
   }
 
-  static List<ScannedShip>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ScannedShip>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ScannedShip>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -152,12 +161,18 @@ class ScannedShip {
   }
 
   // maps a json object with a list of ScannedShip-objects as value to a dart map
-  static Map<String, List<ScannedShip>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ScannedShip>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ScannedShip>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ScannedShip.listFromJson(entry.value, growable: growable,);
+        final value = ScannedShip.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -174,4 +189,3 @@ class ScannedShip {
     'engine',
   };
 }
-

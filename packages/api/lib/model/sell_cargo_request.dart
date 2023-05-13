@@ -22,23 +22,24 @@ class SellCargoRequest {
   int units;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is SellCargoRequest &&
-     other.symbol == symbol &&
-     other.units == units;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SellCargoRequest &&
+          other.symbol == symbol &&
+          other.units == units;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (units.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) + (units.hashCode);
 
   @override
   String toString() => 'SellCargoRequest[symbol=$symbol, units=$units]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'units'] = this.units;
+    json[r'symbol'] = this.symbol;
+    json[r'units'] = this.units;
     return json;
   }
 
@@ -54,8 +55,10 @@ class SellCargoRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "SellCargoRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "SellCargoRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "SellCargoRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "SellCargoRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -68,7 +71,10 @@ class SellCargoRequest {
     return null;
   }
 
-  static List<SellCargoRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<SellCargoRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <SellCargoRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -96,12 +102,18 @@ class SellCargoRequest {
   }
 
   // maps a json object with a list of SellCargoRequest-objects as value to a dart map
-  static Map<String, List<SellCargoRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<SellCargoRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<SellCargoRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = SellCargoRequest.listFromJson(entry.value, growable: growable,);
+        final value = SellCargoRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,4 +128,3 @@ class SellCargoRequest {
     'units',
   };
 }
-

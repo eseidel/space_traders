@@ -25,26 +25,27 @@ class TransferCargoRequest {
   String shipSymbol;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is TransferCargoRequest &&
-     other.tradeSymbol == tradeSymbol &&
-     other.units == units &&
-     other.shipSymbol == shipSymbol;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransferCargoRequest &&
+          other.tradeSymbol == tradeSymbol &&
+          other.units == units &&
+          other.shipSymbol == shipSymbol;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (tradeSymbol.hashCode) +
-    (units.hashCode) +
-    (shipSymbol.hashCode);
+      // ignore: unnecessary_parenthesis
+      (tradeSymbol.hashCode) + (units.hashCode) + (shipSymbol.hashCode);
 
   @override
-  String toString() => 'TransferCargoRequest[tradeSymbol=$tradeSymbol, units=$units, shipSymbol=$shipSymbol]';
+  String toString() =>
+      'TransferCargoRequest[tradeSymbol=$tradeSymbol, units=$units, shipSymbol=$shipSymbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'tradeSymbol'] = this.tradeSymbol;
-      json[r'units'] = this.units;
-      json[r'shipSymbol'] = this.shipSymbol;
+    json[r'tradeSymbol'] = this.tradeSymbol;
+    json[r'units'] = this.units;
+    json[r'shipSymbol'] = this.shipSymbol;
     return json;
   }
 
@@ -60,8 +61,10 @@ class TransferCargoRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "TransferCargoRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "TransferCargoRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "TransferCargoRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "TransferCargoRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -75,7 +78,10 @@ class TransferCargoRequest {
     return null;
   }
 
-  static List<TransferCargoRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<TransferCargoRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <TransferCargoRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -103,12 +109,18 @@ class TransferCargoRequest {
   }
 
   // maps a json object with a list of TransferCargoRequest-objects as value to a dart map
-  static Map<String, List<TransferCargoRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<TransferCargoRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<TransferCargoRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = TransferCargoRequest.listFromJson(entry.value, growable: growable,);
+        final value = TransferCargoRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -124,4 +136,3 @@ class TransferCargoRequest {
     'shipSymbol',
   };
 }
-

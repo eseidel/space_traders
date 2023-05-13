@@ -25,26 +25,27 @@ class TradeGood {
   String description;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is TradeGood &&
-     other.symbol == symbol &&
-     other.name == name &&
-     other.description == description;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TradeGood &&
+          other.symbol == symbol &&
+          other.name == name &&
+          other.description == description;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (name.hashCode) +
-    (description.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) + (name.hashCode) + (description.hashCode);
 
   @override
-  String toString() => 'TradeGood[symbol=$symbol, name=$name, description=$description]';
+  String toString() =>
+      'TradeGood[symbol=$symbol, name=$name, description=$description]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'name'] = this.name;
-      json[r'description'] = this.description;
+    json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
     return json;
   }
 
@@ -60,8 +61,10 @@ class TradeGood {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "TradeGood[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "TradeGood[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "TradeGood[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "TradeGood[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -75,7 +78,10 @@ class TradeGood {
     return null;
   }
 
-  static List<TradeGood>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<TradeGood>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <TradeGood>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -103,12 +109,18 @@ class TradeGood {
   }
 
   // maps a json object with a list of TradeGood-objects as value to a dart map
-  static Map<String, List<TradeGood>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<TradeGood>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<TradeGood>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = TradeGood.listFromJson(entry.value, growable: growable,);
+        final value = TradeGood.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -124,4 +136,3 @@ class TradeGood {
     'description',
   };
 }
-

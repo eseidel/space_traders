@@ -25,13 +25,14 @@ class PatchShipNavRequest {
   ShipNavFlightMode? flightMode;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is PatchShipNavRequest &&
-     other.flightMode == flightMode;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PatchShipNavRequest && other.flightMode == flightMode;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (flightMode == null ? 0 : flightMode!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (flightMode == null ? 0 : flightMode!.hashCode);
 
   @override
   String toString() => 'PatchShipNavRequest[flightMode=$flightMode]';
@@ -58,8 +59,10 @@ class PatchShipNavRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "PatchShipNavRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "PatchShipNavRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "PatchShipNavRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "PatchShipNavRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -71,7 +74,10 @@ class PatchShipNavRequest {
     return null;
   }
 
-  static List<PatchShipNavRequest>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<PatchShipNavRequest>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <PatchShipNavRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -99,12 +105,18 @@ class PatchShipNavRequest {
   }
 
   // maps a json object with a list of PatchShipNavRequest-objects as value to a dart map
-  static Map<String, List<PatchShipNavRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<PatchShipNavRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<PatchShipNavRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = PatchShipNavRequest.listFromJson(entry.value, growable: growable,);
+        final value = PatchShipNavRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -114,7 +126,5 @@ class PatchShipNavRequest {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-  };
+  static const requiredKeys = <String>{};
 }
-

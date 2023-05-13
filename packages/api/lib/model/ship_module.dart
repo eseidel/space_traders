@@ -54,30 +54,33 @@ class ShipModule {
   ShipRequirements requirements;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipModule &&
-     other.symbol == symbol &&
-     other.capacity == capacity &&
-     other.range == range &&
-     other.name == name &&
-     other.description == description &&
-     other.requirements == requirements;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipModule &&
+          other.symbol == symbol &&
+          other.capacity == capacity &&
+          other.range == range &&
+          other.name == name &&
+          other.description == description &&
+          other.requirements == requirements;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (capacity == null ? 0 : capacity!.hashCode) +
-    (range == null ? 0 : range!.hashCode) +
-    (name.hashCode) +
-    (description == null ? 0 : description!.hashCode) +
-    (requirements.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (capacity == null ? 0 : capacity!.hashCode) +
+      (range == null ? 0 : range!.hashCode) +
+      (name.hashCode) +
+      (description == null ? 0 : description!.hashCode) +
+      (requirements.hashCode);
 
   @override
-  String toString() => 'ShipModule[symbol=$symbol, capacity=$capacity, range=$range, name=$name, description=$description, requirements=$requirements]';
+  String toString() =>
+      'ShipModule[symbol=$symbol, capacity=$capacity, range=$range, name=$name, description=$description, requirements=$requirements]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
+    json[r'symbol'] = this.symbol;
     if (this.capacity != null) {
       json[r'capacity'] = this.capacity;
     } else {
@@ -88,13 +91,13 @@ class ShipModule {
     } else {
       json[r'range'] = null;
     }
-      json[r'name'] = this.name;
+    json[r'name'] = this.name;
     if (this.description != null) {
       json[r'description'] = this.description;
     } else {
       json[r'description'] = null;
     }
-      json[r'requirements'] = this.requirements;
+    json[r'requirements'] = this.requirements;
     return json;
   }
 
@@ -110,8 +113,10 @@ class ShipModule {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipModule[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipModule[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipModule[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipModule[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -128,7 +133,10 @@ class ShipModule {
     return null;
   }
 
-  static List<ShipModule>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipModule>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipModule>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -156,12 +164,18 @@ class ShipModule {
   }
 
   // maps a json object with a list of ShipModule-objects as value to a dart map
-  static Map<String, List<ShipModule>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipModule>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipModule>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipModule.listFromJson(entry.value, growable: growable,);
+        final value = ShipModule.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -178,7 +192,6 @@ class ShipModule {
   };
 }
 
-
 class ShipModuleSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipModuleSymbolEnum._(this.value);
@@ -191,23 +204,34 @@ class ShipModuleSymbolEnum {
 
   String toJson() => value;
 
-  static const MINERAL_PROCESSOR_I = ShipModuleSymbolEnum._(r'MODULE_MINERAL_PROCESSOR_I');
+  static const MINERAL_PROCESSOR_I =
+      ShipModuleSymbolEnum._(r'MODULE_MINERAL_PROCESSOR_I');
   static const CARGO_HOLD_I = ShipModuleSymbolEnum._(r'MODULE_CARGO_HOLD_I');
-  static const CREW_QUARTERS_I = ShipModuleSymbolEnum._(r'MODULE_CREW_QUARTERS_I');
-  static const ENVOY_QUARTERS_I = ShipModuleSymbolEnum._(r'MODULE_ENVOY_QUARTERS_I');
-  static const PASSENGER_CABIN_I = ShipModuleSymbolEnum._(r'MODULE_PASSENGER_CABIN_I');
-  static const MICRO_REFINERY_I = ShipModuleSymbolEnum._(r'MODULE_MICRO_REFINERY_I');
-  static const ORE_REFINERY_I = ShipModuleSymbolEnum._(r'MODULE_ORE_REFINERY_I');
-  static const FUEL_REFINERY_I = ShipModuleSymbolEnum._(r'MODULE_FUEL_REFINERY_I');
+  static const CREW_QUARTERS_I =
+      ShipModuleSymbolEnum._(r'MODULE_CREW_QUARTERS_I');
+  static const ENVOY_QUARTERS_I =
+      ShipModuleSymbolEnum._(r'MODULE_ENVOY_QUARTERS_I');
+  static const PASSENGER_CABIN_I =
+      ShipModuleSymbolEnum._(r'MODULE_PASSENGER_CABIN_I');
+  static const MICRO_REFINERY_I =
+      ShipModuleSymbolEnum._(r'MODULE_MICRO_REFINERY_I');
+  static const ORE_REFINERY_I =
+      ShipModuleSymbolEnum._(r'MODULE_ORE_REFINERY_I');
+  static const FUEL_REFINERY_I =
+      ShipModuleSymbolEnum._(r'MODULE_FUEL_REFINERY_I');
   static const SCIENCE_LAB_I = ShipModuleSymbolEnum._(r'MODULE_SCIENCE_LAB_I');
   static const JUMP_DRIVE_I = ShipModuleSymbolEnum._(r'MODULE_JUMP_DRIVE_I');
   static const JUMP_DRIVE_II = ShipModuleSymbolEnum._(r'MODULE_JUMP_DRIVE_II');
-  static const JUMP_DRIVE_III = ShipModuleSymbolEnum._(r'MODULE_JUMP_DRIVE_III');
+  static const JUMP_DRIVE_III =
+      ShipModuleSymbolEnum._(r'MODULE_JUMP_DRIVE_III');
   static const WARP_DRIVE_I = ShipModuleSymbolEnum._(r'MODULE_WARP_DRIVE_I');
   static const WARP_DRIVE_II = ShipModuleSymbolEnum._(r'MODULE_WARP_DRIVE_II');
-  static const WARP_DRIVE_III = ShipModuleSymbolEnum._(r'MODULE_WARP_DRIVE_III');
-  static const SHIELD_GENERATOR_I = ShipModuleSymbolEnum._(r'MODULE_SHIELD_GENERATOR_I');
-  static const SHIELD_GENERATOR_II = ShipModuleSymbolEnum._(r'MODULE_SHIELD_GENERATOR_II');
+  static const WARP_DRIVE_III =
+      ShipModuleSymbolEnum._(r'MODULE_WARP_DRIVE_III');
+  static const SHIELD_GENERATOR_I =
+      ShipModuleSymbolEnum._(r'MODULE_SHIELD_GENERATOR_I');
+  static const SHIELD_GENERATOR_II =
+      ShipModuleSymbolEnum._(r'MODULE_SHIELD_GENERATOR_II');
 
   /// List of all possible values in this [enum][ShipModuleSymbolEnum].
   static const values = <ShipModuleSymbolEnum>[
@@ -230,9 +254,13 @@ class ShipModuleSymbolEnum {
     SHIELD_GENERATOR_II,
   ];
 
-  static ShipModuleSymbolEnum? fromJson(dynamic value) => ShipModuleSymbolEnumTypeTransformer().decode(value);
+  static ShipModuleSymbolEnum? fromJson(dynamic value) =>
+      ShipModuleSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipModuleSymbolEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipModuleSymbolEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipModuleSymbolEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -249,7 +277,8 @@ class ShipModuleSymbolEnum {
 /// Transformation class that can [encode] an instance of [ShipModuleSymbolEnum] to String,
 /// and [decode] dynamic data back to [ShipModuleSymbolEnum].
 class ShipModuleSymbolEnumTypeTransformer {
-  factory ShipModuleSymbolEnumTypeTransformer() => _instance ??= const ShipModuleSymbolEnumTypeTransformer._();
+  factory ShipModuleSymbolEnumTypeTransformer() =>
+      _instance ??= const ShipModuleSymbolEnumTypeTransformer._();
 
   const ShipModuleSymbolEnumTypeTransformer._();
 
@@ -266,23 +295,40 @@ class ShipModuleSymbolEnumTypeTransformer {
   ShipModuleSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'MODULE_MINERAL_PROCESSOR_I': return ShipModuleSymbolEnum.MINERAL_PROCESSOR_I;
-        case r'MODULE_CARGO_HOLD_I': return ShipModuleSymbolEnum.CARGO_HOLD_I;
-        case r'MODULE_CREW_QUARTERS_I': return ShipModuleSymbolEnum.CREW_QUARTERS_I;
-        case r'MODULE_ENVOY_QUARTERS_I': return ShipModuleSymbolEnum.ENVOY_QUARTERS_I;
-        case r'MODULE_PASSENGER_CABIN_I': return ShipModuleSymbolEnum.PASSENGER_CABIN_I;
-        case r'MODULE_MICRO_REFINERY_I': return ShipModuleSymbolEnum.MICRO_REFINERY_I;
-        case r'MODULE_ORE_REFINERY_I': return ShipModuleSymbolEnum.ORE_REFINERY_I;
-        case r'MODULE_FUEL_REFINERY_I': return ShipModuleSymbolEnum.FUEL_REFINERY_I;
-        case r'MODULE_SCIENCE_LAB_I': return ShipModuleSymbolEnum.SCIENCE_LAB_I;
-        case r'MODULE_JUMP_DRIVE_I': return ShipModuleSymbolEnum.JUMP_DRIVE_I;
-        case r'MODULE_JUMP_DRIVE_II': return ShipModuleSymbolEnum.JUMP_DRIVE_II;
-        case r'MODULE_JUMP_DRIVE_III': return ShipModuleSymbolEnum.JUMP_DRIVE_III;
-        case r'MODULE_WARP_DRIVE_I': return ShipModuleSymbolEnum.WARP_DRIVE_I;
-        case r'MODULE_WARP_DRIVE_II': return ShipModuleSymbolEnum.WARP_DRIVE_II;
-        case r'MODULE_WARP_DRIVE_III': return ShipModuleSymbolEnum.WARP_DRIVE_III;
-        case r'MODULE_SHIELD_GENERATOR_I': return ShipModuleSymbolEnum.SHIELD_GENERATOR_I;
-        case r'MODULE_SHIELD_GENERATOR_II': return ShipModuleSymbolEnum.SHIELD_GENERATOR_II;
+        case r'MODULE_MINERAL_PROCESSOR_I':
+          return ShipModuleSymbolEnum.MINERAL_PROCESSOR_I;
+        case r'MODULE_CARGO_HOLD_I':
+          return ShipModuleSymbolEnum.CARGO_HOLD_I;
+        case r'MODULE_CREW_QUARTERS_I':
+          return ShipModuleSymbolEnum.CREW_QUARTERS_I;
+        case r'MODULE_ENVOY_QUARTERS_I':
+          return ShipModuleSymbolEnum.ENVOY_QUARTERS_I;
+        case r'MODULE_PASSENGER_CABIN_I':
+          return ShipModuleSymbolEnum.PASSENGER_CABIN_I;
+        case r'MODULE_MICRO_REFINERY_I':
+          return ShipModuleSymbolEnum.MICRO_REFINERY_I;
+        case r'MODULE_ORE_REFINERY_I':
+          return ShipModuleSymbolEnum.ORE_REFINERY_I;
+        case r'MODULE_FUEL_REFINERY_I':
+          return ShipModuleSymbolEnum.FUEL_REFINERY_I;
+        case r'MODULE_SCIENCE_LAB_I':
+          return ShipModuleSymbolEnum.SCIENCE_LAB_I;
+        case r'MODULE_JUMP_DRIVE_I':
+          return ShipModuleSymbolEnum.JUMP_DRIVE_I;
+        case r'MODULE_JUMP_DRIVE_II':
+          return ShipModuleSymbolEnum.JUMP_DRIVE_II;
+        case r'MODULE_JUMP_DRIVE_III':
+          return ShipModuleSymbolEnum.JUMP_DRIVE_III;
+        case r'MODULE_WARP_DRIVE_I':
+          return ShipModuleSymbolEnum.WARP_DRIVE_I;
+        case r'MODULE_WARP_DRIVE_II':
+          return ShipModuleSymbolEnum.WARP_DRIVE_II;
+        case r'MODULE_WARP_DRIVE_III':
+          return ShipModuleSymbolEnum.WARP_DRIVE_III;
+        case r'MODULE_SHIELD_GENERATOR_I':
+          return ShipModuleSymbolEnum.SHIELD_GENERATOR_I;
+        case r'MODULE_SHIELD_GENERATOR_II':
+          return ShipModuleSymbolEnum.SHIELD_GENERATOR_II;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -295,5 +341,3 @@ class ShipModuleSymbolEnumTypeTransformer {
   /// Singleton [ShipModuleSymbolEnumTypeTransformer] instance.
   static ShipModuleSymbolEnumTypeTransformer? _instance;
 }
-
-

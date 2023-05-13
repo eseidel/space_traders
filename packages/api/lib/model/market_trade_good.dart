@@ -42,32 +42,35 @@ class MarketTradeGood {
   int sellPrice;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is MarketTradeGood &&
-     other.symbol == symbol &&
-     other.tradeVolume == tradeVolume &&
-     other.supply == supply &&
-     other.purchasePrice == purchasePrice &&
-     other.sellPrice == sellPrice;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MarketTradeGood &&
+          other.symbol == symbol &&
+          other.tradeVolume == tradeVolume &&
+          other.supply == supply &&
+          other.purchasePrice == purchasePrice &&
+          other.sellPrice == sellPrice;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (symbol.hashCode) +
-    (tradeVolume.hashCode) +
-    (supply.hashCode) +
-    (purchasePrice.hashCode) +
-    (sellPrice.hashCode);
+      // ignore: unnecessary_parenthesis
+      (symbol.hashCode) +
+      (tradeVolume.hashCode) +
+      (supply.hashCode) +
+      (purchasePrice.hashCode) +
+      (sellPrice.hashCode);
 
   @override
-  String toString() => 'MarketTradeGood[symbol=$symbol, tradeVolume=$tradeVolume, supply=$supply, purchasePrice=$purchasePrice, sellPrice=$sellPrice]';
+  String toString() =>
+      'MarketTradeGood[symbol=$symbol, tradeVolume=$tradeVolume, supply=$supply, purchasePrice=$purchasePrice, sellPrice=$sellPrice]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'symbol'] = this.symbol;
-      json[r'tradeVolume'] = this.tradeVolume;
-      json[r'supply'] = this.supply;
-      json[r'purchasePrice'] = this.purchasePrice;
-      json[r'sellPrice'] = this.sellPrice;
+    json[r'symbol'] = this.symbol;
+    json[r'tradeVolume'] = this.tradeVolume;
+    json[r'supply'] = this.supply;
+    json[r'purchasePrice'] = this.purchasePrice;
+    json[r'sellPrice'] = this.sellPrice;
     return json;
   }
 
@@ -83,8 +86,10 @@ class MarketTradeGood {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "MarketTradeGood[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "MarketTradeGood[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "MarketTradeGood[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "MarketTradeGood[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -100,7 +105,10 @@ class MarketTradeGood {
     return null;
   }
 
-  static List<MarketTradeGood>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<MarketTradeGood>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <MarketTradeGood>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -128,12 +136,18 @@ class MarketTradeGood {
   }
 
   // maps a json object with a list of MarketTradeGood-objects as value to a dart map
-  static Map<String, List<MarketTradeGood>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<MarketTradeGood>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<MarketTradeGood>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = MarketTradeGood.listFromJson(entry.value, growable: growable,);
+        final value = MarketTradeGood.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -178,9 +192,13 @@ class MarketTradeGoodSupplyEnum {
     ABUNDANT,
   ];
 
-  static MarketTradeGoodSupplyEnum? fromJson(dynamic value) => MarketTradeGoodSupplyEnumTypeTransformer().decode(value);
+  static MarketTradeGoodSupplyEnum? fromJson(dynamic value) =>
+      MarketTradeGoodSupplyEnumTypeTransformer().decode(value);
 
-  static List<MarketTradeGoodSupplyEnum>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<MarketTradeGoodSupplyEnum>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <MarketTradeGoodSupplyEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -197,7 +215,8 @@ class MarketTradeGoodSupplyEnum {
 /// Transformation class that can [encode] an instance of [MarketTradeGoodSupplyEnum] to String,
 /// and [decode] dynamic data back to [MarketTradeGoodSupplyEnum].
 class MarketTradeGoodSupplyEnumTypeTransformer {
-  factory MarketTradeGoodSupplyEnumTypeTransformer() => _instance ??= const MarketTradeGoodSupplyEnumTypeTransformer._();
+  factory MarketTradeGoodSupplyEnumTypeTransformer() =>
+      _instance ??= const MarketTradeGoodSupplyEnumTypeTransformer._();
 
   const MarketTradeGoodSupplyEnumTypeTransformer._();
 
@@ -214,10 +233,14 @@ class MarketTradeGoodSupplyEnumTypeTransformer {
   MarketTradeGoodSupplyEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'SCARCE': return MarketTradeGoodSupplyEnum.SCARCE;
-        case r'LIMITED': return MarketTradeGoodSupplyEnum.LIMITED;
-        case r'MODERATE': return MarketTradeGoodSupplyEnum.MODERATE;
-        case r'ABUNDANT': return MarketTradeGoodSupplyEnum.ABUNDANT;
+        case r'SCARCE':
+          return MarketTradeGoodSupplyEnum.SCARCE;
+        case r'LIMITED':
+          return MarketTradeGoodSupplyEnum.LIMITED;
+        case r'MODERATE':
+          return MarketTradeGoodSupplyEnum.MODERATE;
+        case r'ABUNDANT':
+          return MarketTradeGoodSupplyEnum.ABUNDANT;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -230,5 +253,3 @@ class MarketTradeGoodSupplyEnumTypeTransformer {
   /// Singleton [MarketTradeGoodSupplyEnumTypeTransformer] instance.
   static MarketTradeGoodSupplyEnumTypeTransformer? _instance;
 }
-
-

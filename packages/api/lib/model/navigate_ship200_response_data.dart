@@ -22,23 +22,24 @@ class NavigateShip200ResponseData {
   ShipNav nav;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is NavigateShip200ResponseData &&
-     other.fuel == fuel &&
-     other.nav == nav;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NavigateShip200ResponseData &&
+          other.fuel == fuel &&
+          other.nav == nav;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (fuel.hashCode) +
-    (nav.hashCode);
+      // ignore: unnecessary_parenthesis
+      (fuel.hashCode) + (nav.hashCode);
 
   @override
   String toString() => 'NavigateShip200ResponseData[fuel=$fuel, nav=$nav]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'fuel'] = this.fuel;
-      json[r'nav'] = this.nav;
+    json[r'fuel'] = this.fuel;
+    json[r'nav'] = this.nav;
     return json;
   }
 
@@ -54,8 +55,10 @@ class NavigateShip200ResponseData {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "NavigateShip200ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "NavigateShip200ResponseData[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "NavigateShip200ResponseData[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "NavigateShip200ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -68,7 +71,10 @@ class NavigateShip200ResponseData {
     return null;
   }
 
-  static List<NavigateShip200ResponseData>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<NavigateShip200ResponseData>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <NavigateShip200ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -96,12 +102,18 @@ class NavigateShip200ResponseData {
   }
 
   // maps a json object with a list of NavigateShip200ResponseData-objects as value to a dart map
-  static Map<String, List<NavigateShip200ResponseData>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<NavigateShip200ResponseData>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<NavigateShip200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = NavigateShip200ResponseData.listFromJson(entry.value, growable: growable,);
+        final value = NavigateShip200ResponseData.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,4 +128,3 @@ class NavigateShip200ResponseData {
     'nav',
   };
 }
-

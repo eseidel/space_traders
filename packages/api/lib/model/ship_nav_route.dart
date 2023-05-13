@@ -30,29 +30,32 @@ class ShipNavRoute {
   DateTime arrival;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipNavRoute &&
-     other.destination == destination &&
-     other.departure == departure &&
-     other.departureTime == departureTime &&
-     other.arrival == arrival;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipNavRoute &&
+          other.destination == destination &&
+          other.departure == departure &&
+          other.departureTime == departureTime &&
+          other.arrival == arrival;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (destination.hashCode) +
-    (departure.hashCode) +
-    (departureTime.hashCode) +
-    (arrival.hashCode);
+      // ignore: unnecessary_parenthesis
+      (destination.hashCode) +
+      (departure.hashCode) +
+      (departureTime.hashCode) +
+      (arrival.hashCode);
 
   @override
-  String toString() => 'ShipNavRoute[destination=$destination, departure=$departure, departureTime=$departureTime, arrival=$arrival]';
+  String toString() =>
+      'ShipNavRoute[destination=$destination, departure=$departure, departureTime=$departureTime, arrival=$arrival]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'destination'] = this.destination;
-      json[r'departure'] = this.departure;
-      json[r'departureTime'] = this.departureTime.toUtc().toIso8601String();
-      json[r'arrival'] = this.arrival.toUtc().toIso8601String();
+    json[r'destination'] = this.destination;
+    json[r'departure'] = this.departure;
+    json[r'departureTime'] = this.departureTime.toUtc().toIso8601String();
+    json[r'arrival'] = this.arrival.toUtc().toIso8601String();
     return json;
   }
 
@@ -68,8 +71,10 @@ class ShipNavRoute {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipNavRoute[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipNavRoute[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipNavRoute[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipNavRoute[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -84,7 +89,10 @@ class ShipNavRoute {
     return null;
   }
 
-  static List<ShipNavRoute>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipNavRoute>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipNavRoute>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -112,12 +120,18 @@ class ShipNavRoute {
   }
 
   // maps a json object with a list of ShipNavRoute-objects as value to a dart map
-  static Map<String, List<ShipNavRoute>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipNavRoute>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipNavRoute>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipNavRoute.listFromJson(entry.value, growable: growable,);
+        final value = ShipNavRoute.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -134,4 +148,3 @@ class ShipNavRoute {
     'arrival',
   };
 }
-

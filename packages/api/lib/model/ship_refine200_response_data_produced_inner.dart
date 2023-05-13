@@ -34,18 +34,21 @@ class ShipRefine200ResponseDataProducedInner {
   int? units;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ShipRefine200ResponseDataProducedInner &&
-     other.tradeSymbol == tradeSymbol &&
-     other.units == units;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipRefine200ResponseDataProducedInner &&
+          other.tradeSymbol == tradeSymbol &&
+          other.units == units;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (tradeSymbol == null ? 0 : tradeSymbol!.hashCode) +
-    (units == null ? 0 : units!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (tradeSymbol == null ? 0 : tradeSymbol!.hashCode) +
+      (units == null ? 0 : units!.hashCode);
 
   @override
-  String toString() => 'ShipRefine200ResponseDataProducedInner[tradeSymbol=$tradeSymbol, units=$units]';
+  String toString() =>
+      'ShipRefine200ResponseDataProducedInner[tradeSymbol=$tradeSymbol, units=$units]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -74,8 +77,10 @@ class ShipRefine200ResponseDataProducedInner {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ShipRefine200ResponseDataProducedInner[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ShipRefine200ResponseDataProducedInner[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ShipRefine200ResponseDataProducedInner[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ShipRefine200ResponseDataProducedInner[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -88,7 +93,10 @@ class ShipRefine200ResponseDataProducedInner {
     return null;
   }
 
-  static List<ShipRefine200ResponseDataProducedInner>? listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ShipRefine200ResponseDataProducedInner>? listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ShipRefine200ResponseDataProducedInner>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -101,12 +109,14 @@ class ShipRefine200ResponseDataProducedInner {
     return result.toList(growable: growable);
   }
 
-  static Map<String, ShipRefine200ResponseDataProducedInner> mapFromJson(dynamic json) {
+  static Map<String, ShipRefine200ResponseDataProducedInner> mapFromJson(
+      dynamic json) {
     final map = <String, ShipRefine200ResponseDataProducedInner>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipRefine200ResponseDataProducedInner.fromJson(entry.value);
+        final value =
+            ShipRefine200ResponseDataProducedInner.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -116,12 +126,19 @@ class ShipRefine200ResponseDataProducedInner {
   }
 
   // maps a json object with a list of ShipRefine200ResponseDataProducedInner-objects as value to a dart map
-  static Map<String, List<ShipRefine200ResponseDataProducedInner>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ShipRefine200ResponseDataProducedInner>>
+      mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ShipRefine200ResponseDataProducedInner>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipRefine200ResponseDataProducedInner.listFromJson(entry.value, growable: growable,);
+        final value = ShipRefine200ResponseDataProducedInner.listFromJson(
+          entry.value,
+          growable: growable,
+        );
         if (value != null) {
           map[entry.key] = value;
         }
@@ -131,7 +148,5 @@ class ShipRefine200ResponseDataProducedInner {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-  };
+  static const requiredKeys = <String>{};
 }
-
