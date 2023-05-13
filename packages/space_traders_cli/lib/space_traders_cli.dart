@@ -1,4 +1,16 @@
+import 'dart:convert';
+
+import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
+
+void prettyPrintJson(Map<String, dynamic> json) {
+  JsonEncoder encoder = JsonEncoder.withIndent('  ');
+  String prettyprint = encoder.convert(json);
+  print(prettyprint);
+}
+
+// This should be replaceable/mockable/configurable?
+var logger = Logger();
 
 /// Api is a wrapper around the generated api clients.
 /// It provides a single place to inject the api client.
@@ -45,9 +57,9 @@ Future<String> register(String callSign) async {
   try {
     registerResponse =
         await defaultApi.register(registerRequest: registerRequest);
-    print(registerResponse);
+    // print(registerResponse);
   } catch (e) {
-    print('Exception when calling DefaultApi->register: $e\n');
+    logger.err('Exception when calling DefaultApi->register: $e\n');
   }
   return registerResponse!.data.token;
 }

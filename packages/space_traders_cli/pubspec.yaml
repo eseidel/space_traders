@@ -8,6 +8,7 @@ environment:
   sdk: ^3.0.0
 
 dependencies:
+  collection: ^1.17.2
   file: ^6.1.4
   mason_logger: ^0.2.5
   space_traders_api:
