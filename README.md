@@ -34,3 +34,5 @@ openapi-generator generate -c open_api_config.yaml
 ### Bugs to report to OpenAPI
 * required arguments in a request body should make the body required/non-nullable.
   Example: RegisterRequest for POST /users/register
+* The generated "enums" do not have equals or hashCode.  e.g. ShipRole.
+  It doesn't end up mattering because they're singletons though.
