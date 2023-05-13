@@ -104,9 +104,7 @@ class ShipEngine {
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
         condition: mapValueOfType<int>(json, r'condition'),
-        speed: json[r'speed'] == null
-            ? null
-            : num.parse(json[r'speed'].toString()),
+        speed: num.parse(json[r'speed'].toString()),
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
       );
     }

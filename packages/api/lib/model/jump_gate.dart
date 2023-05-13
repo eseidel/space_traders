@@ -80,9 +80,7 @@ class JumpGate {
       }());
 
       return JumpGate(
-        jumpRange: json[r'jumpRange'] == null
-            ? null
-            : num.parse(json[r'jumpRange'].toString()),
+        jumpRange: num.parse(json[r'jumpRange'].toString()),
         factionSymbol: mapValueOfType<String>(json, r'factionSymbol'),
         connectedSystems: ConnectedSystem.listFromJson(json[r'connectedSystems'])!,
       );
