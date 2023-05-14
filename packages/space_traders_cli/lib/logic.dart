@@ -108,9 +108,12 @@ Future<DateTime?> advanceMiner(
     if (currentWaypoint.isAsteroidField) {
       // If we still have space, mine.
       if (ship.spaceAvailable > 0) {
-        logger.info(
-            "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
-        await api.fleet.extractResources(ship.symbol);
+        // Check cooldown and return if cooling down?
+        // logger.info(
+        //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
+        final response = await api.fleet.extractResources(ship.symbol);
+        final yield_ = response!.data.extraction.yield_;
+        logger.info("${ship.symbol}: Mined ${yield_.units} ${yield_.symbol}");
         // We don't return the expiration time because we don't want to force
         // a wait, in case it might plan to do something else next.
         // Instead we'll let it try again and catch the cooldown
@@ -137,7 +140,6 @@ Future<DateTime?> advanceMiner(
         // }
 
         // Otherwise, sell cargo.
-        logger.info("${ship.symbol}: Cargo full, selling");
         await sellCargo(api, ship);
       }
     } else {
