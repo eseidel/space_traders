@@ -6,6 +6,8 @@ import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/queries.dart';
 
 /// Used to accept the first contract in the list of contracts.
 /// Which is the case when just starting the game.
@@ -20,72 +22,6 @@ void acceptFirstContract(Api api) async {
   print(response);
 }
 
-void printWaypoints(List<Waypoint> waypoints) async {
-  for (var waypoint in waypoints) {
-    print(
-        "${waypoint.symbol} - ${waypoint.type} - ${waypoint.traits.map((w) => w.name).join(', ')}");
-  }
-}
-
-void printAvailableShipsAt(Api api, String waypoint) async {
-  final parsed = parseWaypointString(waypoint);
-  final shipyardResponse =
-      await api.systems.getShipyard(parsed.system, parsed.waypoint);
-  for (var shipType in shipyardResponse!.data.shipTypes) {
-    print("${shipType.type}");
-  }
-  final ships = shipyardResponse.data.ships;
-  for (var ship in ships) {
-    print("${ship.type} - ${ship.purchasePrice}");
-  }
-}
-
-// Need to make this generic for all paginated apis.
-Future<List<Waypoint>> waypointsInSystem(Api api, String system) async {
-  List<Waypoint> waypoints = [];
-  int page = 1;
-  int remaining = 0;
-  do {
-    final waypointsResponse =
-        await api.systems.getSystemWaypoints(system, page: page);
-    waypoints.addAll(waypointsResponse!.data);
-    remaining = waypointsResponse.meta.total - waypoints.length;
-    page++;
-  } while (remaining > 0);
-  return waypoints;
-}
-
-// Need to make this generic for all paginated apis.
-Stream<Ship> allMyShips(Api api) async* {
-  int page = 1;
-  int count = 0;
-  int remaining = 0;
-  do {
-    final shipsResponse = await api.fleet.getMyShips(page: page);
-    count += shipsResponse!.data.length;
-    remaining = shipsResponse.meta.total - count;
-    for (var ship in shipsResponse.data) {
-      yield ship;
-    }
-    page++;
-  } while (remaining > 0);
-}
-
-void printShips(List<Ship> ships, List<Waypoint> systemWaypoints) {
-  for (var ship in ships) {
-    final waypoint = lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-    var string =
-        "${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role}";
-    if (ship.crew.morale != 100) {
-      string += " (morale: ${ship.crew.morale})";
-    }
-    if (ship.averageCondition != 100) {
-      string += " (condition: ${ship.averageCondition})";
-    }
-    print(string);
-  }
-}
-
 Future<PurchaseShip201ResponseData> purchaseMiningShip(
     Api api, List<Waypoint> systemWaypoints) async {
   final shipyardWaypoint = systemWaypoints.firstWhere((w) => w.hasShipyard);
@@ -96,10 +32,6 @@ Future<PurchaseShip201ResponseData> purchaseMiningShip(
   final purchaseResponse =
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
   return purchaseResponse!.data;
-}
-
-Waypoint lookupWaypoint(String waypointSymbol, List<Waypoint> systemWaypoints) {
-  return systemWaypoints.firstWhere((w) => w.symbol == waypointSymbol);
 }
 
 void logCargo(Ship ship) {

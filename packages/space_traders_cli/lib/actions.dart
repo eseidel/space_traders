@@ -9,25 +9,6 @@ void prettyPrintJson(Map<String, dynamic> json) {
   print(prettyprint);
 }
 
-/// Api is a wrapper around the generated api clients.
-/// It provides a single place to inject the api client.
-/// This allows for easier mocking.
-class Api {
-  final ApiClient apiClient;
-  final SystemsApi systems;
-  final ContractsApi contracts;
-  final AgentsApi agents;
-  final FleetApi fleet;
-  final FactionsApi factions;
-
-  Api(this.apiClient)
-      : systems = SystemsApi(apiClient),
-        contracts = ContractsApi(apiClient),
-        agents = AgentsApi(apiClient),
-        fleet = FleetApi(apiClient),
-        factions = FactionsApi(apiClient);
-}
-
 /// parseWaypointString parses a waypoint string into its component parts.
 ({String sector, String system, String waypoint}) parseWaypointString(
     String headquarters) {
