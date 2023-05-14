@@ -109,7 +109,7 @@ Future<DateTime?> advanceMiner(
       // If we still have space, mine.
       if (ship.spaceAvailable > 0) {
         logger.info(
-            "${ship.symbol}: Mining (space available: ${ship.spaceAvailable})");
+            "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
         await api.fleet.extractResources(ship.symbol);
         // We don't return the expiration time because we don't want to force
         // a wait, in case it might plan to do something else next.
@@ -176,7 +176,7 @@ Stream<DateTime> logicLoop(Api api) async* {
     return; // Fetch ship lists again.
   }
 
-  printShips(myShips, systemWaypoints);
+  // printShips(myShips, systemWaypoints);
   // loop over all mining ships and advance them.
   for (var ship in myShips) {
     if (shouldUseForMining(ship)) {
