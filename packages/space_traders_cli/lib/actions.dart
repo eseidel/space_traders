@@ -52,7 +52,7 @@ Stream<SellCargo201ResponseData> sellCargo(
   // We should travel first to the marketplace that has the best price for
   // the ore we have a contract for.
   for (final item in ship.cargo.inventory) {
-    if (where != null && where(item.symbol)) {
+    if (where != null && !where(item.symbol)) {
       continue;
     }
     final sellRequest = SellCargoRequest(

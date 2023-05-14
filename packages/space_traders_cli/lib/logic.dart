@@ -101,7 +101,8 @@ Future<DateTime?> advanceMiner(
         //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
         final response = await api.fleet.extractResources(ship.symbol);
         final yield_ = response!.data.extraction.yield_;
-        logger.info('${ship.symbol}: Mined ${yield_.units} ${yield_.symbol}');
+        logger.info('${ship.symbol}: Mined ${yield_.units} ${yield_.symbol} '
+            '(cargo: ${ship.cargo.units}/${ship.cargo.capacity})');
         // We don't return the expiration time because we don't want to force
         // a wait, in case it might plan to do something else next.
         // Instead we'll let it try again and catch the cooldown
