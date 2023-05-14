@@ -1,5 +1,5 @@
 import 'package:file/local.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -25,10 +25,8 @@ void main(List<String> args) async {
 
   final shouldDock = logger.confirm("Wait to dock?", defaultValue: true);
 
-  final request = NavigateShipRequest(waypointSymbol: waypoint.symbol);
-  final navigateResult =
-      await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
-  final eta = navigateResult!.data.nav.route.arrival;
+  final navigateResult = await navigateTo(api, ship, waypoint);
+  final eta = navigateResult.nav.route.arrival;
   final flightTime = eta.difference(DateTime.now());
   print("Expected in $flightTime.");
   if (shouldDock) {
