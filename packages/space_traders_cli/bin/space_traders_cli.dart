@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';

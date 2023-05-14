@@ -1,6 +1,5 @@
 import 'package:file/file.dart';
 import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/rate_limit.dart';
 
@@ -51,4 +50,26 @@ Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
     await fs.file('auth_token.txt').writeAsString(token);
     return token;
   }
+}
+
+/// register registers a new user with the space traders api and
+/// returns the auth token which should be saved and used for future requests.
+Future<String> register(String callSign) async {
+  final defaultApi = DefaultApi();
+
+  final faction = RegisterRequestFactionEnum.values.first;
+
+  RegisterRequest registerRequest = RegisterRequest(
+    symbol: callSign,
+    faction: faction,
+  );
+  Register201Response? registerResponse;
+  try {
+    registerResponse =
+        await defaultApi.register(registerRequest: registerRequest);
+    // print(registerResponse);
+  } catch (e) {
+    logger.err('Exception when calling DefaultApi->register: $e\n');
+  }
+  return registerResponse!.data.token;
 }

@@ -1,5 +1,17 @@
 import 'package:space_traders_api/api.dart';
 
+/// parseWaypointString parses a waypoint string into its component parts.
+({String sector, String system, String waypoint}) parseWaypointString(
+    String headquarters) {
+  final parts = headquarters.split('-');
+  return (
+    sector: parts[0],
+    system: "${parts[0]}-${parts[1]}",
+    waypoint: "${parts[0]}-${parts[1]}-${parts[2]}",
+  );
+}
+
+/// Extensions onto Waypoint to make it easier to work with.
 extension WaypointUtils on Waypoint {
   bool hasTrait(WaypointTraitSymbolEnum trait) {
     return traits.any((t) => t.symbol == trait);
@@ -14,6 +26,7 @@ extension WaypointUtils on Waypoint {
   // bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
 }
 
+/// Extensions onto Ship to make it easier to work with.
 extension ShipUtils on Ship {
   int get spaceAvailable => cargo.capacity - cargo.units;
 
