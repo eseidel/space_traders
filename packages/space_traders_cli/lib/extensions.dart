@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:space_traders_api/api.dart';
 
 /// lookupWaypoint looks up a Waypoint by its symbol in the given list of
@@ -40,6 +42,13 @@ extension WaypointUtils on Waypoint {
 
 /// Extensions onto Ship to make it easier to work with.
 extension ShipUtils on Ship {
+  /// Returns the emoji name of the ship.
+  String get emojiName {
+    // Ships are all AGENT_SYMBOL-1, AGENT_SYMBOL-2, etc.
+    final number = symbol.split('-').last;
+    return '🛸#$number';
+  }
+
   /// Returns the amount of space available on the ship.
   int get spaceAvailable => cargo.capacity - cargo.units;
 
@@ -88,3 +97,22 @@ extension ShipUtils on Ship {
 //         .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol);
 //   }
 // }
+
+/// Error 4000 is just a cooldown error and we can retry.
+/// Detect that case and return the retry time.
+/// https://docs.spacetraders.io/api-guide/response-errors
+DateTime? expirationFromApiException(ApiException e) {
+  if (e.code == 409) {
+    // What we tried to do was still on cooldown.
+    final jsonString = e.message;
+    if (jsonString != null) {
+      final exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
+      final error = exceptionJson['error'] as Map<String, dynamic>?;
+      final errorData = error?['data'] as Map<String, dynamic>?;
+      final cooldown = errorData?['cooldown'];
+      final expiration = mapDateTime(cooldown, 'expiration');
+      return expiration;
+    }
+  }
+  return null;
+}

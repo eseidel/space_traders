@@ -12,6 +12,7 @@ dependencies:
   file: ^6.1.4
   http: ^0.13.6
   mason_logger: ^0.2.5
+  sembast: ^3.4.4
   space_traders_api:
     path: ../space_traders_api
 

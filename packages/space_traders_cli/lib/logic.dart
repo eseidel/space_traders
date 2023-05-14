@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/queries.dart';
@@ -56,14 +55,19 @@ Future<void> sellCargoAndLog(
   bool Function(String tradeSymbol)? where,
 }) async {
   if (ship.cargo.inventory.isEmpty) {
-    logger.info('${ship.symbol}: No cargo to sell');
+    shipInfo(ship, 'No cargo to sell');
     return;
   }
   await for (final response in sellCargo(api, ship, where: where)) {
     final transaction = response.transaction;
-    logger.info(
-      '${ship.symbol}: Sold ${transaction.units} ${transaction.tradeSymbol} '
-      'for ${transaction.totalPrice}c',
+    final agent = response.agent;
+    shipInfo(
+      ship,
+      '🤝 ${transaction.units.toString().padLeft(2)} '
+      // Could use TradeSymbol.values.reduce() to find the longest symbol.
+      '${transaction.tradeSymbol.padRight(18)} '
+      '${transaction.totalPrice.toString().padLeft(3)}c -> '
+      '🏦 ${agent.credits}c',
     );
   }
 }
@@ -87,7 +91,7 @@ Future<DateTime?> advanceMiner(
   }
   if (ship.isDocked) {
     if (ship.fuel.current < ship.fuel.capacity) {
-      logger.info('${ship.symbol}: Refueling');
+      shipInfo(ship, 'Refueling');
       await api.fleet.refuelShip(ship.symbol);
       return null;
     }
@@ -99,11 +103,16 @@ Future<DateTime?> advanceMiner(
         // Check cooldown and return if cooling down?
         // logger.info(
         //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
-        final response = await api.fleet.extractResources(ship.symbol);
-        final yield_ = response!.data.extraction.yield_;
-        final cargo = response.data.cargo;
-        logger.info('${ship.symbol}: Mined ${yield_.units} ${yield_.symbol} '
-            '(cargo: ${cargo.units}/${cargo.capacity})');
+        final response = await extractResources(api, ship);
+        final yield_ = response.extraction.yield_;
+        final cargo = response.cargo;
+        // Could use TradeSymbol.values.reduce() to find the longest symbol.
+        shipInfo(
+            ship,
+            // pickaxe requires an extra space on mac?
+            '⛏️  ${yield_.units} '
+            '${yield_.symbol.padRight(18)} '
+            '📦${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
         // We don't return the expiration time because we don't want to force
         // a wait, in case it might plan to do something else next.
         // Instead we'll let it try again and catch the cooldown
@@ -140,10 +149,10 @@ Future<DateTime?> advanceMiner(
       // Otherwise return to asteroid.
       final asteroidField =
           systemWaypoints.firstWhere((w) => w.isAsteroidField);
-      logger.info('${ship.symbol}: Navigating to ${asteroidField.symbol}');
+      shipInfo(ship, 'Navigating to ${asteroidField.symbol}');
       final result = await navigateTo(api, ship, asteroidField);
       final flightTime = result.nav.route.arrival.difference(DateTime.now());
-      logger.info('${ship.symbol}: Expected in ${flightTime.inSeconds}s.');
+      shipInfo(ship, 'Expected in ${flightTime.inSeconds}s.');
     }
   }
   return null;
@@ -156,13 +165,13 @@ bool _shouldUseForMining(Ship ship) {
 }
 
 /// One loop of the logic.
-Stream<DateTime> logicLoop(Api api) async* {
+Stream<DateTime> logicLoop(Api api, DataStore db) async* {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
-  logger.info('Credits: ${agent.credits}');
   final hq = parseWaypointString(agentResult.data.headquarters);
   final systemWaypoints = await waypointsInSystem(api, hq.system);
   final myShips = await allMyShips(api).toList();
+
   if (shouldPurchaseMiner(agent, myShips)) {
     logger.info('Purchasing mining drone.');
     final shipyardWaypoint = systemWaypoints.firstWhere((w) => w.hasShipyard);
@@ -182,20 +191,9 @@ Stream<DateTime> logicLoop(Api api) async* {
           yield maybeWaitUntil;
         }
       } on ApiException catch (e) {
-        if (e.code == 409) {
-          // What we tried to do was still on cooldown.
-          final jsonString = e.message;
-          if (jsonString != null) {
-            final exceptionJson =
-                jsonDecode(jsonString) as Map<String, dynamic>;
-            final error = exceptionJson['error'] as Map<String, dynamic>?;
-            final errorData = error?['data'] as Map<String, dynamic>?;
-            final cooldown = errorData?['cooldown'];
-            final expiration = mapDateTime(cooldown, 'expiration');
-            if (expiration != null) {
-              yield expiration;
-            }
-          }
+        final expiration = expirationFromApiException(e);
+        if (expiration != null) {
+          yield expiration;
           continue;
         }
         rethrow;
@@ -219,15 +217,18 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
 /// Run the logic loop forever.
 /// Currently just sends ships to mine and sell ore.
 Future<void> logic(Api api) async {
+  final db = DataStore();
+  await db.open();
+
   while (true) {
-    final nextEventTimes = await logicLoop(api).toList();
+    final nextEventTimes = await logicLoop(api, db).toList();
     if (nextEventTimes.isNotEmpty) {
       final earliestWaitUntil =
           nextEventTimes.reduce((a, b) => a.isBefore(b) ? a : b);
       // This future waits until the earliest time we think the server
       // will be ready for us to do something.
       final waitDuration = earliestWaitUntil.difference(DateTime.now());
-      logger.info('Waiting ${waitDuration.inSeconds}s');
+      logger.info('⏱️ ${waitDuration.inSeconds}s');
       await Future<void>.delayed(earliestWaitUntil.difference(DateTime.now()));
     }
     // Otherwise we just loop again immediately and rely on rate limiting in the

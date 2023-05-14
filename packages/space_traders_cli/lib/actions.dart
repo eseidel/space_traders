@@ -28,6 +28,15 @@ Future<NavigateShip200ResponseData> navigateTo(
   return result!.data;
 }
 
+/// Extract resources from asteroid with [ship]
+Future<ExtractResources201ResponseData> extractResources(
+  Api api,
+  Ship ship,
+) async {
+  final response = await api.fleet.extractResources(ship.symbol);
+  return response!.data;
+}
+
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
