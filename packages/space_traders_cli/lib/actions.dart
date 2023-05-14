@@ -1,16 +1,13 @@
 import 'dart:convert';
 
-import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/logger.dart';
 
 void prettyPrintJson(Map<String, dynamic> json) {
   JsonEncoder encoder = JsonEncoder.withIndent('  ');
   String prettyprint = encoder.convert(json);
   print(prettyprint);
 }
-
-// This should be replaceable/mockable/configurable?
-var logger = Logger();
 
 /// Api is a wrapper around the generated api clients.
 /// It provides a single place to inject the api client.
@@ -62,16 +59,4 @@ Future<String> register(String callSign) async {
     logger.err('Exception when calling DefaultApi->register: $e\n');
   }
   return registerResponse!.data.token;
-}
-
-/// findShipyard finds the shipyard in a system and returns the waypoint symbol.
-Future<String?> findShipyard(Api api, String system) async {
-  final waypointsResponse = await api.systems.getSystemWaypoints(system);
-  for (var waypoint in waypointsResponse!.data) {
-    if (waypoint.traits
-        .any((t) => t.symbol == WaypointTraitSymbolEnum.SHIPYARD)) {
-      return waypoint.symbol;
-    }
-  }
-  return null;
 }
