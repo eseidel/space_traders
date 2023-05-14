@@ -1,16 +1,14 @@
+import 'dart:convert';
+
 import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
+import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/rate_limit.dart';
 
-void printHq(Api api) async {
-  final agentResult = await api.agents.getMyAgent();
-  final hq = parseWaypointString(agentResult!.data.headquarters);
-  final waypoint = await api.systems.getWaypoint(hq.system, hq.waypoint);
-  print(waypoint);
-}
-
+/// Used to accept the first contract in the list of contracts.
+/// Which is the case when just starting the game.
 void acceptFirstContract(Api api) async {
   final contracts = await api.contracts.getContracts();
   print(contracts);
@@ -104,60 +102,6 @@ Waypoint lookupWaypoint(String waypointSymbol, List<Waypoint> systemWaypoints) {
   return systemWaypoints.firstWhere((w) => w.symbol == waypointSymbol);
 }
 
-extension on Waypoint {
-  bool hasTrait(WaypointTraitSymbolEnum trait) {
-    return traits.any((t) => t.symbol == trait);
-  }
-
-  bool isType(WaypointType type) {
-    return this.type == type;
-  }
-
-  bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
-  bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
-  // bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
-}
-
-extension on Ship {
-  int get spaceAvailable => cargo.capacity - cargo.units;
-
-  bool get isExcavator => registration.role == ShipRole.EXCAVATOR;
-
-  bool get isInTransit => nav.status == ShipNavStatus.IN_TRANSIT;
-  bool get isDocked => nav.status == ShipNavStatus.DOCKED;
-  bool get isOrbiting => nav.status == ShipNavStatus.IN_ORBIT;
-
-  int get averageCondition {
-    int total = 0;
-    total += engine.condition ?? 100;
-    total += frame.condition ?? 100;
-    total += reactor.condition ?? 100;
-    return total ~/ 3;
-  }
-
-  String get navStatusString {
-    switch (nav.status) {
-      case ShipNavStatus.DOCKED:
-        return "Docked at ${nav.waypointSymbol}";
-      case ShipNavStatus.IN_ORBIT:
-        return "Orbiting ${nav.waypointSymbol}";
-      case ShipNavStatus.IN_TRANSIT:
-        return "In transit to ${nav.waypointSymbol}";
-      default:
-        return "Unknown";
-    }
-  }
-}
-
-// extension on Contract {
-//   bool needsItem(String tradeSymbol) => goodNeeded(tradeSymbol) != null;
-
-//   ContractDeliverGood? goodNeeded(String tradeSymbol) {
-//     return terms.deliver
-//         .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol);
-//   }
-// }
-
 void logCargo(Ship ship) {
   logger.info("Cargo:");
   for (var item in ship.cargo.inventory) {
@@ -195,8 +139,10 @@ Future<DateTime?> advanceMiner(
   // At asteroid:
   // Refuel.
   // Mine (ideally what's on our contract, otherwise whatever.)
-  // If full, return to HQ.
-  // At HQ:
+  // If full:
+  //  If have goods related to contract, go to contract waypoint.
+  //  Otherwise, sell goods.
+  // Not at an asteroid:
   // Fulfill contract if we have one.
   // Otherwise, sell ore.
   // Refuel.
@@ -301,9 +247,26 @@ Stream<DateTime> logicLoop(Api api) async* {
   // loop over all mining ships and advance them.
   for (var ship in myShips) {
     if (ship.isExcavator) {
-      var maybeWaitUntil = await advanceMiner(api, ship, systemWaypoints);
-      if (maybeWaitUntil != null) {
-        yield maybeWaitUntil;
+      try {
+        var maybeWaitUntil = await advanceMiner(api, ship, systemWaypoints);
+        if (maybeWaitUntil != null) {
+          yield maybeWaitUntil;
+        }
+      } on ApiException catch (e) {
+        if (e.code == 409) {
+          // Still on cooldown.
+          var jsonString = e.message;
+          if (jsonString != null) {
+            var exceptionJson = jsonDecode(jsonString);
+            var cooldown = exceptionJson["error"]?["data"]?["cooldown"];
+            var expiration = mapDateTime(cooldown, 'expiration');
+            if (expiration != null) {
+              yield expiration;
+            }
+          }
+          continue;
+        }
+        rethrow;
       }
     }
   }
@@ -335,21 +298,7 @@ void main(List<String> arguments) async {
   logger.info("Welcome to Space Traders! 🚀");
   // Use package:file to make things mockable.
   var fs = const LocalFileSystem();
-  // If we have an auth token file, use that.
-  while (true) {
-    try {
-      final token = (await fs.file('auth_token.txt').readAsString()).trim();
-      final auth = HttpBearerAuth()..accessToken = token;
-      final api =
-          Api(RateLimitedApiClient(requestsPerSecond: 2, authentication: auth));
-      logic(api);
-      break;
-    } catch (e) {
-      logger.info("No auth token found.");
-      // Otherwise, register a new user.
-      final handle = logger.prompt("What is your call sign?");
-      final token = await register(handle);
-      await fs.file('auth_token.txt').writeAsString(token);
-    }
-  }
+  var token = await loadAuthTokenOrRegister(fs);
+  var api = apiFromAuthToken(token);
+  logic(api);
 }
