@@ -2,6 +2,7 @@ import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/rate_limit.dart';
 
 void printHq(Api api) async {
   final agentResult = await api.agents.getMyAgent();
@@ -75,8 +76,15 @@ Stream<Ship> allMyShips(Api api) async* {
 void printShips(List<Ship> ships, List<Waypoint> systemWaypoints) {
   for (var ship in ships) {
     final waypoint = lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-    print(
-        "${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role}");
+    var string =
+        "${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role}";
+    if (ship.crew.morale != 100) {
+      string += " (morale: ${ship.crew.morale})";
+    }
+    if (ship.averageCondition != 100) {
+      string += " (condition: ${ship.averageCondition})";
+    }
+    print(string);
   }
 }
 
@@ -107,7 +115,7 @@ extension on Waypoint {
 
   bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
   bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
-  bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
+  // bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
 }
 
 extension on Ship {
@@ -118,6 +126,14 @@ extension on Ship {
   bool get isInTransit => nav.status == ShipNavStatus.IN_TRANSIT;
   bool get isDocked => nav.status == ShipNavStatus.DOCKED;
   bool get isOrbiting => nav.status == ShipNavStatus.IN_ORBIT;
+
+  int get averageCondition {
+    int total = 0;
+    total += engine.condition ?? 100;
+    total += frame.condition ?? 100;
+    total += reactor.condition ?? 100;
+    return total ~/ 3;
+  }
 
   String get navStatusString {
     switch (nav.status) {
@@ -133,12 +149,41 @@ extension on Ship {
   }
 }
 
+// extension on Contract {
+//   bool needsItem(String tradeSymbol) => goodNeeded(tradeSymbol) != null;
+
+//   ContractDeliverGood? goodNeeded(String tradeSymbol) {
+//     return terms.deliver
+//         .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol);
+//   }
+// }
+
 void logCargo(Ship ship) {
   logger.info("Cargo:");
   for (var item in ship.cargo.inventory) {
     logger.info("  ${item.units.toString().padLeft(3)} ${item.name}");
   }
 }
+
+// Iterable<String> tradeSymbolsFromContracts(List<Contract> contracts) sync* {
+//   for (final contract in contracts) {
+//     for (final item in contract.terms.deliver) {
+//       yield item.tradeSymbol;
+//     }
+//   }
+// }
+
+// Contract? contractNeedingItem(
+//     List<Contract> contracts, String tradeSymbol) {
+//   for (final contract in contracts) {
+//     for (final item in contract.terms.deliver) {
+//       if (item.tradeSymbol == tradeSymbol) {
+//         return contract;
+//       }
+//     }
+//   }
+//   return null;
+// }
 
 Future<DateTime?> advanceMiner(
     Api api, Ship ship, List<Waypoint> systemWaypoints) async {
@@ -178,8 +223,28 @@ Future<DateTime?> advanceMiner(
       if (ship.spaceAvailable > 0) {
         print("Mining (space available: ${ship.spaceAvailable})");
         final extractResponse = await api.fleet.extractResources(ship.symbol);
+        // TODO: It is possible to navigate while mining is on cooldown.
         return extractResponse!.data.cooldown.expiration;
       } else {
+        // Otherwise check to see if we have cargo that is relevant for our
+        // contract.
+        // final contractsResponse = await api.contracts.getContracts();
+
+        // final itemsInCargo = ship.cargo.inventory.map((i) => i.symbol);
+
+        // for (var item in itemsInCargo) {
+        //   final contractNeedingItem = contractsResponse!.data.firstWhereOrNull(
+        //       (c) => c.needsItem(item) && c.issuer != ship.owner);
+        //   if (contractNeedingItem != null) {
+        //     print("Contract needs $item, returning to HQ");
+        //     final waypoint =
+        //         lookupWaypoint(contractNeedingItem.issuer, systemWaypoints);
+        //     await api.fleet.setShipNav(
+        //         ship.symbol, waypoint.systemSymbol, waypoint.symbol);
+        //     return null;
+        //   }
+        // }
+
         // Otherwise, sell cargo.
         print("Cargo full, selling");
         logCargo(ship);
@@ -275,7 +340,8 @@ void main(List<String> arguments) async {
     try {
       final token = (await fs.file('auth_token.txt').readAsString()).trim();
       final auth = HttpBearerAuth()..accessToken = token;
-      final api = Api(ApiClient(authentication: auth));
+      final api =
+          Api(RateLimitedApiClient(requestsPerSecond: 2, authentication: auth));
       logic(api);
       break;
     } catch (e) {
