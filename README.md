@@ -22,6 +22,19 @@ dart pub global activate openapi_generator_cli
 openapi-generator generate -c open_api_config.yaml
 ```
 
+### Todo
+
+Logic:
+* Use the survey when mining from the command ship.
+* Record surveys to be used by vessels at the same location.
+* Record prices seen in systems
+* Teach the command ship how to mine
+* Once have a list of prices try to find arbitrage opportunities
+* Compute earnings per hour per ship.
+
+UI:
+* Add a Flutter UI.
+
 ### Modifications to generated code
 
 * Removed tests/ directory since it was just TODOs.

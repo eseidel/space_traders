@@ -53,7 +53,7 @@ Future<void> sellCargo(Api api, Ship ship) async {
     logger.info("${ship.symbol}: No cargo to sell");
     return;
   }
-  logCargo(ship);
+  // logCargo(ship);
   // final contractsResponse = await api.contracts.getContracts();
   // print("Contracts: ${contractsResponse!.data}");
   // final marketplaces =
@@ -80,30 +80,13 @@ Future<void> sellCargo(Api api, Ship ship) async {
         await api.fleet.sellCargo(ship.symbol, sellCargoRequest: sellRequest);
     final transaction = sellResponse!.data.transaction;
     logger.info(
-        "${ship.symbol}: Sold ${transaction.units} ${transaction.tradeSymbol} for ${transaction.totalPrice}");
+        "${ship.symbol}: Sold ${transaction.units} ${transaction.tradeSymbol} for ${transaction.totalPrice}c");
   }
 }
 
 /// One loop of the mining logic
 Future<DateTime?> advanceMiner(
     Api api, Ship ship, List<Waypoint> systemWaypoints) async {
-  // Cases:
-  // In transit:
-  //  Do nothing for now (assume on right course).
-  // Orbiting:
-  //  Dock.
-  // At asteroid:
-  // Refuel.
-  // Mine (ideally what's on our contract, otherwise whatever.)
-  // If full:
-  //  If have goods related to contract, go to contract waypoint.
-  //  Otherwise, sell goods.
-  // Not at an asteroid:
-  // Fulfill contract if we have one.
-  // Otherwise, sell ore.
-  // Refuel.
-  // If empty, return to asteroid.
-
   if (ship.isInTransit) {
     // Do nothing for now.
     return ship.nav.route.arrival;
@@ -120,17 +103,19 @@ Future<DateTime?> advanceMiner(
       await api.fleet.refuelShip(ship.symbol);
       return null;
     }
-    final waypoint = lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-    if (waypoint.isAsteroidField) {
+    final currentWaypoint =
+        lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+    if (currentWaypoint.isAsteroidField) {
       // If we still have space, mine.
       if (ship.spaceAvailable > 0) {
         logger.info(
             "${ship.symbol}: Mining (space available: ${ship.spaceAvailable})");
-        final extractResponse = await api.fleet.extractResources(ship.symbol);
-        // TODO: It is possible to navigate while mining is on cooldown.
-        // TODO: This should no longer be necessary now that we handle
-        // cooldown errors and sleep there.
-        return extractResponse!.data.cooldown.expiration;
+        await api.fleet.extractResources(ship.symbol);
+        // We don't return the expiration time because we don't want to force
+        // a wait, in case it might plan to do something else next.
+        // Instead we'll let it try again and catch the cooldown
+        // exception if it's still cooling down.
+        return null;
       } else {
         // Otherwise check to see if we have cargo that is relevant for our
         // contract.
@@ -202,7 +187,7 @@ Stream<DateTime> logicLoop(Api api) async* {
         }
       } on ApiException catch (e) {
         if (e.code == 409) {
-          // Still on cooldown.
+          // What we tried to do was still on cooldown.
           var jsonString = e.message;
           if (jsonString != null) {
             var exceptionJson = jsonDecode(jsonString);
