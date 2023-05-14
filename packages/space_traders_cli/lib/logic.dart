@@ -165,14 +165,17 @@ bool shouldUseForMining(Ship ship) {
 /// One loop of the logic.
 Stream<DateTime> logicLoop(Api api) async* {
   final agentResult = await api.agents.getMyAgent();
-  logger.info("Credits: ${agentResult!.data.credits}");
+  final agent = agentResult!.data;
+  logger.info("Credits: ${agent.credits}");
   final hq = parseWaypointString(agentResult.data.headquarters);
   final systemWaypoints = await waypointsInSystem(api, hq.system);
   final myShips = await allMyShips(api).toList();
-  if (shouldPurchaseShip(myShips)) {
-    print("No mining ships, purchasing one");
-    final purchaseResponse = await purchaseMiningShip(api, systemWaypoints);
-    print("Purchased ${purchaseResponse.ship.symbol}");
+  if (shouldPurchaseMiner(agent, myShips)) {
+    logger.info("Purchasing mining drone.");
+    final shipyardWaypoint = systemWaypoints.firstWhere((w) => w.hasShipyard);
+    final purchaseResponse =
+        await purchaseShip(api, ShipType.MINING_DRONE, shipyardWaypoint.symbol);
+    logger.info("Purchased ${purchaseResponse.ship.symbol}");
     return; // Fetch ship lists again.
   }
 
@@ -207,9 +210,14 @@ Stream<DateTime> logicLoop(Api api) async* {
 
 /// Returns true if we should purchase a new ship.
 /// Currently just returns true if we have no mining ships.
-bool shouldPurchaseShip(List<Ship> ships) {
-  // Can have fancier logic here later.
-  return ships.every((s) => !s.isExcavator);
+bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
+  // If we have no mining ships, purchase one.
+  if (ships.every((s) => !s.isExcavator)) {
+    return true;
+  }
+  // This should be dynamic based on market prices?
+  // Risk is that it will try to purchase and fail (causing an exception).
+  return myAgent.credits > 140000;
 }
 
 /// Run the logic loop forever.

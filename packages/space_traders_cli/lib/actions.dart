@@ -1,13 +1,11 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/extensions.dart';
 
-Future<PurchaseShip201ResponseData> purchaseMiningShip(
-    Api api, List<Waypoint> systemWaypoints) async {
-  final shipyardWaypoint = systemWaypoints.firstWhere((w) => w.hasShipyard);
+Future<PurchaseShip201ResponseData> purchaseShip(
+    Api api, ShipType shipType, String shipyardSymbol) async {
   PurchaseShipRequest purchaseShipRequest = PurchaseShipRequest(
-    waypointSymbol: shipyardWaypoint.symbol,
-    shipType: ShipType.MINING_DRONE,
+    waypointSymbol: shipyardSymbol,
+    shipType: shipType,
   );
   final purchaseResponse =
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
