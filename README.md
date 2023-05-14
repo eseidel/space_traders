@@ -28,7 +28,6 @@ Logic:
 * Use the survey when mining from the command ship.
 * Record surveys to be used by vessels at the same location.
 * Record prices seen in systems
-* Teach the command ship how to mine
 * Once have a list of prices try to find arbitrage opportunities
 * Compute earnings per hour per ship.
 
