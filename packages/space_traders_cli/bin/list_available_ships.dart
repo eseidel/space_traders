@@ -2,32 +2,33 @@ import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
-void printAvailableShipsAt(Api api, Waypoint waypoint) async {
+Future<void> printAvailableShipsAt(Api api, Waypoint waypoint) async {
   if (!waypoint.hasShipyard) {
     return;
   }
-  print("Ships types available at ${waypoint.symbol}:");
+  logger.info('Ships types available at ${waypoint.symbol}:');
 
   final shipyardResponse =
       await api.systems.getShipyard(waypoint.systemSymbol, waypoint.symbol);
-  for (var shipType in shipyardResponse!.data.shipTypes) {
-    print("  ${shipType.type}");
+  for (final shipType in shipyardResponse!.data.shipTypes) {
+    logger.info('  ${shipType.type}');
   }
   final ships = shipyardResponse.data.ships;
   if (ships.isEmpty) {
     return;
   }
-  print("Ships available at ${waypoint.symbol}:");
-  for (var ship in ships) {
-    print("  ${ship.type} - ${ship.purchasePrice}");
+  logger.info('Ships available at ${waypoint.symbol}:');
+  for (final ship in ships) {
+    logger.info('  ${ship.type} - ${ship.purchasePrice}');
   }
 }
 
 void main(List<String> args) async {
-  final fs = const LocalFileSystem();
+  const fs = LocalFileSystem();
   final api = defaultApi(fs);
 
   final agentResult = await api.agents.getMyAgent();
@@ -37,11 +38,11 @@ void main(List<String> args) async {
   final systemWaypoints = await waypointsInSystem(api, hq.system);
 
   final myShips = await allMyShips(api).toList();
-  print("Current ships:");
+  logger.info('Current ships:');
   printShips(myShips, systemWaypoints);
-  print("");
+  logger.info('');
 
-  for (var waypoint in systemWaypoints) {
-    printAvailableShipsAt(api, waypoint);
+  for (final waypoint in systemWaypoints) {
+    await printAvailableShipsAt(api, waypoint);
   }
 }

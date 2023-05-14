@@ -1,11 +1,13 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 
-// Need to make this generic for all paginated apis.
+// Need to make these generic for all paginated apis.
+
+/// Fetches all waypoints in a system.  Handles pagination from the server.
 Future<List<Waypoint>> waypointsInSystem(Api api, String system) async {
-  List<Waypoint> waypoints = [];
-  int page = 1;
-  int remaining = 0;
+  final waypoints = <Waypoint>[];
+  var page = 1;
+  var remaining = 0;
   do {
     final waypointsResponse =
         await api.systems.getSystemWaypoints(system, page: page);
@@ -16,16 +18,16 @@ Future<List<Waypoint>> waypointsInSystem(Api api, String system) async {
   return waypoints;
 }
 
-// Need to make this generic for all paginated apis.
+/// Fetches all of the user's ships.  Handles pagination from the server.
 Stream<Ship> allMyShips(Api api) async* {
-  int page = 1;
-  int count = 0;
-  int remaining = 0;
+  var page = 1;
+  var count = 0;
+  var remaining = 0;
   do {
     final shipsResponse = await api.fleet.getMyShips(page: page);
     count += shipsResponse!.data.length;
     remaining = shipsResponse.meta.total - count;
-    for (var ship in shipsResponse.data) {
+    for (final ship in shipsResponse.data) {
       yield ship;
     }
     page++;

@@ -7,10 +7,13 @@ import 'package:space_traders_cli/logger.dart';
 // accurate rate limiting.
 /// Rate limiting api client.
 class RateLimitedApiClient extends ApiClient {
-  final int requestsPerSecond;
-  DateTime _nextRequestTime = DateTime.now();
-
+  /// Construct a rate limited api client.
   RateLimitedApiClient({required this.requestsPerSecond, super.authentication});
+
+  /// The number of requests per second to allow.
+  final int requestsPerSecond;
+
+  DateTime _nextRequestTime = DateTime.now();
 
   @override
   Future<Response> invokeAPI(
@@ -25,11 +28,19 @@ class RateLimitedApiClient extends ApiClient {
     final beforeRequest = DateTime.now();
     if (beforeRequest.isBefore(_nextRequestTime)) {
       logger.detail(
-          "Rate limiting request. Next request time: $_nextRequestTime");
-      await Future.delayed(_nextRequestTime.difference(beforeRequest));
+        'Rate limiting request. Next request time: $_nextRequestTime',
+      );
+      await Future<void>.delayed(_nextRequestTime.difference(beforeRequest));
     }
     final response = await super.invokeAPI(
-        path, method, queryParams, body, headerParams, formParams, contentType);
+      path,
+      method,
+      queryParams,
+      body,
+      headerParams,
+      formParams,
+      contentType,
+    );
     final afterRequest = DateTime.now();
     _nextRequestTime =
         afterRequest.add(Duration(milliseconds: 1000 ~/ requestsPerSecond));

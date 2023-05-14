@@ -7,45 +7,64 @@ import 'package:space_traders_cli/rate_limit.dart';
 /// It provides a single place to inject the api client.
 /// This allows for easier mocking.
 class Api {
-  final ApiClient apiClient;
-  final SystemsApi systems;
-  final ContractsApi contracts;
-  final AgentsApi agents;
-  final FleetApi fleet;
-  final FactionsApi factions;
-
+  /// Construct an Api with the given ApiClient.
   Api(this.apiClient)
       : systems = SystemsApi(apiClient),
         contracts = ContractsApi(apiClient),
         agents = AgentsApi(apiClient),
         fleet = FleetApi(apiClient),
         factions = FactionsApi(apiClient);
+
+  /// The shared ApiClient.
+  final ApiClient apiClient;
+
+  /// SystemApi generated client.
+  final SystemsApi systems;
+
+  /// ContractsApi generated client.
+  final ContractsApi contracts;
+
+  /// AgentsApi generated client.
+  final AgentsApi agents;
+
+  /// FleetApi generated client.
+  final FleetApi fleet;
+
+  /// FactionsApi generated client.
+  final FactionsApi factions;
 }
 
+/// loadAuthToken loads the auth token from the given file system or
+/// throws an error if it cannot be found.
 String loadAuthToken(FileSystem fs) {
   final token = fs.file('auth_token.txt').readAsStringSync().trim();
   if (token.isEmpty) {
-    throw "No auth token found.";
+    throw Exception('No auth token found.');
   }
   return token;
 }
 
+/// apiFromAuthToken creates an Api with the given auth token.
 Api apiFromAuthToken(String token) {
   final auth = HttpBearerAuth()..accessToken = token;
   return Api(RateLimitedApiClient(requestsPerSecond: 2, authentication: auth));
 }
 
+/// defaultApi creates an Api with the default auth token read from the
+/// given file system.
 Api defaultApi(FileSystem fs) {
   return apiFromAuthToken(loadAuthToken(fs));
 }
 
+/// loadAuthTokenOrRegister loads the auth token from the given file system
+/// or registers a new user and returns the auth token.
 Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
   try {
     return loadAuthToken(fs);
   } catch (e) {
-    logger.info("No auth token found.");
+    logger.info('No auth token found.');
     // Otherwise, register a new user.
-    final handle = logger.prompt("What is your call sign?");
+    final handle = logger.prompt('What is your call sign?');
     final token = await register(handle);
     await fs.file('auth_token.txt').writeAsString(token);
     return token;
@@ -59,7 +78,7 @@ Future<String> register(String callSign) async {
 
   final faction = RegisterRequestFactionEnum.values.first;
 
-  RegisterRequest registerRequest = RegisterRequest(
+  final registerRequest = RegisterRequest(
     symbol: callSign,
     faction: faction,
   );

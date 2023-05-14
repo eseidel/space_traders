@@ -6,7 +6,7 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
 void main(List<String> args) async {
-  final fs = const LocalFileSystem();
+  const fs = LocalFileSystem();
   final api = defaultApi(fs);
 
   final agentResult = await api.agents.getMyAgent();
@@ -15,9 +15,11 @@ void main(List<String> args) async {
   final systemWaypoints = await waypointsInSystem(api, hq.system);
 
   final myShips = await allMyShips(api).toList();
-  final ship = logger.chooseOne("Which ship?",
-      choices: myShips,
-      display: (ship) => shipDescription(ship, systemWaypoints));
+  final ship = logger.chooseOne(
+    'Which ship?',
+    choices: myShips,
+    display: (ship) => shipDescription(ship, systemWaypoints),
+  );
   await api.fleet.dockShip(ship.symbol);
-  print("Docked.");
+  logger.info('Docked.');
 }
