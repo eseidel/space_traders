@@ -52,6 +52,13 @@ Future<PurchaseShip201ResponseData> purchaseMiningShip(
 //   return null;
 // }
 
+bool shouldSellItem(String tradeSymbol) {
+  // Could choose not to sell contract items if we have a contract that needs them.
+  // Current excluding antimatter because it's unclear how rare it is?
+  Set<String> excludedItems = {"ANTIMATTER"};
+  return !excludedItems.contains(tradeSymbol);
+}
+
 /// One loop of the mining logic
 Future<DateTime?> advanceMiner(
     Api api, Ship ship, List<Waypoint> systemWaypoints) async {
@@ -77,13 +84,14 @@ Future<DateTime?> advanceMiner(
     return ship.nav.route.arrival;
   }
   if (ship.isOrbiting) {
-    print("Docking ${ship.symbol} at ${ship.nav.waypointSymbol}");
+    logger.info(
+        "${ship.symbol}: Docking ${ship.symbol} at ${ship.nav.waypointSymbol}");
     await api.fleet.dockShip(ship.symbol);
     return null;
   }
   if (ship.isDocked) {
     if (ship.fuel.current < ship.fuel.capacity) {
-      print("Refueling");
+      logger.info("${ship.symbol}: Refueling");
       await api.fleet.refuelShip(ship.symbol);
       return null;
     }
@@ -91,7 +99,8 @@ Future<DateTime?> advanceMiner(
     if (waypoint.isAsteroidField) {
       // If we still have space, mine.
       if (ship.spaceAvailable > 0) {
-        print("Mining (space available: ${ship.spaceAvailable})");
+        logger.info(
+            "${ship.symbol}: Mining (space available: ${ship.spaceAvailable})");
         final extractResponse = await api.fleet.extractResources(ship.symbol);
         // TODO: It is possible to navigate while mining is on cooldown.
         // TODO: This should no longer be necessary now that we handle
@@ -118,7 +127,7 @@ Future<DateTime?> advanceMiner(
         // }
 
         // Otherwise, sell cargo.
-        print("Cargo full, selling");
+        logger.info("${ship.symbol}: Cargo full, selling");
         logCargo(ship);
         // final contractsResponse = await api.contracts.getContracts();
         // print("Contracts: ${contractsResponse!.data}");
@@ -135,6 +144,9 @@ Future<DateTime?> advanceMiner(
         // We should travel first to the marketplace that has the best price for
         // the ore we have a contract for.
         for (final item in ship.cargo.inventory) {
+          if (!shouldSellItem(item.symbol)) {
+            continue;
+          }
           final sellRequest = SellCargoRequest(
             symbol: item.symbol,
             units: item.units,
@@ -142,8 +154,8 @@ Future<DateTime?> advanceMiner(
           final sellResponse = await api.fleet
               .sellCargo(ship.symbol, sellCargoRequest: sellRequest);
           final transaction = sellResponse!.data.transaction;
-          print(
-              "Sold ${transaction.units} ${transaction.tradeSymbol} for ${transaction.totalPrice}");
+          logger.info(
+              "${ship.symbol}: Sold ${transaction.units} ${transaction.tradeSymbol} for ${transaction.totalPrice}");
         }
       }
     } else {
@@ -154,6 +166,12 @@ Future<DateTime?> advanceMiner(
     }
   }
   return null;
+}
+
+bool shouldUseForMining(Ship ship) {
+  // Could check if it has a mining laser.
+  return ship.isExcavator;
+  // return true; // All ships for now.
 }
 
 /// One loop of the logic.
@@ -173,7 +191,7 @@ Stream<DateTime> logicLoop(Api api) async* {
   printShips(myShips, systemWaypoints);
   // loop over all mining ships and advance them.
   for (var ship in myShips) {
-    if (ship.isExcavator) {
+    if (shouldUseForMining(ship)) {
       try {
         var maybeWaitUntil = await advanceMiner(api, ship, systemWaypoints);
         if (maybeWaitUntil != null) {

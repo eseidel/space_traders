@@ -34,7 +34,7 @@ String shipDescription(Ship ship, List<Waypoint> systemWaypoints) {
 
 void printShips(List<Ship> ships, List<Waypoint> systemWaypoints) {
   for (var ship in ships) {
-    print(shipDescription(ship, systemWaypoints));
+    print("  ${shipDescription(ship, systemWaypoints)}");
   }
 }
 
