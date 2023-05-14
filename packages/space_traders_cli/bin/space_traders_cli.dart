@@ -180,8 +180,8 @@ Future<DateTime?> advanceMiner(
         final extractResponse = await api.fleet.extractResources(ship.symbol);
         return extractResponse!.data.cooldown.expiration;
       } else {
-        // Otherwise, return to HQ.
-        print("Returning to HQ");
+        // Otherwise, sell cargo.
+        print("Cargo full, selling");
         logCargo(ship);
         // final contractsResponse = await api.contracts.getContracts();
         // print("Contracts: ${contractsResponse!.data}");
@@ -189,12 +189,25 @@ Future<DateTime?> advanceMiner(
         //     systemWaypoints.where((w) => w.hasMarketplace).toList();
         // printWaypoints(marketplaces);
 
-        final marketResponse =
-            await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
-        final market = marketResponse!.data;
-        prettyPrintJson(market.toJson());
+        // final marketResponse =
+        //     await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
+        // final market = marketResponse!.data;
+        // prettyPrintJson(market.toJson());
 
-        throw "not implemented";
+        // This should not sell anything we have a contract for.
+        // We should travel first to the marketplace that has the best price for
+        // the ore we have a contract for.
+        for (final item in ship.cargo.inventory) {
+          final sellRequest = SellCargoRequest(
+            symbol: item.symbol,
+            units: item.units,
+          );
+          final sellResponse = await api.fleet
+              .sellCargo(ship.symbol, sellCargoRequest: sellRequest);
+          final transaction = sellResponse!.data.transaction;
+          print(
+              "Sold ${transaction.units} ${transaction.tradeSymbol} for ${transaction.totalPrice}");
+        }
       }
     } else {
       throw "not implemented";
@@ -208,7 +221,8 @@ Future<DateTime?> advanceMiner(
 
 Stream<DateTime> logicLoop(Api api) async* {
   final agentResult = await api.agents.getMyAgent();
-  final hq = parseWaypointString(agentResult!.data.headquarters);
+  logger.info("Credits: ${agentResult!.data.credits}");
+  final hq = parseWaypointString(agentResult.data.headquarters);
   final systemWaypoints = await waypointsInSystem(api, hq.system);
   final myShips = await allMyShips(api).toList();
   if (shouldPurchaseShip(myShips)) {
