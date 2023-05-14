@@ -64,6 +64,16 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is in orbit.
   bool get isOrbiting => nav.status == ShipNavStatus.IN_ORBIT;
 
+  /// Returns true if the ship has a surveyor module.
+  // bool get hasSurveyor {
+  //   const surveyorModules = [
+  //     ShipMountSymbolEnum.SURVEYOR_I,
+  //     ShipMountSymbolEnum.SURVEYOR_II,
+  //     ShipMountSymbolEnum.SURVEYOR_III,
+  //   ];
+  //   return modules.any((m) => surveyorModules.contains(m.symbol));
+  // }
+
   /// Returns the average condition of the ship with 100 being perfect and 0
   /// being destroyed. This is the average of the engine, frame, and reactor
   /// conditions.

@@ -75,6 +75,7 @@ Future<void> sellCargoAndLog(
 /// One loop of the mining logic
 Future<DateTime?> advanceMiner(
   Api api,
+  DataStore db,
   Ship ship,
   List<Waypoint> systemWaypoints,
 ) async {
@@ -100,6 +101,18 @@ Future<DateTime?> advanceMiner(
     if (currentWaypoint.isAsteroidField) {
       // If we still have space, mine.
       if (ship.spaceAvailable > 0) {
+        // If we have surveying capabilities, survey.
+        // final latestSurvey = await loadSurvey(db, ship.nav.waypointSymbol);
+        // if (latestSurvey == null) {
+        //   if (ship.hasSurveyor) {
+        //     // Survey
+        //     final response = await api.fleet.createSurvey(ship.symbol);
+        //     final survey = response!.data;
+        //     await saveSurvey(db, survey.surveys);
+        //     shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
+        //   }
+        // }
+
         // Check cooldown and return if cooling down?
         // logger.info(
         //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
@@ -186,7 +199,8 @@ Stream<DateTime> logicLoop(Api api, DataStore db) async* {
   for (final ship in myShips) {
     if (_shouldUseForMining(ship)) {
       try {
-        final maybeWaitUntil = await advanceMiner(api, ship, systemWaypoints);
+        final maybeWaitUntil =
+            await advanceMiner(api, db, ship, systemWaypoints);
         if (maybeWaitUntil != null) {
           yield maybeWaitUntil;
         }
