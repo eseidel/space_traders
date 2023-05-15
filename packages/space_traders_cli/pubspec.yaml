@@ -11,6 +11,7 @@ dependencies:
   collection: ^1.17.2
   file: ^6.1.4
   http: ^0.13.6
+  intl: ^0.17.0
   mason_logger: ^0.2.5
   sembast: ^3.4.4
   space_traders_api:

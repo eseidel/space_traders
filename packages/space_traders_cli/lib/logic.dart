@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
@@ -61,13 +62,15 @@ Future<void> sellCargoAndLog(
   await for (final response in sellCargo(api, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
+    final creditsFormat = NumberFormat();
     shipInfo(
       ship,
       '🤝 ${transaction.units.toString().padLeft(2)} '
       // Could use TradeSymbol.values.reduce() to find the longest symbol.
       '${transaction.tradeSymbol.padRight(18)} '
-      '${transaction.totalPrice.toString().padLeft(3)}c -> '
-      '🏦 ${agent.credits}c',
+      '${creditsFormat.format(transaction.totalPrice).padLeft(3)}c -> '
+      // Always want the 'c' after the credits.
+      '🏦 ${creditsFormat.format(agent.credits)}c',
     );
   }
 }
@@ -126,9 +129,10 @@ Future<DateTime?> advanceMiner(
         shipInfo(
             ship,
             // pickaxe requires an extra space on mac?
-            '⛏️  ${yield_.units} '
+            '⛏️  ${yield_.units.toString().padLeft(2)} '
             '${yield_.symbol.padRight(18)} '
-            '📦${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+            // Space after emoji is needed on windows to not bleed together.
+            '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
         // We don't return the expiration time because we don't want to force
         // a wait, in case it might plan to do something else next.
         // Instead we'll let it try again and catch the cooldown
