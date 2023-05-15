@@ -37,7 +37,8 @@ extension WaypointUtils on Waypoint {
 
   /// Returns true if the waypoint has a shipyard.
   bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
-  // bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
+  /// Returns true if the waypoint has a marketplace.
+  bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
 }
 
 /// Extensions onto Ship to make it easier to work with.

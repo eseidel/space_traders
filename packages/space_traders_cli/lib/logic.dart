@@ -177,6 +177,130 @@ bool _shouldUseForMining(Ship ship) {
   return true; // All ships for now.
 }
 
+// class _Deal {
+//   _Deal({
+//     required this.tradeSymbol,
+//     required this.destination,
+//     required this.sourcePrice,
+//     required this.destinationPrice,
+//   });
+
+//   final String tradeSymbol;
+//   final Waypoint destination;
+//   final int sourcePrice;
+//   final int destinationPrice;
+
+//   int get profit => destinationPrice - sourcePrice;
+// }
+
+// int? recentPriceAt({
+//   required String tradeSymbol,
+//   required String marketplaceSymbol,
+// }) {
+//   return null;
+// }
+
+// Stream<Market> getAllMarkets(
+//   Api api,
+//   List<Waypoint> systemWaypoints,
+// ) async* {
+//   for (final waypoint in systemWaypoints) {
+//     if (!waypoint.hasMarketplace) {
+//       continue;
+//     }
+//     final response =
+//         await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
+//     yield response!.data;
+//   }
+// }
+
+// Iterable<_Deal> _allDeals(Market localMarket,
+//    List<Market> otherMarkets) sync* {
+//   for (final otherMarket in otherMarkets) {
+//     for (final wanted in otherMarket.imports) {
+//       for (final offered in localMarket.tradeGoods) {
+//         if (wanted.symbol == offered.symbol) {
+//           yield _Deal(
+//             tradeSymbol: wanted.symbol,
+//             destination: otherMarket.waypoint,
+//             sourcePrice: offered.price,
+//             destinationPrice: wanted.price,
+//           );
+//         }
+//       }
+//     }
+//   }
+// }
+
+// Future<_Deal> findBestDeal(
+//   Api api,
+//   Ship ship,
+//   Waypoint currentWaypoint,
+//   List<Waypoint> systemWaypoints,
+// ) async {
+//   // Fetch all marketplace data
+//   final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
+//   final localMarket =
+//       allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
+//   final otherMarkets =
+//       allMarkets.where((m) => m.symbol != localMarket.symbol);
+
+//   final allDeals = _allDeals(localMarket, otherMarkets);
+//   // Construct all possible deals.
+//   // Get the list of trade symbols sold at this marketplace.
+//   // Upload current prices at this market to the db.
+//   // For each trade symbol, get the price at this marketplace.
+//   // for (final tradeSymbol in tradeSymbols) {}
+//   // For each trade symbol, get the price at the destination marketplace.
+//   // Sort by assumed profit.
+//   // If we don't have a destination price, assume 50th percentile.
+//   // Deals are then sorted by profit, and we take the best one.
+
+//   // If we don't have a percentile, match only export/import.
+//   // Picking at random from the matchable exports?
+//   // Or picking the shortest distance?
+// }
+
+/// One loop of the trading logic
+Future<DateTime?> advanceTrader(
+  Api api,
+  DataStore db,
+  Ship ship,
+  List<Waypoint> systemWaypoints,
+) async {
+  if (ship.isInTransit) {
+    // Do nothing for now.
+    return ship.nav.route.arrival;
+  }
+  if (ship.isOrbiting) {
+    logger.info(
+      '${ship.symbol}: Docking ${ship.symbol} at ${ship.nav.waypointSymbol}',
+    );
+    await api.fleet.dockShip(ship.symbol);
+    return null;
+  }
+  if (ship.isDocked) {
+    if (ship.fuel.current < ship.fuel.capacity) {
+      shipInfo(ship, 'Refueling');
+      await api.fleet.refuelShip(ship.symbol);
+      return null;
+    }
+    final currentWaypoint =
+        lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+    if (currentWaypoint.hasMarketplace) {
+      // Sell any cargo we can.
+      await sellCargoAndLog(api, ship, where: _shouldSellItem);
+      // final deal =
+      //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
+      // await navigateTo(api, ship, deal.destination);
+      throw UnimplementedError();
+    } else {
+      throw UnimplementedError();
+    }
+  }
+  return null;
+}
+
 /// One loop of the logic.
 Stream<DateTime> logicLoop(Api api, DataStore db) async* {
   final agentResult = await api.agents.getMyAgent();
