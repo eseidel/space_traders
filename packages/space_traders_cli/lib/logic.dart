@@ -100,7 +100,10 @@ Future<DateTime?> advanceMiner(
         lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
     if (currentWaypoint.isAsteroidField) {
       // If we still have space, mine.
-      if (ship.spaceAvailable > 0) {
+      // It's not worth potentially waiting a minute just to get one piece of
+      // cargo if we're going to sell it right away here.
+      // Hence selling when we're down to 5 or fewer spaces left.
+      if (ship.spaceAvailable > 5) {
         // If we have surveying capabilities, survey.
         // final latestSurvey = await loadSurvey(db, ship.nav.waypointSymbol);
         // if (latestSurvey == null) {

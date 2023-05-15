@@ -23,7 +23,9 @@ void _savePricesCache(String prices) {
   File('prices.json').writeAsStringSync(prices);
 }
 
-// {"waypointSymbol": "X1-ZS60-53675E", "symbol": "IRON_ORE", "supply": "ABUNDANT", "purchasePrice": 6, "sellPrice": 4, "tradeVolume": 1000, "timestamp": "2023-05-14T21:52:56.530126100+00:00"}
+// {"waypointSymbol": "X1-ZS60-53675E", "symbol": "IRON_ORE", "supply":
+// "ABUNDANT", "purchasePrice": 6, "sellPrice": 4, "tradeVolume": 1000,
+// "timestamp": "2023-05-14T21:52:56.530126100+00:00"}
 class Price {
   Price({
     required this.waypointSymbol,
