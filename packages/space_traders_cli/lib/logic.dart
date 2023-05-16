@@ -356,7 +356,8 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
   }
   // This should be dynamic based on market prices?
   // Risk is that it will try to purchase and fail (causing an exception).
-  return myAgent.credits > 140000;
+  return false;
+  // return myAgent.credits > 140000;
 }
 
 /// Run the logic loop forever.
@@ -373,7 +374,9 @@ Future<void> logic(Api api) async {
       // This future waits until the earliest time we think the server
       // will be ready for us to do something.
       final waitDuration = earliestWaitUntil.difference(DateTime.now());
-      logger.info('⏱️ ${waitDuration.inSeconds}s');
+      logger.info(
+        '⏱️ ${waitDuration.inSeconds}s until ${earliestWaitUntil.toLocal()}',
+      );
       await Future<void>.delayed(earliestWaitUntil.difference(DateTime.now()));
     }
     // Otherwise we just loop again immediately and rely on rate limiting in the
