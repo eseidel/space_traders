@@ -358,10 +358,11 @@ Future<void> logic(Api api) async {
   for (final contract in contracts) {
     if (!contract.accepted) {
       await api.contracts.acceptContract(contract.id);
-      logger.info('Accepted: ${contractDescription(contract)}.');
-      logger.info(
-        'received ${creditsString(contract.terms.payment.onAccepted)}',
-      );
+      logger
+        ..info('Accepted: ${contractDescription(contract)}.')
+        ..info(
+          'received ${creditsString(contract.terms.payment.onAccepted)}',
+        );
     }
   }
 
