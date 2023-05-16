@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -53,4 +54,25 @@ void logCargo(Ship ship) {
   for (final item in ship.cargo.inventory) {
     logger.info('  ${item.units.toString().padLeft(3)} ${item.name}');
   }
+}
+
+/// Format the given [credits] as a string.
+String creditsString(int credits) {
+  final creditsFormat = NumberFormat();
+  return '${creditsFormat.format(credits)}c';
+}
+
+/// Return a string describing the given [contract].
+String contractDescription(Contract contract) {
+  final terms = contract.terms;
+  var termsString = terms.deliver
+      .map(
+        (d) => '${d.unitsRequired} ${d.tradeSymbol} to ${d.destinationSymbol}',
+      )
+      .join(', ');
+  termsString = 'by ${terms.deadline.toLocal()}';
+  termsString = 'for ${creditsString(terms.payment.onFulfilled)}';
+  termsString = 'with ${creditsString(terms.payment.onAccepted)} upfront';
+  return '${contract.type} from ${contract.factionSymbol}, '
+      'deliver $termsString';
 }

@@ -1,24 +1,11 @@
-import 'package:intl/intl.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
-
-/// Used to accept the first contract in the list of contracts.
-/// Which is the case when just starting the game.
-Future<void> acceptFirstContract(Api api) async {
-  final contracts = await api.contracts.getContracts();
-  logger.info(contracts.toString());
-
-  final firstContract = contracts!.data.first;
-  logger.info(firstContract.toString());
-
-  final response = await api.contracts.acceptContract(firstContract.id);
-  logger.info(response.toString());
-}
 
 // Iterable<String> tradeSymbolsFromContracts(List<Contract> contracts) sync* {
 //   for (final contract in contracts) {
@@ -62,15 +49,14 @@ Future<void> sellCargoAndLog(
   await for (final response in sellCargo(api, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
-    final creditsFormat = NumberFormat();
     shipInfo(
       ship,
       '🤝 ${transaction.units.toString().padLeft(2)} '
       // Could use TradeSymbol.values.reduce() to find the longest symbol.
       '${transaction.tradeSymbol.padRight(18)} '
-      '${creditsFormat.format(transaction.totalPrice).padLeft(3)}c -> '
+      '${creditsString(transaction.totalPrice).padLeft(3)} -> '
       // Always want the 'c' after the credits.
-      '🏦 ${creditsFormat.format(agent.credits)}c',
+      '🏦 ${creditsString(agent.credits)}',
     );
   }
 }
@@ -180,8 +166,8 @@ Future<DateTime?> advanceMiner(
 
 bool _shouldUseForMining(Ship ship) {
   // Could check if it has a mining laser.
-  // return ship.isExcavator;
-  return true; // All ships for now.
+  return ship.isExcavator;
+  // return true; // All ships for now.
 }
 
 // class _Deal {
@@ -365,6 +351,19 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
 Future<void> logic(Api api) async {
   final db = DataStore();
   await db.open();
+
+  final contractsResponse = await api.contracts.getContracts();
+  final contracts = contractsResponse!.data;
+
+  for (final contract in contracts) {
+    if (!contract.accepted) {
+      await api.contracts.acceptContract(contract.id);
+      logger.info('Accepted: ${contractDescription(contract)}.');
+      logger.info(
+        'received ${creditsString(contract.terms.payment.onAccepted)}',
+      );
+    }
+  }
 
   while (true) {
     final nextEventTimes = await logicLoop(api, db).toList();
