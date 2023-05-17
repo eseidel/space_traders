@@ -166,8 +166,8 @@ Future<DateTime?> advanceMiner(
 
 bool _shouldUseForMining(Ship ship) {
   // Could check if it has a mining laser.
-  return ship.isExcavator;
-  // return true; // All ships for now.
+  // return ship.isExcavator;
+  return true; // All ships for now.
 }
 
 // class _Deal {

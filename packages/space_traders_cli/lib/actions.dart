@@ -1,5 +1,6 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/logger.dart';
 
 /// purchase a ship of type [shipType] at [shipyardSymbol]
 Future<PurchaseShip201ResponseData> purchaseShip(
@@ -52,9 +53,9 @@ Stream<SellCargo201ResponseData> sellCargo(
   //     systemWaypoints.where((w) => w.hasMarketplace).toList();
   // printWaypoints(marketplaces);
 
-  // final marketResponse =
-  //     await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
-  // final market = marketResponse!.data;
+  final marketResponse = await api.systems
+      .getMarket(ship.nav.systemSymbol, ship.nav.waypointSymbol);
+  final market = marketResponse!.data;
   // prettyPrintJson(market.toJson());
 
   // This should not sell anything we have a contract for.
@@ -62,6 +63,13 @@ Stream<SellCargo201ResponseData> sellCargo(
   // the ore we have a contract for.
   for (final item in ship.cargo.inventory) {
     if (where != null && !where(item.symbol)) {
+      continue;
+    }
+    if (!market.tradeGoods.any((g) => g.symbol == item.symbol)) {
+      shipInfo(
+        ship,
+        "Market at ${ship.nav.waypointSymbol} doesn't buy ${item.symbol}",
+      );
       continue;
     }
     final sellRequest = SellCargoRequest(
