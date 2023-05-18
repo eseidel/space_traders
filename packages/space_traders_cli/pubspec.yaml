@@ -16,6 +16,7 @@ dependencies:
   sembast: ^3.4.4
   space_traders_api:
     path: ../space_traders_api
+  stats: ^2.0.0
 
 dev_dependencies:
   test: ^1.21.0
