@@ -4,6 +4,7 @@ import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
@@ -34,11 +35,29 @@ bool _shouldSellItem(String tradeSymbol) {
   return !excludedItems.contains(tradeSymbol);
 }
 
+String _emojiForSellPrice(PriceData data, String tradeSymbol, int sellPrice) {
+  final percentile = data.percentileForSellPrice(tradeSymbol, sellPrice);
+  if (percentile == null) {
+    return '🤷';
+  }
+  if (percentile < 25) {
+    return '⏬';
+  }
+  if (percentile < 50) {
+    return '🔽';
+  }
+  if (percentile < 75) {
+    return '🔼';
+  }
+  return '⏫';
+}
+
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
 Future<void> sellCargoAndLog(
   Api api,
+  PriceData data,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
 }) async {
@@ -49,12 +68,17 @@ Future<void> sellCargoAndLog(
   await for (final response in sellCargo(api, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
+    final priceEmoji = _emojiForSellPrice(
+      data,
+      transaction.tradeSymbol,
+      transaction.totalPrice,
+    );
     shipInfo(
       ship,
       '🤝 ${transaction.units.toString().padLeft(2)} '
       // Could use TradeSymbol.values.reduce() to find the longest symbol.
       '${transaction.tradeSymbol.padRight(18)} '
-      '${creditsString(transaction.totalPrice).padLeft(3)} -> '
+      '$priceEmoji ${creditsString(transaction.totalPrice).padLeft(3)} -> '
       // Always want the 'c' after the credits.
       '🏦 ${creditsString(agent.credits)}',
     );
@@ -65,6 +89,7 @@ Future<void> sellCargoAndLog(
 Future<DateTime?> advanceMiner(
   Api api,
   DataStore db,
+  PriceData priceData,
   Ship ship,
   List<Waypoint> systemWaypoints,
 ) async {
@@ -146,12 +171,12 @@ Future<DateTime?> advanceMiner(
         // }
 
         // Otherwise, sell cargo.
-        await sellCargoAndLog(api, ship, where: _shouldSellItem);
+        await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
       }
     } else {
       // Fulfill contract if we have one.
       // Otherwise, sell ore.
-      await sellCargoAndLog(api, ship, where: _shouldSellItem);
+      await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
       // Otherwise return to asteroid.
       final asteroidField =
           systemWaypoints.firstWhere((w) => w.isAsteroidField);
@@ -258,6 +283,7 @@ bool _shouldUseForMining(Ship ship) {
 Future<DateTime?> advanceTrader(
   Api api,
   DataStore db,
+  PriceData priceData,
   Ship ship,
   List<Waypoint> systemWaypoints,
 ) async {
@@ -282,7 +308,7 @@ Future<DateTime?> advanceTrader(
         lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
     if (currentWaypoint.hasMarketplace) {
       // Sell any cargo we can.
-      await sellCargoAndLog(api, ship, where: _shouldSellItem);
+      await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
       // final deal =
       //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
       // await navigateTo(api, ship, deal.destination);
@@ -295,7 +321,7 @@ Future<DateTime?> advanceTrader(
 }
 
 /// One loop of the logic.
-Stream<DateTime> logicLoop(Api api, DataStore db) async* {
+Stream<DateTime> logicLoop(Api api, DataStore db, PriceData priceData) async* {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final hq = parseWaypointString(agentResult.data.headquarters);
@@ -317,7 +343,7 @@ Stream<DateTime> logicLoop(Api api, DataStore db) async* {
     if (_shouldUseForMining(ship)) {
       try {
         final maybeWaitUntil =
-            await advanceMiner(api, db, ship, systemWaypoints);
+            await advanceMiner(api, db, priceData, ship, systemWaypoints);
         if (maybeWaitUntil != null) {
           yield maybeWaitUntil;
         }
@@ -352,6 +378,8 @@ Future<void> logic(Api api) async {
   final db = DataStore();
   await db.open();
 
+  final priceData = await PriceData.load();
+
   final contractsResponse = await api.contracts.getContracts();
   final contracts = contractsResponse!.data;
 
@@ -367,7 +395,7 @@ Future<void> logic(Api api) async {
   }
 
   while (true) {
-    final nextEventTimes = await logicLoop(api, db).toList();
+    final nextEventTimes = await logicLoop(api, db, priceData).toList();
     if (nextEventTimes.isNotEmpty) {
       final earliestWaitUntil =
           nextEventTimes.reduce((a, b) => a.isBefore(b) ? a : b);

@@ -21,6 +21,13 @@ class Price {
     required this.timestamp,
   });
 
+  Price._compareOnly({this.purchasePrice = 0, this.sellPrice = 0})
+      : waypointSymbol = '',
+        symbol = '',
+        supply = MarketTradeGoodSupplyEnum.ABUNDANT,
+        tradeVolume = 0,
+        timestamp = DateTime.now();
+
   /// Create a new price record from a json map.
   factory Price.fromJson(Map<String, dynamic> json) {
     return Price(
@@ -114,5 +121,71 @@ class PriceData {
     final data = PriceData(_parsePrices(response.body), filePath);
     _savePricesCache(jsonString: response.body, cacheFilePath: filePath);
     return data;
+  }
+
+  /// Get the percentile for the purchase price of a trade good.
+  int? percentileForPurchasePrice(String symbol, int purchasePrice) =>
+      _percentileFor(
+        symbol,
+        Price._compareOnly(purchasePrice: purchasePrice),
+        (a, b) => a.purchasePrice.compareTo(b.purchasePrice),
+      );
+
+  /// Get the percentile for the sell price of a trade good.
+  int? percentileForSellPrice(String symbol, int sellPrice) => _percentileFor(
+        symbol,
+        Price._compareOnly(sellPrice: sellPrice),
+        (a, b) => a.sellPrice.compareTo(b.sellPrice),
+      );
+
+  /// Return true if the sell price is in above the [goodPercentile] percentile.
+  bool isGoodSellPrice(
+    String symbol,
+    int sellPrice, {
+    int goodPercentile = 50,
+  }) {
+    final percentile = percentileForSellPrice(symbol, sellPrice);
+    if (percentile == null) {
+      return false;
+    }
+    return percentile >= goodPercentile;
+  }
+
+  /// Return true if the purchase price is in below the [goodPercentile]
+  /// percentile.
+  bool isGoodPurchasePrice(
+    String symbol,
+    int purchasePrice, {
+    int goodPercentile = 50,
+  }) {
+    final percentile = percentileForPurchasePrice(symbol, purchasePrice);
+    if (percentile == null) {
+      return false;
+    }
+    return percentile <= goodPercentile;
+  }
+
+  int? _percentileFor(
+    String symbol,
+    Price price,
+    int Function(Price a, Price b) compareTo,
+  ) {
+    final pricesForSymbol = prices.where((e) => e.symbol == symbol);
+    if (pricesForSymbol.isEmpty) {
+      return null;
+    }
+    // Sort the prices in ascending order.
+    final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
+
+    // Find the first index where the sorted price is greater than the price
+    // being compared.
+    var index =
+        pricesForSymbolSorted.indexWhere((e) => compareTo(e, price) > 0);
+    // If we ran off the end, we know that the price is greater than all
+    // the prices in the list. i.e. 100th percentile.
+    if (index == -1) {
+      index = pricesForSymbol.length;
+    }
+    return (index / pricesForSymbol.length * 100).round();
   }
 }
