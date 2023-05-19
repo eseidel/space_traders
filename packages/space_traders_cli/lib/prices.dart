@@ -123,20 +123,43 @@ class PriceData {
     return data;
   }
 
+  static int _sellPriceAcending(Price a, Price b) =>
+      a.sellPrice.compareTo(b.sellPrice);
+  static int _purchasePriceAcending(Price a, Price b) =>
+      a.purchasePrice.compareTo(b.purchasePrice);
+
   /// Get the percentile for the purchase price of a trade good.
   int? percentileForPurchasePrice(String symbol, int purchasePrice) =>
       _percentileFor(
         symbol,
         Price._compareOnly(purchasePrice: purchasePrice),
-        (a, b) => a.purchasePrice.compareTo(b.purchasePrice),
+        _purchasePriceAcending,
       );
+
+  /// Get the median purchase price for a trade good.
+  int? medianPurchasePrice(String symbol) {
+    final maybePrice = _medianPriceFor(
+      symbol,
+      _purchasePriceAcending,
+    );
+    return maybePrice?.purchasePrice;
+  }
 
   /// Get the percentile for the sell price of a trade good.
   int? percentileForSellPrice(String symbol, int sellPrice) => _percentileFor(
         symbol,
         Price._compareOnly(sellPrice: sellPrice),
-        (a, b) => a.sellPrice.compareTo(b.sellPrice),
+        _sellPriceAcending,
       );
+
+  /// Get the median sell price for a trade good.
+  int? medianSellPrice(String symbol) {
+    final maybePrice = _medianPriceFor(
+      symbol,
+      _sellPriceAcending,
+    );
+    return maybePrice?.sellPrice;
+  }
 
   /// Return true if the sell price is in above the [goodPercentile] percentile.
   bool isGoodSellPrice(
@@ -163,6 +186,19 @@ class PriceData {
       return false;
     }
     return percentile <= goodPercentile;
+  }
+
+  Price? _medianPriceFor(
+    String symbol,
+    int Function(Price a, Price b) compareTo,
+  ) {
+    final pricesForSymbol = prices.where((e) => e.symbol == symbol);
+    if (pricesForSymbol.isEmpty) {
+      return null;
+    }
+    // Sort the prices in ascending order.
+    final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
+    return pricesForSymbolSorted[pricesForSymbolSorted.length ~/ 2];
   }
 
   int? _percentileFor(

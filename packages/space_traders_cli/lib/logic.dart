@@ -1,3 +1,4 @@
+import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
@@ -35,21 +36,42 @@ bool _shouldSellItem(String tradeSymbol) {
   return !excludedItems.contains(tradeSymbol);
 }
 
-String _emojiForSellPrice(PriceData data, String tradeSymbol, int sellPrice) {
-  final percentile = data.percentileForSellPrice(tradeSymbol, sellPrice);
-  if (percentile == null) {
+// String _emojiForSellPrice(PriceData data, String tradeSymbol, int sellPrice)
+// {
+//   final percentile = data.percentileForSellPrice(tradeSymbol, sellPrice);
+//   if (percentile == null) {
+//     return '🤷';
+//   }
+//   if (percentile < 25) {
+//     return '⏬';
+//   }
+//   if (percentile < 50) {
+//     return '🔽';
+//   }
+//   if (percentile < 75) {
+//     return '🔼';
+//   }
+//   return '⏫';
+// }
+
+String _stringForPriceDeviance(
+  PriceData data,
+  String tradeSymbol,
+  int sellPrice,
+) {
+  final median = data.medianSellPrice(tradeSymbol);
+  if (median == null) {
     return '🤷';
   }
-  if (percentile < 25) {
-    return '⏬';
+  final diff = sellPrice - median;
+  if (diff == 0) {
+    return '👌';
   }
-  if (percentile < 50) {
-    return '🔽';
+  final percentOff = (diff / median * 100).round();
+  if (diff < 0) {
+    return lightRed.wrap('$percentOff% ${creditsString(diff)}')!;
   }
-  if (percentile < 75) {
-    return '🔼';
-  }
-  return '⏫';
+  return lightGreen.wrap('+$percentOff% ${creditsString(diff)}')!;
 }
 
 /// Sell all cargo matching the [where] predicate.
@@ -68,17 +90,20 @@ Future<void> sellCargoAndLog(
   await for (final response in sellCargo(api, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
-    final priceEmoji = _emojiForSellPrice(
+    final priceEmoji = _stringForPriceDeviance(
       data,
       transaction.tradeSymbol,
-      transaction.totalPrice,
+      transaction.pricePerUnit,
     );
     shipInfo(
       ship,
       '🤝 ${transaction.units.toString().padLeft(2)} '
       // Could use TradeSymbol.values.reduce() to find the longest symbol.
       '${transaction.tradeSymbol.padRight(18)} '
-      '$priceEmoji ${creditsString(transaction.totalPrice).padLeft(3)} -> '
+      '$priceEmoji per, '
+      '${transaction.units.toString().padLeft(2)} x '
+      '${creditsString(transaction.pricePerUnit).padLeft(3)} = '
+      '${creditsString(transaction.totalPrice).padLeft(3)} -> '
       // Always want the 'c' after the credits.
       '🏦 ${creditsString(agent.credits)}',
     );
