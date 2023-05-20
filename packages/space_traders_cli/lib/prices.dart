@@ -66,7 +66,7 @@ class Price {
 /// A collection of price records.
 class PriceData {
   /// Create a new price data collection.
-  PriceData(this.prices, this.cacheFilePath);
+  PriceData(this.prices);
 
   // Eventually we should keep our own data and not use the global data.
   /// Url from which to fetch the global price data.
@@ -74,9 +74,6 @@ class PriceData {
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'prices.json';
-
-  /// The path to the cache file.
-  final String cacheFilePath;
 
   /// The list of price records.
   final List<Price> prices;
@@ -93,7 +90,6 @@ class PriceData {
     if (pricesFile.existsSync()) {
       return PriceData(
         _parsePrices(pricesFile.readAsStringSync()),
-        cacheFilePath,
       );
     }
     return null;
@@ -122,8 +118,9 @@ class PriceData {
       return fromCache;
     }
     logger.info("Couldn't load prices from cache, fetching from $uri");
+    // We could mock http here.
     final response = await http.get(uri);
-    final data = PriceData(_parsePrices(response.body), filePath);
+    final data = PriceData(_parsePrices(response.body));
     _savePricesCache(fs, jsonString: response.body, cacheFilePath: filePath);
     return data;
   }
