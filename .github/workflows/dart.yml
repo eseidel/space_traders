@@ -39,4 +39,6 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
-          directory: packages/space_traders_cli/coverage
+          working-directory: packages/space_traders_cli
+          directory: coverage
+          verbose: true
