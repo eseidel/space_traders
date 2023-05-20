@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -88,8 +88,8 @@ class PriceData {
         .toList();
   }
 
-  static PriceData? _loadPricesCache(String cacheFilePath) {
-    final pricesFile = File(cacheFilePath);
+  static PriceData? _loadPricesCache(FileSystem fs, String cacheFilePath) {
+    final pricesFile = fs.file(cacheFilePath);
     if (pricesFile.existsSync()) {
       return PriceData(
         _parsePrices(pricesFile.readAsStringSync()),
@@ -99,27 +99,32 @@ class PriceData {
     return null;
   }
 
-  static void _savePricesCache({
+  static void _savePricesCache(
+    FileSystem fs, {
     required String jsonString,
     required String cacheFilePath,
   }) {
-    File(cacheFilePath).writeAsStringSync(jsonString);
+    fs.file(cacheFilePath).writeAsStringSync(jsonString);
   }
 
   /// Load the price data from the cache or from the url.
-  static Future<PriceData> load({String? cacheFilePath, String? url}) async {
+  static Future<PriceData> load(
+    FileSystem fs, {
+    String? cacheFilePath,
+    String? url,
+  }) async {
     final uri = Uri.parse(url ?? defaultUrl);
     final filePath = cacheFilePath ?? defaultCacheFilePath;
     // Try to load prices.json.  If it does not exist, pull down and cache
     // from the url.
-    final fromCache = _loadPricesCache(filePath);
+    final fromCache = _loadPricesCache(fs, filePath);
     if (fromCache != null) {
       return fromCache;
     }
     logger.info("Couldn't load prices from cache, fetching from $uri");
     final response = await http.get(uri);
     final data = PriceData(_parsePrices(response.body), filePath);
-    _savePricesCache(jsonString: response.body, cacheFilePath: filePath);
+    _savePricesCache(fs, jsonString: response.body, cacheFilePath: filePath);
     return data;
   }
 

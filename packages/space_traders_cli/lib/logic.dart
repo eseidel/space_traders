@@ -8,6 +8,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/ship_waiter.dart';
 
 // Iterable<String> tradeSymbolsFromContracts(List<Contract> contracts) sync* {
 //   for (final contract in contracts) {
@@ -73,7 +74,6 @@ Future<void> refuelIfNeededAndLog(
     return;
   }
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
-  // synthesize transaction:
   final responseWrapper = await api.fleet.refuelShip(ship.symbol);
   final response = responseWrapper!.data;
   logTransaction(
@@ -125,7 +125,7 @@ Future<DateTime?> advanceMiner(
   List<Waypoint> systemWaypoints,
 ) async {
   if (ship.isInTransit) {
-    // Do nothing for now.
+    // Just go back to sleep until the ship is done flying.
     return ship.nav.route.arrival;
   }
   final currentWaypoint =
@@ -377,12 +377,10 @@ Future<DateTime?> advanceContractTrader(
   ContractDeliverGood goods,
 ) async {
   if (ship.isInTransit) {
-    // Do nothing for now.
+    // Go back to sleep until we arrive.
     return ship.nav.route.arrival;
   }
-  if (!ship.isDocked) {
-    await api.fleet.dockShip(ship.symbol);
-  }
+  await _dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
@@ -467,12 +465,10 @@ Future<DateTime?> advanceContractTrader(
         logTransaction(ship, priceData, agent, transaction);
       }
     }
-    // Regardless, navigate to contract destination.
-    final destination =
-        lookupWaypoint(goods.destinationSymbol, systemWaypoints);
-    return navigateToAndLog(api, ship, destination);
   }
-  return null;
+  // Regardless, navigate to contract destination.
+  final destination = lookupWaypoint(goods.destinationSymbol, systemWaypoints);
+  return navigateToAndLog(api, ship, destination);
 }
 
 Future<DateTime?> _advanceShip(
@@ -510,76 +506,15 @@ Future<DateTime?> _advanceShip(
           systemWaypoints,
         );
       } on ApiException catch (e) {
+        // This handles the ship (reactor?) cooldown exception which we can
+        // get when running the script fresh with no state while a ship is
+        // still on cooldown from a previous run.
         final expiration = expirationFromApiException(e);
         if (expiration != null) {
           return expiration;
         }
         rethrow;
       }
-  }
-}
-
-/// Keeps track of when we expect to interact with a ship next.
-class ShipWaiter {
-  final Map<String, DateTime> _waitUntilByShipSymbol = {};
-  List<Ship> _latestShips = [];
-
-  void _removeExpiredWaits() {
-    final now = DateTime.now();
-    final entries = _waitUntilByShipSymbol.entries.toList();
-    for (final entry in entries) {
-      final symbol = entry.key;
-      final waitUntil = entry.value;
-      if (waitUntil.isBefore(now)) {
-        _waitUntilByShipSymbol.remove(symbol);
-      }
-    }
-  }
-
-  void _removeUnknownShips() {
-    final entries = _waitUntilByShipSymbol.entries.toList();
-    for (final entry in entries) {
-      final symbol = entry.key;
-      final ship = _latestShips.firstWhereOrNull((s) => s.symbol == symbol);
-      if (ship == null) {
-        _waitUntilByShipSymbol.remove(symbol);
-      }
-    }
-  }
-
-  /// Updates the list of ships we know about.
-  void updateForShips(List<Ship> ships) {
-    _latestShips = ships;
-    _removeUnknownShips();
-    _removeExpiredWaits();
-  }
-
-  /// Updates the wait time for a ship.
-  void updateWaitUntil(String shipSymbol, DateTime? waitUntil) {
-    if (waitUntil == null) {
-      _waitUntilByShipSymbol.remove(shipSymbol);
-    } else {
-      _waitUntilByShipSymbol[shipSymbol] = waitUntil;
-    }
-  }
-
-  /// Returns the wait time for a ship.
-  DateTime? waitUntil(String shipSymbol) {
-    return _waitUntilByShipSymbol[shipSymbol];
-  }
-
-  /// Returns the earliest wait time for any ship.
-  /// Returns null to mean no wait.
-  DateTime? earliestWaitUntil() {
-    if (_waitUntilByShipSymbol.isEmpty) {
-      return null;
-    }
-    // At least one ship might be ready.
-    if (_waitUntilByShipSymbol.length < _latestShips.length) {
-      return null;
-    }
-    final nextEventTimes = _waitUntilByShipSymbol.values;
-    return nextEventTimes.reduce((a, b) => a.isBefore(b) ? a : b);
   }
 }
 
@@ -654,12 +589,7 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
 
 /// Run the logic loop forever.
 /// Currently just sends ships to mine and sell ore.
-Future<void> logic(Api api) async {
-  final db = DataStore();
-  await db.open();
-
-  final priceData = await PriceData.load();
-
+Future<void> logic(Api api, DataStore db, PriceData priceData) async {
   final contractsResponse = await api.contracts.getContracts();
   final contracts = contractsResponse!.data;
 
