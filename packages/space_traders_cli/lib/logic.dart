@@ -36,24 +36,6 @@ bool _shouldSellItem(String tradeSymbol) {
   return !excludedItems.contains(tradeSymbol);
 }
 
-// String _emojiForSellPrice(PriceData data, String tradeSymbol, int sellPrice)
-// {
-//   final percentile = data.percentileForSellPrice(tradeSymbol, sellPrice);
-//   if (percentile == null) {
-//     return '🤷';
-//   }
-//   if (percentile < 25) {
-//     return '⏬';
-//   }
-//   if (percentile < 50) {
-//     return '🔽';
-//   }
-//   if (percentile < 75) {
-//     return '🔼';
-//   }
-//   return '⏫';
-// }
-
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
@@ -78,6 +60,7 @@ Future<ShipCargo> sellCargoAndLog(
   return newCargo;
 }
 
+// TODO(eseidel): Remove this.
 MarketTransaction _refuelTransaction(
   Ship ship,
   int totalPrice,
@@ -200,11 +183,7 @@ Future<DateTime?> advanceMiner(
           '${yield_.symbol.padRight(18)} '
           // Space after emoji is needed on windows to not bleed together.
           '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
-      // We don't return the expiration time because we don't want to force
-      // a wait, in case it might plan to do something else next.
-      // Instead we'll let it try again and catch the cooldown
-      // exception if it's still cooling down.
-      return null;
+      return response.cooldown.expiration;
     } else {
       // Is docking required to refuel and sell?
       await _dockIfNeeded(api, ship);
@@ -516,13 +495,127 @@ Future<DateTime?> advanceContractTrader(
   return null;
 }
 
+Future<DateTime?> _advanceShip(
+  Api api,
+  DataStore db,
+  PriceData priceData,
+  Agent agent,
+  Ship ship,
+  List<Waypoint> systemWaypoints,
+  _ShipLogic logic,
+  Contract? contract,
+  ContractDeliverGood? maybeGoods,
+) async {
+  switch (logic) {
+    case _ShipLogic.trader:
+      // We currently only trigger trader logic if we have a contract.
+      return advanceContractTrader(
+        api,
+        db,
+        priceData,
+        agent,
+        ship,
+        systemWaypoints,
+        contract!,
+        maybeGoods!,
+      );
+    case _ShipLogic.miner:
+      try {
+        return advanceMiner(
+          api,
+          db,
+          priceData,
+          agent,
+          ship,
+          systemWaypoints,
+        );
+      } on ApiException catch (e) {
+        final expiration = expirationFromApiException(e);
+        if (expiration != null) {
+          return expiration;
+        }
+        rethrow;
+      }
+  }
+}
+
+/// Keeps track of when we expect to interact with a ship next.
+class ShipWaiter {
+  final Map<String, DateTime> _waitUntilByShipSymbol = {};
+  List<Ship> _latestShips = [];
+
+  void _removeExpiredWaits() {
+    final now = DateTime.now();
+    final entries = _waitUntilByShipSymbol.entries.toList();
+    for (final entry in entries) {
+      final symbol = entry.key;
+      final waitUntil = entry.value;
+      if (waitUntil.isBefore(now)) {
+        _waitUntilByShipSymbol.remove(symbol);
+      }
+    }
+  }
+
+  void _removeUnknownShips() {
+    final entries = _waitUntilByShipSymbol.entries.toList();
+    for (final entry in entries) {
+      final symbol = entry.key;
+      final ship = _latestShips.firstWhereOrNull((s) => s.symbol == symbol);
+      if (ship == null) {
+        _waitUntilByShipSymbol.remove(symbol);
+      }
+    }
+  }
+
+  /// Updates the list of ships we know about.
+  void updateForShips(List<Ship> ships) {
+    _latestShips = ships;
+    _removeUnknownShips();
+    _removeExpiredWaits();
+  }
+
+  /// Updates the wait time for a ship.
+  void updateWaitUntil(String shipSymbol, DateTime? waitUntil) {
+    if (waitUntil == null) {
+      _waitUntilByShipSymbol.remove(shipSymbol);
+    } else {
+      _waitUntilByShipSymbol[shipSymbol] = waitUntil;
+    }
+  }
+
+  /// Returns the wait time for a ship.
+  DateTime? waitUntil(String shipSymbol) {
+    return _waitUntilByShipSymbol[shipSymbol];
+  }
+
+  /// Returns the earliest wait time for any ship.
+  /// Returns null to mean no wait.
+  DateTime? earliestWaitUntil() {
+    if (_waitUntilByShipSymbol.isEmpty) {
+      return null;
+    }
+    // At least one ship might be ready.
+    if (_waitUntilByShipSymbol.length < _latestShips.length) {
+      return null;
+    }
+    final nextEventTimes = _waitUntilByShipSymbol.values;
+    return nextEventTimes.reduce((a, b) => a.isBefore(b) ? a : b);
+  }
+}
+
 /// One loop of the logic.
-Stream<DateTime> logicLoop(Api api, DataStore db, PriceData priceData) async* {
+Future<void> logicLoop(
+  Api api,
+  DataStore db,
+  PriceData priceData,
+  ShipWaiter waiter,
+) async {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final hq = parseWaypointString(agentResult.data.headquarters);
   final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
   final myShips = await allMyShips(api).toList();
+  waiter.updateForShips(myShips);
   final contracts = await allMyContracts(api).toList();
   if (contracts.length > 1) {
     throw UnimplementedError();
@@ -540,52 +633,29 @@ Stream<DateTime> logicLoop(Api api, DataStore db, PriceData priceData) async* {
     final purchaseResponse =
         await purchaseShip(api, ShipType.MINING_DRONE, shipyardWaypoint.symbol);
     logger.info('Purchased ${purchaseResponse.ship.symbol}');
-    return; // Fetch ship lists again.
+    return; // Fetch ship lists again with no wait.
   }
 
   // printShips(myShips, systemWaypoints);
   // loop over all mining ships and advance them.
   for (final ship in myShips) {
-    final logic = logicByShipSymbol[ship.symbol]!;
-
-    switch (logic) {
-      case _ShipLogic.trader:
-        // We currently only trigger trader logic if we have a contract.
-        final maybeWaitUntil = await advanceContractTrader(
-          api,
-          db,
-          priceData,
-          agent,
-          ship,
-          systemWaypoints,
-          contract!,
-          maybeGoods!,
-        );
-        if (maybeWaitUntil != null) {
-          yield maybeWaitUntil;
-        }
-      case _ShipLogic.miner:
-        try {
-          final maybeWaitUntil = await advanceMiner(
-            api,
-            db,
-            priceData,
-            agent,
-            ship,
-            systemWaypoints,
-          );
-          if (maybeWaitUntil != null) {
-            yield maybeWaitUntil;
-          }
-        } on ApiException catch (e) {
-          final expiration = expirationFromApiException(e);
-          if (expiration != null) {
-            yield expiration;
-            continue;
-          }
-          rethrow;
-        }
+    final previousWait = waiter.waitUntil(ship.symbol);
+    if (previousWait != null) {
+      continue;
     }
+    final logic = logicByShipSymbol[ship.symbol]!;
+    final waitUntil = await _advanceShip(
+      api,
+      db,
+      priceData,
+      agent,
+      ship,
+      systemWaypoints,
+      logic,
+      contract,
+      maybeGoods,
+    );
+    waiter.updateWaitUntil(ship.symbol, waitUntil);
   }
 }
 
@@ -624,11 +694,13 @@ Future<void> logic(Api api) async {
     }
   }
 
+  final waiter = ShipWaiter();
+
   while (true) {
-    final nextEventTimes = await logicLoop(api, db, priceData).toList();
-    if (nextEventTimes.isNotEmpty) {
-      final earliestWaitUntil =
-          nextEventTimes.reduce((a, b) => a.isBefore(b) ? a : b);
+    await logicLoop(api, db, priceData, waiter);
+
+    final earliestWaitUntil = waiter.earliestWaitUntil();
+    if (earliestWaitUntil != null) {
       // This future waits until the earliest time we think the server
       // will be ready for us to do something.
       final waitDuration = earliestWaitUntil.difference(DateTime.now());
