@@ -1,8 +1,8 @@
-# openapi.api.SystemsApi
+# space_traders_api.api.SystemsApi
 
 ## Load the API package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 All URIs are relative to *https://api.spacetraders.io/v2*
@@ -27,7 +27,7 @@ Get jump gate details for a waypoint.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -78,7 +78,7 @@ Retrieve imports, exports and exchange data from a marketplace. Imports can be s
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -129,7 +129,7 @@ Get the shipyard for a waypoint. Send a ship to the waypoint to access ships tha
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -180,7 +180,7 @@ Get the details of a system.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -229,7 +229,7 @@ Fetch all of the waypoints for a given system. System must be charted or a ship 
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -282,7 +282,7 @@ Return a list of all systems.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -333,7 +333,7 @@ View the details of a waypoint.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');

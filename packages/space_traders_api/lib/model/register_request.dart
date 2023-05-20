@@ -15,6 +15,7 @@ class RegisterRequest {
   RegisterRequest({
     required this.faction,
     required this.symbol,
+    this.email,
   });
 
   /// The faction you choose determines your headquarters.
@@ -23,25 +24,43 @@ class RegisterRequest {
   /// How other agents will see your ships and information.
   String symbol;
 
+  /// Your email address. This is used if you reserved your call sign between resets.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? email;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is RegisterRequest &&
           other.faction == faction &&
-          other.symbol == symbol;
+          other.symbol == symbol &&
+          other.email == email;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (faction.hashCode) + (symbol.hashCode);
+      (faction.hashCode) +
+      (symbol.hashCode) +
+      (email == null ? 0 : email!.hashCode);
 
   @override
-  String toString() => 'RegisterRequest[faction=$faction, symbol=$symbol]';
+  String toString() =>
+      'RegisterRequest[faction=$faction, symbol=$symbol, email=$email]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'faction'] = this.faction;
     json[r'symbol'] = this.symbol;
+    if (this.email != null) {
+      json[r'email'] = this.email;
+    } else {
+      json[r'email'] = null;
+    }
     return json;
   }
 
@@ -68,6 +87,7 @@ class RegisterRequest {
       return RegisterRequest(
         faction: RegisterRequestFactionEnum.fromJson(json[r'faction'])!,
         symbol: mapValueOfType<String>(json, r'symbol')!,
+        email: mapValueOfType<String>(json, r'email'),
       );
     }
     return null;

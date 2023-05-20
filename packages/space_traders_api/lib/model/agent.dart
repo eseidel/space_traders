@@ -17,6 +17,7 @@ class Agent {
     required this.symbol,
     required this.headquarters,
     required this.credits,
+    required this.startingFaction,
   });
 
   String accountId;
@@ -29,6 +30,9 @@ class Agent {
   /// The number of credits the agent has available. Credits can be negative if funds have been overdrawn.
   int credits;
 
+  /// The faction the agent started with.
+  String startingFaction;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -36,7 +40,8 @@ class Agent {
           other.accountId == accountId &&
           other.symbol == symbol &&
           other.headquarters == headquarters &&
-          other.credits == credits;
+          other.credits == credits &&
+          other.startingFaction == startingFaction;
 
   @override
   int get hashCode =>
@@ -44,11 +49,12 @@ class Agent {
       (accountId.hashCode) +
       (symbol.hashCode) +
       (headquarters.hashCode) +
-      (credits.hashCode);
+      (credits.hashCode) +
+      (startingFaction.hashCode);
 
   @override
   String toString() =>
-      'Agent[accountId=$accountId, symbol=$symbol, headquarters=$headquarters, credits=$credits]';
+      'Agent[accountId=$accountId, symbol=$symbol, headquarters=$headquarters, credits=$credits, startingFaction=$startingFaction]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -56,6 +62,7 @@ class Agent {
     json[r'symbol'] = this.symbol;
     json[r'headquarters'] = this.headquarters;
     json[r'credits'] = this.credits;
+    json[r'startingFaction'] = this.startingFaction;
     return json;
   }
 
@@ -84,6 +91,7 @@ class Agent {
         symbol: mapValueOfType<String>(json, r'symbol')!,
         headquarters: mapValueOfType<String>(json, r'headquarters')!,
         credits: mapValueOfType<int>(json, r'credits')!,
+        startingFaction: mapValueOfType<String>(json, r'startingFaction')!,
       );
     }
     return null;
@@ -146,5 +154,6 @@ class Agent {
     'symbol',
     'headquarters',
     'credits',
+    'startingFaction',
   };
 }

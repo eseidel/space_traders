@@ -1,8 +1,8 @@
-# openapi.api.AgentsApi
+# space_traders_api.api.AgentsApi
 
 ## Load the API package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 All URIs are relative to *https://api.spacetraders.io/v2*
@@ -21,7 +21,7 @@ Fetch your agent's details.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');

@@ -1,8 +1,8 @@
-# openapi.api.ContractsApi
+# space_traders_api.api.ContractsApi
 
 ## Load the API package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 All URIs are relative to *https://api.spacetraders.io/v2*
@@ -25,7 +25,7 @@ Accept a contract.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -74,7 +74,7 @@ Deliver cargo on a given contract.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -125,7 +125,7 @@ Fulfill a contract
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -174,7 +174,7 @@ Get the details of a contract by ID.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -223,7 +223,7 @@ List all of your contracts.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');

@@ -1,8 +1,8 @@
-# openapi.model.SellCargoRequest
+# space_traders_api.model.SellCargoRequest
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties

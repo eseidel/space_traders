@@ -1,8 +1,8 @@
-# openapi.model.JumpGate
+# space_traders_api.model.JumpGate
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties

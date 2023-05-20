@@ -15,31 +15,37 @@ class RefuelShip200ResponseData {
   RefuelShip200ResponseData({
     required this.agent,
     required this.fuel,
+    required this.transaction,
   });
 
   Agent agent;
 
   ShipFuel fuel;
 
+  MarketTransaction transaction;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is RefuelShip200ResponseData &&
           other.agent == agent &&
-          other.fuel == fuel;
+          other.fuel == fuel &&
+          other.transaction == transaction;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (agent.hashCode) + (fuel.hashCode);
+      (agent.hashCode) + (fuel.hashCode) + (transaction.hashCode);
 
   @override
-  String toString() => 'RefuelShip200ResponseData[agent=$agent, fuel=$fuel]';
+  String toString() =>
+      'RefuelShip200ResponseData[agent=$agent, fuel=$fuel, transaction=$transaction]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'agent'] = this.agent;
     json[r'fuel'] = this.fuel;
+    json[r'transaction'] = this.transaction;
     return json;
   }
 
@@ -66,6 +72,7 @@ class RefuelShip200ResponseData {
       return RefuelShip200ResponseData(
         agent: Agent.fromJson(json[r'agent'])!,
         fuel: ShipFuel.fromJson(json[r'fuel'])!,
+        transaction: MarketTransaction.fromJson(json[r'transaction'])!,
       );
     }
     return null;
@@ -126,5 +133,6 @@ class RefuelShip200ResponseData {
   static const requiredKeys = <String>{
     'agent',
     'fuel',
+    'transaction',
   };
 }

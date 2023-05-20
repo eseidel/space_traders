@@ -1,16 +1,62 @@
-# openapi.api.DefaultApi
+# space_traders_api.api.DefaultApi
 
 ## Load the API package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 All URIs are relative to *https://api.spacetraders.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**getStatus**](DefaultApi.md#getstatus) | **GET** / | Get Status
 [**register**](DefaultApi.md#register) | **POST** /register | Register New Agent
 
+
+# **getStatus**
+> GetStatus200Response getStatus()
+
+Get Status
+
+Return the status of the game server.
+
+### Example
+```dart
+import 'package:space_traders_api/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = DefaultApi();
+
+try {
+    final result = api_instance.getStatus();
+    print(result);
+} catch (e) {
+    print('Exception when calling DefaultApi->getStatus: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**GetStatus200Response**](GetStatus200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **register**
 > Register201Response register(registerRequest)
@@ -21,7 +67,7 @@ Creates a new agent and ties it to a temporary Account.  The agent symbol is a 3
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');

@@ -1,8 +1,8 @@
-# openapi.model.PurchaseShip201ResponseData
+# space_traders_api.model.PurchaseShip201ResponseData
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties

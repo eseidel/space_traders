@@ -1,8 +1,8 @@
-# openapi.model.FulfillContract200Response
+# space_traders_api.model.FulfillContract200Response
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties

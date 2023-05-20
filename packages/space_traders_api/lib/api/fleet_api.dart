@@ -1051,6 +1051,78 @@ class FleetApi {
     return null;
   }
 
+  /// Negotiate Contract
+  ///
+  ///
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///
+  /// * [Object] body:
+  Future<Response> negotiateContractWithHttpInfo(
+    String shipSymbol, {
+    Object? body,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/negotiate/contract'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody = body;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Negotiate Contract
+  ///
+  ///
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///
+  /// * [Object] body:
+  Future<NegotiateContract200Response?> negotiateContract(
+    String shipSymbol, {
+    Object? body,
+  }) async {
+    final response = await negotiateContractWithHttpInfo(
+      shipSymbol,
+      body: body,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'NegotiateContract200Response',
+      ) as NegotiateContract200Response;
+    }
+    return null;
+  }
+
   /// Orbit Ship
   ///
   /// Attempt to move your ship into orbit at it's current location. The request will only succeed if your ship is capable of moving into orbit at the time of the request.  The endpoint is idempotent - successive calls will succeed even if the ship is already in orbit.

@@ -1,8 +1,8 @@
-# openapi.model.RefuelShip200ResponseData
+# space_traders_api.model.RefuelShip200ResponseData
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties
@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **agent** | [**Agent**](Agent.md) |  | 
 **fuel** | [**ShipFuel**](ShipFuel.md) |  | 
+**transaction** | [**MarketTransaction**](MarketTransaction.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -1,4 +1,4 @@
-# openapi
+# space_traders_api
 SpaceTraders is an open-universe game and learning platform that offers a set of HTTP endpoints to control a fleet of ships and explore a multiplayer universe.
 
 The API is documented using [OpenAPI](https://github.com/SpaceTradersAPI/api-docs). You can send your first request right here in your browser to check the status of the game server.
@@ -32,7 +32,7 @@ Dart 2.12 or later
 If this Dart package is published to Github, add the following dependency to your pubspec.yaml
 ```
 dependencies:
-  openapi:
+  space_traders_api:
     git: https://github.com/GIT_USER_ID/GIT_REPO_ID.git
 ```
 
@@ -40,8 +40,8 @@ dependencies:
 To use the package in your local drive, add the following dependency to your pubspec.yaml
 ```
 dependencies:
-  openapi:
-    path: /path/to/openapi
+  space_traders_api:
+    path: /path/to/space_traders_api
 ```
 
 ## Tests
@@ -53,7 +53,7 @@ TODO
 Please follow the [installation procedure](#installation--usage) and then run the following:
 
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
@@ -85,6 +85,7 @@ Class | Method | HTTP request | Description
 *ContractsApi* | [**fulfillContract**](doc\/ContractsApi.md#fulfillcontract) | **POST** /my/contracts/{contractId}/fulfill | Fulfill Contract
 *ContractsApi* | [**getContract**](doc\/ContractsApi.md#getcontract) | **GET** /my/contracts/{contractId} | Get Contract
 *ContractsApi* | [**getContracts**](doc\/ContractsApi.md#getcontracts) | **GET** /my/contracts | List Contracts
+*DefaultApi* | [**getStatus**](doc\/DefaultApi.md#getstatus) | **GET** / | Get Status
 *DefaultApi* | [**register**](doc\/DefaultApi.md#register) | **POST** /register | Register New Agent
 *FactionsApi* | [**getFaction**](doc\/FactionsApi.md#getfaction) | **GET** /factions/{factionSymbol} | Get Faction
 *FactionsApi* | [**getFactions**](doc\/FactionsApi.md#getfactions) | **GET** /factions | List Factions
@@ -103,6 +104,7 @@ Class | Method | HTTP request | Description
 *FleetApi* | [**jettison**](doc\/FleetApi.md#jettison) | **POST** /my/ships/{shipSymbol}/jettison | Jettison Cargo
 *FleetApi* | [**jumpShip**](doc\/FleetApi.md#jumpship) | **POST** /my/ships/{shipSymbol}/jump | Jump Ship
 *FleetApi* | [**navigateShip**](doc\/FleetApi.md#navigateship) | **POST** /my/ships/{shipSymbol}/navigate | Navigate Ship
+*FleetApi* | [**negotiateContract**](doc\/FleetApi.md#negotiatecontract) | **POST** /my/ships/{shipSymbol}/negotiate/contract | Negotiate Contract
 *FleetApi* | [**orbitShip**](doc\/FleetApi.md#orbitship) | **POST** /my/ships/{shipSymbol}/orbit | Orbit Ship
 *FleetApi* | [**patchShipNav**](doc\/FleetApi.md#patchshipnav) | **PATCH** /my/ships/{shipSymbol}/nav | Patch Ship Nav
 *FleetApi* | [**purchaseCargo**](doc\/FleetApi.md#purchasecargo) | **POST** /my/ships/{shipSymbol}/purchase | Purchase Cargo
@@ -168,6 +170,14 @@ Class | Method | HTTP request | Description
  - [GetShipCooldown200Response](doc\/GetShipCooldown200Response.md)
  - [GetShipNav200Response](doc\/GetShipNav200Response.md)
  - [GetShipyard200Response](doc\/GetShipyard200Response.md)
+ - [GetStatus200Response](doc\/GetStatus200Response.md)
+ - [GetStatus200ResponseAnnouncementsInner](doc\/GetStatus200ResponseAnnouncementsInner.md)
+ - [GetStatus200ResponseLeaderboards](doc\/GetStatus200ResponseLeaderboards.md)
+ - [GetStatus200ResponseLeaderboardsMostCreditsInner](doc\/GetStatus200ResponseLeaderboardsMostCreditsInner.md)
+ - [GetStatus200ResponseLeaderboardsMostSubmittedChartsInner](doc\/GetStatus200ResponseLeaderboardsMostSubmittedChartsInner.md)
+ - [GetStatus200ResponseLinksInner](doc\/GetStatus200ResponseLinksInner.md)
+ - [GetStatus200ResponseServerResets](doc\/GetStatus200ResponseServerResets.md)
+ - [GetStatus200ResponseStats](doc\/GetStatus200ResponseStats.md)
  - [GetSystem200Response](doc\/GetSystem200Response.md)
  - [GetSystemWaypoints200Response](doc\/GetSystemWaypoints200Response.md)
  - [GetSystems200Response](doc\/GetSystems200Response.md)
@@ -186,6 +196,8 @@ Class | Method | HTTP request | Description
  - [NavigateShip200Response](doc\/NavigateShip200Response.md)
  - [NavigateShip200ResponseData](doc\/NavigateShip200ResponseData.md)
  - [NavigateShipRequest](doc\/NavigateShipRequest.md)
+ - [NegotiateContract200Response](doc\/NegotiateContract200Response.md)
+ - [NegotiateContract200ResponseData](doc\/NegotiateContract200ResponseData.md)
  - [OrbitShip200Response](doc\/OrbitShip200Response.md)
  - [OrbitShip200ResponseData](doc\/OrbitShip200ResponseData.md)
  - [PatchShipNavRequest](doc\/PatchShipNavRequest.md)

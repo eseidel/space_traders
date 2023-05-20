@@ -315,6 +315,24 @@ class ApiClient {
           return GetShipNav200Response.fromJson(value);
         case 'GetShipyard200Response':
           return GetShipyard200Response.fromJson(value);
+        case 'GetStatus200Response':
+          return GetStatus200Response.fromJson(value);
+        case 'GetStatus200ResponseAnnouncementsInner':
+          return GetStatus200ResponseAnnouncementsInner.fromJson(value);
+        case 'GetStatus200ResponseLeaderboards':
+          return GetStatus200ResponseLeaderboards.fromJson(value);
+        case 'GetStatus200ResponseLeaderboardsMostCreditsInner':
+          return GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(
+              value);
+        case 'GetStatus200ResponseLeaderboardsMostSubmittedChartsInner':
+          return GetStatus200ResponseLeaderboardsMostSubmittedChartsInner
+              .fromJson(value);
+        case 'GetStatus200ResponseLinksInner':
+          return GetStatus200ResponseLinksInner.fromJson(value);
+        case 'GetStatus200ResponseServerResets':
+          return GetStatus200ResponseServerResets.fromJson(value);
+        case 'GetStatus200ResponseStats':
+          return GetStatus200ResponseStats.fromJson(value);
         case 'GetSystem200Response':
           return GetSystem200Response.fromJson(value);
         case 'GetSystemWaypoints200Response':
@@ -351,6 +369,10 @@ class ApiClient {
           return NavigateShip200ResponseData.fromJson(value);
         case 'NavigateShipRequest':
           return NavigateShipRequest.fromJson(value);
+        case 'NegotiateContract200Response':
+          return NegotiateContract200Response.fromJson(value);
+        case 'NegotiateContract200ResponseData':
+          return NegotiateContract200ResponseData.fromJson(value);
         case 'OrbitShip200Response':
           return OrbitShip200Response.fromJson(value);
         case 'OrbitShip200ResponseData':

@@ -18,6 +18,7 @@ class Faction {
     required this.description,
     required this.headquarters,
     this.traits = const [],
+    required this.isRecruiting,
   });
 
   String symbol;
@@ -30,6 +31,9 @@ class Faction {
 
   List<FactionTrait> traits;
 
+  /// Whether or not the faction is currently recruiting new agents.
+  bool isRecruiting;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -38,7 +42,8 @@ class Faction {
           other.name == name &&
           other.description == description &&
           other.headquarters == headquarters &&
-          other.traits == traits;
+          other.traits == traits &&
+          other.isRecruiting == isRecruiting;
 
   @override
   int get hashCode =>
@@ -47,11 +52,12 @@ class Faction {
       (name.hashCode) +
       (description.hashCode) +
       (headquarters.hashCode) +
-      (traits.hashCode);
+      (traits.hashCode) +
+      (isRecruiting.hashCode);
 
   @override
   String toString() =>
-      'Faction[symbol=$symbol, name=$name, description=$description, headquarters=$headquarters, traits=$traits]';
+      'Faction[symbol=$symbol, name=$name, description=$description, headquarters=$headquarters, traits=$traits, isRecruiting=$isRecruiting]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -60,6 +66,7 @@ class Faction {
     json[r'description'] = this.description;
     json[r'headquarters'] = this.headquarters;
     json[r'traits'] = this.traits;
+    json[r'isRecruiting'] = this.isRecruiting;
     return json;
   }
 
@@ -89,6 +96,7 @@ class Faction {
         description: mapValueOfType<String>(json, r'description')!,
         headquarters: mapValueOfType<String>(json, r'headquarters')!,
         traits: FactionTrait.listFromJson(json[r'traits'])!,
+        isRecruiting: mapValueOfType<bool>(json, r'isRecruiting')!,
       );
     }
     return null;
@@ -152,5 +160,6 @@ class Faction {
     'description',
     'headquarters',
     'traits',
+    'isRecruiting',
   };
 }

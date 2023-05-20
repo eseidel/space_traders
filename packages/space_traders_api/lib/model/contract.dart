@@ -20,6 +20,7 @@ class Contract {
     this.accepted = false,
     this.fulfilled = false,
     required this.expiration,
+    this.deadlineToAccept,
   });
 
   String id;
@@ -37,8 +38,17 @@ class Contract {
   /// Whether the contract has been fulfilled
   bool fulfilled;
 
-  /// The time at which the contract expires
+  /// Deprecated in favor of deadlineToAccept
   DateTime expiration;
+
+  /// The time at which the contract is no longer available to be accepted
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  DateTime? deadlineToAccept;
 
   @override
   bool operator ==(Object other) =>
@@ -50,7 +60,8 @@ class Contract {
           other.terms == terms &&
           other.accepted == accepted &&
           other.fulfilled == fulfilled &&
-          other.expiration == expiration;
+          other.expiration == expiration &&
+          other.deadlineToAccept == deadlineToAccept;
 
   @override
   int get hashCode =>
@@ -61,11 +72,12 @@ class Contract {
       (terms.hashCode) +
       (accepted.hashCode) +
       (fulfilled.hashCode) +
-      (expiration.hashCode);
+      (expiration.hashCode) +
+      (deadlineToAccept == null ? 0 : deadlineToAccept!.hashCode);
 
   @override
   String toString() =>
-      'Contract[id=$id, factionSymbol=$factionSymbol, type=$type, terms=$terms, accepted=$accepted, fulfilled=$fulfilled, expiration=$expiration]';
+      'Contract[id=$id, factionSymbol=$factionSymbol, type=$type, terms=$terms, accepted=$accepted, fulfilled=$fulfilled, expiration=$expiration, deadlineToAccept=$deadlineToAccept]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -76,6 +88,12 @@ class Contract {
     json[r'accepted'] = this.accepted;
     json[r'fulfilled'] = this.fulfilled;
     json[r'expiration'] = this.expiration.toUtc().toIso8601String();
+    if (this.deadlineToAccept != null) {
+      json[r'deadlineToAccept'] =
+          this.deadlineToAccept!.toUtc().toIso8601String();
+    } else {
+      json[r'deadlineToAccept'] = null;
+    }
     return json;
   }
 
@@ -107,6 +125,7 @@ class Contract {
         accepted: mapValueOfType<bool>(json, r'accepted')!,
         fulfilled: mapValueOfType<bool>(json, r'fulfilled')!,
         expiration: mapDateTime(json, r'expiration', '')!,
+        deadlineToAccept: mapDateTime(json, r'deadlineToAccept', ''),
       );
     }
     return null;

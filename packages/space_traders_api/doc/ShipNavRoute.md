@@ -1,8 +1,8 @@
-# openapi.model.ShipNavRoute
+# space_traders_api.model.ShipNavRoute
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties

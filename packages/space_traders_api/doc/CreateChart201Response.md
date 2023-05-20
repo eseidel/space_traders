@@ -1,8 +1,8 @@
-# openapi.model.CreateChart201Response
+# space_traders_api.model.CreateChart201Response
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties

@@ -16,7 +16,7 @@ class Cooldown {
     required this.shipSymbol,
     required this.totalSeconds,
     required this.remainingSeconds,
-    required this.expiration,
+    this.expiration,
   });
 
   /// The symbol of the ship that is on cooldown
@@ -33,7 +33,13 @@ class Cooldown {
   int remainingSeconds;
 
   /// The date and time when the cooldown expires in ISO 8601 format
-  DateTime expiration;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  DateTime? expiration;
 
   @override
   bool operator ==(Object other) =>
@@ -50,7 +56,7 @@ class Cooldown {
       (shipSymbol.hashCode) +
       (totalSeconds.hashCode) +
       (remainingSeconds.hashCode) +
-      (expiration.hashCode);
+      (expiration == null ? 0 : expiration!.hashCode);
 
   @override
   String toString() =>
@@ -61,7 +67,11 @@ class Cooldown {
     json[r'shipSymbol'] = this.shipSymbol;
     json[r'totalSeconds'] = this.totalSeconds;
     json[r'remainingSeconds'] = this.remainingSeconds;
-    json[r'expiration'] = this.expiration.toUtc().toIso8601String();
+    if (this.expiration != null) {
+      json[r'expiration'] = this.expiration!.toUtc().toIso8601String();
+    } else {
+      json[r'expiration'] = null;
+    }
     return json;
   }
 
@@ -89,7 +99,7 @@ class Cooldown {
         shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
         totalSeconds: mapValueOfType<int>(json, r'totalSeconds')!,
         remainingSeconds: mapValueOfType<int>(json, r'remainingSeconds')!,
-        expiration: mapDateTime(json, r'expiration', '')!,
+        expiration: mapDateTime(json, r'expiration', ''),
       );
     }
     return null;
@@ -151,6 +161,5 @@ class Cooldown {
     'shipSymbol',
     'totalSeconds',
     'remainingSeconds',
-    'expiration',
   };
 }

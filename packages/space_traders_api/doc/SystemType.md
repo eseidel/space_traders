@@ -1,8 +1,8 @@
-# openapi.model.SystemType
+# space_traders_api.model.SystemType
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:space_traders_api/api.dart';
 ```
 
 ## Properties

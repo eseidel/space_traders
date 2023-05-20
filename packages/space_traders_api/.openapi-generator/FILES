@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 .travis.yml
 README.md
 analysis_options.yaml
@@ -53,6 +52,14 @@ doc/GetMyShips200Response.md
 doc/GetShipCooldown200Response.md
 doc/GetShipNav200Response.md
 doc/GetShipyard200Response.md
+doc/GetStatus200Response.md
+doc/GetStatus200ResponseAnnouncementsInner.md
+doc/GetStatus200ResponseLeaderboards.md
+doc/GetStatus200ResponseLeaderboardsMostCreditsInner.md
+doc/GetStatus200ResponseLeaderboardsMostSubmittedChartsInner.md
+doc/GetStatus200ResponseLinksInner.md
+doc/GetStatus200ResponseServerResets.md
+doc/GetStatus200ResponseStats.md
 doc/GetSystem200Response.md
 doc/GetSystemWaypoints200Response.md
 doc/GetSystems200Response.md
@@ -71,6 +78,8 @@ doc/Meta.md
 doc/NavigateShip200Response.md
 doc/NavigateShip200ResponseData.md
 doc/NavigateShipRequest.md
+doc/NegotiateContract200Response.md
+doc/NegotiateContract200ResponseData.md
 doc/OrbitShip200Response.md
 doc/OrbitShip200ResponseData.md
 doc/PatchShipNavRequest.md
@@ -199,6 +208,14 @@ lib/model/get_my_ships200_response.dart
 lib/model/get_ship_cooldown200_response.dart
 lib/model/get_ship_nav200_response.dart
 lib/model/get_shipyard200_response.dart
+lib/model/get_status200_response.dart
+lib/model/get_status200_response_announcements_inner.dart
+lib/model/get_status200_response_leaderboards.dart
+lib/model/get_status200_response_leaderboards_most_credits_inner.dart
+lib/model/get_status200_response_leaderboards_most_submitted_charts_inner.dart
+lib/model/get_status200_response_links_inner.dart
+lib/model/get_status200_response_server_resets.dart
+lib/model/get_status200_response_stats.dart
 lib/model/get_system200_response.dart
 lib/model/get_system_waypoints200_response.dart
 lib/model/get_systems200_response.dart
@@ -217,6 +234,8 @@ lib/model/meta.dart
 lib/model/navigate_ship200_response.dart
 lib/model/navigate_ship200_response_data.dart
 lib/model/navigate_ship_request.dart
+lib/model/negotiate_contract200_response.dart
+lib/model/negotiate_contract200_response_data.dart
 lib/model/orbit_ship200_response.dart
 lib/model/orbit_ship200_response_data.dart
 lib/model/patch_ship_nav_request.dart
@@ -334,6 +353,14 @@ test/get_my_ships200_response_test.dart
 test/get_ship_cooldown200_response_test.dart
 test/get_ship_nav200_response_test.dart
 test/get_shipyard200_response_test.dart
+test/get_status200_response_announcements_inner_test.dart
+test/get_status200_response_leaderboards_most_credits_inner_test.dart
+test/get_status200_response_leaderboards_most_submitted_charts_inner_test.dart
+test/get_status200_response_leaderboards_test.dart
+test/get_status200_response_links_inner_test.dart
+test/get_status200_response_server_resets_test.dart
+test/get_status200_response_stats_test.dart
+test/get_status200_response_test.dart
 test/get_system200_response_test.dart
 test/get_system_waypoints200_response_test.dart
 test/get_systems200_response_test.dart
@@ -352,6 +379,8 @@ test/meta_test.dart
 test/navigate_ship200_response_data_test.dart
 test/navigate_ship200_response_test.dart
 test/navigate_ship_request_test.dart
+test/negotiate_contract200_response_data_test.dart
+test/negotiate_contract200_response_test.dart
 test/orbit_ship200_response_data_test.dart
 test/orbit_ship200_response_test.dart
 test/patch_ship_nav_request_test.dart
