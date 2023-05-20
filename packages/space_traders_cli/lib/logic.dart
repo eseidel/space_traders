@@ -122,6 +122,20 @@ Future<void> refuelIfNeededAndLog(
   logTransaction(ship, priceData, agent, transaction, transactionEmoji: '⛽');
 }
 
+Future<void> _dockIfNeeded(Api api, Ship ship) async {
+  if (ship.isOrbiting) {
+    shipInfo(ship, 'Docking at ${ship.nav.waypointSymbol}');
+    await api.fleet.dockShip(ship.symbol);
+  }
+}
+
+Future<void> _undockIfNeeded(Api api, Ship ship) async {
+  if (ship.isDocked) {
+    shipInfo(ship, 'Moving to orbit at ${ship.nav.waypointSymbol}');
+    await api.fleet.orbitShip(ship.symbol);
+  }
+}
+
 /// Navigate to the waypoint and log to the ship's log
 Future<DateTime> navigateToAndLog(
   Api api,
@@ -131,7 +145,10 @@ Future<DateTime> navigateToAndLog(
   final result = await navigateTo(api, ship, waypoint);
   final flightTime = result.nav.route.arrival.difference(DateTime.now());
   // Could log used Fuel. result.fuel.fuelConsumed
-  shipInfo(ship, '🛫 to ${waypoint.symbol} (${flightTime.inSeconds}s)');
+  shipInfo(
+    ship,
+    '🛫 to ${waypoint.symbol} (${_durationString(flightTime)})',
+  );
   return result.nav.route.arrival;
 }
 
@@ -148,94 +165,90 @@ Future<DateTime?> advanceMiner(
     // Do nothing for now.
     return ship.nav.route.arrival;
   }
-  if (ship.isOrbiting) {
-    logger.info(
-      '${ship.symbol}: Docking ${ship.symbol} at ${ship.nav.waypointSymbol}',
-    );
-    await api.fleet.dockShip(ship.symbol);
-  }
-  if (ship.isDocked) {
-    await refuelIfNeededAndLog(api, priceData, agent, ship);
-    final currentWaypoint =
-        lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-    if (currentWaypoint.isAsteroidField) {
-      // If we still have space, mine.
-      // It's not worth potentially waiting a minute just to get one piece of
-      // cargo if we're going to sell it right away here.
-      // Hence selling when we're down to 5 or fewer spaces left.
-      if (ship.availableSpace > 5) {
-        // If we have surveying capabilities, survey.
-        // final latestSurvey = await loadSurvey(db, ship.nav.waypointSymbol);
-        // if (latestSurvey == null) {
-        //   if (ship.hasSurveyor) {
-        //     // Survey
-        //     final response = await api.fleet.createSurvey(ship.symbol);
-        //     final survey = response!.data;
-        //     await saveSurvey(db, survey.surveys);
-        //     shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
-        //   }
-        // }
+  final currentWaypoint =
+      lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+  if (currentWaypoint.isAsteroidField) {
+    // If we still have space, mine.
+    // It's not worth potentially waiting a minute just to get one piece of
+    // cargo if we're going to sell it right away here.
+    // Hence selling when we're down to 5 or fewer spaces left.
+    if (ship.availableSpace > 5) {
+      // If we have surveying capabilities, survey.
+      // final latestSurvey = await loadSurvey(db, ship.nav.waypointSymbol);
+      // if (latestSurvey == null) {
+      //   if (ship.hasSurveyor) {
+      //     // Survey
+      //     final response = await api.fleet.createSurvey(ship.symbol);
+      //     final survey = response!.data;
+      //     await saveSurvey(db, survey.surveys);
+      //     shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
+      //   }
+      // }
 
-        // Check cooldown and return if cooling down?
-        // logger.info(
-        //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
-        final response = await extractResources(api, ship);
-        final yield_ = response.extraction.yield_;
-        final cargo = response.cargo;
-        // Could use TradeSymbol.values.reduce() to find the longest symbol.
-        shipInfo(
-            ship,
-            // pickaxe requires an extra space on mac?
-            '⛏️  ${yield_.units.toString().padLeft(2)} '
-            '${yield_.symbol.padRight(18)} '
-            // Space after emoji is needed on windows to not bleed together.
-            '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
-        // We don't return the expiration time because we don't want to force
-        // a wait, in case it might plan to do something else next.
-        // Instead we'll let it try again and catch the cooldown
-        // exception if it's still cooling down.
-        return null;
-      } else {
-        // Otherwise check to see if we have cargo that is relevant for our
-        // contract.
-        // final contractsResponse = await api.contracts.getContracts();
-
-        // final itemsInCargo = ship.cargo.inventory.map((i) => i.symbol);
-
-        // for (var item in itemsInCargo) {
-        //   final contractNeedingItem =
-        //       contractsResponse!.data.firstWhereOrNull(
-        //       (c) => c.needsItem(item) && c.issuer != ship.owner);
-        //   if (contractNeedingItem != null) {
-        //     print("Contract needs $item, returning to HQ");
-        //     final waypoint =
-        //         lookupWaypoint(contractNeedingItem.issuer, systemWaypoints);
-        //     await api.fleet.setShipNav(
-        //         ship.symbol, waypoint.systemSymbol, waypoint.symbol);
-        //     return null;
-        //   }
-        // }
-
-        // Otherwise, sell cargo.
-        await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-      }
+      // Check cooldown and return if cooling down?
+      // logger.info(
+      //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
+      await _undockIfNeeded(api, ship);
+      final response = await extractResources(api, ship);
+      final yield_ = response.extraction.yield_;
+      final cargo = response.cargo;
+      // Could use TradeSymbol.values.reduce() to find the longest symbol.
+      shipInfo(
+          ship,
+          // pickaxe requires an extra space on mac?
+          '⛏️  ${yield_.units.toString().padLeft(2)} '
+          '${yield_.symbol.padRight(18)} '
+          // Space after emoji is needed on windows to not bleed together.
+          '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+      // We don't return the expiration time because we don't want to force
+      // a wait, in case it might plan to do something else next.
+      // Instead we'll let it try again and catch the cooldown
+      // exception if it's still cooling down.
+      return null;
     } else {
-      // Fulfill contract if we have one.
-      // Otherwise, sell ore.
+      // Is docking required to refuel and sell?
+      await _dockIfNeeded(api, ship);
+      await refuelIfNeededAndLog(api, priceData, agent, ship);
+
+      // Otherwise check to see if we have cargo that is relevant for our
+      // contract.
+      // final contractsResponse = await api.contracts.getContracts();
+
+      // final itemsInCargo = ship.cargo.inventory.map((i) => i.symbol);
+
+      // for (var item in itemsInCargo) {
+      //   final contractNeedingItem =
+      //       contractsResponse!.data.firstWhereOrNull(
+      //       (c) => c.needsItem(item) && c.issuer != ship.owner);
+      //   if (contractNeedingItem != null) {
+      //     print("Contract needs $item, returning to HQ");
+      //     final waypoint =
+      //         lookupWaypoint(contractNeedingItem.issuer, systemWaypoints);
+      //     await api.fleet.setShipNav(
+      //         ship.symbol, waypoint.systemSymbol, waypoint.symbol);
+      //     return null;
+      //   }
+      // }
+
+      // Otherwise, sell cargo.
       await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-      // Otherwise return to asteroid.
-      final asteroidField =
-          systemWaypoints.firstWhere((w) => w.isAsteroidField);
-      return navigateToAndLog(api, ship, asteroidField);
     }
+  } else {
+    // Fulfill contract if we have one.
+    // Otherwise, sell ore.
+    await _dockIfNeeded(api, ship);
+    await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
+    // Otherwise return to asteroid.
+    final asteroidField = systemWaypoints.firstWhere((w) => w.isAsteroidField);
+    return navigateToAndLog(api, ship, asteroidField);
   }
   return null;
 }
 
 _ShipLogic _logicFor(Ship ship, ContractDeliverGood? maybeGoods) {
-  if (maybeGoods != null && ship.engine.speed > 20) {
-    return _ShipLogic.trader;
-  }
+  // if (maybeGoods != null && ship.engine.speed > 20) {
+  //   return _ShipLogic.trader;
+  // }
   // Could check if it has a mining laser or ship.isExcavator
   return _ShipLogic.miner;
 }
@@ -377,7 +390,16 @@ List<Market> _marketsWithExport(
       .toList();
 }
 
-String _durationToSeconds(Duration duration) {
+List<Market> _marketsWithExchange(
+  String tradeSymbol,
+  List<Market> markets,
+) {
+  return markets
+      .where((m) => m.exchange.any((e) => e.symbol.value == tradeSymbol))
+      .toList();
+}
+
+String _durationString(Duration duration) {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
   final twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
   final twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
@@ -427,7 +449,7 @@ Future<DateTime?> advanceContractTrader(
         'Delivered $units ${goods.tradeSymbol} '
         'to ${goods.destinationSymbol}; '
         '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
-        '${_durationToSeconds(contract.timeUntilDeadline)} to deadline',
+        '${_durationString(contract.timeUntilDeadline)} to deadline',
       );
       // Update our cargo counts after fullfilling the contract.
       ship.cargo = response.data.cargo;
@@ -443,10 +465,12 @@ Future<DateTime?> advanceContractTrader(
     // Sell anything we have.
     await sellCargoAndLog(api, priceData, ship);
     // nav to place nearby exporting our contract goal.
-    final markets = _marketsWithExport(goods.tradeSymbol, allMarkets);
-    // TODO(eseidel): for now, go back to asteroid field.
-    final marketSymbol = markets.firstOrNull?.symbol ?? 'X1-ZA40-99095A';
-    final destination = lookupWaypoint(marketSymbol, systemWaypoints);
+    var markets = _marketsWithExport(goods.tradeSymbol, allMarkets);
+    if (markets.isEmpty) {
+      markets = _marketsWithExchange(goods.tradeSymbol, allMarkets);
+    }
+    final marketSymbol = markets.firstOrNull?.symbol;
+    final destination = lookupWaypoint(marketSymbol!, systemWaypoints);
     return navigateToAndLog(api, ship, destination);
   }
 
