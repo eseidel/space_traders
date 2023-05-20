@@ -108,16 +108,21 @@ class PriceData {
     FileSystem fs, {
     String? cacheFilePath,
     String? url,
+    bool ignoreCache = false,
   }) async {
     final uri = Uri.parse(url ?? defaultUrl);
     final filePath = cacheFilePath ?? defaultCacheFilePath;
-    // Try to load prices.json.  If it does not exist, pull down and cache
-    // from the url.
-    final fromCache = _loadPricesCache(fs, filePath);
-    if (fromCache != null) {
-      return fromCache;
+    if (!ignoreCache) {
+      // Try to load prices.json.  If it does not exist, pull down and cache
+      // from the url.
+      final fromCache = _loadPricesCache(fs, filePath);
+      if (fromCache != null) {
+        return fromCache;
+      }
+      logger.info('Failed to load prices from cache, fetching from $uri');
+    } else {
+      logger.info('Ignoring cache, fetching prices from $uri');
     }
-    logger.info("Couldn't load prices from cache, fetching from $uri");
     // We could mock http here.
     final response = await http.get(uri);
     final data = PriceData(_parsePrices(response.body));

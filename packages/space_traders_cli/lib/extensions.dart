@@ -147,17 +147,21 @@ extension ContractDeliverGoodUtils on ContractDeliverGood {
 /// Detect that case and return the retry time.
 /// https://docs.spacetraders.io/api-guide/response-errors
 DateTime? expirationFromApiException(ApiException e) {
-  if (e.code == 409) {
-    // What we tried to do was still on cooldown.
-    final jsonString = e.message;
-    if (jsonString != null) {
-      final exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
-      final error = exceptionJson['error'] as Map<String, dynamic>?;
-      final errorData = error?['data'] as Map<String, dynamic>?;
-      final cooldown = errorData?['cooldown'];
-      final expiration = mapDateTime(cooldown, 'expiration');
-      return expiration;
+  // We ignore the error code at the http level, since we only care about
+  // the error code in the response body.
+  // I've seen both 409 and 400 for this error.
+
+  final jsonString = e.message;
+  if (jsonString != null) {
+    final exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
+    final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
+    final code = mapValueOfType<int>(error, 'code');
+    if (code != 4000) {
+      return null;
     }
+    final errorData = mapCastOfType<String, dynamic>(error, 'data');
+    final cooldown = mapCastOfType<String, dynamic>(errorData, 'cooldown');
+    return mapDateTime(cooldown, 'expiration');
   }
   return null;
 }
