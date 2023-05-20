@@ -12,7 +12,7 @@ void main(List<String> args) async {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointsInSystem(api, hq.system);
+  final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
   final marketplaceWaypoints =
       systemWaypoints.where((w) => w.hasMarketplace).toList();
 
@@ -22,8 +22,6 @@ void main(List<String> args) async {
     display: waypointDescription,
   );
 
-  final marketResponse =
-      await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
-  final market = marketResponse!.data;
+  final market = await getMarket(api, waypoint);
   prettyPrintJson(market.toJson());
 }

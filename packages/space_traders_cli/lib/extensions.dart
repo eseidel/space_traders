@@ -1,11 +1,18 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 
 /// lookupWaypoint looks up a Waypoint by its symbol in the given list of
 /// Waypoint objects.
 Waypoint lookupWaypoint(String waypointSymbol, List<Waypoint> systemWaypoints) {
   return systemWaypoints.firstWhere((w) => w.symbol == waypointSymbol);
+}
+
+/// lookupMarket looks up a Market by its symbol in the given list of Market
+/// objects.
+Market lookupMarket(String waypointSymbol, List<Market> markets) {
+  return markets.firstWhere((m) => m.symbol == waypointSymbol);
 }
 
 /// parseWaypointString parses a waypoint string into its component parts.
@@ -37,8 +44,15 @@ extension WaypointUtils on Waypoint {
 
   /// Returns true if the waypoint has a shipyard.
   bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
+
   /// Returns true if the waypoint has a marketplace.
   bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
+}
+
+/// Extensions onto ShipCargo to make it easier to work with.
+extension CargoUtils on ShipCargo {
+  /// Returns the amount of cargo space available on the ship.
+  int get availableSpace => capacity - units;
 }
 
 /// Extensions onto Ship to make it easier to work with.
@@ -50,8 +64,16 @@ extension ShipUtils on Ship {
     return '🛸#$number';
   }
 
+  /// Returns the amount of the given trade good the ship has.
+  int countUnits(String tradeSymbol) {
+    final maybeCargo = cargo.inventory.firstWhereOrNull(
+      (i) => i.symbol == tradeSymbol,
+    );
+    return maybeCargo?.units ?? 0;
+  }
+
   /// Returns the amount of space available on the ship.
-  int get spaceAvailable => cargo.capacity - cargo.units;
+  int get availableSpace => cargo.availableSpace;
 
   /// Returns true if the ship is an excavator.
   bool get isExcavator => registration.role == ShipRole.EXCAVATOR;
@@ -100,14 +122,22 @@ extension ShipUtils on Ship {
   }
 }
 
-// extension ContractUtils on Contract {
-//   bool needsItem(String tradeSymbol) => goodNeeded(tradeSymbol) != null;
+/// Extensions onto Contract to make it easier to work with.
+extension ContractUtils on Contract {
+  // bool needsItem(String tradeSymbol) => goodNeeded(tradeSymbol) != null;
 
-//   ContractDeliverGood? goodNeeded(String tradeSymbol) {
-//     return terms.deliver
-//         .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol);
-//   }
-// }
+  /// Returns the ContractDeliverGood for the given trade good symbol or null if
+  /// the contract doesn't need that good.
+  ContractDeliverGood? goodNeeded(String tradeSymbol) {
+    return terms.deliver
+        .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol);
+  }
+}
+
+extension ContractDeliverGoodUtils on ContractDeliverGood {
+  /// Returns the amount of the given trade good the contract needs.
+  int get amountNeeded => unitsRequired - unitsFulfilled;
+}
 
 /// Error 4000 is just a cooldown error and we can retry.
 /// Detect that case and return the retry time.

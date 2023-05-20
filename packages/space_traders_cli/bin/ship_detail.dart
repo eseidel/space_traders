@@ -21,7 +21,7 @@ void main(List<String> args) async {
 
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointsInSystem(api, hq.system);
+  final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
 
   final myShips = await allMyShips(api).toList();
   final ship = logger.chooseOne(
