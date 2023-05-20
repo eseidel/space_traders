@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/prices.dart';
 
 /// Return a string describing the given [waypoint].
 String waypointDescription(Waypoint waypoint) {
@@ -75,4 +77,69 @@ String contractDescription(Contract contract) {
   termsString = 'with ${creditsString(terms.payment.onAccepted)} upfront';
   return '${contract.type} from ${contract.factionSymbol}, '
       'deliver $termsString';
+}
+
+/// Returns a string describing the price deviance of a given [price] from
+/// the median price of a given [tradeSymbol].
+String stringForPriceDeviance(
+  PriceData data,
+  String tradeSymbol,
+  int price,
+  MarketTransactionTypeEnum type,
+) {
+  final median = type == MarketTransactionTypeEnum.SELL
+      ? data.medianSellPrice(tradeSymbol)
+      : data.medianPurchasePrice(tradeSymbol);
+  if (median == null) {
+    return '🤷';
+  }
+  final diff = price - median;
+  if (diff == 0) {
+    return '👌';
+  }
+  final percentOff = (diff / median * 100).round();
+
+  final lowColor =
+      type == MarketTransactionTypeEnum.SELL ? lightRed : lightGreen;
+  final highColor =
+      type == MarketTransactionTypeEnum.SELL ? lightGreen : lightRed;
+
+  if (diff < 0) {
+    return lowColor.wrap('$percentOff% ${creditsString(diff)}')!;
+  }
+  return highColor.wrap('+$percentOff% ${creditsString(diff)}')!;
+}
+
+/// Logs a transaction to the console.
+void logTransaction(
+  Ship ship,
+  PriceData priceData,
+  Agent agent,
+  MarketTransaction transaction, {
+  String? transactionEmoji,
+}) {
+  final priceEmoji = stringForPriceDeviance(
+    priceData,
+    transaction.tradeSymbol,
+    transaction.pricePerUnit,
+    transaction.type,
+  );
+  final labelEmoji = transactionEmoji ??
+      (transaction.type == MarketTransactionTypeEnum.SELL ? '🤝' : '💸');
+  // creditsSign shows which way our bank account moves.
+  // When it was a sell, we got paid, so we add.
+  final creditsSign =
+      transaction.type == MarketTransactionTypeEnum.SELL ? '+' : '-';
+  shipInfo(
+    ship,
+    '$labelEmoji ${transaction.units.toString().padLeft(2)} '
+    // Could use TradeSymbol.values.reduce() to find the longest symbol.
+    '${transaction.tradeSymbol.padRight(18)} '
+    '$priceEmoji per, '
+    '${transaction.units.toString().padLeft(2)} x '
+    '${creditsString(transaction.pricePerUnit).padLeft(3)} = '
+    '$creditsSign${creditsString(transaction.totalPrice).padLeft(3)} -> '
+    // Always want the 'c' after the credits.
+    '🏦 ${creditsString(agent.credits)}',
+  );
 }

@@ -25,8 +25,8 @@ openapi-generator generate -c open_api_config.yaml
 ### Todo
 
 Logic:
-* Add the ability to accept contracts.
-* Add the most-basic trade route planner.
+* Make ships run in parallel (only wait when *all* need to wait).
+* Keep per-ship logs, so can caculate per-ship efficiency.
 * Use the survey when mining from the command ship.
 * Record surveys to be used by vessels at the same location.
 * Record prices seen in systems

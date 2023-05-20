@@ -1,6 +1,5 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/logger.dart';
 
 /// purchase a ship of type [shipType] at [shipyardSymbol]
 Future<PurchaseShip201ResponseData> purchaseShip(
@@ -66,10 +65,10 @@ Stream<SellCargo201ResponseData> sellCargo(
       continue;
     }
     if (!market.tradeGoods.any((g) => g.symbol == item.symbol)) {
-      shipInfo(
-        ship,
-        "Market at ${ship.nav.waypointSymbol} doesn't buy ${item.symbol}",
-      );
+      // shipInfo(
+      //   ship,
+      //   "Market at ${ship.nav.waypointSymbol} doesn't buy ${item.symbol}",
+      // );
       continue;
     }
     final sellRequest = SellCargoRequest(

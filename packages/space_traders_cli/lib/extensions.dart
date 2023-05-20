@@ -132,8 +132,12 @@ extension ContractUtils on Contract {
     return terms.deliver
         .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol);
   }
+
+  /// Returns the duration until the contract deadline.
+  Duration get timeUntilDeadline => terms.deadline.difference(DateTime.now());
 }
 
+/// Extensions onto ContractDeliverGood to make it easier to work with.
 extension ContractDeliverGoodUtils on ContractDeliverGood {
   /// Returns the amount of the given trade good the contract needs.
   int get amountNeeded => unitsRequired - unitsFulfilled;

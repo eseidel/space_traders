@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
@@ -55,35 +54,6 @@ bool _shouldSellItem(String tradeSymbol) {
 //   return '⏫';
 // }
 
-String _stringForPriceDeviance(
-  PriceData data,
-  String tradeSymbol,
-  int sellPrice,
-  MarketTransactionTypeEnum type,
-) {
-  final median = type == MarketTransactionTypeEnum.SELL
-      ? data.medianSellPrice(tradeSymbol)
-      : data.medianPurchasePrice(tradeSymbol);
-  if (median == null) {
-    return '🤷';
-  }
-  final diff = sellPrice - median;
-  if (diff == 0) {
-    return '👌';
-  }
-  final percentOff = (diff / median * 100).round();
-
-  final lowColor =
-      type == MarketTransactionTypeEnum.SELL ? lightRed : lightGreen;
-  final highColor =
-      type == MarketTransactionTypeEnum.SELL ? lightGreen : lightRed;
-
-  if (diff < 0) {
-    return lowColor.wrap('$percentOff% ${creditsString(diff)}')!;
-  }
-  return highColor.wrap('+$percentOff% ${creditsString(diff)}')!;
-}
-
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
@@ -102,27 +72,67 @@ Future<ShipCargo> sellCargoAndLog(
   await for (final response in sellCargo(api, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
-    final priceEmoji = _stringForPriceDeviance(
-      priceData,
-      transaction.tradeSymbol,
-      transaction.pricePerUnit,
-      transaction.type,
-    );
-    shipInfo(
-      ship,
-      '🤝 ${transaction.units.toString().padLeft(2)} '
-      // Could use TradeSymbol.values.reduce() to find the longest symbol.
-      '${transaction.tradeSymbol.padRight(18)} '
-      '$priceEmoji per, '
-      '${transaction.units.toString().padLeft(2)} x '
-      '${creditsString(transaction.pricePerUnit).padLeft(3)} = '
-      '${creditsString(transaction.totalPrice).padLeft(3)} -> '
-      // Always want the 'c' after the credits.
-      '🏦 ${creditsString(agent.credits)}',
-    );
+    logTransaction(ship, priceData, agent, transaction);
     newCargo = response.cargo;
   }
   return newCargo;
+}
+
+MarketTransaction _refuelTransaction(
+  Ship ship,
+  int totalPrice,
+) {
+  final fuelUnits = ship.fuel.capacity - ship.fuel.current;
+  // If you're down 101 fuel units, you need to buy 2 market units of fuel.
+  final purchaseUnits = (fuelUnits / 100).ceil();
+  final pricePerUnit = totalPrice ~/ purchaseUnits;
+  return MarketTransaction(
+    waypointSymbol: ship.nav.waypointSymbol,
+    shipSymbol: ship.symbol,
+    tradeSymbol: TradeSymbol.FUEL.value,
+    type: MarketTransactionTypeEnum.PURCHASE,
+    units: purchaseUnits,
+    totalPrice: totalPrice,
+    pricePerUnit: pricePerUnit,
+    timestamp: DateTime.now(),
+  );
+}
+
+/// refuel the ship if needed and log the transaction
+Future<void> refuelIfNeededAndLog(
+  Api api,
+  PriceData priceData,
+  Agent agent,
+  Ship ship,
+) async {
+  // One fuel bought from the market is 100 units of fuel in the ship.
+  // For repeated short trips, avoiding buying fuel when we're close to full.
+  if (ship.fuel.current >= (ship.fuel.capacity - 100)) {
+    return;
+  }
+  final creditsBefore = agent.credits;
+  // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
+  // synthesize transaction:
+  final responseWrapper = await api.fleet.refuelShip(ship.symbol);
+  final response = responseWrapper!.data;
+  final totalPrice = creditsBefore - response.agent.credits;
+
+  // refuelShip doesn't return a transaction yet so we make our own.
+  final transaction = _refuelTransaction(ship, totalPrice);
+  logTransaction(ship, priceData, agent, transaction, transactionEmoji: '⛽');
+}
+
+/// Navigate to the waypoint and log to the ship's log
+Future<DateTime> navigateToAndLog(
+  Api api,
+  Ship ship,
+  Waypoint waypoint,
+) async {
+  final result = await navigateTo(api, ship, waypoint);
+  final flightTime = result.nav.route.arrival.difference(DateTime.now());
+  // Could log used Fuel. result.fuel.fuelConsumed
+  shipInfo(ship, '🛫 to ${waypoint.symbol} (${flightTime.inSeconds}s)');
+  return result.nav.route.arrival;
 }
 
 /// One loop of the mining logic
@@ -130,6 +140,7 @@ Future<DateTime?> advanceMiner(
   Api api,
   DataStore db,
   PriceData priceData,
+  Agent agent,
   Ship ship,
   List<Waypoint> systemWaypoints,
 ) async {
@@ -144,10 +155,7 @@ Future<DateTime?> advanceMiner(
     await api.fleet.dockShip(ship.symbol);
   }
   if (ship.isDocked) {
-    if (ship.fuel.current < ship.fuel.capacity) {
-      shipInfo(ship, 'Refueling');
-      await api.fleet.refuelShip(ship.symbol);
-    }
+    await refuelIfNeededAndLog(api, priceData, agent, ship);
     final currentWaypoint =
         lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
     if (currentWaypoint.isAsteroidField) {
@@ -218,10 +226,7 @@ Future<DateTime?> advanceMiner(
       // Otherwise return to asteroid.
       final asteroidField =
           systemWaypoints.firstWhere((w) => w.isAsteroidField);
-      shipInfo(ship, 'Navigating to ${asteroidField.symbol}');
-      final result = await navigateTo(api, ship, asteroidField);
-      final flightTime = result.nav.route.arrival.difference(DateTime.now());
-      shipInfo(ship, 'Expected in ${flightTime.inSeconds}s.');
+      return navigateToAndLog(api, ship, asteroidField);
     }
   }
   return null;
@@ -325,6 +330,7 @@ Future<DateTime?> advanceTrader(
   Api api,
   DataStore db,
   PriceData priceData,
+  Agent agent,
   Ship ship,
   List<Waypoint> systemWaypoints,
 ) async {
@@ -340,11 +346,7 @@ Future<DateTime?> advanceTrader(
     return null;
   }
   if (ship.isDocked) {
-    if (ship.fuel.current < ship.fuel.capacity) {
-      shipInfo(ship, 'Refueling');
-      await api.fleet.refuelShip(ship.symbol);
-      return null;
-    }
+    await refuelIfNeededAndLog(api, priceData, agent, ship);
     final currentWaypoint =
         lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
     if (currentWaypoint.hasMarketplace) {
@@ -352,7 +354,7 @@ Future<DateTime?> advanceTrader(
       await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
       // final deal =
       //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
-      // await navigateTo(api, ship, deal.destination);
+      // await navigateToAndLog(api, ship, deal.destination);
       throw UnimplementedError();
     } else {
       throw UnimplementedError();
@@ -375,11 +377,19 @@ List<Market> _marketsWithExport(
       .toList();
 }
 
+String _durationToSeconds(Duration duration) {
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+  final twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+  final twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+  return '${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
+}
+
 /// One loop of the trading logic
 Future<DateTime?> advanceContractTrader(
   Api api,
   DataStore db,
   PriceData priceData,
+  Agent agent,
   Ship ship,
   List<Waypoint> systemWaypoints,
   Contract contract,
@@ -392,11 +402,7 @@ Future<DateTime?> advanceContractTrader(
   if (!ship.isDocked) {
     await api.fleet.dockShip(ship.symbol);
   }
-  if (ship.fuel.current < ship.fuel.capacity) {
-    shipInfo(ship, 'Refueling');
-    await api.fleet.refuelShip(ship.symbol);
-  }
-
+  await refuelIfNeededAndLog(api, priceData, agent, ship);
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
 
@@ -418,9 +424,10 @@ Future<DateTime?> advanceContractTrader(
       final deliver = updatedContract.goodNeeded(goods.tradeSymbol)!;
       shipInfo(
         ship,
-        'Delivered $units '
-        '(${deliver.unitsFulfilled} / ${deliver.unitsRequired}) '
-        '${goods.tradeSymbol} to ${goods.destinationSymbol}',
+        'Delivered $units ${goods.tradeSymbol} '
+        'to ${goods.destinationSymbol}; '
+        '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
+        '${_durationToSeconds(contract.timeUntilDeadline)} to deadline',
       );
       // Update our cargo counts after fullfilling the contract.
       ship.cargo = response.data.cargo;
@@ -440,9 +447,7 @@ Future<DateTime?> advanceContractTrader(
     // TODO(eseidel): for now, go back to asteroid field.
     final marketSymbol = markets.firstOrNull?.symbol ?? 'X1-ZA40-99095A';
     final destination = lookupWaypoint(marketSymbol, systemWaypoints);
-    shipInfo(ship, 'Navigating to ${destination.symbol}');
-    final response = await navigateTo(api, ship, destination);
-    return response.nav.route.arrival;
+    return navigateToAndLog(api, ship, destination);
   }
 
   // Otherwise if we're not at our contract destination.
@@ -458,8 +463,7 @@ Future<DateTime?> advanceContractTrader(
     if (maybeGood != null &&
         (medianPurchasePrice == null ||
             maybeGood.purchasePrice < medianPurchasePrice)) {
-      // Sell everything we have.
-      shipInfo(ship, 'Selling everything except ${goods.tradeSymbol}');
+      // Sell everything we have except the contract goal.
       final cargo = await sellCargoAndLog(
         api,
         priceData,
@@ -467,7 +471,7 @@ Future<DateTime?> advanceContractTrader(
         where: (s) => s != goods.tradeSymbol,
       );
       if (cargo.availableSpace > 0) {
-        shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
+        // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
         // Buy a full stock of contract goal.
         final request = PurchaseCargoRequest(
           symbol: goods.tradeSymbol,
@@ -475,35 +479,15 @@ Future<DateTime?> advanceContractTrader(
         );
         final response = await api.fleet
             .purchaseCargo(ship.symbol, purchaseCargoRequest: request);
-
         final transaction = response!.data.transaction;
         final agent = response.data.agent;
-        final priceEmoji = _stringForPriceDeviance(
-          priceData,
-          transaction.tradeSymbol,
-          transaction.pricePerUnit,
-          transaction.type,
-        );
-        shipInfo(
-          ship,
-          '💸 ${transaction.units.toString().padLeft(2)} '
-          // Could use TradeSymbol.values.reduce() to find the longest symbol.
-          '${transaction.tradeSymbol.padRight(18)} '
-          '$priceEmoji per, '
-          '${transaction.units.toString().padLeft(2)} x '
-          '${creditsString(transaction.pricePerUnit).padLeft(3)} = '
-          '${creditsString(transaction.totalPrice).padLeft(3)} -> '
-          // Always want the 'c' after the credits.
-          '🏦 ${creditsString(agent.credits)}',
-        );
+        logTransaction(ship, priceData, agent, transaction);
       }
     }
     // Regardless, navigate to contract destination.
     final destination =
         lookupWaypoint(goods.destinationSymbol, systemWaypoints);
-    shipInfo(ship, 'Navigating to ${destination.symbol}');
-    final response = await navigateTo(api, ship, destination);
-    return response.nav.route.arrival;
+    return navigateToAndLog(api, ship, destination);
   }
   return null;
 }
@@ -547,6 +531,7 @@ Stream<DateTime> logicLoop(Api api, DataStore db, PriceData priceData) async* {
           api,
           db,
           priceData,
+          agent,
           ship,
           systemWaypoints,
           contract!,
@@ -557,8 +542,14 @@ Stream<DateTime> logicLoop(Api api, DataStore db, PriceData priceData) async* {
         }
       case _ShipLogic.miner:
         try {
-          final maybeWaitUntil =
-              await advanceMiner(api, db, priceData, ship, systemWaypoints);
+          final maybeWaitUntil = await advanceMiner(
+            api,
+            db,
+            priceData,
+            agent,
+            ship,
+            systemWaypoints,
+          );
           if (maybeWaitUntil != null) {
             yield maybeWaitUntil;
           }
