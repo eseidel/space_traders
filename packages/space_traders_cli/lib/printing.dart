@@ -97,7 +97,9 @@ String stringForPriceDeviance(
   if (diff == 0) {
     return '👌';
   }
-  final percentOff = (diff / median * 100).round();
+  final percentSign = diff < 0 ? '' : '+';
+  final percentOff = '$percentSign${(diff / median * 100).round()}'.padLeft(3);
+  final creditsDiff = creditsString(diff).padLeft(4);
 
   final lowColor =
       type == MarketTransactionTypeEnum.SELL ? lightRed : lightGreen;
@@ -105,9 +107,9 @@ String stringForPriceDeviance(
       type == MarketTransactionTypeEnum.SELL ? lightGreen : lightRed;
 
   if (diff < 0) {
-    return lowColor.wrap('$percentOff% ${creditsString(diff)}')!;
+    return lowColor.wrap('$percentOff% $creditsDiff')!;
   }
-  return highColor.wrap('+$percentOff% ${creditsString(diff)}')!;
+  return highColor.wrap('$percentOff% $creditsDiff')!;
 }
 
 /// Logs a transaction to the console.
@@ -118,7 +120,7 @@ void logTransaction(
   MarketTransaction transaction, {
   String? transactionEmoji,
 }) {
-  final priceEmoji = stringForPriceDeviance(
+  final priceDevianceString = stringForPriceDeviance(
     priceData,
     transaction.tradeSymbol,
     transaction.pricePerUnit,
@@ -130,15 +132,20 @@ void logTransaction(
   // When it was a sell, we got paid, so we add.
   final creditsSign =
       transaction.type == MarketTransactionTypeEnum.SELL ? '+' : '-';
+  // Fuel commonly has a 3 digit price with a credit marker and sign
+  // so we pad to 5.
+  final totalPriceString =
+      '$creditsSign${creditsString(transaction.totalPrice)}'.padLeft(5);
   shipInfo(
     ship,
     '$labelEmoji ${transaction.units.toString().padLeft(2)} '
     // Could use TradeSymbol.values.reduce() to find the longest symbol.
     '${transaction.tradeSymbol.padRight(18)} '
-    '$priceEmoji per, '
+    '$priceDevianceString per, '
     '${transaction.units.toString().padLeft(2)} x '
-    '${creditsString(transaction.pricePerUnit).padLeft(3)} = '
-    '$creditsSign${creditsString(transaction.totalPrice).padLeft(3)} -> '
+    // Fuel is commonly 3 digits + 'c' so we pad to 4.
+    '${creditsString(transaction.pricePerUnit).padLeft(4)} = '
+    '$totalPriceString -> '
     // Always want the 'c' after the credits.
     '🏦 ${creditsString(agent.credits)}',
   );
