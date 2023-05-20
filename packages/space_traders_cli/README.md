@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/eseidel/space_traders/branch/main/graph/badge.svg?token=YU4WO0ULKW)](https://codecov.io/gh/eseidel/space_traders)
+
 # Space Traders CLI
 
 A collection of scripts for playing https://spacetraders.io/ from the command line.
