@@ -60,27 +60,6 @@ Future<ShipCargo> sellCargoAndLog(
   return newCargo;
 }
 
-// TODO(eseidel): Remove this.
-MarketTransaction _refuelTransaction(
-  Ship ship,
-  int totalPrice,
-) {
-  final fuelUnits = ship.fuel.capacity - ship.fuel.current;
-  // If you're down 101 fuel units, you need to buy 2 market units of fuel.
-  final purchaseUnits = (fuelUnits / 100).ceil();
-  final pricePerUnit = totalPrice ~/ purchaseUnits;
-  return MarketTransaction(
-    waypointSymbol: ship.nav.waypointSymbol,
-    shipSymbol: ship.symbol,
-    tradeSymbol: TradeSymbol.FUEL.value,
-    type: MarketTransactionTypeEnum.PURCHASE,
-    units: purchaseUnits,
-    totalPrice: totalPrice,
-    pricePerUnit: pricePerUnit,
-    timestamp: DateTime.now(),
-  );
-}
-
 /// refuel the ship if needed and log the transaction
 Future<void> refuelIfNeededAndLog(
   Api api,
@@ -93,16 +72,17 @@ Future<void> refuelIfNeededAndLog(
   if (ship.fuel.current >= (ship.fuel.capacity - 100)) {
     return;
   }
-  final creditsBefore = agent.credits;
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   // synthesize transaction:
   final responseWrapper = await api.fleet.refuelShip(ship.symbol);
   final response = responseWrapper!.data;
-  final totalPrice = creditsBefore - response.agent.credits;
-
-  // refuelShip doesn't return a transaction yet so we make our own.
-  final transaction = _refuelTransaction(ship, totalPrice);
-  logTransaction(ship, priceData, agent, transaction, transactionEmoji: '⛽');
+  logTransaction(
+    ship,
+    priceData,
+    agent,
+    response.transaction,
+    transactionEmoji: '⛽',
+  );
 }
 
 Future<void> _dockIfNeeded(Api api, Ship ship) async {
