@@ -1,6 +1,7 @@
 import 'package:file/file.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/rate_limit.dart';
 
 /// Api is a wrapper around the generated api clients.
@@ -76,7 +77,21 @@ Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
 Future<String> register(String callSign) async {
   final defaultApi = DefaultApi();
 
-  final faction = RegisterRequestFactionEnum.values.first;
+  final factions = await fetchAllPages(FactionsApi(), (api, page) async {
+    final response = await api.getFactions(page: page);
+    return (response!.data, response.meta);
+  }).toList();
+
+  // There are more factions in the game than players are allowed to join
+  // at the start, so we use RegisterRequestFactionEnum.
+  final faction = logger.chooseOne(
+    'Choose a faction:',
+    choices: RegisterRequestFactionEnum.values,
+    display: (faction) {
+      final f = factions.firstWhere((f) => f.symbol == faction.value);
+      return '${f.symbol} - ${f.description}';
+    },
+  );
 
   final registerRequest = RegisterRequest(
     symbol: callSign,
