@@ -4,3 +4,4 @@
 auth_token.txt
 datastore.json
 prices.json
+coverage/
