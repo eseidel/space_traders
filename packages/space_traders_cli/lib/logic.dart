@@ -228,12 +228,21 @@ Future<DateTime?> advanceMiner(
   return null;
 }
 
-_ShipLogic _logicFor(Ship ship, ContractDeliverGood? maybeGoods) {
-  // if (maybeGoods != null && ship.engine.speed > 20) {
-  //   return _ShipLogic.trader;
+_Behavior _behaviorFor(
+  Ship ship,
+  Agent agent,
+  ContractDeliverGood? maybeGoods,
+) {
+  // Only trade for the contract if we have a fast enough ship and enough
+  // money to buy the goods.
+  // This could create a bad loop where we buy goods, drop under the threshold,
+  // and then sell them again, only to buy them again, etc.
+  // if (maybeGoods != null && ship.engine.speed > 20
+  //    && agent.credits > 10000) {
+  //   return _Behavior.contractTrader;
   // }
   // Could check if it has a mining laser or ship.isExcavator
-  return _ShipLogic.miner;
+  return _Behavior.miner;
 }
 
 // class _Deal {
@@ -322,35 +331,35 @@ Stream<Market> getAllMarkets(
 // }
 
 /// One loop of the trading logic
-// Future<DateTime?> advanceTrader(
-//   Api api,
-//   DataStore db,
-//   PriceData priceData,
-//   Agent agent,
-//   Ship ship,
-//   List<Waypoint> systemWaypoints,
-// ) async {
-//   if (ship.isInTransit) {
-//     // Do nothing for now.
-//     return ship.nav.route.arrival;
-//   }
-//   await _dockIfNeeded(api, ship);
-//   await refuelIfNeededAndLog(api, priceData, agent, ship);
-//   final currentWaypoint =
-//       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-//   if (currentWaypoint.hasMarketplace) {
-//     // Sell any cargo we can.
-//     await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-//     // final deal =
-//     //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
-//     // await navigateToAndLog(api, ship, deal.destination);
-//     throw UnimplementedError();
-//   }
-//   throw UnimplementedError();
-// }
+Future<DateTime?> advanceAbitrageTrader(
+  Api api,
+  DataStore db,
+  PriceData priceData,
+  Agent agent,
+  Ship ship,
+  List<Waypoint> systemWaypoints,
+) async {
+  if (ship.isInTransit) {
+    // Do nothing for now.
+    return ship.nav.route.arrival;
+  }
+  await _dockIfNeeded(api, ship);
+  await refuelIfNeededAndLog(api, priceData, agent, ship);
+  final currentWaypoint =
+      lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+  if (currentWaypoint.hasMarketplace) {
+    // Sell any cargo we can.
+    await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
+    // final deal =
+    //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
+    // await navigateToAndLog(api, ship, deal.destination);
+    throw UnimplementedError();
+  }
+  throw UnimplementedError();
+}
 
-enum _ShipLogic {
-  trader,
+enum _Behavior {
+  contractTrader,
   miner,
 }
 
@@ -379,6 +388,45 @@ String _durationString(Duration duration) {
   return '${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
 }
 
+Future<void> _deliverContractGoodsIfPossible(
+  Api api,
+  Ship ship,
+  Contract contract,
+  ContractDeliverGood goods,
+) async {
+  final units = ship.countUnits(goods.tradeSymbol);
+  if (units < 1) {
+    return;
+  }
+  // And we have the desired cargo.
+  final request = DeliverContractRequest(
+    shipSymbol: ship.symbol,
+    tradeSymbol: goods.tradeSymbol,
+    units: units,
+  );
+  final response = await api.contracts
+      .deliverContract(contract.id, deliverContractRequest: request);
+  final updatedContract = response!.data.contract;
+  final deliver = updatedContract.goodNeeded(goods.tradeSymbol)!;
+  shipInfo(
+    ship,
+    'Delivered $units ${goods.tradeSymbol} '
+    'to ${goods.destinationSymbol}; '
+    '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
+    '${_durationString(contract.timeUntilDeadline)} to deadline',
+  );
+  // Update our cargo counts after fullfilling the contract.
+  ship.cargo = response.data.cargo;
+
+  // If we've delivered enough, complete the contract.
+  if (deliver.amountNeeded <= 0) {
+    await api.contracts.fulfillContract(contract.id);
+    shipInfo(ship, 'Contract complete!');
+    // Go back to mining.
+    return;
+  }
+}
+
 /// One loop of the trading logic
 Future<DateTime?> advanceContractTrader(
   Api api,
@@ -403,39 +451,11 @@ Future<DateTime?> advanceContractTrader(
 
   // If we're at our contract destination.
   if (currentWaypoint.symbol == goods.destinationSymbol) {
-    final units = ship.countUnits(goods.tradeSymbol);
-    if (units > 0) {
-      // And we have the desired cargo.
-      final request = DeliverContractRequest(
-        shipSymbol: ship.symbol,
-        tradeSymbol: goods.tradeSymbol,
-        units: units,
-      );
-      final response = await api.contracts
-          .deliverContract(contract.id, deliverContractRequest: request);
-      final updatedContract = response!.data.contract;
-      final deliver = updatedContract.goodNeeded(goods.tradeSymbol)!;
-      shipInfo(
-        ship,
-        'Delivered $units ${goods.tradeSymbol} '
-        'to ${goods.destinationSymbol}; '
-        '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
-        '${_durationString(contract.timeUntilDeadline)} to deadline',
-      );
-      // Update our cargo counts after fullfilling the contract.
-      ship.cargo = response.data.cargo;
-
-      // If we've delivered enough, complete the contract.
-      if (deliver.amountNeeded <= 0) {
-        await api.contracts.fulfillContract(contract.id);
-        shipInfo(ship, 'Contract complete!');
-        // Go back to mining.
-        return null;
-      }
-    }
+    await _deliverContractGoodsIfPossible(api, ship, contract, goods);
     // Sell anything we have.
     await sellCargoAndLog(api, priceData, ship);
     // nav to place nearby exporting our contract goal.
+    // This should also consider the current market.
     var markets = _marketsWithExport(goods.tradeSymbol, allMarkets);
     if (markets.isEmpty) {
       markets = _marketsWithExchange(goods.tradeSymbol, allMarkets);
@@ -492,12 +512,12 @@ Future<DateTime?> _advanceShip(
   Agent agent,
   Ship ship,
   List<Waypoint> systemWaypoints,
-  _ShipLogic logic,
+  _Behavior behavior,
   Contract? contract,
   ContractDeliverGood? maybeGoods,
 ) async {
-  switch (logic) {
-    case _ShipLogic.trader:
+  switch (behavior) {
+    case _Behavior.contractTrader:
       // We currently only trigger trader logic if we have a contract.
       return advanceContractTrader(
         api,
@@ -509,7 +529,7 @@ Future<DateTime?> _advanceShip(
         contract!,
         maybeGoods!,
       );
-    case _ShipLogic.miner:
+    case _Behavior.miner:
       try {
         // This await is very important, if it's not present, exceptions won't
         // be caught until some outer await.
@@ -554,8 +574,9 @@ Future<void> logicLoop(
   final contract = contracts.firstOrNull;
   final maybeGoods = contract?.terms.deliver.firstOrNull;
 
-  final logicByShipSymbol = <String, _ShipLogic>{
-    for (final ship in myShips) ship.symbol: _logicFor(ship, maybeGoods)
+  final behaviorByShipSymbol = <String, _Behavior>{
+    for (final ship in myShips)
+      ship.symbol: _behaviorFor(ship, agent, maybeGoods)
   };
 
   if (shouldPurchaseMiner(agent, myShips)) {
@@ -574,7 +595,7 @@ Future<void> logicLoop(
     if (previousWait != null) {
       continue;
     }
-    final logic = logicByShipSymbol[ship.symbol]!;
+    final behavior = behaviorByShipSymbol[ship.symbol]!;
     final waitUntil = await _advanceShip(
       api,
       db,
@@ -582,7 +603,7 @@ Future<void> logicLoop(
       agent,
       ship,
       systemWaypoints,
-      logic,
+      behavior,
       contract,
       maybeGoods,
     );
