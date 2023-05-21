@@ -115,6 +115,41 @@ Future<DateTime> navigateToAndLog(
   return result.nav.route.arrival;
 }
 
+/// Either loads a cached survey set or creates a new one if we have a surveyor.
+Future<SurveySet?> loadOrCreateSurveySetIfPossible(
+  Api api,
+  DataStore db,
+  Ship ship,
+) async {
+  final cachedSurveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
+  if (cachedSurveySet != null) {
+    return cachedSurveySet;
+  }
+  if (!ship.hasSurveyor) {
+    return null;
+  }
+  // Survey
+  final response = await api.fleet.createSurvey(ship.symbol);
+  final survey = response!.data;
+  final surveySet = SurveySet(
+    waypointSymbol: ship.nav.waypointSymbol,
+    surveys: survey.surveys,
+  );
+  await saveSurveySet(db, surveySet);
+  shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
+  return null;
+}
+
+Survey? _chooseBestSurvey(SurveySet? surveySet) {
+  if (surveySet == null) {
+    return null;
+  }
+  // Each Survey can have multiple deposits.  The survey itself has a
+  // size.  We should probably choose the most valuable ore based
+  // on market price and then choose the largest deposit of that ore?
+  return surveySet.surveys.firstOrNull;
+}
+
 /// One loop of the mining logic
 Future<DateTime?> advanceMiner(
   Api api,
@@ -134,29 +169,11 @@ Future<DateTime?> advanceMiner(
     // If we still have space, mine.
     // It's not worth potentially waiting a minute just to get one piece of
     // cargo if we're going to sell it right away here.
-    // Hence selling when we're down to 5 or fewer spaces left.
-    if (ship.availableSpace > 5) {
-      // If we have surveying capabilities, survey.
-      // var surveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
-      // if (surveySet == null) {
-      //   if (ship.hasSurveyor) {
-      //     // Survey
-      //     final response = await api.fleet.createSurvey(ship.symbol);
-      //     final survey = response!.data;
-      //     surveySet = SurveySet(
-      //       waypointSymbol: ship.nav.waypointSymbol,
-      //       surveys: survey.surveys,
-      //     );
-      //     await saveSurveySet(db, surveySet);
-      //     shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
-      //   }
-      // }
-      // final maybeSurvey = surveySet?.surveys.firstOrNull;
-      Survey? maybeSurvey;
-
-      // Check cooldown and return if cooling down?
-      // logger.info(
-      //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
+    // Hence selling when we're down to 10 or fewer spaces.
+    if (ship.availableSpace > 10) {
+      // Load a survey set, or if we have surveying capabilities, survey.
+      final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
+      final maybeSurvey = _chooseBestSurvey(surveySet);
       await _undockIfNeeded(api, ship);
       final response = await extractResources(api, ship, survey: maybeSurvey);
       final yield_ = response.extraction.yield_;
