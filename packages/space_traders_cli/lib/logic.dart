@@ -635,7 +635,9 @@ Future<void> logicLoop(
   final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
   final myShips = await allMyShips(api).toList();
   waiter.updateForShips(myShips);
-  final contracts = await allMyContracts(api).toList();
+  final allContracts = await allMyContracts(api).toList();
+  // Filter out the ones we've already done.
+  final contracts = allContracts.where((c) => !c.fulfilled).toList();
   if (contracts.length > 1) {
     throw UnimplementedError();
   }
