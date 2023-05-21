@@ -75,9 +75,10 @@ Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
 /// register registers a new user with the space traders api and
 /// returns the auth token which should be saved and used for future requests.
 Future<String> register(String callSign) async {
-  final defaultApi = DefaultApi();
+  final client = RateLimitedApiClient(requestsPerSecond: 2);
+  final defaultApi = DefaultApi(client);
 
-  final factions = await fetchAllPages(FactionsApi(), (api, page) async {
+  final factions = await fetchAllPages(FactionsApi(client), (api, page) async {
     final response = await api.getFactions(page: page);
     return (response!.data, response.meta);
   }).toList();
