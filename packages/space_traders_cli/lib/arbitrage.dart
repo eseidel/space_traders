@@ -4,12 +4,14 @@ import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/printing.dart';
 
 /// Record of a possible abitrage opportunity.
 class Deal {
   /// Create a new deal.
   Deal({
     required this.tradeSymbol,
+    required this.sourceSymbol,
     required this.destinationSymbol,
     required this.purchasePrice,
     required this.sellPrice,
@@ -17,6 +19,9 @@ class Deal {
 
   /// The trade symbol that we're selling.
   final TradeSymbol tradeSymbol;
+
+  /// The symbol of the market we're buying from.
+  final String sourceSymbol;
 
   /// The symbol of the market we're selling to.
   final String destinationSymbol;
@@ -89,6 +94,7 @@ Iterable<Deal> enumeratePossibleDeals(
       for (final purchaseGood in localMarket.tradeGoods) {
         if (sellSymbol.value == purchaseGood.symbol) {
           yield Deal(
+            sourceSymbol: localMarket.symbol,
             tradeSymbol: sellSymbol,
             destinationSymbol: otherMarket.symbol,
             purchasePrice: purchaseGood.purchasePrice,
@@ -104,8 +110,10 @@ Iterable<Deal> enumeratePossibleDeals(
 void logDeals(List<Deal> deals) {
   for (final deal in deals) {
     logger.info(
-      '${deal.tradeSymbol.value} ${deal.destinationSymbol} '
-      '${deal.purchasePrice} ${deal.sellPrice} ${deal.profit}',
+      '${deal.tradeSymbol.value.padRight(18)} ${deal.destinationSymbol} '
+      '${creditsString(deal.purchasePrice).padLeft(6)} '
+      '${creditsString(deal.sellPrice).padLeft(6)} '
+      '${creditsString(deal.profit).padLeft(6)}',
     );
   }
 }
