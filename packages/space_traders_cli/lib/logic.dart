@@ -171,10 +171,11 @@ Future<DateTime?> advanceMiner(
     // cargo if we're going to sell it right away here.
     // Hence selling when we're down to 10 or fewer spaces.
     if (ship.availableSpace > 10) {
+      // Must be undocked before surveying or mining.
+      await _undockIfNeeded(api, ship);
       // Load a survey set, or if we have surveying capabilities, survey.
       final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
       final maybeSurvey = _chooseBestSurvey(surveySet);
-      await _undockIfNeeded(api, ship);
       final response = await extractResources(api, ship, survey: maybeSurvey);
       final yield_ = response.extraction.yield_;
       final cargo = response.cargo;
