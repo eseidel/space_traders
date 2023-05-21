@@ -34,5 +34,9 @@ void main(List<String> args) async {
 
   final deals = enumeratePossibleDeals(priceData, localMarket, otherMarkets);
   final sortedDeals = deals.sorted((a, b) => a.profit.compareTo(b.profit));
+  if (sortedDeals.isEmpty) {
+    logger.info('No deals found.  Probably no ship at this waypoint.');
+    return;
+  }
   logDeals(sortedDeals);
 }

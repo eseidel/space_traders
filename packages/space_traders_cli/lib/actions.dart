@@ -187,7 +187,7 @@ Future<DateTime> navigateToAndLog(
   // Could log used Fuel. result.fuel.fuelConsumed
   shipInfo(
     ship,
-    '🛫 to ${waypoint.symbol} (${durationString(flightTime)})',
+    '🛫 to ${waypoint.symbol} ${waypoint.type} (${durationString(flightTime)})',
   );
   return result.nav.route.arrival;
 }

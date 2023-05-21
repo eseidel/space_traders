@@ -103,6 +103,7 @@ class PriceData {
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'prices.json';
 
+  // This might not actually be true!  I've never seen a 0 in the data.
   // These may contain 0s and duplicates, best to access it through one
   // of the accessors which knows how to filter.
   final List<Price> _prices;

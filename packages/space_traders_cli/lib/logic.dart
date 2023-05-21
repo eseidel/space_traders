@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/arbitrage.dart';
@@ -170,12 +173,12 @@ _Behavior _behaviorFor(
   // bad loop where at limit X, we buy stuff, now under the limit, so we
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
-  // if (ship.engine.speed > 20) {
-  //   if (maybeGoods != null) {
-  //     return _Behavior.contractTrader;
-  //   }
-  //   return _Behavior.arbitrageTrader;
-  // }
+  if (ship.engine.speed > 20) {
+    if (maybeGoods != null) {
+      return _Behavior.contractTrader;
+    }
+    return _Behavior.arbitrageTrader;
+  }
   // Could check if it has a mining laser or ship.isExcavator
   return _Behavior.miner;
 }
@@ -219,18 +222,41 @@ Future<DateTime?> advanceArbitrageTrader(
       currentWaypoint,
       allMarkets,
     );
-    // Deal can return null (if there are no markets for example).
-    // Not sure what to do in that case.
-    await purchaseCargoAndLog(
-      api,
-      priceData,
-      ship,
-      deal!.tradeSymbol.value,
-      cargo.availableSpace,
-    );
+    // Deal can return null.
+    if (deal != null) {
+      final profitString = lightGreen
+          .wrap('+${creditsString(deal.profit * cargo.availableSpace)}');
+      shipInfo(
+          ship,
+          'Deal ($profitString): ${deal.tradeSymbol} '
+          'for ${creditsString(deal.purchasePrice)}, '
+          'sell for ${creditsString(deal.sellPrice)} '
+          'at ${deal.destinationSymbol} '
+          'profit: ${creditsString(deal.profit)} per unit ');
+      await purchaseCargoAndLog(
+        api,
+        priceData,
+        ship,
+        deal.tradeSymbol.value,
+        cargo.availableSpace,
+      );
 
-    final destination = lookupWaypoint(deal.destinationSymbol, systemWaypoints);
-    return navigateToAndLog(api, ship, destination);
+      final destination =
+          lookupWaypoint(deal.destinationSymbol, systemWaypoints);
+      return navigateToAndLog(api, ship, destination);
+    } else {
+      shipInfo(
+        ship,
+        'No good deals from ${currentWaypoint.symbol}, trying another market',
+      );
+      // Null if there are no markets or all we can
+      // see are unprofitable deals, then we just go to another market.
+      final otherMarkets =
+          allMarkets.where((m) => m.symbol != currentMarket.symbol).toList();
+      final otherMarket = otherMarkets[Random().nextInt(otherMarkets.length)];
+      final waypoint = lookupWaypoint(otherMarket.symbol, systemWaypoints);
+      return navigateToAndLog(api, ship, waypoint);
+    }
   } else {
     // We are not at a marketplace, nothing to do, other than navigate to the
     // the nearest marketplace to fuel up and try again.

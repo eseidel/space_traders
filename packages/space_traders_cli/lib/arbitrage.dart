@@ -62,6 +62,13 @@ int? estimateSellPrice(
     return recentSellPrice;
   }
   final tradeType = market.exchangeType(tradeSymbol.value)!;
+  // Our price data is currently only for market imports/exports, not exchanges.
+  // Exports aren't necessarily even possible to sell to.
+  // This might not actually be true!
+  if (tradeType != ExchangeType.imports) {
+    return null;
+  }
+  // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
   return priceData.percentileForSellPrice(tradeSymbol.value, percentile);
 }
@@ -119,8 +126,12 @@ Future<Deal?> findBestDeal(
 
   final deals = enumeratePossibleDeals(priceData, localMarket, otherMarkets);
   final sortedDeals = deals.sorted((a, b) => a.profit.compareTo(b.profit));
-  logDeals(sortedDeals);
-  return sortedDeals.lastOrNull;
+  // logDeals(sortedDeals);
+  final bestDeal = sortedDeals.lastOrNull;
+  if (bestDeal == null || bestDeal.profit <= 0) {
+    return null;
+  }
+  return bestDeal;
 
   // The simplest possible thing is get the list of trade symbols sold at this
   // marketplace, and then for each trade symbol, get the price at this
