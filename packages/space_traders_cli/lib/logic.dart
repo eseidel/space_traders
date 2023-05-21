@@ -14,31 +14,25 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 
-// Iterable<String> tradeSymbolsFromContracts(List<Contract> contracts) sync* {
-//   for (final contract in contracts) {
-//     for (final item in contract.terms.deliver) {
-//       yield item.tradeSymbol;
-//     }
-//   }
-// }
-
-// Contract? contractNeedingItem(
-//     List<Contract> contracts, String tradeSymbol) {
-//   for (final contract in contracts) {
-//     for (final item in contract.terms.deliver) {
-//       if (item.tradeSymbol == tradeSymbol) {
-//         return contract;
-//       }
-//     }
-//   }
-//   return null;
-// }
-
-bool _shouldSellItem(String tradeSymbol) {
-  // Could choose not to sell contract items if we have a contract that needs
-  // them. Current excluding antimatter because it's unclear how rare it is?
-  final excludedItems = <String>{'ANTIMATTER'};
-  return !excludedItems.contains(tradeSymbol);
+// At the top of the file because I change this so often.
+_Behavior _behaviorFor(
+  Ship ship,
+  Agent agent,
+  ContractDeliverGood? maybeGoods,
+) {
+  // Only trade if we have a fast enough ship and money to buy the goods.
+  // We want some sort of money limit, but currently a money limit can create a
+  // bad loop where at limit X, we buy stuff, now under the limit, so we
+  // resume mining (instead of trading), sell the stuff we just bought.  We
+  // will just continue bouncing at that edge slowly draining our money.
+  // if (ship.engine.speed > 20) {
+  //   if (maybeGoods != null) {
+  //     return _Behavior.contractTrader;
+  //   }
+  //   return _Behavior.arbitrageTrader;
+  // }
+  // Could check if it has a mining laser or ship.isExcavator
+  return _Behavior.miner;
 }
 
 /// Either loads a cached survey set or creates a new one if we have a surveyor.
@@ -73,10 +67,14 @@ Survey? _chooseBestSurvey(SurveySet? surveySet) {
   // Each Survey can have multiple deposits.  The survey itself has a
   // size.  We should probably choose the most valuable ore based
   // on market price and then choose the largest deposit of that ore?
-  return surveySet.surveys.firstOrNull;
+  if (surveySet.surveys.isEmpty) {
+    return null;
+  }
+  // Just picking at random for now.
+  return surveySet.surveys[Random().nextInt(surveySet.surveys.length)];
 }
 
-/// One loop of the mining logic
+/// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
   DataStore db,
@@ -91,103 +89,69 @@ Future<DateTime?> advanceMiner(
   }
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-  if (currentWaypoint.isAsteroidField) {
-    // If we still have space, mine.
-    // It's not worth potentially waiting a minute just to get one piece of
-    // cargo if we're going to sell it right away here.
-    // Hence selling when we're down to 10 or fewer spaces.
-    if (ship.availableSpace > 10) {
-      // Must be undocked before surveying or mining.
-      await undockIfNeeded(api, ship);
-      // Load a survey set, or if we have surveying capabilities, survey.
-      final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
-      final maybeSurvey = _chooseBestSurvey(surveySet);
-      try {
-        final response = await extractResources(api, ship, survey: maybeSurvey);
-        final yield_ = response.extraction.yield_;
-        final cargo = response.cargo;
-        // Could use TradeSymbol.values.reduce() to find the longest symbol.
-        shipInfo(
-            ship,
-            // pickaxe requires an extra space on mac?
-            '⛏️  ${yield_.units.toString().padLeft(2)} '
-            '${yield_.symbol.padRight(18)} '
-            // Space after emoji is needed on windows to not bleed together.
-            '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
-        return response.cooldown.expiration;
-      } on ApiException catch (e) {
-        if (isExpiredSurveyException(e)) {
-          // If the survey is expired, delete it and try again.
-          await deleteSurveySet(db, ship.nav.waypointSymbol);
-          return null;
-        }
-        rethrow;
-      }
-    } else {
-      // Is docking required to refuel and sell?
-      await dockIfNeeded(api, ship);
-      await refuelIfNeededAndLog(api, priceData, agent, ship);
-
-      // Otherwise check to see if we have cargo that is relevant for our
-      // contract.
-      // final contractsResponse = await api.contracts.getContracts();
-
-      // final itemsInCargo = ship.cargo.inventory.map((i) => i.symbol);
-
-      // for (var item in itemsInCargo) {
-      //   final contractNeedingItem =
-      //       contractsResponse!.data.firstWhereOrNull(
-      //       (c) => c.needsItem(item) && c.issuer != ship.owner);
-      //   if (contractNeedingItem != null) {
-      //     print("Contract needs $item, returning to HQ");
-      //     final waypoint =
-      //         lookupWaypoint(contractNeedingItem.issuer, systemWaypoints);
-      //     await api.fleet.setShipNav(
-      //         ship.symbol, waypoint.systemSymbol, waypoint.symbol);
-      //     return null;
-      //   }
-      // }
-
-      // Otherwise, sell cargo.
-      await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-    }
-  } else {
-    // Fulfill contract if we have one.
-    // Otherwise, sell ore.
-    await dockIfNeeded(api, ship);
-    await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-    // Otherwise return to asteroid.
+  if (!currentWaypoint.isAsteroidField) {
+    // We're not at an asteroid field, so we need to navigate to one.
     final asteroidField = systemWaypoints.firstWhere((w) => w.isAsteroidField);
     return navigateToAndLog(api, ship, asteroidField);
   }
-  return null;
-}
-
-_Behavior _behaviorFor(
-  Ship ship,
-  Agent agent,
-  ContractDeliverGood? maybeGoods,
-) {
-  // Only trade if we have a fast enough ship and money to buy the goods.
-  // We want some sort of money limit, but currently a money limit can create a
-  // bad loop where at limit X, we buy stuff, now under the limit, so we
-  // resume mining (instead of trading), sell the stuff we just bought.  We
-  // will just continue bouncing at that edge slowly draining our money.
-  if (ship.engine.speed > 20) {
-    if (maybeGoods != null) {
-      return _Behavior.contractTrader;
-    }
-    return _Behavior.arbitrageTrader;
+  // It's not worth potentially waiting a minute just to get a few pieces
+  // of cargo, when a surveyed mining operation could pull 10+ pieces.
+  // Hence selling when we're down to 15 or fewer spaces.
+  if (ship.availableSpace < 15) {
+    // Otherwise, sell cargo and refuel if needed.
+    await dockIfNeeded(api, ship);
+    await refuelIfNeededAndLog(api, priceData, agent, ship);
+    await sellCargoAndLog(api, priceData, ship);
+    return null;
   }
-  // Could check if it has a mining laser or ship.isExcavator
-  return _Behavior.miner;
+
+  // If we still have space, mine.
+  // Must be undocked before surveying or mining.
+  await undockIfNeeded(api, ship);
+  // Load a survey set, or if we have surveying capabilities, survey.
+  final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
+  final maybeSurvey = _chooseBestSurvey(surveySet);
+  try {
+    final response = await extractResources(api, ship, survey: maybeSurvey);
+    final yield_ = response.extraction.yield_;
+    final cargo = response.cargo;
+    // Could use TradeSymbol.values.reduce() to find the longest symbol.
+    shipInfo(
+        ship,
+        // pickaxe requires an extra space on mac?
+        '⛏️  ${yield_.units.toString().padLeft(2)} '
+        '${yield_.symbol.padRight(18)} '
+        // Space after emoji is needed on windows to not bleed together.
+        '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+    return response.cooldown.expiration;
+  } on ApiException catch (e) {
+    if (isExpiredSurveyException(e)) {
+      // If the survey is expired, delete it and try again.
+      await deleteSurveySet(db, ship.nav.waypointSymbol);
+      return null;
+    }
+    rethrow;
+  }
 }
 
 Future<void> _recordMarketData(PriceData priceData, Market market) async {
+  // shipInfo(ship, 'Recording market data');
   final prices = market.tradeGoods
       .map((g) => Price.fromMarketTradeGood(g, market.symbol))
       .toList();
   await priceData.addPrices(prices);
+}
+
+void _logDeal(Ship ship, Deal deal) {
+  final profitString =
+      lightGreen.wrap('+${creditsString(deal.profit * ship.availableSpace)}');
+  shipInfo(
+      ship,
+      'Deal ($profitString): ${deal.tradeSymbol} '
+      'for ${creditsString(deal.purchasePrice)}, '
+      'sell for ${creditsString(deal.sellPrice)} '
+      'at ${deal.destinationSymbol} '
+      'profit: ${creditsString(deal.profit)} per unit ');
 }
 
 /// One loop of the trading logic
@@ -207,57 +171,7 @@ Future<DateTime?> advanceArbitrageTrader(
   await refuelIfNeededAndLog(api, priceData, agent, ship);
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-  if (currentWaypoint.hasMarketplace) {
-    final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
-    final currentMarket = lookupMarket(currentWaypoint.symbol, allMarkets);
-    shipInfo(ship, 'Recording market data');
-    await _recordMarketData(priceData, currentMarket);
-    // Sell any cargo we can.
-    final cargo =
-        await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-    final deal = await findBestDeal(
-      api,
-      priceData,
-      ship,
-      currentWaypoint,
-      allMarkets,
-    );
-    // Deal can return null.
-    if (deal != null) {
-      final profitString = lightGreen
-          .wrap('+${creditsString(deal.profit * cargo.availableSpace)}');
-      shipInfo(
-          ship,
-          'Deal ($profitString): ${deal.tradeSymbol} '
-          'for ${creditsString(deal.purchasePrice)}, '
-          'sell for ${creditsString(deal.sellPrice)} '
-          'at ${deal.destinationSymbol} '
-          'profit: ${creditsString(deal.profit)} per unit ');
-      await purchaseCargoAndLog(
-        api,
-        priceData,
-        ship,
-        deal.tradeSymbol.value,
-        cargo.availableSpace,
-      );
-
-      final destination =
-          lookupWaypoint(deal.destinationSymbol, systemWaypoints);
-      return navigateToAndLog(api, ship, destination);
-    } else {
-      shipInfo(
-        ship,
-        'No good deals from ${currentWaypoint.symbol}, trying another market',
-      );
-      // Null if there are no markets or all we can
-      // see are unprofitable deals, then we just go to another market.
-      final otherMarkets =
-          allMarkets.where((m) => m.symbol != currentMarket.symbol).toList();
-      final otherMarket = otherMarkets[Random().nextInt(otherMarkets.length)];
-      final waypoint = lookupWaypoint(otherMarket.symbol, systemWaypoints);
-      return navigateToAndLog(api, ship, waypoint);
-    }
-  } else {
+  if (!currentWaypoint.hasMarketplace) {
     // We are not at a marketplace, nothing to do, other than navigate to the
     // the nearest marketplace to fuel up and try again.
     final nearestMarket = systemWaypoints.where((w) => w.hasMarketplace).reduce(
@@ -268,6 +182,55 @@ Future<DateTime?> advanceArbitrageTrader(
         );
     return navigateToAndLog(api, ship, nearestMarket);
   }
+
+  // We are at a marketplace, so we can trade.
+  final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
+  final currentMarket = lookupMarket(currentWaypoint.symbol, allMarkets);
+  await _recordMarketData(priceData, currentMarket);
+  // Sell any cargo we can.
+  ship.cargo = await sellCargoAndLog(api, priceData, ship);
+  const minimumProfit = 500;
+  final deal = await findBestDeal(
+    api,
+    priceData,
+    ship,
+    currentWaypoint,
+    allMarkets,
+    minimumProfitPer: minimumProfit ~/ ship.availableSpace,
+  );
+
+  // Deal can return null if there are no markets or all we can
+  // see are unprofitable deals, in which case we just try another market.
+  if (deal == null) {
+    shipInfo(
+      ship,
+      '🎲 trying another market, no deals >${creditsString(minimumProfit)} '
+      'profit at ${currentMarket.symbol}',
+    );
+    final otherMarkets =
+        allMarkets.where((m) => m.symbol != currentMarket.symbol).toList();
+    final otherMarket = otherMarkets[Random().nextInt(otherMarkets.length)];
+    final waypoint = lookupWaypoint(otherMarket.symbol, systemWaypoints);
+    shipInfo(
+      ship,
+      'Distance: ${currentWaypoint.distanceTo(waypoint)}, '
+      'currentFuel: ${ship.fuel.current}',
+    );
+    return navigateToAndLog(api, ship, waypoint);
+  }
+
+  // Otherwise, we have a worthwhile opportunity, so purchase and go!
+  _logDeal(ship, deal);
+  await purchaseCargoAndLog(
+    api,
+    priceData,
+    ship,
+    deal.tradeSymbol.value,
+    ship.availableSpace,
+  );
+
+  final destination = lookupWaypoint(deal.destinationSymbol, systemWaypoints);
+  return navigateToAndLog(api, ship, destination);
 }
 
 enum _Behavior {
@@ -294,7 +257,7 @@ List<Market> _marketsWithExchange(
       .toList();
 }
 
-Future<void> _deliverContractGoodsIfPossible(
+Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   Api api,
   Ship ship,
   Contract contract,
@@ -302,18 +265,12 @@ Future<void> _deliverContractGoodsIfPossible(
 ) async {
   final units = ship.countUnits(goods.tradeSymbol);
   if (units < 1) {
-    return;
+    return null;
   }
   // And we have the desired cargo.
-  final request = DeliverContractRequest(
-    shipSymbol: ship.symbol,
-    tradeSymbol: goods.tradeSymbol,
-    units: units,
-  );
-  final response = await api.contracts
-      .deliverContract(contract.id, deliverContractRequest: request);
-  final updatedContract = response!.data.contract;
-  final deliver = updatedContract.goodNeeded(goods.tradeSymbol)!;
+  final response =
+      await deliverContract(api, ship, contract, goods.tradeSymbol, units);
+  final deliver = response.contract.goodNeeded(goods.tradeSymbol)!;
   shipInfo(
     ship,
     'Delivered $units ${goods.tradeSymbol} '
@@ -321,16 +278,7 @@ Future<void> _deliverContractGoodsIfPossible(
     '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
     '${durationString(contract.timeUntilDeadline)} to deadline',
   );
-  // Update our cargo counts after fullfilling the contract.
-  ship.cargo = response.data.cargo;
-
-  // If we've delivered enough, complete the contract.
-  if (deliver.amountNeeded <= 0) {
-    await api.contracts.fulfillContract(contract.id);
-    shipInfo(ship, 'Contract complete!');
-    // Go back to mining.
-    return;
-  }
+  return response;
 }
 
 /// One loop of the trading logic
@@ -357,7 +305,20 @@ Future<DateTime?> advanceContractTrader(
 
   // If we're at our contract destination.
   if (currentWaypoint.symbol == goods.destinationSymbol) {
-    await _deliverContractGoodsIfPossible(api, ship, contract, goods);
+    final maybeResponse =
+        await _deliverContractGoodsIfPossible(api, ship, contract, goods);
+    if (maybeResponse != null) {
+      // Update our cargo counts after fullfilling the contract.
+      ship.cargo = maybeResponse.cargo;
+      // If we've delivered enough, complete the contract.
+      if (maybeResponse.contract.goodNeeded(goods.tradeSymbol)!.amountNeeded <=
+          0) {
+        await api.contracts.fulfillContract(contract.id);
+        shipInfo(ship, 'Contract complete!');
+        return null;
+      }
+    }
+
     // Sell anything we have.
     await sellCargoAndLog(api, priceData, ship);
     // nav to place nearby exporting our contract goal.
@@ -566,8 +527,9 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
       // This future waits until the earliest time we think the server
       // will be ready for us to do something.
       final waitDuration = earliestWaitUntil.difference(DateTime.now());
+      // Extra space after emoji needed for windows powershell.
       logger.info(
-        '⏱️ ${waitDuration.inSeconds}s until ${earliestWaitUntil.toLocal()}',
+        '⏱️  ${waitDuration.inSeconds}s until ${earliestWaitUntil.toLocal()}',
       );
       await Future<void>.delayed(earliestWaitUntil.difference(DateTime.now()));
     }

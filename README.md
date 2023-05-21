@@ -81,11 +81,13 @@ Then modified:
 
 Logic:
 * Keep per-ship logs, so can caculate per-ship efficiency.
-* Record prices seen in systems
-* Once have a list of prices try to find arbitrage opportunities
 * Compute earnings per hour per ship.
 * Pull down https://api.spacetraders.io/v2/systems.json and use that to find the
   nearest system to a given system.
+* Survey mines when we pass by if we have another ship there?
+* Include fuel costs in deal calculations.
+* Venture beyond the starting system!
+* Arbitrage should consider going to systems it knows there will be a profit from.
 
 UI:
 * Add a Flutter UI.

@@ -116,8 +116,9 @@ Future<Deal?> findBestDeal(
   PriceData priceData,
   Ship ship,
   Waypoint currentWaypoint,
-  List<Market> allMarkets,
-) async {
+  List<Market> allMarkets, {
+  int minimumProfitPer = 0,
+}) async {
   // Fetch all marketplace data
   final localMarket =
       allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
@@ -128,7 +129,9 @@ Future<Deal?> findBestDeal(
   final sortedDeals = deals.sorted((a, b) => a.profit.compareTo(b.profit));
   // logDeals(sortedDeals);
   final bestDeal = sortedDeals.lastOrNull;
-  if (bestDeal == null || bestDeal.profit <= 0) {
+  // Currently we don't account for fuel, so have an minimum expected
+  // profit instead.
+  if (bestDeal == null || bestDeal.profit <= minimumProfitPer) {
     return null;
   }
   return bestDeal;

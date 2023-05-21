@@ -49,6 +49,24 @@ Future<ExtractResources201ResponseData> extractResources(
   return response!.data;
 }
 
+/// Deliver [units] of [tradeSymbol] to [contract]
+Future<DeliverContract200ResponseData> deliverContract(
+  Api api,
+  Ship ship,
+  Contract contract,
+  String tradeSymbol,
+  int units,
+) async {
+  final request = DeliverContractRequest(
+    shipSymbol: ship.symbol,
+    tradeSymbol: tradeSymbol,
+    units: units,
+  );
+  final response = await api.contracts
+      .deliverContract(contract.id, deliverContractRequest: request);
+  return response!.data;
+}
+
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
@@ -163,7 +181,7 @@ Future<void> refuelIfNeededAndLog(
 /// Dock the ship if needed and log the transaction
 Future<void> dockIfNeeded(Api api, Ship ship) async {
   if (ship.isOrbiting) {
-    shipInfo(ship, 'Docking at ${ship.nav.waypointSymbol}');
+    shipInfo(ship, '🛬 at ${ship.nav.waypointSymbol}');
     await api.fleet.dockShip(ship.symbol);
   }
 }
@@ -171,7 +189,8 @@ Future<void> dockIfNeeded(Api api, Ship ship) async {
 /// Undock the ship if needed and log the transaction
 Future<void> undockIfNeeded(Api api, Ship ship) async {
   if (ship.isDocked) {
-    shipInfo(ship, 'Moving to orbit at ${ship.nav.waypointSymbol}');
+    // Extra space after emoji is needed for windows powershell.
+    shipInfo(ship, '🛰️  at ${ship.nav.waypointSymbol}');
     await api.fleet.orbitShip(ship.symbol);
   }
 }
@@ -187,7 +206,9 @@ Future<DateTime> navigateToAndLog(
   // Could log used Fuel. result.fuel.fuelConsumed
   shipInfo(
     ship,
-    '🛫 to ${waypoint.symbol} ${waypoint.type} (${durationString(flightTime)})',
+    '🛫 to ${waypoint.symbol} ${waypoint.type} '
+    '(${durationString(flightTime)}) '
+    'spent ${result.fuel.consumed?.amount} fuel',
   );
   return result.nav.route.arrival;
 }
