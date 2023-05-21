@@ -176,18 +176,27 @@ Future<DateTime?> advanceMiner(
       // Load a survey set, or if we have surveying capabilities, survey.
       final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
       final maybeSurvey = _chooseBestSurvey(surveySet);
-      final response = await extractResources(api, ship, survey: maybeSurvey);
-      final yield_ = response.extraction.yield_;
-      final cargo = response.cargo;
-      // Could use TradeSymbol.values.reduce() to find the longest symbol.
-      shipInfo(
-          ship,
-          // pickaxe requires an extra space on mac?
-          '⛏️  ${yield_.units.toString().padLeft(2)} '
-          '${yield_.symbol.padRight(18)} '
-          // Space after emoji is needed on windows to not bleed together.
-          '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
-      return response.cooldown.expiration;
+      try {
+        final response = await extractResources(api, ship, survey: maybeSurvey);
+        final yield_ = response.extraction.yield_;
+        final cargo = response.cargo;
+        // Could use TradeSymbol.values.reduce() to find the longest symbol.
+        shipInfo(
+            ship,
+            // pickaxe requires an extra space on mac?
+            '⛏️  ${yield_.units.toString().padLeft(2)} '
+            '${yield_.symbol.padRight(18)} '
+            // Space after emoji is needed on windows to not bleed together.
+            '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+        return response.cooldown.expiration;
+      } on ApiException catch (e) {
+        if (isExpiredSurveyException(e)) {
+          // If the survey is expired, delete it and try again.
+          await deleteSurveySet(db, ship.nav.waypointSymbol);
+          return null;
+        }
+        rethrow;
+      }
     } else {
       // Is docking required to refuel and sell?
       await _dockIfNeeded(api, ship);
@@ -235,38 +244,34 @@ _Behavior _behaviorFor(
 ) {
   // Only trade for the contract if we have a fast enough ship and enough
   // money to buy the goods.
-  // This could create a bad loop where we buy goods, drop under the threshold,
-  // and then sell them again, only to buy them again, etc.
-  // if (maybeGoods != null && ship.engine.speed > 20
-  //    && agent.credits > 10000) {
-  //   return _Behavior.contractTrader;
-  // }
+  // We want some sort of money limit, but as designed they would create a
+  // bad loop where at limit X, we buy stuff, now under the limit, so we
+  // resume mining (instead of trading), sell the stuff we just bought, and
+  // then buy and loop slowly draining money.
+  if (maybeGoods != null && ship.engine.speed > 20) {
+    return _Behavior.contractTrader;
+  }
   // Could check if it has a mining laser or ship.isExcavator
   return _Behavior.miner;
 }
 
-// class _Deal {
-//   _Deal({
-//     required this.tradeSymbol,
-//     required this.destination,
-//     required this.sourcePrice,
-//     required this.destinationPrice,
-//   });
+class _Deal {
+  _Deal({
+    required this.tradeSymbol,
+    required this.destinationSymbol,
+    required this.purchasePrice,
+    required this.sellPrice,
+  });
 
-//   final String tradeSymbol;
-//   final Waypoint destination;
-//   final int sourcePrice;
-//   final int destinationPrice;
+  final TradeSymbol tradeSymbol;
+  final String destinationSymbol;
+  final int purchasePrice;
+  final int sellPrice;
+  // Also should take fuel costs into account.
+  // And possibly time?
 
-//   int get profit => destinationPrice - sourcePrice;
-// }
-
-// int? recentPriceAt({
-//   required String tradeSymbol,
-//   required String marketplaceSymbol,
-// }) {
-//   return null;
-// }
+  int get profit => purchasePrice - sellPrice;
+}
 
 /// Returns Market objects for all passed in waypoints.
 Stream<Market> getAllMarkets(
@@ -283,55 +288,93 @@ Stream<Market> getAllMarkets(
   }
 }
 
-// Iterable<_Deal> _allDeals(Market localMarket,
-//    List<Market> otherMarkets) sync* {
-//   for (final otherMarket in otherMarkets) {
-//     for (final wanted in otherMarket.imports) {
-//       for (final offered in localMarket.tradeGoods) {
-//         if (wanted.symbol == offered.symbol) {
-//           yield _Deal(
-//             tradeSymbol: wanted.symbol,
-//             destination: otherMarket.waypoint,
-//             sourcePrice: offered.price,
-//             destinationPrice: wanted.price,
-//           );
-//         }
-//       }
-//     }
-//   }
-// }
+int _percentileForTradeType(ExchangeType tradeType) {
+  switch (tradeType) {
+    case ExchangeType.exchange:
+      return 50;
+    case ExchangeType.imports:
+      return 25;
+    case ExchangeType.exports:
+      return 75;
+  }
+}
 
-// Future<_Deal> findBestDeal(
-//   Api api,
-//   Ship ship,
-//   Waypoint currentWaypoint,
-//   List<Waypoint> systemWaypoints,
-// ) async {
-//   // Fetch all marketplace data
-//   final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
-//   final localMarket =
-//       allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
-//   final otherMarkets =
-//       allMarkets.where((m) => m.symbol != localMarket.symbol);
+int? _estimateSellPrice(
+  PriceData priceData,
+  TradeSymbol tradeSymbol,
+  Market market,
+) {
+  final tradeType = market.exchangeType(tradeSymbol.value)!;
+  final percentile = _percentileForTradeType(tradeType);
+  return priceData.percentileForSellPrice(tradeSymbol.value, percentile);
+}
 
-//   final allDeals = _allDeals(localMarket, otherMarkets);
-//   // Construct all possible deals.
-//   // Get the list of trade symbols sold at this marketplace.
-//   // Upload current prices at this market to the db.
-//   // For each trade symbol, get the price at this marketplace.
-//   // for (final tradeSymbol in tradeSymbols) {}
-//   // For each trade symbol, get the price at the destination marketplace.
-//   // Sort by assumed profit.
-//   // If we don't have a destination price, assume 50th percentile.
-//   // Deals are then sorted by profit, and we take the best one.
+Iterable<_Deal> _allDeals(
+  PriceData priceData,
+  Market localMarket,
+  List<Market> otherMarkets,
+) sync* {
+  for (final otherMarket in otherMarkets) {
+    for (final sellSymbol in otherMarket.allTradeSymbols) {
+      final sellPrice = _estimateSellPrice(priceData, sellSymbol, otherMarket);
+      if (sellPrice == null) {
+        continue;
+      }
+      for (final purchaseGood in localMarket.tradeGoods) {
+        if (sellSymbol.value == purchaseGood.symbol) {
+          yield _Deal(
+            tradeSymbol: sellSymbol,
+            destinationSymbol: otherMarket.symbol,
+            purchasePrice: purchaseGood.purchasePrice,
+            sellPrice: sellPrice,
+          );
+        }
+      }
+    }
+  }
+}
 
-//   // If we don't have a percentile, match only export/import.
-//   // Picking at random from the matchable exports?
-//   // Or picking the shortest distance?
-// }
+Future<_Deal> _findBestDeal(
+  Api api,
+  PriceData priceData,
+  Ship ship,
+  Waypoint currentWaypoint,
+  List<Waypoint> systemWaypoints,
+) async {
+  // Fetch all marketplace data
+  final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
+  final localMarket =
+      allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
+  final otherMarkets =
+      allMarkets.where((m) => m.symbol != localMarket.symbol).toList();
+
+  final allDeals = _allDeals(priceData, localMarket, otherMarkets);
+  final sortedDeals = allDeals.sorted((a, b) => a.profit.compareTo(b.profit));
+  return sortedDeals.last;
+
+  // The simplest possible thing is get the list of trade symbols sold at this
+  // marketplace, and then for each trade symbol, get the price at this
+  // marketplace, and then for each trade symbol, get the prices at all other
+  // marketplaces, and then sort by assumed profit.
+  // If we don't have a destination price, assume 50th percentile.
+
+  // Construct all possible deals.
+  // Get the list of trade symbols sold at this marketplace.
+  // Upload current prices at this market to the db.
+  // For each trade symbol, get the price at this marketplace.
+  // for (final tradeSymbol in tradeSymbols) {}
+  // For each trade symbol, get the price at the destination marketplace.
+  // Sort by assumed profit.
+  // If we don't have a destination price, assume 50th percentile.
+  // Deals are then sorted by profit, and we take the best one.
+
+  // If we don't have a percentile, match only export/import.
+  // Picking at random from the matchable exports?
+  // Or picking the shortest distance?
+}
 
 /// One loop of the trading logic
-Future<DateTime?> advanceAbitrageTrader(
+Future<DateTime?> advanceArbitrageTrader(
   Api api,
   DataStore db,
   PriceData priceData,
@@ -350,16 +393,32 @@ Future<DateTime?> advanceAbitrageTrader(
   if (currentWaypoint.hasMarketplace) {
     // Sell any cargo we can.
     await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-    // final deal =
-    //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
-    // await navigateToAndLog(api, ship, deal.destination);
-    throw UnimplementedError();
+    final deal = await _findBestDeal(
+      api,
+      priceData,
+      ship,
+      currentWaypoint,
+      systemWaypoints,
+    );
+    final destination = lookupWaypoint(deal.destinationSymbol, systemWaypoints);
+    await navigateToAndLog(api, ship, destination);
+  } else {
+    // We are not at a marketplace, nothing to do, other than navigate to the
+    // the nearest marketplace to fuel up and try again.
+    final nearestMarket = systemWaypoints.where((w) => w.hasMarketplace).reduce(
+          (a, b) =>
+              a.distanceTo(currentWaypoint) < b.distanceTo(currentWaypoint)
+                  ? a
+                  : b,
+        );
+    await navigateToAndLog(api, ship, nearestMarket);
   }
-  throw UnimplementedError();
+  return null;
 }
 
 enum _Behavior {
   contractTrader,
+  arbitrageTrader,
   miner,
 }
 
@@ -528,6 +587,15 @@ Future<DateTime?> _advanceShip(
         systemWaypoints,
         contract!,
         maybeGoods!,
+      );
+    case _Behavior.arbitrageTrader:
+      return advanceArbitrageTrader(
+        api,
+        db,
+        priceData,
+        agent,
+        ship,
+        systemWaypoints,
       );
     case _Behavior.miner:
       try {

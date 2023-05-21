@@ -39,6 +39,11 @@ extension WaypointUtils on Waypoint {
     return this.type == type;
   }
 
+  /// Returns the distance to the given waypoint.
+  int distanceTo(Waypoint other) {
+    return (x - other.x).abs() + (y - other.y).abs();
+  }
+
   /// Returns true if the waypoint is an asteroid field.
   bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
 
@@ -143,6 +148,46 @@ extension ContractDeliverGoodUtils on ContractDeliverGood {
   int get amountNeeded => unitsRequired - unitsFulfilled;
 }
 
+/// Enum representing the type of trades available for a good at a market.
+enum ExchangeType {
+  /// Market imports this good. (Likely to be sold at a higher price.)
+  imports,
+
+  /// Market exports this good. (Likely to be bought at a lower price.)
+  exports,
+
+  /// Market allows agents to exchange this good.
+  exchange,
+}
+
+/// Extensions onto Market to make it easier to work with.
+extension MarketUtils on Market {
+  /// Returns the TradeType for the given trade symbol or null if the market
+  /// doesn't trade that good.
+  ExchangeType? exchangeType(String tradeSymbol) {
+    if (imports.any((g) => g.symbol.value == tradeSymbol)) {
+      return ExchangeType.imports;
+    }
+    if (exports.any((g) => g.symbol.value == tradeSymbol)) {
+      return ExchangeType.exports;
+    }
+    if (exchange.any((g) => g.symbol.value == tradeSymbol)) {
+      return ExchangeType.exchange;
+    }
+    return null;
+  }
+
+  /// Returns all TradeSymbols that the market trades.
+  Set<TradeSymbol> get allTradeSymbols {
+    final symbols = <TradeSymbol>{
+      ...imports.map((g) => g.symbol),
+      ...exports.map((g) => g.symbol),
+      ...exchange.map((g) => g.symbol)
+    };
+    return symbols;
+  }
+}
+
 /// Error 4000 is just a cooldown error and we can retry.
 /// Detect that case and return the retry time.
 /// https://docs.spacetraders.io/api-guide/response-errors
@@ -164,4 +209,20 @@ DateTime? expirationFromApiException(ApiException e) {
     return mapDateTime(cooldown, 'expiration');
   }
   return null;
+}
+
+/// Error 4224 is a survey expired error.
+bool isExpiredSurveyException(ApiException e) {
+  // We ignore the error code at the http level, since we only care about
+  // the error code in the response body.
+  // ApiException 409: {"error":{"message":"Ship extract failed.
+  // Survey X1-VS75-67965Z-D0F7C6 has been exhausted.","code":4224}}
+  final jsonString = e.message;
+  if (jsonString != null) {
+    final exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
+    final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
+    final code = mapValueOfType<int>(error, 'code');
+    return code == 4224;
+  }
+  return false;
 }

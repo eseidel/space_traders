@@ -144,9 +144,15 @@ class PriceData {
       );
 
   /// Get the median purchase price for a trade good.
-  int? medianPurchasePrice(String symbol) {
-    final maybePrice = _medianPriceFor(
+  int? medianPurchasePrice(String symbol) =>
+      percentilePurchasePrice(symbol, 50);
+
+  /// Get the percentile purchase price for a trade good.
+  /// [percentile] must be between 0 and 100.
+  int? percentilePurchasePrice(String symbol, int percentile) {
+    final maybePrice = _percentilePriceFor(
       symbol,
+      percentile,
       _purchasePriceAcending,
     );
     return maybePrice?.purchasePrice;
@@ -160,9 +166,14 @@ class PriceData {
       );
 
   /// Get the median sell price for a trade good.
-  int? medianSellPrice(String symbol) {
-    final maybePrice = _medianPriceFor(
+  int? medianSellPrice(String symbol) => percentileSellPrice(symbol, 50);
+
+  /// Get the percentile sell price for a trade good.
+  /// [percentile] must be between 0 and 100.
+  int? percentileSellPrice(String symbol, int percentile) {
+    final maybePrice = _percentilePriceFor(
       symbol,
+      percentile,
       _sellPriceAcending,
     );
     return maybePrice?.sellPrice;
@@ -195,17 +206,26 @@ class PriceData {
     return percentile <= goodPercentile;
   }
 
-  Price? _medianPriceFor(
+  Price? _percentilePriceFor(
     String symbol,
+    int percentile,
     int Function(Price a, Price b) compareTo,
   ) {
+    if (percentile > 100 || percentile < 0) {
+      throw ArgumentError.value(
+        percentile,
+        'percentile',
+        'Percentile must be between 0 and 100',
+      );
+    }
     final pricesForSymbol = prices.where((e) => e.symbol == symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
-    return pricesForSymbolSorted[pricesForSymbolSorted.length ~/ 2];
+    final index = pricesForSymbolSorted.length * percentile ~/ 100;
+    return pricesForSymbolSorted[index];
   }
 
   int? _percentileFor(

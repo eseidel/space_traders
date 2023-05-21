@@ -78,12 +78,14 @@ class SurveySet {
 /// in the next minute".
 Future<SurveySet?> loadSurveySet(DataStore db, String waypointSymbol) async {
   final store = stringMapStoreFactory.store('surveys');
-  final record = await store.record(waypointSymbol).get(db.db);
-  if (record == null) {
+  final record = store.record(waypointSymbol);
+  final value = await record.get(db.db);
+  if (value == null) {
     return null;
   }
-  final surveySet = SurveySet.fromJson(record);
+  final surveySet = SurveySet.fromJson(value);
   if (surveySet.expiresSoon()) {
+    await record.delete(db.db);
     return null;
   }
   return surveySet;
@@ -93,4 +95,10 @@ Future<SurveySet?> loadSurveySet(DataStore db, String waypointSymbol) async {
 Future<void> saveSurveySet(DataStore db, SurveySet surveySet) async {
   final store = stringMapStoreFactory.store('surveys');
   await store.record(surveySet.waypointSymbol).put(db.db, surveySet.toJson());
+}
+
+/// Deletes the survey set for the given [waypointSymbol] from the data store.
+Future<void> deleteSurveySet(DataStore db, String waypointSymbol) async {
+  final store = stringMapStoreFactory.store('surveys');
+  await store.record(waypointSymbol).delete(db.db);
 }
