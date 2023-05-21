@@ -304,42 +304,32 @@ Stream<Market> getAllMarkets(
 // }
 
 /// One loop of the trading logic
-Future<DateTime?> advanceTrader(
-  Api api,
-  DataStore db,
-  PriceData priceData,
-  Agent agent,
-  Ship ship,
-  List<Waypoint> systemWaypoints,
-) async {
-  if (ship.isInTransit) {
-    // Do nothing for now.
-    return ship.nav.route.arrival;
-  }
-  if (ship.isOrbiting) {
-    logger.info(
-      '${ship.symbol}: Docking ${ship.symbol} at ${ship.nav.waypointSymbol}',
-    );
-    await api.fleet.dockShip(ship.symbol);
-    return null;
-  }
-  if (ship.isDocked) {
-    await refuelIfNeededAndLog(api, priceData, agent, ship);
-    final currentWaypoint =
-        lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-    if (currentWaypoint.hasMarketplace) {
-      // Sell any cargo we can.
-      await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-      // final deal =
-      //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
-      // await navigateToAndLog(api, ship, deal.destination);
-      throw UnimplementedError();
-    } else {
-      throw UnimplementedError();
-    }
-  }
-  return null;
-}
+// Future<DateTime?> advanceTrader(
+//   Api api,
+//   DataStore db,
+//   PriceData priceData,
+//   Agent agent,
+//   Ship ship,
+//   List<Waypoint> systemWaypoints,
+// ) async {
+//   if (ship.isInTransit) {
+//     // Do nothing for now.
+//     return ship.nav.route.arrival;
+//   }
+//   await _dockIfNeeded(api, ship);
+//   await refuelIfNeededAndLog(api, priceData, agent, ship);
+//   final currentWaypoint =
+//       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+//   if (currentWaypoint.hasMarketplace) {
+//     // Sell any cargo we can.
+//     await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
+//     // final deal =
+//     //     await findBestDeal(api, ship, currentWaypoint, systemWaypoints);
+//     // await navigateToAndLog(api, ship, deal.destination);
+//     throw UnimplementedError();
+//   }
+//   throw UnimplementedError();
+// }
 
 enum _ShipLogic {
   trader,

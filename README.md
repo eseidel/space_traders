@@ -59,6 +59,8 @@ But I've not seen the source for that and it appears to be v1 rather than v2.
   Example: RegisterRequest for POST /users/register
 * The generated "enums" do not have equals or hashCode.  e.g. ShipRole.
   It doesn't end up mattering because they're singletons though.
+* Generated toJson methods are not recursive (e.g. Survey.toJson doesn't call
+  SurveyDeposit.toJson).
 
 ## Development
 

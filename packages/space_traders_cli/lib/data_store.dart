@@ -56,11 +56,21 @@ class SurveySet {
     return surveys.any((s) => s.expiration.isBefore(oneMinuteFromNow));
   }
 
+  // Hack around OpenAPI not generating a recursive toJson.
+  Map<String, dynamic> _surveyToJson(Survey survey) {
+    final json = survey.toJson();
+    json['deposits'] = survey.deposits.map((d) => d.toJson()).toList();
+    json['size'] = survey.size.toJson();
+    return json;
+  }
+
   /// Converts the survey set to JSON.
-  Map<String, dynamic> toJson() => {
-        'waypointSymbol': waypointSymbol,
-        'surveys': surveys.map((s) => s.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'waypointSymbol': waypointSymbol,
+      'surveys': surveys.map(_surveyToJson).toList(),
+    };
+  }
 }
 
 /// Loads the most recent survey result from the data store if still valid
