@@ -38,17 +38,17 @@ void main() {
     // code 4000 and the cooldown data is present.
     final expiration2 = expirationFromApiException(
       ApiException(
-        400,
+        409,
         jsonEncode({
           'error': {
-            'message': 'Ship action is still on cooldown for 6 second(s).',
+            'message': 'Ship action is still on cooldown for 10 second(s).',
             'code': 4000,
             'data': {
               'cooldown': {
                 'shipSymbol': 'ESEIDEL2-1',
                 'totalSeconds': 70,
-                'remainingSeconds': 6,
-                'expiration': '2023-05-20T22:53:30.735Z'
+                'remainingSeconds': 10,
+                'expiration': '2023-05-21T00:17:14.284Z'
               }
             }
           }

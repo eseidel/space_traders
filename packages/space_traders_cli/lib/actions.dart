@@ -31,9 +31,17 @@ Future<NavigateShip200ResponseData> navigateTo(
 /// Extract resources from asteroid with [ship]
 Future<ExtractResources201ResponseData> extractResources(
   Api api,
-  Ship ship,
-) async {
-  final response = await api.fleet.extractResources(ship.symbol);
+  Ship ship, {
+  Survey? survey,
+}) async {
+  ExtractResourcesRequest? request;
+  if (survey != null) {
+    request = ExtractResourcesRequest(
+      survey: survey,
+    );
+  }
+  final response = await api.fleet
+      .extractResources(ship.symbol, extractResourcesRequest: request);
   return response!.data;
 }
 

@@ -137,22 +137,28 @@ Future<DateTime?> advanceMiner(
     // Hence selling when we're down to 5 or fewer spaces left.
     if (ship.availableSpace > 5) {
       // If we have surveying capabilities, survey.
-      // final latestSurvey = await loadSurvey(db, ship.nav.waypointSymbol);
-      // if (latestSurvey == null) {
+      // var surveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
+      // if (surveySet == null) {
       //   if (ship.hasSurveyor) {
       //     // Survey
       //     final response = await api.fleet.createSurvey(ship.symbol);
       //     final survey = response!.data;
-      //     await saveSurvey(db, survey.surveys);
+      //     surveySet = SurveySet(
+      //       waypointSymbol: ship.nav.waypointSymbol,
+      //       surveys: survey.surveys,
+      //     );
+      //     await saveSurveySet(db, surveySet);
       //     shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
       //   }
       // }
+      // final maybeSurvey = surveySet?.surveys.firstOrNull;
+      Survey? maybeSurvey;
 
       // Check cooldown and return if cooling down?
       // logger.info(
       //     "${ship.symbol}: Mining (cargo: ${ship.cargo.units}/${ship.cargo.capacity})");
       await _undockIfNeeded(api, ship);
-      final response = await extractResources(api, ship);
+      final response = await extractResources(api, ship, survey: maybeSurvey);
       final yield_ = response.extraction.yield_;
       final cargo = response.cargo;
       // Could use TradeSymbol.values.reduce() to find the longest symbol.
@@ -497,7 +503,9 @@ Future<DateTime?> _advanceShip(
       );
     case _ShipLogic.miner:
       try {
-        return advanceMiner(
+        // This await is very important, if it's not present, exceptions won't
+        // be caught until some outer await.
+        return await advanceMiner(
           api,
           db,
           priceData,
