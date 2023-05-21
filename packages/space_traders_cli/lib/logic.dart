@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
+import 'package:space_traders_cli/arbitrage.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
@@ -35,84 +36,6 @@ bool _shouldSellItem(String tradeSymbol) {
   // them. Current excluding antimatter because it's unclear how rare it is?
   final excludedItems = <String>{'ANTIMATTER'};
   return !excludedItems.contains(tradeSymbol);
-}
-
-/// Sell all cargo matching the [where] predicate.
-/// If [where] is null, sell all cargo.
-/// Logs each transaction or "No cargo to sell" if there is no cargo.
-Future<ShipCargo> sellCargoAndLog(
-  Api api,
-  PriceData priceData,
-  Ship ship, {
-  bool Function(String tradeSymbol)? where,
-}) async {
-  var newCargo = ship.cargo;
-  if (ship.cargo.inventory.isEmpty) {
-    shipInfo(ship, 'No cargo to sell');
-    return newCargo;
-  }
-
-  await for (final response in sellCargo(api, ship, where: where)) {
-    final transaction = response.transaction;
-    final agent = response.agent;
-    logTransaction(ship, priceData, agent, transaction);
-    newCargo = response.cargo;
-  }
-  return newCargo;
-}
-
-/// refuel the ship if needed and log the transaction
-Future<void> refuelIfNeededAndLog(
-  Api api,
-  PriceData priceData,
-  Agent agent,
-  Ship ship,
-) async {
-  // One fuel bought from the market is 100 units of fuel in the ship.
-  // For repeated short trips, avoiding buying fuel when we're close to full.
-  if (ship.fuel.current >= (ship.fuel.capacity - 100)) {
-    return;
-  }
-  // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
-  final responseWrapper = await api.fleet.refuelShip(ship.symbol);
-  final response = responseWrapper!.data;
-  logTransaction(
-    ship,
-    priceData,
-    agent,
-    response.transaction,
-    transactionEmoji: '⛽',
-  );
-}
-
-Future<void> _dockIfNeeded(Api api, Ship ship) async {
-  if (ship.isOrbiting) {
-    shipInfo(ship, 'Docking at ${ship.nav.waypointSymbol}');
-    await api.fleet.dockShip(ship.symbol);
-  }
-}
-
-Future<void> _undockIfNeeded(Api api, Ship ship) async {
-  if (ship.isDocked) {
-    shipInfo(ship, 'Moving to orbit at ${ship.nav.waypointSymbol}');
-    await api.fleet.orbitShip(ship.symbol);
-  }
-}
-
-/// Navigate to the waypoint and log to the ship's log
-Future<DateTime> navigateToAndLog(
-  Api api,
-  Ship ship,
-  Waypoint waypoint,
-) async {
-  final result = await navigateTo(api, ship, waypoint);
-  final flightTime = result.nav.route.arrival.difference(DateTime.now());
-  // Could log used Fuel. result.fuel.fuelConsumed
-  shipInfo(
-    ship,
-    '🛫 to ${waypoint.symbol} (${_durationString(flightTime)})',
-  );
-  return result.nav.route.arrival;
 }
 
 /// Either loads a cached survey set or creates a new one if we have a surveyor.
@@ -172,7 +95,7 @@ Future<DateTime?> advanceMiner(
     // Hence selling when we're down to 10 or fewer spaces.
     if (ship.availableSpace > 10) {
       // Must be undocked before surveying or mining.
-      await _undockIfNeeded(api, ship);
+      await undockIfNeeded(api, ship);
       // Load a survey set, or if we have surveying capabilities, survey.
       final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
       final maybeSurvey = _chooseBestSurvey(surveySet);
@@ -199,7 +122,7 @@ Future<DateTime?> advanceMiner(
       }
     } else {
       // Is docking required to refuel and sell?
-      await _dockIfNeeded(api, ship);
+      await dockIfNeeded(api, ship);
       await refuelIfNeededAndLog(api, priceData, agent, ship);
 
       // Otherwise check to see if we have cargo that is relevant for our
@@ -228,7 +151,7 @@ Future<DateTime?> advanceMiner(
   } else {
     // Fulfill contract if we have one.
     // Otherwise, sell ore.
-    await _dockIfNeeded(api, ship);
+    await dockIfNeeded(api, ship);
     await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
     // Otherwise return to asteroid.
     final asteroidField = systemWaypoints.firstWhere((w) => w.isAsteroidField);
@@ -242,35 +165,19 @@ _Behavior _behaviorFor(
   Agent agent,
   ContractDeliverGood? maybeGoods,
 ) {
-  // Only trade for the contract if we have a fast enough ship and enough
-  // money to buy the goods.
-  // We want some sort of money limit, but as designed they would create a
+  // Only trade if we have a fast enough ship and money to buy the goods.
+  // We want some sort of money limit, but currently a money limit can create a
   // bad loop where at limit X, we buy stuff, now under the limit, so we
-  // resume mining (instead of trading), sell the stuff we just bought, and
-  // then buy and loop slowly draining money.
-  if (maybeGoods != null && ship.engine.speed > 20) {
-    return _Behavior.contractTrader;
+  // resume mining (instead of trading), sell the stuff we just bought.  We
+  // will just continue bouncing at that edge slowly draining our money.
+  if (ship.engine.speed > 20) {
+    if (maybeGoods != null) {
+      return _Behavior.contractTrader;
+    }
+    return _Behavior.arbitrageTrader;
   }
   // Could check if it has a mining laser or ship.isExcavator
   return _Behavior.miner;
-}
-
-class _Deal {
-  _Deal({
-    required this.tradeSymbol,
-    required this.destinationSymbol,
-    required this.purchasePrice,
-    required this.sellPrice,
-  });
-
-  final TradeSymbol tradeSymbol;
-  final String destinationSymbol;
-  final int purchasePrice;
-  final int sellPrice;
-  // Also should take fuel costs into account.
-  // And possibly time?
-
-  int get profit => purchasePrice - sellPrice;
 }
 
 /// Returns Market objects for all passed in waypoints.
@@ -288,91 +195,6 @@ Stream<Market> getAllMarkets(
   }
 }
 
-int _percentileForTradeType(ExchangeType tradeType) {
-  switch (tradeType) {
-    case ExchangeType.exchange:
-      return 50;
-    case ExchangeType.imports:
-      return 25;
-    case ExchangeType.exports:
-      return 75;
-  }
-}
-
-int? _estimateSellPrice(
-  PriceData priceData,
-  TradeSymbol tradeSymbol,
-  Market market,
-) {
-  final tradeType = market.exchangeType(tradeSymbol.value)!;
-  final percentile = _percentileForTradeType(tradeType);
-  return priceData.percentileForSellPrice(tradeSymbol.value, percentile);
-}
-
-Iterable<_Deal> _allDeals(
-  PriceData priceData,
-  Market localMarket,
-  List<Market> otherMarkets,
-) sync* {
-  for (final otherMarket in otherMarkets) {
-    for (final sellSymbol in otherMarket.allTradeSymbols) {
-      final sellPrice = _estimateSellPrice(priceData, sellSymbol, otherMarket);
-      if (sellPrice == null) {
-        continue;
-      }
-      for (final purchaseGood in localMarket.tradeGoods) {
-        if (sellSymbol.value == purchaseGood.symbol) {
-          yield _Deal(
-            tradeSymbol: sellSymbol,
-            destinationSymbol: otherMarket.symbol,
-            purchasePrice: purchaseGood.purchasePrice,
-            sellPrice: sellPrice,
-          );
-        }
-      }
-    }
-  }
-}
-
-Future<_Deal> _findBestDeal(
-  Api api,
-  PriceData priceData,
-  Ship ship,
-  Waypoint currentWaypoint,
-  List<Waypoint> systemWaypoints,
-) async {
-  // Fetch all marketplace data
-  final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
-  final localMarket =
-      allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
-  final otherMarkets =
-      allMarkets.where((m) => m.symbol != localMarket.symbol).toList();
-
-  final allDeals = _allDeals(priceData, localMarket, otherMarkets);
-  final sortedDeals = allDeals.sorted((a, b) => a.profit.compareTo(b.profit));
-  return sortedDeals.last;
-
-  // The simplest possible thing is get the list of trade symbols sold at this
-  // marketplace, and then for each trade symbol, get the price at this
-  // marketplace, and then for each trade symbol, get the prices at all other
-  // marketplaces, and then sort by assumed profit.
-  // If we don't have a destination price, assume 50th percentile.
-
-  // Construct all possible deals.
-  // Get the list of trade symbols sold at this marketplace.
-  // Upload current prices at this market to the db.
-  // For each trade symbol, get the price at this marketplace.
-  // for (final tradeSymbol in tradeSymbols) {}
-  // For each trade symbol, get the price at the destination marketplace.
-  // Sort by assumed profit.
-  // If we don't have a destination price, assume 50th percentile.
-  // Deals are then sorted by profit, and we take the best one.
-
-  // If we don't have a percentile, match only export/import.
-  // Picking at random from the matchable exports?
-  // Or picking the shortest distance?
-}
-
 /// One loop of the trading logic
 Future<DateTime?> advanceArbitrageTrader(
   Api api,
@@ -386,22 +208,34 @@ Future<DateTime?> advanceArbitrageTrader(
     // Do nothing for now.
     return ship.nav.route.arrival;
   }
-  await _dockIfNeeded(api, ship);
+  await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
   if (currentWaypoint.hasMarketplace) {
     // Sell any cargo we can.
-    await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-    final deal = await _findBestDeal(
+    final cargo =
+        await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
+    final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
+    final deal = await findBestDeal(
       api,
       priceData,
       ship,
       currentWaypoint,
-      systemWaypoints,
+      allMarkets,
     );
+    // Deal can return null (if there are no markets for example).
+    // Not sure what to do in that case.
+    await purchaseCargoAndLog(
+      api,
+      priceData,
+      ship,
+      deal!.tradeSymbol.value,
+      cargo.availableSpace,
+    );
+
     final destination = lookupWaypoint(deal.destinationSymbol, systemWaypoints);
-    await navigateToAndLog(api, ship, destination);
+    return navigateToAndLog(api, ship, destination);
   } else {
     // We are not at a marketplace, nothing to do, other than navigate to the
     // the nearest marketplace to fuel up and try again.
@@ -411,9 +245,8 @@ Future<DateTime?> advanceArbitrageTrader(
                   ? a
                   : b,
         );
-    await navigateToAndLog(api, ship, nearestMarket);
+    return navigateToAndLog(api, ship, nearestMarket);
   }
-  return null;
 }
 
 enum _Behavior {
@@ -438,13 +271,6 @@ List<Market> _marketsWithExchange(
   return markets
       .where((m) => m.exchange.any((e) => e.symbol.value == tradeSymbol))
       .toList();
-}
-
-String _durationString(Duration duration) {
-  String twoDigits(int n) => n.toString().padLeft(2, '0');
-  final twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-  final twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-  return '${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
 }
 
 Future<void> _deliverContractGoodsIfPossible(
@@ -472,7 +298,7 @@ Future<void> _deliverContractGoodsIfPossible(
     'Delivered $units ${goods.tradeSymbol} '
     'to ${goods.destinationSymbol}; '
     '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
-    '${_durationString(contract.timeUntilDeadline)} to deadline',
+    '${durationString(contract.timeUntilDeadline)} to deadline',
   );
   // Update our cargo counts after fullfilling the contract.
   ship.cargo = response.data.cargo;
@@ -501,7 +327,7 @@ Future<DateTime?> advanceContractTrader(
     // Go back to sleep until we arrive.
     return ship.nav.route.arrival;
   }
-  await _dockIfNeeded(api, ship);
+  await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
@@ -547,15 +373,13 @@ Future<DateTime?> advanceContractTrader(
       if (cargo.availableSpace > 0) {
         // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
         // Buy a full stock of contract goal.
-        final request = PurchaseCargoRequest(
-          symbol: goods.tradeSymbol,
-          units: cargo.availableSpace,
+        await purchaseCargoAndLog(
+          api,
+          priceData,
+          ship,
+          goods.tradeSymbol,
+          cargo.availableSpace,
         );
-        final response = await api.fleet
-            .purchaseCargo(ship.symbol, purchaseCargoRequest: request);
-        final transaction = response!.data.transaction;
-        final agent = response.data.agent;
-        logTransaction(ship, priceData, agent, transaction);
       }
     }
   }

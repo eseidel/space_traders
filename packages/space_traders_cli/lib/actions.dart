@@ -1,5 +1,9 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/printing.dart';
 
 /// purchase a ship of type [shipType] at [shipyardSymbol]
 Future<PurchaseShip201ResponseData> purchaseShip(
@@ -87,4 +91,103 @@ Stream<SellCargo201ResponseData> sellCargo(
         await api.fleet.sellCargo(ship.symbol, sellCargoRequest: sellRequest);
     yield sellResponse!.data;
   }
+}
+
+/// Sell all cargo matching the [where] predicate.
+/// If [where] is null, sell all cargo.
+/// Logs each transaction or "No cargo to sell" if there is no cargo.
+Future<ShipCargo> sellCargoAndLog(
+  Api api,
+  PriceData priceData,
+  Ship ship, {
+  bool Function(String tradeSymbol)? where,
+}) async {
+  var newCargo = ship.cargo;
+  if (ship.cargo.inventory.isEmpty) {
+    shipInfo(ship, 'No cargo to sell');
+    return newCargo;
+  }
+
+  await for (final response in sellCargo(api, ship, where: where)) {
+    final transaction = response.transaction;
+    final agent = response.agent;
+    logTransaction(ship, priceData, agent, transaction);
+    newCargo = response.cargo;
+  }
+  return newCargo;
+}
+
+/// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
+Future<void> purchaseCargoAndLog(
+  Api api,
+  PriceData priceData,
+  Ship ship,
+  String tradeSymbol,
+  int amountToBuy,
+) async {
+  final request = PurchaseCargoRequest(
+    symbol: tradeSymbol,
+    units: amountToBuy,
+  );
+  final response =
+      await api.fleet.purchaseCargo(ship.symbol, purchaseCargoRequest: request);
+  final transaction = response!.data.transaction;
+  final agent = response.data.agent;
+  logTransaction(ship, priceData, agent, transaction);
+}
+
+/// refuel the ship if needed and log the transaction
+Future<void> refuelIfNeededAndLog(
+  Api api,
+  PriceData priceData,
+  Agent agent,
+  Ship ship,
+) async {
+  // One fuel bought from the market is 100 units of fuel in the ship.
+  // For repeated short trips, avoiding buying fuel when we're close to full.
+  if (ship.fuel.current >= (ship.fuel.capacity - 100)) {
+    return;
+  }
+  // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
+  final responseWrapper = await api.fleet.refuelShip(ship.symbol);
+  final response = responseWrapper!.data;
+  logTransaction(
+    ship,
+    priceData,
+    agent,
+    response.transaction,
+    transactionEmoji: '⛽',
+  );
+}
+
+/// Dock the ship if needed and log the transaction
+Future<void> dockIfNeeded(Api api, Ship ship) async {
+  if (ship.isOrbiting) {
+    shipInfo(ship, 'Docking at ${ship.nav.waypointSymbol}');
+    await api.fleet.dockShip(ship.symbol);
+  }
+}
+
+/// Undock the ship if needed and log the transaction
+Future<void> undockIfNeeded(Api api, Ship ship) async {
+  if (ship.isDocked) {
+    shipInfo(ship, 'Moving to orbit at ${ship.nav.waypointSymbol}');
+    await api.fleet.orbitShip(ship.symbol);
+  }
+}
+
+/// Navigate to the waypoint and log to the ship's log
+Future<DateTime> navigateToAndLog(
+  Api api,
+  Ship ship,
+  Waypoint waypoint,
+) async {
+  final result = await navigateTo(api, ship, waypoint);
+  final flightTime = result.nav.route.arrival.difference(DateTime.now());
+  // Could log used Fuel. result.fuel.fuelConsumed
+  shipInfo(
+    ship,
+    '🛫 to ${waypoint.symbol} (${durationString(flightTime)})',
+  );
+  return result.nav.route.arrival;
 }

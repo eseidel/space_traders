@@ -251,4 +251,29 @@ class PriceData {
     }
     return (index / pricesForSymbol.length * 100).round();
   }
+
+  /// returns the most recent sell price for a trade good at a given market.
+  /// [marketSymbol] is the symbol for the market.
+  /// [tradeSymbol] is the symbol for the trade good.
+  /// [maxAge] is the maximum age of the price in the cache.
+  int? recentSellPrice(
+    String marketSymbol,
+    String tradeSymbol, {
+    Duration? maxAge,
+  }) {
+    final pricesForSymbol = prices.where(
+      (e) => e.symbol == tradeSymbol && e.waypointSymbol == marketSymbol,
+    );
+    if (pricesForSymbol.isEmpty) {
+      return null;
+    }
+    final pricesForSymbolSorted = pricesForSymbol.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final allowedAge = maxAge ?? const Duration(days: 1);
+    if (pricesForSymbolSorted.last.timestamp.difference(DateTime.now()) >
+        allowedAge) {
+      return null;
+    }
+    return pricesForSymbolSorted.last.sellPrice;
+  }
 }
