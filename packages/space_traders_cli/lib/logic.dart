@@ -123,6 +123,7 @@ Future<DateTime?> advanceMiner(
         '${yield_.symbol.padRight(18)} '
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+    // We could sell here before putting ourselves to sleep.
     return response.cooldown.expiration;
   } on ApiException catch (e) {
     if (isExpiredSurveyException(e)) {
