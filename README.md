@@ -55,7 +55,7 @@ The only other one I've seen is: https://crucknuk.itch.io/space-traders
 But I've not seen the source for that and it appears to be v1 rather than v2.
 
 ### Bugs to report to OpenAPI
-* required arguments in a request body should make the body required/non-nullable.
+* Required arguments in request body should make body required/non-nullable.
   Example: RegisterRequest for POST /users/register
 * The generated "enums" do not have equals or hashCode.  e.g. ShipRole.
   It doesn't end up mattering because they're singletons though.
@@ -80,14 +80,12 @@ Then modified:
 ### Todo
 
 Logic:
-* Make ships run in parallel (only wait when *all* need to wait).
 * Keep per-ship logs, so can caculate per-ship efficiency.
-* Use the survey when mining from the command ship.
-* Record surveys to be used by vessels at the same location.
 * Record prices seen in systems
 * Once have a list of prices try to find arbitrage opportunities
 * Compute earnings per hour per ship.
-* Pull down https://api.spacetraders.io/v2/systems.json and use that to find the nearest system to a given system.
+* Pull down https://api.spacetraders.io/v2/systems.json and use that to find the
+  nearest system to a given system.
 
 UI:
 * Add a Flutter UI.
