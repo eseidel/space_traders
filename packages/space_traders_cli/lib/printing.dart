@@ -97,9 +97,9 @@ String stringForPriceDeviance(
   if (diff == 0) {
     return '👌';
   }
-  final percentSign = diff < 0 ? '' : '+';
-  final percentOff = '$percentSign${(diff / median * 100).round()}'.padLeft(3);
-  final creditsDiff = creditsString(diff).padLeft(4);
+  final signString = diff < 0 ? '' : '+';
+  final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(3);
+  final creditsDiff = '$signString${creditsString(diff)}'.padLeft(4);
 
   final lowColor =
       type == MarketTransactionTypeEnum.SELL ? lightRed : lightGreen;

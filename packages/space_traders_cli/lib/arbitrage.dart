@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 
 /// Record of a possible abitrage opportunity.
@@ -53,8 +54,10 @@ int? estimateSellPrice(
   // tradeGoods available, but that would only happen when we have a probe
   // at the market, but aren't recording prices in our priceData.
 
-  final recentSellPrice =
-      priceData.recentSellPrice(market.symbol, tradeSymbol.value);
+  final recentSellPrice = priceData.recentSellPrice(
+    marketSymbol: market.symbol,
+    tradeSymbol: tradeSymbol.value,
+  );
   if (recentSellPrice != null) {
     return recentSellPrice;
   }
@@ -90,6 +93,16 @@ Iterable<Deal> enumeratePossibleDeals(
   }
 }
 
+/// Log proposed [deals] to the console.
+void logDeals(List<Deal> deals) {
+  for (final deal in deals) {
+    logger.info(
+      '${deal.tradeSymbol.value} ${deal.destinationSymbol} '
+      '${deal.purchasePrice} ${deal.sellPrice} ${deal.profit}',
+    );
+  }
+}
+
 /// Find the best deal that can be made from [currentWaypoint].
 Future<Deal?> findBestDeal(
   Api api,
@@ -106,6 +119,7 @@ Future<Deal?> findBestDeal(
 
   final deals = enumeratePossibleDeals(priceData, localMarket, otherMarkets);
   final sortedDeals = deals.sorted((a, b) => a.profit.compareTo(b.profit));
+  logDeals(sortedDeals);
   return sortedDeals.lastOrNull;
 
   // The simplest possible thing is get the list of trade symbols sold at this

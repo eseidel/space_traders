@@ -21,6 +21,15 @@ class Price {
     required this.timestamp,
   });
 
+  /// Create a new price record from a market trade good.
+  Price.fromMarketTradeGood(MarketTradeGood good, this.waypointSymbol)
+      : symbol = good.symbol,
+        supply = good.supply,
+        purchasePrice = good.purchasePrice,
+        sellPrice = good.sellPrice,
+        tradeVolume = good.tradeVolume,
+        timestamp = DateTime.now();
+
   Price._compareOnly({this.purchasePrice = 0, this.sellPrice = 0})
       : waypointSymbol = '',
         symbol = '',
@@ -39,6 +48,19 @@ class Price {
       tradeVolume: json['tradeVolume'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
+  }
+
+  /// Serialize Price as a json map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'waypointSymbol': waypointSymbol,
+      'symbol': symbol,
+      'supply': supply.toJson(),
+      'purchasePrice': purchasePrice,
+      'sellPrice': sellPrice,
+      'tradeVolume': tradeVolume,
+      'timestamp': timestamp.toUtc().toIso8601String(),
+    };
   }
 
   /// The waypoint of the market where this price was recorded.
@@ -64,9 +86,15 @@ class Price {
 }
 
 /// A collection of price records.
+// Could consider sharding this by system if it gets too big.
 class PriceData {
   /// Create a new price data collection.
-  PriceData(this.prices);
+  PriceData(
+    List<Price> prices, {
+    required FileSystem fs,
+    this.cacheFilePath = defaultCacheFilePath,
+  })  : _prices = prices,
+        _fs = fs;
 
   // Eventually we should keep our own data and not use the global data.
   /// Url from which to fetch the global price data.
@@ -75,8 +103,22 @@ class PriceData {
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'prices.json';
 
-  /// The list of price records.
-  final List<Price> prices;
+  // These may contain 0s and duplicates, best to access it through one
+  // of the accessors which knows how to filter.
+  final List<Price> _prices;
+
+  /// The path to the cache file.
+  final String cacheFilePath;
+
+  /// The file system to use.
+  final FileSystem _fs;
+
+  /// Get the count of Price records.
+  int get count => _prices.length;
+
+  /// Get the raw pricing data.  You probably don't want this as it
+  /// will be unfiltered and may contain duplicates and zero values.
+  List<Price> get rawPrices => _prices;
 
   static List<Price> _parsePrices(String prices) {
     final parsed = jsonDecode(prices) as List<dynamic>;
@@ -90,17 +132,16 @@ class PriceData {
     if (pricesFile.existsSync()) {
       return PriceData(
         _parsePrices(pricesFile.readAsStringSync()),
+        fs: fs,
+        cacheFilePath: cacheFilePath,
       );
     }
     return null;
   }
 
-  static void _savePricesCache(
-    FileSystem fs, {
-    required String jsonString,
-    required String cacheFilePath,
-  }) {
-    fs.file(cacheFilePath).writeAsStringSync(jsonString);
+  /// Save the price data to the cache.
+  Future<void> save() async {
+    await _fs.file(cacheFilePath).writeAsString(jsonEncode(_prices));
   }
 
   /// Load the price data from the cache or from the url.
@@ -125,9 +166,32 @@ class PriceData {
     }
     // We could mock http here.
     final response = await http.get(uri);
-    final data = PriceData(_parsePrices(response.body));
-    _savePricesCache(fs, jsonString: response.body, cacheFilePath: filePath);
+    final data =
+        PriceData(_parsePrices(response.body), fs: fs, cacheFilePath: filePath);
+    await data.save();
     return data;
+  }
+
+  /// Add new prices to the price data.
+  Future<void> addPrices(List<Price> newPrices) async {
+    // Go through the list, see if we already have a price for this pair
+    // if so, replace it, otherwise add to the end?
+    // Probably this should add them to a separate buffer, which is then
+    // compacted into the main list at some specific point.
+    for (final newPrice in newPrices) {
+      // This doesn't account for duplicates.
+      final index = _prices.indexWhere(
+        (element) =>
+            element.waypointSymbol == newPrice.waypointSymbol &&
+            element.symbol == newPrice.symbol,
+      );
+      if (index >= 0) {
+        _prices[index] = newPrice;
+      } else {
+        _prices.add(newPrice);
+      }
+    }
+    await save();
   }
 
   static int _sellPriceAcending(Price a, Price b) =>
@@ -140,7 +204,7 @@ class PriceData {
       _percentileFor(
         symbol,
         Price._compareOnly(purchasePrice: purchasePrice),
-        _purchasePriceAcending,
+        MarketTransactionTypeEnum.PURCHASE,
       );
 
   /// Get the median purchase price for a trade good.
@@ -153,7 +217,7 @@ class PriceData {
     final maybePrice = _percentilePriceFor(
       symbol,
       percentile,
-      _purchasePriceAcending,
+      MarketTransactionTypeEnum.PURCHASE,
     );
     return maybePrice?.purchasePrice;
   }
@@ -162,7 +226,7 @@ class PriceData {
   int? percentileForSellPrice(String symbol, int sellPrice) => _percentileFor(
         symbol,
         Price._compareOnly(sellPrice: sellPrice),
-        _sellPriceAcending,
+        MarketTransactionTypeEnum.SELL,
       );
 
   /// Get the median sell price for a trade good.
@@ -174,7 +238,7 @@ class PriceData {
     final maybePrice = _percentilePriceFor(
       symbol,
       percentile,
-      _sellPriceAcending,
+      MarketTransactionTypeEnum.SELL,
     );
     return maybePrice?.sellPrice;
   }
@@ -206,10 +270,34 @@ class PriceData {
     return percentile <= goodPercentile;
   }
 
+  /// Returns all known sell prices for a trade good, optionally restricted
+  /// to a specific waypoint.
+  Iterable<Price> sellPricesFor(String symbol, {String? waypoint}) {
+    final filter = waypoint == null
+        ? (Price e) => e.symbol == symbol && e.sellPrice > 0
+        : (Price e) =>
+            e.symbol == symbol &&
+            e.sellPrice > 0 &&
+            e.waypointSymbol == waypoint;
+    return _prices.where(filter);
+  }
+
+  /// Returns all known purchase prices for a trade good, optionally restricted
+  /// to a specific waypoint.
+  Iterable<Price> purchasePricesFor(String symbol, {String? waypoint}) {
+    final filter = waypoint == null
+        ? (Price e) => e.symbol == symbol && e.purchasePrice > 0
+        : (Price e) =>
+            e.symbol == symbol &&
+            e.purchasePrice > 0 &&
+            e.waypointSymbol == waypoint;
+    return _prices.where(filter);
+  }
+
   Price? _percentilePriceFor(
     String symbol,
     int percentile,
-    int Function(Price a, Price b) compareTo,
+    MarketTransactionTypeEnum action,
   ) {
     if (percentile > 100 || percentile < 0) {
       throw ArgumentError.value(
@@ -218,10 +306,15 @@ class PriceData {
         'Percentile must be between 0 and 100',
       );
     }
-    final pricesForSymbol = prices.where((e) => e.symbol == symbol);
+    final pricesForSymbol = action == MarketTransactionTypeEnum.PURCHASE
+        ? purchasePricesFor(symbol)
+        : sellPricesFor(symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
+    final compareTo = action == MarketTransactionTypeEnum.PURCHASE
+        ? _purchasePriceAcending
+        : _sellPriceAcending;
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     final index = pricesForSymbolSorted.length * percentile ~/ 100;
@@ -231,9 +324,14 @@ class PriceData {
   int? _percentileFor(
     String symbol,
     Price price,
-    int Function(Price a, Price b) compareTo,
+    MarketTransactionTypeEnum action,
   ) {
-    final pricesForSymbol = prices.where((e) => e.symbol == symbol);
+    final compareTo = action == MarketTransactionTypeEnum.PURCHASE
+        ? _purchasePriceAcending
+        : _sellPriceAcending;
+    final pricesForSymbol = action == MarketTransactionTypeEnum.PURCHASE
+        ? purchasePricesFor(symbol)
+        : sellPricesFor(symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -256,14 +354,12 @@ class PriceData {
   /// [marketSymbol] is the symbol for the market.
   /// [tradeSymbol] is the symbol for the trade good.
   /// [maxAge] is the maximum age of the price in the cache.
-  int? recentSellPrice(
-    String marketSymbol,
-    String tradeSymbol, {
+  int? recentSellPrice({
+    required String marketSymbol,
+    required String tradeSymbol,
     Duration? maxAge,
   }) {
-    final pricesForSymbol = prices.where(
-      (e) => e.symbol == tradeSymbol && e.waypointSymbol == marketSymbol,
-    );
+    final pricesForSymbol = sellPricesFor(tradeSymbol, waypoint: marketSymbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }

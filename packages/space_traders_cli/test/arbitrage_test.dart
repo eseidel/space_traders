@@ -1,3 +1,4 @@
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/arbitrage.dart';
@@ -15,6 +16,7 @@ class MockWaypoint extends Mock implements Waypoint {}
 
 void main() {
   test('findBestDeal', () async {
+    final fs = MemoryFileSystem();
     final api = MockApi();
     final ship = MockShip();
     final currentWaypoint = MockWaypoint();
@@ -43,7 +45,7 @@ void main() {
     // We fail to find a deal with no price data.
     final deal = await findBestDeal(
       api,
-      PriceData([]),
+      PriceData([], fs: fs),
       ship,
       currentWaypoint,
       allMarkets,
@@ -52,17 +54,20 @@ void main() {
 
     final deal2 = await findBestDeal(
       api,
-      PriceData([
-        Price(
-          waypointSymbol: 'b',
-          symbol: TradeSymbol.COPPER.value,
-          supply: MarketTradeGoodSupplyEnum.MODERATE,
-          purchasePrice: 1,
-          sellPrice: 2,
-          tradeVolume: 100,
-          timestamp: DateTime.now(),
-        )
-      ]),
+      PriceData(
+        [
+          Price(
+            waypointSymbol: 'b',
+            symbol: TradeSymbol.COPPER.value,
+            supply: MarketTradeGoodSupplyEnum.MODERATE,
+            purchasePrice: 1,
+            sellPrice: 2,
+            tradeVolume: 100,
+            timestamp: DateTime.now(),
+          )
+        ],
+        fs: fs,
+      ),
       ship,
       currentWaypoint,
       allMarkets,

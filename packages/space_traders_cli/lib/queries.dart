@@ -1,5 +1,6 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/extensions.dart';
 
 // Need to make these generic for all paginated apis.
 
@@ -59,4 +60,19 @@ Future<Market> getMarket(Api api, Waypoint waypoint) async {
   final response =
       await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
   return response!.data;
+}
+
+/// Returns Market objects for all passed in waypoints.
+Stream<Market> getAllMarkets(
+  Api api,
+  List<Waypoint> systemWaypoints,
+) async* {
+  for (final waypoint in systemWaypoints) {
+    if (!waypoint.hasMarketplace) {
+      continue;
+    }
+    final response =
+        await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
+    yield response!.data;
+  }
 }

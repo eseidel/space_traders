@@ -170,29 +170,21 @@ _Behavior _behaviorFor(
   // bad loop where at limit X, we buy stuff, now under the limit, so we
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
-  if (ship.engine.speed > 20) {
-    if (maybeGoods != null) {
-      return _Behavior.contractTrader;
-    }
-    return _Behavior.arbitrageTrader;
-  }
+  // if (ship.engine.speed > 20) {
+  //   if (maybeGoods != null) {
+  //     return _Behavior.contractTrader;
+  //   }
+  //   return _Behavior.arbitrageTrader;
+  // }
   // Could check if it has a mining laser or ship.isExcavator
   return _Behavior.miner;
 }
 
-/// Returns Market objects for all passed in waypoints.
-Stream<Market> getAllMarkets(
-  Api api,
-  List<Waypoint> systemWaypoints,
-) async* {
-  for (final waypoint in systemWaypoints) {
-    if (!waypoint.hasMarketplace) {
-      continue;
-    }
-    final response =
-        await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
-    yield response!.data;
-  }
+Future<void> _recordMarketData(PriceData priceData, Market market) async {
+  final prices = market.tradeGoods
+      .map((g) => Price.fromMarketTradeGood(g, market.symbol))
+      .toList();
+  await priceData.addPrices(prices);
 }
 
 /// One loop of the trading logic
@@ -213,10 +205,13 @@ Future<DateTime?> advanceArbitrageTrader(
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
   if (currentWaypoint.hasMarketplace) {
+    final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
+    final currentMarket = lookupMarket(currentWaypoint.symbol, allMarkets);
+    shipInfo(ship, 'Recording market data');
+    await _recordMarketData(priceData, currentMarket);
     // Sell any cargo we can.
     final cargo =
         await sellCargoAndLog(api, priceData, ship, where: _shouldSellItem);
-    final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
     final deal = await findBestDeal(
       api,
       priceData,

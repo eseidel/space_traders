@@ -25,6 +25,7 @@ void main(List<String> args) async {
   const fs = LocalFileSystem();
   final prices = await PriceData.load(fs);
 
-  logger.info('${prices.prices.length} prices loaded.');
-  printPriceRanges(prices.prices);
+  logger.info('${prices.count} prices loaded.');
+  // This may be wrong because it uses rawPrices, which doesn't filter.
+  printPriceRanges(prices.rawPrices);
 }
