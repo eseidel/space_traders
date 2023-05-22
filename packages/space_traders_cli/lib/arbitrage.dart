@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
@@ -109,11 +110,17 @@ Iterable<Deal> enumeratePossibleDeals(
 /// Log proposed [deals] to the console.
 void logDeals(List<Deal> deals) {
   for (final deal in deals) {
+    final sign = deal.profit > 0 ? '+' : '';
+    final profitString = '$sign${creditsString(deal.profit)}'.padLeft(6);
+    final coloredProfitString = deal.profit > 0
+        ? lightGreen.wrap(profitString)
+        : lightRed.wrap(profitString);
     logger.info(
-      '${deal.tradeSymbol.value.padRight(18)} ${deal.destinationSymbol} '
-      '${creditsString(deal.purchasePrice).padLeft(6)} '
-      '${creditsString(deal.sellPrice).padLeft(6)} '
-      '${creditsString(deal.profit).padLeft(6)}',
+      '${deal.tradeSymbol.value.padRight(18)} '
+      ' ${deal.sourceSymbol} ${creditsString(deal.purchasePrice).padLeft(6)} '
+      '-> '
+      '${deal.destinationSymbol} ${creditsString(deal.sellPrice).padLeft(6)} '
+      '$coloredProfitString',
     );
   }
 }

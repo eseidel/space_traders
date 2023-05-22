@@ -9,7 +9,12 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
 
 Iterable<Price> pricesForWaypoint(PriceData priceData, Waypoint waypoint) {
-  return priceData.rawPrices.where((p) => p.waypointSymbol == waypoint.symbol);
+  final prices =
+      priceData.rawPrices.where((p) => p.waypointSymbol == waypoint.symbol);
+  if (prices.isEmpty) {
+    logger.info('No prices for ${waypoint.symbol}');
+  }
+  return prices;
 }
 
 void logPrices(List<Price> prices) {
@@ -26,60 +31,51 @@ void main(List<String> args) async {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
+  final systemResponse = await api.systems.getSystem(hq.system);
+  final system = systemResponse!.data;
+  final jumpGateWaypoint = system.waypoints
+      .firstWhereOrNull((w) => w.type == WaypointType.JUMP_GATE);
 
-  final waypoints = await waypointsInSystem(api, hq.system).toList();
+  final jumpGateResponse =
+      await api.systems.getJumpGate(system.symbol, jumpGateWaypoint!.symbol);
+  final jumpGate = jumpGateResponse!.data;
+  final systemNames = [
+    hq.system,
+    for (final system in jumpGate.connectedSystems) system.symbol
+  ];
 
+  final waypoints = [
+    for (final systemName in systemNames)
+      await for (final waypoint in waypointsInSystem(api, systemName)) waypoint
+  ];
   // Given a set of waypoints.
   // Look at the pricing data.
   final localPrices = [
     for (final waypoint in waypoints) ...pricesForWaypoint(priceData, waypoint)
   ];
+  // Could use a cut-off (e.g. median) instead of keeping only one.
 
-  final sellOpportunities = <Price>[];
   // Collect the most expensive sell price for each symbol.
+  final sellOpportunities = <Price>[];
   for (final tradeSymbol in TradeSymbol.values) {
     final prices = localPrices.where((p) => p.symbol == tradeSymbol.value);
     if (prices.isEmpty) {
       continue;
     }
-    // final medianSellPrice = priceData.medianSellPrice(tradeSymbol.value);
-    // if (medianSellPrice == null) {
-    //   logger.info('No median price for $tradeSymbol');
-    //   continue;
-    // }
     final sortedPrices =
         prices.sorted((a, b) => a.sellPrice.compareTo(b.sellPrice));
-    // final highestSellPrice = sortedPrices.last;
-    // if (highestSellPrice.sellPrice < medianSellPrice) {
-    //   continue;
-    // }
-    // logger.info(
-    //   '$tradeSymbol: $medianSellPrice vs ${highestSellPrice.sellPrice}',
-    // );
     sellOpportunities.add(sortedPrices.last);
   }
 
-  final purchaseOpportunities = <Price>[];
   // Now do the buy side.
+  final purchaseOpportunities = <Price>[];
   for (final tradeSymbol in TradeSymbol.values) {
     final prices = localPrices.where((p) => p.symbol == tradeSymbol.value);
     if (prices.isEmpty) {
       continue;
     }
-    // final medianBuyPrice = priceData.medianPurchasePrice(tradeSymbol.value);
-    // if (medianBuyPrice == null) {
-    //   logger.info('No median price for $tradeSymbol');
-    //   continue;
-    // }
     final sortedPrices =
         prices.sorted((a, b) => a.purchasePrice.compareTo(b.purchasePrice));
-    // final lowestBuyPrice = sortedPrices.first;
-    // if (lowestBuyPrice.purchasePrice > medianBuyPrice) {
-    //   continue;
-    // }
-    // logger.info(
-    //   '$tradeSymbol: $medianBuyPrice vs ${lowestBuyPrice.purchasePrice}',
-    // );
     purchaseOpportunities.add(sortedPrices.first);
   }
 
@@ -97,7 +93,7 @@ void main(List<String> args) async {
         sellPrice: sell.sellPrice,
         tradeSymbol: TradeSymbol.fromJson(buy.symbol)!,
       );
-      if (deal.profit < 0) {
+      if (deal.profit <= 0) {
         continue;
       }
       deals.add(deal);

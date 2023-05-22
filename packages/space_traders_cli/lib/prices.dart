@@ -65,7 +65,10 @@ class Price {
 
   @override
   String toString() {
-    return 'Price{waypointSymbol: $waypointSymbol, symbol: $symbol, supply: $supply, purchasePrice: $purchasePrice, sellPrice: $sellPrice, tradeVolume: $tradeVolume, timestamp: $timestamp}';
+    return 'Price{waypointSymbol: $waypointSymbol, symbol: $symbol, '
+        'supply: $supply, purchasePrice: $purchasePrice, '
+        'sellPrice: $sellPrice, tradeVolume: $tradeVolume, '
+        'timestamp: $timestamp}';
   }
 
   /// The waypoint of the market where this price was recorded.
