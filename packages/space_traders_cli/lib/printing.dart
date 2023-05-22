@@ -15,9 +15,10 @@ String waypointDescription(Waypoint waypoint) {
 }
 
 /// Log a string describing the given [waypoints].
-void printWaypoints(List<Waypoint> waypoints) {
+void printWaypoints(List<Waypoint> waypoints, {String indent = ''}) {
   for (final waypoint in waypoints) {
-    logger.info(waypointDescription(waypoint));
+    final description = waypointDescription(waypoint);
+    logger.info('$indent$description');
   }
 }
 

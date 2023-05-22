@@ -4,6 +4,8 @@ import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/queries.dart';
 
 void main(List<String> args) async {
   const fs = LocalFileSystem();
@@ -24,5 +26,7 @@ void main(List<String> args) async {
   final jumpGate = jumpGateResponse!.data;
   for (final system in jumpGate.connectedSystems) {
     logger.info('${system.symbol} - ${system.distance}');
+    final waypoints = await waypointsInSystem(api, system.symbol).toList();
+    printWaypoints(waypoints, indent: '  ');
   }
 }
