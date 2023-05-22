@@ -501,6 +501,19 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
   // return myAgent.credits > 140000;
 }
 
+/// Returns true if the inner exception is a windows semaphore timeout.
+/// This is a workaround for some behavior in windows I do not understand.
+/// These seem to occur only once every few hours at random.
+bool isWindowsSemaphoreTimeout(ApiException e) {
+  final innerException = e.innerException;
+  if (innerException == null) {
+    return false;
+  }
+  return innerException
+      .toString()
+      .contains('The semaphore timeout period has expired.');
+}
+
 /// Run the logic loop forever.
 /// Currently just sends ships to mine and sell ore.
 Future<void> logic(Api api, DataStore db, PriceData priceData) async {
@@ -521,7 +534,14 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
   final waiter = ShipWaiter();
 
   while (true) {
-    await logicLoop(api, db, priceData, waiter);
+    try {
+      await logicLoop(api, db, priceData, waiter);
+    } on ApiException catch (e) {
+      if (!isWindowsSemaphoreTimeout(e)) {
+        rethrow;
+      }
+      // ignore windows semaphore timeout
+    }
 
     final earliestWaitUntil = waiter.earliestWaitUntil();
     if (earliestWaitUntil != null) {
