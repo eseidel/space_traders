@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/logger.dart';
 
 /// lookupWaypoint looks up a Waypoint by its symbol in the given list of
 /// Waypoint objects.
@@ -246,7 +247,15 @@ DateTime? expirationFromApiException(ApiException e) {
 
   final jsonString = e.message;
   if (jsonString != null) {
-    final exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
+    Map<String, dynamic> exceptionJson;
+    try {
+      exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
+    } on FormatException catch (e) {
+      // Catch any json decode errors, so the original exception can be
+      // rethrown by the caller instead of a json decode error.
+      logger.warn('Failed to parse exception json: $e');
+      return null;
+    }
     final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
     final code = mapValueOfType<int>(error, 'code');
     if (code != 4000) {
