@@ -6,6 +6,7 @@ import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/arbitrage.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -15,7 +16,7 @@ import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 
 // At the top of the file because I change this so often.
-_Behavior _behaviorFor(
+Behavior _behaviorFor(
   Ship ship,
   Agent agent,
   ContractDeliverGood? maybeGoods,
@@ -27,12 +28,12 @@ _Behavior _behaviorFor(
   // will just continue bouncing at that edge slowly draining our money.
   // if (ship.engine.speed > 20) {
   //   if (maybeGoods != null) {
-  //     return _Behavior.contractTrader;
+  //     return Behavior.contractTrader;
   //   }
-  //   return _Behavior.arbitrageTrader;
+  //   return Behavior.arbitrageTrader;
   // }
   // Could check if it has a mining laser or ship.isExcavator
-  return _Behavior.miner;
+  return Behavior.miner;
 }
 
 /// Either loads a cached survey set or creates a new one if we have a surveyor.
@@ -234,12 +235,6 @@ Future<DateTime?> advanceArbitrageTrader(
   return navigateToAndLog(api, ship, destination);
 }
 
-enum _Behavior {
-  contractTrader,
-  arbitrageTrader,
-  miner,
-}
-
 List<Market> _marketsWithExport(
   String tradeSymbol,
   List<Market> markets,
@@ -378,12 +373,12 @@ Future<DateTime?> _advanceShip(
   Agent agent,
   Ship ship,
   List<Waypoint> systemWaypoints,
-  _Behavior behavior,
+  BehaviorState behavior,
   Contract? contract,
   ContractDeliverGood? maybeGoods,
 ) async {
-  switch (behavior) {
-    case _Behavior.contractTrader:
+  switch (behavior.behavior) {
+    case Behavior.contractTrader:
       // We currently only trigger trader logic if we have a contract.
       return advanceContractTrader(
         api,
@@ -395,7 +390,7 @@ Future<DateTime?> _advanceShip(
         contract!,
         maybeGoods!,
       );
-    case _Behavior.arbitrageTrader:
+    case Behavior.arbitrageTrader:
       return advanceArbitrageTrader(
         api,
         db,
@@ -404,7 +399,7 @@ Future<DateTime?> _advanceShip(
         ship,
         systemWaypoints,
       );
-    case _Behavior.miner:
+    case Behavior.miner:
       try {
         // This await is very important, if it's not present, exceptions won't
         // be caught until some outer await.
@@ -429,6 +424,10 @@ Future<DateTime?> _advanceShip(
   }
 }
 
+BehaviorState? _loadBehaviorState(String shipSymbol) {
+  return null;
+}
+
 /// One loop of the logic.
 Future<void> logicLoop(
   Api api,
@@ -451,11 +450,6 @@ Future<void> logicLoop(
   final contract = contracts.firstOrNull;
   final maybeGoods = contract?.terms.deliver.firstOrNull;
 
-  final behaviorByShipSymbol = <String, _Behavior>{
-    for (final ship in myShips)
-      ship.symbol: _behaviorFor(ship, agent, maybeGoods)
-  };
-
   if (shouldPurchaseMiner(agent, myShips)) {
     logger.info('Purchasing mining drone.');
     final shipyardWaypoint = systemWaypoints.firstWhere((w) => w.hasShipyard);
@@ -472,7 +466,12 @@ Future<void> logicLoop(
     if (previousWait != null) {
       continue;
     }
-    final behavior = behaviorByShipSymbol[ship.symbol]!;
+    // We should only generate a new behavior when we're done with our last
+    // behavior?
+    var behaviorState = _loadBehaviorState(ship.symbol);
+    behaviorState ??= BehaviorState(
+      _behaviorFor(ship, agent, maybeGoods),
+    );
     final waitUntil = await _advanceShip(
       api,
       db,
@@ -480,7 +479,7 @@ Future<void> logicLoop(
       agent,
       ship,
       systemWaypoints,
-      behavior,
+      behaviorState,
       contract,
       maybeGoods,
     );
@@ -520,6 +519,7 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
   final contractsResponse = await api.contracts.getContracts();
   final contracts = contractsResponse!.data;
 
+  // Don't accept random contracts anymore.
   for (final contract in contracts) {
     if (!contract.accepted) {
       await api.contracts.acceptContract(contract.id);
