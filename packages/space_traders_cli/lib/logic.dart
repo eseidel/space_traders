@@ -540,6 +540,7 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
       if (!isWindowsSemaphoreTimeout(e)) {
         rethrow;
       }
+      logger.warn('Ignoring windows semaphore timeout exception.');
       // ignore windows semaphore timeout
     }
 
