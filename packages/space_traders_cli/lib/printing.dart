@@ -9,7 +9,8 @@ import 'package:space_traders_cli/prices.dart';
 
 /// Return a string describing the given [waypoint].
 String waypointDescription(Waypoint waypoint) {
-  return '${waypoint.symbol} - ${waypoint.type} - '
+  final chartedString = waypoint.chart != null ? '' : 'uncharted - ';
+  return '${waypoint.symbol} - ${waypoint.type} - $chartedString'
       "${waypoint.traits.map((w) => w.name).join(', ')}";
 }
 
