@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
@@ -41,7 +42,51 @@ extension WaypointUtils on Waypoint {
 
   /// Returns the distance to the given waypoint.
   int distanceTo(Waypoint other) {
-    return (x - other.x).abs() + (y - other.y).abs();
+    // Use euclidean distance.
+    final dx = other.x - x;
+    final dy = other.y - y;
+    return sqrt(dx * dx + dy * dy).round();
+  }
+
+  /// Returns the fuel cost to the given waypoint.
+  int fuelCostTo(
+    Waypoint other, {
+    ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
+  }) {
+    switch (flightMode) {
+      case ShipNavFlightMode.DRIFT:
+        return 1;
+      case ShipNavFlightMode.STEALTH:
+        return distanceTo(other);
+      case ShipNavFlightMode.CRUISE:
+        return distanceTo(other);
+      case ShipNavFlightMode.BURN:
+        return 2 * distanceTo(other);
+    }
+    throw UnimplementedError('Unknown flight mode: $flightMode');
+  }
+
+  /// Returns the flight time to the given waypoint.
+  int flightTimeInSeconds(
+    Waypoint other, {
+    required ShipNavFlightMode flightMode,
+    required int shipSpeed,
+  }) {
+    // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
+    final distance = distanceTo(other);
+    final distanceBySpeed = distance ~/ shipSpeed;
+
+    switch (flightMode) {
+      case ShipNavFlightMode.DRIFT:
+        return 15 + 100 * distanceBySpeed;
+      case ShipNavFlightMode.STEALTH:
+        return 15 + 20 * distanceBySpeed;
+      case ShipNavFlightMode.CRUISE:
+        return 15 + 10 * distanceBySpeed;
+      case ShipNavFlightMode.BURN:
+        return 15 + 5 * distanceBySpeed;
+    }
+    throw UnimplementedError('Unknown flight mode: $flightMode');
   }
 
   /// Returns true if the waypoint is an asteroid field.
