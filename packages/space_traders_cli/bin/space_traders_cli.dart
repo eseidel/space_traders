@@ -24,7 +24,13 @@ void main(List<String> args) async {
   final db = DataStore();
   await db.open();
 
-  final priceData =
-      await PriceData.load(fs, ignoreCache: results['update-prices'] as bool);
+  final priceData = await PriceData.load(
+    fs,
+    updateFromServer: results['update-prices'] as bool,
+  );
+  logger.info(
+    'Loaded ${priceData.count} prices from '
+    '${priceData.waypointCount} waypoints.',
+  );
   await logic(api, db, priceData);
 }

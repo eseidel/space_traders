@@ -39,13 +39,17 @@ class Price {
 
   /// Create a new price record from a json map.
   factory Price.fromJson(Map<String, dynamic> json) {
+    // Server started sending tradeVolume as a string recently, until that
+    // is fixed, need to handle it here.
+    final value = json['tradeVolume'];
+    final tradeVolume = value is int ? value : int.parse(value as String);
     return Price(
       waypointSymbol: json['waypointSymbol'] as String,
       symbol: json['symbol'] as String,
       supply: MarketTradeGoodSupplyEnum.fromJson(json['supply'] as String)!,
       purchasePrice: json['purchasePrice'] as int,
       sellPrice: json['sellPrice'] as int,
-      tradeVolume: json['tradeVolume'] as int,
+      tradeVolume: tradeVolume,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
   }
@@ -125,6 +129,15 @@ class PriceData {
   /// Get the count of Price records.
   int get count => _prices.length;
 
+  /// Get the count of unique waypoints.
+  int get waypointCount {
+    final waypoints = <String>{};
+    for (final price in _prices) {
+      waypoints.add(price.waypointSymbol);
+    }
+    return waypoints.length;
+  }
+
   /// Get the raw pricing data.  You probably don't want this as it
   /// will be unfiltered and may contain duplicates and zero values.
   List<Price> get rawPrices => _prices;
@@ -158,27 +171,31 @@ class PriceData {
     FileSystem fs, {
     String? cacheFilePath,
     String? url,
-    bool ignoreCache = false,
+    bool updateFromServer = false,
   }) async {
     final uri = Uri.parse(url ?? defaultUrl);
     final filePath = cacheFilePath ?? defaultCacheFilePath;
-    if (!ignoreCache) {
-      // Try to load prices.json.  If it does not exist, pull down and cache
-      // from the url.
-      final fromCache = _loadPricesCache(fs, filePath);
-      if (fromCache != null) {
+    // Try to load prices.json.  If it does not exist, pull down and cache
+    // from the url.
+    final fromCache = _loadPricesCache(fs, filePath);
+    if (fromCache != null) {
+      if (!updateFromServer) {
         return fromCache;
       }
-      logger.info('Failed to load prices from cache, fetching from $uri');
     } else {
-      logger.info('Ignoring cache, fetching prices from $uri');
+      logger.info('Failed to load prices from cache, fetching from $uri');
     }
+
     // We could mock http here.
     final response = await http.get(uri);
-    final data =
-        PriceData(_parsePrices(response.body), fs: fs, cacheFilePath: filePath);
-    await data.save();
-    return data;
+    final serverPrices = _parsePrices(response.body);
+    if (fromCache == null) {
+      final data = PriceData(serverPrices, fs: fs, cacheFilePath: filePath);
+      await data.save();
+      return data;
+    }
+    await fromCache.addPrices(serverPrices);
+    return fromCache;
   }
 
   /// Add new prices to the price data.
