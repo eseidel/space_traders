@@ -20,7 +20,7 @@ void main() {
         )
       ],
     );
-    expect(waypointDescription(waypoint), 'a - PLANET - n');
+    expect(waypointDescription(waypoint), 'a - PLANET - uncharted - n');
   });
 
   test('durationString', () {
