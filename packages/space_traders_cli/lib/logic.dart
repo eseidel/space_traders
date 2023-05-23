@@ -359,6 +359,13 @@ Future<DateTime?> advanceContractTrader(
           cargo.availableSpace,
         );
       }
+    } else {
+      // TODO(eseidel): This can't work.  We need to be able to do something
+      // when things are too expensive.
+      shipInfo(
+        ship,
+        '${goods.tradeSymbol} is too expensive at ${currentWaypoint.symbol}',
+      );
     }
   }
   // Regardless, navigate to contract destination.
