@@ -171,3 +171,16 @@ Future<Deal?> findBestDeal(
   // Picking at random from the matchable exports?
   // Or picking the shortest distance?
 }
+
+/// Log a [deal] to the console.
+void logDeal(Ship ship, Deal deal) {
+  final profitString =
+      lightGreen.wrap('+${creditsString(deal.profit * ship.availableSpace)}');
+  shipInfo(
+      ship,
+      'Deal ($profitString): ${deal.tradeSymbol} '
+      'for ${creditsString(deal.purchasePrice)}, '
+      'sell for ${creditsString(deal.sellPrice)} '
+      'at ${deal.destinationSymbol} '
+      'profit: ${creditsString(deal.profit)} per unit ');
+}

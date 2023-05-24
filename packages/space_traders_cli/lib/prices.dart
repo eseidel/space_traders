@@ -416,3 +416,21 @@ class PriceData {
     return pricesForSymbolSorted.last.sellPrice;
   }
 }
+
+/// Record market data and log the result.
+Future<void> recordMarketDataAndLog(
+  PriceData priceData,
+  Market market,
+  Ship ship,
+) async {
+  await recordMarketData(priceData, market);
+  shipInfo(ship, 'Recorded Market data for ${market.symbol}');
+}
+
+/// Record market data.
+Future<void> recordMarketData(PriceData priceData, Market market) async {
+  final prices = market.tradeGoods
+      .map((g) => Price.fromMarketTradeGood(g, market.symbol))
+      .toList();
+  await priceData.addPrices(prices);
+}
