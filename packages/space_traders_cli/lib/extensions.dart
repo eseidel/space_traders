@@ -132,6 +132,16 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is an excavator.
   bool get isExcavator => registration.role == ShipRole.EXCAVATOR;
 
+  /// Returns true if the ship can mine.
+  bool get canMine {
+    const minerMounts = [
+      ShipMountSymbolEnum.MINING_LASER_I,
+      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbolEnum.MINING_LASER_III,
+    ];
+    return mounts.any((m) => minerMounts.contains(m.symbol));
+  }
+
   /// Returns true if the ship is in transit.
   bool get isInTransit => nav.status == ShipNavStatus.IN_TRANSIT;
 

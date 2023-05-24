@@ -33,7 +33,10 @@ Behavior _behaviorFor(
   //   return Behavior.arbitrageTrader;
   // }
   // Could check if it has a mining laser or ship.isExcavator
-  return Behavior.miner;
+  if (ship.canMine) {
+    return Behavior.miner;
+  }
+  return Behavior.explorer;
 }
 
 /// Either loads a cached survey set or creates a new one if we have a surveyor.
@@ -136,8 +139,18 @@ Future<DateTime?> advanceMiner(
   }
 }
 
-Future<void> _recordMarketData(PriceData priceData, Market market) async {
-  // shipInfo(ship, 'Recording market data');
+/// Record market data and log the result.
+Future<void> recordMarketDataAndLog(
+  PriceData priceData,
+  Market market,
+  Ship ship,
+) async {
+  await recordMarketData(priceData, market);
+  shipInfo(ship, 'Recorded Market data for ${market.symbol}');
+}
+
+/// Record market data.
+Future<void> recordMarketData(PriceData priceData, Market market) async {
   final prices = market.tradeGoods
       .map((g) => Price.fromMarketTradeGood(g, market.symbol))
       .toList();
@@ -188,7 +201,7 @@ Future<DateTime?> advanceArbitrageTrader(
   // We are at a marketplace, so we can trade.
   final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
   final currentMarket = lookupMarket(currentWaypoint.symbol, allMarkets);
-  await _recordMarketData(priceData, currentMarket);
+  await recordMarketData(priceData, currentMarket);
   // Sell any cargo we can.
   ship.cargo = await sellCargoAndLog(api, priceData, ship);
   const minimumProfit = 500;
@@ -373,6 +386,74 @@ Future<DateTime?> advanceContractTrader(
   return navigateToAndLog(api, ship, destination);
 }
 
+bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
+  return waypoint.chart == null ||
+      waypoint.hasMarketplace &&
+          !priceData.hasRecentMarketData(waypoint.symbol);
+}
+
+/// One loop of the exploring logic.
+Future<DateTime?> advanceExporer(
+  Api api,
+  DataStore db,
+  PriceData priceData,
+  Agent agent,
+  Ship ship,
+  List<Waypoint> systemWaypoints,
+) async {
+  if (ship.isInTransit) {
+    // Go back to sleep until we arrive.
+    return ship.nav.route.arrival;
+  }
+  // Check our current waypoint.  If it's not charted or doesn't have current
+  // market data, chart it and/or record market data.
+  final currentWaypoint =
+      lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+  if (currentWaypoint.chart == null) {
+    await chartWaypointAndLog(api, ship);
+    return null;
+  }
+  if (currentWaypoint.hasMarketplace &&
+      !priceData.hasRecentMarketData(currentWaypoint.symbol)) {
+    final market = await getMarket(api, currentWaypoint);
+    await recordMarketDataAndLog(priceData, market, ship);
+    return null;
+  }
+  // Check the current system waypoints.
+  // If any are not explored, or have a market but don't have recent market
+  // data, got there.
+  for (final waypoint in systemWaypoints) {
+    if (_isMissingChartOrRecentMarketData(priceData, waypoint)) {
+      return navigateToAndLog(api, ship, waypoint);
+    }
+  }
+
+  // If at a jump gate, go to a nearby system with unexplored waypoints or
+  // missing market data.
+  if (currentWaypoint.isJumpGate) {
+    final jumpGate = await getJumpGate(api, currentWaypoint);
+    for (final connectedSystem in jumpGate.connectedSystems) {
+      final systemWaypoints =
+          await waypointsInSystem(api, connectedSystem.symbol).toList();
+      for (final waypoint in systemWaypoints) {
+        if (_isMissingChartOrRecentMarketData(priceData, waypoint)) {
+          return navigateToAndLog(api, ship, waypoint);
+        }
+      }
+    }
+    logger.err('No unexplored systems connected to ${currentWaypoint.symbol}');
+    return DateTime.now().add(const Duration(days: 1));
+  }
+
+  // Otherwise, go to a jump gate.
+  final jumpGates = systemWaypoints.where((w) => w.isJumpGate).toList();
+  if (jumpGates.isEmpty) {
+    throw UnimplementedError('No jump gates in ${ship.nav.waypointSymbol}');
+  }
+  final jumpGate = jumpGates.first;
+  return navigateToAndLog(api, ship, jumpGate);
+}
+
 Future<DateTime?> _advanceShip(
   Api api,
   DataStore db,
@@ -428,6 +509,15 @@ Future<DateTime?> _advanceShip(
         }
         rethrow;
       }
+    case Behavior.explorer:
+      return advanceExporer(
+        api,
+        db,
+        priceData,
+        agent,
+        ship,
+        systemWaypoints,
+      );
   }
 }
 

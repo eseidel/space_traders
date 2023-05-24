@@ -20,13 +20,13 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   return purchaseResponse!.data;
 }
 
-/// navigate [ship] to [waypoint]
+/// navigate [ship] to [waypointSymbol]
 Future<NavigateShip200ResponseData> navigateTo(
   Api api,
   Ship ship,
-  Waypoint waypoint,
+  String waypointSymbol,
 ) async {
-  final request = NavigateShipRequest(waypointSymbol: waypoint.symbol);
+  final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
   final result =
       await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
   return result!.data;
@@ -201,7 +201,7 @@ Future<DateTime> navigateToAndLog(
   Ship ship,
   Waypoint waypoint,
 ) async {
-  final result = await navigateTo(api, ship, waypoint);
+  final result = await navigateTo(api, ship, waypoint.symbol);
   final flightTime = result.nav.route.arrival.difference(DateTime.now());
   // Could log used Fuel. result.fuel.fuelConsumed
   shipInfo(
@@ -211,4 +211,11 @@ Future<DateTime> navigateToAndLog(
     'spent ${result.fuel.consumed?.amount} fuel',
   );
   return result.nav.route.arrival;
+}
+
+/// Chart the waypoint [ship] is currently at and log.
+Future<void> chartWaypointAndLog(Api api, Ship ship) async {
+  final response = await api.fleet.createChart(ship.symbol);
+  final waypoint = response!.data.waypoint;
+  shipInfo(ship, 'Charted ${waypointDescription(waypoint)}');
 }

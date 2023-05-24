@@ -1,3 +1,5 @@
+import 'package:space_traders_cli/route.dart';
+
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {
   /// Trade to fulfill the current contract.
@@ -8,21 +10,9 @@ enum Behavior {
 
   /// Mine asteroids and sell the ore.
   miner,
-}
 
-/// A route between two waypoints, including possibly jumping through gates.
-class Route {
-  /// Create a route between the given [waypointSymbols].
-  const Route(this.waypointSymbols);
-
-  /// The symbol of the first waypoint in the route.
-  String get start => waypointSymbols.first;
-
-  /// The symbol of the last waypoint in the route.
-  String get end => waypointSymbols.last;
-
-  /// The symbols of the waypoints in the route.
-  final List<String> waypointSymbols;
+  /// Explore the universe.
+  explorer,
 }
 
 /// Class holding the persistent state for a behavior.

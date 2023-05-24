@@ -194,6 +194,7 @@ class PriceData {
       await data.save();
       return data;
     }
+    logger.info('Updating ${serverPrices.length} prices from server.');
     await fromCache.addPrices(serverPrices);
     return fromCache;
   }
@@ -374,6 +375,22 @@ class PriceData {
       index = pricesForSymbol.length;
     }
     return (index / pricesForSymbol.length * 100).round();
+  }
+
+  /// Returns true if there is recent market data for a given market.
+  /// Does not check if the passed in market is a valid market.
+  bool hasRecentMarketData(String marketSymbol, {Duration? maxAge}) {
+    final pricesForMarket =
+        _prices.where((e) => e.waypointSymbol == marketSymbol);
+    if (pricesForMarket.isEmpty) {
+      return false;
+    }
+    final pricesForMarketSorted = pricesForMarket.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    final allowedAge = maxAge ?? const Duration(days: 1);
+    return pricesForMarketSorted.last.timestamp.difference(DateTime.now()) <
+        allowedAge;
   }
 
   /// returns the most recent sell price for a trade good at a given market.

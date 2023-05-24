@@ -71,8 +71,13 @@ Stream<Market> getAllMarkets(
     if (!waypoint.hasMarketplace) {
       continue;
     }
-    final response =
-        await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
-    yield response!.data;
+    yield await getMarket(api, waypoint);
   }
+}
+
+/// Returns JumpGate object for passed in Waypoint.
+Future<JumpGate> getJumpGate(Api api, Waypoint waypoint) async {
+  final response =
+      await api.systems.getJumpGate(waypoint.systemSymbol, waypoint.symbol);
+  return response!.data;
 }
