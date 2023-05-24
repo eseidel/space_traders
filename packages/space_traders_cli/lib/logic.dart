@@ -1,11 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/advance.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/behavior/contract_trader.dart';
-import 'package:space_traders_cli/behavior/explorer.dart';
-import 'package:space_traders_cli/behavior/miner.dart';
-import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -36,73 +33,6 @@ Behavior _behaviorFor(
     return Behavior.miner;
   }
   return Behavior.explorer;
-}
-
-Future<DateTime?> _advanceShip(
-  Api api,
-  DataStore db,
-  PriceData priceData,
-  Agent agent,
-  Ship ship,
-  List<Waypoint> systemWaypoints,
-  BehaviorState behavior,
-  Contract? contract,
-  ContractDeliverGood? maybeGoods,
-) async {
-  switch (behavior.behavior) {
-    case Behavior.contractTrader:
-      // We currently only trigger trader logic if we have a contract.
-      return advanceContractTrader(
-        api,
-        db,
-        priceData,
-        agent,
-        ship,
-        systemWaypoints,
-        contract!,
-        maybeGoods!,
-      );
-    case Behavior.arbitrageTrader:
-      return advanceArbitrageTrader(
-        api,
-        db,
-        priceData,
-        agent,
-        ship,
-        systemWaypoints,
-      );
-    case Behavior.miner:
-      try {
-        // This await is very important, if it's not present, exceptions won't
-        // be caught until some outer await.
-        return await advanceMiner(
-          api,
-          db,
-          priceData,
-          agent,
-          ship,
-          systemWaypoints,
-        );
-      } on ApiException catch (e) {
-        // This handles the ship (reactor?) cooldown exception which we can
-        // get when running the script fresh with no state while a ship is
-        // still on cooldown from a previous run.
-        final expiration = expirationFromApiException(e);
-        if (expiration != null) {
-          return expiration;
-        }
-        rethrow;
-      }
-    case Behavior.explorer:
-      return advanceExporer(
-        api,
-        db,
-        priceData,
-        agent,
-        ship,
-        systemWaypoints,
-      );
-  }
 }
 
 BehaviorState? _loadBehaviorState(String shipSymbol) {
@@ -156,18 +86,30 @@ Future<void> logicLoop(
     behaviorState ??= BehaviorState(
       _behaviorFor(ship, agent, maybeGoods),
     );
-    final waitUntil = await _advanceShip(
-      api,
-      db,
-      priceData,
-      agent,
-      ship,
-      systemWaypoints,
-      behaviorState,
-      contract,
-      maybeGoods,
-    );
-    waiter.updateWaitUntil(ship.symbol, waitUntil);
+    try {
+      final waitUntil = await advanceShipBehavior(
+        api,
+        db,
+        priceData,
+        agent,
+        ship,
+        systemWaypoints,
+        behaviorState,
+        contract,
+        maybeGoods,
+      );
+      waiter.updateWaitUntil(ship.symbol, waitUntil);
+    } on ApiException catch (e) {
+      // Handle the ship reactor cooldown exception which we can get when
+      // running the script fresh with no state while a ship is still on
+      // cooldown from a previous run.
+      final expiration = expirationFromApiException(e);
+      if (expiration == null) {
+        // Was not a reactor cooldown, just rethrow.
+        rethrow;
+      }
+      waiter.updateWaitUntil(ship.symbol, expiration);
+    }
   }
 }
 
@@ -197,13 +139,9 @@ bool isWindowsSemaphoreTimeout(ApiException e) {
       .contains('The semaphore timeout period has expired.');
 }
 
-/// Run the logic loop forever.
-/// Currently just sends ships to mine and sell ore.
-Future<void> logic(Api api, DataStore db, PriceData priceData) async {
+Future<void> _acceptAllContractsIfNeeded(Api api) async {
   final contractsResponse = await api.contracts.getContracts();
   final contracts = contractsResponse!.data;
-
-  // Don't accept random contracts anymore.
   for (final contract in contracts) {
     if (!contract.accepted) {
       await api.contracts.acceptContract(contract.id);
@@ -214,6 +152,15 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
         );
     }
   }
+}
+
+/// Run the logic loop forever.
+/// Currently just sends ships to mine and sell ore.
+Future<void> logic(Api api, DataStore db, PriceData priceData) async {
+  // Accept any contracts we have not yet accepted.
+  // This is a bit dangerous because we could accept a contract and then
+  // not be able to fulfill it.
+  await _acceptAllContractsIfNeeded(api);
 
   final waiter = ShipWaiter();
 
@@ -224,8 +171,11 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
       if (!isWindowsSemaphoreTimeout(e)) {
         rethrow;
       }
-      logger.warn('Ignoring windows semaphore timeout exception.');
       // ignore windows semaphore timeout
+      logger.warn('Ignoring windows semaphore timeout exception, waiting 5s.');
+      // I've seen up to 4 of these happen in a row, so wait a few seconds for
+      // the system to recover.
+      await Future<void>.delayed(const Duration(seconds: 2));
     }
 
     final earliestWaitUntil = waiter.earliestWaitUntil();
