@@ -219,3 +219,16 @@ Future<void> chartWaypointAndLog(Api api, Ship ship) async {
   final waypoint = response!.data.waypoint;
   shipInfo(ship, 'Charted ${waypointDescription(waypoint)}');
 }
+
+/// Use the jump gate to travel to [systemSymbol] and log.
+Future<JumpShip200ResponseData> useJumpGateAndLog(
+  Api api,
+  Ship ship,
+  String systemSymbol,
+) async {
+  final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol);
+  final response =
+      await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
+  shipInfo(ship, 'Used Jump Gate to $systemSymbol');
+  return response!.data;
+}

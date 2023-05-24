@@ -437,7 +437,14 @@ Future<DateTime?> advanceExporer(
           await waypointsInSystem(api, connectedSystem.symbol).toList();
       for (final waypoint in systemWaypoints) {
         if (_isMissingChartOrRecentMarketData(priceData, waypoint)) {
-          return navigateToAndLog(api, ship, waypoint);
+          shipInfo(
+            ship,
+            'Found unexplored system ${waypoint.symbol}, jumping.',
+          );
+          await undockIfNeeded(api, ship);
+          await useJumpGateAndLog(api, ship, waypoint.systemSymbol);
+          // Jumping is instant.
+          return null;
         }
       }
     }
@@ -534,8 +541,6 @@ Future<void> logicLoop(
 ) async {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
-  final hq = parseWaypointString(agentResult.data.headquarters);
-  final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
   final myShips = await allMyShips(api).toList();
   waiter.updateForShips(myShips);
   final allContracts = await allMyContracts(api).toList();
@@ -547,18 +552,23 @@ Future<void> logicLoop(
   final contract = contracts.firstOrNull;
   final maybeGoods = contract?.terms.deliver.firstOrNull;
 
-  if (shouldPurchaseMiner(agent, myShips)) {
-    logger.info('Purchasing mining drone.');
-    final shipyardWaypoint = systemWaypoints.firstWhere((w) => w.hasShipyard);
-    final purchaseResponse =
-        await purchaseShip(api, ShipType.MINING_DRONE, shipyardWaypoint.symbol);
-    logger.info('Purchased ${purchaseResponse.ship.symbol}');
-    return; // Fetch ship lists again with no wait.
-  }
+  // if (shouldPurchaseMiner(agent, myShips)) {
+  //   logger.info('Purchasing mining drone.');
+  //   final shipyardWaypoint =
+  //      systemWaypoints.firstWhere((w) => w.hasShipyard);
+  //   final purchaseResponse =
+  //       await purchaseShip(api, ShipType.MINING_DRONE,
+  //      shipyardWaypoint.symbol);
+  //   logger.info('Purchased ${purchaseResponse.ship.symbol}');
+  //   return; // Fetch ship lists again with no wait.
+  // }
 
   // printShips(myShips, systemWaypoints);
   // loop over all mining ships and advance them.
   for (final ship in myShips) {
+    // Could cache waypoints between ships.
+    final systemWaypoints =
+        await waypointsInSystem(api, ship.nav.systemSymbol).toList();
     final previousWait = waiter.waitUntil(ship.symbol);
     if (previousWait != null) {
       continue;
