@@ -7,7 +7,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 
-/// Record of a possible abitrage opportunity.
+/// Record of a possible arbitrage opportunity.
 class Deal {
   /// Create a new deal.
   Deal({

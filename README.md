@@ -86,8 +86,8 @@ Logic:
   nearest system to a given system.
 * Survey mines when we pass by if we have another ship there?
 * Include fuel costs in deal calculations.
-* Venture beyond the starting system!
 * Arbitrage should consider going to systems it knows there will be a profit from.
+* Probes should plan jumps based on distance to hq, not current location.
 
 UI:
 * Add a Flutter UI.

@@ -229,7 +229,10 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
     }
 
     final earliestWaitUntil = waiter.earliestWaitUntil();
-    if (earliestWaitUntil != null) {
+    // earliestWaitUntil can be past if an earlier ship needed to wait
+    // but then later ships took longer than that wait time to process.
+    if (earliestWaitUntil != null &&
+        earliestWaitUntil.isAfter(DateTime.now())) {
       // This future waits until the earliest time we think the server
       // will be ready for us to do something.
       final waitDuration = earliestWaitUntil.difference(DateTime.now());
