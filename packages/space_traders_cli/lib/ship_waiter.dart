@@ -61,6 +61,7 @@ class ShipWaiter {
       return null;
     }
     final nextEventTimes = _waitUntilByShipSymbol.values;
+    // This could also check against "now" to avoid waiting?
     return nextEventTimes.reduce((a, b) => a.isBefore(b) ? a : b);
   }
 }
