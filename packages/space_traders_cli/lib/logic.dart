@@ -26,12 +26,12 @@ Behavior _behaviorFor(
   // bad loop where at limit X, we buy stuff, now under the limit, so we
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
-  // if (ship.engine.speed > 20) {
-  //   if (maybeGoods != null) {
-  //     return Behavior.contractTrader;
-  //   }
-  //   return Behavior.arbitrageTrader;
-  // }
+  if (ship.engine.speed > 20) {
+    // if (maybeGoods != null) {
+    //   return Behavior.contractTrader;
+    // }
+    //   return Behavior.arbitrageTrader;
+  }
   // Could check if it has a mining laser or ship.isExcavator
   if (ship.canMine) {
     return Behavior.miner;
@@ -290,6 +290,31 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   return response;
 }
 
+Future<DateTime?> _navigateToNearbyMarketIfNeeded(
+  Api api,
+  Ship ship,
+  List<Waypoint> systemWaypoints,
+  List<Market> allMarkets,
+  String tradeSymbol,
+) async {
+  // This needs to find nearby market with the desired tradeSymbol
+  // ideally under median price.
+
+  // This should also consider the current market.
+  var markets = _marketsWithExport(tradeSymbol, allMarkets);
+  if (markets.isEmpty) {
+    markets = _marketsWithExchange(tradeSymbol, allMarkets);
+  }
+  final marketSymbol = markets.firstOrNull?.symbol;
+  if (marketSymbol == null) {
+    logger.err('No markets nearby with $tradeSymbol.');
+    // TODO(eseidel): Instead of waiting we should stop doing this behavior.
+    return DateTime.now().add(const Duration(hours: 1));
+  }
+  final destination = lookupWaypoint(marketSymbol, systemWaypoints);
+  return navigateToAndLog(api, ship, destination);
+}
+
 /// One loop of the trading logic
 Future<DateTime?> advanceContractTrader(
   Api api,
@@ -331,14 +356,13 @@ Future<DateTime?> advanceContractTrader(
     // Sell anything we have.
     await sellCargoAndLog(api, priceData, ship);
     // nav to place nearby exporting our contract goal.
-    // This should also consider the current market.
-    var markets = _marketsWithExport(goods.tradeSymbol, allMarkets);
-    if (markets.isEmpty) {
-      markets = _marketsWithExchange(goods.tradeSymbol, allMarkets);
-    }
-    final marketSymbol = markets.firstOrNull?.symbol;
-    final destination = lookupWaypoint(marketSymbol!, systemWaypoints);
-    return navigateToAndLog(api, ship, destination);
+    return _navigateToNearbyMarketIfNeeded(
+      api,
+      ship,
+      systemWaypoints,
+      allMarkets,
+      goods.tradeSymbol,
+    );
   }
 
   // Otherwise if we're not at our contract destination.
@@ -378,6 +402,13 @@ Future<DateTime?> advanceContractTrader(
       shipInfo(
         ship,
         '${goods.tradeSymbol} is too expensive at ${currentWaypoint.symbol}',
+      );
+      return _navigateToNearbyMarketIfNeeded(
+        api,
+        ship,
+        systemWaypoints,
+        allMarkets,
+        goods.tradeSymbol,
       );
     }
   }
