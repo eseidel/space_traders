@@ -160,3 +160,14 @@ String durationString(Duration duration) {
   final twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
   return '${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
 }
+
+/// Logs the remaining transit time for [ship] and returns the arrival time.
+DateTime logRemainingTransitTime(Ship ship) {
+  final flightTime = ship.nav.route.arrival.difference(DateTime.now());
+  shipInfo(
+    ship,
+    'In transit to ${ship.nav.waypointSymbol} '
+    '(${durationString(flightTime)} left)',
+  );
+  return ship.nav.route.arrival;
+}

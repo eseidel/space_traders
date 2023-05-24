@@ -88,8 +88,8 @@ Future<DateTime?> advanceMiner(
   List<Waypoint> systemWaypoints,
 ) async {
   if (ship.isInTransit) {
-    // Just go back to sleep until the ship is done flying.
-    return ship.nav.route.arrival;
+    // Go back to sleep until we arrive.
+    return logRemainingTransitTime(ship);
   }
   final currentWaypoint =
       lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
@@ -179,8 +179,8 @@ Future<DateTime?> advanceArbitrageTrader(
   List<Waypoint> systemWaypoints,
 ) async {
   if (ship.isInTransit) {
-    // Do nothing for now.
-    return ship.nav.route.arrival;
+    // Go back to sleep until we arrive.
+    return logRemainingTransitTime(ship);
   }
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
@@ -303,7 +303,7 @@ Future<DateTime?> advanceContractTrader(
 ) async {
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
-    return ship.nav.route.arrival;
+    return logRemainingTransitTime(ship);
   }
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
@@ -403,7 +403,7 @@ Future<DateTime?> advanceExporer(
 ) async {
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
-    return ship.nav.route.arrival;
+    return logRemainingTransitTime(ship);
   }
   // Check our current waypoint.  If it's not charted or doesn't have current
   // market data, chart it and/or record market data.
