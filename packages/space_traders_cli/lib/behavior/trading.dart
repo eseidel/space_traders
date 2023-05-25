@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
@@ -127,14 +126,13 @@ void logDeals(List<Deal> deals) {
 }
 
 /// Find the best deal that can be made from [currentWaypoint].
-Future<Deal?> findBestDeal(
-  Api api,
+Deal? findBestDeal(
   PriceData priceData,
   Ship ship,
   Waypoint currentWaypoint,
   List<Market> allMarkets, {
   int minimumProfitPer = 0,
-}) async {
+}) {
   // Fetch all marketplace data
   final localMarket =
       allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);

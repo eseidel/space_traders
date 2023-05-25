@@ -17,7 +17,6 @@ class MockWaypoint extends Mock implements Waypoint {}
 void main() {
   test('findBestDeal', () async {
     final fs = MemoryFileSystem();
-    final api = MockApi();
     final ship = MockShip();
     final currentWaypoint = MockWaypoint();
     when(() => currentWaypoint.symbol).thenReturn('a');
@@ -43,8 +42,7 @@ void main() {
     ];
 
     // We fail to find a deal with no price data.
-    final deal = await findBestDeal(
-      api,
+    final deal = findBestDeal(
       PriceData([], fs: fs),
       ship,
       currentWaypoint,
@@ -52,8 +50,7 @@ void main() {
     );
     expect(deal, null);
 
-    final deal2 = await findBestDeal(
-      api,
+    final deal2 = findBestDeal(
       PriceData(
         [
           Price(

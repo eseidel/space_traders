@@ -50,8 +50,7 @@ Future<DateTime?> advanceArbitrageTrader(
   // Sell any cargo we can.
   ship.cargo = await sellCargoAndLog(api, priceData, ship);
   const minimumProfit = 500;
-  final deal = await findBestDeal(
-    api,
+  final deal = findBestDeal(
     priceData,
     ship,
     currentWaypoint,
