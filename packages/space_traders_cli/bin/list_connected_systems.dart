@@ -11,6 +11,7 @@ void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
 
+  final waypointCache = WaypointCache(api);
   final agentResult = await api.agents.getMyAgent();
 
   final agent = agentResult!.data;
@@ -26,7 +27,7 @@ void main(List<String> args) async {
   final jumpGate = jumpGateResponse!.data;
   for (final system in jumpGate.connectedSystems) {
     logger.info('${system.symbol} - ${system.distance}');
-    final waypoints = await waypointsInSystem(api, system.symbol).toList();
+    final waypoints = await waypointCache.waypointsInSystem(system.symbol);
     printWaypoints(waypoints, indent: '  ');
   }
 }

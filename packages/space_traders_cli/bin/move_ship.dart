@@ -49,6 +49,7 @@ Future<void> _navigateAndDock(
 void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
+  final waypointCache = WaypointCache(api);
 
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
@@ -91,7 +92,7 @@ void main(List<String> args) async {
   );
 
   final destSystemWaypoints =
-      await waypointsInSystem(api, destSystem.symbol).toList();
+      await waypointCache.waypointsInSystem(destSystem.symbol);
 
   final destWaypoint = logger.chooseOne(
     'To where?',

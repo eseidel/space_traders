@@ -8,11 +8,13 @@ import 'package:space_traders_cli/queries.dart';
 void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
+  final waypointCache = WaypointCache(api);
+  final marketCache = MarketCache(waypointCache);
 
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
+  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
   final marketplaceWaypoints =
       systemWaypoints.where((w) => w.hasMarketplace).toList();
 
@@ -22,6 +24,6 @@ void main(List<String> args) async {
     display: waypointDescription,
   );
 
-  final market = await getMarket(api, waypoint);
-  prettyPrintJson(market.toJson());
+  final market = await marketCache.marketForSymbol(waypoint.symbol);
+  prettyPrintJson(market!.toJson());
 }

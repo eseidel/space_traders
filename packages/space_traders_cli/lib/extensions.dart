@@ -7,12 +7,14 @@ import 'package:space_traders_cli/logger.dart';
 
 /// lookupWaypoint looks up a Waypoint by its symbol in the given list of
 /// Waypoint objects.
+/// Most cases you want to use WaypointCache instead of this.
 Waypoint lookupWaypoint(String waypointSymbol, List<Waypoint> systemWaypoints) {
   return systemWaypoints.firstWhere((w) => w.symbol == waypointSymbol);
 }
 
 /// lookupMarket looks up a Market by its symbol in the given list of Market
 /// objects.
+/// Most cases you want to use MarketCache instead of this.
 Market lookupMarket(String waypointSymbol, List<Market> markets) {
   return markets.firstWhere((m) => m.symbol == waypointSymbol);
 }

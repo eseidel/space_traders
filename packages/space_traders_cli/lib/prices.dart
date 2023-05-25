@@ -84,10 +84,10 @@ class Price {
   /// The supply level of the trade good.
   final MarketTradeGoodSupplyEnum supply;
 
-  /// The purchase price of the trade good.
+  /// The price at which this good can be purchased from the market.
   final int purchasePrice;
 
-  /// The sell price of the trade good.
+  /// The price at which this good can be sold to the market.
   final int sellPrice;
 
   /// The trade volume of the trade good.
@@ -299,25 +299,31 @@ class PriceData {
 
   /// Returns all known sell prices for a trade good, optionally restricted
   /// to a specific waypoint.
-  Iterable<Price> sellPricesFor(String symbol, {String? waypoint}) {
-    final filter = waypoint == null
-        ? (Price e) => e.symbol == symbol && e.sellPrice > 0
+  Iterable<Price> sellPricesFor({
+    required String tradeSymbol,
+    String? marketSymbol,
+  }) {
+    final filter = marketSymbol == null
+        ? (Price e) => e.symbol == tradeSymbol && e.sellPrice > 0
         : (Price e) =>
-            e.symbol == symbol &&
+            e.symbol == tradeSymbol &&
             e.sellPrice > 0 &&
-            e.waypointSymbol == waypoint;
+            e.waypointSymbol == marketSymbol;
     return _prices.where(filter);
   }
 
   /// Returns all known purchase prices for a trade good, optionally restricted
   /// to a specific waypoint.
-  Iterable<Price> purchasePricesFor(String symbol, {String? waypoint}) {
-    final filter = waypoint == null
-        ? (Price e) => e.symbol == symbol && e.purchasePrice > 0
+  Iterable<Price> purchasePricesFor({
+    required String tradeSymbol,
+    String? marketSymbol,
+  }) {
+    final filter = marketSymbol == null
+        ? (Price e) => e.symbol == tradeSymbol && e.purchasePrice > 0
         : (Price e) =>
-            e.symbol == symbol &&
+            e.symbol == tradeSymbol &&
             e.purchasePrice > 0 &&
-            e.waypointSymbol == waypoint;
+            e.waypointSymbol == marketSymbol;
     return _prices.where(filter);
   }
 
@@ -334,8 +340,8 @@ class PriceData {
       );
     }
     final pricesForSymbol = action == MarketTransactionTypeEnum.PURCHASE
-        ? purchasePricesFor(symbol)
-        : sellPricesFor(symbol);
+        ? purchasePricesFor(tradeSymbol: symbol)
+        : sellPricesFor(tradeSymbol: symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -357,8 +363,8 @@ class PriceData {
         ? _purchasePriceAcending
         : _sellPriceAcending;
     final pricesForSymbol = action == MarketTransactionTypeEnum.PURCHASE
-        ? purchasePricesFor(symbol)
-        : sellPricesFor(symbol);
+        ? purchasePricesFor(tradeSymbol: symbol)
+        : sellPricesFor(tradeSymbol: symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -402,7 +408,8 @@ class PriceData {
     required String tradeSymbol,
     Duration? maxAge,
   }) {
-    final pricesForSymbol = sellPricesFor(tradeSymbol, waypoint: marketSymbol);
+    final pricesForSymbol =
+        sellPricesFor(tradeSymbol: tradeSymbol, marketSymbol: marketSymbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }

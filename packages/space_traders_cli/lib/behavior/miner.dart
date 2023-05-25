@@ -8,6 +8,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/queries.dart';
 
 /// Either loads a cached survey set or creates a new one if we have a surveyor.
 Future<SurveySet?> loadOrCreateSurveySetIfPossible(
@@ -55,16 +56,17 @@ Future<DateTime?> advanceMiner(
   PriceData priceData,
   Agent agent,
   Ship ship,
-  List<Waypoint> systemWaypoints,
+  WaypointCache waypointCache,
 ) async {
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
     return logRemainingTransitTime(ship);
   }
-  final currentWaypoint =
-      lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   if (!currentWaypoint.isAsteroidField) {
     // We're not at an asteroid field, so we need to navigate to one.
+    final systemWaypoints =
+        await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
     final asteroidField = systemWaypoints.firstWhere((w) => w.isAsteroidField);
     return navigateToAndLog(api, ship, asteroidField);
   }

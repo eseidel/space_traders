@@ -20,7 +20,9 @@ void main(List<String> args) async {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
+  final waypointCache = WaypointCache(api);
+  final marketCache = MarketCache(waypointCache);
+  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
 
   final myShips = await allMyShips(api).toList();
   final ship = logger.chooseOne(
@@ -36,13 +38,12 @@ void main(List<String> args) async {
 
   // Dock if needed?
 
-  final waypoint = lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-  final market = await getMarket(api, waypoint);
+  final market = await marketCache.marketForSymbol(ship.nav.waypointSymbol);
 
   // List all the goods this market sells with their prices.
   final good = logger.chooseOne(
     'Which item type?',
-    choices: market.tradeGoods,
+    choices: market!.tradeGoods,
     display: displayGood,
   );
 

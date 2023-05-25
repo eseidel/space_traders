@@ -25,6 +25,7 @@ String describeShipType(ShipType type, Shipyard shipyard, PriceData priceData) {
 void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
+  final waypointCache = WaypointCache(api);
 
   final priceData = await PriceData.load(fs);
 
@@ -32,7 +33,7 @@ void main(List<String> args) async {
 
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
+  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
   final shipyardWaypoints =
       systemWaypoints.where((w) => w.hasShipyard).toList();
 

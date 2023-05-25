@@ -21,7 +21,8 @@ Future<DateTime?> advanceExporer(
   PriceData priceData,
   Agent agent,
   Ship ship,
-  List<Waypoint> systemWaypoints,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
 ) async {
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
@@ -29,21 +30,22 @@ Future<DateTime?> advanceExporer(
   }
   // Check our current waypoint.  If it's not charted or doesn't have current
   // market data, chart it and/or record market data.
-  final currentWaypoint =
-      lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   if (currentWaypoint.chart == null) {
     await chartWaypointAndLog(api, ship);
     return null;
   }
   if (currentWaypoint.hasMarketplace &&
       !priceData.hasRecentMarketData(currentWaypoint.symbol)) {
-    final market = await getMarket(api, currentWaypoint);
-    await recordMarketDataAndLog(priceData, market, ship);
+    final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
+    await recordMarketDataAndLog(priceData, market!, ship);
     return null;
   }
   // Check the current system waypoints.
   // If any are not explored, or have a market but don't have recent market
   // data, got there.
+  final systemWaypoints =
+      await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
   for (final waypoint in systemWaypoints) {
     if (_isMissingChartOrRecentMarketData(priceData, waypoint)) {
       return navigateToAndLog(api, ship, waypoint);
@@ -53,10 +55,12 @@ Future<DateTime?> advanceExporer(
   // If at a jump gate, go to a nearby system with unexplored waypoints or
   // missing market data.
   if (currentWaypoint.isJumpGate) {
+    // Should look at systems connected to hq and go to the one closest to
+    // hq with unexplored waypoints or missing market data.
     final jumpGate = await getJumpGate(api, currentWaypoint);
     for (final connectedSystem in jumpGate.connectedSystems) {
       final systemWaypoints =
-          await waypointsInSystem(api, connectedSystem.symbol).toList();
+          await waypointCache.waypointsInSystem(connectedSystem.symbol);
       for (final waypoint in systemWaypoints) {
         if (_isMissingChartOrRecentMarketData(priceData, waypoint)) {
           shipInfo(

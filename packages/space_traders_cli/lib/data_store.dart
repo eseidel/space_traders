@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/behavior/behavior.dart';
 
 /// A simple data store that uses Sembast to store data in a JSON file.
 class DataStore {
@@ -101,4 +102,31 @@ Future<void> saveSurveySet(DataStore db, SurveySet surveySet) async {
 Future<void> deleteSurveySet(DataStore db, String waypointSymbol) async {
   final store = stringMapStoreFactory.store('surveys');
   await store.record(waypointSymbol).delete(db.db);
+}
+
+/// Saves the passed [behaviorState] to the data store.
+Future<void> saveBehaviorState(
+  DataStore db,
+  String shipId,
+  BehaviorState behaviorState,
+) async {
+  final store = stringMapStoreFactory.store('behavior');
+  await store.record(shipId).put(db.db, behaviorState.toJson());
+}
+
+/// Loads the behavior state for the given [shipId] from the data store.
+Future<BehaviorState?> loadBehaviorState(DataStore db, String shipId) async {
+  final store = stringMapStoreFactory.store('behavior');
+  final record = store.record(shipId);
+  final value = await record.get(db.db);
+  if (value == null) {
+    return null;
+  }
+  return BehaviorState.fromJson(value);
+}
+
+/// Deletes the behavior state for the given [shipId] from the data store.
+Future<void> deleteBehaviorState(DataStore db, String shipId) async {
+  final store = stringMapStoreFactory.store('behavior');
+  await store.record(shipId).delete(db.db);
 }

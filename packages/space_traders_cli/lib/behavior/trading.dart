@@ -8,6 +8,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 
 /// Record of a possible arbitrage opportunity.
+// This should also include expected cost of fuel and cost of time.
 class Deal {
   /// Create a new deal.
   Deal({

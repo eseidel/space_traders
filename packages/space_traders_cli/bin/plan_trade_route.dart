@@ -26,6 +26,7 @@ void logPrices(List<Price> prices) {
 void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
+  final waypointCache = WaypointCache(api);
 
   final priceData = await PriceData.load(fs);
   final agentResult = await api.agents.getMyAgent();
@@ -46,7 +47,8 @@ void main(List<String> args) async {
 
   final waypoints = [
     for (final systemName in systemNames)
-      await for (final waypoint in waypointsInSystem(api, systemName)) waypoint
+      for (final waypoint in await waypointCache.waypointsInSystem(systemName))
+        waypoint
   ];
   // Given a set of waypoints.
   // Look at the pricing data.

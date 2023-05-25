@@ -16,12 +16,13 @@ void printShipDetails(Ship ship, List<Waypoint> systemWaypoints) {
 void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
+  final waypointCache = WaypointCache(api);
 
   final agentResult = await api.agents.getMyAgent();
 
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointsInSystem(api, hq.system).toList();
+  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
 
   final myShips = await allMyShips(api).toList();
   final ship = logger.chooseOne(

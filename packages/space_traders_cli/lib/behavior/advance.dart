@@ -7,6 +7,7 @@ import 'package:space_traders_cli/behavior/miner.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/queries.dart';
 
 /// Advance the behavior of the given ship.
 /// Returns the time at which the behavior should be advanced again
@@ -14,14 +15,16 @@ import 'package:space_traders_cli/prices.dart';
 Future<DateTime?> advanceShipBehavior(
   Api api,
   DataStore db,
+  BehaviorManager behaviorManager,
   PriceData priceData,
   Agent agent,
   Ship ship,
-  List<Waypoint> systemWaypoints,
-  BehaviorState behavior,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
   Contract? contract,
   ContractDeliverGood? maybeGoods,
 ) async {
+  final behavior = await behaviorManager.getBehavior(ship.symbol);
   switch (behavior.behavior) {
     case Behavior.contractTrader:
       return advanceContractTrader(
@@ -30,7 +33,8 @@ Future<DateTime?> advanceShipBehavior(
         priceData,
         agent,
         ship,
-        systemWaypoints,
+        waypointCache,
+        marketCache,
         contract!,
         maybeGoods!,
       );
@@ -41,7 +45,8 @@ Future<DateTime?> advanceShipBehavior(
         priceData,
         agent,
         ship,
-        systemWaypoints,
+        waypointCache,
+        marketCache,
       );
     case Behavior.miner:
       return advanceMiner(
@@ -50,7 +55,7 @@ Future<DateTime?> advanceShipBehavior(
         priceData,
         agent,
         ship,
-        systemWaypoints,
+        waypointCache,
       );
 
     case Behavior.explorer:
@@ -60,7 +65,8 @@ Future<DateTime?> advanceShipBehavior(
         priceData,
         agent,
         ship,
-        systemWaypoints,
+        waypointCache,
+        marketCache,
       );
   }
 }

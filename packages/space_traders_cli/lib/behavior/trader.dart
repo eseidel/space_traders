@@ -18,7 +18,8 @@ Future<DateTime?> advanceArbitrageTrader(
   PriceData priceData,
   Agent agent,
   Ship ship,
-  List<Waypoint> systemWaypoints,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
 ) async {
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
@@ -26,8 +27,9 @@ Future<DateTime?> advanceArbitrageTrader(
   }
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
-  final currentWaypoint =
-      lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final systemWaypoints =
+      await waypointCache.waypointsInSystem(currentWaypoint.systemSymbol);
   if (!currentWaypoint.hasMarketplace) {
     // We are not at a marketplace, nothing to do, other than navigate to the
     // the nearest marketplace to fuel up and try again.
@@ -41,7 +43,8 @@ Future<DateTime?> advanceArbitrageTrader(
   }
 
   // We are at a marketplace, so we can trade.
-  final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
+  final allMarkets =
+      await marketCache.marketsInSystem(currentWaypoint.systemSymbol).toList();
   final currentMarket = lookupMarket(currentWaypoint.symbol, allMarkets);
   await recordMarketData(priceData, currentMarket);
   // Sell any cargo we can.
@@ -66,6 +69,8 @@ Future<DateTime?> advanceArbitrageTrader(
     );
     final otherMarkets =
         allMarkets.where((m) => m.symbol != currentMarket.symbol).toList();
+    // TODO(eseidel): This should not be random, rather should look at the
+    // cached price data for the markets and pick one with best deals.
     final otherMarket = otherMarkets[Random().nextInt(otherMarkets.length)];
     final waypoint = lookupWaypoint(otherMarket.symbol, systemWaypoints);
     shipInfo(

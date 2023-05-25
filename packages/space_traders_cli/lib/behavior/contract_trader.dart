@@ -54,12 +54,15 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
 Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   Api api,
   Ship ship,
-  List<Waypoint> systemWaypoints,
-  List<Market> allMarkets,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
   String tradeSymbol,
 ) async {
   // This needs to find nearby market with the desired tradeSymbol
   // ideally under median price.
+
+  final allMarkets =
+      await marketCache.marketsInSystem(ship.nav.systemSymbol).toList();
 
   // This should also consider the current market.
   var markets = _marketsWithExport(tradeSymbol, allMarkets);
@@ -72,7 +75,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     // TODO(eseidel): Instead of waiting we should stop doing this behavior.
     return DateTime.now().add(const Duration(hours: 1));
   }
-  final destination = lookupWaypoint(marketSymbol, systemWaypoints);
+  final destination = await waypointCache.waypoint(marketSymbol);
   return navigateToAndLog(api, ship, destination);
 }
 
@@ -83,7 +86,8 @@ Future<DateTime?> advanceContractTrader(
   PriceData priceData,
   Agent agent,
   Ship ship,
-  List<Waypoint> systemWaypoints,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
   Contract contract,
   ContractDeliverGood goods,
 ) async {
@@ -93,11 +97,7 @@ Future<DateTime?> advanceContractTrader(
   }
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
-  final currentWaypoint =
-      lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
-
-  final allMarkets = await getAllMarkets(api, systemWaypoints).toList();
-
+  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   // If we're at our contract destination.
   if (currentWaypoint.symbol == goods.destinationSymbol) {
     final maybeResponse =
@@ -120,8 +120,8 @@ Future<DateTime?> advanceContractTrader(
     return _navigateToNearbyMarketIfNeeded(
       api,
       ship,
-      systemWaypoints,
-      allMarkets,
+      waypointCache,
+      marketCache,
       goods.tradeSymbol,
     );
   }
@@ -129,16 +129,13 @@ Future<DateTime?> advanceContractTrader(
   // Otherwise if we're not at our contract destination.
   // And it has a market.
   if (currentWaypoint.hasMarketplace) {
-    final market = lookupMarket(currentWaypoint.symbol, allMarkets);
-    final maybeGood = market.tradeGoods
+    final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
+    final maybeGood = market!.tradeGoods
         .firstWhereOrNull((g) => g.symbol == goods.tradeSymbol);
-    final medianPurchasePrice =
-        priceData.medianPurchasePrice(goods.tradeSymbol);
-    // And our contract goal is selling < market.
-    // Or we don't know what "market" price is.
-    if (maybeGood != null &&
-        (medianPurchasePrice == null ||
-            maybeGood.purchasePrice < medianPurchasePrice)) {
+    final minimumProfitUnitPrice =
+        contract.terms.payment.onFulfilled / goods.unitsRequired;
+    // And our contract goal is selling < contract profit unit price.
+    if (maybeGood != null && maybeGood.purchasePrice < minimumProfitUnitPrice) {
       // Sell everything we have except the contract goal.
       final cargo = await sellCargoAndLog(
         api,
@@ -167,13 +164,13 @@ Future<DateTime?> advanceContractTrader(
       return _navigateToNearbyMarketIfNeeded(
         api,
         ship,
-        systemWaypoints,
-        allMarkets,
+        waypointCache,
+        marketCache,
         goods.tradeSymbol,
       );
     }
   }
   // Regardless, navigate to contract destination.
-  final destination = lookupWaypoint(goods.destinationSymbol, systemWaypoints);
+  final destination = await waypointCache.waypoint(goods.destinationSymbol);
   return navigateToAndLog(api, ship, destination);
 }

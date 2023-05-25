@@ -26,7 +26,7 @@ Behavior _behaviorFor(
     // if (maybeGoods != null) {
     //   return Behavior.contractTrader;
     // }
-    //   return Behavior.arbitrageTrader;
+    // return Behavior.arbitrageTrader;
   }
   // Could check if it has a mining laser or ship.isExcavator
   if (ship.canMine) {
@@ -35,9 +35,13 @@ Behavior _behaviorFor(
   return Behavior.explorer;
 }
 
-BehaviorState? _loadBehaviorState(String shipSymbol) {
-  return null;
-}
+// Stream<Waypoint> waypointsInJumpRadius({
+//   required Waypoint start,
+//   required WaypointCache waypointCache,
+//   required int jumpRadius,
+// }) {
+//   throw UnimplementedError();
+// }
 
 /// One loop of the logic.
 Future<void> logicLoop(
@@ -46,6 +50,8 @@ Future<void> logicLoop(
   PriceData priceData,
   ShipWaiter waiter,
 ) async {
+  final waypointCache = WaypointCache(api);
+  final marketCache = MarketCache(waypointCache);
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final myShips = await allMyShips(api).toList();
@@ -73,28 +79,26 @@ Future<void> logicLoop(
   // printShips(myShips, systemWaypoints);
   // loop over all mining ships and advance them.
   for (final ship in myShips) {
-    // Could cache waypoints between ships.
-    final systemWaypoints =
-        await waypointsInSystem(api, ship.nav.systemSymbol).toList();
     final previousWait = waiter.waitUntil(ship.symbol);
     if (previousWait != null) {
       continue;
     }
     // We should only generate a new behavior when we're done with our last
     // behavior?
-    var behaviorState = _loadBehaviorState(ship.symbol);
-    behaviorState ??= BehaviorState(
-      _behaviorFor(ship, agent, maybeGoods),
-    );
+    final behaviorManager = BehaviorManager(db, (shipSymbol) {
+      final ship = myShips.firstWhere((s) => s.symbol == shipSymbol);
+      return _behaviorFor(ship, agent, maybeGoods);
+    });
     try {
       final waitUntil = await advanceShipBehavior(
         api,
         db,
+        behaviorManager,
         priceData,
         agent,
         ship,
-        systemWaypoints,
-        behaviorState,
+        waypointCache,
+        marketCache,
         contract,
         maybeGoods,
       );
