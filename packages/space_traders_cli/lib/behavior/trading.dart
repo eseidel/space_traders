@@ -27,15 +27,15 @@ class Deal {
   /// The symbol of the market we're selling to.
   final String destinationSymbol;
 
-  /// The price we're buying at.
+  /// The price we're buying at per unit.
   final int purchasePrice;
 
-  /// The price we're selling at.
+  /// The price we're selling at per unit.
   final int sellPrice;
   // Also should take fuel costs into account.
   // And possibly time?
 
-  /// The profit we'll make on this deal.
+  /// The profit we'll make on this deal per unit.
   int get profit => sellPrice - purchasePrice;
 }
 

@@ -47,6 +47,7 @@ Future<DateTime?> advanceShipBehavior(
         ship,
         waypointCache,
         marketCache,
+        behaviorManager,
       );
     case Behavior.miner:
       return advanceMiner(

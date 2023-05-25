@@ -114,6 +114,32 @@ Future<void> saveBehaviorState(
   await store.record(shipId).put(db.db, behaviorState.toJson());
 }
 
+/// Saves the passed [behaviorTimeouts] to the data store.
+Future<void> saveBehaviorTimeouts(
+  DataStore db,
+  Map<Behavior, DateTime> behaviorTimeouts,
+) {
+  final store = stringMapStoreFactory.store('behavior');
+  final jsonMap = behaviorTimeouts
+      .map((k, v) => MapEntry(k.toJson(), v.toUtc().toIso8601String()));
+  return store.record('timeout').put(db.db, jsonMap);
+}
+
+/// Loads the behavior timeouts from the data store.
+Future<Map<Behavior, DateTime>?> loadBehaviorTimeouts(DataStore db) async {
+  final store = stringMapStoreFactory.store('behavior');
+  final jsonMap = await store.record('timeout').get(db.db);
+  if (jsonMap == null) {
+    return null;
+  }
+  return jsonMap.map(
+    (k, v) => MapEntry(
+      Behavior.fromJson(k),
+      DateTime.parse(v! as String),
+    ),
+  );
+}
+
 /// Loads the behavior state for the given [shipId] from the data store.
 Future<BehaviorState?> loadBehaviorState(DataStore db, String shipId) async {
   final store = stringMapStoreFactory.store('behavior');

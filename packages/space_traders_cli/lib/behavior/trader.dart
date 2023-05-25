@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
@@ -10,6 +9,35 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
+
+Future<Deal?> _findBestDealInSystem(
+  PriceData priceData,
+  Ship ship,
+  WaypointCache waypointCache,
+  MarketCache marketCache, {
+  int minimumProfitPer = 0,
+}) async {
+  final allMarkets =
+      await marketCache.marketsInSystem(ship.nav.systemSymbol).toList();
+  final systemWaypoints =
+      await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
+  final deals = allMarkets
+      .map(
+        (m) => findBestDeal(
+          priceData,
+          ship,
+          lookupWaypoint(m.symbol, systemWaypoints),
+          allMarkets,
+          minimumProfitPer: minimumProfitPer,
+        ),
+      )
+      .whereType<Deal>()
+      .toList();
+  if (deals.isEmpty) {
+    return null;
+  }
+  return deals.reduce((a, b) => a.profit > b.profit ? a : b);
+}
 
 /// One loop of the trading logic
 Future<DateTime?> advanceArbitrageTrader(
@@ -20,6 +48,7 @@ Future<DateTime?> advanceArbitrageTrader(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
+  BehaviorManager behaviorManager,
 ) async {
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
@@ -61,17 +90,29 @@ Future<DateTime?> advanceArbitrageTrader(
   // Deal can return null if there are no markets or all we can
   // see are unprofitable deals, in which case we just try another market.
   if (deal == null) {
+    final otherDeal = await _findBestDealInSystem(
+      priceData,
+      ship,
+      waypointCache,
+      marketCache,
+      minimumProfitPer: minimumProfit,
+    );
+    if (otherDeal == null) {
+      await behaviorManager.disableBehavior(Behavior.arbitrageTrader);
+      shipInfo(
+        ship,
+        'No deals >${creditsString(minimumProfit)} '
+        'profit, disabling trader behavior.',
+      );
+      return null;
+    }
+    // TODO(eseidel): Save the deal we found so we don't have to recompute it.
     shipInfo(
       ship,
       '🎲 trying another market, no deals >${creditsString(minimumProfit)} '
       'profit at ${currentMarket.symbol}',
     );
-    final otherMarkets =
-        allMarkets.where((m) => m.symbol != currentMarket.symbol).toList();
-    // TODO(eseidel): This should not be random, rather should look at the
-    // cached price data for the markets and pick one with best deals.
-    final otherMarket = otherMarkets[Random().nextInt(otherMarkets.length)];
-    final waypoint = lookupWaypoint(otherMarket.symbol, systemWaypoints);
+    final waypoint = lookupWaypoint(otherDeal.sourceSymbol, systemWaypoints);
     shipInfo(
       ship,
       'Distance: ${currentWaypoint.distanceTo(waypoint)}, '

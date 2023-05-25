@@ -13,6 +13,7 @@ import 'package:space_traders_cli/ship_waiter.dart';
 
 // At the top of the file because I change this so often.
 Behavior _behaviorFor(
+  BehaviorManager behaviorManager,
   Ship ship,
   Agent agent,
   ContractDeliverGood? maybeGoods,
@@ -23,13 +24,16 @@ Behavior _behaviorFor(
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
   if (ship.engine.speed > 20) {
-    // if (maybeGoods != null) {
+    // if (maybeGoods != null &&
+    //     behaviorManager.isEnabled(Behavior.contractTrader)) {
     //   return Behavior.contractTrader;
     // }
-    // return Behavior.arbitrageTrader;
+    if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
+      return Behavior.arbitrageTrader;
+    }
   }
   // Could check if it has a mining laser or ship.isExcavator
-  if (ship.canMine) {
+  if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
     return Behavior.miner;
   }
   return Behavior.explorer;
@@ -85,9 +89,9 @@ Future<void> logicLoop(
     }
     // We should only generate a new behavior when we're done with our last
     // behavior?
-    final behaviorManager = BehaviorManager(db, (shipSymbol) {
+    final behaviorManager = await BehaviorManager.load(db, (bm, shipSymbol) {
       final ship = myShips.firstWhere((s) => s.symbol == shipSymbol);
-      return _behaviorFor(ship, agent, maybeGoods);
+      return _behaviorFor(bm, ship, agent, maybeGoods);
     });
     try {
       final waitUntil = await advanceShipBehavior(
