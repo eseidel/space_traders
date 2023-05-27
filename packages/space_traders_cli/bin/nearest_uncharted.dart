@@ -1,12 +1,11 @@
 import 'dart:core';
 
-
 // Future<List<String>?> _innerRouteToNearestUnchartedWaypoint(
 //   Api api,
 //   Set<String> consideredSystems,
 //   String waypointSymbol,
 // ) async {
-//   final systemWaypoints = 
+//   final systemWaypoints =
 //  await waypointsInSystem(api, currentSystem).toList();
 //   final currentWaypoint = lookupWaypoint(waypointSymbol, systemWaypoints);
 
