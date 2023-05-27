@@ -8,7 +8,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
-const _defaultMaxAge = Duration(days: 3);
+const _defaultMaxAge = Duration(days: 2);
 
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
   return waypoint.chart == null ||
@@ -82,7 +82,10 @@ Future<DateTime?> advanceExporer(
         }
       }
     }
-    logger.err('No unexplored systems connected to ${currentWaypoint.symbol}');
+    shipErr(
+      ship,
+      'No unexplored systems connected to ${currentWaypoint.symbol}',
+    );
     return DateTime.now().add(const Duration(days: 1));
   }
 
