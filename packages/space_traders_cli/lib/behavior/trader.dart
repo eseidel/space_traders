@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
@@ -62,12 +63,10 @@ Future<DateTime?> advanceArbitrageTrader(
   if (!currentWaypoint.hasMarketplace) {
     // We are not at a marketplace, nothing to do, other than navigate to the
     // the nearest marketplace to fuel up and try again.
-    final nearestMarket = systemWaypoints.where((w) => w.hasMarketplace).reduce(
-          (a, b) =>
-              a.distanceTo(currentWaypoint) < b.distanceTo(currentWaypoint)
-                  ? a
-                  : b,
-        );
+    final nearestMarket = systemWaypoints
+        .where((w) => w.hasMarketplace)
+        .sortedBy<num>((w) => currentWaypoint.distanceWithinSystemTo(w)!)
+        .first;
     return navigateToAndLog(api, ship, nearestMarket);
   }
 
@@ -115,7 +114,7 @@ Future<DateTime?> advanceArbitrageTrader(
     final waypoint = lookupWaypoint(otherDeal.sourceSymbol, systemWaypoints);
     shipInfo(
       ship,
-      'Distance: ${currentWaypoint.distanceTo(waypoint)}, '
+      'Distance: ${currentWaypoint.distanceWithinSystemTo(waypoint)!}, '
       'currentFuel: ${ship.fuel.current}',
     );
     return navigateToAndLog(api, ship, waypoint);

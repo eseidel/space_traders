@@ -44,7 +44,10 @@ extension WaypointUtils on Waypoint {
   }
 
   /// Returns the distance to the given waypoint.
-  int distanceTo(Waypoint other) {
+  int? distanceWithinSystemTo(Waypoint other) {
+    if (other.systemSymbol != systemSymbol) {
+      return null;
+    }
     // Use euclidean distance.
     final dx = other.x - x;
     final dy = other.y - y;
@@ -52,31 +55,32 @@ extension WaypointUtils on Waypoint {
   }
 
   /// Returns the fuel cost to the given waypoint.
-  int fuelCostTo(
+  int fuelCostWithinSystemTo(
     Waypoint other, {
     ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
   }) {
+    final distance = distanceWithinSystemTo(other)!;
     switch (flightMode) {
       case ShipNavFlightMode.DRIFT:
         return 1;
       case ShipNavFlightMode.STEALTH:
-        return distanceTo(other);
+        return distance;
       case ShipNavFlightMode.CRUISE:
-        return distanceTo(other);
+        return distance;
       case ShipNavFlightMode.BURN:
-        return 2 * distanceTo(other);
+        return 2 * distance;
     }
     throw UnimplementedError('Unknown flight mode: $flightMode');
   }
 
   /// Returns the flight time to the given waypoint.
-  int flightTimeInSeconds(
+  int flightTimeWithinSystemInSeconds(
     Waypoint other, {
     required ShipNavFlightMode flightMode,
     required int shipSpeed,
   }) {
     // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
-    final distance = distanceTo(other);
+    final distance = distanceWithinSystemTo(other)!;
     final distanceBySpeed = distance ~/ shipSpeed;
 
     switch (flightMode) {
