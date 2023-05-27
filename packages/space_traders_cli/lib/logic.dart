@@ -116,6 +116,8 @@ Future<void> logicLoop(
         // Was not a reactor cooldown, just rethrow.
         rethrow;
       }
+      final difference = expiration.difference(DateTime.now());
+      shipInfo(ship, '🥶 for ${durationString(difference)}');
       waiter.updateWaitUntil(ship.symbol, expiration);
     }
   }
