@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/queries.dart';
 
@@ -8,6 +9,7 @@ import 'package:space_traders_cli/queries.dart';
 /// Currently middle waypoints are always jumpgates.
 /// Routes are directional, they list jumpgate waypoints in the system
 /// they are jumping from.
+@immutable
 class Route {
   /// Create a route between the given [waypointSymbols].
   const Route(this.waypointSymbols);
@@ -33,6 +35,15 @@ class Route {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'waypointSymbols': waypointSymbols,
       };
+
+  @override
+  int get hashCode => waypointSymbols.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is Route &&
+      const ListEquality<String>()
+          .equals(waypointSymbols, other.waypointSymbols);
 }
 
 // int expectedFuelCost(Route route) {
