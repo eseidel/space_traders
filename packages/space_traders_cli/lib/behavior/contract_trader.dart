@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -56,6 +57,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
+  BehaviorManager behaviorManager,
   String tradeSymbol,
 ) async {
   // This needs to find nearby market with the desired tradeSymbol
@@ -71,9 +73,13 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   }
   final marketSymbol = markets.firstOrNull?.symbol;
   if (marketSymbol == null) {
-    logger.err('No markets nearby with $tradeSymbol.');
-    // TODO(eseidel): Instead of waiting we should stop doing this behavior.
-    return DateTime.now().add(const Duration(hours: 1));
+    shipErr(
+      ship,
+      'No markets nearby with $tradeSymbol, disabling contract trader.',
+    );
+    // This probably isn't quite right?  We should instead search wider?
+    await behaviorManager.disableBehavior(Behavior.contractTrader);
+    return null;
   }
   final destination = await waypointCache.waypoint(marketSymbol);
   return navigateToAndLog(api, ship, destination);
@@ -88,9 +94,15 @@ Future<DateTime?> advanceContractTrader(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
+  BehaviorManager behaviorManager,
   Contract contract,
   ContractDeliverGood goods,
 ) async {
+  if (agent.credits < 10000) {
+    shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
+    await behaviorManager.disableBehavior(Behavior.contractTrader);
+    return null;
+  }
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
     return logRemainingTransitTime(ship);
@@ -122,6 +134,7 @@ Future<DateTime?> advanceContractTrader(
       ship,
       waypointCache,
       marketCache,
+      behaviorManager,
       goods.tradeSymbol,
     );
   }
@@ -166,6 +179,7 @@ Future<DateTime?> advanceContractTrader(
         ship,
         waypointCache,
         marketCache,
+        behaviorManager,
         goods.tradeSymbol,
       );
     }
