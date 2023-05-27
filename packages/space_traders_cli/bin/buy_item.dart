@@ -19,16 +19,17 @@ void main(List<String> args) async {
   final priceData = await PriceData.load(fs);
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
-  final hq = parseWaypointString(agent.headquarters);
   final waypointCache = WaypointCache(api);
   final marketCache = MarketCache(waypointCache);
-  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
 
   final myShips = await allMyShips(api).toList();
+  final shipWaypointSymbols = myShips.map((s) => s.nav.waypointSymbol).toSet();
+  final shipWaypoints =
+      await waypointCache.waypointsForSymbols(shipWaypointSymbols).toList();
   final ship = logger.chooseOne(
     'Which ship?',
     choices: myShips,
-    display: (ship) => shipDescription(ship, systemWaypoints),
+    display: (ship) => shipDescription(ship, shipWaypoints),
   );
 
   if (ship.availableSpace < 1) {

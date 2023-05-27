@@ -38,8 +38,12 @@ void main(List<String> args) async {
       systemWaypoints.where((w) => w.hasShipyard).toList();
 
   final myShips = await allMyShips(api).toList();
+  final shipWaypointSymbols = myShips.map((s) => s.nav.waypointSymbol).toSet();
+  final shipWaypoints =
+      await waypointCache.waypointsForSymbols(shipWaypointSymbols).toList();
+
   logger.info('Current ships:');
-  printShips(myShips, systemWaypoints);
+  printShips(myShips, shipWaypoints);
   logger.info('');
 
   final waypoint = logger.chooseOne(

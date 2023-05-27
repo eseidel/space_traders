@@ -25,8 +25,8 @@ void printWaypoints(List<Waypoint> waypoints, {String indent = ''}) {
 /// Return a string describing the given [ship].
 /// systemWaypoints is used to look up the waypoint for the ship's
 /// waypointSymbol.
-String shipDescription(Ship ship, List<Waypoint> systemWaypoints) {
-  final waypoint = lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+String shipDescription(Ship ship, List<Waypoint> shipWaypoints) {
+  final waypoint = lookupWaypoint(ship.nav.waypointSymbol, shipWaypoints);
   var string =
       '${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';
   if (ship.crew.morale != 100) {

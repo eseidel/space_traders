@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
@@ -37,6 +38,8 @@ class WaypointCache {
   WaypointCache(this._api);
 
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
+  final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
+  final Map<String, JumpGate?> _jumpGatesBySystem = {};
   final Api _api;
 
   /// Fetch all waypoints in the given system.
@@ -54,6 +57,66 @@ class WaypointCache {
     final systemSymbol = parseWaypointString(waypointSymbol).system;
     final waypoints = await waypointsInSystem(systemSymbol);
     return waypoints.firstWhere((w) => w.symbol == waypointSymbol);
+  }
+
+  /// Fetch the waypoints with the given symbols.
+  Stream<Waypoint> waypointsForSymbols(
+    Iterable<String> waypointSymbols,
+  ) async* {
+    for (final symbol in waypointSymbols) {
+      yield await waypoint(symbol);
+    }
+  }
+
+  /// Return all connected systems in the given system.
+  Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
+    final cachedSystems = _connectedSystemsBySystem[systemSymbol];
+    if (cachedSystems != null) {
+      for (final system in cachedSystems) {
+        yield system;
+      }
+      return;
+    }
+    final jumpGate = await jumpGateForSystem(systemSymbol);
+    if (jumpGate != null) {
+      _connectedSystemsBySystem[systemSymbol] = jumpGate.connectedSystems;
+      for (final system in jumpGate.connectedSystems) {
+        yield system;
+      }
+    } else {
+      _connectedSystemsBySystem[systemSymbol] = [];
+    }
+  }
+
+  // When JumpGate has a symbol accessor, this can be removed.
+  /// Returns the Waypoint for the jump gate in the given system, or null if
+  /// there is no jump gate.
+  Future<Waypoint?> jumpGateWaypointForSystem(String systemSymbol) async {
+    final waypoints = await waypointsInSystem(systemSymbol);
+    // There is at most one jump gate in a system.
+    return waypoints.firstWhereOrNull(
+      (w) => w.type == WaypointType.JUMP_GATE,
+    );
+  }
+
+  /// Fetch the jump gate for the given system, or null if there is no jump
+  /// gate.
+  Future<JumpGate?> jumpGateForSystem(String systemSymbol) async {
+    if (_jumpGatesBySystem.containsKey(systemSymbol)) {
+      return _jumpGatesBySystem[systemSymbol];
+    }
+    final jumpGateWaypoint = await jumpGateWaypointForSystem(systemSymbol);
+    if (jumpGateWaypoint == null) {
+      _jumpGatesBySystem[systemSymbol] = null;
+      return null;
+    }
+    final response = await _api.systems.getJumpGate(
+      systemSymbol,
+      jumpGateWaypoint.symbol,
+    );
+    final jumpGate = response!.data;
+    _jumpGatesBySystem[systemSymbol] = jumpGate;
+    return jumpGate;
   }
 }
 
