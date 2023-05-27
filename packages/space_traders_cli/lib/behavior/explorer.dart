@@ -8,7 +8,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
-const _defaultMaxAge = Duration(days: 2);
+const _defaultMaxAge = Duration(days: 3);
 
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
   return waypoint.chart == null ||
@@ -66,7 +66,9 @@ Future<DateTime?> advanceExporer(
     // Should look at systems connected to hq and go to the one closest to
     // hq with unexplored waypoints or missing market data.
     final jumpGate = await getJumpGate(api, currentWaypoint);
-    for (final connectedSystem in jumpGate.connectedSystems) {
+    final sortedSystems = jumpGate.connectedSystems.toList()
+      ..sort((a, b) => a.distance.compareTo(b.distance));
+    for (final connectedSystem in sortedSystems) {
       final systemWaypoints =
           await waypointCache.waypointsInSystem(connectedSystem.symbol);
       for (final waypoint in systemWaypoints) {
@@ -82,11 +84,18 @@ Future<DateTime?> advanceExporer(
         }
       }
     }
-    shipErr(
+    // If we get here, we've explored all systems connected to the jump gate.
+    // So jump to the furthest and try again.
+    final furthestSystem = sortedSystems.last;
+    shipWarn(
       ship,
-      'No unexplored systems connected to ${currentWaypoint.symbol}',
+      'All systems connected to ${currentWaypoint.symbol} explored, '
+      'jumping to furthest system, ${furthestSystem.symbol}.',
     );
-    return DateTime.now().add(const Duration(days: 1));
+    await undockIfNeeded(api, ship);
+    await useJumpGateAndLog(api, ship, furthestSystem.symbol);
+    // Jumping is instant.
+    return null;
   }
 
   // Otherwise, go to a jump gate.
