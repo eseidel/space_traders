@@ -10,6 +10,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/route.dart';
 
 Future<Deal?> _findBestDealInSystem(
   PriceData priceData,
@@ -65,7 +66,7 @@ Future<DateTime?> advanceArbitrageTrader(
     // the nearest marketplace to fuel up and try again.
     final nearestMarket = systemWaypoints
         .where((w) => w.hasMarketplace)
-        .sortedBy<num>((w) => currentWaypoint.distanceWithinSystemTo(w)!)
+        .sortedBy<num>((w) => distanceWithinSystem(currentWaypoint, w)!)
         .first;
     return navigateToAndLog(api, ship, nearestMarket);
   }
@@ -114,7 +115,7 @@ Future<DateTime?> advanceArbitrageTrader(
     final waypoint = lookupWaypoint(otherDeal.sourceSymbol, systemWaypoints);
     shipInfo(
       ship,
-      'Distance: ${currentWaypoint.distanceWithinSystemTo(waypoint)!}, '
+      'Distance: ${distanceWithinSystem(currentWaypoint, waypoint)!}, '
       'currentFuel: ${ship.fuel.current}',
     );
     return navigateToAndLog(api, ship, waypoint);
