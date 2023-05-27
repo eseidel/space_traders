@@ -166,8 +166,8 @@ DateTime logRemainingTransitTime(Ship ship) {
   final flightTime = ship.nav.route.arrival.difference(DateTime.now());
   shipInfo(
     ship,
-    'In transit to ${ship.nav.waypointSymbol} '
-    '(${durationString(flightTime)} left)',
+    // Extra space is needed for windows powershell.
+    '✈️  to ${ship.nav.waypointSymbol}, ${durationString(flightTime)} left',
   );
   return ship.nav.route.arrival;
 }
