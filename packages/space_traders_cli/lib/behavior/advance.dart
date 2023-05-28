@@ -70,6 +70,7 @@ Future<DateTime?> advanceShipBehavior(
         ship,
         waypointCache,
         marketCache,
+        behaviorManager,
       );
   }
 }

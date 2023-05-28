@@ -120,6 +120,11 @@ Future<DateTime?> advanceContractTrader(
   if (currentWaypoint.symbol == goods.destinationSymbol) {
     final maybeResponse =
         await _deliverContractGoodsIfPossible(api, ship, contract, goods);
+
+    // Delivering the goods counts as completing the behavior, we'll
+    // decide next loop if we need to do more.
+    await behaviorManager.completeBehavior(ship.symbol);
+
     if (maybeResponse != null) {
       // Update our cargo counts after fullfilling the contract.
       ship.cargo = maybeResponse.cargo;

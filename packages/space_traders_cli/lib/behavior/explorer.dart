@@ -1,11 +1,12 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
-import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
@@ -25,29 +26,42 @@ Future<DateTime?> advanceExporer(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
+  BehaviorManager behaviorManager,
 ) async {
-  if (ship.isInTransit) {
-    // Go back to sleep until we arrive.
-    return logRemainingTransitTime(ship);
+  final navResult = await continueNavigationIfNeeded(
+    api,
+    ship,
+    waypointCache,
+    behaviorManager,
+  );
+  if (navResult.shouldReturn()) {
+    return navResult.waitTime;
   }
   // Check our current waypoint.  If it's not charted or doesn't have current
   // market data, chart it and/or record market data.
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
-  if (currentWaypoint.chart == null) {
-    await chartWaypointAndLog(api, ship);
-    return null;
+  if (_isMissingChartOrRecentMarketData(priceData, currentWaypoint)) {
+    if (currentWaypoint.chart == null) {
+      await chartWaypointAndLog(api, ship);
+      return null;
+    }
+    if (currentWaypoint.hasMarketplace &&
+        !priceData.hasRecentMarketData(
+          currentWaypoint.symbol,
+        )) {
+      final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
+      await recordMarketDataAndLog(priceData, market!, ship);
+      return null;
+    }
+    // Explore behavior never changes, but it's still the corect thing to
+    // reset our state after completing on loop of "explore".
+    await behaviorManager.completeBehavior(ship.symbol);
   }
-  if (currentWaypoint.hasMarketplace &&
-      !priceData.hasRecentMarketData(
-        currentWaypoint.symbol,
-      )) {
-    final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
-    await recordMarketDataAndLog(priceData, market!, ship);
-    return null;
-  }
+
   // Check the current system waypoints.
   // If any are not explored, or have a market but don't have recent market
   // data, got there.
+  // TODO(eseidel): This navigation logic should use beginRouteAndLog.
   final systemWaypoints =
       await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
   for (final waypoint in systemWaypoints) {
@@ -82,6 +96,7 @@ Future<DateTime?> advanceExporer(
     }
     // If we get here, we've explored all systems connected to the jump gate.
     // So jump to the furthest and try again.
+    // TODO(eseidel): This ends up looping in a cycle.
     final furthestSystem = sortedSystems.last;
     shipWarn(
       ship,

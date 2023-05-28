@@ -77,6 +77,12 @@ Future<DateTime?> advanceMiner(
         await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
     final maybeAsteroidField =
         systemWaypoints.firstWhereOrNull((w) => w.canBeMined);
+
+    if (currentWaypoint.hasMarketplace && !ship.isFuelFull()) {
+      await dockIfNeeded(api, ship);
+      await refuelIfNeededAndLog(api, priceData, agent, ship);
+    }
+
     if (maybeAsteroidField != null) {
       return navigateToLocalWaypointAndLog(api, ship, maybeAsteroidField);
     }
@@ -102,6 +108,8 @@ Future<DateTime?> advanceMiner(
     await dockIfNeeded(api, ship);
     await refuelIfNeededAndLog(api, priceData, agent, ship);
     await sellCargoAndLog(api, priceData, ship);
+    // Reset our state now that we've done the behavior once.
+    await behaviorManager.completeBehavior(ship.symbol);
     return null;
   }
 
