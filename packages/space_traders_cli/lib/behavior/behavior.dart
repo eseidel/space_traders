@@ -1,3 +1,4 @@
+import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/data_store.dart';
 
 /// Enum to specify which behavior the ship should follow.
@@ -103,7 +104,9 @@ class BehaviorManager {
   }
 
   /// Disable the given behavior for an hour.
-  Future<void> disableBehavior(Behavior behavior) {
+  Future<void> disableBehavior(Ship ship, Behavior behavior) {
+    deleteBehaviorState(_db, ship.symbol);
+
     final expiration = DateTime.now().add(const Duration(hours: 1));
     _behaviorTimeouts[behavior] = expiration;
     return saveBehaviorTimeouts(

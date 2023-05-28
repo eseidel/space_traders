@@ -45,6 +45,15 @@ extension WaypointUtils on Waypoint {
   /// Returns true if the waypoint is an asteroid field.
   bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
 
+  /// Returns true if the waypoint has the stripped trait.
+  bool get isStripped => hasTrait(WaypointTraitSymbolEnum.STRIPPED);
+
+  /// Returns true if the waypoint can be mined.
+  // Unclear if isStripped is needed, hq's system has a stripped asteroid field
+  // but it can't be mined, hit a 500 on another:
+  // https://github.com/SpaceTradersAPI/api-docs/issues/51
+  bool get canBeMined => isAsteroidField; // && !isStripped;
+
   /// Returns true if the waypoint is a jump gate.
   bool get isJumpGate => isType(WaypointType.JUMP_GATE);
 

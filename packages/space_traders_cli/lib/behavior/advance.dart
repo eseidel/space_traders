@@ -58,6 +58,7 @@ Future<DateTime?> advanceShipBehavior(
         agent,
         ship,
         waypointCache,
+        behaviorManager,
       );
 
     case Behavior.explorer:

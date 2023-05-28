@@ -1,13 +1,15 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
-import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
 /// Either loads a cached survey set or creates a new one if we have a surveyor.
@@ -57,18 +59,40 @@ Future<DateTime?> advanceMiner(
   Agent agent,
   Ship ship,
   WaypointCache waypointCache,
+  BehaviorManager behaviorManager,
 ) async {
-  if (ship.isInTransit) {
-    // Go back to sleep until we arrive.
-    return logRemainingTransitTime(ship);
+  final navResult = await continueNavigationIfNeeded(
+    api,
+    ship,
+    waypointCache,
+    behaviorManager,
+  );
+  if (navResult.shouldReturn()) {
+    return navResult.waitTime;
   }
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
-  if (!currentWaypoint.isAsteroidField) {
+  if (!currentWaypoint.canBeMined) {
     // We're not at an asteroid field, so we need to navigate to one.
     final systemWaypoints =
         await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
-    final asteroidField = systemWaypoints.firstWhere((w) => w.isAsteroidField);
-    return navigateToLocalWaypointAndLog(api, ship, asteroidField);
+    final maybeAsteroidField =
+        systemWaypoints.firstWhereOrNull((w) => w.canBeMined);
+    if (maybeAsteroidField != null) {
+      return navigateToLocalWaypointAndLog(api, ship, maybeAsteroidField);
+    }
+    shipWarn(
+      ship,
+      'No minable waypoint in ${ship.nav.systemSymbol}, going home.',
+    );
+    // If we can't find an asteroid field navigate back to the home system.
+    // There is always one there.
+    return beingRouteAndLog(
+      api,
+      ship,
+      waypointCache,
+      behaviorManager,
+      agent.headquarters,
+    );
   }
   // It's not worth potentially waiting a minute just to get a few pieces
   // of cargo, when a surveyed mining operation could pull 10+ pieces.

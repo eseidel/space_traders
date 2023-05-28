@@ -111,7 +111,7 @@ Future<DateTime?> advanceArbitrageTrader(
     minimumProfitPer: minimumProfit,
   );
   if (deal == null) {
-    await behaviorManager.disableBehavior(Behavior.arbitrageTrader);
+    await behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader);
     shipInfo(
       ship,
       'No deals >${creditsString(minimumProfit)} '

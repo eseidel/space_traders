@@ -3,6 +3,7 @@ import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -78,7 +79,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
       'No markets nearby with $tradeSymbol, disabling contract trader.',
     );
     // This probably isn't quite right?  We should instead search wider?
-    await behaviorManager.disableBehavior(Behavior.contractTrader);
+    await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
     return null;
   }
   final destination = await waypointCache.waypoint(marketSymbol);
@@ -100,12 +101,17 @@ Future<DateTime?> advanceContractTrader(
 ) async {
   if (agent.credits < 10000) {
     shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
-    await behaviorManager.disableBehavior(Behavior.contractTrader);
+    await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
     return null;
   }
-  if (ship.isInTransit) {
-    // Go back to sleep until we arrive.
-    return logRemainingTransitTime(ship);
+  final navResult = await continueNavigationIfNeeded(
+    api,
+    ship,
+    waypointCache,
+    behaviorManager,
+  );
+  if (navResult.shouldReturn()) {
+    return navResult.waitTime;
   }
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
