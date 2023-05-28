@@ -8,14 +8,11 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
-const _defaultMaxAge = Duration(days: 3);
-
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
   return waypoint.chart == null ||
       waypoint.hasMarketplace &&
           !priceData.hasRecentMarketData(
             waypoint.symbol,
-            maxAge: _defaultMaxAge,
           );
 }
 
@@ -43,7 +40,6 @@ Future<DateTime?> advanceExporer(
   if (currentWaypoint.hasMarketplace &&
       !priceData.hasRecentMarketData(
         currentWaypoint.symbol,
-        maxAge: _defaultMaxAge,
       )) {
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
     await recordMarketDataAndLog(priceData, market!, ship);
@@ -56,7 +52,7 @@ Future<DateTime?> advanceExporer(
       await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
   for (final waypoint in systemWaypoints) {
     if (_isMissingChartOrRecentMarketData(priceData, waypoint)) {
-      return navigateToAndLog(api, ship, waypoint);
+      return navigateToLocalWaypointAndLog(api, ship, waypoint);
     }
   }
 
@@ -99,10 +95,10 @@ Future<DateTime?> advanceExporer(
   }
 
   // Otherwise, go to a jump gate.
-  final jumpGates = systemWaypoints.where((w) => w.isJumpGate).toList();
-  if (jumpGates.isEmpty) {
+  final jumpGate =
+      await waypointCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
+  if (jumpGate == null) {
     throw UnimplementedError('No jump gates in ${ship.nav.waypointSymbol}');
   }
-  final jumpGate = jumpGates.first;
-  return navigateToAndLog(api, ship, jumpGate);
+  return navigateToLocalWaypointAndLog(api, ship, jumpGate);
 }

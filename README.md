@@ -88,6 +88,11 @@ Logic:
 * Include fuel costs in deal calculations.
 * Arbitrage should consider going to systems it knows there will be a profit from.
 * Probes should plan jumps based on distance to hq, not current location.
+* Cull old prices from prices.json
+* Post prices to the prices server.
+* Fix probes getting stuck cycling.
+* Check and remove all uses of systemWaypoints or systemMarkets or lookupMarket.
+* Remove guards against 0 prices from prices.dart.
 
 UI:
 * Add a Flutter UI.

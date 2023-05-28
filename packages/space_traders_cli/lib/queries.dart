@@ -156,6 +156,10 @@ class MarketCache {
   /// Create a new MarketplaceCache.
   MarketCache(this._waypointCache);
 
+  // This needs to be careful, this caches Market which can differ in
+  // response depending on if we have a ship there or not.
+  // A market with ship in orbit will have tradeGoods and transactions data.
+  // Currently this only caches for one loop.
   final Map<String, Market?> _marketsBySymbol = {};
   final WaypointCache _waypointCache;
 

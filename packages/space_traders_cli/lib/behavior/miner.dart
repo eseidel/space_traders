@@ -68,7 +68,7 @@ Future<DateTime?> advanceMiner(
     final systemWaypoints =
         await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
     final asteroidField = systemWaypoints.firstWhere((w) => w.isAsteroidField);
-    return navigateToAndLog(api, ship, asteroidField);
+    return navigateToLocalWaypointAndLog(api, ship, asteroidField);
   }
   // It's not worth potentially waiting a minute just to get a few pieces
   // of cargo, when a surveyed mining operation could pull 10+ pieces.

@@ -21,7 +21,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
 }
 
 /// navigate [ship] to [waypointSymbol]
-Future<NavigateShip200ResponseData> navigateTo(
+Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Api api,
   Ship ship,
   String waypointSymbol,
@@ -196,12 +196,12 @@ Future<void> undockIfNeeded(Api api, Ship ship) async {
 }
 
 /// Navigate to the waypoint and log to the ship's log
-Future<DateTime> navigateToAndLog(
+Future<DateTime> navigateToLocalWaypointAndLog(
   Api api,
   Ship ship,
   Waypoint waypoint,
 ) async {
-  final result = await navigateTo(api, ship, waypoint.symbol);
+  final result = await navigateToLocalWaypoint(api, ship, waypoint.symbol);
   final flightTime = result.nav.route.arrival.difference(DateTime.now());
   // Could log used Fuel. result.fuel.fuelConsumed
   shipInfo(

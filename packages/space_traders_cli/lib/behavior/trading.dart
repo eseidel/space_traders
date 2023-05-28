@@ -11,9 +11,9 @@ import 'package:space_traders_cli/printing.dart';
 class Deal {
   /// Create a new deal.
   Deal({
-    required this.tradeSymbol,
     required this.sourceSymbol,
     required this.destinationSymbol,
+    required this.tradeSymbol,
     required this.purchasePrice,
     required this.sellPrice,
   });
@@ -35,6 +35,8 @@ class Deal {
   // Also should take fuel costs into account.
   // And possibly time?
 
+  // Profit depends on route taken, so this likely does not
+  // belong here.
   /// The profit we'll make on this deal per unit.
   int get profit => sellPrice - purchasePrice;
 }
@@ -56,9 +58,13 @@ int? estimateSellPrice(
   TradeSymbol tradeSymbol,
   Market market,
 ) {
-  // We could also grab the current sell price if the market has
-  // tradeGoods available, but that would only happen when we have a probe
-  // at the market, but aren't recording prices in our priceData.
+  // This case would only be needed if we have a ship at the market, but somehow
+  // failed to record price data in our price db.
+  final maybeGoods =
+      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol.value);
+  if (maybeGoods != null) {
+    return maybeGoods.sellPrice;
+  }
 
   final recentSellPrice = priceData.recentSellPrice(
     marketSymbol: market.symbol,
@@ -67,23 +73,51 @@ int? estimateSellPrice(
   if (recentSellPrice != null) {
     return recentSellPrice;
   }
+  // logger.info(
+  //   'No recent sell price for ${tradeSymbol.value} at ${market.symbol}',
+  // );
   final tradeType = market.exchangeType(tradeSymbol.value)!;
-  // Our price data is currently only for market imports/exports, not exchanges.
-  // Exports aren't necessarily even possible to sell to.
-  // This might not actually be true!
-  if (tradeType != ExchangeType.imports) {
-    return null;
-  }
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
-  return priceData.percentileForSellPrice(tradeSymbol.value, percentile);
+  // logger
+  //  .info('Looking up sell price for $tradeSymbol at $percentile percentile');
+  return priceData.sellPriceAtPercentile(tradeSymbol.value, percentile);
 }
 
-/// Enumerate all possible deals that could be made between [localMarket] and
+/// Estimate the current purchase price of [tradeSymbol] at [market].
+int? estimatePurchasePrice(
+  PriceData priceData,
+  TradeSymbol tradeSymbol,
+  Market market,
+) {
+  // This case would only be needed if we have a ship at the market, but somehow
+  // failed to record price data in our price db.
+  final maybeGoods =
+      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol.value);
+  if (maybeGoods != null) {
+    return maybeGoods.purchasePrice;
+  }
+  final recentPurchasePrice = priceData.recentPurchasePrice(
+    marketSymbol: market.symbol,
+    tradeSymbol: tradeSymbol.value,
+  );
+  if (recentPurchasePrice != null) {
+    return recentPurchasePrice;
+  }
+  // logger.info(
+  //   'No recent purchase price for ${tradeSymbol.value} at ${market.symbol}',
+  // );
+  final tradeType = market.exchangeType(tradeSymbol.value)!;
+  // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
+  final percentile = _percentileForTradeType(tradeType);
+  return priceData.percentileForPurchasePrice(tradeSymbol.value, percentile);
+}
+
+/// Enumerate all possible deals that could be made between [purchaseMarket] and
 /// [otherMarkets].
 Iterable<Deal> enumeratePossibleDeals(
   PriceData priceData,
-  Market localMarket,
+  Market purchaseMarket,
   List<Market> otherMarkets,
 ) sync* {
   for (final otherMarket in otherMarkets) {
@@ -92,52 +126,64 @@ Iterable<Deal> enumeratePossibleDeals(
       if (sellPrice == null) {
         continue;
       }
-      for (final purchaseGood in localMarket.tradeGoods) {
-        if (sellSymbol.value == purchaseGood.symbol) {
-          yield Deal(
-            sourceSymbol: localMarket.symbol,
-            tradeSymbol: sellSymbol,
-            destinationSymbol: otherMarket.symbol,
-            purchasePrice: purchaseGood.purchasePrice,
-            sellPrice: sellPrice,
-          );
+      for (final purchaseSymbol in purchaseMarket.allTradeSymbols) {
+        if (sellSymbol != purchaseSymbol) {
+          continue;
         }
+        final purchasePrice =
+            estimatePurchasePrice(priceData, purchaseSymbol, purchaseMarket);
+        if (purchasePrice == null) {
+          // We're asking about a good that is not a market we have a ship at
+          // and we don't have enough pricing data to estimate a price.
+          continue;
+        }
+        yield Deal(
+          sourceSymbol: purchaseMarket.symbol,
+          tradeSymbol: sellSymbol,
+          destinationSymbol: otherMarket.symbol,
+          purchasePrice: purchasePrice,
+          sellPrice: sellPrice,
+        );
       }
     }
   }
 }
 
-/// Log proposed [deals] to the console.
-void logDeals(List<Deal> deals) {
-  for (final deal in deals) {
-    final sign = deal.profit > 0 ? '+' : '';
-    final profitString = '$sign${creditsString(deal.profit)}'.padLeft(6);
-    final coloredProfitString = deal.profit > 0
-        ? lightGreen.wrap(profitString)
-        : lightRed.wrap(profitString);
-    logger.info(
-      '${deal.tradeSymbol.value.padRight(18)} '
+/// Describe a [deal] in a human-readable way.
+String describeDeal(Deal deal) {
+  final sign = deal.profit > 0 ? '+' : '';
+  final profitString = '$sign${creditsString(deal.profit)}'.padLeft(6);
+  final coloredProfitString = deal.profit > 0
+      ? lightGreen.wrap(profitString)
+      : lightRed.wrap(profitString);
+  return '${deal.tradeSymbol.value.padRight(18)} '
       ' ${deal.sourceSymbol} ${creditsString(deal.purchasePrice).padLeft(6)} '
       '-> '
       '${deal.destinationSymbol} ${creditsString(deal.sellPrice).padLeft(6)} '
-      '$coloredProfitString',
-    );
+      '$coloredProfitString';
+}
+
+/// Log proposed [deals] to the console.
+void logDeals(List<Deal> deals) {
+  logger.info('Symbol       Source  Dest   Profit');
+  for (final deal in deals) {
+    logger.info(describeDeal(deal));
   }
 }
 
 /// Find the best deal that can be made from [currentWaypoint].
-Deal? findBestDeal(
+Deal? findBestDealFromWaypoint(
   PriceData priceData,
   Ship ship,
   Waypoint currentWaypoint,
-  List<Market> allMarkets, {
+  List<Market> markets, {
   int minimumProfitPer = 0,
 }) {
   // Fetch all marketplace data
   final localMarket =
-      allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
+      markets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
   final otherMarkets =
-      allMarkets.where((m) => m.symbol != localMarket.symbol).toList();
+      markets.where((m) => m.symbol != localMarket.symbol).toList();
 
   final deals = enumeratePossibleDeals(priceData, localMarket, otherMarkets);
   final sortedDeals = deals.sorted((a, b) => a.profit.compareTo(b.profit));
@@ -146,8 +192,19 @@ Deal? findBestDeal(
   // Currently we don't account for fuel, so have an minimum expected
   // profit instead.
   if (bestDeal == null || bestDeal.profit <= minimumProfitPer) {
+    final profitString =
+        bestDeal == null ? null : creditsString(bestDeal.profit);
+    shipInfo(
+      ship,
+      '0 of ${sortedDeals.length} deals profitable '
+      'from ${currentWaypoint.symbol}, best: $profitString',
+    );
     return null;
   }
+  shipInfo(
+      ship,
+      '${sortedDeals.length} deals found from '
+      '${currentWaypoint.symbol}, best: ${creditsString(bestDeal.profit)}');
   return bestDeal;
 
   // The simplest possible thing is get the list of trade symbols sold at this

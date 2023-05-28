@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/logger.dart';
+
+/// default max age for "recent" prices is 3 days
+const defaultMaxAge = Duration(days: 3);
 
 // {"waypointSymbol": "X1-ZS60-53675E", "symbol": "IRON_ORE", "supply":
 // "ABUNDANT", "purchasePrice": 6, "sellPrice": 4, "tradeVolume": 1000,
@@ -236,12 +240,12 @@ class PriceData {
 
   /// Get the median purchase price for a trade good.
   int? medianPurchasePrice(String symbol) =>
-      percentilePurchasePrice(symbol, 50);
+      purchasePriceAtPercentile(symbol, 50);
 
   /// Get the percentile purchase price for a trade good.
   /// [percentile] must be between 0 and 100.
-  int? percentilePurchasePrice(String symbol, int percentile) {
-    final maybePrice = _percentilePriceFor(
+  int? purchasePriceAtPercentile(String symbol, int percentile) {
+    final maybePrice = _priceAtPercentile(
       symbol,
       percentile,
       MarketTransactionTypeEnum.PURCHASE,
@@ -257,12 +261,12 @@ class PriceData {
       );
 
   /// Get the median sell price for a trade good.
-  int? medianSellPrice(String symbol) => percentileSellPrice(symbol, 50);
+  int? medianSellPrice(String symbol) => sellPriceAtPercentile(symbol, 50);
 
   /// Get the percentile sell price for a trade good.
   /// [percentile] must be between 0 and 100.
-  int? percentileSellPrice(String symbol, int percentile) {
-    final maybePrice = _percentilePriceFor(
+  int? sellPriceAtPercentile(String symbol, int percentile) {
+    final maybePrice = _priceAtPercentile(
       symbol,
       percentile,
       MarketTransactionTypeEnum.SELL,
@@ -327,7 +331,7 @@ class PriceData {
     return _prices.where(filter);
   }
 
-  Price? _percentilePriceFor(
+  Price? _priceAtPercentile(
     String symbol,
     int percentile,
     MarketTransactionTypeEnum action,
@@ -350,7 +354,11 @@ class PriceData {
         : _sellPriceAcending;
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
-    final index = pricesForSymbolSorted.length * percentile ~/ 100;
+    // Make sure that 100th percentile doesn't go out of bounds.
+    final index = min(
+      pricesForSymbolSorted.length * percentile ~/ 100,
+      pricesForSymbolSorted.length - 1,
+    );
     return pricesForSymbolSorted[index];
   }
 
@@ -370,6 +378,11 @@ class PriceData {
     }
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
+    // for (final price in pricesForSymbolSorted) {
+    //   logger.info(
+    //     '{${price.waypointSymbol}} ${price.sellPrice}',
+    //   );
+    // }
 
     // Find the first index where the sorted price is greater than the price
     // being compared.
@@ -385,7 +398,10 @@ class PriceData {
 
   /// Returns true if there is recent market data for a given market.
   /// Does not check if the passed in market is a valid market.
-  bool hasRecentMarketData(String marketSymbol, {Duration? maxAge}) {
+  bool hasRecentMarketData(
+    String marketSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) {
     final pricesForMarket =
         _prices.where((e) => e.waypointSymbol == marketSymbol);
     if (pricesForMarket.isEmpty) {
@@ -394,9 +410,8 @@ class PriceData {
     final pricesForMarketSorted = pricesForMarket.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    final allowedAge = maxAge ?? const Duration(days: 1);
     return pricesForMarketSorted.last.timestamp.difference(DateTime.now()) <
-        allowedAge;
+        maxAge;
   }
 
   /// returns the most recent sell price for a trade good at a given market.
@@ -406,7 +421,7 @@ class PriceData {
   int? recentSellPrice({
     required String marketSymbol,
     required String tradeSymbol,
-    Duration? maxAge,
+    Duration maxAge = defaultMaxAge,
   }) {
     final pricesForSymbol =
         sellPricesFor(tradeSymbol: tradeSymbol, marketSymbol: marketSymbol);
@@ -415,12 +430,36 @@ class PriceData {
     }
     final pricesForSymbolSorted = pricesForSymbol.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    final allowedAge = maxAge ?? const Duration(days: 1);
     if (pricesForSymbolSorted.last.timestamp.difference(DateTime.now()) >
-        allowedAge) {
+        maxAge) {
       return null;
     }
     return pricesForSymbolSorted.last.sellPrice;
+  }
+
+  /// returns the most recent purchase price for a trade good at a given market.
+  /// [marketSymbol] is the symbol for the market.
+  /// [tradeSymbol] is the symbol for the trade good.
+  /// [maxAge] is the maximum age of the price in the cache.
+  int? recentPurchasePrice({
+    required String marketSymbol,
+    required String tradeSymbol,
+    Duration maxAge = defaultMaxAge,
+  }) {
+    final pricesForSymbol = purchasePricesFor(
+      tradeSymbol: tradeSymbol,
+      marketSymbol: marketSymbol,
+    );
+    if (pricesForSymbol.isEmpty) {
+      return null;
+    }
+    final pricesForSymbolSorted = pricesForSymbol.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    if (pricesForSymbolSorted.last.timestamp.difference(DateTime.now()) >
+        maxAge) {
+      return null;
+    }
+    return pricesForSymbolSorted.last.purchasePrice;
   }
 }
 

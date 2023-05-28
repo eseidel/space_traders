@@ -1,5 +1,4 @@
 import 'package:space_traders_cli/data_store.dart';
-import 'package:space_traders_cli/route.dart';
 
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {
@@ -37,23 +36,23 @@ class BehaviorState {
   /// Create a new behavior state from JSON.
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
     final behavior = json['behavior'] as String;
-    final route = json['route'] as Map<String, dynamic>?;
+    final destination = json['destination'] as String?;
     return BehaviorState(
       Behavior.values.firstWhere((b) => b.toString() == behavior),
-    )..route = route == null ? null : Route.fromJson(route);
+    )..destination = destination;
   }
 
   /// The current behavior.
   final Behavior behavior;
 
-  /// The current route.
-  Route? route;
+  /// Current navigation destination.
+  String? destination;
 
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'behavior': behavior.toString(),
-      'route': route?.toJson(),
+      'destination': destination,
     };
   }
 }

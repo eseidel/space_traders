@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
+import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:test/test.dart';
 
@@ -18,9 +19,10 @@ void main() {
   test('findBestDeal', () async {
     final fs = MemoryFileSystem();
     final ship = MockShip();
-    final currentWaypoint = MockWaypoint();
-    when(() => currentWaypoint.symbol).thenReturn('a');
-    final allMarkets = [
+    when(() => ship.emojiName).thenReturn('');
+    final waypointA = MockWaypoint();
+    when(() => waypointA.symbol).thenReturn('a');
+    final markets = [
       Market(
         symbol: 'a',
         tradeGoods: [
@@ -32,6 +34,9 @@ void main() {
             sellPrice: 2,
           )
         ],
+        exports: [
+          TradeGood(symbol: TradeSymbol.COPPER, name: '', description: '')
+        ],
       ),
       Market(
         symbol: 'b',
@@ -42,15 +47,15 @@ void main() {
     ];
 
     // We fail to find a deal with no price data.
-    final deal = findBestDeal(
+    final deal = findBestDealFromWaypoint(
       PriceData([], fs: fs),
       ship,
-      currentWaypoint,
-      allMarkets,
+      waypointA,
+      markets,
     );
     expect(deal, null);
 
-    final deal2 = findBestDeal(
+    final deal2 = findBestDealFromWaypoint(
       PriceData(
         [
           Price(
@@ -66,8 +71,8 @@ void main() {
         fs: fs,
       ),
       ship,
-      currentWaypoint,
-      allMarkets,
+      waypointA,
+      markets,
     );
     expect(deal2, isNotNull);
     expect(deal2!.destinationSymbol, 'b');

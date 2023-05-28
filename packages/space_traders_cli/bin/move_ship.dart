@@ -28,13 +28,14 @@ String _shipDescription(Ship ship, List<SystemWaypoint> systemWaypoints) {
   return string;
 }
 
-Future<void> _navigateAndDock(
+Future<void> _navigateToLocalWaypointAndDock(
   Api api,
   Ship ship,
   String waypointSymbol,
   bool shouldDock,
 ) async {
-  final navigateResult = await navigateTo(api, ship, waypointSymbol);
+  final navigateResult =
+      await navigateToLocalWaypoint(api, ship, waypointSymbol);
   final eta = navigateResult.nav.route.arrival;
   final flightTime = eta.difference(DateTime.now());
   logger.info('Expected in $flightTime.');
@@ -103,12 +104,23 @@ void main(List<String> args) async {
   final shouldDock = logger.confirm('Wait to dock?', defaultValue: true);
 
   if (destWaypoint.systemSymbol == startingSystem.symbol) {
-    await _navigateAndDock(api, ship, destWaypoint.symbol, shouldDock);
+    await _navigateToLocalWaypointAndDock(
+      api,
+      ship,
+      destWaypoint.symbol,
+      shouldDock,
+    );
     return;
   }
 
-  await navigateTo(api, ship, jumpGateWaypoint.symbol);
+  // This only handles a single jump at this point.
+  await navigateToLocalWaypoint(api, ship, jumpGateWaypoint.symbol);
   final jumpRequest = JumpShipRequest(systemSymbol: destSystem.symbol);
   await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpRequest);
-  await _navigateAndDock(api, ship, destWaypoint.symbol, shouldDock);
+  await _navigateToLocalWaypointAndDock(
+    api,
+    ship,
+    destWaypoint.symbol,
+    shouldDock,
+  );
 }
