@@ -20,9 +20,9 @@ Market lookupMarket(String waypointSymbol, List<Market> markets) {
 
 /// parseWaypointString parses a waypoint string into its component parts.
 ({String sector, String system, String waypoint}) parseWaypointString(
-  String headquarters,
+  String waypointSymbol,
 ) {
-  final parts = headquarters.split('-');
+  final parts = waypointSymbol.split('-');
   return (
     sector: parts[0],
     system: '${parts[0]}-${parts[1]}',
@@ -86,6 +86,9 @@ extension ShipUtils on Ship {
     );
     return maybeCargo?.units ?? 0;
   }
+
+  /// Returns true if the ship if full on fuel.
+  bool isFuelFull() => fuel.current >= fuel.capacity;
 
   /// Returns the amount of space available on the ship.
   int get availableSpace => cargo.availableSpace;

@@ -8,15 +8,9 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
-SystemWaypoint _lookupWaypoint(
-  String waypointSymbol,
-  List<SystemWaypoint> systemWaypoints,
-) {
-  return systemWaypoints.firstWhere((w) => w.symbol == waypointSymbol);
-}
-
-String _shipDescription(Ship ship, List<SystemWaypoint> systemWaypoints) {
-  final waypoint = _lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
+// This has to be synchronous so can't use WaypointCache.
+String _shipDescription(Ship ship, List<Waypoint> systemWaypoints) {
+  final waypoint = lookupWaypoint(ship.nav.waypointSymbol, systemWaypoints);
   var string =
       '${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';
   if (ship.crew.morale != 100) {
@@ -58,13 +52,16 @@ void main(List<String> args) async {
 
   final systemResponse = await api.systems.getSystem(hq.system);
   final startingSystem = systemResponse!.data;
-  final startingSystemWaypoints = startingSystem.waypoints;
 
   final myShips = await allMyShips(api).toList();
+  final shipWaypointSymbols = myShips.map((s) => s.nav.waypointSymbol).toSet();
+  final shipWaypoints =
+      await waypointCache.waypointsForSymbols(shipWaypointSymbols).toList();
+
   final ship = logger.chooseOne(
     'Which ship?',
     choices: myShips,
-    display: (ship) => _shipDescription(ship, startingSystemWaypoints),
+    display: (ship) => _shipDescription(ship, shipWaypoints),
   );
 
   final jumpGateWaypoint = startingSystem.waypoints
