@@ -110,7 +110,7 @@ int? estimatePurchasePrice(
   final tradeType = market.exchangeType(tradeSymbol.value)!;
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
-  return priceData.percentileForPurchasePrice(tradeSymbol.value, percentile);
+  return priceData.purchasePriceAtPercentile(tradeSymbol.value, percentile);
 }
 
 /// Enumerate all possible deals that could be made between [purchaseMarket] and
@@ -201,10 +201,11 @@ Deal? findBestDealFromWaypoint(
     );
     return null;
   }
+  final bestCreditsString = '+${creditsString(bestDeal.profit)}';
   shipInfo(
       ship,
       '${sortedDeals.length} deals found from '
-      '${currentWaypoint.symbol}, best: ${creditsString(bestDeal.profit)}');
+      '${currentWaypoint.symbol} best: ${bestCreditsString.padLeft(6)}');
   return bestDeal;
 
   // The simplest possible thing is get the list of trade symbols sold at this
@@ -235,8 +236,7 @@ void logDeal(Ship ship, Deal deal) {
   shipInfo(
       ship,
       'Deal ($profitString): ${deal.tradeSymbol} '
-      'for ${creditsString(deal.purchasePrice)}, '
-      'sell for ${creditsString(deal.sellPrice)} '
-      'at ${deal.destinationSymbol} '
+      '${creditsString(deal.purchasePrice)} @ ${deal.sourceSymbol} '
+      '-> ${creditsString(deal.sellPrice)} @ ${deal.destinationSymbol} '
       'profit: ${creditsString(deal.profit)} per unit ');
 }
