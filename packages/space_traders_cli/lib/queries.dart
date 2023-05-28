@@ -37,6 +37,7 @@ class WaypointCache {
   /// Create a new WaypointCache.
   WaypointCache(this._api);
 
+  final Map<String, System> _systemsBySymbol = {};
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Map<String, JumpGate?> _jumpGatesBySystem = {};
@@ -66,6 +67,17 @@ class WaypointCache {
     for (final symbol in waypointSymbols) {
       yield await waypoint(symbol);
     }
+  }
+
+  /// Fetch the system with the given symbol.
+  Future<System> systemBySymbol(String systemSymbol) async {
+    if (_systemsBySymbol.containsKey(systemSymbol)) {
+      return _systemsBySymbol[systemSymbol]!;
+    }
+    final response = await _api.systems.getSystem(systemSymbol);
+    final system = response!.data;
+    _systemsBySymbol[systemSymbol] = system;
+    return system;
   }
 
   /// Return all connected systems in the given system.
