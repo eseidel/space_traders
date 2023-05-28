@@ -28,9 +28,9 @@ Behavior _behaviorFor(
     //     behaviorManager.isEnabled(Behavior.contractTrader)) {
     //   return Behavior.contractTrader;
     // }
-    if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
-      return Behavior.arbitrageTrader;
-    }
+    // if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
+    //   return Behavior.arbitrageTrader;
+    // }
   }
   // Could check if it has a mining laser or ship.isExcavator
   if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
