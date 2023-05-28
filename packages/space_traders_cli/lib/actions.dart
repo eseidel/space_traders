@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
@@ -20,16 +22,66 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   return purchaseResponse!.data;
 }
 
+/// Set the [flightMode] of [shipSymbol]
+Future<ShipNav> setShipFlightMode(
+  Api api,
+  String shipSymbol,
+  ShipNavFlightMode flightMode,
+) async {
+  final request = PatchShipNavRequest(flightMode: flightMode);
+  final response =
+      await api.fleet.patchShipNav(shipSymbol, patchShipNavRequest: request);
+  return response!.data;
+}
+
+// {"error":{"message":"Navigate request failed. Ship ESEIDEL-2 requires 14
+// more fuel for navigation.","code":4203,"data":{"shipSymbol":"ESEIDEL-2",
+// "fuelRequired":39,"fuelAvailable":25}}}
+/// Returns true if [e] is an insufficient fuel exception.
+bool _isInfuficientFuelException(ApiException e) {
+  // We ignore the error code at the http level, since we only care about
+  // the error code in the response body.  Should be 400 though.
+  final jsonString = e.message;
+  if (jsonString == null) {
+    return false;
+  }
+  Map<String, dynamic> exceptionJson;
+  try {
+    exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
+  } on FormatException catch (e) {
+    // Catch any json decode errors, so the original exception can be
+    // rethrown by the caller instead of a json decode error.
+    logger.warn('Failed to parse exception json: $e');
+    return false;
+  }
+  final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
+  final code = mapValueOfType<int>(error, 'code');
+  return code == 4203;
+}
+
 /// navigate [ship] to [waypointSymbol]
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Api api,
   Ship ship,
   String waypointSymbol,
 ) async {
-  final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
-  final result =
-      await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
-  return result!.data;
+  try {
+    final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
+    final result =
+        await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
+    return result!.data;
+  } on ApiException catch (e) {
+    if (!_isInfuficientFuelException(e)) {
+      rethrow;
+    }
+    shipWarn(ship, 'Insufficient fuel, drifting to $waypointSymbol');
+    ship.nav =
+        await setShipFlightMode(api, ship.symbol, ShipNavFlightMode.DRIFT);
+    final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
+    final result =
+        await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
+    return result!.data;
+  }
 }
 
 /// Extract resources from asteroid with [ship]
