@@ -105,6 +105,8 @@ Future<NavResult> continueNavigationIfNeeded(
   }
   // We've reached the destination, so we can stop navigating.
   if (ship.nav.waypointSymbol == destinationSymbol) {
+    // TODO(eseidel): Remove the destination from the ship's state?
+    // Otherwise later it wil try to come back here?
     return NavResult._continueAction();
   }
   final endWaypoint = await waypointCache.waypoint(destinationSymbol);
