@@ -85,9 +85,9 @@ class BehaviorManager {
   }
 
   /// Get the behavior state for the given ship.
-  Future<BehaviorState> getBehavior(String shipId) async {
-    return await loadBehaviorState(_db, shipId) ??
-        BehaviorState(_policy(this, shipId));
+  Future<BehaviorState> getBehavior(String shipSymbol) async {
+    return await loadBehaviorState(_db, shipSymbol) ??
+        BehaviorState(_policy(this, shipSymbol));
   }
 
   /// Check if the given behavior is enabled.
@@ -117,9 +117,14 @@ class BehaviorManager {
 
   /// Set the behavior state for the given ship.
   Future<void> setBehavior(
-    String shipId,
+    String shipSymbol,
     BehaviorState behaviorState,
   ) async {
-    await saveBehaviorState(_db, shipId, behaviorState);
+    await saveBehaviorState(_db, shipSymbol, behaviorState);
+  }
+
+  /// Clear the behavior state for the given ship.
+  Future<void> completeBehavior(String shipSymbol) async {
+    await deleteBehaviorState(_db, shipSymbol);
   }
 }
