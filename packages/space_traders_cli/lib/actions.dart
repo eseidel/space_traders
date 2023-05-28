@@ -228,6 +228,12 @@ Future<void> refuelIfNeededAndLog(
     response.transaction,
     transactionEmoji: '⛽',
   );
+
+  // Reset flight mode on refueling.
+  if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
+    shipInfo(ship, 'Resetting flight mode to cruise');
+    await setShipFlightMode(api, ship.symbol, ShipNavFlightMode.CRUISE);
+  }
 }
 
 /// Dock the ship if needed and log the transaction
@@ -253,6 +259,11 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   Ship ship,
   Waypoint waypoint,
 ) async {
+  // Should this dock and refuel and reset the flight mode if needed?
+  // if (ship.fuel.current < ship.fuel.capacity) {
+  //   await refuelIfNeededAndLog(api, priceData, agent, ship);
+  // }
+
   final result = await navigateToLocalWaypoint(api, ship, waypoint.symbol);
   final flightTime = result.nav.route.arrival.difference(DateTime.now());
   // Could log used Fuel. result.fuel.fuelConsumed
