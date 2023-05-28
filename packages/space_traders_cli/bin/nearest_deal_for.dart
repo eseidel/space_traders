@@ -93,13 +93,7 @@ void main(List<String> args) async {
     ).toList(),
   ];
 
-  final jumpGateWaypoint =
-      systemWaypoints.firstWhere((w) => w.type == WaypointType.JUMP_GATE);
-
-  final jumpGateResponse =
-      await api.systems.getJumpGate(hq.system, jumpGateWaypoint.symbol);
-  final jumpGate = jumpGateResponse!.data;
-  for (final system in jumpGate.connectedSystems) {
+  await for (final system in waypointCache.connectedSystems(hq.system)) {
     logger.info('${system.symbol} - ${system.distance}');
     final waypoints = await waypointCache.waypointsInSystem(system.symbol);
     availabilityList.addAll(

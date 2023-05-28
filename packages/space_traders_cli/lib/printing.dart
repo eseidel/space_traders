@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/queries.dart';
 
 /// Return a string describing the given [waypoint].
 String waypointDescription(Waypoint waypoint) {
@@ -26,7 +28,9 @@ void printWaypoints(List<Waypoint> waypoints, {String indent = ''}) {
 /// systemWaypoints is used to look up the waypoint for the ship's
 /// waypointSymbol.
 String shipDescription(Ship ship, List<Waypoint> shipWaypoints) {
-  final waypoint = lookupWaypoint(ship.nav.waypointSymbol, shipWaypoints);
+  // This has to be synchronous so can't use WaypointCache
+  final waypoint =
+      shipWaypoints.firstWhere((w) => w.symbol == ship.nav.waypointSymbol);
   var string =
       '${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';
   if (ship.crew.morale != 100) {
@@ -39,9 +43,9 @@ String shipDescription(Ship ship, List<Waypoint> shipWaypoints) {
 }
 
 /// Log a string describing the given [ships].
-void printShips(List<Ship> ships, List<Waypoint> systemWaypoints) {
+void printShips(List<Ship> ships, List<Waypoint> shipWaypoints) {
   for (final ship in ships) {
-    logger.info('  ${shipDescription(ship, systemWaypoints)}');
+    logger.info('  ${shipDescription(ship, shipWaypoints)}');
   }
 }
 
@@ -170,4 +174,30 @@ DateTime logRemainingTransitTime(Ship ship) {
     '✈️  to ${ship.nav.waypointSymbol}, ${durationString(flightTime)} left',
   );
   return ship.nav.route.arrival;
+}
+
+/// Fetches the waypoints for the given [ships].
+Future<List<Waypoint>> waypointsForShips(
+  WaypointCache waypointCache,
+  List<Ship> ships,
+) async {
+  final shipWaypointSymbols = ships.map((s) => s.nav.waypointSymbol).toSet();
+  return waypointCache.waypointsForSymbols(shipWaypointSymbols).toList();
+}
+
+/// Choose a ship from a list of ships
+Future<Ship> chooseShip(
+  Api api,
+  WaypointCache waypointCache,
+  List<Ship> ships,
+) async {
+  final shipWaypoints = await waypointsForShips(waypointCache, ships);
+  // Can't just return the result of chooseOne directly without triggering
+  // a type error?
+  final ship = logger.chooseOne(
+    'Which ship?',
+    choices: ships,
+    display: (ship) => shipDescription(ship, shipWaypoints),
+  );
+  return ship;
 }

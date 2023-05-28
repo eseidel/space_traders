@@ -33,15 +33,11 @@ void main(List<String> args) async {
 
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
   final shipyardWaypoints =
-      systemWaypoints.where((w) => w.hasShipyard).toList();
+      await waypointCache.shipyardWaypointsForSystem(hq.system);
 
   final myShips = await allMyShips(api).toList();
-  final shipWaypointSymbols = myShips.map((s) => s.nav.waypointSymbol).toSet();
-  final shipWaypoints =
-      await waypointCache.waypointsForSymbols(shipWaypointSymbols).toList();
-
+  final shipWaypoints = await waypointsForShips(waypointCache, myShips);
   logger.info('Current ships:');
   printShips(myShips, shipWaypoints);
   logger.info('');

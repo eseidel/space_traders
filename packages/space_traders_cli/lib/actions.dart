@@ -127,17 +127,9 @@ Stream<SellCargo201ResponseData> sellCargo(
   Ship ship, {
   bool Function(String tradeSymbol)? where,
 }) async* {
-  // logCargo(ship);
-  // final contractsResponse = await api.contracts.getContracts();
-  // print("Contracts: ${contractsResponse!.data}");
-  // final marketplaces =
-  //     systemWaypoints.where((w) => w.hasMarketplace).toList();
-  // printWaypoints(marketplaces);
-
   final marketResponse = await api.systems
       .getMarket(ship.nav.systemSymbol, ship.nav.waypointSymbol);
   final market = marketResponse!.data;
-  // prettyPrintJson(market.toJson());
 
   // This should not sell anything we have a contract for.
   // We should travel first to the marketplace that has the best price for

@@ -100,6 +100,18 @@ class WaypointCache {
     }
   }
 
+  /// Returns a list of waypoints in the system with a shipyard.
+  Future<List<Waypoint>> shipyardWaypointsForSystem(String systemSymbol) async {
+    final waypoints = await waypointsInSystem(systemSymbol);
+    return waypoints.where((w) => w.hasShipyard).toList();
+  }
+
+  /// Returns a list of waypoints in the system with a marketplace.
+  Future<List<Waypoint>> marketWaypointsForSystem(String systemSymbol) async {
+    final waypoints = await waypointsInSystem(systemSymbol);
+    return waypoints.where((w) => w.hasMarketplace).toList();
+  }
+
   // When JumpGate has a symbol accessor, this can be removed.
   /// Returns the Waypoint for the jump gate in the given system, or null if
   /// there is no jump gate.

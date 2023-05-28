@@ -14,9 +14,8 @@ void main(List<String> args) async {
   final agentResult = await api.agents.getMyAgent();
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
   final marketplaceWaypoints =
-      systemWaypoints.where((w) => w.hasMarketplace).toList();
+      await waypointCache.marketWaypointsForSystem(hq.system);
 
   final waypoint = logger.chooseOne(
     'Which marketplace?',

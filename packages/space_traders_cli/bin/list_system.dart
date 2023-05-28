@@ -13,6 +13,6 @@ void main(List<String> args) async {
 
   final agent = agentResult!.data;
   final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
-  printWaypoints(systemWaypoints);
+  final waypoints = await waypointCache.waypointsInSystem(hq.system);
+  printWaypoints(waypoints);
 }

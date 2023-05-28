@@ -91,7 +91,6 @@ Logic:
 * Cull old prices from prices.json
 * Post prices to the prices server.
 * Fix probes getting stuck cycling.
-* Check and remove all uses of systemWaypoints or systemMarkets or lookupMarket.
 * Remove guards against 0 prices from prices.dart.
 
 UI:

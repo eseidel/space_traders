@@ -23,14 +23,7 @@ void main(List<String> args) async {
   final marketCache = MarketCache(waypointCache);
 
   final myShips = await allMyShips(api).toList();
-  final shipWaypointSymbols = myShips.map((s) => s.nav.waypointSymbol).toSet();
-  final shipWaypoints =
-      await waypointCache.waypointsForSymbols(shipWaypointSymbols).toList();
-  final ship = logger.chooseOne(
-    'Which ship?',
-    choices: myShips,
-    display: (ship) => shipDescription(ship, shipWaypoints),
-  );
+  final ship = await chooseShip(api, waypointCache, myShips);
 
   if (ship.availableSpace < 1) {
     logger.err('No cargo space available on ${ship.symbol}!}');
