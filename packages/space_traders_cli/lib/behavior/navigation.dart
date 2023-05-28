@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
@@ -76,6 +78,13 @@ class NavResult {
   }
 }
 
+int _distanceBetweenSystems(ConnectedSystem a, System b) {
+  // Use euclidean distance.
+  final dx = a.x - b.x;
+  final dy = a.y - b.y;
+  return sqrt(dx * dx + dy * dy).round();
+}
+
 /// Continue navigation if needed, returning the wait time if so.
 /// Reads the destination from the ship's behavior state.
 Future<NavResult> continueNavigationIfNeeded(
@@ -108,11 +117,31 @@ Future<NavResult> continueNavigationIfNeeded(
   // Otherwise, jump to the next system most in its direction.
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   if (currentWaypoint.isJumpGate) {
-    // We are at a jump gate, so we can jump to the next system.
-    await useJumpGateAndLog(api, ship, endWaypoint.systemSymbol);
-    // We can't continue the current action, we have more navigation to do
-    // but it's better to figure that out from the top of the loop again.
-    return NavResult._loop();
+    // Check to make sure the system isn't out of range.  If it is, we need
+    // to jump to a system along the way.
+    final connectedSystems = await waypointCache
+        .connectedSystems(currentWaypoint.systemSymbol)
+        .toList();
+    if (connectedSystems.any((s) => s.symbol == endWaypoint.systemSymbol)) {
+      // We can jump directly to the end system.
+      await useJumpGateAndLog(api, ship, endWaypoint.systemSymbol);
+      // We can't continue the current action, we have more navigation to do
+      // but it's better to figure that out from the top of the loop again.
+      return NavResult._loop();
+    }
+    // Otherwise we have to jump to a system along the way.
+    final endSystem =
+        await waypointCache.systemBySymbol(endWaypoint.systemSymbol);
+    final closestSystem = connectedSystems.reduce(
+      (a, b) => _distanceBetweenSystems(a, endSystem) <
+              _distanceBetweenSystems(b, endSystem)
+          ? a
+          : b,
+    );
+    // What if the closest system is further than the one we're already in?
+    final response = await useJumpGateAndLog(api, ship, closestSystem.symbol);
+    // We will have to jump again, so just wait at the jump gate.
+    return NavResult._wait(response.cooldown.expiration!);
   }
   // We are not at a jump gate, so we need to navigate to the nearest one.
   final jumpGate = await waypointCache.jumpGateWaypointForSystem(
