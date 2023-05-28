@@ -11,7 +11,9 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 
-Future<Deal?> _findBestDealWithinOneJump(
+/// Returns the best deal for the given ship within one jump of it's
+/// current location.
+Future<Deal?> findBestDealWithinOneJump(
   PriceData priceData,
   Ship ship,
   WaypointCache waypointCache,
@@ -59,6 +61,7 @@ Future<Deal?> _findBestDealAcrossMarkets(
   }
 
   // TODO(eseidel): Need to consider time and fuel costs, for the route.
+  // Also need to consider if we can afford the upfront cost of the cargo.
   // Deals which don't start at our current location, also have time and fuel
   // to get to the first waypoint.
   return deals.reduce((a, b) => a.profit > b.profit ? a : b);
@@ -103,7 +106,7 @@ Future<DateTime?> advanceArbitrageTrader(
   const minimumProfit = 500;
 
   // Consider all deals starting at any market within our consideration range.
-  final deal = await _findBestDealWithinOneJump(
+  final deal = await findBestDealWithinOneJump(
     priceData,
     ship,
     waypointCache,
@@ -119,7 +122,7 @@ Future<DateTime?> advanceArbitrageTrader(
     );
     return null;
   }
-  shipInfo(ship, 'Found deal: $deal');
+  shipInfo(ship, 'Found deal: ${describeDeal(deal)}');
 
   // TODO(eseidel): Save the deal we found so we don't have to recompute it.
 

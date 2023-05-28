@@ -7,6 +7,7 @@ import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/data_store.dart';
+import 'package:space_traders_cli/exceptions.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
@@ -78,7 +79,7 @@ Future<DateTime?> advanceMiner(
     final maybeAsteroidField =
         systemWaypoints.firstWhereOrNull((w) => w.canBeMined);
 
-    if (currentWaypoint.hasMarketplace && !ship.isFuelFull()) {
+    if (currentWaypoint.hasMarketplace && ship.shouldRefuel) {
       await dockIfNeeded(api, ship);
       await refuelIfNeededAndLog(api, priceData, agent, ship);
     }

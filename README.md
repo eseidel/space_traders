@@ -92,6 +92,8 @@ Logic:
 * Post prices to the prices server.
 * Fix probes getting stuck cycling.
 * Remove guards against 0 prices from prices.dart.
+* Make shipInfo include an emoji for the behavior.
+* Move to some sort of context object that holds both Ship and Behavior.
 
 UI:
 * Add a Flutter UI.

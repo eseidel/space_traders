@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/logger.dart';
 
 /// parseWaypointString parses a waypoint string into its component parts.
 ({String sector, String system, String waypoint}) parseWaypointString(
@@ -74,7 +71,12 @@ extension ShipUtils on Ship {
   }
 
   /// Returns true if the ship if full on fuel.
-  bool isFuelFull() => fuel.current >= fuel.capacity;
+  bool get isFuelFull => fuel.current >= fuel.capacity;
+
+  /// Returns true if the ship should refuel.
+  // One fuel bought from the market is 100 units of fuel in the ship.
+  // For repeated short trips, avoiding buying fuel when we're close to full.
+  bool get shouldRefuel => fuel.current < (fuel.capacity - 100);
 
   /// Returns the amount of space available on the ship.
   int get availableSpace => cargo.availableSpace;
@@ -198,51 +200,4 @@ extension MarketUtils on Market {
     };
     return symbols;
   }
-}
-
-/// Error 4000 is just a cooldown error and we can retry.
-/// Detect that case and return the retry time.
-/// https://docs.spacetraders.io/api-guide/response-errors
-DateTime? expirationFromApiException(ApiException e) {
-  // We ignore the error code at the http level, since we only care about
-  // the error code in the response body.
-  // I've seen both 409 and 400 for this error.
-
-  final jsonString = e.message;
-  if (jsonString != null) {
-    Map<String, dynamic> exceptionJson;
-    try {
-      exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
-    } on FormatException catch (e) {
-      // Catch any json decode errors, so the original exception can be
-      // rethrown by the caller instead of a json decode error.
-      logger.warn('Failed to parse exception json: $e');
-      return null;
-    }
-    final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
-    final code = mapValueOfType<int>(error, 'code');
-    if (code != 4000) {
-      return null;
-    }
-    final errorData = mapCastOfType<String, dynamic>(error, 'data');
-    final cooldown = mapCastOfType<String, dynamic>(errorData, 'cooldown');
-    return mapDateTime(cooldown, 'expiration');
-  }
-  return null;
-}
-
-/// Error 4224 is a survey expired error.
-bool isExpiredSurveyException(ApiException e) {
-  // We ignore the error code at the http level, since we only care about
-  // the error code in the response body.
-  // ApiException 409: {"error":{"message":"Ship extract failed.
-  // Survey X1-VS75-67965Z-D0F7C6 has been exhausted.","code":4224}}
-  final jsonString = e.message;
-  if (jsonString != null) {
-    final exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
-    final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
-    final code = mapValueOfType<int>(error, 'code');
-    return code == 4224;
-  }
-  return false;
 }

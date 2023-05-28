@@ -1,6 +1,6 @@
 import 'package:file/local.dart';
-import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
@@ -12,12 +12,20 @@ void main() async {
   final marketCache = MarketCache(waypointCache);
 
   final priceData = await PriceData.load(fs);
+  final ships = await allMyShips(api).toList();
+  final ship = ships.first;
 
-  final market = await marketCache.marketForSymbol('X1-TY89-82996C');
-  final price = estimateSellPrice(
+  // final market = await marketCache.marketForSymbol('X1-DB96-67013B');
+  // final price = estimatePurchasePrice(
+  //   priceData,
+  //   TradeSymbol.fromJson('BOTANICAL_SPECIMENS')!,
+  //   market!,
+  // );
+  final deal = await findBestDealWithinOneJump(
     priceData,
-    TradeSymbol.fromJson('MEDICINE')!,
-    market!,
+    ship,
+    waypointCache,
+    marketCache,
   );
-  print(price);
+  logDeal(ship, deal!);
 }
