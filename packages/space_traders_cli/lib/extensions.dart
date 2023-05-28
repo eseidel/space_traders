@@ -149,6 +149,9 @@ extension ContractUtils on Contract {
 
   /// Returns the duration until the contract deadline.
   Duration get timeUntilDeadline => terms.deadline.difference(DateTime.now());
+
+  /// Returns true if the contract has expired.
+  bool get isExpired => timeUntilDeadline.isNegative;
 }
 
 /// Extensions onto ContractDeliverGood to make it easier to work with.

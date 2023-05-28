@@ -24,13 +24,13 @@ Behavior _behaviorFor(
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
   if (ship.engine.speed > 20) {
-    // if (maybeGoods != null &&
-    //     behaviorManager.isEnabled(Behavior.contractTrader)) {
-    //   return Behavior.contractTrader;
-    // }
-    // if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
-    //   return Behavior.arbitrageTrader;
-    // }
+    if (maybeGoods != null &&
+        behaviorManager.isEnabled(Behavior.contractTrader)) {
+      return Behavior.contractTrader;
+    }
+    if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
+      return Behavior.arbitrageTrader;
+    }
   }
   // Could check if it has a mining laser or ship.isExcavator
   if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
@@ -69,6 +69,13 @@ Stream<Waypoint> waypointsInJumpRadius({
   } while (allowedJumps > 0 && systemsToJumpFrom.isNotEmpty);
 }
 
+/// Returns a list of all active (not fulfilled or expired) contracts.
+Future<List<Contract>> activeContracts(Api api) async {
+  final allContracts = await allMyContracts(api).toList();
+  // Filter out the ones we've already done or have expired.
+  return allContracts.where((c) => !c.fulfilled && !c.isExpired).toList();
+}
+
 /// One loop of the logic.
 Future<void> logicLoop(
   Api api,
@@ -82,9 +89,8 @@ Future<void> logicLoop(
   final agent = agentResult!.data;
   final myShips = await allMyShips(api).toList();
   waiter.updateForShips(myShips);
-  final allContracts = await allMyContracts(api).toList();
-  // Filter out the ones we've already done.
-  final contracts = allContracts.where((c) => !c.fulfilled).toList();
+
+  final contracts = await activeContracts(api);
   if (contracts.length > 1) {
     throw UnimplementedError();
   }
