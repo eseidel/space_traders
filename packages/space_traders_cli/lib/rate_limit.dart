@@ -53,6 +53,7 @@ class RateLimitedApiClient extends ApiClient {
       );
       await Future<void>.delayed(_nextRequestTime.difference(beforeRequest));
     }
+    logger.detail('Making request to $path');
     final response = await super.invokeAPI(
       path,
       method,

@@ -40,36 +40,6 @@ Behavior _behaviorFor(
   return Behavior.explorer;
 }
 
-/// Yields a stream of Waypoints that are within n jumps of the given start.
-/// The start is not included in the stream.
-/// The stream is roughly ordered by distance from the start.
-Stream<Waypoint> waypointsInJumpRadius({
-  required WaypointCache waypointCache,
-  required String startSystem,
-  required int allowedJumps,
-}) async* {
-  final systemsToJumpFrom = <String>{startSystem};
-  final systemsExamined = <String>{};
-  do {
-    final jumpFrom = systemsToJumpFrom.first;
-    systemsToJumpFrom.remove(jumpFrom);
-    systemsExamined.add(jumpFrom);
-    final waypoints = await waypointCache.waypointsInSystem(jumpFrom);
-    for (final waypoint in waypoints) {
-      yield waypoint;
-    }
-    final connectedSystems =
-        await waypointCache.connectedSystems(jumpFrom).toList();
-    final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
-    for (final connectedSystem in sortedSystems) {
-      if (!systemsExamined.contains(connectedSystem.symbol)) {
-        systemsToJumpFrom.add(connectedSystem.symbol);
-      }
-    }
-    allowedJumps--;
-  } while (allowedJumps > 0 && systemsToJumpFrom.isNotEmpty);
-}
-
 /// Returns a list of all active (not fulfilled or expired) contracts.
 Future<List<Contract>> activeContracts(Api api) async {
   final allContracts = await allMyContracts(api).toList();

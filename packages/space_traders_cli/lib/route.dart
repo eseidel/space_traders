@@ -92,9 +92,11 @@ class RoutePlanner {
 }
 
 /// Returns the distance to the given waypoint.
-int? distanceWithinSystem(Waypoint a, Waypoint b) {
+int distanceWithinSystem(Waypoint a, Waypoint b) {
   if (a.systemSymbol != b.systemSymbol) {
-    return null;
+    return throw ArgumentError(
+      'Waypoints must be in the same system: $a, $b',
+    );
   }
   // Use euclidean distance.
   final dx = a.x - b.x;
@@ -108,7 +110,7 @@ int fuelCostWithinSystem(
   Waypoint b, {
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
-  final distance = distanceWithinSystem(a, b)!;
+  final distance = distanceWithinSystem(a, b);
   switch (flightMode) {
     case ShipNavFlightMode.DRIFT:
       return 1;
@@ -130,7 +132,7 @@ int flightTimeWithinSystemInSeconds(
   required int shipSpeed,
 }) {
   // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
-  final distance = distanceWithinSystem(a, b)!;
+  final distance = distanceWithinSystem(a, b);
   final distanceBySpeed = distance ~/ shipSpeed;
 
   switch (flightMode) {

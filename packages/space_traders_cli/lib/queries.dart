@@ -45,6 +45,7 @@ class WaypointCache {
 
   /// Fetch all waypoints in the given system.
   Future<List<Waypoint>> waypointsInSystem(String systemSymbol) async {
+    assert(systemSymbol.split('-').length == 2, 'Invalid system symbol');
     if (_waypointsBySystem.containsKey(systemSymbol)) {
       return _waypointsBySystem[systemSymbol]!;
     }
@@ -55,6 +56,7 @@ class WaypointCache {
 
   /// Fetch the waypoint with the given symbol.
   Future<Waypoint> waypoint(String waypointSymbol) async {
+    assert(waypointSymbol.split('-').length == 3, 'Invalid system symbol');
     final systemSymbol = parseWaypointString(waypointSymbol).system;
     final waypoints = await waypointsInSystem(systemSymbol);
     return waypoints.firstWhere((w) => w.symbol == waypointSymbol);

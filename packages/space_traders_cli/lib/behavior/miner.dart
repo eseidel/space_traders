@@ -12,6 +12,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/route.dart';
 
 /// Either loads a cached survey set or creates a new one if we have a surveyor.
 Future<SurveySet?> loadOrCreateSurveySetIfPossible(
@@ -52,6 +53,36 @@ Survey? _chooseBestSurvey(SurveySet? surveySet) {
   return surveySet.surveys[Random().nextInt(surveySet.surveys.length)];
 }
 
+/// Returns the nearest waypoint with a marketplace.
+Future<Waypoint> nearestWaypointWithMarket(
+  WaypointCache waypointCache,
+  String waypointSymbol,
+) async {
+  final waypoint = await waypointCache.waypoint(waypointSymbol);
+  if (waypoint.hasMarketplace) {
+    return waypoint;
+  }
+  final systemMarkets =
+      await waypointCache.marketWaypointsForSystem(waypoint.systemSymbol);
+  if (systemMarkets.isEmpty) {
+    final sortedWaypoints =
+        systemMarkets.sortedBy<num>((w) => distanceWithinSystem(w, waypoint));
+    return sortedWaypoints.first;
+  }
+  await for (final waypoint in waypointsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: waypoint.systemSymbol,
+    allowedJumps: 1,
+  )) {
+    if (waypoint.hasMarketplace) {
+      return waypoint;
+    }
+  }
+  throw Exception(
+    'No waypoints with marketplaces found in jump radius of $waypointSymbol',
+  );
+}
+
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
@@ -72,6 +103,42 @@ Future<DateTime?> advanceMiner(
     return navResult.waitTime;
   }
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+
+  // It's not worth potentially waiting a minute just to get a few pieces
+  // of cargo, when a surveyed mining operation could pull 10+ pieces.
+  // Hence selling when we're down to 15 or fewer spaces.
+  // This eventually should be dependent on market availability.
+  final shouldSell = ship.availableSpace < 15;
+  if (shouldSell) {
+    // Sell cargo and refuel if needed.
+    if (currentWaypoint.hasMarketplace) {
+      await dockIfNeeded(api, ship);
+      await refuelIfNeededAndLog(api, priceData, agent, ship);
+      await sellCargoAndLog(api, priceData, ship);
+      // Reset our state now that we've done the behavior once.
+      await behaviorManager.completeBehavior(ship.symbol);
+      return null;
+    } else {
+      shipInfo(
+          ship,
+          'No marketplace at ${currentWaypoint.symbol}, '
+          'navigating to nearest marketplace.');
+      // TODO(eseidel): This may not be sufficient if the marketplace
+      // does not accept our cargo.
+      final nearestMarket = await nearestWaypointWithMarket(
+        waypointCache,
+        currentWaypoint.symbol,
+      );
+      return beingRouteAndLog(
+        api,
+        ship,
+        waypointCache,
+        behaviorManager,
+        nearestMarket.symbol,
+      );
+    }
+  }
+
   if (!currentWaypoint.canBeMined) {
     // We're not at an asteroid field, so we need to navigate to one.
     final systemWaypoints =
@@ -100,18 +167,6 @@ Future<DateTime?> advanceMiner(
       behaviorManager,
       agent.headquarters,
     );
-  }
-  // It's not worth potentially waiting a minute just to get a few pieces
-  // of cargo, when a surveyed mining operation could pull 10+ pieces.
-  // Hence selling when we're down to 15 or fewer spaces.
-  if (ship.availableSpace < 15) {
-    // Otherwise, sell cargo and refuel if needed.
-    await dockIfNeeded(api, ship);
-    await refuelIfNeededAndLog(api, priceData, agent, ship);
-    await sellCargoAndLog(api, priceData, ship);
-    // Reset our state now that we've done the behavior once.
-    await behaviorManager.completeBehavior(ship.symbol);
-    return null;
   }
 
   // If we still have space, mine.
