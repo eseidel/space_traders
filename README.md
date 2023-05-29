@@ -95,6 +95,8 @@ Logic:
 * Make shipInfo include an emoji for the behavior.
 * Move to some sort of context object that holds both Ship and Behavior.
 * Start to build a system database similar to the pricing database.
+* Carefully choose which survey to use.
+* Continue navigation should print status (e.g. time to destination).
 
 UI:
 * Add a Flutter UI.

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
@@ -39,7 +37,73 @@ Future<SurveySet?> loadOrCreateSurveySetIfPossible(
   return null;
 }
 
-Survey? _chooseBestSurvey(SurveySet? surveySet) {
+// my evaluation logic actually just assumes I'll get 10 extracts from each
+// survey regardless of size - so room for improvement.... I just don't have the
+// data on how many extracts to exhaust a deposit
+
+// what I'd recommend as a fast solution is using taavi's evaluation logic on
+// each survey you make, keep a record of the scores, and then only mine out
+// surveys that historically would have been in the top third (edited)
+
+// do you not divide by the number of deposits in the survey? Aren't you
+// favouring the 5 deposit surveys too much here?
+
+// scoreSurvey(
+//     survey: Survey,
+//     favourItemSymbols: ItemSymbol[] | undefined,
+//     averageSellPrices: Record<ItemSymbol, number>,
+//   ): number {
+//     return survey.deposits.reduce(
+//       (score, item) =>
+//         (score +=
+//           (averageSellPrices[item] ?? 1) *
+//          (favourItemSymbols && favourItemSymbols.includes(item) ? 1000 : 1)),
+//       0,
+//     );
+//   }
+
+// https://discord.com/channels/792864705139048469/792864705139048472/1112766963601645628
+// const occurenceWeightBySymbol = <String, double>{
+//   'ICE_WATER': 40,
+//   'SILICON_CRYSTALS': 20,
+//   'QUARTZ_SAND': 20,
+//   'AMMONIA_ICE': 20,
+//   'SILVER_ORE': 10,
+//   'IRON_ORE': 10,
+//   'COPPER_ORE': 10,
+//   'ALUMINUM_ORE': 10,
+//   'GOLD_ORE': 4,
+//   'PLATINUM_ORE': 4,
+//   'DIAMONDS': 0.2,
+// };
+
+/// Returns the expected value of the survey.
+int expectedValueFromSurvey(
+  PriceData priceData,
+  Waypoint market,
+  Survey survey,
+) {
+  // I'm not yet sure what to do with deposit size.
+  // Look at each of the possible returns.
+  // Price them at the local market.
+
+  final totalValue = survey.deposits.fold<int>(
+    0,
+    (total, deposit) =>
+        total +
+        priceData.recentSellPrice(
+          marketSymbol: market.symbol,
+          tradeSymbol: deposit.symbol,
+        )!,
+  );
+  return totalValue ~/ survey.deposits.length;
+}
+
+Survey? _chooseBestSurvey(
+  PriceData priceData,
+  Waypoint nearestMarket,
+  SurveySet? surveySet,
+) {
   if (surveySet == null) {
     return null;
   }
@@ -50,7 +114,10 @@ Survey? _chooseBestSurvey(SurveySet? surveySet) {
     return null;
   }
   // Just picking at random for now.
-  return surveySet.surveys[Random().nextInt(surveySet.surveys.length)];
+  final sortedSurveys = surveySet.surveys.sortedBy<num>(
+    (s) => expectedValueFromSurvey(priceData, nearestMarket, s),
+  );
+  return sortedSurveys.last;
 }
 
 /// Returns the nearest waypoint with a marketplace.
@@ -179,7 +246,11 @@ Future<DateTime?> advanceMiner(
   await undockIfNeeded(api, ship);
   // Load a survey set, or if we have surveying capabilities, survey.
   final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
-  final maybeSurvey = _chooseBestSurvey(surveySet);
+  final nearestMarket = await nearestWaypointWithMarket(
+    waypointCache,
+    currentWaypoint.symbol,
+  );
+  final maybeSurvey = _chooseBestSurvey(priceData, nearestMarket, surveySet);
   try {
     final response = await extractResources(api, ship, survey: maybeSurvey);
     final yield_ = response.extraction.yield_;
@@ -195,9 +266,22 @@ Future<DateTime?> advanceMiner(
     // We could sell here before putting ourselves to sleep.
     return response.cooldown.expiration;
   } on ApiException catch (e) {
-    if (isExpiredSurveyException(e)) {
-      // If the survey is expired, delete it and try again.
-      await deleteSurveySet(db, ship.nav.waypointSymbol);
+    if (isExhaustedSurveyException(e)) {
+      // If the survey is exhausted, delete it and try again.
+      shipInfo(
+        ship,
+        'Survey ${maybeSurvey!.signature} exhausted, '
+        'deleting and trying again.',
+      );
+      surveySet!.surveys
+          .removeWhere((s) => s.signature == maybeSurvey.signature);
+      // This will end up going through them in order, which is probably wrong.
+      // We should discard any low-value surveys.
+      if (surveySet.surveys.isEmpty) {
+        await deleteSurveySet(db, surveySet.waypointSymbol);
+      } else {
+        await saveSurveySet(db, surveySet);
+      }
       return null;
     }
     rethrow;

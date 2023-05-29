@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/logger.dart';
 
-/// Error 4224 is a survey expired error.
-bool isExpiredSurveyException(ApiException e) {
+/// Error 4224 is a survey exhausted error.
+bool isExhaustedSurveyException(ApiException e) {
   // We ignore the error code at the http level, since we only care about
   // the error code in the response body.
   // ApiException 409: {"error":{"message":"Ship extract failed.
