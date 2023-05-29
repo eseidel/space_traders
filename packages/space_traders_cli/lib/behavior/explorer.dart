@@ -73,8 +73,9 @@ Future<DateTime?> advanceExporer(
   // If at a jump gate, go to a nearby system with unexplored waypoints or
   // missing market data.
   if (currentWaypoint.isJumpGate) {
-    // Should look at systems connected to hq and go to the one closest to
-    // hq with unexplored waypoints or missing market data.
+    // We look for systems within the current jump gate's radius that have
+    // unexplored waypoints or missing market data.
+    // TODO(eseidel): Try removing this, it's redundant with the code below.
     final jumpGate = await getJumpGate(api, currentWaypoint);
     final sortedSystems = jumpGate.connectedSystems.toList()
       ..sort((a, b) => a.distance.compareTo(b.distance));
@@ -94,18 +95,37 @@ Future<DateTime?> advanceExporer(
         }
       }
     }
+    const maxJumpDistance = 100;
     // If we get here, we've explored all systems connected to the jump gate.
-    // So jump to the furthest and try again.
-    // TODO(eseidel): This ends up looping in a cycle.
-    final furthestSystem = sortedSystems.last;
-    shipWarn(
+    // Walk waypoints as far out as we can see until we find one missing
+    // a chart or market data and route to there.
+    await for (final destination in waypointsInJumpRadius(
+      waypointCache: waypointCache,
+      startSystem: currentWaypoint.systemSymbol,
+      allowedJumps: maxJumpDistance,
+    )) {
+      if (_isMissingChartOrRecentMarketData(priceData, destination)) {
+        shipInfo(
+          ship,
+          'Found unexplored system ${destination.symbol}, routing.',
+        );
+        return beingRouteAndLog(
+          api,
+          ship,
+          waypointCache,
+          behaviorManager,
+          destination.symbol,
+        );
+      }
+    }
+    // If we get here, we've explored all systems within maxJumpDistance jumps
+    // of this system.  We just log an error and sleep.
+    shipErr(
       ship,
-      'All systems connected to ${currentWaypoint.symbol} explored, '
-      'jumping to furthest system, ${furthestSystem.symbol}.',
+      'No unexplored systems within $maxJumpDistance jumps of '
+      '${currentWaypoint.systemSymbol}, sleeping.',
     );
-    await undockIfNeeded(api, ship);
-    await useJumpGateAndLog(api, ship, furthestSystem.symbol);
-    // Jumping is instant.
+    await behaviorManager.disableBehavior(ship, Behavior.explorer);
     return null;
   }
 
