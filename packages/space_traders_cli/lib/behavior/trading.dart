@@ -76,7 +76,11 @@ int? estimateSellPrice(
   // logger.info(
   //   'No recent sell price for ${tradeSymbol.value} at ${market.symbol}',
   // );
-  final tradeType = market.exchangeType(tradeSymbol.value)!;
+  final tradeType = market.exchangeType(tradeSymbol.value);
+  if (tradeType == null) {
+    logger.info('${market.symbol} does not trade ${tradeSymbol.value}');
+    return null;
+  }
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
   // logger
@@ -107,7 +111,11 @@ int? estimatePurchasePrice(
   // logger.info(
   //   'No recent purchase price for ${tradeSymbol.value} at ${market.symbol}',
   // );
-  final tradeType = market.exchangeType(tradeSymbol.value)!;
+  final tradeType = market.exchangeType(tradeSymbol.value);
+  if (tradeType == null) {
+    logger.info('${market.symbol} does not trade ${tradeSymbol.value}');
+    return null;
+  }
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
   return priceData.purchasePriceAtPercentile(tradeSymbol.value, percentile);

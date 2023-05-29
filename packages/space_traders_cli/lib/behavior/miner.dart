@@ -108,6 +108,8 @@ Future<DateTime?> advanceMiner(
   // of cargo, when a surveyed mining operation could pull 10+ pieces.
   // Hence selling when we're down to 15 or fewer spaces.
   // This eventually should be dependent on market availability.
+  // How much to expect:
+  // https://discord.com/channels/792864705139048469/1106265069630804019/1112585073712173086
   final shouldSell = ship.availableSpace < 15;
   if (shouldSell) {
     // Sell cargo and refuel if needed.

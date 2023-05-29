@@ -26,7 +26,7 @@ Future<Deal?> findBestDealWithinOneJump(
   final markets = await connectedSystems
       .asyncExpand((s) => marketCache.marketsInSystem(s.symbol))
       .toList();
-  return _findBestDealAcrossMarkets(
+  return findBestDealAcrossMarkets(
     priceData,
     ship,
     waypointCache,
@@ -36,7 +36,8 @@ Future<Deal?> findBestDealWithinOneJump(
   );
 }
 
-Future<Deal?> _findBestDealAcrossMarkets(
+/// Returns the best deal for the given ship across the given set of markets.
+Future<Deal?> findBestDealAcrossMarkets(
   PriceData priceData,
   Ship ship,
   WaypointCache waypointCache,
