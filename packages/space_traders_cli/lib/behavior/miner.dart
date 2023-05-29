@@ -116,9 +116,11 @@ Future<DateTime?> advanceMiner(
     if (currentWaypoint.hasMarketplace) {
       await dockIfNeeded(api, ship);
       await refuelIfNeededAndLog(api, priceData, agent, ship);
+      // TODO(eseidel): This can fail to sell and get stuck in a loop.
       await sellCargoAndLog(api, priceData, ship);
       // Reset our state now that we've done the behavior once.
       await behaviorManager.completeBehavior(ship.symbol);
+      // This return null maybe wrong if we failed to sell?
       return null;
     } else {
       shipInfo(
@@ -142,6 +144,7 @@ Future<DateTime?> advanceMiner(
   }
 
   if (!currentWaypoint.canBeMined) {
+    shipInfo(ship, "can't be mined, navigating to nearest asteroid field.");
     // We're not at an asteroid field, so we need to navigate to one.
     final systemWaypoints =
         await waypointCache.waypointsInSystem(ship.nav.systemSymbol);

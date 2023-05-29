@@ -94,6 +94,8 @@ Logic:
 * Remove guards against 0 prices from prices.dart.
 * Make shipInfo include an emoji for the behavior.
 * Move to some sort of context object that holds both Ship and Behavior.
+* Start to build a system database similar to the pricing database.
 
 UI:
 * Add a Flutter UI.
+* Make it possible to filter for a sub-set of systems (e.g. ones with a market and a mine).

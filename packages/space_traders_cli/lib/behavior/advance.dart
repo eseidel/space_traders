@@ -25,6 +25,7 @@ Future<DateTime?> advanceShipBehavior(
   ContractDeliverGood? maybeGoods,
 ) async {
   final behavior = await behaviorManager.getBehavior(ship.symbol);
+  // shipDetail(ship, 'Advancing behavior: ${behavior.behavior.name}');
   switch (behavior.behavior) {
     case Behavior.contractTrader:
       return advanceContractTrader(
