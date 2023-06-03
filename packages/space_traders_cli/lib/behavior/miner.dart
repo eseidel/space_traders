@@ -117,6 +117,19 @@ Survey? _chooseBestSurvey(
   final sortedSurveys = surveySet.surveys.sortedBy<num>(
     (s) => expectedValueFromSurvey(priceData, nearestMarket, s),
   );
+  // Generally it only gives back one survey, the idea would be to
+  // check the value of that survey relative to historical averages
+  // and either discard it if it's below some historical threshold or mine it.
+
+  // logger.info('Scored surveys:');
+  // for (final survey in sortedSurveys) {
+  //   logger.info(
+  //     '${survey.signature} ${survey.size} '
+  //     '${survey.deposits.map((d) => d.symbol).join(', ')} '
+  //     '${expectedValueFromSurvey(priceData, nearestMarket, survey)}',
+  //   );
+  // }
+
   return sortedSurveys.last;
 }
 

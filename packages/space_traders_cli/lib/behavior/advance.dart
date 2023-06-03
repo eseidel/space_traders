@@ -9,69 +9,111 @@ import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
 
+/// The context for a behavior.
+class BehaviorContext {
+  /// Create a BehaviorContext
+  BehaviorContext(
+    this.api,
+    this.db,
+    this.priceData,
+    this.ship,
+    this.agent,
+    this.waypointCache,
+    this.marketCache,
+    this.behaviorManager,
+    this.contract,
+    this.maybeGoods,
+  );
+
+  /// Handle to the API clients.
+  final Api api;
+
+  /// Handle to the database.
+  final DataStore db;
+
+  /// The current price data.
+  final PriceData priceData;
+
+  /// The ship we are controlling.
+  final Ship ship;
+
+  /// The agent object.
+  final Agent agent;
+
+  /// The cache of waypoints.
+  final WaypointCache waypointCache;
+
+  /// The cache of markets.
+  final MarketCache marketCache;
+
+  /// The behavior manager.
+  final BehaviorManager behaviorManager;
+
+  /// The current contract.
+  final Contract? contract;
+
+  /// The goods we are delivering.
+  final ContractDeliverGood? maybeGoods;
+
+  /// Load the behavior state for the given ship.
+  Future<BehaviorState> loadBehaviorState() async =>
+      behaviorManager.getBehavior(ship.symbol);
+}
+
 /// Advance the behavior of the given ship.
 /// Returns the time at which the behavior should be advanced again
 /// or null if can be advanced immediately.
 Future<DateTime?> advanceShipBehavior(
-  Api api,
-  DataStore db,
-  BehaviorManager behaviorManager,
-  PriceData priceData,
-  Agent agent,
-  Ship ship,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  Contract? contract,
-  ContractDeliverGood? maybeGoods,
+  BehaviorContext ctx,
 ) async {
-  final behavior = await behaviorManager.getBehavior(ship.symbol);
+  final behavior = await ctx.loadBehaviorState();
   // shipDetail(ship, 'Advancing behavior: ${behavior.behavior.name}');
   switch (behavior.behavior) {
     case Behavior.contractTrader:
       return advanceContractTrader(
-        api,
-        db,
-        priceData,
-        agent,
-        ship,
-        waypointCache,
-        marketCache,
-        behaviorManager,
-        contract,
-        maybeGoods!,
+        ctx.api,
+        ctx.db,
+        ctx.priceData,
+        ctx.agent,
+        ctx.ship,
+        ctx.waypointCache,
+        ctx.marketCache,
+        ctx.behaviorManager,
+        ctx.contract,
+        ctx.maybeGoods,
       );
     case Behavior.arbitrageTrader:
       return advanceArbitrageTrader(
-        api,
-        db,
-        priceData,
-        agent,
-        ship,
-        waypointCache,
-        marketCache,
-        behaviorManager,
+        ctx.api,
+        ctx.db,
+        ctx.priceData,
+        ctx.agent,
+        ctx.ship,
+        ctx.waypointCache,
+        ctx.marketCache,
+        ctx.behaviorManager,
       );
     case Behavior.miner:
       return advanceMiner(
-        api,
-        db,
-        priceData,
-        agent,
-        ship,
-        waypointCache,
-        behaviorManager,
+        ctx.api,
+        ctx.db,
+        ctx.priceData,
+        ctx.agent,
+        ctx.ship,
+        ctx.waypointCache,
+        ctx.behaviorManager,
       );
 
     case Behavior.explorer:
       return advanceExporer(
-        api,
-        db,
-        priceData,
-        agent,
-        ship,
-        waypointCache,
-        marketCache,
-        behaviorManager,
+        ctx.api,
+        ctx.db,
+        ctx.priceData,
+        ctx.agent,
+        ctx.ship,
+        ctx.waypointCache,
+        ctx.marketCache,
+        ctx.behaviorManager,
       );
   }
 }

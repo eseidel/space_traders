@@ -93,18 +93,19 @@ Future<void> logicLoop(
       return _behaviorFor(bm, ship, agent, maybeGoods);
     });
     try {
-      final waitUntil = await advanceShipBehavior(
+      final ctx = BehaviorContext(
         api,
         db,
-        behaviorManager,
         priceData,
-        agent,
         ship,
+        agent,
         waypointCache,
         marketCache,
+        behaviorManager,
         maybeContract,
         maybeGoods,
       );
+      final waitUntil = await advanceShipBehavior(ctx);
       waiter.updateWaitUntil(ship.symbol, waitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when
