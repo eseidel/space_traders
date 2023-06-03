@@ -148,20 +148,20 @@ bool isWindowsSemaphoreTimeout(ApiException e) {
       .contains('The semaphore timeout period has expired.');
 }
 
-// Future<void> _acceptAllContractsIfNeeded(Api api) async {
-//   final contractsResponse = await api.contracts.getContracts();
-//   final contracts = contractsResponse!.data;
-//   for (final contract in contracts) {
-//     if (!contract.accepted) {
-//       await api.contracts.acceptContract(contract.id);
-//       logger
-//         ..info('Accepted: ${contractDescription(contract)}.')
-//         ..info(
-//           'received ${creditsString(contract.terms.payment.onAccepted)}',
-//         );
-//     }
-//   }
-// }
+Future<void> _acceptAllContractsIfNeeded(Api api) async {
+  final contractsResponse = await api.contracts.getContracts();
+  final contracts = contractsResponse!.data;
+  for (final contract in contracts) {
+    if (!contract.accepted) {
+      await api.contracts.acceptContract(contract.id);
+      logger
+        ..info('Accepted: ${contractDescription(contract)}.')
+        ..info(
+          'received ${creditsString(contract.terms.payment.onAccepted)}',
+        );
+    }
+  }
+}
 
 /// Run the logic loop forever.
 /// Currently just sends ships to mine and sell ore.
@@ -170,7 +170,7 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
   // This is a bit dangerous because we could accept a contract and then
   // not be able to fulfill it.
   // This also isn't catching maintenance windows.
-  // await _acceptAllContractsIfNeeded(api);
+  await _acceptAllContractsIfNeeded(api);
 
   final waiter = ShipWaiter();
 

@@ -78,9 +78,9 @@ String contractDescription(Contract contract) {
         (d) => '${d.unitsRequired} ${d.tradeSymbol} to ${d.destinationSymbol}',
       )
       .join(', ');
-  termsString = 'by ${terms.deadline.toLocal()}';
-  termsString = 'for ${creditsString(terms.payment.onFulfilled)}';
-  termsString = 'with ${creditsString(terms.payment.onAccepted)} upfront';
+  termsString += ' by ${terms.deadline.toLocal()}';
+  termsString += ' for ${creditsString(terms.payment.onFulfilled)}';
+  termsString += ' with ${creditsString(terms.payment.onAccepted)} upfront';
   return '${contract.type} from ${contract.factionSymbol}, '
       'deliver $termsString';
 }

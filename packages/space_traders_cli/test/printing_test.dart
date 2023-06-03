@@ -31,4 +31,25 @@ void main() {
     expect(durationString(const Duration(seconds: 60)), '00:01:00');
     expect(durationString(const Duration(seconds: 3600)), '01:00:00');
   });
+
+  test('contractDescription', () {
+    final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
+    final contract = Contract(
+      id: 'id',
+      factionSymbol: 'faction',
+      type: ContractTypeEnum.PROCUREMENT,
+      terms: ContractTerms(
+        deadline: moonLanding,
+        payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
+        deliver: [],
+      ),
+      expiration: moonLanding,
+      deadlineToAccept: moonLanding,
+    );
+    expect(
+      contractDescription(contract),
+      'PROCUREMENT from faction, deliver  by 1969-07-20 20:18:04.000 for '
+      '1,000c with 1,000c upfront',
+    );
+  });
 }
