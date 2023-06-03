@@ -191,16 +191,22 @@ class PriceData {
     }
 
     // We could mock http here.
-    final response = await http.get(uri);
-    final serverPrices = _parsePrices(response.body);
-    if (fromCache == null) {
-      final data = PriceData(serverPrices, fs: fs, cacheFilePath: filePath);
-      await data.save();
-      return data;
+    try {
+      final response = await http.get(uri);
+      final serverPrices = _parsePrices(response.body);
+      if (fromCache == null) {
+        final data = PriceData(serverPrices, fs: fs, cacheFilePath: filePath);
+        await data.save();
+        return data;
+      }
+      logger.info('Updating ${serverPrices.length} prices from server.');
+      await fromCache.addPrices(serverPrices);
+    } catch (e) {
+      logger.warn('Failed to fetch prices from $uri: $e');
     }
-    logger.info('Updating ${serverPrices.length} prices from server.');
-    await fromCache.addPrices(serverPrices);
-    return fromCache;
+    // fromCache can still be null if we failed to load from cache and
+    // failed to load from server.
+    return fromCache ?? PriceData([], fs: fs, cacheFilePath: filePath);
   }
 
   /// Add new prices to the price data.
