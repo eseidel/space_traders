@@ -98,3 +98,12 @@ bool isMaintenanceWindowException(ApiException e) {
   // Is 503 and contains "maintenance"
   return isAPIExceptionWithCode(e, 503) && e.toString().contains('maintenance');
 }
+
+// ApiException 400: {"error":{"message":"Cannot register agent. Call sign
+// has been reserved between resets: ESEIDEL. If you reserved your call
+// sign and cannot register, please reach out on Discord, Twitter, or
+// email us at contact@spacetraders.io","code":4110}}
+/// Returns true if the exception is a reserved handle exception.
+bool isReservedHandleException(ApiException e) {
+  return isAPIExceptionWithCode(e, 4110);
+}

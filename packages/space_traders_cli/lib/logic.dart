@@ -184,6 +184,13 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
         continue;
       }
 
+      // Need to handle token changes after reset.
+      // ApiException 401: {"error":{"message":"Failed to parse token.
+      // Token reset_date does not match the server. Server resets happen on a
+      // weekly to bi-weekly frequency during alpha. After a reset, you should
+      // re-register your agent. Expected: 2023-06-03, Actual: 2023-05-20",
+      // "code":401,"data":{"expected":"2023-06-03","actual":"2023-05-20"}}}
+
       if (!isWindowsSemaphoreTimeout(e)) {
         rethrow;
       }

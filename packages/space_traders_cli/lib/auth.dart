@@ -1,5 +1,6 @@
 import 'package:file/file.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/exceptions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/rate_limit.dart';
@@ -72,6 +73,21 @@ Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
   }
 }
 
+Future<String> _tryRegister(
+  DefaultApi api, {
+  required String symbol,
+  required RegisterRequestFactionEnum faction,
+  String? email,
+}) async {
+  final registerRequest = RegisterRequest(
+    symbol: symbol,
+    faction: faction,
+    email: email,
+  );
+  final registerResponse = await api.register(registerRequest: registerRequest);
+  return registerResponse!.data.token;
+}
+
 /// register registers a new user with the space traders api and
 /// returns the auth token which should be saved and used for future requests.
 Future<String> register(String callSign) async {
@@ -94,17 +110,29 @@ Future<String> register(String callSign) async {
     },
   );
 
-  final registerRequest = RegisterRequest(
-    symbol: callSign,
-    faction: faction,
-  );
-  Register201Response? registerResponse;
   try {
-    registerResponse =
-        await defaultApi.register(registerRequest: registerRequest);
-    // print(registerResponse);
-  } catch (e) {
-    logger.err('Exception when calling DefaultApi->register: $e\n');
+    return await _tryRegister(defaultApi, symbol: callSign, faction: faction);
+  } on ApiException catch (e) {
+    if (!isReservedHandleException(e)) {
+      logger.err('Exception registering: $e\n');
+      rethrow;
+    }
   }
-  return registerResponse!.data.token;
+
+  // This was a reserved handle. Ask for the email associated with it.
+  try {
+    final email = logger.prompt(
+      'Call sign has been reserved between resets. Please enter the email '
+      'associated with this call sign to proceed:',
+    );
+    return await _tryRegister(
+      defaultApi,
+      symbol: callSign,
+      faction: faction,
+      email: email,
+    );
+  } on ApiException catch (e) {
+    logger.err('Exception registering: $e\n');
+    rethrow;
+  }
 }
