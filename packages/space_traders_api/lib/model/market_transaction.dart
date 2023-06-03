@@ -37,17 +37,17 @@ class MarketTransaction {
 
   /// The number of units of the transaction.
   ///
-  /// Minimum value: 1
+  /// Minimum value: 0
   int units;
 
   /// The price per unit of the transaction.
   ///
-  /// Minimum value: 1
+  /// Minimum value: 0
   int pricePerUnit;
 
   /// The total price of the transaction.
   ///
-  /// Minimum value: 1
+  /// Minimum value: 0
   int totalPrice;
 
   /// The timestamp of the transaction.

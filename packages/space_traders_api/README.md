@@ -96,11 +96,13 @@ Class | Method | HTTP request | Description
 *FleetApi* | [**createSurvey**](doc\/FleetApi.md#createsurvey) | **POST** /my/ships/{shipSymbol}/survey | Create Survey
 *FleetApi* | [**dockShip**](doc\/FleetApi.md#dockship) | **POST** /my/ships/{shipSymbol}/dock | Dock Ship
 *FleetApi* | [**extractResources**](doc\/FleetApi.md#extractresources) | **POST** /my/ships/{shipSymbol}/extract | Extract Resources
+*FleetApi* | [**getMounts**](doc\/FleetApi.md#getmounts) | **GET** /my/ships/{shipSymbol}/mounts | Get Mounts
 *FleetApi* | [**getMyShip**](doc\/FleetApi.md#getmyship) | **GET** /my/ships/{shipSymbol} | Get Ship
 *FleetApi* | [**getMyShipCargo**](doc\/FleetApi.md#getmyshipcargo) | **GET** /my/ships/{shipSymbol}/cargo | Get Ship Cargo
 *FleetApi* | [**getMyShips**](doc\/FleetApi.md#getmyships) | **GET** /my/ships | List Ships
 *FleetApi* | [**getShipCooldown**](doc\/FleetApi.md#getshipcooldown) | **GET** /my/ships/{shipSymbol}/cooldown | Get Ship Cooldown
 *FleetApi* | [**getShipNav**](doc\/FleetApi.md#getshipnav) | **GET** /my/ships/{shipSymbol}/nav | Get Ship Nav
+*FleetApi* | [**installMount**](doc\/FleetApi.md#installmount) | **POST** /my/ships/{shipSymbol}/mounts/install | Install Mount
 *FleetApi* | [**jettison**](doc\/FleetApi.md#jettison) | **POST** /my/ships/{shipSymbol}/jettison | Jettison Cargo
 *FleetApi* | [**jumpShip**](doc\/FleetApi.md#jumpship) | **POST** /my/ships/{shipSymbol}/jump | Jump Ship
 *FleetApi* | [**navigateShip**](doc\/FleetApi.md#navigateship) | **POST** /my/ships/{shipSymbol}/navigate | Navigate Ship
@@ -110,6 +112,7 @@ Class | Method | HTTP request | Description
 *FleetApi* | [**purchaseCargo**](doc\/FleetApi.md#purchasecargo) | **POST** /my/ships/{shipSymbol}/purchase | Purchase Cargo
 *FleetApi* | [**purchaseShip**](doc\/FleetApi.md#purchaseship) | **POST** /my/ships | Purchase Ship
 *FleetApi* | [**refuelShip**](doc\/FleetApi.md#refuelship) | **POST** /my/ships/{shipSymbol}/refuel | Refuel Ship
+*FleetApi* | [**removeMount**](doc\/FleetApi.md#removemount) | **POST** /my/ships/{shipSymbol}/mounts/remove | Remove Mount
 *FleetApi* | [**sellCargo**](doc\/FleetApi.md#sellcargo) | **POST** /my/ships/{shipSymbol}/sell | Sell Cargo
 *FleetApi* | [**shipRefine**](doc\/FleetApi.md#shiprefine) | **POST** /my/ships/{shipSymbol}/refine | Ship Refine
 *FleetApi* | [**transferCargo**](doc\/FleetApi.md#transfercargo) | **POST** /my/ships/{shipSymbol}/transfer | Transfer Cargo
@@ -163,6 +166,7 @@ Class | Method | HTTP request | Description
  - [GetFactions200Response](doc\/GetFactions200Response.md)
  - [GetJumpGate200Response](doc\/GetJumpGate200Response.md)
  - [GetMarket200Response](doc\/GetMarket200Response.md)
+ - [GetMounts200Response](doc\/GetMounts200Response.md)
  - [GetMyAgent200Response](doc\/GetMyAgent200Response.md)
  - [GetMyShip200Response](doc\/GetMyShip200Response.md)
  - [GetMyShipCargo200Response](doc\/GetMyShipCargo200Response.md)
@@ -182,6 +186,10 @@ Class | Method | HTTP request | Description
  - [GetSystemWaypoints200Response](doc\/GetSystemWaypoints200Response.md)
  - [GetSystems200Response](doc\/GetSystems200Response.md)
  - [GetWaypoint200Response](doc\/GetWaypoint200Response.md)
+ - [InstallMount201Response](doc\/InstallMount201Response.md)
+ - [InstallMount201ResponseData](doc\/InstallMount201ResponseData.md)
+ - [InstallMount201ResponseDataTransaction](doc\/InstallMount201ResponseDataTransaction.md)
+ - [InstallMountRequest](doc\/InstallMountRequest.md)
  - [Jettison200Response](doc\/Jettison200Response.md)
  - [Jettison200ResponseData](doc\/Jettison200ResponseData.md)
  - [JettisonRequest](doc\/JettisonRequest.md)
@@ -211,6 +219,8 @@ Class | Method | HTTP request | Description
  - [Register201Response](doc\/Register201Response.md)
  - [Register201ResponseData](doc\/Register201ResponseData.md)
  - [RegisterRequest](doc\/RegisterRequest.md)
+ - [RemoveMount201Response](doc\/RemoveMount201Response.md)
+ - [RemoveMountRequest](doc\/RemoveMountRequest.md)
  - [ScannedShip](doc\/ScannedShip.md)
  - [ScannedShipEngine](doc\/ScannedShipEngine.md)
  - [ScannedShipFrame](doc\/ScannedShipFrame.md)

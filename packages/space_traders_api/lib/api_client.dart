@@ -301,6 +301,8 @@ class ApiClient {
           return GetJumpGate200Response.fromJson(value);
         case 'GetMarket200Response':
           return GetMarket200Response.fromJson(value);
+        case 'GetMounts200Response':
+          return GetMounts200Response.fromJson(value);
         case 'GetMyAgent200Response':
           return GetMyAgent200Response.fromJson(value);
         case 'GetMyShip200Response':
@@ -341,6 +343,14 @@ class ApiClient {
           return GetSystems200Response.fromJson(value);
         case 'GetWaypoint200Response':
           return GetWaypoint200Response.fromJson(value);
+        case 'InstallMount201Response':
+          return InstallMount201Response.fromJson(value);
+        case 'InstallMount201ResponseData':
+          return InstallMount201ResponseData.fromJson(value);
+        case 'InstallMount201ResponseDataTransaction':
+          return InstallMount201ResponseDataTransaction.fromJson(value);
+        case 'InstallMountRequest':
+          return InstallMountRequest.fromJson(value);
         case 'Jettison200Response':
           return Jettison200Response.fromJson(value);
         case 'Jettison200ResponseData':
@@ -399,6 +409,10 @@ class ApiClient {
           return Register201ResponseData.fromJson(value);
         case 'RegisterRequest':
           return RegisterRequest.fromJson(value);
+        case 'RemoveMount201Response':
+          return RemoveMount201Response.fromJson(value);
+        case 'RemoveMountRequest':
+          return RemoveMountRequest.fromJson(value);
         case 'ScannedShip':
           return ScannedShip.fromJson(value);
         case 'ScannedShipEngine':

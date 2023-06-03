@@ -16,11 +16,13 @@ Method | HTTP request | Description
 [**createSurvey**](FleetApi.md#createsurvey) | **POST** /my/ships/{shipSymbol}/survey | Create Survey
 [**dockShip**](FleetApi.md#dockship) | **POST** /my/ships/{shipSymbol}/dock | Dock Ship
 [**extractResources**](FleetApi.md#extractresources) | **POST** /my/ships/{shipSymbol}/extract | Extract Resources
+[**getMounts**](FleetApi.md#getmounts) | **GET** /my/ships/{shipSymbol}/mounts | Get Mounts
 [**getMyShip**](FleetApi.md#getmyship) | **GET** /my/ships/{shipSymbol} | Get Ship
 [**getMyShipCargo**](FleetApi.md#getmyshipcargo) | **GET** /my/ships/{shipSymbol}/cargo | Get Ship Cargo
 [**getMyShips**](FleetApi.md#getmyships) | **GET** /my/ships | List Ships
 [**getShipCooldown**](FleetApi.md#getshipcooldown) | **GET** /my/ships/{shipSymbol}/cooldown | Get Ship Cooldown
 [**getShipNav**](FleetApi.md#getshipnav) | **GET** /my/ships/{shipSymbol}/nav | Get Ship Nav
+[**installMount**](FleetApi.md#installmount) | **POST** /my/ships/{shipSymbol}/mounts/install | Install Mount
 [**jettison**](FleetApi.md#jettison) | **POST** /my/ships/{shipSymbol}/jettison | Jettison Cargo
 [**jumpShip**](FleetApi.md#jumpship) | **POST** /my/ships/{shipSymbol}/jump | Jump Ship
 [**navigateShip**](FleetApi.md#navigateship) | **POST** /my/ships/{shipSymbol}/navigate | Navigate Ship
@@ -30,6 +32,7 @@ Method | HTTP request | Description
 [**purchaseCargo**](FleetApi.md#purchasecargo) | **POST** /my/ships/{shipSymbol}/purchase | Purchase Cargo
 [**purchaseShip**](FleetApi.md#purchaseship) | **POST** /my/ships | Purchase Ship
 [**refuelShip**](FleetApi.md#refuelship) | **POST** /my/ships/{shipSymbol}/refuel | Refuel Ship
+[**removeMount**](FleetApi.md#removemount) | **POST** /my/ships/{shipSymbol}/mounts/remove | Remove Mount
 [**sellCargo**](FleetApi.md#sellcargo) | **POST** /my/ships/{shipSymbol}/sell | Sell Cargo
 [**shipRefine**](FleetApi.md#shiprefine) | **POST** /my/ships/{shipSymbol}/refine | Ship Refine
 [**transferCargo**](FleetApi.md#transfercargo) | **POST** /my/ships/{shipSymbol}/transfer | Transfer Cargo
@@ -381,6 +384,55 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getMounts**
+> GetMounts200Response getMounts(shipSymbol)
+
+Get Mounts
+
+Get the mounts on a ship.
+
+### Example
+```dart
+import 'package:space_traders_api/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | 
+
+try {
+    final result = api_instance.getMounts(shipSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->getMounts: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**|  | 
+
+### Return type
+
+[**GetMounts200Response**](GetMounts200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getMyShip**
 > GetMyShip200Response getMyShip(shipSymbol)
 
@@ -628,6 +680,57 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **installMount**
+> InstallMount201Response installMount(shipSymbol, installMountRequest)
+
+Install Mount
+
+Install a mount on a ship.
+
+### Example
+```dart
+import 'package:space_traders_api/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | 
+final installMountRequest = InstallMountRequest(); // InstallMountRequest | 
+
+try {
+    final result = api_instance.installMount(shipSymbol, installMountRequest);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->installMount: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**|  | 
+ **installMountRequest** | [**InstallMountRequest**](InstallMountRequest.md)|  | [optional] 
+
+### Return type
+
+[**InstallMount201Response**](InstallMount201Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **jettison**
 > Jettison200Response jettison(shipSymbol, jettisonRequest)
 
@@ -684,7 +787,7 @@ Name | Type | Description  | Notes
 
 Jump Ship
 
-Jump your ship instantly to a target system. Unlike other forms of navigation, jumping requires a unit of antimatter.
+Jump your ship instantly to a target system. When used while in orbit or docked to a jump gate waypoint, any ship can use this command. When used elsewhere, jumping requires a jump drive unit and consumes a unit of antimatter (which needs to be in your cargo).
 
 ### Example
 ```dart
@@ -1077,6 +1180,57 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **removeMount**
+> RemoveMount201Response removeMount(shipSymbol, removeMountRequest)
+
+Remove Mount
+
+Remove a mount from a ship.
+
+### Example
+```dart
+import 'package:space_traders_api/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | 
+final removeMountRequest = RemoveMountRequest(); // RemoveMountRequest | 
+
+try {
+    final result = api_instance.removeMount(shipSymbol, removeMountRequest);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->removeMount: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**|  | 
+ **removeMountRequest** | [**RemoveMountRequest**](RemoveMountRequest.md)|  | [optional] 
+
+### Return type
+
+[**RemoveMount201Response**](RemoveMount201Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

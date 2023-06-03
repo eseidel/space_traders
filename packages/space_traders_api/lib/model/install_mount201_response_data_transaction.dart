@@ -10,29 +10,17 @@
 
 part of space_traders_api;
 
-class ShipyardTransaction {
-  /// Returns a new [ShipyardTransaction] instance.
-  ShipyardTransaction({
-    required this.waypointSymbol,
-    required this.shipSymbol,
-    required this.price,
-    required this.agentSymbol,
+class InstallMount201ResponseDataTransaction {
+  /// Returns a new [InstallMount201ResponseDataTransaction] instance.
+  InstallMount201ResponseDataTransaction({
+    required this.totalPrice,
     required this.timestamp,
   });
 
-  /// The symbol of the waypoint where the transaction took place.
-  String waypointSymbol;
-
-  /// The symbol of the ship that was purchased.
-  String shipSymbol;
-
-  /// The price of the transaction.
+  /// The total price of the transaction.
   ///
   /// Minimum value: 0
-  int price;
-
-  /// The symbol of the agent that made the transaction.
-  String agentSymbol;
+  int totalPrice;
 
   /// The timestamp of the transaction.
   DateTime timestamp;
@@ -40,40 +28,30 @@ class ShipyardTransaction {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ShipyardTransaction &&
-          other.waypointSymbol == waypointSymbol &&
-          other.shipSymbol == shipSymbol &&
-          other.price == price &&
-          other.agentSymbol == agentSymbol &&
+      other is InstallMount201ResponseDataTransaction &&
+          other.totalPrice == totalPrice &&
           other.timestamp == timestamp;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (waypointSymbol.hashCode) +
-      (shipSymbol.hashCode) +
-      (price.hashCode) +
-      (agentSymbol.hashCode) +
-      (timestamp.hashCode);
+      (totalPrice.hashCode) + (timestamp.hashCode);
 
   @override
   String toString() =>
-      'ShipyardTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, price=$price, agentSymbol=$agentSymbol, timestamp=$timestamp]';
+      'InstallMount201ResponseDataTransaction[totalPrice=$totalPrice, timestamp=$timestamp]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'waypointSymbol'] = this.waypointSymbol;
-    json[r'shipSymbol'] = this.shipSymbol;
-    json[r'price'] = this.price;
-    json[r'agentSymbol'] = this.agentSymbol;
+    json[r'totalPrice'] = this.totalPrice;
     json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
     return json;
   }
 
-  /// Returns a new [ShipyardTransaction] instance and imports its values from
+  /// Returns a new [InstallMount201ResponseDataTransaction] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static ShipyardTransaction? fromJson(dynamic value) {
+  static InstallMount201ResponseDataTransaction? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -83,32 +61,29 @@ class ShipyardTransaction {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "ShipyardTransaction[$key]" is missing from JSON.');
+              'Required key "InstallMount201ResponseDataTransaction[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "ShipyardTransaction[$key]" has a null value in JSON.');
+              'Required key "InstallMount201ResponseDataTransaction[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return ShipyardTransaction(
-        waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol')!,
-        shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
-        price: mapValueOfType<int>(json, r'price')!,
-        agentSymbol: mapValueOfType<String>(json, r'agentSymbol')!,
+      return InstallMount201ResponseDataTransaction(
+        totalPrice: mapValueOfType<int>(json, r'totalPrice')!,
         timestamp: mapDateTime(json, r'timestamp', '')!,
       );
     }
     return null;
   }
 
-  static List<ShipyardTransaction>? listFromJson(
+  static List<InstallMount201ResponseDataTransaction>? listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <ShipyardTransaction>[];
+    final result = <InstallMount201ResponseDataTransaction>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = ShipyardTransaction.fromJson(row);
+        final value = InstallMount201ResponseDataTransaction.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -117,12 +92,14 @@ class ShipyardTransaction {
     return result.toList(growable: growable);
   }
 
-  static Map<String, ShipyardTransaction> mapFromJson(dynamic json) {
-    final map = <String, ShipyardTransaction>{};
+  static Map<String, InstallMount201ResponseDataTransaction> mapFromJson(
+      dynamic json) {
+    final map = <String, InstallMount201ResponseDataTransaction>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipyardTransaction.fromJson(entry.value);
+        final value =
+            InstallMount201ResponseDataTransaction.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -131,16 +108,17 @@ class ShipyardTransaction {
     return map;
   }
 
-  // maps a json object with a list of ShipyardTransaction-objects as value to a dart map
-  static Map<String, List<ShipyardTransaction>> mapListFromJson(
+  // maps a json object with a list of InstallMount201ResponseDataTransaction-objects as value to a dart map
+  static Map<String, List<InstallMount201ResponseDataTransaction>>
+      mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<ShipyardTransaction>>{};
+    final map = <String, List<InstallMount201ResponseDataTransaction>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipyardTransaction.listFromJson(
+        final value = InstallMount201ResponseDataTransaction.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -154,10 +132,7 @@ class ShipyardTransaction {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'waypointSymbol',
-    'shipSymbol',
-    'price',
-    'agentSymbol',
+    'totalPrice',
     'timestamp',
   };
 }

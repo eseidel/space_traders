@@ -485,6 +485,71 @@ class FleetApi {
     return null;
   }
 
+  /// Get Mounts
+  ///
+  /// Get the mounts on a ship.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  Future<Response> getMountsWithHttpInfo(
+    String shipSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/my/ships/{shipSymbol}/mounts'.replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Mounts
+  ///
+  /// Get the mounts on a ship.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  Future<GetMounts200Response?> getMounts(
+    String shipSymbol,
+  ) async {
+    final response = await getMountsWithHttpInfo(
+      shipSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMounts200Response',
+      ) as GetMounts200Response;
+    }
+    return null;
+  }
+
   /// Get Ship
   ///
   /// Retrieve the details of your ship.
@@ -831,6 +896,78 @@ class FleetApi {
     return null;
   }
 
+  /// Install Mount
+  ///
+  /// Install a mount on a ship.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///
+  /// * [InstallMountRequest] installMountRequest:
+  Future<Response> installMountWithHttpInfo(
+    String shipSymbol, {
+    InstallMountRequest? installMountRequest,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/mounts/install'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody = installMountRequest;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Install Mount
+  ///
+  /// Install a mount on a ship.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///
+  /// * [InstallMountRequest] installMountRequest:
+  Future<InstallMount201Response?> installMount(
+    String shipSymbol, {
+    InstallMountRequest? installMountRequest,
+  }) async {
+    final response = await installMountWithHttpInfo(
+      shipSymbol,
+      installMountRequest: installMountRequest,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'InstallMount201Response',
+      ) as InstallMount201Response;
+    }
+    return null;
+  }
+
   /// Jettison Cargo
   ///
   /// Jettison cargo from your ship's cargo hold.
@@ -905,7 +1042,7 @@ class FleetApi {
 
   /// Jump Ship
   ///
-  /// Jump your ship instantly to a target system. Unlike other forms of navigation, jumping requires a unit of antimatter.
+  /// Jump your ship instantly to a target system. When used while in orbit or docked to a jump gate waypoint, any ship can use this command. When used elsewhere, jumping requires a jump drive unit and consumes a unit of antimatter (which needs to be in your cargo).
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -944,7 +1081,7 @@ class FleetApi {
 
   /// Jump Ship
   ///
-  /// Jump your ship instantly to a target system. Unlike other forms of navigation, jumping requires a unit of antimatter.
+  /// Jump your ship instantly to a target system. When used while in orbit or docked to a jump gate waypoint, any ship can use this command. When used elsewhere, jumping requires a jump drive unit and consumes a unit of antimatter (which needs to be in your cargo).
   ///
   /// Parameters:
   ///
@@ -1461,6 +1598,78 @@ class FleetApi {
         await _decodeBodyBytes(response),
         'RefuelShip200Response',
       ) as RefuelShip200Response;
+    }
+    return null;
+  }
+
+  /// Remove Mount
+  ///
+  /// Remove a mount from a ship.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///
+  /// * [RemoveMountRequest] removeMountRequest:
+  Future<Response> removeMountWithHttpInfo(
+    String shipSymbol, {
+    RemoveMountRequest? removeMountRequest,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/mounts/remove'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody = removeMountRequest;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Remove Mount
+  ///
+  /// Remove a mount from a ship.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///
+  /// * [RemoveMountRequest] removeMountRequest:
+  Future<RemoveMount201Response?> removeMount(
+    String shipSymbol, {
+    RemoveMountRequest? removeMountRequest,
+  }) async {
+    final response = await removeMountWithHttpInfo(
+      shipSymbol,
+      removeMountRequest: removeMountRequest,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'RemoveMount201Response',
+      ) as RemoveMount201Response;
     }
     return null;
   }

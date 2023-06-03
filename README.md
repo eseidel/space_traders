@@ -64,13 +64,20 @@ But I've not seen the source for that and it appears to be v1 rather than v2.
 
 ## Development
 
+## Reset day checklist
+* Reset prices.json
+* Reset datastore.json
+* clear out auth_token.txt
+* Update the revision in open_api_config.yaml
+* regenerate space_traders_api
+
 ### Generating `space_traders_api` package
 ```
 dart pub global activate openapi_generator_cli
 openapi-generator generate -c open_api_config.yaml
 ```
 Then modified:
-* Removed tests/ directory since it was just TODOs.
+* rm -rf packages/space_traders_api/test directory since it was just TODOs.
 * Fixed handling of required num fields in two places:
     * `api/lib/model/jump_gate.dart`
     * `api/lib/model/ship_engine.dart`

@@ -76,7 +76,7 @@ Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
 Future<String> _tryRegister(
   DefaultApi api, {
   required String symbol,
-  required RegisterRequestFactionEnum faction,
+  required String faction,
   String? email,
 }) async {
   final registerRequest = RegisterRequest(
@@ -99,19 +99,25 @@ Future<String> register(String callSign) async {
     return (response!.data, response.meta);
   }).toList();
 
+  final recruitingFactions = factions.where((f) => f.isRecruiting).toList();
+
   // There are more factions in the game than players are allowed to join
   // at the start, so we use RegisterRequestFactionEnum.
   final faction = logger.chooseOne(
     'Choose a faction:',
-    choices: RegisterRequestFactionEnum.values,
+    choices: recruitingFactions,
     display: (faction) {
-      final f = factions.firstWhere((f) => f.symbol == faction.value);
+      final f = factions.firstWhere((f) => f.symbol == faction.symbol);
       return '${f.symbol} - ${f.description}';
     },
   );
 
   try {
-    return await _tryRegister(defaultApi, symbol: callSign, faction: faction);
+    return await _tryRegister(
+      defaultApi,
+      symbol: callSign,
+      faction: faction.symbol,
+    );
   } on ApiException catch (e) {
     if (!isReservedHandleException(e)) {
       logger.err('Exception registering: $e\n');
@@ -128,7 +134,7 @@ Future<String> register(String callSign) async {
     return await _tryRegister(
       defaultApi,
       symbol: callSign,
-      faction: faction,
+      faction: faction.symbol,
       email: email,
     );
   } on ApiException catch (e) {

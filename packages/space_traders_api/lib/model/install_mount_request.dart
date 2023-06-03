@@ -10,68 +10,37 @@
 
 part of space_traders_api;
 
-class RegisterRequest {
-  /// Returns a new [RegisterRequest] instance.
-  RegisterRequest({
-    required this.faction,
+class InstallMountRequest {
+  /// Returns a new [InstallMountRequest] instance.
+  InstallMountRequest({
     required this.symbol,
-    this.email,
   });
 
-  /// The faction you choose determines your headquarters.
-  Object? faction;
-
-  /// How other agents will see your ships and information.
   String symbol;
-
-  /// Your email address. This is used if you reserved your call sign between resets.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? email;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RegisterRequest &&
-          other.faction == faction &&
-          other.symbol == symbol &&
-          other.email == email;
+      other is InstallMountRequest && other.symbol == symbol;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (faction == null ? 0 : faction!.hashCode) +
-      (symbol.hashCode) +
-      (email == null ? 0 : email!.hashCode);
+      (symbol.hashCode);
 
   @override
-  String toString() =>
-      'RegisterRequest[faction=$faction, symbol=$symbol, email=$email]';
+  String toString() => 'InstallMountRequest[symbol=$symbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.faction != null) {
-      json[r'faction'] = this.faction;
-    } else {
-      json[r'faction'] = null;
-    }
     json[r'symbol'] = this.symbol;
-    if (this.email != null) {
-      json[r'email'] = this.email;
-    } else {
-      json[r'email'] = null;
-    }
     return json;
   }
 
-  /// Returns a new [RegisterRequest] instance and imports its values from
+  /// Returns a new [InstallMountRequest] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static RegisterRequest? fromJson(dynamic value) {
+  static InstallMountRequest? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -81,30 +50,28 @@ class RegisterRequest {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "RegisterRequest[$key]" is missing from JSON.');
+              'Required key "InstallMountRequest[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "RegisterRequest[$key]" has a null value in JSON.');
+              'Required key "InstallMountRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return RegisterRequest(
-        faction: mapValueOfType<Object>(json, r'faction'),
+      return InstallMountRequest(
         symbol: mapValueOfType<String>(json, r'symbol')!,
-        email: mapValueOfType<String>(json, r'email'),
       );
     }
     return null;
   }
 
-  static List<RegisterRequest>? listFromJson(
+  static List<InstallMountRequest>? listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <RegisterRequest>[];
+    final result = <InstallMountRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = RegisterRequest.fromJson(row);
+        final value = InstallMountRequest.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -113,12 +80,12 @@ class RegisterRequest {
     return result.toList(growable: growable);
   }
 
-  static Map<String, RegisterRequest> mapFromJson(dynamic json) {
-    final map = <String, RegisterRequest>{};
+  static Map<String, InstallMountRequest> mapFromJson(dynamic json) {
+    final map = <String, InstallMountRequest>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = RegisterRequest.fromJson(entry.value);
+        final value = InstallMountRequest.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -127,16 +94,16 @@ class RegisterRequest {
     return map;
   }
 
-  // maps a json object with a list of RegisterRequest-objects as value to a dart map
-  static Map<String, List<RegisterRequest>> mapListFromJson(
+  // maps a json object with a list of InstallMountRequest-objects as value to a dart map
+  static Map<String, List<InstallMountRequest>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<RegisterRequest>>{};
+    final map = <String, List<InstallMountRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = RegisterRequest.listFromJson(
+        final value = InstallMountRequest.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -150,7 +117,6 @@ class RegisterRequest {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'faction',
     'symbol',
   };
 }

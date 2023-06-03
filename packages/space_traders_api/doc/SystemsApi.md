@@ -28,12 +28,6 @@ Get jump gate details for a waypoint.
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
 final systemSymbol = systemSymbol_example; // String | The system symbol
@@ -60,7 +54,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 
@@ -79,12 +73,6 @@ Retrieve imports, exports and exchange data from a marketplace. Imports can be s
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
 final systemSymbol = systemSymbol_example; // String | The system symbol
@@ -111,7 +99,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 
@@ -130,12 +118,6 @@ Get the shipyard for a waypoint. Send a ship to the waypoint to access ships tha
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
 final systemSymbol = systemSymbol_example; // String | The system symbol
@@ -162,7 +144,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 
@@ -181,12 +163,6 @@ Get the details of a system.
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
 final systemSymbol = systemSymbol_example; // String | The system symbol
@@ -211,7 +187,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 
@@ -283,12 +259,6 @@ Return a list of all systems.
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
 final page = 56; // int | What entry offset to request
@@ -315,7 +285,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 
@@ -334,12 +304,6 @@ View the details of a waypoint.
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
 final systemSymbol = systemSymbol_example; // String | The system symbol
@@ -366,7 +330,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 

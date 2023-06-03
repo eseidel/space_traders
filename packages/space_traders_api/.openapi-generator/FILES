@@ -45,6 +45,7 @@ doc/GetFaction200Response.md
 doc/GetFactions200Response.md
 doc/GetJumpGate200Response.md
 doc/GetMarket200Response.md
+doc/GetMounts200Response.md
 doc/GetMyAgent200Response.md
 doc/GetMyShip200Response.md
 doc/GetMyShipCargo200Response.md
@@ -64,6 +65,10 @@ doc/GetSystem200Response.md
 doc/GetSystemWaypoints200Response.md
 doc/GetSystems200Response.md
 doc/GetWaypoint200Response.md
+doc/InstallMount201Response.md
+doc/InstallMount201ResponseData.md
+doc/InstallMount201ResponseDataTransaction.md
+doc/InstallMountRequest.md
 doc/Jettison200Response.md
 doc/Jettison200ResponseData.md
 doc/JettisonRequest.md
@@ -93,6 +98,8 @@ doc/RefuelShip200ResponseData.md
 doc/Register201Response.md
 doc/Register201ResponseData.md
 doc/RegisterRequest.md
+doc/RemoveMount201Response.md
+doc/RemoveMountRequest.md
 doc/ScannedShip.md
 doc/ScannedShipEngine.md
 doc/ScannedShipFrame.md
@@ -201,6 +208,7 @@ lib/model/get_faction200_response.dart
 lib/model/get_factions200_response.dart
 lib/model/get_jump_gate200_response.dart
 lib/model/get_market200_response.dart
+lib/model/get_mounts200_response.dart
 lib/model/get_my_agent200_response.dart
 lib/model/get_my_ship200_response.dart
 lib/model/get_my_ship_cargo200_response.dart
@@ -220,6 +228,10 @@ lib/model/get_system200_response.dart
 lib/model/get_system_waypoints200_response.dart
 lib/model/get_systems200_response.dart
 lib/model/get_waypoint200_response.dart
+lib/model/install_mount201_response.dart
+lib/model/install_mount201_response_data.dart
+lib/model/install_mount201_response_data_transaction.dart
+lib/model/install_mount_request.dart
 lib/model/jettison200_response.dart
 lib/model/jettison200_response_data.dart
 lib/model/jettison_request.dart
@@ -249,6 +261,8 @@ lib/model/refuel_ship200_response_data.dart
 lib/model/register201_response.dart
 lib/model/register201_response_data.dart
 lib/model/register_request.dart
+lib/model/remove_mount201_response.dart
+lib/model/remove_mount_request.dart
 lib/model/scanned_ship.dart
 lib/model/scanned_ship_engine.dart
 lib/model/scanned_ship_frame.dart
@@ -346,6 +360,7 @@ test/get_faction200_response_test.dart
 test/get_factions200_response_test.dart
 test/get_jump_gate200_response_test.dart
 test/get_market200_response_test.dart
+test/get_mounts200_response_test.dart
 test/get_my_agent200_response_test.dart
 test/get_my_ship200_response_test.dart
 test/get_my_ship_cargo200_response_test.dart
@@ -365,6 +380,10 @@ test/get_system200_response_test.dart
 test/get_system_waypoints200_response_test.dart
 test/get_systems200_response_test.dart
 test/get_waypoint200_response_test.dart
+test/install_mount201_response_data_test.dart
+test/install_mount201_response_data_transaction_test.dart
+test/install_mount201_response_test.dart
+test/install_mount_request_test.dart
 test/jettison200_response_data_test.dart
 test/jettison200_response_test.dart
 test/jettison_request_test.dart
@@ -394,6 +413,8 @@ test/refuel_ship200_response_test.dart
 test/register201_response_data_test.dart
 test/register201_response_test.dart
 test/register_request_test.dart
+test/remove_mount201_response_test.dart
+test/remove_mount_request_test.dart
 test/scanned_ship_engine_test.dart
 test/scanned_ship_frame_test.dart
 test/scanned_ship_mounts_inner_test.dart

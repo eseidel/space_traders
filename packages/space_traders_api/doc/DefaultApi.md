@@ -23,12 +23,6 @@ Return the status of the game server.
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = DefaultApi();
 
@@ -49,7 +43,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 
@@ -68,12 +62,6 @@ Creates a new agent and ties it to a temporary Account.  The agent symbol is a 3
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = DefaultApi();
 final registerRequest = RegisterRequest(); // RegisterRequest | 
@@ -98,7 +86,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 

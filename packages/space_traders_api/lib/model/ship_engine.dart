@@ -40,7 +40,7 @@ class ShipEngine {
   int? condition;
 
   /// Minimum value: 1
-  num speed;
+  int speed;
 
   ShipRequirements requirements;
 
@@ -109,7 +109,7 @@ class ShipEngine {
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
         condition: mapValueOfType<int>(json, r'condition'),
-        speed: num.parse(json[r'speed'].toString()),
+        speed: mapValueOfType<int>(json, r'speed')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
       );
     }
