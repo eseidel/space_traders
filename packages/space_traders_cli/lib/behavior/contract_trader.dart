@@ -83,7 +83,8 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     return null;
   }
   final destination = await waypointCache.waypoint(marketSymbol);
-  return navigateToLocalWaypointAndLog(api, ship, destination);
+  final arrival = await navigateToLocalWaypointAndLog(api, ship, destination);
+  return arrival;
 }
 
 /// One loop of the trading logic
@@ -202,6 +203,11 @@ Future<DateTime?> advanceContractTrader(
     }
   }
   // Regardless, navigate to contract destination.
-  final destination = await waypointCache.waypoint(goods.destinationSymbol);
-  return navigateToLocalWaypointAndLog(api, ship, destination);
+  return beingRouteAndLog(
+    api,
+    ship,
+    waypointCache,
+    behaviorManager,
+    goods.destinationSymbol,
+  );
 }

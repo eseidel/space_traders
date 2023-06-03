@@ -275,6 +275,6 @@ Future<Contract> negotiateContractAndLog(Api api, Ship ship) async {
   final response = await api.fleet.negotiateContract(ship.symbol);
   final contractData = response!.data;
   final contract = contractData.contract;
-  logger.info('Negotiated contract: ${contractDescription(contract)}');
+  shipInfo(ship, 'Negotiated contract: ${contractDescription(contract)}');
   return contract;
 }

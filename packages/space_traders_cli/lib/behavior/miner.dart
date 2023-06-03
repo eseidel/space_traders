@@ -9,6 +9,7 @@ import 'package:space_traders_cli/exceptions.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/route.dart';
 
@@ -226,7 +227,7 @@ Future<DateTime?> advanceMiner(
   if (!currentWaypoint.canBeMined) {
     shipInfo(
       ship,
-      "$currentWaypoint can't be mined, navigating to nearest asteroid field.",
+      "${waypointShortString(currentWaypoint)} can't be mined, navigating to nearest asteroid field.",
     );
     // We're not at an asteroid field, so we need to navigate to one.
     final systemWaypoints =
