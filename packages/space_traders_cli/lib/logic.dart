@@ -169,7 +169,8 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
   // Accept any contracts we have not yet accepted.
   // This is a bit dangerous because we could accept a contract and then
   // not be able to fulfill it.
-  await _acceptAllContractsIfNeeded(api);
+  // This also isn't catching maintenance windows.
+  // await _acceptAllContractsIfNeeded(api);
 
   final waiter = ShipWaiter();
 
@@ -177,6 +178,12 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
     try {
       await logicLoop(api, db, priceData, waiter);
     } on ApiException catch (e) {
+      if (isMaintenanceWindowException(e)) {
+        logger.warn('Server down for maintenance, waiting 1 minute.');
+        await Future<void>.delayed(const Duration(minutes: 1));
+        continue;
+      }
+
       if (!isWindowsSemaphoreTimeout(e)) {
         rethrow;
       }

@@ -87,3 +87,14 @@ bool isMarketDoesNotSellFuelException(ApiException e) {
 bool isInfuficientFuelException(ApiException e) {
   return isAPIExceptionWithCode(e, 4203);
 }
+
+// ApiException 503: {"error":{"message":"SpaceTraders is currently in
+// maintenance mode and unavailable. This will hopefully only last a few
+// minutes while we update or upgrade our servers. Check discord for updates
+// https://discord.com/invite/jh6zurdWk5 and consider donating to keep the
+// servers running https://donate.stripe.com/28o29m5vxcri6OccMM","code":503}}
+/// Returns true if the exception is a maintenance window exception.
+bool isMaintenanceWindowException(ApiException e) {
+  // Is 503 and contains "maintenance"
+  return isAPIExceptionWithCode(e, 503) && e.toString().contains('maintenance');
+}
