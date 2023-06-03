@@ -268,3 +268,13 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   shipInfo(ship, 'Used Jump Gate to $systemSymbol');
   return response!.data;
 }
+
+/// Negotiate a contract for [ship] and log.
+Future<Contract> negotiateContractAndLog(Api api, Ship ship) async {
+  await dockIfNeeded(api, ship);
+  final response = await api.fleet.negotiateContract(ship.symbol);
+  final contractData = response!.data;
+  final contract = contractData.contract;
+  logger.info('Negotiated contract: ${contractDescription(contract)}');
+  return contract;
+}

@@ -96,9 +96,13 @@ Future<DateTime?> advanceContractTrader(
   WaypointCache waypointCache,
   MarketCache marketCache,
   BehaviorManager behaviorManager,
-  Contract contract,
+  Contract? contract,
   ContractDeliverGood goods,
 ) async {
+  if (contract == null) {
+    await negotiateContractAndLog(api, ship);
+    return null;
+  }
   if (agent.credits < 10000) {
     shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
     await behaviorManager.disableBehavior(ship, Behavior.contractTrader);

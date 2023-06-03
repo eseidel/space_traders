@@ -228,7 +228,8 @@ Future<DateTime?> advanceMiner(
     }
     shipWarn(
       ship,
-      'No minable waypoint in ${ship.nav.systemSymbol}, going home.',
+      'No minable waypoint in ${ship.nav.systemSymbol}, '
+      'going home ${agent.headquarters}.',
     );
     // If we can't find an asteroid field navigate back to the home system.
     // There is always one there.

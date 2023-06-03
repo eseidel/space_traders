@@ -24,15 +24,15 @@ Behavior _behaviorFor(
   // bad loop where at limit X, we buy stuff, now under the limit, so we
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
-  // if (ship.engine.speed > 20) {
-  //   if (maybeGoods != null &&
-  //       behaviorManager.isEnabled(Behavior.contractTrader)) {
-  //     return Behavior.contractTrader;
-  //   }
-  //   if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
-  //     return Behavior.arbitrageTrader;
-  //   }
-  // }
+  if (ship.engine.speed > 20) {
+    if (maybeGoods != null &&
+        behaviorManager.isEnabled(Behavior.contractTrader)) {
+      return Behavior.contractTrader;
+    }
+    // if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
+    //   return Behavior.arbitrageTrader;
+    // }
+  }
   // Could check if it has a mining laser or ship.isExcavator
   if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
     return Behavior.miner;
@@ -62,11 +62,11 @@ Future<void> logicLoop(
   waiter.updateForShips(myShips);
 
   final contracts = await activeContracts(api);
+  final maybeContract = contracts.firstOrNull;
   if (contracts.length > 1) {
-    throw UnimplementedError();
+    throw UnimplementedError("Can't handle multiple contracts yet.");
   }
-  final contract = contracts.firstOrNull;
-  final maybeGoods = contract?.terms.deliver.firstOrNull;
+  final maybeGoods = maybeContract?.terms.deliver.firstOrNull;
 
   // if (shouldPurchaseMiner(agent, myShips)) {
   //   logger.info('Purchasing mining drone.');
@@ -102,7 +102,7 @@ Future<void> logicLoop(
         ship,
         waypointCache,
         marketCache,
-        contract,
+        maybeContract,
         maybeGoods,
       );
       waiter.updateWaitUntil(ship.symbol, waitUntil);

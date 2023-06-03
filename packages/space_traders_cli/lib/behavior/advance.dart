@@ -37,7 +37,7 @@ Future<DateTime?> advanceShipBehavior(
         waypointCache,
         marketCache,
         behaviorManager,
-        contract!,
+        contract,
         maybeGoods!,
       );
     case Behavior.arbitrageTrader:
