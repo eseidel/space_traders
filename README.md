@@ -103,6 +103,7 @@ Logic:
 * Fix contract trader to be able to leave the system.
 * Fix arbitrage trader to not recalculate deal mid-journey.
 * Persist some of WaypointCache to disk.
+* Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 
 UI:
 * Add a Flutter UI.

@@ -6,6 +6,11 @@ import 'package:space_traders_cli/extensions.dart';
 /// Global logger.
 Logger logger = Logger();
 
+/// Set the global logger to verbose logging.
+void setVerboseLogging() {
+  logger.level = Level.verbose;
+}
+
 /// Log [message] for [ship] to the global logger at the detail level.
 void shipDetail(Ship ship, String message) {
   logger.detail('${ship.emojiName} $message');

@@ -192,7 +192,8 @@ Future<DateTime?> advanceContractTrader(
       if (maybeGood != null) {
         shipInfo(
           ship,
-          '${goods.tradeSymbol} is too expensive near ${currentWaypoint.symbol} '
+          '${goods.tradeSymbol} is too expensive near '
+          '${currentWaypoint.symbol} '
           'needed < $minimumProfitUnitPrice, got ${maybeGood.purchasePrice}',
         );
       } else {

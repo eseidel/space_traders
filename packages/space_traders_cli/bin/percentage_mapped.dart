@@ -1,0 +1,72 @@
+import 'package:args/args.dart';
+import 'package:file/local.dart';
+import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
+
+void main(List<String> args) async {
+  // Walk out to some number of jumps.
+  // Return the number of waypoints that are mapped.
+
+  final parser = ArgParser()
+    ..addOption(
+      'jumps',
+      abbr: 'j',
+      help: 'Maximum number of jumps to walk out',
+      defaultsTo: '10',
+    )
+    ..addOption(
+      'start',
+      abbr: 's',
+      help: 'Starting system (defaults to agent headquarters)',
+    )
+    ..addFlag(
+      'verbose',
+      abbr: 'v',
+      help: 'Verbose logging',
+      negatable: false,
+    );
+  final results = parser.parse(args);
+  final maxJumps = int.parse(results['jumps'] as String);
+  if (results['verbose'] as bool) {
+    setVerboseLogging();
+  }
+
+  const fs = LocalFileSystem();
+  final api = defaultApi(fs);
+  final waypointCache = WaypointCache(api);
+
+  Waypoint start;
+  final startArg = results['start'] as String?;
+  if (startArg != null) {
+    final maybeStart = await waypointCache.waypointOrNull(startArg);
+    if (maybeStart == null) {
+      logger.err('--start was invalid, unknown system: ${results['start']}');
+      return;
+    }
+    start = maybeStart;
+  } else {
+    start = await waypointCache.getAgentHeadquarters();
+  }
+
+  final allSystems = <String>[];
+  final chartedSystems = <String>[];
+
+  await for (final waypoint in waypointsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: start.systemSymbol,
+    allowedJumps: maxJumps,
+  )) {
+    allSystems.add(waypoint.symbol);
+    if (waypoint.chart == null) {
+      continue;
+    }
+    chartedSystems.add(waypoint.symbol);
+  }
+  logger.info(
+    '${chartedSystems.length} of ${allSystems.length} systems mapped '
+    'within $maxJumps jumps from ${start.systemSymbol}',
+  );
+}
