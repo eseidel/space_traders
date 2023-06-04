@@ -1,9 +1,18 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+
+int _distanceBetweenSystems(System a, System b) {
+  // Use euclidean distance.
+  final dx = a.x - b.x;
+  final dy = a.y - b.y;
+  return sqrt(dx * dx + dy * dy).round();
+}
 
 /// A cache of the systems in the game.
 class SystemsCache {
@@ -79,5 +88,34 @@ class SystemsCache {
       logger.warn('Failed to load systems from $uri: $e');
     }
     throw Exception('Failed to load systems from $uri');
+  }
+
+  /// Return connected systems for the given [systemSymbol].
+  List<ConnectedSystem> connectedSystems(
+    String systemSymbol, {
+    int jumpGateRange = 2000,
+  }) {
+    final system = _systems.firstWhere((s) => s.symbol == systemSymbol);
+    if (!system.hasJumpGate) {
+      return [];
+    }
+    // Get all systems within X distance of the given system.
+    final connected = _systems
+        .where((s) => s.symbol != systemSymbol)
+        .where((s) => s.hasJumpGate)
+        .where((s) => _distanceBetweenSystems(system, s) <= jumpGateRange)
+        .toList();
+    return connected
+        .map(
+          (s) => ConnectedSystem(
+            symbol: s.symbol,
+            sectorSymbol: s.sectorSymbol,
+            type: s.type,
+            x: s.x,
+            y: s.y,
+            distance: _distanceBetweenSystems(system, s),
+          ),
+        )
+        .toList();
   }
 }

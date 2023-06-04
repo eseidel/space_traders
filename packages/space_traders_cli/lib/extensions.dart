@@ -13,6 +13,13 @@ import 'package:space_traders_api/api.dart';
   );
 }
 
+/// Extensions onto System to make it easier to work with.
+extension SystemUtils on System {
+  /// Returns true if the system has a jump gate.
+  bool get hasJumpGate =>
+      waypoints.any((w) => w.type == WaypointType.JUMP_GATE);
+}
+
 /// Extensions onto Waypoint to make it easier to work with.
 extension WaypointUtils on Waypoint {
   /// Returns true if the waypoint has the given trait.
