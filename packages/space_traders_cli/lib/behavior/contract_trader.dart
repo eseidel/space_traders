@@ -111,7 +111,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   required int breakevenUnitPrice,
 }) async {
   // Find the nearest market within maxJumps that has the tradeSymbol
-  // either at or below our profit unit price, or as an export.
+  // either at or below our profit unit price.
   final nearbyMarket = await _nearbyMarketsWithProfitableTrade(
     ship,
     priceData,
@@ -120,8 +120,6 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     tradeSymbol: tradeSymbol,
     breakevenUnitPrice: breakevenUnitPrice,
   ).firstOrNull;
-
-  // TODO(eseidel): Failing that, find a market with tradeSymbol as an exchange.
   if (nearbyMarket == null) {
     shipErr(
       ship,
@@ -219,68 +217,66 @@ Future<DateTime?> advanceContractTrader(
       breakevenUnitPrice: breakEvenUnitPrice,
     );
   }
+  // Otherwise we're not at our contract destination.
 
-  // Otherwise if we're not at our contract destination.
-  // And it has a market.
+  // If we're at a market place, buy our goods.
   if (currentWaypoint.hasMarketplace) {
+    // Sell everything we have except the contract goal.
+    final cargo = await sellCargoAndLog(
+      api,
+      priceData,
+      ship,
+      where: (s) => s != neededGood.tradeSymbol,
+    );
+
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
     final maybeGood = market!.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
-    // And our contract goal is selling < contract profit unit price.
-    if (maybeGood != null && maybeGood.purchasePrice < breakEvenUnitPrice) {
-      // Sell everything we have except the contract goal.
-      final cargo = await sellCargoAndLog(
-        api,
-        priceData,
-        ship,
-        where: (s) => s != neededGood.tradeSymbol,
-      );
-      if (cargo.availableSpace > 0) {
-        // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
-        // Buy a full stock of contract goal.
-        await purchaseCargoAndLog(
-          api,
-          priceData,
-          ship,
-          neededGood.tradeSymbol,
-          cargo.availableSpace,
-        );
-      }
-    } else {
-      // TODO(eseidel): This can't work.  We need to be able to do something
-      // when things are too expensive.
-      if (maybeGood != null) {
+    // If this market has our desired goods:
+    if (maybeGood != null) {
+      // And its selling at a reasonable price.
+      if (maybeGood.purchasePrice < breakEvenUnitPrice) {
+        if (cargo.availableSpace > 0) {
+          // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
+          // Buy a full stock of contract goal.
+          await purchaseCargoAndLog(
+            api,
+            priceData,
+            ship,
+            neededGood.tradeSymbol,
+            cargo.availableSpace,
+          );
+        }
+      } else {
         shipInfo(
           ship,
           '${neededGood.tradeSymbol} is too expensive near '
           '${currentWaypoint.symbol} '
           'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
         );
-      } else {
-        shipInfo(
-          ship,
-          'No ${neededGood.tradeSymbol} available near '
-          '${currentWaypoint.symbol}',
-        );
       }
-      return _navigateToNearbyMarketIfNeeded(
-        api,
-        priceData,
-        ship,
-        waypointCache,
-        marketCache,
-        behaviorManager,
-        tradeSymbol: neededGood.tradeSymbol,
-        breakevenUnitPrice: breakEvenUnitPrice,
-      );
     }
   }
-  // Regardless, navigate to contract destination.
-  return beingRouteAndLog(
-    api,
-    ship,
-    waypointCache,
-    behaviorManager,
-    neededGood.destinationSymbol,
-  );
+  // Do we already have our goods?
+  // If so navigate to contract destination.
+  if (ship.countUnits(neededGood.tradeSymbol) > 0) {
+    return beingRouteAndLog(
+      api,
+      ship,
+      waypointCache,
+      behaviorManager,
+      neededGood.destinationSymbol,
+    );
+  } else {
+    return _navigateToNearbyMarketIfNeeded(
+      api,
+      priceData,
+      ship,
+      waypointCache,
+      marketCache,
+      behaviorManager,
+      tradeSymbol: neededGood.tradeSymbol,
+      breakevenUnitPrice: breakEvenUnitPrice,
+    );
+  }
 }

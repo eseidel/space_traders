@@ -161,8 +161,8 @@ Future<NavResult> continueNavigationIfNeeded(
   );
 }
 
-/// Yields a stream of Waypoints that are within n jumps of the given start.
-/// The start is not included in the stream.
+/// Yields a stream of Waypoints that are within n jumps of the given system.
+/// Waypoints from the start system are included in the stream.
 /// The stream is roughly ordered by distance from the start.
 Stream<Waypoint> waypointsInJumpRadius({
   required WaypointCache waypointCache,
