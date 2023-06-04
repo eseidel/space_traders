@@ -207,6 +207,7 @@ Future<Ship> chooseShip(
   return ship;
 }
 
+/// Create an approximate string for the given [duration].
 String approximateDuration(Duration duration) {
   if (duration.inDays > 0) {
     return '${duration.inDays}d';

@@ -69,9 +69,6 @@ Stream<Waypoint> _nearbyMarketsWithProfitableTrade(
     startSystem: ship.nav.systemSymbol,
     maxJumps: maxJumps,
   )) {
-    if (waypoint.symbol == ship.nav.waypointSymbol) {
-      continue;
-    }
     if (!waypoint.hasMarketplace) {
       continue;
     }
@@ -88,13 +85,8 @@ Stream<Waypoint> _nearbyMarketsWithProfitableTrade(
     if (purchasePrice == null) {
       continue;
     }
-    final maybeGood =
-        market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
-    if (maybeGood == null) {
-      continue;
-    }
     // And our contract goal is selling < contract profit unit price.
-    if (maybeGood.purchasePrice < breakevenUnitPrice) {
+    if (purchasePrice < breakevenUnitPrice) {
       yield waypoint;
     }
   }
@@ -168,7 +160,9 @@ Future<DateTime?> advanceContractTrader(
   }
   final contract = maybeContract;
   final neededGood = maybeGood!;
-  if (agent.credits < 10000) {
+  // min credits could be relative to the good traded / size of cargo hold?
+  const minimumCreditsToTrade = 100000;
+  if (agent.credits < minimumCreditsToTrade) {
     shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
     await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
     return null;
@@ -202,24 +196,10 @@ Future<DateTime?> advanceContractTrader(
         return null;
       }
     }
-
-    // Sell anything we have.
-    await sellCargoAndLog(api, priceData, ship);
-    // nav to place nearby exporting our contract goal.
-    return _navigateToNearbyMarketIfNeeded(
-      api,
-      priceData,
-      ship,
-      waypointCache,
-      marketCache,
-      behaviorManager,
-      tradeSymbol: neededGood.tradeSymbol,
-      breakevenUnitPrice: breakEvenUnitPrice,
-    );
   }
-  // Otherwise we're not at our contract destination.
 
-  // If we're at a market place, buy our goods.
+  // We might still be at our contract destination.
+  // If we're at a market, buy our goods.
   if (currentWaypoint.hasMarketplace) {
     // Sell everything we have except the contract goal.
     final cargo = await sellCargoAndLog(

@@ -79,7 +79,14 @@ class NavResult {
   }
 }
 
-int _distanceBetweenSystems(ConnectedSystem a, System b) {
+int _distanceBetweenConnectedSystems(ConnectedSystem a, System b) {
+  // Use euclidean distance.
+  final dx = a.x - b.x;
+  final dy = a.y - b.y;
+  return sqrt(dx * dx + dy * dy).round();
+}
+
+int _distanceBetweenSystems(System a, System b) {
   // Use euclidean distance.
   final dx = a.x - b.x;
   final dy = a.y - b.y;
@@ -137,8 +144,8 @@ Future<NavResult> continueNavigationIfNeeded(
     final endSystem =
         await waypointCache.systemBySymbol(endWaypoint.systemSymbol);
     final closestSystem = connectedSystems.reduce(
-      (a, b) => _distanceBetweenSystems(a, endSystem) <
-              _distanceBetweenSystems(b, endSystem)
+      (a, b) => _distanceBetweenConnectedSystems(a, endSystem) <
+              _distanceBetweenConnectedSystems(b, endSystem)
           ? a
           : b,
     );
@@ -161,10 +168,22 @@ Future<NavResult> continueNavigationIfNeeded(
   );
 }
 
-/// Yields a stream of Waypoints that are within n jumps of the given system.
-/// Waypoints from the start system are included in the stream.
+/// Creates a ConnectedSystem from a System and a distance.
+ConnectedSystem connectedSystemFromSystem(System system, int distance) {
+  return ConnectedSystem(
+    distance: distance,
+    symbol: system.symbol,
+    sectorSymbol: system.sectorSymbol,
+    type: system.type,
+    x: system.x,
+    y: system.y,
+  );
+}
+
+/// Yields a stream of system symbols that are within n jumps of the system.
+/// The system itself is included in the stream with distance 0.
 /// The stream is roughly ordered by distance from the start.
-Stream<Waypoint> waypointsInJumpRadius({
+Stream<String> systemSymbolsInJumpRadius({
   required WaypointCache waypointCache,
   required String startSystem,
   required int maxJumps,
@@ -175,10 +194,7 @@ Stream<Waypoint> waypointsInJumpRadius({
     final jumpFrom = systemsToJumpFrom.first;
     systemsToJumpFrom.remove(jumpFrom);
     systemsExamined.add(jumpFrom);
-    final waypoints = await waypointCache.waypointsInSystem(jumpFrom);
-    for (final waypoint in waypoints) {
-      yield waypoint;
-    }
+    yield jumpFrom;
     // Don't bother to check connections if we're out of jumps.
     if (maxJumps > 0) {
       final connectedSystems =
@@ -192,4 +208,48 @@ Stream<Waypoint> waypointsInJumpRadius({
     }
     maxJumps--;
   } while (maxJumps >= 0 && systemsToJumpFrom.isNotEmpty);
+}
+
+/// Yields a stream of Waypoints that are within n jumps of the given system.
+/// Waypoints from the start system are included in the stream.
+/// The stream is roughly ordered by distance from the start.
+Stream<Waypoint> waypointsInJumpRadius({
+  required WaypointCache waypointCache,
+  required String startSystem,
+  required int maxJumps,
+}) async* {
+  await for (final String system in systemSymbolsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: startSystem,
+    maxJumps: maxJumps,
+  )) {
+    final waypoints = await waypointCache.waypointsInSystem(system);
+    for (final waypoint in waypoints) {
+      yield waypoint;
+    }
+  }
+}
+
+/// Yields a stream of system symbols that are within n jumps of the system.
+/// The system itself is included in the stream with distance 0.
+/// The stream is roughly ordered by distance from the start.
+/// This makes one more API call per system than systemsSymbolsInJumpRadius
+/// so use that one if you don't need the ConnectedSystem data.
+Stream<ConnectedSystem> connectedSystemsInJumpRadius({
+  required WaypointCache waypointCache,
+  required String startSystem,
+  required int maxJumps,
+}) async* {
+  final start = await waypointCache.systemBySymbol(startSystem);
+  await for (final String system in systemSymbolsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: startSystem,
+    maxJumps: maxJumps,
+  )) {
+    final destination = await waypointCache.systemBySymbol(system);
+    yield connectedSystemFromSystem(
+      destination,
+      _distanceBetweenSystems(start, destination),
+    );
+  }
 }

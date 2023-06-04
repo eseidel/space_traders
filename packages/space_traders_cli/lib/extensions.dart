@@ -211,3 +211,7 @@ extension MarketUtils on Market {
     return symbols;
   }
 }
+
+/// Returns the duration until the given date time.
+Duration durationUntil(DateTime dateTime) =>
+    dateTime.difference(DateTime.now());

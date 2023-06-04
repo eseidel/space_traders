@@ -73,7 +73,7 @@ void main(List<String> args) async {
 
   final tradeSymbol = TradeSymbol.fromJson(promptResponse.toUpperCase().trim());
   if (tradeSymbol == null) {
-    logger.err('Invalid trade symbol');
+    logger.err('Invalid trade symbol: "$promptResponse"');
     return;
   }
   final hq = await waypointCache.getAgentHeadquarters();
@@ -104,6 +104,7 @@ void main(List<String> args) async {
     );
   }
 
+  logger.info('Found ${availabilityList.length} deals for $tradeSymbol:');
   availabilityList.sort((a, b) => a.sellPrice.compareTo(b.sellPrice));
   for (final availability in availabilityList) {
     logger.info(

@@ -1,8 +1,9 @@
-import 'package:collection/collection.dart';
 import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
@@ -32,31 +33,18 @@ void main(List<String> args) async {
   final api = defaultApi(fs);
   final waypointCache = WaypointCache(api);
 
-  final hq = await waypointCache.getAgentHeadquarters();
-
-  final systemResponse = await api.systems.getSystem(hq.systemSymbol);
-  final startingSystem = systemResponse!.data;
-
   final myShips = await allMyShips(api).toList();
   final ship = await chooseShip(api, waypointCache, myShips);
 
-  final jumpGateWaypoint = startingSystem.waypoints
-      .firstWhereOrNull((w) => w.type == WaypointType.JUMP_GATE);
-
-  final jumpGateResponse = await api.systems
-      .getJumpGate(startingSystem.symbol, jumpGateWaypoint!.symbol);
-  final jumpGate = jumpGateResponse!.data;
+  final startingSystem =
+      await waypointCache.systemBySymbol(ship.nav.systemSymbol);
+  final jumpGate = await waypointCache.jumpGateForSystem(ship.nav.systemSymbol);
+  final jumpGateWaypoint =
+      await waypointCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
 
   final systemChoices = [
-    ConnectedSystem(
-      distance: 0,
-      symbol: startingSystem.symbol,
-      sectorSymbol: startingSystem.sectorSymbol,
-      type: startingSystem.type,
-      x: startingSystem.x,
-      y: startingSystem.y,
-    ),
-    ...jumpGate.connectedSystems,
+    connectedSystemFromSystem(startingSystem, 0),
+    ...jumpGate!.connectedSystems,
   ];
 
   final destSystem = logger.chooseOne(
@@ -87,9 +75,16 @@ void main(List<String> args) async {
   }
 
   // This only handles a single jump at this point.
-  await navigateToLocalWaypoint(api, ship, jumpGateWaypoint.symbol);
+
+  // If we aren't at the jump gate, navigate to it.
+  if (ship.nav.waypointSymbol != jumpGateWaypoint!.symbol) {
+    final arrival =
+        await navigateToLocalWaypointAndLog(api, ship, jumpGateWaypoint);
+    await Future<void>.delayed(durationUntil(arrival));
+  }
   final jumpRequest = JumpShipRequest(systemSymbol: destSystem.symbol);
   await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpRequest);
+  // We don't need to wait after the jump cooldown.
   await _navigateToLocalWaypointAndDock(
     api,
     ship,
