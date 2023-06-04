@@ -8,6 +8,7 @@ import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/surveys.dart';
 
 /// The context for a behavior.
 class BehaviorContext {
@@ -23,6 +24,7 @@ class BehaviorContext {
     this.behaviorManager,
     this.contract,
     this.maybeGoods,
+    this.surveyData,
   );
 
   /// Handle to the API clients.
@@ -54,6 +56,9 @@ class BehaviorContext {
 
   /// The goods we are delivering.
   final ContractDeliverGood? maybeGoods;
+
+  /// The survey data.
+  final SurveyData surveyData;
 
   /// Load the behavior state for the given ship.
   Future<BehaviorState> loadBehaviorState() async =>
@@ -102,6 +107,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.ship,
         ctx.waypointCache,
         ctx.behaviorManager,
+        ctx.surveyData,
       );
 
     case Behavior.explorer:

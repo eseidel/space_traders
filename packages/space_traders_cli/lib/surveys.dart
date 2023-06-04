@@ -56,7 +56,7 @@ class SurveyData {
   final String _cacheFilePath;
 
   /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'prices.json';
+  static const String defaultCacheFilePath = 'surveys.json';
 
   static List<ValuedSurvey> _parseSurveys(String json) {
     final parsed = jsonDecode(json) as List<Map<String, dynamic>>;
@@ -69,7 +69,7 @@ class SurveyData {
     String? cacheFilePath,
   }) async {
     final filePath = cacheFilePath ?? defaultCacheFilePath;
-    final surveysFile = fs.file(cacheFilePath);
+    final surveysFile = fs.file(filePath);
     if (surveysFile.existsSync()) {
       return SurveyData(
         surveys: _parseSurveys(await surveysFile.readAsString()),

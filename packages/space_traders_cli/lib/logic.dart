@@ -11,6 +11,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
+import 'package:space_traders_cli/surveys.dart';
 
 // At the top of the file because I change this so often.
 Behavior _behaviorFor(
@@ -52,6 +53,7 @@ Future<void> logicLoop(
   Api api,
   DataStore db,
   PriceData priceData,
+  SurveyData surveyData,
   ShipWaiter waiter,
 ) async {
   final waypointCache = WaypointCache(api);
@@ -104,6 +106,7 @@ Future<void> logicLoop(
         behaviorManager,
         maybeContract,
         maybeGoods,
+        surveyData,
       );
       final waitUntil = await advanceShipBehavior(ctx);
       waiter.updateWaitUntil(ship.symbol, waitUntil);
@@ -136,19 +139,6 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
   // return myAgent.credits > 140000;
 }
 
-/// Returns true if the inner exception is a windows semaphore timeout.
-/// This is a workaround for some behavior in windows I do not understand.
-/// These seem to occur only once every few hours at random.
-bool isWindowsSemaphoreTimeout(ApiException e) {
-  final innerException = e.innerException;
-  if (innerException == null) {
-    return false;
-  }
-  return innerException
-      .toString()
-      .contains('The semaphore timeout period has expired.');
-}
-
 Future<void> _acceptAllContractsIfNeeded(Api api) async {
   final contractsResponse = await api.contracts.getContracts();
   final contracts = contractsResponse!.data;
@@ -166,7 +156,12 @@ Future<void> _acceptAllContractsIfNeeded(Api api) async {
 
 /// Run the logic loop forever.
 /// Currently just sends ships to mine and sell ore.
-Future<void> logic(Api api, DataStore db, PriceData priceData) async {
+Future<void> logic(
+  Api api,
+  DataStore db,
+  PriceData priceData,
+  SurveyData surveyData,
+) async {
   // Accept any contracts we have not yet accepted.
   // This is a bit dangerous because we could accept a contract and then
   // not be able to fulfill it.
@@ -177,7 +172,7 @@ Future<void> logic(Api api, DataStore db, PriceData priceData) async {
 
   while (true) {
     try {
-      await logicLoop(api, db, priceData, waiter);
+      await logicLoop(api, db, priceData, surveyData, waiter);
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {
         logger.warn('Server down for maintenance, waiting 1 minute.');

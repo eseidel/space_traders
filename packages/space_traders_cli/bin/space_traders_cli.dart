@@ -6,6 +6,7 @@ import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/surveys.dart';
 
 void main(List<String> args) async {
   final parser = ArgParser()
@@ -33,9 +34,10 @@ void main(List<String> args) async {
     fs,
     updateFromServer: results['update-prices'] as bool,
   );
+  final surveyData = await SurveyData.load(fs);
   logger.info(
     'Loaded ${priceData.count} prices from '
     '${priceData.waypointCount} waypoints.',
   );
-  await logic(api, db, priceData);
+  await logic(api, db, priceData, surveyData);
 }

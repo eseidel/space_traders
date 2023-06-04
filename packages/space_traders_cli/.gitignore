@@ -4,5 +4,6 @@
 auth_token.txt
 datastore.json
 prices.json
+surveys.json
 coverage/
 coverage.lcov

@@ -12,6 +12,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/route.dart';
+import 'package:space_traders_cli/surveys.dart';
 
 /// Creates a new one if we have a surveyor.
 Future<SurveySet?> createSurveySetIfPossible(
@@ -33,7 +34,7 @@ Future<SurveySet?> createSurveySetIfPossible(
   );
   await saveSurveySet(db, surveySet);
   shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
-  return null;
+  return surveySet;
 }
 
 // my evaluation logic actually just assumes I'll get 10 extracts from each
@@ -162,6 +163,23 @@ Future<Waypoint> nearestWaypointWithMarket(
   );
 }
 
+List<ValuedSurvey> evaluateSurveys(
+  PriceData priceData,
+  Waypoint nearestMarket,
+  SurveySet surveySet,
+) {
+  final now = DateTime.now();
+  return surveySet.surveys
+      .map(
+        (s) => ValuedSurvey(
+          timestamp: now,
+          survey: s,
+          estimatedValue: expectedValueFromSurvey(priceData, nearestMarket, s),
+        ),
+      )
+      .toList();
+}
+
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
@@ -171,6 +189,7 @@ Future<DateTime?> advanceMiner(
   Ship ship,
   WaypointCache waypointCache,
   BehaviorManager behaviorManager,
+  SurveyData surveyData,
 ) async {
   final navResult = await continueNavigationIfNeeded(
     api,
@@ -263,17 +282,20 @@ Future<DateTime?> advanceMiner(
   await undockIfNeeded(api, ship);
   // Load a survey set, or if we have surveying capabilities, survey.
   var maybeSurveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
+  final nearestMarket = await nearestWaypointWithMarket(
+    waypointCache,
+    currentWaypoint.symbol,
+  );
   if (maybeSurveySet == null) {
     maybeSurveySet ??= await createSurveySetIfPossible(api, db, ship);
     if (maybeSurveySet != null) {
       // Evaluate the surveys in the survey set.  See if any are worth mining.
       // Otherwise discard the set and repeat up to N times.
+      final valuedSurveys =
+          evaluateSurveys(priceData, nearestMarket, maybeSurveySet);
+      await surveyData.addSurveys(valuedSurveys);
     }
   }
-  final nearestMarket = await nearestWaypointWithMarket(
-    waypointCache,
-    currentWaypoint.symbol,
-  );
   final maybeSurvey =
       _chooseBestSurvey(priceData, nearestMarket, maybeSurveySet);
   try {

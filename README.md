@@ -101,6 +101,7 @@ Logic:
 * Start to build a system database similar to the pricing database.
 * Carefully choose which survey to use against historical data.
 * Fix contract trader to be able to leave the system.
+* Fix arbitrage trader to not recalculate deal mid-journey.
 
 UI:
 * Add a Flutter UI.
