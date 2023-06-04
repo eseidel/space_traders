@@ -13,22 +13,20 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/route.dart';
 
-/// Either loads a cached survey set or creates a new one if we have a surveyor.
-Future<SurveySet?> loadOrCreateSurveySetIfPossible(
+/// Creates a new one if we have a surveyor.
+Future<SurveySet?> createSurveySetIfPossible(
   Api api,
   DataStore db,
   Ship ship,
 ) async {
-  final cachedSurveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
-  if (cachedSurveySet != null) {
-    return cachedSurveySet;
-  }
   if (!ship.hasSurveyor) {
     return null;
   }
   // Survey
   final response = await api.fleet.createSurvey(ship.symbol);
   final survey = response!.data;
+  // TODO(eseidel): Move this out of this function and return the response
+  // which includes cooldown.
   final surveySet = SurveySet(
     waypointSymbol: ship.nav.waypointSymbol,
     surveys: survey.surveys,
@@ -264,12 +262,20 @@ Future<DateTime?> advanceMiner(
   // Must be undocked before surveying or mining.
   await undockIfNeeded(api, ship);
   // Load a survey set, or if we have surveying capabilities, survey.
-  final surveySet = await loadOrCreateSurveySetIfPossible(api, db, ship);
+  var maybeSurveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
+  if (maybeSurveySet == null) {
+    maybeSurveySet ??= await createSurveySetIfPossible(api, db, ship);
+    if (maybeSurveySet != null) {
+      // Evaluate the surveys in the survey set.  See if any are worth mining.
+      // Otherwise discard the set and repeat up to N times.
+    }
+  }
   final nearestMarket = await nearestWaypointWithMarket(
     waypointCache,
     currentWaypoint.symbol,
   );
-  final maybeSurvey = _chooseBestSurvey(priceData, nearestMarket, surveySet);
+  final maybeSurvey =
+      _chooseBestSurvey(priceData, nearestMarket, maybeSurveySet);
   try {
     final response = await extractResources(api, ship, survey: maybeSurvey);
     final yield_ = response.extraction.yield_;
@@ -292,14 +298,14 @@ Future<DateTime?> advanceMiner(
         'Survey ${maybeSurvey!.signature} exhausted, '
         'deleting and trying again.',
       );
-      surveySet!.surveys
+      maybeSurveySet!.surveys
           .removeWhere((s) => s.signature == maybeSurvey.signature);
       // This will end up going through them in order, which is probably wrong.
       // We should discard any low-value surveys.
-      if (surveySet.surveys.isEmpty) {
-        await deleteSurveySet(db, surveySet.waypointSymbol);
+      if (maybeSurveySet.surveys.isEmpty) {
+        await deleteSurveySet(db, maybeSurveySet.waypointSymbol);
       } else {
-        await saveSurveySet(db, surveySet);
+        await saveSurveySet(db, maybeSurveySet);
       }
       return null;
     }

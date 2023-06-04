@@ -95,15 +95,12 @@ Logic:
 * Include fuel costs in deal calculations.
 * Arbitrage should consider going to systems it knows there will be a profit from.
 * Probes should plan jumps based on distance to hq, not current location.
-* Cull old prices from prices.json
-* Post prices to the prices server.
 * Fix probes getting stuck cycling.
 * Remove guards against 0 prices from prices.dart.
 * Make shipInfo include an emoji for the behavior.
-* Move to some sort of context object that holds both Ship and Behavior.
 * Start to build a system database similar to the pricing database.
 * Carefully choose which survey to use against historical data.
-* Continue navigation should print status (e.g. time to destination).
+* Fix contract trader to be able to leave the system.
 
 UI:
 * Add a Flutter UI.

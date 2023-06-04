@@ -1,4 +1,5 @@
 import 'package:file/local.dart';
+import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
@@ -11,6 +12,8 @@ void main(List<String> args) async {
 
   final myShips = await allMyShips(api).toList();
   final ship = await chooseShip(api, waypointCache, myShips);
+
+  await dockIfNeeded(api, ship);
 
   final response = await api.fleet.negotiateContract(ship.symbol);
   final contract = response!.data;
