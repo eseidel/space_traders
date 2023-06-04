@@ -207,28 +207,54 @@ Future<Ship> chooseShip(
   return ship;
 }
 
+String approximateDuration(Duration duration) {
+  if (duration.inDays > 0) {
+    return '${duration.inDays}d';
+  } else if (duration.inHours > 0) {
+    return '${duration.inHours}h';
+  } else if (duration.inMinutes > 0) {
+    return '${duration.inMinutes}m';
+  } else {
+    return '${duration.inSeconds}s';
+  }
+}
+
 /// Print the status of the server.
 void printStatus(GetStatus200Response s) {
   final mostCreditsString = s.leaderboards.mostCredits
       .map(
-        (e) => '${e.agentSymbol.padLeft(14)}: '
+        (e) => '${e.agentSymbol.padLeft(14)} '
             '${creditsString(e.credits).padLeft(14)}',
       )
       .join(', ');
   final mostChartsString = s.leaderboards.mostSubmittedCharts
-      .map((e) => '${e.agentSymbol}: ${e.chartCount}')
+      .map(
+        (e) => '${e.agentSymbol.padLeft(14)} '
+            '${e.chartCount.toString().padLeft(14)}',
+      )
       .join(', ');
+  final now = DateTime.now();
+  final resetDate = DateTime.tryParse(s.resetDate)!;
+  final sinceLastReset = approximateDuration(now.difference(resetDate));
+  final nextResetDate = DateTime.tryParse(s.serverResets.next)!;
+  final untilNextReset = approximateDuration(nextResetDate.difference(now));
+  final statsParts = [
+    '${s.stats.agents} agents',
+    '${s.stats.ships} ships',
+    '${s.stats.systems} systems',
+    '${s.stats.waypoints} waypoints',
+  ].map((e) => e.padLeft(20)).toList();
+
   logger
     ..info(
-      'Stats: ${s.stats.agents} agents, ${s.stats.ships} ships, '
-      '${s.stats.systems} systems, ${s.stats.waypoints} waypoints',
+      'Stats: ${statsParts.join(' ')}',
     )
     ..info('Most Credits: $mostCreditsString')
-    ..info('Most Charts: $mostChartsString')
+    ..info('Most Charts:  $mostChartsString')
     ..info(
-      'Last Reset: ${s.resetDate}'
-      'Next reset: ${s.serverResets.next} '
-      '(frequency: ${s.serverResets.frequency})',
+      'Last reset $sinceLastReset ago, '
+      'next reset: $untilNextReset, '
+      'cadence: ${s.serverResets.frequency}',
     );
   final knownAnnouncementTitles = ['Server Resets', 'Discord', 'Support Us'];
   for (final announcement in s.announcements) {
