@@ -256,7 +256,7 @@ Future<void> chartWaypointAndLog(Api api, Ship ship) async {
     final waypoint = response!.data.waypoint;
     shipInfo(ship, 'Charted ${waypointDescription(waypoint)}');
   } on ApiException catch (e) {
-    if (!isAPIExceptionWithCode(e, 4600)) {
+    if (!isWaypointAlreadyChartedException(e)) {
       rethrow;
     }
     shipWarn(ship, '${ship.nav.waypointSymbol} was already charted');

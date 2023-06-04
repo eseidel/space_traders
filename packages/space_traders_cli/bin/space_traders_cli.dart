@@ -8,7 +8,7 @@ import 'package:space_traders_cli/logic.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/surveys.dart';
 
-void main(List<String> args) async {
+Future<void> main(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
     ..addFlag(
