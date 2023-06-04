@@ -163,8 +163,9 @@ Future<DateTime?> advanceContractTrader(
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
     final maybeGood = market!.tradeGoods
         .firstWhereOrNull((g) => g.symbol == goods.tradeSymbol);
-    final minimumProfitUnitPrice =
-        contract.terms.payment.onFulfilled / goods.unitsRequired;
+    final totalPayment =
+        contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
+    final minimumProfitUnitPrice = totalPayment / goods.unitsRequired;
     // And our contract goal is selling < contract profit unit price.
     if (maybeGood != null && maybeGood.purchasePrice < minimumProfitUnitPrice) {
       // Sell everything we have except the contract goal.
@@ -188,10 +189,18 @@ Future<DateTime?> advanceContractTrader(
     } else {
       // TODO(eseidel): This can't work.  We need to be able to do something
       // when things are too expensive.
-      shipInfo(
-        ship,
-        '${goods.tradeSymbol} is too expensive at ${currentWaypoint.symbol}',
-      );
+      if (maybeGood != null) {
+        shipInfo(
+          ship,
+          '${goods.tradeSymbol} is too expensive near ${currentWaypoint.symbol} '
+          'needed < $minimumProfitUnitPrice, got ${maybeGood.purchasePrice}',
+        );
+      } else {
+        shipInfo(
+          ship,
+          'No ${goods.tradeSymbol} available near ${currentWaypoint.symbol}',
+        );
+      }
       return _navigateToNearbyMarketIfNeeded(
         api,
         ship,
