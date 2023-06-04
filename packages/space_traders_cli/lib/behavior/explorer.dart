@@ -7,6 +7,7 @@ import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
@@ -95,6 +96,8 @@ Future<DateTime?> advanceExporer(
         }
       }
     }
+    final myShips = await allMyShips(api).toList();
+    final shipSystems = myShips.map((s) => s.nav.systemSymbol).toSet();
     const maxJumpDistance = 100;
     // If we get here, we've explored all systems connected to the jump gate.
     // Walk waypoints as far out as we can see until we find one missing
@@ -104,6 +107,11 @@ Future<DateTime?> advanceExporer(
       startSystem: currentWaypoint.systemSymbol,
       allowedJumps: maxJumpDistance,
     )) {
+      // Crude logic to spread our explorers out.
+      if (shipSystems.contains(destination.systemSymbol)) {
+        // We already have a ship in this system, don't route there.
+        continue;
+      }
       if (_isMissingChartOrRecentMarketData(priceData, destination)) {
         shipInfo(
           ship,
