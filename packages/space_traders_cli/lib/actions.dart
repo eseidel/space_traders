@@ -251,9 +251,16 @@ Future<DateTime> navigateToLocalWaypointAndLog(
 
 /// Chart the waypoint [ship] is currently at and log.
 Future<void> chartWaypointAndLog(Api api, Ship ship) async {
-  final response = await api.fleet.createChart(ship.symbol);
-  final waypoint = response!.data.waypoint;
-  shipInfo(ship, 'Charted ${waypointDescription(waypoint)}');
+  try {
+    final response = await api.fleet.createChart(ship.symbol);
+    final waypoint = response!.data.waypoint;
+    shipInfo(ship, 'Charted ${waypointDescription(waypoint)}');
+  } on ApiException catch (e) {
+    if (!isAPIExceptionWithCode(e, 4600)) {
+      rethrow;
+    }
+    shipWarn(ship, '${ship.nav.waypointSymbol} was already charted');
+  }
 }
 
 /// Use the jump gate to travel to [systemSymbol] and log.
