@@ -48,7 +48,10 @@ void main(List<String> args) async {
     display: waypointDescription,
   );
 
-  logger.info('Ships types available at ${waypoint.symbol}:');
+  final beforeCredits = creditsString(agent.credits);
+  logger
+    ..info('$beforeCredits credits available.')
+    ..info('Ships types available at ${waypoint.symbol}:');
 
   final shipyardResponse =
       await api.systems.getShipyard(waypoint.systemSymbol, waypoint.symbol);
@@ -64,4 +67,6 @@ void main(List<String> args) async {
   final purchaseResponse = await purchaseShip(api, shipType, shipyard.symbol);
   logger.info('Purchased ${purchaseResponse.ship.symbol} for '
       '${creditsString(purchaseResponse.transaction.price)}.');
+  final afterCredits = creditsString(purchaseResponse.agent.credits);
+  logger.info('$afterCredits credits remaining.');
 }
