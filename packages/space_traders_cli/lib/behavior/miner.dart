@@ -163,6 +163,7 @@ Future<Waypoint> nearestWaypointWithMarket(
   );
 }
 
+/// Creates a list of [ValuedSurvey]s from the given [surveySet].
 List<ValuedSurvey> evaluateSurveys(
   PriceData priceData,
   Waypoint nearestMarket,

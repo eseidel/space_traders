@@ -102,6 +102,7 @@ Logic:
 * Carefully choose which survey to use against historical data.
 * Fix contract trader to be able to leave the system.
 * Fix arbitrage trader to not recalculate deal mid-journey.
+* Persist some of WaypointCache to disk.
 
 UI:
 * Add a Flutter UI.
