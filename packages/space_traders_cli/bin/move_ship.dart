@@ -7,6 +7,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 Future<void> _navigateToLocalWaypointAndDock(
   Api api,

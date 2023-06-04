@@ -4,7 +4,7 @@ import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
-import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 // This should end up sharing code with Deal, Route, etc.
 class _Availability {

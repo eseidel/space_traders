@@ -10,9 +10,9 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/route.dart';
 import 'package:space_traders_cli/surveys.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Creates a new one if we have a surveyor.
 Future<SurveySet?> createSurveySetIfPossible(

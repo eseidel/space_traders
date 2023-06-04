@@ -7,6 +7,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 void main() async {
   const fs = LocalFileSystem();

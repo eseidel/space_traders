@@ -7,7 +7,7 @@ import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
-import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Return a string describing the given [waypoint].
 String waypointShortString(Waypoint waypoint) {

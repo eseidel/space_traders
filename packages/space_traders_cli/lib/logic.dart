@@ -12,6 +12,7 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 import 'package:space_traders_cli/surveys.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 // At the top of the file because I change this so often.
 Behavior _behaviorFor(

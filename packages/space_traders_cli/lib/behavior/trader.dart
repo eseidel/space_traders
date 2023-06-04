@@ -9,7 +9,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Returns the best deal for the given ship within one jump of it's
 /// current location.

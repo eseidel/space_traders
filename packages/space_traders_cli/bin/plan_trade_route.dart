@@ -6,7 +6,7 @@ import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
-import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 Iterable<Price> pricesForWaypoint(PriceData priceData, Waypoint waypoint) {
   final prices =

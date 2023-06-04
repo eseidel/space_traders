@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// A route between two waypoints, including possibly jumping through gates.
 /// Currently middle waypoints are always jumpgates.
