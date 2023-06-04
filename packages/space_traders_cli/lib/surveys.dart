@@ -59,8 +59,12 @@ class SurveyData {
   static const String defaultCacheFilePath = 'surveys.json';
 
   static List<ValuedSurvey> _parseSurveys(String json) {
-    final parsed = jsonDecode(json) as List<Map<String, dynamic>>;
-    return parsed.map(ValuedSurvey.fromJson).toList();
+    final parsed = jsonDecode(json) as List<dynamic>;
+    return parsed
+        .map<ValuedSurvey>(
+          (e) => ValuedSurvey.fromJson(e as Map<String, dynamic>),
+        )
+        .toList();
   }
 
   /// Load the store.
