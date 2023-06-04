@@ -12,8 +12,8 @@ void main(List<String> args) async {
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
     ..addFlag(
       'update-prices',
-      negatable: false,
       help: 'Force update of prices from server.',
+      defaultsTo: true,
     );
   final results = parser.parse(args);
 

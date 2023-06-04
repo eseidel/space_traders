@@ -14,14 +14,19 @@ void main(List<String> args) async {
 
   const pricesPerRequest = 1000;
   final pricesEndpoint = Uri.parse(PriceData.defaultUrl);
+  var sliceNumber = 0;
   for (final slice in priceData.rawPrices.slices(pricesPerRequest)) {
     final jsonEncoded = jsonEncode(slice);
     final headers = <String, String>{
       'Content-type': 'application/json',
       'Accept': 'application/json',
     };
+    final sliceStart = sliceNumber * pricesPerRequest;
+    final sliceEnd = sliceStart + slice.length;
+    logger.info('Sending prices $sliceStart-$sliceEnd');
     final response =
         await http.put(pricesEndpoint, headers: headers, body: jsonEncoded);
     logger.info('Response: ${response.statusCode} ${response.body}');
+    sliceNumber++;
   }
 }
