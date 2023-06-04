@@ -3,7 +3,6 @@ import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
-import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
@@ -29,10 +28,8 @@ void main(List<String> args) async {
   final waypointCache = WaypointCache(api);
 
   final priceData = await PriceData.load(fs);
-  final agentResult = await api.agents.getMyAgent();
-  final agent = agentResult!.data;
-  final hq = parseWaypointString(agent.headquarters);
-  final systemResponse = await api.systems.getSystem(hq.system);
+  final hq = await waypointCache.getAgentHeadquarters();
+  final systemResponse = await api.systems.getSystem(hq.systemSymbol);
   final system = systemResponse!.data;
   final jumpGateWaypoint = system.waypoints
       .firstWhereOrNull((w) => w.type == WaypointType.JUMP_GATE);
@@ -41,7 +38,7 @@ void main(List<String> args) async {
       await api.systems.getJumpGate(system.symbol, jumpGateWaypoint!.symbol);
   final jumpGate = jumpGateResponse!.data;
   final systemNames = [
-    hq.system,
+    hq.systemSymbol,
     for (final system in jumpGate.connectedSystems) system.symbol
   ];
 

@@ -3,7 +3,6 @@ import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
@@ -30,12 +29,10 @@ void main(List<String> args) async {
 
   final priceData = await PriceData.load(fs);
 
-  final agentResult = await api.agents.getMyAgent();
-
-  final agent = agentResult!.data;
-  final hq = parseWaypointString(agent.headquarters);
+  final agent = await getMyAgent(api);
+  final hq = await waypointCache.getAgentHeadquarters();
   final shipyardWaypoints =
-      await waypointCache.shipyardWaypointsForSystem(hq.system);
+      await waypointCache.shipyardWaypointsForSystem(hq.systemSymbol);
 
   final myShips = await allMyShips(api).toList();
   final shipWaypoints = await waypointsForShips(waypointCache, myShips);

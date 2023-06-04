@@ -23,7 +23,6 @@ class _Availability {
 Stream<_Availability> _availabilityInSystem(
   Api api,
   PriceData priceData,
-  Agent agent,
   List<Waypoint> systemWaypoints,
   TradeSymbol tradeSymbol,
   int jumps,
@@ -77,30 +76,27 @@ void main(List<String> args) async {
     logger.err('Invalid trade symbol');
     return;
   }
-  final agentResult = await api.agents.getMyAgent();
-  final agent = agentResult!.data;
-  final hq = parseWaypointString(agent.headquarters);
-  final systemWaypoints = await waypointCache.waypointsInSystem(hq.system);
+  final hq = await waypointCache.getAgentHeadquarters();
+  final systemWaypoints =
+      await waypointCache.waypointsInSystem(hq.systemSymbol);
 
   final availabilityList = <_Availability>[
     ...await _availabilityInSystem(
       api,
       priceData,
-      agent,
       systemWaypoints,
       tradeSymbol,
       0,
     ).toList(),
   ];
 
-  await for (final system in waypointCache.connectedSystems(hq.system)) {
+  await for (final system in waypointCache.connectedSystems(hq.systemSymbol)) {
     logger.info('${system.symbol} - ${system.distance}');
     final waypoints = await waypointCache.waypointsInSystem(system.symbol);
     availabilityList.addAll(
       await _availabilityInSystem(
         api,
         priceData,
-        agent,
         waypoints,
         tradeSymbol,
         1,

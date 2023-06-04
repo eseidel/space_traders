@@ -45,3 +45,9 @@ Stream<Faction> getAllFactions(Api api) {
     return (response!.data, response.meta);
   });
 }
+
+/// Fetch user's [Agent] object.
+Future<Agent> getMyAgent(Api api) async {
+  final response = await api.agents.getMyAgent();
+  return response!.data;
+}

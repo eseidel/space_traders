@@ -59,8 +59,7 @@ Future<void> logicLoop(
 ) async {
   final waypointCache = WaypointCache(api);
   final marketCache = MarketCache(waypointCache);
-  final agentResult = await api.agents.getMyAgent();
-  final agent = agentResult!.data;
+  final agent = await getMyAgent(api);
   final myShips = await allMyShips(api).toList();
   waiter.updateForShips(myShips);
 

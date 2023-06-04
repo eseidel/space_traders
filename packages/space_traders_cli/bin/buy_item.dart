@@ -18,8 +18,7 @@ void main(List<String> args) async {
   final api = defaultApi(fs);
 
   final priceData = await PriceData.load(fs);
-  final agentResult = await api.agents.getMyAgent();
-  final agent = agentResult!.data;
+  final agent = await getMyAgent(api);
   final waypointCache = WaypointCache(api);
   final marketCache = MarketCache(waypointCache);
 

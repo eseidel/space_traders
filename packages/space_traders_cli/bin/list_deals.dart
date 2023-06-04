@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:file/local.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
-import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
@@ -15,17 +14,16 @@ void main(List<String> args) async {
   final marketCache = MarketCache(waypointCache);
 
   final priceData = await PriceData.load(fs);
-  final agentResult = await api.agents.getMyAgent();
-  final agent = agentResult!.data;
-  final hq = parseWaypointString(agent.headquarters);
+  final hq = await waypointCache.getAgentHeadquarters();
   final marketplaceWaypoints =
-      await waypointCache.marketWaypointsForSystem(hq.system);
+      await waypointCache.marketWaypointsForSystem(hq.systemSymbol);
   final currentWaypoint = logger.chooseOne(
     'Which marketplace?',
     choices: marketplaceWaypoints,
     display: waypointDescription,
   );
-  final allMarkets = await marketCache.marketsInSystem(hq.system).toList();
+  final allMarkets =
+      await marketCache.marketsInSystem(hq.systemSymbol).toList();
   // Fetch all marketplace data
   final localMarket =
       allMarkets.firstWhere((m) => m.symbol == currentWaypoint.symbol);

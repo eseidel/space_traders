@@ -17,11 +17,23 @@ class WaypointCache {
   /// Create a new WaypointCache.
   WaypointCache(this._api);
 
+  Waypoint? _agentHeadquarters;
   final Map<String, System> _systemsBySymbol = {};
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Map<String, JumpGate?> _jumpGatesBySystem = {};
   final Api _api;
+
+  /// Fetch the agent's headquarters.
+  // Not sure this belongs on waypointCache, but should be cached somewhere.
+  Future<Waypoint> getAgentHeadquarters() async {
+    if (_agentHeadquarters != null) {
+      return _agentHeadquarters!;
+    }
+    final agent = await getMyAgent(_api);
+    _agentHeadquarters ??= await waypoint(agent.headquarters);
+    return _agentHeadquarters!;
+  }
 
   /// Fetch all waypoints in the given system.
   Future<List<Waypoint>> waypointsInSystem(String systemSymbol) async {

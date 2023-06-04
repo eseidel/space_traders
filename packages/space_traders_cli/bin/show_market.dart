@@ -1,6 +1,5 @@
 import 'package:file/local.dart';
 import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
@@ -11,11 +10,9 @@ void main(List<String> args) async {
   final waypointCache = WaypointCache(api);
   final marketCache = MarketCache(waypointCache);
 
-  final agentResult = await api.agents.getMyAgent();
-  final agent = agentResult!.data;
-  final hq = parseWaypointString(agent.headquarters);
+  final hq = await waypointCache.getAgentHeadquarters();
   final marketplaceWaypoints =
-      await waypointCache.marketWaypointsForSystem(hq.system);
+      await waypointCache.marketWaypointsForSystem(hq.systemSymbol);
 
   final waypoint = logger.chooseOne(
     'Which marketplace?',
