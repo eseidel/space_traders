@@ -206,3 +206,35 @@ Future<Ship> chooseShip(
   );
   return ship;
 }
+
+/// Print the status of the server.
+void printStatus(GetStatus200Response s) {
+  final mostCreditsString = s.leaderboards.mostCredits
+      .map(
+        (e) => '${e.agentSymbol.padLeft(14)}: '
+            '${creditsString(e.credits).padLeft(14)}',
+      )
+      .join(', ');
+  final mostChartsString = s.leaderboards.mostSubmittedCharts
+      .map((e) => '${e.agentSymbol}: ${e.chartCount}')
+      .join(', ');
+  logger
+    ..info(
+      'Stats: ${s.stats.agents} agents, ${s.stats.ships} ships, '
+      '${s.stats.systems} systems, ${s.stats.waypoints} waypoints',
+    )
+    ..info('Most Credits: $mostCreditsString')
+    ..info('Most Charts: $mostChartsString')
+    ..info(
+      'Last Reset: ${s.resetDate}'
+      'Next reset: ${s.serverResets.next} '
+      '(frequency: ${s.serverResets.frequency})',
+    );
+  final knownAnnouncementTitles = ['Server Resets', 'Discord', 'Support Us'];
+  for (final announcement in s.announcements) {
+    if (knownAnnouncementTitles.contains(announcement.title)) {
+      continue;
+    }
+    logger.info('Announcement: ${announcement.title}');
+  }
+}

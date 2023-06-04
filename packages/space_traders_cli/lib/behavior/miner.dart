@@ -152,7 +152,7 @@ Future<Waypoint> nearestWaypointWithMarket(
   await for (final waypoint in waypointsInJumpRadius(
     waypointCache: waypointCache,
     startSystem: waypoint.systemSymbol,
-    allowedJumps: 1,
+    maxJumps: 1,
   )) {
     if (waypoint.hasMarketplace) {
       return waypoint;

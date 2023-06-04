@@ -1,9 +1,11 @@
+import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -11,23 +13,23 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
-List<Market> _marketsWithExport(
-  String tradeSymbol,
-  List<Market> markets,
-) {
-  return markets
-      .where((m) => m.exports.any((e) => e.symbol.value == tradeSymbol))
-      .toList();
-}
+// List<Market> _marketsWithExport(
+//   String tradeSymbol,
+//   List<Market> markets,
+// ) {
+//   return markets
+//       .where((m) => m.exports.any((e) => e.symbol.value == tradeSymbol))
+//       .toList();
+// }
 
-List<Market> _marketsWithExchange(
-  String tradeSymbol,
-  List<Market> markets,
-) {
-  return markets
-      .where((m) => m.exchange.any((e) => e.symbol.value == tradeSymbol))
-      .toList();
-}
+// List<Market> _marketsWithExchange(
+//   String tradeSymbol,
+//   List<Market> markets,
+// ) {
+//   return markets
+//       .where((m) => m.exchange.any((e) => e.symbol.value == tradeSymbol))
+//       .toList();
+// }
 
 Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   Api api,
@@ -53,27 +55,74 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   return response;
 }
 
+Stream<Waypoint> _nearbyMarketsWithProfitableTrade(
+  Ship ship,
+  PriceData priceData,
+  WaypointCache waypointCache,
+  MarketCache marketCache, {
+  required String tradeSymbol,
+  required int breakevenUnitPrice,
+  int maxJumps = 5,
+}) async* {
+  await for (final waypoint in waypointsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: ship.nav.systemSymbol,
+    maxJumps: maxJumps,
+  )) {
+    if (waypoint.symbol == ship.nav.waypointSymbol) {
+      continue;
+    }
+    if (!waypoint.hasMarketplace) {
+      continue;
+    }
+    final market = await marketCache.marketForSymbol(waypoint.symbol);
+    if (market == null) {
+      shipErr(ship, 'Waypoint ${waypoint.symbol} hasMarket but no market??');
+      continue;
+    }
+    final purchasePrice = estimatePurchasePrice(
+      priceData,
+      market,
+      tradeSymbol,
+    );
+    if (purchasePrice == null) {
+      continue;
+    }
+    final maybeGood =
+        market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
+    if (maybeGood == null) {
+      continue;
+    }
+    // And our contract goal is selling < contract profit unit price.
+    if (maybeGood.purchasePrice < breakevenUnitPrice) {
+      yield waypoint;
+    }
+  }
+}
+
 Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   Api api,
+  PriceData priceData,
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  BehaviorManager behaviorManager,
-  String tradeSymbol,
-) async {
-  // This needs to find nearby market with the desired tradeSymbol
-  // ideally under median price.
+  BehaviorManager behaviorManager, {
+  required String tradeSymbol,
+  required int breakevenUnitPrice,
+}) async {
+  // Find the nearest market within maxJumps that has the tradeSymbol
+  // either at or below our profit unit price, or as an export.
+  final nearbyMarket = await _nearbyMarketsWithProfitableTrade(
+    ship,
+    priceData,
+    waypointCache,
+    marketCache,
+    tradeSymbol: tradeSymbol,
+    breakevenUnitPrice: breakevenUnitPrice,
+  ).firstOrNull;
 
-  final allMarkets =
-      await marketCache.marketsInSystem(ship.nav.systemSymbol).toList();
-
-  // This should also consider the current market.
-  var markets = _marketsWithExport(tradeSymbol, allMarkets);
-  if (markets.isEmpty) {
-    markets = _marketsWithExchange(tradeSymbol, allMarkets);
-  }
-  final marketSymbol = markets.firstOrNull?.symbol;
-  if (marketSymbol == null) {
+  // TODO(eseidel): Failing that, find a market with tradeSymbol as an exchange.
+  if (nearbyMarket == null) {
     shipErr(
       ship,
       'No markets nearby with $tradeSymbol, disabling contract trader.',
@@ -82,8 +131,14 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
     return null;
   }
-  final destination = await waypointCache.waypoint(marketSymbol);
-  final arrival = await navigateToLocalWaypointAndLog(api, ship, destination);
+
+  final arrival = await beingRouteAndLog(
+    api,
+    ship,
+    waypointCache,
+    behaviorManager,
+    nearbyMarket.symbol,
+  );
   return arrival;
 }
 
@@ -98,19 +153,8 @@ Future<DateTime?> advanceContractTrader(
   MarketCache marketCache,
   BehaviorManager behaviorManager,
   Contract? maybeContract,
-  ContractDeliverGood? maybeGoods,
+  ContractDeliverGood? maybeGood,
 ) async {
-  if (maybeContract == null) {
-    await negotiateContractAndLog(api, ship);
-    return null;
-  }
-  final contract = maybeContract;
-  final goods = maybeGoods!;
-  if (agent.credits < 10000) {
-    shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
-    await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
-    return null;
-  }
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
@@ -120,23 +164,40 @@ Future<DateTime?> advanceContractTrader(
   if (navResult.shouldReturn()) {
     return navResult.waitTime;
   }
+  if (maybeContract == null) {
+    await negotiateContractAndLog(api, ship);
+    return null;
+  }
+  final contract = maybeContract;
+  final neededGood = maybeGood!;
+  if (agent.credits < 10000) {
+    shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
+    await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
+    return null;
+  }
+  final totalPayment =
+      contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
+  final breakEvenUnitPrice = totalPayment ~/ neededGood.unitsRequired;
+
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   // If we're at our contract destination.
-  if (currentWaypoint.symbol == goods.destinationSymbol) {
+  if (currentWaypoint.symbol == neededGood.destinationSymbol) {
     final maybeResponse =
-        await _deliverContractGoodsIfPossible(api, ship, contract, goods);
+        await _deliverContractGoodsIfPossible(api, ship, contract, neededGood);
 
     // Delivering the goods counts as completing the behavior, we'll
     // decide next loop if we need to do more.
     await behaviorManager.completeBehavior(ship.symbol);
 
     if (maybeResponse != null) {
-      // Update our cargo counts after fullfilling the contract.
+      // Update our cargo counts after fulfilling the contract.
       ship.cargo = maybeResponse.cargo;
       // If we've delivered enough, complete the contract.
-      if (maybeResponse.contract.goodNeeded(goods.tradeSymbol)!.amountNeeded <=
+      if (maybeResponse.contract
+              .goodNeeded(neededGood.tradeSymbol)!
+              .amountNeeded <=
           0) {
         await api.contracts.fulfillContract(contract.id);
         shipInfo(ship, 'Contract complete!');
@@ -149,11 +210,13 @@ Future<DateTime?> advanceContractTrader(
     // nav to place nearby exporting our contract goal.
     return _navigateToNearbyMarketIfNeeded(
       api,
+      priceData,
       ship,
       waypointCache,
       marketCache,
       behaviorManager,
-      goods.tradeSymbol,
+      tradeSymbol: neededGood.tradeSymbol,
+      breakevenUnitPrice: breakEvenUnitPrice,
     );
   }
 
@@ -162,18 +225,15 @@ Future<DateTime?> advanceContractTrader(
   if (currentWaypoint.hasMarketplace) {
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
     final maybeGood = market!.tradeGoods
-        .firstWhereOrNull((g) => g.symbol == goods.tradeSymbol);
-    final totalPayment =
-        contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
-    final minimumProfitUnitPrice = totalPayment / goods.unitsRequired;
+        .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
     // And our contract goal is selling < contract profit unit price.
-    if (maybeGood != null && maybeGood.purchasePrice < minimumProfitUnitPrice) {
+    if (maybeGood != null && maybeGood.purchasePrice < breakEvenUnitPrice) {
       // Sell everything we have except the contract goal.
       final cargo = await sellCargoAndLog(
         api,
         priceData,
         ship,
-        where: (s) => s != goods.tradeSymbol,
+        where: (s) => s != neededGood.tradeSymbol,
       );
       if (cargo.availableSpace > 0) {
         // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
@@ -182,7 +242,7 @@ Future<DateTime?> advanceContractTrader(
           api,
           priceData,
           ship,
-          goods.tradeSymbol,
+          neededGood.tradeSymbol,
           cargo.availableSpace,
         );
       }
@@ -192,23 +252,26 @@ Future<DateTime?> advanceContractTrader(
       if (maybeGood != null) {
         shipInfo(
           ship,
-          '${goods.tradeSymbol} is too expensive near '
+          '${neededGood.tradeSymbol} is too expensive near '
           '${currentWaypoint.symbol} '
-          'needed < $minimumProfitUnitPrice, got ${maybeGood.purchasePrice}',
+          'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
         );
       } else {
         shipInfo(
           ship,
-          'No ${goods.tradeSymbol} available near ${currentWaypoint.symbol}',
+          'No ${neededGood.tradeSymbol} available near '
+          '${currentWaypoint.symbol}',
         );
       }
       return _navigateToNearbyMarketIfNeeded(
         api,
+        priceData,
         ship,
         waypointCache,
         marketCache,
         behaviorManager,
-        goods.tradeSymbol,
+        tradeSymbol: neededGood.tradeSymbol,
+        breakevenUnitPrice: breakEvenUnitPrice,
       );
     }
   }
@@ -218,6 +281,6 @@ Future<DateTime?> advanceContractTrader(
     ship,
     waypointCache,
     behaviorManager,
-    goods.destinationSymbol,
+    neededGood.destinationSymbol,
   );
 }

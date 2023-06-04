@@ -21,6 +21,5 @@ void main(List<String> args) async {
   final myShips = await allMyShips(api).toList();
   final ship = await chooseShip(api, waypointCache, myShips);
   final shipsWaypoints = await waypointsForShips(waypointCache, myShips);
-  // TODO(eseidel): These are the wrong waypoints.
   printShipDetails(ship, shipsWaypoints);
 }

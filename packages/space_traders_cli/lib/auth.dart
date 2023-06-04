@@ -12,6 +12,7 @@ class Api {
   /// Construct an Api with the given ApiClient.
   Api(this.apiClient)
       : systems = SystemsApi(apiClient),
+        defaultApi = DefaultApi(apiClient),
         contracts = ContractsApi(apiClient),
         agents = AgentsApi(apiClient),
         fleet = FleetApi(apiClient),
@@ -19,6 +20,9 @@ class Api {
 
   /// The shared ApiClient.
   final ApiClient apiClient;
+
+  /// DefaultApi generated client.
+  final DefaultApi defaultApi;
 
   /// SystemApi generated client.
   final SystemsApi systems;

@@ -6,6 +6,7 @@ import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/surveys.dart';
 
 Future<void> main(List<String> args) async {
@@ -39,5 +40,9 @@ Future<void> main(List<String> args) async {
     'Loaded ${priceData.count} prices from '
     '${priceData.waypointCount} waypoints.',
   );
+
+  final status = await api.defaultApi.getStatus();
+  printStatus(status!);
+
   await logic(api, db, priceData, surveyData);
 }

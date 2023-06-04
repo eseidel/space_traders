@@ -420,7 +420,7 @@ class PriceData {
         maxAge;
   }
 
-  /// returns the most recent sell price for a trade good at a given market.
+  /// Most recent price a good can be sold to the market for.
   /// [marketSymbol] is the symbol for the market.
   /// [tradeSymbol] is the symbol for the trade good.
   /// [maxAge] is the maximum age of the price in the cache.
@@ -443,7 +443,7 @@ class PriceData {
     return pricesForSymbolSorted.last.sellPrice;
   }
 
-  /// returns the most recent purchase price for a trade good at a given market.
+  /// The most recent price can be purchased from the market.
   /// [marketSymbol] is the symbol for the market.
   /// [tradeSymbol] is the symbol for the trade good.
   /// [maxAge] is the maximum age of the price in the cache.

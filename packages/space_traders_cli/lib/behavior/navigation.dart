@@ -167,7 +167,7 @@ Future<NavResult> continueNavigationIfNeeded(
 Stream<Waypoint> waypointsInJumpRadius({
   required WaypointCache waypointCache,
   required String startSystem,
-  required int allowedJumps,
+  required int maxJumps,
 }) async* {
   final systemsToJumpFrom = <String>{startSystem};
   final systemsExamined = <String>{};
@@ -179,14 +179,17 @@ Stream<Waypoint> waypointsInJumpRadius({
     for (final waypoint in waypoints) {
       yield waypoint;
     }
-    final connectedSystems =
-        await waypointCache.connectedSystems(jumpFrom).toList();
-    final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
-    for (final connectedSystem in sortedSystems) {
-      if (!systemsExamined.contains(connectedSystem.symbol)) {
-        systemsToJumpFrom.add(connectedSystem.symbol);
+    // Don't bother to check connections if we're out of jumps.
+    if (maxJumps > 0) {
+      final connectedSystems =
+          await waypointCache.connectedSystems(jumpFrom).toList();
+      final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
+      for (final connectedSystem in sortedSystems) {
+        if (!systemsExamined.contains(connectedSystem.symbol)) {
+          systemsToJumpFrom.add(connectedSystem.symbol);
+        }
       }
     }
-    allowedJumps--;
-  } while (allowedJumps > 0 && systemsToJumpFrom.isNotEmpty);
+    maxJumps--;
+  } while (maxJumps >= 0 && systemsToJumpFrom.isNotEmpty);
 }

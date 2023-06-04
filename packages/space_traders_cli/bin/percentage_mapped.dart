@@ -57,7 +57,7 @@ void main(List<String> args) async {
   await for (final waypoint in waypointsInJumpRadius(
     waypointCache: waypointCache,
     startSystem: start.systemSymbol,
-    allowedJumps: maxJumps,
+    maxJumps: maxJumps,
   )) {
     allSystems.add(waypoint.symbol);
     if (waypoint.chart == null) {

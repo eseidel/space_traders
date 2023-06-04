@@ -55,20 +55,20 @@ int _percentileForTradeType(ExchangeType tradeType) {
 /// Estimate the current sell price of [tradeSymbol] at [market].
 int? estimateSellPrice(
   PriceData priceData,
-  TradeSymbol tradeSymbol,
   Market market,
+  String tradeSymbol,
 ) {
   // This case would only be needed if we have a ship at the market, but somehow
   // failed to record price data in our price db.
   final maybeGoods =
-      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol.value);
+      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
   if (maybeGoods != null) {
     return maybeGoods.sellPrice;
   }
 
   final recentSellPrice = priceData.recentSellPrice(
     marketSymbol: market.symbol,
-    tradeSymbol: tradeSymbol.value,
+    tradeSymbol: tradeSymbol,
   );
   if (recentSellPrice != null) {
     return recentSellPrice;
@@ -76,34 +76,34 @@ int? estimateSellPrice(
   // logger.info(
   //   'No recent sell price for ${tradeSymbol.value} at ${market.symbol}',
   // );
-  final tradeType = market.exchangeType(tradeSymbol.value);
+  final tradeType = market.exchangeType(tradeSymbol);
   if (tradeType == null) {
-    logger.info('${market.symbol} does not trade ${tradeSymbol.value}');
+    logger.info('${market.symbol} does not trade $tradeSymbol');
     return null;
   }
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
   // logger
   //  .info('Looking up sell price for $tradeSymbol at $percentile percentile');
-  return priceData.sellPriceAtPercentile(tradeSymbol.value, percentile);
+  return priceData.sellPriceAtPercentile(tradeSymbol, percentile);
 }
 
 /// Estimate the current purchase price of [tradeSymbol] at [market].
 int? estimatePurchasePrice(
   PriceData priceData,
-  TradeSymbol tradeSymbol,
   Market market,
+  String tradeSymbol,
 ) {
   // This case would only be needed if we have a ship at the market, but somehow
   // failed to record price data in our price db.
   final maybeGoods =
-      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol.value);
+      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
   if (maybeGoods != null) {
     return maybeGoods.purchasePrice;
   }
   final recentPurchasePrice = priceData.recentPurchasePrice(
     marketSymbol: market.symbol,
-    tradeSymbol: tradeSymbol.value,
+    tradeSymbol: tradeSymbol,
   );
   if (recentPurchasePrice != null) {
     return recentPurchasePrice;
@@ -111,14 +111,14 @@ int? estimatePurchasePrice(
   // logger.info(
   //   'No recent purchase price for ${tradeSymbol.value} at ${market.symbol}',
   // );
-  final tradeType = market.exchangeType(tradeSymbol.value);
+  final tradeType = market.exchangeType(tradeSymbol);
   if (tradeType == null) {
-    logger.info('${market.symbol} does not trade ${tradeSymbol.value}');
+    logger.info('${market.symbol} does not trade $tradeSymbol');
     return null;
   }
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
-  return priceData.purchasePriceAtPercentile(tradeSymbol.value, percentile);
+  return priceData.purchasePriceAtPercentile(tradeSymbol, percentile);
 }
 
 /// Enumerate all possible deals that could be made between [purchaseMarket] and
@@ -130,7 +130,8 @@ Iterable<Deal> enumeratePossibleDeals(
 ) sync* {
   for (final otherMarket in otherMarkets) {
     for (final sellSymbol in otherMarket.allTradeSymbols) {
-      final sellPrice = estimateSellPrice(priceData, sellSymbol, otherMarket);
+      final sellPrice =
+          estimateSellPrice(priceData, otherMarket, sellSymbol.value);
       if (sellPrice == null) {
         continue;
       }
@@ -138,8 +139,11 @@ Iterable<Deal> enumeratePossibleDeals(
         if (sellSymbol != purchaseSymbol) {
           continue;
         }
-        final purchasePrice =
-            estimatePurchasePrice(priceData, purchaseSymbol, purchaseMarket);
+        final purchasePrice = estimatePurchasePrice(
+          priceData,
+          purchaseMarket,
+          purchaseSymbol.value,
+        );
         if (purchasePrice == null) {
           // We're asking about a good that is not a market we have a ship at
           // and we don't have enough pricing data to estimate a price.

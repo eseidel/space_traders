@@ -44,8 +44,9 @@ void main() async {
     if (!market.allowsTradeOf(tradeSymbol.value)) {
       continue;
     }
-    final sellPrice = estimateSellPrice(priceData, tradeSymbol, market);
-    final purchasePrice = estimatePurchasePrice(priceData, tradeSymbol, market);
+    final sellPrice = estimateSellPrice(priceData, market, tradeSymbol.value);
+    final purchasePrice =
+        estimatePurchasePrice(priceData, market, tradeSymbol.value);
     logger.info('${market.symbol}: $sellPrice, $purchasePrice');
   }
 

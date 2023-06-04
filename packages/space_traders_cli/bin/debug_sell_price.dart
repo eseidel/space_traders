@@ -1,5 +1,4 @@
 import 'package:file/local.dart';
-import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -18,8 +17,8 @@ void main() async {
   final market = await marketCache.marketForSymbol('X1-TY89-82996C');
   final price = estimateSellPrice(
     priceData,
-    TradeSymbol.fromJson('MEDICINE')!,
     market!,
+    'MEDICINE',
   );
   final string = price == null ? 'null' : creditsString(price);
   logger.info(string);

@@ -105,7 +105,7 @@ Future<DateTime?> advanceExporer(
     await for (final destination in waypointsInJumpRadius(
       waypointCache: waypointCache,
       startSystem: currentWaypoint.systemSymbol,
-      allowedJumps: maxJumpDistance,
+      maxJumps: maxJumpDistance,
     )) {
       // Crude logic to spread our explorers out.
       if (shipSystems.contains(destination.systemSymbol)) {
