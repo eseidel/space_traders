@@ -108,7 +108,7 @@ bool isReservedHandleException(ApiException e) {
   return isAPIExceptionWithCode(e, 4110);
 }
 
-// ApiException 400: {"error":{"message":"Waypoint already charted: 
+// ApiException 400: {"error":{"message":"Waypoint already charted:
 // X1-ZY63-71980E","code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}
 /// Returns true if the exception is a waypoint already charted exception.
 /// This can happen if we try to chart a waypoint that is already charted
