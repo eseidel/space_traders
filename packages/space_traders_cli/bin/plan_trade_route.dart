@@ -5,6 +5,7 @@ import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 Iterable<Price> pricesForWaypoint(PriceData priceData, Waypoint waypoint) {
@@ -25,7 +26,8 @@ void logPrices(List<Price> prices) {
 void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
-  final waypointCache = WaypointCache(api);
+  final systemsCache = await SystemsCache.load(fs);
+  final waypointCache = WaypointCache(api, systemsCache);
 
   final priceData = await PriceData.load(fs);
   final hq = await waypointCache.getAgentHeadquarters();

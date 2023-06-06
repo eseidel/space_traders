@@ -83,11 +83,21 @@ Stream<Waypoint> _nearbyMarketsWithProfitableTrade(
       tradeSymbol,
     );
     if (purchasePrice == null) {
+      shipInfo(
+        ship,
+        'Cannot estimate price for $tradeSymbol at ${waypoint.symbol}',
+      );
       continue;
     }
     // And our contract goal is selling < contract profit unit price.
     if (purchasePrice < breakevenUnitPrice) {
       yield waypoint;
+    } else {
+      shipInfo(
+        ship,
+        '${waypoint.symbol} has $tradeSymbol, but it is too expensive '
+        '< $breakevenUnitPrice, got $purchasePrice',
+      );
     }
   }
 }
@@ -235,6 +245,12 @@ Future<DateTime?> advanceContractTrader(
           'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
         );
       }
+    } else {
+      shipInfo(
+        ship,
+        'Market at ${currentWaypoint.symbol} does not have '
+        '${neededGood.tradeSymbol}',
+      );
     }
   }
   // Do we already have our goods?

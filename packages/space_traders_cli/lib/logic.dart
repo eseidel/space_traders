@@ -12,6 +12,7 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 import 'package:space_traders_cli/surveys.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 // At the top of the file because I change this so often.
@@ -53,11 +54,12 @@ Future<List<Contract>> activeContracts(Api api) async {
 Future<void> logicLoop(
   Api api,
   DataStore db,
+  SystemsCache systemsCache,
   PriceData priceData,
   SurveyData surveyData,
   ShipWaiter waiter,
 ) async {
-  final waypointCache = WaypointCache(api);
+  final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
   final agent = await getMyAgent(api);
   final myShips = await allMyShips(api).toList();
@@ -159,6 +161,7 @@ Future<void> _acceptAllContractsIfNeeded(Api api) async {
 Future<void> logic(
   Api api,
   DataStore db,
+  SystemsCache systemsCache,
   PriceData priceData,
   SurveyData surveyData,
 ) async {
@@ -172,7 +175,7 @@ Future<void> logic(
 
   while (true) {
     try {
-      await logicLoop(api, db, priceData, surveyData, waiter);
+      await logicLoop(api, db, systemsCache, priceData, surveyData, waiter);
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {
         logger.warn('Server down for maintenance, waiting 1 minute.');

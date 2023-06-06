@@ -7,12 +7,14 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 void main() async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
-  final waypointCache = WaypointCache(api);
+  final systemsCache = await SystemsCache.load(fs);
+  final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
 
   final priceData = await PriceData.load(fs);

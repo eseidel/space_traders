@@ -86,12 +86,12 @@ int _distanceBetweenConnectedSystems(ConnectedSystem a, System b) {
   return sqrt(dx * dx + dy * dy).round();
 }
 
-int _distanceBetweenSystems(System a, System b) {
-  // Use euclidean distance.
-  final dx = a.x - b.x;
-  final dy = a.y - b.y;
-  return sqrt(dx * dx + dy * dy).round();
-}
+// int _distanceBetweenSystems(System a, System b) {
+//   // Use euclidean distance.
+//   final dx = a.x - b.x;
+//   final dy = a.y - b.y;
+//   return sqrt(dx * dx + dy * dy).round();
+// }
 
 /// Continue navigation if needed, returning the wait time if so.
 /// Reads the destination from the ship's behavior state.
@@ -183,20 +183,21 @@ ConnectedSystem connectedSystemFromSystem(System system, int distance) {
 /// Yields a stream of system symbols that are within n jumps of the system.
 /// The system itself is included in the stream with distance 0.
 /// The stream is roughly ordered by distance from the start.
-Stream<String> systemSymbolsInJumpRadius({
+Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
   required WaypointCache waypointCache,
   required String startSystem,
   required int maxJumps,
 }) async* {
+  var jumpsLeft = maxJumps;
   final systemsToJumpFrom = <String>{startSystem};
   final systemsExamined = <String>{};
   do {
     final jumpFrom = systemsToJumpFrom.first;
     systemsToJumpFrom.remove(jumpFrom);
     systemsExamined.add(jumpFrom);
-    yield jumpFrom;
+    yield (jumpFrom, maxJumps - jumpsLeft);
     // Don't bother to check connections if we're out of jumps.
-    if (maxJumps > 0) {
+    if (jumpsLeft > 0) {
       final connectedSystems =
           await waypointCache.connectedSystems(jumpFrom).toList();
       final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
@@ -206,8 +207,8 @@ Stream<String> systemSymbolsInJumpRadius({
         }
       }
     }
-    maxJumps--;
-  } while (maxJumps >= 0 && systemsToJumpFrom.isNotEmpty);
+    jumpsLeft--;
+  } while (jumpsLeft >= 0 && systemsToJumpFrom.isNotEmpty);
 }
 
 /// Yields a stream of Waypoints that are within n jumps of the given system.
@@ -218,7 +219,7 @@ Stream<Waypoint> waypointsInJumpRadius({
   required String startSystem,
   required int maxJumps,
 }) async* {
-  await for (final String system in systemSymbolsInJumpRadius(
+  await for (final (String system, int _) in systemSymbolsInJumpRadius(
     waypointCache: waypointCache,
     startSystem: startSystem,
     maxJumps: maxJumps,
@@ -235,21 +236,21 @@ Stream<Waypoint> waypointsInJumpRadius({
 /// The stream is roughly ordered by distance from the start.
 /// This makes one more API call per system than systemsSymbolsInJumpRadius
 /// so use that one if you don't need the ConnectedSystem data.
-Stream<ConnectedSystem> connectedSystemsInJumpRadius({
-  required WaypointCache waypointCache,
-  required String startSystem,
-  required int maxJumps,
-}) async* {
-  final start = await waypointCache.systemBySymbol(startSystem);
-  await for (final String system in systemSymbolsInJumpRadius(
-    waypointCache: waypointCache,
-    startSystem: startSystem,
-    maxJumps: maxJumps,
-  )) {
-    final destination = await waypointCache.systemBySymbol(system);
-    yield connectedSystemFromSystem(
-      destination,
-      _distanceBetweenSystems(start, destination),
-    );
-  }
-}
+// Stream<ConnectedSystem> connectedSystemsInJumpRadius({
+//   required WaypointCache waypointCache,
+//   required String startSystem,
+//   required int maxJumps,
+// }) async* {
+//   final start = await waypointCache.systemBySymbol(startSystem);
+//   await for (final (String system, int _) in systemSymbolsInJumpRadius(
+//     waypointCache: waypointCache,
+//     startSystem: startSystem,
+//     maxJumps: maxJumps,
+//   )) {
+//     final destination = await waypointCache.systemBySymbol(system);
+//     yield connectedSystemFromSystem(
+//       destination,
+//       _distanceBetweenSystems(start, destination),
+//     );
+//   }
+// }

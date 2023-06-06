@@ -104,6 +104,7 @@ Logic:
 * Fix arbitrage trader to not recalculate deal mid-journey.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
+* systemSymbolsInJumpRadius doesn't seem to be jumping as far as expected.
 
 UI:
 * Add a Flutter UI.

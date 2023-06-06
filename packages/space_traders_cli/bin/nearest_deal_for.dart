@@ -1,9 +1,10 @@
 import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 // This should end up sharing code with Deal, Route, etc.
@@ -12,50 +13,14 @@ class _Availability {
     required this.tradeSymbol,
     required this.marketSymbol,
     required this.sellPrice,
+    required this.purchasePrice,
     required this.jumps,
   });
   final String tradeSymbol;
   final String marketSymbol;
+  final int purchasePrice;
   final int sellPrice;
   final int jumps;
-}
-
-Stream<_Availability> _availabilityInSystem(
-  Api api,
-  PriceData priceData,
-  List<Waypoint> systemWaypoints,
-  TradeSymbol tradeSymbol,
-  int jumps,
-) async* {
-  final marketplaceWaypoints =
-      systemWaypoints.where((w) => w.hasMarketplace).toList();
-
-  for (final marketplaceWaypoint in marketplaceWaypoints) {
-    final prices = priceData
-        .sellPricesFor(
-          tradeSymbol: tradeSymbol.value,
-          marketSymbol: marketplaceWaypoint.symbol,
-        )
-        .toList();
-    if (prices.isEmpty) {
-      if (priceData.hasRecentMarketData(marketplaceWaypoint.symbol)) {
-        logger.info(
-          '${marketplaceWaypoint.symbol} does not have $tradeSymbol.',
-        );
-      } else {
-        logger.info(
-          'No recent price data for ${marketplaceWaypoint.symbol}',
-        );
-      }
-      continue;
-    }
-    yield _Availability(
-      tradeSymbol: tradeSymbol.value,
-      marketSymbol: marketplaceWaypoint.symbol,
-      sellPrice: prices.first.sellPrice,
-      jumps: jumps,
-    );
-  }
 }
 
 /// Look through nearby marketplaces (including ones a jump away)
@@ -63,7 +28,8 @@ Stream<_Availability> _availabilityInSystem(
 void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
-  final waypointCache = WaypointCache(api);
+  final systemsCache = await SystemsCache.load(fs);
+  final waypointCache = WaypointCache(api, systemsCache);
 
   final priceData = await PriceData.load(fs);
 
@@ -76,39 +42,56 @@ void main(List<String> args) async {
     logger.err('Invalid trade symbol: "$promptResponse"');
     return;
   }
+  // Should start from a ship rather than hq.
   final hq = await waypointCache.getAgentHeadquarters();
-  final systemWaypoints =
-      await waypointCache.waypointsInSystem(hq.systemSymbol);
+  const maxJumps = 5;
 
-  final availabilityList = <_Availability>[
-    ...await _availabilityInSystem(
-      api,
-      priceData,
-      systemWaypoints,
-      tradeSymbol,
-      0,
-    ).toList(),
-  ];
+  final availabilityList = <_Availability>[];
 
-  await for (final system in waypointCache.connectedSystems(hq.systemSymbol)) {
-    logger.info('${system.symbol} - ${system.distance}');
-    final waypoints = await waypointCache.waypointsInSystem(system.symbol);
-    availabilityList.addAll(
-      await _availabilityInSystem(
-        api,
-        priceData,
-        waypoints,
-        tradeSymbol,
-        1,
-      ).toList(),
-    );
+  await for (final (String system, int jumps) in systemSymbolsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: hq.systemSymbol,
+    maxJumps: maxJumps,
+  )) {
+    for (final marketplaceWaypoint
+        in await waypointCache.marketWaypointsForSystem(system)) {
+      final prices = priceData
+          .sellPricesFor(
+            tradeSymbol: tradeSymbol.value,
+            marketSymbol: marketplaceWaypoint.symbol,
+          )
+          .toList();
+      if (prices.isEmpty) {
+        if (priceData.hasRecentMarketData(marketplaceWaypoint.symbol)) {
+          logger.info(
+            '${marketplaceWaypoint.symbol} does not have $tradeSymbol.',
+          );
+        } else {
+          logger.info(
+            'No recent price data for ${marketplaceWaypoint.symbol}',
+          );
+        }
+        continue;
+      }
+      availabilityList.add(
+        _Availability(
+          tradeSymbol: tradeSymbol.value,
+          marketSymbol: marketplaceWaypoint.symbol,
+          sellPrice: prices.first.sellPrice,
+          purchasePrice: prices.first.purchasePrice,
+          jumps: jumps,
+        ),
+      );
+    }
   }
 
   logger.info('Found ${availabilityList.length} deals for $tradeSymbol:');
   availabilityList.sort((a, b) => a.sellPrice.compareTo(b.sellPrice));
+  logger.info('symbol - sell - purchase - jumps');
   for (final availability in availabilityList) {
     logger.info(
       '${availability.marketSymbol} - ${availability.sellPrice}'
+      ' - ${availability.purchasePrice}'
       ' - ${availability.jumps}',
     );
   }

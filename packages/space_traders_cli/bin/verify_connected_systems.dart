@@ -47,7 +47,8 @@ bool compareConnectedSystemsLists(
 void main() async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
-  final waypointCache = WaypointCache(api);
+  final systemsCache = await SystemsCache.load(fs);
+  final waypointCache = WaypointCache(api, systemsCache);
   final hq = await waypointCache.getAgentHeadquarters();
   final jumpGate = await waypointCache.jumpGateForSystem(hq.systemSymbol);
   logger.info('Jump gate range: ${jumpGate!.jumpRange}');

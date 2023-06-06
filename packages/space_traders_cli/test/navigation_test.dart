@@ -64,4 +64,45 @@ void main() {
     ).toList();
     expect(waypoints, [...aWaypoints, ...bWaypoints]);
   });
+
+  test('systemSymbolsInJumpRadius', () async {
+    final WaypointCache waypointCache = MockWaypointCache();
+    final expectedSystems = ['A', 'B', 'C', 'D', 'E'];
+    var index = 0;
+    for (final system in expectedSystems) {
+      final neighbors = [
+        if (index < expectedSystems.length - 1)
+          ConnectedSystem(
+            symbol: expectedSystems[index + 1],
+            sectorSymbol: expectedSystems[index + 1],
+            type: SystemType.RED_STAR,
+            x: 0,
+            y: 0,
+            distance: 0,
+          ),
+        if (index > 0)
+          ConnectedSystem(
+            symbol: expectedSystems[index - 1],
+            sectorSymbol: expectedSystems[index - 1],
+            type: SystemType.RED_STAR,
+            x: 0,
+            y: 0,
+            distance: 0,
+          ),
+      ];
+      when(() => waypointCache.connectedSystems(any(that: equals(system))))
+          .thenAnswer(
+        (invocation) => Stream.fromIterable(neighbors),
+      );
+      index++;
+    }
+
+    final systems = await systemSymbolsInJumpRadius(
+      waypointCache: waypointCache,
+      startSystem: 'A',
+      maxJumps: 5,
+    ).toList();
+    final systemSymbols = systems.map((e) => e.$1).toList();
+    expect(systemSymbols, expectedSystems);
+  });
 }

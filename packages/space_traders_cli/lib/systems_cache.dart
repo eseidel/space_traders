@@ -100,12 +100,12 @@ class SystemsCache {
       return [];
     }
     // Get all systems within X distance of the given system.
-    final connected = _systems
+    final inRange = _systems
         .where((s) => s.symbol != systemSymbol)
         .where((s) => s.hasJumpGate)
         .where((s) => _distanceBetweenSystems(system, s) <= jumpGateRange)
         .toList();
-    return connected
+    final connected = inRange
         .map(
           (s) => ConnectedSystem(
             symbol: s.symbol,
@@ -116,6 +116,9 @@ class SystemsCache {
             distance: _distanceBetweenSystems(system, s),
           ),
         )
-        .toList();
+        .toList()
+      ..sort((a, b) => a.distance.compareTo(b.distance));
+    // TODO(eseidel):sort by distance than symbol to be stable.
+    return connected;
   }
 }

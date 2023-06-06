@@ -2,7 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.
 Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
@@ -15,7 +17,7 @@ Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
 /// Stores Waypoint objects fetched recently from the API.
 class WaypointCache {
   /// Create a new WaypointCache.
-  WaypointCache(this._api);
+  WaypointCache(this._api, this._systemsCache);
 
   Waypoint? _agentHeadquarters;
   final Map<String, System> _systemsBySymbol = {};
@@ -23,6 +25,7 @@ class WaypointCache {
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Map<String, JumpGate?> _jumpGatesBySystem = {};
   final Api _api;
+  final SystemsCache _systemsCache;
 
   /// Fetch the agent's headquarters.
   // Not sure this belongs on waypointCache, but should be cached somewhere.
@@ -83,10 +86,35 @@ class WaypointCache {
     return system;
   }
 
-  /// Return all connected systems in the given system.
-  Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
+  void _ensureMatchesCache(String systemSymbol) {
+    void logSystems(List<ConnectedSystem> systems) {
+      for (final system in systems) {
+        logger.info('  ${system.symbol} - ${system.distance}');
+      }
+    }
+
     final cachedSystems = _connectedSystemsBySystem[systemSymbol];
     if (cachedSystems != null) {
+      if (!const DeepCollectionEquality().equals(
+        cachedSystems,
+        _systemsCache.connectedSystems(systemSymbol),
+      )) {
+        logger
+          ..err('Cached connected systems do not match systems cache.')
+          ..info('Cached systems:');
+        logSystems(cachedSystems);
+        logger.info('Systems cache:');
+        logSystems(_systemsCache.connectedSystems(systemSymbol));
+      }
+    }
+  }
+
+  /// Return all connected systems in the given system.
+  Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
+    // This could use the SystemCache to generate these instead.
+    final cachedSystems = _connectedSystemsBySystem[systemSymbol];
+    if (cachedSystems != null) {
+      _ensureMatchesCache(systemSymbol);
       for (final system in cachedSystems) {
         yield system;
       }
