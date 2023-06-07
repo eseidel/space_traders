@@ -192,8 +192,8 @@ Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
   final currentSystemsToJumpFrom = <String>{startSystem};
   final oneJumpFurther = <String>{};
   final systemsExamined = <String>{};
-  do {
-    do {
+  while (jumpsLeft >= 0) {
+    while (currentSystemsToJumpFrom.isNotEmpty) {
       final jumpFrom = currentSystemsToJumpFrom.first;
       currentSystemsToJumpFrom.remove(jumpFrom);
       systemsExamined.add(jumpFrom);
@@ -209,11 +209,11 @@ Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
           }
         }
       }
-    } while (currentSystemsToJumpFrom.isNotEmpty);
+    }
     currentSystemsToJumpFrom.addAll(oneJumpFurther);
     oneJumpFurther.clear();
     jumpsLeft--;
-  } while (jumpsLeft >= 0);
+  }
 }
 
 /// Yields a stream of Waypoints that are within n jumps of the given system.
