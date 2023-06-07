@@ -57,7 +57,14 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   return response;
 }
 
-Stream<Waypoint> _nearbyMarketsWithProfitableTrade(
+// I couldn't figure out how to use record types to do this.
+class _Opportunity {
+  _Opportunity(this.waypoint, this.purchasePrice);
+  final Waypoint waypoint;
+  final int purchasePrice;
+}
+
+Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
   Ship ship,
   PriceData priceData,
   WaypointCache waypointCache,
@@ -79,12 +86,18 @@ Stream<Waypoint> _nearbyMarketsWithProfitableTrade(
       shipErr(ship, 'Waypoint ${waypoint.symbol} hasMarket but no market??');
       continue;
     }
+    if (!market.allowsTradeOf(tradeSymbol)) {
+      continue;
+    }
     final purchasePrice = estimatePurchasePrice(
       priceData,
       market,
       tradeSymbol,
     );
     if (purchasePrice == null) {
+      // Most common reason for estimatePurchasePrice to return null is that
+      // the market doesn't trade in that symbol, but we already checked that
+      // above, so if we hit this it's a different reason.
       shipInfo(
         ship,
         'Cannot estimate price for $tradeSymbol at ${waypoint.symbol}',
@@ -93,7 +106,7 @@ Stream<Waypoint> _nearbyMarketsWithProfitableTrade(
     }
     // And our contract goal is selling < contract profit unit price.
     if (purchasePrice < breakevenUnitPrice) {
-      yield waypoint;
+      yield _Opportunity(waypoint, purchasePrice);
     } else {
       shipInfo(
         ship,
@@ -116,7 +129,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
 }) async {
   // Find the nearest market within maxJumps that has the tradeSymbol
   // either at or below our profit unit price.
-  final nearbyMarket = await _nearbyMarketsWithProfitableTrade(
+  final opportunity = await _nearbyMarketsWithProfitableTrade(
     ship,
     priceData,
     waypointCache,
@@ -124,7 +137,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     tradeSymbol: tradeSymbol,
     breakevenUnitPrice: breakevenUnitPrice,
   ).firstOrNull;
-  if (nearbyMarket == null) {
+  if (opportunity == null) {
     shipErr(
       ship,
       'No markets nearby with $tradeSymbol, disabling contract trader.',
@@ -134,12 +147,17 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     return null;
   }
 
+  shipInfo(
+      ship,
+      'Found nearby market ${opportunity.waypoint.symbol} trading '
+      '$tradeSymbol for ${opportunity.purchasePrice}, less than break '
+      'even price $breakevenUnitPrice, routing.');
   final arrival = await beingRouteAndLog(
     api,
     ship,
     waypointCache,
     behaviorManager,
-    nearbyMarket.symbol,
+    opportunity.waypoint.symbol,
   );
   return arrival;
 }
@@ -222,7 +240,8 @@ Future<DateTime?> advanceContractTrader(
     );
 
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
-    final maybeGood = market!.tradeGoods
+    await recordMarketDataAndLog(priceData, market!, ship);
+    final maybeGood = market.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
     // If this market has our desired goods:
     if (maybeGood != null) {

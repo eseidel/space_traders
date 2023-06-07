@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/advance.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
@@ -28,6 +29,10 @@ Behavior _behaviorFor(
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
   if (ship.engine.speed > 20) {
+    // Not sure how to decide between contract trading and arbitrage trading
+    // except based on historical profits?
+    // Right now this will always contract trade unless we get a contract
+    // we can't fulfill.
     if (behaviorManager.isEnabled(Behavior.contractTrader)) {
       return Behavior.contractTrader;
     }
@@ -64,10 +69,14 @@ Future<void> logicLoop(
   final myShips = await allMyShips(api).toList();
   waiter.updateForShips(myShips);
 
+  // Should this contract lookup move into the contract trader?
   final contracts = await activeContracts(api);
   final maybeContract = contracts.firstOrNull;
   if (contracts.length > 1) {
     throw UnimplementedError("Can't handle multiple contracts yet.");
+  }
+  if (maybeContract?.accepted == false) {
+    await acceptContractAndLog(api, maybeContract!);
   }
   final maybeGoods = maybeContract?.terms.deliver.firstOrNull;
 
@@ -143,21 +152,6 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
   // return myAgent.credits > 140000;
 }
 
-Future<void> _acceptAllContractsIfNeeded(Api api) async {
-  final contractsResponse = await api.contracts.getContracts();
-  final contracts = contractsResponse!.data;
-  for (final contract in contracts) {
-    if (!contract.accepted) {
-      await api.contracts.acceptContract(contract.id);
-      logger
-        ..info('Accepted: ${contractDescription(contract)}.')
-        ..info(
-          'received ${creditsString(contract.terms.payment.onAccepted)}',
-        );
-    }
-  }
-}
-
 /// Run the logic loop forever.
 /// Currently just sends ships to mine and sell ore.
 Future<void> logic(
@@ -167,12 +161,6 @@ Future<void> logic(
   PriceData priceData,
   SurveyData surveyData,
 ) async {
-  // Accept any contracts we have not yet accepted.
-  // This is a bit dangerous because we could accept a contract and then
-  // not be able to fulfill it.
-  // This also isn't catching maintenance windows.
-  await _acceptAllContractsIfNeeded(api);
-
   final waiter = ShipWaiter();
 
   while (true) {

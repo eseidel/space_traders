@@ -290,3 +290,17 @@ Future<Contract> negotiateContractAndLog(Api api, Ship ship) async {
   shipInfo(ship, 'Negotiated contract: ${contractDescription(contract)}');
   return contract;
 }
+
+/// Accept [contract] and log.
+Future<AcceptContract200ResponseData> acceptContractAndLog(
+  Api api,
+  Contract contract,
+) async {
+  final response = await api.contracts.acceptContract(contract.id);
+  logger
+    ..info('Accepted: ${contractDescription(contract)}.')
+    ..info(
+      'received ${creditsString(contract.terms.payment.onAccepted)}',
+    );
+  return response!.data;
+}
