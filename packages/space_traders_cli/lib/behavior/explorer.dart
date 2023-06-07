@@ -12,10 +12,14 @@ import 'package:space_traders_cli/waypoint_cache.dart';
 
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
   return waypoint.chart == null ||
-      waypoint.hasMarketplace &&
-          !priceData.hasRecentMarketData(
-            waypoint.symbol,
-          );
+      _isMissingRecentMarketData(priceData, waypoint);
+}
+
+bool _isMissingRecentMarketData(PriceData priceData, Waypoint waypoint) {
+  return waypoint.hasMarketplace &&
+      !priceData.hasRecentMarketData(
+        waypoint.symbol,
+      );
 }
 
 /// One loop of the exploring logic.
@@ -90,10 +94,18 @@ Future<DateTime?> advanceExporer(
         continue;
       }
       if (_isMissingChartOrRecentMarketData(priceData, destination)) {
-        shipInfo(
-          ship,
-          'Found unexplored system ${destination.symbol}, routing.',
-        );
+        if (destination.chart == null) {
+          shipInfo(
+            ship,
+            'Found system ${destination.symbol} missing chart, routing.',
+          );
+        } else {
+          shipInfo(
+            ship,
+            'Found system ${destination.symbol} missing recent market data, '
+            'routing.',
+          );
+        }
         return beingRouteAndLog(
           api,
           ship,
