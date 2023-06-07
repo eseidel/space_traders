@@ -240,7 +240,7 @@ Future<DateTime?> advanceContractTrader(
     );
 
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
-    await recordMarketDataAndLog(priceData, market!, ship);
+    await recordMarketData(priceData, market!, ship);
     final maybeGood = market.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
     // If this market has our desired goods:
