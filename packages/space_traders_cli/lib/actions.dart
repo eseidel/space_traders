@@ -168,6 +168,11 @@ Future<void> purchaseCargoAndLog(
   final response =
       await api.fleet.purchaseCargo(ship.symbol, purchaseCargoRequest: request);
   final transaction = response!.data.transaction;
+  // TODO(eseidel): Handle transaction limits:
+  // ApiException 400: {"error":{"message":"Market transaction failed.
+  // Trade good REACTOR_FUSION_I has a limit of 10 units per transaction.",
+  // "code":4604,"data":{"waypointSymbol":"X1-UC8-13100A","tradeSymbol":
+  // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
   final agent = response.data.agent;
   logTransaction(ship, priceData, agent, transaction);
 }

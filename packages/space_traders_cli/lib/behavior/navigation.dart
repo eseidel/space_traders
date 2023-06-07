@@ -189,26 +189,31 @@ Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
   required int maxJumps,
 }) async* {
   var jumpsLeft = maxJumps;
-  final systemsToJumpFrom = <String>{startSystem};
+  final currentSystemsToJumpFrom = <String>{startSystem};
+  final oneJumpFurther = <String>{};
   final systemsExamined = <String>{};
   do {
-    final jumpFrom = systemsToJumpFrom.first;
-    systemsToJumpFrom.remove(jumpFrom);
-    systemsExamined.add(jumpFrom);
-    yield (jumpFrom, maxJumps - jumpsLeft);
-    // Don't bother to check connections if we're out of jumps.
-    if (jumpsLeft > 0) {
-      final connectedSystems =
-          await waypointCache.connectedSystems(jumpFrom).toList();
-      final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
-      for (final connectedSystem in sortedSystems) {
-        if (!systemsExamined.contains(connectedSystem.symbol)) {
-          systemsToJumpFrom.add(connectedSystem.symbol);
+    do {
+      final jumpFrom = currentSystemsToJumpFrom.first;
+      currentSystemsToJumpFrom.remove(jumpFrom);
+      systemsExamined.add(jumpFrom);
+      yield (jumpFrom, maxJumps - jumpsLeft);
+      // Don't bother to check connections if we're out of jumps.
+      if (jumpsLeft > 0) {
+        final connectedSystems =
+            await waypointCache.connectedSystems(jumpFrom).toList();
+        final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
+        for (final connectedSystem in sortedSystems) {
+          if (!systemsExamined.contains(connectedSystem.symbol)) {
+            oneJumpFurther.add(connectedSystem.symbol);
+          }
         }
       }
-    }
+    } while (currentSystemsToJumpFrom.isNotEmpty);
+    currentSystemsToJumpFrom.addAll(oneJumpFurther);
+    oneJumpFurther.clear();
     jumpsLeft--;
-  } while (jumpsLeft >= 0 && systemsToJumpFrom.isNotEmpty);
+  } while (jumpsLeft >= 0);
 }
 
 /// Yields a stream of Waypoints that are within n jumps of the given system.

@@ -118,7 +118,7 @@ class SystemsCache {
         )
         .toList()
       ..sort((a, b) => a.distance.compareTo(b.distance));
-    // TODO(eseidel):sort by distance than symbol to be stable.
+    // TODO(eseidel): sort by distance than symbol to be stable.
     return connected;
   }
 }

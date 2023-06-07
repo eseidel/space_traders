@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
@@ -224,25 +226,41 @@ Future<DateTime?> advanceContractTrader(
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
     // If this market has our desired goods:
     if (maybeGood != null) {
+      // TODO(eseidel): This has the potential of racing with multiple ships.
+      final unitsInCargo = cargo.countUnits(neededGood.tradeSymbol);
+      final unitsNeeded = max(
+        0,
+        neededGood.unitsRequired - neededGood.unitsFulfilled - unitsInCargo,
+      );
       // And its selling at a reasonable price.
-      if (maybeGood.purchasePrice < breakEvenUnitPrice) {
-        if (cargo.availableSpace > 0) {
-          // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
-          // Buy a full stock of contract goal.
-          await purchaseCargoAndLog(
-            api,
-            priceData,
+      if (unitsNeeded > 0) {
+        if (maybeGood.purchasePrice < breakEvenUnitPrice) {
+          if (cargo.availableSpace > 0) {
+            // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
+            // Buy a full stock of contract goal.
+            await purchaseCargoAndLog(
+              api,
+              priceData,
+              ship,
+              neededGood.tradeSymbol,
+              unitsNeeded,
+            );
+          }
+        } else {
+          shipInfo(
             ship,
-            neededGood.tradeSymbol,
-            cargo.availableSpace,
+            '${neededGood.tradeSymbol} is too expensive near '
+            '${currentWaypoint.symbol} '
+            'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
           );
         }
       } else {
         shipInfo(
           ship,
-          '${neededGood.tradeSymbol} is too expensive near '
-          '${currentWaypoint.symbol} '
-          'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
+          'Already have $unitsInCargo ${neededGood.tradeSymbol} in '
+          'cargo which is enough to fulfill contract '
+          '(${neededGood.unitsFulfilled}/${neededGood.unitsRequired}) '
+          'at ${currentWaypoint.symbol}',
         );
       }
     } else {

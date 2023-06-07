@@ -58,6 +58,14 @@ extension WaypointUtils on Waypoint {
 extension CargoUtils on ShipCargo {
   /// Returns the amount of cargo space available on the ship.
   int get availableSpace => capacity - units;
+
+  /// Returns the amount of the given trade good the cargo has.
+  int countUnits(String tradeSymbol) {
+    final maybeCargo = inventory.firstWhereOrNull(
+      (i) => i.symbol == tradeSymbol,
+    );
+    return maybeCargo?.units ?? 0;
+  }
 }
 
 /// Extensions onto Ship to make it easier to work with.
@@ -71,10 +79,7 @@ extension ShipUtils on Ship {
 
   /// Returns the amount of the given trade good the ship has.
   int countUnits(String tradeSymbol) {
-    final maybeCargo = cargo.inventory.firstWhereOrNull(
-      (i) => i.symbol == tradeSymbol,
-    );
-    return maybeCargo?.units ?? 0;
+    return cargo.countUnits(tradeSymbol);
   }
 
   /// Returns true if the ship if full on fuel.

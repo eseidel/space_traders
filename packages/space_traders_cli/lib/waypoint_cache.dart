@@ -112,22 +112,15 @@ class WaypointCache {
   /// Return all connected systems in the given system.
   Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
     // This could use the SystemCache to generate these instead.
-    final cachedSystems = _connectedSystemsBySystem[systemSymbol];
-    if (cachedSystems != null) {
+    var cachedSystems = _connectedSystemsBySystem[systemSymbol];
+    if (cachedSystems == null) {
+      final jumpGate = await jumpGateForSystem(systemSymbol);
+      cachedSystems = jumpGate == null ? [] : jumpGate.connectedSystems;
+      _connectedSystemsBySystem[systemSymbol] = cachedSystems;
       _ensureMatchesCache(systemSymbol);
-      for (final system in cachedSystems) {
-        yield system;
-      }
-      return;
     }
-    final jumpGate = await jumpGateForSystem(systemSymbol);
-    if (jumpGate != null) {
-      _connectedSystemsBySystem[systemSymbol] = jumpGate.connectedSystems;
-      for (final system in jumpGate.connectedSystems) {
-        yield system;
-      }
-    } else {
-      _connectedSystemsBySystem[systemSymbol] = [];
+    for (final system in cachedSystems) {
+      yield system;
     }
   }
 
