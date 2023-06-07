@@ -236,6 +236,10 @@ Future<DateTime?> advanceContractTrader(
       if (unitsNeeded > 0) {
         if (maybeGood.purchasePrice < breakEvenUnitPrice) {
           if (cargo.availableSpace > 0) {
+            final unitsToPurchase = min(
+              unitsNeeded,
+              maybeGood.tradeVolume,
+            );
             // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
             // Buy a full stock of contract goal.
             await purchaseCargoAndLog(
@@ -243,8 +247,15 @@ Future<DateTime?> advanceContractTrader(
               priceData,
               ship,
               neededGood.tradeSymbol,
-              unitsNeeded,
+              unitsToPurchase,
             );
+            if (unitsToPurchase < unitsNeeded) {
+              shipInfo(
+                ship,
+                'Purchased $unitsToPurchase of $unitsNeeded needed, looping.',
+              );
+              return null;
+            }
           }
         } else {
           shipInfo(

@@ -28,8 +28,7 @@ Behavior _behaviorFor(
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
   if (ship.engine.speed > 20) {
-    if (maybeGoods != null &&
-        behaviorManager.isEnabled(Behavior.contractTrader)) {
+    if (behaviorManager.isEnabled(Behavior.contractTrader)) {
       return Behavior.contractTrader;
     }
     // if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
@@ -93,8 +92,11 @@ Future<void> logicLoop(
     // We should only generate a new behavior when we're done with our last
     // behavior?
     final behaviorManager = await BehaviorManager.load(db, (bm, shipSymbol) {
+      // This logic is triggered twice for each ship, not sure why.
       final ship = myShips.firstWhere((s) => s.symbol == shipSymbol);
-      return _behaviorFor(bm, ship, agent, maybeGoods);
+      final behavior = _behaviorFor(bm, ship, agent, maybeGoods);
+      // shipInfo(ship, 'Chose new behavior: $behavior');
+      return behavior;
     });
     try {
       final ctx = BehaviorContext(
@@ -189,6 +191,10 @@ Future<void> logic(
       // weekly to bi-weekly frequency during alpha. After a reset, you should
       // re-register your agent. Expected: 2023-06-03, Actual: 2023-05-20",
       // "code":401,"data":{"expected":"2023-06-03","actual":"2023-05-20"}}}
+
+      // Need to handle temporary service unavailable.
+      // ApiException 503: Service Unavailable
+      // Just use exponential backoff until it comes back.
 
       if (!isWindowsSemaphoreTimeout(e)) {
         rethrow;

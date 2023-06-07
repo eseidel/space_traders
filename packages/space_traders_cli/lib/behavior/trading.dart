@@ -78,7 +78,7 @@ int? estimateSellPrice(
   // );
   final tradeType = market.exchangeType(tradeSymbol);
   if (tradeType == null) {
-    logger.info('${market.symbol} does not trade $tradeSymbol');
+    logger.detail('${market.symbol} does not trade $tradeSymbol');
     return null;
   }
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
@@ -113,7 +113,7 @@ int? estimatePurchasePrice(
   // );
   final tradeType = market.exchangeType(tradeSymbol);
   if (tradeType == null) {
-    logger.info('${market.symbol} does not trade $tradeSymbol');
+    logger.detail('${market.symbol} does not trade $tradeSymbol');
     return null;
   }
   // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
