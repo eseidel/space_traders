@@ -214,7 +214,8 @@ Future<DateTime?> advanceMiner(
     // Sell cargo and refuel if needed.
     if (currentWaypoint.hasMarketplace) {
       // This should probably record market data?
-      // final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
+      // final market = await marketCache.marketForSymbol(
+      //    currentWaypoint.symbol);
       // await recordMarketDataAndLog(priceData, market, ship)
       await dockIfNeeded(api, ship);
       await refuelIfNeededAndLog(api, priceData, agent, ship);

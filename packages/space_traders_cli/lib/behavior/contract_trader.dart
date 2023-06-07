@@ -147,11 +147,19 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     return null;
   }
 
+  final priceDeviance = stringForPriceDeviance(
+    priceData,
+    tradeSymbol,
+    opportunity.purchasePrice,
+    MarketTransactionTypeEnum.PURCHASE,
+  );
+  final priceString = creditsString(opportunity.purchasePrice);
+  final breakEvenString = creditsString(breakevenUnitPrice);
   shipInfo(
       ship,
-      'Found nearby market ${opportunity.waypoint.symbol} trading '
-      '$tradeSymbol for ${opportunity.purchasePrice}, less than break '
-      'even price $breakevenUnitPrice, routing.');
+      '${opportunity.waypoint.symbol} trades '
+      '$tradeSymbol at $priceString $priceDeviance, below break '
+      'even price $breakEvenString, routing.');
   final arrival = await beingRouteAndLog(
     api,
     ship,
@@ -240,7 +248,7 @@ Future<DateTime?> advanceContractTrader(
     );
 
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
-    await recordMarketData(priceData, market!, ship);
+    await recordMarketData(priceData, market!);
     final maybeGood = market.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
     // If this market has our desired goods:
