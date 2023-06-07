@@ -17,7 +17,11 @@ Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
 /// Stores Waypoint objects fetched recently from the API.
 class WaypointCache {
   /// Create a new WaypointCache.
-  WaypointCache(this._api, this._systemsCache);
+  WaypointCache(
+    this._api,
+    this._systemsCache, {
+    this.ensureMatchesCache = false,
+  });
 
   Waypoint? _agentHeadquarters;
   final Map<String, System> _systemsBySymbol = {};
@@ -26,6 +30,10 @@ class WaypointCache {
   final Map<String, JumpGate?> _jumpGatesBySystem = {};
   final Api _api;
   final SystemsCache _systemsCache;
+
+  /// True if the WaypointCache should ensure that the SystemsCache matches
+  /// the connected systems cache.
+  final bool ensureMatchesCache;
 
   /// Fetch the agent's headquarters.
   // Not sure this belongs on waypointCache, but should be cached somewhere.
@@ -87,6 +95,9 @@ class WaypointCache {
   }
 
   void _ensureMatchesCache(String systemSymbol) {
+    if (!ensureMatchesCache) {
+      return;
+    }
     void logSystems(List<ConnectedSystem> systems) {
       for (final system in systems) {
         logger.info('  ${system.symbol} - ${system.distance}');
