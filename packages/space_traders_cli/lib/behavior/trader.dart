@@ -36,6 +36,16 @@ Future<Deal?> findBestDealWithinOneJump(
   );
 }
 
+// We want to write a O(N) deal-finding algorithm.
+// Which takes in N markets.  And walks the markets for all goods they trade.
+// Compares the prices of those goods to the 25th/75th known price of that good.
+// and then saves off prices (half-deals) for each good where the price
+// is in the top or bottom quartile of known prices.
+// It then walks all half-deals and finds deals with maximum profit.
+// It also could use a cost function for the distance between markets, in
+// both time and fuel.  Time cost could be ignored for now, but later
+// used as opportunity cost.
+
 /// Returns the best deal for the given ship across the given set of markets.
 Future<Deal?> findBestDealAcrossMarkets(
   PriceData priceData,
