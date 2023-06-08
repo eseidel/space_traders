@@ -198,13 +198,6 @@ Future<DateTime?> advanceContractTrader(
   }
   final contract = maybeContract;
   final neededGood = maybeGood!;
-  // min credits could be relative to the good traded / size of cargo hold?
-  const minimumCreditsToTrade = 100000;
-  if (agent.credits < minimumCreditsToTrade) {
-    shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
-    await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
-    return null;
-  }
   final totalPayment =
       contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
   final breakEvenUnitPrice = totalPayment ~/ neededGood.unitsRequired;
@@ -233,6 +226,14 @@ Future<DateTime?> advanceContractTrader(
         shipInfo(ship, 'Contract complete!');
         return null;
       }
+    }
+    // Make sure we only to our credit check *after* we deliver our goods.
+    final minimumCreditsToTrade =
+        max(100000, breakEvenUnitPrice * ship.cargo.capacity);
+    if (agent.credits < minimumCreditsToTrade) {
+      shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
+      await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
+      return null;
     }
   }
 
@@ -267,6 +268,7 @@ Future<DateTime?> advanceContractTrader(
               unitsNeeded,
               maybeGood.tradeVolume,
             );
+            // Do we need to guard against insufficient credits here?
             // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
             // Buy a full stock of contract goal.
             await purchaseCargoAndLog(
@@ -320,6 +322,7 @@ Future<DateTime?> advanceContractTrader(
       neededGood.destinationSymbol,
     );
   } else {
+    // Do we need to check for sufficient credits here?
     return _navigateToNearbyMarketIfNeeded(
       api,
       priceData,
