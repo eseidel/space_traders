@@ -20,7 +20,7 @@ class WaypointCache {
   WaypointCache(
     this._api,
     this._systemsCache, {
-    this.ensureMatchesCache = false,
+    this.ensureCacheMatchesServer = false,
   });
 
   Waypoint? _agentHeadquarters;
@@ -32,8 +32,8 @@ class WaypointCache {
   final SystemsCache _systemsCache;
 
   /// True if the WaypointCache should ensure that the SystemsCache matches
-  /// the connected systems cache.
-  final bool ensureMatchesCache;
+  /// the server
+  final bool ensureCacheMatchesServer;
 
   /// Fetch the agent's headquarters.
   // Not sure this belongs on waypointCache, but should be cached somewhere.
@@ -94,8 +94,8 @@ class WaypointCache {
     return system;
   }
 
-  void _ensureMatchesCache(String systemSymbol) {
-    if (!ensureMatchesCache) {
+  Future<void> _ensureCacheMatchesServer(String systemSymbol) async {
+    if (!ensureCacheMatchesServer) {
       return;
     }
     void logSystems(List<ConnectedSystem> systems) {
@@ -106,29 +106,32 @@ class WaypointCache {
 
     final cachedSystems = _connectedSystemsBySystem[systemSymbol];
     if (cachedSystems != null) {
+      final jumpGate = await jumpGateForSystem(systemSymbol);
+      final serverSystems =
+          jumpGate == null ? <ConnectedSystem>[] : jumpGate.connectedSystems;
+      // This equality seems too aggressive.
       if (!const DeepCollectionEquality().equals(
         cachedSystems,
-        _systemsCache.connectedSystems(systemSymbol),
+        serverSystems,
       )) {
         logger
-          ..err('Cached connected systems do not match systems cache.')
-          ..info('Cached systems:');
+          ..err('SystemCache connectedSystems do not match server:')
+          ..info('SystemCache:');
         logSystems(cachedSystems);
-        logger.info('Systems cache:');
-        logSystems(_systemsCache.connectedSystems(systemSymbol));
+        logger.info('Server:');
+        logSystems(serverSystems);
       }
     }
   }
 
   /// Return all connected systems in the given system.
   Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
-    // This could use the SystemCache to generate these instead.
+    // Don't really need the _connectdSystemsBySystem with the SystemsCache.
     var cachedSystems = _connectedSystemsBySystem[systemSymbol];
     if (cachedSystems == null) {
-      final jumpGate = await jumpGateForSystem(systemSymbol);
-      cachedSystems = jumpGate == null ? [] : jumpGate.connectedSystems;
+      cachedSystems = _systemsCache.connectedSystems(systemSymbol);
       _connectedSystemsBySystem[systemSymbol] = cachedSystems;
-      _ensureMatchesCache(systemSymbol);
+      await _ensureCacheMatchesServer(systemSymbol);
     }
     for (final system in cachedSystems) {
       yield system;
