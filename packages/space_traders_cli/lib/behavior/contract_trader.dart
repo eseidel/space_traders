@@ -170,6 +170,48 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   return arrival;
 }
 
+// This is split out from the main function to allow early returns.
+Future<void> _purchaseContractGoodIfPossible(
+  Api api,
+  PriceData priceData,
+  Ship ship,
+  Waypoint currentWaypoint,
+  MarketTradeGood maybeGood,
+  ShipCargo cargo,
+  ContractDeliverGood neededGood, {
+  required int breakEvenUnitPrice,
+  required int unitsToPurchase,
+}) async {
+  // And its selling at a reasonable price.
+  if (maybeGood.purchasePrice >= breakEvenUnitPrice) {
+    shipInfo(
+      ship,
+      '${neededGood.tradeSymbol} is too expensive near '
+      '${currentWaypoint.symbol} '
+      'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
+    );
+    return;
+  }
+
+  if (cargo.availableSpace <= 0) {
+    shipInfo(
+      ship,
+      'No cargo space available to purchase ${neededGood.tradeSymbol}',
+    );
+    return;
+  }
+  // Do we need to guard against insufficient credits here?
+  // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
+  // Buy a full stock of contract goal.
+  await purchaseCargoAndLog(
+    api,
+    priceData,
+    ship,
+    neededGood.tradeSymbol,
+    unitsToPurchase,
+  );
+}
+
 /// One loop of the trading logic
 Future<DateTime?> advanceContractTrader(
   Api api,
@@ -252,49 +294,22 @@ Future<DateTime?> advanceContractTrader(
     await recordMarketData(priceData, market!);
     final maybeGood = market.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
+
     // If this market has our desired goods:
-    if (maybeGood != null) {
+    if (maybeGood == null) {
+      shipInfo(
+        ship,
+        'Market at ${currentWaypoint.symbol} does not have '
+        '${neededGood.tradeSymbol}',
+      );
+    } else {
       // TODO(eseidel): This has the potential of racing with multiple ships.
       final unitsInCargo = cargo.countUnits(neededGood.tradeSymbol);
       final unitsNeeded = max(
         0,
         neededGood.unitsRequired - neededGood.unitsFulfilled - unitsInCargo,
       );
-      // And its selling at a reasonable price.
-      if (unitsNeeded > 0) {
-        if (maybeGood.purchasePrice < breakEvenUnitPrice) {
-          if (cargo.availableSpace > 0) {
-            final unitsToPurchase = min(
-              unitsNeeded,
-              maybeGood.tradeVolume,
-            );
-            // Do we need to guard against insufficient credits here?
-            // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
-            // Buy a full stock of contract goal.
-            await purchaseCargoAndLog(
-              api,
-              priceData,
-              ship,
-              neededGood.tradeSymbol,
-              unitsToPurchase,
-            );
-            if (unitsToPurchase < unitsNeeded) {
-              shipInfo(
-                ship,
-                'Purchased $unitsToPurchase of $unitsNeeded needed, looping.',
-              );
-              return null;
-            }
-          }
-        } else {
-          shipInfo(
-            ship,
-            '${neededGood.tradeSymbol} is too expensive near '
-            '${currentWaypoint.symbol} '
-            'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
-          );
-        }
-      } else {
+      if (unitsNeeded <= 0) {
         shipInfo(
           ship,
           'Already have $unitsInCargo ${neededGood.tradeSymbol} in '
@@ -302,13 +317,56 @@ Future<DateTime?> advanceContractTrader(
           '(${neededGood.unitsFulfilled}/${neededGood.unitsRequired}) '
           'at ${currentWaypoint.symbol}',
         );
+      } else {
+        final unitsToPurchase = min(
+          unitsNeeded,
+          maybeGood.tradeVolume,
+        );
+        final creditsNeeded = unitsToPurchase * maybeGood.purchasePrice;
+        if (agent.credits < creditsNeeded) {
+          // If we have some to deliver, deliver it.
+          if (unitsInCargo > 0) {
+            shipInfo(
+              ship,
+              'Not enough credits to purchase $unitsToPurchase '
+              '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}, '
+              'but we have $unitsInCargo in cargo, delivering.',
+            );
+          } else {
+            shipErr(
+              ship,
+              'Not enough credits to purchase $unitsToPurchase '
+              '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}, '
+              'disabling contract trader.',
+            );
+            await behaviorManager.disableBehavior(
+              ship,
+              Behavior.contractTrader,
+            );
+            return null;
+          }
+        } else {
+          await _purchaseContractGoodIfPossible(
+            api,
+            priceData,
+            ship,
+            currentWaypoint,
+            maybeGood,
+            cargo,
+            neededGood,
+            breakEvenUnitPrice: breakEvenUnitPrice,
+            unitsToPurchase: unitsToPurchase,
+          );
+
+          if (unitsToPurchase < unitsNeeded) {
+            shipInfo(
+              ship,
+              'Purchased $unitsToPurchase of $unitsNeeded needed, looping.',
+            );
+            return null;
+          }
+        }
       }
-    } else {
-      shipInfo(
-        ship,
-        'Market at ${currentWaypoint.symbol} does not have '
-        '${neededGood.tradeSymbol}',
-      );
     }
   }
   // Do we already have our goods?
