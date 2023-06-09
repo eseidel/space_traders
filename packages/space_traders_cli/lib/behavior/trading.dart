@@ -177,7 +177,13 @@ String describeDeal(Deal deal) {
 
 /// Log proposed [deals] to the console.
 void logDeals(List<Deal> deals) {
-  logger.info('Symbol       Source  Dest   Profit');
+  final headers = [
+    'Symbol'.padRight(18),
+    'Source'.padRight(18),
+    'Dest'.padRight(18),
+    'Profit'.padRight(18),
+  ];
+  logger.info(headers.join(' '));
   for (final deal in deals) {
     logger.info(describeDeal(deal));
   }
@@ -241,14 +247,17 @@ Deal? findBestDealFromWaypoint(
   // Or picking the shortest distance?
 }
 
-/// Log a [deal] to the console.
-void logDeal(Ship ship, Deal deal) {
+/// Describe a [deal] in a human-readable way.
+String dealDescription(Deal deal, {int units = 1}) {
   final profitString =
-      lightGreen.wrap('+${creditsString(deal.profit * ship.availableSpace)}');
-  shipInfo(
-      ship,
-      'Deal ($profitString): ${deal.tradeSymbol} '
+      lightGreen.wrap('+${creditsString(deal.profit * units)}');
+  return 'Deal ($profitString): ${deal.tradeSymbol} '
       '${creditsString(deal.purchasePrice)} @ ${deal.sourceSymbol} '
       '-> ${creditsString(deal.sellPrice)} @ ${deal.destinationSymbol} '
-      'profit: ${creditsString(deal.profit)} per unit ');
+      'profit: ${creditsString(deal.profit)} per unit ';
+}
+
+/// Log a [deal] to the console.
+void logDeal(Ship ship, Deal deal) {
+  shipInfo(ship, dealDescription(deal, units: ship.availableSpace));
 }

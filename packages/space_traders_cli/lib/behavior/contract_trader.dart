@@ -270,8 +270,9 @@ Future<DateTime?> advanceContractTrader(
       }
     }
     // Make sure we only to our credit check *after* we deliver our goods.
+    const creditsBuffer = 20000;
     final minimumCreditsToTrade =
-        max(100000, breakEvenUnitPrice * ship.cargo.capacity);
+        max(100000, breakEvenUnitPrice * ship.cargo.capacity + creditsBuffer);
     if (agent.credits < minimumCreditsToTrade) {
       shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
       await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
@@ -333,6 +334,7 @@ Future<DateTime?> advanceContractTrader(
               'but we have $unitsInCargo in cargo, delivering.',
             );
           } else {
+            // This should print the pricing of the good we're trying to buy.
             shipErr(
               ship,
               'Not enough credits to purchase $unitsToPurchase '

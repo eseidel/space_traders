@@ -57,6 +57,12 @@ class WaypointCache {
     return waypoints;
   }
 
+  /// Fetch the system waypoint with the given symbol.
+  // Eventually callers should just have a SystemsCache instead.
+  SystemWaypoint systemWaypoint(String waypointSymbol) {
+    return _systemsCache.waypointFromSymbol(waypointSymbol);
+  }
+
   /// Fetch the waypoint with the given symbol.
   Future<Waypoint> waypoint(String waypointSymbol) async {
     final result = await waypointOrNull(waypointSymbol);

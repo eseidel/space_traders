@@ -165,16 +165,27 @@ Future<void> purchaseCargoAndLog(
     symbol: tradeSymbol,
     units: amountToBuy,
   );
-  final response =
-      await api.fleet.purchaseCargo(ship.symbol, purchaseCargoRequest: request);
-  final transaction = response!.data.transaction;
-  // TODO(eseidel): Handle transaction limits:
-  // ApiException 400: {"error":{"message":"Market transaction failed.
-  // Trade good REACTOR_FUSION_I has a limit of 10 units per transaction.",
-  // "code":4604,"data":{"waypointSymbol":"X1-UC8-13100A","tradeSymbol":
-  // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
-  final agent = response.data.agent;
-  logTransaction(ship, priceData, agent, transaction);
+  try {
+    final response = await api.fleet
+        .purchaseCargo(ship.symbol, purchaseCargoRequest: request);
+    final transaction = response!.data.transaction;
+    // Do we need to handle transaction limits?  Callers can check before.
+    // ApiException 400: {"error":{"message":"Market transaction failed.
+    // Trade good REACTOR_FUSION_I has a limit of 10 units per transaction.",
+    // "code":4604,"data":{"waypointSymbol":"X1-UC8-13100A","tradeSymbol":
+    // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
+    final agent = response.data.agent;
+    logTransaction(ship, priceData, agent, transaction);
+  } on ApiException catch (e) {
+    if (!isInsufficientCreditsException(e)) {
+      rethrow;
+    }
+    shipWarn(
+        ship,
+        'Purchase of $amountToBuy $tradeSymbol failed. '
+        'Insufficient credits.');
+    return;
+  }
 }
 
 /// refuel the ship if needed and log the transaction

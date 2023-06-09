@@ -20,8 +20,26 @@ extension SystemUtils on System {
       waypoints.any((w) => w.type == WaypointType.JUMP_GATE);
 }
 
+extension SystemWaypointUtils on SystemWaypoint {
+  /// Returns true if the waypoint is a jump gate.
+  bool get isJumpGate => type == WaypointType.JUMP_GATE;
+
+  /// The system symbol of the waypoint.
+  String get systemSymbol => parseWaypointString(symbol).system;
+}
+
 /// Extensions onto Waypoint to make it easier to work with.
 extension WaypointUtils on Waypoint {
+  /// Converts the waypoint to a SystemWaypoint.
+  SystemWaypoint toSystemWaypoint() {
+    return SystemWaypoint(
+      symbol: symbol,
+      type: type,
+      x: x,
+      y: y,
+    );
+  }
+
   /// Returns true if the waypoint has the given trait.
   bool hasTrait(WaypointTraitSymbolEnum trait) {
     return traits.any((t) => t.symbol == trait);

@@ -145,8 +145,8 @@ Future<Waypoint> nearestWaypointWithMarket(
   final systemMarkets =
       await waypointCache.marketWaypointsForSystem(waypoint.systemSymbol);
   if (systemMarkets.isEmpty) {
-    final sortedWaypoints =
-        systemMarkets.sortedBy<num>((w) => distanceWithinSystem(w, waypoint));
+    final sortedWaypoints = systemMarkets
+        .sortedBy<num>((w) => distanceBetweenWaypointsInSystem(w, waypoint));
     return sortedWaypoints.first;
   }
   await for (final waypoint in waypointsInJumpRadius(

@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
@@ -9,6 +10,8 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/route.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Returns the best deal for the given ship within one jump of it's
@@ -38,13 +41,143 @@ Future<Deal?> findBestDealWithinOneJump(
 
 // We want to write a O(N) deal-finding algorithm.
 // Which takes in N markets.  And walks the markets for all goods they trade.
-// Compares the prices of those goods to the 25th/75th known price of that good.
-// and then saves off prices (half-deals) for each good where the price
-// is in the top or bottom quartile of known prices.
+// Collects the best P prices for each good as half-deals.
 // It then walks all half-deals and finds deals with maximum profit.
 // It also could use a cost function for the distance between markets, in
 // both time and fuel.  Time cost could be ignored for now, but later
 // used as opportunity cost.
+
+@immutable
+class BuyOpp {
+  const BuyOpp({
+    required this.marketSymbol,
+    required this.tradeSymbol,
+    required this.price,
+  });
+  final String marketSymbol;
+  final String tradeSymbol;
+  final int price;
+}
+
+@immutable
+class SellOpp {
+  const SellOpp({
+    required this.marketSymbol,
+    required this.tradeSymbol,
+    required this.price,
+  });
+  final String marketSymbol;
+  final String tradeSymbol;
+  final int price;
+}
+
+class DealFinder {
+  DealFinder(PriceData priceData, {int topLimit = 5})
+      : _priceData = priceData,
+        // _systemsCache = systemsCache,
+        topLimit = topLimit;
+
+  final PriceData _priceData;
+  // final SystemsCache _systemsCache;
+  final int topLimit;
+  final Map<String, List<BuyOpp>> _buyOpps = {};
+  final Map<String, List<SellOpp>> _sellOpps = {};
+
+  void visitMarket(Market market) {
+    for (final tradeSymbol in market.allTradeSymbols) {
+      // See if the price data we have for this trade symbol
+      // are in the top/bottom we've seen, if so, record them.
+      final buy = BuyOpp(
+        marketSymbol: market.symbol,
+        tradeSymbol: tradeSymbol.value,
+        price: estimatePurchasePrice(_priceData, market, tradeSymbol.value)!,
+      );
+      final buys = _buyOpps[tradeSymbol.value] ?? [];
+      buys.add(buy);
+      buys.sort((a, b) => a.price.compareTo(b.price));
+      if (buys.length > topLimit) {
+        buys.removeLast();
+      }
+      _buyOpps[tradeSymbol.value] = buys;
+      final sell = SellOpp(
+        marketSymbol: market.symbol,
+        tradeSymbol: tradeSymbol.value,
+        price: estimateSellPrice(_priceData, market, tradeSymbol.value)!,
+      );
+      final sells = _sellOpps[tradeSymbol.value] ?? [];
+      sells.add(sell);
+      sells.sort((a, b) => a.price.compareTo(b.price));
+      if (sells.length > topLimit) {
+        sells.removeLast();
+      }
+      _sellOpps[tradeSymbol.value] = sells;
+    }
+  }
+
+  List<Deal> findDeals() {
+    final deals = <Deal>[];
+    // final fuelPrice = _priceData.medianPurchasePrice(TradeSymbol.FUEL.value);
+    for (final tradeSymbol in _buyOpps.keys) {
+      final buys = _buyOpps[tradeSymbol]!;
+      final sells = _sellOpps[tradeSymbol]!;
+      for (final buy in buys) {
+        for (final sell in sells) {
+          if (buy.marketSymbol == sell.marketSymbol) {
+            continue;
+          }
+          final profit = sell.price - buy.price;
+          if (profit <= 0) {
+            continue;
+          }
+          // final buyWaypoint = _systemsCache.waypointFromSymbol(buy.marketSymbol);
+          // final sellWaypoint = _systemsCache.waypointFromSymbol(sell.marketSymbol);
+          // final fuelUsed = fuelUsedBetween(_systemsCache, buyWaypoint, sellWaypoint);
+          deals.add(
+            Deal(
+              sourceSymbol: buy.marketSymbol,
+              tradeSymbol: TradeSymbol.fromJson(tradeSymbol)!,
+              purchasePrice: buy.price,
+              destinationSymbol: sell.marketSymbol,
+              sellPrice: sell.price,
+            ),
+          );
+        }
+      }
+    }
+    return deals;
+  }
+}
+
+/// Returns the fuel cost to travel between two waypoints.
+/// This assumes the two waypoints are either within the same system
+/// or are connected by jump gates.
+int fuelUsedBetween(
+  SystemsCache systemsCache,
+  SystemWaypoint a,
+  SystemWaypoint b,
+) {
+  if (a.systemSymbol == b.systemSymbol) {
+    return fuelUsedWithinSystem(a, b);
+  }
+  // a -> jump gate
+  // jump N times
+// jump gate -> b
+  final aJumpGate = systemsCache.jumpGateWaypointForSystem(a.systemSymbol);
+  if (aJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${a.systemSymbol}',
+    );
+  }
+  // Ignoring if there is actually a path between the jump gates.
+  final bJumpGate = systemsCache.jumpGateWaypointForSystem(b.systemSymbol);
+  if (bJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${b.systemSymbol}',
+    );
+  }
+  return fuelUsedWithinSystem(a, aJumpGate) +
+      fuelUsedWithinSystem(bJumpGate, b);
+}
 
 /// Returns the best deal for the given ship across the given set of markets.
 Future<Deal?> findBestDealAcrossMarkets(

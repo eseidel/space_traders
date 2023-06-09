@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:space_traders_api/api.dart';
@@ -88,6 +89,23 @@ class SystemsCache {
       logger.warn('Failed to load systems from $uri: $e');
     }
     throw Exception('Failed to load systems from $uri');
+  }
+
+  /// Return the jump gate waypoint for the given [systemSymbol].
+  SystemWaypoint? jumpGateWaypointForSystem(String systemSymbol) {
+    final system = _systems.firstWhere((s) => s.symbol == systemSymbol);
+    return system.waypoints
+        .firstWhereOrNull((w) => w.type == WaypointType.JUMP_GATE);
+  }
+
+  System systemFromSymbol(String symbol) {
+    return _systems.firstWhere((s) => s.symbol == symbol);
+  }
+
+  SystemWaypoint waypointFromSymbol(String symbol) {
+    final parsed = parseWaypointString(symbol);
+    final system = systemFromSymbol(parsed.system);
+    return system.waypoints.firstWhere((w) => w.symbol == symbol);
   }
 
   /// Return connected systems for the given [systemSymbol].

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// A route between two waypoints, including possibly jumping through gates.
@@ -92,9 +93,14 @@ class RoutePlanner {
 }
 
 /// Returns the distance to the given waypoint.
-int distanceWithinSystem(Waypoint a, Waypoint b) {
+int distanceBetweenWaypointsInSystem(Waypoint a, Waypoint b) {
+  return distanceWithinSystem(a.toSystemWaypoint(), b.toSystemWaypoint());
+}
+
+/// Returns the distance to the given waypoint.
+int distanceWithinSystem(SystemWaypoint a, SystemWaypoint b) {
   if (a.systemSymbol != b.systemSymbol) {
-    return throw ArgumentError(
+    throw ArgumentError(
       'Waypoints must be in the same system: $a, $b',
     );
   }
@@ -105,9 +111,9 @@ int distanceWithinSystem(Waypoint a, Waypoint b) {
 }
 
 /// Returns the fuel cost to the given waypoint.
-int fuelCostWithinSystem(
-  Waypoint a,
-  Waypoint b, {
+int fuelUsedWithinSystem(
+  SystemWaypoint a,
+  SystemWaypoint b, {
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
   final distance = distanceWithinSystem(a, b);
@@ -126,8 +132,8 @@ int fuelCostWithinSystem(
 
 /// Returns the flight time to the given waypoint.
 int flightTimeWithinSystemInSeconds(
-  Waypoint a,
-  Waypoint b, {
+  SystemWaypoint a,
+  SystemWaypoint b, {
   required ShipNavFlightMode flightMode,
   required int shipSpeed,
 }) {

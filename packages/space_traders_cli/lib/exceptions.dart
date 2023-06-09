@@ -129,3 +129,16 @@ bool isWindowsSemaphoreTimeout(ApiException e) {
       .toString()
       .contains('The semaphore timeout period has expired.');
 }
+
+// ApiException 400: {"error":{"message":"Market purchase failed. Agent
+// does not have sufficient credits to purchase 10 unit(s) of
+// MODULE_MINERAL_PROCESSOR_I","code":4600,"data":{"agentCredits":44815,
+// "totalPrice":44930,"tradeSymbol":"MODULE_MINERAL_PROCESSOR_I",
+// "units":10,"purchasePrice":4493}}}
+/// Returns true if the exception is an insufficient credits exception.
+/// This can happen if we try to buy something we cannot afford, even
+/// if we check before it's possible for the price to change as a result
+/// of another player buying something.
+bool isInsufficientCreditsException(ApiException e) {
+  return isAPIExceptionWithCode(e, 4600);
+}
