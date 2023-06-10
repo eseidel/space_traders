@@ -60,10 +60,16 @@ class DealFinder {
     for (final tradeSymbol in market.allTradeSymbols) {
       // See if the price data we have for this trade symbol
       // are in the top/bottom we've seen, if so, record them.
+      final buyPrice =
+          estimatePurchasePrice(_priceData, market, tradeSymbol.value);
+      if (buyPrice == null) {
+        // If we don't have buy data we won't have sell data either.
+        continue;
+      }
       final buy = _BuyOpp(
         marketSymbol: market.symbol,
         tradeSymbol: tradeSymbol.value,
-        price: estimatePurchasePrice(_priceData, market, tradeSymbol.value)!,
+        price: buyPrice,
       );
       final buys = _buyOpps[tradeSymbol.value] ?? [];
       // No clue what it wants me to cascade here?

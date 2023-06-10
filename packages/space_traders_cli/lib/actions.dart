@@ -45,6 +45,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Ship ship,
   String waypointSymbol,
 ) async {
+  await undockIfNeeded(api, ship);
   try {
     final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
     final result =
@@ -367,7 +368,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol);
   final response =
       await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
-  ship.nav = response!.data.nav!;
+  ship.nav = response!.data.nav;
   shipInfo(ship, 'Used Jump Gate to $systemSymbol');
   return response.data;
 }

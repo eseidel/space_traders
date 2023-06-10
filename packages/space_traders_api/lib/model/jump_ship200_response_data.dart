@@ -14,18 +14,12 @@ class JumpShip200ResponseData {
   /// Returns a new [JumpShip200ResponseData] instance.
   JumpShip200ResponseData({
     required this.cooldown,
-    this.nav,
+    required this.nav,
   });
 
   Cooldown cooldown;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  ShipNav? nav;
+  ShipNav nav;
 
   @override
   bool operator ==(Object other) =>
@@ -37,7 +31,7 @@ class JumpShip200ResponseData {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (cooldown.hashCode) + (nav == null ? 0 : nav!.hashCode);
+      (cooldown.hashCode) + (nav.hashCode);
 
   @override
   String toString() => 'JumpShip200ResponseData[cooldown=$cooldown, nav=$nav]';
@@ -45,11 +39,7 @@ class JumpShip200ResponseData {
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'cooldown'] = this.cooldown;
-    if (this.nav != null) {
-      json[r'nav'] = this.nav;
-    } else {
-      json[r'nav'] = null;
-    }
+    json[r'nav'] = this.nav;
     return json;
   }
 
@@ -75,7 +65,7 @@ class JumpShip200ResponseData {
 
       return JumpShip200ResponseData(
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
-        nav: ShipNav.fromJson(json[r'nav']),
+        nav: ShipNav.fromJson(json[r'nav'])!,
       );
     }
     return null;
@@ -135,5 +125,6 @@ class JumpShip200ResponseData {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'cooldown',
+    'nav',
   };
 }

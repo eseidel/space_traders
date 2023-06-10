@@ -65,10 +65,8 @@ But I've not seen the source for that and it appears to be v1 rather than v2.
 ## Development
 
 ## Reset day checklist
-* Reset prices.json
-* Reset datastore.json
-* clear out auth_token.txt
-* Update the revision in open_api_config.yaml
+* run `dart run bin/reset.dart`
+* Update open_api_config.yaml to have the latest git hash.
 * regenerate space_traders_api
 
 ### Generating `space_traders_api` package

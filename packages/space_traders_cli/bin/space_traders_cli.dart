@@ -16,7 +16,6 @@ Future<void> main(List<String> args) async {
     ..addFlag(
       'update-prices',
       help: 'Force update of prices from server.',
-      defaultsTo: true,
     );
   final results = parser.parse(args);
 

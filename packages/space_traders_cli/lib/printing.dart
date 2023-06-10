@@ -106,7 +106,7 @@ String stringForPriceDeviance(
   }
   final diff = price - median;
   if (diff == 0) {
-    return '👌';
+    return '⚖️';
   }
   final signString = diff < 0 ? '' : '+';
   final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(3);

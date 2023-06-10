@@ -188,12 +188,8 @@ class PriceData {
     // Try to load prices.json.  If it does not exist, pull down and cache
     // from the url.
     final fromCache = _loadPricesCache(fs, filePath);
-    if (fromCache != null) {
-      if (!updateFromServer) {
-        return fromCache;
-      }
-    } else {
-      logger.info('Failed to load prices from cache, fetching from $uri');
+    if (!updateFromServer) {
+      return fromCache ?? PriceData([], fs: fs, cacheFilePath: filePath);
     }
 
     // We could mock http here.
@@ -504,5 +500,8 @@ Future<void> recordMarketData(PriceData priceData, Market market) async {
   final prices = market.tradeGoods
       .map((g) => Price.fromMarketTradeGood(g, market.symbol))
       .toList();
+  if (prices.isEmpty) {
+    logger.warn('No prices for ${market.symbol}!');
+  }
   await priceData.addPrices(prices);
 }
