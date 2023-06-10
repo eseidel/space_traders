@@ -89,22 +89,15 @@ Then modified:
 Logic:
 * Keep per-ship logs, so can caculate per-ship efficiency.
 * Compute earnings per hour per ship.
-* Pull down https://api.spacetraders.io/v2/systems.json and use that to find the
-  nearest system to a given system.
 * Survey mines when we pass by if we have another ship there?
-* Include fuel costs in deal calculations.
-* Arbitrage should consider going to systems it knows there will be a profit from.
 * Probes should plan jumps based on distance to hq, not current location.
 * Fix probes getting stuck cycling.
 * Remove guards against 0 prices from prices.dart.
 * Make shipInfo include an emoji for the behavior.
 * Start to build a system database similar to the pricing database.
 * Carefully choose which survey to use against historical data.
-* Fix contract trader to be able to leave the system.
-* Fix arbitrage trader to not recalculate deal mid-journey.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
-* systemSymbolsInJumpRadius doesn't seem to be jumping as far as expected.
 
 UI:
 * Add a Flutter UI.

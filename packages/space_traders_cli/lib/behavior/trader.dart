@@ -196,6 +196,7 @@ CostedDeal costOutDeal(
   SystemsCache systemsCache,
   Deal deal, {
   required int cargoSize,
+  required int shipSpeed,
 }) {
   final source = systemsCache.waypointFromSymbol(deal.sourceSymbol);
   final destination = systemsCache.waypointFromSymbol(deal.destinationSymbol);
@@ -211,7 +212,7 @@ CostedDeal costOutDeal(
       source,
       destination,
       flightMode: ShipNavFlightMode.CRUISE,
-      shipSpeed: 30, // Command ship speed.
+      shipSpeed: shipSpeed,
     ),
     tradeVolume: cargoSize,
   );
@@ -246,7 +247,14 @@ Future<CostedDeal?> findDealFor(
   final deals = finder.findDeals();
 
   final costedDeals = deals
-      .map((d) => costOutDeal(systemsCache, d, cargoSize: availableSpace))
+      .map(
+        (d) => costOutDeal(
+          systemsCache,
+          d,
+          cargoSize: availableSpace,
+          shipSpeed: ship.engine.speed,
+        ),
+      )
       .toList();
 
   if (costedDeals.isEmpty) {

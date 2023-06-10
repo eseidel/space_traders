@@ -269,12 +269,20 @@ Future<DateTime?> advanceContractTrader(
         return null;
       }
     }
+    // We should only use the contract trader when we have enough credits to
+    // complete the entire contract.  Otherwise we're just sinking credits
+    // into a contract we can't complete yet when we could be using that
+    // money for other trading.
     // Make sure we only to our credit check *after* we deliver our goods.
     const creditsBuffer = 20000;
+    final remainingUnits = neededGood.unitsRequired - neededGood.unitsFulfilled;
     final minimumCreditsToTrade =
-        max(100000, breakEvenUnitPrice * ship.cargo.capacity + creditsBuffer);
+        max(100000, breakEvenUnitPrice * remainingUnits + creditsBuffer);
     if (agent.credits < minimumCreditsToTrade) {
-      shipErr(ship, 'Not enough credits to trade, disabling contract trader.');
+      shipWarn(
+        ship,
+        'Not enough credits complete contract, disabling contract trader.',
+      );
       await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
       return null;
     }
