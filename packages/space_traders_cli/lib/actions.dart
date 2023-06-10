@@ -257,18 +257,19 @@ Future<void> refuelIfNeededAndLog(
           'Fuel low: ${ship.fuel.current} / '
           '${ship.fuel.capacity}}');
     }
+    final markupString = markup.toStringAsFixed(1);
     // The really bonkers prices are 100x median.
     if (markup > 10 || fuelPercent > 0.5) {
       shipWarn(
         ship,
-        'Fuel is at $markup times the median price '
+        'Fuel is at $markupString times the median price '
         '$fuelString ($deviation), not refueling.',
       );
       return;
     }
     shipWarn(
         ship,
-        'Fuel is at $markup times the median price '
+        'Fuel is at $markupString times the median price '
         '$fuelString ($deviation), but also critically low, refueling anyway');
   }
 
