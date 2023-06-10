@@ -143,6 +143,17 @@ extension ShipUtils on Ship {
   /// Returns true if the ship uses fuel.
   bool get usesFuel => fuel.capacity > 0;
 
+  /// Returns percentage of fuel remaining.
+  /// Returns 1 if the ship doesn't use fuel.
+  /// Returns 0 if the ship is out of fuel.
+  /// Otherwise returns a value between 0 and 1.
+  double get fuelPercentage {
+    if (!usesFuel) {
+      return 1;
+    }
+    return fuel.current / fuel.capacity;
+  }
+
   /// Returns true if the ship has a surveyor module.
   bool get hasSurveyor {
     const surveyerMounts = [

@@ -337,6 +337,12 @@ Future<DateTime> navigateToLocalWaypointAndLog(
 
   final result = await navigateToLocalWaypoint(api, ship, waypoint.symbol);
   final flightTime = result.nav.route.arrival.difference(DateTime.now());
+  if (ship.fuelPercentage < 0.5) {
+    shipWarn(
+      ship,
+      'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}}',
+    );
+  }
   // Could log used Fuel. result.fuel.fuelConsumed
   shipInfo(
     ship,

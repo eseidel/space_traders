@@ -265,6 +265,7 @@ Future<DateTime?> advanceMiner(
     if (maybeAsteroidField != null) {
       return navigateToLocalWaypointAndLog(api, ship, maybeAsteroidField);
     }
+    // TODO(eseidel): This should instead find the nearest minable system.
     shipWarn(
       ship,
       'No minable waypoint in ${ship.nav.systemSymbol}, '

@@ -13,9 +13,9 @@ const defaultMaxAge = Duration(days: 3);
 // "ABUNDANT", "purchasePrice": 6, "sellPrice": 4, "tradeVolume": 1000,
 // "timestamp": "2023-05-14T21:52:56.530126100+00:00"}
 /// Transaction data for a single trade symbol at a single waypoint.
-class Price {
+class MarketPrice {
   /// Create a new price record.
-  Price({
+  MarketPrice({
     required this.waypointSymbol,
     required this.symbol,
     required this.supply,
@@ -26,7 +26,7 @@ class Price {
   });
 
   /// Create a new price record from a market trade good.
-  Price.fromMarketTradeGood(MarketTradeGood good, this.waypointSymbol)
+  MarketPrice.fromMarketTradeGood(MarketTradeGood good, this.waypointSymbol)
       : symbol = good.symbol,
         supply = good.supply,
         purchasePrice = good.purchasePrice,
@@ -34,7 +34,7 @@ class Price {
         tradeVolume = good.tradeVolume,
         timestamp = DateTime.now();
 
-  Price._compareOnly({this.purchasePrice = 0, this.sellPrice = 0})
+  MarketPrice._compareOnly({this.purchasePrice = 0, this.sellPrice = 0})
       : waypointSymbol = '',
         symbol = '',
         supply = MarketTradeGoodSupplyEnum.ABUNDANT,
@@ -42,12 +42,12 @@ class Price {
         timestamp = DateTime.now();
 
   /// Create a new price record from a json map.
-  factory Price.fromJson(Map<String, dynamic> json) {
+  factory MarketPrice.fromJson(Map<String, dynamic> json) {
     // Server started sending tradeVolume as a string recently, until that
     // is fixed, need to handle it here.
     final value = json['tradeVolume'];
     final tradeVolume = value is int ? value : int.parse(value as String);
-    return Price(
+    return MarketPrice(
       waypointSymbol: json['waypointSymbol'] as String,
       symbol: json['symbol'] as String,
       supply: MarketTradeGoodSupplyEnum.fromJson(json['supply'] as String)!,
@@ -102,7 +102,7 @@ class Price {
 }
 
 /// Describe a price record.
-String describePrice(Price price) {
+String describeMarketPrice(MarketPrice price) {
   return '${price.waypointSymbol} ${price.symbol} '
       '${price.purchasePrice} ${price.sellPrice}';
 }
@@ -112,7 +112,7 @@ String describePrice(Price price) {
 class PriceData {
   /// Create a new price data collection.
   PriceData(
-    List<Price> prices, {
+    List<MarketPrice> prices, {
     required FileSystem fs,
     this.cacheFilePath = defaultCacheFilePath,
   })  : _prices = prices,
@@ -128,7 +128,7 @@ class PriceData {
   // This might not actually be true!  I've never seen a 0 in the data.
   // These may contain 0s and duplicates, best to access it through one
   // of the accessors which knows how to filter.
-  final List<Price> _prices;
+  final List<MarketPrice> _prices;
 
   /// The path to the cache file.
   final String cacheFilePath;
@@ -150,12 +150,14 @@ class PriceData {
 
   /// Get the raw pricing data.  You probably don't want this as it
   /// will be unfiltered and may contain duplicates and zero values.
-  List<Price> get rawPrices => _prices;
+  List<MarketPrice> get rawPrices => _prices;
 
-  static List<Price> _parsePrices(String prices) {
+  static List<MarketPrice> _parsePrices(String prices) {
     final parsed = jsonDecode(prices) as List<dynamic>;
     return parsed
-        .map<Price>((e) => Price.fromJson(e as Map<String, dynamic>))
+        .map<MarketPrice>(
+          (e) => MarketPrice.fromJson(e as Map<String, dynamic>),
+        )
         .toList();
   }
 
@@ -212,7 +214,7 @@ class PriceData {
   }
 
   /// Add new prices to the price data.
-  Future<void> addPrices(List<Price> newPrices) async {
+  Future<void> addPrices(List<MarketPrice> newPrices) async {
     // Go through the list, see if we already have a price for this pair
     // if so, replace it, otherwise add to the end?
     // Probably this should add them to a separate buffer, which is then
@@ -246,16 +248,16 @@ class PriceData {
     await save();
   }
 
-  static int _sellPriceAcending(Price a, Price b) =>
+  static int _sellPriceAcending(MarketPrice a, MarketPrice b) =>
       a.sellPrice.compareTo(b.sellPrice);
-  static int _purchasePriceAcending(Price a, Price b) =>
+  static int _purchasePriceAcending(MarketPrice a, MarketPrice b) =>
       a.purchasePrice.compareTo(b.purchasePrice);
 
   /// Get the percentile for the purchase price of a trade good.
   int? percentileForPurchasePrice(String symbol, int purchasePrice) =>
       _percentileFor(
         symbol,
-        Price._compareOnly(purchasePrice: purchasePrice),
+        MarketPrice._compareOnly(purchasePrice: purchasePrice),
         MarketTransactionTypeEnum.PURCHASE,
       );
 
@@ -277,7 +279,7 @@ class PriceData {
   /// Get the percentile for the sell price of a trade good.
   int? percentileForSellPrice(String symbol, int sellPrice) => _percentileFor(
         symbol,
-        Price._compareOnly(sellPrice: sellPrice),
+        MarketPrice._compareOnly(sellPrice: sellPrice),
         MarketTransactionTypeEnum.SELL,
       );
 
@@ -324,13 +326,13 @@ class PriceData {
 
   /// Returns all known sell prices for a trade good, optionally restricted
   /// to a specific waypoint.
-  Iterable<Price> sellPricesFor({
+  Iterable<MarketPrice> sellPricesFor({
     required String tradeSymbol,
     String? marketSymbol,
   }) {
     final filter = marketSymbol == null
-        ? (Price e) => e.symbol == tradeSymbol && e.sellPrice > 0
-        : (Price e) =>
+        ? (MarketPrice e) => e.symbol == tradeSymbol && e.sellPrice > 0
+        : (MarketPrice e) =>
             e.symbol == tradeSymbol &&
             e.sellPrice > 0 &&
             e.waypointSymbol == marketSymbol;
@@ -339,20 +341,20 @@ class PriceData {
 
   /// Returns all known purchase prices for a trade good, optionally restricted
   /// to a specific waypoint.
-  Iterable<Price> purchasePricesFor({
+  Iterable<MarketPrice> purchasePricesFor({
     required String tradeSymbol,
     String? marketSymbol,
   }) {
     final filter = marketSymbol == null
-        ? (Price e) => e.symbol == tradeSymbol && e.purchasePrice > 0
-        : (Price e) =>
+        ? (MarketPrice e) => e.symbol == tradeSymbol && e.purchasePrice > 0
+        : (MarketPrice e) =>
             e.symbol == tradeSymbol &&
             e.purchasePrice > 0 &&
             e.waypointSymbol == marketSymbol;
     return _prices.where(filter);
   }
 
-  Price? _priceAtPercentile(
+  MarketPrice? _priceAtPercentile(
     String symbol,
     int percentile,
     MarketTransactionTypeEnum action,
@@ -385,7 +387,7 @@ class PriceData {
 
   int? _percentileFor(
     String symbol,
-    Price price,
+    MarketPrice price,
     MarketTransactionTypeEnum action,
   ) {
     final compareTo = action == MarketTransactionTypeEnum.PURCHASE
@@ -499,7 +501,7 @@ Future<void> recordMarketDataAndLog(
 /// Record market data.
 Future<void> recordMarketData(PriceData priceData, Market market) async {
   final prices = market.tradeGoods
-      .map((g) => Price.fromMarketTradeGood(g, market.symbol))
+      .map((g) => MarketPrice.fromMarketTradeGood(g, market.symbol))
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${market.symbol}!');

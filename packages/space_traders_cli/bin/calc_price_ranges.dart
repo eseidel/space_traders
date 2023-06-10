@@ -4,7 +4,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:stats/stats.dart';
 
-void printPriceRanges(List<Price> gameStats) {
+void printPriceRanges(List<MarketPrice> gameStats) {
   void printStats(String label, Iterable<int> values) {
     final stats = Stats.fromData(values);
     logger.info('$label: ${stats.withPrecision(3)}');

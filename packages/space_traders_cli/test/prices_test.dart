@@ -4,7 +4,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:test/test.dart';
 
 // Creates a fake price with good defaults.
-Price makePrice({
+MarketPrice makePrice({
   required String waypointSymbol,
   required String symbol,
   MarketTradeGoodSupplyEnum supply = MarketTradeGoodSupplyEnum.ABUNDANT,
@@ -13,7 +13,7 @@ Price makePrice({
   int tradeVolume = 1,
   DateTime? timestamp,
 }) {
-  return Price(
+  return MarketPrice(
     waypointSymbol: waypointSymbol,
     symbol: symbol,
     supply: supply,

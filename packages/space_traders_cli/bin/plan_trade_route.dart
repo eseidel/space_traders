@@ -8,7 +8,10 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
-Iterable<Price> pricesForWaypoint(PriceData priceData, Waypoint waypoint) {
+Iterable<MarketPrice> pricesForWaypoint(
+  PriceData priceData,
+  Waypoint waypoint,
+) {
   final prices =
       priceData.rawPrices.where((p) => p.waypointSymbol == waypoint.symbol);
   if (prices.isEmpty) {
@@ -17,7 +20,7 @@ Iterable<Price> pricesForWaypoint(PriceData priceData, Waypoint waypoint) {
   return prices;
 }
 
-void logPrices(List<Price> prices) {
+void logPrices(List<MarketPrice> prices) {
   for (final price in prices) {
     logger.info(price.toString());
   }
@@ -57,7 +60,7 @@ void main(List<String> args) async {
   // Could use a cut-off (e.g. median) instead of keeping only one.
 
   // Collect the most expensive sell price for each symbol.
-  final sellOpportunities = <Price>[];
+  final sellOpportunities = <MarketPrice>[];
   for (final tradeSymbol in TradeSymbol.values) {
     final prices = localPrices.where((p) => p.symbol == tradeSymbol.value);
     if (prices.isEmpty) {
@@ -69,7 +72,7 @@ void main(List<String> args) async {
   }
 
   // Now do the buy side.
-  final purchaseOpportunities = <Price>[];
+  final purchaseOpportunities = <MarketPrice>[];
   for (final tradeSymbol in TradeSymbol.values) {
     final prices = localPrices.where((p) => p.symbol == tradeSymbol.value);
     if (prices.isEmpty) {
