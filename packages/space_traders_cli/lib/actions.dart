@@ -93,6 +93,21 @@ Future<DeliverContract200ResponseData> deliverContract(
   return response!.data;
 }
 
+// Future<SellCargo201ResponseData> sellItem(
+//   Api api,
+//   Ship ship,
+//   String tradeSymbol,
+//   int units,
+// ) async {
+//   final request = SellCargoRequest(
+//     symbol: tradeSymbol,
+//     units: units,
+//   );
+//   final response =
+//       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
+//   return response!.data;
+// }
+
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
@@ -154,7 +169,7 @@ Future<ShipCargo> sellCargoAndLog(
 }
 
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
-Future<void> purchaseCargoAndLog(
+Future<SellCargo201ResponseData?> purchaseCargoAndLog(
   Api api,
   PriceData priceData,
   Ship ship,
@@ -176,6 +191,7 @@ Future<void> purchaseCargoAndLog(
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = response.data.agent;
     logTransaction(ship, priceData, agent, transaction);
+    return response.data;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
       rethrow;
@@ -184,7 +200,7 @@ Future<void> purchaseCargoAndLog(
         ship,
         'Purchase of $amountToBuy $tradeSymbol failed. '
         'Insufficient credits.');
-    return;
+    return null;
   }
 }
 

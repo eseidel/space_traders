@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
@@ -131,6 +133,8 @@ class CostedDeal {
     required this.fuelCost,
     required this.tradeVolume,
     required this.time,
+    this.actualPurchasePrice,
+    this.actualSellPrice,
   });
 
   /// Create a CostedDeal from JSON.
@@ -139,6 +143,8 @@ class CostedDeal {
         fuelCost: json['fuelCost'] as int,
         tradeVolume: json['tradeVolume'] as int,
         time: json['time'] as int,
+        actualPurchasePrice: json['actualPurchasePrice'] as int?,
+        actualSellPrice: json['actualSellPrice'] as int?,
       );
 
   /// The deal being considered.
@@ -152,6 +158,12 @@ class CostedDeal {
 
   /// The time in seconds to travel between the two markets.
   int time;
+
+  /// The actual purchase price of the deal.
+  int? actualPurchasePrice;
+
+  /// The actual sell price of the deal.
+  int? actualSellPrice;
 
   /// The total upfront cost of the deal, including fuel.
   int get totalOutlay => deal.purchasePrice * tradeVolume + fuelCost;
@@ -168,6 +180,8 @@ class CostedDeal {
         'fuelCost': fuelCost,
         'tradeVolume': tradeVolume,
         'time': time,
+        'actualPurchasePrice': actualPurchasePrice,
+        'actualSellPrice': actualSellPrice,
       };
 }
 
@@ -362,6 +376,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   WaypointCache waypointCache,
   PriceData priceData,
   BehaviorManager behaviorManager,
+  Market market,
   Ship ship,
   Deal deal,
 ) async {
@@ -370,13 +385,62 @@ Future<DateTime?> _purchaseCargoAndGo(
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(api, priceData, agent, ship);
 
-  await purchaseCargoAndLog(
+  // Sell any cargo we can and update our ship's cargo.
+  if (ship.cargo.isNotEmpty) {
+    ship.cargo = await sellCargoAndLog(
+      api,
+      priceData,
+      ship,
+      where: (tradeSymbol) => tradeSymbol != deal.tradeSymbol.value,
+    );
+  }
+
+  final maybeGood = market.tradeGoods
+      .firstWhereOrNull((g) => g.symbol == deal.tradeSymbol.value);
+  if (maybeGood == null) {
+    throw ArgumentError(
+      'No good ${deal.tradeSymbol.value} in ${market.symbol}',
+    );
+  }
+  final good = maybeGood;
+  final tradeVolume = good.tradeVolume;
+  final unitsToPurchase = min(tradeVolume, ship.availableSpace);
+  if (unitsToPurchase < ship.availableSpace) {
+    shipWarn(
+      ship,
+      'Buying less than ship can carry! '
+      '$unitsToPurchase < ${ship.availableSpace}',
+    );
+  }
+
+  final maybeResult = await purchaseCargoAndLog(
     api,
     priceData,
     ship,
     deal.tradeSymbol.value,
-    ship.availableSpace,
+    unitsToPurchase,
   );
+  if (maybeResult == null) {
+    // We couldn't buy any cargo, so we're done.
+    await behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader);
+    shipInfo(
+      ship,
+      'Failed to buy cargo, disabling trader behavior.',
+    );
+    return null;
+  }
+  final result = maybeResult;
+  final transaction = result.transaction;
+  shipInfo(
+    ship,
+    'Purchased ${transaction.units} ${transaction.tradeSymbol} '
+    '@ ${transaction.pricePerUnit} (expected ${deal.purchasePrice}) '
+    ' = ${transaction.totalPrice}',
+  );
+  final behaviorState = await behaviorManager.getBehavior(ship.symbol);
+  behaviorState.deal!.actualPurchasePrice = result.transaction.pricePerUnit;
+  await behaviorManager.setBehavior(ship.symbol, behaviorState);
+
   return beingRouteAndLog(
     api,
     ship,
@@ -412,6 +476,13 @@ Future<DateTime?> advanceArbitrageTrader(
   final currentMarket =
       await marketCache.marketForSymbol(currentWaypoint.symbol);
 
+  // If we're currently at a market, record the prices and refuel.
+  if (currentMarket != null) {
+    await dockIfNeeded(api, ship);
+    await refuelIfNeededAndLog(api, priceData, agent, ship);
+    await recordMarketData(priceData, currentMarket);
+  }
+
   final behaviorState = await behaviorManager.getBehavior(ship.symbol);
   final pastDeal = behaviorState.deal;
   if (pastDeal != null) {
@@ -425,6 +496,7 @@ Future<DateTime?> advanceArbitrageTrader(
         waypointCache,
         priceData,
         behaviorManager,
+        currentMarket!,
         ship,
         pastDeal.deal,
       );
@@ -432,20 +504,12 @@ Future<DateTime?> advanceArbitrageTrader(
 
     // If we're at the destination of the deal, sell.
     if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
-      await dockIfNeeded(api, ship);
-      await recordMarketData(priceData, currentMarket!);
       // We're at the destination, sell and clear the deal.
       await sellCargoAndLog(api, priceData, ship);
+
       behaviorState.deal = null;
       await behaviorManager.setBehavior(ship.symbol, behaviorState);
       return null;
-    }
-
-    // Otherwise go to the destination, refueling first if needed.
-    if (currentMarket != null) {
-      await dockIfNeeded(api, ship);
-      await refuelIfNeededAndLog(api, priceData, agent, ship);
-      await recordMarketData(priceData, currentMarket);
     }
 
     shipInfo(ship, 'Off course in route to deal, resuming route.');
@@ -459,20 +523,9 @@ Future<DateTime?> advanceArbitrageTrader(
   }
 
   // We don't have a current deal, so get a new one!
-  // If we're currently at a market, record the prices and sell any cargo.
-  if (currentMarket != null) {
-    await dockIfNeeded(api, ship);
-    await refuelIfNeededAndLog(api, priceData, agent, ship);
-    await recordMarketData(priceData, currentMarket);
-    // Sell any cargo we can and update our ship's cargo.
-    if (ship.cargo.isNotEmpty) {
-      ship.cargo = await sellCargoAndLog(api, priceData, ship);
-    }
-  }
 
   // Find a new deal!
-  // Currently limiting search to markets in the current system.
-  const maxJumps = 1;
+  const maxJumps = 2;
   final maxOutlay = agent.credits;
 
   // Consider all deals starting at any market within our consideration range.
@@ -510,6 +563,7 @@ Future<DateTime?> advanceArbitrageTrader(
       waypointCache,
       priceData,
       behaviorManager,
+      currentMarket!,
       ship,
       deal.deal,
     );
