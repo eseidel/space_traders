@@ -8,6 +8,7 @@ import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/surveys.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// The context for a behavior.
@@ -19,6 +20,7 @@ class BehaviorContext {
     this.priceData,
     this.ship,
     this.agent,
+    this.systemsCache,
     this.waypointCache,
     this.marketCache,
     this.behaviorManager,
@@ -41,6 +43,9 @@ class BehaviorContext {
 
   /// The agent object.
   final Agent agent;
+
+  /// The cache of systems.
+  final SystemsCache systemsCache;
 
   /// The cache of waypoints.
   final WaypointCache waypointCache;
@@ -94,6 +99,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.priceData,
         ctx.agent,
         ctx.ship,
+        ctx.systemsCache,
         ctx.waypointCache,
         ctx.marketCache,
         ctx.behaviorManager,

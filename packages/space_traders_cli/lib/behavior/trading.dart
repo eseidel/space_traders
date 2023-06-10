@@ -18,6 +18,17 @@ class Deal {
     required this.sellPrice,
   });
 
+  /// Create a deal from JSON.
+  factory Deal.fromJson(Map<String, dynamic> json) {
+    return Deal(
+      sourceSymbol: json['sourceSymbol'] as String,
+      destinationSymbol: json['destinationSymbol'] as String,
+      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
+      purchasePrice: json['purchasePrice'] as int,
+      sellPrice: json['sellPrice'] as int,
+    );
+  }
+
   /// The trade symbol that we're selling.
   final TradeSymbol tradeSymbol;
 
@@ -39,6 +50,15 @@ class Deal {
   // belong here.
   /// The profit we'll make on this deal per unit.
   int get profit => sellPrice - purchasePrice;
+
+  /// Encode the deal as JSON.
+  Map<String, dynamic> toJson() => {
+        'sourceSymbol': sourceSymbol,
+        'destinationSymbol': destinationSymbol,
+        'tradeSymbol': tradeSymbol.toJson(),
+        'purchasePrice': purchasePrice,
+        'sellPrice': sellPrice,
+      };
 }
 
 int _percentileForTradeType(ExchangeType tradeType) {
@@ -121,46 +141,6 @@ int? estimatePurchasePrice(
   return priceData.purchasePriceAtPercentile(tradeSymbol, percentile);
 }
 
-/// Enumerate all possible deals that could be made between [purchaseMarket] and
-/// [otherMarkets].
-Iterable<Deal> enumeratePossibleDeals(
-  PriceData priceData,
-  Market purchaseMarket,
-  List<Market> otherMarkets,
-) sync* {
-  for (final otherMarket in otherMarkets) {
-    for (final sellSymbol in otherMarket.allTradeSymbols) {
-      final sellPrice =
-          estimateSellPrice(priceData, otherMarket, sellSymbol.value);
-      if (sellPrice == null) {
-        continue;
-      }
-      for (final purchaseSymbol in purchaseMarket.allTradeSymbols) {
-        if (sellSymbol != purchaseSymbol) {
-          continue;
-        }
-        final purchasePrice = estimatePurchasePrice(
-          priceData,
-          purchaseMarket,
-          purchaseSymbol.value,
-        );
-        if (purchasePrice == null) {
-          // We're asking about a good that is not a market we have a ship at
-          // and we don't have enough pricing data to estimate a price.
-          continue;
-        }
-        yield Deal(
-          sourceSymbol: purchaseMarket.symbol,
-          tradeSymbol: sellSymbol,
-          destinationSymbol: otherMarket.symbol,
-          purchasePrice: purchasePrice,
-          sellPrice: sellPrice,
-        );
-      }
-    }
-  }
-}
-
 /// Describe a [deal] in a human-readable way.
 String describeDeal(Deal deal) {
   final sign = deal.profit > 0 ? '+' : '';
@@ -190,64 +170,6 @@ void logDeals(List<Deal> deals) {
   for (final deal in deals) {
     logger.info(describeDeal(deal));
   }
-}
-
-/// Find the best deal that can be made from [currentWaypoint].
-Deal? findBestDealFromWaypoint(
-  PriceData priceData,
-  Ship ship,
-  Waypoint currentWaypoint,
-  List<Market> markets, {
-  int minimumProfitPer = 0,
-}) {
-  // Fetch all marketplace data
-  final localMarket =
-      markets.firstWhere((m) => m.symbol == currentWaypoint.symbol);
-  final otherMarkets =
-      markets.where((m) => m.symbol != localMarket.symbol).toList();
-
-  final deals = enumeratePossibleDeals(priceData, localMarket, otherMarkets);
-  final sortedDeals = deals.sorted((a, b) => a.profit.compareTo(b.profit));
-  // logDeals(sortedDeals);
-  final bestDeal = sortedDeals.lastOrNull;
-  // Currently we don't account for fuel, so have an minimum expected
-  // profit instead.
-  if (bestDeal == null || bestDeal.profit <= minimumProfitPer) {
-    final profitString =
-        bestDeal == null ? null : creditsString(bestDeal.profit);
-    shipInfo(
-      ship,
-      '0 of ${sortedDeals.length} deals profitable '
-      'from ${currentWaypoint.symbol}, best: $profitString',
-    );
-    return null;
-  }
-  final bestCreditsString = '+${creditsString(bestDeal.profit)}';
-  shipInfo(
-      ship,
-      '${sortedDeals.length} deals found from '
-      '${currentWaypoint.symbol} best: ${bestCreditsString.padLeft(6)}');
-  return bestDeal;
-
-  // The simplest possible thing is get the list of trade symbols sold at this
-  // marketplace, and then for each trade symbol, get the price at this
-  // marketplace, and then for each trade symbol, get the prices at all other
-  // marketplaces, and then sort by assumed profit.
-  // If we don't have a destination price, assume 50th percentile.
-
-  // Construct all possible deals.
-  // Get the list of trade symbols sold at this marketplace.
-  // Upload current prices at this market to the db.
-  // For each trade symbol, get the price at this marketplace.
-  // for (final tradeSymbol in tradeSymbols) {}
-  // For each trade symbol, get the price at the destination marketplace.
-  // Sort by assumed profit.
-  // If we don't have a destination price, assume 50th percentile.
-  // Deals are then sorted by profit, and we take the best one.
-
-  // If we don't have a percentile, match only export/import.
-  // Picking at random from the matchable exports?
-  // Or picking the shortest distance?
 }
 
 /// Describe a [deal] in a human-readable way.

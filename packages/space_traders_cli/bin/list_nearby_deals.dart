@@ -2,6 +2,7 @@ import 'package:args/args.dart';
 import 'package:file/local.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
+import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/queries.dart';
@@ -39,7 +40,7 @@ void main(List<String> args) async {
   final waypointCache = WaypointCache(api, systemsCache);
 
   final ships = allMyShips(api);
-  final commandShip = await ships.first;
+  final ship = await ships.first; // command ship
 
   final marketCache = MarketCache(waypointCache);
   final priceData = await PriceData.load(fs);
@@ -48,9 +49,10 @@ void main(List<String> args) async {
     systemsCache,
     waypointCache,
     marketCache,
-    commandShip,
+    ship,
     maxJumps: maxJumps,
     maxOutlay: 10000,
+    availableSpace: ship.availableSpace,
   );
 
   if (maybeDeal == null) {

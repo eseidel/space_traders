@@ -1,4 +1,5 @@
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
 
 /// Enum to specify which behavior the ship should follow.
@@ -38,9 +39,14 @@ class BehaviorState {
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
     final behavior = json['behavior'] as String;
     final destination = json['destination'] as String?;
+    final deal = json['deal'] == null
+        ? null
+        : CostedDeal.fromJson(json['deal'] as Map<String, dynamic>);
     return BehaviorState(
       Behavior.values.firstWhere((b) => b.toString() == behavior),
-    )..destination = destination;
+    )
+      ..destination = destination
+      ..deal = deal;
   }
 
   /// The current behavior.
@@ -49,11 +55,15 @@ class BehaviorState {
   /// Current navigation destination.
   String? destination;
 
+  /// Current deal.
+  CostedDeal? deal;
+
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'behavior': behavior.toString(),
       'destination': destination,
+      'deal': deal?.toJson(),
     };
   }
 }

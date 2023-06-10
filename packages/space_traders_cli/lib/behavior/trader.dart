@@ -16,39 +16,6 @@ import 'package:space_traders_cli/route.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
-/// Returns the best deal for the given ship within one jump of it's
-/// current location.
-Future<Deal?> findBestDealWithinOneJump(
-  PriceData priceData,
-  Ship ship,
-  WaypointCache waypointCache,
-  MarketCache marketCache, {
-  int minimumProfitPer = 0,
-}) async {
-  // Should this start at HQ rather than the current ship location?
-  final connectedSystems =
-      waypointCache.connectedSystems(ship.nav.systemSymbol);
-  final markets = await connectedSystems
-      .asyncExpand((s) => marketCache.marketsInSystem(s.symbol))
-      .toList();
-  return findBestDealAcrossMarkets(
-    priceData,
-    ship,
-    waypointCache,
-    marketCache,
-    markets,
-    minimumProfitPer: minimumProfitPer,
-  );
-}
-
-// We want to write a O(N) deal-finding algorithm.
-// Which takes in N markets.  And walks the markets for all goods they trade.
-// Collects the best P prices for each good as half-deals.
-// It then walks all half-deals and finds deals with maximum profit.
-// It also could use a cost function for the distance between markets, in
-// both time and fuel.  Time cost could be ignored for now, but later
-// used as opportunity cost.
-
 @immutable
 class _BuyOpp {
   const _BuyOpp({
@@ -166,6 +133,14 @@ class CostedDeal {
     required this.time,
   });
 
+  /// Create a CostedDeal from JSON.
+  factory CostedDeal.fromJson(Map<String, dynamic> json) => CostedDeal(
+        deal: Deal.fromJson(json['deal'] as Map<String, dynamic>),
+        fuelCost: json['fuelCost'] as int,
+        tradeVolume: json['tradeVolume'] as int,
+        time: json['time'] as int,
+      );
+
   /// The deal being considered.
   Deal deal;
 
@@ -186,6 +161,14 @@ class CostedDeal {
 
   /// The profit per second of the deal.
   int get profitPerSecond => profit ~/ time;
+
+  /// Convert this CostedDeal to JSON.
+  Map<String, dynamic> toJson() => {
+        'deal': deal.toJson(),
+        'fuelCost': fuelCost,
+        'tradeVolume': tradeVolume,
+        'time': time,
+      };
 }
 
 /// Returns a string describing the given CostedDeal
@@ -209,7 +192,11 @@ String describeCostedDeal(CostedDeal costedDeal) {
 }
 
 /// Returns a CostedDeal for a given deal.
-CostedDeal costOutDeal(SystemsCache systemsCache, Deal deal, int cargoSize) {
+CostedDeal costOutDeal(
+  SystemsCache systemsCache,
+  Deal deal, {
+  required int cargoSize,
+}) {
   final source = systemsCache.waypointFromSymbol(deal.sourceSymbol);
   final destination = systemsCache.waypointFromSymbol(deal.destinationSymbol);
   return CostedDeal(
@@ -240,6 +227,7 @@ Future<CostedDeal?> findDealFor(
   Ship ship, {
   required int maxJumps,
   required int maxOutlay,
+  required int availableSpace,
 }) async {
   final start = await waypointCache.waypoint(ship.nav.waypointSymbol);
   final markets = await systemSymbolsInJumpRadius(
@@ -257,8 +245,9 @@ Future<CostedDeal?> findDealFor(
   }
   final deals = finder.findDeals();
 
-  final costedDeals =
-      deals.map((d) => costOutDeal(systemsCache, d, 60)).toList();
+  final costedDeals = deals
+      .map((d) => costOutDeal(systemsCache, d, cargoSize: availableSpace))
+      .toList();
 
   if (costedDeals.isEmpty) {
     logger.info('No deals found.');
@@ -358,36 +347,31 @@ int flightTimeBetween(
       );
 }
 
-/// Returns the best deal for the given ship across the given set of markets.
-Future<Deal?> findBestDealAcrossMarkets(
-  PriceData priceData,
-  Ship ship,
+/// Purchase cargo for the deal and start towards destination.
+Future<DateTime?> _purchaseCargoAndGo(
+  Api api,
   WaypointCache waypointCache,
-  MarketCache marketCache,
-  List<Market> markets, {
-  int minimumProfitPer = 0,
-}) async {
-  shipInfo(ship, 'Considering deals across ${markets.length} markets');
-  final potentialDeals = markets.map((m) async {
-    return findBestDealFromWaypoint(
-      priceData,
-      ship,
-      await waypointCache.waypoint(m.symbol),
-      markets,
-      minimumProfitPer: minimumProfitPer,
-    );
-  });
-  final maybeDeals = await Future.wait(potentialDeals);
-  final deals = maybeDeals.whereType<Deal>().toList();
-  if (deals.isEmpty) {
-    return null;
-  }
-
-  // TODO(eseidel): Need to consider time and fuel costs, for the route.
-  // Also need to consider if we can afford the upfront cost of the cargo.
-  // Deals which don't start at our current location, also have time and fuel
-  // to get to the first waypoint.
-  return deals.reduce((a, b) => a.profit > b.profit ? a : b);
+  PriceData priceData,
+  BehaviorManager behaviorManager,
+  Ship ship,
+  Deal deal,
+) async {
+  // This assumes the ship is at the source of the deal.
+  assert(deal.sourceSymbol == ship.nav.waypointSymbol, 'Not at source!');
+  await purchaseCargoAndLog(
+    api,
+    priceData,
+    ship,
+    deal.tradeSymbol.value,
+    ship.availableSpace,
+  );
+  return beingRouteAndLog(
+    api,
+    ship,
+    waypointCache,
+    behaviorManager,
+    deal.destinationSymbol,
+  );
 }
 
 /// One loop of the trading logic
@@ -397,6 +381,7 @@ Future<DateTime?> advanceArbitrageTrader(
   PriceData priceData,
   Agent agent,
   Ship ship,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   BehaviorManager behaviorManager,
@@ -414,9 +399,52 @@ Future<DateTime?> advanceArbitrageTrader(
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   final currentMarket =
       await marketCache.marketForSymbol(currentWaypoint.symbol);
-  // We are at a marketplace, so we can trade.
-  // We can also end up here if we're at a waypoint, but it has no market
-  // so we need to guard this check.
+
+  final behaviorState = await behaviorManager.getBehavior(ship.symbol);
+  final pastDeal = behaviorState.deal;
+  if (pastDeal != null) {
+    // If we have a deal
+    // If we're at the source (because we had to travel there) buy the cargo.
+    if (pastDeal.deal.sourceSymbol == ship.nav.waypointSymbol) {
+      // We're at the source, buy and start the route.
+      return _purchaseCargoAndGo(
+        api,
+        waypointCache,
+        priceData,
+        behaviorManager,
+        ship,
+        pastDeal.deal,
+      );
+    }
+
+    // If we're at the destination of the deal, sell.
+    if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
+      // We're at the destination, sell and clear the deal.
+      await sellCargoAndLog(api, priceData, ship);
+      behaviorState.deal = null;
+      await behaviorManager.setBehavior(ship.symbol, behaviorState);
+      return null;
+    }
+
+    // Otherwise go to the destination, refueling first if needed.
+    if (currentMarket != null) {
+      await dockIfNeeded(api, ship);
+      await refuelIfNeededAndLog(api, priceData, agent, ship);
+      await recordMarketData(priceData, currentMarket);
+    }
+
+    shipInfo(ship, 'Off course in route to deal, resuming route.');
+    return beingRouteAndLog(
+      api,
+      ship,
+      waypointCache,
+      behaviorManager,
+      pastDeal.deal.destinationSymbol,
+    );
+  }
+
+  // We don't have a current deal, so get a new one!
+  // If we're currently at a market, record the prices and sell any cargo.
   if (currentMarket != null) {
     await dockIfNeeded(api, ship);
     await refuelIfNeededAndLog(api, priceData, agent, ship);
@@ -425,56 +453,56 @@ Future<DateTime?> advanceArbitrageTrader(
     ship.cargo = await sellCargoAndLog(api, priceData, ship);
   }
 
+  // Find a new deal!
   // Currently limiting search to markets in the current system.
-  const minimumProfit = 500;
+  const maxJumps = 1;
+  final maxOutlay = agent.credits;
 
   // Consider all deals starting at any market within our consideration range.
-  final deal = await findBestDealWithinOneJump(
+  final deal = await findDealFor(
     priceData,
-    ship,
+    systemsCache,
     waypointCache,
     marketCache,
-    minimumProfitPer: minimumProfit,
+    ship,
+    maxJumps: maxJumps,
+    maxOutlay: maxOutlay,
+    availableSpace: ship.availableSpace,
   );
+
   if (deal == null) {
     await behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader);
     shipInfo(
       ship,
-      'No deals >${creditsString(minimumProfit)} '
-      'profit, disabling trader behavior.',
+      'No profitable deals, disabling trader behavior.',
     );
     return null;
   }
-  shipInfo(ship, 'Found deal: ${describeDeal(deal)}');
 
-  // TODO(eseidel): Save the deal we found so we don't have to recompute it.
+  shipInfo(ship, 'Found deal: ${describeCostedDeal(deal)}');
+  final state = await behaviorManager.getBehavior(ship.symbol);
+  state.deal = deal;
+  await behaviorManager.setBehavior(ship.symbol, state);
 
-  if (deal.sourceSymbol != currentWaypoint.symbol) {
-    // We're not at the source, so navigate there.
-    return beingRouteAndLog(
+  if (deal.deal.sourceSymbol == currentWaypoint.symbol) {
+    // Our deal starts here, so we can buy cargo and go!
+    logDeal(ship, deal.deal);
+    return _purchaseCargoAndGo(
       api,
-      ship,
       waypointCache,
+      priceData,
       behaviorManager,
-      deal.sourceSymbol,
+      ship,
+      deal.deal,
     );
   }
 
-  // Otherwise, our deal starts here, so we can buy cargo and go!
-  logDeal(ship, deal);
-  await purchaseCargoAndLog(
-    api,
-    priceData,
-    ship,
-    deal.tradeSymbol.value,
-    ship.availableSpace,
-  );
-
+  // Otherwise we're not at the source, so first navigate there.
   return beingRouteAndLog(
     api,
     ship,
     waypointCache,
     behaviorManager,
-    deal.sourceSymbol,
+    deal.deal.sourceSymbol,
   );
 }
