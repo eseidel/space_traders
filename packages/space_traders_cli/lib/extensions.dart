@@ -78,6 +78,12 @@ extension CargoUtils on ShipCargo {
   /// Returns the amount of cargo space available on the ship.
   int get availableSpace => capacity - units;
 
+  /// Returns true if the cargo is empty.
+  bool get isEmpty => units == 0;
+
+  /// Returns true if the cargo is not empty.
+  bool get isNotEmpty => !isEmpty;
+
   /// Returns the amount of the given trade good the cargo has.
   int countUnits(String tradeSymbol) {
     final maybeCargo = inventory.firstWhereOrNull(

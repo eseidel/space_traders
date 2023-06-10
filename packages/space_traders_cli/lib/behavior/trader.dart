@@ -350,6 +350,7 @@ int flightTimeBetween(
 /// Purchase cargo for the deal and start towards destination.
 Future<DateTime?> _purchaseCargoAndGo(
   Api api,
+  Agent agent,
   WaypointCache waypointCache,
   PriceData priceData,
   BehaviorManager behaviorManager,
@@ -358,6 +359,9 @@ Future<DateTime?> _purchaseCargoAndGo(
 ) async {
   // This assumes the ship is at the source of the deal.
   assert(deal.sourceSymbol == ship.nav.waypointSymbol, 'Not at source!');
+  await dockIfNeeded(api, ship);
+  await refuelIfNeededAndLog(api, priceData, agent, ship);
+
   await purchaseCargoAndLog(
     api,
     priceData,
@@ -409,6 +413,7 @@ Future<DateTime?> advanceArbitrageTrader(
       // We're at the source, buy and start the route.
       return _purchaseCargoAndGo(
         api,
+        agent,
         waypointCache,
         priceData,
         behaviorManager,
@@ -419,6 +424,8 @@ Future<DateTime?> advanceArbitrageTrader(
 
     // If we're at the destination of the deal, sell.
     if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
+      await dockIfNeeded(api, ship);
+      await recordMarketData(priceData, currentMarket!);
       // We're at the destination, sell and clear the deal.
       await sellCargoAndLog(api, priceData, ship);
       behaviorState.deal = null;
@@ -450,7 +457,9 @@ Future<DateTime?> advanceArbitrageTrader(
     await refuelIfNeededAndLog(api, priceData, agent, ship);
     await recordMarketData(priceData, currentMarket);
     // Sell any cargo we can and update our ship's cargo.
-    ship.cargo = await sellCargoAndLog(api, priceData, ship);
+    if (ship.cargo.isNotEmpty) {
+      ship.cargo = await sellCargoAndLog(api, priceData, ship);
+    }
   }
 
   // Find a new deal!
@@ -489,6 +498,7 @@ Future<DateTime?> advanceArbitrageTrader(
     logDeal(ship, deal.deal);
     return _purchaseCargoAndGo(
       api,
+      agent,
       waypointCache,
       priceData,
       behaviorManager,
