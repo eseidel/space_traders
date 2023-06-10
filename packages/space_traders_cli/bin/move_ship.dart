@@ -5,6 +5,7 @@ import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/systems_cache.dart';
@@ -34,6 +35,9 @@ void main(List<String> args) async {
   final api = defaultApi(fs);
   final systemsCache = await SystemsCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache);
+  final marketCache = MarketCache(waypointCache);
+  final priceData = await PriceData.load(fs);
+  final agent = await getMyAgent(api);
 
   final myShips = await allMyShips(api).toList();
   final ship = await chooseShip(api, waypointCache, myShips);
@@ -66,6 +70,12 @@ void main(List<String> args) async {
 
   final shouldDock = logger.confirm('Wait to dock?', defaultValue: true);
 
+  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  if (currentWaypoint.hasMarketplace && ship.shouldRefuel) {
+    final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
+    await refuelIfNeededAndLog(api, priceData, agent, market!, ship);
+  }
+
   if (destWaypoint.systemSymbol == startingSystem.symbol) {
     await _navigateToLocalWaypointAndDock(
       api,
@@ -80,8 +90,11 @@ void main(List<String> args) async {
 
   // If we aren't at the jump gate, navigate to it.
   if (ship.nav.waypointSymbol != jumpGateWaypoint!.symbol) {
-    final arrival =
-        await navigateToLocalWaypointAndLog(api, ship, jumpGateWaypoint);
+    final arrival = await navigateToLocalWaypointAndLog(
+      api,
+      ship,
+      jumpGateWaypoint,
+    );
     await Future<void>.delayed(durationUntil(arrival));
   }
   final jumpRequest = JumpShipRequest(systemSymbol: destSystem.symbol);
