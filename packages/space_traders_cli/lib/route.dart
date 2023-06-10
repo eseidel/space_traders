@@ -134,8 +134,8 @@ int fuelUsedWithinSystem(
 int flightTimeWithinSystemInSeconds(
   SystemWaypoint a,
   SystemWaypoint b, {
-  required ShipNavFlightMode flightMode,
   required int shipSpeed,
+  ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
   // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
   final distance = distanceWithinSystem(a, b);
