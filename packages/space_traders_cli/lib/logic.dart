@@ -16,6 +16,9 @@ import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
+// Consider having a config file like:
+// https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
+// instead of having this dynamic behavior function.
 // At the top of the file because I change this so often.
 Behavior _behaviorFor(
   BehaviorManager behaviorManager,

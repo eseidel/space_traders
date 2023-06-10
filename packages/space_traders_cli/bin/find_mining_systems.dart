@@ -7,8 +7,11 @@ import 'package:file/local.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -41,6 +44,8 @@ void main(List<String> args) async {
   final api = defaultApi(fs);
   final systemsCache = await SystemsCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache);
+  final marketCache = MarketCache(waypointCache);
+  final priceData = await PriceData.load(fs);
 
   Waypoint start;
   final startArg = results['start'] as String?;
@@ -54,6 +59,8 @@ void main(List<String> args) async {
   } else {
     start = await waypointCache.getAgentHeadquarters();
   }
+
+  const tradeSymbol = 'ICE_WATER';
 
   await for (final (systemSymbol, jumps) in systemSymbolsInJumpRadius(
     waypointCache: waypointCache,
@@ -71,6 +78,20 @@ void main(List<String> args) async {
       }
       if (waypoint.hasMarketplace) {
         hasMarket = true;
+        final market = await marketCache.marketForSymbol(waypoint.symbol);
+        final sellPrice = estimateSellPrice(priceData, market!, tradeSymbol);
+        if (sellPrice != null) {
+          final priceDeviance = stringForPriceDeviance(
+            priceData,
+            tradeSymbol,
+            sellPrice,
+            MarketTransactionTypeEnum.SELL,
+          );
+          final priceString = creditsString(sellPrice);
+          logger.info(
+            '$systemSymbol: $jumps jumps: $sellPrice $priceDeviance of ICE_WATER',
+          );
+        }
       }
       if (waypoint.canBeMined) {
         hasMining = true;
