@@ -98,10 +98,12 @@ class SystemsCache {
         .firstWhereOrNull((w) => w.type == WaypointType.JUMP_GATE);
   }
 
+  /// Return the system with the given [symbol].
   System systemFromSymbol(String symbol) {
     return _systems.firstWhere((s) => s.symbol == symbol);
   }
 
+  /// Return the SystemWaypoint for the given [symbol].
   SystemWaypoint waypointFromSymbol(String symbol) {
     final parsed = parseWaypointString(symbol);
     final system = systemFromSymbol(parsed.system);

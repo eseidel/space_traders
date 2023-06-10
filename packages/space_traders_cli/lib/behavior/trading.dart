@@ -164,7 +164,10 @@ Iterable<Deal> enumeratePossibleDeals(
 /// Describe a [deal] in a human-readable way.
 String describeDeal(Deal deal) {
   final sign = deal.profit > 0 ? '+' : '';
-  final profitString = '$sign${creditsString(deal.profit)}'.padLeft(6);
+  final profitPercent = (deal.profit / deal.purchasePrice) * 100;
+  final profitCreditsString = '$sign${creditsString(deal.profit)}'.padLeft(6);
+  final profitPercentString = '${profitPercent.toStringAsFixed(0)}%';
+  final profitString = '$profitCreditsString ($profitPercentString)';
   final coloredProfitString = deal.profit > 0
       ? lightGreen.wrap(profitString)
       : lightRed.wrap(profitString);

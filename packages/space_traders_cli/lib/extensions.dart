@@ -20,6 +20,7 @@ extension SystemUtils on System {
       waypoints.any((w) => w.type == WaypointType.JUMP_GATE);
 }
 
+/// Extensions onto SystemWaypoint to make it easier to work with.
 extension SystemWaypointUtils on SystemWaypoint {
   /// Returns true if the waypoint is a jump gate.
   bool get isJumpGate => type == WaypointType.JUMP_GATE;

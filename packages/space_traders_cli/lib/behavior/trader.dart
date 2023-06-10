@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/actions.dart';
@@ -48,8 +50,8 @@ Future<Deal?> findBestDealWithinOneJump(
 // used as opportunity cost.
 
 @immutable
-class BuyOpp {
-  const BuyOpp({
+class _BuyOpp {
+  const _BuyOpp({
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
@@ -60,8 +62,8 @@ class BuyOpp {
 }
 
 @immutable
-class SellOpp {
-  const SellOpp({
+class _SellOpp {
+  const _SellOpp({
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
@@ -71,42 +73,50 @@ class SellOpp {
   final int price;
 }
 
+/// Finds deals between markets.
 class DealFinder {
-  DealFinder(PriceData priceData, {int topLimit = 5})
-      : _priceData = priceData,
-        // _systemsCache = systemsCache,
-        topLimit = topLimit;
+  /// Create a new DealFinder.
+  DealFinder(PriceData priceData, {this.topLimit = 5}) : _priceData = priceData;
+  // _systemsCache = systemsCache,
 
   final PriceData _priceData;
   // final SystemsCache _systemsCache;
+  /// How many deals to keep track of per trade symbol.
   final int topLimit;
-  final Map<String, List<BuyOpp>> _buyOpps = {};
-  final Map<String, List<SellOpp>> _sellOpps = {};
+  final Map<String, List<_BuyOpp>> _buyOpps = {};
+  final Map<String, List<_SellOpp>> _sellOpps = {};
 
+  /// Record potential deals from the given market.
   void visitMarket(Market market) {
     for (final tradeSymbol in market.allTradeSymbols) {
       // See if the price data we have for this trade symbol
       // are in the top/bottom we've seen, if so, record them.
-      final buy = BuyOpp(
+      final buy = _BuyOpp(
         marketSymbol: market.symbol,
         tradeSymbol: tradeSymbol.value,
         price: estimatePurchasePrice(_priceData, market, tradeSymbol.value)!,
       );
       final buys = _buyOpps[tradeSymbol.value] ?? [];
-      buys.add(buy);
-      buys.sort((a, b) => a.price.compareTo(b.price));
+      // No clue what it wants me to cascade here?
+      // ignore: cascade_invocations
+      buys
+        ..add(buy)
+        ..sort((a, b) => a.price.compareTo(b.price));
       if (buys.length > topLimit) {
         buys.removeLast();
       }
       _buyOpps[tradeSymbol.value] = buys;
-      final sell = SellOpp(
+      final sell = _SellOpp(
         marketSymbol: market.symbol,
         tradeSymbol: tradeSymbol.value,
         price: estimateSellPrice(_priceData, market, tradeSymbol.value)!,
       );
       final sells = _sellOpps[tradeSymbol.value] ?? [];
-      sells.add(sell);
-      sells.sort((a, b) => a.price.compareTo(b.price));
+      // No clue what it wants me to cascade here?
+      // ignore: cascade_invocations
+      sells
+        ..add(sell)
+        ..sort((a, b) => a.price.compareTo(b.price));
       if (sells.length > topLimit) {
         sells.removeLast();
       }
@@ -114,6 +124,7 @@ class DealFinder {
     }
   }
 
+  /// Returns all deals found.
   List<Deal> findDeals() {
     final deals = <Deal>[];
     // final fuelPrice = _priceData.medianPurchasePrice(TradeSymbol.FUEL.value);
@@ -129,9 +140,6 @@ class DealFinder {
           if (profit <= 0) {
             continue;
           }
-          // final buyWaypoint = _systemsCache.waypointFromSymbol(buy.marketSymbol);
-          // final sellWaypoint = _systemsCache.waypointFromSymbol(sell.marketSymbol);
-          // final fuelUsed = fuelUsedBetween(_systemsCache, buyWaypoint, sellWaypoint);
           deals.add(
             Deal(
               sourceSymbol: buy.marketSymbol,
@@ -146,6 +154,130 @@ class DealFinder {
     }
     return deals;
   }
+}
+
+/// A deal between two markets which considers flight cost and time.
+class CostedDeal {
+  /// Create a new CostedDeal.
+  CostedDeal({
+    required this.deal,
+    required this.fuelCost,
+    required this.tradeVolume,
+    required this.time,
+  });
+
+  /// The deal being considered.
+  Deal deal;
+
+  /// The units of fuel to travel between the two markets.
+  int fuelCost;
+
+  /// The number of units of cargo to trade.
+  int tradeVolume;
+
+  /// The time in seconds to travel between the two markets.
+  int time;
+
+  /// The total upfront cost of the deal, including fuel.
+  int get totalOutlay => deal.purchasePrice * tradeVolume + fuelCost;
+
+  /// The total profit of the deal, including fuel.
+  int get profit => deal.profit * tradeVolume - fuelCost;
+
+  /// The profit per second of the deal.
+  int get profitPerSecond => profit ~/ time;
+}
+
+/// Returns a string describing the given CostedDeal
+String describeCostedDeal(CostedDeal costedDeal) {
+  final deal = costedDeal.deal;
+  final sign = deal.profit > 0 ? '+' : '';
+  final profitPercent = (deal.profit / deal.purchasePrice) * 100;
+  final profitCreditsString = '$sign${creditsString(deal.profit)}'.padLeft(8);
+  final profitPercentString =
+      '(${profitPercent.toStringAsFixed(0)}%)'.padLeft(5);
+  final profitString = '$profitCreditsString $profitPercentString';
+  final coloredProfitString = deal.profit > 0
+      ? lightGreen.wrap(profitString)
+      : lightRed.wrap(profitString);
+  final timeString = '${costedDeal.time}s ${costedDeal.profitPerSecond}c/s';
+  return '${deal.tradeSymbol.value.padRight(25)} '
+      ' ${deal.sourceSymbol} ${creditsString(deal.purchasePrice).padLeft(8)} '
+      '-> '
+      '${deal.destinationSymbol} ${creditsString(deal.sellPrice).padLeft(8)} '
+      '$coloredProfitString $timeString ${costedDeal.totalOutlay}c';
+}
+
+/// Returns a CostedDeal for a given deal.
+CostedDeal costOutDeal(SystemsCache systemsCache, Deal deal, int cargoSize) {
+  final source = systemsCache.waypointFromSymbol(deal.sourceSymbol);
+  final destination = systemsCache.waypointFromSymbol(deal.destinationSymbol);
+  return CostedDeal(
+    deal: deal,
+    fuelCost: fuelUsedBetween(
+      systemsCache,
+      source,
+      destination,
+    ),
+    time: flightTimeBetween(
+      systemsCache,
+      source,
+      destination,
+      flightMode: ShipNavFlightMode.CRUISE,
+      shipSpeed: 30, // Command ship speed.
+    ),
+    tradeVolume: cargoSize,
+  );
+}
+
+/// Returns the best deal for the given ship within [maxJumps] of it's
+/// current location.
+Future<CostedDeal?> findDealFor(
+  PriceData priceData,
+  SystemsCache systemsCache,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  Ship ship, {
+  required int maxJumps,
+  required int maxOutlay,
+}) async {
+  final start = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final markets = await systemSymbolsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: start.systemSymbol,
+    maxJumps: maxJumps,
+  )
+      .asyncExpand(
+        (record) => marketCache.marketsInSystem(record.$1),
+      )
+      .toList();
+  final finder = DealFinder(priceData);
+  for (final market in markets) {
+    finder.visitMarket(market);
+  }
+  final deals = finder.findDeals();
+
+  final costedDeals =
+      deals.map((d) => costOutDeal(systemsCache, d, 60)).toList();
+
+  if (costedDeals.isEmpty) {
+    logger.info('No deals found.');
+    return null;
+  }
+  final affordable =
+      costedDeals.where((d) => d.totalOutlay < maxOutlay).toList();
+  if (affordable.isEmpty) {
+    logger.info('No deals found under $maxOutlay credits.');
+    return null;
+  }
+  final sortedDeals = affordable
+      .sorted((a, b) => a.profitPerSecond.compareTo(b.profitPerSecond));
+
+  logger.detail('Considering deals:');
+  for (final deal in sortedDeals) {
+    logger.detail(describeCostedDeal(deal));
+  }
+  return sortedDeals.last;
 }
 
 /// Returns the fuel cost to travel between two waypoints.
@@ -177,6 +309,53 @@ int fuelUsedBetween(
   }
   return fuelUsedWithinSystem(a, aJumpGate) +
       fuelUsedWithinSystem(bJumpGate, b);
+}
+
+/// Returns flight time in seconds between two waypoints.
+int flightTimeBetween(
+  SystemsCache systemsCache,
+  SystemWaypoint a,
+  SystemWaypoint b, {
+  required ShipNavFlightMode flightMode,
+  required int shipSpeed,
+}) {
+  if (a.systemSymbol == b.systemSymbol) {
+    return flightTimeWithinSystemInSeconds(
+      a,
+      b,
+      flightMode: flightMode,
+      shipSpeed: shipSpeed,
+    );
+  }
+  // a -> jump gate
+  // jump N times
+  // jump gate -> b
+  final aJumpGate = systemsCache.jumpGateWaypointForSystem(a.systemSymbol);
+  if (aJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${a.systemSymbol}',
+    );
+  }
+  // Ignoring if there is actually a path between the jump gates.
+  final bJumpGate = systemsCache.jumpGateWaypointForSystem(b.systemSymbol);
+  if (bJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${b.systemSymbol}',
+    );
+  }
+  // Assuming a and b are connected systems!
+  return flightTimeWithinSystemInSeconds(
+        a,
+        aJumpGate,
+        flightMode: flightMode,
+        shipSpeed: shipSpeed,
+      ) +
+      flightTimeWithinSystemInSeconds(
+        bJumpGate,
+        b,
+        flightMode: flightMode,
+        shipSpeed: shipSpeed,
+      );
 }
 
 /// Returns the best deal for the given ship across the given set of markets.

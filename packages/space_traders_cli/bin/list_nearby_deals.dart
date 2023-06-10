@@ -1,13 +1,10 @@
 import 'package:args/args.dart';
-import 'package:collection/collection.dart';
 import 'package:file/local.dart';
-import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
-import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -41,40 +38,24 @@ void main(List<String> args) async {
   final systemsCache = await SystemsCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache);
 
-  Waypoint start;
-  final startArg = results['start'] as String?;
-  if (startArg != null) {
-    final maybeStart = await waypointCache.waypointOrNull(startArg);
-    if (maybeStart == null) {
-      logger.err('--start was invalid, unknown system: ${results['start']}');
-      return;
-    }
-    start = maybeStart;
-  } else {
-    start = await waypointCache.getAgentHeadquarters();
-  }
+  final ships = allMyShips(api);
+  final commandShip = await ships.first;
 
   final marketCache = MarketCache(waypointCache);
   final priceData = await PriceData.load(fs);
-  final markets = await systemSymbolsInJumpRadius(
-    waypointCache: waypointCache,
-    startSystem: start.systemSymbol,
+  final maybeDeal = await findDealFor(
+    priceData,
+    systemsCache,
+    waypointCache,
+    marketCache,
+    commandShip,
     maxJumps: maxJumps,
-  )
-      .asyncExpand(
-        (record) => marketCache.marketsInSystem(record.$1),
-      )
-      .toList();
-  final finder = DealFinder(priceData);
-  for (final market in markets) {
-    finder.visitMarket(market);
-  }
-  final deals = finder.findDeals();
+    maxOutlay: 10000,
+  );
 
-  final sortedDeals = deals.sorted((a, b) => a.profit.compareTo(b.profit));
-  if (sortedDeals.isEmpty) {
-    logger.info('No deals found.');
+  if (maybeDeal == null) {
+    logger.info('No deal found.');
     return;
   }
-  logDeals(sortedDeals);
+  logger.info(describeCostedDeal(maybeDeal));
 }

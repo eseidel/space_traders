@@ -89,7 +89,7 @@ void main(List<String> args) async {
           );
           final priceString = creditsString(sellPrice);
           logger.info(
-            '$systemSymbol: $jumps jumps: $sellPrice $priceDeviance of ICE_WATER',
+            '${waypoint.symbol}: $priceString $priceDeviance of $tradeSymbol',
           );
         }
       }
