@@ -99,4 +99,29 @@ void main() {
     expect(priceData.sellPriceAtPercentile('a', 50), 150);
     expect(priceData.sellPriceAtPercentile('a', 25), 110);
   });
+  test('percentileForPurchasePrice', () {
+    final fs = MemoryFileSystem();
+    final priceData = PriceData(
+      [
+        makePrice(waypointSymbol: 'a', symbol: 'a', purchasePrice: 100),
+        makePrice(waypointSymbol: 'b', symbol: 'a', purchasePrice: 110),
+        makePrice(waypointSymbol: 'c', symbol: 'a', purchasePrice: 150),
+        makePrice(waypointSymbol: 'd', symbol: 'a', purchasePrice: 200),
+        makePrice(waypointSymbol: 'e', symbol: 'a', purchasePrice: 300),
+      ],
+      fs: fs,
+    );
+    expect(priceData.percentileForPurchasePrice('a', 100), 20);
+    expect(priceData.percentileForPurchasePrice('a', 110), 40);
+    expect(priceData.percentileForPurchasePrice('a', 150), 60);
+    expect(priceData.percentileForPurchasePrice('a', 160), 60);
+    expect(priceData.percentileForPurchasePrice('a', 200), 80);
+    expect(priceData.percentileForPurchasePrice('a', 300), 100);
+    expect(priceData.percentileForPurchasePrice('a', 400), 100);
+
+    expect(priceData.purchasePriceAtPercentile('a', 100), 300);
+    expect(priceData.purchasePriceAtPercentile('a', 0), 100);
+    expect(priceData.purchasePriceAtPercentile('a', 50), 150);
+    expect(priceData.purchasePriceAtPercentile('a', 25), 110);
+  });
 }

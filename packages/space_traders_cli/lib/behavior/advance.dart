@@ -112,6 +112,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.agent,
         ctx.ship,
         ctx.waypointCache,
+        ctx.marketCache,
         ctx.behaviorManager,
         ctx.surveyData,
       );

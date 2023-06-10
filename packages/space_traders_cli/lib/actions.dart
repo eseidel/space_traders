@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/exceptions.dart';
@@ -209,11 +210,49 @@ Future<void> refuelIfNeededAndLog(
   Api api,
   PriceData priceData,
   Agent agent,
+  Market market,
   Ship ship,
 ) async {
   if (!ship.shouldRefuel) {
     return;
   }
+  const fuelSymbol = 'FUEL';
+  // Ensure the fuel here is not wildly overpriced (as is sometimes the case).
+  final fuelGood = market.tradeGoods.firstWhereOrNull(
+    (g) => g.symbol == fuelSymbol,
+  );
+  if (fuelGood == null) {
+    shipWarn(ship, 'Market does not sell fuel, not refueling.');
+    return;
+  }
+  final fuelPrice = fuelGood.purchasePrice;
+  final percentile =
+      priceData.percentileForPurchasePrice(fuelSymbol, fuelPrice);
+  if (percentile != null && percentile > 75) {
+    final deviation = stringForPriceDeviance(
+      priceData,
+      fuelSymbol,
+      fuelPrice,
+      MarketTransactionTypeEnum.PURCHASE,
+    );
+    final fuelString = creditsString(fuelPrice);
+
+    final fuelPercent = ship.fuel.current / ship.fuel.capacity;
+    // The really bonkers prices are 100th percentile.
+    if (percentile > 99 || fuelPercent > 0.5) {
+      shipWarn(
+        ship,
+        'Fuel is too expensive (${percentile}th) '
+        '$fuelString ($deviation), not refueling.',
+      );
+      return;
+    }
+    shipWarn(
+        ship,
+        'Fuel is expensive (${percentile}th) '
+        '$fuelString ($deviation), but also critically low, refueling anyway');
+  }
+
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   try {
     final responseWrapper = await api.fleet.refuelShip(ship.symbol);
@@ -245,7 +284,8 @@ Future<void> refuelIfNeededAndLog(
 Future<void> dockIfNeeded(Api api, Ship ship) async {
   if (ship.isOrbiting) {
     shipInfo(ship, '🛬 at ${ship.nav.waypointSymbol}');
-    await api.fleet.dockShip(ship.symbol);
+    final response = await api.fleet.dockShip(ship.symbol);
+    ship.nav = response!.data.nav;
   }
 }
 
@@ -254,7 +294,8 @@ Future<void> undockIfNeeded(Api api, Ship ship) async {
   if (ship.isDocked) {
     // Extra space after emoji is needed for windows powershell.
     shipInfo(ship, '🛰️  at ${ship.nav.waypointSymbol}');
-    await api.fleet.orbitShip(ship.symbol);
+    final response = await api.fleet.orbitShip(ship.symbol);
+    ship.nav = response!.data.nav;
   }
 }
 

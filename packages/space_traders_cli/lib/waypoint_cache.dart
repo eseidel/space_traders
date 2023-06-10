@@ -219,8 +219,11 @@ class MarketCache {
   }
 
   /// Fetch the waypoint with the given symbol.
-  Future<Market?> marketForSymbol(String marketSymbol) async {
-    if (_marketsBySymbol.containsKey(marketSymbol)) {
+  Future<Market?> marketForSymbol(
+    String marketSymbol, {
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh && _marketsBySymbol.containsKey(marketSymbol)) {
       return _marketsBySymbol[marketSymbol];
     }
     final waypoint = await _waypointCache.waypoint(marketSymbol);

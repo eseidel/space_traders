@@ -244,9 +244,17 @@ Future<DateTime?> advanceContractTrader(
       contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
   final breakEvenUnitPrice = totalPayment ~/ neededGood.unitsRequired;
 
-  await dockIfNeeded(api, ship);
-  await refuelIfNeededAndLog(api, priceData, agent, ship);
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final currentMarket = await marketCache
+      .marketForSymbol(currentWaypoint.symbol, forceRefresh: true);
+
+  // If we're currently at a market, record the prices and refuel.
+  if (currentMarket != null) {
+    await dockIfNeeded(api, ship);
+    await refuelIfNeededAndLog(api, priceData, agent, currentMarket, ship);
+    await recordMarketData(priceData, currentMarket);
+  }
+
   // If we're at our contract destination.
   if (currentWaypoint.symbol == neededGood.destinationSymbol) {
     final maybeResponse =
@@ -300,9 +308,8 @@ Future<DateTime?> advanceContractTrader(
       where: (s) => s != neededGood.tradeSymbol,
     );
 
-    final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
-    await recordMarketData(priceData, market!);
-    final maybeGood = market.tradeGoods
+    await recordMarketData(priceData, currentMarket!);
+    final maybeGood = currentMarket.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
 
     // If this market has our desired goods:

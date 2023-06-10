@@ -55,7 +55,10 @@ Future<DateTime?> advanceExporer(
         !priceData.hasRecentMarketData(
           currentWaypoint.symbol,
         )) {
-      final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
+      final market = await marketCache.marketForSymbol(
+        currentWaypoint.symbol,
+        forceRefresh: true,
+      );
       await recordMarketDataAndLog(priceData, market!, ship);
       return null;
     }

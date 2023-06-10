@@ -383,7 +383,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   // This assumes the ship is at the source of the deal.
   assert(deal.sourceSymbol == ship.nav.waypointSymbol, 'Not at source!');
   await dockIfNeeded(api, ship);
-  await refuelIfNeededAndLog(api, priceData, agent, ship);
+  await refuelIfNeededAndLog(api, priceData, agent, market, ship);
 
   // Sell any cargo we can and update our ship's cargo.
   if (ship.cargo.isNotEmpty) {
@@ -473,13 +473,13 @@ Future<DateTime?> advanceArbitrageTrader(
   }
 
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
-  final currentMarket =
-      await marketCache.marketForSymbol(currentWaypoint.symbol);
+  final currentMarket = await marketCache
+      .marketForSymbol(currentWaypoint.symbol, forceRefresh: true);
 
   // If we're currently at a market, record the prices and refuel.
   if (currentMarket != null) {
     await dockIfNeeded(api, ship);
-    await refuelIfNeededAndLog(api, priceData, agent, ship);
+    await refuelIfNeededAndLog(api, priceData, agent, currentMarket, ship);
     await recordMarketData(priceData, currentMarket);
   }
 
@@ -525,7 +525,7 @@ Future<DateTime?> advanceArbitrageTrader(
   // We don't have a current deal, so get a new one!
 
   // Find a new deal!
-  const maxJumps = 2;
+  const maxJumps = 1;
   final maxOutlay = agent.credits;
 
   // Consider all deals starting at any market within our consideration range.

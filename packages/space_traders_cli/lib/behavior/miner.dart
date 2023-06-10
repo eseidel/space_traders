@@ -189,6 +189,7 @@ Future<DateTime?> advanceMiner(
   Agent agent,
   Ship ship,
   WaypointCache waypointCache,
+  MarketCache marketCache,
   BehaviorManager behaviorManager,
   SurveyData surveyData,
 ) async {
@@ -213,12 +214,13 @@ Future<DateTime?> advanceMiner(
   if (shouldSell) {
     // Sell cargo and refuel if needed.
     if (currentWaypoint.hasMarketplace) {
-      // This should probably record market data?
-      // final market = await marketCache.marketForSymbol(
-      //    currentWaypoint.symbol);
-      // await recordMarketDataAndLog(priceData, market, ship)
+      final market = await marketCache.marketForSymbol(
+        currentWaypoint.symbol,
+      );
       await dockIfNeeded(api, ship);
-      await refuelIfNeededAndLog(api, priceData, agent, ship);
+      await recordMarketDataAndLog(priceData, market!, ship);
+      await refuelIfNeededAndLog(api, priceData, agent, market, ship);
+
       // TODO(eseidel): This can fail to sell and get stuck in a loop.
       await sellCargoAndLog(api, priceData, ship);
       // Reset our state now that we've done the behavior once.
@@ -257,11 +259,6 @@ Future<DateTime?> advanceMiner(
         await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
     final maybeAsteroidField =
         systemWaypoints.firstWhereOrNull((w) => w.canBeMined);
-
-    if (currentWaypoint.hasMarketplace && ship.shouldRefuel) {
-      await dockIfNeeded(api, ship);
-      await refuelIfNeededAndLog(api, priceData, agent, ship);
-    }
 
     if (maybeAsteroidField != null) {
       return navigateToLocalWaypointAndLog(api, ship, maybeAsteroidField);
