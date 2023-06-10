@@ -4,6 +4,7 @@ import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/exceptions.dart';
 import 'package:space_traders_cli/extensions.dart';
@@ -182,6 +183,156 @@ List<ValuedSurvey> evaluateSurveys(
       .toList();
 }
 
+/// Want to find systems which have both a mineable resource and a marketplace.
+/// Want to sort by distance between the two.
+/// As well as relative prices for the market.
+/// Might also want to consider what resources the mine produces and if the
+/// market buys them.
+
+class _MineAndSell {
+  _MineAndSell({
+    required this.mineSymbol,
+    required this.marketSymbol,
+    required this.marketPercentile,
+    required this.distanceBetweenMineAndMarket,
+  });
+
+  final String mineSymbol;
+  final String marketSymbol;
+  final int marketPercentile;
+  final int distanceBetweenMineAndMarket;
+
+  int get score {
+    final creditsAboveAverage = marketPercentile - 50;
+    final distancePenalty = distanceBetweenMineAndMarket;
+    // The primary thing we care about is market percentile.
+    // Distances other than 0 have a fuel cost associated with them.
+    // Which would need to be made up by the market percentile?
+    // Maybe this is just estimated profit per second?
+    // Which then will be dominated by the presence of certain resources.
+    return creditsAboveAverage - distancePenalty;
+  }
+}
+
+class _SystemEval {
+  _SystemEval({
+    required this.systemSymbol,
+    required this.jumps,
+    required this.mineAndSells,
+  });
+
+  final String systemSymbol;
+  final int jumps;
+  final List<_MineAndSell> mineAndSells;
+
+  int? get score {
+    if (mineAndSells.isEmpty) {
+      return null;
+    }
+    // This assumes these are sorted.
+    return mineAndSells.last.score;
+  }
+}
+
+int? _marketPercentile(PriceData priceData, Market market) {
+  const tradeSymbol = 'ICE_WATER';
+  final sellPrice = estimateSellPrice(priceData, market, tradeSymbol);
+  if (sellPrice == null) {
+    return null;
+  }
+  return priceData.percentileForSellPrice(
+    tradeSymbol,
+    sellPrice,
+  );
+}
+
+Future<_SystemEval> _evaluateSystem(
+  Api api,
+  PriceData priceData,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  String systemSymbol,
+  int jumps,
+) async {
+  final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
+  final marketWaypoints = waypoints.where((w) => w.hasMarketplace);
+  final markets = await marketCache.marketsInSystem(systemSymbol).toList();
+  final marketToPercentile = {
+    for (var m in markets) m.symbol: _marketPercentile(priceData, m),
+  };
+  final mines = waypoints.where((w) => w.canBeMined);
+  final mineAndSells = <_MineAndSell>[];
+  for (final mine in mines) {
+    for (final market in marketWaypoints) {
+      final marketPercentile = marketToPercentile[market.symbol];
+      if (marketPercentile == null) {
+        continue;
+      }
+      final distance = distanceBetweenWaypointsInSystem(
+        mine,
+        market,
+      );
+      mineAndSells.add(
+        _MineAndSell(
+          mineSymbol: mine.symbol,
+          marketSymbol: market.symbol,
+          marketPercentile: marketPercentile,
+          distanceBetweenMineAndMarket: distance,
+        ),
+      );
+    }
+  }
+  mineAndSells.sortBy<num>((m) => m.score);
+  return _SystemEval(
+    systemSymbol: systemSymbol,
+    jumps: jumps,
+    mineAndSells: mineAndSells,
+  );
+}
+
+String _describeSystemEval(_SystemEval eval) {
+  return '${eval.systemSymbol}: ${eval.jumps} jumps ${eval.score}';
+}
+
+/// Find nearest mine with good mining.
+Future<String?> nearestMineWithGoodMining(
+  Api api,
+  PriceData priceData,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  Waypoint start,
+  int maxJumps,
+) async {
+  final evals = <_SystemEval>[];
+  await for (final (systemSymbol, jumps) in systemSymbolsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: start.systemSymbol,
+    maxJumps: maxJumps,
+  )) {
+    final eval = await _evaluateSystem(
+      api,
+      priceData,
+      waypointCache,
+      marketCache,
+      systemSymbol,
+      jumps,
+    );
+    logger.info(
+      _describeSystemEval(eval),
+    );
+    // Want to know if the market buys what the mine produces?
+    if (eval.score != null) {
+      evals.add(eval);
+    }
+  }
+  final sorted = evals.sortedBy<num>((e) => e.score!);
+  final best = sorted.lastOrNull;
+  if (best == null) {
+    return null;
+  }
+  return best.mineAndSells.last.mineSymbol;
+}
+
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
@@ -269,16 +420,34 @@ Future<DateTime?> advanceMiner(
     shipWarn(
       ship,
       'No minable waypoint in ${ship.nav.systemSymbol}, '
-      'going home ${agent.headquarters}.',
+      'finding nearby system with best mining.',
     );
-    // If we can't find an asteroid field navigate back to the home system.
-    // There is always one there.
+    const maxJumps = 10;
+    final mine = await nearestMineWithGoodMining(
+      api,
+      priceData,
+      waypointCache,
+      marketCache,
+      currentWaypoint,
+      maxJumps,
+    );
+    if (mine == null) {
+      shipWarn(
+        ship,
+        'No good mining system found in '
+        '$maxJumps radius of ${ship.nav.systemSymbol}',
+      );
+      await behaviorManager.disableBehavior(ship, Behavior.miner);
+      return null;
+    }
+
+    // Otherwise navigate to our new mine.
     return beingRouteAndLog(
       api,
       ship,
       waypointCache,
       behaviorManager,
-      agent.headquarters,
+      mine,
     );
   }
 
