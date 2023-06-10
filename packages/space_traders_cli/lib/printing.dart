@@ -102,12 +102,12 @@ String stringForPriceDeviance(
       ? data.medianSellPrice(tradeSymbol)
       : data.medianPurchasePrice(tradeSymbol);
   if (median == null) {
-    return '🤷';
+    return '🤷'.padLeft(8);
   }
   final diff = price - median;
   if (diff == 0) {
     // Extra space is needed for powershell. :(
-    return '⚖️ ';
+    return '⚖️ '.padLeft(8);
   }
   final signString = diff < 0 ? '' : '+';
   final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(3);

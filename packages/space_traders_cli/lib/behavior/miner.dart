@@ -33,7 +33,7 @@ Future<SurveySet?> createSurveySetIfPossible(
     surveys: survey.surveys,
   );
   await saveSurveySet(db, surveySet);
-  shipInfo(ship, 'Surveyed ${ship.nav.waypointSymbol}');
+  shipInfo(ship, '🔭 ${ship.nav.waypointSymbol}');
   return surveySet;
 }
 
