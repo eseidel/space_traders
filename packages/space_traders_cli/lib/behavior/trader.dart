@@ -519,9 +519,7 @@ Future<DateTime?> advanceArbitrageTrader(
     if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
       // We're at the destination, sell and clear the deal.
       await sellCargoAndLog(api, priceData, ship);
-
-      behaviorState.deal = null;
-      await behaviorManager.setBehavior(ship.symbol, behaviorState);
+      await behaviorManager.completeBehavior(ship.symbol);
       return null;
     }
 
@@ -535,7 +533,7 @@ Future<DateTime?> advanceArbitrageTrader(
     );
   }
 
-  // We don't have a current deal, so get a new one!
+  // We don't have a current deal, so get a new one!A
 
   // Find a new deal!
   const maxJumps = 1;

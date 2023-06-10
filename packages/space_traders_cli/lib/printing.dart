@@ -106,7 +106,8 @@ String stringForPriceDeviance(
   }
   final diff = price - median;
   if (diff == 0) {
-    return '⚖️';
+    // Extra space is needed for powershell. :(
+    return '⚖️ ';
   }
   final signString = diff < 0 ? '' : '+';
   final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(3);

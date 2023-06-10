@@ -98,6 +98,8 @@ Logic:
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Fix arbitrage trader to be able to buy more than 10 units of low volume goods.
 * Fix miners to know how to travel to nearby markets to sell.
+* Build a docker container and run the app in the cloud.
+* Add a structured logger and log transactions.
 
 UI:
 * Add a Flutter UI.
