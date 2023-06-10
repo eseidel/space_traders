@@ -7,7 +7,11 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 
-/// purchase a ship of type [shipType] at [shipyardSymbol]
+// Importantly, these actions *should* modify the state objects passed in
+// e.g. if it docks the ship, it should update the ship's nav object.
+// They don't currently update agent (credits), but probably should too.
+
+/// Purchase a ship of type [shipType] at [shipyardSymbol]
 Future<PurchaseShip201ResponseData> purchaseShip(
   Api api,
   ShipType shipType,
@@ -22,16 +26,17 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   return purchaseResponse!.data;
 }
 
-/// Set the [flightMode] of [shipSymbol]
+/// Set the [flightMode] of [ship]
 Future<ShipNav> setShipFlightMode(
   Api api,
-  String shipSymbol,
+  Ship ship,
   ShipNavFlightMode flightMode,
 ) async {
   final request = PatchShipNavRequest(flightMode: flightMode);
   final response =
-      await api.fleet.patchShipNav(shipSymbol, patchShipNavRequest: request);
-  return response!.data;
+      await api.fleet.patchShipNav(ship.symbol, patchShipNavRequest: request);
+  ship.nav = response!.data;
+  return response.data;
 }
 
 /// navigate [ship] to [waypointSymbol]
@@ -44,14 +49,16 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
     final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
     final result =
         await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
-    return result!.data;
+    ship.nav = result!.data.nav;
+    // ignore: cascade_invocations
+    ship.fuel = result.data.fuel;
+    return result.data;
   } on ApiException catch (e) {
     if (!isInfuficientFuelException(e)) {
       rethrow;
     }
     shipWarn(ship, 'Insufficient fuel, drifting to $waypointSymbol');
-    ship.nav =
-        await setShipFlightMode(api, ship.symbol, ShipNavFlightMode.DRIFT);
+    await setShipFlightMode(api, ship, ShipNavFlightMode.DRIFT);
     final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
     final result =
         await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
@@ -73,7 +80,8 @@ Future<ExtractResources201ResponseData> extractResources(
   }
   final response = await api.fleet
       .extractResources(ship.symbol, extractResourcesRequest: request);
-  return response!.data;
+  ship.cargo = response!.data.cargo;
+  return response.data;
 }
 
 /// Deliver [units] of [tradeSymbol] to [contract]
@@ -91,7 +99,9 @@ Future<DeliverContract200ResponseData> deliverContract(
   );
   final response = await api.contracts
       .deliverContract(contract.id, deliverContractRequest: request);
-  return response!.data;
+  // Does not update the contract.
+  ship.cargo = response!.data.cargo;
+  return response.data;
 }
 
 // Future<SellCargo201ResponseData> sellItem(
@@ -141,7 +151,9 @@ Stream<SellCargo201ResponseData> sellCargo(
     );
     final sellResponse =
         await api.fleet.sellCargo(ship.symbol, sellCargoRequest: sellRequest);
-    yield sellResponse!.data;
+    // Does not update agent.
+    ship.cargo = sellResponse!.data.cargo;
+    yield sellResponse.data;
   }
 }
 
@@ -192,6 +204,7 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = response.data.agent;
     logTransaction(ship, priceData, agent, transaction);
+    ship.cargo = response.data.cargo;
     return response.data;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
@@ -226,9 +239,9 @@ Future<void> refuelIfNeededAndLog(
     return;
   }
   final fuelPrice = fuelGood.purchasePrice;
-  final percentile =
-      priceData.percentileForPurchasePrice(fuelSymbol, fuelPrice);
-  if (percentile != null && percentile > 75) {
+  final median = priceData.medianPurchasePrice(fuelSymbol);
+  final markup = median != null ? fuelPrice / median : null;
+  if (markup != null && markup > 2) {
     final deviation = stringForPriceDeviance(
       priceData,
       fuelSymbol,
@@ -244,18 +257,18 @@ Future<void> refuelIfNeededAndLog(
           'Fuel low: ${ship.fuel.current} / '
           '${ship.fuel.capacity}}');
     }
-    // The really bonkers prices are 100th percentile.
-    if (percentile > 99 || fuelPercent > 0.5) {
+    // The really bonkers prices are 100x median.
+    if (markup > 10 || fuelPercent > 0.5) {
       shipWarn(
         ship,
-        'Fuel is too expensive (${percentile}th) '
+        'Fuel is at $markup times the median price '
         '$fuelString ($deviation), not refueling.',
       );
       return;
     }
     shipWarn(
         ship,
-        'Fuel is expensive (${percentile}th) '
+        'Fuel is at $markup times the median price '
         '$fuelString ($deviation), but also critically low, refueling anyway');
   }
 
@@ -263,6 +276,8 @@ Future<void> refuelIfNeededAndLog(
   try {
     final responseWrapper = await api.fleet.refuelShip(ship.symbol);
     final response = responseWrapper!.data;
+    // Does not update agent.
+    ship.fuel = response.fuel;
     logTransaction(
       ship,
       priceData,
@@ -273,7 +288,7 @@ Future<void> refuelIfNeededAndLog(
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
       shipInfo(ship, 'Resetting flight mode to cruise');
-      await setShipFlightMode(api, ship.symbol, ShipNavFlightMode.CRUISE);
+      ship.nav = await setShipFlightMode(api, ship, ShipNavFlightMode.CRUISE);
     }
   } on ApiException catch (e) {
     // Instead of handling this exception, we could check that the market
@@ -351,8 +366,9 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol);
   final response =
       await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
+  ship.nav = response!.data.nav!;
   shipInfo(ship, 'Used Jump Gate to $systemSymbol');
-  return response!.data;
+  return response.data;
 }
 
 /// Negotiate a contract for [ship] and log.

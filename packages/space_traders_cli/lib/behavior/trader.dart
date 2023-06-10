@@ -402,6 +402,13 @@ Future<DateTime?> _purchaseCargoAndGo(
       'No good ${deal.tradeSymbol.value} in ${market.symbol}',
     );
   }
+
+  // We need to figure out what the maximum price is where the deal is still
+  // good. (similar to contract trader).  If the market is above that
+  // we just give up on this deal and try again.
+  // It also allows us repeatedly buy smaller batches of cargo until our
+  // hold is full or the price rises above profitability.
+
   final good = maybeGood;
   final tradeVolume = good.tradeVolume;
   final unitsToPurchase = min(tradeVolume, ship.availableSpace);

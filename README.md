@@ -98,6 +98,8 @@ Logic:
 * Carefully choose which survey to use against historical data.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
+* Fix arbitrage trader to be able to buy more than 10 units of low volume goods.
+* Fix miners to know how to travel to nearby markets to sell.
 
 UI:
 * Add a Flutter UI.

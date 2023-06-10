@@ -405,7 +405,8 @@ class PriceData {
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // for (final price in pricesForSymbolSorted) {
     //   logger.info(
-    //     '  ${price.waypointSymbol} ${price.purchasePrice} ${price.sellPrice}',
+    //     '  ${price.waypointSymbol} '
+    //     '${price.purchasePrice} ${price.sellPrice}',
     //   );
     // }
 
