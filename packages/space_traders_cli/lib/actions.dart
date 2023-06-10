@@ -238,6 +238,12 @@ Future<void> refuelIfNeededAndLog(
     final fuelString = creditsString(fuelPrice);
 
     final fuelPercent = ship.fuel.current / ship.fuel.capacity;
+    if (fuelPercent < 0.5) {
+      shipWarn(
+          ship,
+          'Fuel low: ${ship.fuel.current} / '
+          '${ship.fuel.capacity}}');
+    }
     // The really bonkers prices are 100th percentile.
     if (percentile > 99 || fuelPercent > 0.5) {
       shipWarn(

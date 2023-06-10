@@ -101,6 +101,12 @@ class Price {
   final DateTime timestamp;
 }
 
+/// Describe a price record.
+String describePrice(Price price) {
+  return '${price.waypointSymbol} ${price.symbol} '
+      '${price.purchasePrice} ${price.sellPrice}';
+}
+
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
 class PriceData {
@@ -216,13 +222,26 @@ class PriceData {
     // Probably this should add them to a separate buffer, which is then
     // compacted into the main list at some specific point.
     for (final newPrice in newPrices) {
+      // logger.detail('Recording price: ${describePrice(newPrice)}');
       // This doesn't account for duplicates.
       final index = _prices.indexWhere(
         (element) =>
             element.waypointSymbol == newPrice.waypointSymbol &&
             element.symbol == newPrice.symbol,
       );
+
       if (index >= 0) {
+        // This date logic is necessary to make sure we don't replace
+        // more recent local prices with older server data.
+        final existingPrice = _prices[index];
+        if (DateTime.now().isBefore(newPrice.timestamp)) {
+          logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
+          continue;
+        }
+        if (newPrice.timestamp.isBefore(existingPrice.timestamp)) {
+          continue;
+        }
+        // If the new price is newer than the existing price, replace it.
         _prices[index] = newPrice;
       } else {
         _prices.add(newPrice);
@@ -386,8 +405,7 @@ class PriceData {
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // for (final price in pricesForSymbolSorted) {
     //   logger.info(
-    //     '{${price.waypointSymbol}} '
-    //     '${price.purchasePrice} ${price.sellPrice}',
+    //     '  ${price.waypointSymbol} ${price.purchasePrice} ${price.sellPrice}',
     //   );
     // }
 
