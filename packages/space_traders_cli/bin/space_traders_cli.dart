@@ -9,6 +9,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
+import 'package:space_traders_cli/transactions.dart';
 
 Future<void> main(List<String> args) async {
   final parser = ArgParser()
@@ -43,8 +44,10 @@ Future<void> main(List<String> args) async {
 
   final systemsCache = await SystemsCache.load(fs);
 
+  final transactions = await TransactionLog.load(fs);
+
   final status = await api.defaultApi.getStatus();
   printStatus(status!);
 
-  await logic(api, db, systemsCache, priceData, surveyData);
+  await logic(api, db, systemsCache, priceData, surveyData, transactions);
 }

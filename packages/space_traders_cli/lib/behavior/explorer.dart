@@ -8,7 +8,6 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
@@ -49,22 +48,21 @@ Future<DateTime?> advanceExporer(
   if (_isMissingChartOrRecentMarketData(priceData, currentWaypoint)) {
     if (currentWaypoint.chart == null) {
       await chartWaypointAndLog(api, ship);
-      return null;
     }
-    if (currentWaypoint.hasMarketplace &&
-        !priceData.hasRecentMarketData(
-          currentWaypoint.symbol,
-        )) {
+    if (currentWaypoint.hasMarketplace) {
       final market = await marketCache.marketForSymbol(
         currentWaypoint.symbol,
         forceRefresh: true,
       );
+      if (ship.usesFuel) {
+        await refuelIfNeededAndLog(api, priceData, agent, market!, ship);
+      }
       await recordMarketDataAndLog(priceData, market!, ship);
-      return null;
     }
-    // Explore behavior never changes, but it's still the corect thing to
+    // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
     await behaviorManager.completeBehavior(ship.symbol);
+    return null;
   }
 
   // Check the current system waypoints.
@@ -82,8 +80,8 @@ Future<DateTime?> advanceExporer(
   // If at a jump gate, go to a nearby system with unexplored waypoints or
   // missing market data.
   if (currentWaypoint.isJumpGate) {
-    final myShips = await allMyShips(api).toList();
-    final shipSystems = myShips.map((s) => s.nav.systemSymbol).toSet();
+    // final myShips = await allMyShips(api).toList();
+    // final shipSystems = myShips.map((s) => s.nav.systemSymbol).toSet();
     const maxJumpDistance = 100;
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
@@ -93,10 +91,11 @@ Future<DateTime?> advanceExporer(
       maxJumps: maxJumpDistance,
     )) {
       // Crude logic to spread our explorers out.
-      if (shipSystems.contains(destination.systemSymbol)) {
-        // We already have a ship in this system, don't route there.
-        continue;
-      }
+      // Can't use this or they skip the main system!
+      // if (shipSystems.contains(destination.systemSymbol)) {
+      //   // We already have a ship in this system, don't route there.
+      //   continue;
+      // }
       if (_isMissingChartOrRecentMarketData(priceData, destination)) {
         if (destination.chart == null) {
           shipInfo(

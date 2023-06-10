@@ -12,6 +12,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/route.dart';
 import 'package:space_traders_cli/surveys.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Creates a new one if we have a surveyor.
@@ -190,6 +191,7 @@ Future<DateTime?> advanceMiner(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
+  TransactionLog transactions,
   BehaviorManager behaviorManager,
   SurveyData surveyData,
 ) async {
@@ -222,7 +224,7 @@ Future<DateTime?> advanceMiner(
       await refuelIfNeededAndLog(api, priceData, agent, market, ship);
 
       // TODO(eseidel): This can fail to sell and get stuck in a loop.
-      await sellCargoAndLog(api, priceData, ship);
+      await sellCargoAndLog(api, priceData, transactions, ship);
       // Reset our state now that we've done the behavior once.
       await behaviorManager.completeBehavior(ship.symbol);
       // This return null maybe wrong if we failed to sell?

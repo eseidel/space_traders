@@ -14,6 +14,7 @@ import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 // Consider having a config file like:
@@ -43,7 +44,6 @@ Behavior _behaviorFor(
     //   return Behavior.arbitrageTrader;
     // }
   }
-  // Could check if it has a mining laser or ship.isExcavator
   if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
     return Behavior.miner;
   }
@@ -64,6 +64,7 @@ Future<void> logicLoop(
   SystemsCache systemsCache,
   PriceData priceData,
   SurveyData surveyData,
+  TransactionLog transactions,
   ShipWaiter waiter,
 ) async {
   final waypointCache = WaypointCache(api, systemsCache);
@@ -124,6 +125,7 @@ Future<void> logicLoop(
         maybeContract,
         maybeGoods,
         surveyData,
+        transactions,
       );
       final waitUntil = await advanceShipBehavior(ctx);
       waiter.updateWaitUntil(ship.symbol, waitUntil);
@@ -164,12 +166,21 @@ Future<void> logic(
   SystemsCache systemsCache,
   PriceData priceData,
   SurveyData surveyData,
+  TransactionLog transactions,
 ) async {
   final waiter = ShipWaiter();
 
   while (true) {
     try {
-      await logicLoop(api, db, systemsCache, priceData, surveyData, waiter);
+      await logicLoop(
+        api,
+        db,
+        systemsCache,
+        priceData,
+        surveyData,
+        transactions,
+        waiter,
+      );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {
         logger.warn('Server down for maintenance, waiting 1 minute.');

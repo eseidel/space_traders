@@ -16,6 +16,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/route.dart';
 import 'package:space_traders_cli/systems_cache.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 @immutable
@@ -381,6 +382,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   Agent agent,
   WaypointCache waypointCache,
   PriceData priceData,
+  TransactionLog transactions,
   BehaviorManager behaviorManager,
   Market market,
   Ship ship,
@@ -396,6 +398,7 @@ Future<DateTime?> _purchaseCargoAndGo(
     ship.cargo = await sellCargoAndLog(
       api,
       priceData,
+      transactions,
       ship,
       where: (tradeSymbol) => tradeSymbol != deal.tradeSymbol.value,
     );
@@ -473,6 +476,7 @@ Future<DateTime?> advanceArbitrageTrader(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
+  TransactionLog transactions,
   BehaviorManager behaviorManager,
 ) async {
   final navResult = await continueNavigationIfNeeded(
@@ -508,6 +512,7 @@ Future<DateTime?> advanceArbitrageTrader(
         agent,
         waypointCache,
         priceData,
+        transactions,
         behaviorManager,
         currentMarket!,
         ship,
@@ -518,7 +523,7 @@ Future<DateTime?> advanceArbitrageTrader(
     // If we're at the destination of the deal, sell.
     if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
       // We're at the destination, sell and clear the deal.
-      await sellCargoAndLog(api, priceData, ship);
+      await sellCargoAndLog(api, priceData, transactions, ship);
       await behaviorManager.completeBehavior(ship.symbol);
       return null;
     }
@@ -573,6 +578,7 @@ Future<DateTime?> advanceArbitrageTrader(
       agent,
       waypointCache,
       priceData,
+      transactions,
       behaviorManager,
       currentMarket!,
       ship,

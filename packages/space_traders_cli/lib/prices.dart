@@ -492,7 +492,8 @@ Future<void> recordMarketDataAndLog(
   Ship ship,
 ) async {
   await recordMarketData(priceData, market);
-  shipInfo(ship, 'Recorded Market data for ${market.symbol}');
+  // Powershell needs an extra space after the emoji.
+  shipInfo(ship, '✍️  market data @ ${market.symbol}');
 }
 
 /// Record market data.

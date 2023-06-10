@@ -140,6 +140,9 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is in orbit.
   bool get isOrbiting => nav.status == ShipNavStatus.IN_ORBIT;
 
+  /// Returns true if the ship uses fuel.
+  bool get usesFuel => fuel.capacity > 0;
+
   /// Returns true if the ship has a surveyor module.
   bool get hasSurveyor {
     const surveyerMounts = [

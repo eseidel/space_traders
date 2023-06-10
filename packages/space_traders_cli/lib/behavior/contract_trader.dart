@@ -13,6 +13,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 // List<Market> _marketsWithExport(
@@ -221,6 +222,7 @@ Future<DateTime?> advanceContractTrader(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
+  TransactionLog transactions,
   BehaviorManager behaviorManager,
   Contract? maybeContract,
   ContractDeliverGood? maybeGood,
@@ -304,6 +306,7 @@ Future<DateTime?> advanceContractTrader(
     final cargo = await sellCargoAndLog(
       api,
       priceData,
+      transactions,
       ship,
       where: (s) => s != neededGood.tradeSymbol,
     );

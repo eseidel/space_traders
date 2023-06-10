@@ -6,6 +6,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/transactions.dart';
 
 // Importantly, these actions *should* modify the state objects passed in
 // e.g. if it docks the ship, it should update the ship's nav object.
@@ -164,6 +165,7 @@ Stream<SellCargo201ResponseData> sellCargo(
 Future<ShipCargo> sellCargoAndLog(
   Api api,
   PriceData priceData,
+  TransactionLog transactions,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
 }) async {
@@ -350,7 +352,8 @@ Future<void> chartWaypointAndLog(Api api, Ship ship) async {
   try {
     final response = await api.fleet.createChart(ship.symbol);
     final waypoint = response!.data.waypoint;
-    shipInfo(ship, 'Charted ${waypointDescription(waypoint)}');
+    // Powershell needs the space after the emoji.
+    shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');
   } on ApiException catch (e) {
     if (!isWaypointAlreadyChartedException(e)) {
       rethrow;

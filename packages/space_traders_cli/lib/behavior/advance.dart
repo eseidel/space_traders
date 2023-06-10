@@ -9,6 +9,7 @@ import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// The context for a behavior.
@@ -27,6 +28,7 @@ class BehaviorContext {
     this.contract,
     this.maybeGoods,
     this.surveyData,
+    this.transactions,
   );
 
   /// Handle to the API clients.
@@ -65,6 +67,9 @@ class BehaviorContext {
   /// The survey data.
   final SurveyData surveyData;
 
+  /// The transaction log.
+  final TransactionLog transactions;
+
   /// Load the behavior state for the given ship.
   Future<BehaviorState> loadBehaviorState() async =>
       behaviorManager.getBehavior(ship.symbol);
@@ -88,6 +93,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.ship,
         ctx.waypointCache,
         ctx.marketCache,
+        ctx.transactions,
         ctx.behaviorManager,
         ctx.contract,
         ctx.maybeGoods,
@@ -102,6 +108,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.systemsCache,
         ctx.waypointCache,
         ctx.marketCache,
+        ctx.transactions,
         ctx.behaviorManager,
       );
     case Behavior.miner:
@@ -113,6 +120,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.ship,
         ctx.waypointCache,
         ctx.marketCache,
+        ctx.transactions,
         ctx.behaviorManager,
         ctx.surveyData,
       );
