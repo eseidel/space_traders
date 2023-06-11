@@ -134,6 +134,7 @@ Future<DateTime?> advanceShipBehavior(
       return advanceExporer(
         ctx.api,
         ctx.db,
+        ctx.transactions,
         ctx.priceData,
         ctx.shipyardPrices,
         ctx.agent,

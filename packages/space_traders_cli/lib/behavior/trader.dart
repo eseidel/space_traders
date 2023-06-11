@@ -382,7 +382,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   Agent agent,
   WaypointCache waypointCache,
   PriceData priceData,
-  TransactionLog transactions,
+  TransactionLog transactionLog,
   BehaviorManager behaviorManager,
   Market market,
   Ship ship,
@@ -391,14 +391,21 @@ Future<DateTime?> _purchaseCargoAndGo(
   // This assumes the ship is at the source of the deal.
   assert(deal.sourceSymbol == ship.nav.waypointSymbol, 'Not at source!');
   await dockIfNeeded(api, ship);
-  await refuelIfNeededAndLog(api, priceData, agent, market, ship);
+  await refuelIfNeededAndLog(
+    api,
+    priceData,
+    transactionLog,
+    agent,
+    market,
+    ship,
+  );
 
   // Sell any cargo we can and update our ship's cargo.
   if (ship.cargo.isNotEmpty) {
     ship.cargo = await sellCargoAndLog(
       api,
       priceData,
-      transactions,
+      transactionLog,
       ship,
       where: (tradeSymbol) => tradeSymbol != deal.tradeSymbol.value,
     );
@@ -476,7 +483,7 @@ Future<DateTime?> advanceArbitrageTrader(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  TransactionLog transactions,
+  TransactionLog transactionLog,
   BehaviorManager behaviorManager,
 ) async {
   final navResult = await continueNavigationIfNeeded(
@@ -496,7 +503,14 @@ Future<DateTime?> advanceArbitrageTrader(
   // If we're currently at a market, record the prices and refuel.
   if (currentMarket != null) {
     await dockIfNeeded(api, ship);
-    await refuelIfNeededAndLog(api, priceData, agent, currentMarket, ship);
+    await refuelIfNeededAndLog(
+      api,
+      priceData,
+      transactionLog,
+      agent,
+      currentMarket,
+      ship,
+    );
     await recordMarketData(priceData, currentMarket);
   }
 
@@ -512,7 +526,7 @@ Future<DateTime?> advanceArbitrageTrader(
         agent,
         waypointCache,
         priceData,
-        transactions,
+        transactionLog,
         behaviorManager,
         currentMarket!,
         ship,
@@ -523,7 +537,7 @@ Future<DateTime?> advanceArbitrageTrader(
     // If we're at the destination of the deal, sell.
     if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
       // We're at the destination, sell and clear the deal.
-      await sellCargoAndLog(api, priceData, transactions, ship);
+      await sellCargoAndLog(api, priceData, transactionLog, ship);
       await behaviorManager.completeBehavior(ship.symbol);
       return null;
     }
@@ -578,7 +592,7 @@ Future<DateTime?> advanceArbitrageTrader(
       agent,
       waypointCache,
       priceData,
-      transactions,
+      transactionLog,
       behaviorManager,
       currentMarket!,
       ship,

@@ -179,6 +179,8 @@ Future<ShipCargo> sellCargoAndLog(
     final transaction = response.transaction;
     final agent = response.agent;
     logTransaction(ship, priceData, agent, transaction);
+    transactions
+        .log(Transaction.fromMarketTransaction(transaction, agent.credits));
     newCargo = response.cargo;
   }
   return newCargo;
@@ -225,6 +227,7 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
 Future<void> refuelIfNeededAndLog(
   Api api,
   PriceData priceData,
+  TransactionLog transactionLog,
   Agent agent,
   Market market,
   Ship ship,
@@ -288,6 +291,12 @@ Future<void> refuelIfNeededAndLog(
       agent,
       response.transaction,
       transactionEmoji: '⛽',
+    );
+    transactionLog.log(
+      Transaction.fromMarketTransaction(
+        response.transaction,
+        agent.credits,
+      ),
     );
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {

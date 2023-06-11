@@ -9,3 +9,5 @@ systems.json
 coverage/
 coverage.lcov
 backups/
+shipyard_prices.json
+transactions.json

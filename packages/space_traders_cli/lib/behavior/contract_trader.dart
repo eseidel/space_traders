@@ -222,7 +222,7 @@ Future<DateTime?> advanceContractTrader(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  TransactionLog transactions,
+  TransactionLog transactionLog,
   BehaviorManager behaviorManager,
   Contract? maybeContract,
   ContractDeliverGood? maybeGood,
@@ -253,7 +253,14 @@ Future<DateTime?> advanceContractTrader(
   // If we're currently at a market, record the prices and refuel.
   if (currentMarket != null) {
     await dockIfNeeded(api, ship);
-    await refuelIfNeededAndLog(api, priceData, agent, currentMarket, ship);
+    await refuelIfNeededAndLog(
+      api,
+      priceData,
+      transactionLog,
+      agent,
+      currentMarket,
+      ship,
+    );
     await recordMarketData(priceData, currentMarket);
   }
 
@@ -306,7 +313,7 @@ Future<DateTime?> advanceContractTrader(
     final cargo = await sellCargoAndLog(
       api,
       priceData,
-      transactions,
+      transactionLog,
       ship,
       where: (s) => s != neededGood.tradeSymbol,
     );

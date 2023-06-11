@@ -9,42 +9,53 @@ class JsonLog<Record> {
     List<Record> entries, {
     required FileSystem fs,
     required String path,
+    required Map<String, dynamic> Function(Record) recordToJson,
   })  : _entries = entries,
         _fs = fs,
-        _path = path;
+        _path = path,
+        _recordToJson = recordToJson;
 
   final List<Record> _entries;
+  final Map<String, dynamic> Function(Record) _recordToJson;
+
+  /// The entries in the log.
+  List<Record> get entries => List.unmodifiable(_entries);
 
   final String _path;
 
   /// The file system to use.
   final FileSystem _fs;
 
-  static List<Record> _parseLogFile<Record>(String contents) {
+  static List<Record> _parseLogFile<Record>(
+    String contents,
+    Record Function(Map<String, dynamic>) recordFromJson,
+  ) {
     final entries = <Record>[];
     for (final line in contents.split('\n')) {
       if (line.trim().isEmpty) {
         continue;
       }
-      final record = jsonDecode(line);
-      entries.add(record as Record);
+      entries.add(recordFromJson(jsonDecode(line) as Map<String, dynamic>));
     }
     return entries;
   }
 
   /// Save the log to the file system.
   void save() {
-    _fs.file(_path).writeAsStringSync(_entries.map(jsonEncode).join('\n'));
+    _fs.file(_path).writeAsStringSync(
+          _entries.map(_recordToJson).map(jsonEncode).join('\n'),
+        );
   }
 
   /// Load the log from the file system.
   static Future<List<R>> load<R>(
     FileSystem fs,
     String path,
+    R Function(Map<String, dynamic>) recordFromJson,
   ) async {
     final file = fs.file(path);
     if (await file.exists()) {
-      return _parseLogFile<R>(await file.readAsString());
+      return _parseLogFile<R>(await file.readAsString(), recordFromJson);
     }
     return <R>[];
   }

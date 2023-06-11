@@ -342,7 +342,7 @@ Future<DateTime?> advanceMiner(
   Ship ship,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  TransactionLog transactions,
+  TransactionLog transactionLog,
   BehaviorManager behaviorManager,
   SurveyData surveyData,
 ) async {
@@ -372,10 +372,17 @@ Future<DateTime?> advanceMiner(
       );
       await dockIfNeeded(api, ship);
       await recordMarketDataAndLog(priceData, market!, ship);
-      await refuelIfNeededAndLog(api, priceData, agent, market, ship);
+      await refuelIfNeededAndLog(
+        api,
+        priceData,
+        transactionLog,
+        agent,
+        market,
+        ship,
+      );
 
       // TODO(eseidel): This can fail to sell and get stuck in a loop.
-      await sellCargoAndLog(api, priceData, transactions, ship);
+      await sellCargoAndLog(api, priceData, transactionLog, ship);
       // Reset our state now that we've done the behavior once.
       await behaviorManager.completeBehavior(ship.symbol);
       // This return null maybe wrong if we failed to sell?

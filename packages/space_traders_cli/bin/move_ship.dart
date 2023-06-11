@@ -10,6 +10,7 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/systems_cache.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 Future<void> _navigateToLocalWaypointAndDock(
@@ -18,6 +19,7 @@ Future<void> _navigateToLocalWaypointAndDock(
   PriceData priceData,
   ShipyardPrices shipyardPrices,
   MarketCache marketCache,
+  TransactionLog transactionLog,
   Ship ship,
   Waypoint destination,
   bool shouldDock,
@@ -38,6 +40,7 @@ Future<void> _navigateToLocalWaypointAndDock(
         await refuelIfNeededAndLog(
           api,
           priceData,
+          transactionLog,
           agent,
           market,
           ship,
@@ -60,6 +63,7 @@ void main(List<String> args) async {
   final marketCache = MarketCache(waypointCache);
   final priceData = await PriceData.load(fs);
   final shipyardPrices = await ShipyardPrices.load(fs);
+  final transactionLog = await TransactionLog.load(fs);
   final agent = await getMyAgent(api);
 
   final myShips = await allMyShips(api).toList();
@@ -96,7 +100,14 @@ void main(List<String> args) async {
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   if (currentWaypoint.hasMarketplace && ship.shouldRefuel) {
     final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
-    await refuelIfNeededAndLog(api, priceData, agent, market!, ship);
+    await refuelIfNeededAndLog(
+      api,
+      priceData,
+      transactionLog,
+      agent,
+      market!,
+      ship,
+    );
   }
 
   if (destWaypoint.systemSymbol == startingSystem.symbol) {
@@ -106,6 +117,7 @@ void main(List<String> args) async {
       priceData,
       shipyardPrices,
       marketCache,
+      transactionLog,
       ship,
       destWaypoint,
       shouldDock,
@@ -133,6 +145,7 @@ void main(List<String> args) async {
     priceData,
     shipyardPrices,
     marketCache,
+    transactionLog,
     ship,
     destWaypoint,
     shouldDock,

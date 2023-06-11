@@ -10,6 +10,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 bool _isMissingChartOrRecentPriceData(
@@ -43,6 +44,7 @@ bool _isMissingRecentShipyardData(
 Future<DateTime?> advanceExporer(
   Api api,
   DataStore db,
+  TransactionLog transactionLog,
   PriceData priceData,
   ShipyardPrices shipyardPrices,
   Agent agent,
@@ -79,7 +81,14 @@ Future<DateTime?> advanceExporer(
         forceRefresh: true,
       );
       if (ship.usesFuel) {
-        await refuelIfNeededAndLog(api, priceData, agent, market!, ship);
+        await refuelIfNeededAndLog(
+          api,
+          priceData,
+          transactionLog,
+          agent,
+          market!,
+          ship,
+        );
       }
       await recordMarketDataAndLog(priceData, market!, ship);
     }
