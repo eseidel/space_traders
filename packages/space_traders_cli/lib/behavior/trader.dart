@@ -413,7 +413,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   if (ship.cargo.isNotEmpty) {
     shipInfo(
       ship,
-      'Ship still has cargo: ${ship.cargo}',
+      'Ship still has: ${cargoDescription(ship.cargo)}',
     );
   }
 

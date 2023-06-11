@@ -16,29 +16,6 @@ import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
-/// Creates a new one if we have a surveyor.
-Future<SurveySet?> createSurveySetIfPossible(
-  Api api,
-  DataStore db,
-  Ship ship,
-) async {
-  if (!ship.hasSurveyor) {
-    return null;
-  }
-  // Survey
-  final response = await api.fleet.createSurvey(ship.symbol);
-  final survey = response!.data;
-  // TODO(eseidel): Move this out of this function and return the response
-  // which includes cooldown.
-  final surveySet = SurveySet(
-    waypointSymbol: ship.nav.waypointSymbol,
-    surveys: survey.surveys,
-  );
-  await saveSurveySet(db, surveySet);
-  shipInfo(ship, '🔭 ${ship.nav.waypointSymbol}');
-  return surveySet;
-}
-
 // my evaluation logic actually just assumes I'll get 10 extracts from each
 // survey regardless of size - so room for improvement.... I just don't have the
 // data on how many extracts to exhaust a deposit
@@ -87,7 +64,8 @@ int expectedValueFromSurvey(
 ) {
   // I'm not yet sure what to do with deposit size.
   // Look at each of the possible returns.
-  // Price them at the local market.
+  // Price them at the passed in market.
+  // This will fail if the passed in market doesn't sell everything.
 
   final totalValue = survey.deposits.fold<int>(
     0,
@@ -101,59 +79,17 @@ int expectedValueFromSurvey(
   return totalValue ~/ survey.deposits.length;
 }
 
-Survey? _chooseBestSurvey(
-  PriceData priceData,
-  Waypoint nearestMarket,
-  SurveySet? surveySet,
-) {
-  if (surveySet == null) {
-    return null;
-  }
-  // Each Survey can have multiple deposits.  The survey itself has a
-  // size.  We should probably choose the most valuable ore based
-  // on market price and then choose the largest deposit of that ore?
-  if (surveySet.surveys.isEmpty) {
-    return null;
-  }
-  // Just picking at random for now.
-  final sortedSurveys = surveySet.surveys.sortedBy<num>(
-    (s) => expectedValueFromSurvey(priceData, nearestMarket, s),
-  );
-  // Level 1 only gives back one survey, the idea would be to add that survey
-  // to recent surveys, pick the one with the best ev.  If that ev is above
-  // some threshold, mine it, otherwise survey again.
-
-  // logger.info('Scored surveys:');
-  // for (final survey in sortedSurveys) {
-  //   logger.info(
-  //     '${survey.signature} ${survey.size} '
-  //     '${survey.deposits.map((d) => d.symbol).join(', ')} '
-  //     '${expectedValueFromSurvey(priceData, nearestMarket, survey)}',
-  //   );
-  // }
-
-  return sortedSurveys.last;
-}
-
 /// Returns the nearest waypoint with a marketplace.
 Future<Waypoint> nearestWaypointWithMarket(
   WaypointCache waypointCache,
-  String waypointSymbol,
+  Waypoint start,
 ) async {
-  final waypoint = await waypointCache.waypoint(waypointSymbol);
-  if (waypoint.hasMarketplace) {
-    return waypoint;
-  }
-  final systemMarkets =
-      await waypointCache.marketWaypointsForSystem(waypoint.systemSymbol);
-  if (systemMarkets.isEmpty) {
-    final sortedWaypoints = systemMarkets
-        .sortedBy<num>((w) => distanceBetweenWaypointsInSystem(w, waypoint));
-    return sortedWaypoints.first;
+  if (start.hasMarketplace) {
+    return start;
   }
   await for (final waypoint in waypointsInJumpRadius(
     waypointCache: waypointCache,
-    startSystem: waypoint.systemSymbol,
+    startSystem: start.systemSymbol,
     maxJumps: 1,
   )) {
     if (waypoint.hasMarketplace) {
@@ -161,26 +97,37 @@ Future<Waypoint> nearestWaypointWithMarket(
     }
   }
   throw Exception(
-    'No waypoints with marketplaces found in jump radius of $waypointSymbol',
+    'No waypoints with marketplaces found in jump radius of ${start.symbol}',
   );
 }
 
-/// Creates a list of [ValuedSurvey]s from the given [surveySet].
-List<ValuedSurvey> evaluateSurveys(
-  PriceData priceData,
-  Waypoint nearestMarket,
-  SurveySet surveySet,
-) {
-  final now = DateTime.now();
-  return surveySet.surveys
-      .map(
-        (s) => ValuedSurvey(
-          timestamp: now,
-          survey: s,
-          estimatedValue: expectedValueFromSurvey(priceData, nearestMarket, s),
-        ),
-      )
-      .toList();
+/// Returns a waypoint nearby which trades the good.
+/// This is not necessarily the nearest, but could be improved to be.
+Future<Waypoint> nearbyMarketWhichTrades(
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  Waypoint start,
+  String tradeSymbol,
+) async {
+  if (start.hasMarketplace) {
+    final startMarket = await marketCache.marketForSymbol(start.symbol);
+    if (startMarket!.allowsTradeOf(tradeSymbol)) {
+      return start;
+    }
+  }
+  await for (final waypoint in waypointsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: start.systemSymbol,
+    maxJumps: 1,
+  )) {
+    final market = await marketCache.marketForSymbol(waypoint.symbol);
+    if (market != null && market.allowsTradeOf(tradeSymbol)) {
+      return waypoint;
+    }
+  }
+  throw Exception(
+    'No waypoints with marketplaces found in jump radius of ${start.symbol}',
+  );
 }
 
 /// Want to find systems which have both a mineable resource and a marketplace.
@@ -333,6 +280,66 @@ Future<String?> nearestMineWithGoodMining(
   return best.mineAndSells.last.mineSymbol;
 }
 
+class _ValuedSurvey {
+  _ValuedSurvey({
+    required this.expectedValue,
+    required this.survey,
+    required this.isActive,
+  });
+
+  final int expectedValue;
+  final Survey survey;
+  final bool isActive;
+}
+
+/// Finds a recent survey
+Future<Survey?> surveyWorthMining(
+  PriceData priceData,
+  SurveyData surveyData,
+  Waypoint waypoint, {
+  double percentileThreshold = 0.9,
+}) async {
+  // Get N recent surveys for this waypoint, including expired and exhausted.
+  final recentSurveys = surveyData.recentSurveysAtWaypoint(
+    waypointSymbol: waypoint.symbol,
+    count: 100,
+  );
+  // If we don't have enough surveys to compare, return null.
+  if (recentSurveys.length < 10) {
+    return null;
+  }
+  // Compute the expected values of the surveys using the local market.
+  // Note: this will fail if the passed market doesn't sell everything.
+  final now = DateTime.now().toUtc();
+  final valuedSurveys = recentSurveys.map((s) {
+    return _ValuedSurvey(
+      expectedValue: expectedValueFromSurvey(
+        priceData,
+        waypoint,
+        s.survey,
+      ),
+      survey: s.survey,
+      isActive: !s.exhausted && s.survey.expiration.isAfter(now),
+    );
+  }).sortedBy<num>((s) => s.expectedValue);
+  // Find the index at the desired percentile threshold.
+  final percentileIndex = (valuedSurveys.length * percentileThreshold).floor();
+  // If we have active survey which is above the threshold, return it.
+  final best =
+      valuedSurveys.sublist(percentileIndex).lastWhereOrNull((s) => s.isActive);
+
+  // if (best != null) {
+  //   final survey = best.survey;
+  //   logger.info(
+  //     'Selected '
+  //     '${survey.signature} ${survey.size} '
+  //     '${survey.deposits.map((d) => d.symbol).join(', ')} '
+  //     '${best.expectedValue}c',
+  //   );
+  // }
+  return best?.survey;
+}
+
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
@@ -367,6 +374,7 @@ Future<DateTime?> advanceMiner(
   if (shouldSell) {
     // Sell cargo and refuel if needed.
     if (currentWaypoint.hasMarketplace) {
+      final cargoBefore = ship.cargo.units;
       await dockIfNeeded(api, ship);
       final market = await recordMarketDataIfNeededAndLog(
         priceData,
@@ -383,31 +391,36 @@ Future<DateTime?> advanceMiner(
         ship,
       );
 
-      // TODO(eseidel): This can fail to sell and get stuck in a loop.
       await sellAllCargoAndLog(api, priceData, transactionLog, ship);
-      // Reset our state now that we've done the behavior once.
-      await behaviorManager.completeBehavior(ship.symbol);
-      // This return null maybe wrong if we failed to sell?
-      return null;
+      if (cargoBefore != ship.cargo.units) {
+        // Success!  We mined and sold our cargo!
+        // Reset our state now that we've done the behavior once.
+        await behaviorManager.completeBehavior(ship.symbol);
+        // This return null maybe wrong if we failed to sell?
+        return null;
+      }
+      shipWarn(ship, 'Failed to sell cargo, trying a different market.');
     } else {
       shipInfo(
           ship,
           'No marketplace at ${currentWaypoint.symbol}, '
           'navigating to nearest marketplace.');
-      // TODO(eseidel): This may not be sufficient if the marketplace
-      // does not accept our cargo.
-      final nearestMarket = await nearestWaypointWithMarket(
-        waypointCache,
-        currentWaypoint.symbol,
-      );
-      return beingRouteAndLog(
-        api,
-        ship,
-        waypointCache,
-        behaviorManager,
-        nearestMarket.symbol,
-      );
     }
+
+    final largestCargo = ship.largestCargo();
+    final nearestMarket = await nearbyMarketWhichTrades(
+      waypointCache,
+      marketCache,
+      currentWaypoint,
+      largestCargo!.symbol,
+    );
+    return beingRouteAndLog(
+      api,
+      ship,
+      waypointCache,
+      behaviorManager,
+      nearestMarket.symbol,
+    );
   }
 
   if (!currentWaypoint.canBeMined) {
@@ -471,23 +484,29 @@ Future<DateTime?> advanceMiner(
   // 70% of previous surveys.
   // Otherwise add a new survey.
 
-  var maybeSurveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
   final nearestMarket = await nearestWaypointWithMarket(
     waypointCache,
-    currentWaypoint.symbol,
+    currentWaypoint,
   );
-  if (maybeSurveySet == null) {
-    maybeSurveySet ??= await createSurveySetIfPossible(api, db, ship);
-    if (maybeSurveySet != null) {
-      // Evaluate the surveys in the survey set.  See if any are worth mining.
-      // Otherwise discard the set and repeat up to N times.
-      final valuedSurveys =
-          evaluateSurveys(priceData, nearestMarket, maybeSurveySet);
-      await surveyData.addSurveys(valuedSurveys);
-    }
+
+  // See if we have a good survey to mine.
+  final maybeSurvey = await surveyWorthMining(
+    priceData,
+    surveyData,
+    nearestMarket,
+  );
+  // If not, add some new surveys.
+  if (maybeSurvey == null && ship.hasSurveyor) {
+    final outer = await api.fleet.createSurvey(ship.symbol);
+    final response = outer!.data;
+    // shipDetail(ship, '🔭 ${ship.nav.waypointSymbol}');
+    // Record survey.
+    await surveyData.recordSurveys(response.surveys);
+    // Wait for cooldown.
+    return response.cooldown.expiration;
   }
-  final maybeSurvey =
-      _chooseBestSurvey(priceData, nearestMarket, maybeSurveySet);
+
+  /// If we either have a survey or don't have a surveyer, mine.
   try {
     final response = await extractResources(api, ship, survey: maybeSurvey);
     final yield_ = response.extraction.yield_;
@@ -510,15 +529,7 @@ Future<DateTime?> advanceMiner(
         'Survey ${maybeSurvey!.signature} exhausted, '
         'deleting and trying again.',
       );
-      maybeSurveySet!.surveys
-          .removeWhere((s) => s.signature == maybeSurvey.signature);
-      // This will end up going through them in order, which is probably wrong.
-      // We should discard any low-value surveys.
-      if (maybeSurveySet.surveys.isEmpty) {
-        await deleteSurveySet(db, maybeSurveySet.waypointSymbol);
-      } else {
-        await saveSurveySet(db, maybeSurveySet);
-      }
+      await surveyData.markSurveyExhausted(maybeSurvey);
       return null;
     }
     rethrow;

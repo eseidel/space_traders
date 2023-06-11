@@ -107,6 +107,14 @@ extension ShipUtils on Ship {
     return cargo.countUnits(tradeSymbol);
   }
 
+  /// Returns the largest cargo in the ship.
+  ShipCargoItem? largestCargo() {
+    if (cargo.isEmpty) {
+      return null;
+    }
+    return cargo.inventory.sortedBy<num>((i) => i.units).last;
+  }
+
   /// Returns true if the ship if full on fuel.
   bool get isFuelFull => fuel.current >= fuel.capacity;
 

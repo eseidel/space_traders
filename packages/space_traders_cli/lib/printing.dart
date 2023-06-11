@@ -267,3 +267,8 @@ void printStatus(GetStatus200Response s) {
     logger.info('Announcement: ${announcement.title}');
   }
 }
+
+/// Returns a string describing the given [cargo].
+String cargoDescription(ShipCargo cargo) {
+  return cargo.inventory.map((e) => '${e.units} ${e.name}').join(', ');
+}

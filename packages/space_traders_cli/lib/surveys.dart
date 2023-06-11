@@ -1,41 +1,57 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:space_traders_api/api.dart';
 
 /// Record of a historcial survey.
-class ValuedSurvey {
+class HistoricalSurvey {
   /// Create a HistoricalSurvey
-  ValuedSurvey({
+  HistoricalSurvey({
     required this.timestamp,
     required this.survey,
-    required this.estimatedValue,
+    required this.exhausted,
   });
 
   /// Create a HistoricalSurvey from JSON.
-  factory ValuedSurvey.fromJson(Map<String, dynamic> json) {
-    return ValuedSurvey(
+  factory HistoricalSurvey.fromJson(Map<String, dynamic> json) {
+    return HistoricalSurvey(
       timestamp: DateTime.parse(json['timestamp'] as String),
       survey: Survey.fromJson(json['survey'] as Map<String, dynamic>)!,
-      estimatedValue: json['estimatedValue'] as int,
+      exhausted: json['exhausted'] as bool,
     );
   }
-
-  /// The timestamp of the survey.
-  final DateTime timestamp;
 
   /// The survey.
   final Survey survey;
 
-  /// The estimated value of the survey.
-  final int estimatedValue;
+  /// The timestamp of the survey.
+  final DateTime timestamp;
+
+  /// The survey is exhausted.
+  // Unclear if this should be saved in this class or not, it's the
+  // only mutable value.
+  final bool exhausted;
+
+  /// Create a copy of this HistoricalSurvey with the given fields replaced.
+  HistoricalSurvey copyWith({
+    DateTime? timestamp,
+    Survey? survey,
+    bool? exhausted,
+  }) {
+    return HistoricalSurvey(
+      timestamp: timestamp ?? this.timestamp,
+      survey: survey ?? this.survey,
+      exhausted: exhausted ?? this.exhausted,
+    );
+  }
 
   /// Convert to JSON.
   Map<String, dynamic> toJson() {
     return {
       'timestamp': timestamp.toUtc().toIso8601String(),
       'survey': survey.toJson(),
-      'estimatedValue': estimatedValue,
+      'exhausted': exhausted,
     };
   }
 }
@@ -44,25 +60,25 @@ class ValuedSurvey {
 class SurveyData {
   /// Create a SurveyData.
   SurveyData({
-    required List<ValuedSurvey> surveys,
+    required List<HistoricalSurvey> surveys,
     required FileSystem fs,
     String cacheFilePath = defaultCacheFilePath,
   })  : _surveys = surveys,
         _fs = fs,
         _cacheFilePath = cacheFilePath;
 
-  final List<ValuedSurvey> _surveys;
+  final List<HistoricalSurvey> _surveys;
   final FileSystem _fs;
   final String _cacheFilePath;
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'surveys.json';
 
-  static List<ValuedSurvey> _parseSurveys(String json) {
+  static List<HistoricalSurvey> _parseSurveys(String json) {
     final parsed = jsonDecode(json) as List<dynamic>;
     return parsed
-        .map<ValuedSurvey>(
-          (e) => ValuedSurvey.fromJson(e as Map<String, dynamic>),
+        .map<HistoricalSurvey>(
+          (e) => HistoricalSurvey.fromJson(e as Map<String, dynamic>),
         )
         .toList();
   }
@@ -95,30 +111,60 @@ class SurveyData {
   }
 
   /// Add a survey to the store.
-  Future<void> addSurveys(Iterable<ValuedSurvey> survey) async {
+  Future<void> addSurveys(Iterable<HistoricalSurvey> survey) async {
     _surveys.addAll(survey);
     await save();
   }
 
   /// Return the most recent surveys.
-  List<ValuedSurvey> recentSurveys({int count = 10}) {
-    if (_surveys.length < count) {
-      return _surveys;
+  Iterable<HistoricalSurvey> recentSurveysAtWaypoint({
+    required int count,
+    required String waypointSymbol,
+  }) {
+    return _surveys
+        .where((e) => e.survey.symbol == waypointSymbol)
+        .sortedBy((e) => e.timestamp)
+        .reversed
+        .take(count);
+  }
+
+  /// Record the given surveys.
+  Future<void> recordSurveys(List<Survey> surveys) {
+    final now = DateTime.now().toUtc();
+    final historicalSurveys = surveys.map((e) {
+      return HistoricalSurvey(
+        timestamp: now,
+        survey: e,
+        exhausted: false,
+      );
+    }).toList();
+    return addSurveys(historicalSurveys);
+  }
+
+  /// Mark the given survey as exhausted.
+  Future<void> markSurveyExhausted(Survey survey) async {
+    // Careful, "signature" is unique to the survey, but "symbol" is
+    // the waypoint symbol.
+    final index =
+        _surveys.indexWhere((e) => e.survey.signature == survey.signature);
+    if (index == -1) {
+      throw ArgumentError('Survey not found: $survey');
     }
-    return _surveys.sublist(_surveys.length - count);
+    _surveys[index] = _surveys[index].copyWith(exhausted: true);
+    await save();
   }
 
   /// Return the percentile for the given estimated value.
-  int? percentileFor(int estimatedValue) {
-    final recent = recentSurveys();
-    if (recent.isEmpty) {
-      return null;
-    }
-    final values = recent.map((e) => e.estimatedValue).toList()..sort();
-    final index = values.indexWhere((e) => e > estimatedValue);
-    if (index == -1) {
-      return 100;
-    }
-    return (index / values.length * 100).round();
-  }
+  // int? percentileFor(int estimatedValue) {
+  //   final recent = recentSurveys();
+  //   if (recent.isEmpty) {
+  //     return null;
+  //   }
+  //   final values = recent.map((e) => e.estimatedValue).toList()..sort();
+  //   final index = values.indexWhere((e) => e > estimatedValue);
+  //   if (index == -1) {
+  //     return 100;
+  //   }
+  //   return (index / values.length * 100).round();
+  // }
 }
