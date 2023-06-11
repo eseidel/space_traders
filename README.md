@@ -100,7 +100,6 @@ Logic:
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
 * Build a docker container and run the app in the cloud.
-* Add a structured logger and log transactions.
 
 UI:
 * Add a Flutter UI.

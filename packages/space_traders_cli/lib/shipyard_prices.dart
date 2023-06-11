@@ -55,7 +55,7 @@ class ShipyardPrice {
     json['waypointSymbol'] = waypointSymbol;
     json['shipType'] = shipType.toJson();
     json['purchasePrice'] = purchasePrice;
-    json['timestamp'] = timestamp.toIso8601String();
+    json['timestamp'] = timestamp.toUtc().toIso8601String();
     return json;
   }
 }
