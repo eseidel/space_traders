@@ -247,6 +247,7 @@ Future<DateTime?> advanceContractTrader(
   final neededGood = maybeGood!;
   final totalPayment =
       contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
+  // TODO(eseidel): "break even" should include a minimum margin.
   final breakEvenUnitPrice = totalPayment ~/ neededGood.unitsRequired;
 
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
@@ -310,10 +311,11 @@ Future<DateTime?> advanceContractTrader(
   }
 
   // We might still be at our contract destination.
+  // Which might be a bad deal to buy from!
   // If we're at a market, buy our goods.
   if (currentWaypoint.hasMarketplace) {
     // Sell everything we have except the contract goal.
-    final cargo = await sellCargoAndLog(
+    final cargo = await sellAllCargoAndLog(
       api,
       priceData,
       transactionLog,
@@ -348,9 +350,13 @@ Future<DateTime?> advanceContractTrader(
           'at ${currentWaypoint.symbol}',
         );
       } else {
+        // Constrain by both tradeVolume and our cargo space.
         final unitsToPurchase = min(
-          unitsNeeded,
-          maybeGood.tradeVolume,
+          min(
+            unitsNeeded,
+            maybeGood.tradeVolume,
+          ),
+          cargo.availableSpace,
         );
         final creditsNeeded = unitsToPurchase * maybeGood.purchasePrice;
         if (agent.credits < creditsNeeded) {
@@ -377,6 +383,7 @@ Future<DateTime?> advanceContractTrader(
             return null;
           }
         } else {
+          // If we have the money, do the purchase.
           await _purchaseContractGoodIfPossible(
             api,
             priceData,
@@ -390,10 +397,11 @@ Future<DateTime?> advanceContractTrader(
             unitsToPurchase: unitsToPurchase,
           );
 
-          if (unitsToPurchase < unitsNeeded) {
+          if (cargo.availableSpace > 0) {
             shipInfo(
               ship,
-              'Purchased $unitsToPurchase of $unitsNeeded needed, looping.',
+              'Purchased $unitsToPurchase of $unitsNeeded needed, still have '
+              '${cargo.availableSpace} units of cargo space looping.',
             );
             return null;
           }

@@ -121,6 +121,9 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is an excavator.
   bool get isExcavator => registration.role == ShipRole.EXCAVATOR;
 
+  /// Returns true if the ship is a probe.
+  bool get isProbe => frame.symbol == ShipFrameSymbolEnum.PROBE;
+
   /// Returns true if the ship can mine.
   bool get canMine {
     const minerMounts = [

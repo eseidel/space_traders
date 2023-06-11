@@ -106,25 +106,28 @@ Future<DeliverContract200ResponseData> deliverContract(
   return response.data;
 }
 
-// Future<SellCargo201ResponseData> sellItem(
-//   Api api,
-//   Ship ship,
-//   String tradeSymbol,
-//   int units,
-// ) async {
-//   final request = SellCargoRequest(
-//     symbol: tradeSymbol,
-//     units: units,
-//   );
-//   final response =
-//       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
-//   return response!.data;
-// }
+/// Sell [units] of [tradeSymbol] to market.
+Future<SellCargo201ResponseData> sellCargo(
+  Api api,
+  Ship ship,
+  String tradeSymbol,
+  int units,
+) async {
+  final request = SellCargoRequest(
+    symbol: tradeSymbol,
+    units: units,
+  );
+  final response =
+      await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
+  // Does not update agent.
+  ship.cargo = response!.data.cargo;
+  return response.data;
+}
 
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
-Stream<SellCargo201ResponseData> sellCargo(
+Stream<SellCargo201ResponseData> sellAllCargo(
   Api api,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
@@ -141,28 +144,21 @@ Stream<SellCargo201ResponseData> sellCargo(
       continue;
     }
     if (!market.tradeGoods.any((g) => g.symbol == item.symbol)) {
-      // shipInfo(
-      //   ship,
-      //   "Market at ${ship.nav.waypointSymbol} doesn't buy ${item.symbol}",
-      // );
+      shipInfo(
+        ship,
+        "Market at ${ship.nav.waypointSymbol} doesn't buy ${item.symbol}",
+      );
       continue;
     }
-    final sellRequest = SellCargoRequest(
-      symbol: item.symbol,
-      units: item.units,
-    );
-    final sellResponse =
-        await api.fleet.sellCargo(ship.symbol, sellCargoRequest: sellRequest);
-    // Does not update agent.
-    ship.cargo = sellResponse!.data.cargo;
-    yield sellResponse.data;
+    final response = await sellCargo(api, ship, item.symbol, item.units);
+    yield response;
   }
 }
 
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
-Future<ShipCargo> sellCargoAndLog(
+Future<ShipCargo> sellAllCargoAndLog(
   Api api,
   PriceData priceData,
   TransactionLog transactions,
@@ -175,7 +171,7 @@ Future<ShipCargo> sellCargoAndLog(
     return newCargo;
   }
 
-  await for (final response in sellCargo(api, ship, where: where)) {
+  await for (final response in sellAllCargo(api, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
     logTransaction(ship, priceData, agent, transaction);
@@ -353,7 +349,7 @@ Future<void> refuelIfNeededAndLog(
 /// Dock the ship if needed and log the transaction
 Future<void> dockIfNeeded(Api api, Ship ship) async {
   if (ship.isOrbiting) {
-    shipInfo(ship, '🛬 at ${ship.nav.waypointSymbol}');
+    shipDetail(ship, '🛬 at ${ship.nav.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol);
     ship.nav = response!.data.nav;
   }
@@ -363,7 +359,7 @@ Future<void> dockIfNeeded(Api api, Ship ship) async {
 Future<void> undockIfNeeded(Api api, Ship ship) async {
   if (ship.isDocked) {
     // Extra space after emoji is needed for windows powershell.
-    shipInfo(ship, '🛰️  at ${ship.nav.waypointSymbol}');
+    shipDetail(ship, '🛰️  at ${ship.nav.waypointSymbol}');
     final response = await api.fleet.orbitShip(ship.symbol);
     ship.nav = response!.data.nav;
   }

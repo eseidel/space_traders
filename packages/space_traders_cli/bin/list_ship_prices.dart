@@ -10,6 +10,11 @@ void main(List<String> args) async {
   const fs = LocalFileSystem();
   final shipyardPrices = await ShipyardPrices.load(fs);
 
+  logger.info(
+    'Loaded ${shipyardPrices.count} prices from '
+    '${shipyardPrices.waypointCount} waypoints.',
+  );
+
   final maxNameLength =
       ShipType.values.fold(0, (m, t) => max(m, t.value.length));
 

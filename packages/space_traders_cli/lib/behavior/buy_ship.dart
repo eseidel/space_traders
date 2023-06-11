@@ -14,7 +14,11 @@ import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
-/// Creates a new one if we have a surveyor.
+/// What ship type we're currently buying.
+const shipType = ShipType.PROBE;
+
+/// What the max multiplier of median we would pay for a ship.
+const maxMedianMultipler = 1.1;
 
 /// This should probably wake up once an hour or so and then decide which
 /// ship would be the best to buy with?
@@ -120,9 +124,6 @@ Future<DateTime?> advanceBuyShip(
     return navResult.waitTime;
   }
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
-
-  const shipType = ShipType.ORE_HOUND;
-  const maxMedianMultipler = 1.1;
 
   // Get our median price before updating shipyard prices.
   final medianPrice = shipyardPrices.medianPurchasePrice(shipType);

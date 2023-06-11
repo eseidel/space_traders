@@ -367,11 +367,13 @@ Future<DateTime?> advanceMiner(
   if (shouldSell) {
     // Sell cargo and refuel if needed.
     if (currentWaypoint.hasMarketplace) {
-      final market = await marketCache.marketForSymbol(
+      await dockIfNeeded(api, ship);
+      final market = await recordMarketDataIfNeededAndLog(
+        priceData,
+        marketCache,
+        ship,
         currentWaypoint.symbol,
       );
-      await dockIfNeeded(api, ship);
-      await recordMarketDataAndLog(priceData, market!, ship);
       await refuelIfNeededAndLog(
         api,
         priceData,
@@ -382,7 +384,7 @@ Future<DateTime?> advanceMiner(
       );
 
       // TODO(eseidel): This can fail to sell and get stuck in a loop.
-      await sellCargoAndLog(api, priceData, transactionLog, ship);
+      await sellAllCargoAndLog(api, priceData, transactionLog, ship);
       // Reset our state now that we've done the behavior once.
       await behaviorManager.completeBehavior(ship.symbol);
       // This return null maybe wrong if we failed to sell?
@@ -491,7 +493,7 @@ Future<DateTime?> advanceMiner(
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
     // Could use TradeSymbol.values.reduce() to find the longest symbol.
-    shipInfo(
+    shipDetail(
         ship,
         // pickaxe requires an extra space on mac?
         '⛏️  ${yield_.units.toString().padLeft(2)} '

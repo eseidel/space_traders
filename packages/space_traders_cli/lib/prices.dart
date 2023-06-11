@@ -5,6 +5,7 @@ import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// default max age for "recent" prices is 3 days
 const defaultMaxAge = Duration(days: 3);
@@ -488,6 +489,39 @@ class PriceData {
 }
 
 /// Record market data and log the result.
+/// Returns the market.
+/// This is the prefered way to get the local Market.
+Future<Market> recordMarketDataIfNeededAndLog(
+  PriceData priceData,
+  MarketCache marketCache,
+  Ship ship,
+  String marketSymbol,
+) async {
+  if (ship.nav.waypointSymbol != marketSymbol) {
+    throw ArgumentError.value(
+      marketSymbol,
+      'marketSymbol',
+      'Ship is not in the same system as the market.',
+    );
+  }
+  // If we have very recent market data, don't bother refreshing.
+  // This prevents ships from constantly refreshing the same data.
+  if (priceData.hasRecentMarketData(
+    marketSymbol,
+    maxAge: const Duration(minutes: 5),
+  )) {
+    final market = await marketCache.marketForSymbol(marketSymbol);
+    return market!;
+  }
+  final market = await marketCache.marketForSymbol(
+    ship.nav.waypointSymbol,
+    forceRefresh: true,
+  );
+  await recordMarketDataAndLog(priceData, market!, ship);
+  return market;
+}
+
+/// Record market data and log the result.
 Future<void> recordMarketDataAndLog(
   PriceData priceData,
   Market market,
@@ -498,7 +532,7 @@ Future<void> recordMarketDataAndLog(
   shipInfo(ship, '✍️  market data @ ${market.symbol}');
 }
 
-/// Record market data.
+/// Record market data silently.
 Future<void> recordMarketData(PriceData priceData, Market market) async {
   final prices = market.tradeGoods
       .map((g) => MarketPrice.fromMarketTradeGood(g, market.symbol))

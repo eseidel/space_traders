@@ -72,9 +72,11 @@ Future<DateTime?> advanceExporer(
       await chartWaypointAndLog(api, ship);
     }
     if (currentWaypoint.hasMarketplace) {
-      final market = await marketCache.marketForSymbol(
+      final market = await recordMarketDataIfNeededAndLog(
+        priceData,
+        marketCache,
+        ship,
         currentWaypoint.symbol,
-        forceRefresh: true,
       );
       if (ship.usesFuel) {
         await refuelIfNeededAndLog(
@@ -82,11 +84,10 @@ Future<DateTime?> advanceExporer(
           priceData,
           transactionLog,
           agent,
-          market!,
+          market,
           ship,
         );
       }
-      await recordMarketDataAndLog(priceData, market!, ship);
     }
     if (currentWaypoint.hasShipyard) {
       // Every time we're at a shipyard and can afford a ship, we should
@@ -115,8 +116,9 @@ Future<DateTime?> advanceExporer(
   // If at a jump gate, go to a nearby system with unexplored waypoints or
   // missing market data.
   if (currentWaypoint.isJumpGate) {
-    // final myShips = await allMyShips(api).toList();
-    // final shipSystems = myShips.map((s) => s.nav.systemSymbol).toSet();
+    final myShips = await allMyShips(api).toList();
+    final probeSystems =
+        myShips.where((s) => s.isProbe).map((s) => s.nav.systemSymbol).toSet();
     const maxJumpDistance = 100;
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
@@ -127,10 +129,10 @@ Future<DateTime?> advanceExporer(
     )) {
       // Crude logic to spread our explorers out.
       // Can't use this or they skip the main system!
-      // if (shipSystems.contains(destination.systemSymbol)) {
-      //   // We already have a ship in this system, don't route there.
-      //   continue;
-      // }
+      if (probeSystems.contains(destination.systemSymbol)) {
+        // We already have a ship in this system, don't route there.
+        continue;
+      }
       if (_isMissingChartOrRecentPriceData(
         priceData,
         shipyardPrices,

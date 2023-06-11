@@ -34,9 +34,9 @@ Behavior _behaviorFor(
   // resume mining (instead of trading), sell the stuff we just bought.  We
   // will just continue bouncing at that edge slowly draining our money.
   if (ship.engine.speed > 20) {
-    if (behaviorManager.isEnabled(Behavior.buyShip)) {
-      return Behavior.buyShip;
-    }
+    // if (behaviorManager.isEnabled(Behavior.buyShip)) {
+    //   return Behavior.buyShip;
+    // }
 
     // Not sure how to decide between contract trading and arbitrage trading
     // except based on historical profits?
@@ -45,9 +45,9 @@ Behavior _behaviorFor(
     // if (behaviorManager.isEnabled(Behavior.contractTrader)) {
     //   return Behavior.contractTrader;
     // }
-    // if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
-    //   return Behavior.arbitrageTrader;
-    // }
+    if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
+      return Behavior.arbitrageTrader;
+    }
   }
   if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
     return Behavior.miner;

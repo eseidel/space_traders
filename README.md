@@ -100,6 +100,10 @@ Logic:
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
 * Build a docker container and run the app in the cloud.
+* Track and print expected vs. actual profit on trades.
+* Fix contract trader to share code with arbitrage trader.  Contracts are a
+  special case of arbitrage, in which the destination and trade good are fixed.
+* Make CLI print frequency of api calls on exit.
 
 UI:
 * Add a Flutter UI.

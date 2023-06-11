@@ -402,12 +402,18 @@ Future<DateTime?> _purchaseCargoAndGo(
 
   // Sell any cargo we can and update our ship's cargo.
   if (ship.cargo.isNotEmpty) {
-    ship.cargo = await sellCargoAndLog(
+    ship.cargo = await sellAllCargoAndLog(
       api,
       priceData,
       transactionLog,
       ship,
       where: (tradeSymbol) => tradeSymbol != deal.tradeSymbol.value,
+    );
+  }
+  if (ship.cargo.isNotEmpty) {
+    shipInfo(
+      ship,
+      'Ship still has cargo: ${ship.cargo}',
     );
   }
 
@@ -498,12 +504,17 @@ Future<DateTime?> advanceArbitrageTrader(
   }
 
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
-  final currentMarket = await marketCache
-      .marketForSymbol(currentWaypoint.symbol, forceRefresh: true);
+  Market? currentMarket;
 
   // If we're currently at a market, record the prices and refuel.
-  if (currentMarket != null) {
+  if (currentWaypoint.hasMarketplace) {
     await dockIfNeeded(api, ship);
+    currentMarket = await recordMarketDataIfNeededAndLog(
+      priceData,
+      marketCache,
+      ship,
+      currentWaypoint.symbol,
+    );
     await refuelIfNeededAndLog(
       api,
       priceData,
@@ -512,7 +523,6 @@ Future<DateTime?> advanceArbitrageTrader(
       currentMarket,
       ship,
     );
-    await recordMarketData(priceData, currentMarket);
   }
 
   final behaviorState = await behaviorManager.getBehavior(ship.symbol);
@@ -538,7 +548,7 @@ Future<DateTime?> advanceArbitrageTrader(
     // If we're at the destination of the deal, sell.
     if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
       // We're at the destination, sell and clear the deal.
-      await sellCargoAndLog(api, priceData, transactionLog, ship);
+      await sellAllCargoAndLog(api, priceData, transactionLog, ship);
       await behaviorManager.completeBehavior(ship.symbol);
       return null;
     }

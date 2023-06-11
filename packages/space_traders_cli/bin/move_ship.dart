@@ -34,8 +34,12 @@ Future<void> _navigateToLocalWaypointAndDock(
     await Future<void>.delayed(flightTime);
     await dockIfNeeded(api, ship);
     if (destination.hasMarketplace) {
-      final market = await marketCache.marketForSymbol(destination.symbol);
-      await recordMarketDataAndLog(priceData, market!, ship);
+      final market = await recordMarketDataIfNeededAndLog(
+        priceData,
+        marketCache,
+        ship,
+        destination.symbol,
+      );
       if (ship.shouldRefuel) {
         await refuelIfNeededAndLog(
           api,
