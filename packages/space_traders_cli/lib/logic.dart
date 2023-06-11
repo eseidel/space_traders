@@ -45,9 +45,9 @@ Behavior _behaviorFor(
     // if (behaviorManager.isEnabled(Behavior.contractTrader)) {
     //   return Behavior.contractTrader;
     // }
-    // if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
-    //   return Behavior.arbitrageTrader;
-    // }
+    if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
+      return Behavior.arbitrageTrader;
+    }
   }
   if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
     return Behavior.miner;

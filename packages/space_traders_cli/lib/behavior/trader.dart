@@ -527,6 +527,54 @@ Future<DateTime?> advanceArbitrageTrader(
 
   final behaviorState = await behaviorManager.getBehavior(ship.symbol);
   final pastDeal = behaviorState.deal;
+
+  final pastDealTradeSymbol = pastDeal?.deal.tradeSymbol.value;
+  final dealCargo = ship.largestCargo(
+    where: (i) => i.symbol == pastDealTradeSymbol,
+  );
+  final nonDealCargo = ship.largestCargo(
+    where: (i) => i.symbol != pastDealTradeSymbol,
+  );
+  if (nonDealCargo != null) {
+    if (currentMarket != null) {
+      // If we have cargo that isn't part of our deal, sell it.
+      bool exceptDealCargo(String symbol) => symbol != dealCargo?.symbol;
+      await sellAllCargoAndLog(
+        api,
+        priceData,
+        transactionLog,
+        ship,
+        where: exceptDealCargo,
+      );
+    }
+
+    if (ship.cargo.isNotEmpty) {
+      shipInfo(ship, 'Cargo hold still not empty, finding market.');
+      final market = await nearbyMarketWhichTrades(
+        waypointCache,
+        marketCache,
+        currentWaypoint,
+        nonDealCargo.symbol,
+      );
+      if (market == null) {
+        // We can't sell this cargo anywhere, so we're done.
+        await behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader);
+        shipInfo(
+          ship,
+          'No market for ${nonDealCargo.symbol}, disabling trader behavior.',
+        );
+        return null;
+      }
+      return beingRouteAndLog(
+        api,
+        ship,
+        waypointCache,
+        behaviorManager,
+        market.symbol,
+      );
+    }
+  }
+
   if (pastDeal != null) {
     // If we have a deal
     // If we're at the source (because we had to travel there) buy the cargo.

@@ -1,10 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Record of a possible arbitrage opportunity.
 // This should also include expected cost of fuel and cost of time.
@@ -185,4 +187,33 @@ String dealDescription(Deal deal, {int units = 1}) {
 /// Log a [deal] to the console.
 void logDeal(Ship ship, Deal deal) {
   shipInfo(ship, dealDescription(deal, units: ship.availableSpace));
+}
+
+// Not sure where this blongs?
+/// Returns a waypoint nearby which trades the good.
+/// This is not necessarily the nearest, but could be improved to be.
+Future<Waypoint?> nearbyMarketWhichTrades(
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  Waypoint start,
+  String tradeSymbol, {
+  int maxJumps = 1,
+}) async {
+  if (start.hasMarketplace) {
+    final startMarket = await marketCache.marketForSymbol(start.symbol);
+    if (startMarket!.allowsTradeOf(tradeSymbol)) {
+      return start;
+    }
+  }
+  await for (final waypoint in waypointsInJumpRadius(
+    waypointCache: waypointCache,
+    startSystem: start.systemSymbol,
+    maxJumps: maxJumps,
+  )) {
+    final market = await marketCache.marketForSymbol(waypoint.symbol);
+    if (market != null && market.allowsTradeOf(tradeSymbol)) {
+      return waypoint;
+    }
+  }
+  return null;
 }

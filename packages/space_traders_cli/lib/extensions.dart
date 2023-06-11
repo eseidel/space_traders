@@ -108,11 +108,14 @@ extension ShipUtils on Ship {
   }
 
   /// Returns the largest cargo in the ship.
-  ShipCargoItem? largestCargo() {
+  ShipCargoItem? largestCargo({bool Function(ShipCargoItem)? where}) {
     if (cargo.isEmpty) {
       return null;
     }
-    return cargo.inventory.sortedBy<num>((i) => i.units).last;
+    final filter = where ?? (i) => true;
+    return cargo.inventory
+        .sortedBy<num>((i) => i.units)
+        .lastWhereOrNull(filter);
   }
 
   /// Returns true if the ship if full on fuel.

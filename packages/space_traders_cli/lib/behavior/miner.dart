@@ -101,35 +101,6 @@ Future<Waypoint> nearestWaypointWithMarket(
   );
 }
 
-/// Returns a waypoint nearby which trades the good.
-/// This is not necessarily the nearest, but could be improved to be.
-Future<Waypoint> nearbyMarketWhichTrades(
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  Waypoint start,
-  String tradeSymbol,
-) async {
-  if (start.hasMarketplace) {
-    final startMarket = await marketCache.marketForSymbol(start.symbol);
-    if (startMarket!.allowsTradeOf(tradeSymbol)) {
-      return start;
-    }
-  }
-  await for (final waypoint in waypointsInJumpRadius(
-    waypointCache: waypointCache,
-    startSystem: start.systemSymbol,
-    maxJumps: 1,
-  )) {
-    final market = await marketCache.marketForSymbol(waypoint.symbol);
-    if (market != null && market.allowsTradeOf(tradeSymbol)) {
-      return waypoint;
-    }
-  }
-  throw Exception(
-    'No waypoints with marketplaces found in jump radius of ${start.symbol}',
-  );
-}
-
 /// Want to find systems which have both a mineable resource and a marketplace.
 /// Want to sort by distance between the two.
 /// As well as relative prices for the market.
@@ -414,6 +385,15 @@ Future<DateTime?> advanceMiner(
       currentWaypoint,
       largestCargo!.symbol,
     );
+    if (nearestMarket == null) {
+      shipWarn(
+        ship,
+        'No nearby market which trades ${largestCargo.symbol}, '
+        'disabling miner behavior.',
+      );
+      await behaviorManager.disableBehavior(ship, Behavior.miner);
+      return null;
+    }
     return beingRouteAndLog(
       api,
       ship,
@@ -523,12 +503,8 @@ Future<DateTime?> advanceMiner(
     return response.cooldown.expiration;
   } on ApiException catch (e) {
     if (isExhaustedSurveyException(e)) {
-      // If the survey is exhausted, delete it and try again.
-      shipInfo(
-        ship,
-        'Survey ${maybeSurvey!.signature} exhausted, '
-        'deleting and trying again.',
-      );
+      // If the survey is exhausted, record it as such and try again.
+      shipDetail(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
       await surveyData.markSurveyExhausted(maybeSurvey);
       return null;
     }
