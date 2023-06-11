@@ -98,19 +98,20 @@ String stringForPriceDeviance(
   int price,
   MarketTransactionTypeEnum type,
 ) {
+  const expectedWidth = 10;
   final median = type == MarketTransactionTypeEnum.SELL
       ? data.medianSellPrice(tradeSymbol)
       : data.medianPurchasePrice(tradeSymbol);
   if (median == null) {
-    return '🤷'.padLeft(8);
+    return '🤷'.padLeft(expectedWidth);
   }
   final diff = price - median;
   if (diff == 0) {
     // Extra space is needed for powershell. :(
-    return '⚖️ '.padLeft(8);
+    return '⚖️ '.padLeft(expectedWidth);
   }
   final signString = diff < 0 ? '' : '+';
-  final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(3);
+  final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(4);
   final creditsDiff = '$signString${creditsString(diff)}'.padLeft(4);
 
   final lowColor =
@@ -147,7 +148,7 @@ void logTransaction(
   // Fuel commonly has a 3 digit price with a credit marker and sign
   // so we pad to 5.
   final totalPriceString =
-      '$creditsSign${creditsString(transaction.totalPrice)}'.padLeft(5);
+      '$creditsSign${creditsString(transaction.totalPrice)}'.padLeft(7);
   shipInfo(
     ship,
     '$labelEmoji ${transaction.units.toString().padLeft(2)} '
@@ -155,8 +156,8 @@ void logTransaction(
     '${transaction.tradeSymbol.padRight(18)} '
     '$priceDevianceString per, '
     '${transaction.units.toString().padLeft(2)} x '
-    // Fuel is commonly 3 digits + 'c' so we pad to 4.
-    '${creditsString(transaction.pricePerUnit).padLeft(4)} = '
+    // prices are commonly 5 digits + ',' and 'c' so we pad to 7.
+    '${creditsString(transaction.pricePerUnit).padLeft(7)} = '
     '$totalPriceString -> '
     // Always want the 'c' after the credits.
     '🏦 ${creditsString(agent.credits)}',
