@@ -12,6 +12,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
+import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
@@ -63,6 +64,7 @@ Future<void> logicLoop(
   DataStore db,
   SystemsCache systemsCache,
   PriceData priceData,
+  ShipyardPrices shipyardPrices,
   SurveyData surveyData,
   TransactionLog transactions,
   ShipWaiter waiter,
@@ -116,6 +118,7 @@ Future<void> logicLoop(
         api,
         db,
         priceData,
+        shipyardPrices,
         ship,
         agent,
         systemsCache,
@@ -165,6 +168,7 @@ Future<void> logic(
   DataStore db,
   SystemsCache systemsCache,
   PriceData priceData,
+  ShipyardPrices shipyardPrices,
   SurveyData surveyData,
   TransactionLog transactions,
 ) async {
@@ -177,6 +181,7 @@ Future<void> logic(
         db,
         systemsCache,
         priceData,
+        shipyardPrices,
         surveyData,
         transactions,
         waiter,

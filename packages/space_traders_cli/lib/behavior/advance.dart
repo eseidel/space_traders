@@ -7,6 +7,7 @@ import 'package:space_traders_cli/behavior/miner.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
@@ -19,6 +20,7 @@ class BehaviorContext {
     this.api,
     this.db,
     this.priceData,
+    this.shipyardPrices,
     this.ship,
     this.agent,
     this.systemsCache,
@@ -37,8 +39,11 @@ class BehaviorContext {
   /// Handle to the database.
   final DataStore db;
 
-  /// The current price data.
+  /// The historical market price data.
   final PriceData priceData;
+
+  /// The historical shipyard prices.
+  final ShipyardPrices shipyardPrices;
 
   /// The ship we are controlling.
   final Ship ship;
@@ -130,6 +135,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.api,
         ctx.db,
         ctx.priceData,
+        ctx.shipyardPrices,
         ctx.agent,
         ctx.ship,
         ctx.waypointCache,

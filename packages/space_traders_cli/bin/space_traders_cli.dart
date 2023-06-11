@@ -7,6 +7,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
@@ -43,11 +44,19 @@ Future<void> main(List<String> args) async {
   );
 
   final systemsCache = await SystemsCache.load(fs);
-
   final transactions = await TransactionLog.load(fs);
+  final shipyardPrices = await ShipyardPrices.load(fs);
 
   final status = await api.defaultApi.getStatus();
   printStatus(status!);
 
-  await logic(api, db, systemsCache, priceData, surveyData, transactions);
+  await logic(
+    api,
+    db,
+    systemsCache,
+    priceData,
+    shipyardPrices,
+    surveyData,
+    transactions,
+  );
 }

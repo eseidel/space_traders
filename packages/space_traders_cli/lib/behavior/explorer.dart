@@ -8,6 +8,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
@@ -27,6 +28,7 @@ Future<DateTime?> advanceExporer(
   Api api,
   DataStore db,
   PriceData priceData,
+  ShipyardPrices shipyardPrices,
   Agent agent,
   Ship ship,
   WaypointCache waypointCache,
@@ -45,6 +47,8 @@ Future<DateTime?> advanceExporer(
   // Check our current waypoint.  If it's not charted or doesn't have current
   // market data, chart it and/or record market data.
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  // We currently never route to shipyards, but we will record their data if
+  // we happen to be there.
   if (_isMissingChartOrRecentMarketData(priceData, currentWaypoint)) {
     if (currentWaypoint.chart == null) {
       await chartWaypointAndLog(api, ship);
@@ -58,6 +62,14 @@ Future<DateTime?> advanceExporer(
         await refuelIfNeededAndLog(api, priceData, agent, market!, ship);
       }
       await recordMarketDataAndLog(priceData, market!, ship);
+    }
+    if (currentWaypoint.hasShipyard) {
+      final response = await api.systems.getShipyard(
+        currentWaypoint.systemSymbol,
+        currentWaypoint.symbol,
+      );
+      final shipyard = response!.data;
+      await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
     }
     // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
