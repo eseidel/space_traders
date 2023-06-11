@@ -4,6 +4,9 @@ import 'package:space_traders_cli/data_store.dart';
 
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {
+  /// Go to a shipyard and buy a ship.
+  buyShip,
+
   /// Trade to fulfill the current contract.
   contractTrader,
 

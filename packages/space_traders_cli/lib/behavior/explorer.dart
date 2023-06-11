@@ -25,9 +25,7 @@ bool _isMissingChartOrRecentPriceData(
 
 bool _isMissingRecentMarketData(PriceData priceData, Waypoint waypoint) {
   return waypoint.hasMarketplace &&
-      !priceData.hasRecentMarketData(
-        waypoint.symbol,
-      );
+      !priceData.hasRecentMarketData(waypoint.symbol);
 }
 
 bool _isMissingRecentShipyardData(
@@ -35,9 +33,7 @@ bool _isMissingRecentShipyardData(
   Waypoint waypoint,
 ) {
   return waypoint.hasShipyard &&
-      !shipyardPrices.hasRecentShipyardData(
-        waypoint.symbol,
-      );
+      !shipyardPrices.hasRecentShipyardData(waypoint.symbol);
 }
 
 /// One loop of the exploring logic.
@@ -93,6 +89,8 @@ Future<DateTime?> advanceExporer(
       await recordMarketDataAndLog(priceData, market!, ship);
     }
     if (currentWaypoint.hasShipyard) {
+      // Every time we're at a shipyard and can afford a ship, we should
+      // buy one.  Probably ore hounds at first, then probes?
       final shipyard = await getShipyard(api, currentWaypoint);
       await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
     }

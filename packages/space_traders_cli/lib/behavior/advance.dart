@@ -1,6 +1,7 @@
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/buy_ship.dart';
 import 'package:space_traders_cli/behavior/contract_trader.dart';
 import 'package:space_traders_cli/behavior/explorer.dart';
 import 'package:space_traders_cli/behavior/miner.dart';
@@ -89,6 +90,20 @@ Future<DateTime?> advanceShipBehavior(
   final behavior = await ctx.loadBehaviorState();
   // shipDetail(ship, 'Advancing behavior: ${behavior.behavior.name}');
   switch (behavior.behavior) {
+    case Behavior.buyShip:
+      return advanceBuyShip(
+        ctx.api,
+        ctx.db,
+        ctx.priceData,
+        ctx.shipyardPrices,
+        ctx.agent,
+        ctx.ship,
+        ctx.waypointCache,
+        ctx.marketCache,
+        ctx.transactions,
+        ctx.behaviorManager,
+        ctx.surveyData,
+      );
     case Behavior.contractTrader:
       return advanceContractTrader(
         ctx.api,

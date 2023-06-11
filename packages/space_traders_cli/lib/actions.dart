@@ -15,8 +15,8 @@ import 'package:space_traders_cli/transactions.dart';
 /// Purchase a ship of type [shipType] at [shipyardSymbol]
 Future<PurchaseShip201ResponseData> purchaseShip(
   Api api,
-  ShipType shipType,
   String shipyardSymbol,
+  ShipType shipType,
 ) async {
   final purchaseShipRequest = PurchaseShipRequest(
     waypointSymbol: shipyardSymbol,
@@ -190,6 +190,7 @@ Future<ShipCargo> sellCargoAndLog(
 Future<SellCargo201ResponseData?> purchaseCargoAndLog(
   Api api,
   PriceData priceData,
+  TransactionLog transactionLog,
   Ship ship,
   String tradeSymbol,
   int amountToBuy,
@@ -209,6 +210,12 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = response.data.agent;
     logTransaction(ship, priceData, agent, transaction);
+    transactionLog.log(
+      Transaction.fromMarketTransaction(
+        response.data.transaction,
+        agent.credits,
+      ),
+    );
     ship.cargo = response.data.cargo;
     return response.data;
   } on ApiException catch (e) {
@@ -223,7 +230,36 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
   }
 }
 
-/// refuel the ship if needed and log the transaction
+/// Log a shipyard transaction to the console.
+void logShipyardTransaction(
+  Ship ship,
+  PriceData priceData,
+  Agent agent,
+  ShipyardTransaction t,
+) {
+  shipInfo(
+      ship,
+      'Purchased ${t.shipSymbol} for '
+      '${creditsString(t.price)} -> ');
+  final afterCredits = creditsString(agent.credits);
+  logger.info('$afterCredits credits remaining.');
+}
+
+/// Purchase a ship and log the transaction.
+Future<PurchaseShip201ResponseData> purchaseShipAndLog(
+  Api api,
+  PriceData priceData,
+  Ship ship,
+  Agent agent,
+  String shipyardSymbol,
+  ShipType shipType,
+) async {
+  final result = await purchaseShip(api, shipyardSymbol, shipType);
+  logShipyardTransaction(ship, priceData, result.agent, result.transaction);
+  return result;
+}
+
+/// Refuel the ship if needed and log the transaction
 Future<void> refuelIfNeededAndLog(
   Api api,
   PriceData priceData,

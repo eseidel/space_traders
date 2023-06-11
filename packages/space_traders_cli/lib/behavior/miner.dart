@@ -462,6 +462,13 @@ Future<DateTime?> advanceMiner(
   // Must be undocked before surveying or mining.
   await undockIfNeeded(api, ship);
   // Load a survey set, or if we have surveying capabilities, survey.
+
+  // Load up survey set for this waypoint.
+  // If it has an non-expired survey which is worth mining, mine it.
+  // A survey is worth mining when it's expected value is greater than
+  // 70% of previous surveys.
+  // Otherwise add a new survey.
+
   var maybeSurveySet = await loadSurveySet(db, ship.nav.waypointSymbol);
   final nearestMarket = await nearestWaypointWithMarket(
     waypointCache,

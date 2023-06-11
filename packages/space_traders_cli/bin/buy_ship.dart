@@ -64,7 +64,7 @@ void main(List<String> args) async {
   );
 
   logger.info('Purchasing $shipType.');
-  final purchaseResponse = await purchaseShip(api, shipType, shipyard.symbol);
+  final purchaseResponse = await purchaseShip(api, shipyard.symbol, shipType);
   logger.info('Purchased ${purchaseResponse.ship.symbol} for '
       '${creditsString(purchaseResponse.transaction.price)}.');
   final afterCredits = creditsString(purchaseResponse.agent.credits);

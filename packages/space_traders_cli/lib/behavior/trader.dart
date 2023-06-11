@@ -439,6 +439,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   final maybeResult = await purchaseCargoAndLog(
     api,
     priceData,
+    transactionLog,
     ship,
     deal.tradeSymbol.value,
     unitsToPurchase,

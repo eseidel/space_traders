@@ -8,6 +8,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/systems_cache.dart';
+import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 String displayGood(MarketTradeGood good) {
@@ -23,6 +24,7 @@ void main(List<String> args) async {
   final systemsCache = await SystemsCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
+  final transactionLog = await TransactionLog.load(fs);
 
   final myShips = await allMyShips(api).toList();
   final ship = await chooseShip(api, waypointCache, myShips);
@@ -53,5 +55,12 @@ void main(List<String> args) async {
 
   final quantity = int.parse(logger.prompt('How many?'));
 
-  await purchaseCargoAndLog(api, priceData, ship, good.symbol, quantity);
+  await purchaseCargoAndLog(
+    api,
+    priceData,
+    transactionLog,
+    ship,
+    good.symbol,
+    quantity,
+  );
 }

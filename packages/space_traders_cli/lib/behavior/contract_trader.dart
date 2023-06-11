@@ -175,6 +175,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
 Future<void> _purchaseContractGoodIfPossible(
   Api api,
   PriceData priceData,
+  TransactionLog transactionLog,
   Ship ship,
   Waypoint currentWaypoint,
   MarketTradeGood maybeGood,
@@ -204,9 +205,11 @@ Future<void> _purchaseContractGoodIfPossible(
   // Do we need to guard against insufficient credits here?
   // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
   // Buy a full stock of contract goal.
+  // TODO(eseidel): this can fail.
   await purchaseCargoAndLog(
     api,
     priceData,
+    transactionLog,
     ship,
     neededGood.tradeSymbol,
     unitsToPurchase,
@@ -377,6 +380,7 @@ Future<DateTime?> advanceContractTrader(
           await _purchaseContractGoodIfPossible(
             api,
             priceData,
+            transactionLog,
             ship,
             currentWaypoint,
             maybeGood,
