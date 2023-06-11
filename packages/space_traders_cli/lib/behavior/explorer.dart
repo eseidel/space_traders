@@ -8,6 +8,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -83,11 +84,7 @@ Future<DateTime?> advanceExporer(
       await recordMarketDataAndLog(priceData, market!, ship);
     }
     if (currentWaypoint.hasShipyard) {
-      final response = await api.systems.getShipyard(
-        currentWaypoint.systemSymbol,
-        currentWaypoint.symbol,
-      );
-      final shipyard = response!.data;
+      final shipyard = await getShipyard(api, currentWaypoint);
       await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
     }
     // Explore behavior never changes, but it's still the correct thing to

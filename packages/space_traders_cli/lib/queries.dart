@@ -51,3 +51,13 @@ Future<Agent> getMyAgent(Api api) async {
   final response = await api.agents.getMyAgent();
   return response!.data;
 }
+
+/// Fetch shipyard for a given waypoint, will throw if the waypoint does not
+/// have a shipyard.
+Future<Shipyard> getShipyard(Api api, Waypoint waypoint) async {
+  final response = await api.systems.getShipyard(
+    waypoint.systemSymbol,
+    waypoint.symbol,
+  );
+  return response!.data;
+}

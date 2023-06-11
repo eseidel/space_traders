@@ -31,7 +31,7 @@ class ShipyardPrice {
   factory ShipyardPrice.fromJson(Map<String, dynamic> json) {
     return ShipyardPrice(
       waypointSymbol: json['waypointSymbol'] as String,
-      shipType: ShipType.fromJson(json['shipType'] as Map<String, dynamic>)!,
+      shipType: ShipType.fromJson(json['shipType'] as String)!,
       purchasePrice: json['purchasePrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
