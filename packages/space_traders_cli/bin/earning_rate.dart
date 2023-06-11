@@ -4,7 +4,7 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/transactions.dart';
 
 DateTime snapToHour(DateTime time) {
-  return DateTime(time.year, time.month, time.day, time.hour);
+  return DateTime.utc(time.year, time.month, time.day, time.hour);
 }
 
 int hoursAgo(DateTime time) {
@@ -34,7 +34,8 @@ void main() async {
     latestCredits = transaction.agentCredits;
     if (transaction.timestamp.isAfter(nextPrintDate)) {
       final diff = latestCredits - lastPeriodCredits;
-      final diffString = diff > 0 ? '+$diff' : diff.toString();
+      final prettyDiff = creditsString(diff);
+      final diffString = diff > 0 ? '+$prettyDiff' : prettyDiff;
       final agoString = hoursAgo(nextPrintDate) == 0
           ? 'now'
           : '-${hoursAgo(nextPrintDate)}h'.padRight(timeWidth);
