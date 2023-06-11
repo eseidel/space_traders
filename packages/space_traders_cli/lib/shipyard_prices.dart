@@ -245,7 +245,7 @@ class ShipyardPrices {
 
   /// Returns true if there is recent market data for a given market.
   /// Does not check if the passed in market is a valid market.
-  bool hasRecentMarketData(
+  bool hasRecentShipyardData(
     String marketSymbol, {
     Duration maxAge = defaultMaxAge,
   }) {

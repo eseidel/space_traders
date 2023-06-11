@@ -11,14 +11,29 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
-bool _isMissingChartOrRecentMarketData(PriceData priceData, Waypoint waypoint) {
+bool _isMissingChartOrRecentPriceData(
+  PriceData priceData,
+  ShipyardPrices shipyardPrices,
+  Waypoint waypoint,
+) {
   return waypoint.chart == null ||
-      _isMissingRecentMarketData(priceData, waypoint);
+      _isMissingRecentMarketData(priceData, waypoint) ||
+      _isMissingRecentShipyardData(shipyardPrices, waypoint);
 }
 
 bool _isMissingRecentMarketData(PriceData priceData, Waypoint waypoint) {
   return waypoint.hasMarketplace &&
       !priceData.hasRecentMarketData(
+        waypoint.symbol,
+      );
+}
+
+bool _isMissingRecentShipyardData(
+  ShipyardPrices shipyardPrices,
+  Waypoint waypoint,
+) {
+  return waypoint.hasShipyard &&
+      !shipyardPrices.hasRecentShipyardData(
         waypoint.symbol,
       );
 }
@@ -49,7 +64,11 @@ Future<DateTime?> advanceExporer(
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   // We currently never route to shipyards, but we will record their data if
   // we happen to be there.
-  if (_isMissingChartOrRecentMarketData(priceData, currentWaypoint)) {
+  if (_isMissingChartOrRecentPriceData(
+    priceData,
+    shipyardPrices,
+    currentWaypoint,
+  )) {
     if (currentWaypoint.chart == null) {
       await chartWaypointAndLog(api, ship);
     }
@@ -84,7 +103,7 @@ Future<DateTime?> advanceExporer(
   final systemWaypoints =
       await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
   for (final waypoint in systemWaypoints) {
-    if (_isMissingChartOrRecentMarketData(priceData, waypoint)) {
+    if (_isMissingChartOrRecentPriceData(priceData, shipyardPrices, waypoint)) {
       return navigateToLocalWaypointAndLog(api, ship, waypoint);
     }
   }
@@ -108,17 +127,28 @@ Future<DateTime?> advanceExporer(
       //   // We already have a ship in this system, don't route there.
       //   continue;
       // }
-      if (_isMissingChartOrRecentMarketData(priceData, destination)) {
+      if (_isMissingChartOrRecentPriceData(
+        priceData,
+        shipyardPrices,
+        destination,
+      )) {
         if (destination.chart == null) {
           shipInfo(
             ship,
-            'Found system ${destination.symbol} missing chart, routing.',
+            '${destination.symbol} is missing chart, routing.',
+          );
+        } else if (_isMissingRecentMarketData(priceData, destination)) {
+          shipInfo(
+            ship,
+            '${destination.symbol} is missing recent '
+            '(${approximateDuration(defaultMaxAge)}) market data, '
+            'routing.',
           );
         } else {
           shipInfo(
             ship,
-            'Found system ${destination.symbol} missing recent '
-            '(${approximateDuration(defaultMaxAge)}) market data, '
+            '${destination.symbol} is missing recent '
+            '(${approximateDuration(defaultMaxAge)}) shipyard data, '
             'routing.',
           );
         }
