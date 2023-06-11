@@ -104,6 +104,8 @@ Logic:
 * Fix contract trader to share code with arbitrage trader.  Contracts are a
   special case of arbitrage, in which the destination and trade good are fixed.
 * Make CLI print frequency of api calls on exit.
+* Teach arbitrage trader how to empty its cargo hold of things it's not trading.
+  If the markets it happens by don't trade those things it's stuck with them.
 
 UI:
 * Add a Flutter UI.

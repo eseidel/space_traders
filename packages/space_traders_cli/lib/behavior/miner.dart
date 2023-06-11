@@ -119,9 +119,9 @@ Survey? _chooseBestSurvey(
   final sortedSurveys = surveySet.surveys.sortedBy<num>(
     (s) => expectedValueFromSurvey(priceData, nearestMarket, s),
   );
-  // Generally it only gives back one survey, the idea would be to
-  // check the value of that survey relative to historical averages
-  // and either discard it if it's below some historical threshold or mine it.
+  // Level 1 only gives back one survey, the idea would be to add that survey
+  // to recent surveys, pick the one with the best ev.  If that ev is above
+  // some threshold, mine it, otherwise survey again.
 
   // logger.info('Scored surveys:');
   // for (final survey in sortedSurveys) {
