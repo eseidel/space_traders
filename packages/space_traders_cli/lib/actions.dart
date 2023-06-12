@@ -446,3 +446,35 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
     );
   return response!.data;
 }
+
+/// Install [mountSymbol] on [ship] and log.
+Future<InstallMount201ResponseData> installMountAndLog(
+  Api api,
+  Ship ship,
+  String mountSymbol,
+) async {
+  final request = InstallMountRequest(symbol: mountSymbol);
+  final response =
+      await api.fleet.installMount(ship.symbol, installMountRequest: request);
+  // Not changing agent.
+  ship
+    ..mounts = response!.data.mounts
+    ..cargo = response.data.cargo;
+  return response.data;
+}
+
+/// Remove [mountSymbol] from [ship] and log.
+Future<InstallMount201ResponseData> removeMountAndLog(
+  Api api,
+  Ship ship,
+  String mountSymbol,
+) async {
+  final request = RemoveMountRequest(symbol: mountSymbol);
+  final response =
+      await api.fleet.removeMount(ship.symbol, removeMountRequest: request);
+  // Not changing agent.
+  ship
+    ..mounts = response!.data.mounts
+    ..cargo = response.data.cargo;
+  return response.data;
+}
