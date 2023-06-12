@@ -1,6 +1,4 @@
-import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/actions.dart';
 import 'package:space_traders_cli/auth.dart';
 import 'package:space_traders_cli/behavior/advance.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
@@ -26,41 +24,40 @@ Behavior _behaviorFor(
   BehaviorManager behaviorManager,
   Ship ship,
   Agent agent,
-  ContractDeliverGood? maybeGoods,
 ) {
-  // Only trade if we have a fast enough ship and money to buy the goods.
-  // We want some sort of money limit, but currently a money limit can create a
-  // bad loop where at limit X, we buy stuff, now under the limit, so we
-  // resume mining (instead of trading), sell the stuff we just bought.  We
-  // will just continue bouncing at that edge slowly draining our money.
-  if (ship.engine.speed > 20) {
-    // if (behaviorManager.isEnabled(Behavior.buyShip)) {
-    //   return Behavior.buyShip;
-    // }
+  final disableBehaviors = <Behavior>[
+    Behavior.buyShip,
+    // Behavior.contractTrader,
+    Behavior.arbitrageTrader,
+    // Behavior.miner,
+    // Behavior.idle,
+    // Behavior.explorer,
+  ];
 
-    // Not sure how to decide between contract trading and arbitrage trading
-    // except based on historical profits?
-    // Right now this will always contract trade unless we get a contract
-    // we can't fulfill.
-    if (behaviorManager.isEnabled(Behavior.contractTrader)) {
-      return Behavior.contractTrader;
+  final behaviors = {
+    ShipRole.COMMAND: [
+      Behavior.contractTrader,
+      Behavior.arbitrageTrader,
+      Behavior.miner
+    ],
+    ShipRole.HAULER: [Behavior.contractTrader],
+    ShipRole.EXCAVATOR: [Behavior.miner],
+    ShipRole.SURVEYOR: [Behavior.explorer],
+  }[ship.registration.role];
+  if (behaviors != null) {
+    for (final behavior in behaviors) {
+      if (disableBehaviors.contains(behavior)) {
+        continue;
+      }
+      if (behaviorManager.isEnabled(behavior)) {
+        return behavior;
+      }
     }
-    // Can't really turn this on until it understands "break even price".
-    // if (behaviorManager.isEnabled(Behavior.arbitrageTrader)) {
-    //   return Behavior.arbitrageTrader;
-    // }
+  } else {
+    logger
+        .warn('${ship.registration.role} has no specified behaviors, idling.');
   }
-  if (ship.canMine && behaviorManager.isEnabled(Behavior.miner)) {
-    return Behavior.miner;
-  }
-  return Behavior.explorer;
-}
-
-/// Returns a list of all active (not fulfilled or expired) contracts.
-Future<List<Contract>> activeContracts(Api api) async {
-  final allContracts = await allMyContracts(api).toList();
-  // Filter out the ones we've already done or have expired.
-  return allContracts.where((c) => !c.fulfilled && !c.isExpired).toList();
+  return Behavior.idle;
 }
 
 /// One loop of the logic.
@@ -80,29 +77,6 @@ Future<void> logicLoop(
   final myShips = await allMyShips(api).toList();
   waiter.updateForShips(myShips);
 
-  // Should this contract lookup move into the contract trader?
-  final contracts = await activeContracts(api);
-  final maybeContract = contracts.firstOrNull;
-  if (contracts.length > 1) {
-    throw UnimplementedError("Can't handle multiple contracts yet.");
-  }
-  if (maybeContract?.accepted == false) {
-    await acceptContractAndLog(api, maybeContract!);
-  }
-  final maybeGoods = maybeContract?.terms.deliver.firstOrNull;
-
-  // if (shouldPurchaseMiner(agent, myShips)) {
-  //   logger.info('Purchasing mining drone.');
-  //   final shipyardWaypoint =
-  //      systemWaypoints.firstWhere((w) => w.hasShipyard);
-  //   final purchaseResponse =
-  //       await purchaseShip(api, ShipType.MINING_DRONE,
-  //      shipyardWaypoint.symbol);
-  //   logger.info('Purchased ${purchaseResponse.ship.symbol}');
-  //   return; // Fetch ship lists again with no wait.
-  // }
-
-  // printShips(myShips, systemWaypoints);
   // loop over all mining ships and advance them.
   for (final ship in myShips) {
     final previousWait = waiter.waitUntil(ship.symbol);
@@ -114,7 +88,7 @@ Future<void> logicLoop(
     final behaviorManager = await BehaviorManager.load(db, (bm, shipSymbol) {
       // This logic is triggered twice for each ship, not sure why.
       final ship = myShips.firstWhere((s) => s.symbol == shipSymbol);
-      final behavior = _behaviorFor(bm, ship, agent, maybeGoods);
+      final behavior = _behaviorFor(bm, ship, agent);
       // shipInfo(ship, 'Chose new behavior: $behavior');
       return behavior;
     });
@@ -130,8 +104,6 @@ Future<void> logicLoop(
         waypointCache,
         marketCache,
         behaviorManager,
-        maybeContract,
-        maybeGoods,
         surveyData,
         transactions,
       );

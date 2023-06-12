@@ -15,7 +15,7 @@ import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// What ship type we're currently buying.
-const shipType = ShipType.ORE_HOUND;
+const shipType = ShipType.LIGHT_HAULER;
 
 /// What the max multiplier of median we would pay for a ship.
 const maxMedianMultipler = 1.1;

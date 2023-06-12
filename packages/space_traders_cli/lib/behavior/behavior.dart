@@ -16,6 +16,9 @@ enum Behavior {
   /// Mine asteroids and sell the ore.
   miner,
 
+  /// Idle.
+  idle,
+
   /// Explore the universe.
   explorer;
 

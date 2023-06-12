@@ -7,6 +7,7 @@ import 'package:space_traders_cli/behavior/explorer.dart';
 import 'package:space_traders_cli/behavior/miner.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
+import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
@@ -28,8 +29,6 @@ class BehaviorContext {
     this.waypointCache,
     this.marketCache,
     this.behaviorManager,
-    this.contract,
-    this.maybeGoods,
     this.surveyData,
     this.transactions,
   );
@@ -63,12 +62,6 @@ class BehaviorContext {
 
   /// The behavior manager.
   final BehaviorManager behaviorManager;
-
-  /// The current contract.
-  final Contract? contract;
-
-  /// The goods we are delivering.
-  final ContractDeliverGood? maybeGoods;
 
   /// The survey data.
   final SurveyData surveyData;
@@ -115,8 +108,6 @@ Future<DateTime?> advanceShipBehavior(
         ctx.marketCache,
         ctx.transactions,
         ctx.behaviorManager,
-        ctx.contract,
-        ctx.maybeGoods,
       );
     case Behavior.arbitrageTrader:
       return advanceArbitrageTrader(
@@ -158,5 +149,8 @@ Future<DateTime?> advanceShipBehavior(
         ctx.marketCache,
         ctx.behaviorManager,
       );
+    case Behavior.idle:
+      shipDetail(ctx.ship, 'Idling');
+      return null;
   }
 }

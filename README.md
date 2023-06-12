@@ -93,10 +93,10 @@ Logic:
 * Remove guards against 0 prices from prices.dart.
 * Make shipInfo include an emoji for the behavior.
 * Start to build a system database similar to the pricing database.
-* Carefully choose which survey to use against historical data.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Fix arbitrage trader to be able to buy more than 10 units of low volume goods.
+  The contract trader already knows how to do this?
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
 * Build a docker container and run the app in the cloud.
@@ -110,6 +110,10 @@ Logic:
 * Get above 50% coverage.
 * Fix contract trader to not assume it's current market is the right one to buy
   from if the contract is fulfillable from the market it's at.
+* Teach explorers to avoid each other.  Right now they all route to the same
+  opportunities.
+  Explorers should generate a queue of good planets to explore, and then
+  pull from that queue?
 
 UI:
 * Add a Flutter UI.

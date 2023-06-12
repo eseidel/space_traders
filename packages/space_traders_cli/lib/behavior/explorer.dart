@@ -128,7 +128,10 @@ Future<DateTime?> advanceExporer(
       maxJumps: maxJumpDistance,
     )) {
       // Crude logic to spread our explorers out.
-      // Can't use this or they skip the main system!
+      // This doesn't actually work if they're jumping multiple times, it's just
+      // preventing the probe from *routing* to the intermediate place the
+      // other probes are in.
+      // We need to check the probe destinations stored in behavior state?
       if (probeSystems.contains(destination.systemSymbol)) {
         // We already have a ship in this system, don't route there.
         continue;

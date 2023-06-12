@@ -13,6 +13,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -216,6 +217,13 @@ Future<bool> _purchaseContractGoodIfPossible(
   return true;
 }
 
+/// Returns a list of all active (not fulfilled or expired) contracts.
+Future<List<Contract>> activeContracts(Api api) async {
+  final allContracts = await allMyContracts(api).toList();
+  // Filter out the ones we've already done or have expired.
+  return allContracts.where((c) => !c.fulfilled && !c.isExpired).toList();
+}
+
 /// One loop of the trading logic
 Future<DateTime?> advanceContractTrader(
   Api api,
@@ -227,8 +235,6 @@ Future<DateTime?> advanceContractTrader(
   MarketCache marketCache,
   TransactionLog transactionLog,
   BehaviorManager behaviorManager,
-  Contract? maybeContract,
-  ContractDeliverGood? maybeGood,
 ) async {
   final navResult = await continueNavigationIfNeeded(
     api,
@@ -239,12 +245,20 @@ Future<DateTime?> advanceContractTrader(
   if (navResult.shouldReturn()) {
     return navResult.waitTime;
   }
-  if (maybeContract == null) {
+  // Should this contract lookup move into the contract trader?
+  final contracts = await activeContracts(api);
+  if (contracts.length > 1) {
+    shipWarn(ship, '${contracts.length} contracts! Only servicing the first.');
+  }
+  final contract = contracts.firstOrNull;
+  if (contract == null) {
     await negotiateContractAndLog(api, ship);
     return null;
   }
-  final contract = maybeContract;
-  final neededGood = maybeGood!;
+  if (!contract.accepted) {
+    await acceptContractAndLog(api, contract);
+  }
+  final neededGood = contract.terms.deliver.first;
   final totalPayment =
       contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
   // TODO(eseidel): "break even" should include a minimum margin.
