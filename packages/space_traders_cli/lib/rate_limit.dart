@@ -4,21 +4,22 @@ import 'package:space_traders_cli/logger.dart';
 
 /// RequestCounts tracks the number of requests made to each path.
 class RequestCounts {
-  final Map<String, int> _counts = {};
+  /// The counts.
+  final Map<String, int> counts = {};
 
   /// Get the number of requests made to the given path.
   void recordRequest(String path) {
-    _counts[path] = (_counts[path] ?? 0) + 1;
+    counts[path] = (counts[path] ?? 0) + 1;
   }
 
   /// Get the total number of requests made.
   int totalRequests() {
-    return _counts.values.fold(0, (a, b) => a + b);
+    return counts.values.fold(0, (a, b) => a + b);
   }
 
   /// Reset the counts.
   void reset() {
-    _counts.clear();
+    counts.clear();
   }
 }
 
@@ -32,7 +33,9 @@ class RateLimitedApiClient extends ApiClient {
 
   /// The number of requests per second to allow.
   final int requestsPerSecond;
-  final RequestCounts _requestCounts = RequestCounts();
+
+  /// RequestCounts tracks the number of requests made to each path.
+  final RequestCounts requestCounts = RequestCounts();
 
   DateTime _nextRequestTime = DateTime.now();
 
@@ -63,7 +66,7 @@ class RateLimitedApiClient extends ApiClient {
       formParams,
       contentType,
     );
-    _requestCounts.recordRequest(path);
+    requestCounts.recordRequest(path);
     final afterRequest = DateTime.now();
     _nextRequestTime =
         afterRequest.add(Duration(milliseconds: 1000 ~/ requestsPerSecond));
