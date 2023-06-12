@@ -109,7 +109,7 @@ Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
     if (purchasePrice < breakevenUnitPrice) {
       yield _Opportunity(waypoint, purchasePrice);
     } else {
-      shipInfo(
+      shipDetail(
         ship,
         '${waypoint.symbol} has $tradeSymbol, but it is too expensive '
         '< $breakevenUnitPrice, got $purchasePrice',
@@ -315,13 +315,15 @@ Future<DateTime?> advanceContractTrader(
   // If we're at a market, buy our goods.
   if (currentWaypoint.hasMarketplace) {
     // Sell everything we have except the contract goal.
-    await sellAllCargoAndLog(
-      api,
-      priceData,
-      transactionLog,
-      ship,
-      where: (s) => s != neededGood.tradeSymbol,
-    );
+    if (ship.cargo.isNotEmpty) {
+      await sellAllCargoAndLog(
+        api,
+        priceData,
+        transactionLog,
+        ship,
+        where: (s) => s != neededGood.tradeSymbol,
+      );
+    }
 
     await recordMarketData(priceData, currentMarket!);
     final maybeGood = currentMarket.tradeGoods

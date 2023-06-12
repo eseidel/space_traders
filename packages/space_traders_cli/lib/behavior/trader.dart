@@ -415,7 +415,7 @@ Future<DateTime?> _purchaseCargoAndGo(
 
   // Sell any cargo we can and update our ship's cargo.
   if (ship.cargo.isNotEmpty) {
-    ship.cargo = await sellAllCargoAndLog(
+    await sellAllCargoAndLog(
       api,
       priceData,
       transactionLog,

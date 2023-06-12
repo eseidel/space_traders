@@ -158,17 +158,16 @@ Stream<SellCargo201ResponseData> sellAllCargo(
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
-Future<ShipCargo> sellAllCargoAndLog(
+Future<void> sellAllCargoAndLog(
   Api api,
   PriceData priceData,
   TransactionLog transactions,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
 }) async {
-  var newCargo = ship.cargo;
   if (ship.cargo.inventory.isEmpty) {
     shipInfo(ship, 'No cargo to sell');
-    return newCargo;
+    return;
   }
 
   await for (final response in sellAllCargo(api, ship, where: where)) {
@@ -177,9 +176,7 @@ Future<ShipCargo> sellAllCargoAndLog(
     logTransaction(ship, priceData, agent, transaction);
     transactions
         .log(Transaction.fromMarketTransaction(transaction, agent.credits));
-    newCargo = response.cargo;
   }
-  return newCargo;
 }
 
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
