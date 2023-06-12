@@ -172,14 +172,13 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
 }
 
 // This is split out from the main function to allow early returns.
-Future<void> _purchaseContractGoodIfPossible(
+Future<bool> _purchaseContractGoodIfPossible(
   Api api,
   PriceData priceData,
   TransactionLog transactionLog,
   Ship ship,
   Waypoint currentWaypoint,
   MarketTradeGood maybeGood,
-  ShipCargo cargo,
   ContractDeliverGood neededGood, {
   required int breakEvenUnitPrice,
   required int unitsToPurchase,
@@ -192,15 +191,15 @@ Future<void> _purchaseContractGoodIfPossible(
       '${currentWaypoint.symbol} '
       'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
     );
-    return;
+    return false;
   }
 
-  if (cargo.availableSpace <= 0) {
+  if (ship.cargo.availableSpace <= 0) {
     shipInfo(
       ship,
       'No cargo space available to purchase ${neededGood.tradeSymbol}',
     );
-    return;
+    return false;
   }
   // Do we need to guard against insufficient credits here?
   // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
@@ -214,6 +213,7 @@ Future<void> _purchaseContractGoodIfPossible(
     neededGood.tradeSymbol,
     unitsToPurchase,
   );
+  return true;
 }
 
 /// One loop of the trading logic
@@ -315,7 +315,7 @@ Future<DateTime?> advanceContractTrader(
   // If we're at a market, buy our goods.
   if (currentWaypoint.hasMarketplace) {
     // Sell everything we have except the contract goal.
-    final cargo = await sellAllCargoAndLog(
+    await sellAllCargoAndLog(
       api,
       priceData,
       transactionLog,
@@ -336,7 +336,7 @@ Future<DateTime?> advanceContractTrader(
       );
     } else {
       // TODO(eseidel): This has the potential of racing with multiple ships.
-      final unitsInCargo = cargo.countUnits(neededGood.tradeSymbol);
+      final unitsInCargo = ship.cargo.countUnits(neededGood.tradeSymbol);
       final unitsNeeded = max(
         0,
         neededGood.unitsRequired - neededGood.unitsFulfilled - unitsInCargo,
@@ -356,7 +356,7 @@ Future<DateTime?> advanceContractTrader(
             unitsNeeded,
             maybeGood.tradeVolume,
           ),
-          cargo.availableSpace,
+          ship.cargo.availableSpace,
         );
         final creditsNeeded = unitsToPurchase * maybeGood.purchasePrice;
         if (agent.credits < creditsNeeded) {
@@ -384,24 +384,23 @@ Future<DateTime?> advanceContractTrader(
           }
         } else {
           // If we have the money, do the purchase.
-          await _purchaseContractGoodIfPossible(
+          final succeeded = await _purchaseContractGoodIfPossible(
             api,
             priceData,
             transactionLog,
             ship,
             currentWaypoint,
             maybeGood,
-            cargo,
             neededGood,
             breakEvenUnitPrice: breakEvenUnitPrice,
             unitsToPurchase: unitsToPurchase,
           );
 
-          if (cargo.availableSpace > 0) {
+          if (succeeded && ship.cargo.availableSpace > 0) {
             shipInfo(
               ship,
               'Purchased $unitsToPurchase of $unitsNeeded needed, still have '
-              '${cargo.availableSpace} units of cargo space looping.',
+              '${ship.cargo.availableSpace} units of cargo space looping.',
             );
             return null;
           }

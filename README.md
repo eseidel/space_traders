@@ -108,7 +108,15 @@ Logic:
   If the markets it happens by don't trade those things it's stuck with them.
 * Add logic for buying and mounting modules.
 * Get above 50% coverage.
+* Fix contract trader to not assume it's current market is the right one to buy
+  from if the contract is fulfillable from the market it's at.
 
 UI:
 * Add a Flutter UI.
 * Make it possible to filter for a sub-set of systems (e.g. ones with a market and a mine).
+
+
+Thoughts
+* Miners are just the "find me where to sell this" problem
+* Contracts are just the "find me where to buy this" problem
+* Arbitrage is both of those problems, should be able to share code.

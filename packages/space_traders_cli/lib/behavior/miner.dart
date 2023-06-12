@@ -284,11 +284,7 @@ Future<Survey?> surveyWorthMining(
   final now = DateTime.now().toUtc();
   final valuedSurveys = recentSurveys.map((s) {
     return _ValuedSurvey(
-      expectedValue: expectedValueFromSurvey(
-        priceData,
-        waypoint,
-        s.survey,
-      ),
+      expectedValue: expectedValueFromSurvey(priceData, waypoint, s.survey),
       survey: s.survey,
       isActive: !s.exhausted && s.survey.expiration.isAfter(now),
     );

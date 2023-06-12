@@ -172,8 +172,21 @@ class CostedDeal {
   /// The actual sell price of the deal.
   int? actualSellPrice;
 
+  /// The expected cost of goods sold, not including fuel.
+  int get expectedCostOfGoodsSold => deal.purchasePrice * tradeVolume;
+
+  /// The expected non-goods expenses of the deal, including fuel.
+  int get expectedOperationalExpenses => fuelCost;
+
   /// The total upfront cost of the deal, including fuel.
-  int get totalOutlay => deal.purchasePrice * tradeVolume + fuelCost;
+  int get expectedCosts => deal.purchasePrice * tradeVolume + fuelCost;
+
+  /// The total income of the deal, including fuel.
+  int get expectedRevenue => deal.sellPrice * tradeVolume;
+
+  /// Max we would spend per unit and still expect to break even.
+  int get maxPurchasePrice =>
+      (expectedRevenue - expectedOperationalExpenses) ~/ tradeVolume;
 
   /// The total profit of the deal, including fuel.
   int get profit => deal.profit * tradeVolume - fuelCost;
@@ -209,7 +222,7 @@ String describeCostedDeal(CostedDeal costedDeal) {
       ' ${deal.sourceSymbol} ${creditsString(deal.purchasePrice).padLeft(8)} '
       '-> '
       '${deal.destinationSymbol} ${creditsString(deal.sellPrice).padLeft(8)} '
-      '$coloredProfitString $timeString ${costedDeal.totalOutlay}c';
+      '$coloredProfitString $timeString ${costedDeal.expectedCosts}c';
 }
 
 /// Returns a CostedDeal for a given deal.
@@ -283,7 +296,7 @@ Future<CostedDeal?> findDealFor(
     return null;
   }
   final affordable =
-      costedDeals.where((d) => d.totalOutlay < maxOutlay).toList();
+      costedDeals.where((d) => d.expectedCosts < maxOutlay).toList();
   if (affordable.isEmpty) {
     logger.info('No deals found under $maxOutlay credits.');
     return null;
