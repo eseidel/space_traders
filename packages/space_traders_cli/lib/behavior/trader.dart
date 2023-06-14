@@ -427,7 +427,7 @@ Future<DateTime?> _purchaseCargoAndGo(
     shipInfo(
       ship,
       'Ship still has: ${cargoDescription(ship.cargo)}',
-    );
+  );
   }
 
   final maybeGood = market.tradeGoods

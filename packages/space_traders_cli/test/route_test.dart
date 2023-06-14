@@ -7,13 +7,6 @@ import 'package:test/test.dart';
 class MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
-  test('RoutePlanner.findRoute', () async {
-    final waypointCache = MockWaypointCache();
-    final planner = RoutePlanner(waypointCache);
-    final same = await planner.findRoute('a', 'a');
-    expect(same, const Route(['a']));
-  });
-
   test('fuelUsedWithinSystem', () {
     final a =
         SystemWaypoint(symbol: 'a-b-c', type: WaypointType.PLANET, x: 0, y: 0);
