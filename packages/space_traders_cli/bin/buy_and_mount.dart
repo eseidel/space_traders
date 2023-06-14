@@ -79,6 +79,7 @@ void main(List<String> args) async {
   // it finds a nearby market with that mount.
   final start = await waypointCache.waypoint(ship.nav.waypointSymbol);
   final mountMarket = await nearbyMarketWhichTrades(
+    systemsCache,
     waypointCache,
     marketCache,
     start,

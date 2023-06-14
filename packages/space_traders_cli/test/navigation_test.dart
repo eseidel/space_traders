@@ -1,14 +1,18 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 import 'package:test/test.dart';
 
 class MockWaypointCache extends Mock implements WaypointCache {}
 
+class MockSystemsCache extends Mock implements SystemsCache {}
+
 void main() {
   test('waypointsInJumpRadius', () async {
     final WaypointCache waypointCache = MockWaypointCache();
+    final SystemsCache systemsCache = MockSystemsCache();
     final aWaypoints = [
       Waypoint(
         symbol: 'a',
@@ -45,8 +49,8 @@ void main() {
         .thenAnswer((invocation) => Future.value(aWaypoints));
     when(() => waypointCache.waypointsInSystem('B'))
         .thenAnswer((invocation) => Future.value(bWaypoints));
-    when(() => waypointCache.connectedSystems('A')).thenAnswer(
-      (invocation) => Stream.value(
+    when(() => systemsCache.connectedSystems('A')).thenAnswer(
+      (invocation) => [
         ConnectedSystem(
           symbol: 'B',
           sectorSymbol: 'B',
@@ -55,9 +59,10 @@ void main() {
           y: 0,
           distance: 0,
         ),
-      ),
+      ],
     );
     final waypoints = await waypointsInJumpRadius(
+      systemsCache: systemsCache,
       waypointCache: waypointCache,
       startSystem: 'A',
       maxJumps: 1,
@@ -66,7 +71,7 @@ void main() {
   });
 
   test('systemSymbolsInJumpRadius depth', () async {
-    final WaypointCache waypointCache = MockWaypointCache();
+    final SystemsCache systemsCache = MockSystemsCache();
     final expectedSystems = ['A', 'B', 'C', 'D', 'E'];
     var index = 0;
     for (final system in expectedSystems) {
@@ -90,15 +95,15 @@ void main() {
             distance: 0,
           ),
       ];
-      when(() => waypointCache.connectedSystems(any(that: equals(system))))
+      when(() => systemsCache.connectedSystems(any(that: equals(system))))
           .thenAnswer(
-        (invocation) => Stream.fromIterable(neighbors),
+        (invocation) => neighbors,
       );
       index++;
     }
 
     final systems = await systemSymbolsInJumpRadius(
-      waypointCache: waypointCache,
+      systemsCache: systemsCache,
       startSystem: 'A',
       maxJumps: 5,
     ).toList();
@@ -107,7 +112,7 @@ void main() {
   });
 
   test('systemSymbolsInJumpRadius all connected', () async {
-    final WaypointCache waypointCache = MockWaypointCache();
+    final SystemsCache systemsCache = MockSystemsCache();
     final expectedSystems = ['A', 'B', 'C', 'D', 'E'];
     for (final system in expectedSystems) {
       final neighbors = expectedSystems
@@ -123,14 +128,14 @@ void main() {
             ),
           )
           .toList();
-      when(() => waypointCache.connectedSystems(any(that: equals(system))))
+      when(() => systemsCache.connectedSystems(any(that: equals(system))))
           .thenAnswer(
-        (invocation) => Stream.fromIterable(neighbors),
+        (invocation) => neighbors,
       );
     }
 
     final systems = await systemSymbolsInJumpRadius(
-      waypointCache: waypointCache,
+      systemsCache: systemsCache,
       startSystem: 'A',
       maxJumps: 5,
     ).toList();

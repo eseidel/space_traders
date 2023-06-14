@@ -10,6 +10,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -45,6 +46,7 @@ Future<DateTime?> advanceExporer(
   ShipyardPrices shipyardPrices,
   Agent agent,
   Ship ship,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   BehaviorManager behaviorManager,
@@ -52,7 +54,7 @@ Future<DateTime?> advanceExporer(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
   );
   if (navResult.shouldReturn()) {
@@ -109,7 +111,11 @@ Future<DateTime?> advanceExporer(
       await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
   for (final waypoint in systemWaypoints) {
     if (_isMissingChartOrRecentPriceData(priceData, shipyardPrices, waypoint)) {
-      return navigateToLocalWaypointAndLog(api, ship, waypoint);
+      return navigateToLocalWaypointAndLog(
+        api,
+        ship,
+        waypoint.toSystemWaypoint(),
+      );
     }
   }
 
@@ -125,6 +131,7 @@ Future<DateTime?> advanceExporer(
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
     await for (final destination in waypointsInJumpRadius(
+      systemsCache: systemsCache,
       waypointCache: waypointCache,
       startSystem: currentWaypoint.systemSymbol,
       maxJumps: maxJumpDistance,
@@ -166,7 +173,7 @@ Future<DateTime?> advanceExporer(
         return beingRouteAndLog(
           api,
           ship,
-          waypointCache,
+          systemsCache,
           behaviorManager,
           destination.symbol,
         );
@@ -185,7 +192,7 @@ Future<DateTime?> advanceExporer(
 
   // Otherwise, go to a jump gate.
   final jumpGate =
-      await waypointCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
+      systemsCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
   if (jumpGate == null) {
     throw UnimplementedError('No jump gates in ${ship.nav.waypointSymbol}');
   }

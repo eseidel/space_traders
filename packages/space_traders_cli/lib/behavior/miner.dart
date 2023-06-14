@@ -13,6 +13,7 @@ import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/route.dart';
 import 'package:space_traders_cli/surveys.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -81,6 +82,7 @@ int expectedValueFromSurvey(
 
 /// Returns the nearest waypoint with a marketplace.
 Future<Waypoint> nearestWaypointWithMarket(
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   Waypoint start,
 ) async {
@@ -88,6 +90,7 @@ Future<Waypoint> nearestWaypointWithMarket(
     return start;
   }
   await for (final waypoint in waypointsInJumpRadius(
+    systemsCache: systemsCache,
     waypointCache: waypointCache,
     startSystem: start.systemSymbol,
     maxJumps: 1,
@@ -216,6 +219,7 @@ String _describeSystemEval(_SystemEval eval) {
 Future<String?> nearestMineWithGoodMining(
   Api api,
   PriceData priceData,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   Waypoint start,
@@ -223,7 +227,7 @@ Future<String?> nearestMineWithGoodMining(
 ) async {
   final evals = <_SystemEval>[];
   await for (final (systemSymbol, jumps) in systemSymbolsInJumpRadius(
-    waypointCache: waypointCache,
+    systemsCache: systemsCache,
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {
@@ -314,6 +318,7 @@ Future<DateTime?> advanceMiner(
   PriceData priceData,
   Agent agent,
   Ship ship,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   TransactionLog transactionLog,
@@ -323,7 +328,7 @@ Future<DateTime?> advanceMiner(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
   );
   if (navResult.shouldReturn()) {
@@ -376,6 +381,7 @@ Future<DateTime?> advanceMiner(
 
     final largestCargo = ship.largestCargo();
     final nearestMarket = await nearbyMarketWhichTrades(
+      systemsCache,
       waypointCache,
       marketCache,
       currentWaypoint,
@@ -393,7 +399,7 @@ Future<DateTime?> advanceMiner(
     return beingRouteAndLog(
       api,
       ship,
-      waypointCache,
+      systemsCache,
       behaviorManager,
       nearestMarket.symbol,
     );
@@ -407,7 +413,7 @@ Future<DateTime?> advanceMiner(
     );
     // We're not at an asteroid field, so we need to navigate to one.
     final systemWaypoints =
-        await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
+        systemsCache.waypointsInSystem(ship.nav.systemSymbol);
     final maybeAsteroidField =
         systemWaypoints.firstWhereOrNull((w) => w.canBeMined);
 
@@ -424,6 +430,7 @@ Future<DateTime?> advanceMiner(
     final mine = await nearestMineWithGoodMining(
       api,
       priceData,
+      systemsCache,
       waypointCache,
       marketCache,
       currentWaypoint,
@@ -443,7 +450,7 @@ Future<DateTime?> advanceMiner(
     return beingRouteAndLog(
       api,
       ship,
-      waypointCache,
+      systemsCache,
       behaviorManager,
       mine,
     );
@@ -461,6 +468,7 @@ Future<DateTime?> advanceMiner(
   // Otherwise add a new survey.
 
   final nearestMarket = await nearestWaypointWithMarket(
+    systemsCache,
     waypointCache,
     currentWaypoint,
   );

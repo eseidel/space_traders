@@ -14,6 +14,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -69,6 +70,7 @@ class _Opportunity {
 Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
   Ship ship,
   PriceData priceData,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache, {
   required String tradeSymbol,
@@ -76,6 +78,7 @@ Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
   int maxJumps = 5,
 }) async* {
   await for (final waypoint in waypointsInJumpRadius(
+    systemsCache: systemsCache,
     waypointCache: waypointCache,
     startSystem: ship.nav.systemSymbol,
     maxJumps: maxJumps,
@@ -123,6 +126,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   Api api,
   PriceData priceData,
   Ship ship,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   BehaviorManager behaviorManager, {
@@ -134,6 +138,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   final opportunity = await _nearbyMarketsWithProfitableTrade(
     ship,
     priceData,
+    systemsCache,
     waypointCache,
     marketCache,
     tradeSymbol: tradeSymbol,
@@ -165,7 +170,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   final arrival = await beingRouteAndLog(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
     opportunity.waypoint.symbol,
   );
@@ -231,6 +236,7 @@ Future<DateTime?> advanceContractTrader(
   PriceData priceData,
   Agent agent,
   Ship ship,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   TransactionLog transactionLog,
@@ -239,7 +245,7 @@ Future<DateTime?> advanceContractTrader(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
   );
   if (navResult.shouldReturn()) {
@@ -431,7 +437,7 @@ Future<DateTime?> advanceContractTrader(
     return beingRouteAndLog(
       api,
       ship,
-      waypointCache,
+      systemsCache,
       behaviorManager,
       neededGood.destinationSymbol,
     );
@@ -441,6 +447,7 @@ Future<DateTime?> advanceContractTrader(
       api,
       priceData,
       ship,
+      systemsCache,
       waypointCache,
       marketCache,
       behaviorManager,

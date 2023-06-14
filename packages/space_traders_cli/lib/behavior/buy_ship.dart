@@ -11,6 +11,7 @@ import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
@@ -108,6 +109,7 @@ Future<DateTime?> advanceBuyShip(
   ShipyardPrices shipyardPrices,
   Agent agent,
   Ship ship,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   TransactionLog transactionLog,
@@ -117,7 +119,7 @@ Future<DateTime?> advanceBuyShip(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
   );
   if (navResult.shouldReturn()) {
@@ -201,7 +203,7 @@ Future<DateTime?> advanceBuyShip(
   return beingRouteAndLog(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
     destination.symbol,
   );

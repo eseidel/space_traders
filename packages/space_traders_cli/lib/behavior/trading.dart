@@ -6,6 +6,7 @@ import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Record of a possible arbitrage opportunity.
@@ -193,6 +194,7 @@ void logDeal(Ship ship, Deal deal) {
 /// Returns a waypoint nearby which trades the good.
 /// This is not necessarily the nearest, but could be improved to be.
 Future<Waypoint?> nearbyMarketWhichTrades(
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
   Waypoint start,
@@ -206,6 +208,7 @@ Future<Waypoint?> nearbyMarketWhichTrades(
     }
   }
   await for (final waypoint in waypointsInJumpRadius(
+    systemsCache: systemsCache,
     waypointCache: waypointCache,
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,

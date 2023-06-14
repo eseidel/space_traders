@@ -110,6 +110,13 @@ class SystemsCache {
     return system.waypoints.firstWhere((w) => w.symbol == symbol);
   }
 
+  /// Return the SystemWaypoints for the given [systemSymbol].
+  /// Mostly exists for compatibility with WaypointCache.
+  List<SystemWaypoint> waypointsInSystem(String systemSymbol) {
+    final system = systemFromSymbol(systemSymbol);
+    return system.waypoints;
+  }
+
   /// Return connected systems for the given [systemSymbol].
   List<ConnectedSystem> connectedSystems(
     String systemSymbol, {

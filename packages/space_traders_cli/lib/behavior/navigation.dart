@@ -8,6 +8,7 @@ import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/extensions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
+import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
 /// Begins a new nagivation action for [ship] to [destinationSymbol].
@@ -16,7 +17,7 @@ import 'package:space_traders_cli/waypoint_cache.dart';
 Future<DateTime?> beingRouteAndLog(
   Api api,
   Ship ship,
-  WaypointCache waypointCache,
+  SystemsCache systemsCache,
   BehaviorManager behaviorManager,
   String destinationSymbol,
 ) async {
@@ -29,7 +30,7 @@ Future<DateTime?> beingRouteAndLog(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
   );
   if (navResult.shouldReturn()) {
@@ -99,7 +100,7 @@ int _distanceBetweenConnectedSystems(ConnectedSystem a, System b) {
 Future<NavResult> continueNavigationIfNeeded(
   Api api,
   Ship ship,
-  WaypointCache waypointCache,
+  SystemsCache systemsCache,
   BehaviorManager behaviorManager,
 ) async {
   if (ship.isInTransit) {
@@ -119,7 +120,7 @@ Future<NavResult> continueNavigationIfNeeded(
     await behaviorManager.setBehavior(ship.symbol, state);
     return NavResult._continueAction();
   }
-  final endWaypoint = await waypointCache.waypoint(destinationSymbol);
+  final endWaypoint = systemsCache.waypointFromSymbol(destinationSymbol);
   if (endWaypoint.systemSymbol == ship.nav.systemSymbol) {
     // We're in the same system as the end, so we can just navigate there.
     return NavResult._wait(
@@ -127,13 +128,13 @@ Future<NavResult> continueNavigationIfNeeded(
     );
   }
   // Otherwise, jump to the next system most in its direction.
-  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint =
+      systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
   if (currentWaypoint.isJumpGate) {
     // Check to make sure the system isn't out of range.  If it is, we need
     // to jump to a system along the way.
-    final connectedSystems = await waypointCache
-        .connectedSystems(currentWaypoint.systemSymbol)
-        .toList();
+    final connectedSystems =
+        systemsCache.connectedSystems(currentWaypoint.systemSymbol);
     if (connectedSystems.any((s) => s.symbol == endWaypoint.systemSymbol)) {
       // We can jump directly to the end system.
       await useJumpGateAndLog(api, ship, endWaypoint.systemSymbol);
@@ -142,8 +143,7 @@ Future<NavResult> continueNavigationIfNeeded(
       return NavResult._loop();
     }
     // Otherwise we have to jump to a system along the way.
-    final endSystem =
-        await waypointCache.systemBySymbol(endWaypoint.systemSymbol);
+    final endSystem = systemsCache.systemFromSymbol(endWaypoint.systemSymbol);
     final closestSystem = connectedSystems.reduce(
       (a, b) => _distanceBetweenConnectedSystems(a, endSystem) <
               _distanceBetweenConnectedSystems(b, endSystem)
@@ -156,7 +156,7 @@ Future<NavResult> continueNavigationIfNeeded(
     return NavResult._wait(response.cooldown.expiration!);
   }
   // We are not at a jump gate, so we need to navigate to the nearest one.
-  final jumpGate = await waypointCache.jumpGateWaypointForSystem(
+  final jumpGate = systemsCache.jumpGateWaypointForSystem(
     currentWaypoint.systemSymbol,
   );
   if (jumpGate == null) {
@@ -185,7 +185,7 @@ ConnectedSystem connectedSystemFromSystem(System system, int distance) {
 /// The system itself is included in the stream with distance 0.
 /// The stream is roughly ordered by distance from the start.
 Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
-  required WaypointCache waypointCache,
+  required SystemsCache systemsCache,
   required String startSystem,
   required int maxJumps,
 }) async* {
@@ -202,7 +202,7 @@ Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
       // Don't bother to check connections if we're out of jumps.
       if (jumpsLeft > 0) {
         final connectedSystems =
-            await waypointCache.connectedSystems(jumpFrom).toList();
+            systemsCache.connectedSystems(jumpFrom).toList();
         final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
         for (final connectedSystem in sortedSystems) {
           // Don't add systems we've already examined or are already in the
@@ -224,12 +224,13 @@ Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
 /// Waypoints from the start system are included in the stream.
 /// The stream is roughly ordered by distance from the start.
 Stream<Waypoint> waypointsInJumpRadius({
+  required SystemsCache systemsCache,
   required WaypointCache waypointCache,
   required String startSystem,
   required int maxJumps,
 }) async* {
   await for (final (String system, int _) in systemSymbolsInJumpRadius(
-    waypointCache: waypointCache,
+    systemsCache: systemsCache,
     startSystem: startSystem,
     maxJumps: maxJumps,
   )) {

@@ -366,7 +366,7 @@ Future<void> undockIfNeeded(Api api, Ship ship) async {
 Future<DateTime> navigateToLocalWaypointAndLog(
   Api api,
   Ship ship,
-  Waypoint waypoint,
+  SystemWaypoint waypoint,
 ) async {
   // Should this dock and refuel and reset the flight mode if needed?
   // if (ship.shouldRefuel) {

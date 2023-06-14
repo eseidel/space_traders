@@ -54,7 +54,7 @@ void main(List<String> args) async {
   }
 
   await for (final (systemSymbol, jumps) in systemSymbolsInJumpRadius(
-    waypointCache: waypointCache,
+    systemsCache: systemsCache,
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {

@@ -264,10 +264,10 @@ Future<CostedDeal?> findDealFor(
   required int maxOutlay,
   required int availableSpace,
 }) async {
-  final start = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final start = ship.nav.waypointSymbol;
   final markets = await systemSymbolsInJumpRadius(
-    waypointCache: waypointCache,
-    startSystem: start.systemSymbol,
+    systemsCache: systemsCache,
+    startSystem: start,
     maxJumps: maxJumps,
   )
       .asyncExpand(
@@ -393,6 +393,7 @@ int flightTimeBetween(
 Future<DateTime?> _purchaseCargoAndGo(
   Api api,
   Agent agent,
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   PriceData priceData,
   TransactionLog transactionLog,
@@ -427,7 +428,7 @@ Future<DateTime?> _purchaseCargoAndGo(
     shipInfo(
       ship,
       'Ship still has: ${cargoDescription(ship.cargo)}',
-  );
+    );
   }
 
   final maybeGood = market.tradeGoods
@@ -487,7 +488,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   return beingRouteAndLog(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
     deal.destinationSymbol,
   );
@@ -509,7 +510,7 @@ Future<DateTime?> advanceArbitrageTrader(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
   );
   if (navResult.shouldReturn()) {
@@ -564,6 +565,7 @@ Future<DateTime?> advanceArbitrageTrader(
     if (ship.cargo.isNotEmpty) {
       shipInfo(ship, 'Cargo hold still not empty, finding market.');
       final market = await nearbyMarketWhichTrades(
+        systemsCache,
         waypointCache,
         marketCache,
         currentWaypoint,
@@ -581,7 +583,7 @@ Future<DateTime?> advanceArbitrageTrader(
       return beingRouteAndLog(
         api,
         ship,
-        waypointCache,
+        systemsCache,
         behaviorManager,
         market.symbol,
       );
@@ -596,6 +598,7 @@ Future<DateTime?> advanceArbitrageTrader(
       return _purchaseCargoAndGo(
         api,
         agent,
+        systemsCache,
         waypointCache,
         priceData,
         transactionLog,
@@ -618,7 +621,7 @@ Future<DateTime?> advanceArbitrageTrader(
     return beingRouteAndLog(
       api,
       ship,
-      waypointCache,
+      systemsCache,
       behaviorManager,
       pastDeal.deal.destinationSymbol,
     );
@@ -662,6 +665,7 @@ Future<DateTime?> advanceArbitrageTrader(
     return _purchaseCargoAndGo(
       api,
       agent,
+      systemsCache,
       waypointCache,
       priceData,
       transactionLog,
@@ -676,7 +680,7 @@ Future<DateTime?> advanceArbitrageTrader(
   return beingRouteAndLog(
     api,
     ship,
-    waypointCache,
+    systemsCache,
     behaviorManager,
     deal.deal.sourceSymbol,
   );

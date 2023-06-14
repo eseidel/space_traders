@@ -49,7 +49,7 @@ void main(List<String> args) async {
   final availabilityList = <_Availability>[];
 
   await for (final (String system, int jumps) in systemSymbolsInJumpRadius(
-    waypointCache: waypointCache,
+    systemsCache: systemsCache,
     startSystem: hq.systemSymbol,
     maxJumps: maxJumps,
   )) {

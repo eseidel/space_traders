@@ -22,8 +22,17 @@ extension SystemUtils on System {
 
 /// Extensions onto SystemWaypoint to make it easier to work with.
 extension SystemWaypointUtils on SystemWaypoint {
+  /// Returns true if the waypoint has the given type.
+  bool isType(WaypointType type) => this.type == type;
+
   /// Returns true if the waypoint is a jump gate.
-  bool get isJumpGate => type == WaypointType.JUMP_GATE;
+  bool get isJumpGate => isType(WaypointType.JUMP_GATE);
+
+  /// Returns true if the waypoint is an asteroid field.
+  bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
+
+  /// Returns true if the waypoint can be mined.
+  bool get canBeMined => isAsteroidField;
 
   /// The system symbol of the waypoint.
   String get systemSymbol => parseWaypointString(symbol).system;

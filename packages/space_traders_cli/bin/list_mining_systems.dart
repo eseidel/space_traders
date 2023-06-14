@@ -60,6 +60,7 @@ void main(List<String> args) async {
   final mine = await nearestMineWithGoodMining(
     api,
     priceData,
+    systemsCache,
     waypointCache,
     marketCache,
     start,

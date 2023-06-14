@@ -77,7 +77,7 @@ void main(List<String> args) async {
       await waypointCache.systemBySymbol(ship.nav.systemSymbol);
   final jumpGate = await waypointCache.jumpGateForSystem(ship.nav.systemSymbol);
   final jumpGateWaypoint =
-      await waypointCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
+      systemsCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
 
   final systemChoices = [
     connectedSystemFromSystem(startingSystem, 0),
