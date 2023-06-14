@@ -115,8 +115,17 @@ Future<void> main(List<String> args) async {
   ProcessSignal.sigint.watch().listen((signal) {
     final client = api.apiClient as RateLimitedApiClient;
     final counts = client.requestCounts.counts;
+    final generalizedCounts = <String, int>{};
+    for (final key in counts.keys) {
+      final generalizedKey = key
+          .split('/')
+          .map((part) => part.contains('-') ? 'N' : part)
+          .join('/');
+      generalizedCounts[generalizedKey] =
+          (generalizedCounts[generalizedKey] ?? 0) + counts[key]!;
+    }
     // print the counts in order of most to least.
-    final sortedCounts = counts.entries.toList()
+    final sortedCounts = generalizedCounts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     logger.info('Request stats:');
     for (final entry in sortedCounts) {
