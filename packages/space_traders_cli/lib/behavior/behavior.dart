@@ -75,7 +75,10 @@ class BehaviorState {
 }
 
 /// Function to set Behavior per ship.
-typedef BehaviorPolicy = Behavior Function(BehaviorManager, String);
+typedef BehaviorPolicy = Behavior Function(
+  BehaviorManager behaviorManager,
+  Ship ship,
+);
 
 /// Class to allow managemnet of BehaviorState.
 class BehaviorManager {
@@ -101,9 +104,9 @@ class BehaviorManager {
   }
 
   /// Get the behavior state for the given ship.
-  Future<BehaviorState> getBehavior(String shipSymbol) async {
-    return await loadBehaviorState(_db, shipSymbol) ??
-        BehaviorState(_policy(this, shipSymbol));
+  Future<BehaviorState> getBehavior(Ship ship) async {
+    return await loadBehaviorState(_db, ship.symbol) ??
+        BehaviorState(_policy(this, ship));
   }
 
   /// Check if the given behavior is enabled.

@@ -85,7 +85,7 @@ Then modified:
 ### Todo
 
 Logic:
-* Keep per-ship logs, so can caculate per-ship efficiency.
+* Keep per-ship logs, so can calculate per-ship efficiency.
 * Compute earnings per hour per ship.
 * Survey mines when we pass by if we have another ship there?
 * Probes should plan jumps based on distance to hq, not current location.
@@ -109,11 +109,16 @@ Logic:
 * Add logic for buying and mounting modules.
 * Get above 50% coverage.
 * Fix contract trader to not assume it's current market is the right one to buy
-  from if the contract is fulfillable from the market it's at.
+  from if the contract is fulfill-able from the market it's at.
 * Teach explorers to avoid each other.  Right now they all route to the same
   opportunities.
   Explorers should generate a queue of good planets to explore, and then
   pull from that queue?
+* Add a mass-move command which uses explore logic and logicLoop to move
+  multiple ships at once.
+* Add some object to hold agent and ships so both can be updated by results
+  of API calls and not fetched after every ship.
+* Teach URL frequency summary to ignore changing values (ship name, etc.)
 
 UI:
 * Add a Flutter UI.

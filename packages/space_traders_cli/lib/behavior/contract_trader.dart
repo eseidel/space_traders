@@ -253,6 +253,7 @@ Future<DateTime?> advanceContractTrader(
   final contract = contracts.firstOrNull;
   if (contract == null) {
     await negotiateContractAndLog(api, ship);
+    // TODO(eseidel): Print expected time and profits of the new contract.
     return null;
   }
   if (!contract.accepted) {

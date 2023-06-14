@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:file/local.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
@@ -14,6 +16,52 @@ import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
+
+// Consider having a config file like:
+// https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
+// instead of having this dynamic behavior function.
+// At the top of the file because I change this so often.
+Behavior _behaviorFor(
+  BehaviorManager behaviorManager,
+  Ship ship,
+) {
+  final disableBehaviors = <Behavior>[
+    // Behavior.buyShip,
+    // Behavior.contractTrader,
+    Behavior.arbitrageTrader,
+    // Behavior.miner,
+    // Behavior.idle,
+    // Behavior.explorer,
+  ];
+
+  final behaviors = {
+    ShipRole.COMMAND: [
+      Behavior.buyShip,
+      Behavior.contractTrader,
+      Behavior.arbitrageTrader,
+      Behavior.miner
+    ],
+    // Can't have more than one contract trader on small/expensive contracts
+    // or we'll overbuy.
+    ShipRole.HAULER: [Behavior.idle],
+    ShipRole.EXCAVATOR: [Behavior.miner],
+    ShipRole.SURVEYOR: [Behavior.explorer],
+  }[ship.registration.role];
+  if (behaviors != null) {
+    for (final behavior in behaviors) {
+      if (disableBehaviors.contains(behavior)) {
+        continue;
+      }
+      if (behaviorManager.isEnabled(behavior)) {
+        return behavior;
+      }
+    }
+  } else {
+    logger
+        .warn('${ship.registration.role} has no specified behaviors, idling.');
+  }
+  return Behavior.idle;
+}
 
 Future<void> main(List<String> args) async {
   final parser = ArgParser()
@@ -50,6 +98,15 @@ Future<void> main(List<String> args) async {
   final transactions = await TransactionLog.load(fs);
   final shipyardPrices = await ShipyardPrices.load(fs);
 
+  // Behaviors are expected to "complete" behaviors when done and
+  // disable behaviors on error.
+  final behaviorManager = await BehaviorManager.load(db, (bm, ship) {
+    // TODO(eseidel): This logic is triggered twice for each ship?
+    final behavior = _behaviorFor(bm, ship);
+    // shipInfo(ship, 'Chose new behavior: $behavior');
+    return behavior;
+  });
+
   final status = await api.defaultApi.getStatus();
   printStatus(status!);
 
@@ -77,5 +134,6 @@ Future<void> main(List<String> args) async {
     shipyardPrices,
     surveyData,
     transactions,
+    behaviorManager,
   );
 }

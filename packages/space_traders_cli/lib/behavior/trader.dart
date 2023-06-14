@@ -480,7 +480,7 @@ Future<DateTime?> _purchaseCargoAndGo(
     '@ ${transaction.pricePerUnit} (expected ${deal.purchasePrice}) '
     ' = ${transaction.totalPrice}',
   );
-  final behaviorState = await behaviorManager.getBehavior(ship.symbol);
+  final behaviorState = await behaviorManager.getBehavior(ship);
   behaviorState.deal!.actualPurchasePrice = result.transaction.pricePerUnit;
   await behaviorManager.setBehavior(ship.symbol, behaviorState);
 
@@ -538,7 +538,7 @@ Future<DateTime?> advanceArbitrageTrader(
     );
   }
 
-  final behaviorState = await behaviorManager.getBehavior(ship.symbol);
+  final behaviorState = await behaviorManager.getBehavior(ship);
   final pastDeal = behaviorState.deal;
 
   final pastDealTradeSymbol = pastDeal?.deal.tradeSymbol.value;
@@ -652,7 +652,7 @@ Future<DateTime?> advanceArbitrageTrader(
   }
 
   shipInfo(ship, 'Found deal: ${describeCostedDeal(deal)}');
-  final state = await behaviorManager.getBehavior(ship.symbol);
+  final state = await behaviorManager.getBehavior(ship);
   state.deal = deal;
   await behaviorManager.setBehavior(ship.symbol, state);
 

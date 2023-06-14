@@ -20,7 +20,7 @@ Future<DateTime?> beingRouteAndLog(
   BehaviorManager behaviorManager,
   String destinationSymbol,
 ) async {
-  final state = await behaviorManager.getBehavior(ship.symbol);
+  final state = await behaviorManager.getBehavior(ship);
   state.destination = destinationSymbol;
   // TODO(eseidel): Should this buy fuel first if we need it?
   // TODO(eseidel): Pass in the whole route and log it?
@@ -106,7 +106,7 @@ Future<NavResult> continueNavigationIfNeeded(
     // Go back to sleep until we arrive.
     return NavResult._wait(logRemainingTransitTime(ship));
   }
-  final state = await behaviorManager.getBehavior(ship.symbol);
+  final state = await behaviorManager.getBehavior(ship);
   final destinationSymbol = state.destination;
   if (destinationSymbol == null) {
     // We don't have a destination, so we can't navigate.
@@ -205,7 +205,10 @@ Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
             await waypointCache.connectedSystems(jumpFrom).toList();
         final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
         for (final connectedSystem in sortedSystems) {
-          if (!systemsExamined.contains(connectedSystem.symbol)) {
+          // Don't add systems we've already examined or are already in the
+          // list to examine next.
+          if (!systemsExamined.contains(connectedSystem.symbol) &&
+              !currentSystemsToJumpFrom.contains(connectedSystem.symbol)) {
             oneJumpFurther.add(connectedSystem.symbol);
           }
         }

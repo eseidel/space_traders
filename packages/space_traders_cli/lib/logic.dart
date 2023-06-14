@@ -16,52 +16,8 @@ import 'package:space_traders_cli/systems_cache.dart';
 import 'package:space_traders_cli/transactions.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';
 
-// Consider having a config file like:
-// https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
-// instead of having this dynamic behavior function.
-// At the top of the file because I change this so often.
-Behavior _behaviorFor(
-  BehaviorManager behaviorManager,
-  Ship ship,
-  Agent agent,
-) {
-  final disableBehaviors = <Behavior>[
-    Behavior.buyShip,
-    // Behavior.contractTrader,
-    Behavior.arbitrageTrader,
-    // Behavior.miner,
-    // Behavior.idle,
-    // Behavior.explorer,
-  ];
-
-  final behaviors = {
-    ShipRole.COMMAND: [
-      Behavior.contractTrader,
-      Behavior.arbitrageTrader,
-      Behavior.miner
-    ],
-    ShipRole.HAULER: [Behavior.contractTrader],
-    ShipRole.EXCAVATOR: [Behavior.miner],
-    ShipRole.SURVEYOR: [Behavior.explorer],
-  }[ship.registration.role];
-  if (behaviors != null) {
-    for (final behavior in behaviors) {
-      if (disableBehaviors.contains(behavior)) {
-        continue;
-      }
-      if (behaviorManager.isEnabled(behavior)) {
-        return behavior;
-      }
-    }
-  } else {
-    logger
-        .warn('${ship.registration.role} has no specified behaviors, idling.');
-  }
-  return Behavior.idle;
-}
-
 /// One loop of the logic.
-Future<void> logicLoop(
+Future<void> advanceShips(
   Api api,
   DataStore db,
   SystemsCache systemsCache,
@@ -69,29 +25,22 @@ Future<void> logicLoop(
   ShipyardPrices shipyardPrices,
   SurveyData surveyData,
   TransactionLog transactions,
+  BehaviorManager behaviorManager,
   ShipWaiter waiter,
+  List<Ship> myShips,
 ) async {
+  // WaypointCache and MarketCache only live for one loop over the ships.
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
   final agent = await getMyAgent(api);
-  final myShips = await allMyShips(api).toList();
   waiter.updateForShips(myShips);
 
-  // loop over all mining ships and advance them.
+  // loop over all ships and advance them.
   for (final ship in myShips) {
     final previousWait = waiter.waitUntil(ship.symbol);
     if (previousWait != null) {
       continue;
     }
-    // We should only generate a new behavior when we're done with our last
-    // behavior?
-    final behaviorManager = await BehaviorManager.load(db, (bm, shipSymbol) {
-      // This logic is triggered twice for each ship, not sure why.
-      final ship = myShips.firstWhere((s) => s.symbol == shipSymbol);
-      final behavior = _behaviorFor(bm, ship, agent);
-      // shipInfo(ship, 'Chose new behavior: $behavior');
-      return behavior;
-    });
     try {
       final ctx = BehaviorContext(
         api,
@@ -139,7 +88,6 @@ bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
 }
 
 /// Run the logic loop forever.
-/// Currently just sends ships to mine and sell ore.
 Future<void> logic(
   Api api,
   DataStore db,
@@ -148,12 +96,13 @@ Future<void> logic(
   ShipyardPrices shipyardPrices,
   SurveyData surveyData,
   TransactionLog transactions,
+  BehaviorManager behaviorManager,
 ) async {
   final waiter = ShipWaiter();
 
   while (true) {
     try {
-      await logicLoop(
+      await advanceShips(
         api,
         db,
         systemsCache,
@@ -161,7 +110,9 @@ Future<void> logic(
         shipyardPrices,
         surveyData,
         transactions,
+        behaviorManager,
         waiter,
+        await allMyShips(api).toList(),
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {

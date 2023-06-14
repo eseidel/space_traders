@@ -71,7 +71,7 @@ class BehaviorContext {
 
   /// Load the behavior state for the given ship.
   Future<BehaviorState> loadBehaviorState() async =>
-      behaviorManager.getBehavior(ship.symbol);
+      behaviorManager.getBehavior(ship);
 }
 
 /// Advance the behavior of the given ship.

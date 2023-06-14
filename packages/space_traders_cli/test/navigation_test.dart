@@ -65,7 +65,7 @@ void main() {
     expect(waypoints, [...aWaypoints, ...bWaypoints]);
   });
 
-  test('systemSymbolsInJumpRadius', () async {
+  test('systemSymbolsInJumpRadius depth', () async {
     final WaypointCache waypointCache = MockWaypointCache();
     final expectedSystems = ['A', 'B', 'C', 'D', 'E'];
     var index = 0;
@@ -74,7 +74,7 @@ void main() {
         if (index < expectedSystems.length - 1)
           ConnectedSystem(
             symbol: expectedSystems[index + 1],
-            sectorSymbol: expectedSystems[index + 1],
+            sectorSymbol: 'S',
             type: SystemType.RED_STAR,
             x: 0,
             y: 0,
@@ -83,7 +83,7 @@ void main() {
         if (index > 0)
           ConnectedSystem(
             symbol: expectedSystems[index - 1],
-            sectorSymbol: expectedSystems[index - 1],
+            sectorSymbol: 'S',
             type: SystemType.RED_STAR,
             x: 0,
             y: 0,
@@ -95,6 +95,38 @@ void main() {
         (invocation) => Stream.fromIterable(neighbors),
       );
       index++;
+    }
+
+    final systems = await systemSymbolsInJumpRadius(
+      waypointCache: waypointCache,
+      startSystem: 'A',
+      maxJumps: 5,
+    ).toList();
+    final systemSymbols = systems.map((e) => e.$1).toList();
+    expect(systemSymbols, expectedSystems);
+  });
+
+  test('systemSymbolsInJumpRadius all connected', () async {
+    final WaypointCache waypointCache = MockWaypointCache();
+    final expectedSystems = ['A', 'B', 'C', 'D', 'E'];
+    for (final system in expectedSystems) {
+      final neighbors = expectedSystems
+          .where((s) => s != system)
+          .map(
+            (s) => ConnectedSystem(
+              symbol: s,
+              sectorSymbol: 'S',
+              type: SystemType.RED_STAR,
+              x: 0,
+              y: 0,
+              distance: 0,
+            ),
+          )
+          .toList();
+      when(() => waypointCache.connectedSystems(any(that: equals(system))))
+          .thenAnswer(
+        (invocation) => Stream.fromIterable(neighbors),
+      );
     }
 
     final systems = await systemSymbolsInJumpRadius(
