@@ -223,14 +223,18 @@ Future<String?> nearestMineWithGoodMining(
   WaypointCache waypointCache,
   MarketCache marketCache,
   Waypoint start,
-  int maxJumps,
-) async {
+  int maxJumps, {
+  bool Function(String systemSymbol)? systemFilter,
+}) async {
   final evals = <_SystemEval>[];
   await for (final (systemSymbol, jumps) in systemSymbolsInJumpRadius(
     systemsCache: systemsCache,
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {
+    if (systemFilter != null && !systemFilter(systemSymbol)) {
+      continue;
+    }
     final eval = await _evaluateSystem(
       api,
       priceData,
@@ -481,13 +485,49 @@ Future<DateTime?> advanceMiner(
   );
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
-    final outer = await api.fleet.createSurvey(ship.symbol);
-    final response = outer!.data;
-    // shipDetail(ship, '🔭 ${ship.nav.waypointSymbol}');
-    // Record survey.
-    await surveyData.recordSurveys(response.surveys);
-    // Wait for cooldown.
-    return response.cooldown.expiration;
+    try {
+      final outer = await api.fleet.createSurvey(ship.symbol);
+      final response = outer!.data;
+      // shipDetail(ship, '🔭 ${ship.nav.waypointSymbol}');
+      // Record survey.
+      await surveyData.recordSurveys(response.surveys);
+      // Wait for cooldown.
+      return response.cooldown.expiration;
+    } on ApiException catch (e) {
+      // 500 doesn't make sense, but there is a current issue:
+      // https://github.com/SpaceTradersAPI/api-docs/issues/62
+      if (e.code == 500) {
+        shipWarn(ship, 'Survey failed, with 500 error, moving systems.');
+        final mineSymbol = await nearestMineWithGoodMining(
+          api,
+          priceData,
+          systemsCache,
+          waypointCache,
+          marketCache,
+          nearestMarket,
+          5,
+          systemFilter: (systemSymbol) => systemSymbol != ship.nav.systemSymbol,
+        );
+        if (mineSymbol != null) {
+          return beingRouteAndLog(
+            api,
+            ship,
+            systemsCache,
+            behaviorManager,
+            mineSymbol,
+          );
+        } else {
+          shipWarn(
+            ship,
+            'No good mining system found in 5 radius of '
+            '${ship.nav.systemSymbol}, disabling miner behavior.',
+          );
+          await behaviorManager.disableBehavior(ship, Behavior.miner);
+          return null;
+        }
+      }
+      rethrow;
+    }
   }
 
   /// If we either have a survey or don't have a surveyer, mine.

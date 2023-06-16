@@ -143,6 +143,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     marketCache,
     tradeSymbol: tradeSymbol,
     breakevenUnitPrice: breakevenUnitPrice,
+    maxJumps: 10,
   ).firstOrNull;
   if (opportunity == null) {
     shipErr(
