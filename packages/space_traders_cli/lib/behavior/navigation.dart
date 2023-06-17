@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/net/actions.dart';
+import 'package:space_traders_cli/printing.dart';
 
 /// Begins a new nagivation action for [ship] to [destinationSymbol].
 /// Returns the wait time if the ship should wait or null if no wait is needed.

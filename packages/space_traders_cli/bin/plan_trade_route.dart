@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
-import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/net/auth.dart';
 
 Iterable<MarketPrice> pricesForWaypoint(
   PriceData priceData,

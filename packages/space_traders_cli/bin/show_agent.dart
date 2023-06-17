@@ -1,7 +1,7 @@
 import 'package:file/local.dart';
 import 'package:space_traders_cli/net/auth.dart';
-import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/net/queries.dart';
+import 'package:space_traders_cli/printing.dart';
 
 void main(List<String> args) async {
   const fs = LocalFileSystem();

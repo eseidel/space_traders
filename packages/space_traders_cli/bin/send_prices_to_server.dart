@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:file/local.dart';
 import 'package:http/http.dart' as http;
-import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/logger.dart';
 
 void main(List<String> args) async {
   const fs = LocalFileSystem();

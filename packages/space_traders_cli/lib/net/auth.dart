@@ -1,7 +1,7 @@
 import 'package:file/file.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/net/exceptions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/net/exceptions.dart';
 import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/net/rate_limit.dart';
 

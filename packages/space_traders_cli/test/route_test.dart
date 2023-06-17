@@ -1,7 +1,7 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/route.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/route.dart';
 import 'package:test/test.dart';
 
 class MockWaypointCache extends Mock implements WaypointCache {}

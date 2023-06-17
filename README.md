@@ -126,6 +126,12 @@ Automation:
   multiple ships at once.
 * Have a config language to explain what mounts a ship should have.
 * Have a config language to explain what the ships should be doing.
+* Need to store handle and email somewhere.
+* Need logic for planning which faction to be (random)?
+* Logic for planning what to do with money (e.g. buy ships, by mods)
+  Should disable buying behavior for less time early on?
+* When to enable which behaviors?
+* Surveys.  How much surveying should we do before we start mining?
 
 UI:
 * Make shipInfo include an emoji for the behavior.

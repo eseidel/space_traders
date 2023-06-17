@@ -1,14 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:file/local.dart';
-import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/net/auth.dart';
-import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/net/actions.dart';
+import 'package:space_traders_cli/net/auth.dart';
+import 'package:space_traders_cli/net/queries.dart';
+import 'package:space_traders_cli/printing.dart';
 
 String describeShipType(ShipType type, Shipyard shipyard, PriceData priceData) {
 // This assumes there is only one ship available of each type in the yard.

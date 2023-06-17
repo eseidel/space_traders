@@ -6,7 +6,6 @@ import 'package:space_traders_cli/behavior/explorer.dart';
 import 'package:space_traders_cli/behavior/miner.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
@@ -14,6 +13,7 @@ import 'package:space_traders_cli/cache/surveys.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/logger.dart';
 
 /// The context for a behavior.
 class BehaviorContext {

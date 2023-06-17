@@ -4,18 +4,18 @@ import 'package:args/args.dart';
 import 'package:file/local.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/logic.dart';
 import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/net/rate_limit.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
+import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/logic.dart';
+import 'package:space_traders_cli/net/auth.dart';
+import 'package:space_traders_cli/net/rate_limit.dart';
+import 'package:space_traders_cli/printing.dart';
 
 // Consider having a config file like:
 // https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
@@ -62,14 +62,6 @@ Behavior _behaviorFor(
   }
   return Behavior.idle;
 }
-
-// Planning questions
-// - Need to store handle and email somewhere.
-// - Need logic for planning which faction to be (random)?
-// - Logic for planning what to do with money (e.g. buy ships, by mods)
-// Should disable buying behavior for less time early on?
-// - When to enable which behaviors?
-// - Surveys.  How much surveying should we do before we start mining?
 
 Future<void> main(List<String> args) async {
   final parser = ArgParser()
