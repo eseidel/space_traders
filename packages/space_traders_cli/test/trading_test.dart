@@ -10,11 +10,50 @@ class MockWaypointCache extends Mock implements WaypointCache {}
 class MockPriceData extends Mock implements PriceData {}
 
 void main() {
-  test('DealFinder', () {
+  test('DealFinder empty', () {
     final priceData = MockPriceData();
     final finder = DealFinder(priceData);
     final deals = finder.findDeals();
     expect(deals, isEmpty);
+  });
+
+  test('DealFinder single deal', () {
+    final priceData = MockPriceData();
+    final tradeGood =
+        TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
+    final finder = DealFinder(priceData)
+      ..visitMarket(
+        Market(
+          symbol: 'A',
+          exchange: [tradeGood],
+          tradeGoods: [
+            MarketTradeGood(
+              symbol: 'FUEL',
+              tradeVolume: 100,
+              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+              purchasePrice: 2,
+              sellPrice: 3,
+            )
+          ],
+        ),
+      )
+      ..visitMarket(
+        Market(
+          symbol: 'B',
+          exchange: [tradeGood],
+          tradeGoods: [
+            MarketTradeGood(
+              symbol: 'FUEL',
+              tradeVolume: 100,
+              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+              purchasePrice: 1,
+              sellPrice: 2,
+            )
+          ],
+        ),
+      );
+    final deals = finder.findDeals();
+    expect(deals, isNotEmpty);
   });
 
   test('estimateSellPrice null', () {

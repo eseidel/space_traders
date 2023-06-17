@@ -217,27 +217,43 @@ Future<Waypoint?> nearbyMarketWhichTrades(
   return null;
 }
 
+/// A potential purchase opportunity.
 @immutable
 class _BuyOpp {
+  /// Create a new BuyOpp.
   const _BuyOpp({
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
   });
+
+  /// The symbol of the market where the good is sold.
   final String marketSymbol;
+
+  /// The symbol of the good being sold.
   final String tradeSymbol;
+
+  /// The price of the good.
   final int price;
 }
 
+/// A potential sale opportunity.  Only public for testing.
 @immutable
 class _SellOpp {
+  /// Create a new SellOpp.
   const _SellOpp({
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
   });
+
+  /// The symbol of the market where the good is bought.
   final String marketSymbol;
+
+  /// The symbol of the good being bought.
   final String tradeSymbol;
+
+  /// The price of the good.
   final int price;
 }
 
