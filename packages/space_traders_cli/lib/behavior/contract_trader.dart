@@ -337,7 +337,7 @@ Future<DateTime?> advanceContractTrader(
   // Which might be a bad deal to buy from!
   // If we're at a market, buy our goods.
   if (currentMarket != null) {
-  // Sell everything we have except the contract goal.
+    // Sell everything we have except the contract goal.
     if (ship.cargo.isNotEmpty) {
       await sellAllCargoAndLog(
         api,
