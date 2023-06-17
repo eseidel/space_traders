@@ -11,9 +11,10 @@ import 'package:space_traders_cli/route.dart';
 
 /// Record of a possible arbitrage opportunity.
 // This should also include expected cost of fuel and cost of time.
+@immutable
 class Deal {
   /// Create a new deal.
-  Deal({
+  const Deal({
     required this.sourceSymbol,
     required this.destinationSymbol,
     required this.tradeSymbol,
@@ -62,6 +63,25 @@ class Deal {
         'purchasePrice': purchasePrice,
         'sellPrice': sellPrice,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Deal &&
+          runtimeType == other.runtimeType &&
+          tradeSymbol == other.tradeSymbol &&
+          sourceSymbol == other.sourceSymbol &&
+          destinationSymbol == other.destinationSymbol &&
+          purchasePrice == other.purchasePrice &&
+          sellPrice == other.sellPrice;
+
+  @override
+  int get hashCode =>
+      tradeSymbol.hashCode ^
+      sourceSymbol.hashCode ^
+      destinationSymbol.hashCode ^
+      purchasePrice.hashCode ^
+      sellPrice.hashCode;
 }
 
 int _percentileForTradeType(ExchangeType tradeType) {
@@ -369,16 +389,16 @@ class CostedDeal {
       );
 
   /// The deal being considered.
-  Deal deal;
+  final Deal deal;
 
   /// The units of fuel to travel between the two markets.
-  int fuelCost;
+  final int fuelCost;
 
   /// The number of units of cargo to trade.
-  int tradeVolume;
+  final int tradeVolume;
 
   /// The time in seconds to travel between the two markets.
-  int time;
+  final int time;
 
   /// The actual purchase price of the deal.
   int? actualPurchasePrice;
