@@ -84,48 +84,54 @@ Then modified:
 
 ### Todo
 
-Logic:
+Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
 * Compute earnings per hour per ship.
-* Survey mines when we pass by if we have another ship there?
-* Probes should plan jumps based on distance to hq, not current location.
-* Fix probes getting stuck cycling.
-* Remove guards against 0 prices from prices.dart.
-* Make shipInfo include an emoji for the behavior.
-* Start to build a system database similar to the pricing database.
-* Persist some of WaypointCache to disk.
-* Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Fix arbitrage trader to be able to buy more than 10 units of low volume goods.
   The contract trader already knows how to do this?
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
-* Build a docker container and run the app in the cloud.  With a docker volume
-  so the state persists.
 * Track and print expected vs. actual profit on trades.
-* Fix contract trader to share code with arbitrage trader.  Contracts are a
-  special case of arbitrage, in which the destination and trade good are fixed.
-* Make CLI print frequency of api calls on exit.
 * Teach arbitrage trader how to empty its cargo hold of things it's not trading.
   If the markets it happens by don't trade those things it's stuck with them.
 * Add logic for buying and mounting modules.
-* Get above 50% coverage.
 * Fix contract trader to not assume it's current market is the right one to buy
   from if the contract is fulfill-able from the market it's at.
+
+Exploring:
+* Probes should plan jumps based on distance to hq, not current location.
+* Fix probes getting stuck cycling.
 * Teach explorers to avoid each other.  Right now they all route to the same
   opportunities.
   Explorers should generate a queue of good systems to explore, and then
   pull from that queue?
-* Add a mass-move command which uses explore logic and logicLoop to move
-  multiple ships at once.
+
+Tech Debt:
+* Build a docker container and run the app in the cloud.  With a docker volume
+  so the state persists.
+* Remove guards against 0 prices from prices.dart.
+* Get above 50% coverage.
+
+Efficiency:
+* Start to build a system database similar to the pricing database.
+* Persist some of WaypointCache to disk.
+* Make dart run .\bin\percentage_mapped.dart -v make zero requests.
+* Fix contract trader to share code with arbitrage trader.  Contracts are a
+  special case of arbitrage, in which the destination and trade good are fixed.
 * Add some object to hold agent and ships so both can be updated by results
   of API calls and not fetched after every ship.
+
+Automation:
+* Automate resets
+* Add a mass-move command which uses explore logic and logicLoop to move
+  multiple ships at once.
 * Have a config language to explain what mounts a ship should have.
 * Have a config language to explain what the ships should be doing.
 
 UI:
+* Make shipInfo include an emoji for the behavior.
 * Add a Flutter UI.
 * Make it possible to filter for a sub-set of systems (e.g. ones with a market and a mine).
-
 
 Thoughts
 * Miners are just the "find me where to sell this" problem
