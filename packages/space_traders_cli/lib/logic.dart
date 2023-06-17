@@ -9,6 +9,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/ship_cache.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
@@ -27,27 +28,34 @@ Future<void> advanceShips(
   TransactionLog transactions,
   BehaviorManager behaviorManager,
   ShipWaiter waiter,
-  List<Ship> myShips,
+  ShipCache shipCache,
 ) async {
   // WaypointCache and MarketCache only live for one loop over the ships.
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
   final agent = await getMyAgent(api);
-  waiter.updateForShips(myShips);
+
+  // TODO(eseidel): This should be removed once we believe we're keeping
+  // the list of ships up to date correctly from responses.
+  shipCache.updateShips(await allMyShips(api).toList());
+  waiter.updateForShips(shipCache.ships);
+
+  final shipSymbols = shipCache.shipSymbols;
 
   // loop over all ships and advance them.
-  for (final ship in myShips) {
-    final previousWait = waiter.waitUntil(ship.symbol);
+  for (final shipSymbol in shipSymbols) {
+    final previousWait = waiter.waitUntil(shipSymbol);
     if (previousWait != null) {
       continue;
     }
+    final ship = shipCache.ship(shipSymbol);
     try {
       final ctx = BehaviorContext(
         api,
         db,
         priceData,
         shipyardPrices,
-        ship,
+        shipCache,
         agent,
         systemsCache,
         waypointCache,
@@ -55,9 +63,10 @@ Future<void> advanceShips(
         behaviorManager,
         surveyData,
         transactions,
+        ship,
       );
       final waitUntil = await advanceShipBehavior(ctx);
-      waiter.updateWaitUntil(ship.symbol, waitUntil);
+      waiter.updateWaitUntil(shipSymbol, waitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when
       // running the script fresh with no state while a ship is still on
@@ -69,8 +78,10 @@ Future<void> advanceShips(
       }
       final difference = expiration.difference(DateTime.now());
       shipInfo(ship, '🥶 for ${durationString(difference)}');
-      waiter.updateWaitUntil(ship.symbol, expiration);
+      waiter.updateWaitUntil(shipSymbol, expiration);
     }
+    // This assumes that advanceShipBehavior updated the passed in ship.
+    shipCache.updateShip(ship);
   }
 }
 
@@ -99,6 +110,7 @@ Future<void> logic(
   BehaviorManager behaviorManager,
 ) async {
   final waiter = ShipWaiter();
+  final shipCache = ShipCache(await allMyShips(api).toList());
 
   while (true) {
     try {
@@ -112,7 +124,7 @@ Future<void> logic(
         transactions,
         behaviorManager,
         waiter,
-        await allMyShips(api).toList(),
+        shipCache,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {

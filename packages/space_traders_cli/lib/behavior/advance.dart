@@ -9,6 +9,7 @@ import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/data_store.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/ship_cache.dart';
 import 'package:space_traders_cli/shipyard_prices.dart';
 import 'package:space_traders_cli/surveys.dart';
 import 'package:space_traders_cli/systems_cache.dart';
@@ -23,7 +24,7 @@ class BehaviorContext {
     this.db,
     this.priceData,
     this.shipyardPrices,
-    this.ship,
+    this.shipCache,
     this.agent,
     this.systemsCache,
     this.waypointCache,
@@ -31,6 +32,7 @@ class BehaviorContext {
     this.behaviorManager,
     this.surveyData,
     this.transactions,
+    this.ship,
   );
 
   /// Handle to the API clients.
@@ -44,6 +46,9 @@ class BehaviorContext {
 
   /// The historical shipyard prices.
   final ShipyardPrices shipyardPrices;
+
+  /// The ShipCache.
+  final ShipCache shipCache;
 
   /// The ship we are controlling.
   final Ship ship;

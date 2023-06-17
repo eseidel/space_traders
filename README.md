@@ -113,13 +113,14 @@ Logic:
   from if the contract is fulfill-able from the market it's at.
 * Teach explorers to avoid each other.  Right now they all route to the same
   opportunities.
-  Explorers should generate a queue of good planets to explore, and then
+  Explorers should generate a queue of good systems to explore, and then
   pull from that queue?
 * Add a mass-move command which uses explore logic and logicLoop to move
   multiple ships at once.
 * Add some object to hold agent and ships so both can be updated by results
   of API calls and not fetched after every ship.
-* Teach URL frequency summary to ignore changing values (ship name, etc.)
+* Have a config language to explain what mounts a ship should have.
+* Have a config language to explain what the ships should be doing.
 
 UI:
 * Add a Flutter UI.
