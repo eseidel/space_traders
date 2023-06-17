@@ -79,9 +79,9 @@ All URIs are relative to *https://api.spacetraders.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AgentsApi* | [**getMyAgent**](doc\/AgentsApi.md#getmyagent) | **GET** /my/agent | My Agent Details
+*AgentsApi* | [**getMyAgent**](doc\/AgentsApi.md#getmyagent) | **GET** /my/agent | Get Agent
 *ContractsApi* | [**acceptContract**](doc\/ContractsApi.md#acceptcontract) | **POST** /my/contracts/{contractId}/accept | Accept Contract
-*ContractsApi* | [**deliverContract**](doc\/ContractsApi.md#delivercontract) | **POST** /my/contracts/{contractId}/deliver | Deliver Contract
+*ContractsApi* | [**deliverContract**](doc\/ContractsApi.md#delivercontract) | **POST** /my/contracts/{contractId}/deliver | Deliver Cargo to Contract
 *ContractsApi* | [**fulfillContract**](doc\/ContractsApi.md#fulfillcontract) | **POST** /my/contracts/{contractId}/fulfill | Fulfill Contract
 *ContractsApi* | [**getContract**](doc\/ContractsApi.md#getcontract) | **GET** /my/contracts/{contractId} | Get Contract
 *ContractsApi* | [**getContracts**](doc\/ContractsApi.md#getcontracts) | **GET** /my/contracts | List Contracts
@@ -121,7 +121,7 @@ Class | Method | HTTP request | Description
 *SystemsApi* | [**getMarket**](doc\/SystemsApi.md#getmarket) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/market | Get Market
 *SystemsApi* | [**getShipyard**](doc\/SystemsApi.md#getshipyard) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/shipyard | Get Shipyard
 *SystemsApi* | [**getSystem**](doc\/SystemsApi.md#getsystem) | **GET** /systems/{systemSymbol} | Get System
-*SystemsApi* | [**getSystemWaypoints**](doc\/SystemsApi.md#getsystemwaypoints) | **GET** /systems/{systemSymbol}/waypoints | List Waypoints
+*SystemsApi* | [**getSystemWaypoints**](doc\/SystemsApi.md#getsystemwaypoints) | **GET** /systems/{systemSymbol}/waypoints | List Waypoints in System
 *SystemsApi* | [**getSystems**](doc\/SystemsApi.md#getsystems) | **GET** /systems | List Systems
 *SystemsApi* | [**getWaypoint**](doc\/SystemsApi.md#getwaypoint) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol} | Get Waypoint
 
@@ -158,6 +158,7 @@ Class | Method | HTTP request | Description
  - [Extraction](doc\/Extraction.md)
  - [ExtractionYield](doc\/ExtractionYield.md)
  - [Faction](doc\/Faction.md)
+ - [FactionSymbols](doc\/FactionSymbols.md)
  - [FactionTrait](doc\/FactionTrait.md)
  - [FulfillContract200Response](doc\/FulfillContract200Response.md)
  - [GetContract200Response](doc\/GetContract200Response.md)
@@ -188,7 +189,6 @@ Class | Method | HTTP request | Description
  - [GetWaypoint200Response](doc\/GetWaypoint200Response.md)
  - [InstallMount201Response](doc\/InstallMount201Response.md)
  - [InstallMount201ResponseData](doc\/InstallMount201ResponseData.md)
- - [InstallMount201ResponseDataTransaction](doc\/InstallMount201ResponseDataTransaction.md)
  - [InstallMountRequest](doc\/InstallMountRequest.md)
  - [Jettison200Response](doc\/Jettison200Response.md)
  - [Jettison200ResponseData](doc\/Jettison200ResponseData.md)
@@ -216,10 +216,12 @@ Class | Method | HTTP request | Description
  - [PurchaseShipRequest](doc\/PurchaseShipRequest.md)
  - [RefuelShip200Response](doc\/RefuelShip200Response.md)
  - [RefuelShip200ResponseData](doc\/RefuelShip200ResponseData.md)
+ - [RefuelShipRequest](doc\/RefuelShipRequest.md)
  - [Register201Response](doc\/Register201Response.md)
  - [Register201ResponseData](doc\/Register201ResponseData.md)
  - [RegisterRequest](doc\/RegisterRequest.md)
  - [RemoveMount201Response](doc\/RemoveMount201Response.md)
+ - [RemoveMount201ResponseData](doc\/RemoveMount201ResponseData.md)
  - [RemoveMountRequest](doc\/RemoveMountRequest.md)
  - [ScannedShip](doc\/ScannedShip.md)
  - [ScannedShipEngine](doc\/ScannedShipEngine.md)
@@ -239,6 +241,7 @@ Class | Method | HTTP request | Description
  - [ShipFrame](doc\/ShipFrame.md)
  - [ShipFuel](doc\/ShipFuel.md)
  - [ShipFuelConsumed](doc\/ShipFuelConsumed.md)
+ - [ShipModificationTransaction](doc\/ShipModificationTransaction.md)
  - [ShipModule](doc\/ShipModule.md)
  - [ShipMount](doc\/ShipMount.md)
  - [ShipNav](doc\/ShipNav.md)
@@ -247,9 +250,9 @@ Class | Method | HTTP request | Description
  - [ShipNavRouteWaypoint](doc\/ShipNavRouteWaypoint.md)
  - [ShipNavStatus](doc\/ShipNavStatus.md)
  - [ShipReactor](doc\/ShipReactor.md)
- - [ShipRefine200Response](doc\/ShipRefine200Response.md)
- - [ShipRefine200ResponseData](doc\/ShipRefine200ResponseData.md)
- - [ShipRefine200ResponseDataProducedInner](doc\/ShipRefine200ResponseDataProducedInner.md)
+ - [ShipRefine201Response](doc\/ShipRefine201Response.md)
+ - [ShipRefine201ResponseData](doc\/ShipRefine201ResponseData.md)
+ - [ShipRefine201ResponseDataProducedInner](doc\/ShipRefine201ResponseDataProducedInner.md)
  - [ShipRefineRequest](doc\/ShipRefineRequest.md)
  - [ShipRegistration](doc\/ShipRegistration.md)
  - [ShipRequirements](doc\/ShipRequirements.md)

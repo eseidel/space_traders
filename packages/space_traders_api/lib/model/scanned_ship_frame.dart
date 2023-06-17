@@ -16,6 +16,7 @@ class ScannedShipFrame {
     required this.symbol,
   });
 
+  /// The symbol of the frame.
   String symbol;
 
   @override

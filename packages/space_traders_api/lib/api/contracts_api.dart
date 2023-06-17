@@ -18,13 +18,14 @@ class ContractsApi {
 
   /// Accept Contract
   ///
-  /// Accept a contract.
+  /// Accept a contract by ID.   You can only accept contracts that were offered to you, were not accepted yet, and whose deadlines has not passed yet.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
+  ///   The contract ID to accept.
   Future<Response> acceptContractWithHttpInfo(
     String contractId,
   ) async {
@@ -54,11 +55,12 @@ class ContractsApi {
 
   /// Accept Contract
   ///
-  /// Accept a contract.
+  /// Accept a contract by ID.   You can only accept contracts that were offered to you, were not accepted yet, and whose deadlines has not passed yet.
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
+  ///   The contract ID to accept.
   Future<AcceptContract200Response?> acceptContract(
     String contractId,
   ) async {
@@ -81,18 +83,19 @@ class ContractsApi {
     return null;
   }
 
-  /// Deliver Contract
+  /// Deliver Cargo to Contract
   ///
-  /// Deliver cargo on a given contract.
+  /// Deliver cargo to a contract.  In order to use this API, a ship must be at the delivery location (denoted in the delivery terms as `destinationSymbol` of a contract) and must have a number of units of a good required by this contract in its cargo.  Cargo that was delivered will be removed from the ship's cargo.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  ///   The ID of the contract
+  ///   The ID of the contract.
   ///
   /// * [DeliverContractRequest] deliverContractRequest:
+  ///
   Future<Response> deliverContractWithHttpInfo(
     String contractId, {
     DeliverContractRequest? deliverContractRequest,
@@ -121,16 +124,17 @@ class ContractsApi {
     );
   }
 
-  /// Deliver Contract
+  /// Deliver Cargo to Contract
   ///
-  /// Deliver cargo on a given contract.
+  /// Deliver cargo to a contract.  In order to use this API, a ship must be at the delivery location (denoted in the delivery terms as `destinationSymbol` of a contract) and must have a number of units of a good required by this contract in its cargo.  Cargo that was delivered will be removed from the ship's cargo.
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  ///   The ID of the contract
+  ///   The ID of the contract.
   ///
   /// * [DeliverContractRequest] deliverContractRequest:
+  ///
   Future<DeliverContract200Response?> deliverContract(
     String contractId, {
     DeliverContractRequest? deliverContractRequest,
@@ -157,14 +161,14 @@ class ContractsApi {
 
   /// Fulfill Contract
   ///
-  /// Fulfill a contract
+  /// Fulfill a contract. Can only be used on contracts that have all of their delivery terms fulfilled.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  ///   The ID of the contract
+  ///   The ID of the contract to fulfill.
   Future<Response> fulfillContractWithHttpInfo(
     String contractId,
   ) async {
@@ -194,12 +198,12 @@ class ContractsApi {
 
   /// Fulfill Contract
   ///
-  /// Fulfill a contract
+  /// Fulfill a contract. Can only be used on contracts that have all of their delivery terms fulfilled.
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  ///   The ID of the contract
+  ///   The ID of the contract to fulfill.
   Future<FulfillContract200Response?> fulfillContract(
     String contractId,
   ) async {
@@ -291,7 +295,7 @@ class ContractsApi {
 
   /// List Contracts
   ///
-  /// List all of your contracts.
+  /// Return a paginated list of all your contracts.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -338,7 +342,7 @@ class ContractsApi {
 
   /// List Contracts
   ///
-  /// List all of your contracts.
+  /// Return a paginated list of all your contracts.
   ///
   /// Parameters:
   ///

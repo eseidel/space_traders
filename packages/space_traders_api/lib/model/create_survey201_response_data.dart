@@ -19,6 +19,7 @@ class CreateSurvey201ResponseData {
 
   Cooldown cooldown;
 
+  /// Surveys created by this action.
   List<Survey> surveys;
 
   @override

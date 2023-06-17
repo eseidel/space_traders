@@ -18,10 +18,13 @@ class DeliverContractRequest {
     required this.units,
   });
 
+  /// Symbol of a ship located in the destination to deliver a contract and that has a good to deliver in its cargo.
   String shipSymbol;
 
+  /// The symbol of the good to deliver.
   String tradeSymbol;
 
+  /// Amount of units to deliver.
   int units;
 
   @override

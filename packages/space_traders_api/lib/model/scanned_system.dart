@@ -21,16 +21,21 @@ class ScannedSystem {
     required this.distance,
   });
 
+  /// Symbol of the system.
   String symbol;
 
+  /// Symbol of the system's sector.
   String sectorSymbol;
 
   SystemType type;
 
+  /// Position in the universe in the x axis.
   int x;
 
+  /// Position in the universe in the y axis.
   int y;
 
+  /// The system's distance from the scanning ship.
   int distance;
 
   @override

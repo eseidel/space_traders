@@ -285,6 +285,8 @@ class ApiClient {
           return ExtractionYield.fromJson(value);
         case 'Faction':
           return Faction.fromJson(value);
+        case 'FactionSymbols':
+          return FactionSymbolsTypeTransformer().decode(value);
         case 'FactionTrait':
           return FactionTrait.fromJson(value);
         case 'FulfillContract200Response':
@@ -347,8 +349,6 @@ class ApiClient {
           return InstallMount201Response.fromJson(value);
         case 'InstallMount201ResponseData':
           return InstallMount201ResponseData.fromJson(value);
-        case 'InstallMount201ResponseDataTransaction':
-          return InstallMount201ResponseDataTransaction.fromJson(value);
         case 'InstallMountRequest':
           return InstallMountRequest.fromJson(value);
         case 'Jettison200Response':
@@ -403,6 +403,8 @@ class ApiClient {
           return RefuelShip200Response.fromJson(value);
         case 'RefuelShip200ResponseData':
           return RefuelShip200ResponseData.fromJson(value);
+        case 'RefuelShipRequest':
+          return RefuelShipRequest.fromJson(value);
         case 'Register201Response':
           return Register201Response.fromJson(value);
         case 'Register201ResponseData':
@@ -411,6 +413,8 @@ class ApiClient {
           return RegisterRequest.fromJson(value);
         case 'RemoveMount201Response':
           return RemoveMount201Response.fromJson(value);
+        case 'RemoveMount201ResponseData':
+          return RemoveMount201ResponseData.fromJson(value);
         case 'RemoveMountRequest':
           return RemoveMountRequest.fromJson(value);
         case 'ScannedShip':
@@ -449,6 +453,8 @@ class ApiClient {
           return ShipFuel.fromJson(value);
         case 'ShipFuelConsumed':
           return ShipFuelConsumed.fromJson(value);
+        case 'ShipModificationTransaction':
+          return ShipModificationTransaction.fromJson(value);
         case 'ShipModule':
           return ShipModule.fromJson(value);
         case 'ShipMount':
@@ -465,12 +471,12 @@ class ApiClient {
           return ShipNavStatusTypeTransformer().decode(value);
         case 'ShipReactor':
           return ShipReactor.fromJson(value);
-        case 'ShipRefine200Response':
-          return ShipRefine200Response.fromJson(value);
-        case 'ShipRefine200ResponseData':
-          return ShipRefine200ResponseData.fromJson(value);
-        case 'ShipRefine200ResponseDataProducedInner':
-          return ShipRefine200ResponseDataProducedInner.fromJson(value);
+        case 'ShipRefine201Response':
+          return ShipRefine201Response.fromJson(value);
+        case 'ShipRefine201ResponseData':
+          return ShipRefine201ResponseData.fromJson(value);
+        case 'ShipRefine201ResponseDataProducedInner':
+          return ShipRefine201ResponseDataProducedInner.fromJson(value);
         case 'ShipRefineRequest':
           return ShipRefineRequest.fromJson(value);
         case 'ShipRegistration':

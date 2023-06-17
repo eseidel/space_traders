@@ -43,9 +43,9 @@ Behavior _behaviorFor(
     ],
     // Can't have more than one contract trader on small/expensive contracts
     // or we'll overbuy.
-    ShipRole.HAULER: [Behavior.idle],
+    ShipRole.HAULER: [Behavior.contractTrader],
     ShipRole.EXCAVATOR: [Behavior.miner],
-    ShipRole.SURVEYOR: [Behavior.explorer],
+    ShipRole.SATELLITE: [Behavior.explorer],
   }[ship.registration.role];
   if (behaviors != null) {
     for (final behavior in behaviors) {
@@ -63,6 +63,13 @@ Behavior _behaviorFor(
   return Behavior.idle;
 }
 
+// Planning questions
+// - Need to store handle and email somewhere.
+// - Need logic for planning which faction to be (random)?
+// - Logic for planning what to do with money (e.g. buy ships, by mods)
+// - When to enable which behaviors?
+// - Surveys.  How much surveying should we do before we start mining?
+
 Future<void> main(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
@@ -79,7 +86,11 @@ Future<void> main(List<String> args) async {
   // Use package:file to make things mockable.
   const fs = LocalFileSystem();
 
-  final token = await loadAuthTokenOrRegister(fs);
+  final env = Platform.environment;
+  final callsign = env['SPACETRADERS_CALLSIGN'];
+  final email = env['SPACETRADERS_EMAIL'];
+  final token =
+      await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
   final api = apiFromAuthToken(token);
   final db = DataStore();
   await db.open();

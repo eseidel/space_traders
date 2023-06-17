@@ -8,12 +8,12 @@ import 'package:space_traders_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | **String** |  | 
+**symbol** | **String** | Symbol of the waypoint. | 
 **type** | [**WaypointType**](WaypointType.md) |  | 
-**systemSymbol** | **String** |  | 
-**x** | **int** |  | 
-**y** | **int** |  | 
-**orbitals** | [**List<WaypointOrbital>**](WaypointOrbital.md) |  | [default to const []]
+**systemSymbol** | **String** | Symbol of the system. | 
+**x** | **int** | Position in the universe in the x axis. | 
+**y** | **int** | Position in the universe in the y axis. | 
+**orbitals** | [**List<WaypointOrbital>**](WaypointOrbital.md) | List of waypoints that orbit this waypoint. | [default to const []]
 **faction** | [**WaypointFaction**](WaypointFaction.md) |  | [optional] 
 **traits** | [**List<WaypointTrait>**](WaypointTrait.md) | The traits of the waypoint. | [default to const []]
 **chart** | [**Chart**](Chart.md) |  | [optional] 

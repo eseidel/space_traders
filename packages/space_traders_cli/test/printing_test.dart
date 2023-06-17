@@ -11,7 +11,7 @@ void main() {
       x: 1,
       y: 2,
       orbitals: [],
-      faction: WaypointFaction(symbol: 'f'),
+      faction: WaypointFaction(symbol: FactionSymbols.AEGIS),
       traits: [
         WaypointTrait(
           description: 't',

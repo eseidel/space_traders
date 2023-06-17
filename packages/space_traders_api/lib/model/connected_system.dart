@@ -22,8 +22,10 @@ class ConnectedSystem {
     required this.distance,
   });
 
+  /// The symbol of the system.
   String symbol;
 
+  /// The sector of this system.
   String sectorSymbol;
 
   SystemType type;
@@ -37,10 +39,13 @@ class ConnectedSystem {
   ///
   String? factionSymbol;
 
+  /// Position in the universe in the x axis.
   int x;
 
+  /// Position in the universe in the y axis.
   int y;
 
+  /// The distance of this system to the connected Jump Gate.
   int distance;
 
   @override

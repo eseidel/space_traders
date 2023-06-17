@@ -17,12 +17,15 @@ class ShipModule {
     this.capacity,
     this.range,
     required this.name,
-    this.description,
+    required this.description,
     required this.requirements,
   });
 
+  /// The symbol of the module.
   ShipModuleSymbolEnum symbol;
 
+  /// Modules that provide capacity, such as cargo hold or crew quarters will show this value to denote how much of a bonus the module grants.
+  ///
   /// Minimum value: 0
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -32,6 +35,8 @@ class ShipModule {
   ///
   int? capacity;
 
+  /// Modules that have a range will such as a sensor array show this value to denote how far can the module reach with its capabilities.
+  ///
   /// Minimum value: 0
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -41,15 +46,11 @@ class ShipModule {
   ///
   int? range;
 
+  /// Name of this module.
   String name;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? description;
+  /// Description of this module.
+  String description;
 
   ShipRequirements requirements;
 
@@ -71,7 +72,7 @@ class ShipModule {
       (capacity == null ? 0 : capacity!.hashCode) +
       (range == null ? 0 : range!.hashCode) +
       (name.hashCode) +
-      (description == null ? 0 : description!.hashCode) +
+      (description.hashCode) +
       (requirements.hashCode);
 
   @override
@@ -92,11 +93,7 @@ class ShipModule {
       json[r'range'] = null;
     }
     json[r'name'] = this.name;
-    if (this.description != null) {
-      json[r'description'] = this.description;
-    } else {
-      json[r'description'] = null;
-    }
+    json[r'description'] = this.description;
     json[r'requirements'] = this.requirements;
     return json;
   }
@@ -126,7 +123,7 @@ class ShipModule {
         capacity: mapValueOfType<int>(json, r'capacity'),
         range: mapValueOfType<int>(json, r'range'),
         name: mapValueOfType<String>(json, r'name')!,
-        description: mapValueOfType<String>(json, r'description'),
+        description: mapValueOfType<String>(json, r'description')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
       );
     }
@@ -188,10 +185,12 @@ class ShipModule {
   static const requiredKeys = <String>{
     'symbol',
     'name',
+    'description',
     'requirements',
   };
 }
 
+/// The symbol of the module.
 class ShipModuleSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipModuleSymbolEnum._(this.value);

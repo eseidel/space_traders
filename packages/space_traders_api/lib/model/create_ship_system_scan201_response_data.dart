@@ -19,6 +19,7 @@ class CreateShipSystemScan201ResponseData {
 
   Cooldown cooldown;
 
+  /// List of scanned systems.
   List<ScannedSystem> systems;
 
   @override

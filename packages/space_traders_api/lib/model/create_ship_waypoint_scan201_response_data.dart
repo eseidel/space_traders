@@ -19,6 +19,7 @@ class CreateShipWaypointScan201ResponseData {
 
   Cooldown cooldown;
 
+  /// List of scanned waypoints.
   List<ScannedWaypoint> waypoints;
 
   @override

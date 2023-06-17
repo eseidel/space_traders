@@ -31,7 +31,7 @@ import 'package:space_traders_api/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FactionsApi();
-final factionSymbol = factionSymbol_example; // String | The faction symbol
+final factionSymbol = COSMIC; // String | The faction symbol
 
 try {
     final result = api_instance.getFaction(factionSymbol);
@@ -45,7 +45,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **factionSymbol** | **String**| The faction symbol | [default to 'CGR']
+ **factionSymbol** | **String**| The faction symbol | 
 
 ### Return type
 
@@ -67,7 +67,7 @@ Name | Type | Description  | Notes
 
 List Factions
 
-List all discovered factions in the game.
+Return a paginated list of all the factions in the game.
 
 ### Example
 ```dart
@@ -95,8 +95,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **page** | **int**| What entry offset to request | [optional] 
- **limit** | **int**| How many entries to return per page | [optional] 
+ **page** | **int**| What entry offset to request | [optional] [default to 1]
+ **limit** | **int**| How many entries to return per page | [optional] [default to 10]
 
 ### Return type
 

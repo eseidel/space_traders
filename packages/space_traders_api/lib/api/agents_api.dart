@@ -15,7 +15,7 @@ class AgentsApi {
 
   final ApiClient apiClient;
 
-  /// My Agent Details
+  /// Get Agent
   ///
   /// Fetch your agent's details.
   ///
@@ -44,7 +44,7 @@ class AgentsApi {
     );
   }
 
-  /// My Agent Details
+  /// Get Agent
   ///
   /// Fetch your agent's details.
   Future<GetMyAgent200Response?> getMyAgent() async {

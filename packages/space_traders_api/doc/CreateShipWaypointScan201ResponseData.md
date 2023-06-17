@@ -9,7 +9,7 @@ import 'package:space_traders_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **cooldown** | [**Cooldown**](Cooldown.md) |  | 
-**waypoints** | [**List<ScannedWaypoint>**](ScannedWaypoint.md) |  | [default to const []]
+**waypoints** | [**List<ScannedWaypoint>**](ScannedWaypoint.md) | List of scanned waypoints. | [default to const []]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

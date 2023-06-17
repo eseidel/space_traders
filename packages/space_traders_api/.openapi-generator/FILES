@@ -36,6 +36,7 @@ doc/ExtractResourcesRequest.md
 doc/Extraction.md
 doc/ExtractionYield.md
 doc/Faction.md
+doc/FactionSymbols.md
 doc/FactionTrait.md
 doc/FactionsApi.md
 doc/FleetApi.md
@@ -68,7 +69,6 @@ doc/GetSystems200Response.md
 doc/GetWaypoint200Response.md
 doc/InstallMount201Response.md
 doc/InstallMount201ResponseData.md
-doc/InstallMount201ResponseDataTransaction.md
 doc/InstallMountRequest.md
 doc/Jettison200Response.md
 doc/Jettison200ResponseData.md
@@ -96,10 +96,12 @@ doc/PurchaseShip201ResponseData.md
 doc/PurchaseShipRequest.md
 doc/RefuelShip200Response.md
 doc/RefuelShip200ResponseData.md
+doc/RefuelShipRequest.md
 doc/Register201Response.md
 doc/Register201ResponseData.md
 doc/RegisterRequest.md
 doc/RemoveMount201Response.md
+doc/RemoveMount201ResponseData.md
 doc/RemoveMountRequest.md
 doc/ScannedShip.md
 doc/ScannedShipEngine.md
@@ -119,6 +121,7 @@ doc/ShipEngine.md
 doc/ShipFrame.md
 doc/ShipFuel.md
 doc/ShipFuelConsumed.md
+doc/ShipModificationTransaction.md
 doc/ShipModule.md
 doc/ShipMount.md
 doc/ShipNav.md
@@ -127,9 +130,9 @@ doc/ShipNavRoute.md
 doc/ShipNavRouteWaypoint.md
 doc/ShipNavStatus.md
 doc/ShipReactor.md
-doc/ShipRefine200Response.md
-doc/ShipRefine200ResponseData.md
-doc/ShipRefine200ResponseDataProducedInner.md
+doc/ShipRefine201Response.md
+doc/ShipRefine201ResponseData.md
+doc/ShipRefine201ResponseDataProducedInner.md
 doc/ShipRefineRequest.md
 doc/ShipRegistration.md
 doc/ShipRequirements.md
@@ -201,6 +204,7 @@ lib/model/extract_resources_request.dart
 lib/model/extraction.dart
 lib/model/extraction_yield.dart
 lib/model/faction.dart
+lib/model/faction_symbols.dart
 lib/model/faction_trait.dart
 lib/model/fulfill_contract200_response.dart
 lib/model/get_contract200_response.dart
@@ -231,7 +235,6 @@ lib/model/get_systems200_response.dart
 lib/model/get_waypoint200_response.dart
 lib/model/install_mount201_response.dart
 lib/model/install_mount201_response_data.dart
-lib/model/install_mount201_response_data_transaction.dart
 lib/model/install_mount_request.dart
 lib/model/jettison200_response.dart
 lib/model/jettison200_response_data.dart
@@ -259,10 +262,12 @@ lib/model/purchase_ship201_response_data.dart
 lib/model/purchase_ship_request.dart
 lib/model/refuel_ship200_response.dart
 lib/model/refuel_ship200_response_data.dart
+lib/model/refuel_ship_request.dart
 lib/model/register201_response.dart
 lib/model/register201_response_data.dart
 lib/model/register_request.dart
 lib/model/remove_mount201_response.dart
+lib/model/remove_mount201_response_data.dart
 lib/model/remove_mount_request.dart
 lib/model/scanned_ship.dart
 lib/model/scanned_ship_engine.dart
@@ -282,6 +287,7 @@ lib/model/ship_engine.dart
 lib/model/ship_frame.dart
 lib/model/ship_fuel.dart
 lib/model/ship_fuel_consumed.dart
+lib/model/ship_modification_transaction.dart
 lib/model/ship_module.dart
 lib/model/ship_mount.dart
 lib/model/ship_nav.dart
@@ -290,9 +296,9 @@ lib/model/ship_nav_route.dart
 lib/model/ship_nav_route_waypoint.dart
 lib/model/ship_nav_status.dart
 lib/model/ship_reactor.dart
-lib/model/ship_refine200_response.dart
-lib/model/ship_refine200_response_data.dart
-lib/model/ship_refine200_response_data_produced_inner.dart
+lib/model/ship_refine201_response.dart
+lib/model/ship_refine201_response_data.dart
+lib/model/ship_refine201_response_data_produced_inner.dart
 lib/model/ship_refine_request.dart
 lib/model/ship_registration.dart
 lib/model/ship_requirements.dart
@@ -350,6 +356,7 @@ test/extract_resources201_response_test.dart
 test/extract_resources_request_test.dart
 test/extraction_test.dart
 test/extraction_yield_test.dart
+test/faction_symbols_test.dart
 test/faction_test.dart
 test/faction_trait_test.dart
 test/factions_api_test.dart
@@ -382,7 +389,6 @@ test/get_system_waypoints200_response_test.dart
 test/get_systems200_response_test.dart
 test/get_waypoint200_response_test.dart
 test/install_mount201_response_data_test.dart
-test/install_mount201_response_data_transaction_test.dart
 test/install_mount201_response_test.dart
 test/install_mount_request_test.dart
 test/jettison200_response_data_test.dart
@@ -411,9 +417,11 @@ test/purchase_ship201_response_test.dart
 test/purchase_ship_request_test.dart
 test/refuel_ship200_response_data_test.dart
 test/refuel_ship200_response_test.dart
+test/refuel_ship_request_test.dart
 test/register201_response_data_test.dart
 test/register201_response_test.dart
 test/register_request_test.dart
+test/remove_mount201_response_data_test.dart
 test/remove_mount201_response_test.dart
 test/remove_mount_request_test.dart
 test/scanned_ship_engine_test.dart
@@ -433,6 +441,7 @@ test/ship_engine_test.dart
 test/ship_frame_test.dart
 test/ship_fuel_consumed_test.dart
 test/ship_fuel_test.dart
+test/ship_modification_transaction_test.dart
 test/ship_module_test.dart
 test/ship_mount_test.dart
 test/ship_nav_flight_mode_test.dart
@@ -441,9 +450,9 @@ test/ship_nav_route_waypoint_test.dart
 test/ship_nav_status_test.dart
 test/ship_nav_test.dart
 test/ship_reactor_test.dart
-test/ship_refine200_response_data_produced_inner_test.dart
-test/ship_refine200_response_data_test.dart
-test/ship_refine200_response_test.dart
+test/ship_refine201_response_data_produced_inner_test.dart
+test/ship_refine201_response_data_test.dart
+test/ship_refine201_response_test.dart
 test/ship_refine_request_test.dart
 test/ship_registration_test.dart
 test/ship_requirements_test.dart

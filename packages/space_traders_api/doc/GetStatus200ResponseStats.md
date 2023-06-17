@@ -8,10 +8,10 @@ import 'package:space_traders_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**agents** | **int** |  | 
-**ships** | **int** |  | 
-**systems** | **int** |  | 
-**waypoints** | **int** |  | 
+**agents** | **int** | Number of registered agents in the game. | 
+**ships** | **int** | Total number of ships in the game. | 
+**systems** | **int** | Total number of systems in the game. | 
+**waypoints** | **int** | Total number of waypoints in the game. | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

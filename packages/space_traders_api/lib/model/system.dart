@@ -22,18 +22,24 @@ class System {
     this.factions = const [],
   });
 
+  /// The symbol of the system.
   String symbol;
 
+  /// The symbol of the sector.
   String sectorSymbol;
 
   SystemType type;
 
+  /// Position in the universe in the x axis.
   int x;
 
+  /// Position in the universe in the y axis.
   int y;
 
+  /// Waypoints in this system.
   List<SystemWaypoint> waypoints;
 
+  /// Factions that control this system.
   List<SystemFaction> factions;
 
   @override

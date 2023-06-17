@@ -47,6 +47,7 @@ class ScannedShip {
 
   ScannedShipEngine engine;
 
+  /// List of mounts installed in the ship.
   List<ScannedShipMountsInner> mounts;
 
   @override

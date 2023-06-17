@@ -10,7 +10,7 @@
 
 part of space_traders_api;
 
-///
+/// Type of ship
 class ShipType {
   /// Instantiate a new enum with the provided [value].
   const ShipType._(this.value);

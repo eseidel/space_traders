@@ -20,8 +20,10 @@ class TradeGood {
 
   TradeSymbol symbol;
 
+  /// The name of the good.
   String name;
 
+  /// The description of the good.
   String description;
 
   @override

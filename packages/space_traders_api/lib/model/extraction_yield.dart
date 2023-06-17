@@ -17,7 +17,7 @@ class ExtractionYield {
     required this.units,
   });
 
-  String symbol;
+  TradeSymbol symbol;
 
   /// The number of units extracted that were placed into the ship's cargo hold.
   int units;
@@ -65,7 +65,7 @@ class ExtractionYield {
       }());
 
       return ExtractionYield(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: TradeSymbol.fromJson(json[r'symbol'])!,
         units: mapValueOfType<int>(json, r'units')!,
       );
     }

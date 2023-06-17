@@ -18,6 +18,7 @@ class Chart {
     this.submittedOn,
   });
 
+  /// The symbol of the waypoint.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -26,6 +27,7 @@ class Chart {
   ///
   String? waypointSymbol;
 
+  /// The agent that submitted the chart for this waypoint.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -34,6 +36,7 @@ class Chart {
   ///
   String? submittedBy;
 
+  /// The time the chart for this waypoint was submitted.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated

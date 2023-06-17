@@ -23,7 +23,7 @@ class ShipyardTransaction {
   /// The symbol of the waypoint where the transaction took place.
   String waypointSymbol;
 
-  /// The symbol of the ship that was purchased.
+  /// The symbol of the ship that was the subject of the transaction.
   String shipSymbol;
 
   /// The price of the transaction.

@@ -17,8 +17,10 @@ class GetStatus200ResponseLeaderboardsMostCreditsInner {
     required this.credits,
   });
 
+  /// Symbol of the agent.
   String agentSymbol;
 
+  /// Amount of credits.
   int credits;
 
   @override

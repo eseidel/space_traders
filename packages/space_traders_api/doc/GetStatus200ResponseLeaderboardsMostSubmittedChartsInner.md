@@ -8,8 +8,8 @@ import 'package:space_traders_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**agentSymbol** | **String** |  | 
-**chartCount** | **int** |  | 
+**agentSymbol** | **String** | Symbol of the agent. | 
+**chartCount** | **int** | Amount of charts done by the agent. | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

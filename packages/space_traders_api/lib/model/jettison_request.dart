@@ -17,8 +17,10 @@ class JettisonRequest {
     required this.units,
   });
 
-  String symbol;
+  TradeSymbol symbol;
 
+  /// Amount of units to jettison of this good.
+  ///
   /// Minimum value: 1
   int units;
 
@@ -65,7 +67,7 @@ class JettisonRequest {
       }());
 
       return JettisonRequest(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: TradeSymbol.fromJson(json[r'symbol'])!,
         units: mapValueOfType<int>(json, r'units')!,
       );
     }

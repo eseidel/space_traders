@@ -20,8 +20,10 @@ class Agent {
     required this.startingFaction,
   });
 
+  /// Account ID that is tied to this agent.
   String accountId;
 
+  /// Symbol of the agent.
   String symbol;
 
   /// The headquarters of the agent.

@@ -1,4 +1,4 @@
-# space_traders_api.model.InstallMount201ResponseData
+# space_traders_api.model.RemoveMount201ResponseData
 
 ## Load the model package
 ```dart
@@ -9,7 +9,7 @@ import 'package:space_traders_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **agent** | [**Agent**](Agent.md) |  | 
-**mounts** | [**List<ShipMount>**](ShipMount.md) | List of installed mounts after the installation of the new mount. | [default to const []]
+**mounts** | [**List<ShipMount>**](ShipMount.md) | List of installed mounts after the removal of the selected mount. | [default to const []]
 **cargo** | [**ShipCargo**](ShipCargo.md) |  | 
 **transaction** | [**ShipModificationTransaction**](ShipModificationTransaction.md) |  | 
 

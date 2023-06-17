@@ -18,10 +18,9 @@ class RegisterRequest {
     this.email,
   });
 
-  /// The faction you choose determines your headquarters.
-  Object? faction;
+  FactionSymbols faction;
 
-  /// How other agents will see your ships and information.
+  /// Your desired agent symbol. This will be a unique name used to represent your agent, and will be the prefix for your ships.
   String symbol;
 
   /// Your email address. This is used if you reserved your call sign between resets.
@@ -44,7 +43,7 @@ class RegisterRequest {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (faction == null ? 0 : faction!.hashCode) +
+      (faction.hashCode) +
       (symbol.hashCode) +
       (email == null ? 0 : email!.hashCode);
 
@@ -54,11 +53,7 @@ class RegisterRequest {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.faction != null) {
-      json[r'faction'] = this.faction;
-    } else {
-      json[r'faction'] = null;
-    }
+    json[r'faction'] = this.faction;
     json[r'symbol'] = this.symbol;
     if (this.email != null) {
       json[r'email'] = this.email;
@@ -89,7 +84,7 @@ class RegisterRequest {
       }());
 
       return RegisterRequest(
-        faction: mapValueOfType<Object>(json, r'faction'),
+        faction: FactionSymbols.fromJson(json[r'faction'])!,
         symbol: mapValueOfType<String>(json, r'symbol')!,
         email: mapValueOfType<String>(json, r'email'),
       );

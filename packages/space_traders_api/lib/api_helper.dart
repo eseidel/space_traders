@@ -65,6 +65,9 @@ String parameterToString(dynamic value) {
   if (value is DateTime) {
     return value.toUtc().toIso8601String();
   }
+  if (value is FactionSymbols) {
+    return FactionSymbolsTypeTransformer().encode(value).toString();
+  }
   if (value is ShipNavFlightMode) {
     return ShipNavFlightModeTypeTransformer().encode(value).toString();
   }

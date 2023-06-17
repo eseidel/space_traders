@@ -20,14 +20,18 @@ class ShipNavRouteWaypoint {
     required this.y,
   });
 
+  /// The symbol of the waypoint.
   String symbol;
 
   WaypointType type;
 
+  /// The symbol of the system the waypoint is in.
   String systemSymbol;
 
+  /// Position in the universe in the x axis.
   int x;
 
+  /// Position in the universe in the y axis.
   int y;
 
   @override

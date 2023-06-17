@@ -18,11 +18,17 @@ Method | HTTP request | Description
 
 Get Status
 
-Return the status of the game server.
+Return the status of the game server. This also includes a few global elements, such as announcements, server reset dates and leaderboards.
 
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = DefaultApi();
 
@@ -43,7 +49,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-No authorization required
+[AgentToken](../README.md#AgentToken)
 
 ### HTTP request headers
 
@@ -57,11 +63,17 @@ No authorization required
 
 Register New Agent
 
-Creates a new agent and ties it to a temporary Account.  The agent symbol is a 3-14 character string that will represent your agent. This symbol will prefix the symbol of every ship you own. Agent symbols will be cast to all uppercase characters.  A new agent will be granted an authorization token, a contract with their starting faction, a command ship with a jump drive, and one hundred thousand credits.  > #### Keep your token safe and secure > > Save your token during the alpha phase. There is no way to regenerate this token without starting a new agent. In the future you will be able to generate and manage your tokens from the SpaceTraders website.  You can accept your contract using the `/my/contracts/{contractId}/accept` endpoint. You will want to navigate your command ship to a nearby asteroid field and execute the `/my/ships/{shipSymbol}/extract` endpoint to mine various types of ores and minerals.  Return to the contract destination and execute the `/my/ships/{shipSymbol}/deliver` endpoint to deposit goods into the contract.  When your contract is fulfilled, you can call `/my/contracts/{contractId}/fulfill` to retrieve payment.
+Creates a new agent and ties it to an account.  The agent symbol must consist of a 3-14 character string, and will be used to represent your agent. This symbol will prefix the symbol of every ship you own. Agent symbols will be cast to all uppercase characters.  This new agent will be tied to a starting faction of your choice, which determines your starting location, and will be granted an authorization token, a contract with their starting faction, a command ship that can fly across space with advanced capabilities, a small probe ship that can be used for reconnaissance, and 150,000 credits.  > #### Keep your token safe and secure > > Save your token during the alpha phase. There is no way to regenerate this token without starting a new agent. In the future you will be able to generate and manage your tokens from the SpaceTraders website.  If you are new to SpaceTraders, It is recommended to register with the COSMIC faction, a faction that is well connected to the rest of the universe. After registering, you should try our interactive [quickstart guide](https://docs.spacetraders.io/quickstart/new-game) which will walk you through basic API requests in just a few minutes.
 
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = DefaultApi();
 final registerRequest = RegisterRequest(); // RegisterRequest | 
@@ -86,7 +98,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-No authorization required
+[AgentToken](../README.md#AgentToken)
 
 ### HTTP request headers
 

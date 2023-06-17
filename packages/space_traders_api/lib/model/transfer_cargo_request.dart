@@ -18,10 +18,12 @@ class TransferCargoRequest {
     required this.shipSymbol,
   });
 
-  String tradeSymbol;
+  TradeSymbol tradeSymbol;
 
+  /// Amount of units to transfer.
   int units;
 
+  /// The symbol of the ship to transfer to.
   String shipSymbol;
 
   @override
@@ -70,7 +72,7 @@ class TransferCargoRequest {
       }());
 
       return TransferCargoRequest(
-        tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol')!,
+        tradeSymbol: TradeSymbol.fromJson(json[r'tradeSymbol'])!,
         units: mapValueOfType<int>(json, r'units')!,
         shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
       );

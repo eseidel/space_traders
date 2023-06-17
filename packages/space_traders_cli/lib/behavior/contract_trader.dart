@@ -217,7 +217,7 @@ Future<bool> _purchaseContractGoodIfPossible(
     priceData,
     transactionLog,
     ship,
-    neededGood.tradeSymbol,
+    TradeSymbol.fromJson(neededGood.tradeSymbol)!,
     unitsToPurchase,
   );
   return true;

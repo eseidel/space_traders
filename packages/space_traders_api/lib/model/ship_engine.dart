@@ -21,10 +21,13 @@ class ShipEngine {
     required this.requirements,
   });
 
+  /// The symbol of the engine.
   ShipEngineSymbolEnum symbol;
 
+  /// The name of the engine.
   String name;
 
+  /// The description of the engine.
   String description;
 
   /// Condition is a range of 0 to 100 where 0 is completely worn out and 100 is brand new.
@@ -39,6 +42,8 @@ class ShipEngine {
   ///
   int? condition;
 
+  /// The speed stat of this engine. The higher the speed, the faster a ship can travel from one point to another. Reduces the time of arrival when navigating the ship.
+  ///
   /// Minimum value: 1
   int speed;
 
@@ -177,6 +182,7 @@ class ShipEngine {
   };
 }
 
+/// The symbol of the engine.
 class ShipEngineSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipEngineSymbolEnum._(this.value);

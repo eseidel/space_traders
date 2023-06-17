@@ -10,6 +10,7 @@
 
 part of space_traders_api;
 
+/// The good's symbol.
 class TradeSymbol {
   /// Instantiate a new enum with the provided [value].
   const TradeSymbol._(this.value);

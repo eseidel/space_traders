@@ -19,6 +19,7 @@ class CreateShipShipScan201ResponseData {
 
   Cooldown cooldown;
 
+  /// List of scanned ships.
   List<ScannedShip> ships;
 
   @override

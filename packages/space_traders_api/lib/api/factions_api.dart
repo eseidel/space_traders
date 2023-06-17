@@ -85,7 +85,7 @@ class FactionsApi {
 
   /// List Factions
   ///
-  /// List all discovered factions in the game.
+  /// Return a paginated list of all the factions in the game.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -132,7 +132,7 @@ class FactionsApi {
 
   /// List Factions
   ///
-  /// List all discovered factions in the game.
+  /// Return a paginated list of all the factions in the game.
   ///
   /// Parameters:
   ///

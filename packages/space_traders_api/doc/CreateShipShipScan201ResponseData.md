@@ -9,7 +9,7 @@ import 'package:space_traders_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **cooldown** | [**Cooldown**](Cooldown.md) |  | 
-**ships** | [**List<ScannedShip>**](ScannedShip.md) |  | [default to const []]
+**ships** | [**List<ScannedShip>**](ScannedShip.md) | List of scanned ships. | [default to const []]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

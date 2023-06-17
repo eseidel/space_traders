@@ -14,14 +14,24 @@ class Meta {
   /// Returns a new [Meta] instance.
   Meta({
     required this.total,
-    required this.page,
-    required this.limit,
+    this.page = 1,
+    this.limit = 10,
   });
 
+  /// Shows the total amount of items of this kind that exist.
+  ///
+  /// Minimum value: 0
   int total;
 
+  /// A page denotes an amount of items, offset from the first item. Each page holds an amount of items equal to the `limit`.
+  ///
+  /// Minimum value: 1
   int page;
 
+  /// The amount of items in each page. Limits how many items can be fetched at once.
+  ///
+  /// Minimum value: 1
+  /// Maximum value: 20
   int limit;
 
   @override

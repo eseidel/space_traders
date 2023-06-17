@@ -17,14 +17,14 @@ class FleetApi {
 
   /// Create Chart
   ///
-  /// Command a ship to chart the current waypoint.  Waypoints in the universe are uncharted by default. These locations will not show up in the API until they have been charted by a ship.  Charting a location will record your agent as the one who created the chart.
+  /// Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<Response> createChartWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -54,12 +54,12 @@ class FleetApi {
 
   /// Create Chart
   ///
-  /// Command a ship to chart the current waypoint.  Waypoints in the universe are uncharted by default. These locations will not show up in the API until they have been charted by a ship.  Charting a location will record your agent as the one who created the chart.
+  /// Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<CreateChart201Response?> createChart(
     String shipSymbol,
   ) async {
@@ -84,13 +84,14 @@ class FleetApi {
 
   /// Scan Ships
   ///
-  /// Activate your ship's sensor arrays to scan for ship information.
+  /// Scan for nearby ships, retrieving information for all ships in range.  Requires a ship to have the `Sensor Array` mount installed to use.  The ship will enter a cooldown after using this function, during which it cannot execute certain actions.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   Future<Response> createShipShipScanWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -120,11 +121,12 @@ class FleetApi {
 
   /// Scan Ships
   ///
-  /// Activate your ship's sensor arrays to scan for ship information.
+  /// Scan for nearby ships, retrieving information for all ships in range.  Requires a ship to have the `Sensor Array` mount installed to use.  The ship will enter a cooldown after using this function, during which it cannot execute certain actions.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   Future<CreateShipShipScan201Response?> createShipShipScan(
     String shipSymbol,
   ) async {
@@ -149,13 +151,14 @@ class FleetApi {
 
   /// Scan Systems
   ///
-  /// Activate your ship's sensor arrays to scan for system information.
+  /// Scan for nearby systems, retrieving information on the systems' distance from the ship and their waypoints. Requires a ship to have the `Sensor Array` mount installed to use.  The ship will enter a cooldown after using this function, during which it cannot execute certain actions.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   Future<Response> createShipSystemScanWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -185,11 +188,12 @@ class FleetApi {
 
   /// Scan Systems
   ///
-  /// Activate your ship's sensor arrays to scan for system information.
+  /// Scan for nearby systems, retrieving information on the systems' distance from the ship and their waypoints. Requires a ship to have the `Sensor Array` mount installed to use.  The ship will enter a cooldown after using this function, during which it cannot execute certain actions.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   Future<CreateShipSystemScan201Response?> createShipSystemScan(
     String shipSymbol,
   ) async {
@@ -214,13 +218,14 @@ class FleetApi {
 
   /// Scan Waypoints
   ///
-  /// Activate your ship's sensor arrays to scan for waypoint information.
+  /// Scan for nearby waypoints, retrieving detailed information on each waypoint in range. Scanning uncharted waypoints will allow you to ignore their uncharted state and will list the waypoints' traits.  Requires a ship to have the `Sensor Array` mount installed to use.  The ship will enter a cooldown after using this function, during which it cannot execute certain actions.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   Future<Response> createShipWaypointScanWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -250,11 +255,12 @@ class FleetApi {
 
   /// Scan Waypoints
   ///
-  /// Activate your ship's sensor arrays to scan for waypoint information.
+  /// Scan for nearby waypoints, retrieving detailed information on each waypoint in range. Scanning uncharted waypoints will allow you to ignore their uncharted state and will list the waypoints' traits.  Requires a ship to have the `Sensor Array` mount installed to use.  The ship will enter a cooldown after using this function, during which it cannot execute certain actions.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   Future<CreateShipWaypointScan201Response?> createShipWaypointScan(
     String shipSymbol,
   ) async {
@@ -279,14 +285,14 @@ class FleetApi {
 
   /// Create Survey
   ///
-  /// If you want to target specific yields for an extraction, you can survey a waypoint, such as an asteroid field, and send the survey in the body of the extract request. Each survey may have multiple deposits, and if a symbol shows up more than once, that indicates a higher chance of extracting that resource.  Your ship will enter a cooldown between consecutive survey requests. Surveys will eventually expire after a period of time. Multiple ships can use the same survey for extraction.
+  /// Create surveys on a waypoint that can be extracted such as asteroid fields. A survey focuses on specific types of deposits from the extracted location. When ships extract using this survey, they are guaranteed to procure a high amount of one of the goods in the survey.  In order to use a survey, send the entire survey details in the body of the extract request.  Each survey may have multiple deposits, and if a symbol shows up more than once, that indicates a higher chance of extracting that resource.  Your ship will enter a cooldown after surveying in which it is unable to perform certain actions. Surveys will eventually expire after a period of time or will be exhausted after being extracted several times based on the survey's size. Multiple ships can use the same survey for extraction.  A ship must have the `Surveyor` mount installed in order to use this function.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<Response> createSurveyWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -316,12 +322,12 @@ class FleetApi {
 
   /// Create Survey
   ///
-  /// If you want to target specific yields for an extraction, you can survey a waypoint, such as an asteroid field, and send the survey in the body of the extract request. Each survey may have multiple deposits, and if a symbol shows up more than once, that indicates a higher chance of extracting that resource.  Your ship will enter a cooldown between consecutive survey requests. Surveys will eventually expire after a period of time. Multiple ships can use the same survey for extraction.
+  /// Create surveys on a waypoint that can be extracted such as asteroid fields. A survey focuses on specific types of deposits from the extracted location. When ships extract using this survey, they are guaranteed to procure a high amount of one of the goods in the survey.  In order to use a survey, send the entire survey details in the body of the extract request.  Each survey may have multiple deposits, and if a symbol shows up more than once, that indicates a higher chance of extracting that resource.  Your ship will enter a cooldown after surveying in which it is unable to perform certain actions. Surveys will eventually expire after a period of time or will be exhausted after being extracted several times based on the survey's size. Multiple ships can use the same survey for extraction.  A ship must have the `Surveyor` mount installed in order to use this function.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<CreateSurvey201Response?> createSurvey(
     String shipSymbol,
   ) async {
@@ -346,14 +352,14 @@ class FleetApi {
 
   /// Dock Ship
   ///
-  /// Attempt to dock your ship at it's current location. Docking will only succeed if the waypoint is a dockable location, and your ship is capable of docking at the time of the request.  The endpoint is idempotent - successive calls will succeed even if the ship is already docked.
+  /// Attempt to dock your ship at its current location. Docking will only succeed if your ship is capable of docking at the time of the request.  Docked ships can access elements in their current location, such as the market or a shipyard, but cannot do actions that require the ship to be above surface such as navigating or extracting.  The endpoint is idempotent - successive calls will succeed even if the ship is already docked.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<Response> dockShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -383,12 +389,12 @@ class FleetApi {
 
   /// Dock Ship
   ///
-  /// Attempt to dock your ship at it's current location. Docking will only succeed if the waypoint is a dockable location, and your ship is capable of docking at the time of the request.  The endpoint is idempotent - successive calls will succeed even if the ship is already docked.
+  /// Attempt to dock your ship at its current location. Docking will only succeed if your ship is capable of docking at the time of the request.  Docked ships can access elements in their current location, such as the market or a shipyard, but cannot do actions that require the ship to be above surface such as navigating or extracting.  The endpoint is idempotent - successive calls will succeed even if the ship is already docked.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<DockShip200Response?> dockShip(
     String shipSymbol,
   ) async {
@@ -413,14 +419,14 @@ class FleetApi {
 
   /// Extract Resources
   ///
-  /// Extract resources from the waypoint into your ship. Send an optional survey as the payload to target specific yields.
+  /// Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.  The ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   ///
   /// * [ExtractResourcesRequest] extractResourcesRequest:
   Future<Response> extractResourcesWithHttpInfo(
@@ -453,12 +459,12 @@ class FleetApi {
 
   /// Extract Resources
   ///
-  /// Extract resources from the waypoint into your ship. Send an optional survey as the payload to target specific yields.
+  /// Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.  The ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   ///
   /// * [ExtractResourcesRequest] extractResourcesRequest:
   Future<ExtractResources201Response?> extractResources(
@@ -487,13 +493,14 @@ class FleetApi {
 
   /// Get Mounts
   ///
-  /// Get the mounts on a ship.
+  /// Get the mounts installed on a ship.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   Future<Response> getMountsWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -523,11 +530,12 @@ class FleetApi {
 
   /// Get Mounts
   ///
-  /// Get the mounts on a ship.
+  /// Get the mounts installed on a ship.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   Future<GetMounts200Response?> getMounts(
     String shipSymbol,
   ) async {
@@ -552,13 +560,14 @@ class FleetApi {
 
   /// Get Ship
   ///
-  /// Retrieve the details of your ship.
+  /// Retrieve the details of a ship under your agent's ownership.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The symbol of the ship.
   Future<Response> getMyShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -588,11 +597,12 @@ class FleetApi {
 
   /// Get Ship
   ///
-  /// Retrieve the details of your ship.
+  /// Retrieve the details of a ship under your agent's ownership.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The symbol of the ship.
   Future<GetMyShip200Response?> getMyShip(
     String shipSymbol,
   ) async {
@@ -617,14 +627,14 @@ class FleetApi {
 
   /// Get Ship Cargo
   ///
-  /// Retrieve the cargo of your ship.
+  /// Retrieve the cargo of a ship under your agent's ownership.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<Response> getMyShipCargoWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -654,12 +664,12 @@ class FleetApi {
 
   /// Get Ship Cargo
   ///
-  /// Retrieve the cargo of your ship.
+  /// Retrieve the cargo of a ship under your agent's ownership.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<GetMyShipCargo200Response?> getMyShipCargo(
     String shipSymbol,
   ) async {
@@ -684,7 +694,7 @@ class FleetApi {
 
   /// List Ships
   ///
-  /// Retrieve all of your ships.
+  /// Return a paginated list of all of ships under your agent's ownership.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -731,7 +741,7 @@ class FleetApi {
 
   /// List Ships
   ///
-  /// Retrieve all of your ships.
+  /// Return a paginated list of all of ships under your agent's ownership.
   ///
   /// Parameters:
   ///
@@ -773,6 +783,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The symbol of the ship.
   Future<Response> getShipCooldownWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -807,6 +818,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The symbol of the ship.
   Future<GetShipCooldown200Response?> getShipCooldown(
     String shipSymbol,
   ) async {
@@ -838,7 +850,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   Future<Response> getShipNavWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -873,7 +885,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   Future<GetShipNav200Response?> getShipNav(
     String shipSymbol,
   ) async {
@@ -898,13 +910,14 @@ class FleetApi {
 
   /// Install Mount
   ///
-  /// Install a mount on a ship.
+  /// Install a mount on a ship.  In order to install a mount, the ship must be docked and located in a waypoint that has a `Shipyard` trait. The ship also must have the mount to install in its cargo hold.  An installation fee will be deduced by the Shipyard for installing the mount on the ship.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   ///
   /// * [InstallMountRequest] installMountRequest:
   Future<Response> installMountWithHttpInfo(
@@ -937,11 +950,12 @@ class FleetApi {
 
   /// Install Mount
   ///
-  /// Install a mount on a ship.
+  /// Install a mount on a ship.  In order to install a mount, the ship must be docked and located in a waypoint that has a `Shipyard` trait. The ship also must have the mount to install in its cargo hold.  An installation fee will be deduced by the Shipyard for installing the mount on the ship.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   ///
   /// * [InstallMountRequest] installMountRequest:
   Future<InstallMount201Response?> installMount(
@@ -977,6 +991,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   ///
   /// * [JettisonRequest] jettisonRequest:
   Future<Response> jettisonWithHttpInfo(
@@ -1014,6 +1029,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   ///
   /// * [JettisonRequest] jettisonRequest:
   Future<Jettison200Response?> jettison(
@@ -1042,13 +1058,14 @@ class FleetApi {
 
   /// Jump Ship
   ///
-  /// Jump your ship instantly to a target system. The ship must be in orbit to use this function. When used while in orbit of a Jump Gate waypoint, any ship can use this command. When used elsewhere, jumping requires the ship to have a Jump Drive module and consumes a unit of antimatter from the ship's cargo (the command will fail if there is no antimatter to consume).
+  /// Jump your ship instantly to a target system. The ship must be in orbit to use this function. When used while in orbit of a Jump Gate waypoint, any ship can use this command, jumping to the target system's Jump Gate waypoint.  When used elsewhere, jumping requires the ship to have a `Jump Drive` module installed and consumes a unit of antimatter from the ship's cargo. The command will fail if there is no antimatter to consume. When jumping via the `Jump Drive` module, the ship ends up at its largest source of energy in the system, such as a gas planet or a jump gate.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   ///
   /// * [JumpShipRequest] jumpShipRequest:
   Future<Response> jumpShipWithHttpInfo(
@@ -1081,11 +1098,12 @@ class FleetApi {
 
   /// Jump Ship
   ///
-  /// Jump your ship instantly to a target system. The ship must be in orbit to use this function. When used while in orbit of a Jump Gate waypoint, any ship can use this command. When used elsewhere, jumping requires the ship to have a Jump Drive module and consumes a unit of antimatter from the ship's cargo (the command will fail if there is no antimatter to consume).
+  /// Jump your ship instantly to a target system. The ship must be in orbit to use this function. When used while in orbit of a Jump Gate waypoint, any ship can use this command, jumping to the target system's Jump Gate waypoint.  When used elsewhere, jumping requires the ship to have a `Jump Drive` module installed and consumes a unit of antimatter from the ship's cargo. The command will fail if there is no antimatter to consume. When jumping via the `Jump Drive` module, the ship ends up at its largest source of energy in the system, such as a gas planet or a jump gate.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   ///
   /// * [JumpShipRequest] jumpShipRequest:
   Future<JumpShip200Response?> jumpShip(
@@ -1114,14 +1132,14 @@ class FleetApi {
 
   /// Navigate Ship
   ///
-  /// Navigate to a target destination. The ship must be in orbit to use this function. The destination must be located within the same system as the ship. Navigating will consume the necessary fuel and supplies from the ship's manifest, and will pay out crew wages from the agent's account.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at it's destination.  To travel between systems, see the ship's warp or jump actions.
+  /// Navigate to a target destination. The ship must be in orbit to use this function. The destination waypoint must be within the same system as the ship's current location. Navigating will consume the necessary fuel from the ship's manifest based on the distance to the target waypoint.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at it's destination.  To travel between systems, see the ship's Warp or Jump actions.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
   ///
@@ -1155,12 +1173,12 @@ class FleetApi {
 
   /// Navigate Ship
   ///
-  /// Navigate to a target destination. The ship must be in orbit to use this function. The destination must be located within the same system as the ship. Navigating will consume the necessary fuel and supplies from the ship's manifest, and will pay out crew wages from the agent's account.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at it's destination.  To travel between systems, see the ship's warp or jump actions.
+  /// Navigate to a target destination. The ship must be in orbit to use this function. The destination waypoint must be within the same system as the ship's current location. Navigating will consume the necessary fuel from the ship's manifest based on the distance to the target waypoint.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at it's destination.  To travel between systems, see the ship's Warp or Jump actions.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
   ///
@@ -1190,31 +1208,29 @@ class FleetApi {
 
   /// Negotiate Contract
   ///
-  ///
+  /// Negotiate a new contract with the HQ.  In order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.  Once a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept.   The ship must be present at a faction's HQ waypoint to negotiate a contract with that faction.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///
-  /// * [Object] body:
+  ///   The ship's symbol.
   Future<Response> negotiateContractWithHttpInfo(
-    String shipSymbol, {
-    Object? body,
-  }) async {
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/negotiate/contract'
         .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
-    Object? postBody = body;
+    Object? postBody;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
-    const contentTypes = <String>['application/json'];
+    const contentTypes = <String>[];
 
     return apiClient.invokeAPI(
       path,
@@ -1229,20 +1245,17 @@ class FleetApi {
 
   /// Negotiate Contract
   ///
-  ///
+  /// Negotiate a new contract with the HQ.  In order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.  Once a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept.   The ship must be present at a faction's HQ waypoint to negotiate a contract with that faction.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///
-  /// * [Object] body:
+  ///   The ship's symbol.
   Future<NegotiateContract200Response?> negotiateContract(
-    String shipSymbol, {
-    Object? body,
-  }) async {
+    String shipSymbol,
+  ) async {
     final response = await negotiateContractWithHttpInfo(
       shipSymbol,
-      body: body,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1262,14 +1275,14 @@ class FleetApi {
 
   /// Orbit Ship
   ///
-  /// Attempt to move your ship into orbit at it's current location. The request will only succeed if your ship is capable of moving into orbit at the time of the request.  The endpoint is idempotent - successive calls will succeed even if the ship is already in orbit.
+  /// Attempt to move your ship into orbit at its current location. The request will only succeed if your ship is capable of moving into orbit at the time of the request.  Orbiting ships are able to do actions that require the ship to be above surface such as navigating or extracting, but cannot access elements in their current waypoint, such as the market or a shipyard.  The endpoint is idempotent - successive calls will succeed even if the ship is already in orbit.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<Response> orbitShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -1299,12 +1312,12 @@ class FleetApi {
 
   /// Orbit Ship
   ///
-  /// Attempt to move your ship into orbit at it's current location. The request will only succeed if your ship is capable of moving into orbit at the time of the request.  The endpoint is idempotent - successive calls will succeed even if the ship is already in orbit.
+  /// Attempt to move your ship into orbit at its current location. The request will only succeed if your ship is capable of moving into orbit at the time of the request.  Orbiting ships are able to do actions that require the ship to be above surface such as navigating or extracting, but cannot access elements in their current waypoint, such as the market or a shipyard.  The endpoint is idempotent - successive calls will succeed even if the ship is already in orbit.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<OrbitShip200Response?> orbitShip(
     String shipSymbol,
   ) async {
@@ -1329,14 +1342,14 @@ class FleetApi {
 
   /// Patch Ship Nav
   ///
-  /// Update the nav data of a ship, such as the flight mode.
+  /// Update the nav configuration of a ship.  Currently only supports configuring the Flight Mode of the ship, which affects its speed and fuel consumption.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   ///
   /// * [PatchShipNavRequest] patchShipNavRequest:
   Future<Response> patchShipNavWithHttpInfo(
@@ -1369,12 +1382,12 @@ class FleetApi {
 
   /// Patch Ship Nav
   ///
-  /// Update the nav data of a ship, such as the flight mode.
+  /// Update the nav configuration of a ship.  Currently only supports configuring the Flight Mode of the ship, which affects its speed and fuel consumption.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol
+  ///   The ship symbol.
   ///
   /// * [PatchShipNavRequest] patchShipNavRequest:
   Future<GetShipNav200Response?> patchShipNav(
@@ -1403,13 +1416,14 @@ class FleetApi {
 
   /// Purchase Cargo
   ///
-  /// Purchase cargo.
+  /// Purchase cargo from a market.  The ship must be docked in a waypoint that has `Marketplace` trait, and the market must be selling a good to be able to purchase it.  The maximum amount of units of a good that can be purchased in each transaction are denoted by the `tradeVolume` value of the good, which can be viewed by using the Get Market action.  Purchased goods are added to the ship's cargo hold.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   ///
   /// * [PurchaseCargoRequest] purchaseCargoRequest:
   Future<Response> purchaseCargoWithHttpInfo(
@@ -1442,11 +1456,12 @@ class FleetApi {
 
   /// Purchase Cargo
   ///
-  /// Purchase cargo.
+  /// Purchase cargo from a market.  The ship must be docked in a waypoint that has `Marketplace` trait, and the market must be selling a good to be able to purchase it.  The maximum amount of units of a good that can be purchased in each transaction are denoted by the `tradeVolume` value of the good, which can be viewed by using the Get Market action.  Purchased goods are added to the ship's cargo hold.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   ///
   /// * [PurchaseCargoRequest] purchaseCargoRequest:
   Future<PurchaseCargo201Response?> purchaseCargo(
@@ -1475,7 +1490,7 @@ class FleetApi {
 
   /// Purchase Ship
   ///
-  /// Purchase a ship
+  /// Purchase a ship from a Shipyard. In order to use this function, a ship under your agent's ownership must be in a waypoint that has the `Shipyard` trait, and the Shipyard must sell the type of the desired ship.  Shipyards typically offer ship types, which are predefined templates of ships that have dedicated roles. A template comes with a preset of an engine, a reactor, and a frame. It may also include a few modules and mounts.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -1510,7 +1525,7 @@ class FleetApi {
 
   /// Purchase Ship
   ///
-  /// Purchase a ship
+  /// Purchase a ship from a Shipyard. In order to use this function, a ship under your agent's ownership must be in a waypoint that has the `Shipyard` trait, and the Shipyard must sell the type of the desired ship.  Shipyards typically offer ship types, which are predefined templates of ships that have dedicated roles. A template comes with a preset of an engine, a reactor, and a frame. It may also include a few modules and mounts.
   ///
   /// Parameters:
   ///
@@ -1539,28 +1554,32 @@ class FleetApi {
 
   /// Refuel Ship
   ///
-  /// Refuel your ship from the local market.
+  /// Refuel your ship by buying fuel from the local market.  Requires the ship to be docked in a waypoint that has the `Marketplace` trait, and the market must be selling fuel in order to refuel.  Each fuel bought from the market replenishes 100 units in your ship's fuel.  Ships will always be refuel to their frame's maximum fuel capacity when using this action.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  ///
+  /// * [RefuelShipRequest] refuelShipRequest:
   Future<Response> refuelShipWithHttpInfo(
-    String shipSymbol,
-  ) async {
+    String shipSymbol, {
+    RefuelShipRequest? refuelShipRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path =
         r'/my/ships/{shipSymbol}/refuel'.replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
-    Object? postBody;
+    Object? postBody = refuelShipRequest;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
-    const contentTypes = <String>[];
+    const contentTypes = <String>['application/json'];
 
     return apiClient.invokeAPI(
       path,
@@ -1575,16 +1594,21 @@ class FleetApi {
 
   /// Refuel Ship
   ///
-  /// Refuel your ship from the local market.
+  /// Refuel your ship by buying fuel from the local market.  Requires the ship to be docked in a waypoint that has the `Marketplace` trait, and the market must be selling fuel in order to refuel.  Each fuel bought from the market replenishes 100 units in your ship's fuel.  Ships will always be refuel to their frame's maximum fuel capacity when using this action.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  ///
+  /// * [RefuelShipRequest] refuelShipRequest:
   Future<RefuelShip200Response?> refuelShip(
-    String shipSymbol,
-  ) async {
+    String shipSymbol, {
+    RefuelShipRequest? refuelShipRequest,
+  }) async {
     final response = await refuelShipWithHttpInfo(
       shipSymbol,
+      refuelShipRequest: refuelShipRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1604,13 +1628,14 @@ class FleetApi {
 
   /// Remove Mount
   ///
-  /// Remove a mount from a ship.
+  /// Remove a mount from a ship.  The ship must be docked in a waypoint that has the `Shipyard` trait, and must have the desired mount that it wish to remove installed.  A removal fee will be deduced from the agent by the Shipyard.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   ///
   /// * [RemoveMountRequest] removeMountRequest:
   Future<Response> removeMountWithHttpInfo(
@@ -1643,11 +1668,12 @@ class FleetApi {
 
   /// Remove Mount
   ///
-  /// Remove a mount from a ship.
+  /// Remove a mount from a ship.  The ship must be docked in a waypoint that has the `Shipyard` trait, and must have the desired mount that it wish to remove installed.  A removal fee will be deduced from the agent by the Shipyard.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship's symbol.
   ///
   /// * [RemoveMountRequest] removeMountRequest:
   Future<RemoveMount201Response?> removeMount(
@@ -1676,13 +1702,14 @@ class FleetApi {
 
   /// Sell Cargo
   ///
-  /// Sell cargo.
+  /// Sell cargo in your ship to a market that trades this cargo. The ship must be docked in a waypoint that has the `Marketplace` trait in order to use this function.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   Symbol of a ship.
   ///
   /// * [SellCargoRequest] sellCargoRequest:
   Future<Response> sellCargoWithHttpInfo(
@@ -1715,11 +1742,12 @@ class FleetApi {
 
   /// Sell Cargo
   ///
-  /// Sell cargo.
+  /// Sell cargo in your ship to a market that trades this cargo. The ship must be docked in a waypoint that has the `Marketplace` trait in order to use this function.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   Symbol of a ship.
   ///
   /// * [SellCargoRequest] sellCargoRequest:
   Future<SellCargo201Response?> sellCargo(
@@ -1748,14 +1776,14 @@ class FleetApi {
 
   /// Ship Refine
   ///
-  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request.
+  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 30 basic goods will be converted into 10 processed goods.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   ///
   /// * [ShipRefineRequest] shipRefineRequest:
   Future<Response> shipRefineWithHttpInfo(
@@ -1788,15 +1816,15 @@ class FleetApi {
 
   /// Ship Refine
   ///
-  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request.
+  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 30 basic goods will be converted into 10 processed goods.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   ///
   /// * [ShipRefineRequest] shipRefineRequest:
-  Future<ShipRefine200Response?> shipRefine(
+  Future<ShipRefine201Response?> shipRefine(
     String shipSymbol, {
     ShipRefineRequest? shipRefineRequest,
   }) async {
@@ -1814,21 +1842,22 @@ class FleetApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'ShipRefine200Response',
-      ) as ShipRefine200Response;
+        'ShipRefine201Response',
+      ) as ShipRefine201Response;
     }
     return null;
   }
 
   /// Transfer Cargo
   ///
-  /// Transfer cargo between ships.
+  /// Transfer cargo between ships.  The receiving ship must be in the same waypoint as the transferring ship, and it must able to hold the additional cargo after the transfer is complete. Both ships also must be in the same state, either both are docked or both are orbiting.  The response body's cargo shows the cargo of the transferring ship after the transfer is complete.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The transferring ship's symbol.
   ///
   /// * [TransferCargoRequest] transferCargoRequest:
   Future<Response> transferCargoWithHttpInfo(
@@ -1861,11 +1890,12 @@ class FleetApi {
 
   /// Transfer Cargo
   ///
-  /// Transfer cargo between ships.
+  /// Transfer cargo between ships.  The receiving ship must be in the same waypoint as the transferring ship, and it must able to hold the additional cargo after the transfer is complete. Both ships also must be in the same state, either both are docked or both are orbiting.  The response body's cargo shows the cargo of the transferring ship after the transfer is complete.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The transferring ship's symbol.
   ///
   /// * [TransferCargoRequest] transferCargoRequest:
   Future<TransferCargo200Response?> transferCargo(
@@ -1894,13 +1924,14 @@ class FleetApi {
 
   /// Warp Ship
   ///
-  /// Warp your ship to a target destination in another system. The ship must be in orbit to use this function. Warping will consume the necessary fuel and supplies from the ship's manifest, and will pay out crew wages from the agent's account.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at it's destination.
+  /// Warp your ship to a target destination in another system. The ship must be in orbit to use this function and must have the `Warp Drive` module installed. Warping will consume the necessary fuel from the ship's manifest.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at its destination.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
   ///
@@ -1934,11 +1965,12 @@ class FleetApi {
 
   /// Warp Ship
   ///
-  /// Warp your ship to a target destination in another system. The ship must be in orbit to use this function. Warping will consume the necessary fuel and supplies from the ship's manifest, and will pay out crew wages from the agent's account.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at it's destination.
+  /// Warp your ship to a target destination in another system. The ship must be in orbit to use this function and must have the `Warp Drive` module installed. Warping will consume the necessary fuel from the ship's manifest.  The returned response will detail the route information including the expected time of arrival. Most ship actions are unavailable until the ship has arrived at its destination.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
+  ///   The ship symbol.
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
   ///

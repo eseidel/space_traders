@@ -1,4 +1,4 @@
-# space_traders_api.model.ShipRefine200ResponseDataProducedInner
+# space_traders_api.model.ShipRefine201Response
 
 ## Load the model package
 ```dart
@@ -8,8 +8,7 @@ import 'package:space_traders_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**tradeSymbol** | **String** |  | [optional] 
-**units** | **int** |  | [optional] 
+**data** | [**ShipRefine201ResponseData**](ShipRefine201ResponseData.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

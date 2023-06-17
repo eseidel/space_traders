@@ -16,6 +16,7 @@ class ShipRefineRequest {
     required this.produce,
   });
 
+  /// The type of good to produce out of the refining process.
   ShipRefineRequestProduceEnum produce;
 
   @override
@@ -121,6 +122,7 @@ class ShipRefineRequest {
   };
 }
 
+/// The type of good to produce out of the refining process.
 class ShipRefineRequestProduceEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipRefineRequestProduceEnum._(this.value);

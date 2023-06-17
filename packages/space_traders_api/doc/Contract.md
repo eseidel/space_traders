@@ -8,9 +8,9 @@ import 'package:space_traders_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **String** |  | 
+**id** | **String** | ID of the contract. | 
 **factionSymbol** | **String** | The symbol of the faction that this contract is for. | 
-**type** | **String** |  | 
+**type** | **String** | Type of contract. | 
 **terms** | [**ContractTerms**](ContractTerms.md) |  | 
 **accepted** | **bool** | Whether the contract has been accepted by the agent | [default to false]
 **fulfilled** | **bool** | Whether the contract has been fulfilled | [default to false]

@@ -8,11 +8,11 @@ import 'package:space_traders_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | **String** |  | 
-**name** | **String** |  | 
-**description** | **String** |  | 
-**headquarters** | **String** |  | 
-**traits** | [**List<FactionTrait>**](FactionTrait.md) |  | [default to const []]
+**symbol** | [**FactionSymbols**](FactionSymbols.md) |  | 
+**name** | **String** | Name of the faction. | 
+**description** | **String** | Description of the faction. | 
+**headquarters** | **String** | The waypoint in which the faction's HQ is located in. | 
+**traits** | [**List<FactionTrait>**](FactionTrait.md) | List of traits that define this faction. | [default to const []]
 **isRecruiting** | **bool** | Whether or not the faction is currently recruiting new agents. | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -10,12 +10,24 @@
 
 part of space_traders_api;
 
-class InstallMount201ResponseDataTransaction {
-  /// Returns a new [InstallMount201ResponseDataTransaction] instance.
-  InstallMount201ResponseDataTransaction({
+class ShipModificationTransaction {
+  /// Returns a new [ShipModificationTransaction] instance.
+  ShipModificationTransaction({
+    required this.waypointSymbol,
+    required this.shipSymbol,
+    required this.tradeSymbol,
     required this.totalPrice,
     required this.timestamp,
   });
+
+  /// The symbol of the waypoint where the transaction took place.
+  String waypointSymbol;
+
+  /// The symbol of the ship that made the transaction.
+  String shipSymbol;
+
+  /// The symbol of the trade good.
+  String tradeSymbol;
 
   /// The total price of the transaction.
   ///
@@ -28,30 +40,40 @@ class InstallMount201ResponseDataTransaction {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is InstallMount201ResponseDataTransaction &&
+      other is ShipModificationTransaction &&
+          other.waypointSymbol == waypointSymbol &&
+          other.shipSymbol == shipSymbol &&
+          other.tradeSymbol == tradeSymbol &&
           other.totalPrice == totalPrice &&
           other.timestamp == timestamp;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (totalPrice.hashCode) + (timestamp.hashCode);
+      (waypointSymbol.hashCode) +
+      (shipSymbol.hashCode) +
+      (tradeSymbol.hashCode) +
+      (totalPrice.hashCode) +
+      (timestamp.hashCode);
 
   @override
   String toString() =>
-      'InstallMount201ResponseDataTransaction[totalPrice=$totalPrice, timestamp=$timestamp]';
+      'ShipModificationTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, tradeSymbol=$tradeSymbol, totalPrice=$totalPrice, timestamp=$timestamp]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    json[r'waypointSymbol'] = this.waypointSymbol;
+    json[r'shipSymbol'] = this.shipSymbol;
+    json[r'tradeSymbol'] = this.tradeSymbol;
     json[r'totalPrice'] = this.totalPrice;
     json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
     return json;
   }
 
-  /// Returns a new [InstallMount201ResponseDataTransaction] instance and imports its values from
+  /// Returns a new [ShipModificationTransaction] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static InstallMount201ResponseDataTransaction? fromJson(dynamic value) {
+  static ShipModificationTransaction? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -61,14 +83,17 @@ class InstallMount201ResponseDataTransaction {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "InstallMount201ResponseDataTransaction[$key]" is missing from JSON.');
+              'Required key "ShipModificationTransaction[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "InstallMount201ResponseDataTransaction[$key]" has a null value in JSON.');
+              'Required key "ShipModificationTransaction[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return InstallMount201ResponseDataTransaction(
+      return ShipModificationTransaction(
+        waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol')!,
+        shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
+        tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol')!,
         totalPrice: mapValueOfType<int>(json, r'totalPrice')!,
         timestamp: mapDateTime(json, r'timestamp', '')!,
       );
@@ -76,14 +101,14 @@ class InstallMount201ResponseDataTransaction {
     return null;
   }
 
-  static List<InstallMount201ResponseDataTransaction>? listFromJson(
+  static List<ShipModificationTransaction>? listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <InstallMount201ResponseDataTransaction>[];
+    final result = <ShipModificationTransaction>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = InstallMount201ResponseDataTransaction.fromJson(row);
+        final value = ShipModificationTransaction.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -92,14 +117,12 @@ class InstallMount201ResponseDataTransaction {
     return result.toList(growable: growable);
   }
 
-  static Map<String, InstallMount201ResponseDataTransaction> mapFromJson(
-      dynamic json) {
-    final map = <String, InstallMount201ResponseDataTransaction>{};
+  static Map<String, ShipModificationTransaction> mapFromJson(dynamic json) {
+    final map = <String, ShipModificationTransaction>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value =
-            InstallMount201ResponseDataTransaction.fromJson(entry.value);
+        final value = ShipModificationTransaction.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,17 +131,16 @@ class InstallMount201ResponseDataTransaction {
     return map;
   }
 
-  // maps a json object with a list of InstallMount201ResponseDataTransaction-objects as value to a dart map
-  static Map<String, List<InstallMount201ResponseDataTransaction>>
-      mapListFromJson(
+  // maps a json object with a list of ShipModificationTransaction-objects as value to a dart map
+  static Map<String, List<ShipModificationTransaction>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<InstallMount201ResponseDataTransaction>>{};
+    final map = <String, List<ShipModificationTransaction>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = InstallMount201ResponseDataTransaction.listFromJson(
+        final value = ShipModificationTransaction.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -132,6 +154,9 @@ class InstallMount201ResponseDataTransaction {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'waypointSymbol',
+    'shipSymbol',
+    'tradeSymbol',
     'totalPrice',
     'timestamp',
   };

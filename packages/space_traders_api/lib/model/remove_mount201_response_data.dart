@@ -10,9 +10,9 @@
 
 part of space_traders_api;
 
-class InstallMount201ResponseData {
-  /// Returns a new [InstallMount201ResponseData] instance.
-  InstallMount201ResponseData({
+class RemoveMount201ResponseData {
+  /// Returns a new [RemoveMount201ResponseData] instance.
+  RemoveMount201ResponseData({
     required this.agent,
     this.mounts = const [],
     required this.cargo,
@@ -21,7 +21,7 @@ class InstallMount201ResponseData {
 
   Agent agent;
 
-  /// List of installed mounts after the installation of the new mount.
+  /// List of installed mounts after the removal of the selected mount.
   List<ShipMount> mounts;
 
   ShipCargo cargo;
@@ -31,7 +31,7 @@ class InstallMount201ResponseData {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is InstallMount201ResponseData &&
+      other is RemoveMount201ResponseData &&
           other.agent == agent &&
           other.mounts == mounts &&
           other.cargo == cargo &&
@@ -47,7 +47,7 @@ class InstallMount201ResponseData {
 
   @override
   String toString() =>
-      'InstallMount201ResponseData[agent=$agent, mounts=$mounts, cargo=$cargo, transaction=$transaction]';
+      'RemoveMount201ResponseData[agent=$agent, mounts=$mounts, cargo=$cargo, transaction=$transaction]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -58,10 +58,10 @@ class InstallMount201ResponseData {
     return json;
   }
 
-  /// Returns a new [InstallMount201ResponseData] instance and imports its values from
+  /// Returns a new [RemoveMount201ResponseData] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static InstallMount201ResponseData? fromJson(dynamic value) {
+  static RemoveMount201ResponseData? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -71,14 +71,14 @@ class InstallMount201ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "InstallMount201ResponseData[$key]" is missing from JSON.');
+              'Required key "RemoveMount201ResponseData[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "InstallMount201ResponseData[$key]" has a null value in JSON.');
+              'Required key "RemoveMount201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return InstallMount201ResponseData(
+      return RemoveMount201ResponseData(
         agent: Agent.fromJson(json[r'agent'])!,
         mounts: ShipMount.listFromJson(json[r'mounts'])!,
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
@@ -89,14 +89,14 @@ class InstallMount201ResponseData {
     return null;
   }
 
-  static List<InstallMount201ResponseData>? listFromJson(
+  static List<RemoveMount201ResponseData>? listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <InstallMount201ResponseData>[];
+    final result = <RemoveMount201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = InstallMount201ResponseData.fromJson(row);
+        final value = RemoveMount201ResponseData.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -105,12 +105,12 @@ class InstallMount201ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, InstallMount201ResponseData> mapFromJson(dynamic json) {
-    final map = <String, InstallMount201ResponseData>{};
+  static Map<String, RemoveMount201ResponseData> mapFromJson(dynamic json) {
+    final map = <String, RemoveMount201ResponseData>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = InstallMount201ResponseData.fromJson(entry.value);
+        final value = RemoveMount201ResponseData.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -119,16 +119,16 @@ class InstallMount201ResponseData {
     return map;
   }
 
-  // maps a json object with a list of InstallMount201ResponseData-objects as value to a dart map
-  static Map<String, List<InstallMount201ResponseData>> mapListFromJson(
+  // maps a json object with a list of RemoveMount201ResponseData-objects as value to a dart map
+  static Map<String, List<RemoveMount201ResponseData>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<InstallMount201ResponseData>>{};
+    final map = <String, List<RemoveMount201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = InstallMount201ResponseData.listFromJson(
+        final value = RemoveMount201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );

@@ -17,8 +17,9 @@ class PurchaseCargoRequest {
     required this.units,
   });
 
-  String symbol;
+  TradeSymbol symbol;
 
+  /// Amounts of units to purchase.
   int units;
 
   @override
@@ -64,7 +65,7 @@ class PurchaseCargoRequest {
       }());
 
       return PurchaseCargoRequest(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: TradeSymbol.fromJson(json[r'symbol'])!,
         units: mapValueOfType<int>(json, r'units')!,
       );
     }

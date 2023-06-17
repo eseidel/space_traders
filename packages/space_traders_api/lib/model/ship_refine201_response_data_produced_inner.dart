@@ -10,13 +10,14 @@
 
 part of space_traders_api;
 
-class ShipRefine200ResponseDataProducedInner {
-  /// Returns a new [ShipRefine200ResponseDataProducedInner] instance.
-  ShipRefine200ResponseDataProducedInner({
+class ShipRefine201ResponseDataProducedInner {
+  /// Returns a new [ShipRefine201ResponseDataProducedInner] instance.
+  ShipRefine201ResponseDataProducedInner({
     this.tradeSymbol,
     this.units,
   });
 
+  /// Symbol of the good.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -25,6 +26,7 @@ class ShipRefine200ResponseDataProducedInner {
   ///
   String? tradeSymbol;
 
+  /// Amount of units of the good.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -36,7 +38,7 @@ class ShipRefine200ResponseDataProducedInner {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ShipRefine200ResponseDataProducedInner &&
+      other is ShipRefine201ResponseDataProducedInner &&
           other.tradeSymbol == tradeSymbol &&
           other.units == units;
 
@@ -48,7 +50,7 @@ class ShipRefine200ResponseDataProducedInner {
 
   @override
   String toString() =>
-      'ShipRefine200ResponseDataProducedInner[tradeSymbol=$tradeSymbol, units=$units]';
+      'ShipRefine201ResponseDataProducedInner[tradeSymbol=$tradeSymbol, units=$units]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -65,10 +67,10 @@ class ShipRefine200ResponseDataProducedInner {
     return json;
   }
 
-  /// Returns a new [ShipRefine200ResponseDataProducedInner] instance and imports its values from
+  /// Returns a new [ShipRefine201ResponseDataProducedInner] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static ShipRefine200ResponseDataProducedInner? fromJson(dynamic value) {
+  static ShipRefine201ResponseDataProducedInner? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -78,14 +80,14 @@ class ShipRefine200ResponseDataProducedInner {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "ShipRefine200ResponseDataProducedInner[$key]" is missing from JSON.');
+              'Required key "ShipRefine201ResponseDataProducedInner[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "ShipRefine200ResponseDataProducedInner[$key]" has a null value in JSON.');
+              'Required key "ShipRefine201ResponseDataProducedInner[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return ShipRefine200ResponseDataProducedInner(
+      return ShipRefine201ResponseDataProducedInner(
         tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol'),
         units: mapValueOfType<int>(json, r'units'),
       );
@@ -93,14 +95,14 @@ class ShipRefine200ResponseDataProducedInner {
     return null;
   }
 
-  static List<ShipRefine200ResponseDataProducedInner>? listFromJson(
+  static List<ShipRefine201ResponseDataProducedInner>? listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <ShipRefine200ResponseDataProducedInner>[];
+    final result = <ShipRefine201ResponseDataProducedInner>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = ShipRefine200ResponseDataProducedInner.fromJson(row);
+        final value = ShipRefine201ResponseDataProducedInner.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -109,14 +111,14 @@ class ShipRefine200ResponseDataProducedInner {
     return result.toList(growable: growable);
   }
 
-  static Map<String, ShipRefine200ResponseDataProducedInner> mapFromJson(
+  static Map<String, ShipRefine201ResponseDataProducedInner> mapFromJson(
       dynamic json) {
-    final map = <String, ShipRefine200ResponseDataProducedInner>{};
+    final map = <String, ShipRefine201ResponseDataProducedInner>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
         final value =
-            ShipRefine200ResponseDataProducedInner.fromJson(entry.value);
+            ShipRefine201ResponseDataProducedInner.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -125,17 +127,17 @@ class ShipRefine200ResponseDataProducedInner {
     return map;
   }
 
-  // maps a json object with a list of ShipRefine200ResponseDataProducedInner-objects as value to a dart map
-  static Map<String, List<ShipRefine200ResponseDataProducedInner>>
+  // maps a json object with a list of ShipRefine201ResponseDataProducedInner-objects as value to a dart map
+  static Map<String, List<ShipRefine201ResponseDataProducedInner>>
       mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<ShipRefine200ResponseDataProducedInner>>{};
+    final map = <String, List<ShipRefine201ResponseDataProducedInner>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipRefine200ResponseDataProducedInner.listFromJson(
+        final value = ShipRefine201ResponseDataProducedInner.listFromJson(
           entry.value,
           growable: growable,
         );

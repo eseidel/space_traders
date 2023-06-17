@@ -16,6 +16,7 @@ class RemoveMountRequest {
     required this.symbol,
   });
 
+  /// The symbol of the mount to remove.
   String symbol;
 
   @override

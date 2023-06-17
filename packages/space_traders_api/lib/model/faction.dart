@@ -21,14 +21,18 @@ class Faction {
     required this.isRecruiting,
   });
 
-  String symbol;
+  FactionSymbols symbol;
 
+  /// Name of the faction.
   String name;
 
+  /// Description of the faction.
   String description;
 
+  /// The waypoint in which the faction's HQ is located in.
   String headquarters;
 
+  /// List of traits that define this faction.
   List<FactionTrait> traits;
 
   /// Whether or not the faction is currently recruiting new agents.
@@ -91,7 +95,7 @@ class Faction {
       }());
 
       return Faction(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: FactionSymbols.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
         headquarters: mapValueOfType<String>(json, r'headquarters')!,

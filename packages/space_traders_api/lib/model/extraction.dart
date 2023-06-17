@@ -17,6 +17,7 @@ class Extraction {
     required this.yield_,
   });
 
+  /// Symbol of the ship that executed the extraction.
   String shipSymbol;
 
   ExtractionYield yield_;

@@ -13,7 +13,7 @@ Method | HTTP request | Description
 [**getMarket**](SystemsApi.md#getmarket) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/market | Get Market
 [**getShipyard**](SystemsApi.md#getshipyard) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/shipyard | Get Shipyard
 [**getSystem**](SystemsApi.md#getsystem) | **GET** /systems/{systemSymbol} | Get System
-[**getSystemWaypoints**](SystemsApi.md#getsystemwaypoints) | **GET** /systems/{systemSymbol}/waypoints | List Waypoints
+[**getSystemWaypoints**](SystemsApi.md#getsystemwaypoints) | **GET** /systems/{systemSymbol}/waypoints | List Waypoints in System
 [**getSystems**](SystemsApi.md#getsystems) | **GET** /systems | List Systems
 [**getWaypoint**](SystemsApi.md#getwaypoint) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol} | Get Waypoint
 
@@ -23,7 +23,7 @@ Method | HTTP request | Description
 
 Get Jump Gate
 
-Get jump gate details for a waypoint.
+Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  The response will return all systems that are have a Jump Gate in range of this Jump Gate. Those systems can be jumped to from this Jump Gate.
 
 ### Example
 ```dart
@@ -74,7 +74,7 @@ Name | Type | Description  | Notes
 
 Get Market
 
-Retrieve imports, exports and exchange data from a marketplace. Imports can be sold, exports can be purchased, and exchange goods can be purchased or sold. Send a ship to the waypoint to access trade good prices and recent transactions.
+Retrieve imports, exports and exchange data from a marketplace. Requires a waypoint that has the `Marketplace` trait to use.  Send a ship to the waypoint to access trade good prices and recent transactions. Refer to the [Market Overview page](https://docs.spacetraders.io/game-concepts/markets) to gain better a understanding of the market in the game.
 
 ### Example
 ```dart
@@ -125,7 +125,7 @@ Name | Type | Description  | Notes
 
 Get Shipyard
 
-Get the shipyard for a waypoint. Send a ship to the waypoint to access ships that are currently available for purchase and recent transactions.
+Get the shipyard for a waypoint. Requires a waypoint that has the `Shipyard` trait to use. Send a ship to the waypoint to access data on ships that are currently available for purchase and recent transactions.
 
 ### Example
 ```dart
@@ -223,9 +223,9 @@ Name | Type | Description  | Notes
 # **getSystemWaypoints**
 > GetSystemWaypoints200Response getSystemWaypoints(systemSymbol, page, limit)
 
-List Waypoints
+List Waypoints in System
 
-Fetch all of the waypoints for a given system. System must be charted or a ship must be present to return waypoint details.
+Return a paginated list of all of the waypoints for a given system.  If a waypoint is uncharted, it will return the `Uncharted` trait instead of its actual traits.
 
 ### Example
 ```dart
@@ -255,8 +255,8 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **systemSymbol** | **String**| The system symbol | 
- **page** | **int**| What entry offset to request | [optional] 
- **limit** | **int**| How many entries to return per page | [optional] 
+ **page** | **int**| What entry offset to request | [optional] [default to 1]
+ **limit** | **int**| How many entries to return per page | [optional] [default to 10]
 
 ### Return type
 
@@ -278,7 +278,7 @@ Name | Type | Description  | Notes
 
 List Systems
 
-Return a list of all systems.
+Return a paginated list of all systems.
 
 ### Example
 ```dart
@@ -306,8 +306,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **page** | **int**| What entry offset to request | [optional] 
- **limit** | **int**| How many entries to return per page | [optional] 
+ **page** | **int**| What entry offset to request | [optional] [default to 1]
+ **limit** | **int**| How many entries to return per page | [optional] [default to 10]
 
 ### Return type
 
@@ -329,7 +329,7 @@ Name | Type | Description  | Notes
 
 Get Waypoint
 
-View the details of a waypoint.
+View the details of a waypoint.  If the waypoint is uncharted, it will return the 'Uncharted' trait instead of its actual traits.
 
 ### Example
 ```dart

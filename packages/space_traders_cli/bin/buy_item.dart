@@ -60,7 +60,7 @@ void main(List<String> args) async {
     priceData,
     transactionLog,
     ship,
-    good.symbol,
+    TradeSymbol.fromJson(good.symbol)!,
     quantity,
   );
 }

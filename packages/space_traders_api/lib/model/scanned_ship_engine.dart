@@ -16,6 +16,7 @@ class ScannedShipEngine {
     required this.symbol,
   });
 
+  /// The symbol of the engine.
   String symbol;
 
   @override

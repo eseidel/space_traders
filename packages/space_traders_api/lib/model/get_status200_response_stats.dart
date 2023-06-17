@@ -19,12 +19,16 @@ class GetStatus200ResponseStats {
     required this.waypoints,
   });
 
+  /// Number of registered agents in the game.
   int agents;
 
+  /// Total number of ships in the game.
   int ships;
 
+  /// Total number of systems in the game.
   int systems;
 
+  /// Total number of waypoints in the game.
   int waypoints;
 
   @override

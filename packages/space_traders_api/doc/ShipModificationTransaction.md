@@ -1,4 +1,4 @@
-# space_traders_api.model.ShipyardTransaction
+# space_traders_api.model.ShipModificationTransaction
 
 ## Load the model package
 ```dart
@@ -9,9 +9,9 @@ import 'package:space_traders_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **waypointSymbol** | **String** | The symbol of the waypoint where the transaction took place. | 
-**shipSymbol** | **String** | The symbol of the ship that was the subject of the transaction. | 
-**price** | **int** | The price of the transaction. | 
-**agentSymbol** | **String** | The symbol of the agent that made the transaction. | 
+**shipSymbol** | **String** | The symbol of the ship that made the transaction. | 
+**tradeSymbol** | **String** | The symbol of the trade good. | 
+**totalPrice** | **int** | The total price of the transaction. | 
 **timestamp** | [**DateTime**](DateTime.md) | The timestamp of the transaction. | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

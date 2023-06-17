@@ -16,7 +16,7 @@ class WaypointFaction {
     required this.symbol,
   });
 
-  String symbol;
+  FactionSymbols symbol;
 
   @override
   bool operator ==(Object other) =>
@@ -58,7 +58,7 @@ class WaypointFaction {
       }());
 
       return WaypointFaction(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: FactionSymbols.fromJson(json[r'symbol'])!,
       );
     }
     return null;

@@ -16,6 +16,7 @@ class WaypointOrbital {
     required this.symbol,
   });
 
+  /// The symbol of the orbiting waypoint.
   String symbol;
 
   @override

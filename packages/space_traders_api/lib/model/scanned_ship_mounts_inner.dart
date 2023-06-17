@@ -16,6 +16,7 @@ class ScannedShipMountsInner {
     required this.symbol,
   });
 
+  /// The symbol of the mount.
   String symbol;
 
   @override

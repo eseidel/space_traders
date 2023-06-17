@@ -17,8 +17,10 @@ class GetStatus200ResponseLeaderboardsMostSubmittedChartsInner {
     required this.chartCount,
   });
 
+  /// Symbol of the agent.
   String agentSymbol;
 
+  /// Amount of charts done by the agent.
   int chartCount;
 
   @override

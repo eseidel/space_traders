@@ -10,37 +10,50 @@
 
 part of space_traders_api;
 
-class ShipRefine200Response {
-  /// Returns a new [ShipRefine200Response] instance.
-  ShipRefine200Response({
-    required this.data,
+class RefuelShipRequest {
+  /// Returns a new [RefuelShipRequest] instance.
+  RefuelShipRequest({
+    this.units,
   });
 
-  ShipRefine200ResponseData data;
+  /// The amount of fuel to fill in the ship's tanks. When not specified, the ship will be refueled to its maximum fuel capacity. If the amount specified is greater than the ship's remaining capacity, the ship will only be refueled to its maximum fuel capacity. The amount specified is not in market units but in ship fuel units.
+  ///
+  /// Minimum value: 1
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  int? units;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ShipRefine200Response && other.data == data;
+      other is RefuelShipRequest && other.units == units;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (data.hashCode);
+      (units == null ? 0 : units!.hashCode);
 
   @override
-  String toString() => 'ShipRefine200Response[data=$data]';
+  String toString() => 'RefuelShipRequest[units=$units]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'data'] = this.data;
+    if (this.units != null) {
+      json[r'units'] = this.units;
+    } else {
+      json[r'units'] = null;
+    }
     return json;
   }
 
-  /// Returns a new [ShipRefine200Response] instance and imports its values from
+  /// Returns a new [RefuelShipRequest] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static ShipRefine200Response? fromJson(dynamic value) {
+  static RefuelShipRequest? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -50,28 +63,28 @@ class ShipRefine200Response {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "ShipRefine200Response[$key]" is missing from JSON.');
+              'Required key "RefuelShipRequest[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "ShipRefine200Response[$key]" has a null value in JSON.');
+              'Required key "RefuelShipRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return ShipRefine200Response(
-        data: ShipRefine200ResponseData.fromJson(json[r'data'])!,
+      return RefuelShipRequest(
+        units: mapValueOfType<int>(json, r'units'),
       );
     }
     return null;
   }
 
-  static List<ShipRefine200Response>? listFromJson(
+  static List<RefuelShipRequest>? listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <ShipRefine200Response>[];
+    final result = <RefuelShipRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = ShipRefine200Response.fromJson(row);
+        final value = RefuelShipRequest.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -80,12 +93,12 @@ class ShipRefine200Response {
     return result.toList(growable: growable);
   }
 
-  static Map<String, ShipRefine200Response> mapFromJson(dynamic json) {
-    final map = <String, ShipRefine200Response>{};
+  static Map<String, RefuelShipRequest> mapFromJson(dynamic json) {
+    final map = <String, RefuelShipRequest>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipRefine200Response.fromJson(entry.value);
+        final value = RefuelShipRequest.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -94,16 +107,16 @@ class ShipRefine200Response {
     return map;
   }
 
-  // maps a json object with a list of ShipRefine200Response-objects as value to a dart map
-  static Map<String, List<ShipRefine200Response>> mapListFromJson(
+  // maps a json object with a list of RefuelShipRequest-objects as value to a dart map
+  static Map<String, List<RefuelShipRequest>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<ShipRefine200Response>>{};
+    final map = <String, List<RefuelShipRequest>>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ShipRefine200Response.listFromJson(
+        final value = RefuelShipRequest.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -116,7 +129,5 @@ class ShipRefine200Response {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'data',
-  };
+  static const requiredKeys = <String>{};
 }

@@ -17,8 +17,10 @@ class GetStatus200ResponseLeaderboards {
     this.mostSubmittedCharts = const [],
   });
 
+  /// Top agents with the most credits.
   List<GetStatus200ResponseLeaderboardsMostCreditsInner> mostCredits;
 
+  /// Top agents with the most charted submitted.
   List<GetStatus200ResponseLeaderboardsMostSubmittedChartsInner>
       mostSubmittedCharts;
 

@@ -21,10 +21,13 @@ class ShipMount {
     required this.requirements,
   });
 
+  /// Symbo of this mount.
   ShipMountSymbolEnum symbol;
 
+  /// Name of this mount.
   String name;
 
+  /// Description of this mount.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -33,6 +36,8 @@ class ShipMount {
   ///
   String? description;
 
+  /// Mounts that have this value, such as mining lasers, denote how powerful this mount's capabilities are.
+  ///
   /// Minimum value: 0
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -42,6 +47,7 @@ class ShipMount {
   ///
   int? strength;
 
+  /// Mounts that have this value denote what goods can be produced from using the mount.
   List<ShipMountDepositsEnum> deposits;
 
   ShipRequirements requirements;
@@ -182,6 +188,7 @@ class ShipMount {
   };
 }
 
+/// Symbo of this mount.
 class ShipMountSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipMountSymbolEnum._(this.value);

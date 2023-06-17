@@ -23,11 +23,13 @@ class Contract {
     this.deadlineToAccept,
   });
 
+  /// ID of the contract.
   String id;
 
   /// The symbol of the faction that this contract is for.
   String factionSymbol;
 
+  /// Type of contract.
   ContractTypeEnum type;
 
   ContractTerms terms;
@@ -194,6 +196,7 @@ class Contract {
   };
 }
 
+/// Type of contract.
 class ContractTypeEnum {
   /// Instantiate a new enum with the provided [value].
   const ContractTypeEnum._(this.value);

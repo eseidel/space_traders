@@ -16,6 +16,7 @@ class ScannedShipReactor {
     required this.symbol,
   });
 
+  /// The symbol of the reactor.
   String symbol;
 
   @override

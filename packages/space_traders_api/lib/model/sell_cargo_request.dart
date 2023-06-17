@@ -17,8 +17,9 @@ class SellCargoRequest {
     required this.units,
   });
 
-  String symbol;
+  TradeSymbol symbol;
 
+  /// Amounts of units to sell of the selected good.
   int units;
 
   @override
@@ -64,7 +65,7 @@ class SellCargoRequest {
       }());
 
       return SellCargoRequest(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: TradeSymbol.fromJson(json[r'symbol'])!,
         units: mapValueOfType<int>(json, r'units')!,
       );
     }

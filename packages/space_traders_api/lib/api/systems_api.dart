@@ -18,7 +18,7 @@ class SystemsApi {
 
   /// Get Jump Gate
   ///
-  /// Get jump gate details for a waypoint.
+  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  The response will return all systems that are have a Jump Gate in range of this Jump Gate. Those systems can be jumped to from this Jump Gate.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -60,7 +60,7 @@ class SystemsApi {
 
   /// Get Jump Gate
   ///
-  /// Get jump gate details for a waypoint.
+  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  The response will return all systems that are have a Jump Gate in range of this Jump Gate. Those systems can be jumped to from this Jump Gate.
   ///
   /// Parameters:
   ///
@@ -95,7 +95,7 @@ class SystemsApi {
 
   /// Get Market
   ///
-  /// Retrieve imports, exports and exchange data from a marketplace. Imports can be sold, exports can be purchased, and exchange goods can be purchased or sold. Send a ship to the waypoint to access trade good prices and recent transactions.
+  /// Retrieve imports, exports and exchange data from a marketplace. Requires a waypoint that has the `Marketplace` trait to use.  Send a ship to the waypoint to access trade good prices and recent transactions. Refer to the [Market Overview page](https://docs.spacetraders.io/game-concepts/markets) to gain better a understanding of the market in the game.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -137,7 +137,7 @@ class SystemsApi {
 
   /// Get Market
   ///
-  /// Retrieve imports, exports and exchange data from a marketplace. Imports can be sold, exports can be purchased, and exchange goods can be purchased or sold. Send a ship to the waypoint to access trade good prices and recent transactions.
+  /// Retrieve imports, exports and exchange data from a marketplace. Requires a waypoint that has the `Marketplace` trait to use.  Send a ship to the waypoint to access trade good prices and recent transactions. Refer to the [Market Overview page](https://docs.spacetraders.io/game-concepts/markets) to gain better a understanding of the market in the game.
   ///
   /// Parameters:
   ///
@@ -172,7 +172,7 @@ class SystemsApi {
 
   /// Get Shipyard
   ///
-  /// Get the shipyard for a waypoint. Send a ship to the waypoint to access ships that are currently available for purchase and recent transactions.
+  /// Get the shipyard for a waypoint. Requires a waypoint that has the `Shipyard` trait to use. Send a ship to the waypoint to access data on ships that are currently available for purchase and recent transactions.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -214,7 +214,7 @@ class SystemsApi {
 
   /// Get Shipyard
   ///
-  /// Get the shipyard for a waypoint. Send a ship to the waypoint to access ships that are currently available for purchase and recent transactions.
+  /// Get the shipyard for a waypoint. Requires a waypoint that has the `Shipyard` trait to use. Send a ship to the waypoint to access data on ships that are currently available for purchase and recent transactions.
   ///
   /// Parameters:
   ///
@@ -314,9 +314,9 @@ class SystemsApi {
     return null;
   }
 
-  /// List Waypoints
+  /// List Waypoints in System
   ///
-  /// Fetch all of the waypoints for a given system. System must be charted or a ship must be present to return waypoint details.
+  /// Return a paginated list of all of the waypoints for a given system.  If a waypoint is uncharted, it will return the `Uncharted` trait instead of its actual traits.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -366,9 +366,9 @@ class SystemsApi {
     );
   }
 
-  /// List Waypoints
+  /// List Waypoints in System
   ///
-  /// Fetch all of the waypoints for a given system. System must be charted or a ship must be present to return waypoint details.
+  /// Return a paginated list of all of the waypoints for a given system.  If a waypoint is uncharted, it will return the `Uncharted` trait instead of its actual traits.
   ///
   /// Parameters:
   ///
@@ -408,7 +408,7 @@ class SystemsApi {
 
   /// List Systems
   ///
-  /// Return a list of all systems.
+  /// Return a paginated list of all systems.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -455,7 +455,7 @@ class SystemsApi {
 
   /// List Systems
   ///
-  /// Return a list of all systems.
+  /// Return a paginated list of all systems.
   ///
   /// Parameters:
   ///
@@ -490,7 +490,7 @@ class SystemsApi {
 
   /// Get Waypoint
   ///
-  /// View the details of a waypoint.
+  /// View the details of a waypoint.  If the waypoint is uncharted, it will return the 'Uncharted' trait instead of its actual traits.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -532,7 +532,7 @@ class SystemsApi {
 
   /// Get Waypoint
   ///
-  /// View the details of a waypoint.
+  /// View the details of a waypoint.  If the waypoint is uncharted, it will return the 'Uncharted' trait instead of its actual traits.
   ///
   /// Parameters:
   ///

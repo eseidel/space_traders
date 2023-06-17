@@ -24,16 +24,21 @@ class ScannedWaypoint {
     this.chart,
   });
 
+  /// Symbol of the waypoint.
   String symbol;
 
   WaypointType type;
 
+  /// Symbol of the system.
   String systemSymbol;
 
+  /// Position in the universe in the x axis.
   int x;
 
+  /// Position in the universe in the y axis.
   int y;
 
+  /// List of waypoints that orbit this waypoint.
   List<WaypointOrbital> orbitals;
 
   ///

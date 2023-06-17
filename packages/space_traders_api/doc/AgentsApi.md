@@ -9,13 +9,13 @@ All URIs are relative to *https://api.spacetraders.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getMyAgent**](AgentsApi.md#getmyagent) | **GET** /my/agent | My Agent Details
+[**getMyAgent**](AgentsApi.md#getmyagent) | **GET** /my/agent | Get Agent
 
 
 # **getMyAgent**
 > GetMyAgent200Response getMyAgent()
 
-My Agent Details
+Get Agent
 
 Fetch your agent's details.
 

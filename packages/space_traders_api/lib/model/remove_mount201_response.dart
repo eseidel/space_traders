@@ -16,7 +16,7 @@ class RemoveMount201Response {
     required this.data,
   });
 
-  InstallMount201ResponseData data;
+  RemoveMount201ResponseData data;
 
   @override
   bool operator ==(Object other) =>
@@ -58,7 +58,7 @@ class RemoveMount201Response {
       }());
 
       return RemoveMount201Response(
-        data: InstallMount201ResponseData.fromJson(json[r'data'])!,
+        data: RemoveMount201ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;

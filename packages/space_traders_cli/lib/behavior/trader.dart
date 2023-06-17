@@ -462,7 +462,7 @@ Future<DateTime?> _purchaseCargoAndGo(
     priceData,
     transactionLog,
     ship,
-    deal.tradeSymbol.value,
+    deal.tradeSymbol,
     unitsToPurchase,
   );
   if (maybeResult == null) {

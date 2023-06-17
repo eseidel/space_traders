@@ -68,15 +68,14 @@ int expectedValueFromSurvey(
   // Price them at the passed in market.
   // This will fail if the passed in market doesn't sell everything.
 
-  final totalValue = survey.deposits.fold<int>(
-    0,
-    (total, deposit) =>
-        total +
-        priceData.recentSellPrice(
+  final totalValue = survey.deposits.fold<int>(0, (total, deposit) {
+    final sellPrice = priceData.recentSellPrice(
           marketSymbol: market.symbol,
           tradeSymbol: deposit.symbol,
-        )!,
-  );
+        ) ??
+        0; // null when prices database is empty.
+    return total + sellPrice;
+  });
   return totalValue ~/ survey.deposits.length;
 }
 
@@ -543,7 +542,7 @@ Future<DateTime?> advanceMiner(
         ship,
         // pickaxe requires an extra space on mac?
         '⛏️  ${yield_.units.toString().padLeft(2)} '
-        '${yield_.symbol.padRight(18)} '
+        '${yield_.symbol.value.padRight(18)} '
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
     // We could sell here before putting ourselves to sleep.

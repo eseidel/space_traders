@@ -64,14 +64,18 @@ Api defaultApi(FileSystem fs) {
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.
-Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
+Future<String> loadAuthTokenOrRegister(
+  FileSystem fs, {
+  String? callsign,
+  String? email,
+}) async {
   try {
     return loadAuthToken(fs);
   } catch (e) {
     logger.info('No auth token found.');
     // Otherwise, register a new user.
-    final handle = logger.prompt('What is your call sign?');
-    final token = await register(handle);
+    final handle = callsign ?? logger.prompt('What is your call sign?');
+    final token = await register(callsign: handle, email: email);
     await fs.file('auth_token.txt').writeAsString(token);
     return token;
   }
@@ -80,7 +84,7 @@ Future<String> loadAuthTokenOrRegister(FileSystem fs) async {
 Future<String> _tryRegister(
   DefaultApi api, {
   required String symbol,
-  required String faction,
+  required FactionSymbols faction,
   String? email,
 }) async {
   final registerRequest = RegisterRequest(
@@ -94,7 +98,9 @@ Future<String> _tryRegister(
 
 /// register registers a new user with the space traders api and
 /// returns the auth token which should be saved and used for future requests.
-Future<String> register(String callSign) async {
+/// If the call sign is already taken, it will prompt for the email address
+/// associated with the call sign.
+Future<String> register({required String callsign, String? email}) async {
   final client = RateLimitedApiClient(requestsPerSecond: 2);
   final defaultApi = DefaultApi(client);
 
@@ -119,8 +125,9 @@ Future<String> register(String callSign) async {
   try {
     return await _tryRegister(
       defaultApi,
-      symbol: callSign,
+      symbol: callsign,
       faction: faction.symbol,
+      email: email,
     );
   } on ApiException catch (e) {
     if (!isReservedHandleException(e)) {
@@ -137,7 +144,7 @@ Future<String> register(String callSign) async {
     );
     return await _tryRegister(
       defaultApi,
-      symbol: callSign,
+      symbol: callsign,
       faction: faction.symbol,
       email: email,
     );

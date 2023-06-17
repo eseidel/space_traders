@@ -26,7 +26,7 @@ class Ship {
     required this.fuel,
   });
 
-  /// The globally unique identifier of the ship in the following format: `[AGENT_SYMBOL]_[HEX_ID]`
+  /// The globally unique identifier of the ship in the following format: `[AGENT_SYMBOL]-[HEX_ID]`
   String symbol;
 
   ShipRegistration registration;
@@ -41,8 +41,10 @@ class Ship {
 
   ShipEngine engine;
 
+  /// Modules installed in this ship.
   List<ShipModule> modules;
 
+  /// Mounts installed in this ship.
   List<ShipMount> mounts;
 
   ShipCargo cargo;

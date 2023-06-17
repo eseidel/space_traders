@@ -21,10 +21,13 @@ class ShipReactor {
     required this.requirements,
   });
 
+  /// Symbol of the reactor.
   ShipReactorSymbolEnum symbol;
 
+  /// Name of the reactor.
   String name;
 
+  /// Description of the reactor.
   String description;
 
   /// Condition is a range of 0 to 100 where 0 is completely worn out and 100 is brand new.
@@ -39,6 +42,8 @@ class ShipReactor {
   ///
   int? condition;
 
+  /// The amount of power provided by this reactor. The more power a reactor provides to the ship, the lower the cooldown it gets when using a module or mount that taxes the ship's power.
+  ///
   /// Minimum value: 1
   int powerOutput;
 
@@ -177,6 +182,7 @@ class ShipReactor {
   };
 }
 
+/// Symbol of the reactor.
 class ShipReactorSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipReactorSymbolEnum._(this.value);

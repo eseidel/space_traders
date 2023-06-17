@@ -8,10 +8,10 @@ import 'package:space_traders_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | **String** |  | 
+**symbol** | **String** | The symbol of the waypoint. | 
 **type** | [**WaypointType**](WaypointType.md) |  | 
-**x** | **int** |  | 
-**y** | **int** |  | 
+**x** | **int** | Position in the universe in the x axis. | 
+**y** | **int** | Position in the universe in the y axis. | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

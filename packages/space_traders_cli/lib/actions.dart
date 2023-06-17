@@ -112,7 +112,7 @@ Future<DeliverContract200ResponseData> deliverContract(
 Future<SellCargo201ResponseData> sellCargo(
   Api api,
   Ship ship,
-  String tradeSymbol,
+  TradeSymbol tradeSymbol,
   int units,
 ) async {
   final request = SellCargoRequest(
@@ -158,7 +158,12 @@ Stream<SellCargo201ResponseData> sellAllCargo(
     while (leftToSell > 0) {
       final toSell = min(leftToSell, good.tradeVolume);
       leftToSell -= toSell;
-      final response = await sellCargo(api, ship, item.symbol, toSell);
+      final response = await sellCargo(
+        api,
+        ship,
+        TradeSymbol.fromJson(item.symbol)!,
+        toSell,
+      );
       yield response;
     }
   }
@@ -195,7 +200,7 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
   PriceData priceData,
   TransactionLog transactionLog,
   Ship ship,
-  String tradeSymbol,
+  TradeSymbol tradeSymbol,
   int amountToBuy,
 ) async {
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
@@ -472,7 +477,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
 }
 
 /// Remove [mountSymbol] from [ship] and log.
-Future<InstallMount201ResponseData> removeMountAndLog(
+Future<RemoveMount201ResponseData> removeMountAndLog(
   Api api,
   Ship ship,
   String mountSymbol,
