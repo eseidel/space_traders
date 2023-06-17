@@ -83,8 +83,7 @@ int? estimateSellPrice(
 ) {
   // This case would only be needed if we have a ship at the market, but somehow
   // failed to record price data in our price db.
-  final maybeGoods =
-      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
+  final maybeGoods = market.marketTradeGood(tradeSymbol);
   if (maybeGoods != null) {
     return maybeGoods.sellPrice;
   }
@@ -119,8 +118,7 @@ int? estimatePurchasePrice(
 ) {
   // This case would only be needed if we have a ship at the market, but somehow
   // failed to record price data in our price db.
-  final maybeGoods =
-      market.tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
+  final maybeGoods = market.marketTradeGood(tradeSymbol);
   if (maybeGoods != null) {
     return maybeGoods.purchasePrice;
   }
