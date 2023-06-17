@@ -128,9 +128,7 @@ Future<DateTime?> advanceExporer(
     const maxJumpDistance = 100;
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
-    await for (final destination in waypointsInJumpRadius(
-      systemsCache: systemsCache,
-      waypointCache: waypointCache,
+    await for (final destination in waypointCache.waypointsInJumpRadius(
       startSystem: currentWaypoint.systemSymbol,
       maxJumps: maxJumpDistance,
     )) {

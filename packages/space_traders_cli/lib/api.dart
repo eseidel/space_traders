@@ -324,3 +324,15 @@ extension MarketUtils on Market {
 /// Returns the duration until the given date time.
 Duration durationUntil(DateTime dateTime) =>
     dateTime.difference(DateTime.now());
+
+/// Creates a ConnectedSystem from a System and a distance.
+ConnectedSystem connectedSystemFromSystem(System system, int distance) {
+  return ConnectedSystem(
+    distance: distance,
+    symbol: system.symbol,
+    sectorSymbol: system.sectorSymbol,
+    type: system.type,
+    x: system.x,
+    y: system.y,
+  );
+}

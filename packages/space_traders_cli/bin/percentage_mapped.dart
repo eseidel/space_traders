@@ -1,7 +1,6 @@
 import 'package:args/args.dart';
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -56,9 +55,7 @@ void main(List<String> args) async {
   final allSystems = <String>[];
   final chartedSystems = <String>[];
 
-  await for (final waypoint in waypointsInJumpRadius(
-    systemsCache: systemsCache,
-    waypointCache: waypointCache,
+  await for (final waypoint in waypointCache.waypointsInJumpRadius(
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {

@@ -1,6 +1,6 @@
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
+import 'package:space_traders_cli/trading.dart';
 
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {

@@ -1,10 +1,8 @@
 import 'dart:math';
 
-import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/printing.dart';
@@ -166,99 +164,3 @@ Future<NavResult> continueNavigationIfNeeded(
     await navigateToLocalWaypointAndLog(api, ship, jumpGate),
   );
 }
-
-/// Creates a ConnectedSystem from a System and a distance.
-ConnectedSystem connectedSystemFromSystem(System system, int distance) {
-  return ConnectedSystem(
-    distance: distance,
-    symbol: system.symbol,
-    sectorSymbol: system.sectorSymbol,
-    type: system.type,
-    x: system.x,
-    y: system.y,
-  );
-}
-
-/// Yields a stream of system symbols that are within n jumps of the system.
-/// The system itself is included in the stream with distance 0.
-/// The stream is roughly ordered by distance from the start.
-Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
-  required SystemsCache systemsCache,
-  required String startSystem,
-  required int maxJumps,
-}) async* {
-  var jumpsLeft = maxJumps;
-  final currentSystemsToJumpFrom = <String>{startSystem};
-  final oneJumpFurther = <String>{};
-  final systemsExamined = <String>{};
-  while (jumpsLeft >= 0) {
-    while (currentSystemsToJumpFrom.isNotEmpty) {
-      final jumpFrom = currentSystemsToJumpFrom.first;
-      currentSystemsToJumpFrom.remove(jumpFrom);
-      systemsExamined.add(jumpFrom);
-      yield (jumpFrom, maxJumps - jumpsLeft);
-      // Don't bother to check connections if we're out of jumps.
-      if (jumpsLeft > 0) {
-        final connectedSystems =
-            systemsCache.connectedSystems(jumpFrom).toList();
-        final sortedSystems = connectedSystems.sortedBy<num>((s) => s.distance);
-        for (final connectedSystem in sortedSystems) {
-          // Don't add systems we've already examined or are already in the
-          // list to examine next.
-          if (!systemsExamined.contains(connectedSystem.symbol) &&
-              !currentSystemsToJumpFrom.contains(connectedSystem.symbol)) {
-            oneJumpFurther.add(connectedSystem.symbol);
-          }
-        }
-      }
-    }
-    currentSystemsToJumpFrom.addAll(oneJumpFurther);
-    oneJumpFurther.clear();
-    jumpsLeft--;
-  }
-}
-
-/// Yields a stream of Waypoints that are within n jumps of the given system.
-/// Waypoints from the start system are included in the stream.
-/// The stream is roughly ordered by distance from the start.
-Stream<Waypoint> waypointsInJumpRadius({
-  required SystemsCache systemsCache,
-  required WaypointCache waypointCache,
-  required String startSystem,
-  required int maxJumps,
-}) async* {
-  await for (final (String system, int _) in systemSymbolsInJumpRadius(
-    systemsCache: systemsCache,
-    startSystem: startSystem,
-    maxJumps: maxJumps,
-  )) {
-    final waypoints = await waypointCache.waypointsInSystem(system);
-    for (final waypoint in waypoints) {
-      yield waypoint;
-    }
-  }
-}
-
-/// Yields a stream of system symbols that are within n jumps of the system.
-/// The system itself is included in the stream with distance 0.
-/// The stream is roughly ordered by distance from the start.
-/// This makes one more API call per system than systemsSymbolsInJumpRadius
-/// so use that one if you don't need the ConnectedSystem data.
-// Stream<ConnectedSystem> connectedSystemsInJumpRadius({
-//   required WaypointCache waypointCache,
-//   required String startSystem,
-//   required int maxJumps,
-// }) async* {
-//   final start = await waypointCache.systemBySymbol(startSystem);
-//   await for (final (String system, int _) in systemSymbolsInJumpRadius(
-//     waypointCache: waypointCache,
-//     startSystem: startSystem,
-//     maxJumps: maxJumps,
-//   )) {
-//     final destination = await waypointCache.systemBySymbol(system);
-//     yield connectedSystemFromSystem(
-//       destination,
-//       _distanceBetweenSystems(start, destination),
-//     );
-//   }
-// }

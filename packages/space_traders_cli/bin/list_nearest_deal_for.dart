@@ -1,6 +1,5 @@
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
@@ -48,8 +47,8 @@ void main(List<String> args) async {
 
   final availabilityList = <_Availability>[];
 
-  await for (final (String system, int jumps) in systemSymbolsInJumpRadius(
-    systemsCache: systemsCache,
+  await for (final (String system, int jumps)
+      in systemsCache.systemSymbolsInJumpRadius(
     startSystem: hq.systemSymbol,
     maxJumps: maxJumps,
   )) {

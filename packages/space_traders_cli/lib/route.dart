@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/systems_cache.dart';
 
 /// Returns the distance to the given waypoint.
 int distanceBetweenWaypointsInSystem(Waypoint a, Waypoint b) {
@@ -62,4 +63,82 @@ int flightTimeWithinSystemInSeconds(
       return 15 + 5 * distanceBySpeed;
   }
   throw UnimplementedError('Unknown flight mode: $flightMode');
+}
+
+/// Returns the fuel cost to travel between two waypoints.
+/// This assumes the two waypoints are either within the same system
+/// or are connected by jump gates.
+int fuelUsedBetween(
+  SystemsCache systemsCache,
+  SystemWaypoint a,
+  SystemWaypoint b,
+) {
+  if (a.systemSymbol == b.systemSymbol) {
+    return fuelUsedWithinSystem(a, b);
+  }
+  // a -> jump gate
+  // jump N times
+// jump gate -> b
+  final aJumpGate = systemsCache.jumpGateWaypointForSystem(a.systemSymbol);
+  if (aJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${a.systemSymbol}',
+    );
+  }
+  // Ignoring if there is actually a path between the jump gates.
+  final bJumpGate = systemsCache.jumpGateWaypointForSystem(b.systemSymbol);
+  if (bJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${b.systemSymbol}',
+    );
+  }
+  return fuelUsedWithinSystem(a, aJumpGate) +
+      fuelUsedWithinSystem(bJumpGate, b);
+}
+
+/// Returns flight time in seconds between two waypoints.
+int flightTimeBetween(
+  SystemsCache systemsCache,
+  SystemWaypoint a,
+  SystemWaypoint b, {
+  required ShipNavFlightMode flightMode,
+  required int shipSpeed,
+}) {
+  if (a.systemSymbol == b.systemSymbol) {
+    return flightTimeWithinSystemInSeconds(
+      a,
+      b,
+      flightMode: flightMode,
+      shipSpeed: shipSpeed,
+    );
+  }
+  // a -> jump gate
+  // jump N times
+  // jump gate -> b
+  final aJumpGate = systemsCache.jumpGateWaypointForSystem(a.systemSymbol);
+  if (aJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${a.systemSymbol}',
+    );
+  }
+  // Ignoring if there is actually a path between the jump gates.
+  final bJumpGate = systemsCache.jumpGateWaypointForSystem(b.systemSymbol);
+  if (bJumpGate == null) {
+    throw ArgumentError(
+      'No jump gate for ${b.systemSymbol}',
+    );
+  }
+  // Assuming a and b are connected systems!
+  return flightTimeWithinSystemInSeconds(
+        a,
+        aJumpGate,
+        flightMode: flightMode,
+        shipSpeed: shipSpeed,
+      ) +
+      flightTimeWithinSystemInSeconds(
+        bJumpGate,
+        b,
+        flightMode: flightMode,
+        shipSpeed: shipSpeed,
+      );
 }

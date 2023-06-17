@@ -1,6 +1,5 @@
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';

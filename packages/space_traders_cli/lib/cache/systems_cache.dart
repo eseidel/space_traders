@@ -147,4 +147,66 @@ class SystemsCache {
     // TODO(eseidel): sort by distance than symbol to be stable.
     return connected;
   }
+
+  /// Yields a stream of system symbols that are within n jumps of the system.
+  /// The system itself is included in the stream with distance 0.
+  /// The stream is roughly ordered by distance from the start.
+  Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
+    required String startSystem,
+    required int maxJumps,
+  }) async* {
+    var jumpsLeft = maxJumps;
+    final currentSystemsToJumpFrom = <String>{startSystem};
+    final oneJumpFurther = <String>{};
+    final systemsExamined = <String>{};
+    while (jumpsLeft >= 0) {
+      while (currentSystemsToJumpFrom.isNotEmpty) {
+        final jumpFrom = currentSystemsToJumpFrom.first;
+        currentSystemsToJumpFrom.remove(jumpFrom);
+        systemsExamined.add(jumpFrom);
+        yield (jumpFrom, maxJumps - jumpsLeft);
+        // Don't bother to check connections if we're out of jumps.
+        if (jumpsLeft > 0) {
+          final connectedSystems = this.connectedSystems(jumpFrom).toList();
+          final sortedSystems =
+              connectedSystems.sortedBy<num>((s) => s.distance);
+          for (final connectedSystem in sortedSystems) {
+            // Don't add systems we've already examined or are already in the
+            // list to examine next.
+            if (!systemsExamined.contains(connectedSystem.symbol) &&
+                !currentSystemsToJumpFrom.contains(connectedSystem.symbol)) {
+              oneJumpFurther.add(connectedSystem.symbol);
+            }
+          }
+        }
+      }
+      currentSystemsToJumpFrom.addAll(oneJumpFurther);
+      oneJumpFurther.clear();
+      jumpsLeft--;
+    }
+  }
+
+  /// Yields a stream of system symbols that are within n jumps of the system.
+  /// The system itself is included in the stream with distance 0.
+  /// The stream is roughly ordered by distance from the start.
+  /// This makes one more API call per system than systemsSymbolsInJumpRadius
+  /// so use that one if you don't need the ConnectedSystem data.
+// Stream<ConnectedSystem> connectedSystemsInJumpRadius({
+//   required WaypointCache waypointCache,
+//   required String startSystem,
+//   required int maxJumps,
+// }) async* {
+//   final start = await waypointCache.systemBySymbol(startSystem);
+//   await for (final (String system, int _) in systemSymbolsInJumpRadius(
+//     waypointCache: waypointCache,
+//     startSystem: startSystem,
+//     maxJumps: maxJumps,
+//   )) {
+//     final destination = await waypointCache.systemBySymbol(system);
+//     yield connectedSystemFromSystem(
+//       destination,
+//       _distanceBetweenSystems(start, destination),
+//     );
+//   }
+// }
 }

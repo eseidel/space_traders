@@ -184,6 +184,25 @@ class WaypointCache {
     _jumpGatesBySystem[systemSymbol] = jumpGate;
     return jumpGate;
   }
+
+  /// Yields a stream of Waypoints that are within n jumps of the given system.
+  /// Waypoints from the start system are included in the stream.
+  /// The stream is roughly ordered by distance from the start.
+  Stream<Waypoint> waypointsInJumpRadius({
+    required String startSystem,
+    required int maxJumps,
+  }) async* {
+    await for (final (String system, int _)
+        in _systemsCache.systemSymbolsInJumpRadius(
+      startSystem: startSystem,
+      maxJumps: maxJumps,
+    )) {
+      final waypoints = await waypointsInSystem(system);
+      for (final waypoint in waypoints) {
+        yield waypoint;
+      }
+    }
+  }
 }
 
 /// Fetches Market for a given Waypoint.

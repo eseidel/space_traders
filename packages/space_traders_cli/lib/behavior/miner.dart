@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
@@ -14,6 +13,7 @@ import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/net/exceptions.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/route.dart';
+import 'package:space_traders_cli/trading.dart';
 
 // my evaluation logic actually just assumes I'll get 10 extracts from each
 // survey regardless of size - so room for improvement.... I just don't have the
@@ -86,9 +86,7 @@ Future<Waypoint> nearestWaypointWithMarket(
   if (start.hasMarketplace) {
     return start;
   }
-  await for (final waypoint in waypointsInJumpRadius(
-    systemsCache: systemsCache,
-    waypointCache: waypointCache,
+  await for (final waypoint in waypointCache.waypointsInJumpRadius(
     startSystem: start.systemSymbol,
     maxJumps: 1,
   )) {
@@ -224,8 +222,8 @@ Future<String?> nearestMineWithGoodMining(
   bool Function(String systemSymbol)? systemFilter,
 }) async {
   final evals = <_SystemEval>[];
-  await for (final (systemSymbol, jumps) in systemSymbolsInJumpRadius(
-    systemsCache: systemsCache,
+  await for (final (systemSymbol, jumps)
+      in systemsCache.systemSymbolsInJumpRadius(
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {
