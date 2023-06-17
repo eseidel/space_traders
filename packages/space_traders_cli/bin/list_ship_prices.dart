@@ -4,7 +4,7 @@ import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/shipyard_prices.dart';
+import 'package:space_traders_cli/cache/shipyard_prices.dart';
 
 void main(List<String> args) async {
   const fs = LocalFileSystem();
