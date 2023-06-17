@@ -98,21 +98,21 @@ class SystemsCache {
   }
 
   /// Return the system with the given [symbol].
-  System systemFromSymbol(String symbol) {
+  System systemBySymbol(String symbol) {
     return _systems.firstWhere((s) => s.symbol == symbol);
   }
 
   /// Return the SystemWaypoint for the given [symbol].
   SystemWaypoint waypointFromSymbol(String symbol) {
     final parsed = parseWaypointString(symbol);
-    final system = systemFromSymbol(parsed.system);
+    final system = systemBySymbol(parsed.system);
     return system.waypoints.firstWhere((w) => w.symbol == symbol);
   }
 
   /// Return the SystemWaypoints for the given [systemSymbol].
   /// Mostly exists for compatibility with WaypointCache.
   List<SystemWaypoint> waypointsInSystem(String systemSymbol) {
-    final system = systemFromSymbol(systemSymbol);
+    final system = systemBySymbol(systemSymbol);
     return system.waypoints;
   }
 

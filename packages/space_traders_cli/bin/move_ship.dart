@@ -71,11 +71,11 @@ void main(List<String> args) async {
   final myShips = await allMyShips(api).toList();
   final ship = await chooseShip(api, waypointCache, myShips);
 
-  final startingSystem =
-      await waypointCache.systemBySymbol(ship.nav.systemSymbol);
-  final jumpGate = await waypointCache.jumpGateForSystem(ship.nav.systemSymbol);
+  final startSystemSymbol = ship.nav.systemSymbol;
+  final startingSystem = systemsCache.systemBySymbol(startSystemSymbol);
+  final jumpGate = await waypointCache.jumpGateForSystem(startSystemSymbol);
   final jumpGateWaypoint =
-      systemsCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
+      systemsCache.jumpGateWaypointForSystem(startSystemSymbol);
 
   final systemChoices = [
     connectedSystemFromSystem(startingSystem, 0),

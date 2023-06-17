@@ -139,7 +139,7 @@ Future<NavResult> continueNavigationIfNeeded(
       return NavResult._loop();
     }
     // Otherwise we have to jump to a system along the way.
-    final endSystem = systemsCache.systemFromSymbol(endWaypoint.systemSymbol);
+    final endSystem = systemsCache.systemBySymbol(endWaypoint.systemSymbol);
     final closestSystem = connectedSystems.reduce(
       (a, b) => _distanceBetweenConnectedSystems(a, endSystem) <
               _distanceBetweenConnectedSystems(b, endSystem)

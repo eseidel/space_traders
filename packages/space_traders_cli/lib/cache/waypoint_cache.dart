@@ -22,7 +22,6 @@ class WaypointCache {
   });
 
   Waypoint? _agentHeadquarters;
-  final Map<String, System> _systemsBySymbol = {};
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Map<String, JumpGate?> _jumpGatesBySystem = {};
@@ -55,12 +54,6 @@ class WaypointCache {
     return waypoints;
   }
 
-  /// Fetch the system waypoint with the given symbol.
-  // Eventually callers should just have a SystemsCache instead.
-  SystemWaypoint systemWaypoint(String waypointSymbol) {
-    return _systemsCache.waypointFromSymbol(waypointSymbol);
-  }
-
   /// Fetch the waypoint with the given symbol.
   Future<Waypoint> waypoint(String waypointSymbol) async {
     final result = await waypointOrNull(waypointSymbol);
@@ -85,17 +78,6 @@ class WaypointCache {
     for (final symbol in waypointSymbols) {
       yield await waypoint(symbol);
     }
-  }
-
-  /// Fetch the system with the given symbol.
-  Future<System> systemBySymbol(String systemSymbol) async {
-    if (_systemsBySymbol.containsKey(systemSymbol)) {
-      return _systemsBySymbol[systemSymbol]!;
-    }
-    final response = await _api.systems.getSystem(systemSymbol);
-    final system = response!.data;
-    _systemsBySymbol[systemSymbol] = system;
-    return system;
   }
 
   Future<void> _ensureCacheMatchesServer(String systemSymbol) async {
@@ -154,33 +136,19 @@ class WaypointCache {
     return waypoints.where((w) => w.hasMarketplace).toList();
   }
 
-  // When JumpGate has a symbol accessor, this can be removed.
-  /// Returns the Waypoint for the jump gate in the given system, or null if
-  /// there is no jump gate.
-  Future<Waypoint?> jumpGateWaypointForSystem(String systemSymbol) async {
-    final waypoints = await waypointsInSystem(systemSymbol);
-    // There is at most one jump gate in a system.
-    return waypoints.firstWhereOrNull(
-      (w) => w.type == WaypointType.JUMP_GATE,
-    );
-  }
-
   /// Fetch the jump gate for the given system, or null if there is no jump
   /// gate.
   Future<JumpGate?> jumpGateForSystem(String systemSymbol) async {
     if (_jumpGatesBySystem.containsKey(systemSymbol)) {
       return _jumpGatesBySystem[systemSymbol];
     }
-    final jumpGateWaypoint = await jumpGateWaypointForSystem(systemSymbol);
+    final jumpGateWaypoint =
+        _systemsCache.jumpGateWaypointForSystem(systemSymbol);
     if (jumpGateWaypoint == null) {
       _jumpGatesBySystem[systemSymbol] = null;
       return null;
     }
-    final response = await _api.systems.getJumpGate(
-      systemSymbol,
-      jumpGateWaypoint.symbol,
-    );
-    final jumpGate = response!.data;
+    final jumpGate = await getJumpGate(_api, jumpGateWaypoint);
     _jumpGatesBySystem[systemSymbol] = jumpGate;
     return jumpGate;
   }
@@ -203,13 +171,6 @@ class WaypointCache {
       }
     }
   }
-}
-
-/// Fetches Market for a given Waypoint.
-Future<Market> _getMarket(Api api, Waypoint waypoint) async {
-  final response =
-      await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
-  return response!.data;
 }
 
 /// Stores Market objects fetched recently from the API.
@@ -245,16 +206,9 @@ class MarketCache {
     }
     final waypoint = await _waypointCache.waypoint(marketSymbol);
     final maybeMarket = waypoint.hasMarketplace
-        ? await _getMarket(_waypointCache._api, waypoint)
+        ? await getMarket(_waypointCache._api, waypoint)
         : null;
     _marketsBySymbol[marketSymbol] = maybeMarket;
     return maybeMarket;
   }
-}
-
-/// Returns JumpGate object for passed in Waypoint.
-Future<JumpGate> getJumpGate(Api api, Waypoint waypoint) async {
-  final response =
-      await api.systems.getJumpGate(waypoint.systemSymbol, waypoint.symbol);
-  return response!.data;
 }

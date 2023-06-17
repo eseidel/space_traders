@@ -51,7 +51,7 @@ void main() async {
   final startSystem = hq.system;
 
   // This should be connectedSystemsWithinJumpRangeFromSystem or similar.
-  final startingSystem = await waypointCache.systemBySymbol(startSystem);
+  final startingSystem = systemsCache.systemBySymbol(startSystem);
   final jumpGate = await waypointCache.jumpGateForSystem(startSystem);
   final systemChoices = [
     connectedSystemFromSystem(startingSystem, 0),
