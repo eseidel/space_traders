@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/eseidel/space_traders/branch/main/graph/badge.svg?token=YU4WO0ULKW)](https://codecov.io/gh/eseidel/space_traders)
+
 # Space Traders in Dart
 
 Playing around with writing a Dart implementation of the Space Traders game.
