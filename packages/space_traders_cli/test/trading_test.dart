@@ -5,6 +5,8 @@ import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/trading.dart';
 import 'package:test/test.dart';
 
+import 'waypoints_cache_test.dart';
+
 class MockWaypointCache extends Mock implements WaypointCache {}
 
 class MockPriceData extends Mock implements PriceData {}
@@ -136,6 +138,45 @@ void main() {
     final json2 = costed2.toJson();
     // Can't compare objects via equals because CostedDeal is not immutable.
     expect(json, json2);
+  });
+
+  test('costOutDeal basic', () {
+    final systemsCache = MockSystemsCache();
+    when(() => systemsCache.waypointFromSymbol('X-S-A')).thenReturn(
+      SystemWaypoint(
+        symbol: 'X-S-A',
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => systemsCache.waypointFromSymbol('X-S-B')).thenReturn(
+      SystemWaypoint(
+        symbol: 'X-S-B',
+        type: WaypointType.PLANET,
+        x: 0,
+        y: 0,
+      ),
+    );
+    const deal = Deal(
+      sourceSymbol: 'X-S-A',
+      destinationSymbol: 'X-S-B',
+      tradeSymbol: TradeSymbol.FUEL,
+      purchasePrice: 1,
+      sellPrice: 2,
+    );
+    final costed = costOutDeal(
+      systemsCache,
+      deal,
+      cargoSize: 1,
+      shipSpeed: 1,
+    );
+
+    /// These aren't very useful numbers, I don't think it takes 15s to fly
+    /// 0 distance (even between orbitals)?
+    expect(costed.fuelCost, 0);
+    expect(costed.tradeVolume, 1);
+    expect(costed.time, 15);
   });
 
   test('describe', () {
