@@ -17,16 +17,48 @@ void main() {
     expect(deals, isEmpty);
   });
 
-  test('estimateSellPrice', () {
+  test('estimateSellPrice null', () {
     final priceData = MockPriceData();
     final estimate = estimateSellPrice(priceData, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
   });
 
-  test('estimatePurchasePrice', () {
+  test('estimatePurchasePrice null', () {
     final priceData = MockPriceData();
     final estimate =
         estimatePurchasePrice(priceData, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
+  });
+
+  test('estimatePrice fresh', () {
+    final priceData = MockPriceData();
+    final market = Market(
+      symbol: 'A',
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: 'FUEL',
+          tradeVolume: 100,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+        )
+      ],
+    );
+    expect(
+      estimateSellPrice(
+        priceData,
+        market,
+        'FUEL',
+      ),
+      2,
+    );
+    expect(
+      estimatePurchasePrice(
+        priceData,
+        market,
+        'FUEL',
+      ),
+      1,
+    );
   });
 }
