@@ -67,6 +67,7 @@ Behavior _behaviorFor(
 // - Need to store handle and email somewhere.
 // - Need logic for planning which faction to be (random)?
 // - Logic for planning what to do with money (e.g. buy ships, by mods)
+// Should disable buying behavior for less time early on?
 // - When to enable which behaviors?
 // - Surveys.  How much surveying should we do before we start mining?
 

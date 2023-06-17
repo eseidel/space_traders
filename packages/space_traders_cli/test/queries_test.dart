@@ -8,7 +8,7 @@ void main() {
     const api = 'ignored';
     Future<(List<String>, Meta)> fetchPage(String api, int page) async {
       if (page == 1) {
-        return (['a', 'b'], Meta(total: 3, page: 1, limit: 2));
+        return (['a', 'b'], Meta(total: 3, limit: 2));
       } else if (page == 2) {
         return (['c'], Meta(total: 3, page: 2, limit: 2));
       } else {
