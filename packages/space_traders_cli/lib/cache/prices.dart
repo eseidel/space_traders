@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -14,9 +15,10 @@ const defaultMaxAge = Duration(days: 3);
 // "ABUNDANT", "purchasePrice": 6, "sellPrice": 4, "tradeVolume": 1000,
 // "timestamp": "2023-05-14T21:52:56.530126100+00:00"}
 /// Transaction data for a single trade symbol at a single waypoint.
+@immutable
 class MarketPrice {
   /// Create a new price record.
-  MarketPrice({
+  const MarketPrice({
     required this.waypointSymbol,
     required this.symbol,
     required this.supply,
@@ -100,6 +102,29 @@ class MarketPrice {
 
   /// The timestamp of the price record.
   final DateTime timestamp;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MarketPrice &&
+          runtimeType == other.runtimeType &&
+          waypointSymbol == other.waypointSymbol &&
+          symbol == other.symbol &&
+          supply == other.supply &&
+          purchasePrice == other.purchasePrice &&
+          sellPrice == other.sellPrice &&
+          tradeVolume == other.tradeVolume &&
+          timestamp == other.timestamp;
+
+  @override
+  int get hashCode =>
+      waypointSymbol.hashCode ^
+      symbol.hashCode ^
+      supply.hashCode ^
+      purchasePrice.hashCode ^
+      sellPrice.hashCode ^
+      tradeVolume.hashCode ^
+      timestamp.hashCode;
 }
 
 /// Describe a price record.
