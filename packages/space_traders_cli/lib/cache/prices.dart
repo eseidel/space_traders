@@ -74,14 +74,6 @@ class MarketPrice {
     };
   }
 
-  @override
-  String toString() {
-    return 'Price{waypointSymbol: $waypointSymbol, symbol: $symbol, '
-        'supply: $supply, purchasePrice: $purchasePrice, '
-        'sellPrice: $sellPrice, tradeVolume: $tradeVolume, '
-        'timestamp: $timestamp}';
-  }
-
   /// The waypoint of the market where this price was recorded.
   final String waypointSymbol;
 
@@ -125,12 +117,6 @@ class MarketPrice {
       sellPrice.hashCode ^
       tradeVolume.hashCode ^
       timestamp.hashCode;
-}
-
-/// Describe a price record.
-String describeMarketPrice(MarketPrice price) {
-  return '${price.waypointSymbol} ${price.symbol} '
-      '${price.purchasePrice} ${price.sellPrice}';
 }
 
 /// A collection of price records.
