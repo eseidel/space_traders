@@ -15,7 +15,7 @@ void main(List<String> args) async {
   const pricesPerRequest = 1000;
   final pricesEndpoint = Uri.parse(PriceData.defaultUrl);
   var sliceNumber = 0;
-  for (final slice in priceData.rawPrices.slices(pricesPerRequest)) {
+  for (final slice in priceData.prices.slices(pricesPerRequest)) {
     final jsonEncoded = jsonEncode(slice);
     final headers = <String, String>{
       'Content-type': 'application/json',

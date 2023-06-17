@@ -149,9 +149,8 @@ class PriceData {
     return waypoints.length;
   }
 
-  /// Get the raw pricing data.  You probably don't want this as it
-  /// will be unfiltered and may contain duplicates and zero values.
-  List<MarketPrice> get rawPrices => _prices;
+  /// Get the raw pricing data.
+  List<MarketPrice> get prices => _prices;
 
   static List<MarketPrice> _parsePrices(String prices) {
     final parsed = jsonDecode(prices) as List<dynamic>;
@@ -298,46 +297,17 @@ class PriceData {
     return maybePrice?.sellPrice;
   }
 
-  /// Return true if the sell price is in above the [goodPercentile] percentile.
-  bool isGoodSellPrice(
-    String symbol,
-    int sellPrice, {
-    int goodPercentile = 50,
-  }) {
-    final percentile = percentileForSellPrice(symbol, sellPrice);
-    if (percentile == null) {
-      return false;
-    }
-    return percentile >= goodPercentile;
-  }
-
-  /// Return true if the purchase price is in below the [goodPercentile]
-  /// percentile.
-  bool isGoodPurchasePrice(
-    String symbol,
-    int purchasePrice, {
-    int goodPercentile = 50,
-  }) {
-    final percentile = percentileForPurchasePrice(symbol, purchasePrice);
-    if (percentile == null) {
-      return false;
-    }
-    return percentile <= goodPercentile;
-  }
-
   /// Returns all known sell prices for a trade good, optionally restricted
   /// to a specific waypoint.
   Iterable<MarketPrice> sellPricesFor({
     required String tradeSymbol,
     String? marketSymbol,
   }) {
-    final filter = marketSymbol == null
-        ? (MarketPrice e) => e.symbol == tradeSymbol && e.sellPrice > 0
-        : (MarketPrice e) =>
-            e.symbol == tradeSymbol &&
-            e.sellPrice > 0 &&
-            e.waypointSymbol == marketSymbol;
-    return _prices.where(filter);
+    final sellPrices = _prices.where((e) => e.symbol == tradeSymbol);
+    if (marketSymbol == null) {
+      return sellPrices;
+    }
+    return sellPrices.where((e) => e.waypointSymbol == marketSymbol);
   }
 
   /// Returns all known purchase prices for a trade good, optionally restricted
@@ -346,13 +316,11 @@ class PriceData {
     required String tradeSymbol,
     String? marketSymbol,
   }) {
-    final filter = marketSymbol == null
-        ? (MarketPrice e) => e.symbol == tradeSymbol && e.purchasePrice > 0
-        : (MarketPrice e) =>
-            e.symbol == tradeSymbol &&
-            e.purchasePrice > 0 &&
-            e.waypointSymbol == marketSymbol;
-    return _prices.where(filter);
+    final purchasePrices = _prices.where((e) => e.symbol == tradeSymbol);
+    if (marketSymbol == null) {
+      return purchasePrices;
+    }
+    return purchasePrices.where((e) => e.waypointSymbol == marketSymbol);
   }
 
   MarketPrice? _priceAtPercentile(
@@ -421,22 +389,25 @@ class PriceData {
     return (index / pricesForSymbol.length * 100).round();
   }
 
+  /// Returns all known prices for a given market.
+  List<MarketPrice> pricesAtMarket(String marketSymbol) {
+    return _prices.where((e) => e.waypointSymbol == marketSymbol).toList();
+  }
+
   /// Returns true if there is recent market data for a given market.
   /// Does not check if the passed in market is a valid market.
   bool hasRecentMarketData(
     String marketSymbol, {
     Duration maxAge = defaultMaxAge,
   }) {
-    final pricesForMarket =
-        _prices.where((e) => e.waypointSymbol == marketSymbol);
-    if (pricesForMarket.isEmpty) {
+    final prices = pricesAtMarket(marketSymbol);
+    if (prices.isEmpty) {
       return false;
     }
-    final pricesForMarketSorted = pricesForMarket.toList()
+    final sortedPrices = prices.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    return pricesForMarketSorted.last.timestamp.difference(DateTime.now()) <
-        maxAge;
+    return sortedPrices.last.timestamp.difference(DateTime.now()) < maxAge;
   }
 
   /// Most recent price a good can be sold to the market for.

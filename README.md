@@ -109,7 +109,6 @@ Exploring:
 Tech Debt:
 * Build a docker container and run the app in the cloud.  With a docker volume
   so the state persists.
-* Remove guards against 0 prices from prices.dart.
 * Get above 50% coverage.
 
 Efficiency:

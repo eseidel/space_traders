@@ -12,8 +12,7 @@ Iterable<MarketPrice> pricesForWaypoint(
   PriceData priceData,
   Waypoint waypoint,
 ) {
-  final prices =
-      priceData.rawPrices.where((p) => p.waypointSymbol == waypoint.symbol);
+  final prices = priceData.pricesAtMarket(waypoint.symbol);
   if (prices.isEmpty) {
     logger.info('No prices for ${waypoint.symbol}');
   }

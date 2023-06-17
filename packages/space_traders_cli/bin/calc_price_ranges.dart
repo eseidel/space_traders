@@ -26,6 +26,5 @@ void main(List<String> args) async {
   final prices = await PriceData.load(fs);
 
   logger.info('${prices.count} prices loaded.');
-  // This may be wrong because it uses rawPrices, which doesn't filter.
-  printPriceRanges(prices.rawPrices);
+  printPriceRanges(prices.prices);
 }
