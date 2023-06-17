@@ -335,19 +335,20 @@ Future<DateTime?> advanceContractTrader(
   // We might still be at our contract destination.
   // Which might be a bad deal to buy from!
   // If we're at a market, buy our goods.
-  if (currentWaypoint.hasMarketplace) {
+  if (currentMarket != null) {
     // Sell everything we have except the contract goal.
     if (ship.cargo.isNotEmpty) {
       await sellAllCargoAndLog(
         api,
         priceData,
         transactionLog,
+        currentMarket,
         ship,
         where: (s) => s != neededGood.tradeSymbol,
       );
     }
 
-    await recordMarketData(priceData, currentMarket!);
+    await recordMarketData(priceData, currentMarket);
     final maybeGood = currentMarket.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
 

@@ -420,6 +420,7 @@ Future<DateTime?> _purchaseCargoAndGo(
       api,
       priceData,
       transactionLog,
+      market,
       ship,
       where: (tradeSymbol) => tradeSymbol != deal.tradeSymbol.value,
     );
@@ -557,6 +558,7 @@ Future<DateTime?> advanceArbitrageTrader(
         api,
         priceData,
         transactionLog,
+        currentMarket,
         ship,
         where: exceptDealCargo,
       );
@@ -612,7 +614,13 @@ Future<DateTime?> advanceArbitrageTrader(
     // If we're at the destination of the deal, sell.
     if (pastDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
       // We're at the destination, sell and clear the deal.
-      await sellAllCargoAndLog(api, priceData, transactionLog, ship);
+      await sellAllCargoAndLog(
+        api,
+        priceData,
+        transactionLog,
+        currentMarket!,
+        ship,
+      );
       await behaviorManager.completeBehavior(ship.symbol);
       return null;
     }

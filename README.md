@@ -99,7 +99,8 @@ Logic:
   The contract trader already knows how to do this?
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
-* Build a docker container and run the app in the cloud.
+* Build a docker container and run the app in the cloud.  With a docker volume
+  so the state persists.
 * Track and print expected vs. actual profit on trades.
 * Fix contract trader to share code with arbitrage trader.  Contracts are a
   special case of arbitrage, in which the destination and trade good are fixed.

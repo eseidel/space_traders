@@ -268,6 +268,11 @@ extension MarketUtils on Market {
   /// Returns true if the market allows trading of the given trade symbol.
   bool allowsTradeOf(String tradeSymbol) => exchangeType(tradeSymbol) != null;
 
+  /// Returns [MarketTradeGood] for the given trade symbol or null if the market
+  /// doesn't trade that good.
+  MarketTradeGood? marketTradeGood(String tradeSymbol) =>
+      tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
+
   /// Returns all TradeSymbols that the market trades.
   Set<TradeSymbol> get allTradeSymbols {
     final symbols = <TradeSymbol>{

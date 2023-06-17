@@ -367,7 +367,7 @@ Future<DateTime?> advanceMiner(
         ship,
       );
 
-      await sellAllCargoAndLog(api, priceData, transactionLog, ship);
+      await sellAllCargoAndLog(api, priceData, transactionLog, market, ship);
       if (cargoBefore != ship.cargo.units) {
         // Success!  We mined and sold our cargo!
         // Reset our state now that we've done the behavior once.

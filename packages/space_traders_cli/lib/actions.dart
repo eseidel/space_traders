@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/auth.dart';
@@ -129,13 +131,10 @@ Future<SellCargo201ResponseData> sellCargo(
 /// returns a stream of the sell responses.
 Stream<SellCargo201ResponseData> sellAllCargo(
   Api api,
+  Market market,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
 }) async* {
-  final marketResponse = await api.systems
-      .getMarket(ship.nav.systemSymbol, ship.nav.waypointSymbol);
-  final market = marketResponse!.data;
-
   // This should not sell anything we have a contract for.
   // We should travel first to the marketplace that has the best price for
   // the ore we have a contract for.
@@ -143,15 +142,25 @@ Stream<SellCargo201ResponseData> sellAllCargo(
     if (where != null && !where(item.symbol)) {
       continue;
     }
-    if (!market.tradeGoods.any((g) => g.symbol == item.symbol)) {
+    final good = market.marketTradeGood(item.symbol);
+    if (good == null) {
       shipInfo(
         ship,
         "Market at ${ship.nav.waypointSymbol} doesn't buy ${item.symbol}",
       );
       continue;
     }
-    final response = await sellCargo(api, ship, item.symbol, item.units);
-    yield response;
+    assert(
+      good.tradeVolume > 0,
+      'Market has 0 trade volume for ${good.symbol}',
+    );
+    var leftToSell = item.units;
+    while (leftToSell > 0) {
+      final toSell = min(leftToSell, good.tradeVolume);
+      leftToSell -= toSell;
+      final response = await sellCargo(api, ship, item.symbol, toSell);
+      yield response;
+    }
   }
 }
 
@@ -162,6 +171,7 @@ Future<void> sellAllCargoAndLog(
   Api api,
   PriceData priceData,
   TransactionLog transactions,
+  Market market,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
 }) async {
@@ -170,7 +180,7 @@ Future<void> sellAllCargoAndLog(
     return;
   }
 
-  await for (final response in sellAllCargo(api, ship, where: where)) {
+  await for (final response in sellAllCargo(api, market, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
     logTransaction(ship, priceData, agent, transaction);
@@ -188,6 +198,7 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
   String tradeSymbol,
   int amountToBuy,
 ) async {
+  // TODO(eseidel): Move trade volume and cargo space checks inside here.
   final request = PurchaseCargoRequest(
     symbol: tradeSymbol,
     units: amountToBuy,
