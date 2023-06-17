@@ -1,3 +1,4 @@
+import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/prices.dart';
@@ -188,13 +189,15 @@ void main() {
       sellPrice: 2,
     );
     // Not clear why we have two of similar functions here.
+    final profit1 = lightGreen.wrap('   +1c (100%)');
     expect(
       describeDeal(deal),
-      'FUEL                A     1c -> B     2c \x1B[92m   +1c (100%)\x1B[0m',
+      'FUEL                A     1c -> B     2c $profit1',
     );
+    final profit2 = lightGreen.wrap('+1c');
     expect(
       dealDescription(deal),
-      'Deal (\x1B[92m+1c\x1B[0m): FUEL 1c @ A -> 2c @ B profit: 1c per unit ',
+      'Deal ($profit2): FUEL 1c @ A -> 2c @ B profit: 1c per unit ',
     );
   });
 }
