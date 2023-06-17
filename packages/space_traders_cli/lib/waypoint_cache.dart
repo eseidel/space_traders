@@ -1,7 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/systems_cache.dart';

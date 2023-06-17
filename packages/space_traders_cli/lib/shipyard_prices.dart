@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart'; // just for maxAge.
 

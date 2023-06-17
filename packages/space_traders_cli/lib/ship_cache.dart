@@ -1,4 +1,4 @@
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 
 /// In-memory cache of ships.
 class ShipCache {

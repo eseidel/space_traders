@@ -1,5 +1,5 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 import 'package:test/test.dart';
 

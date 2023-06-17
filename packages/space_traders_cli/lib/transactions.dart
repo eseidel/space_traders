@@ -1,5 +1,5 @@
 import 'package:file/file.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/json_log.dart';
 
 /// A class to hold transaction data from a ship.

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 
 /// Record of a historcial survey.
 class HistoricalSurvey {

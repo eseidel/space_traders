@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
 
 /// Error 4224 is a survey exhausted error.

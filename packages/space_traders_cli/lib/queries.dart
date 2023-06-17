@@ -1,5 +1,4 @@
-import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/api.dart';
 
 // Need to make these generic for all paginated apis.
 

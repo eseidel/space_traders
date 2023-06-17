@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/auth.dart';
-import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:space_traders_cli/waypoint_cache.dart';

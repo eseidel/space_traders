@@ -1,4 +1,4 @@
-import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:test/test.dart';
 
 void main() {

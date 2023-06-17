@@ -1,5 +1,4 @@
-import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/auth.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/buy_ship.dart';
 import 'package:space_traders_cli/behavior/contract_trader.dart';

@@ -1,6 +1,5 @@
 import 'package:mason_logger/mason_logger.dart';
-import 'package:space_traders_api/api.dart';
-import 'package:space_traders_cli/extensions.dart';
+import 'package:space_traders_cli/api.dart';
 
 // This should be replaceable/mockable/configurable?
 /// Global logger.

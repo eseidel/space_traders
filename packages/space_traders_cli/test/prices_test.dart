@@ -1,5 +1,5 @@
 import 'package:file/memory.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/prices.dart';
 import 'package:test/test.dart';
 

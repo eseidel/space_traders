@@ -1,44 +1,9 @@
 import 'package:file/file.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/exceptions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/queries.dart';
 import 'package:space_traders_cli/rate_limit.dart';
-
-/// Api is a wrapper around the generated api clients.
-/// It provides a single place to inject the api client.
-/// This allows for easier mocking.
-class Api {
-  /// Construct an Api with the given ApiClient.
-  Api(this.apiClient)
-      : systems = SystemsApi(apiClient),
-        defaultApi = DefaultApi(apiClient),
-        contracts = ContractsApi(apiClient),
-        agents = AgentsApi(apiClient),
-        fleet = FleetApi(apiClient),
-        factions = FactionsApi(apiClient);
-
-  /// The shared ApiClient.
-  final ApiClient apiClient;
-
-  /// DefaultApi generated client.
-  final DefaultApi defaultApi;
-
-  /// SystemApi generated client.
-  final SystemsApi systems;
-
-  /// ContractsApi generated client.
-  final ContractsApi contracts;
-
-  /// AgentsApi generated client.
-  final AgentsApi agents;
-
-  /// FleetApi generated client.
-  final FleetApi fleet;
-
-  /// FactionsApi generated client.
-  final FactionsApi factions;
-}
 
 /// loadAuthToken loads the auth token from the given file system or
 /// throws an error if it cannot be found.
