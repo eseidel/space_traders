@@ -74,7 +74,7 @@ void main(List<String> args) async {
   // pick a ship.
   final ship = await chooseShip(api, waypointCache, myShips);
   // pick a mount.
-  const tradeSymbol = 'MOUNT_SURVEYOR_II';
+  const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
 
   // it finds a nearby market with that mount.
   final start = await waypointCache.waypoint(ship.nav.waypointSymbol);
@@ -83,7 +83,8 @@ void main(List<String> args) async {
     waypointCache,
     marketCache,
     start,
-    tradeSymbol,
+    tradeSymbol.value,
+    maxJumps: 10,
   );
   if (mountMarket == null) {
     logger.info('No nearby market with $tradeSymbol.');
@@ -112,5 +113,5 @@ void main(List<String> args) async {
     1,
   );
   // mounts the mount.
-  await installMountAndLog(api, ship, tradeSymbol);
+  await installMountAndLog(api, ship, tradeSymbol.value);
 }
