@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/actions.dart';
+import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/logger.dart';

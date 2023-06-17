@@ -1,18 +1,18 @@
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/actions.dart';
+import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/behavior/trading.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/exceptions.dart';
+import 'package:space_traders_cli/net/exceptions.dart';
 import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/route.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/transactions.dart';
+import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 
 // my evaluation logic actually just assumes I'll get 10 extracts from each

@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/queries.dart';
+import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.

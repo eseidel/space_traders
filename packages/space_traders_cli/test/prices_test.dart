@@ -1,6 +1,6 @@
 import 'package:file/memory.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/prices.dart';
+import 'package:space_traders_cli/cache/prices.dart';
 import 'package:test/test.dart';
 
 // Creates a fake price with good defaults.
