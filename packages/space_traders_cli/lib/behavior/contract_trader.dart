@@ -326,7 +326,8 @@ Future<DateTime?> advanceContractTrader(
   if (agent.credits < minimumCreditsToTrade) {
     shipWarn(
       ship,
-      'Not enough credits complete contract, disabling contract trader.',
+      'Not enough credits (${creditsString(minimumCreditsToTrade)}) to '
+      'complete contract, disabling contract trader.',
     );
     await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
     return null;
@@ -336,7 +337,7 @@ Future<DateTime?> advanceContractTrader(
   // Which might be a bad deal to buy from!
   // If we're at a market, buy our goods.
   if (currentMarket != null) {
-    // Sell everything we have except the contract goal.
+  // Sell everything we have except the contract goal.
     if (ship.cargo.isNotEmpty) {
       await sellAllCargoAndLog(
         api,

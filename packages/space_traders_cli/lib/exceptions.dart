@@ -4,19 +4,17 @@ import 'package:space_traders_api/api.dart';
 import 'package:space_traders_cli/logger.dart';
 
 /// Error 4224 is a survey exhausted error.
-bool isExhaustedSurveyException(ApiException e) {
-  // We ignore the error code at the http level, since we only care about
-  // the error code in the response body.
+bool isSurveyExhaustedException(ApiException e) {
   // ApiException 409: {"error":{"message":"Ship extract failed.
   // Survey X1-VS75-67965Z-D0F7C6 has been exhausted.","code":4224}}
-  final jsonString = e.message;
-  if (jsonString != null) {
-    final exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
-    final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
-    final code = mapValueOfType<int>(error, 'code');
-    return code == 4224;
-  }
-  return false;
+  return isAPIExceptionWithCode(e, 4224);
+}
+
+/// Error 4221 is a survey expired error.
+bool isSurveyExpiredException(ApiException e) {
+  // ApiException 400: {"error":{"message":"Ship survey failed. Target
+  // signature is no longer in range or valid.","code":4221}}
+  return isAPIExceptionWithCode(e, 4221);
 }
 
 /// Error 4000 is just a cooldown error and we can retry.

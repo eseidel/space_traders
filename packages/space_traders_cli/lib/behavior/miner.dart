@@ -289,12 +289,15 @@ Future<Survey?> surveyWorthMining(
   }
   // Compute the expected values of the surveys using the local market.
   // Note: this will fail if the passed market doesn't sell everything.
-  final now = DateTime.now().toUtc();
+  // Use one minute from now as our expiration time to avoid surveys
+  // expiring between when we compute the best survey and when we mine.
+  final oneMinuteFromNow =
+      DateTime.now().toUtc().add(const Duration(minutes: 1));
   final valuedSurveys = recentSurveys.map((s) {
     return _ValuedSurvey(
       expectedValue: expectedValueFromSurvey(priceData, waypoint, s.survey),
       survey: s.survey,
-      isActive: !s.exhausted && s.survey.expiration.isAfter(now),
+      isActive: !s.exhausted && s.survey.expiration.isAfter(oneMinuteFromNow),
     );
   }).sortedBy<num>((s) => s.expectedValue);
   // Find the index at the desired percentile threshold.
@@ -546,9 +549,18 @@ Future<DateTime?> advanceMiner(
     // We could sell here before putting ourselves to sleep.
     return response.cooldown.expiration;
   } on ApiException catch (e) {
-    if (isExhaustedSurveyException(e)) {
+    if (isSurveyExhaustedException(e)) {
       // If the survey is exhausted, record it as such and try again.
       shipDetail(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
+      await surveyData.markSurveyExhausted(maybeSurvey);
+      return null;
+    }
+    // This should have been caught before using the survey, but we'll
+    // just mark it exhausted and try again.
+    if (isSurveyExpiredException(e)) {
+      shipWarn(ship, 'Survey ${maybeSurvey!.signature} expired.');
+      // It's not technically exhausted, but that's our easy way to disable
+      // the survey.  We use a warning to catch if we're doing this often.
       await surveyData.markSurveyExhausted(maybeSurvey);
       return null;
     }
