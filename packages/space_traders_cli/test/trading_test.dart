@@ -100,4 +100,23 @@ void main() {
       1,
     );
   });
+
+  test('describe', () {
+    final deal = Deal(
+      sourceSymbol: 'A',
+      destinationSymbol: 'B',
+      tradeSymbol: TradeSymbol.FUEL,
+      purchasePrice: 1,
+      sellPrice: 2,
+    );
+    // Not clear why we have two of similar functions here.
+    expect(
+      describeDeal(deal),
+      'FUEL                A     1c -> B     2c \x1B[92m   +1c (100%)\x1B[0m',
+    );
+    expect(
+      dealDescription(deal),
+      'Deal (\x1B[92m+1c\x1B[0m): FUEL 1c @ A -> 2c @ B profit: 1c per unit ',
+    );
+  });
 }

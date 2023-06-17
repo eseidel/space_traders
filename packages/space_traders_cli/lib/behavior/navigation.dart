@@ -20,7 +20,6 @@ Future<DateTime?> beingRouteAndLog(
   final state = await behaviorManager.getBehavior(ship);
   state.destination = destinationSymbol;
   // TODO(eseidel): Should this buy fuel first if we need it?
-  // TODO(eseidel): Pass in the whole route and log it?
   shipInfo(ship, 'Begining route to $destinationSymbol');
   await behaviorManager.setBehavior(ship.symbol, state);
   final navResult = await continueNavigationIfNeeded(
