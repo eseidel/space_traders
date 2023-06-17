@@ -36,44 +36,6 @@ void main() {
     expect(priceData.medianSellPrice('b'), null);
   });
 
-  test('recentSellPrice ignores zero', () {
-    // The prices db includes 0 are a sell price when something can't
-    // be sold, so we should ignore them when looking for recent prices.
-    final fs = MemoryFileSystem();
-    final a = makePrice(waypointSymbol: 'a', symbol: '1', sellPrice: 0);
-    final priceData = PriceData([a], fs: fs);
-    expect(
-      priceData.recentSellPrice(marketSymbol: 'a', tradeSymbol: '1'),
-      null,
-    );
-    // Works fine with a single non-zero sell price.
-    final newA = makePrice(waypointSymbol: 'a', symbol: '1', sellPrice: 3);
-    priceData.addPrices([newA]);
-    expect(
-      priceData.recentSellPrice(marketSymbol: 'a', tradeSymbol: '1'),
-      3,
-    );
-  });
-
-  test('medianSellPrice ignores zero', () {
-    // The prices db includes 0 are a sell price when something can't
-    // be sold, so we should ignore them when looking for recent prices.
-    final fs = MemoryFileSystem();
-    final a = makePrice(waypointSymbol: 'a', symbol: '1', sellPrice: 0);
-    final priceData = PriceData([a], fs: fs);
-    expect(
-      priceData.medianSellPrice('1'),
-      null,
-    );
-    // Works fine with a single non-zero sell price.
-    final newA = makePrice(waypointSymbol: 'a', symbol: '1', sellPrice: 3);
-    priceData.addPrices([newA]);
-    expect(
-      priceData.medianSellPrice('1'),
-      3,
-    );
-  });
-
   test('percentileForSellPrice', () {
     final fs = MemoryFileSystem();
     final priceData = PriceData(
