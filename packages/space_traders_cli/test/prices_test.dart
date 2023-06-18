@@ -36,6 +36,23 @@ void main() {
     expect(priceData.medianSellPrice('b'), null);
   });
 
+  test('fromMarketTradeGood', () {
+    final good = MarketTradeGood(
+      symbol: 'A',
+      tradeVolume: 1,
+      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      purchasePrice: 1,
+      sellPrice: 2,
+    );
+    final price = MarketPrice.fromMarketTradeGood(good, 'W');
+    expect(price.symbol, 'A');
+    expect(price.waypointSymbol, 'W');
+    expect(price.tradeVolume, 1);
+    expect(price.supply, MarketTradeGoodSupplyEnum.ABUNDANT);
+    expect(price.purchasePrice, 1);
+    expect(price.timestamp, isNotNull);
+  });
+
   test('percentileForSellPrice', () {
     final fs = MemoryFileSystem();
     final priceData = PriceData(
