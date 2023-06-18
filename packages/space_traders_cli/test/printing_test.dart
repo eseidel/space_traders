@@ -1,4 +1,7 @@
+import 'package:file/memory.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:test/test.dart';
 
@@ -150,6 +153,50 @@ void main() {
       contractDescription(contract),
       'PROCUREMENT from faction, deliver  by 1969-07-20 20:18:04.000 for '
       '1,000c with 1,000c upfront',
+    );
+  });
+
+  test('stringForPriceDeviance', () {
+    final fs = MemoryFileSystem.test();
+    final priceData = PriceData([], fs: fs);
+    expect(
+      stringForPriceDeviance(
+        priceData,
+        'A',
+        0,
+        MarketTransactionTypeEnum.PURCHASE,
+      ),
+      '        🤷',
+    );
+    priceData.addPrices([
+      MarketPrice(
+        waypointSymbol: 'A',
+        symbol: 'A',
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 1,
+        sellPrice: 2,
+        tradeVolume: 100,
+        timestamp: DateTime.timestamp(),
+      )
+    ]);
+
+    expect(
+      stringForPriceDeviance(
+        priceData,
+        'A',
+        0,
+        MarketTransactionTypeEnum.PURCHASE,
+      ),
+      lightGreen.wrap('-100%  -1c'),
+    );
+    expect(
+      stringForPriceDeviance(
+        priceData,
+        'A',
+        0,
+        MarketTransactionTypeEnum.SELL,
+      ),
+      lightRed.wrap('-100%  -2c'),
     );
   });
 
