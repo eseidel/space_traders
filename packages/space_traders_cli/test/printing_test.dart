@@ -60,14 +60,14 @@ void main() {
         current: 0,
         required_: 0,
         capacity: 0,
-        morale: 100,
+        morale: 90,
         wages: 0,
       ),
       frame: ShipFrame(
         symbol: ShipFrameSymbolEnum.CARRIER,
         name: 'name',
         description: 'description',
-        condition: 100,
+        condition: 90,
         moduleSlots: 0,
         mountingPoints: 0,
         fuelCapacity: 0,
@@ -77,7 +77,7 @@ void main() {
         symbol: ShipReactorSymbolEnum.FISSION_I,
         name: 'name',
         description: 'description',
-        condition: 100,
+        condition: 90,
         powerOutput: 100,
         requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
       ),
@@ -85,7 +85,7 @@ void main() {
         symbol: ShipEngineSymbolEnum.ION_DRIVE_I,
         name: 'name',
         description: 'description',
-        condition: 100,
+        condition: 90,
         speed: 100,
         requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
       ),
@@ -119,7 +119,7 @@ void main() {
     ];
     expect(
       shipDescription(ship, shipWaypoints),
-      'A - Docked at symbol PLANET COMMAND 100/100',
+      'A - Docked at symbol PLANET COMMAND 100/100 (morale: 90) (condition: 90)',
     );
   });
 
