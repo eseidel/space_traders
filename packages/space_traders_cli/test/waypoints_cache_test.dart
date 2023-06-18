@@ -1,12 +1,53 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
+import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:test/test.dart';
 
 class MockSystemsCache extends Mock implements SystemsCache {}
 
 class MockApi extends Mock implements Api {}
 
+class MockSystemsApi extends Mock implements SystemsApi {}
+
 void main() {
+  test('WaypointCache.waypoint', () async {
+    final api = MockApi();
+    final SystemsApi systemsApi = MockSystemsApi();
+    when(() => api.systems).thenReturn(systemsApi);
+    final expectedWaypoint = Waypoint(
+      symbol: 'S-E-A',
+      systemSymbol: 'S-E',
+      type: WaypointType.PLANET,
+      x: 0,
+      y: 0,
+    );
+    when(
+      () => systemsApi.getSystemWaypoints(
+        any(),
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer((invocation) async {
+      return GetSystemWaypoints200Response(
+        data: [expectedWaypoint],
+        meta: Meta(total: 1),
+      );
+    });
+    final systemsCache = MockSystemsCache();
+    final waypointCache = WaypointCache(api, systemsCache);
+    expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);
+    // Call it twice, it should cache.
+    expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);
+    verify(
+      () => systemsApi.getSystemWaypoints(
+        any(),
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+      ),
+    ).called(1);
+  });
+
   // Needs work to resurrect this test.
   // Likely overriding the api call to getSystemWaypoints.
   // test('waypointsInJumpRadius', () async {
