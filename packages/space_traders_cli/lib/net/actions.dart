@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/exceptions.dart';
@@ -16,6 +17,8 @@ import 'package:space_traders_cli/printing.dart';
 /// Purchase a ship of type [shipType] at [shipyardSymbol]
 Future<PurchaseShip201ResponseData> purchaseShip(
   Api api,
+  ShipCache shipCache,
+  AgentCache agentCache,
   String shipyardSymbol,
   ShipType shipType,
 ) async {
@@ -25,7 +28,10 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   );
   final purchaseResponse =
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
-  return purchaseResponse!.data;
+  final data = purchaseResponse!.data;
+  shipCache.updateShip(data.ship);
+  agentCache.updateAgent(data.agent);
+  return data;
 }
 
 /// Set the [flightMode] of [ship]
@@ -41,7 +47,24 @@ Future<ShipNav> setShipFlightMode(
   return response.data;
 }
 
-/// navigate [ship] to [waypointSymbol]
+/// Navigate [ship] to [waypointSymbol]
+Future<NavigateShip200ResponseData> _navigateShip(
+  Api api,
+  Ship ship,
+  String waypointSymbol,
+) async {
+  final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
+  final result =
+      await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
+  final data = result!.data;
+  ship
+    ..nav = data.nav
+    ..fuel = data.fuel;
+  return data;
+}
+
+/// Navigate [ship] to [waypointSymbol] will retry in drift mode if
+/// there is insufficient fuel.
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Api api,
   Ship ship,
@@ -49,23 +72,14 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 ) async {
   await undockIfNeeded(api, ship);
   try {
-    final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
-    final result =
-        await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
-    ship.nav = result!.data.nav;
-    // ignore: cascade_invocations
-    ship.fuel = result.data.fuel;
-    return result.data;
+    return await _navigateShip(api, ship, waypointSymbol);
   } on ApiException catch (e) {
     if (!isInfuficientFuelException(e)) {
       rethrow;
     }
     shipWarn(ship, 'Insufficient fuel, drifting to $waypointSymbol');
     await setShipFlightMode(api, ship, ShipNavFlightMode.DRIFT);
-    final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
-    final result =
-        await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
-    return result!.data;
+    return _navigateShip(api, ship, waypointSymbol);
   }
 }
 
@@ -110,6 +124,7 @@ Future<DeliverContract200ResponseData> deliverContract(
 /// Sell [units] of [tradeSymbol] to market.
 Future<SellCargo201ResponseData> sellCargo(
   Api api,
+  AgentCache agentCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int units,
@@ -120,8 +135,8 @@ Future<SellCargo201ResponseData> sellCargo(
   );
   final response =
       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
-  // Does not update agent.
   ship.cargo = response!.data.cargo;
+  agentCache.updateAgent(response.data.agent);
   return response.data;
 }
 
@@ -130,6 +145,7 @@ Future<SellCargo201ResponseData> sellCargo(
 /// returns a stream of the sell responses.
 Stream<SellCargo201ResponseData> sellAllCargo(
   Api api,
+  AgentCache agentCache,
   Market market,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
@@ -159,6 +175,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
       leftToSell -= toSell;
       final response = await sellCargo(
         api,
+        agentCache,
         ship,
         TradeSymbol.fromJson(item.symbol)!,
         toSell,
@@ -175,6 +192,7 @@ Future<void> sellAllCargoAndLog(
   Api api,
   PriceData priceData,
   TransactionLog transactions,
+  AgentCache agentCache,
   Market market,
   Ship ship, {
   bool Function(String tradeSymbol)? where,
@@ -184,7 +202,8 @@ Future<void> sellAllCargoAndLog(
     return;
   }
 
-  await for (final response in sellAllCargo(api, market, ship, where: where)) {
+  await for (final response
+      in sellAllCargo(api, agentCache, market, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
     logTransaction(ship, priceData, agent, transaction);
@@ -257,12 +276,14 @@ void logShipyardTransaction(
 Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
   PriceData priceData,
+  ShipCache shipCache,
+  AgentCache agentCache,
   Ship ship,
-  AgentCache agent,
   String shipyardSymbol,
   ShipType shipType,
 ) async {
-  final result = await purchaseShip(api, shipyardSymbol, shipType);
+  final result =
+      await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
   logShipyardTransaction(ship, priceData, result.agent, result.transaction);
   return result;
 }

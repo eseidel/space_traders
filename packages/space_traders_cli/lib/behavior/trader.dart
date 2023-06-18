@@ -46,6 +46,7 @@ Future<DateTime?> _purchaseCargoAndGo(
       api,
       priceData,
       transactionLog,
+      agentCache,
       market,
       ship,
       where: (tradeSymbol) => tradeSymbol != deal.tradeSymbol.value,
@@ -184,6 +185,7 @@ Future<DateTime?> advanceArbitrageTrader(
         api,
         priceData,
         transactionLog,
+        agentCache,
         currentMarket,
         ship,
         where: exceptDealCargo,
@@ -244,6 +246,7 @@ Future<DateTime?> advanceArbitrageTrader(
         api,
         priceData,
         transactionLog,
+        agentCache,
         currentMarket!,
         ship,
       );

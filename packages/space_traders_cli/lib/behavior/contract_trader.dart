@@ -340,6 +340,7 @@ Future<DateTime?> advanceContractTrader(
         api,
         priceData,
         transactionLog,
+        agentCache,
         currentMarket,
         ship,
         where: (s) => s != neededGood.tradeSymbol,

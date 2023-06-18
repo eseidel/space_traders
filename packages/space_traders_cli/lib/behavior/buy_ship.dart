@@ -181,8 +181,9 @@ Future<DateTime?> advanceBuyShip(
     await purchaseShipAndLog(
       api,
       priceData,
-      ship,
+      shipCache,
       agentCache,
+      ship,
       shipyard.symbol,
       shipType,
     );
