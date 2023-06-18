@@ -144,14 +144,22 @@ void main() {
       terms: ContractTerms(
         deadline: moonLanding,
         payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
-        deliver: [],
+        deliver: [
+          ContractDeliverGood(
+            tradeSymbol: 'T',
+            destinationSymbol: 'W',
+            unitsFulfilled: 0,
+            unitsRequired: 10,
+          )
+        ],
       ),
       expiration: moonLanding,
       deadlineToAccept: moonLanding,
     );
+    final localTime = moonLanding.toLocal().toString();
     expect(
       contractDescription(contract),
-      'PROCUREMENT from faction, deliver  by 1969-07-20 20:18:04.000 for '
+      'PROCUREMENT from faction, deliver 10 T to W by $localTime for '
       '1,000c with 1,000c upfront',
     );
   });
