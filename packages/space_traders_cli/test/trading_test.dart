@@ -180,7 +180,7 @@ void main() {
     expect(costed.time, 15);
   });
 
-  test('describe', () {
+  test('describe deal', () {
     const deal = Deal(
       sourceSymbol: 'A',
       destinationSymbol: 'B',
@@ -198,6 +198,26 @@ void main() {
     expect(
       dealDescription(deal),
       'Deal ($profit2): FUEL 1c @ A -> 2c @ B profit: 1c per unit ',
+    );
+  });
+
+  test('describeCostedDeal', () {
+    final costed = CostedDeal(
+      deal: const Deal(
+        sourceSymbol: 'A',
+        destinationSymbol: 'B',
+        tradeSymbol: TradeSymbol.FUEL,
+        purchasePrice: 1,
+        sellPrice: 2,
+      ),
+      fuelCost: 1,
+      tradeVolume: 1,
+      time: 1,
+    );
+    final profit = lightGreen.wrap('     +1c (100%)');
+    expect(
+      describeCostedDeal(costed),
+      'FUEL                       A       1c -> B       2c $profit 1s 0c/s 2c',
     );
   });
 }
