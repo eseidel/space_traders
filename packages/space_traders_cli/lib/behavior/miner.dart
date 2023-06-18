@@ -410,7 +410,7 @@ Future<DateTime?> advanceMiner(
   if (!currentWaypoint.canBeMined) {
     shipInfo(
       ship,
-      "${waypointShortString(currentWaypoint)} can't be mined, navigating "
+      "${waypointDescription(currentWaypoint)} can't be mined, navigating "
       'to nearest asteroid field.',
     );
     // We're not at an asteroid field, so we need to navigate to one.

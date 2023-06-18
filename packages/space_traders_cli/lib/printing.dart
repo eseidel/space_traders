@@ -8,11 +8,6 @@ import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 
 /// Return a string describing the given [waypoint].
-String waypointShortString(Waypoint waypoint) {
-  return '${waypoint.symbol} - ${waypoint.type}';
-}
-
-/// Return a string describing the given [waypoint].
 String waypointDescription(Waypoint waypoint) {
   final chartedString = waypoint.chart != null ? '' : 'uncharted - ';
   return '${waypoint.symbol} - ${waypoint.type} - $chartedString'

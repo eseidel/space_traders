@@ -23,6 +23,106 @@ void main() {
     expect(waypointDescription(waypoint), 'a - PLANET - uncharted - n');
   });
 
+  test('shipDescription', () {
+    final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
+    final ship = Ship(
+      symbol: 'A',
+      registration: ShipRegistration(
+        factionSymbol: FactionSymbols.AEGIS.value,
+        name: 'name',
+        role: ShipRole.COMMAND,
+      ),
+      nav: ShipNav(
+        systemSymbol: 'c',
+        waypointSymbol: 'symbol',
+        route: ShipNavRoute(
+          destination: ShipNavRouteWaypoint(
+            symbol: 'a',
+            type: WaypointType.PLANET,
+            systemSymbol: 'c',
+            x: 1,
+            y: 2,
+          ),
+          departure: ShipNavRouteWaypoint(
+            symbol: 'a',
+            type: WaypointType.PLANET,
+            systemSymbol: 'c',
+            x: 1,
+            y: 2,
+          ),
+          arrival: moonLanding,
+          departureTime: moonLanding,
+        ),
+        status: ShipNavStatus.DOCKED,
+        flightMode: ShipNavFlightMode.CRUISE,
+      ),
+      crew: ShipCrew(
+        current: 0,
+        required_: 0,
+        capacity: 0,
+        morale: 100,
+        wages: 0,
+      ),
+      frame: ShipFrame(
+        symbol: ShipFrameSymbolEnum.CARRIER,
+        name: 'name',
+        description: 'description',
+        condition: 100,
+        moduleSlots: 0,
+        mountingPoints: 0,
+        fuelCapacity: 0,
+        requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
+      ),
+      reactor: ShipReactor(
+        symbol: ShipReactorSymbolEnum.FISSION_I,
+        name: 'name',
+        description: 'description',
+        condition: 100,
+        powerOutput: 100,
+        requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
+      ),
+      engine: ShipEngine(
+        symbol: ShipEngineSymbolEnum.ION_DRIVE_I,
+        name: 'name',
+        description: 'description',
+        condition: 100,
+        speed: 100,
+        requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
+      ),
+      cargo: ShipCargo(
+        capacity: 100,
+        units: 100,
+        inventory: [],
+      ),
+      fuel: ShipFuel(
+        current: 100,
+        capacity: 100,
+      ),
+    );
+    final shipWaypoints = [
+      Waypoint(
+        symbol: 'symbol',
+        type: WaypointType.PLANET,
+        systemSymbol: 'c',
+        x: 1,
+        y: 2,
+        orbitals: [],
+        faction: WaypointFaction(symbol: FactionSymbols.AEGIS),
+        traits: [
+          WaypointTrait(
+            description: 't',
+            name: 'n',
+            symbol: WaypointTraitSymbolEnum.CORRUPT,
+          )
+        ],
+      ),
+    ];
+    expect(
+      shipDescription(ship, shipWaypoints),
+      'A - Docked at symbol PLANET COMMAND 100/100',
+    );
+  });
+
   test('durationString', () {
     // I don't like that it always shows hours and minutes, even if they're 0.
     // But that's what we have for now, so testing it.
