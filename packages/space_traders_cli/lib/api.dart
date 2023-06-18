@@ -93,9 +93,7 @@ extension WaypointUtils on Waypoint {
   }
 
   /// Returns true if the waypoint has the given type.
-  bool isType(WaypointType type) {
-    return this.type == type;
-  }
+  bool isType(WaypointType type) => this.type == type;
 
   /// Returns true if the waypoint is an asteroid field.
   bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
