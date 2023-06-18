@@ -67,7 +67,7 @@ void main(List<String> args) async {
   final priceData = await PriceData.load(fs);
   final shipyardPrices = await ShipyardPrices.load(fs);
   final transactionLog = await TransactionLog.load(fs);
-  final agentCache = AgentCache(await getMyAgent(api));
+  final agentCache = await AgentCache.load(api);
 
   final myShips = await allMyShips(api).toList();
   final ship = await chooseShip(api, waypointCache, myShips);

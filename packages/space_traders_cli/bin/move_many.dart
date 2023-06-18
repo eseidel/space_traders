@@ -43,7 +43,7 @@ void main() async {
   final shipyardPrices = await ShipyardPrices.load(fs);
   final db = DataStore();
   await db.open();
-  final agentCache = AgentCache(await getMyAgent(api));
+  final agentCache = await AgentCache.load(api);
 
   final myShips = await allMyShips(api).toList();
 

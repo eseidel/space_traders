@@ -12,7 +12,6 @@ import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/exceptions.dart';
-import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 
@@ -35,8 +34,7 @@ Future<void> advanceShips(
   final marketCache = MarketCache(waypointCache);
 
   await shipCache.ensureShipsUpToDate(api);
-  // TODO(eseidel): Remove once we believe we're keeping the agent up to date.
-  agentCache.updateAgent(await getMyAgent(api));
+  await agentCache.ensureAgentUpToDate(api);
 
   waiter.updateForShips(shipCache.ships);
 

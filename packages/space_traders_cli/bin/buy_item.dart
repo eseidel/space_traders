@@ -20,7 +20,7 @@ void main(List<String> args) async {
   final api = defaultApi(fs);
 
   final priceData = await PriceData.load(fs);
-  final agentCache = AgentCache(await getMyAgent(api));
+  final agentCache = await AgentCache.load(api);
   final systemsCache = await SystemsCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);

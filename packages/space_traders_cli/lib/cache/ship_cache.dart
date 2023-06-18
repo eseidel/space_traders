@@ -5,16 +5,18 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/third_party/compare.dart';
 
-bool _shipListsMatch(List<Ship> a, List<Ship> b) {
-  if (a.length != b.length) {
-    logger.info("Ship list lengths don't match: ${a.length} != ${b.length}");
+bool _shipListsMatch(List<Ship> actual, List<Ship> expected) {
+  if (actual.length != expected.length) {
+    logger.info(
+      "Ship list lengths don't match: ${actual.length} != ${expected.length}",
+    );
     return false;
   }
 
-  for (var i = 0; i < a.length; i++) {
+  for (var i = 0; i < actual.length; i++) {
     final diff = findDifferenceBetweenStrings(
-      jsonEncode(a[i].toJson()),
-      jsonEncode(b[i].toJson()),
+      jsonEncode(actual[i].toJson()),
+      jsonEncode(expected[i].toJson()),
     );
     if (diff != null) {
       logger.info('Ship list differs at index $i: $diff');
@@ -29,6 +31,12 @@ bool _shipListsMatch(List<Ship> a, List<Ship> b) {
 class ShipCache {
   /// Creates a new ship cache.
   ShipCache(this.ships, {this.requestsBetweenChecks = 100});
+
+  /// Creates a new ShipCache from the API.
+  static Future<ShipCache> load(Api api) async {
+    final ships = await allMyShips(api).toList();
+    return ShipCache(ships);
+  }
 
   /// Ships in the cache.
   final List<Ship> ships;

@@ -33,7 +33,7 @@ void main(List<String> args) async {
 
   final priceData = await PriceData.load(fs);
 
-  final agentCache = AgentCache(await getMyAgent(api));
+  final agentCache = await AgentCache.load(api);
   final hq = await waypointCache.getAgentHeadquarters();
   final shipyardWaypoints =
       await waypointCache.shipyardWaypointsForSystem(hq.systemSymbol);
