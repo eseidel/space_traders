@@ -8,6 +8,7 @@ import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
@@ -143,6 +144,13 @@ Future<void> main(List<String> args) async {
   });
 
   final agentCache = AgentCache(await getMyAgent(api));
+  final agent = agentCache.agent;
+  logger.info(
+    'Welcome ${agent.symbol} of the ${agent.startingFaction}!'
+    ' ${creditsString(agent.credits)}',
+  );
+  final shipCache = ShipCache(await allMyShips(api).toList());
+  logger.info(describeFleet(shipCache));
 
   await logic(
     api,
@@ -154,5 +162,6 @@ Future<void> main(List<String> args) async {
     transactions,
     behaviorManager,
     agentCache,
+    shipCache,
   );
 }

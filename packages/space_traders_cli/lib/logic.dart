@@ -110,9 +110,9 @@ Future<void> logic(
   TransactionLog transactions,
   BehaviorManager behaviorManager,
   AgentCache agentCache,
+  ShipCache shipCache,
 ) async {
   final waiter = ShipWaiter();
-  final shipCache = ShipCache(await allMyShips(api).toList());
 
   while (true) {
     try {

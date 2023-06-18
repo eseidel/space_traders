@@ -1,5 +1,5 @@
 import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -14,20 +14,13 @@ void main(List<String> args) async {
   final waypointCache = WaypointCache(api, systemsCache);
 
   final ships = await allMyShips(api).toList();
+  final shipCache = ShipCache(ships);
 
-  // get all the ships
-  // count them by type.
-  final typeCounts = <ShipFrameSymbolEnum, int>{};
-  for (final ship in ships) {
-    final type = ship.frame.symbol;
-    typeCounts[type] = (typeCounts[type] ?? 0) + 1;
-  }
-
+  final typeCounts = shipCache.frameCounts;
   for (final type in typeCounts.keys) {
     logger.info('$type: ${typeCounts[type]}');
   }
 
-  // list them all.
   final shipWaypoints = await waypointsForShips(waypointCache, ships);
   for (final ship in ships) {
     logger.info(shipDescription(ship, shipWaypoints));
