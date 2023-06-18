@@ -166,7 +166,7 @@ void main() {
         0,
         MarketTransactionTypeEnum.PURCHASE,
       ),
-      '        🤷',
+      '            🤷',
     );
     priceData.addPrices([
       MarketPrice(
@@ -187,7 +187,7 @@ void main() {
         0,
         MarketTransactionTypeEnum.PURCHASE,
       ),
-      lightGreen.wrap('-100%  -1c'),
+      lightGreen.wrap('-100%  -1c per'),
     );
     expect(
       stringForPriceDeviance(
@@ -196,7 +196,16 @@ void main() {
         0,
         MarketTransactionTypeEnum.SELL,
       ),
-      lightRed.wrap('-100%  -2c'),
+      lightRed.wrap('-100%  -2c per'),
+    );
+    expect(
+      stringForPriceDeviance(
+        priceData,
+        'A',
+        2,
+        MarketTransactionTypeEnum.SELL,
+      ),
+      '            ⚖️ ',
     );
   });
 

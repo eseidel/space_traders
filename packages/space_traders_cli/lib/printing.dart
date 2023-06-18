@@ -91,7 +91,7 @@ String stringForPriceDeviance(
   int price,
   MarketTransactionTypeEnum type,
 ) {
-  const expectedWidth = 10;
+  const expectedWidth = 14;
   final median = type == MarketTransactionTypeEnum.SELL
       ? data.medianSellPrice(tradeSymbol)
       : data.medianPurchasePrice(tradeSymbol);
@@ -101,11 +101,11 @@ String stringForPriceDeviance(
   final diff = price - median;
   if (diff == 0) {
     // Extra space is needed for powershell. :(
-    return '⚖️ '.padLeft(expectedWidth);
+    return '⚖️ '.padLeft(expectedWidth + 1);
   }
   final signString = diff < 0 ? '' : '+';
   final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(4);
-  final creditsDiff = '$signString${creditsString(diff)}'.padLeft(4);
+  final creditsDiff = '$signString${creditsString(diff)} per'.padLeft(8);
 
   final lowColor =
       type == MarketTransactionTypeEnum.SELL ? lightRed : lightGreen;
@@ -147,8 +147,7 @@ void logTransaction(
     '$labelEmoji ${transaction.units.toString().padLeft(2)} '
     // Could use TradeSymbol.values.reduce() to find the longest symbol.
     '${transaction.tradeSymbol.padRight(18)} '
-    '$priceDevianceString per, '
-    '${transaction.units.toString().padLeft(2)} x '
+    '$priceDevianceString ${transaction.units.toString().padLeft(2)} x '
     // prices are commonly 5 digits + ',' and 'c' so we pad to 7.
     '${creditsString(transaction.pricePerUnit).padLeft(7)} = '
     '$totalPriceString -> '

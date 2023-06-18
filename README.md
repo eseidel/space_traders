@@ -124,6 +124,8 @@ Efficiency:
   special case of arbitrage, in which the destination and trade good are fixed.
 * Add some object to hold agent and ships so both can be updated by results
   of API calls and not fetched after every ship.
+* Write a better rate-limiting model.
+* Teach RateLimiter to print out requests per minute every minute.
 
 Automation:
 * Automate resets
