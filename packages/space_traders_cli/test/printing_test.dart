@@ -152,4 +152,18 @@ void main() {
       '1,000c with 1,000c upfront',
     );
   });
+
+  test('approximateDuration', () {
+    expect(approximateDuration(Duration.zero), '0s');
+    expect(approximateDuration(const Duration(seconds: 1)), '1s');
+    expect(approximateDuration(const Duration(seconds: 60)), '1m');
+    expect(approximateDuration(const Duration(seconds: 3600)), '1h');
+    expect(approximateDuration(const Duration(seconds: 3600 * 24)), '1d');
+    expect(approximateDuration(const Duration(seconds: 3600 * 24 * 7)), '7d');
+    expect(approximateDuration(const Duration(seconds: 3600 * 24 * 30)), '30d');
+    expect(
+      approximateDuration(const Duration(seconds: 3600 * 24 * 365)),
+      '365d',
+    );
+  });
 }

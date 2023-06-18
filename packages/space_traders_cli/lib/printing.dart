@@ -176,15 +176,6 @@ DateTime logRemainingTransitTime(Ship ship) {
   return ship.nav.route.arrival;
 }
 
-/// Fetches the waypoints for the given [ships].
-Future<List<Waypoint>> waypointsForShips(
-  WaypointCache waypointCache,
-  List<Ship> ships,
-) async {
-  final shipWaypointSymbols = ships.map((s) => s.nav.waypointSymbol).toSet();
-  return waypointCache.waypointsForSymbols(shipWaypointSymbols).toList();
-}
-
 /// Choose a ship from a list of ships
 Future<Ship> chooseShip(
   Api api,
