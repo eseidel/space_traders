@@ -33,10 +33,8 @@ class ShipCache {
   ShipCache(this.ships, {this.requestsBetweenChecks = 100});
 
   /// Creates a new ShipCache from the API.
-  static Future<ShipCache> load(Api api) async {
-    final ships = await allMyShips(api).toList();
-    return ShipCache(ships);
-  }
+  static Future<ShipCache> load(Api api) async =>
+      ShipCache(await allMyShips(api).toList());
 
   /// Ships in the cache.
   final List<Ship> ships;

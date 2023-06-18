@@ -126,8 +126,9 @@ Future<DateTime?> advanceBuyShip(
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
 
   // This is a hack for now, we need real planning.
-  final shipType =
-      shipCache.ships.length.isEven ? ShipType.ORE_HOUND : ShipType.PROBE;
+  // final shipType =
+  //     shipCache.ships.length.isEven ? ShipType.ORE_HOUND : ShipType.PROBE;
+  const shipType = ShipType.ORE_HOUND;
 
   // Get our median price before updating shipyard prices.
   final medianPrice = shipyardPrices.medianPurchasePrice(shipType);

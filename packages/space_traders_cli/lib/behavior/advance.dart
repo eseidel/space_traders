@@ -161,6 +161,7 @@ Future<DateTime?> advanceShipBehavior(
       );
     case Behavior.idle:
       shipDetail(ctx.ship, 'Idling');
-      return null;
+      // Return a time in the future so we don't spin hot.
+      return DateTime.now().add(const Duration(minutes: 1));
   }
 }
