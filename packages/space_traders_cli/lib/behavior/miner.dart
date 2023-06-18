@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
@@ -318,7 +319,7 @@ Future<DateTime?> advanceMiner(
   Api api,
   DataStore db,
   PriceData priceData,
-  Agent agent,
+  AgentCache agentCache,
   Ship ship,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
@@ -360,7 +361,7 @@ Future<DateTime?> advanceMiner(
         api,
         priceData,
         transactionLog,
-        agent,
+        agentCache,
         market,
         ship,
       );

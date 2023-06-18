@@ -1,5 +1,6 @@
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
@@ -14,7 +15,7 @@ import 'package:space_traders_cli/trading.dart';
 
 Future<void> _navigateToLocalWaypointAndDock(
   Api api,
-  Agent agent,
+  AgentCache agentCache,
   PriceData priceData,
   ShipyardPrices shipyardPrices,
   MarketCache marketCache,
@@ -44,7 +45,7 @@ Future<void> _navigateToLocalWaypointAndDock(
           api,
           priceData,
           transactionLog,
-          agent,
+          agentCache,
           market,
           ship,
         );
@@ -67,7 +68,7 @@ void main(List<String> args) async {
   final priceData = await PriceData.load(fs);
   final shipyardPrices = await ShipyardPrices.load(fs);
   final transactionLog = await TransactionLog.load(fs);
-  final agent = await getMyAgent(api);
+  final agentCache = AgentCache(await getMyAgent(api));
 
   final myShips = await allMyShips(api).toList();
   // pick a ship.
@@ -93,7 +94,7 @@ void main(List<String> args) async {
   // navigates there.
   await _navigateToLocalWaypointAndDock(
     api,
-    agent,
+    agentCache,
     priceData,
     shipyardPrices,
     marketCache,

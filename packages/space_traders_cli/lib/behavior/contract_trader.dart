@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
@@ -231,7 +232,7 @@ Future<DateTime?> advanceContractTrader(
   Api api,
   DataStore db,
   PriceData priceData,
-  Agent agent,
+  AgentCache agentCache,
   Ship ship,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
@@ -279,7 +280,7 @@ Future<DateTime?> advanceContractTrader(
       api,
       priceData,
       transactionLog,
-      agent,
+      agentCache,
       currentMarket,
       ship,
     );
@@ -319,7 +320,7 @@ Future<DateTime?> advanceContractTrader(
   final remainingUnits = neededGood.unitsRequired - neededGood.unitsFulfilled;
   final minimumCreditsToTrade =
       max(100000, breakEvenUnitPrice * remainingUnits + creditsBuffer);
-  if (agent.credits < minimumCreditsToTrade) {
+  if (agentCache.agent.credits < minimumCreditsToTrade) {
     shipWarn(
       ship,
       'Not enough credits (${creditsString(minimumCreditsToTrade)}) to '
@@ -381,7 +382,7 @@ Future<DateTime?> advanceContractTrader(
           ship.cargo.availableSpace,
         );
         final creditsNeeded = unitsToPurchase * maybeGood.purchasePrice;
-        if (agent.credits < creditsNeeded) {
+        if (agentCache.agent.credits < creditsNeeded) {
           // If we have some to deliver, deliver it.
           if (unitsInCargo > 0) {
             shipInfo(

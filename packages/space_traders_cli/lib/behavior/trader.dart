@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
@@ -17,7 +18,7 @@ import 'package:space_traders_cli/trading.dart';
 /// Purchase cargo for the deal and start towards destination.
 Future<DateTime?> _purchaseCargoAndGo(
   Api api,
-  Agent agent,
+  AgentCache agentCache,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   PriceData priceData,
@@ -34,7 +35,7 @@ Future<DateTime?> _purchaseCargoAndGo(
     api,
     priceData,
     transactionLog,
-    agent,
+    agentCache,
     market,
     ship,
   );
@@ -125,7 +126,7 @@ Future<DateTime?> advanceArbitrageTrader(
   Api api,
   DataStore db,
   PriceData priceData,
-  Agent agent,
+  AgentCache agentCache,
   Ship ship,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
@@ -159,7 +160,7 @@ Future<DateTime?> advanceArbitrageTrader(
       api,
       priceData,
       transactionLog,
-      agent,
+      agentCache,
       currentMarket,
       ship,
     );
@@ -224,7 +225,7 @@ Future<DateTime?> advanceArbitrageTrader(
       // We're at the source, buy and start the route.
       return _purchaseCargoAndGo(
         api,
-        agent,
+        agentCache,
         systemsCache,
         waypointCache,
         priceData,
@@ -264,7 +265,7 @@ Future<DateTime?> advanceArbitrageTrader(
 
   // Find a new deal!
   const maxJumps = 1;
-  final maxOutlay = agent.credits;
+  final maxOutlay = agentCache.agent.credits;
 
   // Consider all deals starting at any market within our consideration range.
   final deal = await findDealFor(
@@ -297,7 +298,7 @@ Future<DateTime?> advanceArbitrageTrader(
     logDeal(ship, deal.deal);
     return _purchaseCargoAndGo(
       api,
-      agent,
+      agentCache,
       systemsCache,
       waypointCache,
       priceData,

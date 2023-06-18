@@ -2,6 +2,7 @@ import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
@@ -42,12 +43,12 @@ void main() async {
   final shipyardPrices = await ShipyardPrices.load(fs);
   final db = DataStore();
   await db.open();
-  final agent = await getMyAgent(api);
+  final agentCache = AgentCache(await getMyAgent(api));
 
   final myShips = await allMyShips(api).toList();
 
   // Where to move?
-  final hq = parseWaypointString(agent.headquarters);
+  final hq = parseWaypointString(agentCache.agent.headquarters);
   final startSystem = hq.system;
 
   // This should be connectedSystemsWithinJumpRangeFromSystem or similar.
@@ -119,6 +120,7 @@ void main() async {
       behaviorManager,
       waiter,
       shipCache,
+      agentCache,
     );
 
     final earliestWaitUntil = waiter.earliestWaitUntil();

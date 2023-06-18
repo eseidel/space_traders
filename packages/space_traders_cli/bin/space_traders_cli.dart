@@ -5,6 +5,7 @@ import 'package:file/local.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
@@ -14,6 +15,7 @@ import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
 import 'package:space_traders_cli/net/auth.dart';
+import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/net/rate_limit.dart';
 import 'package:space_traders_cli/printing.dart';
 
@@ -26,7 +28,7 @@ Behavior _behaviorFor(
   Ship ship,
 ) {
   final disableBehaviors = <Behavior>[
-    // Behavior.buyShip,
+    Behavior.buyShip,
     // Behavior.contractTrader,
     Behavior.arbitrageTrader,
     // Behavior.miner,
@@ -61,6 +63,25 @@ Behavior _behaviorFor(
         .warn('${ship.registration.role} has no specified behaviors, idling.');
   }
   return Behavior.idle;
+}
+
+void printRequestStats(RateLimitedApiClient client) {
+  final counts = client.requestCounts.counts;
+  final generalizedCounts = <String, int>{};
+  for (final key in counts.keys) {
+    final generalizedKey =
+        key.split('/').map((part) => part.contains('-') ? 'N' : part).join('/');
+    generalizedCounts[generalizedKey] =
+        (generalizedCounts[generalizedKey] ?? 0) + counts[key]!;
+  }
+  // print the counts in order of most to least.
+  final sortedCounts = generalizedCounts.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  logger.info('Request stats:');
+  for (final entry in sortedCounts) {
+    logger.info('${entry.value} ${entry.key}');
+  }
+  logger.info('Total: ${client.requestCounts.totalRequests()} requests.');
 }
 
 Future<void> main(List<String> args) async {
@@ -117,27 +138,11 @@ Future<void> main(List<String> args) async {
   // Handle ctrl-c and print out request stats.
   // This should be made an argument rather than on by default.
   ProcessSignal.sigint.watch().listen((signal) {
-    final client = api.apiClient as RateLimitedApiClient;
-    final counts = client.requestCounts.counts;
-    final generalizedCounts = <String, int>{};
-    for (final key in counts.keys) {
-      final generalizedKey = key
-          .split('/')
-          .map((part) => part.contains('-') ? 'N' : part)
-          .join('/');
-      generalizedCounts[generalizedKey] =
-          (generalizedCounts[generalizedKey] ?? 0) + counts[key]!;
-    }
-    // print the counts in order of most to least.
-    final sortedCounts = generalizedCounts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    logger.info('Request stats:');
-    for (final entry in sortedCounts) {
-      logger.info('${entry.value} ${entry.key}');
-    }
-    logger.info('Total: ${client.requestCounts.totalRequests()} requests.');
+    printRequestStats(api.apiClient as RateLimitedApiClient);
     exit(0);
   });
+
+  final agentCache = AgentCache(await getMyAgent(api));
 
   await logic(
     api,
@@ -148,5 +153,6 @@ Future<void> main(List<String> args) async {
     surveyData,
     transactions,
     behaviorManager,
+    agentCache,
   );
 }

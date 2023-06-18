@@ -9,4 +9,8 @@ class AgentCache {
 
   /// Ships in the cache.
   Agent agent;
+
+  /// Updates the agent.
+  // ignore: use_setters_to_change_properties
+  void updateAgent(Agent newAgent) => agent = newAgent;
 }

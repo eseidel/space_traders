@@ -1,6 +1,7 @@
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/advance.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
@@ -27,15 +28,17 @@ Future<void> advanceShips(
   BehaviorManager behaviorManager,
   ShipWaiter waiter,
   ShipCache shipCache,
+  AgentCache agentCache,
 ) async {
   // WaypointCache and MarketCache only live for one loop over the ships.
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
-  final agent = await getMyAgent(api);
 
-  // TODO(eseidel): This should be removed once we believe we're keeping
-  // the list of ships up to date correctly from responses.
+  // TODO(eseidel): Remove once we believe we're keeping ships up to date.
   shipCache.updateShips(await allMyShips(api).toList());
+  // TODO(eseidel): Remove once we believe we're keeping the agent up to date.
+  agentCache.updateAgent(await getMyAgent(api));
+
   waiter.updateForShips(shipCache.ships);
 
   final shipSymbols = shipCache.shipSymbols;
@@ -54,7 +57,7 @@ Future<void> advanceShips(
         priceData,
         shipyardPrices,
         shipCache,
-        agent,
+        agentCache,
         systemsCache,
         waypointCache,
         marketCache,
@@ -106,6 +109,7 @@ Future<void> logic(
   SurveyData surveyData,
   TransactionLog transactions,
   BehaviorManager behaviorManager,
+  AgentCache agentCache,
 ) async {
   final waiter = ShipWaiter();
   final shipCache = ShipCache(await allMyShips(api).toList());
@@ -123,6 +127,7 @@ Future<void> logic(
         behaviorManager,
         waiter,
         shipCache,
+        agentCache,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {

@@ -1,8 +1,10 @@
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
@@ -12,9 +14,6 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
-
-/// What ship type we're currently buying.
-const shipType = ShipType.ORE_HOUND;
 
 /// What the max multiplier of median we would pay for a ship.
 const maxMedianMultipler = 1.1;
@@ -105,7 +104,8 @@ Future<DateTime?> advanceBuyShip(
   DataStore db,
   PriceData priceData,
   ShipyardPrices shipyardPrices,
-  Agent agent,
+  AgentCache agentCache,
+  ShipCache shipCache,
   Ship ship,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
@@ -125,6 +125,10 @@ Future<DateTime?> advanceBuyShip(
   }
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
 
+  // This is a hack for now, we need real planning.
+  final shipType =
+      shipCache.ships.length.isEven ? ShipType.ORE_HOUND : ShipType.PROBE;
+
   // Get our median price before updating shipyard prices.
   final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
   if (medianPrice == null) {
@@ -136,10 +140,11 @@ Future<DateTime?> advanceBuyShip(
     return null;
   }
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
-  if (agent.credits < maxPrice) {
+  final credits = agentCache.agent.credits;
+  if (credits < maxPrice) {
     shipWarn(
       ship,
-      'Cant by ship, credits ${agent.credits} < max price $maxPrice, '
+      'Cant by ship, credits $credits < max price $maxPrice, '
       'disabling behavior.',
     );
     await behaviorManager.disableBehavior(ship, Behavior.buyShip);
@@ -162,22 +167,32 @@ Future<DateTime?> advanceBuyShip(
       shipWarn(
         ship,
         'Failed to buy ship, $recentPriceString > max price $maxPrice '
-        'disabling behavior.',
+        'disabling behavior for 30m.',
       );
-      await behaviorManager.disableBehavior(ship, Behavior.buyShip);
+      await behaviorManager.disableBehavior(
+        ship,
+        Behavior.buyShip,
+        timeout: const Duration(minutes: 30),
+      );
       return null;
     }
+
     // Do we need to catch exceptions about insufficient credits?
     await purchaseShipAndLog(
       api,
       priceData,
       ship,
-      agent,
+      agentCache,
       shipyard.symbol,
       shipType,
     );
 
     await behaviorManager.completeBehavior(ship.symbol);
+    await behaviorManager.disableBehavior(
+      ship,
+      Behavior.buyShip,
+      timeout: const Duration(minutes: 20),
+    );
     return null;
   }
 

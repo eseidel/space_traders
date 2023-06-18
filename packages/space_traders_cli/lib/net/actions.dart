@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -257,7 +258,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
   PriceData priceData,
   Ship ship,
-  Agent agent,
+  AgentCache agent,
   String shipyardSymbol,
   ShipType shipType,
 ) async {
@@ -271,7 +272,7 @@ Future<void> refuelIfNeededAndLog(
   Api api,
   PriceData priceData,
   TransactionLog transactionLog,
-  Agent agent,
+  AgentCache agentCache,
   Market market,
   Ship ship,
 ) async {
@@ -331,14 +332,14 @@ Future<void> refuelIfNeededAndLog(
     logTransaction(
       ship,
       priceData,
-      agent,
+      agentCache.agent,
       response.transaction,
       transactionEmoji: '⛽',
     );
     transactionLog.log(
       Transaction.fromMarketTransaction(
         response.transaction,
-        agent.credits,
+        agentCache.agent.credits,
       ),
     );
     // Reset flight mode on refueling.

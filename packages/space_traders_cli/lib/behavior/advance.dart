@@ -5,6 +5,7 @@ import 'package:space_traders_cli/behavior/contract_trader.dart';
 import 'package:space_traders_cli/behavior/explorer.dart';
 import 'package:space_traders_cli/behavior/miner.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
@@ -24,7 +25,7 @@ class BehaviorContext {
     this.priceData,
     this.shipyardPrices,
     this.shipCache,
-    this.agent,
+    this.agentCache,
     this.systemsCache,
     this.waypointCache,
     this.marketCache,
@@ -53,7 +54,7 @@ class BehaviorContext {
   final Ship ship;
 
   /// The agent object.
-  final Agent agent;
+  final AgentCache agentCache;
 
   /// The cache of systems.
   final SystemsCache systemsCache;
@@ -93,7 +94,8 @@ Future<DateTime?> advanceShipBehavior(
         ctx.db,
         ctx.priceData,
         ctx.shipyardPrices,
-        ctx.agent,
+        ctx.agentCache,
+        ctx.shipCache,
         ctx.ship,
         ctx.systemsCache,
         ctx.waypointCache,
@@ -107,7 +109,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.api,
         ctx.db,
         ctx.priceData,
-        ctx.agent,
+        ctx.agentCache,
         ctx.ship,
         ctx.systemsCache,
         ctx.waypointCache,
@@ -120,7 +122,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.api,
         ctx.db,
         ctx.priceData,
-        ctx.agent,
+        ctx.agentCache,
         ctx.ship,
         ctx.systemsCache,
         ctx.waypointCache,
@@ -133,7 +135,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.api,
         ctx.db,
         ctx.priceData,
-        ctx.agent,
+        ctx.agentCache,
         ctx.ship,
         ctx.systemsCache,
         ctx.waypointCache,
@@ -150,7 +152,7 @@ Future<DateTime?> advanceShipBehavior(
         ctx.transactions,
         ctx.priceData,
         ctx.shipyardPrices,
-        ctx.agent,
+        ctx.agentCache,
         ctx.ship,
         ctx.systemsCache,
         ctx.waypointCache,

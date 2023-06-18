@@ -107,6 +107,8 @@ Exploring:
   opportunities.
   Explorers should generate a queue of good systems to explore, and then
   pull from that queue?
+* Explorers should explore an entire system and then go to the jumpgate
+  and then from the jump gate plan their next system.
 
 Tech Debt:
 * Build a docker container and run the app in the cloud.  With a docker volume

@@ -1,6 +1,7 @@
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
@@ -42,7 +43,7 @@ Future<DateTime?> advanceExporer(
   TransactionLog transactionLog,
   PriceData priceData,
   ShipyardPrices shipyardPrices,
-  Agent agent,
+  AgentCache agentCache,
   Ship ship,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
@@ -83,7 +84,7 @@ Future<DateTime?> advanceExporer(
           api,
           priceData,
           transactionLog,
-          agent,
+          agentCache,
           market,
           ship,
         );

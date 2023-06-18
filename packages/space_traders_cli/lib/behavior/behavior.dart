@@ -123,10 +123,14 @@ class BehaviorManager {
   }
 
   /// Disable the given behavior for an hour.
-  Future<void> disableBehavior(Ship ship, Behavior behavior) {
-    deleteBehaviorState(_db, ship.symbol);
+  Future<void> disableBehavior(
+    Ship ship,
+    Behavior behavior, {
+    Duration timeout = const Duration(hours: 1),
+  }) async {
+    await deleteBehaviorState(_db, ship.symbol);
 
-    final expiration = DateTime.now().add(const Duration(hours: 1));
+    final expiration = DateTime.now().add(timeout);
     _behaviorTimeouts[behavior] = expiration;
     return saveBehaviorTimeouts(
       _db,
