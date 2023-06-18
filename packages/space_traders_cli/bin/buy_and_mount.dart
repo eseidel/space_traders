@@ -108,6 +108,7 @@ void main(List<String> args) async {
     api,
     priceData,
     transactionLog,
+    agentCache,
     ship,
     tradeSymbol,
     1,

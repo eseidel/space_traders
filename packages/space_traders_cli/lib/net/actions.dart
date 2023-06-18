@@ -7,61 +7,14 @@ import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/net/direct.dart';
 import 'package:space_traders_cli/net/exceptions.dart';
 import 'package:space_traders_cli/printing.dart';
 
+export 'package:space_traders_cli/net/direct.dart';
+
 // Importantly, these actions *should* modify the state objects passed in
 // e.g. if it docks the ship, it should update the ship's nav object.
-// They don't currently update agent (credits), but probably should too.
-
-/// Purchase a ship of type [shipType] at [shipyardSymbol]
-Future<PurchaseShip201ResponseData> purchaseShip(
-  Api api,
-  ShipCache shipCache,
-  AgentCache agentCache,
-  String shipyardSymbol,
-  ShipType shipType,
-) async {
-  final purchaseShipRequest = PurchaseShipRequest(
-    waypointSymbol: shipyardSymbol,
-    shipType: shipType,
-  );
-  final purchaseResponse =
-      await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
-  final data = purchaseResponse!.data;
-  shipCache.updateShip(data.ship);
-  agentCache.updateAgent(data.agent);
-  return data;
-}
-
-/// Set the [flightMode] of [ship]
-Future<ShipNav> setShipFlightMode(
-  Api api,
-  Ship ship,
-  ShipNavFlightMode flightMode,
-) async {
-  final request = PatchShipNavRequest(flightMode: flightMode);
-  final response =
-      await api.fleet.patchShipNav(ship.symbol, patchShipNavRequest: request);
-  ship.nav = response!.data;
-  return response.data;
-}
-
-/// Navigate [ship] to [waypointSymbol]
-Future<NavigateShip200ResponseData> _navigateShip(
-  Api api,
-  Ship ship,
-  String waypointSymbol,
-) async {
-  final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
-  final result =
-      await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
-  final data = result!.data;
-  ship
-    ..nav = data.nav
-    ..fuel = data.fuel;
-  return data;
-}
 
 /// Navigate [ship] to [waypointSymbol] will retry in drift mode if
 /// there is insufficient fuel.
@@ -72,72 +25,15 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 ) async {
   await undockIfNeeded(api, ship);
   try {
-    return await _navigateShip(api, ship, waypointSymbol);
+    return await navigateShip(api, ship, waypointSymbol);
   } on ApiException catch (e) {
     if (!isInfuficientFuelException(e)) {
       rethrow;
     }
     shipWarn(ship, 'Insufficient fuel, drifting to $waypointSymbol');
     await setShipFlightMode(api, ship, ShipNavFlightMode.DRIFT);
-    return _navigateShip(api, ship, waypointSymbol);
+    return navigateShip(api, ship, waypointSymbol);
   }
-}
-
-/// Extract resources from asteroid with [ship]
-Future<ExtractResources201ResponseData> extractResources(
-  Api api,
-  Ship ship, {
-  Survey? survey,
-}) async {
-  ExtractResourcesRequest? request;
-  if (survey != null) {
-    request = ExtractResourcesRequest(
-      survey: survey,
-    );
-  }
-  final response = await api.fleet
-      .extractResources(ship.symbol, extractResourcesRequest: request);
-  ship.cargo = response!.data.cargo;
-  return response.data;
-}
-
-/// Deliver [units] of [tradeSymbol] to [contract]
-Future<DeliverContract200ResponseData> deliverContract(
-  Api api,
-  Ship ship,
-  Contract contract,
-  String tradeSymbol,
-  int units,
-) async {
-  final request = DeliverContractRequest(
-    shipSymbol: ship.symbol,
-    tradeSymbol: tradeSymbol,
-    units: units,
-  );
-  final response = await api.contracts
-      .deliverContract(contract.id, deliverContractRequest: request);
-  // Does not update the contract.
-  ship.cargo = response!.data.cargo;
-  return response.data;
-}
-
-/// Sell [units] of [tradeSymbol] to market.
-Future<SellCargo201ResponseData> sellCargo(
-  Api api,
-  AgentCache agentCache,
-  Ship ship,
-  TradeSymbol tradeSymbol,
-  int units,
-) async {
-  final request = SellCargoRequest(
-    symbol: tradeSymbol,
-    units: units,
-  );
-  final response =
-      await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
-  ship.cargo = response!.data.cargo;
-  agentCache.updateAgent(response.data.agent);
-  return response.data;
 }
 
 /// Sell all cargo matching the [where] predicate.
@@ -217,34 +113,30 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
   Api api,
   PriceData priceData,
   TransactionLog transactionLog,
+  AgentCache agentCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int amountToBuy,
 ) async {
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
-  final request = PurchaseCargoRequest(
-    symbol: tradeSymbol,
-    units: amountToBuy,
-  );
   try {
-    final response = await api.fleet
-        .purchaseCargo(ship.symbol, purchaseCargoRequest: request);
-    final transaction = response!.data.transaction;
-    // Do we need to handle transaction limits?  Callers can check before.
+    final data =
+        await purchaseCargo(api, agentCache, ship, tradeSymbol, amountToBuy);
+    // Do we need to handle transaction limits?  Callers should check before.
     // ApiException 400: {"error":{"message":"Market transaction failed.
     // Trade good REACTOR_FUSION_I has a limit of 10 units per transaction.",
     // "code":4604,"data":{"waypointSymbol":"X1-UC8-13100A","tradeSymbol":
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
-    final agent = response.data.agent;
+    final agent = data.agent;
+    final transaction = data.transaction;
     logTransaction(ship, priceData, agent, transaction);
     transactionLog.log(
       Transaction.fromMarketTransaction(
-        response.data.transaction,
+        transaction,
         agent.credits,
       ),
     );
-    ship.cargo = response.data.cargo;
-    return response.data;
+    return data;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
       rethrow;
@@ -346,22 +238,18 @@ Future<void> refuelIfNeededAndLog(
 
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   try {
-    final responseWrapper = await api.fleet.refuelShip(ship.symbol);
-    final response = responseWrapper!.data;
-    // Does not update agent.
-    ship.fuel = response.fuel;
+    final data = await refuelShip(api, agentCache, ship);
+    final transaction = data.transaction;
+    final agent = agentCache.agent;
     logTransaction(
       ship,
       priceData,
-      agentCache.agent,
-      response.transaction,
+      agent,
+      transaction,
       transactionEmoji: '⛽',
     );
     transactionLog.log(
-      Transaction.fromMarketTransaction(
-        response.transaction,
-        agentCache.agent.credits,
-      ),
+      Transaction.fromMarketTransaction(transaction, agent.credits),
     );
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {

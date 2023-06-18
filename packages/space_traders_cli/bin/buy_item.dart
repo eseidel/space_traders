@@ -1,5 +1,6 @@
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
@@ -19,7 +20,7 @@ void main(List<String> args) async {
   final api = defaultApi(fs);
 
   final priceData = await PriceData.load(fs);
-  final agent = await getMyAgent(api);
+  final agentCache = AgentCache(await getMyAgent(api));
   final systemsCache = await SystemsCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
@@ -45,7 +46,7 @@ void main(List<String> args) async {
   );
 
   final purchasePrice = good.purchasePrice;
-  final maxBuy = agent.credits ~/ purchasePrice;
+  final maxBuy = agentCache.agent.credits ~/ purchasePrice;
 
   if (maxBuy < 1) {
     logger.err("You can't afford any of those!");
@@ -58,6 +59,7 @@ void main(List<String> args) async {
     api,
     priceData,
     transactionLog,
+    agentCache,
     ship,
     TradeSymbol.fromJson(good.symbol)!,
     quantity,

@@ -88,6 +88,7 @@ Future<DateTime?> _purchaseCargoAndGo(
     api,
     priceData,
     transactionLog,
+    agentCache,
     ship,
     deal.tradeSymbol,
     unitsToPurchase,
