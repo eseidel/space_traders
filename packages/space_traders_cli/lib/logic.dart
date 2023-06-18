@@ -34,8 +34,7 @@ Future<void> advanceShips(
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
 
-  // TODO(eseidel): Remove once we believe we're keeping ships up to date.
-  shipCache.updateShips(await allMyShips(api).toList());
+  await shipCache.ensureShipsUpToDate(api);
   // TODO(eseidel): Remove once we believe we're keeping the agent up to date.
   agentCache.updateAgent(await getMyAgent(api));
 

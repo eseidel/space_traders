@@ -1,13 +1,57 @@
+import 'dart:convert';
+
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/net/queries.dart';
+import 'package:space_traders_cli/third_party/compare.dart';
+
+bool _shipListsMatch(List<Ship> a, List<Ship> b) {
+  if (a.length != b.length) {
+    logger.info("Ship list lengths don't match: ${a.length} != ${b.length}");
+    return false;
+  }
+
+  for (var i = 0; i < a.length; i++) {
+    final diff = findDifferenceBetweenStrings(
+      jsonEncode(a[i].toJson()),
+      jsonEncode(b[i].toJson()),
+    );
+    if (diff != null) {
+      logger.info('Ship list differs at index $i: $diff');
+      return false;
+    }
+  }
+  return true;
+}
 
 /// In-memory cache of ships.
 // Should this just be called Fleet?
 class ShipCache {
   /// Creates a new ship cache.
-  ShipCache(this.ships);
+  ShipCache(this.ships, {this.requestsBetweenChecks = 100});
 
   /// Ships in the cache.
   final List<Ship> ships;
+
+  /// Number of requests between checks to ensure ships are up to date.
+  final int requestsBetweenChecks;
+
+  int _requestsSinceLastCheck = 0;
+
+  /// Ensures the ships in the cache are up to date.
+  Future<void> ensureShipsUpToDate(Api api) async {
+    _requestsSinceLastCheck++;
+    if (_requestsSinceLastCheck < requestsBetweenChecks) {
+      return;
+    }
+    final newShips = await allMyShips(api).toList();
+    _requestsSinceLastCheck = 0;
+    if (_shipListsMatch(ships, newShips)) {
+      return;
+    }
+    logger.warn('Ship list changed, updating cache.');
+    updateShips(newShips);
+  }
 
   /// Updates the ships in the cache.
   void updateShips(List<Ship> newShips) {
