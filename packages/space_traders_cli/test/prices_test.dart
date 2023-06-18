@@ -36,6 +36,69 @@ void main() {
     expect(priceData.medianSellPrice('b'), null);
   });
 
+  test('PriceData.addPrices', () async {
+    final fs = MemoryFileSystem();
+    final a = makePrice(waypointSymbol: 'a', symbol: 'a', purchasePrice: 10);
+    final b = makePrice(waypointSymbol: 'b', symbol: 'a');
+    final priceData = PriceData([a], fs: fs);
+    expect(priceData.count, 1);
+    expect(priceData.waypointCount, 1);
+
+    await priceData.addPrices([b]);
+    expect(priceData.count, 2);
+    expect(priceData.waypointCount, 2);
+
+    // Ignores invalid price dates
+    final c = makePrice(
+      waypointSymbol: 'c',
+      symbol: 'c',
+      timestamp: DateTime.now().add(const Duration(days: 1)),
+    );
+    await priceData.addPrices([c]);
+    expect(priceData.count, 2);
+    expect(priceData.waypointCount, 2);
+
+    // Will replace prices with newer ones.
+    expect(
+      priceData
+          .purchasePricesFor(tradeSymbol: 'a', marketSymbol: 'a')
+          .first
+          .purchasePrice,
+      10,
+    );
+    final d = makePrice(
+      waypointSymbol: 'a',
+      symbol: 'a',
+      purchasePrice: 20,
+    );
+    await priceData.addPrices([d]);
+    expect(priceData.count, 2);
+    expect(priceData.waypointCount, 2);
+    expect(
+      priceData
+          .purchasePricesFor(tradeSymbol: 'a', marketSymbol: 'a')
+          .first
+          .purchasePrice,
+      20,
+    );
+
+    // But will ignore older prices.
+    final e = makePrice(
+      waypointSymbol: 'a',
+      symbol: 'a',
+      purchasePrice: 5,
+      timestamp: DateTime.now().subtract(const Duration(days: 1)),
+    );
+    await priceData.addPrices([e]);
+    expect(
+      priceData
+          .purchasePricesFor(tradeSymbol: 'a', marketSymbol: 'a')
+          .first
+          .purchasePrice,
+      20,
+    );
+  });
+
   test('fromMarketTradeGood', () {
     final good = MarketTradeGood(
       symbol: 'A',

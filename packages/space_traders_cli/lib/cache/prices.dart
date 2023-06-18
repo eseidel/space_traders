@@ -239,14 +239,16 @@ class PriceData {
             element.symbol == newPrice.symbol,
       );
 
+      if (DateTime.now().isBefore(newPrice.timestamp)) {
+        // This is detail to avoid showing in the PriceData.addPrices test.
+        logger.detail('Bogus timestamp on price: ${newPrice.timestamp}');
+        continue;
+      }
+
       if (index >= 0) {
         // This date logic is necessary to make sure we don't replace
         // more recent local prices with older server data.
         final existingPrice = _prices[index];
-        if (DateTime.now().isBefore(newPrice.timestamp)) {
-          logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
-          continue;
-        }
         if (newPrice.timestamp.isBefore(existingPrice.timestamp)) {
           continue;
         }
