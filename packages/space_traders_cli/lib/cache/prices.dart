@@ -420,7 +420,8 @@ class PriceData {
     final sortedPrices = prices.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    return sortedPrices.last.timestamp.difference(DateTime.now()) < maxAge;
+    return DateTime.timestamp().difference(sortedPrices.last.timestamp) <
+        maxAge;
   }
 
   /// Most recent price a good can be sold to the market for.

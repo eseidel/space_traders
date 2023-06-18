@@ -112,6 +112,7 @@ Tech Debt:
 * Build a docker container and run the app in the cloud.  With a docker volume
   so the state persists.
 * Get above 50% coverage.
+* Fix all uses of DateTime.now() to be DateTime.timestamp() and test.
 
 Efficiency:
 * Start to build a system database similar to the pricing database.

@@ -180,10 +180,15 @@ void main() {
     final fs = MemoryFileSystem();
     final priceData = PriceData([], fs: fs);
     expect(priceData.hasRecentMarketData('a'), false);
-    final a = makePrice(waypointSymbol: 'a', symbol: 'a');
+    final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
+    final a =
+        makePrice(waypointSymbol: 'a', symbol: 'a', timestamp: oneMinuteAgo);
     priceData.addPrices([a]);
     expect(priceData.hasRecentMarketData('a'), true);
-    expect(priceData.hasRecentMarketData('a', maxAge: Duration.zero), false);
+    expect(
+      priceData.hasRecentMarketData('a', maxAge: const Duration(seconds: 1)),
+      false,
+    );
   });
 
   test('recordMarketData', () async {
