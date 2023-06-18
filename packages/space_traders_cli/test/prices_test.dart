@@ -60,10 +60,7 @@ void main() {
 
     // Will replace prices with newer ones.
     expect(
-      priceData
-          .purchasePricesFor(tradeSymbol: 'a', marketSymbol: 'a')
-          .first
-          .purchasePrice,
+      priceData.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
       10,
     );
     final d = makePrice(
@@ -75,10 +72,7 @@ void main() {
     expect(priceData.count, 2);
     expect(priceData.waypointCount, 2);
     expect(
-      priceData
-          .purchasePricesFor(tradeSymbol: 'a', marketSymbol: 'a')
-          .first
-          .purchasePrice,
+      priceData.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
       20,
     );
 
@@ -91,10 +85,7 @@ void main() {
     );
     await priceData.addPrices([e]);
     expect(
-      priceData
-          .purchasePricesFor(tradeSymbol: 'a', marketSymbol: 'a')
-          .first
-          .purchasePrice,
+      priceData.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
       20,
     );
   });
@@ -183,5 +174,35 @@ void main() {
     final json2 = price2.toJson();
     expect(price2, price);
     expect(json2, json);
+  });
+
+  test('PriceData.hasRecentMarketData', () {
+    final fs = MemoryFileSystem();
+    final priceData = PriceData([], fs: fs);
+    expect(priceData.hasRecentMarketData('a'), false);
+    final a = makePrice(waypointSymbol: 'a', symbol: 'a');
+    priceData.addPrices([a]);
+    expect(priceData.hasRecentMarketData('a'), true);
+    expect(priceData.hasRecentMarketData('a', maxAge: Duration.zero), false);
+  });
+
+  test('recordMarketData', () async {
+    final fs = MemoryFileSystem();
+    final priceData = PriceData([], fs: fs);
+    final market = Market(
+      symbol: 'a',
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: 'a',
+          tradeVolume: 1,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+        )
+      ],
+    );
+    await recordMarketData(priceData, market);
+    expect(priceData.hasRecentMarketData('a'), true);
+    expect(priceData.count, 1);
   });
 }
