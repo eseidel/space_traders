@@ -62,8 +62,8 @@ void main() {
       409,
       jsonEncode({
         'error': {
-          'message':
-              'Ship extract failed. Survey X1-VS75-67965Z-D0F7C6 has been exhausted.',
+          'message': 'Ship extract failed. '
+              'Survey X1-VS75-67965Z-D0F7C6 has been exhausted.',
           'code': 4224
         }
       }),
@@ -76,8 +76,8 @@ void main() {
       400,
       jsonEncode({
         'error': {
-          'message':
-              'Ship survey failed. Target signature is no longer in range or valid.',
+          'message': 'Ship survey failed. '
+              'Target signature is no longer in range or valid.',
           'code': 4221
         }
       }),
