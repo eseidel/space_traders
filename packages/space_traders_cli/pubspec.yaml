@@ -16,6 +16,10 @@ dependencies:
   intl: ^0.17.0
   mason_logger: ^0.2.5
   meta: ^1.9.1
+  scoped:
+    git:
+      url: https://github.com/shorebirdtech/shorebird.git
+      path: packages/scoped
   sembast: ^3.4.4
   space_traders_api:
     path: ../space_traders_api
