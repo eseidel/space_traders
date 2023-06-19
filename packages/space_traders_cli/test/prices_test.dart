@@ -189,6 +189,10 @@ void main() {
       priceData.hasRecentMarketData('a', maxAge: const Duration(seconds: 1)),
       false,
     );
+    expect(
+      priceData.hasRecentMarketData('a', maxAge: const Duration(hours: 1)),
+      true,
+    );
   });
 
   test('recordMarketData', () async {

@@ -59,9 +59,9 @@ import 'package:space_traders_cli/trading.dart';
 /// Returns the expected value of the survey.
 int expectedValueFromSurvey(
   PriceData priceData,
-  Waypoint market,
-  Survey survey,
-) {
+  Survey survey, {
+  required String marketSymbol,
+}) {
   // I'm not yet sure what to do with deposit size.
   // Look at each of the possible returns.
   // Price them at the passed in market.
@@ -69,7 +69,7 @@ int expectedValueFromSurvey(
 
   final totalValue = survey.deposits.fold<int>(0, (total, deposit) {
     final sellPrice = priceData.recentSellPrice(
-          marketSymbol: market.symbol,
+          marketSymbol: marketSymbol,
           tradeSymbol: deposit.symbol,
         ) ??
         0; // null when prices database is empty.
@@ -79,25 +79,23 @@ int expectedValueFromSurvey(
 }
 
 /// Returns the nearest waypoint with a marketplace.
-Future<Waypoint> nearestWaypointWithMarket(
-  SystemsCache systemsCache,
+Future<Waypoint?> nearestWaypointWithMarket(
   WaypointCache waypointCache,
-  Waypoint start,
-) async {
+  Waypoint start, {
+  int maxJumps = 1,
+}) async {
   if (start.hasMarketplace) {
     return start;
   }
   await for (final waypoint in waypointCache.waypointsInJumpRadius(
     startSystem: start.systemSymbol,
-    maxJumps: 1,
+    maxJumps: maxJumps,
   )) {
     if (waypoint.hasMarketplace) {
       return waypoint;
     }
   }
-  throw Exception(
-    'No waypoints with marketplaces found in jump radius of ${start.symbol}',
-  );
+  return null;
 }
 
 /// Want to find systems which have both a mineable resource and a marketplace.
@@ -218,8 +216,8 @@ Future<String?> nearestMineWithGoodMining(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  Waypoint start,
-  int maxJumps, {
+  Waypoint start, {
+  required int maxJumps,
   bool Function(String systemSymbol)? systemFilter,
 }) async {
   final evals = <_SystemEval>[];
@@ -270,28 +268,33 @@ class _ValuedSurvey {
 /// Finds a recent survey
 Future<Survey?> surveyWorthMining(
   PriceData priceData,
-  SurveyData surveyData,
-  Waypoint waypoint, {
+  SurveyData surveyData, {
+  required String surveyWaypointSymbol,
+  required String nearbyMarketSymbol,
+  int minimumSurveys = 10,
   double percentileThreshold = 0.9,
 }) async {
   // Get N recent surveys for this waypoint, including expired and exhausted.
   final recentSurveys = surveyData.recentSurveysAtWaypoint(
-    waypointSymbol: waypoint.symbol,
+    waypointSymbol: surveyWaypointSymbol,
     count: 100,
   );
   // If we don't have enough surveys to compare, return null.
-  if (recentSurveys.length < 10) {
+  if (recentSurveys.length < minimumSurveys) {
     return null;
   }
   // Compute the expected values of the surveys using the local market.
   // Note: this will fail if the passed market doesn't sell everything.
   // Use one minute from now as our expiration time to avoid surveys
   // expiring between when we compute the best survey and when we mine.
-  final oneMinuteFromNow =
-      DateTime.now().toUtc().add(const Duration(minutes: 1));
+  final oneMinuteFromNow = DateTime.timestamp().add(const Duration(minutes: 1));
   final valuedSurveys = recentSurveys.map((s) {
     return _ValuedSurvey(
-      expectedValue: expectedValueFromSurvey(priceData, waypoint, s.survey),
+      expectedValue: expectedValueFromSurvey(
+        priceData,
+        s.survey,
+        marketSymbol: nearbyMarketSymbol,
+      ),
       survey: s.survey,
       isActive: !s.exhausted && s.survey.expiration.isAfter(oneMinuteFromNow),
     );
@@ -312,6 +315,56 @@ Future<Survey?> surveyWorthMining(
   //   );
   // }
   return best?.survey;
+}
+
+Future<DateTime?> _navigateToNewSystemForMining(
+  Api api,
+  PriceData priceData,
+  Ship ship,
+  SystemsCache systemsCache,
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  BehaviorManager behaviorManager,
+  Waypoint currentWaypoint, {
+  int maxJumps = 10,
+}) async {
+  final mine = await nearestMineWithGoodMining(
+    api,
+    priceData,
+    systemsCache,
+    waypointCache,
+    marketCache,
+    currentWaypoint,
+    maxJumps: maxJumps,
+  );
+  if (mine == null) {
+    shipWarn(
+      ship,
+      'No good mining system found in '
+      '$maxJumps radius of ${ship.nav.systemSymbol}',
+    );
+    await behaviorManager.disableBehavior(ship, Behavior.miner);
+    return null;
+  }
+
+  // Otherwise navigate to our new mine.
+  return beingRouteAndLog(
+    api,
+    ship,
+    systemsCache,
+    behaviorManager,
+    mine,
+  );
+}
+
+// This could be fancier and pick one actually nearby, instead it just
+// returns the first.
+SystemWaypoint? _nearbyMineWithinSystem(
+  SystemsCache systemsCache,
+  String systemSymbol,
+) {
+  final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
+  return systemWaypoints.firstWhereOrNull((w) => w.canBeMined);
 }
 
 /// Apply the miner behavior to the ship.
@@ -349,7 +402,6 @@ Future<DateTime?> advanceMiner(
   if (shouldSell) {
     // Sell cargo and refuel if needed.
     if (currentWaypoint.hasMarketplace) {
-      final cargoBefore = ship.cargo.units;
       await dockIfNeeded(api, ship);
       final market = await recordMarketDataIfNeededAndLog(
         priceData,
@@ -374,14 +426,16 @@ Future<DateTime?> advanceMiner(
         market,
         ship,
       );
-      if (cargoBefore != ship.cargo.units) {
-        // Success!  We mined and sold our cargo!
-        // Reset our state now that we've done the behavior once.
+      // This could also compare before cargo and after cargo and call
+      // a change success.  That would allow ships to mine even when they have
+      // cargo which is otherwise hard to sell.
+      if (ship.cargo.isEmpty) {
+        // Success!  We mined and sold all our cargo!
+        // Reset our state now that we've mined + sold once.
         await behaviorManager.completeBehavior(ship.symbol);
-        // This return null maybe wrong if we failed to sell?
         return null;
       }
-      shipWarn(ship, 'Failed to sell cargo, trying a different market.');
+      shipWarn(ship, 'Failed to sell some cargo, trying a different market.');
     } else {
       shipInfo(
           ship,
@@ -422,71 +476,59 @@ Future<DateTime?> advanceMiner(
       'to nearest asteroid field.',
     );
     // We're not at an asteroid field, so we need to navigate to one.
-    final systemWaypoints =
-        systemsCache.waypointsInSystem(ship.nav.systemSymbol);
-    final maybeAsteroidField =
-        systemWaypoints.firstWhereOrNull((w) => w.canBeMined);
-
-    if (maybeAsteroidField != null) {
-      return navigateToLocalWaypointAndLog(api, ship, maybeAsteroidField);
+    final nearbyMine =
+        _nearbyMineWithinSystem(systemsCache, ship.nav.systemSymbol);
+    if (nearbyMine != null) {
+      return navigateToLocalWaypointAndLog(api, ship, nearbyMine);
     }
     shipWarn(
       ship,
       'No minable waypoint in ${ship.nav.systemSymbol}, '
       'finding nearby system with best mining.',
     );
-    const maxJumps = 10;
-    final mine = await nearestMineWithGoodMining(
+    return _navigateToNewSystemForMining(
       api,
       priceData,
+      ship,
       systemsCache,
       waypointCache,
       marketCache,
-      currentWaypoint,
-      maxJumps,
-    );
-    if (mine == null) {
-      shipWarn(
-        ship,
-        'No good mining system found in '
-        '$maxJumps radius of ${ship.nav.systemSymbol}',
-      );
-      await behaviorManager.disableBehavior(ship, Behavior.miner);
-      return null;
-    }
-
-    // Otherwise navigate to our new mine.
-    return beingRouteAndLog(
-      api,
-      ship,
-      systemsCache,
       behaviorManager,
-      mine,
+      currentWaypoint,
     );
   }
-
-  // If we still have space, mine.
-  // Must be undocked before surveying or mining.
-  await undockIfNeeded(api, ship);
-  // Load a survey set, or if we have surveying capabilities, survey.
-
-  // Load up survey set for this waypoint.
-  // If it has an non-expired survey which is worth mining, mine it.
-  // A survey is worth mining when it's expected value is greater than
-  // 70% of previous surveys.
-  // Otherwise add a new survey.
-
+  // This is wrong, we don't know if this market will be able to sell
+  // the goods we can mine.
   final nearestMarket = await nearestWaypointWithMarket(
-    systemsCache,
     waypointCache,
     currentWaypoint,
   );
+  if (nearestMarket == null) {
+    shipWarn(
+      ship,
+      'No nearby market, navigating to new system for mining.',
+    );
+    return _navigateToNewSystemForMining(
+      api,
+      priceData,
+      ship,
+      systemsCache,
+      waypointCache,
+      marketCache,
+      behaviorManager,
+      currentWaypoint,
+    );
+  }
+
+  // Both surveying and mining require being undocked.
+  await undockIfNeeded(api, ship);
 
   // See if we have a good survey to mine.
   final maybeSurvey = await surveyWorthMining(
     priceData,
     surveyData,
-    nearestMarket,
+    surveyWaypointSymbol: currentWaypoint.symbol,
+    nearbyMarketSymbol: nearestMarket.symbol,
   );
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
@@ -503,39 +545,22 @@ Future<DateTime?> advanceMiner(
       // https://github.com/SpaceTradersAPI/api-docs/issues/62
       if (e.code == 500) {
         shipWarn(ship, 'Survey failed, with 500 error, moving systems.');
-        final mineSymbol = await nearestMineWithGoodMining(
+        return _navigateToNewSystemForMining(
           api,
           priceData,
+          ship,
           systemsCache,
           waypointCache,
           marketCache,
-          nearestMarket,
-          5,
-          systemFilter: (systemSymbol) => systemSymbol != ship.nav.systemSymbol,
+          behaviorManager,
+          currentWaypoint,
         );
-        if (mineSymbol != null) {
-          return beingRouteAndLog(
-            api,
-            ship,
-            systemsCache,
-            behaviorManager,
-            mineSymbol,
-          );
-        } else {
-          shipWarn(
-            ship,
-            'No good mining system found in 5 radius of '
-            '${ship.nav.systemSymbol}, disabling miner behavior.',
-          );
-          await behaviorManager.disableBehavior(ship, Behavior.miner);
-          return null;
-        }
       }
       rethrow;
     }
   }
 
-  /// If we either have a survey or don't have a surveyer, mine.
+  // If we either have a survey or don't have a surveyer, mine.
   try {
     final response = await extractResources(api, ship, survey: maybeSurvey);
     final yield_ = response.extraction.yield_;

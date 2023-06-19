@@ -3,14 +3,16 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
+import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/prices.dart'; // just for maxAge.
 import 'package:space_traders_cli/logger.dart';
 
 /// Price data for a single ship type in a shipyard.
+@immutable
 class ShipyardPrice {
   /// Create a new price record.
-  ShipyardPrice({
+  const ShipyardPrice({
     required this.waypointSymbol,
     required this.shipType,
     required this.purchasePrice,
@@ -58,6 +60,23 @@ class ShipyardPrice {
     json['timestamp'] = timestamp.toUtc().toIso8601String();
     return json;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipyardPrice &&
+          runtimeType == other.runtimeType &&
+          waypointSymbol == other.waypointSymbol &&
+          shipType == other.shipType &&
+          purchasePrice == other.purchasePrice &&
+          timestamp == other.timestamp;
+
+  @override
+  int get hashCode =>
+      waypointSymbol.hashCode ^
+      shipType.hashCode ^
+      purchasePrice.hashCode ^
+      timestamp.hashCode;
 }
 
 /// A collection of price records.
@@ -257,7 +276,8 @@ class ShipyardPrices {
     final pricesForMarketSorted = pricesForMarket.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    return pricesForMarketSorted.last.timestamp.difference(DateTime.now()) <
+    return DateTime.timestamp()
+            .difference(pricesForMarketSorted.last.timestamp) <
         maxAge;
   }
 

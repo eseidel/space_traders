@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
+import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
 
 /// Record of a historcial survey.
@@ -48,9 +49,13 @@ class HistoricalSurvey {
 
   /// Convert to JSON.
   Map<String, dynamic> toJson() {
+    final surveyJson = survey.toJson();
+    // Hack around openapi codegen not having recursive toJson.
+    surveyJson['size'] = survey.size.toJson();
+    surveyJson['deposits'] = survey.deposits.map((e) => e.toJson()).toList();
     return {
       'timestamp': timestamp.toUtc().toIso8601String(),
-      'survey': survey.toJson(),
+      'survey': surveyJson,
       'exhausted': exhausted,
     };
   }
@@ -73,6 +78,10 @@ class SurveyData {
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'surveys.json';
+
+  /// The surveys.
+  @visibleForTesting
+  List<HistoricalSurvey> get surveys => _surveys;
 
   static List<HistoricalSurvey> _parseSurveys(String json) {
     final parsed = jsonDecode(json) as List<dynamic>;

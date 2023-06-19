@@ -64,7 +64,7 @@ void main(List<String> args) async {
     waypointCache,
     marketCache,
     start,
-    maxJumps,
+    maxJumps: maxJumps,
   );
   if (mine == null) {
     logger.err('No good mining systems found.');
