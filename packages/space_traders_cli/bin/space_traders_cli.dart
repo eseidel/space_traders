@@ -28,7 +28,7 @@ Behavior _behaviorFor(
   Ship ship,
 ) {
   final disableBehaviors = <Behavior>[
-    Behavior.buyShip,
+    // Behavior.buyShip,
     // Behavior.contractTrader,
     Behavior.arbitrageTrader,
     // Behavior.miner,

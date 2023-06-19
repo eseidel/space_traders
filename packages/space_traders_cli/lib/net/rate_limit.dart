@@ -1,4 +1,5 @@
 import 'package:http/http.dart';
+import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
 
@@ -39,6 +40,29 @@ class RateLimitedApiClient extends ApiClient {
 
   DateTime _nextRequestTime = DateTime.now();
 
+  /// Handle an unexpected rate limit response by waiting and retrying once.
+  @visibleForTesting
+  static Future<Response> handleUnexpectedRateLimit(
+    Future<Response> Function() sendRequest, {
+    int waitTimeSeconds = 10,
+  }) async {
+    try {
+      return await sendRequest();
+    } on ApiException catch (e) {
+      // We should never hit this, except we seem to.  So either there is a
+      // bug in our rate limiting code, or a bug in the server.
+      if (e.code != 429) {
+        rethrow;
+      }
+      logger.warn(
+        'Unexpected rate limit response, waiting $waitTimeSeconds '
+        'seconds and retrying',
+      );
+      await Future<void>.delayed(Duration(seconds: waitTimeSeconds));
+      return sendRequest();
+    }
+  }
+
   @override
   Future<Response> invokeAPI(
     String path,
@@ -57,14 +81,16 @@ class RateLimitedApiClient extends ApiClient {
       await Future<void>.delayed(_nextRequestTime.difference(beforeRequest));
     }
     logger.detail('Making request to $path');
-    final response = await super.invokeAPI(
-      path,
-      method,
-      queryParams,
-      body,
-      headerParams,
-      formParams,
-      contentType,
+    final response = await handleUnexpectedRateLimit(
+      () async => super.invokeAPI(
+        path,
+        method,
+        queryParams,
+        body,
+        headerParams,
+        formParams,
+        contentType,
+      ),
     );
     requestCounts.recordRequest(path);
     final afterRequest = DateTime.now();
