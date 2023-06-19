@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:file/local.dart';
+import 'package:scoped/scoped.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
@@ -83,7 +84,7 @@ void printRequestStats(RateLimitedApiClient client) {
   logger.info('Total: ${client.requestCounts.totalRequests()} requests.');
 }
 
-Future<void> main(List<String> args) async {
+Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
     ..addFlag(
@@ -160,5 +161,14 @@ Future<void> main(List<String> args) async {
     behaviorManager,
     agentCache,
     shipCache,
+  );
+}
+
+Future<void> main(List<String> args) async {
+  await runScoped(
+    () async {
+      await cliMain(args);
+    },
+    values: {loggerRef},
   );
 }
