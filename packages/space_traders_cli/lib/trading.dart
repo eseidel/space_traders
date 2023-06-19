@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/prices.dart';
@@ -115,18 +114,11 @@ int? estimateSellPrice(
   if (recentSellPrice != null) {
     return recentSellPrice;
   }
-  // logger.info(
-  //   'No recent sell price for ${tradeSymbol.value} at ${market.symbol}',
-  // );
   final tradeType = market.exchangeType(tradeSymbol);
   if (tradeType == null) {
-    logger.detail('${market.symbol} does not trade $tradeSymbol');
     return null;
   }
-  // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
-  // logger
-  //  .info('Looking up sell price for $tradeSymbol at $percentile percentile');
   return priceData.sellPriceAtPercentile(tradeSymbol, percentile);
 }
 
@@ -149,15 +141,10 @@ int? estimatePurchasePrice(
   if (recentPurchasePrice != null) {
     return recentPurchasePrice;
   }
-  // logger.info(
-  //   'No recent purchase price for ${tradeSymbol.value} at ${market.symbol}',
-  // );
   final tradeType = market.exchangeType(tradeSymbol);
   if (tradeType == null) {
-    logger.detail('${market.symbol} does not trade $tradeSymbol');
     return null;
   }
-  // print('Looking up ${tradeSymbol.value} ${market.symbol} $tradeType');
   final percentile = _percentileForTradeType(tradeType);
   return priceData.purchasePriceAtPercentile(tradeSymbol, percentile);
 }

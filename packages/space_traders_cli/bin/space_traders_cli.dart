@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:file/local.dart';
-import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
@@ -93,8 +92,7 @@ Future<void> main(List<String> args) async {
     );
   final results = parser.parse(args);
 
-  logger =
-      Logger(level: results['verbose'] as bool ? Level.verbose : Level.info);
+  logger.level = results['verbose'] as bool ? Level.verbose : Level.info;
 
   logger.info('Welcome to Space Traders! 🚀');
   // Use package:file to make things mockable.

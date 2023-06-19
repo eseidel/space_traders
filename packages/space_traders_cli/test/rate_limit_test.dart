@@ -1,5 +1,4 @@
 import 'package:http/http.dart';
-import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -19,10 +18,13 @@ void main() {
       return Response('ok', 200);
     }
 
-    logger = MockLogger();
-    final response = await RateLimitedApiClient.handleUnexpectedRateLimit(
-      sendRequest,
-      waitTimeSeconds: 0,
+    final logger = MockLogger();
+    final response = await runWithLogger(
+      logger,
+      () => RateLimitedApiClient.handleUnexpectedRateLimit(
+        sendRequest,
+        waitTimeSeconds: 0,
+      ),
     );
     verify(
       () => logger.warn(

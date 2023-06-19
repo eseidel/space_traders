@@ -240,8 +240,7 @@ class PriceData {
       );
 
       if (DateTime.now().isBefore(newPrice.timestamp)) {
-        // This is detail to avoid showing in the PriceData.addPrices test.
-        logger.detail('Bogus timestamp on price: ${newPrice.timestamp}');
+        logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
         continue;
       }
 

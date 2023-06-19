@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
-import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';

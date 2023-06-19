@@ -1,4 +1,3 @@
-import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
@@ -193,20 +192,22 @@ void main() {
     when(() => shipNav.route).thenReturn(shipNavRoute);
     when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
 
-    // TODO(eseidel): How do we mock globals during a test?
-    logger = MockLogger();
-    final waitUntil = await advanceMiner(
-      api,
-      db,
-      priceData,
-      agentCache,
-      ship,
-      systemsCache,
-      waypointCache,
-      marketCache,
-      transactionLog,
-      behaviorManager,
-      surveyData,
+    final logger = MockLogger();
+    final waitUntil = await runWithLogger(
+      logger,
+      () => advanceMiner(
+        api,
+        db,
+        priceData,
+        agentCache,
+        ship,
+        systemsCache,
+        waypointCache,
+        marketCache,
+        transactionLog,
+        behaviorManager,
+        surveyData,
+      ),
     );
     expect(waitUntil, arrivalTime);
     verify(() => logger.info('🛸#S  ✈️  to W, 00:00:00 left')).called(1);

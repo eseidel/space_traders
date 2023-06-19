@@ -1,7 +1,10 @@
 import 'package:file/memory.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
+
+import 'advance_test.dart';
 
 // Creates a fake price with good defaults.
 MarketPrice makePrice({
@@ -54,7 +57,8 @@ void main() {
       symbol: 'c',
       timestamp: DateTime.now().add(const Duration(days: 1)),
     );
-    await priceData.addPrices([c]);
+    final logger = MockLogger();
+    await runWithLogger(logger, () => priceData.addPrices([c]));
     expect(priceData.count, 2);
     expect(priceData.waypointCount, 2);
 
@@ -68,7 +72,7 @@ void main() {
       symbol: 'a',
       purchasePrice: 20,
     );
-    await priceData.addPrices([d]);
+    await runWithLogger(logger, () => priceData.addPrices([d]));
     expect(priceData.count, 2);
     expect(priceData.waypointCount, 2);
     expect(
@@ -83,7 +87,7 @@ void main() {
       purchasePrice: 5,
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
     );
-    await priceData.addPrices([e]);
+    await runWithLogger(logger, () => priceData.addPrices([e]));
     expect(
       priceData.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
       20,
