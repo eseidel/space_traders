@@ -45,7 +45,7 @@ class WaypointCache {
 
   /// Fetch all waypoints in the given system.
   Future<List<Waypoint>> waypointsInSystem(String systemSymbol) async {
-    assert(systemSymbol.split('-').length == 2, 'Invalid system symbol');
+    assertIsSystemSymbol(systemSymbol);
     if (_waypointsBySystem.containsKey(systemSymbol)) {
       return _waypointsBySystem[systemSymbol]!;
     }
@@ -56,6 +56,7 @@ class WaypointCache {
 
   /// Fetch the waypoint with the given symbol.
   Future<Waypoint> waypoint(String waypointSymbol) async {
+    assertIsWaypointSymbol(waypointSymbol);
     final result = await waypointOrNull(waypointSymbol);
     if (result == null) {
       throw ArgumentError('Unknown waypoint: $waypointSymbol');
@@ -65,6 +66,7 @@ class WaypointCache {
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   Future<Waypoint?> waypointOrNull(String waypointSymbol) async {
+    assertIsWaypointSymbol(waypointSymbol);
     assert(waypointSymbol.split('-').length == 3, 'Invalid system symbol');
     final systemSymbol = parseWaypointString(waypointSymbol).system;
     final waypoints = await waypointsInSystem(systemSymbol);
@@ -81,6 +83,7 @@ class WaypointCache {
   }
 
   Future<void> _ensureCacheMatchesServer(String systemSymbol) async {
+    assertIsSystemSymbol(systemSymbol);
     if (!ensureCacheMatchesServer) {
       return;
     }
@@ -112,6 +115,7 @@ class WaypointCache {
 
   /// Return all connected systems in the given system.
   Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
+    assertIsSystemSymbol(systemSymbol);
     // Don't really need the _connectdSystemsBySystem with the SystemsCache.
     var cachedSystems = _connectedSystemsBySystem[systemSymbol];
     if (cachedSystems == null) {
@@ -187,6 +191,7 @@ class MarketCache {
 
   /// Fetch all markets in the given system.
   Stream<Market> marketsInSystem(String systemSymbol) async* {
+    assertIsSystemSymbol(systemSymbol);
     final waypoints = await _waypointCache.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       final maybeMarket = await marketForSymbol(waypoint.symbol);

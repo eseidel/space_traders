@@ -96,11 +96,26 @@ Future<NavResult> continueNavigationIfNeeded(
   Api api,
   Ship ship,
   SystemsCache systemsCache,
-  BehaviorManager behaviorManager,
-) async {
+  BehaviorManager behaviorManager, {
+  // Hook for overriding the current time in tests.
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  // This can't work because nothing ever updates the ship to say it's not
+  // in transit.  Either we need to speculatively update it ourselves, or
+  // we need to refresh that part of the ship cache from the server.
   if (ship.isInTransit) {
     // Go back to sleep until we arrive.
-    return NavResult._wait(logRemainingTransitTime(ship));
+    final now = getNow();
+    final waitUntil = logRemainingTransitTime(ship, getNow: getNow);
+    if (!waitUntil.isBefore(now)) {
+      return NavResult._wait(waitUntil);
+    }
+    // Otherwise fix the ship's state and continue;
+    shipDetail(ship, 'Ship is in transit, but transit time is over');
+    // This can race with the check in ship_cache.dart.  Since it might decide
+    // that it's time to check our ships against the server and find that a ship
+    // has arrived before we got a chance to update it here.
+    ship.nav.status = ShipNavStatus.IN_ORBIT;
   }
   final state = await behaviorManager.getBehavior(ship);
   final destinationSymbol = state.destination;

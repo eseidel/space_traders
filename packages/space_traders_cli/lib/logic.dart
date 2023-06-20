@@ -158,15 +158,18 @@ Future<void> logic(
     // earliestWaitUntil can be past if an earlier ship needed to wait
     // but then later ships took longer than that wait time to process.
     if (earliestWaitUntil != null &&
-        earliestWaitUntil.isAfter(DateTime.now())) {
+        earliestWaitUntil.isAfter(DateTime.timestamp())) {
       // This future waits until the earliest time we think the server
       // will be ready for us to do something.
-      final waitDuration = earliestWaitUntil.difference(DateTime.now());
+      final waitDuration = earliestWaitUntil.difference(DateTime.timestamp());
       // Extra space after emoji needed for windows powershell.
-      logger.info(
-        '⏱️  ${waitDuration.inSeconds}s until ${earliestWaitUntil.toLocal()}',
+      final time = waitDuration.inSeconds < 1
+          ? '${waitDuration.inMilliseconds}ms'
+          : '${waitDuration.inSeconds}s';
+      logger.info('⏱️  $time until ${earliestWaitUntil.toLocal()}');
+      await Future<void>.delayed(
+        earliestWaitUntil.difference(DateTime.timestamp()),
       );
-      await Future<void>.delayed(earliestWaitUntil.difference(DateTime.now()));
     }
     // Otherwise we just loop again immediately and rely on rate limiting in the
     // API client to prevent us from sending requests too quickly.

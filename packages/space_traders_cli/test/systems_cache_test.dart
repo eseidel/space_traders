@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('systemSymbolsInJumpRadius depth', () async {
-    final expectedSystems = ['A', 'B', 'C', 'D', 'E'];
+    final expectedSystems = ['S-A', 'S-B', 'S-C', 'S-D', 'S-E'];
     const jumpDistance = 200;
     var i = 0;
     final inputSystems = [
@@ -18,7 +18,7 @@ void main() {
           y: 0,
           waypoints: [
             SystemWaypoint(
-              symbol: 'S-$system-J',
+              symbol: '$system-J',
               type: WaypointType.JUMP_GATE,
               x: 0,
               y: 0,
@@ -31,7 +31,7 @@ void main() {
     final systemsCache = SystemsCache(systems: inputSystems, fs: fs);
     final systems = await systemsCache
         .systemSymbolsInJumpRadius(
-          startSystem: 'A',
+          startSystem: 'S-A',
           maxJumps: 5,
         )
         .toList();

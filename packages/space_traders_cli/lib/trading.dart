@@ -486,10 +486,9 @@ Future<CostedDeal?> findDealFor(
   required int maxOutlay,
   required int availableSpace,
 }) async {
-  final start = ship.nav.waypointSymbol;
   final markets = await systemsCache
       .systemSymbolsInJumpRadius(
-        startSystem: start,
+        startSystem: ship.nav.systemSymbol,
         maxJumps: maxJumps,
       )
       .asyncExpand(

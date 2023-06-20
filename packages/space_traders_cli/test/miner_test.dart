@@ -184,7 +184,9 @@ void main() {
     final shipNav = MockShipNav();
     final shipNavRoute = MockShipNavRoute();
 
-    final arrivalTime = DateTime.timestamp();
+    final now = DateTime(2021);
+    final arrivalTime = now.add(const Duration(seconds: 1));
+    DateTime getNow() => now;
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
@@ -207,9 +209,10 @@ void main() {
         transactionLog,
         behaviorManager,
         surveyData,
+        getNow: getNow,
       ),
     );
     expect(waitUntil, arrivalTime);
-    verify(() => logger.info('🛸#S  ✈️  to W, 00:00:00 left')).called(1);
+    verify(() => logger.info('🛸#S  ✈️  to W, 00:00:01 left')).called(1);
   });
 }

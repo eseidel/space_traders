@@ -135,6 +135,7 @@ Automation:
 * Have a config language to explain what the ships should be doing.
 * Need to store handle and email somewhere.
 * Need logic for planning which faction to be (random)?
+* Ensure we don't join a faction which is not connected to others.
 * Logic for planning what to do with money (e.g. buy ships, by mods)
   Should disable buying behavior for less time early on?
 * When to enable which behaviors?

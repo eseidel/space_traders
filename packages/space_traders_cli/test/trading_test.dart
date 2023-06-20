@@ -1,16 +1,27 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/trading.dart';
 import 'package:test/test.dart';
 
-import 'waypoints_cache_test.dart';
+class MockLogger extends Mock implements Logger {}
+
+class MockShipNav extends Mock implements ShipNav {}
+
+class MockApi extends Mock implements Api {}
+
+class MockSystemsCache extends Mock implements SystemsCache {}
+
+class MockMarketCache extends Mock implements MarketCache {}
 
 class MockWaypointCache extends Mock implements WaypointCache {}
 
 class MockPriceData extends Mock implements PriceData {}
+
+class MockShip extends Mock implements Ship {}
 
 void main() {
   test('DealFinder empty', () {
@@ -219,5 +230,38 @@ void main() {
       describeCostedDeal(costed),
       'FUEL                       A       1c -> B       2c $profit 1s 0c/s 2c',
     );
+  });
+
+  test('findDealFor smoketest', () async {
+    final priceData = MockPriceData();
+    final systemsCache = MockSystemsCache();
+    final waypointCache = MockWaypointCache();
+    final marketCache = MockMarketCache();
+    final ship = MockShip();
+    final shipNav = MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(
+      () => systemsCache.systemSymbolsInJumpRadius(
+        startSystem: 'S-A',
+        maxJumps: 1,
+      ),
+    ).thenAnswer((invocation) => Stream.fromIterable([]));
+    final logger = MockLogger();
+
+    final costed = await runWithLogger(
+      logger,
+      () => findDealFor(
+        priceData,
+        systemsCache,
+        waypointCache,
+        marketCache,
+        ship,
+        maxJumps: 1,
+        maxOutlay: 100,
+        availableSpace: 10,
+      ),
+    );
+    expect(costed, isNull);
   });
 }

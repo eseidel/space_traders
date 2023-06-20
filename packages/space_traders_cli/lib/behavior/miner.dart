@@ -379,13 +379,15 @@ Future<DateTime?> advanceMiner(
   MarketCache marketCache,
   TransactionLog transactionLog,
   BehaviorManager behaviorManager,
-  SurveyData surveyData,
-) async {
+  SurveyData surveyData, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
     systemsCache,
     behaviorManager,
+    getNow: getNow,
   );
   if (navResult.shouldReturn()) {
     return navResult.waitTime;

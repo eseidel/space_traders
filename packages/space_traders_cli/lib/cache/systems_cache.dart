@@ -155,6 +155,7 @@ class SystemsCache {
     required String startSystem,
     required int maxJumps,
   }) async* {
+    assertIsSystemSymbol(startSystem);
     var jumpsLeft = maxJumps;
     final currentSystemsToJumpFrom = <String>{startSystem};
     final oneJumpFurther = <String>{};

@@ -19,7 +19,7 @@ bool _shipListsMatch(List<Ship> actual, List<Ship> expected) {
       jsonEncode(expected[i].toJson()),
     );
     if (diff != null) {
-      logger.info('Ship list differs at index $i: $diff');
+      logger.info('Ship list differs at index $i: ${diff.which}');
       return false;
     }
   }
@@ -52,6 +52,12 @@ class ShipCache {
     }
     final newShips = await allMyShips(api).toList();
     _requestsSinceLastCheck = 0;
+    // This check races with the code in continueNavigationIfNeeded which
+    // knows how to update the ShipNavStatus from IN_TRANSIT to IN_ORBIT when
+    // a ship has arrived.  We could add some special logic here to ignore
+    // that false positive.  This check is called at the top of every loop
+    // and might notice that a ship has arrived before the ship logic gets
+    // to run and update the status.
     if (_shipListsMatch(ships, newShips)) {
       return;
     }

@@ -38,6 +38,22 @@ class Api {
   final FactionsApi factions;
 }
 
+/// Asserts that the given system symbol is valid.
+void assertIsSystemSymbol(String systemSymbol) {
+  assert(
+    systemSymbol.split('-').length == 2,
+    '$systemSymbol is not a valid system symbol',
+  );
+}
+
+/// Asserts that the given waypoint symbol is valid.
+void assertIsWaypointSymbol(String waypointSymbol) {
+  assert(
+    waypointSymbol.split('-').length == 3,
+    '$waypointSymbol is not a valid waypoint symbol',
+  );
+}
+
 /// parseWaypointString parses a waypoint string into its component parts.
 ({String sector, String system, String waypoint}) parseWaypointString(
   String waypointSymbol,

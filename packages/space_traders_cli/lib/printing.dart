@@ -6,6 +6,10 @@ import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 
+/// The default implementation of getNow for production.
+/// Used for tests for overriding the current time.
+DateTime defaultGetNow() => DateTime.timestamp();
+
 /// Return a string describing the given [waypoint].
 String waypointDescription(Waypoint waypoint) {
   final chartedString = waypoint.chart != null ? '' : 'uncharted - ';
@@ -164,14 +168,19 @@ String durationString(Duration duration) {
 }
 
 /// Logs the remaining transit time for [ship] and returns the arrival time.
-DateTime logRemainingTransitTime(Ship ship) {
-  final flightTime = ship.nav.route.arrival.difference(DateTime.now());
+DateTime logRemainingTransitTime(
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
+  final arrival = ship.nav.route.arrival;
+  final now = getNow();
+  final flightTime = arrival.difference(now);
   shipInfo(
     ship,
-    // Extra space is needed for windows powershell.
+    // Extra space after emoji is needed for windows powershell.
     '✈️  to ${ship.nav.waypointSymbol}, ${durationString(flightTime)} left',
   );
-  return ship.nav.route.arrival;
+  return arrival;
 }
 
 /// Choose a ship from a list of ships
