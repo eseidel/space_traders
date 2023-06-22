@@ -45,7 +45,10 @@ Behavior _behaviorFor(
     ],
     // Can't have more than one contract trader on small/expensive contracts
     // or we'll overbuy.
-    ShipRole.HAULER: [Behavior.contractTrader],
+    ShipRole.HAULER: [
+      Behavior.contractTrader,
+      Behavior.arbitrageTrader,
+    ],
     ShipRole.EXCAVATOR: [Behavior.miner],
     ShipRole.SATELLITE: [Behavior.explorer],
   }[ship.registration.role];

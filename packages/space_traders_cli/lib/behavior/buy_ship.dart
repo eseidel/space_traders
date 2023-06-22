@@ -98,6 +98,18 @@ Future<Waypoint?> _nearbyShipyardWithBestPrice(
   return bestWaypoint;
 }
 
+int _countOfTypeInFleet(ShipCache shipCache, ShipType shipType) {
+  final frameForType = {
+    ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
+    ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
+    ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
+  }[shipType];
+  if (frameForType == null) {
+    return 0;
+  }
+  return shipCache.frameCounts[frameForType] ?? 0;
+}
+
 /// Apply the buy ship behavior.
 Future<DateTime?> advanceBuyShip(
   Api api,
@@ -129,6 +141,21 @@ Future<DateTime?> advanceBuyShip(
   // final shipType =
   //     shipCache.ships.length.isEven ? ShipType.ORE_HOUND : ShipType.PROBE;
   const shipType = ShipType.ORE_HOUND;
+  final targetCounts = {
+    ShipType.ORE_HOUND: 30,
+    ShipType.PROBE: 10,
+    ShipType.LIGHT_HAULER: 5,
+  };
+  final currentCount = _countOfTypeInFleet(shipCache, shipType);
+  if (currentCount >= targetCounts[shipType]!) {
+    shipWarn(
+      ship,
+      'Failed to buy ship, already have $currentCount $shipType, '
+      'disabling behavior.',
+    );
+    await behaviorManager.disableBehavior(ship, Behavior.buyShip);
+    return null;
+  }
 
   // Get our median price before updating shipyard prices.
   final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
