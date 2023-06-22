@@ -162,11 +162,11 @@ Future<void> logic(
       // This future waits until the earliest time we think the server
       // will be ready for us to do something.
       final waitDuration = earliestWaitUntil.difference(DateTime.timestamp());
-      // Extra space after emoji needed for windows powershell.
-      final time = waitDuration.inSeconds < 1
-          ? '${waitDuration.inMilliseconds}ms'
-          : '${waitDuration.inSeconds}s';
-      logger.info('⏱️  $time until ${earliestWaitUntil.toLocal()}');
+      if (waitDuration.inSeconds > 5) {
+        // Extra space after emoji needed for windows powershell.
+        final wait = approximateDuration(waitDuration);
+        logger.info('⏱️  $wait until ${earliestWaitUntil.toLocal()}');
+      }
       await Future<void>.delayed(
         earliestWaitUntil.difference(DateTime.timestamp()),
       );
