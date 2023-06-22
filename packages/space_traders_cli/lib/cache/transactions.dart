@@ -1,11 +1,13 @@
 import 'package:file/file.dart';
+import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/json_log.dart';
 
 /// A class to hold transaction data from a ship.
+@immutable
 class Transaction {
   /// Create a new transaction.
-  Transaction({
+  const Transaction({
     required this.shipSymbol,
     required this.waypointSymbol,
     required this.tradeSymbol,
@@ -80,7 +82,7 @@ class Transaction {
   final int quantity;
 
   /// Type of transaction.
-  MarketTransactionTypeEnum tradeType;
+  final MarketTransactionTypeEnum tradeType;
 
   /// Per-unit price of the transaction.
   final int perUnitPrice;
@@ -113,6 +115,31 @@ class Transaction {
       'agentCredits': agentCredits,
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Transaction &&
+          runtimeType == other.runtimeType &&
+          shipSymbol == other.shipSymbol &&
+          waypointSymbol == other.waypointSymbol &&
+          tradeSymbol == other.tradeSymbol &&
+          quantity == other.quantity &&
+          tradeType == other.tradeType &&
+          perUnitPrice == other.perUnitPrice &&
+          timestamp == other.timestamp &&
+          agentCredits == other.agentCredits;
+
+  @override
+  int get hashCode =>
+      shipSymbol.hashCode ^
+      waypointSymbol.hashCode ^
+      tradeSymbol.hashCode ^
+      quantity.hashCode ^
+      tradeType.hashCode ^
+      perUnitPrice.hashCode ^
+      timestamp.hashCode ^
+      agentCredits.hashCode;
 }
 
 /// A class to manage a transaction log file.
