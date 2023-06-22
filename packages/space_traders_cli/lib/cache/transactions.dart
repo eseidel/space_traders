@@ -91,6 +91,15 @@ class Transaction {
   /// Credits of the agent after the transaction.
   final int agentCredits;
 
+  /// The change in credits from this transaction.
+  int get creditChange {
+    if (tradeType == MarketTransactionTypeEnum.PURCHASE) {
+      return -perUnitPrice * quantity;
+    } else {
+      return perUnitPrice * quantity;
+    }
+  }
+
   /// Convert the transaction to json.
   Map<String, dynamic> toJson() {
     return {
@@ -121,5 +130,10 @@ class TransactionLog extends JsonLog<Transaction> {
     final entries =
         await JsonLog.load<Transaction>(fs, filePath, Transaction.fromJson);
     return TransactionLog(entries, fs: fs, path: filePath);
+  }
+
+  /// Return all the ship symbols in the transaction log.
+  Set<String> get shipSymbols {
+    return entries.map((e) => e.shipSymbol).toSet();
   }
 }

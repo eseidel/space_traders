@@ -109,6 +109,10 @@ Exploring:
   pull from that queue?
 * Explorers should explore an entire system and then go to the jumpgate
   and then from the jump gate plan their next system.
+* Probes should go sit at shipyards and marketplaces when there is nothing
+  to explore.
+* Buy an Explorer and teach it how to warp to other systems and other
+  jump gate clusters.
 
 Tech Debt:
 * Build a docker container and run the app in the cloud.  With a docker volume
@@ -126,6 +130,7 @@ Efficiency:
   of API calls and not fetched after every ship.
 * Write a better rate-limiting model.
 * Teach RateLimiter to print out requests per minute every minute.
+* Teach arbitrage trader how to buy multiple times up to the max cargo hold.
 
 Automation:
 * Automate resets
@@ -140,6 +145,7 @@ Automation:
   Should disable buying behavior for less time early on?
 * When to enable which behaviors?
 * Surveys.  How much surveying should we do before we start mining?
+* Need the ability to disable behaviors on a per-ship-level.
 
 UI:
 * Make shipInfo include an emoji for the behavior.

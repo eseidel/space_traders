@@ -1,12 +1,13 @@
 import 'dart:math';
 
 import 'package:file/local.dart';
+import 'package:scoped/scoped.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
 
-void main(List<String> args) async {
+Future<void> cliMain() async {
   const fs = LocalFileSystem();
   final shipyardPrices = await ShipyardPrices.load(fs);
 
@@ -28,4 +29,8 @@ void main(List<String> args) async {
     final name = shipType.value.substring('SHIP_'.length);
     logger.info('${name.padRight(maxNameLength)} $priceString');
   }
+}
+
+void main(List<String> args) async {
+  await runScoped(cliMain, values: {loggerRef});
 }
