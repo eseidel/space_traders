@@ -6,19 +6,19 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:test/test.dart';
 
-import '../behavior/advance_test.dart';
+class MockAgent extends Mock implements Agent {}
 
 class MockApi extends Mock implements Api {}
 
 class MockFleetApi extends Mock implements FleetApi {}
 
-class MockAgent extends Mock implements Agent {}
+class MockLogger extends Mock implements Logger {}
 
 class MockShip extends Mock implements Ship {}
 
-class MockShipyardTransaction extends Mock implements ShipyardTransaction {}
-
 class MockShipNav extends Mock implements ShipNav {}
+
+class MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 void main() {
   test('purchaseShip', () async {

@@ -83,19 +83,6 @@ Future<void> advanceShips(
   }
 }
 
-/// Returns true if we should purchase a new ship.
-/// Currently just returns true if we have no mining ships.
-bool shouldPurchaseMiner(Agent myAgent, List<Ship> ships) {
-  // If we have no mining ships, purchase one.
-  if (ships.every((s) => !s.isExcavator)) {
-    return true;
-  }
-  // This should be dynamic based on market prices?
-  // Risk is that it will try to purchase and fail (causing an exception).
-  return false;
-  // return myAgent.credits > 140000;
-}
-
 /// Run the logic loop forever.
 Future<void> logic(
   Api api,
