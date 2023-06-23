@@ -1,10 +1,7 @@
 import 'package:file/memory.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
 import 'package:test/test.dart';
-
-class MockShip extends Mock implements Ship {}
 
 void main() {
   test('HistoricalSurvey roundtrip', () {

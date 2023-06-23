@@ -7,32 +7,30 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/trading.dart';
 import 'package:test/test.dart';
 
-class MockLogger extends Mock implements Logger {}
+class _MockLogger extends Mock implements Logger {}
 
-class MockShipNav extends Mock implements ShipNav {}
+class _MockShipNav extends Mock implements ShipNav {}
 
-class MockApi extends Mock implements Api {}
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class MockSystemsCache extends Mock implements SystemsCache {}
+class _MockMarketCache extends Mock implements MarketCache {}
 
-class MockMarketCache extends Mock implements MarketCache {}
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class MockWaypointCache extends Mock implements WaypointCache {}
+class _MockPriceData extends Mock implements PriceData {}
 
-class MockPriceData extends Mock implements PriceData {}
-
-class MockShip extends Mock implements Ship {}
+class _MockShip extends Mock implements Ship {}
 
 void main() {
   test('DealFinder empty', () {
-    final priceData = MockPriceData();
+    final priceData = _MockPriceData();
     final finder = DealFinder(priceData);
     final deals = finder.findDeals();
     expect(deals, isEmpty);
   });
 
   test('DealFinder single deal', () {
-    final priceData = MockPriceData();
+    final priceData = _MockPriceData();
     final tradeGood =
         TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
     final finder = DealFinder(priceData)
@@ -71,20 +69,20 @@ void main() {
   });
 
   test('estimateSellPrice null', () {
-    final priceData = MockPriceData();
+    final priceData = _MockPriceData();
     final estimate = estimateSellPrice(priceData, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
   });
 
   test('estimatePurchasePrice null', () {
-    final priceData = MockPriceData();
+    final priceData = _MockPriceData();
     final estimate =
         estimatePurchasePrice(priceData, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
   });
 
   test('estimatePrice fresh', () {
-    final priceData = MockPriceData();
+    final priceData = _MockPriceData();
     final market = Market(
       symbol: 'A',
       tradeGoods: [
@@ -153,7 +151,7 @@ void main() {
   });
 
   test('costOutDeal basic', () {
-    final systemsCache = MockSystemsCache();
+    final systemsCache = _MockSystemsCache();
     when(() => systemsCache.waypointFromSymbol('X-S-A')).thenReturn(
       SystemWaypoint(
         symbol: 'X-S-A',
@@ -233,12 +231,12 @@ void main() {
   });
 
   test('findDealFor smoketest', () async {
-    final priceData = MockPriceData();
-    final systemsCache = MockSystemsCache();
-    final waypointCache = MockWaypointCache();
-    final marketCache = MockMarketCache();
-    final ship = MockShip();
-    final shipNav = MockShipNav();
+    final priceData = _MockPriceData();
+    final systemsCache = _MockSystemsCache();
+    final waypointCache = _MockWaypointCache();
+    final marketCache = _MockMarketCache();
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.systemSymbol).thenReturn('S-A');
     when(
@@ -247,7 +245,7 @@ void main() {
         maxJumps: 1,
       ),
     ).thenAnswer((invocation) => Stream.fromIterable([]));
-    final logger = MockLogger();
+    final logger = _MockLogger();
 
     final costed = await runWithLogger(
       logger,

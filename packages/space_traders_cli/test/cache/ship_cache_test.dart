@@ -3,22 +3,22 @@ import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:test/test.dart';
 
-class MockShip extends Mock implements Ship {}
+class _MockShip extends Mock implements Ship {}
 
-class MockShipFrame extends Mock implements ShipFrame {}
+class _MockShipFrame extends Mock implements ShipFrame {}
 
 void main() {
   test('frameCounts', () {
-    final one = MockShip();
-    final oneFrame = MockShipFrame();
+    final one = _MockShip();
+    final oneFrame = _MockShipFrame();
     when(() => one.frame).thenReturn(oneFrame);
     when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
-    final two = MockShip();
-    final twoFrame = MockShipFrame();
+    final two = _MockShip();
+    final twoFrame = _MockShipFrame();
     when(() => two.frame).thenReturn(twoFrame);
     when(() => twoFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
-    final three = MockShip();
-    final threeFrame = MockShipFrame();
+    final three = _MockShip();
+    final threeFrame = _MockShipFrame();
     when(() => three.frame).thenReturn(threeFrame);
     when(() => threeFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
     final shipCache = ShipCache([one, two, three]);
@@ -29,20 +29,20 @@ void main() {
   });
 
   test('describeFleet', () {
-    final one = MockShip();
-    final oneFrame = MockShipFrame();
+    final one = _MockShip();
+    final oneFrame = _MockShipFrame();
     when(() => one.frame).thenReturn(oneFrame);
     when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
-    final two = MockShip();
-    final twoFrame = MockShipFrame();
+    final two = _MockShip();
+    final twoFrame = _MockShipFrame();
     when(() => two.frame).thenReturn(twoFrame);
     when(() => twoFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
-    final three = MockShip();
-    final threeFrame = MockShipFrame();
+    final three = _MockShip();
+    final threeFrame = _MockShipFrame();
     when(() => three.frame).thenReturn(threeFrame);
     when(() => threeFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
-    final four = MockShip();
-    final fourFrame = MockShipFrame();
+    final four = _MockShip();
+    final fourFrame = _MockShipFrame();
     when(() => four.frame).thenReturn(fourFrame);
     when(() => fourFrame.symbol)
         .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);

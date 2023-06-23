@@ -5,7 +5,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/rate_limit.dart';
 import 'package:test/test.dart';
 
-class MockLogger extends Mock implements Logger {}
+class _MockLogger extends Mock implements Logger {}
 
 void main() {
   test('handleUnexpectedRateLimit', () async {
@@ -18,7 +18,7 @@ void main() {
       return Response('ok', 200);
     }
 
-    final logger = MockLogger();
+    final logger = _MockLogger();
     final response = await runWithLogger(
       logger,
       () => RateLimitedApiClient.handleUnexpectedRateLimit(

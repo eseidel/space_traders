@@ -6,28 +6,28 @@ import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
-class MockApi extends Mock implements Api {}
+class _MockApi extends Mock implements Api {}
 
-class MockShip extends Mock implements Ship {}
+class _MockShip extends Mock implements Ship {}
 
-class MockSystemsCache extends Mock implements SystemsCache {}
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class MockBehaviorManager extends Mock implements BehaviorManager {}
+class _MockBehaviorManager extends Mock implements BehaviorManager {}
 
-class MockLogger extends Mock implements Logger {}
+class _MockLogger extends Mock implements Logger {}
 
-class MockShipNav extends Mock implements ShipNav {}
+class _MockShipNav extends Mock implements ShipNav {}
 
-class MockShipNavRoute extends Mock implements ShipNavRoute {}
+class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
-    final api = MockApi();
-    final ship = MockShip();
-    final systemsCache = MockSystemsCache();
-    final behaviorManager = MockBehaviorManager();
-    final shipNav = MockShipNav();
-    final shipNavRoute = MockShipNavRoute();
+    final api = _MockApi();
+    final ship = _MockShip();
+    final systemsCache = _MockSystemsCache();
+    final behaviorManager = _MockBehaviorManager();
+    final shipNav = _MockShipNav();
+    final shipNavRoute = _MockShipNavRoute();
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
 
@@ -37,7 +37,7 @@ void main() {
 
     final now = DateTime(2021);
     DateTime getNow() => now;
-    final logger = MockLogger();
+    final logger = _MockLogger();
     // The case when the arrival time is in the past.
     final before = now.subtract(const Duration(milliseconds: 1));
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);

@@ -4,16 +4,16 @@ import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:test/test.dart';
 
-class MockSystemsCache extends Mock implements SystemsCache {}
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class MockApi extends Mock implements Api {}
+class _MockApi extends Mock implements Api {}
 
-class MockSystemsApi extends Mock implements SystemsApi {}
+class _MockSystemsApi extends Mock implements SystemsApi {}
 
 void main() {
   test('WaypointCache.waypoint', () async {
-    final api = MockApi();
-    final SystemsApi systemsApi = MockSystemsApi();
+    final api = _MockApi();
+    final SystemsApi systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
     final expectedWaypoint = Waypoint(
       symbol: 'S-E-A',
@@ -34,7 +34,7 @@ void main() {
         meta: Meta(total: 1),
       );
     });
-    final systemsCache = MockSystemsCache();
+    final systemsCache = _MockSystemsCache();
     final waypointCache = WaypointCache(api, systemsCache);
     expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);
     // Call it twice, it should cache.
@@ -97,7 +97,7 @@ void main() {
   //   final systemsCache =
   //       SystemsCache(systems: [aSystem, bSystem],
   //        fs: MemoryFileSystem.test());
-  //   final api = MockApi();
+  //   final api = _MockApi();
   //   final waypointCache = WaypointCache(api, systemsCache);
   //   final waypoints = await waypointCache
   //       .waypointsInJumpRadius(

@@ -6,34 +6,34 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:test/test.dart';
 
-class MockAgent extends Mock implements Agent {}
+class _MockAgent extends Mock implements Agent {}
 
-class MockApi extends Mock implements Api {}
+class _MockApi extends Mock implements Api {}
 
-class MockFleetApi extends Mock implements FleetApi {}
+class _MockFleetApi extends Mock implements FleetApi {}
 
-class MockLogger extends Mock implements Logger {}
+class _MockLogger extends Mock implements Logger {}
 
-class MockShip extends Mock implements Ship {}
+class _MockShip extends Mock implements Ship {}
 
-class MockShipNav extends Mock implements ShipNav {}
+class _MockShipNav extends Mock implements ShipNav {}
 
-class MockShipyardTransaction extends Mock implements ShipyardTransaction {}
+class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 void main() {
   test('purchaseShip', () async {
-    final Api api = MockApi();
-    final FleetApi fleetApi = MockFleetApi();
+    final Api api = _MockApi();
+    final FleetApi fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
 
     final shipCache = ShipCache([]);
-    final agent1 = MockAgent();
-    final agent2 = MockAgent();
+    final agent1 = _MockAgent();
+    final agent2 = _MockAgent();
 
     final responseData = PurchaseShip201ResponseData(
       agent: agent2,
-      ship: MockShip(),
-      transaction: MockShipyardTransaction(),
+      ship: _MockShip(),
+      transaction: _MockShipyardTransaction(),
     );
 
     when(
@@ -59,11 +59,11 @@ void main() {
   });
 
   test('setShipFlightMode', () async {
-    final Api api = MockApi();
-    final FleetApi fleetApi = MockFleetApi();
+    final Api api = _MockApi();
+    final FleetApi fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    final shipNav = MockShipNav();
-    final ship = MockShip();
+    final shipNav = _MockShipNav();
+    final ship = _MockShip();
     when(() => ship.symbol).thenReturn('SY');
     when(
       () => fleetApi.patchShipNav(
@@ -79,23 +79,23 @@ void main() {
   });
 
   test('undockIfNeeded', () async {
-    final api = MockApi();
-    final fleetApi = MockFleetApi();
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.orbitShip(any())).thenAnswer(
       (invocation) => Future.value(
         OrbitShip200Response(
-          data: OrbitShip200ResponseData(nav: MockShipNav()),
+          data: OrbitShip200ResponseData(nav: _MockShipNav()),
         ),
       ),
     );
-    final ship = MockShip();
+    final ship = _MockShip();
     when(() => ship.emojiName).thenReturn('S');
-    final shipNav = MockShipNav();
+    final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('A');
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    final logger = MockLogger();
+    final logger = _MockLogger();
     await runWithLogger(logger, () => undockIfNeeded(api, ship));
     verifyNever(() => fleetApi.orbitShip(any()));
 
@@ -105,23 +105,23 @@ void main() {
   });
 
   test('dockIfNeeded', () async {
-    final api = MockApi();
-    final fleetApi = MockFleetApi();
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.dockShip(any())).thenAnswer(
       (invocation) => Future.value(
         DockShip200Response(
-          data: OrbitShip200ResponseData(nav: MockShipNav()),
+          data: OrbitShip200ResponseData(nav: _MockShipNav()),
         ),
       ),
     );
-    final ship = MockShip();
+    final ship = _MockShip();
     when(() => ship.emojiName).thenReturn('S');
-    final shipNav = MockShipNav();
+    final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('A');
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    final logger = MockLogger();
+    final logger = _MockLogger();
     await runWithLogger(logger, () => dockIfNeeded(api, ship));
     verifyNever(() => fleetApi.dockShip(any()));
 

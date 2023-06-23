@@ -3,12 +3,12 @@ import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 import 'package:test/test.dart';
 
-class MockShip extends Mock implements Ship {}
+class _MockShip extends Mock implements Ship {}
 
 void main() {
   test('ShipWaiter', () {
     final waiter = ShipWaiter();
-    final a = MockShip();
+    final a = _MockShip();
     when(() => a.symbol).thenReturn('a');
     final aTime = DateTime.now();
     waiter.updateWaitUntil('a', aTime);

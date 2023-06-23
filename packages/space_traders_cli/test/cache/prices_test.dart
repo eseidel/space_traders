@@ -5,7 +5,7 @@ import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
-class MockLogger extends Mock implements Logger {}
+class _MockLogger extends Mock implements Logger {}
 
 // Creates a fake price with good defaults.
 MarketPrice makePrice({
@@ -58,7 +58,7 @@ void main() {
       symbol: 'c',
       timestamp: DateTime.now().add(const Duration(days: 1)),
     );
-    final logger = MockLogger();
+    final logger = _MockLogger();
     await runWithLogger(logger, () => priceData.addPrices([c]));
     expect(priceData.count, 2);
     expect(priceData.waypointCount, 2);
