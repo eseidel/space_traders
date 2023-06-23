@@ -6,7 +6,6 @@ import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/surveys.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
@@ -123,14 +122,15 @@ Future<DateTime?> advanceBuyShip(
   WaypointCache waypointCache,
   MarketCache marketCache,
   TransactionLog transactionLog,
-  BehaviorManager behaviorManager,
-  SurveyData surveyData,
-) async {
+  BehaviorManager behaviorManager, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
     systemsCache,
     behaviorManager,
+    getNow: getNow,
   );
   if (navResult.shouldReturn()) {
     return navResult.waitTime;

@@ -102,7 +102,6 @@ Future<DateTime?> advanceShipBehavior(
         ctx.marketCache,
         ctx.transactions,
         ctx.behaviorManager,
-        ctx.surveyData,
       );
     case Behavior.contractTrader:
       return advanceContractTrader(
