@@ -2,8 +2,11 @@ import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
+import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:test/test.dart';
+
+import 'advance_test.dart';
 
 class MockApi extends Mock implements Api {}
 
@@ -73,5 +76,57 @@ void main() {
 
     await setShipFlightMode(api, ship, ShipNavFlightMode.CRUISE);
     verify(() => ship.nav = shipNav).called(1);
+  });
+
+  test('undockIfNeeded', () async {
+    final api = MockApi();
+    final fleetApi = MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    when(() => fleetApi.orbitShip(any())).thenAnswer(
+      (invocation) => Future.value(
+        OrbitShip200Response(
+          data: OrbitShip200ResponseData(nav: MockShipNav()),
+        ),
+      ),
+    );
+    final ship = MockShip();
+    when(() => ship.emojiName).thenReturn('S');
+    final shipNav = MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn('A');
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    final logger = MockLogger();
+    await runWithLogger(logger, () => undockIfNeeded(api, ship));
+    verifyNever(() => fleetApi.orbitShip(any()));
+
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    await runWithLogger(logger, () => undockIfNeeded(api, ship));
+    verify(() => fleetApi.orbitShip(any())).called(1);
+  });
+
+  test('dockIfNeeded', () async {
+    final api = MockApi();
+    final fleetApi = MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    when(() => fleetApi.dockShip(any())).thenAnswer(
+      (invocation) => Future.value(
+        DockShip200Response(
+          data: OrbitShip200ResponseData(nav: MockShipNav()),
+        ),
+      ),
+    );
+    final ship = MockShip();
+    when(() => ship.emojiName).thenReturn('S');
+    final shipNav = MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn('A');
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    final logger = MockLogger();
+    await runWithLogger(logger, () => dockIfNeeded(api, ship));
+    verifyNever(() => fleetApi.dockShip(any()));
+
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    await runWithLogger(logger, () => dockIfNeeded(api, ship));
+    verify(() => fleetApi.dockShip(any())).called(1);
   });
 }

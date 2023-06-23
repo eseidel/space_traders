@@ -172,7 +172,7 @@ Future<DateTime?> advanceBuyShip(
   if (credits < maxPrice) {
     shipWarn(
       ship,
-      'Cant by ship, credits $credits < max price $maxPrice, '
+      'Cant by $shipType, credits $credits < max price $maxPrice, '
       'disabling behavior.',
     );
     await behaviorManager.disableBehavior(ship, Behavior.buyShip);
@@ -194,7 +194,7 @@ Future<DateTime?> advanceBuyShip(
     if (recentPrice > maxPrice) {
       shipWarn(
         ship,
-        'Failed to buy ship, $recentPriceString > max price $maxPrice '
+        'Failed to buy $shipType, $recentPriceString > max price $maxPrice '
         'disabling behavior for 30m.',
       );
       await behaviorManager.disableBehavior(

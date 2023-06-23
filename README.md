@@ -146,6 +146,7 @@ Automation:
 * When to enable which behaviors?
 * Surveys.  How much surveying should we do before we start mining?
 * Need the ability to disable behaviors on a per-ship-level.
+* Add expoential back-off for 429s?  Not sure why they're getting through.
 
 UI:
 * Make shipInfo include an emoji for the behavior.
