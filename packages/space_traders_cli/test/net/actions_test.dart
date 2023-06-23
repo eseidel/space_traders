@@ -6,7 +6,7 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:test/test.dart';
 
-import 'advance_test.dart';
+import '../behavior/advance_test.dart';
 
 class MockApi extends Mock implements Api {}
 

@@ -1,10 +1,11 @@
 import 'package:file/memory.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/prices.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
-import 'advance_test.dart';
+class MockLogger extends Mock implements Logger {}
 
 // Creates a fake price with good defaults.
 MarketPrice makePrice({
