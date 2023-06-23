@@ -125,16 +125,7 @@ Future<DateTime?> advanceBuyShip(
   BehaviorManager behaviorManager, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final navResult = await continueNavigationIfNeeded(
-    api,
-    ship,
-    systemsCache,
-    behaviorManager,
-    getNow: getNow,
-  );
-  if (navResult.shouldReturn()) {
-    return navResult.waitTime;
-  }
+  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
 
   // This is a hack for now, we need real planning.

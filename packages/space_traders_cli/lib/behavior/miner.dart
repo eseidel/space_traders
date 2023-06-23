@@ -273,6 +273,7 @@ Future<Survey?> surveyWorthMining(
   required String nearbyMarketSymbol,
   int minimumSurveys = 10,
   double percentileThreshold = 0.9,
+  DateTime Function() getNow = defaultGetNow,
 }) async {
   // Get N recent surveys for this waypoint, including expired and exhausted.
   final recentSurveys = surveyData.recentSurveysAtWaypoint(
@@ -287,7 +288,7 @@ Future<Survey?> surveyWorthMining(
   // Note: this will fail if the passed market doesn't sell everything.
   // Use one minute from now as our expiration time to avoid surveys
   // expiring between when we compute the best survey and when we mine.
-  final oneMinuteFromNow = DateTime.timestamp().add(const Duration(minutes: 1));
+  final oneMinuteFromNow = getNow().add(const Duration(minutes: 1));
   final valuedSurveys = recentSurveys.map((s) {
     return _ValuedSurvey(
       expectedValue: expectedValueFromSurvey(
@@ -382,16 +383,8 @@ Future<DateTime?> advanceMiner(
   SurveyData surveyData, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final navResult = await continueNavigationIfNeeded(
-    api,
-    ship,
-    systemsCache,
-    behaviorManager,
-    getNow: getNow,
-  );
-  if (navResult.shouldReturn()) {
-    return navResult.waitTime;
-  }
+  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
+
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
 
   // It's not worth potentially waiting a minute just to get a few pieces
@@ -539,7 +532,7 @@ Future<DateTime?> advanceMiner(
       final response = outer!.data;
       // shipDetail(ship, '🔭 ${ship.nav.waypointSymbol}');
       // Record survey.
-      await surveyData.recordSurveys(response.surveys);
+      await surveyData.recordSurveys(response.surveys, getNow: getNow);
       // Wait for cooldown.
       return response.cooldown.expiration;
     } on ApiException catch (e) {

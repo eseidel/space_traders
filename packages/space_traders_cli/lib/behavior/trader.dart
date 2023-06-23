@@ -136,15 +136,7 @@ Future<DateTime?> advanceArbitrageTrader(
   TransactionLog transactionLog,
   BehaviorManager behaviorManager,
 ) async {
-  final navResult = await continueNavigationIfNeeded(
-    api,
-    ship,
-    systemsCache,
-    behaviorManager,
-  );
-  if (navResult.shouldReturn()) {
-    return navResult.waitTime;
-  }
+  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
   Market? currentMarket;

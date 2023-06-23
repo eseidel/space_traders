@@ -4,6 +4,7 @@ import 'package:space_traders_cli/behavior/buy_ship.dart';
 import 'package:space_traders_cli/behavior/contract_trader.dart';
 import 'package:space_traders_cli/behavior/explorer.dart';
 import 'package:space_traders_cli/behavior/miner.dart';
+import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
@@ -15,6 +16,7 @@ import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/printing.dart';
 
 /// The context for a behavior.
 class BehaviorContext {
@@ -83,9 +85,21 @@ class BehaviorContext {
 /// Returns the time at which the behavior should be advanced again
 /// or null if can be advanced immediately.
 Future<DateTime?> advanceShipBehavior(
-  BehaviorContext ctx,
-) async {
+  BehaviorContext ctx, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   final behavior = await ctx.loadBehaviorState();
+  final navResult = await continueNavigationIfNeeded(
+    ctx.api,
+    ctx.ship,
+    ctx.systemsCache,
+    ctx.behaviorManager,
+    getNow: getNow,
+  );
+  if (navResult.shouldReturn()) {
+    return navResult.waitTime;
+  }
+
   // shipDetail(ship, 'Advancing behavior: ${behavior.behavior.name}');
   switch (behavior.behavior) {
     case Behavior.buyShip:

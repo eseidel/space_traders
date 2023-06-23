@@ -12,40 +12,38 @@ import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
-class MockShipNav extends Mock implements ShipNav {}
+class _MockShipNav extends Mock implements ShipNav {}
 
-class MockShipNavRoute extends Mock implements ShipNavRoute {}
+class _MockApi extends Mock implements Api {}
 
-class MockApi extends Mock implements Api {}
+class _MockDataStore extends Mock implements DataStore {}
 
-class MockDataStore extends Mock implements DataStore {}
+class _MockAgentCache extends Mock implements AgentCache {}
 
-class MockAgentCache extends Mock implements AgentCache {}
+class _MockShip extends Mock implements Ship {}
 
-class MockShip extends Mock implements Ship {}
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class MockSystemsCache extends Mock implements SystemsCache {}
+class _MockMarketCache extends Mock implements MarketCache {}
 
-class MockMarketCache extends Mock implements MarketCache {}
+class _MockTransactionLog extends Mock implements TransactionLog {}
 
-class MockTransactionLog extends Mock implements TransactionLog {}
+class _MockBehaviorManager extends Mock implements BehaviorManager {}
 
-class MockBehaviorManager extends Mock implements BehaviorManager {}
+class _MockPriceData extends Mock implements PriceData {}
 
-class MockPriceData extends Mock implements PriceData {}
+class _MockSurveyData extends Mock implements SurveyData {}
 
-class MockSurveyData extends Mock implements SurveyData {}
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class MockWaypointCache extends Mock implements WaypointCache {}
+class _MockWaypoint extends Mock implements Waypoint {}
 
-class MockWaypoint extends Mock implements Waypoint {}
-
-class MockLogger extends Mock implements Logger {}
+class _MockLogger extends Mock implements Logger {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
-    final priceData = MockPriceData();
-    final surveyData = MockSurveyData();
+    final priceData = _MockPriceData();
+    final surveyData = _MockSurveyData();
     when(
       () => surveyData.recentSurveysAtWaypoint(
         count: any(named: 'count'),
@@ -62,9 +60,10 @@ void main() {
   });
 
   test('surveyWorthMining', () async {
-    final priceData = MockPriceData();
-    final surveyData = MockSurveyData();
-    final now = DateTime.timestamp();
+    final priceData = _MockPriceData();
+    final surveyData = _MockSurveyData();
+    final now = DateTime(2021);
+    DateTime getNow() => now;
     final oneHourFromNow = now.add(const Duration(hours: 1));
     final surveys = [
       for (int i = 0; i < 10; i++)
@@ -107,12 +106,13 @@ void main() {
       surveyData,
       surveyWaypointSymbol: 'S-E-A',
       nearbyMarketSymbol: 'S-E-A',
+      getNow: getNow,
     );
     expect(maybeSurvey!.deposits.first.symbol, 'DIAMONDS');
   });
   test('nearestWaypointWithMarket returns start', () async {
-    final waypointCache = MockWaypointCache();
-    final start = MockWaypoint();
+    final waypointCache = _MockWaypointCache();
+    final start = _MockWaypoint();
     when(() => start.traits).thenReturn(
       [
         WaypointTrait(
@@ -127,9 +127,9 @@ void main() {
   });
 
   test('nearestWaypointWithMarket null', () async {
-    final waypointCache = MockWaypointCache();
-    final start = MockWaypoint();
-    final market = MockWaypoint();
+    final waypointCache = _MockWaypointCache();
+    final start = _MockWaypoint();
+    final market = _MockWaypoint();
     when(() => start.traits).thenReturn([]);
     when(() => start.systemSymbol).thenReturn('S-E');
     when(
@@ -144,9 +144,9 @@ void main() {
   });
 
   test('nearestWaypointWithMarket', () async {
-    final waypointCache = MockWaypointCache();
-    final start = MockWaypoint();
-    final market = MockWaypoint();
+    final waypointCache = _MockWaypointCache();
+    final start = _MockWaypoint();
+    final market = _MockWaypoint();
     when(() => start.traits).thenReturn([]);
     when(() => start.systemSymbol).thenReturn('S-E');
     when(
@@ -168,33 +168,63 @@ void main() {
     expect(nearest, market);
   });
 
-  // This is mostly a proof of concept that we can test advance* functions.
-  test('advanceMiner in transit', () async {
-    final api = MockApi();
-    final db = MockDataStore();
-    final priceData = MockPriceData();
-    final agentCache = MockAgentCache();
-    final ship = MockShip();
-    final systemsCache = MockSystemsCache();
-    final waypointCache = MockWaypointCache();
-    final marketCache = MockMarketCache();
-    final transactionLog = MockTransactionLog();
-    final behaviorManager = MockBehaviorManager();
-    final surveyData = MockSurveyData();
-    final shipNav = MockShipNav();
-    final shipNavRoute = MockShipNavRoute();
+  test('advanceMiner smoke test', () async {
+    final api = _MockApi();
+    final db = _MockDataStore();
+    final priceData = _MockPriceData();
+    final agentCache = _MockAgentCache();
+    final ship = _MockShip();
+    final systemsCache = _MockSystemsCache();
+    final waypointCache = _MockWaypointCache();
+    final marketCache = _MockMarketCache();
+    final transactionLog = _MockTransactionLog();
+    final behaviorManager = _MockBehaviorManager();
+    final surveyData = _MockSurveyData();
+    final shipNav = _MockShipNav();
 
     final now = DateTime(2021);
-    final arrivalTime = now.add(const Duration(seconds: 1));
     DateTime getNow() => now;
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
-    when(() => shipNav.waypointSymbol).thenReturn('W');
-    when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    when(() => shipNav.systemSymbol).thenReturn('S-A');
 
-    final logger = MockLogger();
+    final waypoint = _MockWaypoint();
+    when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
+    when(() => waypoint.traits).thenReturn([]);
+    when(() => waypoint.systemSymbol).thenReturn('S-A');
+
+    when(() => waypointCache.waypoint(any()))
+        .thenAnswer((_) => Future.value(waypoint));
+    when(
+      () => waypointCache.waypointsInJumpRadius(
+        startSystem: any(named: 'startSystem'),
+        maxJumps: any(named: 'maxJumps'),
+      ),
+    ).thenAnswer((_) => Stream.fromIterable([waypoint]));
+
+    when(
+      () => systemsCache.systemSymbolsInJumpRadius(
+        startSystem: any(named: 'startSystem'),
+        maxJumps: any(named: 'maxJumps'),
+      ),
+    ).thenAnswer((_) => Stream.fromIterable([('S-A', 0)]));
+
+    when(
+      () => waypointCache.waypointsInSystem(any()),
+    ).thenAnswer((_) => Future.value([waypoint]));
+
+    when(() => marketCache.marketsInSystem(any()))
+        .thenAnswer((_) => Stream.fromIterable([]));
+
+    final shipCargo = ShipCargo(capacity: 60, units: 0);
+    when(() => ship.cargo).thenReturn(shipCargo);
+
+    when(() => behaviorManager.disableBehavior(ship, Behavior.miner))
+        .thenAnswer((_) => Future.value());
+
+    final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
       () => advanceMiner(
@@ -212,7 +242,6 @@ void main() {
         getNow: getNow,
       ),
     );
-    expect(waitUntil, arrivalTime);
-    verify(() => logger.info('🛸#S  ✈️  to W, 00:00:01 left')).called(1);
+    expect(waitUntil, isNull);
   });
 }

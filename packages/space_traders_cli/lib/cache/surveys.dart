@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/printing.dart';
 
 /// Record of a historcial survey.
 class HistoricalSurvey {
@@ -138,8 +139,11 @@ class SurveyData {
   }
 
   /// Record the given surveys.
-  Future<void> recordSurveys(List<Survey> surveys) {
-    final now = DateTime.now().toUtc();
+  Future<void> recordSurveys(
+    List<Survey> surveys, {
+    DateTime Function() getNow = defaultGetNow,
+  }) {
+    final now = getNow();
     final historicalSurveys = surveys.map((e) {
       return HistoricalSurvey(
         timestamp: now,

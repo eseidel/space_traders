@@ -126,8 +126,6 @@ Efficiency:
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Fix contract trader to share code with arbitrage trader.  Contracts are a
   special case of arbitrage, in which the destination and trade good are fixed.
-* Add some object to hold agent and ships so both can be updated by results
-  of API calls and not fetched after every ship.
 * Write a better rate-limiting model.
 * Teach RateLimiter to print out requests per minute every minute.
 * Teach arbitrage trader how to buy multiple times up to the max cargo hold.
@@ -140,13 +138,12 @@ Automation:
 * Have a config language to explain what the ships should be doing.
 * Need to store handle and email somewhere.
 * Need logic for planning which faction to be (random)?
-* Ensure we don't join a faction which is not connected to others.
 * Logic for planning what to do with money (e.g. buy ships, by mods)
   Should disable buying behavior for less time early on?
 * When to enable which behaviors?
 * Surveys.  How much surveying should we do before we start mining?
 * Need the ability to disable behaviors on a per-ship-level.
-* Add expoential back-off for 429s?  Not sure why they're getting through.
+* Add exponential back-off for 429s?  Not sure why they're getting through.
 
 UI:
 * Make shipInfo include an emoji for the behavior.

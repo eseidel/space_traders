@@ -242,15 +242,7 @@ Future<DateTime?> advanceContractTrader(
   TransactionLog transactionLog,
   BehaviorManager behaviorManager,
 ) async {
-  final navResult = await continueNavigationIfNeeded(
-    api,
-    ship,
-    systemsCache,
-    behaviorManager,
-  );
-  if (navResult.shouldReturn()) {
-    return navResult.waitTime;
-  }
+  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
   // Should this contract lookup move into the contract trader?
   final contracts = await activeContracts(api);
   if (contracts.length > 1) {

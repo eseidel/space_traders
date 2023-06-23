@@ -50,15 +50,8 @@ Future<DateTime?> advanceExporer(
   MarketCache marketCache,
   BehaviorManager behaviorManager,
 ) async {
-  final navResult = await continueNavigationIfNeeded(
-    api,
-    ship,
-    systemsCache,
-    behaviorManager,
-  );
-  if (navResult.shouldReturn()) {
-    return navResult.waitTime;
-  }
+  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
+
   // Check our current waypoint.  If it's not charted or doesn't have current
   // market data, chart it and/or record market data.
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
