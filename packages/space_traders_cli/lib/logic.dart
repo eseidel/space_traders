@@ -12,6 +12,7 @@ import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/exceptions.dart';
+import 'package:space_traders_cli/net/rate_limit.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 
@@ -83,6 +84,45 @@ Future<void> advanceShips(
   }
 }
 
+/// RateLimitTracker tracks the rate limit usage and prints stats.
+class RateLimitTracker {
+  /// Construct a rate limit tracker.
+  RateLimitTracker(Api api, {this.printEvery = const Duration(minutes: 1)})
+      : _rateLimit = api.apiClient,
+        _lastPrintTime = DateTime.timestamp() {
+    _lastRequestCount = _rateLimit.requestCounts.totalRequests();
+  }
+
+  /// The rate limit stats are printed every this often.
+  final Duration printEvery;
+
+  final RateLimitedApiClient _rateLimit;
+  DateTime _lastPrintTime;
+  late int _lastRequestCount;
+
+  /// Print the stats if it has been long enough since the last print.
+  void printStatsIfNeeded() {
+    final now = DateTime.timestamp();
+    final timeSinceLastPrint = now.difference(_lastPrintTime);
+    final requestCounts = _rateLimit.requestCounts;
+    if (timeSinceLastPrint > printEvery) {
+      final requestCount = requestCounts.totalRequests();
+      final requestsSinceLastPrint = requestCount - _lastRequestCount;
+      _lastRequestCount = requestCount;
+      final requestsPerSecond =
+          requestsSinceLastPrint / timeSinceLastPrint.inSeconds;
+      final max =
+          timeSinceLastPrint.inSeconds * _rateLimit.maxRequestsPerSecond;
+      final percent = ((requestsSinceLastPrint / max) * 100).round();
+      logger.info(
+        '${requestsPerSecond.toStringAsFixed(1)} requests per second '
+        '($percent% of max)',
+      );
+      _lastPrintTime = now;
+    }
+  }
+}
+
 /// Run the logic loop forever.
 Future<void> logic(
   Api api,
@@ -97,8 +137,10 @@ Future<void> logic(
   ShipCache shipCache,
 ) async {
   final waiter = ShipWaiter();
+  final rateLimitTracker = RateLimitTracker(api);
 
   while (true) {
+    rateLimitTracker.printStatsIfNeeded();
     try {
       await advanceShips(
         api,

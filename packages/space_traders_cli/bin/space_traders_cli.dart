@@ -140,7 +140,7 @@ Future<void> cliMain(List<String> args) async {
   // Handle ctrl-c and print out request stats.
   // This should be made an argument rather than on by default.
   ProcessSignal.sigint.watch().listen((signal) {
-    printRequestStats(api.apiClient as RateLimitedApiClient);
+    printRequestStats(api.apiClient);
     exit(0);
   });
 

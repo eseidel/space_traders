@@ -30,10 +30,13 @@ class RequestCounts {
 /// Rate limiting api client.
 class RateLimitedApiClient extends ApiClient {
   /// Construct a rate limited api client.
-  RateLimitedApiClient({required this.requestsPerSecond, super.authentication});
+  RateLimitedApiClient({
+    required this.maxRequestsPerSecond,
+    super.authentication,
+  });
 
   /// The number of requests per second to allow.
-  final int requestsPerSecond;
+  final int maxRequestsPerSecond;
 
   /// RequestCounts tracks the number of requests made to each path.
   final RequestCounts requestCounts = RequestCounts();
@@ -95,7 +98,7 @@ class RateLimitedApiClient extends ApiClient {
     requestCounts.recordRequest(path);
     final afterRequest = DateTime.now();
     _nextRequestTime =
-        afterRequest.add(Duration(milliseconds: 1000 ~/ requestsPerSecond));
+        afterRequest.add(Duration(milliseconds: 1000 ~/ maxRequestsPerSecond));
     return response;
   }
 }

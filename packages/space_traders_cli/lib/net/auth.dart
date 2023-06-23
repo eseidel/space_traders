@@ -18,7 +18,9 @@ String loadAuthToken(FileSystem fs) {
 /// apiFromAuthToken creates an Api with the given auth token.
 Api apiFromAuthToken(String token) {
   final auth = HttpBearerAuth()..accessToken = token;
-  return Api(RateLimitedApiClient(requestsPerSecond: 2, authentication: auth));
+  return Api(
+    RateLimitedApiClient(maxRequestsPerSecond: 2, authentication: auth),
+  );
 }
 
 /// defaultApi creates an Api with the default auth token read from the
@@ -66,7 +68,7 @@ Future<String> _tryRegister(
 /// If the call sign is already taken, it will prompt for the email address
 /// associated with the call sign.
 Future<String> register({required String callsign, String? email}) async {
-  final client = RateLimitedApiClient(requestsPerSecond: 2);
+  final client = RateLimitedApiClient(maxRequestsPerSecond: 2);
   final defaultApi = DefaultApi(client);
 
   final factions = await fetchAllPages(FactionsApi(client), (api, page) async {

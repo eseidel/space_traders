@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:space_traders_api/api.dart';
+import 'package:space_traders_cli/net/rate_limit.dart';
 
 export 'package:space_traders_api/api.dart';
 
@@ -17,7 +18,7 @@ class Api {
         factions = FactionsApi(apiClient);
 
   /// The shared ApiClient.
-  final ApiClient apiClient;
+  final RateLimitedApiClient apiClient;
 
   /// DefaultApi generated client.
   final DefaultApi defaultApi;

@@ -101,8 +101,6 @@ Earning:
   from if the contract is fulfill-able from the market it's at.
 
 Exploring:
-* Probes should plan jumps based on distance to hq, not current location.
-* Fix probes getting stuck cycling.
 * Teach explorers to avoid each other.  Right now they all route to the same
   opportunities.
   Explorers should generate a queue of good systems to explore, and then
