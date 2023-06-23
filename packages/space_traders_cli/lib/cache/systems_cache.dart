@@ -29,6 +29,9 @@ class SystemsCache {
   final FileSystem _fs;
   final String _cacheFilePath;
 
+  /// All systems in the game.
+  List<System> get systems => _systems;
+
   /// Default cache location.
   static const String defaultCacheFilePath = 'systems.json';
 
