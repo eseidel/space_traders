@@ -1,18 +1,15 @@
-import 'package:file/local.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/printing.dart';
 
 void main(List<String> args) async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
+  await run(args, command);
+}
 
-  final hq = await waypointCache.getAgentHeadquarters();
-  final waypoints = await waypointCache.waypointsInSystem(hq.systemSymbol);
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
+  final hq = await caches.waypoints.getAgentHeadquarters();
+  final waypoints = await caches.waypoints.waypointsInSystem(hq.systemSymbol);
 
   final waypoint = logger.chooseOne(
     'Which waypoint?',

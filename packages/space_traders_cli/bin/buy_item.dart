@@ -1,14 +1,7 @@
-import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
-import 'package:space_traders_cli/net/auth.dart';
-import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 
 String displayGood(MarketTradeGood good) {
@@ -16,27 +9,20 @@ String displayGood(MarketTradeGood good) {
 }
 
 void main(List<String> args) async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
+  await run(args, command);
+}
 
-  final priceData = await PriceData.load(fs);
-  final agentCache = await AgentCache.load(api);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
-  final marketCache = MarketCache(waypointCache);
-  final transactionLog = await TransactionLog.load(fs);
-
-  final myShips = await allMyShips(api).toList();
-  final ship = await chooseShip(api, waypointCache, myShips);
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
+  final myShips = caches.ships.ships;
+  final ship = await chooseShip(api, caches.waypoints, myShips);
 
   if (ship.availableSpace < 1) {
     logger.err('No cargo space available on ${ship.symbol}!}');
     return;
   }
 
-  // Dock if needed?
-
-  final market = await marketCache.marketForSymbol(ship.nav.waypointSymbol);
+  await dockIfNeeded(api, ship);
+  final market = await caches.markets.marketForSymbol(ship.nav.waypointSymbol);
 
   // List all the goods this market sells with their prices.
   final good = logger.chooseOne(
@@ -46,7 +32,7 @@ void main(List<String> args) async {
   );
 
   final purchasePrice = good.purchasePrice;
-  final maxBuy = agentCache.agent.credits ~/ purchasePrice;
+  final maxBuy = caches.agent.agent.credits ~/ purchasePrice;
 
   if (maxBuy < 1) {
     logger.err("You can't afford any of those!");
@@ -57,9 +43,9 @@ void main(List<String> args) async {
 
   await purchaseCargoAndLog(
     api,
-    priceData,
-    transactionLog,
-    agentCache,
+    caches.marketPrices,
+    caches.transactions,
+    caches.agent,
     ship,
     TradeSymbol.fromJson(good.symbol)!,
     quantity,

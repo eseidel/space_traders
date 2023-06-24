@@ -1,19 +1,10 @@
-import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/ship_cache.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/surveys.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
@@ -34,26 +25,21 @@ Future<List<Ship>> chooseShips(
   return choices;
 }
 
-void main() async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
-  final priceData = await PriceData.load(fs);
-  final shipyardPrices = await ShipyardPrices.load(fs);
+void main(List<String> args) async {
+  await run(args, command);
+}
+
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final db = DataStore();
   await db.open();
-  final agentCache = await AgentCache.load(api);
-
-  final myShips = await allMyShips(api).toList();
-
   // Where to move?
-  final hq = parseWaypointString(agentCache.agent.headquarters);
+  final hq = parseWaypointString(caches.agent.agent.headquarters);
   final startSystem = hq.system;
+  final myShips = caches.ships.ships;
 
   // This should be connectedSystemsWithinJumpRangeFromSystem or similar.
-  final startingSystem = systemsCache.systemBySymbol(startSystem);
-  final jumpGate = await waypointCache.jumpGateForSystem(startSystem);
+  final startingSystem = caches.systems.systemBySymbol(startSystem);
+  final jumpGate = await caches.waypoints.jumpGateForSystem(startSystem);
   final systemChoices = [
     connectedSystemFromSystem(startingSystem, 0),
     ...jumpGate!.connectedSystems,
@@ -66,7 +52,7 @@ void main() async {
   );
 
   final destSystemWaypoints =
-      await waypointCache.waypointsInSystem(destSystem.symbol);
+      await caches.waypoints.waypointsInSystem(destSystem.symbol);
 
   final destWaypoint = logger.chooseOne(
     'To where?',
@@ -75,9 +61,10 @@ void main() async {
   );
 
   // Select many from a list.
-  final selectedShips = await chooseShips(api, waypointCache, myShips);
+  final selectedShips = await chooseShips(api, caches.waypoints, myShips);
 
-  final shipWaypoints = await waypointsForShips(waypointCache, selectedShips);
+  final shipWaypoints =
+      await waypointsForShips(caches.waypoints, selectedShips);
   printShips(selectedShips, shipWaypoints);
 
   final behaviorManager =
@@ -91,14 +78,12 @@ void main() async {
     await beingRouteAndLog(
       api,
       ship,
-      systemsCache,
+      caches.systems,
       behaviorManager,
       destWaypoint.symbol,
     );
   }
 
-  final transactions = await TransactionLog.load(fs);
-  final surveyData = await SurveyData.load(fs);
   final waiter = ShipWaiter();
 
   final activeShipSymbols = selectedShips.map((s) => s.symbol).toSet();
@@ -112,15 +97,15 @@ void main() async {
     await advanceShips(
       api,
       db,
-      systemsCache,
-      priceData,
-      shipyardPrices,
-      surveyData,
-      transactions,
+      caches.systems,
+      caches.marketPrices,
+      caches.shipyardPrices,
+      caches.surveys,
+      caches.transactions,
       behaviorManager,
       waiter,
       shipCache,
-      agentCache,
+      caches.agent,
     );
 
     final earliestWaitUntil = waiter.earliestWaitUntil();

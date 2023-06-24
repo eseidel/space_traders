@@ -1,14 +1,7 @@
-import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/trading.dart';
@@ -60,28 +53,22 @@ Future<void> _navigateToLocalWaypointAndDock(
 }
 
 void main(List<String> args) async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
-  final marketCache = MarketCache(waypointCache);
-  final priceData = await PriceData.load(fs);
-  final shipyardPrices = await ShipyardPrices.load(fs);
-  final transactionLog = await TransactionLog.load(fs);
-  final agentCache = await AgentCache.load(api);
+  await run(args, command);
+}
 
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final myShips = await allMyShips(api).toList();
   // pick a ship.
-  final ship = await chooseShip(api, waypointCache, myShips);
+  final ship = await chooseShip(api, caches.waypoints, myShips);
   // pick a mount.
   const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
 
   // it finds a nearby market with that mount.
-  final start = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final start = await caches.waypoints.waypoint(ship.nav.waypointSymbol);
   final mountMarket = await nearbyMarketWhichTrades(
-    systemsCache,
-    waypointCache,
-    marketCache,
+    caches.systems,
+    caches.waypoints,
+    caches.markets,
     start,
     tradeSymbol.value,
     maxJumps: 10,
@@ -94,11 +81,11 @@ void main(List<String> args) async {
   // navigates there.
   await _navigateToLocalWaypointAndDock(
     api,
-    agentCache,
-    priceData,
-    shipyardPrices,
-    marketCache,
-    transactionLog,
+    caches.agent,
+    caches.marketPrices,
+    caches.shipyardPrices,
+    caches.markets,
+    caches.transactions,
     ship,
     mountMarket,
     true,
@@ -106,9 +93,9 @@ void main(List<String> args) async {
   // Buys the mount.
   await purchaseCargoAndLog(
     api,
-    priceData,
-    transactionLog,
-    agentCache,
+    caches.marketPrices,
+    caches.transactions,
+    caches.agent,
     ship,
     tradeSymbol,
     1,

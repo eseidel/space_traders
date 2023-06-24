@@ -1,10 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/auth.dart';
 
 // void printConnectedSystems(List<ConnectedSystem> connectedSystems) {
 //   for (final system in connectedSystems) {
@@ -44,13 +41,13 @@ bool compareConnectedSystemsLists(
   return listsAreEqual;
 }
 
-void main() async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
-  final hq = await waypointCache.getAgentHeadquarters();
-  final jumpGate = await waypointCache.jumpGateForSystem(hq.systemSymbol);
+void main(List<String> args) async {
+  await run(args, command);
+}
+
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
+  final hq = await caches.waypoints.getAgentHeadquarters();
+  final jumpGate = await caches.waypoints.jumpGateForSystem(hq.systemSymbol);
   logger.info('Jump gate range: ${jumpGate!.jumpRange}');
   final jumpGateConnecteSystems = jumpGate.connectedSystems;
   // logger.info('From Jump Gate: ');

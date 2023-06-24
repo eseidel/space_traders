@@ -1,14 +1,7 @@
-import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 
@@ -32,6 +25,7 @@ Future<void> _navigateToLocalWaypointAndDock(
     logger.info('Waiting to dock...');
     await Future<void>.delayed(flightTime);
     await dockIfNeeded(api, ship);
+    // TODO: Move this "visit waypoint" logic into a central place.
     if (destination.hasMarketplace) {
       final market = await recordMarketDataIfNeededAndLog(
         priceData,
@@ -59,24 +53,18 @@ Future<void> _navigateToLocalWaypointAndDock(
 }
 
 void main(List<String> args) async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
-  final marketCache = MarketCache(waypointCache);
-  final priceData = await PriceData.load(fs);
-  final shipyardPrices = await ShipyardPrices.load(fs);
-  final transactionLog = await TransactionLog.load(fs);
-  final agentCache = await AgentCache.load(api);
+  await run(args, command);
+}
 
-  final myShips = await allMyShips(api).toList();
-  final ship = await chooseShip(api, waypointCache, myShips);
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
+  final myShips = caches.ships.ships;
+  final ship = await chooseShip(api, caches.waypoints, myShips);
 
   final startSystemSymbol = ship.nav.systemSymbol;
-  final startingSystem = systemsCache.systemBySymbol(startSystemSymbol);
-  final jumpGate = await waypointCache.jumpGateForSystem(startSystemSymbol);
+  final startingSystem = caches.systems.systemBySymbol(startSystemSymbol);
+  final jumpGate = await caches.waypoints.jumpGateForSystem(startSystemSymbol);
   final jumpGateWaypoint =
-      systemsCache.jumpGateWaypointForSystem(startSystemSymbol);
+      caches.systems.jumpGateWaypointForSystem(startSystemSymbol);
 
   final systemChoices = [
     connectedSystemFromSystem(startingSystem, 0),
@@ -90,7 +78,7 @@ void main(List<String> args) async {
   );
 
   final destSystemWaypoints =
-      await waypointCache.waypointsInSystem(destSystem.symbol);
+      await caches.waypoints.waypointsInSystem(destSystem.symbol);
 
   final destWaypoint = logger.chooseOne(
     'To where?',
@@ -100,14 +88,15 @@ void main(List<String> args) async {
 
   final shouldDock = logger.confirm('Wait to dock?', defaultValue: true);
 
-  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint =
+      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
   if (currentWaypoint.hasMarketplace && ship.shouldRefuel) {
-    final market = await marketCache.marketForSymbol(currentWaypoint.symbol);
+    final market = await caches.markets.marketForSymbol(currentWaypoint.symbol);
     await refuelIfNeededAndLog(
       api,
-      priceData,
-      transactionLog,
-      agentCache,
+      caches.marketPrices,
+      caches.transactions,
+      caches.agent,
       market!,
       ship,
     );
@@ -116,11 +105,11 @@ void main(List<String> args) async {
   if (destWaypoint.systemSymbol == startingSystem.symbol) {
     await _navigateToLocalWaypointAndDock(
       api,
-      agentCache,
-      priceData,
-      shipyardPrices,
-      marketCache,
-      transactionLog,
+      caches.agent,
+      caches.marketPrices,
+      caches.shipyardPrices,
+      caches.markets,
+      caches.transactions,
       ship,
       destWaypoint,
       shouldDock,
@@ -144,11 +133,11 @@ void main(List<String> args) async {
   // We don't need to wait after the jump cooldown.
   await _navigateToLocalWaypointAndDock(
     api,
-    agentCache,
-    priceData,
-    shipyardPrices,
-    marketCache,
-    transactionLog,
+    caches.agent,
+    caches.marketPrices,
+    caches.shipyardPrices,
+    caches.markets,
+    caches.transactions,
     ship,
     destWaypoint,
     shouldDock,

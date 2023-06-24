@@ -1,10 +1,6 @@
-import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/auth.dart';
 
 // This should end up sharing code with Deal, Route, etc.
 class _Availability {
@@ -22,14 +18,13 @@ class _Availability {
   final int jumps;
 }
 
+void main(List<String> args) async {
+  await run(args, command);
+}
+
 /// Look through nearby marketplaces (including ones a jump away)
 /// looking for the best deal for a given symbol.
-void main(List<String> args) async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
-
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final priceData = await PriceData.load(fs);
 
   final promptResponse = logger.prompt(
@@ -42,18 +37,18 @@ void main(List<String> args) async {
     return;
   }
   // Should start from a ship rather than hq.
-  final hq = await waypointCache.getAgentHeadquarters();
+  final hq = await caches.waypoints.getAgentHeadquarters();
   const maxJumps = 5;
 
   final availabilityList = <_Availability>[];
 
   await for (final (String system, int jumps)
-      in systemsCache.systemSymbolsInJumpRadius(
+      in caches.systems.systemSymbolsInJumpRadius(
     startSystem: hq.systemSymbol,
     maxJumps: maxJumps,
   )) {
     for (final marketplaceWaypoint
-        in await waypointCache.marketWaypointsForSystem(system)) {
+        in await caches.waypoints.marketWaypointsForSystem(system)) {
       final prices = priceData
           .sellPricesFor(
             tradeSymbol: tradeSymbol.value,

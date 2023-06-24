@@ -1,15 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/ship_cache.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
+import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
-import 'package:space_traders_cli/net/auth.dart';
-import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 
 String describeShipType(ShipType type, Shipyard shipyard, PriceData priceData) {
@@ -26,20 +19,16 @@ String describeShipType(ShipType type, Shipyard shipyard, PriceData priceData) {
 }
 
 void main(List<String> args) async {
-  const fs = LocalFileSystem();
-  final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
+  await run(args, command);
+}
 
-  final priceData = await PriceData.load(fs);
-
-  final agentCache = await AgentCache.load(api);
-  final hq = await waypointCache.getAgentHeadquarters();
+Future<void> command(FileSystem fs, Api api, Caches caches) async {
+  final hq = await caches.waypoints.getAgentHeadquarters();
   final shipyardWaypoints =
-      await waypointCache.shipyardWaypointsForSystem(hq.systemSymbol);
+      await caches.waypoints.shipyardWaypointsForSystem(hq.systemSymbol);
 
-  final ships = await allMyShips(api).toList();
-  final shipWaypoints = await waypointsForShips(waypointCache, ships);
+  final ships = caches.ships.ships;
+  final shipWaypoints = await waypointsForShips(caches.waypoints, ships);
   logger.info('Current ships:');
   printShips(ships, shipWaypoints);
   logger.info('');
@@ -50,7 +39,7 @@ void main(List<String> args) async {
     display: waypointDescription,
   );
 
-  final beforeCredits = creditsString(agentCache.agent.credits);
+  final beforeCredits = creditsString(caches.agent.agent.credits);
   logger
     ..info('$beforeCredits credits available.')
     ..info('Ships types available at ${waypoint.symbol}:');
@@ -62,13 +51,18 @@ void main(List<String> args) async {
   final shipType = logger.chooseOne(
     'Which type?',
     choices: shipyard.shipTypes.map((t) => t.type!).toList(),
-    display: (s) => describeShipType(s, shipyard, priceData),
+    display: (s) => describeShipType(s, shipyard, caches.marketPrices),
   );
 
   logger.info('Purchasing $shipType.');
   final shipCache = ShipCache(ships);
-  final purchaseResponse =
-      await purchaseShip(api, shipCache, agentCache, shipyard.symbol, shipType);
+  final purchaseResponse = await purchaseShip(
+    api,
+    shipCache,
+    caches.agent,
+    shipyard.symbol,
+    shipType,
+  );
   logger.info('Purchased ${purchaseResponse.ship.symbol} for '
       '${creditsString(purchaseResponse.transaction.price)}.');
   final afterCredits = creditsString(purchaseResponse.agent.credits);
