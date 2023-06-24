@@ -1,15 +1,10 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/printing.dart';
@@ -23,7 +18,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   WaypointCache waypointCache,
   PriceData priceData,
   TransactionLog transactionLog,
-  BehaviorManager behaviorManager,
+  CentralCommand centralCommand,
   Market market,
   Ship ship,
   Deal deal,
@@ -95,7 +90,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   );
   if (maybeResult == null) {
     // We couldn't buy any cargo, so we're done.
-    await behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader);
+    await centralCommand.disableBehavior(ship, Behavior.arbitrageTrader);
     shipInfo(
       ship,
       'Failed to buy cargo, disabling trader behavior.',
@@ -110,15 +105,15 @@ Future<DateTime?> _purchaseCargoAndGo(
     '@ ${transaction.pricePerUnit} (expected ${deal.purchasePrice}) '
     ' = ${transaction.totalPrice}',
   );
-  final behaviorState = await behaviorManager.getBehavior(ship);
+  final behaviorState = centralCommand.getBehavior(ship.symbol)!;
   behaviorState.deal!.actualPurchasePrice = result.transaction.pricePerUnit;
-  await behaviorManager.setBehavior(ship.symbol, behaviorState);
+  await centralCommand.setBehavior(ship.symbol, behaviorState);
 
   return beingRouteAndLog(
     api,
     ship,
     systemsCache,
-    behaviorManager,
+    centralCommand,
     deal.destinationSymbol,
   );
 }
@@ -126,41 +121,37 @@ Future<DateTime?> _purchaseCargoAndGo(
 /// One loop of the trading logic
 Future<DateTime?> advanceArbitrageTrader(
   Api api,
-  DataStore db,
-  PriceData priceData,
-  AgentCache agentCache,
-  Ship ship,
-  SystemsCache systemsCache,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  TransactionLog transactionLog,
-  BehaviorManager behaviorManager,
-) async {
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
-  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint =
+      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
   Market? currentMarket;
 
   // If we're currently at a market, record the prices and refuel.
   if (currentWaypoint.hasMarketplace) {
     await dockIfNeeded(api, ship);
     currentMarket = await recordMarketDataIfNeededAndLog(
-      priceData,
-      marketCache,
+      caches.marketPrices,
+      caches.markets,
       ship,
       currentWaypoint.symbol,
     );
     await refuelIfNeededAndLog(
       api,
-      priceData,
-      transactionLog,
-      agentCache,
+      caches.marketPrices,
+      caches.transactions,
+      caches.agent,
       currentMarket,
       ship,
     );
   }
 
-  final behaviorState = await behaviorManager.getBehavior(ship);
+  final behaviorState = centralCommand.getBehavior(ship.symbol)!;
   final pastDeal = behaviorState.deal;
 
   final pastDealTradeSymbol = pastDeal?.deal.tradeSymbol.value;
@@ -176,9 +167,9 @@ Future<DateTime?> advanceArbitrageTrader(
       bool exceptDealCargo(String symbol) => symbol != dealCargo?.symbol;
       await sellAllCargoAndLog(
         api,
-        priceData,
-        transactionLog,
-        agentCache,
+        caches.marketPrices,
+        caches.transactions,
+        caches.agent,
         currentMarket,
         ship,
         where: exceptDealCargo,
@@ -188,15 +179,15 @@ Future<DateTime?> advanceArbitrageTrader(
     if (ship.cargo.isNotEmpty) {
       shipInfo(ship, 'Cargo hold still not empty, finding market.');
       final market = await nearbyMarketWhichTrades(
-        systemsCache,
-        waypointCache,
-        marketCache,
+        caches.systems,
+        caches.waypoints,
+        caches.markets,
         currentWaypoint,
         nonDealCargo.symbol,
       );
       if (market == null) {
         // We can't sell this cargo anywhere, so we're done.
-        await behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader);
+        await centralCommand.disableBehavior(ship, Behavior.arbitrageTrader);
         shipInfo(
           ship,
           'No market for ${nonDealCargo.symbol}, disabling trader behavior.',
@@ -206,8 +197,8 @@ Future<DateTime?> advanceArbitrageTrader(
       return beingRouteAndLog(
         api,
         ship,
-        systemsCache,
-        behaviorManager,
+        caches.systems,
+        centralCommand,
         market.symbol,
       );
     }
@@ -220,12 +211,12 @@ Future<DateTime?> advanceArbitrageTrader(
       // We're at the source, buy and start the route.
       return _purchaseCargoAndGo(
         api,
-        agentCache,
-        systemsCache,
-        waypointCache,
-        priceData,
-        transactionLog,
-        behaviorManager,
+        caches.agent,
+        caches.systems,
+        caches.waypoints,
+        caches.marketPrices,
+        caches.transactions,
+        centralCommand,
         currentMarket!,
         ship,
         pastDeal.deal,
@@ -237,13 +228,13 @@ Future<DateTime?> advanceArbitrageTrader(
       // We're at the destination, sell and clear the deal.
       await sellAllCargoAndLog(
         api,
-        priceData,
-        transactionLog,
-        agentCache,
+        caches.marketPrices,
+        caches.transactions,
+        caches.agent,
         currentMarket!,
         ship,
       );
-      await behaviorManager.completeBehavior(ship.symbol);
+      await centralCommand.completeBehavior(ship.symbol);
       return null;
     }
 
@@ -251,8 +242,8 @@ Future<DateTime?> advanceArbitrageTrader(
     return beingRouteAndLog(
       api,
       ship,
-      systemsCache,
-      behaviorManager,
+      caches.systems,
+      centralCommand,
       pastDeal.deal.destinationSymbol,
     );
   }
@@ -261,14 +252,14 @@ Future<DateTime?> advanceArbitrageTrader(
 
   // Find a new deal!
   const maxJumps = 1;
-  final maxOutlay = agentCache.agent.credits;
+  final maxOutlay = caches.agent.agent.credits;
 
   // Consider all deals starting at any market within our consideration range.
   final deal = await findDealFor(
-    priceData,
-    systemsCache,
-    waypointCache,
-    marketCache,
+    caches.marketPrices,
+    caches.systems,
+    caches.waypoints,
+    caches.markets,
     ship,
     maxJumps: maxJumps,
     maxOutlay: maxOutlay,
@@ -276,7 +267,7 @@ Future<DateTime?> advanceArbitrageTrader(
   );
 
   if (deal == null) {
-    await behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader);
+    await centralCommand.disableBehavior(ship, Behavior.arbitrageTrader);
     shipInfo(
       ship,
       'No profitable deals, disabling trader behavior.',
@@ -285,21 +276,20 @@ Future<DateTime?> advanceArbitrageTrader(
   }
 
   shipInfo(ship, 'Found deal: ${describeCostedDeal(deal)}');
-  final state = await behaviorManager.getBehavior(ship);
-  state.deal = deal;
-  await behaviorManager.setBehavior(ship.symbol, state);
+  final state = centralCommand.getBehavior(ship.symbol)!..deal = deal;
+  await centralCommand.setBehavior(ship.symbol, state);
 
   if (deal.deal.sourceSymbol == currentWaypoint.symbol) {
     // Our deal starts here, so we can buy cargo and go!
     logDeal(ship, deal.deal);
     return _purchaseCargoAndGo(
       api,
-      agentCache,
-      systemsCache,
-      waypointCache,
-      priceData,
-      transactionLog,
-      behaviorManager,
+      caches.agent,
+      caches.systems,
+      caches.waypoints,
+      caches.marketPrices,
+      caches.transactions,
+      centralCommand,
       currentMarket!,
       ship,
       deal.deal,
@@ -310,8 +300,8 @@ Future<DateTime?> advanceArbitrageTrader(
   return beingRouteAndLog(
     api,
     ship,
-    systemsCache,
-    behaviorManager,
+    caches.systems,
+    centralCommand,
     deal.deal.sourceSymbol,
   );
 }

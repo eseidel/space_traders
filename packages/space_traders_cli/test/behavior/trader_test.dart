@@ -1,13 +1,8 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/trader.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
@@ -16,10 +11,6 @@ class _MockAgent extends Mock implements Agent {}
 class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
-
-class _MockBehaviorManager extends Mock implements BehaviorManager {}
-
-class _MockDataStore extends Mock implements DataStore {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
@@ -43,10 +34,13 @@ class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
+class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockCaches extends Mock implements Caches {}
+
 void main() {
   test('advanceContractTrader smoke test', () async {
     final api = _MockApi();
-    final db = _MockDataStore();
     final priceData = _MockPriceData();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
@@ -54,10 +48,17 @@ void main() {
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
     final transactionLog = _MockTransactionLog();
-    final behaviorManager = _MockBehaviorManager();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
+    final centralCommand = _MockCentralCommand();
+    final caches = _MockCaches();
+    when(() => caches.waypoints).thenReturn(waypointCache);
+    when(() => caches.markets).thenReturn(marketCache);
+    when(() => caches.transactions).thenReturn(transactionLog);
+    when(() => caches.marketPrices).thenReturn(priceData);
+    when(() => caches.agent).thenReturn(agentCache);
+    when(() => caches.systems).thenReturn(systemsCache);
 
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
@@ -80,10 +81,10 @@ void main() {
       ),
     ).thenAnswer((invocation) => Stream.fromIterable([]));
 
-    when(() => behaviorManager.getBehavior(ship)).thenAnswer(
-      (_) => Future.value(BehaviorState(Behavior.arbitrageTrader)),
+    when(() => centralCommand.getBehavior('S')).thenAnswer(
+      (_) => BehaviorState('S', Behavior.arbitrageTrader),
     );
-    when(() => behaviorManager.disableBehavior(ship, Behavior.arbitrageTrader))
+    when(() => centralCommand.disableBehavior(ship, Behavior.arbitrageTrader))
         .thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
@@ -100,15 +101,10 @@ void main() {
       logger,
       () => advanceArbitrageTrader(
         api,
-        db,
-        priceData,
-        agentCache,
+        centralCommand,
+        caches,
         ship,
-        systemsCache,
-        waypointCache,
-        marketCache,
-        transactionLog,
-        behaviorManager,
+        getNow: () => DateTime(2021),
       ),
     );
     expect(waitUntil, isNull);

@@ -2,15 +2,10 @@ import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/net/queries.dart';
@@ -126,7 +121,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  BehaviorManager behaviorManager, {
+  CentralCommand centralCommand, {
   required String tradeSymbol,
   required int breakevenUnitPrice,
 }) async {
@@ -148,7 +143,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
       'No markets nearby with $tradeSymbol, disabling contract trader.',
     );
     // This probably isn't quite right?  We should instead search wider?
-    await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
+    await centralCommand.disableBehavior(ship, Behavior.contractTrader);
     return null;
   }
 
@@ -169,7 +164,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     api,
     ship,
     systemsCache,
-    behaviorManager,
+    centralCommand,
     opportunity.waypoint.symbol,
   );
   return arrival;
@@ -232,16 +227,11 @@ Future<List<Contract>> activeContracts(Api api) async {
 /// One loop of the trading logic
 Future<DateTime?> advanceContractTrader(
   Api api,
-  DataStore db,
-  PriceData priceData,
-  AgentCache agentCache,
-  Ship ship,
-  SystemsCache systemsCache,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  TransactionLog transactionLog,
-  BehaviorManager behaviorManager,
-) async {
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
   // Should this contract lookup move into the contract trader?
   final contracts = await activeContracts(api);
@@ -263,8 +253,9 @@ Future<DateTime?> advanceContractTrader(
   // TODO(eseidel): "break even" should include a minimum margin.
   final breakEvenUnitPrice = totalPayment ~/ neededGood.unitsRequired;
 
-  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
-  final currentMarket = await marketCache
+  final currentWaypoint =
+      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final currentMarket = await caches.markets
       .marketForSymbol(currentWaypoint.symbol, forceRefresh: true);
 
   // If we're currently at a market, record the prices and refuel.
@@ -272,13 +263,13 @@ Future<DateTime?> advanceContractTrader(
     await dockIfNeeded(api, ship);
     await refuelIfNeededAndLog(
       api,
-      priceData,
-      transactionLog,
-      agentCache,
+      caches.marketPrices,
+      caches.transactions,
+      caches.agent,
       currentMarket,
       ship,
     );
-    await recordMarketData(priceData, currentMarket);
+    await recordMarketData(caches.marketPrices, currentMarket);
   }
 
   // If we're at our contract destination.
@@ -288,7 +279,7 @@ Future<DateTime?> advanceContractTrader(
 
     // Delivering the goods counts as completing the behavior, we'll
     // decide next loop if we need to do more.
-    await behaviorManager.completeBehavior(ship.symbol);
+    await centralCommand.completeBehavior(ship.symbol);
 
     if (maybeResponse != null) {
       // Update our cargo counts after fulfilling the contract.
@@ -314,13 +305,13 @@ Future<DateTime?> advanceContractTrader(
   final remainingUnits = neededGood.unitsRequired - neededGood.unitsFulfilled;
   final minimumCreditsToTrade =
       max(100000, breakEvenUnitPrice * remainingUnits + creditsBuffer);
-  if (agentCache.agent.credits < minimumCreditsToTrade) {
+  if (caches.agent.agent.credits < minimumCreditsToTrade) {
     shipWarn(
       ship,
       'Not enough credits (${creditsString(minimumCreditsToTrade)}) to '
       'complete contract, disabling contract trader.',
     );
-    await behaviorManager.disableBehavior(ship, Behavior.contractTrader);
+    await centralCommand.disableBehavior(ship, Behavior.contractTrader);
     return null;
   }
 
@@ -332,16 +323,16 @@ Future<DateTime?> advanceContractTrader(
     if (ship.cargo.isNotEmpty) {
       await sellAllCargoAndLog(
         api,
-        priceData,
-        transactionLog,
-        agentCache,
+        caches.marketPrices,
+        caches.transactions,
+        caches.agent,
         currentMarket,
         ship,
         where: (s) => s != neededGood.tradeSymbol,
       );
     }
 
-    await recordMarketData(priceData, currentMarket);
+    await recordMarketData(caches.marketPrices, currentMarket);
     final maybeGood = currentMarket.tradeGoods
         .firstWhereOrNull((g) => g.symbol == neededGood.tradeSymbol);
 
@@ -377,7 +368,7 @@ Future<DateTime?> advanceContractTrader(
           ship.cargo.availableSpace,
         );
         final creditsNeeded = unitsToPurchase * maybeGood.purchasePrice;
-        if (agentCache.agent.credits < creditsNeeded) {
+        if (caches.agent.agent.credits < creditsNeeded) {
           // If we have some to deliver, deliver it.
           if (unitsInCargo > 0) {
             shipInfo(
@@ -394,7 +385,7 @@ Future<DateTime?> advanceContractTrader(
               '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}, '
               'disabling contract trader.',
             );
-            await behaviorManager.disableBehavior(
+            await centralCommand.disableBehavior(
               ship,
               Behavior.contractTrader,
             );
@@ -404,9 +395,9 @@ Future<DateTime?> advanceContractTrader(
           // If we have the money, do the purchase.
           final succeeded = await _purchaseContractGoodIfPossible(
             api,
-            priceData,
-            transactionLog,
-            agentCache,
+            caches.marketPrices,
+            caches.transactions,
+            caches.agent,
             ship,
             currentWaypoint,
             maybeGood,
@@ -433,20 +424,20 @@ Future<DateTime?> advanceContractTrader(
     return beingRouteAndLog(
       api,
       ship,
-      systemsCache,
-      behaviorManager,
+      caches.systems,
+      centralCommand,
       neededGood.destinationSymbol,
     );
   } else {
     // Do we need to check for sufficient credits here?
     return _navigateToNearbyMarketIfNeeded(
       api,
-      priceData,
+      caches.marketPrices,
       ship,
-      systemsCache,
-      waypointCache,
-      marketCache,
-      behaviorManager,
+      caches.systems,
+      caches.waypoints,
+      caches.markets,
+      centralCommand,
       tradeSymbol: neededGood.tradeSymbol,
       breakevenUnitPrice: breakEvenUnitPrice,
     );

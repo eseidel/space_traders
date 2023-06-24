@@ -1,13 +1,7 @@
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/net/queries.dart';
@@ -55,27 +49,22 @@ Future<Waypoint?> _nearestWaypointNeedingExploration(
 /// One loop of the exploring logic.
 Future<DateTime?> advanceExplorer(
   Api api,
-  DataStore db,
-  TransactionLog transactionLog,
-  PriceData priceData,
-  ShipyardPrices shipyardPrices,
-  AgentCache agentCache,
-  Ship ship,
-  SystemsCache systemsCache,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  BehaviorManager behaviorManager,
-) async {
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
   // Check our current waypoint.  If it's not charted or doesn't have current
   // market data, chart it and/or record market data.
-  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint =
+      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
   // We currently never route to shipyards, but we will record their data if
   // we happen to be there.
   if (_isMissingChartOrRecentPriceData(
-    priceData,
-    shipyardPrices,
+    caches.marketPrices,
+    caches.shipyardPrices,
     currentWaypoint,
   )) {
     if (currentWaypoint.chart == null) {
@@ -83,17 +72,17 @@ Future<DateTime?> advanceExplorer(
     }
     if (currentWaypoint.hasMarketplace) {
       final market = await recordMarketDataIfNeededAndLog(
-        priceData,
-        marketCache,
+        caches.marketPrices,
+        caches.markets,
         ship,
         currentWaypoint.symbol,
       );
       if (ship.usesFuel) {
         await refuelIfNeededAndLog(
           api,
-          priceData,
-          transactionLog,
-          agentCache,
+          caches.marketPrices,
+          caches.transactions,
+          caches.agent,
           market,
           ship,
         );
@@ -103,11 +92,11 @@ Future<DateTime?> advanceExplorer(
       // Every time we're at a shipyard and can afford a ship, we should
       // buy one.  Probably ore hounds at first, then probes?
       final shipyard = await getShipyard(api, currentWaypoint);
-      await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
+      await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
     }
     // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
-    await behaviorManager.completeBehavior(ship.symbol);
+    await centralCommand.completeBehavior(ship.symbol);
     return null;
   }
 
@@ -116,9 +105,9 @@ Future<DateTime?> advanceExplorer(
   // data, got there.
   // TODO(eseidel): This navigation logic should use beginRouteAndLog.
   final nearest = await _nearestWaypointNeedingExploration(
-    waypointCache,
-    priceData,
-    shipyardPrices,
+    caches.waypoints,
+    caches.marketPrices,
+    caches.shipyardPrices,
     ship,
   );
   if (nearest != null) {
@@ -140,7 +129,7 @@ Future<DateTime?> advanceExplorer(
     const maxJumpDistance = 100;
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
-    await for (final destination in waypointCache.waypointsInJumpRadius(
+    await for (final destination in caches.waypoints.waypointsInJumpRadius(
       startSystem: currentWaypoint.systemSymbol,
       maxJumps: maxJumpDistance,
     )) {
@@ -154,8 +143,8 @@ Future<DateTime?> advanceExplorer(
       //   continue;
       // }
       if (_isMissingChartOrRecentPriceData(
-        priceData,
-        shipyardPrices,
+        caches.marketPrices,
+        caches.shipyardPrices,
         destination,
       )) {
         if (destination.chart == null) {
@@ -163,7 +152,8 @@ Future<DateTime?> advanceExplorer(
             ship,
             '${destination.symbol} is missing chart, routing.',
           );
-        } else if (_isMissingRecentMarketData(priceData, destination)) {
+        } else if (_isMissingRecentMarketData(
+            caches.marketPrices, destination)) {
           shipInfo(
             ship,
             '${destination.symbol} is missing recent '
@@ -181,8 +171,8 @@ Future<DateTime?> advanceExplorer(
         return beingRouteAndLog(
           api,
           ship,
-          systemsCache,
-          behaviorManager,
+          caches.systems,
+          centralCommand,
           destination.symbol,
         );
       }
@@ -194,13 +184,13 @@ Future<DateTime?> advanceExplorer(
       'No unexplored systems within $maxJumpDistance jumps of '
       '${currentWaypoint.systemSymbol}, sleeping.',
     );
-    await behaviorManager.disableBehavior(ship, Behavior.explorer);
+    await centralCommand.disableBehavior(ship, Behavior.explorer);
     return null;
   }
 
   // Otherwise, go to a jump gate.
   final jumpGate =
-      systemsCache.jumpGateWaypointForSystem(ship.nav.systemSymbol);
+      caches.systems.jumpGateWaypointForSystem(ship.nav.systemSymbol);
   if (jumpGate == null) {
     throw UnimplementedError('No jump gates in ${ship.nav.waypointSymbol}');
   }

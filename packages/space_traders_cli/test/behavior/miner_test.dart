@@ -1,22 +1,14 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/miner.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/surveys.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockApi extends Mock implements Api {}
-
-class _MockDataStore extends Mock implements DataStore {}
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
@@ -28,8 +20,6 @@ class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockTransactionLog extends Mock implements TransactionLog {}
 
-class _MockBehaviorManager extends Mock implements BehaviorManager {}
-
 class _MockPriceData extends Mock implements PriceData {}
 
 class _MockSurveyData extends Mock implements SurveyData {}
@@ -39,6 +29,10 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockLogger extends Mock implements Logger {}
+
+class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockCaches extends Mock implements Caches {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
@@ -170,7 +164,6 @@ void main() {
 
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
-    final db = _MockDataStore();
     final priceData = _MockPriceData();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
@@ -178,9 +171,17 @@ void main() {
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
     final transactionLog = _MockTransactionLog();
-    final behaviorManager = _MockBehaviorManager();
     final surveyData = _MockSurveyData();
     final shipNav = _MockShipNav();
+    final centralCommand = _MockCentralCommand();
+    final caches = _MockCaches();
+    when(() => caches.waypoints).thenReturn(waypointCache);
+    when(() => caches.markets).thenReturn(marketCache);
+    when(() => caches.transactions).thenReturn(transactionLog);
+    when(() => caches.marketPrices).thenReturn(priceData);
+    when(() => caches.agent).thenReturn(agentCache);
+    when(() => caches.systems).thenReturn(systemsCache);
+    when(() => caches.surveys).thenReturn(surveyData);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -221,7 +222,7 @@ void main() {
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
 
-    when(() => behaviorManager.disableBehavior(ship, Behavior.miner))
+    when(() => centralCommand.disableBehavior(ship, Behavior.miner))
         .thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
@@ -229,16 +230,9 @@ void main() {
       logger,
       () => advanceMiner(
         api,
-        db,
-        priceData,
-        agentCache,
+        centralCommand,
+        caches,
         ship,
-        systemsCache,
-        waypointCache,
-        marketCache,
-        transactionLog,
-        behaviorManager,
-        surveyData,
         getNow: getNow,
       ),
     );

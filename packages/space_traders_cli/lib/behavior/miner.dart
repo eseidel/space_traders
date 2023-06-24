@@ -1,14 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/surveys.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/net/exceptions.dart';
@@ -325,7 +319,7 @@ Future<DateTime?> _navigateToNewSystemForMining(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  BehaviorManager behaviorManager,
+  CentralCommand centralCommand,
   Waypoint currentWaypoint, {
   int maxJumps = 10,
 }) async {
@@ -344,7 +338,7 @@ Future<DateTime?> _navigateToNewSystemForMining(
       'No good mining system found in '
       '$maxJumps radius of ${ship.nav.systemSymbol}',
     );
-    await behaviorManager.disableBehavior(ship, Behavior.miner);
+    await centralCommand.disableBehavior(ship, Behavior.miner);
     return null;
   }
 
@@ -353,7 +347,7 @@ Future<DateTime?> _navigateToNewSystemForMining(
     api,
     ship,
     systemsCache,
-    behaviorManager,
+    centralCommand,
     mine,
   );
 }
@@ -371,21 +365,15 @@ SystemWaypoint? _nearbyMineWithinSystem(
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
-  DataStore db,
-  PriceData priceData,
-  AgentCache agentCache,
-  Ship ship,
-  SystemsCache systemsCache,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  TransactionLog transactionLog,
-  BehaviorManager behaviorManager,
-  SurveyData surveyData, {
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
-  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint =
+      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
 
   // It's not worth potentially waiting a minute just to get a few pieces
   // of cargo, when a surveyed mining operation could pull 10+ pieces.
@@ -399,25 +387,25 @@ Future<DateTime?> advanceMiner(
     if (currentWaypoint.hasMarketplace) {
       await dockIfNeeded(api, ship);
       final market = await recordMarketDataIfNeededAndLog(
-        priceData,
-        marketCache,
+        caches.marketPrices,
+        caches.markets,
         ship,
         currentWaypoint.symbol,
       );
       await refuelIfNeededAndLog(
         api,
-        priceData,
-        transactionLog,
-        agentCache,
+        caches.marketPrices,
+        caches.transactions,
+        caches.agent,
         market,
         ship,
       );
 
       await sellAllCargoAndLog(
         api,
-        priceData,
-        transactionLog,
-        agentCache,
+        caches.marketPrices,
+        caches.transactions,
+        caches.agent,
         market,
         ship,
       );
@@ -427,7 +415,7 @@ Future<DateTime?> advanceMiner(
       if (ship.cargo.isEmpty) {
         // Success!  We mined and sold all our cargo!
         // Reset our state now that we've mined + sold once.
-        await behaviorManager.completeBehavior(ship.symbol);
+        await centralCommand.completeBehavior(ship.symbol);
         return null;
       }
       shipWarn(ship, 'Failed to sell some cargo, trying a different market.');
@@ -440,9 +428,9 @@ Future<DateTime?> advanceMiner(
 
     final largestCargo = ship.largestCargo();
     final nearestMarket = await nearbyMarketWhichTrades(
-      systemsCache,
-      waypointCache,
-      marketCache,
+      caches.systems,
+      caches.waypoints,
+      caches.markets,
       currentWaypoint,
       largestCargo!.symbol,
     );
@@ -452,14 +440,14 @@ Future<DateTime?> advanceMiner(
         'No nearby market which trades ${largestCargo.symbol}, '
         'disabling miner behavior.',
       );
-      await behaviorManager.disableBehavior(ship, Behavior.miner);
+      await centralCommand.disableBehavior(ship, Behavior.miner);
       return null;
     }
     return beingRouteAndLog(
       api,
       ship,
-      systemsCache,
-      behaviorManager,
+      caches.systems,
+      centralCommand,
       nearestMarket.symbol,
     );
   }
@@ -472,7 +460,7 @@ Future<DateTime?> advanceMiner(
     );
     // We're not at an asteroid field, so we need to navigate to one.
     final nearbyMine =
-        _nearbyMineWithinSystem(systemsCache, ship.nav.systemSymbol);
+        _nearbyMineWithinSystem(caches.systems, ship.nav.systemSymbol);
     if (nearbyMine != null) {
       return navigateToLocalWaypointAndLog(api, ship, nearbyMine);
     }
@@ -483,19 +471,19 @@ Future<DateTime?> advanceMiner(
     );
     return _navigateToNewSystemForMining(
       api,
-      priceData,
+      caches.marketPrices,
       ship,
-      systemsCache,
-      waypointCache,
-      marketCache,
-      behaviorManager,
+      caches.systems,
+      caches.waypoints,
+      caches.markets,
+      centralCommand,
       currentWaypoint,
     );
   }
   // This is wrong, we don't know if this market will be able to sell
   // the goods we can mine.
   final nearestMarket = await nearestWaypointWithMarket(
-    waypointCache,
+    caches.waypoints,
     currentWaypoint,
   );
   if (nearestMarket == null) {
@@ -505,12 +493,12 @@ Future<DateTime?> advanceMiner(
     );
     return _navigateToNewSystemForMining(
       api,
-      priceData,
+      caches.marketPrices,
       ship,
-      systemsCache,
-      waypointCache,
-      marketCache,
-      behaviorManager,
+      caches.systems,
+      caches.waypoints,
+      caches.markets,
+      centralCommand,
       currentWaypoint,
     );
   }
@@ -520,8 +508,8 @@ Future<DateTime?> advanceMiner(
 
   // See if we have a good survey to mine.
   final maybeSurvey = await surveyWorthMining(
-    priceData,
-    surveyData,
+    caches.marketPrices,
+    caches.surveys,
     surveyWaypointSymbol: currentWaypoint.symbol,
     nearbyMarketSymbol: nearestMarket.symbol,
   );
@@ -532,7 +520,7 @@ Future<DateTime?> advanceMiner(
       final response = outer!.data;
       // shipDetail(ship, '🔭 ${ship.nav.waypointSymbol}');
       // Record survey.
-      await surveyData.recordSurveys(response.surveys, getNow: getNow);
+      await caches.surveys.recordSurveys(response.surveys, getNow: getNow);
       // Wait for cooldown.
       return response.cooldown.expiration;
     } on ApiException catch (e) {
@@ -542,12 +530,12 @@ Future<DateTime?> advanceMiner(
         shipWarn(ship, 'Survey failed, with 500 error, moving systems.');
         return _navigateToNewSystemForMining(
           api,
-          priceData,
+          caches.marketPrices,
           ship,
-          systemsCache,
-          waypointCache,
-          marketCache,
-          behaviorManager,
+          caches.systems,
+          caches.waypoints,
+          caches.markets,
+          centralCommand,
           currentWaypoint,
         );
       }
@@ -574,7 +562,7 @@ Future<DateTime?> advanceMiner(
     if (isSurveyExhaustedException(e)) {
       // If the survey is exhausted, record it as such and try again.
       shipDetail(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
-      await surveyData.markSurveyExhausted(maybeSurvey);
+      await caches.surveys.markSurveyExhausted(maybeSurvey);
       return null;
     }
     // This should have been caught before using the survey, but we'll
@@ -583,7 +571,7 @@ Future<DateTime?> advanceMiner(
       shipWarn(ship, 'Survey ${maybeSurvey!.signature} expired.');
       // It's not technically exhausted, but that's our easy way to disable
       // the survey.  We use a warning to catch if we're doing this often.
-      await surveyData.markSurveyExhausted(maybeSurvey);
+      await caches.surveys.markSurveyExhausted(maybeSurvey);
       return null;
     }
     rethrow;

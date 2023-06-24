@@ -1,15 +1,6 @@
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/advance.dart';
-import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/ship_cache.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/surveys.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/exceptions.dart';
 import 'package:space_traders_cli/net/rate_limit.dart';
@@ -19,27 +10,20 @@ import 'package:space_traders_cli/ship_waiter.dart';
 /// One loop of the logic.
 Future<void> advanceShips(
   Api api,
-  DataStore db,
-  SystemsCache systemsCache,
-  PriceData priceData,
-  ShipyardPrices shipyardPrices,
-  SurveyData surveyData,
-  TransactionLog transactions,
-  BehaviorManager behaviorManager,
+  CentralCommand centralCommand,
+  Caches caches,
   ShipWaiter waiter,
-  ShipCache shipCache,
-  AgentCache agentCache,
 ) async {
   // WaypointCache and MarketCache only live for one loop over the ships.
-  final waypointCache = WaypointCache(api, systemsCache);
+  final waypointCache = WaypointCache(api, caches.systems);
   final marketCache = MarketCache(waypointCache);
 
-  await shipCache.ensureShipsUpToDate(api);
-  await agentCache.ensureAgentUpToDate(api);
+  await caches.ships.ensureShipsUpToDate(api);
+  await caches.agent.ensureAgentUpToDate(api);
 
-  waiter.updateForShips(shipCache.ships);
+  waiter.updateForShips(caches.ships.ships);
 
-  final shipSymbols = shipCache.shipSymbols;
+  final shipSymbols = caches.ships.shipSymbols;
 
   // loop over all ships and advance them.
   for (final shipSymbol in shipSymbols) {
@@ -47,24 +31,14 @@ Future<void> advanceShips(
     if (previousWait != null) {
       continue;
     }
-    final ship = shipCache.ship(shipSymbol);
+    final ship = caches.ships.ship(shipSymbol);
     try {
-      final ctx = BehaviorContext(
+      final waitUntil = await advanceShipBehavior(
         api,
-        db,
-        priceData,
-        shipyardPrices,
-        shipCache,
-        agentCache,
-        systemsCache,
-        waypointCache,
-        marketCache,
-        behaviorManager,
-        surveyData,
-        transactions,
+        centralCommand,
+        caches,
         ship,
       );
-      final waitUntil = await advanceShipBehavior(ctx);
       waiter.updateWaitUntil(shipSymbol, waitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when
@@ -80,7 +54,7 @@ Future<void> advanceShips(
       waiter.updateWaitUntil(shipSymbol, expiration);
     }
     // This assumes that advanceShipBehavior updated the passed in ship.
-    shipCache.updateShip(ship);
+    caches.ships.updateShip(ship);
   }
 }
 
@@ -126,15 +100,8 @@ class RateLimitTracker {
 /// Run the logic loop forever.
 Future<void> logic(
   Api api,
-  DataStore db,
-  SystemsCache systemsCache,
-  PriceData priceData,
-  ShipyardPrices shipyardPrices,
-  SurveyData surveyData,
-  TransactionLog transactions,
-  BehaviorManager behaviorManager,
-  AgentCache agentCache,
-  ShipCache shipCache,
+  CentralCommand centralCommand,
+  Caches caches,
 ) async {
   final waiter = ShipWaiter();
   final rateLimitTracker = RateLimitTracker(api);
@@ -144,16 +111,9 @@ Future<void> logic(
     try {
       await advanceShips(
         api,
-        db,
-        systemsCache,
-        priceData,
-        shipyardPrices,
-        surveyData,
-        transactions,
-        behaviorManager,
+        centralCommand,
+        caches,
         waiter,
-        shipCache,
-        agentCache,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {

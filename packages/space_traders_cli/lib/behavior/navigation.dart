@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
@@ -14,19 +14,17 @@ Future<DateTime?> beingRouteAndLog(
   Api api,
   Ship ship,
   SystemsCache systemsCache,
-  BehaviorManager behaviorManager,
+  CentralCommand centralCommand,
   String destinationSymbol,
 ) async {
-  final state = await behaviorManager.getBehavior(ship);
-  state.destination = destinationSymbol;
+  await centralCommand.setDestination(ship, destinationSymbol);
   // TODO(eseidel): Should this buy fuel first if we need it?
   shipInfo(ship, 'Begining route to $destinationSymbol');
-  await behaviorManager.setBehavior(ship.symbol, state);
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
     systemsCache,
-    behaviorManager,
+    centralCommand,
   );
   if (navResult.shouldReturn()) {
     return navResult.waitTime;
@@ -96,7 +94,7 @@ Future<NavResult> continueNavigationIfNeeded(
   Api api,
   Ship ship,
   SystemsCache systemsCache,
-  BehaviorManager behaviorManager, {
+  CentralCommand centralCommand, {
   // Hook for overriding the current time in tests.
   DateTime Function() getNow = defaultGetNow,
 }) async {
@@ -117,8 +115,7 @@ Future<NavResult> continueNavigationIfNeeded(
     // has arrived before we got a chance to update it here.
     ship.nav.status = ShipNavStatus.IN_ORBIT;
   }
-  final state = await behaviorManager.getBehavior(ship);
-  final destinationSymbol = state.destination;
+  final destinationSymbol = centralCommand.currentDestination(ship);
   if (destinationSymbol == null) {
     // We don't have a destination, so we can't navigate.
     return NavResult._continueAction();
@@ -126,8 +123,7 @@ Future<NavResult> continueNavigationIfNeeded(
   // We've reached the destination, so we can stop navigating.
   if (ship.nav.waypointSymbol == destinationSymbol) {
     // Remove the destination from the ship's state or it will try to come back.
-    state.destination = null;
-    await behaviorManager.setBehavior(ship.symbol, state);
+    await centralCommand.reachedDestination(ship);
     return NavResult._continueAction();
   }
   final endWaypoint = systemsCache.waypointFromSymbol(destinationSymbol);

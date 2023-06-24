@@ -3,70 +3,14 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/ship_cache.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/surveys.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
 import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/net/rate_limit.dart';
 import 'package:space_traders_cli/printing.dart';
-
-// Consider having a config file like:
-// https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
-// instead of having this dynamic behavior function.
-// At the top of the file because I change this so often.
-Behavior _behaviorFor(
-  BehaviorManager behaviorManager,
-  Ship ship,
-) {
-  final disableBehaviors = <Behavior>[
-    // Behavior.buyShip,
-    // Behavior.contractTrader,
-    // Behavior.arbitrageTrader,
-    // Behavior.miner,
-    // Behavior.idle,
-    // Behavior.explorer,
-  ];
-
-  final behaviors = {
-    ShipRole.COMMAND: [
-      Behavior.buyShip,
-      Behavior.contractTrader,
-      Behavior.arbitrageTrader,
-      Behavior.miner
-    ],
-    // Can't have more than one contract trader on small/expensive contracts
-    // or we'll overbuy.
-    ShipRole.HAULER: [
-      Behavior.contractTrader,
-      Behavior.arbitrageTrader,
-    ],
-    ShipRole.EXCAVATOR: [Behavior.miner],
-    ShipRole.SATELLITE: [Behavior.explorer],
-  }[ship.registration.role];
-  if (behaviors != null) {
-    for (final behavior in behaviors) {
-      if (disableBehaviors.contains(behavior)) {
-        continue;
-      }
-      if (behaviorManager.isEnabled(behavior)) {
-        return behavior;
-      }
-    }
-  } else {
-    logger
-        .warn('${ship.registration.role} has no specified behaviors, idling.');
-  }
-  return Behavior.idle;
-}
 
 void printRequestStats(RateLimitedApiClient client) {
   final counts = client.requestCounts.counts;
@@ -104,28 +48,14 @@ Future<void> cliMain(List<String> args) async {
   final token =
       await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
   final api = apiFromAuthToken(token);
-  final db = DataStore();
-  await db.open();
 
-  final priceData = await PriceData.load(fs);
-  final surveyData = await SurveyData.load(fs);
+  final caches = await Caches.load(fs, api);
   logger.info(
-    'Loaded ${priceData.count} prices from '
-    '${priceData.waypointCount} waypoints.',
+    'Loaded ${caches.marketPrices.count} prices from '
+    '${caches.marketPrices.waypointCount} markets.',
   );
-
-  final systemsCache = await SystemsCache.load(fs);
-  final transactions = await TransactionLog.load(fs);
-  final shipyardPrices = await ShipyardPrices.load(fs);
-
-  // Behaviors are expected to "complete" behaviors when done and
-  // disable behaviors on error.
-  final behaviorManager = await BehaviorManager.load(db, (bm, ship) {
-    // TODO(eseidel): This logic is triggered twice for each ship?
-    final behavior = _behaviorFor(bm, ship);
-    // shipInfo(ship, 'Chose new behavior: $behavior');
-    return behavior;
-  });
+  final behaviorCache = await BehaviorCache.load(fs);
+  final centralCommand = CentralCommand(behaviorCache);
 
   final status = await api.defaultApi.getStatus();
   printStatus(status!);
@@ -146,18 +76,7 @@ Future<void> cliMain(List<String> args) async {
   final shipCache = await ShipCache.load(api);
   logger.info(describeFleet(shipCache));
 
-  await logic(
-    api,
-    db,
-    systemsCache,
-    priceData,
-    shipyardPrices,
-    surveyData,
-    transactions,
-    behaviorManager,
-    agentCache,
-    shipCache,
-  );
+  await logic(api, centralCommand, caches);
 }
 
 Future<void> main(List<String> args) async {

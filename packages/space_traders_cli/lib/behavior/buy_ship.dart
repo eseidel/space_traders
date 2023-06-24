@@ -1,16 +1,9 @@
 import 'dart:math';
 
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
-import 'package:space_traders_cli/cache/prices.dart';
-import 'package:space_traders_cli/cache/ship_cache.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/net/queries.dart';
@@ -114,6 +107,11 @@ int _countOfTypeInFleet(ShipCache shipCache, ShipType shipType) {
 
 // This is a hack for now, we need real planning.
 ShipType? _shipTypeToBuy(ShipCache shipCache, {int? randomSeed}) {
+  final isEarlyGame = shipCache.ships.length < 10;
+  if (isEarlyGame) {
+    return ShipType.ORE_HOUND;
+  }
+
   final random = Random(randomSeed);
   final targetCounts = {
     ShipType.ORE_HOUND: 30,
@@ -135,51 +133,44 @@ ShipType? _shipTypeToBuy(ShipCache shipCache, {int? randomSeed}) {
 /// Apply the buy ship behavior.
 Future<DateTime?> advanceBuyShip(
   Api api,
-  DataStore db,
-  PriceData priceData,
-  ShipyardPrices shipyardPrices,
-  AgentCache agentCache,
-  ShipCache shipCache,
-  Ship ship,
-  SystemsCache systemsCache,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  TransactionLog transactionLog,
-  BehaviorManager behaviorManager, {
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
-  final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint =
+      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
 
-  final shipType = _shipTypeToBuy(shipCache);
+  final shipType = _shipTypeToBuy(caches.ships);
   if (shipType == null) {
     shipWarn(
       ship,
       'No ships needed, disabling behavior.',
     );
-    await behaviorManager.disableBehavior(ship, Behavior.buyShip);
+    await centralCommand.disableBehavior(ship, Behavior.buyShip);
     return null;
   }
 
   // Get our median price before updating shipyard prices.
-  final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
+  final medianPrice = caches.shipyardPrices.medianPurchasePrice(shipType);
   if (medianPrice == null) {
     shipWarn(
         ship,
         'Failed to buy ship, no median price for $shipType'
         'disabling behavior.');
-    await behaviorManager.disableBehavior(ship, Behavior.buyShip);
+    await centralCommand.disableBehavior(ship, Behavior.buyShip);
     return null;
   }
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
-  final credits = agentCache.agent.credits;
+  final credits = caches.agent.agent.credits;
   if (credits < maxPrice) {
     shipWarn(
       ship,
       'Cant by $shipType, credits $credits < max price $maxPrice, '
       'disabling behavior.',
     );
-    await behaviorManager.disableBehavior(ship, Behavior.buyShip);
+    await centralCommand.disableBehavior(ship, Behavior.buyShip);
     return null;
   }
 
@@ -187,10 +178,10 @@ Future<DateTime?> advanceBuyShip(
   if (currentWaypoint.hasShipyard) {
     // Update our shipyard prices regardless of any later errors.
     final shipyard = await getShipyard(api, currentWaypoint);
-    await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
+    await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
     // We should *always* have a recent price, we just updated it.
-    final recentPrice = shipyardPrices.recentPurchasePrice(
+    final recentPrice = caches.shipyardPrices.recentPurchasePrice(
       shipyardSymbol: currentWaypoint.symbol,
       shipType: shipType,
     )!;
@@ -203,7 +194,7 @@ Future<DateTime?> advanceBuyShip(
         '$recentPriceString > max price $maxPrice '
         'disabling behavior for ${approximateDuration(timeout)}.',
       );
-      await behaviorManager.disableBehavior(
+      await centralCommand.disableBehavior(
         ship,
         Behavior.buyShip,
         timeout: timeout,
@@ -214,16 +205,16 @@ Future<DateTime?> advanceBuyShip(
     // Do we need to catch exceptions about insufficient credits?
     await purchaseShipAndLog(
       api,
-      priceData,
-      shipCache,
-      agentCache,
+      caches.marketPrices,
+      caches.ships,
+      caches.agent,
       ship,
       shipyard.symbol,
       shipType,
     );
 
-    await behaviorManager.completeBehavior(ship.symbol);
-    await behaviorManager.disableBehavior(
+    await centralCommand.completeBehavior(ship.symbol);
+    await centralCommand.disableBehavior(
       ship,
       Behavior.buyShip,
       timeout: const Duration(minutes: 20),
@@ -234,8 +225,8 @@ Future<DateTime?> advanceBuyShip(
   /// Otherwise, assume this is our first time through this behavior.
   /// Go to the nearest shipyard (maybe with best price?)
   final destination = await _nearbyShipyardWithBestPrice(
-    waypointCache,
-    shipyardPrices,
+    caches.waypoints,
+    caches.shipyardPrices,
     ship,
     shipType,
     maxMedianMultipler,
@@ -245,14 +236,14 @@ Future<DateTime?> advanceBuyShip(
         ship,
         'Failed to buy $shipType, no shipyard near ${ship.nav.waypointSymbol} '
         'with good price, disabling behavior.');
-    await behaviorManager.disableBehavior(ship, Behavior.buyShip);
+    await centralCommand.disableBehavior(ship, Behavior.buyShip);
     return null;
   }
   return beingRouteAndLog(
     api,
     ship,
-    systemsCache,
-    behaviorManager,
+    caches.systems,
+    centralCommand,
     destination.symbol,
   );
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:file/file.dart';
 
 /// A class to manage a json log file.
+/// The file as a whole is *not* valid json, each line of it is valid json.
 class JsonLog<Record> {
   /// Create a new json log.
   JsonLog(

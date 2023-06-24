@@ -1,7 +1,7 @@
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/json_log.dart';
+import 'package:space_traders_cli/cache/json_log.dart';
 
 /// A class to hold transaction data from a ship.
 @immutable

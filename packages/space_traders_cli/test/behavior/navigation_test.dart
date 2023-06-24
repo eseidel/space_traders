@@ -1,6 +1,7 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -12,28 +13,28 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class _MockBehaviorManager extends Mock implements BehaviorManager {}
-
 class _MockLogger extends Mock implements Logger {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
+class _MockCentralCommand extends Mock implements CentralCommand {}
+
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
     final api = _MockApi();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
-    final behaviorManager = _MockBehaviorManager();
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
+    final centralCommand = _MockCentralCommand();
 
     /// The behavior doesn't matter, just needs to have a null destination.
-    when(() => behaviorManager.getBehavior(ship))
-        .thenAnswer((invocation) => Future.value(BehaviorState(Behavior.idle)));
+    when(() => centralCommand.getBehavior('S'))
+        .thenAnswer((_) => BehaviorState('S', Behavior.idle));
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -51,7 +52,7 @@ void main() {
         api,
         ship,
         systemsCache,
-        behaviorManager,
+        centralCommand,
         getNow: getNow,
       ),
     );
@@ -73,7 +74,7 @@ void main() {
         api,
         ship,
         systemsCache,
-        behaviorManager,
+        centralCommand,
         getNow: getNow,
       ),
     );

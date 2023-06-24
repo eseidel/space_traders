@@ -1,7 +1,7 @@
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/cache/data_store.dart';
 import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
@@ -30,8 +30,6 @@ void main(List<String> args) async {
 }
 
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
-  final db = DataStore();
-  await db.open();
   // Where to move?
   final hq = parseWaypointString(caches.agent.agent.headquarters);
   final startSystem = hq.system;
@@ -67,13 +65,13 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
       await waypointsForShips(caches.waypoints, selectedShips);
   printShips(selectedShips, shipWaypoints);
 
-  final behaviorManager =
-      await BehaviorManager.load(db, (_, __) => Behavior.idle);
+  final behaviorCache = await BehaviorCache.load(fs);
+  final centralCommand = CentralCommand(behaviorCache);
   // Set a destination for each ship.
   for (final ship in selectedShips) {
-    await behaviorManager.setBehavior(
+    await behaviorCache.setBehavior(
       ship.symbol,
-      BehaviorState(Behavior.explorer),
+      Behavior.explorer,
     );
     await beingRouteAndLog(
       api,
