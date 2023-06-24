@@ -3,7 +3,6 @@ import 'package:scoped/scoped.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:space_traders_cli/net/queries.dart';
 
 class ClusterFinder {
@@ -51,6 +50,14 @@ class ClusterFinder {
   }
 }
 
+Stream<Faction> _getAllFactionsUnauthenticated() {
+  final factionsApi = FactionsApi();
+  return fetchAllPages(factionsApi, (factionsApi, page) async {
+    final response = await factionsApi.getFactions(page: page);
+    return (response!.data, response.meta);
+  });
+}
+
 Future<void> cliMain() async {
 // Load up all the factions HQs.
 // Find the number of systems reachable from each HQ.
@@ -58,9 +65,8 @@ Future<void> cliMain() async {
 
   const fs = LocalFileSystem();
   final systemsCache = await SystemsCache.load(fs);
-  final api = defaultApi(fs);
 
-  final factions = await getAllFactions(api).toList();
+  final factions = await _getAllFactionsUnauthenticated().toList();
   final hqByFaction = <String, String>{
     for (final faction in factions) faction.symbol.value: faction.headquarters
   };
