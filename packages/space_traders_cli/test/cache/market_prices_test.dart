@@ -24,7 +24,7 @@ MarketPrice makePrice({
     purchasePrice: purchasePrice,
     sellPrice: sellPrice,
     tradeVolume: tradeVolume,
-    timestamp: timestamp ?? DateTime.now(),
+    timestamp: timestamp ?? DateTime.timestamp(),
   );
 }
 
@@ -239,8 +239,8 @@ void main() {
     expect(marketPrices.hasRecentMarketData('a'), true);
     expect(marketPrices.count, 1);
 
-    final priceData2 = await MarketPrices.load(fs);
-    expect(priceData2.hasRecentMarketData('a'), true);
-    expect(priceData2.count, 1);
+    final marketPrices2 = await MarketPrices.load(fs);
+    expect(marketPrices2.hasRecentMarketData('a'), true);
+    expect(marketPrices2.count, 1);
   });
 }
