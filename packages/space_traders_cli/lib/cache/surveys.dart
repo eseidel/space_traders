@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/json_list_store.dart';
 import 'package:space_traders_cli/printing.dart';
 
 /// Record of a historcial survey.
@@ -63,61 +62,34 @@ class HistoricalSurvey {
 }
 
 /// The data store for historical surveys.
-class SurveyData {
+class SurveyData extends JsonListStore<HistoricalSurvey> {
   /// Create a SurveyData.
   SurveyData({
     required List<HistoricalSurvey> surveys,
-    required FileSystem fs,
-    String cacheFilePath = defaultCacheFilePath,
-  })  : _surveys = surveys,
-        _fs = fs,
-        _cacheFilePath = cacheFilePath;
-
-  final List<HistoricalSurvey> _surveys;
-  final FileSystem _fs;
-  final String _cacheFilePath;
+    required super.fs,
+    super.path = defaultCacheFilePath,
+  }) : super(surveys);
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'surveys.json';
 
   /// The surveys.
   @visibleForTesting
-  List<HistoricalSurvey> get surveys => _surveys;
+  List<HistoricalSurvey> get surveys => entries;
 
-  static List<HistoricalSurvey> _parseSurveys(String json) {
-    final parsed = jsonDecode(json) as List<dynamic>;
-    return parsed
-        .map<HistoricalSurvey>(
-          (e) => HistoricalSurvey.fromJson(e as Map<String, dynamic>),
-        )
-        .toList();
-  }
+  List<HistoricalSurvey> get _surveys => entries;
 
   /// Load the store.
   static Future<SurveyData> load(
     FileSystem fs, {
-    String? cacheFilePath,
+    String path = defaultCacheFilePath,
   }) async {
-    final filePath = cacheFilePath ?? defaultCacheFilePath;
-    final surveysFile = fs.file(filePath);
-    if (surveysFile.existsSync()) {
-      return SurveyData(
-        surveys: _parseSurveys(await surveysFile.readAsString()),
-        fs: fs,
-        cacheFilePath: filePath,
-      );
-    }
-    return SurveyData(
-      surveys: [],
-      fs: fs,
-      cacheFilePath: filePath,
+    final surveys = await JsonListStore.load<HistoricalSurvey>(
+      fs,
+      path,
+      HistoricalSurvey.fromJson,
     );
-  }
-
-  /// Save the store.
-  Future<void> save() async {
-    final surveysFile = _fs.file(_cacheFilePath);
-    await surveysFile.writeAsString(jsonEncode(_surveys));
+    return SurveyData(surveys: surveys, fs: fs, path: path);
   }
 
   /// Add a survey to the store.
