@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/json_list_store.dart';
 import 'package:space_traders_cli/cache/market_prices.dart'; // just for maxAge.
 import 'package:space_traders_cli/logger.dart';
 
@@ -81,14 +81,13 @@ class ShipyardPrice {
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class ShipyardPrices {
+class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   /// Create a new price data collection.
   ShipyardPrices(
-    List<ShipyardPrice> prices, {
-    required FileSystem fs,
-    this.cacheFilePath = defaultCacheFilePath,
-  })  : _prices = prices,
-        _fs = fs;
+    super.prices, {
+    required super.fs,
+    super.path = defaultCacheFilePath,
+  });
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'shipyard_prices.json';
@@ -96,16 +95,7 @@ class ShipyardPrices {
   // This might not actually be true!  I've never seen a 0 in the data.
   // These may contain 0s and duplicates, best to access it through one
   // of the accessors which knows how to filter.
-  final List<ShipyardPrice> _prices;
-
-  /// The path to the cache file.
-  final String cacheFilePath;
-
-  /// The file system to use.
-  final FileSystem _fs;
-
-  /// Get the count of Price records.
-  int get count => _prices.length;
+  List<ShipyardPrice> get _prices => entries;
 
   /// Get the count of unique waypoints.
   int get waypointCount {
@@ -119,40 +109,17 @@ class ShipyardPrices {
   /// Get the raw pricing data.
   List<ShipyardPrice> get rawPrices => _prices;
 
-  static List<ShipyardPrice> _parsePrices(String prices) {
-    final parsed = jsonDecode(prices) as List<dynamic>;
-    return parsed
-        .map<ShipyardPrice>(
-          (e) => ShipyardPrice.fromJson(e as Map<String, dynamic>),
-        )
-        .toList();
-  }
-
-  static ShipyardPrices? _loadPricesCache(FileSystem fs, String cacheFilePath) {
-    final pricesFile = fs.file(cacheFilePath);
-    if (pricesFile.existsSync()) {
-      return ShipyardPrices(
-        _parsePrices(pricesFile.readAsStringSync()),
-        fs: fs,
-        cacheFilePath: cacheFilePath,
-      );
-    }
-    return null;
-  }
-
-  /// Save the price data to the cache.
-  Future<void> save() async {
-    await _fs.file(cacheFilePath).writeAsString(jsonEncode(_prices));
-  }
-
   /// Load the price data from the cache or from the url.
   static Future<ShipyardPrices> load(
     FileSystem fs, {
-    String? cacheFilePath,
+    String? path,
   }) async {
-    final filePath = cacheFilePath ?? defaultCacheFilePath;
-    final fromCache = _loadPricesCache(fs, filePath);
-    return fromCache ?? ShipyardPrices([], fs: fs, cacheFilePath: filePath);
+    final prices = await JsonListStore.load<ShipyardPrice>(
+      fs,
+      path ?? defaultCacheFilePath,
+      ShipyardPrice.fromJson,
+    );
+    return ShipyardPrices(prices, fs: fs);
   }
 
   /// Add new prices to the price data.
