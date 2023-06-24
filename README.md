@@ -127,6 +127,7 @@ Efficiency:
 * Write a better rate-limiting model.
 * Teach arbitrage trader how to buy multiple times up to the max cargo hold.
 * Make the script robust to network failures.
+* Contract trader should record shipyard prices.
 
 Automation:
 * Automate resets
