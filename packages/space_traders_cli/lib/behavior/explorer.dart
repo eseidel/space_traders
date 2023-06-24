@@ -36,8 +36,24 @@ bool _isMissingRecentShipyardData(
       !shipyardPrices.hasRecentShipyardData(waypoint.symbol);
 }
 
+Future<Waypoint?> _nearestWaypointNeedingExploration(
+  WaypointCache waypointCache,
+  PriceData priceData,
+  ShipyardPrices shipyardPrices,
+  Ship ship,
+) async {
+  final systemWaypoints =
+      await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
+  for (final waypoint in systemWaypoints) {
+    if (_isMissingChartOrRecentPriceData(priceData, shipyardPrices, waypoint)) {
+      return waypoint;
+    }
+  }
+  return null;
+}
+
 /// One loop of the exploring logic.
-Future<DateTime?> advanceExporer(
+Future<DateTime?> advanceExplorer(
   Api api,
   DataStore db,
   TransactionLog transactionLog,
@@ -99,16 +115,18 @@ Future<DateTime?> advanceExporer(
   // If any are not explored, or have a market but don't have recent market
   // data, got there.
   // TODO(eseidel): This navigation logic should use beginRouteAndLog.
-  final systemWaypoints =
-      await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
-  for (final waypoint in systemWaypoints) {
-    if (_isMissingChartOrRecentPriceData(priceData, shipyardPrices, waypoint)) {
-      return navigateToLocalWaypointAndLog(
-        api,
-        ship,
-        waypoint.toSystemWaypoint(),
-      );
-    }
+  final nearest = await _nearestWaypointNeedingExploration(
+    waypointCache,
+    priceData,
+    shipyardPrices,
+    ship,
+  );
+  if (nearest != null) {
+    shipInfo(
+      ship,
+      'Exploring ${nearest.symbol} in ${nearest.systemSymbol}',
+    );
+    return navigateToLocalWaypointAndLog(api, ship, nearest.toSystemWaypoint());
   }
 
   // If at a jump gate, go to a nearby system with unexplored waypoints or

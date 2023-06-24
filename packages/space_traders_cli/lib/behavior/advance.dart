@@ -159,7 +159,7 @@ Future<DateTime?> advanceShipBehavior(
       );
 
     case Behavior.explorer:
-      return advanceExporer(
+      return advanceExplorer(
         ctx.api,
         ctx.db,
         ctx.transactions,

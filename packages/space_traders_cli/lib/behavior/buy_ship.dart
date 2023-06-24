@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
@@ -59,6 +61,7 @@ const maxMedianMultipler = 1.1;
 //   return false;
 // }
 
+// TODO(eseidel): This only looks in the current system.
 Future<Waypoint?> _nearbyShipyardWithBestPrice(
   WaypointCache waypointCache,
   ShipyardPrices shipyardPrices,
@@ -109,6 +112,26 @@ int _countOfTypeInFleet(ShipCache shipCache, ShipType shipType) {
   return shipCache.frameCounts[frameForType] ?? 0;
 }
 
+// This is a hack for now, we need real planning.
+ShipType? _shipTypeToBuy(ShipCache shipCache, {int? randomSeed}) {
+  final random = Random(randomSeed);
+  final targetCounts = {
+    ShipType.ORE_HOUND: 30,
+    ShipType.PROBE: 10,
+    ShipType.LIGHT_HAULER: 5,
+  };
+  final typesToBuy = targetCounts.keys
+      .where(
+        (shipType) =>
+            _countOfTypeInFleet(shipCache, shipType) < targetCounts[shipType]!,
+      )
+      .toList();
+  if (typesToBuy.isEmpty) {
+    return null;
+  }
+  return typesToBuy[random.nextInt(typesToBuy.length)];
+}
+
 /// Apply the buy ship behavior.
 Future<DateTime?> advanceBuyShip(
   Api api,
@@ -128,21 +151,11 @@ Future<DateTime?> advanceBuyShip(
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
   final currentWaypoint = await waypointCache.waypoint(ship.nav.waypointSymbol);
 
-  // This is a hack for now, we need real planning.
-  // final shipType =
-  //     shipCache.ships.length.isEven ? ShipType.ORE_HOUND : ShipType.PROBE;
-  const shipType = ShipType.ORE_HOUND;
-  final targetCounts = {
-    ShipType.ORE_HOUND: 30,
-    ShipType.PROBE: 10,
-    ShipType.LIGHT_HAULER: 5,
-  };
-  final currentCount = _countOfTypeInFleet(shipCache, shipType);
-  if (currentCount >= targetCounts[shipType]!) {
+  final shipType = _shipTypeToBuy(shipCache);
+  if (shipType == null) {
     shipWarn(
       ship,
-      'Failed to buy ship, already have $currentCount $shipType, '
-      'disabling behavior.',
+      'No ships needed, disabling behavior.',
     );
     await behaviorManager.disableBehavior(ship, Behavior.buyShip);
     return null;
@@ -183,15 +196,17 @@ Future<DateTime?> advanceBuyShip(
     )!;
     final recentPriceString = creditsString(recentPrice);
     if (recentPrice > maxPrice) {
+      const timeout = Duration(minutes: 30);
       shipWarn(
         ship,
-        'Failed to buy $shipType, $recentPriceString > max price $maxPrice '
-        'disabling behavior for 30m.',
+        'Failed to buy $shipType at ${currentWaypoint.symbol}, '
+        '$recentPriceString > max price $maxPrice '
+        'disabling behavior for ${approximateDuration(timeout)}.',
       );
       await behaviorManager.disableBehavior(
         ship,
         Behavior.buyShip,
-        timeout: const Duration(minutes: 30),
+        timeout: timeout,
       );
       return null;
     }
@@ -228,8 +243,8 @@ Future<DateTime?> advanceBuyShip(
   if (destination == null) {
     shipWarn(
         ship,
-        'Failed to buy ship, no nearby shipyard with good price '
-        'disabling behavior.');
+        'Failed to buy $shipType, no shipyard near ${ship.nav.waypointSymbol} '
+        'with good price, disabling behavior.');
     await behaviorManager.disableBehavior(ship, Behavior.buyShip);
     return null;
   }

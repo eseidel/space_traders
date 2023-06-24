@@ -125,8 +125,8 @@ Efficiency:
 * Fix contract trader to share code with arbitrage trader.  Contracts are a
   special case of arbitrage, in which the destination and trade good are fixed.
 * Write a better rate-limiting model.
-* Teach RateLimiter to print out requests per minute every minute.
 * Teach arbitrage trader how to buy multiple times up to the max cargo hold.
+* Make the script robust to network failures.
 
 Automation:
 * Automate resets
