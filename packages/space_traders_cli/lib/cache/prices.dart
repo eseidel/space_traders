@@ -1,11 +1,12 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/json_list_store.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/printing.dart';
 
 /// default max age for "recent" prices is 3 days
 const defaultMaxAge = Duration(days: 3);
@@ -120,85 +121,49 @@ class MarketPrice {
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class PriceData {
+class PriceData extends JsonListStore<MarketPrice> {
   /// Create a new price data collection.
   PriceData(
-    List<MarketPrice> prices, {
-    required FileSystem fs,
-    this.cacheFilePath = defaultCacheFilePath,
-  })  : _prices = prices,
-        _fs = fs;
+    super.prices, {
+    required super.fs,
+    super.path = defaultCacheFilePath,
+  });
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'prices.json';
 
-  // This might not actually be true!  I've never seen a 0 in the data.
-  // These may contain 0s and duplicates, best to access it through one
-  // of the accessors which knows how to filter.
-  final List<MarketPrice> _prices;
-
-  /// The path to the cache file.
-  final String cacheFilePath;
-
-  /// The file system to use.
-  final FileSystem _fs;
-
-  /// Get the count of Price records.
-  int get count => _prices.length;
+  /// Load the price data from the cache.
+  static Future<PriceData> load(
+    FileSystem fs, {
+    String path = defaultCacheFilePath,
+  }) async {
+    final prices = await JsonListStore.load<MarketPrice>(
+      fs,
+      path,
+      MarketPrice.fromJson,
+    );
+    return PriceData(prices, fs: fs, path: path);
+  }
 
   /// Get the count of unique waypoints.
   int get waypointCount {
     final waypoints = <String>{};
-    for (final price in _prices) {
+    for (final price in entries) {
       waypoints.add(price.waypointSymbol);
     }
     return waypoints.length;
   }
 
   /// Get the raw pricing data.
-  List<MarketPrice> get prices => _prices;
+  List<MarketPrice> get prices => List.unmodifiable(entries);
 
-  static List<MarketPrice> _parsePrices(String prices) {
-    final parsed = jsonDecode(prices) as List<dynamic>;
-    return parsed
-        .map<MarketPrice>(
-          (e) => MarketPrice.fromJson(e as Map<String, dynamic>),
-        )
-        .toList();
-  }
-
-  static PriceData? _loadPricesCache(FileSystem fs, String cacheFilePath) {
-    final pricesFile = fs.file(cacheFilePath);
-    if (pricesFile.existsSync()) {
-      return PriceData(
-        _parsePrices(pricesFile.readAsStringSync()),
-        fs: fs,
-        cacheFilePath: cacheFilePath,
-      );
-    }
-    return null;
-  }
-
-  /// Save the price data to the cache.
-  Future<void> save() async {
-    await _fs.file(cacheFilePath).writeAsString(jsonEncode(_prices));
-  }
-
-  /// Load the price data from the cache or from the url.
-  static Future<PriceData> load(
-    FileSystem fs, {
-    String? cacheFilePath,
-    String? url,
-  }) async {
-    final filePath = cacheFilePath ?? defaultCacheFilePath;
-    // Try to load prices.json.  If it does not exist, pull down and cache
-    // from the url.
-    final fromCache = _loadPricesCache(fs, filePath);
-    return fromCache ?? PriceData([], fs: fs, cacheFilePath: filePath);
-  }
+  List<MarketPrice> get _prices => entries;
 
   /// Add new prices to the price data.
-  Future<void> addPrices(List<MarketPrice> newPrices) async {
+  Future<void> addPrices(
+    List<MarketPrice> newPrices, {
+    DateTime Function() getNow = defaultGetNow,
+  }) async {
     // Go through the list, see if we already have a price for this pair
     // if so, replace it, otherwise add to the end?
     // Probably this should add them to a separate buffer, which is then
@@ -212,7 +177,7 @@ class PriceData {
             element.symbol == newPrice.symbol,
       );
 
-      if (DateTime.now().isBefore(newPrice.timestamp)) {
+      if (getNow().isBefore(newPrice.timestamp)) {
         logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
         continue;
       }
