@@ -28,6 +28,15 @@ class WaypointCache {
   final Api _api;
   final SystemsCache _systemsCache;
 
+  // TODO(eseidel): This should not exist.
+  /// Used to reset part of the WaypointsCache every loop.
+  void resetForLoop() {
+    // _agentHeadquarters = null;
+    _waypointsBySystem.clear();
+    // _connectedSystemsBySystem.clear();
+    // _jumpGatesBySystem.clear();
+  }
+
   /// True if the WaypointCache should ensure that the SystemsCache matches
   /// the server
   final bool ensureCacheMatchesServer;
@@ -188,6 +197,12 @@ class MarketCache {
   // Currently this only caches for one loop.
   final Map<String, Market?> _marketsBySymbol = {};
   final WaypointCache _waypointCache;
+
+  // TODO(eseidel): This should not exist.
+  /// Used to reset part of the MarketCache every loop over the ships.
+  void resetForLoop() {
+    _marketsBySymbol.clear();
+  }
 
   /// Fetch all markets in the given system.
   Stream<Market> marketsInSystem(String systemSymbol) async* {

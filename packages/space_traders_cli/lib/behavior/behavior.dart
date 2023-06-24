@@ -85,17 +85,17 @@ class BehaviorState {
 class BehaviorCache {
   /// Create a new behavior cache.
   BehaviorCache(
-    Map<String, BehaviorState> behaviorStates, {
+    Map<String, BehaviorState> stateByShipSymbol, {
     required FileSystem fs,
     String path = defaultPath,
-  })  : _behaviorStates = behaviorStates,
+  })  : _stateByShipSymbol = stateByShipSymbol,
         _fs = fs,
         _path = path;
 
   /// The default path to the cache file.
   static const String defaultPath = 'behaviors.json';
 
-  final Map<String, BehaviorState> _behaviorStates;
+  final Map<String, BehaviorState> _stateByShipSymbol;
 
   final String _path;
 
@@ -104,7 +104,7 @@ class BehaviorCache {
 
   /// Save entries to a file.
   Future<void> save() async {
-    await _fs.file(_path).writeAsString(jsonEncode(_behaviorStates));
+    await _fs.file(_path).writeAsString(jsonEncode(_stateByShipSymbol));
   }
 
   /// Load the cache from a file.
@@ -114,32 +114,39 @@ class BehaviorCache {
   }) async {
     final file = fs.file(path);
     if (await file.exists()) {
-      final behaviorStates =
-          jsonDecode(await file.readAsString()) as Map<String, BehaviorState>;
+      final jsonMap =
+          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      final behaviorStates = jsonMap.map<String, BehaviorState>(
+        (key, value) => MapEntry(
+          key,
+          BehaviorState.fromJson(value as Map<String, dynamic>),
+        ),
+      );
       return BehaviorCache(behaviorStates, fs: fs, path: path);
     }
     return BehaviorCache({}, fs: fs, path: path);
   }
 
   /// Get the behavior state for the given ship.
-  BehaviorState? getBehavior(String shipSymbol) => _behaviorStates[shipSymbol];
+  BehaviorState? getBehavior(String shipSymbol) =>
+      _stateByShipSymbol[shipSymbol];
 
   /// Delete the behavior state for the given ship.
   Future<void> deleteBehavior(String shipSymbol) async =>
-      _behaviorStates.remove(shipSymbol);
+      _stateByShipSymbol.remove(shipSymbol);
 
   /// Set the behavior state for the given ship.
   Future<void> setBehavior(
     String shipSymbol,
     BehaviorState behaviorState,
   ) async {
-    _behaviorStates[shipSymbol] = behaviorState;
+    _stateByShipSymbol[shipSymbol] = behaviorState;
     await save();
   }
 
   /// Clear the behavior state for the given ship.
   Future<void> completeBehavior(String shipSymbol) async {
-    _behaviorStates.remove(shipSymbol);
+    _stateByShipSymbol.remove(shipSymbol);
     await save();
   }
 }

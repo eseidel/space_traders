@@ -5,7 +5,6 @@ import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/logic.dart';
-import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:space_traders_cli/ship_waiter.dart';
 
@@ -71,39 +70,28 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   for (final ship in selectedShips) {
     await behaviorCache.setBehavior(
       ship.symbol,
-      Behavior.explorer,
+      BehaviorState(ship.symbol, Behavior.explorer),
     );
     await beingRouteAndLog(
       api,
       ship,
       caches.systems,
-      behaviorManager,
+      centralCommand,
       destWaypoint.symbol,
     );
   }
 
   final waiter = ShipWaiter();
-
   final activeShipSymbols = selectedShips.map((s) => s.symbol).toSet();
 
   // Loop the logicLoop until all ships are idle.
   while (true) {
-    final ships = await allMyShips(api)
-        .where((s) => activeShipSymbols.contains(s.symbol))
-        .toList();
-    final shipCache = ShipCache(ships);
     await advanceShips(
       api,
-      db,
-      caches.systems,
-      caches.marketPrices,
-      caches.shipyardPrices,
-      caches.surveys,
-      caches.transactions,
-      behaviorManager,
+      centralCommand,
+      caches,
       waiter,
-      shipCache,
-      caches.agent,
+      shipFilter: (s) => activeShipSymbols.contains(s.symbol),
     );
 
     final earliestWaitUntil = waiter.earliestWaitUntil();

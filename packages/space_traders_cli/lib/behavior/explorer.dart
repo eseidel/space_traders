@@ -153,7 +153,9 @@ Future<DateTime?> advanceExplorer(
             '${destination.symbol} is missing chart, routing.',
           );
         } else if (_isMissingRecentMarketData(
-            caches.marketPrices, destination)) {
+          caches.marketPrices,
+          destination,
+        )) {
           shipInfo(
             ship,
             '${destination.symbol} is missing recent '

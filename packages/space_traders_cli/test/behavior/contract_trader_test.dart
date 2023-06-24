@@ -9,19 +9,7 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockShip extends Mock implements Ship {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockMarketCache extends Mock implements MarketCache {}
-
-class _MockTransactionLog extends Mock implements TransactionLog {}
-
-class _MockPriceData extends Mock implements PriceData {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockLogger extends Mock implements Logger {}
 
@@ -36,13 +24,7 @@ class _MockCaches extends Mock implements Caches {}
 void main() {
   test('advanceContractTrader smoke test', () async {
     final api = _MockApi();
-    final priceData = _MockPriceData();
-    final agentCache = _MockAgentCache();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
-    final marketCache = _MockMarketCache();
-    final transactionLog = _MockTransactionLog();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = _MockCaches();

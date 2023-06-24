@@ -12,11 +12,12 @@ Future<void> advanceShips(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
-  ShipWaiter waiter,
-) async {
+  ShipWaiter waiter, {
+  bool Function(Ship ship)? shipFilter,
+}) async {
   // WaypointCache and MarketCache only live for one loop over the ships.
-  final waypointCache = WaypointCache(api, caches.systems);
-  final marketCache = MarketCache(waypointCache);
+  caches.waypoints.resetForLoop();
+  caches.markets.resetForLoop();
 
   await caches.ships.ensureShipsUpToDate(api);
   await caches.agent.ensureAgentUpToDate(api);
@@ -32,6 +33,9 @@ Future<void> advanceShips(
       continue;
     }
     final ship = caches.ships.ship(shipSymbol);
+    if (shipFilter != null && !shipFilter(ship)) {
+      continue;
+    }
     try {
       final waitUntil = await advanceShipBehavior(
         api,
