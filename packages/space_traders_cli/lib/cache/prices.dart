@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:file/file.dart';
-import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
@@ -130,10 +129,6 @@ class PriceData {
   })  : _prices = prices,
         _fs = fs;
 
-  // Eventually we should keep our own data and not use the global data.
-  /// Url from which to fetch the global price data.
-  static const String defaultUrl = 'https://st.feba66.de/prices';
-
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'prices.json';
 
@@ -194,33 +189,11 @@ class PriceData {
     FileSystem fs, {
     String? cacheFilePath,
     String? url,
-    bool updateFromServer = false,
   }) async {
-    final uri = Uri.parse(url ?? defaultUrl);
     final filePath = cacheFilePath ?? defaultCacheFilePath;
     // Try to load prices.json.  If it does not exist, pull down and cache
     // from the url.
     final fromCache = _loadPricesCache(fs, filePath);
-    if (!updateFromServer) {
-      return fromCache ?? PriceData([], fs: fs, cacheFilePath: filePath);
-    }
-
-    // We could mock http here.
-    try {
-      final response = await http.get(uri);
-      final serverPrices = _parsePrices(response.body);
-      if (fromCache == null) {
-        final data = PriceData(serverPrices, fs: fs, cacheFilePath: filePath);
-        await data.save();
-        return data;
-      }
-      logger.info('Updating ${serverPrices.length} prices from server.');
-      await fromCache.addPrices(serverPrices);
-    } catch (e) {
-      logger.warn('Failed to fetch prices from $uri: $e');
-    }
-    // fromCache can still be null if we failed to load from cache and
-    // failed to load from server.
     return fromCache ?? PriceData([], fs: fs, cacheFilePath: filePath);
   }
 

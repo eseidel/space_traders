@@ -3,28 +3,8 @@ import 'package:scoped/scoped.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/logger.dart';
-
-final hqByFaction = {
-  'Cosmic Engineers': 'X1-ZT91-90060F',
-  'Voidfarers': 'X1-QV16-48270X',
-  'Galactic Alliance': 'X1-GX61-52060A',
-  'Quantum Federation': 'X1-JY4-10620Z',
-  'Stellar Dominion': 'X1-MZ97-82310B',
-  'Astro-Salvage Alliance': 'X1-HV92-92380A',
-  'Seventh Space Corsairs': 'X1-XR77-94090F',
-  'Obsidian Syndicate': 'X1-GX98-61300D',
-  'Aegis Collective': 'X1-FD34-85450C',
-  'United Independent Settlements': 'X1-MH43-62860F',
-  'Solitary Systems Alliance': 'X1-RS97-03910B',
-  'Cobalt Traders Alliance': 'X1-VG20-48250F',
-  'Omega Star Network': 'X1-YR16-63760F',
-  'Echo Technological Conclave': 'X1-QN84-21330Z',
-  'Lords of the Void': 'X1-QM47-80470D',
-  'Cult of the Machine': 'X1-UV4-35890X',
-  'Ancient Guardians': 'X1-QM50-15330F',
-  'Shadow Stalkers': 'X1-XB85-02550Z',
-  'Ethereal Enclave': 'X1-BK36-82930F'
-};
+import 'package:space_traders_cli/net/auth.dart';
+import 'package:space_traders_cli/net/queries.dart';
 
 class ClusterFinder {
   ClusterFinder(this.systemsCache);
@@ -78,6 +58,12 @@ Future<void> cliMain() async {
 
   const fs = LocalFileSystem();
   final systemsCache = await SystemsCache.load(fs);
+  final api = defaultApi(fs);
+
+  final factions = await getAllFactions(api).toList();
+  final hqByFaction = <String, String>{
+    for (final faction in factions) faction.symbol.value: faction.headquarters
+  };
 
   final startingSystems =
       hqByFaction.values.map((w) => parseWaypointString(w).system).toList();

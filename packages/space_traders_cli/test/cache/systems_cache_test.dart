@@ -1,7 +1,12 @@
 import 'package:file/memory.dart';
+import 'package:http/http.dart' as http;
+import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
+import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
+
+class _MockLogger extends Mock implements Logger {}
 
 void main() {
   test('systemSymbolsInJumpRadius depth', () async {
@@ -71,5 +76,23 @@ void main() {
         .toList();
     final systemSymbols = systems.map((e) => e.$1).toList();
     expect(systemSymbols, expectedSystems);
+  });
+
+  test('SystemCache load http failure', () async {
+    final fs = MemoryFileSystem();
+    Future<http.Response> mockGet(Uri uri) async {
+      return http.Response('Not Found', 404);
+    }
+
+    final logger = _MockLogger();
+    try {
+      await runWithLogger(
+        logger,
+        () => SystemsCache.load(fs, httpGet: mockGet),
+      );
+      fail('exception not thrown');
+    } on ApiException catch (e) {
+      expect(e.code, 404);
+    }
   });
 }

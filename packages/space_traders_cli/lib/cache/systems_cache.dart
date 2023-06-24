@@ -68,6 +68,7 @@ class SystemsCache {
     FileSystem fs, {
     String? cacheFilePath,
     String? url,
+    Future<http.Response> Function(Uri uri)? httpGet,
   }) async {
     final uri = Uri.parse(url ?? defaultUrl);
     final filePath = cacheFilePath ?? defaultCacheFilePath;
@@ -81,7 +82,11 @@ class SystemsCache {
     }
 
     try {
-      final response = await http.get(uri);
+      final get = httpGet ?? http.get;
+      final response = await get(uri);
+      if (response.statusCode >= 400) {
+        throw ApiException(response.statusCode, response.body);
+      }
       final systems = _parseSystems(response.body);
       final data =
           SystemsCache(systems: systems, fs: fs, cacheFilePath: filePath);
@@ -89,8 +94,8 @@ class SystemsCache {
       return data;
     } catch (e) {
       logger.warn('Failed to load systems from $uri: $e');
+      rethrow;
     }
-    throw Exception('Failed to load systems from $uri');
   }
 
   /// Return the jump gate waypoint for the given [systemSymbol].

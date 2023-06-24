@@ -219,4 +219,28 @@ void main() {
     expect(priceData.hasRecentMarketData('a'), true);
     expect(priceData.count, 1);
   });
+
+  test('PriceData save/load roundtrip', () async {
+    final fs = MemoryFileSystem();
+    final priceData = PriceData([], fs: fs);
+    final market = Market(
+      symbol: 'a',
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: 'a',
+          tradeVolume: 1,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+        )
+      ],
+    );
+    await recordMarketData(priceData, market);
+    expect(priceData.hasRecentMarketData('a'), true);
+    expect(priceData.count, 1);
+
+    final priceData2 = await PriceData.load(fs);
+    expect(priceData2.hasRecentMarketData('a'), true);
+    expect(priceData2.count, 1);
+  });
 }

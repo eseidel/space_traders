@@ -25,7 +25,7 @@ Future<void> _navigateToLocalWaypointAndDock(
     logger.info('Waiting to dock...');
     await Future<void>.delayed(flightTime);
     await dockIfNeeded(api, ship);
-    // TODO: Move this "visit waypoint" logic into a central place.
+    // TODO(eseidel): Move this "visit waypoint" logic into a central place.
     if (destination.hasMarketplace) {
       final market = await recordMarketDataIfNeededAndLog(
         priceData,
