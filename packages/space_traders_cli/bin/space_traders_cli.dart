@@ -89,11 +89,7 @@ void printRequestStats(RateLimitedApiClient client) {
 
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
-    ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
-    ..addFlag(
-      'update-prices',
-      help: 'Force update of prices from server.',
-    );
+    ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.');
   final results = parser.parse(args);
 
   logger.level = results['verbose'] as bool ? Level.verbose : Level.info;
@@ -111,10 +107,7 @@ Future<void> cliMain(List<String> args) async {
   final db = DataStore();
   await db.open();
 
-  final priceData = await PriceData.load(
-    fs,
-    updateFromServer: results['update-prices'] as bool,
-  );
+  final priceData = await PriceData.load(fs);
   final surveyData = await SurveyData.load(fs);
   logger.info(
     'Loaded ${priceData.count} prices from '
