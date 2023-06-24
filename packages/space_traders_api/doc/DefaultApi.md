@@ -68,12 +68,6 @@ Creates a new agent and ties it to an account.  The agent symbol must consist of
 ### Example
 ```dart
 import 'package:space_traders_api/api.dart';
-// TODO Configure HTTP Bearer authorization: AgentToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = DefaultApi();
 final registerRequest = RegisterRequest(); // RegisterRequest | 
@@ -98,7 +92,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+No authorization required
 
 ### HTTP request headers
 
