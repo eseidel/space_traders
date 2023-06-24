@@ -1,7 +1,7 @@
 import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/printing.dart';
 import 'package:test/test.dart';
 
@@ -166,17 +166,17 @@ void main() {
 
   test('stringForPriceDeviance', () {
     final fs = MemoryFileSystem.test();
-    final priceData = PriceData([], fs: fs);
+    final marketPrices = MarketPrices([], fs: fs);
     expect(
       stringForPriceDeviance(
-        priceData,
+        marketPrices,
         'A',
         0,
         MarketTransactionTypeEnum.PURCHASE,
       ),
       '            🤷',
     );
-    priceData.addPrices([
+    marketPrices.addPrices([
       MarketPrice(
         waypointSymbol: 'A',
         symbol: 'A',
@@ -190,7 +190,7 @@ void main() {
 
     expect(
       stringForPriceDeviance(
-        priceData,
+        marketPrices,
         'A',
         0,
         MarketTransactionTypeEnum.PURCHASE,
@@ -199,7 +199,7 @@ void main() {
     );
     expect(
       stringForPriceDeviance(
-        priceData,
+        marketPrices,
         'A',
         0,
         MarketTransactionTypeEnum.SELL,
@@ -208,7 +208,7 @@ void main() {
     );
     expect(
       stringForPriceDeviance(
-        priceData,
+        marketPrices,
         'A',
         2,
         MarketTransactionTypeEnum.SELL,

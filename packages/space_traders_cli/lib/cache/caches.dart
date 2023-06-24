@@ -1,7 +1,7 @@
 import 'package:file/file.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:space_traders_cli/cache/surveys.dart';
@@ -12,7 +12,7 @@ import 'package:space_traders_cli/cache/waypoint_cache.dart';
 export 'package:file/file.dart';
 export 'package:space_traders_cli/api.dart';
 export 'package:space_traders_cli/cache/agent_cache.dart';
-export 'package:space_traders_cli/cache/prices.dart';
+export 'package:space_traders_cli/cache/market_prices.dart';
 export 'package:space_traders_cli/cache/ship_cache.dart';
 export 'package:space_traders_cli/cache/shipyard_prices.dart';
 export 'package:space_traders_cli/cache/surveys.dart';
@@ -38,7 +38,7 @@ class Caches {
   final AgentCache agent;
 
   /// The historical market price data.
-  final PriceData marketPrices;
+  final MarketPrices marketPrices;
 
   /// The ship cache.
   final ShipCache ships;
@@ -64,7 +64,7 @@ class Caches {
   /// Load the cache from disk and network.
   static Future<Caches> load(FileSystem fs, Api api) async {
     final agent = await AgentCache.load(api);
-    final prices = await PriceData.load(fs);
+    final prices = await MarketPrices.load(fs);
     final ships = await ShipCache.load(api);
     final shipyard = await ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);

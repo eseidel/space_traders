@@ -6,7 +6,7 @@ import 'package:args/args.dart';
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/miner.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -42,7 +42,7 @@ void main(List<String> args) async {
   final systemsCache = await SystemsCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
-  final priceData = await PriceData.load(fs);
+  final marketPrices = await MarketPrices.load(fs);
 
   Waypoint start;
   final startArg = results['start'] as String?;
@@ -59,7 +59,7 @@ void main(List<String> args) async {
 
   final mine = await nearestMineWithGoodMining(
     api,
-    priceData,
+    marketPrices,
     systemsCache,
     waypointCache,
     marketCache,

@@ -1,7 +1,7 @@
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
@@ -33,24 +33,24 @@ void main() {
     final fs = MemoryFileSystem();
     final a = makePrice(waypointSymbol: 'a', symbol: 'a');
     final b = makePrice(waypointSymbol: 'b', symbol: 'a');
-    final priceData = PriceData([a, b], fs: fs);
-    expect(priceData.medianPurchasePrice('a'), 1);
-    expect(priceData.medianSellPrice('a'), 1);
-    expect(priceData.medianPurchasePrice('b'), null);
-    expect(priceData.medianSellPrice('b'), null);
+    final marketPrices = MarketPrices([a, b], fs: fs);
+    expect(marketPrices.medianPurchasePrice('a'), 1);
+    expect(marketPrices.medianSellPrice('a'), 1);
+    expect(marketPrices.medianPurchasePrice('b'), null);
+    expect(marketPrices.medianSellPrice('b'), null);
   });
 
   test('PriceData.addPrices', () async {
     final fs = MemoryFileSystem();
     final a = makePrice(waypointSymbol: 'a', symbol: 'a', purchasePrice: 10);
     final b = makePrice(waypointSymbol: 'b', symbol: 'a');
-    final priceData = PriceData([a], fs: fs);
-    expect(priceData.count, 1);
-    expect(priceData.waypointCount, 1);
+    final marketPrices = MarketPrices([a], fs: fs);
+    expect(marketPrices.count, 1);
+    expect(marketPrices.waypointCount, 1);
 
-    await priceData.addPrices([b]);
-    expect(priceData.count, 2);
-    expect(priceData.waypointCount, 2);
+    await marketPrices.addPrices([b]);
+    expect(marketPrices.count, 2);
+    expect(marketPrices.waypointCount, 2);
 
     // Ignores invalid price dates
     final c = makePrice(
@@ -59,13 +59,13 @@ void main() {
       timestamp: DateTime.now().add(const Duration(days: 1)),
     );
     final logger = _MockLogger();
-    await runWithLogger(logger, () => priceData.addPrices([c]));
-    expect(priceData.count, 2);
-    expect(priceData.waypointCount, 2);
+    await runWithLogger(logger, () => marketPrices.addPrices([c]));
+    expect(marketPrices.count, 2);
+    expect(marketPrices.waypointCount, 2);
 
     // Will replace prices with newer ones.
     expect(
-      priceData.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
+      marketPrices.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
       10,
     );
     final d = makePrice(
@@ -73,11 +73,11 @@ void main() {
       symbol: 'a',
       purchasePrice: 20,
     );
-    await runWithLogger(logger, () => priceData.addPrices([d]));
-    expect(priceData.count, 2);
-    expect(priceData.waypointCount, 2);
+    await runWithLogger(logger, () => marketPrices.addPrices([d]));
+    expect(marketPrices.count, 2);
+    expect(marketPrices.waypointCount, 2);
     expect(
-      priceData.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
+      marketPrices.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
       20,
     );
 
@@ -88,9 +88,9 @@ void main() {
       purchasePrice: 5,
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
     );
-    await runWithLogger(logger, () => priceData.addPrices([e]));
+    await runWithLogger(logger, () => marketPrices.addPrices([e]));
     expect(
-      priceData.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
+      marketPrices.recentPurchasePrice(marketSymbol: 'a', tradeSymbol: 'a'),
       20,
     );
   });
@@ -114,7 +114,7 @@ void main() {
 
   test('percentileForSellPrice', () {
     final fs = MemoryFileSystem();
-    final priceData = PriceData(
+    final marketPrices = MarketPrices(
       [
         makePrice(waypointSymbol: 'a', symbol: 'a', sellPrice: 100),
         makePrice(waypointSymbol: 'b', symbol: 'a', sellPrice: 110),
@@ -124,22 +124,22 @@ void main() {
       ],
       fs: fs,
     );
-    expect(priceData.percentileForSellPrice('a', 100), 20);
-    expect(priceData.percentileForSellPrice('a', 110), 40);
-    expect(priceData.percentileForSellPrice('a', 150), 60);
-    expect(priceData.percentileForSellPrice('a', 160), 60);
-    expect(priceData.percentileForSellPrice('a', 200), 80);
-    expect(priceData.percentileForSellPrice('a', 300), 100);
-    expect(priceData.percentileForSellPrice('a', 400), 100);
+    expect(marketPrices.percentileForSellPrice('a', 100), 20);
+    expect(marketPrices.percentileForSellPrice('a', 110), 40);
+    expect(marketPrices.percentileForSellPrice('a', 150), 60);
+    expect(marketPrices.percentileForSellPrice('a', 160), 60);
+    expect(marketPrices.percentileForSellPrice('a', 200), 80);
+    expect(marketPrices.percentileForSellPrice('a', 300), 100);
+    expect(marketPrices.percentileForSellPrice('a', 400), 100);
 
-    expect(priceData.sellPriceAtPercentile('a', 100), 300);
-    expect(priceData.sellPriceAtPercentile('a', 0), 100);
-    expect(priceData.sellPriceAtPercentile('a', 50), 150);
-    expect(priceData.sellPriceAtPercentile('a', 25), 110);
+    expect(marketPrices.sellPriceAtPercentile('a', 100), 300);
+    expect(marketPrices.sellPriceAtPercentile('a', 0), 100);
+    expect(marketPrices.sellPriceAtPercentile('a', 50), 150);
+    expect(marketPrices.sellPriceAtPercentile('a', 25), 110);
   });
   test('percentileForPurchasePrice', () {
     final fs = MemoryFileSystem();
-    final priceData = PriceData(
+    final marketPrices = MarketPrices(
       [
         makePrice(waypointSymbol: 'a', symbol: 'a', purchasePrice: 100),
         makePrice(waypointSymbol: 'b', symbol: 'a', purchasePrice: 110),
@@ -149,18 +149,18 @@ void main() {
       ],
       fs: fs,
     );
-    expect(priceData.percentileForPurchasePrice('a', 100), 20);
-    expect(priceData.percentileForPurchasePrice('a', 110), 40);
-    expect(priceData.percentileForPurchasePrice('a', 150), 60);
-    expect(priceData.percentileForPurchasePrice('a', 160), 60);
-    expect(priceData.percentileForPurchasePrice('a', 200), 80);
-    expect(priceData.percentileForPurchasePrice('a', 300), 100);
-    expect(priceData.percentileForPurchasePrice('a', 400), 100);
+    expect(marketPrices.percentileForPurchasePrice('a', 100), 20);
+    expect(marketPrices.percentileForPurchasePrice('a', 110), 40);
+    expect(marketPrices.percentileForPurchasePrice('a', 150), 60);
+    expect(marketPrices.percentileForPurchasePrice('a', 160), 60);
+    expect(marketPrices.percentileForPurchasePrice('a', 200), 80);
+    expect(marketPrices.percentileForPurchasePrice('a', 300), 100);
+    expect(marketPrices.percentileForPurchasePrice('a', 400), 100);
 
-    expect(priceData.purchasePriceAtPercentile('a', 100), 300);
-    expect(priceData.purchasePriceAtPercentile('a', 0), 100);
-    expect(priceData.purchasePriceAtPercentile('a', 50), 150);
-    expect(priceData.purchasePriceAtPercentile('a', 25), 110);
+    expect(marketPrices.purchasePriceAtPercentile('a', 100), 300);
+    expect(marketPrices.purchasePriceAtPercentile('a', 0), 100);
+    expect(marketPrices.purchasePriceAtPercentile('a', 50), 150);
+    expect(marketPrices.purchasePriceAtPercentile('a', 25), 110);
   });
 
   test('MarketPrice JSON roundtrip', () {
@@ -183,26 +183,26 @@ void main() {
 
   test('PriceData.hasRecentMarketData', () {
     final fs = MemoryFileSystem();
-    final priceData = PriceData([], fs: fs);
-    expect(priceData.hasRecentMarketData('a'), false);
+    final marketPrices = MarketPrices([], fs: fs);
+    expect(marketPrices.hasRecentMarketData('a'), false);
     final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
     final a =
         makePrice(waypointSymbol: 'a', symbol: 'a', timestamp: oneMinuteAgo);
-    priceData.addPrices([a]);
-    expect(priceData.hasRecentMarketData('a'), true);
+    marketPrices.addPrices([a]);
+    expect(marketPrices.hasRecentMarketData('a'), true);
     expect(
-      priceData.hasRecentMarketData('a', maxAge: const Duration(seconds: 1)),
+      marketPrices.hasRecentMarketData('a', maxAge: const Duration(seconds: 1)),
       false,
     );
     expect(
-      priceData.hasRecentMarketData('a', maxAge: const Duration(hours: 1)),
+      marketPrices.hasRecentMarketData('a', maxAge: const Duration(hours: 1)),
       true,
     );
   });
 
   test('recordMarketData', () async {
     final fs = MemoryFileSystem();
-    final priceData = PriceData([], fs: fs);
+    final marketPrices = MarketPrices([], fs: fs);
     final market = Market(
       symbol: 'a',
       tradeGoods: [
@@ -215,14 +215,14 @@ void main() {
         )
       ],
     );
-    await recordMarketData(priceData, market);
-    expect(priceData.hasRecentMarketData('a'), true);
-    expect(priceData.count, 1);
+    await recordMarketData(marketPrices, market);
+    expect(marketPrices.hasRecentMarketData('a'), true);
+    expect(marketPrices.count, 1);
   });
 
   test('PriceData save/load roundtrip', () async {
     final fs = MemoryFileSystem();
-    final priceData = PriceData([], fs: fs);
+    final marketPrices = MarketPrices([], fs: fs);
     final market = Market(
       symbol: 'a',
       tradeGoods: [
@@ -235,11 +235,11 @@ void main() {
         )
       ],
     );
-    await recordMarketData(priceData, market);
-    expect(priceData.hasRecentMarketData('a'), true);
-    expect(priceData.count, 1);
+    await recordMarketData(marketPrices, market);
+    expect(marketPrices.hasRecentMarketData('a'), true);
+    expect(marketPrices.count, 1);
 
-    final priceData2 = await PriceData.load(fs);
+    final priceData2 = await MarketPrices.load(fs);
     expect(priceData2.hasRecentMarketData('a'), true);
     expect(priceData2.count, 1);
   });

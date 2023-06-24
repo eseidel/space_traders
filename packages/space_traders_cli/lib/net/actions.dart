@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:space_traders_cli/cache/transactions.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -86,7 +86,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
 Future<void> sellAllCargoAndLog(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   TransactionLog transactions,
   AgentCache agentCache,
   Market market,
@@ -102,7 +102,7 @@ Future<void> sellAllCargoAndLog(
       in sellAllCargo(api, agentCache, market, ship, where: where)) {
     final transaction = response.transaction;
     final agent = response.agent;
-    logTransaction(ship, priceData, agent, transaction);
+    logTransaction(ship, marketPrices, agent, transaction);
     transactions
         .log(Transaction.fromMarketTransaction(transaction, agent.credits));
   }
@@ -111,7 +111,7 @@ Future<void> sellAllCargoAndLog(
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
 Future<SellCargo201ResponseData?> purchaseCargoAndLog(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   TransactionLog transactionLog,
   AgentCache agentCache,
   Ship ship,
@@ -129,7 +129,7 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = data.agent;
     final transaction = data.transaction;
-    logTransaction(ship, priceData, agent, transaction);
+    logTransaction(ship, marketPrices, agent, transaction);
     transactionLog.log(
       Transaction.fromMarketTransaction(
         transaction,
@@ -152,7 +152,7 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
 /// Log a shipyard transaction to the console.
 void logShipyardTransaction(
   Ship ship,
-  PriceData priceData,
+  MarketPrices marketPrices,
   Agent agent,
   ShipyardTransaction t,
 ) {
@@ -167,7 +167,7 @@ void logShipyardTransaction(
 /// Purchase a ship and log the transaction.
 Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   ShipCache shipCache,
   AgentCache agentCache,
   Ship ship,
@@ -176,14 +176,14 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
 ) async {
   final result =
       await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
-  logShipyardTransaction(ship, priceData, result.agent, result.transaction);
+  logShipyardTransaction(ship, marketPrices, result.agent, result.transaction);
   return result;
 }
 
 /// Refuel the ship if needed and log the transaction
 Future<void> refuelIfNeededAndLog(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   TransactionLog transactionLog,
   AgentCache agentCache,
   Market market,
@@ -202,11 +202,11 @@ Future<void> refuelIfNeededAndLog(
     return;
   }
   final fuelPrice = fuelGood.purchasePrice;
-  final median = priceData.medianPurchasePrice(fuelSymbol);
+  final median = marketPrices.medianPurchasePrice(fuelSymbol);
   final markup = median != null ? fuelPrice / median : null;
   if (markup != null && markup > 2) {
     final deviation = stringForPriceDeviance(
-      priceData,
+      marketPrices,
       fuelSymbol,
       fuelPrice,
       MarketTransactionTypeEnum.PURCHASE,
@@ -243,7 +243,7 @@ Future<void> refuelIfNeededAndLog(
     final agent = agentCache.agent;
     logTransaction(
       ship,
-      priceData,
+      marketPrices,
       agent,
       transaction,
       transactionEmoji: '⛽',
@@ -294,7 +294,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
 ) async {
   // Should this dock and refuel and reset the flight mode if needed?
   // if (ship.shouldRefuel) {
-  //   await refuelIfNeededAndLog(api, priceData, agent, ship);
+  //   await refuelIfNeededAndLog(api, marketPrices, agent, ship);
   // }
 
   final result = await navigateToLocalWaypoint(api, ship, waypoint.symbol);

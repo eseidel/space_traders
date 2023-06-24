@@ -20,7 +20,7 @@ class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockTransactionLog extends Mock implements TransactionLog {}
 
-class _MockPriceData extends Mock implements PriceData {}
+class _MockPriceData extends Mock implements MarketPrices {}
 
 class _MockSurveyData extends Mock implements SurveyData {}
 
@@ -36,7 +36,7 @@ class _MockCaches extends Mock implements Caches {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
-    final priceData = _MockPriceData();
+    final marketPrices = _MockPriceData();
     final surveyData = _MockSurveyData();
     when(
       () => surveyData.recentSurveysAtWaypoint(
@@ -45,7 +45,7 @@ void main() {
       ),
     ).thenReturn([]);
     final maybeSurvey = await surveyWorthMining(
-      priceData,
+      marketPrices,
       surveyData,
       surveyWaypointSymbol: 'S-E-A',
       nearbyMarketSymbol: 'S-E-A',
@@ -54,7 +54,7 @@ void main() {
   });
 
   test('surveyWorthMining', () async {
-    final priceData = _MockPriceData();
+    final marketPrices = _MockPriceData();
     final surveyData = _MockSurveyData();
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -84,19 +84,19 @@ void main() {
       ),
     ).thenReturn(surveys);
     when(
-      () => priceData.recentSellPrice(
+      () => marketPrices.recentSellPrice(
         marketSymbol: any(named: 'marketSymbol'),
         tradeSymbol: 'DIAMONDS',
       ),
     ).thenReturn(100);
     when(
-      () => priceData.recentSellPrice(
+      () => marketPrices.recentSellPrice(
         marketSymbol: any(named: 'marketSymbol'),
         tradeSymbol: 'ALUMINUM',
       ),
     ).thenReturn(10);
     final maybeSurvey = await surveyWorthMining(
-      priceData,
+      marketPrices,
       surveyData,
       surveyWaypointSymbol: 'S-E-A',
       nearbyMarketSymbol: 'S-E-A',
@@ -164,7 +164,7 @@ void main() {
 
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
-    final priceData = _MockPriceData();
+    final marketPrices = _MockPriceData();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
@@ -178,7 +178,7 @@ void main() {
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
     when(() => caches.transactions).thenReturn(transactionLog);
-    when(() => caches.marketPrices).thenReturn(priceData);
+    when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.surveys).thenReturn(surveyData);

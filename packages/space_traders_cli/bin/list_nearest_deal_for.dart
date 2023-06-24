@@ -25,7 +25,7 @@ void main(List<String> args) async {
 /// Look through nearby marketplaces (including ones a jump away)
 /// looking for the best deal for a given symbol.
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
-  final priceData = await PriceData.load(fs);
+  final marketPrices = await MarketPrices.load(fs);
 
   final promptResponse = logger.prompt(
     'Which trade symbol? (Options: ${TradeSymbol.values.join(', ')}))',
@@ -49,14 +49,14 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   )) {
     for (final marketplaceWaypoint
         in await caches.waypoints.marketWaypointsForSystem(system)) {
-      final prices = priceData
+      final prices = marketPrices
           .sellPricesFor(
             tradeSymbol: tradeSymbol.value,
             marketSymbol: marketplaceWaypoint.symbol,
           )
           .toList();
       if (prices.isEmpty) {
-        if (priceData.hasRecentMarketData(marketplaceWaypoint.symbol)) {
+        if (marketPrices.hasRecentMarketData(marketplaceWaypoint.symbol)) {
           logger.info(
             '${marketplaceWaypoint.symbol} does not have $tradeSymbol.',
           );

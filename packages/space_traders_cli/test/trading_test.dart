@@ -1,6 +1,6 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -17,23 +17,23 @@ class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class _MockPriceData extends Mock implements PriceData {}
+class _MockPriceData extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
 
 void main() {
   test('DealFinder empty', () {
-    final priceData = _MockPriceData();
-    final finder = DealFinder(priceData);
+    final marketPrices = _MockPriceData();
+    final finder = DealFinder(marketPrices);
     final deals = finder.findDeals();
     expect(deals, isEmpty);
   });
 
   test('DealFinder single deal', () {
-    final priceData = _MockPriceData();
+    final marketPrices = _MockPriceData();
     final tradeGood =
         TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
-    final finder = DealFinder(priceData)
+    final finder = DealFinder(marketPrices)
       ..visitMarket(
         Market(
           symbol: 'A',
@@ -69,20 +69,21 @@ void main() {
   });
 
   test('estimateSellPrice null', () {
-    final priceData = _MockPriceData();
-    final estimate = estimateSellPrice(priceData, Market(symbol: 'A'), 'FUEL');
+    final marketPrices = _MockPriceData();
+    final estimate =
+        estimateSellPrice(marketPrices, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
   });
 
   test('estimatePurchasePrice null', () {
-    final priceData = _MockPriceData();
+    final marketPrices = _MockPriceData();
     final estimate =
-        estimatePurchasePrice(priceData, Market(symbol: 'A'), 'FUEL');
+        estimatePurchasePrice(marketPrices, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
   });
 
   test('estimatePrice fresh', () {
-    final priceData = _MockPriceData();
+    final marketPrices = _MockPriceData();
     final market = Market(
       symbol: 'A',
       tradeGoods: [
@@ -97,7 +98,7 @@ void main() {
     );
     expect(
       estimateSellPrice(
-        priceData,
+        marketPrices,
         market,
         'FUEL',
       ),
@@ -105,7 +106,7 @@ void main() {
     );
     expect(
       estimatePurchasePrice(
-        priceData,
+        marketPrices,
         market,
         'FUEL',
       ),
@@ -231,7 +232,7 @@ void main() {
   });
 
   test('findDealFor smoketest', () async {
-    final priceData = _MockPriceData();
+    final marketPrices = _MockPriceData();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
@@ -250,7 +251,7 @@ void main() {
     final costed = await runWithLogger(
       logger,
       () => findDealFor(
-        priceData,
+        marketPrices,
         systemsCache,
         waypointCache,
         marketCache,

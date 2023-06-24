@@ -8,18 +8,18 @@ import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 
 bool _isMissingChartOrRecentPriceData(
-  PriceData priceData,
+  MarketPrices marketPrices,
   ShipyardPrices shipyardPrices,
   Waypoint waypoint,
 ) {
   return waypoint.chart == null ||
-      _isMissingRecentMarketData(priceData, waypoint) ||
+      _isMissingRecentMarketData(marketPrices, waypoint) ||
       _isMissingRecentShipyardData(shipyardPrices, waypoint);
 }
 
-bool _isMissingRecentMarketData(PriceData priceData, Waypoint waypoint) {
+bool _isMissingRecentMarketData(MarketPrices marketPrices, Waypoint waypoint) {
   return waypoint.hasMarketplace &&
-      !priceData.hasRecentMarketData(waypoint.symbol);
+      !marketPrices.hasRecentMarketData(waypoint.symbol);
 }
 
 bool _isMissingRecentShipyardData(
@@ -32,14 +32,15 @@ bool _isMissingRecentShipyardData(
 
 Future<Waypoint?> _nearestWaypointNeedingExploration(
   WaypointCache waypointCache,
-  PriceData priceData,
+  MarketPrices marketPrices,
   ShipyardPrices shipyardPrices,
   Ship ship,
 ) async {
   final systemWaypoints =
       await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
   for (final waypoint in systemWaypoints) {
-    if (_isMissingChartOrRecentPriceData(priceData, shipyardPrices, waypoint)) {
+    if (_isMissingChartOrRecentPriceData(
+        marketPrices, shipyardPrices, waypoint)) {
       return waypoint;
     }
   }

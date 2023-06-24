@@ -121,9 +121,9 @@ class MarketPrice {
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class PriceData extends JsonListStore<MarketPrice> {
+class MarketPrices extends JsonListStore<MarketPrice> {
   /// Create a new price data collection.
-  PriceData(
+  MarketPrices(
     super.prices, {
     required super.fs,
     super.path = defaultCacheFilePath,
@@ -133,7 +133,7 @@ class PriceData extends JsonListStore<MarketPrice> {
   static const String defaultCacheFilePath = 'prices.json';
 
   /// Load the price data from the cache.
-  static Future<PriceData> load(
+  static Future<MarketPrices> load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) async {
@@ -142,7 +142,7 @@ class PriceData extends JsonListStore<MarketPrice> {
       path,
       MarketPrice.fromJson,
     );
-    return PriceData(prices, fs: fs, path: path);
+    return MarketPrices(prices, fs: fs, path: path);
   }
 
   /// Get the count of unique waypoints.
@@ -414,7 +414,7 @@ class PriceData extends JsonListStore<MarketPrice> {
 /// Returns the market.
 /// This is the prefered way to get the local Market.
 Future<Market> recordMarketDataIfNeededAndLog(
-  PriceData priceData,
+  MarketPrices marketPrices,
   MarketCache marketCache,
   Ship ship,
   String marketSymbol,
@@ -428,7 +428,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
   }
   // If we have very recent market data, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (priceData.hasRecentMarketData(
+  if (marketPrices.hasRecentMarketData(
     marketSymbol,
     maxAge: const Duration(minutes: 5),
   )) {
@@ -439,28 +439,28 @@ Future<Market> recordMarketDataIfNeededAndLog(
     ship.nav.waypointSymbol,
     forceRefresh: true,
   );
-  await recordMarketDataAndLog(priceData, market!, ship);
+  await recordMarketDataAndLog(marketPrices, market!, ship);
   return market;
 }
 
 /// Record market data and log the result.
 Future<void> recordMarketDataAndLog(
-  PriceData priceData,
+  MarketPrices marketPrices,
   Market market,
   Ship ship,
 ) async {
-  await recordMarketData(priceData, market);
+  await recordMarketData(marketPrices, market);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  market data @ ${market.symbol}');
 }
 
 /// Record market data silently.
-Future<void> recordMarketData(PriceData priceData, Market market) async {
+Future<void> recordMarketData(MarketPrices marketPrices, Market market) async {
   final prices = market.tradeGoods
       .map((g) => MarketPrice.fromMarketTradeGood(g, market.symbol))
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${market.symbol}!');
   }
-  await priceData.addPrices(prices);
+  await marketPrices.addPrices(prices);
 }

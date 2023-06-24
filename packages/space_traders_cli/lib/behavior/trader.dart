@@ -16,7 +16,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   AgentCache agentCache,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
-  PriceData priceData,
+  MarketPrices marketPrices,
   TransactionLog transactionLog,
   CentralCommand centralCommand,
   Market market,
@@ -28,7 +28,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   await dockIfNeeded(api, ship);
   await refuelIfNeededAndLog(
     api,
-    priceData,
+    marketPrices,
     transactionLog,
     agentCache,
     market,
@@ -39,7 +39,7 @@ Future<DateTime?> _purchaseCargoAndGo(
   if (ship.cargo.isNotEmpty) {
     await sellAllCargoAndLog(
       api,
-      priceData,
+      marketPrices,
       transactionLog,
       agentCache,
       market,
@@ -81,7 +81,7 @@ Future<DateTime?> _purchaseCargoAndGo(
 
   final maybeResult = await purchaseCargoAndLog(
     api,
-    priceData,
+    marketPrices,
     transactionLog,
     agentCache,
     ship,

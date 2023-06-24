@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart'; // just for maxAge.
+import 'package:space_traders_cli/cache/market_prices.dart'; // just for maxAge.
 import 'package:space_traders_cli/logger.dart';
 
 /// Price data for a single ship type in a shipyard.

@@ -5,13 +5,17 @@ import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/printing.dart';
 
-String describeShipType(ShipType type, Shipyard shipyard, PriceData priceData) {
+String describeShipType(
+  ShipType type,
+  Shipyard shipyard,
+  MarketPrices marketPrices,
+) {
 // This assumes there is only one ship available of each type in the yard.
   final ship = shipyard.ships.firstWhereOrNull(
     (s) => s.type == type,
   );
   final actualPriceString = ship == null ? '' : ' - ${ship.purchasePrice}';
-  final medianPrice = priceData.medianPurchasePrice(type.value);
+  final medianPrice = marketPrices.medianPurchasePrice(type.value);
   final medianPriceString = medianPrice == null
       ? ''
       : ' - median price: ${creditsString(medianPrice)}';

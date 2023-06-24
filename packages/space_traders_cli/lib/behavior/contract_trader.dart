@@ -63,7 +63,7 @@ class _Opportunity {
 
 Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
   Ship ship,
-  PriceData priceData,
+  MarketPrices marketPrices,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache, {
@@ -87,7 +87,7 @@ Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
       continue;
     }
     final purchasePrice = estimatePurchasePrice(
-      priceData,
+      marketPrices,
       market,
       tradeSymbol,
     );
@@ -116,7 +116,7 @@ Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
 
 Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   Ship ship,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
@@ -129,7 +129,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   // either at or below our profit unit price.
   final opportunity = await _nearbyMarketsWithProfitableTrade(
     ship,
-    priceData,
+    marketPrices,
     systemsCache,
     waypointCache,
     marketCache,
@@ -148,7 +148,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   }
 
   final priceDeviance = stringForPriceDeviance(
-    priceData,
+    marketPrices,
     tradeSymbol,
     opportunity.purchasePrice,
     MarketTransactionTypeEnum.PURCHASE,
@@ -173,7 +173,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
 // This is split out from the main function to allow early returns.
 Future<bool> _purchaseContractGoodIfPossible(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   TransactionLog transactionLog,
   AgentCache agentCache,
   Ship ship,
@@ -207,7 +207,7 @@ Future<bool> _purchaseContractGoodIfPossible(
   // TODO(eseidel): this can fail.
   await purchaseCargoAndLog(
     api,
-    priceData,
+    marketPrices,
     transactionLog,
     agentCache,
     ship,

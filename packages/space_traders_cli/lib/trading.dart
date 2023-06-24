@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/cache/systems_cache.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -96,7 +96,7 @@ int _percentileForTradeType(ExchangeType tradeType) {
 
 /// Estimate the current sell price of [tradeSymbol] at [market].
 int? estimateSellPrice(
-  PriceData priceData,
+  MarketPrices marketPrices,
   Market market,
   String tradeSymbol,
 ) {
@@ -107,7 +107,7 @@ int? estimateSellPrice(
     return maybeGoods.sellPrice;
   }
 
-  final recentSellPrice = priceData.recentSellPrice(
+  final recentSellPrice = marketPrices.recentSellPrice(
     marketSymbol: market.symbol,
     tradeSymbol: tradeSymbol,
   );
@@ -119,12 +119,12 @@ int? estimateSellPrice(
     return null;
   }
   final percentile = _percentileForTradeType(tradeType);
-  return priceData.sellPriceAtPercentile(tradeSymbol, percentile);
+  return marketPrices.sellPriceAtPercentile(tradeSymbol, percentile);
 }
 
 /// Estimate the current purchase price of [tradeSymbol] at [market].
 int? estimatePurchasePrice(
-  PriceData priceData,
+  MarketPrices marketPrices,
   Market market,
   String tradeSymbol,
 ) {
@@ -134,7 +134,7 @@ int? estimatePurchasePrice(
   if (maybeGoods != null) {
     return maybeGoods.purchasePrice;
   }
-  final recentPurchasePrice = priceData.recentPurchasePrice(
+  final recentPurchasePrice = marketPrices.recentPurchasePrice(
     marketSymbol: market.symbol,
     tradeSymbol: tradeSymbol,
   );
@@ -146,7 +146,7 @@ int? estimatePurchasePrice(
     return null;
   }
   final percentile = _percentileForTradeType(tradeType);
-  return priceData.purchasePriceAtPercentile(tradeSymbol, percentile);
+  return marketPrices.purchasePriceAtPercentile(tradeSymbol, percentile);
 }
 
 /// Describe a [deal] in a human-readable way.
@@ -267,10 +267,11 @@ class _SellOpp {
 /// Finds deals between markets.
 class DealFinder {
   /// Create a new DealFinder.
-  DealFinder(PriceData priceData, {this.topLimit = 5}) : _priceData = priceData;
+  DealFinder(MarketPrices marketPrices, {this.topLimit = 5})
+      : _priceData = marketPrices;
   // _systemsCache = systemsCache,
 
-  final PriceData _priceData;
+  final MarketPrices _priceData;
   // final SystemsCache _systemsCache;
   /// How many deals to keep track of per trade symbol.
   final int topLimit;
@@ -477,7 +478,7 @@ CostedDeal costOutDeal(
 /// Returns the best deal for the given ship within [maxJumps] of it's
 /// current location.
 Future<CostedDeal?> findDealFor(
-  PriceData priceData,
+  MarketPrices marketPrices,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
@@ -495,7 +496,7 @@ Future<CostedDeal?> findDealFor(
         (record) => marketCache.marketsInSystem(record.$1),
       )
       .toList();
-  final finder = DealFinder(priceData);
+  final finder = DealFinder(marketPrices);
   for (final market in markets) {
     finder.visitMarket(market);
   }

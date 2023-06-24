@@ -8,7 +8,7 @@ import 'package:space_traders_cli/printing.dart';
 Future<void> _navigateToLocalWaypointAndDock(
   Api api,
   AgentCache agentCache,
-  PriceData priceData,
+  MarketPrices marketPrices,
   ShipyardPrices shipyardPrices,
   MarketCache marketCache,
   TransactionLog transactionLog,
@@ -28,7 +28,7 @@ Future<void> _navigateToLocalWaypointAndDock(
     // TODO(eseidel): Move this "visit waypoint" logic into a central place.
     if (destination.hasMarketplace) {
       final market = await recordMarketDataIfNeededAndLog(
-        priceData,
+        marketPrices,
         marketCache,
         ship,
         destination.symbol,
@@ -36,7 +36,7 @@ Future<void> _navigateToLocalWaypointAndDock(
       if (ship.shouldRefuel) {
         await refuelIfNeededAndLog(
           api,
-          priceData,
+          marketPrices,
           transactionLog,
           agentCache,
           market,

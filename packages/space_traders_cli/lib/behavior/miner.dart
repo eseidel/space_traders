@@ -52,7 +52,7 @@ import 'package:space_traders_cli/trading.dart';
 
 /// Returns the expected value of the survey.
 int expectedValueFromSurvey(
-  PriceData priceData,
+  MarketPrices marketPrices,
   Survey survey, {
   required String marketSymbol,
 }) {
@@ -62,7 +62,7 @@ int expectedValueFromSurvey(
   // This will fail if the passed in market doesn't sell everything.
 
   final totalValue = survey.deposits.fold<int>(0, (total, deposit) {
-    final sellPrice = priceData.recentSellPrice(
+    final sellPrice = marketPrices.recentSellPrice(
           marketSymbol: marketSymbol,
           tradeSymbol: deposit.symbol,
         ) ??
@@ -143,13 +143,13 @@ class _SystemEval {
   }
 }
 
-int? _marketPercentile(PriceData priceData, Market market) {
+int? _marketPercentile(MarketPrices marketPrices, Market market) {
   const tradeSymbol = 'ICE_WATER';
-  final sellPrice = estimateSellPrice(priceData, market, tradeSymbol);
+  final sellPrice = estimateSellPrice(marketPrices, market, tradeSymbol);
   if (sellPrice == null) {
     return null;
   }
-  return priceData.percentileForSellPrice(
+  return marketPrices.percentileForSellPrice(
     tradeSymbol,
     sellPrice,
   );
@@ -157,7 +157,7 @@ int? _marketPercentile(PriceData priceData, Market market) {
 
 Future<_SystemEval> _evaluateSystem(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   WaypointCache waypointCache,
   MarketCache marketCache,
   String systemSymbol,
@@ -167,7 +167,7 @@ Future<_SystemEval> _evaluateSystem(
   final marketWaypoints = waypoints.where((w) => w.hasMarketplace);
   final markets = await marketCache.marketsInSystem(systemSymbol).toList();
   final marketToPercentile = {
-    for (var m in markets) m.symbol: _marketPercentile(priceData, m),
+    for (var m in markets) m.symbol: _marketPercentile(marketPrices, m),
   };
   final mines = waypoints.where((w) => w.canBeMined);
   final mineAndSells = <_MineAndSell>[];
@@ -206,7 +206,7 @@ String _describeSystemEval(_SystemEval eval) {
 /// Find nearest mine with good mining.
 Future<String?> nearestMineWithGoodMining(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
@@ -225,7 +225,7 @@ Future<String?> nearestMineWithGoodMining(
     }
     final eval = await _evaluateSystem(
       api,
-      priceData,
+      marketPrices,
       waypointCache,
       marketCache,
       systemSymbol,
@@ -261,7 +261,7 @@ class _ValuedSurvey {
 
 /// Finds a recent survey
 Future<Survey?> surveyWorthMining(
-  PriceData priceData,
+  MarketPrices marketPrices,
   SurveyData surveyData, {
   required String surveyWaypointSymbol,
   required String nearbyMarketSymbol,
@@ -286,7 +286,7 @@ Future<Survey?> surveyWorthMining(
   final valuedSurveys = recentSurveys.map((s) {
     return _ValuedSurvey(
       expectedValue: expectedValueFromSurvey(
-        priceData,
+        marketPrices,
         s.survey,
         marketSymbol: nearbyMarketSymbol,
       ),
@@ -314,7 +314,7 @@ Future<Survey?> surveyWorthMining(
 
 Future<DateTime?> _navigateToNewSystemForMining(
   Api api,
-  PriceData priceData,
+  MarketPrices marketPrices,
   Ship ship,
   SystemsCache systemsCache,
   WaypointCache waypointCache,
@@ -325,7 +325,7 @@ Future<DateTime?> _navigateToNewSystemForMining(
 }) async {
   final mine = await nearestMineWithGoodMining(
     api,
-    priceData,
+    marketPrices,
     systemsCache,
     waypointCache,
     marketCache,

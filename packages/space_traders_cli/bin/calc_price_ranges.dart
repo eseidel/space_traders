@@ -1,6 +1,6 @@
 import 'package:file/local.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:stats/stats.dart';
 
@@ -23,7 +23,7 @@ void printPriceRanges(List<MarketPrice> gameStats) {
 
 void main(List<String> args) async {
   const fs = LocalFileSystem();
-  final prices = await PriceData.load(fs);
+  final prices = await MarketPrices.load(fs);
 
   logger.info('${prices.count} prices loaded.');
   printPriceRanges(prices.prices);

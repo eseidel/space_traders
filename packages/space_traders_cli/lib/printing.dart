@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/prices.dart';
+import 'package:space_traders_cli/cache/market_prices.dart';
 import 'package:space_traders_cli/cache/waypoint_cache.dart';
 import 'package:space_traders_cli/logger.dart';
 
@@ -89,7 +89,7 @@ String contractDescription(Contract contract) {
 /// Returns a string describing the price deviance of a given [price] from
 /// the median price of a given [tradeSymbol].
 String stringForPriceDeviance(
-  PriceData data,
+  MarketPrices data,
   String tradeSymbol,
   int price,
   MarketTransactionTypeEnum type,
@@ -124,13 +124,13 @@ String stringForPriceDeviance(
 /// Logs a transaction to the console.
 void logTransaction(
   Ship ship,
-  PriceData priceData,
+  MarketPrices marketPrices,
   Agent agent,
   MarketTransaction transaction, {
   String? transactionEmoji,
 }) {
   final priceDevianceString = stringForPriceDeviance(
-    priceData,
+    marketPrices,
     transaction.tradeSymbol,
     transaction.pricePerUnit,
     transaction.type,
