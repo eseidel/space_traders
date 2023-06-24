@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:space_traders_cli/api.dart';
+import 'package:space_traders_cli/cache/json_list_store.dart';
 import 'package:space_traders_cli/logger.dart';
 
 int _distanceBetweenSystems(System a, System b) {
@@ -15,22 +16,18 @@ int _distanceBetweenSystems(System a, System b) {
 }
 
 /// A cache of the systems in the game.
-class SystemsCache {
-  /// Create a new [SystemsCache] with the given [systems] and [fs].
+class SystemsCache extends JsonListStore<System> {
+  /// Create a new [SystemsCache] with the given [systems] and file system.
   SystemsCache({
     required List<System> systems,
-    required FileSystem fs,
-    String cacheFilePath = defaultCacheFilePath,
-  })  : _systems = systems,
-        _fs = fs,
-        _cacheFilePath = cacheFilePath;
-
-  final List<System> _systems;
-  final FileSystem _fs;
-  final String _cacheFilePath;
+    required super.fs,
+    super.path = defaultCacheFilePath,
+  }) : super(systems);
 
   /// All systems in the game.
-  List<System> get systems => _systems;
+  List<System> get systems => List.unmodifiable(entries);
+
+  List<System> get _systems => entries;
 
   /// Default cache location.
   static const String defaultCacheFilePath = 'systems.json';
@@ -46,21 +43,20 @@ class SystemsCache {
         .toList();
   }
 
-  static SystemsCache? _loadSystemsCache(FileSystem fs, String cacheFilePath) {
-    final systemsfile = fs.file(cacheFilePath);
+  static Future<SystemsCache?> _loadSystemsCache(
+    FileSystem fs,
+    String path,
+  ) async {
+    final systemsfile = fs.file(path);
     if (systemsfile.existsSync()) {
-      return SystemsCache(
-        systems: _parseSystems(systemsfile.readAsStringSync()),
-        fs: fs,
-        cacheFilePath: cacheFilePath,
+      final systems = await JsonListStore.load<System>(
+        fs,
+        path,
+        (json) => System.fromJson(json)!,
       );
+      return SystemsCache(systems: systems, fs: fs, path: path);
     }
     return null;
-  }
-
-  /// Save the cache to disk.
-  Future<void> save() async {
-    await _fs.file(_cacheFilePath).writeAsString(jsonEncode(_systems));
   }
 
   /// Load the cache from disk.
@@ -74,7 +70,7 @@ class SystemsCache {
     final filePath = cacheFilePath ?? defaultCacheFilePath;
     // Try to load systems.json.  If it does not exist, pull down and cache
     // from the url.
-    final fromCache = _loadSystemsCache(fs, filePath);
+    final fromCache = await _loadSystemsCache(fs, filePath);
     if (fromCache != null) {
       return fromCache;
     } else {
@@ -88,8 +84,7 @@ class SystemsCache {
         throw ApiException(response.statusCode, response.body);
       }
       final systems = _parseSystems(response.body);
-      final data =
-          SystemsCache(systems: systems, fs: fs, cacheFilePath: filePath);
+      final data = SystemsCache(systems: systems, fs: fs, path: filePath);
       await data.save();
       return data;
     } catch (e) {
