@@ -3,8 +3,8 @@ import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
 
-void printShipDetails(Ship ship, List<Waypoint> shipWaypoints) {
-  logger.info(shipDescription(ship, shipWaypoints));
+void printShipDetails(Ship ship, SystemsCache systemsCache) {
+  logger.info(shipDescription(ship, systemsCache));
   logCargo(ship);
 
   prettyPrintJson(ship.toJson());
@@ -16,7 +16,6 @@ void main(List<String> args) async {
 
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final myShips = caches.ships.ships;
-  final ship = await chooseShip(api, caches.waypoints, myShips);
-  final shipsWaypoints = await waypointsForShips(caches.waypoints, myShips);
-  printShipDetails(ship, shipsWaypoints);
+  final ship = await chooseShip(api, caches.systems, myShips);
+  printShipDetails(ship, caches.systems);
 }

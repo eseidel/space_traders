@@ -10,16 +10,15 @@ import 'package:cli/ship_waiter.dart';
 
 Future<List<Ship>> chooseShips(
   Api api,
-  WaypointCache waypointCache,
+  SystemsCache systemsCache,
   List<Ship> ships,
 ) async {
-  final shipWaypoints = await waypointsForShips(waypointCache, ships);
   // Can't just return the result of chooseOne directly without triggering
   // a type error?
   final choices = logger.chooseAny(
     'Which ships?',
     choices: ships,
-    display: (ship) => shipDescription(ship, shipWaypoints),
+    display: (ship) => shipDescription(ship, systemsCache),
   );
   return choices;
 }
@@ -58,11 +57,8 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   );
 
   // Select many from a list.
-  final selectedShips = await chooseShips(api, caches.waypoints, myShips);
-
-  final shipWaypoints =
-      await waypointsForShips(caches.waypoints, selectedShips);
-  printShips(selectedShips, shipWaypoints);
+  final selectedShips = await chooseShips(api, caches.systems, myShips);
+  printShips(selectedShips, caches.systems);
 
   final behaviorCache = await BehaviorCache.load(fs);
   final centralCommand = CentralCommand(behaviorCache, caches.ships);

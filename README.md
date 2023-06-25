@@ -127,13 +127,9 @@ Efficiency:
 * Write a better rate-limiting model.
 * Teach arbitrage trader how to buy multiple times up to the max cargo hold.
 * Make the script robust to network failures.
-* Contract trader should record shipyard prices.
-* Write generalized route planner to calcualte route times and costs.
+* Write generalized route planner to calculate route times and costs.
 
 Automation:
-* Automate resets
-* Add a mass-move command which uses explore logic and logicLoop to move
-  multiple ships at once.
 * Have a config language to explain what mounts a ship should have.
 * Have a config language to explain what the ships should be doing.
 * Need to store handle and email somewhere.

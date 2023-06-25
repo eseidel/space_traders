@@ -1,9 +1,13 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/printing.dart';
 import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
 void main() {
   test('waypointDescription', () {
@@ -102,26 +106,17 @@ void main() {
         capacity: 100,
       ),
     );
-    final shipWaypoints = [
-      Waypoint(
+    final systemsCache = _MockSystemsCache();
+    when(() => systemsCache.waypointFromSymbol('symbol')).thenReturn(
+      SystemWaypoint(
         symbol: 'symbol',
         type: WaypointType.PLANET,
-        systemSymbol: 'c',
         x: 1,
         y: 2,
-        orbitals: [],
-        faction: WaypointFaction(symbol: FactionSymbols.AEGIS),
-        traits: [
-          WaypointTrait(
-            description: 't',
-            name: 'n',
-            symbol: WaypointTraitSymbolEnum.CORRUPT,
-          )
-        ],
       ),
-    ];
+    );
     expect(
-      shipDescription(ship, shipWaypoints),
+      shipDescription(ship, systemsCache),
       'A - Docked at symbol PLANET COMMAND 100/100 (morale: 90) (condition: 90)',
     );
   });

@@ -32,9 +32,8 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
       await caches.waypoints.shipyardWaypointsForSystem(hq.systemSymbol);
 
   final ships = caches.ships.ships;
-  final shipWaypoints = await waypointsForShips(caches.waypoints, ships);
   logger.info('Current ships:');
-  printShips(ships, shipWaypoints);
+  printShips(ships, caches.systems);
   logger.info('');
 
   final waypoint = logger.chooseOne(

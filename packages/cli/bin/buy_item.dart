@@ -14,7 +14,7 @@ void main(List<String> args) async {
 
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final myShips = caches.ships.ships;
-  final ship = await chooseShip(api, caches.waypoints, myShips);
+  final ship = await chooseShip(api, caches.systems, myShips);
 
   if (ship.availableSpace < 1) {
     logger.err('No cargo space available on ${ship.symbol}!}');

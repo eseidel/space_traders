@@ -8,13 +8,9 @@ void main(List<String> args) async {
 }
 
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
-  final typeCounts = caches.ships.frameCounts;
-  for (final type in typeCounts.keys) {
-    logger.info('$type: ${typeCounts[type]}');
-  }
+  logger.info(describeFleet(caches.ships));
   final ships = caches.ships.ships;
-  final shipWaypoints = await waypointsForShips(caches.waypoints, ships);
   for (final ship in ships) {
-    logger.info(shipDescription(ship, shipWaypoints));
+    logger.info(shipDescription(ship, caches.systems));
   }
 }

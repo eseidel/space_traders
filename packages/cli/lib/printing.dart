@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
-import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:intl/intl.dart';
 
@@ -28,10 +28,9 @@ void printWaypoints(List<Waypoint> waypoints, {String indent = ''}) {
 /// Return a string describing the given [ship].
 /// systemWaypoints is used to look up the waypoint for the ship's
 /// waypointSymbol.
-String shipDescription(Ship ship, List<Waypoint> shipWaypoints) {
+String shipDescription(Ship ship, SystemsCache systemsCache) {
   // This has to be synchronous so can't use WaypointCache
-  final waypoint =
-      shipWaypoints.firstWhere((w) => w.symbol == ship.nav.waypointSymbol);
+  final waypoint = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
   var string =
       '${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';
   if (ship.crew.morale != 100) {
@@ -44,9 +43,9 @@ String shipDescription(Ship ship, List<Waypoint> shipWaypoints) {
 }
 
 /// Log a string describing the given [ships].
-void printShips(List<Ship> ships, List<Waypoint> shipWaypoints) {
+void printShips(List<Ship> ships, SystemsCache systemsCache) {
   for (final ship in ships) {
-    logger.info('  ${shipDescription(ship, shipWaypoints)}');
+    logger.info('  ${shipDescription(ship, systemsCache)}');
   }
 }
 
@@ -186,16 +185,15 @@ DateTime logRemainingTransitTime(
 /// Choose a ship from a list of ships
 Future<Ship> chooseShip(
   Api api,
-  WaypointCache waypointCache,
+  SystemsCache systemsCache,
   List<Ship> ships,
 ) async {
-  final shipWaypoints = await waypointsForShips(waypointCache, ships);
   // Can't just return the result of chooseOne directly without triggering
   // a type error?
   final ship = logger.chooseOne(
     'Which ship?',
     choices: ships,
-    display: (ship) => shipDescription(ship, shipWaypoints),
+    display: (ship) => shipDescription(ship, systemsCache),
   );
   return ship;
 }

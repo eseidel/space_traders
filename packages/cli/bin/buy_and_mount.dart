@@ -36,7 +36,7 @@ void main(List<String> args) async {
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final myShips = await allMyShips(api).toList();
   // pick a ship.
-  final ship = await chooseShip(api, caches.waypoints, myShips);
+  final ship = await chooseShip(api, caches.systems, myShips);
   // pick a mount.
   const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
 
