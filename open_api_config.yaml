@@ -1,17 +1,17 @@
 # These names I inferred from https://github.com/OpenAPITools/openapi-generator/blob/master/docs/configuration.md
 # but they seem to work:
 inputSpec: https://raw.githubusercontent.com/SpaceTradersAPI/api-docs/0d7bb3cca99ae5092342a875831f42be43cb18e9/reference/SpaceTraders.json
-outputDir: packages/space_traders_api
+outputDir: packages/openapi
 generatorName: dart
 
 # Dart specific config:
 # https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/dart.md
 # Also:
 # openapi-generator config-help -g dart
-pubName: space_traders_api
+pubName: openapi
 pubAuthor: Eric Seidel
 pubAuthorEmail: eric@shorebird.dev
-pubDescription: SpaceTraders API (v2)
+pubDescription: SpaceTraders API
 pubRepository: https://github.com/eseidel/space_traders
-pubLibrary: space_traders_api
+pubLibrary: openapi
 pubPublishTo: none

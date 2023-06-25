@@ -74,13 +74,13 @@ But I've not seen the source for that and it appears to be v1 rather than v2.
 ### Generating `space_traders_api` package
 ```
 dart pub global activate openapi_generator_cli
-rmdir packages/space_traders_api/
+rmdir packages/openapi/
 openapi-generator generate -c open_api_config.yaml
 ```
 Then modified:
-* rmdir packages/space_traders_api/test directory since it was just TODOs.
+* rmdir packages/openapi/test directory since it was just TODOs.
 * Fixed handling of required num fields:
-    * `api/lib/model/jump_gate.dart`
+    * `openapi/lib/model/jump_gate.dart`
   Due to: https://github.com/OpenAPITools/openapi-generator/pull/10637#pullrequestreview-1425351014
 * Ran `dart format` on the generated code.
 

@@ -1,8 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:space_traders_api/api.dart';
+import 'package:openapi/api.dart';
 import 'package:space_traders_cli/net/rate_limit.dart';
 
-export 'package:space_traders_api/api.dart';
+export 'package:openapi/api.dart';
 
 /// Api is a wrapper around the generated api clients.
 /// It provides a single place to inject the api client.

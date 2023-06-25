@@ -217,6 +217,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  openapi:
+    dependency: "direct main"
+    description:
+      path: "../openapi"
+      relative: true
+    source: path
+    version: "1.0.0"
   package_config:
     dependency: transitive
     description:
@@ -322,13 +329,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
-  space_traders_api:
-    dependency: "direct main"
-    description:
-      path: "../space_traders_api"
-      relative: true
-    source: path
-    version: "1.0.0"
   stack_trace:
     dependency: transitive
     description:
