@@ -90,10 +90,11 @@ Future<DateTime?> _purchaseCargoAndGo(
   );
   if (maybeResult == null) {
     // We couldn't buy any cargo, so we're done.
-    await centralCommand.disableBehavior(ship, Behavior.arbitrageTrader);
-    shipInfo(
+    await centralCommand.disableBehavior(
       ship,
-      'Failed to buy cargo, disabling trader behavior.',
+      Behavior.arbitrageTrader,
+      'Failed to buy cargo.',
+      const Duration(hours: 1),
     );
     return null;
   }
@@ -187,10 +188,11 @@ Future<DateTime?> advanceArbitrageTrader(
       );
       if (market == null) {
         // We can't sell this cargo anywhere, so we're done.
-        await centralCommand.disableBehavior(ship, Behavior.arbitrageTrader);
-        shipInfo(
+        await centralCommand.disableBehavior(
           ship,
-          'No market for ${nonDealCargo.symbol}, disabling trader behavior.',
+          Behavior.arbitrageTrader,
+          'No market for ${nonDealCargo.symbol}.',
+          const Duration(hours: 1),
         );
         return null;
       }
@@ -267,10 +269,11 @@ Future<DateTime?> advanceArbitrageTrader(
   );
 
   if (deal == null) {
-    await centralCommand.disableBehavior(ship, Behavior.arbitrageTrader);
-    shipInfo(
+    await centralCommand.disableBehavior(
       ship,
-      'No profitable deals, disabling trader behavior.',
+      Behavior.arbitrageTrader,
+      'No profitable deals.',
+      const Duration(hours: 1),
     );
     return null;
   }

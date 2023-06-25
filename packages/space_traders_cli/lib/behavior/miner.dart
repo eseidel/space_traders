@@ -333,12 +333,13 @@ Future<DateTime?> _navigateToNewSystemForMining(
     maxJumps: maxJumps,
   );
   if (mine == null) {
-    shipWarn(
+    await centralCommand.disableBehavior(
       ship,
+      Behavior.miner,
       'No good mining system found in '
-      '$maxJumps radius of ${ship.nav.systemSymbol}',
+      '$maxJumps radius of ${ship.nav.systemSymbol}.',
+      const Duration(hours: 1),
     );
-    await centralCommand.disableBehavior(ship, Behavior.miner);
     return null;
   }
 
@@ -435,12 +436,12 @@ Future<DateTime?> advanceMiner(
       largestCargo!.symbol,
     );
     if (nearestMarket == null) {
-      shipWarn(
+      await centralCommand.disableBehavior(
         ship,
-        'No nearby market which trades ${largestCargo.symbol}, '
-        'disabling miner behavior.',
+        Behavior.miner,
+        'No nearby market which trades ${largestCargo.symbol}.',
+        const Duration(hours: 1),
       );
-      await centralCommand.disableBehavior(ship, Behavior.miner);
       return null;
     }
     return beingRouteAndLog(

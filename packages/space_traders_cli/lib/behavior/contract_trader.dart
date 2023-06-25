@@ -138,12 +138,13 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     maxJumps: 10,
   ).firstOrNull;
   if (opportunity == null) {
-    shipErr(
-      ship,
-      'No markets nearby with $tradeSymbol, disabling contract trader.',
-    );
     // This probably isn't quite right?  We should instead search wider?
-    await centralCommand.disableBehavior(ship, Behavior.contractTrader);
+    await centralCommand.disableBehavior(
+      ship,
+      Behavior.contractTrader,
+      'No markets nearby with $tradeSymbol.',
+      const Duration(hours: 1),
+    );
     return null;
   }
 
@@ -306,12 +307,13 @@ Future<DateTime?> advanceContractTrader(
   final minimumCreditsToTrade =
       max(100000, breakEvenUnitPrice * remainingUnits + creditsBuffer);
   if (caches.agent.agent.credits < minimumCreditsToTrade) {
-    shipWarn(
+    await centralCommand.disableBehavior(
       ship,
-      'Not enough credits (${creditsString(minimumCreditsToTrade)}) to '
-      'complete contract, disabling contract trader.',
+      Behavior.contractTrader,
+      'Not enough credits (${creditsString(caches.agent.agent.credits)}) to '
+      'complete contract (${creditsString(minimumCreditsToTrade)}).',
+      const Duration(hours: 1),
     );
-    await centralCommand.disableBehavior(ship, Behavior.contractTrader);
     return null;
   }
 
@@ -379,15 +381,12 @@ Future<DateTime?> advanceContractTrader(
             );
           } else {
             // This should print the pricing of the good we're trying to buy.
-            shipErr(
-              ship,
-              'Not enough credits to purchase $unitsToPurchase '
-              '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}, '
-              'disabling contract trader.',
-            );
             await centralCommand.disableBehavior(
               ship,
               Behavior.contractTrader,
+              'Not enough credits to purchase $unitsToPurchase '
+              '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}',
+              const Duration(hours: 1),
             );
             return null;
           }

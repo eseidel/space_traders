@@ -84,8 +84,15 @@ void main() {
     when(() => centralCommand.getBehavior('S')).thenAnswer(
       (_) => BehaviorState('S', Behavior.arbitrageTrader),
     );
-    when(() => centralCommand.disableBehavior(ship, Behavior.arbitrageTrader))
-        .thenAnswer((_) => Future.value());
+    registerFallbackValue(Duration.zero);
+    when(
+      () => centralCommand.disableBehavior(
+        ship,
+        Behavior.arbitrageTrader,
+        any(),
+        any(),
+      ),
+    ).thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);

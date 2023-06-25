@@ -76,8 +76,15 @@ void main() {
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
 
-    when(() => centralCommand.disableBehavior(ship, Behavior.buyShip))
-        .thenAnswer((_) => Future.value());
+    registerFallbackValue(Duration.zero);
+    when(
+      () => centralCommand.disableBehavior(
+        ship,
+        Behavior.buyShip,
+        any(),
+        any(),
+      ),
+    ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

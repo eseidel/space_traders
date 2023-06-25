@@ -222,8 +222,10 @@ void main() {
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
 
-    when(() => centralCommand.disableBehavior(ship, Behavior.miner))
-        .thenAnswer((_) => Future.value());
+    registerFallbackValue(Duration.zero);
+    when(
+      () => centralCommand.disableBehavior(ship, Behavior.miner, any(), any()),
+    ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

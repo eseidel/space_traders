@@ -44,6 +44,7 @@
 import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/logger.dart';
+import 'package:space_traders_cli/printing.dart';
 
 /// Central command for the fleet.
 class CentralCommand {
@@ -99,8 +100,8 @@ class CentralCommand {
   ) {
     final disableBehaviors = <Behavior>[
       // Behavior.buyShip,
-      Behavior.contractTrader,
-      Behavior.arbitrageTrader,
+      // Behavior.contractTrader,
+      // Behavior.arbitrageTrader,
       // Behavior.miner,
       // Behavior.idle,
       // Behavior.explorer,
@@ -144,10 +145,16 @@ class CentralCommand {
   // callback to the central command.
   Future<void> disableBehavior(
     Ship ship,
-    Behavior behavior, {
-    Duration timeout = const Duration(hours: 1),
-  }) async {
+    Behavior behavior,
+    String why,
+    Duration timeout,
+  ) async {
     await _behaviorCache.deleteBehavior(ship.symbol);
+
+    shipWarn(
+      ship,
+      '$why Disabling $behavior for ${approximateDuration(timeout)}.',
+    );
 
     final expiration = DateTime.now().add(timeout);
     _behaviorTimeouts[behavior] = expiration;

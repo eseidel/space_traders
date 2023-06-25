@@ -4,7 +4,6 @@ import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/central_command.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
 import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
@@ -144,33 +143,35 @@ Future<DateTime?> advanceBuyShip(
 
   final shipType = _shipTypeToBuy(caches.ships);
   if (shipType == null) {
-    shipWarn(
+    await centralCommand.disableBehavior(
       ship,
-      'No ships needed, disabling behavior.',
+      Behavior.buyShip,
+      'No ships needed.',
+      const Duration(hours: 1),
     );
-    await centralCommand.disableBehavior(ship, Behavior.buyShip);
     return null;
   }
 
   // Get our median price before updating shipyard prices.
   final medianPrice = caches.shipyardPrices.medianPurchasePrice(shipType);
   if (medianPrice == null) {
-    shipWarn(
-        ship,
-        'Failed to buy ship, no median price for $shipType'
-        'disabling behavior.');
-    await centralCommand.disableBehavior(ship, Behavior.buyShip);
+    await centralCommand.disableBehavior(
+      ship,
+      Behavior.buyShip,
+      'Failed to buy ship, no median price for $shipType.',
+      const Duration(hours: 1),
+    );
     return null;
   }
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
   final credits = caches.agent.agent.credits;
   if (credits < maxPrice) {
-    shipWarn(
+    await centralCommand.disableBehavior(
       ship,
-      'Cant by $shipType, credits $credits < max price $maxPrice, '
-      'disabling behavior.',
+      Behavior.buyShip,
+      'Can not by $shipType, credits $credits < max price $maxPrice.',
+      const Duration(minutes: 20),
     );
-    await centralCommand.disableBehavior(ship, Behavior.buyShip);
     return null;
   }
 
@@ -187,17 +188,12 @@ Future<DateTime?> advanceBuyShip(
     )!;
     final recentPriceString = creditsString(recentPrice);
     if (recentPrice > maxPrice) {
-      const timeout = Duration(minutes: 30);
-      shipWarn(
-        ship,
-        'Failed to buy $shipType at ${currentWaypoint.symbol}, '
-        '$recentPriceString > max price $maxPrice '
-        'disabling behavior for ${approximateDuration(timeout)}.',
-      );
       await centralCommand.disableBehavior(
         ship,
         Behavior.buyShip,
-        timeout: timeout,
+        'Failed to buy $shipType at ${currentWaypoint.symbol}, '
+        '$recentPriceString > max price $maxPrice.',
+        const Duration(minutes: 30),
       );
       return null;
     }
@@ -217,7 +213,8 @@ Future<DateTime?> advanceBuyShip(
     await centralCommand.disableBehavior(
       ship,
       Behavior.buyShip,
-      timeout: const Duration(minutes: 20),
+      'Purchase successful.',
+      const Duration(minutes: 20),
     );
     return null;
   }
@@ -232,11 +229,14 @@ Future<DateTime?> advanceBuyShip(
     maxMedianMultipler,
   );
   if (destination == null) {
-    shipWarn(
-        ship,
-        'Failed to buy $shipType, no shipyard near ${ship.nav.waypointSymbol} '
-        'with good price, disabling behavior.');
-    await centralCommand.disableBehavior(ship, Behavior.buyShip);
+    const timeout = Duration(minutes: 30);
+    await centralCommand.disableBehavior(
+      ship,
+      Behavior.buyShip,
+      'No shipyard near ${ship.nav.waypointSymbol} '
+      'with good price for $shipType.',
+      timeout,
+    );
     return null;
   }
   return beingRouteAndLog(

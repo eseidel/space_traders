@@ -40,7 +40,10 @@ Future<Waypoint?> _nearestWaypointNeedingExploration(
       await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
   for (final waypoint in systemWaypoints) {
     if (_isMissingChartOrRecentPriceData(
-        marketPrices, shipyardPrices, waypoint)) {
+      marketPrices,
+      shipyardPrices,
+      waypoint,
+    )) {
       return waypoint;
     }
   }
@@ -182,12 +185,13 @@ Future<DateTime?> advanceExplorer(
     }
     // If we get here, we've explored all systems within maxJumpDistance jumps
     // of this system.  We just log an error and sleep.
-    shipErr(
+    await centralCommand.disableBehavior(
       ship,
+      Behavior.explorer,
       'No unexplored systems within $maxJumpDistance jumps of '
-      '${currentWaypoint.systemSymbol}, sleeping.',
+      '${currentWaypoint.systemSymbol}.',
+      const Duration(hours: 1),
     );
-    await centralCommand.disableBehavior(ship, Behavior.explorer);
     return null;
   }
 
