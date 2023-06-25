@@ -1,5 +1,5 @@
+import 'package:cli/api.dart';
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/api.dart';
 
 /// Keeps track of when we expect to interact with a ship next.
 class ShipWaiter {

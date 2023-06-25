@@ -1,11 +1,11 @@
-import 'package:space_traders_cli/behavior/advance.dart';
-import 'package:space_traders_cli/behavior/central_command.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/exceptions.dart';
-import 'package:space_traders_cli/net/rate_limit.dart';
-import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/ship_waiter.dart';
+import 'package:cli/behavior/advance.dart';
+import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/exceptions.dart';
+import 'package:cli/net/rate_limit.dart';
+import 'package:cli/printing.dart';
+import 'package:cli/ship_waiter.dart';
 
 /// One loop of the logic.
 Future<void> advanceShips(

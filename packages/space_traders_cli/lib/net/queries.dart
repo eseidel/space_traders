@@ -1,4 +1,4 @@
-import 'package:space_traders_cli/api.dart';
+import 'package:cli/api.dart';
 
 /// Fetches all pages from the given fetchPage function.
 Stream<T> fetchAllPages<T, A>(

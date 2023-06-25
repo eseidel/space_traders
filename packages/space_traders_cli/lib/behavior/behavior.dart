@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:cli/trading.dart';
 import 'package:file/file.dart';
-import 'package:space_traders_cli/trading.dart';
 
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {

@@ -1,8 +1,8 @@
+import 'package:cli/cache/transactions.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/printing.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/printing.dart';
 
 double creditsPerMinute(
   TransactionLog transactions,

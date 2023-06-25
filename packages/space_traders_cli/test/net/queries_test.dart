@@ -1,5 +1,5 @@
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/net/queries.dart';
+import 'package:cli/api.dart';
+import 'package:cli/net/queries.dart';
 import 'package:test/test.dart';
 
 void main() {

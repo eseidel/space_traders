@@ -1,6 +1,6 @@
+import 'package:cli/api.dart';
+import 'package:cli/cache/shipyard_prices.dart';
 import 'package:file/memory.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
 import 'package:test/test.dart';
 
 void main() {

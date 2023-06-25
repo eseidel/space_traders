@@ -1,8 +1,8 @@
+import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/explorer.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_cli/behavior/central_command.dart';
-import 'package:space_traders_cli/behavior/explorer.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
 class _MockShipNav extends Mock implements ShipNav {}

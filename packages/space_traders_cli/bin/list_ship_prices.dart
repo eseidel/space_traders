@@ -1,11 +1,11 @@
 import 'dart:math';
 
+import 'package:cli/api.dart';
+import 'package:cli/cache/shipyard_prices.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/printing.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/shipyard_prices.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/printing.dart';
 
 Future<void> cliMain() async {
   const fs = LocalFileSystem();

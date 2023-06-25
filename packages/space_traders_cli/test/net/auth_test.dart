@@ -1,5 +1,5 @@
+import 'package:cli/net/auth.dart';
 import 'package:file/memory.dart';
-import 'package:space_traders_cli/net/auth.dart';
 import 'package:test/test.dart';
 
 void main() {

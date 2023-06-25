@@ -1,6 +1,6 @@
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/cli.dart';
-import 'package:space_traders_cli/logger.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/cli.dart';
+import 'package:cli/logger.dart';
 
 // This should end up sharing code with Deal, Route, etc.
 class _Availability {

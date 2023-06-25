@@ -1,5 +1,5 @@
+import 'package:cli/logger.dart';
 import 'package:file/local.dart';
-import 'package:space_traders_cli/logger.dart';
 
 void main() {
   // Get current date

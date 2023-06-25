@@ -1,15 +1,15 @@
+import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/explorer.dart';
+import 'package:cli/behavior/navigation.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/actions.dart';
+import 'package:cli/net/exceptions.dart';
+import 'package:cli/printing.dart';
+import 'package:cli/route.dart';
+import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/behavior/central_command.dart';
-import 'package:space_traders_cli/behavior/explorer.dart';
-import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/actions.dart';
-import 'package:space_traders_cli/net/exceptions.dart';
-import 'package:space_traders_cli/printing.dart';
-import 'package:space_traders_cli/route.dart';
-import 'package:space_traders_cli/trading.dart';
 
 // my evaluation logic actually just assumes I'll get 10 extracts from each
 // survey regardless of size - so room for improvement.... I just don't have the

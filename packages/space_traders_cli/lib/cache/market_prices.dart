@@ -1,12 +1,12 @@
 import 'dart:math';
 
+import 'package:cli/api.dart';
+import 'package:cli/cache/json_list_store.dart';
+import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/printing.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/json_list_store.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/printing.dart';
 
 /// default max age for "recent" prices is 3 days
 const defaultMaxAge = Duration(days: 3);

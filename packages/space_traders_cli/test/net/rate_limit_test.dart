@@ -1,8 +1,8 @@
+import 'package:cli/api.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/rate_limit.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/rate_limit.dart';
 import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}

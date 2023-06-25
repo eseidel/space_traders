@@ -1,9 +1,9 @@
 import 'package:args/args.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/auth.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/auth.dart';
 
 /// Run command with a logger.
 Future<R> run<R>(

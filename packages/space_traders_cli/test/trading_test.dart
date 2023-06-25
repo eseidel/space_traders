@@ -1,10 +1,10 @@
+import 'package:cli/api.dart';
+import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/trading.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/market_prices.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/trading.dart';
 import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}

@@ -1,6 +1,6 @@
+import 'package:cli/net/rate_limit.dart';
 import 'package:collection/collection.dart';
 import 'package:openapi/api.dart';
-import 'package:space_traders_cli/net/rate_limit.dart';
 
 export 'package:openapi/api.dart';
 

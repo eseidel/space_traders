@@ -1,5 +1,5 @@
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/printing.dart';
+import 'package:cli/api.dart';
+import 'package:cli/printing.dart';
 
 void main(List<String> args) async {
   final maybeStatus = await DefaultApi().getStatus();

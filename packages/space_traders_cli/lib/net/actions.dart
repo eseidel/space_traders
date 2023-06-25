@@ -1,17 +1,17 @@
 import 'dart:math';
 
+import 'package:cli/api.dart';
+import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/transactions.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/direct.dart';
+import 'package:cli/net/exceptions.dart';
+import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/agent_cache.dart';
-import 'package:space_traders_cli/cache/market_prices.dart';
-import 'package:space_traders_cli/cache/ship_cache.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/direct.dart';
-import 'package:space_traders_cli/net/exceptions.dart';
-import 'package:space_traders_cli/printing.dart';
 
-export 'package:space_traders_cli/net/direct.dart';
+export 'package:cli/net/direct.dart';
 
 // Importantly, these actions *should* modify the state objects passed in
 // e.g. if it docks the ship, it should update the ship's nav object.

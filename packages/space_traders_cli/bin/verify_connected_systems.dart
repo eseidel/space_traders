@@ -1,7 +1,7 @@
+import 'package:cli/cache/caches.dart';
+import 'package:cli/cli.dart';
+import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/cli.dart';
-import 'package:space_traders_cli/logger.dart';
 
 // void printConnectedSystems(List<ConnectedSystem> connectedSystems) {
 //   for (final system in connectedSystems) {

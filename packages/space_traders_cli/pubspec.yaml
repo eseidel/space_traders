@@ -1,4 +1,4 @@
-name: space_traders_cli
+name: cli
 description: A command line interface to spacetraders.io
 version: 1.0.0
 publish_to: none

@@ -1,8 +1,8 @@
+import 'package:cli/api.dart';
+import 'package:cli/cache/market_prices.dart';
+import 'package:cli/printing.dart';
 import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/market_prices.dart';
-import 'package:space_traders_cli/printing.dart';
 import 'package:test/test.dart';
 
 void main() {

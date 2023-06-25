@@ -41,10 +41,10 @@
 // instead of sending all of the haulers to the same market.  Again
 // approximating how much price is going to raise from a deal?
 
-import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/printing.dart';
+import 'package:cli/behavior/behavior.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/printing.dart';
 
 /// Central command for the fleet.
 class CentralCommand {

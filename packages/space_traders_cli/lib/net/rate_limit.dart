@@ -1,7 +1,7 @@
+import 'package:cli/api.dart';
+import 'package:cli/logger.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/logger.dart';
 
 /// RequestCounts tracks the number of requests made to each path.
 class RequestCounts {

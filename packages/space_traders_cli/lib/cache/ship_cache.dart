@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/queries.dart';
-import 'package:space_traders_cli/third_party/compare.dart';
+import 'package:cli/api.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/queries.dart';
+import 'package:cli/third_party/compare.dart';
 
 bool _shipListsMatch(List<Ship> actual, List<Ship> expected) {
   if (actual.length != expected.length) {

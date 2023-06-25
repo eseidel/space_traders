@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
+import 'package:cli/api.dart';
+import 'package:cli/cache/systems_cache.dart';
 
 /// Returns the distance to the given waypoint.
 int distanceBetweenWaypointsInSystem(Waypoint a, Waypoint b) {

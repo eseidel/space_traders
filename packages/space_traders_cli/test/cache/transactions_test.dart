@@ -1,5 +1,5 @@
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/transactions.dart';
+import 'package:cli/api.dart';
+import 'package:cli/cache/transactions.dart';
 import 'package:test/test.dart';
 
 void main() {

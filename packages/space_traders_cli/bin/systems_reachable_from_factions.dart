@@ -1,9 +1,9 @@
+import 'package:cli/api.dart';
+import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/queries.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/queries.dart';
 
 class ClusterFinder {
   ClusterFinder(this.systemsCache);

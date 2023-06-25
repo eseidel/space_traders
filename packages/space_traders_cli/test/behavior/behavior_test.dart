@@ -1,5 +1,5 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:file/memory.dart';
-import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:test/test.dart';
 
 void main() {

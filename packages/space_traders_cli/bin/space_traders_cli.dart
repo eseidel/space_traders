@@ -1,16 +1,16 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/logic.dart';
+import 'package:cli/net/auth.dart';
+import 'package:cli/net/rate_limit.dart';
+import 'package:cli/printing.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
-import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/behavior/central_command.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/logic.dart';
-import 'package:space_traders_cli/net/auth.dart';
-import 'package:space_traders_cli/net/rate_limit.dart';
-import 'package:space_traders_cli/printing.dart';
 
 void printRequestStats(RateLimitedApiClient client) {
   final counts = client.requestCounts.counts;

@@ -1,9 +1,9 @@
+import 'package:cli/cache/caches.dart';
+import 'package:cli/cli.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/actions.dart';
+import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/cli.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/net/actions.dart';
-import 'package:space_traders_cli/printing.dart';
 
 String describeShipType(
   ShipType type,

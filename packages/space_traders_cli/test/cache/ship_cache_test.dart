@@ -1,6 +1,6 @@
+import 'package:cli/api.dart';
+import 'package:cli/cache/ship_cache.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/ship_cache.dart';
 import 'package:test/test.dart';
 
 class _MockShip extends Mock implements Ship {}

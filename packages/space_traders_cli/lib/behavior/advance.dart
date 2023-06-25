@@ -1,14 +1,14 @@
-import 'package:space_traders_cli/behavior/behavior.dart';
-import 'package:space_traders_cli/behavior/buy_ship.dart';
-import 'package:space_traders_cli/behavior/central_command.dart';
-import 'package:space_traders_cli/behavior/contract_trader.dart';
-import 'package:space_traders_cli/behavior/explorer.dart';
-import 'package:space_traders_cli/behavior/miner.dart';
-import 'package:space_traders_cli/behavior/navigation.dart';
-import 'package:space_traders_cli/behavior/trader.dart';
-import 'package:space_traders_cli/cache/caches.dart';
-import 'package:space_traders_cli/logger.dart';
-import 'package:space_traders_cli/printing.dart';
+import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/buy_ship.dart';
+import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/contract_trader.dart';
+import 'package:cli/behavior/explorer.dart';
+import 'package:cli/behavior/miner.dart';
+import 'package:cli/behavior/navigation.dart';
+import 'package:cli/behavior/trader.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/printing.dart';
 
 /// Advance the behavior of the given ship.
 /// Returns the time at which the behavior should be advanced again

@@ -1,9 +1,9 @@
+import 'package:cli/api.dart';
+import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/systems_cache.dart';
-import 'package:space_traders_cli/logger.dart';
 import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}

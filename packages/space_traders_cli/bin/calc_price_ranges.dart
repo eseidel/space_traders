@@ -1,7 +1,7 @@
+import 'package:cli/api.dart';
+import 'package:cli/cache/market_prices.dart';
+import 'package:cli/logger.dart';
 import 'package:file/local.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/market_prices.dart';
-import 'package:space_traders_cli/logger.dart';
 import 'package:stats/stats.dart';
 
 void printPriceRanges(List<MarketPrice> gameStats) {

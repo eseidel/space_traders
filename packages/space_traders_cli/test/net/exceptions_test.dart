@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/net/exceptions.dart';
+import 'package:cli/api.dart';
+import 'package:cli/net/exceptions.dart';
 import 'package:test/test.dart';
 
 void main() {

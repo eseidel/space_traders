@@ -1,10 +1,10 @@
 import 'dart:convert';
 
+import 'package:cli/api.dart';
+import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/logger.dart';
 import 'package:intl/intl.dart';
-import 'package:space_traders_cli/api.dart';
-import 'package:space_traders_cli/cache/market_prices.dart';
-import 'package:space_traders_cli/cache/waypoint_cache.dart';
-import 'package:space_traders_cli/logger.dart';
 
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
