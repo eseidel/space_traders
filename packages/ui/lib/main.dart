@@ -1,56 +1,31 @@
+import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/logger.dart';
+import 'package:file/local.dart';
 import 'package:flutter/material.dart';
-import 'package:openapi/api.dart';
+import 'package:scoped/scoped.dart';
+import 'package:ui/route.dart';
 
-void main() => runApp(const DataTableExampleApp());
+const fs = LocalFileSystem();
+late SystemsCache systemsCache;
 
-class DataTableExampleApp extends StatelessWidget {
-  const DataTableExampleApp({super.key});
+void main() async {
+  await runScoped(
+    () async {
+      systemsCache = await SystemsCache.load(fs);
+    },
+    values: {loggerRef},
+  );
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('SpaceTraders')),
-        body: const DataTableExample(),
-      ),
-    );
-  }
+  runApp(const MyApp());
 }
 
-class DataTableExample extends StatelessWidget {
-  const DataTableExample({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ships = <Ship>[];
-    return DataTable(
-      columns: const <DataColumn>[
-        DataColumn(
-          label: Expanded(
-            child: Text(
-              'Symbol',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ),
-        DataColumn(
-          label: Expanded(
-            child: Text(
-              'Location',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ),
-      ],
-      rows: <DataRow>[
-        for (final ship in ships)
-          DataRow(
-            cells: <DataCell>[
-              DataCell(Text(ship.symbol)),
-              DataCell(Text(ship.nav.waypointSymbol)),
-            ],
-          ),
-      ],
+    return MaterialApp.router(
+      routerConfig: router,
     );
   }
 }

@@ -7,13 +7,19 @@ environment:
   sdk: '>=3.0.5 <4.0.0'
 
 dependencies:
-  cupertino_icons: ^1.0.2
-  flutter:
-    sdk: flutter
-  openapi:
-    path: ../openapi
   cli:
     path: ../cli
+  cupertino_icons: ^1.0.2
+  file: ^6.1.4
+  flutter:
+    sdk: flutter
+  go_router: ^8.2.0
+  openapi:
+    path: ../openapi
+  scoped:
+    git:
+      url: https://github.com/shorebirdtech/shorebird.git
+      path: packages/scoped
 
 dev_dependencies:
   flutter_test:
