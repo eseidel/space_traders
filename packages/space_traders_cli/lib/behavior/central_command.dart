@@ -100,7 +100,7 @@ class CentralCommand {
   ) {
     final disableBehaviors = <Behavior>[
       // Behavior.buyShip,
-      // Behavior.contractTrader,
+      Behavior.contractTrader,
       // Behavior.arbitrageTrader,
       // Behavior.miner,
       // Behavior.idle,

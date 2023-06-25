@@ -128,6 +128,7 @@ Efficiency:
 * Teach arbitrage trader how to buy multiple times up to the max cargo hold.
 * Make the script robust to network failures.
 * Contract trader should record shipyard prices.
+* Write generalized route planner to calcualte route times and costs.
 
 Automation:
 * Automate resets
