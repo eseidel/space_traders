@@ -58,10 +58,13 @@ class ShipId implements Comparable<ShipId> {
   String toString() => symbol;
 }
 
-Future<void> cliMain() async {
+Future<void> cliMain(List<String> args) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
-  const lookback = Duration(hours: 3);
+  final lookbackMinutesString = args.firstOrNull;
+  final lookbackMinutes =
+      lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
+  final lookback = Duration(minutes: lookbackMinutes);
 
   const fs = LocalFileSystem();
   final transactions = await TransactionLog.load(fs);
@@ -91,5 +94,5 @@ Future<void> cliMain() async {
 }
 
 void main(List<String> args) async {
-  await runScoped(cliMain, values: {loggerRef});
+  await runScoped(() => cliMain(args), values: {loggerRef});
 }
