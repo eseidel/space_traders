@@ -12,24 +12,6 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 
-// List<Market> _marketsWithExport(
-//   String tradeSymbol,
-//   List<Market> markets,
-// ) {
-//   return markets
-//       .where((m) => m.exports.any((e) => e.symbol.value == tradeSymbol))
-//       .toList();
-// }
-
-// List<Market> _marketsWithExchange(
-//   String tradeSymbol,
-//   List<Market> markets,
-// ) {
-//   return markets
-//       .where((m) => m.exchange.any((e) => e.symbol.value == tradeSymbol))
-//       .toList();
-// }
-
 Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   Api api,
   Ship ship,
@@ -68,7 +50,7 @@ Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
   WaypointCache waypointCache,
   MarketCache marketCache, {
   required String tradeSymbol,
-  required int breakevenUnitPrice,
+  required int maximumWorthwhileUnitPurchasePrice,
   int maxJumps = 5,
 }) async* {
   await for (final waypoint in waypointCache.waypointsInJumpRadius(
@@ -102,13 +84,13 @@ Stream<_Opportunity> _nearbyMarketsWithProfitableTrade(
       continue;
     }
     // And our contract goal is selling < contract profit unit price.
-    if (purchasePrice < breakevenUnitPrice) {
+    if (purchasePrice < maximumWorthwhileUnitPurchasePrice) {
       yield _Opportunity(waypoint, purchasePrice);
     } else {
       shipDetail(
         ship,
         '${waypoint.symbol} has $tradeSymbol, but it is too expensive '
-        '< $breakevenUnitPrice, got $purchasePrice',
+        '< $maximumWorthwhileUnitPurchasePrice, got $purchasePrice',
       );
     }
   }
@@ -123,7 +105,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
   MarketCache marketCache,
   CentralCommand centralCommand, {
   required String tradeSymbol,
-  required int breakevenUnitPrice,
+  required int maximumWorthwhileUnitPurchasePrice,
 }) async {
   // Find the nearest market within maxJumps that has the tradeSymbol
   // either at or below our profit unit price.
@@ -134,7 +116,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     waypointCache,
     marketCache,
     tradeSymbol: tradeSymbol,
-    breakevenUnitPrice: breakevenUnitPrice,
+    maximumWorthwhileUnitPurchasePrice: maximumWorthwhileUnitPurchasePrice,
     maxJumps: 10,
   ).firstOrNull;
   if (opportunity == null) {
@@ -155,7 +137,7 @@ Future<DateTime?> _navigateToNearbyMarketIfNeeded(
     MarketTransactionTypeEnum.PURCHASE,
   );
   final priceString = creditsString(opportunity.purchasePrice);
-  final breakEvenString = creditsString(breakevenUnitPrice);
+  final breakEvenString = creditsString(maximumWorthwhileUnitPurchasePrice);
   shipInfo(
       ship,
       '${opportunity.waypoint.symbol} trades '
@@ -181,16 +163,17 @@ Future<bool> _purchaseContractGoodIfPossible(
   Waypoint currentWaypoint,
   MarketTradeGood maybeGood,
   ContractDeliverGood neededGood, {
-  required int breakEvenUnitPrice,
+  required int maximumWorthwhileUnitPurchasePrice,
   required int unitsToPurchase,
 }) async {
   // And its selling at a reasonable price.
-  if (maybeGood.purchasePrice >= breakEvenUnitPrice) {
+  if (maybeGood.purchasePrice >= maximumWorthwhileUnitPurchasePrice) {
     shipInfo(
       ship,
       '${neededGood.tradeSymbol} is too expensive near '
       '${currentWaypoint.symbol} '
-      'needed < $breakEvenUnitPrice, got ${maybeGood.purchasePrice}',
+      'needed < $maximumWorthwhileUnitPurchasePrice, '
+      'got ${maybeGood.purchasePrice}',
     );
     return false;
   }
@@ -252,7 +235,8 @@ Future<DateTime?> advanceContractTrader(
   final totalPayment =
       contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
   // TODO(eseidel): "break even" should include a minimum margin.
-  final breakEvenUnitPrice = totalPayment ~/ neededGood.unitsRequired;
+  final maximumWorthwhileUnitPurchasePrice =
+      totalPayment ~/ neededGood.unitsRequired;
 
   final currentWaypoint =
       await caches.waypoints.waypoint(ship.nav.waypointSymbol);
@@ -304,8 +288,10 @@ Future<DateTime?> advanceContractTrader(
   // Make sure we only to our credit check *after* we deliver our goods.
   const creditsBuffer = 20000;
   final remainingUnits = neededGood.unitsRequired - neededGood.unitsFulfilled;
-  final minimumCreditsToTrade =
-      max(100000, breakEvenUnitPrice * remainingUnits + creditsBuffer);
+  final minimumCreditsToTrade = max(
+    100000,
+    maximumWorthwhileUnitPurchasePrice * remainingUnits + creditsBuffer,
+  );
   if (caches.agent.agent.credits < minimumCreditsToTrade) {
     await centralCommand.disableBehavior(
       ship,
@@ -401,7 +387,8 @@ Future<DateTime?> advanceContractTrader(
             currentWaypoint,
             maybeGood,
             neededGood,
-            breakEvenUnitPrice: breakEvenUnitPrice,
+            maximumWorthwhileUnitPurchasePrice:
+                maximumWorthwhileUnitPurchasePrice,
             unitsToPurchase: unitsToPurchase,
           );
 
@@ -438,7 +425,7 @@ Future<DateTime?> advanceContractTrader(
       caches.markets,
       centralCommand,
       tradeSymbol: neededGood.tradeSymbol,
-      breakevenUnitPrice: breakEvenUnitPrice,
+      maximumWorthwhileUnitPurchasePrice: maximumWorthwhileUnitPurchasePrice,
     );
   }
 }
