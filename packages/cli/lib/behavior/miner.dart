@@ -216,8 +216,7 @@ Future<String?> nearestMineWithGoodMining(
   bool Function(String systemSymbol)? systemFilter,
 }) async {
   final evals = <_SystemEval>[];
-  await for (final (systemSymbol, jumps)
-      in systemsCache.systemSymbolsInJumpRadius(
+  for (final (systemSymbol, jumps) in systemsCache.systemSymbolsInJumpRadius(
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {

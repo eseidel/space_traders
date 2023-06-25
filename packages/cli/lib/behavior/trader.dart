@@ -237,21 +237,16 @@ Future<DateTime?> advanceArbitrageTrader(
     );
   }
 
-  // We don't have a current deal, so get a new one!A
-
-  // Find a new deal!
-  const maxJumps = 1;
-  final maxOutlay = caches.agent.agent.credits;
-
+  // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
-  final deal = await findDealFor(
+  final deal = await centralCommand.findNextDeal(
     caches.marketPrices,
     caches.systems,
     caches.waypoints,
     caches.markets,
     ship,
-    maxJumps: maxJumps,
-    maxOutlay: maxOutlay,
+    maxJumps: 1,
+    maxOutlay: caches.agent.agent.credits,
     availableSpace: ship.availableSpace,
   );
 

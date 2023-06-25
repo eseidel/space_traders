@@ -210,7 +210,7 @@ void main() {
         startSystem: any(named: 'startSystem'),
         maxJumps: any(named: 'maxJumps'),
       ),
-    ).thenAnswer((_) => Stream.fromIterable([('S-A', 0)]));
+    ).thenReturn([('S-A', 0)]);
 
     when(
       () => waypointCache.waypointsInSystem(any()),

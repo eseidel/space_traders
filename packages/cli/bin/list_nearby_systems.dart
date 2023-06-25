@@ -52,8 +52,7 @@ void main(List<String> args) async {
     start = await waypointCache.getAgentHeadquarters();
   }
 
-  await for (final (systemSymbol, jumps)
-      in systemsCache.systemSymbolsInJumpRadius(
+  for (final (systemSymbol, jumps) in systemsCache.systemSymbolsInJumpRadius(
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {

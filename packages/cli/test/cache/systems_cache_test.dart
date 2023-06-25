@@ -34,7 +34,7 @@ void main() {
 
     final fs = MemoryFileSystem.test();
     final systemsCache = SystemsCache(systems: inputSystems, fs: fs);
-    final systems = await systemsCache
+    final systems = systemsCache
         .systemSymbolsInJumpRadius(
           startSystem: 'S-A',
           maxJumps: 5,
@@ -68,7 +68,7 @@ void main() {
     final fs = MemoryFileSystem.test();
     final systemsCache = SystemsCache(systems: inputSystems, fs: fs);
 
-    final systems = await systemsCache
+    final systems = systemsCache
         .systemSymbolsInJumpRadius(
           startSystem: 'S-A',
           maxJumps: 5,

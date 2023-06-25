@@ -154,10 +154,10 @@ class SystemsCache extends JsonListStore<System> {
   /// Yields a stream of system symbols that are within n jumps of the system.
   /// The system itself is included in the stream with distance 0.
   /// The stream is roughly ordered by distance from the start.
-  Stream<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
+  Iterable<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
     required String startSystem,
     required int maxJumps,
-  }) async* {
+  }) sync* {
     assertIsSystemSymbol(startSystem);
     var jumpsLeft = maxJumps;
     final currentSystemsToJumpFrom = <String>{startSystem};

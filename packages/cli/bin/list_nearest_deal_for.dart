@@ -42,7 +42,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
 
   final availabilityList = <_Availability>[];
 
-  await for (final (String system, int jumps)
+  for (final (String system, int jumps)
       in caches.systems.systemSymbolsInJumpRadius(
     startSystem: hq.systemSymbol,
     maxJumps: maxJumps,

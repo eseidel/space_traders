@@ -45,6 +45,7 @@ import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/trading.dart';
 
 /// Central command for the fleet.
 class CentralCommand {
@@ -211,6 +212,52 @@ class CentralCommand {
   /// Set the current [BehaviorState] for the [shipSymbol].
   Future<void> setBehavior(String shipSymbol, BehaviorState state) async {
     await _behaviorCache.setBehavior(shipSymbol, state);
+  }
+
+  /// Returns all systems containing explorers or explorer destinations.
+  Iterable<CostedDeal> _dealsInProgress() sync* {
+    for (final state in _behaviorCache.states) {
+      final deal = state.deal;
+      if (deal != null) {
+        yield deal;
+      }
+    }
+  }
+
+  /// Find next deal for the given [ship], considering all deals in progress.
+  Future<CostedDeal?> findNextDeal(
+    MarketPrices marketPrices,
+    SystemsCache systemsCache,
+    WaypointCache waypointCache,
+    MarketCache marketCache,
+    Ship ship, {
+    required int maxJumps,
+    required int maxOutlay,
+    required int availableSpace,
+  }) async {
+    final inProgress = _dealsInProgress().toList();
+    // Avoid having two ships working on the same deal since by the time the
+    // second one gets there the prices will have changed.
+    bool filter(CostedDeal deal) {
+      return inProgress.any(
+        (d) =>
+            d.deal.sourceSymbol != deal.deal.sourceSymbol ||
+            d.deal.tradeSymbol != deal.deal.tradeSymbol,
+      );
+    }
+
+    final maybeDeal = await findDealFor(
+      marketPrices,
+      systemsCache,
+      waypointCache,
+      marketCache,
+      ship,
+      maxJumps: maxJumps,
+      maxOutlay: maxOutlay,
+      availableSpace: ship.availableSpace,
+      filter: filter,
+    );
+    return maybeDeal;
   }
 
   /// Returns all systems containing explorers or explorer destinations.

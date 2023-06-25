@@ -83,7 +83,7 @@ void main() {
         startSystem: 'S-A',
         maxJumps: 1,
       ),
-    ).thenAnswer((invocation) => Stream.fromIterable([]));
+    ).thenReturn([]);
 
     when(() => centralCommand.getBehavior('S')).thenAnswer(
       (_) => BehaviorState('S', Behavior.arbitrageTrader),
@@ -95,6 +95,19 @@ void main() {
         Behavior.arbitrageTrader,
         any(),
         any(),
+      ),
+    ).thenAnswer((_) => Future.value());
+
+    when(
+      () => centralCommand.findNextDeal(
+        marketPrices,
+        systemsCache,
+        waypointCache,
+        marketCache,
+        ship,
+        maxJumps: any(named: 'maxJumps'),
+        maxOutlay: any(named: 'maxOutlay'),
+        availableSpace: any(named: 'availableSpace'),
       ),
     ).thenAnswer((_) => Future.value());
 

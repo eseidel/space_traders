@@ -226,9 +226,9 @@ Future<Waypoint?> nearbyMarketWhichTrades(
 
 /// A potential purchase opportunity.
 @immutable
-class _BuyOpp {
+class BuyOpp {
   /// Create a new BuyOpp.
-  const _BuyOpp({
+  const BuyOpp({
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
@@ -246,9 +246,9 @@ class _BuyOpp {
 
 /// A potential sale opportunity.  Only public for testing.
 @immutable
-class _SellOpp {
+class SellOpp {
   /// Create a new SellOpp.
-  const _SellOpp({
+  const SellOpp({
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
@@ -264,19 +264,16 @@ class _SellOpp {
   final int price;
 }
 
-/// Finds deals between markets.
-class DealFinder {
-  /// Create a new DealFinder.
-  DealFinder(MarketPrices marketPrices, {this.topLimit = 5})
-      : _priceData = marketPrices;
-  // _systemsCache = systemsCache,
+class _MarketScanBuilder {
+  _MarketScanBuilder(MarketPrices marketPrices, {required this.topLimit})
+      : _marketPrices = marketPrices;
 
-  final MarketPrices _priceData;
-  // final SystemsCache _systemsCache;
   /// How many deals to keep track of per trade symbol.
   final int topLimit;
-  final Map<String, List<_BuyOpp>> _buyOpps = {};
-  final Map<String, List<_SellOpp>> _sellOpps = {};
+  final Map<String, List<BuyOpp>> buyOpps = {};
+  final Map<String, List<SellOpp>> sellOpps = {};
+
+  final MarketPrices _marketPrices;
 
   /// Record potential deals from the given market.
   void visitMarket(Market market) {
@@ -284,17 +281,17 @@ class DealFinder {
       // See if the price data we have for this trade symbol
       // are in the top/bottom we've seen, if so, record them.
       final buyPrice =
-          estimatePurchasePrice(_priceData, market, tradeSymbol.value);
+          estimatePurchasePrice(_marketPrices, market, tradeSymbol.value);
       if (buyPrice == null) {
         // If we don't have buy data we won't have sell data either.
         continue;
       }
-      final buy = _BuyOpp(
+      final buy = BuyOpp(
         marketSymbol: market.symbol,
         tradeSymbol: tradeSymbol.value,
         price: buyPrice,
       );
-      final buys = _buyOpps[tradeSymbol.value] ?? [];
+      final buys = buyOpps[tradeSymbol.value] ?? [];
       // No clue what it wants me to cascade here?
       // ignore: cascade_invocations
       buys
@@ -303,13 +300,13 @@ class DealFinder {
       if (buys.length > topLimit) {
         buys.removeLast();
       }
-      _buyOpps[tradeSymbol.value] = buys;
-      final sell = _SellOpp(
+      buyOpps[tradeSymbol.value] = buys;
+      final sell = SellOpp(
         marketSymbol: market.symbol,
         tradeSymbol: tradeSymbol.value,
-        price: estimateSellPrice(_priceData, market, tradeSymbol.value)!,
+        price: estimateSellPrice(_marketPrices, market, tradeSymbol.value)!,
       );
-      final sells = _sellOpps[tradeSymbol.value] ?? [];
+      final sells = sellOpps[tradeSymbol.value] ?? [];
       // No clue what it wants me to cascade here?
       // ignore: cascade_invocations
       sells
@@ -318,40 +315,77 @@ class DealFinder {
       if (sells.length > topLimit) {
         sells.removeLast();
       }
-      _sellOpps[tradeSymbol.value] = sells;
+      sellOpps[tradeSymbol.value] = sells;
     }
+  }
+}
+
+/// Represents a collection of buy and sell opportunities for a given set
+/// of markets.
+class MarketScan {
+  MarketScan._({
+    required Map<String, List<BuyOpp>> buyOpps,
+    required Map<String, List<SellOpp>> sellOpps,
+  })  : _buyOpps = Map.unmodifiable(buyOpps),
+        _sellOpps = Map.unmodifiable(sellOpps);
+
+  /// Given a set of markets, will collect the top N buy and sell opportunities
+  /// for each trade symbol.
+  factory MarketScan.fromMarkets(
+    MarketPrices marketPrices,
+    Iterable<Market> markets,
+  ) {
+    final builder = _MarketScanBuilder(marketPrices, topLimit: 5);
+    for (final market in markets) {
+      builder.visitMarket(market);
+    }
+    return MarketScan._(buyOpps: builder.buyOpps, sellOpps: builder.sellOpps);
   }
 
-  /// Returns all deals found.
-  List<Deal> findDeals() {
-    final deals = <Deal>[];
-    // final fuelPrice = _priceData.medianPurchasePrice(TradeSymbol.FUEL.value);
-    for (final tradeSymbol in _buyOpps.keys) {
-      final buys = _buyOpps[tradeSymbol]!;
-      final sells = _sellOpps[tradeSymbol]!;
-      for (final buy in buys) {
-        for (final sell in sells) {
-          if (buy.marketSymbol == sell.marketSymbol) {
-            continue;
-          }
-          final profit = sell.price - buy.price;
-          if (profit <= 0) {
-            continue;
-          }
-          deals.add(
-            Deal(
-              sourceSymbol: buy.marketSymbol,
-              tradeSymbol: TradeSymbol.fromJson(tradeSymbol)!,
-              purchasePrice: buy.price,
-              destinationSymbol: sell.marketSymbol,
-              sellPrice: sell.price,
-            ),
-          );
+  final Map<String, List<BuyOpp>> _buyOpps;
+  final Map<String, List<SellOpp>> _sellOpps;
+
+  /// The trade symbols for which we found opportunities.
+  List<String> get tradeSymbols => _buyOpps.keys.toList();
+
+  /// Lookup the buy opportunities for the given trade symbol.
+  List<BuyOpp> buyOppsForTradeSymbol(String tradeSymbol) =>
+      _buyOpps[tradeSymbol] ?? [];
+
+  /// Lookup the sell opportunities for the given trade symbol.
+  List<SellOpp> sellOppsForTradeSymbol(String tradeSymbol) =>
+      _sellOpps[tradeSymbol] ?? [];
+}
+
+/// Builds a list of deals found from the provided MarketScan.
+List<Deal> buildDealsFromScan(MarketScan scan) {
+  final deals = <Deal>[];
+  // final fuelPrice = _priceData.medianPurchasePrice(TradeSymbol.FUEL.value);
+  for (final tradeSymbol in scan.tradeSymbols) {
+    final buys = scan.buyOppsForTradeSymbol(tradeSymbol);
+    final sells = scan.sellOppsForTradeSymbol(tradeSymbol);
+    for (final buy in buys) {
+      for (final sell in sells) {
+        if (buy.marketSymbol == sell.marketSymbol) {
+          continue;
         }
+        final profit = sell.price - buy.price;
+        if (profit <= 0) {
+          continue;
+        }
+        deals.add(
+          Deal(
+            sourceSymbol: buy.marketSymbol,
+            tradeSymbol: TradeSymbol.fromJson(tradeSymbol)!,
+            purchasePrice: buy.price,
+            destinationSymbol: sell.marketSymbol,
+            sellPrice: sell.price,
+          ),
+        );
       }
     }
-    return deals;
   }
+  return deals;
 }
 
 /// A deal between two markets which considers flight cost and time.
@@ -486,21 +520,16 @@ Future<CostedDeal?> findDealFor(
   required int maxJumps,
   required int maxOutlay,
   required int availableSpace,
+  bool Function(CostedDeal deal)? filter,
 }) async {
-  final markets = await systemsCache
-      .systemSymbolsInJumpRadius(
+  final markets = await marketCache
+      .marketsInJumpRadius(
         startSystem: ship.nav.systemSymbol,
         maxJumps: maxJumps,
       )
-      .asyncExpand(
-        (record) => marketCache.marketsInSystem(record.$1),
-      )
       .toList();
-  final finder = DealFinder(marketPrices);
-  for (final market in markets) {
-    finder.visitMarket(market);
-  }
-  final deals = finder.findDeals();
+  final scan = MarketScan.fromMarkets(marketPrices, markets);
+  final deals = buildDealsFromScan(scan);
 
   final costedDeals = deals
       .map(
@@ -513,12 +542,15 @@ Future<CostedDeal?> findDealFor(
       )
       .toList();
 
-  if (costedDeals.isEmpty) {
+  final filtered =
+      filter != null ? costedDeals.where(filter).toList() : costedDeals;
+
+  if (filtered.isEmpty) {
     logger.info('No deals found.');
     return null;
   }
   final affordable =
-      costedDeals.where((d) => d.expectedCosts < maxOutlay).toList();
+      filtered.where((d) => d.expectedCosts < maxOutlay).toList();
   if (affordable.isEmpty) {
     logger.info('No deals found under $maxOutlay credits.');
     return null;

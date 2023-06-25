@@ -22,49 +22,47 @@ class _MockPriceData extends Mock implements MarketPrices {}
 class _MockShip extends Mock implements Ship {}
 
 void main() {
-  test('DealFinder empty', () {
+  test('MarketScan empty', () {
     final marketPrices = _MockPriceData();
-    final finder = DealFinder(marketPrices);
-    final deals = finder.findDeals();
+    final scan = MarketScan.fromMarkets(marketPrices, []);
+    final deals = buildDealsFromScan(scan);
     expect(deals, isEmpty);
   });
 
-  test('DealFinder single deal', () {
+  test('MarketScan single deal', () {
     final marketPrices = _MockPriceData();
     final tradeGood =
         TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
-    final finder = DealFinder(marketPrices)
-      ..visitMarket(
-        Market(
-          symbol: 'A',
-          exchange: [tradeGood],
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: 'FUEL',
-              tradeVolume: 100,
-              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-              purchasePrice: 2,
-              sellPrice: 3,
-            )
-          ],
-        ),
-      )
-      ..visitMarket(
-        Market(
-          symbol: 'B',
-          exchange: [tradeGood],
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: 'FUEL',
-              tradeVolume: 100,
-              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-              purchasePrice: 1,
-              sellPrice: 2,
-            )
-          ],
-        ),
-      );
-    final deals = finder.findDeals();
+    final markets = [
+      Market(
+        symbol: 'A',
+        exchange: [tradeGood],
+        tradeGoods: [
+          MarketTradeGood(
+            symbol: 'FUEL',
+            tradeVolume: 100,
+            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+            purchasePrice: 2,
+            sellPrice: 3,
+          )
+        ],
+      ),
+      Market(
+        symbol: 'B',
+        exchange: [tradeGood],
+        tradeGoods: [
+          MarketTradeGood(
+            symbol: 'FUEL',
+            tradeVolume: 100,
+            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+            purchasePrice: 1,
+            sellPrice: 2,
+          )
+        ],
+      ),
+    ];
+    final scan = MarketScan.fromMarkets(marketPrices, markets);
+    final deals = buildDealsFromScan(scan);
     expect(deals, isNotEmpty);
   });
 
@@ -240,14 +238,10 @@ void main() {
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.systemSymbol).thenReturn('S-A');
-    when(
-      () => systemsCache.systemSymbolsInJumpRadius(
-        startSystem: 'S-A',
-        maxJumps: 1,
-      ),
-    ).thenAnswer((invocation) => Stream.fromIterable([]));
-    final logger = _MockLogger();
+    when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
+        .thenAnswer((_) => const Stream.empty());
 
+    final logger = _MockLogger();
     final costed = await runWithLogger(
       logger,
       () => findDealFor(
