@@ -226,6 +226,7 @@ Future<DateTime?> advanceArbitrageTrader(
       return null;
     }
 
+    /// TODO(eseidel): How do we know if buying or selling is next?
     shipInfo(ship, 'Off course in route to deal, resuming route.');
     return beingRouteAndLog(
       api,
