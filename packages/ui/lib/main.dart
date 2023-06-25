@@ -1,69 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:openapi/api.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const DataTableExampleApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DataTableExampleApp extends StatelessWidget {
+  const DataTableExampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SpaceTraders',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      home: Scaffold(
+        appBar: AppBar(title: const Text('SpaceTraders')),
+        body: const DataTableExample(),
       ),
-      home: const MyHomePage(title: 'SpaceTraders'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({required this.title, super.key});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+class DataTableExample extends StatelessWidget {
+  const DataTableExample({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+    final ships = <Ship>[];
+    return DataTable(
+      columns: const <DataColumn>[
+        DataColumn(
+          label: Expanded(
+            child: Text(
+              'Symbol',
+              style: TextStyle(fontStyle: FontStyle.italic),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+        DataColumn(
+          label: Expanded(
+            child: Text(
+              'Location',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+        ),
+      ],
+      rows: <DataRow>[
+        for (final ship in ships)
+          DataRow(
+            cells: <DataCell>[
+              DataCell(Text(ship.symbol)),
+              DataCell(Text(ship.nav.waypointSymbol)),
+            ],
+          ),
+      ],
     );
   }
 }
