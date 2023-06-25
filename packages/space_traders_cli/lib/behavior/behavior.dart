@@ -95,12 +95,17 @@ class BehaviorCache {
   /// The default path to the cache file.
   static const String defaultPath = 'behaviors.json';
 
+  /// The behavior state for each ship.
   final Map<String, BehaviorState> _stateByShipSymbol;
 
+  /// The path to the cache file.
   final String _path;
 
   /// The file system to use.
   final FileSystem _fs;
+
+  /// Get the list of all behavior states.
+  List<BehaviorState> get states => _stateByShipSymbol.values.toList();
 
   /// Save entries to a file.
   Future<void> save() async {

@@ -125,11 +125,8 @@ Future<DateTime?> advanceExplorer(
   // If at a jump gate, go to a nearby system with unexplored waypoints or
   // missing market data.
   if (currentWaypoint.isJumpGate) {
-    // TODO(eseidel): I believe this is the source of requests.
-    // final myShips = await allMyShips(api).toList();
-    // final probeSystems =
-    //     myShips.where((s) => s.isProbe)
-    //     .map((s) => s.nav.systemSymbol).toSet();
+    final probeSystems =
+        centralCommand.otherExplorerSystems(ship.symbol).toSet();
     const maxJumpDistance = 100;
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
@@ -137,15 +134,10 @@ Future<DateTime?> advanceExplorer(
       startSystem: currentWaypoint.systemSymbol,
       maxJumps: maxJumpDistance,
     )) {
-      // Crude logic to spread our explorers out.
-      // This doesn't actually work if they're jumping multiple times, it's just
-      // preventing the probe from *routing* to the intermediate place the
-      // other probes are in.
-      // We need to check the probe destinations stored in behavior state?
-      // if (probeSystems.contains(destination.systemSymbol)) {
-      //   // We already have a ship in this system, don't route there.
-      //   continue;
-      // }
+      if (probeSystems.contains(destination.systemSymbol)) {
+        // We already have a ship in this system, don't route there.
+        continue;
+      }
       if (_isMissingChartOrRecentPriceData(
         caches.marketPrices,
         caches.shipyardPrices,

@@ -41,19 +41,22 @@
 // instead of sending all of the haulers to the same market.  Again
 // approximating how much price is going to raise from a deal?
 
-import 'package:space_traders_cli/api.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
+import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/printing.dart';
 
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
-  CentralCommand(BehaviorCache behaviorCache) : _behaviorCache = behaviorCache;
+  CentralCommand(BehaviorCache behaviorCache, ShipCache shipCache)
+      : _behaviorCache = behaviorCache,
+        _shipCache = shipCache;
 
   final Map<Behavior, DateTime> _behaviorTimeouts = {};
 
   final BehaviorCache _behaviorCache;
+  final ShipCache _shipCache;
 
   // To tell a given explorer what to do.
   // Figure out what squad they're in (are they watching a waypoint for us
@@ -208,5 +211,24 @@ class CentralCommand {
   /// Set the current [BehaviorState] for the [shipSymbol].
   Future<void> setBehavior(String shipSymbol, BehaviorState state) async {
     await _behaviorCache.setBehavior(shipSymbol, state);
+  }
+
+  /// Returns all systems containing explorers or explorer destinations.
+  Iterable<String> otherExplorerSystems(String thisShipSymbol) sync* {
+    for (final state in _behaviorCache.states) {
+      if (state.shipSymbol == thisShipSymbol) {
+        continue;
+      }
+      if (state.behavior == Behavior.explorer) {
+        final destination = state.destination;
+        if (destination != null) {
+          final parsed = parseWaypointString(destination);
+          yield parsed.system;
+        } else {
+          final ship = _shipCache.ship(state.shipSymbol);
+          yield ship.nav.systemSymbol;
+        }
+      }
+    }
   }
 }

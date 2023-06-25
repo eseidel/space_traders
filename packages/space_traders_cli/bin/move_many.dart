@@ -65,7 +65,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   printShips(selectedShips, shipWaypoints);
 
   final behaviorCache = await BehaviorCache.load(fs);
-  final centralCommand = CentralCommand(behaviorCache);
+  final centralCommand = CentralCommand(behaviorCache, caches.ships);
   // Set a destination for each ship.
   for (final ship in selectedShips) {
     await behaviorCache.setBehavior(

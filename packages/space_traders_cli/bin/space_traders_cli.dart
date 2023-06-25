@@ -55,7 +55,7 @@ Future<void> cliMain(List<String> args) async {
     '${caches.marketPrices.waypointCount} markets.',
   );
   final behaviorCache = await BehaviorCache.load(fs);
-  final centralCommand = CentralCommand(behaviorCache);
+  final centralCommand = CentralCommand(behaviorCache, caches.ships);
 
   final status = await api.defaultApi.getStatus();
   printStatus(status!);
