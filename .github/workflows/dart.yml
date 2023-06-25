@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: packages/space_traders_cli
+        working-directory: packages/cli
 
     steps:
       - uses: actions/checkout@v3
@@ -46,4 +46,4 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
-          working-directory: packages/space_traders_cli
+          working-directory: packages/cli
