@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:space_traders_cli/behavior/behavior.dart';
 import 'package:space_traders_cli/behavior/central_command.dart';
+import 'package:space_traders_cli/behavior/explorer.dart';
 import 'package:space_traders_cli/behavior/navigation.dart';
 import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/logger.dart';
@@ -385,29 +386,15 @@ Future<DateTime?> advanceMiner(
   final shouldSell = ship.availableSpace < 15;
   if (shouldSell) {
     // Sell cargo and refuel if needed.
-    if (currentWaypoint.hasMarketplace) {
-      await dockIfNeeded(api, ship);
-      final market = await recordMarketDataIfNeededAndLog(
-        caches.marketPrices,
-        caches.markets,
-        ship,
-        currentWaypoint.symbol,
-      );
-      await refuelIfNeededAndLog(
-        api,
-        caches.marketPrices,
-        caches.transactions,
-        caches.agent,
-        market,
-        ship,
-      );
-
+    final currentMarket =
+        await visitLocalMarket(api, caches, currentWaypoint, ship);
+    if (currentMarket != null) {
       await sellAllCargoAndLog(
         api,
         caches.marketPrices,
         caches.transactions,
         caches.agent,
-        market,
+        currentMarket,
         ship,
       );
       // This could also compare before cargo and after cargo and call

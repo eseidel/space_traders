@@ -1,17 +1,13 @@
+import 'package:space_traders_cli/behavior/explorer.dart';
 import 'package:space_traders_cli/cache/caches.dart';
 import 'package:space_traders_cli/cli.dart';
 import 'package:space_traders_cli/logger.dart';
 import 'package:space_traders_cli/net/actions.dart';
-import 'package:space_traders_cli/net/queries.dart';
 import 'package:space_traders_cli/printing.dart';
 
 Future<void> _navigateToLocalWaypointAndDock(
   Api api,
-  AgentCache agentCache,
-  MarketPrices marketPrices,
-  ShipyardPrices shipyardPrices,
-  MarketCache marketCache,
-  TransactionLog transactionLog,
+  Caches caches,
   Ship ship,
   Waypoint destination,
   bool shouldDock,
@@ -25,29 +21,8 @@ Future<void> _navigateToLocalWaypointAndDock(
     logger.info('Waiting to dock...');
     await Future<void>.delayed(flightTime);
     await dockIfNeeded(api, ship);
-    // TODO(eseidel): Move this "visit waypoint" logic into a central place.
-    if (destination.hasMarketplace) {
-      final market = await recordMarketDataIfNeededAndLog(
-        marketPrices,
-        marketCache,
-        ship,
-        destination.symbol,
-      );
-      if (ship.shouldRefuel) {
-        await refuelIfNeededAndLog(
-          api,
-          marketPrices,
-          transactionLog,
-          agentCache,
-          market,
-          ship,
-        );
-      }
-    }
-    if (destination.hasShipyard) {
-      final shipyard = await getShipyard(api, destination);
-      await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
-    }
+    await visitLocalMarket(api, caches, destination, ship);
+    await visitLocalShipyard(api, caches.shipyardPrices, destination, ship);
     logger.info('Docked.');
   }
 }
@@ -105,11 +80,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   if (destWaypoint.systemSymbol == startingSystem.symbol) {
     await _navigateToLocalWaypointAndDock(
       api,
-      caches.agent,
-      caches.marketPrices,
-      caches.shipyardPrices,
-      caches.markets,
-      caches.transactions,
+      caches,
       ship,
       destWaypoint,
       shouldDock,
@@ -133,11 +104,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   // We don't need to wait after the jump cooldown.
   await _navigateToLocalWaypointAndDock(
     api,
-    caches.agent,
-    caches.marketPrices,
-    caches.shipyardPrices,
-    caches.markets,
-    caches.transactions,
+    caches,
     ship,
     destWaypoint,
     shouldDock,

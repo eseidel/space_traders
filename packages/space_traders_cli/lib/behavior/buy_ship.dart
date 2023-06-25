@@ -169,7 +169,7 @@ Future<DateTime?> advanceBuyShip(
     await centralCommand.disableBehavior(
       ship,
       Behavior.buyShip,
-      'Can not by $shipType, credits $credits < max price $maxPrice.',
+      'Can not buy $shipType, credits $credits < max price $maxPrice.',
       const Duration(minutes: 20),
     );
     return null;
@@ -199,7 +199,7 @@ Future<DateTime?> advanceBuyShip(
     }
 
     // Do we need to catch exceptions about insufficient credits?
-    await purchaseShipAndLog(
+    final result = await purchaseShipAndLog(
       api,
       caches.marketPrices,
       caches.ships,
@@ -213,7 +213,7 @@ Future<DateTime?> advanceBuyShip(
     await centralCommand.disableBehavior(
       ship,
       Behavior.buyShip,
-      'Purchase successful.',
+      'Purchase of ${result.ship.symbol} ($shipType) successful!',
       const Duration(minutes: 20),
     );
     return null;

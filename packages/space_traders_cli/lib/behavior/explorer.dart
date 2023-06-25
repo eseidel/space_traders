@@ -50,6 +50,60 @@ Future<Waypoint?> _nearestWaypointNeedingExploration(
   return null;
 }
 
+/// Visits the local market if we're at a waypoint with a market.
+/// Will return the market if we visited it, otherwise null.
+/// Market data will be recorded if needed.
+/// Market data only be refreshed if we haven't refreshed in 5 minutes.
+Future<Market?> visitLocalMarket(
+  Api api,
+  Caches caches,
+  Waypoint waypoint,
+  Ship ship, {
+  Duration maxAge = const Duration(minutes: 5),
+}) async {
+  // If we're currently at a market, record the prices and refuel.
+  if (!waypoint.hasMarketplace) {
+    return null;
+  }
+  // This could avoid the dock and market lookup if the caller
+  // doesn't need the Market value, we don't need fuel and we have
+  // recent market data.
+  await dockIfNeeded(api, ship);
+  final market = await recordMarketDataIfNeededAndLog(
+    caches.marketPrices,
+    caches.markets,
+    ship,
+    waypoint.symbol,
+    maxAge: maxAge,
+  );
+  if (ship.usesFuel) {
+    await refuelIfNeededAndLog(
+      api,
+      caches.marketPrices,
+      caches.transactions,
+      caches.agent,
+      market,
+      ship,
+    );
+  }
+  return market;
+}
+
+/// Visits the local shipyard if we're at a waypoint with a shipyard.
+/// Records shipyard data if needed.
+Future<void> visitLocalShipyard(
+  Api api,
+  ShipyardPrices shipyardPrices,
+  Waypoint waypoint,
+  Ship ship,
+) async {
+  if (!waypoint.hasShipyard) {
+    return;
+  }
+  final shipyard = await getShipyard(api, waypoint);
+  await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
+}
+
 /// One loop of the exploring logic.
 Future<DateTime?> advanceExplorer(
   Api api,
@@ -62,42 +116,21 @@ Future<DateTime?> advanceExplorer(
 
   // Check our current waypoint.  If it's not charted or doesn't have current
   // market data, chart it and/or record market data.
-  final currentWaypoint =
-      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final waypoint = await caches.waypoints.waypoint(ship.nav.waypointSymbol);
   // We currently never route to shipyards, but we will record their data if
   // we happen to be there.
   if (_isMissingChartOrRecentPriceData(
     caches.marketPrices,
     caches.shipyardPrices,
-    currentWaypoint,
+    waypoint,
   )) {
-    if (currentWaypoint.chart == null) {
+    if (waypoint.chart == null) {
       await chartWaypointAndLog(api, ship);
     }
-    if (currentWaypoint.hasMarketplace) {
-      final market = await recordMarketDataIfNeededAndLog(
-        caches.marketPrices,
-        caches.markets,
-        ship,
-        currentWaypoint.symbol,
-      );
-      if (ship.usesFuel) {
-        await refuelIfNeededAndLog(
-          api,
-          caches.marketPrices,
-          caches.transactions,
-          caches.agent,
-          market,
-          ship,
-        );
-      }
-    }
-    if (currentWaypoint.hasShipyard) {
-      // Every time we're at a shipyard and can afford a ship, we should
-      // buy one.  Probably ore hounds at first, then probes?
-      final shipyard = await getShipyard(api, currentWaypoint);
-      await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
-    }
+    await visitLocalMarket(api, caches, waypoint, ship);
+    // Every time we're at a shipyard and can afford a ship, we should
+    // buy one.  Probably ore hounds at first, then probes?
+    await visitLocalShipyard(api, caches.shipyardPrices, waypoint, ship);
     // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
     await centralCommand.completeBehavior(ship.symbol);
@@ -124,14 +157,14 @@ Future<DateTime?> advanceExplorer(
 
   // If at a jump gate, go to a nearby system with unexplored waypoints or
   // missing market data.
-  if (currentWaypoint.isJumpGate) {
+  if (waypoint.isJumpGate) {
     final probeSystems =
         centralCommand.otherExplorerSystems(ship.symbol).toSet();
     const maxJumpDistance = 100;
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
     await for (final destination in caches.waypoints.waypointsInJumpRadius(
-      startSystem: currentWaypoint.systemSymbol,
+      startSystem: waypoint.systemSymbol,
       maxJumps: maxJumpDistance,
     )) {
       if (probeSystems.contains(destination.systemSymbol)) {
@@ -181,7 +214,7 @@ Future<DateTime?> advanceExplorer(
       ship,
       Behavior.explorer,
       'No unexplored systems within $maxJumpDistance jumps of '
-      '${currentWaypoint.systemSymbol}.',
+      '${waypoint.systemSymbol}.',
       const Duration(hours: 1),
     );
     return null;

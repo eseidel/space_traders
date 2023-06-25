@@ -417,21 +417,19 @@ Future<Market> recordMarketDataIfNeededAndLog(
   MarketPrices marketPrices,
   MarketCache marketCache,
   Ship ship,
-  String marketSymbol,
-) async {
+  String marketSymbol, {
+  Duration maxAge = const Duration(minutes: 5),
+}) async {
   if (ship.nav.waypointSymbol != marketSymbol) {
     throw ArgumentError.value(
       marketSymbol,
       'marketSymbol',
-      'Ship is not in the same system as the market.',
+      '${ship.symbol} is not at $marketSymbol, ${ship.nav.waypointSymbol}.',
     );
   }
-  // If we have very recent market data, don't bother refreshing.
+  // If we have market data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (marketPrices.hasRecentMarketData(
-    marketSymbol,
-    maxAge: const Duration(minutes: 5),
-  )) {
+  if (marketPrices.hasRecentMarketData(marketSymbol, maxAge: maxAge)) {
     final market = await marketCache.marketForSymbol(marketSymbol);
     return market!;
   }

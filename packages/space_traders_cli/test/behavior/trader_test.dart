@@ -12,6 +12,10 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
+class _MockCaches extends Mock implements Caches {}
+
+class _MockCentralCommand extends Mock implements CentralCommand {}
+
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -26,6 +30,8 @@ class _MockShipCargo extends Mock implements ShipCargo {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipyardPrices extends Mock implements ShipyardPrices {}
+
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockTransactionLog extends Mock implements TransactionLog {}
@@ -33,10 +39,6 @@ class _MockTransactionLog extends Mock implements TransactionLog {}
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
-
-class _MockCentralCommand extends Mock implements CentralCommand {}
-
-class _MockCaches extends Mock implements Caches {}
 
 void main() {
   test('advanceContractTrader smoke test', () async {
@@ -48,6 +50,7 @@ void main() {
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
     final transactionLog = _MockTransactionLog();
+    final shipyardPrices = _MockShipyardPrices();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -59,6 +62,7 @@ void main() {
     when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
+    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
 
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
