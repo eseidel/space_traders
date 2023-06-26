@@ -31,7 +31,7 @@ class RequestCounts {
 class RateLimitedApiClient extends ApiClient {
   /// Construct a rate limited api client.
   RateLimitedApiClient({
-    required this.maxRequestsPerSecond,
+    this.maxRequestsPerSecond = 2,
     super.authentication,
   });
 
@@ -41,28 +41,35 @@ class RateLimitedApiClient extends ApiClient {
   /// RequestCounts tracks the number of requests made to each path.
   final RequestCounts requestCounts = RequestCounts();
 
-  DateTime _nextRequestTime = DateTime.now();
+  DateTime _nextRequestTime = DateTime.timestamp();
+
+  // static DateTime? _parseResetTime(Response response) {
+  //   final resetString = response.headers['x-ratelimit-reset'];
+  //   if (resetString == null) {
+  //     return null;
+  //   }
+  //   return DateTime.parse(resetString);
+  // }
 
   /// Handle an unexpected rate limit response by waiting and retrying once.
   @visibleForTesting
   static Future<Response> handleUnexpectedRateLimit(
     Future<Response> Function() sendRequest, {
-    int waitTimeSeconds = 10,
+    Duration waitTime = const Duration(seconds: 10),
   }) async {
-    try {
-      return await sendRequest();
-    } on ApiException catch (e) {
-      // We should never hit this, except we seem to.  So either there is a
-      // bug in our rate limiting code, or a bug in the server.
-      if (e.code != 429) {
-        rethrow;
+    // TODO(eseidel): This should use exponential back-off or a fixed
+    // nubmer of retries.
+    while (true) {
+      final response = await sendRequest();
+      if (response.statusCode != 429) {
+        return response;
       }
+      // Could parse out the reset time from the headers and wait until then.
       logger.warn(
-        'Unexpected rate limit response, waiting $waitTimeSeconds '
+        'Unexpected rate limit response, waiting ${waitTime.inSeconds} '
         'seconds and retrying',
       );
-      await Future<void>.delayed(Duration(seconds: waitTimeSeconds));
-      return sendRequest();
+      await Future<void>.delayed(waitTime);
     }
   }
 

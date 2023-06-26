@@ -1,4 +1,3 @@
-import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/rate_limit.dart';
 import 'package:http/http.dart';
@@ -13,7 +12,7 @@ void main() {
     Future<Response> sendRequest() async {
       callCount++;
       if (callCount == 1) {
-        throw ApiException(429, 'rate limited');
+        return Response('rate limited', 429);
       }
       return Response('ok', 200);
     }
@@ -23,7 +22,7 @@ void main() {
       logger,
       () => RateLimitedApiClient.handleUnexpectedRateLimit(
         sendRequest,
-        waitTimeSeconds: 0,
+        waitTime: Duration.zero,
       ),
     );
     verify(
