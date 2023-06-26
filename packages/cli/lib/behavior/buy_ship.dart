@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/navigation.dart';
@@ -10,48 +8,6 @@ import 'package:cli/printing.dart';
 
 /// What the max multiplier of median we would pay for a ship.
 const maxMedianMultipler = 1.1;
-
-/// This should probably wake up once an hour or so and then decide which
-/// ship would be the best to buy with?
-// Future<bool> shouldBuyShip(
-//   Api api,
-//   Agent agent,
-//   WaypointCache waypointCache,
-//   ShipyardPrices shipyardPrices,
-//   Ship ship,
-// ) async {
-//   const shipType = ShipType.ORE_HOUND;
-//   // Shipyard nearby that sells ships within 1.1x of the median price.
-//   // We have enough money to buy the ship.
-
-//   final shipyardWaypoints =
-//       await waypointCache.shipyardWaypointsForSystem(ship.nav.systemSymbol);
-//   if (shipyardWaypoints.isEmpty) {
-//     return false;
-//   }
-//   final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
-//   if (medianPrice == null) {
-//     return false;
-//   }
-//   final maxPrice = medianPrice * 1.1;
-//   if (agent.credits < maxPrice) {
-//     return false;
-//   }
-//   for (final waypoint in shipyardWaypoints) {
-//     final recentPrice = shipyardPrices.recentPurchasePrice(
-//       shipyardSymbol: waypoint.symbol,
-//       shipType: shipType,
-//     );
-//     // We could also assume it's median as a reason to explore?
-//     if (recentPrice == null) {
-//       continue;
-//     }
-//     if (recentPrice < maxPrice) {
-//       return true;
-//     }
-//   }
-//   return false;
-// }
 
 // TODO(eseidel): This only looks in the current system.
 Future<Waypoint?> _nearbyShipyardWithBestPrice(
@@ -92,43 +48,6 @@ Future<Waypoint?> _nearbyShipyardWithBestPrice(
   return bestWaypoint;
 }
 
-int _countOfTypeInFleet(ShipCache shipCache, ShipType shipType) {
-  final frameForType = {
-    ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
-    ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
-    ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
-  }[shipType];
-  if (frameForType == null) {
-    return 0;
-  }
-  return shipCache.frameCounts[frameForType] ?? 0;
-}
-
-// This is a hack for now, we need real planning.
-ShipType? _shipTypeToBuy(ShipCache shipCache, {int? randomSeed}) {
-  final isEarlyGame = shipCache.ships.length < 10;
-  if (isEarlyGame) {
-    return ShipType.ORE_HOUND;
-  }
-
-  final random = Random(randomSeed);
-  final targetCounts = {
-    ShipType.ORE_HOUND: 30,
-    ShipType.PROBE: 10,
-    ShipType.LIGHT_HAULER: 5,
-  };
-  final typesToBuy = targetCounts.keys
-      .where(
-        (shipType) =>
-            _countOfTypeInFleet(shipCache, shipType) < targetCounts[shipType]!,
-      )
-      .toList();
-  if (typesToBuy.isEmpty) {
-    return null;
-  }
-  return typesToBuy[random.nextInt(typesToBuy.length)];
-}
-
 /// Apply the buy ship behavior.
 Future<DateTime?> advanceBuyShip(
   Api api,
@@ -141,7 +60,7 @@ Future<DateTime?> advanceBuyShip(
   final currentWaypoint =
       await caches.waypoints.waypoint(ship.nav.waypointSymbol);
 
-  final shipType = _shipTypeToBuy(caches.ships);
+  final shipType = centralCommand.shipTypeToBuy();
   if (shipType == null) {
     await centralCommand.disableBehavior(
       ship,

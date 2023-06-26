@@ -41,6 +41,8 @@
 // instead of sending all of the haulers to the same market.  Again
 // approximating how much price is going to raise from a deal?
 
+import 'dart:math';
+
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -277,5 +279,50 @@ class CentralCommand {
         }
       }
     }
+  }
+
+  int _countOfTypeInFleet(ShipType shipType) {
+    final frameForType = {
+      ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
+      ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
+      ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
+    }[shipType];
+    if (frameForType == null) {
+      return 0;
+    }
+    return _shipCache.frameCounts[frameForType] ?? 0;
+  }
+
+// This is a hack for now, we need real planning.
+  /// Determine what type of ship to buy.
+  ShipType? shipTypeToBuy({int? randomSeed}) {
+    // We should buy a new ship when:
+    // - We have request capacity to spare
+    // - We have money to spare.
+    // - We don't have better uses for the money (e.g. trading or modules)
+
+    // We should buy ships based on earnings of that ship type over the last
+    // N hours?
+
+    final isEarlyGame = _shipCache.ships.length < 10;
+    if (isEarlyGame) {
+      return ShipType.ORE_HOUND;
+    }
+
+    final random = Random(randomSeed);
+    final targetCounts = {
+      ShipType.ORE_HOUND: 30,
+      ShipType.PROBE: 10,
+      ShipType.LIGHT_HAULER: 20,
+    };
+    final typesToBuy = targetCounts.keys
+        .where(
+          (shipType) => _countOfTypeInFleet(shipType) < targetCounts[shipType]!,
+        )
+        .toList();
+    if (typesToBuy.isEmpty) {
+      return null;
+    }
+    return typesToBuy[random.nextInt(typesToBuy.length)];
   }
 }
