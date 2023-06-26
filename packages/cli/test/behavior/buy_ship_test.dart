@@ -18,7 +18,7 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
 
-class _MockPriceData extends Mock implements MarketPrices {}
+class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -39,7 +39,7 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 void main() {
   test('advanceBuyShip smoke test', () async {
     final api = _MockApi();
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();

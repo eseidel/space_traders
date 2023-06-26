@@ -17,20 +17,20 @@ class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class _MockPriceData extends Mock implements MarketPrices {}
+class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
 
 void main() {
   test('MarketScan empty', () {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final scan = MarketScan.fromMarkets(marketPrices, []);
     final deals = buildDealsFromScan(scan);
     expect(deals, isEmpty);
   });
 
   test('MarketScan single deal', () {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final tradeGood =
         TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
     final markets = [
@@ -67,21 +67,21 @@ void main() {
   });
 
   test('estimateSellPrice null', () {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final estimate =
         estimateSellPrice(marketPrices, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
   });
 
   test('estimatePurchasePrice null', () {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final estimate =
         estimatePurchasePrice(marketPrices, Market(symbol: 'A'), 'FUEL');
     expect(estimate, null);
   });
 
   test('estimatePrice fresh', () {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final market = Market(
       symbol: 'A',
       tradeGoods: [
@@ -140,6 +140,7 @@ void main() {
       fuelCost: 1,
       tradeVolume: 1,
       time: 1,
+      transactions: [],
     );
 
     final json = costed.toJson();
@@ -221,6 +222,7 @@ void main() {
       fuelCost: 1,
       tradeVolume: 1,
       time: 1,
+      transactions: [],
     );
     final profit = lightGreen.wrap('     +1c (100%)');
     expect(
@@ -230,7 +232,7 @@ void main() {
   });
 
   test('findDealFor smoketest', () async {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();

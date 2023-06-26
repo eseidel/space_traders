@@ -20,7 +20,7 @@ class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockTransactionLog extends Mock implements TransactionLog {}
 
-class _MockPriceData extends Mock implements MarketPrices {}
+class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockSurveyData extends Mock implements SurveyData {}
 
@@ -36,7 +36,7 @@ class _MockCaches extends Mock implements Caches {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final surveyData = _MockSurveyData();
     when(
       () => surveyData.recentSurveysAtWaypoint(
@@ -54,7 +54,7 @@ void main() {
   });
 
   test('surveyWorthMining', () async {
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final surveyData = _MockSurveyData();
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -164,7 +164,7 @@ void main() {
 
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
-    final marketPrices = _MockPriceData();
+    final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();

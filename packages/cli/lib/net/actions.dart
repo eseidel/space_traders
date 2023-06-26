@@ -9,7 +9,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
-import 'package:collection/collection.dart';
 
 export 'package:cli/net/direct.dart';
 
@@ -180,28 +179,12 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   return result;
 }
 
-/// Refuel the ship if needed and log the transaction
-Future<void> refuelIfNeededAndLog(
-  Api api,
+bool _shouldRefuelAfterCheckingPrice(
   MarketPrices marketPrices,
-  TransactionLog transactionLog,
-  AgentCache agentCache,
-  Market market,
   Ship ship,
-) async {
-  if (!ship.shouldRefuel) {
-    return;
-  }
-  const fuelSymbol = 'FUEL';
-  // Ensure the fuel here is not wildly overpriced (as is sometimes the case).
-  final fuelGood = market.tradeGoods.firstWhereOrNull(
-    (g) => g.symbol == fuelSymbol,
-  );
-  if (fuelGood == null) {
-    shipWarn(ship, 'Market does not sell fuel, not refueling.');
-    return;
-  }
-  final fuelPrice = fuelGood.purchasePrice;
+  int fuelPrice,
+) {
+  final fuelSymbol = TradeSymbol.FUEL.value;
   final median = marketPrices.medianPurchasePrice(fuelSymbol);
   final markup = median != null ? fuelPrice / median : null;
   if (markup != null && markup > 2) {
@@ -228,14 +211,41 @@ Future<void> refuelIfNeededAndLog(
         'Fuel is at $markupString times the median price '
         '$fuelString ($deviation), not refueling.',
       );
-      return;
+      return false; // Do not refuel.
     }
     shipWarn(
         ship,
         'Fuel is at $markupString times the median price '
         '$fuelString ($deviation), but also critically low, refueling anyway');
   }
+  return true; // Refuel.
+}
 
+/// Refuel the ship if needed and log the transaction
+Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
+  Api api,
+  MarketPrices marketPrices,
+  TransactionLog transactionLog,
+  AgentCache agentCache,
+  Market market,
+  Ship ship,
+) async {
+  if (!ship.shouldRefuel) {
+    return null;
+  }
+  // Ensure the fuel here is not wildly overpriced (as is sometimes the case).
+  final fuelGood = market.marketTradeGood(TradeSymbol.FUEL.value);
+  if (fuelGood == null) {
+    shipWarn(ship, 'Market does not sell fuel, not refueling.');
+    return null;
+  }
+  if (!_shouldRefuelAfterCheckingPrice(
+    marketPrices,
+    ship,
+    fuelGood.purchasePrice,
+  )) {
+    return null;
+  }
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   try {
     final data = await refuelShip(api, agentCache, ship);
@@ -254,17 +264,18 @@ Future<void> refuelIfNeededAndLog(
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
       shipInfo(ship, 'Resetting flight mode to cruise');
-      ship.nav = await setShipFlightMode(api, ship, ShipNavFlightMode.CRUISE);
+      await setShipFlightMode(api, ship, ShipNavFlightMode.CRUISE);
     }
+    return data;
   } on ApiException catch (e) {
-    // Instead of handling this exception, we could check that the market
-    // sells fuel before hand, but that would be one extra request if we don't
-    // have the market cached.  (We probably always have it cached...)
+    // This should no longer be needed now that we check if the market sells
+    // fuel before trying to purchase.
     if (!isMarketDoesNotSellFuelException(e)) {
       rethrow;
     }
     shipInfo(ship, 'Market does not sell fuel, not refueling.');
   }
+  return null;
 }
 
 /// Dock the ship if needed and log the transaction

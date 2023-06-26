@@ -389,6 +389,8 @@ List<Deal> buildDealsFromScan(MarketScan scan) {
 }
 
 /// A deal between two markets which considers flight cost and time.
+// This could be made immutable with a bit of work.  Currently we edit
+// transactions in place.
 class CostedDeal {
   /// Create a new CostedDeal.
   CostedDeal({
@@ -396,9 +398,8 @@ class CostedDeal {
     required this.fuelCost,
     required this.tradeVolume,
     required this.time,
-    this.actualPurchasePrice,
-    this.actualSellPrice,
-  });
+    required List<MarketTransaction> transactions,
+  }) : transactions = List.unmodifiable(transactions);
 
   /// Create a CostedDeal from JSON.
   factory CostedDeal.fromJson(Map<String, dynamic> json) => CostedDeal(
@@ -406,8 +407,9 @@ class CostedDeal {
         fuelCost: json['fuelCost'] as int,
         tradeVolume: json['tradeVolume'] as int,
         time: json['time'] as int,
-        actualPurchasePrice: json['actualPurchasePrice'] as int?,
-        actualSellPrice: json['actualSellPrice'] as int?,
+        transactions: (json['transactions'] as List<dynamic>)
+            .map((e) => MarketTransaction.fromJson(e as Map<String, dynamic>)!)
+            .toList(),
       );
 
   /// The deal being considered.
@@ -422,11 +424,11 @@ class CostedDeal {
   /// The time in seconds to travel between the two markets.
   final int time;
 
-  /// The actual purchase price of the deal.
-  int? actualPurchasePrice;
+  /// The tranactions made as a part of executing this deal.
+  final List<MarketTransaction> transactions;
 
-  /// The actual sell price of the deal.
-  int? actualSellPrice;
+  /// The symbol of the trade good being traded.
+  String get tradeSymbol => deal.tradeSymbol.value;
 
   /// The expected cost of goods sold, not including fuel.
   int get expectedCostOfGoodsSold => deal.purchasePrice * tradeVolume;
@@ -441,7 +443,7 @@ class CostedDeal {
   int get expectedRevenue => deal.sellPrice * tradeVolume;
 
   /// Max we would spend per unit and still expect to break even.
-  int get maxPurchasePrice =>
+  int get maxPurchaseUnitPrice =>
       (expectedRevenue - expectedOperationalExpenses) ~/ tradeVolume;
 
   /// The total profit of the deal, including fuel.
@@ -456,9 +458,25 @@ class CostedDeal {
         'fuelCost': fuelCost,
         'tradeVolume': tradeVolume,
         'time': time,
-        'actualPurchasePrice': actualPurchasePrice,
-        'actualSellPrice': actualSellPrice,
+        'transactions': transactions.map((e) => e.toJson()).toList(),
       };
+
+  /// Copy this CostedDeal with the given fields replaced.
+  CostedDeal copyWith({
+    Deal? deal,
+    int? fuelCost,
+    int? tradeVolume,
+    int? time,
+    List<MarketTransaction>? transactions,
+  }) {
+    return CostedDeal(
+      deal: deal ?? this.deal,
+      fuelCost: fuelCost ?? this.fuelCost,
+      tradeVolume: tradeVolume ?? this.tradeVolume,
+      time: time ?? this.time,
+      transactions: transactions ?? this.transactions,
+    );
+  }
 }
 
 /// Returns a string describing the given CostedDeal
@@ -506,6 +524,7 @@ CostedDeal costOutDeal(
       shipSpeed: shipSpeed,
     ),
     tradeVolume: cargoSize,
+    transactions: [],
   );
 }
 
