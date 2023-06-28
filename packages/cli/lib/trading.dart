@@ -667,10 +667,10 @@ Future<CostedDeal?> findDealFor(
 
   final costedDeals = deals.map(
     (deal) => costOutDeal(
+      shipSpeed: ship.engine.speed,
       systemsCache,
       deal,
       cargoSize: availableSpace,
-      shipSpeed: ship.engine.speed,
     ),
   );
 

@@ -89,22 +89,11 @@ Then modified:
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
 * Compute earnings per hour per ship.
-* Fix arbitrage trader to be able to buy more than 10 units of low volume goods.
-  The contract trader already knows how to do this?
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
-* Track and print expected vs. actual profit on trades.
-* Teach arbitrage trader how to empty its cargo hold of things it's not trading.
-  If the markets it happens by don't trade those things it's stuck with them.
 * Add logic for buying and mounting modules.
-* Fix contract trader to not assume it's current market is the right one to buy
-  from if the contract is fulfill-able from the market it's at.
 
 Exploring:
-* Teach explorers to avoid each other.  Right now they all route to the same
-  opportunities.
-  Explorers should generate a queue of good systems to explore, and then
-  pull from that queue?
 * Explorers should explore an entire system and then go to the jumpgate
   and then from the jump gate plan their next system.
 * Probes should go sit at shipyards and marketplaces when there is nothing
@@ -122,10 +111,7 @@ Efficiency:
 * Start to build a system database similar to the pricing database.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
-* Fix contract trader to share code with arbitrage trader.  Contracts are a
-  special case of arbitrage, in which the destination and trade good are fixed.
 * Write a better rate-limiting model.
-* Teach arbitrage trader how to buy multiple times up to the max cargo hold.
 * Make the script robust to network failures.
 * Write generalized route planner to calculate route times and costs.
 
@@ -139,7 +125,6 @@ Automation:
 * When to enable which behaviors?
 * Surveys.  How much surveying should we do before we start mining?
 * Need the ability to disable behaviors on a per-ship-level.
-* Add exponential back-off for 429s?  Not sure why they're getting through.
 
 UI:
 * Make shipInfo include an emoji for the behavior.
