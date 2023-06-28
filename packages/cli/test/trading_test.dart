@@ -137,9 +137,9 @@ void main() {
     );
     final costed = CostedDeal(
       deal: deal,
-      fuelCost: 1,
+      expectedFuelCost: 1,
       tradeVolume: 1,
-      time: 1,
+      expectedTime: 1,
       transactions: [],
     );
 
@@ -184,9 +184,9 @@ void main() {
 
     /// These aren't very useful numbers, I don't think it takes 15s to fly
     /// 0 distance (even between orbitals)?
-    expect(costed.fuelCost, 0);
+    expect(costed.expectedFuelCost, 0);
     expect(costed.tradeVolume, 1);
-    expect(costed.time, 15);
+    expect(costed.expectedTime, 15);
   });
 
   test('describe deal', () {
@@ -219,9 +219,9 @@ void main() {
         purchasePrice: 1,
         sellPrice: 2,
       ),
-      fuelCost: 1,
+      expectedFuelCost: 1,
       tradeVolume: 1,
-      time: 1,
+      expectedTime: 1,
       transactions: [],
     );
     final profit = lightGreen.wrap('     +1c (100%)');
@@ -253,7 +253,7 @@ void main() {
         marketCache,
         ship,
         maxJumps: 1,
-        maxOutlay: 100,
+        maxTotalOutlay: 100,
         availableSpace: 10,
       ),
     );

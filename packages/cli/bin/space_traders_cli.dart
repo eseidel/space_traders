@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -54,8 +53,7 @@ Future<void> cliMain(List<String> args) async {
     'Loaded ${caches.marketPrices.count} prices from '
     '${caches.marketPrices.waypointCount} markets.',
   );
-  final behaviorCache = await BehaviorCache.load(fs);
-  final centralCommand = CentralCommand(behaviorCache, caches.ships);
+  final centralCommand = CentralCommand(caches.behaviors, caches.ships);
 
   final status = await api.defaultApi.getStatus();
   printStatus(status!);

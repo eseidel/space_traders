@@ -11,7 +11,8 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
 // This is split out from the main function to allow early returns.
-Future<SellCargo201ResponseData?> _purchaseTradeGoodIfPossible(
+/// Public to allow sharing with contract trader (for now).
+Future<Transaction?> purchaseTradeGoodIfPossible(
   Api api,
   MarketPrices marketPrices,
   TransactionLog transactionLog,
@@ -19,15 +20,17 @@ Future<SellCargo201ResponseData?> _purchaseTradeGoodIfPossible(
   Ship ship,
   MarketTradeGood marketGood,
   String neededTradeSymbol, {
-  required int maximumWorthwhileUnitPurchasePrice,
+  required int maxWorthwhileUnitPurchasePrice,
   required int unitsToPurchase,
 }) async {
   // And its selling at a reasonable price.
-  if (marketGood.purchasePrice >= maximumWorthwhileUnitPurchasePrice) {
+  // If the market is above maxWorthwhileUnitPurchasePrice and we don't have any
+  // cargo yet then we give up and try again.
+  if (marketGood.purchasePrice >= maxWorthwhileUnitPurchasePrice) {
     shipInfo(
       ship,
       '$neededTradeSymbol is too expensive at ${ship.nav.waypointSymbol} '
-      'needed < $maximumWorthwhileUnitPurchasePrice, '
+      'needed < $maxWorthwhileUnitPurchasePrice, '
       'got ${marketGood.purchasePrice}',
     );
     return null;
@@ -40,9 +43,33 @@ Future<SellCargo201ResponseData?> _purchaseTradeGoodIfPossible(
     );
     return null;
   }
+
   // Do we need to guard against insufficient credits here?
-  // shipInfo(ship, 'Buying ${goods.tradeSymbol} to fill contract');
-  // Buy a full stock of contract goal.
+  // e.g.
+//     final creditsNeeded = unitsToPurchase * maybeGood.purchasePrice;
+//     if (caches.agent.agent.credits < creditsNeeded) {
+//       // If we have some to deliver, deliver it.
+//       if (unitsInCargo > 0) {
+//         shipInfo(
+//           ship,
+//           'Not enough credits to purchase $unitsToPurchase '
+//           '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}, '
+//           'but we have $unitsInCargo in cargo, delivering.',
+//         );
+//       } else {
+//         // This should print the pricing of the good we're trying to buy.
+//         await centralCommand.disableBehavior(
+//           ship,
+//           Behavior.contractTrader,
+//           'Not enough credits to purchase $unitsToPurchase '
+//           '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}',
+//           const Duration(hours: 1),
+//         );
+//         return null;
+//       }
+//     }
+//   }
+
   final result = await purchaseCargoAndLog(
     api,
     marketPrices,
@@ -55,6 +82,20 @@ Future<SellCargo201ResponseData?> _purchaseTradeGoodIfPossible(
   return result;
 }
 
+int _unitsToPurchase(
+  CostedDeal costedDeal,
+  MarketTradeGood good,
+  Ship ship,
+) {
+  // Many market goods trade in batches much smaller than our cargo hold
+  // e.g. 10 vs. 120, if we try to buy 120 we'll get an error.
+  final marketTradeVolume = good.tradeVolume;
+  final unitsToPurchase = min(marketTradeVolume, ship.availableSpace);
+  // Some deals have limited size (like contracts) for normal arbitrage deals
+  // costedDeal.tradeVolume == ship.cargoSpace.
+  return min(unitsToPurchase, costedDeal.tradeVolume);
+}
+
 Future<DateTime?> _handleAtSourceWithDeal(
   Api api,
   CentralCommand centralCommand,
@@ -64,19 +105,12 @@ Future<DateTime?> _handleAtSourceWithDeal(
   CostedDeal costedDeal,
 ) async {
   final dealTradeSymbol = costedDeal.tradeSymbol;
-  final good =
-      currentMarket.tradeGoods.firstWhere((g) => g.symbol == dealTradeSymbol);
+  final good = currentMarket.marketTradeGood(dealTradeSymbol)!;
 
-  final maximumPerUnitPrice = costedDeal.maxPurchaseUnitPrice;
+  final maxPerUnitPrice = costedDeal.maxPurchaseUnitPrice;
 
-  // If the market is above maximumPerUnitPrice and we don't have any cargo
-  // yet then we give up and try again.
-  // It also allows us repeatedly buy smaller batches of cargo until our
-  // hold is full or the price rises above profitability.
-  final tradeVolume = good.tradeVolume;
-  final unitsToPurchase = min(tradeVolume, ship.availableSpace);
-
-  final maybeResult = await _purchaseTradeGoodIfPossible(
+  final unitsToPurchase = _unitsToPurchase(costedDeal, good, ship);
+  final transaction = await purchaseTradeGoodIfPossible(
     api,
     caches.marketPrices,
     caches.transactions,
@@ -84,11 +118,11 @@ Future<DateTime?> _handleAtSourceWithDeal(
     ship,
     good,
     dealTradeSymbol,
-    maximumWorthwhileUnitPurchasePrice: maximumPerUnitPrice,
+    maxWorthwhileUnitPurchasePrice: maxPerUnitPrice,
     unitsToPurchase: unitsToPurchase,
   );
 
-  if (maybeResult != null && ship.cargo.availableSpace > 0) {
+  if (transaction != null && ship.cargo.availableSpace > 0) {
     shipInfo(
       ship,
       'Purchased $unitsToPurchase of $dealTradeSymbol, still have '
@@ -97,18 +131,15 @@ Future<DateTime?> _handleAtSourceWithDeal(
     return null;
   }
 
-  if (maybeResult != null) {
-    final transaction = maybeResult.transaction;
+  if (transaction != null) {
     shipInfo(
       ship,
-      'Purchased ${transaction.units} ${transaction.tradeSymbol} '
-      '@ ${transaction.pricePerUnit} (expected '
-      '${costedDeal.deal.purchasePrice})  = ${transaction.totalPrice}',
+      'Purchased ${transaction.quantity} ${transaction.tradeSymbol} '
+      '@ ${transaction.perUnitPrice} (expected '
+      '${costedDeal.deal.purchasePrice}) = '
+      '${creditsString(transaction.creditChange)}',
     );
-    final behaviorState = centralCommand.getBehavior(ship.symbol)!;
-    final newTransactions = costedDeal.transactions.toList()..add(transaction);
-    behaviorState.deal = costedDeal.copyWith(transactions: newTransactions);
-    await centralCommand.setBehavior(ship.symbol, behaviorState);
+    await centralCommand.recordDealTransactions(ship, [transaction]);
   }
   final haveTradeCargo = ship.cargo.countUnits(dealTradeSymbol) > 0;
   if (!haveTradeCargo) {
@@ -131,7 +162,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
   );
 }
 
-Future<DateTime?> _handleAtDestinationWithDeal(
+Future<DateTime?> _handleArbitrageDealAtDestination(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
@@ -152,7 +183,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
     );
   }
   // We're at the destination, sell and clear the deal.
-  await sellAllCargoAndLog(
+  final transactions = await sellAllCargoAndLog(
     api,
     caches.marketPrices,
     caches.transactions,
@@ -160,8 +191,87 @@ Future<DateTime?> _handleAtDestinationWithDeal(
     currentMarket,
     ship,
   );
+  // We don't yet record the completed deal anywhere.
+  final completedDeal = costedDeal.byAddingTransactions(transactions);
+  shipInfo(
+      ship,
+      'Expected ${creditsString(completedDeal.expectedProfit)} profit '
+      '(${creditsString(completedDeal.expectedProfitPerSecond)}/s), got '
+      '${creditsString(completedDeal.actualProfit)} '
+      '(${creditsString(completedDeal.actualProfitPerSecond)}/s)');
   await centralCommand.completeBehavior(ship.symbol);
   return null;
+}
+
+/// Handle contract deal at destination.
+Future<DateTime?> _handleContractDealAtDestination(
+  Api api,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship,
+  Market currentMarket,
+  CostedDeal costedDeal,
+) async {
+  final contractGood = costedDeal.tradeSymbol;
+  final contract = caches.contracts.contract(costedDeal.contractId!);
+  final neededGood = contract!.goodNeeded(costedDeal.tradeSymbol);
+  final maybeResponse = await _deliverContractGoodsIfPossible(
+    api,
+    caches.contracts,
+    ship,
+    contract,
+    neededGood!,
+  );
+
+  // Delivering the goods counts as completing the behavior, we'll
+  // decide next loop if we need to do more.
+  await centralCommand.completeBehavior(ship.symbol);
+
+  if (maybeResponse != null) {
+    // Update our cargo counts after fulfilling the contract.
+    ship.cargo = maybeResponse.cargo;
+    // If we've delivered enough, complete the contract.
+    if (maybeResponse.contract.goodNeeded(contractGood)!.amountNeeded <= 0) {
+      final response = await api.contracts.fulfillContract(contract.id);
+      final data = response!.data;
+      caches.agent.updateAgent(data.agent);
+      caches.contracts.updateContract(data.contract);
+      shipInfo(ship, 'Contract complete!');
+      return null;
+    }
+  }
+  return null;
+}
+
+Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
+  Api api,
+  ContractCache contractCache,
+  Ship ship,
+  Contract contract,
+  ContractDeliverGood goods,
+) async {
+  final units = ship.countUnits(goods.tradeSymbol);
+  if (units < 1) {
+    return null;
+  }
+  // And we have the desired cargo.
+  final response = await deliverContract(
+    api,
+    ship,
+    contractCache,
+    contract,
+    tradeSymbol: goods.tradeSymbol,
+    units: units,
+  );
+  final deliver = response.contract.goodNeeded(goods.tradeSymbol)!;
+  shipInfo(
+    ship,
+    'Delivered $units ${goods.tradeSymbol} '
+    'to ${goods.destinationSymbol}; '
+    '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
+    '${durationString(contract.timeUntilDeadline)} to deadline',
+  );
+  return response;
 }
 
 Future<DateTime?> _handleOffCourseWithDeal(
@@ -215,7 +325,17 @@ Future<DateTime?> _handleDeal(
   }
   // If we're at the destination of the deal, sell.
   if (costedDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
-    return _handleAtDestinationWithDeal(
+    if (costedDeal.isContractDeal) {
+      return _handleContractDealAtDestination(
+        api,
+        centralCommand,
+        caches,
+        ship,
+        currentMarket!,
+        costedDeal,
+      );
+    }
+    return _handleArbitrageDealAtDestination(
       api,
       centralCommand,
       caches,
@@ -233,8 +353,28 @@ Future<DateTime?> _handleDeal(
   );
 }
 
+/// Accepts contracts for us if needed.
+Future<DateTime?> acceptContractsIfNeeded(
+  Api api,
+  ContractCache contractCache,
+  AgentCache agentCache,
+  Ship ship,
+) async {
+  /// Accept logic we run any time contract trading is turned on.
+  final contracts = contractCache.activeContracts;
+  if (contracts.isEmpty) {
+    await negotiateContractAndLog(api, ship);
+    // TODO(eseidel): Print expected time and profits of the new contract.
+    return null;
+  }
+  for (final contract in contractCache.unacceptedContracts) {
+    await acceptContractAndLog(api, contractCache, agentCache, contract);
+  }
+  return null;
+}
+
 /// One loop of the trading logic
-Future<DateTime?> advanceArbitrageTrader(
+Future<DateTime?> advanceTrader(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
@@ -250,6 +390,15 @@ Future<DateTime?> advanceArbitrageTrader(
   final currentMarket =
       await visitLocalMarket(api, caches, currentWaypoint, ship);
   await visitLocalShipyard(api, caches.shipyardPrices, currentWaypoint, ship);
+
+  if (centralCommand.isContractTradingEnabled) {
+    await acceptContractsIfNeeded(
+      api,
+      caches.contracts,
+      caches.agent,
+      ship,
+    );
+  }
 
   final behaviorState = centralCommand.getBehavior(ship.symbol)!;
   final pastDeal = behaviorState.deal;
@@ -290,7 +439,7 @@ Future<DateTime?> advanceArbitrageTrader(
         // We can't sell this cargo anywhere so give up?
         await centralCommand.disableBehavior(
           ship,
-          Behavior.arbitrageTrader,
+          Behavior.trader,
           'No market for ${nonDealCargo.symbol}.',
           const Duration(hours: 1),
         );
@@ -321,20 +470,23 @@ Future<DateTime?> advanceArbitrageTrader(
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
   final newDeal = await centralCommand.findNextDeal(
+    caches.agent,
+    caches.contracts,
     caches.marketPrices,
     caches.systems,
     caches.waypoints,
     caches.markets,
     ship,
+    // TODO(eseidel): make maxJumps bigger (and cache MarketScan if needed).
     maxJumps: 1,
-    maxOutlay: caches.agent.agent.credits,
+    maxTotalOutlay: caches.agent.agent.credits,
     availableSpace: ship.availableSpace,
   );
 
   if (newDeal == null) {
     await centralCommand.disableBehavior(
       ship,
-      Behavior.arbitrageTrader,
+      Behavior.trader,
       'No profitable deals.',
       const Duration(hours: 1),
     );

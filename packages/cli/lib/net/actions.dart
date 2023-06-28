@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/transactions.dart';
@@ -83,10 +84,10 @@ Stream<SellCargo201ResponseData> sellAllCargo(
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
-Future<void> sellAllCargoAndLog(
+Future<List<Transaction>> sellAllCargoAndLog(
   Api api,
   MarketPrices marketPrices,
-  TransactionLog transactions,
+  TransactionLog transactionLog,
   AgentCache agentCache,
   Market market,
   Ship ship, {
@@ -94,21 +95,25 @@ Future<void> sellAllCargoAndLog(
 }) async {
   if (ship.cargo.inventory.isEmpty) {
     shipInfo(ship, 'No cargo to sell');
-    return;
+    return [];
   }
 
+  final transactions = <Transaction>[];
   await for (final response
       in sellAllCargo(api, agentCache, market, ship, where: where)) {
-    final transaction = response.transaction;
+    final marketTransaction = response.transaction;
     final agent = response.agent;
-    logTransaction(ship, marketPrices, agent, transaction);
-    transactions
-        .log(Transaction.fromMarketTransaction(transaction, agent.credits));
+    logTransaction(ship, marketPrices, agent, marketTransaction);
+    final transaction =
+        Transaction.fromMarketTransaction(marketTransaction, agent.credits);
+    transactionLog.log(transaction);
+    transactions.add(transaction);
   }
+  return transactions;
 }
 
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
-Future<SellCargo201ResponseData?> purchaseCargoAndLog(
+Future<Transaction?> purchaseCargoAndLog(
   Api api,
   MarketPrices marketPrices,
   TransactionLog transactionLog,
@@ -127,15 +132,14 @@ Future<SellCargo201ResponseData?> purchaseCargoAndLog(
     // "code":4604,"data":{"waypointSymbol":"X1-UC8-13100A","tradeSymbol":
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = data.agent;
-    final transaction = data.transaction;
-    logTransaction(ship, marketPrices, agent, transaction);
-    transactionLog.log(
-      Transaction.fromMarketTransaction(
-        transaction,
-        agent.credits,
-      ),
+    final marketTransaction = data.transaction;
+    logTransaction(ship, marketPrices, agent, marketTransaction);
+    final transaction = Transaction.fromMarketTransaction(
+      marketTransaction,
+      agent.credits,
     );
-    return data;
+    transactionLog.log(transaction);
+    return transaction;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
       rethrow;
@@ -368,15 +372,20 @@ Future<Contract> negotiateContractAndLog(Api api, Ship ship) async {
 /// Accept [contract] and log.
 Future<AcceptContract200ResponseData> acceptContractAndLog(
   Api api,
+  ContractCache contractCache,
+  AgentCache agentCache,
   Contract contract,
 ) async {
   final response = await api.contracts.acceptContract(contract.id);
+  final data = response!.data;
+  agentCache.updateAgent(data.agent);
+  contractCache.updateContract(data.contract);
   logger
     ..info('Accepted: ${contractDescription(contract)}.')
     ..info(
       'received ${creditsString(contract.terms.payment.onAccepted)}',
     );
-  return response!.data;
+  return data;
 }
 
 /// Install [mountSymbol] on [ship] and log.

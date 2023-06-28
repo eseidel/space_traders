@@ -1,5 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/behavior_cache.dart';
+import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
@@ -11,6 +13,8 @@ import 'package:file/file.dart';
 
 export 'package:cli/api.dart';
 export 'package:cli/cache/agent_cache.dart';
+export 'package:cli/cache/behavior_cache.dart';
+export 'package:cli/cache/contract_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
@@ -32,6 +36,8 @@ class Caches {
     required this.transactions,
     required this.waypoints,
     required this.markets,
+    required this.contracts,
+    required this.behaviors,
   });
 
   /// The agent cache.
@@ -42,6 +48,9 @@ class Caches {
 
   /// The ship cache.
   final ShipCache ships;
+
+  /// The contract cache.
+  final ContractCache contracts;
 
   /// The historical shipyard prices.
   final ShipyardPrices shipyardPrices;
@@ -61,6 +70,9 @@ class Caches {
   /// The cache of markets.
   final MarketCache markets;
 
+  /// The cache of behaviors.
+  final BehaviorCache behaviors;
+
   /// Load the cache from disk and network.
   static Future<Caches> load(FileSystem fs, Api api) async {
     final agent = await AgentCache.load(api);
@@ -72,6 +84,8 @@ class Caches {
     final transactions = await TransactionLog.load(fs);
     final waypoints = WaypointCache(api, systems);
     final markets = MarketCache(waypoints);
+    final contracts = await ContractCache.load(api);
+    final behaviors = await BehaviorCache.load(fs);
     return Caches._(
       agent: agent,
       marketPrices: prices,
@@ -82,6 +96,8 @@ class Caches {
       transactions: transactions,
       waypoints: waypoints,
       markets: markets,
+      contracts: contracts,
+      behaviors: behaviors,
     );
   }
 }

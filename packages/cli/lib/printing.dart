@@ -29,7 +29,6 @@ void printWaypoints(List<Waypoint> waypoints, {String indent = ''}) {
 /// systemWaypoints is used to look up the waypoint for the ship's
 /// waypointSymbol.
 String shipDescription(Ship ship, SystemsCache systemsCache) {
-  // This has to be synchronous so can't use WaypointCache
   final waypoint = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
   var string =
       '${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';

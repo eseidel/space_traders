@@ -1,7 +1,6 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/contract_trader.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/navigation.dart';
@@ -41,15 +40,8 @@ Future<DateTime?> advanceShipBehavior(
         caches,
         ship,
       );
-    case Behavior.contractTrader:
-      return advanceContractTrader(
-        api,
-        centralCommand,
-        caches,
-        ship,
-      );
-    case Behavior.arbitrageTrader:
-      return advanceArbitrageTrader(
+    case Behavior.trader:
+      return advanceTrader(
         api,
         centralCommand,
         caches,

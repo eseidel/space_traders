@@ -106,25 +106,18 @@ class CentralCommand {
   ) {
     final disableBehaviors = <Behavior>[
       // Behavior.buyShip,
-      Behavior.contractTrader,
-      // Behavior.arbitrageTrader,
+      // Behavior.trader,
       // Behavior.miner,
       // Behavior.idle,
       // Behavior.explorer,
     ];
 
     final behaviors = {
-      ShipRole.COMMAND: [
-        Behavior.buyShip,
-        Behavior.contractTrader,
-        Behavior.arbitrageTrader,
-        Behavior.miner
-      ],
+      ShipRole.COMMAND: [Behavior.buyShip, Behavior.trader, Behavior.miner],
       // Can't have more than one contract trader on small/expensive contracts
       // or we'll overbuy.
       ShipRole.HAULER: [
-        Behavior.contractTrader,
-        Behavior.arbitrageTrader,
+        Behavior.trader,
       ],
       ShipRole.EXCAVATOR: [Behavior.miner],
       ShipRole.SATELLITE: [Behavior.explorer],
@@ -190,6 +183,17 @@ class CentralCommand {
     await _behaviorCache.setBehavior(ship.symbol, state);
   }
 
+  /// Record the given [transactions] for the current deal for [ship].
+  Future<void> recordDealTransactions(
+    Ship ship,
+    List<Transaction> transactions,
+  ) async {
+    final behaviorState = getBehavior(ship.symbol)!;
+    final deal = behaviorState.deal!;
+    behaviorState.deal = deal.byAddingTransactions(transactions);
+    await setBehavior(ship.symbol, behaviorState);
+  }
+
   // This feels wrong.
   /// Load or create the right behavior state for [ship].
   Future<BehaviorState> loadBehaviorState(Ship ship) async {
@@ -226,15 +230,40 @@ class CentralCommand {
     }
   }
 
+  /// Returns true if contract trading is enabled.
+  /// We will only accept and start new contracts when this is true.
+  /// We will continue to deliver current contract deals even if this is false,
+  /// but will not start new deals involving contracts.
+  bool get isContractTradingEnabled => false;
+
+  Iterable<SellOpp> _contractSellOpps(
+    AgentCache agentCache,
+    ContractCache contractCache,
+  ) sync* {
+    for (final contract in affordableContracts(agentCache, contractCache)) {
+      for (final good in contract.terms.deliver) {
+        yield SellOpp(
+          marketSymbol: good.destinationSymbol,
+          tradeSymbol: good.tradeSymbol,
+          isContractDelivery: true,
+          price: _maxWorthwhileUnitPurchasePrice(contract, good),
+          maxUnits: remainingUnitsNeededForContract(contract, good.tradeSymbol),
+        );
+      }
+    }
+  }
+
   /// Find next deal for the given [ship], considering all deals in progress.
   Future<CostedDeal?> findNextDeal(
+    AgentCache agentCache,
+    ContractCache contractCache,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
     WaypointCache waypointCache,
     MarketCache marketCache,
     Ship ship, {
     required int maxJumps,
-    required int maxOutlay,
+    required int maxTotalOutlay,
     required int availableSpace,
   }) async {
     final inProgress = _dealsInProgress().toList();
@@ -248,6 +277,12 @@ class CentralCommand {
       );
     }
 
+    /// This should decide if contract trading is enabled, and if it is
+    /// include extra SellOpps for the contract goods.
+    final contractSellOpps = isContractTradingEnabled
+        ? _contractSellOpps(agentCache, contractCache).toList()
+        : null;
+
     final maybeDeal = await findDealFor(
       marketPrices,
       systemsCache,
@@ -255,8 +290,9 @@ class CentralCommand {
       marketCache,
       ship,
       maxJumps: maxJumps,
-      maxOutlay: maxOutlay,
+      maxTotalOutlay: maxTotalOutlay,
       availableSpace: ship.availableSpace,
+      extraSellOpps: contractSellOpps,
       filter: filter,
     );
     return maybeDeal;
@@ -325,4 +361,69 @@ class CentralCommand {
     }
     return typesToBuy[random.nextInt(typesToBuy.length)];
   }
+
+  /// Computes the number of units needed to fulfill the given [contract].
+  /// It should exclude units already spoken for by other ships, but doesn't
+  /// yet.
+  int remainingUnitsNeededForContract(Contract contract, String tradeSymbol) {
+    // TODO(eseidel): This has the potential of racing with multiple ships.
+    // This should look at the deals other ships are working on and subtract
+    // those from what remains in the contract.
+    final neededGood = contract.goodNeeded(tradeSymbol);
+    return neededGood!.unitsRequired - neededGood.unitsFulfilled;
+  }
+}
+
+int _maxWorthwhileUnitPurchasePrice(
+  Contract contract,
+  ContractDeliverGood good,
+) {
+  // To compute all of this we need to:
+  // 1. First estimate the total cost of the contract goods based on median
+  //    market prices.
+  // 2. Then compare to total revenue of the contract to get expected profit. We
+  //    could also add our own minimum profit here if needed?
+  // 3. Then distribute profit evenly across all goods based on total price
+  //    weight of the goods.
+  // 4. The compute the price + profit expected for each good.
+  // 5. Then take the remaining units needed for each good time price + profit.
+
+  final totalPayment =
+      contract.terms.payment.onAccepted + contract.terms.payment.onFulfilled;
+  // TODO(eseidel): "break even" should include a minimum margin.
+  return totalPayment ~/ good.unitsRequired;
+}
+
+/// Returns the minimum float required to complete this contract.
+int _minimumFloatRequired(Contract contract) {
+  assert(
+    contract.type == ContractTypeEnum.PROCUREMENT,
+    'Only procurement contracts are supported',
+  );
+  assert(
+    contract.terms.deliver.length == 1,
+    'Only contracts with a single deliver good are supported',
+  );
+  final good = contract.terms.deliver.first;
+  final maxUnitPrice = _maxWorthwhileUnitPurchasePrice(contract, good);
+  const creditsBuffer = 20000;
+  final remainingUnits = good.unitsRequired - good.unitsFulfilled;
+  // TODO(eseidel): 100000 is an arbitrary minimum we should remove!
+  return max(100000, maxUnitPrice * remainingUnits + creditsBuffer);
+}
+
+/// Returns the contracts we should consider for trading.
+/// This is a subset of the active contracts that we have enough money to
+/// complete.
+Iterable<Contract> affordableContracts(
+  AgentCache agentCache,
+  ContractCache contractsCache,
+) {
+  // We should only use the contract trader when we have enough credits to
+  // complete the entire contract.  Otherwise we're just sinking credits into a
+  // contract we can't complete yet when we could be using that money for other
+  // trading.
+  final credits = agentCache.agent.credits;
+  return contractsCache.activeContracts
+      .where((c) => _minimumFloatRequired(c) < credits);
 }

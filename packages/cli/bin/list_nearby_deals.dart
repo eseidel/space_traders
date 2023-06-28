@@ -51,7 +51,7 @@ void main(List<String> args) async {
     marketCache,
     ship,
     maxJumps: maxJumps,
-    maxOutlay: 10000,
+    maxTotalOutlay: 10000,
     availableSpace: ship.availableSpace,
   );
 

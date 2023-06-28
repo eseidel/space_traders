@@ -43,6 +43,10 @@ class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
+class _MockContractsApi extends Mock implements ContractsApi {}
+
+class _MockContractCache extends Mock implements ContractCache {}
+
 void main() {
   test('advanceContractTrader smoke test', () async {
     final api = _MockApi();
@@ -54,10 +58,12 @@ void main() {
     final marketCache = _MockMarketCache();
     final transactionLog = _MockTransactionLog();
     final shipyardPrices = _MockShipyardPrices();
+    final contractCache = _MockContractCache();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final centralCommand = _MockCentralCommand();
+    when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
@@ -66,6 +72,7 @@ void main() {
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
+    when(() => caches.contracts).thenReturn(contractCache);
 
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
@@ -89,13 +96,13 @@ void main() {
     ).thenReturn([]);
 
     when(() => centralCommand.getBehavior('S')).thenAnswer(
-      (_) => BehaviorState('S', Behavior.arbitrageTrader),
+      (_) => BehaviorState('S', Behavior.trader),
     );
     registerFallbackValue(Duration.zero);
     when(
       () => centralCommand.disableBehavior(
         ship,
-        Behavior.arbitrageTrader,
+        Behavior.trader,
         any(),
         any(),
       ),
@@ -103,13 +110,15 @@ void main() {
 
     when(
       () => centralCommand.findNextDeal(
+        agentCache,
+        contractCache,
         marketPrices,
         systemsCache,
         waypointCache,
         marketCache,
         ship,
         maxJumps: any(named: 'maxJumps'),
-        maxOutlay: any(named: 'maxOutlay'),
+        maxTotalOutlay: any(named: 'maxTotalOutlay'),
         availableSpace: any(named: 'availableSpace'),
       ),
     ).thenAnswer((_) => Future.value());
@@ -126,7 +135,7 @@ void main() {
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
-      () => advanceArbitrageTrader(
+      () => advanceTrader(
         api,
         centralCommand,
         caches,
@@ -158,6 +167,7 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
 
     final centralCommand = _MockCentralCommand();
+    when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
@@ -217,9 +227,9 @@ void main() {
         purchasePrice: 10,
         sellPrice: 20,
       ),
-      fuelCost: 0,
+      expectedFuelCost: 0,
       tradeVolume: 10,
-      time: 10,
+      expectedTime: 10,
       transactions: [],
     );
 
@@ -247,7 +257,7 @@ void main() {
         .thenAnswer((_) => Future.value(market));
 
     when(() => centralCommand.getBehavior('S')).thenAnswer(
-      (_) => BehaviorState('S', Behavior.arbitrageTrader, deal: costedDeal),
+      (_) => BehaviorState('S', Behavior.trader, deal: costedDeal),
     );
     when(() => centralCommand.setDestination(ship, 'S-A-C'))
         .thenAnswer((_) => Future.value());
@@ -255,7 +265,7 @@ void main() {
     when(
       () => centralCommand.disableBehavior(
         ship,
-        Behavior.arbitrageTrader,
+        Behavior.trader,
         any(),
         any(),
       ),
@@ -308,7 +318,7 @@ void main() {
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
-      () => advanceArbitrageTrader(
+      () => advanceTrader(
         api,
         centralCommand,
         caches,
@@ -322,6 +332,120 @@ void main() {
         refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
+    expect(waitUntil, isNull);
+  });
+
+  test('trade contracts smoke test', () async {
+    final api = _MockApi();
+    final marketPrices = _MockMarketPrices();
+    final agentCache = _MockAgentCache();
+    final ship = _MockShip();
+    final systemsCache = _MockSystemsCache();
+    final waypointCache = _MockWaypointCache();
+    final marketCache = _MockMarketCache();
+    final transactionLog = _MockTransactionLog();
+    final shipyardPrices = _MockShipyardPrices();
+    final shipNav = _MockShipNav();
+    final centralCommand = _MockCentralCommand();
+    final contractCache = _MockContractCache();
+    when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
+    final caches = _MockCaches();
+    when(() => caches.waypoints).thenReturn(waypointCache);
+    when(() => caches.markets).thenReturn(marketCache);
+    when(() => caches.transactions).thenReturn(transactionLog);
+    when(() => caches.marketPrices).thenReturn(marketPrices);
+    when(() => caches.agent).thenReturn(agentCache);
+    when(() => caches.systems).thenReturn(systemsCache);
+    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
+    when(() => caches.contracts).thenReturn(contractCache);
+    when(() => contractCache.activeContracts).thenReturn([]);
+
+    final agent = _MockAgent();
+    when(() => agentCache.agent).thenReturn(agent);
+    when(() => agent.credits).thenReturn(1000000);
+
+    final contractsApi = _MockContractsApi();
+    when(() => api.contracts).thenReturn(contractsApi);
+    when(
+      () => contractsApi.getContracts(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        GetContracts200Response(meta: Meta(total: 0), data: []),
+      ),
+    );
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    when(() => fleetApi.negotiateContract(any())).thenAnswer(
+      (_) => Future.value(
+        NegotiateContract200Response(
+          data: NegotiateContract200ResponseData(
+            contract: Contract(
+              id: 'id',
+              factionSymbol: 'factionSymbol',
+              type: ContractTypeEnum.PROCUREMENT,
+              expiration: DateTime(2021),
+              terms: ContractTerms(
+                deadline: DateTime(2021),
+                payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final shipCargo = _MockShipCargo();
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => shipCargo.units).thenReturn(0);
+    when(() => shipCargo.capacity).thenReturn(10);
+
+    when(() => ship.symbol).thenReturn('S');
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => shipNav.waypointSymbol).thenReturn('W');
+
+    final waypoint = _MockWaypoint();
+    when(() => waypoint.symbol).thenReturn('S-A-B');
+    when(() => waypoint.systemSymbol).thenReturn('S-A');
+    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
+    when(() => waypoint.traits).thenReturn([]);
+    when(() => waypointCache.waypoint(any()))
+        .thenAnswer((_) => Future.value(waypoint));
+
+    when(() => centralCommand.getBehavior('S'))
+        .thenAnswer((_) => BehaviorState('S', Behavior.trader));
+
+    when(
+      () => centralCommand.findNextDeal(
+        agentCache,
+        contractCache,
+        marketPrices,
+        systemsCache,
+        waypointCache,
+        marketCache,
+        ship,
+        maxJumps: any(named: 'maxJumps'),
+        maxTotalOutlay: any(named: 'maxTotalOutlay'),
+        availableSpace: any(named: 'availableSpace'),
+      ),
+    ).thenAnswer((_) => Future.value());
+    when(
+      () => centralCommand.disableBehavior(ship, Behavior.trader, any(), any()),
+    ).thenAnswer((_) => Future.value());
+
+    final logger = _MockLogger();
+    final waitUntil = await runWithLogger(
+      logger,
+      () => advanceTrader(
+        api,
+        centralCommand,
+        caches,
+        ship,
+      ),
+    );
     expect(waitUntil, isNull);
   });
 }

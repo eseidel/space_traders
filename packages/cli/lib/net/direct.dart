@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 
 // This is for direct non-logging actions
@@ -79,10 +80,11 @@ Future<ExtractResources201ResponseData> extractResources(
 Future<DeliverContract200ResponseData> deliverContract(
   Api api,
   Ship ship,
-  Contract contract,
-  String tradeSymbol,
-  int units,
-) async {
+  ContractCache contractCache,
+  Contract contract, {
+  required String tradeSymbol,
+  required int units,
+}) async {
   final request = DeliverContractRequest(
     shipSymbol: ship.symbol,
     tradeSymbol: tradeSymbol,
@@ -90,9 +92,10 @@ Future<DeliverContract200ResponseData> deliverContract(
   );
   final response = await api.contracts
       .deliverContract(contract.id, deliverContractRequest: request);
-  // Does not update the contract.
-  ship.cargo = response!.data.cargo;
-  return response.data;
+  final data = response!.data;
+  contractCache.updateContract(data.contract);
+  ship.cargo = data.cargo;
+  return data;
 }
 
 /// Sell [units] of [tradeSymbol] to market.
