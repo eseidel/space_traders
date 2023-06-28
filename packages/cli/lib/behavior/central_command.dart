@@ -101,7 +101,6 @@ class CentralCommand {
 // At the top of the file because I change this so often.
   /// What behavior should the given ship be doing?
   Behavior behaviorFor(
-    BehaviorCache behaviorManager,
     Ship ship,
   ) {
     final disableBehaviors = <Behavior>[
@@ -199,7 +198,7 @@ class CentralCommand {
   Future<BehaviorState> loadBehaviorState(Ship ship) async {
     final state = _behaviorCache.getBehavior(ship.symbol);
     if (state == null) {
-      final behavior = behaviorFor(_behaviorCache, ship);
+      final behavior = behaviorFor(ship);
       final newState = BehaviorState(
         ship.symbol,
         behavior,
