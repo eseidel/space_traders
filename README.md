@@ -92,6 +92,8 @@ Earning:
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
 * Add logic for buying and mounting modules.
+* Traders only consider how repeated buys inflate prices, they do not consider
+  how repeated sells might deflate prices at sell point.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jumpgate

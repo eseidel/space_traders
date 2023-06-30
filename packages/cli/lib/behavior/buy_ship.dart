@@ -62,7 +62,7 @@ Future<DateTime?> advanceBuyShip(
 
   final shipType = centralCommand.shipTypeToBuy();
   if (shipType == null) {
-    await centralCommand.disableBehavior(
+    await centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'No ships needed.',
@@ -74,7 +74,7 @@ Future<DateTime?> advanceBuyShip(
   // Get our median price before updating shipyard prices.
   final medianPrice = caches.shipyardPrices.medianPurchasePrice(shipType);
   if (medianPrice == null) {
-    await centralCommand.disableBehavior(
+    await centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Failed to buy ship, no median price for $shipType.',
@@ -85,7 +85,7 @@ Future<DateTime?> advanceBuyShip(
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
   final credits = caches.agent.agent.credits;
   if (credits < maxPrice) {
-    await centralCommand.disableBehavior(
+    await centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Can not buy $shipType, credits $credits < max price $maxPrice.',
@@ -98,16 +98,27 @@ Future<DateTime?> advanceBuyShip(
   if (currentWaypoint.hasShipyard) {
     // Update our shipyard prices regardless of any later errors.
     final shipyard = await getShipyard(api, currentWaypoint);
+    if (!shipyard.hasShipType(shipType)) {
+      await centralCommand.disableBehaviorForShip(
+        ship,
+        Behavior.buyShip,
+        'Shipyard at ${currentWaypoint.symbol} does not sell $shipType.',
+        const Duration(minutes: 30),
+      );
+      return null;
+    }
+
     await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
-    // We should *always* have a recent price, we just updated it.
+    // We should *always* have a recent price unless the shipyard doesn't
+    // sell that type of ship.
     final recentPrice = caches.shipyardPrices.recentPurchasePrice(
       shipyardSymbol: currentWaypoint.symbol,
       shipType: shipType,
     )!;
     final recentPriceString = creditsString(recentPrice);
     if (recentPrice > maxPrice) {
-      await centralCommand.disableBehavior(
+      await centralCommand.disableBehaviorForShip(
         ship,
         Behavior.buyShip,
         'Failed to buy $shipType at ${currentWaypoint.symbol}, '
@@ -129,7 +140,7 @@ Future<DateTime?> advanceBuyShip(
     );
 
     await centralCommand.completeBehavior(ship.symbol);
-    await centralCommand.disableBehavior(
+    await centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Purchase of ${result.ship.symbol} ($shipType) successful!',
@@ -149,7 +160,7 @@ Future<DateTime?> advanceBuyShip(
   );
   if (destination == null) {
     const timeout = Duration(minutes: 30);
-    await centralCommand.disableBehavior(
+    await centralCommand.disableBehaviorForShip(
       ship,
       Behavior.buyShip,
       'No shipyard near ${ship.nav.waypointSymbol} '

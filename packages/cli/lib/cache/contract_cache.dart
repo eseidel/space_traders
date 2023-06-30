@@ -5,7 +5,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/third_party/compare.dart';
 
-// FIXME: Share code with _shipListsMatch.
+// TODO(eseidel): Share code with _shipListsMatch.
 bool _contractListsMatch(List<Contract> actual, List<Contract> expected) {
   if (actual.length != expected.length) {
     logger.info(

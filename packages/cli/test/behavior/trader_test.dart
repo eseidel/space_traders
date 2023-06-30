@@ -100,7 +100,7 @@ void main() {
     );
     registerFallbackValue(Duration.zero);
     when(
-      () => centralCommand.disableBehavior(
+      () => centralCommand.disableBehaviorForShip(
         ship,
         Behavior.trader,
         any(),
@@ -263,7 +263,7 @@ void main() {
         .thenAnswer((_) => Future.value());
     registerFallbackValue(Duration.zero);
     when(
-      () => centralCommand.disableBehavior(
+      () => centralCommand.disableBehaviorForAll(
         ship,
         Behavior.trader,
         any(),
@@ -406,6 +406,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn('W');
+    when(() => shipNav.systemSymbol).thenReturn('S-A');
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn('S-A-B');
@@ -433,7 +434,12 @@ void main() {
       ),
     ).thenAnswer((_) => Future.value());
     when(
-      () => centralCommand.disableBehavior(ship, Behavior.trader, any(), any()),
+      () => centralCommand.disableBehaviorForShip(
+        ship,
+        Behavior.trader,
+        any(),
+        any(),
+      ),
     ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();

@@ -224,7 +224,12 @@ void main() {
 
     registerFallbackValue(Duration.zero);
     when(
-      () => centralCommand.disableBehavior(ship, Behavior.miner, any(), any()),
+      () => centralCommand.disableBehaviorForShip(
+        ship,
+        Behavior.miner,
+        any(),
+        any(),
+      ),
     ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();

@@ -336,6 +336,14 @@ extension MarketUtils on Market {
   }
 }
 
+/// Extensions onto Shipyard to make it easier to work with.
+extension ShipyardUtils on Shipyard {
+  /// Returns true if the Shipyard has the given ship type.
+  bool hasShipType(ShipType shipType) {
+    return shipTypes.any((s) => s.type == shipType);
+  }
+}
+
 /// Returns the duration until the given date time.
 Duration durationUntil(DateTime dateTime) =>
     dateTime.difference(DateTime.now());

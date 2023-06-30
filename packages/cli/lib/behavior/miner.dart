@@ -215,6 +215,7 @@ Future<String?> nearestMineWithGoodMining(
   required int maxJumps,
   bool Function(String systemSymbol)? systemFilter,
 }) async {
+  // TODO(eseidel): These evals should be cached on centralCommand.
   final evals = <_SystemEval>[];
   for (final (systemSymbol, jumps) in systemsCache.systemSymbolsInJumpRadius(
     startSystem: start.systemSymbol,
@@ -321,7 +322,7 @@ Future<DateTime?> _navigateToNewSystemForMining(
   MarketCache marketCache,
   CentralCommand centralCommand,
   Waypoint currentWaypoint, {
-  int maxJumps = 10,
+  int maxJumps = 5,
 }) async {
   final mine = await nearestMineWithGoodMining(
     api,
@@ -333,7 +334,7 @@ Future<DateTime?> _navigateToNewSystemForMining(
     maxJumps: maxJumps,
   );
   if (mine == null) {
-    await centralCommand.disableBehavior(
+    await centralCommand.disableBehaviorForShip(
       ship,
       Behavior.miner,
       'No good mining system found in '
@@ -422,7 +423,7 @@ Future<DateTime?> advanceMiner(
       largestCargo!.symbol,
     );
     if (nearestMarket == null) {
-      await centralCommand.disableBehavior(
+      await centralCommand.disableBehaviorForShip(
         ship,
         Behavior.miner,
         'No nearby market which trades ${largestCargo.symbol}.',

@@ -23,7 +23,7 @@ void main() {
     final behaviorCache = _MockBehhaviorCache();
     final shipCache = _MockShipCache();
     final centralCommand = CentralCommand(behaviorCache, shipCache);
-    expect(centralCommand.isEnabled(Behavior.trader), true);
+    expect(centralCommand.isBehaviorDisabled(Behavior.trader), false);
 
     when(() => behaviorCache.deleteBehavior('S'))
         .thenAnswer((_) => Future.value());
@@ -34,14 +34,14 @@ void main() {
 
     await runWithLogger(
       logger,
-      () async => centralCommand.disableBehavior(
+      () async => centralCommand.disableBehaviorForAll(
         ship,
         Behavior.trader,
         'why',
         const Duration(hours: 1),
       ),
     );
-    expect(centralCommand.isEnabled(Behavior.trader), false);
+    expect(centralCommand.isBehaviorDisabled(Behavior.trader), true);
   });
 
   test('CentralCommand.behaviorFor', () async {

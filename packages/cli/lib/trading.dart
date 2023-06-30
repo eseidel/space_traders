@@ -592,10 +592,11 @@ class CostedDeal {
 
 /// Returns a string describing the given CostedDeal
 String describeCostedDeal(CostedDeal costedDeal) {
+  const c = creditsString;
   final deal = costedDeal.deal;
   final sign = deal.profit > 0 ? '+' : '';
   final profitPercent = (deal.profit / deal.purchasePrice) * 100;
-  final profitCreditsString = '$sign${creditsString(deal.profit)}'.padLeft(8);
+  final profitCreditsString = '$sign${c(deal.profit)}'.padLeft(8);
   final profitPercentString =
       '(${profitPercent.toStringAsFixed(0)}%)'.padLeft(5);
   final profitString = '$profitCreditsString $profitPercentString';
@@ -603,12 +604,12 @@ String describeCostedDeal(CostedDeal costedDeal) {
       ? lightGreen.wrap(profitString)
       : lightRed.wrap(profitString);
   final timeString = '${costedDeal.expectedTime}s '
-      '${creditsString(costedDeal.expectedProfitPerSecond)}/s';
+      '${c(costedDeal.expectedProfitPerSecond)}/s';
   return '${deal.tradeSymbol.value.padRight(25)} '
-      ' ${deal.sourceSymbol} ${creditsString(deal.purchasePrice).padLeft(8)} '
+      ' ${deal.sourceSymbol} ${c(deal.purchasePrice).padLeft(8)} '
       '-> '
-      '${deal.destinationSymbol} ${creditsString(deal.sellPrice).padLeft(8)} '
-      '$coloredProfitString $timeString ${costedDeal.expectedCosts}c';
+      '${deal.destinationSymbol} ${c(deal.sellPrice).padLeft(8)} '
+      '$coloredProfitString $timeString ${c(costedDeal.expectedCosts)}';
 }
 
 /// Returns a CostedDeal for a given deal.
@@ -693,5 +694,11 @@ Future<CostedDeal?> findDealFor(
   for (final deal in sortedDeals) {
     logger.detail(describeCostedDeal(deal));
   }
-  return sortedDeals.last;
+
+  final profitable = sortedDeals.where((d) => d.expectedProfitPerSecond > 0);
+  if (profitable.isEmpty) {
+    logger.info('No profitable deals $withinRange.');
+    return null;
+  }
+  return profitable.last;
 }

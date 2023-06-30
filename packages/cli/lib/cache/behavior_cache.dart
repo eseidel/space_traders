@@ -31,7 +31,9 @@ class BehaviorCache {
 
   /// Save entries to a file.
   Future<void> save() async {
-    await _fs.file(_path).writeAsString(jsonEncode(_stateByShipSymbol));
+    const encoder = JsonEncoder.withIndent(' ');
+    final prettyprint = encoder.convert(_stateByShipSymbol);
+    await _fs.file(_path).writeAsString(prettyprint);
   }
 
   /// Load the cache from a file.

@@ -427,7 +427,11 @@ Future<DateTime?> advanceTrader(
     }
 
     if (ship.cargo.isNotEmpty) {
-      shipInfo(ship, 'Cargo hold still not empty, finding market.');
+      shipInfo(
+        ship,
+        'Cargo hold still not empty, finding '
+        'market to sell ${nonDealCargo.symbol}.',
+      );
       final market = await nearbyMarketWhichTrades(
         caches.systems,
         caches.waypoints,
@@ -437,7 +441,7 @@ Future<DateTime?> advanceTrader(
       );
       if (market == null) {
         // We can't sell this cargo anywhere so give up?
-        await centralCommand.disableBehavior(
+        await centralCommand.disableBehaviorForShip(
           ship,
           Behavior.trader,
           'No market for ${nonDealCargo.symbol}.',
@@ -467,6 +471,9 @@ Future<DateTime?> advanceTrader(
     return waitUntil;
   }
 
+  // TODO(eseidel): make maxJumps bigger (and cache MarketScan if needed).
+  const maxJumps = 3;
+
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
   final newDeal = await centralCommand.findNextDeal(
@@ -477,17 +484,17 @@ Future<DateTime?> advanceTrader(
     caches.waypoints,
     caches.markets,
     ship,
-    // TODO(eseidel): make maxJumps bigger (and cache MarketScan if needed).
-    maxJumps: 1,
+    maxJumps: maxJumps,
     maxTotalOutlay: caches.agent.agent.credits,
     availableSpace: ship.availableSpace,
   );
 
   if (newDeal == null) {
-    await centralCommand.disableBehavior(
+    // Instead just fly to some nearby system and explore?
+    await centralCommand.disableBehaviorForShip(
       ship,
       Behavior.trader,
-      'No profitable deals.',
+      'No profitable deals within $maxJumps jumps of ${ship.nav.systemSymbol}.',
       const Duration(hours: 1),
     );
     return null;

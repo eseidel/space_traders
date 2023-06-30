@@ -48,6 +48,16 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
+import 'package:meta/meta.dart';
+
+@immutable
+class _ShipTimeout {
+  const _ShipTimeout(this.shipSymbol, this.behavior, this.timeout);
+
+  final String shipSymbol;
+  final Behavior behavior;
+  final DateTime timeout;
+}
 
 /// Central command for the fleet.
 class CentralCommand {
@@ -57,6 +67,7 @@ class CentralCommand {
         _shipCache = shipCache;
 
   final Map<Behavior, DateTime> _behaviorTimeouts = {};
+  final List<_ShipTimeout> _shipTimeouts = [];
 
   final BehaviorCache _behaviorCache;
   final ShipCache _shipCache;
@@ -82,17 +93,35 @@ class CentralCommand {
 
   // Otherwise, find a system to explore.
 
-  /// Check if the given behavior is enabled.
-  bool isEnabled(Behavior behavior) {
+  /// Check if the given behavior is globally disabled.
+  bool isBehaviorDisabled(Behavior behavior) {
     final expiration = _behaviorTimeouts[behavior];
     if (expiration == null) {
-      return true;
+      return false;
     }
-    if (DateTime.now().isAfter(expiration)) {
+    if (DateTime.timestamp().isAfter(expiration)) {
       _behaviorTimeouts.remove(behavior);
-      return true;
+      return false;
     }
-    return false;
+    return true;
+  }
+
+  /// Check if the given behavior is disabled for the given ship.
+  bool isBehaviorDisabledForShip(Ship ship, Behavior behavior) {
+    bool matches(_ShipTimeout timeout) {
+      return timeout.shipSymbol == ship.symbol && timeout.behavior == behavior;
+    }
+
+    final timeouts = _shipTimeouts.where(matches).toList();
+    if (timeouts.isEmpty) {
+      return false;
+    }
+    final expiration = timeouts.first.timeout;
+    if (DateTime.timestamp().isAfter(expiration)) {
+      _shipTimeouts.removeWhere(matches);
+      return false;
+    }
+    return true;
   }
 
 // Consider having a config file like:
@@ -113,10 +142,10 @@ class CentralCommand {
 
     final behaviors = {
       ShipRole.COMMAND: [Behavior.buyShip, Behavior.trader, Behavior.miner],
-      // Can't have more than one contract trader on small/expensive contracts
-      // or we'll overbuy.
       ShipRole.HAULER: [
         Behavior.trader,
+        // Explorer is a hack here to get the haulers to move and try again.
+        Behavior.explorer,
       ],
       ShipRole.EXCAVATOR: [Behavior.miner],
       ShipRole.SATELLITE: [Behavior.explorer],
@@ -126,7 +155,8 @@ class CentralCommand {
         if (disableBehaviors.contains(behavior)) {
           continue;
         }
-        if (isEnabled(behavior)) {
+        if (!isBehaviorDisabled(behavior) &&
+            !isBehaviorDisabledForShip(ship, behavior)) {
           return behavior;
         }
       }
@@ -141,7 +171,7 @@ class CentralCommand {
   /// Disable the given behavior for an hour.
   // This should be a return type from the advance function instead of a
   // callback to the central command.
-  Future<void> disableBehavior(
+  Future<void> disableBehaviorForAll(
     Ship ship,
     Behavior behavior,
     String why,
@@ -154,7 +184,26 @@ class CentralCommand {
       '$why Disabling $behavior for ${approximateDuration(timeout)}.',
     );
 
-    final expiration = DateTime.now().add(timeout);
+    final expiration = DateTime.timestamp().add(timeout);
+    _behaviorTimeouts[behavior] = expiration;
+  }
+
+  /// Disable the given behavior for [ship] for [timeout].
+  Future<void> disableBehaviorForShip(
+    Ship ship,
+    Behavior behavior,
+    String why,
+    Duration timeout,
+  ) async {
+    await _behaviorCache.deleteBehavior(ship.symbol);
+
+    shipWarn(
+      ship,
+      '$why Disabling $behavior for ${ship.symbol} '
+      'for ${approximateDuration(timeout)}.',
+    );
+
+    final expiration = DateTime.timestamp().add(timeout);
     _behaviorTimeouts[behavior] = expiration;
   }
 
@@ -269,7 +318,7 @@ class CentralCommand {
     // Avoid having two ships working on the same deal since by the time the
     // second one gets there the prices will have changed.
     bool filter(CostedDeal deal) {
-      return inProgress.any(
+      return inProgress.every(
         (d) =>
             d.deal.sourceSymbol != deal.deal.sourceSymbol ||
             d.deal.tradeSymbol != deal.deal.tradeSymbol,
@@ -281,6 +330,13 @@ class CentralCommand {
     final contractSellOpps = isContractTradingEnabled
         ? _contractSellOpps(agentCache, contractCache).toList()
         : null;
+    if (contractSellOpps != null) {
+      final opp = contractSellOpps.first;
+      logger.info(
+        'Including contract sell opp: '
+        '${opp.maxUnits} ${opp.tradeSymbol} at ${opp.marketSymbol}',
+      );
+    }
 
     final maybeDeal = await findDealFor(
       marketPrices,
@@ -348,7 +404,7 @@ class CentralCommand {
     final targetCounts = {
       ShipType.ORE_HOUND: 30,
       ShipType.PROBE: 10,
-      ShipType.LIGHT_HAULER: 20,
+      ShipType.LIGHT_HAULER: 30,
     };
     final typesToBuy = targetCounts.keys
         .where(

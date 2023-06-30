@@ -78,7 +78,7 @@ void main() {
 
     registerFallbackValue(Duration.zero);
     when(
-      () => centralCommand.disableBehavior(
+      () => centralCommand.disableBehaviorForAll(
         ship,
         Behavior.buyShip,
         any(),

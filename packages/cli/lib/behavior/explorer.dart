@@ -210,7 +210,7 @@ Future<DateTime?> advanceExplorer(
     }
     // If we get here, we've explored all systems within maxJumpDistance jumps
     // of this system.  We just log an error and sleep.
-    await centralCommand.disableBehavior(
+    await centralCommand.disableBehaviorForShip(
       ship,
       Behavior.explorer,
       'No unexplored systems within $maxJumpDistance jumps of '
