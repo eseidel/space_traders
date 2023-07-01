@@ -7,7 +7,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
-import 'package:cli/route.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 
@@ -178,10 +177,7 @@ Future<_SystemEval> _evaluateSystem(
       if (marketPercentile == null) {
         continue;
       }
-      final distance = distanceBetweenWaypointsInSystem(
-        mine,
-        market,
-      );
+      final distance = mine.distanceTo(market);
       mineAndSells.add(
         _MineAndSell(
           mineSymbol: mine.symbol,

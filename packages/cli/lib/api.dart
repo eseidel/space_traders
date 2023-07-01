@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:cli/net/rate_limit.dart';
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 import 'package:openapi/api.dart';
 
 export 'package:openapi/api.dart';
@@ -67,11 +70,72 @@ void assertIsWaypointSymbol(String waypointSymbol) {
   );
 }
 
+/// A position within an unspecified coordinate space.
+@immutable
+class Position {
+  const Position._(this.x, this.y);
+
+  /// The x coordinate.
+  final int x;
+
+  /// The y coordinate.
+  final int y;
+}
+
+/// An x, y position within the System coordinate space.
+@immutable
+class SystemPosition extends Position {
+  /// Construct a SystemPosition with the given x and y.
+  const SystemPosition(super.x, super.y) : super._();
+
+  /// Returns the distance between this position and the given position.
+  int distanceTo(SystemPosition other) {
+    // Use euclidean distance.
+    final dx = other.x - x;
+    final dy = other.y - y;
+    return sqrt(dx * dx + dy * dy).round();
+  }
+}
+
+/// An x, y position within the Waypoint coordinate space.
+@immutable
+class WaypointPosition extends Position {
+  /// Construct a WaypointPosition with the given x and y.
+  const WaypointPosition(super.x, super.y, this.system) : super._();
+
+  /// The system symbol of the waypoint.
+  final String system;
+
+  /// Returns the distance between this position and the given position.
+  int distanceTo(WaypointPosition other) {
+    if (system != other.system) {
+      throw ArgumentError(
+        'Waypoints must be in the same system: $this, $other',
+      );
+    }
+    // Use euclidean distance.
+    final dx = other.x - x;
+    final dy = other.y - y;
+    return sqrt(dx * dx + dy * dy).round();
+  }
+}
+
 /// Extensions onto System to make it easier to work with.
 extension SystemUtils on System {
   /// Returns true if the system has a jump gate.
   bool get hasJumpGate =>
       waypoints.any((w) => w.type == WaypointType.JUMP_GATE);
+
+  /// Returns the the SystemWaypoint for the jump gate if it has one.
+  SystemWaypoint? get jumpGateWaypoint => waypoints.firstWhereOrNull(
+        (w) => w.type == WaypointType.JUMP_GATE,
+      );
+
+  /// Returns the SystemPosition of the system.
+  SystemPosition get position => SystemPosition(x, y);
+
+  /// Returns the distance to the given system.
+  int distanceTo(System other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto SystemWaypoint to make it easier to work with.
@@ -90,6 +154,12 @@ extension SystemWaypointUtils on SystemWaypoint {
 
   /// The system symbol of the waypoint.
   String get systemSymbol => parseWaypointString(symbol).system;
+
+  /// Returns the WaypointPosition of the waypoint.
+  WaypointPosition get position => WaypointPosition(x, y, systemSymbol);
+
+  /// Returns the distance to the given waypoint.
+  int distanceTo(SystemWaypoint other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto Waypoint to make it easier to work with.
@@ -132,6 +202,12 @@ extension WaypointUtils on Waypoint {
 
   /// Returns true if the waypoint has a marketplace.
   bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
+
+  /// Returns the WaypointPosition of the waypoint.
+  WaypointPosition get position => WaypointPosition(x, y, systemSymbol);
+
+  /// Returns the distance to the given waypoint.
+  int distanceTo(Waypoint other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto ShipCargo to make it easier to work with.

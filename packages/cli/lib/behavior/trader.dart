@@ -472,7 +472,9 @@ Future<DateTime?> advanceTrader(
   }
 
   // TODO(eseidel): make maxJumps bigger (and cache MarketScan if needed).
-  const maxJumps = 3;
+  // This can't be bigger until costOutDeal knows how to handle routes more than
+  // one jump long.
+  const maxJumps = 1;
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.

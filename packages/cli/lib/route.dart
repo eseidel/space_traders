@@ -1,25 +1,5 @@
-import 'dart:math';
-
 import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
-
-/// Returns the distance to the given waypoint.
-int distanceBetweenWaypointsInSystem(Waypoint a, Waypoint b) {
-  return distanceWithinSystem(a.toSystemWaypoint(), b.toSystemWaypoint());
-}
-
-/// Returns the distance to the given waypoint.
-int distanceWithinSystem(SystemWaypoint a, SystemWaypoint b) {
-  if (a.systemSymbol != b.systemSymbol) {
-    throw ArgumentError(
-      'Waypoints must be in the same system: $a, $b',
-    );
-  }
-  // Use euclidean distance.
-  final dx = a.x - b.x;
-  final dy = a.y - b.y;
-  return sqrt(dx * dx + dy * dy).round();
-}
 
 /// Returns the fuel cost to the given waypoint.
 int fuelUsedWithinSystem(
@@ -27,7 +7,7 @@ int fuelUsedWithinSystem(
   SystemWaypoint b, {
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
-  final distance = distanceWithinSystem(a, b);
+  final distance = a.distanceTo(b);
   switch (flightMode) {
     case ShipNavFlightMode.DRIFT:
       return 1;
@@ -49,7 +29,7 @@ int flightTimeWithinSystemInSeconds(
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
   // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
-  final distance = distanceWithinSystem(a, b);
+  final distance = a.distanceTo(b);
   final distanceBySpeed = distance ~/ shipSpeed;
 
   switch (flightMode) {
