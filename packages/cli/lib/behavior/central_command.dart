@@ -73,16 +73,16 @@ class CentralCommand {
   final ShipCache _shipCache;
 
   // void runCentralCommandLogic() {
-    // Run every N loops.
-    // Evaluate earnings for all ships over the last N minutes.
-    // If we don't have enough data for a ship/squad, then skip it.
-    // If we have enough data, then we can compute earnings per second.
-    // If it's below some threshold, then we should move it to a system
-    // we think might be more profitable.
-    // - Check if we need to buy a new ship.
-    // - Check if our miners are still at an optimal waypoint?
-    // - Refresh MarketScan for deals?
-    // - Refresh MarketScan for miners?
+  // Run every N loops.
+  // Evaluate earnings for all ships over the last N minutes.
+  // If we don't have enough data for a ship/squad, then skip it.
+  // If we have enough data, then we can compute earnings per second.
+  // If it's below some threshold, then we should move it to a system
+  // we think might be more profitable.
+  // - Check if we need to buy a new ship.
+  // - Check if our miners are still at an optimal waypoint?
+  // - Refresh MarketScan for deals?
+  // - Refresh MarketScan for miners?
   // }
 
   // To tell a given explorer what to do.
