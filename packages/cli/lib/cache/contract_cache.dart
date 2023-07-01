@@ -1,31 +1,54 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/response_cache.dart';
 import 'package:cli/net/queries.dart';
+import 'package:file/file.dart';
 
 /// In-memory cache of contacts.
 class ContractCache extends ResponseListCache<Contract> {
   /// Creates a new contract cache.
-  ContractCache(super.contracts, {super.checkEvery = 100})
-      : super(
+  ContractCache(
+    super.contracts, {
+    super.checkEvery = 100,
+    super.fs,
+    super.path = defaultPath,
+  }) : super(
           entryToJson: (c) => c.toJson(),
           refreshEntries: (Api api) => allMyContracts(api).toList(),
         );
 
-  /// Creates a new ContractCache from the API.
-  static Future<ContractCache> load(Api api) async =>
-      ContractCache(await allMyContracts(api).toList());
+  /// Creates a new ContractCache from the Api or FileSystem if provided.
+  static Future<ContractCache> load(
+    Api api, {
+    FileSystem? fs,
+    String path = defaultPath,
+  }) async {
+    if (fs != null && await fs.isFile(path)) {
+      final contracts = await ResponseListCache.load<Contract>(
+        fs,
+        path,
+        (j) => Contract.fromJson(j)!,
+      );
+      return ContractCache(contracts, fs: fs, path: path);
+    }
+    final contracts = await allMyContracts(api).toList();
+    return ContractCache(contracts, fs: fs, path: path);
+  }
+
+  /// The default path to the contracts cache.
+  static const String defaultPath = 'contracts.json';
 
   /// Contracts in the cache.
   List<Contract> get contracts => entries;
 
   /// Updates a single contract in the cache.
-  void updateContract(Contract contract) {
+  Future<void> updateContract(Contract contract) async {
     final index = contracts.indexWhere((c) => c.id == contract.id);
     if (index == -1) {
       contracts.add(contract);
     } else {
       contracts[index] = contract;
     }
+    await save();
   }
 
   /// Returns a list of all active (not fulfilled or expired) contracts.

@@ -379,7 +379,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   final response = await api.contracts.acceptContract(contract.id);
   final data = response!.data;
   agentCache.updateAgent(data.agent);
-  contractCache.updateContract(data.contract);
+  await contractCache.updateContract(data.contract);
   logger
     ..info('Accepted: ${contractDescription(contract)}.')
     ..info(

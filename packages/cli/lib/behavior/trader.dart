@@ -235,7 +235,7 @@ Future<DateTime?> _handleContractDealAtDestination(
       final response = await api.contracts.fulfillContract(contract.id);
       final data = response!.data;
       caches.agent.updateAgent(data.agent);
-      caches.contracts.updateContract(data.contract);
+      await caches.contracts.updateContract(data.contract);
       shipInfo(ship, 'Contract complete!');
       return null;
     }

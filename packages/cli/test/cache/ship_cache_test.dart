@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:cli/api.dart';
 import 'package:cli/cache/ship_cache.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class _MockApi extends Mock implements Api {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -51,5 +56,106 @@ void main() {
       describeFleet(shipCache),
       'Fleet: 2 Carrier, 1 Fighter, 1 Light Freighter',
     );
+  });
+
+  test('describeFleet empty', () {
+    final shipCache = ShipCache([]);
+    expect(describeFleet(shipCache), 'Fleet: 0 ships');
+  });
+
+  test('describeFleet one', () {
+    final one = _MockShip();
+    final oneFrame = _MockShipFrame();
+    when(() => one.frame).thenReturn(oneFrame);
+    when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
+    final shipCache = ShipCache([one]);
+    expect(describeFleet(shipCache), 'Fleet: 1 Carrier');
+  });
+
+  test('ShipCache load save', () async {
+    final api = _MockApi();
+    final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
+    final fs = MemoryFileSystem.test();
+    final ship = Ship(
+      symbol: 'A',
+      registration: ShipRegistration(
+        factionSymbol: FactionSymbols.AEGIS.value,
+        name: 'name',
+        role: ShipRole.COMMAND,
+      ),
+      nav: ShipNav(
+        systemSymbol: 'c',
+        waypointSymbol: 'symbol',
+        route: ShipNavRoute(
+          destination: ShipNavRouteWaypoint(
+            symbol: 'a',
+            type: WaypointType.PLANET,
+            systemSymbol: 'c',
+            x: 1,
+            y: 2,
+          ),
+          departure: ShipNavRouteWaypoint(
+            symbol: 'a',
+            type: WaypointType.PLANET,
+            systemSymbol: 'c',
+            x: 1,
+            y: 2,
+          ),
+          arrival: moonLanding,
+          departureTime: moonLanding,
+        ),
+        status: ShipNavStatus.DOCKED,
+        flightMode: ShipNavFlightMode.CRUISE,
+      ),
+      crew: ShipCrew(
+        current: 0,
+        required_: 0,
+        capacity: 0,
+        morale: 90,
+        wages: 0,
+      ),
+      frame: ShipFrame(
+        symbol: ShipFrameSymbolEnum.CARRIER,
+        name: 'name',
+        description: 'description',
+        condition: 90,
+        moduleSlots: 0,
+        mountingPoints: 0,
+        fuelCapacity: 0,
+        requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
+      ),
+      reactor: ShipReactor(
+        symbol: ShipReactorSymbolEnum.FISSION_I,
+        name: 'name',
+        description: 'description',
+        condition: 90,
+        powerOutput: 100,
+        requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
+      ),
+      engine: ShipEngine(
+        symbol: ShipEngineSymbolEnum.ION_DRIVE_I,
+        name: 'name',
+        description: 'description',
+        condition: 90,
+        speed: 100,
+        requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
+      ),
+      cargo: ShipCargo(
+        capacity: 100,
+        units: 100,
+        inventory: [],
+      ),
+      fuel: ShipFuel(
+        current: 100,
+        capacity: 100,
+      ),
+    );
+    final ships = [ship];
+    final shipCache = ShipCache(ships, fs: fs);
+    await shipCache.save();
+    final shipCache2 = await ShipCache.load(api, fs: fs);
+    expect(shipCache2.ships.length, ships.length);
+    // Ship.toJson doesn't recurse (openapi gen bug), so use jsonEncode.
+    expect(jsonEncode(shipCache2.ships.first), jsonEncode(ship));
   });
 }

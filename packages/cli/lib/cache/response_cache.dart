@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/third_party/compare.dart';
+import 'package:file/file.dart';
 
 /// Returns true if the two lists of T match when converted to Json.
 bool jsonListMatch<T>(
@@ -38,15 +39,24 @@ class ResponseListCache<T> {
     this.entries, {
     required Map<String, dynamic> Function(T t) entryToJson,
     required Future<List<T>> Function(Api api) refreshEntries,
+    FileSystem? fs,
+    String? path,
     this.checkEvery = 100,
   })  : _entryToJson = entryToJson,
-        _refreshEntries = refreshEntries;
+        _refreshEntries = refreshEntries,
+        _fs = fs,
+        _path = path;
 
   final Map<String, dynamic> Function(T t) _entryToJson;
   final Future<List<T>> Function(Api api) _refreshEntries;
 
   /// Entries in the cache.
   final List<T> entries;
+
+  final String? _path;
+
+  /// The file system to use.
+  final FileSystem? _fs;
 
   /// Number of requests between checks to ensure entries are up to date.
   final int checkEvery;
@@ -65,13 +75,47 @@ class ResponseListCache<T> {
       return;
     }
     logger.warn('$T list changed, updating cache.');
-    update(newEntries);
+    await update(newEntries);
   }
 
   /// Updates the entries in the cache.
-  void update(List<T> newEntries) {
+  Future<void> update(List<T> newEntries) async {
     entries
       ..clear()
       ..addAll(newEntries);
+  }
+
+  static List<T> _parseEntries<T>(
+    String contents,
+    T Function(Map<String, dynamic>) entryFromJson,
+  ) {
+    final parsed = jsonDecode(contents) as List<dynamic>;
+    return parsed
+        .map<T>(
+          (e) => entryFromJson(e as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
+  /// Load entries from a file.
+  static Future<List<R>> load<R>(
+    FileSystem fs,
+    String path,
+    R Function(Map<String, dynamic>) entryFromJson,
+  ) async {
+    final file = fs.file(path);
+    if (await file.exists()) {
+      return _parseEntries<R>(await file.readAsString(), entryFromJson);
+    }
+    return <R>[];
+  }
+
+  /// Saves the entries to disk.
+  Future<void> save() async {
+    if (_path == null || _fs == null) {
+      return;
+    }
+    final file = _fs!.file(_path);
+    await file.writeAsString(jsonEncode(entries.map(_entryToJson).toList()));
   }
 }

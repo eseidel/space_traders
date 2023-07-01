@@ -24,7 +24,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   final purchaseResponse =
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
   final data = purchaseResponse!.data;
-  shipCache.updateShip(data.ship);
+  await shipCache.updateShip(data.ship);
   agentCache.updateAgent(data.agent);
   return data;
 }
@@ -93,7 +93,7 @@ Future<DeliverContract200ResponseData> deliverContract(
   final response = await api.contracts
       .deliverContract(contract.id, deliverContractRequest: request);
   final data = response!.data;
-  contractCache.updateContract(data.contract);
+  await contractCache.updateContract(data.contract);
   ship.cargo = data.cargo;
   return data;
 }
