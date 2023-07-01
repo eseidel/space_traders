@@ -324,8 +324,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
   //    endSymbol: 'X1-YU85-07121B', expectedTime: Duration(seconds: 25)),
   // ]
 
-  // ETHEREAL only connects to 2 systems, so it will always be quick to test.
-  final faction = factionCache.factionBySymbol(FactionSymbols.ETHEREAL);
+  // SHADOW only connects to 2 systems, so it will always be quick to test.
+  final faction = factionCache.factionBySymbol(FactionSymbols.SHADOW);
   final hqSymbol = faction.headquarters;
   final hq = systemsCache.waypointFromSymbol(hqSymbol);
   final connectedSystems = systemsCache.connectedSystems(hq.systemSymbol);
