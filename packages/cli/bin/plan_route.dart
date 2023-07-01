@@ -1,8 +1,10 @@
+import 'package:args/args.dart';
 import 'package:cli/cache/caches.dart';
-import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/route.dart';
 import 'package:collection/collection.dart';
+import 'package:file/local.dart';
+import 'package:scoped/scoped.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440
 // Planned route from X1-CX76-69886Z to X1-XH63-75510F under fuel: 1200
@@ -44,13 +46,13 @@ class RouteAction {
     required this.endSymbol,
     required this.type,
     required this.duration,
-    required this.cooldown,
+    // required this.cooldown,
   });
   final String startSymbol;
   final String endSymbol;
   final RouteActionType type;
   final int duration;
-  final int cooldown;
+  // final int cooldown;
 }
 
 typedef WaypointSymbol = String;
@@ -65,6 +67,9 @@ class RoutePlan {
   final int fuelCapacity;
   final int shipSpeed;
   final List<RouteAction> actions;
+
+  String get startSymbol => actions.first.startSymbol;
+  String get endSymbol => actions.last.endSymbol;
 }
 
 Iterable<WaypointSymbol> _neighborsFor(
@@ -174,6 +179,7 @@ RoutePlan? planRoute(
     }
   }
   if (cameFrom[end.symbol] == null) {
+    logger.info("cameFrom doesn't contain end");
     return null;
   }
 
@@ -189,14 +195,12 @@ RoutePlan? planRoute(
       currentWaypoint,
       shipSpeed: shipSpeed,
     );
-    const cooldown = 0;
     route.add(
       RouteAction(
         startSymbol: previous,
         endSymbol: current,
         type: RouteActionType.navCruise,
         duration: duration,
-        cooldown: cooldown,
       ),
     );
     current = previous;
@@ -209,31 +213,55 @@ RoutePlan? planRoute(
   );
 }
 
-void main(List<String> args) async {
-  await run(args, command);
+String describeRoutePlan(RoutePlan plan) {
+  final buffer = StringBuffer()
+    ..writeln('Route ${plan.startSymbol} to ${plan.endSymbol} '
+        'speed: ${plan.shipSpeed} max-fuel: ${plan.fuelCapacity}');
+  for (final action in plan.actions) {
+    buffer.writeln('${action.type.name.padRight(14)}  ${action.startSymbol}  '
+        '${action.endSymbol}  '
+        '${action.duration}s');
+  }
+  buffer.writeln(
+    'Total duration ${plan.actions.fold<int>(0, (a, b) => a + b.duration)}s',
+  );
+  return buffer.toString();
 }
 
-Future<void> command(FileSystem fs, Api api, Caches caches) async {
-  final systemsCache = await SystemsCache.load(
-    fs,
-    cacheFilePath: 'backups/6-24-23/systems.json',
+Future<R> runOffline<R>(
+  List<String> args,
+  Future<R> Function(FileSystem fs) fn,
+) async {
+  final parser = ArgParser()
+    ..addFlag(
+      'verbose',
+      abbr: 'v',
+      help: 'Verbose logging',
+      negatable: false,
+    );
+  final results = parser.parse(args);
+  if (results['verbose'] as bool) {
+    setVerboseLogging();
+  }
+  const fs = LocalFileSystem();
+  return runScoped(
+    () async {
+      return fn(fs);
+    },
+    values: {loggerRef},
   );
-  const startSymbol = 'X1-CX76-69886Z';
-  const endSymbol = 'X1-XH63-75510F';
-  // const fuelLimit = 1200;
-  // const shipSpeed = 30;
-  // const canWarp = false;
+}
 
-  // Always optimize for time right now?
-  // Ignoring warps for now.
+void main(List<String> args) async {
+  await runOffline(args, command);
+}
 
-  final start = systemsCache.waypointFromSymbol(startSymbol);
-  final end = systemsCache.waypointFromSymbol(endSymbol);
-
-  logger
-    ..info(start.toString())
-    ..info(end.toString());
-
+void planRouteAndLog(
+  SystemsCache systemsCache,
+  SystemWaypoint start,
+  SystemWaypoint end,
+) {
+  final routeStart = DateTime.now();
   final plan = planRoute(
     systemsCache,
     start: start,
@@ -241,9 +269,94 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     fuelCapacity: 1200,
     shipSpeed: 30,
   );
+  final routeEnd = DateTime.now();
+  final duration = routeEnd.difference(routeStart);
   if (plan == null) {
-    logger.err('No route found');
-    return;
+    logger.err('No route found (${duration.inMilliseconds}ms)');
+  } else {
+    logger
+      ..info('Route found (${duration.inMilliseconds}ms)')
+      ..info(describeRoutePlan(plan));
   }
-  logger.info(plan.actions.toString());
+}
+
+class RouteTest {
+  const RouteTest({
+    required this.startSymbol,
+    required this.endSymbol,
+    required this.expectedTime,
+    this.fuelCapacity = 1200,
+    this.shipSpeed = 30,
+  });
+  final String startSymbol;
+  final String endSymbol;
+  final int fuelCapacity;
+  final int shipSpeed;
+  final Duration expectedTime;
+}
+
+Future<void> command(FileSystem fs) async {
+  // final systemsCache = await SystemsCache.load(fs
+  //   cacheFilePath: 'backups/6-24-23/systems.json',
+  // );
+  // const startSymbol = 'X1-CX76-69886Z';
+  // const endSymbol = 'X1-XH63-75510F';
+  // const fuelLimit = 1200;
+  // const shipSpeed = 30;
+  // const canWarp = false;
+
+  // Always optimize for time right now?
+  // Ignoring warps for now.
+
+  // final start = systemsCache.waypointFromSymbol(startSymbol);
+  // final end = systemsCache.waypointFromSymbol(endSymbol);
+  // logger
+  //   ..info(start.toString())
+  //   ..info(end.toString());
+
+  // final plan = planRoute(
+  //   systemsCache,
+  //   start: start,
+  //   end: end,
+  //   fuelCapacity: 1200,
+  //   shipSpeed: 30,
+  // );
+  // if (plan == null) {
+  //   logger.err('No route found');
+  //   return;
+  // }
+  // logger.info(plan.actions.toString());
+
+  final systemsCache = await SystemsCache.load(fs);
+  final factionCache = FactionCache.loadFromCache(fs)!;
+  final factions = factionCache.factions;
+  // final startTime = DateTime.now();
+  // // Plan routes between each pair of faction headquarters.
+  // for (var i = 0; i < factions.length; i++) {
+  //   final faction = factions[i];
+  //   final nextFaction = factions[(i + 1) % factions.length];
+  //   final hqSymbol = faction.headquarters;
+  //   final nextHqSymbol = nextFaction.headquarters;
+  //   final hq = systemsCache.waypointFromSymbol(hqSymbol);
+  //   final nextHq = systemsCache.waypointFromSymbol(nextHqSymbol);
+  //   logger.info('Routing from ${faction.symbol} ($hqSymbol) to '
+  //       '${nextFaction.symbol} ($nextHqSymbol)');
+  //   planRouteAndLog(systemsCache, hq, nextHq);
+  // }
+  // final endTime = DateTime.now();
+  // logger.info('Total time: ${endTime.difference(startTime)}');
+
+  // final tests = [
+  //   const RouteTest(startSymbol: 'X1-YU85-99640B',
+  //    endSymbol: 'X1-YU85-07121B', expectedTime: Duration(seconds: 25)),
+  // ]
+
+  final faction = factions.first;
+  final hqSymbol = faction.headquarters;
+  final hq = systemsCache.waypointFromSymbol(hqSymbol);
+  final connectedSystems = systemsCache.connectedSystems(hq.systemSymbol);
+  final connectedSystemWaypoints =
+      systemsCache.waypointsInSystem(connectedSystems.first.symbol);
+  final nearbyWaypoint = connectedSystemWaypoints.first;
+  planRouteAndLog(systemsCache, hq, nearbyWaypoint);
 }
