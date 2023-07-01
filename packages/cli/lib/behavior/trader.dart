@@ -495,7 +495,7 @@ Future<DateTime?> advanceTrader(
       ship,
       Behavior.trader,
       'No profitable deals within $maxJumps jumps of ${ship.nav.systemSymbol}.',
-      const Duration(hours: 1),
+      const Duration(minutes: 20),
     );
     return null;
   }
