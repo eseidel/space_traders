@@ -35,10 +35,10 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
 
   // This should be connectedSystemsWithinJumpRangeFromSystem or similar.
   final startingSystem = caches.systems.systemBySymbol(startSystem);
-  final jumpGate = await caches.waypoints.jumpGateForSystem(startSystem);
+  final connectedSystems = caches.systems.connectedSystems(startSystem);
   final systemChoices = [
     connectedSystemFromSystem(startingSystem, 0),
-    ...jumpGate!.connectedSystems,
+    ...connectedSystems
   ];
 
   final destSystem = logger.chooseOne(

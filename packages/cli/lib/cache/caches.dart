@@ -84,18 +84,22 @@ class Caches {
     final agent = await AgentCache.load(api);
     final prices = await MarketPrices.load(fs);
     // Intentionally do not load ships from disk (they change too often).
-    final ships = await ShipCache.load(api);
+    final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
     final shipyard = await ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);
     final systems = await SystemsCache.load(fs);
     final transactions = await TransactionLog.load(fs);
     final waypoints = WaypointCache(api, systems);
     final markets = MarketCache(waypoints);
-    // Intentionally do not load contracts from disk (we could?).
-    final contracts = await ContractCache.load(api);
+    // Intentionally force refresh contracts in case we've been offline.
+    final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);
     final behaviors = await BehaviorCache.load(fs);
     // Intentionally load factions from disk (they never change).
     final factions = await FactionCache.load(api, fs: fs);
+
+    // Save out the caches we never modify so we don't have to load them again.
+    await factions.save();
+
     return Caches._(
       agent: agent,
       marketPrices: prices,

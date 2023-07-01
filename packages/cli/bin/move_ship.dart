@@ -37,13 +37,13 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
 
   final startSystemSymbol = ship.nav.systemSymbol;
   final startingSystem = caches.systems.systemBySymbol(startSystemSymbol);
-  final jumpGate = await caches.waypoints.jumpGateForSystem(startSystemSymbol);
+  final connectedSystems = caches.systems.connectedSystems(startSystemSymbol);
   final jumpGateWaypoint =
       caches.systems.jumpGateWaypointForSystem(startSystemSymbol);
 
   final systemChoices = [
     connectedSystemFromSystem(startingSystem, 0),
-    ...jumpGate!.connectedSystems,
+    ...connectedSystems
   ];
 
   final destSystem = logger.chooseOne(

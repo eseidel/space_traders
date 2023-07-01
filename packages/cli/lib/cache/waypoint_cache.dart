@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
 
@@ -15,31 +14,22 @@ Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
 /// Stores Waypoint objects fetched recently from the API.
 class WaypointCache {
   /// Create a new WaypointCache.
-  WaypointCache(
-    this._api,
-    this._systemsCache, {
-    this.ensureCacheMatchesServer = false,
-  });
+  WaypointCache(this._api, this._systemsCache);
 
   Waypoint? _agentHeadquarters;
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
-  final Map<String, JumpGate?> _jumpGatesBySystem = {};
   final Api _api;
   final SystemsCache _systemsCache;
 
-  // TODO(eseidel): This should not exist.
+  // TODO(eseidel): This should not exist.  This should instead work like
+  // the marketCache, where callers request with a given desired freshness.
+  // Also, once a waypoint has been charted, it never changes.
   /// Used to reset part of the WaypointsCache every loop.
   void resetForLoop() {
-    // _agentHeadquarters = null;
     _waypointsBySystem.clear();
-    // _connectedSystemsBySystem.clear();
-    // _jumpGatesBySystem.clear();
+    // agentHeadquarters, connectedSystems, and jumpGates don't ever change.
   }
-
-  /// True if the WaypointCache should ensure that the SystemsCache matches
-  /// the server
-  final bool ensureCacheMatchesServer;
 
   /// Fetch the agent's headquarters.
   // Not sure this belongs on waypointCache, but should be cached somewhere.
@@ -91,37 +81,6 @@ class WaypointCache {
     }
   }
 
-  Future<void> _ensureCacheMatchesServer(String systemSymbol) async {
-    assertIsSystemSymbol(systemSymbol);
-    if (!ensureCacheMatchesServer) {
-      return;
-    }
-    void logSystems(List<ConnectedSystem> systems) {
-      for (final system in systems) {
-        logger.info('  ${system.symbol} - ${system.distance}');
-      }
-    }
-
-    final cachedSystems = _connectedSystemsBySystem[systemSymbol];
-    if (cachedSystems != null) {
-      final jumpGate = await jumpGateForSystem(systemSymbol);
-      final serverSystems =
-          jumpGate == null ? <ConnectedSystem>[] : jumpGate.connectedSystems;
-      // This equality seems too aggressive.
-      if (!const DeepCollectionEquality().equals(
-        cachedSystems,
-        serverSystems,
-      )) {
-        logger
-          ..err('SystemCache connectedSystems do not match server:')
-          ..info('SystemCache:');
-        logSystems(cachedSystems);
-        logger.info('Server:');
-        logSystems(serverSystems);
-      }
-    }
-  }
-
   /// Return all connected systems in the given system.
   Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
     assertIsSystemSymbol(systemSymbol);
@@ -130,7 +89,6 @@ class WaypointCache {
     if (cachedSystems == null) {
       cachedSystems = _systemsCache.connectedSystems(systemSymbol);
       _connectedSystemsBySystem[systemSymbol] = cachedSystems;
-      await _ensureCacheMatchesServer(systemSymbol);
     }
     for (final system in cachedSystems) {
       yield system;
@@ -147,23 +105,6 @@ class WaypointCache {
   Future<List<Waypoint>> marketWaypointsForSystem(String systemSymbol) async {
     final waypoints = await waypointsInSystem(systemSymbol);
     return waypoints.where((w) => w.hasMarketplace).toList();
-  }
-
-  /// Fetch the jump gate for the given system, or null if there is no jump
-  /// gate.
-  Future<JumpGate?> jumpGateForSystem(String systemSymbol) async {
-    if (_jumpGatesBySystem.containsKey(systemSymbol)) {
-      return _jumpGatesBySystem[systemSymbol];
-    }
-    final jumpGateWaypoint =
-        _systemsCache.jumpGateWaypointForSystem(systemSymbol);
-    if (jumpGateWaypoint == null) {
-      _jumpGatesBySystem[systemSymbol] = null;
-      return null;
-    }
-    final jumpGate = await getJumpGate(_api, jumpGateWaypoint);
-    _jumpGatesBySystem[systemSymbol] = jumpGate;
-    return jumpGate;
   }
 
   /// Yields a stream of Waypoints that are within n jumps of the given system.
@@ -198,7 +139,10 @@ class MarketCache {
   final Map<String, Market?> _marketsBySymbol = {};
   final WaypointCache _waypointCache;
 
-  // TODO(eseidel): This should not exist.
+  // TODO(eseidel): This should not exist.  Callers should instead distinguish
+  // between if they want market trade data (which is only availble when
+  // a ship is in orbit).  If they don't, we shouldn't ever return it
+  // and if we do, we should always fetch from the server.
   /// Used to reset part of the MarketCache every loop over the ships.
   void resetForLoop() {
     _marketsBySymbol.clear();

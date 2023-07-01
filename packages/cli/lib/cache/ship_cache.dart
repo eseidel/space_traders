@@ -22,14 +22,17 @@ class ShipCache extends ResponseListCache<Ship> {
     Api api, {
     FileSystem? fs,
     String path = defaultPath,
+    bool forceRefresh = false,
   }) async {
-    if (fs != null && await fs.isFile(path)) {
-      final ships = await ResponseListCache.load<Ship>(
+    if (!forceRefresh && fs != null) {
+      final ships = ResponseListCache.load<Ship>(
         fs,
         path,
         (j) => Ship.fromJson(j)!,
       );
-      return ShipCache(ships, fs: fs, path: path);
+      if (ships != null) {
+        return ShipCache(ships, fs: fs, path: path);
+      }
     }
     final ships = await allMyShips(api).toList();
     return ShipCache(ships, fs: fs, path: path);

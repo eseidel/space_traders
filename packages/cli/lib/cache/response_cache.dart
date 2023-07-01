@@ -98,16 +98,16 @@ class ResponseListCache<T> {
   }
 
   /// Load entries from a file.
-  static Future<List<R>> load<R>(
+  static List<R>? load<R>(
     FileSystem fs,
     String path,
     R Function(Map<String, dynamic>) entryFromJson,
-  ) async {
+  ) {
     final file = fs.file(path);
-    if (await file.exists()) {
-      return _parseEntries<R>(await file.readAsString(), entryFromJson);
+    if (!file.existsSync()) {
+      return null;
     }
-    return <R>[];
+    return _parseEntries<R>(file.readAsStringSync(), entryFromJson);
   }
 
   /// Saves the entries to disk.

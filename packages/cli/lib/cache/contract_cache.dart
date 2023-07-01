@@ -21,14 +21,17 @@ class ContractCache extends ResponseListCache<Contract> {
     Api api, {
     FileSystem? fs,
     String path = defaultPath,
+    bool forceRefresh = false,
   }) async {
-    if (fs != null && await fs.isFile(path)) {
-      final contracts = await ResponseListCache.load<Contract>(
+    if (!forceRefresh && fs != null) {
+      final contracts = ResponseListCache.load<Contract>(
         fs,
         path,
         (j) => Contract.fromJson(j)!,
       );
-      return ContractCache(contracts, fs: fs, path: path);
+      if (contracts != null) {
+        return ContractCache(contracts, fs: fs, path: path);
+      }
     }
     final contracts = await allMyContracts(api).toList();
     return ContractCache(contracts, fs: fs, path: path);

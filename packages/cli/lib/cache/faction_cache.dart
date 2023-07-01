@@ -17,19 +17,38 @@ class FactionCache extends ResponseListCache<Faction> {
           refreshEntries: (Api api) => getAllFactions(api).toList(),
         );
 
+  /// Creates a new FactionCache from the cache if possible.
+  static FactionCache? loadFromCache(
+    FileSystem fs, {
+    String path = defaultPath,
+  }) {
+    final factions = ResponseListCache.load<Faction>(
+      fs,
+      path,
+      (j) => Faction.fromJson(j)!,
+    );
+    if (factions == null) {
+      return null;
+    }
+    return FactionCache(factions, fs: fs, path: path);
+  }
+
   /// Creates a new FactionCache from the Api or FileSystem if provided.
   static Future<FactionCache> load(
     Api api, {
     FileSystem? fs,
     String path = defaultPath,
+    bool forceRefresh = false,
   }) async {
-    if (fs != null && await fs.isFile(path)) {
-      final factions = await ResponseListCache.load<Faction>(
+    if (!forceRefresh && fs != null && await fs.isFile(path)) {
+      final factions = ResponseListCache.load<Faction>(
         fs,
         path,
         (j) => Faction.fromJson(j)!,
       );
-      return FactionCache(factions, fs: fs, path: path);
+      if (factions != null) {
+        return FactionCache(factions, fs: fs, path: path);
+      }
     }
     final factions = await getAllFactions(api).toList();
     return FactionCache(factions, fs: fs, path: path);
