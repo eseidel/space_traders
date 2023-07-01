@@ -15,13 +15,7 @@ Future<void> advanceShips(
   ShipWaiter waiter, {
   bool Function(Ship ship)? shipFilter,
 }) async {
-  // WaypointCache and MarketCache only live for one loop over the ships.
-  caches.waypoints.resetForLoop();
-  caches.markets.resetForLoop();
-
-  await caches.ships.ensureShipsUpToDate(api);
-  await caches.agent.ensureAgentUpToDate(api);
-
+  await caches.updateAtTopOfLoop(api);
   waiter.updateForShips(caches.ships.ships);
 
   final shipSymbols = caches.ships.shipSymbols;
@@ -53,12 +47,10 @@ Future<void> advanceShips(
         // Was not a reactor cooldown, just rethrow.
         rethrow;
       }
-      final difference = expiration.difference(DateTime.now());
+      final difference = expiration.difference(DateTime.timestamp());
       shipInfo(ship, '🥶 for ${durationString(difference)}');
       waiter.updateWaitUntil(shipSymbol, expiration);
     }
-    // This assumes that advanceShipBehavior updated the passed in ship.
-    caches.ships.updateShip(ship);
   }
 }
 

@@ -100,4 +100,21 @@ class Caches {
       behaviors: behaviors,
     );
   }
+
+  /// Update the caches at the top of the loop.
+  Future<void> updateAtTopOfLoop(Api api) async {
+    // WaypointCache and MarketCache only live for one loop over the ships.
+    waypoints.resetForLoop();
+    markets.resetForLoop();
+
+    // This check races with the code in continueNavigationIfNeeded which
+    // knows how to update the ShipNavStatus from IN_TRANSIT to IN_ORBIT when
+    // a ship has arrived.  We could add some special logic here to ignore
+    // that false positive.  This check is called at the top of every loop
+    // and might notice that a ship has arrived before the ship logic gets
+    // to run and update the status.
+    await ships.ensureUpToDate(api);
+    await contracts.ensureUpToDate(api);
+    await agent.ensureAgentUpToDate(api);
+  }
 }

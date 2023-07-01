@@ -58,10 +58,9 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   );
 
   logger.info('Purchasing $shipType.');
-  final shipCache = ShipCache(ships);
   final purchaseResponse = await purchaseShip(
     api,
-    shipCache,
+    caches.ships,
     caches.agent,
     shipyard.symbol,
     shipType,

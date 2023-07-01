@@ -1,76 +1,23 @@
-import 'dart:convert';
-
 import 'package:cli/api.dart';
-import 'package:cli/logger.dart';
+import 'package:cli/cache/response_cache.dart';
 import 'package:cli/net/queries.dart';
-import 'package:cli/third_party/compare.dart';
-
-bool _shipListsMatch(List<Ship> actual, List<Ship> expected) {
-  if (actual.length != expected.length) {
-    logger.info(
-      "Ship list lengths don't match: ${actual.length} != ${expected.length}",
-    );
-    return false;
-  }
-
-  for (var i = 0; i < actual.length; i++) {
-    final diff = findDifferenceBetweenStrings(
-      jsonEncode(actual[i].toJson()),
-      jsonEncode(expected[i].toJson()),
-    );
-    if (diff != null) {
-      logger.info('Ship list differs at index $i: ${diff.which}');
-      return false;
-    }
-  }
-  return true;
-}
 
 /// In-memory cache of ships.
 // Should this just be called Fleet?
-class ShipCache {
+class ShipCache extends ResponseListCache<Ship> {
   /// Creates a new ship cache.
-  ShipCache(this.ships, {this.requestsBetweenChecks = 100});
+  ShipCache(super.ships, {super.checkEvery = 100})
+      : super(
+          entryToJson: (s) => s.toJson(),
+          refreshEntries: (Api api) => allMyShips(api).toList(),
+        );
 
   /// Creates a new ShipCache from the API.
   static Future<ShipCache> load(Api api) async =>
       ShipCache(await allMyShips(api).toList());
 
   /// Ships in the cache.
-  final List<Ship> ships;
-
-  /// Number of requests between checks to ensure ships are up to date.
-  final int requestsBetweenChecks;
-
-  int _requestsSinceLastCheck = 0;
-
-  /// Ensures the ships in the cache are up to date.
-  Future<void> ensureShipsUpToDate(Api api) async {
-    _requestsSinceLastCheck++;
-    if (_requestsSinceLastCheck < requestsBetweenChecks) {
-      return;
-    }
-    final newShips = await allMyShips(api).toList();
-    _requestsSinceLastCheck = 0;
-    // This check races with the code in continueNavigationIfNeeded which
-    // knows how to update the ShipNavStatus from IN_TRANSIT to IN_ORBIT when
-    // a ship has arrived.  We could add some special logic here to ignore
-    // that false positive.  This check is called at the top of every loop
-    // and might notice that a ship has arrived before the ship logic gets
-    // to run and update the status.
-    if (_shipListsMatch(ships, newShips)) {
-      return;
-    }
-    logger.warn('Ship list changed, updating cache.');
-    updateShips(newShips);
-  }
-
-  /// Updates the ships in the cache.
-  void updateShips(List<Ship> newShips) {
-    ships
-      ..clear()
-      ..addAll(newShips);
-  }
+  List<Ship> get ships => entries;
 
   /// Updates a single ship in the cache.
   void updateShip(Ship ship) {
