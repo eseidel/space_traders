@@ -355,7 +355,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   final response =
       await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
   ship.nav = response!.data.nav;
-  shipInfo(ship, 'Used Jump Gate to $systemSymbol');
+  shipDetail(ship, 'Used Jump Gate to $systemSymbol');
   return response.data;
 }
 

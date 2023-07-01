@@ -88,7 +88,7 @@ Then modified:
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
-* Compute earnings per hour per ship.
+* Use recent earnings-per-second in ship behavior planning.
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
 * Add logic for buying and mounting modules.
@@ -124,9 +124,12 @@ Automation:
 * Need logic for planning which faction to be (random)?
 * Logic for planning what to do with money (e.g. buy ships, by mods)
   Should disable buying behavior for less time early on?
-* When to enable which behaviors?
 * Surveys.  How much surveying should we do before we start mining?
-* Need the ability to disable behaviors on a per-ship-level.
+* Add the ability to "queue" behaviors, so that when a ship pulls its next
+  behavior it can pull from the queue.  This would allow us to queue a buyShip
+  for a ship which was otherwise busy at the moment, for example?
+* Teach ships when visiting ship-yards to ask the centralCommand if they
+  should buy a new ship and then do so.
 
 UI:
 * Make shipInfo include an emoji for the behavior.
