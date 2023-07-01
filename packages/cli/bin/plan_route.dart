@@ -67,87 +67,90 @@ class RoutePlan {
   final List<RouteAction> actions;
 }
 
+Iterable<WaypointSymbol> _neighborsFor(
+  SystemsCache systemsCache,
+  WaypointSymbol symbol,
+) sync* {
+  final waypoint = systemsCache.waypointFromSymbol(symbol);
+  // If we're currently at a jump gate, we can jump to any other jumpgate
+  // connected to this one.
+  if (waypoint.isJumpGate) {
+    final systems = systemsCache.connectedSystems(waypoint.systemSymbol);
+    for (final system in systems) {
+      yield systemsCache.jumpGateWaypointForSystem(system.symbol)!.symbol;
+    }
+  } else {
+    // Otherwise we can navigate to any other waypoint in this system.
+    // TODO(eseidel): This needs to enforce fuelCapacity.
+    final otherWaypoints =
+        systemsCache.waypointsInSystem(waypoint.systemSymbol);
+    for (final otherWaypoint in otherWaypoints) {
+      if (otherWaypoint.symbol != waypoint.symbol) {
+        yield otherWaypoint.symbol;
+      }
+    }
+  }
+  // We don't currently support warping.
+}
+
+int _approximateTimeBetween(
+  SystemsCache systemsCache,
+  SystemWaypoint a,
+  WaypointSymbol bSymbol,
+  int shipSpeed,
+) {
+  if (a.symbol == bSymbol) {
+    return 0;
+  }
+  final b = systemsCache.waypointFromSymbol(bSymbol);
+  if (a.systemSymbol == b.systemSymbol) {
+    return a.position.distanceTo(b.position) ~/ shipSpeed;
+  }
+  final aSystem = systemsCache.systemBySymbol(a.systemSymbol);
+  final aGate = aSystem.jumpGateWaypoint;
+  if (aGate == null) {
+    throw Exception('No jump gate in system ${a.systemSymbol}');
+  }
+  final bSystem = systemsCache.systemBySymbol(b.systemSymbol);
+  final bGate = bSystem.jumpGateWaypoint;
+  if (bGate == null) {
+    throw Exception('No jump gate in system ${b.systemSymbol}');
+  }
+  final systemDistance = aSystem.distanceTo(bSystem);
+  final aTimeToGate = a.distanceTo(aGate) ~/ shipSpeed;
+  final bTimeToGate = b.distanceTo(bGate) ~/ shipSpeed;
+  // Cooldown time for jumps is Math.min(60, distance / 10)
+  // distance / 10 is an approximation of the cooldown time for a jump gate.
+  // This assumes there are direct jumps in a line.
+  return aTimeToGate + bTimeToGate + systemDistance ~/ 10;
+}
+
+int _timeBetween(
+  SystemsCache systemsCache,
+  WaypointSymbol aSymbol,
+  WaypointSymbol bSymbol,
+  int shipSpeed,
+) {
+  if (aSymbol == bSymbol) {
+    return 0;
+  }
+  // TODO(eseidel): This should compute the exact travel time and likely
+  // return a RouteAction.
+  final a = systemsCache.waypointFromSymbol(aSymbol);
+  final b = systemsCache.waypointFromSymbol(bSymbol);
+  return _approximateTimeBetween(systemsCache, a, b.symbol, shipSpeed);
+}
+
 /// Plan a route between two waypoints.
 RoutePlan? planRoute(
-  SystemsCache systemCache, {
+  SystemsCache systemsCache, {
   required SystemWaypoint start,
   required SystemWaypoint end,
   required int fuelCapacity,
   required int shipSpeed,
 }) {
-// frontier = PriorityQueue()
-// frontier.put(start, 0)
-// came_from = dict()
-// cost_so_far = dict()
-// came_from[start] = None
-// cost_so_far[start] = 0
-
-// while not frontier.empty():
-//    current = frontier.get()
-
-//    if current == goal:
-//       break
-
-//    for next in graph.neighbors(current):
-//       new_cost = cost_so_far[current] + graph.cost(current, next)
-//       if next not in cost_so_far or new_cost < cost_so_far[next]:
-//          cost_so_far[next] = new_cost
-//          priority = new_cost + heuristic(goal, next)
-//          frontier.put(next, priority)
-//          came_from[next] = current
-
-  Iterable<WaypointSymbol> neighborsFor(WaypointSymbol symbol) sync* {
-    final waypoint = systemCache.waypointFromSymbol(symbol);
-    if (waypoint.isJumpGate) {
-      final systems = systemCache.connectedSystems(waypoint.systemSymbol);
-      for (final system in systems) {
-        yield systemCache.jumpGateWaypointForSystem(system.symbol)!.symbol;
-      }
-    } else {
-      final otherWaypoints =
-          systemCache.waypointsInSystem(waypoint.systemSymbol);
-      for (final otherWaypoint in otherWaypoints) {
-        if (otherWaypoint.symbol != waypoint.symbol) {
-          yield otherWaypoint.symbol;
-        }
-      }
-    }
-  }
-
-  int approximateTimeBetween(SystemWaypoint a, WaypointSymbol bSymbol) {
-    if (a.symbol == bSymbol) {
-      return 0;
-    }
-    final b = systemCache.waypointFromSymbol(bSymbol);
-    if (a.systemSymbol == b.systemSymbol) {
-      return a.position.distanceTo(b.position) ~/ shipSpeed;
-    }
-    final aSystem = systemCache.systemBySymbol(a.systemSymbol);
-    final aGate = aSystem.jumpGateWaypoint;
-    if (aGate == null) {
-      throw Exception('No jump gate in system ${a.systemSymbol}');
-    }
-    final bSystem = systemCache.systemBySymbol(b.systemSymbol);
-    final bGate = bSystem.jumpGateWaypoint;
-    if (bGate == null) {
-      throw Exception('No jump gate in system ${b.systemSymbol}');
-    }
-    final systemDistance = aSystem.distanceTo(bSystem);
-    final aTimeToGate = a.distanceTo(aGate) ~/ shipSpeed;
-    final bTimeToGate = b.distanceTo(bGate) ~/ shipSpeed;
-    // distance / 10 is an approximation of the cooldown time for a jump gate.
-    return aTimeToGate + bTimeToGate + systemDistance ~/ 10;
-  }
-
-  int timeBetween(WaypointSymbol aSymbol, WaypointSymbol bSymbol) {
-    if (aSymbol == bSymbol) {
-      return 0;
-    }
-    final a = systemCache.waypointFromSymbol(aSymbol);
-    final b = systemCache.waypointFromSymbol(bSymbol);
-    return approximateTimeBetween(a, b.symbol);
-  }
-
+  // This is A* search, thanks to
+  // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   final frontier = PriorityQueue<Element>((a, b) => a.$2.compareTo(b.$2))
     ..add((start.symbol, 0));
   final cameFrom = <WaypointSymbol, WaypointSymbol>{};
@@ -158,11 +161,13 @@ RoutePlan? planRoute(
     if (current.$1 == end.symbol) {
       break;
     }
-    for (final next in neighborsFor(current.$1)) {
-      final newCost = costSoFar[current.$1]! + timeBetween(current.$1, next);
+    for (final next in _neighborsFor(systemsCache, current.$1)) {
+      final newCost = costSoFar[current.$1]! +
+          _timeBetween(systemsCache, current.$1, next, shipSpeed);
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
-        final priority = newCost + approximateTimeBetween(end, next);
+        final priority = newCost +
+            _approximateTimeBetween(systemsCache, end, next, shipSpeed);
         frontier.add((next, priority));
         cameFrom[next] = current.$1;
       }
@@ -177,8 +182,8 @@ RoutePlan? planRoute(
   var current = end.symbol;
   while (current != start.symbol) {
     final previous = cameFrom[current]!;
-    final previousWaypoint = systemCache.waypointFromSymbol(previous);
-    final currentWaypoint = systemCache.waypointFromSymbol(current);
+    final previousWaypoint = systemsCache.waypointFromSymbol(previous);
+    final currentWaypoint = systemsCache.waypointFromSymbol(current);
     final duration = flightTimeWithinSystemInSeconds(
       previousWaypoint,
       currentWaypoint,

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 
@@ -74,6 +76,18 @@ int fuelUsedBetween(
   }
   return fuelUsedWithinSystem(a, aJumpGate) +
       fuelUsedWithinSystem(bJumpGate, b);
+}
+
+/// Returns the cooldown time after jumping between two systems.
+int cooldownTimeForJumpBetweenSystems(System a, System b) {
+  // This would need to check that this two are connected by a jumpgate.
+  final distance = a.distanceTo(b);
+  if (distance > 2000) {
+    throw ArgumentError(
+      'Distance ${a.symbol} to ${b.symbol} is too far $distance to jump.',
+    );
+  }
+  return min(60, distance ~/ 10);
 }
 
 /// Returns flight time in seconds between two waypoints.
