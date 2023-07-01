@@ -3,10 +3,10 @@ import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/miner.dart';
-import 'package:cli/behavior/navigation.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/navigation.dart';
 import 'package:cli/printing.dart';
 
 /// Advance the behavior of the given ship.

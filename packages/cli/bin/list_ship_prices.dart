@@ -2,13 +2,12 @@ import 'dart:math';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/shipyard_prices.dart';
+import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:file/local.dart';
-import 'package:scoped/scoped.dart';
+import 'package:file/file.dart';
 
-Future<void> cliMain() async {
-  const fs = LocalFileSystem();
+Future<void> command(FileSystem fs, List<String> args) async {
   final shipyardPrices = await ShipyardPrices.load(fs);
 
   logger.info(
@@ -32,5 +31,5 @@ Future<void> cliMain() async {
 }
 
 void main(List<String> args) async {
-  await runScoped(cliMain, values: {loggerRef});
+  await runOffline(args, command);
 }

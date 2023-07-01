@@ -59,4 +59,8 @@ class FactionCache extends ResponseListCache<Faction> {
 
   /// Factions in the cache.
   List<Faction> get factions => entries;
+
+  /// Gets the faction with the given symbol.
+  Faction factionBySymbol(FactionSymbols symbol) =>
+      factions.firstWhere((f) => f.symbol == symbol);
 }

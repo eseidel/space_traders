@@ -1,8 +1,8 @@
 import 'package:cli/cache/transactions.dart';
+import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:file/local.dart';
-import 'package:scoped/scoped.dart';
+import 'package:file/file.dart';
 
 double creditsPerMinute(
   TransactionLog transactions,
@@ -58,7 +58,7 @@ class ShipId implements Comparable<ShipId> {
   String toString() => symbol;
 }
 
-Future<void> cliMain(List<String> args) async {
+Future<void> command(FileSystem fs, List<String> args) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
   final lookbackMinutesString = args.firstOrNull;
@@ -66,7 +66,6 @@ Future<void> cliMain(List<String> args) async {
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  const fs = LocalFileSystem();
   final transactions = await TransactionLog.load(fs);
   final shipSymbols = transactions.shipSymbols;
   final shipIds = shipSymbols.map(ShipId.fromSymbol).toList()..sort();
@@ -94,5 +93,5 @@ Future<void> cliMain(List<String> args) async {
 }
 
 void main(List<String> args) async {
-  await runScoped(() => cliMain(args), values: {loggerRef});
+  await runOffline(args, command);
 }

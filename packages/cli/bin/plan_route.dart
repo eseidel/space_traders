@@ -1,10 +1,8 @@
-import 'package:args/args.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/route.dart';
+import 'package:cli/nav/route.dart';
 import 'package:collection/collection.dart';
-import 'package:file/local.dart';
-import 'package:scoped/scoped.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440
 // Planned route from X1-CX76-69886Z to X1-XH63-75510F under fuel: 1200
@@ -228,30 +226,6 @@ String describeRoutePlan(RoutePlan plan) {
   return buffer.toString();
 }
 
-Future<R> runOffline<R>(
-  List<String> args,
-  Future<R> Function(FileSystem fs) fn,
-) async {
-  final parser = ArgParser()
-    ..addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Verbose logging',
-      negatable: false,
-    );
-  final results = parser.parse(args);
-  if (results['verbose'] as bool) {
-    setVerboseLogging();
-  }
-  const fs = LocalFileSystem();
-  return runScoped(
-    () async {
-      return fn(fs);
-    },
-    values: {loggerRef},
-  );
-}
-
 void main(List<String> args) async {
   await runOffline(args, command);
 }
@@ -295,7 +269,7 @@ class RouteTest {
   final Duration expectedTime;
 }
 
-Future<void> command(FileSystem fs) async {
+Future<void> command(FileSystem fs, List<String> args) async {
   // final systemsCache = await SystemsCache.load(fs
   //   cacheFilePath: 'backups/6-24-23/systems.json',
   // );
@@ -329,7 +303,6 @@ Future<void> command(FileSystem fs) async {
 
   final systemsCache = await SystemsCache.load(fs);
   final factionCache = FactionCache.loadFromCache(fs)!;
-  final factions = factionCache.factions;
   // final startTime = DateTime.now();
   // // Plan routes between each pair of faction headquarters.
   // for (var i = 0; i < factions.length; i++) {
@@ -351,7 +324,8 @@ Future<void> command(FileSystem fs) async {
   //    endSymbol: 'X1-YU85-07121B', expectedTime: Duration(seconds: 25)),
   // ]
 
-  final faction = factions.first;
+  // ETHEREAL only connects to 2 systems, so it will always be quick to test.
+  final faction = factionCache.factionBySymbol(FactionSymbols.ETHEREAL);
   final hqSymbol = faction.headquarters;
   final hq = systemsCache.waypointFromSymbol(hqSymbol);
   final connectedSystems = systemsCache.connectedSystems(hq.systemSymbol);

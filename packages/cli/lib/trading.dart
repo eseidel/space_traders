@@ -6,8 +6,8 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
-import 'package:cli/route.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
