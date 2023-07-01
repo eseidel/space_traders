@@ -2,6 +2,7 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
+import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
@@ -15,6 +16,7 @@ export 'package:cli/api.dart';
 export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
+export 'package:cli/cache/faction_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
@@ -38,6 +40,7 @@ class Caches {
     required this.markets,
     required this.contracts,
     required this.behaviors,
+    required this.factions,
   });
 
   /// The agent cache.
@@ -73,10 +76,14 @@ class Caches {
   /// The cache of behaviors.
   final BehaviorCache behaviors;
 
+  /// The cache of factions.
+  final FactionCache factions;
+
   /// Load the cache from disk and network.
   static Future<Caches> load(FileSystem fs, Api api) async {
     final agent = await AgentCache.load(api);
     final prices = await MarketPrices.load(fs);
+    // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.load(api);
     final shipyard = await ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);
@@ -84,8 +91,11 @@ class Caches {
     final transactions = await TransactionLog.load(fs);
     final waypoints = WaypointCache(api, systems);
     final markets = MarketCache(waypoints);
+    // Intentionally do not load contracts from disk (we could?).
     final contracts = await ContractCache.load(api);
     final behaviors = await BehaviorCache.load(fs);
+    // Intentionally load factions from disk (they never change).
+    final factions = await FactionCache.load(api, fs: fs);
     return Caches._(
       agent: agent,
       marketPrices: prices,
@@ -98,6 +108,7 @@ class Caches {
       markets: markets,
       contracts: contracts,
       behaviors: behaviors,
+      factions: factions,
     );
   }
 

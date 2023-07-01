@@ -51,7 +51,9 @@ Future<void> cliMain(List<String> args) async {
   final caches = await Caches.load(fs, api);
   logger.info(
     'Loaded ${caches.marketPrices.count} prices from '
-    '${caches.marketPrices.waypointCount} markets.',
+    '${caches.marketPrices.waypointCount} markets and '
+    '${caches.shipyardPrices.count} prices from '
+    '${caches.shipyardPrices.waypointCount} shipyards.',
   );
   final centralCommand = CentralCommand(caches.behaviors, caches.ships);
 
