@@ -48,37 +48,6 @@ int flightTimeWithinSystemInSeconds(
   throw UnimplementedError('Unknown flight mode: $flightMode');
 }
 
-/// Returns the fuel cost to travel between two waypoints.
-/// This assumes the two waypoints are either within the same system
-/// or are connected by jump gates.
-int fuelUsedBetween(
-  SystemsCache systemsCache,
-  SystemWaypoint a,
-  SystemWaypoint b,
-) {
-  if (a.systemSymbol == b.systemSymbol) {
-    return fuelUsedWithinSystem(a, b);
-  }
-  // a -> jump gate
-  // jump N times
-// jump gate -> b
-  final aJumpGate = systemsCache.jumpGateWaypointForSystem(a.systemSymbol);
-  if (aJumpGate == null) {
-    throw ArgumentError(
-      'No jump gate for ${a.systemSymbol}',
-    );
-  }
-  // Ignoring if there is actually a path between the jump gates.
-  final bJumpGate = systemsCache.jumpGateWaypointForSystem(b.systemSymbol);
-  if (bJumpGate == null) {
-    throw ArgumentError(
-      'No jump gate for ${b.systemSymbol}',
-    );
-  }
-  return fuelUsedWithinSystem(a, aJumpGate) +
-      fuelUsedWithinSystem(bJumpGate, b);
-}
-
 /// Returns the cooldown time after jumping between two systems.
 int cooldownTimeForJumpBetweenSystems(System a, System b) {
   // This would need to check that this two are connected by a jumpgate.
@@ -89,53 +58,6 @@ int cooldownTimeForJumpBetweenSystems(System a, System b) {
     );
   }
   return min(60, distance ~/ 10);
-}
-
-/// Returns flight time in seconds between two waypoints.
-int flightTimeBetween(
-  SystemsCache systemsCache,
-  SystemWaypoint a,
-  SystemWaypoint b, {
-  required ShipNavFlightMode flightMode,
-  required int shipSpeed,
-}) {
-  if (a.systemSymbol == b.systemSymbol) {
-    return flightTimeWithinSystemInSeconds(
-      a,
-      b,
-      flightMode: flightMode,
-      shipSpeed: shipSpeed,
-    );
-  }
-  // a -> jump gate
-  // jump N times
-  // jump gate -> b
-  final aJumpGate = systemsCache.jumpGateWaypointForSystem(a.systemSymbol);
-  if (aJumpGate == null) {
-    throw ArgumentError(
-      'No jump gate for ${a.systemSymbol}',
-    );
-  }
-  // Ignoring if there is actually a path between the jump gates.
-  final bJumpGate = systemsCache.jumpGateWaypointForSystem(b.systemSymbol);
-  if (bJumpGate == null) {
-    throw ArgumentError(
-      'No jump gate for ${b.systemSymbol}',
-    );
-  }
-  // Assuming a and b are connected systems!
-  return flightTimeWithinSystemInSeconds(
-        a,
-        aJumpGate,
-        flightMode: flightMode,
-        shipSpeed: shipSpeed,
-      ) +
-      flightTimeWithinSystemInSeconds(
-        bJumpGate,
-        b,
-        flightMode: flightMode,
-        shipSpeed: shipSpeed,
-      );
 }
 
 /// Enum describing the type of action taken in a action in a route.
@@ -455,7 +377,7 @@ int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
     final end = action.endSymbol;
     final startWaypoint = systemsCache.waypointFromSymbol(start);
     final endWaypoint = systemsCache.waypointFromSymbol(end);
-    fuelUsed += fuelUsedBetween(systemsCache, startWaypoint, endWaypoint);
+    fuelUsed += fuelUsedWithinSystem(startWaypoint, endWaypoint);
   }
   return fuelUsed;
 }
