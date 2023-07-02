@@ -34,7 +34,7 @@ void main() {
     );
   });
 
-  test('planRouteFor', () {
+  test('planRoute', () {
     const fs = LocalFileSystem();
     final systemsCache = SystemsCache.loadFromCache(
       fs,
@@ -53,6 +53,9 @@ void main() {
       expect(route, isNotNull);
       expect(route!.duration, expectedSeconds);
     }
+
+    // Same place
+    expectRoute('X1-YU85-99640B', 'X1-YU85-99640B', 0);
 
     // Within one system
     expectRoute('X1-YU85-99640B', 'X1-YU85-07121B', 25);

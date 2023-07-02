@@ -163,6 +163,19 @@ class RouteAction {
     // required this.cooldown,
   });
 
+  /// Create a new route action from JSON.
+  factory RouteAction.fromJson(Map<String, dynamic> json) {
+    return RouteAction(
+      startSymbol: json['startSymbol'] as String,
+      endSymbol: json['endSymbol'] as String,
+      type: RouteActionType.values.firstWhere(
+        (e) => e.name == json['type'] as String,
+      ),
+      duration: json['duration'] as int,
+      // cooldown: json['cooldown'] as int,
+    );
+  }
+
   /// The symbol of the waypoint where this action starts.
   final String startSymbol;
 
@@ -175,6 +188,15 @@ class RouteAction {
   /// The duration of this action in seconds.
   final int duration;
   // final int cooldown;
+
+  /// Convert this action to JSON.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'startSymbol': startSymbol,
+        'endSymbol': endSymbol,
+        'type': type.name,
+        'duration': duration,
+        // 'cooldown': cooldown,
+      };
 }
 
 typedef _WaypointSymbol = String;
@@ -187,13 +209,35 @@ class RoutePlan {
     required this.fuelCapacity,
     required this.shipSpeed,
     required this.actions,
+    required this.fuelUsed,
   });
+
+  /// Create a new route plan from JSON.
+  factory RoutePlan.fromJson(Map<String, dynamic> json) {
+    return RoutePlan(
+      fuelCapacity: json['fuelCapacity'] as int,
+      shipSpeed: json['shipSpeed'] as int,
+      actions: (json['actions'] as List<dynamic>)
+          .map((e) => RouteAction.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      fuelUsed: json['fuelUsed'] as int,
+    );
+  }
+
+  /// Create an empty route plan.
+  @visibleForTesting
+  const RoutePlan.empty({required this.shipSpeed, required this.fuelCapacity})
+      : actions = const [],
+        fuelUsed = 0;
 
   /// The fuel capacity the route was planned for.
   final int fuelCapacity;
 
   /// The speed of the ship the route was planned for.
   final int shipSpeed;
+
+  /// The total fuel used during this route.
+  final int fuelUsed;
 
   /// The actions to take to travel between the two waypoints.
   final List<RouteAction> actions;
@@ -206,6 +250,14 @@ class RoutePlan {
 
   /// The total time of this route in seconds.
   int get duration => actions.fold<int>(0, (a, b) => a + b.duration);
+
+  /// Convert this route plan to JSON.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'fuelCapacity': fuelCapacity,
+        'shipSpeed': shipSpeed,
+        'actions': actions.map((e) => e.toJson()).toList(),
+        'fuelUsed': fuelUsed,
+      };
 }
 
 Iterable<_WaypointSymbol> _neighborsFor(
@@ -293,6 +345,15 @@ RoutePlan? planRoute(
   required int fuelCapacity,
   required int shipSpeed,
 }) {
+  if (start.symbol == end.symbol) {
+    return RoutePlan(
+      actions: const [],
+      fuelCapacity: fuelCapacity,
+      shipSpeed: 0,
+      fuelUsed: 0,
+    );
+  }
+
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   final frontier =
@@ -373,10 +434,69 @@ RoutePlan? planRoute(
     current = previous;
   }
 
+  final actions = route.reversed.toList();
+  final fuelUsed = _fuelUsedByActions(systemsCache, actions);
+
   return RoutePlan(
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
-    actions: route.reversed.toList(),
+    actions: actions,
+    fuelUsed: fuelUsed,
+  );
+}
+
+int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
+  var fuelUsed = 0;
+  for (final action in actions) {
+    if (action.type != RouteActionType.navCruise) {
+      continue;
+    }
+    final start = action.startSymbol;
+    final end = action.endSymbol;
+    final startWaypoint = systemsCache.waypointFromSymbol(start);
+    final endWaypoint = systemsCache.waypointFromSymbol(end);
+    fuelUsed += fuelUsedBetween(systemsCache, startWaypoint, endWaypoint);
+  }
+  return fuelUsed;
+}
+
+/// Plan a route through a series of waypoints.
+RoutePlan? planRouteThrough(
+  SystemsCache systemsCache,
+  List<String> waypointSymbols, {
+  required int fuelCapacity,
+  required int shipSpeed,
+}) {
+  if (waypointSymbols.length < 2) {
+    throw ArgumentError('Must have at least two waypoints');
+  }
+  final segments = <RoutePlan>[];
+  for (var i = 0; i < waypointSymbols.length - 1; i++) {
+    final start = systemsCache.waypointFromSymbol(waypointSymbols[i]);
+    final end = systemsCache.waypointFromSymbol(waypointSymbols[i + 1]);
+    final plan = planRoute(
+      systemsCache,
+      start: start,
+      end: end,
+      fuelCapacity: fuelCapacity,
+      shipSpeed: shipSpeed,
+    );
+    if (plan == null) {
+      return null;
+    }
+    segments.add(plan);
+  }
+  // Combine segments into a single plan.
+  final actions = <RouteAction>[];
+  for (final segment in segments) {
+    actions.addAll(segment.actions);
+  }
+  final fuelUsed = _fuelUsedByActions(systemsCache, actions);
+  return RoutePlan(
+    fuelCapacity: fuelCapacity,
+    shipSpeed: shipSpeed,
+    actions: actions,
+    fuelUsed: fuelUsed,
   );
 }
 

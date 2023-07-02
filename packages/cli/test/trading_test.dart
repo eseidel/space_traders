@@ -3,6 +3,7 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -20,6 +21,8 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
 
 void main() {
   test('MarketScan empty', () {
@@ -137,10 +140,11 @@ void main() {
     );
     final costed = CostedDeal(
       deal: deal,
-      expectedFuelCost: 1,
       tradeVolume: 1,
-      expectedTime: 1,
       transactions: [],
+      startTime: DateTime(2021),
+      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      costPerFuelUnit: 100,
     );
 
     final json = costed.toJson();
@@ -152,22 +156,22 @@ void main() {
 
   test('costOutDeal basic', () {
     final systemsCache = _MockSystemsCache();
-    when(() => systemsCache.waypointFromSymbol('X-S-A')).thenReturn(
-      SystemWaypoint(
-        symbol: 'X-S-A',
-        type: WaypointType.ASTEROID_FIELD,
-        x: 0,
-        y: 0,
-      ),
+    final start = SystemWaypoint(
+      symbol: 'X-S-A',
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
     );
-    when(() => systemsCache.waypointFromSymbol('X-S-B')).thenReturn(
-      SystemWaypoint(
-        symbol: 'X-S-B',
-        type: WaypointType.PLANET,
-        x: 0,
-        y: 0,
-      ),
+    final end = SystemWaypoint(
+      symbol: 'X-S-B',
+      type: WaypointType.PLANET,
+      x: 0,
+      y: 0,
     );
+    when(() => systemsCache.waypointFromSymbol('X-S-A')).thenReturn(start);
+    when(() => systemsCache.waypointFromSymbol('X-S-B')).thenReturn(end);
+    when(() => systemsCache.waypointsInSystem('X-S')).thenReturn([start, end]);
+
     const deal = Deal(
       sourceSymbol: 'X-S-A',
       destinationSymbol: 'X-S-B',
@@ -180,6 +184,9 @@ void main() {
       deal,
       cargoSize: 1,
       shipSpeed: 1,
+      shipFuelCapacity: 100,
+      shipWaypointSymbol: 'X-S-A',
+      costPerFuelUnit: 100,
     );
 
     /// These aren't very useful numbers, I don't think it takes 15s to fly
@@ -219,19 +226,20 @@ void main() {
         purchasePrice: 1,
         sellPrice: 2,
       ),
-      expectedFuelCost: 1,
       tradeVolume: 1,
-      expectedTime: 1,
       transactions: [],
+      startTime: DateTime(2021),
+      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      costPerFuelUnit: 100,
     );
     final profit = lightGreen.wrap('     +1c (100%)');
     expect(
       describeCostedDeal(costed),
-      'FUEL                       A       1c -> B       2c $profit 1s 0c/s 2c',
+      'FUEL                       A       1c -> B       2c $profit 0s 1c/s 1c',
     );
   });
 
-  test('findDealFor smoketest', () async {
+  test('findDealFor no markets', () async {
     final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
@@ -253,10 +261,118 @@ void main() {
         marketCache,
         ship,
         maxJumps: 1,
-        maxTotalOutlay: 100,
+        maxTotalOutlay: 100000,
         availableSpace: 10,
       ),
     );
     expect(costed, isNull);
+  });
+
+  test('findDealFor includes time to source', () async {
+    // findDealFor used to not consider time to get to the source system.
+    // which meant if there was a very far away system with a great deal
+    // we would try to do that, even if it took forever to get there and thus
+    // the profit per second was poor.
+    // S-A-A and S-A-B are close but have poor deals, S-A-C is far away but
+    // has a great deal, but we still choose S-A-B because it's faster and
+    // thus has a better profit per second.
+    final marketPrices = _MockMarketPrices();
+    final systemsCache = _MockSystemsCache();
+    final waypointCache = _MockWaypointCache();
+    final marketCache = _MockMarketCache();
+    final saa = SystemWaypoint(
+      symbol: 'S-A-A',
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+    );
+    final sab = SystemWaypoint(
+      symbol: 'S-A-B',
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+    );
+    final sac = SystemWaypoint(
+      symbol: 'S-A-C',
+      type: WaypointType.ASTEROID_FIELD,
+      x: 1000,
+      y: 1000,
+    );
+    final waypoints = [saa, sab, sac];
+    when(() => systemsCache.waypointFromSymbol('S-A-A')).thenReturn(saa);
+    when(() => systemsCache.waypointFromSymbol('S-A-B')).thenReturn(sab);
+    when(() => systemsCache.waypointFromSymbol('S-A-C')).thenReturn(sac);
+    when(() => systemsCache.waypointsInSystem('S-A')).thenReturn(waypoints);
+    final tradeGood =
+        TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
+    final marketA = Market(
+      symbol: 'S-A-A',
+      exchange: [tradeGood],
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: 'FUEL',
+          tradeVolume: 100,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 200,
+          sellPrice: 201,
+        )
+      ],
+    );
+    final marketB = Market(
+      symbol: 'S-A-B',
+      exchange: [tradeGood],
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: 'FUEL',
+          tradeVolume: 100,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 100,
+          sellPrice: 101,
+        )
+      ],
+    );
+    final marketC = Market(
+      symbol: 'S-A-C',
+      exchange: [tradeGood],
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: 'FUEL',
+          tradeVolume: 100,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 1000,
+          sellPrice: 1001,
+        )
+      ],
+    );
+    final markets = [marketA, marketB, marketC];
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    final shipEngine = _MockShipEngine();
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-A');
+    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.speed).thenReturn(30);
+    when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
+        .thenAnswer((_) => Stream.fromIterable(markets));
+
+    final logger = _MockLogger();
+    final costed = await runWithLogger(
+      logger,
+      () => findDealFor(
+        marketPrices,
+        systemsCache,
+        waypointCache,
+        marketCache,
+        ship,
+        maxJumps: 1,
+        maxTotalOutlay: 100000,
+        availableSpace: 1,
+      ),
+    );
+    expect(costed, isNotNull);
+    expect(costed?.expectedProfitPerSecond, 3);
+    expect(costed?.expectedProfit, 101);
   });
 }

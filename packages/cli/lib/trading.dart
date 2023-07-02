@@ -429,23 +429,27 @@ class CostedDeal {
   /// Create a new CostedDeal.
   CostedDeal({
     required this.deal,
-    required this.expectedFuelCost,
     required this.tradeVolume,
-    required this.expectedTime,
     required List<Transaction> transactions,
+    required this.startTime,
+    required this.route,
+    required this.costPerFuelUnit,
     this.contractId,
   }) : transactions = List.unmodifiable(transactions);
 
   /// Create a CostedDeal from JSON.
   factory CostedDeal.fromJson(Map<String, dynamic> json) => CostedDeal(
         deal: Deal.fromJson(json['deal'] as Map<String, dynamic>),
-        expectedFuelCost: json['expectedFuelCost'] as int,
         tradeVolume: json['tradeVolume'] as int,
-        expectedTime: json['expectedTime'] as int,
         contractId: json['contractId'] as String?,
+        startTime: json['startTime'] == null
+            ? null
+            : DateTime.parse(json['startTime'] as String),
+        route: RoutePlan.fromJson(json['route'] as Map<String, dynamic>),
         transactions: (json['transactions'] as List<dynamic>)
             .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
             .toList(),
+        costPerFuelUnit: json['costPerFuelUnit'] as int,
       );
 
   /// The id of the contract this deal is a part of.
@@ -466,17 +470,29 @@ class CostedDeal {
   /// The deal being considered.
   final Deal deal;
 
-  /// The units of fuel to travel between the two markets.
-  final int expectedFuelCost;
-
   /// The number of units of cargo to trade.  This must be less than or equal to
   /// the Deal.maxUnits (if set) and accounts for the specific cargo hold size
   /// of the ship for which we're costing this deal.
   // TODO(eseidel): Rename to maxUnits?
   final int tradeVolume;
 
+  /// The cost per unit of fuel used for computing expected fuel costs.
+  final int costPerFuelUnit;
+
+  /// The units of fuel to travel along the route.
+  int get expectedFuelUsed => route.fuelUsed;
+
+  /// The cost of fuel to travel along the route.
+  int get expectedFuelCost => (expectedFuelUsed / 100).ceil() * costPerFuelUnit;
+
   /// The time in seconds to travel between the two markets.
-  final int expectedTime;
+  int get expectedTime => route.duration;
+
+  /// The time at which this deal was started.
+  final DateTime? startTime;
+
+  /// The route taken to complete this deal.
+  final RoutePlan route;
 
   /// The transactions made as a part of executing this deal.
   // It's possible these should be stored separately and composed in
@@ -508,7 +524,12 @@ class CostedDeal {
   int get expectedProfit => deal.profit * tradeVolume - expectedFuelCost;
 
   /// The profit per second of the deal.
-  int get expectedProfitPerSecond => expectedProfit ~/ expectedTime;
+  int get expectedProfitPerSecond {
+    if (expectedTime < 1) {
+      return expectedProfit;
+    }
+    return expectedProfit ~/ expectedTime;
+  }
 
   /// The actual time taken to complete the deal.
   Duration get actualTime {
@@ -563,6 +584,9 @@ class CostedDeal {
         'expectedTime': expectedTime,
         'contractId': contractId,
         'transactions': transactions.map((e) => e.toJson()).toList(),
+        'startTime': startTime?.toIso8601String(),
+        'route': route.toJson(),
+        'costPerFuelUnit': costPerFuelUnit,
       };
 
   /// Copy this CostedDeal with the given fields replaced.
@@ -575,10 +599,11 @@ class CostedDeal {
   }) {
     return CostedDeal(
       deal: deal ?? this.deal,
-      expectedFuelCost: expectedFuelCost ?? this.expectedFuelCost,
       tradeVolume: tradeVolume ?? this.tradeVolume,
-      expectedTime: expectedTime ?? this.expectedTime,
       transactions: transactions ?? this.transactions,
+      startTime: startTime,
+      route: route,
+      costPerFuelUnit: costPerFuelUnit,
     );
   }
 
@@ -618,27 +643,30 @@ CostedDeal costOutDeal(
   Deal deal, {
   required int cargoSize,
   required int shipSpeed,
+  required String shipWaypointSymbol,
+  required int shipFuelCapacity,
+  required int costPerFuelUnit,
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
-  final source = systemsCache.waypointFromSymbol(deal.sourceSymbol);
-  final destination = systemsCache.waypointFromSymbol(deal.destinationSymbol);
+  final route = planRouteThrough(
+    systemsCache,
+    [shipWaypointSymbol, deal.sourceSymbol, deal.destinationSymbol],
+    fuelCapacity: shipFuelCapacity,
+    shipSpeed: shipSpeed,
+  );
+
+  if (route == null) {
+    throw Exception('No route found for $deal');
+  }
+
   return CostedDeal(
     deal: deal,
-    expectedFuelCost: fuelUsedBetween(
-      systemsCache,
-      source,
-      destination,
-    ),
-    expectedTime: flightTimeBetween(
-      systemsCache,
-      source,
-      destination,
-      flightMode: flightMode,
-      shipSpeed: shipSpeed,
-    ),
     tradeVolume:
         deal.maxUnits != null ? min(deal.maxUnits!, cargoSize) : cargoSize,
     transactions: [],
+    startTime: DateTime.timestamp(),
+    route: route,
+    costPerFuelUnit: costPerFuelUnit,
   );
 }
 
@@ -672,6 +700,10 @@ Future<CostedDeal?> findDealFor(
       systemsCache,
       deal,
       cargoSize: availableSpace,
+      shipWaypointSymbol: ship.nav.waypointSymbol,
+      shipFuelCapacity: ship.fuel.capacity,
+      costPerFuelUnit:
+          marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
     ),
   );
 

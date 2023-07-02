@@ -3,6 +3,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -227,10 +228,11 @@ void main() {
         purchasePrice: 10,
         sellPrice: 20,
       ),
-      expectedFuelCost: 0,
       tradeVolume: 10,
-      expectedTime: 10,
       transactions: [],
+      startTime: DateTime(2021),
+      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      costPerFuelUnit: 100,
     );
 
     final market = Market(
