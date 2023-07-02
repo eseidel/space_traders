@@ -17,6 +17,11 @@ void main() {
       ),
       0,
     );
+
+    expect(fuelUsedByDistance(10, ShipNavFlightMode.CRUISE), 10);
+    expect(fuelUsedByDistance(10, ShipNavFlightMode.DRIFT), 1);
+    expect(fuelUsedByDistance(10, ShipNavFlightMode.BURN), 20);
+    expect(fuelUsedByDistance(10, ShipNavFlightMode.STEALTH), 10);
   });
 
   test('flightTimeWithinSystemInSeconds', () {
@@ -31,6 +36,14 @@ void main() {
         shipSpeed: 30,
       ),
       15,
+    );
+
+    expect(flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.CRUISE), 16);
+    expect(flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.DRIFT), 20);
+    expect(flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.BURN), 15);
+    expect(
+      () => flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.STEALTH),
+      throwsUnimplementedError,
     );
   });
 
@@ -58,9 +71,9 @@ void main() {
     expectRoute('X1-YU85-99640B', 'X1-YU85-99640B', 0);
 
     // Within one system
-    expectRoute('X1-YU85-99640B', 'X1-YU85-07121B', 25);
+    expectRoute('X1-YU85-99640B', 'X1-YU85-07121B', 30);
     // Exactly one jump, jump duration doesn't matter since it doesn't stop
     // navigation.
-    expectRoute('X1-RG48-59920X', 'X1-TV72-74710F', 90);
+    expectRoute('X1-RG48-59920X', 'X1-TV72-74710F', 129);
   });
 }

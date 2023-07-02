@@ -4,13 +4,12 @@ import 'package:cli/cache/caches.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
-/// Returns the fuel cost to the given waypoint.
-int fuelUsedWithinSystem(
-  SystemWaypoint a,
-  SystemWaypoint b, {
-  ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
-}) {
-  final distance = a.distanceTo(b);
+// https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
+/// Returns the fuel used for with a flight mode and the given distance.
+int fuelUsedByDistance(
+  int distance,
+  ShipNavFlightMode flightMode,
+) {
   switch (flightMode) {
     case ShipNavFlightMode.DRIFT:
       return 1;
@@ -24,6 +23,43 @@ int fuelUsedWithinSystem(
   throw UnimplementedError('Unknown flight mode: $flightMode');
 }
 
+/// Returns the fuel cost to the given waypoint.
+int fuelUsedWithinSystem(
+  SystemWaypoint a,
+  SystemWaypoint b, {
+  ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
+}) {
+  final distance = a.distanceTo(b);
+  return fuelUsedByDistance(distance, flightMode);
+}
+
+double _speedMultiplier(ShipNavFlightMode flightMode) {
+  switch (flightMode) {
+    case ShipNavFlightMode.CRUISE:
+      return 15;
+    case ShipNavFlightMode.DRIFT:
+      return 150;
+    case ShipNavFlightMode.BURN:
+      return 7.5;
+    case ShipNavFlightMode.STEALTH:
+      throw UnimplementedError('STEALTH speed multiplier not implemented');
+  }
+  throw UnimplementedError('Unknown flight mode: $flightMode');
+}
+
+// https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
+/// Returns the flight time to the given distance.
+int flightTimeByDistanceAndSpeed(
+  double distance,
+  int shipSpeed,
+  ShipNavFlightMode flightMode,
+) {
+  return (distance.roundToDouble() *
+              (_speedMultiplier(flightMode) / shipSpeed) +
+          15)
+      .round();
+}
+
 /// Returns the flight time to the given waypoint.
 int flightTimeWithinSystemInSeconds(
   SystemWaypoint a,
@@ -31,21 +67,9 @@ int flightTimeWithinSystemInSeconds(
   required int shipSpeed,
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
-  // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
-  final distance = a.distanceTo(b);
-  final distanceBySpeed = distance ~/ shipSpeed;
-
-  switch (flightMode) {
-    case ShipNavFlightMode.DRIFT:
-      return 15 + 100 * distanceBySpeed;
-    case ShipNavFlightMode.STEALTH:
-      return 15 + 20 * distanceBySpeed;
-    case ShipNavFlightMode.CRUISE:
-      return 15 + 10 * distanceBySpeed;
-    case ShipNavFlightMode.BURN:
-      return 15 + 5 * distanceBySpeed;
-  }
-  throw UnimplementedError('Unknown flight mode: $flightMode');
+  // TODO(eseidel): We should move to double distances.
+  final distance = a.distanceTo(b).toDouble();
+  return flightTimeByDistanceAndSpeed(distance, shipSpeed, flightMode);
 }
 
 /// Returns the cooldown time after jumping between two systems.
@@ -271,7 +295,7 @@ RoutePlan? planRoute(
     return RoutePlan(
       actions: const [],
       fuelCapacity: fuelCapacity,
-      shipSpeed: 0,
+      shipSpeed: shipSpeed,
       fuelUsed: 0,
     );
   }
