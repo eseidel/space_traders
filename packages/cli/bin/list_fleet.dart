@@ -50,10 +50,31 @@ Duration timeToDestination(
   return time + Duration(seconds: route.duration);
 }
 
+String describeInventory(
+  MarketPrices marketPrices,
+  List<ShipCargoItem> inventory, {
+  String indent = '',
+}) {
+  final lines = <String>[];
+  for (final item in inventory) {
+    final symbol = item.symbol;
+    final count = item.units;
+    final price = marketPrices.medianSellPrice(symbol);
+    final priceString = price == null ? '???' : creditsString(price);
+    final valueString = price == null ? '???' : creditsString(price * count);
+    lines.add(
+      '$indent${symbol.padRight(23)} ${count.toString().padLeft(3)} x '
+      '${priceString.padRight(8)} = $valueString',
+    );
+  }
+  return lines.join('\n');
+}
+
 Future<void> command(FileSystem fs, List<String> args) async {
   final behaviorCache = await BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
   final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final marketPrices = await MarketPrices.load(fs);
 
   final centralCommand = CentralCommand(behaviorCache, shipCache);
   logger.info(describeFleet(shipCache));
@@ -63,6 +84,11 @@ Future<void> command(FileSystem fs, List<String> args) async {
     logger
       ..info('${ship.symbol}: ${behavior?.behavior}')
       ..info('  ${_shipStatusLine(ship, systemsCache)}');
+    if (ship.cargo.inventory.isNotEmpty) {
+      logger.info(
+        describeInventory(marketPrices, ship.cargo.inventory, indent: '  '),
+      );
+    }
     final destination = behavior?.destination;
     if (destination != null) {
       final timeToArrival = timeToDestination(systemsCache, ship, destination);
