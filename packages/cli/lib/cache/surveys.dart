@@ -84,11 +84,12 @@ class SurveyData extends JsonListStore<HistoricalSurvey> {
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) async {
-    final surveys = await JsonListStore.load<HistoricalSurvey>(
-      fs,
-      path,
-      HistoricalSurvey.fromJson,
-    );
+    final surveys = JsonListStore.load<HistoricalSurvey>(
+          fs,
+          path,
+          HistoricalSurvey.fromJson,
+        ) ??
+        [];
     return SurveyData(surveys: surveys, fs: fs, path: path);
   }
 

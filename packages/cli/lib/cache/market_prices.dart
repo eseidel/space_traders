@@ -137,11 +137,12 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) async {
-    final prices = await JsonListStore.load<MarketPrice>(
-      fs,
-      path,
-      MarketPrice.fromJson,
-    );
+    final prices = JsonListStore.load<MarketPrice>(
+          fs,
+          path,
+          MarketPrice.fromJson,
+        ) ??
+        [];
     return MarketPrices(prices, fs: fs, path: path);
   }
 

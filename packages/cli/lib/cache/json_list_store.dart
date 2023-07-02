@@ -44,15 +44,15 @@ class JsonListStore<Record> {
   }
 
   /// Load entries from a file.
-  static Future<List<R>> load<R>(
+  static List<R>? load<R>(
     FileSystem fs,
     String path,
     R Function(Map<String, dynamic>) recordFromJson,
-  ) async {
+  ) {
     final file = fs.file(path);
-    if (await file.exists()) {
-      return _parseRecords<R>(await file.readAsString(), recordFromJson);
+    if (file.existsSync()) {
+      return _parseRecords<R>(file.readAsStringSync(), recordFromJson);
     }
-    return <R>[];
+    return null;
   }
 }

@@ -135,6 +135,12 @@ UI:
 * Make shipInfo include an emoji for the behavior.
 * Add a Flutter UI.
 * Make it possible to filter for a sub-set of systems (e.g. ones with a market and a mine).
+* Show where all ships currently are.
+* Show which waypoints are charted vs. not.
+* Show which systems have a market vs. not.
+* Show which systems have a mine vs. not.
+* Show which systems have a shipyard vs. not.
+* Show which systems have a jump gate vs. not.
 
 Thoughts
 * Miners are just the "find me where to sell this" problem

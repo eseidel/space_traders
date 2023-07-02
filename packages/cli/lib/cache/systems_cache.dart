@@ -43,40 +43,49 @@ class SystemsCache extends JsonListStore<System> {
         .toList();
   }
 
-  static Future<SystemsCache?> _loadSystemsCache(
+  static SystemsCache? _loadSystemsCache(
     FileSystem fs,
     String path,
-  ) async {
-    final systemsfile = fs.file(path);
-    if (systemsfile.existsSync()) {
-      final systems = await JsonListStore.load<System>(
-        fs,
-        path,
-        (json) => System.fromJson(json)!,
-      );
-      return SystemsCache(systems: systems, fs: fs, path: path);
+  ) {
+    final systems = JsonListStore.load<System>(
+      fs,
+      path,
+      (json) => System.fromJson(json)!,
+    );
+    if (systems == null) {
+      return null;
     }
-    return null;
+    return SystemsCache(systems: systems, fs: fs, path: path);
   }
 
   /// Load the cache from disk.
+  static SystemsCache? loadFromCache(
+    FileSystem fs, {
+    String path = defaultCacheFilePath,
+  }) {
+    final systems = _loadSystemsCache(fs, path);
+    if (systems == null) {
+      return null;
+    }
+    return SystemsCache(systems: systems.systems, fs: fs, path: path);
+  }
+
+  /// Load the cache from disk or fall back to fetching from the url.
   static Future<SystemsCache> load(
     FileSystem fs, {
-    String? cacheFilePath,
-    String? url,
+    String path = defaultCacheFilePath,
+    String url = defaultUrl,
     Future<http.Response> Function(Uri uri)? httpGet,
   }) async {
-    final uri = Uri.parse(url ?? defaultUrl);
-    final filePath = cacheFilePath ?? defaultCacheFilePath;
-    // Try to load systems.json.  If it does not exist, pull down and cache
-    // from the url.
-    final fromCache = await _loadSystemsCache(fs, filePath);
+    // Try to load systems.json.
+    final fromCache = _loadSystemsCache(fs, path);
     if (fromCache != null) {
       return fromCache;
-    } else {
-      logger.info('Failed to load systems from cache, fetching from $uri');
     }
 
+    // If it does not exist, pull down and cache from the url.
+    final uri = Uri.parse(url);
+    logger.info('Failed to load systems from cache, fetching from $uri');
     try {
       final get = httpGet ?? http.get;
       final response = await get(uri);
@@ -84,7 +93,7 @@ class SystemsCache extends JsonListStore<System> {
         throw ApiException(response.statusCode, response.body);
       }
       final systems = _parseSystems(response.body);
-      final data = SystemsCache(systems: systems, fs: fs, path: filePath);
+      final data = SystemsCache(systems: systems, fs: fs, path: path);
       await data.save();
       return data;
     } catch (e) {
