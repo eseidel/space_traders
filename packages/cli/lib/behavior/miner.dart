@@ -143,8 +143,11 @@ class _SystemEval {
   }
 }
 
-int? _marketPercentile(MarketPrices marketPrices, Market market) {
-  const tradeSymbol = 'ICE_WATER';
+int? _marketPercentile(
+  MarketPrices marketPrices,
+  Market market, {
+  required String tradeSymbol,
+}) {
   final sellPrice = estimateSellPrice(marketPrices, market, tradeSymbol);
   if (sellPrice == null) {
     return null;
@@ -159,15 +162,17 @@ Future<_SystemEval> _evaluateSystem(
   Api api,
   MarketPrices marketPrices,
   WaypointCache waypointCache,
-  MarketCache marketCache,
-  String systemSymbol,
-  int jumps,
-) async {
+  MarketCache marketCache, {
+  required String tradeSymbol,
+  required String systemSymbol,
+  required int jumps,
+}) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
   final marketWaypoints = waypoints.where((w) => w.hasMarketplace);
   final markets = await marketCache.marketsInSystem(systemSymbol).toList();
   final marketToPercentile = {
-    for (var m in markets) m.symbol: _marketPercentile(marketPrices, m),
+    for (var m in markets)
+      m.symbol: _marketPercentile(marketPrices, m, tradeSymbol: tradeSymbol),
   };
   final mines = waypoints.where((w) => w.canBeMined);
   final mineAndSells = <_MineAndSell>[];
@@ -208,6 +213,7 @@ Future<String?> nearestMineWithGoodMining(
   WaypointCache waypointCache,
   MarketCache marketCache,
   Waypoint start, {
+  required String tradeSymbol,
   required int maxJumps,
   bool Function(String systemSymbol)? systemFilter,
 }) async {
@@ -225,8 +231,9 @@ Future<String?> nearestMineWithGoodMining(
       marketPrices,
       waypointCache,
       marketCache,
-      systemSymbol,
-      jumps,
+      tradeSymbol: tradeSymbol,
+      systemSymbol: systemSymbol,
+      jumps: jumps,
     );
     logger.info(
       _describeSystemEval(eval),
@@ -328,6 +335,7 @@ Future<DateTime?> _navigateToNewSystemForMining(
     marketCache,
     currentWaypoint,
     maxJumps: maxJumps,
+    tradeSymbol: 'PRECIOUS_STONES',
   );
   if (mine == null) {
     await centralCommand.disableBehaviorForShip(

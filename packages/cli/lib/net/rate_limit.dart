@@ -58,9 +58,12 @@ class RateLimitedApiClient extends ApiClient {
     Duration waitTime = const Duration(seconds: 10),
   }) async {
     // TODO(eseidel): This should use exponential back-off or a fixed
-    // nubmer of retries.
+    // number of retries for all types of failures, not just 429.
     while (true) {
       final response = await sendRequest();
+      if (response.statusCode > 500) {
+        logger.warn('${response.statusCode} seen at ${DateTime.now()}');
+      }
       if (response.statusCode != 429) {
         return response;
       }

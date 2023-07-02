@@ -442,9 +442,7 @@ class CostedDeal {
         deal: Deal.fromJson(json['deal'] as Map<String, dynamic>),
         tradeVolume: json['tradeVolume'] as int,
         contractId: json['contractId'] as String?,
-        startTime: json['startTime'] == null
-            ? null
-            : DateTime.parse(json['startTime'] as String),
+        startTime: DateTime.parse(json['startTime'] as String),
         route: RoutePlan.fromJson(json['route'] as Map<String, dynamic>),
         transactions: (json['transactions'] as List<dynamic>)
             .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
@@ -489,7 +487,7 @@ class CostedDeal {
   int get expectedTime => route.duration;
 
   /// The time at which this deal was started.
-  final DateTime? startTime;
+  final DateTime startTime;
 
   /// The route taken to complete this deal.
   final RoutePlan route;
@@ -532,13 +530,7 @@ class CostedDeal {
   }
 
   /// The actual time taken to complete the deal.
-  Duration get actualTime {
-    // TODO(eseidel): This isn't right for deals where we have to travel
-    // to the source location.
-    final start = transactions.first.timestamp;
-    final end = transactions.last.timestamp;
-    return end.difference(start);
-  }
+  Duration get actualTime => transactions.last.timestamp.difference(startTime);
 
   /// The actual revenue of the deal.
   int get actualRevenue {
@@ -571,7 +563,7 @@ class CostedDeal {
   int get actualProfitPerSecond {
     final actualSeconds = actualTime.inSeconds;
     if (actualSeconds == 0) {
-      return 0;
+      return actualProfit;
     }
     return actualProfit ~/ actualSeconds;
   }
@@ -584,7 +576,7 @@ class CostedDeal {
         'expectedTime': expectedTime,
         'contractId': contractId,
         'transactions': transactions.map((e) => e.toJson()).toList(),
-        'startTime': startTime?.toIso8601String(),
+        'startTime': startTime.toUtc().toIso8601String(),
         'route': route.toJson(),
         'costPerFuelUnit': costPerFuelUnit,
       };

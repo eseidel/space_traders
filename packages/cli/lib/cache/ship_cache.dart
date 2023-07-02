@@ -17,6 +17,22 @@ class ShipCache extends ResponseListCache<Ship> {
           refreshEntries: (Api api) => allMyShips(api).toList(),
         );
 
+  /// Loads a ShipCache from cache if it exists.
+  static ShipCache? loadCached(
+    FileSystem fs, {
+    String path = defaultPath,
+  }) {
+    final ships = ResponseListCache.load<Ship>(
+      fs,
+      path,
+      (j) => Ship.fromJson(j)!,
+    );
+    if (ships != null) {
+      return ShipCache(ships, fs: fs, path: path);
+    }
+    return null;
+  }
+
   /// Creates a new ShipCache from the Api or FileSystem if provided.
   static Future<ShipCache> load(
     Api api, {

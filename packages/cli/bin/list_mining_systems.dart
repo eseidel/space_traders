@@ -11,8 +11,9 @@ import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/auth.dart';
 import 'package:file/local.dart';
+import 'package:scoped/scoped.dart';
 
-void main(List<String> args) async {
+Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addOption(
       'jumps',
@@ -65,10 +66,15 @@ void main(List<String> args) async {
     marketCache,
     start,
     maxJumps: maxJumps,
+    tradeSymbol: 'PRECIOUS_STONES',
   );
   if (mine == null) {
     logger.err('No good mining systems found.');
     return;
   }
   logger.info('Nearest good mine: $mine');
+}
+
+void main(List<String> args) async {
+  await runScoped(() => cliMain(args), values: {loggerRef});
 }

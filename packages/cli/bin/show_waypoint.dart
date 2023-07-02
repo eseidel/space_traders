@@ -4,12 +4,18 @@ import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
 
 void main(List<String> args) async {
-  await run(args, command);
+  await runWithArgs(args, command);
 }
 
-Future<void> command(FileSystem fs, Api api, Caches caches) async {
+Future<void> command(
+  List<String> args,
+  FileSystem fs,
+  Api api,
+  Caches caches,
+) async {
   final hq = await caches.waypoints.getAgentHeadquarters();
-  final waypoints = await caches.waypoints.waypointsInSystem(hq.systemSymbol);
+  final systemSymbol = args.firstOrNull ?? hq.systemSymbol;
+  final waypoints = await caches.waypoints.waypointsInSystem(systemSymbol);
 
   final waypoint = logger.chooseOne(
     'Which waypoint?',

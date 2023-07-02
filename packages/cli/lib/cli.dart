@@ -32,6 +32,34 @@ Future<R> run<R>(
   );
 }
 
+/// Run command with a logger and pass through the remaining args.
+Future<R> runWithArgs<R>(
+  List<String> args,
+  Future<R> Function(List<String> args, FileSystem fs, Api api, Caches caches)
+      fn,
+) async {
+  final parser = ArgParser()
+    ..addFlag(
+      'verbose',
+      abbr: 'v',
+      help: 'Verbose logging',
+      negatable: false,
+    );
+  final results = parser.parse(args);
+  if (results['verbose'] as bool) {
+    setVerboseLogging();
+  }
+  const fs = LocalFileSystem();
+  return runScoped(
+    () async {
+      final api = defaultApi(fs);
+      final caches = await Caches.load(fs, api);
+      return fn(args, fs, api, caches);
+    },
+    values: {loggerRef},
+  );
+}
+
 /// Run command with a logger, but without an Api.
 Future<R> runOffline<R>(
   List<String> args,

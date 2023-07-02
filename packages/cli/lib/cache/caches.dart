@@ -131,5 +131,9 @@ class Caches {
     await ships.ensureUpToDate(api);
     await contracts.ensureUpToDate(api);
     await agent.ensureAgentUpToDate(api);
+
+    // TODO(eseidel): Ship objects get modifed directly and ShipCache isn't told
+    // about those modifications, so save it out every loop.
+    await ships.save();
   }
 }
