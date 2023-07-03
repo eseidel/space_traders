@@ -31,7 +31,7 @@ class RequestCounts {
 class RateLimitedApiClient extends ApiClient {
   /// Construct a rate limited api client.
   RateLimitedApiClient({
-    this.maxRequestsPerSecond = 2,
+    this.maxRequestsPerSecond = 3,
     super.authentication,
   });
 
@@ -93,7 +93,11 @@ class RateLimitedApiClient extends ApiClient {
       // );
       await Future<void>.delayed(_nextRequestTime.difference(beforeRequest));
     }
-    logger.detail('$path');
+    final urlEncodedQueryParams = queryParams.map((param) => '$param');
+    final queryString = urlEncodedQueryParams.isNotEmpty
+        ? '?${urlEncodedQueryParams.join('&')}'
+        : '';
+    logger.detail('$path$queryString');
     final response = await handleUnexpectedRateLimit(
       () async => super.invokeAPI(
         path,
