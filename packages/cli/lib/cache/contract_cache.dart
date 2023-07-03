@@ -38,7 +38,7 @@ class ContractCache extends ResponseListCache<Contract> {
   }
 
   /// The default path to the contracts cache.
-  static const String defaultPath = 'contracts.json';
+  static const String defaultPath = 'data/contracts.json';
 
   /// Contracts in the cache.
   List<Contract> get contracts => entries;

@@ -43,9 +43,9 @@ class JsonLog<Record> {
 
   /// Save the log to the file system.
   void save() {
-    _fs.file(_path).writeAsStringSync(
-          _entries.map(_recordToJson).map(jsonEncode).join('\n'),
-        );
+    final file = _fs.file(_path)..createSync(recursive: true);
+    final contents = _entries.map(_recordToJson).map(jsonEncode).join('\n');
+    file.writeAsStringSync(contents);
   }
 
   /// Load the log from the file system.

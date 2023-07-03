@@ -116,6 +116,7 @@ class ResponseListCache<T> {
       return;
     }
     final file = _fs!.file(_path);
+    await file.create(recursive: true);
     const encoder = JsonEncoder.withIndent(' ');
     final prettyprint = encoder.convert(entries.map(_entryToJson).toList());
     await file.writeAsString(prettyprint);

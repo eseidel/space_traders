@@ -5,10 +5,13 @@ import 'package:cli/net/queries.dart';
 import 'package:cli/net/rate_limit.dart';
 import 'package:file/file.dart';
 
+/// The default path to the auth token.
+const String defaultAuthTokenPath = 'data/auth_token.txt';
+
 /// loadAuthToken loads the auth token from the given file system or
 /// throws an error if it cannot be found.
-String loadAuthToken(FileSystem fs) {
-  final token = fs.file('auth_token.txt').readAsStringSync().trim();
+String loadAuthToken(FileSystem fs, {String path = defaultAuthTokenPath}) {
+  final token = fs.file(path).readAsStringSync().trim();
   if (token.isEmpty) {
     throw Exception('No auth token found.');
   }
@@ -35,6 +38,7 @@ Future<String> loadAuthTokenOrRegister(
   FileSystem fs, {
   String? callsign,
   String? email,
+  String path = defaultAuthTokenPath,
 }) async {
   try {
     return loadAuthToken(fs);
@@ -43,7 +47,9 @@ Future<String> loadAuthTokenOrRegister(
     // Otherwise, register a new user.
     final handle = callsign ?? logger.prompt('What is your call sign?');
     final token = await register(callsign: handle, email: email);
-    await fs.file('auth_token.txt').writeAsString(token);
+    final file = fs.file(path);
+    await file.create(recursive: true);
+    await file.writeAsString(token);
     return token;
   }
 }

@@ -71,7 +71,7 @@ class SurveyData extends JsonListStore<HistoricalSurvey> {
   }) : super(surveys);
 
   /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'surveys.json';
+  static const String defaultCacheFilePath = 'data/surveys.json';
 
   /// The surveys.
   @visibleForTesting

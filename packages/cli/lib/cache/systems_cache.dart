@@ -30,7 +30,7 @@ class SystemsCache extends JsonListStore<System> {
   List<System> get _systems => entries;
 
   /// Default cache location.
-  static const String defaultCacheFilePath = 'systems.json';
+  static const String defaultCacheFilePath = 'data/systems.json';
 
   /// Default url to fetch systems from.
   static const String defaultUrl =

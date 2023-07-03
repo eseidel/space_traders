@@ -55,7 +55,7 @@ class ShipCache extends ResponseListCache<Ship> {
   }
 
   /// The default path to the contracts cache.
-  static const String defaultPath = 'ships.json';
+  static const String defaultPath = 'data/ships.json';
 
   /// Ships in the cache.
   List<Ship> get ships => entries;

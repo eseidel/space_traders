@@ -151,12 +151,17 @@ class TransactionLog extends JsonLog<Transaction> {
     required super.path,
   }) : super(recordToJson: (record) => record.toJson());
 
+  /// The default path to the transaction log.
+  static const String defaultPath = 'data/transactions.json';
+
   /// Load the transaction log from the file system.
-  static Future<TransactionLog> load(FileSystem fs, [String? path]) async {
-    final filePath = path ?? 'transactions.json';
+  static Future<TransactionLog> load(
+    FileSystem fs, {
+    String path = defaultPath,
+  }) async {
     final entries =
-        await JsonLog.load<Transaction>(fs, filePath, Transaction.fromJson);
-    return TransactionLog(entries, fs: fs, path: filePath);
+        await JsonLog.load<Transaction>(fs, path, Transaction.fromJson);
+    return TransactionLog(entries, fs: fs, path: path);
   }
 
   /// Return all the ship symbols in the transaction log.

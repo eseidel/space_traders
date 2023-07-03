@@ -6,7 +6,9 @@ void main() {
   test('loadAuthToken', () {
     final fs = MemoryFileSystem.test();
     expect(() => loadAuthToken(fs), throwsException);
-    fs.file('auth_token.txt').writeAsStringSync('token\n\n');
+    fs.file(defaultAuthTokenPath)
+      ..createSync(recursive: true)
+      ..writeAsStringSync('token\n\n');
     expect(loadAuthToken(fs), 'token');
   });
 }

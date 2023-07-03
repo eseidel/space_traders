@@ -55,7 +55,7 @@ class FactionCache extends ResponseListCache<Faction> {
   }
 
   /// The default path to the factions cache.
-  static const String defaultPath = 'factions.json';
+  static const String defaultPath = 'data/factions.json';
 
   /// Factions in the cache.
   List<Faction> get factions => entries;

@@ -5,14 +5,5 @@ coverage/
 backups/
 coverage.lcov
 
-auth_token.txt
-behaviors.json
-datastore.json
-prices.json
-shipyard_prices.json
-surveys.json
-systems.json
-transactions.json
-factions.json
-contracts.json
-ships.json
+# Where the cli stores all its cache files.
+data/

@@ -90,7 +90,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   });
 
   /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'shipyard_prices.json';
+  static const String defaultCacheFilePath = 'data/shipyard_prices.json';
 
   // This might not actually be true!  I've never seen a 0 in the data.
   // These may contain 0s and duplicates, best to access it through one

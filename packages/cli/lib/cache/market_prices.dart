@@ -130,7 +130,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   });
 
   /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'prices.json';
+  static const String defaultCacheFilePath = 'data/prices.json';
 
   /// Load the price data from the cache.
   static Future<MarketPrices> load(

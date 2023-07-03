@@ -15,7 +15,7 @@ class BehaviorCache {
         _path = path;
 
   /// The default path to the cache file.
-  static const String defaultPath = 'behaviors.json';
+  static const String defaultPath = 'data/behaviors.json';
 
   /// The behavior state for each ship.
   final Map<String, BehaviorState> _stateByShipSymbol;
@@ -33,7 +33,9 @@ class BehaviorCache {
   Future<void> save() async {
     const encoder = JsonEncoder.withIndent(' ');
     final prettyprint = encoder.convert(_stateByShipSymbol);
-    await _fs.file(_path).writeAsString(prettyprint);
+    final file = _fs.file(_path);
+    await file.create(recursive: true);
+    await file.writeAsString(prettyprint);
   }
 
   /// Load the cache from a file.

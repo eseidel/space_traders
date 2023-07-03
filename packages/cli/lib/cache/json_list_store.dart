@@ -40,7 +40,9 @@ class JsonListStore<Record> {
 
   /// Save entries to a file.
   Future<void> save() async {
-    await _fs.file(_path).writeAsString(jsonEncode(entries));
+    final file = _fs.file(_path);
+    await file.create(recursive: true);
+    await file.writeAsString(jsonEncode(entries));
   }
 
   /// Load entries from a file.
