@@ -88,12 +88,12 @@ class RateLimitedApiClient extends ApiClient {
   ) async {
     final beforeRequest = DateTime.now();
     if (beforeRequest.isBefore(_nextRequestTime)) {
-      logger.detail(
-        'Rate limiting request. Next request time: $_nextRequestTime',
-      );
+      // logger.detail(
+      //   'Rate limiting request. Next request time: $_nextRequestTime',
+      // );
       await Future<void>.delayed(_nextRequestTime.difference(beforeRequest));
     }
-    logger.detail('Making request to $path');
+    logger.detail('$path');
     final response = await handleUnexpectedRateLimit(
       () async => super.invokeAPI(
         path,

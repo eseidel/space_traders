@@ -67,14 +67,12 @@ Future<void> cliMain(List<String> args) async {
     exit(0);
   });
 
-  final agentCache = await AgentCache.load(api);
-  final agent = agentCache.agent;
-  logger.info(
+  final agent = caches.agent.agent;
+  logger..info(
     'Welcome ${agent.symbol} of the ${agent.startingFaction}!'
     ' ${creditsString(agent.credits)}',
-  );
-  final shipCache = await ShipCache.load(api);
-  logger.info(describeFleet(shipCache));
+  )
+  ..info(describeFleet(caches.ships));
 
   await logic(api, centralCommand, caches);
 }
