@@ -662,43 +662,29 @@ CostedDeal costOutDeal(
   );
 }
 
-/// Returns the best deal for the given ship within [maxJumps] of it's
-/// current location.
-Future<CostedDeal?> findDealFor(
-  MarketPrices marketPrices,
-  SystemsCache systemsCache,
-  WaypointCache waypointCache,
+/// Builds a MarketScan for markets within [maxJumps] of [waypointSymbol].
+Future<MarketScan> scanMarketsNear(
   MarketCache marketCache,
-  Ship ship, {
+  MarketPrices marketPrices, {
+  required String systemSymbol,
   required int maxJumps,
-  required int maxTotalOutlay,
-  required int availableSpace,
-  List<SellOpp>? extraSellOpps,
-  bool Function(CostedDeal deal)? filter,
 }) async {
-  final systemSymbol = ship.nav.systemSymbol;
   final markets = await marketCache
       .marketsInJumpRadius(
         startSystem: systemSymbol,
         maxJumps: maxJumps,
       )
       .toList();
-  final scan = MarketScan.fromMarkets(marketPrices, markets);
-  final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
+  return MarketScan.fromMarkets(marketPrices, markets);
+}
 
-  final costedDeals = deals.map(
-    (deal) => costOutDeal(
-      shipSpeed: ship.engine.speed,
-      systemsCache,
-      deal,
-      cargoSize: availableSpace,
-      shipWaypointSymbol: ship.nav.waypointSymbol,
-      shipFuelCapacity: ship.fuel.capacity,
-      costPerFuelUnit:
-          marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
-    ),
-  );
-
+CostedDeal? _filterDealsAndLog(
+  Iterable<CostedDeal> costedDeals, {
+  required int maxJumps,
+  required int maxTotalOutlay,
+  required String systemSymbol,
+  bool Function(CostedDeal deal)? filter,
+}) {
   final filtered = filter != null ? costedDeals.where(filter) : costedDeals;
 
   final withinRange = 'within $maxJumps of $systemSymbol';
@@ -725,4 +711,40 @@ Future<CostedDeal?> findDealFor(
     return null;
   }
   return profitable.last;
+}
+
+/// Returns the best deal for the given ship within [maxJumps] of it's
+/// current location.
+Future<CostedDeal?> findDealFor(
+  MarketPrices marketPrices,
+  SystemsCache systemsCache,
+  MarketScan scan,
+  Ship ship, {
+  required int maxJumps,
+  required int maxTotalOutlay,
+  required int availableSpace,
+  List<SellOpp>? extraSellOpps,
+  bool Function(CostedDeal deal)? filter,
+}) async {
+  final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
+
+  final costedDeals = deals.map(
+    (deal) => costOutDeal(
+      shipSpeed: ship.engine.speed,
+      systemsCache,
+      deal,
+      cargoSize: availableSpace,
+      shipWaypointSymbol: ship.nav.waypointSymbol,
+      shipFuelCapacity: ship.fuel.capacity,
+      costPerFuelUnit:
+          marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
+    ),
+  );
+  return _filterDealsAndLog(
+    costedDeals,
+    maxJumps: maxJumps,
+    maxTotalOutlay: maxTotalOutlay,
+    systemSymbol: ship.nav.systemSymbol,
+    filter: filter,
+  );
 }

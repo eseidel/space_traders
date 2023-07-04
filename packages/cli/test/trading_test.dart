@@ -16,8 +16,6 @@ class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
 
-class _MockWaypointCache extends Mock implements WaypointCache {}
-
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
@@ -242,7 +240,6 @@ void main() {
   test('findDealFor no markets', () async {
     final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
@@ -251,16 +248,24 @@ void main() {
     when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
         .thenAnswer((_) => const Stream.empty());
 
+    // We should use a MarketScan mock here.
+    const maxJumps = 1;
+    final marketScan = await scanMarketsNear(
+      marketCache,
+      marketPrices,
+      systemSymbol: ship.nav.systemSymbol,
+      maxJumps: maxJumps,
+    );
+
     final logger = _MockLogger();
     final costed = await runWithLogger(
       logger,
       () => findDealFor(
         marketPrices,
         systemsCache,
-        waypointCache,
-        marketCache,
+        marketScan,
         ship,
-        maxJumps: 1,
+        maxJumps: maxJumps,
         maxTotalOutlay: 100000,
         availableSpace: 10,
       ),
@@ -278,7 +283,6 @@ void main() {
     // thus has a better profit per second.
     final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
     final saa = SystemWaypoint(
       symbol: 'S-A-A',
@@ -357,14 +361,22 @@ void main() {
     when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
         .thenAnswer((_) => Stream.fromIterable(markets));
 
+    // We should use a MarketScan mock here.
+    const maxJumps = 1;
+    final marketScan = await scanMarketsNear(
+      marketCache,
+      marketPrices,
+      systemSymbol: ship.nav.systemSymbol,
+      maxJumps: maxJumps,
+    );
+
     final logger = _MockLogger();
     final costed = await runWithLogger(
       logger,
       () => findDealFor(
         marketPrices,
         systemsCache,
-        waypointCache,
-        marketCache,
+        marketScan,
         ship,
         maxJumps: 1,
         maxTotalOutlay: 100000,

@@ -351,11 +351,12 @@ class CentralCommand {
       );
     }
 
+  final marketScan = await scanMarketsNear(marketCache, marketPrices,
+      systemSymbol: ship.nav.systemSymbol, maxJumps: maxJumps,);
     final maybeDeal = await findDealFor(
       marketPrices,
       systemsCache,
-      waypointCache,
-      marketCache,
+      marketScan,
       ship,
       maxJumps: maxJumps,
       maxTotalOutlay: maxTotalOutlay,
