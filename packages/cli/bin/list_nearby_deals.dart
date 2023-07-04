@@ -44,8 +44,12 @@ void main(List<String> args) async {
 
   final marketCache = MarketCache(waypointCache);
   final marketPrices = await MarketPrices.load(fs);
-  final marketScan = await scanMarketsNear(marketCache, marketPrices,
-      systemSymbol: ship.nav.systemSymbol, maxJumps: maxJumps,);
+  final marketScan = await scanMarketsNear(
+    marketCache,
+    marketPrices,
+    systemSymbol: ship.nav.systemSymbol,
+    maxJumps: maxJumps,
+  );
   final maybeDeal = await findDealFor(
     marketPrices,
     systemsCache,
