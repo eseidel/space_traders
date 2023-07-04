@@ -94,6 +94,8 @@ Earning:
 * Add logic for buying and mounting modules.
 * Traders only consider how repeated buys inflate prices, they do not consider
   how repeated sells might deflate prices at sell point.
+* Generate potential deals directly from PriceData with no server queries.
+* Teach miners how to coordinate with haulers to sell their goods further away.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jumpgate
@@ -106,7 +108,6 @@ Exploring:
 Tech Debt:
 * Build a docker container and run the app in the cloud.  With a docker volume
   so the state persists.
-* Get above 50% coverage.
 * Fix all uses of DateTime.now() to be DateTime.timestamp() and test.
 
 Efficiency:

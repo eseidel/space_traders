@@ -100,6 +100,9 @@ class Caches {
     // Save out the caches we never modify so we don't have to load them again.
     await factions.save();
 
+    // We rarely modify contracts, so save them out here too.
+    await contracts.save();
+
     return Caches._(
       agent: agent,
       marketPrices: prices,

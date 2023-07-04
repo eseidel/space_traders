@@ -16,6 +16,19 @@ class ContractCache extends ResponseListCache<Contract> {
           refreshEntries: (Api api) => allMyContracts(api).toList(),
         );
 
+  /// Load the ContractCache from the file system.
+  static ContractCache? loadCached(FileSystem fs, {String path = defaultPath}) {
+    final contracts = ResponseListCache.load<Contract>(
+      fs,
+      path,
+      (j) => Contract.fromJson(j)!,
+    );
+    if (contracts != null) {
+      return ContractCache(contracts, fs: fs, path: path);
+    }
+    return null;
+  }
+
   /// Creates a new ContractCache from the Api or FileSystem if provided.
   static Future<ContractCache> load(
     Api api, {
