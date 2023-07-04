@@ -7,3 +7,4 @@ coverage.lcov
 
 # Where the cli stores all its cache files.
 data/
+data_backup/

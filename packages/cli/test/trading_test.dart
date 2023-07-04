@@ -67,6 +67,68 @@ void main() {
     expect(deals, isNotEmpty);
   });
 
+  test('MarketScan topLimit', () {
+    // We're testing that market scan compares the top N sell/buy deals.
+    // There was a bug before where it was sorting the sell opps in the wrong
+    // direction, thus always returning the 10 worst sell locations rather
+    // than the 10 best.
+
+    final marketPrices = _MockMarketPrices();
+    final tradeGood =
+        TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
+    final markets = [
+      for (int i = 0; i < 10; i++)
+        Market(
+          symbol: '$i',
+          exchange: [tradeGood],
+          tradeGoods: [
+            MarketTradeGood(
+              symbol: 'FUEL',
+              tradeVolume: 100,
+              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+              purchasePrice: 100,
+              sellPrice: 101,
+            )
+          ],
+        ),
+      Market(
+        symbol: 'EXPENSIVE',
+        exchange: [tradeGood],
+        tradeGoods: [
+          MarketTradeGood(
+            symbol: 'FUEL',
+            tradeVolume: 100,
+            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+            purchasePrice: 200,
+            sellPrice: 201,
+          )
+        ],
+      ),
+      Market(
+        symbol: 'CHEAP',
+        exchange: [tradeGood],
+        tradeGoods: [
+          MarketTradeGood(
+            symbol: 'FUEL',
+            tradeVolume: 100,
+            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+            purchasePrice: 10,
+            sellPrice: 11,
+          )
+        ],
+      ),
+    ];
+    final scan = MarketScan.fromMarkets(marketPrices, markets, topLimit: 10);
+    final buyOpps = scan.buyOppsForTradeSymbol('FUEL');
+    expect(buyOpps, hasLength(10));
+        final buyPrices = buyOpps.map((o) => o.price).toList();
+    expect(buyPrices, [10, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
+    final sellOpps = scan.sellOppsForTradeSymbol('FUEL');
+    expect(sellOpps, hasLength(10));
+    final sellPrices = sellOpps.map((o) => o.price).toList();
+    expect(sellPrices, [201, 101, 101, 101, 101, 101, 101, 101, 101, 101]);
+  });
+
   test('estimateSellPrice null', () {
     final marketPrices = _MockMarketPrices();
     final estimate =

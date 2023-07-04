@@ -297,6 +297,48 @@ class _MarketScanBuilder {
 
   final MarketPrices _marketPrices;
 
+  void _addBuyOpp(BuyOpp buy) {
+    // Sort buys ascending so we remove the most expensive buy price.
+    final buys = (buyOpps[buy.tradeSymbol] ?? [])
+      ..add(buy)
+      ..sort((a, b) => a.price.compareTo(b.price));
+    if (buys.length > topLimit) {
+      buys.removeLast();
+    }
+    buyOpps[buy.tradeSymbol] = buys;
+  }
+
+  void _addSellOpp(SellOpp sell) {
+    // Sort sells decending so we remove the cheapest sell price.
+    final sells = (sellOpps[sell.tradeSymbol] ?? [])
+      ..add(sell)
+      ..sort((a, b) => -a.price.compareTo(b.price));
+    if (sells.length > topLimit) {
+      sells.removeLast();
+    }
+    sellOpps[sell.tradeSymbol] = sells;
+  }
+
+  /// Record potential deals from the given historical market price.
+  void visitMarketPrice(MarketPrice marketPrice) {
+    final marketSymbol = marketPrice.waypointSymbol;
+    final tradeSymbol = marketPrice.symbol;
+    _addBuyOpp(
+      BuyOpp(
+        marketSymbol: marketSymbol,
+        tradeSymbol: tradeSymbol,
+        price: marketPrice.purchasePrice,
+      ),
+    );
+    _addSellOpp(
+      SellOpp(
+        marketSymbol: marketSymbol,
+        tradeSymbol: tradeSymbol,
+        price: marketPrice.sellPrice,
+      ),
+    );
+  }
+
   /// Record potential deals from the given market.
   void visitMarket(Market market) {
     for (final tradeSymbol in market.allTradeSymbols) {
@@ -308,36 +350,20 @@ class _MarketScanBuilder {
         // If we don't have buy data we won't have sell data either.
         continue;
       }
-      final buy = BuyOpp(
-        marketSymbol: market.symbol,
-        tradeSymbol: tradeSymbol.value,
-        price: buyPrice,
+      _addBuyOpp(
+        BuyOpp(
+          marketSymbol: market.symbol,
+          tradeSymbol: tradeSymbol.value,
+          price: buyPrice,
+        ),
       );
-      final buys = buyOpps[tradeSymbol.value] ?? [];
-      // No clue what it wants me to cascade here?
-      // ignore: cascade_invocations
-      buys
-        ..add(buy)
-        ..sort((a, b) => a.price.compareTo(b.price));
-      if (buys.length > topLimit) {
-        buys.removeLast();
-      }
-      buyOpps[tradeSymbol.value] = buys;
-      final sell = SellOpp(
-        marketSymbol: market.symbol,
-        tradeSymbol: tradeSymbol.value,
-        price: estimateSellPrice(_marketPrices, market, tradeSymbol.value)!,
+      _addSellOpp(
+        SellOpp(
+          marketSymbol: market.symbol,
+          tradeSymbol: tradeSymbol.value,
+          price: estimateSellPrice(_marketPrices, market, tradeSymbol.value)!,
+        ),
       );
-      final sells = sellOpps[tradeSymbol.value] ?? [];
-      // No clue what it wants me to cascade here?
-      // ignore: cascade_invocations
-      sells
-        ..add(sell)
-        ..sort((a, b) => a.price.compareTo(b.price));
-      if (sells.length > topLimit) {
-        sells.removeLast();
-      }
-      sellOpps[tradeSymbol.value] = sells;
     }
   }
 }
@@ -355,11 +381,29 @@ class MarketScan {
   /// for each trade symbol.
   factory MarketScan.fromMarkets(
     MarketPrices marketPrices,
-    Iterable<Market> markets,
-  ) {
-    final builder = _MarketScanBuilder(marketPrices, topLimit: 5);
+    Iterable<Market> markets, {
+    int topLimit = 5,
+  }) {
+    final builder = _MarketScanBuilder(marketPrices, topLimit: topLimit);
     for (final market in markets) {
       builder.visitMarket(market);
+    }
+    return MarketScan._(buyOpps: builder.buyOpps, sellOpps: builder.sellOpps);
+  }
+
+  /// Given a set of historical market prices, will collect the top N buy and
+  /// sell opportunities for each trade symbol regardless of distance.
+  factory MarketScan.fromMarketPrices(
+    MarketPrices marketPrices, {
+    bool Function(String waypointSymbol)? waypointFilter,
+  }) {
+    final builder = _MarketScanBuilder(marketPrices, topLimit: 5);
+    for (final marketPrice in marketPrices.prices) {
+      if (waypointFilter != null &&
+          !waypointFilter(marketPrice.waypointSymbol)) {
+        continue;
+      }
+      builder.visitMarketPrice(marketPrice);
     }
     return MarketScan._(buyOpps: builder.buyOpps, sellOpps: builder.sellOpps);
   }
@@ -662,7 +706,7 @@ CostedDeal costOutDeal(
   );
 }
 
-/// Builds a MarketScan for markets within [maxJumps] of [waypointSymbol].
+/// Builds a MarketScan for markets within [maxJumps] of [systemSymbol].
 Future<MarketScan> scanMarketsNear(
   MarketCache marketCache,
   MarketPrices marketPrices, {
@@ -727,6 +771,7 @@ Future<CostedDeal?> findDealFor(
   bool Function(CostedDeal deal)? filter,
 }) async {
   final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
+  logger.detail('Found ${deals.length} potential deals.');
 
   final costedDeals = deals.map(
     (deal) => costOutDeal(
@@ -740,6 +785,7 @@ Future<CostedDeal?> findDealFor(
           marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
     ),
   );
+  logger.detail('costed deals');
   return _filterDealsAndLog(
     costedDeals,
     maxJumps: maxJumps,
