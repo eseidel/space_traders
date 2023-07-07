@@ -121,7 +121,7 @@ void main() {
     final scan = MarketScan.fromMarkets(marketPrices, markets, topLimit: 10);
     final buyOpps = scan.buyOppsForTradeSymbol('FUEL');
     expect(buyOpps, hasLength(10));
-        final buyPrices = buyOpps.map((o) => o.price).toList();
+    final buyPrices = buyOpps.map((o) => o.price).toList();
     expect(buyPrices, [10, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
     final sellOpps = scan.sellOppsForTradeSymbol('FUEL');
     expect(sellOpps, hasLength(10));
