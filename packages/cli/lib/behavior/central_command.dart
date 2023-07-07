@@ -1,3 +1,14 @@
+import 'dart:math';
+
+import 'package:cli/behavior/behavior.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/net/actions.dart';
+import 'package:cli/net/queries.dart';
+import 'package:cli/printing.dart';
+import 'package:cli/trading.dart';
+import 'package:meta/meta.dart';
+
 // Central command sets behavior for all ships.
 // Groups ships into squads.
 // Can hold queues of work to distribute among squads.
@@ -41,15 +52,6 @@
 // instead of sending all of the haulers to the same market.  Again
 // approximating how much price is going to raise from a deal?
 
-import 'dart:math';
-
-import 'package:cli/behavior/behavior.dart';
-import 'package:cli/cache/caches.dart';
-import 'package:cli/logger.dart';
-import 'package:cli/printing.dart';
-import 'package:cli/trading.dart';
-import 'package:meta/meta.dart';
-
 @immutable
 class _ShipTimeout {
   const _ShipTimeout(this.shipSymbol, this.behavior, this.timeout);
@@ -62,8 +64,10 @@ class _ShipTimeout {
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
-  CentralCommand(BehaviorCache behaviorCache, ShipCache shipCache)
-      : _behaviorCache = behaviorCache,
+  CentralCommand({
+    required BehaviorCache behaviorCache,
+    required ShipCache shipCache,
+  })  : _behaviorCache = behaviorCache,
         _shipCache = shipCache;
 
   final Map<Behavior, DateTime> _behaviorTimeouts = {};
@@ -190,7 +194,15 @@ class CentralCommand {
     String why,
     Duration timeout,
   ) async {
-    await _behaviorCache.deleteBehavior(ship.symbol);
+    final currentState = _behaviorCache.getBehavior(ship.symbol);
+    if (currentState == null || currentState.behavior == behavior) {
+      await _behaviorCache.deleteBehavior(ship.symbol);
+    } else {
+      shipInfo(
+        ship,
+        'Not deleting ${currentState.behavior} for ${ship.symbol}.',
+      );
+    }
 
     shipWarn(
       ship,
@@ -208,7 +220,15 @@ class CentralCommand {
     String why,
     Duration timeout,
   ) async {
-    await _behaviorCache.deleteBehavior(ship.symbol);
+    final currentState = _behaviorCache.getBehavior(ship.symbol);
+    if (currentState == null || currentState.behavior == behavior) {
+      await _behaviorCache.deleteBehavior(ship.symbol);
+    } else {
+      shipInfo(
+        ship,
+        'Not deleting ${currentState.behavior} for ${ship.symbol}.',
+      );
+    }
 
     shipWarn(
       ship,
@@ -404,7 +424,12 @@ class CentralCommand {
 
 // This is a hack for now, we need real planning.
   /// Determine what type of ship to buy.
-  ShipType? shipTypeToBuy({int? randomSeed}) {
+  // TODO(eseidel): This should consider pricing in it so that we can by
+  // other ship types if they're not overpriced?
+  ShipType? shipTypeToBuy(
+    AgentCache agentCache, {
+    required String waypointSymbol,
+  }) {
     // We should buy a new ship when:
     // - We have request capacity to spare
     // - We have money to spare.
@@ -412,17 +437,23 @@ class CentralCommand {
 
     // We should buy ships based on earnings of that ship type over the last
     // N hours?
+    final systemSymbol = parseWaypointString(waypointSymbol).system;
+    final hqSystemSymbol =
+        parseWaypointString(agentCache.agent.headquarters).system;
+    final inStartSystem = systemSymbol == hqSystemSymbol;
 
     final isEarlyGame = _shipCache.ships.length < 10;
     if (isEarlyGame) {
+      if (!inStartSystem) {
+        return null;
+      }
       return ShipType.ORE_HOUND;
     }
 
-    final random = Random(randomSeed);
     final targetCounts = {
       ShipType.ORE_HOUND: 30,
       ShipType.PROBE: 10,
-      ShipType.LIGHT_HAULER: 30,
+      ShipType.LIGHT_HAULER: 50,
     };
     final typesToBuy = targetCounts.keys
         .where(
@@ -432,7 +463,147 @@ class CentralCommand {
     if (typesToBuy.isEmpty) {
       return null;
     }
-    return typesToBuy[random.nextInt(typesToBuy.length)];
+
+    // We should buy haulers if we have fewer than X haulers idle.
+    if (typesToBuy.contains(ShipType.LIGHT_HAULER)) {
+      final haulerSymbols =
+          _shipCache.ships.where((s) => s.isHauler).map((s) => s.symbol);
+      final idleBehaviors = [Behavior.idle, Behavior.explorer];
+      final idleHaulerStates = _behaviorCache.states
+          .where((s) => haulerSymbols.contains(s.shipSymbol))
+          .where((s) => idleBehaviors.contains(s.behavior))
+          .toList();
+      logger.info('Found ${idleHaulerStates.length} idle haulers.');
+      if (idleHaulerStates.length < 4) {
+        return ShipType.LIGHT_HAULER;
+      }
+    }
+    // We should buy ore-hounds only if we're at a system which has good mining.
+    if (typesToBuy.contains(ShipType.ORE_HOUND) && inStartSystem) {
+      return ShipType.ORE_HOUND;
+    }
+    // We should buy probes if we have fewer than X of them.
+    if (typesToBuy.contains(ShipType.PROBE)) {
+      return ShipType.PROBE;
+    }
+    return null;
+  }
+
+  /// Visits the local shipyard if we're at a waypoint with a shipyard.
+  /// Records shipyard data if needed.
+  Future<void> visitLocalShipyard(
+    Api api,
+    ShipyardPrices shipyardPrices,
+    AgentCache agentCache,
+    Waypoint waypoint,
+    Ship ship,
+  ) async {
+    if (!waypoint.hasShipyard) {
+      return;
+    }
+    final shipyard = await getShipyard(api, waypoint);
+    await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
+
+    // Buy ship if we should.
+    // For now lets always by haulers if we can afford them and we have
+    // fewer than 3 haulers idle.
+    await buyShipIfPossible(api, shipyardPrices, agentCache, ship);
+  }
+
+  /// What the max multiplier of median we would pay for a ship.
+  double get maxMedianShipPriceMultipler => 1.1;
+
+  /// Attempt to buy a ship for the given [ship].
+  Future<bool> buyShipIfPossible(
+    Api api,
+    ShipyardPrices shipyardPrices,
+    AgentCache agentCache,
+    Ship ship,
+  ) async {
+    if (isBehaviorDisabled(Behavior.buyShip) ||
+        isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
+      return false;
+    }
+    // This assumes the ship in question is at a shipyard and already docked.
+    final waypointSymbol = ship.nav.waypointSymbol;
+    final shipType = shipTypeToBuy(agentCache, waypointSymbol: waypointSymbol);
+    if (shipType == null) {
+      await disableBehaviorForAll(
+        ship,
+        Behavior.buyShip,
+        'No ships needed.',
+        const Duration(hours: 1),
+      );
+      return false;
+    }
+
+    // Get our median price before updating shipyard prices.
+    final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
+    if (medianPrice == null) {
+      await disableBehaviorForAll(
+        ship,
+        Behavior.buyShip,
+        'Failed to buy ship, no median price for $shipType.',
+        const Duration(hours: 1),
+      );
+      return false;
+    }
+    final maxMedianMultiplier = maxMedianShipPriceMultipler;
+    final maxPrice = (medianPrice * maxMedianMultiplier).toInt();
+    final credits = agentCache.agent.credits;
+    if (credits < maxPrice) {
+      await disableBehaviorForAll(
+        ship,
+        Behavior.buyShip,
+        'Can not buy $shipType, credits $credits < max price $maxPrice.',
+        const Duration(minutes: 20),
+      );
+      return false;
+    }
+
+    final recentPrice = shipyardPrices.recentPurchasePrice(
+      shipyardSymbol: waypointSymbol,
+      shipType: shipType,
+    );
+    if (recentPrice == null) {
+      await disableBehaviorForShip(
+        ship,
+        Behavior.buyShip,
+        'Shipyard at $waypointSymbol does not sell $shipType.',
+        const Duration(minutes: 30),
+      );
+      return false;
+    }
+
+    final recentPriceString = creditsString(recentPrice);
+    if (recentPrice > maxPrice) {
+      await disableBehaviorForShip(
+        ship,
+        Behavior.buyShip,
+        'Failed to buy $shipType at $waypointSymbol, '
+        '$recentPriceString > max price $maxPrice.',
+        const Duration(minutes: 30),
+      );
+      return false;
+    }
+
+    // Do we need to catch exceptions about insufficient credits?
+    final result = await purchaseShipAndLog(
+      api,
+      _shipCache,
+      agentCache,
+      ship,
+      waypointSymbol,
+      shipType,
+    );
+
+    await disableBehaviorForAll(
+      ship,
+      Behavior.buyShip,
+      'Purchase of ${result.ship.symbol} ($shipType) successful!',
+      const Duration(minutes: 20),
+    );
+    return true;
   }
 
   /// Computes the number of units needed to fulfill the given [contract].

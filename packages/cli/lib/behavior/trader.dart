@@ -389,7 +389,8 @@ Future<DateTime?> advanceTrader(
   // If we're currently at a market, record the prices and refuel.
   final currentMarket =
       await visitLocalMarket(api, caches, currentWaypoint, ship);
-  await visitLocalShipyard(api, caches.shipyardPrices, currentWaypoint, ship);
+  await centralCommand.visitLocalShipyard(
+      api, caches.shipyardPrices, caches.agent, currentWaypoint, ship);
 
   if (centralCommand.isContractTradingEnabled) {
     await acceptContractsIfNeeded(
@@ -472,7 +473,7 @@ Future<DateTime?> advanceTrader(
   }
 
   // TODO(eseidel): make maxJumps bigger (and cache MarketScan if needed).
-  const maxJumps = 5;
+  const maxJumps = 1;
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.

@@ -83,6 +83,15 @@ void main() {
 
     when(() => centralCommand.completeBehavior(any()))
         .thenAnswer((_) => Future.value());
+    when(
+      () => centralCommand.visitLocalShipyard(
+        api,
+        shipyardPrices,
+        agentCache,
+        waypoint,
+        ship,
+      ),
+    ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

@@ -76,7 +76,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final marketPrices = await MarketPrices.load(fs);
 
-  final centralCommand = CentralCommand(behaviorCache, shipCache);
+  final centralCommand =
+      CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
   logger.info(describeFleet(shipCache));
   final ships = shipCache.ships;
   for (final ship in ships) {
@@ -98,6 +99,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
     final deal = behavior?.deal;
     if (deal != null) {
       logger.info('  ${describeCostedDeal(deal)}');
+      final since = DateTime.timestamp().difference(deal.startTime);
+      logger.info(' duration: ${approximateDuration(since)}');
     }
   }
 }

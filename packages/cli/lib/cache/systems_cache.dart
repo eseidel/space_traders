@@ -199,6 +199,56 @@ class SystemsCache extends JsonListStore<System> {
     }
   }
 
+  /// Yields a stream of Systems that are within n jumps of the given system.
+  /// Waypoints from the start system are included in the stream.
+  /// The stream is roughly ordered by distance from the start.
+  // Iterable<System> systemsInJumpRadius({
+  //   required String startSystem,
+  //   required int maxJumps,
+  // }) sync* {
+  //   for (final (String system, int _)
+  //       in systemSymbolsInJumpRadius(
+  //     startSystem: startSystem,
+  //     maxJumps: maxJumps,
+  //   )) {
+  //     yield systemBySymbol(system);
+  //   }
+  // }
+
+  Iterable<String> waypointSymbolsInJumpRadius({
+    required String startSystem,
+    required int maxJumps,
+  }) sync* {
+    for (final (String system, int _) in systemSymbolsInJumpRadius(
+      startSystem: startSystem,
+      maxJumps: maxJumps,
+    )) {
+      final waypoints = waypointsInSystem(system);
+      for (final waypoint in waypoints) {
+        yield waypoint.symbol;
+      }
+    }
+  }
+
+  /// Yields a stream of SystemWaypoints that are within n jumps of the given
+  /// system. Waypoints from the start system are included in the stream.
+  /// The stream is roughly ordered by distance from the start.
+  // Iterable<SystemWaypoint> waypointsInJumpRadius({
+  //   required String startSystem,
+  //   required int maxJumps,
+  // }) sync* {
+  //   for (final (String system, int _)
+  //       in systemSymbolsInJumpRadius(
+  //     startSystem: startSystem,
+  //     maxJumps: maxJumps,
+  //   )) {
+  //     final waypoints = waypointsInSystem(system);
+  //     for (final waypoint in waypoints) {
+  //       yield waypoint;
+  //     }
+  //   }
+  // }
+
   /// Yields a stream of system symbols that are within n jumps of the system.
   /// The system itself is included in the stream with distance 0.
   /// The stream is roughly ordered by distance from the start.

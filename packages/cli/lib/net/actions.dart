@@ -155,7 +155,6 @@ Future<Transaction?> purchaseCargoAndLog(
 /// Log a shipyard transaction to the console.
 void logShipyardTransaction(
   Ship ship,
-  MarketPrices marketPrices,
   Agent agent,
   ShipyardTransaction t,
 ) {
@@ -170,7 +169,6 @@ void logShipyardTransaction(
 /// Purchase a ship and log the transaction.
 Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
-  MarketPrices marketPrices,
   ShipCache shipCache,
   AgentCache agentCache,
   Ship ship,
@@ -179,7 +177,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
 ) async {
   final result =
       await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
-  logShipyardTransaction(ship, marketPrices, result.agent, result.transaction);
+  logShipyardTransaction(ship, result.agent, result.transaction);
   return result;
 }
 

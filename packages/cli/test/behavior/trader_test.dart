@@ -123,6 +123,15 @@ void main() {
         availableSpace: any(named: 'availableSpace'),
       ),
     ).thenAnswer((_) => Future.value());
+    when(
+      () => centralCommand.visitLocalShipyard(
+        api,
+        shipyardPrices,
+        agentCache,
+        waypoint,
+        ship,
+      ),
+    ).thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -316,6 +325,15 @@ void main() {
         ),
       ),
     );
+    when(
+      () => centralCommand.visitLocalShipyard(
+        api,
+        shipyardPrices,
+        agentCache,
+        waypoint,
+        ship,
+      ),
+    ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -441,6 +459,15 @@ void main() {
         Behavior.trader,
         any(),
         any(),
+      ),
+    ).thenAnswer((_) => Future.value());
+    when(
+      () => centralCommand.visitLocalShipyard(
+        api,
+        shipyardPrices,
+        agentCache,
+        waypoint,
+        ship,
       ),
     ).thenAnswer((_) => Future.value());
 

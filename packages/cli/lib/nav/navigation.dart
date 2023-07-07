@@ -4,6 +4,7 @@ import 'package:cli/api.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 
@@ -88,6 +89,26 @@ int _distanceBetweenConnectedSystems(ConnectedSystem a, System b) {
 //   return sqrt(dx * dx + dy * dy).round();
 // }
 
+void _verifyJumpTime(
+  SystemsCache systemsCache,
+  Ship ship,
+  String fromSystem,
+  String toSystem,
+  Cooldown cooldown,
+) {
+  final from = systemsCache.systemBySymbol(fromSystem);
+  final to = systemsCache.systemBySymbol(toSystem);
+  final expectedCooldown = cooldownTimeForJumpBetweenSystems(from, to);
+  final distance = from.distanceTo(to);
+  final actualCooldown = cooldown.totalSeconds;
+  if (expectedCooldown != actualCooldown) {
+    shipWarn(
+        ship,
+        'Jump ${from.symbol} to ${to.symbol} ($distance) '
+        'expected $expectedCooldown, got $actualCooldown.');
+  }
+}
+
 /// Continue navigation if needed, returning the wait time if so.
 /// Reads the destination from the ship's behavior state.
 Future<NavResult> continueNavigationIfNeeded(
@@ -143,7 +164,15 @@ Future<NavResult> continueNavigationIfNeeded(
         systemsCache.connectedSystems(currentWaypoint.systemSymbol);
     if (connectedSystems.any((s) => s.symbol == endWaypoint.systemSymbol)) {
       // We can jump directly to the end system.
-      await useJumpGateAndLog(api, ship, endWaypoint.systemSymbol);
+      final response =
+          await useJumpGateAndLog(api, ship, endWaypoint.systemSymbol);
+      _verifyJumpTime(
+        systemsCache,
+        ship,
+        currentWaypoint.systemSymbol,
+        endWaypoint.systemSymbol,
+        response.cooldown,
+      );
       // We can't continue the current action, we have more navigation to do
       // but it's better to figure that out from the top of the loop again.
       return NavResult._loop();

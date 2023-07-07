@@ -1,3 +1,4 @@
+import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
@@ -69,6 +70,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final transactions = await TransactionLog.load(fs);
   final shipSymbols = transactions.shipSymbols;
   final shipIds = shipSymbols.map(ShipId.fromSymbol).toList()..sort();
+  final behaviorCache = await BehaviorCache.load(fs);
 
   final longestHexNumber = shipIds.fold(
     0,
@@ -79,16 +81,16 @@ Future<void> command(FileSystem fs, List<String> args) async {
       'last ${approximateDuration(lookback)}:');
 
   for (final shipId in shipIds) {
+    final state = behaviorCache.getBehavior(shipId.symbol);
     final perMinuteDiff = creditsPerMinute(
       transactions,
       shipId.symbol,
       lookback,
       filter: (t) => !t.tradeSymbol.startsWith('SHIP_'),
     );
-    logger.info(
-      '${shipId.hexNumber.padRight(longestHexNumber)}  '
-      '${perMinuteDiff.toStringAsFixed(2)}',
-    );
+    logger.info('${shipId.hexNumber.padRight(longestHexNumber)}  '
+        '${perMinuteDiff.toStringAsFixed(2)} '
+        '  ${state?.behavior.name ?? 'Unknown'}');
   }
 }
 

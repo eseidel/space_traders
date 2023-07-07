@@ -272,6 +272,9 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is a probe.
   bool get isProbe => frame.symbol == ShipFrameSymbolEnum.PROBE;
 
+  /// Returns true if the ship is a hauler.
+  bool get isHauler => frame.symbol == ShipFrameSymbolEnum.LIGHT_FREIGHTER;
+
   /// Returns true if the ship can mine.
   bool get canMine {
     const minerMounts = [

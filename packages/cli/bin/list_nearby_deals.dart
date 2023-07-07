@@ -1,21 +1,20 @@
 import 'package:args/args.dart';
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/net/auth.dart';
-import 'package:cli/net/queries.dart';
 import 'package:cli/trading.dart';
 import 'package:file/local.dart';
+import 'package:scoped/scoped.dart';
 
-void main(List<String> args) async {
+Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addOption(
       'jumps',
       abbr: 'j',
       help: 'Maximum number of jumps to walk out',
-      defaultsTo: '0',
+      defaultsTo: '1',
     )
     ..addOption(
       'start',
@@ -35,21 +34,34 @@ void main(List<String> args) async {
   }
 
   const fs = LocalFileSystem();
-  final api = defaultApi(fs);
   final systemsCache = await SystemsCache.load(fs);
-  final waypointCache = WaypointCache(api, systemsCache);
+  final shipCache = ShipCache.loadCached(fs)!;
+  // Just grab the command ship.
+  final ship = shipCache.ships.first;
 
-  final ships = allMyShips(api);
-  final ship = await ships.first; // command ship
-
-  final marketCache = MarketCache(waypointCache);
   final marketPrices = await MarketPrices.load(fs);
-  final marketScan = await scanMarketsNear(
-    marketCache,
+  // final waypointCache = WaypointCache(api, systemsCache);
+  // final marketCache = MarketCache(waypointCache);
+  // final marketScan = await scanMarketsNear(
+  //   marketCache,
+  //   marketPrices,
+  //   systemSymbol: ship.nav.systemSymbol,
+  //   maxJumps: maxJumps,
+  // );
+  logger.info('starting scan');
+  final allowedWaypoints = systemsCache
+      .waypointSymbolsInJumpRadius(
+        startSystem: ship.nav.systemSymbol,
+        maxJumps: maxJumps,
+      )
+      .toSet();
+  logger.info('${allowedWaypoints.length} allowed waypoints');
+
+  final marketScan = MarketScan.fromMarketPrices(
     marketPrices,
-    systemSymbol: ship.nav.systemSymbol,
-    maxJumps: maxJumps,
+    waypointFilter: allowedWaypoints.contains,
   );
+  logger.info('scan complete');
   final maybeDeal = await findDealFor(
     marketPrices,
     systemsCache,
@@ -65,4 +77,8 @@ void main(List<String> args) async {
     return;
   }
   logger.info(describeCostedDeal(maybeDeal));
+}
+
+void main(List<String> args) async {
+  await runScoped(() => cliMain(args), values: {loggerRef});
 }

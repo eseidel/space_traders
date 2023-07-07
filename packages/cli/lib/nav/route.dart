@@ -72,16 +72,30 @@ int flightTimeWithinSystemInSeconds(
   return flightTimeByDistanceAndSpeed(distance, shipSpeed, flightMode);
 }
 
+/// Returns the cooldown time after jumping a given distance.
+int cooldownTimeForJumpDistance(int distance) {
+  if (distance < 0) {
+    throw ArgumentError('Distance $distance is negative.');
+  }
+  if (distance > 2000) {
+    throw ArgumentError('Distance $distance is too far to jump.');
+  }
+  return max(60, (distance / 10).round());
+}
+
 /// Returns the cooldown time after jumping between two systems.
 int cooldownTimeForJumpBetweenSystems(System a, System b) {
-  // This would need to check that this two are connected by a jumpgate.
+  if (a.symbol == b.symbol) {
+    throw ArgumentError('Cannot jump between the same system ${a.symbol}.');
+  }
   final distance = a.distanceTo(b);
   if (distance > 2000) {
     throw ArgumentError(
       'Distance ${a.symbol} to ${b.symbol} is too far $distance to jump.',
     );
   }
-  return min(60, distance ~/ 10);
+  // This would need to check that this two are connected by a jumpgate.
+  return max(60, (distance / 10).round());
 }
 
 /// Enum describing the type of action taken in a action in a route.
@@ -261,7 +275,7 @@ int _approximateTimeBetween(
       flightTimeWithinSystemInSeconds(a, aGate, shipSpeed: shipSpeed);
   final bTimeToGate =
       flightTimeWithinSystemInSeconds(b, bGate, shipSpeed: shipSpeed);
-  // Cooldown time for jumps is Math.min(60, distance / 10)
+  // Cooldown time for jumps is Math.max(60, distance / 10)
   // distance / 10 is an approximation of the cooldown time for a jump gate.
   // This assumes there are direct jumps in a line.
   return aTimeToGate + bTimeToGate + systemDistance ~/ 10;
@@ -299,6 +313,9 @@ RoutePlan? planRoute(
       fuelUsed: 0,
     );
   }
+
+  // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
+  // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
 
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html

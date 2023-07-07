@@ -22,7 +22,8 @@ void main() {
   test('CentralCommand.isEnabled', () async {
     final behaviorCache = _MockBehhaviorCache();
     final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(behaviorCache, shipCache);
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     expect(centralCommand.isBehaviorDisabled(Behavior.trader), false);
 
     when(() => behaviorCache.deleteBehavior('S'))
@@ -47,7 +48,8 @@ void main() {
   test('CentralCommand.behaviorFor', () async {
     final behaviorCache = _MockBehhaviorCache();
     final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(behaviorCache, shipCache);
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final ship = _MockShip();
     when(() => ship.registration).thenReturn(
       ShipRegistration(
@@ -67,7 +69,8 @@ void main() {
     final fs = MemoryFileSystem.test();
     final behaviorCache = await BehaviorCache.load(fs);
     final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(behaviorCache, shipCache);
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final shipA = _MockShip();
     final shipNavA = _MockShipNav();
     when(() => shipA.symbol).thenReturn('A');

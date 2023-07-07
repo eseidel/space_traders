@@ -22,7 +22,6 @@ Future<void> _navigateToLocalWaypointAndDock(
     await Future<void>.delayed(flightTime);
     await dockIfNeeded(api, ship);
     await visitLocalMarket(api, caches, destination, ship);
-    await visitLocalShipyard(api, caches.shipyardPrices, destination, ship);
     logger.info('Docked.');
   }
 }

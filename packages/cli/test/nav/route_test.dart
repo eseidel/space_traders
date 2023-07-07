@@ -47,6 +47,43 @@ void main() {
     );
   });
 
+  test('cooldownTime', () {
+    final a = System(
+      sectorSymbol: 'S',
+      symbol: 'a',
+      x: 0,
+      y: 0,
+      type: SystemType.RED_STAR,
+    );
+    final b = System(
+      sectorSymbol: 'S',
+      symbol: 'b',
+      x: 2000,
+      y: 0,
+      type: SystemType.RED_STAR,
+    );
+    final c = System(
+      sectorSymbol: 'S',
+      symbol: 'c',
+      x: 2001,
+      y: 0,
+      type: SystemType.RED_STAR,
+    );
+    expect(cooldownTimeForJumpBetweenSystems(a, b), 200);
+    expect(cooldownTimeForJumpBetweenSystems(b, a), 200);
+    expect(() => cooldownTimeForJumpBetweenSystems(a, c), throwsArgumentError);
+    expect(() => cooldownTimeForJumpBetweenSystems(a, a), throwsArgumentError);
+    expect(cooldownTimeForJumpBetweenSystems(b, c), 60);
+
+    expect(cooldownTimeForJumpDistance(2000), 200);
+    expect(cooldownTimeForJumpDistance(0), 60);
+    // Server seems to round, rather than floor:
+    expect(cooldownTimeForJumpDistance(1527), 153);
+    expect(() => cooldownTimeForJumpDistance(2001), throwsArgumentError);
+    expect(() => cooldownTimeForJumpDistance(-20), throwsArgumentError);
+    expect(() => cooldownTimeForJumpDistance(-2001), throwsArgumentError);
+  });
+
   test('planRoute', () {
     const fs = LocalFileSystem();
     final systemsCache = SystemsCache.loadFromCache(

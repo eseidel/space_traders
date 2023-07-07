@@ -94,8 +94,9 @@ Earning:
 * Add logic for buying and mounting modules.
 * Traders only consider how repeated buys inflate prices, they do not consider
   how repeated sells might deflate prices at sell point.
-* Generate potential deals directly from PriceData with no server queries.
 * Teach miners how to coordinate with haulers to sell their goods further away.
+* It's not clear if contract trading is working, should write a tool to list
+  nearby deals and highligh where the contract deal sits in that list.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jumpgate
@@ -106,17 +107,16 @@ Exploring:
   jump gate clusters.
 
 Tech Debt:
-* Build a docker container and run the app in the cloud.  With a docker volume
-  so the state persists.
 * Fix all uses of DateTime.now() to be DateTime.timestamp() and test.
 
 Efficiency:
+* Cache system-to-system routes via jumpgates.
 * Start to build a system database similar to the pricing database.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Write a better rate-limiting model.
 * Make the script robust to network failures.
-* Write generalized route planner to calculate route times and costs.
+* Teach route planner how to warp.
 
 Automation:
 * Have a config language to explain what mounts a ship should have.
@@ -147,3 +147,43 @@ Thoughts
 * Miners are just the "find me where to sell this" problem
 * Contracts are just the "find me where to buy this" problem
 * Arbitrage is both of those problems, should be able to share code.
+
+
+Something is wrong with deal "actual" logic:
+🛸#20 ✍️  market data @ X1-YN50-47435D
+/my/ships/ESEIDEL-20/refuel
+🛸#20 ⛽  2 FUEL                           ⚖️   2 x    122c =   -244c -> 🏦 43,911,593c
+/my/ships/ESEIDEL-20/sell
+🛸#20 🤝 100 DIAMONDS             +5% +25c per 100 x    480c = +48,000c -> 🏦 43,959,593c
+/my/ships/ESEIDEL-20/sell
+🛸#20 🤝 20 DIAMONDS             +3% +14c per 20 x    469c = +9,380c -> 🏦 43,968,973c
+🛸#20 Expected 2,516c profit (13c/s), got 48,080c (139c/s)
+
+This may just have been that the route actions were empty for old deals
+still in progress when routes were added.
+
+Handle 500 errors better:
+
+🛸#20 ✈️  to X1-AP26-80647B, 00:00:00 left
+[WARN] Failed to parse exception json: FormatException: Unexpected character (at line 2, character 1)
+<html><head>
+^
+
+[WARN] Failed to parse exception json: FormatException: Unexpected character (at line 2, character 1)
+<html><head>
+^
+
+Unhandled exception:
+ApiException 500:
+<html><head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<title>500 Server Error</title>
+</head>
+<body text=#000000 bgcolor=#ffffff>
+<h1>Error: Server Error</h1>
+<h2>The server encountered an error and could not complete your request.<p>Please try again in 30 seconds.</h2>
+<h2></h2>
+</body></html>
+
+#0      SystemsApi.getSystemWaypoints (package:openapi/api/systems_api.dart:394:7)
+<asynchronous suspension>

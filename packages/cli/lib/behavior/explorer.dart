@@ -4,7 +4,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
-import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 
 bool _isMissingChartOrRecentPriceData(
@@ -89,21 +88,6 @@ Future<Market?> visitLocalMarket(
   return market;
 }
 
-/// Visits the local shipyard if we're at a waypoint with a shipyard.
-/// Records shipyard data if needed.
-Future<void> visitLocalShipyard(
-  Api api,
-  ShipyardPrices shipyardPrices,
-  Waypoint waypoint,
-  Ship ship,
-) async {
-  if (!waypoint.hasShipyard) {
-    return;
-  }
-  final shipyard = await getShipyard(api, waypoint);
-  await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
-}
-
 /// One loop of the exploring logic.
 Future<DateTime?> advanceExplorer(
   Api api,
@@ -128,9 +112,14 @@ Future<DateTime?> advanceExplorer(
       await chartWaypointAndLog(api, ship);
     }
     await visitLocalMarket(api, caches, waypoint, ship);
-    // Every time we're at a shipyard and can afford a ship, we should
-    // buy one.  Probably ore hounds at first, then probes?
-    await visitLocalShipyard(api, caches.shipyardPrices, waypoint, ship);
+    // We might buy a ship if we're at a ship yard.
+    await centralCommand.visitLocalShipyard(
+      api,
+      caches.shipyardPrices,
+      caches.agent,
+      waypoint,
+      ship,
+    );
     // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
     await centralCommand.completeBehavior(ship.symbol);

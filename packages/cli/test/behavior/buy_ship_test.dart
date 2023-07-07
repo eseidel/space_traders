@@ -65,10 +65,11 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('W');
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.systemSymbol).thenReturn('S-A');
+    when(() => waypoint.symbol).thenReturn('S-A-W');
 
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
@@ -83,6 +84,15 @@ void main() {
         Behavior.buyShip,
         any(),
         any(),
+      ),
+    ).thenAnswer((_) => Future.value());
+    when(
+      () => centralCommand.visitLocalShipyard(
+        api,
+        shipyardPrices,
+        agentCache,
+        waypoint,
+        ship,
       ),
     ).thenAnswer((_) => Future.value());
 

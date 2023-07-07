@@ -6,9 +6,6 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 
-/// What the max multiplier of median we would pay for a ship.
-const maxMedianMultipler = 1.1;
-
 // TODO(eseidel): This only looks in the current system.
 Future<Waypoint?> _nearbyShipyardWithBestPrice(
   WaypointCache waypointCache,
@@ -60,7 +57,10 @@ Future<DateTime?> advanceBuyShip(
   final currentWaypoint =
       await caches.waypoints.waypoint(ship.nav.waypointSymbol);
 
-  final shipType = centralCommand.shipTypeToBuy();
+  final shipType = centralCommand.shipTypeToBuy(
+    caches.agent,
+    waypointSymbol: currentWaypoint.symbol,
+  );
   if (shipType == null) {
     await centralCommand.disableBehaviorForAll(
       ship,
@@ -82,6 +82,7 @@ Future<DateTime?> advanceBuyShip(
     );
     return null;
   }
+  final maxMedianMultipler = centralCommand.maxMedianShipPriceMultipler;
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
   final credits = caches.agent.agent.credits;
   if (credits < maxPrice) {
@@ -131,7 +132,6 @@ Future<DateTime?> advanceBuyShip(
     // Do we need to catch exceptions about insufficient credits?
     final result = await purchaseShipAndLog(
       api,
-      caches.marketPrices,
       caches.ships,
       caches.agent,
       ship,

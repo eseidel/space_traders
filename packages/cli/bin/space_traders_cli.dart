@@ -55,7 +55,8 @@ Future<void> cliMain(List<String> args) async {
     '${caches.shipyardPrices.count} prices from '
     '${caches.shipyardPrices.waypointCount} shipyards.',
   );
-  final centralCommand = CentralCommand(caches.behaviors, caches.ships);
+  final centralCommand =
+      CentralCommand(behaviorCache: caches.behaviors, shipCache: caches.ships);
 
   final status = await api.defaultApi.getStatus();
   printStatus(status!);
