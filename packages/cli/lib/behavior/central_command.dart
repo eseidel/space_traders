@@ -649,6 +649,8 @@ int _minimumFloatRequired(Contract contract) {
     'Only contracts with a single deliver good are supported',
   );
   final good = contract.terms.deliver.first;
+  // MaxUnitPrice is the max we'd pay, which isn't the max they're likely to
+  // cost.  We could instead use median price of the good in question.
   final maxUnitPrice = _maxWorthwhileUnitPurchasePrice(contract, good);
   const creditsBuffer = 20000;
   final remainingUnits = good.unitsRequired - good.unitsFulfilled;
@@ -669,5 +671,5 @@ Iterable<Contract> affordableContracts(
   // trading.
   final credits = agentCache.agent.credits;
   return contractsCache.activeContracts
-      .where((c) => _minimumFloatRequired(c) < credits);
+      .where((c) => _minimumFloatRequired(c) <= credits);
 }

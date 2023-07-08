@@ -1,7 +1,9 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
+import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
@@ -17,6 +19,8 @@ class _MockShip extends Mock implements Ship {}
 class _MockLogger extends Mock implements Logger {}
 
 class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockAgent extends Mock implements Agent {}
 
 void main() {
   test('CentralCommand.isDisabledForAll', () async {
@@ -140,5 +144,60 @@ void main() {
     await centralCommand.completeBehavior('B');
     final otherSystems3 = centralCommand.otherExplorerSystems('A');
     expect(otherSystems3, <String>[]);
+  });
+
+  test('CentralCommand.affordableContracts', () {
+    final ship = _MockShip();
+    final agent = _MockAgent();
+    // TODO(eseidel): Contracts are disabled under 100000 credits.
+    when(() => agent.credits).thenReturn(100000);
+    final agentCache = AgentCache(agent);
+    when(() => ship.symbol).thenReturn('S');
+    final hourFromNow = DateTime.timestamp().add(const Duration(hours: 1));
+    final contract1 = Contract(
+      id: '1',
+      factionSymbol: 'faction',
+      type: ContractTypeEnum.PROCUREMENT,
+      terms: ContractTerms(
+        deadline: hourFromNow,
+        payment: ContractPayment(onAccepted: 100000, onFulfilled: 100000),
+        deliver: [
+          ContractDeliverGood(
+            tradeSymbol: 'T',
+            destinationSymbol: 'W',
+            unitsFulfilled: 0,
+            unitsRequired: 1,
+          )
+        ],
+      ),
+      expiration: hourFromNow,
+      deadlineToAccept: hourFromNow,
+    );
+    final contract2 = Contract(
+      id: '2',
+      factionSymbol: 'faction',
+      type: ContractTypeEnum.PROCUREMENT,
+      terms: ContractTerms(
+        deadline: hourFromNow,
+        payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
+        deliver: [
+          ContractDeliverGood(
+            tradeSymbol: 'T',
+            destinationSymbol: 'W',
+            unitsFulfilled: 0,
+            unitsRequired: 10,
+          )
+        ],
+      ),
+      expiration: hourFromNow,
+      deadlineToAccept: hourFromNow,
+    );
+    final contracts = [contract1, contract2];
+    final contractCache = ContractCache(contracts);
+    final active = contractCache.activeContracts;
+    expect(active.length, 2);
+    final affordable = affordableContracts(agentCache, contractCache).toList();
+    expect(affordable.length, 1);
+    expect(affordable.first.id, '2');
   });
 }
