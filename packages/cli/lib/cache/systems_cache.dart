@@ -113,6 +113,15 @@ class SystemsCache extends JsonListStore<System> {
     return _systems.firstWhere((s) => s.symbol == symbol);
   }
 
+  /// Fetch the waypoint with the given symbol, or null if it does not exist.
+  Future<SystemWaypoint?> waypointOrNull(String waypointSymbol) async {
+    assertIsWaypointSymbol(waypointSymbol);
+    assert(waypointSymbol.split('-').length == 3, 'Invalid system symbol');
+    final systemSymbol = parseWaypointString(waypointSymbol).system;
+    final waypoints = waypointsInSystem(systemSymbol);
+    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
+  }
+
   /// Return the SystemWaypoint for the given [symbol].
   SystemWaypoint waypointFromSymbol(String symbol) {
     final parsed = parseWaypointString(symbol);

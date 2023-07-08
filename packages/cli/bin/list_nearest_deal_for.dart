@@ -37,7 +37,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     return;
   }
   // Should start from a ship rather than hq.
-  final hq = await caches.waypoints.getAgentHeadquarters();
+  final hq = caches.agent.headquarters(caches.systems);
   const maxJumps = 5;
 
   final availabilityList = <_Availability>[];

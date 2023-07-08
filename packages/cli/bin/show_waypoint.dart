@@ -13,7 +13,7 @@ Future<void> command(
   Api api,
   Caches caches,
 ) async {
-  final hq = await caches.waypoints.getAgentHeadquarters();
+  final hq = caches.agent.headquarters(caches.systems);
   final systemSymbol = args.firstOrNull ?? hq.systemSymbol;
   final waypoints = await caches.waypoints.waypointsInSystem(systemSymbol);
 
