@@ -99,6 +99,9 @@ Earning:
   nearby deals and highlight where the contract deal sits in that list.
 * Add refining
 * Add gas siphoning
+* Consider up to N waypoints for trading, rather than N jumps.
+* Add logic for command ship to switch between trading and mining depending
+  on expected profit.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate

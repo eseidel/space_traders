@@ -543,6 +543,9 @@ class CentralCommand {
     // This assumes the ship in question is at a shipyard and already docked.
     final waypointSymbol = ship.nav.waypointSymbol;
     final shipType = shipTypeToBuy(agentCache, waypointSymbol: waypointSymbol);
+    // TODO(eseidel): This is wrong, this will disable buying for all
+    // ships even though we might just be at a system where we don't need a ship
+    // or can't afford one?
     if (shipType == null) {
       await disableBehaviorForAll(
         ship,
