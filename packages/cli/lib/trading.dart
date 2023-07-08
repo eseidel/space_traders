@@ -770,7 +770,6 @@ Future<CostedDeal?> findDealFor(
   Ship ship, {
   required int maxJumps,
   required int maxTotalOutlay,
-  required int availableSpace,
   List<SellOpp>? extraSellOpps,
   bool Function(CostedDeal deal)? filter,
 }) async {
@@ -783,7 +782,7 @@ Future<CostedDeal?> findDealFor(
       systemsCache,
       systemConnectivity,
       deal,
-      cargoSize: availableSpace,
+      cargoSize: ship.availableSpace,
       shipWaypointSymbol: ship.nav.waypointSymbol,
       shipFuelCapacity: ship.fuel.capacity,
       costPerFuelUnit:

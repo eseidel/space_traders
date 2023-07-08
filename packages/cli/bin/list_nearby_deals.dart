@@ -1,5 +1,4 @@
 import 'package:args/args.dart';
-import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
@@ -72,7 +71,6 @@ Future<void> cliMain(List<String> args) async {
     ship,
     maxJumps: maxJumps,
     maxTotalOutlay: 10000,
-    availableSpace: ship.availableSpace,
   );
 
   if (maybeDeal == null) {

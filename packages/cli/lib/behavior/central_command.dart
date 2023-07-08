@@ -347,7 +347,6 @@ class CentralCommand {
     Ship ship, {
     required int maxJumps,
     required int maxTotalOutlay,
-    required int availableSpace,
   }) async {
     final inProgress = _dealsInProgress().toList();
     // Avoid having two ships working on the same deal since by the time the
@@ -387,7 +386,6 @@ class CentralCommand {
       ship,
       maxJumps: maxJumps,
       maxTotalOutlay: maxTotalOutlay,
-      availableSpace: ship.availableSpace,
       extraSellOpps: contractSellOpps,
       filter: filter,
     );

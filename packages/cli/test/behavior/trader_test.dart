@@ -126,7 +126,6 @@ void main() {
         ship,
         maxJumps: any(named: 'maxJumps'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
-        availableSpace: any(named: 'availableSpace'),
       ),
     ).thenAnswer((_) => Future.value());
     when(
@@ -459,7 +458,6 @@ void main() {
         ship,
         maxJumps: any(named: 'maxJumps'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
-        availableSpace: any(named: 'availableSpace'),
       ),
     ).thenAnswer((_) => Future.value());
     when(

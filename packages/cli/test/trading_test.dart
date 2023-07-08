@@ -25,6 +25,8 @@ class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
+class _MockShipCargo extends Mock implements ShipCargo {}
+
 void main() {
   test('MarketScan empty', () {
     final marketPrices = _MockMarketPrices();
@@ -342,7 +344,6 @@ void main() {
         ship,
         maxJumps: maxJumps,
         maxTotalOutlay: 100000,
-        availableSpace: 10,
       ),
     );
     expect(costed, isNull);
@@ -434,12 +435,16 @@ void main() {
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final shipEngine = _MockShipEngine();
+    final shipCargo = _MockShipCargo();
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-A');
     when(() => shipNav.systemSymbol).thenReturn('S-A');
     when(() => ship.engine).thenReturn(shipEngine);
     when(() => shipEngine.speed).thenReturn(30);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => shipCargo.capacity).thenReturn(1);
+    when(() => shipCargo.units).thenReturn(0);
     when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
         .thenAnswer((_) => Stream.fromIterable(markets));
 
@@ -463,7 +468,6 @@ void main() {
         ship,
         maxJumps: 1,
         maxTotalOutlay: 100000,
-        availableSpace: 1,
       ),
     );
     expect(costed, isNotNull);

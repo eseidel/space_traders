@@ -493,7 +493,6 @@ Future<DateTime?> advanceTrader(
     ship,
     maxJumps: maxJumps,
     maxTotalOutlay: caches.agent.agent.credits,
-    availableSpace: ship.availableSpace,
   );
 
   if (newDeal == null) {
