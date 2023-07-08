@@ -3,7 +3,6 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -29,7 +28,6 @@ void main() {
     final FleetApi fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
 
-    final fs = MemoryFileSystem.test();
     final shipCache = _MockShipCache();
     final agent1 = _MockAgent();
     final agent2 = _MockAgent();
