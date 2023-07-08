@@ -7,7 +7,7 @@ import 'package:file/file.dart';
 class FactionCache extends ResponseListCache<Faction> {
   /// Creates a new faction cache.
   FactionCache(
-    super.contracts, {
+    super.factions, {
     // Factions should never change.
     super.checkEvery = 10000,
     super.fs,
