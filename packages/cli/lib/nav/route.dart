@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
@@ -299,7 +300,8 @@ int _timeBetween(
 
 /// Plan a route between two waypoints.
 RoutePlan? planRoute(
-  SystemsCache systemsCache, {
+  SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity, {
   required SystemWaypoint start,
   required SystemWaypoint end,
   required int fuelCapacity,
@@ -312,6 +314,16 @@ RoutePlan? planRoute(
       shipSpeed: shipSpeed,
       fuelUsed: 0,
     );
+  }
+
+  // We only handle jumps at the moment.
+  // We fail out quickly from our reachability cache if these system waypoints
+  // are not in the same system cluster.
+  if (!systemConnectivity.canJumpBetween(
+    startSystemSymbol: start.systemSymbol,
+    endSystemSymbol: end.systemSymbol,
+  )) {
+    return null;
   }
 
   // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
@@ -426,6 +438,7 @@ int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
 /// Plan a route through a series of waypoints.
 RoutePlan? planRouteThrough(
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   List<String> waypointSymbols, {
   required int fuelCapacity,
   required int shipSpeed,
@@ -439,6 +452,7 @@ RoutePlan? planRouteThrough(
     final end = systemsCache.waypointFromSymbol(waypointSymbols[i + 1]);
     final plan = planRoute(
       systemsCache,
+      systemConnectivity,
       start: start,
       end: end,
       fuelCapacity: fuelCapacity,

@@ -3,6 +3,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
@@ -25,6 +26,7 @@ String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
 
 Duration timeToDestination(
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   Ship ship,
   String destinationSymbol,
 ) {
@@ -38,6 +40,7 @@ Duration timeToDestination(
   final end = systemsCache.waypointFromSymbol(destinationSymbol);
   final route = planRoute(
     systemsCache,
+    systemConnectivity,
     start: start,
     end: end,
     fuelCapacity: ship.fuel.capacity,
@@ -75,6 +78,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final shipCache = ShipCache.loadCached(fs)!;
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final marketPrices = await MarketPrices.load(fs);
+  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
 
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
@@ -92,7 +96,12 @@ Future<void> command(FileSystem fs, List<String> args) async {
     }
     final destination = behavior?.destination;
     if (destination != null) {
-      final timeToArrival = timeToDestination(systemsCache, ship, destination);
+      final timeToArrival = timeToDestination(
+        systemsCache,
+        systemConnectivity,
+        ship,
+        destination,
+      );
       logger.info('  destination: $destination, '
           'arrives in ${approximateDuration(timeToArrival)}');
     }

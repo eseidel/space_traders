@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
@@ -340,6 +341,7 @@ class CentralCommand {
     ContractCache contractCache,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
+    SystemConnectivity systemConnectivity,
     WaypointCache waypointCache,
     MarketCache marketCache,
     Ship ship, {
@@ -380,6 +382,7 @@ class CentralCommand {
     final maybeDeal = await findDealFor(
       marketPrices,
       systemsCache,
+      systemConnectivity,
       marketScan,
       ship,
       maxJumps: maxJumps,

@@ -40,7 +40,7 @@ Future<void> cliMain(List<String> args) async {
 
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
-  final systemsCache = await SystemsCache.load(fs);
+  final systemsCache = SystemsCache.loadFromCache(fs)!;
   final waypointCache = WaypointCache(api, systemsCache);
   final marketCache = MarketCache(waypointCache);
   final marketPrices = await MarketPrices.load(fs);

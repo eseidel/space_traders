@@ -54,14 +54,14 @@ Map<String, int> _findClusters(SystemsCache systemsCache) {
 
 /// Holds the results from finding clusters of systems on the jumpgate
 /// networks.
-class SystemReachability {
-  /// Creates a new SystemReachability.
-  SystemReachability(Map<String, int> clusterBySystemSymbol)
+class SystemConnectivity {
+  /// Creates a new SystemConnectivity.
+  SystemConnectivity(Map<String, int> clusterBySystemSymbol)
       : _clusterBySystemSymbol = clusterBySystemSymbol;
 
-  /// Creates a new SystemReachability from the systemsCache.
-  factory SystemReachability.fromSystemsCache(SystemsCache systemsCache) {
-    return SystemReachability(_findClusters(systemsCache));
+  /// Creates a new SystemConnectivity from the systemsCache.
+  factory SystemConnectivity.fromSystemsCache(SystemsCache systemsCache) {
+    return SystemConnectivity(_findClusters(systemsCache));
   }
 
   final Map<String, int> _clusterBySystemSymbol;

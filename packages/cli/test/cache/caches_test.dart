@@ -63,9 +63,14 @@ void main() {
     );
 
     final fs = MemoryFileSystem.test();
+    fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);
+    fs.file(SystemsCache.defaultCacheFilePath).writeAsStringSync('[]');
     final logger = _MockLogger();
-    final caches =
-        await runWithLogger(logger, () async => Caches.load(fs, api));
+    Never httpGet(f) => throw UnimplementedError();
+    final caches = await runWithLogger(
+      logger,
+      () async => Caches.load(fs, api, httpGet: httpGet),
+    );
     expect(caches.agent, isNotNull);
   });
 }

@@ -73,9 +73,9 @@ class SystemsCache extends JsonListStore<System> {
   /// Load the cache from disk or fall back to fetching from the url.
   static Future<SystemsCache> load(
     FileSystem fs, {
+    required Future<http.Response> Function(Uri uri) httpGet,
     String path = defaultCacheFilePath,
     String url = defaultUrl,
-    Future<http.Response> Function(Uri uri)? httpGet,
   }) async {
     // Try to load systems.json.
     final fromCache = _loadSystemsCache(fs, path);
@@ -87,8 +87,7 @@ class SystemsCache extends JsonListStore<System> {
     final uri = Uri.parse(url);
     logger.info('Failed to load systems from cache, fetching from $uri');
     try {
-      final get = httpGet ?? http.get;
-      final response = await get(uri);
+      final response = await httpGet(uri);
       if (response.statusCode >= 400) {
         throw ApiException(response.statusCode, response.body);
       }

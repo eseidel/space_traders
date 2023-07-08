@@ -10,7 +10,9 @@ import 'package:cli/cache/surveys.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/file.dart';
+import 'package:http/http.dart' as http;
 
 export 'package:cli/api.dart';
 export 'package:cli/cache/agent_cache.dart';
@@ -35,6 +37,7 @@ class Caches {
     required this.shipyardPrices,
     required this.surveys,
     required this.systems,
+    required this.systemConnectivity,
     required this.transactions,
     required this.waypoints,
     required this.markets,
@@ -64,6 +67,9 @@ class Caches {
   /// The cache of systems.
   final SystemsCache systems;
 
+  /// Cache of system reachability.
+  final SystemConnectivity systemConnectivity;
+
   /// The transaction log.
   final TransactionLog transactions;
 
@@ -80,14 +86,19 @@ class Caches {
   final FactionCache factions;
 
   /// Load the cache from disk and network.
-  static Future<Caches> load(FileSystem fs, Api api) async {
+  static Future<Caches> load(
+    FileSystem fs,
+    Api api, {
+    required Future<http.Response> Function(Uri uri) httpGet,
+  }) async {
     final agent = await AgentCache.load(api);
     final prices = await MarketPrices.load(fs);
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
     final shipyard = await ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);
-    final systems = await SystemsCache.load(fs);
+    final systems = await SystemsCache.load(fs, httpGet: httpGet);
+    final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
     final transactions = await TransactionLog.load(fs);
     final waypoints = WaypointCache(api, systems);
     final markets = MarketCache(waypoints);
@@ -110,6 +121,7 @@ class Caches {
       shipyardPrices: shipyard,
       surveys: surveys,
       systems: systems,
+      systemConnectivity: systemConnectivity,
       transactions: transactions,
       waypoints: waypoints,
       markets: markets,

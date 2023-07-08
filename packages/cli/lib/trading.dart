@@ -7,6 +7,7 @@ import 'package:cli/cache/transactions.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -676,6 +677,7 @@ String describeCostedDeal(CostedDeal costedDeal) {
 /// Returns a CostedDeal for a given deal.
 CostedDeal costOutDeal(
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   Deal deal, {
   required int cargoSize,
   required int shipSpeed,
@@ -686,6 +688,7 @@ CostedDeal costOutDeal(
 }) {
   final route = planRouteThrough(
     systemsCache,
+    systemConnectivity,
     [shipWaypointSymbol, deal.sourceSymbol, deal.destinationSymbol],
     fuelCapacity: shipFuelCapacity,
     shipSpeed: shipSpeed,
@@ -762,6 +765,7 @@ CostedDeal? _filterDealsAndLog(
 Future<CostedDeal?> findDealFor(
   MarketPrices marketPrices,
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   MarketScan scan,
   Ship ship, {
   required int maxJumps,
@@ -777,6 +781,7 @@ Future<CostedDeal?> findDealFor(
     (deal) => costOutDeal(
       shipSpeed: ship.engine.speed,
       systemsCache,
+      systemConnectivity,
       deal,
       cargoSize: availableSpace,
       shipWaypointSymbol: ship.nav.waypointSymbol,

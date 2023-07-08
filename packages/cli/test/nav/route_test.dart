@@ -1,6 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/local.dart';
 import 'package:test/test.dart';
 
@@ -90,11 +91,14 @@ void main() {
       fs,
       path: 'test/nav/fixtures/systems-06-24-2023.json',
     )!;
+    final systemConnectivity =
+        SystemConnectivity.fromSystemsCache(systemsCache);
     void expectRoute(String start, String end, int expectedSeconds) {
       final startWaypoint = systemsCache.waypointFromSymbol(start);
       final endWaypoint = systemsCache.waypointFromSymbol(end);
       final route = planRoute(
         systemsCache,
+        systemConnectivity,
         start: startWaypoint,
         end: endWaypoint,
         fuelCapacity: 1200,

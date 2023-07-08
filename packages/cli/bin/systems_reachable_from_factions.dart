@@ -3,7 +3,7 @@ import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/system_reachability.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
 
@@ -25,7 +25,7 @@ Future<FactionCache> _loadFactionCache(FileSystem fs) async {
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  final systemsCache = await SystemsCache.load(fs);
+  final systemsCache = SystemsCache.loadFromCache(fs)!;
   final factionCache = await _loadFactionCache(fs);
 
   final factions = factionCache.factions;
@@ -33,7 +33,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     for (final faction in factions) faction.symbol.value: faction.headquarters
   };
 
-  final clusterCache = SystemReachability.fromSystemsCache(systemsCache);
+  final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
   for (final faction in hqByFaction.keys) {
     final hq = hqByFaction[faction]!;
     final reachable = clusterCache.connectedSystemCount(

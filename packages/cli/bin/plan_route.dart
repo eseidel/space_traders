@@ -2,6 +2,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440
 // Planned route from X1-CX76-69886Z to X1-XH63-75510F under fuel: 1200
@@ -33,12 +34,14 @@ void main(List<String> args) async {
 
 void planRouteAndLog(
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   SystemWaypoint start,
   SystemWaypoint end,
 ) {
   final routeStart = DateTime.now();
   final plan = planRoute(
     systemsCache,
+    systemConnectivity,
     start: start,
     end: end,
     fuelCapacity: 1200,
@@ -102,7 +105,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
   // }
   // logger.info(plan.actions.toString());
 
-  final systemsCache = await SystemsCache.load(fs);
+  final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final factionCache = FactionCache.loadFromCache(fs)!;
   final factions = factionCache.factions;
   final startTime = DateTime.now();
@@ -116,7 +120,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     final nextHq = systemsCache.waypointFromSymbol(nextHqSymbol);
     logger.info('Routing from ${faction.symbol} ($hqSymbol) to '
         '${nextFaction.symbol} ($nextHqSymbol)');
-    planRouteAndLog(systemsCache, hq, nextHq);
+    planRouteAndLog(systemsCache, systemConnectivity, hq, nextHq);
   }
   final endTime = DateTime.now();
   logger.info('Total time: ${endTime.difference(startTime)}');

@@ -4,6 +4,7 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
@@ -34,7 +35,8 @@ Future<void> cliMain(List<String> args) async {
   }
 
   const fs = LocalFileSystem();
-  final systemsCache = await SystemsCache.load(fs);
+  final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final shipCache = ShipCache.loadCached(fs)!;
   // Just grab the command ship.
   final ship = shipCache.ships.first;
@@ -65,6 +67,7 @@ Future<void> cliMain(List<String> args) async {
   final maybeDeal = await findDealFor(
     marketPrices,
     systemsCache,
+    systemConnectivity,
     marketScan,
     ship,
     maxJumps: maxJumps,

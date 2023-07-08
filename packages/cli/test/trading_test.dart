@@ -4,6 +4,7 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -21,6 +22,8 @@ class _MockMarketPrices extends Mock implements MarketPrices {}
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipEngine extends Mock implements ShipEngine {}
+
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 void main() {
   test('MarketScan empty', () {
@@ -216,6 +219,7 @@ void main() {
 
   test('costOutDeal basic', () {
     final systemsCache = _MockSystemsCache();
+    final systemConnectivity = _MockSystemConnectivity();
     final start = SystemWaypoint(
       symbol: 'X-S-A',
       type: WaypointType.ASTEROID_FIELD,
@@ -231,6 +235,12 @@ void main() {
     when(() => systemsCache.waypointFromSymbol('X-S-A')).thenReturn(start);
     when(() => systemsCache.waypointFromSymbol('X-S-B')).thenReturn(end);
     when(() => systemsCache.waypointsInSystem('X-S')).thenReturn([start, end]);
+    when(
+      () => systemConnectivity.canJumpBetween(
+        startSystemSymbol: any(named: 'startSystemSymbol'),
+        endSystemSymbol: any(named: 'endSystemSymbol'),
+      ),
+    ).thenReturn(true);
 
     const deal = Deal(
       sourceSymbol: 'X-S-A',
@@ -241,6 +251,7 @@ void main() {
     );
     final costed = costOutDeal(
       systemsCache,
+      systemConnectivity,
       deal,
       cargoSize: 1,
       shipSpeed: 1,
@@ -302,6 +313,7 @@ void main() {
   test('findDealFor no markets', () async {
     final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
+    final systemConnectivity = _MockSystemConnectivity();
     final marketCache = _MockMarketCache();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
@@ -325,6 +337,7 @@ void main() {
       () => findDealFor(
         marketPrices,
         systemsCache,
+        systemConnectivity,
         marketScan,
         ship,
         maxJumps: maxJumps,
@@ -345,6 +358,13 @@ void main() {
     // thus has a better profit per second.
     final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
+    final systemConnectivity = _MockSystemConnectivity();
+    when(
+      () => systemConnectivity.canJumpBetween(
+        startSystemSymbol: any(named: 'startSystemSymbol'),
+        endSystemSymbol: any(named: 'endSystemSymbol'),
+      ),
+    ).thenReturn(true);
     final marketCache = _MockMarketCache();
     final saa = SystemWaypoint(
       symbol: 'S-A-A',
@@ -438,6 +458,7 @@ void main() {
       () => findDealFor(
         marketPrices,
         systemsCache,
+        systemConnectivity,
         marketScan,
         ship,
         maxJumps: 1,

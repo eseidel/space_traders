@@ -487,6 +487,7 @@ Future<DateTime?> advanceTrader(
     caches.contracts,
     caches.marketPrices,
     caches.systems,
+    caches.systemConnectivity,
     caches.waypoints,
     caches.markets,
     ship,

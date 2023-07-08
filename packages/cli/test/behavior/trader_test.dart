@@ -4,6 +4,7 @@ import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -48,6 +49,8 @@ class _MockContractsApi extends Mock implements ContractsApi {}
 
 class _MockContractCache extends Mock implements ContractCache {}
 
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
 void main() {
   test('advanceContractTrader smoke test', () async {
     final api = _MockApi();
@@ -55,6 +58,7 @@ void main() {
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
+    final systemConnectivity = _MockSystemConnectivity();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
     final transactionLog = _MockTransactionLog();
@@ -74,6 +78,7 @@ void main() {
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.contracts).thenReturn(contractCache);
+    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
 
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
@@ -115,6 +120,7 @@ void main() {
         contractCache,
         marketPrices,
         systemsCache,
+        systemConnectivity,
         waypointCache,
         marketCache,
         ship,
@@ -361,6 +367,7 @@ void main() {
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
+    final systemConnectivity = _MockSystemConnectivity();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
     final transactionLog = _MockTransactionLog();
@@ -379,6 +386,7 @@ void main() {
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.contracts).thenReturn(contractCache);
     when(() => contractCache.activeContracts).thenReturn([]);
+    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
 
     final agent = _MockAgent();
     when(() => agentCache.agent).thenReturn(agent);
@@ -445,6 +453,7 @@ void main() {
         contractCache,
         marketPrices,
         systemsCache,
+        systemConnectivity,
         waypointCache,
         marketCache,
         ship,

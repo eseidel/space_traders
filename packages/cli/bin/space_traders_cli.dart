@@ -9,6 +9,7 @@ import 'package:cli/net/auth.dart';
 import 'package:cli/net/rate_limit.dart';
 import 'package:cli/printing.dart';
 import 'package:file/local.dart';
+import 'package:http/http.dart' as http;
 import 'package:scoped/scoped.dart';
 
 void printRequestStats(RateLimitedApiClient client) {
@@ -48,7 +49,7 @@ Future<void> cliMain(List<String> args) async {
       await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
   final api = apiFromAuthToken(token);
 
-  final caches = await Caches.load(fs, api);
+  final caches = await Caches.load(fs, api, httpGet: http.get);
   logger.info(
     'Loaded ${caches.marketPrices.count} prices from '
     '${caches.marketPrices.waypointCount} markets and '
