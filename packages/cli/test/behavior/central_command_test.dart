@@ -134,7 +134,7 @@ void main() {
     final otherSystems = centralCommand.otherExplorerSystems('A');
     expect(otherSystems, ['S-B']); // From destination
     await centralCommand.reachedDestination(shipB);
-    expect(centralCommand.currentDestination(shipB), null);
+    expect(centralCommand.currentDestination(shipB), isNull);
     final otherSystems2 = centralCommand.otherExplorerSystems('A');
     expect(otherSystems2, ['S-C']); // From nav.systemSymbol
     await centralCommand.completeBehavior('B');

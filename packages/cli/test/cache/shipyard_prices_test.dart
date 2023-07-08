@@ -36,10 +36,10 @@ void main() {
       timestamp: moonLanding,
     );
     await shipyardPrices.addPrices([a, b]);
-    expect(shipyardPrices.rawPrices, [a, b]);
+    expect(shipyardPrices.prices, [a, b]);
     await shipyardPrices.save();
     final shipyardPrices2 = await ShipyardPrices.load(fs);
-    expect(shipyardPrices2.rawPrices, [a, b]);
+    expect(shipyardPrices2.prices, [a, b]);
   });
 
   test('ShipyardPrices.hasRecentShipyardData', () {
@@ -47,6 +47,14 @@ void main() {
     final shipyardPrices = ShipyardPrices([], fs: fs);
     expect(shipyardPrices.hasRecentShipyardData('A'), false);
     final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
+    expect(
+      shipyardPrices.recentPurchasePrice(
+        shipyardSymbol: 'A',
+        shipType: ShipType.EXPLORER,
+        maxAge: const Duration(minutes: 1),
+      ),
+      isNull,
+    );
     final a = ShipyardPrice(
       waypointSymbol: 'A',
       shipType: ShipType.EXPLORER,
@@ -55,6 +63,14 @@ void main() {
     );
     shipyardPrices.addPrices([a]);
     expect(shipyardPrices.hasRecentShipyardData('A'), true);
+    expect(
+      shipyardPrices.recentPurchasePrice(
+        shipyardSymbol: 'A',
+        shipType: ShipType.EXPLORER,
+        maxAge: const Duration(minutes: 1),
+      ),
+      1,
+    );
     expect(
       shipyardPrices.hasRecentShipyardData(
         'A',

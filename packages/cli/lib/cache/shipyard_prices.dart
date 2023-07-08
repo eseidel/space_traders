@@ -25,7 +25,7 @@ class ShipyardPrice {
       waypointSymbol: waypoint,
       shipType: ship.type!,
       purchasePrice: ship.purchasePrice,
-      timestamp: DateTime.now(),
+      timestamp: DateTime.timestamp(),
     );
   }
 
@@ -107,7 +107,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   }
 
   /// Get the raw pricing data.
-  List<ShipyardPrice> get rawPrices => _prices;
+  List<ShipyardPrice> get prices => _prices;
 
   /// Load the price data from the cache or from the url.
   static Future<ShipyardPrices> load(
@@ -123,15 +123,10 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     return ShipyardPrices(prices, fs: fs);
   }
 
-  /// Add new prices to the price data.
+  /// Add new prices to the shipyard price data.
   Future<void> addPrices(List<ShipyardPrice> newPrices) async {
-    // Go through the list, see if we already have a price for this pair
-    // if so, replace it, otherwise add to the end?
-    // Probably this should add them to a separate buffer, which is then
-    // compacted into the main list at some specific point.
     for (final newPrice in newPrices) {
-      // logger.detail('Recording price: ${describePrice(newPrice)}');
-      // This doesn't account for duplicates.
+      // This doesn't account for existing duplicates.
       final index = _prices.indexWhere(
         (element) =>
             element.waypointSymbol == newPrice.waypointSymbol &&
@@ -142,7 +137,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
         // This date logic is necessary to make sure we don't replace
         // more recent local prices with older server data.
         final existingPrice = _prices[index];
-        if (DateTime.now().isBefore(newPrice.timestamp)) {
+        if (DateTime.timestamp().isBefore(newPrice.timestamp)) {
           logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
           continue;
         }
@@ -158,41 +153,13 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     await save();
   }
 
-  /// Get the percentile for the purchase price of a trade good.
-  int? percentileForPurchasePrice(ShipType shipType, int purchasePrice) {
-    final pricesForSymbol = purchasePricesFor(shipType);
-    if (pricesForSymbol.isEmpty) {
-      return null;
-    }
-    // Sort the prices in ascending order.
-    final pricesForSymbolSorted =
-        pricesForSymbol.toList().sortedBy<num>((e) => e.purchasePrice);
-    // for (final price in pricesForSymbolSorted) {
-    //   logger.info(
-    //     '  ${price.waypointSymbol} '
-    //     '${price.purchasePrice} ${price.sellPrice}',
-    //   );
-    // }
-
-    // Find the first index where the sorted price is greater than the price
-    // being compared.
-    var index = pricesForSymbolSorted
-        .indexWhere((e) => e.purchasePrice > purchasePrice);
-    // If we ran off the end, we know that the price is greater than all
-    // the prices in the list. i.e. 100th percentile.
-    if (index == -1) {
-      index = pricesForSymbol.length;
-    }
-    return (index / pricesForSymbol.length * 100).round();
-  }
-
-  /// Get the median purchase price for a trade good.
+  /// Get the median purchase price for a [ShipType].
   int? medianPurchasePrice(ShipType shipType) =>
-      purchasePriceAtPercentile(shipType, 50);
+      _purchasePriceAtPercentile(shipType, 50);
 
-  /// Get the percentile purchase price for a trade good.
+  /// Get the percentile purchase price for a [ShipType].
   /// [percentile] must be between 0 and 100.
-  int? purchasePriceAtPercentile(ShipType shipType, int percentile) {
+  int? _purchasePriceAtPercentile(ShipType shipType, int percentile) {
     if (percentile > 100 || percentile < 0) {
       throw ArgumentError.value(
         percentile,
@@ -215,7 +182,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     return pricesForSymbolSorted[index].purchasePrice;
   }
 
-  /// Returns all known purchase prices for a trade good, optionally restricted
+  /// Returns all known purchase prices for a [ShipType], optionally restricted
   /// to a specific waypoint.
   Iterable<ShipyardPrice> purchasePricesFor(
     ShipType shipType, {
@@ -267,7 +234,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     }
     final pricesForSymbolSorted = pricesForSymbol.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    if (pricesForSymbolSorted.last.timestamp.difference(DateTime.now()) >
+    if (pricesForSymbolSorted.last.timestamp.difference(DateTime.timestamp()) >
         maxAge) {
       return null;
     }

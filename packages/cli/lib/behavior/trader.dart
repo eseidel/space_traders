@@ -390,7 +390,12 @@ Future<DateTime?> advanceTrader(
   final currentMarket =
       await visitLocalMarket(api, caches, currentWaypoint, ship);
   await centralCommand.visitLocalShipyard(
-      api, caches.shipyardPrices, caches.agent, currentWaypoint, ship);
+    api,
+    caches.shipyardPrices,
+    caches.agent,
+    currentWaypoint,
+    ship,
+  );
 
   if (centralCommand.isContractTradingEnabled) {
     await acceptContractsIfNeeded(
