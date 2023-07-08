@@ -8,7 +8,7 @@ Playing around with writing a Dart implementation of the Space Traders game.
 ## Usage
 
 ```
-cd packages/space_traders_cli
+cd packages/cli
 dart run
 ```
 
@@ -131,8 +131,6 @@ Automation:
 * Add the ability to "queue" behaviors, so that when a ship pulls its next
   behavior it can pull from the queue.  This would allow us to queue a buyShip
   for a ship which was otherwise busy at the moment, for example?
-* Teach ships when visiting ship-yards to ask the centralCommand if they
-  should buy a new ship and then do so.
 
 UI:
 * Make shipInfo include an emoji for the behavior.
