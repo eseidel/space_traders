@@ -71,7 +71,7 @@ void main() {
     final oneFrame = _MockShipFrame();
     when(() => one.frame).thenReturn(oneFrame);
     when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
-        final fs = MemoryFileSystem.test();
+    final fs = MemoryFileSystem.test();
     final shipCache = ShipCache([one], fs: fs);
     expect(describeFleet(shipCache), 'Fleet: 1 Carrier');
   });
