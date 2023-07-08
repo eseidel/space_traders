@@ -148,8 +148,8 @@ void logDeal(Ship ship, Deal deal) {
 /// This is not necessarily the nearest, but could be improved to be.
 Future<Waypoint?> nearbyMarketWhichTrades(
   SystemsCache systemsCache,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
+  WaypointFetcher waypointFetcher,
+  MarketFetcher marketFetcher,
   Waypoint start,
   String tradeSymbol, {
   int maxJumps = 1,

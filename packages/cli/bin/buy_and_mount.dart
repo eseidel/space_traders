@@ -1,5 +1,6 @@
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
@@ -38,13 +39,16 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final ship = await chooseShip(api, caches.systems, myShips);
   // pick a mount.
   const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
+  final marketFetcher = MarketFetcher(api, waypointFetcher, caches.systems);
 
   // it finds a nearby market with that mount.
-  final start = await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final start = await waypointFetcher.waypoint(ship.nav.waypointSymbol);
   final mountMarket = await nearbyMarketWhichTrades(
     caches.systems,
-    caches.waypoints,
-    caches.markets,
+    waypointFetcher,
+    marketFetcher,
     start,
     tradeSymbol.value,
     maxJumps: 10,

@@ -1,5 +1,6 @@
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
@@ -50,9 +51,12 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     choices: systemChoices,
     display: (system) => '${system.symbol} - ${system.distance}',
   );
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
+  final marketFetcher = MarketFetcher(api, waypointFetcher, caches.systems);
 
   final destSystemWaypoints =
-      await caches.waypoints.waypointsInSystem(destSystem.symbol);
+      await waypointFetcher.waypointsInSystem(destSystem.symbol);
 
   final destWaypoint = logger.chooseOne(
     'To where?',
@@ -63,9 +67,9 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final shouldDock = logger.confirm('Wait to dock?', defaultValue: true);
 
   final currentWaypoint =
-      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+      await waypointFetcher.waypoint(ship.nav.waypointSymbol);
   if (currentWaypoint.hasMarketplace && ship.shouldRefuel) {
-    final market = await caches.markets.marketForSymbol(currentWaypoint.symbol);
+    final market = await marketFetcher.marketForSymbol(currentWaypoint.symbol);
     await refuelIfNeededAndLog(
       api,
       caches.marketPrices,

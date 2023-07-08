@@ -15,7 +15,9 @@ Future<void> command(
 ) async {
   final hq = caches.agent.headquarters(caches.systems);
   final systemSymbol = args.firstOrNull ?? hq.systemSymbol;
-  final waypoints = await caches.waypoints.waypointsInSystem(systemSymbol);
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
+  final waypoints = await waypointFetcher.waypointsInSystem(systemSymbol);
 
   final waypoint = logger.chooseOne(
     'Which waypoint?',

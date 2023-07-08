@@ -10,8 +10,10 @@ void main(List<String> args) async {
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final myShips = caches.ships.ships;
   final ship = await chooseShip(api, caches.systems, myShips);
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
   final shipyardWaypoints =
-      await caches.waypoints.shipyardWaypointsForSystem(ship.nav.systemSymbol);
+      await waypointFetcher.shipyardWaypointsForSystem(ship.nav.systemSymbol);
 
   final waypoint = logger.chooseOne(
     'Which shipyard?',

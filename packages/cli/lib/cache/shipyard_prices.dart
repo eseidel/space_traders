@@ -109,6 +109,21 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   /// Get the raw pricing data.
   List<ShipyardPrice> get prices => _prices;
 
+  /// Returns all shipyardSymbols with price data for the given [systemSymbol].
+  Iterable<String> shipyardSymbolsForSystem(String systemSymbol) sync* {
+    final seen = <String>{};
+    for (final price in prices) {
+      final waypointSymbol = price.waypointSymbol;
+      if (waypointSymbol.startsWith(systemSymbol)) {
+        if (seen.contains(waypointSymbol)) {
+          continue;
+        }
+        seen.add(waypointSymbol);
+        yield waypointSymbol;
+      }
+    }
+  }
+
   /// Load the price data from the cache or from the url.
   static Future<ShipyardPrices> load(
     FileSystem fs, {

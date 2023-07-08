@@ -1,4 +1,5 @@
 import 'package:cli/cache/caches.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:collection/collection.dart';
@@ -63,10 +64,7 @@ int? _marketPercentile(
   if (sellPrice == null) {
     return null;
   }
-  return marketPrices.percentileForSellPrice(
-    tradeSymbol,
-    sellPrice,
-  );
+  return marketPrices.percentileForSellPrice(tradeSymbol, sellPrice);
 }
 
 Future<_SystemEval> _evaluateSystem(
@@ -78,7 +76,7 @@ Future<_SystemEval> _evaluateSystem(
   required String systemSymbol,
   required int jumps,
 }) async {
-  final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
+  final waypoints = waypointCache.waypointsInSystem(systemSymbol);
   final marketWaypoints = waypoints.where((w) => w.hasMarketplace);
   final markets = await marketCache.marketsInSystem(systemSymbol).toList();
   final marketToPercentile = {
@@ -121,8 +119,8 @@ Future<String?> nearestMineWithGoodMining(
   Api api,
   MarketPrices marketPrices,
   SystemsCache systemsCache,
-  WaypointCache waypointCache,
-  MarketCache marketCache,
+  WaypointFetcher waypointFetcher,
+  MarketFetcher marketFetcher,
   SystemWaypoint start, {
   required String tradeSymbol,
   required int maxJumps,

@@ -7,27 +7,27 @@ import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 
 // TODO(eseidel): This only looks in the current system.
-Future<Waypoint?> _nearbyShipyardWithBestPrice(
+Future<String?> _nearbyShipyardWithBestPrice(
   WaypointCache waypointCache,
   ShipyardPrices shipyardPrices,
   Ship ship,
   ShipType shipType,
   double maxMedianMultipler,
 ) async {
-  final shipyardWaypoints =
-      await waypointCache.shipyardWaypointsForSystem(ship.nav.systemSymbol);
-  if (shipyardWaypoints.isEmpty) {
+  final shipyardSymbols =
+      shipyardPrices.shipyardSymbolsForSystem(ship.nav.systemSymbol);
+  if (shipyardSymbols.isEmpty) {
     return null;
   }
   final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
   if (medianPrice == null) {
     return null;
   }
-  Waypoint? bestWaypoint;
+  String? bestWaypointSymbol;
   int? bestPrice;
-  for (final waypoint in shipyardWaypoints) {
+  for (final waypointSymbol in shipyardSymbols) {
     final recentPrice = shipyardPrices.recentPurchasePrice(
-      shipyardSymbol: waypoint.symbol,
+      shipyardSymbol: waypointSymbol,
       shipType: shipType,
     );
     // We could also assume it's median as a reason to explore?
@@ -36,13 +36,13 @@ Future<Waypoint?> _nearbyShipyardWithBestPrice(
     }
     if (bestPrice == null || recentPrice < bestPrice) {
       bestPrice = recentPrice;
-      bestWaypoint = waypoint;
+      bestWaypointSymbol = waypointSymbol;
     }
   }
   if (bestPrice != null && bestPrice > medianPrice * maxMedianMultipler) {
     return null;
   }
-  return bestWaypoint;
+  return bestWaypointSymbol;
 }
 
 /// Apply the buy ship behavior.
@@ -54,8 +54,20 @@ Future<DateTime?> advanceBuyShip(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
+
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
+
   final currentWaypoint =
-      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+      await waypointFetcher.waypoint(ship.nav.waypointSymbol);
+
+  await centralCommand.visitLocalShipyard(
+    api,
+    caches.shipyardPrices,
+    caches.agent,
+    currentWaypoint,
+    ship,
+  );
 
   final shipType = centralCommand.shipTypeToBuy(
     caches.agent,

@@ -38,7 +38,7 @@ void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
   final systemsCache = SystemsCache.loadFromCache(fs)!;
-  final waypointCache = WaypointCache(api, systemsCache);
+  final waypointCache = WaypointCache.loadCached(systemsCache, fs)!;
 
   SystemWaypoint start;
   final startArg = results['start'] as String?;
@@ -57,15 +57,15 @@ void main(List<String> args) async {
   final allSystems = <String>[];
   final chartedSystems = <String>[];
 
-  await for (final waypoint in waypointCache.waypointsInJumpRadius(
+  for (final waypointSymbol in systemsCache.waypointSymbolsInJumpRadius(
     startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {
-    allSystems.add(waypoint.symbol);
-    if (waypoint.chart == null) {
+    allSystems.add(waypointSymbol);
+    if (waypointCache.isCharted(waypointSymbol)) {
       continue;
     }
-    chartedSystems.add(waypoint.symbol);
+    chartedSystems.add(waypointSymbol);
   }
   logger.info(
     '${chartedSystems.length} of ${allSystems.length} systems mapped '

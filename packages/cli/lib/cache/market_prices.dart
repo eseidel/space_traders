@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
 import 'package:file/file.dart';
@@ -416,7 +416,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
 /// This is the prefered way to get the local Market.
 Future<Market> recordMarketDataIfNeededAndLog(
   MarketPrices marketPrices,
-  MarketCache marketCache,
+  MarketFetcher marketFetcher,
   Ship ship,
   String marketSymbol, {
   Duration maxAge = const Duration(minutes: 5),
@@ -431,10 +431,10 @@ Future<Market> recordMarketDataIfNeededAndLog(
   // If we have market data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
   if (marketPrices.hasRecentMarketData(marketSymbol, maxAge: maxAge)) {
-    final market = await marketCache.marketForSymbol(marketSymbol);
+    final market = await marketFetcher.marketForSymbol(marketSymbol);
     return market!;
   }
-  final market = await marketCache.marketForSymbol(
+  final market = await marketFetcher.marketForSymbol(
     ship.nav.waypointSymbol,
     forceRefresh: true,
   );

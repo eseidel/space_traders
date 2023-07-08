@@ -25,7 +25,9 @@ void main(List<String> args) async {
 /// Look through nearby marketplaces (including ones a jump away)
 /// looking for the best deal for a given symbol.
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
-  final marketPrices = await MarketPrices.load(fs);
+  final marketPrices = caches.marketPrices;
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
 
   final promptResponse = logger.prompt(
     'Which trade symbol? (Options: ${TradeSymbol.values.join(', ')}))',
@@ -48,7 +50,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     maxJumps: maxJumps,
   )) {
     for (final marketplaceWaypoint
-        in await caches.waypoints.marketWaypointsForSystem(system)) {
+        in await waypointFetcher.marketWaypointsForSystem(system)) {
       final prices = marketPrices
           .sellPricesFor(
             tradeSymbol: tradeSymbol.value,

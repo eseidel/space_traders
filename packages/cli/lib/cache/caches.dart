@@ -76,8 +76,8 @@ class Caches {
   /// The cache of waypoints.
   final WaypointCache waypoints;
 
-  /// The cache of markets.
-  final MarketCache markets;
+  // /// The cache of markets.
+  // final MarketCache markets;
 
   /// The cache of behaviors.
   final BehaviorCache behaviors;

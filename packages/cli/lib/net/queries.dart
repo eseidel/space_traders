@@ -51,7 +51,7 @@ Future<Agent> getMyAgent(Api api) async {
 
 /// Fetch shipyard for a given waypoint, will throw if the waypoint does not
 /// have a shipyard.
-Future<Shipyard> getShipyard(Api api, Waypoint waypoint) async {
+Future<Shipyard> getShipyard(Api api, SystemWaypoint waypoint) async {
   final response = await api.systems.getShipyard(
     waypoint.systemSymbol,
     waypoint.symbol,

@@ -32,6 +32,8 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final hq = parseWaypointString(caches.agent.agent.headquarters);
   final startSystem = hq.system;
   final myShips = caches.ships.ships;
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
 
   // This should be connectedSystemsWithinJumpRangeFromSystem or similar.
   final startingSystem = caches.systems.systemBySymbol(startSystem);
@@ -48,7 +50,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   );
 
   final destSystemWaypoints =
-      await caches.waypoints.waypointsInSystem(destSystem.symbol);
+      await waypointFetcher.waypointsInSystem(destSystem.symbol);
 
   final destWaypoint = logger.chooseOne(
     'To where?',

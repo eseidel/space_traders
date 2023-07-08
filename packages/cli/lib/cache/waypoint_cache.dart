@@ -1,7 +1,9 @@
 import 'package:cli/api.dart';
+import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
+import 'package:file/file.dart';
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.
 Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
@@ -12,55 +14,101 @@ Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
 }
 
 /// Charted values from a waypoint.
-// class ChartedValues {
-//   /// Create a new ChartedValues.
-//   const ChartedValues({
-//     required this.waypointSymbol,
-//     required this.orbitals,
-//     required this.faction,
-//     required this.traits,
-//     required this.chart,
-//   });
+class ChartedValues {
+  /// Create a new ChartedValues.
+  const ChartedValues({
+    required this.waypointSymbol,
+    required this.orbitals,
+    required this.faction,
+    required this.traits,
+    required this.chart,
+  });
 
-//   /// The symbol of the waypoint these are for.
-//   final String waypointSymbol;
+  factory ChartedValues.fromJson();
 
-//   /// Waypoints that orbit this waypoint.
-//   final List<WaypointOrbital> orbitals;
+  /// The symbol of the waypoint these are for.
+  final String waypointSymbol;
 
-//   /// Faction owning the waypoint.
-//   final WaypointFaction faction;
+  /// Waypoints that orbit this waypoint.
+  final List<WaypointOrbital> orbitals;
 
-//   /// The traits of the waypoint.
-//   final List<WaypointTrait> traits;
+  /// Faction owning the waypoint.
+  final WaypointFaction faction;
 
-//   /// The chart of the waypoint.
-//   final Chart chart;
-// }
+  /// The traits of the waypoint.
+  final List<WaypointTrait> traits;
 
-// Waypoint _waypointFromCache(SystemWaypoint waypoint,
-//  ChartedValues? charted) {
-//   return Waypoint(
-//     symbol: waypoint.symbol,
-//     type: waypoint.type,
-//     systemSymbol: waypoint.systemSymbol,
-//     x: waypoint.x,
-//     y: waypoint.y,
-//     orbitals: charted?.orbitals ?? [],
-//     faction: charted?.faction,
-//     traits: charted?.traits ?? [],
-//     chart: charted?.chart,
-//   );
-// }
+  /// The chart of the waypoint.
+  final Chart chart;
+}
+
+Waypoint _waypointFromCache(SystemWaypoint waypoint, ChartedValues? charted) {
+  return Waypoint(
+    symbol: waypoint.symbol,
+    type: waypoint.type,
+    systemSymbol: waypoint.systemSymbol,
+    x: waypoint.x,
+    y: waypoint.y,
+    orbitals: charted?.orbitals ?? [],
+    faction: charted?.faction,
+    traits: charted?.traits ?? [],
+    chart: charted?.chart,
+  );
+}
+
+class WaypointCache extends JsonListStore<ChartedValues> {
+  WaypointCache(SystemsCache systemsCache) : _systemsCache = systemsCache;
+
+  final SystemsCache _systemsCache;
+
+  ChartedValues? chartingForSymbol(String waypointSymbol) {
+    return entries.firstOrNull((e) => e.waypointSymbol == waypointSymbol);
+  }
+
+  /// Load the ContractCache from the file system.
+  static WaypointCache? loadCached(SystemsCache systemsCache, FileSystem fs, {String path = defaultPath}) {
+    final values = JsonListStore.load<ChartedValues>(
+      fs,
+      path,
+      ChartedValues.fromJson,
+    );
+    if (values != null) {
+      return WaypointCache(systemsCache, values, fs: fs, path: path);
+    }
+    return null;
+  }
+
+  static const defaultPath = 'data/charts.json';
+
+  /// Fetch all waypoints in the given system.
+  List<Waypoint>? waypointsInSystem(String systemSymbol) {
+    final systemWaypoints = _systemsCache.waypointsInSystem(systemSymbol);
+    final waypoints = <Waypoint>[];
+    for (final waypoint in systemWaypoints) {
+      final charted = _chartingByWaypointSymbol[waypoint.symbol];
+      if (charted == null) {
+        return null;
+      }
+      waypoints.add(_waypointFromCache(waypoint, charted));
+    }
+    return waypoints;
+  }
+}
 
 /// Stores Waypoint objects fetched recently from the API.
-class WaypointCache {
+class WaypointFetcher {
   /// Create a new WaypointCache.
-  WaypointCache(this._api, this._systemsCache);
+  WaypointFetcher(
+    Api api,
+    WaypointCache waypointCache,
+    SystemsCache systemsCache,
+  )   : _api = api,
+        _waypointCache = waypointCache,
+        _systemsCache = systemsCache;
 
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
-  final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Api _api;
+  final WaypointCache _waypointCache;
   final SystemsCache _systemsCache;
 
   // TODO(eseidel): This should not exist.  This should instead work like
@@ -112,17 +160,9 @@ class WaypointCache {
   }
 
   /// Return all connected systems in the given system.
-  Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
+  List<ConnectedSystem> connectedSystems(String systemSymbol) {
     assertIsSystemSymbol(systemSymbol);
-    // Don't really need the _connectdSystemsBySystem with the SystemsCache.
-    var cachedSystems = _connectedSystemsBySystem[systemSymbol];
-    if (cachedSystems == null) {
-      cachedSystems = _systemsCache.connectedSystems(systemSymbol);
-      _connectedSystemsBySystem[systemSymbol] = cachedSystems;
-    }
-    for (final system in cachedSystems) {
-      yield system;
-    }
+    return _systemsCache.connectedSystems(systemSymbol);
   }
 
   /// Returns a list of waypoints in the system with a shipyard.
@@ -153,70 +193,6 @@ class WaypointCache {
       for (final waypoint in waypoints) {
         yield waypoint;
       }
-    }
-  }
-}
-
-/// Stores Market objects fetched recently from the API.
-class MarketCache {
-  /// Create a new MarketplaceCache.
-  MarketCache(this._waypointCache);
-
-  // This needs to be careful, this caches Market which can differ in
-  // response depending on if we have a ship there or not.
-  // A market with ship in orbit will have tradeGoods and transactions data.
-  // Currently this only caches for one loop.
-  final Map<String, Market?> _marketsBySymbol = {};
-  final WaypointCache _waypointCache;
-
-  // TODO(eseidel): This should not exist.  Callers should instead distinguish
-  // between if they want market trade data (which is only availble when
-  // a ship is in orbit).  If they don't, we shouldn't ever return it
-  // and if we do, we should always fetch from the server.
-  /// Used to reset part of the MarketCache every loop over the ships.
-  void resetForLoop() {
-    _marketsBySymbol.clear();
-  }
-
-  /// Fetch all markets in the given system.
-  Stream<Market> marketsInSystem(String systemSymbol) async* {
-    assertIsSystemSymbol(systemSymbol);
-    final waypoints = await _waypointCache.waypointsInSystem(systemSymbol);
-    for (final waypoint in waypoints) {
-      final maybeMarket = await marketForSymbol(waypoint.symbol);
-      if (maybeMarket != null) {
-        yield maybeMarket;
-      }
-    }
-  }
-
-  /// Fetch the waypoint with the given symbol.
-  Future<Market?> marketForSymbol(
-    String marketSymbol, {
-    bool forceRefresh = false,
-  }) async {
-    if (!forceRefresh && _marketsBySymbol.containsKey(marketSymbol)) {
-      return _marketsBySymbol[marketSymbol];
-    }
-    final waypoint = await _waypointCache.waypoint(marketSymbol);
-    final maybeMarket = waypoint.hasMarketplace
-        ? await getMarket(_waypointCache._api, waypoint)
-        : null;
-    _marketsBySymbol[marketSymbol] = maybeMarket;
-    return maybeMarket;
-  }
-
-  /// Yields a stream of Markets that are within n jumps of the given system.
-  Stream<Market> marketsInJumpRadius({
-    required String startSystem,
-    required int maxJumps,
-  }) async* {
-    for (final (String system, int _)
-        in _waypointCache._systemsCache.systemSymbolsInJumpRadius(
-      startSystem: startSystem,
-      maxJumps: maxJumps,
-    )) {
-      yield* marketsInSystem(system);
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:cli/cache/caches.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
@@ -22,7 +23,10 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   }
 
   await dockIfNeeded(api, ship);
-  final market = await caches.markets.marketForSymbol(ship.nav.waypointSymbol);
+  final waypointFetcher =
+      WaypointFetcher(api, caches.waypoints, caches.systems);
+  final marketFetcher = MarketFetcher(api, waypointFetcher, caches.systems);
+  final market = await marketFetcher.marketForSymbol(ship.nav.waypointSymbol);
 
   // List all the goods this market sells with their prices.
   final good = logger.chooseOne(

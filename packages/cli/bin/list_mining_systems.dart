@@ -5,6 +5,7 @@
 import 'package:args/args.dart';
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -42,8 +43,9 @@ Future<void> cliMain(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
   final systemsCache = SystemsCache.loadFromCache(fs)!;
-  final waypointCache = WaypointCache(api, systemsCache);
-  final marketCache = MarketCache(waypointCache);
+  final waypointCache = WaypointCache.loadCached(systemsCache, fs)!;
+  final waypointFetcher = WaypointFetcher(api, waypointCache, systemsCache);
+  final marketFetcher = MarketFetcher(api, waypointFetcher, systemsCache);
   final marketPrices = await MarketPrices.load(fs);
 
   SystemWaypoint start;
@@ -64,8 +66,8 @@ Future<void> cliMain(List<String> args) async {
     api,
     marketPrices,
     systemsCache,
-    waypointCache,
-    marketCache,
+    waypointFetcher,
+    marketFetcher,
     start,
     maxJumps: maxJumps,
     tradeSymbol: 'PRECIOUS_STONES',
