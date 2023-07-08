@@ -86,7 +86,7 @@ class WaypointCache {
   /// Fetch the waypoint with the given symbol.
   Future<Waypoint> waypoint(String waypointSymbol) async {
     assertIsWaypointSymbol(waypointSymbol);
-    final result = await waypointOrNull(waypointSymbol);
+    final result = await _waypointOrNull(waypointSymbol);
     if (result == null) {
       throw ArgumentError('Unknown waypoint: $waypointSymbol');
     }
@@ -94,7 +94,7 @@ class WaypointCache {
   }
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
-  Future<Waypoint?> waypointOrNull(String waypointSymbol) async {
+  Future<Waypoint?> _waypointOrNull(String waypointSymbol) async {
     assertIsWaypointSymbol(waypointSymbol);
     assert(waypointSymbol.split('-').length == 3, 'Invalid system symbol');
     final systemSymbol = parseWaypointString(waypointSymbol).system;

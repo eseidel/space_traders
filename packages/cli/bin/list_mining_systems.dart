@@ -49,7 +49,7 @@ Future<void> cliMain(List<String> args) async {
   SystemWaypoint start;
   final startArg = results['start'] as String?;
   if (startArg != null) {
-    final maybeStart = await systemsCache.waypointOrNull(startArg);
+    final maybeStart = systemsCache.waypointOrNull(startArg);
     if (maybeStart == null) {
       logger.err('--start was invalid, unknown system: ${results['start']}');
       return;
