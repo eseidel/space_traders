@@ -1,10 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/faction_cache.dart';
 import 'package:file/memory.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
-
-class _MockApi extends Mock implements Api {}
 
 void main() {
   test('FactionCache load/save', () async {

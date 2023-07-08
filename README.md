@@ -96,7 +96,9 @@ Earning:
   how repeated sells might deflate prices at sell point.
 * Teach miners how to coordinate with haulers to sell their goods further away.
 * It's not clear if contract trading is working, should write a tool to list
-  nearby deals and highligh where the contract deal sits in that list.
+  nearby deals and highlight where the contract deal sits in that list.
+* Add refining
+* Add gas siphoning
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate

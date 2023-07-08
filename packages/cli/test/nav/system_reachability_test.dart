@@ -1,6 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/nav/cluster_finder.dart';
+import 'package:cli/nav/system_reachability.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -10,8 +10,8 @@ void main() {
   test('ClusterFinder single system', () {
     final systemsCache = _MockSystemsCache();
     when(() => systemsCache.connectedSystems('A')).thenReturn([]);
-    final finder = ClusterFinder(systemsCache)..paintCluster('A');
-    expect(finder.connectedSystemCount('A'), equals(1));
+    final reachability = SystemReachability.fromSystemsCache(systemsCache);
+    expect(reachability.connectedSystemCount('A'), equals(1));
   });
 
   test('ClusterFinder two systems', () {
@@ -36,7 +36,7 @@ void main() {
         y: 0,
       )
     ]);
-    final finder = ClusterFinder(systemsCache)..paintCluster('S-A');
+    final finder = SystemReachability.fromSystemsCache(systemsCache);
     expect(finder.connectedSystemCount('S-A'), equals(2));
   });
 }
