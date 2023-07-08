@@ -123,7 +123,7 @@ Future<String?> nearestMineWithGoodMining(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  Waypoint start, {
+  SystemWaypoint start, {
   required String tradeSymbol,
   required int maxJumps,
   bool Function(String systemSymbol)? systemFilter,

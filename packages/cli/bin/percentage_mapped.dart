@@ -1,5 +1,6 @@
 import 'package:args/args.dart';
 import 'package:cli/api.dart';
+import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
@@ -39,17 +40,18 @@ void main(List<String> args) async {
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final waypointCache = WaypointCache(api, systemsCache);
 
-  Waypoint start;
+  SystemWaypoint start;
   final startArg = results['start'] as String?;
   if (startArg != null) {
-    final maybeStart = await waypointCache.waypointOrNull(startArg);
+    final maybeStart = await systemsCache.waypointOrNull(startArg);
     if (maybeStart == null) {
       logger.err('--start was invalid, unknown system: ${results['start']}');
       return;
     }
     start = maybeStart;
   } else {
-    start = await waypointCache.getAgentHeadquarters();
+    final agentCache = await AgentCache.load(api);
+    start = agentCache.headquarters(systemsCache);
   }
 
   final allSystems = <String>[];

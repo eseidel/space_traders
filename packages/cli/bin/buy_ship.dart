@@ -27,7 +27,7 @@ void main(List<String> args) async {
 }
 
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
-  final hq = await caches.waypoints.getAgentHeadquarters();
+  final hq = caches.agent.headquarters(caches.systems);
   final shipyardWaypoints =
       await caches.waypoints.shipyardWaypointsForSystem(hq.systemSymbol);
 

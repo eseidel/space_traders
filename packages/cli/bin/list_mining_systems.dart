@@ -4,6 +4,7 @@
 
 import 'package:args/args.dart';
 import 'package:cli/api.dart';
+import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -45,17 +46,18 @@ Future<void> cliMain(List<String> args) async {
   final marketCache = MarketCache(waypointCache);
   final marketPrices = await MarketPrices.load(fs);
 
-  Waypoint start;
+  SystemWaypoint start;
   final startArg = results['start'] as String?;
   if (startArg != null) {
-    final maybeStart = await waypointCache.waypointOrNull(startArg);
+    final maybeStart = await systemsCache.waypointOrNull(startArg);
     if (maybeStart == null) {
       logger.err('--start was invalid, unknown system: ${results['start']}');
       return;
     }
     start = maybeStart;
   } else {
-    start = await waypointCache.getAgentHeadquarters();
+    final agentCache = await AgentCache.load(api);
+    start = agentCache.headquarters(systemsCache);
   }
 
   final mine = await nearestMineWithGoodMining(

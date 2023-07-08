@@ -58,7 +58,6 @@ class WaypointCache {
   /// Create a new WaypointCache.
   WaypointCache(this._api, this._systemsCache);
 
-  Waypoint? _agentHeadquarters;
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Api _api;
@@ -71,17 +70,6 @@ class WaypointCache {
   void resetForLoop() {
     _waypointsBySystem.clear();
     // agentHeadquarters, connectedSystems, and jumpGates don't ever change.
-  }
-
-  /// Fetch the agent's headquarters.
-  // Not sure this belongs on waypointCache, but should be cached somewhere.
-  Future<Waypoint> getAgentHeadquarters() async {
-    if (_agentHeadquarters != null) {
-      return _agentHeadquarters!;
-    }
-    final agent = await getMyAgent(_api);
-    _agentHeadquarters ??= await waypoint(agent.headquarters);
-    return _agentHeadquarters!;
   }
 
   /// Fetch all waypoints in the given system.

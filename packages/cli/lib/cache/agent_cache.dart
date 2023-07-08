@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cli/api.dart';
+import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/third_party/compare.dart';
@@ -37,6 +38,10 @@ class AgentCache {
   final int requestsBetweenChecks;
 
   int _requestsSinceLastCheck = 0;
+
+  /// The headquarters of the agent.
+  SystemWaypoint headquarters(SystemsCache systems) =>
+      systems.waypointFromSymbol(agent.headquarters);
 
   /// Updates the agent.
   // ignore: use_setters_to_change_properties
