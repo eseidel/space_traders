@@ -128,11 +128,13 @@ void main() {
       BehaviorState('B', Behavior.explorer),
     );
     await centralCommand.setDestination(shipB, 'S-B-W');
+    expect(centralCommand.currentDestination(shipB), 'S-B-W');
     when(() => shipCache.ship('B')).thenReturn(shipB);
 
     final otherSystems = centralCommand.otherExplorerSystems('A');
     expect(otherSystems, ['S-B']); // From destination
     await centralCommand.reachedDestination(shipB);
+    expect(centralCommand.currentDestination(shipB), null);
     final otherSystems2 = centralCommand.otherExplorerSystems('A');
     expect(otherSystems2, ['S-C']); // From nav.systemSymbol
     await centralCommand.completeBehavior('B');
