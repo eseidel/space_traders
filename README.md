@@ -99,7 +99,7 @@ Earning:
   nearby deals and highligh where the contract deal sits in that list.
 
 Exploring:
-* Explorers should explore an entire system and then go to the jumpgate
+* Explorers should explore an entire system and then go to the jump gate
   and then from the jump gate plan their next system.
 * Probes should go sit at shipyards and marketplaces when there is nothing
   to explore.

@@ -19,7 +19,7 @@ class _MockLogger extends Mock implements Logger {}
 class _MockShipNav extends Mock implements ShipNav {}
 
 void main() {
-  test('CentralCommand.isEnabled', () async {
+  test('CentralCommand.isDisabledForAll', () async {
     final behaviorCache = _MockBehhaviorCache();
     final shipCache = _MockShipCache();
     final centralCommand =
@@ -43,6 +43,43 @@ void main() {
       ),
     );
     expect(centralCommand.isBehaviorDisabled(Behavior.trader), true);
+  });
+
+  test('CentralCommand.isDisabledForShip', () async {
+    final fs = MemoryFileSystem.test();
+    final behaviorCache = await BehaviorCache.load(fs);
+    final shipCache = _MockShipCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final ship = _MockShip();
+    when(() => ship.symbol).thenReturn('S');
+    expect(
+      centralCommand.isBehaviorDisabledForShip(ship, Behavior.trader),
+      false,
+    );
+
+    await behaviorCache.setBehavior('S', BehaviorState('S', Behavior.trader));
+
+    final logger = _MockLogger();
+    await runWithLogger(
+      logger,
+      () async => centralCommand.disableBehaviorForShip(
+        ship,
+        Behavior.trader,
+        'why',
+        const Duration(hours: 1),
+      ),
+    );
+    final ship2 = _MockShip();
+    when(() => ship2.symbol).thenReturn('T');
+    expect(
+      centralCommand.isBehaviorDisabledForShip(ship, Behavior.trader),
+      true,
+    );
+    expect(
+      centralCommand.isBehaviorDisabledForShip(ship2, Behavior.trader),
+      false,
+    );
   });
 
   test('CentralCommand.behaviorFor', () async {

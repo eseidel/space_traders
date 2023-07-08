@@ -213,12 +213,12 @@ class CentralCommand {
     _behaviorTimeouts[behavior] = expiration;
   }
 
-  /// Disable the given behavior for [ship] for [timeout].
+  /// Disable the given behavior for [ship] for [duration].
   Future<void> disableBehaviorForShip(
     Ship ship,
     Behavior behavior,
     String why,
-    Duration timeout,
+    Duration duration,
   ) async {
     final currentState = _behaviorCache.getBehavior(ship.symbol);
     if (currentState == null || currentState.behavior == behavior) {
@@ -233,11 +233,11 @@ class CentralCommand {
     shipWarn(
       ship,
       '$why Disabling $behavior for ${ship.symbol} '
-      'for ${approximateDuration(timeout)}.',
+      'for ${approximateDuration(duration)}.',
     );
 
-    final expiration = DateTime.timestamp().add(timeout);
-    _behaviorTimeouts[behavior] = expiration;
+    final expiration = DateTime.timestamp().add(duration);
+    _shipTimeouts.add(_ShipTimeout(ship.symbol, behavior, expiration));
   }
 
   /// Complete the current behavior for the given ship.
