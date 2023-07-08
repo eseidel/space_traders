@@ -84,10 +84,14 @@ class RateLimitTracker {
       final max =
           timeSinceLastPrint.inSeconds * _rateLimit.maxRequestsPerSecond;
       final percent = ((requestsSinceLastPrint / max) * 100).round();
-      logger.info(
-        '${requestsPerSecond.toStringAsFixed(1)} requests per second '
-        '($percent% of max)',
-      );
+      // No sense in printing low percentages, as that will just end up being
+      // most of what we print.
+      if (percent > 60) {
+        logger.info(
+          '${requestsPerSecond.toStringAsFixed(1)} requests per second '
+          '($percent% of max)',
+        );
+      }
       _lastPrintTime = now;
     }
   }

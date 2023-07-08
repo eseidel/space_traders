@@ -79,18 +79,23 @@ class CentralCommand {
   final BehaviorCache _behaviorCache;
   final ShipCache _shipCache;
 
-  // void runCentralCommandLogic() {
-  // Run every N loops.
-  // Evaluate earnings for all ships over the last N minutes.
-  // If we don't have enough data for a ship/squad, then skip it.
-  // If we have enough data, then we can compute earnings per second.
-  // If it's below some threshold, then we should move it to a system
-  // we think might be more profitable.
-  // - Check if we need to buy a new ship.
-  // - Check if our miners are still at an optimal waypoint?
-  // - Refresh MarketScan for deals?
-  // - Refresh MarketScan for miners?
-  // }
+  int _loops = 0;
+
+  /// Give the central command a chance to run.
+  void runCentralCommandLogic() {
+    _loops++;
+    if (_loops % 100 == 0) {}
+    // Run every N loops.
+    // Evaluate earnings for all ships over the last N minutes.
+    // If we don't have enough data for a ship/squad, then skip it.
+    // If we have enough data, then we can compute earnings per second.
+    // If it's below some threshold, then we should move it to a system
+    // we think might be more profitable.
+    // - Check if we need to buy a new ship.
+    // - Check if our miners are still at an optimal waypoint?
+    // - Refresh MarketScan for deals?
+    // - Refresh MarketScan for miners?
+  }
 
   // To tell a given explorer what to do.
   // Figure out what squad they're in (are they watching a waypoint for us
@@ -160,8 +165,16 @@ class CentralCommand {
       // Behavior.explorer,
     ];
 
+    // Probably want special behavior for the command ship when we
+    // only have a few ships?
+
     final behaviors = {
-      ShipRole.COMMAND: [Behavior.buyShip, Behavior.trader, Behavior.miner],
+      // TODO(eseidel): Evaluate based on expected value, not just order.
+      ShipRole.COMMAND: [
+        Behavior.buyShip,
+        Behavior.trader,
+        Behavior.miner,
+      ],
       ShipRole.HAULER: [
         Behavior.trader,
         // Explorer is a hack here to get the haulers to move and try again.

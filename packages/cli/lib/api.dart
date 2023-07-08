@@ -120,6 +120,43 @@ class WaypointPosition extends Position {
   }
 }
 
+/// Parsed ShipSymbol which can be compared/sorted.
+@immutable
+class ShipSymbol implements Comparable<ShipSymbol> {
+  /// Create a ShipSymbol from name and number part.
+  /// The number part is given in decimal, but will be represented in hex.
+  const ShipSymbol(this.name, this.number);
+
+  /// Create a ShipSymbol from a string.
+  ShipSymbol.fromString(String symbol)
+      : name = symbol.split('-')[0],
+        number = int.parse(symbol.split('-')[1], radix: 16);
+
+  /// The name part of the ship symbol.
+  final String name;
+
+  /// The number part of the ship symbol.
+  final int number;
+
+  /// The number part in hex.
+  String get hexNumber => number.toRadixString(16).toUpperCase();
+
+  /// The full ship symbol.
+  String get symbol => '$name-$hexNumber';
+
+  @override
+  int compareTo(ShipSymbol other) {
+    final nameCompare = name.compareTo(other.name);
+    if (nameCompare != 0) {
+      return nameCompare;
+    }
+    return number.compareTo(other.number);
+  }
+
+  @override
+  String toString() => symbol;
+}
+
 /// Extensions onto System to make it easier to work with.
 extension SystemUtils on System {
   /// Returns true if the system has a jump gate.

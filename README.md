@@ -186,3 +186,7 @@ ApiException 500:
 
 #0      SystemsApi.getSystemWaypoints (package:openapi/api/systems_api.dart:394:7)
 <asynchronous suspension>
+
+
+Automatically handle resets:
+ApiException 401: {"error":{"message":"Failed to parse token. Token reset_date does not match the server. Server resets happen on a weekly to bi-weekly frequency during alpha. After a reset, you should re-register your agent. Expected: 2023-07-08, Actual: 2023-06-24","code":401,"data":{"expected":"2023-07-08","actual":"2023-06-24"}}}

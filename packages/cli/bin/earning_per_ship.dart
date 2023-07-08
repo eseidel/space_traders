@@ -1,3 +1,4 @@
+import 'package:cli/api.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
@@ -33,32 +34,6 @@ double creditsPerMinute(
   return diff / minutes;
 }
 
-class ShipId implements Comparable<ShipId> {
-  ShipId(this.name, this.number);
-
-  ShipId.fromSymbol(String symbol)
-      : name = symbol.split('-')[0],
-        number = int.parse(symbol.split('-')[1], radix: 16);
-
-  final String name;
-  final int number;
-
-  String get hexNumber => number.toRadixString(16).toUpperCase();
-  String get symbol => '$name-$hexNumber';
-
-  @override
-  int compareTo(ShipId other) {
-    final nameCompare = name.compareTo(other.name);
-    if (nameCompare != 0) {
-      return nameCompare;
-    }
-    return number.compareTo(other.number);
-  }
-
-  @override
-  String toString() => symbol;
-}
-
 Future<void> command(FileSystem fs, List<String> args) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
@@ -69,7 +44,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   final transactions = await TransactionLog.load(fs);
   final shipSymbols = transactions.shipSymbols;
-  final shipIds = shipSymbols.map(ShipId.fromSymbol).toList()..sort();
+  final shipIds = shipSymbols.map(ShipSymbol.fromString).toList()..sort();
   final behaviorCache = await BehaviorCache.load(fs);
 
   final longestHexNumber = shipIds.fold(
@@ -88,8 +63,10 @@ Future<void> command(FileSystem fs, List<String> args) async {
       lookback,
       filter: (t) => !t.tradeSymbol.startsWith('SHIP_'),
     );
+    final perSecDiff = perMinuteDiff / 60;
     logger.info('${shipId.hexNumber.padRight(longestHexNumber)}  '
-        '${perMinuteDiff.toStringAsFixed(2)} '
+        '${creditsString(perMinuteDiff.round())}/min '
+        '(${creditsString(perSecDiff.round())}/sec) '
         '  ${state?.behavior.name ?? 'Unknown'}');
   }
 }
