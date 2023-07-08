@@ -25,5 +25,7 @@ void main() {
     await cache.save();
     final cache2 = FactionCache.loadFromCache(fs)!;
     expect(cache2.factions.length, 1);
+    final faction = cache2.factionBySymbol(FactionSymbols.AEGIS);
+    expect(faction.isRecruiting, isTrue);
   });
 }
