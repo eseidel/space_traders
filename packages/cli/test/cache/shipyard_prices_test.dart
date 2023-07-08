@@ -19,6 +19,29 @@ void main() {
     expect(json2, json);
   });
 
+  test('ShipyardPrices load/save roundtrip', () async {
+    final fs = MemoryFileSystem();
+    final shipyardPrices = ShipyardPrices([], fs: fs);
+    final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
+    final a = ShipyardPrice(
+      waypointSymbol: 'A',
+      shipType: ShipType.EXPLORER,
+      purchasePrice: 1,
+      timestamp: moonLanding,
+    );
+    final b = ShipyardPrice(
+      waypointSymbol: 'B',
+      shipType: ShipType.EXPLORER,
+      purchasePrice: 2,
+      timestamp: moonLanding,
+    );
+    await shipyardPrices.addPrices([a, b]);
+    expect(shipyardPrices.rawPrices, [a, b]);
+    await shipyardPrices.save();
+    final shipyardPrices2 = await ShipyardPrices.load(fs);
+    expect(shipyardPrices2.rawPrices, [a, b]);
+  });
+
   test('ShipyardPrices.hasRecentShipyardData', () {
     final fs = MemoryFileSystem();
     final shipyardPrices = ShipyardPrices([], fs: fs);
