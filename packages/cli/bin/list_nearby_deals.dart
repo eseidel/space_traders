@@ -3,6 +3,7 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/market_scan.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
 import 'package:file/local.dart';

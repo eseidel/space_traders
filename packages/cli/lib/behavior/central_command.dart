@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/market_scan.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 // Central command sets behavior for all ships.
@@ -616,6 +618,37 @@ class CentralCommand {
     // those from what remains in the contract.
     final neededGood = contract.goodNeeded(tradeSymbol);
     return neededGood!.unitsRequired - neededGood.unitsFulfilled;
+  }
+
+  /// Returns the symbol of the nearest mine to the given [ship].
+  // This should probably return a "mining plan" instead, which includes
+  // what type of mining this is, where the mine is, where the markets are?
+  String? mineSymbolForShip(SystemsCache systemsCache, Ship ship) {
+    final systemSymbol = ship.nav.systemSymbol;
+    // Return the nearest mine to the ship for now?
+    final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
+    return systemWaypoints.firstWhereOrNull((w) => w.canBeMined)?.symbol;
+
+    // final mine = await nearestMineWithGoodMining(
+    //   api,
+    //   marketPrices,
+    //   systemsCache,
+    //   waypointCache,
+    //   marketCache,
+    //   currentWaypoint,
+    //   maxJumps: maxJumps,
+    //   tradeSymbol: 'PRECIOUS_STONES',
+    // );
+    // if (mine == null) {
+    //   await centralCommand.disableBehaviorForShip(
+    //     ship,
+    //     Behavior.miner,
+    //     'No good mining system found in '
+    //     '$maxJumps radius of ${ship.nav.systemSymbol}.',
+    //     const Duration(hours: 1),
+    //   );
+    //   return null;
+    // }
   }
 }
 
