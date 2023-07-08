@@ -113,7 +113,6 @@ Tech Debt:
 
 Efficiency:
 * Cache system-to-system routes via jumpgates.
-* Start to build a system database similar to the pricing database.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Write a better rate-limiting model.
