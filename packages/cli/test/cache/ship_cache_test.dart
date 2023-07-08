@@ -26,7 +26,8 @@ void main() {
     final threeFrame = _MockShipFrame();
     when(() => three.frame).thenReturn(threeFrame);
     when(() => threeFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
-    final shipCache = ShipCache([one, two, three]);
+    final fs = MemoryFileSystem.test();
+    final shipCache = ShipCache([one, two, three], fs: fs);
     expect(
       shipCache.frameCounts,
       {ShipFrameSymbolEnum.CARRIER: 2, ShipFrameSymbolEnum.FIGHTER: 1},
@@ -51,7 +52,8 @@ void main() {
     when(() => four.frame).thenReturn(fourFrame);
     when(() => fourFrame.symbol)
         .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
-    final shipCache = ShipCache([one, two, three, four]);
+    final fs = MemoryFileSystem.test();
+    final shipCache = ShipCache([one, two, three, four], fs: fs);
     expect(
       describeFleet(shipCache),
       'Fleet: 2 Carrier, 1 Fighter, 1 Light Freighter',
@@ -59,7 +61,8 @@ void main() {
   });
 
   test('describeFleet empty', () {
-    final shipCache = ShipCache([]);
+    final fs = MemoryFileSystem.test();
+    final shipCache = ShipCache([], fs: fs);
     expect(describeFleet(shipCache), 'Fleet: 0 ships');
   });
 
@@ -68,7 +71,8 @@ void main() {
     final oneFrame = _MockShipFrame();
     when(() => one.frame).thenReturn(oneFrame);
     when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
-    final shipCache = ShipCache([one]);
+        final fs = MemoryFileSystem.test();
+    final shipCache = ShipCache([one], fs: fs);
     expect(describeFleet(shipCache), 'Fleet: 1 Carrier');
   });
 

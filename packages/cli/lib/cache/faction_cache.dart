@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
 import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
@@ -8,9 +9,8 @@ class FactionCache extends ResponseListCache<Faction> {
   /// Creates a new faction cache.
   FactionCache(
     super.factions, {
-    // Factions should never change.
+    required super.fs, // Factions should never change.
     super.checkEvery = 10000,
-    super.fs,
     super.path = defaultPath,
   }) : super(
           entryToJson: (c) => c.toJson(),
@@ -22,7 +22,7 @@ class FactionCache extends ResponseListCache<Faction> {
     FileSystem fs, {
     String path = defaultPath,
   }) {
-    final factions = ResponseListCache.load<Faction>(
+    final factions = JsonListStore.load<Faction>(
       fs,
       path,
       (j) => Faction.fromJson(j)!,
@@ -36,12 +36,12 @@ class FactionCache extends ResponseListCache<Faction> {
   /// Creates a new FactionCache from the Api or FileSystem if provided.
   static Future<FactionCache> load(
     Api api, {
-    FileSystem? fs,
+    required FileSystem fs,
     String path = defaultPath,
     bool forceRefresh = false,
   }) async {
-    if (!forceRefresh && fs != null && await fs.isFile(path)) {
-      final factions = ResponseListCache.load<Faction>(
+    if (!forceRefresh && await fs.isFile(path)) {
+      final factions = JsonListStore.load<Faction>(
         fs,
         path,
         (j) => Faction.fromJson(j)!,

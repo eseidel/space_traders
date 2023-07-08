@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
 import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
@@ -9,8 +10,8 @@ class ShipCache extends ResponseListCache<Ship> {
   /// Creates a new ship cache.
   ShipCache(
     super.ships, {
+    required super.fs,
     super.checkEvery = 100,
-    super.fs,
     super.path = defaultPath,
   }) : super(
           entryToJson: (s) => s.toJson(),
@@ -22,7 +23,7 @@ class ShipCache extends ResponseListCache<Ship> {
     FileSystem fs, {
     String path = defaultPath,
   }) {
-    final ships = ResponseListCache.load<Ship>(
+    final ships = JsonListStore.load<Ship>(
       fs,
       path,
       (j) => Ship.fromJson(j)!,
@@ -36,12 +37,12 @@ class ShipCache extends ResponseListCache<Ship> {
   /// Creates a new ShipCache from the Api or FileSystem if provided.
   static Future<ShipCache> load(
     Api api, {
-    FileSystem? fs,
+    required FileSystem fs,
     String path = defaultPath,
     bool forceRefresh = false,
   }) async {
-    if (!forceRefresh && fs != null) {
-      final ships = ResponseListCache.load<Ship>(
+    if (!forceRefresh) {
+      final ships = JsonListStore.load<Ship>(
         fs,
         path,
         (j) => Ship.fromJson(j)!,

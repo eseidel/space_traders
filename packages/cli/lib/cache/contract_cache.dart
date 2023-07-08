@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
 import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
@@ -8,8 +9,8 @@ class ContractCache extends ResponseListCache<Contract> {
   /// Creates a new contract cache.
   ContractCache(
     super.contracts, {
+    required super.fs,
     super.checkEvery = 100,
-    super.fs,
     super.path = defaultPath,
   }) : super(
           entryToJson: (c) => c.toJson(),
@@ -18,7 +19,7 @@ class ContractCache extends ResponseListCache<Contract> {
 
   /// Load the ContractCache from the file system.
   static ContractCache? loadCached(FileSystem fs, {String path = defaultPath}) {
-    final contracts = ResponseListCache.load<Contract>(
+    final contracts = JsonListStore.load<Contract>(
       fs,
       path,
       (j) => Contract.fromJson(j)!,
@@ -32,12 +33,12 @@ class ContractCache extends ResponseListCache<Contract> {
   /// Creates a new ContractCache from the Api or FileSystem if provided.
   static Future<ContractCache> load(
     Api api, {
-    FileSystem? fs,
+    required FileSystem fs,
     String path = defaultPath,
     bool forceRefresh = false,
   }) async {
-    if (!forceRefresh && fs != null) {
-      final contracts = ResponseListCache.load<Contract>(
+    if (!forceRefresh) {
+      final contracts = JsonListStore.load<Contract>(
         fs,
         path,
         (j) => Contract.fromJson(j)!,

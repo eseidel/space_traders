@@ -11,6 +11,48 @@ Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
   });
 }
 
+/// Charted values from a waypoint.
+// class ChartedValues {
+//   /// Create a new ChartedValues.
+//   const ChartedValues({
+//     required this.waypointSymbol,
+//     required this.orbitals,
+//     required this.faction,
+//     required this.traits,
+//     required this.chart,
+//   });
+
+//   /// The symbol of the waypoint these are for.
+//   final String waypointSymbol;
+
+//   /// Waypoints that orbit this waypoint.
+//   final List<WaypointOrbital> orbitals;
+
+//   /// Faction owning the waypoint.
+//   final WaypointFaction faction;
+
+//   /// The traits of the waypoint.
+//   final List<WaypointTrait> traits;
+
+//   /// The chart of the waypoint.
+//   final Chart chart;
+// }
+
+// Waypoint _waypointFromCache(SystemWaypoint waypoint,
+//  ChartedValues? charted) {
+//   return Waypoint(
+//     symbol: waypoint.symbol,
+//     type: waypoint.type,
+//     systemSymbol: waypoint.systemSymbol,
+//     x: waypoint.x,
+//     y: waypoint.y,
+//     orbitals: charted?.orbitals ?? [],
+//     faction: charted?.faction,
+//     traits: charted?.traits ?? [],
+//     chart: charted?.chart,
+//   );
+// }
+
 /// Stores Waypoint objects fetched recently from the API.
 class WaypointCache {
   /// Create a new WaypointCache.

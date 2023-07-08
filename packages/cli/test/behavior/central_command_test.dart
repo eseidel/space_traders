@@ -193,7 +193,8 @@ void main() {
       deadlineToAccept: hourFromNow,
     );
     final contracts = [contract1, contract2];
-    final contractCache = ContractCache(contracts);
+    final fs = MemoryFileSystem.test();
+    final contractCache = ContractCache(contracts, fs: fs);
     final active = contractCache.activeContracts;
     expect(active.length, 2);
     final affordable = affordableContracts(agentCache, contractCache).toList();

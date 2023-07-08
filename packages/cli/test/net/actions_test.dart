@@ -3,6 +3,7 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -20,13 +21,16 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
+class _MockShipCache extends Mock implements ShipCache {}
+
 void main() {
   test('purchaseShip', () async {
     final Api api = _MockApi();
     final FleetApi fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
 
-    final shipCache = ShipCache([]);
+    final fs = MemoryFileSystem.test();
+    final shipCache = _MockShipCache();
     final agent1 = _MockAgent();
     final agent2 = _MockAgent();
 
@@ -44,6 +48,10 @@ void main() {
       (invocation) => Future.value(PurchaseShip201Response(data: responseData)),
     );
 
+    when(() => shipCache.updateShip(responseData.ship)).thenAnswer(
+      (invocation) => Future.value(),
+    );
+
     final agentCache = AgentCache(agent1);
     const shipyardSymbol = 'SY';
     const shipType = ShipType.PROBE;
@@ -54,7 +62,9 @@ void main() {
       shipyardSymbol,
       shipType,
     );
-    expect(shipCache.ships, hasLength(1));
+    verify(
+      () => shipCache.updateShip(responseData.ship),
+    ).called(1);
     expect(agentCache.agent, agent2);
   });
 
