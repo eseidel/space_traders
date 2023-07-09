@@ -332,7 +332,9 @@ class CentralCommand {
   /// but will not start new deals involving contracts.
   bool get isContractTradingEnabled => false;
 
-  Iterable<SellOpp> _contractSellOpps(
+  /// Procurment contracts converted to sell opps.
+  @visibleForTesting
+  Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
     ContractCache contractCache,
   ) sync* {
@@ -376,14 +378,14 @@ class CentralCommand {
 
     /// This should decide if contract trading is enabled, and if it is
     /// include extra SellOpps for the contract goods.
-    final contractSellOpps = isContractTradingEnabled
-        ? _contractSellOpps(agentCache, contractCache).toList()
+    final extraSellOpps = isContractTradingEnabled
+        ? contractSellOpps(agentCache, contractCache).toList()
         : null;
-    if (contractSellOpps != null) {
-      final opp = contractSellOpps.first;
+    if (extraSellOpps != null) {
+      final opp = extraSellOpps.first;
       logger.info(
-        'Including contract sell opp: '
-        '${opp.maxUnits} ${opp.tradeSymbol} at ${opp.marketSymbol}',
+        'Including contract sell opp: ${opp.maxUnits} ${opp.tradeSymbol} '
+        '@ ${creditsString(opp.price)} -> ${opp.marketSymbol}',
       );
     }
 
@@ -402,7 +404,7 @@ class CentralCommand {
       ship,
       maxJumps: maxJumps,
       maxTotalOutlay: maxTotalOutlay,
-      extraSellOpps: contractSellOpps,
+      extraSellOpps: extraSellOpps,
       filter: filter,
     );
     return maybeDeal;

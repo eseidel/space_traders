@@ -419,9 +419,9 @@ String describeCostedDeal(CostedDeal costedDeal) {
   final name =
       costedDeal.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
   return '${name.padRight(25)} '
-      ' ${deal.sourceSymbol} ${c(deal.purchasePrice).padLeft(8)} '
+      ' ${deal.sourceSymbol.padRight(14)} ${c(deal.purchasePrice).padLeft(8)} '
       '-> '
-      '${deal.destinationSymbol} ${c(deal.sellPrice).padLeft(8)} '
+      '${deal.destinationSymbol.padRight(14)} ${c(deal.sellPrice).padLeft(8)} '
       '$coloredProfitString $timeString ${c(costedDeal.expectedCosts)}';
 }
 

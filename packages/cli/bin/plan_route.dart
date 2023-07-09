@@ -58,12 +58,16 @@ void planRouteAndLog(
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
+  if (args.length != 2) {
+    logger.err('Usage: plan_route START END');
+    return;
+  }
+
+  final startSymbol = args[0];
+  final endSymbol = args[1];
+
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
-
-  // final startSymbol = 'X1-QU45-24413B';
-  const startSymbol = 'X1-S72-45410F';
-  const endSymbol = 'X1-CP30-57877X';
 
   final start = systemsCache.waypointFromSymbol(startSymbol);
   final end = systemsCache.waypointFromSymbol(endSymbol);

@@ -1,7 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
@@ -15,8 +14,6 @@ class _MockLogger extends Mock implements Logger {}
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
