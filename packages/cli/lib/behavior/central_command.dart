@@ -211,7 +211,7 @@ class CentralCommand {
   ) async {
     final currentState = _behaviorCache.getBehavior(ship.symbol);
     if (currentState == null || currentState.behavior == behavior) {
-      await _behaviorCache.deleteBehavior(ship.symbol);
+      _behaviorCache.deleteBehavior(ship.symbol);
     } else {
       shipInfo(
         ship,
@@ -237,7 +237,7 @@ class CentralCommand {
   ) async {
     final currentState = _behaviorCache.getBehavior(ship.symbol);
     if (currentState == null || currentState.behavior == behavior) {
-      await _behaviorCache.deleteBehavior(ship.symbol);
+      _behaviorCache.deleteBehavior(ship.symbol);
     } else {
       shipInfo(
         ship,
@@ -264,7 +264,7 @@ class CentralCommand {
   Future<void> setDestination(Ship ship, String destinationSymbol) async {
     final state = _behaviorCache.getBehavior(ship.symbol)!
       ..destination = destinationSymbol;
-    await _behaviorCache.setBehavior(ship.symbol, state);
+    _behaviorCache.setBehavior(ship.symbol, state);
   }
 
   /// Get the current destination for the given ship.
@@ -276,7 +276,7 @@ class CentralCommand {
   /// The [ship] has reached its destination.
   Future<void> reachedDestination(Ship ship) async {
     final state = _behaviorCache.getBehavior(ship.symbol)!..destination = null;
-    await _behaviorCache.setBehavior(ship.symbol, state);
+    _behaviorCache.setBehavior(ship.symbol, state);
   }
 
   /// Record the given [transactions] for the current deal for [ship].
@@ -300,7 +300,7 @@ class CentralCommand {
         ship.symbol,
         behavior,
       );
-      await _behaviorCache.setBehavior(ship.symbol, newState);
+      _behaviorCache.setBehavior(ship.symbol, newState);
     }
     return _behaviorCache.getBehavior(ship.symbol)!;
   }
@@ -313,7 +313,7 @@ class CentralCommand {
 
   /// Set the current [BehaviorState] for the [shipSymbol].
   Future<void> setBehavior(String shipSymbol, BehaviorState state) async {
-    await _behaviorCache.setBehavior(shipSymbol, state);
+    _behaviorCache.setBehavior(shipSymbol, state);
   }
 
   /// Returns all systems containing explorers or explorer destinations.
@@ -330,10 +330,9 @@ class CentralCommand {
   /// We will only accept and start new contracts when this is true.
   /// We will continue to deliver current contract deals even if this is false,
   /// but will not start new deals involving contracts.
-  bool get isContractTradingEnabled => false;
+  bool get isContractTradingEnabled => true;
 
   /// Procurment contracts converted to sell opps.
-  @visibleForTesting
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
     ContractCache contractCache,
@@ -343,7 +342,7 @@ class CentralCommand {
         yield SellOpp(
           marketSymbol: good.destinationSymbol,
           tradeSymbol: good.tradeSymbol,
-          isContractDelivery: true,
+          contractId: contract.id,
           price: _maxWorthwhileUnitPurchasePrice(contract, good),
           maxUnits: remainingUnitsNeededForContract(contract, good.tradeSymbol),
         );
@@ -368,6 +367,8 @@ class CentralCommand {
     final inProgress = _dealsInProgress().toList();
     // Avoid having two ships working on the same deal since by the time the
     // second one gets there the prices will have changed.
+    // Note this does not check destination, so should still allow two
+    // ships to work on the same contract.
     bool filter(CostedDeal deal) {
       return inProgress.every(
         (d) =>
@@ -543,6 +544,8 @@ class CentralCommand {
         isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
       return false;
     }
+    // TODO(eseidel): Consider which ships are sold at this shipyard.
+
     // This assumes the ship in question is at a shipyard and already docked.
     final waypointSymbol = ship.nav.waypointSymbol;
     final shipType = shipTypeToBuy(agentCache, waypointSymbol: waypointSymbol);

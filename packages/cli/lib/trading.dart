@@ -25,6 +25,7 @@ class Deal {
     required this.purchasePrice,
     required this.sellPrice,
     this.maxUnits,
+    this.contractId,
   });
 
   /// Create a deal from JSON.
@@ -36,6 +37,7 @@ class Deal {
       purchasePrice: json['purchasePrice'] as int,
       sellPrice: json['sellPrice'] as int,
       maxUnits: json['maxUnits'] as int?,
+      contractId: json['contractId'] as String?,
     );
   }
 
@@ -60,6 +62,18 @@ class Deal {
   /// This is only used for contract deliveries.  Null means unlimited.
   final int? maxUnits;
 
+  /// The id of the contract this deal is a part of.
+  /// Contract deals are very similar to arbitrage deals except:
+  /// 1. The destination market is predetermined.
+  /// 2. Trade volume is predetermined and coordinated across all ships.
+  /// 3. Contract deals only pay out on completed contracts, not for individual
+  ///    deliveries, thus they are only viable when we have enough capital
+  ///    to expect to complete the contract.
+  /// 4. Behavior at destinations is different ("fulfill" instead of "sell").
+  /// 5. We treat the "sell" price as the total reward of contract divided by
+  ///    the number of units of cargo we need to deliver.
+  final String? contractId;
+
   // Profit depends on route taken, so this likely does not
   // belong here.
   /// The profit we'll make on this deal per unit.
@@ -73,6 +87,7 @@ class Deal {
         'purchasePrice': purchasePrice,
         'sellPrice': sellPrice,
         'maxUnits': maxUnits,
+        'contractId': contractId,
       };
 
   @override
@@ -85,7 +100,8 @@ class Deal {
           destinationSymbol == other.destinationSymbol &&
           purchasePrice == other.purchasePrice &&
           sellPrice == other.sellPrice &&
-          maxUnits == other.maxUnits;
+          maxUnits == other.maxUnits &&
+          contractId == other.contractId;
 
   @override
   int get hashCode =>
@@ -94,7 +110,8 @@ class Deal {
       destinationSymbol.hashCode ^
       purchasePrice.hashCode ^
       sellPrice.hashCode ^
-      maxUnits.hashCode;
+      maxUnits.hashCode ^
+      contractId.hashCode;
 }
 
 /// Describe a [deal] in a human-readable way.
@@ -188,8 +205,12 @@ List<Deal> buildDealsFromScan(
   for (final tradeSymbol in tradeSymbols) {
     final buys = scan.buyOppsForTradeSymbol(tradeSymbol);
     final scanSells = scan.sellOppsForTradeSymbol(tradeSymbol);
-    final sells =
-        extraSellOpps != null ? [...scanSells, ...extraSellOpps] : scanSells;
+    final sells = extraSellOpps != null
+        ? [
+            ...scanSells,
+            ...extraSellOpps.where((o) => o.tradeSymbol == tradeSymbol)
+          ]
+        : scanSells;
     for (final buy in buys) {
       for (final sell in sells) {
         if (buy.marketSymbol == sell.marketSymbol) {
@@ -207,6 +228,7 @@ List<Deal> buildDealsFromScan(
             destinationSymbol: sell.marketSymbol,
             sellPrice: sell.price,
             maxUnits: sell.maxUnits,
+            contractId: sell.contractId,
           ),
         );
       }
@@ -227,14 +249,12 @@ class CostedDeal {
     required this.startTime,
     required this.route,
     required this.costPerFuelUnit,
-    this.contractId,
   }) : transactions = List.unmodifiable(transactions);
 
   /// Create a CostedDeal from JSON.
   factory CostedDeal.fromJson(Map<String, dynamic> json) => CostedDeal(
         deal: Deal.fromJson(json['deal'] as Map<String, dynamic>),
         tradeVolume: json['tradeVolume'] as int,
-        contractId: json['contractId'] as String?,
         startTime: DateTime.parse(json['startTime'] as String),
         route: RoutePlan.fromJson(json['route'] as Map<String, dynamic>),
         transactions: (json['transactions'] as List<dynamic>)
@@ -244,19 +264,10 @@ class CostedDeal {
       );
 
   /// The id of the contract this deal is a part of.
-  /// Contract deals are very similar to arbitrage deals except:
-  /// 1. The destination market is predetermined.
-  /// 2. Trade volume is predetermined and coordinated across all ships.
-  /// 3. Contract deals only pay out on completed contracts, not for individual
-  ///    deliveries, thus they are only viable when we have enough capital
-  ///    to expect to complete the contract.
-  /// 4. Behavior at destinations is different ("fulfill" instead of "sell").
-  /// 5. We treat the "sell" price as the total reward of contract divided by
-  ///    the number of units of cargo we need to deliver.
-  final String? contractId;
+  String? get contractId => deal.contractId;
 
   /// Whether this deal is a contract deal.
-  bool get isContractDeal => contractId != null;
+  bool get isContractDeal => deal.contractId != null;
 
   /// The deal being considered.
   final Deal deal;

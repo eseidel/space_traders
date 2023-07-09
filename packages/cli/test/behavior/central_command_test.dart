@@ -30,9 +30,6 @@ void main() {
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     expect(centralCommand.isBehaviorDisabled(Behavior.trader), false);
 
-    when(() => behaviorCache.deleteBehavior('S'))
-        .thenAnswer((_) => Future.value());
-
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn('S');
     final logger = _MockLogger();
@@ -51,7 +48,7 @@ void main() {
 
   test('CentralCommand.isDisabledForShip', () async {
     final fs = MemoryFileSystem.test();
-    final behaviorCache = await BehaviorCache.load(fs);
+    final behaviorCache = BehaviorCache.load(fs);
     final shipCache = _MockShipCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
@@ -62,7 +59,7 @@ void main() {
       false,
     );
 
-    await behaviorCache.setBehavior('S', BehaviorState('S', Behavior.trader));
+    behaviorCache.setBehavior('S', BehaviorState('S', Behavior.trader));
 
     final logger = _MockLogger();
     await runWithLogger(
@@ -108,7 +105,7 @@ void main() {
 
   test('CentralCommand.otherExplorerSystems', () async {
     final fs = MemoryFileSystem.test();
-    final behaviorCache = await BehaviorCache.load(fs);
+    final behaviorCache = BehaviorCache.load(fs);
     final shipCache = _MockShipCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);

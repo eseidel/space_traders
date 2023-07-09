@@ -395,8 +395,14 @@ Future<DateTime?> advanceTrader(
       await caches.waypoints.waypoint(ship.nav.waypointSymbol);
 
   // If we're currently at a market, record the prices and refuel.
-  final currentMarket =
-      await visitLocalMarket(api, caches, currentWaypoint, ship);
+  final currentMarket = await visitLocalMarket(
+    api,
+    caches,
+    currentWaypoint,
+    ship,
+    // We want to always be using super up-to-date market prices for the trader.
+    maxAge: const Duration(seconds: 5),
+  );
   await centralCommand.visitLocalShipyard(
     api,
     caches.shipyardPrices,

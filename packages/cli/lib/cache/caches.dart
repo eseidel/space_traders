@@ -105,7 +105,7 @@ class Caches {
     final markets = MarketCache(waypoints);
     // Intentionally force refresh contracts in case we've been offline.
     final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);
-    final behaviors = await BehaviorCache.load(fs);
+    final behaviors = BehaviorCache.load(fs);
     // Intentionally load factions from disk (they never change).
     final factions = await FactionCache.load(api, fs: fs);
 

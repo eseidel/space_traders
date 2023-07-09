@@ -46,7 +46,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final transactions = await TransactionLog.load(fs);
   final shipSymbols = transactions.shipSymbols;
   final shipIds = shipSymbols.map(ShipSymbol.fromString).toList()..sort();
-  final behaviorCache = await BehaviorCache.load(fs);
+  final behaviorCache = BehaviorCache.load(fs);
 
   final longestHexNumber = shipIds.fold(
     0,

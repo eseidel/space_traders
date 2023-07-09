@@ -9,9 +9,8 @@ void main() {
     final stateByShipSymbol = {
       'S': BehaviorState('S', Behavior.buyShip),
     };
-    final cache = BehaviorCache(stateByShipSymbol, fs: fs);
-    await cache.save();
-    final loaded = await BehaviorCache.load(fs);
+    BehaviorCache(stateByShipSymbol, fs: fs).save();
+    final loaded = BehaviorCache.load(fs);
     expect(loaded.getBehavior('S')!.behavior, stateByShipSymbol['S']!.behavior);
   });
 }

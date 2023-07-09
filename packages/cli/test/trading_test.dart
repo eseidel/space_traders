@@ -200,7 +200,8 @@ void main() {
     final profit = lightGreen.wrap('     +1c (100%)');
     expect(
       describeCostedDeal(costed),
-      'FUEL                       A       1c -> B       2c $profit 0s 1c/s 1c',
+      'FUEL                       A                    '
+      '1c -> B                    2c $profit 0s 1c/s 1c',
     );
   });
 
@@ -326,5 +327,61 @@ void main() {
     expect(costed, isNotNull);
     expect(costed?.expectedProfitPerSecond, 3);
     expect(costed?.expectedProfit, 101);
+  });
+
+  test('buildDealsFromScan empty', () {
+    final scan = MarketScan.test(buyOpps: [], sellOpps: []);
+    final deals = buildDealsFromScan(scan);
+    expect(deals, isEmpty);
+  });
+
+  test('buildDealsFromScan one', () {
+    final trade1 = TradeSymbol.FUEL.value;
+    final buyOpps = [
+      BuyOpp(marketSymbol: 'M-A', tradeSymbol: trade1, price: 1),
+    ];
+    final sellOpps = [
+      SellOpp(marketSymbol: 'M-B', tradeSymbol: trade1, price: 2),
+    ];
+    final scan = MarketScan.test(buyOpps: buyOpps, sellOpps: sellOpps);
+    final deals = buildDealsFromScan(scan);
+    expect(deals.length, 1);
+    expect(deals.first.sourceSymbol, 'M-A');
+    expect(deals.first.destinationSymbol, 'M-B');
+    expect(deals.first.tradeSymbol, TradeSymbol.FUEL);
+    expect(deals.first.purchasePrice, 1);
+    expect(deals.first.sellPrice, 2);
+  });
+
+  test('buildDealsFromScan extraSellOpps', () {
+    final trade1 = TradeSymbol.FUEL.value;
+    final trade2 = TradeSymbol.ICE_WATER.value;
+
+    final buyOpps = [
+      BuyOpp(marketSymbol: 'M-A', tradeSymbol: trade1, price: 1),
+      BuyOpp(marketSymbol: 'M-A', tradeSymbol: trade2, price: 1),
+    ];
+    final sellOpps = [
+      SellOpp(marketSymbol: 'M-B', tradeSymbol: trade1, price: 2),
+      SellOpp(marketSymbol: 'M-B', tradeSymbol: trade2, price: 3),
+    ];
+    final scan = MarketScan.test(buyOpps: buyOpps, sellOpps: sellOpps);
+    final deals = buildDealsFromScan(scan);
+    expect(deals.length, 2);
+
+    final extraSellOpps = [
+      SellOpp(
+        marketSymbol: 'M-C',
+        tradeSymbol: trade2,
+        price: 4,
+        contractId: 'foo',
+      ),
+    ];
+
+    final deals2 = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
+    // Importantly not 4.  extraSellOpps only applies to the second deal.
+    expect(deals2.length, 3);
+    // The contractId is plumbed through correctly.
+    expect(deals2.any((d) => d.contractId == 'foo'), isTrue);
   });
 }

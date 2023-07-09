@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 int _percentileForTradeType(ExchangeType tradeType) {
@@ -78,10 +79,10 @@ class BuyOpp {
     required this.price,
   });
 
-  /// The symbol of the market where the good is sold.
+  /// The symbol of the market where the good can be purchased.
   final String marketSymbol;
 
-  /// The symbol of the good being sold.
+  /// The symbol of the good offered for purchase.
   final String tradeSymbol;
 
   /// The price of the good.
@@ -96,21 +97,21 @@ class SellOpp {
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
-    this.isContractDelivery = false,
+    this.contractId,
     this.maxUnits,
   });
 
-  /// The symbol of the market where the good is bought.
+  /// The symbol of the market where the good can be sold.
   final String marketSymbol;
 
-  /// The symbol of the good being bought.
+  /// The symbol of the good.
   final String tradeSymbol;
 
   /// The price of the good.
   final int price;
 
-  /// Whether this is a contract delivery.
-  final bool isContractDelivery;
+  /// Set to the contractId for contract deliveries.
+  final String? contractId;
 
   /// The maximum number of units we can sell.
   /// This is only used for contract deliveries towards the very end of
@@ -208,6 +209,14 @@ class MarketScan {
     required Map<String, List<SellOpp>> sellOpps,
   })  : _buyOpps = Map.unmodifiable(buyOpps),
         _sellOpps = Map.unmodifiable(sellOpps);
+
+  /// Create a new MarketScan for testing.
+  @visibleForTesting
+  MarketScan.test({
+    required List<BuyOpp> buyOpps,
+    required List<SellOpp> sellOpps,
+  })  : _buyOpps = groupBy(buyOpps, (b) => b.tradeSymbol),
+        _sellOpps = groupBy(sellOpps, (s) => s.tradeSymbol);
 
   /// Given a set of historical market prices, will collect the top N buy and
   /// sell opportunities for each trade symbol regardless of distance.

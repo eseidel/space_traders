@@ -1,83 +1,68 @@
-import 'dart:convert';
-
 import 'package:cli/behavior/behavior.dart';
+import 'package:cli/cache/json_store.dart';
 import 'package:file/file.dart';
 
+typedef _Record = Map<String, BehaviorState>;
+
 /// A class to manage the behavior cache.
-class BehaviorCache {
+class BehaviorCache extends JsonStore<_Record> {
   /// Create a new behavior cache.
   BehaviorCache(
-    Map<String, BehaviorState> stateByShipSymbol, {
-    required FileSystem fs,
+    super.stateByShipSymbol, {
+    required super.fs,
+    super.path = defaultPath,
+  });
+
+  /// Load the cache from a file.
+  factory BehaviorCache.load(
+    FileSystem fs, {
     String path = defaultPath,
-  })  : _stateByShipSymbol = stateByShipSymbol,
-        _fs = fs,
-        _path = path;
+  }) {
+    final record = JsonStore.load<_Record>(
+          fs,
+          path,
+          (Map<String, dynamic> j) => j.map(
+            (key, value) => MapEntry(
+              key,
+              BehaviorState.fromJson(value as Map<String, dynamic>),
+            ),
+          ),
+        ) ??
+        {};
+    return BehaviorCache(record, fs: fs, path: path);
+  }
 
   /// The default path to the cache file.
   static const String defaultPath = 'data/behaviors.json';
 
   /// The behavior state for each ship.
-  final Map<String, BehaviorState> _stateByShipSymbol;
-
-  /// The path to the cache file.
-  final String _path;
-
-  /// The file system to use.
-  final FileSystem _fs;
+  Map<String, BehaviorState> get _stateByShipSymbol => record;
 
   /// Get the list of all behavior states.
   List<BehaviorState> get states => _stateByShipSymbol.values.toList();
-
-  /// Save entries to a file.
-  Future<void> save() async {
-    const encoder = JsonEncoder.withIndent(' ');
-    final prettyprint = encoder.convert(_stateByShipSymbol);
-    final file = _fs.file(_path);
-    await file.create(recursive: true);
-    await file.writeAsString(prettyprint);
-  }
-
-  /// Load the cache from a file.
-  static Future<BehaviorCache> load(
-    FileSystem fs, {
-    String path = defaultPath,
-  }) async {
-    final file = fs.file(path);
-    if (await file.exists()) {
-      final jsonMap =
-          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-      final behaviorStates = jsonMap.map<String, BehaviorState>(
-        (key, value) => MapEntry(
-          key,
-          BehaviorState.fromJson(value as Map<String, dynamic>),
-        ),
-      );
-      return BehaviorCache(behaviorStates, fs: fs, path: path);
-    }
-    return BehaviorCache({}, fs: fs, path: path);
-  }
 
   /// Get the behavior state for the given ship.
   BehaviorState? getBehavior(String shipSymbol) =>
       _stateByShipSymbol[shipSymbol];
 
   /// Delete the behavior state for the given ship.
-  Future<void> deleteBehavior(String shipSymbol) async =>
-      _stateByShipSymbol.remove(shipSymbol);
+  void deleteBehavior(String shipSymbol) {
+    _stateByShipSymbol.remove(shipSymbol);
+    save();
+  }
 
   /// Set the behavior state for the given ship.
-  Future<void> setBehavior(
+  void setBehavior(
     String shipSymbol,
     BehaviorState behaviorState,
-  ) async {
+  ) {
     _stateByShipSymbol[shipSymbol] = behaviorState;
-    await save();
+    save();
   }
 
   /// Clear the behavior state for the given ship.
-  Future<void> completeBehavior(String shipSymbol) async {
+  void completeBehavior(String shipSymbol) {
     _stateByShipSymbol.remove(shipSymbol);
-    await save();
+    save();
   }
 }

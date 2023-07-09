@@ -117,7 +117,7 @@ bool Function(Ship) filterFromArgs(List<String> args) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final filter = filterFromArgs(args);
-  final behaviorCache = await BehaviorCache.load(fs);
+  final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final marketPrices = await MarketPrices.load(fs);
