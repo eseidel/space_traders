@@ -34,11 +34,15 @@ class AgentCache extends JsonStore<Agent> {
 
   /// Creates a new AgentCache from a file.
   static AgentCache? loadCached(FileSystem fs, {String path = defaultPath}) {
-    return JsonStore.load<Agent>(
+    final agent = JsonStore.load<Agent>(
       fs,
       path,
       (j) => Agent.fromJson(j)!,
-    ) as AgentCache?;
+    );
+    if (agent == null) {
+      return null;
+    }
+    return AgentCache(agent, fs: fs, path: path);
   }
 
   /// Creates a new AgentCache from the API.

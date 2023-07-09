@@ -32,4 +32,19 @@ void main() {
     cache.ensureAgentUpToDate(api);
     verify(agents.getMyAgent).called(1);
   });
+
+  test('AgentCache save/load round trip', () {
+    final agent = Agent(
+      accountId: 'accountId',
+      symbol: 'symbol',
+      headquarters: 'headquarters',
+      credits: 100,
+      startingFaction: 'startingFaction',
+    );
+    final fs = MemoryFileSystem.test();
+    AgentCache(agent, fs: fs).save();
+    final loaded = AgentCache.loadCached(fs);
+    expect(loaded, isNotNull);
+    expect(loaded!.agent.credits, agent.credits);
+  });
 }
