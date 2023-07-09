@@ -151,7 +151,8 @@ void main() {
     final agent = _MockAgent();
     // TODO(eseidel): Contracts are disabled under 100000 credits.
     when(() => agent.credits).thenReturn(100000);
-    final agentCache = AgentCache(agent);
+    final fs = MemoryFileSystem.test();
+    final agentCache = AgentCache(agent, fs: fs);
     when(() => ship.symbol).thenReturn('S');
     final hourFromNow = DateTime.timestamp().add(const Duration(hours: 1));
     final contract1 = Contract(
@@ -193,7 +194,6 @@ void main() {
       deadlineToAccept: hourFromNow,
     );
     final contracts = [contract1, contract2];
-    final fs = MemoryFileSystem.test();
     final contractCache = ContractCache(contracts, fs: fs);
     final active = contractCache.activeContracts;
     expect(active.length, 2);

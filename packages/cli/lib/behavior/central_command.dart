@@ -393,7 +393,7 @@ class CentralCommand {
       systemSymbol: ship.nav.systemSymbol,
       maxJumps: maxJumps,
     );
-    final maybeDeal = await findDealFor(
+    final maybeDeal = await findDealForShip(
       marketPrices,
       systemsCache,
       systemConnectivity,

@@ -25,7 +25,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
   final data = purchaseResponse!.data;
   await shipCache.updateShip(data.ship);
-  agentCache.updateAgent(data.agent);
+  agentCache.agent = data.agent;
   return data;
 }
 
@@ -113,7 +113,7 @@ Future<SellCargo201ResponseData> sellCargo(
   final response =
       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
   ship.cargo = response!.data.cargo;
-  agentCache.updateAgent(response.data.agent);
+  agentCache.agent = response.data.agent;
   return response.data;
 }
 
@@ -135,7 +135,7 @@ Future<SellCargo201ResponseData> purchaseCargo(
       await api.fleet.purchaseCargo(ship.symbol, purchaseCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
-  agentCache.updateAgent(data.agent);
+  agentCache.agent = data.agent;
   return data;
 }
 
@@ -149,7 +149,7 @@ Future<RefuelShip200ResponseData> refuelShip(
 ) async {
   final responseWrapper = await api.fleet.refuelShip(ship.symbol);
   final data = responseWrapper!.data;
-  agentCache.updateAgent(data.agent);
+  agentCache.agent = data.agent;
   ship.fuel = data.fuel;
   return data;
 }

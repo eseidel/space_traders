@@ -508,14 +508,43 @@ CostedDeal? _filterDealsAndLog(
   return profitable.last;
 }
 
-/// Returns the best deal for the given ship within [maxJumps] of it's
-/// current location.
-Future<CostedDeal?> findDealFor(
+/// Returns the best deal for the given ship.
+Future<CostedDeal?> findDealForShip(
   MarketPrices marketPrices,
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
   MarketScan scan,
   Ship ship, {
+  required int maxJumps,
+  required int maxTotalOutlay,
+  List<SellOpp>? extraSellOpps,
+  bool Function(CostedDeal deal)? filter,
+}) {
+  return findDealFor(
+    marketPrices, systemsCache, systemConnectivity, scan,
+    startSymbol: ship.nav.waypointSymbol,
+    fuelCapacity: ship.fuel.capacity,
+    // Currently using capacity, rather than availableSpace, since the
+    // trader logic tries to clear out the hold.
+    cargoCapacity: ship.cargo.capacity,
+    maxJumps: maxJumps,
+    shipSpeed: ship.engine.speed,
+    maxTotalOutlay: maxTotalOutlay,
+    extraSellOpps: extraSellOpps,
+    filter: filter,
+  );
+}
+
+/// Returns the best deal for the given parameters.
+Future<CostedDeal?> findDealFor(
+  MarketPrices marketPrices,
+  SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
+  MarketScan scan, {
+  required String startSymbol,
+  required int fuelCapacity,
+  required int cargoCapacity,
+  required int shipSpeed,
   required int maxJumps,
   required int maxTotalOutlay,
   List<SellOpp>? extraSellOpps,
@@ -526,13 +555,13 @@ Future<CostedDeal?> findDealFor(
 
   final costedDeals = deals.map(
     (deal) => costOutDeal(
-      shipSpeed: ship.engine.speed,
+      shipSpeed: shipSpeed,
       systemsCache,
       systemConnectivity,
       deal,
-      cargoSize: ship.availableSpace,
-      shipWaypointSymbol: ship.nav.waypointSymbol,
-      shipFuelCapacity: ship.fuel.capacity,
+      cargoSize: cargoCapacity,
+      shipWaypointSymbol: startSymbol,
+      shipFuelCapacity: fuelCapacity,
       costPerFuelUnit:
           marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
     ),
@@ -542,7 +571,7 @@ Future<CostedDeal?> findDealFor(
     costedDeals,
     maxJumps: maxJumps,
     maxTotalOutlay: maxTotalOutlay,
-    systemSymbol: ship.nav.systemSymbol,
+    systemSymbol: startSymbol,
     filter: filter,
   );
 }

@@ -3,6 +3,7 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -31,6 +32,7 @@ void main() {
     final shipCache = _MockShipCache();
     final agent1 = _MockAgent();
     final agent2 = _MockAgent();
+    when(agent2.toJson).thenReturn({});
 
     final responseData = PurchaseShip201ResponseData(
       agent: agent2,
@@ -50,7 +52,8 @@ void main() {
       (invocation) => Future.value(),
     );
 
-    final agentCache = AgentCache(agent1);
+    final fs = MemoryFileSystem.test();
+    final agentCache = AgentCache(agent1, fs: fs);
     const shipyardSymbol = 'SY';
     const shipType = ShipType.PROBE;
     await purchaseShip(

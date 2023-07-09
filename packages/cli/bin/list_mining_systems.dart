@@ -56,7 +56,7 @@ Future<void> cliMain(List<String> args) async {
     }
     start = maybeStart;
   } else {
-    final agentCache = await AgentCache.load(api);
+    final agentCache = await AgentCache.load(api, fs: fs);
     start = agentCache.headquarters(systemsCache);
   }
 

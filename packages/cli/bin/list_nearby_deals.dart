@@ -1,7 +1,5 @@
 import 'package:args/args.dart';
-import 'package:cli/cache/market_prices.dart';
-import 'package:cli/cache/ship_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/system_connectivity.dart';
@@ -15,7 +13,7 @@ Future<void> cliMain(List<String> args) async {
       'jumps',
       abbr: 'j',
       help: 'Maximum number of jumps to walk out',
-      defaultsTo: '1',
+      defaultsTo: '5',
     )
     ..addOption(
       'start',
@@ -36,10 +34,8 @@ Future<void> cliMain(List<String> args) async {
 
   const fs = LocalFileSystem();
   final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final agentCache = AgentCache.loadCached(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
-  final shipCache = ShipCache.loadCached(fs)!;
-  // Just grab the command ship.
-  final ship = shipCache.ships.first;
 
   final marketPrices = await MarketPrices.load(fs);
   // final waypointCache = WaypointCache(api, systemsCache);
@@ -50,28 +46,48 @@ Future<void> cliMain(List<String> args) async {
   //   systemSymbol: ship.nav.systemSymbol,
   //   maxJumps: maxJumps,
   // );
-  logger.info('starting scan');
+
+  const maxWaypoints = 100;
+  const maxOutlay = 100000;
+  const cargoCapacity = 120;
+  const shipSpeed = 30;
+  const fuelCapacity = 1200;
+  final start = agentCache.headquarters(systemsCache);
+  logger.info(
+    'Finding deals with '
+    'start: ${start.symbol}, '
+    'max jumps: $maxJumps, '
+    'max waypoints: $maxWaypoints, '
+    'max outlay: $maxOutlay, '
+    'max units: $cargoCapacity, '
+    'fuel capacity: $fuelCapacity, '
+    'ship speed: $shipSpeed',
+  );
+
   final allowedWaypoints = systemsCache
       .waypointSymbolsInJumpRadius(
-        startSystem: ship.nav.systemSymbol,
+        startSystem: start.systemSymbol,
         maxJumps: maxJumps,
       )
+      .take(maxWaypoints)
       .toSet();
-  logger.info('${allowedWaypoints.length} allowed waypoints');
+  logger.info('Considering ${allowedWaypoints.length} waypoints');
 
   final marketScan = MarketScan.fromMarketPrices(
     marketPrices,
     waypointFilter: allowedWaypoints.contains,
   );
-  logger.info('scan complete');
   final maybeDeal = await findDealFor(
     marketPrices,
     systemsCache,
     systemConnectivity,
     marketScan,
-    ship,
     maxJumps: maxJumps,
-    maxTotalOutlay: 10000,
+    maxTotalOutlay: maxOutlay,
+    cargoCapacity: cargoCapacity,
+    fuelCapacity: fuelCapacity,
+    shipSpeed: shipSpeed,
+    startSymbol: start.symbol,
   );
 
   if (maybeDeal == null) {

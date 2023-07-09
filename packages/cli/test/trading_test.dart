@@ -320,7 +320,15 @@ void main() {
     final marketCache = _MockMarketCache();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
+    final shipFuel = ShipFuel(current: 100, capacity: 100);
+    final shipCargo = ShipCargo(capacity: 100, units: 0);
+    final shipEngine = _MockShipEngine();
     when(() => ship.nav).thenReturn(shipNav);
+    when(() => ship.fuel).thenReturn(shipFuel);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.speed).thenReturn(30);
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.systemSymbol).thenReturn('S-A');
     when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
         .thenAnswer((_) => const Stream.empty());
@@ -337,7 +345,7 @@ void main() {
     final logger = _MockLogger();
     final costed = await runWithLogger(
       logger,
-      () => findDealFor(
+      () => findDealForShip(
         marketPrices,
         systemsCache,
         systemConnectivity,
@@ -461,7 +469,7 @@ void main() {
     final logger = _MockLogger();
     final costed = await runWithLogger(
       logger,
-      () => findDealFor(
+      () => findDealForShip(
         marketPrices,
         systemsCache,
         systemConnectivity,

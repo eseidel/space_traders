@@ -5,10 +5,10 @@ import 'package:meta/meta.dart';
 
 /// A class to manage a file containing a json object.
 /// The resulting file is valid json.
-class JsonStore<MapType> {
+class JsonStore<Record> {
   /// Create a new JsonStore.
   JsonStore(
-    this.map, {
+    this.record, {
     required FileSystem fs,
     required String path,
   })  : _fs = fs,
@@ -16,37 +16,36 @@ class JsonStore<MapType> {
 
   /// The root object of the store.
   @protected
-  final MapType map;
+  Record record;
+
+  /// Replace the root object of the store.
+  void setRecord(Record newRecord) {
+    record = newRecord;
+    save();
+  }
 
   final String _path;
 
   /// The file system to use.
   final FileSystem _fs;
 
-  static MapType _parseMap<MapType>(
-    String contents,
-    MapType Function(Map<String, dynamic>) recordFromJson,
-  ) {
-    final parsed = jsonDecode(contents) as Map<String, dynamic>;
-    return recordFromJson(parsed);
-  }
-
   /// Save entries to a file.
-  Future<void> save() async {
-    final file = _fs.file(_path);
-    await file.create(recursive: true);
-    await file.writeAsString(jsonEncode(map));
+  void save() {
+    _fs.file(_path)
+      ..createSync(recursive: true)
+      ..writeAsStringSync(jsonEncode(record));
   }
 
   /// Load entries from a file.
-  static MapType? load<MapType>(
+  static Record? load<Record>(
     FileSystem fs,
     String path,
-    MapType Function(Map<String, dynamic>) recordFromJson,
+    Record Function(Map<String, dynamic>) recordFromJson,
   ) {
     final file = fs.file(path);
     if (file.existsSync()) {
-      return _parseMap<MapType>(file.readAsStringSync(), recordFromJson);
+      final contents = file.readAsStringSync();
+      return recordFromJson(jsonDecode(contents) as Map<String, dynamic>);
     }
     return null;
   }

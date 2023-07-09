@@ -234,7 +234,7 @@ Future<DateTime?> _handleContractDealAtDestination(
     if (maybeResponse.contract.goodNeeded(contractGood)!.amountNeeded <= 0) {
       final response = await api.contracts.fulfillContract(contract.id);
       final data = response!.data;
-      caches.agent.updateAgent(data.agent);
+      caches.agent.agent = data.agent;
       await caches.contracts.updateContract(data.contract);
       shipInfo(ship, 'Contract complete!');
       return null;

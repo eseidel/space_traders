@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -21,7 +22,8 @@ void main() {
     when(agents.getMyAgent).thenAnswer(
       (_) => Future.value(GetMyAgent200Response(data: newAgent)),
     );
-    final cache = AgentCache(agent, requestsBetweenChecks: 3);
+    final fs = MemoryFileSystem.test();
+    final cache = AgentCache(agent, fs: fs, requestsBetweenChecks: 3);
     expect(cache.agent, agent);
     cache.ensureAgentUpToDate(api);
     verifyNever(agents.getMyAgent);
