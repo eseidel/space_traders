@@ -73,6 +73,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
       api,
       ship,
       caches.systems,
+      caches.systemConnectivity,
       centralCommand,
       destWaypoint.symbol,
     );

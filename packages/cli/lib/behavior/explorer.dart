@@ -192,6 +192,7 @@ Future<DateTime?> advanceExplorer(
           api,
           ship,
           caches.systems,
+          caches.systemConnectivity,
           centralCommand,
           destination.symbol,
         );

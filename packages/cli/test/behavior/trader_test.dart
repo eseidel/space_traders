@@ -4,7 +4,6 @@ import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -125,6 +124,7 @@ void main() {
         marketCache,
         ship,
         maxJumps: any(named: 'maxJumps'),
+        maxWaypoints: any(named: 'maxWaypoints'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenAnswer((_) => Future.value());
@@ -177,6 +177,7 @@ void main() {
     final marketCache = _MockMarketCache();
     final transactionLog = _MockTransactionLog();
     final shipyardPrices = _MockShipyardPrices();
+    final systemConnectivity = _MockSystemConnectivity();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -191,6 +192,7 @@ void main() {
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
+    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
 
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
@@ -456,6 +458,7 @@ void main() {
         waypointCache,
         marketCache,
         ship,
+        maxWaypoints: any(named: 'maxWaypoints'),
         maxJumps: any(named: 'maxJumps'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),

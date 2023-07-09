@@ -2,7 +2,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/nav/system_connectivity.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440
 // Planned route from X1-CX76-69886Z to X1-XH63-75510F under fuel: 1200
@@ -58,70 +57,15 @@ void planRouteAndLog(
   }
 }
 
-class RouteTest {
-  const RouteTest({
-    required this.startSymbol,
-    required this.endSymbol,
-    required this.expectedTime,
-    this.fuelCapacity = 1200,
-    this.shipSpeed = 30,
-  });
-  final String startSymbol;
-  final String endSymbol;
-  final int fuelCapacity;
-  final int shipSpeed;
-  final Duration expectedTime;
-}
-
 Future<void> command(FileSystem fs, List<String> args) async {
-  // final systemsCache = await SystemsCache.load(fs
-  //   cacheFilePath: 'backups/6-24-23/systems.json',
-  // );
-  // const startSymbol = 'X1-CX76-69886Z';
-  // const endSymbol = 'X1-XH63-75510F';
-  // const fuelLimit = 1200;
-  // const shipSpeed = 30;
-  // const canWarp = false;
-
-  // Always optimize for time right now?
-  // Ignoring warps for now.
-
-  // final start = systemsCache.waypointFromSymbol(startSymbol);
-  // final end = systemsCache.waypointFromSymbol(endSymbol);
-  // logger
-  //   ..info(start.toString())
-  //   ..info(end.toString());
-
-  // final plan = planRoute(
-  //   systemsCache,
-  //   start: start,
-  //   end: end,
-  //   fuelCapacity: 1200,
-  //   shipSpeed: 30,
-  // );
-  // if (plan == null) {
-  //   logger.err('No route found');
-  //   return;
-  // }
-  // logger.info(plan.actions.toString());
-
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
-  final factionCache = FactionCache.loadFromCache(fs)!;
-  final factions = factionCache.factions;
-  final startTime = DateTime.now();
-  // Plan routes between each pair of faction headquarters.
-  for (var i = 0; i < factions.length; i++) {
-    final faction = factions[i];
-    final nextFaction = factions[(i + 1) % factions.length];
-    final hqSymbol = faction.headquarters;
-    final nextHqSymbol = nextFaction.headquarters;
-    final hq = systemsCache.waypointFromSymbol(hqSymbol);
-    final nextHq = systemsCache.waypointFromSymbol(nextHqSymbol);
-    logger.info('Routing from ${faction.symbol} ($hqSymbol) to '
-        '${nextFaction.symbol} ($nextHqSymbol)');
-    planRouteAndLog(systemsCache, systemConnectivity, hq, nextHq);
-  }
-  final endTime = DateTime.now();
-  logger.info('Total time: ${endTime.difference(startTime)}');
+
+  // final startSymbol = 'X1-QU45-24413B';
+  const startSymbol = 'X1-S72-45410F';
+  const endSymbol = 'X1-CP30-57877X';
+
+  final start = systemsCache.waypointFromSymbol(startSymbol);
+  final end = systemsCache.waypointFromSymbol(endSymbol);
+  planRouteAndLog(systemsCache, systemConnectivity, start, end);
 }

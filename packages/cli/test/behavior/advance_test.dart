@@ -22,12 +22,16 @@ class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
 void main() {
   test('advanceShipBehavior idle does not spin hot', () async {
     final api = _MockApi();
     final systemsCache = _MockSystemsCache();
+    final systemConnectivity = _MockSystemConnectivity();
     final caches = _MockCaches();
     when(() => caches.systems).thenReturn(systemsCache);
+    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final now = DateTime(2021);
@@ -58,11 +62,13 @@ void main() {
     final api = _MockApi();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
+    final systemConnectivity = _MockSystemConnectivity();
 
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     final caches = _MockCaches();
     when(() => caches.systems).thenReturn(systemsCache);
+    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
 
     final now = DateTime(2021);
     final arrivalTime = now.add(const Duration(seconds: 1));

@@ -3,7 +3,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
@@ -73,7 +72,51 @@ String describeInventory(
   return lines.join('\n');
 }
 
+void logShip(
+  SystemsCache systemsCache,
+  CentralCommand centralCommand,
+  MarketPrices marketPrices,
+  SystemConnectivity systemConnectivity,
+  Ship ship,
+) {
+  final behavior = centralCommand.getBehavior(ship.symbol);
+  logger
+    ..info('${ship.symbol}: ${behavior?.behavior}')
+    ..info('  ${_shipStatusLine(ship, systemsCache)}');
+  if (ship.cargo.inventory.isNotEmpty) {
+    logger.info(
+      describeInventory(marketPrices, ship.cargo.inventory, indent: '  '),
+    );
+  }
+  final destination = behavior?.destination;
+  if (destination != null) {
+    final timeToArrival = timeToDestination(
+      systemsCache,
+      systemConnectivity,
+      ship,
+      destination,
+    );
+    logger.info('  destination: $destination, '
+        'arrives in ${approximateDuration(timeToArrival)}');
+  }
+  final deal = behavior?.deal;
+  if (deal != null) {
+    logger.info('  ${describeCostedDeal(deal)}');
+    final since = DateTime.timestamp().difference(deal.startTime);
+    logger.info(' duration: ${approximateDuration(since)}');
+  }
+}
+
+bool Function(Ship) filterFromArgs(List<String> args) {
+  if (args.isEmpty) {
+    return (ship) => true;
+  }
+  final symbol = args.first;
+  return (ship) => ship.symbol == symbol;
+}
+
 Future<void> command(FileSystem fs, List<String> args) async {
+  final filter = filterFromArgs(args);
   final behaviorCache = await BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
   final systemsCache = SystemsCache.loadFromCache(fs)!;
@@ -85,31 +128,15 @@ Future<void> command(FileSystem fs, List<String> args) async {
   logger.info(describeFleet(shipCache));
   final ships = shipCache.ships;
   for (final ship in ships) {
-    final behavior = centralCommand.getBehavior(ship.symbol);
-    logger
-      ..info('${ship.symbol}: ${behavior?.behavior}')
-      ..info('  ${_shipStatusLine(ship, systemsCache)}');
-    if (ship.cargo.inventory.isNotEmpty) {
-      logger.info(
-        describeInventory(marketPrices, ship.cargo.inventory, indent: '  '),
-      );
+    if (!filter(ship)) {
+      continue;
     }
-    final destination = behavior?.destination;
-    if (destination != null) {
-      final timeToArrival = timeToDestination(
-        systemsCache,
-        systemConnectivity,
-        ship,
-        destination,
-      );
-      logger.info('  destination: $destination, '
-          'arrives in ${approximateDuration(timeToArrival)}');
-    }
-    final deal = behavior?.deal;
-    if (deal != null) {
-      logger.info('  ${describeCostedDeal(deal)}');
-      final since = DateTime.timestamp().difference(deal.startTime);
-      logger.info(' duration: ${approximateDuration(since)}');
-    }
+    logShip(
+      systemsCache,
+      centralCommand,
+      marketPrices,
+      systemConnectivity,
+      ship,
+    );
   }
 }

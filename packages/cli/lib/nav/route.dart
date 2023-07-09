@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 

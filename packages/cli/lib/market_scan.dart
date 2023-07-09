@@ -209,20 +209,6 @@ class MarketScan {
   })  : _buyOpps = Map.unmodifiable(buyOpps),
         _sellOpps = Map.unmodifiable(sellOpps);
 
-  /// Given a set of markets, will collect the top N buy and sell opportunities
-  /// for each trade symbol.
-  factory MarketScan.fromMarkets(
-    MarketPrices marketPrices,
-    Iterable<Market> markets, {
-    int topLimit = 5,
-  }) {
-    final builder = _MarketScanBuilder(marketPrices, topLimit: topLimit);
-    for (final market in markets) {
-      builder.visitMarket(market);
-    }
-    return MarketScan._(buyOpps: builder.buyOpps, sellOpps: builder.sellOpps);
-  }
-
   /// Given a set of historical market prices, will collect the top N buy and
   /// sell opportunities for each trade symbol regardless of distance.
   factory MarketScan.fromMarketPrices(

@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:cli/api.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 
@@ -15,6 +14,7 @@ Future<DateTime?> beingRouteAndLog(
   Api api,
   Ship ship,
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   CentralCommand centralCommand,
   String destinationSymbol,
 ) async {
@@ -25,6 +25,7 @@ Future<DateTime?> beingRouteAndLog(
     api,
     ship,
     systemsCache,
+    systemConnectivity,
     centralCommand,
   );
   if (navResult.shouldReturn()) {
@@ -75,20 +76,6 @@ class NavResult {
   }
 }
 
-int _distanceBetweenConnectedSystems(ConnectedSystem a, System b) {
-  // Use euclidean distance.
-  final dx = a.x - b.x;
-  final dy = a.y - b.y;
-  return sqrt(dx * dx + dy * dy).round();
-}
-
-// int _distanceBetweenSystems(System a, System b) {
-//   // Use euclidean distance.
-//   final dx = a.x - b.x;
-//   final dy = a.y - b.y;
-//   return sqrt(dx * dx + dy * dy).round();
-// }
-
 void _verifyJumpTime(
   SystemsCache systemsCache,
   Ship ship,
@@ -115,6 +102,7 @@ Future<NavResult> continueNavigationIfNeeded(
   Api api,
   Ship ship,
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   CentralCommand centralCommand, {
   // Hook for overriding the current time in tests.
   DateTime Function() getNow = defaultGetNow,
@@ -147,59 +135,46 @@ Future<NavResult> continueNavigationIfNeeded(
     await centralCommand.reachedDestination(ship);
     return NavResult._continueAction();
   }
-  final endWaypoint = systemsCache.waypointFromSymbol(destinationSymbol);
-  if (endWaypoint.systemSymbol == ship.nav.systemSymbol) {
-    // We're in the same system as the end, so we can just navigate there.
-    return NavResult._wait(
-      await navigateToLocalWaypointAndLog(api, ship, endWaypoint),
-    );
+  final start = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
+  // We're not at the destination, so we need to navigate.
+  final route = planRoute(
+    systemsCache,
+    systemConnectivity,
+    start: start,
+    end: systemsCache.waypointFromSymbol(destinationSymbol),
+    fuelCapacity: ship.fuel.capacity,
+    shipSpeed: ship.engine.speed,
+  );
+  if (route == null) {
+    shipErr(ship, 'No route to $destinationSymbol!?');
+    await centralCommand.reachedDestination(ship);
+    return NavResult._loop();
   }
-  // Otherwise, jump to the next system most in its direction.
-  final currentWaypoint =
-      systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
-  if (currentWaypoint.isJumpGate) {
-    // Check to make sure the system isn't out of range.  If it is, we need
-    // to jump to a system along the way.
-    final connectedSystems =
-        systemsCache.connectedSystems(currentWaypoint.systemSymbol);
-    if (connectedSystems.any((s) => s.symbol == endWaypoint.systemSymbol)) {
-      // We can jump directly to the end system.
+  final action = route.actions.firstOrNull;
+  if (action == null) {
+    shipErr(ship, 'No actions in route to $destinationSymbol!?');
+    await centralCommand.reachedDestination(ship);
+    return NavResult._loop();
+  }
+  final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
+  switch (action.type) {
+    case RouteActionType.jump:
       final response =
-          await useJumpGateAndLog(api, ship, endWaypoint.systemSymbol);
+          await useJumpGateAndLog(api, ship, actionEnd.systemSymbol);
       _verifyJumpTime(
         systemsCache,
         ship,
-        currentWaypoint.systemSymbol,
-        endWaypoint.systemSymbol,
+        start.systemSymbol,
+        actionEnd.systemSymbol,
         response.cooldown,
       );
       // We can't continue the current action, we have more navigation to do
       // but it's better to figure that out from the top of the loop again.
       return NavResult._loop();
-    }
-    // Otherwise we have to jump to a system along the way.
-    final endSystem = systemsCache.systemBySymbol(endWaypoint.systemSymbol);
-    final closestSystem = connectedSystems.reduce(
-      (a, b) => _distanceBetweenConnectedSystems(a, endSystem) <
-              _distanceBetweenConnectedSystems(b, endSystem)
-          ? a
-          : b,
-    );
-    // What if the closest system is further than the one we're already in?
-    final response = await useJumpGateAndLog(api, ship, closestSystem.symbol);
-    // We will have to jump again, so just wait at the jump gate.
-    return NavResult._wait(response.cooldown.expiration!);
+    case RouteActionType.navCruise:
+      // We're in the same system as the end, so we can just navigate there.
+      return NavResult._wait(
+        await navigateToLocalWaypointAndLog(api, ship, actionEnd),
+      );
   }
-  // We are not at a jump gate, so we need to navigate to the nearest one.
-  final jumpGate = systemsCache.jumpGateWaypointForSystem(
-    currentWaypoint.systemSymbol,
-  );
-  if (jumpGate == null) {
-    throw StateError(
-      'No jump gate found for system ${currentWaypoint.systemSymbol}',
-    );
-  }
-  return NavResult._wait(
-    await navigateToLocalWaypointAndLog(api, ship, jumpGate),
-  );
 }

@@ -415,7 +415,10 @@ String describeCostedDeal(CostedDeal costedDeal) {
       : lightRed.wrap(profitString);
   final timeString = '${costedDeal.expectedTime}s '
       '${c(costedDeal.expectedProfitPerSecond)}/s';
-  return '${deal.tradeSymbol.value.padRight(25)} '
+  final tradeSymbol = deal.tradeSymbol.value;
+  final name =
+      costedDeal.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
+  return '${name.padRight(25)} '
       ' ${deal.sourceSymbol} ${c(deal.purchasePrice).padLeft(8)} '
       '-> '
       '${deal.destinationSymbol} ${c(deal.sellPrice).padLeft(8)} '
@@ -457,20 +460,28 @@ CostedDeal costOutDeal(
   );
 }
 
-/// Builds a MarketScan for markets within [maxJumps] of [systemSymbol].
-Future<MarketScan> scanMarketsNear(
-  MarketCache marketCache,
+/// Builds a MarketScan from a starting system outwards limiting to
+/// maxJumps and maxWaypoints.
+MarketScan scanNearbyMarkets(
+  SystemsCache systemsCache,
   MarketPrices marketPrices, {
   required String systemSymbol,
   required int maxJumps,
-}) async {
-  final markets = await marketCache
-      .marketsInJumpRadius(
+  required int maxWaypoints,
+}) {
+  final allowedWaypoints = systemsCache
+      .waypointSymbolsInJumpRadius(
         startSystem: systemSymbol,
         maxJumps: maxJumps,
       )
-      .toList();
-  return MarketScan.fromMarkets(marketPrices, markets);
+      .take(maxWaypoints)
+      .toSet();
+  logger.info('Considering ${allowedWaypoints.length} waypoints');
+
+  return MarketScan.fromMarketPrices(
+    marketPrices,
+    waypointFilter: allowedWaypoints.contains,
+  );
 }
 
 CostedDeal? _filterDealsAndLog(
@@ -495,9 +506,9 @@ CostedDeal? _filterDealsAndLog(
   final sortedDeals =
       affordable.sortedBy<num>((e) => e.expectedProfitPerSecond);
 
-  logger.detail('Considering deals:');
+  logger.info('Considering deals:');
   for (final deal in sortedDeals) {
-    logger.detail(describeCostedDeal(deal));
+    logger.info(describeCostedDeal(deal));
   }
 
   final profitable = sortedDeals.where((d) => d.expectedProfitPerSecond > 0);
@@ -550,8 +561,18 @@ Future<CostedDeal?> findDealFor(
   List<SellOpp>? extraSellOpps,
   bool Function(CostedDeal deal)? filter,
 }) async {
+  logger.info(
+    'Finding deals with '
+    'start: $startSymbol, '
+    'max jumps: $maxJumps, '
+    'max outlay: $maxTotalOutlay, '
+    'max units: $cargoCapacity, '
+    'fuel capacity: $fuelCapacity, '
+    'ship speed: $shipSpeed',
+  );
+
   final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
-  logger.detail('Found ${deals.length} potential deals.');
+  logger.info('Found ${deals.length} potential deals.');
 
   final costedDeals = deals.map(
     (deal) => costOutDeal(
@@ -566,7 +587,7 @@ Future<CostedDeal?> findDealFor(
           marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
     ),
   );
-  logger.detail('costed deals');
+  logger.info('costed deals');
   return _filterDealsAndLog(
     costedDeals,
     maxJumps: maxJumps,

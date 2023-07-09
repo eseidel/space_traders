@@ -26,6 +26,7 @@ export 'package:cli/cache/surveys.dart';
 export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/transactions.dart';
 export 'package:cli/cache/waypoint_cache.dart';
+export 'package:cli/nav/system_connectivity.dart';
 export 'package:file/file.dart';
 
 /// Container for all the caches.

@@ -1,8 +1,6 @@
 import 'package:args/args.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/market_scan.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
@@ -27,32 +25,35 @@ Future<void> cliMain(List<String> args) async {
       negatable: false,
     );
   final results = parser.parse(args);
-  final maxJumps = int.parse(results['jumps'] as String);
+  // final maxJumps = int.parse(results['jumps'] as String);
   if (results['verbose'] as bool) {
     setVerboseLogging();
   }
 
   const fs = LocalFileSystem();
   final systemsCache = SystemsCache.loadFromCache(fs)!;
-  final agentCache = AgentCache.loadCached(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
 
   final marketPrices = await MarketPrices.load(fs);
-  // final waypointCache = WaypointCache(api, systemsCache);
-  // final marketCache = MarketCache(waypointCache);
-  // final marketScan = await scanMarketsNear(
-  //   marketCache,
-  //   marketPrices,
-  //   systemSymbol: ship.nav.systemSymbol,
-  //   maxJumps: maxJumps,
-  // );
 
-  const maxWaypoints = 100;
-  const maxOutlay = 100000;
+  // const maxWaypoints = 100;
+  // const maxOutlay = 100000;
+  // const cargoCapacity = 120;
+  // const shipSpeed = 30;
+  // const fuelCapacity = 1200;
+  // final agentCache = AgentCache.loadCached(fs)!;
+  // final start = agentCache.headquarters(systemsCache);
+
+  // Finding deals with start: X1-SB93-93497E, max jumps: 5,
+  // max outlay: 1172797, max units: 120, fuel capacity: 1700, ship speed: 10
+  const maxJumps = 10;
+  const maxWaypoints = 200;
+  const maxOutlay = 1172797;
   const cargoCapacity = 120;
-  const shipSpeed = 30;
-  const fuelCapacity = 1200;
-  final start = agentCache.headquarters(systemsCache);
+  const shipSpeed = 10;
+  const fuelCapacity = 1700;
+  final start = systemsCache.waypointFromSymbol('X1-SB93-93497E');
+
   logger.info(
     'Finding deals with '
     'start: ${start.symbol}, '
@@ -64,19 +65,15 @@ Future<void> cliMain(List<String> args) async {
     'ship speed: $shipSpeed',
   );
 
-  final allowedWaypoints = systemsCache
-      .waypointSymbolsInJumpRadius(
-        startSystem: start.systemSymbol,
-        maxJumps: maxJumps,
-      )
-      .take(maxWaypoints)
-      .toSet();
-  logger.info('Considering ${allowedWaypoints.length} waypoints');
-
-  final marketScan = MarketScan.fromMarketPrices(
+  final marketScan = scanNearbyMarkets(
+    systemsCache,
     marketPrices,
-    waypointFilter: allowedWaypoints.contains,
+    systemSymbol: start.systemSymbol,
+    maxJumps: maxJumps,
+    maxWaypoints: maxWaypoints,
   );
+  logger
+      .info('Found opps for ${marketScan.tradeSymbols.length} trade symbols.');
   final maybeDeal = await findDealFor(
     marketPrices,
     systemsCache,

@@ -205,18 +205,4 @@ class MarketCache {
     _marketsBySymbol[marketSymbol] = maybeMarket;
     return maybeMarket;
   }
-
-  /// Yields a stream of Markets that are within n jumps of the given system.
-  Stream<Market> marketsInJumpRadius({
-    required String startSystem,
-    required int maxJumps,
-  }) async* {
-    for (final (String system, int _)
-        in _waypointCache._systemsCache.systemSymbolsInJumpRadius(
-      startSystem: startSystem,
-      maxJumps: maxJumps,
-    )) {
-      yield* marketsInSystem(system);
-    }
-  }
 }

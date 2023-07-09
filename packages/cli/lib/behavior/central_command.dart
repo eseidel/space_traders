@@ -4,7 +4,6 @@ import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
@@ -362,6 +361,7 @@ class CentralCommand {
     Ship ship, {
     required int maxJumps,
     required int maxTotalOutlay,
+    required int maxWaypoints,
   }) async {
     final inProgress = _dealsInProgress().toList();
     // Avoid having two ships working on the same deal since by the time the
@@ -387,11 +387,12 @@ class CentralCommand {
       );
     }
 
-    final marketScan = await scanMarketsNear(
-      marketCache,
+    final marketScan = scanNearbyMarkets(
+      systemsCache,
       marketPrices,
       systemSymbol: ship.nav.systemSymbol,
       maxJumps: maxJumps,
+      maxWaypoints: maxWaypoints,
     );
     final maybeDeal = await findDealForShip(
       marketPrices,
@@ -551,7 +552,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'No ships needed.',
-        const Duration(hours: 1),
+        const Duration(hours: 10),
       );
       return false;
     }
@@ -563,7 +564,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Failed to buy ship, no median price for $shipType.',
-        const Duration(hours: 1),
+        const Duration(hours: 10),
       );
       return false;
     }
@@ -575,7 +576,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Can not buy $shipType, credits $credits < max price $maxPrice.',
-        const Duration(minutes: 20),
+        const Duration(minutes: 10),
       );
       return false;
     }
@@ -589,7 +590,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Shipyard at $waypointSymbol does not sell $shipType.',
-        const Duration(minutes: 30),
+        const Duration(minutes: 10),
       );
       return false;
     }
@@ -601,7 +602,7 @@ class CentralCommand {
         Behavior.buyShip,
         'Failed to buy $shipType at $waypointSymbol, '
         '$recentPriceString > max price $maxPrice.',
-        const Duration(minutes: 30),
+        const Duration(minutes: 10),
       );
       return false;
     }
@@ -620,7 +621,7 @@ class CentralCommand {
       ship,
       Behavior.buyShip,
       'Purchase of ${result.ship.symbol} ($shipType) successful!',
-      const Duration(minutes: 20),
+      const Duration(minutes: 10),
     );
     return true;
   }
@@ -644,6 +645,7 @@ class CentralCommand {
     // Return the nearest mine to the ship for now?
     final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
     return systemWaypoints.firstWhereOrNull((w) => w.canBeMined)?.symbol;
+    // If the ship is in a system without a mine go to the HQ?
 
     // final mine = await nearestMineWithGoodMining(
     //   api,

@@ -5,6 +5,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
 import 'package:file/file.dart';
+import 'package:intl/intl.dart';
 
 double creditsPerMinute(
   TransactionLog transactions,
@@ -55,6 +56,9 @@ Future<void> command(FileSystem fs, List<String> args) async {
   logger.info('Credits per minute for ships over the '
       'last ${approximateDuration(lookback)}:');
 
+  String c(num n) =>
+      n.isFinite ? NumberFormat().format(n.round()) : n.toString();
+
   for (final shipId in shipIds) {
     final state = behaviorCache.getBehavior(shipId.symbol);
     final perMinuteDiff = creditsPerMinute(
@@ -65,8 +69,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
     );
     final perSecDiff = perMinuteDiff / 60;
     logger.info('${shipId.hexNumber.padRight(longestHexNumber)}  '
-        '${creditsString(perMinuteDiff.round())}/min '
-        '(${creditsString(perSecDiff.round())}/sec) '
+        '${c(perMinuteDiff).padLeft(5)} c/m '
+        '${c(perSecDiff).padLeft(4)} c/s '
         '  ${state?.behavior.name ?? 'Unknown'}');
   }
 }

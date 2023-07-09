@@ -29,112 +29,6 @@ class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 class _MockShipCargo extends Mock implements ShipCargo {}
 
 void main() {
-  test('MarketScan empty', () {
-    final marketPrices = _MockMarketPrices();
-    final scan = MarketScan.fromMarkets(marketPrices, []);
-    final deals = buildDealsFromScan(scan);
-    expect(deals, isEmpty);
-  });
-
-  test('MarketScan single deal', () {
-    final marketPrices = _MockMarketPrices();
-    final tradeGood =
-        TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
-    final markets = [
-      Market(
-        symbol: 'A',
-        exchange: [tradeGood],
-        tradeGoods: [
-          MarketTradeGood(
-            symbol: 'FUEL',
-            tradeVolume: 100,
-            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-            purchasePrice: 2,
-            sellPrice: 3,
-          )
-        ],
-      ),
-      Market(
-        symbol: 'B',
-        exchange: [tradeGood],
-        tradeGoods: [
-          MarketTradeGood(
-            symbol: 'FUEL',
-            tradeVolume: 100,
-            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-            purchasePrice: 1,
-            sellPrice: 2,
-          )
-        ],
-      ),
-    ];
-    final scan = MarketScan.fromMarkets(marketPrices, markets);
-    final deals = buildDealsFromScan(scan);
-    expect(deals, isNotEmpty);
-  });
-
-  test('MarketScan topLimit', () {
-    // We're testing that market scan compares the top N sell/buy deals.
-    // There was a bug before where it was sorting the sell opps in the wrong
-    // direction, thus always returning the 10 worst sell locations rather
-    // than the 10 best.
-
-    final marketPrices = _MockMarketPrices();
-    final tradeGood =
-        TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
-    final markets = [
-      for (int i = 0; i < 10; i++)
-        Market(
-          symbol: '$i',
-          exchange: [tradeGood],
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: 'FUEL',
-              tradeVolume: 100,
-              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-              purchasePrice: 100,
-              sellPrice: 101,
-            )
-          ],
-        ),
-      Market(
-        symbol: 'EXPENSIVE',
-        exchange: [tradeGood],
-        tradeGoods: [
-          MarketTradeGood(
-            symbol: 'FUEL',
-            tradeVolume: 100,
-            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-            purchasePrice: 200,
-            sellPrice: 201,
-          )
-        ],
-      ),
-      Market(
-        symbol: 'CHEAP',
-        exchange: [tradeGood],
-        tradeGoods: [
-          MarketTradeGood(
-            symbol: 'FUEL',
-            tradeVolume: 100,
-            supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-            purchasePrice: 10,
-            sellPrice: 11,
-          )
-        ],
-      ),
-    ];
-    final scan = MarketScan.fromMarkets(marketPrices, markets, topLimit: 10);
-    final buyOpps = scan.buyOppsForTradeSymbol('FUEL');
-    expect(buyOpps, hasLength(10));
-    final buyPrices = buyOpps.map((o) => o.price).toList();
-    expect(buyPrices, [10, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
-    final sellOpps = scan.sellOppsForTradeSymbol('FUEL');
-    expect(sellOpps, hasLength(10));
-    final sellPrices = sellOpps.map((o) => o.price).toList();
-    expect(sellPrices, [201, 101, 101, 101, 101, 101, 101, 101, 101, 101]);
-  });
-
   test('estimateSellPrice null', () {
     final marketPrices = _MockMarketPrices();
     final estimate =
@@ -313,51 +207,6 @@ void main() {
     );
   });
 
-  test('findDealFor no markets', () async {
-    final marketPrices = _MockMarketPrices();
-    final systemsCache = _MockSystemsCache();
-    final systemConnectivity = _MockSystemConnectivity();
-    final marketCache = _MockMarketCache();
-    final ship = _MockShip();
-    final shipNav = _MockShipNav();
-    final shipFuel = ShipFuel(current: 100, capacity: 100);
-    final shipCargo = ShipCargo(capacity: 100, units: 0);
-    final shipEngine = _MockShipEngine();
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => ship.fuel).thenReturn(shipFuel);
-    when(() => ship.cargo).thenReturn(shipCargo);
-    when(() => ship.engine).thenReturn(shipEngine);
-    when(() => shipEngine.speed).thenReturn(30);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
-    when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
-        .thenAnswer((_) => const Stream.empty());
-
-    // We should use a MarketScan mock here.
-    const maxJumps = 1;
-    final marketScan = await scanMarketsNear(
-      marketCache,
-      marketPrices,
-      systemSymbol: ship.nav.systemSymbol,
-      maxJumps: maxJumps,
-    );
-
-    final logger = _MockLogger();
-    final costed = await runWithLogger(
-      logger,
-      () => findDealForShip(
-        marketPrices,
-        systemsCache,
-        systemConnectivity,
-        marketScan,
-        ship,
-        maxJumps: maxJumps,
-        maxTotalOutlay: 100000,
-      ),
-    );
-    expect(costed, isNull);
-  });
-
   test('findDealFor includes time to source', () async {
     // findDealFor used to not consider time to get to the source system.
     // which meant if there was a very far away system with a great deal
@@ -375,7 +224,6 @@ void main() {
         endSystemSymbol: any(named: 'endSystemSymbol'),
       ),
     ).thenReturn(true);
-    final marketCache = _MockMarketCache();
     final saa = SystemWaypoint(
       symbol: 'S-A-A',
       type: WaypointType.ASTEROID_FIELD,
@@ -399,48 +247,44 @@ void main() {
     when(() => systemsCache.waypointFromSymbol('S-A-B')).thenReturn(sab);
     when(() => systemsCache.waypointFromSymbol('S-A-C')).thenReturn(sac);
     when(() => systemsCache.waypointsInSystem('S-A')).thenReturn(waypoints);
-    final tradeGood =
-        TradeGood(symbol: TradeSymbol.FUEL, name: 'Fuel', description: '');
-    final marketA = Market(
-      symbol: 'S-A-A',
-      exchange: [tradeGood],
-      tradeGoods: [
-        MarketTradeGood(
-          symbol: 'FUEL',
-          tradeVolume: 100,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-          purchasePrice: 200,
-          sellPrice: 201,
-        )
-      ],
-    );
-    final marketB = Market(
-      symbol: 'S-A-B',
-      exchange: [tradeGood],
-      tradeGoods: [
-        MarketTradeGood(
-          symbol: 'FUEL',
-          tradeVolume: 100,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-          purchasePrice: 100,
-          sellPrice: 101,
-        )
-      ],
-    );
-    final marketC = Market(
-      symbol: 'S-A-C',
-      exchange: [tradeGood],
-      tradeGoods: [
-        MarketTradeGood(
-          symbol: 'FUEL',
-          tradeVolume: 100,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-          purchasePrice: 1000,
-          sellPrice: 1001,
-        )
-      ],
-    );
-    final markets = [marketA, marketB, marketC];
+    when(
+      () => systemsCache.waypointSymbolsInJumpRadius(
+        startSystem: 'S-A',
+        maxJumps: 1,
+      ),
+    ).thenAnswer((invocation) => ['S-A-A', 'S-A-B', 'S-A-C']);
+    final tradeSymbol = TradeSymbol.FUEL.value;
+    final now = DateTime.timestamp();
+    final prices = [
+      MarketPrice(
+        waypointSymbol: 'S-A-A',
+        symbol: tradeSymbol,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 200,
+        sellPrice: 201,
+        tradeVolume: 100,
+        timestamp: now,
+      ),
+      MarketPrice(
+        waypointSymbol: 'S-A-B',
+        symbol: tradeSymbol,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 100,
+        sellPrice: 101,
+        tradeVolume: 100,
+        timestamp: now,
+      ),
+      MarketPrice(
+        waypointSymbol: 'S-A-C',
+        symbol: tradeSymbol,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 1000,
+        sellPrice: 1001,
+        tradeVolume: 100,
+        timestamp: now,
+      ),
+    ];
+    when(() => marketPrices.prices).thenReturn(prices);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final shipEngine = _MockShipEngine();
@@ -454,19 +298,22 @@ void main() {
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => shipCargo.capacity).thenReturn(1);
     when(() => shipCargo.units).thenReturn(0);
-    when(() => marketCache.marketsInJumpRadius(startSystem: 'S-A', maxJumps: 1))
-        .thenAnswer((_) => Stream.fromIterable(markets));
-
-    // We should use a MarketScan mock here.
-    const maxJumps = 1;
-    final marketScan = await scanMarketsNear(
-      marketCache,
-      marketPrices,
-      systemSymbol: ship.nav.systemSymbol,
-      maxJumps: maxJumps,
-    );
 
     final logger = _MockLogger();
+
+    const maxJumps = 1;
+    const maxWaypoints = 10;
+    final marketScan = runWithLogger(
+      logger,
+      () => scanNearbyMarkets(
+        systemsCache,
+        marketPrices,
+        systemSymbol: ship.nav.systemSymbol,
+        maxJumps: maxJumps,
+        maxWaypoints: maxWaypoints,
+      ),
+    );
+
     final costed = await runWithLogger(
       logger,
       () => findDealForShip(

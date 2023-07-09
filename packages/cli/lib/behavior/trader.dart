@@ -157,6 +157,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
     api,
     ship,
     caches.systems,
+    caches.systemConnectivity,
     centralCommand,
     costedDeal.deal.destinationSymbol,
   );
@@ -178,6 +179,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
       api,
       ship,
       caches.systems,
+      caches.systemConnectivity,
       centralCommand,
       costedDeal.deal.sourceSymbol,
     );
@@ -193,12 +195,16 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   );
   // We don't yet record the completed deal anywhere.
   final completedDeal = costedDeal.byAddingTransactions(transactions);
-  shipInfo(
+  final duration = DateTime.timestamp().difference(completedDeal.startTime);
+  final expectedDuration = Duration(seconds: completedDeal.expectedTime);
+  shipWarn(
       ship,
       'Expected ${creditsString(completedDeal.expectedProfit)} profit '
       '(${creditsString(completedDeal.expectedProfitPerSecond)}/s), got '
       '${creditsString(completedDeal.actualProfit)} '
-      '(${creditsString(completedDeal.actualProfitPerSecond)}/s)');
+      '(${creditsString(completedDeal.actualProfitPerSecond)}/s)'
+      'in ${durationString(duration)}, '
+      'expected ${durationString(expectedDuration)}');
   await centralCommand.completeBehavior(ship.symbol);
   return null;
 }
@@ -288,6 +294,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
       api,
       ship,
       caches.systems,
+      caches.systemConnectivity,
       centralCommand,
       costedDeal.deal.sourceSymbol,
     );
@@ -298,6 +305,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
       api,
       ship,
       caches.systems,
+      caches.systemConnectivity,
       centralCommand,
       costedDeal.deal.destinationSymbol,
     );
@@ -459,6 +467,7 @@ Future<DateTime?> advanceTrader(
         api,
         ship,
         caches.systems,
+        caches.systemConnectivity,
         centralCommand,
         market.symbol,
       );
@@ -477,8 +486,9 @@ Future<DateTime?> advanceTrader(
     return waitUntil;
   }
 
-  // TODO(eseidel): make maxJumps bigger (and cache MarketScan if needed).
-  const maxJumps = 1;
+  const maxJumps = 5;
+  // TODO(eseidel): Make maxWaypoints bigger as routing gets faster.
+  const maxWaypoints = 100;
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
@@ -492,6 +502,7 @@ Future<DateTime?> advanceTrader(
     caches.markets,
     ship,
     maxJumps: maxJumps,
+    maxWaypoints: maxWaypoints,
     maxTotalOutlay: caches.agent.agent.credits,
   );
 
@@ -501,6 +512,17 @@ Future<DateTime?> advanceTrader(
       ship,
       Behavior.trader,
       'No profitable deals within $maxJumps jumps of ${ship.nav.systemSymbol}.',
+      const Duration(minutes: 20),
+    );
+    return null;
+  }
+
+  if (newDeal.expectedProfitPerSecond < 10) {
+    await centralCommand.disableBehaviorForShip(
+      ship,
+      Behavior.trader,
+      'Deal expected profit per second too low: '
+      '${creditsString(newDeal.expectedProfitPerSecond)}/s',
       const Duration(minutes: 20),
     );
     return null;
