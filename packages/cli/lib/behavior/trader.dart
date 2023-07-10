@@ -518,7 +518,7 @@ Future<DateTime?> advanceTrader(
       ship,
       Behavior.trader,
       'No profitable deals within $maxJumps jumps of ${ship.nav.systemSymbol}.',
-      const Duration(minutes: 20),
+      const Duration(minutes: 10),
     );
     return null;
   }
@@ -530,7 +530,7 @@ Future<DateTime?> advanceTrader(
       Behavior.trader,
       'Deal expected profit per second too low: '
       '${creditsString(newDeal.expectedProfitPerSecond)}/s',
-      const Duration(minutes: 20),
+      const Duration(minutes: 10),
     );
     return null;
   }
