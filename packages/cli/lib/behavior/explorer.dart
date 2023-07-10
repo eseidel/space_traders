@@ -98,11 +98,11 @@ Future<DateTime?> advanceExplorer(
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
-  // Check our current waypoint.  If it's not charted or doesn't have current
-  // market data, chart it and/or record market data.
   final waypoint = await caches.waypoints.waypoint(ship.nav.waypointSymbol);
-  // We currently never route to shipyards, but we will record their data if
-  // we happen to be there.
+  // advanceExplorer is only ever called when we're idle at a location, so
+  // either it's the first time and we need to set a destination, or we've just
+  // completed a loop.  This _isMissingChartOrRecentPriceData is really our
+  // check for "did we just do a loop"?  If so, we complete the behavior.
   if (_isMissingChartOrRecentPriceData(
     caches.marketPrices,
     caches.shipyardPrices,
@@ -126,95 +126,64 @@ Future<DateTime?> advanceExplorer(
     return null;
   }
 
-  // Check the current system waypoints.
-  // If any are not explored, or have a market but don't have recent market
-  // data, got there.
-  // TODO(eseidel): This navigation logic should use beginRouteAndLog.
-  final nearest = await _nearestWaypointNeedingExploration(
-    caches.waypoints,
-    caches.marketPrices,
-    caches.shipyardPrices,
-    ship,
-  );
-  if (nearest != null) {
-    shipInfo(
-      ship,
-      'Exploring ${nearest.symbol} in ${nearest.systemSymbol}',
-    );
-    return navigateToLocalWaypointAndLog(api, ship, nearest.toSystemWaypoint());
-  }
-
-  // If at a jump gate, go to a nearby system with unexplored waypoints or
-  // missing market data.
-  if (waypoint.isJumpGate) {
-    final probeSystems =
-        centralCommand.otherExplorerSystems(ship.symbol).toSet();
-    const maxJumpDistance = 100;
-    // Walk waypoints as far out as we can see until we find one missing
-    // a chart or market data and route to there.
-    await for (final destination in caches.waypoints.waypointsInJumpRadius(
-      startSystem: waypoint.systemSymbol,
-      maxJumps: maxJumpDistance,
+  final probeSystems = centralCommand.otherExplorerSystems(ship.symbol).toSet();
+  const maxJumpDistance = 100;
+  // Walk waypoints as far out as we can see until we find one missing
+  // a chart or market data and route to there.
+  await for (final destination in caches.waypoints.waypointsInJumpRadius(
+    startSystem: waypoint.systemSymbol,
+    maxJumps: maxJumpDistance,
+  )) {
+    if (probeSystems.contains(destination.systemSymbol)) {
+      // We already have a ship in this system, don't route there.
+      continue;
+    }
+    if (_isMissingChartOrRecentPriceData(
+      caches.marketPrices,
+      caches.shipyardPrices,
+      destination,
     )) {
-      if (probeSystems.contains(destination.systemSymbol)) {
-        // We already have a ship in this system, don't route there.
-        continue;
-      }
-      if (_isMissingChartOrRecentPriceData(
+      if (destination.chart == null) {
+        shipInfo(
+          ship,
+          '${destination.symbol} is missing chart, routing.',
+        );
+      } else if (_isMissingRecentMarketData(
         caches.marketPrices,
-        caches.shipyardPrices,
         destination,
       )) {
-        if (destination.chart == null) {
-          shipInfo(
-            ship,
-            '${destination.symbol} is missing chart, routing.',
-          );
-        } else if (_isMissingRecentMarketData(
-          caches.marketPrices,
-          destination,
-        )) {
-          shipInfo(
-            ship,
-            '${destination.symbol} is missing recent '
-            '(${approximateDuration(defaultMaxAge)}) market data, '
-            'routing.',
-          );
-        } else {
-          shipInfo(
-            ship,
-            '${destination.symbol} is missing recent '
-            '(${approximateDuration(defaultMaxAge)}) shipyard data, '
-            'routing.',
-          );
-        }
-        return beingRouteAndLog(
-          api,
+        shipInfo(
           ship,
-          caches.systems,
-          caches.systemConnectivity,
-          centralCommand,
-          destination.symbol,
+          '${destination.symbol} is missing recent '
+          '(${approximateDuration(defaultMaxAge)}) market data, '
+          'routing.',
+        );
+      } else {
+        shipInfo(
+          ship,
+          '${destination.symbol} is missing recent '
+          '(${approximateDuration(defaultMaxAge)}) shipyard data, '
+          'routing.',
         );
       }
+      return beingRouteAndLog(
+        api,
+        ship,
+        caches.systems,
+        caches.systemConnectivity,
+        centralCommand,
+        destination.symbol,
+      );
     }
-    // If we get here, we've explored all systems within maxJumpDistance jumps
-    // of this system.  We just log an error and sleep.
-    await centralCommand.disableBehaviorForShip(
-      ship,
-      Behavior.explorer,
-      'No unexplored systems within $maxJumpDistance jumps of '
-      '${waypoint.systemSymbol}.',
-      const Duration(hours: 1),
-    );
-    return null;
   }
-
-  // Otherwise, go to a jump gate.
-  final jumpGate =
-      caches.systems.jumpGateWaypointForSystem(ship.nav.systemSymbol);
-  if (jumpGate == null) {
-    throw UnimplementedError('No jump gates in ${ship.nav.waypointSymbol}');
-  }
-  return navigateToLocalWaypointAndLog(api, ship, jumpGate);
+  // If we get here, we've explored all systems within maxJumpDistance jumps
+  // of this system.  We just log an error and sleep.
+  await centralCommand.disableBehaviorForShip(
+    ship,
+    Behavior.explorer,
+    'No unexplored systems within $maxJumpDistance jumps of '
+    '${waypoint.systemSymbol}.',
+    const Duration(hours: 1),
+  );
+  return null;
 }

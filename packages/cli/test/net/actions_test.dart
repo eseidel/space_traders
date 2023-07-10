@@ -23,6 +23,8 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockShipCache extends Mock implements ShipCache {}
 
+class _MockShipFuel extends Mock implements ShipFuel {}
+
 void main() {
   test('purchaseShip', () async {
     final Api api = _MockApi();
@@ -139,5 +141,59 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     await runWithLogger(logger, () => dockIfNeeded(api, ship));
     verify(() => fleetApi.dockShip(any())).called(1);
+  });
+
+  test('navigateToLocalWaypoint sets probes to burn', () async {
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final ship = _MockShip();
+    when(() => ship.emojiName).thenReturn('S');
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn('A');
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
+    final shipFuel = _MockShipFuel();
+    when(() => ship.fuel).thenReturn(shipFuel);
+    when(() => shipFuel.capacity).thenReturn(0);
+
+    when(
+      () => fleetApi.patchShipNav(
+        any(),
+        patchShipNavRequest: any(named: 'patchShipNavRequest'),
+      ),
+    ).thenAnswer(
+      (invocation) => Future.value(
+        GetShipNav200Response(data: _MockShipNav()),
+      ),
+    );
+
+    when(
+      () => fleetApi.navigateShip(
+        any(),
+        navigateShipRequest: any(named: 'navigateShipRequest'),
+      ),
+    ).thenAnswer(
+      (invocation) => Future.value(
+        NavigateShip200Response(
+          data: NavigateShip200ResponseData(
+            fuel: shipFuel,
+            nav: _MockShipNav(),
+          ),
+        ),
+      ),
+    );
+
+    final logger = _MockLogger();
+    await runWithLogger(logger, () => navigateToLocalWaypoint(api, ship, 'B'));
+
+    verify(
+      () => fleetApi.patchShipNav(
+        any(),
+        patchShipNavRequest:
+            PatchShipNavRequest(flightMode: ShipNavFlightMode.BURN),
+      ),
+    ).called(1);
   });
 }

@@ -173,8 +173,26 @@ Future<NavResult> continueNavigationIfNeeded(
       return NavResult._loop();
     case RouteActionType.navCruise:
       // We're in the same system as the end, so we can just navigate there.
-      return NavResult._wait(
-        await navigateToLocalWaypointAndLog(api, ship, actionEnd),
+      final arrivalTime =
+          await navigateToLocalWaypointAndLog(api, ship, actionEnd);
+      final flightTime = arrivalTime.difference(DateTime.timestamp());
+
+      final expectedFlightTime = Duration(
+        seconds: flightTimeWithinSystemInSeconds(
+          start,
+          actionEnd,
+          shipSpeed: ship.engine.speed,
+          flightMode: ship.nav.flightMode,
+        ),
       );
+      final delta = (flightTime - expectedFlightTime).inSeconds.abs();
+      if (delta > 1) {
+        shipWarn(
+          ship,
+          'Flight time ${durationString(flightTime)} '
+          'does not match predicted ${durationString(expectedFlightTime)}',
+        );
+      }
+      return NavResult._wait(arrivalTime);
   }
 }

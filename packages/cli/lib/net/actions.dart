@@ -24,6 +24,10 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   String waypointSymbol,
 ) async {
   await undockIfNeeded(api, ship);
+  if (!ship.usesFuel && ship.nav.flightMode != ShipNavFlightMode.BURN) {
+    shipInfo(ship, 'Does not use fuel, setting flight mode to burn.');
+    await setShipFlightMode(api, ship, ShipNavFlightMode.BURN);
+  }
   try {
     return await navigateShip(api, ship, waypointSymbol);
   } on ApiException catch (e) {
@@ -311,7 +315,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   // }
 
   final result = await navigateToLocalWaypoint(api, ship, waypoint.symbol);
-  final flightTime = result.nav.route.arrival.difference(DateTime.now());
+  final flightTime = result.nav.route.arrival.difference(DateTime.timestamp());
   if (ship.fuelPercentage < 0.5) {
     shipWarn(
       ship,
