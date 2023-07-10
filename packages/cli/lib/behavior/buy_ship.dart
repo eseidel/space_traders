@@ -58,6 +58,7 @@ Future<DateTime?> advanceBuyShip(
       await caches.waypoints.waypoint(ship.nav.waypointSymbol);
 
   final shipType = centralCommand.shipTypeToBuy(
+    caches.shipyardPrices,
     caches.agent,
     waypointSymbol: currentWaypoint.symbol,
   );

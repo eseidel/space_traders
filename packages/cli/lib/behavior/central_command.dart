@@ -452,6 +452,7 @@ class CentralCommand {
   // TODO(eseidel): This should consider pricing in it so that we can by
   // other ship types if they're not overpriced?
   ShipType? shipTypeToBuy(
+    ShipyardPrices shipyardPrices,
     AgentCache agentCache, {
     required String waypointSymbol,
   }) {
@@ -459,6 +460,14 @@ class CentralCommand {
     // - We have request capacity to spare
     // - We have money to spare.
     // - We don't have better uses for the money (e.g. trading or modules)
+
+    bool shipyardHas(ShipType shipType) {
+      return shipyardPrices.recentPurchasePrice(
+            shipyardSymbol: waypointSymbol,
+            shipType: shipType,
+          ) !=
+          null;
+    }
 
     // We should buy ships based on earnings of that ship type over the last
     // N hours?
@@ -482,7 +491,9 @@ class CentralCommand {
     };
     final typesToBuy = targetCounts.keys
         .where(
-          (shipType) => _countOfTypeInFleet(shipType) < targetCounts[shipType]!,
+          (shipType) =>
+              shipyardHas(shipType) &&
+              (_countOfTypeInFleet(shipType) < targetCounts[shipType]!),
         )
         .toList();
     if (typesToBuy.isEmpty) {
@@ -553,7 +564,11 @@ class CentralCommand {
 
     // This assumes the ship in question is at a shipyard and already docked.
     final waypointSymbol = ship.nav.waypointSymbol;
-    final shipType = shipTypeToBuy(agentCache, waypointSymbol: waypointSymbol);
+    final shipType = shipTypeToBuy(
+      shipyardPrices,
+      agentCache,
+      waypointSymbol: waypointSymbol,
+    );
     // TODO(eseidel): This is wrong, this will disable buying for all
     // ships even though we might just be at a system where we don't need a ship
     // or can't afford one?
@@ -562,7 +577,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'No ships needed.',
-        const Duration(hours: 10),
+        const Duration(minutes: 1),
       );
       return false;
     }
@@ -574,7 +589,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Failed to buy ship, no median price for $shipType.',
-        const Duration(hours: 10),
+        const Duration(minutes: 1),
       );
       return false;
     }
@@ -586,7 +601,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Can not buy $shipType, credits $credits < max price $maxPrice.',
-        const Duration(minutes: 10),
+        const Duration(minutes: 1),
       );
       return false;
     }
@@ -600,7 +615,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Shipyard at $waypointSymbol does not sell $shipType.',
-        const Duration(minutes: 10),
+        const Duration(minutes: 1),
       );
       return false;
     }
@@ -612,7 +627,7 @@ class CentralCommand {
         Behavior.buyShip,
         'Failed to buy $shipType at $waypointSymbol, '
         '$recentPriceString > max price $maxPrice.',
-        const Duration(minutes: 10),
+        const Duration(minutes: 1),
       );
       return false;
     }
@@ -631,7 +646,7 @@ class CentralCommand {
       ship,
       Behavior.buyShip,
       'Purchase of ${result.ship.symbol} ($shipType) successful!',
-      const Duration(minutes: 10),
+      const Duration(minutes: 1),
     );
     return true;
   }
