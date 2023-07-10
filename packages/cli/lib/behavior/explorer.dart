@@ -29,26 +29,6 @@ bool _isMissingRecentShipyardData(
       !shipyardPrices.hasRecentShipyardData(waypoint.symbol);
 }
 
-Future<Waypoint?> _nearestWaypointNeedingExploration(
-  WaypointCache waypointCache,
-  MarketPrices marketPrices,
-  ShipyardPrices shipyardPrices,
-  Ship ship,
-) async {
-  final systemWaypoints =
-      await waypointCache.waypointsInSystem(ship.nav.systemSymbol);
-  for (final waypoint in systemWaypoints) {
-    if (_isMissingChartOrRecentPriceData(
-      marketPrices,
-      shipyardPrices,
-      waypoint,
-    )) {
-      return waypoint;
-    }
-  }
-  return null;
-}
-
 /// Visits the local market if we're at a waypoint with a market.
 /// Will return the market if we visited it, otherwise null.
 /// Market data will be recorded if needed.

@@ -102,6 +102,7 @@ Earning:
 * Consider up to N waypoints for trading, rather than N jumps.
 * Add logic for command ship to switch between trading and mining depending
   on expected profit.
+* Record trade volume on a per-market basis in pricing data.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate

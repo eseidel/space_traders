@@ -523,7 +523,8 @@ Future<DateTime?> advanceTrader(
     return null;
   }
 
-  if (newDeal.expectedProfitPerSecond < 10) {
+  if (newDeal.expectedProfitPerSecond <
+      centralCommand.minTraderProfitPerSecond) {
     await centralCommand.disableBehaviorForShip(
       ship,
       Behavior.trader,

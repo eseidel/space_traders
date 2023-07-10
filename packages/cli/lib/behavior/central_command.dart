@@ -332,6 +332,11 @@ class CentralCommand {
   /// but will not start new deals involving contracts.
   bool get isContractTradingEnabled => true;
 
+  /// Minimum profit per second we will accept when trading.
+  // Should set this based on the ship type and how much we expect to earn
+  // from other sources (e.g. hauling mining goods?)
+  int get minTraderProfitPerSecond => 7;
+
   /// Procurment contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,

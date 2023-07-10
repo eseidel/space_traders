@@ -348,6 +348,7 @@ class CostedDeal {
     // TODO(eseidel): This only works when transactions does not include fuel.
     return transactions
         .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
+        .where((t) => t.tradeSymbol != TradeSymbol.FUEL.value)
         .fold(0, (a, b) => a + -b.creditChange);
   }
 
@@ -385,28 +386,15 @@ class CostedDeal {
         'costPerFuelUnit': costPerFuelUnit,
       };
 
-  /// Copy this CostedDeal with the given fields replaced.
-  CostedDeal copyWith({
-    Deal? deal,
-    int? expectedFuelCost,
-    int? tradeVolume,
-    int? expectedTime,
-    List<Transaction>? transactions,
-  }) {
+  /// Return a new CostedDeal with the given transactions added.
+  CostedDeal byAddingTransactions(List<Transaction> transactions) {
     return CostedDeal(
-      deal: deal ?? this.deal,
-      tradeVolume: tradeVolume ?? this.tradeVolume,
-      transactions: transactions ?? this.transactions,
+      deal: deal,
+      tradeVolume: tradeVolume,
+      transactions: [...this.transactions, ...transactions],
       startTime: startTime,
       route: route,
       costPerFuelUnit: costPerFuelUnit,
-    );
-  }
-
-  /// Return a new CostedDeal with the given transactions added.
-  CostedDeal byAddingTransactions(List<Transaction> transactions) {
-    return copyWith(
-      transactions: [...this.transactions, ...transactions],
     );
   }
 }

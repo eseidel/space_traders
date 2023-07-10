@@ -1,6 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/cache/transactions.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
@@ -383,5 +384,47 @@ void main() {
     expect(deals2.length, 3);
     // The contractId is plumbed through correctly.
     expect(deals2.any((d) => d.contractId == 'foo'), isTrue);
+  });
+
+  test('byAddingTransactions', () {
+    const deal = Deal(
+      sourceSymbol: 'A',
+      destinationSymbol: 'B',
+      tradeSymbol: TradeSymbol.FUEL,
+      purchasePrice: 1,
+      sellPrice: 2,
+    );
+    final costed = CostedDeal(
+      deal: deal,
+      tradeVolume: 1,
+      transactions: [],
+      startTime: DateTime(2021),
+      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      costPerFuelUnit: 100,
+    );
+    final transaction1 = Transaction(
+      shipSymbol: 'foo',
+      waypointSymbol: 'bar',
+      tradeSymbol: 'FUEL',
+      perUnitPrice: 10,
+      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      quantity: 1,
+      timestamp: DateTime(2021),
+      agentCredits: 10,
+    );
+    final transaction2 = Transaction(
+      shipSymbol: 'foo',
+      waypointSymbol: 'bar',
+      tradeSymbol: 'FUEL',
+      perUnitPrice: 10,
+      tradeType: MarketTransactionTypeEnum.SELL,
+      quantity: 1,
+      timestamp: DateTime(2021),
+      agentCredits: 10,
+    );
+    final costed2 = costed.byAddingTransactions([transaction1]);
+    expect(costed2.transactions, [transaction1]);
+    final costed3 = costed2.byAddingTransactions([transaction2]);
+    expect(costed3.transactions, [transaction1, transaction2]);
   });
 }
