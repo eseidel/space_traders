@@ -30,8 +30,10 @@ void main() {
     final systemsCache = _MockSystemsCache();
     final systemConnectivity = _MockSystemConnectivity();
     final caches = _MockCaches();
+    final jumpCache = JumpCache();
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
+    when(() => caches.jumps).thenReturn(jumpCache);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final now = DateTime(2021);
@@ -69,6 +71,8 @@ void main() {
     final caches = _MockCaches();
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
+    final jumpCache = JumpCache();
+    when(() => caches.jumps).thenReturn(jumpCache);
 
     final now = DateTime(2021);
     final arrivalTime = now.add(const Duration(seconds: 1));

@@ -217,6 +217,7 @@ Future<DateTime?> advanceMiner(
       ship,
       caches.systems,
       caches.systemConnectivity,
+      caches.jumps,
       centralCommand,
       nearestMarket.symbol,
     );
@@ -238,6 +239,7 @@ Future<DateTime?> advanceMiner(
       ship,
       caches.systems,
       caches.systemConnectivity,
+      caches.jumps,
       centralCommand,
       mineSymbol,
     );

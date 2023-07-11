@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/transactions.dart';
@@ -115,6 +116,7 @@ void main() {
   test('costOutDeal basic', () {
     final systemsCache = _MockSystemsCache();
     final systemConnectivity = _MockSystemConnectivity();
+    final jumpCache = JumpCache();
     final start = SystemWaypoint(
       symbol: 'X-S-A',
       type: WaypointType.ASTEROID_FIELD,
@@ -147,6 +149,7 @@ void main() {
     final costed = costOutDeal(
       systemsCache,
       systemConnectivity,
+      jumpCache,
       deal,
       cargoSize: 1,
       shipSpeed: 1,
@@ -217,6 +220,7 @@ void main() {
     final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
     final systemConnectivity = _MockSystemConnectivity();
+    final jumpCache = JumpCache();
     when(
       () => systemConnectivity.canJumpBetween(
         startSystemSymbol: any(named: 'startSystemSymbol'),
@@ -319,6 +323,7 @@ void main() {
         marketPrices,
         systemsCache,
         systemConnectivity,
+        jumpCache,
         marketScan,
         ship,
         maxJumps: 1,

@@ -1,6 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
@@ -30,6 +31,7 @@ void main() {
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final systemConnectivity = _MockSystemConnectivity();
+    final jumpCache = JumpCache();
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     when(() => ship.symbol).thenReturn('S');
@@ -57,6 +59,7 @@ void main() {
         ship,
         systemsCache,
         systemConnectivity,
+        jumpCache,
         centralCommand,
         getNow: getNow,
       ),
@@ -80,6 +83,7 @@ void main() {
         ship,
         systemsCache,
         systemConnectivity,
+        jumpCache,
         centralCommand,
         getNow: getNow,
       ),

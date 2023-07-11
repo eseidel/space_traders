@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/api.dart';
+import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/transactions.dart';
@@ -428,6 +429,7 @@ String describeCostedDeal(CostedDeal costedDeal) {
 CostedDeal costOutDeal(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   Deal deal, {
   required int cargoSize,
   required int shipSpeed,
@@ -439,6 +441,7 @@ CostedDeal costOutDeal(
   final route = planRouteThrough(
     systemsCache,
     systemConnectivity,
+    jumpCache,
     [shipWaypointSymbol, deal.sourceSymbol, deal.destinationSymbol],
     fuelCapacity: shipFuelCapacity,
     shipSpeed: shipSpeed,
@@ -523,6 +526,7 @@ Future<CostedDeal?> findDealForShip(
   MarketPrices marketPrices,
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   MarketScan scan,
   Ship ship, {
   required int maxJumps,
@@ -531,7 +535,7 @@ Future<CostedDeal?> findDealForShip(
   bool Function(CostedDeal deal)? filter,
 }) {
   return findDealFor(
-    marketPrices, systemsCache, systemConnectivity, scan,
+    marketPrices, systemsCache, systemConnectivity, jumpCache, scan,
     startSymbol: ship.nav.waypointSymbol,
     fuelCapacity: ship.fuel.capacity,
     // Currently using capacity, rather than availableSpace, since the
@@ -550,6 +554,7 @@ Future<CostedDeal?> findDealFor(
   MarketPrices marketPrices,
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   MarketScan scan, {
   required String startSymbol,
   required int fuelCapacity,
@@ -573,20 +578,26 @@ Future<CostedDeal?> findDealFor(
   final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
   logger.info('Found ${deals.length} potential deals.');
 
-  final costedDeals = deals.map(
-    (deal) => costOutDeal(
-      shipSpeed: shipSpeed,
-      systemsCache,
-      systemConnectivity,
-      deal,
-      cargoSize: cargoCapacity,
-      shipWaypointSymbol: startSymbol,
-      shipFuelCapacity: fuelCapacity,
-      costPerFuelUnit:
-          marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
-    ),
-  );
-  logger.info('costed deals');
+  final before = DateTime.now();
+  final costedDeals = deals
+      .map(
+        (deal) => costOutDeal(
+          shipSpeed: shipSpeed,
+          systemsCache,
+          systemConnectivity,
+          jumpCache,
+          deal,
+          cargoSize: cargoCapacity,
+          shipWaypointSymbol: startSymbol,
+          shipFuelCapacity: fuelCapacity,
+          costPerFuelUnit:
+              marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
+        ),
+      )
+      .toList();
+  // toList is used to force resolution of the list before we log.
+  final after = DateTime.now();
+  logger.info('costed deals in ${after.difference(before)}');
   return _filterDealsAndLog(
     costedDeals,
     maxJumps: maxJumps,

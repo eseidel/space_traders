@@ -158,6 +158,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
     ship,
     caches.systems,
     caches.systemConnectivity,
+    caches.jumps,
     centralCommand,
     costedDeal.deal.destinationSymbol,
   );
@@ -180,6 +181,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
       ship,
       caches.systems,
       caches.systemConnectivity,
+      caches.jumps,
       centralCommand,
       costedDeal.deal.sourceSymbol,
     );
@@ -295,6 +297,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
       ship,
       caches.systems,
       caches.systemConnectivity,
+      caches.jumps,
       centralCommand,
       costedDeal.deal.sourceSymbol,
     );
@@ -306,6 +309,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
       ship,
       caches.systems,
       caches.systemConnectivity,
+      caches.jumps,
       centralCommand,
       costedDeal.deal.destinationSymbol,
     );
@@ -474,6 +478,7 @@ Future<DateTime?> advanceTrader(
         ship,
         caches.systems,
         caches.systemConnectivity,
+        caches.jumps,
         centralCommand,
         market.symbol,
       );
@@ -492,7 +497,7 @@ Future<DateTime?> advanceTrader(
     return waitUntil;
   }
 
-  const maxJumps = 5;
+  const maxJumps = 10;
   // TODO(eseidel): Make maxWaypoints bigger as routing gets faster.
   const maxWaypoints = 100;
 
@@ -504,6 +509,7 @@ Future<DateTime?> advanceTrader(
     caches.marketPrices,
     caches.systems,
     caches.systemConnectivity,
+    caches.jumps,
     caches.waypoints,
     caches.markets,
     ship,

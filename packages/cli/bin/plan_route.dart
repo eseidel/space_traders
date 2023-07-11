@@ -34,6 +34,7 @@ void main(List<String> args) async {
 void planRouteAndLog(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   SystemWaypoint start,
   SystemWaypoint end,
 ) {
@@ -41,6 +42,7 @@ void planRouteAndLog(
   final plan = planRoute(
     systemsCache,
     systemConnectivity,
+    jumpCache,
     start: start,
     end: end,
     fuelCapacity: 1200,
@@ -68,8 +70,9 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
+  final jumpCache = JumpCache();
 
   final start = systemsCache.waypointFromSymbol(startSymbol);
   final end = systemsCache.waypointFromSymbol(endSymbol);
-  planRouteAndLog(systemsCache, systemConnectivity, start, end);
+  planRouteAndLog(systemsCache, systemConnectivity, jumpCache, start, end);
 }

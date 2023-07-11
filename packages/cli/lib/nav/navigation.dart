@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
@@ -15,6 +16,7 @@ Future<DateTime?> beingRouteAndLog(
   Ship ship,
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   CentralCommand centralCommand,
   String destinationSymbol,
 ) async {
@@ -26,6 +28,7 @@ Future<DateTime?> beingRouteAndLog(
     ship,
     systemsCache,
     systemConnectivity,
+    jumpCache,
     centralCommand,
   );
   if (navResult.shouldReturn()) {
@@ -103,6 +106,7 @@ Future<NavResult> continueNavigationIfNeeded(
   Ship ship,
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   CentralCommand centralCommand, {
   // Hook for overriding the current time in tests.
   DateTime Function() getNow = defaultGetNow,
@@ -140,6 +144,7 @@ Future<NavResult> continueNavigationIfNeeded(
   final route = planRoute(
     systemsCache,
     systemConnectivity,
+    jumpCache,
     start: start,
     end: systemsCache.waypointFromSymbol(destinationSymbol),
     fuelCapacity: ship.fuel.capacity,

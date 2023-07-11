@@ -297,10 +297,144 @@ int _timeBetween(
   return _approximateTimeBetween(systemsCache, a, b.symbol, shipSpeed);
 }
 
+/// Plan a route between two waypoints using a pre-computed jump plan.
+RoutePlan routePlanFromJumpPlan(
+  SystemsCache systemsCache, {
+  required SystemWaypoint start,
+  required SystemWaypoint end,
+  required JumpPlan jumpPlan,
+  required int fuelCapacity,
+  required int shipSpeed,
+}) {
+  final actions = <RouteAction>[];
+  if (jumpPlan.route.first != start.systemSymbol) {
+    throw ArgumentError('Jump plan does not start at ${start.systemSymbol}');
+  }
+  if (jumpPlan.route.last != end.systemSymbol) {
+    throw ArgumentError('Jump plan does not end at ${end.systemSymbol}');
+  }
+  final startJumpGate =
+      systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
+  if (startJumpGate.symbol != start.symbol) {
+    actions.add(_navigationAction(start, startJumpGate, shipSpeed));
+  }
+
+  for (var i = 0; i < jumpPlan.route.length - 1; i++) {
+    final startSymbol = jumpPlan.route[i];
+    final endSymbol = jumpPlan.route[i + 1];
+    final startJumpgate = systemsCache.jumpGateWaypointForSystem(startSymbol)!;
+    final endJumpGate = systemsCache.jumpGateWaypointForSystem(endSymbol)!;
+    final isLastJump = i == jumpPlan.route.length - 2;
+    actions.add(
+      _jumpAction(
+        systemsCache,
+        startJumpgate,
+        endJumpGate,
+        shipSpeed,
+        isLastJump: isLastJump,
+      ),
+    );
+  }
+  final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
+  if (endJumpGate.symbol != end.symbol) {
+    actions.add(_navigationAction(endJumpGate, end, shipSpeed));
+  }
+
+  final fuelUsed = _fuelUsedByActions(systemsCache, actions);
+  return RoutePlan(
+    fuelCapacity: fuelCapacity,
+    shipSpeed: shipSpeed,
+    actions: actions,
+    fuelUsed: fuelUsed,
+  );
+}
+
+class _JumpPlanBuilder {
+  _JumpPlanBuilder();
+
+  final List<String> _systems = [];
+
+  bool get isNotEmpty => _systems.isNotEmpty;
+
+  void addWaypoint(String waypointSymbol) {
+    final system = parseWaypointString(waypointSymbol).system;
+    _systems.add(system);
+  }
+
+  JumpPlan build() {
+    final plan = JumpPlan(_systems);
+    _systems.clear();
+    return plan;
+  }
+}
+
+void _saveJumpsInCache(JumpCache jumpCache, List<RouteAction> actions) {
+  // Walk through actions, find any jump sequences, turn those into JumpPlans
+  // which are then given to the JumpCache.
+  final builder = _JumpPlanBuilder();
+  for (var i = 0; i < actions.length; i++) {
+    final action = actions[i];
+    if (action.type == RouteActionType.jump) {
+      builder.addWaypoint(action.startSymbol);
+    } else {
+      if (builder.isNotEmpty) {
+        builder.addWaypoint(action.startSymbol);
+        jumpCache.addJumpPlan(builder.build());
+      }
+    }
+  }
+  // This only happens when the last action is a jump e.g. we're at a jumpgate.
+  if (builder.isNotEmpty) {
+    builder.addWaypoint(actions.last.endSymbol);
+    jumpCache.addJumpPlan(builder.build());
+  }
+}
+
+RouteAction _navigationAction(
+  SystemWaypoint start,
+  SystemWaypoint end,
+  int shipSpeed,
+) {
+  final duration = flightTimeWithinSystemInSeconds(
+    start,
+    end,
+    shipSpeed: shipSpeed,
+  );
+  return RouteAction(
+    startSymbol: start.symbol,
+    endSymbol: end.symbol,
+    type: RouteActionType.navCruise,
+    duration: duration,
+  );
+}
+
+RouteAction _jumpAction(
+  SystemsCache systemsCache,
+  SystemWaypoint start,
+  SystemWaypoint end,
+  int shipSpeed, {
+  required bool isLastJump,
+}) {
+  final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
+  final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
+  final cooldown = cooldownTimeForJumpBetweenSystems(startSystem, endSystem);
+  // This isn't quite right to use cooldown as duration, but it's
+  // close enough for now.  This isLastJump hack also would break
+  // if we had two separate series of jumps in the route.
+  final duration = isLastJump ? 0 : cooldown;
+  return RouteAction(
+    startSymbol: start.symbol,
+    endSymbol: end.symbol,
+    type: RouteActionType.jump,
+    duration: duration,
+  );
+}
+
 /// Plan a route between two waypoints.
 RoutePlan? planRoute(
   SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity, {
+  SystemConnectivity systemConnectivity,
+  JumpCache jumpCache, {
   required SystemWaypoint start,
   required SystemWaypoint end,
   required int fuelCapacity,
@@ -323,6 +457,22 @@ RoutePlan? planRoute(
     endSystemSymbol: end.systemSymbol,
   )) {
     return null;
+  }
+
+  // Look up in the jump cache, if so, create a plan from that.
+  final jumpPlan = jumpCache.lookupJumpPlan(
+    fromSystem: start.systemSymbol,
+    toSystem: end.systemSymbol,
+  );
+  if (jumpPlan != null) {
+    return routePlanFromJumpPlan(
+      systemsCache,
+      start: start,
+      end: end,
+      jumpPlan: jumpPlan,
+      fuelCapacity: fuelCapacity,
+      shipSpeed: shipSpeed,
+    );
   }
 
   // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
@@ -370,37 +520,22 @@ RoutePlan? planRoute(
     final currentWaypoint = systemsCache.waypointFromSymbol(current);
     if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
       // Assume we jumped.
-      final previousSystem =
-          systemsCache.systemBySymbol(previousWaypoint.systemSymbol);
-      final currentSystem =
-          systemsCache.systemBySymbol(currentWaypoint.systemSymbol);
-      final cooldown =
-          cooldownTimeForJumpBetweenSystems(previousSystem, currentSystem);
-      // This isn't quite right to use cooldown as duration, but it's
-      // close enough for now.  This isLastJump hack also would break
-      // if we had two separate series of jumps in the route.
-      final duration = isLastJump ? 0 : cooldown;
-      isLastJump = false;
       route.add(
-        RouteAction(
-          startSymbol: previous,
-          endSymbol: current,
-          type: RouteActionType.jump,
-          duration: duration,
+        _jumpAction(
+          systemsCache,
+          previousWaypoint,
+          currentWaypoint,
+          shipSpeed,
+          isLastJump: isLastJump,
         ),
       );
+      isLastJump = false;
     } else {
-      final duration = flightTimeWithinSystemInSeconds(
-        previousWaypoint,
-        currentWaypoint,
-        shipSpeed: shipSpeed,
-      );
       route.add(
-        RouteAction(
-          startSymbol: previous,
-          endSymbol: current,
-          type: RouteActionType.navCruise,
-          duration: duration,
+        _navigationAction(
+          previousWaypoint,
+          currentWaypoint,
+          shipSpeed,
         ),
       );
     }
@@ -410,6 +545,8 @@ RoutePlan? planRoute(
 
   final actions = route.reversed.toList();
   final fuelUsed = _fuelUsedByActions(systemsCache, actions);
+
+  _saveJumpsInCache(jumpCache, actions);
 
   return RoutePlan(
     fuelCapacity: fuelCapacity,
@@ -438,6 +575,7 @@ int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
 RoutePlan? planRouteThrough(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   List<String> waypointSymbols, {
   required int fuelCapacity,
   required int shipSpeed,
@@ -452,6 +590,7 @@ RoutePlan? planRouteThrough(
     final plan = planRoute(
       systemsCache,
       systemConnectivity,
+      jumpCache,
       start: start,
       end: end,
       fuelCapacity: fuelCapacity,

@@ -63,6 +63,7 @@ void main() {
     final transactionLog = _MockTransactionLog();
     final shipyardPrices = _MockShipyardPrices();
     final contractCache = _MockContractCache();
+    final jumpCache = JumpCache();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -78,6 +79,7 @@ void main() {
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.contracts).thenReturn(contractCache);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
+    when(() => caches.jumps).thenReturn(jumpCache);
 
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
@@ -120,6 +122,7 @@ void main() {
         marketPrices,
         systemsCache,
         systemConnectivity,
+        jumpCache,
         waypointCache,
         marketCache,
         ship,
@@ -193,6 +196,8 @@ void main() {
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
+    final jumpCache = JumpCache();
+    when(() => caches.jumps).thenReturn(jumpCache);
 
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
@@ -376,6 +381,7 @@ void main() {
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final contractCache = _MockContractCache();
+    final jumpCache = JumpCache();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
@@ -388,6 +394,7 @@ void main() {
     when(() => caches.contracts).thenReturn(contractCache);
     when(() => contractCache.activeContracts).thenReturn([]);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
+    when(() => caches.jumps).thenReturn(jumpCache);
 
     final agent = _MockAgent();
     when(() => agentCache.agent).thenReturn(agent);
@@ -455,6 +462,7 @@ void main() {
         marketPrices,
         systemsCache,
         systemConnectivity,
+        jumpCache,
         waypointCache,
         marketCache,
         ship,

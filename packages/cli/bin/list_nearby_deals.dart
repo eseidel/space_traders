@@ -34,6 +34,7 @@ Future<void> cliMain(List<String> args) async {
   const fs = LocalFileSystem();
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
+  final jumpCache = JumpCache();
 
   final marketPrices = await MarketPrices.load(fs);
 
@@ -93,6 +94,22 @@ Future<void> cliMain(List<String> args) async {
     marketPrices,
     systemsCache,
     systemConnectivity,
+    jumpCache,
+    marketScan,
+    maxJumps: maxJumps,
+    maxTotalOutlay: maxOutlay,
+    cargoCapacity: cargoCapacity,
+    fuelCapacity: fuelCapacity,
+    shipSpeed: shipSpeed,
+    startSymbol: start.symbol,
+    extraSellOpps: extraSellOpps,
+  );
+
+  final maybeDeal2 = await findDealFor(
+    marketPrices,
+    systemsCache,
+    systemConnectivity,
+    jumpCache,
     marketScan,
     maxJumps: maxJumps,
     maxTotalOutlay: maxOutlay,

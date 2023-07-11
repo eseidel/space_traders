@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
@@ -91,6 +92,7 @@ void main() {
       fs,
       path: 'test/nav/fixtures/systems-06-24-2023.json',
     )!;
+    final jumpCache = JumpCache();
     final systemConnectivity =
         SystemConnectivity.fromSystemsCache(systemsCache);
     void expectRoute(String start, String end, int expectedSeconds) {
@@ -99,6 +101,7 @@ void main() {
       final route = planRoute(
         systemsCache,
         systemConnectivity,
+        jumpCache,
         start: startWaypoint,
         end: endWaypoint,
         fuelCapacity: 1200,
@@ -106,6 +109,30 @@ void main() {
       );
       expect(route, isNotNull);
       expect(route!.duration, expectedSeconds);
+
+      // No need to test caching of the empty route.
+      if (route.actions.isEmpty) {
+        return;
+      }
+
+      // Also verify that our caching works:
+      // This actually isn't triggered ever since we're only using local
+      // navigation in this test so far.
+      final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
+        ..add(route.actions.last.endSymbol);
+      final route2 = planRoute(
+        systemsCache,
+        systemConnectivity,
+        jumpCache,
+        start: startWaypoint,
+        end: endWaypoint,
+        fuelCapacity: 1200,
+        shipSpeed: 30,
+      )!;
+      final routeSymbols2 = route2.actions.map((w) => w.startSymbol).toList()
+        ..add(route.actions.last.endSymbol);
+      // Should be identical when coming from cache.
+      expect(routeSymbols2, routeSymbols);
     }
 
     // Same place

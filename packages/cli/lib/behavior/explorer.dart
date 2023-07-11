@@ -151,6 +151,7 @@ Future<DateTime?> advanceExplorer(
         ship,
         caches.systems,
         caches.systemConnectivity,
+        caches.jumps,
         centralCommand,
         destination.symbol,
       );

@@ -26,6 +26,7 @@ String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
 Duration timeToDestination(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   Ship ship,
   String destinationSymbol,
 ) {
@@ -40,6 +41,7 @@ Duration timeToDestination(
   final route = planRoute(
     systemsCache,
     systemConnectivity,
+    jumpCache,
     start: start,
     end: end,
     fuelCapacity: ship.fuel.capacity,
@@ -77,6 +79,7 @@ void logShip(
   CentralCommand centralCommand,
   MarketPrices marketPrices,
   SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
   Ship ship,
 ) {
   final behavior = centralCommand.getBehavior(ship.symbol);
@@ -93,6 +96,7 @@ void logShip(
     final timeToArrival = timeToDestination(
       systemsCache,
       systemConnectivity,
+      jumpCache,
       ship,
       destination,
     );
@@ -122,6 +126,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final systemsCache = SystemsCache.loadFromCache(fs)!;
   final marketPrices = await MarketPrices.load(fs);
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
+  final jumpCache = JumpCache();
 
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
@@ -136,6 +141,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
       centralCommand,
       marketPrices,
       systemConnectivity,
+      jumpCache,
       ship,
     );
   }

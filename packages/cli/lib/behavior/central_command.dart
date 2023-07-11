@@ -362,6 +362,7 @@ class CentralCommand {
     MarketPrices marketPrices,
     SystemsCache systemsCache,
     SystemConnectivity systemConnectivity,
+    JumpCache jumpCache,
     WaypointCache waypointCache,
     MarketCache marketCache,
     Ship ship, {
@@ -406,6 +407,7 @@ class CentralCommand {
       marketPrices,
       systemsCache,
       systemConnectivity,
+      jumpCache,
       marketScan,
       ship,
       maxJumps: maxJumps,

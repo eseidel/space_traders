@@ -3,6 +3,7 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/faction_cache.dart';
+import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
@@ -19,6 +20,7 @@ export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
 export 'package:cli/cache/faction_cache.dart';
+export 'package:cli/cache/jump_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
@@ -85,6 +87,9 @@ class Caches {
 
   /// The cache of factions.
   final FactionCache factions;
+
+  /// The cache of jump routes.
+  final JumpCache jumps = JumpCache();
 
   /// Load the cache from disk and network.
   static Future<Caches> load(
