@@ -95,14 +95,12 @@ Earning:
 * Traders only consider how repeated buys inflate prices, they do not consider
   how repeated sells might deflate prices at sell point.
 * Teach miners how to coordinate with haulers to sell their goods further away.
-* It's not clear if contract trading is working, should write a tool to list
-  nearby deals and highlight where the contract deal sits in that list.
 * Add refining
 * Add gas siphoning
-* Consider up to N waypoints for trading, rather than N jumps.
 * Add logic for command ship to switch between trading and mining depending
   on expected profit.
 * Record trade volume on a per-market basis in pricing data.
+* Make traders move towards areas with good trades instead of exploring.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
@@ -114,9 +112,9 @@ Exploring:
 
 Tech Debt:
 * Fix all uses of DateTime.now() to be DateTime.timestamp() and test.
+* Write a test suite for routing.
 
 Efficiency:
-* Cache system-to-system routes via jumpgates.
 * Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Write a better rate-limiting model.
