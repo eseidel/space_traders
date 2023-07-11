@@ -105,21 +105,6 @@ Future<void> cliMain(List<String> args) async {
     extraSellOpps: extraSellOpps,
   );
 
-  final maybeDeal2 = await findDealFor(
-    marketPrices,
-    systemsCache,
-    systemConnectivity,
-    jumpCache,
-    marketScan,
-    maxJumps: maxJumps,
-    maxTotalOutlay: maxOutlay,
-    cargoCapacity: cargoCapacity,
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
-    startSymbol: start.symbol,
-    extraSellOpps: extraSellOpps,
-  );
-
   if (maybeDeal == null) {
     logger.info('No deal found.');
     return;
