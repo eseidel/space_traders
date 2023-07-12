@@ -18,6 +18,10 @@ class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockContractCache extends Mock implements ContractCache {}
+
+class _MockContractsApi extends Mock implements ContractsApi {}
+
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -30,11 +34,15 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipCargo extends Mock implements ShipCargo {}
 
+class _MockShipEngine extends Mock implements ShipEngine {}
+
 class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
+
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
@@ -44,14 +52,11 @@ class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class _MockContractsApi extends Mock implements ContractsApi {}
-
-class _MockContractCache extends Mock implements ContractCache {}
-
-class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
-
 void main() {
   test('advanceContractTrader smoke test', () async {
+    registerFallbackValue(Duration.zero);
+    registerFallbackValue(BehaviorState('S', Behavior.trader));
+
     final api = _MockApi();
     final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
@@ -69,6 +74,19 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final centralCommand = _MockCentralCommand();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
+    when(
+      () => centralCommand.findBetterTradeLocation(
+        systemsCache,
+        systemConnectivity,
+        jumpCache,
+        agentCache,
+        marketPrices,
+        ship,
+        maxJumps: any(named: 'maxJumps'),
+        maxWaypoints: any(named: 'maxWaypoints'),
+      ),
+    ).thenAnswer((_) => Future.value());
+    when(() => centralCommand.minTraderProfitPerSecond).thenReturn(10);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
@@ -81,6 +99,9 @@ void main() {
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
     when(() => caches.jumps).thenReturn(jumpCache);
 
+    final shipFuel = _MockShipFuel();
+    when(() => ship.fuel).thenReturn(shipFuel);
+    when(() => shipFuel.capacity).thenReturn(0);
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
@@ -91,7 +112,44 @@ void main() {
     when(() => waypoint.symbol).thenReturn('S-A-B');
     when(() => waypoint.systemSymbol).thenReturn('S-A');
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([]);
+    when(() => waypoint.traits).thenReturn([
+      WaypointTrait(
+        symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+        name: '',
+        description: '',
+      )
+    ]);
+    when(() => marketCache.marketForSymbol('S-A-B')).thenAnswer(
+      (_) => Future.value(
+        Market(
+          symbol: 'S-A-B',
+          tradeGoods: [
+            MarketTradeGood(
+              symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+              tradeVolume: 100,
+              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+              purchasePrice: 100,
+              sellPrice: 101,
+            )
+          ],
+        ),
+      ),
+    );
+    when(
+      () => marketPrices.hasRecentMarketData(
+        'S-A-B',
+        maxAge: any(named: 'maxAge'),
+      ),
+    ).thenReturn(true);
+
+    when(() => waypointCache.waypoint(any()))
+        .thenAnswer((_) => Future.value(waypoint));
+    when(
+      () => systemsCache.systemSymbolsInJumpRadius(
+        startSystem: 'S-A',
+        maxJumps: 1,
+      ),
+    ).thenReturn([]);
 
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
@@ -105,7 +163,7 @@ void main() {
     when(() => centralCommand.getBehavior('S')).thenAnswer(
       (_) => BehaviorState('S', Behavior.trader),
     );
-    registerFallbackValue(Duration.zero);
+
     when(
       () => centralCommand.disableBehaviorForShip(
         ship,
@@ -114,6 +172,33 @@ void main() {
         any(),
       ),
     ).thenAnswer((_) => Future.value());
+
+    final costedDeal = CostedDeal(
+      deal: const Deal(
+        sourceSymbol: 'S-A-B',
+        destinationSymbol: 'S-A-C',
+        tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+        purchasePrice: 10,
+        sellPrice: 20,
+      ),
+      tradeVolume: 10,
+      transactions: [],
+      startTime: DateTime(2021),
+      route: const RoutePlan(
+        actions: [
+          RouteAction(
+            startSymbol: 'S-A-B',
+            endSymbol: 'S-A-C',
+            type: RouteActionType.navCruise,
+            duration: 10,
+          )
+        ],
+        fuelCapacity: 10,
+        fuelUsed: 10,
+        shipSpeed: 10,
+      ),
+      costPerFuelUnit: 100,
+    );
 
     when(
       () => centralCommand.findNextDeal(
@@ -130,7 +215,8 @@ void main() {
         maxWaypoints: any(named: 'maxWaypoints'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
-    ).thenAnswer((_) => Future.value());
+    ).thenAnswer((_) => Future.value(costedDeal));
+    when(() => centralCommand.minTraderProfitPerSecond).thenReturn(10);
     when(
       () => centralCommand.visitLocalShipyard(
         api,
@@ -140,11 +226,16 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
+    when(() => centralCommand.setBehavior('S', any()))
+        .thenAnswer((_) => Future.value());
+    when(() => centralCommand.completeBehavior('S'))
+        .thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => shipCargo.units).thenReturn(0);
     when(() => shipCargo.capacity).thenReturn(10);
+    when(() => shipCargo.inventory).thenReturn([]);
 
     final agent = _MockAgent();
     when(() => agentCache.agent).thenReturn(agent);
@@ -213,6 +304,10 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn('S-A');
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
 
+    final shipEngine = _MockShipEngine();
+    when(() => shipEngine.speed).thenReturn(10);
+    when(() => ship.engine).thenReturn(shipEngine);
+
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn('S-A-B');
     when(() => waypoint.systemSymbol).thenReturn('S-A');
@@ -240,7 +335,36 @@ void main() {
         maxJumps: 1,
       ),
     ).thenReturn([]);
+    when(() => systemsCache.waypointFromSymbol('S-A-B')).thenReturn(
+      SystemWaypoint(
+        symbol: 'S-A-B',
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => systemsCache.waypointFromSymbol('S-A-C')).thenReturn(
+      SystemWaypoint(
+        symbol: 'S-A-C',
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
 
+    const routePlan = RoutePlan(
+      actions: [
+        RouteAction(
+          startSymbol: 'S-A-B',
+          endSymbol: 'S-A-C',
+          type: RouteActionType.navCruise,
+          duration: 10,
+        )
+      ],
+      fuelCapacity: 10,
+      fuelUsed: 10,
+      shipSpeed: 10,
+    );
     final costedDeal = CostedDeal(
       deal: const Deal(
         sourceSymbol: 'S-A-B',
@@ -252,7 +376,7 @@ void main() {
       tradeVolume: 10,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      route: routePlan,
       costPerFuelUnit: 100,
     );
 
@@ -282,7 +406,7 @@ void main() {
     when(() => centralCommand.getBehavior('S')).thenAnswer(
       (_) => BehaviorState('S', Behavior.trader, deal: costedDeal),
     );
-    when(() => centralCommand.setDestination(ship, 'S-A-C'))
+    when(() => centralCommand.setRoutePlan(ship, routePlan))
         .thenAnswer((_) => Future.value());
     registerFallbackValue(Duration.zero);
     when(
@@ -346,6 +470,14 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
+    when(
+      () => systemConnectivity.canJumpBetween(
+        startSystemSymbol: any(named: 'startSystemSymbol'),
+        endSystemSymbol: any(named: 'endSystemSymbol'),
+      ),
+    ).thenReturn(true);
+
+    when(() => systemsCache.waypointsInSystem('S-A')).thenReturn([]);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -368,6 +500,9 @@ void main() {
   });
 
   test('trade contracts smoke test', () async {
+    registerFallbackValue(Duration.zero);
+    registerFallbackValue(BehaviorState('S', Behavior.trader));
+
     final api = _MockApi();
     final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
@@ -383,6 +518,7 @@ void main() {
     final contractCache = _MockContractCache();
     final jumpCache = JumpCache();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
+    when(() => centralCommand.minTraderProfitPerSecond).thenReturn(10);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
@@ -395,6 +531,19 @@ void main() {
     when(() => contractCache.activeContracts).thenReturn([]);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
     when(() => caches.jumps).thenReturn(jumpCache);
+    final contract = Contract(
+      id: 'id',
+      factionSymbol: 'factionSymbol',
+      type: ContractTypeEnum.PROCUREMENT,
+      expiration: DateTime(2021),
+      terms: ContractTerms(
+        deadline: DateTime(2021),
+        payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
+      ),
+    );
+    when(() => contractCache.updateContract(contract)).thenAnswer(
+      (_) => Future.value(),
+    );
 
     final agent = _MockAgent();
     when(() => agentCache.agent).thenReturn(agent);
@@ -418,16 +567,7 @@ void main() {
       (_) => Future.value(
         NegotiateContract200Response(
           data: NegotiateContract200ResponseData(
-            contract: Contract(
-              id: 'id',
-              factionSymbol: 'factionSymbol',
-              type: ContractTypeEnum.PROCUREMENT,
-              expiration: DateTime(2021),
-              terms: ContractTerms(
-                deadline: DateTime(2021),
-                payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
-              ),
-            ),
+            contract: contract,
           ),
         ),
       ),
@@ -437,6 +577,7 @@ void main() {
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => shipCargo.units).thenReturn(0);
     when(() => shipCargo.capacity).thenReturn(10);
+    when(() => shipCargo.inventory).thenReturn([]);
 
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
@@ -454,7 +595,45 @@ void main() {
 
     when(() => centralCommand.getBehavior('S'))
         .thenAnswer((_) => BehaviorState('S', Behavior.trader));
+    when(() => centralCommand.setBehavior('S', any()))
+        .thenAnswer((_) => Future.value());
+    const routePlan = RoutePlan(
+      actions: [
+        RouteAction(
+          startSymbol: 'S-A-B',
+          endSymbol: 'A',
+          type: RouteActionType.navCruise,
+          duration: 10,
+        )
+      ],
+      fuelCapacity: 10,
+      fuelUsed: 10,
+      shipSpeed: 10,
+    );
+    registerFallbackValue(routePlan);
+    when(() => centralCommand.setRoutePlan(ship, any()))
+        .thenAnswer((_) => Future.value());
+    // when(() => centralCommand.disableBehaviorForShip(
+    //       ship,
+    //       Behavior.trader,
+    //       any(),
+    //       any(),
+    //     )).thenAnswer((_) => Future.value());
 
+    final costedDeal = CostedDeal(
+      deal: const Deal(
+        sourceSymbol: 'S-A-B',
+        destinationSymbol: 'A',
+        tradeSymbol: TradeSymbol.FUEL,
+        purchasePrice: 10,
+        sellPrice: 20,
+      ),
+      tradeVolume: 10,
+      transactions: [],
+      startTime: DateTime(2021),
+      route: routePlan,
+      costPerFuelUnit: 100,
+    );
     when(
       () => centralCommand.findNextDeal(
         agentCache,
@@ -470,7 +649,7 @@ void main() {
         maxJumps: any(named: 'maxJumps'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
-    ).thenAnswer((_) => Future.value());
+    ).thenAnswer((_) => Future.value(costedDeal));
     when(
       () => centralCommand.disableBehaviorForShip(
         ship,
@@ -486,6 +665,18 @@ void main() {
         agentCache,
         waypoint,
         ship,
+      ),
+    ).thenAnswer((_) => Future.value());
+    when(
+      () => centralCommand.findBetterTradeLocation(
+        systemsCache,
+        systemConnectivity,
+        jumpCache,
+        agentCache,
+        marketPrices,
+        ship,
+        maxJumps: any(named: 'maxJumps'),
+        maxWaypoints: any(named: 'maxWaypoints'),
       ),
     ).thenAnswer((_) => Future.value());
 

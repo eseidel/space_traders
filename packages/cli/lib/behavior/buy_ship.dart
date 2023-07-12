@@ -170,7 +170,7 @@ Future<DateTime?> advanceBuyShip(
     );
     return null;
   }
-  return beingRouteAndLog(
+  return beingNewRouteAndLog(
     api,
     ship,
     caches.systems,

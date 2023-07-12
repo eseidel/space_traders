@@ -100,7 +100,12 @@ Earning:
 * Add logic for command ship to switch between trading and mining depending
   on expected profit.
 * Record trade volume on a per-market basis in pricing data.
-* Make traders move towards areas with good trades instead of exploring.
+* Keep a minimum buffer per trader, so we don't get stuck with no money.
+* Buy some ratio of explorers to traders (e.g 1:2).
+* Buy traders when trading is more profitable than mining, and vice versa.
+* Use routes for pathing so we can avoid re-planning.
+  Would just always check the current waypoint, if it's not on the route,
+  re-plan to the destination, otherwise do the next action on the route.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
@@ -192,3 +197,27 @@ ApiException 500:
 
 Automatically handle resets:
 ApiException 401: {"error":{"message":"Failed to parse token. Token reset_date does not match the server. Server resets happen on a weekly to bi-weekly frequency during alpha. After a reset, you should re-register your agent. Expected: 2023-07-08, Actual: 2023-06-24","code":401,"data":{"expected":"2023-07-08","actual":"2023-06-24"}}}
+
+
+
+[WARN] Failed to parse exception json: FormatException: Unexpected character (at character 1)
+HTTP connection failed: POST /my/ships/ESEIDEL-15/navigate
+^
+
+Unhandled exception:
+ApiException 400: HTTP connection failed: POST /my/ships/ESEIDEL-15/navigate (Inner exception: Connection reset by peer)
+
+#0      IOClient.send (package:http/src/io_client.dart:96:7)
+<asynchronous suspension>
+#1      BaseClient._sendUnstreamed (package:http/src/base_client.dart:93:32)
+<asynchronous suspension>
+#2      ApiClient.invokeAPI (package:openapi/api_client.dart:101:18)
+<asynchronous suspension>
+#3      RateLimitedApiClient.handleUnexpectedRateLimit (package:cli/net/rate_limit.dart:63:24)
+<asynchronous suspension>
+#4      RateLimitedApiClient.invokeAPI (package:cli/net/rate_limit.dart:101:22)
+<asynchronous suspension>
+#5      FleetApi.navigateShip (package:openapi/api/fleet_api.dart:1189:22)
+<asynchronous suspension>
+#6      navigateShip (package:cli/net/direct.dart:53:7)
+<asynchronous suspension>

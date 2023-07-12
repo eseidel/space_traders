@@ -11,7 +11,7 @@ import 'package:cli/printing.dart';
 /// Begins a new nagivation action for [ship] to [destinationSymbol].
 /// Returns the wait time if the ship should wait or null if no wait is needed.
 /// Saves the destination to the ship's behavior state.
-Future<DateTime?> beingRouteAndLog(
+Future<DateTime?> beingNewRouteAndLog(
   Api api,
   Ship ship,
   SystemsCache systemsCache,
@@ -20,9 +20,52 @@ Future<DateTime?> beingRouteAndLog(
   CentralCommand centralCommand,
   String destinationSymbol,
 ) async {
-  await centralCommand.setDestination(ship, destinationSymbol);
+  final start = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
+  final route = planRoute(
+    systemsCache,
+    systemConnectivity,
+    jumpCache,
+    start: start,
+    end: systemsCache.waypointFromSymbol(destinationSymbol),
+    fuelCapacity: ship.fuel.capacity,
+    shipSpeed: ship.engine.speed,
+  );
+  if (route == null) {
+    shipErr(ship, 'No route to $destinationSymbol!?');
+    return null;
+  }
+  final action = route.actions.firstOrNull;
+  if (action == null) {
+    shipErr(ship, 'No actions in route to $destinationSymbol!?');
+    return null;
+  }
+  final waitTime = await beingRouteAndLog(
+    api,
+    ship,
+    systemsCache,
+    systemConnectivity,
+    jumpCache,
+    centralCommand,
+    route,
+  );
+  return waitTime;
+}
+
+/// Begins a new nagivation action [ship] along [routePlan].
+/// Returns the wait time if the ship should wait or null if no wait is needed.
+/// Saves the route to the ship's behavior state.
+Future<DateTime?> beingRouteAndLog(
+  Api api,
+  Ship ship,
+  SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
+  CentralCommand centralCommand,
+  RoutePlan routePlan,
+) async {
+  await centralCommand.setRoutePlan(ship, routePlan);
   // TODO(eseidel): Should this buy fuel first if we need it?
-  shipInfo(ship, 'Begining route to $destinationSymbol');
+  shipInfo(ship, 'Beginning route to ${routePlan.endSymbol}');
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
@@ -128,39 +171,19 @@ Future<NavResult> continueNavigationIfNeeded(
     // has arrived before we got a chance to update it here.
     ship.nav.status = ShipNavStatus.IN_ORBIT;
   }
-  final destinationSymbol = centralCommand.currentDestination(ship);
-  if (destinationSymbol == null) {
-    // We don't have a destination, so we can't navigate.
+  final routePlan = centralCommand.currentRoutePlan(ship);
+  if (routePlan == null) {
+    // We don't have a routePlan, so we can't navigate.
     return NavResult._continueAction();
   }
-  // We've reached the destination, so we can stop navigating.
-  if (ship.nav.waypointSymbol == destinationSymbol) {
+  // We've reached the routePlan, so we can stop navigating.
+  if (ship.nav.waypointSymbol == routePlan.endSymbol) {
     // Remove the destination from the ship's state or it will try to come back.
-    await centralCommand.reachedDestination(ship);
+    await centralCommand.reachedEndOfRoutePlan(ship);
     return NavResult._continueAction();
   }
-  final start = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
-  // We're not at the destination, so we need to navigate.
-  final route = planRoute(
-    systemsCache,
-    systemConnectivity,
-    jumpCache,
-    start: start,
-    end: systemsCache.waypointFromSymbol(destinationSymbol),
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
-  );
-  if (route == null) {
-    shipErr(ship, 'No route to $destinationSymbol!?');
-    await centralCommand.reachedDestination(ship);
-    return NavResult._loop();
-  }
-  final action = route.actions.firstOrNull;
-  if (action == null) {
-    shipErr(ship, 'No actions in route to $destinationSymbol!?');
-    await centralCommand.reachedDestination(ship);
-    return NavResult._loop();
-  }
+  final action = routePlan.nextActionFrom(ship.nav.waypointSymbol);
+  final actionStart = systemsCache.waypointFromSymbol(action.startSymbol);
   final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
   switch (action.type) {
     case RouteActionType.jump:
@@ -169,7 +192,7 @@ Future<NavResult> continueNavigationIfNeeded(
       _verifyJumpTime(
         systemsCache,
         ship,
-        start.systemSymbol,
+        actionStart.systemSymbol,
         actionEnd.systemSymbol,
         response.cooldown,
       );
@@ -184,7 +207,7 @@ Future<NavResult> continueNavigationIfNeeded(
 
       final expectedFlightTime = Duration(
         seconds: flightTimeWithinSystemInSeconds(
-          start,
+          actionStart,
           actionEnd,
           shipSpeed: ship.engine.speed,
           flightMode: ship.nav.flightMode,

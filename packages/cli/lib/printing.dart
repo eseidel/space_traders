@@ -145,10 +145,10 @@ void logTransaction(
       '$creditsSign${creditsString(transaction.totalPrice)}'.padLeft(7);
   shipInfo(
     ship,
-    '$labelEmoji ${transaction.units.toString().padLeft(2)} '
+    '$labelEmoji ${transaction.units.toString().padLeft(3)} '
     // Could use TradeSymbol.values.reduce() to find the longest symbol.
     '${transaction.tradeSymbol.padRight(18)} '
-    '$priceDevianceString ${transaction.units.toString().padLeft(2)} x '
+    '$priceDevianceString ${transaction.units.toString().padLeft(3)} x '
     // prices are commonly 5 digits + ',' and 'c' so we pad to 7.
     '${creditsString(transaction.pricePerUnit).padLeft(7)} = '
     '$totalPriceString -> '

@@ -31,9 +31,10 @@ class JsonStore<Record> {
 
   /// Save entries to a file.
   void save() {
-    _fs.file(_path)
-      ..createSync(recursive: true)
-      ..writeAsStringSync(jsonEncode(record));
+    final file = _fs.file(_path)..createSync(recursive: true);
+    const encoder = JsonEncoder.withIndent(' ');
+    final prettyprint = encoder.convert(record);
+    file.writeAsStringSync(prettyprint);
   }
 
   /// Load entries from a file.

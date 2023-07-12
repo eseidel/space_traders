@@ -92,6 +92,8 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
+    when(() => centralCommand.maxAgeForExplorerData)
+        .thenReturn(const Duration(days: 3));
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

@@ -1,3 +1,4 @@
+import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 
 /// Enum to specify which behavior the ship should follow.
@@ -33,21 +34,28 @@ enum Behavior {
 // behavior for that ship or ship-type for some timeout.
 class BehaviorState {
   /// Create a new behavior state.
-  BehaviorState(this.shipSymbol, this.behavior, {this.destination, this.deal});
+  BehaviorState(
+    this.shipSymbol,
+    this.behavior, {
+    this.deal,
+    this.routePlan,
+  });
 
   /// Create a new behavior state from JSON.
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
     final behavior = Behavior.fromJson(json['behavior'] as String);
     final shipSymbol = json['shipSymbol'] as String;
-    final destination = json['destination'] as String?;
     final deal = json['deal'] == null
         ? null
         : CostedDeal.fromJson(json['deal'] as Map<String, dynamic>);
+    final routePlan = json['routePlan'] == null
+        ? null
+        : RoutePlan.fromJson(json['routePlan'] as Map<String, dynamic>);
     return BehaviorState(
       shipSymbol,
       behavior,
-      destination: destination,
       deal: deal,
+      routePlan: routePlan,
     );
   }
 
@@ -57,19 +65,19 @@ class BehaviorState {
   /// The current behavior.
   final Behavior behavior;
 
-  /// Current navigation destination.
-  String? destination;
-
   /// Current deal.
   CostedDeal? deal;
+
+  /// Current route plan.
+  RoutePlan? routePlan;
 
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'behavior': behavior.toJson(),
       'shipSymbol': shipSymbol,
-      'destination': destination,
       'deal': deal?.toJson(),
+      'routePlan': routePlan?.toJson(),
     };
   }
 }

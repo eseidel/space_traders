@@ -4,6 +4,7 @@ import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
@@ -77,8 +78,29 @@ class CentralCommand {
 
   final BehaviorCache _behaviorCache;
   final ShipCache _shipCache;
+  Duration _maxAgeForExplorerData = const Duration(days: 3);
 
   int _loops = 0;
+
+  /// Returns true if contract trading is enabled.
+  /// We will only accept and start new contracts when this is true.
+  /// We will continue to deliver current contract deals even if this is false,
+  /// but will not start new deals involving contracts.
+  bool get isContractTradingEnabled => true;
+
+  /// Minimum profit per second we will accept when trading.
+  // Should set this based on the ship type and how much we expect to earn
+  // from other sources (e.g. hauling mining goods?)
+  int get minTraderProfitPerSecond => 7;
+
+  /// Data older than this will be refreshed by explorers.
+  /// Explorers will shorten this time if they run out of places to explore.
+  Duration get maxAgeForExplorerData => _maxAgeForExplorerData;
+
+  /// Shorten the max age for explorer data.
+  Duration shortenMaxAgeForExplorerData() {
+    return _maxAgeForExplorerData ~/= 2;
+  }
 
   /// Give the central command a chance to run.
   void runCentralCommandLogic() {
@@ -161,7 +183,8 @@ class CentralCommand {
       // Behavior.trader,
       // Behavior.miner,
       // Behavior.idle,
-      // Behavior.explorer,
+      // Hangs too much for now.
+      Behavior.explorer,
     ];
 
     // Probably want special behavior for the command ship when we
@@ -180,7 +203,7 @@ class CentralCommand {
         Behavior.explorer,
       ],
       ShipRole.EXCAVATOR: [Behavior.miner],
-      ShipRole.SATELLITE: [Behavior.explorer],
+      ShipRole.SATELLITE: [Behavior.idle],
     }[ship.registration.role];
     if (behaviors != null) {
       for (final behavior in behaviors) {
@@ -260,22 +283,22 @@ class CentralCommand {
     return _behaviorCache.deleteBehavior(shipSymbol);
   }
 
-  /// Set the destination for the given ship.
-  Future<void> setDestination(Ship ship, String destinationSymbol) async {
+  /// Set the [RoutePlan] for the ship.
+  Future<void> setRoutePlan(Ship ship, RoutePlan routePlan) async {
     final state = _behaviorCache.getBehavior(ship.symbol)!
-      ..destination = destinationSymbol;
+      ..routePlan = routePlan;
     _behaviorCache.setBehavior(ship.symbol, state);
   }
 
-  /// Get the current destination for the given ship.
-  String? currentDestination(Ship ship) {
+  /// Get the current [RoutePlan] for the given ship.
+  RoutePlan? currentRoutePlan(Ship ship) {
     final state = _behaviorCache.getBehavior(ship.symbol);
-    return state?.destination;
+    return state?.routePlan;
   }
 
   /// The [ship] has reached its destination.
-  Future<void> reachedDestination(Ship ship) async {
-    final state = _behaviorCache.getBehavior(ship.symbol)!..destination = null;
+  Future<void> reachedEndOfRoutePlan(Ship ship) async {
+    final state = _behaviorCache.getBehavior(ship.symbol)!..routePlan = null;
     _behaviorCache.setBehavior(ship.symbol, state);
   }
 
@@ -326,17 +349,6 @@ class CentralCommand {
     }
   }
 
-  /// Returns true if contract trading is enabled.
-  /// We will only accept and start new contracts when this is true.
-  /// We will continue to deliver current contract deals even if this is false,
-  /// but will not start new deals involving contracts.
-  bool get isContractTradingEnabled => true;
-
-  /// Minimum profit per second we will accept when trading.
-  // Should set this based on the ship type and how much we expect to earn
-  // from other sources (e.g. hauling mining goods?)
-  int get minTraderProfitPerSecond => 7;
-
   /// Procurment contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
@@ -349,7 +361,8 @@ class CentralCommand {
           tradeSymbol: good.tradeSymbol,
           contractId: contract.id,
           price: _maxWorthwhileUnitPurchasePrice(contract, good),
-          maxUnits: remainingUnitsNeededForContract(contract, good.tradeSymbol),
+          maxUnits:
+              _remainingUnitsNeededForContract(contract, good.tradeSymbol),
         );
       }
     }
@@ -387,10 +400,10 @@ class CentralCommand {
     /// include extra SellOpps for the contract goods.
     final extraSellOpps = isContractTradingEnabled
         ? contractSellOpps(agentCache, contractCache).toList()
-        : null;
-    if (extraSellOpps != null) {
+        : <SellOpp>[];
+    if (extraSellOpps.isNotEmpty) {
       final opp = extraSellOpps.first;
-      logger.info(
+      logger.detail(
         'Including contract sell opp: ${opp.maxUnits} ${opp.tradeSymbol} '
         '@ ${creditsString(opp.price)} -> ${opp.marketSymbol}',
       );
@@ -418,14 +431,17 @@ class CentralCommand {
     return maybeDeal;
   }
 
-  /// Returns all systems containing explorers or explorer destinations.
-  Iterable<String> otherExplorerSystems(String thisShipSymbol) sync* {
+  /// Returns other systems containing ships with [behavior].
+  Iterable<String> _otherSystemsWithBehavior(
+    String thisShipSymbol,
+    Behavior behavior,
+  ) sync* {
     for (final state in _behaviorCache.states) {
       if (state.shipSymbol == thisShipSymbol) {
         continue;
       }
-      if (state.behavior == Behavior.explorer) {
-        final destination = state.destination;
+      if (state.behavior == behavior) {
+        final destination = state.routePlan?.endSymbol;
         if (destination != null) {
           final parsed = parseWaypointString(destination);
           yield parsed.system;
@@ -436,6 +452,14 @@ class CentralCommand {
       }
     }
   }
+
+  /// Returns all systems containing explorers or explorer destinations.
+  Iterable<String> otherExplorerSystems(String thisShipSymbol) =>
+      _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
+
+  /// Returns all systems containing explorers or explorer destinations.
+  Iterable<String> _otherTraderSystems(String thisShipSymbol) =>
+      _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
   int _countOfTypeInFleet(ShipType shipType) {
     final frameForType = {
@@ -504,15 +528,8 @@ class CentralCommand {
 
     // We should buy haulers if we have fewer than X haulers idle.
     if (typesToBuy.contains(ShipType.LIGHT_HAULER)) {
-      final haulerSymbols =
-          _shipCache.ships.where((s) => s.isHauler).map((s) => s.symbol);
-      final idleBehaviors = [Behavior.idle, Behavior.explorer];
-      final idleHaulerStates = _behaviorCache.states
-          .where((s) => haulerSymbols.contains(s.shipSymbol))
-          .where((s) => idleBehaviors.contains(s.behavior))
-          .toList();
-      logger.info('Found ${idleHaulerStates.length} idle haulers.');
-      if (idleHaulerStates.length < 4) {
+      final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
+      if (idleHaulers.length < 4) {
         return ShipType.LIGHT_HAULER;
       }
     }
@@ -551,6 +568,13 @@ class CentralCommand {
   /// What the max multiplier of median we would pay for a ship.
   double get maxMedianShipPriceMultipler => 1.1;
 
+  /// How many haulers do we have?
+  int get numberOfHaulers =>
+      _shipCache.frameCounts[ShipFrameSymbolEnum.LIGHT_FREIGHTER] ?? 0;
+
+  /// The minimum credits we should have to buy a new ship.
+  int get minimumCreditsForTrading => numberOfHaulers * 10000;
+
   /// Attempt to buy a ship for the given [ship].
   Future<bool> buyShipIfPossible(
     Api api,
@@ -562,6 +586,7 @@ class CentralCommand {
         isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
       return false;
     }
+
     // TODO(eseidel): Consider which ships are sold at this shipyard.
 
     // This assumes the ship in question is at a shipyard and already docked.
@@ -579,7 +604,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'No ships needed.',
-        const Duration(minutes: 1),
+        const Duration(minutes: 10),
       );
       return false;
     }
@@ -591,19 +616,23 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Failed to buy ship, no median price for $shipType.',
-        const Duration(minutes: 1),
+        const Duration(minutes: 10),
       );
       return false;
     }
     final maxMedianMultiplier = maxMedianShipPriceMultipler;
     final maxPrice = (medianPrice * maxMedianMultiplier).toInt();
-    final credits = agentCache.agent.credits;
+
+    // We should only try to buy new ships if we have enough money to keep
+    // our traders trading.
+    final budget = agentCache.agent.credits - minimumCreditsForTrading;
+    final credits = budget;
     if (credits < maxPrice) {
       await disableBehaviorForAll(
         ship,
         Behavior.buyShip,
-        'Can not buy $shipType, credits $credits < max price $maxPrice.',
-        const Duration(minutes: 1),
+        'Can not buy $shipType, budget $credits < max price $maxPrice.',
+        const Duration(minutes: 10),
       );
       return false;
     }
@@ -617,7 +646,7 @@ class CentralCommand {
         ship,
         Behavior.buyShip,
         'Shipyard at $waypointSymbol does not sell $shipType.',
-        const Duration(minutes: 1),
+        const Duration(minutes: 10),
       );
       return false;
     }
@@ -629,7 +658,7 @@ class CentralCommand {
         Behavior.buyShip,
         'Failed to buy $shipType at $waypointSymbol, '
         '$recentPriceString > max price $maxPrice.',
-        const Duration(minutes: 1),
+        const Duration(minutes: 10),
       );
       return false;
     }
@@ -648,20 +677,34 @@ class CentralCommand {
       ship,
       Behavior.buyShip,
       'Purchase of ${result.ship.symbol} ($shipType) successful!',
-      const Duration(minutes: 1),
+      const Duration(minutes: 10),
     );
     return true;
+  }
+
+  /// Returns the ship symbols working on [contract].
+  Iterable<String> _shipSymbolsServicingContract(Contract contract) {
+    return _behaviorCache.states
+        .where((state) => state.deal?.contractId == contract.id)
+        .map((state) => state.shipSymbol);
   }
 
   /// Computes the number of units needed to fulfill the given [contract].
   /// It should exclude units already spoken for by other ships, but doesn't
   /// yet.
-  int remainingUnitsNeededForContract(Contract contract, String tradeSymbol) {
-    // TODO(eseidel): This has the potential of racing with multiple ships.
-    // This should look at the deals other ships are working on and subtract
-    // those from what remains in the contract.
+  int _remainingUnitsNeededForContract(Contract contract, String tradeSymbol) {
+    final shipSymbols = _shipSymbolsServicingContract(contract);
+    final ships = _shipCache.ships.where((s) => shipSymbols.contains(s.symbol));
+    // This is an over-estimation of the max units in flight since
+    // ships might get to a destination and not buy a full load.
+    final maxUnitsInFlight = ships.fold<int>(
+      0,
+      (sum, ship) => sum + ship.cargo.capacity,
+    );
     final neededGood = contract.goodNeeded(tradeSymbol);
-    return neededGood!.unitsRequired - neededGood.unitsFulfilled;
+    return neededGood!.unitsRequired -
+        neededGood.unitsFulfilled -
+        maxUnitsInFlight;
   }
 
   /// Returns the symbol of the nearest mine to the given [ship].
@@ -694,6 +737,38 @@ class CentralCommand {
     //   );
     //   return null;
     // }
+  }
+
+  /// Find a better destination for the given trader [ship].
+  Future<String?> findBetterTradeLocation(
+    SystemsCache systemsCache,
+    SystemConnectivity systemConnectivity,
+    JumpCache jumpCache,
+    AgentCache agentCache,
+    MarketPrices marketPrices,
+    Ship ship, {
+    required int maxJumps,
+    required int maxWaypoints,
+  }) async {
+    final traderSystems = _otherTraderSystems(ship.symbol).toList();
+    final search = _MarketSearch.start(
+      marketPrices,
+      systemsCache,
+      avoidSystems: traderSystems.toSet(),
+    );
+    final placement = await _findBetterSystemForTrader(
+      systemsCache,
+      systemConnectivity,
+      jumpCache,
+      agentCache,
+      marketPrices,
+      search,
+      ship,
+      maxJumps: maxJumps,
+      maxWaypoints: maxWaypoints,
+      profitPerSecondThreshold: minTraderProfitPerSecond,
+    );
+    return placement?.destinationSymbol;
   }
 }
 
@@ -751,4 +826,194 @@ Iterable<Contract> affordableContracts(
   final credits = agentCache.agent.credits;
   return contractsCache.activeContracts
       .where((c) => _minimumFloatRequired(c) <= credits);
+}
+
+/// Compute the score for each market based on the distance of each good's
+/// price from the median price.
+Map<String, int> scoreMarketSystems(
+  MarketPrices marketPrices, {
+  int limit = 100,
+}) {
+  // Walk all markets in the market prices.  Get all goods for each market
+  // compute the absolute distance for each good from the median price
+  // sum up that value for the market and record that as the "market score".
+
+  // First calculate median prices for all goods.
+  final medianPurchasePrices = <String, int?>{};
+  final medianSellPrices = <String, int?>{};
+  for (final tradeSymbolEnum in TradeSymbol.values) {
+    final tradeSymbol = tradeSymbolEnum.value;
+    medianPurchasePrices[tradeSymbol] =
+        marketPrices.medianPurchasePrice(tradeSymbol);
+    medianSellPrices[tradeSymbol] = marketPrices.medianSellPrice(tradeSymbol);
+  }
+
+  final marketSystemScores = <String, int>{};
+  for (final price in marketPrices.prices) {
+    final market = price.waypointSymbol;
+    final system = parseWaypointString(market).system;
+    final medianPurchasePrice = medianPurchasePrices[price.symbol]!;
+    final medianSellPrice = medianSellPrices[price.symbol]!;
+    final purchaseScore = (price.purchasePrice - medianPurchasePrice).abs();
+    final sellScore = (price.sellPrice - medianSellPrice).abs();
+    final score = purchaseScore + sellScore;
+    marketSystemScores[system] = (marketSystemScores[system] ?? 0) + score;
+  }
+
+  final sortedScores = marketSystemScores.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  return Map.fromEntries(sortedScores.take(limit));
+}
+
+/// Returns the ship symbols for all idle haulers.
+List<String> idleHaulerSymbols(
+  ShipCache shipCache,
+  BehaviorCache behaviorCache,
+) {
+  final haulerSymbols =
+      shipCache.ships.where((s) => s.isHauler).map((s) => s.symbol);
+  final idleBehaviors = [Behavior.idle, Behavior.explorer];
+  final idleHaulerStates = behaviorCache.states
+      .where((s) => haulerSymbols.contains(s.shipSymbol))
+      .where((s) => idleBehaviors.contains(s.behavior))
+      .toList();
+  return idleHaulerStates.map((s) => s.shipSymbol).toList();
+}
+
+System? _closestSystem(
+  SystemsCache systemsCache,
+  System start,
+  List<System> systems,
+) {
+  var bestDistance = double.infinity;
+  System? bestSystem;
+  for (final system in systems) {
+    final distance = start.distanceTo(system);
+    if (distance < bestDistance) {
+      bestDistance = distance.toDouble();
+      bestSystem = system;
+    }
+  }
+  return bestSystem;
+}
+
+class _ShipPlacement {
+  _ShipPlacement({
+    required this.score,
+    required this.distance,
+    required this.profitPerSecond,
+    required this.destinationSymbol,
+  });
+
+  final int score;
+  final int distance;
+  final int profitPerSecond;
+  final String destinationSymbol;
+}
+
+class _MarketSearch {
+  _MarketSearch({
+    required this.marketSystems,
+    required this.marketSystemScores,
+    required this.claimedSystemSymbols,
+  });
+
+  factory _MarketSearch.start(
+    MarketPrices marketPrices,
+    SystemsCache systemsCache, {
+    Set<String>? avoidSystems,
+  }) {
+    final marketSystemScores = scoreMarketSystems(marketPrices);
+    final marketSystems =
+        marketSystemScores.keys.map(systemsCache.systemBySymbol).toList();
+    return _MarketSearch(
+      marketSystems: marketSystems,
+      marketSystemScores: marketSystemScores,
+      claimedSystemSymbols: avoidSystems ?? {},
+    );
+  }
+
+  final List<System> marketSystems;
+  final Map<String, int> marketSystemScores;
+  final Set<String> claimedSystemSymbols;
+
+  System? closestAvailableSystem(
+    SystemsCache systemsCache,
+    System startSystem,
+  ) {
+    final availableSystems = marketSystems
+        .where((system) => !claimedSystemSymbols.contains(system.symbol))
+        .toList();
+    return _closestSystem(systemsCache, startSystem, availableSystems);
+  }
+
+  void markUsed(System system) => claimedSystemSymbols.add(system.symbol);
+
+  int scoreFor(String systemSymbol) => marketSystemScores[systemSymbol]!;
+}
+
+Future<_ShipPlacement?> _findBetterSystemForTrader(
+  SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
+  AgentCache agentCache,
+  MarketPrices marketPrices,
+  _MarketSearch search,
+  Ship ship, {
+  required int maxJumps,
+  required int maxWaypoints,
+  required int profitPerSecondThreshold,
+}) async {
+  final shipSymbol = ship.symbol;
+  final shipSystem = systemsCache.systemBySymbol(ship.nav.systemSymbol);
+  while (true) {
+    final closest = search.closestAvailableSystem(systemsCache, shipSystem);
+    if (closest == null) {
+      logger.info('No nearby markets for $shipSymbol');
+      return null;
+    }
+    search.markUsed(closest);
+    final score = search.scoreFor(closest.symbol);
+    final scan = scanNearbyMarkets(
+      systemsCache,
+      marketPrices,
+      systemSymbol: closest.symbol,
+      maxJumps: maxJumps,
+      maxWaypoints: maxWaypoints,
+    );
+    final systemJumpGate =
+        systemsCache.jumpGateWaypointForSystem(closest.symbol)!;
+    final deal = await findDealFor(
+      marketPrices,
+      systemsCache,
+      systemConnectivity,
+      jumpCache,
+      scan,
+      startSymbol: systemJumpGate.symbol,
+      fuelCapacity: ship.fuel.capacity,
+      cargoCapacity: ship.cargo.capacity,
+      shipSpeed: ship.engine.speed,
+      maxJumps: maxJumps,
+      maxTotalOutlay: agentCache.agent.credits,
+    );
+    if (deal == null) {
+      logger.info('No deal found for $shipSymbol at ${closest.symbol}');
+      search.markUsed(closest);
+      continue;
+    }
+    final profitPerSecond = deal.expectedProfitPerSecond;
+    if (profitPerSecond < profitPerSecondThreshold) {
+      logger.info('Profit per second too low for $shipSymbol at '
+          '${closest.symbol}, $profitPerSecond < $profitPerSecondThreshold');
+      search.markUsed(closest);
+      continue;
+    }
+    final placement = _ShipPlacement(
+      score: score,
+      distance: shipSystem.distanceTo(closest),
+      profitPerSecond: profitPerSecond,
+      destinationSymbol: systemJumpGate.symbol,
+    );
+    return placement;
+  }
 }

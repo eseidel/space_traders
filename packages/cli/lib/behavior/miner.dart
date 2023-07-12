@@ -212,7 +212,7 @@ Future<DateTime?> advanceMiner(
       );
       return null;
     }
-    return beingRouteAndLog(
+    return beingNewRouteAndLog(
       api,
       ship,
       caches.systems,
@@ -234,7 +234,7 @@ Future<DateTime?> advanceMiner(
     return null;
   }
   if (ship.nav.waypointSymbol != mineSymbol) {
-    return beingRouteAndLog(
+    return beingNewRouteAndLog(
       api,
       ship,
       caches.systems,

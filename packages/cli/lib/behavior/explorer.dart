@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -9,24 +8,30 @@ import 'package:cli/printing.dart';
 bool _isMissingChartOrRecentPriceData(
   MarketPrices marketPrices,
   ShipyardPrices shipyardPrices,
-  Waypoint waypoint,
-) {
+  Waypoint waypoint, {
+  required Duration maxAge,
+}) {
   return waypoint.chart == null ||
-      _isMissingRecentMarketData(marketPrices, waypoint) ||
-      _isMissingRecentShipyardData(shipyardPrices, waypoint);
+      _isMissingRecentMarketData(marketPrices, waypoint, maxAge: maxAge) ||
+      _isMissingRecentShipyardData(shipyardPrices, waypoint, maxAge: maxAge);
 }
 
-bool _isMissingRecentMarketData(MarketPrices marketPrices, Waypoint waypoint) {
+bool _isMissingRecentMarketData(
+  MarketPrices marketPrices,
+  Waypoint waypoint, {
+  required Duration maxAge,
+}) {
   return waypoint.hasMarketplace &&
-      !marketPrices.hasRecentMarketData(waypoint.symbol);
+      !marketPrices.hasRecentMarketData(waypoint.symbol, maxAge: maxAge);
 }
 
 bool _isMissingRecentShipyardData(
   ShipyardPrices shipyardPrices,
-  Waypoint waypoint,
-) {
+  Waypoint waypoint, {
+  required Duration maxAge,
+}) {
   return waypoint.hasShipyard &&
-      !shipyardPrices.hasRecentShipyardData(waypoint.symbol);
+      !shipyardPrices.hasRecentShipyardData(waypoint.symbol, maxAge: maxAge);
 }
 
 /// Visits the local market if we're at a waypoint with a market.
@@ -68,6 +73,61 @@ Future<Market?> visitLocalMarket(
   return market;
 }
 
+Future<Waypoint?> _findNewWaypointToExplore(
+  WaypointCache waypointCache,
+  MarketPrices marketPrices,
+  ShipyardPrices shipyardPrices,
+  Ship ship, {
+  required String startSystem,
+  required int maxJumpDistance,
+  required bool Function(String systemSymbol) filter,
+  required Duration maxAge,
+}) async {
+  await for (final destination in waypointCache.waypointsInJumpRadius(
+    startSystem: startSystem,
+    maxJumps: maxJumpDistance,
+  )) {
+    if (!filter(destination.symbol)) {
+      // We already have a ship in this system, don't route there.
+      continue;
+    }
+    if (!_isMissingChartOrRecentPriceData(
+      marketPrices,
+      shipyardPrices,
+      destination,
+      maxAge: maxAge,
+    )) {
+      continue;
+    }
+    if (destination.chart == null) {
+      shipInfo(
+        ship,
+        '${destination.symbol} is missing chart, routing.',
+      );
+    } else if (_isMissingRecentMarketData(
+      marketPrices,
+      destination,
+      maxAge: maxAge,
+    )) {
+      shipInfo(
+        ship,
+        '${destination.symbol} is missing recent '
+        '(${approximateDuration(defaultMaxAge)}) market data, '
+        'routing.',
+      );
+    } else {
+      shipInfo(
+        ship,
+        '${destination.symbol} is missing recent '
+        '(${approximateDuration(defaultMaxAge)}) shipyard data, '
+        'routing.',
+      );
+    }
+    return destination;
+  }
+  return null;
+}
+
 /// One loop of the exploring logic.
 Future<DateTime?> advanceExplorer(
   Api api,
@@ -78,6 +138,7 @@ Future<DateTime?> advanceExplorer(
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
+  final maxAge = centralCommand.maxAgeForExplorerData;
   final waypoint = await caches.waypoints.waypoint(ship.nav.waypointSymbol);
   // advanceExplorer is only ever called when we're idle at a location, so
   // either it's the first time and we need to set a destination, or we've just
@@ -87,6 +148,7 @@ Future<DateTime?> advanceExplorer(
     caches.marketPrices,
     caches.shipyardPrices,
     waypoint,
+    maxAge: maxAge,
   )) {
     if (waypoint.chart == null) {
       await chartWaypointAndLog(api, ship);
@@ -107,64 +169,52 @@ Future<DateTime?> advanceExplorer(
   }
 
   final probeSystems = centralCommand.otherExplorerSystems(ship.symbol).toSet();
-  const maxJumpDistance = 100;
+  // TODO(eseidel): maxWaypoints rather than max jumps.
+  const maxJumpDistance = 20;
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
-  await for (final destination in caches.waypoints.waypointsInJumpRadius(
-    startSystem: waypoint.systemSymbol,
-    maxJumps: maxJumpDistance,
-  )) {
-    if (probeSystems.contains(destination.systemSymbol)) {
-      // We already have a ship in this system, don't route there.
-      continue;
-    }
-    if (_isMissingChartOrRecentPriceData(
-      caches.marketPrices,
-      caches.shipyardPrices,
-      destination,
-    )) {
-      if (destination.chart == null) {
-        shipInfo(
-          ship,
-          '${destination.symbol} is missing chart, routing.',
-        );
-      } else if (_isMissingRecentMarketData(
-        caches.marketPrices,
-        destination,
-      )) {
-        shipInfo(
-          ship,
-          '${destination.symbol} is missing recent '
-          '(${approximateDuration(defaultMaxAge)}) market data, '
-          'routing.',
-        );
-      } else {
-        shipInfo(
-          ship,
-          '${destination.symbol} is missing recent '
-          '(${approximateDuration(defaultMaxAge)}) shipyard data, '
-          'routing.',
-        );
-      }
-      return beingRouteAndLog(
-        api,
-        ship,
-        caches.systems,
-        caches.systemConnectivity,
-        caches.jumps,
-        centralCommand,
-        destination.symbol,
-      );
-    }
+  // TODO(eseidel): This can take a very long time on a cold cache.
+  final startTime = getNow();
+  final destination = await _findNewWaypointToExplore(
+    caches.waypoints,
+    caches.marketPrices,
+    caches.shipyardPrices,
+    ship,
+    startSystem: ship.nav.systemSymbol,
+    maxJumpDistance: maxJumpDistance,
+    filter: (String systemSymbol) => !probeSystems.contains(systemSymbol),
+    maxAge: maxAge,
+  );
+  final endTime = getNow();
+  final elapsed = endTime.difference(startTime);
+  if (elapsed > const Duration(seconds: 5)) {
+    shipErr(
+      ship,
+      'Took ${approximateDuration(elapsed)} to find next system to explore.',
+    );
+  }
+  if (destination != null) {
+    return beingNewRouteAndLog(
+      api,
+      ship,
+      caches.systems,
+      caches.systemConnectivity,
+      caches.jumps,
+      centralCommand,
+      destination.symbol,
+    );
   }
   // If we get here, we've explored all systems within maxJumpDistance jumps
-  // of this system.  We just log an error and sleep.
-  await centralCommand.disableBehaviorForShip(
+  // of this system.
+  shipWarn(
     ship,
-    Behavior.explorer,
     'No unexplored systems within $maxJumpDistance jumps of '
     '${waypoint.systemSymbol}.',
-    const Duration(hours: 1),
+  );
+  final newMaxAge = centralCommand.shortenMaxAgeForExplorerData();
+  shipWarn(
+    ship,
+    'Shortened maxAge to ${approximateDuration(newMaxAge)} and resuming.',
   );
   return null;
 }

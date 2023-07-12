@@ -58,7 +58,9 @@ Future<void> cliMain(List<String> args) async {
   // const shipSpeed = 30;
   // const fuelCapacity = 1200;
   // final agentCache = AgentCache.loadCached(fs)!;
-  final start = agentCache.headquarters(systemsCache);
+  final start = results.rest.isEmpty
+      ? agentCache.headquarters(systemsCache)
+      : systemsCache.waypointFromSymbol(results.rest.first);
 
   // Finding deals with start: X1-SB93-93497E, max jumps: 5,
   // max outlay: 1172797, max units: 120, fuel capacity: 1700, ship speed: 10

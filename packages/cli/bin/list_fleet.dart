@@ -23,37 +23,6 @@ String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
   return string;
 }
 
-Duration timeToDestination(
-  SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  JumpCache jumpCache,
-  Ship ship,
-  String destinationSymbol,
-) {
-  var time = Duration.zero;
-  if (ship.isInTransit) {
-    time += ship.nav.route.arrival.difference(DateTime.timestamp());
-  }
-  // We could find this waypoint in the Deal route and take the reamining
-  // actions and compute from those?
-  final start = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
-  final end = systemsCache.waypointFromSymbol(destinationSymbol);
-  final route = planRoute(
-    systemsCache,
-    systemConnectivity,
-    jumpCache,
-    start: start,
-    end: end,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
-  );
-  if (route == null) {
-    shipWarn(ship, 'No route to $destinationSymbol!?');
-    return time;
-  }
-  return time + Duration(seconds: route.duration);
-}
-
 String describeInventory(
   MarketPrices marketPrices,
   List<ShipCargoItem> inventory, {
@@ -74,6 +43,17 @@ String describeInventory(
   return lines.join('\n');
 }
 
+Duration timeToArrival(
+  SystemsCache systemsCache,
+  RoutePlan routePlan,
+  String waypointSymbol,
+) {
+  final newPlan = routePlan.subPlanStartingFrom(systemsCache, waypointSymbol);
+  // Include cooldown until next jump.
+  // Include remaining navigation time.
+  return Duration(seconds: newPlan.duration);
+}
+
 void logShip(
   SystemsCache systemsCache,
   CentralCommand centralCommand,
@@ -91,17 +71,13 @@ void logShip(
       describeInventory(marketPrices, ship.cargo.inventory, indent: '  '),
     );
   }
-  final destination = behavior?.destination;
-  if (destination != null) {
-    final timeToArrival = timeToDestination(
-      systemsCache,
-      systemConnectivity,
-      jumpCache,
-      ship,
-      destination,
-    );
+  final routePlan = behavior?.routePlan;
+  if (routePlan != null) {
+    final timeLeft =
+        timeToArrival(systemsCache, routePlan, ship.nav.waypointSymbol);
+    final destination = routePlan.endSymbol;
     logger.info('  destination: $destination, '
-        'arrives in ${approximateDuration(timeToArrival)}');
+        'arrives in ${approximateDuration(timeLeft)}');
   }
   final deal = behavior?.deal;
   if (deal != null) {

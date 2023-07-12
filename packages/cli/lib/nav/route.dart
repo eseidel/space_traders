@@ -184,12 +184,6 @@ class RoutePlan {
     );
   }
 
-  /// Create an empty route plan.
-  @visibleForTesting
-  const RoutePlan.empty({required this.shipSpeed, required this.fuelCapacity})
-      : actions = const [],
-        fuelUsed = 0;
-
   /// The fuel capacity the route was planned for.
   final int fuelCapacity;
 
@@ -210,6 +204,37 @@ class RoutePlan {
 
   /// The total time of this route in seconds.
   int get duration => actions.fold<int>(0, (a, b) => a + b.duration);
+
+  /// Returns the next action to take from the given waypoint.
+  RouteAction nextActionFrom(String waypointSymbol) {
+    final index = actions.indexWhere((e) => e.startSymbol == waypointSymbol);
+    if (index == -1) {
+      throw ArgumentError('No action starting from $waypointSymbol');
+    }
+    return actions[index];
+  }
+
+  /// Makes a new route plan starting from the given waypoint.
+  RoutePlan subPlanStartingFrom(
+    SystemsCache systemsCache,
+    String waypointSymbol,
+  ) {
+    final index = actions.indexWhere((e) => e.startSymbol == waypointSymbol);
+    if (index == -1) {
+      throw ArgumentError('No action starting from $waypointSymbol');
+    }
+    final newActions = actions.sublist(index);
+    final fuelUsed = _fuelUsedByActions(
+      systemsCache,
+      newActions,
+    );
+    return RoutePlan(
+      fuelCapacity: fuelCapacity,
+      shipSpeed: shipSpeed,
+      actions: newActions,
+      fuelUsed: fuelUsed,
+    );
+  }
 
   /// Convert this route plan to JSON.
   Map<String, dynamic> toJson() => <String, dynamic>{

@@ -362,11 +362,16 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
 }
 
 /// Negotiate a contract for [ship] and log.
-Future<Contract> negotiateContractAndLog(Api api, Ship ship) async {
+Future<Contract> negotiateContractAndLog(
+  Api api,
+  Ship ship,
+  ContractCache contractCache,
+) async {
   await dockIfNeeded(api, ship);
   final response = await api.fleet.negotiateContract(ship.symbol);
   final contractData = response!.data;
   final contract = contractData.contract;
+  await contractCache.updateContract(contract);
   shipInfo(ship, 'Negotiated contract: ${contractDescription(contract)}');
   return contract;
 }

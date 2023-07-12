@@ -478,7 +478,7 @@ MarketScan scanNearbyMarkets(
       )
       .take(maxWaypoints)
       .toSet();
-  logger.info('Considering ${allowedWaypoints.length} waypoints');
+  logger.detail('Considering ${allowedWaypoints.length} waypoints');
 
   return MarketScan.fromMarketPrices(
     marketPrices,
@@ -508,8 +508,8 @@ CostedDeal? _filterDealsAndLog(
   final sortedDeals =
       affordable.sortedBy<num>((e) => e.expectedProfitPerSecond);
 
-  logger.info('Considering deals:');
-  for (final deal in sortedDeals) {
+  logger.info('Top 5 deals $withinRange:');
+  for (final deal in sortedDeals.reversed.take(5).toList().reversed) {
     logger.info(describeCostedDeal(deal));
   }
 
@@ -565,7 +565,7 @@ Future<CostedDeal?> findDealFor(
   List<SellOpp>? extraSellOpps,
   bool Function(CostedDeal deal)? filter,
 }) async {
-  logger.info(
+  logger.detail(
     'Finding deals with '
     'start: $startSymbol, '
     'max jumps: $maxJumps, '
@@ -576,7 +576,7 @@ Future<CostedDeal?> findDealFor(
   );
 
   final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
-  logger.info('Found ${deals.length} potential deals.');
+  logger.detail('Found ${deals.length} potential deals.');
 
   final before = DateTime.now();
   final costedDeals = deals
@@ -597,7 +597,9 @@ Future<CostedDeal?> findDealFor(
       .toList();
   // toList is used to force resolution of the list before we log.
   final after = DateTime.now();
-  logger.info('costed deals in ${after.difference(before)}');
+  final elapsed = after.difference(before);
+  logger
+      .info('Costed ${deals.length} deals in ${approximateDuration(elapsed)}');
   return _filterDealsAndLog(
     costedDeals,
     maxJumps: maxJumps,

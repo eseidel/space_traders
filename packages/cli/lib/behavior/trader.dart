@@ -10,6 +10,10 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
+const _maxJumps = 10;
+// TODO(eseidel): Make maxWaypoints bigger as routing gets faster.
+const _maxWaypoints = 100;
+
 // This is split out from the main function to allow early returns.
 /// Public to allow sharing with contract trader (for now).
 Future<Transaction?> purchaseTradeGoodIfPossible(
@@ -153,14 +157,15 @@ Future<DateTime?> _handleAtSourceWithDeal(
   }
 
   // Otherwise we've bought what we can here, deliver what we have.
-  return beingRouteAndLog(
+  // TODO(eseidel): Could use beginRouteAndLog instead?
+  return beingNewRouteAndLog(
     api,
     ship,
     caches.systems,
     caches.systemConnectivity,
     caches.jumps,
     centralCommand,
-    costedDeal.deal.destinationSymbol,
+    costedDeal.route.endSymbol,
   );
 }
 
@@ -172,20 +177,6 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   Market currentMarket,
   CostedDeal costedDeal,
 ) async {
-  final haveDealCargo = ship.cargo.countUnits(costedDeal.tradeSymbol) > 0;
-  if (!haveDealCargo) {
-    // We don't have any deal cargo, so we must have just gotten a new
-    // deal which *ends* here, but we haven't gotten the cargo yet, go get it.
-    return beingRouteAndLog(
-      api,
-      ship,
-      caches.systems,
-      caches.systemConnectivity,
-      caches.jumps,
-      centralCommand,
-      costedDeal.deal.sourceSymbol,
-    );
-  }
   // We're at the destination, sell and clear the deal.
   final transactions = await sellAllCargoAndLog(
     api,
@@ -204,7 +195,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
       'Expected ${creditsString(completedDeal.expectedProfit)} profit '
       '(${creditsString(completedDeal.expectedProfitPerSecond)}/s), got '
       '${creditsString(completedDeal.actualProfit)} '
-      '(${creditsString(completedDeal.actualProfitPerSecond)}/s)'
+      '(${creditsString(completedDeal.actualProfitPerSecond)}/s) '
       'in ${durationString(duration)}, '
       'expected ${durationString(expectedDuration)}');
   await centralCommand.completeBehavior(ship.symbol);
@@ -262,6 +253,16 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   if (units < 1) {
     return null;
   }
+  if (contract.fulfilled) {
+    // Prevent exceptions from racing ships:
+    // ApiException 400: {"error":{"message":"Failed to update contract.
+    // Contract has already been fulfilled.","code":4504,"data":
+    // {"contractId":"cljysnr2wt47as60cvz377bhh"}}}
+    shipWarn(ship, 'Contract ${contract.id} already fulfilled, ignoring.');
+    // Caller will complete behavior.
+    return null;
+  }
+
   // And we have the desired cargo.
   final response = await deliverContract(
     api,
@@ -292,7 +293,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
   final haveDealCargo = ship.cargo.countUnits(costedDeal.tradeSymbol) > 0;
   if (!haveDealCargo) {
     // We don't have the cargo we need, so go get it.
-    return beingRouteAndLog(
+    return beingNewRouteAndLog(
       api,
       ship,
       caches.systems,
@@ -304,16 +305,59 @@ Future<DateTime?> _handleOffCourseWithDeal(
   } else {
     shipInfo(ship, 'Off course in route to deal, resuming route.');
     // We have the cargo we need, so go sell it.
-    return beingRouteAndLog(
+    // TODO(eseidel): Could this use beginRouteAndLog instead?
+    return beingNewRouteAndLog(
       api,
       ship,
       caches.systems,
       caches.systemConnectivity,
       caches.jumps,
       centralCommand,
-      costedDeal.deal.destinationSymbol,
+      costedDeal.route.endSymbol,
     );
   }
+}
+
+Future<DateTime?> _handleAtDestinationWithDeal(
+  Api api,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship,
+  Market currentMarket,
+  CostedDeal costedDeal,
+) {
+  final haveDealCargo = ship.cargo.countUnits(costedDeal.tradeSymbol) > 0;
+  if (!haveDealCargo) {
+    // We don't have any deal cargo, so we must have just gotten a new
+    // deal which *ends* here, but we haven't gotten the cargo yet, go get it.
+    return beingNewRouteAndLog(
+      api,
+      ship,
+      caches.systems,
+      caches.systemConnectivity,
+      caches.jumps,
+      centralCommand,
+      costedDeal.deal.sourceSymbol,
+    );
+  }
+  if (costedDeal.isContractDeal) {
+    return _handleContractDealAtDestination(
+      api,
+      centralCommand,
+      caches,
+      ship,
+      currentMarket,
+      costedDeal,
+    );
+  }
+  return _handleArbitrageDealAtDestination(
+    api,
+    centralCommand,
+    caches,
+    ship,
+    currentMarket,
+    costedDeal,
+  );
 }
 
 Future<DateTime?> _handleDeal(
@@ -326,33 +370,33 @@ Future<DateTime?> _handleDeal(
 ) async {
   // If we're at the source buy the cargo.
   if (costedDeal.deal.sourceSymbol == ship.nav.waypointSymbol) {
+    if (currentMarket == null) {
+      throw StateError(
+        'No currentMarket for $ship at ${ship.nav.waypointSymbol}',
+      );
+    }
     return _handleAtSourceWithDeal(
       api,
       centralCommand,
       caches,
       ship,
-      currentMarket!,
+      currentMarket,
       costedDeal,
     );
   }
   // If we're at the destination of the deal, sell.
   if (costedDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
-    if (costedDeal.isContractDeal) {
-      return _handleContractDealAtDestination(
-        api,
-        centralCommand,
-        caches,
-        ship,
-        currentMarket!,
-        costedDeal,
+    if (currentMarket == null) {
+      throw StateError(
+        'No currentMarket for $ship at ${ship.nav.waypointSymbol}',
       );
     }
-    return _handleArbitrageDealAtDestination(
+    return _handleAtDestinationWithDeal(
       api,
       centralCommand,
       caches,
       ship,
-      currentMarket!,
+      currentMarket,
       costedDeal,
     );
   }
@@ -375,7 +419,7 @@ Future<DateTime?> acceptContractsIfNeeded(
   /// Accept logic we run any time contract trading is turned on.
   final contracts = contractCache.activeContracts;
   if (contracts.isEmpty) {
-    await negotiateContractAndLog(api, ship);
+    await negotiateContractAndLog(api, ship, contractCache);
     // TODO(eseidel): Print expected time and profits of the new contract.
     return null;
   }
@@ -383,6 +427,49 @@ Future<DateTime?> acceptContractsIfNeeded(
     await acceptContractAndLog(api, contractCache, agentCache, contract);
   }
   return null;
+}
+
+Future<DateTime?> _navigateToBetterTradeLocation(
+  Api api,
+  CentralCommand centralCommand,
+  SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
+  JumpCache jumpCache,
+  AgentCache agentCache,
+  MarketPrices marketPrices,
+  Ship ship,
+  String why,
+) async {
+  shipWarn(ship, why);
+  final destinationSymbol = await centralCommand.findBetterTradeLocation(
+    systemsCache,
+    systemConnectivity,
+    jumpCache,
+    agentCache,
+    marketPrices,
+    ship,
+    maxJumps: _maxJumps,
+    maxWaypoints: _maxWaypoints,
+  );
+  if (destinationSymbol == null) {
+    await centralCommand.disableBehaviorForShip(
+      ship,
+      Behavior.trader,
+      'Failed to find better location for trader.',
+      const Duration(hours: 1),
+    );
+    return null;
+  }
+  final waitUntil = await beingNewRouteAndLog(
+    api,
+    ship,
+    systemsCache,
+    systemConnectivity,
+    jumpCache,
+    centralCommand,
+    destinationSymbol,
+  );
+  return waitUntil;
 }
 
 /// One loop of the trading logic
@@ -436,9 +523,8 @@ Future<DateTime?> advanceTrader(
   /// Regardless of where we are, if we have cargo that isn't part of our deal,
   /// try to sell it.
   if (nonDealCargo != null) {
+    bool exceptDealCargo(String symbol) => symbol != dealCargo?.symbol;
     if (currentMarket != null) {
-      // If we have cargo that isn't part of our deal, sell it.
-      bool exceptDealCargo(String symbol) => symbol != dealCargo?.symbol;
       await sellAllCargoAndLog(
         api,
         caches.marketPrices,
@@ -473,7 +559,7 @@ Future<DateTime?> advanceTrader(
         );
         return null;
       }
-      return beingRouteAndLog(
+      return beingNewRouteAndLog(
         api,
         ship,
         caches.systems,
@@ -497,10 +583,6 @@ Future<DateTime?> advanceTrader(
     return waitUntil;
   }
 
-  const maxJumps = 10;
-  // TODO(eseidel): Make maxWaypoints bigger as routing gets faster.
-  const maxWaypoints = 100;
-
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
   final newDeal = await centralCommand.findNextDeal(
@@ -513,32 +595,34 @@ Future<DateTime?> advanceTrader(
     caches.waypoints,
     caches.markets,
     ship,
-    maxJumps: maxJumps,
-    maxWaypoints: maxWaypoints,
+    maxJumps: _maxJumps,
+    maxWaypoints: _maxWaypoints,
     maxTotalOutlay: caches.agent.agent.credits,
   );
 
-  if (newDeal == null) {
-    // Instead just fly to some nearby system and explore?
-    await centralCommand.disableBehaviorForShip(
+  Future<DateTime?> findBetterLocation(String why) async {
+    final waitUntil = await _navigateToBetterTradeLocation(
+      api,
+      centralCommand,
+      caches.systems,
+      caches.systemConnectivity,
+      caches.jumps,
+      caches.agent,
+      caches.marketPrices,
       ship,
-      Behavior.trader,
-      'No profitable deals within $maxJumps jumps of ${ship.nav.systemSymbol}.',
-      const Duration(minutes: 10),
+      why,
     );
-    return null;
+    return waitUntil;
   }
 
+  if (newDeal == null) {
+    return findBetterLocation('No profitable deals within $_maxJumps jumps '
+        'of ${ship.nav.systemSymbol}.');
+  }
   if (newDeal.expectedProfitPerSecond <
       centralCommand.minTraderProfitPerSecond) {
-    await centralCommand.disableBehaviorForShip(
-      ship,
-      Behavior.trader,
-      'Deal expected profit per second too low: '
-      '${creditsString(newDeal.expectedProfitPerSecond)}/s',
-      const Duration(minutes: 10),
-    );
-    return null;
+    return findBetterLocation('Deal expected profit per second too low: '
+        '${creditsString(newDeal.expectedProfitPerSecond)}/s');
   }
 
   shipInfo(ship, 'Found deal: ${describeCostedDeal(newDeal)}');

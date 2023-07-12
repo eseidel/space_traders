@@ -40,6 +40,9 @@ class JumpCache {
 
   /// Add a route between two systems.
   void addJumpPlan(JumpPlan plan) {
+    // TODO(eseidel): This could also cache each sub-segment of the path.
+    // A-B-C could be cached as A-B, B-C, A-C.
+    // Or the path lookup could find such.
     _plans.add(plan);
   }
 }

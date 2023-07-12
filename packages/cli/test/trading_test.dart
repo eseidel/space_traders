@@ -102,7 +102,19 @@ void main() {
       tradeVolume: 1,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      route: const RoutePlan(
+        actions: [
+          RouteAction(
+            startSymbol: 'A',
+            endSymbol: 'B',
+            type: RouteActionType.navCruise,
+            duration: 10,
+          )
+        ],
+        fuelCapacity: 10,
+        fuelUsed: 10,
+        shipSpeed: 10,
+      ),
       costPerFuelUnit: 100,
     );
 
@@ -191,21 +203,33 @@ void main() {
       deal: const Deal(
         sourceSymbol: 'A',
         destinationSymbol: 'B',
-        tradeSymbol: TradeSymbol.FUEL,
+        tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
         purchasePrice: 1,
         sellPrice: 2,
       ),
       tradeVolume: 1,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      route: const RoutePlan(
+        actions: [
+          RouteAction(
+            startSymbol: 'A',
+            endSymbol: 'B',
+            type: RouteActionType.navCruise,
+            duration: 10,
+          )
+        ],
+        fuelCapacity: 10,
+        fuelUsed: 0,
+        shipSpeed: 10,
+      ),
       costPerFuelUnit: 100,
     );
     final profit = lightGreen.wrap('     +1c (100%)');
     expect(
       describeCostedDeal(costed),
-      'FUEL                       A                    '
-      '1c -> B                    2c $profit 0s 1c/s 1c',
+      'ADVANCED_CIRCUITRY         A                    '
+      '1c -> B                    2c $profit 10s 0c/s 1c',
     );
   });
 
@@ -404,7 +428,19 @@ void main() {
       tradeVolume: 1,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan.empty(fuelCapacity: 10, shipSpeed: 10),
+      route: const RoutePlan(
+        actions: [
+          RouteAction(
+            startSymbol: 'A',
+            endSymbol: 'B',
+            type: RouteActionType.navCruise,
+            duration: 10,
+          )
+        ],
+        fuelCapacity: 10,
+        fuelUsed: 10,
+        shipSpeed: 10,
+      ),
       costPerFuelUnit: 100,
     );
     final transaction1 = Transaction(
