@@ -36,7 +36,11 @@ Future<DateTime?> beingNewRouteAndLog(
   }
   final action = route.actions.firstOrNull;
   if (action == null) {
-    shipErr(ship, 'No actions in route to $destinationSymbol!?');
+    shipErr(
+      ship,
+      'No actions in route to $destinationSymbol '
+      'from ${start.systemSymbol}!?',
+    );
     return null;
   }
   final waitTime = await beingRouteAndLog(

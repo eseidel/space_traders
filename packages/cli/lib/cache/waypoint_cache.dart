@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:cli/api.dart';
+import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
+import 'package:cli/third_party/compare.dart';
 import 'package:collection/collection.dart';
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.
@@ -11,57 +16,32 @@ Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
   });
 }
 
-/// Charted values from a waypoint.
-// class ChartedValues {
-//   /// Create a new ChartedValues.
-//   const ChartedValues({
-//     required this.waypointSymbol,
-//     required this.orbitals,
-//     required this.faction,
-//     required this.traits,
-//     required this.chart,
-//   });
-
-//   /// The symbol of the waypoint these are for.
-//   final String waypointSymbol;
-
-//   /// Waypoints that orbit this waypoint.
-//   final List<WaypointOrbital> orbitals;
-
-//   /// Faction owning the waypoint.
-//   final WaypointFaction faction;
-
-//   /// The traits of the waypoint.
-//   final List<WaypointTrait> traits;
-
-//   /// The chart of the waypoint.
-//   final Chart chart;
-// }
-
-// Waypoint _waypointFromCache(SystemWaypoint waypoint,
-//  ChartedValues? charted) {
-//   return Waypoint(
-//     symbol: waypoint.symbol,
-//     type: waypoint.type,
-//     systemSymbol: waypoint.systemSymbol,
-//     x: waypoint.x,
-//     y: waypoint.y,
-//     orbitals: charted?.orbitals ?? [],
-//     faction: charted?.faction,
-//     traits: charted?.traits ?? [],
-//     chart: charted?.chart,
-//   );
-// }
+// TODO(eseidel): Share code with agent_cache.dart
+bool _waypointsMatch(Waypoint actual, Waypoint expected) {
+  final diff = findDifferenceBetweenStrings(
+    jsonEncode(actual.toJson()),
+    jsonEncode(expected.toJson()),
+  );
+  if (diff != null) {
+    logger.warn('Waypoint differs from expected: $diff');
+    return false;
+  }
+  return true;
+}
 
 /// Stores Waypoint objects fetched recently from the API.
 class WaypointCache {
   /// Create a new WaypointCache.
-  WaypointCache(this._api, this._systemsCache);
+  WaypointCache(Api api, SystemsCache systemsCache, ChartingCache chartingCache)
+      : _api = api,
+        _systemsCache = systemsCache,
+        _chartingCache = chartingCache;
 
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Api _api;
   final SystemsCache _systemsCache;
+  final ChartingCache _chartingCache;
 
   // TODO(eseidel): This should not exist.  This should instead work like
   // the marketCache, where callers request with a given desired freshness.
@@ -80,6 +60,7 @@ class WaypointCache {
     }
     final waypoints = await _allWaypointsInSystem(_api, systemSymbol).toList();
     _waypointsBySystem[systemSymbol] = waypoints;
+    _chartingCache.addWaypoints(waypoints);
     return waypoints;
   }
 
@@ -98,8 +79,17 @@ class WaypointCache {
     assertIsWaypointSymbol(waypointSymbol);
     assert(waypointSymbol.split('-').length == 3, 'Invalid system symbol');
     final systemSymbol = parseWaypointString(waypointSymbol).system;
+    final cachedWaypoint =
+        _chartingCache.waypointFromSymbol(_systemsCache, waypointSymbol);
     final waypoints = await waypointsInSystem(systemSymbol);
-    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
+    final waypoint =
+        waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
+    // This doesn't use the charting cache by default yet, but once
+    // we confirm it's not logging we can move to that.
+    if (waypoint != null && cachedWaypoint != null) {
+      _waypointsMatch(waypoint, cachedWaypoint);
+    }
+    return waypoint;
   }
 
   /// Fetch the waypoints with the given symbols.

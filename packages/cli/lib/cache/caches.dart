@@ -1,6 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
+import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/jump_cache.dart';
@@ -18,6 +19,7 @@ import 'package:http/http.dart' as http;
 export 'package:cli/api.dart';
 export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
+export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
 export 'package:cli/cache/faction_cache.dart';
 export 'package:cli/cache/jump_cache.dart';
@@ -47,6 +49,7 @@ class Caches {
     required this.contracts,
     required this.behaviors,
     required this.factions,
+    required this.charting,
   });
 
   /// The agent cache.
@@ -88,6 +91,9 @@ class Caches {
   /// The cache of factions.
   final FactionCache factions;
 
+  /// The cache of charting data.
+  final ChartingCache charting;
+
   /// The cache of jump routes.
   final JumpCache jumps = JumpCache();
 
@@ -106,7 +112,8 @@ class Caches {
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
     final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
     final transactions = await TransactionLog.load(fs);
-    final waypoints = WaypointCache(api, systems);
+    final charting = ChartingCache.load(fs);
+    final waypoints = WaypointCache(api, systems, charting);
     final markets = MarketCache(waypoints);
     // Intentionally force refresh contracts in case we've been offline.
     final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);
@@ -134,6 +141,7 @@ class Caches {
       contracts: contracts,
       behaviors: behaviors,
       factions: factions,
+      charting: charting,
     );
   }
 

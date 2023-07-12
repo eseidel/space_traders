@@ -1,5 +1,7 @@
 import 'package:cli/api.dart';
+import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
+import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
@@ -53,8 +55,13 @@ Future<void> command(FileSystem fs, List<String> args) async {
     (m, s) => m > s.hexNumber.length ? m : s.hexNumber.length,
   );
 
-  logger.info('Credits per minute for ships over the '
-      'last ${approximateDuration(lookback)}:');
+  final shipCache = ShipCache.loadCached(fs)!;
+  final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
+  logger
+    ..info(describeFleet(shipCache))
+    ..info('${idleHaulers.length} idle traders')
+    ..info('Credits per minute for ships over the '
+        'last ${approximateDuration(lookback)}:');
 
   String c(num n) =>
       n.isFinite ? NumberFormat().format(n.round()) : n.toString();

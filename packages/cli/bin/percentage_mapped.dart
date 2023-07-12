@@ -1,6 +1,7 @@
 import 'package:args/args.dart';
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
@@ -38,7 +39,8 @@ void main(List<String> args) async {
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
   final systemsCache = SystemsCache.loadFromCache(fs)!;
-  final waypointCache = WaypointCache(api, systemsCache);
+  final chartingCache = ChartingCache.load(fs);
+  final waypointCache = WaypointCache(api, systemsCache, chartingCache);
 
   SystemWaypoint start;
   final startArg = results['start'] as String?;

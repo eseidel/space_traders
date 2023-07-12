@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,6 +10,8 @@ class _MockSystemsCache extends Mock implements SystemsCache {}
 class _MockApi extends Mock implements Api {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
+
+class _MockChartingCache extends Mock implements ChartingCache {}
 
 void main() {
   test('WaypointCache.waypoint', () async {
@@ -35,7 +38,8 @@ void main() {
       );
     });
     final systemsCache = _MockSystemsCache();
-    final waypointCache = WaypointCache(api, systemsCache);
+    final chartingCache = _MockChartingCache();
+    final waypointCache = WaypointCache(api, systemsCache, chartingCache);
     expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);
     // Call it twice, it should cache.
     expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);
