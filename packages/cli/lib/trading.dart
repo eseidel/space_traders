@@ -521,34 +521,6 @@ CostedDeal? _filterDealsAndLog(
   return profitable.last;
 }
 
-/// Returns the best deal for the given ship.
-Future<CostedDeal?> findDealForShip(
-  MarketPrices marketPrices,
-  SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  JumpCache jumpCache,
-  MarketScan scan,
-  Ship ship, {
-  required int maxJumps,
-  required int maxTotalOutlay,
-  List<SellOpp>? extraSellOpps,
-  bool Function(CostedDeal deal)? filter,
-}) {
-  return findDealFor(
-    marketPrices, systemsCache, systemConnectivity, jumpCache, scan,
-    startSymbol: ship.nav.waypointSymbol,
-    fuelCapacity: ship.fuel.capacity,
-    // Currently using capacity, rather than availableSpace, since the
-    // trader logic tries to clear out the hold.
-    cargoCapacity: ship.cargo.capacity,
-    maxJumps: maxJumps,
-    shipSpeed: ship.engine.speed,
-    maxTotalOutlay: maxTotalOutlay,
-    extraSellOpps: extraSellOpps,
-    filter: filter,
-  );
-}
-
 /// Returns the best deal for the given parameters.
 Future<CostedDeal?> findDealFor(
   MarketPrices marketPrices,

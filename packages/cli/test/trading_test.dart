@@ -343,15 +343,18 @@ void main() {
 
     final costed = await runWithLogger(
       logger,
-      () => findDealForShip(
+      () => findDealFor(
         marketPrices,
         systemsCache,
         systemConnectivity,
         jumpCache,
         marketScan,
-        ship,
         maxJumps: 1,
         maxTotalOutlay: 100000,
+        startSymbol: ship.nav.waypointSymbol,
+        fuelCapacity: ship.fuel.capacity,
+        cargoCapacity: ship.cargo.capacity,
+        shipSpeed: ship.engine.speed,
       ),
     );
     expect(costed, isNotNull);

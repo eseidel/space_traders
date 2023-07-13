@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import 'package:cli/api.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
-import 'package:cli/third_party/compare.dart';
 import 'package:collection/collection.dart';
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.
@@ -16,19 +12,6 @@ Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
   });
 }
 
-// TODO(eseidel): Share code with agent_cache.dart
-bool _waypointsMatch(Waypoint actual, Waypoint expected) {
-  final diff = findDifferenceBetweenStrings(
-    jsonEncode(actual.toJson()),
-    jsonEncode(expected.toJson()),
-  );
-  if (diff != null) {
-    logger.warn('Waypoint differs from expected: $diff');
-    return false;
-  }
-  return true;
-}
-
 /// Stores Waypoint objects fetched recently from the API.
 class WaypointCache {
   /// Create a new WaypointCache.
@@ -37,7 +20,11 @@ class WaypointCache {
         _systemsCache = systemsCache,
         _chartingCache = chartingCache;
 
+  // _waypointsBySystem is no longer very useful, mostly it holds onto
+  // uncharted waypoints for a single loop, we could explicitly cache
+  // uncharted waypoints for a set amount of time instead?
   final Map<String, List<Waypoint>> _waypointsBySystem = {};
+  // TODO(eseidel): remove _connectedSystemsBySystem.
   final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Api _api;
   final SystemsCache _systemsCache;
@@ -52,12 +39,35 @@ class WaypointCache {
     // agentHeadquarters, connectedSystems, and jumpGates don't ever change.
   }
 
+  List<Waypoint>? _waypointsInSystemFromCache(String systemSymbol) {
+    final systemWaypoints = _systemsCache.waypointsInSystem(systemSymbol);
+    final cachedWaypoints = <Waypoint>[];
+    for (final systemWaypoint in systemWaypoints) {
+      final waypoint = _chartingCache.waypointFromSymbol(
+        _systemsCache,
+        systemWaypoint.symbol,
+      );
+      if (waypoint == null) {
+        return null;
+      }
+      cachedWaypoints.add(waypoint);
+    }
+    return cachedWaypoints;
+  }
+
   /// Fetch all waypoints in the given system.
   Future<List<Waypoint>> waypointsInSystem(String systemSymbol) async {
     assertIsSystemSymbol(systemSymbol);
     if (_waypointsBySystem.containsKey(systemSymbol)) {
       return _waypointsBySystem[systemSymbol]!;
     }
+    // Check if all waypoints are in the charting cache.
+    final cachedWaypoints = _waypointsInSystemFromCache(systemSymbol);
+    if (cachedWaypoints != null) {
+      _waypointsBySystem[systemSymbol] = cachedWaypoints;
+      return cachedWaypoints;
+    }
+
     final waypoints = await _allWaypointsInSystem(_api, systemSymbol).toList();
     _waypointsBySystem[systemSymbol] = waypoints;
     _chartingCache.addWaypoints(waypoints);
@@ -81,15 +91,11 @@ class WaypointCache {
     final systemSymbol = parseWaypointString(waypointSymbol).system;
     final cachedWaypoint =
         _chartingCache.waypointFromSymbol(_systemsCache, waypointSymbol);
-    final waypoints = await waypointsInSystem(systemSymbol);
-    final waypoint =
-        waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
-    // This doesn't use the charting cache by default yet, but once
-    // we confirm it's not logging we can move to that.
-    if (waypoint != null && cachedWaypoint != null) {
-      _waypointsMatch(waypoint, cachedWaypoint);
+    if (cachedWaypoint != null) {
+      return cachedWaypoint;
     }
-    return waypoint;
+    final waypoints = await waypointsInSystem(systemSymbol);
+    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
   }
 
   /// Fetch the waypoints with the given symbols.

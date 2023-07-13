@@ -22,6 +22,8 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockAgent extends Mock implements Agent {}
 
+class _MockShipFuel extends Mock implements ShipFuel {}
+
 void main() {
   test('CentralCommand.isDisabledForAll', () async {
     final behaviorCache = _MockBehhaviorCache();
@@ -96,6 +98,10 @@ void main() {
         role: ShipRole.CARRIER,
       ),
     );
+    final shipFuel = _MockShipFuel();
+    when(() => shipFuel.capacity).thenReturn(100);
+    when(() => shipFuel.current).thenReturn(100);
+    when(() => ship.fuel).thenReturn(shipFuel);
     final logger = _MockLogger();
     // Ship types we've never heard of, just return idle.
     final behavior =

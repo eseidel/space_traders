@@ -38,6 +38,14 @@ void main() {
       );
     });
     final systemsCache = _MockSystemsCache();
+    when(() => systemsCache.waypointsInSystem('S-E')).thenReturn([
+      SystemWaypoint(
+        symbol: 'S-E-A',
+        type: WaypointType.PLANET,
+        x: 0,
+        y: 0,
+      )
+    ]);
     final chartingCache = _MockChartingCache();
     final waypointCache = WaypointCache(api, systemsCache, chartingCache);
     expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);

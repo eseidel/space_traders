@@ -178,6 +178,10 @@ class CentralCommand {
   Behavior behaviorFor(
     Ship ship,
   ) {
+    if (ship.isOutOfFuel) {
+      return Behavior.idle;
+    }
+
     final disableBehaviors = <Behavior>[
       // Behavior.buyShip,
       // Behavior.trader,
@@ -376,13 +380,17 @@ class CentralCommand {
     SystemsCache systemsCache,
     SystemConnectivity systemConnectivity,
     JumpCache jumpCache,
-    WaypointCache waypointCache,
-    MarketCache marketCache,
     Ship ship, {
     required int maxJumps,
     required int maxTotalOutlay,
     required int maxWaypoints,
+    String? overrideStartSymbol,
   }) async {
+    final startSymbol = overrideStartSymbol ?? ship.nav.waypointSymbol;
+    final systemSymbol = overrideStartSymbol != null
+        ? parseWaypointString(overrideStartSymbol).system
+        : ship.nav.systemSymbol;
+
     final inProgress = _dealsInProgress().toList();
     // Avoid having two ships working on the same deal since by the time the
     // second one gets there the prices will have changed.
@@ -412,23 +420,95 @@ class CentralCommand {
     final marketScan = scanNearbyMarkets(
       systemsCache,
       marketPrices,
-      systemSymbol: ship.nav.systemSymbol,
+      systemSymbol: systemSymbol,
       maxJumps: maxJumps,
       maxWaypoints: maxWaypoints,
     );
-    final maybeDeal = await findDealForShip(
+    final maybeDeal = await findDealFor(
       marketPrices,
       systemsCache,
       systemConnectivity,
       jumpCache,
       marketScan,
-      ship,
       maxJumps: maxJumps,
       maxTotalOutlay: maxTotalOutlay,
       extraSellOpps: extraSellOpps,
       filter: filter,
+      startSymbol: startSymbol,
+      fuelCapacity: ship.fuel.capacity,
+      // Currently using capacity, rather than availableSpace, since the
+      // trader logic tries to clear out the hold.
+      cargoCapacity: ship.cargo.capacity,
+      shipSpeed: ship.engine.speed,
     );
     return maybeDeal;
+  }
+
+  Future<_ShipPlacement?> _findBetterSystemForTrader(
+    SystemsCache systemsCache,
+    SystemConnectivity systemConnectivity,
+    JumpCache jumpCache,
+    AgentCache agentCache,
+    ContractCache contractCache,
+    MarketPrices marketPrices,
+    _MarketSearch search,
+    Ship ship, {
+    required int maxJumps,
+    required int maxWaypoints,
+    required int profitPerSecondThreshold,
+  }) async {
+    final shipSymbol = ship.symbol;
+    final shipSystem = systemsCache.systemBySymbol(ship.nav.systemSymbol);
+    while (true) {
+      final closest = search.closestAvailableSystem(systemsCache, shipSystem);
+      if (closest == null) {
+        logger.info('No nearby markets for $shipSymbol');
+        return null;
+      }
+      search.markUsed(closest);
+      final score = search.scoreFor(closest.symbol);
+      final systemJumpGate =
+          systemsCache.jumpGateWaypointForSystem(closest.symbol)!;
+      final deal = await findNextDeal(
+        agentCache,
+        contractCache,
+        marketPrices,
+        systemsCache,
+        systemConnectivity,
+        jumpCache,
+        ship,
+        overrideStartSymbol: systemJumpGate.symbol,
+        maxJumps: maxJumps,
+        maxTotalOutlay: agentCache.agent.credits,
+        maxWaypoints: maxWaypoints,
+      );
+      if (deal == null) {
+        shipInfo(ship, 'No deal found for $shipSymbol at ${closest.symbol}');
+        search.markUsed(closest);
+        continue;
+      }
+      final profitPerSecond = deal.expectedProfitPerSecond;
+      if (profitPerSecond < profitPerSecondThreshold) {
+        shipInfo(
+            ship,
+            'Profit per second too low for $shipSymbol at '
+            '${closest.symbol}, $profitPerSecond < $profitPerSecondThreshold');
+        search.markUsed(closest);
+        continue;
+      }
+      final placement = _ShipPlacement(
+        score: score,
+        distance: shipSystem.distanceTo(closest),
+        profitPerSecond: profitPerSecond,
+        destinationSymbol: systemJumpGate.symbol,
+      );
+      shipInfo(
+          ship,
+          'Found placement: $profitPerSecond ${placement.score} '
+          '${placement.distance} ${placement.destinationSymbol}');
+      shipInfo(ship, 'Potential: ${describeCostedDeal(deal)}');
+      return placement;
+    }
   }
 
   /// Returns other systems containing ships with [behavior].
@@ -745,6 +825,7 @@ class CentralCommand {
     SystemConnectivity systemConnectivity,
     JumpCache jumpCache,
     AgentCache agentCache,
+    ContractCache contractCache,
     MarketPrices marketPrices,
     Ship ship, {
     required int maxJumps,
@@ -761,6 +842,7 @@ class CentralCommand {
       systemConnectivity,
       jumpCache,
       agentCache,
+      contractCache,
       marketPrices,
       search,
       ship,
@@ -950,70 +1032,4 @@ class _MarketSearch {
   void markUsed(System system) => claimedSystemSymbols.add(system.symbol);
 
   int scoreFor(String systemSymbol) => marketSystemScores[systemSymbol]!;
-}
-
-Future<_ShipPlacement?> _findBetterSystemForTrader(
-  SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  JumpCache jumpCache,
-  AgentCache agentCache,
-  MarketPrices marketPrices,
-  _MarketSearch search,
-  Ship ship, {
-  required int maxJumps,
-  required int maxWaypoints,
-  required int profitPerSecondThreshold,
-}) async {
-  final shipSymbol = ship.symbol;
-  final shipSystem = systemsCache.systemBySymbol(ship.nav.systemSymbol);
-  while (true) {
-    final closest = search.closestAvailableSystem(systemsCache, shipSystem);
-    if (closest == null) {
-      logger.info('No nearby markets for $shipSymbol');
-      return null;
-    }
-    search.markUsed(closest);
-    final score = search.scoreFor(closest.symbol);
-    final scan = scanNearbyMarkets(
-      systemsCache,
-      marketPrices,
-      systemSymbol: closest.symbol,
-      maxJumps: maxJumps,
-      maxWaypoints: maxWaypoints,
-    );
-    final systemJumpGate =
-        systemsCache.jumpGateWaypointForSystem(closest.symbol)!;
-    final deal = await findDealFor(
-      marketPrices,
-      systemsCache,
-      systemConnectivity,
-      jumpCache,
-      scan,
-      startSymbol: systemJumpGate.symbol,
-      fuelCapacity: ship.fuel.capacity,
-      cargoCapacity: ship.cargo.capacity,
-      shipSpeed: ship.engine.speed,
-      maxJumps: maxJumps,
-      maxTotalOutlay: agentCache.agent.credits,
-    );
-    if (deal == null) {
-      logger.info('No deal found for $shipSymbol at ${closest.symbol}');
-      search.markUsed(closest);
-      continue;
-    }
-    final profitPerSecond = deal.expectedProfitPerSecond;
-    if (profitPerSecond < profitPerSecondThreshold) {
-      logger.info('Profit per second too low for $shipSymbol at '
-          '${closest.symbol}, $profitPerSecond < $profitPerSecondThreshold');
-      search.markUsed(closest);
-      continue;
-    }
-    final placement = _ShipPlacement(
-      score: score,
-      distance: shipSystem.distanceTo(closest),
-      profitPerSecond: profitPerSecond,
-      destinationSymbol: systemJumpGate.symbol,
-    );
-    return placement;
-  }
 }

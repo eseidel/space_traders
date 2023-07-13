@@ -100,12 +100,9 @@ Earning:
 * Add logic for command ship to switch between trading and mining depending
   on expected profit.
 * Record trade volume on a per-market basis in pricing data.
-* Keep a minimum buffer per trader, so we don't get stuck with no money.
 * Buy some ratio of explorers to traders (e.g 1:2).
 * Buy traders when trading is more profitable than mining, and vice versa.
-* Use routes for pathing so we can avoid re-planning.
-  Would just always check the current waypoint, if it's not on the route,
-  re-plan to the destination, otherwise do the next action on the route.
+* Add a behavior for panic-buying fuel?
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
@@ -120,7 +117,6 @@ Tech Debt:
 * Write a test suite for routing.
 
 Efficiency:
-* Persist some of WaypointCache to disk.
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
 * Write a better rate-limiting model.
 * Make the script robust to network failures.

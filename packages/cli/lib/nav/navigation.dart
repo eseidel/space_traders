@@ -38,8 +38,7 @@ Future<DateTime?> beingNewRouteAndLog(
   if (action == null) {
     shipErr(
       ship,
-      'No actions in route to $destinationSymbol '
-      'from ${start.systemSymbol}!?',
+      'No actions in route to $destinationSymbol from ${start.symbol}!?',
     );
     return null;
   }

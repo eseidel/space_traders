@@ -465,7 +465,9 @@ RoutePlan? planRoute(
   required int fuelCapacity,
   required int shipSpeed,
 }) {
+  // TODO(eseidel): This is wrong.  An empty route is not valid.
   if (start.symbol == end.symbol) {
+    // throw ArgumentError('Cannot plan route between same waypoint');
     return RoutePlan(
       actions: const [],
       fuelCapacity: fuelCapacity,
