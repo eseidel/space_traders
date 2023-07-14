@@ -1,6 +1,8 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
+import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:stats/stats.dart';
 
@@ -21,10 +23,14 @@ void printPriceRanges(List<MarketPrice> gameStats) {
   }
 }
 
-void main(List<String> args) async {
+Future<void> command(FileSystem fs, List<String> args) async {
   const fs = LocalFileSystem();
   final prices = await MarketPrices.load(fs);
 
   logger.info('${prices.count} prices loaded.');
   printPriceRanges(prices.prices);
+}
+
+void main(List<String> args) {
+  runOffline(args, command);
 }

@@ -164,6 +164,12 @@ class TransactionLog extends JsonLog<Transaction> {
     return TransactionLog(entries, fs: fs, path: path);
   }
 
+  /// Return transactions with the given filter applied.
+  List<Transaction> where(bool Function(Transaction t) filter) {
+    return entries.where(filter).toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  }
+
   /// Return all the ship symbols in the transaction log.
   Set<String> get shipSymbols {
     return entries.map((e) => e.shipSymbol).toSet();

@@ -914,7 +914,7 @@ Iterable<Contract> affordableContracts(
 /// price from the median price.
 Map<String, int> scoreMarketSystems(
   MarketPrices marketPrices, {
-  int limit = 100,
+  int limit = 200,
 }) {
   // Walk all markets in the market prices.  Get all goods for each market
   // compute the absolute distance for each good from the median price

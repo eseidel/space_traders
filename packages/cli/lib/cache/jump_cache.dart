@@ -28,11 +28,17 @@ class JumpCache {
     required String toSystem,
   }) {
     for (final plan in _plans) {
-      if (plan.fromSystem == fromSystem && plan.toSystem == toSystem) {
-        return plan;
+      final fromIndex = plan.route.indexOf(fromSystem);
+      if (fromIndex == -1) continue;
+      final toIndex = plan.route.indexOf(toSystem);
+      if (toIndex == -1) continue;
+      if (fromIndex < toIndex) {
+        return JumpPlan(plan.route.sublist(fromIndex, toIndex + 1));
       }
-      if (plan.fromSystem == toSystem && plan.toSystem == fromSystem) {
-        return plan.reversed();
+      if (fromIndex > toIndex) {
+        return JumpPlan(
+          plan.route.sublist(toIndex, fromIndex + 1).reversed.toList(),
+        );
       }
     }
     return null;
@@ -40,9 +46,6 @@ class JumpCache {
 
   /// Add a route between two systems.
   void addJumpPlan(JumpPlan plan) {
-    // TODO(eseidel): This could also cache each sub-segment of the path.
-    // A-B-C could be cached as A-B, B-C, A-C.
-    // Or the path lookup could find such.
     _plans.add(plan);
   }
 }

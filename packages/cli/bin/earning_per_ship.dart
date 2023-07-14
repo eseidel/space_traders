@@ -9,32 +9,40 @@ import 'package:cli/printing.dart';
 import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 
-double creditsPerMinute(
-  TransactionLog transactions,
-  String shipSymbol,
-  Duration lookback, {
-  bool Function(Transaction t)? filter,
-}) {
-  final startTime = DateTime.timestamp().subtract(lookback);
-  final shipTransactions = transactions.entries
-      .where((t) => t.shipSymbol == shipSymbol)
-      .where((t) => t.timestamp.isAfter(startTime))
-      .toList();
-  if (filter != null) {
-    shipTransactions.retainWhere(filter);
+class TransactionSummary {
+  TransactionSummary(Iterable<Transaction> transactions)
+      : transactions = List.from(transactions);
+  final List<Transaction> transactions;
+
+  bool get isEmpty => transactions.isEmpty;
+
+  int get creditDiff => transactions.fold(0, (m, t) => m + t.creditChange);
+  Duration get duration => transactions.isEmpty
+      ? Duration.zero
+      : transactions.last.timestamp.difference(transactions.first.timestamp);
+
+  double get perSecond {
+    if (duration.inSeconds == 0) {
+      return 0;
+    }
+    return creditDiff / duration.inSeconds;
   }
 
-  final sorted = shipTransactions.toList()
-    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-  if (sorted.isEmpty) {
-    return 0;
+  double get perMinute {
+    if (duration > const Duration(minutes: 1)) {
+      return creditDiff / duration.inMinutes;
+    } else {
+      return perSecond * 60;
+    }
   }
 
-  final diff = sorted.fold(0, (m, t) => m + t.creditChange);
-  final minutes =
-      sorted.last.timestamp.difference(sorted.first.timestamp).inMinutes;
-  return diff / minutes;
+  double get perHour {
+    if (duration > const Duration(hours: 1)) {
+      return creditDiff / duration.inHours;
+    } else {
+      return perMinute * 60;
+    }
+  }
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
@@ -45,8 +53,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final transactions = await TransactionLog.load(fs);
-  final shipSymbols = transactions.shipSymbols;
+  final transactionLog = await TransactionLog.load(fs);
+  final shipSymbols = transactionLog.shipSymbols;
   final shipIds = shipSymbols.map(ShipSymbol.fromString).toList()..sort();
   final behaviorCache = BehaviorCache.load(fs);
 
@@ -66,18 +74,22 @@ Future<void> command(FileSystem fs, List<String> args) async {
   String c(num n) =>
       n.isFinite ? NumberFormat().format(n.round()) : n.toString();
 
+  // final behaviorCounts = <String, int>{};
+  // final behaviorCreditsTotals = <String, int>{};
+
+  final startTime = DateTime.timestamp().subtract(lookback);
+  final transactions = transactionLog.where(
+    (t) => t.timestamp.isAfter(startTime) && !t.tradeSymbol.startsWith('SHIP_'),
+  );
+
   for (final shipId in shipIds) {
     final state = behaviorCache.getBehavior(shipId.symbol);
-    final perMinuteDiff = creditsPerMinute(
-      transactions,
-      shipId.symbol,
-      lookback,
-      filter: (t) => !t.tradeSymbol.startsWith('SHIP_'),
+    final summary = TransactionSummary(
+      transactions.where((t) => t.shipSymbol == shipId.symbol),
     );
-    final perSecDiff = perMinuteDiff / 60;
     logger.info('${shipId.hexNumber.padRight(longestHexNumber)}  '
-        '${c(perMinuteDiff).padLeft(5)} c/m '
-        '${c(perSecDiff).padLeft(4)} c/s '
+        '${c(summary.perMinute).padLeft(5)} c/m '
+        '${c(summary.perSecond).padLeft(4)} c/s '
         '  ${state?.behavior.name ?? 'Unknown'}');
   }
 }
