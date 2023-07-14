@@ -18,16 +18,17 @@ void main() {
     }
 
     final logger = _MockLogger();
+    final client = RateLimitedApiClient();
     final response = await runWithLogger(
       logger,
-      () => RateLimitedApiClient.handleUnexpectedRateLimit(
+      () => client.handleUnexpectedRateLimit(
         sendRequest,
-        waitTime: Duration.zero,
+        overrideWaitTime: Duration.zero,
       ),
     );
     verify(
       () => logger.warn(
-        'Unexpected rate limit response, waiting 0 seconds and retrying',
+        'Unexpected 429 response: rate limited, retrying after 1 seconds',
       ),
     ).called(1);
     expect(response.statusCode, 200);

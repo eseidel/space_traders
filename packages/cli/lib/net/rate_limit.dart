@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
 import 'package:http/http.dart';
@@ -38,6 +40,8 @@ class RateLimitedApiClient extends ApiClient {
   /// The number of requests per second to allow.
   final int maxRequestsPerSecond;
 
+  int _backoffSeconds = 1;
+
   /// RequestCounts tracks the number of requests made to each path.
   final RequestCounts requestCounts = RequestCounts();
 
@@ -51,27 +55,58 @@ class RateLimitedApiClient extends ApiClient {
   //   return DateTime.parse(resetString);
   // }
 
+  /// Reset the backoff, called after a successful request.
+  void _resetBackoff() {
+    _backoffSeconds = 1;
+  }
+
+  /// Used to guess whether the response is from the server (which will always
+  /// reply with json) or from some other source (which may not).
+  bool _tryParseBody(Response response) {
+    try {
+      jsonDecode(response.body);
+      return true;
+    } on FormatException {
+      return false;
+    }
+  }
+
   /// Handle an unexpected rate limit response by waiting and retrying once.
   @visibleForTesting
-  static Future<Response> handleUnexpectedRateLimit(
+  Future<Response> handleUnexpectedRateLimit(
     Future<Response> Function() sendRequest, {
-    Duration waitTime = const Duration(seconds: 10),
+    Duration? overrideWaitTime,
   }) async {
-    // TODO(eseidel): This should use exponential back-off or a fixed
-    // number of retries for all types of failures, not just 429.
     while (true) {
-      final response = await sendRequest();
-      if (response.statusCode > 500) {
-        logger.warn('${response.statusCode} seen at ${DateTime.now()}');
+      try {
+        final response = await sendRequest();
+        // We assume any response < 400 is OK.
+        if (response.statusCode < 400) {
+          return response;
+        }
+        // If it's not a 429 (rate limit) response, and we can parse the body,
+        // we assume it's a valid error from the server and return it.
+        if (response.statusCode != 429 && _tryParseBody(response)) {
+          return response;
+        }
+        // If this is a 429, we could parse the x-ratelimit-reset header and
+        // wait until then.
+        // final resetTime = _parseResetTime(response);
+
+        // Otherwise we assume it's a transient error and retry.
+        logger.warn(
+          'Unexpected ${response.statusCode} response: '
+          '${response.body}, retrying after $_backoffSeconds seconds',
+        );
+      } catch (e) {
+        // Network errors are transient and we retry.
+        logger.warn(
+          'Unexpected $e, retrying after $_backoffSeconds seconds',
+        );
       }
-      if (response.statusCode != 429) {
-        return response;
-      }
-      // Could parse out the reset time from the headers and wait until then.
-      logger.warn(
-        'Unexpected rate limit response, waiting ${waitTime.inSeconds} '
-        'seconds and retrying',
-      );
+      // Override the wait time for testing.
+      final waitTime = overrideWaitTime ?? Duration(seconds: _backoffSeconds);
+      _backoffSeconds *= 2;
       await Future<void>.delayed(waitTime);
     }
   }
@@ -88,9 +123,6 @@ class RateLimitedApiClient extends ApiClient {
   ) async {
     final beforeRequest = DateTime.now();
     if (beforeRequest.isBefore(_nextRequestTime)) {
-      // logger.detail(
-      //   'Rate limiting request. Next request time: $_nextRequestTime',
-      // );
       await Future<void>.delayed(_nextRequestTime.difference(beforeRequest));
     }
     final urlEncodedQueryParams = queryParams.map((param) => '$param');
@@ -113,6 +145,7 @@ class RateLimitedApiClient extends ApiClient {
     final afterRequest = DateTime.now();
     _nextRequestTime =
         afterRequest.add(Duration(milliseconds: 1000 ~/ maxRequestsPerSecond));
+    _resetBackoff();
     return response;
   }
 }

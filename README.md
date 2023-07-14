@@ -103,6 +103,8 @@ Earning:
 * Buy some ratio of explorers to traders (e.g 1:2).
 * Buy traders when trading is more profitable than mining, and vice versa.
 * Add a behavior for panic-buying fuel?
+* Dead ships aren't differnet from idle ships and will be counted as
+  "idle haulers" and prevent buying more ships.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate

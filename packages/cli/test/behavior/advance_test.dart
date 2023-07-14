@@ -24,6 +24,8 @@ class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
+class _MockBehaviorCache extends Mock implements BehaviorCache {}
+
 void main() {
   test('advanceShipBehavior idle does not spin hot', () async {
     final api = _MockApi();
@@ -41,6 +43,8 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    final behaviorCache = _MockBehaviorCache();
+    when(() => caches.behaviors).thenReturn(behaviorCache);
 
     final behaviorState = BehaviorState('S', Behavior.idle);
     final centralCommand = _MockCentralCommand();

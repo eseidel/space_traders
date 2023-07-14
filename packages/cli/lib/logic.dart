@@ -57,7 +57,7 @@ Future<void> advanceShips(
 /// RateLimitTracker tracks the rate limit usage and prints stats.
 class RateLimitTracker {
   /// Construct a rate limit tracker.
-  RateLimitTracker(Api api, {this.printEvery = const Duration(minutes: 1)})
+  RateLimitTracker(Api api, {this.printEvery = const Duration(minutes: 2)})
       : _rateLimit = api.apiClient,
         _lastPrintTime = DateTime.timestamp() {
     _lastRequestCount = _rateLimit.requestCounts.totalRequests();
@@ -86,12 +86,10 @@ class RateLimitTracker {
       final percent = ((requestsSinceLastPrint / max) * 100).round();
       // No sense in printing low percentages, as that will just end up being
       // most of what we print.
-      if (percent > 60) {
-        logger.info(
-          '${requestsPerSecond.toStringAsFixed(1)} requests per second '
-          '($percent% of max)',
-        );
-      }
+      logger.info(
+        '${requestsPerSecond.toStringAsFixed(1)} requests per second '
+        '($percent% of max)',
+      );
       _lastPrintTime = now;
     }
   }
