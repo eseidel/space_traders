@@ -15,6 +15,155 @@ class AgentsApi {
 
   final ApiClient apiClient;
 
+  /// Get Public Agent
+  ///
+  /// Fetch agent details.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] agentSymbol (required):
+  ///   The agent symbol
+  Future<Response> getAgentWithHttpInfo(
+    String agentSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/agents/{agentSymbol}'.replaceAll('{agentSymbol}', agentSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Public Agent
+  ///
+  /// Fetch agent details.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] agentSymbol (required):
+  ///   The agent symbol
+  Future<GetMyAgent200Response?> getAgent(
+    String agentSymbol,
+  ) async {
+    final response = await getAgentWithHttpInfo(
+      agentSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMyAgent200Response',
+      ) as GetMyAgent200Response;
+    }
+    return null;
+  }
+
+  /// List Agents
+  ///
+  /// Fetch agents details.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [int] page:
+  ///   What entry offset to request
+  ///
+  /// * [int] limit:
+  ///   How many entries to return per page
+  Future<Response> getAgentsWithHttpInfo({
+    int? page,
+    int? limit,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/agents';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (page != null) {
+      queryParams.addAll(_queryParams('', 'page', page));
+    }
+    if (limit != null) {
+      queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// List Agents
+  ///
+  /// Fetch agents details.
+  ///
+  /// Parameters:
+  ///
+  /// * [int] page:
+  ///   What entry offset to request
+  ///
+  /// * [int] limit:
+  ///   How many entries to return per page
+  Future<GetAgents200Response?> getAgents({
+    int? page,
+    int? limit,
+  }) async {
+    final response = await getAgentsWithHttpInfo(
+      page: page,
+      limit: limit,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetAgents200Response',
+      ) as GetAgents200Response;
+    }
+    return null;
+  }
+
   /// Get Agent
   ///
   /// Fetch your agent's details.

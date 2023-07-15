@@ -13,27 +13,15 @@ part of openapi;
 class ShipRefine201ResponseDataProducedInner {
   /// Returns a new [ShipRefine201ResponseDataProducedInner] instance.
   ShipRefine201ResponseDataProducedInner({
-    this.tradeSymbol,
-    this.units,
+    required this.tradeSymbol,
+    required this.units,
   });
 
   /// Symbol of the good.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? tradeSymbol;
+  String tradeSymbol;
 
   /// Amount of units of the good.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  int? units;
+  int units;
 
   @override
   bool operator ==(Object other) =>
@@ -45,8 +33,7 @@ class ShipRefine201ResponseDataProducedInner {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (tradeSymbol == null ? 0 : tradeSymbol!.hashCode) +
-      (units == null ? 0 : units!.hashCode);
+      (tradeSymbol.hashCode) + (units.hashCode);
 
   @override
   String toString() =>
@@ -54,16 +41,8 @@ class ShipRefine201ResponseDataProducedInner {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.tradeSymbol != null) {
-      json[r'tradeSymbol'] = this.tradeSymbol;
-    } else {
-      json[r'tradeSymbol'] = null;
-    }
-    if (this.units != null) {
-      json[r'units'] = this.units;
-    } else {
-      json[r'units'] = null;
-    }
+    json[r'tradeSymbol'] = this.tradeSymbol;
+    json[r'units'] = this.units;
     return json;
   }
 
@@ -88,8 +67,8 @@ class ShipRefine201ResponseDataProducedInner {
       }());
 
       return ShipRefine201ResponseDataProducedInner(
-        tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol'),
-        units: mapValueOfType<int>(json, r'units'),
+        tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol')!,
+        units: mapValueOfType<int>(json, r'units')!,
       );
     }
     return null;
@@ -150,5 +129,8 @@ class ShipRefine201ResponseDataProducedInner {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{};
+  static const requiredKeys = <String>{
+    'tradeSymbol',
+    'units',
+  };
 }

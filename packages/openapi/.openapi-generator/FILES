@@ -41,6 +41,7 @@ doc/FactionTrait.md
 doc/FactionsApi.md
 doc/FleetApi.md
 doc/FulfillContract200Response.md
+doc/GetAgents200Response.md
 doc/GetContract200Response.md
 doc/GetContracts200Response.md
 doc/GetFaction200Response.md
@@ -207,6 +208,7 @@ lib/model/faction.dart
 lib/model/faction_symbols.dart
 lib/model/faction_trait.dart
 lib/model/fulfill_contract200_response.dart
+lib/model/get_agents200_response.dart
 lib/model/get_contract200_response.dart
 lib/model/get_contracts200_response.dart
 lib/model/get_faction200_response.dart
@@ -362,6 +364,7 @@ test/faction_trait_test.dart
 test/factions_api_test.dart
 test/fleet_api_test.dart
 test/fulfill_contract200_response_test.dart
+test/get_agents200_response_test.dart
 test/get_contract200_response_test.dart
 test/get_contracts200_response_test.dart
 test/get_faction200_response_test.dart

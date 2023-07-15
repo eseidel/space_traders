@@ -63,12 +63,13 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AgentsApi();
+final agentSymbol = agentSymbol_example; // String | The agent symbol
 
 try {
-    final result = api_instance.getMyAgent();
+    final result = api_instance.getAgent(agentSymbol);
     print(result);
 } catch (e) {
-    print('Exception when calling AgentsApi->getMyAgent: $e\n');
+    print('Exception when calling AgentsApi->getAgent: $e\n');
 }
 
 ```
@@ -79,6 +80,8 @@ All URIs are relative to *https://api.spacetraders.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AgentsApi* | [**getAgent**](doc\/AgentsApi.md#getagent) | **GET** /agents/{agentSymbol} | Get Public Agent
+*AgentsApi* | [**getAgents**](doc\/AgentsApi.md#getagents) | **GET** /agents | List Agents
 *AgentsApi* | [**getMyAgent**](doc\/AgentsApi.md#getmyagent) | **GET** /my/agent | Get Agent
 *ContractsApi* | [**acceptContract**](doc\/ContractsApi.md#acceptcontract) | **POST** /my/contracts/{contractId}/accept | Accept Contract
 *ContractsApi* | [**deliverContract**](doc\/ContractsApi.md#delivercontract) | **POST** /my/contracts/{contractId}/deliver | Deliver Cargo to Contract
@@ -161,6 +164,7 @@ Class | Method | HTTP request | Description
  - [FactionSymbols](doc\/FactionSymbols.md)
  - [FactionTrait](doc\/FactionTrait.md)
  - [FulfillContract200Response](doc\/FulfillContract200Response.md)
+ - [GetAgents200Response](doc\/GetAgents200Response.md)
  - [GetContract200Response](doc\/GetContract200Response.md)
  - [GetContracts200Response](doc\/GetContracts200Response.md)
  - [GetFaction200Response](doc\/GetFaction200Response.md)

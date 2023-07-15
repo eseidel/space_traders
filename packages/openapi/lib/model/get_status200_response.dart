@@ -30,7 +30,7 @@ class GetStatus200Response {
   /// The current version of the API.
   String version;
 
-  /// The date and time when the game server was last reset.
+  /// The date when the game server was last reset.
   String resetDate;
 
   String description;

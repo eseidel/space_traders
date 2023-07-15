@@ -13,15 +13,22 @@ part of openapi;
 class Agent {
   /// Returns a new [Agent] instance.
   Agent({
-    required this.accountId,
+    this.accountId,
     required this.symbol,
     required this.headquarters,
     required this.credits,
     required this.startingFaction,
+    this.shipCount,
   });
 
-  /// Account ID that is tied to this agent.
-  String accountId;
+  /// Account ID that is tied to this agent. Only included on your own agent.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? accountId;
 
   /// Symbol of the agent.
   String symbol;
@@ -35,6 +42,15 @@ class Agent {
   /// The faction the agent started with.
   String startingFaction;
 
+  /// How many ships are owned by the agent.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  int? shipCount;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -43,28 +59,39 @@ class Agent {
           other.symbol == symbol &&
           other.headquarters == headquarters &&
           other.credits == credits &&
-          other.startingFaction == startingFaction;
+          other.startingFaction == startingFaction &&
+          other.shipCount == shipCount;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (accountId.hashCode) +
+      (accountId == null ? 0 : accountId!.hashCode) +
       (symbol.hashCode) +
       (headquarters.hashCode) +
       (credits.hashCode) +
-      (startingFaction.hashCode);
+      (startingFaction.hashCode) +
+      (shipCount == null ? 0 : shipCount!.hashCode);
 
   @override
   String toString() =>
-      'Agent[accountId=$accountId, symbol=$symbol, headquarters=$headquarters, credits=$credits, startingFaction=$startingFaction]';
+      'Agent[accountId=$accountId, symbol=$symbol, headquarters=$headquarters, credits=$credits, startingFaction=$startingFaction, shipCount=$shipCount]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'accountId'] = this.accountId;
+    if (this.accountId != null) {
+      json[r'accountId'] = this.accountId;
+    } else {
+      json[r'accountId'] = null;
+    }
     json[r'symbol'] = this.symbol;
     json[r'headquarters'] = this.headquarters;
     json[r'credits'] = this.credits;
     json[r'startingFaction'] = this.startingFaction;
+    if (this.shipCount != null) {
+      json[r'shipCount'] = this.shipCount;
+    } else {
+      json[r'shipCount'] = null;
+    }
     return json;
   }
 
@@ -89,11 +116,12 @@ class Agent {
       }());
 
       return Agent(
-        accountId: mapValueOfType<String>(json, r'accountId')!,
+        accountId: mapValueOfType<String>(json, r'accountId'),
         symbol: mapValueOfType<String>(json, r'symbol')!,
         headquarters: mapValueOfType<String>(json, r'headquarters')!,
         credits: mapValueOfType<int>(json, r'credits')!,
         startingFaction: mapValueOfType<String>(json, r'startingFaction')!,
+        shipCount: mapValueOfType<int>(json, r'shipCount'),
       );
     }
     return null;
@@ -152,7 +180,6 @@ class Agent {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'accountId',
     'symbol',
     'headquarters',
     'credits',

@@ -67,6 +67,7 @@ part 'model/faction.dart';
 part 'model/faction_symbols.dart';
 part 'model/faction_trait.dart';
 part 'model/fulfill_contract200_response.dart';
+part 'model/get_agents200_response.dart';
 part 'model/get_contract200_response.dart';
 part 'model/get_contracts200_response.dart';
 part 'model/get_faction200_response.dart';

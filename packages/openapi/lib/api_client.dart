@@ -291,6 +291,8 @@ class ApiClient {
           return FactionTrait.fromJson(value);
         case 'FulfillContract200Response':
           return FulfillContract200Response.fromJson(value);
+        case 'GetAgents200Response':
+          return GetAgents200Response.fromJson(value);
         case 'GetContract200Response':
           return GetContract200Response.fromJson(value);
         case 'GetContracts200Response':

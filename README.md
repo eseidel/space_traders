@@ -78,11 +78,11 @@ rmdir packages/openapi/
 openapi-generator generate -c open_api_config.yaml
 ```
 Then modified:
-* rmdir packages/openapi/test directory since it was just TODOs.
+* `rmdir packages/openapi/test` directory since it was just TODOs.
 * Fixed handling of required num fields:
-    * `openapi/lib/model/jump_gate.dart`
+    * `packages/openapi/lib/model/jump_gate.dart`
   Due to: https://github.com/OpenAPITools/openapi-generator/pull/10637#pullrequestreview-1425351014
-* Ran `dart format` on the generated code.
+* Ran `dart format packages/openapi`
 
 ### Todo
 
