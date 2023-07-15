@@ -71,6 +71,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     ship,
     tradeSymbol,
     1,
+    AccountingType.capital,
   );
   // mounts the mount.
   await installMountAndLog(api, ship, tradeSymbol.value);

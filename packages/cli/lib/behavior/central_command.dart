@@ -201,11 +201,7 @@ class CentralCommand {
         Behavior.trader,
         Behavior.miner,
       ],
-      ShipRole.HAULER: [
-        Behavior.trader,
-        // Explorer is a hack here to get the haulers to move and try again.
-        Behavior.explorer,
-      ],
+      ShipRole.HAULER: [Behavior.trader],
       ShipRole.EXCAVATOR: [Behavior.miner],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
@@ -585,7 +581,7 @@ class CentralCommand {
         parseWaypointString(agentCache.agent.headquarters).system;
     final inStartSystem = systemSymbol == hqSystemSymbol;
 
-    final isEarlyGame = _shipCache.ships.length < 10;
+    final isEarlyGame = _shipCache.ships.length < 5;
     if (isEarlyGame) {
       if (!inStartSystem) {
         return null;
@@ -593,9 +589,12 @@ class CentralCommand {
       return ShipType.ORE_HOUND;
     }
 
+    final traderCount = _countOfTypeInFleet(ShipType.LIGHT_HAULER);
+    final probeTarget = traderCount / 2;
+
     final targetCounts = {
       ShipType.ORE_HOUND: 30,
-      ShipType.PROBE: 10,
+      ShipType.PROBE: probeTarget,
       ShipType.LIGHT_HAULER: 50,
     };
     final typesToBuy = targetCounts.keys
@@ -609,7 +608,8 @@ class CentralCommand {
       return null;
     }
 
-    // We should buy haulers if we have fewer than X haulers idle.
+    // We should buy haulers if we have fewer than X haulers idle and we have
+    // enough extra cash on hand to support trading.
     if (typesToBuy.contains(ShipType.LIGHT_HAULER)) {
       final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
       if (idleHaulers.length < 4) {

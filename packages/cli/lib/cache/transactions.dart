@@ -3,6 +3,24 @@ import 'package:cli/cache/json_log.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 
+/// The type of a transaction.
+enum AccountingType {
+  /// Capital transaction (e.g. ships, mounts).
+  capital,
+
+  /// Fuel transaction (e.g. fuel for transport, not for sale).
+  fuel,
+
+  /// Goods transaction (e.g. buying/selling trade goods).
+  goods,
+}
+
+// enum BehaviorSource {
+//   miner,
+//   trader,
+//   centralCommand,
+// }
+
 /// A class to hold transaction data from a ship.
 @immutable
 class Transaction {
@@ -16,6 +34,7 @@ class Transaction {
     required this.perUnitPrice,
     required this.timestamp,
     required this.agentCredits,
+    required this.accounting,
   });
 
   /// Create a new transaction from json.
@@ -30,6 +49,10 @@ class Transaction {
       perUnitPrice: json['perUnitPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
       agentCredits: json['agentCredits'] as int,
+      accounting: json['accounting'] == null
+          ? null
+          : AccountingType.values
+              .firstWhere((e) => e.name == json['accounting'] as String),
     );
   }
 
@@ -37,6 +60,7 @@ class Transaction {
   factory Transaction.fromMarketTransaction(
     MarketTransaction transaction,
     int agentCredits,
+    AccountingType accounting,
   ) {
     return Transaction(
       shipSymbol: transaction.shipSymbol,
@@ -47,6 +71,7 @@ class Transaction {
       perUnitPrice: transaction.pricePerUnit,
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
+      accounting: accounting,
     );
   }
 
@@ -66,6 +91,7 @@ class Transaction {
       perUnitPrice: transaction.price,
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
+      accounting: AccountingType.capital,
     );
   }
 
@@ -78,10 +104,10 @@ class Transaction {
   /// Trade symbol of the transaction.
   final String tradeSymbol;
 
-  /// Quantity of the transaction.
+  /// Quantity of units transacted.
   final int quantity;
 
-  /// Type of transaction.
+  /// Market transaction type (e.g. PURCHASE, SELL)
   final MarketTransactionTypeEnum tradeType;
 
   /// Per-unit price of the transaction.
@@ -92,6 +118,12 @@ class Transaction {
 
   /// Credits of the agent after the transaction.
   final int agentCredits;
+
+  /// The accounting classification of the transaction.
+  final AccountingType? accounting;
+
+  // /// The behavior that caused this transaction.
+  // final BehaviorSource? behavior;
 
   /// The change in credits from this transaction.
   int get creditChange {
@@ -113,6 +145,7 @@ class Transaction {
       'perUnitPrice': perUnitPrice,
       'timestamp': timestamp.toUtc().toIso8601String(),
       'agentCredits': agentCredits,
+      'accounting': accounting?.name,
     };
   }
 

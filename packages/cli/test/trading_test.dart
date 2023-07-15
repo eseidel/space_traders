@@ -455,6 +455,7 @@ void main() {
       quantity: 1,
       timestamp: DateTime(2021),
       agentCredits: 10,
+      accounting: AccountingType.fuel,
     );
     final transaction2 = Transaction(
       shipSymbol: 'foo',
@@ -465,6 +466,7 @@ void main() {
       quantity: 1,
       timestamp: DateTime(2021),
       agentCredits: 10,
+      accounting: AccountingType.fuel,
     );
     final costed2 = costed.byAddingTransactions([transaction1]);
     expect(costed2.transactions, [transaction1]);

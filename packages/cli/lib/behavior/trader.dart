@@ -82,6 +82,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
     ship,
     TradeSymbol.fromJson(neededTradeSymbol)!,
     unitsToPurchase,
+    AccountingType.goods,
   );
   return result;
 }
@@ -185,6 +186,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
     caches.agent,
     currentMarket,
     ship,
+    AccountingType.goods,
   );
   // We don't yet record the completed deal anywhere.
   final completedDeal = costedDeal.byAddingTransactions(transactions);
@@ -534,6 +536,9 @@ Future<DateTime?> advanceTrader(
         caches.agent,
         currentMarket,
         ship,
+        // TODO(eseidel): We don't know what type of transaction this is.
+        // e.g. we could be selling MOUNTS which would be capital.
+        AccountingType.goods,
         where: exceptDealCargo,
       );
     }

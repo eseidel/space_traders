@@ -177,6 +177,7 @@ Future<DateTime?> advanceMiner(
         caches.agent,
         currentMarket,
         ship,
+        AccountingType.goods,
       );
       // This could also compare before cargo and after cargo and call
       // a change success.  That would allow ships to mine even when they have

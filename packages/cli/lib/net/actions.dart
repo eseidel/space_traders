@@ -94,7 +94,8 @@ Future<List<Transaction>> sellAllCargoAndLog(
   TransactionLog transactionLog,
   AgentCache agentCache,
   Market market,
-  Ship ship, {
+  Ship ship,
+  AccountingType accounting, {
   bool Function(String tradeSymbol)? where,
 }) async {
   if (ship.cargo.inventory.isEmpty) {
@@ -108,8 +109,11 @@ Future<List<Transaction>> sellAllCargoAndLog(
     final marketTransaction = response.transaction;
     final agent = response.agent;
     logTransaction(ship, marketPrices, agent, marketTransaction);
-    final transaction =
-        Transaction.fromMarketTransaction(marketTransaction, agent.credits);
+    final transaction = Transaction.fromMarketTransaction(
+      marketTransaction,
+      agent.credits,
+      accounting,
+    );
     transactionLog.log(transaction);
     transactions.add(transaction);
   }
@@ -125,6 +129,7 @@ Future<Transaction?> purchaseCargoAndLog(
   Ship ship,
   TradeSymbol tradeSymbol,
   int amountToBuy,
+  AccountingType accounting,
 ) async {
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
   try {
@@ -141,6 +146,7 @@ Future<Transaction?> purchaseCargoAndLog(
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
       agent.credits,
+      accounting,
     );
     transactionLog.log(transaction);
     return transaction;
@@ -265,7 +271,11 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
       transactionEmoji: '⛽',
     );
     transactionLog.log(
-      Transaction.fromMarketTransaction(transaction, agent.credits),
+      Transaction.fromMarketTransaction(
+        transaction,
+        agent.credits,
+        AccountingType.fuel,
+      ),
     );
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {

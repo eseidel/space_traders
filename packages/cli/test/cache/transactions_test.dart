@@ -14,6 +14,7 @@ void main() {
       perUnitPrice: 2,
       timestamp: moonLanding,
       agentCredits: 3,
+      accounting: AccountingType.capital,
     );
     final json = price.toJson();
     final price2 = Transaction.fromJson(json);

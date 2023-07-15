@@ -49,10 +49,12 @@ void printSyntheticDeal(SyntheticDeal deal) {
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final deals = <SyntheticDeal>[];
   final openDeals = <String, List<Transaction>>{};
+  final ignoredTransactions = <Transaction>[];
   for (final transaction in caches.transactions.entries) {
     // Ignore fuel transactions for now, our logic below would need to be more
     // complicated not to get confused by them.
     if (transaction.tradeSymbol == TradeSymbol.FUEL.value) {
+      ignoredTransactions.add(transaction);
       continue;
     }
     if (transaction.tradeType == MarketTransactionTypeEnum.PURCHASE) {
@@ -69,6 +71,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     } else if (transaction.tradeType == MarketTransactionTypeEnum.SELL) {
       final openDeal = openDeals[transaction.shipSymbol];
       if (openDeal == null) {
+        ignoredTransactions.add(transaction);
         continue; // Ignore the transaction we don't have a purchase for.
       } else {
         openDeal.add(transaction);
@@ -81,5 +84,10 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
 
   for (final deal in deals) {
     printSyntheticDeal(deal);
+  }
+
+  logger.info('Ignored ${ignoredTransactions.length} transactions:');
+  for (final transaction in ignoredTransactions) {
+    logger.info(describeTransaction(transaction));
   }
 }
