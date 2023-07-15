@@ -131,13 +131,14 @@ void main() {
   });
 
   test('contractDescription', () {
-    final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
+    final deadline = DateTime.utc(2021);
+    final now = DateTime.utc(2020);
     final contract = Contract(
       id: 'id',
       factionSymbol: 'faction',
       type: ContractTypeEnum.PROCUREMENT,
       terms: ContractTerms(
-        deadline: moonLanding,
+        deadline: deadline,
         payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
         deliver: [
           ContractDeliverGood(
@@ -148,14 +149,15 @@ void main() {
           )
         ],
       ),
-      expiration: moonLanding,
-      deadlineToAccept: moonLanding,
+      expiration: deadline,
+      deadlineToAccept: deadline,
     );
-    final localTime = moonLanding.toLocal().toString();
     expect(
-      contractDescription(contract),
-      'PROCUREMENT from faction, deliver 10 T to W by $localTime for '
-      '1,000c with 1,000c upfront',
+      contractDescription(
+        contract,
+        getNow: () => now,
+      ),
+      'deliver 10  T to W in 1y for 1,000c with 1,000c upfront',
     );
   });
 

@@ -85,8 +85,7 @@ void logShip(
   if (routePlan != null) {
     final timeLeft = timeToArrival(systemsCache, routePlan, ship);
     final destination = routePlan.endSymbol;
-    final arrival =
-        timeLeft == null ? 'unknown' : approximateDuration(timeLeft);
+    final arrival = approximateDuration(timeLeft);
     logger.info('  destination: $destination, '
         'arrives in $arrival');
   }

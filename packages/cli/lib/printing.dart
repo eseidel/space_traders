@@ -70,17 +70,26 @@ String creditsString(int credits) {
 }
 
 /// Return a string describing the given [contract].
-String contractDescription(Contract contract) {
+String contractDescription(
+  Contract contract, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
   final terms = contract.terms;
-  var termsString = terms.deliver
-      .map(
-        (d) => '${d.unitsRequired} ${d.tradeSymbol} to ${d.destinationSymbol}',
-      )
-      .join(', ');
-  termsString += ' by ${terms.deadline.toLocal()}';
+  var termsString = terms.deliver.map((d) {
+    final unitsRemaining = d.unitsRequired - d.unitsFulfilled;
+    final remainingString = d.unitsFulfilled == 0
+        ? ''
+        : '(${unitsRemaining.toString().padLeft(3)} remaining)';
+    return '${d.unitsRequired} $remainingString '
+        '${d.tradeSymbol} to ${d.destinationSymbol}';
+  }).join(', ');
+  final timeRemaining = terms.deadline.difference(getNow());
+  termsString += ' in ${approximateDuration(timeRemaining)}';
   termsString += ' for ${creditsString(terms.payment.onFulfilled)}';
   termsString += ' with ${creditsString(terms.payment.onAccepted)} upfront';
-  return '${contract.type} from ${contract.factionSymbol}, '
+  return
+      // '${contract.type} '
+      // 'from ${contract.factionSymbol}, '
       'deliver $termsString';
 }
 

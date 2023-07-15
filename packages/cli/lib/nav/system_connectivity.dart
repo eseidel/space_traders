@@ -77,6 +77,18 @@ class SystemConnectivity {
         .length;
   }
 
+  /// Returns the cluster id for the given system.
+  int clusterIdForSystem(String systemSymbol) =>
+      _clusterBySystemSymbol[systemSymbol]!;
+
+  /// Returns all the systemSymbols in a given cluster. This is most useful when
+  /// looking up a cluster for a specific system first, then you can use this
+  /// method to find all the systems in that cluster.
+  Iterable<String> systemSymbolsByClusterId(int clusterId) =>
+      _clusterBySystemSymbol.entries
+          .where((e) => e.value == clusterId)
+          .map((e) => e.key);
+
   /// Returns true if there exists a path in the jumpgate network between
   /// [startSystemSymbol] and [endSystemSymbol]
   bool canJumpBetween({

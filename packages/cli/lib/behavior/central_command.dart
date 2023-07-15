@@ -360,14 +360,17 @@ class CentralCommand {
   ) sync* {
     for (final contract in affordableContracts(agentCache, contractCache)) {
       for (final good in contract.terms.deliver) {
-        yield SellOpp(
-          marketSymbol: good.destinationSymbol,
-          tradeSymbol: good.tradeSymbol,
-          contractId: contract.id,
-          price: _maxWorthwhileUnitPurchasePrice(contract, good),
-          maxUnits:
-              _remainingUnitsNeededForContract(contract, good.tradeSymbol),
-        );
+        final unitsNeeded =
+            _remainingUnitsNeededForContract(contract, good.tradeSymbol);
+        if (unitsNeeded > 0) {
+          yield SellOpp(
+            marketSymbol: good.destinationSymbol,
+            tradeSymbol: good.tradeSymbol,
+            contractId: contract.id,
+            price: _maxWorthwhileUnitPurchasePrice(contract, good),
+            maxUnits: unitsNeeded,
+          );
+        }
       }
     }
   }
@@ -770,8 +773,7 @@ class CentralCommand {
   }
 
   /// Computes the number of units needed to fulfill the given [contract].
-  /// It should exclude units already spoken for by other ships, but doesn't
-  /// yet.
+  /// Includes units in flight.
   int _remainingUnitsNeededForContract(Contract contract, String tradeSymbol) {
     final shipSymbols = _shipSymbolsServicingContract(contract);
     final ships = _shipCache.ships.where((s) => shipSymbols.contains(s.symbol));

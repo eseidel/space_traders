@@ -68,6 +68,14 @@ class ContractCache extends ResponseListCache<Contract> {
     await save();
   }
 
+  /// Returns a list of all completed contracts.
+  List<Contract> get completedContracts =>
+      contracts.where((c) => c.fulfilled).toList();
+
+  /// Returns a list of all expired contracts.
+  List<Contract> get expiredContracts =>
+      contracts.where((c) => c.isExpired && !c.fulfilled).toList();
+
   /// Returns a list of all active (not fulfilled or expired) contracts.
   List<Contract> get activeContracts =>
       contracts.where((c) => !c.fulfilled && !c.isExpired).toList();

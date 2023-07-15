@@ -250,7 +250,8 @@ class CostedDeal {
     required this.route,
     required this.cargoSize,
     required this.costPerFuelUnit,
-  }) : transactions = List.unmodifiable(transactions);
+  })  : transactions = List.unmodifiable(transactions),
+        assert(cargoSize > 0, 'cargoSize must be > 0');
 
   /// Create a CostedDeal from JSON.
   factory CostedDeal.fromJson(Map<String, dynamic> json) => CostedDeal(
