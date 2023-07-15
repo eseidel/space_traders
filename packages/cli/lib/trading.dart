@@ -245,17 +245,17 @@ class CostedDeal {
   /// Create a new CostedDeal.
   CostedDeal({
     required this.deal,
-    required this.tradeVolume,
     required List<Transaction> transactions,
     required this.startTime,
     required this.route,
+    required this.cargoSize,
     required this.costPerFuelUnit,
   }) : transactions = List.unmodifiable(transactions);
 
   /// Create a CostedDeal from JSON.
   factory CostedDeal.fromJson(Map<String, dynamic> json) => CostedDeal(
         deal: Deal.fromJson(json['deal'] as Map<String, dynamic>),
-        tradeVolume: json['tradeVolume'] as int,
+        cargoSize: json['cargoSize'] as int? ?? json['tradeVolume'] as int,
         startTime: DateTime.parse(json['startTime'] as String),
         route: RoutePlan.fromJson(json['route'] as Map<String, dynamic>),
         transactions: (json['transactions'] as List<dynamic>)
@@ -273,11 +273,26 @@ class CostedDeal {
   /// The deal being considered.
   final Deal deal;
 
-  /// The number of units of cargo to trade.  This must be less than or equal to
-  /// the Deal.maxUnits (if set) and accounts for the specific cargo hold size
-  /// of the ship for which we're costing this deal.
-  // TODO(eseidel): Rename to maxUnits?
-  final int tradeVolume;
+  /// The number of units of cargo this deal was priced for.
+  final int cargoSize;
+
+  /// expectedUnits uses cargoSize instead of maxUnitsToBuy when computing
+  /// pricing to avoid having contracts never finish due to only needing one
+  /// more unit yet that unit not being worth carrying in an otherwise empty
+  /// ship.
+  int get expectedUnits => cargoSize;
+
+  /// The max number of units of cargo to buy. This must be less than or equal
+  /// to the Deal.maxUnits (if set) and expectedUnits and accounts for contracts
+  /// which only take up to a certain number of units as well as cargo size
+  /// (expectedUnits).
+  /// We can't inflate the price of the units towards the end of the contract
+  /// without causing us to over-spend, so we instead inflate the number
+  /// we're expected to buy (by not reducing to maxUnits) to allow those last
+  /// few units to look profitable during planning and not let contracts stall.
+  int get maxUnitsToBuy => deal.maxUnits != null
+      ? min(deal.maxUnits!, expectedUnits)
+      : expectedUnits;
 
   /// The cost per unit of fuel used for computing expected fuel costs.
   final int costPerFuelUnit;
@@ -308,23 +323,24 @@ class CostedDeal {
   String get tradeSymbol => deal.tradeSymbol.value;
 
   /// The expected cost of goods sold, not including fuel.
-  int get expectedCostOfGoodsSold => deal.purchasePrice * tradeVolume;
+  int get expectedCostOfGoodsSold => deal.purchasePrice * expectedUnits;
 
   /// The expected non-goods expenses of the deal, including fuel.
   int get expectedOperationalExpenses => expectedFuelCost;
 
   /// The total upfront cost of the deal, including fuel.
-  int get expectedCosts => deal.purchasePrice * tradeVolume + expectedFuelCost;
+  int get expectedCosts =>
+      deal.purchasePrice * expectedUnits + expectedFuelCost;
 
   /// The total income of the deal, including fuel.
-  int get expectedRevenue => deal.sellPrice * tradeVolume;
+  int get expectedRevenue => deal.sellPrice * expectedUnits;
 
   /// Max we would spend per unit and still expect to break even.
   int get maxPurchaseUnitPrice =>
-      (expectedRevenue - expectedOperationalExpenses) ~/ tradeVolume;
+      (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
 
   /// The total profit of the deal, including fuel.
-  int get expectedProfit => deal.profit * tradeVolume - expectedFuelCost;
+  int get expectedProfit => deal.profit * expectedUnits - expectedFuelCost;
 
   /// The profit per second of the deal.
   int get expectedProfitPerSecond {
@@ -378,7 +394,9 @@ class CostedDeal {
   Map<String, dynamic> toJson() => {
         'deal': deal.toJson(),
         'expectedFuelCost': expectedFuelCost,
-        'tradeVolume': tradeVolume,
+        // Remove tradeVolume once we're sure we don't need it.
+        'tradeVolume': cargoSize,
+        'cargoSize': cargoSize,
         'expectedTime': expectedTime,
         'contractId': contractId,
         'transactions': transactions.map((e) => e.toJson()).toList(),
@@ -391,7 +409,7 @@ class CostedDeal {
   CostedDeal byAddingTransactions(List<Transaction> transactions) {
     return CostedDeal(
       deal: deal,
-      tradeVolume: tradeVolume,
+      cargoSize: cargoSize,
       transactions: [...this.transactions, ...transactions],
       startTime: startTime,
       route: route,
@@ -453,8 +471,7 @@ CostedDeal costOutDeal(
 
   return CostedDeal(
     deal: deal,
-    tradeVolume:
-        deal.maxUnits != null ? min(deal.maxUnits!, cargoSize) : cargoSize,
+    cargoSize: cargoSize,
     transactions: [],
     startTime: DateTime.timestamp(),
     route: route,
@@ -495,7 +512,7 @@ CostedDeal? _filterDealsAndLog(
 }) {
   final filtered = filter != null ? costedDeals.where(filter) : costedDeals;
 
-  final withinRange = 'within $maxJumps of $systemSymbol';
+  final withinRange = 'within $maxJumps jumps of $systemSymbol';
   if (filtered.isEmpty) {
     logger.info('No deals $withinRange.');
     return null;
@@ -508,8 +525,8 @@ CostedDeal? _filterDealsAndLog(
   final sortedDeals =
       affordable.sortedBy<num>((e) => e.expectedProfitPerSecond);
 
-  logger.info('Top 5 deals $withinRange:');
-  for (final deal in sortedDeals.reversed.take(5).toList().reversed) {
+  logger.info('Top 3 deals (of ${sortedDeals.length}) $withinRange:');
+  for (final deal in sortedDeals.reversed.take(3).toList().reversed) {
     logger.info(describeCostedDeal(deal));
   }
 
@@ -570,8 +587,12 @@ Future<CostedDeal?> findDealFor(
   // toList is used to force resolution of the list before we log.
   final after = DateTime.now();
   final elapsed = after.difference(before);
-  logger
-      .info('Costed ${deals.length} deals in ${approximateDuration(elapsed)}');
+  // This should be 300ms or less.
+  if (elapsed > const Duration(seconds: 1)) {
+    logger.warn(
+      'Costed ${deals.length} deals in ${approximateDuration(elapsed)}',
+    );
+  }
   return _filterDealsAndLog(
     costedDeals,
     maxJumps: maxJumps,

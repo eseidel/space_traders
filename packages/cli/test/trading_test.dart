@@ -99,7 +99,7 @@ void main() {
     );
     final costed = CostedDeal(
       deal: deal,
-      tradeVolume: 1,
+      cargoSize: 1,
       transactions: [],
       startTime: DateTime(2021),
       route: const RoutePlan(
@@ -173,7 +173,7 @@ void main() {
     /// These aren't very useful numbers, I don't think it takes 15s to fly
     /// 0 distance (even between orbitals)?
     expect(costed.expectedFuelCost, 0);
-    expect(costed.tradeVolume, 1);
+    expect(costed.cargoSize, 1);
     expect(costed.expectedTime, 15);
   });
 
@@ -207,7 +207,7 @@ void main() {
         purchasePrice: 1,
         sellPrice: 2,
       ),
-      tradeVolume: 1,
+      cargoSize: 1,
       transactions: [],
       startTime: DateTime(2021),
       route: const RoutePlan(
@@ -428,7 +428,7 @@ void main() {
     );
     final costed = CostedDeal(
       deal: deal,
-      tradeVolume: 1,
+      cargoSize: 1,
       transactions: [],
       startTime: DateTime(2021),
       route: const RoutePlan(
@@ -470,5 +470,39 @@ void main() {
     expect(costed2.transactions, [transaction1]);
     final costed3 = costed2.byAddingTransactions([transaction2]);
     expect(costed3.transactions, [transaction1, transaction2]);
+  });
+
+  test('Deal.maxUnits', () {
+    const deal = Deal(
+      sourceSymbol: 'A',
+      destinationSymbol: 'B',
+      tradeSymbol: TradeSymbol.FUEL,
+      purchasePrice: 1,
+      sellPrice: 2,
+      maxUnits: 10,
+    );
+    final costedDeal = CostedDeal(
+      deal: deal,
+      cargoSize: 100,
+      transactions: [],
+      startTime: DateTime(2021),
+      route: const RoutePlan(
+        actions: [
+          RouteAction(
+            startSymbol: 'A',
+            endSymbol: 'B',
+            type: RouteActionType.navCruise,
+            duration: 10,
+          )
+        ],
+        fuelCapacity: 10,
+        fuelUsed: 10,
+        shipSpeed: 10,
+      ),
+      costPerFuelUnit: 100,
+    );
+    expect(costedDeal.cargoSize, 100);
+    expect(costedDeal.expectedUnits, 100);
+    expect(costedDeal.maxUnitsToBuy, 10);
   });
 }

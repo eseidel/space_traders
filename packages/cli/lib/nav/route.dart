@@ -220,6 +220,7 @@ class RoutePlan {
     String waypointSymbol,
   ) {
     final index = actions.indexWhere((e) => e.startSymbol == waypointSymbol);
+    // This most commonly occurs when something asks for the endSymbol.
     if (index == -1) {
       throw ArgumentError('No action starting from $waypointSymbol');
     }

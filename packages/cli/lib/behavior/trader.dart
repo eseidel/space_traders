@@ -96,8 +96,8 @@ int _unitsToPurchase(
   final marketTradeVolume = good.tradeVolume;
   final unitsToPurchase = min(marketTradeVolume, ship.availableSpace);
   // Some deals have limited size (like contracts) for normal arbitrage deals
-  // costedDeal.tradeVolume == ship.cargoSpace.
-  return min(unitsToPurchase, costedDeal.tradeVolume);
+  // costedDeal.cargoSize == ship.cargoSpace.
+  return min(unitsToPurchase, costedDeal.maxUnitsToBuy);
 }
 
 Future<DateTime?> _handleAtSourceWithDeal(
