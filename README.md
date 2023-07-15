@@ -113,10 +113,12 @@ Exploring:
   to explore.
 * Buy an Explorer and teach it how to warp to other systems and other
   jump gate clusters.
+* Make the explorer logic work entirely offline.
 
 Tech Debt:
 * Fix all uses of DateTime.now() to be DateTime.timestamp() and test.
 * Write a test suite for routing.
+* Make all load/loadCached functions consistent.
 
 Efficiency:
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
