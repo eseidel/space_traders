@@ -188,7 +188,7 @@ class CentralCommand {
       // Behavior.miner,
       // Behavior.idle,
       // Hangs too much for now.
-      Behavior.explorer,
+      // Behavior.explorer,
     ];
 
     // Probably want special behavior for the command ship when we
@@ -207,7 +207,7 @@ class CentralCommand {
         Behavior.explorer,
       ],
       ShipRole.EXCAVATOR: [Behavior.miner],
-      ShipRole.SATELLITE: [Behavior.idle],
+      ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
     if (behaviors != null) {
       for (final behavior in behaviors) {
