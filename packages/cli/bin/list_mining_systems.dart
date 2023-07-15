@@ -46,7 +46,7 @@ Future<void> cliMain(List<String> args) async {
   final chartingCache = ChartingCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache, chartingCache);
   final marketCache = MarketCache(waypointCache);
-  final marketPrices = await MarketPrices.load(fs);
+  final marketPrices = MarketPrices.load(fs);
 
   SystemWaypoint start;
   final startArg = results['start'] as String?;

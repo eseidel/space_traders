@@ -104,7 +104,7 @@ class Caches {
     required Future<http.Response> Function(Uri uri) httpGet,
   }) async {
     final agent = await AgentCache.load(api, fs: fs);
-    final prices = await MarketPrices.load(fs);
+    final prices = MarketPrices.load(fs);
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
     final shipyard = await ShipyardPrices.load(fs);

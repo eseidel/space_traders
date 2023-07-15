@@ -110,7 +110,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
   final systemsCache = SystemsCache.loadFromCache(fs)!;
-  final marketPrices = await MarketPrices.load(fs);
+  final marketPrices = MarketPrices.load(fs);
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final jumpCache = JumpCache();
 

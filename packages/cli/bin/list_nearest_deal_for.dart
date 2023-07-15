@@ -25,7 +25,7 @@ void main(List<String> args) async {
 /// Look through nearby marketplaces (including ones a jump away)
 /// looking for the best deal for a given symbol.
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
-  final marketPrices = await MarketPrices.load(fs);
+  final marketPrices = MarketPrices.load(fs);
 
   final promptResponse = logger.prompt(
     'Which trade symbol? (Options: ${TradeSymbol.values.join(', ')}))',

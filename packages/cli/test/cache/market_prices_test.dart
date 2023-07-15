@@ -239,7 +239,7 @@ void main() {
     expect(marketPrices.hasRecentMarketData('a'), true);
     expect(marketPrices.count, 1);
 
-    final marketPrices2 = await MarketPrices.load(fs);
+    final marketPrices2 = MarketPrices.load(fs);
     expect(marketPrices2.hasRecentMarketData('a'), true);
     expect(marketPrices2.count, 1);
   });

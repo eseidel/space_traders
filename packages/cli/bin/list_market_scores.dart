@@ -5,7 +5,7 @@ import 'package:cli/logger.dart';
 import 'package:file/file.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  final marketPrices = await MarketPrices.load(fs);
+  final marketPrices = MarketPrices.load(fs);
   final topTen = scoreMarketSystems(marketPrices, limit: 10);
   for (final entry in topTen.entries) {
     final market = entry.key;

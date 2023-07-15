@@ -74,12 +74,14 @@ Future<DateTime?> advanceBuyShip(
 
   // Get our median price before updating shipyard prices.
   final medianPrice = caches.shipyardPrices.medianPurchasePrice(shipType);
+  // TODO(eseidel): As written, this can never buy a ship immediately on spawn.
+  // Since we won't have surveyed any shipyards yet.
   if (medianPrice == null) {
     await centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Failed to buy ship, no median price for $shipType.',
-      const Duration(hours: 1),
+      const Duration(minutes: 30),
     );
     return null;
   }

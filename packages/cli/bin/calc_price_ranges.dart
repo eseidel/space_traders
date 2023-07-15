@@ -25,7 +25,7 @@ void printPriceRanges(List<MarketPrice> gameStats) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   const fs = LocalFileSystem();
-  final prices = await MarketPrices.load(fs);
+  final prices = MarketPrices.load(fs);
 
   logger.info('${prices.count} prices loaded.');
   printPriceRanges(prices.prices);

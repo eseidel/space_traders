@@ -133,10 +133,11 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   static const String defaultCacheFilePath = 'data/prices.json';
 
   /// Load the price data from the cache.
-  static Future<MarketPrices> load(
+  // ignore: prefer_constructors_over_static_methods
+  static MarketPrices load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
-  }) async {
+  }) {
     final prices = JsonListStore.load<MarketPrice>(
           fs,
           path,
@@ -212,7 +213,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
         MarketTransactionTypeEnum.PURCHASE,
       );
 
-  /// Get the median purchase price for a trade good.
+  /// Get the median price this good can be purchased for.
   int? medianPurchasePrice(String symbol) =>
       purchasePriceAtPercentile(symbol, 50);
 
