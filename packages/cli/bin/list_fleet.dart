@@ -46,12 +46,22 @@ String describeInventory(
 Duration timeToArrival(
   SystemsCache systemsCache,
   RoutePlan routePlan,
-  String waypointSymbol,
+  Ship ship,
 ) {
-  final newPlan = routePlan.subPlanStartingFrom(systemsCache, waypointSymbol);
-  // Include cooldown until next jump.
-  // Include remaining navigation time.
-  return Duration(seconds: newPlan.duration);
+  var timeLeft = ship.nav.status == ShipNavStatus.IN_TRANSIT
+      ? ship.nav.route.arrival.difference(DateTime.timestamp())
+      : Duration.zero;
+  if (routePlan.endSymbol != ship.nav.waypointSymbol) {
+    final newPlan =
+        routePlan.subPlanStartingFrom(systemsCache, ship.nav.waypointSymbol);
+    timeLeft += Duration(seconds: newPlan.duration);
+    // Include cooldown until next jump.
+    // We would need to keep ship cooldowns on ShipCache to do this.
+    // if (newPlan.actions.first.type == RouteActionType.jump) {
+    //   timeLeft += ship.jumpCooldown;
+    // }
+  }
+  return timeLeft;
 }
 
 void logShip(
@@ -73,11 +83,12 @@ void logShip(
   }
   final routePlan = behavior?.routePlan;
   if (routePlan != null) {
-    final timeLeft =
-        timeToArrival(systemsCache, routePlan, ship.nav.waypointSymbol);
+    final timeLeft = timeToArrival(systemsCache, routePlan, ship);
     final destination = routePlan.endSymbol;
+    final arrival =
+        timeLeft == null ? 'unknown' : approximateDuration(timeLeft);
     logger.info('  destination: $destination, '
-        'arrives in ${approximateDuration(timeLeft)}');
+        'arrives in $arrival');
   }
   final deal = behavior?.deal;
   if (deal != null) {
