@@ -341,7 +341,7 @@ class CentralCommand {
     _behaviorCache.setBehavior(shipSymbol, state);
   }
 
-  /// Returns all systems containing explorers or explorer destinations.
+  /// Returns all deals in progress.
   Iterable<CostedDeal> _dealsInProgress() sync* {
     for (final state in _behaviorCache.states) {
       final deal = state.deal;
@@ -522,15 +522,16 @@ class CentralCommand {
       if (state.shipSymbol == thisShipSymbol) {
         continue;
       }
-      if (state.behavior == behavior) {
-        final destination = state.routePlan?.endSymbol;
-        if (destination != null) {
-          final parsed = parseWaypointString(destination);
-          yield parsed.system;
-        } else {
-          final ship = _shipCache.ship(state.shipSymbol);
-          yield ship.nav.systemSymbol;
-        }
+      if (state.behavior != behavior) {
+        continue;
+      }
+      final destination = state.routePlan?.endSymbol;
+      if (destination != null) {
+        final parsed = parseWaypointString(destination);
+        yield parsed.system;
+      } else {
+        final ship = _shipCache.ship(state.shipSymbol);
+        yield ship.nav.systemSymbol;
       }
     }
   }
@@ -539,7 +540,7 @@ class CentralCommand {
   Iterable<String> otherExplorerSystems(String thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
 
-  /// Returns all systems containing explorers or explorer destinations.
+  /// Returns all systems containing traders or trader destinations.
   Iterable<String> _otherTraderSystems(String thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
@@ -626,13 +627,13 @@ class CentralCommand {
       ShipType.PROBE: probeTarget,
       ShipType.LIGHT_HAULER: 50,
     };
-    final typesToBuy = targetCounts.keys
-        .where(
-          (shipType) =>
-              shipyardHas(shipType) &&
-              (_countOfTypeInFleet(shipType) < targetCounts[shipType]!),
-        )
-        .toList();
+    final typesToBuy = targetCounts.keys.where((shipType) {
+      if (!shipyardHas(shipType)) {
+        logger.info("Shipyard doesn't have $shipType");
+        return false;
+      }
+      return _countOfTypeInFleet(shipType) < targetCounts[shipType]!;
+    }).toList();
     logger.info('typesToBuy: $typesToBuy');
     if (typesToBuy.isEmpty) {
       return null;

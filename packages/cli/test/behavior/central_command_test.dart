@@ -6,6 +6,7 @@ import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -18,7 +19,7 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockLogger extends Mock implements Logger {}
 
-// class _MockShipNav extends Mock implements ShipNav {}
+class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockAgent extends Mock implements Agent {}
 
@@ -109,45 +110,61 @@ void main() {
     expect(behavior, Behavior.idle);
   });
 
-  // test('CentralCommand.otherExplorerSystems', () async {
-  //   final fs = MemoryFileSystem.test();
-  //   final behaviorCache = BehaviorCache.load(fs);
-  //   final shipCache = _MockShipCache();
-  //   final centralCommand =
-  //       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-  //   final shipA = _MockShip();
-  //   final shipNavA = _MockShipNav();
-  //   when(() => shipA.symbol).thenReturn('A');
-  //   when(() => shipNavA.systemSymbol).thenReturn('S-A');
-  //   when(() => shipA.nav).thenReturn(shipNavA);
-  //   await centralCommand.setBehavior(
-  //     'A',
-  //     BehaviorState('A', Behavior.explorer),
-  //   );
-  //   await centralCommand.setDestination(shipA, 'S-A-W');
-  //   final shipB = _MockShip();
-  //   when(() => shipB.symbol).thenReturn('B');
-  //   final shipNavB = _MockShipNav();
-  //   when(() => shipNavB.systemSymbol).thenReturn('S-C');
-  //   when(() => shipB.nav).thenReturn(shipNavB);
-  //   await centralCommand.setBehavior(
-  //     'B',
-  //     BehaviorState('B', Behavior.explorer),
-  //   );
-  //   await centralCommand.setDestination(shipB, 'S-B-W');
-  //   expect(centralCommand.currentDestination(shipB), 'S-B-W');
-  //   when(() => shipCache.ship('B')).thenReturn(shipB);
+  test('CentralCommand.otherExplorerSystems', () async {
+    RoutePlan fakeJump(String start, String end) {
+      return RoutePlan(
+        fuelCapacity: 10,
+        shipSpeed: 10,
+        actions: [
+          RouteAction(
+            startSymbol: start,
+            endSymbol: end,
+            type: RouteActionType.jump,
+            duration: 10,
+          )
+        ],
+        fuelUsed: 10,
+      );
+    }
 
-  //   final otherSystems = centralCommand.otherExplorerSystems('A').toList();
-  //   expect(otherSystems, ['S-B']); // From destination
-  //   await centralCommand.reachedDestination(shipB);
-  //   expect(centralCommand.currentDestination(shipB), isNull);
-  //   final otherSystems2 = centralCommand.otherExplorerSystems('A').toList();
-  //   expect(otherSystems2, ['S-C']); // From nav.systemSymbol
-  //   await centralCommand.completeBehavior('B');
-  //   final otherSystems3 = centralCommand.otherExplorerSystems('A').toList();
-  //   expect(otherSystems3, <String>[]);
-  // });
+    final fs = MemoryFileSystem.test();
+    final behaviorCache = BehaviorCache.load(fs);
+    final shipCache = _MockShipCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final shipA = _MockShip();
+    final shipNavA = _MockShipNav();
+    when(() => shipA.symbol).thenReturn('A');
+    when(() => shipNavA.systemSymbol).thenReturn('S-A');
+    when(() => shipA.nav).thenReturn(shipNavA);
+    await centralCommand.setBehavior(
+      'A',
+      BehaviorState('A', Behavior.explorer),
+    );
+    await centralCommand.setRoutePlan(shipA, fakeJump('S-A-A', 'S-A-W'));
+    final shipB = _MockShip();
+    when(() => shipB.symbol).thenReturn('B');
+    final shipNavB = _MockShipNav();
+    when(() => shipNavB.systemSymbol).thenReturn('S-C');
+    when(() => shipB.nav).thenReturn(shipNavB);
+    await centralCommand.setBehavior(
+      'B',
+      BehaviorState('B', Behavior.explorer),
+    );
+    await centralCommand.setRoutePlan(shipB, fakeJump('S-A-A', 'S-B-W'));
+    expect(centralCommand.currentRoutePlan(shipB)!.endSymbol, 'S-B-W');
+    when(() => shipCache.ship('B')).thenReturn(shipB);
+
+    final otherSystems = centralCommand.otherExplorerSystems('A').toList();
+    expect(otherSystems, ['S-B']); // From destination
+    await centralCommand.reachedEndOfRoutePlan(shipB);
+    expect(centralCommand.currentRoutePlan(shipB), isNull);
+    final otherSystems2 = centralCommand.otherExplorerSystems('A').toList();
+    expect(otherSystems2, ['S-C']); // From nav.systemSymbol
+    await centralCommand.completeBehavior('B');
+    final otherSystems3 = centralCommand.otherExplorerSystems('A').toList();
+    expect(otherSystems3, <String>[]);
+  });
 
   test('CentralCommand.affordableContracts', () {
     final ship = _MockShip();
