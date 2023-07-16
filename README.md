@@ -67,7 +67,7 @@ But I've not seen the source for that and it appears to be v1 rather than v2.
 ## Development
 
 ## Reset day checklist
-* run `dart run bin/reset.dart`
+* run `dart run bin/reset.dart` -- does not work.
 * Update open_api_config.yaml to have the latest git hash.
 * regenerate space_traders_api
 
@@ -223,6 +223,6 @@ ApiException 400: HTTP connection failed: POST /my/ships/ESEIDEL-15/navigate (In
 <asynchronous suspension>
 
 
-Probably from contracts?
+I think the server is now returning ship inventories with an unstable sort:
 Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O ..., ... "symbol":"PRECIOUS_S ...,               ^]
 [WARN] Ship list changed, updating cache.

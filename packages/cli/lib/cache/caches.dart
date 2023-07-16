@@ -101,13 +101,13 @@ class Caches {
   static Future<Caches> load(
     FileSystem fs,
     Api api, {
-    required Future<http.Response> Function(Uri uri) httpGet,
+    Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
   }) async {
     final agent = await AgentCache.load(api, fs: fs);
     final prices = MarketPrices.load(fs);
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
-    final shipyard = await ShipyardPrices.load(fs);
+    final shipyard = ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
     final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);

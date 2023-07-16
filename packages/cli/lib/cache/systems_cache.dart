@@ -59,7 +59,7 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Load the cache from disk.
-  static SystemsCache? loadFromCache(
+  static SystemsCache? loadCached(
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
@@ -73,7 +73,7 @@ class SystemsCache extends JsonListStore<System> {
   /// Load the cache from disk or fall back to fetching from the url.
   static Future<SystemsCache> load(
     FileSystem fs, {
-    required Future<http.Response> Function(Uri uri) httpGet,
+    Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
     String path = defaultCacheFilePath,
     String url = defaultUrl,
   }) async {

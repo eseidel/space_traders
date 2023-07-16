@@ -40,7 +40,7 @@ void main() {
     expect(loaded.waypointCount, 1);
     expect(loaded.values.first.waypointSymbol, 'A');
     expect(loaded.values.first.chart.submittedBy, 'ESEIDEL');
-    expect(loaded.values.first.faction.symbol, FactionSymbols.AEGIS);
+    expect(loaded.values.first.faction?.symbol, FactionSymbols.AEGIS);
     expect(loaded.values.first.traits, hasLength(1));
     expect(
       loaded.values.first.traits.first.symbol,

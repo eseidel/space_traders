@@ -27,7 +27,7 @@ class Result {
 Future<void> command(FileSystem fs, List<String> args) async {
   const count = 500;
 
-  final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final systemsCache = SystemsCache.loadCached(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final jumpCache = JumpCache();
   final factionCache = FactionCache.loadFromCache(fs)!;

@@ -36,7 +36,7 @@ void main(List<String> args) async {
 
   const fs = LocalFileSystem();
   final api = defaultApi(fs);
-  final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final systemsCache = SystemsCache.loadCached(fs)!;
 
   SystemWaypoint start;
   final startArg = results['start'] as String?;

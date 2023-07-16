@@ -110,10 +110,11 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   List<ShipyardPrice> get prices => _prices;
 
   /// Load the price data from the cache or from the url.
-  static Future<ShipyardPrices> load(
+  // ignore: prefer_constructors_over_static_methods
+  static ShipyardPrices load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
-  }) async {
+  }) {
     final prices = JsonListStore.load<ShipyardPrice>(
           fs,
           path,

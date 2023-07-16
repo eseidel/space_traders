@@ -21,7 +21,7 @@ class ChartedValues {
         .map((j) => WaypointOrbital.fromJson(j)!)
         .toList();
     final faction =
-        WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>)!;
+        WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>);
     final traits = (json['traits'] as List<dynamic>)
         .cast<Map<String, dynamic>>()
         .map((j) => WaypointTrait.fromJson(j)!)
@@ -45,7 +45,7 @@ class ChartedValues {
   final List<WaypointOrbital> orbitals;
 
   /// Faction for this waypoint.
-  final WaypointFaction faction;
+  final WaypointFaction? faction;
 
   /// The traits of the waypoint.
   final List<WaypointTrait> traits;
@@ -57,7 +57,7 @@ class ChartedValues {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'waypointSymbol': waypointSymbol,
         'orbitals': orbitals.map((o) => o.toJson()).toList(),
-        'faction': faction.toJson(),
+        'faction': faction?.toJson(),
         'traits': traits.map((t) => t.toJson()).toList(),
         'chart': chart.toJson(),
       };
@@ -111,18 +111,16 @@ class ChartingCache extends JsonStore<_Record> {
   /// Adds a waypoint to the cache.
   void addWaypoint(Waypoint waypoint, {bool shouldSave = true}) {
     final chart = waypoint.chart;
-    final faction = waypoint.faction;
-    final orbitals = waypoint.orbitals;
     // These should either all by null or all be non-null.
     // We only store non-null values, e.g. waypoints which have already
     // been charted.
-    if (chart == null || faction == null || orbitals.isEmpty) {
+    if (chart == null) {
       return;
     }
     final chartedValues = ChartedValues(
       waypointSymbol: waypoint.symbol,
       orbitals: waypoint.orbitals,
-      faction: faction,
+      faction: waypoint.faction,
       traits: waypoint.traits,
       chart: chart,
     );

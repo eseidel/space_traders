@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
@@ -343,10 +344,15 @@ Future<DateTime> navigateToLocalWaypointAndLog(
 }
 
 /// Chart the waypoint [ship] is currently at and log.
-Future<void> chartWaypointAndLog(Api api, Ship ship) async {
+Future<void> chartWaypointAndLog(
+  Api api,
+  ChartingCache chartingCache,
+  Ship ship,
+) async {
   try {
     final response = await api.fleet.createChart(ship.symbol);
     final waypoint = response!.data.waypoint;
+    chartingCache.addWaypoint(waypoint);
     // Powershell needs the space after the emoji.
     shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');
   } on ApiException catch (e) {

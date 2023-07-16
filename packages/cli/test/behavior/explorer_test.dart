@@ -35,6 +35,8 @@ class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockCaches extends Mock implements Caches {}
 
+class _MockChartingCache extends Mock implements ChartingCache {}
+
 void main() {
   test('advanceExplorer smoke test', () async {
     final api = _MockApi();
@@ -50,6 +52,7 @@ void main() {
     final fleetApi = _MockFleetApi();
     final centralCommand = _MockCentralCommand();
     final caches = _MockCaches();
+    final chartingCache = _MockChartingCache();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
     when(() => caches.transactions).thenReturn(transactionLog);
@@ -57,6 +60,7 @@ void main() {
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
+    when(() => caches.charting).thenReturn(chartingCache);
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn('S-A-B');

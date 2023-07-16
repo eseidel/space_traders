@@ -68,7 +68,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final startSymbol = args[0];
   final endSymbol = args[1];
 
-  final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final systemsCache = SystemsCache.loadCached(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final jumpCache = JumpCache();
 

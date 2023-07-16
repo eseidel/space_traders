@@ -88,7 +88,7 @@ void main() {
 
   test('planRoute', () {
     const fs = LocalFileSystem();
-    final systemsCache = SystemsCache.loadFromCache(
+    final systemsCache = SystemsCache.loadCached(
       fs,
       path: 'test/nav/fixtures/systems-06-24-2023.json',
     )!;

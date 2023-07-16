@@ -6,7 +6,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
-import 'package:http/http.dart' as http;
 
 Stream<Faction> _getAllFactionsUnauthenticated() {
   final factionsApi = FactionsApi();
@@ -26,7 +25,7 @@ Future<FactionCache> _loadFactionCache(FileSystem fs) async {
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  final systemsCache = await SystemsCache.load(fs, httpGet: http.get);
+  final systemsCache = await SystemsCache.load(fs);
   final factionCache = await _loadFactionCache(fs);
 
   final factions = factionCache.factions;

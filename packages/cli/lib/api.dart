@@ -2,10 +2,14 @@ import 'dart:math';
 
 import 'package:cli/net/rate_limit.dart';
 import 'package:collection/collection.dart';
+import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart';
 
 export 'package:openapi/api.dart';
+
+/// The default http get function.
+const defaultHttpGet = http.get;
 
 /// Api is a wrapper around the generated api clients.
 /// It provides a single place to inject the api client.

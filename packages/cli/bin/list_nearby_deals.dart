@@ -32,7 +32,7 @@ Future<void> cliMain(List<String> args) async {
   }
 
   const fs = LocalFileSystem();
-  final systemsCache = SystemsCache.loadFromCache(fs)!;
+  final systemsCache = SystemsCache.loadCached(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final jumpCache = JumpCache();
 

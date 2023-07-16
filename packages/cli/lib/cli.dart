@@ -3,7 +3,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/auth.dart';
 import 'package:file/local.dart';
-import 'package:http/http.dart' as http;
 import 'package:scoped/scoped.dart';
 
 /// Run command with a logger.
@@ -26,7 +25,7 @@ Future<R> run<R>(
   return runScoped(
     () async {
       final api = defaultApi(fs);
-      final caches = await Caches.load(fs, api, httpGet: http.get);
+      final caches = await Caches.load(fs, api);
       return fn(fs, api, caches);
     },
     values: {loggerRef},
@@ -54,7 +53,7 @@ Future<R> runWithArgs<R>(
   return runScoped(
     () async {
       final api = defaultApi(fs);
-      final caches = await Caches.load(fs, api, httpGet: http.get);
+      final caches = await Caches.load(fs, api);
       return fn(args, fs, api, caches);
     },
     values: {loggerRef},

@@ -589,8 +589,9 @@ class CentralCommand {
       return ShipType.ORE_HOUND;
     }
 
+    const probeMinimum = 5;
     final traderCount = _countOfTypeInFleet(ShipType.LIGHT_HAULER);
-    final probeTarget = traderCount / 2;
+    final probeTarget = min(traderCount / 2, probeMinimum);
 
     final targetCounts = {
       ShipType.ORE_HOUND: 30,

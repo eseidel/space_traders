@@ -2,7 +2,6 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:scoped/scoped.dart';
 import 'package:ui/route.dart';
 
@@ -12,7 +11,7 @@ late SystemsCache systemsCache;
 void main() async {
   await runScoped(
     () async {
-      systemsCache = await SystemsCache.load(fs, httpGet: http.get);
+      systemsCache = await SystemsCache.load(fs);
     },
     values: {loggerRef},
   );

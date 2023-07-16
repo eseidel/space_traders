@@ -38,7 +38,7 @@ void main() {
     await shipyardPrices.addPrices([a, b]);
     expect(shipyardPrices.prices, [a, b]);
     await shipyardPrices.save();
-    final shipyardPrices2 = await ShipyardPrices.load(fs);
+    final shipyardPrices2 = ShipyardPrices.load(fs);
     expect(shipyardPrices2.prices, [a, b]);
   });
 
