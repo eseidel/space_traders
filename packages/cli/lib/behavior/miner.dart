@@ -224,7 +224,8 @@ Future<DateTime?> advanceMiner(
     );
   }
 
-  final mineSymbol = centralCommand.mineSymbolForShip(caches.systems, ship);
+  final mineSymbol =
+      centralCommand.mineSymbolForShip(caches.systems, caches.agent, ship);
   if (mineSymbol == null) {
     await centralCommand.disableBehaviorForShip(
       ship,

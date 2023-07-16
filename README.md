@@ -221,3 +221,8 @@ ApiException 400: HTTP connection failed: POST /my/ships/ESEIDEL-15/navigate (In
 <asynchronous suspension>
 #6      navigateShip (package:cli/net/direct.dart:53:7)
 <asynchronous suspension>
+
+
+Probably from contracts?
+Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O ..., ... "symbol":"PRECIOUS_S ...,               ^]
+[WARN] Ship list changed, updating cache.

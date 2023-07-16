@@ -198,7 +198,7 @@ class CentralCommand {
       // TODO(eseidel): Evaluate based on expected value, not just order.
       ShipRole.COMMAND: [
         Behavior.buyShip,
-        Behavior.trader,
+        // Behavior.trader,
         Behavior.miner,
       ],
       ShipRole.HAULER: [Behavior.trader],
@@ -581,7 +581,7 @@ class CentralCommand {
         parseWaypointString(agentCache.agent.headquarters).system;
     final inStartSystem = systemSymbol == hqSystemSymbol;
 
-    final isEarlyGame = _shipCache.ships.length < 5;
+    final isEarlyGame = _shipCache.ships.length < 8;
     if (isEarlyGame) {
       if (!inStartSystem) {
         return null;
@@ -792,8 +792,15 @@ class CentralCommand {
   /// Returns the symbol of the nearest mine to the given [ship].
   // This should probably return a "mining plan" instead, which includes
   // what type of mining this is, where the mine is, where the markets are?
-  String? mineSymbolForShip(SystemsCache systemsCache, Ship ship) {
-    final systemSymbol = ship.nav.systemSymbol;
+  String? mineSymbolForShip(
+    SystemsCache systemsCache,
+    AgentCache agentCache,
+    Ship ship,
+  ) {
+    final hq = agentCache.agent.headquarters;
+    final hqSystemSymbol = parseWaypointString(hq).system;
+    final systemSymbol = hqSystemSymbol;
+    // final systemSymbol = ship.nav.systemSymbol;
     // Return the nearest mine to the ship for now?
     final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
     return systemWaypoints.firstWhereOrNull((w) => w.canBeMined)?.symbol;
