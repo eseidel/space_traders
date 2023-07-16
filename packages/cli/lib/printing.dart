@@ -209,17 +209,17 @@ Future<Ship> chooseShip(
 
 /// Create an approximate string for the given [duration].
 String approximateDuration(Duration duration) {
-  if (duration.inDays >= 365) {
+  if (duration.inDays.abs() >= 365) {
     return '${(duration.inDays / 365).round()}y';
-  } else if (duration.inDays >= 7) {
+  } else if (duration.inDays.abs() >= 7) {
     return '${(duration.inDays / 7).round()}w';
-  } else if (duration.inDays > 0) {
+  } else if (duration.inDays.abs() > 0) {
     return '${duration.inDays}d';
-  } else if (duration.inHours > 0) {
+  } else if (duration.inHours.abs() > 0) {
     return '${duration.inHours}h';
-  } else if (duration.inMinutes > 0) {
+  } else if (duration.inMinutes.abs() > 0) {
     return '${duration.inMinutes}m';
-  } else if (duration.inSeconds > 0) {
+  } else if (duration.inSeconds.abs() > 0) {
     return '${duration.inSeconds}s';
   } else {
     return '${duration.inMilliseconds}ms';
