@@ -146,7 +146,7 @@ Future<DateTime?> advanceBuyShip(
     await centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
-      'Purchase of ${result.ship.symbol} ($shipType) successful!',
+      'Purchased ${result.ship.symbol} ($shipType)!',
       const Duration(minutes: 20),
     );
     return null;

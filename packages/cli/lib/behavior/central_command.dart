@@ -759,7 +759,7 @@ class CentralCommand {
     await disableBehaviorForAll(
       ship,
       Behavior.buyShip,
-      'Purchase of ${result.ship.symbol} ($shipType) successful!',
+      'Purchased ${result.ship.symbol} ($shipType)!',
       const Duration(minutes: 10),
     );
     return true;
