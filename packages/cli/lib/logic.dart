@@ -48,7 +48,7 @@ Future<void> advanceShips(
         rethrow;
       }
       final difference = expiration.difference(DateTime.timestamp());
-      shipInfo(ship, '🥶 for ${durationString(difference)}');
+      shipInfo(ship, '🥶 for ${approximateDuration(difference)}');
       waiter.updateWaitUntil(shipSymbol, expiration);
     }
   }

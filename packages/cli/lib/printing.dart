@@ -185,7 +185,8 @@ DateTime logRemainingTransitTime(
   shipInfo(
     ship,
     // Extra space after emoji is needed for windows powershell.
-    '✈️  to ${ship.nav.waypointSymbol}, ${durationString(flightTime)} left',
+    '✈️  to ${ship.nav.waypointSymbol}, '
+    '${approximateDuration(flightTime)} left',
   );
   return arrival;
 }

@@ -105,6 +105,6 @@ void main() {
       ),
     );
     expect(waitUntil, arrivalTime);
-    verify(() => logger.info('🛸#S  ✈️  to W, 00:00:01 left')).called(1);
+    verify(() => logger.info('🛸#S  ✈️  to W, 1s left')).called(1);
   });
 }

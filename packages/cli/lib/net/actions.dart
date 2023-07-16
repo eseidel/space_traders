@@ -337,7 +337,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   shipInfo(
     ship,
     '🛫 to ${waypoint.symbol} ${waypoint.type} '
-    '(${durationString(flightTime)}) '
+    '(${approximateDuration(flightTime)}) '
     'spent ${result.fuel.consumed?.amount} fuel',
   );
   return result.nav.route.arrival;
