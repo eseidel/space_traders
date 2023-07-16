@@ -480,9 +480,9 @@ RoutePlan? planRoute(
   // We only handle jumps at the moment.
   // We fail out quickly from our reachability cache if these system waypoints
   // are not in the same system cluster.
-  if (!systemConnectivity.canJumpBetween(
-    startSystemSymbol: start.systemSymbol,
-    endSystemSymbol: end.systemSymbol,
+  if (!systemConnectivity.canJumpBetweenSystemSymbols(
+    start.systemSymbol,
+    end.systemSymbol,
   )) {
     return null;
   }

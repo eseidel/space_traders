@@ -90,13 +90,10 @@ class SystemConnectivity {
           .map((e) => e.key);
 
   /// Returns true if there exists a path in the jumpgate network between
-  /// [startSystemSymbol] and [endSystemSymbol]
-  bool canJumpBetween({
-    required String startSystemSymbol,
-    required String endSystemSymbol,
-  }) {
-    final startCluster = _clusterBySystemSymbol[startSystemSymbol];
-    final endCluster = _clusterBySystemSymbol[endSystemSymbol];
+  /// [startSymbol] and [endSymbol]
+  bool canJumpBetweenSystemSymbols(String startSymbol, String endSymbol) {
+    final startCluster = _clusterBySystemSymbol[startSymbol];
+    final endCluster = _clusterBySystemSymbol[endSymbol];
     return startCluster == endCluster;
   }
 }

@@ -470,9 +470,9 @@ void main() {
       ),
     ).thenAnswer((_) => Future.value());
     when(
-      () => systemConnectivity.canJumpBetween(
-        startSystemSymbol: any(named: 'startSystemSymbol'),
-        endSystemSymbol: any(named: 'endSystemSymbol'),
+      () => systemConnectivity.canJumpBetweenSystemSymbols(
+        any(),
+        any(),
       ),
     ).thenReturn(true);
 

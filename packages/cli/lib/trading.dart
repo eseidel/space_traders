@@ -515,25 +515,25 @@ CostedDeal? _filterDealsAndLog(
 
   final withinRange = 'within $maxJumps jumps of $systemSymbol';
   if (filtered.isEmpty) {
-    logger.info('No deals $withinRange.');
+    logger.detail('No deals $withinRange.');
     return null;
   }
   final affordable = filtered.where((d) => d.expectedCosts < maxTotalOutlay);
   if (affordable.isEmpty) {
-    logger.info('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
+    logger.detail('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
     return null;
   }
   final sortedDeals =
       affordable.sortedBy<num>((e) => e.expectedProfitPerSecond);
 
-  logger.info('Top 3 deals (of ${sortedDeals.length}) $withinRange:');
+  logger.detail('Top 3 deals (of ${sortedDeals.length}) $withinRange:');
   for (final deal in sortedDeals.reversed.take(3).toList().reversed) {
-    logger.info(describeCostedDeal(deal));
+    logger.detail(describeCostedDeal(deal));
   }
 
   final profitable = sortedDeals.where((d) => d.expectedProfitPerSecond > 0);
   if (profitable.isEmpty) {
-    logger.info('No profitable deals $withinRange.');
+    logger.detail('No profitable deals $withinRange.');
     return null;
   }
   return profitable.last;

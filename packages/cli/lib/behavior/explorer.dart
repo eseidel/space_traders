@@ -4,6 +4,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 
 bool _isMissingChartOrRecentPriceData(
@@ -154,10 +155,8 @@ Future<String?> findNewWaypointSymbolToExplore(
       .toList();
   // Walk through the list finding one missing either a chart or market data.
   for (final system in sortedSystems) {
-    final distance = system.distanceTo(startSystem);
-    logger.info(
-      'Checking ${system.symbol} (distance $distance).',
-    );
+    // final distance = system.distanceTo(startSystem);
+    // logger.info('Checking ${system.symbol} (distance $distance).');
     final symbol = await _waypointSymbolNeedingExploration(
       systemsCache,
       chartingCache,
@@ -176,6 +175,77 @@ Future<String?> findNewWaypointSymbolToExplore(
   return null;
 }
 
+String _nearestHeadquarters(
+  SystemConnectivity systemConnectivity,
+  SystemsCache systemsCache,
+  AgentCache agentCache,
+  FactionCache factionCache,
+  Ship ship,
+) {
+  final factionsHqs = factionCache.factions.map((e) => e.headquarters).toList();
+  final startSystem = systemsCache.systemBySymbol(ship.nav.systemSymbol);
+  final reachableHqs = factionsHqs
+      .where(
+        (hq) => systemConnectivity.canJumpBetweenSystemSymbols(
+          ship.nav.systemSymbol,
+          parseWaypointString(hq).system,
+        ),
+      )
+      .toList();
+  final sortedHqs = reachableHqs
+      .sortedBy<num>(
+        (hq) => systemsCache
+            .systemBySymbol(parseWaypointString(hq).system)
+            .distanceTo(startSystem),
+      )
+      .toList();
+  // There is always a reacahble HQ since we don't warp yet.
+  return sortedHqs.first;
+}
+
+/// If we're low on fuel, route to the nearest market which trades fuel.
+Future<DateTime?> routeForEmergencyFuelingIfNeeded(
+  Api api,
+  Caches caches,
+  CentralCommand centralCommand,
+  Waypoint waypoint,
+  Ship ship,
+) async {
+  if (ship.fuelPercentage > 0.4) {
+    return null;
+  }
+  shipWarn(ship, 'Fuel critically low, routing to market.');
+  var destination = (await nearbyMarketWhichTrades(
+    caches.systems,
+    caches.waypoints,
+    caches.markets,
+    waypoint,
+    TradeSymbol.FUEL.value,
+    maxJumps: 5,
+  ))
+      ?.symbol;
+  if (destination == null) {
+    shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
+    destination = _nearestHeadquarters(
+      caches.systemConnectivity,
+      caches.systems,
+      caches.agent,
+      caches.factions,
+      ship,
+    );
+  }
+  final waitUntil = await beingNewRouteAndLog(
+    api,
+    ship,
+    caches.systems,
+    caches.systemConnectivity,
+    caches.jumps,
+    centralCommand,
+    destination,
+  );
+  return waitUntil;
+}
+
 /// One loop of the exploring logic.
 Future<DateTime?> advanceExplorer(
   Api api,
@@ -192,28 +262,46 @@ Future<DateTime?> advanceExplorer(
   // either it's the first time and we need to set a destination, or we've just
   // completed a loop.  This _isMissingChartOrRecentPriceData is really our
   // check for "did we just do a loop"?  If so, we complete the behavior.
-  if (_isMissingChartOrRecentPriceData(
+  final willCompleteBehavior = _isMissingChartOrRecentPriceData(
     caches.marketPrices,
     caches.shipyardPrices,
     waypoint,
     maxAge: maxAge,
-  )) {
-    if (waypoint.chart == null) {
-      await chartWaypointAndLog(api, caches.charting, ship);
-    }
-    await visitLocalMarket(api, caches, waypoint, ship);
-    // We might buy a ship if we're at a ship yard.
-    await centralCommand.visitLocalShipyard(
-      api,
-      caches.shipyardPrices,
-      caches.agent,
-      waypoint,
-      ship,
-    );
+  );
+  // We still do our charting and market visits even if this isn't going to
+  // cause us to complete the behavior (e.g. we're refueling).
+  if (waypoint.chart == null) {
+    await chartWaypointAndLog(api, caches.charting, ship);
+  }
+  // If we don't visit the market, we won't refuel (even when low).
+  await visitLocalMarket(api, caches, waypoint, ship);
+  // We might buy a ship if we're at a ship yard.
+  await centralCommand.visitLocalShipyard(
+    api,
+    caches.shipyardPrices,
+    caches.agent,
+    waypoint,
+    ship,
+  );
+
+  if (willCompleteBehavior) {
     // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
     await centralCommand.completeBehavior(ship.symbol);
     return null;
+  }
+
+  // So far this is only needed for Explorers since they go to waypoints
+  // which do not have markets.  Other behaviors always stick to markets.
+  final refuelWaitTime = await routeForEmergencyFuelingIfNeeded(
+    api,
+    caches,
+    centralCommand,
+    waypoint,
+    ship,
+  );
+  if (refuelWaitTime != null) {
+    return refuelWaitTime;
   }
 
   final probeSystems = centralCommand.otherExplorerSystems(ship.symbol).toSet();

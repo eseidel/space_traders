@@ -127,16 +127,16 @@ Future<DateTime?> _handleAtSourceWithDeal(
     unitsToPurchase: unitsToPurchase,
   );
 
-  if (transaction != null && ship.cargo.availableSpace > 0) {
-    shipInfo(
-      ship,
-      'Purchased $unitsToPurchase of $dealTradeSymbol, still have '
-      '${ship.cargo.availableSpace} units of cargo space looping.',
-    );
-    return null;
-  }
-
   if (transaction != null) {
+    await centralCommand.recordDealTransactions(ship, [transaction]);
+    if (ship.cargo.availableSpace > 0) {
+      shipInfo(
+        ship,
+        'Purchased $unitsToPurchase of $dealTradeSymbol, still have '
+        '${ship.cargo.availableSpace} units of cargo space looping.',
+      );
+      return null;
+    }
     shipInfo(
       ship,
       'Purchased ${transaction.quantity} ${transaction.tradeSymbol} '
@@ -144,7 +144,6 @@ Future<DateTime?> _handleAtSourceWithDeal(
       '${costedDeal.deal.purchasePrice}) = '
       '${creditsString(transaction.creditChange)}',
     );
-    await centralCommand.recordDealTransactions(ship, [transaction]);
   }
   final haveTradeCargo = ship.cargo.countUnits(dealTradeSymbol) > 0;
   if (!haveTradeCargo) {

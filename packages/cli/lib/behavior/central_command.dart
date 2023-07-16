@@ -201,7 +201,9 @@ class CentralCommand {
         // Behavior.trader,
         Behavior.miner,
       ],
-      ShipRole.HAULER: [Behavior.trader],
+      // Haulers are terrible explorers, but early game we just need
+      // things mapping.
+      ShipRole.HAULER: [Behavior.trader, Behavior.explorer],
       ShipRole.EXCAVATOR: [Behavior.miner],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
@@ -482,13 +484,13 @@ class CentralCommand {
         maxWaypoints: maxWaypoints,
       );
       if (deal == null) {
-        shipInfo(ship, 'No deal found for $shipSymbol at ${closest.symbol}');
+        shipDetail(ship, 'No deal found for $shipSymbol at ${closest.symbol}');
         search.markUsed(closest);
         continue;
       }
       final profitPerSecond = deal.expectedProfitPerSecond;
       if (profitPerSecond < profitPerSecondThreshold) {
-        shipInfo(
+        shipDetail(
             ship,
             'Profit per second too low for $shipSymbol at '
             '${closest.symbol}, $profitPerSecond < $profitPerSecondThreshold');
@@ -503,8 +505,9 @@ class CentralCommand {
       );
       shipInfo(
           ship,
-          'Found placement: $profitPerSecond ${placement.score} '
-          '${placement.distance} ${placement.destinationSymbol}');
+          'Found placement: ${creditsString(profitPerSecond)}/s '
+          '${placement.score} ${placement.distance} '
+          '${placement.destinationSymbol}');
       shipInfo(ship, 'Potential: ${describeCostedDeal(deal)}');
       return placement;
     }
@@ -557,9 +560,10 @@ class CentralCommand {
   // TODO(eseidel): This should consider pricing in it so that we can by
   // other ship types if they're not overpriced?
   ShipType? shipTypeToBuy(
+    Ship ship,
     ShipyardPrices shipyardPrices,
     AgentCache agentCache, {
-    required String waypointSymbol,
+    String? shipyardSymbol,
   }) {
     // We should buy a new ship when:
     // - We have request capacity to spare
@@ -567,8 +571,12 @@ class CentralCommand {
     // - We don't have better uses for the money (e.g. trading or modules)
 
     bool shipyardHas(ShipType shipType) {
+      // Hack to make BuyShip behavior not break.
+      if (shipyardSymbol == null) {
+        return true;
+      }
       return shipyardPrices.recentPurchasePrice(
-            shipyardSymbol: waypointSymbol,
+            shipyardSymbol: shipyardSymbol,
             shipType: shipType,
           ) !=
           null;
@@ -576,18 +584,37 @@ class CentralCommand {
 
     // We should buy ships based on earnings of that ship type over the last
     // N hours?
-    final systemSymbol = parseWaypointString(waypointSymbol).system;
+    final systemSymbol = ship.nav.systemSymbol;
     final hqSystemSymbol =
         parseWaypointString(agentCache.agent.headquarters).system;
     final inStartSystem = systemSymbol == hqSystemSymbol;
 
-    final isEarlyGame = _shipCache.ships.length < 8;
+    // Early game should be:
+    // 10 miners
+    // 10 probes
+    // then choose as we need.
+
+    final probeCount = _countOfTypeInFleet(ShipType.PROBE);
+    final minerCount = _countOfTypeInFleet(ShipType.ORE_HOUND);
+
+    // Early game can stop when we have enough miners going and markets
+    // mapped to start trading.
+    // This is not enough:
+    // Loaded 364 prices from 61 markets and 7 prices from 2 shipyards.
+    // Probably need a couple hundred markets.
+
+    final isEarlyGame = _shipCache.ships.length < 20;
     if (isEarlyGame) {
-      if (!inStartSystem) {
-        logger.info('Early game, not buying ships outside of start system.');
-        return null;
+      // We will buy miners in the start system.
+      // Or probes anywhere (once we have enough miners).
+      // We will not buy traders until we have enough miners to support a base
+      // income and enough probes to have found deals for us to trade.
+      if (minerCount < 10 && inStartSystem) {
+        return ShipType.ORE_HOUND;
+      } else if (minerCount > 5 && probeCount < 10) {
+        return ShipType.PROBE;
       }
-      return ShipType.ORE_HOUND;
+      return null;
     }
 
     const probeMinimum = 5;
@@ -677,11 +704,12 @@ class CentralCommand {
     // TODO(eseidel): Consider which ships are sold at this shipyard.
 
     // This assumes the ship in question is at a shipyard and already docked.
-    final waypointSymbol = ship.nav.waypointSymbol;
+    final shipyardSymbol = ship.nav.waypointSymbol;
     final shipType = shipTypeToBuy(
+      ship,
       shipyardPrices,
       agentCache,
-      waypointSymbol: waypointSymbol,
+      shipyardSymbol: shipyardSymbol,
     );
     // TODO(eseidel): This is wrong, this will disable buying for all
     // ships even though we might just be at a system where we don't need a ship
@@ -725,14 +753,14 @@ class CentralCommand {
     }
 
     final recentPrice = shipyardPrices.recentPurchasePrice(
-      shipyardSymbol: waypointSymbol,
+      shipyardSymbol: shipyardSymbol,
       shipType: shipType,
     );
     if (recentPrice == null) {
       await disableBehaviorForShip(
         ship,
         Behavior.buyShip,
-        'Shipyard at $waypointSymbol does not sell $shipType.',
+        'Shipyard at $shipyardSymbol does not sell $shipType.',
         const Duration(minutes: 10),
       );
       return false;
@@ -743,7 +771,7 @@ class CentralCommand {
       await disableBehaviorForShip(
         ship,
         Behavior.buyShip,
-        'Failed to buy $shipType at $waypointSymbol, '
+        'Failed to buy $shipType at $shipyardSymbol, '
         '$recentPriceString > max price $maxPrice.',
         const Duration(minutes: 10),
       );
@@ -756,7 +784,7 @@ class CentralCommand {
       _shipCache,
       agentCache,
       ship,
-      waypointSymbol,
+      shipyardSymbol,
       shipType,
     );
 

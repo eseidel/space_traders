@@ -58,9 +58,9 @@ Future<DateTime?> advanceBuyShip(
       await caches.waypoints.waypoint(ship.nav.waypointSymbol);
 
   final shipType = centralCommand.shipTypeToBuy(
+    ship,
     caches.shipyardPrices,
     caches.agent,
-    waypointSymbol: currentWaypoint.symbol,
   );
   if (shipType == null) {
     await centralCommand.disableBehaviorForAll(

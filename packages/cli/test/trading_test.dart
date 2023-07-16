@@ -145,9 +145,9 @@ void main() {
     when(() => systemsCache.waypointFromSymbol('X-S-B')).thenReturn(end);
     when(() => systemsCache.waypointsInSystem('X-S')).thenReturn([start, end]);
     when(
-      () => systemConnectivity.canJumpBetween(
-        startSystemSymbol: any(named: 'startSystemSymbol'),
-        endSystemSymbol: any(named: 'endSystemSymbol'),
+      () => systemConnectivity.canJumpBetweenSystemSymbols(
+        any(),
+        any(),
       ),
     ).thenReturn(true);
 
@@ -246,9 +246,9 @@ void main() {
     final systemConnectivity = _MockSystemConnectivity();
     final jumpCache = JumpCache();
     when(
-      () => systemConnectivity.canJumpBetween(
-        startSystemSymbol: any(named: 'startSystemSymbol'),
-        endSystemSymbol: any(named: 'endSystemSymbol'),
+      () => systemConnectivity.canJumpBetweenSystemSymbols(
+        any(),
+        any(),
       ),
     ).thenReturn(true);
     final saa = SystemWaypoint(
