@@ -584,6 +584,7 @@ class CentralCommand {
     final isEarlyGame = _shipCache.ships.length < 8;
     if (isEarlyGame) {
       if (!inStartSystem) {
+        logger.info('Early game, not buying ships outside of start system.');
         return null;
       }
       return ShipType.ORE_HOUND;
@@ -605,6 +606,7 @@ class CentralCommand {
               (_countOfTypeInFleet(shipType) < targetCounts[shipType]!),
         )
         .toList();
+    logger.info('typesToBuy: $typesToBuy');
     if (typesToBuy.isEmpty) {
       return null;
     }
@@ -613,6 +615,7 @@ class CentralCommand {
     // enough extra cash on hand to support trading.
     if (typesToBuy.contains(ShipType.LIGHT_HAULER)) {
       final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
+      logger.info('Idle haulers: ${idleHaulers.length}');
       if (idleHaulers.length < 4) {
         return ShipType.LIGHT_HAULER;
       }

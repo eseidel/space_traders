@@ -21,7 +21,7 @@ class ChartedValues {
         .map((j) => WaypointOrbital.fromJson(j)!)
         .toList();
     final faction =
-        WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>);
+        WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
     final traits = (json['traits'] as List<dynamic>)
         .cast<Map<String, dynamic>>()
         .map((j) => WaypointTrait.fromJson(j)!)
