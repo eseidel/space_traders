@@ -279,7 +279,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
     'Delivered $units ${goods.tradeSymbol} '
     'to ${goods.destinationSymbol}; '
     '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
-    '${durationString(contract.timeUntilDeadline)} to deadline',
+    '${approximateDuration(contract.timeUntilDeadline)} to deadline',
   );
   return response;
 }
