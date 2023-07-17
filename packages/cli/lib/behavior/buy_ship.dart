@@ -147,7 +147,7 @@ Future<DateTime?> advanceBuyShip(
       ship,
       Behavior.buyShip,
       'Purchased ${result.ship.symbol} ($shipType)!',
-      const Duration(minutes: 20),
+      const Duration(minutes: 10),
     );
     return null;
   }

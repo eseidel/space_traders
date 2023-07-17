@@ -4,7 +4,6 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/printing.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 
@@ -217,7 +216,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   int? medianPurchasePrice(String symbol) =>
       purchasePriceAtPercentile(symbol, 50);
 
-  /// Get the percentile purchase price for a trade good.
+  /// Get the percentile purchase price (price you can buy at) for a trade good.
   /// [percentile] must be between 0 and 100.
   int? purchasePriceAtPercentile(String symbol, int percentile) {
     final maybePrice = _priceAtPercentile(
@@ -228,7 +227,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     return maybePrice?.purchasePrice;
   }
 
-  /// Get the percentile for the sell price of a trade good.
+  /// Get the percentile for the sell price (you sell to them) of a trade good.
   int? percentileForSellPrice(String symbol, int sellPrice) => _percentileFor(
         symbol,
         MarketPrice._compareOnly(sellPrice: sellPrice),
@@ -249,30 +248,17 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     return maybePrice?.sellPrice;
   }
 
-  /// Returns all known sell prices for a trade good, optionally restricted
-  /// to a specific waypoint.
-  Iterable<MarketPrice> sellPricesFor({
+  /// Returns all known prices for a trade good,
+  /// optionally restricted to a specific waypoint.
+  Iterable<MarketPrice> pricesFor({
     required String tradeSymbol,
     String? marketSymbol,
   }) {
-    final sellPrices = _prices.where((e) => e.symbol == tradeSymbol);
+    final prices = _prices.where((e) => e.symbol == tradeSymbol);
     if (marketSymbol == null) {
-      return sellPrices;
+      return prices;
     }
-    return sellPrices.where((e) => e.waypointSymbol == marketSymbol);
-  }
-
-  /// Returns all known purchase prices for a trade good, optionally restricted
-  /// to a specific waypoint.
-  Iterable<MarketPrice> purchasePricesFor({
-    required String tradeSymbol,
-    String? marketSymbol,
-  }) {
-    final purchasePrices = _prices.where((e) => e.symbol == tradeSymbol);
-    if (marketSymbol == null) {
-      return purchasePrices;
-    }
-    return purchasePrices.where((e) => e.waypointSymbol == marketSymbol);
+    return prices.where((e) => e.waypointSymbol == marketSymbol);
   }
 
   MarketPrice? _priceAtPercentile(
@@ -287,9 +273,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
         'Percentile must be between 0 and 100',
       );
     }
-    final pricesForSymbol = action == MarketTransactionTypeEnum.PURCHASE
-        ? purchasePricesFor(tradeSymbol: symbol)
-        : sellPricesFor(tradeSymbol: symbol);
+    final pricesForSymbol = pricesFor(tradeSymbol: symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -314,9 +298,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     final compareTo = action == MarketTransactionTypeEnum.PURCHASE
         ? _purchasePriceAcending
         : _sellPriceAcending;
-    final pricesForSymbol = action == MarketTransactionTypeEnum.PURCHASE
-        ? purchasePricesFor(tradeSymbol: symbol)
-        : sellPricesFor(tradeSymbol: symbol);
+    final pricesForSymbol = pricesFor(tradeSymbol: symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -373,7 +355,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     Duration maxAge = defaultMaxAge,
   }) {
     final pricesForSymbol =
-        sellPricesFor(tradeSymbol: tradeSymbol, marketSymbol: marketSymbol);
+        pricesFor(tradeSymbol: tradeSymbol, marketSymbol: marketSymbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -395,7 +377,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     required String tradeSymbol,
     Duration maxAge = defaultMaxAge,
   }) {
-    final pricesForSymbol = purchasePricesFor(
+    final pricesForSymbol = pricesFor(
       tradeSymbol: tradeSymbol,
       marketSymbol: marketSymbol,
     );

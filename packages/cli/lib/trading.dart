@@ -363,10 +363,9 @@ class CostedDeal {
 
   /// The actual cost of goods sold.
   int get actualCostOfGoodsSold {
-    // TODO(eseidel): This only works when transactions does not include fuel.
     return transactions
         .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
-        .where((t) => t.tradeSymbol != TradeSymbol.FUEL.value)
+        .where((t) => t.accounting == AccountingType.goods)
         .fold(0, (a, b) => a + -b.creditChange);
   }
 
@@ -375,7 +374,7 @@ class CostedDeal {
     // TODO(eseidel): This only works when tradeSymbol != TradeSymbol.FUEL
     return transactions
         .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
-        .where((t) => t.tradeSymbol == TradeSymbol.FUEL.value)
+        .where((t) => t.accounting == AccountingType.fuel)
         .fold(0, (a, b) => a + -b.creditChange);
   }
 
@@ -395,8 +394,6 @@ class CostedDeal {
   Map<String, dynamic> toJson() => {
         'deal': deal.toJson(),
         'expectedFuelCost': expectedFuelCost,
-        // Remove tradeVolume once we're sure we don't need it.
-        'tradeVolume': cargoSize,
         'cargoSize': cargoSize,
         'expectedTime': expectedTime,
         'contractId': contractId,

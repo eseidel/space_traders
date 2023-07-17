@@ -242,7 +242,9 @@ void main() {
     expect(approximateDuration(const Duration(seconds: -3600 * 24)), '-1d');
     expect(approximateDuration(const Duration(seconds: -3600 * 24 * 7)), '-1w');
     expect(
-        approximateDuration(const Duration(seconds: -3600 * 24 * 30)), '-4w');
+      approximateDuration(const Duration(seconds: -3600 * 24 * 30)),
+      '-4w',
+    );
     expect(
       approximateDuration(const Duration(seconds: -3600 * 24 * 365)),
       '-1y',

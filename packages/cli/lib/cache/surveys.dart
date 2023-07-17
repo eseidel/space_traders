@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';

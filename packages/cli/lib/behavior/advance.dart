@@ -7,7 +7,6 @@ import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/printing.dart';
 
 /// Advance the behavior of the given ship.
 /// Returns the time at which the behavior should be advanced again

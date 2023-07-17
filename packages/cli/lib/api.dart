@@ -11,6 +11,10 @@ export 'package:openapi/api.dart';
 /// The default http get function.
 const defaultHttpGet = http.get;
 
+/// The default implementation of getNow for production.
+/// Used for tests for overriding the current time.
+DateTime defaultGetNow() => DateTime.timestamp();
+
 /// Api is a wrapper around the generated api clients.
 /// It provides a single place to inject the api client.
 /// This allows for easier mocking.

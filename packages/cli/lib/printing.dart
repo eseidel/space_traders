@@ -6,10 +6,6 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:intl/intl.dart';
 
-/// The default implementation of getNow for production.
-/// Used for tests for overriding the current time.
-DateTime defaultGetNow() => DateTime.timestamp();
-
 /// Return a string describing the given [waypoint].
 String waypointDescription(Waypoint waypoint) {
   final chartedString = waypoint.chart != null ? '' : 'uncharted - ';

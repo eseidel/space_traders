@@ -572,7 +572,11 @@ class CentralCommand {
     // - We don't have better uses for the money (e.g. trading or modules)
 
     bool shipyardHas(ShipType shipType) {
-      // Hack to make BuyShip behavior not break.
+      // Hack to make Behavior.buyShip not break.
+      // This hack is needed because Behavior.buyShip first checks what ship
+      // to buy and then finds a shipyard to buy that ship, where as this
+      // function is also used by visitShipyard where you're already at a
+      // shipyard but not sure what you might buy.
       if (shipyardSymbol == null) {
         return true;
       }
@@ -604,27 +608,28 @@ class CentralCommand {
     // Loaded 364 prices from 61 markets and 7 prices from 2 shipyards.
     // Probably need a couple hundred markets.
 
+    // We will buy miners in the start system.
+    // Or probes anywhere (once we have enough miners).
+    if (minerCount < 10 && inStartSystem) {
+      return ShipType.ORE_HOUND;
+    } else if (minerCount > 5 && probeCount < 10) {
+      return ShipType.PROBE;
+    }
+    // We will not buy traders until we have enough miners to support a base
+    // income and enough probes to have found deals for us to trade.
     final isEarlyGame = _shipCache.ships.length < 20;
     if (isEarlyGame) {
-      // We will buy miners in the start system.
-      // Or probes anywhere (once we have enough miners).
-      // We will not buy traders until we have enough miners to support a base
-      // income and enough probes to have found deals for us to trade.
-      if (minerCount < 10 && inStartSystem) {
-        return ShipType.ORE_HOUND;
-      } else if (minerCount > 5 && probeCount < 10) {
-        return ShipType.PROBE;
-      }
       return null;
     }
 
-    const probeMinimum = 5;
-    final traderCount = _countOfTypeInFleet(ShipType.LIGHT_HAULER);
-    final probeTarget = min(traderCount / 2, probeMinimum);
+    // const probeMinimum = 5;
+    // final traderCount = _countOfTypeInFleet(ShipType.LIGHT_HAULER);
+    // final probeTarget = min(traderCount / 2, probeMinimum);
 
+    // SafPlusPlus limits to 50 probes and 40 miners
     final targetCounts = {
-      ShipType.ORE_HOUND: 30,
-      ShipType.PROBE: probeTarget,
+      ShipType.ORE_HOUND: 40,
+      ShipType.PROBE: 50,
       ShipType.LIGHT_HAULER: 50,
     };
     final typesToBuy = targetCounts.keys.where((shipType) {
