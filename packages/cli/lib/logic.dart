@@ -46,9 +46,12 @@ Future<void> advanceShips(
       final behaviorState = caches.behaviors.getBehavior(shipSymbol);
       final expectedSeconds = requests / api.apiClient.maxRequestsPerSecond;
       if (duration.inSeconds > expectedSeconds * 1.5) {
-        logger.warn(
-          '$shipSymbol (${behaviorState?.behavior.name}) '
-          '${duration.inSeconds}s ($requests requests) '
+        final behaviorName = behaviorState?.behavior.name;
+        final behaviorString = behaviorName == null ? '' : '($behaviorName) ';
+        shipWarn(
+          ship,
+          '$behaviorString'
+          'took ${duration.inSeconds}s ($requests requests) '
           'expected ${expectedSeconds.toStringAsFixed(1)}s',
         );
       }
