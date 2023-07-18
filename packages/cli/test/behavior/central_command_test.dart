@@ -22,8 +22,6 @@ class _MockContractTerms extends Mock implements ContractTerms {}
 
 class _MockCostedDeal extends Mock implements CostedDeal {}
 
-class _MockDeal extends Mock implements Deal {}
-
 class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}

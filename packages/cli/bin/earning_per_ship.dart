@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
@@ -45,6 +46,14 @@ class TransactionSummary {
   }
 }
 
+Behavior? behaviorFromFrame(Ship ship) {
+  return {
+    ShipFrameSymbolEnum.PROBE: Behavior.explorer,
+    ShipFrameSymbolEnum.MINER: Behavior.miner,
+    ShipFrameSymbolEnum.LIGHT_FREIGHTER: Behavior.trader,
+  }[ship.frame.symbol];
+}
+
 Future<void> command(FileSystem fs, List<String> args) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
@@ -74,8 +83,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
   String c(num n) =>
       n.isFinite ? NumberFormat().format(n.round()) : n.toString();
 
-  // final behaviorCounts = <String, int>{};
-  // final behaviorCreditsTotals = <String, int>{};
+  final behaviorCounts = <String, int>{};
+  final behaviorCreditPerSecondTotals = <String, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = transactionLog.where(
@@ -86,14 +95,26 @@ Future<void> command(FileSystem fs, List<String> args) async {
   );
 
   for (final shipId in shipIds) {
+    final ship = shipCache.ship(shipId.symbol);
     final state = behaviorCache.getBehavior(shipId.symbol);
+    final stateName =
+        state?.behavior.name ?? behaviorFromFrame(ship)?.name ?? 'Unknown';
     final summary = TransactionSummary(
       transactions.where((t) => t.shipSymbol == shipId.symbol),
     );
+    behaviorCounts[stateName] = (behaviorCounts[stateName] ?? 0) + 1;
+    behaviorCreditPerSecondTotals[stateName] =
+        (behaviorCreditPerSecondTotals[stateName] ?? 0) + summary.perSecond;
     logger.info('${shipId.hexNumber.padRight(longestHexNumber)}  '
         '${c(summary.perMinute).padLeft(5)} c/m '
         '${c(summary.perSecond).padLeft(4)} c/s '
-        '  ${state?.behavior.name ?? 'Unknown'}');
+        '  ${stateName.padRight(10)}');
+  }
+  for (final stateName in behaviorCounts.keys.toList()..sort()) {
+    final count = behaviorCounts[stateName]!;
+    final total = behaviorCreditPerSecondTotals[stateName]!;
+    final average = (total / count).round();
+    logger.info('$stateName: $count ships, ${c(average)} c/s');
   }
 }
 

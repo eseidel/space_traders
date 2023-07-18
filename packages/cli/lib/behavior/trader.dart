@@ -169,6 +169,32 @@ Future<DateTime?> _handleAtSourceWithDeal(
   );
 }
 
+void _logCompletedDeal(Ship ship, CostedDeal completedDeal) {
+  const cpsSlop = 1; // credits/s
+  const durationSlop = 0.1; // Percent;
+  final duration = DateTime.timestamp().difference(completedDeal.startTime);
+  final expectedDuration = Duration(seconds: completedDeal.expectedTime);
+  final message =
+      'Expected ${creditsString(completedDeal.expectedProfit)} profit '
+      '(${creditsString(completedDeal.expectedProfitPerSecond)}/s), got '
+      '${creditsString(completedDeal.actualProfit)} '
+      '(${creditsString(completedDeal.actualProfitPerSecond)}/s) '
+      'in ${durationString(duration)}, '
+      'expected ${durationString(expectedDuration)}';
+  final durationDiff = duration - expectedDuration;
+  final durationDiffPercent =
+      (durationDiff.inSeconds / expectedDuration.inSeconds).abs();
+  final cpsDiff = (completedDeal.actualProfitPerSecond -
+          completedDeal.expectedProfitPerSecond)
+      .abs();
+  final useWarn = cpsDiff > cpsSlop || durationDiffPercent > durationSlop;
+  if (useWarn) {
+    shipWarn(ship, message);
+  } else {
+    shipInfo(ship, message);
+  }
+}
+
 Future<DateTime?> _handleArbitrageDealAtDestination(
   Api api,
   CentralCommand centralCommand,
@@ -189,16 +215,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   );
   // We don't yet record the completed deal anywhere.
   final completedDeal = costedDeal.byAddingTransactions(transactions);
-  final duration = DateTime.timestamp().difference(completedDeal.startTime);
-  final expectedDuration = Duration(seconds: completedDeal.expectedTime);
-  shipWarn(
-      ship,
-      'Expected ${creditsString(completedDeal.expectedProfit)} profit '
-      '(${creditsString(completedDeal.expectedProfitPerSecond)}/s), got '
-      '${creditsString(completedDeal.actualProfit)} '
-      '(${creditsString(completedDeal.actualProfitPerSecond)}/s) '
-      'in ${durationString(duration)}, '
-      'expected ${durationString(expectedDuration)}');
+  _logCompletedDeal(ship, completedDeal);
   await centralCommand.completeBehavior(ship.symbol);
   return null;
 }

@@ -551,10 +551,7 @@ class CentralCommand {
       ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
       ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
       ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
-    }[shipType];
-    if (frameForType == null) {
-      return 0;
-    }
+    }[shipType]!;
     return _shipCache.frameCounts[frameForType] ?? 0;
   }
 
