@@ -436,17 +436,7 @@ RouteAction _navigationAction(
   );
 }
 
-class _RoutingResult {
-  _RoutingResult(Map<_WaypointSymbol, _WaypointSymbol> cameFrom)
-      : _cameFrom = cameFrom;
-
-  final Map<_WaypointSymbol, _WaypointSymbol> _cameFrom;
-
-  _WaypointSymbol? cameFrom(_WaypointSymbol waypointSymbol) =>
-      _cameFrom[waypointSymbol];
-}
-
-_RoutingResult _doAStar(
+List<_WaypointSymbol>? _findWaypointPath(
   SystemsCache systemsCache,
   SystemWaypoint start,
   SystemWaypoint end,
@@ -480,7 +470,18 @@ _RoutingResult _doAStar(
       }
     }
   }
-  return _RoutingResult(cameFrom);
+  if (cameFrom[end.symbol] == null) {
+    return null;
+  }
+
+  final symbols = <_WaypointSymbol>[];
+  var current = end.symbol;
+  while (current != start.symbol) {
+    symbols.add(current);
+    current = cameFrom[current]!;
+  }
+  symbols.add(start.symbol);
+  return symbols.reversed.toList();
 }
 
 RouteAction _jumpAction(
@@ -556,12 +557,15 @@ RoutePlan? planRoute(
 
   // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
   // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
-  final result = _doAStar(
+  final symbols = _findWaypointPath(
     systemsCache,
     start,
     end,
     shipSpeed,
   );
+  if (symbols == null) {
+    return null;
+  }
 
   final endTime = DateTime.timestamp();
   final planningDuration = endTime.difference(startTime);
@@ -570,16 +574,14 @@ RoutePlan? planRoute(
         'took ${approximateDuration(planningDuration)}');
   }
 
-  if (result.cameFrom(end.symbol) == null) {
-    return null;
-  }
-
-  // walk backwards from end through cameFrom to build the route
+  // walk backwards from end through symbols to build the route
+  // we could alternatively build it forward and then fix the jump durations
+  // after.
   final route = <RouteAction>[];
-  var current = end.symbol;
   var isLastJump = true;
-  while (current != start.symbol) {
-    final previous = result.cameFrom(current)!;
+  for (var i = symbols.length - 1; i > 0; i--) {
+    final current = symbols[i];
+    final previous = symbols[i - 1];
     final previousWaypoint = systemsCache.waypointFromSymbol(previous);
     final currentWaypoint = systemsCache.waypointFromSymbol(current);
     if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
@@ -603,8 +605,6 @@ RoutePlan? planRoute(
         ),
       );
     }
-
-    current = previous;
   }
 
   final actions = route.reversed.toList();
