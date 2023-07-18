@@ -79,7 +79,10 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = transactionLog.where(
-    (t) => t.timestamp.isAfter(startTime) && !t.tradeSymbol.startsWith('SHIP_'),
+    (t) =>
+        t.timestamp.isAfter(startTime) &&
+        (t.accounting == AccountingType.goods ||
+            t.accounting == AccountingType.fuel),
   );
 
   for (final shipId in shipIds) {

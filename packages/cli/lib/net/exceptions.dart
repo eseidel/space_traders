@@ -140,3 +140,11 @@ bool isWindowsSemaphoreTimeout(ApiException e) {
 bool isInsufficientCreditsException(ApiException e) {
   return isAPIExceptionWithCode(e, 4600);
 }
+
+// ApiException 400: {"error":{"message":
+// "Ship action failed. Ship is not currently in orbit at X1-PA79-91721F.",
+// "code":4236,"data":{"waypointSymbol":"X1-PA79-91721F"}}}
+/// Returns true if the exception is a ship not in orbit exception.
+bool isShipNotInOrbitException(ApiException e) {
+  return isAPIExceptionWithCode(e, 4236);
+}

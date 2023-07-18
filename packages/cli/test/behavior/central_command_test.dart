@@ -7,23 +7,32 @@ import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/trading.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
+class _MockAgent extends Mock implements Agent {}
+
 class _MockBehhaviorCache extends Mock implements BehaviorCache {}
 
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockContract extends Mock implements Contract {}
 
-class _MockShip extends Mock implements Ship {}
+class _MockContractTerms extends Mock implements ContractTerms {}
+
+class _MockCostedDeal extends Mock implements CostedDeal {}
+
+class _MockDeal extends Mock implements Deal {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockShipNav extends Mock implements ShipNav {}
+class _MockShip extends Mock implements Ship {}
 
-class _MockAgent extends Mock implements Agent {}
+class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockShipFuel extends Mock implements ShipFuel {}
+
+class _MockShipNav extends Mock implements ShipNav {}
 
 void main() {
   test('CentralCommand.isDisabledForAll', () async {
@@ -220,5 +229,34 @@ void main() {
     final affordable = affordableContracts(agentCache, contractCache).toList();
     expect(affordable.length, 1);
     expect(affordable.first.id, '2');
+  });
+
+  test('CentralCommand.remainingUnitsNeededForContract', () {
+    final behaviorCache = _MockBehhaviorCache();
+    final shipCache = _MockShipCache();
+    when(() => shipCache.shipSymbols).thenReturn(['A']);
+    final costedDeal = _MockCostedDeal();
+    when(() => costedDeal.contractId).thenReturn('C');
+    when(() => costedDeal.maxUnitsToBuy).thenReturn(10);
+    const tradeSymbol = 'FUEL';
+    when(() => behaviorCache.getBehavior('A'))
+        .thenReturn(BehaviorState('A', Behavior.trader, deal: costedDeal));
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final contract = _MockContract();
+    final contractTerms = _MockContractTerms();
+    when(() => contract.terms).thenReturn(contractTerms);
+    when(() => contract.id).thenReturn('C');
+    final good = ContractDeliverGood(
+      tradeSymbol: tradeSymbol,
+      destinationSymbol: 'W',
+      unitsFulfilled: 50,
+      unitsRequired: 100,
+    );
+    when(() => contractTerms.deliver).thenReturn([good]);
+    expect(
+      centralCommand.remainingUnitsNeededForContract(contract, tradeSymbol),
+      40,
+    );
   });
 }

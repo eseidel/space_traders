@@ -31,12 +31,27 @@ Future<void> advanceShips(
       continue;
     }
     try {
+      final before = DateTime.timestamp();
+      final requestsBefore = api.apiClient.requestCounts.totalRequests();
       final waitUntil = await advanceShipBehavior(
         api,
         centralCommand,
         caches,
         ship,
       );
+      final after = DateTime.timestamp();
+      final duration = after.difference(before);
+      final requestsAfter = api.apiClient.requestCounts.totalRequests();
+      final requests = requestsAfter - requestsBefore;
+      final behaviorState = caches.behaviors.getBehavior(shipSymbol);
+      final expectedSeconds = requests / api.apiClient.maxRequestsPerSecond;
+      if (duration.inSeconds > expectedSeconds * 1.5) {
+        logger.warn(
+          '$shipSymbol (${behaviorState?.behavior.name}) '
+          '${duration.inSeconds}s ($requests requests) '
+          'expected ${expectedSeconds.toStringAsFixed(1)}s',
+        );
+      }
       waiter.updateWaitUntil(shipSymbol, waitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when

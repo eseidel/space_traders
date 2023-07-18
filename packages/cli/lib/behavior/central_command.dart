@@ -358,8 +358,10 @@ class CentralCommand {
   ) sync* {
     for (final contract in affordableContracts(agentCache, contractCache)) {
       for (final good in contract.terms.deliver) {
-        final unitsNeeded =
-            _remainingUnitsNeededForContract(contract, good.tradeSymbol);
+        final unitsNeeded = remainingUnitsNeededForContract(
+          contract,
+          good.tradeSymbol,
+        );
         if (unitsNeeded > 0) {
           yield SellOpp(
             marketSymbol: good.destinationSymbol,
@@ -803,28 +805,25 @@ class CentralCommand {
     return true;
   }
 
-  /// Returns the ship symbols working on [contract].
-  Iterable<String> _shipSymbolsServicingContract(Contract contract) {
-    return _behaviorCache.states
-        .where((state) => state.deal?.contractId == contract.id)
-        .map((state) => state.shipSymbol);
-  }
-
   /// Computes the number of units needed to fulfill the given [contract].
   /// Includes units in flight.
-  int _remainingUnitsNeededForContract(Contract contract, String tradeSymbol) {
-    final shipSymbols = _shipSymbolsServicingContract(contract);
-    final ships = _shipCache.ships.where((s) => shipSymbols.contains(s.symbol));
-    // This is an over-estimation of the max units in flight since
-    // ships might get to a destination and not buy a full load.
-    final maxUnitsInFlight = ships.fold<int>(
-      0,
-      (sum, ship) => sum + ship.cargo.capacity,
-    );
+  @visibleForTesting
+  int remainingUnitsNeededForContract(Contract contract, String tradeSymbol) {
+    var unitsAssigned = 0;
+    for (final shipSymbol in _shipCache.shipSymbols) {
+      final deal = _behaviorCache.getBehavior(shipSymbol)?.deal;
+      if (deal == null) {
+        continue;
+      }
+      if (deal.contractId != contract.id) {
+        continue;
+      }
+      unitsAssigned += deal.maxUnitsToBuy;
+    }
     final neededGood = contract.goodNeeded(tradeSymbol);
     return neededGood!.unitsRequired -
         neededGood.unitsFulfilled -
-        maxUnitsInFlight;
+        unitsAssigned;
   }
 
   /// Returns the symbol of the nearest mine to the given [ship].

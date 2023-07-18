@@ -188,6 +188,7 @@ Future<NavResult> continueNavigationIfNeeded(
   final action = routePlan.nextActionFrom(ship.nav.waypointSymbol);
   final actionStart = systemsCache.waypointFromSymbol(action.startSymbol);
   final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
+  await undockIfNeeded(api, ship);
   switch (action.type) {
     case RouteActionType.jump:
       final response =
