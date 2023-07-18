@@ -158,6 +158,8 @@ Future<DateTime?> _handleAtSourceWithDeal(
 
   // Otherwise we've bought what we can here, deliver what we have.
   // TODO(eseidel): Could use beginRouteAndLog instead?
+  // That might work?  Note costedDeal.route is more than just source->dest
+  // it also includes the work to get to source.
   return beingNewRouteAndLog(
     api,
     ship,

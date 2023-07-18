@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
@@ -434,6 +436,53 @@ RouteAction _navigationAction(
   );
 }
 
+class _RoutingResult {
+  _RoutingResult(Map<_WaypointSymbol, _WaypointSymbol> cameFrom)
+      : _cameFrom = cameFrom;
+
+  final Map<_WaypointSymbol, _WaypointSymbol> _cameFrom;
+
+  _WaypointSymbol? cameFrom(_WaypointSymbol waypointSymbol) =>
+      _cameFrom[waypointSymbol];
+}
+
+_RoutingResult _doAStar(
+  SystemsCache systemsCache,
+  SystemWaypoint start,
+  SystemWaypoint end,
+  int shipSpeed,
+) {
+  // This is A* search, thanks to
+  // https://www.redblobgames.com/pathfinding/a-star/introduction.html
+  final frontier =
+      PriorityQueue<(_WaypointSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
+        ..add((start.symbol, 0));
+  final cameFrom = <_WaypointSymbol, _WaypointSymbol>{};
+  final costSoFar = <_WaypointSymbol, int>{};
+  // logger.info('start: ${start.symbol} end: ${end.symbol}');
+  costSoFar[start.symbol] = 0;
+  while (frontier.isNotEmpty) {
+    final current = frontier.removeFirst();
+    // logger.info('current: ${current.$1}');
+    if (current.$1 == end.symbol) {
+      break;
+    }
+    for (final next in _neighborsFor(systemsCache, current.$1)) {
+      // logger.info('considering: $next');
+      final newCost = costSoFar[current.$1]! +
+          _timeBetween(systemsCache, current.$1, next, shipSpeed);
+      if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
+        costSoFar[next] = newCost;
+        final priority = newCost +
+            _approximateTimeBetween(systemsCache, end, next, shipSpeed);
+        frontier.add((next, priority));
+        cameFrom[next] = current.$1;
+      }
+    }
+  }
+  return _RoutingResult(cameFrom);
+}
+
 RouteAction _jumpAction(
   SystemsCache systemsCache,
   SystemWaypoint start,
@@ -503,38 +552,25 @@ RoutePlan? planRoute(
     );
   }
 
+  final startTime = DateTime.timestamp();
+
   // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
   // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
+  final result = _doAStar(
+    systemsCache,
+    start,
+    end,
+    shipSpeed,
+  );
 
-  // This is A* search, thanks to
-  // https://www.redblobgames.com/pathfinding/a-star/introduction.html
-  final frontier =
-      PriorityQueue<(_WaypointSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((start.symbol, 0));
-  final cameFrom = <_WaypointSymbol, _WaypointSymbol>{};
-  final costSoFar = <_WaypointSymbol, int>{};
-  // logger.info('start: ${start.symbol} end: ${end.symbol}');
-  costSoFar[start.symbol] = 0;
-  while (frontier.isNotEmpty) {
-    final current = frontier.removeFirst();
-    // logger.info('current: ${current.$1}');
-    if (current.$1 == end.symbol) {
-      break;
-    }
-    for (final next in _neighborsFor(systemsCache, current.$1)) {
-      // logger.info('considering: $next');
-      final newCost = costSoFar[current.$1]! +
-          _timeBetween(systemsCache, current.$1, next, shipSpeed);
-      if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
-        costSoFar[next] = newCost;
-        final priority = newCost +
-            _approximateTimeBetween(systemsCache, end, next, shipSpeed);
-        frontier.add((next, priority));
-        cameFrom[next] = current.$1;
-      }
-    }
+  final endTime = DateTime.timestamp();
+  final planningDuration = endTime.difference(startTime);
+  if (planningDuration.inSeconds > 1) {
+    logger.warn('planning ${start.symbol} to ${end.symbol} '
+        'took ${approximateDuration(planningDuration)}');
   }
-  if (cameFrom[end.symbol] == null) {
+
+  if (result.cameFrom(end.symbol) == null) {
     return null;
   }
 
@@ -543,7 +579,7 @@ RoutePlan? planRoute(
   var current = end.symbol;
   var isLastJump = true;
   while (current != start.symbol) {
-    final previous = cameFrom[current]!;
+    final previous = result.cameFrom(current)!;
     final previousWaypoint = systemsCache.waypointFromSymbol(previous);
     final currentWaypoint = systemsCache.waypointFromSymbol(current);
     if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
