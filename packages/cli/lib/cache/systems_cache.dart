@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
@@ -7,13 +6,6 @@ import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
-
-int _distanceBetweenSystems(System a, System b) {
-  // Use euclidean distance.
-  final dx = a.x - b.x;
-  final dy = a.y - b.y;
-  return sqrt(dx * dx + dy * dy).round();
-}
 
 /// A cache of the systems in the game.
 class SystemsCache extends JsonListStore<System> {
@@ -109,9 +101,8 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Return the system with the given [symbol].
-  System systemBySymbol(String symbol) {
-    return _systems.firstWhere((s) => s.symbol == symbol);
-  }
+  System systemBySymbol(String symbol) =>
+      _systems.firstWhere((s) => s.symbol == symbol);
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   SystemWaypoint? waypointOrNull(String waypointSymbol) {
@@ -123,16 +114,12 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Return the SystemWaypoint for the given [symbol].
-  SystemWaypoint waypointFromSymbol(String symbol) {
-    return waypointOrNull(symbol)!;
-  }
+  SystemWaypoint waypointFromSymbol(String symbol) => waypointOrNull(symbol)!;
 
   /// Return the SystemWaypoints for the given [systemSymbol].
   /// Mostly exists for compatibility with WaypointCache.
-  List<SystemWaypoint> waypointsInSystem(String systemSymbol) {
-    final system = systemBySymbol(systemSymbol);
-    return system.waypoints;
-  }
+  List<SystemWaypoint> waypointsInSystem(String systemSymbol) =>
+      systemBySymbol(systemSymbol).waypoints;
 
   /// Return connected systems for the given [systemSymbol].
   List<ConnectedSystem> connectedSystems(
@@ -147,7 +134,7 @@ class SystemsCache extends JsonListStore<System> {
     final inRange = _systems
         .where((s) => s.symbol != systemSymbol)
         .where((s) => s.hasJumpGate)
-        .where((s) => _distanceBetweenSystems(system, s) <= jumpGateRange)
+        .where((s) => system.distanceTo(s) <= jumpGateRange)
         .toList();
     final connected = inRange
         .map(
@@ -157,11 +144,11 @@ class SystemsCache extends JsonListStore<System> {
             type: s.type,
             x: s.x,
             y: s.y,
-            distance: _distanceBetweenSystems(system, s),
+            distance: system.distanceTo(s),
           ),
         )
         .toList()
-      ..sort((a, b) => a.distance.compareTo(b.distance));
+      ..sortBy<num>((e) => e.distance);
     // TODO(eseidel): sort by distance than symbol to be stable.
     return connected;
   }

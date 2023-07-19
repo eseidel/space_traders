@@ -221,6 +221,7 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 
 ### Jump timing:
 [WARN] 🛸#A  Jump X1-U93 to X1-KV19 (1759) expected 176, got 175.
+[WARN] 🛸#4C Jump X1-UM11 to X1-SY37 (2000) expected 200, got 199.
 
 ### Explorer double shipyard record?
 🛸#1A ✈️  to X1-VQ83-56254F, -8ms left
@@ -229,3 +230,34 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 🛸#1A ✍️  shipyard data @ X1-VQ83-56254F
 🛸#1A ✍️  shipyard data @ X1-VQ83-56254F
 🛸#1A X1-BB5-41700X is missing chart, routing.
+
+### Sell side trade volumes killing profits
+
+🛸#C  ✍️  shipyard data @ X1-XD55-07827C
+🛸#C  🤝  10 MODULE_ORE_REFINERY_I   +4% +824c per  10 x 23,237c = +232,370c -> 🏦 10,806,100c
+🛸#C  🤝  10 MODULE_ORE_REFINERY_I   +3% +601c per  10 x 23,014c = +230,140c -> 🏦 11,036,240c
+🛸#C  🤝  10 MODULE_ORE_REFINERY_I   +1% +327c per  10 x 22,740c = +227,400c -> 🏦 11,263,640c
+🛸#C  🤝  10 MODULE_ORE_REFINERY_I    0% -10c per  10 x 22,403c = +224,030c -> 🏦 11,487,670c
+🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -2% -425c per  10 x 21,988c = +219,880c -> 🏦 11,707,550c
+🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -4% -937c per  10 x 21,476c = +214,760c -> 🏦 11,922,310c
+🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -7% -1,566c per  10 x 20,847c = +208,470c -> 🏦 12,130,780c
+[WARN] 🛸#C  Expected 121,552c profit (220c/s), got -14,130c (-21c/s) in 00:10:49, expected 00:09:12
+
+### Some routes take way too long:
+[WARN] planning X1-MZ67-89424A to X1-ZC22-26502F took 27s
+[WARN] planning X1-QY7-49849C to X1-ZC22-26502F took 1m
+[WARN] planning X1-QZ16-60787C to X1-ZC22-26502F took 15s
+[WARN] planning X1-PR89-34810A to X1-ZC22-26502F took 13s
+[WARN] planning X1-YP31-34280X to X1-VS61-13110B took 4s
+
+### Ships chasing each other
+🛸#4B ✈️  to X1-TM59-47122Z, 7m left
+🛸#4C ✈️  to X1-TM59-47122Z, 7m left
+🛸#4D ✈️  to X1-PQ90-95787D, -1m left
+🛸#4E ✈️  to X1-PQ90-95787D, -1m left
+🛸#4F ✈️  to X1-TM59-47122Z, 7m left
+🛸#50 ✈️  to X1-TM59-47122Z, 7m left
+🛸#54 ✈️  to X1-TM59-47122Z, 7m left
+🛸#55 ✈️  to X1-TM59-47122Z, 7m left
+🛸#56 ✈️  to X1-TM59-47122Z, 7m left
+🛸#57 ✈️  to X1-TM59-47122Z, 7m left
