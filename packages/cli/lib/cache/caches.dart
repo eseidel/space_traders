@@ -12,6 +12,7 @@ import 'package:cli/cache/surveys.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
@@ -50,6 +51,7 @@ class Caches {
     required this.behaviors,
     required this.factions,
     required this.charting,
+    required this.routePlanner,
   });
 
   /// The agent cache.
@@ -94,8 +96,8 @@ class Caches {
   /// The cache of charting data.
   final ChartingCache charting;
 
-  /// The cache of jump routes.
-  final JumpCache jumps = JumpCache();
+  /// The route planner.
+  final RoutePlanner routePlanner;
 
   /// Load the cache from disk and network.
   static Future<Caches> load(
@@ -110,7 +112,6 @@ class Caches {
     final shipyard = ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
-    final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
     final transactions = await TransactionLog.load(fs);
     final charting = ChartingCache.load(fs);
     final waypoints = WaypointCache(api, systems, charting);
@@ -120,6 +121,14 @@ class Caches {
     final behaviors = BehaviorCache.load(fs);
     // Intentionally load factions from disk (they never change).
     final factions = await FactionCache.load(api, fs: fs);
+
+    final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
+    final jumps = JumpCache();
+    final routePlanner = RoutePlanner(
+      jumpCache: jumps,
+      systemsCache: systems,
+      systemConnectivity: systemConnectivity,
+    );
 
     // Save out the caches we never modify so we don't have to load them again.
     await factions.save();
@@ -142,6 +151,7 @@ class Caches {
       behaviors: behaviors,
       factions: factions,
       charting: charting,
+      routePlanner: routePlanner,
     );
   }
 

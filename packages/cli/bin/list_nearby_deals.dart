@@ -2,6 +2,7 @@ import 'package:args/args.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
@@ -33,8 +34,7 @@ Future<void> cliMain(List<String> args) async {
 
   const fs = LocalFileSystem();
   final systemsCache = SystemsCache.loadCached(fs)!;
-  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
-  final jumpCache = JumpCache();
+  final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
 
   final marketPrices = MarketPrices.load(fs);
 
@@ -95,8 +95,7 @@ Future<void> cliMain(List<String> args) async {
   final maybeDeal = await findDealFor(
     marketPrices,
     systemsCache,
-    systemConnectivity,
-    jumpCache,
+    routePlanner,
     marketScan,
     maxJumps: maxJumps,
     maxTotalOutlay: maxOutlay,

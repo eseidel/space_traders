@@ -23,8 +23,6 @@ Future<DateTime?> advanceShipBehavior(
     api,
     ship,
     caches.systems,
-    caches.systemConnectivity,
-    caches.jumps,
     centralCommand,
     getNow: getNow,
   );

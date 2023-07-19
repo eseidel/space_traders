@@ -176,8 +176,7 @@ Future<DateTime?> advanceBuyShip(
     api,
     ship,
     caches.systems,
-    caches.systemConnectivity,
-    caches.jumps,
+    caches.routePlanner,
     centralCommand,
     destination.symbol,
   );

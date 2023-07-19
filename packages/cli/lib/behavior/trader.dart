@@ -6,6 +6,7 @@ import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
@@ -164,8 +165,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
     api,
     ship,
     caches.systems,
-    caches.systemConnectivity,
-    caches.jumps,
+    caches.routePlanner,
     centralCommand,
     costedDeal.route.endSymbol,
   );
@@ -317,8 +317,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
       api,
       ship,
       caches.systems,
-      caches.systemConnectivity,
-      caches.jumps,
+      caches.routePlanner,
       centralCommand,
       costedDeal.deal.sourceSymbol,
     );
@@ -330,8 +329,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
       api,
       ship,
       caches.systems,
-      caches.systemConnectivity,
-      caches.jumps,
+      caches.routePlanner,
       centralCommand,
       costedDeal.route.endSymbol,
     );
@@ -354,8 +352,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
       api,
       ship,
       caches.systems,
-      caches.systemConnectivity,
-      caches.jumps,
+      caches.routePlanner,
       centralCommand,
       costedDeal.deal.sourceSymbol,
     );
@@ -453,8 +450,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   Api api,
   CentralCommand centralCommand,
   SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  JumpCache jumpCache,
+  RoutePlanner routePlanner,
   AgentCache agentCache,
   ContractCache contractCache,
   MarketPrices marketPrices,
@@ -464,8 +460,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   shipWarn(ship, why);
   final destinationSymbol = await centralCommand.findBetterTradeLocation(
     systemsCache,
-    systemConnectivity,
-    jumpCache,
+    routePlanner,
     agentCache,
     contractCache,
     marketPrices,
@@ -486,8 +481,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
     api,
     ship,
     systemsCache,
-    systemConnectivity,
-    jumpCache,
+    routePlanner,
     centralCommand,
     destinationSymbol,
   );
@@ -588,8 +582,7 @@ Future<DateTime?> advanceTrader(
         api,
         ship,
         caches.systems,
-        caches.systemConnectivity,
-        caches.jumps,
+        caches.routePlanner,
         centralCommand,
         market.symbol,
       );
@@ -615,8 +608,7 @@ Future<DateTime?> advanceTrader(
     caches.contracts,
     caches.marketPrices,
     caches.systems,
-    caches.systemConnectivity,
-    caches.jumps,
+    caches.routePlanner,
     ship,
     maxJumps: _maxJumps,
     maxWaypoints: _maxWaypoints,
@@ -628,8 +620,7 @@ Future<DateTime?> advanceTrader(
       api,
       centralCommand,
       caches.systems,
-      caches.systemConnectivity,
-      caches.jumps,
+      caches.routePlanner,
       caches.agent,
       caches.contracts,
       caches.marketPrices,

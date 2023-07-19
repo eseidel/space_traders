@@ -238,8 +238,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
     api,
     ship,
     caches.systems,
-    caches.systemConnectivity,
-    caches.jumps,
+    caches.routePlanner,
     centralCommand,
     destination,
   );
@@ -333,8 +332,7 @@ Future<DateTime?> advanceExplorer(
       api,
       ship,
       caches.systems,
-      caches.systemConnectivity,
-      caches.jumps,
+      caches.routePlanner,
       centralCommand,
       destinationSymbol,
     );

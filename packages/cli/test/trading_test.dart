@@ -27,6 +27,8 @@ class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockShipCargo extends Mock implements ShipCargo {}
 
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
 void main() {
   test('estimateSellPrice null', () {
     final marketPrices = _MockMarketPrices();
@@ -127,8 +129,6 @@ void main() {
 
   test('costOutDeal basic', () {
     final systemsCache = _MockSystemsCache();
-    final systemConnectivity = _MockSystemConnectivity();
-    final jumpCache = JumpCache();
     final start = SystemWaypoint(
       symbol: 'X-S-A',
       type: WaypointType.ASTEROID_FIELD,
@@ -144,12 +144,33 @@ void main() {
     when(() => systemsCache.waypointFromSymbol('X-S-A')).thenReturn(start);
     when(() => systemsCache.waypointFromSymbol('X-S-B')).thenReturn(end);
     when(() => systemsCache.waypointsInSystem('X-S')).thenReturn([start, end]);
+
+    final routePlanner = _MockRoutePlanner();
+    const fuelCapacity = 100;
+    const shipSpeed = 1;
+    registerFallbackValue(start);
     when(
-      () => systemConnectivity.canJumpBetweenSystemSymbols(
-        any(),
-        any(),
+      () => routePlanner.planRoute(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
       ),
-    ).thenReturn(true);
+    ).thenReturn(
+      RoutePlan(
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+        actions: [
+          RouteAction(
+            startSymbol: start.symbol,
+            endSymbol: end.symbol,
+            type: RouteActionType.navCruise,
+            duration: 15,
+          )
+        ],
+        fuelUsed: 0,
+      ),
+    );
 
     const deal = Deal(
       sourceSymbol: 'X-S-A',
@@ -160,18 +181,15 @@ void main() {
     );
     final costed = costOutDeal(
       systemsCache,
-      systemConnectivity,
-      jumpCache,
+      routePlanner,
       deal,
       cargoSize: 1,
-      shipSpeed: 1,
-      shipFuelCapacity: 100,
+      shipSpeed: shipSpeed,
+      shipFuelCapacity: fuelCapacity,
       shipWaypointSymbol: 'X-S-A',
       costPerFuelUnit: 100,
     );
 
-    /// These aren't very useful numbers, I don't think it takes 15s to fly
-    /// 0 distance (even between orbitals)?
     expect(costed.expectedFuelCost, 0);
     expect(costed.cargoSize, 1);
     expect(costed.expectedTime, 15);
@@ -243,14 +261,6 @@ void main() {
     // thus has a better profit per second.
     final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
-    final systemConnectivity = _MockSystemConnectivity();
-    final jumpCache = JumpCache();
-    when(
-      () => systemConnectivity.canJumpBetweenSystemSymbols(
-        any(),
-        any(),
-      ),
-    ).thenReturn(true);
     final saa = SystemWaypoint(
       symbol: 'S-A-A',
       type: WaypointType.ASTEROID_FIELD,
@@ -326,6 +336,20 @@ void main() {
     when(() => shipCargo.capacity).thenReturn(1);
     when(() => shipCargo.units).thenReturn(0);
 
+    final systemConnectivity = _MockSystemConnectivity();
+    final jumpCache = JumpCache();
+    when(
+      () => systemConnectivity.canJumpBetweenSystemSymbols(
+        any(),
+        any(),
+      ),
+    ).thenReturn(true);
+    final routePlanner = RoutePlanner(
+      systemConnectivity: systemConnectivity,
+      jumpCache: jumpCache,
+      systemsCache: systemsCache,
+    );
+
     final logger = _MockLogger();
 
     const maxJumps = 1;
@@ -346,8 +370,7 @@ void main() {
       () => findDealFor(
         marketPrices,
         systemsCache,
-        systemConnectivity,
-        jumpCache,
+        routePlanner,
         marketScan,
         maxJumps: 1,
         maxTotalOutlay: 100000,

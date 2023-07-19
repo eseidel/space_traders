@@ -52,6 +52,8 @@ class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
 void main() {
   test('advanceContractTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
@@ -68,7 +70,7 @@ void main() {
     final transactionLog = _MockTransactionLog();
     final shipyardPrices = _MockShipyardPrices();
     final contractCache = _MockContractCache();
-    final jumpCache = JumpCache();
+    final routePlanner = _MockRoutePlanner();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -77,8 +79,7 @@ void main() {
     when(
       () => centralCommand.findBetterTradeLocation(
         systemsCache,
-        systemConnectivity,
-        jumpCache,
+        routePlanner,
         agentCache,
         contractCache,
         marketPrices,
@@ -98,7 +99,7 @@ void main() {
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.contracts).thenReturn(contractCache);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
-    when(() => caches.jumps).thenReturn(jumpCache);
+    when(() => caches.routePlanner).thenReturn(routePlanner);
 
     final shipFuel = _MockShipFuel();
     when(() => ship.fuel).thenReturn(shipFuel);
@@ -207,8 +208,7 @@ void main() {
         contractCache,
         marketPrices,
         systemsCache,
-        systemConnectivity,
-        jumpCache,
+        routePlanner,
         ship,
         maxJumps: any(named: 'maxJumps'),
         maxWaypoints: any(named: 'maxWaypoints'),
@@ -286,8 +286,8 @@ void main() {
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
-    final jumpCache = JumpCache();
-    when(() => caches.jumps).thenReturn(jumpCache);
+    final routePlanner = _MockRoutePlanner();
+    when(() => caches.routePlanner).thenReturn(routePlanner);
 
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
@@ -515,7 +515,6 @@ void main() {
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final contractCache = _MockContractCache();
-    final jumpCache = JumpCache();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
     when(() => centralCommand.minTraderProfitPerSecond).thenReturn(10);
     final caches = _MockCaches();
@@ -529,7 +528,8 @@ void main() {
     when(() => caches.contracts).thenReturn(contractCache);
     when(() => contractCache.activeContracts).thenReturn([]);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
-    when(() => caches.jumps).thenReturn(jumpCache);
+    final routePlanner = _MockRoutePlanner();
+    when(() => caches.routePlanner).thenReturn(routePlanner);
     final contract = Contract(
       id: 'id',
       factionSymbol: 'factionSymbol',
@@ -639,8 +639,7 @@ void main() {
         contractCache,
         marketPrices,
         systemsCache,
-        systemConnectivity,
-        jumpCache,
+        routePlanner,
         ship,
         maxWaypoints: any(named: 'maxWaypoints'),
         maxJumps: any(named: 'maxJumps'),
@@ -667,8 +666,7 @@ void main() {
     when(
       () => centralCommand.findBetterTradeLocation(
         systemsCache,
-        systemConnectivity,
-        jumpCache,
+        routePlanner,
         agentCache,
         contractCache,
         marketPrices,

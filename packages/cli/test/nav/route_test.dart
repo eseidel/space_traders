@@ -1,8 +1,6 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/local.dart';
 import 'package:test/test.dart';
 
@@ -92,16 +90,11 @@ void main() {
       fs,
       path: 'test/nav/fixtures/systems-06-24-2023.json',
     )!;
-    final jumpCache = JumpCache();
-    final systemConnectivity =
-        SystemConnectivity.fromSystemsCache(systemsCache);
+    final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
     void expectRoute(String start, String end, int expectedSeconds) {
       final startWaypoint = systemsCache.waypointFromSymbol(start);
       final endWaypoint = systemsCache.waypointFromSymbol(end);
-      final route = planRoute(
-        systemsCache,
-        systemConnectivity,
-        jumpCache,
+      final route = routePlanner.planRoute(
         start: startWaypoint,
         end: endWaypoint,
         fuelCapacity: 1200,
@@ -120,10 +113,7 @@ void main() {
       // navigation in this test so far.
       final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
         ..add(route.actions.last.endSymbol);
-      final route2 = planRoute(
-        systemsCache,
-        systemConnectivity,
-        jumpCache,
+      final route2 = routePlanner.planRoute(
         start: startWaypoint,
         end: endWaypoint,
         fuelCapacity: 1200,

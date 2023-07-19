@@ -379,118 +379,140 @@ RouteAction _jumpAction(
   );
 }
 
-/// Plan a route between two waypoints.
-RoutePlan? planRoute(
-  SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  JumpCache jumpCache, {
-  required SystemWaypoint start,
-  required SystemWaypoint end,
-  required int fuelCapacity,
-  required int shipSpeed,
-}) {
-  // TODO(eseidel): This is wrong.  An empty route is not valid.
-  if (start.symbol == end.symbol) {
-    // throw ArgumentError('Cannot plan route between same waypoint');
-    return RoutePlan(
-      actions: const [],
-      fuelCapacity: fuelCapacity,
-      shipSpeed: shipSpeed,
-      fuelUsed: 0,
-    );
-  }
+/// A route planner.
+// Using a class instead of a function for easier mocking in tests.
+class RoutePlanner {
+  /// Create a new route planner.
+  RoutePlanner({
+    required SystemsCache systemsCache,
+    required SystemConnectivity systemConnectivity,
+    required JumpCache jumpCache,
+  })  : _systemsCache = systemsCache,
+        _systemConnectivity = systemConnectivity,
+        _jumpCache = jumpCache;
 
-  // We only handle jumps at the moment.
-  // We fail out quickly from our reachability cache if these system waypoints
-  // are not in the same system cluster.
-  if (!systemConnectivity.canJumpBetweenSystemSymbols(
-    start.systemSymbol,
-    end.systemSymbol,
-  )) {
-    return null;
-  }
+  /// Create a new route planner from a systems cache.
+  RoutePlanner.fromSystemsCache(SystemsCache systemsCache)
+      : this(
+          systemsCache: systemsCache,
+          systemConnectivity: SystemConnectivity.fromSystemsCache(systemsCache),
+          jumpCache: JumpCache(),
+        );
 
-  // Look up in the jump cache, if so, create a plan from that.
-  final jumpPlan = jumpCache.lookupJumpPlan(
-    fromSystem: start.systemSymbol,
-    toSystem: end.systemSymbol,
-  );
-  if (jumpPlan != null) {
-    return routePlanFromJumpPlan(
-      systemsCache,
-      start: start,
-      end: end,
-      jumpPlan: jumpPlan,
-      fuelCapacity: fuelCapacity,
-      shipSpeed: shipSpeed,
-    );
-  }
+  final SystemsCache _systemsCache;
+  final SystemConnectivity _systemConnectivity;
+  final JumpCache _jumpCache;
 
-  final startTime = DateTime.timestamp();
-
-  // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
-  // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
-  final symbols = findWaypointPath(
-    systemsCache,
-    start,
-    end,
-    shipSpeed,
-  );
-  if (symbols == null) {
-    return null;
-  }
-
-  final endTime = DateTime.timestamp();
-  final planningDuration = endTime.difference(startTime);
-  if (planningDuration.inSeconds > 1) {
-    logger.warn('planning ${start.symbol} to ${end.symbol} '
-        'took ${approximateDuration(planningDuration)}');
-  }
-
-  // walk backwards from end through symbols to build the route
-  // we could alternatively build it forward and then fix the jump durations
-  // after.
-  final route = <RouteAction>[];
-  var isLastJump = true;
-  for (var i = symbols.length - 1; i > 0; i--) {
-    final current = symbols[i];
-    final previous = symbols[i - 1];
-    final previousWaypoint = systemsCache.waypointFromSymbol(previous);
-    final currentWaypoint = systemsCache.waypointFromSymbol(current);
-    if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
-      // Assume we jumped.
-      route.add(
-        _jumpAction(
-          systemsCache,
-          previousWaypoint,
-          currentWaypoint,
-          shipSpeed,
-          isLastJump: isLastJump,
-        ),
-      );
-      isLastJump = false;
-    } else {
-      route.add(
-        _navigationAction(
-          previousWaypoint,
-          currentWaypoint,
-          shipSpeed,
-        ),
+  /// Plan a route between two waypoints.
+  RoutePlan? planRoute({
+    required SystemWaypoint start,
+    required SystemWaypoint end,
+    required int fuelCapacity,
+    required int shipSpeed,
+  }) {
+    // TODO(eseidel): This is wrong.  An empty route is not valid.
+    if (start.symbol == end.symbol) {
+      // throw ArgumentError('Cannot plan route between same waypoint');
+      return RoutePlan(
+        actions: const [],
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+        fuelUsed: 0,
       );
     }
+
+    // We only handle jumps at the moment.
+    // We fail out quickly from our reachability cache if these system waypoints
+    // are not in the same system cluster.
+    if (!_systemConnectivity.canJumpBetweenSystemSymbols(
+      start.systemSymbol,
+      end.systemSymbol,
+    )) {
+      return null;
+    }
+
+    // Look up in the jump cache, if so, create a plan from that.
+    final jumpPlan = _jumpCache.lookupJumpPlan(
+      fromSystem: start.systemSymbol,
+      toSystem: end.systemSymbol,
+    );
+    if (jumpPlan != null) {
+      return routePlanFromJumpPlan(
+        _systemsCache,
+        start: start,
+        end: end,
+        jumpPlan: jumpPlan,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      );
+    }
+
+    final startTime = DateTime.timestamp();
+
+    // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
+    // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
+    final symbols = findWaypointPath(
+      _systemsCache,
+      start,
+      end,
+      shipSpeed,
+    );
+    if (symbols == null) {
+      return null;
+    }
+
+    final endTime = DateTime.timestamp();
+    final planningDuration = endTime.difference(startTime);
+    if (planningDuration.inSeconds > 1) {
+      logger.warn('planning ${start.symbol} to ${end.symbol} '
+          'took ${approximateDuration(planningDuration)}');
+    }
+
+    // walk backwards from end through symbols to build the route
+    // we could alternatively build it forward and then fix the jump durations
+    // after.
+    final route = <RouteAction>[];
+    var isLastJump = true;
+    for (var i = symbols.length - 1; i > 0; i--) {
+      final current = symbols[i];
+      final previous = symbols[i - 1];
+      final previousWaypoint = _systemsCache.waypointFromSymbol(previous);
+      final currentWaypoint = _systemsCache.waypointFromSymbol(current);
+      if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
+        // Assume we jumped.
+        route.add(
+          _jumpAction(
+            _systemsCache,
+            previousWaypoint,
+            currentWaypoint,
+            shipSpeed,
+            isLastJump: isLastJump,
+          ),
+        );
+        isLastJump = false;
+      } else {
+        route.add(
+          _navigationAction(
+            previousWaypoint,
+            currentWaypoint,
+            shipSpeed,
+          ),
+        );
+      }
+    }
+
+    final actions = route.reversed.toList();
+    final fuelUsed = _fuelUsedByActions(_systemsCache, actions);
+
+    _saveJumpsInCache(_jumpCache, actions);
+
+    return RoutePlan(
+      fuelCapacity: fuelCapacity,
+      shipSpeed: shipSpeed,
+      actions: actions,
+      fuelUsed: fuelUsed,
+    );
   }
-
-  final actions = route.reversed.toList();
-  final fuelUsed = _fuelUsedByActions(systemsCache, actions);
-
-  _saveJumpsInCache(jumpCache, actions);
-
-  return RoutePlan(
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
-    actions: actions,
-    fuelUsed: fuelUsed,
-  );
 }
 
 int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
@@ -511,8 +533,7 @@ int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
 /// Plan a route through a series of waypoints.
 RoutePlan? planRouteThrough(
   SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  JumpCache jumpCache,
+  RoutePlanner routePlanner,
   List<String> waypointSymbols, {
   required int fuelCapacity,
   required int shipSpeed,
@@ -522,12 +543,17 @@ RoutePlan? planRouteThrough(
   }
   final segments = <RoutePlan>[];
   for (var i = 0; i < waypointSymbols.length - 1; i++) {
-    final start = systemsCache.waypointFromSymbol(waypointSymbols[i]);
-    final end = systemsCache.waypointFromSymbol(waypointSymbols[i + 1]);
-    final plan = planRoute(
-      systemsCache,
-      systemConnectivity,
-      jumpCache,
+    final startSymbol = waypointSymbols[i];
+    final endSymbol = waypointSymbols[i + 1];
+    // Skip any segments where we start and end at the same waypoint.
+    // costOutDeal currently calls this with:
+    // [shipLocation, start, end] if shipLocation == start, then we can skip.
+    if (startSymbol == endSymbol) {
+      continue;
+    }
+    final start = systemsCache.waypointFromSymbol(startSymbol);
+    final end = systemsCache.waypointFromSymbol(endSymbol);
+    final plan = routePlanner.planRoute(
       start: start,
       end: end,
       fuelCapacity: fuelCapacity,

@@ -42,16 +42,19 @@ Future<void> command(FileSystem fs, List<String> args) async {
       .map((s) => systemsCache.jumpGateWaypointForSystem(s)!)
       .toList();
 
+  final planner = RoutePlanner(
+    jumpCache: jumpCache,
+    systemsCache: systemsCache,
+    systemConnectivity: systemConnectivity,
+  );
+
   final results = <Result>[];
   // plan routes between each pair of jumpgates and print the timing.
   for (var i = 0; i < jumpgates.length - 1; i++) {
     final start = jumpgates[i];
     final end = jumpgates[i + 1];
     final routeStart = DateTime.now();
-    planRoute(
-      systemsCache,
-      systemConnectivity,
-      jumpCache,
+    planner.planRoute(
       start: start,
       end: end,
       fuelCapacity: 1200,

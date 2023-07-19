@@ -381,8 +381,7 @@ class CentralCommand {
     ContractCache contractCache,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
-    SystemConnectivity systemConnectivity,
-    JumpCache jumpCache,
+    RoutePlanner routePlanner,
     Ship ship, {
     required int maxJumps,
     required int maxTotalOutlay,
@@ -430,8 +429,7 @@ class CentralCommand {
     final maybeDeal = await findDealFor(
       marketPrices,
       systemsCache,
-      systemConnectivity,
-      jumpCache,
+      routePlanner,
       marketScan,
       maxJumps: maxJumps,
       maxTotalOutlay: maxTotalOutlay,
@@ -449,8 +447,7 @@ class CentralCommand {
 
   Future<_ShipPlacement?> _findBetterSystemForTrader(
     SystemsCache systemsCache,
-    SystemConnectivity systemConnectivity,
-    JumpCache jumpCache,
+    RoutePlanner routePlanner,
     AgentCache agentCache,
     ContractCache contractCache,
     MarketPrices marketPrices,
@@ -477,8 +474,7 @@ class CentralCommand {
         contractCache,
         marketPrices,
         systemsCache,
-        systemConnectivity,
-        jumpCache,
+        routePlanner,
         ship,
         overrideStartSymbol: systemJumpGate.symbol,
         maxJumps: maxJumps,
@@ -865,8 +861,7 @@ class CentralCommand {
   /// Find a better destination for the given trader [ship].
   Future<String?> findBetterTradeLocation(
     SystemsCache systemsCache,
-    SystemConnectivity systemConnectivity,
-    JumpCache jumpCache,
+    RoutePlanner routePlanner,
     AgentCache agentCache,
     ContractCache contractCache,
     MarketPrices marketPrices,
@@ -882,8 +877,7 @@ class CentralCommand {
     );
     final placement = await _findBetterSystemForTrader(
       systemsCache,
-      systemConnectivity,
-      jumpCache,
+      routePlanner,
       agentCache,
       contractCache,
       marketPrices,

@@ -32,17 +32,12 @@ void main(List<String> args) async {
 }
 
 void planRouteAndLog(
-  SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  JumpCache jumpCache,
+  RoutePlanner planner,
   SystemWaypoint start,
   SystemWaypoint end,
 ) {
   final routeStart = DateTime.now();
-  final plan = planRoute(
-    systemsCache,
-    systemConnectivity,
-    jumpCache,
+  final plan = planner.planRoute(
     start: start,
     end: end,
     fuelCapacity: 1200,
@@ -69,10 +64,9 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final endSymbol = args[1];
 
   final systemsCache = SystemsCache.loadCached(fs)!;
-  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
-  final jumpCache = JumpCache();
+  final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
 
   final start = systemsCache.waypointFromSymbol(startSymbol);
   final end = systemsCache.waypointFromSymbol(endSymbol);
-  planRouteAndLog(systemsCache, systemConnectivity, jumpCache, start, end);
+  planRouteAndLog(routePlanner, start, end);
 }
