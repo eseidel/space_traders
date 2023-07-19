@@ -1,5 +1,6 @@
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/nav/system_pathing.dart';
 import 'package:cli/nav/waypoint_pathing.dart';
 import 'package:collection/collection.dart';
@@ -39,12 +40,13 @@ Future<void> command(FileSystem fs, List<String> args) async {
         findWaypointPathJumpsOnly(systemsCache, start, end, shipSpeed);
     final matches =
         const ListEquality<String>().equals(waypointPath, jumpsOnly);
-    print('${start.symbol} -> ${end.symbol}');
+    logger.info('${start.symbol} -> ${end.symbol}');
     if (matches) {
-      print('  matches');
+      logger.info('  matches');
     } else {
-      print('  old: $waypointPath');
-      print('  new: $jumpsOnly');
+      logger
+        ..info('  old: $waypointPath')
+        ..info('  new: $jumpsOnly');
     }
   }
 }
