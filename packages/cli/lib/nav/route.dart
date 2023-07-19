@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/waypoint_pathing.dart';
+import 'package:cli/nav/system_pathing.dart';
 import 'package:cli/printing.dart';
 import 'package:meta/meta.dart';
 
@@ -451,7 +451,7 @@ class RoutePlanner {
 
     // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
     // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
-    final symbols = findWaypointPath(
+    final symbols = findWaypointPathJumpsOnly(
       _systemsCache,
       start,
       end,

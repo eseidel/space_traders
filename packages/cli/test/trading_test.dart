@@ -344,6 +344,16 @@ void main() {
         any(),
       ),
     ).thenReturn(true);
+    when(() => systemsCache.systemBySymbol('S-A')).thenReturn(
+      System(
+        symbol: 'S-A',
+        sectorSymbol: 'S',
+        x: 0,
+        y: 0,
+        type: SystemType.RED_STAR,
+      ),
+    );
+
     final routePlanner = RoutePlanner(
       systemConnectivity: systemConnectivity,
       jumpCache: jumpCache,
