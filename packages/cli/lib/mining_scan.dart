@@ -131,7 +131,7 @@ Future<String?> nearestMineWithGoodMining(
   // TODO(eseidel): These evals should be cached on centralCommand.
   final evals = <_SystemEval>[];
   for (final (systemSymbol, jumps) in systemsCache.systemSymbolsInJumpRadius(
-    startSystem: start.systemSymbol,
+    startSystem: start.systemSymbol.system,
     maxJumps: maxJumps,
   )) {
     if (systemFilter != null && !systemFilter(systemSymbol)) {

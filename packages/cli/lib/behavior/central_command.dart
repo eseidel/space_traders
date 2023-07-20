@@ -512,12 +512,12 @@ class CentralCommand {
   }
 
   /// Returns other systems containing ships with [behavior].
-  Iterable<String> _otherSystemsWithBehavior(
-    String thisShipSymbol,
+  Iterable<SystemSymbol> _otherSystemsWithBehavior(
+    ShipSymbol thisShipSymbol,
     Behavior behavior,
   ) sync* {
     for (final state in _behaviorCache.states) {
-      if (state.shipSymbol == thisShipSymbol) {
+      if (state.shipSymbol == thisShipSymbol.symbol) {
         continue;
       }
       if (state.behavior != behavior) {
@@ -525,21 +525,21 @@ class CentralCommand {
       }
       final destination = state.routePlan?.endSymbol;
       if (destination != null) {
-        final parsed = parseWaypointString(destination);
-        yield parsed.system;
+        final waypointSymbol = WaypointSymbol.fromString(destination);
+        yield waypointSymbol.systemSymbol;
       } else {
         final ship = _shipCache.ship(state.shipSymbol);
-        yield ship.nav.systemSymbol;
+        yield SystemSymbol.fromString(ship.nav.systemSymbol);
       }
     }
   }
 
   /// Returns all systems containing explorers or explorer destinations.
-  Iterable<String> otherExplorerSystems(String thisShipSymbol) =>
+  Iterable<SystemSymbol> otherExplorerSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
 
   /// Returns all systems containing traders or trader destinations.
-  Iterable<String> _otherTraderSystems(String thisShipSymbol) =>
+  Iterable<SystemSymbol> _otherTraderSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
   int _countOfTypeInFleet(ShipType shipType) {
@@ -879,7 +879,7 @@ class CentralCommand {
     required int maxJumps,
     required int maxWaypoints,
   }) async {
-    final traderSystems = _otherTraderSystems(ship.symbol).toList();
+    final traderSystems = _otherTraderSystems(ship.shipSymbol).toList();
     final search = _MarketSearch.start(
       marketPrices,
       systemsCache,
@@ -1050,7 +1050,7 @@ class _MarketSearch {
   factory _MarketSearch.start(
     MarketPrices marketPrices,
     SystemsCache systemsCache, {
-    Set<String>? avoidSystems,
+    Set<SystemSymbol>? avoidSystems,
   }) {
     final marketSystemScores = scoreMarketSystems(marketPrices);
     final marketSystems =
@@ -1064,19 +1064,19 @@ class _MarketSearch {
 
   final List<System> marketSystems;
   final Map<String, int> marketSystemScores;
-  final Set<String> claimedSystemSymbols;
+  final Set<SystemSymbol> claimedSystemSymbols;
 
   System? closestAvailableSystem(
     SystemsCache systemsCache,
     System startSystem,
   ) {
     final availableSystems = marketSystems
-        .where((system) => !claimedSystemSymbols.contains(system.symbol))
+        .where((system) => !claimedSystemSymbols.contains(system.systemSymbol))
         .toList();
     return _closestSystem(systemsCache, startSystem, availableSystems);
   }
 
-  void markUsed(System system) => claimedSystemSymbols.add(system.symbol);
+  void markUsed(System system) => claimedSystemSymbols.add(system.systemSymbol);
 
   int scoreFor(String systemSymbol) => marketSystemScores[systemSymbol]!;
 }

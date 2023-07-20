@@ -86,7 +86,7 @@ Future<void> cliMain(List<String> args) async {
   final marketScan = scanNearbyMarkets(
     systemsCache,
     marketPrices,
-    systemSymbol: start.systemSymbol,
+    systemSymbol: start.systemSymbol.system,
     maxJumps: maxJumps,
     maxWaypoints: maxWaypoints,
   );

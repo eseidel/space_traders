@@ -338,6 +338,7 @@ void main() {
 
     final systemConnectivity = _MockSystemConnectivity();
     final jumpCache = JumpCache();
+    registerFallbackValue(SystemSymbol.fromString('S-A'));
     when(
       () => systemConnectivity.canJumpBetweenSystemSymbols(
         any(),

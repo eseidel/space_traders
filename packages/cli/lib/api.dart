@@ -128,6 +128,81 @@ class WaypointPosition extends Position {
   }
 }
 
+/// Type-safe representation of a Waypoint Symbol
+@immutable
+class WaypointSymbol {
+  const WaypointSymbol._(this.waypoint);
+
+  /// Create a WaypointSymbol from a string.
+  factory WaypointSymbol.fromString(String symbol) {
+    if (symbol.split('-').length != 3) {
+      throw ArgumentError('Invalid waypoint symbol: $symbol');
+    }
+    return WaypointSymbol._(symbol);
+  }
+
+  /// The sector symbol of the waypoint.
+  String get sector => system.split('-')[0];
+
+  /// The system symbol of the waypoint.
+  String get system {
+    final parts = waypoint.split('-');
+    return '${parts[0]}-${parts[1]}';
+  }
+
+  /// The SystemSymbol of the waypoint.
+  SystemSymbol get systemSymbol => SystemSymbol.fromString(system);
+
+  /// The full waypoint symbol.
+  final String waypoint;
+
+  @override
+  String toString() => waypoint;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WaypointSymbol &&
+          runtimeType == other.runtimeType &&
+          system == other.waypoint;
+
+  @override
+  int get hashCode => waypoint.hashCode;
+}
+
+/// Type-safe representation of a System Symbol
+@immutable
+class SystemSymbol {
+  const SystemSymbol._(this.system);
+
+  /// Create a SystemSymbol from a string.
+  factory SystemSymbol.fromString(String symbol) {
+    if (symbol.split('-').length != 2) {
+      throw ArgumentError('Invalid system symbol: $symbol');
+    }
+    return SystemSymbol._(symbol);
+  }
+
+  /// The sector symbol of the system.
+  String get sector => system.split('-')[0];
+
+  /// The full system symbol.
+  final String system;
+
+  @override
+  String toString() => system;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SystemSymbol &&
+          runtimeType == other.runtimeType &&
+          system == other.system;
+
+  @override
+  int get hashCode => system.hashCode;
+}
+
 /// Parsed ShipSymbol which can be compared/sorted.
 @immutable
 class ShipSymbol implements Comparable<ShipSymbol> {
@@ -167,6 +242,9 @@ class ShipSymbol implements Comparable<ShipSymbol> {
 
 /// Extensions onto System to make it easier to work with.
 extension SystemUtils on System {
+  /// Returns the SystemSymbol of the system.
+  SystemSymbol get systemSymbol => SystemSymbol.fromString(symbol);
+
   /// Returns true if the system has a jump gate.
   bool get hasJumpGate =>
       waypoints.any((w) => w.type == WaypointType.JUMP_GATE);
@@ -197,11 +275,14 @@ extension SystemWaypointUtils on SystemWaypoint {
   /// Returns true if the waypoint can be mined.
   bool get canBeMined => isAsteroidField;
 
+  /// symbol as a WaypointSymbol.
+  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+
   /// The system symbol of the waypoint.
-  String get systemSymbol => parseWaypointString(symbol).system;
+  SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
 
   /// Returns the WaypointPosition of the waypoint.
-  WaypointPosition get position => WaypointPosition(x, y, systemSymbol);
+  WaypointPosition get position => WaypointPosition(x, y, systemSymbol.system);
 
   /// Returns the distance to the given waypoint.
   int distanceTo(SystemWaypoint other) => position.distanceTo(other.position);
@@ -277,6 +358,16 @@ extension CargoUtils on ShipCargo {
 
 /// Extensions onto Ship to make it easier to work with.
 extension ShipUtils on Ship {
+  /// Returns the ShipSymbol of the ship.
+  ShipSymbol get shipSymbol => ShipSymbol.fromString(symbol);
+
+  /// Returns the current SystemSymbol of the ship.
+  SystemSymbol get systemSymbol => SystemSymbol.fromString(nav.systemSymbol);
+
+  /// Returns the current WaypointSymbol of the ship.
+  WaypointSymbol get waypointSymbol =>
+      WaypointSymbol.fromString(nav.waypointSymbol);
+
   /// Returns the emoji name of the ship.
   String get emojiName {
     // Ships are all AGENT_SYMBOL-1, AGENT_SYMBOL-2, etc.

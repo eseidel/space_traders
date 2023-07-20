@@ -35,7 +35,7 @@ void main() {
     expect(asteroidField.isAsteroidField, isTrue);
     expect(planet.canBeMined, isFalse);
     expect(asteroidField.canBeMined, isTrue);
-    expect(jumpGate.systemSymbol, 'S-E');
+    expect(jumpGate.systemSymbol, SystemSymbol.fromString('S-E'));
   });
 
   test('Waypoint.hasTrait', () {

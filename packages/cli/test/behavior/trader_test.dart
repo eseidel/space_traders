@@ -469,6 +469,7 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
+    registerFallbackValue(SystemSymbol.fromString('S-A'));
     when(
       () => systemConnectivity.canJumpBetweenSystemSymbols(
         any(),

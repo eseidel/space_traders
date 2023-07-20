@@ -157,7 +157,7 @@ class ChartingCache extends JsonStore<_Record> {
     return Waypoint(
       symbol: systemWaypoint.symbol,
       type: systemWaypoint.type,
-      systemSymbol: systemWaypoint.systemSymbol,
+      systemSymbol: systemWaypoint.systemSymbol.system,
       x: systemWaypoint.x,
       y: systemWaypoint.y,
       chart: values.chart,

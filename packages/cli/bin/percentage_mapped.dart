@@ -60,7 +60,7 @@ void main(List<String> args) async {
   final chartedSystems = <String>[];
 
   await for (final waypoint in waypointCache.waypointsInJumpRadius(
-    startSystem: start.systemSymbol,
+    startSystem: start.systemSymbol.system,
     maxJumps: maxJumps,
   )) {
     allSystems.add(waypoint.symbol);

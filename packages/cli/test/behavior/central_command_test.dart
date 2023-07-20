@@ -141,36 +141,40 @@ void main() {
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final shipA = _MockShip();
     final shipNavA = _MockShipNav();
-    when(() => shipA.symbol).thenReturn('A');
+    final aSymbol = ShipSymbol.fromString('X-A');
+    when(() => shipA.symbol).thenReturn(aSymbol.symbol);
     when(() => shipNavA.systemSymbol).thenReturn('S-A');
     when(() => shipA.nav).thenReturn(shipNavA);
     await centralCommand.setBehavior(
-      'A',
-      BehaviorState('A', Behavior.explorer),
+      aSymbol.symbol,
+      BehaviorState(aSymbol.symbol, Behavior.explorer),
     );
     await centralCommand.setRoutePlan(shipA, fakeJump('S-A-A', 'S-A-W'));
     final shipB = _MockShip();
-    when(() => shipB.symbol).thenReturn('B');
+    when(() => shipB.symbol).thenReturn('X-B');
     final shipNavB = _MockShipNav();
     when(() => shipNavB.systemSymbol).thenReturn('S-C');
     when(() => shipB.nav).thenReturn(shipNavB);
     await centralCommand.setBehavior(
-      'B',
-      BehaviorState('B', Behavior.explorer),
+      'X-B',
+      BehaviorState('X-B', Behavior.explorer),
     );
     await centralCommand.setRoutePlan(shipB, fakeJump('S-A-A', 'S-B-W'));
     expect(centralCommand.currentRoutePlan(shipB)!.endSymbol, 'S-B-W');
-    when(() => shipCache.ship('B')).thenReturn(shipB);
+    when(() => shipCache.ship('X-B')).thenReturn(shipB);
 
-    final otherSystems = centralCommand.otherExplorerSystems('A').toList();
-    expect(otherSystems, ['S-B']); // From destination
+    final otherSystems = centralCommand.otherExplorerSystems(aSymbol).toList();
+    expect(otherSystems, [SystemSymbol.fromString('S-B')]); // From destination
     await centralCommand.reachedEndOfRoutePlan(shipB);
     expect(centralCommand.currentRoutePlan(shipB), isNull);
-    final otherSystems2 = centralCommand.otherExplorerSystems('A').toList();
-    expect(otherSystems2, ['S-C']); // From nav.systemSymbol
-    await centralCommand.completeBehavior('B');
-    final otherSystems3 = centralCommand.otherExplorerSystems('A').toList();
-    expect(otherSystems3, <String>[]);
+    final otherSystems2 = centralCommand.otherExplorerSystems(aSymbol).toList();
+    expect(
+      otherSystems2,
+      [SystemSymbol.fromString('S-C')],
+    ); // From nav.systemSymbol
+    await centralCommand.completeBehavior('X-B');
+    final otherSystems3 = centralCommand.otherExplorerSystems(aSymbol).toList();
+    expect(otherSystems3, <SystemSymbol>[]);
   });
 
   test('CentralCommand.affordableContracts', () {

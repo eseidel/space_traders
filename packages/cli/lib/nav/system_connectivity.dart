@@ -1,3 +1,4 @@
+import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 
 typedef _ClusterId = int;
@@ -91,7 +92,10 @@ class SystemConnectivity {
 
   /// Returns true if there exists a path in the jumpgate network between
   /// [startSymbol] and [endSymbol]
-  bool canJumpBetweenSystemSymbols(String startSymbol, String endSymbol) {
+  bool canJumpBetweenSystemSymbols(
+    SystemSymbol startSymbol,
+    SystemSymbol endSymbol,
+  ) {
     final startCluster = _clusterBySystemSymbol[startSymbol];
     final endCluster = _clusterBySystemSymbol[endSymbol];
     return startCluster == endCluster;

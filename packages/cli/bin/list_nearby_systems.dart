@@ -53,7 +53,7 @@ void main(List<String> args) async {
   }
 
   for (final (systemSymbol, jumps) in systemsCache.systemSymbolsInJumpRadius(
-    startSystem: start.systemSymbol,
+    startSystem: start.systemSymbol.system,
     maxJumps: maxJumps,
   )) {
     logger.info('$systemSymbol at $jumps jumps');

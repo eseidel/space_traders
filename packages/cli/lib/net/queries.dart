@@ -61,8 +61,8 @@ Future<Shipyard> getShipyard(Api api, Waypoint waypoint) async {
 
 /// Returns JumpGate object for passed in Waypoint.
 Future<JumpGate> getJumpGate(Api api, SystemWaypoint waypoint) async {
-  final response =
-      await api.systems.getJumpGate(waypoint.systemSymbol, waypoint.symbol);
+  final response = await api.systems
+      .getJumpGate(waypoint.systemSymbol.system, waypoint.symbol);
   return response!.data;
 }
 

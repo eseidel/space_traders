@@ -106,8 +106,8 @@ List<String>? findWaypointPathJumpsOnly(
   SystemWaypoint end,
   int shipSpeed,
 ) {
-  final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
-  final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
+  final startSystem = systemsCache.systemBySymbol(start.systemSymbol.system);
+  final endSystem = systemsCache.systemBySymbol(end.systemSymbol.system);
   if (start.systemSymbol == end.systemSymbol) {
     return [start.symbol, end.symbol];
   }

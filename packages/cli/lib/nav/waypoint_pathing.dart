@@ -12,14 +12,15 @@ Iterable<_WaypointSymbol> _neighborsFor(
   // If we're currently at a jump gate, we can jump to any other jumpgate
   // connected to this one.
   if (waypoint.isJumpGate) {
-    final systems = systemsCache.connectedSystems(waypoint.systemSymbol);
+    final systems = systemsCache.connectedSystems(waypoint.systemSymbol.system);
     for (final system in systems) {
       yield systemsCache.jumpGateWaypointForSystem(system.symbol)!.symbol;
     }
   }
   // Otherwise we can always navigate to any other waypoint in this system.
   // TODO(eseidel): This needs to enforce fuelCapacity.
-  final otherWaypoints = systemsCache.waypointsInSystem(waypoint.systemSymbol);
+  final otherWaypoints =
+      systemsCache.waypointsInSystem(waypoint.systemSymbol.system);
   for (final otherWaypoint in otherWaypoints) {
     if (otherWaypoint.symbol != waypoint.symbol) {
       yield otherWaypoint.symbol;
@@ -42,12 +43,12 @@ int _approximateTimeBetween(
     return flightTimeWithinSystemInSeconds(a, b, shipSpeed: shipSpeed);
     // return a.position.distanceTo(b.position) ~/ shipSpeed;
   }
-  final aSystem = systemsCache.systemBySymbol(a.systemSymbol);
+  final aSystem = systemsCache.systemBySymbol(a.systemSymbol.system);
   final aGate = aSystem.jumpGateWaypoint;
   if (aGate == null) {
     throw Exception('No jump gate in system ${a.systemSymbol}');
   }
-  final bSystem = systemsCache.systemBySymbol(b.systemSymbol);
+  final bSystem = systemsCache.systemBySymbol(b.systemSymbol.system);
   final bGate = bSystem.jumpGateWaypoint;
   if (bGate == null) {
     throw Exception('No jump gate in system ${b.systemSymbol}');

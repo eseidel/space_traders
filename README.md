@@ -106,6 +106,8 @@ Earning:
 * Be able to buy miners outside of the main system.
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems.
+* Add dedicated survey ships.
+* Write a script to collect/print repeat buys/sells from transactions.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
@@ -250,3 +252,51 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 🛸#55 ✈️  to X1-TM59-47122Z, 7m left
 🛸#56 ✈️  to X1-TM59-47122Z, 7m left
 🛸#57 ✈️  to X1-TM59-47122Z, 7m left
+
+### Deal planning needs a cache
+🛸#4A ✍️  market data @ X1-AF63-69302X
+[WARN] 🛸#4A No profitable deals within 10 jumps of X1-AF63.
+[WARN] planning X1-QC19-44545C to X1-FK85-17613A took 3s
+[WARN] Costed 15 deals in 3s
+[WARN] planning X1-ZK61-40889A to X1-FK85-17613A took 2s
+[WARN] Costed 5 deals in 2s
+[WARN] planning X1-HA27-82906A to X1-FK85-17613A took 3s
+[WARN] Costed 2 deals in 3s
+[WARN] planning X1-VP50-40413C to X1-FK85-17613A took 6s
+[WARN] planning X1-RQ52-75611B to X1-FK85-17613A took 8s
+[WARN] Costed 5 deals in 15s
+[WARN] planning X1-NK41-26588X to X1-FK85-17613A took 8s
+[WARN] Costed 8 deals in 8s
+[WARN] planning X1-BS76-95937C to X1-FK85-17613A took 3s
+[WARN] Costed 10 deals in 3s
+[WARN] planning X1-Y3-22546F to X1-FK85-17613A took 4s
+[WARN] Costed 2 deals in 4s
+[WARN] planning X1-JX18-24605A to X1-FK85-17613A took 5s
+[WARN] Costed 6 deals in 5s
+[WARN] planning X1-CX61-59010D to X1-FK85-17613A took 3s
+[WARN] Costed 5 deals in 3s
+[WARN] Costed 2 deals in 1s
+[WARN] planning X1-MA9-83012X to X1-FK85-17613A took 5s
+[WARN] Costed 12 deals in 5s
+[WARN] Costed 57 deals in 1s
+[WARN] Costed 4 deals in 1s
+[WARN] planning X1-VF21-68037Z to X1-FK85-17613A took 4s
+[WARN] Costed 6 deals in 4s
+[WARN] planning X1-YA66-57211X to X1-FK85-17613A took 2s
+[WARN] Costed 4 deals in 2s
+[WARN] Costed 18 deals in 1s
+[WARN] planning X1-NS34-07355A to X1-FK85-17613A took 10s
+[WARN] Costed 39 deals in 11s
+[WARN] Costed 64 deals in 1s
+[WARN] planning X1-UB97-84299A to X1-FK85-17613A took 2s
+[WARN] Costed 12 deals in 3s
+[WARN] Costed 4 deals in 1s
+[WARN] planning X1-VF43-91464B to X1-FK85-17613A took 2s
+[WARN] Costed 8 deals in 2s
+[WARN] Costed 10 deals in 1s
+[WARN] Costed 81 deals in 1s
+🛸#4A Found placement: 7c/s 9820 35449 X1-UZ93-16812Z
+🛸#4A Potential: COPPER_ORE                 X1-YP31-30465Z      35c -> X1-YP31-21892B      55c     +20c (57%) 314s 7c/s 4,322c
+🛸#4A Beginning route to X1-UZ93-16812Z
+🛸#4A 🛫 to X1-AF63-64525B JUMP_GATE (2m) spent 104 fuel
+[WARN] 🛸#4A (trader) took 124s (3 requests) expected 1.0s

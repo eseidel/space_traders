@@ -256,14 +256,14 @@ RoutePlan routePlanFromJumpPlan(
   required int shipSpeed,
 }) {
   final actions = <RouteAction>[];
-  if (jumpPlan.route.first != start.systemSymbol) {
+  if (jumpPlan.route.first != start.systemSymbol.system) {
     throw ArgumentError('Jump plan does not start at ${start.systemSymbol}');
   }
-  if (jumpPlan.route.last != end.systemSymbol) {
+  if (jumpPlan.route.last != end.systemSymbol.system) {
     throw ArgumentError('Jump plan does not end at ${end.systemSymbol}');
   }
   final startJumpGate =
-      systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
+      systemsCache.jumpGateWaypointForSystem(start.systemSymbol.system)!;
   if (startJumpGate.symbol != start.symbol) {
     actions.add(_navigationAction(start, startJumpGate, shipSpeed));
   }
@@ -284,7 +284,8 @@ RoutePlan routePlanFromJumpPlan(
       ),
     );
   }
-  final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
+  final endJumpGate =
+      systemsCache.jumpGateWaypointForSystem(end.systemSymbol.system)!;
   if (endJumpGate.symbol != end.symbol) {
     actions.add(_navigationAction(endJumpGate, end, shipSpeed));
   }
@@ -364,8 +365,8 @@ RouteAction _jumpAction(
   int shipSpeed, {
   required bool isLastJump,
 }) {
-  final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
-  final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
+  final startSystem = systemsCache.systemBySymbol(start.systemSymbol.system);
+  final endSystem = systemsCache.systemBySymbol(end.systemSymbol.system);
   final cooldown = cooldownTimeForJumpBetweenSystems(startSystem, endSystem);
   // This isn't quite right to use cooldown as duration, but it's
   // close enough for now.  This isLastJump hack also would break
@@ -433,8 +434,8 @@ class RoutePlanner {
 
     // Look up in the jump cache, if so, create a plan from that.
     final jumpPlan = _jumpCache.lookupJumpPlan(
-      fromSystem: start.systemSymbol,
-      toSystem: end.systemSymbol,
+      fromSystem: start.systemSymbol.system,
+      toSystem: end.systemSymbol.system,
     );
     if (jumpPlan != null) {
       return routePlanFromJumpPlan(

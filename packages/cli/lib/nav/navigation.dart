@@ -178,12 +178,12 @@ Future<NavResult> continueNavigationIfNeeded(
   switch (action.type) {
     case RouteActionType.jump:
       final response =
-          await useJumpGateAndLog(api, ship, actionEnd.systemSymbol);
+          await useJumpGateAndLog(api, ship, actionEnd.systemSymbol.system);
       _verifyJumpTime(
         systemsCache,
         ship,
-        actionStart.systemSymbol,
-        actionEnd.systemSymbol,
+        actionStart.systemSymbol.system,
+        actionEnd.systemSymbol.system,
         response.cooldown,
       );
       // We can't continue the current action, we have more navigation to do

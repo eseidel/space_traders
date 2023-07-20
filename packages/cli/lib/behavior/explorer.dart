@@ -84,12 +84,12 @@ Future<String?> _waypointSymbolNeedingExploration(
   Ship ship,
   System system, {
   required Duration maxAge,
-  required bool Function(String systemSymbol)? filter,
+  required bool Function(SystemSymbol systemSymbol)? filter,
   required WaypointCache? waypointCache,
 }) async {
   for (final systemWaypoint in system.waypoints) {
     final waypointSymbol = systemWaypoint.symbol;
-    if (filter != null && !filter(waypointSymbol)) {
+    if (filter != null && !filter(systemWaypoint.systemSymbol)) {
       continue;
     }
     var values = chartingCache.valuesForSymbol(waypointSymbol);
@@ -138,7 +138,7 @@ Future<String?> findNewWaypointSymbolToExplore(
   Ship ship, {
   required String startSystemSymbol,
   WaypointCache? waypointCache,
-  bool Function(String systemSymbol)? filter,
+  bool Function(SystemSymbol systemSymbol)? filter,
   Duration maxAge = defaultMaxAge,
 }) async {
   // Find all systems in the jumpgate network.
@@ -187,8 +187,8 @@ String _nearestHeadquarters(
   final reachableHqs = factionsHqs
       .where(
         (hq) => systemConnectivity.canJumpBetweenSystemSymbols(
-          ship.nav.systemSymbol,
-          parseWaypointString(hq).system,
+          ship.systemSymbol,
+          WaypointSymbol.fromString(hq).systemSymbol,
         ),
       )
       .toList();
@@ -303,7 +303,8 @@ Future<DateTime?> advanceExplorer(
     return refuelWaitTime;
   }
 
-  final probeSystems = centralCommand.otherExplorerSystems(ship.symbol).toSet();
+  final probeSystems =
+      centralCommand.otherExplorerSystems(ship.shipSymbol).toSet();
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
   final startTime = getNow();
@@ -315,7 +316,7 @@ Future<DateTime?> advanceExplorer(
     caches.shipyardPrices,
     ship,
     startSystemSymbol: ship.nav.systemSymbol,
-    filter: (String systemSymbol) => !probeSystems.contains(systemSymbol),
+    filter: (SystemSymbol systemSymbol) => !probeSystems.contains(systemSymbol),
     maxAge: maxAge,
     waypointCache: caches.waypoints,
   );
