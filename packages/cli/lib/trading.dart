@@ -369,7 +369,6 @@ class CostedDeal {
 
   /// The actual operational expenses of the deal.
   int get actualOperationalExpenses {
-    // TODO(eseidel): This only works when tradeSymbol != TradeSymbol.FUEL
     return transactions
         .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
         .where((t) => t.accounting == AccountingType.fuel)

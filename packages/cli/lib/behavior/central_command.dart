@@ -547,6 +547,7 @@ class CentralCommand {
       ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
       ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
       ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
+      ShipType.HEAVY_FREIGHTER: ShipFrameSymbolEnum.HEAVY_FREIGHTER,
     }[shipType]!;
     return _shipCache.frameCounts[frameForType] ?? 0;
   }
@@ -573,7 +574,12 @@ class CentralCommand {
       // function is also used by visitShipyard where you're already at a
       // shipyard but not sure what you might buy.
       if (shipyardSymbol == null) {
-        return true;
+        final starterShipyardTypes = [
+          ShipType.LIGHT_HAULER,
+          ShipType.PROBE,
+          ShipType.ORE_HOUND
+        ];
+        return starterShipyardTypes.contains(shipType);
       }
       return shipyardPrices.recentPurchasePrice(
             shipyardSymbol: shipyardSymbol,
@@ -626,6 +632,7 @@ class CentralCommand {
       ShipType.ORE_HOUND: 40,
       ShipType.PROBE: 50,
       ShipType.LIGHT_HAULER: 50,
+      ShipType.HEAVY_FREIGHTER: 1,
     };
     final typesToBuy = targetCounts.keys.where((shipType) {
       if (!shipyardHas(shipType)) {
@@ -655,6 +662,9 @@ class CentralCommand {
     // We should buy probes if we have fewer than X of them.
     if (typesToBuy.contains(ShipType.PROBE)) {
       return ShipType.PROBE;
+    }
+    if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER)) {
+      return ShipType.HEAVY_FREIGHTER;
     }
     return null;
   }

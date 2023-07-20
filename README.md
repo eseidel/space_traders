@@ -99,7 +99,6 @@ Earning:
 * Add gas siphoning
 * Add logic for command ship to switch between trading and mining depending
   on expected profit.
-* Record trade volume on a per-market basis in pricing data.
 * Buy traders when trading is more profitable than mining, and vice versa.
 * Dead ships aren't differnet from idle ships and will be counted as
   "idle haulers" and prevent buying more ships.
@@ -215,10 +214,6 @@ ApiException 400: HTTP connection failed: POST /my/ships/ESEIDEL-15/navigate (In
 Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O ..., ... "symbol":"PRECIOUS_S ...,               ^]
 [WARN] Ship list changed, updating cache.
 
-### Filter by accounting type rather than FUEL:
-🛸#10 🤝 120 FUEL                 +7%  +8c per 120 x    126c = +15,120c -> 🏦 214,830c
-[WARN] 🛸#10 Expected 480c profit (16c/s), got 15,120c (397c/s) in 00:00:38, expected 00:00:30
-
 ### Jump timing:
 [WARN] 🛸#A  Jump X1-U93 to X1-KV19 (1759) expected 176, got 175.
 [WARN] 🛸#4C Jump X1-UM11 to X1-SY37 (2000) expected 200, got 199.
@@ -243,12 +238,6 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -7% -1,566c per  10 x 20,847c = +208,470c -> 🏦 12,130,780c
 [WARN] 🛸#C  Expected 121,552c profit (220c/s), got -14,130c (-21c/s) in 00:10:49, expected 00:09:12
 
-### Some routes take way too long:
-[WARN] planning X1-MZ67-89424A to X1-ZC22-26502F took 27s
-[WARN] planning X1-QY7-49849C to X1-ZC22-26502F took 1m
-[WARN] planning X1-QZ16-60787C to X1-ZC22-26502F took 15s
-[WARN] planning X1-PR89-34810A to X1-ZC22-26502F took 13s
-[WARN] planning X1-YP31-34280X to X1-VS61-13110B took 4s
 
 ### Ships chasing each other
 🛸#4B ✈️  to X1-TM59-47122Z, 7m left
