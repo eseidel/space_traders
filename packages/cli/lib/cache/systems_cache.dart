@@ -14,12 +14,16 @@ class SystemsCache extends JsonListStore<System> {
     required List<System> systems,
     required super.fs,
     super.path = defaultCacheFilePath,
-  }) : super(systems);
+  })  : _index = Map.fromEntries(systems.map((e) => MapEntry(e.symbol, e))),
+        super(systems);
 
   /// All systems in the game.
   List<System> get systems => List.unmodifiable(entries);
 
   List<System> get _systems => entries;
+
+  final Map<String, System> _index;
+  final Map<String, List<ConnectedSystem>> _connectedSystems = {};
 
   /// Default cache location.
   static const String defaultCacheFilePath = 'data/systems.json';
@@ -35,10 +39,11 @@ class SystemsCache extends JsonListStore<System> {
         .toList();
   }
 
-  static SystemsCache? _loadSystemsCache(
-    FileSystem fs,
-    String path,
-  ) {
+  /// Load the cache from disk.
+  static SystemsCache? loadCached(
+    FileSystem fs, {
+    String path = defaultCacheFilePath,
+  }) {
     final systems = JsonListStore.load<System>(
       fs,
       path,
@@ -50,18 +55,6 @@ class SystemsCache extends JsonListStore<System> {
     return SystemsCache(systems: systems, fs: fs, path: path);
   }
 
-  /// Load the cache from disk.
-  static SystemsCache? loadCached(
-    FileSystem fs, {
-    String path = defaultCacheFilePath,
-  }) {
-    final systems = _loadSystemsCache(fs, path);
-    if (systems == null) {
-      return null;
-    }
-    return SystemsCache(systems: systems.systems, fs: fs, path: path);
-  }
-
   /// Load the cache from disk or fall back to fetching from the url.
   static Future<SystemsCache> load(
     FileSystem fs, {
@@ -70,7 +63,7 @@ class SystemsCache extends JsonListStore<System> {
     String url = defaultUrl,
   }) async {
     // Try to load systems.json.
-    final fromCache = _loadSystemsCache(fs, path);
+    final fromCache = loadCached(fs, path: path);
     if (fromCache != null) {
       return fromCache;
     }
@@ -102,7 +95,7 @@ class SystemsCache extends JsonListStore<System> {
 
   /// Return the system with the given [symbol].
   System systemBySymbol(String symbol) =>
-      _systems.firstWhere((s) => s.symbol == symbol);
+      _index[symbol] ?? (throw ArgumentError('Unknown system $symbol'));
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   SystemWaypoint? waypointOrNull(String waypointSymbol) {
@@ -121,11 +114,8 @@ class SystemsCache extends JsonListStore<System> {
   List<SystemWaypoint> waypointsInSystem(String systemSymbol) =>
       systemBySymbol(systemSymbol).waypoints;
 
-  /// Return connected systems for the given [systemSymbol].
-  List<ConnectedSystem> connectedSystems(
-    String systemSymbol, {
-    int jumpGateRange = 2000,
-  }) {
+  List<ConnectedSystem> _computeConnectedSystems(String systemSymbol) {
+    const jumpGateRange = 2000;
     final system = _systems.firstWhere((s) => s.symbol == systemSymbol);
     if (!system.hasJumpGate) {
       return [];
@@ -150,6 +140,19 @@ class SystemsCache extends JsonListStore<System> {
         .toList()
       ..sortBy<num>((e) => e.distance);
     // TODO(eseidel): sort by distance than symbol to be stable.
+    return connected;
+  }
+
+  /// Return connected systems for the given [systemSymbol].
+  List<ConnectedSystem> connectedSystems(
+    String systemSymbol,
+  ) {
+    final cached = _connectedSystems[systemSymbol];
+    if (cached != null) {
+      return cached;
+    }
+    final connected = _computeConnectedSystems(systemSymbol);
+    _connectedSystems[systemSymbol] = connected;
     return connected;
   }
 

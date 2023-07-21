@@ -96,8 +96,8 @@ class SystemConnectivity {
     SystemSymbol startSymbol,
     SystemSymbol endSymbol,
   ) {
-    final startCluster = _clusterBySystemSymbol[startSymbol];
-    final endCluster = _clusterBySystemSymbol[endSymbol];
+    final startCluster = _clusterBySystemSymbol[startSymbol.system];
+    final endCluster = _clusterBySystemSymbol[endSymbol.system];
     return startCluster == endCluster;
   }
 }
