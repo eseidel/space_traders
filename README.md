@@ -300,3 +300,21 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 🛸#4A Beginning route to X1-UZ93-16812Z
 🛸#4A 🛫 to X1-AF63-64525B JUMP_GATE (2m) spent 104 fuel
 [WARN] 🛸#4A (trader) took 124s (3 requests) expected 1.0s
+
+
+### Bad jump if ship cache is stale?
+ApiException 400: {"error":{"message":"Failed to execute jump. Ship cannot execute jump to the system it is currently located in.","code":4208}}
+#0      FleetApi.jumpShip (package:openapi/api/fleet_api.dart:1118:7)
+
+
+<title>500 Server Error</title>
+</head>
+<body text=#000000 bgcolor=#ffffff>
+<h1>Error: Server Error</h1>
+<h2>The server encountered an error and could not complete your request.<p>Please try again in 30 seconds.</h2>
+<h2></h2>
+</body></html>
+, retrying after 1 seconds
+Unhandled exception:
+ApiException 400: {"error":{"message":"Failed to execute jump. Ship cannot execute jump to the system it is currently located in.","code":4208}}
+#0      FleetApi.jumpShip (package:openapi/api/fleet_api.dart:1118:7)

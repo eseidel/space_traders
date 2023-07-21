@@ -185,7 +185,8 @@ class CentralCommand {
     final disableBehaviors = <Behavior>[
       // Behavior.buyShip,
       // Behavior.trader,
-      // Behavior.miner,
+      // Hack becuase mining is so bad towards end game.
+      Behavior.miner,
       // Behavior.idle,
       // Hangs too much for now.
       // Behavior.explorer,
