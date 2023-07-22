@@ -82,6 +82,20 @@ class ShipCache extends ResponseListCache<Ship> {
     return typeCounts;
   }
 
+  /// Returns the number of ships of the given [shipType] in the fleet.
+  int countOfType(ShipType shipType) {
+    final frameForType = {
+      ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
+      ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
+      ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
+      ShipType.HEAVY_FREIGHTER: ShipFrameSymbolEnum.HEAVY_FREIGHTER,
+    }[shipType];
+    if (frameForType == null) {
+      throw ArgumentError('Unknown frame mapping for type: $shipType');
+    }
+    return frameCounts[frameForType] ?? 0;
+  }
+
   /// Returns all ship symbols.
   List<String> get shipSymbols => ships.map((s) => s.symbol).toList();
 

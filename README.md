@@ -90,7 +90,7 @@ Most impact:
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems.
 * Add logic for buying and mounting modules.
-* Make saving take less time (db?)
+* Make saving take less time (log rolling or db?)
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
@@ -110,6 +110,8 @@ Earning:
 * Add dedicated survey ships.
 * Teach deal logic that price can move (even if just 1c) on each buy/sell lot.
 * Calculate "wait time" when servicing a ship.
+* Try changing deal finding heuristic to only consider buy price.
+* Spread out traders across the galaxy better.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate

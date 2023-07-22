@@ -17,9 +17,6 @@ import 'package:meta/meta.dart';
 // Can hold queues of work to distribute among squads.
 // Need to figure out what disableBehavior looks like for squads.
 
-// Central command can also be responsible for deciding when to buy a ship
-// and what type of ship to buy.
-
 // Central command can also plan sourcing of modules for ships even
 // across long distances to bring back mounts for our ships?
 
@@ -127,17 +124,6 @@ class CentralCommand {
   // If there still aren't any places to explore, then we need to see if there
   // is a place for them to watch.
   // If there still isn't, then we print a warning and have them idle.
-
-  // Absolute dumbest thing:
-  // - Get a request for a new system (because they're at a jump gate)
-  // - Find systems with unexplored waypoints
-  // - Remove all systems with probes currently there or targeting there.
-  // - Pick the closest system to the current system.
-  // - Send them there.
-
-  // Will require moving the behavior state into the central command.
-
-  // Otherwise, find a system to explore.
 
   /// Check if the given behavior is globally disabled.
   bool isBehaviorDisabled(Behavior behavior) {
@@ -543,16 +529,6 @@ class CentralCommand {
   Iterable<SystemSymbol> _otherTraderSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
-  int _countOfTypeInFleet(ShipType shipType) {
-    final frameForType = {
-      ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
-      ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
-      ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
-      ShipType.HEAVY_FREIGHTER: ShipFrameSymbolEnum.HEAVY_FREIGHTER,
-    }[shipType]!;
-    return _shipCache.frameCounts[frameForType] ?? 0;
-  }
-
 // This is a hack for now, we need real planning.
   /// Determine what type of ship to buy.
   // TODO(eseidel): This should consider pricing in it so that we can by
@@ -589,20 +565,20 @@ class CentralCommand {
           null;
     }
 
-    // We should buy ships based on earnings of that ship type over the last
-    // N hours?
+    // Buy ships based on earnings of that ship type over the last N hours?
     final systemSymbol = ship.nav.systemSymbol;
     final hqSystemSymbol =
         parseWaypointString(agentCache.agent.headquarters).system;
     final inStartSystem = systemSymbol == hqSystemSymbol;
 
     // Early game should be:
-    // 10 miners
+    // ~10 miners
     // 10 probes
-    // then choose as we need.
+    // No haulers until we have 100+ markets?
+    // Then choose as we need.
 
-    final probeCount = _countOfTypeInFleet(ShipType.PROBE);
-    final minerCount = _countOfTypeInFleet(ShipType.ORE_HOUND);
+    final probeCount = _shipCache.countOfType(ShipType.PROBE);
+    final minerCount = _shipCache.countOfType(ShipType.ORE_HOUND);
 
     // Early game can stop when we have enough miners going and markets
     // mapped to start trading.
@@ -640,7 +616,7 @@ class CentralCommand {
         logger.info("Shipyard doesn't have $shipType");
         return false;
       }
-      return _countOfTypeInFleet(shipType) < targetCounts[shipType]!;
+      return _shipCache.countOfType(shipType) < targetCounts[shipType]!;
     }).toList();
     logger.info('typesToBuy: $typesToBuy');
     if (typesToBuy.isEmpty) {
