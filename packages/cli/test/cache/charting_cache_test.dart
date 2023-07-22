@@ -1,7 +1,11 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/charting_cache.dart';
+import 'package:cli/cache/waypoint_traits.dart';
 import 'package:file/memory.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
 void main() {
   test('ChartingCache load/save', () async {
@@ -21,12 +25,8 @@ void main() {
       faction: WaypointFaction(
         symbol: FactionSymbols.AEGIS,
       ),
-      traits: [
-        WaypointTrait(
-          symbol: WaypointTraitSymbolEnum.ASH_CLOUDS,
-          name: 'Ash Clouds',
-          description: 'Ash Clouds',
-        ),
+      traitSymbols: const [
+        WaypointTraitSymbolEnum.ASH_CLOUDS,
       ],
       orbitals: [
         WaypointOrbital(
@@ -34,16 +34,17 @@ void main() {
         ),
       ],
     );
+    final waypointTraits = _MockWaypointTraitCache();
     final valuesBySymbol = {values.waypointSymbol: values};
-    ChartingCache(valuesBySymbol, fs: fs).save();
+    ChartingCache(valuesBySymbol, waypointTraits, fs: fs).save();
     final loaded = ChartingCache.load(fs);
     expect(loaded.waypointCount, 1);
     expect(loaded.values.first.waypointSymbol, 'A');
     expect(loaded.values.first.chart.submittedBy, 'ESEIDEL');
     expect(loaded.values.first.faction?.symbol, FactionSymbols.AEGIS);
-    expect(loaded.values.first.traits, hasLength(1));
+    expect(loaded.values.first.traitSymbols, hasLength(1));
     expect(
-      loaded.values.first.traits.first.symbol,
+      loaded.values.first.traitSymbols.first,
       WaypointTraitSymbolEnum.ASH_CLOUDS,
     );
     expect(loaded.values.first.orbitals, hasLength(1));

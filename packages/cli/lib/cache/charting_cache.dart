@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_store.dart';
+import 'package:cli/cache/waypoint_traits.dart';
 import 'package:meta/meta.dart';
 
 /// A charted value.
@@ -10,7 +11,7 @@ class ChartedValues {
     required this.waypointSymbol,
     required this.chart,
     required this.faction,
-    required this.traits,
+    required this.traitSymbols,
     required this.orbitals,
   });
 
@@ -22,18 +23,31 @@ class ChartedValues {
         .toList();
     final faction =
         WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
-    final traits = (json['traits'] as List<dynamic>)
-        .cast<Map<String, dynamic>>()
-        .map((j) => WaypointTrait.fromJson(j)!)
-        .toList();
+    final traitSymbols = _loadTraitSymbols(json);
     final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
     return ChartedValues(
       waypointSymbol: json['waypointSymbol'] as String,
       orbitals: orbitals,
       faction: faction,
-      traits: traits,
+      traitSymbols: traitSymbols,
       chart: chart,
     );
+  }
+
+  static List<WaypointTraitSymbolEnum> _loadTraitSymbols(
+    Map<String, dynamic> json,
+  ) {
+    final maybeNames = json['traitSymbols'] as List<dynamic>?;
+    if (maybeNames == null) {
+      return (json['traits'] as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .map((j) => WaypointTrait.fromJson(j)!.symbol)
+          .toList();
+    }
+    return maybeNames
+        .cast<String>()
+        .map((e) => WaypointTraitSymbolEnum.fromJson(e)!)
+        .toList();
   }
 
   /// Symbol for this waypoint.
@@ -48,7 +62,7 @@ class ChartedValues {
   final WaypointFaction? faction;
 
   /// The traits of the waypoint.
-  final List<WaypointTrait> traits;
+  final List<WaypointTraitSymbolEnum> traitSymbols;
 
   /// Chart for this waypoint.
   final Chart chart;
@@ -58,7 +72,7 @@ class ChartedValues {
         'waypointSymbol': waypointSymbol,
         'orbitals': orbitals.map((o) => o.toJson()).toList(),
         'faction': faction?.toJson(),
-        'traits': traits.map((t) => t.toJson()).toList(),
+        'traitSymbols': traitSymbols.map((e) => e.value).toList(),
         'chart': chart.toJson(),
       };
 }
@@ -69,13 +83,17 @@ typedef _Record = Map<String, ChartedValues>;
 class ChartingCache extends JsonStore<_Record> {
   /// Creates a new charting cache.
   ChartingCache(
-    super.valuesBySymbol, {
+    super.valuesBySymbol,
+    this.waypointTraits, {
     required super.fs,
     super.path = defaultCacheFilePath,
   });
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'data/charts.json';
+
+  /// The cache of waypoint traits.
+  final WaypointTraitCache waypointTraits;
 
   /// Load the charted values from the cache.
   // TODO(eseidel): Maybe this should be a constructor?
@@ -95,7 +113,8 @@ class ChartingCache extends JsonStore<_Record> {
           ),
         ) ??
         {};
-    return ChartingCache(valuesBySymbol, fs: fs, path: path);
+    final waypointTraits = WaypointTraitCache.load(fs);
+    return ChartingCache(valuesBySymbol, waypointTraits, fs: fs, path: path);
   }
 
   /// The charted values by waypoint symbol.
@@ -121,9 +140,10 @@ class ChartingCache extends JsonStore<_Record> {
       waypointSymbol: waypoint.symbol,
       orbitals: waypoint.orbitals,
       faction: waypoint.faction,
-      traits: waypoint.traits,
+      traitSymbols: waypoint.traits.map((e) => e.symbol).toList(),
       chart: chart,
     );
+    waypointTraits.addTraits(waypoint.traits);
     _valuesBySymbol[waypoint.symbol] = chartedValues;
     // This is just a minor optimization to allow addWaypoints to only
     // save once.
@@ -154,6 +174,10 @@ class ChartingCache extends JsonStore<_Record> {
       return null;
     }
     final systemWaypoint = systemsCache.waypointFromSymbol(waypointSymbol);
+    final traits = values.traitSymbols
+        .map(waypointTraits.traitFromSymbol)
+        .whereType<WaypointTrait>()
+        .toList();
     return Waypoint(
       symbol: systemWaypoint.symbol,
       type: systemWaypoint.type,
@@ -163,7 +187,7 @@ class ChartingCache extends JsonStore<_Record> {
       chart: values.chart,
       faction: values.faction,
       orbitals: values.orbitals,
-      traits: values.traits,
+      traits: traits,
     );
   }
 }
