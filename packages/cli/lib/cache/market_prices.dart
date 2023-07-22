@@ -79,6 +79,9 @@ class MarketPrice {
   /// The symbol of the trade good.
   final String symbol;
 
+  /// The trade symbol of the trade good.
+  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
+
   /// The supply level of the trade good.
   final MarketTradeGoodSupplyEnum supply;
 
@@ -205,7 +208,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
       a.purchasePrice.compareTo(b.purchasePrice);
 
   /// Get the percentile for the purchase price of a trade good.
-  int? percentileForPurchasePrice(String symbol, int purchasePrice) =>
+  int? percentileForPurchasePrice(TradeSymbol symbol, int purchasePrice) =>
       _percentileFor(
         symbol,
         MarketPrice._compareOnly(purchasePrice: purchasePrice),
@@ -213,12 +216,12 @@ class MarketPrices extends JsonListStore<MarketPrice> {
       );
 
   /// Get the median price this good can be purchased for.
-  int? medianPurchasePrice(String symbol) =>
+  int? medianPurchasePrice(TradeSymbol symbol) =>
       purchasePriceAtPercentile(symbol, 50);
 
   /// Get the percentile purchase price (price you can buy at) for a trade good.
   /// [percentile] must be between 0 and 100.
-  int? purchasePriceAtPercentile(String symbol, int percentile) {
+  int? purchasePriceAtPercentile(TradeSymbol symbol, int percentile) {
     final maybePrice = _priceAtPercentile(
       symbol,
       percentile,
@@ -228,18 +231,19 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   }
 
   /// Get the percentile for the sell price (you sell to them) of a trade good.
-  int? percentileForSellPrice(String symbol, int sellPrice) => _percentileFor(
+  int? percentileForSellPrice(TradeSymbol symbol, int sellPrice) =>
+      _percentileFor(
         symbol,
         MarketPrice._compareOnly(sellPrice: sellPrice),
         MarketTransactionTypeEnum.SELL,
       );
 
   /// Get the median sell price for a trade good.
-  int? medianSellPrice(String symbol) => sellPriceAtPercentile(symbol, 50);
+  int? medianSellPrice(TradeSymbol symbol) => sellPriceAtPercentile(symbol, 50);
 
   /// Get the percentile sell price for a trade good.
   /// [percentile] must be between 0 and 100.
-  int? sellPriceAtPercentile(String symbol, int percentile) {
+  int? sellPriceAtPercentile(TradeSymbol symbol, int percentile) {
     final maybePrice = _priceAtPercentile(
       symbol,
       percentile,
@@ -250,11 +254,11 @@ class MarketPrices extends JsonListStore<MarketPrice> {
 
   /// Returns all known prices for a trade good,
   /// optionally restricted to a specific waypoint.
-  Iterable<MarketPrice> pricesFor({
-    required String tradeSymbol,
+  Iterable<MarketPrice> pricesFor(
+    TradeSymbol tradeSymbol, {
     String? marketSymbol,
   }) {
-    final prices = _prices.where((e) => e.symbol == tradeSymbol);
+    final prices = _prices.where((e) => e.symbol == tradeSymbol.value);
     if (marketSymbol == null) {
       return prices;
     }
@@ -262,7 +266,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   }
 
   MarketPrice? _priceAtPercentile(
-    String symbol,
+    TradeSymbol symbol,
     int percentile,
     MarketTransactionTypeEnum action,
   ) {
@@ -273,7 +277,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
         'Percentile must be between 0 and 100',
       );
     }
-    final pricesForSymbol = pricesFor(tradeSymbol: symbol);
+    final pricesForSymbol = pricesFor(symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -291,14 +295,14 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   }
 
   int? _percentileFor(
-    String symbol,
+    TradeSymbol symbol,
     MarketPrice price,
     MarketTransactionTypeEnum action,
   ) {
     final compareTo = action == MarketTransactionTypeEnum.PURCHASE
         ? _purchasePriceAcending
         : _sellPriceAcending;
-    final pricesForSymbol = pricesFor(tradeSymbol: symbol);
+    final pricesForSymbol = pricesFor(symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -349,13 +353,12 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// [marketSymbol] is the symbol for the market.
   /// [tradeSymbol] is the symbol for the trade good.
   /// [maxAge] is the maximum age of the price in the cache.
-  int? recentSellPrice({
+  int? recentSellPrice(
+    TradeSymbol tradeSymbol, {
     required String marketSymbol,
-    required String tradeSymbol,
     Duration maxAge = defaultMaxAge,
   }) {
-    final pricesForSymbol =
-        pricesFor(tradeSymbol: tradeSymbol, marketSymbol: marketSymbol);
+    final pricesForSymbol = pricesFor(tradeSymbol, marketSymbol: marketSymbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -372,13 +375,13 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// [marketSymbol] is the symbol for the market.
   /// [tradeSymbol] is the symbol for the trade good.
   /// [maxAge] is the maximum age of the price in the cache.
-  int? recentPurchasePrice({
+  int? recentPurchasePrice(
+    TradeSymbol tradeSymbol, {
     required String marketSymbol,
-    required String tradeSymbol,
     Duration maxAge = defaultMaxAge,
   }) {
     final pricesForSymbol = pricesFor(
-      tradeSymbol: tradeSymbol,
+      tradeSymbol,
       marketSymbol: marketSymbol,
     );
     if (pricesForSymbol.isEmpty) {

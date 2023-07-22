@@ -18,7 +18,7 @@ int _percentileForTradeType(ExchangeType tradeType) {
 int? estimateSellPrice(
   MarketPrices marketPrices,
   Market market,
-  String tradeSymbol,
+  TradeSymbol tradeSymbol,
 ) {
   // This case would only be needed if we have a ship at the market, but somehow
   // failed to record price data in our price db.
@@ -28,8 +28,8 @@ int? estimateSellPrice(
   }
 
   final recentSellPrice = marketPrices.recentSellPrice(
+    tradeSymbol,
     marketSymbol: market.symbol,
-    tradeSymbol: tradeSymbol,
   );
   if (recentSellPrice != null) {
     return recentSellPrice;
@@ -46,7 +46,7 @@ int? estimateSellPrice(
 int? estimatePurchasePrice(
   MarketPrices marketPrices,
   Market market,
-  String tradeSymbol,
+  TradeSymbol tradeSymbol,
 ) {
   // This case would only be needed if we have a ship at the market, but somehow
   // failed to record price data in our price db.
@@ -56,7 +56,7 @@ int? estimatePurchasePrice(
   }
   final recentPurchasePrice = marketPrices.recentPurchasePrice(
     marketSymbol: market.symbol,
-    tradeSymbol: tradeSymbol,
+    tradeSymbol,
   );
   if (recentPurchasePrice != null) {
     return recentPurchasePrice;
@@ -178,7 +178,7 @@ class _MarketScanBuilder {
       // See if the price data we have for this trade symbol
       // are in the top/bottom we've seen, if so, record them.
       final buyPrice =
-          estimatePurchasePrice(_marketPrices, market, tradeSymbol.value);
+          estimatePurchasePrice(_marketPrices, market, tradeSymbol);
       if (buyPrice == null) {
         // If we don't have buy data we won't have sell data either.
         continue;
@@ -194,7 +194,7 @@ class _MarketScanBuilder {
         SellOpp(
           marketSymbol: market.symbol,
           tradeSymbol: tradeSymbol.value,
-          price: estimateSellPrice(_marketPrices, market, tradeSymbol.value)!,
+          price: estimateSellPrice(_marketPrices, market, tradeSymbol)!,
         ),
       );
     }

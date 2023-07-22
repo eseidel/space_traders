@@ -93,7 +93,7 @@ String contractDescription(
 /// the median price of a given [tradeSymbol].
 String stringForPriceDeviance(
   MarketPrices data,
-  String tradeSymbol,
+  TradeSymbol tradeSymbol,
   int price,
   MarketTransactionTypeEnum type,
 ) {
@@ -134,7 +134,7 @@ void logTransaction(
 }) {
   final priceDevianceString = stringForPriceDeviance(
     marketPrices,
-    transaction.tradeSymbol,
+    transaction.tradeSymbolObject,
     transaction.pricePerUnit,
     transaction.type,
   );

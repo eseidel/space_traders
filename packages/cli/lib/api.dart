@@ -348,9 +348,9 @@ extension CargoUtils on ShipCargo {
   bool get isNotEmpty => !isEmpty;
 
   /// Returns the amount of the given trade good the cargo has.
-  int countUnits(String tradeSymbol) {
+  int countUnits(TradeSymbol tradeSymbol) {
     final maybeCargo = inventory.firstWhereOrNull(
-      (i) => i.symbol == tradeSymbol,
+      (i) => i.symbol == tradeSymbol.value,
     );
     return maybeCargo?.units ?? 0;
   }
@@ -376,7 +376,7 @@ extension ShipUtils on Ship {
   }
 
   /// Returns the amount of the given trade good the ship has.
-  int countUnits(String tradeSymbol) {
+  int countUnits(TradeSymbol tradeSymbol) {
     return cargo.countUnits(tradeSymbol);
   }
 
@@ -488,9 +488,9 @@ extension ContractUtils on Contract {
 
   /// Returns the ContractDeliverGood for the given trade good symbol or null if
   /// the contract doesn't need that good.
-  ContractDeliverGood? goodNeeded(String tradeSymbol) {
+  ContractDeliverGood? goodNeeded(TradeSymbol tradeSymbol) {
     return terms.deliver
-        .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol);
+        .firstWhereOrNull((item) => item.tradeSymbol == tradeSymbol.value);
   }
 
   /// Returns the duration until the contract deadline.
@@ -504,6 +504,21 @@ extension ContractUtils on Contract {
 extension ContractDeliverGoodUtils on ContractDeliverGood {
   /// Returns the amount of the given trade good the contract needs.
   int get amountNeeded => unitsRequired - unitsFulfilled;
+
+  /// Returns tradeSymbol as a TradeSymbol object.
+  TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
+}
+
+/// Extensions onto SurveyDeposit to make it easier to work with.
+extension SurveyDepositUtils on SurveyDeposit {
+  /// Returns symbol as a TradeSymbol object.
+  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
+}
+
+/// Extensions onto ShipCargoItem to make it easier to work with.
+extension ShipCargoItemUtils on ShipCargoItem {
+  /// Returns symbol as a TradeSymbol object.
+  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
 }
 
 /// Enum representing the type of trades available for a good at a market.
@@ -522,26 +537,27 @@ enum ExchangeType {
 extension MarketUtils on Market {
   /// Returns the TradeType for the given trade symbol or null if the market
   /// doesn't trade that good.
-  ExchangeType? exchangeType(String tradeSymbol) {
-    if (imports.any((g) => g.symbol.value == tradeSymbol)) {
+  ExchangeType? exchangeType(TradeSymbol tradeSymbol) {
+    if (imports.any((g) => g.symbol == tradeSymbol)) {
       return ExchangeType.imports;
     }
-    if (exports.any((g) => g.symbol.value == tradeSymbol)) {
+    if (exports.any((g) => g.symbol == tradeSymbol)) {
       return ExchangeType.exports;
     }
-    if (exchange.any((g) => g.symbol.value == tradeSymbol)) {
+    if (exchange.any((g) => g.symbol == tradeSymbol)) {
       return ExchangeType.exchange;
     }
     return null;
   }
 
   /// Returns true if the market allows trading of the given trade symbol.
-  bool allowsTradeOf(String tradeSymbol) => exchangeType(tradeSymbol) != null;
+  bool allowsTradeOf(TradeSymbol tradeSymbol) =>
+      exchangeType(tradeSymbol) != null;
 
   /// Returns [MarketTradeGood] for the given trade symbol or null if the market
   /// doesn't trade that good.
-  MarketTradeGood? marketTradeGood(String tradeSymbol) =>
-      tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
+  MarketTradeGood? marketTradeGood(TradeSymbol tradeSymbol) =>
+      tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol.value);
 
   /// Returns all TradeSymbols that the market trades.
   Set<TradeSymbol> get allTradeSymbols {
@@ -560,6 +576,12 @@ extension ShipyardUtils on Shipyard {
   bool hasShipType(ShipType shipType) {
     return shipTypes.any((s) => s.type == shipType);
   }
+}
+
+/// Extensions onto MarketTransaction to make it easier to work with.
+extension MarketTransactionUtils on MarketTransaction {
+  /// Returns the TradeSymbol for the given transaction.
+  TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
 }
 
 /// Returns the duration until the given date time.

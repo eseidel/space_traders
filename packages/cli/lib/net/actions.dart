@@ -49,16 +49,16 @@ Stream<SellCargo201ResponseData> sellAllCargo(
   AgentCache agentCache,
   Market market,
   Ship ship, {
-  bool Function(String tradeSymbol)? where,
+  bool Function(TradeSymbol tradeSymbol)? where,
 }) async* {
   // This should not sell anything we have a contract for.
   // We should travel first to the marketplace that has the best price for
   // the ore we have a contract for.
   for (final item in ship.cargo.inventory) {
-    if (where != null && !where(item.symbol)) {
+    if (where != null && !where(item.tradeSymbol)) {
       continue;
     }
-    final good = market.marketTradeGood(item.symbol);
+    final good = market.marketTradeGood(item.tradeSymbol);
     if (good == null) {
       shipInfo(
         ship,
@@ -97,7 +97,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
   Market market,
   Ship ship,
   AccountingType accounting, {
-  bool Function(String tradeSymbol)? where,
+  bool Function(TradeSymbol tradeSymbol)? where,
 }) async {
   if (ship.cargo.inventory.isEmpty) {
     shipInfo(ship, 'No cargo to sell');
@@ -197,7 +197,7 @@ bool _shouldRefuelAfterCheckingPrice(
   Ship ship,
   int fuelPrice,
 ) {
-  final fuelSymbol = TradeSymbol.FUEL.value;
+  const fuelSymbol = TradeSymbol.FUEL;
   final median = marketPrices.medianPurchasePrice(fuelSymbol);
   final markup = median != null ? fuelPrice / median : null;
   if (markup != null && markup > 2) {
@@ -247,7 +247,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
     return null;
   }
   // Ensure the fuel here is not wildly overpriced (as is sometimes the case).
-  final fuelGood = market.marketTradeGood(TradeSymbol.FUEL.value);
+  final fuelGood = market.marketTradeGood(TradeSymbol.FUEL);
   if (fuelGood == null) {
     shipWarn(ship, 'Market does not sell fuel, not refueling.');
     return null;

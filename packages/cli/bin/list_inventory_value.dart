@@ -1,9 +1,7 @@
-import 'package:cli/cache/market_prices.dart';
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:file/file.dart';
 
 Future<void> main(List<String> args) async {
   await runOffline(args, command);
@@ -12,12 +10,12 @@ Future<void> main(List<String> args) async {
 Future<void> command(FileSystem fs, List<String> args) async {
   final shipCache = ShipCache.loadCached(fs)!;
   final marketPrices = MarketPrices.load(fs);
-  final countByTradeSymbol = <String, int>{};
+  final countByTradeSymbol = <TradeSymbol, int>{};
   final ships = shipCache.ships;
   for (final ship in ships) {
     final inventory = ship.cargo.inventory;
     for (final item in inventory) {
-      final symbol = item.symbol;
+      final symbol = TradeSymbol.fromJson(item.symbol)!;
       final count = countByTradeSymbol[symbol] ?? 0;
       countByTradeSymbol[symbol] = count + item.units;
     }
@@ -34,7 +32,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
       }
       final value = price * count;
       logger.info(
-        '${symbol.padRight(23)} ${count.toString().padLeft(3)} x '
+        '${symbol.value.padRight(23)} ${count.toString().padLeft(3)} x '
         '${creditsString(price).padRight(8)} = ${creditsString(value)}',
       );
       return total + value;

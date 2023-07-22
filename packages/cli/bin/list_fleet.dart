@@ -30,13 +30,13 @@ String describeInventory(
 }) {
   final lines = <String>[];
   for (final item in inventory) {
-    final symbol = item.symbol;
+    final symbol = TradeSymbol.fromJson(item.symbol)!;
     final count = item.units;
     final price = marketPrices.medianSellPrice(symbol);
     final priceString = price == null ? '???' : creditsString(price);
     final valueString = price == null ? '???' : creditsString(price * count);
     lines.add(
-      '$indent${symbol.padRight(23)} ${count.toString().padLeft(3)} x '
+      '$indent${symbol.value.padRight(23)} ${count.toString().padLeft(3)} x '
       '${priceString.padRight(8)} = $valueString',
     );
   }

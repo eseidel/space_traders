@@ -32,25 +32,27 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 void main() {
   test('estimateSellPrice null', () {
     final marketPrices = _MockMarketPrices();
-    final estimate =
-        estimateSellPrice(marketPrices, Market(symbol: 'A'), 'FUEL');
+    const a = TradeSymbol.FUEL;
+    final estimate = estimateSellPrice(marketPrices, Market(symbol: 'A'), a);
     expect(estimate, null);
   });
 
   test('estimatePurchasePrice null', () {
     final marketPrices = _MockMarketPrices();
+    const a = TradeSymbol.FUEL;
     final estimate =
-        estimatePurchasePrice(marketPrices, Market(symbol: 'A'), 'FUEL');
+        estimatePurchasePrice(marketPrices, Market(symbol: 'A'), a);
     expect(estimate, null);
   });
 
   test('estimatePrice fresh', () {
     final marketPrices = _MockMarketPrices();
+    const a = TradeSymbol.FUEL;
     final market = Market(
       symbol: 'A',
       tradeGoods: [
         MarketTradeGood(
-          symbol: 'FUEL',
+          symbol: a.value,
           tradeVolume: 100,
           supply: MarketTradeGoodSupplyEnum.ABUNDANT,
           purchasePrice: 1,
@@ -62,7 +64,7 @@ void main() {
       estimateSellPrice(
         marketPrices,
         market,
-        'FUEL',
+        a,
       ),
       2,
     );
@@ -70,7 +72,7 @@ void main() {
       estimatePurchasePrice(
         marketPrices,
         market,
-        'FUEL',
+        a,
       ),
       1,
     );

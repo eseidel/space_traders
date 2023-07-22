@@ -70,7 +70,7 @@ Future<void> cliMain(List<String> args) async {
     marketCache,
     start,
     maxJumps: maxJumps,
-    tradeSymbol: 'PRECIOUS_STONES',
+    tradeSymbol: TradeSymbol.PRECIOUS_STONES,
   );
   if (mine == null) {
     logger.err('No good mining systems found.');

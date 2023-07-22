@@ -51,8 +51,8 @@ int expectedValueFromSurvey(
 
   final totalValue = survey.deposits.fold<int>(0, (total, deposit) {
     final sellPrice = marketPrices.recentSellPrice(
+          deposit.tradeSymbol,
           marketSymbol: marketSymbol,
-          tradeSymbol: deposit.symbol,
         ) ??
         0; // null when prices database is empty.
     return total + sellPrice;
@@ -202,7 +202,7 @@ Future<DateTime?> advanceMiner(
       caches.waypoints,
       caches.markets,
       currentWaypoint,
-      largestCargo!.symbol,
+      largestCargo!.tradeSymbol,
     );
     if (nearestMarket == null) {
       await centralCommand.disableBehaviorForShip(
@@ -234,14 +234,14 @@ Future<DateTime?> advanceMiner(
     );
     return null;
   }
-  if (ship.nav.waypointSymbol != mineSymbol) {
+  if (ship.nav.waypointSymbol != mineSymbol.waypoint) {
     return beingNewRouteAndLog(
       api,
       ship,
       caches.systems,
       caches.routePlanner,
       centralCommand,
-      mineSymbol,
+      mineSymbol.waypoint,
     );
   }
 

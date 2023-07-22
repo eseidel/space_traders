@@ -167,7 +167,7 @@ Future<Waypoint?> nearbyMarketWhichTrades(
   WaypointCache waypointCache,
   MarketCache marketCache,
   Waypoint start,
-  String tradeSymbol, {
+  TradeSymbol tradeSymbol, {
   int maxJumps = 1,
 }) async {
   if (start.hasMarketplace) {
@@ -319,7 +319,7 @@ class CostedDeal {
   final List<Transaction> transactions;
 
   /// The symbol of the trade good being traded.
-  String get tradeSymbol => deal.tradeSymbol.value;
+  TradeSymbol get tradeSymbol => deal.tradeSymbol;
 
   /// The expected cost of goods sold, not including fuel.
   int get expectedCostOfGoodsSold => deal.purchasePrice * expectedUnits;
@@ -571,7 +571,7 @@ Future<CostedDeal?> findDealFor(
           shipWaypointSymbol: startSymbol,
           shipFuelCapacity: fuelCapacity,
           costPerFuelUnit:
-              marketPrices.medianPurchasePrice(TradeSymbol.FUEL.value) ?? 100,
+              marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ?? 100,
         ),
       )
       .toList();

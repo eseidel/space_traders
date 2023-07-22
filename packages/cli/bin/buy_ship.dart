@@ -8,14 +8,14 @@ import 'package:collection/collection.dart';
 String describeShipType(
   ShipType type,
   Shipyard shipyard,
-  MarketPrices marketPrices,
+  ShipyardPrices shipyardPrices,
 ) {
 // This assumes there is only one ship available of each type in the yard.
   final ship = shipyard.ships.firstWhereOrNull(
     (s) => s.type == type,
   );
   final actualPriceString = ship == null ? '' : ' - ${ship.purchasePrice}';
-  final medianPrice = marketPrices.medianPurchasePrice(type.value);
+  final medianPrice = shipyardPrices.medianPurchasePrice(type);
   final medianPriceString = medianPrice == null
       ? ''
       : ' - median price: ${creditsString(medianPrice)}';
@@ -54,7 +54,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final shipType = logger.chooseOne(
     'Which type?',
     choices: shipyard.shipTypes.map((t) => t.type!).toList(),
-    display: (s) => describeShipType(s, shipyard, caches.marketPrices),
+    display: (s) => describeShipType(s, shipyard, caches.shipyardPrices),
   );
 
   logger.info('Purchasing $shipType.');

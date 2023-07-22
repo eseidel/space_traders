@@ -240,7 +240,7 @@ void main() {
     final costedDeal = _MockCostedDeal();
     when(() => costedDeal.contractId).thenReturn('C');
     when(() => costedDeal.maxUnitsToBuy).thenReturn(10);
-    const tradeSymbol = 'FUEL';
+    const tradeSymbol = TradeSymbol.FUEL;
     when(() => behaviorCache.getBehavior('A'))
         .thenReturn(BehaviorState('A', Behavior.trader, deal: costedDeal));
     final centralCommand =
@@ -250,7 +250,7 @@ void main() {
     when(() => contract.terms).thenReturn(contractTerms);
     when(() => contract.id).thenReturn('C');
     final good = ContractDeliverGood(
-      tradeSymbol: tradeSymbol,
+      tradeSymbol: tradeSymbol.value,
       destinationSymbol: 'W',
       unitsFulfilled: 50,
       unitsRequired: 100,

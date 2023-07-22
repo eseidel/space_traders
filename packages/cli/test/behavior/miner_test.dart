@@ -85,14 +85,14 @@ void main() {
     ).thenReturn(surveys);
     when(
       () => marketPrices.recentSellPrice(
+        TradeSymbol.DIAMONDS,
         marketSymbol: any(named: 'marketSymbol'),
-        tradeSymbol: 'DIAMONDS',
       ),
     ).thenReturn(100);
     when(
       () => marketPrices.recentSellPrice(
+        TradeSymbol.ALUMINUM,
         marketSymbol: any(named: 'marketSymbol'),
-        tradeSymbol: 'ALUMINUM',
       ),
     ).thenReturn(10);
     final maybeSurvey = await surveyWorthMining(

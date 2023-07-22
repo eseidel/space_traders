@@ -164,10 +164,11 @@ void main() {
   test('stringForPriceDeviance', () {
     final fs = MemoryFileSystem.test();
     final marketPrices = MarketPrices([], fs: fs);
+    const a = TradeSymbol.FUEL;
     expect(
       stringForPriceDeviance(
         marketPrices,
-        'A',
+        a,
         0,
         MarketTransactionTypeEnum.PURCHASE,
       ),
@@ -176,7 +177,7 @@ void main() {
     marketPrices.addPrices([
       MarketPrice(
         waypointSymbol: 'A',
-        symbol: 'A',
+        symbol: a.value,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 1,
         sellPrice: 2,
@@ -188,7 +189,7 @@ void main() {
     expect(
       stringForPriceDeviance(
         marketPrices,
-        'A',
+        a,
         0,
         MarketTransactionTypeEnum.PURCHASE,
       ),
@@ -197,7 +198,7 @@ void main() {
     expect(
       stringForPriceDeviance(
         marketPrices,
-        'A',
+        a,
         0,
         MarketTransactionTypeEnum.SELL,
       ),
@@ -206,7 +207,7 @@ void main() {
     expect(
       stringForPriceDeviance(
         marketPrices,
-        'A',
+        a,
         2,
         MarketTransactionTypeEnum.SELL,
       ),

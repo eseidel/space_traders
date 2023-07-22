@@ -9,8 +9,8 @@ import 'package:file/file.dart';
 int? expectedProfit(Contract contract, MarketPrices marketPrices) {
   // Add up the total expected outlay.
   final terms = contract.terms;
-  final tradeSymbols = terms.deliver.map((d) => d.tradeSymbol).toSet();
-  final medianPricesBySymbol = <String, int>{};
+  final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();
+  final medianPricesBySymbol = <TradeSymbol, int>{};
   for (final tradeSymbol in tradeSymbols) {
     final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol);
     if (medianPrice == null) {
@@ -21,7 +21,7 @@ int? expectedProfit(Contract contract, MarketPrices marketPrices) {
 
   final expectedOutlay = terms.deliver
       .map(
-        (d) => medianPricesBySymbol[d.tradeSymbol]! * d.unitsRequired,
+        (d) => medianPricesBySymbol[d.tradeSymbolObject]! * d.unitsRequired,
       )
       .fold(0, (sum, e) => sum + e);
   final payment = contract.terms.payment;

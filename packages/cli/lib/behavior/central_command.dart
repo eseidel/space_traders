@@ -347,7 +347,7 @@ class CentralCommand {
       for (final good in contract.terms.deliver) {
         final unitsNeeded = remainingUnitsNeededForContract(
           contract,
-          good.tradeSymbol,
+          good.tradeSymbolObject,
         );
         if (unitsNeeded > 0) {
           yield SellOpp(
@@ -788,7 +788,10 @@ class CentralCommand {
   /// Computes the number of units needed to fulfill the given [contract].
   /// Includes units in flight.
   @visibleForTesting
-  int remainingUnitsNeededForContract(Contract contract, String tradeSymbol) {
+  int remainingUnitsNeededForContract(
+    Contract contract,
+    TradeSymbol tradeSymbol,
+  ) {
     var unitsAssigned = 0;
     for (final shipSymbol in _shipCache.shipSymbols) {
       final deal = _behaviorCache.getBehavior(shipSymbol)?.deal;
@@ -809,7 +812,7 @@ class CentralCommand {
   /// Returns the symbol of the nearest mine to the given [ship].
   // This should probably return a "mining plan" instead, which includes
   // what type of mining this is, where the mine is, where the markets are?
-  String? mineSymbolForShip(
+  WaypointSymbol? mineSymbolForShip(
     SystemsCache systemsCache,
     AgentCache agentCache,
     Ship ship,
@@ -820,7 +823,9 @@ class CentralCommand {
     // final systemSymbol = ship.nav.systemSymbol;
     // Return the nearest mine to the ship for now?
     final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
-    return systemWaypoints.firstWhereOrNull((w) => w.canBeMined)?.symbol;
+    return systemWaypoints
+        .firstWhereOrNull((w) => w.canBeMined)
+        ?.waypointSymbol;
     // If the ship is in a system without a mine go to the HQ?
 
     // final mine = await nearestMineWithGoodMining(
@@ -945,10 +950,9 @@ Map<String, int> scoreMarketSystems(
   // sum up that value for the market and record that as the "market score".
 
   // First calculate median prices for all goods.
-  final medianPurchasePrices = <String, int?>{};
-  final medianSellPrices = <String, int?>{};
-  for (final tradeSymbolEnum in TradeSymbol.values) {
-    final tradeSymbol = tradeSymbolEnum.value;
+  final medianPurchasePrices = <TradeSymbol, int?>{};
+  final medianSellPrices = <TradeSymbol, int?>{};
+  for (final tradeSymbol in TradeSymbol.values) {
     medianPurchasePrices[tradeSymbol] =
         marketPrices.medianPurchasePrice(tradeSymbol);
     medianSellPrices[tradeSymbol] = marketPrices.medianSellPrice(tradeSymbol);
@@ -958,8 +962,8 @@ Map<String, int> scoreMarketSystems(
   for (final price in marketPrices.prices) {
     final market = price.waypointSymbol;
     final system = parseWaypointString(market).system;
-    final medianPurchasePrice = medianPurchasePrices[price.symbol]!;
-    final medianSellPrice = medianSellPrices[price.symbol]!;
+    final medianPurchasePrice = medianPurchasePrices[price.tradeSymbol]!;
+    final medianSellPrice = medianSellPrices[price.tradeSymbol]!;
     final purchaseScore = (price.purchasePrice - medianPurchasePrice).abs();
     final sellScore = (price.sellPrice - medianSellPrice).abs();
     final score = purchaseScore + sellScore;

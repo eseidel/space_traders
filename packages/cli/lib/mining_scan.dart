@@ -57,7 +57,7 @@ class _SystemEval {
 int? _marketPercentile(
   MarketPrices marketPrices,
   Market market, {
-  required String tradeSymbol,
+  required TradeSymbol tradeSymbol,
 }) {
   final sellPrice = estimateSellPrice(marketPrices, market, tradeSymbol);
   if (sellPrice == null) {
@@ -74,7 +74,7 @@ Future<_SystemEval> _evaluateSystem(
   MarketPrices marketPrices,
   WaypointCache waypointCache,
   MarketCache marketCache, {
-  required String tradeSymbol,
+  required TradeSymbol tradeSymbol,
   required String systemSymbol,
   required int jumps,
 }) async {
@@ -124,7 +124,7 @@ Future<String?> nearestMineWithGoodMining(
   WaypointCache waypointCache,
   MarketCache marketCache,
   SystemWaypoint start, {
-  required String tradeSymbol,
+  required TradeSymbol tradeSymbol,
   required int maxJumps,
   bool Function(String systemSymbol)? systemFilter,
 }) async {

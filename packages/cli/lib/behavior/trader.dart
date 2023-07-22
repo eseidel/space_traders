@@ -24,7 +24,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   AgentCache agentCache,
   Ship ship,
   MarketTradeGood marketGood,
-  String neededTradeSymbol, {
+  TradeSymbol neededTradeSymbol, {
   required int maxWorthwhileUnitPurchasePrice,
   required int unitsToPurchase,
 }) async {
@@ -269,7 +269,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   Contract contract,
   ContractDeliverGood goods,
 ) async {
-  final units = ship.countUnits(goods.tradeSymbol);
+  final units = ship.countUnits(goods.tradeSymbolObject);
   if (units < 1) {
     return null;
   }
@@ -292,7 +292,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
     tradeSymbol: goods.tradeSymbol,
     units: units,
   );
-  final deliver = response.contract.goodNeeded(goods.tradeSymbol)!;
+  final deliver = response.contract.goodNeeded(goods.tradeSymbolObject)!;
   shipInfo(
     ship,
     'Delivered $units ${goods.tradeSymbol} '
@@ -530,16 +530,17 @@ Future<DateTime?> advanceTrader(
   final behaviorState = centralCommand.getBehavior(ship.symbol)!;
   final pastDeal = behaviorState.deal;
   final dealCargo = ship.largestCargo(
-    where: (i) => i.symbol == pastDeal?.tradeSymbol,
+    where: (i) => i.tradeSymbol == pastDeal?.tradeSymbol,
   );
   final nonDealCargo = ship.largestCargo(
-    where: (i) => i.symbol != pastDeal?.tradeSymbol,
+    where: (i) => i.tradeSymbol != pastDeal?.tradeSymbol,
   );
 
   /// Regardless of where we are, if we have cargo that isn't part of our deal,
   /// try to sell it.
   if (nonDealCargo != null) {
-    bool exceptDealCargo(String symbol) => symbol != dealCargo?.symbol;
+    bool exceptDealCargo(TradeSymbol symbol) =>
+        symbol != dealCargo?.tradeSymbol;
     if (currentMarket != null) {
       await sellAllCargoAndLog(
         api,
@@ -566,7 +567,7 @@ Future<DateTime?> advanceTrader(
         caches.waypoints,
         caches.markets,
         currentWaypoint,
-        nonDealCargo.symbol,
+        nonDealCargo.tradeSymbol,
       );
       if (market == null) {
         // We can't sell this cargo anywhere so give up?

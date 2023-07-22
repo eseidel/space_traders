@@ -46,7 +46,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     caches.waypoints,
     caches.markets,
     start,
-    tradeSymbol.value,
+    tradeSymbol,
     maxJumps: 10,
   );
   if (mountMarket == null) {

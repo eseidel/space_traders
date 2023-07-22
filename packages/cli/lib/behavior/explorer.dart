@@ -220,7 +220,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
     caches.waypoints,
     caches.markets,
     waypoint,
-    TradeSymbol.FUEL.value,
+    TradeSymbol.FUEL,
     maxJumps: 5,
   ))
       ?.symbol;
