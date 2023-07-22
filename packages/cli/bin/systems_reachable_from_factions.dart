@@ -4,29 +4,11 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/system_connectivity.dart';
-import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
-
-Stream<Faction> _getAllFactionsUnauthenticated() {
-  final factionsApi = FactionsApi();
-  return fetchAllPages(factionsApi, (factionsApi, page) async {
-    final response = await factionsApi.getFactions(page: page);
-    return (response!.data, response.meta);
-  });
-}
-
-Future<FactionCache> _loadFactionCache(FileSystem fs) async {
-  final cache = FactionCache.loadFromCache(fs);
-  if (cache != null) {
-    return cache;
-  }
-  final factions = await _getAllFactionsUnauthenticated().toList();
-  return FactionCache(factions, fs: fs);
-}
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final systemsCache = await SystemsCache.load(fs);
-  final factionCache = await _loadFactionCache(fs);
+  final factionCache = await FactionCache.loadUnauthenticated(fs);
 
   final factions = factionCache.factions;
   final hqByFaction = <String, String>{

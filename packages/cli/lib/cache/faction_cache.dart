@@ -33,6 +33,24 @@ class FactionCache extends ResponseListCache<Faction> {
     return FactionCache(factions, fs: fs, path: path);
   }
 
+  /// Creates a new FactionCache using an unauthenticated Api.
+  static Future<FactionCache> loadUnauthenticated(
+    FileSystem fs, {
+    String path = defaultPath,
+  }) async {
+    final cached = loadFromCache(fs);
+    if (cached != null) {
+      return cached;
+    }
+    final factionsApi = FactionsApi();
+    final factions =
+        await fetchAllPages(factionsApi, (factionsApi, page) async {
+      final response = await factionsApi.getFactions(page: page);
+      return (response!.data, response.meta);
+    }).toList();
+    return FactionCache(factions, fs: fs, path: path);
+  }
+
   /// Creates a new FactionCache from the Api or FileSystem if provided.
   static Future<FactionCache> load(
     Api api, {

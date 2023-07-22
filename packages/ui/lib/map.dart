@@ -13,16 +13,31 @@ class MapScreen extends StatelessWidget {
     return ColoredBox(
       color: Colors.black,
       child: SizedBox.expand(
-        child: CustomPaint(painter: SystemMapPainter(systemsCache)),
+        child: CustomPaint(
+          painter: SystemMapPainter(systemsCache, PaintMode.shipColors),
+        ),
       ),
     );
   }
 }
 
+enum PaintMode {
+  systemColors,
+  shipColors,
+}
+
+@immutable
+class SystemAttributes {
+  const SystemAttributes(this.color, this.scale);
+  final Color color;
+  final double scale;
+}
+
 class SystemMapPainter extends CustomPainter {
-  const SystemMapPainter(this.systemsCache);
+  const SystemMapPainter(this.systemsCache, this.paintMode);
 
   final SystemsCache systemsCache;
+  final PaintMode paintMode;
 
   Rect getMapExtents() {
     var minX = double.infinity;
@@ -50,10 +65,31 @@ class SystemMapPainter extends CustomPainter {
     return Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.save();
-    final colorBySystemType = <SystemType, Color>{
+  SystemAttributes attributesForSystem(System system) {
+    if (paintMode == PaintMode.shipColors) {
+      final ships = shipCache.ships
+          .where((ship) => ship.nav.systemSymbol == system.symbol);
+      const colorByType = {
+        ShipRole.EXCAVATOR: Colors.green,
+        ShipRole.COMMAND: Colors.blue,
+        ShipRole.HAULER: Colors.red,
+        ShipRole.SATELLITE: Colors.yellow,
+      };
+      if (ships.isNotEmpty) {
+        final color = colorByType[ships.last.registration.role] ?? Colors.brown;
+        final scale = 1.0 + (ships.length * 1.0);
+        return SystemAttributes(color, scale);
+      }
+      final factionSystems = factionCache.factions
+          .map((f) => WaypointSymbol.fromString(f.headquarters).system)
+          .toSet();
+      if (factionSystems.contains(system.symbol)) {
+        return const SystemAttributes(Colors.blue, 3);
+      }
+      return SystemAttributes(Colors.grey.shade700, 1);
+    }
+
+    const colorBySystemType = <SystemType, Color>{
       SystemType.NEUTRON_STAR: Colors.purple,
       SystemType.RED_STAR: Colors.red,
       SystemType.ORANGE_STAR: Colors.orange,
@@ -65,6 +101,13 @@ class SystemMapPainter extends CustomPainter {
       SystemType.NEBULA: Colors.grey,
       SystemType.UNSTABLE: Colors.pink,
     };
+    final color = colorBySystemType[system.type] ?? Colors.white;
+    return SystemAttributes(color, 1);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
 
     final paint = Paint()
       ..style = PaintingStyle.fill
@@ -80,10 +123,12 @@ class SystemMapPainter extends CustomPainter {
       ..translate(translation.dx, translation.dy);
 
     for (final system in systemsCache.systems) {
+      final attributes = attributesForSystem(system);
       final x = system.x;
       final y = system.y;
-      const radius = 100.0;
-      paint.color = colorBySystemType[system.type] ?? Colors.white;
+      const defaultRadius = 100.0;
+      final radius = defaultRadius * attributes.scale;
+      paint.color = attributes.color;
       canvas.drawCircle(Offset(x.toDouble(), y.toDouble()), radius, paint);
     }
     canvas.restore();

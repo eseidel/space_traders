@@ -9,6 +9,7 @@ environment:
 dependencies:
   cli:
     path: ../cli
+  collection: ^1.17.1
   cupertino_icons: ^1.0.2
   file: ^6.1.4
   flutter:
