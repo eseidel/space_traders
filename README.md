@@ -108,7 +108,8 @@ Earning:
 * Remove all use of maxJumps and use distance or maxWaypoints instead.
 * Be able to buy miners outside of the main system.
 * Add dedicated survey ships.
-* Write a script to collect/print repeat buys/sells from transactions.
+* Teach deal logic that price can move (even if just 1c) on each buy/sell lot.
+* Calculate "wait time" when servicing a ship.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
