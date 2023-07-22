@@ -62,7 +62,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final transactionLog = await TransactionLog.load(fs);
+  final transactionLog = TransactionLog.load(fs);
   final shipSymbols = transactionLog.shipSymbols;
   final shipIds = shipSymbols.map(ShipSymbol.fromString).toList()..sort();
   final behaviorCache = BehaviorCache.load(fs);

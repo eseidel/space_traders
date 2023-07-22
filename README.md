@@ -86,12 +86,17 @@ Then modified:
 
 ### Todo
 
+Most impact:
+* Be able to support miners across multiple systems.
+* Be able to move miners between systems.
+* Add logic for buying and mounting modules.
+* Make saving take less time (db?)
+
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
 * Use recent earnings-per-second in ship behavior planning.
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
-* Add logic for buying and mounting modules.
 * Traders only consider how repeated buys inflate prices, they do not consider
   how repeated sells might deflate prices at sell point.
 * Teach miners how to coordinate with haulers to sell their goods further away.
@@ -100,12 +105,8 @@ Earning:
 * Add logic for command ship to switch between trading and mining depending
   on expected profit.
 * Buy traders when trading is more profitable than mining, and vice versa.
-* Dead ships aren't differnet from idle ships and will be counted as
-  "idle haulers" and prevent buying more ships.
 * Remove all use of maxJumps and use distance or maxWaypoints instead.
 * Be able to buy miners outside of the main system.
-* Be able to support miners across multiple systems.
-* Be able to move miners between systems.
 * Add dedicated survey ships.
 * Write a script to collect/print repeat buys/sells from transactions.
 
@@ -136,9 +137,6 @@ Automation:
 * Logic for planning what to do with money (e.g. buy ships, by mods)
   Should disable buying behavior for less time early on?
 * Surveys.  How much surveying should we do before we start mining?
-* Add the ability to "queue" behaviors, so that when a ship pulls its next
-  behavior it can pull from the queue.  This would allow us to queue a buyShip
-  for a ship which was otherwise busy at the moment, for example?
 
 UI:
 * Make shipInfo include an emoji for the behavior.

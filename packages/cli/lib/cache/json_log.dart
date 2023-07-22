@@ -49,14 +49,14 @@ class JsonLog<Record> {
   }
 
   /// Load the log from the file system.
-  static Future<List<R>> load<R>(
+  static List<R> load<R>(
     FileSystem fs,
     String path,
     R Function(Map<String, dynamic>) recordFromJson,
-  ) async {
+  ) {
     final file = fs.file(path);
-    if (await file.exists()) {
-      return _parseLogFile<R>(await file.readAsString(), recordFromJson);
+    if (file.existsSync()) {
+      return _parseLogFile<R>(file.readAsStringSync(), recordFromJson);
     }
     return <R>[];
   }

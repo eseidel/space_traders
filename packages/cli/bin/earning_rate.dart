@@ -14,7 +14,7 @@ int hoursAgo(DateTime time) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   // Credits per hour.
-  final transactions = await TransactionLog.load(fs);
+  final transactions = TransactionLog.load(fs);
 
   final oldest = transactions.entries.first;
   final firstTransactionHour = snapToHour(oldest.timestamp);

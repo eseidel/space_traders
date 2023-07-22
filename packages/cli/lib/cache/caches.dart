@@ -112,7 +112,7 @@ class Caches {
     final shipyard = ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
-    final transactions = await TransactionLog.load(fs);
+    final transactions = TransactionLog.load(fs);
     final charting = ChartingCache.load(fs);
     final waypoints = WaypointCache(api, systems, charting);
     final markets = MarketCache(waypoints);

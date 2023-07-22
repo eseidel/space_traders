@@ -188,12 +188,12 @@ class TransactionLog extends JsonLog<Transaction> {
   static const String defaultPath = 'data/transactions.json';
 
   /// Load the transaction log from the file system.
-  static Future<TransactionLog> load(
+  // ignore: prefer_constructors_over_static_methods
+  static TransactionLog load(
     FileSystem fs, {
     String path = defaultPath,
-  }) async {
-    final entries =
-        await JsonLog.load<Transaction>(fs, path, Transaction.fromJson);
+  }) {
+    final entries = JsonLog.load<Transaction>(fs, path, Transaction.fromJson);
     return TransactionLog(entries, fs: fs, path: path);
   }
 

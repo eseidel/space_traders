@@ -16,7 +16,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final lookbackMinutes = (args.length > 1) ? int.parse(args[1]) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final transactionLog = await TransactionLog.load(fs);
+  final transactionLog = TransactionLog.load(fs);
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = transactionLog.where(
