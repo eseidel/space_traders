@@ -335,7 +335,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
     );
   }
   final consumedFuel = result.fuel.consumed?.amount;
-  final fuelString = consumedFuel != null ? ' spend $consumedFuel fuel' : '';
+  final fuelString = consumedFuel != null ? ' spent $consumedFuel fuel' : '';
   shipInfo(
     ship,
     '🛫 to ${waypoint.symbol} ${waypoint.type} '
