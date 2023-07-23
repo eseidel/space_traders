@@ -14,12 +14,16 @@ void printDiffs(List<int> data) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   // final marketPrices = MarketPrices.load(fs);
+  final transactionLogOld =
+      TransactionLog.load(fs, path: 'data/transactions1.json');
   final transactionLog = TransactionLog.load(fs);
+  final allTransactions =
+      transactionLogOld.entries.followedBy(transactionLog.entries);
 
   // Walk through all transactions, finding repeats.
   final transactionSets = <List<Transaction>>[];
   var repeats = <Transaction>[];
-  for (final transaction in transactionLog.entries) {
+  for (final transaction in allTransactions) {
     // If the transaction has the same market and tradeSymbol as the previous
     // one, then it's a repeat, and should be collected together into a group
     // of repeats.
@@ -53,6 +57,12 @@ Future<void> command(FileSystem fs, List<String> args) async {
       '${transaction.tradeSymbol} '
       'at ${transaction.waypointSymbol}',
     );
+    // Generate a list of the diffs in price between transactions.
+    final diffs = <int>[];
+    for (var i = 1; i < set.length; i++) {
+      diffs.add(set[i].perUnitPrice - set[i - 1].perUnitPrice);
+    }
+    printDiffs(diffs);
   }
 }
 
