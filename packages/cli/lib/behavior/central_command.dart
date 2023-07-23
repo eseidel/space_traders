@@ -569,7 +569,7 @@ class CentralCommand {
     // ~10 miners
     // 10 probes
     // No haulers until we have 100+ markets?
-    // Then choose as we need.
+    // At some point start buying heavy freighters intead of light haulers?
 
     final probeCount = _shipCache.countOfType(ShipType.PROBE);
     final minerCount = _shipCache.countOfType(ShipType.ORE_HOUND);
@@ -601,9 +601,9 @@ class CentralCommand {
     // SafPlusPlus limits to 50 probes and 40 miners
     final targetCounts = {
       ShipType.ORE_HOUND: 40,
-      ShipType.PROBE: 50,
-      ShipType.LIGHT_HAULER: 50,
-      ShipType.HEAVY_FREIGHTER: 1,
+      ShipType.PROBE: 40,
+      ShipType.LIGHT_HAULER: 20,
+      ShipType.HEAVY_FREIGHTER: 40,
     };
     final typesToBuy = targetCounts.keys.where((shipType) {
       if (!shipyardHas(shipType)) {
