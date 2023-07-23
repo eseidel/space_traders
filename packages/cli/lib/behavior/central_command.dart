@@ -88,7 +88,12 @@ class CentralCommand {
   /// Minimum profit per second we will accept when trading.
   // Should set this based on the ship type and how much we expect to earn
   // from other sources (e.g. hauling mining goods?)
-  int get minTraderProfitPerSecond => 7;
+  int minTraderProfitPerSecond(Ship ship) {
+    if (ship.registration.role == ShipRole.COMMAND) {
+      return 6;
+    }
+    return 7;
+  }
 
   /// Data older than this will be refreshed by explorers.
   /// Explorers will shorten this time if they run out of places to explore.
@@ -182,15 +187,21 @@ class CentralCommand {
     // Probably want special behavior for the command ship when we
     // only have a few ships?
 
-    final shipCount = _shipCache.ships.length;
-
     final behaviors = {
       // TODO(eseidel): Evaluate based on expected value, not just order.
+      // Should mine until we have one ore-hound, then switch to survey-only?
+
       ShipRole.COMMAND: [
         Behavior.buyShip,
-        if (shipCount > 10) Behavior.trader,
-        if (shipCount <= 10) Behavior.miner,
-        if (shipCount > 10) Behavior.explorer,
+        // Will only trade if we can make 6/s or more.
+        // There are commonly 20c/s trades in the starting system, and at
+        // the minimum we want to accept the contract.
+        // Might want to consider limiting to short trades (< 5 mins) to avoid
+        // tying up capital early.
+        Behavior.trader,
+        // Early on the command ship makes about 5c/s vs.
+        // ore hounds making 6c/s.
+        Behavior.miner,
       ],
       // Haulers are terrible explorers, but early game we just need
       // things mapping.
@@ -561,8 +572,9 @@ class CentralCommand {
     // No haulers until we have 100+ markets?
     // At some point start buying heavy freighters intead of light haulers?
 
+    final shipCount = _shipCache.ships.length;
     final probeCount = _shipCache.countOfType(ShipType.PROBE);
-    final minerCount = _shipCache.countOfType(ShipType.ORE_HOUND);
+    final houndCount = _shipCache.countOfType(ShipType.ORE_HOUND);
 
     // Early game can stop when we have enough miners going and markets
     // mapped to start trading.
@@ -572,9 +584,12 @@ class CentralCommand {
 
     // We will buy miners in the start system.
     // Or probes anywhere (once we have enough miners).
-    if (minerCount < 10 && inStartSystem) {
+    if (houndCount < 10 && inStartSystem) {
+      if (shipCount < 4) {
+        return ShipType.MINING_DRONE;
+      }
       return ShipType.ORE_HOUND;
-    } else if (minerCount > 5 && probeCount < 10) {
+    } else if (houndCount > 5 && probeCount < 10) {
       return ShipType.PROBE;
     }
     // We will not buy traders until we have enough miners to support a base
@@ -590,6 +605,7 @@ class CentralCommand {
 
     // SafPlusPlus limits to 50 probes and 40 miners
     final targetCounts = {
+      ShipType.MINING_DRONE: 1,
       ShipType.ORE_HOUND: 40,
       ShipType.PROBE: 40,
       ShipType.LIGHT_HAULER: 20,
@@ -879,7 +895,7 @@ class CentralCommand {
       ship,
       maxJumps: maxJumps,
       maxWaypoints: maxWaypoints,
-      profitPerSecondThreshold: minTraderProfitPerSecond,
+      profitPerSecondThreshold: minTraderProfitPerSecond(ship),
     );
     return placement?.destinationSymbol;
   }

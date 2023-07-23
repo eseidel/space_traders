@@ -89,7 +89,7 @@ void main() {
         maxWaypoints: any(named: 'maxWaypoints'),
       ),
     ).thenAnswer((_) => Future.value());
-    when(() => centralCommand.minTraderProfitPerSecond).thenReturn(10);
+    when(() => centralCommand.minTraderProfitPerSecond(ship)).thenReturn(10);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
@@ -220,7 +220,7 @@ void main() {
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenAnswer((_) => Future.value(costedDeal));
-    when(() => centralCommand.minTraderProfitPerSecond).thenReturn(10);
+    when(() => centralCommand.minTraderProfitPerSecond(ship)).thenReturn(10);
     when(
       () => centralCommand.visitLocalShipyard(
         api,
@@ -529,7 +529,7 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final contractCache = _MockContractCache();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
-    when(() => centralCommand.minTraderProfitPerSecond).thenReturn(10);
+    when(() => centralCommand.minTraderProfitPerSecond(ship)).thenReturn(10);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);

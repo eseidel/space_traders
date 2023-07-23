@@ -315,6 +315,8 @@ Future<DateTime?> advanceExplorer(
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
   final startTime = getNow();
+  // TODO(eseidel): Early on it might be useful to prefer systems with a greater
+  // chance of selling ship parts (e.g. orbital stations?)
   final destinationSymbol = await findNewWaypointSymbolToExplore(
     caches.systems,
     caches.systemConnectivity,

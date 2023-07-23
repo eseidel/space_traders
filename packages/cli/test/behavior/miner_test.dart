@@ -197,6 +197,7 @@ void main() {
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    when(() => ship.mounts).thenReturn([]);
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
@@ -253,5 +254,43 @@ void main() {
       ),
     );
     expect(waitUntil, isNull);
+  });
+
+  test('maxExtractedUnits', () {
+    final ship = _MockShip();
+    when(() => ship.cargo).thenReturn(ShipCargo(capacity: 60, units: 0));
+    final laser1 = ShipMount(
+      symbol: ShipMountSymbolEnum.MINING_LASER_I,
+      name: '',
+      description: '',
+      strength: 10,
+      requirements: ShipRequirements(),
+    );
+    final laser2 = ShipMount(
+      symbol: ShipMountSymbolEnum.MINING_LASER_II,
+      name: '',
+      description: '',
+      strength: 25,
+      requirements: ShipRequirements(),
+    );
+    final laser3 = ShipMount(
+      symbol: ShipMountSymbolEnum.MINING_LASER_III,
+      name: '',
+      description: '',
+      strength: 60,
+      requirements: ShipRequirements(),
+    );
+
+    when(() => ship.mounts).thenReturn([laser1]);
+    expect(maxExtractedUnits(ship), 15);
+    when(() => ship.mounts).thenReturn([laser1, laser1]);
+    expect(maxExtractedUnits(ship), 30);
+    when(() => ship.mounts).thenReturn([laser1, laser2]);
+    expect(maxExtractedUnits(ship), 45);
+    // Limited by cargo capacity
+    when(() => ship.mounts).thenReturn([laser1, laser2, laser3]);
+    expect(maxExtractedUnits(ship), 60);
+    when(() => ship.cargo).thenReturn(ShipCargo(capacity: 120, units: 0));
+    expect(maxExtractedUnits(ship), 110);
   });
 }

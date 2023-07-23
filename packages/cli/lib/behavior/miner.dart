@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/explorer.dart';
@@ -145,6 +147,32 @@ Future<Survey?> surveyWorthMining(
   return best?.survey;
 }
 
+// https://discord.com/channels/792864705139048469/792864705139048472/1132761138849923092
+// "Each laser adds its strength +-5. Power is 10 for laser I, 25 for laser II,
+// 60 for laser III. So for example laser I plus laser II is 35 +- 10"
+/// Compute the maximum number of units we can expect from an extraction.
+int maxExtractedUnits(Ship ship) {
+  var laserStrength = 0;
+  var variance = 0;
+  final laserMounts = {
+    ShipMountSymbolEnum.MINING_LASER_I,
+    ShipMountSymbolEnum.MINING_LASER_II,
+    ShipMountSymbolEnum.MINING_LASER_III
+  };
+  for (final mount in ship.mounts) {
+    if (laserMounts.contains(mount.symbol)) {
+      final strength = mount.strength;
+      // We could log here, this should never happen.
+      if (strength == null) {
+        continue;
+      }
+      laserStrength += strength;
+      variance += 5;
+    }
+  }
+  return min(laserStrength + variance, ship.cargo.capacity);
+}
+
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
@@ -162,8 +190,8 @@ Future<DateTime?> advanceMiner(
   // Hence selling when we're down to 15 or fewer spaces.
   // This eventually should be dependent on market availability.
   // How much to expect:
-  // https://discord.com/channels/792864705139048469/1106265069630804019/1112585073712173086
-  final shouldSell = ship.availableSpace < 15;
+
+  final shouldSell = ship.availableSpace < maxExtractedUnits(ship);
   if (shouldSell) {
     // Sell cargo and refuel if needed.
     final currentMarket =

@@ -211,10 +211,7 @@ bool _shouldRefuelAfterCheckingPrice(
 
     final fuelPercent = ship.fuel.current / ship.fuel.capacity;
     if (fuelPercent < 0.5) {
-      shipWarn(
-          ship,
-          'Fuel low: ${ship.fuel.current} / '
-          '${ship.fuel.capacity}}');
+      shipWarn(ship, 'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}');
     }
     final markupString = markup.toStringAsFixed(1);
     // The really bonkers prices are 100x median.
@@ -329,10 +326,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
       await navigateToLocalWaypoint(api, ship, waypoint.waypointSymbol);
   final flightTime = result.nav.route.arrival.difference(DateTime.timestamp());
   if (ship.fuelPercentage < 0.5) {
-    shipWarn(
-      ship,
-      'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}}',
-    );
+    shipWarn(ship, 'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}');
   }
   final consumedFuel = result.fuel.consumed?.amount;
   final fuelString = consumedFuel != null ? ' spent $consumedFuel fuel' : '';
