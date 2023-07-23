@@ -203,7 +203,8 @@ class RoutePlan {
   WaypointSymbol get endSymbol => actions.last.endSymbol;
 
   /// The total time of this route in seconds.
-  int get duration => actions.fold<int>(0, (a, b) => a + b.duration);
+  Duration get duration =>
+      Duration(seconds: actions.fold<int>(0, (a, b) => a + b.duration));
 
   /// Returns the next action to take from the given waypoint.
   RouteAction nextActionFrom(WaypointSymbol waypointSymbol) {

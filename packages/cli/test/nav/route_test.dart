@@ -105,7 +105,7 @@ void main() {
         shipSpeed: 30,
       );
       expect(route, isNotNull);
-      expect(route!.duration, expectedSeconds);
+      expect(route!.duration.inSeconds, expectedSeconds);
 
       // No need to test caching of the empty route.
       if (route.actions.isEmpty) {

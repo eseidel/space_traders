@@ -304,7 +304,7 @@ class CostedDeal {
   int get expectedFuelCost => (expectedFuelUsed / 100).ceil() * costPerFuelUnit;
 
   /// The time in seconds to travel between the two markets.
-  int get expectedTime => route.duration;
+  Duration get expectedTime => route.duration;
 
   /// The time at which this deal was started.
   final DateTime startTime;
@@ -344,10 +344,11 @@ class CostedDeal {
 
   /// The profit per second of the deal.
   int get expectedProfitPerSecond {
-    if (expectedTime < 1) {
+    final seconds = expectedTime.inSeconds;
+    if (seconds < 1) {
       return expectedProfit;
     }
-    return expectedProfit ~/ expectedTime;
+    return expectedProfit ~/ seconds;
   }
 
   /// The actual time taken to complete the deal.
@@ -427,7 +428,7 @@ String describeCostedDeal(CostedDeal costedDeal) {
   final coloredProfitString = deal.profit > 0
       ? lightGreen.wrap(profitString)
       : lightRed.wrap(profitString);
-  final timeString = '${costedDeal.expectedTime}s '
+  final timeString = '${approximateDuration(costedDeal.expectedTime)} '
       '${c(costedDeal.expectedProfitPerSecond)}/s';
   final tradeSymbol = deal.tradeSymbol.value;
   final name =

@@ -54,7 +54,7 @@ Duration timeToArrival(
   if (routePlan.endSymbol != ship.waypointSymbol) {
     final newPlan =
         routePlan.subPlanStartingFrom(systemsCache, ship.waypointSymbol);
-    timeLeft += Duration(seconds: newPlan.duration);
+    timeLeft += newPlan.duration;
     // Include cooldown until next jump.
     // We would need to keep ship cooldowns on ShipCache to do this.
     // if (newPlan.actions.first.type == RouteActionType.jump) {

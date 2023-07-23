@@ -175,7 +175,7 @@ void _logCompletedDeal(Ship ship, CostedDeal completedDeal) {
   const cpsSlop = 1; // credits/s
   const durationSlop = 0.1; // Percent;
   final duration = DateTime.timestamp().difference(completedDeal.startTime);
-  final expectedDuration = Duration(seconds: completedDeal.expectedTime);
+  final expectedDuration = completedDeal.expectedTime;
   final message =
       'Expected ${creditsString(completedDeal.expectedProfit)} profit '
       '(${creditsString(completedDeal.expectedProfitPerSecond)}/s), got '

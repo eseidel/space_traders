@@ -200,7 +200,7 @@ void main() {
 
     expect(costed.expectedFuelCost, 0);
     expect(costed.cargoSize, 1);
-    expect(costed.expectedTime, 15);
+    expect(costed.expectedTime.inSeconds, 15);
   });
 
   test('describe deal', () {
