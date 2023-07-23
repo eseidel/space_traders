@@ -394,7 +394,6 @@ class CostedDeal {
         'deal': deal.toJson(),
         'expectedFuelCost': expectedFuelCost,
         'cargoSize': cargoSize,
-        'expectedTime': expectedTime,
         'contractId': contractId,
         'transactions': transactions.map((e) => e.toJson()).toList(),
         'startTime': startTime.toUtc().toIso8601String(),
