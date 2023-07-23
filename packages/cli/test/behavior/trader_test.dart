@@ -57,7 +57,8 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 void main() {
   test('advanceContractTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
-    registerFallbackValue(BehaviorState('S', Behavior.trader));
+    const shipSymbol = ShipSymbol('S', 1);
+    registerFallbackValue(BehaviorState(shipSymbol, Behavior.trader));
 
     final api = _MockApi();
     final marketPrices = _MockMarketPrices();
@@ -107,7 +108,7 @@ void main() {
     final shipFuel = _MockShipFuel();
     when(() => ship.fuel).thenReturn(shipFuel);
     when(() => shipFuel.capacity).thenReturn(0);
-    when(() => ship.symbol).thenReturn('S');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
@@ -166,8 +167,8 @@ void main() {
       ),
     ).thenReturn([]);
 
-    when(() => centralCommand.getBehavior('S')).thenAnswer(
-      (_) => BehaviorState('S', Behavior.trader),
+    when(() => centralCommand.getBehavior(shipSymbol)).thenAnswer(
+      (_) => BehaviorState(shipSymbol, Behavior.trader),
     );
 
     when(
@@ -229,9 +230,9 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
-    when(() => centralCommand.setBehavior('S', any()))
+    when(() => centralCommand.setBehavior(shipSymbol, any()))
         .thenAnswer((_) => Future.value());
-    when(() => centralCommand.completeBehavior('S'))
+    when(() => centralCommand.completeBehavior(shipSymbol))
         .thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
@@ -299,7 +300,8 @@ void main() {
     // And needs refueling.
     when(() => shipFuel.current).thenReturn(100);
     when(() => ship.fuel).thenReturn(shipFuel);
-    when(() => ship.symbol).thenReturn('S');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
 
     final start = WaypointSymbol.fromString('S-A-B');
@@ -410,8 +412,8 @@ void main() {
     when(() => marketCache.marketForSymbol(start))
         .thenAnswer((_) => Future.value(market));
 
-    when(() => centralCommand.getBehavior('S')).thenAnswer(
-      (_) => BehaviorState('S', Behavior.trader, deal: costedDeal),
+    when(() => centralCommand.getBehavior(shipSymbol)).thenAnswer(
+      (_) => BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal),
     );
     when(() => centralCommand.setRoutePlan(ship, routePlan))
         .thenAnswer((_) => Future.value());
@@ -449,12 +451,12 @@ void main() {
       type: MarketTransactionTypeEnum.PURCHASE,
       tradeSymbol: TradeSymbol.FUEL.value,
       waypointSymbol: start.waypoint,
-      shipSymbol: 'S',
+      shipSymbol: shipSymbol.symbol,
       timestamp: DateTime(2021),
     );
     when(
       () => fleetApi.refuelShip(
-        'S',
+        shipSymbol.symbol,
         refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).thenAnswer(
@@ -500,7 +502,7 @@ void main() {
     );
     verify(
       () => fleetApi.refuelShip(
-        'S',
+        shipSymbol.symbol,
         refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
@@ -509,7 +511,9 @@ void main() {
 
   test('trade contracts smoke test', () async {
     registerFallbackValue(Duration.zero);
-    registerFallbackValue(BehaviorState('S', Behavior.trader));
+    const shipSymbol = ShipSymbol('S', 1);
+
+    registerFallbackValue(BehaviorState(shipSymbol, Behavior.trader));
 
     final api = _MockApi();
     final marketPrices = _MockMarketPrices();
@@ -587,7 +591,7 @@ void main() {
     when(() => shipCargo.capacity).thenReturn(10);
     when(() => shipCargo.inventory).thenReturn([]);
 
-    when(() => ship.symbol).thenReturn('S');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
@@ -605,9 +609,9 @@ void main() {
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
-    when(() => centralCommand.getBehavior('S'))
-        .thenAnswer((_) => BehaviorState('S', Behavior.trader));
-    when(() => centralCommand.setBehavior('S', any()))
+    when(() => centralCommand.getBehavior(shipSymbol))
+        .thenAnswer((_) => BehaviorState(shipSymbol, Behavior.trader));
+    when(() => centralCommand.setBehavior(shipSymbol, any()))
         .thenAnswer((_) => Future.value());
     final routePlan = RoutePlan(
       actions: [

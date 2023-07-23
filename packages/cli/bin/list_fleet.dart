@@ -72,7 +72,7 @@ void logShip(
   JumpCache jumpCache,
   Ship ship,
 ) {
-  final behavior = centralCommand.getBehavior(ship.symbol);
+  final behavior = centralCommand.getBehavior(ship.shipSymbol);
   logger
     ..info('${ship.symbol}: ${behavior?.behavior}')
     ..info('  ${_shipStatusLine(ship, systemsCache)}');

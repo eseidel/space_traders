@@ -141,7 +141,7 @@ Future<DateTime?> advanceBuyShip(
       shipType,
     );
 
-    await centralCommand.completeBehavior(ship.symbol);
+    await centralCommand.completeBehavior(ship.shipSymbol);
     await centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,

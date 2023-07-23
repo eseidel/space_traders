@@ -41,7 +41,7 @@ void main() {
     expect(centralCommand.isBehaviorDisabled(Behavior.trader), false);
 
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('S');
+    when(() => ship.symbol).thenReturn('S-1');
     final logger = _MockLogger();
 
     await runWithLogger(
@@ -63,13 +63,17 @@ void main() {
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('S');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     expect(
       centralCommand.isBehaviorDisabledForShip(ship, Behavior.trader),
       false,
     );
 
-    behaviorCache.setBehavior('S', BehaviorState('S', Behavior.trader));
+    behaviorCache.setBehavior(
+      shipSymbol,
+      BehaviorState(shipSymbol, Behavior.trader),
+    );
 
     final logger = _MockLogger();
     await runWithLogger(
@@ -82,7 +86,7 @@ void main() {
       ),
     );
     final ship2 = _MockShip();
-    when(() => ship2.symbol).thenReturn('T');
+    when(() => ship2.symbol).thenReturn('S-2');
     expect(
       centralCommand.isBehaviorDisabledForShip(ship, Behavior.trader),
       true,
@@ -146,26 +150,27 @@ void main() {
     when(() => shipNavA.systemSymbol).thenReturn('S-A');
     when(() => shipA.nav).thenReturn(shipNavA);
     await centralCommand.setBehavior(
-      aSymbol.symbol,
-      BehaviorState(aSymbol.symbol, Behavior.explorer),
+      aSymbol,
+      BehaviorState(aSymbol, Behavior.explorer),
     );
 
     final saa = WaypointSymbol.fromString('S-A-A');
     final saw = WaypointSymbol.fromString('S-A-W');
     await centralCommand.setRoutePlan(shipA, fakeJump(saa, saw));
     final shipB = _MockShip();
-    when(() => shipB.symbol).thenReturn('X-B');
+    final shipBSymbol = ShipSymbol.fromString('X-B');
+    when(() => shipB.symbol).thenReturn(shipBSymbol.symbol);
     final shipNavB = _MockShipNav();
     when(() => shipNavB.systemSymbol).thenReturn('S-C');
     when(() => shipB.nav).thenReturn(shipNavB);
     await centralCommand.setBehavior(
-      'X-B',
-      BehaviorState('X-B', Behavior.explorer),
+      shipBSymbol,
+      BehaviorState(shipBSymbol, Behavior.explorer),
     );
     final sbw = WaypointSymbol.fromString('S-B-W');
     await centralCommand.setRoutePlan(shipB, fakeJump(saa, sbw));
     expect(centralCommand.currentRoutePlan(shipB)!.endSymbol, sbw);
-    when(() => shipCache.ship('X-B')).thenReturn(shipB);
+    when(() => shipCache.ship(shipBSymbol)).thenReturn(shipB);
 
     final otherSystems = centralCommand.otherExplorerSystems(aSymbol).toList();
     expect(otherSystems, [sbw.systemSymbol]); // From destination
@@ -176,7 +181,7 @@ void main() {
       otherSystems2,
       [SystemSymbol.fromString('S-C')],
     ); // From nav.systemSymbol
-    await centralCommand.completeBehavior('X-B');
+    await centralCommand.completeBehavior(shipBSymbol);
     final otherSystems3 = centralCommand.otherExplorerSystems(aSymbol).toList();
     expect(otherSystems3, <SystemSymbol>[]);
   });
@@ -240,13 +245,15 @@ void main() {
   test('CentralCommand.remainingUnitsNeededForContract', () {
     final behaviorCache = _MockBehhaviorCache();
     final shipCache = _MockShipCache();
-    when(() => shipCache.shipSymbols).thenReturn(['A']);
+    final shipASymbol = ShipSymbol.fromString('X-A');
+    when(() => shipCache.shipSymbols).thenReturn([shipASymbol]);
     final costedDeal = _MockCostedDeal();
     when(() => costedDeal.contractId).thenReturn('C');
     when(() => costedDeal.maxUnitsToBuy).thenReturn(10);
     const tradeSymbol = TradeSymbol.FUEL;
-    when(() => behaviorCache.getBehavior('A'))
-        .thenReturn(BehaviorState('A', Behavior.trader, deal: costedDeal));
+    when(() => behaviorCache.getBehavior(shipASymbol)).thenReturn(
+      BehaviorState(shipASymbol, Behavior.trader, deal: costedDeal),
+    );
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final contract = _MockContract();

@@ -184,7 +184,7 @@ Future<DateTime?> advanceMiner(
       if (ship.cargo.isEmpty) {
         // Success!  We mined and sold all our cargo!
         // Reset our state now that we've mined + sold once.
-        await centralCommand.completeBehavior(ship.symbol);
+        await centralCommand.completeBehavior(ship.shipSymbol);
         return null;
       }
       shipWarn(ship, 'Failed to sell some cargo, trying a different market.');

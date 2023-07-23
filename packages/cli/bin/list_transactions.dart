@@ -11,7 +11,7 @@ String describeTransaction(Transaction t) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final shipNumber = args.firstOrNull;
-  final shipId = ShipSymbol.fromString('ESEIDEL-$shipNumber');
+  final shipSymbol = ShipSymbol.fromString('ESEIDEL-$shipNumber');
 
   final lookbackMinutes = (args.length > 1) ? int.parse(args[1]) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
@@ -20,7 +20,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = transactionLog.where(
-    (t) => t.timestamp.isAfter(startTime) && t.shipSymbol == shipId.symbol,
+    (t) => t.timestamp.isAfter(startTime) && t.shipSymbol == shipSymbol,
   );
   for (final transaction in transactions) {
     logger.info(describeTransaction(transaction));

@@ -97,10 +97,11 @@ class ShipCache extends ResponseListCache<Ship> {
   }
 
   /// Returns all ship symbols.
-  List<String> get shipSymbols => ships.map((s) => s.symbol).toList();
+  List<ShipSymbol> get shipSymbols => ships.map((s) => s.shipSymbol).toList();
 
   /// Currently assumes ships can never be removed from the cache.
-  Ship ship(String symbol) => ships.firstWhere((s) => s.symbol == symbol);
+  Ship ship(ShipSymbol symbol) =>
+      ships.firstWhere((s) => s.shipSymbol == symbol);
 }
 
 /// Return a string describing the given [shipCache]. p

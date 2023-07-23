@@ -64,7 +64,7 @@ Future<DateTime?> advanceShipBehavior(
     case Behavior.idle:
       shipDetail(ship, 'Idling');
       // Make sure ships don't stay idle forever.
-      caches.behaviors.completeBehavior(ship.symbol);
+      caches.behaviors.completeBehavior(ship.shipSymbol);
       // Return a time in the future so we don't spin hot.
       return DateTime.now().add(const Duration(minutes: 10));
   }

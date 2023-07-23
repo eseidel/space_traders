@@ -9,11 +9,12 @@ void main() {
   test('ShipWaiter', () {
     final waiter = ShipWaiter();
     final a = _MockShip();
-    when(() => a.symbol).thenReturn('a');
+    const aSymbol = ShipSymbol('a', 1);
+    when(() => a.symbol).thenReturn(aSymbol.symbol);
     final aTime = DateTime.now();
-    waiter.updateWaitUntil('a', aTime);
-    expect(waiter.waitUntil('a'), aTime);
+    waiter.updateWaitUntil(aSymbol, aTime);
+    expect(waiter.waitUntil(aSymbol), aTime);
     waiter.updateForShips([a]);
-    expect(waiter.waitUntil('a'), isNull);
+    expect(waiter.waitUntil(aSymbol), isNull);
   });
 }

@@ -78,7 +78,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
         api,
         agentCache,
         ship,
-        TradeSymbol.fromJson(item.symbol)!,
+        item.tradeSymbol,
         toSell,
       );
       yield response;

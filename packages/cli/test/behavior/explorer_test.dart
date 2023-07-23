@@ -78,7 +78,8 @@ void main() {
       ),
     );
 
-    when(() => ship.symbol).thenReturn('S');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
@@ -87,7 +88,7 @@ void main() {
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
-    when(() => centralCommand.completeBehavior(any()))
+    when(() => centralCommand.completeBehavior(shipSymbol))
         .thenAnswer((_) => Future.value());
     when(
       () => centralCommand.visitLocalShipyard(

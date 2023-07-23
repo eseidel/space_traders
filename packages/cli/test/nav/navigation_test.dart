@@ -28,13 +28,14 @@ void main() {
     final systemsCache = _MockSystemsCache();
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
-    when(() => ship.symbol).thenReturn('S');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     final centralCommand = _MockCentralCommand();
 
     /// The behavior doesn't matter, just needs to have a null destination.
-    when(() => centralCommand.getBehavior('S'))
-        .thenAnswer((_) => BehaviorState('S', Behavior.idle));
+    when(() => centralCommand.getBehavior(shipSymbol))
+        .thenAnswer((_) => BehaviorState(shipSymbol, Behavior.idle));
 
     final now = DateTime(2021);
     DateTime getNow() => now;

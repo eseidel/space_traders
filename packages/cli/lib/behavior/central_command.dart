@@ -56,7 +56,7 @@ import 'package:meta/meta.dart';
 class _ShipTimeout {
   const _ShipTimeout(this.shipSymbol, this.behavior, this.timeout);
 
-  final String shipSymbol;
+  final ShipSymbol shipSymbol;
   final Behavior behavior;
   final DateTime timeout;
 }
@@ -141,7 +141,8 @@ class CentralCommand {
   /// Check if the given behavior is disabled for the given ship.
   bool isBehaviorDisabledForShip(Ship ship, Behavior behavior) {
     bool matches(_ShipTimeout timeout) {
-      return timeout.shipSymbol == ship.symbol && timeout.behavior == behavior;
+      return timeout.shipSymbol == ship.shipSymbol &&
+          timeout.behavior == behavior;
     }
 
     final timeouts = _shipTimeouts.where(matches).toList();
@@ -221,14 +222,12 @@ class CentralCommand {
     String why,
     Duration timeout,
   ) async {
-    final currentState = _behaviorCache.getBehavior(ship.symbol);
+    final shipSymbol = ship.shipSymbol;
+    final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
-      _behaviorCache.deleteBehavior(ship.symbol);
+      _behaviorCache.deleteBehavior(shipSymbol);
     } else {
-      shipInfo(
-        ship,
-        'Not deleting ${currentState.behavior} for ${ship.symbol}.',
-      );
+      shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
     }
 
     shipWarn(
@@ -247,48 +246,47 @@ class CentralCommand {
     String why,
     Duration duration,
   ) async {
-    final currentState = _behaviorCache.getBehavior(ship.symbol);
+    final shipSymbol = ship.shipSymbol;
+    final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
-      _behaviorCache.deleteBehavior(ship.symbol);
+      _behaviorCache.deleteBehavior(shipSymbol);
     } else {
-      shipInfo(
-        ship,
-        'Not deleting ${currentState.behavior} for ${ship.symbol}.',
-      );
+      shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
     }
 
     shipWarn(
       ship,
-      '$why Disabling $behavior for ${ship.symbol} '
+      '$why Disabling $behavior for $shipSymbol '
       'for ${approximateDuration(duration)}.',
     );
 
     final expiration = DateTime.timestamp().add(duration);
-    _shipTimeouts.add(_ShipTimeout(ship.symbol, behavior, expiration));
+    _shipTimeouts.add(_ShipTimeout(ship.shipSymbol, behavior, expiration));
   }
 
   /// Complete the current behavior for the given ship.
-  Future<void> completeBehavior(String shipSymbol) async {
+  Future<void> completeBehavior(ShipSymbol shipSymbol) async {
     return _behaviorCache.deleteBehavior(shipSymbol);
   }
 
   /// Set the [RoutePlan] for the ship.
   Future<void> setRoutePlan(Ship ship, RoutePlan routePlan) async {
-    final state = _behaviorCache.getBehavior(ship.symbol)!
+    final state = _behaviorCache.getBehavior(ship.shipSymbol)!
       ..routePlan = routePlan;
-    _behaviorCache.setBehavior(ship.symbol, state);
+    _behaviorCache.setBehavior(ship.shipSymbol, state);
   }
 
   /// Get the current [RoutePlan] for the given ship.
   RoutePlan? currentRoutePlan(Ship ship) {
-    final state = _behaviorCache.getBehavior(ship.symbol);
+    final state = _behaviorCache.getBehavior(ship.shipSymbol);
     return state?.routePlan;
   }
 
   /// The [ship] has reached its destination.
   Future<void> reachedEndOfRoutePlan(Ship ship) async {
-    final state = _behaviorCache.getBehavior(ship.symbol)!..routePlan = null;
-    _behaviorCache.setBehavior(ship.symbol, state);
+    final state = _behaviorCache.getBehavior(ship.shipSymbol)!
+      ..routePlan = null;
+    _behaviorCache.setBehavior(ship.shipSymbol, state);
   }
 
   /// Record the given [transactions] for the current deal for [ship].
@@ -296,35 +294,33 @@ class CentralCommand {
     Ship ship,
     List<Transaction> transactions,
   ) async {
-    final behaviorState = getBehavior(ship.symbol)!;
+    final behaviorState = getBehavior(ship.shipSymbol)!;
     final deal = behaviorState.deal!;
     behaviorState.deal = deal.byAddingTransactions(transactions);
-    await setBehavior(ship.symbol, behaviorState);
+    await setBehavior(ship.shipSymbol, behaviorState);
   }
 
   // This feels wrong.
   /// Load or create the right behavior state for [ship].
   Future<BehaviorState> loadBehaviorState(Ship ship) async {
-    final state = _behaviorCache.getBehavior(ship.symbol);
+    final shipSymbol = ship.shipSymbol;
+    final state = _behaviorCache.getBehavior(shipSymbol);
     if (state == null) {
       final behavior = behaviorFor(ship);
-      final newState = BehaviorState(
-        ship.symbol,
-        behavior,
-      );
-      _behaviorCache.setBehavior(ship.symbol, newState);
+      final newState = BehaviorState(ship.shipSymbol, behavior);
+      _behaviorCache.setBehavior(shipSymbol, newState);
     }
-    return _behaviorCache.getBehavior(ship.symbol)!;
+    return _behaviorCache.getBehavior(shipSymbol)!;
   }
 
   // Needs refactoring, provided for compatiblity with old BehaviorManager.
   /// Get the current [BehaviorState] for the  [shipSymbol].
-  BehaviorState? getBehavior(String shipSymbol) {
+  BehaviorState? getBehavior(ShipSymbol shipSymbol) {
     return _behaviorCache.getBehavior(shipSymbol);
   }
 
   /// Set the current [BehaviorState] for the [shipSymbol].
-  Future<void> setBehavior(String shipSymbol, BehaviorState state) async {
+  Future<void> setBehavior(ShipSymbol shipSymbol, BehaviorState state) async {
     _behaviorCache.setBehavior(shipSymbol, state);
   }
 
@@ -504,7 +500,7 @@ class CentralCommand {
     Behavior behavior,
   ) sync* {
     for (final state in _behaviorCache.states) {
-      if (state.shipSymbol == thisShipSymbol.symbol) {
+      if (state.shipSymbol == thisShipSymbol) {
         continue;
       }
       if (state.behavior != behavior) {
@@ -974,12 +970,12 @@ Map<SystemSymbol, int> scoreMarketSystems(
 }
 
 /// Returns the ship symbols for all idle haulers.
-List<String> idleHaulerSymbols(
+List<ShipSymbol> idleHaulerSymbols(
   ShipCache shipCache,
   BehaviorCache behaviorCache,
 ) {
   final haulerSymbols =
-      shipCache.ships.where((s) => s.isHauler).map((s) => s.symbol);
+      shipCache.ships.where((s) => s.isHauler).map((s) => s.shipSymbol);
   final idleBehaviors = [Behavior.idle, Behavior.explorer];
   final idleHaulerStates = behaviorCache.states
       .where((s) => haulerSymbols.contains(s.shipSymbol))

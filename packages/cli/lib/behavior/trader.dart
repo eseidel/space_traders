@@ -153,7 +153,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
       ship,
       'Unable to purchase $dealTradeSymbol, giving up on this trade.',
     );
-    await centralCommand.completeBehavior(ship.symbol);
+    await centralCommand.completeBehavior(ship.shipSymbol);
     return null;
   }
 
@@ -218,7 +218,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   // We don't yet record the completed deal anywhere.
   final completedDeal = costedDeal.byAddingTransactions(transactions);
   _logCompletedDeal(ship, completedDeal);
-  await centralCommand.completeBehavior(ship.symbol);
+  await centralCommand.completeBehavior(ship.shipSymbol);
   return null;
 }
 
@@ -244,7 +244,7 @@ Future<DateTime?> _handleContractDealAtDestination(
 
   // Delivering the goods counts as completing the behavior, we'll
   // decide next loop if we need to do more.
-  await centralCommand.completeBehavior(ship.symbol);
+  await centralCommand.completeBehavior(ship.shipSymbol);
 
   if (maybeResponse != null) {
     // Update our cargo counts after fulfilling the contract.
@@ -526,7 +526,7 @@ Future<DateTime?> advanceTrader(
     );
   }
 
-  final behaviorState = centralCommand.getBehavior(ship.symbol)!;
+  final behaviorState = centralCommand.getBehavior(ship.shipSymbol)!;
   final pastDeal = behaviorState.deal;
   final dealCargo = ship.largestCargo(
     where: (i) => i.tradeSymbol == pastDeal?.tradeSymbol,
@@ -641,8 +641,8 @@ Future<DateTime?> advanceTrader(
   }
 
   shipInfo(ship, 'Found deal: ${describeCostedDeal(newDeal)}');
-  final state = centralCommand.getBehavior(ship.symbol)!..deal = newDeal;
-  await centralCommand.setBehavior(ship.symbol, state);
+  final state = centralCommand.getBehavior(ship.shipSymbol)!..deal = newDeal;
+  await centralCommand.setBehavior(ship.shipSymbol, state);
   final waitUntil = await _handleDeal(
     api,
     centralCommand,

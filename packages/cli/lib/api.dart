@@ -50,34 +50,6 @@ class Api {
   final FactionsApi factions;
 }
 
-/// Asserts that the given system symbol is valid.
-void assertIsSystemSymbol(String systemSymbol) {
-  assert(
-    systemSymbol.split('-').length == 2,
-    '$systemSymbol is not a valid system symbol',
-  );
-}
-
-/// Asserts that the given waypoint symbol is valid.
-void assertIsWaypointSymbol(String waypointSymbol) {
-  assert(
-    waypointSymbol.split('-').length == 3,
-    '$waypointSymbol is not a valid waypoint symbol',
-  );
-}
-
-/// parseWaypointString parses a waypoint string into its component parts.
-({String sector, String system, String waypoint}) parseWaypointString(
-  String waypointSymbol,
-) {
-  final parts = waypointSymbol.split('-');
-  return (
-    sector: parts[0],
-    system: '${parts[0]}-${parts[1]}',
-    waypoint: '${parts[0]}-${parts[1]}-${parts[2]}',
-  );
-}
-
 /// A position within an unspecified coordinate space.
 @immutable
 class Position {
@@ -112,7 +84,7 @@ class WaypointPosition extends Position {
   const WaypointPosition(super.x, super.y, this.system) : super._();
 
   /// The system symbol of the waypoint.
-  final String system;
+  final SystemSymbol system;
 
   /// Returns the distance between this position and the given position.
   int distanceTo(WaypointPosition other) {
@@ -222,6 +194,9 @@ class ShipSymbol implements Comparable<ShipSymbol> {
       : name = symbol.split('-')[0],
         number = int.parse(symbol.split('-')[1], radix: 16);
 
+  /// Create a ShipSymbol from a json string.
+  factory ShipSymbol.fromJson(String json) => ShipSymbol.fromString(json);
+
   /// The name part of the ship symbol.
   final String name;
 
@@ -245,6 +220,20 @@ class ShipSymbol implements Comparable<ShipSymbol> {
 
   @override
   String toString() => symbol;
+
+  /// Returns the json representation of the ship symbol.
+  String toJson() => symbol;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipSymbol &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          number == other.number;
+
+  @override
+  int get hashCode => name.hashCode ^ number.hashCode;
 }
 
 /// Extensions onto System to make it easier to work with.
@@ -301,7 +290,7 @@ extension SystemWaypointUtils on SystemWaypoint {
   SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
 
   /// Returns the WaypointPosition of the waypoint.
-  WaypointPosition get position => WaypointPosition(x, y, systemSymbol.system);
+  WaypointPosition get position => WaypointPosition(x, y, systemSymbol);
 
   /// Returns the distance to the given waypoint.
   int distanceTo(SystemWaypoint other) => position.distanceTo(other.position);
@@ -355,7 +344,7 @@ extension WaypointUtils on Waypoint {
   bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
 
   /// Returns the WaypointPosition of the waypoint.
-  WaypointPosition get position => WaypointPosition(x, y, systemSymbol);
+  WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);
 
   /// Returns the distance to the given waypoint.
   int distanceTo(Waypoint other) => position.distanceTo(other.position);
@@ -630,6 +619,23 @@ extension ShipyardUtils on Shipyard {
 extension MarketTransactionUtils on MarketTransaction {
   /// Returns the TradeSymbol for the given transaction.
   TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
+
+  /// Returns the ShipSymbol for the given transaction.
+  ShipSymbol get shipSymbolObject => ShipSymbol.fromString(shipSymbol);
+
+  /// Returns the WaypointSymbol for the given transaction.
+  WaypointSymbol get waypointSymbolObject =>
+      WaypointSymbol.fromString(waypointSymbol);
+}
+
+/// Extensions onto ShipyardTransaction to make it easier to work with.
+extension ShipyardTransactionUtils on ShipyardTransaction {
+  /// Returns the ShipSymbol for the given transaction.
+  ShipSymbol get shipSymbolObject => ShipSymbol.fromString(shipSymbol);
+
+  /// Returns the WaypointSymbol for the given transaction.
+  WaypointSymbol get waypointSymbolObject =>
+      WaypointSymbol.fromString(waypointSymbol);
 }
 
 /// Extensions onto Faction to make it easier to work with.

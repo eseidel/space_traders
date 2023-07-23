@@ -48,7 +48,7 @@ void printSyntheticDeal(SyntheticDeal deal) {
 
 Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final deals = <SyntheticDeal>[];
-  final openDeals = <String, List<Transaction>>{};
+  final openDeals = <ShipSymbol, List<Transaction>>{};
   final ignoredTransactions = <Transaction>[];
   for (final transaction in caches.transactions.entries) {
     // Ignore fuel transactions for now, our logic below would need to be more

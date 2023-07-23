@@ -40,8 +40,8 @@ class Transaction {
   /// Create a new transaction from json.
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
-      shipSymbol: json['shipSymbol'] as String,
-      waypointSymbol: json['waypointSymbol'] as String,
+      shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       tradeSymbol: json['tradeSymbol'] as String,
       quantity: json['quantity'] as int,
       tradeType: MarketTransactionTypeEnum.values
@@ -63,8 +63,8 @@ class Transaction {
     AccountingType accounting,
   ) {
     return Transaction(
-      shipSymbol: transaction.shipSymbol,
-      waypointSymbol: transaction.waypointSymbol,
+      shipSymbol: transaction.shipSymbolObject,
+      waypointSymbol: transaction.waypointSymbolObject,
       tradeSymbol: transaction.tradeSymbol,
       quantity: transaction.units,
       tradeType: transaction.type,
@@ -83,8 +83,8 @@ class Transaction {
   ) {
     return Transaction(
       // shipSymbol is the new ship, not the ship that made the transaction.
-      shipSymbol: transaction.shipSymbol,
-      waypointSymbol: transaction.waypointSymbol,
+      shipSymbol: transaction.shipSymbolObject,
+      waypointSymbol: transaction.waypointSymbolObject,
       tradeSymbol: shipType.value,
       quantity: 1,
       tradeType: MarketTransactionTypeEnum.PURCHASE,
@@ -96,12 +96,13 @@ class Transaction {
   }
 
   /// Ship symbol which made the transaction.
-  final String shipSymbol;
+  final ShipSymbol shipSymbol;
 
   /// Waypoint symbol where the transaction was made.
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
 
   /// Trade symbol of the transaction.
+  // TODO(eseidel): This isn't actually a trade symbol since it includes ships!
   final String tradeSymbol;
 
   /// Quantity of units transacted.
@@ -137,8 +138,8 @@ class Transaction {
   /// Convert the transaction to json.
   Map<String, dynamic> toJson() {
     return {
-      'shipSymbol': shipSymbol,
-      'waypointSymbol': waypointSymbol,
+      'shipSymbol': shipSymbol.toJson(),
+      'waypointSymbol': waypointSymbol.toJson(),
       'tradeSymbol': tradeSymbol,
       'quantity': quantity,
       'tradeType': tradeType.value,
@@ -204,7 +205,7 @@ class TransactionLog extends JsonLog<Transaction> {
   }
 
   /// Return all the ship symbols in the transaction log.
-  Set<String> get shipSymbols {
+  Set<ShipSymbol> get shipSymbols {
     return entries.map((e) => e.shipSymbol).toSet();
   }
 }

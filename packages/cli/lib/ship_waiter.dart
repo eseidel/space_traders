@@ -3,7 +3,7 @@ import 'package:collection/collection.dart';
 
 /// Keeps track of when we expect to interact with a ship next.
 class ShipWaiter {
-  final Map<String, DateTime> _waitUntilByShipSymbol = {};
+  final Map<ShipSymbol, DateTime> _waitUntilByShipSymbol = {};
   List<Ship> _latestShips = [];
 
   void _removeExpiredWaits() {
@@ -22,7 +22,8 @@ class ShipWaiter {
     final entries = _waitUntilByShipSymbol.entries.toList();
     for (final entry in entries) {
       final symbol = entry.key;
-      final ship = _latestShips.firstWhereOrNull((s) => s.symbol == symbol);
+      final ship =
+          _latestShips.firstWhereOrNull((s) => s.symbol == symbol.symbol);
       if (ship == null) {
         _waitUntilByShipSymbol.remove(symbol);
       }
@@ -37,7 +38,7 @@ class ShipWaiter {
   }
 
   /// Updates the wait time for a ship.
-  void updateWaitUntil(String shipSymbol, DateTime? waitUntil) {
+  void updateWaitUntil(ShipSymbol shipSymbol, DateTime? waitUntil) {
     if (waitUntil == null) {
       _waitUntilByShipSymbol.remove(shipSymbol);
     } else {
@@ -46,7 +47,7 @@ class ShipWaiter {
   }
 
   /// Returns the wait time for a ship.
-  DateTime? waitUntil(String shipSymbol) {
+  DateTime? waitUntil(ShipSymbol shipSymbol) {
     return _waitUntilByShipSymbol[shipSymbol];
   }
 

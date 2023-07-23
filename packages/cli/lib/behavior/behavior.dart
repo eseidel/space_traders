@@ -1,3 +1,4 @@
+import 'package:cli/api.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 
@@ -44,7 +45,7 @@ class BehaviorState {
   /// Create a new behavior state from JSON.
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
     final behavior = Behavior.fromJson(json['behavior'] as String);
-    final shipSymbol = json['shipSymbol'] as String;
+    final shipSymbol = ShipSymbol.fromJson(json['shipSymbol'] as String);
     final deal = json['deal'] == null
         ? null
         : CostedDeal.fromJson(json['deal'] as Map<String, dynamic>);
@@ -60,7 +61,7 @@ class BehaviorState {
   }
 
   /// The symbol of the ship this state is for.
-  final String shipSymbol;
+  final ShipSymbol shipSymbol;
 
   /// The current behavior.
   final Behavior behavior;
@@ -75,7 +76,7 @@ class BehaviorState {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'behavior': behavior.toJson(),
-      'shipSymbol': shipSymbol,
+      'shipSymbol': shipSymbol.toJson(),
       'deal': deal?.toJson(),
       'routePlan': routePlan?.toJson(),
     };

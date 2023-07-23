@@ -63,11 +63,10 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final lookback = Duration(minutes: lookbackMinutes);
 
   final transactionLog = TransactionLog.load(fs);
-  final shipSymbols = transactionLog.shipSymbols;
-  final shipIds = shipSymbols.map(ShipSymbol.fromString).toList()..sort();
+  final shipSymbols = transactionLog.shipSymbols.toList()..sort();
   final behaviorCache = BehaviorCache.load(fs);
 
-  final longestHexNumber = shipIds.fold(
+  final longestHexNumber = shipSymbols.fold(
     0,
     (m, s) => m > s.hexNumber.length ? m : s.hexNumber.length,
   );
@@ -94,18 +93,18 @@ Future<void> command(FileSystem fs, List<String> args) async {
             t.accounting == AccountingType.fuel),
   );
 
-  for (final shipId in shipIds) {
-    final ship = shipCache.ship(shipId.symbol);
-    final state = behaviorCache.getBehavior(shipId.symbol);
+  for (final shipSymbol in shipSymbols) {
+    final ship = shipCache.ship(shipSymbol);
+    final state = behaviorCache.getBehavior(shipSymbol);
     final stateName =
         state?.behavior.name ?? behaviorFromFrame(ship)?.name ?? 'Unknown';
     final summary = TransactionSummary(
-      transactions.where((t) => t.shipSymbol == shipId.symbol),
+      transactions.where((t) => t.shipSymbol == shipSymbol),
     );
     behaviorCounts[stateName] = (behaviorCounts[stateName] ?? 0) + 1;
     behaviorCreditPerSecondTotals[stateName] =
         (behaviorCreditPerSecondTotals[stateName] ?? 0) + summary.perSecond;
-    logger.info('${shipId.hexNumber.padRight(longestHexNumber)}  '
+    logger.info('${shipSymbol.hexNumber.padRight(longestHexNumber)}  '
         '${c(summary.perMinute).padLeft(5)} c/m '
         '${c(summary.perSecond).padLeft(4)} c/s '
         '  ${stateName.padRight(10)}');

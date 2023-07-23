@@ -38,13 +38,14 @@ void main() {
     final shipNav = _MockShipNav();
     final now = DateTime(2021);
     DateTime getNow() => now;
-    when(() => ship.symbol).thenReturn('S');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final behaviorCache = _MockBehaviorCache();
     when(() => caches.behaviors).thenReturn(behaviorCache);
 
-    final behaviorState = BehaviorState('S', Behavior.idle);
+    final behaviorState = BehaviorState(shipSymbol, Behavior.idle);
     final centralCommand = _MockCentralCommand();
     when(() => centralCommand.loadBehaviorState(ship))
         .thenAnswer((_) => Future.value(behaviorState));
@@ -77,7 +78,8 @@ void main() {
     final now = DateTime(2021);
     final arrivalTime = now.add(const Duration(seconds: 1));
     DateTime getNow() => now;
-    when(() => ship.symbol).thenReturn('S');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
@@ -85,8 +87,9 @@ void main() {
     when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
     final centralCommand = _MockCentralCommand();
 
-    when(() => centralCommand.loadBehaviorState(ship))
-        .thenAnswer((_) => Future.value(BehaviorState('S', Behavior.idle)));
+    when(() => centralCommand.loadBehaviorState(ship)).thenAnswer(
+      (_) => Future.value(BehaviorState(shipSymbol, Behavior.idle)),
+    );
 
     final logger = _MockLogger();
 
@@ -101,6 +104,6 @@ void main() {
       ),
     );
     expect(waitUntil, arrivalTime);
-    verify(() => logger.info('🛸#S  ✈️  to S-A-W, 1s left')).called(1);
+    verify(() => logger.info('🛸#1  ✈️  to S-A-W, 1s left')).called(1);
   });
 }
