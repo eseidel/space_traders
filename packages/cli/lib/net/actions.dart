@@ -334,12 +334,12 @@ Future<DateTime> navigateToLocalWaypointAndLog(
       'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}}',
     );
   }
-  // Could log used Fuel. result.fuel.fuelConsumed
+  final consumedFuel = result.fuel.consumed?.amount;
+  final fuelString = consumedFuel != null ? ' spend $consumedFuel fuel' : '';
   shipInfo(
     ship,
     '🛫 to ${waypoint.symbol} ${waypoint.type} '
-    '(${approximateDuration(flightTime)}) '
-    'spent ${result.fuel.consumed?.amount} fuel',
+    '(${approximateDuration(flightTime)})$fuelString',
   );
   return result.nav.route.arrival;
 }
