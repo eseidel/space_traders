@@ -123,6 +123,40 @@ CostedTrip? findBestMarketToBuy(
 //   final RoutePlan route;
 // }
 
+// class ShipTemplate {
+//   const ShipTemplate({
+//     required this.frameType,
+//     required this.mounts,
+//   });
+//   final ShipFrameSymbolEnum frameType;
+//   final Map<TradeSymbol, int> mounts;
+// }
+
+// According to SAF:
+// Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
+
+// final templates = [
+//   ShipTemplate(
+//     frameType: ShipFrameSymbolEnum.MINER,
+//     mounts: {
+//       TradeSymbol.MOUNT_MINING_LASER_II: 2,
+//       TradeSymbol.MOUNT_MINING_LASER_I: 1,
+//     },
+//   )
+// ];
+
+// Map<TradeSymbol, int> neededMounts(ShipCache shipCache) {
+//   final needed = <TradeSymbol, int>{};
+//   for (final ship in shipCache.ships) {
+//     for (final mount in ship.mounts) {
+//       if (mount.isMissing) {
+//         needed[mount.tradeSymbol] = (needed[mount.tradeSymbol] ?? 0) + 1;
+//       }
+//     }
+//   }
+//   return needed;
+// }
+
 /// Advance the behavior of the given ship.
 Future<DateTime?> advanceDeliver(
   Api api,
@@ -131,10 +165,16 @@ Future<DateTime?> advanceDeliver(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  // Figure out what item we're supposed to get.
+  // Figure out if there are any thigns needing to be delivered.
+  // Look at our ore-hounds, see if they are matching spec.
+  // If mounts are missing, see if we can buy them.
+  // If so, in what priority?
+  // If we can't buy them, disable the behavior for a while.
 
-  // According to SAF:
-  // Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
+  // Figure out what item we're supposed to get.
+  // const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
+  const tradeSymbol = TradeSymbol.MOUNT_MINING_LASER_II;
+  const amountToBuy = 10;
 
   final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
   final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
@@ -149,9 +189,6 @@ Future<DateTime?> advanceDeliver(
     return null;
   }
 
-  // const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
-  const tradeSymbol = TradeSymbol.MOUNT_MINING_LASER_II;
-  const amountToBuy = 10;
   final haveItem = ship.countUnits(tradeSymbol) > 0;
   final atDelivery = ship.waypointSymbol == shipyard.waypointSymbol;
 
