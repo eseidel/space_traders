@@ -16,7 +16,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   for (final faction in factions) {
     final hq = faction.headquartersSymbol;
     final reachable = clusterCache.connectedSystemCount(hq.systemSymbol);
-    logger.info('$faction: $reachable');
+    logger.info('${faction.symbol}: $reachable');
   }
 }
 

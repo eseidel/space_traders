@@ -173,7 +173,7 @@ class CentralCommand {
       // Behavior.buyShip,
       // Behavior.trader,
       // Hack becuase mining is so bad towards end game.
-      Behavior.miner,
+      // Behavior.miner,
       // Behavior.idle,
       // Hangs too much for now.
       // Behavior.explorer,
@@ -182,12 +182,15 @@ class CentralCommand {
     // Probably want special behavior for the command ship when we
     // only have a few ships?
 
+    final shipCount = _shipCache.ships.length;
+
     final behaviors = {
       // TODO(eseidel): Evaluate based on expected value, not just order.
       ShipRole.COMMAND: [
         Behavior.buyShip,
-        // Behavior.trader,
-        Behavior.miner,
+        if (shipCount > 10) Behavior.trader,
+        if (shipCount <= 10) Behavior.miner,
+        if (shipCount > 10) Behavior.explorer,
       ],
       // Haulers are terrible explorers, but early game we just need
       // things mapping.
@@ -801,6 +804,15 @@ class CentralCommand {
     return neededGood!.unitsRequired -
         neededGood.unitsFulfilled -
         unitsAssigned;
+  }
+
+  /// Returns the percentile of surveys to discard.
+  double get surveyPercentileThreshold {
+    // In the early game its more important to mine than get the perfect survey.
+    if (_shipCache.ships.length < 5) {
+      return 0.5;
+    }
+    return 0.9;
   }
 
   /// Returns the symbol of the nearest mine to the given [ship].
