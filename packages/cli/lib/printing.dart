@@ -203,6 +203,7 @@ Future<Ship> chooseShip(
   return ship;
 }
 
+// TODO(eseidel): This should round, e.g. 0:02:43.000000 should be 3m not 2m.
 /// Create an approximate string for the given [duration].
 String approximateDuration(Duration duration) {
   if (duration.inDays.abs() >= 365) {

@@ -16,6 +16,9 @@ enum Behavior {
   /// Idle.
   idle,
 
+  /// Fetch an item, bring it somewhere and wait.
+  deliver,
+
   /// Explore the universe.
   explorer;
 

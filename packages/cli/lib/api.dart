@@ -390,9 +390,7 @@ extension ShipUtils on Ship {
   }
 
   /// Returns the amount of the given trade good the ship has.
-  int countUnits(TradeSymbol tradeSymbol) {
-    return cargo.countUnits(tradeSymbol);
-  }
+  int countUnits(TradeSymbol tradeSymbol) => cargo.countUnits(tradeSymbol);
 
   /// Returns the largest cargo in the ship.
   ShipCargoItem? largestCargo({bool Function(ShipCargoItem)? where}) {
