@@ -25,8 +25,10 @@ class ChartedValues {
         WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
     final traitSymbols = _loadTraitSymbols(json);
     final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
+    final waypointSymbol =
+        WaypointSymbol.fromJson(json['waypointSymbol'] as String);
     return ChartedValues(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: waypointSymbol,
       orbitals: orbitals,
       faction: faction,
       traitSymbols: traitSymbols,
@@ -51,7 +53,7 @@ class ChartedValues {
   }
 
   /// Symbol for this waypoint.
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
 
   /// Waypoints that orbit this waypoint.
   // TODO(eseidel): It's not clear if we should store orbitals. I think they're
@@ -68,16 +70,18 @@ class ChartedValues {
   final Chart chart;
 
   /// Converts this charted values to JSON data.
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'waypointSymbol': waypointSymbol,
-        'orbitals': orbitals.map((o) => o.toJson()).toList(),
-        'faction': faction?.toJson(),
-        'traitSymbols': traitSymbols.map((e) => e.value).toList(),
-        'chart': chart.toJson(),
-      };
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'waypointSymbol': waypointSymbol.toJson(),
+      'orbitals': orbitals.map((o) => o.toJson()).toList(),
+      'faction': faction?.toJson(),
+      'traitSymbols': traitSymbols.map((e) => e.value).toList(),
+      'chart': chart.toJson(),
+    };
+  }
 }
 
-typedef _Record = Map<String, ChartedValues>;
+typedef _Record = Map<WaypointSymbol, ChartedValues>;
 
 /// A cached of charted values from Waypoints.
 class ChartingCache extends JsonStore<_Record> {
@@ -87,7 +91,14 @@ class ChartingCache extends JsonStore<_Record> {
     this.waypointTraits, {
     required super.fs,
     super.path = defaultCacheFilePath,
-  });
+  }) : super(
+          recordToJson: (r) => r.map(
+            (key, value) => MapEntry(
+              key.toJson(),
+              value.toJson(),
+            ),
+          ),
+        );
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'data/charts.json';
@@ -107,7 +118,7 @@ class ChartingCache extends JsonStore<_Record> {
           path,
           (Map<String, dynamic> j) => j.map(
             (key, value) => MapEntry(
-              key,
+              WaypointSymbol.fromJson(key),
               ChartedValues.fromJson(value as Map<String, dynamic>),
             ),
           ),
@@ -118,7 +129,7 @@ class ChartingCache extends JsonStore<_Record> {
   }
 
   /// The charted values by waypoint symbol.
-  Map<String, ChartedValues> get _valuesBySymbol => record;
+  Map<WaypointSymbol, ChartedValues> get _valuesBySymbol => record;
 
   /// The charted values.
   @visibleForTesting
@@ -137,14 +148,14 @@ class ChartingCache extends JsonStore<_Record> {
       return;
     }
     final chartedValues = ChartedValues(
-      waypointSymbol: waypoint.symbol,
+      waypointSymbol: waypoint.waypointSymbol,
       orbitals: waypoint.orbitals,
       faction: waypoint.faction,
       traitSymbols: waypoint.traits.map((e) => e.symbol).toList(),
       chart: chart,
     );
     waypointTraits.addTraits(waypoint.traits);
-    _valuesBySymbol[waypoint.symbol] = chartedValues;
+    _valuesBySymbol[waypoint.waypointSymbol] = chartedValues;
     // This is just a minor optimization to allow addWaypoints to only
     // save once.
     if (shouldSave) {
@@ -161,13 +172,13 @@ class ChartingCache extends JsonStore<_Record> {
   }
 
   /// Gets the charted values for the given waypoint symbol.
-  ChartedValues? valuesForSymbol(String waypointSymbol) =>
+  ChartedValues? valuesForSymbol(WaypointSymbol waypointSymbol) =>
       _valuesBySymbol[waypointSymbol];
 
   /// Sythesizes a waypoint from cached values if possible.
   Waypoint? waypointFromSymbol(
     SystemsCache systemsCache,
-    String waypointSymbol,
+    WaypointSymbol waypointSymbol,
   ) {
     final values = valuesForSymbol(waypointSymbol);
     if (values == null) {

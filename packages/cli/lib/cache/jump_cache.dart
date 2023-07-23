@@ -1,18 +1,20 @@
+import 'package:cli/api.dart';
+
 /// A route between two systems.
 class JumpPlan {
   /// Creates a route between two systems.
-  JumpPlan(Iterable<String> route)
+  JumpPlan(Iterable<SystemSymbol> route)
       : route = List.from(route),
         assert(route.length >= 2, 'Route must have at least two systems');
 
   /// The system where the route starts.
-  String get fromSystem => route.first;
+  SystemSymbol get fromSystem => route.first;
 
   /// The system where the route ends.
-  String get toSystem => route.last;
+  SystemSymbol get toSystem => route.last;
 
   /// The systems that make up the route.
-  final List<String> route;
+  final List<SystemSymbol> route;
 
   /// Returns a reversed copy of this route.
   JumpPlan reversed() => JumpPlan(route.reversed);
@@ -24,8 +26,8 @@ class JumpCache {
 
   /// Check to see if a route exists between two systems.
   JumpPlan? lookupJumpPlan({
-    required String fromSystem,
-    required String toSystem,
+    required SystemSymbol fromSystem,
+    required SystemSymbol toSystem,
   }) {
     for (final plan in _plans) {
       final fromIndex = plan.route.indexOf(fromSystem);
@@ -45,7 +47,5 @@ class JumpCache {
   }
 
   /// Add a route between two systems.
-  void addJumpPlan(JumpPlan plan) {
-    _plans.add(plan);
-  }
+  void addJumpPlan(JumpPlan plan) => _plans.add(plan);
 }

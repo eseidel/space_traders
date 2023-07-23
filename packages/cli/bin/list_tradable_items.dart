@@ -10,10 +10,9 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final ships = caches.ships.ships;
   final ship = ships.first;
 
-  final connectedSystems =
-      caches.waypoints.connectedSystems(ship.nav.systemSymbol);
+  final connectedSystems = caches.waypoints.connectedSystems(ship.systemSymbol);
   final markets = await connectedSystems
-      .asyncExpand((s) => caches.markets.marketsInSystem(s.symbol))
+      .asyncExpand((s) => caches.markets.marketsInSystem(s.systemSymbol))
       .toList();
 
   // Collect all the trade symbols and their market counts.

@@ -351,8 +351,8 @@ class CentralCommand {
         );
         if (unitsNeeded > 0) {
           yield SellOpp(
-            marketSymbol: good.destinationSymbol,
-            tradeSymbol: good.tradeSymbol,
+            marketSymbol: good.destination,
+            tradeSymbol: good.tradeSymbolObject,
             contractId: contract.id,
             price: _maxWorthwhileUnitPurchasePrice(contract, good),
             maxUnits: unitsNeeded,
@@ -373,12 +373,12 @@ class CentralCommand {
     required int maxJumps,
     required int maxTotalOutlay,
     required int maxWaypoints,
-    String? overrideStartSymbol,
+    WaypointSymbol? overrideStartSymbol,
   }) async {
-    final startSymbol = overrideStartSymbol ?? ship.nav.waypointSymbol;
+    final startSymbol = overrideStartSymbol ?? ship.waypointSymbol;
     final systemSymbol = overrideStartSymbol != null
-        ? parseWaypointString(overrideStartSymbol).system
-        : ship.nav.systemSymbol;
+        ? overrideStartSymbol.systemSymbol
+        : ship.systemSymbol;
 
     final inProgress = _dealsInProgress().toList();
     // Avoid having two ships working on the same deal since by the time the
@@ -445,7 +445,7 @@ class CentralCommand {
     required int profitPerSecondThreshold,
   }) async {
     final shipSymbol = ship.symbol;
-    final shipSystem = systemsCache.systemBySymbol(ship.nav.systemSymbol);
+    final shipSystem = systemsCache.systemBySymbol(ship.systemSymbol);
     while (true) {
       final closest = search.closestAvailableSystem(systemsCache, shipSystem);
       if (closest == null) {
@@ -453,9 +453,9 @@ class CentralCommand {
         return null;
       }
       search.markUsed(closest);
-      final score = search.scoreFor(closest.symbol);
+      final score = search.scoreFor(closest.systemSymbol);
       final systemJumpGate =
-          systemsCache.jumpGateWaypointForSystem(closest.symbol)!;
+          systemsCache.jumpGateWaypointForSystem(closest.systemSymbol)!;
       final deal = await findNextDeal(
         agentCache,
         contractCache,
@@ -463,7 +463,7 @@ class CentralCommand {
         systemsCache,
         routePlanner,
         ship,
-        overrideStartSymbol: systemJumpGate.symbol,
+        overrideStartSymbol: systemJumpGate.waypointSymbol,
         maxJumps: maxJumps,
         maxTotalOutlay: agentCache.agent.credits,
         maxWaypoints: maxWaypoints,
@@ -486,7 +486,7 @@ class CentralCommand {
         score: score,
         distance: shipSystem.distanceTo(closest),
         profitPerSecond: profitPerSecond,
-        destinationSymbol: systemJumpGate.symbol,
+        destinationSymbol: systemJumpGate.waypointSymbol,
       );
       shipInfo(
           ship,
@@ -512,11 +512,10 @@ class CentralCommand {
       }
       final destination = state.routePlan?.endSymbol;
       if (destination != null) {
-        final waypointSymbol = WaypointSymbol.fromString(destination);
-        yield waypointSymbol.systemSymbol;
+        yield destination.systemSymbol;
       } else {
         final ship = _shipCache.ship(state.shipSymbol);
-        yield SystemSymbol.fromString(ship.nav.systemSymbol);
+        yield ship.systemSymbol;
       }
     }
   }
@@ -537,7 +536,7 @@ class CentralCommand {
     Ship ship,
     ShipyardPrices shipyardPrices,
     AgentCache agentCache, {
-    String? shipyardSymbol,
+    WaypointSymbol? shipyardSymbol,
   }) {
     // We should buy a new ship when:
     // - We have request capacity to spare
@@ -566,9 +565,8 @@ class CentralCommand {
     }
 
     // Buy ships based on earnings of that ship type over the last N hours?
-    final systemSymbol = ship.nav.systemSymbol;
-    final hqSystemSymbol =
-        parseWaypointString(agentCache.agent.headquarters).system;
+    final systemSymbol = ship.systemSymbol;
+    final hqSystemSymbol = agentCache.headquartersSymbol.systemSymbol;
     final inStartSystem = systemSymbol == hqSystemSymbol;
 
     // Early game should be:
@@ -692,7 +690,7 @@ class CentralCommand {
     // TODO(eseidel): Consider which ships are sold at this shipyard.
 
     // This assumes the ship in question is at a shipyard and already docked.
-    final shipyardSymbol = ship.nav.waypointSymbol;
+    final shipyardSymbol = ship.waypointSymbol;
     final shipType = shipTypeToBuy(
       ship,
       shipyardPrices,
@@ -817,10 +815,10 @@ class CentralCommand {
     AgentCache agentCache,
     Ship ship,
   ) {
-    final hq = agentCache.agent.headquarters;
-    final hqSystemSymbol = parseWaypointString(hq).system;
+    final hq = agentCache.agent.headquartersSymbol;
+    final hqSystemSymbol = hq.systemSymbol;
     final systemSymbol = hqSystemSymbol;
-    // final systemSymbol = ship.nav.systemSymbol;
+    // final systemSymbol = ship.systemSymbol;
     // Return the nearest mine to the ship for now?
     final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
     return systemWaypoints
@@ -843,7 +841,7 @@ class CentralCommand {
     //     ship,
     //     Behavior.miner,
     //     'No good mining system found in '
-    //     '$maxJumps radius of ${ship.nav.systemSymbol}.',
+    //     '$maxJumps radius of ${ship.systemSymbol}.',
     //     const Duration(hours: 1),
     //   );
     //   return null;
@@ -851,7 +849,7 @@ class CentralCommand {
   }
 
   /// Find a better destination for the given trader [ship].
-  Future<String?> findBetterTradeLocation(
+  Future<WaypointSymbol?> findBetterTradeLocation(
     SystemsCache systemsCache,
     RoutePlanner routePlanner,
     AgentCache agentCache,
@@ -941,7 +939,7 @@ Iterable<Contract> affordableContracts(
 
 /// Compute the score for each market based on the distance of each good's
 /// price from the median price.
-Map<String, int> scoreMarketSystems(
+Map<SystemSymbol, int> scoreMarketSystems(
   MarketPrices marketPrices, {
   int limit = 200,
 }) {
@@ -958,10 +956,10 @@ Map<String, int> scoreMarketSystems(
     medianSellPrices[tradeSymbol] = marketPrices.medianSellPrice(tradeSymbol);
   }
 
-  final marketSystemScores = <String, int>{};
+  final marketSystemScores = <SystemSymbol, int>{};
   for (final price in marketPrices.prices) {
     final market = price.waypointSymbol;
-    final system = parseWaypointString(market).system;
+    final system = market.systemSymbol;
     final medianPurchasePrice = medianPurchasePrices[price.tradeSymbol]!;
     final medianSellPrice = medianSellPrices[price.tradeSymbol]!;
     final purchaseScore = (price.purchasePrice - medianPurchasePrice).abs();
@@ -1018,7 +1016,7 @@ class _ShipPlacement {
   final int score;
   final int distance;
   final int profitPerSecond;
-  final String destinationSymbol;
+  final WaypointSymbol destinationSymbol;
 }
 
 class _MarketSearch {
@@ -1044,7 +1042,7 @@ class _MarketSearch {
   }
 
   final List<System> marketSystems;
-  final Map<String, int> marketSystemScores;
+  final Map<SystemSymbol, int> marketSystemScores;
   final Set<SystemSymbol> claimedSystemSymbols;
 
   System? closestAvailableSystem(
@@ -1059,5 +1057,5 @@ class _MarketSearch {
 
   void markUsed(System system) => claimedSystemSymbols.add(system.systemSymbol);
 
-  int scoreFor(String systemSymbol) => marketSystemScores[systemSymbol]!;
+  int scoreFor(SystemSymbol systemSymbol) => marketSystemScores[systemSymbol]!;
 }

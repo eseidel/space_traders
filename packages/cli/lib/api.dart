@@ -133,6 +133,10 @@ class WaypointPosition extends Position {
 class WaypointSymbol {
   const WaypointSymbol._(this.waypoint);
 
+  /// Create a WaypointSymbol from a json string.
+  factory WaypointSymbol.fromJson(String json) =>
+      WaypointSymbol.fromString(json);
+
   /// Create a WaypointSymbol from a string.
   factory WaypointSymbol.fromString(String symbol) {
     if (symbol.split('-').length != 3) {
@@ -159,12 +163,15 @@ class WaypointSymbol {
   @override
   String toString() => waypoint;
 
+  /// Returns the json representation of the waypoint.
+  String toJson() => waypoint;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is WaypointSymbol &&
           runtimeType == other.runtimeType &&
-          system == other.waypoint;
+          waypoint == other.waypoint;
 
   @override
   int get hashCode => waypoint.hashCode;
@@ -261,6 +268,18 @@ extension SystemUtils on System {
   int distanceTo(System other) => position.distanceTo(other.position);
 }
 
+/// Extensions onto ConnectedSystem to make it easier to work with.
+extension ConnectedSystemUtils on ConnectedSystem {
+  /// Returns the SystemSymbol of the system.
+  SystemSymbol get systemSymbol => SystemSymbol.fromString(symbol);
+
+  /// Returns the SystemPosition of the system.
+  SystemPosition get position => SystemPosition(x, y);
+
+  /// Returns the distance to the given system.
+  int distanceTo(System other) => position.distanceTo(other.position);
+}
+
 /// Extensions onto SystemWaypoint to make it easier to work with.
 extension SystemWaypointUtils on SystemWaypoint {
   /// Returns true if the waypoint has the given type.
@@ -290,6 +309,12 @@ extension SystemWaypointUtils on SystemWaypoint {
 
 /// Extensions onto Waypoint to make it easier to work with.
 extension WaypointUtils on Waypoint {
+  /// Returns the WaypointSymbol of the waypoint.
+  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+
+  /// The system symbol of the waypoint.
+  SystemSymbol get systemSymbolObject => waypointSymbol.systemSymbol;
+
   /// Converts the waypoint to a SystemWaypoint.
   SystemWaypoint toSystemWaypoint() {
     return SystemWaypoint(
@@ -482,6 +507,16 @@ extension ShipUtils on Ship {
   }
 }
 
+/// Extensions onto ShipNav to make it easier to work with.
+extension ShipNavUtils on ShipNav {
+  /// Returns the current SystemSymbol of the ship.
+  SystemSymbol get systemSymbolObject => SystemSymbol.fromString(systemSymbol);
+
+  /// Returns the current WaypointSymbol of the ship.
+  WaypointSymbol get waypointSymbolObject =>
+      WaypointSymbol.fromString(waypointSymbol);
+}
+
 /// Extensions onto Contract to make it easier to work with.
 extension ContractUtils on Contract {
   // bool needsItem(String tradeSymbol) => goodNeeded(tradeSymbol) != null;
@@ -504,6 +539,10 @@ extension ContractUtils on Contract {
 extension ContractDeliverGoodUtils on ContractDeliverGood {
   /// Returns the amount of the given trade good the contract needs.
   int get amountNeeded => unitsRequired - unitsFulfilled;
+
+  /// Destination as a WaypointSymbol.
+  WaypointSymbol get destination =>
+      WaypointSymbol.fromString(destinationSymbol);
 
   /// Returns tradeSymbol as a TradeSymbol object.
   TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
@@ -535,6 +574,12 @@ enum ExchangeType {
 
 /// Extensions onto Market to make it easier to work with.
 extension MarketUtils on Market {
+  /// Returns the WaypointSymbol of the market.
+  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+
+  /// Returns the SystemSymbol of the market.
+  SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
+
   /// Returns the TradeType for the given trade symbol or null if the market
   /// doesn't trade that good.
   ExchangeType? exchangeType(TradeSymbol tradeSymbol) {
@@ -572,6 +617,9 @@ extension MarketUtils on Market {
 
 /// Extensions onto Shipyard to make it easier to work with.
 extension ShipyardUtils on Shipyard {
+  /// Returns the WaypointSymbol for the shipyard.
+  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+
   /// Returns true if the Shipyard has the given ship type.
   bool hasShipType(ShipType shipType) {
     return shipTypes.any((s) => s.type == shipType);
@@ -582,6 +630,20 @@ extension ShipyardUtils on Shipyard {
 extension MarketTransactionUtils on MarketTransaction {
   /// Returns the TradeSymbol for the given transaction.
   TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
+}
+
+/// Extensions onto Faction to make it easier to work with.
+extension FactionUtils on Faction {
+  /// Returns the WaypointSymbol for the faction headquarters.
+  WaypointSymbol get headquartersSymbol =>
+      WaypointSymbol.fromString(headquarters);
+}
+
+/// Extensions onto Agent to make it easier to work with.
+extension AgentUtils on Agent {
+  /// Returns the WaypointSymbol for the agent headquarters.
+  WaypointSymbol get headquartersSymbol =>
+      WaypointSymbol.fromString(headquarters);
 }
 
 /// Returns the duration until the given date time.

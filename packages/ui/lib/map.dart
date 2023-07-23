@@ -68,7 +68,7 @@ class SystemMapPainter extends CustomPainter {
   SystemAttributes attributesForSystem(System system) {
     if (paintMode == PaintMode.shipColors) {
       final ships = shipCache.ships
-          .where((ship) => ship.nav.systemSymbol == system.symbol);
+          .where((ship) => ship.systemSymbol == system.systemSymbol);
       const colorByType = {
         ShipRole.EXCAVATOR: Colors.green,
         ShipRole.COMMAND: Colors.blue,

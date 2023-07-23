@@ -15,7 +15,7 @@ Future<Waypoint?> _nearbyShipyardWithBestPrice(
   double maxMedianMultipler,
 ) async {
   final shipyardWaypoints =
-      await waypointCache.shipyardWaypointsForSystem(ship.nav.systemSymbol);
+      await waypointCache.shipyardWaypointsForSystem(ship.systemSymbol);
   if (shipyardWaypoints.isEmpty) {
     return null;
   }
@@ -27,7 +27,7 @@ Future<Waypoint?> _nearbyShipyardWithBestPrice(
   int? bestPrice;
   for (final waypoint in shipyardWaypoints) {
     final recentPrice = shipyardPrices.recentPurchasePrice(
-      shipyardSymbol: waypoint.symbol,
+      shipyardSymbol: waypoint.waypointSymbol,
       shipType: shipType,
     );
     // We could also assume it's median as a reason to explore?
@@ -54,8 +54,7 @@ Future<DateTime?> advanceBuyShip(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
-  final currentWaypoint =
-      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   final shipType = centralCommand.shipTypeToBuy(
     ship,
@@ -117,7 +116,7 @@ Future<DateTime?> advanceBuyShip(
     // We should *always* have a recent price unless the shipyard doesn't
     // sell that type of ship.
     final recentPrice = caches.shipyardPrices.recentPurchasePrice(
-      shipyardSymbol: currentWaypoint.symbol,
+      shipyardSymbol: currentWaypoint.waypointSymbol,
       shipType: shipType,
     )!;
     final recentPriceString = creditsString(recentPrice);
@@ -138,7 +137,7 @@ Future<DateTime?> advanceBuyShip(
       caches.ships,
       caches.agent,
       ship,
-      shipyard.symbol,
+      shipyard.waypointSymbol,
       shipType,
     );
 
@@ -166,7 +165,7 @@ Future<DateTime?> advanceBuyShip(
     await centralCommand.disableBehaviorForShip(
       ship,
       Behavior.buyShip,
-      'No shipyard near ${ship.nav.waypointSymbol} '
+      'No shipyard near ${ship.waypointSymbol} '
       'with good price for $shipType.',
       timeout,
     );
@@ -178,6 +177,6 @@ Future<DateTime?> advanceBuyShip(
     caches.systems,
     caches.routePlanner,
     centralCommand,
-    destination.symbol,
+    destination.waypointSymbol,
   );
 }

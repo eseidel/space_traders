@@ -25,7 +25,7 @@ void printWaypoints(List<Waypoint> waypoints, {String indent = ''}) {
 /// systemWaypoints is used to look up the waypoint for the ship's
 /// waypointSymbol.
 String shipDescription(Ship ship, SystemsCache systemsCache) {
-  final waypoint = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
+  final waypoint = systemsCache.waypointFromSymbol(ship.waypointSymbol);
   var string =
       '${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';
   if (ship.crew.morale != 100) {
@@ -181,7 +181,7 @@ DateTime logRemainingTransitTime(
   shipInfo(
     ship,
     // Extra space after emoji is needed for windows powershell.
-    '✈️  to ${ship.nav.waypointSymbol}, '
+    '✈️  to ${ship.waypointSymbol}, '
     '${approximateDuration(flightTime)} left',
   );
   return arrival;

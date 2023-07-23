@@ -2,28 +2,25 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/route.dart';
 import 'package:collection/collection.dart';
 
-typedef _SystemSymbol = String;
-
 Iterable<System> _neighborsFor(
   SystemsCache systemsCache,
   System startSystem,
 ) sync* {
-  final systemSymbol = startSystem.symbol;
-  assert(startSystem.hasJumpGate, 'System $systemSymbol has no jump gate');
-  final systems = systemsCache.connectedSystems(systemSymbol);
+  assert(startSystem.hasJumpGate, 'System $startSystem has no jump gate');
+  final systems = systemsCache.connectedSystems(startSystem.systemSymbol);
   for (final system in systems) {
     // Could also write a ConnectedSystem.toSystem() method.
-    yield systemsCache.systemBySymbol(system.symbol);
+    yield systemsCache.systemBySymbol(system.systemSymbol);
   }
 }
 
 int _approximateTimeBetween(
   SystemsCache systemsCache,
   System aSystem,
-  _SystemSymbol bSymbol,
+  SystemSymbol bSymbol,
   int shipSpeed,
 ) {
-  final aSymbol = aSystem.symbol;
+  final aSymbol = aSystem.systemSymbol;
   if (aSymbol == bSymbol) {
     return 0;
   }
@@ -52,7 +49,7 @@ int _timeBetween(
 }
 
 /// Returns the path from [start] to [end] as a list of system symbols.
-List<String>? findSystemPath(
+List<SystemSymbol>? findSystemPath(
   SystemsCache systemsCache,
   System start,
   System end,
@@ -61,19 +58,19 @@ List<String>? findSystemPath(
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   final frontier =
-      PriorityQueue<(_SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((start.symbol, 0));
-  final cameFrom = <_SystemSymbol, _SystemSymbol>{};
-  final costSoFar = <_SystemSymbol, int>{};
-  costSoFar[start.symbol] = 0;
+      PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
+        ..add((start.systemSymbol, 0));
+  final cameFrom = <SystemSymbol, SystemSymbol>{};
+  final costSoFar = <SystemSymbol, int>{};
+  costSoFar[start.systemSymbol] = 0;
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
-    if (current.$1 == end.symbol) {
+    if (current.$1 == end.systemSymbol) {
       break;
     }
     final currentSystem = systemsCache.systemBySymbol(current.$1);
     for (final nextSystem in _neighborsFor(systemsCache, currentSystem)) {
-      final next = nextSystem.symbol;
+      final next = nextSystem.systemSymbol;
       final newCost = costSoFar[current.$1]! +
           _timeBetween(systemsCache, currentSystem, nextSystem, shipSpeed);
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
@@ -85,31 +82,31 @@ List<String>? findSystemPath(
       }
     }
   }
-  if (cameFrom[end.symbol] == null) {
+  if (cameFrom[end.systemSymbol] == null) {
     return null;
   }
 
-  final symbols = <_SystemSymbol>[];
-  var current = end.symbol;
-  while (current != start.symbol) {
+  final symbols = <SystemSymbol>[];
+  var current = end.systemSymbol;
+  while (current != start.systemSymbol) {
     symbols.add(current);
     current = cameFrom[current]!;
   }
-  symbols.add(start.symbol);
+  symbols.add(start.systemSymbol);
   return symbols.reversed.toList();
 }
 
 /// Returns the path from [start] to [end] as a list of waypoint symbols.
-List<String>? findWaypointPathJumpsOnly(
+List<WaypointSymbol>? findWaypointPathJumpsOnly(
   SystemsCache systemsCache,
   SystemWaypoint start,
   SystemWaypoint end,
   int shipSpeed,
 ) {
-  final startSystem = systemsCache.systemBySymbol(start.systemSymbol.system);
-  final endSystem = systemsCache.systemBySymbol(end.systemSymbol.system);
+  final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
+  final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
   if (start.systemSymbol == end.systemSymbol) {
-    return [start.symbol, end.symbol];
+    return [start.waypointSymbol, end.waypointSymbol];
   }
   if (!startSystem.hasJumpGate || !endSystem.hasJumpGate) {
     return null;
@@ -121,10 +118,10 @@ List<String>? findWaypointPathJumpsOnly(
     return null;
   }
   final jumpGateSymbols = systemSymbols
-      .map((s) => systemsCache.jumpGateWaypointForSystem(s)!.symbol);
+      .map((s) => systemsCache.jumpGateWaypointForSystem(s)!.waypointSymbol);
   return [
-    if (start.symbol != jumpGateSymbols.first) start.symbol,
+    if (start.waypointSymbol != jumpGateSymbols.first) start.waypointSymbol,
     ...jumpGateSymbols,
-    if (end.symbol != jumpGateSymbols.last) end.symbol,
+    if (end.waypointSymbol != jumpGateSymbols.last) end.waypointSymbol,
   ];
 }

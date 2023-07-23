@@ -118,7 +118,7 @@ void main() {
   });
 
   test('CentralCommand.otherExplorerSystems', () async {
-    RoutePlan fakeJump(String start, String end) {
+    RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
       return RoutePlan(
         fuelCapacity: 10,
         shipSpeed: 10,
@@ -149,7 +149,10 @@ void main() {
       aSymbol.symbol,
       BehaviorState(aSymbol.symbol, Behavior.explorer),
     );
-    await centralCommand.setRoutePlan(shipA, fakeJump('S-A-A', 'S-A-W'));
+
+    final saa = WaypointSymbol.fromString('S-A-A');
+    final saw = WaypointSymbol.fromString('S-A-W');
+    await centralCommand.setRoutePlan(shipA, fakeJump(saa, saw));
     final shipB = _MockShip();
     when(() => shipB.symbol).thenReturn('X-B');
     final shipNavB = _MockShipNav();
@@ -159,12 +162,13 @@ void main() {
       'X-B',
       BehaviorState('X-B', Behavior.explorer),
     );
-    await centralCommand.setRoutePlan(shipB, fakeJump('S-A-A', 'S-B-W'));
-    expect(centralCommand.currentRoutePlan(shipB)!.endSymbol, 'S-B-W');
+    final sbw = WaypointSymbol.fromString('S-B-W');
+    await centralCommand.setRoutePlan(shipB, fakeJump(saa, sbw));
+    expect(centralCommand.currentRoutePlan(shipB)!.endSymbol, sbw);
     when(() => shipCache.ship('X-B')).thenReturn(shipB);
 
     final otherSystems = centralCommand.otherExplorerSystems(aSymbol).toList();
-    expect(otherSystems, [SystemSymbol.fromString('S-B')]); // From destination
+    expect(otherSystems, [sbw.systemSymbol]); // From destination
     await centralCommand.reachedEndOfRoutePlan(shipB);
     expect(centralCommand.currentRoutePlan(shipB), isNull);
     final otherSystems2 = centralCommand.otherExplorerSystems(aSymbol).toList();

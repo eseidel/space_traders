@@ -45,7 +45,7 @@ void main(List<String> args) async {
   SystemWaypoint start;
   final startArg = results['start'] as String?;
   if (startArg != null) {
-    final maybeStart = systemsCache.waypointOrNull(startArg);
+    final maybeStart = systemsCache.waypointFromString(startArg);
     if (maybeStart == null) {
       logger.err('--start was invalid, unknown system: ${results['start']}');
       return;
@@ -60,7 +60,7 @@ void main(List<String> args) async {
   final chartedSystems = <String>[];
 
   await for (final waypoint in waypointCache.waypointsInJumpRadius(
-    startSystem: start.systemSymbol.system,
+    startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {
     allSystems.add(waypoint.symbol);

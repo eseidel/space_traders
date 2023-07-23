@@ -11,16 +11,16 @@ class _ClusterFinder {
   /// The systems cache being used by this cluster finder.
   final SystemsCache systemsCache;
 
-  final _clusterForSystem = <String, _ClusterId>{};
+  final _clusterForSystem = <SystemSymbol, _ClusterId>{};
   _ClusterId _nextClusterId = 0;
 
   /// Returns a Map from System symbol to cluster id.
   /// Cluster ids may not be stable, depending on what order the input
   /// systems were processed.
-  Map<String, int> get clusterBySystemSymbol => _clusterForSystem;
+  Map<SystemSymbol, int> get clusterBySystemSymbol => _clusterForSystem;
 
   /// Paints the cluster reachable from [startSystemSymbol].
-  void paintCluster(String startSystemSymbol) {
+  void paintCluster(SystemSymbol startSystemSymbol) {
     if (_clusterForSystem.containsKey(startSystemSymbol)) {
       return;
     }
@@ -40,15 +40,15 @@ class _ClusterFinder {
       }
       _clusterForSystem[systemSymbol] = cluster;
       final connected = systemsCache.connectedSystems(systemSymbol);
-      queue.addAll(connected.map((s) => s.symbol));
+      queue.addAll(connected.map((s) => s.systemSymbol));
     }
   }
 }
 
-Map<String, int> _findClusters(SystemsCache systemsCache) {
+Map<SystemSymbol, int> _findClusters(SystemsCache systemsCache) {
   final clusterFinder = _ClusterFinder(systemsCache);
   for (final system in systemsCache.systems) {
-    clusterFinder.paintCluster(system.symbol);
+    clusterFinder.paintCluster(system.systemSymbol);
   }
   return clusterFinder.clusterBySystemSymbol;
 }
@@ -57,7 +57,7 @@ Map<String, int> _findClusters(SystemsCache systemsCache) {
 /// networks.
 class SystemConnectivity {
   /// Creates a new SystemConnectivity.
-  SystemConnectivity(Map<String, int> clusterBySystemSymbol)
+  SystemConnectivity(Map<SystemSymbol, int> clusterBySystemSymbol)
       : _clusterBySystemSymbol = clusterBySystemSymbol;
 
   /// Creates a new SystemConnectivity from the systemsCache.
@@ -65,10 +65,10 @@ class SystemConnectivity {
     return SystemConnectivity(_findClusters(systemsCache));
   }
 
-  final Map<String, int> _clusterBySystemSymbol;
+  final Map<SystemSymbol, int> _clusterBySystemSymbol;
 
   /// Returns the number of systems reachable from [systemSymbol].
-  int connectedSystemCount(String systemSymbol) {
+  int connectedSystemCount(SystemSymbol systemSymbol) {
     final systemClusterId = _clusterBySystemSymbol[systemSymbol];
     if (systemClusterId == null) {
       throw ArgumentError('System $systemSymbol has no cluster');
@@ -79,13 +79,13 @@ class SystemConnectivity {
   }
 
   /// Returns the cluster id for the given system.
-  int clusterIdForSystem(String systemSymbol) =>
+  int clusterIdForSystem(SystemSymbol systemSymbol) =>
       _clusterBySystemSymbol[systemSymbol]!;
 
   /// Returns all the systemSymbols in a given cluster. This is most useful when
   /// looking up a cluster for a specific system first, then you can use this
   /// method to find all the systems in that cluster.
-  Iterable<String> systemSymbolsByClusterId(int clusterId) =>
+  Iterable<SystemSymbol> systemSymbolsByClusterId(int clusterId) =>
       _clusterBySystemSymbol.entries
           .where((e) => e.value == clusterId)
           .map((e) => e.key);
@@ -96,8 +96,8 @@ class SystemConnectivity {
     SystemSymbol startSymbol,
     SystemSymbol endSymbol,
   ) {
-    final startCluster = _clusterBySystemSymbol[startSymbol.system];
-    final endCluster = _clusterBySystemSymbol[endSymbol.system];
+    final startCluster = _clusterBySystemSymbol[startSymbol];
+    final endCluster = _clusterBySystemSymbol[endSymbol];
     return startCluster == endCluster;
   }
 }

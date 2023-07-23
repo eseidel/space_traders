@@ -7,7 +7,7 @@ void main() {
   test('ShipyardPrice JSON roundtrip', () {
     final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
     final price = ShipyardPrice(
-      waypointSymbol: 'A',
+      waypointSymbol: WaypointSymbol.fromString('S-A-W'),
       shipType: ShipType.EXPLORER,
       purchasePrice: 1,
       timestamp: moonLanding,
@@ -23,14 +23,16 @@ void main() {
     final fs = MemoryFileSystem();
     final shipyardPrices = ShipyardPrices([], fs: fs);
     final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
+    final aSymbol = WaypointSymbol.fromString('S-A-W');
     final a = ShipyardPrice(
-      waypointSymbol: 'A',
+      waypointSymbol: aSymbol,
       shipType: ShipType.EXPLORER,
       purchasePrice: 1,
       timestamp: moonLanding,
     );
+    final bSymbol = WaypointSymbol.fromString('S-B-W');
     final b = ShipyardPrice(
-      waypointSymbol: 'B',
+      waypointSymbol: bSymbol,
       shipType: ShipType.EXPLORER,
       purchasePrice: 2,
       timestamp: moonLanding,
@@ -45,27 +47,28 @@ void main() {
   test('ShipyardPrices.hasRecentShipyardData', () {
     final fs = MemoryFileSystem();
     final shipyardPrices = ShipyardPrices([], fs: fs);
-    expect(shipyardPrices.hasRecentShipyardData('A'), false);
+    final symbol = WaypointSymbol.fromString('S-A-W');
+    expect(shipyardPrices.hasRecentShipyardData(symbol), false);
     final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
     expect(
       shipyardPrices.recentPurchasePrice(
-        shipyardSymbol: 'A',
+        shipyardSymbol: symbol,
         shipType: ShipType.EXPLORER,
         maxAge: const Duration(minutes: 1),
       ),
       isNull,
     );
     final a = ShipyardPrice(
-      waypointSymbol: 'A',
+      waypointSymbol: symbol,
       shipType: ShipType.EXPLORER,
       purchasePrice: 1,
       timestamp: oneMinuteAgo,
     );
     shipyardPrices.addPrices([a]);
-    expect(shipyardPrices.hasRecentShipyardData('A'), true);
+    expect(shipyardPrices.hasRecentShipyardData(symbol), true);
     expect(
       shipyardPrices.recentPurchasePrice(
-        shipyardSymbol: 'A',
+        shipyardSymbol: symbol,
         shipType: ShipType.EXPLORER,
         maxAge: const Duration(minutes: 1),
       ),
@@ -73,14 +76,14 @@ void main() {
     );
     expect(
       shipyardPrices.hasRecentShipyardData(
-        'A',
+        symbol,
         maxAge: const Duration(seconds: 1),
       ),
       false,
     );
     expect(
       shipyardPrices.hasRecentShipyardData(
-        'A',
+        symbol,
         maxAge: const Duration(hours: 1),
       ),
       true,

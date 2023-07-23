@@ -128,8 +128,8 @@ class RouteAction {
   /// Create a new route action from JSON.
   factory RouteAction.fromJson(Map<String, dynamic> json) {
     return RouteAction(
-      startSymbol: json['startSymbol'] as String,
-      endSymbol: json['endSymbol'] as String,
+      startSymbol: WaypointSymbol.fromJson(json['startSymbol'] as String),
+      endSymbol: WaypointSymbol.fromJson(json['endSymbol'] as String),
       type: RouteActionType.values.firstWhere(
         (e) => e.name == json['type'] as String,
       ),
@@ -139,10 +139,10 @@ class RouteAction {
   }
 
   /// The symbol of the waypoint where this action starts.
-  final String startSymbol;
+  final WaypointSymbol startSymbol;
 
   /// The symbol of the waypoint where this action ends.
-  final String endSymbol;
+  final WaypointSymbol endSymbol;
 
   /// The type of action taken.
   final RouteActionType type;
@@ -153,8 +153,8 @@ class RouteAction {
 
   /// Convert this action to JSON.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'startSymbol': startSymbol,
-        'endSymbol': endSymbol,
+        'startSymbol': startSymbol.toJson(),
+        'endSymbol': endSymbol.toJson(),
         'type': type.name,
         'duration': duration,
         // 'cooldown': cooldown,
@@ -197,16 +197,16 @@ class RoutePlan {
   final List<RouteAction> actions;
 
   /// The symbol of the waypoint where this route starts.
-  String get startSymbol => actions.first.startSymbol;
+  WaypointSymbol get startSymbol => actions.first.startSymbol;
 
   /// The symbol of the waypoint where this route ends.
-  String get endSymbol => actions.last.endSymbol;
+  WaypointSymbol get endSymbol => actions.last.endSymbol;
 
   /// The total time of this route in seconds.
   int get duration => actions.fold<int>(0, (a, b) => a + b.duration);
 
   /// Returns the next action to take from the given waypoint.
-  RouteAction nextActionFrom(String waypointSymbol) {
+  RouteAction nextActionFrom(WaypointSymbol waypointSymbol) {
     final index = actions.indexWhere((e) => e.startSymbol == waypointSymbol);
     if (index == -1) {
       throw ArgumentError('No action starting from $waypointSymbol');
@@ -217,7 +217,7 @@ class RoutePlan {
   /// Makes a new route plan starting from the given waypoint.
   RoutePlan subPlanStartingFrom(
     SystemsCache systemsCache,
-    String waypointSymbol,
+    WaypointSymbol waypointSymbol,
   ) {
     final index = actions.indexWhere((e) => e.startSymbol == waypointSymbol);
     // This most commonly occurs when something asks for the endSymbol.
@@ -256,14 +256,14 @@ RoutePlan routePlanFromJumpPlan(
   required int shipSpeed,
 }) {
   final actions = <RouteAction>[];
-  if (jumpPlan.route.first != start.systemSymbol.system) {
+  if (jumpPlan.route.first != start.systemSymbol) {
     throw ArgumentError('Jump plan does not start at ${start.systemSymbol}');
   }
-  if (jumpPlan.route.last != end.systemSymbol.system) {
+  if (jumpPlan.route.last != end.systemSymbol) {
     throw ArgumentError('Jump plan does not end at ${end.systemSymbol}');
   }
   final startJumpGate =
-      systemsCache.jumpGateWaypointForSystem(start.systemSymbol.system)!;
+      systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
   if (startJumpGate.symbol != start.symbol) {
     actions.add(_navigationAction(start, startJumpGate, shipSpeed));
   }
@@ -284,8 +284,7 @@ RoutePlan routePlanFromJumpPlan(
       ),
     );
   }
-  final endJumpGate =
-      systemsCache.jumpGateWaypointForSystem(end.systemSymbol.system)!;
+  final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
   if (endJumpGate.symbol != end.symbol) {
     actions.add(_navigationAction(endJumpGate, end, shipSpeed));
   }
@@ -302,13 +301,12 @@ RoutePlan routePlanFromJumpPlan(
 class _JumpPlanBuilder {
   _JumpPlanBuilder();
 
-  final List<String> _systems = [];
+  final List<SystemSymbol> _systems = [];
 
   bool get isNotEmpty => _systems.isNotEmpty;
 
-  void addWaypoint(String waypointSymbol) {
-    final system = parseWaypointString(waypointSymbol).system;
-    _systems.add(system);
+  void addWaypoint(WaypointSymbol waypointSymbol) {
+    _systems.add(waypointSymbol.systemSymbol);
   }
 
   JumpPlan build() {
@@ -351,8 +349,8 @@ RouteAction _navigationAction(
     shipSpeed: shipSpeed,
   );
   return RouteAction(
-    startSymbol: start.symbol,
-    endSymbol: end.symbol,
+    startSymbol: start.waypointSymbol,
+    endSymbol: end.waypointSymbol,
     type: RouteActionType.navCruise,
     duration: duration,
   );
@@ -365,16 +363,16 @@ RouteAction _jumpAction(
   int shipSpeed, {
   required bool isLastJump,
 }) {
-  final startSystem = systemsCache.systemBySymbol(start.systemSymbol.system);
-  final endSystem = systemsCache.systemBySymbol(end.systemSymbol.system);
+  final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
+  final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
   final cooldown = cooldownTimeForJumpBetweenSystems(startSystem, endSystem);
   // This isn't quite right to use cooldown as duration, but it's
   // close enough for now.  This isLastJump hack also would break
   // if we had two separate series of jumps in the route.
   final duration = isLastJump ? 0 : cooldown;
   return RouteAction(
-    startSymbol: start.symbol,
-    endSymbol: end.symbol,
+    startSymbol: start.waypointSymbol,
+    endSymbol: end.waypointSymbol,
     type: RouteActionType.jump,
     duration: duration,
   );
@@ -434,8 +432,8 @@ class RoutePlanner {
 
     // Look up in the jump cache, if so, create a plan from that.
     final jumpPlan = _jumpCache.lookupJumpPlan(
-      fromSystem: start.systemSymbol.system,
-      toSystem: end.systemSymbol.system,
+      fromSystem: start.systemSymbol,
+      toSystem: end.systemSymbol,
     );
     if (jumpPlan != null) {
       return routePlanFromJumpPlan(
@@ -535,7 +533,7 @@ int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
 RoutePlan? planRouteThrough(
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
-  List<String> waypointSymbols, {
+  List<WaypointSymbol> waypointSymbols, {
   required int fuelCapacity,
   required int shipSpeed,
 }) {

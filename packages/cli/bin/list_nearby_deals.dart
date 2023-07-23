@@ -60,7 +60,7 @@ Future<void> cliMain(List<String> args) async {
   // final agentCache = AgentCache.loadCached(fs)!;
   final start = results.rest.isEmpty
       ? agentCache.headquarters(systemsCache)
-      : systemsCache.waypointFromSymbol(results.rest.first);
+      : systemsCache.waypointFromString(results.rest.first)!;
 
   // Finding deals with start: X1-SB93-93497E, max jumps: 5,
   // max outlay: 1172797, max units: 120, fuel capacity: 1700, ship speed: 10
@@ -86,7 +86,7 @@ Future<void> cliMain(List<String> args) async {
   final marketScan = scanNearbyMarkets(
     systemsCache,
     marketPrices,
-    systemSymbol: start.systemSymbol.system,
+    systemSymbol: start.systemSymbol,
     maxJumps: maxJumps,
     maxWaypoints: maxWaypoints,
   );
@@ -102,7 +102,7 @@ Future<void> cliMain(List<String> args) async {
     cargoCapacity: cargoCapacity,
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
-    startSymbol: start.symbol,
+    startSymbol: start.waypointSymbol,
     extraSellOpps: extraSellOpps,
   );
 

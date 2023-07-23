@@ -80,7 +80,7 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
-    when(() => shipNav.waypointSymbol).thenReturn('W');
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.route).thenReturn(shipNavRoute);
     when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
     final centralCommand = _MockCentralCommand();
@@ -101,6 +101,6 @@ void main() {
       ),
     );
     expect(waitUntil, arrivalTime);
-    verify(() => logger.info('🛸#S  ✈️  to W, 1s left')).called(1);
+    verify(() => logger.info('🛸#S  ✈️  to S-A-W, 1s left')).called(1);
   });
 }

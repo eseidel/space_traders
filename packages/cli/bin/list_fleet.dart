@@ -11,7 +11,7 @@ void main(List<String> args) async {
 }
 
 String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
-  final waypoint = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
+  final waypoint = systemsCache.waypointFromSymbol(ship.waypointSymbol);
   var string =
       '${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';
   if (ship.crew.morale != 100) {
@@ -30,7 +30,7 @@ String describeInventory(
 }) {
   final lines = <String>[];
   for (final item in inventory) {
-    final symbol = TradeSymbol.fromJson(item.symbol)!;
+    final symbol = item.tradeSymbol;
     final count = item.units;
     final price = marketPrices.medianSellPrice(symbol);
     final priceString = price == null ? '???' : creditsString(price);
@@ -51,9 +51,9 @@ Duration timeToArrival(
   var timeLeft = ship.nav.status == ShipNavStatus.IN_TRANSIT
       ? ship.nav.route.arrival.difference(DateTime.timestamp())
       : Duration.zero;
-  if (routePlan.endSymbol != ship.nav.waypointSymbol) {
+  if (routePlan.endSymbol != ship.waypointSymbol) {
     final newPlan =
-        routePlan.subPlanStartingFrom(systemsCache, ship.nav.waypointSymbol);
+        routePlan.subPlanStartingFrom(systemsCache, ship.waypointSymbol);
     timeLeft += Duration(seconds: newPlan.duration);
     // Include cooldown until next jump.
     // We would need to keep ship cooldowns on ShipCache to do this.

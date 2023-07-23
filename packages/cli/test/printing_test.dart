@@ -40,20 +40,20 @@ void main() {
         role: ShipRole.COMMAND,
       ),
       nav: ShipNav(
-        systemSymbol: 'c',
-        waypointSymbol: 'symbol',
+        systemSymbol: 'S-A',
+        waypointSymbol: 'S-A-B',
         route: ShipNavRoute(
           destination: ShipNavRouteWaypoint(
-            symbol: 'a',
+            symbol: 'S-A-B',
             type: WaypointType.PLANET,
-            systemSymbol: 'c',
+            systemSymbol: 'S-A',
             x: 1,
             y: 2,
           ),
           departure: ShipNavRouteWaypoint(
-            symbol: 'a',
+            symbol: 'S-A-W',
             type: WaypointType.PLANET,
-            systemSymbol: 'c',
+            systemSymbol: 'S-A',
             x: 1,
             y: 2,
           ),
@@ -107,9 +107,12 @@ void main() {
       ),
     );
     final systemsCache = _MockSystemsCache();
-    when(() => systemsCache.waypointFromSymbol('symbol')).thenReturn(
+    final symbol = WaypointSymbol.fromString('S-A-B');
+    when(
+      () => systemsCache.waypointFromSymbol(symbol),
+    ).thenReturn(
       SystemWaypoint(
-        symbol: 'symbol',
+        symbol: symbol.waypoint,
         type: WaypointType.PLANET,
         x: 1,
         y: 2,
@@ -117,7 +120,7 @@ void main() {
     );
     expect(
       shipDescription(ship, systemsCache),
-      'A - Docked at symbol PLANET COMMAND 100/100 (morale: 90) (condition: 90)',
+      'A - Docked at S-A-B PLANET COMMAND 100/100 (morale: 90) (condition: 90)',
     );
   });
 
@@ -176,7 +179,7 @@ void main() {
     );
     marketPrices.addPrices([
       MarketPrice(
-        waypointSymbol: 'A',
+        waypointSymbol: WaypointSymbol.fromString('S-A-W'),
         symbol: a.value,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 1,

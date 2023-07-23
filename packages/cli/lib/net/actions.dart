@@ -22,7 +22,7 @@ export 'package:cli/net/direct.dart';
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Api api,
   Ship ship,
-  String waypointSymbol,
+  WaypointSymbol waypointSymbol,
 ) async {
   await undockIfNeeded(api, ship);
   if (!ship.usesFuel && ship.nav.flightMode != ShipNavFlightMode.BURN) {
@@ -62,7 +62,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
     if (good == null) {
       shipInfo(
         ship,
-        "Market at ${ship.nav.waypointSymbol} doesn't buy ${item.symbol}",
+        "Market at ${ship.waypointSymbol} doesn't buy ${item.symbol}",
       );
       continue;
     }
@@ -183,7 +183,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   ShipCache shipCache,
   AgentCache agentCache,
   Ship ship,
-  String shipyardSymbol,
+  WaypointSymbol shipyardSymbol,
   ShipType shipType,
 ) async {
   final result =
@@ -298,7 +298,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
 /// Dock the ship if needed and log the transaction
 Future<void> dockIfNeeded(Api api, Ship ship) async {
   if (ship.isOrbiting) {
-    shipDetail(ship, '🛬 at ${ship.nav.waypointSymbol}');
+    shipDetail(ship, '🛬 at ${ship.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol);
     ship.nav = response!.data.nav;
   }
@@ -308,7 +308,7 @@ Future<void> dockIfNeeded(Api api, Ship ship) async {
 Future<void> undockIfNeeded(Api api, Ship ship) async {
   if (ship.isDocked) {
     // Extra space after emoji is needed for windows powershell.
-    shipDetail(ship, '🛰️  at ${ship.nav.waypointSymbol}');
+    shipDetail(ship, '🛰️  at ${ship.waypointSymbol}');
     final response = await api.fleet.orbitShip(ship.symbol);
     ship.nav = response!.data.nav;
   }
@@ -325,7 +325,8 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   //   await refuelIfNeededAndLog(api, marketPrices, agent, ship);
   // }
 
-  final result = await navigateToLocalWaypoint(api, ship, waypoint.symbol);
+  final result =
+      await navigateToLocalWaypoint(api, ship, waypoint.waypointSymbol);
   final flightTime = result.nav.route.arrival.difference(DateTime.timestamp());
   if (ship.fuelPercentage < 0.5) {
     shipWarn(
@@ -359,16 +360,16 @@ Future<void> chartWaypointAndLog(
     if (!isWaypointAlreadyChartedException(e)) {
       rethrow;
     }
-    shipWarn(ship, '${ship.nav.waypointSymbol} was already charted');
+    shipWarn(ship, '${ship.waypointSymbol} was already charted');
   }
 }
 
 Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
   Api api,
   Ship ship,
-  String systemSymbol,
+  SystemSymbol systemSymbol,
 ) async {
-  final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol);
+  final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol.system);
   final response =
       await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
   ship.nav = response!.data.nav;
@@ -380,7 +381,7 @@ Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
 Future<JumpShip200ResponseData> useJumpGateAndLog(
   Api api,
   Ship ship,
-  String systemSymbol,
+  SystemSymbol systemSymbol,
 ) async {
   try {
     final waitUntil = await _useJumpGateAndLogInner(api, ship, systemSymbol);

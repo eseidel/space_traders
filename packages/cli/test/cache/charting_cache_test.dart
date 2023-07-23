@@ -10,15 +10,11 @@ class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 void main() {
   test('ChartingCache load/save', () async {
     final fs = MemoryFileSystem.test();
+    final a = WaypointSymbol.fromString('S-S-A');
     final values = ChartedValues(
-      //       required this.waypointSymbol,
-      // required this.chart,
-      // required this.faction,
-      // required this.traits,
-      // required this.orbitals,
-      waypointSymbol: 'A',
+      waypointSymbol: a,
       chart: Chart(
-        waypointSymbol: 'A',
+        waypointSymbol: a.waypoint,
         submittedBy: 'ESEIDEL',
         submittedOn: DateTime(2021),
       ),
@@ -30,7 +26,7 @@ void main() {
       ],
       orbitals: [
         WaypointOrbital(
-          symbol: 'F',
+          symbol: 'S-A-F',
         ),
       ],
     );
@@ -39,7 +35,7 @@ void main() {
     ChartingCache(valuesBySymbol, waypointTraits, fs: fs).save();
     final loaded = ChartingCache.load(fs);
     expect(loaded.waypointCount, 1);
-    expect(loaded.values.first.waypointSymbol, 'A');
+    expect(loaded.values.first.waypointSymbol, a);
     expect(loaded.values.first.chart.submittedBy, 'ESEIDEL');
     expect(loaded.values.first.faction?.symbol, FactionSymbols.AEGIS);
     expect(loaded.values.first.traitSymbols, hasLength(1));

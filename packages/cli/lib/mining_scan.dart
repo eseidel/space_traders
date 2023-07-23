@@ -17,8 +17,8 @@ class _MineAndSell {
     required this.distanceBetweenMineAndMarket,
   });
 
-  final String mineSymbol;
-  final String marketSymbol;
+  final WaypointSymbol mineSymbol;
+  final WaypointSymbol marketSymbol;
   final int marketPercentile;
   final int distanceBetweenMineAndMarket;
 
@@ -41,7 +41,7 @@ class _SystemEval {
     required this.mineAndSells,
   });
 
-  final String systemSymbol;
+  final SystemSymbol systemSymbol;
   final int jumps;
   final List<_MineAndSell> mineAndSells;
 
@@ -75,7 +75,7 @@ Future<_SystemEval> _evaluateSystem(
   WaypointCache waypointCache,
   MarketCache marketCache, {
   required TradeSymbol tradeSymbol,
-  required String systemSymbol,
+  required SystemSymbol systemSymbol,
   required int jumps,
 }) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
@@ -96,8 +96,8 @@ Future<_SystemEval> _evaluateSystem(
       final distance = mine.distanceTo(market);
       mineAndSells.add(
         _MineAndSell(
-          mineSymbol: mine.symbol,
-          marketSymbol: market.symbol,
+          mineSymbol: mine.waypointSymbol,
+          marketSymbol: market.waypointSymbol,
           marketPercentile: marketPercentile,
           distanceBetweenMineAndMarket: distance,
         ),
@@ -117,7 +117,7 @@ String _describeSystemEval(_SystemEval eval) {
 }
 
 /// Find nearest mine with good mining.
-Future<String?> nearestMineWithGoodMining(
+Future<WaypointSymbol?> nearestMineWithGoodMining(
   Api api,
   MarketPrices marketPrices,
   SystemsCache systemsCache,
@@ -126,12 +126,12 @@ Future<String?> nearestMineWithGoodMining(
   SystemWaypoint start, {
   required TradeSymbol tradeSymbol,
   required int maxJumps,
-  bool Function(String systemSymbol)? systemFilter,
+  bool Function(SystemSymbol systemSymbol)? systemFilter,
 }) async {
   // TODO(eseidel): These evals should be cached on centralCommand.
   final evals = <_SystemEval>[];
   for (final (systemSymbol, jumps) in systemsCache.systemSymbolsInJumpRadius(
-    startSystem: start.systemSymbol.system,
+    startSystem: start.systemSymbol,
     maxJumps: maxJumps,
   )) {
     if (systemFilter != null && !systemFilter(systemSymbol)) {

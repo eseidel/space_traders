@@ -12,7 +12,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final ship = await chooseShip(api, caches.systems, myShips);
 
   final marketplaceWaypoints =
-      await caches.waypoints.marketWaypointsForSystem(ship.nav.systemSymbol);
+      await caches.waypoints.marketWaypointsForSystem(ship.systemSymbol);
 
   final waypoint = logger.chooseOne(
     'Which marketplace?',
@@ -20,6 +20,6 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     display: waypointDescription,
   );
 
-  final market = await caches.markets.marketForSymbol(waypoint.symbol);
+  final market = await caches.markets.marketForSymbol(waypoint.waypointSymbol);
   prettyPrintJson(market!.toJson());
 }

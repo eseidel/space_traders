@@ -20,7 +20,10 @@ class ShipyardPrice {
   });
 
   /// Create a new price record from a ShipyardShip.
-  factory ShipyardPrice.fromShipyardShip(ShipyardShip ship, String waypoint) {
+  factory ShipyardPrice.fromShipyardShip(
+    ShipyardShip ship,
+    WaypointSymbol waypoint,
+  ) {
     return ShipyardPrice(
       waypointSymbol: waypoint,
       shipType: ship.type!,
@@ -32,7 +35,7 @@ class ShipyardPrice {
   /// Create a new price record from JSON.
   factory ShipyardPrice.fromJson(Map<String, dynamic> json) {
     return ShipyardPrice(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       shipType: ShipType.fromJson(json['shipType'] as String)!,
       purchasePrice: json['purchasePrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
@@ -40,7 +43,7 @@ class ShipyardPrice {
   }
 
   /// The waypoint of the market where this price was recorded.
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
 
   /// The symbol of the ship type.
   final ShipType shipType;
@@ -54,7 +57,7 @@ class ShipyardPrice {
   /// Convert this price record to JSON.
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json['waypointSymbol'] = waypointSymbol;
+    json['waypointSymbol'] = waypointSymbol.toJson();
     json['shipType'] = shipType.toJson();
     json['purchasePrice'] = purchasePrice;
     json['timestamp'] = timestamp.toUtc().toIso8601String();
@@ -99,7 +102,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
 
   /// Get the count of unique waypoints.
   int get waypointCount {
-    final waypoints = <String>{};
+    final waypoints = <WaypointSymbol>{};
     for (final price in _prices) {
       waypoints.add(price.waypointSymbol);
     }
@@ -187,7 +190,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   /// to a specific waypoint.
   Iterable<ShipyardPrice> purchasePricesFor(
     ShipType shipType, {
-    String? shipyardSymbol,
+    WaypointSymbol? shipyardSymbol,
   }) {
     final filter = shipyardSymbol == null
         ? (ShipyardPrice e) => e.shipType == shipType && e.purchasePrice > 0
@@ -201,7 +204,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   /// Returns true if there is recent market data for a given market.
   /// Does not check if the passed in market is a valid market.
   bool hasRecentShipyardData(
-    String marketSymbol, {
+    WaypointSymbol marketSymbol, {
     Duration maxAge = defaultMaxAge,
   }) {
     final pricesForMarket =
@@ -222,7 +225,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   /// [shipType] is the ShipType to check.
   /// [maxAge] is the maximum age of the price in the cache.
   int? recentPurchasePrice({
-    required String shipyardSymbol,
+    required WaypointSymbol shipyardSymbol,
     required ShipType shipType,
     Duration maxAge = defaultMaxAge,
   }) {
@@ -260,7 +263,7 @@ Future<void> recordShipyardData(
   Shipyard shipyard,
 ) async {
   final prices = shipyard.ships
-      .map((s) => ShipyardPrice.fromShipyardShip(s, shipyard.symbol))
+      .map((s) => ShipyardPrice.fromShipyardShip(s, shipyard.waypointSymbol))
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${shipyard.symbol}!');

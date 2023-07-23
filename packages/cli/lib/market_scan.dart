@@ -29,7 +29,7 @@ int? estimateSellPrice(
 
   final recentSellPrice = marketPrices.recentSellPrice(
     tradeSymbol,
-    marketSymbol: market.symbol,
+    marketSymbol: market.waypointSymbol,
   );
   if (recentSellPrice != null) {
     return recentSellPrice;
@@ -55,7 +55,7 @@ int? estimatePurchasePrice(
     return maybeGoods.purchasePrice;
   }
   final recentPurchasePrice = marketPrices.recentPurchasePrice(
-    marketSymbol: market.symbol,
+    marketSymbol: market.waypointSymbol,
     tradeSymbol,
   );
   if (recentPurchasePrice != null) {
@@ -80,10 +80,10 @@ class BuyOpp {
   });
 
   /// The symbol of the market where the good can be purchased.
-  final String marketSymbol;
+  final WaypointSymbol marketSymbol;
 
   /// The symbol of the good offered for purchase.
-  final String tradeSymbol;
+  final TradeSymbol tradeSymbol;
 
   /// The price of the good.
   final int price;
@@ -102,10 +102,10 @@ class SellOpp {
   });
 
   /// The symbol of the market where the good can be sold.
-  final String marketSymbol;
+  final WaypointSymbol marketSymbol;
 
   /// The symbol of the good.
-  final String tradeSymbol;
+  final TradeSymbol tradeSymbol;
 
   /// The price of the good.
   final int price;
@@ -125,8 +125,8 @@ class _MarketScanBuilder {
 
   /// How many deals to keep track of per trade symbol.
   final int topLimit;
-  final Map<String, List<BuyOpp>> buyOpps = {};
-  final Map<String, List<SellOpp>> sellOpps = {};
+  final Map<TradeSymbol, List<BuyOpp>> buyOpps = {};
+  final Map<TradeSymbol, List<SellOpp>> sellOpps = {};
 
   final MarketPrices _marketPrices;
 
@@ -155,7 +155,7 @@ class _MarketScanBuilder {
   /// Record potential deals from the given historical market price.
   void visitMarketPrice(MarketPrice marketPrice) {
     final marketSymbol = marketPrice.waypointSymbol;
-    final tradeSymbol = marketPrice.symbol;
+    final tradeSymbol = marketPrice.tradeSymbol;
     _addBuyOpp(
       BuyOpp(
         marketSymbol: marketSymbol,
@@ -185,15 +185,15 @@ class _MarketScanBuilder {
       }
       _addBuyOpp(
         BuyOpp(
-          marketSymbol: market.symbol,
-          tradeSymbol: tradeSymbol.value,
+          marketSymbol: market.waypointSymbol,
+          tradeSymbol: tradeSymbol,
           price: buyPrice,
         ),
       );
       _addSellOpp(
         SellOpp(
-          marketSymbol: market.symbol,
-          tradeSymbol: tradeSymbol.value,
+          marketSymbol: market.waypointSymbol,
+          tradeSymbol: tradeSymbol,
           price: estimateSellPrice(_marketPrices, market, tradeSymbol)!,
         ),
       );
@@ -205,8 +205,8 @@ class _MarketScanBuilder {
 /// of markets.
 class MarketScan {
   MarketScan._({
-    required Map<String, List<BuyOpp>> buyOpps,
-    required Map<String, List<SellOpp>> sellOpps,
+    required Map<TradeSymbol, List<BuyOpp>> buyOpps,
+    required Map<TradeSymbol, List<SellOpp>> sellOpps,
   })  : _buyOpps = Map.unmodifiable(buyOpps),
         _sellOpps = Map.unmodifiable(sellOpps);
 
@@ -222,7 +222,7 @@ class MarketScan {
   /// sell opportunities for each trade symbol regardless of distance.
   factory MarketScan.fromMarketPrices(
     MarketPrices marketPrices, {
-    bool Function(String waypointSymbol)? waypointFilter,
+    bool Function(WaypointSymbol waypointSymbol)? waypointFilter,
   }) {
     final builder = _MarketScanBuilder(marketPrices, topLimit: 5);
     for (final marketPrice in marketPrices.prices) {
@@ -235,17 +235,17 @@ class MarketScan {
     return MarketScan._(buyOpps: builder.buyOpps, sellOpps: builder.sellOpps);
   }
 
-  final Map<String, List<BuyOpp>> _buyOpps;
-  final Map<String, List<SellOpp>> _sellOpps;
+  final Map<TradeSymbol, List<BuyOpp>> _buyOpps;
+  final Map<TradeSymbol, List<SellOpp>> _sellOpps;
 
   /// The trade symbols for which we found opportunities.
-  List<String> get tradeSymbols => _buyOpps.keys.toList();
+  List<TradeSymbol> get tradeSymbols => _buyOpps.keys.toList();
 
   /// Lookup the buy opportunities for the given trade symbol.
-  List<BuyOpp> buyOppsForTradeSymbol(String tradeSymbol) =>
+  List<BuyOpp> buyOppsForTradeSymbol(TradeSymbol tradeSymbol) =>
       _buyOpps[tradeSymbol] ?? [];
 
   /// Lookup the sell opportunities for the given trade symbol.
-  List<SellOpp> sellOppsForTradeSymbol(String tradeSymbol) =>
+  List<SellOpp> sellOppsForTradeSymbol(TradeSymbol tradeSymbol) =>
       _sellOpps[tradeSymbol] ?? [];
 }

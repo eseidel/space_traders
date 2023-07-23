@@ -15,9 +15,9 @@ Future<DateTime?> beingNewRouteAndLog(
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
   CentralCommand centralCommand,
-  String destinationSymbol,
+  WaypointSymbol destinationSymbol,
 ) async {
-  final start = systemsCache.waypointFromSymbol(ship.nav.waypointSymbol);
+  final start = systemsCache.waypointFromSymbol(ship.waypointSymbol);
   final route = routePlanner.planRoute(
     start: start,
     end: systemsCache.waypointFromSymbol(destinationSymbol),
@@ -116,8 +116,8 @@ class NavResult {
 void _verifyJumpTime(
   SystemsCache systemsCache,
   Ship ship,
-  String fromSystem,
-  String toSystem,
+  SystemSymbol fromSystem,
+  SystemSymbol toSystem,
   Cooldown cooldown,
 ) {
   final from = systemsCache.systemBySymbol(fromSystem);
@@ -166,24 +166,24 @@ Future<NavResult> continueNavigationIfNeeded(
     return NavResult._continueAction();
   }
   // We've reached the routePlan, so we can stop navigating.
-  if (ship.nav.waypointSymbol == routePlan.endSymbol) {
+  if (ship.waypointSymbol == routePlan.endSymbol) {
     // Remove the destination from the ship's state or it will try to come back.
     await centralCommand.reachedEndOfRoutePlan(ship);
     return NavResult._continueAction();
   }
-  final action = routePlan.nextActionFrom(ship.nav.waypointSymbol);
+  final action = routePlan.nextActionFrom(ship.waypointSymbol);
   final actionStart = systemsCache.waypointFromSymbol(action.startSymbol);
   final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
   await undockIfNeeded(api, ship);
   switch (action.type) {
     case RouteActionType.jump:
       final response =
-          await useJumpGateAndLog(api, ship, actionEnd.systemSymbol.system);
+          await useJumpGateAndLog(api, ship, actionEnd.systemSymbol);
       _verifyJumpTime(
         systemsCache,
         ship,
-        actionStart.systemSymbol.system,
-        actionEnd.systemSymbol.system,
+        actionStart.systemSymbol,
+        actionEnd.systemSymbol,
         response.cooldown,
       );
       // We can't continue the current action, we have more navigation to do

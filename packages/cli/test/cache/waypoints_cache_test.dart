@@ -38,7 +38,8 @@ void main() {
       );
     });
     final systemsCache = _MockSystemsCache();
-    when(() => systemsCache.waypointsInSystem('S-E')).thenReturn([
+    final symbol = WaypointSymbol.fromString('S-E-A');
+    when(() => systemsCache.waypointsInSystem(symbol.systemSymbol)).thenReturn([
       SystemWaypoint(
         symbol: 'S-E-A',
         type: WaypointType.PLANET,
@@ -48,9 +49,9 @@ void main() {
     ]);
     final chartingCache = _MockChartingCache();
     final waypointCache = WaypointCache(api, systemsCache, chartingCache);
-    expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);
+    expect(await waypointCache.waypoint(symbol), expectedWaypoint);
     // Call it twice, it should cache.
-    expect(await waypointCache.waypoint('S-E-A'), expectedWaypoint);
+    expect(await waypointCache.waypoint(symbol), expectedWaypoint);
     verify(
       () => systemsApi.getSystemWaypoints(
         any(),

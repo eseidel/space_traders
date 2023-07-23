@@ -2,28 +2,27 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/route.dart';
 import 'package:collection/collection.dart';
 
-typedef _WaypointSymbol = String;
-
-Iterable<_WaypointSymbol> _neighborsFor(
+Iterable<WaypointSymbol> _neighborsFor(
   SystemsCache systemsCache,
-  _WaypointSymbol symbol,
+  WaypointSymbol symbol,
 ) sync* {
   final waypoint = systemsCache.waypointFromSymbol(symbol);
   // If we're currently at a jump gate, we can jump to any other jumpgate
   // connected to this one.
   if (waypoint.isJumpGate) {
-    final systems = systemsCache.connectedSystems(waypoint.systemSymbol.system);
+    final systems = systemsCache.connectedSystems(waypoint.systemSymbol);
     for (final system in systems) {
-      yield systemsCache.jumpGateWaypointForSystem(system.symbol)!.symbol;
+      yield systemsCache
+          .jumpGateWaypointForSystem(system.systemSymbol)!
+          .waypointSymbol;
     }
   }
   // Otherwise we can always navigate to any other waypoint in this system.
   // TODO(eseidel): This needs to enforce fuelCapacity.
-  final otherWaypoints =
-      systemsCache.waypointsInSystem(waypoint.systemSymbol.system);
+  final otherWaypoints = systemsCache.waypointsInSystem(waypoint.systemSymbol);
   for (final otherWaypoint in otherWaypoints) {
     if (otherWaypoint.symbol != waypoint.symbol) {
-      yield otherWaypoint.symbol;
+      yield otherWaypoint.waypointSymbol;
     }
   }
   // We don't currently support warping.
@@ -32,10 +31,10 @@ Iterable<_WaypointSymbol> _neighborsFor(
 int _approximateTimeBetween(
   SystemsCache systemsCache,
   SystemWaypoint a,
-  _WaypointSymbol bSymbol,
+  WaypointSymbol bSymbol,
   int shipSpeed,
 ) {
-  if (a.symbol == bSymbol) {
+  if (a.waypointSymbol == bSymbol) {
     return 0;
   }
   final b = systemsCache.waypointFromSymbol(bSymbol);
@@ -43,12 +42,12 @@ int _approximateTimeBetween(
     return flightTimeWithinSystemInSeconds(a, b, shipSpeed: shipSpeed);
     // return a.position.distanceTo(b.position) ~/ shipSpeed;
   }
-  final aSystem = systemsCache.systemBySymbol(a.systemSymbol.system);
+  final aSystem = systemsCache.systemBySymbol(a.systemSymbol);
   final aGate = aSystem.jumpGateWaypoint;
   if (aGate == null) {
     throw Exception('No jump gate in system ${a.systemSymbol}');
   }
-  final bSystem = systemsCache.systemBySymbol(b.systemSymbol.system);
+  final bSystem = systemsCache.systemBySymbol(b.systemSymbol);
   final bGate = bSystem.jumpGateWaypoint;
   if (bGate == null) {
     throw Exception('No jump gate in system ${b.systemSymbol}');
@@ -68,8 +67,8 @@ int _approximateTimeBetween(
 
 int _timeBetween(
   SystemsCache systemsCache,
-  _WaypointSymbol aSymbol,
-  _WaypointSymbol bSymbol,
+  WaypointSymbol aSymbol,
+  WaypointSymbol bSymbol,
   int shipSpeed,
 ) {
   if (aSymbol == bSymbol) {
@@ -79,11 +78,11 @@ int _timeBetween(
   // return a RouteAction.
   final a = systemsCache.waypointFromSymbol(aSymbol);
   final b = systemsCache.waypointFromSymbol(bSymbol);
-  return _approximateTimeBetween(systemsCache, a, b.symbol, shipSpeed);
+  return _approximateTimeBetween(systemsCache, a, b.waypointSymbol, shipSpeed);
 }
 
 /// Returns the path from [start] to [end] as a list of waypoint symbols.
-List<String>? findWaypointPath(
+List<WaypointSymbol>? findWaypointPath(
   SystemsCache systemsCache,
   SystemWaypoint start,
   SystemWaypoint end,
@@ -92,16 +91,16 @@ List<String>? findWaypointPath(
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   final frontier =
-      PriorityQueue<(_WaypointSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((start.symbol, 0));
-  final cameFrom = <_WaypointSymbol, _WaypointSymbol>{};
-  final costSoFar = <_WaypointSymbol, int>{};
+      PriorityQueue<(WaypointSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
+        ..add((start.waypointSymbol, 0));
+  final cameFrom = <WaypointSymbol, WaypointSymbol>{};
+  final costSoFar = <WaypointSymbol, int>{};
   // logger.info('start: ${start.symbol} end: ${end.symbol}');
-  costSoFar[start.symbol] = 0;
+  costSoFar[start.waypointSymbol] = 0;
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
     // logger.info('current: ${current.$1}');
-    if (current.$1 == end.symbol) {
+    if (current.$1 == end.waypointSymbol) {
       break;
     }
     for (final next in _neighborsFor(systemsCache, current.$1)) {
@@ -117,16 +116,16 @@ List<String>? findWaypointPath(
       }
     }
   }
-  if (cameFrom[end.symbol] == null) {
+  if (cameFrom[end.waypointSymbol] == null) {
     return null;
   }
 
-  final symbols = <_WaypointSymbol>[];
-  var current = end.symbol;
-  while (current != start.symbol) {
+  final symbols = <WaypointSymbol>[];
+  var current = end.waypointSymbol;
+  while (current != start.waypointSymbol) {
     symbols.add(current);
     current = cameFrom[current]!;
   }
-  symbols.add(start.symbol);
+  symbols.add(start.waypointSymbol);
   return symbols.reversed.toList();
 }

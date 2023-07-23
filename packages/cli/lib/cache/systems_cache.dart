@@ -14,7 +14,8 @@ class SystemsCache extends JsonListStore<System> {
     required List<System> systems,
     required super.fs,
     super.path = defaultCacheFilePath,
-  })  : _index = Map.fromEntries(systems.map((e) => MapEntry(e.symbol, e))),
+  })  : _index =
+            Map.fromEntries(systems.map((e) => MapEntry(e.systemSymbol, e))),
         super(systems);
 
   /// All systems in the game.
@@ -22,8 +23,8 @@ class SystemsCache extends JsonListStore<System> {
 
   List<System> get _systems => entries;
 
-  final Map<String, System> _index;
-  final Map<String, List<ConnectedSystem>> _connectedSystems = {};
+  final Map<SystemSymbol, System> _index;
+  final Map<SystemSymbol, List<ConnectedSystem>> _connectedSystems = {};
 
   /// Default cache location.
   static const String defaultCacheFilePath = 'data/systems.json';
@@ -86,43 +87,46 @@ class SystemsCache extends JsonListStore<System> {
     }
   }
 
-  /// Return the jump gate waypoint for the given [systemSymbol].
-  SystemWaypoint? jumpGateWaypointForSystem(String systemSymbol) {
-    final system = _systems.firstWhere((s) => s.symbol == systemSymbol);
+  /// Return the jump gate waypoint for the given [symbol].
+  SystemWaypoint? jumpGateWaypointForSystem(SystemSymbol symbol) {
+    final system = systemBySymbol(symbol);
     return system.waypoints
         .firstWhereOrNull((w) => w.type == WaypointType.JUMP_GATE);
   }
 
   /// Return the system with the given [symbol].
-  System systemBySymbol(String symbol) =>
+  System systemBySymbol(SystemSymbol symbol) =>
       _index[symbol] ?? (throw ArgumentError('Unknown system $symbol'));
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
-  SystemWaypoint? waypointOrNull(String waypointSymbol) {
-    assertIsWaypointSymbol(waypointSymbol);
-    assert(waypointSymbol.split('-').length == 3, 'Invalid system symbol');
-    final systemSymbol = parseWaypointString(waypointSymbol).system;
-    final waypoints = waypointsInSystem(systemSymbol);
-    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
+  SystemWaypoint? waypointOrNull(WaypointSymbol waypointSymbol) {
+    final waypoints = waypointsInSystem(waypointSymbol.systemSymbol);
+    return waypoints
+        .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
   }
 
   /// Return the SystemWaypoint for the given [symbol].
-  SystemWaypoint waypointFromSymbol(String symbol) => waypointOrNull(symbol)!;
+  SystemWaypoint waypointFromSymbol(WaypointSymbol symbol) =>
+      waypointOrNull(symbol)!;
+
+  /// Return the SystemWaypoint for the given [symbol].
+  SystemWaypoint? waypointFromString(String symbol) =>
+      waypointOrNull(WaypointSymbol.fromString(symbol));
 
   /// Return the SystemWaypoints for the given [systemSymbol].
   /// Mostly exists for compatibility with WaypointCache.
-  List<SystemWaypoint> waypointsInSystem(String systemSymbol) =>
+  List<SystemWaypoint> waypointsInSystem(SystemSymbol systemSymbol) =>
       systemBySymbol(systemSymbol).waypoints;
 
-  List<ConnectedSystem> _computeConnectedSystems(String systemSymbol) {
+  List<ConnectedSystem> _computeConnectedSystems(SystemSymbol systemSymbol) {
     const jumpGateRange = 2000;
-    final system = _systems.firstWhere((s) => s.symbol == systemSymbol);
+    final system = systemBySymbol(systemSymbol);
     if (!system.hasJumpGate) {
       return [];
     }
     // Get all systems within X distance of the given system.
     final inRange = _systems
-        .where((s) => s.symbol != systemSymbol)
+        .where((s) => s.symbol != systemSymbol.system)
         .where((s) => s.hasJumpGate)
         .where((s) => system.distanceTo(s) <= jumpGateRange)
         .toList();
@@ -145,7 +149,7 @@ class SystemsCache extends JsonListStore<System> {
 
   /// Return connected systems for the given [systemSymbol].
   List<ConnectedSystem> connectedSystems(
-    String systemSymbol,
+    SystemSymbol systemSymbol,
   ) {
     final cached = _connectedSystems[systemSymbol];
     if (cached != null) {
@@ -159,15 +163,14 @@ class SystemsCache extends JsonListStore<System> {
   /// Yields a stream of system symbols that are within n jumps of the system.
   /// The system itself is included in the stream with distance 0.
   /// The stream is roughly ordered by distance from the start.
-  Iterable<(String systemSymbol, int jumps)> systemSymbolsInJumpRadius({
-    required String startSystem,
+  Iterable<(SystemSymbol systemSymbol, int jumps)> systemSymbolsInJumpRadius({
+    required SystemSymbol startSystem,
     required int maxJumps,
   }) sync* {
-    assertIsSystemSymbol(startSystem);
     var jumpsLeft = maxJumps;
-    final currentSystemsToJumpFrom = <String>{startSystem};
-    final oneJumpFurther = <String>{};
-    final systemsExamined = <String>{};
+    final currentSystemsToJumpFrom = <SystemSymbol>{startSystem};
+    final oneJumpFurther = <SystemSymbol>{};
+    final systemsExamined = <SystemSymbol>{};
     while (jumpsLeft >= 0) {
       while (currentSystemsToJumpFrom.isNotEmpty) {
         final jumpFrom = currentSystemsToJumpFrom.first;
@@ -182,9 +185,10 @@ class SystemsCache extends JsonListStore<System> {
           for (final connectedSystem in sortedSystems) {
             // Don't add systems we've already examined or are already in the
             // list to examine next.
-            if (!systemsExamined.contains(connectedSystem.symbol) &&
-                !currentSystemsToJumpFrom.contains(connectedSystem.symbol)) {
-              oneJumpFurther.add(connectedSystem.symbol);
+            if (!systemsExamined.contains(connectedSystem.systemSymbol) &&
+                !currentSystemsToJumpFrom
+                    .contains(connectedSystem.systemSymbol)) {
+              oneJumpFurther.add(connectedSystem.systemSymbol);
             }
           }
         }
@@ -211,17 +215,17 @@ class SystemsCache extends JsonListStore<System> {
   //   }
   // }
 
-  Iterable<String> waypointSymbolsInJumpRadius({
-    required String startSystem,
+  Iterable<WaypointSymbol> waypointSymbolsInJumpRadius({
+    required SystemSymbol startSystem,
     required int maxJumps,
   }) sync* {
-    for (final (String system, int _) in systemSymbolsInJumpRadius(
+    for (final (SystemSymbol system, int _) in systemSymbolsInJumpRadius(
       startSystem: startSystem,
       maxJumps: maxJumps,
     )) {
       final waypoints = waypointsInSystem(system);
       for (final waypoint in waypoints) {
-        yield waypoint.symbol;
+        yield waypoint.waypointSymbol;
       }
     }
   }

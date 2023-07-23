@@ -101,18 +101,21 @@ void main() {
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
     when(() => caches.routePlanner).thenReturn(routePlanner);
 
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+
     final shipFuel = _MockShipFuel();
     when(() => ship.fuel).thenReturn(shipFuel);
     when(() => shipFuel.capacity).thenReturn(0);
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-B');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(start.system);
 
     final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn('S-A-B');
-    when(() => waypoint.systemSymbol).thenReturn('S-A');
+    when(() => waypoint.symbol).thenReturn(start.waypoint);
+    when(() => waypoint.systemSymbol).thenReturn(start.system);
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
     when(() => waypoint.traits).thenReturn([
       WaypointTrait(
@@ -121,10 +124,10 @@ void main() {
         description: '',
       )
     ]);
-    when(() => marketCache.marketForSymbol('S-A-B')).thenAnswer(
+    when(() => marketCache.marketForSymbol(start)).thenAnswer(
       (_) => Future.value(
         Market(
-          symbol: 'S-A-B',
+          symbol: end.waypoint,
           tradeGoods: [
             MarketTradeGood(
               symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
@@ -139,16 +142,17 @@ void main() {
     );
     when(
       () => marketPrices.hasRecentMarketData(
-        'S-A-B',
+        start,
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
 
+    registerFallbackValue(start);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
     when(
       () => systemsCache.systemSymbolsInJumpRadius(
-        startSystem: 'S-A',
+        startSystem: start.systemSymbol,
         maxJumps: 1,
       ),
     ).thenReturn([]);
@@ -157,7 +161,7 @@ void main() {
         .thenAnswer((_) => Future.value(waypoint));
     when(
       () => systemsCache.systemSymbolsInJumpRadius(
-        startSystem: 'S-A',
+        startSystem: start.systemSymbol,
         maxJumps: 1,
       ),
     ).thenReturn([]);
@@ -176,9 +180,9 @@ void main() {
     ).thenAnswer((_) => Future.value());
 
     final costedDeal = CostedDeal(
-      deal: const Deal(
-        sourceSymbol: 'S-A-B',
-        destinationSymbol: 'S-A-C',
+      deal: Deal(
+        sourceSymbol: start,
+        destinationSymbol: end,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
         purchasePrice: 10,
         sellPrice: 20,
@@ -186,11 +190,11 @@ void main() {
       cargoSize: 10,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan(
+      route: RoutePlan(
         actions: [
           RouteAction(
-            startSymbol: 'S-A-B',
-            endSymbol: 'S-A-C',
+            startSymbol: start,
+            endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
           )
@@ -297,10 +301,14 @@ void main() {
     when(() => ship.fuel).thenReturn(shipFuel);
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
+
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+
     // We do not need to dock.
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-B');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(start.system);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
 
     final shipEngine = _MockShipEngine();
@@ -308,8 +316,8 @@ void main() {
     when(() => ship.engine).thenReturn(shipEngine);
 
     final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn('S-A-B');
-    when(() => waypoint.systemSymbol).thenReturn('S-A');
+    when(() => waypoint.symbol).thenReturn(start.waypoint);
+    when(() => waypoint.systemSymbol).thenReturn(start.system);
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
     // We have a marketplace.
     when(() => waypoint.traits).thenReturn([
@@ -321,7 +329,7 @@ void main() {
     ]);
     when(
       () => marketPrices.hasRecentMarketData(
-        'S-A-B',
+        start,
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
@@ -330,32 +338,32 @@ void main() {
         .thenAnswer((_) => Future.value(waypoint));
     when(
       () => systemsCache.systemSymbolsInJumpRadius(
-        startSystem: 'S-A',
+        startSystem: start.systemSymbol,
         maxJumps: 1,
       ),
     ).thenReturn([]);
-    when(() => systemsCache.waypointFromSymbol('S-A-B')).thenReturn(
+    when(() => systemsCache.waypointFromSymbol(start)).thenReturn(
       SystemWaypoint(
-        symbol: 'S-A-B',
+        symbol: start.waypoint,
         type: WaypointType.ASTEROID_FIELD,
         x: 0,
         y: 0,
       ),
     );
-    when(() => systemsCache.waypointFromSymbol('S-A-C')).thenReturn(
+    when(() => systemsCache.waypointFromSymbol(end)).thenReturn(
       SystemWaypoint(
-        symbol: 'S-A-C',
+        symbol: end.waypoint,
         type: WaypointType.ASTEROID_FIELD,
         x: 0,
         y: 0,
       ),
     );
 
-    const routePlan = RoutePlan(
+    final routePlan = RoutePlan(
       actions: [
         RouteAction(
-          startSymbol: 'S-A-B',
-          endSymbol: 'S-A-C',
+          startSymbol: start,
+          endSymbol: end,
           type: RouteActionType.navCruise,
           duration: 10,
         )
@@ -365,9 +373,9 @@ void main() {
       shipSpeed: 10,
     );
     final costedDeal = CostedDeal(
-      deal: const Deal(
-        sourceSymbol: 'S-A-B',
-        destinationSymbol: 'S-A-C',
+      deal: Deal(
+        sourceSymbol: start,
+        destinationSymbol: end,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
         purchasePrice: 10,
         sellPrice: 20,
@@ -380,7 +388,7 @@ void main() {
     );
 
     final market = Market(
-      symbol: 'S-A-B',
+      symbol: start.waypoint,
       tradeGoods: [
         MarketTradeGood(
           symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
@@ -399,7 +407,7 @@ void main() {
         ),
       ],
     );
-    when(() => marketCache.marketForSymbol('S-A-B'))
+    when(() => marketCache.marketForSymbol(start))
         .thenAnswer((_) => Future.value(market));
 
     when(() => centralCommand.getBehavior('S')).thenAnswer(
@@ -440,7 +448,7 @@ void main() {
       totalPrice: 100,
       type: MarketTransactionTypeEnum.PURCHASE,
       tradeSymbol: TradeSymbol.FUEL.value,
-      waypointSymbol: 'S-A-B',
+      waypointSymbol: start.waypoint,
       shipSymbol: 'S',
       timestamp: DateTime(2021),
     );
@@ -469,15 +477,15 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
-    registerFallbackValue(SystemSymbol.fromString('S-A'));
+    when(() => systemsCache.waypointsInSystem(start.systemSymbol))
+        .thenReturn([]);
+    registerFallbackValue(start.systemSymbol);
     when(
       () => systemConnectivity.canJumpBetweenSystemSymbols(
         any(),
         any(),
       ),
     ).thenReturn(true);
-
-    when(() => systemsCache.waypointsInSystem('S-A')).thenReturn([]);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -582,12 +590,16 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('W');
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.systemSymbol).thenReturn('S-A');
 
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+    registerFallbackValue(start);
+
     final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn('S-A-B');
-    when(() => waypoint.systemSymbol).thenReturn('S-A');
+    when(() => waypoint.symbol).thenReturn(start.waypoint);
+    when(() => waypoint.systemSymbol).thenReturn(start.system);
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
     when(() => waypoint.traits).thenReturn([]);
     when(() => waypointCache.waypoint(any()))
@@ -597,11 +609,11 @@ void main() {
         .thenAnswer((_) => BehaviorState('S', Behavior.trader));
     when(() => centralCommand.setBehavior('S', any()))
         .thenAnswer((_) => Future.value());
-    const routePlan = RoutePlan(
+    final routePlan = RoutePlan(
       actions: [
         RouteAction(
-          startSymbol: 'S-A-B',
-          endSymbol: 'A',
+          startSymbol: start,
+          endSymbol: end,
           type: RouteActionType.navCruise,
           duration: 10,
         )
@@ -613,17 +625,11 @@ void main() {
     registerFallbackValue(routePlan);
     when(() => centralCommand.setRoutePlan(ship, any()))
         .thenAnswer((_) => Future.value());
-    // when(() => centralCommand.disableBehaviorForShip(
-    //       ship,
-    //       Behavior.trader,
-    //       any(),
-    //       any(),
-    //     )).thenAnswer((_) => Future.value());
 
     final costedDeal = CostedDeal(
-      deal: const Deal(
-        sourceSymbol: 'S-A-B',
-        destinationSymbol: 'A',
+      deal: Deal(
+        sourceSymbol: start,
+        destinationSymbol: end,
         tradeSymbol: TradeSymbol.FUEL,
         purchasePrice: 10,
         sellPrice: 20,

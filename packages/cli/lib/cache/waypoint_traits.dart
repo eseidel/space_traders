@@ -11,7 +11,10 @@ class WaypointTraitCache extends JsonStore<_Record> {
     super.traitsBySymbol, {
     required super.fs,
     super.path = defaultCacheFilePath,
-  });
+  }) : super(
+          recordToJson: (r) =>
+              r.map((key, value) => MapEntry(key.toJson(), value.toJson())),
+        );
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'data/waypoint_traits.json';

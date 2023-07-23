@@ -17,9 +17,10 @@ void main() {
       y: 0,
     );
     when(() => systemsCache.systems).thenReturn([systemA]);
-    when(() => systemsCache.connectedSystems('S-A')).thenReturn([]);
+    final systemSymbol = SystemSymbol.fromString('S-A');
+    when(() => systemsCache.connectedSystems(systemSymbol)).thenReturn([]);
     final reachability = SystemConnectivity.fromSystemsCache(systemsCache);
-    expect(reachability.connectedSystemCount('S-A'), equals(1));
+    expect(reachability.connectedSystemCount(systemSymbol), equals(1));
   });
 
   test('ClusterFinder two systems', () {
@@ -39,11 +40,11 @@ void main() {
       y: 0,
     );
     when(() => systemsCache.systems).thenReturn([systemA, systemB]);
-    when(() => systemsCache.connectedSystems('S-A'))
+    when(() => systemsCache.connectedSystems(systemA.systemSymbol))
         .thenReturn([connectedSystemFromSystem(systemB, 0)]);
-    when(() => systemsCache.connectedSystems('S-B'))
+    when(() => systemsCache.connectedSystems(systemB.systemSymbol))
         .thenReturn([connectedSystemFromSystem(systemA, 0)]);
     final finder = SystemConnectivity.fromSystemsCache(systemsCache);
-    expect(finder.connectedSystemCount('S-A'), equals(2));
+    expect(finder.connectedSystemCount(systemA.systemSymbol), equals(2));
   });
 }

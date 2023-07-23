@@ -32,8 +32,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final jumpCache = JumpCache();
   final factionCache = FactionCache.loadFromCache(fs)!;
   // COSMIC has always been on the main jumpgate network.
-  final faction = factionCache.factionBySymbol(FactionSymbols.COSMIC);
-  final systemSymbol = parseWaypointString(faction.headquarters).system;
+  final factionHq = factionCache.headquartersFor(FactionSymbols.COSMIC);
+  final systemSymbol = factionHq.systemSymbol;
   final clusterId = systemConnectivity.clusterIdForSystem(systemSymbol);
   final allSystemSymbols =
       systemConnectivity.systemSymbolsByClusterId(clusterId);

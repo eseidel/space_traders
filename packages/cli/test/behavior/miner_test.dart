@@ -38,17 +38,18 @@ void main() {
   test('surveyWorthMining with no surveys', () async {
     final marketPrices = _MockMarketPrices();
     final surveyData = _MockSurveyData();
+    final symbol = WaypointSymbol.fromString('S-E-A');
     when(
       () => surveyData.recentSurveysAtWaypoint(
+        symbol,
         count: any(named: 'count'),
-        waypointSymbol: any(named: 'waypointSymbol'),
       ),
     ).thenReturn([]);
     final maybeSurvey = await surveyWorthMining(
       marketPrices,
       surveyData,
-      surveyWaypointSymbol: 'S-E-A',
-      nearbyMarketSymbol: 'S-E-A',
+      surveyWaypointSymbol: symbol,
+      nearbyMarketSymbol: symbol,
     );
     expect(maybeSurvey, isNull);
   });
@@ -59,6 +60,7 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     final oneHourFromNow = now.add(const Duration(hours: 1));
+    final waypointSymbol = WaypointSymbol.fromString('S-E-A');
     final surveys = [
       for (int i = 0; i < 10; i++)
         HistoricalSurvey(
@@ -67,7 +69,7 @@ void main() {
           survey: Survey(
             expiration: oneHourFromNow,
             signature: 'sig$i',
-            symbol: 'sym',
+            symbol: waypointSymbol.waypoint,
             deposits: [
               SurveyDeposit(
                 symbol: (i == 0) ? 'DIAMONDS' : 'ALUMINUM',
@@ -79,27 +81,27 @@ void main() {
     ];
     when(
       () => surveyData.recentSurveysAtWaypoint(
+        waypointSymbol,
         count: any(named: 'count'),
-        waypointSymbol: any(named: 'waypointSymbol'),
       ),
     ).thenReturn(surveys);
     when(
       () => marketPrices.recentSellPrice(
         TradeSymbol.DIAMONDS,
-        marketSymbol: any(named: 'marketSymbol'),
+        marketSymbol: waypointSymbol,
       ),
     ).thenReturn(100);
     when(
       () => marketPrices.recentSellPrice(
         TradeSymbol.ALUMINUM,
-        marketSymbol: any(named: 'marketSymbol'),
+        marketSymbol: waypointSymbol,
       ),
     ).thenReturn(10);
     final maybeSurvey = await surveyWorthMining(
       marketPrices,
       surveyData,
-      surveyWaypointSymbol: 'S-E-A',
-      nearbyMarketSymbol: 'S-E-A',
+      surveyWaypointSymbol: waypointSymbol,
+      nearbyMarketSymbol: waypointSymbol,
       getNow: getNow,
     );
     expect(maybeSurvey!.deposits.first.symbol, 'DIAMONDS');
@@ -125,10 +127,12 @@ void main() {
     final start = _MockWaypoint();
     final market = _MockWaypoint();
     when(() => start.traits).thenReturn([]);
-    when(() => start.systemSymbol).thenReturn('S-E');
+    final symbol = WaypointSymbol.fromString('S-E-W');
+    when(() => start.symbol).thenReturn(symbol.waypoint);
+    when(() => start.systemSymbol).thenReturn(symbol.system);
     when(
       () => waypointCache.waypointsInJumpRadius(
-        startSystem: any(named: 'startSystem'),
+        startSystem: symbol.systemSymbol,
         maxJumps: any(named: 'maxJumps'),
       ),
     ).thenAnswer((_) => Stream.fromIterable([market]));
@@ -142,10 +146,12 @@ void main() {
     final start = _MockWaypoint();
     final market = _MockWaypoint();
     when(() => start.traits).thenReturn([]);
-    when(() => start.systemSymbol).thenReturn('S-E');
+    final symbol = WaypointSymbol.fromString('S-E-W');
+    when(() => start.symbol).thenReturn(symbol.waypoint);
+    when(() => start.systemSymbol).thenReturn(symbol.system);
     when(
       () => waypointCache.waypointsInJumpRadius(
-        startSystem: any(named: 'startSystem'),
+        startSystem: symbol.systemSymbol,
         maxJumps: any(named: 'maxJumps'),
       ),
     ).thenAnswer((_) => Stream.fromIterable([market]));
@@ -188,16 +194,19 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    final symbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
     when(() => waypoint.traits).thenReturn([]);
-    when(() => waypoint.systemSymbol).thenReturn('S-A');
+    when(() => waypoint.systemSymbol).thenReturn(symbol.system);
 
+    registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
+    registerFallbackValue(symbol.systemSymbol);
     when(
       () => waypointCache.waypointsInJumpRadius(
         startSystem: any(named: 'startSystem'),
@@ -210,7 +219,7 @@ void main() {
         startSystem: any(named: 'startSystem'),
         maxJumps: any(named: 'maxJumps'),
       ),
-    ).thenReturn([('S-A', 0)]);
+    ).thenReturn([(symbol.systemSymbol, 0)]);
 
     when(
       () => waypointCache.waypointsInSystem(any()),

@@ -65,12 +65,14 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    final symbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
 
     final waypoint = _MockWaypoint();
-    when(() => waypoint.systemSymbol).thenReturn('S-A');
-    when(() => waypoint.symbol).thenReturn('S-A-W');
+    when(() => waypoint.systemSymbol).thenReturn(symbol.system);
+    when(() => waypoint.symbol).thenReturn(symbol.waypoint);
 
+    registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 

@@ -30,8 +30,9 @@ class Deal {
   /// Create a deal from JSON.
   factory Deal.fromJson(Map<String, dynamic> json) {
     return Deal(
-      sourceSymbol: json['sourceSymbol'] as String,
-      destinationSymbol: json['destinationSymbol'] as String,
+      sourceSymbol: WaypointSymbol.fromJson(json['sourceSymbol'] as String),
+      destinationSymbol:
+          WaypointSymbol.fromJson(json['destinationSymbol'] as String),
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
       purchasePrice: json['purchasePrice'] as int,
       sellPrice: json['sellPrice'] as int,
@@ -44,10 +45,10 @@ class Deal {
   final TradeSymbol tradeSymbol;
 
   /// The symbol of the market we're buying from.
-  final String sourceSymbol;
+  final WaypointSymbol sourceSymbol;
 
   /// The symbol of the market we're selling to.
-  final String destinationSymbol;
+  final WaypointSymbol destinationSymbol;
 
   /// The price we're buying at per unit.
   final int purchasePrice;
@@ -80,8 +81,8 @@ class Deal {
 
   /// Encode the deal as JSON.
   Map<String, dynamic> toJson() => {
-        'sourceSymbol': sourceSymbol,
-        'destinationSymbol': destinationSymbol,
+        'sourceSymbol': sourceSymbol.toJson(),
+        'destinationSymbol': destinationSymbol.toJson(),
         'tradeSymbol': tradeSymbol.toJson(),
         'purchasePrice': purchasePrice,
         'sellPrice': sellPrice,
@@ -171,16 +172,16 @@ Future<Waypoint?> nearbyMarketWhichTrades(
   int maxJumps = 1,
 }) async {
   if (start.hasMarketplace) {
-    final startMarket = await marketCache.marketForSymbol(start.symbol);
+    final startMarket = await marketCache.marketForSymbol(start.waypointSymbol);
     if (startMarket!.allowsTradeOf(tradeSymbol)) {
       return start;
     }
   }
   await for (final waypoint in waypointCache.waypointsInJumpRadius(
-    startSystem: start.systemSymbol,
+    startSystem: start.systemSymbolObject,
     maxJumps: maxJumps,
   )) {
-    final market = await marketCache.marketForSymbol(waypoint.symbol);
+    final market = await marketCache.marketForSymbol(waypoint.waypointSymbol);
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
       return waypoint;
     }
@@ -222,7 +223,7 @@ List<Deal> buildDealsFromScan(
         deals.add(
           Deal(
             sourceSymbol: buy.marketSymbol,
-            tradeSymbol: TradeSymbol.fromJson(tradeSymbol)!,
+            tradeSymbol: tradeSymbol,
             purchasePrice: buy.price,
             destinationSymbol: sell.marketSymbol,
             sellPrice: sell.price,
@@ -432,9 +433,11 @@ String describeCostedDeal(CostedDeal costedDeal) {
   final name =
       costedDeal.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
   return '${name.padRight(25)} '
-      ' ${deal.sourceSymbol.padRight(14)} ${c(deal.purchasePrice).padLeft(8)} '
+      ' ${deal.sourceSymbol.waypoint.padRight(14)} '
+      '${c(deal.purchasePrice).padLeft(8)} '
       '-> '
-      '${deal.destinationSymbol.padRight(14)} ${c(deal.sellPrice).padLeft(8)} '
+      '${deal.destinationSymbol.waypoint.padRight(14)} '
+      '${c(deal.sellPrice).padLeft(8)} '
       '$coloredProfitString $timeString ${c(costedDeal.expectedCosts)}';
 }
 
@@ -445,7 +448,7 @@ CostedDeal costOutDeal(
   Deal deal, {
   required int cargoSize,
   required int shipSpeed,
-  required String shipWaypointSymbol,
+  required WaypointSymbol shipWaypointSymbol,
   required int shipFuelCapacity,
   required int costPerFuelUnit,
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
@@ -477,7 +480,7 @@ CostedDeal costOutDeal(
 MarketScan scanNearbyMarkets(
   SystemsCache systemsCache,
   MarketPrices marketPrices, {
-  required String systemSymbol,
+  required SystemSymbol systemSymbol,
   required int maxJumps,
   required int maxWaypoints,
 }) {
@@ -500,7 +503,7 @@ CostedDeal? _filterDealsAndLog(
   Iterable<CostedDeal> costedDeals, {
   required int maxJumps,
   required int maxTotalOutlay,
-  required String systemSymbol,
+  required SystemSymbol systemSymbol,
   bool Function(CostedDeal deal)? filter,
 }) {
   final filtered = filter != null ? costedDeals.where(filter) : costedDeals;
@@ -537,7 +540,7 @@ Future<CostedDeal?> findDealFor(
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
   MarketScan scan, {
-  required String startSymbol,
+  required WaypointSymbol startSymbol,
   required int fuelCapacity,
   required int cargoCapacity,
   required int shipSpeed,
@@ -588,7 +591,7 @@ Future<CostedDeal?> findDealFor(
     costedDeals,
     maxJumps: maxJumps,
     maxTotalOutlay: maxTotalOutlay,
-    systemSymbol: startSymbol,
+    systemSymbol: startSymbol.systemSymbol,
     filter: filter,
   );
 }

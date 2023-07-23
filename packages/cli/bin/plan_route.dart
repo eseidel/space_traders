@@ -66,7 +66,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final systemsCache = SystemsCache.loadCached(fs)!;
   final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
 
-  final start = systemsCache.waypointFromSymbol(startSymbol);
-  final end = systemsCache.waypointFromSymbol(endSymbol);
+  final start = systemsCache.waypointFromString(startSymbol)!;
+  final end = systemsCache.waypointFromString(endSymbol)!;
   planRouteAndLog(routePlanner, start, end);
 }

@@ -5,9 +5,10 @@ import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.
-Stream<Waypoint> _allWaypointsInSystem(Api api, String system) {
+Stream<Waypoint> _allWaypointsInSystem(Api api, SystemSymbol system) {
   return fetchAllPages(api, (api, page) async {
-    final response = await api.systems.getSystemWaypoints(system, page: page);
+    final response =
+        await api.systems.getSystemWaypoints(system.system, page: page);
     return (response!.data, response.meta);
   });
 }
@@ -23,9 +24,9 @@ class WaypointCache {
   // _waypointsBySystem is no longer very useful, mostly it holds onto
   // uncharted waypoints for a single loop, we could explicitly cache
   // uncharted waypoints for a set amount of time instead?
-  final Map<String, List<Waypoint>> _waypointsBySystem = {};
+  final Map<SystemSymbol, List<Waypoint>> _waypointsBySystem = {};
   // TODO(eseidel): remove _connectedSystemsBySystem.
-  final Map<String, List<ConnectedSystem>> _connectedSystemsBySystem = {};
+  final Map<SystemSymbol, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Api _api;
   final SystemsCache _systemsCache;
   final ChartingCache _chartingCache;
@@ -39,13 +40,13 @@ class WaypointCache {
     // agentHeadquarters, connectedSystems, and jumpGates don't ever change.
   }
 
-  List<Waypoint>? _waypointsInSystemFromCache(String systemSymbol) {
+  List<Waypoint>? _waypointsInSystemFromCache(SystemSymbol systemSymbol) {
     final systemWaypoints = _systemsCache.waypointsInSystem(systemSymbol);
     final cachedWaypoints = <Waypoint>[];
     for (final systemWaypoint in systemWaypoints) {
       final waypoint = _chartingCache.waypointFromSymbol(
         _systemsCache,
-        systemWaypoint.symbol,
+        systemWaypoint.waypointSymbol,
       );
       if (waypoint == null) {
         return null;
@@ -56,8 +57,7 @@ class WaypointCache {
   }
 
   /// Fetch all waypoints in the given system.
-  Future<List<Waypoint>> waypointsInSystem(String systemSymbol) async {
-    assertIsSystemSymbol(systemSymbol);
+  Future<List<Waypoint>> waypointsInSystem(SystemSymbol systemSymbol) async {
     if (_waypointsBySystem.containsKey(systemSymbol)) {
       return _waypointsBySystem[systemSymbol]!;
     }
@@ -75,8 +75,7 @@ class WaypointCache {
   }
 
   /// Fetch the waypoint with the given symbol.
-  Future<Waypoint> waypoint(String waypointSymbol) async {
-    assertIsWaypointSymbol(waypointSymbol);
+  Future<Waypoint> waypoint(WaypointSymbol waypointSymbol) async {
     final result = await _waypointOrNull(waypointSymbol);
     if (result == null) {
       throw ArgumentError('Unknown waypoint: $waypointSymbol');
@@ -85,22 +84,21 @@ class WaypointCache {
   }
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
-  Future<Waypoint?> _waypointOrNull(String waypointSymbol) async {
-    assertIsWaypointSymbol(waypointSymbol);
-    assert(waypointSymbol.split('-').length == 3, 'Invalid system symbol');
-    final systemSymbol = parseWaypointString(waypointSymbol).system;
+  Future<Waypoint?> _waypointOrNull(WaypointSymbol waypointSymbol) async {
+    final systemSymbol = waypointSymbol.systemSymbol;
     final cachedWaypoint =
         _chartingCache.waypointFromSymbol(_systemsCache, waypointSymbol);
     if (cachedWaypoint != null) {
       return cachedWaypoint;
     }
     final waypoints = await waypointsInSystem(systemSymbol);
-    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
+    return waypoints
+        .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
   }
 
   /// Fetch the waypoints with the given symbols.
   Stream<Waypoint> waypointsForSymbols(
-    Iterable<String> waypointSymbols,
+    Iterable<WaypointSymbol> waypointSymbols,
   ) async* {
     for (final symbol in waypointSymbols) {
       yield await waypoint(symbol);
@@ -108,8 +106,7 @@ class WaypointCache {
   }
 
   /// Return all connected systems in the given system.
-  Stream<ConnectedSystem> connectedSystems(String systemSymbol) async* {
-    assertIsSystemSymbol(systemSymbol);
+  Stream<ConnectedSystem> connectedSystems(SystemSymbol systemSymbol) async* {
     // Don't really need the _connectdSystemsBySystem with the SystemsCache.
     var cachedSystems = _connectedSystemsBySystem[systemSymbol];
     if (cachedSystems == null) {
@@ -122,13 +119,17 @@ class WaypointCache {
   }
 
   /// Returns a list of waypoints in the system with a shipyard.
-  Future<List<Waypoint>> shipyardWaypointsForSystem(String systemSymbol) async {
+  Future<List<Waypoint>> shipyardWaypointsForSystem(
+    SystemSymbol systemSymbol,
+  ) async {
     final waypoints = await waypointsInSystem(systemSymbol);
     return waypoints.where((w) => w.hasShipyard).toList();
   }
 
   /// Returns a list of waypoints in the system with a marketplace.
-  Future<List<Waypoint>> marketWaypointsForSystem(String systemSymbol) async {
+  Future<List<Waypoint>> marketWaypointsForSystem(
+    SystemSymbol systemSymbol,
+  ) async {
     final waypoints = await waypointsInSystem(systemSymbol);
     return waypoints.where((w) => w.hasMarketplace).toList();
   }
@@ -137,10 +138,10 @@ class WaypointCache {
   /// Waypoints from the start system are included in the stream.
   /// The stream is roughly ordered by distance from the start.
   Stream<Waypoint> waypointsInJumpRadius({
-    required String startSystem,
+    required SystemSymbol startSystem,
     required int maxJumps,
   }) async* {
-    for (final (String system, int _)
+    for (final (SystemSymbol system, int _)
         in _systemsCache.systemSymbolsInJumpRadius(
       startSystem: startSystem,
       maxJumps: maxJumps,
@@ -162,7 +163,7 @@ class MarketCache {
   // response depending on if we have a ship there or not.
   // A market with ship in orbit will have tradeGoods and transactions data.
   // Currently this only caches for one loop.
-  final Map<String, Market?> _marketsBySymbol = {};
+  final Map<WaypointSymbol, Market?> _marketsBySymbol = {};
   final WaypointCache _waypointCache;
 
   // TODO(eseidel): This should not exist.  Callers should instead distinguish
@@ -175,11 +176,10 @@ class MarketCache {
   }
 
   /// Fetch all markets in the given system.
-  Stream<Market> marketsInSystem(String systemSymbol) async* {
-    assertIsSystemSymbol(systemSymbol);
+  Stream<Market> marketsInSystem(SystemSymbol systemSymbol) async* {
     final waypoints = await _waypointCache.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
-      final maybeMarket = await marketForSymbol(waypoint.symbol);
+      final maybeMarket = await marketForSymbol(waypoint.waypointSymbol);
       if (maybeMarket != null) {
         yield maybeMarket;
       }
@@ -188,7 +188,7 @@ class MarketCache {
 
   /// Fetch the waypoint with the given symbol.
   Future<Market?> marketForSymbol(
-    String marketSymbol, {
+    WaypointSymbol marketSymbol, {
     bool forceRefresh = false,
   }) async {
     if (!forceRefresh && _marketsBySymbol.containsKey(marketSymbol)) {

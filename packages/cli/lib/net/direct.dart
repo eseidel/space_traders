@@ -14,11 +14,11 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   Api api,
   ShipCache shipCache,
   AgentCache agentCache,
-  String shipyardSymbol,
+  WaypointSymbol shipyardSymbol,
   ShipType shipType,
 ) async {
   final purchaseShipRequest = PurchaseShipRequest(
-    waypointSymbol: shipyardSymbol,
+    waypointSymbol: shipyardSymbol.waypoint,
     shipType: shipType,
   );
   final purchaseResponse =
@@ -46,9 +46,9 @@ Future<ShipNav> setShipFlightMode(
 Future<NavigateShip200ResponseData> navigateShip(
   Api api,
   Ship ship,
-  String waypointSymbol,
+  WaypointSymbol waypointSymbol,
 ) async {
-  final request = NavigateShipRequest(waypointSymbol: waypointSymbol);
+  final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
   final result =
       await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
   final data = result!.data;
@@ -82,12 +82,12 @@ Future<DeliverContract200ResponseData> deliverContract(
   Ship ship,
   ContractCache contractCache,
   Contract contract, {
-  required String tradeSymbol,
+  required TradeSymbol tradeSymbol,
   required int units,
 }) async {
   final request = DeliverContractRequest(
     shipSymbol: ship.symbol,
-    tradeSymbol: tradeSymbol,
+    tradeSymbol: tradeSymbol.value,
     units: units,
   );
   final response = await api.contracts

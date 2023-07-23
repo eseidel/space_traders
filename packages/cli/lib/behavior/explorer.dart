@@ -24,7 +24,10 @@ bool _isMissingRecentMarketData(
   required Duration maxAge,
 }) {
   return waypoint.hasMarketplace &&
-      !marketPrices.hasRecentMarketData(waypoint.symbol, maxAge: maxAge);
+      !marketPrices.hasRecentMarketData(
+        waypoint.waypointSymbol,
+        maxAge: maxAge,
+      );
 }
 
 bool _isMissingRecentShipyardData(
@@ -33,7 +36,10 @@ bool _isMissingRecentShipyardData(
   required Duration maxAge,
 }) {
   return waypoint.hasShipyard &&
-      !shipyardPrices.hasRecentShipyardData(waypoint.symbol, maxAge: maxAge);
+      !shipyardPrices.hasRecentShipyardData(
+        waypoint.waypointSymbol,
+        maxAge: maxAge,
+      );
 }
 
 /// Visits the local market if we're at a waypoint with a market.
@@ -59,7 +65,7 @@ Future<Market?> visitLocalMarket(
     caches.marketPrices,
     caches.markets,
     ship,
-    waypoint.symbol,
+    waypoint.waypointSymbol,
     maxAge: maxAge,
   );
   if (ship.usesFuel) {
@@ -76,7 +82,7 @@ Future<Market?> visitLocalMarket(
 }
 
 /// Returns the symbol of a waypoint in the system missing a chart.
-Future<String?> _waypointSymbolNeedingExploration(
+Future<WaypointSymbol?> _waypointSymbolNeedingExploration(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
   MarketPrices marketPrices,
@@ -88,7 +94,7 @@ Future<String?> _waypointSymbolNeedingExploration(
   required WaypointCache? waypointCache,
 }) async {
   for (final systemWaypoint in system.waypoints) {
-    final waypointSymbol = systemWaypoint.symbol;
+    final waypointSymbol = systemWaypoint.waypointSymbol;
     if (filter != null && !filter(systemWaypoint.systemSymbol)) {
       continue;
     }
@@ -129,14 +135,14 @@ Future<String?> _waypointSymbolNeedingExploration(
 }
 
 /// Returns the closet waypoint worth exploring.
-Future<String?> findNewWaypointSymbolToExplore(
+Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
   ChartingCache chartingCache,
   MarketPrices marketPrices,
   ShipyardPrices shipyardPrices,
   Ship ship, {
-  required String startSystemSymbol,
+  required SystemSymbol startSystemSymbol,
   WaypointCache? waypointCache,
   bool Function(SystemSymbol systemSymbol)? filter,
   Duration maxAge = defaultMaxAge,
@@ -175,27 +181,28 @@ Future<String?> findNewWaypointSymbolToExplore(
   return null;
 }
 
-String _nearestHeadquarters(
+WaypointSymbol _nearestHeadquarters(
   SystemConnectivity systemConnectivity,
   SystemsCache systemsCache,
   AgentCache agentCache,
   FactionCache factionCache,
   Ship ship,
 ) {
-  final factionsHqs = factionCache.factions.map((e) => e.headquarters).toList();
-  final startSystem = systemsCache.systemBySymbol(ship.nav.systemSymbol);
+  final factionsHqs =
+      factionCache.factions.map((e) => e.headquartersSymbol).toList();
+  final startSystem = systemsCache.systemBySymbol(ship.systemSymbol);
   final reachableHqs = factionsHqs
       .where(
         (hq) => systemConnectivity.canJumpBetweenSystemSymbols(
           ship.systemSymbol,
-          WaypointSymbol.fromString(hq).systemSymbol,
+          hq.systemSymbol,
         ),
       )
       .toList();
   final sortedHqs = reachableHqs
       .sortedBy<num>(
         (hq) => systemsCache
-            .systemBySymbol(parseWaypointString(hq).system)
+            .systemBySymbol(hq.systemSymbol)
             .distanceTo(startSystem),
       )
       .toList();
@@ -223,7 +230,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
     TradeSymbol.FUEL,
     maxJumps: 5,
   ))
-      ?.symbol;
+      ?.waypointSymbol;
   if (destination == null) {
     shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
     destination = _nearestHeadquarters(
@@ -256,7 +263,7 @@ Future<DateTime?> advanceExplorer(
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
   final maxAge = centralCommand.maxAgeForExplorerData;
-  final waypoint = await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   // advanceExplorer is only ever called when we're idle at a location, so
   // either it's the first time and we need to set a destination, or we've just
   // completed a loop.  This _isMissingChartOrRecentPriceData is really our
@@ -315,7 +322,7 @@ Future<DateTime?> advanceExplorer(
     caches.marketPrices,
     caches.shipyardPrices,
     ship,
-    startSystemSymbol: ship.nav.systemSymbol,
+    startSystemSymbol: ship.systemSymbol,
     filter: (SystemSymbol systemSymbol) => !probeSystems.contains(systemSymbol),
     maxAge: maxAge,
     waypointCache: caches.waypoints,

@@ -18,7 +18,7 @@ MarketPrice makePrice({
   DateTime? timestamp,
 }) {
   return MarketPrice(
-    waypointSymbol: waypointSymbol,
+    waypointSymbol: WaypointSymbol.fromString(waypointSymbol),
     symbol: symbol.value,
     supply: supply,
     purchasePrice: purchasePrice,
@@ -33,8 +33,8 @@ void main() {
     final fs = MemoryFileSystem();
     const a = TradeSymbol.FUEL;
     const b = TradeSymbol.FOOD;
-    final aPrice = makePrice(waypointSymbol: 'a', symbol: a);
-    final bPrice = makePrice(waypointSymbol: 'b', symbol: a);
+    final aPrice = makePrice(waypointSymbol: 'S-S-A', symbol: a);
+    final bPrice = makePrice(waypointSymbol: 'S-S-B', symbol: a);
     final marketPrices = MarketPrices([aPrice, bPrice], fs: fs);
     expect(marketPrices.medianPurchasePrice(a), 1);
     expect(marketPrices.medianSellPrice(a), 1);
@@ -45,20 +45,21 @@ void main() {
   test('PriceData.addPrices', () async {
     final fs = MemoryFileSystem();
     const a = TradeSymbol.FUEL;
-    final aPrice = makePrice(waypointSymbol: 'a', symbol: a, purchasePrice: 10);
+    final aPrice =
+        makePrice(waypointSymbol: 'S-S-A', symbol: a, purchasePrice: 10);
     final marketPrices = MarketPrices([aPrice], fs: fs);
     expect(marketPrices.count, 1);
     expect(marketPrices.waypointCount, 1);
 
     const b = TradeSymbol.FOOD;
-    final bPrice = makePrice(waypointSymbol: 'b', symbol: b);
+    final bPrice = makePrice(waypointSymbol: 'S-S-B', symbol: b);
     await marketPrices.addPrices([bPrice]);
     expect(marketPrices.count, 2);
     expect(marketPrices.waypointCount, 2);
 
     // Ignores invalid price dates
     final c = makePrice(
-      waypointSymbol: 'c',
+      waypointSymbol: 'S-S-C',
       symbol: TradeSymbol.ADVANCED_CIRCUITRY,
       timestamp: DateTime.now().add(const Duration(days: 1)),
     );
@@ -68,12 +69,13 @@ void main() {
     expect(marketPrices.waypointCount, 2);
 
     // Will replace prices with newer ones.
+    final market = WaypointSymbol.fromString('S-S-A');
     expect(
-      marketPrices.recentPurchasePrice(marketSymbol: 'a', a),
+      marketPrices.recentPurchasePrice(marketSymbol: market, a),
       10,
     );
     final d = makePrice(
-      waypointSymbol: 'a',
+      waypointSymbol: 'S-S-A',
       symbol: a,
       purchasePrice: 20,
     );
@@ -81,20 +83,20 @@ void main() {
     expect(marketPrices.count, 2);
     expect(marketPrices.waypointCount, 2);
     expect(
-      marketPrices.recentPurchasePrice(marketSymbol: 'a', a),
+      marketPrices.recentPurchasePrice(marketSymbol: market, a),
       20,
     );
 
     // But will ignore older prices.
     final e = makePrice(
-      waypointSymbol: 'a',
+      waypointSymbol: 'S-S-A',
       symbol: a,
       purchasePrice: 5,
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
     );
     await runWithLogger(logger, () => marketPrices.addPrices([e]));
     expect(
-      marketPrices.recentPurchasePrice(marketSymbol: 'a', a),
+      marketPrices.recentPurchasePrice(marketSymbol: market, a),
       20,
     );
   });
@@ -107,9 +109,13 @@ void main() {
       purchasePrice: 1,
       sellPrice: 2,
     );
-    final price = MarketPrice.fromMarketTradeGood(good, 'W');
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    final price = MarketPrice.fromMarketTradeGood(
+      good,
+      waypointSymbol,
+    );
     expect(price.symbol, 'A');
-    expect(price.waypointSymbol, 'W');
+    expect(price.waypointSymbol, waypointSymbol);
     expect(price.tradeVolume, 1);
     expect(price.supply, MarketTradeGoodSupplyEnum.ABUNDANT);
     expect(price.purchasePrice, 1);
@@ -121,11 +127,11 @@ void main() {
     const a = TradeSymbol.FUEL;
     final marketPrices = MarketPrices(
       [
-        makePrice(waypointSymbol: 'a', symbol: a, sellPrice: 100),
-        makePrice(waypointSymbol: 'b', symbol: a, sellPrice: 110),
-        makePrice(waypointSymbol: 'c', symbol: a, sellPrice: 150),
-        makePrice(waypointSymbol: 'd', symbol: a, sellPrice: 200),
-        makePrice(waypointSymbol: 'e', symbol: a, sellPrice: 300),
+        makePrice(waypointSymbol: 'S-S-A', symbol: a, sellPrice: 100),
+        makePrice(waypointSymbol: 'S-S-B', symbol: a, sellPrice: 110),
+        makePrice(waypointSymbol: 'S-S-C', symbol: a, sellPrice: 150),
+        makePrice(waypointSymbol: 'S-S-D', symbol: a, sellPrice: 200),
+        makePrice(waypointSymbol: 'S-S-E', symbol: a, sellPrice: 300),
       ],
       fs: fs,
     );
@@ -141,37 +147,11 @@ void main() {
     expect(marketPrices.sellPriceAtPercentile(a, 50), 150);
     expect(marketPrices.sellPriceAtPercentile(a, 25), 110);
   });
-  test('percentileForPurchasePrice', () {
-    final fs = MemoryFileSystem();
-    const a = TradeSymbol.FUEL;
-    final marketPrices = MarketPrices(
-      [
-        makePrice(waypointSymbol: 'a', symbol: a, purchasePrice: 100),
-        makePrice(waypointSymbol: 'b', symbol: a, purchasePrice: 110),
-        makePrice(waypointSymbol: 'c', symbol: a, purchasePrice: 150),
-        makePrice(waypointSymbol: 'd', symbol: a, purchasePrice: 200),
-        makePrice(waypointSymbol: 'e', symbol: a, purchasePrice: 300),
-      ],
-      fs: fs,
-    );
-    expect(marketPrices.percentileForPurchasePrice(a, 100), 20);
-    expect(marketPrices.percentileForPurchasePrice(a, 110), 40);
-    expect(marketPrices.percentileForPurchasePrice(a, 150), 60);
-    expect(marketPrices.percentileForPurchasePrice(a, 160), 60);
-    expect(marketPrices.percentileForPurchasePrice(a, 200), 80);
-    expect(marketPrices.percentileForPurchasePrice(a, 300), 100);
-    expect(marketPrices.percentileForPurchasePrice(a, 400), 100);
-
-    expect(marketPrices.purchasePriceAtPercentile(a, 100), 300);
-    expect(marketPrices.purchasePriceAtPercentile(a, 0), 100);
-    expect(marketPrices.purchasePriceAtPercentile(a, 50), 150);
-    expect(marketPrices.purchasePriceAtPercentile(a, 25), 110);
-  });
 
   test('MarketPrice JSON roundtrip', () {
     final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
     final price = MarketPrice(
-      waypointSymbol: 'A',
+      waypointSymbol: WaypointSymbol.fromString('S-A-W'),
       symbol: 'A',
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 1,
@@ -190,18 +170,28 @@ void main() {
     final fs = MemoryFileSystem();
     const a = TradeSymbol.FUEL;
     final marketPrices = MarketPrices([], fs: fs);
-    expect(marketPrices.hasRecentMarketData('a'), false);
+    final marketSymbol = WaypointSymbol.fromString('S-A-W');
+    expect(marketPrices.hasRecentMarketData(marketSymbol), false);
     final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
-    final aPrice =
-        makePrice(waypointSymbol: 'a', symbol: a, timestamp: oneMinuteAgo);
+    final aPrice = makePrice(
+      waypointSymbol: marketSymbol.waypoint,
+      symbol: a,
+      timestamp: oneMinuteAgo,
+    );
     marketPrices.addPrices([aPrice]);
-    expect(marketPrices.hasRecentMarketData('a'), true);
+    expect(marketPrices.hasRecentMarketData(marketSymbol), true);
     expect(
-      marketPrices.hasRecentMarketData('a', maxAge: const Duration(seconds: 1)),
+      marketPrices.hasRecentMarketData(
+        marketSymbol,
+        maxAge: const Duration(seconds: 1),
+      ),
       false,
     );
     expect(
-      marketPrices.hasRecentMarketData('a', maxAge: const Duration(hours: 1)),
+      marketPrices.hasRecentMarketData(
+        marketSymbol,
+        maxAge: const Duration(hours: 1),
+      ),
       true,
     );
   });
@@ -209,8 +199,9 @@ void main() {
   test('recordMarketData', () async {
     final fs = MemoryFileSystem();
     final marketPrices = MarketPrices([], fs: fs);
+    final marketSymbol = WaypointSymbol.fromString('S-A-W');
     final market = Market(
-      symbol: 'a',
+      symbol: marketSymbol.waypoint,
       tradeGoods: [
         MarketTradeGood(
           symbol: 'a',
@@ -222,15 +213,16 @@ void main() {
       ],
     );
     await recordMarketData(marketPrices, market);
-    expect(marketPrices.hasRecentMarketData('a'), true);
+    expect(marketPrices.hasRecentMarketData(marketSymbol), true);
     expect(marketPrices.count, 1);
   });
 
   test('PriceData save/load roundtrip', () async {
     final fs = MemoryFileSystem();
     final marketPrices = MarketPrices([], fs: fs);
+    final marketSymbol = WaypointSymbol.fromString('S-A-W');
     final market = Market(
-      symbol: 'a',
+      symbol: marketSymbol.waypoint,
       tradeGoods: [
         MarketTradeGood(
           symbol: 'a',
@@ -242,11 +234,11 @@ void main() {
       ],
     );
     await recordMarketData(marketPrices, market);
-    expect(marketPrices.hasRecentMarketData('a'), true);
+    expect(marketPrices.hasRecentMarketData(marketSymbol), true);
     expect(marketPrices.count, 1);
 
     final marketPrices2 = MarketPrices.load(fs);
-    expect(marketPrices2.hasRecentMarketData('a'), true);
+    expect(marketPrices2.hasRecentMarketData(marketSymbol), true);
     expect(marketPrices2.count, 1);
   });
 }

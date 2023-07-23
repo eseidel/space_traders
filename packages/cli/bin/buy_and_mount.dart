@@ -15,7 +15,7 @@ Future<void> _navigateToLocalWaypointAndDock(
   bool shouldDock,
 ) async {
   final navigateResult =
-      await navigateToLocalWaypoint(api, ship, destination.symbol);
+      await navigateToLocalWaypoint(api, ship, destination.waypointSymbol);
   final eta = navigateResult.nav.route.arrival;
   final flightTime = eta.difference(DateTime.now());
   logger.info('Expected in $flightTime.');
@@ -40,7 +40,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
 
   // it finds a nearby market with that mount.
-  final start = await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final start = await caches.waypoints.waypoint(ship.waypointSymbol);
   final mountMarket = await nearbyMarketWhichTrades(
     caches.systems,
     caches.waypoints,

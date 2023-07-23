@@ -30,7 +30,7 @@ class AgentCache extends JsonStore<Agent> {
     required super.fs,
     super.path = defaultPath,
     this.requestsBetweenChecks = 100,
-  });
+  }) : super(recordToJson: (a) => a.toJson());
 
   /// Creates a new AgentCache from a file.
   static AgentCache? loadCached(FileSystem fs, {String path = defaultPath}) {
@@ -72,7 +72,10 @@ class AgentCache extends JsonStore<Agent> {
 
   /// The headquarters of the agent.
   SystemWaypoint headquarters(SystemsCache systems) =>
-      systems.waypointFromSymbol(agent.headquarters);
+      systems.waypointFromSymbol(agent.headquartersSymbol);
+
+  /// The symbol of the agent's headquarters.
+  WaypointSymbol get headquartersSymbol => agent.headquartersSymbol;
 
   /// Ensures the agent in the cache is up to date.
   Future<void> ensureAgentUpToDate(Api api) async {

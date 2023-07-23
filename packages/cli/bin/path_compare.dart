@@ -1,3 +1,4 @@
+import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
@@ -28,8 +29,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   const shipSpeed = 30;
   for (final pair in pathPairs) {
-    final start = systemsCache.waypointFromSymbol(pair[0]);
-    final end = systemsCache.waypointFromSymbol(pair[1]);
+    final start = systemsCache.waypointFromString(pair[0])!;
+    final end = systemsCache.waypointFromString(pair[1])!;
     final waypointPath = findWaypointPath(
       systemsCache,
       start,
@@ -39,7 +40,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     final jumpsOnly =
         findWaypointPathJumpsOnly(systemsCache, start, end, shipSpeed);
     final matches =
-        const ListEquality<String>().equals(waypointPath, jumpsOnly);
+        const ListEquality<WaypointSymbol>().equals(waypointPath, jumpsOnly);
     logger.info('${start.symbol} -> ${end.symbol}');
     if (matches) {
       logger.info('  matches');

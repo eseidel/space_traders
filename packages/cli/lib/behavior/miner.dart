@@ -42,7 +42,7 @@ import 'package:collection/collection.dart';
 int expectedValueFromSurvey(
   MarketPrices marketPrices,
   Survey survey, {
-  required String marketSymbol,
+  required WaypointSymbol marketSymbol,
 }) {
   // I'm not yet sure what to do with deposit size.
   // Look at each of the possible returns.
@@ -70,7 +70,7 @@ Future<Waypoint?> nearestWaypointWithMarket(
     return start;
   }
   await for (final waypoint in waypointCache.waypointsInJumpRadius(
-    startSystem: start.systemSymbol,
+    startSystem: start.systemSymbolObject,
     maxJumps: maxJumps,
   )) {
     if (waypoint.hasMarketplace) {
@@ -96,15 +96,15 @@ class _ValuedSurvey {
 Future<Survey?> surveyWorthMining(
   MarketPrices marketPrices,
   SurveyData surveyData, {
-  required String surveyWaypointSymbol,
-  required String nearbyMarketSymbol,
+  required WaypointSymbol surveyWaypointSymbol,
+  required WaypointSymbol nearbyMarketSymbol,
   int minimumSurveys = 10,
   double percentileThreshold = 0.9,
   DateTime Function() getNow = defaultGetNow,
 }) async {
   // Get N recent surveys for this waypoint, including expired and exhausted.
   final recentSurveys = surveyData.recentSurveysAtWaypoint(
-    waypointSymbol: surveyWaypointSymbol,
+    surveyWaypointSymbol,
     count: 100,
   );
   // If we don't have enough surveys to compare, return null.
@@ -155,8 +155,7 @@ Future<DateTime?> advanceMiner(
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
-  final currentWaypoint =
-      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   // It's not worth potentially waiting a minute just to get a few pieces
   // of cargo, when a surveyed mining operation could pull 10+ pieces.
@@ -219,7 +218,7 @@ Future<DateTime?> advanceMiner(
       caches.systems,
       caches.routePlanner,
       centralCommand,
-      nearestMarket.symbol,
+      nearestMarket.waypointSymbol,
     );
   }
 
@@ -234,14 +233,14 @@ Future<DateTime?> advanceMiner(
     );
     return null;
   }
-  if (ship.nav.waypointSymbol != mineSymbol.waypoint) {
+  if (ship.waypointSymbol != mineSymbol) {
     return beingNewRouteAndLog(
       api,
       ship,
       caches.systems,
       caches.routePlanner,
       centralCommand,
-      mineSymbol.waypoint,
+      mineSymbol,
     );
   }
 
@@ -278,14 +277,14 @@ Future<DateTime?> advanceMiner(
   final maybeSurvey = await surveyWorthMining(
     caches.marketPrices,
     caches.surveys,
-    surveyWaypointSymbol: currentWaypoint.symbol,
-    nearbyMarketSymbol: nearestMarket.symbol,
+    surveyWaypointSymbol: currentWaypoint.waypointSymbol,
+    nearbyMarketSymbol: nearestMarket.waypointSymbol,
   );
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
     final outer = await api.fleet.createSurvey(ship.symbol);
     final response = outer!.data;
-    // shipDetail(ship, '🔭 ${ship.nav.waypointSymbol}');
+    // shipDetail(ship, '🔭 ${ship.waypointSymbol}');
     await caches.surveys.recordSurveys(response.surveys, getNow: getNow);
     return response.cooldown.expiration;
   }

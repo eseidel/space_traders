@@ -10,13 +10,14 @@ class _MockLogger extends Mock implements Logger {}
 
 void main() {
   test('systemSymbolsInJumpRadius depth', () async {
-    final expectedSystems = ['S-A', 'S-B', 'S-C', 'S-D', 'S-E'];
+    final systemStrings = ['S-A', 'S-B', 'S-C', 'S-D', 'S-E'];
+    final expectedSystems = systemStrings.map(SystemSymbol.fromString).toList();
     const jumpDistance = 200;
     var i = 0;
     final inputSystems = [
       for (final system in expectedSystems)
         System(
-          symbol: system,
+          symbol: system.system,
           sectorSymbol: 'S',
           type: SystemType.RED_STAR,
           x: i++ * (jumpDistance - 1),
@@ -36,7 +37,7 @@ void main() {
     final systemsCache = SystemsCache(systems: inputSystems, fs: fs);
     final systems = systemsCache
         .systemSymbolsInJumpRadius(
-          startSystem: 'S-A',
+          startSystem: SystemSymbol.fromString('S-A'),
           maxJumps: 5,
         )
         .toList();
@@ -45,11 +46,12 @@ void main() {
   });
 
   test('systemSymbolsInJumpRadius all connected', () async {
-    final expectedSystems = ['S-A', 'S-B', 'S-C', 'S-D', 'S-E'];
+    final systemStrings = ['S-A', 'S-B', 'S-C', 'S-D', 'S-E'];
+    final expectedSystems = systemStrings.map(SystemSymbol.fromString).toList();
     final inputSystems = [
       for (final system in expectedSystems)
         System(
-          symbol: system,
+          symbol: system.system,
           sectorSymbol: 'S',
           type: SystemType.RED_STAR,
           x: 0,
@@ -70,7 +72,7 @@ void main() {
 
     final systems = systemsCache
         .systemSymbolsInJumpRadius(
-          startSystem: 'S-A',
+          startSystem: SystemSymbol.fromString('S-A'),
           maxJumps: 5,
         )
         .toList();

@@ -33,7 +33,8 @@ void main() {
   test('estimateSellPrice null', () {
     final marketPrices = _MockMarketPrices();
     const a = TradeSymbol.FUEL;
-    final estimate = estimateSellPrice(marketPrices, Market(symbol: 'A'), a);
+    final estimate =
+        estimateSellPrice(marketPrices, Market(symbol: 'S-S-A'), a);
     expect(estimate, null);
   });
 
@@ -41,7 +42,7 @@ void main() {
     final marketPrices = _MockMarketPrices();
     const a = TradeSymbol.FUEL;
     final estimate =
-        estimatePurchasePrice(marketPrices, Market(symbol: 'A'), a);
+        estimatePurchasePrice(marketPrices, Market(symbol: 'S-S-A'), a);
     expect(estimate, null);
   });
 
@@ -79,9 +80,9 @@ void main() {
   });
 
   test('Deal JSON roundtrip', () {
-    const deal = Deal(
-      sourceSymbol: 'A',
-      destinationSymbol: 'B',
+    final deal = Deal(
+      sourceSymbol: WaypointSymbol.fromString('S-A-B'),
+      destinationSymbol: WaypointSymbol.fromString('S-A-C'),
       tradeSymbol: TradeSymbol.FUEL,
       purchasePrice: 1,
       sellPrice: 2,
@@ -94,9 +95,11 @@ void main() {
   });
 
   test('CostedDeal JSON roundtrip', () {
-    const deal = Deal(
-      sourceSymbol: 'A',
-      destinationSymbol: 'B',
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+    final deal = Deal(
+      sourceSymbol: start,
+      destinationSymbol: end,
       tradeSymbol: TradeSymbol.FUEL,
       purchasePrice: 1,
       sellPrice: 2,
@@ -106,11 +109,11 @@ void main() {
       cargoSize: 1,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan(
+      route: RoutePlan(
         actions: [
           RouteAction(
-            startSymbol: 'A',
-            endSymbol: 'B',
+            startSymbol: start,
+            endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
           )
@@ -143,9 +146,12 @@ void main() {
       x: 0,
       y: 0,
     );
-    when(() => systemsCache.waypointFromSymbol('X-S-A')).thenReturn(start);
-    when(() => systemsCache.waypointFromSymbol('X-S-B')).thenReturn(end);
-    when(() => systemsCache.waypointsInSystem('X-S')).thenReturn([start, end]);
+    when(() => systemsCache.waypointFromSymbol(start.waypointSymbol))
+        .thenReturn(start);
+    when(() => systemsCache.waypointFromSymbol(end.waypointSymbol))
+        .thenReturn(end);
+    when(() => systemsCache.waypointsInSystem(start.systemSymbol))
+        .thenReturn([start, end]);
 
     final routePlanner = _MockRoutePlanner();
     const fuelCapacity = 100;
@@ -164,8 +170,8 @@ void main() {
         shipSpeed: shipSpeed,
         actions: [
           RouteAction(
-            startSymbol: start.symbol,
-            endSymbol: end.symbol,
+            startSymbol: start.waypointSymbol,
+            endSymbol: end.waypointSymbol,
             type: RouteActionType.navCruise,
             duration: 15,
           )
@@ -174,9 +180,9 @@ void main() {
       ),
     );
 
-    const deal = Deal(
-      sourceSymbol: 'X-S-A',
-      destinationSymbol: 'X-S-B',
+    final deal = Deal(
+      sourceSymbol: start.waypointSymbol,
+      destinationSymbol: end.waypointSymbol,
       tradeSymbol: TradeSymbol.FUEL,
       purchasePrice: 1,
       sellPrice: 2,
@@ -188,7 +194,7 @@ void main() {
       cargoSize: 1,
       shipSpeed: shipSpeed,
       shipFuelCapacity: fuelCapacity,
-      shipWaypointSymbol: 'X-S-A',
+      shipWaypointSymbol: start.waypointSymbol,
       costPerFuelUnit: 100,
     );
 
@@ -198,9 +204,9 @@ void main() {
   });
 
   test('describe deal', () {
-    const deal = Deal(
-      sourceSymbol: 'A',
-      destinationSymbol: 'B',
+    final deal = Deal(
+      sourceSymbol: WaypointSymbol.fromString('S-A-B'),
+      destinationSymbol: WaypointSymbol.fromString('S-A-C'),
       tradeSymbol: TradeSymbol.FUEL,
       purchasePrice: 1,
       sellPrice: 2,
@@ -209,20 +215,22 @@ void main() {
     final profit1 = lightGreen.wrap('   +1c (100%)');
     expect(
       describeDeal(deal),
-      'FUEL                A     1c -> B     2c $profit1',
+      'FUEL                S-A-B     1c -> S-A-C     2c $profit1',
     );
     final profit2 = lightGreen.wrap('+1c');
     expect(
       dealDescription(deal),
-      'Deal ($profit2): FUEL 1c @ A -> 2c @ B profit: 1c per unit ',
+      'Deal ($profit2): FUEL 1c @ S-A-B -> 2c @ S-A-C profit: 1c per unit ',
     );
   });
 
   test('describeCostedDeal', () {
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
     final costed = CostedDeal(
-      deal: const Deal(
-        sourceSymbol: 'A',
-        destinationSymbol: 'B',
+      deal: Deal(
+        sourceSymbol: start,
+        destinationSymbol: end,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
         purchasePrice: 1,
         sellPrice: 2,
@@ -230,11 +238,11 @@ void main() {
       cargoSize: 1,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan(
+      route: RoutePlan(
         actions: [
           RouteAction(
-            startSymbol: 'A',
-            endSymbol: 'B',
+            startSymbol: start,
+            endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
           )
@@ -248,8 +256,8 @@ void main() {
     final profit = lightGreen.wrap('     +1c (100%)');
     expect(
       describeCostedDeal(costed),
-      'ADVANCED_CIRCUITRY         A                    '
-      '1c -> B                    2c $profit 10s 0c/s 1c',
+      'ADVANCED_CIRCUITRY         S-A-B                '
+      '1c -> S-A-C                2c $profit 10s 0c/s 1c',
     );
   });
 
@@ -282,21 +290,25 @@ void main() {
       y: 1000,
     );
     final waypoints = [saa, sab, sac];
-    when(() => systemsCache.waypointFromSymbol('S-A-A')).thenReturn(saa);
-    when(() => systemsCache.waypointFromSymbol('S-A-B')).thenReturn(sab);
-    when(() => systemsCache.waypointFromSymbol('S-A-C')).thenReturn(sac);
-    when(() => systemsCache.waypointsInSystem('S-A')).thenReturn(waypoints);
+    when(() => systemsCache.waypointFromSymbol(saa.waypointSymbol))
+        .thenReturn(saa);
+    when(() => systemsCache.waypointFromSymbol(sab.waypointSymbol))
+        .thenReturn(sab);
+    when(() => systemsCache.waypointFromSymbol(sac.waypointSymbol))
+        .thenReturn(sac);
+    when(() => systemsCache.waypointsInSystem(saa.systemSymbol))
+        .thenReturn(waypoints);
     when(
       () => systemsCache.waypointSymbolsInJumpRadius(
-        startSystem: 'S-A',
+        startSystem: saa.systemSymbol,
         maxJumps: 1,
       ),
-    ).thenAnswer((invocation) => ['S-A-A', 'S-A-B', 'S-A-C']);
+    ).thenAnswer((invocation) => waypoints.map((w) => w.waypointSymbol));
     final tradeSymbol = TradeSymbol.FUEL.value;
     final now = DateTime.timestamp();
     final prices = [
       MarketPrice(
-        waypointSymbol: 'S-A-A',
+        waypointSymbol: saa.waypointSymbol,
         symbol: tradeSymbol,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 200,
@@ -305,7 +317,7 @@ void main() {
         timestamp: now,
       ),
       MarketPrice(
-        waypointSymbol: 'S-A-B',
+        waypointSymbol: sab.waypointSymbol,
         symbol: tradeSymbol,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 100,
@@ -314,7 +326,7 @@ void main() {
         timestamp: now,
       ),
       MarketPrice(
-        waypointSymbol: 'S-A-C',
+        waypointSymbol: sac.waypointSymbol,
         symbol: tradeSymbol,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 1000,
@@ -347,7 +359,7 @@ void main() {
         any(),
       ),
     ).thenReturn(true);
-    when(() => systemsCache.systemBySymbol('S-A')).thenReturn(
+    when(() => systemsCache.systemBySymbol(saa.systemSymbol)).thenReturn(
       System(
         symbol: 'S-A',
         sectorSymbol: 'S',
@@ -372,7 +384,7 @@ void main() {
       () => scanNearbyMarkets(
         systemsCache,
         marketPrices,
-        systemSymbol: ship.nav.systemSymbol,
+        systemSymbol: ship.systemSymbol,
         maxJumps: maxJumps,
         maxWaypoints: maxWaypoints,
       ),
@@ -387,7 +399,7 @@ void main() {
         marketScan,
         maxJumps: 1,
         maxTotalOutlay: 100000,
-        startSymbol: ship.nav.waypointSymbol,
+        startSymbol: ship.waypointSymbol,
         fuelCapacity: ship.fuel.capacity,
         cargoCapacity: ship.cargo.capacity,
         shipSpeed: ship.engine.speed,
@@ -405,34 +417,39 @@ void main() {
   });
 
   test('buildDealsFromScan one', () {
-    final trade1 = TradeSymbol.FUEL.value;
+    const trade1 = TradeSymbol.FUEL;
+    final a = WaypointSymbol.fromString('S-M-A');
+    final b = WaypointSymbol.fromString('S-M-B');
     final buyOpps = [
-      BuyOpp(marketSymbol: 'M-A', tradeSymbol: trade1, price: 1),
+      BuyOpp(marketSymbol: a, tradeSymbol: trade1, price: 1),
     ];
     final sellOpps = [
-      SellOpp(marketSymbol: 'M-B', tradeSymbol: trade1, price: 2),
+      SellOpp(marketSymbol: b, tradeSymbol: trade1, price: 2),
     ];
     final scan = MarketScan.test(buyOpps: buyOpps, sellOpps: sellOpps);
     final deals = buildDealsFromScan(scan);
     expect(deals.length, 1);
-    expect(deals.first.sourceSymbol, 'M-A');
-    expect(deals.first.destinationSymbol, 'M-B');
+    expect(deals.first.sourceSymbol, a);
+    expect(deals.first.destinationSymbol, b);
     expect(deals.first.tradeSymbol, TradeSymbol.FUEL);
     expect(deals.first.purchasePrice, 1);
     expect(deals.first.sellPrice, 2);
   });
 
   test('buildDealsFromScan extraSellOpps', () {
-    final trade1 = TradeSymbol.FUEL.value;
-    final trade2 = TradeSymbol.ICE_WATER.value;
+    const trade1 = TradeSymbol.FUEL;
+    const trade2 = TradeSymbol.ICE_WATER;
 
+    final a = WaypointSymbol.fromString('S-M-A');
+    final b = WaypointSymbol.fromString('S-M-B');
+    final c = WaypointSymbol.fromString('S-M-C');
     final buyOpps = [
-      BuyOpp(marketSymbol: 'M-A', tradeSymbol: trade1, price: 1),
-      BuyOpp(marketSymbol: 'M-A', tradeSymbol: trade2, price: 1),
+      BuyOpp(marketSymbol: a, tradeSymbol: trade1, price: 1),
+      BuyOpp(marketSymbol: a, tradeSymbol: trade2, price: 1),
     ];
     final sellOpps = [
-      SellOpp(marketSymbol: 'M-B', tradeSymbol: trade1, price: 2),
-      SellOpp(marketSymbol: 'M-B', tradeSymbol: trade2, price: 3),
+      SellOpp(marketSymbol: b, tradeSymbol: trade1, price: 2),
+      SellOpp(marketSymbol: b, tradeSymbol: trade2, price: 3),
     ];
     final scan = MarketScan.test(buyOpps: buyOpps, sellOpps: sellOpps);
     final deals = buildDealsFromScan(scan);
@@ -440,7 +457,7 @@ void main() {
 
     final extraSellOpps = [
       SellOpp(
-        marketSymbol: 'M-C',
+        marketSymbol: c,
         tradeSymbol: trade2,
         price: 4,
         contractId: 'foo',
@@ -455,9 +472,11 @@ void main() {
   });
 
   test('byAddingTransactions', () {
-    const deal = Deal(
-      sourceSymbol: 'A',
-      destinationSymbol: 'B',
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+    final deal = Deal(
+      sourceSymbol: start,
+      destinationSymbol: end,
       tradeSymbol: TradeSymbol.FUEL,
       purchasePrice: 1,
       sellPrice: 2,
@@ -467,11 +486,11 @@ void main() {
       cargoSize: 1,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan(
+      route: RoutePlan(
         actions: [
           RouteAction(
-            startSymbol: 'A',
-            endSymbol: 'B',
+            startSymbol: start,
+            endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
           )
@@ -511,9 +530,11 @@ void main() {
   });
 
   test('Deal.maxUnits', () {
-    const deal = Deal(
-      sourceSymbol: 'A',
-      destinationSymbol: 'B',
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+    final deal = Deal(
+      sourceSymbol: start,
+      destinationSymbol: end,
       tradeSymbol: TradeSymbol.FUEL,
       purchasePrice: 1,
       sellPrice: 2,
@@ -524,11 +545,11 @@ void main() {
       cargoSize: 100,
       transactions: [],
       startTime: DateTime(2021),
-      route: const RoutePlan(
+      route: RoutePlan(
         actions: [
           RouteAction(
-            startSymbol: 'A',
-            endSymbol: 'B',
+            startSymbol: start,
+            endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
           )

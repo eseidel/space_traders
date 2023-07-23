@@ -34,7 +34,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   if (marketGood.purchasePrice >= maxWorthwhileUnitPurchasePrice) {
     shipInfo(
       ship,
-      '$neededTradeSymbol is too expensive at ${ship.nav.waypointSymbol} '
+      '$neededTradeSymbol is too expensive at ${ship.waypointSymbol} '
       'needed < $maxWorthwhileUnitPurchasePrice, '
       'got ${marketGood.purchasePrice}',
     );
@@ -81,7 +81,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
     transactionLog,
     agentCache,
     ship,
-    TradeSymbol.fromJson(neededTradeSymbol)!,
+    neededTradeSymbol,
     unitsToPurchase,
     AccountingType.goods,
   );
@@ -289,7 +289,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
     ship,
     contractCache,
     contract,
-    tradeSymbol: goods.tradeSymbol,
+    tradeSymbol: goods.tradeSymbolObject,
     units: units,
   );
   final deliver = response.contract.goodNeeded(goods.tradeSymbolObject)!;
@@ -386,10 +386,10 @@ Future<DateTime?> _handleDeal(
   Market? currentMarket,
 ) async {
   // If we're at the source buy the cargo.
-  if (costedDeal.deal.sourceSymbol == ship.nav.waypointSymbol) {
+  if (costedDeal.deal.sourceSymbol == ship.waypointSymbol) {
     if (currentMarket == null) {
       throw StateError(
-        'No currentMarket for $ship at ${ship.nav.waypointSymbol}',
+        'No currentMarket for $ship at ${ship.waypointSymbol}',
       );
     }
     return _handleAtSourceWithDeal(
@@ -402,10 +402,10 @@ Future<DateTime?> _handleDeal(
     );
   }
   // If we're at the destination of the deal, sell.
-  if (costedDeal.deal.destinationSymbol == ship.nav.waypointSymbol) {
+  if (costedDeal.deal.destinationSymbol == ship.waypointSymbol) {
     if (currentMarket == null) {
       throw StateError(
-        'No currentMarket for $ship at ${ship.nav.waypointSymbol}',
+        'No currentMarket for $ship at ${ship.waypointSymbol}',
       );
     }
     return _handleAtDestinationWithDeal(
@@ -498,8 +498,7 @@ Future<DateTime?> advanceTrader(
 }) async {
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
 
-  final currentWaypoint =
-      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   // If we're currently at a market, record the prices and refuel.
   final currentMarket = await visitLocalMarket(
@@ -585,7 +584,7 @@ Future<DateTime?> advanceTrader(
         caches.systems,
         caches.routePlanner,
         centralCommand,
-        market.symbol,
+        market.waypointSymbol,
       );
     }
   }
@@ -633,7 +632,7 @@ Future<DateTime?> advanceTrader(
 
   if (newDeal == null) {
     return findBetterLocation('No profitable deals within $_maxJumps jumps '
-        'of ${ship.nav.systemSymbol}.');
+        'of ${ship.systemSymbol}.');
   }
   if (newDeal.expectedProfitPerSecond <
       centralCommand.minTraderProfitPerSecond) {

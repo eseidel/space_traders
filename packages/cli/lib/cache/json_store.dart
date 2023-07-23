@@ -11,12 +11,16 @@ class JsonStore<Record> {
     this.record, {
     required FileSystem fs,
     required String path,
+    required Map<String, dynamic> Function(Record) recordToJson,
   })  : _fs = fs,
-        _path = path;
+        _path = path,
+        _toJson = recordToJson;
 
   /// The root object of the store.
   @protected
   Record record;
+
+  final Map<String, dynamic> Function(Record) _toJson;
 
   /// Replace the root object of the store.
   void setRecord(Record newRecord) {
@@ -33,7 +37,7 @@ class JsonStore<Record> {
   void save() {
     final file = _fs.file(_path)..createSync(recursive: true);
     const encoder = JsonEncoder.withIndent(' ');
-    final prettyprint = encoder.convert(record);
+    final prettyprint = encoder.convert(_toJson(record));
     file.writeAsStringSync(prettyprint);
   }
 

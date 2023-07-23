@@ -99,12 +99,12 @@ class SurveyData extends JsonListStore<HistoricalSurvey> {
   }
 
   /// Return the most recent surveys.
-  Iterable<HistoricalSurvey> recentSurveysAtWaypoint({
+  Iterable<HistoricalSurvey> recentSurveysAtWaypoint(
+    WaypointSymbol waypointSymbol, {
     required int count,
-    required String waypointSymbol,
   }) {
     return _surveys
-        .where((e) => e.survey.symbol == waypointSymbol)
+        .where((e) => e.survey.symbol == waypointSymbol.waypoint)
         .sortedBy((e) => e.timestamp)
         .reversed
         .take(count);

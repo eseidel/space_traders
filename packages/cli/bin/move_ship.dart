@@ -13,7 +13,7 @@ Future<void> _navigateToLocalWaypointAndDock(
   bool shouldDock,
 ) async {
   final navigateResult =
-      await navigateToLocalWaypoint(api, ship, destination.symbol);
+      await navigateToLocalWaypoint(api, ship, destination.waypointSymbol);
   final eta = navigateResult.nav.route.arrival;
   final flightTime = eta.difference(DateTime.now());
   logger.info('Expected in $flightTime.');
@@ -34,7 +34,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final myShips = caches.ships.ships;
   final ship = await chooseShip(api, caches.systems, myShips);
 
-  final startSystemSymbol = ship.nav.systemSymbol;
+  final startSystemSymbol = ship.systemSymbol;
   final startingSystem = caches.systems.systemBySymbol(startSystemSymbol);
   final connectedSystems = caches.systems.connectedSystems(startSystemSymbol);
   final jumpGateWaypoint =
@@ -52,7 +52,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   );
 
   final destSystemWaypoints =
-      await caches.waypoints.waypointsInSystem(destSystem.symbol);
+      await caches.waypoints.waypointsInSystem(destSystem.systemSymbol);
 
   final destWaypoint = logger.chooseOne(
     'To where?',
@@ -62,10 +62,10 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
 
   final shouldDock = logger.confirm('Wait to dock?', defaultValue: true);
 
-  final currentWaypoint =
-      await caches.waypoints.waypoint(ship.nav.waypointSymbol);
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   if (currentWaypoint.hasMarketplace && ship.shouldRefuel) {
-    final market = await caches.markets.marketForSymbol(currentWaypoint.symbol);
+    final market =
+        await caches.markets.marketForSymbol(currentWaypoint.waypointSymbol);
     await refuelIfNeededAndLog(
       api,
       caches.marketPrices,
@@ -90,7 +90,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   // This only handles a single jump at this point.
 
   // If we aren't at the jump gate, navigate to it.
-  if (ship.nav.waypointSymbol != jumpGateWaypoint!.symbol) {
+  if (ship.waypointSymbol != jumpGateWaypoint!.waypointSymbol) {
     final arrival = await navigateToLocalWaypointAndLog(
       api,
       ship,

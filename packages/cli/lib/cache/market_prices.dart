@@ -36,11 +36,12 @@ class MarketPrice {
         tradeVolume = good.tradeVolume,
         timestamp = DateTime.now();
 
-  MarketPrice._compareOnly({this.purchasePrice = 0, this.sellPrice = 0})
-      : waypointSymbol = '',
+  MarketPrice._compareOnly({this.sellPrice = 0})
+      : waypointSymbol = WaypointSymbol.fromString('A-B-C'),
         symbol = '',
         supply = MarketTradeGoodSupplyEnum.ABUNDANT,
         tradeVolume = 0,
+        purchasePrice = 0,
         timestamp = DateTime.now();
 
   /// Create a new price record from a json map.
@@ -50,7 +51,7 @@ class MarketPrice {
     final value = json['tradeVolume'];
     final tradeVolume = value is int ? value : int.parse(value as String);
     return MarketPrice(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       symbol: json['symbol'] as String,
       supply: MarketTradeGoodSupplyEnum.fromJson(json['supply'] as String)!,
       purchasePrice: json['purchasePrice'] as int,
@@ -63,7 +64,7 @@ class MarketPrice {
   /// Serialize Price as a json map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'symbol': symbol,
       'supply': supply.toJson(),
       'purchasePrice': purchasePrice,
@@ -74,9 +75,10 @@ class MarketPrice {
   }
 
   /// The waypoint of the market where this price was recorded.
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
 
   /// The symbol of the trade good.
+  // TODO(eseidel): Change to TradeSymbol
   final String symbol;
 
   /// The trade symbol of the trade good.
@@ -151,7 +153,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
 
   /// Get the count of unique waypoints.
   int get waypointCount {
-    final waypoints = <String>{};
+    final waypoints = <WaypointSymbol>{};
     for (final price in entries) {
       waypoints.add(price.waypointSymbol);
     }
@@ -207,14 +209,6 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   static int _purchasePriceAcending(MarketPrice a, MarketPrice b) =>
       a.purchasePrice.compareTo(b.purchasePrice);
 
-  /// Get the percentile for the purchase price of a trade good.
-  int? percentileForPurchasePrice(TradeSymbol symbol, int purchasePrice) =>
-      _percentileFor(
-        symbol,
-        MarketPrice._compareOnly(purchasePrice: purchasePrice),
-        MarketTransactionTypeEnum.PURCHASE,
-      );
-
   /// Get the median price this good can be purchased for.
   int? medianPurchasePrice(TradeSymbol symbol) =>
       purchasePriceAtPercentile(symbol, 50);
@@ -231,12 +225,26 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   }
 
   /// Get the percentile for the sell price (you sell to them) of a trade good.
-  int? percentileForSellPrice(TradeSymbol symbol, int sellPrice) =>
-      _percentileFor(
-        symbol,
-        MarketPrice._compareOnly(sellPrice: sellPrice),
-        MarketTransactionTypeEnum.SELL,
-      );
+  int? percentileForSellPrice(TradeSymbol symbol, int sellPrice) {
+    const compareTo = _sellPriceAcending;
+    final price = MarketPrice._compareOnly(sellPrice: sellPrice);
+    final pricesForSymbol = pricesFor(symbol);
+    if (pricesForSymbol.isEmpty) {
+      return null;
+    }
+    // Sort the prices in ascending order.
+    final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
+    // Find the first index where the sorted price is greater than the price
+    // being compared.
+    var index =
+        pricesForSymbolSorted.indexWhere((e) => compareTo(e, price) > 0);
+    // If we ran off the end, we know that the price is greater than all
+    // the prices in the list. i.e. 100th percentile.
+    if (index == -1) {
+      index = pricesForSymbol.length;
+    }
+    return (index / pricesForSymbol.length * 100).round();
+  }
 
   /// Get the median sell price for a trade good.
   int? medianSellPrice(TradeSymbol symbol) => sellPriceAtPercentile(symbol, 50);
@@ -256,7 +264,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// optionally restricted to a specific waypoint.
   Iterable<MarketPrice> pricesFor(
     TradeSymbol tradeSymbol, {
-    String? marketSymbol,
+    WaypointSymbol? marketSymbol,
   }) {
     final prices = _prices.where((e) => e.symbol == tradeSymbol.value);
     if (marketSymbol == null) {
@@ -294,48 +302,15 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     return pricesForSymbolSorted[index];
   }
 
-  int? _percentileFor(
-    TradeSymbol symbol,
-    MarketPrice price,
-    MarketTransactionTypeEnum action,
-  ) {
-    final compareTo = action == MarketTransactionTypeEnum.PURCHASE
-        ? _purchasePriceAcending
-        : _sellPriceAcending;
-    final pricesForSymbol = pricesFor(symbol);
-    if (pricesForSymbol.isEmpty) {
-      return null;
-    }
-    // Sort the prices in ascending order.
-    final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
-    // for (final price in pricesForSymbolSorted) {
-    //   logger.info(
-    //     '  ${price.waypointSymbol} '
-    //     '${price.purchasePrice} ${price.sellPrice}',
-    //   );
-    // }
-
-    // Find the first index where the sorted price is greater than the price
-    // being compared.
-    var index =
-        pricesForSymbolSorted.indexWhere((e) => compareTo(e, price) > 0);
-    // If we ran off the end, we know that the price is greater than all
-    // the prices in the list. i.e. 100th percentile.
-    if (index == -1) {
-      index = pricesForSymbol.length;
-    }
-    return (index / pricesForSymbol.length * 100).round();
-  }
-
   /// Returns all known prices for a given market.
-  List<MarketPrice> pricesAtMarket(String marketSymbol) {
+  List<MarketPrice> pricesAtMarket(WaypointSymbol marketSymbol) {
     return _prices.where((e) => e.waypointSymbol == marketSymbol).toList();
   }
 
   /// Returns true if there is recent market data for a given market.
   /// Does not check if the passed in market is a valid market.
   bool hasRecentMarketData(
-    String marketSymbol, {
+    WaypointSymbol marketSymbol, {
     Duration maxAge = defaultMaxAge,
   }) {
     final prices = pricesAtMarket(marketSymbol);
@@ -355,7 +330,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// [maxAge] is the maximum age of the price in the cache.
   int? recentSellPrice(
     TradeSymbol tradeSymbol, {
-    required String marketSymbol,
+    required WaypointSymbol marketSymbol,
     Duration maxAge = defaultMaxAge,
   }) {
     final pricesForSymbol = pricesFor(tradeSymbol, marketSymbol: marketSymbol);
@@ -377,7 +352,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// [maxAge] is the maximum age of the price in the cache.
   int? recentPurchasePrice(
     TradeSymbol tradeSymbol, {
-    required String marketSymbol,
+    required WaypointSymbol marketSymbol,
     Duration maxAge = defaultMaxAge,
   }) {
     final pricesForSymbol = pricesFor(
@@ -404,14 +379,14 @@ Future<Market> recordMarketDataIfNeededAndLog(
   MarketPrices marketPrices,
   MarketCache marketCache,
   Ship ship,
-  String marketSymbol, {
+  WaypointSymbol marketSymbol, {
   Duration maxAge = const Duration(minutes: 5),
 }) async {
-  if (ship.nav.waypointSymbol != marketSymbol) {
+  if (ship.waypointSymbol != marketSymbol) {
     throw ArgumentError.value(
       marketSymbol,
       'marketSymbol',
-      '${ship.symbol} is not at $marketSymbol, ${ship.nav.waypointSymbol}.',
+      '${ship.symbol} is not at $marketSymbol, ${ship.waypointSymbol}.',
     );
   }
   // If we have market data more recent than maxAge, don't bother refreshing.
@@ -421,7 +396,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
     return market!;
   }
   final market = await marketCache.marketForSymbol(
-    ship.nav.waypointSymbol,
+    ship.waypointSymbol,
     forceRefresh: true,
   );
   await recordMarketDataAndLog(marketPrices, market!, ship);
@@ -442,7 +417,7 @@ Future<void> recordMarketDataAndLog(
 /// Record market data silently.
 Future<void> recordMarketData(MarketPrices marketPrices, Market market) async {
   final prices = market.tradeGoods
-      .map((g) => MarketPrice.fromMarketTradeGood(g, market.symbol))
+      .map((g) => MarketPrice.fromMarketTradeGood(g, market.waypointSymbol))
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${market.symbol}!');

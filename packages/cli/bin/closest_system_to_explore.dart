@@ -19,7 +19,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     marketPrices,
     shipyardPrices,
     ship,
-    startSystemSymbol: ship.nav.systemSymbol,
+    startSystemSymbol: ship.systemSymbol,
   );
   if (destinationSymbol == null) {
     logger.info('No new waypoints to explore.');

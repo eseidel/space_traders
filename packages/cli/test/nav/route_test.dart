@@ -92,8 +92,10 @@ void main() {
     )!;
     final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
     void expectRoute(String start, String end, int expectedSeconds) {
-      final startWaypoint = systemsCache.waypointFromSymbol(start);
-      final endWaypoint = systemsCache.waypointFromSymbol(end);
+      final startWaypoint =
+          systemsCache.waypointFromSymbol(WaypointSymbol.fromString(start));
+      final endWaypoint =
+          systemsCache.waypointFromSymbol(WaypointSymbol.fromString(end));
       final route = routePlanner.planRoute(
         start: startWaypoint,
         end: endWaypoint,

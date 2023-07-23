@@ -11,16 +11,11 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final factionCache = await FactionCache.loadUnauthenticated(fs);
 
   final factions = factionCache.factions;
-  final hqByFaction = <String, String>{
-    for (final faction in factions) faction.symbol.value: faction.headquarters
-  };
 
   final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
-  for (final faction in hqByFaction.keys) {
-    final hq = hqByFaction[faction]!;
-    final reachable = clusterCache.connectedSystemCount(
-      parseWaypointString(hq).system,
-    );
+  for (final faction in factions) {
+    final hq = faction.headquartersSymbol;
+    final reachable = clusterCache.connectedSystemCount(hq.systemSymbol);
     logger.info('$faction: $reachable');
   }
 }

@@ -11,7 +11,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   final myShips = caches.ships.ships;
   final ship = await chooseShip(api, caches.systems, myShips);
   final shipyardWaypoints =
-      await caches.waypoints.shipyardWaypointsForSystem(ship.nav.systemSymbol);
+      await caches.waypoints.shipyardWaypointsForSystem(ship.systemSymbol);
 
   final waypoint = logger.chooseOne(
     'Which shipyard?',

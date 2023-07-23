@@ -81,4 +81,10 @@ class FactionCache extends ResponseListCache<Faction> {
   /// Gets the faction with the given symbol.
   Faction factionBySymbol(FactionSymbols symbol) =>
       factions.firstWhere((f) => f.symbol == symbol);
+
+  /// Gets the headquarters for the given faction.
+  WaypointSymbol headquartersFor(FactionSymbols symbol) {
+    final faction = factionBySymbol(symbol);
+    return WaypointSymbol.fromString(faction.headquarters);
+  }
 }

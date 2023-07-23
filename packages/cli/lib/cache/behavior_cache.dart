@@ -11,7 +11,10 @@ class BehaviorCache extends JsonStore<_Record> {
     super.stateByShipSymbol, {
     required super.fs,
     super.path = defaultPath,
-  });
+  }) : super(
+          recordToJson: (r) =>
+              r.map((key, value) => MapEntry(key, value.toJson())),
+        );
 
   /// Load the cache from a file.
   factory BehaviorCache.load(

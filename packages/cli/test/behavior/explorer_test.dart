@@ -63,6 +63,7 @@ void main() {
     when(() => caches.charting).thenReturn(chartingCache);
 
     final waypoint = _MockWaypoint();
+    final waypointSymbol = WaypointSymbol.fromString('S-A-B');
     when(() => waypoint.symbol).thenReturn('S-A-B');
     when(() => waypoint.systemSymbol).thenReturn('S-A');
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
@@ -80,8 +81,9 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('W');
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
 
+    registerFallbackValue(waypointSymbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 

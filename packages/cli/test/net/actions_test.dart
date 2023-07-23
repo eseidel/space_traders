@@ -56,7 +56,7 @@ void main() {
 
     final fs = MemoryFileSystem.test();
     final agentCache = AgentCache(agent1, fs: fs);
-    const shipyardSymbol = 'SY';
+    final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
     const shipType = ShipType.PROBE;
     await purchaseShip(
       api,
@@ -77,7 +77,7 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('SY');
+    when(() => ship.symbol).thenReturn('S-Y');
     when(
       () => fleetApi.patchShipNav(
         any(),
@@ -106,7 +106,7 @@ void main() {
     when(() => ship.emojiName).thenReturn('S');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('A');
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final logger = _MockLogger();
     await runWithLogger(logger, () => undockIfNeeded(api, ship));
@@ -132,7 +132,7 @@ void main() {
     when(() => ship.emojiName).thenReturn('S');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('A');
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final logger = _MockLogger();
     await runWithLogger(logger, () => dockIfNeeded(api, ship));
@@ -186,7 +186,14 @@ void main() {
     );
 
     final logger = _MockLogger();
-    await runWithLogger(logger, () => navigateToLocalWaypoint(api, ship, 'B'));
+    await runWithLogger(
+      logger,
+      () => navigateToLocalWaypoint(
+        api,
+        ship,
+        WaypointSymbol.fromString('S-A-W'),
+      ),
+    );
 
     verify(
       () => fleetApi.patchShipNav(
