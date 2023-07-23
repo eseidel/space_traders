@@ -12,17 +12,25 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final shipCache = ShipCache.loadCached(fs)!;
 
   final ship = shipCache.ships.first;
-  const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
 
-  final best = findBestMarketToBuy(
-    marketPrices,
-    routePlanner,
-    ship,
-    tradeSymbol,
-  );
-  if (best == null) {
-    logger.info('No market for $tradeSymbol');
-  } else {
+  final mounts = [
+    TradeSymbol.MOUNT_SURVEYOR_I,
+    TradeSymbol.MOUNT_SURVEYOR_II,
+    TradeSymbol.MOUNT_MINING_LASER_I,
+    TradeSymbol.MOUNT_MINING_LASER_II,
+  ];
+
+  for (final tradeSymbol in mounts) {
+    final best = findBestMarketToBuy(
+      marketPrices,
+      routePlanner,
+      ship,
+      tradeSymbol,
+    );
+    if (best == null) {
+      logger.info('No market for $tradeSymbol');
+      continue;
+    }
     logger.info(
       'Best value for $tradeSymbol is '
       '${approximateDuration(best.route.duration)} away '

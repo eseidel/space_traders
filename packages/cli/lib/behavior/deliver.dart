@@ -42,13 +42,16 @@ CostedTrip? costTrip(
 }
 
 /// Find the best market to buy a given item from.
-CostedTrip findBestMarketToBuy(
+CostedTrip? findBestMarketToBuy(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
   TradeSymbol tradeSymbol,
 ) {
   final prices = marketPrices.pricesFor(tradeSymbol).toList();
+  if (prices.isEmpty) {
+    return null;
+  }
   final start = ship.waypointSymbol;
 
   // If there are a lot f prices we could cut down the search space by only
@@ -72,6 +75,10 @@ CostedTrip findBestMarketToBuy(
     ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
 
   final nearest = sorted.first;
+  if (sorted.length == 1) {
+    return nearest;
+  }
+
   // Have a set time value of money (e.g. 7c/s)
   const expectedCreditsPerSecond = 7;
 
@@ -156,6 +163,15 @@ Future<DateTime?> advanceDeliver(
       ship,
       tradeSymbol,
     );
+    if (trip == null) {
+      await centralCommand.disableBehaviorForShip(
+        ship,
+        Behavior.deliver,
+        'No market for $tradeSymbol',
+        const Duration(days: 1),
+      );
+      return null;
+    }
 
     // Go there.
     return beingRouteAndLog(
