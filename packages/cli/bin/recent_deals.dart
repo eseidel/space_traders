@@ -2,9 +2,10 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
+import 'package:collection/collection.dart';
 
 void main(List<String> args) async {
-  await run(args, command);
+  await runOffline(args, command);
 }
 
 String describeTransaction(Transaction t) {
@@ -15,49 +16,102 @@ String describeTransaction(Transaction t) {
 class SyntheticDeal {
   const SyntheticDeal(this.transactions);
   final List<Transaction> transactions;
+
+  List<Transaction> get goodsBuys => transactions
+      .where(
+        (t) =>
+            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+            t.accounting == AccountingType.goods,
+      )
+      .toList();
+
+  List<Transaction> get goolsSells => transactions
+      .where(
+        (t) =>
+            t.tradeType == MarketTransactionTypeEnum.SELL &&
+            t.accounting == AccountingType.goods,
+      )
+      .toList();
+
+  bool get isCompleted {
+    final buys = goodsBuys;
+    final sells = goolsSells;
+    if (buys.isEmpty || sells.isEmpty) {
+      return false;
+    }
+    return buys.length == sells.length;
+  }
+
+  String get tradeSymbol => goodsBuys.first.tradeSymbol;
+
+  int get units => goodsBuys.fold<int>(0, (sum, t) => sum + t.quantity);
+
+  int get costOfGoodsSold =>
+      goodsBuys.fold<int>(0, (sum, t) => sum + t.creditChange);
+
+  int get revenue => transactions
+      .where((t) => t.tradeType == MarketTransactionTypeEnum.SELL)
+      .fold<int>(0, (sum, t) => sum + t.creditChange);
+
+  int get operatingExpenses => transactions
+      .where(
+        (t) =>
+            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+            t.accounting == AccountingType.fuel,
+      )
+      .fold<int>(0, (sum, t) => sum + t.creditChange);
+
+  int get profit => revenue + costOfGoodsSold + operatingExpenses;
+
+  Duration get duration =>
+      transactions.last.timestamp.difference(transactions.first.timestamp);
+
+  int get profitPerSecond {
+    final seconds = duration.inSeconds;
+    if (seconds == 0) {
+      logger.warn('Broken: $isCompleted $duration $transactions');
+      logger.info(transactions.toString());
+      return 0;
+    }
+    return profit ~/ duration.inSeconds;
+  }
+
+  ShipSymbol get shipSymbol => transactions.first.shipSymbol;
+
+  WaypointSymbol get start => transactions.first.waypointSymbol;
+  WaypointSymbol get end => transactions.last.waypointSymbol;
 }
 
 void printSyntheticDeal(SyntheticDeal deal) {
-  final entries = deal.transactions;
-  final start = entries.first.waypointSymbol;
-  final end = entries.last.waypointSymbol;
-  final buyEntries = entries
-      .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
-      .toList();
-  final sellEntries = entries
-      .where((t) => t.tradeType == MarketTransactionTypeEnum.SELL)
-      .toList();
-  final buyUnits = buyEntries.fold<int>(0, (sum, t) => sum + t.quantity);
-  final sellUnits = sellEntries.fold<int>(0, (sum, t) => sum + t.quantity);
-  if (buyUnits != sellUnits) {
-    return; // incomplete deal
-  }
-  final totalSpend = buyEntries.fold<int>(0, (sum, t) => sum + t.creditChange);
-  final totalRevenue =
-      sellEntries.fold<int>(0, (sum, t) => sum + t.creditChange);
-  final profit = totalRevenue + totalSpend;
-  final time = entries.last.timestamp.difference(entries.first.timestamp);
-  final profitPerSecond = profit / time.inSeconds;
-  final shipSymbol = entries.first.shipSymbol;
-
-  logger.info('$shipSymbol $buyUnits of ${buyEntries.first.tradeSymbol} '
-      '$start -> $end in ${approximateDuration(time)} '
-      'for ${creditsString(profit)} '
-      '(${creditsString(profitPerSecond.toInt())}/s)');
+  logger.info('${deal.shipSymbol} ${deal.units} of ${deal.tradeSymbol} '
+      '${deal.start} -> ${deal.end} in ${approximateDuration(deal.duration)} '
+      'for ${creditsString(deal.profit)} '
+      '(${creditsString(deal.profitPerSecond)}/s)');
 }
 
-Future<void> command(FileSystem fs, Api api, Caches caches) async {
+Future<void> command(FileSystem fs, List<String> args) async {
+  final transactionLog = TransactionLog.load(fs);
   final deals = <SyntheticDeal>[];
   final openDeals = <ShipSymbol, List<Transaction>>{};
   final ignoredTransactions = <Transaction>[];
-  for (final transaction in caches.transactions.entries) {
-    // Ignore fuel transactions for now, our logic below would need to be more
-    // complicated not to get confused by them.
-    if (transaction.tradeSymbol == TradeSymbol.FUEL.value) {
+  final supportedTypes = {AccountingType.fuel, AccountingType.goods};
+
+  void recordDeal(List<Transaction> openDeal) {
+    final deal = SyntheticDeal(openDeal);
+    if (deal.isCompleted) {
+      deals.add(deal);
+    } else {
+      ignoredTransactions.addAll(openDeal);
+    }
+  }
+
+  for (final transaction in transactionLog.entries) {
+    if (!supportedTypes.contains(transaction.accounting)) {
       ignoredTransactions.add(transaction);
       continue;
     }
-    if (transaction.tradeType == MarketTransactionTypeEnum.PURCHASE) {
+    if (transaction.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+        transaction.accounting == AccountingType.goods) {
       final openDeal = openDeals[transaction.shipSymbol];
       if (openDeal == null) {
         openDeals[transaction.shipSymbol] = [transaction];
@@ -65,10 +119,11 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
           MarketTransactionTypeEnum.PURCHASE) {
         openDeal.add(transaction);
       } else {
-        deals.add(SyntheticDeal(openDeal));
+        recordDeal(openDeal);
         openDeals[transaction.shipSymbol] = [transaction];
       }
-    } else if (transaction.tradeType == MarketTransactionTypeEnum.SELL) {
+    } else if (transaction.tradeType == MarketTransactionTypeEnum.SELL ||
+        transaction.accounting == AccountingType.fuel) {
       final openDeal = openDeals[transaction.shipSymbol];
       if (openDeal == null) {
         ignoredTransactions.add(transaction);
@@ -79,15 +134,29 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
     }
   }
   for (final openDeal in openDeals.values) {
-    deals.add(SyntheticDeal(openDeal));
+    recordDeal(openDeal);
   }
 
-  for (final deal in deals) {
+  final sorted = deals.sortedBy<num>((d) => d.profitPerSecond);
+
+  logger.info('Worst 10:');
+  final top = sorted.take(10);
+  for (final deal in top) {
     printSyntheticDeal(deal);
   }
 
-  logger.info('Ignored ${ignoredTransactions.length} transactions:');
-  for (final transaction in ignoredTransactions) {
-    logger.info(describeTransaction(transaction));
+  logger.info('Best 20:');
+  final bottom = sorted.reversed.take(20);
+  for (final deal in bottom) {
+    printSyntheticDeal(deal);
   }
+
+  // for (final deal in deals) {
+  //   printSyntheticDeal(deal);
+  // }
+
+  logger.info('Ignored ${ignoredTransactions.length} transactions.');
+  // for (final transaction in ignoredTransactions) {
+  //   logger.info(describeTransaction(transaction));
+  // }
 }
