@@ -103,6 +103,7 @@ void main() {
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final ship = _MockShip();
+    when(() => shipCache.ships).thenReturn([ship]);
     when(() => ship.registration).thenReturn(
       ShipRegistration(
         name: 'S',

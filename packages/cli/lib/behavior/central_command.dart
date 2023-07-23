@@ -534,28 +534,15 @@ class CentralCommand {
   ShipType? shipTypeToBuy(
     Ship ship,
     ShipyardPrices shipyardPrices,
-    AgentCache agentCache, {
-    WaypointSymbol? shipyardSymbol,
-  }) {
+    AgentCache agentCache,
+    WaypointSymbol shipyardSymbol,
+  ) {
     // We should buy a new ship when:
     // - We have request capacity to spare
     // - We have money to spare.
     // - We don't have better uses for the money (e.g. trading or modules)
 
     bool shipyardHas(ShipType shipType) {
-      // Hack to make Behavior.buyShip not break.
-      // This hack is needed because Behavior.buyShip first checks what ship
-      // to buy and then finds a shipyard to buy that ship, where as this
-      // function is also used by visitShipyard where you're already at a
-      // shipyard but not sure what you might buy.
-      if (shipyardSymbol == null) {
-        final starterShipyardTypes = [
-          ShipType.LIGHT_HAULER,
-          ShipType.PROBE,
-          ShipType.ORE_HOUND
-        ];
-        return starterShipyardTypes.contains(shipType);
-      }
       return shipyardPrices.recentPurchasePrice(
             shipyardSymbol: shipyardSymbol,
             shipType: shipType,
@@ -694,7 +681,7 @@ class CentralCommand {
       ship,
       shipyardPrices,
       agentCache,
-      shipyardSymbol: shipyardSymbol,
+      shipyardSymbol,
     );
     // TODO(eseidel): This is wrong, this will disable buying for all
     // ships even though we might just be at a system where we don't need a ship
@@ -809,18 +796,18 @@ class CentralCommand {
   /// Returns the minimum number of surveys to examine before mining
   int get minimumSurveys {
     // In the early game its more important to mine than get the perfect survey.
-    if (_shipCache.ships.length < 5) {
-      return 2;
-    }
+    // if (_shipCache.ships.length < 5) {
+    //   return 2;
+    // }
     return 10;
   }
 
   /// Returns the percentile of surveys to discard.
   double get surveyPercentileThreshold {
     // In the early game its more important to mine than get the perfect survey.
-    if (_shipCache.ships.length < 5) {
-      return 0.5;
-    }
+    // if (_shipCache.ships.length < 5) {
+    //   return 0.5;
+    // }
     return 0.9;
   }
 

@@ -65,8 +65,10 @@ void main() {
     when(() => ship.symbol).thenReturn('S');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
@@ -75,6 +77,8 @@ void main() {
     registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
+    when(() => waypointCache.shipyardWaypointsForSystem(symbol.systemSymbol))
+        .thenAnswer((_) => Future.value([waypoint]));
 
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
