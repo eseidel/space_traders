@@ -279,6 +279,7 @@ Future<DateTime?> advanceMiner(
     caches.surveys,
     surveyWaypointSymbol: currentWaypoint.waypointSymbol,
     nearbyMarketSymbol: nearestMarket.waypointSymbol,
+    minimumSurveys: centralCommand.minimumSurveys,
     percentileThreshold: centralCommand.surveyPercentileThreshold,
   );
   // If not, add some new surveys.

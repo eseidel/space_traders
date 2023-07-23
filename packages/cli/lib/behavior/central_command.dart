@@ -806,6 +806,15 @@ class CentralCommand {
         unitsAssigned;
   }
 
+  /// Returns the minimum number of surveys to examine before mining
+  int get minimumSurveys {
+    // In the early game its more important to mine than get the perfect survey.
+    if (_shipCache.ships.length < 5) {
+      return 2;
+    }
+    return 10;
+  }
+
   /// Returns the percentile of surveys to discard.
   double get surveyPercentileThreshold {
     // In the early game its more important to mine than get the perfect survey.
