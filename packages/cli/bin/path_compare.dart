@@ -29,8 +29,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   const shipSpeed = 30;
   for (final pair in pathPairs) {
-    final start = systemsCache.waypointFromString(pair[0])!;
-    final end = systemsCache.waypointFromString(pair[1])!;
+    final start = WaypointSymbol.fromString(pair[0]);
+    final end = WaypointSymbol.fromString(pair[1]);
     final waypointPath = findWaypointPath(
       systemsCache,
       start,
@@ -41,7 +41,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
         findWaypointPathJumpsOnly(systemsCache, start, end, shipSpeed);
     final matches =
         const ListEquality<WaypointSymbol>().equals(waypointPath, jumpsOnly);
-    logger.info('${start.symbol} -> ${end.symbol}');
+    logger.info('$start -> $end');
     if (matches) {
       logger.info('  matches');
     } else {

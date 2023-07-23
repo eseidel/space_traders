@@ -17,10 +17,10 @@ Future<DateTime?> beingNewRouteAndLog(
   CentralCommand centralCommand,
   WaypointSymbol destinationSymbol,
 ) async {
-  final start = systemsCache.waypointFromSymbol(ship.waypointSymbol);
+  final start = ship.waypointSymbol;
   final route = routePlanner.planRoute(
     start: start,
-    end: systemsCache.waypointFromSymbol(destinationSymbol),
+    end: destinationSymbol,
     fuelCapacity: ship.fuel.capacity,
     shipSpeed: ship.engine.speed,
   );
@@ -32,7 +32,7 @@ Future<DateTime?> beingNewRouteAndLog(
   if (action == null) {
     shipErr(
       ship,
-      'No actions in route to $destinationSymbol from ${start.symbol}!?',
+      'No actions in route to $destinationSymbol from $start!?',
     );
     return null;
   }

@@ -33,8 +33,8 @@ void main(List<String> args) async {
 
 void planRouteAndLog(
   RoutePlanner planner,
-  SystemWaypoint start,
-  SystemWaypoint end,
+  WaypointSymbol start,
+  WaypointSymbol end,
 ) {
   final routeStart = DateTime.now();
   final plan = planner.planRoute(
@@ -66,7 +66,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final systemsCache = SystemsCache.loadCached(fs)!;
   final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
 
-  final start = systemsCache.waypointFromString(startSymbol)!;
-  final end = systemsCache.waypointFromString(endSymbol)!;
+  final start = WaypointSymbol.fromString(startSymbol);
+  final end = WaypointSymbol.fromString(endSymbol);
   planRouteAndLog(routePlanner, start, end);
 }

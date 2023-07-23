@@ -99,14 +99,14 @@ List<SystemSymbol>? findSystemPath(
 /// Returns the path from [start] to [end] as a list of waypoint symbols.
 List<WaypointSymbol>? findWaypointPathJumpsOnly(
   SystemsCache systemsCache,
-  SystemWaypoint start,
-  SystemWaypoint end,
+  WaypointSymbol start,
+  WaypointSymbol end,
   int shipSpeed,
 ) {
   final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
   final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
   if (start.systemSymbol == end.systemSymbol) {
-    return [start.waypointSymbol, end.waypointSymbol];
+    return [start, end];
   }
   if (!startSystem.hasJumpGate || !endSystem.hasJumpGate) {
     return null;
@@ -120,8 +120,8 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   final jumpGateSymbols = systemSymbols
       .map((s) => systemsCache.jumpGateWaypointForSystem(s)!.waypointSymbol);
   return [
-    if (start.waypointSymbol != jumpGateSymbols.first) start.waypointSymbol,
+    if (start != jumpGateSymbols.first) start,
     ...jumpGateSymbols,
-    if (end.waypointSymbol != jumpGateSymbols.last) end.waypointSymbol,
+    if (end != jumpGateSymbols.last) end,
   ];
 }

@@ -156,7 +156,7 @@ void main() {
     final routePlanner = _MockRoutePlanner();
     const fuelCapacity = 100;
     const shipSpeed = 1;
-    registerFallbackValue(start);
+    registerFallbackValue(start.waypointSymbol);
     when(
       () => routePlanner.planRoute(
         start: any(named: 'start'),

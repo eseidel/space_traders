@@ -249,8 +249,8 @@ class RoutePlan {
 /// Plan a route between two waypoints using a pre-computed jump plan.
 RoutePlan routePlanFromJumpPlan(
   SystemsCache systemsCache, {
-  required SystemWaypoint start,
-  required SystemWaypoint end,
+  required WaypointSymbol start,
+  required WaypointSymbol end,
   required JumpPlan jumpPlan,
   required int fuelCapacity,
   required int shipSpeed,
@@ -262,10 +262,11 @@ RoutePlan routePlanFromJumpPlan(
   if (jumpPlan.route.last != end.systemSymbol) {
     throw ArgumentError('Jump plan does not end at ${end.systemSymbol}');
   }
+  final startWaypoint = systemsCache.waypointFromSymbol(start);
   final startJumpGate =
       systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
-  if (startJumpGate.symbol != start.symbol) {
-    actions.add(_navigationAction(start, startJumpGate, shipSpeed));
+  if (startJumpGate.symbol != start.waypoint) {
+    actions.add(_navigationAction(startWaypoint, startJumpGate, shipSpeed));
   }
 
   for (var i = 0; i < jumpPlan.route.length - 1; i++) {
@@ -284,9 +285,10 @@ RoutePlan routePlanFromJumpPlan(
       ),
     );
   }
+  final endWaypoint = systemsCache.waypointFromSymbol(end);
   final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
-  if (endJumpGate.symbol != end.symbol) {
-    actions.add(_navigationAction(endJumpGate, end, shipSpeed));
+  if (endJumpGate.symbol != end.waypoint) {
+    actions.add(_navigationAction(endJumpGate, endWaypoint, shipSpeed));
   }
 
   final fuelUsed = _fuelUsedByActions(systemsCache, actions);
@@ -404,13 +406,13 @@ class RoutePlanner {
 
   /// Plan a route between two waypoints.
   RoutePlan? planRoute({
-    required SystemWaypoint start,
-    required SystemWaypoint end,
+    required WaypointSymbol start,
+    required WaypointSymbol end,
     required int fuelCapacity,
     required int shipSpeed,
   }) {
     // TODO(eseidel): This is wrong.  An empty route is not valid.
-    if (start.symbol == end.symbol) {
+    if (start.waypoint == end.waypoint) {
       // throw ArgumentError('Cannot plan route between same waypoint');
       return RoutePlan(
         actions: const [],
@@ -463,7 +465,7 @@ class RoutePlanner {
     final endTime = DateTime.timestamp();
     final planningDuration = endTime.difference(startTime);
     if (planningDuration.inSeconds > 1) {
-      logger.warn('planning ${start.symbol} to ${end.symbol} '
+      logger.warn('planning $start to $end '
           'took ${approximateDuration(planningDuration)}');
     }
 
@@ -542,16 +544,14 @@ RoutePlan? planRouteThrough(
   }
   final segments = <RoutePlan>[];
   for (var i = 0; i < waypointSymbols.length - 1; i++) {
-    final startSymbol = waypointSymbols[i];
-    final endSymbol = waypointSymbols[i + 1];
+    final start = waypointSymbols[i];
+    final end = waypointSymbols[i + 1];
     // Skip any segments where we start and end at the same waypoint.
     // costOutDeal currently calls this with:
     // [shipLocation, start, end] if shipLocation == start, then we can skip.
-    if (startSymbol == endSymbol) {
+    if (start == end) {
       continue;
     }
-    final start = systemsCache.waypointFromSymbol(startSymbol);
-    final end = systemsCache.waypointFromSymbol(endSymbol);
     final plan = routePlanner.planRoute(
       start: start,
       end: end,

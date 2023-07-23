@@ -69,8 +69,9 @@ class SyntheticDeal {
   int get profitPerSecond {
     final seconds = duration.inSeconds;
     if (seconds == 0) {
-      logger.warn('Broken: $isCompleted $duration $transactions');
-      logger.info(transactions.toString());
+      logger
+        ..warn('Broken: $isCompleted $duration $transactions')
+        ..info(transactions.toString());
       return 0;
     }
     return profit ~/ duration.inSeconds;

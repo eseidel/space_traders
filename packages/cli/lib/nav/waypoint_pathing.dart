@@ -84,23 +84,24 @@ int _timeBetween(
 /// Returns the path from [start] to [end] as a list of waypoint symbols.
 List<WaypointSymbol>? findWaypointPath(
   SystemsCache systemsCache,
-  SystemWaypoint start,
-  SystemWaypoint end,
+  WaypointSymbol start,
+  WaypointSymbol end,
   int shipSpeed,
 ) {
+  final endWaypoint = systemsCache.waypointFromSymbol(end);
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   final frontier =
       PriorityQueue<(WaypointSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((start.waypointSymbol, 0));
+        ..add((start, 0));
   final cameFrom = <WaypointSymbol, WaypointSymbol>{};
   final costSoFar = <WaypointSymbol, int>{};
   // logger.info('start: ${start.symbol} end: ${end.symbol}');
-  costSoFar[start.waypointSymbol] = 0;
+  costSoFar[start] = 0;
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
     // logger.info('current: ${current.$1}');
-    if (current.$1 == end.waypointSymbol) {
+    if (current.$1 == end) {
       break;
     }
     for (final next in _neighborsFor(systemsCache, current.$1)) {
@@ -110,22 +111,22 @@ List<WaypointSymbol>? findWaypointPath(
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
         final priority = newCost +
-            _approximateTimeBetween(systemsCache, end, next, shipSpeed);
+            _approximateTimeBetween(systemsCache, endWaypoint, next, shipSpeed);
         frontier.add((next, priority));
         cameFrom[next] = current.$1;
       }
     }
   }
-  if (cameFrom[end.waypointSymbol] == null) {
+  if (cameFrom[end] == null) {
     return null;
   }
 
   final symbols = <WaypointSymbol>[];
-  var current = end.waypointSymbol;
-  while (current != start.waypointSymbol) {
+  var current = end;
+  while (current != start) {
     symbols.add(current);
     current = cameFrom[current]!;
   }
-  symbols.add(start.waypointSymbol);
+  symbols.add(start);
   return symbols.reversed.toList();
 }

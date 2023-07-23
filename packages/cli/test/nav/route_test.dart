@@ -91,14 +91,16 @@ void main() {
       path: 'test/nav/fixtures/systems-06-24-2023.json',
     )!;
     final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
-    void expectRoute(String start, String end, int expectedSeconds) {
-      final startWaypoint =
-          systemsCache.waypointFromSymbol(WaypointSymbol.fromString(start));
-      final endWaypoint =
-          systemsCache.waypointFromSymbol(WaypointSymbol.fromString(end));
+    void expectRoute(
+      String startString,
+      String endString,
+      int expectedSeconds,
+    ) {
+      final start = WaypointSymbol.fromString(startString);
+      final end = WaypointSymbol.fromString(endString);
       final route = routePlanner.planRoute(
-        start: startWaypoint,
-        end: endWaypoint,
+        start: start,
+        end: end,
         fuelCapacity: 1200,
         shipSpeed: 30,
       );
@@ -116,8 +118,8 @@ void main() {
       final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
         ..add(route.actions.last.endSymbol);
       final route2 = routePlanner.planRoute(
-        start: startWaypoint,
-        end: endWaypoint,
+        start: start,
+        end: end,
         fuelCapacity: 1200,
         shipSpeed: 30,
       )!;

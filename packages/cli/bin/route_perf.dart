@@ -55,8 +55,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
     final end = jumpgates[i + 1];
     final routeStart = DateTime.now();
     planner.planRoute(
-      start: start,
-      end: end,
+      start: start.waypointSymbol,
+      end: end.waypointSymbol,
       fuelCapacity: 1200,
       shipSpeed: 30,
     );
