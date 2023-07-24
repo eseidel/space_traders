@@ -293,7 +293,7 @@ Future<DateTime?> advanceExplorer(
   if (willCompleteBehavior) {
     // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
-    await centralCommand.completeBehavior(ship.shipSymbol);
+    centralCommand.completeBehavior(ship.shipSymbol);
     return null;
   }
 

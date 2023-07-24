@@ -56,7 +56,7 @@ Future<DateTime?> beingRouteAndLog(
   CentralCommand centralCommand,
   RoutePlan routePlan,
 ) async {
-  await centralCommand.setRoutePlan(ship, routePlan);
+  centralCommand.setRoutePlan(ship, routePlan);
   // TODO(eseidel): Should this buy fuel first if we need it?
   shipInfo(ship, 'Beginning route to ${routePlan.endSymbol}');
   final navResult = await continueNavigationIfNeeded(
@@ -168,7 +168,7 @@ Future<NavResult> continueNavigationIfNeeded(
   // We've reached the routePlan, so we can stop navigating.
   if (ship.waypointSymbol == routePlan.endSymbol) {
     // Remove the destination from the ship's state or it will try to come back.
-    await centralCommand.reachedEndOfRoutePlan(ship);
+    centralCommand.reachedEndOfRoutePlan(ship);
     return NavResult._continueAction();
   }
   final action = routePlan.nextActionFrom(ship.waypointSymbol);

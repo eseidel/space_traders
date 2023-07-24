@@ -19,6 +19,9 @@ enum Behavior {
   /// Fetch an item, bring it somewhere and wait.
   deliver,
 
+  /// Change mounts on this ship.
+  changeMounts,
+
   /// Explore the universe.
   explorer;
 
@@ -43,6 +46,7 @@ class BehaviorState {
     this.behavior, {
     this.deal,
     this.routePlan,
+    this.mountToAdd,
   });
 
   /// Create a new behavior state from JSON.
@@ -55,11 +59,15 @@ class BehaviorState {
     final routePlan = json['routePlan'] == null
         ? null
         : RoutePlan.fromJson(json['routePlan'] as Map<String, dynamic>);
+    final mountToAdd = json['mountToAdd'] == null
+        ? null
+        : ShipMountSymbolEnum.fromJson(json['mountToAdd'] as String);
     return BehaviorState(
       shipSymbol,
       behavior,
       deal: deal,
       routePlan: routePlan,
+      mountToAdd: mountToAdd,
     );
   }
 
@@ -75,6 +83,9 @@ class BehaviorState {
   /// Current route plan.
   RoutePlan? routePlan;
 
+  /// Mount to add.
+  ShipMountSymbolEnum? mountToAdd;
+
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -82,6 +93,7 @@ class BehaviorState {
       'shipSymbol': shipSymbol.toJson(),
       'deal': deal?.toJson(),
       'routePlan': routePlan?.toJson(),
+      'mountToAdd': mountToAdd?.toJson(),
     };
   }
 }

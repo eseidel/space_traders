@@ -171,15 +171,6 @@ void main() {
       (_) => BehaviorState(shipSymbol, Behavior.trader),
     );
 
-    when(
-      () => centralCommand.disableBehaviorForShip(
-        ship,
-        Behavior.trader,
-        any(),
-        any(),
-      ),
-    ).thenAnswer((_) => Future.value());
-
     final costedDeal = CostedDeal(
       deal: Deal(
         sourceSymbol: start,
@@ -230,10 +221,6 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
-    when(() => centralCommand.setBehavior(shipSymbol, any()))
-        .thenAnswer((_) => Future.value());
-    when(() => centralCommand.completeBehavior(shipSymbol))
-        .thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -415,17 +402,6 @@ void main() {
     when(() => centralCommand.getBehavior(shipSymbol)).thenAnswer(
       (_) => BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal),
     );
-    when(() => centralCommand.setRoutePlan(ship, routePlan))
-        .thenAnswer((_) => Future.value());
-    registerFallbackValue(Duration.zero);
-    when(
-      () => centralCommand.disableBehaviorForAll(
-        ship,
-        Behavior.trader,
-        any(),
-        any(),
-      ),
-    ).thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -611,8 +587,6 @@ void main() {
 
     when(() => centralCommand.getBehavior(shipSymbol))
         .thenAnswer((_) => BehaviorState(shipSymbol, Behavior.trader));
-    when(() => centralCommand.setBehavior(shipSymbol, any()))
-        .thenAnswer((_) => Future.value());
     final routePlan = RoutePlan(
       actions: [
         RouteAction(
@@ -626,9 +600,6 @@ void main() {
       fuelUsed: 10,
       shipSpeed: 10,
     );
-    registerFallbackValue(routePlan);
-    when(() => centralCommand.setRoutePlan(ship, any()))
-        .thenAnswer((_) => Future.value());
 
     final costedDeal = CostedDeal(
       deal: Deal(
@@ -657,14 +628,6 @@ void main() {
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenAnswer((_) => Future.value(costedDeal));
-    when(
-      () => centralCommand.disableBehaviorForShip(
-        ship,
-        Behavior.trader,
-        any(),
-        any(),
-      ),
-    ).thenAnswer((_) => Future.value());
     when(
       () => centralCommand.visitLocalShipyard(
         api,

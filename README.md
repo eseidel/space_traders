@@ -241,19 +241,6 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -7% -1,566c per  10 x 20,847c = +208,470c -> 🏦 12,130,780c
 [WARN] 🛸#C  Expected 121,552c profit (220c/s), got -14,130c (-21c/s) in 00:10:49, expected 00:09:12
 
-
-### Ships chasing each other
-🛸#4B ✈️  to X1-TM59-47122Z, 7m left
-🛸#4C ✈️  to X1-TM59-47122Z, 7m left
-🛸#4D ✈️  to X1-PQ90-95787D, -1m left
-🛸#4E ✈️  to X1-PQ90-95787D, -1m left
-🛸#4F ✈️  to X1-TM59-47122Z, 7m left
-🛸#50 ✈️  to X1-TM59-47122Z, 7m left
-🛸#54 ✈️  to X1-TM59-47122Z, 7m left
-🛸#55 ✈️  to X1-TM59-47122Z, 7m left
-🛸#56 ✈️  to X1-TM59-47122Z, 7m left
-🛸#57 ✈️  to X1-TM59-47122Z, 7m left
-
 ### Deal planning needs a cache
 🛸#4A ✍️  market data @ X1-AF63-69302X
 [WARN] 🛸#4A No profitable deals within 10 jumps of X1-AF63.
@@ -319,3 +306,8 @@ ApiException 400: {"error":{"message":"Failed to execute jump. Ship cannot execu
 Unhandled exception:
 ApiException 400: {"error":{"message":"Failed to execute jump. Ship cannot execute jump to the system it is currently located in.","code":4208}}
 #0      FleetApi.jumpShip (package:openapi/api/fleet_api.dart:1118:7)
+
+
+### Does the trader know how to complete contracts that don't require moving?
+deliver 1210  COPPER_ORE to X1-FA31-74322Z in 6d for 161,510c with 32,985c upfront
+Expected profit: 125,525c

@@ -20,7 +20,7 @@ Future<DateTime?> advanceBuyShip(
   final shipyardWaypoints =
       await caches.waypoints.shipyardWaypointsForSystem(ship.systemSymbol);
   if (shipyardWaypoints.isEmpty) {
-    await centralCommand.disableBehaviorForShip(
+    centralCommand.disableBehaviorForShip(
       ship,
       Behavior.buyShip,
       'No shipyards in system ${ship.systemSymbol}.',
@@ -38,7 +38,7 @@ Future<DateTime?> advanceBuyShip(
     shipyardSymbol,
   );
   if (shipType == null) {
-    await centralCommand.disableBehaviorForAll(
+    centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'No ships needed.',
@@ -52,7 +52,7 @@ Future<DateTime?> advanceBuyShip(
   // TODO(eseidel): As written, this can never buy a ship immediately on spawn.
   // Since we won't have surveyed any shipyards yet.
   if (medianPrice == null) {
-    await centralCommand.disableBehaviorForAll(
+    centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Failed to buy ship, no median price for $shipType.',
@@ -70,7 +70,7 @@ Future<DateTime?> advanceBuyShip(
     shipType: shipType,
   );
   if (shipyardPrice == null) {
-    await centralCommand.disableBehaviorForShip(
+    centralCommand.disableBehaviorForShip(
       ship,
       Behavior.buyShip,
       'Failed to buy ship, no recent price for $shipType at $shipyardSymbol.',
@@ -83,7 +83,7 @@ Future<DateTime?> advanceBuyShip(
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
   final credits = caches.agent.agent.credits;
   if (credits < maxPriceToCheck) {
-    await centralCommand.disableBehaviorForAll(
+    centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Can not buy $shipType at $shipyardSymbol, '
@@ -97,7 +97,7 @@ Future<DateTime?> advanceBuyShip(
     // Update our shipyard prices regardless of any later errors.
     final shipyard = await getShipyard(api, currentWaypoint);
     if (!shipyard.hasShipType(shipType)) {
-      await centralCommand.disableBehaviorForShip(
+      centralCommand.disableBehaviorForShip(
         ship,
         Behavior.buyShip,
         'Shipyard at ${currentWaypoint.symbol} does not sell $shipType.',
@@ -116,7 +116,7 @@ Future<DateTime?> advanceBuyShip(
     )!;
     final recentPriceString = creditsString(recentPrice);
     if (recentPrice > maxPrice) {
-      await centralCommand.disableBehaviorForShip(
+      centralCommand.disableBehaviorForShip(
         ship,
         Behavior.buyShip,
         'Failed to buy $shipType at ${currentWaypoint.symbol}, '
@@ -136,13 +136,14 @@ Future<DateTime?> advanceBuyShip(
       shipType,
     );
 
-    await centralCommand.completeBehavior(ship.shipSymbol);
-    await centralCommand.disableBehaviorForAll(
-      ship,
-      Behavior.buyShip,
-      'Purchased ${result.ship.symbol} ($shipType)!',
-      const Duration(minutes: 10),
-    );
+    centralCommand
+      ..completeBehavior(ship.shipSymbol)
+      ..disableBehaviorForAll(
+        ship,
+        Behavior.buyShip,
+        'Purchased ${result.ship.symbol} ($shipType)!',
+        const Duration(minutes: 10),
+      );
     return null;
   }
 

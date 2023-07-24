@@ -1,6 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/change_mounts.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/miner.dart';
@@ -63,6 +64,13 @@ Future<DateTime?> advanceShipBehavior(
       );
     case Behavior.deliver:
       return advanceDeliver(
+        api,
+        centralCommand,
+        caches,
+        ship,
+      );
+    case Behavior.changeMounts:
+      return advanceChangeMounts(
         api,
         centralCommand,
         caches,

@@ -123,39 +123,99 @@ CostedTrip? findBestMarketToBuy(
 //   final RoutePlan route;
 // }
 
-// class ShipTemplate {
-//   const ShipTemplate({
-//     required this.frameType,
-//     required this.mounts,
-//   });
-//   final ShipFrameSymbolEnum frameType;
-//   final Map<TradeSymbol, int> mounts;
-// }
+/// Compute the trade symbol for the given mount symbol.
+TradeSymbol? tradeSymbolForMountSymbol(ShipMountSymbolEnum mountSymbol) {
+  return TradeSymbol.fromJson(mountSymbol.value);
+}
 
-// According to SAF:
-// Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
+/// Compute the mount symbol for the given trade symbol.
+ShipMountSymbolEnum? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
+  return ShipMountSymbolEnum.fromJson(tradeSymbol.value);
+}
 
-// final templates = [
-//   ShipTemplate(
-//     frameType: ShipFrameSymbolEnum.MINER,
-//     mounts: {
-//       TradeSymbol.MOUNT_MINING_LASER_II: 2,
-//       TradeSymbol.MOUNT_MINING_LASER_I: 1,
-//     },
-//   )
-// ];
+/// Compute the mounts in the given ship's inventory.
+Map<ShipMountSymbolEnum, int> countMountsInInventory(Ship ship) {
+  final counts = <ShipMountSymbolEnum, int>{};
+  for (final item in ship.cargo.inventory) {
+    final mountSymbol = mountSymbolForTradeSymbol(item.tradeSymbol);
+    if (mountSymbol == null) {
+      continue;
+    }
+    final count = counts[mountSymbol] ?? 0;
+    counts[mountSymbol] = count + item.units;
+  }
+  return counts;
+}
 
-// Map<TradeSymbol, int> neededMounts(ShipCache shipCache) {
-//   final needed = <TradeSymbol, int>{};
-//   for (final ship in shipCache.ships) {
-//     for (final mount in ship.mounts) {
-//       if (mount.isMissing) {
-//         needed[mount.tradeSymbol] = (needed[mount.tradeSymbol] ?? 0) + 1;
-//       }
-//     }
-//   }
-//   return needed;
-// }
+/// Compute the mounts mounted on the given ship.
+Map<ShipMountSymbolEnum, int> countMountedMounts(Ship ship) {
+  final counts = <ShipMountSymbolEnum, int>{};
+  for (final mount in ship.mounts) {
+    final count = counts[mount.symbol] ?? 0;
+    counts[mount.symbol] = count + 1;
+  }
+  return counts;
+}
+
+/// Compute the mounts needed to make the given ship match the given template.
+Map<ShipMountSymbolEnum, int> mountsNeededForShip(
+  Ship ship,
+  ShipTemplate template,
+) {
+  final needed = <ShipMountSymbolEnum, int>{};
+  final existing = countMountedMounts(ship);
+  for (final mountSymbol in template.mounts.keys) {
+    final neededCount = template.mounts[mountSymbol]!;
+    final existingCount = existing[mountSymbol] ?? 0;
+    final neededMounts = neededCount - existingCount;
+    if (neededMounts > 0) {
+      needed[mountSymbol] = neededMounts;
+    }
+  }
+  return needed;
+}
+
+Map<ShipMountSymbolEnum, int> _mountsNeededForAllShips(
+  CentralCommand centralCommand,
+  ShipCache shipCache,
+) {
+  final needed = <ShipMountSymbolEnum, int>{};
+  for (final ship in shipCache.ships) {
+    final template = centralCommand.templateForShip(ship);
+    if (template == null) {
+      continue;
+    }
+    for (final entry in mountsNeededForShip(ship, template).entries) {
+      final mountSymbol = entry.key;
+      final neededCount = entry.value;
+      final existingCount = needed[mountSymbol] ?? 0;
+      needed[mountSymbol] = existingCount + neededCount;
+    }
+  }
+  return needed;
+}
+
+class _BuyRequest {
+  _BuyRequest({
+    required this.tradeSymbol,
+    required this.units,
+  });
+
+  final TradeSymbol tradeSymbol;
+  final int units;
+}
+
+_BuyRequest? _buyRequestFromNeededMounts(Map<ShipMountSymbolEnum, int> needed) {
+  if (needed.isEmpty) {
+    return null;
+  }
+  // Check each of the needed mounts for availability and affordability.
+
+  final mountSymbol = needed.keys.first;
+  final units = needed[mountSymbol]!;
+  final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol)!;
+  return _BuyRequest(tradeSymbol: tradeSymbol, units: units);
+}
 
 /// Advance the behavior of the given ship.
 Future<DateTime?> advanceDeliver(
@@ -165,22 +225,42 @@ Future<DateTime?> advanceDeliver(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  // Figure out if there are any thigns needing to be delivered.
+  // Figure out if there are any things needing to be delivered.
   // Look at our ore-hounds, see if they are matching spec.
   // If mounts are missing, see if we can buy them.
-  // If so, in what priority?
-  // If we can't buy them, disable the behavior for a while.
+  final neededMounts = _mountsNeededForAllShips(centralCommand, caches.ships);
+  if (neededMounts.isEmpty) {
+    centralCommand.disableBehaviorForShip(
+      ship,
+      Behavior.deliver,
+      'No mounts needed.',
+      const Duration(minutes: 20),
+    );
+    return null;
+  }
 
   // Figure out what item we're supposed to get.
-  // const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
-  const tradeSymbol = TradeSymbol.MOUNT_MINING_LASER_II;
-  const amountToBuy = 10;
+  // If so, in what priority?
+  // If we can't buy them, disable the behavior for a while.
+  final buyRequest = _buyRequestFromNeededMounts(neededMounts);
+  if (buyRequest == null) {
+    centralCommand.disableBehaviorForShip(
+      ship,
+      Behavior.deliver,
+      'No mounts available.',
+      const Duration(minutes: 20),
+    );
+    return null;
+  }
+
+  final tradeSymbol = buyRequest.tradeSymbol;
+  final maxToBuy = buyRequest.units;
 
   final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
   final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
   final shipyard = hqWaypoints.firstWhereOrNull((w) => w.hasShipyard);
   if (shipyard == null) {
-    await centralCommand.disableBehaviorForShip(
+    centralCommand.disableBehaviorForShip(
       ship,
       Behavior.deliver,
       'No shipyard in $hqSystem',
@@ -201,7 +281,7 @@ Future<DateTime?> advanceDeliver(
       tradeSymbol,
     );
     if (trip == null) {
-      await centralCommand.disableBehaviorForShip(
+      centralCommand.disableBehaviorForShip(
         ship,
         Behavior.deliver,
         'No market for $tradeSymbol',
@@ -221,11 +301,12 @@ Future<DateTime?> advanceDeliver(
   }
 
   if (atDelivery) {
-    await centralCommand.completeBehavior(ship.shipSymbol);
-    await centralCommand.setBehavior(
-      ship.shipSymbol,
-      BehaviorState(ship.shipSymbol, Behavior.idle),
-    );
+    centralCommand
+      ..completeBehavior(ship.shipSymbol)
+      ..setBehavior(
+        ship.shipSymbol,
+        BehaviorState(ship.shipSymbol, Behavior.idle),
+      );
     return null;
   }
 
@@ -237,7 +318,7 @@ Future<DateTime?> advanceDeliver(
     caches.agent,
     ship,
     tradeSymbol,
-    amountToBuy,
+    maxToBuy,
     AccountingType.capital,
   );
   // And go to our destination.
@@ -250,31 +331,6 @@ Future<DateTime?> advanceDeliver(
     shipyard.waypointSymbol,
   );
   return waitUntil;
-
-  // // Buy it.
-
-  // // When we're there, we need to do the actual transfer and mount.
-  // final request = TransferCargoRequest(
-  //   shipSymbol: toShip.symbol,
-  //   tradeSymbol: tradeSymbol,
-  //   units: 1,
-  // );
-  // await api.fleet.transferCargo(fromShip.symbol,
-  //    transferCargoRequest: request);
-
-  // // toShip needs to be docked at a shipyard.
-  // const toBeRemoved = TradeSymbol.MOUNT_MINING_LASER_I;
-  // await api.fleet.removeMount(
-  //   toShip.symbol,
-  //   removeMountRequest: RemoveMountRequest(symbol: toBeRemoved.value),
-  // );
-
-  // await api.fleet.installMount(
-  //   toShip.symbol,
-  //   installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
-  // );
-
-  // What do we do with the old mount?
 }
 
 // This seems related to using haulers for delivery of trade goods.

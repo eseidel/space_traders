@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
@@ -60,6 +61,35 @@ class _ShipTimeout {
   final Behavior behavior;
   final DateTime timeout;
 }
+
+/// Mounts template for a ship.
+class ShipTemplate {
+  /// Create a new ship template.
+  const ShipTemplate({
+    required this.frameSymbol,
+    required this.mounts,
+  });
+
+  /// Frame type that this template is for.
+  final ShipFrameSymbolEnum frameSymbol;
+
+  /// Mounts that this template has.
+  final Map<ShipMountSymbolEnum, int> mounts;
+}
+
+// According to SAF:
+// Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
+
+final _templates = [
+  const ShipTemplate(
+    frameSymbol: ShipFrameSymbolEnum.MINER,
+    mounts: {
+      ShipMountSymbolEnum.MINING_LASER_II: 1,
+      ShipMountSymbolEnum.MINING_LASER_I: 1,
+      ShipMountSymbolEnum.SURVEYOR_I: 1,
+    },
+  )
+];
 
 /// Central command for the fleet.
 class CentralCommand {
@@ -129,6 +159,12 @@ class CentralCommand {
   // If there still aren't any places to explore, then we need to see if there
   // is a place for them to watch.
   // If there still isn't, then we print a warning and have them idle.
+
+  /// What template should we use for the given ship?
+  ShipTemplate? templateForShip(Ship ship) {
+    final frameSymbol = ship.frame.symbol;
+    return _templates.firstWhereOrNull((e) => e.frameSymbol == frameSymbol);
+  }
 
   /// Check if the given behavior is globally disabled.
   bool isBehaviorDisabled(Behavior behavior) {
@@ -230,12 +266,12 @@ class CentralCommand {
   /// Disable the given behavior for an hour.
   // This should be a return type from the advance function instead of a
   // callback to the central command.
-  Future<void> disableBehaviorForAll(
+  void disableBehaviorForAll(
     Ship ship,
     Behavior behavior,
     String why,
     Duration timeout,
-  ) async {
+  ) {
     final shipSymbol = ship.shipSymbol;
     final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
@@ -254,12 +290,12 @@ class CentralCommand {
   }
 
   /// Disable the given behavior for [ship] for [duration].
-  Future<void> disableBehaviorForShip(
+  void disableBehaviorForShip(
     Ship ship,
     Behavior behavior,
     String why,
     Duration duration,
-  ) async {
+  ) {
     final shipSymbol = ship.shipSymbol;
     final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
@@ -279,12 +315,99 @@ class CentralCommand {
   }
 
   /// Complete the current behavior for the given ship.
-  Future<void> completeBehavior(ShipSymbol shipSymbol) async {
+  void completeBehavior(ShipSymbol shipSymbol) {
     return _behaviorCache.deleteBehavior(shipSymbol);
   }
 
+  /// Returns any mount that's been queued for adding to this ship.
+  ShipMountSymbolEnum? getMountToAdd(ShipSymbol shipSymbol) {
+    final state = _behaviorCache.getBehavior(shipSymbol);
+    return state?.mountToAdd;
+  }
+
+  /// Saves the given mount to be added to the ship.
+  void claimMount(ShipSymbol shipSymbol, ShipMountSymbolEnum mountSymbol) {
+    final state = _behaviorCache.getBehavior(shipSymbol);
+    if (state == null) {
+      logger.warn('No state for $shipSymbol');
+      return;
+    }
+    state.mountToAdd = mountSymbol;
+  }
+
+  /// Returns the delivery ship bringing the mounts.
+  Ship? getDeliveryShip(ShipSymbol shipSymbol, TradeSymbol item) {
+    final deliveryShip = _shipCache.ships.first;
+    final deliveryState = getBehavior(deliveryShip.shipSymbol);
+    if (deliveryState?.behavior != Behavior.deliver) {
+      return null;
+    }
+    // Check if it's at the shipyard?
+    return deliveryShip;
+  }
+
+  /// Returns the counts of mounts already claimed.
+  Map<ShipMountSymbolEnum, int> claimedMounts() {
+    final claimed = <ShipMountSymbolEnum, int>{};
+    for (final state in _behaviorCache.states) {
+      final behavior = state.behavior;
+      if (behavior != Behavior.changeMounts) {
+        continue;
+      }
+      final mountSymbol = state.mountToAdd;
+      if (mountSymbol == null) {
+        continue;
+      }
+      claimed[mountSymbol] = (claimed[mountSymbol] ?? 0) + 1;
+    }
+    return claimed;
+  }
+
+  /// Returns the number of mounts available at the waypoint.
+  Map<ShipMountSymbolEnum, int> unclaimedMountsAt(WaypointSymbol waypoint) {
+    // Get all the ships at that symbol
+    final ships = _shipCache.ships
+        .where((s) => s.waypointSymbol == waypoint && !s.isInTransit);
+
+    // That have behavior delivery.
+    final counts = <ShipMountSymbolEnum, int>{};
+    for (final ship in ships) {
+      final state = _behaviorCache.getBehavior(ship.shipSymbol);
+      if (state == null || state.behavior != Behavior.deliver) {
+        continue;
+      }
+      final inventory = countMountsInInventory(ship);
+      for (final entry in inventory.entries) {
+        final mountSymbol = entry.key;
+        final count = entry.value;
+        final existingCount = counts[mountSymbol] ?? 0;
+        counts[mountSymbol] = existingCount + count;
+      }
+    }
+    // Get all the claimed mounts out of other ships states.
+    final claimed = claimedMounts();
+    for (final entry in claimed.entries) {
+      final mountSymbol = entry.key;
+      final count = entry.value;
+      final existingCount = counts[mountSymbol] ?? 0;
+      final remaining = existingCount - count;
+      if (remaining <= 0) {
+        if (remaining < 0) {
+          logger.warn(
+            'More mounts claimed than available: '
+            '$mountSymbol $existingCount - $count',
+          );
+        }
+        counts.remove(mountSymbol);
+      } else {
+        counts[mountSymbol] = remaining;
+      }
+    }
+    return counts;
+  }
+
   /// Set the [RoutePlan] for the ship.
-  Future<void> setRoutePlan(Ship ship, RoutePlan routePlan) async {
+  void setRoutePlan(Ship ship, RoutePlan routePlan) {
     final state = _behaviorCache.getBehavior(ship.shipSymbol)!
       ..routePlan = routePlan;
     _behaviorCache.setBehavior(ship.shipSymbol, state);
@@ -297,7 +420,7 @@ class CentralCommand {
   }
 
   /// The [ship] has reached its destination.
-  Future<void> reachedEndOfRoutePlan(Ship ship) async {
+  void reachedEndOfRoutePlan(Ship ship) {
     final state = _behaviorCache.getBehavior(ship.shipSymbol)!
       ..routePlan = null;
     _behaviorCache.setBehavior(ship.shipSymbol, state);
@@ -311,7 +434,7 @@ class CentralCommand {
     final behaviorState = getBehavior(ship.shipSymbol)!;
     final deal = behaviorState.deal!;
     behaviorState.deal = deal.byAddingTransactions(transactions);
-    await setBehavior(ship.shipSymbol, behaviorState);
+    setBehavior(ship.shipSymbol, behaviorState);
   }
 
   // This feels wrong.
@@ -334,7 +457,7 @@ class CentralCommand {
   }
 
   /// Set the current [BehaviorState] for the [shipSymbol].
-  Future<void> setBehavior(ShipSymbol shipSymbol, BehaviorState state) async {
+  void setBehavior(ShipSymbol shipSymbol, BehaviorState state) {
     _behaviorCache.setBehavior(shipSymbol, state);
   }
 
@@ -703,7 +826,7 @@ class CentralCommand {
     // ships even though we might just be at a system where we don't need a ship
     // or can't afford one?
     if (shipType == null) {
-      await disableBehaviorForAll(
+      disableBehaviorForAll(
         ship,
         Behavior.buyShip,
         'No ships needed.',
@@ -715,7 +838,7 @@ class CentralCommand {
     // Get our median price before updating shipyard prices.
     final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
     if (medianPrice == null) {
-      await disableBehaviorForAll(
+      disableBehaviorForAll(
         ship,
         Behavior.buyShip,
         'Failed to buy ship, no median price for $shipType.',
@@ -731,7 +854,7 @@ class CentralCommand {
     final budget = agentCache.agent.credits - minimumCreditsForTrading;
     final credits = budget;
     if (credits < maxPrice) {
-      await disableBehaviorForAll(
+      disableBehaviorForAll(
         ship,
         Behavior.buyShip,
         'Can not buy $shipType, budget $credits < max price $maxPrice.',
@@ -745,7 +868,7 @@ class CentralCommand {
       shipType: shipType,
     );
     if (recentPrice == null) {
-      await disableBehaviorForShip(
+      disableBehaviorForShip(
         ship,
         Behavior.buyShip,
         'Shipyard at $shipyardSymbol does not sell $shipType.',
@@ -756,7 +879,7 @@ class CentralCommand {
 
     final recentPriceString = creditsString(recentPrice);
     if (recentPrice > maxPrice) {
-      await disableBehaviorForShip(
+      disableBehaviorForShip(
         ship,
         Behavior.buyShip,
         'Failed to buy $shipType at $shipyardSymbol, '
@@ -776,7 +899,7 @@ class CentralCommand {
       shipType,
     );
 
-    await disableBehaviorForAll(
+    disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Purchased ${result.ship.symbol} ($shipType)!',

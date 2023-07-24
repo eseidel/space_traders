@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
@@ -231,16 +230,6 @@ void main() {
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
-
-    registerFallbackValue(Duration.zero);
-    when(
-      () => centralCommand.disableBehaviorForShip(
-        ship,
-        Behavior.miner,
-        any(),
-        any(),
-      ),
-    ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

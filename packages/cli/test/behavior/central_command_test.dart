@@ -150,39 +150,39 @@ void main() {
     when(() => shipA.symbol).thenReturn(aSymbol.symbol);
     when(() => shipNavA.systemSymbol).thenReturn('S-A');
     when(() => shipA.nav).thenReturn(shipNavA);
-    await centralCommand.setBehavior(
+    centralCommand.setBehavior(
       aSymbol,
       BehaviorState(aSymbol, Behavior.explorer),
     );
 
     final saa = WaypointSymbol.fromString('S-A-A');
     final saw = WaypointSymbol.fromString('S-A-W');
-    await centralCommand.setRoutePlan(shipA, fakeJump(saa, saw));
+    centralCommand.setRoutePlan(shipA, fakeJump(saa, saw));
     final shipB = _MockShip();
     final shipBSymbol = ShipSymbol.fromString('X-B');
     when(() => shipB.symbol).thenReturn(shipBSymbol.symbol);
     final shipNavB = _MockShipNav();
     when(() => shipNavB.systemSymbol).thenReturn('S-C');
     when(() => shipB.nav).thenReturn(shipNavB);
-    await centralCommand.setBehavior(
+    centralCommand.setBehavior(
       shipBSymbol,
       BehaviorState(shipBSymbol, Behavior.explorer),
     );
     final sbw = WaypointSymbol.fromString('S-B-W');
-    await centralCommand.setRoutePlan(shipB, fakeJump(saa, sbw));
+    centralCommand.setRoutePlan(shipB, fakeJump(saa, sbw));
     expect(centralCommand.currentRoutePlan(shipB)!.endSymbol, sbw);
     when(() => shipCache.ship(shipBSymbol)).thenReturn(shipB);
 
     final otherSystems = centralCommand.otherExplorerSystems(aSymbol).toList();
     expect(otherSystems, [sbw.systemSymbol]); // From destination
-    await centralCommand.reachedEndOfRoutePlan(shipB);
+    centralCommand.reachedEndOfRoutePlan(shipB);
     expect(centralCommand.currentRoutePlan(shipB), isNull);
     final otherSystems2 = centralCommand.otherExplorerSystems(aSymbol).toList();
     expect(
       otherSystems2,
       [SystemSymbol.fromString('S-C')],
     ); // From nav.systemSymbol
-    await centralCommand.completeBehavior(shipBSymbol);
+    centralCommand.completeBehavior(shipBSymbol);
     final otherSystems3 = centralCommand.otherExplorerSystems(aSymbol).toList();
     expect(otherSystems3, <SystemSymbol>[]);
   });

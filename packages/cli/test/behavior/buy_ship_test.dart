@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
@@ -82,25 +81,6 @@ void main() {
 
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
-
-    registerFallbackValue(Duration.zero);
-    when(
-      () => centralCommand.disableBehaviorForAll(
-        ship,
-        Behavior.buyShip,
-        any(),
-        any(),
-      ),
-    ).thenAnswer((_) => Future.value());
-    when(
-      () => centralCommand.visitLocalShipyard(
-        api,
-        shipyardPrices,
-        agentCache,
-        waypoint,
-        ship,
-      ),
-    ).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

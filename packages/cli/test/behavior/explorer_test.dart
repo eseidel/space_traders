@@ -88,8 +88,6 @@ void main() {
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
-    when(() => centralCommand.completeBehavior(shipSymbol))
-        .thenAnswer((_) => Future.value());
     when(
       () => centralCommand.visitLocalShipyard(
         api,
