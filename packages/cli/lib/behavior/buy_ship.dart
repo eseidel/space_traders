@@ -83,16 +83,15 @@ Future<DateTime?> advanceBuyShip(
     );
     return null;
   }
-  final maxPriceToCheck = (shipyardPrice * 1.05).toInt();
-  final maxMedianMultipler = centralCommand.maxMedianShipPriceMultipler;
-  final maxPrice = (medianPrice * maxMedianMultipler).toInt();
+  const priceAdjustment = 1.05;
+  final maxPriceToCheck = (shipyardPrice * priceAdjustment).toInt();
   final credits = caches.agent.agent.credits;
   if (credits < maxPriceToCheck) {
     centralCommand.disableBehaviorForAll(
       ship,
       Behavior.buyShip,
       'Can not buy $shipType at $shipyardSymbol, '
-      'credits $credits < max price $maxPrice.',
+      'credits $credits < $priceAdjustment * price = $maxPriceToCheck.',
       const Duration(minutes: 10),
     );
     return null;
@@ -132,6 +131,8 @@ Future<DateTime?> advanceBuyShip(
     shipType: shipType,
   )!;
   final recentPriceString = creditsString(recentPrice);
+  final maxMedianMultipler = centralCommand.maxMedianShipPriceMultipler;
+  final maxPrice = (medianPrice * maxMedianMultipler).toInt();
   if (recentPrice > maxPrice) {
     centralCommand.disableBehaviorForShip(
       ship,

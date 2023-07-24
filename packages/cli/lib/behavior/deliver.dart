@@ -175,26 +175,6 @@ Map<ShipMountSymbolEnum, int> mountsNeededForShip(
   return needed;
 }
 
-Map<ShipMountSymbolEnum, int> _mountsNeededForAllShips(
-  CentralCommand centralCommand,
-  ShipCache shipCache,
-) {
-  final needed = <ShipMountSymbolEnum, int>{};
-  for (final ship in shipCache.ships) {
-    final template = centralCommand.templateForShip(ship);
-    if (template == null) {
-      continue;
-    }
-    for (final entry in mountsNeededForShip(ship, template).entries) {
-      final mountSymbol = entry.key;
-      final neededCount = entry.value;
-      final existingCount = needed[mountSymbol] ?? 0;
-      needed[mountSymbol] = existingCount + neededCount;
-    }
-  }
-  return needed;
-}
-
 class _BuyRequest {
   _BuyRequest({
     required this.tradeSymbol,
@@ -228,7 +208,7 @@ Future<DateTime?> advanceDeliver(
   // Figure out if there are any things needing to be delivered.
   // Look at our ore-hounds, see if they are matching spec.
   // If mounts are missing, see if we can buy them.
-  final neededMounts = _mountsNeededForAllShips(centralCommand, caches.ships);
+  final neededMounts = centralCommand.mountsNeededForAllShips();
   if (neededMounts.isEmpty) {
     centralCommand.disableBehaviorForShip(
       ship,

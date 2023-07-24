@@ -107,8 +107,6 @@ class CentralCommand {
   final ShipCache _shipCache;
   Duration _maxAgeForExplorerData = const Duration(days: 3);
 
-  int _loops = 0;
-
   /// Returns true if contract trading is enabled.
   /// We will only accept and start new contracts when this is true.
   /// We will continue to deliver current contract deals even if this is false,
@@ -134,22 +132,6 @@ class CentralCommand {
     return _maxAgeForExplorerData ~/= 2;
   }
 
-  /// Give the central command a chance to run.
-  void runCentralCommandLogic() {
-    _loops++;
-    if (_loops % 100 == 0) {}
-    // Run every N loops.
-    // Evaluate earnings for all ships over the last N minutes.
-    // If we don't have enough data for a ship/squad, then skip it.
-    // If we have enough data, then we can compute earnings per second.
-    // If it's below some threshold, then we should move it to a system
-    // we think might be more profitable.
-    // - Check if we need to buy a new ship.
-    // - Check if our miners are still at an optimal waypoint?
-    // - Refresh MarketScan for deals?
-    // - Refresh MarketScan for miners?
-  }
-
   // To tell a given explorer what to do.
   // Figure out what squad they're in (are they watching a waypoint for us
   // or are they exploring? and if so what jump gate network?)
@@ -164,6 +146,24 @@ class CentralCommand {
   ShipTemplate? templateForShip(Ship ship) {
     final frameSymbol = ship.frame.symbol;
     return _templates.firstWhereOrNull((e) => e.frameSymbol == frameSymbol);
+  }
+
+  /// Add up all mounts needed for current ships based on current templating.
+  Map<ShipMountSymbolEnum, int> mountsNeededForAllShips() {
+    final needed = <ShipMountSymbolEnum, int>{};
+    for (final ship in _shipCache.ships) {
+      final template = templateForShip(ship);
+      if (template == null) {
+        continue;
+      }
+      for (final entry in mountsNeededForShip(ship, template).entries) {
+        final mountSymbol = entry.key;
+        final neededCount = entry.value;
+        final existingCount = needed[mountSymbol] ?? 0;
+        needed[mountSymbol] = existingCount + neededCount;
+      }
+    }
+    return needed;
   }
 
   /// Check if the given behavior is globally disabled.
@@ -272,6 +272,11 @@ class CentralCommand {
     String why,
     Duration timeout,
   ) {
+    shipWarn(
+      ship,
+      '$why Disabling $behavior for ${approximateDuration(timeout)}.',
+    );
+
     final shipSymbol = ship.shipSymbol;
     final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
@@ -279,11 +284,6 @@ class CentralCommand {
     } else {
       shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
     }
-
-    shipWarn(
-      ship,
-      '$why Disabling $behavior for ${approximateDuration(timeout)}.',
-    );
 
     final expiration = DateTime.timestamp().add(timeout);
     _behaviorTimeouts[behavior] = expiration;
@@ -297,18 +297,18 @@ class CentralCommand {
     Duration duration,
   ) {
     final shipSymbol = ship.shipSymbol;
+    shipWarn(
+      ship,
+      '$why Disabling $behavior for $shipSymbol '
+      'for ${approximateDuration(duration)}.',
+    );
+
     final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
       _behaviorCache.deleteBehavior(shipSymbol);
     } else {
       shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
     }
-
-    shipWarn(
-      ship,
-      '$why Disabling $behavior for $shipSymbol '
-      'for ${approximateDuration(duration)}.',
-    );
 
     final expiration = DateTime.timestamp().add(duration);
     _shipTimeouts.add(_ShipTimeout(ship.shipSymbol, behavior, expiration));
