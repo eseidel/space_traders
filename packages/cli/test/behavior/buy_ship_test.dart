@@ -66,19 +66,28 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
 
     final symbol = WaypointSymbol.fromString('S-A-W');
+    when(() => agentCache.headquartersSymbol).thenReturn(symbol);
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
+    when(() => waypoint.traits).thenReturn([
+      WaypointTrait(
+        symbol: WaypointTraitSymbolEnum.SHIPYARD,
+        name: '',
+        description: '',
+      )
+    ]);
 
     registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
     when(() => waypointCache.shipyardWaypointsForSystem(symbol.systemSymbol))
         .thenAnswer((_) => Future.value([waypoint]));
-
+    when(() => waypointCache.waypointsInSystem(symbol.systemSymbol))
+        .thenAnswer((_) => Future.value([waypoint]));
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
 

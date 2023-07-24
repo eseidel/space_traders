@@ -17,20 +17,25 @@ Future<DateTime?> advanceBuyShip(
   assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
-  final shipyardWaypoints =
-      await caches.waypoints.shipyardWaypointsForSystem(ship.systemSymbol);
-  if (shipyardWaypoints.isEmpty) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      Behavior.buyShip,
-      'No shipyards in system ${ship.systemSymbol}.',
-      const Duration(minutes: 10),
-    );
-    return null;
-  }
+  // final shipyardWaypoints =
+  //     await caches.waypoints.shipyardWaypointsForSystem(ship.systemSymbol);
+  // if (shipyardWaypoints.isEmpty) {
+  //   centralCommand.disableBehaviorForShip(
+  //     ship,
+  //     Behavior.buyShip,
+  //     'No shipyards in system ${ship.systemSymbol}.',
+  //     const Duration(minutes: 10),
+  //   );
+  //   return null;
+  // }
 
-  final shipyardWaypoint = shipyardWaypoints.first;
+  // final shipyardWaypoint = shipyardWaypoints.first;
+  // final shipyardSymbol = shipyardWaypoint.waypointSymbol;
+  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
+  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
+  final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
   final shipyardSymbol = shipyardWaypoint.waypointSymbol;
+
   final shipType = centralCommand.shipTypeToBuy(
     ship,
     caches.shipyardPrices,
@@ -93,68 +98,69 @@ Future<DateTime?> advanceBuyShip(
     return null;
   }
 
-  if (currentWaypoint.waypointSymbol == shipyardSymbol) {
-    // Update our shipyard prices regardless of any later errors.
-    final shipyard = await getShipyard(api, currentWaypoint);
-    if (!shipyard.hasShipType(shipType)) {
-      centralCommand.disableBehaviorForShip(
-        ship,
-        Behavior.buyShip,
-        'Shipyard at ${currentWaypoint.symbol} does not sell $shipType.',
-        const Duration(minutes: 30),
-      );
-      return null;
-    }
-
-    await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
-
-    // We should *always* have a recent price unless the shipyard doesn't
-    // sell that type of ship.
-    final recentPrice = caches.shipyardPrices.recentPurchasePrice(
-      shipyardSymbol: currentWaypoint.waypointSymbol,
-      shipType: shipType,
-    )!;
-    final recentPriceString = creditsString(recentPrice);
-    if (recentPrice > maxPrice) {
-      centralCommand.disableBehaviorForShip(
-        ship,
-        Behavior.buyShip,
-        'Failed to buy $shipType at ${currentWaypoint.symbol}, '
-        '$recentPriceString > max price $maxPrice.',
-        const Duration(minutes: 30),
-      );
-      return null;
-    }
-
-    // Do we need to catch exceptions about insufficient credits?
-    final result = await purchaseShipAndLog(
+  if (currentWaypoint.waypointSymbol != shipyardSymbol) {
+    // We're not there, go to the shipyard to purchase.
+    return beingNewRouteAndLog(
       api,
-      caches.ships,
-      caches.agent,
       ship,
-      shipyard.waypointSymbol,
-      shipType,
+      caches.systems,
+      caches.routePlanner,
+      centralCommand,
+      shipyardSymbol,
     );
+  }
+  // Otherwise we're at the shipyard we intended to be at.
 
-    centralCommand
-      ..completeBehavior(ship.shipSymbol)
-      ..disableBehaviorForAll(
-        ship,
-        Behavior.buyShip,
-        'Purchased ${result.ship.symbol} ($shipType)!',
-        const Duration(minutes: 10),
-      );
+  // Update our shipyard prices regardless of any later errors.
+  final shipyard = await getShipyard(api, currentWaypoint);
+  if (!shipyard.hasShipType(shipType)) {
+    centralCommand.disableBehaviorForShip(
+      ship,
+      Behavior.buyShip,
+      'Shipyard at ${currentWaypoint.symbol} does not sell $shipType.',
+      const Duration(minutes: 30),
+    );
     return null;
   }
 
-  /// Otherwise, assume this is our first time through this behavior.
-  /// Go to the nearest shipyard (maybe with best price?)
-  return beingNewRouteAndLog(
+  await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
+
+  // We should *always* have a recent price unless the shipyard doesn't
+  // sell that type of ship.
+  final recentPrice = caches.shipyardPrices.recentPurchasePrice(
+    shipyardSymbol: currentWaypoint.waypointSymbol,
+    shipType: shipType,
+  )!;
+  final recentPriceString = creditsString(recentPrice);
+  if (recentPrice > maxPrice) {
+    centralCommand.disableBehaviorForShip(
+      ship,
+      Behavior.buyShip,
+      'Failed to buy $shipType at ${currentWaypoint.symbol}, '
+      '$recentPriceString > max price $maxPrice.',
+      const Duration(minutes: 30),
+    );
+    return null;
+  }
+
+  // Do we need to catch exceptions about insufficient credits?
+  final result = await purchaseShipAndLog(
     api,
+    caches.ships,
+    caches.agent,
     ship,
-    caches.systems,
-    caches.routePlanner,
-    centralCommand,
-    shipyardSymbol,
+    shipyard.waypointSymbol,
+    shipType,
   );
+
+  // Record our success!
+  centralCommand
+    ..completeBehavior(ship.shipSymbol)
+    ..disableBehaviorForAll(
+      ship,
+      Behavior.buyShip,
+      'Purchased ${result.ship.symbol} ($shipType)!',
+      const Duration(minutes: 10),
+    );
+  return null;
 }
