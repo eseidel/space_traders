@@ -28,9 +28,7 @@ Api apiFromAuthToken(String token) {
 
 /// defaultApi creates an Api with the default auth token read from the
 /// given file system.
-Api defaultApi(FileSystem fs) {
-  return apiFromAuthToken(loadAuthToken(fs));
-}
+Api defaultApi(FileSystem fs) => apiFromAuthToken(loadAuthToken(fs));
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.

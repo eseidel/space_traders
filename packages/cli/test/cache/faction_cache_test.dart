@@ -12,7 +12,7 @@ void main() {
           symbol: FactionSymbols.AEGIS,
           name: 'A',
           description: 'description',
-          headquarters: 'headquarters',
+          headquarters: 'S-A-W',
           isRecruiting: true,
         )
       ],
@@ -24,5 +24,7 @@ void main() {
     expect(cache2.factions.length, 1);
     final faction = cache2.factionBySymbol(FactionSymbols.AEGIS);
     expect(faction.isRecruiting, isTrue);
+    final hq = cache2.headquartersFor(FactionSymbols.AEGIS);
+    expect(hq.waypoint, 'S-A-W');
   });
 }
