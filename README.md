@@ -242,6 +242,13 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -7% -1,566c per  10 x 20,847c = +208,470c -> 🏦 12,130,780c
 [WARN] 🛸#C  Expected 121,552c profit (220c/s), got -14,130c (-21c/s) in 00:10:49, expected 00:09:12
 
+🛸#25 🤝  10 MOUNT_TURRET_I     +124% +2,576c per  10 x  4,657c = +46,570c -> 🏦 2,981,897c
+🛸#25 🤝  10 MOUNT_TURRET_I     +119% +2,483c per  10 x  4,564c = +45,640c -> 🏦 3,027,537c
+🛸#25 🤝  10 MOUNT_TURRET_I     +114% +2,368c per  10 x  4,449c = +44,490c -> 🏦 3,072,027c
+🛸#25 🤝  10 MOUNT_TURRET_I     +107% +2,227c per  10 x  4,308c = +43,080c -> 🏦 3,115,107c
+🛸#25 🤝  10 MOUNT_TURRET_I      +99% +2,053c per  10 x  4,134c = +41,340c -> 🏦 3,156,447c
+[WARN] 🛸#25 Expected 23,632c profit (43c/s), got -5,260c (-6c/s) in 00:13:53, expected 00:09:04
+
 ### Deal planning needs a cache
 🛸#4A ✍️  market data @ X1-AF63-69302X
 [WARN] 🛸#4A No profitable deals within 10 jumps of X1-AF63.
