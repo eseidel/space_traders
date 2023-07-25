@@ -338,12 +338,15 @@ class JobResult {
   /// Get the JobError from the result.
   JobError get error => _error!;
 
+  /// Is this job complete?  (Not necessarily the whole behavior)
+  bool get isComplete => _type == _JobResultType.complete;
+
   /// Whether the caller should return after the navigation action
-  bool shouldReturn() => _type != _JobResultType.continueAction;
+  bool get shouldReturn => _type != _JobResultType.continueAction;
 
   /// The wait time if [shouldReturn] is true
   DateTime? get waitTime {
-    if (!shouldReturn()) {
+    if (!shouldReturn) {
       throw StateError('Cannot get wait time for non-wait result');
     }
     return _waitTime;
@@ -437,7 +440,6 @@ Future<JobResult> doBuyJob(
 }) async {
   final buyJob = state.buyJob;
   if (buyJob == null) {
-    centralCommand.completeBehavior(ship.shipSymbol);
     return JobResult._error('No buy job', const Duration(hours: 1));
   }
   // If we aren't at our buy location, go there.
@@ -477,7 +479,6 @@ Future<JobResult> doDeliverJob(
 }) async {
   final deliverJob = state.deliverJob;
   if (deliverJob == null) {
-    centralCommand.completeBehavior(ship.shipSymbol);
     return JobResult._error('No deliver job', const Duration(hours: 1));
   }
 
@@ -564,8 +565,12 @@ Future<DateTime?> advanceDeliver(
   final state = centralCommand.getBehavior(ship.shipSymbol);
   // How would we be here w/o a state?
   if (state == null) {
-    shipErr(ship, 'No behavior state');
-    centralCommand.completeBehavior(ship.shipSymbol);
+    centralCommand.disableBehaviorForShip(
+      ship,
+      Behavior.deliver,
+      'No behavior state.',
+      const Duration(hours: 1),
+    );
     return null;
   }
 
@@ -585,8 +590,13 @@ Future<DateTime?> advanceDeliver(
   for (var i = 0; i < 10; i++) {
     final jobIndex = state.jobIndex;
     if (jobIndex < 0 || jobIndex >= jobFunctions.length) {
-      shipErr(ship, 'Invalid deliver job index $jobIndex');
-      centralCommand.completeBehavior(ship.shipSymbol);
+      centralCommand.disableBehaviorForShip(
+        ship,
+        Behavior.deliver,
+        'No behavior state.',
+        const Duration(hours: 1),
+      );
+      return null;
     }
 
     final jobFunction = jobFunctions[jobIndex];
@@ -597,11 +607,20 @@ Future<DateTime?> advanceDeliver(
       caches,
       ship,
     );
+    if (result.isComplete) {
+      state.jobIndex++;
+      if (jobIndex < jobFunctions.length) {
+        centralCommand.setBehavior(ship.shipSymbol, state);
+      } else {
+        centralCommand.completeBehavior(ship.shipSymbol);
+        return null;
+      }
+    }
     if (result.isError) {
       _disableWithJobError(ship, centralCommand, result.error);
       return null;
     }
-    if (result.shouldReturn()) {
+    if (result.shouldReturn) {
       return result.waitTime;
     }
   }
