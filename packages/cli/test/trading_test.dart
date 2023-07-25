@@ -30,55 +30,6 @@ class _MockShipCargo extends Mock implements ShipCargo {}
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 void main() {
-  test('estimateSellPrice null', () {
-    final marketPrices = _MockMarketPrices();
-    const a = TradeSymbol.FUEL;
-    final estimate =
-        estimateSellPrice(marketPrices, Market(symbol: 'S-S-A'), a);
-    expect(estimate, null);
-  });
-
-  test('estimatePurchasePrice null', () {
-    final marketPrices = _MockMarketPrices();
-    const a = TradeSymbol.FUEL;
-    final estimate =
-        estimatePurchasePrice(marketPrices, Market(symbol: 'S-S-A'), a);
-    expect(estimate, null);
-  });
-
-  test('estimatePrice fresh', () {
-    final marketPrices = _MockMarketPrices();
-    const a = TradeSymbol.FUEL;
-    final market = Market(
-      symbol: 'A',
-      tradeGoods: [
-        MarketTradeGood(
-          symbol: a.value,
-          tradeVolume: 100,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-          purchasePrice: 1,
-          sellPrice: 2,
-        )
-      ],
-    );
-    expect(
-      estimateSellPrice(
-        marketPrices,
-        market,
-        a,
-      ),
-      2,
-    );
-    expect(
-      estimatePurchasePrice(
-        marketPrices,
-        market,
-        a,
-      ),
-      1,
-    );
-  });
-
   test('Deal JSON roundtrip', () {
     final deal = Deal(
       sourceSymbol: WaypointSymbol.fromString('S-A-B'),

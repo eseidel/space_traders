@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/market_scan.dart';
 import 'package:collection/collection.dart';
 
 /// Want to find systems which have both a mineable resource and a marketplace.
@@ -54,21 +53,6 @@ class _SystemEval {
   }
 }
 
-int? _marketPercentile(
-  MarketPrices marketPrices,
-  Market market, {
-  required TradeSymbol tradeSymbol,
-}) {
-  final sellPrice = estimateSellPrice(marketPrices, market, tradeSymbol);
-  if (sellPrice == null) {
-    return null;
-  }
-  return marketPrices.percentileForSellPrice(
-    tradeSymbol,
-    sellPrice,
-  );
-}
-
 Future<_SystemEval> _evaluateSystem(
   Api api,
   MarketPrices marketPrices,
@@ -83,7 +67,10 @@ Future<_SystemEval> _evaluateSystem(
   final markets = await marketCache.marketsInSystem(systemSymbol).toList();
   final marketToPercentile = {
     for (var m in markets)
-      m.symbol: _marketPercentile(marketPrices, m, tradeSymbol: tradeSymbol),
+      m.symbol: marketPrices.recentSellPrice(
+        tradeSymbol,
+        marketSymbol: m.waypointSymbol,
+      )
   };
   final mines = waypoints.where((w) => w.canBeMined);
   final mineAndSells = <_MineAndSell>[];

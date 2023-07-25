@@ -3,72 +3,6 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
-int _percentileForTradeType(ExchangeType tradeType) {
-  switch (tradeType) {
-    case ExchangeType.exchange:
-      return 50;
-    case ExchangeType.imports:
-      return 25;
-    case ExchangeType.exports:
-      return 75;
-  }
-}
-
-/// Estimate the current sell price of [tradeSymbol] at [market].
-int? estimateSellPrice(
-  MarketPrices marketPrices,
-  Market market,
-  TradeSymbol tradeSymbol,
-) {
-  // This case would only be needed if we have a ship at the market, but somehow
-  // failed to record price data in our price db.
-  final maybeGoods = market.marketTradeGood(tradeSymbol);
-  if (maybeGoods != null) {
-    return maybeGoods.sellPrice;
-  }
-
-  final recentSellPrice = marketPrices.recentSellPrice(
-    tradeSymbol,
-    marketSymbol: market.waypointSymbol,
-  );
-  if (recentSellPrice != null) {
-    return recentSellPrice;
-  }
-  final tradeType = market.exchangeType(tradeSymbol);
-  if (tradeType == null) {
-    return null;
-  }
-  final percentile = _percentileForTradeType(tradeType);
-  return marketPrices.sellPriceAtPercentile(tradeSymbol, percentile);
-}
-
-/// Estimate the current purchase price of [tradeSymbol] at [market].
-int? estimatePurchasePrice(
-  MarketPrices marketPrices,
-  Market market,
-  TradeSymbol tradeSymbol,
-) {
-  // This case would only be needed if we have a ship at the market, but somehow
-  // failed to record price data in our price db.
-  final maybeGoods = market.marketTradeGood(tradeSymbol);
-  if (maybeGoods != null) {
-    return maybeGoods.purchasePrice;
-  }
-  final recentPurchasePrice = marketPrices.recentPurchasePrice(
-    marketSymbol: market.waypointSymbol,
-    tradeSymbol,
-  );
-  if (recentPurchasePrice != null) {
-    return recentPurchasePrice;
-  }
-  final tradeType = market.exchangeType(tradeSymbol);
-  if (tradeType == null) {
-    return null;
-  }
-  final percentile = _percentileForTradeType(tradeType);
-  return marketPrices.purchasePriceAtPercentile(tradeSymbol, percentile);
-}
-
 /// A potential purchase opportunity.
 @immutable
 class BuyOpp {
@@ -120,15 +54,12 @@ class SellOpp {
 }
 
 class _MarketScanBuilder {
-  _MarketScanBuilder(MarketPrices marketPrices, {required this.topLimit})
-      : _marketPrices = marketPrices;
+  _MarketScanBuilder({required this.topLimit});
 
   /// How many deals to keep track of per trade symbol.
   final int topLimit;
   final Map<TradeSymbol, List<BuyOpp>> buyOpps = {};
   final Map<TradeSymbol, List<SellOpp>> sellOpps = {};
-
-  final MarketPrices _marketPrices;
 
   void _addBuyOpp(BuyOpp buy) {
     // Sort buys ascending so we remove the most expensive buy price.
@@ -171,34 +102,6 @@ class _MarketScanBuilder {
       ),
     );
   }
-
-  /// Record potential deals from the given market.
-  void visitMarket(Market market) {
-    for (final tradeSymbol in market.allTradeSymbols) {
-      // See if the price data we have for this trade symbol
-      // are in the top/bottom we've seen, if so, record them.
-      final buyPrice =
-          estimatePurchasePrice(_marketPrices, market, tradeSymbol);
-      if (buyPrice == null) {
-        // If we don't have buy data we won't have sell data either.
-        continue;
-      }
-      _addBuyOpp(
-        BuyOpp(
-          marketSymbol: market.waypointSymbol,
-          tradeSymbol: tradeSymbol,
-          price: buyPrice,
-        ),
-      );
-      _addSellOpp(
-        SellOpp(
-          marketSymbol: market.waypointSymbol,
-          tradeSymbol: tradeSymbol,
-          price: estimateSellPrice(_marketPrices, market, tradeSymbol)!,
-        ),
-      );
-    }
-  }
 }
 
 /// Represents a collection of buy and sell opportunities for a given set
@@ -224,7 +127,7 @@ class MarketScan {
     MarketPrices marketPrices, {
     bool Function(WaypointSymbol waypointSymbol)? waypointFilter,
   }) {
-    final builder = _MarketScanBuilder(marketPrices, topLimit: 5);
+    final builder = _MarketScanBuilder(topLimit: 5);
     for (final marketPrice in marketPrices.prices) {
       if (waypointFilter != null &&
           !waypointFilter(marketPrice.waypointSymbol)) {
