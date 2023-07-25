@@ -1,5 +1,5 @@
-import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:mocktail/mocktail.dart';
@@ -36,7 +36,7 @@ class _MockWaypoint extends Mock implements Waypoint {}
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
-  test('advanceBuyShip smoke test', () async {
+  test('advanceDeliver smoke test', () async {
     final api = _MockApi();
     final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
@@ -61,6 +61,7 @@ void main() {
 
     final now = DateTime(2021);
     DateTime getNow() => now;
+    when(() => ship.symbol).thenReturn('S-1');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
 
@@ -93,7 +94,7 @@ void main() {
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
-      () => advanceBuyShip(
+      () => advanceDeliver(
         api,
         centralCommand,
         caches,
