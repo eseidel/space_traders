@@ -312,3 +312,18 @@ ApiException 400: {"error":{"message":"Failed to execute jump. Ship cannot execu
 ### Does the trader know how to complete contracts that don't require moving?
 deliver 1210  COPPER_ORE to X1-FA31-74322Z in 6d for 161,510c with 32,985c upfront
 Expected profit: 125,525c
+
+
+### Bought too many units for a contract:
+
+ESEIDEL-2C: Behavior.trader
+  Orbiting X1-SQ35-24719Z JUMP_GATE HAULER 105/120
+  MOUNT_MINING_LASER_II   105 x 20,446c  = 2,146,830c
+  destination: X1-FA31-97247X, arrives in 1h
+  MOUNT_MINING_LASER_II (contract)  X1-F44-10751B   34,598c -> X1-FA31-97247X  61,073c +26,475c (77%) 1h 507c/s 4,152,126c
+ duration: 38m
+root@ubuntu-s-1vcpu-1gb-sfo3-01:~/space_traders/packages/cli# dart run bin/show_contracts.dart 
+3 completed.
+1 active:
+deliver 7  MOUNT_MINING_LASER_II to X1-FA31-97247X in 6d for 342,009c with 85,502c upfront
+Expected profit: 127,526c

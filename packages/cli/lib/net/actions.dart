@@ -328,8 +328,8 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   if (ship.fuelPercentage < 0.5) {
     shipWarn(ship, 'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}');
   }
-  final consumedFuel = result.fuel.consumed?.amount;
-  final fuelString = consumedFuel != null ? ' spent $consumedFuel fuel' : '';
+  final consumedFuel = result.fuel.consumed?.amount ?? 0;
+  final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
   shipInfo(
     ship,
     '🛫 to ${waypoint.symbol} ${waypoint.type} '

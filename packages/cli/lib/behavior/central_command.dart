@@ -788,14 +788,14 @@ class CentralCommand {
       return null;
     }
 
+    final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
+    logger.info('${idleHaulers.length} idle haulers');
+    final buyTraders = idleHaulers.length < 4;
+
     // We should buy haulers if we have fewer than X haulers idle and we have
     // enough extra cash on hand to support trading.
-    if (typesToBuy.contains(ShipType.LIGHT_HAULER)) {
-      final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
-      logger.info('Idle haulers: ${idleHaulers.length}');
-      if (idleHaulers.length < 4) {
-        return ShipType.LIGHT_HAULER;
-      }
+    if (typesToBuy.contains(ShipType.LIGHT_HAULER) && buyTraders) {
+      return ShipType.LIGHT_HAULER;
     }
     // We should buy ore-hounds only if we're at a system which has good mining.
     if (typesToBuy.contains(ShipType.ORE_HOUND) && inStartSystem) {
@@ -805,7 +805,7 @@ class CentralCommand {
     if (typesToBuy.contains(ShipType.PROBE)) {
       return ShipType.PROBE;
     }
-    if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER)) {
+    if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER) && buyTraders) {
       return ShipType.HEAVY_FREIGHTER;
     }
     return null;
