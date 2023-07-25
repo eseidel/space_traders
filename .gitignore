@@ -26,3 +26,5 @@ doc/api/
 
 # This should be pulled from the network onto the device instead.
 systems.json
+
+coverage/
