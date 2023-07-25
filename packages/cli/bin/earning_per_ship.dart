@@ -29,19 +29,19 @@ class TransactionSummary {
     return creditDiff / duration.inSeconds;
   }
 
-  double get perMinute {
+  double? get perMinute {
     if (duration > const Duration(minutes: 1)) {
       return creditDiff / duration.inMinutes;
     } else {
-      return perSecond * 60;
+      return null;
     }
   }
 
-  double get perHour {
+  double? get perHour {
     if (duration > const Duration(hours: 1)) {
       return creditDiff / duration.inHours;
     } else {
-      return perMinute * 60;
+      return null;
     }
   }
 }
@@ -79,8 +79,12 @@ Future<void> command(FileSystem fs, List<String> args) async {
     ..info('Credits per minute for ships over the '
         'last ${approximateDuration(lookback)}:');
 
-  String c(num n) =>
-      n.isFinite ? NumberFormat().format(n.round()) : n.toString();
+  String c(num? n) {
+    if (n == null) {
+      return '';
+    }
+    return n.isFinite ? NumberFormat().format(n.round()) : n.toString();
+  }
 
   final behaviorCounts = <String, int>{};
   final behaviorCreditPerSecondTotals = <String, double>{};

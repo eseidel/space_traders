@@ -106,6 +106,7 @@ Earning:
   on expected profit.
 * Buy traders when trading is more profitable than mining, and vice versa.
 * Remove all use of maxJumps and use distance or maxWaypoints instead.
+  Jumps will get the wrong answers in dense areas of the galaxy.
 * Be able to buy miners outside of the main system.
 * Add dedicated survey ships.
 * Teach deal logic that price can move (even if just 1c) on each buy/sell lot.

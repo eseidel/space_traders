@@ -56,6 +56,11 @@ Future<DateTime?> beingRouteAndLog(
   CentralCommand centralCommand,
   RoutePlan routePlan,
 ) async {
+  if (routePlan.actions.isEmpty) {
+    shipWarn(ship, "Route plan is empty, assuming we're already there.");
+    return null;
+  }
+
   centralCommand.setRoutePlan(ship, routePlan);
   // TODO(eseidel): Should this buy fuel first if we need it?
   shipInfo(ship, 'Beginning route to ${routePlan.endSymbol}');
@@ -165,6 +170,12 @@ Future<NavResult> continueNavigationIfNeeded(
     // We don't have a routePlan, so we can't navigate.
     return NavResult._continueAction();
   }
+  if (routePlan.actions.isEmpty) {
+    shipWarn(ship, "Route plan is empty, assuming we're already there.");
+    centralCommand.reachedEndOfRoutePlan(ship);
+    return NavResult._continueAction();
+  }
+
   // We've reached the routePlan, so we can stop navigating.
   if (ship.waypointSymbol == routePlan.endSymbol) {
     // Remove the destination from the ship's state or it will try to come back.

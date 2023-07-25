@@ -1,6 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
 
@@ -89,9 +90,10 @@ class ShipCache extends ResponseListCache<Ship> {
       ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
       ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
       ShipType.HEAVY_FREIGHTER: ShipFrameSymbolEnum.HEAVY_FREIGHTER,
+      ShipType.MINING_DRONE: ShipFrameSymbolEnum.DRONE,
     }[shipType];
     if (frameForType == null) {
-      throw ArgumentError('Unknown frame mapping for type: $shipType');
+      logger.err('Unknown frame mapping for type: $shipType');
     }
     return frameCounts[frameForType] ?? 0;
   }

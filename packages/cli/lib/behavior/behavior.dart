@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/behavior/deliver.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 
@@ -47,6 +48,9 @@ class BehaviorState {
     this.deal,
     this.routePlan,
     this.mountToAdd,
+    this.buyJob,
+    this.deliverJob,
+    this.jobIndex = 0,
   });
 
   /// Create a new behavior state from JSON.
@@ -62,12 +66,22 @@ class BehaviorState {
     final mountToAdd = json['mountToAdd'] == null
         ? null
         : ShipMountSymbolEnum.fromJson(json['mountToAdd'] as String);
+    final buyJob = json['buyJob'] == null
+        ? null
+        : BuyJob.fromJson(json['buyJob'] as Map<String, dynamic>);
+    final deliverJob = json['deliverJob'] == null
+        ? null
+        : DeliverJob.fromJson(json['deliverJob'] as Map<String, dynamic>);
+    final jobIndex = json['jobIndex'] as int? ?? 0;
     return BehaviorState(
       shipSymbol,
       behavior,
       deal: deal,
       routePlan: routePlan,
       mountToAdd: mountToAdd,
+      buyJob: buyJob,
+      deliverJob: deliverJob,
+      jobIndex: jobIndex,
     );
   }
 
@@ -77,11 +91,20 @@ class BehaviorState {
   /// The current behavior.
   final Behavior behavior;
 
+  /// Used for compound jobs (Deliver is the only one so far).
+  int jobIndex;
+
   /// Current deal.
   CostedDeal? deal;
 
   /// Current route plan.
   RoutePlan? routePlan;
+
+  /// Used by Behavior.deliver for buying (but not selling) items.
+  BuyJob? buyJob;
+
+  /// Used by Behavior.deliver for delivering items.
+  DeliverJob? deliverJob;
 
   /// Mount to add.
   ShipMountSymbolEnum? mountToAdd;
@@ -94,6 +117,9 @@ class BehaviorState {
       'deal': deal?.toJson(),
       'routePlan': routePlan?.toJson(),
       'mountToAdd': mountToAdd?.toJson(),
+      'buyJob': buyJob?.toJson(),
+      'deliverJob': deliverJob?.toJson(),
+      'jobIndex': jobIndex,
     };
   }
 }

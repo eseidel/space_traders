@@ -84,8 +84,7 @@ final _templates = [
   const ShipTemplate(
     frameSymbol: ShipFrameSymbolEnum.MINER,
     mounts: {
-      ShipMountSymbolEnum.MINING_LASER_II: 1,
-      ShipMountSymbolEnum.MINING_LASER_I: 1,
+      ShipMountSymbolEnum.MINING_LASER_II: 2,
       ShipMountSymbolEnum.SURVEYOR_I: 1,
     },
   )
@@ -228,6 +227,9 @@ class CentralCommand {
       // Should mine until we have one ore-hound, then switch to survey-only?
 
       ShipRole.COMMAND: [
+        // If we can get mounts for our ships, that's the best thing we can do.
+        // Behavior.deliver,
+        // Otherwise buying more ships is best.
         Behavior.buyShip,
         // Will only trade if we can make 6/s or more.
         // There are commonly 20c/s trades in the starting system, and at
@@ -242,7 +244,11 @@ class CentralCommand {
       // Haulers are terrible explorers, but early game we just need
       // things mapping.
       ShipRole.HAULER: [Behavior.trader, Behavior.explorer],
-      ShipRole.EXCAVATOR: [Behavior.miner],
+      ShipRole.EXCAVATOR: [
+        // We'll always upgrade the ship as our best option.
+        // Behavior.changeMounts,
+        Behavior.miner
+      ],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
     if (behaviors != null) {
@@ -404,6 +410,42 @@ class CentralCommand {
       }
     }
     return counts;
+  }
+
+  /// Sets the deliver state for the given ship.
+  void setBuyJob(Ship ship, BuyJob buyJob) {
+    final shipSymbol = ship.shipSymbol;
+    final state = _behaviorCache.getBehavior(shipSymbol);
+    if (state == null) {
+      shipWarn(ship, 'No state for $shipSymbol');
+      return;
+    }
+    state.buyJob = buyJob;
+  }
+
+  /// Returns the DeliverState for the given ship.
+  BuyJob? getBuyJob(Ship ship) {
+    final shipSymbol = ship.shipSymbol;
+    final state = _behaviorCache.getBehavior(shipSymbol);
+    return state?.buyJob;
+  }
+
+  /// Sets the deliver state for the given ship.
+  void setDeliverJob(Ship ship, DeliverJob deliverJob) {
+    final shipSymbol = ship.shipSymbol;
+    final state = _behaviorCache.getBehavior(shipSymbol);
+    if (state == null) {
+      shipWarn(ship, 'No state for $shipSymbol');
+      return;
+    }
+    state.deliverJob = deliverJob;
+  }
+
+  /// Returns the DeliverState for the given ship.
+  DeliverJob? getDeliverJob(Ship ship) {
+    final shipSymbol = ship.shipSymbol;
+    final state = _behaviorCache.getBehavior(shipSymbol);
+    return state?.deliverJob;
   }
 
   /// Set the [RoutePlan] for the ship.
@@ -707,7 +749,7 @@ class CentralCommand {
 
     // We will buy miners in the start system.
     // Or probes anywhere (once we have enough miners).
-    if (houndCount < 10 && inStartSystem) {
+    if (houndCount < 20 && inStartSystem) {
       if (shipCount < 4) {
         return ShipType.MINING_DRONE;
       }
@@ -717,7 +759,7 @@ class CentralCommand {
     }
     // We will not buy traders until we have enough miners to support a base
     // income and enough probes to have found deals for us to trade.
-    final isEarlyGame = _shipCache.ships.length < 20;
+    final isEarlyGame = _shipCache.ships.length < 30;
     if (isEarlyGame) {
       return null;
     }
@@ -732,7 +774,7 @@ class CentralCommand {
       ShipType.ORE_HOUND: 40,
       ShipType.PROBE: 40,
       ShipType.LIGHT_HAULER: 20,
-      ShipType.HEAVY_FREIGHTER: 40,
+      ShipType.HEAVY_FREIGHTER: 20,
     };
     final typesToBuy = targetCounts.keys.where((shipType) {
       if (!shipyardHas(shipType)) {
