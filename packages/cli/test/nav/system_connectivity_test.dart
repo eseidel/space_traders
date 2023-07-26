@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 void main() {
-  test('ClusterFinder single system', () {
+  test('SystemConnectivity single system', () {
     final systemsCache = _MockSystemsCache();
     final systemA = System(
       symbol: 'S-A',
@@ -23,7 +23,7 @@ void main() {
     expect(reachability.connectedSystemCount(systemSymbol), equals(1));
   });
 
-  test('ClusterFinder two systems', () {
+  test('SystemConnectivity two systems', () {
     final systemsCache = _MockSystemsCache();
     final systemA = System(
       symbol: 'S-A',
@@ -44,7 +44,17 @@ void main() {
         .thenReturn([connectedSystemFromSystem(systemB, 0)]);
     when(() => systemsCache.connectedSystems(systemB.systemSymbol))
         .thenReturn([connectedSystemFromSystem(systemA, 0)]);
-    final finder = SystemConnectivity.fromSystemsCache(systemsCache);
-    expect(finder.connectedSystemCount(systemA.systemSymbol), equals(2));
+    final systemConnectivity =
+        SystemConnectivity.fromSystemsCache(systemsCache);
+    expect(
+      systemConnectivity.connectedSystemCount(systemA.systemSymbol),
+      equals(2),
+    );
+
+    final clusterId =
+        systemConnectivity.clusterIdForSystem(systemA.systemSymbol);
+    final systems =
+        systemConnectivity.systemSymbolsByClusterId(clusterId).toList();
+    expect(systems, [systemA.systemSymbol, systemB.systemSymbol]);
   });
 }

@@ -334,3 +334,42 @@ root@ubuntu-s-1vcpu-1gb-sfo3-01:~/space_traders/packages/cli# dart run bin/show_
 1 active:
 deliver 7  MOUNT_MINING_LASER_II to X1-FA31-97247X in 6d for 342,009c with 85,502c upfront
 Expected profit: 127,526c
+
+
+ESEIDEL-21: Behavior.trader
+  Orbiting X1-XU8-50704X JUMP_GATE HAULER 92/120
+  MODULE_ORE_REFINERY_I    92 x 22,601c  = 2,079,292c
+  destination: X1-FA31-97247X, arrives in 32m
+  MODULE_ORE_REFINERY_I (contract)  X1-PQ85-27813E  23,434c -> X1-FA31-97247X  38,235c +14,801c (63%) 51m 578c/s 2,812,324c
+ duration: 21m
+ root@ubuntu-s-1vcpu-1gb-sfo3-01:~/space_traders/packages/cli# dart run bin/show_contracts.dart 
+8 completed.
+1 active:
+deliver 94 (  4 remaining) MODULE_ORE_REFINERY_I to X1-FA31-97247X in 6d for 2,659,627c with 934,463c upfront
+Expected profit: -588,346c
+
+
+### Crashed due to 500
+
+🛸#3B ✍️  market data @ X1-UK74-29935F
+🛸#3B ⛽   4 FUEL                           ⚖️    4 x    122c =   -488c -> 🏦 12,239,210c
+Unhandled exception:
+ApiException 500: {"error":{"code":500,"message":"Something unexpected went wrong! If you want to help you can file an issue here: https://github.com/SpaceTradersAPI/api-docs"}}
+#0      SystemsApi.getShipyard (package:openapi/api/systems_api.dart:235:7)
+<asynchronous suspension>
+#1      getShipyard (package:cli/net/queries.dart:55:20)
+<asynchronous suspension>
+#2      CentralCommand.visitLocalShipyard (package:cli/behavior/central_command.dart:826:22)
+<asynchronous suspension>
+#3      advanceTrader (package:cli/behavior/trader.dart:512:3)
+<asynchronous suspension>
+#4      advanceShips (package:cli/logic.dart:36:25)
+<asynchronous suspension>
+#5      logic (package:cli/logic.dart:128:7)
+<asynchronous suspension>
+#6      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:79:3)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:85:7)
+<asynchronous suspension>
+#8      main (file:///root/space_traders/packages/cli/bin/cli.dart:83:3)
+<asynchronous suspension>

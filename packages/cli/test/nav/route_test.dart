@@ -91,19 +91,25 @@ void main() {
       path: 'test/nav/fixtures/systems-06-24-2023.json',
     )!;
     final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+    RoutePlan? planRoute(
+      String startString,
+      String endString, {
+      int fuelCapacity = 1200,
+      int shipSpeed = 30,
+    }) =>
+        routePlanner.planRoute(
+          start: WaypointSymbol.fromString(startString),
+          end: WaypointSymbol.fromString(endString),
+          fuelCapacity: fuelCapacity,
+          shipSpeed: shipSpeed,
+        );
+
     void expectRoute(
       String startString,
       String endString,
       int expectedSeconds,
     ) {
-      final start = WaypointSymbol.fromString(startString);
-      final end = WaypointSymbol.fromString(endString);
-      final route = routePlanner.planRoute(
-        start: start,
-        end: end,
-        fuelCapacity: 1200,
-        shipSpeed: 30,
-      );
+      final route = planRoute(startString, endString);
       expect(route, isNotNull);
       expect(route!.duration.inSeconds, expectedSeconds);
 
@@ -117,12 +123,7 @@ void main() {
       // navigation in this test so far.
       final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
         ..add(route.actions.last.endSymbol);
-      final route2 = routePlanner.planRoute(
-        start: start,
-        end: end,
-        fuelCapacity: 1200,
-        shipSpeed: 30,
-      )!;
+      final route2 = planRoute(startString, endString)!;
       final routeSymbols2 = route2.actions.map((w) => w.startSymbol).toList()
         ..add(route.actions.last.endSymbol);
       // Should be identical when coming from cache.
@@ -134,8 +135,38 @@ void main() {
 
     // Within one system
     expectRoute('X1-YU85-99640B', 'X1-YU85-07121B', 30);
+
+    final route = planRoute('X1-YU85-99640B', 'X1-YU85-07121B');
+    expect(route!.startSymbol, WaypointSymbol.fromString('X1-YU85-99640B'));
+    expect(route.endSymbol, WaypointSymbol.fromString('X1-YU85-07121B'));
+    expect(
+      () => route.nextActionFrom(
+        // No actions after the last one.
+        WaypointSymbol.fromString('X1-YU85-07121B'),
+      ),
+      throwsArgumentError,
+    );
+    // Make a sub-plan starting from the same starting point.
+    final subPlan = route.subPlanStartingFrom(
+      systemsCache,
+      // Not in the route.
+      WaypointSymbol.fromString('X1-YU85-99640B'),
+    );
+    expect(subPlan.actions.length, route.actions.length);
+    expect(
+      () => route.subPlanStartingFrom(
+        systemsCache,
+        // Not in the route.
+        WaypointSymbol.fromString('X1-RG48-59920X'),
+      ),
+      throwsArgumentError,
+    );
+
     // Exactly one jump, jump duration doesn't matter since it doesn't stop
     // navigation.
     expectRoute('X1-RG48-59920X', 'X1-TV72-74710F', 129);
+
+    // We don't know how to plan warps yet.
+    expect(planRoute('X1-YU85-07121B', 'X1-RG48-59920X'), isNull);
   });
 }

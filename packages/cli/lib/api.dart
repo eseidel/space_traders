@@ -315,9 +315,8 @@ extension WaypointUtils on Waypoint {
   }
 
   /// Returns true if the waypoint has the given trait.
-  bool hasTrait(WaypointTraitSymbolEnum trait) {
-    return traits.any((t) => t.symbol == trait);
-  }
+  bool hasTrait(WaypointTraitSymbolEnum trait) =>
+      traits.any((t) => t.symbol == trait);
 
   /// Returns true if the waypoint has the given type.
   bool isType(WaypointType type) => this.type == type;

@@ -14,6 +14,7 @@ void main() {
     final aTime = DateTime.now();
     waiter.updateWaitUntil(aSymbol, aTime);
     expect(waiter.waitUntil(aSymbol), aTime);
+    expect(waiter.earliestWaitUntil(), aTime);
     waiter.updateForShips([a]);
     expect(waiter.waitUntil(aSymbol), isNull);
   });
