@@ -630,19 +630,15 @@ CostedTrip? costTrip(
   return CostedTrip(route: route, price: price);
 }
 
-/// Find the best market to buy a given item from.
-/// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
-/// used for evaluating the trade-off between "closest" vs. "cheapest".
-CostedTrip? findBestMarketToBuy(
+List<CostedTrip> _marketsTradingSortedByDistance(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
-  TradeSymbol tradeSymbol, {
-  required int expectedCreditsPerSecond,
-}) {
+  TradeSymbol tradeSymbol,
+) {
   final prices = marketPrices.pricesFor(tradeSymbol).toList();
   if (prices.isEmpty) {
-    return null;
+    return [];
   }
   final start = ship.waypointSymbol;
 
@@ -665,12 +661,29 @@ CostedTrip? findBestMarketToBuy(
 
   final sorted = costed.toList()
     ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
+  return sorted;
+}
 
-  final nearest = sorted.first;
-  if (sorted.length == 1) {
-    return nearest;
+/// Find the best market to buy a given item from.
+/// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
+/// used for evaluating the trade-off between "closest" vs. "cheapest".
+CostedTrip? findBestMarketToBuy(
+  MarketPrices marketPrices,
+  RoutePlanner routePlanner,
+  Ship ship,
+  TradeSymbol tradeSymbol, {
+  required int expectedCreditsPerSecond,
+}) {
+  final sorted = _marketsTradingSortedByDistance(
+    marketPrices,
+    routePlanner,
+    ship,
+    tradeSymbol,
+  );
+  if (sorted.isEmpty) {
+    return null;
   }
-
+  final nearest = sorted.first;
   var best = nearest;
   // Pick any one further that saves more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
@@ -679,6 +692,44 @@ CostedTrip? findBestMarketToBuy(
     final extraTime = trip.route.duration - nearest.route.duration;
     final savingsPerSecond = savings / extraTime.inSeconds;
     if (savingsPerSecond > expectedCreditsPerSecond) {
+      best = trip;
+      break;
+    }
+  }
+
+  return best;
+}
+
+/// Find the best market to sell a given item to.
+/// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
+/// used for evaluating the trade-off between "closest" vs. "cheapest".\
+CostedTrip? findBestMarketToSell(
+  MarketPrices marketPrices,
+  RoutePlanner routePlanner,
+  Ship ship,
+  TradeSymbol tradeSymbol, {
+  required int expectedCreditsPerSecond,
+}) {
+  // Some callers might want to use a round trip cost?
+  // e.g. if just trying to empty inventory and return to current location.
+  final sorted = _marketsTradingSortedByDistance(
+    marketPrices,
+    routePlanner,
+    ship,
+    tradeSymbol,
+  );
+  if (sorted.isEmpty) {
+    return null;
+  }
+  final nearest = sorted.first;
+  var best = nearest;
+  // Pick any one further that earns more than expectedCreditsPerSecond
+  for (final trip in sorted.sublist(1)) {
+    final priceDiff = trip.price.sellPrice - nearest.price.sellPrice;
+    final earnings = priceDiff;
+    final extraTime = trip.route.duration - nearest.route.duration;
+    final earningsPerSecond = earnings / extraTime.inSeconds;
+    if (earningsPerSecond > expectedCreditsPerSecond) {
       best = trip;
       break;
     }

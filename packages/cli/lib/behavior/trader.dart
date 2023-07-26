@@ -534,27 +534,26 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
     'Cargo hold still not empty, finding '
     'market to sell ${unwantedCargo.symbol}.',
   );
-  final market = await nearbyMarketWhichTrades(
-    caches.systems,
-    caches.waypoints,
-    caches.markets,
-    ship.waypointSymbol,
+  final costedTrip = findBestMarketToSell(
+    caches.marketPrices,
+    caches.routePlanner,
+    ship,
     unwantedCargo.tradeSymbol,
+    expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
   );
-  if (market == null) {
+  if (costedTrip == null) {
     // We can't sell this cargo anywhere so give up?
     return JobResult.error(
       'No market for ${unwantedCargo.symbol}.',
       const Duration(hours: 1),
     );
   }
-  final waitUntil = await beingNewRouteAndLog(
+  final waitUntil = await beingRouteAndLog(
     api,
     ship,
     caches.systems,
-    caches.routePlanner,
     centralCommand,
-    market.waypointSymbol,
+    costedTrip.route,
   );
   return JobResult.wait(waitUntil);
 }
