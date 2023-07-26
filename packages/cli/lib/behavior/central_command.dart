@@ -12,6 +12,7 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
+import 'package:more/collection.dart';
 
 // Central command sets behavior for all ships.
 // Groups ships into squads.
@@ -74,19 +75,20 @@ class ShipTemplate {
   final ShipFrameSymbolEnum frameSymbol;
 
   /// Mounts that this template has.
-  final Map<ShipMountSymbolEnum, int> mounts;
+  final Multiset<ShipMountSymbolEnum> mounts;
 }
 
 // According to SAF:
 // Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
 
 final _templates = [
-  const ShipTemplate(
+  ShipTemplate(
     frameSymbol: ShipFrameSymbolEnum.MINER,
-    mounts: {
-      ShipMountSymbolEnum.MINING_LASER_II: 2,
-      ShipMountSymbolEnum.SURVEYOR_I: 1,
-    },
+    mounts: Multiset.from([
+      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbolEnum.SURVEYOR_I
+    ]),
   )
 ];
 
@@ -150,21 +152,16 @@ class CentralCommand {
   }
 
   /// Add up all mounts needed for current ships based on current templating.
-  Map<ShipMountSymbolEnum, int> mountsNeededForAllShips() {
-    final needed = <ShipMountSymbolEnum, int>{};
+  Multiset<ShipMountSymbolEnum> mountsNeededForAllShips() {
+    final totalNeeded = Multiset<ShipMountSymbolEnum>();
     for (final ship in _shipCache.ships) {
       final template = templateForShip(ship);
       if (template == null) {
         continue;
       }
-      for (final entry in mountsNeededForShip(ship, template).entries) {
-        final mountSymbol = entry.key;
-        final neededCount = entry.value;
-        final existingCount = needed[mountSymbol] ?? 0;
-        needed[mountSymbol] = existingCount + neededCount;
-      }
+      totalNeeded.addAll(mountsNeededForShip(ship, template));
     }
-    return needed;
+    return totalNeeded;
   }
 
   /// Check if the given behavior is globally disabled.
@@ -366,8 +363,8 @@ class CentralCommand {
   }
 
   /// Returns the counts of mounts already claimed.
-  Map<ShipMountSymbolEnum, int> claimedMounts() {
-    final claimed = <ShipMountSymbolEnum, int>{};
+  Multiset<ShipMountSymbolEnum> claimedMounts() {
+    final claimed = Multiset<ShipMountSymbolEnum>();
     for (final state in _behaviorCache.states) {
       final behavior = state.behavior;
       if (behavior != Behavior.changeMounts) {
@@ -377,52 +374,37 @@ class CentralCommand {
       if (mountSymbol == null) {
         continue;
       }
-      claimed[mountSymbol] = (claimed[mountSymbol] ?? 0) + 1;
+      claimed.add(mountSymbol);
     }
     return claimed;
   }
 
   /// Returns the number of mounts available at the waypoint.
-  Map<ShipMountSymbolEnum, int> unclaimedMountsAt(WaypointSymbol waypoint) {
+  Multiset<ShipMountSymbolEnum> unclaimedMountsAt(WaypointSymbol waypoint) {
     // Get all the ships at that symbol
     final ships = _shipCache.ships
         .where((s) => s.waypointSymbol == waypoint && !s.isInTransit);
 
     // That have behavior delivery.
-    final counts = <ShipMountSymbolEnum, int>{};
+    final available = Multiset<ShipMountSymbolEnum>();
     for (final ship in ships) {
       final state = _behaviorCache.getBehavior(ship.shipSymbol);
       if (state == null || state.behavior != Behavior.deliver) {
         continue;
       }
-      final inventory = countMountsInInventory(ship);
-      for (final entry in inventory.entries) {
-        final mountSymbol = entry.key;
-        final count = entry.value;
-        final existingCount = counts[mountSymbol] ?? 0;
-        counts[mountSymbol] = existingCount + count;
-      }
+      available.addAll(countMountsInInventory(ship));
     }
-    // Get all the claimed mounts out of other ships states.
     final claimed = claimedMounts();
-    for (final entry in claimed.entries) {
-      final mountSymbol = entry.key;
-      final count = entry.value;
-      final existingCount = counts[mountSymbol] ?? 0;
-      final remaining = existingCount - count;
-      if (remaining <= 0) {
-        if (remaining < 0) {
-          logger.warn(
-            'More mounts claimed than available: '
-            '$mountSymbol $existingCount - $count',
-          );
-        }
-        counts.remove(mountSymbol);
-      } else {
-        counts[mountSymbol] = remaining;
+    // Unclear where this warning belongs.
+    for (final symbol in claimed.distinct) {
+      if (claimed[symbol] > available[symbol]) {
+        logger.warn(
+          'More mounts claimed than available at $waypoint: '
+          '${claimed[symbol]} > ${available[symbol]}',
+        );
       }
     }
-    return counts;
+    return available.difference(claimed);
   }
 
   /// Sets the deliver state for the given ship.

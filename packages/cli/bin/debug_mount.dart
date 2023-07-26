@@ -21,8 +21,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
       logger.info('No mounts needed for ${ship.symbol}.');
       continue;
     }
-    for (final mountSymbol in needed.keys) {
-      final units = needed[mountSymbol]!;
+    for (final mountSymbol in needed.distinct) {
+      final units = needed[mountSymbol];
       logger.info('Need $units $mountSymbol for ${ship.symbol}.');
     }
   }
@@ -32,8 +32,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
     logger.info('No mounts needed.');
     return;
   }
-  for (final mountSymbol in mounts.keys) {
-    final units = mounts[mountSymbol]!;
+  for (final mountSymbol in mounts.distinct) {
+    final units = mounts[mountSymbol];
     logger.info('Need $units $mountSymbol.');
   }
 }

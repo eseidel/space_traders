@@ -666,3 +666,13 @@ ConnectedSystem connectedSystemFromSystem(System system, int distance) {
     y: system.y,
   );
 }
+
+/// Compute the trade symbol for the given mount symbol.
+TradeSymbol? tradeSymbolForMountSymbol(ShipMountSymbolEnum mountSymbol) {
+  return TradeSymbol.fromJson(mountSymbol.value);
+}
+
+/// Compute the mount symbol for the given trade symbol.
+ShipMountSymbolEnum? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
+  return ShipMountSymbolEnum.fromJson(tradeSymbol.value);
+}

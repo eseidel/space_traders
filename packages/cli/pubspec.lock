@@ -41,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  characters:
+    dependency: transitive
+    description:
+      name: characters
+      sha256: "04a925763edad70e8443c99234dc3328f442e811f1d8fd1a72f1c8ad0f69a605"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.0"
   clock:
     dependency: transitive
     description:
@@ -209,6 +217,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  more:
+    dependency: "direct main"
+    description:
+      name: more
+      sha256: "74d7379587be84284e9e1a15b4c296351bfdac0370bf2e55de996f13c93a2dc3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   node_preamble:
     dependency: transitive
     description:

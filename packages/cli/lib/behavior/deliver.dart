@@ -9,6 +9,7 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
+import 'package:more/collection.dart';
 // Go buy and deliver.
 // Used for modules.
 
@@ -87,56 +88,33 @@ class DeliverJob {
   }
 }
 
-/// Compute the trade symbol for the given mount symbol.
-TradeSymbol? tradeSymbolForMountSymbol(ShipMountSymbolEnum mountSymbol) {
-  return TradeSymbol.fromJson(mountSymbol.value);
-}
-
-/// Compute the mount symbol for the given trade symbol.
-ShipMountSymbolEnum? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
-  return ShipMountSymbolEnum.fromJson(tradeSymbol.value);
-}
-
 /// Compute the mounts in the given ship's inventory.
-Map<ShipMountSymbolEnum, int> countMountsInInventory(Ship ship) {
-  final counts = <ShipMountSymbolEnum, int>{};
+Multiset<ShipMountSymbolEnum> countMountsInInventory(Ship ship) {
+  final counts = Multiset<ShipMountSymbolEnum>();
   for (final item in ship.cargo.inventory) {
     final mountSymbol = mountSymbolForTradeSymbol(item.tradeSymbol);
+    // Will be null if the item isn't a mount.
     if (mountSymbol == null) {
       continue;
     }
-    final count = counts[mountSymbol] ?? 0;
-    counts[mountSymbol] = count + item.units;
+    counts.add(mountSymbol, item.units);
   }
   return counts;
 }
 
 /// Compute the mounts mounted on the given ship.
-Map<ShipMountSymbolEnum, int> countMountedMounts(Ship ship) {
-  final counts = <ShipMountSymbolEnum, int>{};
-  for (final mount in ship.mounts) {
-    final count = counts[mount.symbol] ?? 0;
-    counts[mount.symbol] = count + 1;
-  }
-  return counts;
+Multiset<ShipMountSymbolEnum> countMountedMounts(Ship ship) {
+  return Multiset<ShipMountSymbolEnum>.fromIterable(
+    ship.mounts.map((m) => m.symbol),
+  );
 }
 
 /// Compute the mounts needed to make the given ship match the given template.
-Map<ShipMountSymbolEnum, int> mountsNeededForShip(
+Multiset<ShipMountSymbolEnum> mountsNeededForShip(
   Ship ship,
   ShipTemplate template,
 ) {
-  final needed = <ShipMountSymbolEnum, int>{};
-  final existing = countMountedMounts(ship);
-  for (final mountSymbol in template.mounts.keys) {
-    final templateCount = template.mounts[mountSymbol]!;
-    final existingCount = existing[mountSymbol] ?? 0;
-    final neededMounts = templateCount - existingCount;
-    if (neededMounts > 0) {
-      needed[mountSymbol] = neededMounts;
-    }
-  }
-  return needed;
+  return template.mounts.difference(countMountedMounts(ship));
 }
 
 class _BuyRequest {
@@ -149,14 +127,14 @@ class _BuyRequest {
   final int units;
 }
 
-_BuyRequest? _buyRequestFromNeededMounts(Map<ShipMountSymbolEnum, int> needed) {
+_BuyRequest? _buyRequestFromNeededMounts(Multiset<ShipMountSymbolEnum> needed) {
   if (needed.isEmpty) {
     return null;
   }
   // Check each of the needed mounts for availability and affordability.
 
-  final mountSymbol = needed.keys.first;
-  final units = needed[mountSymbol]!;
+  final mountSymbol = needed.first;
+  final units = needed[mountSymbol];
   final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol)!;
   return _BuyRequest(tradeSymbol: tradeSymbol, units: units);
 }

@@ -5,18 +5,14 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
+import 'package:more/collection.dart';
 
 ShipMountSymbolEnum? _pickMountFromAvailable(
-  Map<ShipMountSymbolEnum, int> available,
-  Map<ShipMountSymbolEnum, int> needed,
+  Multiset<ShipMountSymbolEnum> available,
+  Multiset<ShipMountSymbolEnum> needed,
 ) {
-  for (final mount in needed.keys) {
-    final availableCount = available[mount] ?? 0;
-    if (availableCount > 0) {
-      return mount;
-    }
-  }
-  return null;
+  // We could do something more sophisticated here.
+  return needed.firstWhereOrNull((mount) => available[mount] > 0);
 }
 
 /// Change mounts on a ship.

@@ -16,6 +16,7 @@ dependencies:
   intl: ^0.17.0
   mason_logger: ^0.2.5
   meta: ^1.9.1
+  more: ^4.0.0
   openapi:
     path: ../openapi
   scoped:
