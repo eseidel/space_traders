@@ -228,7 +228,7 @@ class CentralCommand {
 
       ShipRole.COMMAND: [
         // If we can get mounts for our ships, that's the best thing we can do.
-        // Behavior.deliver,
+        Behavior.deliver,
         // Otherwise buying more ships is best.
         Behavior.buyShip,
         // Will only trade if we can make 6/s or more.
@@ -269,22 +269,28 @@ class CentralCommand {
     return Behavior.idle;
   }
 
-  /// Disable the given behavior for an hour.
+  /// Disable the given behavior for timeout.
   // This should be a return type from the advance function instead of a
   // callback to the central command.
+  // explicitBehavior is only used for shared code like buyShipIfPossible.
   void disableBehaviorForAll(
     Ship ship,
-    Behavior behavior,
     String why,
-    Duration timeout,
-  ) {
+    Duration timeout, {
+    Behavior? explicitBehavior,
+  }) {
+    final shipSymbol = ship.shipSymbol;
+    final currentState = _behaviorCache.getBehavior(shipSymbol);
+    final behavior = explicitBehavior ?? currentState?.behavior;
+    if (behavior == null) {
+      shipWarn(ship, '$shipSymbol has no behavior to disable.');
+      return;
+    }
     shipWarn(
       ship,
       '$why Disabling $behavior for ${approximateDuration(timeout)}.',
     );
 
-    final shipSymbol = ship.shipSymbol;
-    final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
       _behaviorCache.deleteBehavior(shipSymbol);
     } else {
@@ -298,18 +304,23 @@ class CentralCommand {
   /// Disable the given behavior for [ship] for [duration].
   void disableBehaviorForShip(
     Ship ship,
-    Behavior behavior,
     String why,
-    Duration duration,
-  ) {
+    Duration duration, {
+    Behavior? explicitBehavior,
+  }) {
     final shipSymbol = ship.shipSymbol;
+    final currentState = _behaviorCache.getBehavior(shipSymbol);
+    final behavior = explicitBehavior ?? currentState?.behavior;
+    if (behavior == null) {
+      shipWarn(ship, '$shipSymbol has no behavior to disable.');
+      return;
+    }
     shipWarn(
       ship,
       '$why Disabling $behavior for $shipSymbol '
       'for ${approximateDuration(duration)}.',
     );
 
-    final currentState = _behaviorCache.getBehavior(shipSymbol);
     if (currentState == null || currentState.behavior == behavior) {
       _behaviorCache.deleteBehavior(shipSymbol);
     } else {
@@ -870,9 +881,9 @@ class CentralCommand {
     if (shipType == null) {
       disableBehaviorForAll(
         ship,
-        Behavior.buyShip,
         'No ships needed.',
         const Duration(minutes: 10),
+        explicitBehavior: Behavior.buyShip,
       );
       return false;
     }
@@ -882,9 +893,9 @@ class CentralCommand {
     if (medianPrice == null) {
       disableBehaviorForAll(
         ship,
-        Behavior.buyShip,
         'Failed to buy ship, no median price for $shipType.',
         const Duration(minutes: 10),
+        explicitBehavior: Behavior.buyShip,
       );
       return false;
     }
@@ -898,9 +909,9 @@ class CentralCommand {
     if (credits < maxPrice) {
       disableBehaviorForAll(
         ship,
-        Behavior.buyShip,
         'Can not buy $shipType, budget $credits < max price $maxPrice.',
         const Duration(minutes: 10),
+        explicitBehavior: Behavior.buyShip,
       );
       return false;
     }
@@ -912,9 +923,9 @@ class CentralCommand {
     if (recentPrice == null) {
       disableBehaviorForShip(
         ship,
-        Behavior.buyShip,
         'Shipyard at $shipyardSymbol does not sell $shipType.',
         const Duration(minutes: 10),
+        explicitBehavior: Behavior.buyShip,
       );
       return false;
     }
@@ -923,10 +934,10 @@ class CentralCommand {
     if (recentPrice > maxPrice) {
       disableBehaviorForShip(
         ship,
-        Behavior.buyShip,
         'Failed to buy $shipType at $shipyardSymbol, '
         '$recentPriceString > max price $maxPrice.',
         const Duration(minutes: 10),
+        explicitBehavior: Behavior.buyShip,
       );
       return false;
     }
@@ -943,9 +954,9 @@ class CentralCommand {
 
     disableBehaviorForAll(
       ship,
-      Behavior.buyShip,
       'Purchased ${result.ship.symbol} ($shipType)!',
       const Duration(minutes: 10),
+      explicitBehavior: Behavior.buyShip,
     );
     return true;
   }

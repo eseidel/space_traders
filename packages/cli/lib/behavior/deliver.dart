@@ -1,5 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/explorer.dart';
+import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
@@ -298,14 +300,9 @@ class JobError {
 
 /// The result from doJob
 class JobResult {
-  JobResult._continue()
-      : _type = _JobResultType.continueAction,
-        _waitTime = null,
-        _error = null;
-
   /// Wait tells the caller to return out the DateTime? to have the ship
   /// wait.  Does not advance to the next job.
-  JobResult._wait(DateTime? wait)
+  JobResult.wait(DateTime? wait)
       : _type = _JobResultType.waitOrLoop,
         _waitTime = wait,
         _error = null;
@@ -313,14 +310,14 @@ class JobResult {
   /// Complete tells the caller this job is complete.  If wait is null
   /// the caller may continue to the next job, otherwise it should wait
   /// until the given time.
-  JobResult._complete([DateTime? wait])
+  JobResult.complete([DateTime? wait])
       : _type = _JobResultType.complete,
         _waitTime = wait,
         _error = null;
 
   /// Error tells the caller this job completed with an error.  The caller
   /// should return out the error.
-  JobResult._error(
+  JobResult.error(
     String why,
     Duration timeout, [
     DisableBehavior disable = DisableBehavior.thisShip,
@@ -367,7 +364,6 @@ Future<BuyJob?> computeBuyJob(
   if (neededMounts.isEmpty) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.deliver,
       'No mounts needed.',
       const Duration(minutes: 20),
     );
@@ -381,7 +377,6 @@ Future<BuyJob?> computeBuyJob(
   if (buyRequest == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.deliver,
       'No mounts available.',
       const Duration(minutes: 20),
     );
@@ -397,7 +392,6 @@ Future<BuyJob?> computeBuyJob(
   if (shipyard == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.deliver,
       'No shipyard in $hqSystem',
       const Duration(days: 1),
     );
@@ -414,8 +408,7 @@ Future<BuyJob?> computeBuyJob(
   if (trip == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.deliver,
-      'No market for $tradeSymbol',
+      'No market to buy $tradeSymbol',
       const Duration(days: 1),
     );
     return null;
@@ -440,8 +433,42 @@ Future<JobResult> doBuyJob(
 }) async {
   final buyJob = state.buyJob;
   if (buyJob == null) {
-    return JobResult._error('No buy job', const Duration(hours: 1));
+    return JobResult.error('No buy job', const Duration(hours: 1));
   }
+
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+
+  // If we're currently at a market, record the prices and refuel.
+  final currentMarket = await visitLocalMarket(
+    api,
+    caches,
+    currentWaypoint,
+    ship,
+    // We want to always be using super up-to-date market prices for the trader.
+    maxAge: const Duration(seconds: 5),
+  );
+  await centralCommand.visitLocalShipyard(
+    api,
+    caches.shipyardPrices,
+    caches.agent,
+    currentWaypoint,
+    ship,
+  );
+
+  // Regardless of where we are, if we have cargo that isn't part of our deal,
+  // try to sell it.
+  final result = await handleUnwantedCargoIfNeeded(
+    api,
+    centralCommand,
+    caches,
+    ship,
+    currentMarket,
+    buyJob.tradeSymbol,
+  );
+  if (!result.isComplete) {
+    return result;
+  }
+
   // If we aren't at our buy location, go there.
   if (ship.waypointSymbol != buyJob.buyLocation) {
     final waitUntil = await beingNewRouteAndLog(
@@ -452,9 +479,16 @@ Future<JobResult> doBuyJob(
       centralCommand,
       buyJob.buyLocation,
     );
-    return JobResult._wait(waitUntil);
+    return JobResult.wait(waitUntil);
   }
+  final units = ship.countUnits(buyJob.tradeSymbol);
+  if (units >= buyJob.units) {
+    shipWarn(ship, 'Deliver already has ${buyJob.units} ${buyJob.tradeSymbol}');
+    return JobResult.complete();
+  }
+
   // Otherwise we're at our buy location and we buy.
+  await dockIfNeeded(api, ship);
   await purchaseCargoAndLog(
     api,
     caches.marketPrices,
@@ -465,7 +499,7 @@ Future<JobResult> doBuyJob(
     buyJob.units,
     AccountingType.capital,
   );
-  return JobResult._complete();
+  return JobResult.complete();
 }
 
 /// Execute the DeliverJob
@@ -479,7 +513,7 @@ Future<JobResult> doDeliverJob(
 }) async {
   final deliverJob = state.deliverJob;
   if (deliverJob == null) {
-    return JobResult._error('No deliver job', const Duration(hours: 1));
+    return JobResult.error('No deliver job', const Duration(hours: 1));
   }
 
   // If we're not at our deliver location, go there.
@@ -492,7 +526,7 @@ Future<JobResult> doDeliverJob(
       centralCommand,
       deliverJob.waypointSymbol,
     );
-    return JobResult._wait(waitUntil);
+    return JobResult.wait(waitUntil);
   }
 
   final haveItem = ship.countUnits(deliverJob.tradeSymbol) > 0;
@@ -504,11 +538,11 @@ Future<JobResult> doDeliverJob(
         ship.shipSymbol,
         BehaviorState(ship.shipSymbol, Behavior.idle),
       );
-    JobResult._complete();
+    JobResult.complete();
   }
   // Otherwise we wait.
   final waitUntil = getNow().add(const Duration(minutes: 5));
-  return JobResult._wait(waitUntil);
+  return JobResult.wait(waitUntil);
 }
 
 /// Init the BuyJob.
@@ -526,30 +560,32 @@ Future<JobResult> doInitJob(
     ship,
   );
   if (buyJob == null) {
-    return JobResult._error('No buy job', const Duration(minutes: 20));
+    return JobResult.error('No buy job', const Duration(minutes: 20));
   }
   centralCommand.setBuyJob(ship, buyJob);
-  return JobResult._continue();
+  return JobResult.complete();
 }
 
-void _disableWithJobError(
+/// Disable the current behavior with the given error.
+void disableWithJobError(
   Ship ship,
   CentralCommand centralCommand,
-  JobError error,
-) {
+  JobError error, {
+  Behavior? explicitBehavior,
+}) {
   if (error.disable == DisableBehavior.thisShip) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.deliver,
       error.why,
       error.timeout,
+      explicitBehavior: explicitBehavior,
     );
   } else {
     centralCommand.disableBehaviorForAll(
       ship,
-      Behavior.deliver,
       error.why,
       error.timeout,
+      explicitBehavior: explicitBehavior,
     );
   }
 }
@@ -562,12 +598,12 @@ Future<DateTime?> advanceDeliver(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  shipInfo(ship, 'DELIVER');
   final state = centralCommand.getBehavior(ship.shipSymbol);
   // How would we be here w/o a state?
   if (state == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.deliver,
       'No behavior state.',
       const Duration(hours: 1),
     );
@@ -589,10 +625,10 @@ Future<DateTime?> advanceDeliver(
 
   for (var i = 0; i < 10; i++) {
     final jobIndex = state.jobIndex;
+    shipInfo(ship, 'DELIVER $jobIndex');
     if (jobIndex < 0 || jobIndex >= jobFunctions.length) {
       centralCommand.disableBehaviorForShip(
         ship,
-        Behavior.deliver,
         'No behavior state.',
         const Duration(hours: 1),
       );
@@ -607,6 +643,7 @@ Future<DateTime?> advanceDeliver(
       caches,
       ship,
     );
+    shipInfo(ship, 'DELIVER $jobIndex $result');
     if (result.isComplete) {
       state.jobIndex++;
       if (jobIndex < jobFunctions.length) {
@@ -617,7 +654,8 @@ Future<DateTime?> advanceDeliver(
       }
     }
     if (result.isError) {
-      _disableWithJobError(ship, centralCommand, result.error);
+      shipInfo(ship, 'Error, disabling.');
+      disableWithJobError(ship, centralCommand, result.error);
       return null;
     }
     if (result.shouldReturn) {
@@ -626,7 +664,6 @@ Future<DateTime?> advanceDeliver(
   }
   centralCommand.disableBehaviorForAll(
     ship,
-    Behavior.deliver,
     'Too many deliver job iterations',
     const Duration(hours: 1),
   );

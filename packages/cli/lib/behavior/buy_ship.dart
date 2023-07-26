@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/navigation.dart';
@@ -45,7 +44,6 @@ Future<DateTime?> advanceBuyShip(
   if (shipType == null) {
     centralCommand.disableBehaviorForAll(
       ship,
-      Behavior.buyShip,
       'No ships needed.',
       const Duration(hours: 1),
     );
@@ -59,7 +57,6 @@ Future<DateTime?> advanceBuyShip(
   if (medianPrice == null) {
     centralCommand.disableBehaviorForAll(
       ship,
-      Behavior.buyShip,
       'Failed to buy ship, no median price for $shipType.',
       const Duration(minutes: 20),
     );
@@ -77,7 +74,6 @@ Future<DateTime?> advanceBuyShip(
   if (shipyardPrice == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.buyShip,
       'Failed to buy ship, no recent price for $shipType at $shipyardSymbol.',
       const Duration(minutes: 20),
     );
@@ -89,7 +85,6 @@ Future<DateTime?> advanceBuyShip(
   if (credits < maxPriceToCheck) {
     centralCommand.disableBehaviorForAll(
       ship,
-      Behavior.buyShip,
       'Can not buy $shipType at $shipyardSymbol, '
       'credits $credits < $priceAdjustment * price = $maxPriceToCheck.',
       const Duration(minutes: 10),
@@ -115,7 +110,6 @@ Future<DateTime?> advanceBuyShip(
   if (!shipyard.hasShipType(shipType)) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.buyShip,
       'Shipyard at ${currentWaypoint.symbol} does not sell $shipType.',
       const Duration(minutes: 30),
     );
@@ -136,7 +130,6 @@ Future<DateTime?> advanceBuyShip(
   if (recentPrice > maxPrice) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.buyShip,
       'Failed to buy $shipType at ${currentWaypoint.symbol}, '
       '$recentPriceString > max price $maxPrice.',
       const Duration(minutes: 30),
@@ -159,7 +152,6 @@ Future<DateTime?> advanceBuyShip(
     ..completeBehavior(ship.shipSymbol)
     ..disableBehaviorForAll(
       ship,
-      Behavior.buyShip,
       'Purchased ${result.ship.symbol} ($shipType)!',
       const Duration(minutes: 10),
     );

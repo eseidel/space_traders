@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
@@ -228,13 +227,12 @@ Future<DateTime?> advanceMiner(
       caches.systems,
       caches.waypoints,
       caches.markets,
-      currentWaypoint,
+      currentWaypoint.waypointSymbol,
       largestCargo!.tradeSymbol,
     );
     if (nearestMarket == null) {
       centralCommand.disableBehaviorForShip(
         ship,
-        Behavior.miner,
         'No nearby market which trades ${largestCargo.symbol}.',
         const Duration(hours: 1),
       );
@@ -255,7 +253,6 @@ Future<DateTime?> advanceMiner(
   if (mineSymbol == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.miner,
       'No desired mine for ship.',
       const Duration(hours: 1),
     );
@@ -276,7 +273,6 @@ Future<DateTime?> advanceMiner(
   if (!currentWaypoint.canBeMined) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.miner,
       "${waypointDescription(currentWaypoint)} can't be mined.",
       const Duration(hours: 1),
     );
@@ -291,7 +287,6 @@ Future<DateTime?> advanceMiner(
   if (nearestMarket == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.miner,
       'No nearby market for ${waypointDescription(currentWaypoint)}.',
       const Duration(hours: 1),
     );

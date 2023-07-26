@@ -21,7 +21,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     tradeSymbol,
   );
   if (best == null) {
-    logger.info('No market for $tradeSymbol');
+    logger.info('No market to buy $tradeSymbol');
   } else {
     logger.info(
       'Best value for $tradeSymbol is '

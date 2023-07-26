@@ -48,9 +48,9 @@ void main() {
       logger,
       () async => centralCommand.disableBehaviorForAll(
         ship,
-        Behavior.trader,
         'why',
         const Duration(hours: 1),
+        explicitBehavior: Behavior.trader,
       ),
     );
     expect(centralCommand.isBehaviorDisabled(Behavior.trader), true);
@@ -80,7 +80,6 @@ void main() {
       logger,
       () async => centralCommand.disableBehaviorForShip(
         ship,
-        Behavior.trader,
         'why',
         const Duration(hours: 1),
       ),

@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
@@ -46,7 +45,6 @@ Future<DateTime?> advanceChangeMounts(
     if (fromShip == null) {
       centralCommand.disableBehaviorForAll(
         ship,
-        Behavior.changeMounts,
         'No delivery ship for $tradeSymbol.',
         const Duration(minutes: 10),
       );
@@ -91,7 +89,6 @@ Future<DateTime?> advanceChangeMounts(
     // We're done.
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.changeMounts,
       'Mounting complete.',
       const Duration(hours: 1),
     );
@@ -103,7 +100,6 @@ Future<DateTime?> advanceChangeMounts(
   if (template == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.changeMounts,
       'No template for ship.',
       const Duration(hours: 1),
     );
@@ -114,7 +110,6 @@ Future<DateTime?> advanceChangeMounts(
   if (needed.isEmpty) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.changeMounts,
       'No mounts needed.',
       const Duration(hours: 1),
     );
@@ -127,7 +122,6 @@ Future<DateTime?> advanceChangeMounts(
   if (shipyard == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.deliver,
       'No shipyard in $hqSystem',
       const Duration(days: 1),
     );
@@ -142,7 +136,6 @@ Future<DateTime?> advanceChangeMounts(
   if (toClaim == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.changeMounts,
       'No unclaimed mounts available at shipyard.',
       const Duration(hours: 1),
     );

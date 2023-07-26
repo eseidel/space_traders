@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -471,7 +471,6 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   if (destinationSymbol == null) {
     centralCommand.disableBehaviorForShip(
       ship,
-      Behavior.trader,
       'Failed to find better location for trader.',
       const Duration(hours: 1),
     );
@@ -486,6 +485,78 @@ Future<DateTime?> _navigateToBetterTradeLocation(
     destinationSymbol,
   );
   return waitUntil;
+}
+
+/// Sell any cargo we don't need.
+Future<JobResult> handleUnwantedCargoIfNeeded(
+  Api api,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship,
+  Market? currentMarket,
+  TradeSymbol? wantedTradeSymbol,
+) async {
+  final wantedCargo = ship.largestCargo(
+    where: (i) => i.tradeSymbol == wantedTradeSymbol,
+  );
+  // If tradeSymbol is null, all cargo is "non-deal cargo".
+  // Pick the largest as an example, we'll try to sell it all regardless.
+  final unwantedCargo = ship.largestCargo(
+    where: (i) => i.tradeSymbol != wantedTradeSymbol,
+  );
+
+  if (unwantedCargo == null) {
+    return JobResult.complete();
+  }
+
+  bool isNotWantedCargo(TradeSymbol symbol) =>
+      symbol != wantedCargo?.tradeSymbol;
+  if (currentMarket != null) {
+    await sellAllCargoAndLog(
+      api,
+      caches.marketPrices,
+      caches.transactions,
+      caches.agent,
+      currentMarket,
+      ship,
+      // TODO(eseidel): We don't know what type of transaction this is.
+      // e.g. we could be selling MOUNTS which would be capital.
+      AccountingType.goods,
+      where: isNotWantedCargo,
+    );
+  }
+
+  if (ship.cargo.isEmpty) {
+    return JobResult.complete();
+  }
+  shipInfo(
+    ship,
+    'Cargo hold still not empty, finding '
+    'market to sell ${unwantedCargo.symbol}.',
+  );
+  final market = await nearbyMarketWhichTrades(
+    caches.systems,
+    caches.waypoints,
+    caches.markets,
+    ship.waypointSymbol,
+    unwantedCargo.tradeSymbol,
+  );
+  if (market == null) {
+    // We can't sell this cargo anywhere so give up?
+    return JobResult.error(
+      'No market for ${unwantedCargo.symbol}.',
+      const Duration(hours: 1),
+    );
+  }
+  final waitUntil = await beingNewRouteAndLog(
+    api,
+    ship,
+    caches.systems,
+    caches.routePlanner,
+    centralCommand,
+    market.waypointSymbol,
+  );
+  return JobResult.wait(waitUntil);
 }
 
 /// One loop of the trading logic
@@ -528,66 +599,24 @@ Future<DateTime?> advanceTrader(
 
   final behaviorState = centralCommand.getBehavior(ship.shipSymbol)!;
   final pastDeal = behaviorState.deal;
-  final dealCargo = ship.largestCargo(
-    where: (i) => i.tradeSymbol == pastDeal?.tradeSymbol,
+  // Regardless of where we are, if we have cargo that isn't part of our deal,
+  // try to sell it.
+  final result = await handleUnwantedCargoIfNeeded(
+    api,
+    centralCommand,
+    caches,
+    ship,
+    currentMarket,
+    pastDeal?.tradeSymbol,
   );
-  final nonDealCargo = ship.largestCargo(
-    where: (i) => i.tradeSymbol != pastDeal?.tradeSymbol,
-  );
-
-  /// Regardless of where we are, if we have cargo that isn't part of our deal,
-  /// try to sell it.
-  if (nonDealCargo != null) {
-    bool exceptDealCargo(TradeSymbol symbol) =>
-        symbol != dealCargo?.tradeSymbol;
-    if (currentMarket != null) {
-      await sellAllCargoAndLog(
-        api,
-        caches.marketPrices,
-        caches.transactions,
-        caches.agent,
-        currentMarket,
-        ship,
-        // TODO(eseidel): We don't know what type of transaction this is.
-        // e.g. we could be selling MOUNTS which would be capital.
-        AccountingType.goods,
-        where: exceptDealCargo,
-      );
-    }
-
-    if (ship.cargo.isNotEmpty) {
-      shipInfo(
-        ship,
-        'Cargo hold still not empty, finding '
-        'market to sell ${nonDealCargo.symbol}.',
-      );
-      final market = await nearbyMarketWhichTrades(
-        caches.systems,
-        caches.waypoints,
-        caches.markets,
-        currentWaypoint,
-        nonDealCargo.tradeSymbol,
-      );
-      if (market == null) {
-        // We can't sell this cargo anywhere so give up?
-        centralCommand.disableBehaviorForShip(
-          ship,
-          Behavior.trader,
-          'No market for ${nonDealCargo.symbol}.',
-          const Duration(hours: 1),
-        );
-        return null;
-      }
-      return beingNewRouteAndLog(
-        api,
-        ship,
-        caches.systems,
-        caches.routePlanner,
-        centralCommand,
-        market.waypointSymbol,
-      );
-    }
+  if (result.isError) {
+    disableWithJobError(ship, centralCommand, result.error);
+    return null;
   }
+  if (result.shouldReturn) {
+    return result.waitTime;
+  }
+
   // We already have a deal, handle it.
   if (pastDeal != null) {
     final waitUntil = await _handleDeal(

@@ -163,14 +163,16 @@ void logDeal(Ship ship, Deal deal) {
 // Not sure where this blongs?
 /// Returns a waypoint nearby which trades the good.
 /// This is not necessarily the nearest, but could be improved to be.
+// TODO(eseidel): replace with MarketPrices-based logic.
 Future<Waypoint?> nearbyMarketWhichTrades(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketCache marketCache,
-  Waypoint start,
+  WaypointSymbol startSymbol,
   TradeSymbol tradeSymbol, {
   int maxJumps = 1,
 }) async {
+  final start = await waypointCache.waypoint(startSymbol);
   if (start.hasMarketplace) {
     final startMarket = await marketCache.marketForSymbol(start.waypointSymbol);
     if (startMarket!.allowsTradeOf(tradeSymbol)) {

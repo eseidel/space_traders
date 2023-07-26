@@ -109,19 +109,25 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final filter = filterFromArgs(args);
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
-  final systemsCache = SystemsCache.loadCached(fs)!;
-  final marketPrices = MarketPrices.load(fs);
-  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
-  final jumpCache = JumpCache();
 
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
   logger.info(describeFleet(shipCache));
   final ships = shipCache.ships;
-  for (final ship in ships) {
-    if (!filter(ship)) {
-      continue;
-    }
+  final matchingShips = ships.where(filter).toList();
+  if (matchingShips.isEmpty) {
+    logger
+      ..info('No ships matching ${args.firstOrNull}.')
+      ..info('Usage: list_fleet [ship_symbol]')
+      ..info('Example: list_fleet ${shipCache.ships.first.symbol}');
+    return;
+  }
+
+  final systemsCache = SystemsCache.loadCached(fs)!;
+  final marketPrices = MarketPrices.load(fs);
+  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
+  final jumpCache = JumpCache();
+  for (final ship in matchingShips) {
     logShip(
       systemsCache,
       centralCommand,
