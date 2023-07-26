@@ -25,13 +25,15 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   Ship ship,
   MarketTradeGood marketGood,
   TradeSymbol neededTradeSymbol, {
-  required int maxWorthwhileUnitPurchasePrice,
+  required int? maxWorthwhileUnitPurchasePrice,
   required int unitsToPurchase,
+  AccountingType accountingType = AccountingType.goods,
 }) async {
   // And its selling at a reasonable price.
   // If the market is above maxWorthwhileUnitPurchasePrice and we don't have any
   // cargo yet then we give up and try again.
-  if (marketGood.purchasePrice >= maxWorthwhileUnitPurchasePrice) {
+  if (maxWorthwhileUnitPurchasePrice != null &&
+      marketGood.purchasePrice >= maxWorthwhileUnitPurchasePrice) {
     shipInfo(
       ship,
       '$neededTradeSymbol is too expensive at ${ship.waypointSymbol} '
@@ -83,23 +85,25 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
     ship,
     neededTradeSymbol,
     unitsToPurchase,
-    AccountingType.goods,
+    accountingType,
   );
   return result;
 }
 
-int _unitsToPurchase(
-  CostedDeal costedDeal,
-  MarketTradeGood good,
-  Ship ship,
-) {
+/// Returns the number of units we should purchase considering the ship
+/// cargo size and the market trade volume as well as any maximum units
+/// the deal proscribes.
+int unitsToPurchase(MarketTradeGood good, Ship ship, int maxUnitsToBuy) {
   // Many market goods trade in batches much smaller than our cargo hold
   // e.g. 10 vs. 120, if we try to buy 120 we'll get an error.
+  final unitsInCargo = ship.cargo.countUnits(good.tradeSymbol);
+  final unitsLeftToBuy = maxUnitsToBuy - unitsInCargo;
+
   final marketTradeVolume = good.tradeVolume;
   final unitsToPurchase = min(marketTradeVolume, ship.availableSpace);
   // Some deals have limited size (like contracts) for normal arbitrage deals
   // costedDeal.cargoSize == ship.cargoSpace.
-  return min(unitsToPurchase, costedDeal.maxUnitsToBuy);
+  return min(unitsToPurchase, unitsLeftToBuy);
 }
 
 Future<DateTime?> _handleAtSourceWithDeal(
@@ -115,7 +119,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
 
   final maxPerUnitPrice = costedDeal.maxPurchaseUnitPrice;
 
-  final unitsToPurchase = _unitsToPurchase(costedDeal, good, ship);
+  final units = unitsToPurchase(good, ship, costedDeal.maxUnitsToBuy);
   final transaction = await purchaseTradeGoodIfPossible(
     api,
     caches.marketPrices,
@@ -125,7 +129,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
     good,
     dealTradeSymbol,
     maxWorthwhileUnitPurchasePrice: maxPerUnitPrice,
-    unitsToPurchase: unitsToPurchase,
+    unitsToPurchase: units,
   );
 
   if (transaction != null) {
@@ -133,7 +137,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
     if (ship.cargo.availableSpace > 0) {
       shipInfo(
         ship,
-        'Purchased $unitsToPurchase of $dealTradeSymbol, still have '
+        'Purchased $units of $dealTradeSymbol, still have '
         '${ship.cargo.availableSpace} units of cargo space looping.',
       );
       return null;

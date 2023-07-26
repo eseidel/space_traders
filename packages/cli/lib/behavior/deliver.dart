@@ -6,6 +6,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -385,24 +386,68 @@ Future<JobResult> doBuyJob(
     );
     return JobResult.wait(waitUntil);
   }
-  final units = ship.countUnits(buyJob.tradeSymbol);
-  if (units >= buyJob.units) {
+  final existingUnits = ship.countUnits(buyJob.tradeSymbol);
+  if (existingUnits >= buyJob.units) {
     shipWarn(ship, 'Deliver already has ${buyJob.units} ${buyJob.tradeSymbol}');
     return JobResult.complete();
   }
 
+  if (currentMarket == null) {
+    return JobResult.error(
+      'No market at ${ship.waypointSymbol}',
+      const Duration(minutes: 5),
+    );
+  }
+
   // Otherwise we're at our buy location and we buy.
   await dockIfNeeded(api, ship);
-  await purchaseCargoAndLog(
+
+  // TODO(eseidel): Share this code with trader.dart
+  final tradeSymbol = buyJob.tradeSymbol;
+  final good = currentMarket.marketTradeGood(tradeSymbol)!;
+
+  final units = unitsToPurchase(good, ship, buyJob.units);
+  final transaction = await purchaseTradeGoodIfPossible(
     api,
     caches.marketPrices,
     caches.transactions,
     caches.agent,
     ship,
-    buyJob.tradeSymbol,
-    buyJob.units,
-    AccountingType.capital,
+    good,
+    tradeSymbol,
+    maxWorthwhileUnitPurchasePrice: null,
+    unitsToPurchase: units,
+    accountingType: AccountingType.capital,
   );
+
+  if (transaction != null) {
+    // Don't record deal transactions, there is no deal for this case?
+    final leftToBuy = unitsToPurchase(good, ship, buyJob.units);
+    if (leftToBuy > 0) {
+      shipInfo(
+        ship,
+        'Purchased $units of $tradeSymbol, still have '
+        '$leftToBuy units we would like to buy, looping.',
+      );
+      return JobResult.wait(null);
+    }
+    shipInfo(
+      ship,
+      'Purchased ${transaction.quantity} ${transaction.tradeSymbol} '
+      '@ ${transaction.perUnitPrice} '
+      '${creditsString(transaction.creditChange)}',
+    );
+  }
+  final haveTradeCargo = ship.cargo.countUnits(tradeSymbol) > 0;
+  if (!haveTradeCargo) {
+    // We couldn't buy any cargo, so we're done with this deal.
+    return JobResult.error(
+      'Unable to purchase $tradeSymbol, giving up on this trade.',
+      // Not sure what duration to use?  Zero risks spinning hot.
+      const Duration(minutes: 10),
+    );
+  }
+
   return JobResult.complete();
 }
 
@@ -449,7 +494,7 @@ Future<JobResult> doDeliverJob(
   return JobResult.wait(waitUntil);
 }
 
-/// Init the BuyJob.
+/// Init the BuyJob and DeliverJob for DeliverBehavior.
 Future<JobResult> doInitJob(
   BehaviorState state,
   Api api,
@@ -467,6 +512,16 @@ Future<JobResult> doInitJob(
     return JobResult.error('No buy job', const Duration(minutes: 20));
   }
   centralCommand.setBuyJob(ship, buyJob);
+
+  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
+  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
+  final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
+
+  final deliverJob = DeliverJob(
+    tradeSymbol: buyJob.tradeSymbol,
+    waypointSymbol: shipyard.waypointSymbol,
+  );
+  centralCommand.setDeliverJob(ship, deliverJob);
   return JobResult.complete();
 }
 

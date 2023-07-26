@@ -603,6 +603,12 @@ extension MarketUtils on Market {
   }
 }
 
+/// Extensions onto MarketTradeGood to make it easier to work with.
+extension MarketTradeGoodUtils on MarketTradeGood {
+  /// Returns symbol as a TradeSymbol object.
+  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
+}
+
 /// Extensions onto Shipyard to make it easier to work with.
 extension ShipyardUtils on Shipyard {
   /// Returns the WaypointSymbol for the shipyard.
