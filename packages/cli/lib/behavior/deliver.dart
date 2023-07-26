@@ -478,20 +478,12 @@ Future<JobResult> doDeliverJob(
     return JobResult.wait(waitUntil);
   }
 
-  final haveItem = ship.countUnits(deliverJob.tradeSymbol) > 0;
   // If we've handed out all our items, we're done.
-  if (!haveItem) {
-    centralCommand
-      ..completeBehavior(ship.shipSymbol)
-      ..setBehavior(
-        ship.shipSymbol,
-        BehaviorState(ship.shipSymbol, Behavior.idle),
-      );
-    JobResult.complete();
+  if (ship.countUnits(deliverJob.tradeSymbol) == 0) {
+    return JobResult.complete();
   }
   // Otherwise we wait.
-  final waitUntil = getNow().add(const Duration(minutes: 5));
-  return JobResult.wait(waitUntil);
+  return JobResult.wait(getNow().add(const Duration(minutes: 5)));
 }
 
 /// Init the BuyJob and DeliverJob for DeliverBehavior.
@@ -609,6 +601,7 @@ Future<DateTime?> advanceDeliver(
         centralCommand.setBehavior(ship.shipSymbol, state);
       } else {
         centralCommand.completeBehavior(ship.shipSymbol);
+        shipInfo(ship, 'Delivery complete!');
         return null;
       }
     }
