@@ -163,7 +163,7 @@ void logDeal(Ship ship, Deal deal) {
 // Not sure where this blongs?
 /// Returns a waypoint nearby which trades the good.
 /// This is not necessarily the nearest, but could be improved to be.
-// TODO(eseidel): replace with MarketPrices-based logic.
+// TODO(eseidel): replace with findBestMarketToSell in all places?
 Future<Waypoint?> nearbyMarketWhichTrades(
   SystemsCache systemsCache,
   WaypointCache waypointCache,

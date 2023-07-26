@@ -30,6 +30,7 @@ Future<DateTime?> beingNewRouteAndLog(
   }
   final action = route.actions.firstOrNull;
   if (action == null) {
+    // Was the caller supposed to check for this case and not ask to route?
     shipErr(
       ship,
       'No actions in route to $destinationSymbol from $start!?',

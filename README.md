@@ -113,6 +113,9 @@ Earning:
 * Calculate "wait time" when servicing a ship.
 * Try changing deal finding heuristic to only consider buy price.
 * Spread out traders across the galaxy better.
+* buy-in-a-loop for small tradeVolumes gets worse as we have more ships.
+  This is likely the #1 contributor to "wait time".
+  Every place we return null to loop has the same problem.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate

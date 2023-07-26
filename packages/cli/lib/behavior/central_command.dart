@@ -245,7 +245,7 @@ class CentralCommand {
       ShipRole.HAULER: [Behavior.trader, Behavior.explorer],
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
-        // Behavior.changeMounts,
+        Behavior.changeMounts,
         Behavior.miner
       ],
       ShipRole.SATELLITE: [Behavior.explorer],

@@ -362,10 +362,13 @@ extension CargoUtils on ShipCargo {
 
   /// Returns the amount of the given trade good the cargo has.
   int countUnits(TradeSymbol tradeSymbol) {
-    final maybeCargo = inventory.firstWhereOrNull(
-      (i) => i.symbol == tradeSymbol.value,
-    );
-    return maybeCargo?.units ?? 0;
+    return cargoItem(tradeSymbol)?.units ?? 0;
+  }
+
+  /// Returns the ShipCargoItem for the given trade good or null if the cargo
+  /// doesn't have that good.
+  ShipCargoItem? cargoItem(TradeSymbol tradeSymbol) {
+    return inventory.firstWhereOrNull((i) => i.symbol == tradeSymbol.value);
   }
 }
 
@@ -400,6 +403,26 @@ extension ShipUtils on Ship {
     return cargo.inventory
         .sortedBy<num>((i) => i.units)
         .lastWhereOrNull(filter);
+  }
+
+  /// Attempt to munge ths ship's cache to reflect the added cargo.
+  void updateCacheWithAddedCargo(TradeSymbol tradeSymbol, int units) {
+    final item = cargo.cargoItem(tradeSymbol);
+    if (item == null) {
+      final inventory = cargo.inventory.toList()
+        ..add(
+          ShipCargoItem(
+            symbol: tradeSymbol.value,
+            name: tradeSymbol.value,
+            description: tradeSymbol.value,
+            units: 0,
+          ),
+        );
+      // We may have to replace the list because it defaults to const [] which
+      // is immutable.
+      cargo.inventory = inventory;
+    }
+    cargo.cargoItem(tradeSymbol)!.units += units;
   }
 
   /// Returns true if the ship if full on fuel.

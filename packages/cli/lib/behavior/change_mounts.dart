@@ -15,6 +15,59 @@ ShipMountSymbolEnum? _pickMountFromAvailable(
   return needed.firstWhereOrNull((mount) => available[mount] > 0);
 }
 
+/// Install a mount on a ship.
+Future<InstallMount201ResponseData> installMount(
+  Api api,
+  AgentCache agentCache,
+  ShipCache shipCache,
+  TransactionLog transactionLog,
+  Ship ship,
+  ShipMountSymbolEnum tradeSymbol,
+) async {
+  final response = await api.fleet.installMount(
+    ship.symbol,
+    installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
+  );
+  final data = response!.data;
+  agentCache.agent = data.agent;
+  ship
+    ..cargo = data.cargo
+    ..mounts = data.mounts;
+  await shipCache.updateShip(ship);
+  // FIXME: Record the transaction.
+  // ShipModificationTransaction transaction;
+  return data;
+}
+
+/// Transfer cargo between two ships.
+Future<Jettison200ResponseData> transferCargo(
+  Api api,
+  ShipCache cache, {
+  required Ship from,
+  required Ship to,
+  required TradeSymbol tradeSymbol,
+  required int units,
+}) async {
+  final request = TransferCargoRequest(
+    shipSymbol: to.symbol,
+    tradeSymbol: tradeSymbol,
+    units: 1,
+  );
+  final response = await api.fleet.transferCargo(
+    from.symbol,
+    transferCargoRequest: request,
+  );
+  // On failure
+  // ApiException 400: {"error":{"message":"Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1 unit(s) of MOUNT_MINING_LASER_II. Ship has 0 unit(s) of MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1","tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
+
+  final data = response!.data;
+  from.cargo = data.cargo;
+  to.updateCacheWithAddedCargo(tradeSymbol, units);
+  await cache.updateShip(from);
+  await cache.updateShip(to);
+  return data;
+}
+
 /// Change mounts on a ship.
 Future<DateTime?> advanceChangeMounts(
   Api api,
@@ -25,6 +78,30 @@ Future<DateTime?> advanceChangeMounts(
 }) async {
   final toMount = centralCommand.getMountToAdd(ship.shipSymbol);
 
+  shipInfo(ship, 'Changing mounts. Mounting $toMount.');
+
+  // Re-validate every loop in case resuming from error.
+  final template = centralCommand.templateForShip(ship);
+  if (template == null) {
+    centralCommand.disableBehaviorForShip(
+      ship,
+      'No template for ship.',
+      const Duration(hours: 1),
+    );
+    return null;
+  }
+
+  final needed = mountsNeededForShip(ship, template);
+  if (needed.isEmpty) {
+    centralCommand.disableBehaviorForShip(
+      ship,
+      'No mounts needed.',
+      const Duration(hours: 1),
+    );
+    return null;
+  }
+
+  // We've already started a change-mount job, continue.
   if (toMount != null) {
     final currentWaypoint =
         await caches.waypoints.waypoint(ship.waypointSymbol);
@@ -49,23 +126,26 @@ Future<DateTime?> advanceChangeMounts(
 
     // We could match the docking status instead.
     if (!fromShip.isDocked) {
-      shipErr(ship, 'Delivery ship undocked during change mount.');
-      centralCommand.completeBehavior(ship.shipSymbol);
-      return null;
+      shipErr(ship, 'Delivery ship undocked during change mount, docking it.');
+      // Terrible hack.
+      await dockIfNeeded(api, fromShip);
+      // centralCommand.completeBehavior(ship.shipSymbol);
+      // return null;
     }
 
     await dockIfNeeded(api, ship);
 
-    // Get it from the delivery ship.
-    final request = TransferCargoRequest(
-      shipSymbol: ship.symbol,
-      tradeSymbol: tradeSymbol,
-      units: 1,
-    );
-    await api.fleet.transferCargo(
-      fromShip.symbol,
-      transferCargoRequest: request,
-    );
+    if (ship.countUnits(tradeSymbol) < 1) {
+      // Get it from the delivery ship.
+      await transferCargo(
+        api,
+        caches.ships,
+        from: fromShip,
+        to: ship,
+        tradeSymbol: tradeSymbol,
+        units: 1,
+      );
+    }
 
     // Unmount existing mounts if needed.
     // const toBeRemoved = TradeSymbol.MOUNT_MINING_LASER_I;
@@ -75,9 +155,13 @@ Future<DateTime?> advanceChangeMounts(
     // );
 
     // Mount the new mount.
-    await api.fleet.installMount(
-      ship.symbol,
-      installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
+    await installMount(
+      api,
+      caches.agent,
+      caches.ships,
+      caches.transactions,
+      ship,
+      toMount,
     );
 
     // Give the delivery ship our extra mount if we have one.
@@ -86,27 +170,6 @@ Future<DateTime?> advanceChangeMounts(
     centralCommand.disableBehaviorForShip(
       ship,
       'Mounting complete.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
-
-  // Do I need mounts?
-  final template = centralCommand.templateForShip(ship);
-  if (template == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No template for ship.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
-
-  final needed = mountsNeededForShip(ship, template);
-  if (needed.isEmpty) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No mounts needed.',
       const Duration(hours: 1),
     );
     return null;
