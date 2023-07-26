@@ -2,6 +2,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -34,6 +35,8 @@ class _MockTransactionLog extends Mock implements TransactionLog {}
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
+
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 void main() {
   test('advanceDeliver smoke test', () async {
@@ -103,5 +106,20 @@ void main() {
       ),
     );
     expect(waitUntil, isNull);
+  });
+
+  test('findBestMarketToBuy smoke test', () {
+    final ship = _MockShip();
+    final routePlanner = _MockRoutePlanner();
+    final marketPrices = _MockMarketPrices();
+    when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM)).thenReturn([]);
+
+    findBestMarketToBuy(
+      marketPrices,
+      routePlanner,
+      ship,
+      TradeSymbol.ALUMINUM,
+      expectedCreditsPerSecond: 7,
+    );
   });
 }

@@ -45,19 +45,22 @@ CostedTrip? costTrip(
 }
 
 /// Find the best market to buy a given item from.
+/// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
+/// used for evaluating the trade-off between "closest" vs. "cheapest".
 CostedTrip? findBestMarketToBuy(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
-  TradeSymbol tradeSymbol,
-) {
+  TradeSymbol tradeSymbol, {
+  required int expectedCreditsPerSecond,
+}) {
   final prices = marketPrices.pricesFor(tradeSymbol).toList();
   if (prices.isEmpty) {
     return null;
   }
   final start = ship.waypointSymbol;
 
-  // If there are a lot f prices we could cut down the search space by only
+  // If there are a lot of prices we could cut down the search space by only
   // looking at prices at or below median?
   // final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol)!;
   // Find the closest 10 prices which are median or below.
@@ -82,11 +85,8 @@ CostedTrip? findBestMarketToBuy(
     return nearest;
   }
 
-  // Have a set time value of money (e.g. 7c/s)
-  const expectedCreditsPerSecond = 7;
-
   var best = nearest;
-  // Pick any one further that saves more than 7c/s
+  // Pick any one further that saves more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
     final priceDiff = trip.price.purchasePrice - nearest.price.purchasePrice;
     final savings = -priceDiff;
@@ -404,6 +404,7 @@ Future<BuyJob?> computeBuyJob(
     caches.routePlanner,
     ship,
     tradeSymbol,
+    expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
   );
   if (trip == null) {
     centralCommand.disableBehaviorForShip(

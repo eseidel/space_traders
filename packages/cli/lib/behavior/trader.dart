@@ -664,7 +664,7 @@ Future<DateTime?> advanceTrader(
         'of ${ship.systemSymbol}.');
   }
   if (newDeal.expectedProfitPerSecond <
-      centralCommand.minTraderProfitPerSecond(ship)) {
+      centralCommand.expectedCreditsPerSecond(ship)) {
     return findBetterLocation('Deal expected profit per second too low: '
         '${creditsString(newDeal.expectedProfitPerSecond)}/s');
   }

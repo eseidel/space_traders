@@ -112,10 +112,12 @@ class CentralCommand {
   /// but will not start new deals involving contracts.
   bool get isContractTradingEnabled => true;
 
-  /// Minimum profit per second we will accept when trading.
+  /// Minimum profit per second we expect this ship to make.
   // Should set this based on the ship type and how much we expect to earn
   // from other sources (e.g. hauling mining goods?)
-  int minTraderProfitPerSecond(Ship ship) {
+  int expectedCreditsPerSecond(Ship ship) {
+    // Command makes a bit less than either miners or haulers due to its
+    // worse cargo capacity and laser.
     if (ship.registration.role == ShipRole.COMMAND) {
       return 6;
     }
@@ -1071,7 +1073,7 @@ class CentralCommand {
       ship,
       maxJumps: maxJumps,
       maxWaypoints: maxWaypoints,
-      profitPerSecondThreshold: minTraderProfitPerSecond(ship),
+      profitPerSecondThreshold: expectedCreditsPerSecond(ship),
     );
     return placement?.destinationSymbol;
   }

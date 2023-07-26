@@ -19,6 +19,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     routePlanner,
     ship,
     tradeSymbol,
+    expectedCreditsPerSecond: 7,
   );
   if (best == null) {
     logger.info('No market to buy $tradeSymbol');
