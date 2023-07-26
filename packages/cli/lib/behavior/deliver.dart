@@ -5,101 +5,12 @@ import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 // Go buy and deliver.
 // Used for modules.
-
-/// Calculated trip cost of going and buying something.
-class CostedTrip {
-  /// Create a new costed trip.
-  CostedTrip({required this.route, required this.price});
-
-  /// The route to get there.
-  final RoutePlan route;
-
-  /// The historical price for the item at a given market.
-  final MarketPrice price;
-}
-
-/// Compute the cost of going to and buying from a specific MarketPrice record.
-CostedTrip? costTrip(
-  Ship ship,
-  RoutePlanner planner,
-  MarketPrice price,
-  WaypointSymbol start,
-  WaypointSymbol end,
-) {
-  final route = planner.planRoute(
-    start: start,
-    end: end,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
-  );
-  if (route == null) {
-    return null;
-  }
-  return CostedTrip(route: route, price: price);
-}
-
-/// Find the best market to buy a given item from.
-/// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
-/// used for evaluating the trade-off between "closest" vs. "cheapest".
-CostedTrip? findBestMarketToBuy(
-  MarketPrices marketPrices,
-  RoutePlanner routePlanner,
-  Ship ship,
-  TradeSymbol tradeSymbol, {
-  required int expectedCreditsPerSecond,
-}) {
-  final prices = marketPrices.pricesFor(tradeSymbol).toList();
-  if (prices.isEmpty) {
-    return null;
-  }
-  final start = ship.waypointSymbol;
-
-  // If there are a lot of prices we could cut down the search space by only
-  // looking at prices at or below median?
-  // final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol)!;
-  // Find the closest 10 prices which are median or below.
-  // final medianOrBelow = prices.where((e) => e.purchasePrice <= medianPrice);
-
-  final costed = <CostedTrip>[];
-  for (final price in prices) {
-    final end = price.waypointSymbol;
-    final trip = costTrip(ship, routePlanner, price, start, end);
-    if (trip != null) {
-      costed.add(trip);
-    } else {
-      logger.warn('No route from $start to $end');
-    }
-  }
-
-  final sorted = costed.toList()
-    ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
-
-  final nearest = sorted.first;
-  if (sorted.length == 1) {
-    return nearest;
-  }
-
-  var best = nearest;
-  // Pick any one further that saves more than expectedCreditsPerSecond
-  for (final trip in sorted.sublist(1)) {
-    final priceDiff = trip.price.purchasePrice - nearest.price.purchasePrice;
-    final savings = -priceDiff;
-    final extraTime = trip.route.duration - nearest.route.duration;
-    final savingsPerSecond = savings / extraTime.inSeconds;
-    if (savingsPerSecond > expectedCreditsPerSecond) {
-      best = trip;
-      break;
-    }
-  }
-
-  return best;
-}
 
 /// A job to buy a given item.
 @immutable

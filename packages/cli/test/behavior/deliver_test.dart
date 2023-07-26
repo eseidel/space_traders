@@ -107,19 +107,4 @@ void main() {
     );
     expect(waitUntil, isNull);
   });
-
-  test('findBestMarketToBuy smoke test', () {
-    final ship = _MockShip();
-    final routePlanner = _MockRoutePlanner();
-    final marketPrices = _MockMarketPrices();
-    when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM)).thenReturn([]);
-
-    findBestMarketToBuy(
-      marketPrices,
-      routePlanner,
-      ship,
-      TradeSymbol.ALUMINUM,
-      expectedCreditsPerSecond: 7,
-    );
-  });
 }

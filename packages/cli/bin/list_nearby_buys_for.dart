@@ -1,9 +1,9 @@
-import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/trading.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final marketPrices = MarketPrices.load(fs);

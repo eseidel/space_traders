@@ -516,4 +516,19 @@ void main() {
     expect(costedDeal.expectedUnits, 100);
     expect(costedDeal.maxUnitsToBuy, 10);
   });
+  test('findBestMarketToBuy smoke test', () {
+    final ship = _MockShip();
+    final routePlanner = _MockRoutePlanner();
+    final marketPrices = _MockMarketPrices();
+    when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM)).thenReturn([]);
+
+    final market = findBestMarketToBuy(
+      marketPrices,
+      routePlanner,
+      ship,
+      TradeSymbol.ALUMINUM,
+      expectedCreditsPerSecond: 7,
+    );
+    expect(market, isNull);
+  });
 }
