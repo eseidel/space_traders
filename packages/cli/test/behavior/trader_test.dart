@@ -55,7 +55,7 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 void main() {
-  test('advanceContractTrader smoke test', () async {
+  test('advanceTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
     const shipSymbol = ShipSymbol('S', 1);
     registerFallbackValue(BehaviorState(shipSymbol, Behavior.trader));

@@ -155,7 +155,6 @@ class DeliverState {
 }
 
 enum _JobResultType {
-  continueAction,
   waitOrLoop,
   complete,
   error,
@@ -228,7 +227,7 @@ class JobResult {
   bool get isComplete => _type == _JobResultType.complete;
 
   /// Whether the caller should return after the navigation action
-  bool get shouldReturn => _type != _JobResultType.continueAction;
+  bool get shouldReturn => _type != _JobResultType.complete;
 
   /// The wait time if [shouldReturn] is true
   DateTime? get waitTime {
@@ -236,6 +235,21 @@ class JobResult {
       throw StateError('Cannot get wait time for non-wait result');
     }
     return _waitTime;
+  }
+
+  @override
+  String toString() {
+    if (isError) {
+      return 'Error: ${error.why}';
+    }
+    if (isComplete) {
+      return 'Complete';
+    }
+    final wait = _waitTime;
+    if (wait == null) {
+      return 'Return and loop';
+    }
+    return 'Wait until ${wait.toIso8601String()}';
   }
 }
 
