@@ -4,7 +4,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
-import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:more/collection.dart';
 
@@ -14,96 +13,6 @@ ShipMountSymbolEnum? _pickMountFromAvailable(
 ) {
   // We could do something more sophisticated here.
   return needed.firstWhereOrNull((mount) => available[mount] > 0);
-}
-
-/// Remove mount from a ship's mount list (but not cargo).
-Future<RemoveMount201ResponseData> removeMount(
-  Api api,
-  AgentCache agentCache,
-  ShipCache shipCache,
-  TransactionLog transactionLog,
-  Ship ship,
-  ShipMountSymbolEnum tradeSymbol,
-) async {
-  final response = await api.fleet.removeMount(
-    ship.symbol,
-    removeMountRequest: RemoveMountRequest(symbol: tradeSymbol.value),
-  );
-  final data = response!.data;
-  agentCache.agent = data.agent;
-  ship
-    ..cargo = data.cargo
-    ..mounts = data.mounts;
-  shipCache.updateShip(ship);
-  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
-  final transaction = Transaction.fromShipModificationTransaction(
-    data.transaction,
-    agentCache.agent.credits,
-  );
-  transactionLog.log(transaction);
-  return data;
-}
-
-/// Install a mount on a ship from its cargo.
-Future<InstallMount201ResponseData> installMount(
-  Api api,
-  AgentCache agentCache,
-  ShipCache shipCache,
-  TransactionLog transactionLog,
-  Ship ship,
-  ShipMountSymbolEnum tradeSymbol,
-) async {
-  final response = await api.fleet.installMount(
-    ship.symbol,
-    installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
-  );
-  final data = response!.data;
-  agentCache.agent = data.agent;
-  ship
-    ..cargo = data.cargo
-    ..mounts = data.mounts;
-  shipCache.updateShip(ship);
-  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
-  final transaction = Transaction.fromShipModificationTransaction(
-    data.transaction,
-    agentCache.agent.credits,
-  );
-  transactionLog.log(transaction);
-  return data;
-}
-
-/// Transfer cargo between two ships.
-Future<Jettison200ResponseData> transferCargo(
-  Api api,
-  ShipCache cache, {
-  required Ship from,
-  required Ship to,
-  required TradeSymbol tradeSymbol,
-  required int units,
-}) async {
-  final request = TransferCargoRequest(
-    shipSymbol: to.symbol,
-    tradeSymbol: tradeSymbol,
-    units: 1,
-  );
-  final response = await api.fleet.transferCargo(
-    from.symbol,
-    transferCargoRequest: request,
-  );
-  // On failure:
-  // ApiException 400: {"error":{"message":
-  // "Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1
-  // unit(s) of MOUNT_MINING_LASER_II. Ship has 0 unit(s) of
-  // MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1",
-  // "tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
-
-  final data = response!.data;
-  from.cargo = data.cargo;
-  to.updateCacheWithAddedCargo(tradeSymbol, units);
-  cache
-    ..updateShip(from)
-    ..updateShip(to);
-  return data;
 }
 
 /// Returns ShipCargoItems for mounts in our cargo if any.
@@ -186,7 +95,7 @@ Future<DateTime?> advanceChangeMounts(
 
     if (ship.countUnits(tradeSymbol) < 1) {
       // Get it from the delivery ship.
-      await transferCargo(
+      await transferCargoAndLog(
         api,
         caches.ships,
         from: deliveryShip,
@@ -202,7 +111,7 @@ Future<DateTime?> advanceChangeMounts(
     if (toRemove.isNotEmpty) {
       // Unmount existing mounts if needed.
       for (final mount in toRemove) {
-        await removeMount(
+        await removeMountAndLog(
           api,
           caches.agent,
           caches.ships,
@@ -214,7 +123,7 @@ Future<DateTime?> advanceChangeMounts(
     }
 
     // Mount the new mount.
-    await installMount(
+    await installMountAndLog(
       api,
       caches.agent,
       caches.ships,
@@ -228,7 +137,7 @@ Future<DateTime?> advanceChangeMounts(
     if (extraMounts.isNotEmpty) {
       // This could send more items than deliveryShip has space for.
       for (final cargoItem in extraMounts) {
-        await transferCargo(
+        await transferCargoAndLog(
           api,
           caches.ships,
           from: ship,

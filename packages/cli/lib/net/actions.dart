@@ -433,34 +433,96 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   return data;
 }
 
-/// Install [mountSymbol] on [ship] and log.
+/// Install a mount on a ship from its cargo.
 Future<InstallMount201ResponseData> installMountAndLog(
   Api api,
+  AgentCache agentCache,
+  ShipCache shipCache,
+  TransactionLog transactionLog,
   Ship ship,
-  String mountSymbol,
+  ShipMountSymbolEnum tradeSymbol,
 ) async {
-  final request = InstallMountRequest(symbol: mountSymbol);
-  final response =
-      await api.fleet.installMount(ship.symbol, installMountRequest: request);
-  // Not changing agent.
+  final response = await api.fleet.installMount(
+    ship.symbol,
+    installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
+  );
+  final data = response!.data;
+  agentCache.agent = data.agent;
   ship
-    ..mounts = response!.data.mounts
-    ..cargo = response.data.cargo;
-  return response.data;
+    ..cargo = data.cargo
+    ..mounts = data.mounts;
+  shipCache.updateShip(ship);
+  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
+  final transaction = Transaction.fromShipModificationTransaction(
+    data.transaction,
+    agentCache.agent.credits,
+  );
+  transactionLog.log(transaction);
+  return data;
 }
 
-/// Remove [mountSymbol] from [ship] and log.
+/// Remove mount from a ship's mount list (but not cargo).
 Future<RemoveMount201ResponseData> removeMountAndLog(
   Api api,
+  AgentCache agentCache,
+  ShipCache shipCache,
+  TransactionLog transactionLog,
   Ship ship,
-  String mountSymbol,
+  ShipMountSymbolEnum tradeSymbol,
 ) async {
-  final request = RemoveMountRequest(symbol: mountSymbol);
-  final response =
-      await api.fleet.removeMount(ship.symbol, removeMountRequest: request);
-  // Not changing agent.
+  final response = await api.fleet.removeMount(
+    ship.symbol,
+    removeMountRequest: RemoveMountRequest(symbol: tradeSymbol.value),
+  );
+  final data = response!.data;
+  agentCache.agent = data.agent;
   ship
-    ..mounts = response!.data.mounts
-    ..cargo = response.data.cargo;
-  return response.data;
+    ..cargo = data.cargo
+    ..mounts = data.mounts;
+  shipCache.updateShip(ship);
+  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
+  final transaction = Transaction.fromShipModificationTransaction(
+    data.transaction,
+    agentCache.agent.credits,
+  );
+  transactionLog.log(transaction);
+  return data;
+}
+
+/// Transfer cargo between two ships.
+Future<Jettison200ResponseData> transferCargoAndLog(
+  Api api,
+  ShipCache cache, {
+  required Ship from,
+  required Ship to,
+  required TradeSymbol tradeSymbol,
+  required int units,
+}) async {
+  final request = TransferCargoRequest(
+    shipSymbol: to.symbol,
+    tradeSymbol: tradeSymbol,
+    units: 1,
+  );
+  final response = await api.fleet.transferCargo(
+    from.symbol,
+    transferCargoRequest: request,
+  );
+  // On failure:
+  // ApiException 400: {"error":{"message":
+  // "Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1
+  // unit(s) of MOUNT_MINING_LASER_II. Ship has 0 unit(s) of
+  // MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1",
+  // "tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
+
+  final data = response!.data;
+  from.cargo = data.cargo;
+  to.updateCacheWithAddedCargo(tradeSymbol, units);
+  cache
+    ..updateShip(from)
+    ..updateShip(to);
+  shipInfo(
+      from,
+      'Transferred $units $tradeSymbol from ${from.symbol} to '
+      '${to.symbol}');
+  return data;
 }
