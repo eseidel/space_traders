@@ -666,6 +666,16 @@ extension ShipyardTransactionUtils on ShipyardTransaction {
       WaypointSymbol.fromString(waypointSymbol);
 }
 
+/// Extensions onto ShipModificationTransaction to make it easier to work with.
+extension ShipModificationTransactionUtils on ShipModificationTransaction {
+  /// Returns the ShipSymbol for the given transaction.
+  ShipSymbol get shipSymbolObject => ShipSymbol.fromString(shipSymbol);
+
+  /// Returns the WaypointSymbol for the given transaction.
+  WaypointSymbol get waypointSymbolObject =>
+      WaypointSymbol.fromString(waypointSymbol);
+}
+
 /// Extensions onto Faction to make it easier to work with.
 extension FactionUtils on Faction {
   /// Returns the WaypointSymbol for the faction headquarters.

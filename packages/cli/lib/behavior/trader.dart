@@ -590,6 +590,7 @@ Future<DateTime?> advanceTrader(
   await centralCommand.visitLocalShipyard(
     api,
     caches.shipyardPrices,
+    caches.transactions,
     caches.agent,
     currentWaypoint,
     ship,

@@ -216,6 +216,7 @@ void main() {
       () => centralCommand.visitLocalShipyard(
         api,
         shipyardPrices,
+        transactionLog,
         agentCache,
         waypoint,
         ship,
@@ -450,6 +451,7 @@ void main() {
       () => centralCommand.visitLocalShipyard(
         api,
         shipyardPrices,
+        transactionLog,
         agentCache,
         waypoint,
         ship,
@@ -632,6 +634,7 @@ void main() {
       () => centralCommand.visitLocalShipyard(
         api,
         shipyardPrices,
+        transactionLog,
         agentCache,
         waypoint,
         ship,

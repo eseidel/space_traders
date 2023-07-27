@@ -285,6 +285,7 @@ Future<DateTime?> advanceExplorer(
   await centralCommand.visitLocalShipyard(
     api,
     caches.shipyardPrices,
+    caches.transactions,
     caches.agent,
     waypoint,
     ship,

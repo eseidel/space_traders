@@ -109,7 +109,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
       in sellAllCargo(api, agentCache, market, ship, where: where)) {
     final marketTransaction = response.transaction;
     final agent = response.agent;
-    logTransaction(ship, marketPrices, agent, marketTransaction);
+    logMarketTransaction(ship, marketPrices, agent, marketTransaction);
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
       agent.credits,
@@ -143,7 +143,7 @@ Future<Transaction?> purchaseCargoAndLog(
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = data.agent;
     final marketTransaction = data.transaction;
-    logTransaction(ship, marketPrices, agent, marketTransaction);
+    logMarketTransaction(ship, marketPrices, agent, marketTransaction);
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
       agent.credits,
@@ -163,25 +163,12 @@ Future<Transaction?> purchaseCargoAndLog(
   }
 }
 
-/// Log a shipyard transaction to the console.
-void logShipyardTransaction(
-  Ship ship,
-  Agent agent,
-  ShipyardTransaction t,
-) {
-  shipInfo(
-      ship,
-      'Purchased ${t.shipSymbol} for '
-      '${creditsString(t.price)} -> ');
-  final afterCredits = creditsString(agent.credits);
-  logger.info('$afterCredits credits remaining.');
-}
-
 /// Purchase a ship and log the transaction.
 Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
   ShipCache shipCache,
   AgentCache agentCache,
+  TransactionLog transactionLog,
   Ship ship,
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
@@ -189,6 +176,12 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   final result =
       await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
   logShipyardTransaction(ship, result.agent, result.transaction);
+  final transaction = Transaction.fromShipyardTransaction(
+    result.transaction,
+    shipType,
+    agentCache.agent.credits,
+  );
+  transactionLog.log(transaction);
   return result;
 }
 
@@ -261,7 +254,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
     final data = await refuelShip(api, agentCache, ship);
     final transaction = data.transaction;
     final agent = agentCache.agent;
-    logTransaction(
+    logMarketTransaction(
       ship,
       marketPrices,
       agent,

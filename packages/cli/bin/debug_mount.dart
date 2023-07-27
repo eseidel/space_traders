@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
@@ -10,20 +12,38 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
 
+  final symbolWidth =
+      ShipMountSymbolEnum.values.fold(0, (s, e) => max(s, e.value.length)) + 1;
+
   for (final ship in shipCache.ships) {
     final template = centralCommand.templateForShip(ship);
     if (template == null) {
-      logger.info('No template for ${ship.symbol}.');
+      logger.detail('No template for ${ship.symbol}.');
       continue;
     }
-    final needed = mountsNeededForShip(ship, template);
+    final needed = mountsToAddToShip(ship, template);
     if (needed.isEmpty) {
-      logger.info('No mounts needed for ${ship.symbol}.');
-      continue;
+      logger.detail('No mounts to add to ${ship.symbol}.');
+    } else {
+      for (final mountSymbol in needed.distinct) {
+        final units = needed[mountSymbol];
+        logger.info(
+          '+$units '
+          '${mountSymbol.value.padRight(symbolWidth)} ${ship.symbol}',
+        );
+      }
     }
-    for (final mountSymbol in needed.distinct) {
-      final units = needed[mountSymbol];
-      logger.info('Need $units $mountSymbol for ${ship.symbol}.');
+    final toRemove = mountsToRemoveFromShip(ship, template);
+    if (toRemove.isEmpty) {
+      logger.detail('No mounts to remove from ${ship.symbol}.');
+    } else {
+      for (final mountSymbol in toRemove.distinct) {
+        final units = toRemove[mountSymbol];
+        logger.info(
+          '-$units '
+          '${mountSymbol.value.padRight(symbolWidth)} ${ship.symbol}',
+        );
+      }
     }
   }
 

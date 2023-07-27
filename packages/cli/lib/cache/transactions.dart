@@ -95,6 +95,26 @@ class Transaction {
     );
   }
 
+  /// Create a new transaction from a ship modification transaction.
+  factory Transaction.fromShipModificationTransaction(
+    ShipModificationTransaction transaction,
+    int agentCredits,
+  ) {
+    return Transaction(
+      // shipSymbol is the new ship, not the ship that made the transaction.
+      shipSymbol: transaction.shipSymbolObject,
+      waypointSymbol: transaction.waypointSymbolObject,
+      tradeSymbol: transaction.tradeSymbol,
+      quantity: 1,
+      // This is more a service than a purchase.
+      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      perUnitPrice: transaction.totalPrice,
+      timestamp: transaction.timestamp,
+      agentCredits: agentCredits,
+      accounting: AccountingType.capital,
+    );
+  }
+
   /// Ship symbol which made the transaction.
   final ShipSymbol shipSymbol;
 

@@ -78,20 +78,6 @@ class ShipTemplate {
   final Multiset<ShipMountSymbolEnum> mounts;
 }
 
-// According to SAF:
-// Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
-
-final _templates = [
-  ShipTemplate(
-    frameSymbol: ShipFrameSymbolEnum.MINER,
-    mounts: Multiset.from([
-      ShipMountSymbolEnum.MINING_LASER_II,
-      ShipMountSymbolEnum.MINING_LASER_II,
-      ShipMountSymbolEnum.SURVEYOR_I
-    ]),
-  )
-];
-
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
@@ -144,8 +130,33 @@ class CentralCommand {
   // If there still isn't, then we print a warning and have them idle.
 
   /// What template should we use for the given ship?
-  ShipTemplate? templateForShip(Ship ship) =>
-      _templates.firstWhereOrNull((e) => e.frameSymbol == ship.frame.symbol);
+  ShipTemplate? templateForShip(Ship ship) {
+    // Hack to test a new template.
+    // if (ship.symbol == 'ESEIDEL-1B') {
+    //   return ShipTemplate(
+    //     frameSymbol: ShipFrameSymbolEnum.MINER,
+    //     mounts: Multiset.from([
+    //       ShipMountSymbolEnum.SURVEYOR_II,
+    //       ShipMountSymbolEnum.SURVEYOR_II,
+    //     ]),
+    //   );
+    // }
+
+    // According to SAF:
+    // Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
+    final templates = [
+      ShipTemplate(
+        frameSymbol: ShipFrameSymbolEnum.MINER,
+        mounts: Multiset.from([
+          ShipMountSymbolEnum.MINING_LASER_II,
+          ShipMountSymbolEnum.MINING_LASER_II,
+          ShipMountSymbolEnum.SURVEYOR_I
+        ]),
+      )
+    ];
+    return templates
+        .firstWhereOrNull((e) => e.frameSymbol == ship.frame.symbol);
+  }
 
   /// Add up all mounts needed for current ships based on current templating.
   Multiset<ShipMountSymbolEnum> mountsNeededForAllShips() {
@@ -155,7 +166,7 @@ class CentralCommand {
       if (template == null) {
         continue;
       }
-      totalNeeded.addAll(mountsNeededForShip(ship, template));
+      totalNeeded.addAll(mountsToAddToShip(ship, template));
     }
     return totalNeeded;
   }
@@ -807,6 +818,7 @@ class CentralCommand {
   Future<void> visitLocalShipyard(
     Api api,
     ShipyardPrices shipyardPrices,
+    TransactionLog transactionLog,
     AgentCache agentCache,
     Waypoint waypoint,
     Ship ship,
@@ -820,7 +832,13 @@ class CentralCommand {
     // Buy ship if we should.
     // For now lets always by haulers if we can afford them and we have
     // fewer than 3 haulers idle.
-    await buyShipIfPossible(api, shipyardPrices, agentCache, ship);
+    await buyShipIfPossible(
+      api,
+      shipyardPrices,
+      agentCache,
+      transactionLog,
+      ship,
+    );
   }
 
   /// What the max multiplier of median we would pay for a ship.
@@ -838,6 +856,7 @@ class CentralCommand {
     Api api,
     ShipyardPrices shipyardPrices,
     AgentCache agentCache,
+    TransactionLog transactionLog,
     Ship ship,
   ) async {
     if (isBehaviorDisabled(Behavior.buyShip) ||
@@ -927,6 +946,7 @@ class CentralCommand {
       api,
       _shipCache,
       agentCache,
+      transactionLog,
       ship,
       shipyardSymbol,
       shipType,

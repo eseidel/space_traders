@@ -51,11 +51,6 @@ Welcome to Space Traders! 🚀
 ⏱️ 66s until 2023-05-20 10:31:43.985
 ```
 
-## Other Dart Clients
-
-The only other one I've seen is: https://crucknuk.itch.io/space-traders
-But I've not seen the source for that and it appears to be v1 rather than v2.
-
 ### Bugs to report to OpenAPI
 * Required arguments in request body should make body required/non-nullable.
   Example: RegisterRequest for POST /users/register
@@ -67,18 +62,18 @@ But I've not seen the source for that and it appears to be v1 rather than v2.
 ## Development
 
 ## Reset day checklist
-* run `dart run bin/reset.dart` -- does not work.
+* run `dart run bin/reset.dart`
 * Update open_api_config.yaml to have the latest git hash.
 * regenerate space_traders_api
 
 ### Generating `space_traders_api` package
 ```
 dart pub global activate openapi_generator_cli
-rmdir packages/openapi/
+rm -rf packages/openapi/
 openapi-generator generate -c open_api_config.yaml
 ```
 Then modified:
-* `rmdir packages/openapi/test` directory since it was just TODOs.
+* `rm -rf packages/openapi/test` directory since it was just TODOs.
 * Fixed handling of required num fields:
     * `packages/openapi/lib/model/jump_gate.dart`
   Due to: https://github.com/OpenAPITools/openapi-generator/pull/10637#pullrequestreview-1425351014

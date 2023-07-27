@@ -110,12 +110,20 @@ Multiset<ShipMountSymbolEnum> countMountedMounts(Ship ship) {
   );
 }
 
-/// Compute the mounts needed to make the given ship match the given template.
-Multiset<ShipMountSymbolEnum> mountsNeededForShip(
+/// Mounts to add to make [ship] match [template].
+Multiset<ShipMountSymbolEnum> mountsToAddToShip(
   Ship ship,
   ShipTemplate template,
 ) {
   return template.mounts.difference(countMountedMounts(ship));
+}
+
+/// Mounts to remove to make [ship] match [template].
+Multiset<ShipMountSymbolEnum> mountsToRemoveFromShip(
+  Ship ship,
+  ShipTemplate template,
+) {
+  return countMountedMounts(ship).difference(template.mounts);
 }
 
 class _BuyRequest {
@@ -355,6 +363,7 @@ Future<JobResult> doBuyJob(
   await centralCommand.visitLocalShipyard(
     api,
     caches.shipyardPrices,
+    caches.transactions,
     caches.agent,
     currentWaypoint,
     ship,

@@ -92,6 +92,7 @@ void main() {
       () => centralCommand.visitLocalShipyard(
         api,
         shipyardPrices,
+        transactionLog,
         agentCache,
         waypoint,
         ship,

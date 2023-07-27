@@ -125,7 +125,7 @@ String stringForPriceDeviance(
 }
 
 /// Logs a transaction to the console.
-void logTransaction(
+void logMarketTransaction(
   Ship ship,
   MarketPrices marketPrices,
   Agent agent,
@@ -157,9 +157,34 @@ void logTransaction(
     // prices are commonly 5 digits + ',' and 'c' so we pad to 7.
     '${creditsString(transaction.pricePerUnit).padLeft(7)} = '
     '$totalPriceString -> '
-    // Always want the 'c' after the credits.
     '🏦 ${creditsString(agent.credits)}',
   );
+}
+
+/// Log a shipyard transaction to the console.
+void logShipyardTransaction(
+  Ship ship,
+  Agent agent,
+  ShipyardTransaction t,
+) {
+  shipInfo(
+      ship,
+      'Purchased ${t.shipSymbol} for '
+      '${creditsString(t.price)} -> '
+      '🏦 ${creditsString(agent.credits)}');
+}
+
+/// Log a ship modification transaction to the console.
+void logShipModificationTransaction(
+  Ship ship,
+  Agent agent,
+  ShipModificationTransaction t,
+) {
+  shipInfo(
+      ship,
+      '🔧 ${t.tradeSymbol} on ${t.shipSymbol} for '
+      '${creditsString(t.totalPrice)} -> '
+      '🏦 ${creditsString(agent.credits)}');
 }
 
 /// Generate a String for the given [duration].

@@ -142,6 +142,7 @@ Future<DateTime?> advanceBuyShip(
     api,
     caches.ships,
     caches.agent,
+    caches.transactions,
     ship,
     shipyard.waypointSymbol,
     shipType,

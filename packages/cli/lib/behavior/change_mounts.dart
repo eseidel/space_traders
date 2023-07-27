@@ -4,6 +4,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:more/collection.dart';
 
@@ -15,7 +16,35 @@ ShipMountSymbolEnum? _pickMountFromAvailable(
   return needed.firstWhereOrNull((mount) => available[mount] > 0);
 }
 
-/// Install a mount on a ship.
+/// Remove mount from a ship's mount list (but not cargo).
+Future<RemoveMount201ResponseData> removeMount(
+  Api api,
+  AgentCache agentCache,
+  ShipCache shipCache,
+  TransactionLog transactionLog,
+  Ship ship,
+  ShipMountSymbolEnum tradeSymbol,
+) async {
+  final response = await api.fleet.removeMount(
+    ship.symbol,
+    removeMountRequest: RemoveMountRequest(symbol: tradeSymbol.value),
+  );
+  final data = response!.data;
+  agentCache.agent = data.agent;
+  ship
+    ..cargo = data.cargo
+    ..mounts = data.mounts;
+  await shipCache.updateShip(ship);
+  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
+  final transaction = Transaction.fromShipModificationTransaction(
+    data.transaction,
+    agentCache.agent.credits,
+  );
+  transactionLog.log(transaction);
+  return data;
+}
+
+/// Install a mount on a ship from its cargo.
 Future<InstallMount201ResponseData> installMount(
   Api api,
   AgentCache agentCache,
@@ -34,8 +63,12 @@ Future<InstallMount201ResponseData> installMount(
     ..cargo = data.cargo
     ..mounts = data.mounts;
   await shipCache.updateShip(ship);
-  // FIXME: Record the transaction.
-  // ShipModificationTransaction transaction;
+  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
+  final transaction = Transaction.fromShipModificationTransaction(
+    data.transaction,
+    agentCache.agent.credits,
+  );
+  transactionLog.log(transaction);
   return data;
 }
 
@@ -57,8 +90,12 @@ Future<Jettison200ResponseData> transferCargo(
     from.symbol,
     transferCargoRequest: request,
   );
-  // On failure
-  // ApiException 400: {"error":{"message":"Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1 unit(s) of MOUNT_MINING_LASER_II. Ship has 0 unit(s) of MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1","tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
+  // On failure:
+  // ApiException 400: {"error":{"message":
+  // "Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1
+  // unit(s) of MOUNT_MINING_LASER_II. Ship has 0 unit(s) of
+  // MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1",
+  // "tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
 
   final data = response!.data;
   from.cargo = data.cargo;
@@ -91,7 +128,7 @@ Future<DateTime?> advanceChangeMounts(
     return null;
   }
 
-  final needed = mountsNeededForShip(ship, template);
+  final needed = mountsToAddToShip(ship, template);
   if (needed.isEmpty) {
     centralCommand.disableBehaviorForShip(
       ship,
