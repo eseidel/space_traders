@@ -50,8 +50,7 @@ void main() {
       timestamp: moonLanding,
     );
     final surveys = [survey];
-    final surveyData = SurveyData(surveys: surveys, fs: fs);
-    await surveyData.save();
+    SurveyData(surveys: surveys, fs: fs).save();
     final surveyData2 = await SurveyData.load(fs);
     expect(surveyData2.surveys.length, surveys.length);
     // Could also json compare.

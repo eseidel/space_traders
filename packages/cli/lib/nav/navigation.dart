@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
@@ -12,6 +13,7 @@ import 'package:cli/printing.dart';
 Future<DateTime?> beingNewRouteAndLog(
   Api api,
   Ship ship,
+  ShipCache shipCache,
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
   CentralCommand centralCommand,
@@ -40,6 +42,7 @@ Future<DateTime?> beingNewRouteAndLog(
   final waitTime = await beingRouteAndLog(
     api,
     ship,
+    shipCache,
     systemsCache,
     centralCommand,
     route,
@@ -53,6 +56,7 @@ Future<DateTime?> beingNewRouteAndLog(
 Future<DateTime?> beingRouteAndLog(
   Api api,
   Ship ship,
+  ShipCache shipCache,
   SystemsCache systemsCache,
   CentralCommand centralCommand,
   RoutePlan routePlan,
@@ -68,6 +72,7 @@ Future<DateTime?> beingRouteAndLog(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
+    shipCache,
     systemsCache,
     centralCommand,
   );
@@ -144,6 +149,7 @@ void _verifyJumpTime(
 Future<NavResult> continueNavigationIfNeeded(
   Api api,
   Ship ship,
+  ShipCache shipCache,
   SystemsCache systemsCache,
   CentralCommand centralCommand, {
   // Hook for overriding the current time in tests.
@@ -186,11 +192,11 @@ Future<NavResult> continueNavigationIfNeeded(
   final action = routePlan.nextActionFrom(ship.waypointSymbol);
   final actionStart = systemsCache.waypointFromSymbol(action.startSymbol);
   final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
-  await undockIfNeeded(api, ship);
+  await undockIfNeeded(api, shipCache, ship);
   switch (action.type) {
     case RouteActionType.jump:
       final response =
-          await useJumpGateAndLog(api, ship, actionEnd.systemSymbol);
+          await useJumpGateAndLog(api, shipCache, ship, actionEnd.systemSymbol);
       _verifyJumpTime(
         systemsCache,
         ship,
@@ -204,7 +210,7 @@ Future<NavResult> continueNavigationIfNeeded(
     case RouteActionType.navCruise:
       // We're in the same system as the end, so we can just navigate there.
       final arrivalTime =
-          await navigateToLocalWaypointAndLog(api, ship, actionEnd);
+          await navigateToLocalWaypointAndLog(api, shipCache, ship, actionEnd);
       final flightTime = arrivalTime.difference(DateTime.timestamp());
 
       final expectedFlightTime = Duration(

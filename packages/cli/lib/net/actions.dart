@@ -21,23 +21,24 @@ export 'package:cli/net/direct.dart';
 /// there is insufficient fuel.
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Api api,
+  ShipCache shipCache,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
-  await undockIfNeeded(api, ship);
+  await undockIfNeeded(api, shipCache, ship);
   if (!ship.usesFuel && ship.nav.flightMode != ShipNavFlightMode.BURN) {
     shipInfo(ship, 'Does not use fuel, setting flight mode to burn.');
-    await setShipFlightMode(api, ship, ShipNavFlightMode.BURN);
+    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.BURN);
   }
   try {
-    return await navigateShip(api, ship, waypointSymbol);
+    return await navigateShip(api, shipCache, ship, waypointSymbol);
   } on ApiException catch (e) {
     if (!isInfuficientFuelException(e)) {
       rethrow;
     }
     shipWarn(ship, 'Insufficient fuel, drifting to $waypointSymbol');
-    await setShipFlightMode(api, ship, ShipNavFlightMode.DRIFT);
-    return navigateShip(api, ship, waypointSymbol);
+    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.DRIFT);
+    return navigateShip(api, shipCache, ship, waypointSymbol);
   }
 }
 
@@ -230,6 +231,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   MarketPrices marketPrices,
   TransactionLog transactionLog,
   AgentCache agentCache,
+  ShipCache shipCache,
   Market market,
   Ship ship,
 ) async {
@@ -271,7 +273,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
       shipInfo(ship, 'Resetting flight mode to cruise');
-      await setShipFlightMode(api, ship, ShipNavFlightMode.CRUISE);
+      await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.CRUISE);
     }
     return data;
   } on ApiException catch (e) {
@@ -286,27 +288,30 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
 }
 
 /// Dock the ship if needed and log the transaction
-Future<void> dockIfNeeded(Api api, Ship ship) async {
+Future<void> dockIfNeeded(Api api, ShipCache shipCache, Ship ship) async {
   if (ship.isOrbiting) {
     shipDetail(ship, '🛬 at ${ship.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol);
     ship.nav = response!.data.nav;
+    shipCache.updateShip(ship);
   }
 }
 
 /// Undock the ship if needed and log the transaction
-Future<void> undockIfNeeded(Api api, Ship ship) async {
+Future<void> undockIfNeeded(Api api, ShipCache shipCache, Ship ship) async {
   if (ship.isDocked) {
     // Extra space after emoji is needed for windows powershell.
     shipDetail(ship, '🛰️  at ${ship.waypointSymbol}');
     final response = await api.fleet.orbitShip(ship.symbol);
     ship.nav = response!.data.nav;
+    shipCache.updateShip(ship);
   }
 }
 
 /// Navigate to the waypoint and log to the ship's log
 Future<DateTime> navigateToLocalWaypointAndLog(
   Api api,
+  ShipCache shipCache,
   Ship ship,
   SystemWaypoint waypoint,
 ) async {
@@ -315,8 +320,12 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   //   await refuelIfNeededAndLog(api, marketPrices, agent, ship);
   // }
 
-  final result =
-      await navigateToLocalWaypoint(api, ship, waypoint.waypointSymbol);
+  final result = await navigateToLocalWaypoint(
+    api,
+    shipCache,
+    ship,
+    waypoint.waypointSymbol,
+  );
   final flightTime = result.nav.route.arrival.difference(DateTime.timestamp());
   if (ship.fuelPercentage < 0.5) {
     shipWarn(ship, 'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}');
@@ -353,6 +362,7 @@ Future<void> chartWaypointAndLog(
 
 Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
   Api api,
+  ShipCache shipCache,
   Ship ship,
   SystemSymbol systemSymbol,
 ) async {
@@ -360,6 +370,7 @@ Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
   final response =
       await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
   ship.nav = response!.data.nav;
+  shipCache.updateShip(ship);
   // shipDetail(ship, 'Used Jump Gate to $systemSymbol');
   return response.data;
 }
@@ -367,11 +378,13 @@ Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
 /// Use the jump gate to travel to [systemSymbol] and log.
 Future<JumpShip200ResponseData> useJumpGateAndLog(
   Api api,
+  ShipCache shipCache,
   Ship ship,
   SystemSymbol systemSymbol,
 ) async {
   try {
-    final waitUntil = await _useJumpGateAndLogInner(api, ship, systemSymbol);
+    final waitUntil =
+        await _useJumpGateAndLogInner(api, shipCache, ship, systemSymbol);
     return waitUntil;
   } on ApiException catch (e) {
     if (!isShipNotInOrbitException(e)) {
@@ -379,7 +392,8 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
     }
     // This is an error in the surrounding code (or possibly our cached state).
     shipWarn(ship, 'Ship tried to jump while not in orbit?!');
-    final waitUntil = await _useJumpGateAndLogInner(api, ship, systemSymbol);
+    final waitUntil =
+        await _useJumpGateAndLogInner(api, shipCache, ship, systemSymbol);
     return waitUntil;
   }
 }
@@ -388,13 +402,14 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
 Future<Contract> negotiateContractAndLog(
   Api api,
   Ship ship,
+  ShipCache shipCache,
   ContractCache contractCache,
 ) async {
-  await dockIfNeeded(api, ship);
+  await dockIfNeeded(api, shipCache, ship);
   final response = await api.fleet.negotiateContract(ship.symbol);
   final contractData = response!.data;
   final contract = contractData.contract;
-  await contractCache.updateContract(contract);
+  contractCache.updateContract(contract);
   shipInfo(ship, 'Negotiated contract: ${contractDescription(contract)}');
   return contract;
 }
@@ -409,7 +424,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   final response = await api.contracts.acceptContract(contract.id);
   final data = response!.data;
   agentCache.agent = data.agent;
-  await contractCache.updateContract(data.contract);
+  contractCache.updateContract(data.contract);
   logger
     ..info('Accepted: ${contractDescription(contract)}.')
     ..info(

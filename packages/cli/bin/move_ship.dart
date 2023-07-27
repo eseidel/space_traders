@@ -12,15 +12,19 @@ Future<void> _navigateToLocalWaypointAndDock(
   Waypoint destination,
   bool shouldDock,
 ) async {
-  final navigateResult =
-      await navigateToLocalWaypoint(api, ship, destination.waypointSymbol);
+  final navigateResult = await navigateToLocalWaypoint(
+    api,
+    caches.ships,
+    ship,
+    destination.waypointSymbol,
+  );
   final eta = navigateResult.nav.route.arrival;
   final flightTime = eta.difference(DateTime.now());
   logger.info('Expected in $flightTime.');
   if (shouldDock) {
     logger.info('Waiting to dock...');
     await Future<void>.delayed(flightTime);
-    await dockIfNeeded(api, ship);
+    await dockIfNeeded(api, caches.ships, ship);
     await visitLocalMarket(api, caches, destination, ship);
     logger.info('Docked.');
   }
@@ -71,6 +75,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
       caches.marketPrices,
       caches.transactions,
       caches.agent,
+      caches.ships,
       market!,
       ship,
     );
@@ -93,6 +98,7 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
   if (ship.waypointSymbol != jumpGateWaypoint!.waypointSymbol) {
     final arrival = await navigateToLocalWaypointAndLog(
       api,
+      caches.ships,
       ship,
       jumpGateWaypoint,
     );

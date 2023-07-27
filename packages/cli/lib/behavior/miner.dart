@@ -241,6 +241,7 @@ Future<DateTime?> advanceMiner(
     return beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,
@@ -262,6 +263,7 @@ Future<DateTime?> advanceMiner(
     return beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,
@@ -294,7 +296,7 @@ Future<DateTime?> advanceMiner(
   }
 
   // Both surveying and mining require being undocked.
-  await undockIfNeeded(api, ship);
+  await undockIfNeeded(api, caches.ships, ship);
 
   // See if we have a good survey to mine.
   final maybeSurvey = await surveyWorthMining(

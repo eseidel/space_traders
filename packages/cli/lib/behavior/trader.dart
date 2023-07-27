@@ -172,6 +172,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
   return beingNewRouteAndLog(
     api,
     ship,
+    caches.ships,
     caches.systems,
     caches.routePlanner,
     centralCommand,
@@ -245,6 +246,7 @@ Future<DateTime?> _handleContractDealAtDestination(
   final maybeResponse = await _deliverContractGoodsIfPossible(
     api,
     caches.contracts,
+    caches.ships,
     ship,
     contract,
     neededGood!,
@@ -262,7 +264,7 @@ Future<DateTime?> _handleContractDealAtDestination(
       final response = await api.contracts.fulfillContract(contract.id);
       final data = response!.data;
       caches.agent.agent = data.agent;
-      await caches.contracts.updateContract(data.contract);
+      caches.contracts.updateContract(data.contract);
       shipInfo(ship, 'Contract complete!');
       return null;
     }
@@ -273,6 +275,7 @@ Future<DateTime?> _handleContractDealAtDestination(
 Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   Api api,
   ContractCache contractCache,
+  ShipCache shipCache,
   Ship ship,
   Contract contract,
   ContractDeliverGood goods,
@@ -295,6 +298,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   final response = await deliverContract(
     api,
     ship,
+    shipCache,
     contractCache,
     contract,
     tradeSymbol: goods.tradeSymbolObject,
@@ -324,6 +328,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
     return beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,
@@ -336,6 +341,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
     return beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,
@@ -359,6 +365,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
     return beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,
@@ -434,18 +441,54 @@ Future<DateTime?> _handleDeal(
   );
 }
 
+int? _expectedContractProfit(Contract contract, MarketPrices marketPrices) {
+  // Add up the total expected outlay.
+  final terms = contract.terms;
+  final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();
+  final medianPricesBySymbol = <TradeSymbol, int>{};
+  for (final tradeSymbol in tradeSymbols) {
+    final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol);
+    if (medianPrice == null) {
+      return null;
+    }
+    medianPricesBySymbol[tradeSymbol] = medianPrice;
+  }
+
+  final expectedOutlay = terms.deliver
+      .map(
+        (d) => medianPricesBySymbol[d.tradeSymbolObject]! * d.unitsRequired,
+      )
+      .fold(0, (sum, e) => sum + e);
+  final payment = contract.terms.payment;
+  final reward = payment.onAccepted + payment.onFulfilled;
+  return reward - expectedOutlay;
+}
+
+/// Returns a string describing the expected profit of a contract.
+String describeExpectedContractProfit(
+  MarketPrices marketPrices,
+  Contract contract,
+) {
+  final profit = _expectedContractProfit(contract, marketPrices);
+  final profitString = profit == null ? 'unknown' : creditsString(profit);
+  return 'Expected profit: $profitString';
+}
+
 /// Accepts contracts for us if needed.
 Future<DateTime?> acceptContractsIfNeeded(
   Api api,
   ContractCache contractCache,
+  MarketPrices marketPrices,
   AgentCache agentCache,
+  ShipCache shipCache,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
   final contracts = contractCache.activeContracts;
   if (contracts.isEmpty) {
-    await negotiateContractAndLog(api, ship, contractCache);
-    // TODO(eseidel): Print expected time and profits of the new contract.
+    final contract =
+        await negotiateContractAndLog(api, ship, shipCache, contractCache);
+    shipInfo(ship, describeExpectedContractProfit(marketPrices, contract));
     return null;
   }
   for (final contract in contractCache.unacceptedContracts) {
@@ -462,6 +505,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   AgentCache agentCache,
   ContractCache contractCache,
   MarketPrices marketPrices,
+  ShipCache shipCache,
   Ship ship,
   String why,
 ) async {
@@ -487,6 +531,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   final waitUntil = await beingNewRouteAndLog(
     api,
     ship,
+    shipCache,
     systemsCache,
     routePlanner,
     centralCommand,
@@ -527,8 +572,8 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       caches.agent,
       currentMarket,
       ship,
-      // TODO(eseidel): We don't know what type of transaction this is.
-      // e.g. we could be selling MOUNTS which would be capital.
+      // We don't have a good way to know what type of cargo this is.
+      // Assuming it's goods (rather than captial) is probably fine.
       AccountingType.goods,
       where: isNotWantedCargo,
     );
@@ -559,6 +604,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   final waitUntil = await beingRouteAndLog(
     api,
     ship,
+    caches.ships,
     caches.systems,
     centralCommand,
     costedTrip.route,
@@ -600,7 +646,9 @@ Future<DateTime?> advanceTrader(
     await acceptContractsIfNeeded(
       api,
       caches.contracts,
+      caches.marketPrices,
       caches.agent,
+      caches.ships,
       ship,
     );
   }
@@ -661,6 +709,7 @@ Future<DateTime?> advanceTrader(
       caches.agent,
       caches.contracts,
       caches.marketPrices,
+      caches.ships,
       ship,
       why,
     );

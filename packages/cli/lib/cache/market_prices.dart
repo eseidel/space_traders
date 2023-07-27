@@ -201,7 +201,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
         _prices.add(newPrice);
       }
     }
-    await save();
+    save();
   }
 
   static int _sellPriceAcending(MarketPrice a, MarketPrice b) =>

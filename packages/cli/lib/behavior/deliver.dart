@@ -388,6 +388,7 @@ Future<JobResult> doBuyJob(
     final waitUntil = await beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,
@@ -395,6 +396,10 @@ Future<JobResult> doBuyJob(
     );
     return JobResult.wait(waitUntil);
   }
+  // TODO(eseidel): Should reassess the buyJob now that we've arrived.
+  // Sometimes it takes a long time to get here, and we might now need more
+  // items than we did when we started.
+
   final existingUnits = ship.countUnits(buyJob.tradeSymbol);
   if (existingUnits >= buyJob.units) {
     shipWarn(ship, 'Deliver already has ${buyJob.units} ${buyJob.tradeSymbol}');
@@ -409,7 +414,7 @@ Future<JobResult> doBuyJob(
   }
 
   // Otherwise we're at our buy location and we buy.
-  await dockIfNeeded(api, ship);
+  await dockIfNeeded(api, caches.ships, ship);
 
   // TODO(eseidel): Share this code with trader.dart
   final tradeSymbol = buyJob.tradeSymbol;
@@ -479,6 +484,7 @@ Future<JobResult> doDeliverJob(
     final waitUntil = await beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,

@@ -58,14 +58,14 @@ class ContractCache extends ResponseListCache<Contract> {
   List<Contract> get contracts => entries;
 
   /// Updates a single contract in the cache.
-  Future<void> updateContract(Contract contract) async {
+  void updateContract(Contract contract) {
     final index = contracts.indexWhere((c) => c.id == contract.id);
     if (index == -1) {
       contracts.add(contract);
     } else {
       contracts[index] = contract;
     }
-    await save();
+    save();
   }
 
   /// Returns a list of all completed contracts.

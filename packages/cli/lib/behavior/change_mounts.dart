@@ -34,7 +34,7 @@ Future<RemoveMount201ResponseData> removeMount(
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
-  await shipCache.updateShip(ship);
+  shipCache.updateShip(ship);
   logShipModificationTransaction(ship, agentCache.agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
@@ -62,7 +62,7 @@ Future<InstallMount201ResponseData> installMount(
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
-  await shipCache.updateShip(ship);
+  shipCache.updateShip(ship);
   logShipModificationTransaction(ship, agentCache.agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
@@ -100,9 +100,21 @@ Future<Jettison200ResponseData> transferCargo(
   final data = response!.data;
   from.cargo = data.cargo;
   to.updateCacheWithAddedCargo(tradeSymbol, units);
-  await cache.updateShip(from);
-  await cache.updateShip(to);
+  cache
+    ..updateShip(from)
+    ..updateShip(to);
   return data;
+}
+
+/// Returns ShipCargoItems for mounts in our cargo if any.
+/// Used for getting rid of extra mounts at the end of a change-mounts job.
+Iterable<ShipCargoItem> mountsInCargo(Ship ship) sync* {
+  for (final cargoItem in ship.cargo.inventory) {
+    final isMount = mountSymbolForTradeSymbol(cargoItem.tradeSymbol) != null;
+    if (isMount) {
+      yield cargoItem;
+    }
+  }
 }
 
 /// Change mounts on a ship.
@@ -149,10 +161,10 @@ Future<DateTime?> advanceChangeMounts(
     }
 
     final tradeSymbol = tradeSymbolForMountSymbol(toMount)!;
-    final fromShip =
+    final deliveryShip =
         centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol);
 
-    if (fromShip == null) {
+    if (deliveryShip == null) {
       centralCommand.disableBehaviorForAll(
         ship,
         'No delivery ship for $tradeSymbol.',
@@ -162,34 +174,44 @@ Future<DateTime?> advanceChangeMounts(
     }
 
     // We could match the docking status instead.
-    if (!fromShip.isDocked) {
+    if (!deliveryShip.isDocked) {
       shipErr(ship, 'Delivery ship undocked during change mount, docking it.');
       // Terrible hack.
-      await dockIfNeeded(api, fromShip);
+      await dockIfNeeded(api, caches.ships, deliveryShip);
       // centralCommand.completeBehavior(ship.shipSymbol);
       // return null;
     }
 
-    await dockIfNeeded(api, ship);
+    await dockIfNeeded(api, caches.ships, ship);
 
     if (ship.countUnits(tradeSymbol) < 1) {
       // Get it from the delivery ship.
       await transferCargo(
         api,
         caches.ships,
-        from: fromShip,
+        from: deliveryShip,
         to: ship,
         tradeSymbol: tradeSymbol,
         units: 1,
       );
     }
 
-    // Unmount existing mounts if needed.
-    // const toBeRemoved = TradeSymbol.MOUNT_MINING_LASER_I;
-    // await api.fleet.removeMount(
-    //   ship.symbol,
-    //   removeMountRequest: RemoveMountRequest(symbol: toBeRemoved.value),
-    // );
+    // TODO(eseidel): This should only remove mounts if we absolutely need to.
+    // This could end up removing mounts before we need to.
+    final toRemove = mountsToRemoveFromShip(ship, template);
+    if (toRemove.isNotEmpty) {
+      // Unmount existing mounts if needed.
+      for (final mount in toRemove) {
+        await removeMount(
+          api,
+          caches.agent,
+          caches.ships,
+          caches.transactions,
+          ship,
+          mount,
+        );
+      }
+    }
 
     // Mount the new mount.
     await installMount(
@@ -202,6 +224,20 @@ Future<DateTime?> advanceChangeMounts(
     );
 
     // Give the delivery ship our extra mount if we have one.
+    final extraMounts = mountsInCargo(ship).toList();
+    if (extraMounts.isNotEmpty) {
+      // This could send more items than deliveryShip has space for.
+      for (final cargoItem in extraMounts) {
+        await transferCargo(
+          api,
+          caches.ships,
+          from: ship,
+          to: deliveryShip,
+          tradeSymbol: cargoItem.tradeSymbol,
+          units: cargoItem.units,
+        );
+      }
+    }
 
     // We're done.
     centralCommand.disableBehaviorForShip(
@@ -243,6 +279,7 @@ Future<DateTime?> advanceChangeMounts(
   final waitUntil = beingNewRouteAndLog(
     api,
     ship,
+    caches.ships,
     caches.systems,
     caches.routePlanner,
     centralCommand,

@@ -154,7 +154,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
         _prices.add(newPrice);
       }
     }
-    await save();
+    save();
   }
 
   /// Get the median purchase price for a [ShipType].

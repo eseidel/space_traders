@@ -54,6 +54,8 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
+class _MockShipCache extends Mock implements ShipCache {}
+
 void main() {
   test('advanceTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
@@ -101,6 +103,8 @@ void main() {
     when(() => caches.contracts).thenReturn(contractCache);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
     when(() => caches.routePlanner).thenReturn(routePlanner);
+    final shipCache = _MockShipCache();
+    when(() => caches.ships).thenReturn(shipCache);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -281,6 +285,8 @@ void main() {
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
     final routePlanner = _MockRoutePlanner();
     when(() => caches.routePlanner).thenReturn(routePlanner);
+    final shipCache = _MockShipCache();
+    when(() => caches.ships).thenReturn(shipCache);
 
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
@@ -519,6 +525,8 @@ void main() {
     when(() => caches.contracts).thenReturn(contractCache);
     when(() => contractCache.activeContracts).thenReturn([]);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
+    final shipCache = _MockShipCache();
+    when(() => caches.ships).thenReturn(shipCache);
     final routePlanner = _MockRoutePlanner();
     when(() => caches.routePlanner).thenReturn(routePlanner);
     final contract = Contract(
@@ -530,9 +538,6 @@ void main() {
         deadline: DateTime(2021),
         payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
       ),
-    );
-    when(() => contractCache.updateContract(contract)).thenAnswer(
-      (_) => Future.value(),
     );
 
     final agent = _MockAgent();

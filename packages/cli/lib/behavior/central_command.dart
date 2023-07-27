@@ -132,15 +132,15 @@ class CentralCommand {
   /// What template should we use for the given ship?
   ShipTemplate? templateForShip(Ship ship) {
     // Hack to test a new template.
-    // if (ship.symbol == 'ESEIDEL-1B') {
-    //   return ShipTemplate(
-    //     frameSymbol: ShipFrameSymbolEnum.MINER,
-    //     mounts: Multiset.from([
-    //       ShipMountSymbolEnum.SURVEYOR_II,
-    //       ShipMountSymbolEnum.SURVEYOR_II,
-    //     ]),
-    //   );
-    // }
+    if (ship.symbol == 'ESEIDEL-1B') {
+      return ShipTemplate(
+        frameSymbol: ShipFrameSymbolEnum.MINER,
+        mounts: Multiset.from([
+          ShipMountSymbolEnum.SURVEYOR_II,
+          ShipMountSymbolEnum.SURVEYOR_II,
+        ]),
+      );
+    }
 
     // According to SAF:
     // Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
@@ -863,9 +863,6 @@ class CentralCommand {
         isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
       return false;
     }
-
-    // TODO(eseidel): Consider which ships are sold at this shipyard.
-
     // This assumes the ship in question is at a shipyard and already docked.
     final shipyardSymbol = ship.waypointSymbol;
     final shipType = shipTypeToBuy(
@@ -874,14 +871,13 @@ class CentralCommand {
       agentCache,
       shipyardSymbol,
     );
-    // TODO(eseidel): This is wrong, this will disable buying for all
-    // ships even though we might just be at a system where we don't need a ship
-    // or can't afford one?
     if (shipType == null) {
-      disableBehaviorForAll(
+      // We may just be at a shipyard which doesn't have ships we want
+      // just disable this behavior for this ship briefly.
+      disableBehaviorForShip(
         ship,
-        'No ships needed.',
-        const Duration(minutes: 10),
+        'No ship to buy at $shipyardSymbol.',
+        const Duration(minutes: 5),
         explicitBehavior: Behavior.buyShip,
       );
       return false;

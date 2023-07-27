@@ -1,6 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
@@ -21,11 +22,14 @@ class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockShipCache extends Mock implements ShipCache {}
+
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
     final api = _MockApi();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
+    final shipCache = _MockShipCache();
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
@@ -52,6 +56,7 @@ void main() {
       () => continueNavigationIfNeeded(
         api,
         ship,
+        shipCache,
         systemsCache,
         centralCommand,
         getNow: getNow,
@@ -74,6 +79,7 @@ void main() {
       () => continueNavigationIfNeeded(
         api,
         ship,
+        shipCache,
         systemsCache,
         centralCommand,
         getNow: getNow,

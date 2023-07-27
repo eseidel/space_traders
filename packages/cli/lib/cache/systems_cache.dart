@@ -78,8 +78,7 @@ class SystemsCache extends JsonListStore<System> {
         throw ApiException(response.statusCode, response.body);
       }
       final systems = _parseSystems(response.body);
-      final data = SystemsCache(systems: systems, fs: fs, path: path);
-      await data.save();
+      final data = SystemsCache(systems: systems, fs: fs, path: path)..save();
       return data;
     } catch (e) {
       logger.warn('Failed to load systems from $uri: $e');

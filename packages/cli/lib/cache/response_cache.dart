@@ -65,11 +65,11 @@ class ResponseListCache<T> extends JsonListStore<T> {
       return;
     }
     logger.warn('$T list changed, updating cache.');
-    await update(newEntries);
+    replaceEntries(newEntries);
   }
 
   /// Updates the entries in the cache.
-  Future<void> update(List<T> newEntries) async {
+  void replaceEntries(List<T> newEntries) {
     entries
       ..clear()
       ..addAll(newEntries);

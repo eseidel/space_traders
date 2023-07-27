@@ -50,10 +50,6 @@ void main() {
       (invocation) => Future.value(PurchaseShip201Response(data: responseData)),
     );
 
-    when(() => shipCache.updateShip(responseData.ship)).thenAnswer(
-      (invocation) => Future.value(),
-    );
-
     final fs = MemoryFileSystem.test();
     final agentCache = AgentCache(agent1, fs: fs);
     final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
@@ -86,8 +82,9 @@ void main() {
     ).thenAnswer(
       (invocation) => Future.value(GetShipNav200Response(data: shipNav)),
     );
+    final shipCache = _MockShipCache();
 
-    await setShipFlightMode(api, ship, ShipNavFlightMode.CRUISE);
+    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.CRUISE);
     verify(() => ship.nav = shipNav).called(1);
   });
 
@@ -108,12 +105,13 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    final shipCache = _MockShipCache();
     final logger = _MockLogger();
-    await runWithLogger(logger, () => undockIfNeeded(api, ship));
+    await runWithLogger(logger, () => undockIfNeeded(api, shipCache, ship));
     verifyNever(() => fleetApi.orbitShip(any()));
 
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    await runWithLogger(logger, () => undockIfNeeded(api, ship));
+    await runWithLogger(logger, () => undockIfNeeded(api, shipCache, ship));
     verify(() => fleetApi.orbitShip(any())).called(1);
   });
 
@@ -128,6 +126,7 @@ void main() {
         ),
       ),
     );
+    final shipCache = _MockShipCache();
     final ship = _MockShip();
     when(() => ship.emojiName).thenReturn('S');
     final shipNav = _MockShipNav();
@@ -135,11 +134,11 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final logger = _MockLogger();
-    await runWithLogger(logger, () => dockIfNeeded(api, ship));
+    await runWithLogger(logger, () => dockIfNeeded(api, shipCache, ship));
     verifyNever(() => fleetApi.dockShip(any()));
 
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    await runWithLogger(logger, () => dockIfNeeded(api, ship));
+    await runWithLogger(logger, () => dockIfNeeded(api, shipCache, ship));
     verify(() => fleetApi.dockShip(any())).called(1);
   });
 
@@ -157,6 +156,7 @@ void main() {
     final shipFuel = _MockShipFuel();
     when(() => ship.fuel).thenReturn(shipFuel);
     when(() => shipFuel.capacity).thenReturn(0);
+    final shipCache = _MockShipCache();
 
     when(
       () => fleetApi.patchShipNav(
@@ -190,6 +190,7 @@ void main() {
       logger,
       () => navigateToLocalWaypoint(
         api,
+        shipCache,
         ship,
         WaypointSymbol.fromString('S-A-W'),
       ),

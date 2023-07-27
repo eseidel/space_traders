@@ -33,8 +33,7 @@ void main() {
       deadlineToAccept: moonLanding,
     );
     final contracts = [contract];
-    final contractCache = ContractCache(contracts, fs: fs);
-    await contractCache.save();
+    ContractCache(contracts, fs: fs).save();
     final contractCache2 = await ContractCache.load(api, fs: fs);
     expect(contractCache2.contracts.length, contracts.length);
     // Contract.toJson doesn't recurse (openapi gen bug), so use jsonEncode.

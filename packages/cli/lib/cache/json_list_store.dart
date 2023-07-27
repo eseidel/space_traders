@@ -39,12 +39,11 @@ class JsonListStore<Record> {
   }
 
   /// Save entries to a file.
-  Future<void> save() async {
-    final file = _fs.file(_path);
-    await file.create(recursive: true);
+  void save() {
+    final file = _fs.file(_path)..createSync(recursive: true);
     const encoder = JsonEncoder.withIndent(' ');
     final prettyprint = encoder.convert(entries);
-    await file.writeAsString(prettyprint);
+    file.writeAsStringSync(prettyprint);
   }
 
   /// Load entries from a file.

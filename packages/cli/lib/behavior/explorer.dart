@@ -60,7 +60,7 @@ Future<Market?> visitLocalMarket(
   // This could avoid the dock and market lookup if the caller
   // doesn't need the Market value, we don't need fuel and we have
   // recent market data.
-  await dockIfNeeded(api, ship);
+  await dockIfNeeded(api, caches.ships, ship);
   final market = await recordMarketDataIfNeededAndLog(
     caches.marketPrices,
     caches.markets,
@@ -74,6 +74,7 @@ Future<Market?> visitLocalMarket(
       caches.marketPrices,
       caches.transactions,
       caches.agent,
+      caches.ships,
       market,
       ship,
     );
@@ -244,6 +245,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   final waitUntil = await beingNewRouteAndLog(
     api,
     ship,
+    caches.ships,
     caches.systems,
     caches.routePlanner,
     centralCommand,
@@ -342,6 +344,7 @@ Future<DateTime?> advanceExplorer(
     return beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,

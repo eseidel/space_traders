@@ -155,8 +155,7 @@ void main() {
       ),
     );
     final ships = [ship];
-    final shipCache = ShipCache(ships, fs: fs);
-    await shipCache.save();
+    ShipCache(ships, fs: fs).save();
     final shipCache2 = await ShipCache.load(api, fs: fs);
     expect(shipCache2.ships.length, ships.length);
     // Ship.toJson doesn't recurse (openapi gen bug), so use jsonEncode.

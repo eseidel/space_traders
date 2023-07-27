@@ -63,14 +63,14 @@ class ShipCache extends ResponseListCache<Ship> {
   List<Ship> get ships => entries;
 
   /// Updates a single ship in the cache.
-  Future<void> updateShip(Ship ship) async {
+  void updateShip(Ship ship) {
     final index = ships.indexWhere((s) => s.symbol == ship.symbol);
     if (index == -1) {
       ships.add(ship);
     } else {
       ships[index] = ship;
     }
-    await save();
+    save();
   }
 
   /// Returns a map of ship frame type to count in fleet.

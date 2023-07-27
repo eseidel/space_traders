@@ -131,10 +131,10 @@ class Caches {
     );
 
     // Save out the caches we never modify so we don't have to load them again.
-    await factions.save();
+    factions.save();
 
     // We rarely modify contracts, so save them out here too.
-    await contracts.save();
+    contracts.save();
 
     return Caches._(
       agent: agent,
@@ -173,6 +173,6 @@ class Caches {
 
     // TODO(eseidel): Ship objects get modifed directly and ShipCache isn't told
     // about those modifications, so save it out every loop.
-    await ships.save();
+    ships.save();
   }
 }

@@ -24,6 +24,7 @@ Future<DateTime?> advanceShipBehavior(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
+    caches.ships,
     caches.systems,
     centralCommand,
     getNow: getNow,

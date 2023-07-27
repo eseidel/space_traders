@@ -24,7 +24,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   final purchaseResponse =
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
   final data = purchaseResponse!.data;
-  await shipCache.updateShip(data.ship);
+  shipCache.updateShip(data.ship);
   agentCache.agent = data.agent;
   return data;
 }
@@ -32,6 +32,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
 /// Set the [flightMode] of [ship]
 Future<ShipNav> setShipFlightMode(
   Api api,
+  ShipCache shipCache,
   Ship ship,
   ShipNavFlightMode flightMode,
 ) async {
@@ -39,12 +40,14 @@ Future<ShipNav> setShipFlightMode(
   final response =
       await api.fleet.patchShipNav(ship.symbol, patchShipNavRequest: request);
   ship.nav = response!.data;
+  shipCache.updateShip(ship);
   return response.data;
 }
 
 /// Navigate [ship] to [waypointSymbol]
 Future<NavigateShip200ResponseData> navigateShip(
   Api api,
+  ShipCache shipCache,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
@@ -55,6 +58,7 @@ Future<NavigateShip200ResponseData> navigateShip(
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
+  shipCache.updateShip(ship);
   return data;
 }
 
@@ -80,6 +84,7 @@ Future<ExtractResources201ResponseData> extractResources(
 Future<DeliverContract200ResponseData> deliverContract(
   Api api,
   Ship ship,
+  ShipCache shipCache,
   ContractCache contractCache,
   Contract contract, {
   required TradeSymbol tradeSymbol,
@@ -93,8 +98,9 @@ Future<DeliverContract200ResponseData> deliverContract(
   final response = await api.contracts
       .deliverContract(contract.id, deliverContractRequest: request);
   final data = response!.data;
-  await contractCache.updateContract(data.contract);
+  contractCache.updateContract(data.contract);
   ship.cargo = data.cargo;
+  shipCache.updateShip(ship);
   return data;
 }
 

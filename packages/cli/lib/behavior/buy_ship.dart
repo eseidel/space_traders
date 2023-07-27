@@ -54,6 +54,8 @@ Future<DateTime?> advanceBuyShip(
   final medianPrice = caches.shipyardPrices.medianPurchasePrice(shipType);
   // TODO(eseidel): As written, this can never buy a ship immediately on spawn.
   // Since we won't have surveyed any shipyards yet.
+  // Should just remove medianPrice and work from opportunity cost instead
+  // like findBestMarketToBuyFrom does.
   if (medianPrice == null) {
     centralCommand.disableBehaviorForAll(
       ship,
@@ -97,6 +99,7 @@ Future<DateTime?> advanceBuyShip(
     return beingNewRouteAndLog(
       api,
       ship,
+      caches.ships,
       caches.systems,
       caches.routePlanner,
       centralCommand,

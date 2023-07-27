@@ -95,7 +95,7 @@ class SurveyData extends JsonListStore<HistoricalSurvey> {
   /// Add a survey to the store.
   Future<void> addSurveys(Iterable<HistoricalSurvey> survey) async {
     _surveys.addAll(survey);
-    await save();
+    save();
   }
 
   /// Return the most recent surveys.
@@ -136,7 +136,7 @@ class SurveyData extends JsonListStore<HistoricalSurvey> {
       throw ArgumentError('Survey not found: $survey');
     }
     _surveys[index] = _surveys[index].copyWith(exhausted: true);
-    await save();
+    save();
   }
 
   /// Return the percentile for the given estimated value.

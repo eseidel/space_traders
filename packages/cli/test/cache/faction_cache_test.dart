@@ -19,7 +19,7 @@ void main() {
       fs: fs,
     );
     expect(cache.factions.length, 1);
-    await cache.save();
+    cache.save();
     final cache2 = FactionCache.loadFromCache(fs)!;
     expect(cache2.factions.length, 1);
     final faction = cache2.factionBySymbol(FactionSymbols.AEGIS);
