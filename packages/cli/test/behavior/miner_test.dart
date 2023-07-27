@@ -198,7 +198,11 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
     when(() => ship.mounts).thenReturn([]);
 
+    when(() => centralCommand.mineSymbolForShip(systemsCache, agentCache, ship))
+        .thenReturn(symbol);
+
     final waypoint = _MockWaypoint();
+    when(() => waypoint.symbol).thenReturn(symbol.waypoint);
     when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
     when(() => waypoint.traits).thenReturn([]);
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);

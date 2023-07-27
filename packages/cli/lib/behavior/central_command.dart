@@ -131,9 +131,7 @@ class CentralCommand {
   Duration get maxAgeForExplorerData => _maxAgeForExplorerData;
 
   /// Shorten the max age for explorer data.
-  Duration shortenMaxAgeForExplorerData() {
-    return _maxAgeForExplorerData ~/= 2;
-  }
+  Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
 
   // To tell a given explorer what to do.
   // Figure out what squad they're in (are they watching a waypoint for us
@@ -146,10 +144,8 @@ class CentralCommand {
   // If there still isn't, then we print a warning and have them idle.
 
   /// What template should we use for the given ship?
-  ShipTemplate? templateForShip(Ship ship) {
-    final frameSymbol = ship.frame.symbol;
-    return _templates.firstWhereOrNull((e) => e.frameSymbol == frameSymbol);
-  }
+  ShipTemplate? templateForShip(Ship ship) =>
+      _templates.firstWhereOrNull((e) => e.frameSymbol == ship.frame.symbol);
 
   /// Add up all mounts needed for current ships based on current templating.
   Multiset<ShipMountSymbolEnum> mountsNeededForAllShips() {

@@ -119,37 +119,42 @@ Future<DateTime?> _handleAtSourceWithDeal(
 
   final maxPerUnitPrice = costedDeal.maxPurchaseUnitPrice;
 
+  // Could this get confused by having other cargo in our hold?
   final units = unitsToPurchase(good, ship, costedDeal.maxUnitsToBuy);
-  final transaction = await purchaseTradeGoodIfPossible(
-    api,
-    caches.marketPrices,
-    caches.transactions,
-    caches.agent,
-    ship,
-    good,
-    dealTradeSymbol,
-    maxWorthwhileUnitPurchasePrice: maxPerUnitPrice,
-    unitsToPurchase: units,
-  );
+  if (units > 0) {
+    final transaction = await purchaseTradeGoodIfPossible(
+      api,
+      caches.marketPrices,
+      caches.transactions,
+      caches.agent,
+      ship,
+      good,
+      dealTradeSymbol,
+      maxWorthwhileUnitPurchasePrice: maxPerUnitPrice,
+      unitsToPurchase: units,
+    );
 
-  if (transaction != null) {
-    await centralCommand.recordDealTransactions(ship, [transaction]);
-    if (ship.cargo.availableSpace > 0) {
+    if (transaction != null) {
+      await centralCommand.recordDealTransactions(ship, [transaction]);
+      final leftToBuy = unitsToPurchase(good, ship, costedDeal.maxUnitsToBuy);
+      if (leftToBuy > 0) {
+        shipInfo(
+          ship,
+          'Purchased $units of $dealTradeSymbol, still have '
+          '$leftToBuy units we would like to buy, looping.',
+        );
+        return null;
+      }
       shipInfo(
         ship,
-        'Purchased $units of $dealTradeSymbol, still have '
-        '${ship.cargo.availableSpace} units of cargo space looping.',
+        'Purchased ${transaction.quantity} ${transaction.tradeSymbol} '
+        '@ ${transaction.perUnitPrice} (expected '
+        '${costedDeal.deal.purchasePrice}) = '
+        '${creditsString(transaction.creditChange)}',
       );
-      return null;
     }
-    shipInfo(
-      ship,
-      'Purchased ${transaction.quantity} ${transaction.tradeSymbol} '
-      '@ ${transaction.perUnitPrice} (expected '
-      '${costedDeal.deal.purchasePrice}) = '
-      '${creditsString(transaction.creditChange)}',
-    );
   }
+
   final haveTradeCargo = ship.cargo.countUnits(dealTradeSymbol) > 0;
   if (!haveTradeCargo) {
     // We couldn't buy any cargo, so we're done with this deal.
@@ -160,7 +165,6 @@ Future<DateTime?> _handleAtSourceWithDeal(
     centralCommand.completeBehavior(ship.shipSymbol);
     return null;
   }
-
   // Otherwise we've bought what we can here, deliver what we have.
   // TODO(eseidel): Could use beginRouteAndLog instead?
   // That might work?  Note costedDeal.route is more than just source->dest

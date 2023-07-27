@@ -88,9 +88,9 @@ Then modified:
 
 Most impact:
 * Be able to support miners across multiple systems.
-* Be able to move miners between systems.
-* Add logic for buying and mounting modules.
-* Make saving take less time (log rolling or db?)
+* Be able to move miners between systems (squads).
+* Make saving take less time (log rolling or db?), also avoids dataloss.
+* Park a probe at a shipyard to buy ships.
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
@@ -325,6 +325,7 @@ Expected profit: 125,525c
 
 
 ### Bought too many units for a contract:
+(I think this is fixed by my unitsToPurchase changes.)
 
 ESEIDEL-2C: Behavior.trader
   Orbiting X1-SQ35-24719Z JUMP_GATE HAULER 105/120
