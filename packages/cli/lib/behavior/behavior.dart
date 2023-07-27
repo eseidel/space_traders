@@ -14,6 +14,9 @@ enum Behavior {
   /// Mine asteroids and sell the ore.
   miner,
 
+  /// Survey indefinitely.
+  surveyor,
+
   /// Idle.
   idle,
 

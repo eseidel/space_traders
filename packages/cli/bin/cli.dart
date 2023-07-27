@@ -30,9 +30,26 @@ void printRequestStats(RateLimitedApiClient client) {
   logger.info('Total: ${client.requestCounts.totalRequests()} requests.');
 }
 
+bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
+  if (only.isEmpty) {
+    return null;
+  }
+  final onlyShips =
+      only.map((s) => ShipSymbol(agent.symbol, int.parse(s, radix: 16)));
+  if (onlyShips.isNotEmpty) {
+    logger.info('Only running ships: $onlyShips');
+  }
+  return (Ship ship) => onlyShips.contains(ship.shipSymbol);
+}
+
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
-    ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.');
+    ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
+    ..addMultiOption(
+      'only',
+      abbr: 'o',
+      help: 'Only run the given ship numbers (hex).',
+    );
   final results = parser.parse(args);
 
   logger.level = results['verbose'] as bool ? Level.verbose : Level.info;
@@ -76,7 +93,12 @@ Future<void> cliMain(List<String> args) async {
     )
     ..info(describeFleet(caches.ships));
 
-  await logic(api, centralCommand, caches);
+  // We use defaultTo: [], so we don't have to check fo null here.
+  // This means that we won't notice `--only` being passed with no ships.
+  // But that's also OK since that's nonsentical.
+  final shipFilter =
+      _shipFilterFromArgs(agent, results['only'] as List<String>);
+  await logic(api, centralCommand, caches, shipFilter: shipFilter);
 }
 
 Future<void> main(List<String> args) async {

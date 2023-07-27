@@ -78,14 +78,18 @@ class Transaction {
   /// Create a new transaction from a shipyard transaction.
   factory Transaction.fromShipyardTransaction(
     ShipyardTransaction transaction,
-    ShipType shipType,
     int agentCredits,
+    ShipSymbol purchaser,
   ) {
     return Transaction(
-      // shipSymbol is the new ship, not the ship that made the transaction.
-      shipSymbol: transaction.shipSymbolObject,
+      // .shipSymbol is the new ship type, not a ShipSymbol involved
+      // in the transaction.
+      // https://github.com/SpaceTradersAPI/api-docs/issues/68
+      shipSymbol: purchaser,
       waypointSymbol: transaction.waypointSymbolObject,
-      tradeSymbol: shipType.value,
+      // shipSymbol is the trade symbol for the shipyard transaction, not
+      // the new ship's id.
+      tradeSymbol: transaction.shipSymbol,
       quantity: 1,
       tradeType: MarketTransactionTypeEnum.PURCHASE,
       perUnitPrice: transaction.price,

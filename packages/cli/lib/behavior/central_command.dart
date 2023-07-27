@@ -215,6 +215,11 @@ class CentralCommand {
       return Behavior.idle;
     }
 
+    // final forceIdle = ['ESEIDEL-1B'];
+    // if (forceIdle.contains(ship.symbol)) {
+    //   return Behavior.changeMounts;
+    // }
+
     final disableBehaviors = <Behavior>[
       // Behavior.buyShip,
       // Behavior.trader,
@@ -253,7 +258,8 @@ class CentralCommand {
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
         Behavior.changeMounts,
-        Behavior.miner
+        if (ship.canMine) Behavior.miner,
+        if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
       ],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
@@ -829,9 +835,8 @@ class CentralCommand {
     final shipyard = await getShipyard(api, waypoint);
     await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
 
-    // Buy ship if we should.
-    // For now lets always by haulers if we can afford them and we have
-    // fewer than 3 haulers idle.
+    // Buy ship if we should. Important to do this after
+    // recordShipyardDataAndLog as it depends on having price data.
     await buyShipIfPossible(
       api,
       shipyardPrices,
@@ -863,8 +868,17 @@ class CentralCommand {
         isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
       return false;
     }
+
     // This assumes the ship in question is at a shipyard and already docked.
     final shipyardSymbol = ship.waypointSymbol;
+    // This only works if we've recorded prices from this shipyard before.
+    final knownPrices = shipyardPrices.pricesAtShipyard(ship.waypointSymbol);
+    final availableTypes = knownPrices.map((p) => p.shipType);
+    shipInfo(
+      ship,
+      'Visiting shipyard $shipyardSymbol, available: $availableTypes',
+    );
+
     final shipType = shipTypeToBuy(
       ship,
       shipyardPrices,

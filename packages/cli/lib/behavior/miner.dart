@@ -332,6 +332,12 @@ Future<DateTime?> advanceMiner(
     // We could sell here before putting ourselves to sleep.
     return response.cooldown.expiration;
   } on ApiException catch (e) {
+    /// ApiException 400: {"error":{"message":
+    /// Ship ESEIDEL-1B does not have a required mining laser mount.",
+    /// "code":4243,"data":{"shipSymbol":"ESEIDEL-1B",
+    /// "miningLasers":["MOUNT_MINING_LASER_I","MOUNT_MINING_LASER_II",
+    /// "MOUNT_MINING_LASER_III"]}}}
+
     if (isSurveyExhaustedException(e)) {
       // If the survey is exhausted, record it as such and try again.
       shipDetail(ship, 'Survey ${maybeSurvey!.signature} exhausted.');

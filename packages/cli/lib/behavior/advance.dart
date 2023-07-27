@@ -5,10 +5,52 @@ import 'package:cli/behavior/change_mounts.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/miner.dart';
+import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
+
+Future<DateTime?> _advanceIdle(
+  Api api,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  shipDetail(ship, 'Idling');
+  // Make sure ships don't stay idle forever.
+  caches.behaviors.completeBehavior(ship.shipSymbol);
+  // Return a time in the future so we don't spin hot.
+  return DateTime.now().add(const Duration(minutes: 10));
+}
+
+Future<DateTime?> Function(
+  Api api,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow,
+}) _behaviorFunction(Behavior behavior) {
+  switch (behavior) {
+    case Behavior.buyShip:
+      return advanceBuyShip;
+    case Behavior.trader:
+      return advanceTrader;
+    case Behavior.miner:
+      return advanceMiner;
+    case Behavior.surveyor:
+      return advanceSurveyor;
+    case Behavior.explorer:
+      return advanceExplorer;
+    case Behavior.deliver:
+      return advanceDeliver;
+    case Behavior.changeMounts:
+      return advanceChangeMounts;
+    case Behavior.idle:
+      return _advanceIdle;
+  }
+}
 
 /// Advance the behavior of the given ship.
 /// Returns the time at which the behavior should be advanced again
@@ -34,54 +76,13 @@ Future<DateTime?> advanceShipBehavior(
   }
 
   // shipDetail(ship, 'Advancing behavior: ${behavior.behavior.name}');
-  switch (behavior.behavior) {
-    case Behavior.buyShip:
-      return advanceBuyShip(
-        api,
-        centralCommand,
-        caches,
-        ship,
-      );
-    case Behavior.trader:
-      return advanceTrader(
-        api,
-        centralCommand,
-        caches,
-        ship,
-      );
-    case Behavior.miner:
-      return advanceMiner(
-        api,
-        centralCommand,
-        caches,
-        ship,
-      );
-    case Behavior.explorer:
-      return advanceExplorer(
-        api,
-        centralCommand,
-        caches,
-        ship,
-      );
-    case Behavior.deliver:
-      return advanceDeliver(
-        api,
-        centralCommand,
-        caches,
-        ship,
-      );
-    case Behavior.changeMounts:
-      return advanceChangeMounts(
-        api,
-        centralCommand,
-        caches,
-        ship,
-      );
-    case Behavior.idle:
-      shipDetail(ship, 'Idling');
-      // Make sure ships don't stay idle forever.
-      caches.behaviors.completeBehavior(ship.shipSymbol);
-      // Return a time in the future so we don't spin hot.
-      return DateTime.now().add(const Duration(minutes: 10));
-  }
+  final behaviorFunction = _behaviorFunction(behavior.behavior);
+  final waitUntil = await behaviorFunction(
+    api,
+    centralCommand,
+    caches,
+    ship,
+    getNow: getNow,
+  );
+  return waitUntil;
 }

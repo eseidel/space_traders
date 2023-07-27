@@ -177,10 +177,11 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   final result =
       await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
   logShipyardTransaction(ship, result.agent, result.transaction);
+  shipErr(ship, 'Bought ship, new name: ${result.transaction.shipSymbol}');
   final transaction = Transaction.fromShipyardTransaction(
     result.transaction,
-    shipType,
     agentCache.agent.credits,
+    ship.shipSymbol,
   );
   transactionLog.log(transaction);
   return result;

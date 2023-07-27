@@ -36,8 +36,6 @@ Future<DateTime?> advanceChangeMounts(
 }) async {
   final toMount = centralCommand.getMountToAdd(ship.shipSymbol);
 
-  shipInfo(ship, 'Changing mounts. Mounting $toMount.');
-
   // Re-validate every loop in case resuming from error.
   final template = centralCommand.templateForShip(ship);
   if (template == null) {
@@ -58,6 +56,8 @@ Future<DateTime?> advanceChangeMounts(
     );
     return null;
   }
+
+  shipInfo(ship, 'Changing mounts. Mounting $toMount.');
 
   // We've already started a change-mount job, continue.
   if (toMount != null) {

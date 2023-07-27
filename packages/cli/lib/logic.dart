@@ -117,8 +117,9 @@ class RateLimitTracker {
 Future<void> logic(
   Api api,
   CentralCommand centralCommand,
-  Caches caches,
-) async {
+  Caches caches, {
+  bool Function(Ship ship)? shipFilter,
+}) async {
   final waiter = ShipWaiter();
   final rateLimitTracker = RateLimitTracker(api);
 
@@ -130,6 +131,7 @@ Future<void> logic(
         centralCommand,
         caches,
         waiter,
+        shipFilter: shipFilter,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {

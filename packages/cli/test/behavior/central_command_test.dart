@@ -102,6 +102,7 @@ void main() {
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final ship = _MockShip();
+    when(() => ship.mounts).thenReturn([]);
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => ship.registration).thenReturn(
       ShipRegistration(

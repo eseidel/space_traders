@@ -266,7 +266,7 @@ extension ConnectedSystemUtils on ConnectedSystem {
   SystemPosition get position => SystemPosition(x, y);
 
   /// Returns the distance to the given system.
-  int distanceTo(System other) => position.distanceTo(other.position);
+  int distanceTo(ConnectedSystem other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto SystemWaypoint to make it easier to work with.
@@ -485,11 +485,11 @@ extension ShipUtils on Ship {
 
   /// Returns true if the ship has a surveyor module.
   bool get hasSurveyor {
-    const surveyerMounts = [
+    const surveyerMounts = {
       ShipMountSymbolEnum.SURVEYOR_I,
       ShipMountSymbolEnum.SURVEYOR_II,
       ShipMountSymbolEnum.SURVEYOR_III,
-    ];
+    };
     return mounts.any((m) => surveyerMounts.contains(m.symbol));
   }
 
@@ -658,8 +658,9 @@ extension MarketTransactionUtils on MarketTransaction {
 
 /// Extensions onto ShipyardTransaction to make it easier to work with.
 extension ShipyardTransactionUtils on ShipyardTransaction {
-  /// Returns the ShipSymbol for the given transaction.
-  ShipSymbol get shipSymbolObject => ShipSymbol.fromString(shipSymbol);
+  // Note: shipSymbol on the transaction is actually shipType.
+  /// Returns the ShipType purchased in the transaction.
+  ShipType get shipType => ShipType.fromJson(shipSymbol)!;
 
   /// Returns the WaypointSymbol for the given transaction.
   WaypointSymbol get waypointSymbolObject =>

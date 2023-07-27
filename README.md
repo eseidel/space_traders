@@ -111,6 +111,8 @@ Earning:
 * buy-in-a-loop for small tradeVolumes gets worse as we have more ships.
   This is likely the #1 contributor to "wait time".
   Every place we return null to loop has the same problem.
+* Record # of extractions per survey?  (Does laser power matter?)
+* Record which ship generated a survey?
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
