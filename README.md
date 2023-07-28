@@ -86,6 +86,7 @@ Most impact:
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
 * Park a probe at a shipyard to buy ships.
+* Use MineJob to cache market and mine location (save lookups).
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.

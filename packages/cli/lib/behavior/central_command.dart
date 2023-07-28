@@ -879,23 +879,17 @@ class CentralCommand {
       'Visiting shipyard $shipyardSymbol, available: $availableTypes',
     );
 
-    final shipType = shipTypeToBuy(
-      ship,
-      shipyardPrices,
-      agentCache,
-      shipyardSymbol,
-    );
-    if (shipType == null) {
-      // We may just be at a shipyard which doesn't have ships we want
-      // just disable this behavior for this ship briefly.
-      disableBehaviorForShip(
+    final shipType = assertNotNull(
+      shipTypeToBuy(
         ship,
-        'No ship to buy at $shipyardSymbol.',
-        const Duration(minutes: 5),
-        explicitBehavior: Behavior.buyShip,
-      );
-      return false;
-    }
+        shipyardPrices,
+        agentCache,
+        shipyardSymbol,
+      ),
+      'No ship to buy at $shipyardSymbol.',
+      const Duration(minutes: 5),
+      explicitBehavior: Behavior.buyShip,
+    );
 
     // Get our median price before updating shipyard prices.
     final medianPrice = shipyardPrices.medianPurchasePrice(shipType);

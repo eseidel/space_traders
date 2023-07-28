@@ -71,18 +71,14 @@ Future<DateTime?> advanceBuyShip(
   // In the early game, we'll pay any price, since the max price should really
   // be based on the opportunity cost of the travel.  Our expected earnings
   // early are low.
-  final shipyardPrice = caches.shipyardPrices.recentPurchasePrice(
-    shipyardSymbol: shipyardSymbol,
-    shipType: shipType,
+  final shipyardPrice = assertNotNull(
+    caches.shipyardPrices.recentPurchasePrice(
+      shipyardSymbol: shipyardSymbol,
+      shipType: shipType,
+    ),
+    'Failed to buy ship, no recent price for $shipType at $shipyardSymbol.',
+    const Duration(minutes: 20),
   );
-  if (shipyardPrice == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'Failed to buy ship, no recent price for $shipType at $shipyardSymbol.',
-      const Duration(minutes: 20),
-    );
-    return null;
-  }
   const priceAdjustment = 1.05;
   final maxPriceToCheck = (shipyardPrice * priceAdjustment).toInt();
   final credits = caches.agent.agent.credits;
@@ -112,14 +108,11 @@ Future<DateTime?> advanceBuyShip(
 
   // Update our shipyard prices regardless of any later errors.
   final shipyard = await getShipyard(api, currentWaypoint);
-  if (!shipyard.hasShipType(shipType)) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'Shipyard at ${currentWaypoint.symbol} does not sell $shipType.',
-      const Duration(minutes: 30),
-    );
-    return null;
-  }
+  jobAssert(
+    shipyard.hasShipType(shipType),
+    'Shipyard at ${currentWaypoint.symbol} does not sell $shipType.',
+    const Duration(minutes: 30),
+  );
 
   await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
@@ -132,15 +125,12 @@ Future<DateTime?> advanceBuyShip(
   final recentPriceString = creditsString(recentPrice);
   final maxMedianMultipler = centralCommand.maxMedianShipPriceMultipler;
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
-  if (recentPrice > maxPrice) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'Failed to buy $shipType at ${currentWaypoint.symbol}, '
-      '$recentPriceString > max price $maxPrice.',
-      const Duration(minutes: 30),
-    );
-    return null;
-  }
+  jobAssert(
+    recentPrice <= maxPrice,
+    'Failed to buy $shipType at ${currentWaypoint.symbol}, '
+    '$recentPriceString > max price $maxPrice.',
+    const Duration(minutes: 30),
+  );
 
   // Do we need to catch exceptions about insufficient credits?
   final result = await purchaseShipAndLog(

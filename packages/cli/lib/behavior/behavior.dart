@@ -164,16 +164,30 @@ class JobException implements Exception {
 }
 
 /// Exception thrown from a Job if the condition is not met.
-void jobAssert(bool condition, String message, Duration timeout) {
+void jobAssert(
+  bool condition,
+  String message,
+  Duration timeout, {
+  Behavior? explicitBehavior,
+}) {
   if (!condition) {
-    throw JobException(message, const Duration(seconds: 30));
+    throw JobException(
+      message,
+      const Duration(seconds: 30),
+      explicitBehavior: explicitBehavior,
+    );
   }
 }
 
 /// Exception thrown from a Job if the condition is not met.
-T assertNotNull<T>(T? value, String message, Duration timeout) {
+T assertNotNull<T>(
+  T? value,
+  String message,
+  Duration timeout, {
+  Behavior? explicitBehavior,
+}) {
   if (value == null) {
-    throw JobException(message, timeout);
+    throw JobException(message, timeout, explicitBehavior: explicitBehavior);
   }
   return value;
 }
