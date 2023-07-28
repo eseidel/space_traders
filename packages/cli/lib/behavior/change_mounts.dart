@@ -69,7 +69,7 @@ Future<DateTime?> advanceChangeMounts(
       return null;
     }
 
-    final tradeSymbol = tradeSymbolForMountSymbol(toMount)!;
+    final tradeSymbol = tradeSymbolForMountSymbol(toMount);
     final deliveryShip =
         centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol);
 

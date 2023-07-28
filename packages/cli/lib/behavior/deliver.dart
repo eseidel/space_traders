@@ -144,7 +144,7 @@ _BuyRequest? _buyRequestFromNeededMounts(Multiset<ShipMountSymbolEnum> needed) {
 
   final mountSymbol = needed.first;
   final units = needed[mountSymbol];
-  final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol)!;
+  final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
   return _BuyRequest(tradeSymbol: tradeSymbol, units: units);
 }
 

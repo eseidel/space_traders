@@ -148,7 +148,7 @@ void main() {
     expect(faction.headquartersSymbol, WaypointSymbol.fromString('S-A-W'));
   });
   test('AgentUtils', () {
-    final agent = Agentco
+    final agent = Agent(
       symbol: 'A-1',
       headquarters: 'S-A-W',
       credits: 0,
