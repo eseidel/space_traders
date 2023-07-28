@@ -93,7 +93,7 @@ class SurveyData extends JsonListStore<HistoricalSurvey> {
   }
 
   /// Add a survey to the store.
-  Future<void> addSurveys(Iterable<HistoricalSurvey> survey) async {
+  void addSurveys(Iterable<HistoricalSurvey> survey) {
     _surveys.addAll(survey);
     save();
   }
@@ -111,7 +111,7 @@ class SurveyData extends JsonListStore<HistoricalSurvey> {
   }
 
   /// Record the given surveys.
-  Future<void> recordSurveys(
+  void recordSurveys(
     List<Survey> surveys, {
     DateTime Function() getNow = defaultGetNow,
   }) {

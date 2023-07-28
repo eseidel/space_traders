@@ -14,7 +14,6 @@ Future<DateTime?> advanceSurveyor(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  shipInfo(ship, '🔭 Surveyor');
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   final mineSymbol =
@@ -56,7 +55,7 @@ Future<DateTime?> advanceSurveyor(
   final response = outer!.data;
   // shipDetail(ship, '🔭 ${ship.waypointSymbol}');
   shipInfo(ship, '🔭 Got ${response.surveys.length} surveys!');
-  await caches.surveys.recordSurveys(response.surveys, getNow: getNow);
+  caches.surveys.recordSurveys(response.surveys, getNow: getNow);
   // Each survey is the whole behavior.
   centralCommand.completeBehavior(ship.shipSymbol);
   return response.cooldown.expiration;

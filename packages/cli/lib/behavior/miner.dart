@@ -304,7 +304,7 @@ Future<DateTime?> advanceMiner(
     final outer = await api.fleet.createSurvey(ship.symbol);
     final response = outer!.data;
     // shipDetail(ship, '🔭 ${ship.waypointSymbol}');
-    await caches.surveys.recordSurveys(response.surveys, getNow: getNow);
+    caches.surveys.recordSurveys(response.surveys, getNow: getNow);
     return response.cooldown.expiration;
   }
 
