@@ -102,7 +102,8 @@ Future<void> command(FileSystem fs, Api api, Caches caches) async {
       ship,
       jumpGateWaypoint,
     );
-    await Future<void>.delayed(durationUntil(arrival));
+    final durationUntil = arrival.difference(DateTime.timestamp());
+    await Future<void>.delayed(durationUntil);
   }
   final jumpRequest = JumpShipRequest(systemSymbol: destSystem.symbol);
   await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpRequest);

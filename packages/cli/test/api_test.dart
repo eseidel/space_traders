@@ -136,4 +136,32 @@ void main() {
       ShipSymbol.fromString('A-1A'),
     ]);
   });
+  test('FactionUtils', () {
+    final faction = Faction(
+      description: '',
+      symbol: FactionSymbols.AEGIS,
+      name: '',
+      headquarters: 'S-A-W',
+      traits: [],
+      isRecruiting: true,
+    );
+    expect(faction.headquartersSymbol, WaypointSymbol.fromString('S-A-W'));
+  });
+  test('AgentUtils', () {
+    final agent = Agentco
+      symbol: 'A-1',
+      headquarters: 'S-A-W',
+      credits: 0,
+      startingFaction: FactionSymbols.AEGIS.value,
+    );
+    expect(agent.headquartersSymbol, WaypointSymbol.fromString('S-A-W'));
+  });
+  test('tradeSymbolForMountSymbol', () {
+    for (final mountSymbol in ShipMountSymbolEnum.values) {
+      final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
+      expect(mountSymbolForTradeSymbol(tradeSymbol), mountSymbol);
+    }
+    // Non-mount symbols will fail however:
+    expect(mountSymbolForTradeSymbol(TradeSymbol.ADVANCED_CIRCUITRY), isNull);
+  });
 }

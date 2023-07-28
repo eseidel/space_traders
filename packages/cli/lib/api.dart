@@ -638,9 +638,8 @@ extension ShipyardUtils on Shipyard {
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
 
   /// Returns true if the Shipyard has the given ship type.
-  bool hasShipType(ShipType shipType) {
-    return shipTypes.any((s) => s.type == shipType);
-  }
+  bool hasShipType(ShipType shipType) =>
+      shipTypes.any((s) => s.type == shipType);
 }
 
 /// Extensions onto MarketTransaction to make it easier to work with.
@@ -691,10 +690,6 @@ extension AgentUtils on Agent {
       WaypointSymbol.fromString(headquarters);
 }
 
-/// Returns the duration until the given date time.
-Duration durationUntil(DateTime dateTime) =>
-    dateTime.difference(DateTime.now());
-
 /// Creates a ConnectedSystem from a System and a distance.
 ConnectedSystem connectedSystemFromSystem(System system, int distance) {
   return ConnectedSystem(
@@ -708,11 +703,13 @@ ConnectedSystem connectedSystemFromSystem(System system, int distance) {
 }
 
 /// Compute the trade symbol for the given mount symbol.
-TradeSymbol? tradeSymbolForMountSymbol(ShipMountSymbolEnum mountSymbol) {
-  return TradeSymbol.fromJson(mountSymbol.value);
+/// TradeSymbols are a superset of ShipMountSymbols so this should never fail.
+TradeSymbol tradeSymbolForMountSymbol(ShipMountSymbolEnum mountSymbol) {
+  return TradeSymbol.fromJson(mountSymbol.value)!;
 }
 
 /// Compute the mount symbol for the given trade symbol.
+/// This will return null if the trade symbol is not a mount symbol.
 ShipMountSymbolEnum? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
   return ShipMountSymbolEnum.fromJson(tradeSymbol.value);
 }
