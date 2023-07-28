@@ -1,3 +1,4 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
@@ -34,6 +35,8 @@ class _MockTransactionLog extends Mock implements TransactionLog {}
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
+
+class _MockBehaviorState extends Mock implements BehaviorState {}
 
 void main() {
   test('advanceBuyShip smoke test', () async {
@@ -89,6 +92,7 @@ void main() {
         .thenAnswer((_) => Future.value([waypoint]));
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
+    final state = _MockBehaviorState();
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -97,6 +101,7 @@ void main() {
         api,
         centralCommand,
         caches,
+        state,
         ship,
         getNow: getNow,
       ),

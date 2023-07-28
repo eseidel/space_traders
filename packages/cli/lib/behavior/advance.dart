@@ -15,6 +15,7 @@ Future<DateTime?> _advanceIdle(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
+  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
@@ -29,6 +30,7 @@ Future<DateTime?> Function(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
+  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow,
 }) _behaviorFunction(Behavior behavior) {
@@ -62,7 +64,7 @@ Future<DateTime?> advanceShipBehavior(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final behavior = await centralCommand.loadBehaviorState(ship);
+  final state = await centralCommand.loadBehaviorState(ship);
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
@@ -76,13 +78,33 @@ Future<DateTime?> advanceShipBehavior(
   }
 
   // shipDetail(ship, 'Advancing behavior: ${behavior.behavior.name}');
-  final behaviorFunction = _behaviorFunction(behavior.behavior);
-  final waitUntil = await behaviorFunction(
-    api,
-    centralCommand,
-    caches,
-    ship,
-    getNow: getNow,
-  );
-  return waitUntil;
+  final behaviorFunction = _behaviorFunction(state.behavior);
+  try {
+    final waitUntil = await behaviorFunction(
+      api,
+      centralCommand,
+      caches,
+      state,
+      ship,
+      getNow: getNow,
+    );
+    return waitUntil;
+  } on JobException catch (error) {
+    if (error.disable == DisableBehavior.thisShip) {
+      centralCommand.disableBehaviorForShip(
+        ship,
+        error.message,
+        error.timeout,
+        explicitBehavior: error.explicitBehavior,
+      );
+    } else {
+      centralCommand.disableBehaviorForAll(
+        ship,
+        error.message,
+        error.timeout,
+        explicitBehavior: error.explicitBehavior,
+      );
+    }
+  }
+  return null;
 }

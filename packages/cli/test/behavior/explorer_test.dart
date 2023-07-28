@@ -1,9 +1,12 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class _MockBehaviorState extends Mock implements BehaviorState {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
@@ -100,6 +103,7 @@ void main() {
     ).thenAnswer((_) => Future.value());
     when(() => centralCommand.maxAgeForExplorerData)
         .thenReturn(const Duration(days: 3));
+    final state = _MockBehaviorState();
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -108,6 +112,7 @@ void main() {
         api,
         centralCommand,
         caches,
+        state,
         ship,
         getNow: () => DateTime(2021),
       ),

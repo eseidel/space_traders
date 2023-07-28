@@ -1,9 +1,12 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class _MockBehaviorState extends Mock implements BehaviorState {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
@@ -234,6 +237,7 @@ void main() {
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
+    final state = _MockBehaviorState();
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -242,6 +246,7 @@ void main() {
         api,
         centralCommand,
         caches,
+        state,
         ship,
         getNow: getNow,
       ),

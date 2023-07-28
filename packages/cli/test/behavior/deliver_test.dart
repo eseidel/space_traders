@@ -1,9 +1,11 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:more/collection.dart';
 import 'package:test/test.dart';
 
 class _MockAgentCache extends Mock implements AgentCache {}
@@ -36,7 +38,11 @@ class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
+class _MockBehaviorState extends Mock implements BehaviorState {}
+
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
 
 void main() {
   test('advanceDeliver smoke test', () async {
@@ -73,6 +79,14 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
 
+    const fuelCapacity = 100;
+    when(() => ship.fuel)
+        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
+    final shipEngine = _MockShipEngine();
+    when(() => ship.engine).thenReturn(shipEngine);
+    const shipSpeed = 10;
+    when(() => shipEngine.speed).thenReturn(shipSpeed);
+
     final waypoint = _MockWaypoint();
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
@@ -94,6 +108,54 @@ void main() {
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
 
+    final state = _MockBehaviorState();
+    when(() => state.jobIndex).thenReturn(0);
+    when(() => state.buyJob).thenReturn(
+      BuyJob(
+        tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
+        units: 10,
+        buyLocation: symbol,
+      ),
+    );
+
+    when(centralCommand.mountsNeededForAllShips)
+        .thenReturn(Multiset.from([ShipMountSymbolEnum.GAS_SIPHON_I]));
+    final routePlanner = _MockRoutePlanner();
+    when(() => caches.routePlanner).thenReturn(routePlanner);
+    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
+    when(
+      () => marketPrices.pricesFor(
+        TradeSymbol.MOUNT_GAS_SIPHON_I,
+        marketSymbol: any(named: 'marketSymbol'),
+      ),
+    ).thenReturn([
+      MarketPrice(
+        waypointSymbol: symbol,
+        symbol: TradeSymbol.MOUNT_GAS_SIPHON_I.value,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 100,
+        sellPrice: 101,
+        tradeVolume: 10,
+        timestamp: DateTime(2021),
+      )
+    ]);
+
+    when(
+      () => routePlanner.planRoute(
+        start: symbol,
+        end: symbol,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      ),
+    ).thenReturn(
+      const RoutePlan(
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+        actions: [],
+        fuelUsed: 10,
+      ),
+    );
+
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
@@ -101,6 +163,7 @@ void main() {
         api,
         centralCommand,
         caches,
+        state,
         ship,
         getNow: getNow,
       ),

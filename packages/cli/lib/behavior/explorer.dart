@@ -1,3 +1,4 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -259,11 +260,10 @@ Future<DateTime?> advanceExplorer(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
+  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
-
   final maxAge = centralCommand.maxAgeForExplorerData;
   final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   // advanceExplorer is only ever called when we're idle at a location, so

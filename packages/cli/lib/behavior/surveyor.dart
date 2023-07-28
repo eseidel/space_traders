@@ -1,3 +1,4 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -9,6 +10,7 @@ Future<DateTime?> advanceSurveyor(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
+  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {

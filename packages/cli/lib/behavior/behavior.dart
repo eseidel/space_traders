@@ -126,3 +126,54 @@ class BehaviorState {
     };
   }
 }
+
+/// Disable behavior for this ship or all ships?
+enum DisableBehavior {
+  /// Disable behavior for this ship only.
+  thisShip,
+
+  /// Disable behavior for all ships.
+  allShips,
+}
+
+/// Exception thrown from a Job.
+class JobException implements Exception {
+  /// Create a new job exception.
+  JobException(
+    this.message,
+    this.timeout, {
+    this.disable = DisableBehavior.thisShip,
+    this.explicitBehavior,
+  })  : assert(message.isNotEmpty, 'why must not be empty'),
+        assert(timeout.inSeconds > 0, 'timeout must be positive');
+
+  /// Why did the job error?
+  final String message;
+
+  /// How long should the calling behavior be disabled
+  final Duration timeout;
+
+  /// Should the behavior be disabled for this ship or all ships?
+  final DisableBehavior disable;
+
+  // Was this exception thrown in a behavior other than the current one?
+  final Behavior? explicitBehavior;
+
+  @override
+  String toString() => message;
+}
+
+/// Exception thrown from a Job if the condition is not met.
+void jobAssert(bool condition, String message, Duration timeout) {
+  if (!condition) {
+    throw JobException(message, const Duration(seconds: 30));
+  }
+}
+
+/// Exception thrown from a Job if the condition is not met.
+T assertNotNull<T>(T? value, String message, Duration timeout) {
+  if (value == null) {
+    throw JobException(message, timeout);
+  }
+  return value;
+}

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
@@ -177,6 +178,7 @@ Future<DateTime?> advanceMiner(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
+  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {

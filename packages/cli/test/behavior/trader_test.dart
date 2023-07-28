@@ -56,6 +56,8 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 class _MockShipCache extends Mock implements ShipCache {}
 
+class _MockBehaviorState extends Mock implements BehaviorState {}
+
 void main() {
   test('advanceTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
@@ -236,6 +238,7 @@ void main() {
     final agent = _MockAgent();
     when(() => agentCache.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
+    final state = _MockBehaviorState();
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -244,6 +247,7 @@ void main() {
         api,
         centralCommand,
         caches,
+        state,
         ship,
         getNow: () => DateTime(2021),
       ),
@@ -290,7 +294,8 @@ void main() {
 
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
-    when(() => shipFuel.capacity).thenReturn(1000);
+    const fuelCapacity = 1000;
+    when(() => shipFuel.capacity).thenReturn(fuelCapacity);
     // And needs refueling.
     when(() => shipFuel.current).thenReturn(100);
     when(() => ship.fuel).thenReturn(shipFuel);
@@ -308,7 +313,8 @@ void main() {
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
 
     final shipEngine = _MockShipEngine();
-    when(() => shipEngine.speed).thenReturn(10);
+    const shipSpeed = 10;
+    when(() => shipEngine.speed).thenReturn(shipSpeed);
     when(() => ship.engine).thenReturn(shipEngine);
 
     final waypoint = _MockWaypoint();
@@ -323,6 +329,7 @@ void main() {
         description: '',
       )
     ]);
+    registerFallbackValue(Duration.zero);
     when(
       () => marketPrices.hasRecentMarketData(
         start,
@@ -472,6 +479,60 @@ void main() {
         any(),
       ),
     ).thenReturn(true);
+    final state = _MockBehaviorState();
+
+    when(
+      () => fleetApi.sellCargo(
+        shipSymbol.symbol,
+        sellCargoRequest: any(named: 'sellCargoRequest'),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        SellCargo201Response(
+          data: SellCargo201ResponseData(
+            agent: agent,
+            cargo: shipCargo,
+            transaction: MarketTransaction(
+              waypointSymbol: start.waypoint,
+              shipSymbol: shipSymbol.symbol,
+              tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+              units: 10,
+              totalPrice: 100,
+              pricePerUnit: 10,
+              type: MarketTransactionTypeEnum.SELL,
+              timestamp: DateTime(2021),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
+    when(
+      () => marketPrices.pricesFor(
+        TradeSymbol.ADVANCED_CIRCUITRY,
+        marketSymbol: any(named: 'marketSymbol'),
+      ),
+    ).thenReturn([
+      MarketPrice(
+        waypointSymbol: start,
+        symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 100,
+        sellPrice: 101,
+        tradeVolume: 10,
+        timestamp: DateTime(2021),
+      )
+    ]);
+
+    when(
+      () => routePlanner.planRoute(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      ),
+    ).thenReturn(routePlan);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -480,6 +541,7 @@ void main() {
         api,
         centralCommand,
         caches,
+        state,
         ship,
         getNow: () => DateTime(2021),
       ),
@@ -657,6 +719,7 @@ void main() {
         maxWaypoints: any(named: 'maxWaypoints'),
       ),
     ).thenAnswer((_) => Future.value());
+    final state = _MockBehaviorState();
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -665,6 +728,7 @@ void main() {
         api,
         centralCommand,
         caches,
+        state,
         ship,
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/explorer.dart';
@@ -587,20 +588,19 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
     'Cargo hold still not empty, finding '
     'market to sell ${unwantedCargo.symbol}.',
   );
-  final costedTrip = findBestMarketToSell(
-    caches.marketPrices,
-    caches.routePlanner,
-    ship,
-    unwantedCargo.tradeSymbol,
-    expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
+  // We can't sell this cargo anywhere so give up?
+
+  final costedTrip = assertNotNull(
+    findBestMarketToSell(
+      caches.marketPrices,
+      caches.routePlanner,
+      ship,
+      unwantedCargo.tradeSymbol,
+      expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
+    ),
+    'No market for ${unwantedCargo.symbol}.',
+    const Duration(hours: 1),
   );
-  if (costedTrip == null) {
-    // We can't sell this cargo anywhere so give up?
-    return JobResult.error(
-      'No market for ${unwantedCargo.symbol}.',
-      const Duration(hours: 1),
-    );
-  }
   final waitUntil = await beingRouteAndLog(
     api,
     ship,
@@ -617,6 +617,7 @@ Future<DateTime?> advanceTrader(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
+  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
@@ -653,8 +654,7 @@ Future<DateTime?> advanceTrader(
     );
   }
 
-  final behaviorState = centralCommand.getBehavior(ship.shipSymbol)!;
-  final pastDeal = behaviorState.deal;
+  final pastDeal = state.deal;
   // Regardless of where we are, if we have cargo that isn't part of our deal,
   // try to sell it.
   final result = await handleUnwantedCargoIfNeeded(
@@ -665,10 +665,6 @@ Future<DateTime?> advanceTrader(
     currentMarket,
     pastDeal?.tradeSymbol,
   );
-  if (result.isError) {
-    disableWithJobError(ship, centralCommand, result.error);
-    return null;
-  }
   if (result.shouldReturn) {
     return result.waitTime;
   }
@@ -727,7 +723,7 @@ Future<DateTime?> advanceTrader(
   }
 
   shipInfo(ship, 'Found deal: ${describeCostedDeal(newDeal)}');
-  final state = centralCommand.getBehavior(ship.shipSymbol)!..deal = newDeal;
+  state.deal = newDeal;
   centralCommand.setBehavior(ship.shipSymbol, state);
   final waitUntil = await _handleDeal(
     api,
