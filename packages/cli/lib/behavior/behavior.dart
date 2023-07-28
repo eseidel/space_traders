@@ -156,7 +156,7 @@ class JobException implements Exception {
   /// Should the behavior be disabled for this ship or all ships?
   final DisableBehavior disable;
 
-  // Was this exception thrown in a behavior other than the current one?
+  /// Was this exception thrown in a behavior other than the current one?
   final Behavior? explicitBehavior;
 
   @override
@@ -165,6 +165,7 @@ class JobException implements Exception {
 
 /// Exception thrown from a Job if the condition is not met.
 void jobAssert(
+  // ignore: avoid_positional_boolean_parameters
   bool condition,
   String message,
   Duration timeout, {

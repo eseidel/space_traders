@@ -18,12 +18,6 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class _MockMarketCache extends Mock implements MarketCache {}
-
-class _MockTransactionLog extends Mock implements TransactionLog {}
-
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
 class _MockSurveyData extends Mock implements SurveyData {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
