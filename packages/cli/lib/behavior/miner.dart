@@ -182,8 +182,6 @@ Future<DateTime?> advanceMiner(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
-
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   // It's not worth potentially waiting a minute just to get a few pieces
@@ -251,16 +249,11 @@ Future<DateTime?> advanceMiner(
     );
   }
 
-  final mineSymbol =
-      centralCommand.mineSymbolForShip(caches.systems, caches.agent, ship);
-  if (mineSymbol == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No desired mine for ship.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
+  final mineSymbol = assertNotNull(
+    centralCommand.mineSymbolForShip(caches.systems, caches.agent, ship),
+    'No desired mine for ship.',
+    const Duration(hours: 1),
+  );
   if (ship.waypointSymbol != mineSymbol) {
     return beingNewRouteAndLog(
       api,
@@ -273,15 +266,12 @@ Future<DateTime?> advanceMiner(
     );
   }
 
-  /// This could be an assert, since central command told us to be here.
-  if (!currentWaypoint.canBeMined) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      "${waypointDescription(currentWaypoint)} can't be mined.",
-      const Duration(hours: 1),
-    );
-    return null;
-  }
+  jobAssert(
+    currentWaypoint.canBeMined,
+    "${waypointDescription(currentWaypoint)} can't be mined.",
+    const Duration(hours: 1),
+  );
+
   // This is wrong, we don't know if this market will be able to sell
   // the goods we can mine.
   final nearestMarket = await nearestWaypointWithMarket(

@@ -38,9 +38,16 @@ Future<DateTime?> advanceSurveyor(
       mineSymbol,
     );
   }
-  // TODO(eseidel): Throw exceptions which disable the behavior for a time.
-  assert(currentWaypoint.canBeMined, 'Must be at a mineable waypoint.');
-  assert(ship.hasSurveyor, 'Must have a surveyor.');
+  jobAssert(
+    currentWaypoint.canBeMined,
+    'Must be at a mineable waypoint.',
+    const Duration(minutes: 10),
+  );
+  jobAssert(
+    ship.hasSurveyor,
+    'Must have a surveyor.',
+    const Duration(hours: 1),
+  );
 
   // Surveying requires being undocked.
   await undockIfNeeded(api, caches.ships, ship);
