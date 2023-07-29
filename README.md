@@ -388,6 +388,13 @@ ApiException 500: {"error":{"code":500,"message":"Something unexpected went wron
 🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
 
 
+### Make sure multiple ships can work on a single contract:
+deliver 96000 (95640 remaining) ALUMINUM_ORE to X1-ST5-23902F in 6d for 6,182,400c with 2,649,600c upfront
+Expected profit: 3,840,000c
+
+Maybe show the list of ships on it in the output?
+
+
 ## Redesign
 
 Problem statement:
@@ -468,3 +475,53 @@ NAV_TO
 * Executes
 * On failure, marks queue as failed, flushes it?
 * Sends state back to planner (or just updates a shared state via DB?)
+
+
+### Threw away money?
+
+Worst 10:
+ESEIDEL-2C 110 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,495,282c (-5,642c/s)
+ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,136,772c (-4,194c/s)
+ESEIDEL-2C 110 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,124,182c (-3,944c/s)
+ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,124,832c (-3,800c/s)
+ESEIDEL-2C 110 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-DS5-11453A in 4m for -754,604c (-2,675c/s)
+ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-DS5-11453A in 4m for -610,874c (-2,340c/s)
+ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-DS5-11453A in 4m for -610,874c (-2,296c/s)
+ESEIDEL-2C 80 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-CK21-59613B in 8m for -82,706c (-156c/s)
+
+
+### Never purchase above median?
+
+🛸#30 ✈️  to X1-F44-10751B, -1m left
+🛸#30 ✍️  market data @ X1-F44-10751B
+🛸#30 ⛽   2 FUEL                           ⚖️    2 x    122c =   -244c -> 🏦 136,196,023c
+🛸#30 💸  10 MOUNT_MINING_LASER_II   -7% -2,458c per  10 x 33,145c = -331,450c -> 🏦 135,864,573c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+[WARN] 🛸#30 (trader) took 2s (4 requests) expected 1.3s
+🛸#30 💸  10 MOUNT_MINING_LASER_II   -6% -2,285c per  10 x 33,318c = -333,180c -> 🏦 135,531,393c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II   -6% -2,073c per  10 x 33,530c = -335,300c -> 🏦 135,196,093c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II   -5% -1,812c per  10 x 33,791c = -337,910c -> 🏦 134,858,183c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II   -4% -1,491c per  10 x 34,112c = -341,120c -> 🏦 134,517,063c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II   -3% -1,095c per  10 x 34,508c = -345,080c -> 🏦 134,171,983c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II   -2% -607c per  10 x 34,996c = -349,960c -> 🏦 133,822,023c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 ✍️  market data @ X1-F44-10751B
+🛸#30 💸  10 MOUNT_MINING_LASER_II    0%  -7c per  10 x 35,596c = -355,960c -> 🏦 133,466,063c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+[WARN] 🛸#30 (trader) took 1s (2 requests) expected 0.7s
+🛸#30 💸  10 MOUNT_MINING_LASER_II   +2% +731c per  10 x 36,334c = -363,340c -> 🏦 133,102,723c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II   +5% +1,641c per  10 x 37,244c = -372,440c -> 🏦 132,730,283c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II   +8% +2,760c per  10 x 38,363c = -383,630c -> 🏦 132,346,653c
+🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
+🛸#30 💸  10 MOUNT_MINING_LASER_II  +12% +4,138c per  10 x 39,741c = -397,410c -> 🏦 131,949,243c
+🛸#30 Purchased 10 MOUNT_MINING_LASER_II @ 39741 (expected 33145) = -397,410c
+🛸#30 Beginning route to X1-HA48-79877C
+🛸#30 🛫 to X1-F44-02893X JUMP_GATE (1m) spent 47 fuel
+
