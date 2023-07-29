@@ -6,6 +6,7 @@ import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/surveys.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';
@@ -177,7 +178,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   final result =
       await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
   logShipyardTransaction(ship, result.agent, result.transaction);
-  shipErr(ship, 'Bought ship, new name: ${result.transaction.shipSymbol}');
+  shipErr(ship, 'Bought ship: ${result.ship.symbol}');
   final transaction = Transaction.fromShipyardTransaction(
     result.transaction,
     agentCache.agent.credits,
@@ -526,4 +527,19 @@ Future<Jettison200ResponseData> transferCargoAndLog(
       'Transferred $units $tradeSymbol from ${from.symbol} to '
       '${to.symbol}');
   return data;
+}
+
+/// Record the survey and log.
+Future<CreateSurvey201ResponseData> surveyAndLog(
+  Api api,
+  SurveyData surveyData,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final outer = await api.fleet.createSurvey(ship.symbol);
+  final response = outer!.data;
+  final count = response.surveys.length;
+  shipInfo(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
+  surveyData.recordSurveys(response.surveys, getNow: getNow);
+  return response;
 }

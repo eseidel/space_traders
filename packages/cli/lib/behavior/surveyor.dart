@@ -1,7 +1,6 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 
@@ -39,23 +38,15 @@ Future<DateTime?> advanceSurveyor(
   }
   jobAssert(
     currentWaypoint.canBeMined,
-    'Must be at a mineable waypoint.',
+    'Requires a mineable waypoint.',
     const Duration(minutes: 10),
   );
-  jobAssert(
-    ship.hasSurveyor,
-    'Must have a surveyor.',
-    const Duration(hours: 1),
-  );
+  jobAssert(ship.hasSurveyor, 'Requires a surveyor.', const Duration(hours: 1));
 
   // Surveying requires being undocked.
   await undockIfNeeded(api, caches.ships, ship);
-
-  final outer = await api.fleet.createSurvey(ship.symbol);
-  final response = outer!.data;
-  // shipDetail(ship, '🔭 ${ship.waypointSymbol}');
-  shipInfo(ship, '🔭 Got ${response.surveys.length} surveys!');
-  caches.surveys.recordSurveys(response.surveys, getNow: getNow);
+  final response =
+      await surveyAndLog(api, caches.surveys, ship, getNow: getNow);
   // Each survey is the whole behavior.
   centralCommand.completeBehavior(ship.shipSymbol);
   return response.cooldown.expiration;

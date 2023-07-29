@@ -82,11 +82,18 @@ Then modified:
 ### Todo
 
 Most impact:
+* Park a probe at a shipyard to buy ships.
+* Fix trading to understand low-volume trade prices.
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
-* Park a probe at a shipyard to buy ships.
 * Use MineJob to cache market and mine location (save lookups).
+
+Early Game:
+* Could ask the intial probe to sit still, or come back to buy ships for you.
+  Currently that breaks because it doesn't have prices to buy from.
+  Also breaks contract trading to not have price data.
+  Could have it just explore the initial system and then go sit?
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.

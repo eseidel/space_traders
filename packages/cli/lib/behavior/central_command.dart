@@ -78,8 +78,26 @@ class ShipTemplate {
   final Multiset<ShipMountSymbolEnum> mounts;
 }
 
+/// Lets us order enums by their index.
+mixin EnumIndexOrdering<T extends Enum> on Enum implements Comparable<T> {
+  @override
+  int compareTo(T other) => index.compareTo(other.index);
+
+  /// Returns true if this enum is less than [other].
+  bool operator <(T other) => index < other.index;
+
+  /// Returns true if this enum is greater than [other].
+  bool operator >(T other) => index > other.index;
+
+  /// Returns true if this enum is greater than or equal to [other].
+  bool operator >=(T other) => index >= other.index;
+
+  /// Returns true if this enum is less than or equal to [other].
+  bool operator <=(T other) => index <= other.index;
+}
+
 /// Where are we in the phases of the reset.
-enum GamePhase {
+enum GamePhase with EnumIndexOrdering<GamePhase> {
   /// Early, we have little money, lots of request space.
   /// What matters most at this point is that we buy ships as fast as we can.
   /// We don't care a ton about price, more about opportunity cost (so we can
@@ -114,7 +132,7 @@ enum GamePhase {
   /// to maximize total credits at the end of that time.
   /// We don't want to start new long contracts at this point (or long trades)?
   /// Sell all mounts?
-  end,
+  end;
 }
 
 /// Central command for the fleet.
@@ -149,6 +167,11 @@ class CentralCommand {
     // Command makes a bit less than either miners or haulers due to its
     // worse cargo capacity and laser.
     if (ship.registration.role == ShipRole.COMMAND) {
+      // We want to strongly prefer mining (really surveying) for the mining
+      // drones early.
+      if (phase == GamePhase.early) {
+        return 10;
+      }
       return 6;
     }
     return 7;
@@ -174,21 +197,21 @@ class CentralCommand {
   /// What template should we use for the given ship?
   ShipTemplate? templateForShip(Ship ship) {
     // Hack to test a new template.
-    final surveyors = [
-      'ESEIDEL-5',
-      'ESEIDEL-6',
-      'ESEIDEL-7',
-      'ESEIDEL-1B',
-    ];
-    if (surveyors.contains(ship.symbol)) {
-      return ShipTemplate(
-        frameSymbol: ShipFrameSymbolEnum.MINER,
-        mounts: Multiset.from([
-          ShipMountSymbolEnum.SURVEYOR_II,
-          ShipMountSymbolEnum.SURVEYOR_II,
-        ]),
-      );
-    }
+    // final surveyors = [
+    //   'ESEIDEL-5',
+    //   'ESEIDEL-6',
+    //   'ESEIDEL-7',
+    //   'ESEIDEL-1B',
+    // ];
+    // if (surveyors.contains(ship.symbol)) {
+    //   return ShipTemplate(
+    //     frameSymbol: ShipFrameSymbolEnum.MINER,
+    //     mounts: Multiset.from([
+    //       ShipMountSymbolEnum.SURVEYOR_II,
+    //       ShipMountSymbolEnum.SURVEYOR_II,
+    //     ]),
+    //   );
+    // }
 
     // According to SAF:
     // Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
@@ -264,16 +287,18 @@ class CentralCommand {
     }
 
     // Just sits there so we can buy ships.
-    if (ship.symbol == 'ESEIDEL-2') {
-      // if (!isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
-      //   return Behavior.buyShip;
-      // }
-      return Behavior.idle;
-    }
+    // if (ship.symbol == 'ESEIDEL-2') {
+    //   // if (!isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
+    //   //   return Behavior.buyShip;
+    //   // }
+    //   return Behavior.idle;
+    // }
 
     // Disable drones (which should just be ESEIDEL-4).
-    if (ship.frame.symbol == ShipFrameSymbolEnum.DRONE) {
-      return Behavior.idle;
+    if (phase > GamePhase.ramp) {
+      if (ship.frame.symbol == ShipFrameSymbolEnum.DRONE) {
+        return Behavior.idle;
+      }
     }
 
     // Only use the first 20 probes.
@@ -290,18 +315,7 @@ class CentralCommand {
     //   }
     // }
 
-    final disableBehaviors = <Behavior>[
-      // Behavior.buyShip,
-      // Behavior.trader,
-      // Hack becuase mining is so bad towards end game.
-      // Behavior.miner,
-      // Behavior.idle,
-      // Hangs too much for now.
-      // Behavior.explorer,
-    ];
-
-    // Probably want special behavior for the command ship when we
-    // only have a few ships?
+    // final shipCount = _shipCache.ships.length;
 
     final behaviors = {
       // TODO(eseidel): Evaluate based on expected value, not just order.
@@ -318,6 +332,7 @@ class CentralCommand {
         // Might want to consider limiting to short trades (< 5 mins) to avoid
         // tying up capital early.
         Behavior.trader,
+        // if (shipCount < 4) Behavior.surveyor,
         // Early on the command ship makes about 5c/s vs.
         // ore hounds making 6c/s.
         Behavior.miner,
@@ -328,17 +343,17 @@ class CentralCommand {
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
         // Behavior.changeMounts,
-        // if (ship.canMine) Behavior.miner,
-        // if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
+        if (phase < GamePhase.tradingTransition && ship.canMine) Behavior.miner,
+        if (phase < GamePhase.tradingTransition &&
+            !ship.canMine &&
+            ship.hasSurveyor)
+          Behavior.surveyor,
         Behavior.idle,
       ],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
     if (behaviors != null) {
       for (final behavior in behaviors) {
-        if (disableBehaviors.contains(behavior)) {
-          continue;
-        }
         if (!isBehaviorDisabled(behavior) &&
             !isBehaviorDisabledForShip(ship, behavior)) {
           return behavior;

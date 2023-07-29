@@ -301,10 +301,8 @@ Future<DateTime?> advanceMiner(
   );
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
-    final outer = await api.fleet.createSurvey(ship.symbol);
-    final response = outer!.data;
-    // shipDetail(ship, '🔭 ${ship.waypointSymbol}');
-    caches.surveys.recordSurveys(response.surveys, getNow: getNow);
+    final response =
+        await surveyAndLog(api, caches.surveys, ship, getNow: getNow);
     return response.cooldown.expiration;
   }
 
