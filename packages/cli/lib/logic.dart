@@ -28,11 +28,15 @@ Future<void> advanceShips(
   required int loopCount,
   bool Function(Ship ship)? shipFilter,
 }) async {
+  // loopCount is only used to control how often we reset our waypoint and
+  // market caches.  If we got rid of those we could get rid of loopCount.
   await caches.updateAtTopOfLoop(api);
-  waiter.scheduleMissingShips(caches.ships.ships);
 
   // loop over all ships and advance them.
   for (var i = 0; i < loopCount; i++) {
+    // Make sure we check every time in case a ship was added.
+    waiter.scheduleMissingShips(caches.ships.ships);
+
     final entry = waiter.nextShip();
     final shipSymbol = entry.shipSymbol;
 
