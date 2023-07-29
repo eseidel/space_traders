@@ -82,7 +82,6 @@ Then modified:
 ### Todo
 
 Most impact:
-* Park a probe at a shipyard to buy ships.
 * Fix trading to understand low-volume trade prices.
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems (squads).
@@ -91,10 +90,6 @@ Most impact:
 * Confirm planRoute is using PriorityQueue correctly.
 
 Early Game:
-* Could ask the intial probe to sit still, or come back to buy ships for you.
-  Currently that breaks because it doesn't have prices to buy from.
-  Also breaks contract trading to not have price data.
-  Could have it just explore the initial system and then go sit?
 * Probe should probably stay close to the main system to help find trades?
 
 Earning:
@@ -128,6 +123,8 @@ Earning:
   When execution hits an error, just throw it back to the generator thread.
   Run each of the ships as separate "programs".
   Unclear if multi-threaded will work OK with json files.
+* Make Survey selection find a value point and then look back further than
+  the last 100 surveys for surveys above that value.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
