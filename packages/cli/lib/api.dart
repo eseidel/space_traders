@@ -439,6 +439,9 @@ extension ShipUtils on Ship {
   /// Returns the amount of space available on the ship.
   int get availableSpace => cargo.availableSpace;
 
+  /// Returns true if the ship is a command ship.
+  bool get isCommand => registration.role == ShipRole.COMMAND;
+
   /// Returns true if the ship is an excavator.
   bool get isExcavator => registration.role == ShipRole.EXCAVATOR;
 

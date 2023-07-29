@@ -303,6 +303,12 @@ Future<DateTime?> advanceMiner(
   if (maybeSurvey == null && ship.hasSurveyor) {
     final response =
         await surveyAndLog(api, caches.surveys, ship, getNow: getNow);
+    // Count completion of survey as a success, otherwise we could end up
+    // surveying for a long time before checking other behaviors.
+    // We don't need to do this for miners since they don't change as often.
+    if (ship.isCommand) {
+      centralCommand.completeBehavior(ship.shipSymbol);
+    }
     return response.cooldown.expiration;
   }
 
