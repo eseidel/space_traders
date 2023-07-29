@@ -181,7 +181,12 @@ class CentralCommand {
   bool get isContractTradingEnabled => true;
 
   /// What phase of the game we think we're in.
-  GamePhase get phase => GamePhase.early;
+  GamePhase get phase {
+    if (_shipCache.ships.length < 30) {
+      return GamePhase.early;
+    }
+    return GamePhase.ramp;
+  }
 
   /// Minimum profit per second we expect this ship to make.
   // Should set this based on the ship type and how much we expect to earn
@@ -223,6 +228,32 @@ class CentralCommand {
 
   /// What template should we use for the given ship?
   ShipTemplate? templateForShip(Ship ship) {
+    final genericMiner = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.MINER,
+      mounts: Multiset.from([
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.SURVEYOR_I
+      ]),
+    );
+
+    // According to SAF: Surveyor = 2x mk2s,  miner = 2x mk2 + 1x mk1
+    // final surveyOnly = ShipTemplate(
+    //   frameSymbol: ShipFrameSymbolEnum.MINER,
+    //   mounts: Multiset.from([
+    //     ShipMountSymbolEnum.SURVEYOR_II,
+    //     ShipMountSymbolEnum.SURVEYOR_II,
+    //   ]),
+    // );
+    // final mineOnly = ShipTemplate(
+    //   frameSymbol: ShipFrameSymbolEnum.MINER,
+    //   mounts: Multiset.from([
+    //     ShipMountSymbolEnum.MINING_LASER_II,
+    //     ShipMountSymbolEnum.MINING_LASER_II,
+    //     ShipMountSymbolEnum.MINING_LASER_I,
+    //   ]),
+    // );
+
     // Hack to test a new template.
     // final surveyors = [
     //   'ESEIDEL-5',
@@ -231,28 +262,11 @@ class CentralCommand {
     //   'ESEIDEL-1B',
     // ];
     // if (surveyors.contains(ship.symbol)) {
-    //   return ShipTemplate(
-    //     frameSymbol: ShipFrameSymbolEnum.MINER,
-    //     mounts: Multiset.from([
-    //       ShipMountSymbolEnum.SURVEYOR_II,
-    //       ShipMountSymbolEnum.SURVEYOR_II,
-    //     ]),
-    //   );
+    //   return surveyOnly;
     // }
 
-    // According to SAF:
-    // Surveyor with 2x mk2s and miners with 2x mk2 + 1x mk1
-    final templates = [
-      ShipTemplate(
-        frameSymbol: ShipFrameSymbolEnum.MINER,
-        mounts: Multiset.from([
-          ShipMountSymbolEnum.MINING_LASER_II,
-          ShipMountSymbolEnum.MINING_LASER_II,
-          ShipMountSymbolEnum.SURVEYOR_I
-        ]),
-      )
-    ];
-    return templates
+    final genericTemplates = [genericMiner];
+    return genericTemplates
         .firstWhereOrNull((e) => e.frameSymbol == ship.frame.symbol);
   }
 
@@ -313,15 +327,7 @@ class CentralCommand {
       return Behavior.idle;
     }
 
-    // Just sits there so we can buy ships.
-    // if (ship.symbol == 'ESEIDEL-2') {
-    //   // if (!isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
-    //   //   return Behavior.buyShip;
-    //   // }
-    //   return Behavior.idle;
-    // }
-
-    // Disable drones (which should just be ESEIDEL-4).
+    // Disable drones after ramping to a full fleet.
     if (phase > GamePhase.ramp) {
       if (ship.frame.symbol == ShipFrameSymbolEnum.DRONE) {
         return Behavior.idle;
@@ -342,7 +348,7 @@ class CentralCommand {
     //   }
     // }
 
-    // final shipCount = _shipCache.ships.length;
+    final shipCount = _shipCache.ships.length;
 
     final behaviors = {
       // TODO(eseidel): Evaluate based on expected value, not just order.
@@ -362,12 +368,15 @@ class CentralCommand {
         // Early on the command ship makes about 5c/s vs. ore hounds making
         // 6c/s. It's a better surveyor than miner. Especially when enabling
         // mining drones.
-        // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
+        if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         Behavior.miner,
       ],
       // Haulers are terrible explorers, but early game we just need
       // things mapping.
-      ShipRole.HAULER: [Behavior.trader, Behavior.explorer],
+      ShipRole.HAULER: [
+        Behavior.trader,
+        Behavior.explorer,
+      ],
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
         Behavior.changeMounts,
@@ -859,7 +868,6 @@ class CentralCommand {
     // No haulers until we have 100+ markets?
     // At some point start buying heavy freighters intead of light haulers?
 
-    final shipCount = _shipCache.ships.length;
     final probeCount = _shipCache.countOfType(ShipType.PROBE);
     final houndCount = _shipCache.countOfType(ShipType.ORE_HOUND);
 
@@ -872,29 +880,28 @@ class CentralCommand {
     // We will buy miners in the start system.
     // Or probes anywhere (once we have enough miners).
     if (houndCount < 20 && inStartSystem) {
-      if (shipCount < 4) {
-        return ShipType.MINING_DRONE;
-      }
+      // Mining drones are never worth it.  They cost 80k a piece and pay
+      // for themselves in ~5 hours.  But ore hounds only cost 160k a piece
+      // pay for themselves in the same 5 hours, but also come with a laser 2
+      // and can mount a second laser 2 for only 80k more.  So you end up with
+      // 2 laser 2s for 240k, which is a better deal than 1 laser 1 for 80k.
       return ShipType.ORE_HOUND;
     } else if (houndCount > 5 && probeCount < 10) {
+      // If our probe happens to explore to another system which sells probes
+      // we could buy a few more probes.
       return ShipType.PROBE;
     }
     // We will not buy traders until we have enough miners to support a base
     // income and enough probes to have found deals for us to trade.
-    final isEarlyGame = _shipCache.ships.length < 30;
-    if (isEarlyGame) {
+    if (phase <= GamePhase.ramp) {
       return null;
     }
 
-    // const probeMinimum = 5;
-    // final traderCount = _countOfTypeInFleet(ShipType.LIGHT_HAULER);
-    // final probeTarget = min(traderCount / 2, probeMinimum);
-
     // SafPlusPlus limits to 50 probes and 40 miners
     final targetCounts = {
-      ShipType.MINING_DRONE: 1,
       ShipType.ORE_HOUND: 40,
-      ShipType.PROBE: 40,
+      // Not sure what the right number of probes is.
+      ShipType.PROBE: 20,
       ShipType.LIGHT_HAULER: 20,
       ShipType.HEAVY_FREIGHTER: 30,
     };
