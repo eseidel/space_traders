@@ -225,7 +225,7 @@ Future<BuyJob?> computeBuyJob(
   final neededMounts = centralCommand.mountsNeededForAllShips();
   jobAssert(
     neededMounts.isNotEmpty,
-    'No mounts needed.',
+    'No deliveries needed.',
     const Duration(minutes: 10),
   );
 

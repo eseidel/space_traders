@@ -169,13 +169,13 @@ void jobAssert(
   bool condition,
   String message,
   Duration timeout, {
-  Behavior? explicitBehavior,
+  DisableBehavior disable = DisableBehavior.thisShip,
 }) {
   if (!condition) {
     throw JobException(
       message,
-      const Duration(seconds: 30),
-      explicitBehavior: explicitBehavior,
+      timeout,
+      disable: disable,
     );
   }
 }
@@ -185,10 +185,14 @@ T assertNotNull<T>(
   T? value,
   String message,
   Duration timeout, {
-  Behavior? explicitBehavior,
+  DisableBehavior disable = DisableBehavior.thisShip,
 }) {
   if (value == null) {
-    throw JobException(message, timeout, explicitBehavior: explicitBehavior);
+    throw JobException(
+      message,
+      timeout,
+      disable: disable,
+    );
   }
   return value;
 }

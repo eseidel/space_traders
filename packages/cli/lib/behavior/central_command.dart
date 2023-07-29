@@ -958,13 +958,34 @@ class CentralCommand {
 
     // Buy ship if we should. Important to do this after
     // recordShipyardDataAndLog as it depends on having price data.
-    await buyShipIfPossible(
-      api,
-      shipyardPrices,
-      agentCache,
-      transactionLog,
-      ship,
-    );
+    try {
+      await buyShipIfPossible(
+        api,
+        shipyardPrices,
+        agentCache,
+        transactionLog,
+        ship,
+      );
+    } on JobException catch (error) {
+      // Catch any job error from buyShipIfPossible and explicitly
+      // disable the buyShip behavior rather than whatever behavior
+      // we happen to be running.
+      if (error.disable == DisableBehavior.thisShip) {
+        disableBehaviorForShip(
+          ship,
+          error.message,
+          error.timeout,
+          explicitBehavior: Behavior.buyShip,
+        );
+      } else {
+        disableBehaviorForAll(
+          ship,
+          error.message,
+          error.timeout,
+          explicitBehavior: Behavior.buyShip,
+        );
+      }
+    }
   }
 
   /// What the max multiplier of median we would pay for a ship.
@@ -978,6 +999,7 @@ class CentralCommand {
   int get minimumCreditsForTrading => numberOfHaulers * 10000;
 
   /// Attempt to buy a ship for the given [ship].
+  // TODO(eseidel): Unify this with buyShip behavior.
   Future<bool> buyShipIfPossible(
     Api api,
     ShipyardPrices shipyardPrices,
@@ -1009,20 +1031,15 @@ class CentralCommand {
       ),
       'No ship to buy at $shipyardSymbol.',
       const Duration(minutes: 5),
-      explicitBehavior: Behavior.buyShip,
     );
 
     // Get our median price before updating shipyard prices.
-    final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
-    if (medianPrice == null) {
-      disableBehaviorForAll(
-        ship,
-        'Failed to buy ship, no median price for $shipType.',
-        const Duration(minutes: 10),
-        explicitBehavior: Behavior.buyShip,
-      );
-      return false;
-    }
+    final medianPrice = assertNotNull(
+      shipyardPrices.medianPurchasePrice(shipType),
+      'Failed to buy ship, no median price for $shipType.',
+      const Duration(minutes: 10),
+      disable: DisableBehavior.allShips,
+    );
     final maxMedianMultiplier = maxMedianShipPriceMultipler;
     final maxPrice = (medianPrice * maxMedianMultiplier).toInt();
 
@@ -1030,41 +1047,29 @@ class CentralCommand {
     // our traders trading.
     final budget = agentCache.agent.credits - minimumCreditsForTrading;
     final credits = budget;
-    if (credits < maxPrice) {
-      disableBehaviorForAll(
-        ship,
-        'Can not buy $shipType, budget $credits < max price $maxPrice.',
-        const Duration(minutes: 10),
-        explicitBehavior: Behavior.buyShip,
-      );
-      return false;
-    }
-
-    final recentPrice = shipyardPrices.recentPurchasePrice(
-      shipyardSymbol: shipyardSymbol,
-      shipType: shipType,
+    jobAssert(
+      credits >= maxPrice,
+      'Can not buy $shipType, budget $credits < max price $maxPrice.',
+      const Duration(minutes: 10),
+      disable: DisableBehavior.allShips,
     );
-    if (recentPrice == null) {
-      disableBehaviorForShip(
-        ship,
-        'Shipyard at $shipyardSymbol does not sell $shipType.',
-        const Duration(minutes: 10),
-        explicitBehavior: Behavior.buyShip,
-      );
-      return false;
-    }
+
+    final recentPrice = assertNotNull(
+      shipyardPrices.recentPurchasePrice(
+        shipyardSymbol: shipyardSymbol,
+        shipType: shipType,
+      ),
+      'Shipyard at $shipyardSymbol does not sell $shipType.',
+      const Duration(minutes: 10),
+    );
 
     final recentPriceString = creditsString(recentPrice);
-    if (recentPrice > maxPrice) {
-      disableBehaviorForShip(
-        ship,
-        'Failed to buy $shipType at $shipyardSymbol, '
-        '$recentPriceString > max price $maxPrice.',
-        const Duration(minutes: 10),
-        explicitBehavior: Behavior.buyShip,
-      );
-      return false;
-    }
+    jobAssert(
+      recentPrice <= maxPrice,
+      'Failed to buy $shipType at $shipyardSymbol, '
+      '$recentPriceString > max price $maxPrice.',
+      const Duration(minutes: 10),
+    );
 
     // Do we need to catch exceptions about insufficient credits?
     final result = await purchaseShipAndLog(
@@ -1077,11 +1082,12 @@ class CentralCommand {
       shipType,
     );
 
-    disableBehaviorForAll(
-      ship,
+    // Abusing jobAssert a little here to throw an exception on success
+    // which will clear only the buyShip behavior.
+    jobAssert(
+      false,
       'Purchased ${result.ship.symbol} ($shipType)!',
       const Duration(minutes: 10),
-      explicitBehavior: Behavior.buyShip,
     );
     return true;
   }
