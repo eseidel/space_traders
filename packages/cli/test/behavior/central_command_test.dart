@@ -32,6 +32,8 @@ class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipFrame extends Mock implements ShipFrame {}
+
 void main() {
   test('CentralCommand.isDisabledForAll', () async {
     final behaviorCache = _MockBehhaviorCache();
@@ -111,6 +113,10 @@ void main() {
         role: ShipRole.CARRIER,
       ),
     );
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol)
+        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
     final shipFuel = _MockShipFuel();
     when(() => shipFuel.capacity).thenReturn(100);
     when(() => shipFuel.current).thenReturn(100);
