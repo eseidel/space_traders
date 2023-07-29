@@ -1,21 +1,31 @@
 import 'package:cli/api.dart';
 import 'package:cli/ship_waiter.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
-
-class _MockShip extends Mock implements Ship {}
 
 void main() {
   test('ShipWaiter', () {
     final waiter = ShipWaiter();
-    final a = _MockShip();
     const aSymbol = ShipSymbol('a', 1);
-    when(() => a.symbol).thenReturn(aSymbol.symbol);
     final aTime = DateTime.now();
-    waiter.updateWaitUntil(aSymbol, aTime);
-    expect(waiter.waitUntil(aSymbol), aTime);
-    expect(waiter.earliestWaitUntil(), aTime);
-    waiter.updateForShips([a]);
-    expect(waiter.waitUntil(aSymbol), isNull);
+    waiter.scheduleShip(aSymbol, aTime);
+    final next = waiter.nextShip();
+    expect(next.waitUntil, aTime);
+  });
+
+  test('ShipWaiter order', () {
+    final waiter = ShipWaiter();
+    const short = ShipSymbol('a', 1);
+    const long = ShipSymbol('a', 2);
+    const nullTime = ShipSymbol('a', 3);
+    waiter
+      ..scheduleShip(short, DateTime.now().add(const Duration(seconds: 1)))
+      ..scheduleShip(
+        long,
+        DateTime.now().add(const Duration(seconds: 1000)),
+      )
+      ..scheduleShip(nullTime, null);
+    expect(waiter.nextShip().shipSymbol, nullTime);
+    expect(waiter.nextShip().shipSymbol, short);
+    expect(waiter.nextShip().shipSymbol, long);
   });
 }

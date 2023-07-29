@@ -7,25 +7,36 @@ import 'package:cli/net/rate_limit.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/ship_waiter.dart';
 
+// Pulled in to a separate function to help make sure we don't confuse
+// the wait we needed for this ship with the next wait.
+Future<void> _waitIfNeeded(ShipWaiterEntry entry) async {
+  final waitUntil = entry.waitUntil;
+  if (waitUntil != null && waitUntil.isAfter(DateTime.timestamp())) {
+    final waitDuration = waitUntil.difference(DateTime.timestamp());
+    final wait = approximateDuration(waitDuration);
+    logger.info('⏱️  $wait until ${waitUntil.toLocal()}');
+    await Future<void>.delayed(waitDuration);
+  }
+}
+
 /// One loop of the logic.
 Future<void> advanceShips(
   Api api,
   CentralCommand centralCommand,
   Caches caches,
   ShipWaiter waiter, {
+  required int loopCount,
   bool Function(Ship ship)? shipFilter,
 }) async {
   await caches.updateAtTopOfLoop(api);
-  waiter.updateForShips(caches.ships.ships);
-
-  final shipSymbols = caches.ships.shipSymbols;
+  waiter.scheduleMissingShips(caches.ships.ships);
 
   // loop over all ships and advance them.
-  for (final shipSymbol in shipSymbols) {
-    final previousWait = waiter.waitUntil(shipSymbol);
-    if (previousWait != null) {
-      continue;
-    }
+  for (var i = 0; i < loopCount; i++) {
+    final entry = waiter.nextShip();
+    final shipSymbol = entry.shipSymbol;
+
+    await _waitIfNeeded(entry);
     final ship = caches.ships.ship(shipSymbol);
     if (shipFilter != null && !shipFilter(ship)) {
       continue;
@@ -55,7 +66,7 @@ Future<void> advanceShips(
           'expected ${expectedSeconds.toStringAsFixed(1)}s',
         );
       }
-      waiter.updateWaitUntil(shipSymbol, waitUntil);
+      waiter.scheduleShip(shipSymbol, waitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when
       // running the script fresh with no state while a ship is still on
@@ -67,7 +78,7 @@ Future<void> advanceShips(
       }
       final difference = expiration.difference(DateTime.timestamp());
       shipInfo(ship, '🥶 for ${approximateDuration(difference)}');
-      waiter.updateWaitUntil(shipSymbol, expiration);
+      waiter.scheduleShip(shipSymbol, expiration);
     }
   }
 }
@@ -120,11 +131,17 @@ Future<void> logic(
   Caches caches, {
   bool Function(Ship ship)? shipFilter,
 }) async {
-  final waiter = ShipWaiter();
+  final waiter = ShipWaiter()
+    ..scheduleMissingShips(caches.ships.ships, suppressWarnings: true);
   final rateLimitTracker = RateLimitTracker(api);
 
   while (true) {
     rateLimitTracker.printStatsIfNeeded();
+    // Get the next ship from the priority queue.
+    // Figure out what the next time it's ready is.
+    // Wait until then?
+    // advance the ship
+    // loop.
     try {
       await advanceShips(
         api,
@@ -132,6 +149,7 @@ Future<void> logic(
         caches,
         waiter,
         shipFilter: shipFilter,
+        loopCount: 50,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {
@@ -160,25 +178,5 @@ Future<void> logic(
       // the system to recover.
       await Future<void>.delayed(const Duration(seconds: 2));
     }
-
-    final earliestWaitUntil = waiter.earliestWaitUntil();
-    // earliestWaitUntil can be past if an earlier ship needed to wait
-    // but then later ships took longer than that wait time to process.
-    if (earliestWaitUntil != null &&
-        earliestWaitUntil.isAfter(DateTime.timestamp())) {
-      // This future waits until the earliest time we think the server
-      // will be ready for us to do something.
-      final waitDuration = earliestWaitUntil.difference(DateTime.timestamp());
-      // if (waitDuration.inSeconds > 5) {
-      // Extra space after emoji needed for windows powershell.
-      final wait = approximateDuration(waitDuration);
-      logger.info('⏱️  $wait until ${earliestWaitUntil.toLocal()}');
-      // }
-      await Future<void>.delayed(
-        earliestWaitUntil.difference(DateTime.timestamp()),
-      );
-    }
-    // Otherwise we just loop again immediately and rely on rate limiting in the
-    // API client to prevent us from sending requests too quickly.
   }
 }
