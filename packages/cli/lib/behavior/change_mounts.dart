@@ -155,8 +155,8 @@ Future<DateTime?> advanceChangeMounts(
   // Decide on the mount and "claim" it by saving it in our state.
   final toClaim = assertNotNull(
     _pickMountFromAvailable(available, needed),
-    'No unclaimed mounts available at shipyard.',
-    const Duration(hours: 1),
+    'No unclaimed mounts at $shipyardSymbol.',
+    const Duration(minutes: 10),
   );
   centralCommand.claimMount(ship.shipSymbol, toClaim);
 

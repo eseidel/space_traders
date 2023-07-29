@@ -141,7 +141,7 @@ Future<Survey?> surveyWorthMining(
   //     'Selected '
   //     '${survey.signature} ${survey.size} '
   //     '${survey.deposits.map((d) => d.symbol).join(', ')} '
-  //     '${best.expectedValue}c',
+  //     '${creditsString(best.expectedValue)}',
   //   );
   // }
   return best?.survey;

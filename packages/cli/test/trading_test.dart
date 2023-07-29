@@ -518,18 +518,108 @@ void main() {
   });
   test('findBestMarketToBuy smoke test', () {
     final ship = _MockShip();
+    final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
+    const fuelCapacity = 100;
+    when(() => ship.fuel)
+        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
+    final shipEngine = _MockShipEngine();
+    when(() => ship.engine).thenReturn(shipEngine);
+    const shipSpeed = 30;
+    when(() => shipEngine.speed).thenReturn(shipSpeed);
     final routePlanner = _MockRoutePlanner();
     final marketPrices = _MockMarketPrices();
-    when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM)).thenReturn([]);
-
-    final market = findBestMarketToBuy(
-      marketPrices,
-      routePlanner,
-      ship,
-      TradeSymbol.ALUMINUM,
-      expectedCreditsPerSecond: 7,
+    final now = DateTime(2021);
+    // 3 potential deals:
+    // One which is the closest.  One which is further but better buy price,
+    // and a 3rd which is further still but not worth the extra travel.
+    final near = MarketPrice(
+      waypointSymbol: nearSymbol,
+      symbol: TradeSymbol.ALUMINUM.value,
+      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      purchasePrice: 1000,
+      sellPrice: 1,
+      tradeVolume: 10,
+      timestamp: now,
     );
-    expect(market, isNull);
+    final mid = MarketPrice(
+      waypointSymbol: WaypointSymbol.fromString('S-A-MID'),
+      symbol: TradeSymbol.ALUMINUM.value,
+      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      purchasePrice: 100,
+      sellPrice: 1,
+      tradeVolume: 10,
+      timestamp: now,
+    );
+    final far = MarketPrice(
+      waypointSymbol: WaypointSymbol.fromString('S-A-FAR'),
+      symbol: TradeSymbol.ALUMINUM.value,
+      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      purchasePrice: 10,
+      sellPrice: 1,
+      tradeVolume: 10,
+      timestamp: now,
+    );
+
+    when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM))
+        .thenReturn([near, mid, far]);
+
+    RoutePlan fakePlan(WaypointSymbol start, WaypointSymbol end, int duration) {
+      return RoutePlan(
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+        actions: [
+          RouteAction(
+            startSymbol: start,
+            endSymbol: end,
+            type: RouteActionType.navCruise,
+            duration: duration,
+          )
+        ],
+        fuelUsed: 1,
+      );
+    }
+
+    when(
+      () => routePlanner.planRoute(
+        start: nearSymbol,
+        end: nearSymbol,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      ),
+    ).thenReturn(fakePlan(nearSymbol, nearSymbol, 1));
+    when(
+      () => routePlanner.planRoute(
+        start: nearSymbol,
+        end: mid.waypointSymbol,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      ),
+    ).thenReturn(fakePlan(nearSymbol, mid.waypointSymbol, 10));
+    when(
+      () => routePlanner.planRoute(
+        start: nearSymbol,
+        end: far.waypointSymbol,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      ),
+    ).thenReturn(fakePlan(nearSymbol, far.waypointSymbol, 10000000));
+
+    final logger = _MockLogger();
+    final market = runWithLogger(
+      logger,
+      () => findBestMarketToBuy(
+        marketPrices,
+        routePlanner,
+        ship,
+        TradeSymbol.ALUMINUM,
+        expectedCreditsPerSecond: 1,
+      ),
+    );
+
+    expect(market?.price, mid);
   });
 
   test('findBestMarketToSell smoke test', () {

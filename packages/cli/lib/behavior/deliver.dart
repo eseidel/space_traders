@@ -226,7 +226,7 @@ Future<BuyJob?> computeBuyJob(
   jobAssert(
     neededMounts.isNotEmpty,
     'No mounts needed.',
-    const Duration(minutes: 20),
+    const Duration(minutes: 10),
   );
 
   // Figure out what item we're supposed to get.
@@ -235,7 +235,7 @@ Future<BuyJob?> computeBuyJob(
   final buyRequest = assertNotNull(
     _buyRequestFromNeededMounts(neededMounts),
     'No mounts available.',
-    const Duration(minutes: 20),
+    const Duration(minutes: 10),
   );
 
   final tradeSymbol = buyRequest.tradeSymbol;
@@ -259,7 +259,7 @@ Future<BuyJob?> computeBuyJob(
       expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
     ),
     'No market to buy $tradeSymbol',
-    const Duration(days: 1),
+    const Duration(hours: 1),
   );
   final buyJob = BuyJob(
     tradeSymbol: tradeSymbol,

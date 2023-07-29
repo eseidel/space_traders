@@ -350,7 +350,7 @@ class CentralCommand {
 
       ShipRole.COMMAND: [
         // If we can get mounts for our ships, that's the best thing we can do.
-        // Behavior.deliver,
+        Behavior.deliver,
         // Otherwise buying more ships is best.
         Behavior.buyShip,
         // Will only trade if we can make 6/s or more.
@@ -370,7 +370,7 @@ class CentralCommand {
       ShipRole.HAULER: [Behavior.trader, Behavior.explorer],
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
-        // Behavior.changeMounts,
+        Behavior.changeMounts,
         if (phase < GamePhase.tradingTransition && ship.canMine) Behavior.miner,
         if (phase < GamePhase.tradingTransition &&
             !ship.canMine &&
