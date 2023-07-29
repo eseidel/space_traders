@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
@@ -1033,53 +1033,17 @@ class CentralCommand {
       const Duration(minutes: 5),
     );
 
-    // Get our median price before updating shipyard prices.
-    final medianPrice = assertNotNull(
-      shipyardPrices.medianPurchasePrice(shipType),
-      'Failed to buy ship, no median price for $shipType.',
-      const Duration(minutes: 10),
-      disable: DisableBehavior.allShips,
-    );
-    final maxMedianMultiplier = maxMedianShipPriceMultipler;
-    final maxPrice = (medianPrice * maxMedianMultiplier).toInt();
-
-    // We should only try to buy new ships if we have enough money to keep
-    // our traders trading.
-    final budget = agentCache.agent.credits - minimumCreditsForTrading;
-    final credits = budget;
-    jobAssert(
-      credits >= maxPrice,
-      'Can not buy $shipType, budget $credits < max price $maxPrice.',
-      const Duration(minutes: 10),
-      disable: DisableBehavior.allShips,
-    );
-
-    final recentPrice = assertNotNull(
-      shipyardPrices.recentPurchasePrice(
-        shipyardSymbol: shipyardSymbol,
-        shipType: shipType,
-      ),
-      'Shipyard at $shipyardSymbol does not sell $shipType.',
-      const Duration(minutes: 10),
-    );
-
-    final recentPriceString = creditsString(recentPrice);
-    jobAssert(
-      recentPrice <= maxPrice,
-      'Failed to buy $shipType at $shipyardSymbol, '
-      '$recentPriceString > max price $maxPrice.',
-      const Duration(minutes: 10),
-    );
-
-    // Do we need to catch exceptions about insufficient credits?
-    final result = await purchaseShipAndLog(
+    final result = await doBuyShipJob(
       api,
       _shipCache,
+      shipyardPrices,
       agentCache,
       transactionLog,
       ship,
       shipyardSymbol,
       shipType,
+      maxMedianShipPriceMultipler: maxMedianShipPriceMultipler,
+      minimumCreditsForTrading: minimumCreditsForTrading,
     );
 
     // Abusing jobAssert a little here to throw an exception on success
