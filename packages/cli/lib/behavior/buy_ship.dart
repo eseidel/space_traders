@@ -86,7 +86,8 @@ Future<DateTime?> advanceBuyShip(
     centralCommand.disableBehaviorForAll(
       ship,
       'Can not buy $shipType at $shipyardSymbol, '
-      'credits $credits < $priceAdjustment * price = $maxPriceToCheck.',
+      'credits ${creditsString(credits)} < '
+      '$priceAdjustment * price = ${creditsString(maxPriceToCheck)}.',
       const Duration(minutes: 10),
     );
     return null;
