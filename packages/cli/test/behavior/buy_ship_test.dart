@@ -18,8 +18,6 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
 
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipCache extends Mock implements ShipCache {}
@@ -38,10 +36,17 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockBehaviorState extends Mock implements BehaviorState {}
 
+class _MockAgent extends Mock implements Agent {}
+
+class _MockSystemsApi extends Mock implements SystemsApi {}
+
+class _MockFleetApi extends Mock implements FleetApi {}
+
+class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
+
 void main() {
   test('advanceBuyShip smoke test', () async {
     final api = _MockApi();
-    final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
@@ -56,7 +61,6 @@ void main() {
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
     when(() => caches.transactions).thenReturn(transactionLog);
-    when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
@@ -64,6 +68,8 @@ void main() {
 
     final now = DateTime(2021);
     DateTime getNow() => now;
+    const shipSymbol = ShipSymbol('A', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
 
@@ -83,6 +89,10 @@ void main() {
       )
     ]);
 
+    final agent = _MockAgent();
+    when(() => agentCache.agent).thenReturn(agent);
+    when(() => agent.credits).thenReturn(1000000);
+
     registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
@@ -94,18 +104,90 @@ void main() {
     when(() => shipCache.frameCounts).thenReturn({});
     final state = _MockBehaviorState();
 
-    final logger = _MockLogger();
-    final waitUntil = await runWithLogger(
-      logger,
-      () => advanceBuyShip(
-        api,
-        centralCommand,
-        caches,
-        state,
+    const shipType = ShipType.ORE_HOUND;
+    when(() => shipyardPrices.medianPurchasePrice(shipType)).thenReturn(1);
+    when(
+      () => shipyardPrices.recentPurchasePrice(
+        shipyardSymbol: symbol,
+        shipType: shipType,
+      ),
+    ).thenReturn(1);
+
+    when(
+      () => centralCommand.shipTypeToBuy(
         ship,
-        getNow: getNow,
+        shipyardPrices,
+        agentCache,
+        symbol,
+      ),
+    ).thenReturn(shipType);
+
+    final systemsApi = _MockSystemsApi();
+    when(() => api.systems).thenReturn(systemsApi);
+    when(() => systemsApi.getShipyard(symbol.system, symbol.waypoint))
+        .thenAnswer(
+      (_) => Future.value(
+        GetShipyard200Response(
+          data: Shipyard(
+            symbol: symbol.waypoint,
+            shipTypes: [
+              ShipyardShipTypesInner(type: shipType),
+            ],
+          ),
+        ),
       ),
     );
-    expect(waitUntil, isNull);
+    final fleetApi = _MockFleetApi();
+    final transaction = _MockShipyardTransaction();
+    when(() => transaction.shipSymbol).thenReturn(shipSymbol.symbol);
+    when(() => transaction.price).thenReturn(2);
+    when(() => transaction.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => transaction.timestamp).thenReturn(DateTime(2021));
+    when(
+      () => fleetApi.purchaseShip(
+        purchaseShipRequest: PurchaseShipRequest(
+          shipType: shipType,
+          waypointSymbol: symbol.waypoint,
+        ),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        PurchaseShip201Response(
+          data: PurchaseShip201ResponseData(
+            agent: agent,
+            transaction: transaction,
+            ship: ship, // Supposed to be the new ship, cheating for the mock.
+          ),
+        ),
+      ),
+    );
+    when(() => api.fleet).thenReturn(fleetApi);
+
+    when(() => centralCommand.maxMedianShipPriceMultipler).thenReturn(1.05);
+
+    final logger = _MockLogger();
+    expect(
+      () async {
+        final waitUntil = await runWithLogger(
+          logger,
+          () => advanceBuyShip(
+            api,
+            centralCommand,
+            caches,
+            state,
+            ship,
+            getNow: getNow,
+          ),
+        );
+        return waitUntil;
+      },
+      throwsA(
+        const JobException(
+          'Purchased A-1 (SHIP_ORE_HOUND)!',
+          Duration(minutes: 10),
+          disable: DisableBehavior.allShips,
+        ),
+      ),
+    );
   });
 }

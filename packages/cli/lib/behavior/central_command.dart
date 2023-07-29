@@ -954,7 +954,7 @@ class CentralCommand {
       return;
     }
     final shipyard = await getShipyard(api, waypoint);
-    await recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
+    recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
 
     // Buy ship if we should. Important to do this after
     // recordShipyardDataAndLog as it depends on having price data.

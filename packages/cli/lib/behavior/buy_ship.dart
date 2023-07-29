@@ -15,7 +15,6 @@ Future<DateTime?> advanceBuyShip(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   // final shipyardWaypoints =
@@ -37,35 +36,29 @@ Future<DateTime?> advanceBuyShip(
   final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
   final shipyardSymbol = shipyardWaypoint.waypointSymbol;
 
-  final shipType = centralCommand.shipTypeToBuy(
-    ship,
-    caches.shipyardPrices,
-    caches.agent,
-    shipyardSymbol,
-  );
-  if (shipType == null) {
-    centralCommand.disableBehaviorForShip(
+  final shipType = assertNotNull(
+    centralCommand.shipTypeToBuy(
       ship,
-      'No ship to buy at $shipyardSymbol.',
-      const Duration(minutes: 10),
-    );
-    return null;
-  }
+      caches.shipyardPrices,
+      caches.agent,
+      shipyardSymbol,
+    ),
+    'No ship to buy at $shipyardSymbol.',
+    const Duration(minutes: 10),
+  );
 
   // Get our median price before updating shipyard prices.
-  final medianPrice = caches.shipyardPrices.medianPurchasePrice(shipType);
   // TODO(eseidel): As written, this can never buy a ship immediately on spawn.
   // Since we won't have surveyed any shipyards yet.
   // Should just remove medianPrice and work from opportunity cost instead
   // like findBestMarketToBuyFrom does.
-  if (medianPrice == null) {
-    centralCommand.disableBehaviorForAll(
-      ship,
-      'Failed to buy ship, no median price for $shipType.',
-      const Duration(minutes: 20),
-    );
-    return null;
-  }
+  final medianPrice = assertNotNull(
+    caches.shipyardPrices.medianPurchasePrice(shipType),
+    'Failed to buy ship, no median price for $shipType.',
+    const Duration(minutes: 20),
+    disable: DisableBehavior.allShips,
+  );
+
   // Separate out the number of credits needed to go check
   // Which should be ~5% above the last price we saw.
   // In the early game, we'll pay any price, since the max price should really
@@ -82,16 +75,14 @@ Future<DateTime?> advanceBuyShip(
   const priceAdjustment = 1.05;
   final maxPriceToCheck = (shipyardPrice * priceAdjustment).toInt();
   final credits = caches.agent.agent.credits;
-  if (credits < maxPriceToCheck) {
-    centralCommand.disableBehaviorForAll(
-      ship,
-      'Can not buy $shipType at $shipyardSymbol, '
-      'credits ${creditsString(credits)} < '
-      '$priceAdjustment * price = ${creditsString(maxPriceToCheck)}.',
-      const Duration(minutes: 10),
-    );
-    return null;
-  }
+  jobAssert(
+    credits >= maxPriceToCheck,
+    'Can not buy $shipType at $shipyardSymbol, '
+    'credits ${creditsString(credits)} < '
+    '$priceAdjustment * price = ${creditsString(maxPriceToCheck)}.',
+    const Duration(minutes: 10),
+    disable: DisableBehavior.allShips,
+  );
 
   if (currentWaypoint.waypointSymbol != shipyardSymbol) {
     // We're not there, go to the shipyard to purchase.
@@ -115,7 +106,7 @@ Future<DateTime?> advanceBuyShip(
     const Duration(minutes: 30),
   );
 
-  await recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
+  recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
   // We should *always* have a recent price unless the shipyard doesn't
   // sell that type of ship.
@@ -145,12 +136,12 @@ Future<DateTime?> advanceBuyShip(
   );
 
   // Record our success!
-  centralCommand
-    ..completeBehavior(ship.shipSymbol)
-    ..disableBehaviorForAll(
-      ship,
-      'Purchased ${result.ship.symbol} ($shipType)!',
-      const Duration(minutes: 10),
-    );
+  centralCommand.completeBehavior(ship.shipSymbol);
+  jobAssert(
+    false,
+    'Purchased ${result.ship.symbol} ($shipType)!',
+    const Duration(minutes: 10),
+    disable: DisableBehavior.allShips,
+  );
   return null;
 }

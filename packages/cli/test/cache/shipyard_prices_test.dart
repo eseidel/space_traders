@@ -37,7 +37,7 @@ void main() {
       purchasePrice: 2,
       timestamp: moonLanding,
     );
-    await shipyardPrices.addPrices([a, b]);
+    shipyardPrices.addPrices([a, b]);
     expect(shipyardPrices.prices, [a, b]);
     shipyardPrices.save();
     final shipyardPrices2 = ShipyardPrices.load(fs);

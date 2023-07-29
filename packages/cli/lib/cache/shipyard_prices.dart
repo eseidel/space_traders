@@ -128,7 +128,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   }
 
   /// Add new prices to the shipyard price data.
-  Future<void> addPrices(List<ShipyardPrice> newPrices) async {
+  void addPrices(List<ShipyardPrice> newPrices) {
     for (final newPrice in newPrices) {
       // This doesn't account for existing duplicates.
       final index = _prices.indexWhere(
@@ -252,26 +252,26 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
 }
 
 /// Record shipyard data and log the result.
-Future<void> recordShipyardDataAndLog(
+void recordShipyardDataAndLog(
   ShipyardPrices shipyardPrices,
   Shipyard shipyard,
   Ship ship,
-) async {
-  await recordShipyardData(shipyardPrices, shipyard);
+) {
+  recordShipyardData(shipyardPrices, shipyard);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  shipyard data @ ${shipyard.symbol}');
 }
 
 /// Record shipyard data.
-Future<void> recordShipyardData(
+void recordShipyardData(
   ShipyardPrices shipyardPrices,
   Shipyard shipyard,
-) async {
+) {
   final prices = shipyard.ships
       .map((s) => ShipyardPrice.fromShipyardShip(s, shipyard.waypointSymbol))
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${shipyard.symbol}!');
   }
-  await shipyardPrices.addPrices(prices);
+  shipyardPrices.addPrices(prices);
 }

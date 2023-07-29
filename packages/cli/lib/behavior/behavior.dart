@@ -2,6 +2,7 @@ import 'package:cli/api.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
+import 'package:meta/meta.dart';
 
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {
@@ -137,15 +138,15 @@ enum DisableBehavior {
 }
 
 /// Exception thrown from a Job.
+@immutable
 class JobException implements Exception {
   /// Create a new job exception.
-  JobException(
+  const JobException(
     this.message,
     this.timeout, {
     this.disable = DisableBehavior.thisShip,
     this.explicitBehavior,
-  })  : assert(message.isNotEmpty, 'why must not be empty'),
-        assert(timeout.inSeconds > 0, 'timeout must be positive');
+  });
 
   /// Why did the job error?
   final String message;
@@ -160,7 +161,23 @@ class JobException implements Exception {
   final Behavior? explicitBehavior;
 
   @override
-  String toString() => message;
+  String toString() => 'JobException: $message, timeout: $timeout, '
+      'disable: $disable, explicitBehavior: $explicitBehavior';
+
+  @override
+  bool operator ==(Object other) =>
+      other is JobException &&
+      message == other.message &&
+      timeout == other.timeout &&
+      disable == other.disable &&
+      explicitBehavior == other.explicitBehavior;
+
+  @override
+  int get hashCode =>
+      message.hashCode ^
+      timeout.hashCode ^
+      disable.hashCode ^
+      explicitBehavior.hashCode;
 }
 
 /// Exception thrown from a Job if the condition is not met.
