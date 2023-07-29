@@ -135,6 +135,29 @@ enum GamePhase with EnumIndexOrdering<GamePhase> {
   end;
 }
 
+/// A request for a delivery.
+class DeliveryRequest {
+  /// Create a new delivery request.
+  DeliveryRequest({
+    required this.requester,
+    required this.tradeSymbol,
+    required this.destination,
+    required this.units,
+  });
+
+  /// Who is requesting this delivery?
+  final ShipSymbol requester;
+
+  /// What are we delivering?
+  final TradeSymbol tradeSymbol;
+
+  /// Where are we delivering it?
+  final WaypointSymbol destination;
+
+  /// How many units are we delivering?
+  final int units;
+}
+
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
@@ -319,7 +342,7 @@ class CentralCommand {
     //   }
     // }
 
-    final shipCount = _shipCache.ships.length;
+    // final shipCount = _shipCache.ships.length;
 
     final behaviors = {
       // TODO(eseidel): Evaluate based on expected value, not just order.
@@ -339,7 +362,7 @@ class CentralCommand {
         // Early on the command ship makes about 5c/s vs. ore hounds making
         // 6c/s. It's a better surveyor than miner. Especially when enabling
         // mining drones.
-        if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
+        // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         Behavior.miner,
       ],
       // Haulers are terrible explorers, but early game we just need

@@ -44,10 +44,10 @@ Future<DateTime?> advanceBuyShip(
     shipyardSymbol,
   );
   if (shipType == null) {
-    centralCommand.disableBehaviorForAll(
+    centralCommand.disableBehaviorForShip(
       ship,
-      'No ships needed.',
-      const Duration(hours: 1),
+      'No ship to buy at $shipyardSymbol.',
+      const Duration(minutes: 10),
     );
     return null;
   }

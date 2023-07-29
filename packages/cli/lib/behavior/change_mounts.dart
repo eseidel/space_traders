@@ -39,25 +39,13 @@ Future<DateTime?> advanceChangeMounts(
   final toMount = centralCommand.getMountToAdd(ship.shipSymbol);
 
   // Re-validate every loop in case resuming from error.
-  final template = centralCommand.templateForShip(ship);
-  if (template == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No template for ship.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
-
+  final template = assertNotNull(
+    centralCommand.templateForShip(ship),
+    'No template.',
+    const Duration(hours: 1),
+  );
   final needed = mountsToAddToShip(ship, template);
-  if (needed.isEmpty) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No mounts needed.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
+  jobAssert(needed.isNotEmpty, 'No mounts needed.', const Duration(hours: 1));
 
   shipInfo(ship, 'Changing mounts. Mounting $toMount.');
 
@@ -72,17 +60,11 @@ Future<DateTime?> advanceChangeMounts(
     }
 
     final tradeSymbol = tradeSymbolForMountSymbol(toMount);
-    final deliveryShip =
-        centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol);
-
-    if (deliveryShip == null) {
-      centralCommand.disableBehaviorForAll(
-        ship,
-        'No delivery ship for $tradeSymbol.',
-        const Duration(minutes: 10),
-      );
-      return null;
-    }
+    final deliveryShip = assertNotNull(
+      centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol),
+      'No delivery ship for $tradeSymbol.',
+      const Duration(minutes: 10),
+    );
 
     // We could match the docking status instead.
     if (!deliveryShip.isDocked) {
@@ -161,29 +143,21 @@ Future<DateTime?> advanceChangeMounts(
 
   final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
   final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
-  final shipyard = hqWaypoints.firstWhereOrNull((w) => w.hasShipyard);
-  if (shipyard == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No shipyard in $hqSystem',
-      const Duration(days: 1),
-    );
-    return null;
-  }
+  final shipyard = assertNotNull(
+    hqWaypoints.firstWhereOrNull((w) => w.hasShipyard),
+    'No shipyard in $hqSystem',
+    const Duration(days: 1),
+  );
   final shipyardSymbol = shipyard.waypointSymbol;
 
   final available = centralCommand.unclaimedMountsAt(shipyardSymbol);
   // If there is a mount ready for us to claim, claim it?
   // Decide on the mount and "claim" it by saving it in our state.
-  final toClaim = _pickMountFromAvailable(available, needed);
-  if (toClaim == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No unclaimed mounts available at shipyard.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
+  final toClaim = assertNotNull(
+    _pickMountFromAvailable(available, needed),
+    'No unclaimed mounts available at shipyard.',
+    const Duration(hours: 1),
+  );
   centralCommand.claimMount(ship.shipSymbol, toClaim);
 
   // Go to the shipyard.

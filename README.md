@@ -88,6 +88,7 @@ Most impact:
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
 * Use MineJob to cache market and mine location (save lookups).
+* Confirm planRoute is using PriorityQueue correctly.
 
 Early Game:
 * Could ask the intial probe to sit still, or come back to buy ships for you.
