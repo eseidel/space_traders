@@ -78,6 +78,44 @@ class ShipTemplate {
   final Multiset<ShipMountSymbolEnum> mounts;
 }
 
+/// Where are we in the phases of the reset.
+enum GamePhase {
+  /// Early, we have little money, lots of request space.
+  /// What matters most at this point is that we buy ships as fast as we can.
+  /// We don't care a ton about price, more about opportunity cost (so we can
+  /// spend our requests faster).
+  /// Command center is trading when it can, but only near the starting system?
+  /// The starting probe is parked at the starting shipyard or at least knows
+  /// how to be back in time to buy things.
+  /// We transition to Ramp when we can buy 1 module every 10 minutes?
+  early,
+
+  /// Ramp, we have money flowing in, but we haven't upgraded our ships yet.
+  /// Our fleet is not yet full either.  We're buying modules when we can fit
+  /// them (they're cheaper) and ships when we need more module space.
+  /// We're trying to get to max efficiency as fast as possible.
+  /// We transition to mid when we're at the request limit.
+  ramp,
+
+  /// We're at the request limit at this point. We're trying to maximize
+  /// for profit per second.  Still mostly mining.  We're exploring so we can
+  /// prepare for trading.
+  /// We transition to trading transition when we turn off our first miner
+  /// in favor of a trader?
+  exploring,
+
+  /// We're at the request limit.  We're trying to maximize profit per request
+  /// Slowly converting from a mining based economy to a trading one.
+  /// We transition to "end" when we have less than 4 hours until the end of
+  /// the game.
+  tradingTransition,
+
+  /// The game has a fixed time limit and all actions should be optimized
+  /// to maximize total credits at the end of that time.
+  /// We don't want to start new long contracts at this point (or long trades)?
+  end,
+}
+
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
@@ -132,7 +170,13 @@ class CentralCommand {
   /// What template should we use for the given ship?
   ShipTemplate? templateForShip(Ship ship) {
     // Hack to test a new template.
-    if (ship.symbol == 'ESEIDEL-1B') {
+    final surveyors = [
+      'ESEIDEL-5',
+      'ESEIDEL-6',
+      'ESEIDEL-7',
+      'ESEIDEL-1B',
+    ];
+    if (surveyors.contains(ship.symbol)) {
       return ShipTemplate(
         frameSymbol: ShipFrameSymbolEnum.MINER,
         mounts: Multiset.from([
@@ -215,9 +259,23 @@ class CentralCommand {
       return Behavior.idle;
     }
 
-    // final forceIdle = ['ESEIDEL-1B'];
-    // if (forceIdle.contains(ship.symbol)) {
-    //   return Behavior.changeMounts;
+    // Disable drones (which should just be ESEIDEL-4).
+    if (ship.frame.symbol == ShipFrameSymbolEnum.DRONE) {
+      return Behavior.idle;
+    }
+
+    // Only use the first 20 probes.
+    // const activeProbes = 20;
+    // var probeCount = 0;
+    // for (final ship in _shipCache.ships) {
+    //   if (ship.frame.symbol == ShipFrameSymbolEnum.PROBE) {
+    //     probeCount++;
+    //     if (probeCount < activeProbes) {
+    //       return Behavior.explorer;
+    //     } else {
+    //       return Behavior.idle;
+    //     }
+    //   }
     // }
 
     final disableBehaviors = <Behavior>[
@@ -257,9 +315,10 @@ class CentralCommand {
       ShipRole.HAULER: [Behavior.trader, Behavior.explorer],
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
-        Behavior.changeMounts,
-        if (ship.canMine) Behavior.miner,
-        if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
+        // Behavior.changeMounts,
+        // if (ship.canMine) Behavior.miner,
+        // if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
+        Behavior.idle,
       ],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
@@ -782,7 +841,7 @@ class CentralCommand {
       ShipType.ORE_HOUND: 40,
       ShipType.PROBE: 40,
       ShipType.LIGHT_HAULER: 20,
-      ShipType.HEAVY_FREIGHTER: 20,
+      ShipType.HEAVY_FREIGHTER: 30,
     };
     final typesToBuy = targetCounts.keys.where((shipType) {
       if (!shipyardHas(shipType)) {

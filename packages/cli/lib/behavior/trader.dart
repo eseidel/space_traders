@@ -621,8 +621,6 @@ Future<DateTime?> advanceTrader(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  assert(!ship.isInTransit, 'Ship ${ship.symbol} is in transit');
-
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   // If we're currently at a market, record the prices and refuel.

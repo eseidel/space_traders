@@ -114,6 +114,11 @@ Earning:
   Every place we return null to loop has the same problem.
 * Record # of extractions per survey?  (Does laser power matter?)
 * Record which ship generated a survey?
+* Allow ships to buy from the same location at high trade volumes?
+* Have one thread be generating instructions and another thread executing.
+  When execution hits an error, just throw it back to the generator thread.
+  Run each of the ships as separate "programs".
+  Unclear if multi-threaded will work OK with json files.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
@@ -375,3 +380,91 @@ ApiException 500: {"error":{"code":500,"message":"Something unexpected went wron
 <asynchronous suspension>
 #8      main (file:///root/space_traders/packages/cli/bin/cli.dart:83:3)
 <asynchronous suspension>
+
+### Show how many more units we would by:
+🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
+🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
+🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
+🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
+
+
+## Redesign
+
+Problem statement:
+- Want to ensure that we always deliver reqeusts to the server on time.
+- Want planning to be able to run ahead of execution.
+- Would like a recorded form of planning to debug separate from execution.
+
+
+Idea:
+- Have an execution thread which cannot plan, can only execute instruction
+  streams, one per ship.  Also knows how to schedule between instruction
+  streams, both for dealing with yields/waits, but also priority.
+- Have a planning thread which cannot execute, only compile to instruction
+  streams which are sent over the to the execution thread.
+
+Planner cannot talk to the network.
+
+Executor cannot plan.
+
+Need to write out an example plan in the instruction/action language.
+
+Questions:
+* How is state transfered between executor and planner?
+
+
+### NavTo
+NAV LOCATION
+DONE
+
+### Surveyor
+ASSERT_AT LOCATION
+ORBIT
+SURVEY
+DONE
+
+### MakeEmpty
+FOR EACH CARGO
+  NAV_TO MARKET
+  SELL CARGO
+DONE
+
+### Miner
+ASSERT_AT LOCATION
+ASSERT enough space
+SELECT_SURVEY
+EXTRACT
+MAKE_EMPTY
+DONE
+
+### Explorer
+NAV_TO
+DONE
+
+### GoBuy
+NAV_TO
+BUY
+DONE
+
+### Distribute
+NAV_TO
+DONE
+
+### ChangeMounts
+NAV_TO
+
+
+
+# Planner loop
+* Knows about priority?
+* Sees an empty queue, plans for it.
+* Works on projected state?
+* Loops
+
+# Executor loop
+* Knows about priority.
+* Knows about network cooldowns.
+* Pulls a command from the queue.
+* Executes
+* On failure, marks queue as failed, flushes it?
+* Sends state back to planner (or just updates a shared state via DB?)
