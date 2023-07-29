@@ -94,6 +94,7 @@ Early Game:
   Currently that breaks because it doesn't have prices to buy from.
   Also breaks contract trading to not have price data.
   Could have it just explore the initial system and then go sit?
+* Probe should probably stay close to the main system to help find trades?
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.

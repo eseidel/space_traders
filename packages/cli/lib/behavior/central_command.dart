@@ -167,13 +167,17 @@ class CentralCommand {
     // Command makes a bit less than either miners or haulers due to its
     // worse cargo capacity and laser.
     if (ship.registration.role == ShipRole.COMMAND) {
-      // We want to strongly prefer mining (really surveying) for the mining
-      // drones early.
+      // We want to strongly prefer surveying for the mining drones early.
+      // We increase their value by ~3c/s each, so 9c/s total?
+      // But drones only get 5c/s anyway, so maybe not worth it?
       if (phase == GamePhase.early) {
-        return 10;
+        return 9;
       }
+      // After we stop being a useful surveyor (once we have ore hounds)
+      // We're not a great trader, but we'll take trades I guess?
       return 6;
     }
+    // This should depend on phase and ship type?
     return 7;
   }
 
