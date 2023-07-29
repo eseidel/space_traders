@@ -315,7 +315,7 @@ class CentralCommand {
     //   }
     // }
 
-    // final shipCount = _shipCache.ships.length;
+    final shipCount = _shipCache.ships.length;
 
     final behaviors = {
       // TODO(eseidel): Evaluate based on expected value, not just order.
@@ -332,9 +332,10 @@ class CentralCommand {
         // Might want to consider limiting to short trades (< 5 mins) to avoid
         // tying up capital early.
         Behavior.trader,
-        // if (shipCount < 4) Behavior.surveyor,
-        // Early on the command ship makes about 5c/s vs.
-        // ore hounds making 6c/s.
+        // Early on the command ship makes about 5c/s vs. ore hounds making
+        // 6c/s. It's a better surveyor than miner. Especially when enabling
+        // mining drones.
+        if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         Behavior.miner,
       ],
       // Haulers are terrible explorers, but early game we just need
