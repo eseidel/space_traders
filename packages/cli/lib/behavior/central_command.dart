@@ -113,6 +113,7 @@ enum GamePhase {
   /// The game has a fixed time limit and all actions should be optimized
   /// to maximize total credits at the end of that time.
   /// We don't want to start new long contracts at this point (or long trades)?
+  /// Sell all mounts?
   end,
 }
 
@@ -137,6 +138,9 @@ class CentralCommand {
   /// We will continue to deliver current contract deals even if this is false,
   /// but will not start new deals involving contracts.
   bool get isContractTradingEnabled => true;
+
+  /// What phase of the game we think we're in.
+  GamePhase get phase => GamePhase.early;
 
   /// Minimum profit per second we expect this ship to make.
   // Should set this based on the ship type and how much we expect to earn
@@ -259,6 +263,14 @@ class CentralCommand {
       return Behavior.idle;
     }
 
+    // Just sits there so we can buy ships.
+    if (ship.symbol == 'ESEIDEL-2') {
+      // if (!isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
+      //   return Behavior.buyShip;
+      // }
+      return Behavior.idle;
+    }
+
     // Disable drones (which should just be ESEIDEL-4).
     if (ship.frame.symbol == ShipFrameSymbolEnum.DRONE) {
       return Behavior.idle;
@@ -297,7 +309,7 @@ class CentralCommand {
 
       ShipRole.COMMAND: [
         // If we can get mounts for our ships, that's the best thing we can do.
-        Behavior.deliver,
+        // Behavior.deliver,
         // Otherwise buying more ships is best.
         Behavior.buyShip,
         // Will only trade if we can make 6/s or more.
