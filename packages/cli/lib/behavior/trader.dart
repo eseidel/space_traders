@@ -200,7 +200,10 @@ void _logCompletedDeal(Ship ship, CostedDeal completedDeal) {
           completedDeal.expectedProfitPerSecond)
       .abs();
   final useWarn = cpsDiff > cpsSlop || durationDiffPercent > durationSlop;
-  if (useWarn) {
+  final useErr = completedDeal.actualProfitPerSecond < 0;
+  if (useErr) {
+    shipErr(ship, message);
+  } else if (useWarn) {
     shipWarn(ship, message);
   } else {
     shipInfo(ship, message);
