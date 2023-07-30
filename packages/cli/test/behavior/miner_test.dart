@@ -40,6 +40,8 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
+class _MockExtractionLog extends Mock implements ExtractionLog {}
+
 void main() {
   test('surveyWorthMining with no surveys', () async {
     final marketPrices = _MockMarketPrices();
@@ -194,6 +196,8 @@ void main() {
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.surveys).thenReturn(surveyData);
+    final extractionLog = _MockExtractionLog();
+    when(() => caches.extractions).thenReturn(extractionLog);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
