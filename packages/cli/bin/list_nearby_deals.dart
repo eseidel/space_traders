@@ -92,7 +92,7 @@ Future<void> cliMain(List<String> args) async {
   );
   logger
       .info('Found opps for ${marketScan.tradeSymbols.length} trade symbols.');
-  final maybeDeal = await findDealFor(
+  final maybeDeal = findDealFor(
     marketPrices,
     systemsCache,
     routePlanner,

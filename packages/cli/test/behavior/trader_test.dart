@@ -81,18 +81,6 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final centralCommand = _MockCentralCommand();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
-    when(
-      () => centralCommand.findBetterTradeLocation(
-        systemsCache,
-        routePlanner,
-        agentCache,
-        contractCache,
-        marketPrices,
-        ship,
-        maxJumps: any(named: 'maxJumps'),
-        maxWaypoints: any(named: 'maxWaypoints'),
-      ),
-    ).thenAnswer((_) => Future.value());
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
@@ -183,7 +171,7 @@ void main() {
         destinationSymbol: end,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
         purchasePrice: 10,
-        sellPrice: 20,
+        sellPrice: 200,
       ),
       cargoSize: 10,
       transactions: [],
@@ -216,8 +204,8 @@ void main() {
         maxWaypoints: any(named: 'maxWaypoints'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
-    ).thenAnswer((_) => Future.value(costedDeal));
-    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
+    ).thenReturn(costedDeal);
+    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(1);
     when(
       () => centralCommand.visitLocalShipyard(
         api,
@@ -239,6 +227,35 @@ void main() {
     when(() => agentCache.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
     final state = _MockBehaviorState();
+
+    when(
+      () => fleetApi.purchaseCargo(
+        shipSymbol.symbol,
+        purchaseCargoRequest: PurchaseCargoRequest(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          units: 10,
+        ),
+      ),
+    ).thenAnswer(
+      (invocation) => Future.value(
+        PurchaseCargo201Response(
+          data: SellCargo201ResponseData(
+            agent: agent,
+            cargo: shipCargo,
+            transaction: MarketTransaction(
+              waypointSymbol: start.waypoint,
+              shipSymbol: shipSymbol.symbol,
+              tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+              units: 10,
+              totalPrice: 100,
+              pricePerUnit: 10,
+              type: MarketTransactionTypeEnum.PURCHASE,
+              timestamp: DateTime(2021),
+            ),
+          ),
+        ),
+      ),
+    );
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -575,7 +592,7 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final contractCache = _MockContractCache();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
-    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
+    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(1);
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
@@ -641,6 +658,10 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
+    final shipEngine = _MockShipEngine();
+    when(() => shipEngine.speed).thenReturn(10);
+    when(() => ship.engine).thenReturn(shipEngine);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -676,9 +697,9 @@ void main() {
         destinationSymbol: end,
         tradeSymbol: TradeSymbol.FUEL,
         purchasePrice: 10,
-        sellPrice: 20,
+        sellPrice: 200,
       ),
-      cargoSize: 10,
+      cargoSize: 100,
       transactions: [],
       startTime: DateTime(2021),
       route: routePlan,
@@ -696,7 +717,7 @@ void main() {
         maxJumps: any(named: 'maxJumps'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
-    ).thenAnswer((_) => Future.value(costedDeal));
+    ).thenReturn(costedDeal);
     when(
       () => centralCommand.visitLocalShipyard(
         api,
@@ -705,18 +726,6 @@ void main() {
         agentCache,
         waypoint,
         ship,
-      ),
-    ).thenAnswer((_) => Future.value());
-    when(
-      () => centralCommand.findBetterTradeLocation(
-        systemsCache,
-        routePlanner,
-        agentCache,
-        contractCache,
-        marketPrices,
-        ship,
-        maxJumps: any(named: 'maxJumps'),
-        maxWaypoints: any(named: 'maxWaypoints'),
       ),
     ).thenAnswer((_) => Future.value());
     final state = _MockBehaviorState();

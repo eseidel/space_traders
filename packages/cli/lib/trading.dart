@@ -537,7 +537,7 @@ CostedDeal? _filterDealsAndLog(
 }
 
 /// Returns the best deal for the given parameters.
-Future<CostedDeal?> findDealFor(
+CostedDeal? findDealFor(
   MarketPrices marketPrices,
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
@@ -550,7 +550,7 @@ Future<CostedDeal?> findDealFor(
   required int maxTotalOutlay,
   List<SellOpp>? extraSellOpps,
   bool Function(CostedDeal deal)? filter,
-}) async {
+}) {
   logger.detail(
     'Finding deals with '
     'start: $startSymbol, '

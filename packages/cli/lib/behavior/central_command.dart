@@ -601,10 +601,10 @@ class CentralCommand {
   }
 
   /// Record the given [transactions] for the current deal for [ship].
-  Future<void> recordDealTransactions(
+  void recordDealTransactions(
     Ship ship,
     List<Transaction> transactions,
-  ) async {
+  ) {
     final behaviorState = getBehavior(ship.shipSymbol)!;
     final deal = behaviorState.deal!;
     behaviorState.deal = deal.byAddingTransactions(transactions);
@@ -670,7 +670,7 @@ class CentralCommand {
   }
 
   /// Find next deal for the given [ship], considering all deals in progress.
-  Future<CostedDeal?> findNextDeal(
+  CostedDeal? findNextDeal(
     AgentCache agentCache,
     ContractCache contractCache,
     MarketPrices marketPrices,
@@ -681,7 +681,7 @@ class CentralCommand {
     required int maxTotalOutlay,
     required int maxWaypoints,
     WaypointSymbol? overrideStartSymbol,
-  }) async {
+  }) {
     final startSymbol = overrideStartSymbol ?? ship.waypointSymbol;
     final systemSymbol = overrideStartSymbol != null
         ? overrideStartSymbol.systemSymbol
@@ -720,7 +720,7 @@ class CentralCommand {
       maxJumps: maxJumps,
       maxWaypoints: maxWaypoints,
     );
-    final maybeDeal = await findDealFor(
+    final maybeDeal = findDealFor(
       marketPrices,
       systemsCache,
       routePlanner,
@@ -739,7 +739,7 @@ class CentralCommand {
     return maybeDeal;
   }
 
-  Future<_ShipPlacement?> _findBetterSystemForTrader(
+  _ShipPlacement? _findBetterSystemForTrader(
     SystemsCache systemsCache,
     RoutePlanner routePlanner,
     AgentCache agentCache,
@@ -750,7 +750,7 @@ class CentralCommand {
     required int maxJumps,
     required int maxWaypoints,
     required int profitPerSecondThreshold,
-  }) async {
+  }) {
     final shipSymbol = ship.symbol;
     final shipSystem = systemsCache.systemBySymbol(ship.systemSymbol);
     while (true) {
@@ -763,7 +763,7 @@ class CentralCommand {
       final score = search.scoreFor(closest.systemSymbol);
       final systemJumpGate =
           systemsCache.jumpGateWaypointForSystem(closest.systemSymbol)!;
-      final deal = await findNextDeal(
+      final deal = findNextDeal(
         agentCache,
         contractCache,
         marketPrices,
@@ -1136,7 +1136,7 @@ class CentralCommand {
   }
 
   /// Find a better destination for the given trader [ship].
-  Future<WaypointSymbol?> findBetterTradeLocation(
+  WaypointSymbol? findBetterTradeLocation(
     SystemsCache systemsCache,
     RoutePlanner routePlanner,
     AgentCache agentCache,
@@ -1145,14 +1145,14 @@ class CentralCommand {
     Ship ship, {
     required int maxJumps,
     required int maxWaypoints,
-  }) async {
+  }) {
     final traderSystems = _otherTraderSystems(ship.shipSymbol).toList();
     final search = _MarketSearch.start(
       marketPrices,
       systemsCache,
       avoidSystems: traderSystems.toSet(),
     );
-    final placement = await _findBetterSystemForTrader(
+    final placement = _findBetterSystemForTrader(
       systemsCache,
       routePlanner,
       agentCache,

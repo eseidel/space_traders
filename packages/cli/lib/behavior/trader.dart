@@ -136,7 +136,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
     );
 
     if (transaction != null) {
-      await centralCommand.recordDealTransactions(ship, [transaction]);
+      centralCommand.recordDealTransactions(ship, [transaction]);
       final leftToBuy = unitsToPurchase(good, ship, costedDeal.maxUnitsToBuy);
       if (leftToBuy > 0) {
         shipInfo(
@@ -514,24 +514,20 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   String why,
 ) async {
   shipWarn(ship, why);
-  final destinationSymbol = await centralCommand.findBetterTradeLocation(
-    systemsCache,
-    routePlanner,
-    agentCache,
-    contractCache,
-    marketPrices,
-    ship,
-    maxJumps: _maxJumps,
-    maxWaypoints: _maxWaypoints,
-  );
-  if (destinationSymbol == null) {
-    centralCommand.disableBehaviorForShip(
+  final destinationSymbol = assertNotNull(
+    centralCommand.findBetterTradeLocation(
+      systemsCache,
+      routePlanner,
+      agentCache,
+      contractCache,
+      marketPrices,
       ship,
-      'Failed to find better location for trader.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
+      maxJumps: _maxJumps,
+      maxWaypoints: _maxWaypoints,
+    ),
+    'Failed to find better location for trader.',
+    const Duration(hours: 1),
+  );
   final waitUntil = await beingNewRouteAndLog(
     api,
     ship,
@@ -685,7 +681,7 @@ Future<DateTime?> advanceTrader(
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
-  final newDeal = await centralCommand.findNextDeal(
+  final newDeal = centralCommand.findNextDeal(
     caches.agent,
     caches.contracts,
     caches.marketPrices,
@@ -714,13 +710,17 @@ Future<DateTime?> advanceTrader(
   }
 
   if (newDeal == null) {
-    return findBetterLocation('No profitable deals within $_maxJumps jumps '
-        'of ${ship.systemSymbol}.');
+    final waitUntil =
+        await findBetterLocation('No profitable deals within $_maxJumps jumps '
+            'of ${ship.systemSymbol}.');
+    return waitUntil;
   }
   if (newDeal.expectedProfitPerSecond <
       centralCommand.expectedCreditsPerSecond(ship)) {
-    return findBetterLocation('Deal expected profit per second too low: '
-        '${creditsString(newDeal.expectedProfitPerSecond)}/s');
+    final waitUntil =
+        await findBetterLocation('Deal expected profit per second too low: '
+            '${creditsString(newDeal.expectedProfitPerSecond)}/s');
+    return waitUntil;
   }
 
   shipInfo(ship, 'Found deal: ${describeCostedDeal(newDeal)}');

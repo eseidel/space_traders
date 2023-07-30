@@ -341,7 +341,7 @@ void main() {
       ),
     );
 
-    final costed = await runWithLogger(
+    final costed = runWithLogger(
       logger,
       () => findDealFor(
         marketPrices,
