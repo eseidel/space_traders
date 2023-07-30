@@ -3,6 +3,7 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
+import 'package:cli/cache/extraction_log.dart';
 import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/market_prices.dart';
@@ -22,6 +23,7 @@ export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
+export 'package:cli/cache/extraction_log.dart';
 export 'package:cli/cache/faction_cache.dart';
 export 'package:cli/cache/jump_cache.dart';
 export 'package:cli/cache/market_prices.dart';
@@ -45,6 +47,7 @@ class Caches {
     required this.systems,
     required this.systemConnectivity,
     required this.transactions,
+    required this.extractions,
     required this.waypoints,
     required this.markets,
     required this.contracts,
@@ -81,6 +84,9 @@ class Caches {
   /// The transaction log.
   final TransactionLog transactions;
 
+  /// The extraction log.
+  final ExtractionLog extractions;
+
   /// The cache of waypoints.
   final WaypointCache waypoints;
 
@@ -113,6 +119,7 @@ class Caches {
     final surveys = await SurveyData.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
     final transactions = TransactionLog.load(fs);
+    final extractions = ExtractionLog.load(fs);
     final charting = ChartingCache.load(fs);
     final waypoints = WaypointCache(api, systems, charting);
     final markets = MarketCache(waypoints);
@@ -145,6 +152,7 @@ class Caches {
       systems: systems,
       systemConnectivity: systemConnectivity,
       transactions: transactions,
+      extractions: extractions,
       waypoints: waypoints,
       markets: markets,
       contracts: contracts,
