@@ -38,9 +38,19 @@ void main() {
       15,
     );
 
-    expect(flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.CRUISE), 16);
+    expect(flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.CRUISE), 15);
     expect(flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.DRIFT), 20);
     expect(flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.BURN), 15);
+
+    // Zero is rounded up to one.
+    expect(flightTimeByDistanceAndSpeed(0, 30, ShipNavFlightMode.CRUISE), 15);
+    expect(flightTimeByDistanceAndSpeed(0, 30, ShipNavFlightMode.DRIFT), 20);
+    expect(flightTimeByDistanceAndSpeed(0, 30, ShipNavFlightMode.BURN), 15);
+
+    // Probe zero times.
+    expect(flightTimeByDistanceAndSpeed(0, 2, ShipNavFlightMode.CRUISE), 22);
+    expect(flightTimeByDistanceAndSpeed(0, 2, ShipNavFlightMode.BURN), 18);
+
     expect(
       () => flightTimeByDistanceAndSpeed(1, 30, ShipNavFlightMode.STEALTH),
       throwsUnimplementedError,

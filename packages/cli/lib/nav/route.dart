@@ -56,10 +56,11 @@ int flightTimeByDistanceAndSpeed(
   int shipSpeed,
   ShipNavFlightMode flightMode,
 ) {
-  return (distance.roundToDouble() *
-              (_speedMultiplier(flightMode) / shipSpeed) +
-          15)
-      .round();
+  final double roundedDistance = max(1, distance.roundToDouble());
+
+  /// Wiki says round(), but that doesn't match observed behavior with probes.
+  return (roundedDistance * (_speedMultiplier(flightMode) / shipSpeed) + 15)
+      .floor();
 }
 
 /// Returns the flight time to the given waypoint.
