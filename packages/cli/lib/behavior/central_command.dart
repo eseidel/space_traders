@@ -923,18 +923,19 @@ class CentralCommand {
     logger.info('${idleHaulers.length} idle haulers');
     final buyTraders = idleHaulers.length < 4;
 
-    // We should buy haulers if we have fewer than X haulers idle and we have
-    // enough extra cash on hand to support trading.
-    if (typesToBuy.contains(ShipType.LIGHT_HAULER) && buyTraders) {
-      return ShipType.LIGHT_HAULER;
+    // We should buy probes if we have fewer than X of them.  We need probes
+    // first to explore before traders are useful.
+    if (typesToBuy.contains(ShipType.PROBE)) {
+      return ShipType.PROBE;
     }
     // We should buy ore-hounds only if we're at a system which has good mining.
     if (typesToBuy.contains(ShipType.ORE_HOUND) && inStartSystem) {
       return ShipType.ORE_HOUND;
     }
-    // We should buy probes if we have fewer than X of them.
-    if (typesToBuy.contains(ShipType.PROBE)) {
-      return ShipType.PROBE;
+    // We should buy haulers if we have fewer than X haulers idle and we have
+    // enough extra cash on hand to support trading.
+    if (typesToBuy.contains(ShipType.LIGHT_HAULER) && buyTraders) {
+      return ShipType.LIGHT_HAULER;
     }
     // Heavy traders are the last option after other types have been filled?
     if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER) && buyTraders) {
