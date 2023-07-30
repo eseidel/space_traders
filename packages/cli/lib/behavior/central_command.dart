@@ -657,7 +657,7 @@ class CentralCommand {
           good.tradeSymbolObject,
         );
         if (unitsNeeded > 0) {
-          yield SellOpp(
+          yield SellOpp.fromContract(
             marketSymbol: good.destination,
             tradeSymbol: good.tradeSymbolObject,
             contractId: contract.id,

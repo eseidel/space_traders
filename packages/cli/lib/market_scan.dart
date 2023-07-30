@@ -7,38 +7,48 @@ import 'package:meta/meta.dart';
 @immutable
 class BuyOpp {
   /// Create a new BuyOpp.
-  const BuyOpp({
-    required this.marketSymbol,
-    required this.tradeSymbol,
-    required this.price,
-  });
+  const BuyOpp(this.marketPrice);
+
+  /// State of the market where this buy opportunity was found.
+  final MarketPrice marketPrice;
 
   /// The symbol of the market where the good can be purchased.
-  final WaypointSymbol marketSymbol;
+  WaypointSymbol get marketSymbol => marketPrice.waypointSymbol;
 
   /// The symbol of the good offered for purchase.
-  final TradeSymbol tradeSymbol;
+  TradeSymbol get tradeSymbol => marketPrice.tradeSymbol;
 
   /// The price of the good.
-  final int price;
+  int get price => marketPrice.purchasePrice;
 }
 
 /// A potential sale opportunity.  Only public for testing.
 @immutable
 class SellOpp {
-  /// Create a new SellOpp.
-  const SellOpp({
+  /// Create a new SellOpp from a MarketPrice.
+  SellOpp.fromMarketPrice(MarketPrice this.marketPrice)
+      : marketSymbol = marketPrice.waypointSymbol,
+        tradeSymbol = marketPrice.tradeSymbol,
+        price = marketPrice.sellPrice,
+        contractId = null,
+        maxUnits = null;
+
+  /// Create a new SellOpp from a contract.
+  const SellOpp.fromContract({
     required this.marketSymbol,
     required this.tradeSymbol,
     required this.price,
-    this.contractId,
-    this.maxUnits,
-  });
+    required this.contractId,
+    required this.maxUnits,
+  }) : marketPrice = null;
+
+  /// State of the market where this sell opportunity was found.
+  final MarketPrice? marketPrice;
 
   /// The symbol of the market where the good can be sold.
   final WaypointSymbol marketSymbol;
 
-  /// The symbol of the good.
+  /// The symbol of the good offered for sold.
   final TradeSymbol tradeSymbol;
 
   /// The price of the good.
@@ -85,22 +95,8 @@ class _MarketScanBuilder {
 
   /// Record potential deals from the given historical market price.
   void visitMarketPrice(MarketPrice marketPrice) {
-    final marketSymbol = marketPrice.waypointSymbol;
-    final tradeSymbol = marketPrice.tradeSymbol;
-    _addBuyOpp(
-      BuyOpp(
-        marketSymbol: marketSymbol,
-        tradeSymbol: tradeSymbol,
-        price: marketPrice.purchasePrice,
-      ),
-    );
-    _addSellOpp(
-      SellOpp(
-        marketSymbol: marketSymbol,
-        tradeSymbol: tradeSymbol,
-        price: marketPrice.sellPrice,
-      ),
-    );
+    _addBuyOpp(BuyOpp(marketPrice));
+    _addSellOpp(SellOpp.fromMarketPrice(marketPrice));
   }
 }
 

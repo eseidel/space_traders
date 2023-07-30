@@ -12,57 +12,194 @@ import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+/// A delivery for a contract.
+@immutable
+class ContractDelivery {
+  /// Create a new ContractDelivery.
+  const ContractDelivery({
+    required this.contractId,
+    required this.destination,
+    required this.tradeSymbol,
+    required this.rewardPerUnit,
+    required this.maxUnits,
+  });
+
+  /// Create a ContractDelivery from a SellOpp.
+  factory ContractDelivery.fromSellOpp(SellOpp sellOpp) {
+    return ContractDelivery(
+      tradeSymbol: sellOpp.tradeSymbol,
+      contractId: sellOpp.contractId!,
+      destination: sellOpp.marketSymbol,
+      rewardPerUnit: sellOpp.price,
+      maxUnits: sellOpp.maxUnits!,
+    );
+  }
+
+  /// Create a ContractDelivery from JSON.
+  factory ContractDelivery.fromJson(Map<String, dynamic> json) {
+    return ContractDelivery(
+      contractId: json['contractId'] as String,
+      destination: WaypointSymbol.fromJson(json['destination'] as String),
+      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
+      rewardPerUnit: json['rewardPerUnit'] as int,
+      maxUnits: json['maxUnits'] as int,
+    );
+  }
+
+  /// Which contract this delivery is a part of.
+  final String contractId;
+
+  /// The destination of this delivery.
+  final WaypointSymbol destination;
+
+  /// The trade symbol of the cargo to deliver.
+  final TradeSymbol tradeSymbol;
+
+  /// The maximum number of units of cargo to deliver.
+  final int maxUnits;
+
+  /// The reward per unit of cargo delivered.
+  final int rewardPerUnit;
+
+  /// Encode this ContractDelivery as JSON.
+  Map<String, dynamic> toJson() => {
+        'contractId': contractId,
+        'destination': destination.toJson(),
+        'tradeSymbol': tradeSymbol.toJson(),
+        'rewardPerUnit': rewardPerUnit,
+        'maxUnits': maxUnits,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ContractDelivery &&
+          runtimeType == other.runtimeType &&
+          contractId == other.contractId &&
+          destination == other.destination &&
+          tradeSymbol == other.tradeSymbol &&
+          rewardPerUnit == other.rewardPerUnit &&
+          maxUnits == other.maxUnits;
+
+  @override
+  int get hashCode =>
+      contractId.hashCode ^
+      destination.hashCode ^
+      tradeSymbol.hashCode ^
+      rewardPerUnit.hashCode ^
+      maxUnits.hashCode;
+}
+
 /// Record of a possible arbitrage opportunity.
 // This should also include expected cost of fuel and cost of time.
 @immutable
 class Deal {
-  /// Create a new deal.
-  const Deal({
-    required this.sourceSymbol,
-    required this.destinationSymbol,
-    required this.tradeSymbol,
-    required this.purchasePrice,
-    required this.sellPrice,
-    this.maxUnits,
-    this.contractId,
+  /// Create a new deal for a contract delivery.
+  Deal.fromContractDelivery({
+    required this.sourcePrice,
+    required ContractDelivery this.contractDelivery,
+  })  : destinationPrice = null,
+        assert(
+          sourcePrice.tradeSymbol == contractDelivery.tradeSymbol,
+          'sourcePrice and contractDelivery must be for the same tradeSymbol',
+        );
+
+  /// Create a new deal for an arbitrage opportunity.
+  Deal.fromMarketPrices({
+    required this.sourcePrice,
+    required MarketPrice this.destinationPrice,
+  })  : contractDelivery = null,
+        assert(
+          sourcePrice.waypointSymbol != destinationPrice.waypointSymbol,
+          'sourcePrice and destinationPrice must be for different markets',
+        ),
+        assert(
+          sourcePrice.tradeSymbol == destinationPrice.tradeSymbol,
+          'sourcePrice and destinationPrice must be for the same tradeSymbol',
+        );
+
+  /// Create a new deal from a BuyOpp and SellOpp.
+  factory Deal.fromOpps(BuyOpp buyOpp, SellOpp sellOpp) {
+    if (sellOpp.contractId != null) {
+      return Deal.fromContractDelivery(
+        sourcePrice: buyOpp.marketPrice,
+        contractDelivery: ContractDelivery.fromSellOpp(sellOpp),
+      );
+    }
+    return Deal.fromMarketPrices(
+      sourcePrice: buyOpp.marketPrice,
+      destinationPrice: sellOpp.marketPrice!,
+    );
+  }
+
+  /// Create a test deal.
+  @visibleForTesting
+  factory Deal.test({
+    required WaypointSymbol sourceSymbol,
+    required WaypointSymbol destinationSymbol,
+    required TradeSymbol tradeSymbol,
+    required int purchasePrice,
+    required int sellPrice,
+  }) {
+    return Deal.fromMarketPrices(
+      sourcePrice: MarketPrice(
+        waypointSymbol: sourceSymbol,
+        symbol: tradeSymbol.value,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: purchasePrice,
+        sellPrice: purchasePrice + 1,
+        tradeVolume: 100,
+        // If these aren't UTC, they won't roundtrip through JSON correctly
+        // because MarketPrice always converts to UTC in toJson.
+        timestamp: DateTime(2021).toUtc(),
+      ),
+      destinationPrice: MarketPrice(
+        waypointSymbol: destinationSymbol,
+        symbol: tradeSymbol.value,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: sellPrice - 1,
+        sellPrice: sellPrice,
+        tradeVolume: 100,
+        timestamp: DateTime(2021).toUtc(),
+      ),
+    );
+  }
+
+  const Deal._({
+    required this.sourcePrice,
+    required this.destinationPrice,
+    required this.contractDelivery,
   });
 
   /// Create a deal from JSON.
   factory Deal.fromJson(Map<String, dynamic> json) {
-    return Deal(
-      sourceSymbol: WaypointSymbol.fromJson(json['sourceSymbol'] as String),
-      destinationSymbol:
-          WaypointSymbol.fromJson(json['destinationSymbol'] as String),
-      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
-      purchasePrice: json['purchasePrice'] as int,
-      sellPrice: json['sellPrice'] as int,
-      maxUnits: json['maxUnits'] as int?,
-      contractId: json['contractId'] as String?,
+    return Deal._(
+      sourcePrice: MarketPrice.fromJson(
+        json['sourcePrice'] as Map<String, dynamic>,
+      ),
+      destinationPrice: json['destinationPrice'] == null
+          ? null
+          : MarketPrice.fromJson(
+              json['destinationPrice'] as Map<String, dynamic>,
+            ),
+      contractDelivery: json['contractDelivery'] == null
+          ? null
+          : ContractDelivery.fromJson(
+              json['contractDelivery'] as Map<String, dynamic>,
+            ),
     );
   }
 
   /// The trade symbol that we're selling.
-  final TradeSymbol tradeSymbol;
+  TradeSymbol get tradeSymbol => sourcePrice.tradeSymbol;
 
-  /// The symbol of the market we're buying from.
-  final WaypointSymbol sourceSymbol;
+  /// Market state at the source.
+  final MarketPrice sourcePrice;
 
-  /// The symbol of the market we're selling to.
-  final WaypointSymbol destinationSymbol;
+  /// Market state at the destination.
+  final MarketPrice? destinationPrice;
 
-  /// The price we're buying at per unit.
-  final int purchasePrice;
-
-  /// The price we're selling at per unit.
-  final int sellPrice;
-  // Also should take fuel costs into account.
-  // And possibly time?
-
-  /// The maximum number of units we can trade in this deal.
-  /// This is only used for contract deliveries.  Null means unlimited.
-  final int? maxUnits;
-
-  /// The id of the contract this deal is a part of.
+  /// The contract this deal is a part of.
   /// Contract deals are very similar to arbitrage deals except:
   /// 1. The destination market is predetermined.
   /// 2. Trade volume is predetermined and coordinated across all ships.
@@ -72,22 +209,32 @@ class Deal {
   /// 4. Behavior at destinations is different ("fulfill" instead of "sell").
   /// 5. We treat the "sell" price as the total reward of contract divided by
   ///    the number of units of cargo we need to deliver.
-  final String? contractId;
+  final ContractDelivery? contractDelivery;
 
-  // Profit depends on route taken, so this likely does not
-  // belong here.
-  /// The profit we'll make on this deal per unit.
-  int get profit => sellPrice - purchasePrice;
+  /// The symbol of the market we're buying from.
+  WaypointSymbol get sourceSymbol => sourcePrice.waypointSymbol;
+
+  /// The symbol of the market we're selling to.
+  WaypointSymbol get destinationSymbol {
+    final contract = contractDelivery;
+    if (contract != null) {
+      return contract.destination;
+    }
+    return destinationPrice!.waypointSymbol;
+  }
+
+  /// The id of the contract this deal is a part of.
+  String? get contractId => contractDelivery?.contractId;
+
+  /// The maximum number of units we can trade in this deal.
+  /// This is only used for contract deliveries.  Null means unlimited.
+  int? get maxUnits => contractDelivery?.maxUnits;
 
   /// Encode the deal as JSON.
   Map<String, dynamic> toJson() => {
-        'sourceSymbol': sourceSymbol.toJson(),
-        'destinationSymbol': destinationSymbol.toJson(),
-        'tradeSymbol': tradeSymbol.toJson(),
-        'purchasePrice': purchasePrice,
-        'sellPrice': sellPrice,
-        'maxUnits': maxUnits,
-        'contractId': contractId,
+        'sourcePrice': sourcePrice.toJson(),
+        'destinationPrice': destinationPrice?.toJson(),
+        'contractDelivery': contractDelivery?.toJson(),
       };
 
   @override
@@ -95,69 +242,15 @@ class Deal {
       identical(this, other) ||
       other is Deal &&
           runtimeType == other.runtimeType &&
-          tradeSymbol == other.tradeSymbol &&
-          sourceSymbol == other.sourceSymbol &&
-          destinationSymbol == other.destinationSymbol &&
-          purchasePrice == other.purchasePrice &&
-          sellPrice == other.sellPrice &&
-          maxUnits == other.maxUnits &&
-          contractId == other.contractId;
+          sourcePrice == other.sourcePrice &&
+          destinationPrice == other.destinationPrice &&
+          contractDelivery == other.contractDelivery;
 
   @override
   int get hashCode =>
-      tradeSymbol.hashCode ^
-      sourceSymbol.hashCode ^
-      destinationSymbol.hashCode ^
-      purchasePrice.hashCode ^
-      sellPrice.hashCode ^
-      maxUnits.hashCode ^
-      contractId.hashCode;
-}
-
-/// Describe a [deal] in a human-readable way.
-String describeDeal(Deal deal) {
-  final sign = deal.profit > 0 ? '+' : '';
-  final profitPercent = (deal.profit / deal.purchasePrice) * 100;
-  final profitCreditsString = '$sign${creditsString(deal.profit)}'.padLeft(6);
-  final profitPercentString = '${profitPercent.toStringAsFixed(0)}%';
-  final profitString = '$profitCreditsString ($profitPercentString)';
-  final coloredProfitString = deal.profit > 0
-      ? lightGreen.wrap(profitString)
-      : lightRed.wrap(profitString);
-  return '${deal.tradeSymbol.value.padRight(18)} '
-      ' ${deal.sourceSymbol} ${creditsString(deal.purchasePrice).padLeft(6)} '
-      '-> '
-      '${deal.destinationSymbol} ${creditsString(deal.sellPrice).padLeft(6)} '
-      '$coloredProfitString';
-}
-
-/// Log proposed [deals] to the console.
-void logDeals(List<Deal> deals) {
-  final headers = [
-    'Symbol'.padRight(18),
-    'Source'.padRight(18),
-    'Dest'.padRight(18),
-    'Profit'.padRight(18),
-  ];
-  logger.info(headers.join(' '));
-  for (final deal in deals) {
-    logger.info(describeDeal(deal));
-  }
-}
-
-/// Describe a [deal] in a human-readable way.
-String dealDescription(Deal deal, {int units = 1}) {
-  final profitString =
-      lightGreen.wrap('+${creditsString(deal.profit * units)}');
-  return 'Deal ($profitString): ${deal.tradeSymbol} '
-      '${creditsString(deal.purchasePrice)} @ ${deal.sourceSymbol} '
-      '-> ${creditsString(deal.sellPrice)} @ ${deal.destinationSymbol} '
-      'profit: ${creditsString(deal.profit)} per unit ';
-}
-
-/// Log a [deal] to the console.
-void logDeal(Ship ship, Deal deal) {
-  shipInfo(ship, dealDescription(deal, units: ship.availableSpace));
+      sourcePrice.hashCode ^
+      destinationPrice.hashCode ^
+      contractDelivery.hashCode;
 }
 
 // Not sure where this blongs?
@@ -222,21 +315,31 @@ List<Deal> buildDealsFromScan(
         if (profit <= 0) {
           continue;
         }
-        deals.add(
-          Deal(
-            sourceSymbol: buy.marketSymbol,
-            tradeSymbol: tradeSymbol,
-            purchasePrice: buy.price,
-            destinationSymbol: sell.marketSymbol,
-            sellPrice: sell.price,
-            maxUnits: sell.maxUnits,
-            contractId: sell.contractId,
-          ),
-        );
+        deals.add(Deal.fromOpps(buy, sell));
       }
     }
   }
   return deals;
+}
+
+/// How many units can we trade between these markets before the price
+/// drop below our expected profit margin?
+int profitableVolumeBetween(
+  MarketPrice a,
+  MarketPrice b, {
+  int minimumUnitProfit = 0,
+}) {
+  var units = 0;
+  while (true) {
+    // This is N^2 for the trade volume, which should be fine for now.
+    final aPrice = a.predictPurchasePriceForUnit(units);
+    final bPrice = b.predictSellPriceForUnit(units);
+    final profit = bPrice - aPrice;
+    if (profit <= minimumUnitProfit) {
+      return units;
+    }
+    units++;
+  }
 }
 
 /// A deal between two markets which considers flight cost and time.
@@ -282,7 +385,17 @@ class CostedDeal {
   /// pricing to avoid having contracts never finish due to only needing one
   /// more unit yet that unit not being worth carrying in an otherwise empty
   /// ship.
-  int get expectedUnits => cargoSize;
+  int get expectedUnits {
+    final destinationPrice = deal.destinationPrice;
+    // Contract deal
+    if (destinationPrice == null) {
+      return cargoSize;
+    }
+    return min(
+      cargoSize,
+      profitableVolumeBetween(deal.sourcePrice, destinationPrice),
+    );
+  }
 
   /// The max number of units of cargo to buy. This must be less than or equal
   /// to the Deal.maxUnits (if set) and expectedUnits and accounts for contracts
@@ -325,24 +438,62 @@ class CostedDeal {
   TradeSymbol get tradeSymbol => deal.tradeSymbol;
 
   /// The expected cost of goods sold, not including fuel.
-  int get expectedCostOfGoodsSold => deal.purchasePrice * expectedUnits;
+  int get expectedCostOfGoodsSold =>
+      deal.sourcePrice.totalPurchasePriceFor(expectedUnits);
 
   /// The expected non-goods expenses of the deal, including fuel.
   int get expectedOperationalExpenses => expectedFuelCost;
 
   /// The total upfront cost of the deal, including fuel.
-  int get expectedCosts =>
-      deal.purchasePrice * expectedUnits + expectedFuelCost;
+  int get expectedCosts => expectedCostOfGoodsSold + expectedFuelCost;
 
   /// The total income of the deal, including fuel.
-  int get expectedRevenue => deal.sellPrice * expectedUnits;
+  int get expectedRevenue {
+    // Contract rewards don't move with market state.
+    final contract = deal.contractDelivery;
+    if (contract != null) {
+      return contract.rewardPerUnit * expectedUnits;
+    }
+    return deal.destinationPrice!.totalSellPriceFor(expectedUnits);
+  }
+
+  /// The expected initial per-unit buy price.
+  int get expectedInitialBuyPrice =>
+      deal.sourcePrice.predictPurchasePriceForUnit(0);
+
+  /// The expected initial per-unit sell price.
+  int get expectedInitialSellPrice {
+    final contract = deal.contractDelivery;
+    if (contract != null) {
+      return contract.rewardPerUnit;
+    }
+    return deal.destinationPrice!.predictSellPriceForUnit(0);
+  }
 
   /// Max we would spend per unit and still expect to break even.
   int get maxPurchaseUnitPrice =>
       (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
 
+  /// Count of units purchased so far.
+  int get unitsPurchased => transactions
+      .where(
+        (t) =>
+            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+            t.accounting == AccountingType.goods,
+      )
+      .fold(0, (a, b) => a + b.quantity);
+
+  /// The next expected purchase price.
+  int get predictNextPurchasePrice {
+    if (isContractDeal) {
+      // Contract deals don't move with market state.
+      return deal.sourcePrice.purchasePrice;
+    }
+    return deal.sourcePrice.predictPurchasePriceForUnit(unitsPurchased + 1);
+  }
+
   /// The total profit of the deal, including fuel.
-  int get expectedProfit => deal.profit * expectedUnits - expectedFuelCost;
+  int get expectedProfit => expectedRevenue - expectedCosts;
 
   /// The profit per second of the deal.
   int get expectedProfitPerSecond {
@@ -420,15 +571,15 @@ class CostedDeal {
 String describeCostedDeal(CostedDeal costedDeal) {
   const c = creditsString;
   final deal = costedDeal.deal;
-  final sign = deal.profit > 0 ? '+' : '';
-  final profitPercent = (deal.profit / deal.purchasePrice) * 100;
-  final profitCreditsString = '$sign${c(deal.profit)}'.padLeft(8);
+  final profit = costedDeal.expectedProfit;
+  final sign = profit > 0 ? '+' : '';
+  final profitPercent = (profit / costedDeal.expectedCosts) * 100;
+  final profitCreditsString = '$sign${c(profit)}'.padLeft(8);
   final profitPercentString =
       '(${profitPercent.toStringAsFixed(0)}%)'.padLeft(5);
   final profitString = '$profitCreditsString $profitPercentString';
-  final coloredProfitString = deal.profit > 0
-      ? lightGreen.wrap(profitString)
-      : lightRed.wrap(profitString);
+  final coloredProfitString =
+      profit > 0 ? lightGreen.wrap(profitString) : lightRed.wrap(profitString);
   final timeString = '${approximateDuration(costedDeal.expectedTime)} '
       '${c(costedDeal.expectedProfitPerSecond)}/s';
   final tradeSymbol = deal.tradeSymbol.value;
@@ -436,10 +587,12 @@ String describeCostedDeal(CostedDeal costedDeal) {
       costedDeal.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
   return '${name.padRight(25)} '
       ' ${deal.sourceSymbol.waypoint.padRight(14)} '
-      '${c(deal.purchasePrice).padLeft(8)} '
+      // This could use the average expected purchase/sell price across the
+      // whole deal volume.
+      '${c(costedDeal.expectedInitialBuyPrice).padLeft(8)} '
       '-> '
       '${deal.destinationSymbol.waypoint.padRight(14)} '
-      '${c(deal.sellPrice).padLeft(8)} '
+      '${c(costedDeal.expectedInitialSellPrice).padLeft(8)} '
       '$coloredProfitString $timeString ${c(costedDeal.expectedCosts)}';
 }
 

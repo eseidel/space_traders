@@ -25,7 +25,7 @@ void main() {
       fuelUsed: 20,
     );
     state.routePlan = route;
-    final deal = Deal(
+    final deal = Deal.test(
       sourceSymbol: WaypointSymbol.fromString('S-A-B'),
       destinationSymbol: WaypointSymbol.fromString('S-A-C'),
       tradeSymbol: TradeSymbol.FUEL,

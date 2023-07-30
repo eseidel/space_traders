@@ -166,7 +166,7 @@ void main() {
     );
 
     final costedDeal = CostedDeal(
-      deal: Deal(
+      deal: Deal.test(
         sourceSymbol: start,
         destinationSymbol: end,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
@@ -393,7 +393,7 @@ void main() {
       shipSpeed: 10,
     );
     final costedDeal = CostedDeal(
-      deal: Deal(
+      deal: Deal.test(
         sourceSymbol: start,
         destinationSymbol: end,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
@@ -692,7 +692,7 @@ void main() {
     );
 
     final costedDeal = CostedDeal(
-      deal: Deal(
+      deal: Deal.test(
         sourceSymbol: start,
         destinationSymbol: end,
         tradeSymbol: TradeSymbol.FUEL,

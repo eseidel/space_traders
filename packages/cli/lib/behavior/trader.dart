@@ -121,6 +121,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
   final good = currentMarket.marketTradeGood(dealTradeSymbol)!;
 
   final maxPerUnitPrice = costedDeal.maxPurchaseUnitPrice;
+  final nextExpectedPrice = costedDeal.predictNextPurchasePrice;
 
   // Could this get confused by having other cargo in our hold?
   final units = unitsToPurchase(good, ship, costedDeal.maxUnitsToBuy);
@@ -153,7 +154,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
         ship,
         'Purchased ${transaction.quantity} ${transaction.tradeSymbol} '
         '@ ${transaction.perUnitPrice} (expected '
-        '${costedDeal.deal.purchasePrice}) = '
+        '${creditsString(nextExpectedPrice)}) = '
         '${creditsString(transaction.creditChange)}',
       );
     }

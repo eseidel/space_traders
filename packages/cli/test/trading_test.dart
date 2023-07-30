@@ -29,9 +29,45 @@ class _MockShipCargo extends Mock implements ShipCargo {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
+BuyOpp _makeBuyOpp({
+  required WaypointSymbol marketSymbol,
+  required TradeSymbol tradeSymbol,
+  required int price,
+}) {
+  return BuyOpp(
+    MarketPrice(
+      waypointSymbol: marketSymbol,
+      symbol: tradeSymbol.value,
+      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      purchasePrice: price,
+      sellPrice: price + 1,
+      tradeVolume: 10,
+      timestamp: DateTime(2021),
+    ),
+  );
+}
+
+SellOpp _makeSellOpp({
+  required WaypointSymbol marketSymbol,
+  required TradeSymbol tradeSymbol,
+  required int price,
+}) {
+  return SellOpp.fromMarketPrice(
+    MarketPrice(
+      waypointSymbol: marketSymbol,
+      symbol: tradeSymbol.value,
+      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      purchasePrice: price - 1,
+      sellPrice: price,
+      tradeVolume: 10,
+      timestamp: DateTime(2021),
+    ),
+  );
+}
+
 void main() {
   test('Deal JSON roundtrip', () {
-    final deal = Deal(
+    final deal = Deal.test(
       sourceSymbol: WaypointSymbol.fromString('S-A-B'),
       destinationSymbol: WaypointSymbol.fromString('S-A-C'),
       tradeSymbol: TradeSymbol.FUEL,
@@ -48,7 +84,7 @@ void main() {
   test('CostedDeal JSON roundtrip', () {
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
-    final deal = Deal(
+    final deal = Deal.test(
       sourceSymbol: start,
       destinationSymbol: end,
       tradeSymbol: TradeSymbol.FUEL,
@@ -131,7 +167,7 @@ void main() {
       ),
     );
 
-    final deal = Deal(
+    final deal = Deal.test(
       sourceSymbol: start.waypointSymbol,
       destinationSymbol: end.waypointSymbol,
       tradeSymbol: TradeSymbol.FUEL,
@@ -154,32 +190,11 @@ void main() {
     expect(costed.expectedTime.inSeconds, 15);
   });
 
-  test('describe deal', () {
-    final deal = Deal(
-      sourceSymbol: WaypointSymbol.fromString('S-A-B'),
-      destinationSymbol: WaypointSymbol.fromString('S-A-C'),
-      tradeSymbol: TradeSymbol.FUEL,
-      purchasePrice: 1,
-      sellPrice: 2,
-    );
-    // Not clear why we have two of similar functions here.
-    final profit1 = lightGreen.wrap('   +1c (100%)');
-    expect(
-      describeDeal(deal),
-      'FUEL                S-A-B     1c -> S-A-C     2c $profit1',
-    );
-    final profit2 = lightGreen.wrap('+1c');
-    expect(
-      dealDescription(deal),
-      'Deal ($profit2): FUEL 1c @ S-A-B -> 2c @ S-A-C profit: 1c per unit ',
-    );
-  });
-
   test('describeCostedDeal', () {
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
     final costed = CostedDeal(
-      deal: Deal(
+      deal: Deal.test(
         sourceSymbol: start,
         destinationSymbol: end,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
@@ -372,10 +387,20 @@ void main() {
     final a = WaypointSymbol.fromString('S-M-A');
     final b = WaypointSymbol.fromString('S-M-B');
     final buyOpps = [
-      BuyOpp(marketSymbol: a, tradeSymbol: trade1, price: 1),
+      _makeBuyOpp(marketSymbol: a, tradeSymbol: trade1, price: 1),
     ];
     final sellOpps = [
-      SellOpp(marketSymbol: b, tradeSymbol: trade1, price: 2),
+      SellOpp.fromMarketPrice(
+        MarketPrice(
+          waypointSymbol: b,
+          symbol: trade1.value,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+          tradeVolume: 10,
+          timestamp: DateTime(2021),
+        ),
+      ),
     ];
     final scan = MarketScan.test(buyOpps: buyOpps, sellOpps: sellOpps);
     final deals = buildDealsFromScan(scan);
@@ -383,8 +408,6 @@ void main() {
     expect(deals.first.sourceSymbol, a);
     expect(deals.first.destinationSymbol, b);
     expect(deals.first.tradeSymbol, TradeSymbol.FUEL);
-    expect(deals.first.purchasePrice, 1);
-    expect(deals.first.sellPrice, 2);
   });
 
   test('buildDealsFromScan extraSellOpps', () {
@@ -395,23 +418,24 @@ void main() {
     final b = WaypointSymbol.fromString('S-M-B');
     final c = WaypointSymbol.fromString('S-M-C');
     final buyOpps = [
-      BuyOpp(marketSymbol: a, tradeSymbol: trade1, price: 1),
-      BuyOpp(marketSymbol: a, tradeSymbol: trade2, price: 1),
+      _makeBuyOpp(marketSymbol: a, tradeSymbol: trade1, price: 1),
+      _makeBuyOpp(marketSymbol: a, tradeSymbol: trade2, price: 1),
     ];
     final sellOpps = [
-      SellOpp(marketSymbol: b, tradeSymbol: trade1, price: 2),
-      SellOpp(marketSymbol: b, tradeSymbol: trade2, price: 3),
+      _makeSellOpp(marketSymbol: b, tradeSymbol: trade1, price: 2),
+      _makeSellOpp(marketSymbol: b, tradeSymbol: trade2, price: 3),
     ];
     final scan = MarketScan.test(buyOpps: buyOpps, sellOpps: sellOpps);
     final deals = buildDealsFromScan(scan);
     expect(deals.length, 2);
 
     final extraSellOpps = [
-      SellOpp(
+      SellOpp.fromContract(
         marketSymbol: c,
         tradeSymbol: trade2,
         price: 4,
         contractId: 'foo',
+        maxUnits: 1,
       ),
     ];
 
@@ -425,7 +449,7 @@ void main() {
   test('byAddingTransactions', () {
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
-    final deal = Deal(
+    final deal = Deal.test(
       sourceSymbol: start,
       destinationSymbol: end,
       tradeSymbol: TradeSymbol.FUEL,
@@ -484,13 +508,23 @@ void main() {
   test('Deal.maxUnits', () {
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
-    final deal = Deal(
-      sourceSymbol: start,
-      destinationSymbol: end,
-      tradeSymbol: TradeSymbol.FUEL,
-      purchasePrice: 1,
-      sellPrice: 2,
-      maxUnits: 10,
+    final deal = Deal.fromContractDelivery(
+      sourcePrice: MarketPrice(
+        waypointSymbol: start,
+        symbol: TradeSymbol.FUEL.value,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 1,
+        sellPrice: 2,
+        tradeVolume: 10,
+        timestamp: DateTime(2021),
+      ),
+      contractDelivery: ContractDelivery(
+        destination: end,
+        tradeSymbol: TradeSymbol.FUEL,
+        contractId: 'foo',
+        rewardPerUnit: 2,
+        maxUnits: 10,
+      ),
     );
     final costedDeal = CostedDeal(
       deal: deal,

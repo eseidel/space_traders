@@ -99,6 +99,48 @@ class MarketPrice {
   /// The timestamp of the price record.
   final DateTime timestamp;
 
+  /// Predict the price of buying the Nth unit of this good.
+  /// Unit is a 0-based index of the unit being purchased.
+  int predictPurchasePriceForUnit(int unit) {
+    // TODO(eseidel): movementPerBatch is wrong.
+    // For large trade volumes, it's probably 0, for small trade volumes
+    // it can be very large.
+    const movementPerBatch = 1;
+    final batchCount = unit ~/ tradeVolume;
+    final movement = movementPerBatch * batchCount;
+    return purchasePrice + movement;
+  }
+
+  /// Predict the price of buying the Nth unit of this good.
+  /// Unit is a 0-based index of the unit being purchased.
+  int predictSellPriceForUnit(int unit) {
+    // TODO(eseidel): movementPerBatch is wrong.
+    // For large trade volumes, it's probably 0, for small trade volumes
+    // it can be very large.
+    const movementPerBatch = -1;
+    final batchCount = unit ~/ tradeVolume;
+    final movement = movementPerBatch * batchCount;
+    return sellPrice + movement;
+  }
+
+  /// Predict the total price of buying [units] of this good.
+  int totalPurchasePriceFor(int units) {
+    var totalPrice = 0;
+    for (var i = 0; i < units; i++) {
+      totalPrice += predictPurchasePriceForUnit(i);
+    }
+    return totalPrice;
+  }
+
+  /// Predict the total price of buying [units] of this good.
+  int totalSellPriceFor(int units) {
+    var totalPrice = 0;
+    for (var i = 0; i < units; i++) {
+      totalPrice += predictSellPriceForUnit(i);
+    }
+    return totalPrice;
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
