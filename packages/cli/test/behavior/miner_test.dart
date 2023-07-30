@@ -6,35 +6,39 @@ import 'package:cli/logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
-class _MockShipNav extends Mock implements ShipNav {}
+class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockAgentCache extends Mock implements AgentCache {}
+class _MockBehaviorState extends Mock implements BehaviorState {}
 
-class _MockShip extends Mock implements Ship {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockMarketCache extends Mock implements MarketCache {}
-
-class _MockTransactionLog extends Mock implements TransactionLog {}
-
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
-class _MockSurveyData extends Mock implements SurveyData {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
-
-class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockLogger extends Mock implements Logger {}
+class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
-class _MockCaches extends Mock implements Caches {}
+class _MockLogger extends Mock implements Logger {}
+
+class _MockMarketCache extends Mock implements MarketCache {}
+
+class _MockMarketPrices extends Mock implements MarketPrices {}
+
+class _MockShip extends Mock implements Ship {}
+
+class _MockShipCache extends Mock implements ShipCache {}
+
+class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockSurveyData extends Mock implements SurveyData {}
+
+class _MockSystemsCache extends Mock implements SystemsCache {}
+
+class _MockTransactionLog extends Mock implements TransactionLog {}
+
+class _MockWaypoint extends Mock implements Waypoint {}
+
+class _MockWaypointCache extends Mock implements WaypointCache {}
+
+class _MockFleetApi extends Mock implements FleetApi {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
@@ -193,7 +197,8 @@ void main() {
 
     final now = DateTime(2021);
     DateTime getNow() => now;
-    when(() => ship.symbol).thenReturn('S');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
@@ -201,8 +206,8 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
     when(() => ship.mounts).thenReturn([]);
 
-    when(() => centralCommand.mineSymbolForShip(systemsCache, agentCache, ship))
-        .thenReturn(symbol);
+    when(() => centralCommand.mineJobForShip(systemsCache, agentCache, ship))
+        .thenReturn(MineJob(mine: symbol, market: symbol));
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
@@ -213,31 +218,48 @@ void main() {
     registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
-    registerFallbackValue(symbol.systemSymbol);
-    when(
-      () => waypointCache.waypointsInJumpRadius(
-        startSystem: any(named: 'startSystem'),
-        maxJumps: any(named: 'maxJumps'),
-      ),
-    ).thenAnswer((_) => Stream.fromIterable([waypoint]));
 
-    when(
-      () => systemsCache.systemSymbolsInJumpRadius(
-        startSystem: any(named: 'startSystem'),
-        maxJumps: any(named: 'maxJumps'),
-      ),
-    ).thenReturn([(symbol.systemSymbol, 0)]);
-
-    when(
-      () => waypointCache.waypointsInSystem(any()),
-    ).thenAnswer((_) => Future.value([waypoint]));
-
-    when(() => marketCache.marketsInSystem(any()))
-        .thenAnswer((_) => Stream.fromIterable([]));
+    final shipCache = _MockShipCache();
+    when(() => shipCache.ships).thenReturn([ship]);
+    when(() => caches.ships).thenReturn(shipCache);
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
     final state = _MockBehaviorState();
+
+    when(() => centralCommand.minimumSurveys).thenReturn(10);
+    when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
+    when(() => surveyData.recentSurveysAtWaypoint(symbol, count: 100))
+        .thenReturn([]);
+
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    when(
+      () => fleetApi.extractResources(
+        shipSymbol.symbol,
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        ExtractResources201Response(
+          data: ExtractResources201ResponseData(
+            cooldown: Cooldown(
+              shipSymbol: shipSymbol.symbol,
+              remainingSeconds: 0,
+              expiration: now,
+              totalSeconds: 0,
+            ),
+            extraction: Extraction(
+              shipSymbol: shipSymbol.symbol,
+              yield_: ExtractionYield(
+                symbol: TradeSymbol.DIAMONDS,
+                units: 10,
+              ),
+            ),
+            cargo: shipCargo,
+          ),
+        ),
+      ),
+    );
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -251,7 +273,7 @@ void main() {
         getNow: getNow,
       ),
     );
-    expect(waitUntil, isNull);
+    expect(waitUntil, DateTime(2021));
   });
 
   test('maxExtractedUnits', () {

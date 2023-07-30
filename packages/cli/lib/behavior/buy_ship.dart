@@ -40,7 +40,7 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
     disable: DisableBehavior.allShips,
   );
   final maxMedianMultiplier = maxMedianShipPriceMultipler;
-  final maxPrice = medianPrice * maxMedianMultiplier;
+  final maxPrice = (medianPrice * maxMedianMultiplier).round();
 
   // We should only try to buy new ships if we have enough money to keep
   // our traders trading.
@@ -48,7 +48,8 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
   final credits = budget;
   jobAssert(
     credits >= maxPrice,
-    'Can not buy $shipType, budget $credits < max price $maxPrice.',
+    'Can not buy $shipType, budget ${creditsString(credits)} '
+    '< max price ${creditsString(maxPrice)}.',
     const Duration(minutes: 10),
     disable: DisableBehavior.allShips,
   );
@@ -66,7 +67,7 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
   jobAssert(
     recentPrice <= maxPrice,
     'Failed to buy $shipType at $shipyardSymbol, '
-    '$recentPriceString > max price $maxPrice.',
+    '$recentPriceString > max price ${creditsString(maxPrice)}.',
     const Duration(minutes: 10),
   );
 
@@ -196,9 +197,9 @@ Future<DateTime?> advanceBuyShip(
   final maxPrice = (medianPrice * maxMedianMultipler).toInt();
   jobAssert(
     recentPrice <= maxPrice,
-    'Failed to buy $shipType at ${currentWaypoint.symbol}, '
-    '$recentPriceString > max price $maxPrice.',
-    const Duration(minutes: 30),
+    'Failed to buy $shipType at $shipyardSymbol, '
+    '$recentPriceString > max price ${creditsString(maxPrice)}.',
+    const Duration(minutes: 10),
   );
 
   // Do we need to catch exceptions about insufficient credits?

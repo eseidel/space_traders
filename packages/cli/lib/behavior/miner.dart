@@ -173,6 +173,18 @@ int maxExtractedUnits(Ship ship) {
   return min(laserStrength + variance, ship.cargo.capacity);
 }
 
+/// Extract resources from a mine.
+class MineJob {
+  /// Create a new mine job.
+  MineJob({required this.mine, required this.market});
+
+  /// The mine to extract from.
+  final WaypointSymbol mine;
+
+  /// The market to sell to.
+  final WaypointSymbol market;
+}
+
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
@@ -249,11 +261,11 @@ Future<DateTime?> advanceMiner(
     );
   }
 
-  final mineSymbol = assertNotNull(
-    centralCommand.mineSymbolForShip(caches.systems, caches.agent, ship),
-    'No desired mine for ship.',
-    const Duration(hours: 1),
-  );
+  final mineJob =
+      centralCommand.mineJobForShip(caches.systems, caches.agent, ship);
+  final mineSymbol = mineJob.mine;
+  final marketSymbol = mineJob.market;
+
   if (ship.waypointSymbol != mineSymbol) {
     return beingNewRouteAndLog(
       api,
@@ -272,21 +284,6 @@ Future<DateTime?> advanceMiner(
     const Duration(hours: 1),
   );
 
-  // This is wrong, we don't know if this market will be able to sell
-  // the goods we can mine.
-  final nearestMarket = await nearestWaypointWithMarket(
-    caches.waypoints,
-    currentWaypoint,
-  );
-  if (nearestMarket == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No nearby market for ${waypointDescription(currentWaypoint)}.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
-
   // Both surveying and mining require being undocked.
   await undockIfNeeded(api, caches.ships, ship);
 
@@ -295,7 +292,7 @@ Future<DateTime?> advanceMiner(
     caches.marketPrices,
     caches.surveys,
     surveyWaypointSymbol: currentWaypoint.waypointSymbol,
-    nearbyMarketSymbol: nearestMarket.waypointSymbol,
+    nearbyMarketSymbol: marketSymbol,
     minimumSurveys: centralCommand.minimumSurveys,
     percentileThreshold: centralCommand.surveyPercentileThreshold,
   );

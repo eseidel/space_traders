@@ -15,16 +15,9 @@ Future<DateTime?> advanceSurveyor(
 }) async {
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
-  final mineSymbol =
-      centralCommand.mineSymbolForShip(caches.systems, caches.agent, ship);
-  if (mineSymbol == null) {
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'No desired mine for ship.',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
+  final mineJob =
+      centralCommand.mineJobForShip(caches.systems, caches.agent, ship);
+  final mineSymbol = mineJob.mine;
   if (ship.waypointSymbol != mineSymbol) {
     return beingNewRouteAndLog(
       api,

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/deliver.dart';
+import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
@@ -1098,10 +1099,8 @@ class CentralCommand {
     return 0.9;
   }
 
-  /// Returns the symbol of the nearest mine to the given [ship].
-  // This should probably return a "mining plan" instead, which includes
-  // what type of mining this is, where the mine is, where the markets are?
-  WaypointSymbol? mineSymbolForShip(
+  /// Returns the mining plan for the given [ship].
+  MineJob mineJobForShip(
     SystemsCache systemsCache,
     AgentCache agentCache,
     Ship ship,
@@ -1109,12 +1108,9 @@ class CentralCommand {
     final hq = agentCache.agent.headquartersSymbol;
     final hqSystemSymbol = hq.systemSymbol;
     final systemSymbol = hqSystemSymbol;
-    // final systemSymbol = ship.systemSymbol;
-    // Return the nearest mine to the ship for now?
     final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
-    return systemWaypoints
-        .firstWhereOrNull((w) => w.canBeMined)
-        ?.waypointSymbol;
+    final mine = systemWaypoints.firstWhere((w) => w.canBeMined).waypointSymbol;
+    return MineJob(mine: mine, market: mine);
     // If the ship is in a system without a mine go to the HQ?
 
     // final mine = await nearestMineWithGoodMining(
