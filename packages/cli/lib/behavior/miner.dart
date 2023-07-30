@@ -147,6 +147,21 @@ Future<Survey?> surveyWorthMining(
   return best?.survey;
 }
 
+final _laserMountSymbols = {
+  ShipMountSymbolEnum.MINING_LASER_I,
+  ShipMountSymbolEnum.MINING_LASER_II,
+  ShipMountSymbolEnum.MINING_LASER_III
+};
+
+int _laserMountStrength(Ship ship) {
+  return ship.mounts.fold(0, (sum, m) {
+    if (_laserMountSymbols.contains(m.symbol)) {
+      return sum + (m.strength ?? 0);
+    }
+    return sum;
+  });
+}
+
 // https://discord.com/channels/792864705139048469/792864705139048472/1132761138849923092
 // "Each laser adds its strength +-5. Power is 10 for laser I, 25 for laser II,
 // 60 for laser III. So for example laser I plus laser II is 35 +- 10"
@@ -154,13 +169,8 @@ Future<Survey?> surveyWorthMining(
 int maxExtractedUnits(Ship ship) {
   var laserStrength = 0;
   var variance = 0;
-  final laserMounts = {
-    ShipMountSymbolEnum.MINING_LASER_I,
-    ShipMountSymbolEnum.MINING_LASER_II,
-    ShipMountSymbolEnum.MINING_LASER_III
-  };
   for (final mount in ship.mounts) {
-    if (laserMounts.contains(mount.symbol)) {
+    if (_laserMountSymbols.contains(mount.symbol)) {
       final strength = mount.strength;
       // We could log here, this should never happen.
       if (strength == null) {
@@ -196,14 +206,8 @@ Future<DateTime?> advanceMiner(
 }) async {
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
-  // It's not worth potentially waiting a minute just to get a few pieces
-  // of cargo, when a surveyed mining operation could pull 10+ pieces.
-  // Hence selling when we're down to 15 or fewer spaces.
-  // This eventually should be dependent on market availability.
-  // How much to expect:
-
-  final shouldSell = ship.availableSpace < maxExtractedUnits(ship);
-  if (shouldSell) {
+  // Sell if our next extraction could overflow our cargo.
+  if (ship.availableSpace < maxExtractedUnits(ship)) {
     // Sell cargo and refuel if needed.
     final currentMarket =
         await visitLocalMarket(api, caches, currentWaypoint, ship);
@@ -314,6 +318,17 @@ Future<DateTime?> advanceMiner(
     final response = await extractResources(api, ship, survey: maybeSurvey);
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
+    caches.extractions.log(
+      ExtractionRecord(
+        shipSymbol: ship.shipSymbol,
+        waypointSymbol: mineSymbol,
+        tradeSymbol: yield_.symbol,
+        quantity: yield_.units,
+        power: _laserMountStrength(ship),
+        surveySignature: maybeSurvey?.signature,
+        timestamp: getNow(),
+      ),
+    );
     // Could use TradeSymbol.values.reduce() to find the longest symbol.
     shipDetail(
         ship,
