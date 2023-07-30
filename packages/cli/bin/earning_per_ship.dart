@@ -100,6 +100,9 @@ Future<void> command(FileSystem fs, List<String> args) async {
   for (final shipSymbol in shipSymbols) {
     final ship = shipCache.ship(shipSymbol);
     final state = behaviorCache.getBehavior(shipSymbol);
+    if (ship.isProbe) {
+      continue;
+    }
     final stateName =
         state?.behavior.name ?? behaviorFromFrame(ship)?.name ?? 'Unknown';
     final summary = TransactionSummary(
