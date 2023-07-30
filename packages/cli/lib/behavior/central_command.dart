@@ -880,21 +880,22 @@ class CentralCommand {
 
     // We will buy miners in the start system.
     // Or probes anywhere (once we have enough miners).
-    if (houndCount < 20 && inStartSystem) {
-      // Mining drones are never worth it.  They cost 80k a piece and pay
-      // for themselves in ~5 hours.  But ore hounds only cost 160k a piece
-      // pay for themselves in the same 5 hours, but also come with a laser 2
-      // and can mount a second laser 2 for only 80k more.  So you end up with
-      // 2 laser 2s for 240k, which is a better deal than 1 laser 1 for 80k.
-      return ShipType.ORE_HOUND;
-    } else if (houndCount > 5 && probeCount < 10) {
-      // If our probe happens to explore to another system which sells probes
-      // we could buy a few more probes.
-      return ShipType.PROBE;
-    }
-    // We will not buy traders until we have enough miners to support a base
-    // income and enough probes to have found deals for us to trade.
-    if (phase <= GamePhase.ramp) {
+    if (phase == GamePhase.early) {
+      if (houndCount < 20 && inStartSystem) {
+        // Mining drones are never worth it.  They cost 80k a piece and pay
+        // for themselves in ~5 hours.  But ore hounds only cost 160k a piece
+        // pay for themselves in the same 5 hours, but also come with a laser 2
+        // and can mount a second laser 2 for only 80k more.  So you end up with
+        // 2 laser 2s for 240k, which is a better deal than 1 laser 1 for 80k.
+        return ShipType.ORE_HOUND;
+      } else if (houndCount > 5 && probeCount < 10) {
+        // If our probe happens to explore to another system which sells probes
+        // we could buy a few more probes.
+        return ShipType.PROBE;
+      }
+      // We will not buy traders until we have enough miners to support a base
+      // income and enough probes to have found deals for us to trade.
+      // We exit early game at 30 ships and enter ramp.
       return null;
     }
 
@@ -935,6 +936,7 @@ class CentralCommand {
     if (typesToBuy.contains(ShipType.PROBE)) {
       return ShipType.PROBE;
     }
+    // Heavy traders are the last option after other types have been filled?
     if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER) && buyTraders) {
       return ShipType.HEAVY_FREIGHTER;
     }
