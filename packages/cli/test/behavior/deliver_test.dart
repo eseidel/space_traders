@@ -131,7 +131,7 @@ void main() {
     ).thenReturn([
       MarketPrice(
         waypointSymbol: symbol,
-        symbol: TradeSymbol.MOUNT_GAS_SIPHON_I.value,
+        symbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 100,
         sellPrice: 101,

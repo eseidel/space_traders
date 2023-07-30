@@ -37,7 +37,7 @@ BuyOpp _makeBuyOpp({
   return BuyOpp(
     MarketPrice(
       waypointSymbol: marketSymbol,
-      symbol: tradeSymbol.value,
+      symbol: tradeSymbol,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: price,
       sellPrice: price + 1,
@@ -55,7 +55,7 @@ SellOpp _makeSellOpp({
   return SellOpp.fromMarketPrice(
     MarketPrice(
       waypointSymbol: marketSymbol,
-      symbol: tradeSymbol.value,
+      symbol: tradeSymbol,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: price - 1,
       sellPrice: price,
@@ -270,7 +270,7 @@ void main() {
         maxJumps: 1,
       ),
     ).thenAnswer((invocation) => waypoints.map((w) => w.waypointSymbol));
-    final tradeSymbol = TradeSymbol.FUEL.value;
+    const tradeSymbol = TradeSymbol.FUEL;
     final now = DateTime.timestamp();
     final prices = [
       MarketPrice(
@@ -393,7 +393,7 @@ void main() {
       SellOpp.fromMarketPrice(
         MarketPrice(
           waypointSymbol: b,
-          symbol: trade1.value,
+          symbol: trade1,
           supply: MarketTradeGoodSupplyEnum.ABUNDANT,
           purchasePrice: 1,
           sellPrice: 2,
@@ -511,7 +511,7 @@ void main() {
     final deal = Deal.fromContractDelivery(
       sourcePrice: MarketPrice(
         waypointSymbol: start,
-        symbol: TradeSymbol.FUEL.value,
+        symbol: TradeSymbol.FUEL,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 1,
         sellPrice: 2,
@@ -571,7 +571,7 @@ void main() {
     // and a 3rd which is further still but not worth the extra travel.
     final near = MarketPrice(
       waypointSymbol: nearSymbol,
-      symbol: TradeSymbol.ALUMINUM.value,
+      symbol: TradeSymbol.ALUMINUM,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 1000,
       sellPrice: 1,
@@ -580,7 +580,7 @@ void main() {
     );
     final mid = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-MID'),
-      symbol: TradeSymbol.ALUMINUM.value,
+      symbol: TradeSymbol.ALUMINUM,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 100,
       sellPrice: 1,
@@ -589,7 +589,7 @@ void main() {
     );
     final far = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-FAR'),
-      symbol: TradeSymbol.ALUMINUM.value,
+      symbol: TradeSymbol.ALUMINUM,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 10,
       sellPrice: 1,
@@ -677,7 +677,7 @@ void main() {
     // and a 3rd which is further still but not worth the extra travel.
     final near = MarketPrice(
       waypointSymbol: nearSymbol,
-      symbol: TradeSymbol.ALUMINUM.value,
+      symbol: TradeSymbol.ALUMINUM,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 1,
       sellPrice: 10,
@@ -686,7 +686,7 @@ void main() {
     );
     final mid = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-MID'),
-      symbol: TradeSymbol.ALUMINUM.value,
+      symbol: TradeSymbol.ALUMINUM,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 1,
       sellPrice: 100,
@@ -695,7 +695,7 @@ void main() {
     );
     final far = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-FAR'),
-      symbol: TradeSymbol.ALUMINUM.value,
+      symbol: TradeSymbol.ALUMINUM,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 1,
       sellPrice: 1000,

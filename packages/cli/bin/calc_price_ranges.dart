@@ -13,8 +13,7 @@ void printPriceRanges(List<MarketPrice> gameStats) {
   }
 
   for (final tradeSymbol in TradeSymbol.values) {
-    final trades =
-        gameStats.where((p) => p.symbol == tradeSymbol.value).toList();
+    final trades = gameStats.where((p) => p.symbol == tradeSymbol).toList();
     if (trades.isEmpty) {
       continue;
     }

@@ -29,34 +29,30 @@ class MarketPrice {
 
   /// Create a new price record from a market trade good.
   MarketPrice.fromMarketTradeGood(MarketTradeGood good, this.waypointSymbol)
-      : symbol = good.symbol,
+      : symbol = good.tradeSymbol,
         supply = good.supply,
         purchasePrice = good.purchasePrice,
         sellPrice = good.sellPrice,
         tradeVolume = good.tradeVolume,
-        timestamp = DateTime.now();
+        timestamp = DateTime.timestamp();
 
   MarketPrice._compareOnly({this.sellPrice = 0})
       : waypointSymbol = WaypointSymbol.fromString('A-B-C'),
-        symbol = '',
+        symbol = TradeSymbol.COPPER,
         supply = MarketTradeGoodSupplyEnum.ABUNDANT,
         tradeVolume = 0,
         purchasePrice = 0,
-        timestamp = DateTime.now();
+        timestamp = DateTime.timestamp();
 
   /// Create a new price record from a json map.
   factory MarketPrice.fromJson(Map<String, dynamic> json) {
-    // Server started sending tradeVolume as a string recently, until that
-    // is fixed, need to handle it here.
-    final value = json['tradeVolume'];
-    final tradeVolume = value is int ? value : int.parse(value as String);
     return MarketPrice(
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-      symbol: json['symbol'] as String,
+      symbol: TradeSymbol.fromJson(json['symbol'] as String)!,
       supply: MarketTradeGoodSupplyEnum.fromJson(json['supply'] as String)!,
       purchasePrice: json['purchasePrice'] as int,
       sellPrice: json['sellPrice'] as int,
-      tradeVolume: tradeVolume,
+      tradeVolume: json['tradeVolume'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
   }
@@ -65,7 +61,7 @@ class MarketPrice {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'waypointSymbol': waypointSymbol.toJson(),
-      'symbol': symbol,
+      'symbol': symbol.toJson(),
       'supply': supply.toJson(),
       'purchasePrice': purchasePrice,
       'sellPrice': sellPrice,
@@ -78,11 +74,11 @@ class MarketPrice {
   final WaypointSymbol waypointSymbol;
 
   /// The symbol of the trade good.
-  // TODO(eseidel): Change to TradeSymbol
-  final String symbol;
+  // rename to tradeSymbol.
+  final TradeSymbol symbol;
 
-  /// The trade symbol of the trade good.
-  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
+  /// The symbol of the trade good.
+  TradeSymbol get tradeSymbol => symbol;
 
   /// The supply level of the trade good.
   final MarketTradeGoodSupplyEnum supply;
@@ -315,7 +311,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     TradeSymbol tradeSymbol, {
     WaypointSymbol? marketSymbol,
   }) {
-    final prices = _prices.where((e) => e.symbol == tradeSymbol.value);
+    final prices = _prices.where((e) => e.symbol == tradeSymbol);
     if (marketSymbol == null) {
       return prices;
     }

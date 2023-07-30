@@ -8,7 +8,7 @@ void main(List<String> args) async {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final marketPrices = MarketPrices.load(fs);
-  final tradeVolumesBySymbol = <String, Set<int>>{};
+  final tradeVolumesBySymbol = <TradeSymbol, Set<int>>{};
   for (final price in marketPrices.prices) {
     final tradeSymbol = price.symbol;
     final tradeVolume = price.tradeVolume;

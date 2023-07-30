@@ -180,7 +180,7 @@ void main() {
     marketPrices.addPrices([
       MarketPrice(
         waypointSymbol: WaypointSymbol.fromString('S-A-W'),
-        symbol: a.value,
+        symbol: a,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 1,
         sellPrice: 2,

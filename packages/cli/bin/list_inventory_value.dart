@@ -15,7 +15,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   for (final ship in ships) {
     final inventory = ship.cargo.inventory;
     for (final item in inventory) {
-      final symbol = TradeSymbol.fromJson(item.symbol)!;
+      final symbol = item.tradeSymbol;
       final count = countByTradeSymbol[symbol] ?? 0;
       countByTradeSymbol[symbol] = count + item.units;
     }

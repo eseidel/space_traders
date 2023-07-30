@@ -19,7 +19,7 @@ MarketPrice makePrice({
 }) {
   return MarketPrice(
     waypointSymbol: WaypointSymbol.fromString(waypointSymbol),
-    symbol: symbol.value,
+    symbol: symbol,
     supply: supply,
     purchasePrice: purchasePrice,
     sellPrice: sellPrice,
@@ -103,7 +103,7 @@ void main() {
 
   test('fromMarketTradeGood', () {
     final good = MarketTradeGood(
-      symbol: 'A',
+      symbol: 'FUEL',
       tradeVolume: 1,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 1,
@@ -114,7 +114,7 @@ void main() {
       good,
       waypointSymbol,
     );
-    expect(price.symbol, 'A');
+    expect(price.symbol, TradeSymbol.FUEL);
     expect(price.waypointSymbol, waypointSymbol);
     expect(price.tradeVolume, 1);
     expect(price.supply, MarketTradeGoodSupplyEnum.ABUNDANT);
@@ -152,7 +152,7 @@ void main() {
     final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
     final price = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-W'),
-      symbol: 'A',
+      symbol: TradeSymbol.FUEL,
       supply: MarketTradeGoodSupplyEnum.ABUNDANT,
       purchasePrice: 1,
       sellPrice: 2,
@@ -204,7 +204,7 @@ void main() {
       symbol: marketSymbol.waypoint,
       tradeGoods: [
         MarketTradeGood(
-          symbol: 'a',
+          symbol: 'FUEL',
           tradeVolume: 1,
           supply: MarketTradeGoodSupplyEnum.ABUNDANT,
           purchasePrice: 1,
@@ -225,7 +225,7 @@ void main() {
       symbol: marketSymbol.waypoint,
       tradeGoods: [
         MarketTradeGood(
-          symbol: 'a',
+          symbol: 'FUEL',
           tradeVolume: 1,
           supply: MarketTradeGoodSupplyEnum.ABUNDANT,
           purchasePrice: 1,

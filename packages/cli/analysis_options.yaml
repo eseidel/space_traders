@@ -11,3 +11,4 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   errors:
     collection_methods_unrelated_type: warning
+    unrelated_type_equality_checks: warning

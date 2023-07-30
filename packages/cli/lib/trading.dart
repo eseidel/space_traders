@@ -144,7 +144,7 @@ class Deal {
     return Deal.fromMarketPrices(
       sourcePrice: MarketPrice(
         waypointSymbol: sourceSymbol,
-        symbol: tradeSymbol.value,
+        symbol: tradeSymbol,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: purchasePrice,
         sellPrice: purchasePrice + 1,
@@ -155,7 +155,7 @@ class Deal {
       ),
       destinationPrice: MarketPrice(
         waypointSymbol: destinationSymbol,
-        symbol: tradeSymbol.value,
+        symbol: tradeSymbol,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: sellPrice - 1,
         sellPrice: sellPrice,

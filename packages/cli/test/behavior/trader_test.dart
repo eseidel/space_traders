@@ -533,7 +533,7 @@ void main() {
     ).thenReturn([
       MarketPrice(
         waypointSymbol: start,
-        symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+        symbol: TradeSymbol.ADVANCED_CIRCUITRY,
         supply: MarketTradeGoodSupplyEnum.ABUNDANT,
         purchasePrice: 100,
         sellPrice: 101,
