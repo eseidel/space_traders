@@ -130,6 +130,7 @@ Future<SellCargo201ResponseData> sellCargo(
 Future<SellCargo201ResponseData> purchaseCargo(
   Api api,
   AgentCache agentCache,
+  ShipCache shipCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int units,
@@ -142,6 +143,7 @@ Future<SellCargo201ResponseData> purchaseCargo(
       await api.fleet.purchaseCargo(ship.symbol, purchaseCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
+  shipCache.updateShip(ship);
   agentCache.agent = data.agent;
   return data;
 }
@@ -152,11 +154,13 @@ Future<SellCargo201ResponseData> purchaseCargo(
 Future<RefuelShip200ResponseData> refuelShip(
   Api api,
   AgentCache agentCache,
+  ShipCache shipCache,
   Ship ship,
 ) async {
   final responseWrapper = await api.fleet.refuelShip(ship.symbol);
   final data = responseWrapper!.data;
   agentCache.agent = data.agent;
   ship.fuel = data.fuel;
+  shipCache.updateShip(ship);
   return data;
 }

@@ -129,6 +129,7 @@ Future<Transaction?> purchaseCargoAndLog(
   MarketPrices marketPrices,
   TransactionLog transactionLog,
   AgentCache agentCache,
+  ShipCache shipCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int amountToBuy,
@@ -136,8 +137,14 @@ Future<Transaction?> purchaseCargoAndLog(
 ) async {
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
   try {
-    final data =
-        await purchaseCargo(api, agentCache, ship, tradeSymbol, amountToBuy);
+    final data = await purchaseCargo(
+      api,
+      agentCache,
+      shipCache,
+      ship,
+      tradeSymbol,
+      amountToBuy,
+    );
     // Do we need to handle transaction limits?  Callers should check before.
     // ApiException 400: {"error":{"message":"Market transaction failed.
     // Trade good REACTOR_FUSION_I has a limit of 10 units per transaction.",
@@ -255,7 +262,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   }
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   try {
-    final data = await refuelShip(api, agentCache, ship);
+    final data = await refuelShip(api, agentCache, shipCache, ship);
     final transaction = data.transaction;
     final agent = agentCache.agent;
     logMarketTransaction(

@@ -358,6 +358,7 @@ Future<JobResult> doBuyJob(
     caches.marketPrices,
     caches.transactions,
     caches.agent,
+    caches.ships,
     ship,
     good,
     tradeSymbol,

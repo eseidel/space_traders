@@ -23,6 +23,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   MarketPrices marketPrices,
   TransactionLog transactionLog,
   AgentCache agentCache,
+  ShipCache shipCache,
   Ship ship,
   MarketTradeGood marketGood,
   TradeSymbol neededTradeSymbol, {
@@ -83,6 +84,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
     marketPrices,
     transactionLog,
     agentCache,
+    shipCache,
     ship,
     neededTradeSymbol,
     unitsToPurchase,
@@ -128,6 +130,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
       caches.marketPrices,
       caches.transactions,
       caches.agent,
+      caches.ships,
       ship,
       good,
       dealTradeSymbol,
