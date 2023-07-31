@@ -120,6 +120,7 @@ Earning:
   Unclear if multi-threaded will work OK with json files.
 * Make Survey selection find a value point and then look back further than
   the last 100 surveys for surveys above that value.
+* Print warnings when our predicted buy/sell price differs from actual.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate

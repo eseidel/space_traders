@@ -12,15 +12,7 @@ void printDiffs(List<int> data) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   // final marketPrices = MarketPrices.load(fs);
-
-  // This won't do anything if we don't have a transactions1.json file
-  // since it defaults to an empty list.
-  final transactionLogOld =
-      TransactionLog.load(fs, path: 'data/transactions1.json');
-  final transactionLog = TransactionLog.load(fs);
-  final allTransactions =
-      transactionLogOld.entries.followedBy(transactionLog.entries);
-
+  final allTransactions = loadAllTransactions(fs);
   // Walk through all transactions, finding repeats.
   final transactionSets = <List<Transaction>>[];
   var repeats = <Transaction>[];

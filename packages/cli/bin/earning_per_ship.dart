@@ -62,8 +62,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final transactionLog = TransactionLog.load(fs);
-  final shipSymbols = transactionLog.shipSymbols.toList()..sort();
+  final allTransactions = loadAllTransactions(fs).toList();
+  final shipSymbols = allTransactions.map((e) => e.shipSymbol).toSet();
   final behaviorCache = BehaviorCache.load(fs);
 
   final longestHexNumber = shipSymbols.fold(
@@ -90,7 +90,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final behaviorCreditPerSecondTotals = <String, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = transactionLog.where(
+  final transactions = allTransactions.where(
     (t) =>
         t.timestamp.isAfter(startTime) &&
         (t.accounting == AccountingType.goods ||

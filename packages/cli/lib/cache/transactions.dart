@@ -233,3 +233,14 @@ class TransactionLog extends JsonLog<Transaction> {
     return entries.map((e) => e.shipSymbol).toSet();
   }
 }
+
+/// Load all transactions from the file system.
+// Hack around our lack of a real database or log rolling.
+Iterable<Transaction> loadAllTransactions(FileSystem fs) {
+  // This won't do anything if we don't have a transactions1.json file
+  // since it defaults to an empty list.
+  final transactionLogOld =
+      TransactionLog.load(fs, path: 'data/transactions1.json');
+  final transactionLog = TransactionLog.load(fs);
+  return transactionLogOld.entries.followedBy(transactionLog.entries);
+}

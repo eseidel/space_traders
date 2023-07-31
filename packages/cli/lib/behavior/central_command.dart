@@ -239,13 +239,13 @@ class CentralCommand {
     );
 
     // According to SAF: Surveyor = 2x mk2s,  miner = 2x mk2 + 1x mk1
-    // final surveyOnly = ShipTemplate(
-    //   frameSymbol: ShipFrameSymbolEnum.MINER,
-    //   mounts: Multiset.from([
-    //     ShipMountSymbolEnum.SURVEYOR_II,
-    //     ShipMountSymbolEnum.SURVEYOR_II,
-    //   ]),
-    // );
+    final surveyOnly = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.MINER,
+      mounts: Multiset.from([
+        ShipMountSymbolEnum.SURVEYOR_II,
+        ShipMountSymbolEnum.SURVEYOR_II,
+      ]),
+    );
     // final mineOnly = ShipTemplate(
     //   frameSymbol: ShipFrameSymbolEnum.MINER,
     //   mounts: Multiset.from([
@@ -256,15 +256,14 @@ class CentralCommand {
     // );
 
     // Hack to test a new template.
-    // final surveyors = [
-    //   'ESEIDEL-5',
-    //   'ESEIDEL-6',
-    //   'ESEIDEL-7',
-    //   'ESEIDEL-1B',
-    // ];
-    // if (surveyors.contains(ship.symbol)) {
-    //   return surveyOnly;
-    // }
+    final surveyors = [
+      'ESEIDEL-5',
+      'ESEIDEL-6',
+      'ESEIDEL-7',
+    ];
+    if (surveyors.contains(ship.symbol)) {
+      return surveyOnly;
+    }
 
     final genericTemplates = [genericMiner];
     return genericTemplates
