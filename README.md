@@ -428,3 +428,43 @@ NAV_TO
 * Executes
 * On failure, marks queue as failed, flushes it?
 * Sends state back to planner (or just updates a shared state via DB?)
+
+
+### Prevent bad trades?
+
+🛸#2B ✈️  to X1-PY78-88810Z, -2s left
+🛸#2B ✍️  market data @ X1-PY78-88810Z
+🛸#2B ⛽   2 FUEL                           ⚖️    2 x    122c =   -244c -> 🏦 2,632,986c
+🛸#2B 🤝 100 MACHINERY            +2% +11c per 100 x    576c = +57,600c -> 🏦 2,690,586c
+🛸#2B 🤝  10 MACHINERY            +0%  +1c per  10 x    566c = +5,660c -> 🏦 2,696,246c
+🛸#2B Expected 3,174c profit (7c/s), got -2,830c (-6c/s) in 00:07:20, expected 00:07:01
+
+### Our handling is still wrong:
+
+🛸#27 ✈️  to X1-MN97-71751A, -3s left
+🛸#27 ✍️  market data @ X1-MN97-71751A
+🛸#27 ⛽   6 FUEL                           ⚖️    6 x    122c =   -732c -> 🏦 2,726,894c
+🛸#27 💸  10 MACHINERY           -56% -642c per  10 x    498c = -4,980c -> 🏦 2,721,914c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -55% -627c per  10 x    513c = -5,130c -> 🏦 2,716,784c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -53% -608c per  10 x    532c = -5,320c -> 🏦 2,711,464c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -51% -585c per  10 x    555c = -5,550c -> 🏦 2,705,914c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -49% -557c per  10 x    583c = -5,830c -> 🏦 2,700,084c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -46% -522c per  10 x    618c = -6,180c -> 🏦 2,693,904c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -42% -478c per  10 x    662c = -6,620c -> 🏦 2,687,284c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -37% -425c per  10 x    715c = -7,150c -> 🏦 2,680,134c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -32% -360c per  10 x    780c = -7,800c -> 🏦 2,672,334c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MACHINERY           -25% -280c per  10 x    860c = -8,600c -> 🏦 2,663,734c
+🛸#27 Purchased 10 of MACHINERY, still have 10 units we would like to buy, looping.
+🛸#27 ✍️  market data @ X1-MN97-71751A
+🛸#27 MACHINERY is too expensive at X1-MN97-71751A needed < 573, got 959
+🛸#27 Beginning route to X1-NG76-74133A
+🛸#27 🛫 to X1-MN97-97114E JUMP_GATE (1m) spent 43 fuel
