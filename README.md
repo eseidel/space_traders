@@ -82,7 +82,6 @@ Then modified:
 ### Todo
 
 Most impact:
-* Fix trading to understand low-volume trade prices.
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
@@ -97,8 +96,6 @@ Earning:
 * Use recent earnings-per-second in ship behavior planning.
 * Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
-* Traders only consider how repeated buys inflate prices, they do not consider
-  how repeated sells might deflate prices at sell point.
 * Teach miners how to coordinate with haulers to sell their goods further away.
 * Add refining
 * Add gas siphoning
@@ -109,14 +106,12 @@ Earning:
   Jumps will get the wrong answers in dense areas of the galaxy.
 * Be able to buy miners outside of the main system.
 * Add dedicated survey ships.
-* Teach deal logic that price can move (even if just 1c) on each buy/sell lot.
 * Calculate "wait time" when servicing a ship.
 * Try changing deal finding heuristic to only consider buy price.
 * Spread out traders across the galaxy better.
 * buy-in-a-loop for small tradeVolumes gets worse as we have more ships.
   This is likely the #1 contributor to "wait time".
   Every place we return null to loop has the same problem.
-* Record # of extractions per survey?  (Does laser power matter?)
 * Record which ship generated a survey?
 * Allow ships to buy from the same location at high trade volumes?
 * Have one thread be generating instructions and another thread executing.
@@ -242,25 +237,6 @@ Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O
 🛸#1A ✍️  shipyard data @ X1-VQ83-56254F
 🛸#1A X1-BB5-41700X is missing chart, routing.
 
-### Sell side trade volumes killing profits
-
-🛸#C  ✍️  shipyard data @ X1-XD55-07827C
-🛸#C  🤝  10 MODULE_ORE_REFINERY_I   +4% +824c per  10 x 23,237c = +232,370c -> 🏦 10,806,100c
-🛸#C  🤝  10 MODULE_ORE_REFINERY_I   +3% +601c per  10 x 23,014c = +230,140c -> 🏦 11,036,240c
-🛸#C  🤝  10 MODULE_ORE_REFINERY_I   +1% +327c per  10 x 22,740c = +227,400c -> 🏦 11,263,640c
-🛸#C  🤝  10 MODULE_ORE_REFINERY_I    0% -10c per  10 x 22,403c = +224,030c -> 🏦 11,487,670c
-🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -2% -425c per  10 x 21,988c = +219,880c -> 🏦 11,707,550c
-🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -4% -937c per  10 x 21,476c = +214,760c -> 🏦 11,922,310c
-🛸#C  🤝  10 MODULE_ORE_REFINERY_I   -7% -1,566c per  10 x 20,847c = +208,470c -> 🏦 12,130,780c
-[WARN] 🛸#C  Expected 121,552c profit (220c/s), got -14,130c (-21c/s) in 00:10:49, expected 00:09:12
-
-🛸#25 🤝  10 MOUNT_TURRET_I     +124% +2,576c per  10 x  4,657c = +46,570c -> 🏦 2,981,897c
-🛸#25 🤝  10 MOUNT_TURRET_I     +119% +2,483c per  10 x  4,564c = +45,640c -> 🏦 3,027,537c
-🛸#25 🤝  10 MOUNT_TURRET_I     +114% +2,368c per  10 x  4,449c = +44,490c -> 🏦 3,072,027c
-🛸#25 🤝  10 MOUNT_TURRET_I     +107% +2,227c per  10 x  4,308c = +43,080c -> 🏦 3,115,107c
-🛸#25 🤝  10 MOUNT_TURRET_I      +99% +2,053c per  10 x  4,134c = +41,340c -> 🏦 3,156,447c
-[WARN] 🛸#25 Expected 23,632c profit (43c/s), got -5,260c (-6c/s) in 00:13:53, expected 00:09:04
-
 ### Deal planning needs a cache
 🛸#4A ✍️  market data @ X1-AF63-69302X
 [WARN] 🛸#4A No profitable deals within 10 jumps of X1-AF63.
@@ -331,36 +307,6 @@ ApiException 400: {"error":{"message":"Failed to execute jump. Ship cannot execu
 ### Does the trader know how to complete contracts that don't require moving?
 deliver 1210  COPPER_ORE to X1-FA31-74322Z in 6d for 161,510c with 32,985c upfront
 Expected profit: 125,525c
-
-
-### Bought too many units for a contract:
-(I think this is fixed by my unitsToPurchase changes.)
-
-ESEIDEL-2C: Behavior.trader
-  Orbiting X1-SQ35-24719Z JUMP_GATE HAULER 105/120
-  MOUNT_MINING_LASER_II   105 x 20,446c  = 2,146,830c
-  destination: X1-FA31-97247X, arrives in 1h
-  MOUNT_MINING_LASER_II (contract)  X1-F44-10751B   34,598c -> X1-FA31-97247X  61,073c +26,475c (77%) 1h 507c/s 4,152,126c
- duration: 38m
-root@ubuntu-s-1vcpu-1gb-sfo3-01:~/space_traders/packages/cli# dart run bin/show_contracts.dart 
-3 completed.
-1 active:
-deliver 7  MOUNT_MINING_LASER_II to X1-FA31-97247X in 6d for 342,009c with 85,502c upfront
-Expected profit: 127,526c
-
-
-ESEIDEL-21: Behavior.trader
-  Orbiting X1-XU8-50704X JUMP_GATE HAULER 92/120
-  MODULE_ORE_REFINERY_I    92 x 22,601c  = 2,079,292c
-  destination: X1-FA31-97247X, arrives in 32m
-  MODULE_ORE_REFINERY_I (contract)  X1-PQ85-27813E  23,434c -> X1-FA31-97247X  38,235c +14,801c (63%) 51m 578c/s 2,812,324c
- duration: 21m
- root@ubuntu-s-1vcpu-1gb-sfo3-01:~/space_traders/packages/cli# dart run bin/show_contracts.dart 
-8 completed.
-1 active:
-deliver 94 (  4 remaining) MODULE_ORE_REFINERY_I to X1-FA31-97247X in 6d for 2,659,627c with 934,463c upfront
-Expected profit: -588,346c
-
 
 ### Crashed due to 500
 
@@ -481,53 +427,3 @@ NAV_TO
 * Executes
 * On failure, marks queue as failed, flushes it?
 * Sends state back to planner (or just updates a shared state via DB?)
-
-
-### Threw away money?
-
-Worst 10:
-ESEIDEL-2C 110 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,495,282c (-5,642c/s)
-ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,136,772c (-4,194c/s)
-ESEIDEL-2C 110 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,124,182c (-3,944c/s)
-ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-DS5-11453A -> X1-CK21-59613B in 4m for -1,124,832c (-3,800c/s)
-ESEIDEL-2C 110 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-DS5-11453A in 4m for -754,604c (-2,675c/s)
-ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-DS5-11453A in 4m for -610,874c (-2,340c/s)
-ESEIDEL-2C 100 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-DS5-11453A in 4m for -610,874c (-2,296c/s)
-ESEIDEL-2C 80 of MODULE_SHIELD_GENERATOR_I X1-CK21-59613B -> X1-CK21-59613B in 8m for -82,706c (-156c/s)
-
-
-### Never purchase above median?
-
-🛸#30 ✈️  to X1-F44-10751B, -1m left
-🛸#30 ✍️  market data @ X1-F44-10751B
-🛸#30 ⛽   2 FUEL                           ⚖️    2 x    122c =   -244c -> 🏦 136,196,023c
-🛸#30 💸  10 MOUNT_MINING_LASER_II   -7% -2,458c per  10 x 33,145c = -331,450c -> 🏦 135,864,573c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-[WARN] 🛸#30 (trader) took 2s (4 requests) expected 1.3s
-🛸#30 💸  10 MOUNT_MINING_LASER_II   -6% -2,285c per  10 x 33,318c = -333,180c -> 🏦 135,531,393c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II   -6% -2,073c per  10 x 33,530c = -335,300c -> 🏦 135,196,093c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II   -5% -1,812c per  10 x 33,791c = -337,910c -> 🏦 134,858,183c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II   -4% -1,491c per  10 x 34,112c = -341,120c -> 🏦 134,517,063c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II   -3% -1,095c per  10 x 34,508c = -345,080c -> 🏦 134,171,983c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II   -2% -607c per  10 x 34,996c = -349,960c -> 🏦 133,822,023c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 ✍️  market data @ X1-F44-10751B
-🛸#30 💸  10 MOUNT_MINING_LASER_II    0%  -7c per  10 x 35,596c = -355,960c -> 🏦 133,466,063c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-[WARN] 🛸#30 (trader) took 1s (2 requests) expected 0.7s
-🛸#30 💸  10 MOUNT_MINING_LASER_II   +2% +731c per  10 x 36,334c = -363,340c -> 🏦 133,102,723c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II   +5% +1,641c per  10 x 37,244c = -372,440c -> 🏦 132,730,283c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II   +8% +2,760c per  10 x 38,363c = -383,630c -> 🏦 132,346,653c
-🛸#30 Purchased 10 of MOUNT_MINING_LASER_II, still have 10 units we would like to buy, looping.
-🛸#30 💸  10 MOUNT_MINING_LASER_II  +12% +4,138c per  10 x 39,741c = -397,410c -> 🏦 131,949,243c
-🛸#30 Purchased 10 MOUNT_MINING_LASER_II @ 39741 (expected 33145) = -397,410c
-🛸#30 Beginning route to X1-HA48-79877C
-🛸#30 🛫 to X1-F44-02893X JUMP_GATE (1m) spent 47 fuel
-
