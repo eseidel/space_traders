@@ -19,6 +19,7 @@ dependencies:
   more: ^4.0.0
   openapi:
     path: ../openapi
+  scidart: ^0.0.2-dev.12
   scoped:
     git:
       url: https://github.com/shorebirdtech/shorebird.git

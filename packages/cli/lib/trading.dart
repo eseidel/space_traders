@@ -327,6 +327,7 @@ List<Deal> buildDealsFromScan(
 int profitableVolumeBetween(
   MarketPrice a,
   MarketPrice b, {
+  required int maxVolume,
   int minimumUnitProfit = 0,
 }) {
   var units = 0;
@@ -339,6 +340,11 @@ int profitableVolumeBetween(
       return units;
     }
     units++;
+    // Some goods change in price very slowly, so we need to cap the max
+    // volume we'll consider or we'll loop forever.
+    if (units >= maxVolume) {
+      return maxVolume;
+    }
   }
 }
 
@@ -393,7 +399,11 @@ class CostedDeal {
     }
     return min(
       cargoSize,
-      profitableVolumeBetween(deal.sourcePrice, destinationPrice),
+      profitableVolumeBetween(
+        deal.sourcePrice,
+        destinationPrice,
+        maxVolume: cargoSize,
+      ),
     );
   }
 

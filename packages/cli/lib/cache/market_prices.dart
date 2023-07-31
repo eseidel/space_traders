@@ -10,6 +10,33 @@ import 'package:meta/meta.dart';
 /// default max age for "recent" prices is 3 days
 const defaultMaxAge = Duration(days: 3);
 
+/// Predict the next price based on the current price and the trade volume.
+int expectedPriceMovement({
+  required int currentPrice,
+  required int tradeVolume,
+  required int units,
+  // required int medianPrice,
+  required MarketTransactionTypeEnum action,
+}) {
+  // I'm confident that price movements are quadratic in nature.
+  // When I've attempted to fit the curve across multiple repeated buys,
+  // they've fit very well to a quadratic curve.
+  // Including buying units below the set price *decreasing* the price.
+  // However I don't know how to turn that into a function to predict the
+  // next price, especially acros multiple different markets and trade goods.
+  // These price changes most notably affect "shallow" markets, where the
+  // trade volume is low.
+  // I don't have good data for tradeVolume = 1, it likely moves faster?
+  if (tradeVolume <= 10) {
+    final onePercent = currentPrice ~/ 100;
+    if (action == MarketTransactionTypeEnum.PURCHASE) {
+      return onePercent;
+    }
+    return -onePercent;
+  }
+  return 0;
+}
+
 // {"waypointSymbol": "X1-ZS60-53675E", "symbol": "IRON_ORE", "supply":
 // "ABUNDANT", "purchasePrice": 6, "sellPrice": 4, "tradeVolume": 1000,
 // "timestamp": "2023-05-14T21:52:56.530126100+00:00"}
@@ -98,25 +125,35 @@ class MarketPrice {
   /// Predict the price of buying the Nth unit of this good.
   /// Unit is a 0-based index of the unit being purchased.
   int predictPurchasePriceForUnit(int unit) {
-    // TODO(eseidel): movementPerBatch is wrong.
-    // For large trade volumes, it's probably 0, for small trade volumes
-    // it can be very large.
-    const movementPerBatch = 1;
+    var predictedPrice = purchasePrice;
     final batchCount = unit ~/ tradeVolume;
-    final movement = movementPerBatch * batchCount;
-    return purchasePrice + movement;
+    for (var i = 0; i < batchCount; i++) {
+      final expectedMovement = expectedPriceMovement(
+        currentPrice: predictedPrice,
+        tradeVolume: tradeVolume,
+        units: unit,
+        action: MarketTransactionTypeEnum.PURCHASE,
+      );
+      predictedPrice += expectedMovement;
+    }
+    return predictedPrice;
   }
 
   /// Predict the price of buying the Nth unit of this good.
   /// Unit is a 0-based index of the unit being purchased.
   int predictSellPriceForUnit(int unit) {
-    // TODO(eseidel): movementPerBatch is wrong.
-    // For large trade volumes, it's probably 0, for small trade volumes
-    // it can be very large.
-    const movementPerBatch = -1;
+    var predictedPrice = sellPrice;
     final batchCount = unit ~/ tradeVolume;
-    final movement = movementPerBatch * batchCount;
-    return sellPrice + movement;
+    for (var i = 0; i < batchCount; i++) {
+      final expectedMovement = expectedPriceMovement(
+        currentPrice: predictedPrice,
+        tradeVolume: tradeVolume,
+        units: unit,
+        action: MarketTransactionTypeEnum.SELL,
+      );
+      predictedPrice += expectedMovement;
+    }
+    return predictedPrice;
   }
 
   /// Predict the total price of buying [units] of this good.

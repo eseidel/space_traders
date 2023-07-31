@@ -761,4 +761,57 @@ void main() {
 
     expect(market?.price, mid);
   });
+  test('Deal.expectedUnits < cargoSize', () {
+    // For high-value, low-tradeVolume items, we should expect their
+    // prices to move (possibly quickly) and not be able to fill a full
+    // cargo hold.
+
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+    const tradeSymbol = TradeSymbol.MODULE_CARGO_HOLD_I;
+    final deal = Deal.fromMarketPrices(
+      sourcePrice: MarketPrice(
+        waypointSymbol: start,
+        symbol: tradeSymbol,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 10000,
+        sellPrice: 10200,
+        tradeVolume: 10,
+        // If these aren't UTC, they won't roundtrip through JSON correctly
+        // because MarketPrice always converts to UTC in toJson.
+        timestamp: DateTime(2021).toUtc(),
+      ),
+      destinationPrice: MarketPrice(
+        waypointSymbol: end,
+        symbol: tradeSymbol,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 10200,
+        sellPrice: 10400,
+        tradeVolume: 10,
+        timestamp: DateTime(2021).toUtc(),
+      ),
+    );
+    final costedDeal = CostedDeal(
+      deal: deal,
+      cargoSize: 100,
+      transactions: [],
+      startTime: DateTime(2021),
+      route: RoutePlan(
+        actions: [
+          RouteAction(
+            startSymbol: start,
+            endSymbol: end,
+            type: RouteActionType.navCruise,
+            duration: 10,
+          )
+        ],
+        fuelCapacity: 10,
+        fuelUsed: 10,
+        shipSpeed: 10,
+      ),
+      costPerFuelUnit: 100,
+    );
+    expect(costedDeal.cargoSize, 100);
+    expect(costedDeal.expectedUnits, 20);
+  });
 }

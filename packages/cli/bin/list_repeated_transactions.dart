@@ -1,5 +1,3 @@
-// import 'package:scidart/numdart.dart';
-
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logger.dart';
@@ -14,6 +12,9 @@ void printDiffs(List<int> data) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   // final marketPrices = MarketPrices.load(fs);
+
+  // This won't do anything if we don't have a transactions1.json file
+  // since it defaults to an empty list.
   final transactionLogOld =
       TransactionLog.load(fs, path: 'data/transactions1.json');
   final transactionLog = TransactionLog.load(fs);
@@ -52,8 +53,17 @@ Future<void> command(FileSystem fs, List<String> args) async {
   for (final transactionSet in transactionSets) {
     final set = transactionSet;
     final transaction = set.first;
+    final tradeVolume = transaction.quantity; // actually the max across set.
+    /// Ones not a multiple of 10 are just mining sales.
+    if (tradeVolume % 10 != 0) {
+      continue;
+    }
+    // Transaction.tradeSymbol isn't always a tradeSymbol (it could be a
+    // shipSymbol) but repeated ones should always be TradeSymbols.
+    // final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol)!;
+    // final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol)!;
     logger.info(
-      '${set.length} x ${transaction.tradeType} '
+      '${set.length} x ${transaction.tradeType} ($tradeVolume) '
       '${transaction.tradeSymbol} '
       'at ${transaction.waypointSymbol}',
     );
@@ -63,6 +73,50 @@ Future<void> command(FileSystem fs, List<String> args) async {
       diffs.add(set[i].perUnitPrice - set[i - 1].perUnitPrice);
     }
     printDiffs(diffs);
+
+    final diffAsPercentOfCurrentPrice = <double>[];
+    for (var i = 1; i < set.length; i++) {
+      diffAsPercentOfCurrentPrice.add(
+        (set[i].perUnitPrice - set[i - 1].perUnitPrice) /
+            set[i].perUnitPrice *
+            100,
+      );
+    }
+    printDiffs(diffAsPercentOfCurrentPrice.map((e) => e.round()).toList());
+
+    // final diffToMedian = <int>[];
+    // for (var i = 1; i < set.length; i++) {
+    //   diffToMedian.add(set[i].perUnitPrice - medianPrice);
+    // }
+    // printDiffs(diffToMedian);
+
+    // final medianPercents = <double>[];
+    // for (final diff in diffs) {
+    //   medianPercents.add(diff / medianPrice);
+    // }
+    // printDiffs(medianPercents.map((e) => (e * 100).round()).toList());
+
+    // final diffAsPercentOfMedianDiff = <double>[];
+    // for (var i = 1; i < set.length; i++) {
+    //   diffAsPercentOfMedianDiff.add(
+    //     (set[i].perUnitPrice - set[i - 1].perUnitPrice) /
+    //         (set[i].perUnitPrice - medianPrice),
+    //   );
+    // }
+    // printDiffs(
+    //   diffAsPercentOfMedianDiff.map((e) => (e * 100).round()).toList(),
+    // );
+
+    // const degree = 2;
+    // final x = Array(
+    //   List<double>.generate(
+    //     set.length,
+    //     (i) => i.toDouble() * tradeVolume,
+    //   ),
+    // );
+    // final y = Array(set.map((t) => t.perUnitPrice / medianPrice).toList());
+    // final p = PolyFit(x, y, degree);
+    // print(p);
   }
 }
 
