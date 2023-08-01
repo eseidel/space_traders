@@ -633,7 +633,12 @@ Future<DateTime?> advanceTrader(
     currentWaypoint,
     ship,
     // We want to always be using super up-to-date market prices for the trader.
-    maxAge: const Duration(seconds: 5),
+    // If we don't do this, we will end up buying based on stale prices
+    // which will make us think the goods are cheaper than they are
+    // and buy too many of them.
+    // TODO(eseidel): We can fix this by modeling the change in price
+    // and thus not having to update?
+    maxAge: const Duration(milliseconds: 300),
   );
   await centralCommand.visitLocalShipyard(
     api,

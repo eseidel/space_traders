@@ -249,6 +249,19 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   List<ShipyardPrice> pricesAtShipyard(WaypointSymbol marketSymbol) {
     return _prices.where((e) => e.waypointSymbol == marketSymbol).toList();
   }
+
+  /// Returns all known prices for a ship type,
+  /// optionally restricted to a specific waypoint.
+  Iterable<ShipyardPrice> pricesFor(
+    ShipType shipType, {
+    WaypointSymbol? marketSymbol,
+  }) {
+    final prices = _prices.where((e) => e.shipType == shipType);
+    if (marketSymbol == null) {
+      return prices;
+    }
+    return prices.where((e) => e.waypointSymbol == marketSymbol);
+  }
 }
 
 /// Record shipyard data and log the result.

@@ -85,7 +85,6 @@ Most impact:
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
-* Use MineJob to cache market and mine location (save lookups).
 * Confirm planRoute is using PriorityQueue correctly.
 
 Early Game:
@@ -121,6 +120,8 @@ Earning:
 * Make Survey selection find a value point and then look back further than
   the last 100 surveys for surveys above that value.
 * Print warnings when our predicted buy/sell price differs from actual.
+* Do we correctly navigate right away after the last jump?
+* Use the closest ship to a shipyard when buying a ship.
 
 Exploring:
 * Explorers should explore an entire system and then go to the jump gate
@@ -334,6 +335,34 @@ ApiException 500: {"error":{"code":500,"message":"Something unexpected went wron
 #8      main (file:///root/space_traders/packages/cli/bin/cli.dart:83:3)
 <asynchronous suspension>
 
+And another:
+
+Unhandled exception:
+ApiException 500: {"error":{"code":500,"message":"Something unexpected went wrong! If you want to help you can file an issue here: https://github.com/SpaceTradersAPI/api-docs"}}
+#0      FleetApi.purchaseCargo (package:openapi/api/fleet_api.dart:1476:7)
+<asynchronous suspension>
+#1      purchaseCargo (package:cli/net/direct.dart:143:7)
+<asynchronous suspension>
+#2      purchaseCargoAndLog (package:cli/net/actions.dart:140:18)
+<asynchronous suspension>
+#3      purchaseTradeGoodIfPossible (package:cli/behavior/trader.dart:82:18)
+<asynchronous suspension>
+#4      _handleAtSourceWithDeal (package:cli/behavior/trader.dart:129:25)
+<asynchronous suspension>
+#5      advanceTrader (package:cli/behavior/trader.dart:680:23)
+<asynchronous suspension>
+#6      advanceShipBehavior (package:cli/behavior/advance.dart:83:23)
+<asynchronous suspension>
+#7      advanceShips (package:cli/logic.dart:51:25)
+<asynchronous suspension>
+#8      logic (package:cli/logic.dart:150:7)
+<asynchronous suspension>
+#9      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:101:3)
+<asynchronous suspension>
+#10     main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:107:7)
+<asynchronous suspension>
+#11     main (file:///root/space_traders/packages/cli/bin/cli.dart:105:3)
+
 ### Show how many more units we would by:
 🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
 🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
@@ -468,3 +497,56 @@ NAV_TO
 🛸#27 MACHINERY is too expensive at X1-MN97-71751A needed < 573, got 959
 🛸#27 Beginning route to X1-NG76-74133A
 🛸#27 🛫 to X1-MN97-97114E JUMP_GATE (1m) spent 43 fuel
+
+
+🛸#27 ✈️  to X1-XY58-42132Z, -5s left
+🛸#27 ✍️  market data @ X1-XY58-42132Z
+🛸#27 ⛽   3 FUEL                           ⚖️    3 x    122c =   -366c -> 🏦 7,293,930c
+🛸#27 💸  10 MICROPROCESSORS     -56% -750c per  10 x    600c = -6,000c -> 🏦 7,287,930c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -55% -737c per  10 x    613c = -6,130c -> 🏦 7,281,800c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -53% -721c per  10 x    629c = -6,290c -> 🏦 7,275,510c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -52% -701c per  10 x    649c = -6,490c -> 🏦 7,269,020c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -50% -677c per  10 x    673c = -6,730c -> 🏦 7,262,290c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -48% -647c per  10 x    703c = -7,030c -> 🏦 7,255,260c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -45% -610c per  10 x    740c = -7,400c -> 🏦 7,247,860c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -42% -565c per  10 x    785c = -7,850c -> 🏦 7,240,010c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -38% -509c per  10 x    841c = -8,410c -> 🏦 7,231,600c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 💸  10 MICROPROCESSORS     -33% -441c per  10 x    909c = -9,090c -> 🏦 7,222,510c
+🛸#27 Purchased 10 of MICROPROCESSORS, still have 10 units we would like to buy, looping.
+🛸#27 ✍️  market data @ X1-XY58-42132Z
+🛸#27 MICROPROCESSORS is too expensive at X1-XY58-42132Z needed < 662, got 994
+🛸#27 Beginning route to X1-QQ30-77574B
+
+### Print more debugging information about why trades fail?
+
+🛸#42 ✈️  to X1-QZ69-30211C, -1ms left
+🛸#42 ✍️  market data @ X1-QZ69-30211C
+🛸#42 ⛽   3 FUEL                           ⚖️    3 x    122c =   -366c -> 🏦 7,181,528c
+🛸#42 🤝 100 LAB_INSTRUMENTS      +1%  +5c per 100 x    695c = +69,500c -> 🏦 7,251,028c
+🛸#42 Expected 6,350c profit (8c/s), got -5,740c (-7c/s) in 00:12:51, expected 00:12:10
+[WARN] 🛸#42 No profitable deals within 10 jumps of X1-QZ69.
+
+e.g. did the price change since when the trade was scoped vs. when it was executed?
+
+
+### Confirm System.json validity against /stats
+"The /status endpoint also gives you the total number of entities in the stats node. You could compare against that and retrigger the download."
+```
+{
+  "stats": {
+    "agents": 199,
+    "ships": 1757,
+    "systems": 12000,
+    "waypoints": 66798
+  }
+}
+```

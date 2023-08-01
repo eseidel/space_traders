@@ -484,6 +484,32 @@ class CostedDeal {
   int get maxPurchaseUnitPrice =>
       (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
 
+  // This does not acount for any expected profit.
+  /// The expected per-unit purchase price for the next lot of units.
+  /// For each additional unit (or batch of) we buy, we expect to:
+  /// - spend more to buy it (prices go up at source market)
+  /// - less to transport it (opex is amortized over more units)
+  /// - and sell it for less (prices go down at destination market)
+  /// This function answers the question "what's the max we would pay
+  /// perUnit for this next lot of unit and still expect to profit".
+  // int maxPurchaseUnitPrice({required int existingUnits, required int lotSize}) {
+  //   // Contract deals are easy, "sell" prices dont change.
+  //   // perUnitRewards - perUnitOpExp = maxPerUnitPurchasePrice
+  //   final destinationPrice = deal.destinationPrice;
+  //   if (destinationPrice == null) {
+  //     return (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
+  //   }
+  //   // Taking lotSize into account, we end up with a smaller max purchase price
+  //   // for the first few units (as the fuel costs are spread over few units)
+  //   // which gets higher as we buy more units (as the fuel costs are spread
+  //   // over more units) and then lower again as we buy more units (as the
+  //   // destination price drops).
+
+  //   // This should get a range value instead?
+  //   final expectedSellValue =
+  //       destinationPrice.predictSellPriceForUnit(existingUnits + 1)
+  // }
+
   /// Count of units purchased so far.
   int get unitsPurchased => transactions
       .where(
