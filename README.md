@@ -86,6 +86,8 @@ Most impact:
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
 * Confirm planRoute is using PriorityQueue correctly.
+* Could await on somehting other than the network (e.g. a priority queue).
+* Add atmomic writes (write to a temp file and then rename).
 
 Early Game:
 * Probe should probably stay close to the main system to help find trades?
@@ -222,6 +224,33 @@ ApiException 400: HTTP connection failed: POST /my/ships/ESEIDEL-15/navigate (In
 #6      navigateShip (package:cli/net/direct.dart:53:7)
 <asynchronous suspension>
 
+
+[WARN] 🛸#C  took 1s (2 requests) expected 0.7s
+[WARN] 🛸#C  (miner) took 1s (2 requests) expected 0.7s
+Unhandled exception:
+ApiException 500: {"error":{"code":500,"message":"Something unexpected went wrong! If you want to help you can file an issue here: https://github.com/SpaceTradersAPI/api-docs"}}
+#0      FleetApi.sellCargo (package:openapi/api/fleet_api.dart:1762:7)
+<asynchronous suspension>
+#1      sellCargo (package:cli/net/direct.dart:121:7)
+<asynchronous suspension>
+#2      sellAllCargo (package:cli/net/actions.dart:79:24)
+<asynchronous suspension>
+#3      sellAllCargoAndLog (package:cli/net/actions.dart:110:3)
+<asynchronous suspension>
+#4      advanceMiner (package:cli/behavior/miner.dart:215:7)
+<asynchronous suspension>
+#5      advanceShipBehavior (package:cli/behavior/advance.dart:83:23)
+<asynchronous suspension>
+#6      advanceShips (package:cli/logic.dart:51:25)
+<asynchronous suspension>
+#7      logic (package:cli/logic.dart:150:7)
+<asynchronous suspension>
+#8      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:101:3)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:107:7)
+<asynchronous suspension>
+#10     main (file:///root/space_traders/packages/cli/bin/cli.dart:105:3)
+<asynchronous suspension>
 
 ### Server is returning ship inventories with an unstable sort:
 Ship list differs at index 2: [differs at offset 3046:, ... "symbol":"ALUMINUM_O ..., ... "symbol":"PRECIOUS_S ...,               ^]
