@@ -186,7 +186,14 @@ class CentralCommand {
     if (_shipCache.ships.length < 30) {
       return GamePhase.early;
     }
-    return GamePhase.ramp;
+    final traderCount = _shipCache.ships
+        .where((s) => s.registration.role == ShipRole.HAULER)
+        .length;
+    if (traderCount < 30) {
+      return GamePhase.ramp;
+    }
+    // When is GamePhase.exploring?
+    return GamePhase.tradingTransition;
   }
 
   /// Minimum profit per second we expect this ship to make.
@@ -330,6 +337,11 @@ class CentralCommand {
     // Disable drones after ramping to a full fleet.
     if (phase > GamePhase.ramp) {
       if (ship.frame.symbol == ShipFrameSymbolEnum.DRONE) {
+        return Behavior.idle;
+      }
+    }
+    if (phase >= GamePhase.tradingTransition) {
+      if (ship.frame.symbol == ShipFrameSymbolEnum.MINER) {
         return Behavior.idle;
       }
     }
