@@ -90,7 +90,17 @@ void printSyntheticDeal(SyntheticDeal deal) {
       '(${creditsString(deal.profitPerSecond)}/s)');
 }
 
+bool Function(Transaction t) filterFromArgs(List<String> args) {
+  final shipHex = args.firstOrNull;
+  if (shipHex == null) {
+    return (Transaction t) => true;
+  }
+  final shipSymbol = ShipSymbol.fromString('ESEIDEL-$shipHex');
+  return (Transaction t) => t.shipSymbol == shipSymbol;
+}
+
 Future<void> command(FileSystem fs, List<String> args) async {
+  final filter = filterFromArgs(args);
   final transactionLog = TransactionLog.load(fs);
   final deals = <SyntheticDeal>[];
   final openDeals = <ShipSymbol, List<Transaction>>{};
@@ -107,6 +117,9 @@ Future<void> command(FileSystem fs, List<String> args) async {
   }
 
   for (final transaction in transactionLog.entries) {
+    if (!filter(transaction)) {
+      continue;
+    }
     if (!supportedTypes.contains(transaction.accounting)) {
       ignoredTransactions.add(transaction);
       continue;
@@ -157,7 +170,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   // }
 
   logger.info('Ignored ${ignoredTransactions.length} transactions.');
-  // for (final transaction in ignoredTransactions) {
-  //   logger.info(describeTransaction(transaction));
-  // }
+  for (final transaction in ignoredTransactions) {
+    logger.info(describeTransaction(transaction));
+  }
 }
