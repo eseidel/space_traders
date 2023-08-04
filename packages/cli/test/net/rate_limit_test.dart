@@ -34,4 +34,16 @@ void main() {
     expect(response.statusCode, 200);
     expect(callCount, 2);
   });
+
+  test('RateLimiter', () async {
+    // final rateLimiter = RateLimiter();
+
+    // To test:
+    // - First request scheduled should be immediate.
+    // - Second request should be set to wait.
+    // - If a request takes a long time, a second request will not go off
+    //   while it's still in progress.
+    // - Rate limit responses should retry (above)
+    // - If time passes between requests, the next request should be immediate.
+  });
 }
