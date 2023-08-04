@@ -3,28 +3,43 @@ import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/route.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class _MockAgent extends Mock implements Agent {}
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorState extends Mock implements BehaviorState {}
+
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
 
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipCache extends Mock implements ShipCache {}
 
+class _MockShipEngine extends Mock implements ShipEngine {}
+
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
+
+class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
+
+class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
@@ -34,15 +49,7 @@ class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
-class _MockAgent extends Mock implements Agent {}
-
-class _MockSystemsApi extends Mock implements SystemsApi {}
-
-class _MockFleetApi extends Mock implements FleetApi {}
-
-class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
+class _MockRoutePlan extends Mock implements RoutePlan {}
 
 void main() {
   test('advanceBuyShip smoke test', () async {
@@ -65,6 +72,8 @@ void main() {
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.ships).thenReturn(shipCache);
+    final routePlanner = _MockRoutePlanner();
+    when(() => caches.routePlanner).thenReturn(routePlanner);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -72,6 +81,13 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    const fuelCapacity = 100;
+    when(() => ship.fuel)
+        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
+    final shipEngine = _MockShipEngine();
+    when(() => ship.engine).thenReturn(shipEngine);
+    const shipSpeed = 30;
+    when(() => shipEngine.speed).thenReturn(shipSpeed);
 
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => agentCache.headquartersSymbol).thenReturn(symbol);
@@ -104,7 +120,7 @@ void main() {
     when(() => shipCache.frameCounts).thenReturn({});
     final state = _MockBehaviorState();
 
-    const shipType = ShipType.ORE_HOUND;
+    const shipType = ShipType.HEAVY_FREIGHTER;
     when(() => shipyardPrices.medianPurchasePrice(shipType)).thenReturn(1);
     when(
       () => shipyardPrices.recentPurchasePrice(
@@ -112,6 +128,14 @@ void main() {
         shipType: shipType,
       ),
     ).thenReturn(1);
+    when(() => shipyardPrices.pricesFor(shipType)).thenReturn([
+      ShipyardPrice(
+        waypointSymbol: symbol,
+        shipType: shipType,
+        purchasePrice: 1,
+        timestamp: DateTime(2021),
+      )
+    ]);
 
     when(
       () => centralCommand.shipTypeToBuy(
@@ -165,6 +189,16 @@ void main() {
 
     when(() => centralCommand.maxMedianShipPriceMultipler).thenReturn(1.05);
 
+    final route = _MockRoutePlan();
+    when(
+      () => routePlanner.planRoute(
+        start: symbol,
+        end: symbol,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      ),
+    ).thenReturn(route);
+
     final logger = _MockLogger();
     expect(
       () async {
@@ -183,7 +217,7 @@ void main() {
       },
       throwsA(
         const JobException(
-          'Purchased A-1 (SHIP_ORE_HOUND)!',
+          'Purchased A-1 (SHIP_HEAVY_FREIGHTER)!',
           Duration(minutes: 10),
           disable: DisableBehavior.allShips,
         ),
