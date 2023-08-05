@@ -199,38 +199,24 @@ Future<DateTime?> advanceBuyShip(
 }) async {
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
-  // final shipyardWaypoints =
-  //     await caches.waypoints.shipyardWaypointsForSystem(ship.systemSymbol);
-  // if (shipyardWaypoints.isEmpty) {
-  //   centralCommand.disableBehaviorForShip(
+  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
+  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
+  // const wantedType = ShipType.HEAVY_FREIGHTER;
+  // final trip = assertNotNull(
+  //   findBestShipyardToBuy(
+  //     caches.shipyardPrices,
+  //     caches.routePlanner,
   //     ship,
-  //     Behavior.buyShip,
-  //     'No shipyards in system ${ship.systemSymbol}.',
-  //     const Duration(minutes: 10),
-  //   );
-  //   return null;
-  // }
+  //     wantedType,
+  //     expectedCreditsPerSecond: 7,
+  //   ),
+  //   'No shipyards found to buy $wantedType.',
+  //   const Duration(minutes: 10),
+  // );
 
-  // final shipyardWaypoint = shipyardWaypoints.first;
-  // final shipyardSymbol = shipyardWaypoint.waypointSymbol;
-  // final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
-  // final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
-  const wantedType = ShipType.HEAVY_FREIGHTER;
-  final trip = assertNotNull(
-    findBestShipyardToBuy(
-      caches.shipyardPrices,
-      caches.routePlanner,
-      ship,
-      wantedType,
-      expectedCreditsPerSecond: 7,
-    ),
-    'No shipyards found to buy $wantedType.',
-    const Duration(minutes: 10),
-  );
-
-  // final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
-  // final shipyardSymbol = shipyardWaypoint.waypointSymbol;
-  final shipyardSymbol = trip.price.waypointSymbol;
+  final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
+  final shipyardSymbol = shipyardWaypoint.waypointSymbol;
+  // final shipyardSymbol = trip.price.waypointSymbol;
   final shipType = assertNotNull(
     centralCommand.shipTypeToBuy(
       ship,
