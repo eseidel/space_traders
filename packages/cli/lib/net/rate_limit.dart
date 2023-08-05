@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
+import 'package:clock/clock.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 
@@ -35,10 +36,13 @@ class RateLimiter {
   /// The number of requests per second to allow.
   final int maxRequestsPerSecond;
 
+  /// Get the current time (in utc).
+  static DateTime _now() => clock.now().toUtc();
+
   int _backoffSeconds = 1;
   Timer? _timer;
   final List<Completer<void>> _queue = [];
-  DateTime _nextRequestTime = DateTime.timestamp();
+  DateTime _nextRequestTime = _now();
   bool _requestInProgress = false;
 
   /// The current backoff in seconds.
@@ -50,7 +54,7 @@ class RateLimiter {
   /// Reset the backoff, called after a successful request.
   void requestCompleted() {
     _requestInProgress = false;
-    _nextRequestTime = DateTime.timestamp().add(_minWaitTime);
+    _nextRequestTime = _now().add(_minWaitTime);
     _backoffSeconds = 1;
   }
 
@@ -58,7 +62,7 @@ class RateLimiter {
   void requestCameBackRateLimited({Duration? overrideWaitTime}) {
     _requestInProgress = false;
     final waitTime = overrideWaitTime ?? Duration(seconds: _backoffSeconds);
-    final nextRequestTime = DateTime.timestamp().add(waitTime);
+    final nextRequestTime = _now().add(waitTime);
     _scheduleNextRequestFor(nextRequestTime);
     _backoffSeconds *= 2;
   }
@@ -68,7 +72,7 @@ class RateLimiter {
     if (_timer != null) {
       _timer!.cancel();
     }
-    _timer = Timer(time.difference(DateTime.timestamp()), _timerFired);
+    _timer = Timer(time.difference(_now()), _timerFired);
   }
 
   void _startTimerIfNeeded() {
@@ -77,10 +81,9 @@ class RateLimiter {
 
   void _timerFired() {
     _timer = null;
-    final now = DateTime.timestamp();
     // This can happen when we're rate-limited and we get a doubleBackoff
     // call before the timer fires.
-    if (now.isBefore(_nextRequestTime)) {
+    if (_now().isBefore(_nextRequestTime)) {
       _scheduleNextRequestFor(_nextRequestTime);
       return;
     }
@@ -111,7 +114,7 @@ class RateLimiter {
     // immediately return.
     if (!_requestInProgress &&
         _queue.isEmpty &&
-        DateTime.timestamp().isAfter(_nextRequestTime)) {
+        _now().isAfter(_nextRequestTime)) {
       _requestInProgress = true;
       // _nextRequestTime will be updated when the request completes.
       return Future.value();
@@ -124,6 +127,16 @@ class RateLimiter {
   }
 }
 
+typedef InvokeApi = Future<Response> Function(
+  String path,
+  String method,
+  List<QueryParam> queryParams,
+  Object? body,
+  Map<String, String> headerParams,
+  Map<String, String> formParams,
+  String? contentType,
+);
+
 // This does not yet support "burst" requests which the api allows.
 // This also could hold a queue of recent request times to allow for more
 // accurate rate limiting.
@@ -133,9 +146,12 @@ class RateLimitedApiClient extends ApiClient {
   RateLimitedApiClient({
     int maxRequestsPerSecond = 3,
     super.authentication,
-  }) : _rateLimiter = RateLimiter(maxRequestsPerSecond: maxRequestsPerSecond);
+    @visibleForTesting InvokeApi? mockInvokeApi,
+  })  : _rateLimiter = RateLimiter(maxRequestsPerSecond: maxRequestsPerSecond),
+        _mockInvokeAPI = mockInvokeApi;
 
   final RateLimiter _rateLimiter;
+  final InvokeApi? _mockInvokeAPI;
 
   /// RequestCounts tracks the number of requests made to each path.
   final RequestCounts requestCounts = RequestCounts();
@@ -219,6 +235,9 @@ class RateLimitedApiClient extends ApiClient {
     final queryString = urlEncodedQueryParams.isNotEmpty
         ? '?${urlEncodedQueryParams.join('&')}'
         : '';
+
+    final doInvokeAPI = _mockInvokeAPI ?? super.invokeAPI;
+
     final response = await handleUnexpectedRateLimit(
       () async {
         // Wait for our turn (even when retrying)
@@ -227,7 +246,7 @@ class RateLimitedApiClient extends ApiClient {
         logger.detail('$path$queryString');
         requestCounts.recordRequest(path);
         // Actually do the request.
-        final response = await super.invokeAPI(
+        final response = await doInvokeAPI(
           path,
           method,
           queryParams,
