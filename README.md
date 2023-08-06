@@ -23,6 +23,15 @@ disable it with:
 export BOT=true
 ```
 
+## Contents
+* packages/cli - A command line interface to the Space Traders API.
+* packages/openapi - A generated Dart client for the Space Traders API.
+* packages/server - A very basic server for supporting the UI.
+* packages/ui - A Flutter UI for the Space Traders API.
+
+packages/cli is the only package that is well developed.  openapi is generated
+and the rest are in very early stages of development.
+
 ## Usage
 
 ```
