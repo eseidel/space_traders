@@ -1,66 +1,73 @@
 use anyhow::Result;
-use postgres::{Client, NoTls};
+use postgres::fallible_iterator::FallibleIterator;
 
 struct Request {
-    _id: i32,
+    _id: i64,
+    priority: i32,
     url: String,
     body: String,
 }
 
-impl Request {
-    fn empty(url: &str) -> Request {
-        Request {
-            _id: 0,
-            url: String::from(url),
-            body: String::new(),
-        }
-    }
-}
+// struct Response {
+//     _id: i32,
+//     url: String,
+//     body: String,
+// }
 
 fn main() -> Result<()> {
-    let mut client = Client::connect(
+    let mut db = postgres::Client::connect(
         "postgresql://postgres:password@localhost/spacetraders",
-        NoTls,
+        postgres::NoTls,
     )?;
 
-    client.batch_execute(
-        "
-        CREATE TABLE IF NOT EXISTS request_ (
-            id              SERIAL PRIMARY KEY,
-            url             VARCHAR NOT NULL,
-            body            VARCHAR NOT NULL
-            )
-    ",
-    )?;
+    let requests_per_second = 1;
+    let time_between_requests = std::time::Duration::from_millis(1000 / requests_per_second);
+    let net = reqwest::blocking::Client::new();
+    let mut next_request_time = std::time::Instant::now();
 
-    let requests = vec![
-        Request::empty("https://api.spacetraders.io/v2/my/agent"),
-        Request::empty("https://api.spacetraders.io/v2/my/agent"),
-        Request::empty("https://api.spacetraders.io/v2/my/agent"),
-    ];
+    // Could be any name, just needs to be the same as the NOTIFY.
+    db.batch_execute("LISTEN request_")?;
 
-    for request in &requests {
-        client.execute(
-            "INSERT INTO request_ (url, body) VALUES ($1, $2)",
-            &[&request.url, &request.body],
-        )?;
+    loop {
+        // Wait until the next request time.
+        let now = std::time::Instant::now();
+        if next_request_time > now {
+            std::thread::sleep(next_request_time - now);
+        }
+        // Every wakeup, get a new request, and make it for the server.
+        // Set the next request time.
+        next_request_time = std::time::Instant::now() + time_between_requests;
+
+        // Get one request of the highest priority.
+        let result = db.query_one(
+            "SELECT id, priority, url, body FROM request_ ORDER BY priority DESC LIMIT 1",
+            &[],
+        );
+        if let Ok(row) = result {
+            let request = Request {
+                _id: row.get(0),
+                priority: row.get(1),
+                url: row.get(2),
+                body: row.get(3),
+            };
+            println!("{} {} with {}", request.priority, request.url, request.body);
+            let res = net
+                .get("http://localhost:8000/")
+                .body("the exact body that is sent")
+                .send()?;
+            let text = res.text()?;
+            println!("{}", text);
+            // post the result.
+            db.execute(
+                "INSERT INTO response_ (url, body) VALUES ($1, $2)",
+                &[&request.url, &text],
+            )?;
+            // delete the request.
+            db.execute("DELETE FROM request_ WHERE id = $1", &[&request._id])?;
+        } else {
+            println!("Waiting...");
+            // Wait for a notification.
+            let _ = db.notifications().blocking_iter().next();
+        }
     }
-
-    for row in client.query("SELECT id, url, body FROM request_", &[])? {
-        let request = Request {
-            _id: row.get(0),
-            url: row.get(1),
-            body: row.get(2),
-        };
-        println!("{} with {}", request.url, request.body);
-    }
-
-    let client = reqwest::blocking::Client::new();
-    let res = client
-        .get("http://localhost:8000/")
-        .body("the exact body that is sent")
-        .send()?;
-    print!("{}", res.text()?);
-
-    Ok(())
 }

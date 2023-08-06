@@ -13,8 +13,8 @@ docker run \
 ```
 
 ```
-docker cp scripts/ spacetraders_postgres:/scripts
-docker cp sql/ spacetraders_postgres:/sql
+docker cp scripts/. spacetraders_postgres:/scripts
+docker cp sql/. spacetraders_postgres:/sql
 ```
 
 ```
