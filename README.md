@@ -4,6 +4,23 @@
 
 Playing around with writing a Dart implementation of the Space Traders game.
 
+## Setup
+
+This requires Dart 3.0.0 or later.
+
+The easiest way to get Dart is typically via Flutter.  See
+https://flutter.dev/docs/get-started/install for instructions.
+
+On ubuntu:
+```
+sudo snap install flutter --classic
+```
+
+Dart/Flutter will print a warning when running as root, you can disable
+that warning with:
+```
+export BOT=true
+```
 
 ## Usage
 
