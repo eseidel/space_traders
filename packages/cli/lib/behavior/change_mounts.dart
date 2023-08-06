@@ -47,10 +47,9 @@ Future<DateTime?> advanceChangeMounts(
   final needed = mountsToAddToShip(ship, template);
   jobAssert(needed.isNotEmpty, 'No mounts needed.', const Duration(hours: 1));
 
-  shipInfo(ship, 'Changing mounts. Mounting $toMount.');
-
   // We've already started a change-mount job, continue.
   if (toMount != null) {
+    shipInfo(ship, 'Changing mounts. Mounting $toMount.');
     final currentWaypoint =
         await caches.waypoints.waypoint(ship.waypointSymbol);
     if (!currentWaypoint.hasShipyard) {
@@ -159,6 +158,7 @@ Future<DateTime?> advanceChangeMounts(
     'No unclaimed mounts at $shipyardSymbol.',
     const Duration(minutes: 10),
   );
+  shipInfo(ship, 'Claiming mount: $toClaim.');
   centralCommand.claimMount(ship.shipSymbol, toClaim);
 
   // Go to the shipyard.
