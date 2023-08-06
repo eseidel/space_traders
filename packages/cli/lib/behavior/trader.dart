@@ -31,6 +31,11 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   required int unitsToPurchase,
   AccountingType accountingType = AccountingType.goods,
 }) async {
+  if (unitsToPurchase <= 0) {
+    shipWarn(ship, 'Tried to purchase $unitsToPurchase of $neededTradeSymbol?');
+    return null;
+  }
+
   // And its selling at a reasonable price.
   // If the market is above maxWorthwhileUnitPurchasePrice and we don't have any
   // cargo yet then we give up and try again.
@@ -96,7 +101,12 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
 /// Returns the number of units we should purchase considering the ship
 /// cargo size and the market trade volume as well as any maximum units
 /// the deal proscribes.
-int unitsToPurchase(MarketTradeGood good, Ship ship, int maxUnitsToBuy) {
+int unitsToPurchase(
+  MarketTradeGood good,
+  Ship ship,
+  int maxUnitsToBuy, {
+  int? credits,
+}) {
   // Many market goods trade in batches much smaller than our cargo hold
   // e.g. 10 vs. 120, if we try to buy 120 we'll get an error.
   final unitsInCargo = ship.cargo.countUnits(good.tradeSymbol);
@@ -106,7 +116,10 @@ int unitsToPurchase(MarketTradeGood good, Ship ship, int maxUnitsToBuy) {
   final unitsToPurchase = min(marketTradeVolume, ship.availableSpace);
   // Some deals have limited size (like contracts) for normal arbitrage deals
   // costedDeal.cargoSize == ship.cargoSpace.
-  return min(unitsToPurchase, unitsLeftToBuy);
+  final contactLimited = min(unitsToPurchase, unitsLeftToBuy);
+  final maxFromCredits = credits == null ? null : credits ~/ good.purchasePrice;
+  final maxUnits = min(contactLimited, maxFromCredits ?? unitsToPurchase);
+  return maxUnits;
 }
 
 Future<DateTime?> _handleAtSourceWithDeal(

@@ -106,6 +106,7 @@ Future<DateTime?> advanceChangeMounts(
       }
     }
 
+    // 🛸#6  🔧 MOUNT_MINING_LASER_II on ESEIDEL-6 for 3,600c -> 🏦 89,172c
     // Mount the new mount.
     await installMountAndLog(
       api,

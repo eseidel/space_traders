@@ -268,7 +268,7 @@ class CentralCommand {
       'ESEIDEL-6',
       'ESEIDEL-7',
     ];
-    if (surveyors.contains(ship.symbol)) {
+    if (phase > GamePhase.ramp && surveyors.contains(ship.symbol)) {
       return surveyOnly;
     }
 

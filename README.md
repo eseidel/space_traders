@@ -91,6 +91,8 @@ Most impact:
 
 Early Game:
 * Probe should probably stay close to the main system to help find trades?
+* buy ship behavior on shipyard visit is causing us to buy ships instead of
+  modules when we'd prefer modules.
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.

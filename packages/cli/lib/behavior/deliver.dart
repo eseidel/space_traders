@@ -261,6 +261,8 @@ Future<BuyJob?> computeBuyJob(
     'No market to buy $tradeSymbol',
     const Duration(hours: 1),
   );
+  // TODO(eseidel): This does not consider the cost of the mounts.
+  // Should also be setup to re-compute how many mounts we need when we arrive.
   final buyJob = BuyJob(
     tradeSymbol: tradeSymbol,
     units: maxToBuy,
@@ -333,26 +335,41 @@ Future<JobResult> doBuyJob(
   // Sometimes it takes a long time to get here, and we might now need more
   // items than we did when we started.
 
-  final existingUnits = ship.countUnits(buyJob.tradeSymbol);
-  if (existingUnits >= buyJob.units) {
-    shipWarn(ship, 'Deliver already has ${buyJob.units} ${buyJob.tradeSymbol}');
-    return JobResult.complete();
-  }
-
   final currentMarket = assertNotNull(
     maybeMarket,
     'No market at ${ship.waypointSymbol}',
     const Duration(minutes: 5),
   );
 
+  final tradeSymbol = buyJob.tradeSymbol;
+  final good = currentMarket.marketTradeGood(tradeSymbol)!;
+
+  final units = unitsToPurchase(
+    good,
+    ship,
+    buyJob.units,
+    credits: caches.agent.agent.credits,
+  );
+
+  final existingUnits = ship.countUnits(buyJob.tradeSymbol);
+  if (existingUnits >= buyJob.units) {
+    shipWarn(ship, 'Deliver already has ${buyJob.units} ${buyJob.tradeSymbol}');
+    return JobResult.complete();
+  }
+
+  if (units <= 0 && existingUnits > 0) {
+    shipWarn(
+      ship,
+      'Deliver already has $existingUnits ${buyJob.tradeSymbol},'
+      " can't afford more.",
+    );
+    return JobResult.complete();
+  }
+
   // Otherwise we're at our buy location and we buy.
   await dockIfNeeded(api, caches.ships, ship);
 
   // TODO(eseidel): Share this code with trader.dart
-  final tradeSymbol = buyJob.tradeSymbol;
-  final good = currentMarket.marketTradeGood(tradeSymbol)!;
-
-  final units = unitsToPurchase(good, ship, buyJob.units);
   final transaction = await purchaseTradeGoodIfPossible(
     api,
     caches.marketPrices,
@@ -488,9 +505,8 @@ Future<DateTime?> advanceDeliver(
   ];
 
   for (var i = 0; i < 10; i++) {
-    final jobIndex = state.jobIndex;
-    shipInfo(ship, 'DELIVER $jobIndex');
-    if (jobIndex < 0 || jobIndex >= jobFunctions.length) {
+    shipInfo(ship, 'DELIVER ${state.jobIndex}');
+    if (state.jobIndex < 0 || state.jobIndex >= jobFunctions.length) {
       centralCommand.disableBehaviorForShip(
         ship,
         'No behavior state.',
@@ -499,7 +515,7 @@ Future<DateTime?> advanceDeliver(
       return null;
     }
 
-    final jobFunction = jobFunctions[jobIndex];
+    final jobFunction = jobFunctions[state.jobIndex];
     final result = await jobFunction(
       state,
       api,
@@ -507,10 +523,10 @@ Future<DateTime?> advanceDeliver(
       caches,
       ship,
     );
-    shipInfo(ship, 'DELIVER $jobIndex $result');
+    shipInfo(ship, 'DELIVER ${state.jobIndex} $result');
     if (result.isComplete) {
       state.jobIndex++;
-      if (jobIndex < jobFunctions.length) {
+      if (state.jobIndex < jobFunctions.length) {
         centralCommand.setBehavior(ship.shipSymbol, state);
       } else {
         centralCommand.completeBehavior(ship.shipSymbol);
