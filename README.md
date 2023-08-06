@@ -16,8 +16,9 @@ On ubuntu:
 sudo snap install flutter --classic
 ```
 
-Dart/Flutter will print a warning when running as root, you can disable
-that warning with:
+If you're running this in a docker container, or otherwise as root Dart and
+Flutter will print a warning about running as root.  You can ignore it or
+disable it with:
 ```
 export BOT=true
 ```
