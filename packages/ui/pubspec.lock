@@ -183,6 +183,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  more:
+    dependency: transitive
+    description:
+      name: more
+      sha256: "74d7379587be84284e9e1a15b4c296351bfdac0370bf2e55de996f13c93a2dc3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   openapi:
     dependency: "direct main"
     description:
@@ -198,6 +206,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.3"
+  scidart:
+    dependency: transitive
+    description:
+      name: scidart
+      sha256: af816eed552cadb6a9a324c594515b0cdff41617839345c382047927bd8dc02d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2-dev.12"
   scoped:
     dependency: "direct main"
     description:
