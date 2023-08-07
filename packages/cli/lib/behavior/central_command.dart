@@ -263,12 +263,13 @@ class CentralCommand {
     // );
 
     // Hack to test a new template.
+    final minerCount = _shipCache.countOfType(ShipType.ORE_HOUND);
     final surveyors = [
       'ESEIDEL-5',
       'ESEIDEL-6',
       'ESEIDEL-7',
     ];
-    if (phase > GamePhase.ramp && surveyors.contains(ship.symbol)) {
+    if (minerCount > 20 && surveyors.contains(ship.symbol)) {
       return surveyOnly;
     }
 
