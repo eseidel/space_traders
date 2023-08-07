@@ -1,5 +1,6 @@
 use anyhow::Result;
 use postgres::fallible_iterator::FallibleIterator;
+use serde::Serialize;
 
 struct Request {
     _id: i64,
@@ -10,9 +11,22 @@ struct Request {
 
 // struct Response {
 //     _id: i32,
+//     request_id: i32,
 //     url: String,
 //     body: String,
 // }
+
+#[derive(Serialize)]
+struct Header {
+    name: String,
+    value: String,
+}
+
+#[derive(Serialize)]
+struct Call {
+    headers: Vec<Header>,
+    body: String,
+}
 
 fn main() -> Result<()> {
     let mut db = postgres::Client::connect(
@@ -51,16 +65,17 @@ fn main() -> Result<()> {
                 body: row.get(3),
             };
             println!("{} {} with {}", request.priority, request.url, request.body);
-            let res = net
-                .get("http://localhost:8000/")
-                .body("the exact body that is sent")
-                .send()?;
+            let body = serde_json::to_string(&Call {
+                headers: vec![],
+                body: request.body,
+            })?;
+            let res = net.get("http://localhost:8000/").body(body).send()?;
             let text = res.text()?;
             println!("{}", text);
             // post the result.
             db.execute(
-                "INSERT INTO response_ (url, body) VALUES ($1, $2)",
-                &[&request.url, &text],
+                "INSERT INTO response_ (url, body, request_id) VALUES ($1, $2, $3)",
+                &[&request.url, &text, &request._id],
             )?;
             // delete the request.
             db.execute("DELETE FROM request_ WHERE id = $1", &[&request._id])?;

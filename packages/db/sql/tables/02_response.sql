@@ -2,6 +2,8 @@
 CREATE TABLE IF NOT EXISTS "response_" (
   -- The unique identifier for the response.
   "id" bigserial NOT NULL PRIMARY KEY,
+  -- The unique identifier for the request that caused this response.
+  "request_id" bigserial NOT NULL,
   -- The url for the response.
   "url" VARCHAR NOT NULL,
   -- The body of the response.
