@@ -27,6 +27,27 @@ impl Request {
 //     pub body: String,
 // }
 
+pub enum Mode {
+    Requestor,
+    Responder,
+}
+
+pub fn connect_to_db(mode: Mode) -> Result<postgres::Client, postgres::Error> {
+    let mut db = postgres::Client::connect(
+        "postgresql://postgres:password@localhost/spacetraders",
+        postgres::NoTls,
+    )?;
+    match mode {
+        Mode::Responder => {
+            db.batch_execute("LISTEN request_")?;
+        }
+        Mode::Requestor => {
+            db.batch_execute("LISTEN response_")?;
+        }
+    }
+    Ok(db)
+}
+
 pub fn queue_request(db: &mut postgres::Client, request: Request) -> Result<i64> {
     let id = db.query(
         "INSERT INTO request_ (url, body, priority, method) VALUES ($1, $2, $3, $4) RETURNING id",
@@ -74,5 +95,6 @@ pub fn queue_response(
         "INSERT INTO response_ (url, body, request_id) VALUES ($1, $2, $3)",
         &[&url, &body, &request_id],
     )?;
+    db.batch_execute("NOTIFY response_")?;
     Ok(())
 }

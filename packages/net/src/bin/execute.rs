@@ -34,18 +34,12 @@ fn get_time_until_reset(headers: &reqwest::header::HeaderMap) -> chrono::Duratio
 }
 
 fn main() -> Result<()> {
-    let mut db = postgres::Client::connect(
-        "postgresql://postgres:password@localhost/spacetraders",
-        postgres::NoTls,
-    )?;
+    let mut db = connect_to_db(Mode::Responder)?;
 
     let requests_per_second = 1;
     let time_between_requests = std::time::Duration::from_millis(1000 / requests_per_second);
     let net = reqwest::blocking::Client::new();
     let mut next_request_time = std::time::Instant::now();
-
-    // Could be any name, just needs to be the same as the NOTIFY.
-    db.batch_execute("LISTEN request_")?;
 
     loop {
         // Wait until the next request time.
