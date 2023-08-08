@@ -1,6 +1,6 @@
 [workspace]
 
 members = [
-    "packages/net",
-    "packages/echo",
+    "crates/net",
+    "crates/echo",
 ]
