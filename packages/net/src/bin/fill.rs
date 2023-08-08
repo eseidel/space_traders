@@ -1,25 +1,7 @@
 use anyhow::Result;
 use postgres::{Client, NoTls};
 
-struct Request {
-    _id: i32,
-    priority: i32,
-    method: String,
-    url: String,
-    body: String,
-}
-
-impl Request {
-    fn empty(url: &str, priority: i32) -> Request {
-        Request {
-            _id: 0,
-            priority,
-            method: String::from("GET"),
-            url: String::from(url),
-            body: String::new(),
-        }
-    }
-}
+use net::*;
 
 fn main() -> Result<()> {
     let mut db = Client::connect(
@@ -35,19 +17,12 @@ fn main() -> Result<()> {
         Request::empty("https://api.spacetraders.io/v2/my/2", 2),
         Request::empty("https://api.spacetraders.io/v2/my/1", 1),
     ];
+    let count = requests.len();
 
-    for request in &requests {
-        db.execute(
-            "INSERT INTO request_ (url, body, priority, method) VALUES ($1, $2, $3, $4)",
-            &[
-                &request.url,
-                &request.body,
-                &request.priority,
-                &request.method,
-            ],
-        )?;
+    for request in requests.into_iter() {
+        queue_request(&mut db, request)?;
     }
     db.batch_execute("NOTIFY request_")?;
-    println!("Added {} requests to the database", requests.len());
+    println!("Added {} requests to the database", count);
     Ok(())
 }
