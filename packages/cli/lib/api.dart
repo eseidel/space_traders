@@ -198,18 +198,24 @@ class SystemSymbol {
 class ShipSymbol implements Comparable<ShipSymbol> {
   /// Create a ShipSymbol from name and number part.
   /// The number part is given in decimal, but will be represented in hex.
-  const ShipSymbol(this.name, this.number);
+  const ShipSymbol(this.agentName, this.number);
 
   /// Create a ShipSymbol from a string.
   ShipSymbol.fromString(String symbol)
-      : name = symbol.split('-')[0],
-        number = int.parse(symbol.split('-')[1], radix: 16);
+      : agentName = _parseAgentName(symbol),
+        number = int.parse(symbol.split('-').last, radix: 16);
 
   /// Create a ShipSymbol from a json string.
   factory ShipSymbol.fromJson(String json) => ShipSymbol.fromString(json);
 
+  static String _parseAgentName(String name) {
+    final parts = name.split('-');
+    final nameParts = parts.sublist(0, parts.length - 1);
+    return nameParts.join('-');
+  }
+
   /// The name part of the ship symbol.
-  final String name;
+  final String agentName;
 
   /// The number part of the ship symbol.
   final int number;
@@ -218,11 +224,11 @@ class ShipSymbol implements Comparable<ShipSymbol> {
   String get hexNumber => number.toRadixString(16).toUpperCase();
 
   /// The full ship symbol.
-  String get symbol => '$name-$hexNumber';
+  String get symbol => '$agentName-$hexNumber';
 
   @override
   int compareTo(ShipSymbol other) {
-    final nameCompare = name.compareTo(other.name);
+    final nameCompare = agentName.compareTo(other.agentName);
     if (nameCompare != 0) {
       return nameCompare;
     }
@@ -240,11 +246,11 @@ class ShipSymbol implements Comparable<ShipSymbol> {
       identical(this, other) ||
       other is ShipSymbol &&
           runtimeType == other.runtimeType &&
-          name == other.name &&
+          agentName == other.agentName &&
           number == other.number;
 
   @override
-  int get hashCode => name.hashCode ^ number.hashCode;
+  int get hashCode => agentName.hashCode ^ number.hashCode;
 }
 
 /// Extensions onto System to make it easier to work with.

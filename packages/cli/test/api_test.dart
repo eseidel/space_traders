@@ -136,6 +136,11 @@ void main() {
       ShipSymbol.fromString('A-1A'),
     ]);
   });
+  test('ShipSymbol agentName with hyphen', () {
+    final symbol = ShipSymbol.fromString('A-1-A');
+    expect(symbol.agentName, 'A-1');
+  });
+
   test('FactionUtils', () {
     final faction = Faction(
       description: '',
