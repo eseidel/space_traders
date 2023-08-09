@@ -1,7 +1,6 @@
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final shipCache = ShipCache.loadCached(fs)!;

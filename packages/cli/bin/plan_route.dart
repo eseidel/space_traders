@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440

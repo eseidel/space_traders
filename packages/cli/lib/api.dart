@@ -29,7 +29,18 @@ class Api {
         factions = FactionsApi(apiClient);
 
   /// The shared ApiClient.
-  final RateLimitedApiClient apiClient;
+  final ApiClient apiClient;
+
+  /// soon to be removed.
+  /// The shared ApiClient.
+  RateLimitedApiClient get rateLimitedApiClient =>
+      apiClient as RateLimitedApiClient;
+
+  /// Counts of requests sent through this api.
+  RequestCounts get requestCounts => rateLimitedApiClient.requestCounts;
+
+  /// The number of requests per second allowed by the api.
+  int get maxRequestsPerSecond => 3;
 
   /// DefaultApi generated client.
   final DefaultApi defaultApi;

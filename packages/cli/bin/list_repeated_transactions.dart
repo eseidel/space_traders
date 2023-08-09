@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
 
 void printDiffs(List<int> data) {
   final diffs = <int>[];

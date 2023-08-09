@@ -4,6 +4,9 @@ import 'package:cli/logger.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
 
+export 'package:cli/logger.dart';
+export 'package:file/file.dart';
+
 /// Run command with a logger, but without an Api.
 Future<R> runOffline<R>(
   List<String> args,

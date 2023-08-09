@@ -1,8 +1,6 @@
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:file/file.dart';
 
 DateTime snapToHour(DateTime time) {
   return DateTime.utc(time.year, time.month, time.day, time.hour);

@@ -2,9 +2,7 @@ import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:file/file.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final contractCache = ContractCache.loadCached(fs)!;

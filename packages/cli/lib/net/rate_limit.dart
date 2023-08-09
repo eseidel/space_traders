@@ -127,6 +127,7 @@ class RateLimiter {
   }
 }
 
+/// A function that can be used to invoke the api.
 typedef InvokeApi = Future<Response> Function(
   String path,
   String method,

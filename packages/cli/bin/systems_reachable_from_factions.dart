@@ -2,9 +2,7 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/nav/system_connectivity.dart';
-import 'package:file/file.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final systemsCache = await SystemsCache.load(fs);

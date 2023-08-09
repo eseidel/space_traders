@@ -1,8 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
-import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:stats/stats.dart';
 

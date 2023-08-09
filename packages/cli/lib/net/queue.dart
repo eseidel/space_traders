@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:cli/api.dart';
 import 'package:http/http.dart';
 import 'package:postgres/postgres.dart';
 
+/// Request queued for later execution.
 class QueuedRequest {
+  /// Creates a new [QueuedRequest].
   const QueuedRequest({
     required this.id,
     required this.priority,
@@ -13,6 +14,7 @@ class QueuedRequest {
     required this.body,
   });
 
+  /// Creates an empty [QueuedRequest] with the given [url] and [priority].
   factory QueuedRequest.empty(String url, int priority) {
     return QueuedRequest(
       id: 0,
@@ -23,13 +25,24 @@ class QueuedRequest {
     );
   }
 
+  /// id of the request in the database, or 0 if not yet inserted.
   final int id;
+
+  /// Priority of the request, higher numbers are executed first.
   final int priority;
+
+  /// HTTP method of the request.
   final String method;
+
+  /// URL of the request.
   final String url;
+
+  /// Body of the request.
   final String body;
 }
 
+/// A queue of requests to be sent to the server.
+/// Must be disconnected when no longer needed or main may not exit.
 class NetQueue {
   final PostgreSQLConnection _connection = PostgreSQLConnection(
     'localhost',
@@ -50,6 +63,7 @@ class NetQueue {
     _connected = true;
   }
 
+  /// Disconnects from the database.
   Future<void> disconnect() async {
     if (!_connected) {
       return;
@@ -101,64 +115,9 @@ class NetQueue {
     );
   }
 
+  /// Sends the given request and waits for a response.
   Future<Response> sendAndWait(QueuedRequest request) async {
     final requestId = await _queueRequest(request);
     return _waitForResponse(requestId);
   }
-}
-
-class DatabaseApiClient extends ApiClient {
-  /// Construct a rate limited api client.
-  DatabaseApiClient({super.authentication}) : _queue = NetQueue();
-
-  final NetQueue _queue;
-
-  @override
-  Future<Response> invokeAPI(
-    String path,
-    String method,
-    List<QueryParam> queryParams,
-    Object? body,
-    Map<String, String> headerParams,
-    Map<String, String> formParams,
-    String? contentType,
-  ) async {
-    final urlEncodedQueryParams = queryParams.map((param) => '$param');
-    final queryString = urlEncodedQueryParams.isNotEmpty
-        ? '?${urlEncodedQueryParams.join('&')}'
-        : '';
-
-    final request = QueuedRequest(
-      id: 0,
-      priority: 0,
-      method: method,
-      url: '$path$queryString',
-      body: body.toString(),
-    );
-    final response = await _queue.sendAndWait(request);
-    return response;
-  }
-}
-
-void main() async {
-  final queue = NetQueue();
-
-  final requests = [
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/3', 3),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/2', 2),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/1', 1),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/3', 3),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/2', 2),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/1', 1),
-  ];
-
-  // We don't yet have support for waiting on multiple requests, so sending
-  // one at a time.
-  for (final request in requests) {
-    final response = await queue.sendAndWait(request);
-    print('Got response: ${response.statusCode} ${response.body}');
-  }
-
-  await queue.disconnect();
-  print('Done!');
 }

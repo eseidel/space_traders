@@ -5,9 +5,7 @@ import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 
 class TransactionSummary {

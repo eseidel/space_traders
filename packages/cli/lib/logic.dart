@@ -3,7 +3,6 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/exceptions.dart';
-import 'package:cli/net/rate_limit.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/ship_waiter.dart';
 
@@ -47,7 +46,7 @@ Future<void> advanceShips(
     }
     try {
       final before = DateTime.timestamp();
-      final requestsBefore = api.apiClient.requestCounts.totalRequests();
+      final requestsBefore = api.requestCounts.totalRequests();
       final waitUntil = await advanceShipBehavior(
         api,
         centralCommand,
@@ -56,10 +55,10 @@ Future<void> advanceShips(
       );
       final after = DateTime.timestamp();
       final duration = after.difference(before);
-      final requestsAfter = api.apiClient.requestCounts.totalRequests();
+      final requestsAfter = api.requestCounts.totalRequests();
       final requests = requestsAfter - requestsBefore;
       final behaviorState = caches.behaviors.getBehavior(shipSymbol);
-      final expectedSeconds = requests / api.apiClient.maxRequestsPerSecond;
+      final expectedSeconds = requests / api.maxRequestsPerSecond;
       if (duration.inSeconds > expectedSeconds * 1.2) {
         final behaviorName = behaviorState?.behavior.name;
         final behaviorString = behaviorName == null ? '' : '($behaviorName) ';
@@ -91,15 +90,15 @@ Future<void> advanceShips(
 class RateLimitTracker {
   /// Construct a rate limit tracker.
   RateLimitTracker(Api api, {this.printEvery = const Duration(minutes: 2)})
-      : _rateLimit = api.apiClient,
+      : _api = api,
         _lastPrintTime = DateTime.timestamp() {
-    _lastRequestCount = _rateLimit.requestCounts.totalRequests();
+    _lastRequestCount = _api.requestCounts.totalRequests();
   }
 
   /// The rate limit stats are printed every this often.
   final Duration printEvery;
 
-  final RateLimitedApiClient _rateLimit;
+  final Api _api;
   DateTime _lastPrintTime;
   late int _lastRequestCount;
 
@@ -107,15 +106,14 @@ class RateLimitTracker {
   void printStatsIfNeeded() {
     final now = DateTime.timestamp();
     final timeSinceLastPrint = now.difference(_lastPrintTime);
-    final requestCounts = _rateLimit.requestCounts;
+    final requestCounts = _api.requestCounts;
     if (timeSinceLastPrint > printEvery) {
       final requestCount = requestCounts.totalRequests();
       final requestsSinceLastPrint = requestCount - _lastRequestCount;
       _lastRequestCount = requestCount;
       final requestsPerSecond =
           requestsSinceLastPrint / timeSinceLastPrint.inSeconds;
-      final max =
-          timeSinceLastPrint.inSeconds * _rateLimit.maxRequestsPerSecond;
+      final max = timeSinceLastPrint.inSeconds * _api.maxRequestsPerSecond;
       final percent = ((requestsSinceLastPrint / max) * 100).round();
       // No sense in printing low percentages, as that will just end up being
       // most of what we print.

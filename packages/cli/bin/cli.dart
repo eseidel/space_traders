@@ -11,8 +11,8 @@ import 'package:cli/printing.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
 
-void printRequestStats(RateLimitedApiClient client) {
-  final counts = client.requestCounts.counts;
+void printRequestStats(RequestCounts requestCounts) {
+  final counts = requestCounts.counts;
   final generalizedCounts = <String, int>{};
   for (final key in counts.keys) {
     final generalizedKey =
@@ -27,7 +27,7 @@ void printRequestStats(RateLimitedApiClient client) {
   for (final entry in sortedCounts) {
     logger.info('${entry.value} ${entry.key}');
   }
-  logger.info('Total: ${client.requestCounts.totalRequests()} requests.');
+  logger.info('Total: ${requestCounts.totalRequests()} requests.');
 }
 
 bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
@@ -81,7 +81,7 @@ Future<void> cliMain(List<String> args) async {
   // Handle ctrl-c and print out request stats.
   // This should be made an argument rather than on by default.
   ProcessSignal.sigint.watch().listen((signal) {
-    printRequestStats(api.apiClient);
+    printRequestStats(api.requestCounts);
     exit(0);
   });
 

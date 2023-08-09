@@ -1,8 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logger.dart';
-import 'package:file/file.dart';
 
 String describeTransaction(Transaction t) {
   return '${t.timestamp} ${t.tradeSymbol} ${t.quantity} ${t.tradeType} '

@@ -492,7 +492,8 @@ class CostedDeal {
   /// - and sell it for less (prices go down at destination market)
   /// This function answers the question "what's the max we would pay
   /// perUnit for this next lot of unit and still expect to profit".
-  // int maxPurchaseUnitPrice({required int existingUnits, required int lotSize}) {
+  // int maxPurchaseUnitPrice({required int existingUnits,
+  //      required int lotSize}) {
   //   // Contract deals are easy, "sell" prices dont change.
   //   // perUnitRewards - perUnitOpExp = maxPerUnitPurchasePrice
   //   final destinationPrice = deal.destinationPrice;
