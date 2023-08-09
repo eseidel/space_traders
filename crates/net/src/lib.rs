@@ -20,12 +20,13 @@ impl Request {
     }
 }
 
-// pub struct Response {
-//     pub id: i64,
-//     pub request_id: i264,
-//     pub url: String,
-//     pub body: String,
-// }
+pub struct Response {
+    pub id: i64,
+    pub request_id: i64,
+    pub status_code: i32,
+    pub url: String,
+    pub body: String,
+}
 
 pub enum Mode {
     Requestor,
@@ -85,15 +86,15 @@ pub fn delete_request(db: &mut postgres::Client, request_id: i64) -> Result<()> 
     Ok(())
 }
 
-pub fn queue_response(
-    db: &mut postgres::Client,
-    request_id: i64,
-    url: &str,
-    body: &str,
-) -> Result<()> {
+pub fn queue_response(db: &mut postgres::Client, response: Response) -> Result<()> {
     db.execute(
-        "INSERT INTO response_ (url, body, request_id) VALUES ($1, $2, $3)",
-        &[&url, &body, &request_id],
+        "INSERT INTO response_ (request_id, status_code, url, body) VALUES ($1, $2, $3, $4)",
+        &[
+            &response.request_id,
+            &response.status_code,
+            &response.url,
+            &response.body,
+        ],
     )?;
     db.batch_execute("NOTIFY response_")?;
     Ok(())

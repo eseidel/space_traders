@@ -70,10 +70,20 @@ fn main() -> Result<()> {
                 std::thread::sleep(time_until_reset.to_std()?);
             }
 
+            let status_code = res.status().as_u16() as i32;
             let text = res.text()?;
             println!("{}", text);
             // post the result.
-            queue_response(&mut db, request.id, &request.url, &text)?;
+            queue_response(
+                &mut db,
+                Response {
+                    id: 0,
+                    request_id: request.id,
+                    status_code: status_code,
+                    url: request.url,
+                    body: text,
+                },
+            )?;
             delete_request(&mut db, request.id)?;
         } else {
             println!("Waiting...");
