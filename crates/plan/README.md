@@ -1,3 +1,19 @@
+OK, assume we're running all of our business logic in Dart.
+The big thing blocking our transition to multi-process is moving all networking
+to a separate process.
+
+We probably don't even have to fix timeouts at first, just inject our own Client
+which talks through our db instead and inserts an extra priority header?
+
+A more advanced version might be to move away from the Client API and make
+DB calls directly without the timeout risk?
+
+In order to run the Dart code in a second process we need to get rid of
+all file access and networking.
+
+In order to pass additional values through the Api calls, each ship will need
+its own "context" object, and separate Api object.
+
 # New CLI
 
 This is a re-write of my Dart cli, except now in Rust on top of a new
