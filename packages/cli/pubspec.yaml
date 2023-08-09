@@ -21,6 +21,7 @@ dependencies:
   more: ^4.0.0
   openapi:
     path: ../openapi
+  postgres: ^2.6.2
   scidart: ^0.0.2-dev.12
   scoped:
     git:
