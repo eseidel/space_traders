@@ -7,8 +7,10 @@ import 'package:cli/logger.dart';
 import 'package:cli/logic.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/counts.dart';
+import 'package:cli/net/queue.dart';
 import 'package:cli/printing.dart';
 import 'package:file/local.dart';
+import 'package:postgres/postgres.dart';
 import 'package:scoped/scoped.dart';
 
 void printRequestStats(RequestCounts requestCounts) {
@@ -42,6 +44,19 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
   return (Ship ship) => onlyShips.contains(ship.shipSymbol);
 }
 
+Api getApi(
+  String token,
+  PostgreSQLConnection? connection,
+) {
+  if (connection == null) {
+    return apiFromAuthToken(token, ClientType.localLimits);
+  }
+  final api = apiFromAuthToken(token, ClientType.unlimited);
+  final queuedClient = QueuedClient(connection)..getPriority = () => 0;
+  api.apiClient.client = queuedClient;
+  return api;
+}
+
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
@@ -63,7 +78,9 @@ Future<void> cliMain(List<String> args) async {
   final email = env['SPACETRADERS_EMAIL'];
   final token =
       await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
-  final api = apiFromAuthToken(token, ClientType.localLimits);
+
+  final dbConnection = await defaultDatabase();
+  final api = getApi(token, dbConnection);
 
   final caches = await Caches.load(fs, api);
   logger.info(
