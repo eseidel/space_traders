@@ -109,7 +109,7 @@ class QueuedResponse {
     return QueuedResponse(
       body: json['body'] as String,
       statusCode: json['statusCode'] as int,
-      headers: json['headers'] as Map<String, String>,
+      headers: (json['headers'] as Map<String, dynamic>).cast(),
     );
   }
 
@@ -212,6 +212,7 @@ class NetQueue {
         'json': jsonEncode(request),
       },
     );
+    // TODO(eseidel): This could be a trigger.
     await _connection.execute('NOTIFY request_');
     return result[0][0] as int;
   }
@@ -270,6 +271,17 @@ class NetQueue {
     );
   }
 
+  /// Deletes the given request from the queue.
+  Future<void> deleteRequest(RequestRecord request) async {
+    await _connect();
+    await _connection.query(
+      'DELETE FROM request_ WHERE id = @id',
+      substitutionValues: {
+        'id': request.id,
+      },
+    );
+  }
+
   /// Responds to the given request with the given response.
   Future<void> respondToRequest(
     RequestRecord request,
@@ -285,6 +297,7 @@ class NetQueue {
         'json': jsonEncode(response),
       },
     );
+    // TODO(eseidel): This could be a trigger.
     await _connection.execute('NOTIFY response_');
   }
 

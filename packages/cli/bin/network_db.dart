@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cli/api.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/queries.dart';
@@ -77,7 +78,10 @@ class QueuedClient extends BaseClient {
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  final api = defaultApi(fs);
+  // Don't want to use defaultApi, since it uses RateLimitedApiClient.
+  final token = loadAuthToken(fs);
+  final auth = HttpBearerAuth()..accessToken = token;
+  final api = Api(ApiClient(authentication: auth));
   final queuedClient = QueuedClient();
   api.apiClient.client = queuedClient;
   final agent = await getMyAgent(api);
