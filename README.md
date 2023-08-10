@@ -608,3 +608,27 @@ e.g. did the price change since when the trade was scoped vs. when it was execut
   }
 }
 ```
+
+## Confused
+
+🛸#54 🛫 to X1-UC71-90215B JUMP_GATE (39s) spent 49 fuel
+🛸#6F ✈️  to X1-YA22-87615D, -1m left
+Unhandled exception:
+Invalid argument (marketSymbol): ESEIDEL-6F is not at X1-YA22-87615D, X1-YA22-92610F.: Instance of 'WaypointSymbol'
+#0      recordMarketDataIfNeededAndLog (package:cli/cache/market_prices.dart:468:5)
+#1      visitLocalMarket (package:cli/behavior/explorer.dart:65:24)
+<asynchronous suspension>
+#2      advanceTrader (package:cli/behavior/trader.dart:643:25)
+<asynchronous suspension>
+#3      advanceShipBehavior (package:cli/behavior/advance.dart:83:23)
+<asynchronous suspension>
+#4      advanceShips (package:cli/logic.dart:51:25)
+<asynchronous suspension>
+#5      logic (package:cli/logic.dart:150:7)
+<asynchronous suspension>
+#6      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:101:3)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:107:7)
+<asynchronous suspension>
+#8      main (file:///root/space_traders/packages/cli/bin/cli.dart:105:3)
+<asynchronous suspension>

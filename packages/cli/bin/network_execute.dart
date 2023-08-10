@@ -1,14 +1,17 @@
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
+import 'package:cli/net/rate_limit.dart';
 import 'package:cli/printing.dart';
 import 'package:http/http.dart';
 import 'package:postgres/postgres.dart';
 
 class NetExecutor {
-  NetExecutor(PostgreSQLConnection connection, {this.maxRequestsPerSecond = 3})
-      : queue = NetQueue(connection, QueueRole.responder);
+  NetExecutor(
+    PostgreSQLConnection connection, {
+    this.targetRequestsPerSecond = 3,
+  }) : queue = NetQueue(connection, QueueRole.responder);
 
-  final int maxRequestsPerSecond;
+  final int targetRequestsPerSecond;
   final Client _client = Client();
   final NetQueue queue;
 
@@ -20,11 +23,12 @@ class NetExecutor {
     return DateTime.parse(resetString);
   }
 
-  Future<Response> sendRequest(QueuedRequest request) async {
-    final method = request.method;
-    final uri = Uri.parse(request.url);
-    final body = request.body;
-    final headers = request.headers;
+  Future<Response> _dispatchRequest(
+    String method,
+    Uri uri, {
+    Map<String, String>? headers,
+    String? body,
+  }) {
     switch (method) {
       case 'POST':
         return _client.post(uri, headers: headers, body: body);
@@ -42,6 +46,16 @@ class NetExecutor {
     throw Exception('Unknown method: $method');
   }
 
+  Future<Response> sendRequest(QueuedRequest request) async {
+    final method = request.method;
+    final uri = Uri.parse(request.url);
+    final body = request.body;
+    final headers = request.headers;
+    final response =
+        await _dispatchRequest(method, uri, headers: headers, body: body);
+    return response;
+  }
+
   String _removeExpectedPrefix(String url) {
     const expectedPrefix = 'https://api.spacetraders.io/v2';
     if (!url.startsWith(expectedPrefix)) {
@@ -52,10 +66,12 @@ class NetExecutor {
 
   Future<void> run() async {
     logger.info('Servicing network requests...');
-    final minWaitTime = const Duration(seconds: 1) ~/ maxRequestsPerSecond;
+    final minWaitTime = const Duration(seconds: 1) ~/ targetRequestsPerSecond;
+    final stats = RateLimitStatPrinter();
     DateTime? nextRequestTime;
     var backoffSeconds = 1;
     while (true) {
+      stats.printIfNeeded();
       final request = await queue.nextRequest();
       if (request == null) {
         await queue.waitForRequest();
@@ -72,16 +88,16 @@ class NetExecutor {
       final path = _removeExpectedPrefix(request.request.url);
       nextRequestTime = DateTime.timestamp().add(minWaitTime);
       final response = await sendRequest(request.request);
-      final after = DateTime.timestamp();
-      final duration = after.difference(before);
-      logger.info(
+      stats.record(response);
+      final duration = DateTime.timestamp().difference(before);
+      logger.detail(
         '${approximateDuration(duration)} ${response.statusCode} '
         '${request.request.method.padRight(5)} $path',
       );
       if (response.statusCode == 429) {
         final resetTime = _parseResetTime(response);
         if (resetTime != null) {
-          logger.info('Rate limited, waiting until $resetTime');
+          logger.warn('Rate limited, waiting until $resetTime');
           final duration = resetTime.difference(DateTime.timestamp());
           await Future<void>.delayed(duration);
         } else {
