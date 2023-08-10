@@ -7,43 +7,11 @@ import 'package:cli/net/queries.dart';
 import 'package:cli/net/queue.dart';
 import 'package:http/http.dart';
 
-// class DatabaseApiClient extends ApiClient {
-//   /// Construct a rate limited api client.
-//   DatabaseApiClient({super.authentication}) : _queue = NetQueue();
-
-//   final NetQueue _queue;
-
-//   Future<void> disconnect() => _queue.disconnect();
-
-//   @override
-//   Future<Response> invokeAPI(
-//     String path,
-//     String method,
-//     List<QueryParam> queryParams,
-//     Object? body,
-//     Map<String, String> headerParams,
-//     Map<String, String> formParams,
-//     String? contentType,
-//   ) async {
-//     final urlEncodedQueryParams = queryParams.map((param) => '$param');
-//     final queryString = urlEncodedQueryParams.isNotEmpty
-//         ? '?${urlEncodedQueryParams.join('&')}'
-//         : '';
-//     final uri = Uri.parse('$basePath$path$queryString');
-
-//     final request = QueuedRequest(
-//       id: 0,
-//       priority: 0,
-//       method: method,
-//       url: uri.toString(),
-//       body: body == null ? '' : body.toString(),
-//     );
-//     final response = await _queue.sendAndWait(request);
-//     return response;
-//   }
-// }
-
 class QueuedClient extends BaseClient {
+  QueuedClient(int Function() getPriority) : _getPriority = getPriority;
+
+  final int Function() _getPriority;
+
   final NetQueue _queue = NetQueue(QueueRole.requestor);
 
   @override
@@ -57,8 +25,7 @@ class QueuedClient extends BaseClient {
       body: String.fromCharCodes(body),
       headers: request.headers,
     );
-    const priority = 0;
-    final response = await _queue.sendAndWait(priority, queuedRequest);
+    final response = await _queue.sendAndWait(_getPriority(), queuedRequest);
     return StreamedResponse(
       Stream.fromIterable([response.bodyBytes]),
       response.statusCode,
@@ -82,7 +49,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final token = loadAuthToken(fs);
   final auth = HttpBearerAuth()..accessToken = token;
   final api = Api(ApiClient(authentication: auth));
-  final queuedClient = QueuedClient();
+  int getPriority() => 0;
+  final queuedClient = QueuedClient(getPriority);
   api.apiClient.client = queuedClient;
   final agent = await getMyAgent(api);
   logger.info('Got agent: $agent');
