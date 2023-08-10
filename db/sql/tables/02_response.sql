@@ -4,12 +4,8 @@ CREATE TABLE IF NOT EXISTS "response_" (
   "id" bigserial NOT NULL PRIMARY KEY,
   -- The unique identifier for the request that caused this response.
   "request_id" bigserial NOT NULL,
-  -- The status code of the response.
-  "status_code" integer NOT NULL,
-  -- The url for the response.
-  "url" VARCHAR NOT NULL,
-  -- The body of the response.
-  "body" VARCHAR NOT NULL,
+  -- The response encoded as json
+  "json" varchar NOT NULL,
   -- When the response was created.
   "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );

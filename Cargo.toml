@@ -1,7 +1,5 @@
 [workspace]
 
 members = [
-    "crates/net",
     "crates/echo",
-    "crates/plan",
 ]

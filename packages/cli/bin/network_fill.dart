@@ -2,21 +2,22 @@ import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  final queue = NetQueue();
+  final queue = NetQueue(QueueRole.requestor);
 
   final requests = [
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/3', 3),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/2', 2),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/1', 1),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/3', 3),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/2', 2),
-    QueuedRequest.empty('https://api.spacetraders.io/v2/my/1', 1),
+    (3, 'https://api.spacetraders.io/v2/my/3'),
+    (2, 'https://api.spacetraders.io/v2/my/2'),
+    (1, 'https://api.spacetraders.io/v2/my/1'),
+    (3, 'https://api.spacetraders.io/v2/my/3'),
+    (2, 'https://api.spacetraders.io/v2/my/2'),
+    (1, 'https://api.spacetraders.io/v2/my/1'),
   ];
 
   // We don't yet have support for waiting on multiple requests, so sending
   // one at a time.
   for (final request in requests) {
-    final response = await queue.sendAndWait(request);
+    final response =
+        await queue.sendAndWait(request.$1, QueuedRequest.empty(request.$2));
     logger.info('Got response: ${response.statusCode} ${response.body}');
   }
 

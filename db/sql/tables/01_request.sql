@@ -4,12 +4,8 @@ CREATE TABLE IF NOT EXISTS "request_" (
   "id" bigserial NOT NULL PRIMARY KEY,
   -- The priority of the request.
   "priority" integer NOT NULL,
-  -- The method for the request.
-  "method" VARCHAR NOT NULL,
-  -- The url for the request.
-  "url" VARCHAR NOT NULL,
-  -- The body of the request.
-  "body" VARCHAR NOT NULL,
+  -- The request encoded as json
+  "json" varchar NOT NULL,
   -- When the request was created.
   "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
