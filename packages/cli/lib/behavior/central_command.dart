@@ -1127,27 +1127,6 @@ class CentralCommand {
     final mine = systemWaypoints.firstWhere((w) => w.canBeMined).waypointSymbol;
     return MineJob(mine: mine, market: mine);
     // If the ship is in a system without a mine go to the HQ?
-
-    // final mine = await nearestMineWithGoodMining(
-    //   api,
-    //   marketPrices,
-    //   systemsCache,
-    //   waypointCache,
-    //   marketCache,
-    //   currentWaypoint,
-    //   maxJumps: maxJumps,
-    //   tradeSymbol: 'PRECIOUS_STONES',
-    // );
-    // if (mine == null) {
-    //   await centralCommand.disableBehaviorForShip(
-    //     ship,
-    //     Behavior.miner,
-    //     'No good mining system found in '
-    //     '$maxJumps radius of ${ship.systemSymbol}.',
-    //     const Duration(hours: 1),
-    //   );
-    //   return null;
-    // }
   }
 
   /// Find a better destination for the given trader [ship].
