@@ -41,7 +41,7 @@ class SyntheticDeal {
     return buys.length == sells.length;
   }
 
-  String get tradeSymbol => goodsBuys.first.tradeSymbol;
+  TradeSymbol get tradeSymbol => goodsBuys.first.tradeSymbol!;
 
   int get units => goodsBuys.fold<int>(0, (sum, t) => sum + t.quantity);
 
@@ -117,6 +117,10 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   for (final transaction in transactionLog.entries) {
     if (!filter(transaction)) {
+      continue;
+    }
+    // We only handle market transactions for now.
+    if (transaction.tradeSymbol == null) {
       continue;
     }
     if (!supportedTypes.contains(transaction.accounting)) {

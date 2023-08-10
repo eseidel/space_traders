@@ -167,6 +167,7 @@ void main() {
     when(() => transaction.price).thenReturn(2);
     when(() => transaction.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => transaction.timestamp).thenReturn(DateTime(2021));
+    when(() => transaction.shipSymbol).thenReturn(shipType.value);
     when(
       () => fleetApi.purchaseShip(
         purchaseShipRequest: PurchaseShipRequest(

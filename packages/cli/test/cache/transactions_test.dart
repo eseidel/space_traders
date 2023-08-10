@@ -6,9 +6,11 @@ void main() {
   test('Transaction JSON roundtrip', () {
     final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
     final price = Transaction(
+      transactionType: TransactionType.market,
       waypointSymbol: WaypointSymbol.fromString('S-E-P'),
       shipSymbol: const ShipSymbol('S', 1),
-      tradeSymbol: TradeSymbol.FUEL.value,
+      tradeSymbol: TradeSymbol.FUEL,
+      shipType: null,
       quantity: 1,
       tradeType: MarketTransactionTypeEnum.PURCHASE,
       perUnitPrice: 2,

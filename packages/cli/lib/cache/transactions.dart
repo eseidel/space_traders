@@ -3,7 +3,7 @@ import 'package:cli/cache/json_log.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 
-/// The type of a transaction.
+/// The accounting type of a transaction.
 enum AccountingType {
   /// Capital transaction (e.g. ships, mounts).
   capital,
@@ -15,20 +15,64 @@ enum AccountingType {
   goods,
 }
 
-// enum BehaviorSource {
-//   miner,
-//   trader,
-//   centralCommand,
-// }
+/// The type of transaction which created this transaction.
+enum TransactionType {
+  /// A market transaction.
+  market,
+
+  /// A shipyard transaction.
+  shipyard,
+
+  /// A ship modification transaction.
+  shipModification,
+}
+
+Transaction _migrate(Map<String, dynamic> json) {
+  assert(json['transactionType'] == null, 'Already migrated');
+  final oldSymbol = json['tradeSymbol'] as String;
+  var transactionType = TransactionType.market;
+  ShipType? shipType;
+  TradeSymbol? tradeSymbol;
+  if (oldSymbol.startsWith('SHIP')) {
+    transactionType = TransactionType.shipyard;
+    shipType = ShipType.fromJson(oldSymbol);
+  } else {
+    if (oldSymbol.startsWith('MOUNT') && json['quantity'] == 1) {
+      transactionType = TransactionType.shipModification;
+    } else {
+      transactionType = TransactionType.market;
+    }
+    tradeSymbol = TradeSymbol.fromJson(oldSymbol);
+  }
+  return Transaction(
+    transactionType: transactionType,
+    shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
+    waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
+    tradeSymbol: tradeSymbol,
+    shipType: shipType,
+    quantity: json['quantity'] as int,
+    tradeType: MarketTransactionTypeEnum.values
+        .firstWhere((e) => e.value == json['tradeType'] as String),
+    perUnitPrice: json['perUnitPrice'] as int,
+    timestamp: DateTime.parse(json['timestamp'] as String),
+    agentCredits: json['agentCredits'] as int,
+    accounting: json['accounting'] == null
+        ? null
+        : AccountingType.values
+            .firstWhere((e) => e.name == json['accounting'] as String),
+  );
+}
 
 /// A class to hold transaction data from a ship.
 @immutable
 class Transaction {
   /// Create a new transaction.
   const Transaction({
+    required this.transactionType,
     required this.shipSymbol,
     required this.waypointSymbol,
     required this.tradeSymbol,
+    required this.shipType,
     required this.tradeType,
     required this.quantity,
     required this.perUnitPrice,
@@ -39,10 +83,16 @@ class Transaction {
 
   /// Create a new transaction from json.
   factory Transaction.fromJson(Map<String, dynamic> json) {
+    if (json['transactionType'] == null) {
+      return _migrate(json);
+    }
     return Transaction(
+      transactionType: TransactionType.values
+          .firstWhere((e) => e.index == json['transactionType'] as int),
       shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-      tradeSymbol: json['tradeSymbol'] as String,
+      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String?),
+      shipType: ShipType.fromJson(json['shipType'] as String?),
       quantity: json['quantity'] as int,
       tradeType: MarketTransactionTypeEnum.values
           .firstWhere((e) => e.value == json['tradeType'] as String),
@@ -62,10 +112,14 @@ class Transaction {
     int agentCredits,
     AccountingType accounting,
   ) {
+    // Using a local to force non-null.
+    final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol)!;
     return Transaction(
+      transactionType: TransactionType.market,
       shipSymbol: transaction.shipSymbolObject,
       waypointSymbol: transaction.waypointSymbolObject,
-      tradeSymbol: transaction.tradeSymbol,
+      tradeSymbol: tradeSymbol,
+      shipType: null,
       quantity: transaction.units,
       tradeType: transaction.type,
       perUnitPrice: transaction.pricePerUnit,
@@ -81,15 +135,19 @@ class Transaction {
     int agentCredits,
     ShipSymbol purchaser,
   ) {
+    // shipSymbol is the trade symbol for the shipyard transaction, not
+    // the new ship's id.
+    // Using a local to force non-null.
+    final shipType = ShipType.fromJson(transaction.shipSymbol)!;
     return Transaction(
+      transactionType: TransactionType.shipyard,
       // .shipSymbol is the new ship type, not a ShipSymbol involved
       // in the transaction.
       // https://github.com/SpaceTradersAPI/api-docs/issues/68
       shipSymbol: purchaser,
       waypointSymbol: transaction.waypointSymbolObject,
-      // shipSymbol is the trade symbol for the shipyard transaction, not
-      // the new ship's id.
-      tradeSymbol: transaction.shipSymbol,
+      shipType: shipType,
+      tradeSymbol: null,
       quantity: 1,
       tradeType: MarketTransactionTypeEnum.PURCHASE,
       perUnitPrice: transaction.price,
@@ -104,11 +162,16 @@ class Transaction {
     ShipModificationTransaction transaction,
     int agentCredits,
   ) {
+    // TODO(eseidel): Is this a ShipMountSymbol?
+    // Using a local to force non-null.
+    final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol)!;
     return Transaction(
+      transactionType: TransactionType.shipModification,
       // shipSymbol is the new ship, not the ship that made the transaction.
       shipSymbol: transaction.shipSymbolObject,
       waypointSymbol: transaction.waypointSymbolObject,
-      tradeSymbol: transaction.tradeSymbol,
+      tradeSymbol: tradeSymbol,
+      shipType: null,
       quantity: 1,
       // This is more a service than a purchase.
       tradeType: MarketTransactionTypeEnum.PURCHASE,
@@ -119,6 +182,9 @@ class Transaction {
     );
   }
 
+  /// What type of market transaction created this transaction.
+  final TransactionType transactionType;
+
   /// Ship symbol which made the transaction.
   final ShipSymbol shipSymbol;
 
@@ -126,8 +192,10 @@ class Transaction {
   final WaypointSymbol waypointSymbol;
 
   /// Trade symbol of the transaction.
-  // TODO(eseidel): This isn't actually a trade symbol since it includes ships!
-  final String tradeSymbol;
+  final TradeSymbol? tradeSymbol;
+
+  /// Only used for Shipyard transactions.
+  final ShipType? shipType;
 
   /// Quantity of units transacted.
   final int quantity;
@@ -147,9 +215,6 @@ class Transaction {
   /// The accounting classification of the transaction.
   final AccountingType? accounting;
 
-  // /// The behavior that caused this transaction.
-  // final BehaviorSource? behavior;
-
   /// The change in credits from this transaction.
   int get creditChange {
     if (tradeType == MarketTransactionTypeEnum.PURCHASE) {
@@ -162,9 +227,11 @@ class Transaction {
   /// Convert the transaction to json.
   Map<String, dynamic> toJson() {
     return {
+      'transactionType': transactionType.index,
       'shipSymbol': shipSymbol.toJson(),
       'waypointSymbol': waypointSymbol.toJson(),
-      'tradeSymbol': tradeSymbol,
+      'tradeSymbol': tradeSymbol?.toJson(),
+      'shipType': shipType?.toJson(),
       'quantity': quantity,
       'tradeType': tradeType.value,
       'perUnitPrice': perUnitPrice,
@@ -178,6 +245,7 @@ class Transaction {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Transaction &&
+          transactionType == other.transactionType &&
           runtimeType == other.runtimeType &&
           shipSymbol == other.shipSymbol &&
           waypointSymbol == other.waypointSymbol &&
@@ -190,6 +258,7 @@ class Transaction {
 
   @override
   int get hashCode =>
+      transactionType.hashCode ^
       shipSymbol.hashCode ^
       waypointSymbol.hashCode ^
       tradeSymbol.hashCode ^

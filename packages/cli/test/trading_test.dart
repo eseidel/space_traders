@@ -478,9 +478,11 @@ void main() {
     );
     const shipSymbol = ShipSymbol('S', 1);
     final transaction1 = Transaction(
+      transactionType: TransactionType.market,
       shipSymbol: shipSymbol,
       waypointSymbol: start,
-      tradeSymbol: 'FUEL',
+      tradeSymbol: TradeSymbol.FUEL,
+      shipType: null,
       perUnitPrice: 10,
       tradeType: MarketTransactionTypeEnum.PURCHASE,
       quantity: 1,
@@ -489,9 +491,11 @@ void main() {
       accounting: AccountingType.fuel,
     );
     final transaction2 = Transaction(
+      transactionType: TransactionType.market,
       shipSymbol: shipSymbol,
       waypointSymbol: end,
-      tradeSymbol: 'FUEL',
+      tradeSymbol: TradeSymbol.FUEL,
+      shipType: null,
       perUnitPrice: 10,
       tradeType: MarketTransactionTypeEnum.SELL,
       quantity: 1,
