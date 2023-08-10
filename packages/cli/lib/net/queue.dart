@@ -49,7 +49,7 @@ class QueuedRequest {
       method: json['method'] as String,
       url: json['url'] as String,
       body: json['body'] as String,
-      headers: json['headers'] as Map<String, String>,
+      headers: (json['headers'] as Map<String, dynamic>).cast(),
     );
   }
 
