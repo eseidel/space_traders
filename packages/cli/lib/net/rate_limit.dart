@@ -3,30 +3,10 @@ import 'dart:convert';
 
 import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/net/counts.dart';
 import 'package:clock/clock.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
-
-/// RequestCounts tracks the number of requests made to each path.
-class RequestCounts {
-  /// The counts.
-  final Map<String, int> counts = {};
-
-  /// Get the number of requests made to the given path.
-  void recordRequest(String path) {
-    counts[path] = (counts[path] ?? 0) + 1;
-  }
-
-  /// Get the total number of requests made.
-  int totalRequests() {
-    return counts.values.fold(0, (a, b) => a + b);
-  }
-
-  /// Reset the counts.
-  void reset() {
-    counts.clear();
-  }
-}
 
 /// A rate limiter that can be used to rate limit requests to the api.
 class RateLimiter {
@@ -142,7 +122,7 @@ typedef InvokeApi = Future<Response> Function(
 // This also could hold a queue of recent request times to allow for more
 // accurate rate limiting.
 /// Rate limiting api client.
-class RateLimitedApiClient extends ApiClient {
+class RateLimitedApiClient extends CountingApiClient {
   /// Construct a rate limited api client.
   RateLimitedApiClient({
     int maxRequestsPerSecond = 3,
@@ -153,9 +133,6 @@ class RateLimitedApiClient extends ApiClient {
 
   final RateLimiter _rateLimiter;
   final InvokeApi? _mockInvokeAPI;
-
-  /// RequestCounts tracks the number of requests made to each path.
-  final RequestCounts requestCounts = RequestCounts();
 
   /// Called by other code for printing.
   int get maxRequestsPerSecond => _rateLimiter.maxRequestsPerSecond;
@@ -245,7 +222,6 @@ class RateLimitedApiClient extends ApiClient {
         await _rateLimiter.waitForRateLimit();
         // Could include retry count here.
         logger.detail('$path$queryString');
-        requestCounts.recordRequest(path);
         // Actually do the request.
         final response = await doInvokeAPI(
           path,

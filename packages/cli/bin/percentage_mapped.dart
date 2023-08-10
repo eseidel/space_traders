@@ -37,7 +37,7 @@ void main(List<String> args) async {
   }
 
   const fs = LocalFileSystem();
-  final api = defaultApi(fs);
+  final api = defaultApi(fs, ClientType.localLimits);
   final systemsCache = SystemsCache.loadCached(fs)!;
   final chartingCache = ChartingCache.load(fs);
   final waypointCache = WaypointCache(api, systemsCache, chartingCache);

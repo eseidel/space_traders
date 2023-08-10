@@ -4,6 +4,46 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:postgres/postgres.dart';
 
+/// An http Client implementation which sends requests to another process
+/// through a postgres queue.
+class QueuedClient extends BaseClient {
+  /// Creates a new [QueuedClient].
+  QueuedClient(int Function() getPriority) : _getPriority = getPriority;
+
+  final int Function() _getPriority;
+
+  final NetQueue _queue = NetQueue(QueueRole.requestor);
+
+  @override
+  Future<StreamedResponse> send(BaseRequest request) async {
+    final stream = request.finalize();
+    final body = await stream.toBytes();
+
+    final queuedRequest = QueuedRequest(
+      method: request.method,
+      url: request.url.toString(),
+      body: String.fromCharCodes(body),
+      headers: request.headers,
+    );
+    final response = await _queue.sendAndWait(_getPriority(), queuedRequest);
+    return StreamedResponse(
+      Stream.fromIterable([response.bodyBytes]),
+      response.statusCode,
+      contentLength: response.bodyBytes.length,
+      request: request,
+      headers: response.headers,
+      isRedirect: response.isRedirect,
+      persistentConnection: response.persistentConnection,
+      reasonPhrase: response.reasonPhrase,
+    );
+  }
+
+  @override
+  void close() {
+    _queue.disconnect();
+  }
+}
+
 /// Request queued for later execution.
 class RequestRecord {
   /// Creates a new [RequestRecord].

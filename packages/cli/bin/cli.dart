@@ -6,7 +6,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic.dart';
 import 'package:cli/net/auth.dart';
-import 'package:cli/net/rate_limit.dart';
+import 'package:cli/net/counts.dart';
 import 'package:cli/printing.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
@@ -63,7 +63,7 @@ Future<void> cliMain(List<String> args) async {
   final email = env['SPACETRADERS_EMAIL'];
   final token =
       await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
-  final api = apiFromAuthToken(token);
+  final api = apiFromAuthToken(token, ClientType.localLimits);
 
   final caches = await Caches.load(fs, api);
   logger.info(

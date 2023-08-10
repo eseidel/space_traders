@@ -7,14 +7,14 @@ void main() {
   test('loadAuthToken', () {
     final fs = MemoryFileSystem.test();
     expect(() => loadAuthToken(fs), throwsException);
-    expect(() => defaultApi(fs), throwsException);
+    expect(() => defaultApi(fs, ClientType.localLimits), throwsException);
 
     fs.file(defaultAuthTokenPath)
       ..createSync(recursive: true)
       ..writeAsStringSync('token\n\n');
     expect(loadAuthToken(fs), 'token');
 
-    final api = defaultApi(fs);
+    final api = defaultApi(fs, ClientType.localLimits);
     expect(api.apiClient, isA<RateLimitedApiClient>());
   });
 }

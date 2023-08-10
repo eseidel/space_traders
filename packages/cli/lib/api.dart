@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:cli/net/rate_limit.dart';
+import 'package:cli/net/counts.dart';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
@@ -29,15 +29,10 @@ class Api {
         factions = FactionsApi(apiClient);
 
   /// The shared ApiClient.
-  final ApiClient apiClient;
-
-  /// soon to be removed.
-  /// The shared ApiClient.
-  RateLimitedApiClient get rateLimitedApiClient =>
-      apiClient as RateLimitedApiClient;
+  final CountingApiClient apiClient;
 
   /// Counts of requests sent through this api.
-  RequestCounts get requestCounts => rateLimitedApiClient.requestCounts;
+  RequestCounts get requestCounts => apiClient.requestCounts;
 
   /// The number of requests per second allowed by the api.
   int get maxRequestsPerSecond => 3;

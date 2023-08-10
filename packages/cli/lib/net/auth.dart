@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/net/counts.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/net/rate_limit.dart';
@@ -18,17 +19,34 @@ String loadAuthToken(FileSystem fs, {String path = defaultAuthTokenPath}) {
   return token;
 }
 
+/// ClientType is the type of ApiClient to use.
+enum ClientType {
+  /// Use an in-process queue to rate limit requests.
+  localLimits,
+
+  /// Don't limit requests.
+  unlimited,
+}
+
+CountingApiClient _apiClientByType(ClientType clientType, Authentication auth) {
+  switch (clientType) {
+    case ClientType.localLimits:
+      return RateLimitedApiClient(authentication: auth);
+    case ClientType.unlimited:
+      return CountingApiClient(authentication: auth);
+  }
+}
+
 /// apiFromAuthToken creates an Api with the given auth token.
-Api apiFromAuthToken(String token) {
+Api apiFromAuthToken(String token, ClientType clientType) {
   final auth = HttpBearerAuth()..accessToken = token;
-  return Api(
-    RateLimitedApiClient(authentication: auth),
-  );
+  return Api(_apiClientByType(clientType, auth));
 }
 
 /// defaultApi creates an Api with the default auth token read from the
 /// given file system.
-Api defaultApi(FileSystem fs) => apiFromAuthToken(loadAuthToken(fs));
+Api defaultApi(FileSystem fs, ClientType clientType) =>
+    apiFromAuthToken(loadAuthToken(fs), clientType);
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.
