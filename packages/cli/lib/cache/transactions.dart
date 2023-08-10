@@ -27,42 +27,6 @@ enum TransactionType {
   shipModification,
 }
 
-Transaction _migrate(Map<String, dynamic> json) {
-  assert(json['transactionType'] == null, 'Already migrated');
-  final oldSymbol = json['tradeSymbol'] as String;
-  var transactionType = TransactionType.market;
-  ShipType? shipType;
-  TradeSymbol? tradeSymbol;
-  if (oldSymbol.startsWith('SHIP')) {
-    transactionType = TransactionType.shipyard;
-    shipType = ShipType.fromJson(oldSymbol);
-  } else {
-    if (oldSymbol.startsWith('MOUNT') && json['quantity'] == 1) {
-      transactionType = TransactionType.shipModification;
-    } else {
-      transactionType = TransactionType.market;
-    }
-    tradeSymbol = TradeSymbol.fromJson(oldSymbol);
-  }
-  return Transaction(
-    transactionType: transactionType,
-    shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
-    waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-    tradeSymbol: tradeSymbol,
-    shipType: shipType,
-    quantity: json['quantity'] as int,
-    tradeType: MarketTransactionTypeEnum.values
-        .firstWhere((e) => e.value == json['tradeType'] as String),
-    perUnitPrice: json['perUnitPrice'] as int,
-    timestamp: DateTime.parse(json['timestamp'] as String),
-    agentCredits: json['agentCredits'] as int,
-    accounting: json['accounting'] == null
-        ? null
-        : AccountingType.values
-            .firstWhere((e) => e.name == json['accounting'] as String),
-  );
-}
-
 /// A class to hold transaction data from a ship.
 @immutable
 class Transaction {
@@ -83,9 +47,6 @@ class Transaction {
 
   /// Create a new transaction from json.
   factory Transaction.fromJson(Map<String, dynamic> json) {
-    if (json['transactionType'] == null) {
-      return _migrate(json);
-    }
     return Transaction(
       transactionType: TransactionType.values
           .firstWhere((e) => e.index == json['transactionType'] as int),
