@@ -1,18 +1,42 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cli/logger.dart';
 import 'package:http/http.dart';
 import 'package:postgres/postgres.dart';
+
+/// Connect to the default local database.
+/// Logs and returns null on failure.
+Future<PostgreSQLConnection?> defaultDatabase() async {
+  final connection = PostgreSQLConnection(
+    'localhost',
+    5432,
+    'spacetraders',
+    username: 'postgres',
+    password: 'password',
+  );
+  try {
+    await connection.open();
+  } on PostgreSQLException catch (e) {
+    logger.err('Failed to connect to database: $e');
+    return null;
+  }
+  return connection;
+}
 
 /// An http Client implementation which sends requests to another process
 /// through a postgres queue.
 class QueuedClient extends BaseClient {
   /// Creates a new [QueuedClient].
-  QueuedClient(int Function() getPriority) : _getPriority = getPriority;
+  QueuedClient(PostgreSQLConnection connection, [this.getPriority])
+      : _connection = connection,
+        _queue = NetQueue(connection, QueueRole.requestor);
 
-  final int Function() _getPriority;
+  /// Callback to get the priority of the next request.
+  int Function()? getPriority;
 
-  final NetQueue _queue = NetQueue(QueueRole.requestor);
+  final PostgreSQLConnection _connection;
+  final NetQueue _queue;
 
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
@@ -25,7 +49,8 @@ class QueuedClient extends BaseClient {
       body: String.fromCharCodes(body),
       headers: request.headers,
     );
-    final response = await _queue.sendAndWait(_getPriority(), queuedRequest);
+    final priority = getPriority?.call() ?? 0;
+    final response = await _queue.sendAndWait(priority, queuedRequest);
     return StreamedResponse(
       Stream.fromIterable([response.bodyBytes]),
       response.statusCode,
@@ -40,7 +65,7 @@ class QueuedClient extends BaseClient {
 
   @override
   void close() {
-    _queue.disconnect();
+    _connection.close();
   }
 }
 
@@ -197,43 +222,26 @@ enum QueueRole {
 // TODO(eseidel): This could be a generic "prioritized database queue"?
 class NetQueue {
   /// Creates a new [NetQueue].
-  // TODO(eseidel): Maybe take the connection as an argument?
-  NetQueue(this.role)
-      : _connection = PostgreSQLConnection(
-          'localhost',
-          5432,
-          'spacetraders',
-          username: 'postgres',
-          password: 'password',
-        );
+  NetQueue(PostgreSQLConnection connection, this.role)
+      : _connection = connection;
 
   final PostgreSQLConnection _connection;
 
   /// Role of the user of this queue.
   final QueueRole role;
 
-  bool _connected = false;
+  bool _listening = false;
 
-  Future<void> _connect() async {
-    if (_connected) {
+  Future<void> _listenIfNeeded() async {
+    if (_listening) {
       return;
     }
-    await _connection.open();
     if (role == QueueRole.requestor) {
       await _connection.execute('LISTEN response_');
     } else {
       await _connection.execute('LISTEN request_');
     }
-    _connected = true;
-  }
-
-  /// Disconnects from the database.
-  Future<void> disconnect() async {
-    if (!_connected) {
-      return;
-    }
-    await _connection.close();
-    _connected = false;
+    _listening = true;
   }
 
   /// Inserts a request into the database, notifying listeners that a new
@@ -243,7 +251,6 @@ class NetQueue {
     QueuedRequest request,
   ) async {
     assert(role == QueueRole.requestor, 'Only requestors can queue requests.');
-    await _connect();
     final result = await _connection.query(
       'INSERT INTO request_ (priority, json) '
       'VALUES (@priority, @json) RETURNING id',
@@ -266,7 +273,7 @@ class NetQueue {
       role == QueueRole.requestor,
       'Only requestors can wait for responses.',
     );
-    await _connect();
+    await _listenIfNeeded();
     final _ = await _connection.notifications.firstWhere(
       (notification) => notification.channel == 'response_',
     );
@@ -294,7 +301,6 @@ class NetQueue {
   /// Gets the next request from the queue, or null if there are no requests.
   Future<RequestRecord?> nextRequest() async {
     assert(role == QueueRole.responder, 'Only responders can get requests.');
-    await _connect();
     final result = await _connection.query(
       'SELECT id, priority, json FROM request_ ORDER BY priority DESC LIMIT 1',
     );
@@ -313,7 +319,6 @@ class NetQueue {
 
   /// Deletes the given request from the queue.
   Future<void> deleteRequest(RequestRecord request) async {
-    await _connect();
     await _connection.query(
       'DELETE FROM request_ WHERE id = @id',
       substitutionValues: {
@@ -328,7 +333,6 @@ class NetQueue {
     QueuedResponse response,
   ) async {
     assert(role == QueueRole.responder, 'Only responders can respond.');
-    await _connect();
     await _connection.query(
       'INSERT INTO response_ (request_id, json) '
       'VALUES (@requestId, @json)',
@@ -344,7 +348,7 @@ class NetQueue {
   /// Waits for a notification that a new request is available.
   Future<void> waitForRequest() async {
     assert(role == QueueRole.responder, 'Only responders can wait.');
-    await _connect();
+    await _listenIfNeeded();
     await _connection.notifications.firstWhere(
       (notification) => notification.channel == 'request_',
     );

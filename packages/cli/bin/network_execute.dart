@@ -1,11 +1,15 @@
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 import 'package:http/http.dart';
+import 'package:postgres/postgres.dart';
 
 class NetExecutor {
-  final maxRequestsPerSecond = 3;
+  NetExecutor(PostgreSQLConnection connection, {this.maxRequestsPerSecond = 3})
+      : queue = NetQueue(connection, QueueRole.responder);
+
+  final int maxRequestsPerSecond;
   final Client _client = Client();
-  final NetQueue queue = NetQueue(QueueRole.responder);
+  final NetQueue queue;
 
   static DateTime? _parseResetTime(Response response) {
     final resetString = response.headers['x-ratelimit-reset'];
@@ -87,7 +91,8 @@ class NetExecutor {
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  await NetExecutor().run();
+  final connection = await defaultDatabase();
+  await NetExecutor(connection!).run();
 }
 
 void main(List<String> args) async {
