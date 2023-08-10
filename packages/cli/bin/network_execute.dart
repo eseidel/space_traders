@@ -1,5 +1,6 @@
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
+import 'package:cli/printing.dart';
 import 'package:http/http.dart';
 import 'package:postgres/postgres.dart';
 
@@ -41,18 +42,25 @@ class NetExecutor {
     throw Exception('Unknown method: $method');
   }
 
+  String _removeExpectedPrefix(String url) {
+    const expectedPrefix = 'https://api.spacetraders.io/v2';
+    if (!url.startsWith(expectedPrefix)) {
+      return url;
+    }
+    return url.substring(expectedPrefix.length);
+  }
+
   Future<void> run() async {
+    logger.info('Servicing network requests...');
     final minWaitTime = const Duration(seconds: 1) ~/ maxRequestsPerSecond;
     DateTime? nextRequestTime;
     var backoffSeconds = 1;
     while (true) {
       final request = await queue.nextRequest();
       if (request == null) {
-        logger.info('Waiting...');
         await queue.waitForRequest();
         continue;
       }
-      logger.info('${request.request.method} ${request.request.url}');
       if (nextRequestTime != null) {
         final waitTime = nextRequestTime.difference(DateTime.timestamp());
         if (waitTime > Duration.zero) {
@@ -60,9 +68,16 @@ class NetExecutor {
           await Future<void>.delayed(waitTime);
         }
       }
+      final before = DateTime.timestamp();
+      final path = _removeExpectedPrefix(request.request.url);
       nextRequestTime = DateTime.timestamp().add(minWaitTime);
       final response = await sendRequest(request.request);
-      logger.info('Got response: ${response.statusCode} ${response.body}');
+      final after = DateTime.timestamp();
+      final duration = after.difference(before);
+      logger.info(
+        '${approximateDuration(duration)} ${response.statusCode} '
+        '${request.request.method.padRight(5)} $path',
+      );
       if (response.statusCode == 429) {
         final resetTime = _parseResetTime(response);
         if (resetTime != null) {
