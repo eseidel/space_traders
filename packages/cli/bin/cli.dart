@@ -48,6 +48,9 @@ Api getApi(
   String token,
   PostgreSQLConnection? connection,
 ) {
+  // TODO(eseidel): This is wrong.  This needs to check that
+  // that there is a network executor running, not just that we have
+  // a connection to the database.
   if (connection == null) {
     return apiFromAuthToken(token, ClientType.localLimits);
   }
@@ -60,6 +63,12 @@ Api getApi(
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
+    ..addFlag(
+      'local',
+      abbr: 'l',
+      negatable: false,
+      help: 'Use in-process rate limiting instead of database queue.',
+    )
     ..addMultiOption(
       'only',
       abbr: 'o',
@@ -79,7 +88,8 @@ Future<void> cliMain(List<String> args) async {
   final token =
       await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
 
-  final dbConnection = await defaultDatabase();
+  final useOutOfProcessNetwork = !(results['local'] as bool);
+  final dbConnection = useOutOfProcessNetwork ? await defaultDatabase() : null;
   final api = getApi(token, dbConnection);
 
   final caches = await Caches.load(fs, api);

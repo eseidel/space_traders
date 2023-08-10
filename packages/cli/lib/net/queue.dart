@@ -14,6 +14,7 @@ Future<PostgreSQLConnection?> defaultDatabase() async {
     'spacetraders',
     username: 'postgres',
     password: 'password',
+    timeoutInSeconds: 1,
   );
   try {
     await connection.open();
