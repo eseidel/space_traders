@@ -253,8 +253,8 @@ class NetQueue {
       role == QueueRole.requestor,
       'Only requestors can wait for responses.',
     );
+    await _listenIfNeeded();
     while (true) {
-      await _listenIfNeeded();
       final _ = await _db.connection.notifications.firstWhere(
         (notification) => notification.channel == 'response_',
       );

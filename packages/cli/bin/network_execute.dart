@@ -77,6 +77,7 @@ class NetExecutor {
         await queue.waitForRequest();
         continue;
       }
+      logger.info('priority=${request.priority}');
       if (nextRequestTime != null) {
         final waitTime = nextRequestTime.difference(DateTime.timestamp());
         if (waitTime > Duration.zero) {

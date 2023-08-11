@@ -9,7 +9,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final queue = NetQueue(db, QueueRole.requestor);
 
   while (true) {
-    final response = await queue.sendAndWait(
+    final _ = await queue.sendAndWait(
       // Low prioirty.
       -1,
       QueuedRequest.empty('https://api.spacetraders.io/v2'),
