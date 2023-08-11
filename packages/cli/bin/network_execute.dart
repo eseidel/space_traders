@@ -72,12 +72,6 @@ class NetExecutor {
     var backoffSeconds = 1;
     while (true) {
       stats.printIfNeeded();
-      final request = await queue.nextRequest();
-      if (request == null) {
-        await queue.waitForRequest();
-        continue;
-      }
-      logger.info('priority=${request.priority}');
       if (nextRequestTime != null) {
         final waitTime = nextRequestTime.difference(DateTime.timestamp());
         if (waitTime > Duration.zero) {
@@ -85,6 +79,14 @@ class NetExecutor {
           await Future<void>.delayed(waitTime);
         }
       }
+      // Don't pull the next request until we're about to send it or we might
+      // end up pulling a request we don't need to send or is low priority.
+      final request = await queue.nextRequest();
+      if (request == null) {
+        await queue.waitForRequest();
+        continue;
+      }
+      logger.info('priority=${request.priority}');
       final before = DateTime.timestamp();
       final path = _removeExpectedPrefix(request.request.url);
       nextRequestTime = DateTime.timestamp().add(minWaitTime);
