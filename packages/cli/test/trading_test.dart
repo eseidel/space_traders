@@ -1,10 +1,10 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
+import 'package:cli/nav/jump_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';

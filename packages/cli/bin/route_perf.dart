@@ -1,8 +1,8 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/faction_cache.dart';
-import 'package:cli/cache/jump_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/nav/jump_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 
