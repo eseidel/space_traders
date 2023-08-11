@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 import 'package:db/db.dart';
@@ -12,7 +14,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
       -1,
       QueuedRequest.empty('https://api.spacetraders.io/v2'),
     );
-    logger.info('Got response: ${response.statusCode} ${response.body}');
+    stdout.write('.');
   }
 }
 

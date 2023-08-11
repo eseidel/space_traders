@@ -253,23 +253,28 @@ class NetQueue {
       role == QueueRole.requestor,
       'Only requestors can wait for responses.',
     );
-    await _listenIfNeeded();
-    final _ = await _db.connection.notifications.firstWhere(
-      (notification) => notification.channel == 'response_',
-    );
-    // TODO(eseidel): This does not yet handle queuing multiple requests
-    // and waiting on all of them.
-    // TODO(eseidel): Move this into db package.
-    final result = await _db.connection.query(
-      'SELECT json FROM response_ WHERE request_id = @requestId',
-      substitutionValues: {
-        'requestId': requestId,
-      },
-    );
-    final queued = QueuedResponse.fromJson(
-      jsonDecode(result[0][0] as String) as Map<String, dynamic>,
-    );
-    return queued.toResponse();
+    while (true) {
+      await _listenIfNeeded();
+      final _ = await _db.connection.notifications.firstWhere(
+        (notification) => notification.channel == 'response_',
+      );
+      // TODO(eseidel): This does not yet handle queuing multiple requests
+      // and waiting on all of them.
+      // TODO(eseidel): Move this into db package.
+      final result = await _db.connection.query(
+        'SELECT json FROM response_ WHERE request_id = @requestId',
+        substitutionValues: {
+          'requestId': requestId,
+        },
+      );
+      if (result.isEmpty) {
+        continue;
+      }
+      final queued = QueuedResponse.fromJson(
+        jsonDecode(result[0][0] as String) as Map<String, dynamic>,
+      );
+      return queued.toResponse();
+    }
   }
 
   /// Sends the given request and waits for a response.
