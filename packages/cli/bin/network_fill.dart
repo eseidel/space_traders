@@ -1,9 +1,10 @@
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
+import 'package:db/db.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  final connection = await defaultDatabase();
-  final queue = NetQueue(connection!, QueueRole.requestor);
+  final db = await defaultDatabase();
+  final queue = NetQueue(db, QueueRole.requestor);
 
   final requests = [
     (3, 'https://api.spacetraders.io/v2/my/3'),
@@ -22,7 +23,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     logger.info('Got response: ${response.statusCode} ${response.body}');
   }
 
-  await connection.close();
+  await db.close();
   logger.info('Done!');
 }
 

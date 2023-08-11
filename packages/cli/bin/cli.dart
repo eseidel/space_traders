@@ -9,8 +9,8 @@ import 'package:cli/net/auth.dart';
 import 'package:cli/net/counts.dart';
 import 'package:cli/net/queue.dart';
 import 'package:cli/printing.dart';
+import 'package:db/db.dart';
 import 'package:file/local.dart';
-import 'package:postgres/postgres.dart';
 import 'package:scoped/scoped.dart';
 
 void printRequestStats(RequestCounts requestCounts) {
@@ -46,16 +46,17 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
 
 Api getApi(
   String token,
-  PostgreSQLConnection? connection,
-) {
+  Database db, {
+  required bool useOutOfProcessNetwork,
+}) {
   // TODO(eseidel): This is wrong.  This needs to check that
   // that there is a network executor running, not just that we have
   // a connection to the database.
-  if (connection == null) {
+  if (!useOutOfProcessNetwork) {
     return apiFromAuthToken(token, ClientType.localLimits);
   }
   final api = apiFromAuthToken(token, ClientType.unlimited);
-  final queuedClient = QueuedClient(connection)..getPriority = () => 0;
+  final queuedClient = QueuedClient(db)..getPriority = () => 0;
   api.apiClient.client = queuedClient;
   return api;
 }
@@ -88,9 +89,9 @@ Future<void> cliMain(List<String> args) async {
   final token =
       await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
 
-  final useOutOfProcessNetwork = !(results['local'] as bool);
-  final dbConnection = useOutOfProcessNetwork ? await defaultDatabase() : null;
-  final api = getApi(token, dbConnection);
+  final db = await defaultDatabase();
+  final api =
+      getApi(token, db, useOutOfProcessNetwork: !(results['local'] as bool));
 
   final caches = await Caches.load(fs, api);
   logger.info(
@@ -125,7 +126,7 @@ Future<void> cliMain(List<String> args) async {
   // But that's also OK since that's nonsentical.
   final shipFilter =
       _shipFilterFromArgs(agent, results['only'] as List<String>);
-  await logic(api, centralCommand, caches, shipFilter: shipFilter);
+  await logic(api, db, centralCommand, caches, shipFilter: shipFilter);
 }
 
 Future<void> main(List<String> args) async {

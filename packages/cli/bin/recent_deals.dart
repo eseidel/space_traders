@@ -2,6 +2,8 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
+import 'package:db/transaction.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);
@@ -99,12 +101,13 @@ bool Function(Transaction t) filterFromArgs(List<String> args) {
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
+  final db = await defaultDatabase();
   final filter = filterFromArgs(args);
-  final transactionLog = TransactionLog.load(fs);
   final deals = <SyntheticDeal>[];
   final openDeals = <ShipSymbol, List<Transaction>>{};
   final ignoredTransactions = <Transaction>[];
   final supportedTypes = {AccountingType.fuel, AccountingType.goods};
+  final transactions = (await allTransactions(db)).map(Transaction.fromRecord);
 
   void recordDeal(List<Transaction> openDeal) {
     final deal = SyntheticDeal(openDeal);
@@ -115,7 +118,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     }
   }
 
-  for (final transaction in transactionLog.entries) {
+  for (final transaction in transactions) {
     if (!filter(transaction)) {
       continue;
     }

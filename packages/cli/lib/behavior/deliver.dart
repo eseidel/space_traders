@@ -8,6 +8,7 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
+import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:more/collection.dart';
 // Go buy and deliver.
@@ -276,6 +277,7 @@ Future<BuyJob?> computeBuyJob(
 Future<JobResult> doBuyJob(
   BehaviorState state,
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship, {
@@ -289,6 +291,7 @@ Future<JobResult> doBuyJob(
   // If we're currently at a market, record the prices and refuel.
   final maybeMarket = await visitLocalMarket(
     api,
+    db,
     caches,
     currentWaypoint,
     ship,
@@ -297,8 +300,8 @@ Future<JobResult> doBuyJob(
   );
   await centralCommand.visitLocalShipyard(
     api,
+    db,
     caches.shipyardPrices,
-    caches.transactions,
     caches.agent,
     currentWaypoint,
     ship,
@@ -308,6 +311,7 @@ Future<JobResult> doBuyJob(
   // try to sell it.
   final result = await handleUnwantedCargoIfNeeded(
     api,
+    db,
     centralCommand,
     caches,
     ship,
@@ -372,8 +376,8 @@ Future<JobResult> doBuyJob(
   // TODO(eseidel): Share this code with trader.dart
   final transaction = await purchaseTradeGoodIfPossible(
     api,
+    db,
     caches.marketPrices,
-    caches.transactions,
     caches.agent,
     caches.ships,
     ship,
@@ -416,6 +420,7 @@ Future<JobResult> doBuyJob(
 Future<JobResult> doDeliverJob(
   BehaviorState state,
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship, {
@@ -453,6 +458,7 @@ Future<JobResult> doDeliverJob(
 Future<JobResult> doInitJob(
   BehaviorState state,
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship, {
@@ -485,6 +491,7 @@ Future<JobResult> doInitJob(
 /// Advance the behavior of the given ship.
 Future<DateTime?> advanceDeliver(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -494,6 +501,7 @@ Future<DateTime?> advanceDeliver(
   final jobFunctions = <Future<JobResult> Function(
     BehaviorState,
     Api,
+    Database,
     CentralCommand,
     Caches,
     Ship, {
@@ -519,6 +527,7 @@ Future<DateTime?> advanceDeliver(
     final result = await jobFunction(
       state,
       api,
+      db,
       centralCommand,
       caches,
       ship,

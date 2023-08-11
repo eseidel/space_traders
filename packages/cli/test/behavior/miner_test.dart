@@ -3,6 +3,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -15,6 +16,12 @@ class _MockBehaviorState extends Mock implements BehaviorState {}
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockDatabase extends Mock implements Database {}
+
+class _MockExtractionLog extends Mock implements ExtractionLog {}
+
+class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
@@ -32,15 +39,9 @@ class _MockSurveyData extends Mock implements SurveyData {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class _MockTransactionLog extends Mock implements TransactionLog {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
-
-class _MockFleetApi extends Mock implements FleetApi {}
-
-class _MockExtractionLog extends Mock implements ExtractionLog {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
@@ -178,20 +179,19 @@ void main() {
 
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
-    final transactionLog = _MockTransactionLog();
     final surveyData = _MockSurveyData();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.transactions).thenReturn(transactionLog);
     when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
@@ -270,6 +270,7 @@ void main() {
       logger,
       () => advanceMiner(
         api,
+        db,
         centralCommand,
         caches,
         state,

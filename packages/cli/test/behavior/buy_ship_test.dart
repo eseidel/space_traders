@@ -4,6 +4,8 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:db/db.dart';
+import 'package:db/transaction.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -19,11 +21,15 @@ class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockDatabase extends Mock implements Database {}
+
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
+
+class _MockRoutePlan extends Mock implements RoutePlan {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
@@ -43,23 +49,19 @@ class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class _MockTransactionLog extends Mock implements TransactionLog {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class _MockRoutePlan extends Mock implements RoutePlan {}
-
 void main() {
   test('advanceBuyShip smoke test', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
-    final transactionLog = _MockTransactionLog();
     final shipNav = _MockShipNav();
     final shipyardPrices = _MockShipyardPrices();
     final shipCache = _MockShipCache();
@@ -67,7 +69,6 @@ void main() {
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.transactions).thenReturn(transactionLog);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
@@ -200,6 +201,9 @@ void main() {
       ),
     ).thenReturn(route);
 
+    registerFallbackValue(TransactionRecord.test());
+    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+
     final logger = _MockLogger();
     expect(
       () async {
@@ -207,6 +211,7 @@ void main() {
           logger,
           () => advanceBuyShip(
             api,
+            db,
             centralCommand,
             caches,
             state,

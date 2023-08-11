@@ -5,6 +5,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/ship_waiter.dart';
+import 'package:db/db.dart';
 
 // Pulled in to a separate function to help make sure we don't confuse
 // the wait we needed for this ship with the next wait.
@@ -21,6 +22,7 @@ Future<void> _waitIfNeeded(ShipWaiterEntry entry) async {
 /// One loop of the logic.
 Future<void> advanceShips(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   ShipWaiter waiter, {
@@ -49,6 +51,7 @@ Future<void> advanceShips(
       final requestsBefore = api.requestCounts.totalRequests();
       final waitUntil = await advanceShipBehavior(
         api,
+        db,
         centralCommand,
         caches,
         ship,
@@ -129,6 +132,7 @@ class RateLimitTracker {
 /// Run the logic loop forever.
 Future<void> logic(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches, {
   bool Function(Ship ship)? shipFilter,
@@ -147,6 +151,7 @@ Future<void> logic(
     try {
       await advanceShips(
         api,
+        db,
         centralCommand,
         caches,
         waiter,

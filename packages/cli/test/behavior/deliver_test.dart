@@ -4,6 +4,7 @@ import 'package:cli/behavior/deliver.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:more/collection.dart';
 import 'package:test/test.dart';
@@ -12,9 +13,13 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorState extends Mock implements BehaviorState {}
+
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockDatabase extends Mock implements Database {}
 
 class _MockLogger extends Mock implements Logger {}
 
@@ -22,9 +27,13 @@ class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipCache extends Mock implements ShipCache {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
@@ -32,28 +41,20 @@ class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class _MockTransactionLog extends Mock implements TransactionLog {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
-class _MockRoutePlanner extends Mock implements RoutePlanner {}
-
-class _MockShipEngine extends Mock implements ShipEngine {}
-
 void main() {
   test('advanceDeliver smoke test', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final marketPrices = _MockMarketPrices();
     final agentCache = _MockAgentCache();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
-    final transactionLog = _MockTransactionLog();
     final shipNav = _MockShipNav();
     final shipyardPrices = _MockShipyardPrices();
     final shipCache = _MockShipCache();
@@ -61,7 +62,6 @@ void main() {
     final caches = _MockCaches();
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.transactions).thenReturn(transactionLog);
     when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
@@ -161,6 +161,7 @@ void main() {
       logger,
       () => advanceDeliver(
         api,
+        db,
         centralCommand,
         caches,
         state,

@@ -4,40 +4,44 @@ import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
-class _MockShipNav extends Mock implements ShipNav {}
+class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
-class _MockShip extends Mock implements Ship {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockSurveyData extends Mock implements SurveyData {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
-
-class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockLogger extends Mock implements Logger {}
-
-class _MockCentralCommand extends Mock implements CentralCommand {}
+class _MockBehaviorState extends Mock implements BehaviorState {}
 
 class _MockCaches extends Mock implements Caches {}
 
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
+
+class _MockLogger extends Mock implements Logger {}
+
+class _MockShip extends Mock implements Ship {}
+
+class _MockShipCache extends Mock implements ShipCache {}
+
+class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockSurveyData extends Mock implements SurveyData {}
+
+class _MockSystemsCache extends Mock implements SystemsCache {}
+
+class _MockWaypoint extends Mock implements Waypoint {}
+
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceSurveyor smoke test', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final agentCache = _MockAgentCache();
@@ -113,6 +117,7 @@ void main() {
       logger,
       () => advanceSurveyor(
         api,
+        db,
         centralCommand,
         caches,
         state,

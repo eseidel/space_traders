@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/json_log.dart';
-import 'package:file/file.dart';
+import 'package:db/transaction.dart';
 import 'package:meta/meta.dart';
 
 /// The accounting type of a transaction.
@@ -12,7 +11,12 @@ enum AccountingType {
   fuel,
 
   /// Goods transaction (e.g. buying/selling trade goods).
-  goods,
+  goods;
+
+  /// Lookup an accounting type by name.
+  static AccountingType fromName(String name) {
+    return AccountingType.values.firstWhere((e) => e.name == name);
+  }
 }
 
 /// The type of transaction which created this transaction.
@@ -24,7 +28,12 @@ enum TransactionType {
   shipyard,
 
   /// A ship modification transaction.
-  shipModification,
+  shipModification;
+
+  /// Lookup a transaction type by index.
+  static TransactionType fromName(String name) {
+    return TransactionType.values.firstWhere((e) => e.name == name);
+  }
 }
 
 /// A class to hold transaction data from a ship.
@@ -46,6 +55,7 @@ class Transaction {
   });
 
   /// Create a new transaction from json.
+  /// This only exists to support CostedDeal.fromJson and should be removed.
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
       transactionType: TransactionType.values
@@ -60,10 +70,25 @@ class Transaction {
       perUnitPrice: json['perUnitPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
       agentCredits: json['agentCredits'] as int,
-      accounting: json['accounting'] == null
-          ? null
-          : AccountingType.values
-              .firstWhere((e) => e.name == json['accounting'] as String),
+      accounting: AccountingType.values
+          .firstWhere((e) => e.name == json['accounting'] as String),
+    );
+  }
+
+  /// Create a new transaction from json.
+  factory Transaction.fromRecord(TransactionRecord record) {
+    return Transaction(
+      transactionType: TransactionType.fromName(record.transactionType),
+      shipSymbol: ShipSymbol.fromJson(record.shipSymbol),
+      waypointSymbol: WaypointSymbol.fromJson(record.waypointSymbol),
+      tradeSymbol: TradeSymbol.fromJson(record.tradeSymbol),
+      shipType: ShipType.fromJson(record.shipType),
+      quantity: record.quantity,
+      tradeType: MarketTransactionTypeEnum.fromJson(record.tradeType)!,
+      perUnitPrice: record.perUnitPrice,
+      timestamp: record.timestamp,
+      agentCredits: record.agentCredits,
+      accounting: AccountingType.fromName(record.accounting),
     );
   }
 
@@ -174,7 +199,7 @@ class Transaction {
   final int agentCredits;
 
   /// The accounting classification of the transaction.
-  final AccountingType? accounting;
+  final AccountingType accounting;
 
   /// The change in credits from this transaction.
   int get creditChange {
@@ -186,6 +211,7 @@ class Transaction {
   }
 
   /// Convert the transaction to json.
+  /// This only exists to support CostedDeal.toJson and should be removed.
   Map<String, dynamic> toJson() {
     return {
       'transactionType': transactionType.index,
@@ -198,24 +224,43 @@ class Transaction {
       'perUnitPrice': perUnitPrice,
       'timestamp': timestamp.toUtc().toIso8601String(),
       'agentCredits': agentCredits,
-      'accounting': accounting?.name,
+      'accounting': accounting.name,
     };
+  }
+
+  /// Convert the transaction to a record.
+  TransactionRecord toRecord() {
+    return TransactionRecord(
+      transactionType: transactionType.name,
+      shipSymbol: shipSymbol.toJson(),
+      waypointSymbol: waypointSymbol.toJson(),
+      tradeSymbol: tradeSymbol?.toJson(),
+      shipType: shipType?.toJson(),
+      quantity: quantity,
+      tradeType: tradeType.value,
+      perUnitPrice: perUnitPrice,
+      timestamp: timestamp,
+      agentCredits: agentCredits,
+      accounting: accounting.name,
+    );
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Transaction &&
-          transactionType == other.transactionType &&
           runtimeType == other.runtimeType &&
+          transactionType == other.transactionType &&
           shipSymbol == other.shipSymbol &&
           waypointSymbol == other.waypointSymbol &&
           tradeSymbol == other.tradeSymbol &&
+          shipType == other.shipType &&
           quantity == other.quantity &&
           tradeType == other.tradeType &&
           perUnitPrice == other.perUnitPrice &&
           timestamp == other.timestamp &&
-          agentCredits == other.agentCredits;
+          agentCredits == other.agentCredits &&
+          accounting == other.accounting;
 
   @override
   int get hashCode =>
@@ -223,54 +268,11 @@ class Transaction {
       shipSymbol.hashCode ^
       waypointSymbol.hashCode ^
       tradeSymbol.hashCode ^
+      shipType.hashCode ^
       quantity.hashCode ^
       tradeType.hashCode ^
       perUnitPrice.hashCode ^
       timestamp.hashCode ^
-      agentCredits.hashCode;
-}
-
-/// A class to manage a transaction log file.
-class TransactionLog extends JsonLog<Transaction> {
-  /// Create a new transaction log.
-  TransactionLog(
-    super.entries, {
-    required super.fs,
-    required super.path,
-  }) : super(recordToJson: (record) => record.toJson());
-
-  /// The default path to the transaction log.
-  static const String defaultPath = 'data/transactions.json';
-
-  /// Load the transaction log from the file system.
-  // ignore: prefer_constructors_over_static_methods
-  static TransactionLog load(
-    FileSystem fs, {
-    String path = defaultPath,
-  }) {
-    final entries = JsonLog.load<Transaction>(fs, path, Transaction.fromJson);
-    return TransactionLog(entries, fs: fs, path: path);
-  }
-
-  /// Return transactions with the given filter applied.
-  List<Transaction> where(bool Function(Transaction t) filter) {
-    return entries.where(filter).toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-  }
-
-  /// Return all the ship symbols in the transaction log.
-  Set<ShipSymbol> get shipSymbols {
-    return entries.map((e) => e.shipSymbol).toSet();
-  }
-}
-
-/// Load all transactions from the file system.
-// Hack around our lack of a real database or log rolling.
-Iterable<Transaction> loadAllTransactions(FileSystem fs) {
-  // This won't do anything if we don't have a transactions1.json file
-  // since it defaults to an empty list.
-  final transactionLogOld =
-      TransactionLog.load(fs, path: 'data/transactions1.json');
-  final transactionLog = TransactionLog.load(fs);
-  return transactionLogOld.entries.followedBy(transactionLog.entries);
+      agentCredits.hashCode ^
+      accounting.hashCode;
 }

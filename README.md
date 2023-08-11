@@ -632,3 +632,6 @@ Invalid argument (marketSymbol): ESEIDEL-6F is not at X1-YA22-87615D, X1-YA22-92
 <asynchronous suspension>
 #8      main (file:///root/space_traders/packages/cli/bin/cli.dart:105:3)
 <asynchronous suspension>
+
+## Use best-place-to-buy logic for ships:
+[WARN] 🛸#1  Can not buy SHIP_ORE_HOUND at X1-YA22-18767C, credits 318,996c < 1.05 * price = 1,334,568c. Disabling Behavior.buyShip for 10m.

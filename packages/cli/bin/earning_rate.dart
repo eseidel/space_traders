@@ -1,6 +1,7 @@
-import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
+import 'package:db/db.dart';
+import 'package:db/transaction.dart';
 
 DateTime snapToHour(DateTime time) {
   return DateTime.utc(time.year, time.month, time.day, time.hour);
@@ -11,13 +12,12 @@ int hoursAgo(DateTime time) {
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
+  final db = await defaultDatabase();
   // Credits per hour.
-  final transactions = TransactionLog.load(fs);
-
-  final oldest = transactions.entries.first;
-  final firstTransactionHour = snapToHour(oldest.timestamp);
   final oneDayAgoAsHour =
       snapToHour(DateTime.now().subtract(const Duration(hours: 24)));
+  final transactions = await transactionsAfter(db, oneDayAgoAsHour);
+  final firstTransactionHour = snapToHour(transactions.first.timestamp);
 
   const timeWidth = 5;
   const creditsWidth = 15;
@@ -28,7 +28,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
       : firstTransactionHour;
   var latestCredits = 0;
   var lastPeriodCredits = 0;
-  for (final transaction in transactions.entries) {
+  for (final transaction in transactions) {
     latestCredits = transaction.agentCredits;
     if (transaction.timestamp.isAfter(nextPrintDate)) {
       final diff = latestCredits - lastPeriodCredits;
@@ -43,7 +43,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
       nextPrintDate = nextPrintDate.add(const Duration(hours: 1));
     }
   }
-  final last = transactions.entries.lastOrNull;
+  final last = transactions.lastOrNull;
   if (last != null) {
     final sinceLast =
         approximateDuration(DateTime.now().difference(last.timestamp))

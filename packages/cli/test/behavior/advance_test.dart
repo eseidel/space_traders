@@ -3,36 +3,40 @@ import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorCache extends Mock implements BehaviorCache {}
+
 class _MockCaches extends Mock implements Caches {}
+
+class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockDatabase extends Mock implements Database {}
 
 class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
 
+class _MockShipCache extends Mock implements ShipCache {}
+
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockCentralCommand extends Mock implements CentralCommand {}
-
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
-class _MockBehaviorCache extends Mock implements BehaviorCache {}
-
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
 void main() {
   test('advanceShipBehavior idle does not spin hot', () async {
     final api = _MockApi();
     final systemsCache = _MockSystemsCache();
     final systemConnectivity = _MockSystemConnectivity();
+    final db = _MockDatabase();
     final caches = _MockCaches();
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
@@ -58,6 +62,7 @@ void main() {
       logger,
       () => advanceShipBehavior(
         api,
+        db,
         centralCommand,
         caches,
         ship,
@@ -69,6 +74,7 @@ void main() {
 
   test('advanceShipBehavior in transit', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final systemConnectivity = _MockSystemConnectivity();
@@ -103,6 +109,7 @@ void main() {
       logger,
       () => advanceShipBehavior(
         api,
+        db,
         centralCommand,
         caches,
         ship,

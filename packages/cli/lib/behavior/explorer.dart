@@ -7,6 +7,7 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 
 bool _isMissingChartOrRecentPriceData(
   MarketPrices marketPrices,
@@ -49,6 +50,7 @@ bool _isMissingRecentShipyardData(
 /// Market data only be refreshed if we haven't refreshed in 5 minutes.
 Future<Market?> visitLocalMarket(
   Api api,
+  Database db,
   Caches caches,
   Waypoint waypoint,
   Ship ship, {
@@ -72,8 +74,8 @@ Future<Market?> visitLocalMarket(
   if (ship.usesFuel) {
     await refuelIfNeededAndLog(
       api,
+      db,
       caches.marketPrices,
-      caches.transactions,
       caches.agent,
       caches.ships,
       market,
@@ -258,6 +260,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
 /// One loop of the exploring logic.
 Future<DateTime?> advanceExplorer(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -282,12 +285,12 @@ Future<DateTime?> advanceExplorer(
     await chartWaypointAndLog(api, caches.charting, ship);
   }
   // If we don't visit the market, we won't refuel (even when low).
-  await visitLocalMarket(api, caches, waypoint, ship);
+  await visitLocalMarket(api, db, caches, waypoint, ship);
   // We might buy a ship if we're at a ship yard.
   await centralCommand.visitLocalShipyard(
     api,
+    db,
     caches.shipyardPrices,
-    caches.transactions,
     caches.agent,
     waypoint,
     ship,

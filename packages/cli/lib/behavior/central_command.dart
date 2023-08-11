@@ -12,6 +12,7 @@ import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:more/collection.dart';
 
@@ -960,8 +961,8 @@ class CentralCommand {
   /// Records shipyard data if needed.
   Future<void> visitLocalShipyard(
     Api api,
+    Database db,
     ShipyardPrices shipyardPrices,
-    TransactionLog transactionLog,
     AgentCache agentCache,
     Waypoint waypoint,
     Ship ship,
@@ -977,9 +978,9 @@ class CentralCommand {
     try {
       await buyShipIfPossible(
         api,
+        db,
         shipyardPrices,
         agentCache,
-        transactionLog,
         ship,
       );
     } on JobException catch (error) {
@@ -1018,9 +1019,9 @@ class CentralCommand {
   // TODO(eseidel): Unify this with buyShip behavior.
   Future<bool> buyShipIfPossible(
     Api api,
+    Database db,
     ShipyardPrices shipyardPrices,
     AgentCache agentCache,
-    TransactionLog transactionLog,
     Ship ship,
   ) async {
     if (isBehaviorDisabled(Behavior.buyShip) ||
@@ -1051,10 +1052,10 @@ class CentralCommand {
 
     final result = await doBuyShipJob(
       api,
+      db,
       _shipCache,
       shipyardPrices,
       agentCache,
-      transactionLog,
       ship,
       shipyardSymbol,
       shipType,

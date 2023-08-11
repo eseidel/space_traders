@@ -7,6 +7,7 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
+import 'package:db/db.dart';
 
 /// Job to buy a ship.
 // class ShipBuyJob {
@@ -126,10 +127,10 @@ CostedTrip? findBestShipyardToBuy(
 /// to try and share code.
 Future<PurchaseShip201ResponseData> doBuyShipJob(
   Api api,
+  Database db,
   ShipCache shipCache,
   ShipyardPrices shipyardPrices,
   AgentCache agentCache,
-  TransactionLog transactionLog,
   Ship ship,
   WaypointSymbol shipyardSymbol,
   ShipType shipType, {
@@ -178,9 +179,9 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
   // Do we need to catch exceptions about insufficient credits?
   final result = await purchaseShipAndLog(
     api,
+    db,
     shipCache,
     agentCache,
-    transactionLog,
     ship,
     shipyardSymbol,
     shipType,
@@ -191,6 +192,7 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
 /// Apply the buy ship behavior.
 Future<DateTime?> advanceBuyShip(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -308,9 +310,9 @@ Future<DateTime?> advanceBuyShip(
   // Do we need to catch exceptions about insufficient credits?
   final result = await purchaseShipAndLog(
     api,
+    db,
     caches.ships,
     caches.agent,
-    caches.transactions,
     ship,
     shipyard.waypointSymbol,
     shipType,

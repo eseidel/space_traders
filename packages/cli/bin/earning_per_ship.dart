@@ -6,6 +6,8 @@ import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
+import 'package:db/db.dart';
+import 'package:db/transaction.dart';
 import 'package:intl/intl.dart';
 
 class TransactionSummary {
@@ -60,8 +62,9 @@ Future<void> command(FileSystem fs, List<String> args) async {
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final allTransactions = loadAllTransactions(fs).toList();
-  final shipSymbols = allTransactions.map((e) => e.shipSymbol).toSet();
+  final db = await defaultDatabase();
+
+  final shipSymbols = (await uniqueShipSymbols(db)).map(ShipSymbol.fromString);
   final behaviorCache = BehaviorCache.load(fs);
 
   final longestHexNumber = shipSymbols.fold(
@@ -88,12 +91,13 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final behaviorCreditPerSecondTotals = <String, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = allTransactions.where(
-    (t) =>
-        t.timestamp.isAfter(startTime) &&
-        (t.accounting == AccountingType.goods ||
-            t.accounting == AccountingType.fuel),
-  );
+  final transactions = (await transactionsAfter(db, startTime))
+      .map(Transaction.fromRecord)
+      .where(
+        (t) =>
+            t.accounting == AccountingType.goods ||
+            t.accounting == AccountingType.fuel,
+      );
 
   for (final shipSymbol in shipSymbols) {
     final ship = shipCache.ship(shipSymbol);

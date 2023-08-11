@@ -12,6 +12,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
+import 'package:db/db.dart';
 
 export 'package:cli/net/direct.dart';
 
@@ -93,8 +94,8 @@ Stream<SellCargo201ResponseData> sellAllCargo(
 /// Logs each transaction or "No cargo to sell" if there is no cargo.
 Future<List<Transaction>> sellAllCargoAndLog(
   Api api,
+  Database db,
   MarketPrices marketPrices,
-  TransactionLog transactionLog,
   AgentCache agentCache,
   Market market,
   Ship ship,
@@ -117,7 +118,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
       agent.credits,
       accounting,
     );
-    transactionLog.log(transaction);
+    await db.insertTransaction(transaction.toRecord());
     transactions.add(transaction);
   }
   return transactions;
@@ -126,8 +127,8 @@ Future<List<Transaction>> sellAllCargoAndLog(
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
 Future<Transaction?> purchaseCargoAndLog(
   Api api,
+  Database db,
   MarketPrices marketPrices,
-  TransactionLog transactionLog,
   AgentCache agentCache,
   ShipCache shipCache,
   Ship ship,
@@ -158,7 +159,7 @@ Future<Transaction?> purchaseCargoAndLog(
       agent.credits,
       accounting,
     );
-    transactionLog.log(transaction);
+    await db.insertTransaction(transaction.toRecord());
     return transaction;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
@@ -175,9 +176,9 @@ Future<Transaction?> purchaseCargoAndLog(
 /// Purchase a ship and log the transaction.
 Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
+  Database db,
   ShipCache shipCache,
   AgentCache agentCache,
-  TransactionLog transactionLog,
   Ship ship,
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
@@ -191,7 +192,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
     agentCache.agent.credits,
     ship.shipSymbol,
   );
-  transactionLog.log(transaction);
+  await db.insertTransaction(transaction.toRecord());
   return result;
 }
 
@@ -237,8 +238,8 @@ bool _shouldRefuelAfterCheckingPrice(
 /// Refuel the ship if needed and log the transaction
 Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Api api,
+  Database db,
   MarketPrices marketPrices,
-  TransactionLog transactionLog,
   AgentCache agentCache,
   ShipCache shipCache,
   Market market,
@@ -263,22 +264,21 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   try {
     final data = await refuelShip(api, agentCache, shipCache, ship);
-    final transaction = data.transaction;
+    final marketTransaction = data.transaction;
     final agent = agentCache.agent;
     logMarketTransaction(
       ship,
       marketPrices,
       agent,
-      transaction,
+      marketTransaction,
       transactionEmoji: '⛽',
     );
-    transactionLog.log(
-      Transaction.fromMarketTransaction(
-        transaction,
-        agent.credits,
-        AccountingType.fuel,
-      ),
+    final transaction = Transaction.fromMarketTransaction(
+      marketTransaction,
+      agent.credits,
+      AccountingType.fuel,
     );
+    await db.insertTransaction(transaction.toRecord());
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
       shipInfo(ship, 'Resetting flight mode to cruise');
@@ -445,9 +445,9 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
 /// Install a mount on a ship from its cargo.
 Future<InstallMount201ResponseData> installMountAndLog(
   Api api,
+  Database db,
   AgentCache agentCache,
   ShipCache shipCache,
-  TransactionLog transactionLog,
   Ship ship,
   ShipMountSymbolEnum tradeSymbol,
 ) async {
@@ -466,16 +466,16 @@ Future<InstallMount201ResponseData> installMountAndLog(
     data.transaction,
     agentCache.agent.credits,
   );
-  transactionLog.log(transaction);
+  await db.insertTransaction(transaction.toRecord());
   return data;
 }
 
 /// Remove mount from a ship's mount list (but not cargo).
 Future<RemoveMount201ResponseData> removeMountAndLog(
   Api api,
+  Database db,
   AgentCache agentCache,
   ShipCache shipCache,
-  TransactionLog transactionLog,
   Ship ship,
   ShipMountSymbolEnum tradeSymbol,
 ) async {
@@ -494,7 +494,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     data.transaction,
     agentCache.agent.credits,
   );
-  transactionLog.log(transaction);
+  await db.insertTransaction(transaction.toRecord());
   return data;
 }
 

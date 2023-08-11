@@ -10,9 +10,11 @@ import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
+import 'package:db/db.dart';
 
 Future<DateTime?> _advanceIdle(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -28,6 +30,7 @@ Future<DateTime?> _advanceIdle(
 
 Future<DateTime?> Function(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -59,6 +62,7 @@ Future<DateTime?> Function(
 /// or null if can be advanced immediately.
 Future<DateTime?> advanceShipBehavior(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship, {
@@ -82,6 +86,7 @@ Future<DateTime?> advanceShipBehavior(
   try {
     final waitUntil = await behaviorFunction(
       api,
+      db,
       centralCommand,
       caches,
       state,

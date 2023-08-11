@@ -11,6 +11,7 @@ import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 
 // my evaluation logic actually just assumes I'll get 10 extracts from each
 // survey regardless of size - so room for improvement.... I just don't have the
@@ -198,6 +199,7 @@ class MineJob {
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -210,12 +212,12 @@ Future<DateTime?> advanceMiner(
   if (ship.availableSpace < maxExtractedUnits(ship)) {
     // Sell cargo and refuel if needed.
     final currentMarket =
-        await visitLocalMarket(api, caches, currentWaypoint, ship);
+        await visitLocalMarket(api, db, caches, currentWaypoint, ship);
     if (currentMarket != null) {
       await sellAllCargoAndLog(
         api,
+        db,
         caches.marketPrices,
-        caches.transactions,
         caches.agent,
         currentMarket,
         ship,

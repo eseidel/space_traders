@@ -11,6 +11,7 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
+import 'package:db/db.dart';
 
 const _maxJumps = 10;
 // TODO(eseidel): Make maxWaypoints bigger as routing gets faster.
@@ -20,8 +21,8 @@ const _maxWaypoints = 100;
 /// Public to allow sharing with contract trader (for now).
 Future<Transaction?> purchaseTradeGoodIfPossible(
   Api api,
+  Database db,
   MarketPrices marketPrices,
-  TransactionLog transactionLog,
   AgentCache agentCache,
   ShipCache shipCache,
   Ship ship,
@@ -86,8 +87,8 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
 
   final result = await purchaseCargoAndLog(
     api,
+    db,
     marketPrices,
-    transactionLog,
     agentCache,
     shipCache,
     ship,
@@ -124,6 +125,7 @@ int unitsToPurchase(
 
 Future<DateTime?> _handleAtSourceWithDeal(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
@@ -141,8 +143,8 @@ Future<DateTime?> _handleAtSourceWithDeal(
   if (units > 0) {
     final transaction = await purchaseTradeGoodIfPossible(
       api,
+      db,
       caches.marketPrices,
-      caches.transactions,
       caches.agent,
       caches.ships,
       ship,
@@ -229,6 +231,7 @@ void _logCompletedDeal(Ship ship, CostedDeal completedDeal) {
 
 Future<DateTime?> _handleArbitrageDealAtDestination(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
@@ -238,8 +241,8 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   // We're at the destination, sell and clear the deal.
   final transactions = await sellAllCargoAndLog(
     api,
+    db,
     caches.marketPrices,
-    caches.transactions,
     caches.agent,
     currentMarket,
     ship,
@@ -373,6 +376,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
 
 Future<DateTime?> _handleAtDestinationWithDeal(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
@@ -405,6 +409,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
   }
   return _handleArbitrageDealAtDestination(
     api,
+    db,
     centralCommand,
     caches,
     ship,
@@ -415,6 +420,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
 
 Future<DateTime?> _handleDeal(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   CostedDeal costedDeal,
@@ -430,6 +436,7 @@ Future<DateTime?> _handleDeal(
     }
     return _handleAtSourceWithDeal(
       api,
+      db,
       centralCommand,
       caches,
       ship,
@@ -446,6 +453,7 @@ Future<DateTime?> _handleDeal(
     }
     return _handleAtDestinationWithDeal(
       api,
+      db,
       centralCommand,
       caches,
       ship,
@@ -560,6 +568,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
 /// Sell any cargo we don't need.
 Future<JobResult> handleUnwantedCargoIfNeeded(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
@@ -584,8 +593,8 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   if (currentMarket != null) {
     await sellAllCargoAndLog(
       api,
+      db,
       caches.marketPrices,
-      caches.transactions,
       caches.agent,
       currentMarket,
       ship,
@@ -631,6 +640,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
 /// One loop of the trading logic
 Future<DateTime?> advanceTrader(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -642,6 +652,7 @@ Future<DateTime?> advanceTrader(
   // If we're currently at a market, record the prices and refuel.
   final currentMarket = await visitLocalMarket(
     api,
+    db,
     caches,
     currentWaypoint,
     ship,
@@ -655,8 +666,8 @@ Future<DateTime?> advanceTrader(
   );
   await centralCommand.visitLocalShipyard(
     api,
+    db,
     caches.shipyardPrices,
-    caches.transactions,
     caches.agent,
     currentWaypoint,
     ship,
@@ -678,6 +689,7 @@ Future<DateTime?> advanceTrader(
   // try to sell it.
   final result = await handleUnwantedCargoIfNeeded(
     api,
+    db,
     centralCommand,
     caches,
     ship,
@@ -692,6 +704,7 @@ Future<DateTime?> advanceTrader(
   if (pastDeal != null) {
     final waitUntil = await _handleDeal(
       api,
+      db,
       centralCommand,
       caches,
       pastDeal,
@@ -750,6 +763,7 @@ Future<DateTime?> advanceTrader(
   centralCommand.setBehavior(ship.shipSymbol, state);
   final waitUntil = await _handleDeal(
     api,
+    db,
     centralCommand,
     caches,
     newDeal,

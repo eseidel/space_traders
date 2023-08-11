@@ -2,14 +2,14 @@ import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 import 'package:cli/net/rate_limit.dart';
 import 'package:cli/printing.dart';
+import 'package:db/db.dart';
 import 'package:http/http.dart';
-import 'package:postgres/postgres.dart';
 
 class NetExecutor {
   NetExecutor(
-    PostgreSQLConnection connection, {
+    Database db, {
     this.targetRequestsPerSecond = 3,
-  }) : queue = NetQueue(connection, QueueRole.responder);
+  }) : queue = NetQueue(db, QueueRole.responder);
 
   final int targetRequestsPerSecond;
   final Client _client = Client();
@@ -123,7 +123,7 @@ class NetExecutor {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final connection = await defaultDatabase();
-  await NetExecutor(connection!).run();
+  await NetExecutor(connection).run();
 }
 
 void main(List<String> args) async {

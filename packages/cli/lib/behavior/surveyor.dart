@@ -3,10 +3,12 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
+import 'package:db/db.dart';
 
 /// For dedicated survey ships.
 Future<DateTime?> advanceSurveyor(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,

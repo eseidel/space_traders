@@ -1,5 +1,7 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:db/db.dart';
+import 'package:db/transaction.dart';
 
 void printDiffs(List<int> data) {
   final diffs = <int>[];
@@ -10,12 +12,13 @@ void printDiffs(List<int> data) {
 }
 
 Future<void> command(FileSystem fs, List<String> args) async {
+  final db = await defaultDatabase();
+  final transactions = (await allTransactions(db)).map(Transaction.fromRecord);
   // final marketPrices = MarketPrices.load(fs);
-  final allTransactions = loadAllTransactions(fs);
   // Walk through all transactions, finding repeats.
   final transactionSets = <List<Transaction>>[];
   var repeats = <Transaction>[];
-  for (final transaction in allTransactions) {
+  for (final transaction in transactions) {
     // If the transaction has the same market and tradeSymbol as the previous
     // one, then it's a repeat, and should be collected together into a group
     // of repeats.

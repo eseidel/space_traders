@@ -4,6 +4,7 @@ import 'package:cli/behavior/change_mounts.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:more/collection.dart';
 import 'package:test/test.dart';
@@ -17,6 +18,8 @@ class _MockBehaviorState extends Mock implements BehaviorState {}
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
+
+class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
@@ -41,6 +44,7 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 void main() {
   test('advanceChangeMounts smoke test', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final agentCache = _MockAgentCache();
@@ -121,6 +125,7 @@ void main() {
       logger,
       () => advanceChangeMounts(
         api,
+        db,
         centralCommand,
         caches,
         state,

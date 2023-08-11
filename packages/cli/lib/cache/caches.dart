@@ -11,7 +11,6 @@ import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
 import 'package:cli/cache/surveys.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/transactions.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
@@ -46,7 +45,6 @@ class Caches {
     required this.surveys,
     required this.systems,
     required this.systemConnectivity,
-    required this.transactions,
     required this.extractions,
     required this.waypoints,
     required this.markets,
@@ -80,9 +78,6 @@ class Caches {
 
   /// Cache of system reachability.
   final SystemConnectivity systemConnectivity;
-
-  /// The transaction log.
-  final TransactionLog transactions;
 
   /// The extraction log.
   final ExtractionLog extractions;
@@ -118,7 +113,6 @@ class Caches {
     final shipyard = ShipyardPrices.load(fs);
     final surveys = await SurveyData.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
-    final transactions = TransactionLog.load(fs);
     final extractions = ExtractionLog.load(fs);
     final charting = ChartingCache.load(fs);
     final waypoints = WaypointCache(api, systems, charting);
@@ -151,7 +145,6 @@ class Caches {
       surveys: surveys,
       systems: systems,
       systemConnectivity: systemConnectivity,
-      transactions: transactions,
       extractions: extractions,
       waypoints: waypoints,
       markets: markets,

@@ -6,6 +6,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 import 'package:more/collection.dart';
 
 ShipMountSymbolEnum? _pickMountFromAvailable(
@@ -30,6 +31,7 @@ Iterable<ShipCargoItem> mountsInCargo(Ship ship) sync* {
 /// Change mounts on a ship.
 Future<DateTime?> advanceChangeMounts(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   BehaviorState state,
@@ -96,9 +98,9 @@ Future<DateTime?> advanceChangeMounts(
       for (final mount in toRemove) {
         await removeMountAndLog(
           api,
+          db,
           caches.agent,
           caches.ships,
-          caches.transactions,
           ship,
           mount,
         );
@@ -109,9 +111,9 @@ Future<DateTime?> advanceChangeMounts(
     // Mount the new mount.
     await installMountAndLog(
       api,
+      db,
       caches.agent,
       caches.ships,
-      caches.transactions,
       ship,
       toMount,
     );
