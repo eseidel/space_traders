@@ -75,7 +75,7 @@ class NetExecutor {
       if (nextRequestTime != null) {
         final waitTime = nextRequestTime.difference(DateTime.timestamp());
         if (waitTime > Duration.zero) {
-          logger.detail('Waiting until $nextRequestTime');
+          // logger.detail('Waiting until $nextRequestTime');
           await Future<void>.delayed(waitTime);
         }
       }
@@ -86,7 +86,6 @@ class NetExecutor {
         await queue.waitForRequest();
         continue;
       }
-      logger.info('priority=${request.priority}');
       final before = DateTime.timestamp();
       final path = _removeExpectedPrefix(request.request.url);
       nextRequestTime = DateTime.timestamp().add(minWaitTime);
@@ -94,14 +93,14 @@ class NetExecutor {
       stats.record(response);
       final duration = DateTime.timestamp().difference(before);
       logger.detail(
-        '${approximateDuration(duration)} ${response.statusCode} '
-        '${request.request.method.padRight(5)} $path',
+        '${approximateDuration(duration)} ${request.priority} '
+        '${response.statusCode} ${request.request.method.padRight(5)} $path',
       );
       if (response.statusCode == 429) {
         final resetTime = _parseResetTime(response);
         if (resetTime != null) {
-          logger.warn('Rate limited, waiting until $resetTime');
           final duration = resetTime.difference(DateTime.timestamp());
+          logger.warn('Rate limited, waiting ${approximateDuration(duration)}');
           await Future<void>.delayed(duration);
         } else {
           logger.err(

@@ -20,12 +20,12 @@ Future<R> runOffline<R>(
       negatable: false,
     );
   final results = parser.parse(args);
-  if (results['verbose'] as bool) {
-    setVerboseLogging();
-  }
   const fs = LocalFileSystem();
   return runScoped(
     () async {
+      if (results['verbose'] as bool) {
+        setVerboseLogging();
+      }
       return fn(fs, results.rest);
     },
     values: {loggerRef},
