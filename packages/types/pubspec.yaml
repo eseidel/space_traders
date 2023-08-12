@@ -1,0 +1,21 @@
+name: types
+description: Types layer.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.6
+
+dependencies:
+  # Must match Flutter verion dependencies.
+  collection: ^1.17.1
+  intl: ^0.17.0
+  # We only want the model types.
+  meta: ^1.9.1
+  openapi:
+    path: ../openapi
+
+dev_dependencies:
+  mocktail: ^1.0.0
+  test: ^1.19.2
+  very_good_analysis: ^5.0.0

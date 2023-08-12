@@ -1,6 +1,6 @@
 name: db
-description: Database that supports cli
-version: 0.1.0+1
+description: Database layer
+version: 0.1.0
 publish_to: none
 
 environment:
@@ -9,6 +9,8 @@ environment:
 dependencies: 
   meta: ^1.9.1
   postgres: ^2.6.2
+  types:
+    path: ../types
 
 dev_dependencies:
   mocktail: ^1.0.0

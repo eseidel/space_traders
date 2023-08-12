@@ -97,8 +97,8 @@ class _ValuedSurvey {
 
 /// Finds a recent survey
 Future<Survey?> surveyWorthMining(
-  MarketPrices marketPrices,
-  SurveyData surveyData, {
+  Database db,
+  MarketPrices marketPrices, {
   required WaypointSymbol surveyWaypointSymbol,
   required WaypointSymbol nearbyMarketSymbol,
   int minimumSurveys = 10,
@@ -106,7 +106,7 @@ Future<Survey?> surveyWorthMining(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   // Get N recent surveys for this waypoint, including expired and exhausted.
-  final recentSurveys = surveyData.recentSurveysAtWaypoint(
+  final recentSurveys = await db.recentSurveysAtWaypoint(
     surveyWaypointSymbol,
     count: 100,
   );
@@ -119,17 +119,21 @@ Future<Survey?> surveyWorthMining(
   // Use one minute from now as our expiration time to avoid surveys
   // expiring between when we compute the best survey and when we mine.
   final oneMinuteFromNow = getNow().add(const Duration(minutes: 1));
-  final valuedSurveys = recentSurveys.map((s) {
-    return _ValuedSurvey(
-      expectedValue: expectedValueFromSurvey(
-        marketPrices,
-        s.survey,
-        marketSymbol: nearbyMarketSymbol,
-      ),
-      survey: s.survey,
-      isActive: !s.exhausted && s.survey.expiration.isAfter(oneMinuteFromNow),
-    );
-  }).sortedBy<num>((s) => s.expectedValue);
+  final valuedSurveys = recentSurveys
+      .map((s) {
+        return _ValuedSurvey(
+          expectedValue: expectedValueFromSurvey(
+            marketPrices,
+            s.survey,
+            marketSymbol: nearbyMarketSymbol,
+          ),
+          survey: s.survey,
+          isActive:
+              !s.exhausted && s.survey.expiration.isAfter(oneMinuteFromNow),
+        );
+      })
+      .toList()
+      .sortedBy<num>((s) => s.expectedValue);
   // Find the index at the desired percentile threshold.
   final percentileIndex = (valuedSurveys.length * percentileThreshold).floor();
   // If we have active survey which is above the threshold, return it.
@@ -295,8 +299,8 @@ Future<DateTime?> advanceMiner(
 
   // See if we have a good survey to mine.
   final maybeSurvey = await surveyWorthMining(
+    db,
     caches.marketPrices,
-    caches.surveys,
     surveyWaypointSymbol: currentWaypoint.waypointSymbol,
     nearbyMarketSymbol: marketSymbol,
     minimumSurveys: centralCommand.minimumSurveys,
@@ -304,8 +308,7 @@ Future<DateTime?> advanceMiner(
   );
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
-    final response =
-        await surveyAndLog(api, caches.surveys, ship, getNow: getNow);
+    final response = await surveyAndLog(api, db, ship, getNow: getNow);
     // Count completion of survey as a success, otherwise we could end up
     // surveying for a long time before checking other behaviors.
     // We don't need to do this for miners since they don't change as often.
@@ -351,7 +354,7 @@ Future<DateTime?> advanceMiner(
     if (isSurveyExhaustedException(e)) {
       // If the survey is exhausted, record it as such and try again.
       shipDetail(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
-      await caches.surveys.markSurveyExhausted(maybeSurvey);
+      await db.markSurveyExhausted(maybeSurvey);
       return null;
     }
     // This should have been caught before using the survey, but we'll
@@ -360,7 +363,7 @@ Future<DateTime?> advanceMiner(
       shipWarn(ship, 'Survey ${maybeSurvey!.signature} expired.');
       // It's not technically exhausted, but that's our easy way to disable
       // the survey.  We use a warning to catch if we're doing this often.
-      await caches.surveys.markSurveyExhausted(maybeSurvey);
+      await db.markSurveyExhausted(maybeSurvey);
       return null;
     }
     rethrow;

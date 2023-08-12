@@ -637,3 +637,8 @@ Invalid argument (marketSymbol): ESEIDEL-6F is not at X1-YA22-87615D, X1-YA22-92
 [WARN] 🛸#1  Can not buy SHIP_ORE_HOUND at X1-YA22-18767C, credits 318,996c < 1.05 * price = 1,334,568c. Disabling Behavior.buyShip for 10m.
 
 ## Teach late-start clients how to purchase traders instead of miners?
+
+
+### Types
+Move Transaction and other custom model objects down to that layer.
+Remove api.dart re-export of types.

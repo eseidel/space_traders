@@ -6,7 +6,6 @@ import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
-import 'package:cli/cache/surveys.dart';
 import 'package:cli/cache/transactions.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';
@@ -536,10 +535,27 @@ Future<Jettison200ResponseData> transferCargoAndLog(
   return data;
 }
 
+/// Record the given surveys.
+void recordSurveys(
+  Database db,
+  List<Survey> surveys, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
+  final now = getNow();
+  for (final survey in surveys) {
+    final historicalSurvey = HistoricalSurvey(
+      survey: survey,
+      timestamp: now,
+      exhausted: false,
+    );
+    db.insertSurvey(historicalSurvey);
+  }
+}
+
 /// Record the survey and log.
 Future<CreateSurvey201ResponseData> surveyAndLog(
   Api api,
-  SurveyData surveyData,
+  Database db,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
@@ -547,6 +563,6 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
   final response = outer!.data;
   final count = response.surveys.length;
   shipInfo(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
-  surveyData.recordSurveys(response.surveys, getNow: getNow);
+  recordSurveys(db, response.surveys, getNow: getNow);
   return response;
 }

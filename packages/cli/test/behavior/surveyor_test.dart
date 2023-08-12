@@ -30,8 +30,6 @@ class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSurveyData extends Mock implements SurveyData {}
-
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
@@ -48,7 +46,6 @@ void main() {
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
-    final surveyData = _MockSurveyData();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = _MockCaches();
@@ -57,7 +54,6 @@ void main() {
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
-    when(() => caches.surveys).thenReturn(surveyData);
 
     final now = DateTime(2021);
     DateTime getNow() => now;

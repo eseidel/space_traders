@@ -1,9 +1,10 @@
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:db/db.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
-  final surveyData = await SurveyData.load(fs);
+  final db = await defaultDatabase();
   final marketPrices = MarketPrices.load(fs);
   final agentCache = AgentCache.loadCached(fs)!;
   final systemsCache = await SystemsCache.load(fs);
@@ -17,8 +18,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
       systemWaypoints.firstWhere((w) => w.canBeMined).waypointSymbol;
 
   final survey = await surveyWorthMining(
+    db,
     marketPrices,
-    surveyData,
     surveyWaypointSymbol: mineSymbol,
     nearbyMarketSymbol: mineSymbol,
   );

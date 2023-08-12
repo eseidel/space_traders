@@ -5,13 +5,12 @@ import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/extraction_log.dart';
 import 'package:cli/cache/faction_cache.dart';
-import 'package:cli/nav/jump_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
-import 'package:cli/cache/surveys.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/nav/jump_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/file.dart';
@@ -24,14 +23,13 @@ export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
 export 'package:cli/cache/extraction_log.dart';
 export 'package:cli/cache/faction_cache.dart';
-export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
-export 'package:cli/cache/surveys.dart';
 export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/transactions.dart';
 export 'package:cli/cache/waypoint_cache.dart';
+export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/system_connectivity.dart';
 export 'package:file/file.dart';
 
@@ -42,7 +40,6 @@ class Caches {
     required this.marketPrices,
     required this.ships,
     required this.shipyardPrices,
-    required this.surveys,
     required this.systems,
     required this.systemConnectivity,
     required this.extractions,
@@ -69,9 +66,6 @@ class Caches {
 
   /// The historical shipyard prices.
   final ShipyardPrices shipyardPrices;
-
-  /// The survey data.
-  final SurveyData surveys;
 
   /// The cache of systems.
   final SystemsCache systems;
@@ -111,7 +105,6 @@ class Caches {
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
     final shipyard = ShipyardPrices.load(fs);
-    final surveys = await SurveyData.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
     final extractions = ExtractionLog.load(fs);
     final charting = ChartingCache.load(fs);
@@ -142,7 +135,6 @@ class Caches {
       marketPrices: prices,
       ships: ships,
       shipyardPrices: shipyard,
-      surveys: surveys,
       systems: systems,
       systemConnectivity: systemConnectivity,
       extractions: extractions,

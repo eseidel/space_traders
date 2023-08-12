@@ -1,5 +1,7 @@
+import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
 import 'package:postgres/postgres.dart';
+import 'package:types/types.dart';
 
 /// Connect to the default local database.
 /// Logs and returns null on failure.
@@ -44,5 +46,42 @@ class Database {
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
     await connection.query('LISTEN $channel');
+  }
+
+  /// Insert a survey into the database.
+  Future<void> insertSurvey(HistoricalSurvey survey) async {
+    final query = insertSurveyQuery(survey);
+    await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+  }
+
+  /// Return the most recent surveys.
+  Future<Iterable<HistoricalSurvey>> recentSurveysAtWaypoint(
+    WaypointSymbol waypointSymbol, {
+    required int count,
+  }) async {
+    final query = recentSurveysAtWaypointQuery(
+      waypointSymbol: waypointSymbol,
+      count: count,
+    );
+    final result = await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+    return result.map<HistoricalSurvey>(surveyFromResultRow);
+  }
+
+  /// Mark the given survey as exhausted.
+  Future<void> markSurveyExhausted(Survey survey) async {
+    final query = markSurveyExhaustedQuery(survey);
+    final result = await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+    if (result.affectedRowCount != 1) {
+      throw ArgumentError('Survey not found: $survey');
+    }
   }
 }

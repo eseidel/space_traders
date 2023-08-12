@@ -35,8 +35,6 @@ class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSurveyData extends Mock implements SurveyData {}
-
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
@@ -45,18 +43,14 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
+    final db = _MockDatabase();
     final marketPrices = _MockMarketPrices();
-    final surveyData = _MockSurveyData();
     final symbol = WaypointSymbol.fromString('S-E-A');
-    when(
-      () => surveyData.recentSurveysAtWaypoint(
-        symbol,
-        count: any(named: 'count'),
-      ),
-    ).thenReturn([]);
+    when(() => db.recentSurveysAtWaypoint(symbol, count: 100))
+        .thenAnswer((_) => Future.value([]));
     final maybeSurvey = await surveyWorthMining(
+      db,
       marketPrices,
-      surveyData,
       surveyWaypointSymbol: symbol,
       nearbyMarketSymbol: symbol,
     );
@@ -64,8 +58,8 @@ void main() {
   });
 
   test('surveyWorthMining', () async {
+    final db = _MockDatabase();
     final marketPrices = _MockMarketPrices();
-    final surveyData = _MockSurveyData();
     final now = DateTime(2021);
     DateTime getNow() => now;
     final oneHourFromNow = now.add(const Duration(hours: 1));
@@ -88,12 +82,8 @@ void main() {
           ),
         )
     ];
-    when(
-      () => surveyData.recentSurveysAtWaypoint(
-        waypointSymbol,
-        count: any(named: 'count'),
-      ),
-    ).thenReturn(surveys);
+    when(() => db.recentSurveysAtWaypoint(waypointSymbol, count: 100))
+        .thenAnswer((_) => Future.value(surveys));
     when(
       () => marketPrices.recentSellPrice(
         TradeSymbol.DIAMONDS,
@@ -107,8 +97,8 @@ void main() {
       ),
     ).thenReturn(10);
     final maybeSurvey = await surveyWorthMining(
+      db,
       marketPrices,
-      surveyData,
       surveyWaypointSymbol: waypointSymbol,
       nearbyMarketSymbol: waypointSymbol,
       getNow: getNow,
@@ -186,7 +176,6 @@ void main() {
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
     final marketCache = _MockMarketCache();
-    final surveyData = _MockSurveyData();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = _MockCaches();
@@ -195,7 +184,6 @@ void main() {
     when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
-    when(() => caches.surveys).thenReturn(surveyData);
     final extractionLog = _MockExtractionLog();
     when(() => caches.extractions).thenReturn(extractionLog);
 
@@ -233,8 +221,6 @@ void main() {
 
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
-    when(() => surveyData.recentSurveysAtWaypoint(symbol, count: 100))
-        .thenReturn([]);
 
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -264,6 +250,8 @@ void main() {
         ),
       ),
     );
+    when(() => db.recentSurveysAtWaypoint(symbol, count: 100))
+        .thenAnswer((_) => Future.value([]));
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

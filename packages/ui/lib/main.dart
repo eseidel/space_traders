@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cli/api.dart';
 import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
@@ -9,6 +8,7 @@ import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped/scoped.dart';
+import 'package:types/types.dart';
 import 'package:ui/route.dart';
 
 const fs = LocalFileSystem();

@@ -30,6 +30,8 @@ dependencies:
       path: packages/scoped
   sembast: ^3.4.4
   stats: ^2.0.0
+  types:
+    path: ../types
 
 dev_dependencies:
   mocktail: ^0.3.0
