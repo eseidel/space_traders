@@ -32,14 +32,16 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
     await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.BURN);
   }
   try {
-    return await navigateShip(api, shipCache, ship, waypointSymbol);
+    final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
+    return waitUntil;
   } on ApiException catch (e) {
     if (!isInfuficientFuelException(e)) {
       rethrow;
     }
     shipWarn(ship, 'Insufficient fuel, drifting to $waypointSymbol');
     await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.DRIFT);
-    return navigateShip(api, shipCache, ship, waypointSymbol);
+    final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
+    return waitUntil;
   }
 }
 
