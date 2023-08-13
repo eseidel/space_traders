@@ -2,6 +2,7 @@ import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final db = await defaultDatabase();

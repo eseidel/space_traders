@@ -1,6 +1,6 @@
-import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
+import 'package:types/types.dart';
 
 /// A ship that is waiting to be processed.
 class ShipWaiterEntry {

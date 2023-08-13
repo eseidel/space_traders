@@ -6,6 +6,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
+import 'package:types/types.dart';
 
 /// Begins a new nagivation action for [ship] to [destinationSymbol].
 /// Returns the wait time if the ship should wait or null if no wait is needed.

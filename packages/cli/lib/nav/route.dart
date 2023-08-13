@@ -5,6 +5,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/system_pathing.dart';
 import 'package:cli/printing.dart';
 import 'package:meta/meta.dart';
+import 'package:types/types.dart';
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 /// Returns the fuel used for with a flight mode and the given distance.

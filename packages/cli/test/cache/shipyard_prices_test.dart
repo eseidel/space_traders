@@ -1,7 +1,7 @@
-import 'package:cli/api.dart';
 import 'package:cli/cache/shipyard_prices.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('ShipyardPrice JSON roundtrip', () {

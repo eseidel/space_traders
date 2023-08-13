@@ -1,7 +1,7 @@
-import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/json_store.dart';
 import 'package:file/file.dart';
+import 'package:types/types.dart';
 
 typedef _Record = Map<ShipSymbol, BehaviorState>;
 

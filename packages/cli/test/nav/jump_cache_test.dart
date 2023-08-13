@@ -1,6 +1,6 @@
-import 'package:cli/api.dart';
 import 'package:cli/nav/jump_cache.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('JumpCache sub-path', () async {

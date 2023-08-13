@@ -4,6 +4,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 /// For dedicated survey ships.
 Future<DateTime?> advanceSurveyor(

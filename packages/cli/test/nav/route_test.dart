@@ -1,8 +1,8 @@
-import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:file/local.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('fuelUsedWithinSystem', () {

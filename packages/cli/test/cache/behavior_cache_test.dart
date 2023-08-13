@@ -1,10 +1,10 @@
-import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('BehaviorCache roundtrip', () async {

@@ -1,6 +1,7 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/route.dart';
 import 'package:collection/collection.dart';
+import 'package:types/types.dart';
 
 Iterable<System> _neighborsFor(
   SystemsCache systemsCache,

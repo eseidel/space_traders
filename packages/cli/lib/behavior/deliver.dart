@@ -11,6 +11,8 @@ import 'package:cli/trading.dart';
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:more/collection.dart';
+import 'package:types/types.dart';
+
 // Go buy and deliver.
 // Used for modules.
 

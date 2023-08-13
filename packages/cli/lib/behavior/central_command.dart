@@ -15,6 +15,7 @@ import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:more/collection.dart';
+import 'package:types/types.dart';
 
 // Central command sets behavior for all ships.
 // Groups ships into squads.

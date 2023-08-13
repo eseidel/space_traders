@@ -6,6 +6,7 @@ import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
+import 'package:types/types.dart';
 
 /// default max age for "recent" prices is 3 days
 const defaultMaxAge = Duration(days: 3);

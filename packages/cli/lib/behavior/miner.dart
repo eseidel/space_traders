@@ -12,6 +12,7 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 // my evaluation logic actually just assumes I'll get 10 extracts from each
 // survey regardless of size - so room for improvement.... I just don't have the

@@ -2,6 +2,7 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
+import 'package:types/types.dart';
 
 // This is for direct non-logging actions
 // Functions in this file are responsible for unwrapping data from inside

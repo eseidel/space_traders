@@ -4,6 +4,7 @@ import 'package:cli/cache/response_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:file/file.dart';
+import 'package:types/types.dart';
 
 /// In-memory cache of ships.
 // Should this just be called Fleet?

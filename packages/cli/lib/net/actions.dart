@@ -11,6 +11,7 @@ import 'package:cli/net/direct.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 export 'package:cli/net/direct.dart';
 

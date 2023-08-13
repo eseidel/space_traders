@@ -8,6 +8,7 @@ import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:more/collection.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockAgentCache extends Mock implements AgentCache {}
 

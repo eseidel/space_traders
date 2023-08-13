@@ -1,4 +1,3 @@
-import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
@@ -8,6 +7,7 @@ import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:db/transaction.dart';
 import 'package:intl/intl.dart';
+import 'package:types/types.dart';
 
 class TransactionSummary {
   TransactionSummary(Iterable<Transaction> transactions)

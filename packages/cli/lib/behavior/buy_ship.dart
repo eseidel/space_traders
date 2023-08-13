@@ -8,6 +8,7 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 /// Job to buy a ship.
 // class ShipBuyJob {

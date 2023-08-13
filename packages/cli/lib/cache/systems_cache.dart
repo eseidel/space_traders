@@ -6,6 +6,7 @@ import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
+import 'package:types/types.dart';
 
 /// A cache of the systems in the game.
 class SystemsCache extends JsonListStore<System> {

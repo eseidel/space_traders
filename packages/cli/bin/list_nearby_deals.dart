@@ -6,6 +6,7 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
+import 'package:types/types.dart';
 
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()

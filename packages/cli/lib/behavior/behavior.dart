@@ -1,8 +1,8 @@
-import 'package:cli/api.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:meta/meta.dart';
+import 'package:types/types.dart';
 
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {

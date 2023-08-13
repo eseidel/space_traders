@@ -1,9 +1,9 @@
-import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/system_pathing.dart';
 import 'package:cli/nav/waypoint_pathing.dart';
 import 'package:collection/collection.dart';
+import 'package:types/types.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);

@@ -1,8 +1,8 @@
-import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 

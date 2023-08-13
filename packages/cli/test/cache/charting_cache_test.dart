@@ -1,9 +1,9 @@
-import 'package:cli/api.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/waypoint_traits.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 

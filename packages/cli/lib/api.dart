@@ -3,8 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:openapi/api.dart';
 
 export 'package:openapi/api.dart';
-// remove this.
-export 'package:types/types.dart';
 
 /// The default http get function.
 const defaultHttpGet = http.get;

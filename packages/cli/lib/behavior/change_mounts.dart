@@ -8,6 +8,7 @@ import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:more/collection.dart';
+import 'package:types/types.dart';
 
 ShipMountSymbolEnum? _pickMountFromAvailable(
   Multiset<ShipMountSymbolEnum> available,

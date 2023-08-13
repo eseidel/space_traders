@@ -7,6 +7,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/third_party/compare.dart';
 import 'package:file/file.dart';
+import 'package:types/types.dart';
 
 bool _agentsMatch(Agent actual, Agent expected) {
   final diff = findDifferenceBetweenStrings(

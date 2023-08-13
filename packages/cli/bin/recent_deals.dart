@@ -4,6 +4,7 @@ import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:db/transaction.dart';
+import 'package:types/types.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);

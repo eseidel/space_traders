@@ -11,6 +11,7 @@ import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
+import 'package:types/types.dart';
 
 void printRequestStats(RequestCounts requestCounts) {
   final counts = requestCounts.counts;

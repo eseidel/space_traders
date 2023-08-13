@@ -12,6 +12,7 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 const _maxJumps = 10;
 // TODO(eseidel): Make maxWaypoints bigger as routing gets faster.

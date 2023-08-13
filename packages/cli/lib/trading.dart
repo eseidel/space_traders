@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -10,6 +9,7 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
+import 'package:types/types.dart';
 
 /// A delivery for a contract.
 @immutable

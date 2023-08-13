@@ -2,6 +2,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_store.dart';
 import 'package:cli/cache/waypoint_traits.dart';
 import 'package:meta/meta.dart';
+import 'package:types/types.dart';
 
 /// A charted value.
 @immutable

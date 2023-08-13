@@ -1,4 +1,4 @@
-import 'package:cli/api.dart';
+import 'package:types/types.dart';
 
 /// A route between two systems.
 class JumpPlan {

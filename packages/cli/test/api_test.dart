@@ -1,5 +1,5 @@
-import 'package:cli/api.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('SystemWaypoint.isType', () {

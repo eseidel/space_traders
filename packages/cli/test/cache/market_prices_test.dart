@@ -1,9 +1,9 @@
-import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockLogger extends Mock implements Logger {}
 

@@ -6,6 +6,7 @@ import 'package:cli/net/actions.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockAgent extends Mock implements Agent {}
 

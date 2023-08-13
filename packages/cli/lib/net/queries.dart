@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:types/types.dart';
 
 /// Fetches all pages from the given fetchPage function.
 Stream<T> fetchAllPages<T, A>(

@@ -8,6 +8,7 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 bool _isMissingChartOrRecentPriceData(
   MarketPrices marketPrices,

@@ -1,4 +1,3 @@
-import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/agent_cache.dart';
@@ -11,6 +10,7 @@ import 'package:cli/trading.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockAgent extends Mock implements Agent {}
 

@@ -3,6 +3,7 @@ import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
+import 'package:types/types.dart';
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.
 Stream<Waypoint> _allWaypointsInSystem(Api api, SystemSymbol system) {

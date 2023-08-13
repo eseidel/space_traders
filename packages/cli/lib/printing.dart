@@ -5,6 +5,7 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:intl/intl.dart';
+import 'package:types/types.dart';
 
 /// Return a string describing the given [waypoint].
 String waypointDescription(Waypoint waypoint) {
