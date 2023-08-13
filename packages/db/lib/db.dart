@@ -13,7 +13,6 @@ Future<Database> defaultDatabase() async {
     'spacetraders',
     username: 'postgres',
     password: 'password',
-    timeoutInSeconds: 1,
   );
   await connection.open();
   return Database(connection);
