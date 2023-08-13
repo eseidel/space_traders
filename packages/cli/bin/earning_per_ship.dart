@@ -3,7 +3,6 @@ import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
-import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
@@ -91,13 +90,11 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final behaviorCreditPerSecondTotals = <String, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = (await transactionsAfter(db, startTime))
-      .map(Transaction.fromRecord)
-      .where(
-        (t) =>
-            t.accounting == AccountingType.goods ||
-            t.accounting == AccountingType.fuel,
-      );
+  final transactions = (await transactionsAfter(db, startTime)).where(
+    (t) =>
+        t.accounting == AccountingType.goods ||
+        t.accounting == AccountingType.fuel,
+  );
 
   for (final shipSymbol in shipSymbols) {
     final ship = shipCache.ship(shipSymbol);

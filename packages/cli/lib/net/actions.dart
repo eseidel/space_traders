@@ -6,7 +6,6 @@ import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
-import 'package:cli/cache/transactions.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';
 import 'package:cli/net/exceptions.dart';
@@ -119,7 +118,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
       agent.credits,
       accounting,
     );
-    await db.insertTransaction(transaction.toRecord());
+    await db.insertTransaction(transaction);
     transactions.add(transaction);
   }
   return transactions;
@@ -160,7 +159,7 @@ Future<Transaction?> purchaseCargoAndLog(
       agent.credits,
       accounting,
     );
-    await db.insertTransaction(transaction.toRecord());
+    await db.insertTransaction(transaction);
     return transaction;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
@@ -193,7 +192,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
     agentCache.agent.credits,
     ship.shipSymbol,
   );
-  await db.insertTransaction(transaction.toRecord());
+  await db.insertTransaction(transaction);
   return result;
 }
 
@@ -279,7 +278,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
       agent.credits,
       AccountingType.fuel,
     );
-    await db.insertTransaction(transaction.toRecord());
+    await db.insertTransaction(transaction);
     // Reset flight mode on refueling.
     if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
       shipInfo(ship, 'Resetting flight mode to cruise');
@@ -467,7 +466,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
     data.transaction,
     agentCache.agent.credits,
   );
-  await db.insertTransaction(transaction.toRecord());
+  await db.insertTransaction(transaction);
   return data;
 }
 
@@ -495,7 +494,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     data.transaction,
     agentCache.agent.credits,
   );
-  await db.insertTransaction(transaction.toRecord());
+  await db.insertTransaction(transaction);
   return data;
 }
 

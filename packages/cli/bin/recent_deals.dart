@@ -107,7 +107,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final openDeals = <ShipSymbol, List<Transaction>>{};
   final ignoredTransactions = <Transaction>[];
   final supportedTypes = {AccountingType.fuel, AccountingType.goods};
-  final transactions = (await allTransactions(db)).map(Transaction.fromRecord);
+  final transactions = await allTransactions(db);
 
   void recordDeal(List<Transaction> openDeal) {
     final deal = SyntheticDeal(openDeal);

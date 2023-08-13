@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/transactions.dart';
 import 'package:cli/cli.dart';
 import 'package:db/db.dart';
 import 'package:db/transaction.dart';
@@ -19,7 +18,6 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final db = await defaultDatabase();
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await transactionsAfter(db, startTime))
-      .map(Transaction.fromRecord)
       .where((t) => t.shipSymbol == shipSymbol);
   for (final transaction in transactions) {
     logger.info(describeTransaction(transaction));

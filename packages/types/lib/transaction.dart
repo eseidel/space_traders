@@ -1,6 +1,5 @@
-import 'package:cli/api.dart';
-import 'package:db/transaction.dart';
 import 'package:meta/meta.dart';
+import 'package:types/api.dart';
 
 /// The accounting type of a transaction.
 enum AccountingType {
@@ -54,6 +53,23 @@ class Transaction {
     required this.accounting,
   });
 
+  /// Create a new transaction to allow any() use in mocks.
+  @visibleForTesting
+  Transaction.fallbackValue()
+      : this(
+          transactionType: TransactionType.market,
+          shipSymbol: const ShipSymbol('A', 1),
+          waypointSymbol: WaypointSymbol.fromString('S-E-P'),
+          tradeSymbol: TradeSymbol.FUEL,
+          shipType: null,
+          quantity: 1,
+          tradeType: MarketTransactionTypeEnum.PURCHASE,
+          perUnitPrice: 2,
+          timestamp: DateTime(2021),
+          agentCredits: 3,
+          accounting: AccountingType.goods,
+        );
+
   /// Create a new transaction from json.
   /// This only exists to support CostedDeal.fromJson and should be removed.
   factory Transaction.fromJson(Map<String, dynamic> json) {
@@ -72,23 +88,6 @@ class Transaction {
       agentCredits: json['agentCredits'] as int,
       accounting: AccountingType.values
           .firstWhere((e) => e.name == json['accounting'] as String),
-    );
-  }
-
-  /// Create a new transaction from json.
-  factory Transaction.fromRecord(TransactionRecord record) {
-    return Transaction(
-      transactionType: TransactionType.fromName(record.transactionType),
-      shipSymbol: ShipSymbol.fromJson(record.shipSymbol),
-      waypointSymbol: WaypointSymbol.fromJson(record.waypointSymbol),
-      tradeSymbol: TradeSymbol.fromJson(record.tradeSymbol),
-      shipType: ShipType.fromJson(record.shipType),
-      quantity: record.quantity,
-      tradeType: MarketTransactionTypeEnum.fromJson(record.tradeType)!,
-      perUnitPrice: record.perUnitPrice,
-      timestamp: record.timestamp,
-      agentCredits: record.agentCredits,
-      accounting: AccountingType.fromName(record.accounting),
     );
   }
 
@@ -226,23 +225,6 @@ class Transaction {
       'agentCredits': agentCredits,
       'accounting': accounting.name,
     };
-  }
-
-  /// Convert the transaction to a record.
-  TransactionRecord toRecord() {
-    return TransactionRecord(
-      transactionType: transactionType.name,
-      shipSymbol: shipSymbol.toJson(),
-      waypointSymbol: waypointSymbol.toJson(),
-      tradeSymbol: tradeSymbol?.toJson(),
-      shipType: shipType?.toJson(),
-      quantity: quantity,
-      tradeType: tradeType.value,
-      perUnitPrice: perUnitPrice,
-      timestamp: timestamp,
-      agentCredits: agentCredits,
-      accounting: accounting.name,
-    );
   }
 
   @override

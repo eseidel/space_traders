@@ -13,7 +13,7 @@ void printDiffs(List<int> data) {
 
 Future<void> command(FileSystem fs, List<String> args) async {
   final db = await defaultDatabase();
-  final transactions = (await allTransactions(db)).map(Transaction.fromRecord);
+  final transactions = await allTransactions(db);
   // final marketPrices = MarketPrices.load(fs);
   // Walk through all transactions, finding repeats.
   final transactionSets = <List<Transaction>>[];

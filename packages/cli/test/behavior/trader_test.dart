@@ -6,7 +6,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:db/db.dart';
-import 'package:db/transaction.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -257,7 +256,6 @@ void main() {
         ),
       ),
     );
-    registerFallbackValue(TransactionRecord.test());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
@@ -553,7 +551,7 @@ void main() {
         shipSpeed: shipSpeed,
       ),
     ).thenReturn(routePlan);
-    registerFallbackValue(TransactionRecord.test());
+    registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();

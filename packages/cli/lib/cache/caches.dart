@@ -27,7 +27,6 @@ export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
 export 'package:cli/cache/systems_cache.dart';
-export 'package:cli/cache/transactions.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/system_connectivity.dart';

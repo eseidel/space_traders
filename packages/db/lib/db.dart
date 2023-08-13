@@ -24,8 +24,8 @@ class Database {
   Database(this.connection);
 
   /// Insert a transaction into the database.
-  Future<void> insertTransaction(TransactionRecord record) async {
-    final query = insertTransactionQuery(record);
+  Future<void> insertTransaction(Transaction transaction) async {
+    final query = insertTransactionQuery(transaction);
     await connection.query(
       query.fmtString,
       substitutionValues: query.substitutionValues,
