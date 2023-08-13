@@ -93,7 +93,7 @@ Future<void> cliMain(List<String> args) async {
   final api =
       getApi(token, db, useOutOfProcessNetwork: !(results['local'] as bool));
 
-  final caches = await Caches.load(fs, api);
+  final caches = await Caches.load(fs, api, db);
   logger.info(
     'Loaded ${caches.marketPrices.count} prices from '
     '${caches.marketPrices.waypointCount} markets and '

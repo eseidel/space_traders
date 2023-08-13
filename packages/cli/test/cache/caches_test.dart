@@ -1,26 +1,30 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:db/db.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class _MockApi extends Mock implements Api {}
+class _MockAgent extends Mock implements Agent {}
 
 class _MockAgentsApi extends Mock implements AgentsApi {}
 
-class _MockAgent extends Mock implements Agent {}
+class _MockApi extends Mock implements Api {}
+
+class _MockContractsApi extends Mock implements ContractsApi {}
+
+class _MockDatabase extends Mock implements Database {}
+
+class _MockFactionsApi extends Mock implements FactionsApi {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockContractsApi extends Mock implements ContractsApi {}
-
-class _MockFactionsApi extends Mock implements FactionsApi {}
-
 void main() {
   test('Caches load test', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final agentsApi = _MockAgentsApi();
     when(() => api.agents).thenReturn(agentsApi);
     final agent = _MockAgent();
@@ -69,7 +73,7 @@ void main() {
     Never httpGet(f) => throw UnimplementedError();
     final caches = await runWithLogger(
       logger,
-      () async => Caches.load(fs, api, httpGet: httpGet),
+      () async => Caches.load(fs, api, db, httpGet: httpGet),
     );
     expect(caches.agent, isNotNull);
   });

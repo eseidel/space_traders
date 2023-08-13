@@ -271,7 +271,7 @@ class NetQueue {
         continue;
       }
       final queued = QueuedResponse.fromJson(
-        jsonDecode(result[0][0] as String) as Map<String, dynamic>,
+        result[0][0] as Map<String, dynamic>,
       );
       return queued.toResponse();
     }
@@ -299,7 +299,7 @@ class NetQueue {
       id: row[0] as int,
       priority: row[1] as int,
       request: QueuedRequest.fromJson(
-        jsonDecode(row[2] as String) as Map<String, dynamic>,
+        row[2] as Map<String, dynamic>,
       ),
     );
   }

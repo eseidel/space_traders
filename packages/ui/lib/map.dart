@@ -81,12 +81,6 @@ class SystemMapPainter extends CustomPainter {
         final scale = 1.0 + (ships.length * 1.0);
         return SystemAttributes(color, scale);
       }
-      final factionSystems = factionCache.factions
-          .map((f) => WaypointSymbol.fromString(f.headquarters).system)
-          .toSet();
-      if (factionSystems.contains(system.symbol)) {
-        return const SystemAttributes(Colors.blue, 3);
-      }
       return SystemAttributes(Colors.grey.shade700, 1);
     }
 

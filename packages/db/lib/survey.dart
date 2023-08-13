@@ -22,7 +22,7 @@ HistoricalSurvey surveyFromResultRow(PostgreSQLResultRow row) {
 }
 
 /// Convert a survey into substitution values for a query.
-Map<String, dynamic> surveyToSubstitutionValues(HistoricalSurvey survey) {
+Map<String, dynamic> surveyToColumnMap(HistoricalSurvey survey) {
   return {
     'signature': survey.survey.signature,
     'waypoint_symbol': survey.survey.symbol,
@@ -40,10 +40,10 @@ Query recentSurveysAtWaypointQuery({
   required int count,
 }) {
   return Query(
-    'SELECT * FROM survey WHERE waypointSymbol = @waypointSymbol '
+    'SELECT * FROM survey_ WHERE waypoint_symbol = @waypointSymbol '
     'ORDER BY timestamp DESC LIMIT @count',
     substitutionValues: {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'count': count,
     },
   );
@@ -52,10 +52,10 @@ Query recentSurveysAtWaypointQuery({
 /// Insert a survey into the database.
 Query insertSurveyQuery(HistoricalSurvey survey) {
   return Query(
-    'INSERT INTO survey (signature, waypoint_symbol, deposits, expiration, '
-    'size, timestamp, exhausted) VALUES (@signature, @waypointSymbol, '
+    'INSERT INTO survey_ (signature, waypoint_symbol, deposits, expiration, '
+    'size, timestamp, exhausted) VALUES (@signature, @waypoint_symbol, '
     '@deposits, @expiration, @size, @timestamp, @exhausted)',
-    substitutionValues: surveyToSubstitutionValues(survey),
+    substitutionValues: surveyToColumnMap(survey),
   );
 }
 
@@ -63,7 +63,7 @@ Query insertSurveyQuery(HistoricalSurvey survey) {
 Query markSurveyExhaustedQuery(Survey survey) {
   // "signature" is unique to the survey, "symbol" is the waypoint symbol.
   return Query(
-    'UPDATE survey SET exhausted = true WHERE signature = @signature',
+    'UPDATE survey_ SET exhausted = true WHERE signature = @signature',
     substitutionValues: {
       'signature': survey.signature,
     },

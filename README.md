@@ -642,3 +642,8 @@ Invalid argument (marketSymbol): ESEIDEL-6F is not at X1-YA22-87615D, X1-YA22-92
 ### Types
 Move Transaction and other custom model objects down to that layer.
 Remove api.dart re-export of types.
+
+### Surveys
+Miners will likely fight over surveys, probably all grabbing the "best"
+survey and possibly exhausting it at the same time and having to restart
+the mining operation?

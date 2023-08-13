@@ -185,17 +185,17 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   return null;
 }
 
-WaypointSymbol _nearestHeadquarters(
+Future<WaypointSymbol> _nearestHeadquarters(
+  Database db,
   SystemConnectivity systemConnectivity,
   SystemsCache systemsCache,
   AgentCache agentCache,
-  FactionCache factionCache,
   Ship ship,
-) {
-  final factionsHqs =
-      factionCache.factions.map((e) => e.headquartersSymbol).toList();
+) async {
+  final factionHqs =
+      (await loadFactions(db)).map((e) => e.headquartersSymbol).toList();
   final startSystem = systemsCache.systemBySymbol(ship.systemSymbol);
-  final reachableHqs = factionsHqs
+  final reachableHqs = factionHqs
       .where(
         (hq) => systemConnectivity.canJumpBetweenSystemSymbols(
           ship.systemSymbol,
@@ -217,6 +217,7 @@ WaypointSymbol _nearestHeadquarters(
 /// If we're low on fuel, route to the nearest market which trades fuel.
 Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   Api api,
+  Database db,
   Caches caches,
   CentralCommand centralCommand,
   Waypoint waypoint,
@@ -237,11 +238,11 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
       ?.waypointSymbol;
   if (destination == null) {
     shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
-    destination = _nearestHeadquarters(
+    destination = await _nearestHeadquarters(
+      db,
       caches.systemConnectivity,
       caches.systems,
       caches.agent,
-      caches.factions,
       ship,
     );
   }
@@ -307,6 +308,7 @@ Future<DateTime?> advanceExplorer(
   // which do not have markets.  Other behaviors always stick to markets.
   final refuelWaitTime = await routeForEmergencyFuelingIfNeeded(
     api,
+    db,
     caches,
     centralCommand,
     waypoint,

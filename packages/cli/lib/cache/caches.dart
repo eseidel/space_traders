@@ -4,7 +4,6 @@ import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/extraction_log.dart';
-import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
@@ -13,6 +12,8 @@ import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/nav/jump_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
+import 'package:cli/net/queries.dart';
+import 'package:db/db.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,7 +23,6 @@ export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
 export 'package:cli/cache/extraction_log.dart';
-export 'package:cli/cache/faction_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
@@ -47,7 +47,6 @@ class Caches {
     required this.markets,
     required this.contracts,
     required this.behaviors,
-    required this.factions,
     required this.charting,
     required this.routePlanner,
   });
@@ -85,9 +84,6 @@ class Caches {
   /// The cache of behaviors.
   final BehaviorCache behaviors;
 
-  /// The cache of factions.
-  final FactionCache factions;
-
   /// The cache of charting data.
   final ChartingCache charting;
 
@@ -97,7 +93,8 @@ class Caches {
   /// Load the cache from disk and network.
   static Future<Caches> load(
     FileSystem fs,
-    Api api, {
+    Api api,
+    Database db, {
     Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
   }) async {
     final agent = await AgentCache.load(api, fs: fs);
@@ -113,8 +110,6 @@ class Caches {
     // Intentionally force refresh contracts in case we've been offline.
     final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);
     final behaviors = BehaviorCache.load(fs);
-    // Intentionally load factions from disk (they never change).
-    final factions = await FactionCache.load(api, fs: fs);
 
     final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
     final jumps = JumpCache();
@@ -124,8 +119,8 @@ class Caches {
       systemConnectivity: systemConnectivity,
     );
 
-    // Save out the caches we never modify so we don't have to load them again.
-    factions.save();
+    // Make sure factions are loaded.
+    await loadFactions(db);
 
     // We rarely modify contracts, so save them out here too.
     contracts.save();
@@ -142,7 +137,6 @@ class Caches {
       markets: markets,
       contracts: contracts,
       behaviors: behaviors,
-      factions: factions,
       charting: charting,
       routePlanner: routePlanner,
     );
@@ -168,4 +162,28 @@ class Caches {
     // about those modifications, so save it out every loop.
     ships.save();
   }
+}
+
+/// Load all factions from the API.
+// With our out-of-process rate limiting, this won't matter that it uses
+// a separate API client.
+Future<List<Faction>> allFactionsUnauthenticated() async {
+  final factionsApi = FactionsApi();
+  final factions = await fetchAllPages(factionsApi, (factionsApi, page) async {
+    final response = await factionsApi.getFactions(page: page);
+    return (response!.data, response.meta);
+  }).toList();
+  return factions;
+}
+
+/// Loads the factions from the database, or fetches them from the API if
+/// they're not cached.
+Future<List<Faction>> loadFactions(Database db) async {
+  final cachedFactions = await db.allFactions();
+  if (cachedFactions.isNotEmpty) {
+    return Future.value(cachedFactions);
+  }
+  final factions = await allFactionsUnauthenticated();
+  await db.cacheFactions(factions);
+  return factions;
 }

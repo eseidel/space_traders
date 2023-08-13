@@ -1,3 +1,4 @@
+import 'package:db/faction.dart';
 import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
 import 'package:postgres/postgres.dart';
@@ -83,5 +84,34 @@ class Database {
     if (result.affectedRowCount != 1) {
       throw ArgumentError('Survey not found: $survey');
     }
+  }
+
+  /// Gets the faction with the given symbol.
+  Future<Faction> factionBySymbol(FactionSymbols symbol) {
+    final query = factionBySymbolQuery(symbol);
+    return connection
+        .query(query.fmtString, substitutionValues: query.substitutionValues)
+        .then((result) => factionFromResultRow(result.first));
+  }
+
+  /// Gets all factions.
+  Future<List<Faction>> allFactions() {
+    final query = allFactionsQuery();
+    return connection
+        .query(query.fmtString, substitutionValues: query.substitutionValues)
+        .then((result) => result.map(factionFromResultRow).toList());
+  }
+
+  /// Cache the given factions.
+  Future<void> cacheFactions(List<Faction> factions) async {
+    await connection.transaction((connection) async {
+      for (final faction in factions) {
+        final query = insertFactionQuery(faction);
+        await connection.query(
+          query.fmtString,
+          substitutionValues: query.substitutionValues,
+        );
+      }
+    });
   }
 }

@@ -1,10 +1,10 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/jump_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
+import 'package:db/db.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);
@@ -25,12 +25,13 @@ class Result {
 Future<void> command(FileSystem fs, List<String> args) async {
   const count = 5000;
 
+  final db = await defaultDatabase();
   final systemsCache = SystemsCache.loadCached(fs)!;
   final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final jumpCache = JumpCache();
-  final factionCache = FactionCache.loadFromCache(fs)!;
   // COSMIC has always been on the main jumpgate network.
-  final factionHq = factionCache.headquartersFor(FactionSymbols.COSMIC);
+  final factionHq =
+      (await db.factionBySymbol(FactionSymbols.COSMIC)).headquartersSymbol;
   final systemSymbol = factionHq.systemSymbol;
   final clusterId = systemConnectivity.clusterIdForSystem(systemSymbol);
   final allSystemSymbols =

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cli/cache/faction_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
@@ -8,16 +7,11 @@ import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped/scoped.dart';
-import 'package:types/types.dart';
 import 'package:ui/route.dart';
 
 const fs = LocalFileSystem();
 late SystemsCache systemsCache;
 late ShipCache shipCache;
-late FactionCache factionCache;
-final factionSystems = factionCache.factions
-    .map((f) => WaypointSymbol.fromString(f.headquarters).system)
-    .toSet();
 
 const shipsUrl = 'http://localhost:8080/ships';
 
@@ -39,7 +33,6 @@ void main() async {
     values: {loggerRef},
   );
   shipCache = await loadShips();
-  factionCache = await FactionCache.loadUnauthenticated(fs);
 
   runApp(const MyApp());
 }

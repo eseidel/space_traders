@@ -1,14 +1,11 @@
-import 'package:cli/api.dart';
-import 'package:cli/cache/faction_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/nav/system_connectivity.dart';
+import 'package:db/db.dart';
 
 Future<void> command(FileSystem fs, List<String> args) async {
+  final db = await defaultDatabase();
   final systemsCache = await SystemsCache.load(fs);
-  final factionCache = await FactionCache.loadUnauthenticated(fs);
-
-  final factions = factionCache.factions;
+  final factions = await loadFactions(db);
 
   final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
   for (final faction in factions) {

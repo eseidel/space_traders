@@ -11,12 +11,12 @@ Query insertTransactionQuery(TransactionRecord record) {
     'agent_credits, accounting) VALUES (@transaction_type, @ship_symbol, '
     '@waypoint_symbol, @trade_symbol, @ship_type, @quantity, @trade_type, '
     '@per_unit_price, @timestamp, @agent_credits, @accounting)',
-    substitutionValues: toSubstitutionValues(record),
+    substitutionValues: transactionToColumnMap(record),
   );
 }
 
 /// Convert the transaction to substitution values for insertion.
-Map<String, dynamic> toSubstitutionValues(TransactionRecord record) {
+Map<String, dynamic> transactionToColumnMap(TransactionRecord record) {
   return {
     'transaction_type': record.transactionType,
     'ship_symbol': record.shipSymbol,

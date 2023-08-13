@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS "request_" (
   -- The priority of the request.
   "priority" integer NOT NULL,
   -- The request encoded as json
-  "json" varchar NOT NULL,
+  "json" json NOT NULL,
   -- When the request was created.
   "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );

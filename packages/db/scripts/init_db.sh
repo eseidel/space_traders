@@ -21,3 +21,4 @@ psql -U postgres -d $DB_NAME -f sql/tables/01_request.sql
 psql -U postgres -d $DB_NAME -f sql/tables/02_response.sql
 psql -U postgres -d $DB_NAME -f sql/tables/03_transaction.sql
 psql -U postgres -d $DB_NAME -f sql/tables/04_survey.sql
+psql -U postgres -d $DB_NAME -f sql/tables/05_faction.sql
