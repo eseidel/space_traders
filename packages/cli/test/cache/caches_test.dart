@@ -65,6 +65,8 @@ void main() {
         GetFactions200Response(meta: Meta(total: 0), data: []),
       ),
     );
+    when(db.allFactions).thenAnswer((_) => Future.value(<Faction>[]));
+    when(() => db.cacheFactions(any())).thenAnswer((_) => Future.value());
 
     final fs = MemoryFileSystem.test();
     fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);
