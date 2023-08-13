@@ -269,6 +269,7 @@ class NetQueue {
         final _ = await _db.connection.notifications.firstWhere(
           (notification) => notification.channel == 'response_',
         );
+        continue;
       }
       final queued = QueuedResponse.fromJson(
         result[0][0] as Map<String, dynamic>,
