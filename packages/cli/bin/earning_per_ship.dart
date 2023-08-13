@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';

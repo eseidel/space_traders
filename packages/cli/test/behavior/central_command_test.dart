@@ -1,12 +1,9 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/route.dart';
-import 'package:cli/trading.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -21,6 +18,8 @@ class _MockContract extends Mock implements Contract {}
 class _MockContractTerms extends Mock implements ContractTerms {}
 
 class _MockCostedDeal extends Mock implements CostedDeal {}
+
+class _MockDeal extends Mock implements Deal {}
 
 class _MockLogger extends Mock implements Logger {}
 
@@ -255,8 +254,11 @@ void main() {
     final shipASymbol = ShipSymbol.fromString('X-A');
     when(() => shipCache.shipSymbols).thenReturn([shipASymbol]);
     final costedDeal = _MockCostedDeal();
+    final deal = _MockDeal();
+    when(() => costedDeal.deal).thenReturn(deal);
+    when(() => costedDeal.cargoSize).thenReturn(120);
+    when(() => deal.maxUnits).thenReturn(10);
     when(() => costedDeal.contractId).thenReturn('C');
-    when(() => costedDeal.maxUnitsToBuy).thenReturn(10);
     const tradeSymbol = TradeSymbol.FUEL;
     when(() => behaviorCache.getBehavior(shipASymbol)).thenReturn(
       BehaviorState(shipASymbol, Behavior.trader, deal: costedDeal),

@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/json_store.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';

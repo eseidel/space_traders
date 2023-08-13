@@ -5,7 +5,6 @@ import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:file/file.dart';
-import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 /// default max age for "recent" prices is 3 days
@@ -38,91 +37,8 @@ int expectedPriceMovement({
   return 0;
 }
 
-// {"waypointSymbol": "X1-ZS60-53675E", "symbol": "IRON_ORE", "supply":
-// "ABUNDANT", "purchasePrice": 6, "sellPrice": 4, "tradeVolume": 1000,
-// "timestamp": "2023-05-14T21:52:56.530126100+00:00"}
-/// Transaction data for a single trade symbol at a single waypoint.
-@immutable
-class MarketPrice {
-  /// Create a new price record.
-  const MarketPrice({
-    required this.waypointSymbol,
-    required this.symbol,
-    required this.supply,
-    required this.purchasePrice,
-    required this.sellPrice,
-    required this.tradeVolume,
-    required this.timestamp,
-  });
-
-  /// Create a new price record from a market trade good.
-  MarketPrice.fromMarketTradeGood(MarketTradeGood good, this.waypointSymbol)
-      : symbol = good.tradeSymbol,
-        supply = good.supply,
-        purchasePrice = good.purchasePrice,
-        sellPrice = good.sellPrice,
-        tradeVolume = good.tradeVolume,
-        timestamp = DateTime.timestamp();
-
-  MarketPrice._compareOnly({this.sellPrice = 0})
-      : waypointSymbol = WaypointSymbol.fromString('A-B-C'),
-        symbol = TradeSymbol.COPPER,
-        supply = MarketTradeGoodSupplyEnum.ABUNDANT,
-        tradeVolume = 0,
-        purchasePrice = 0,
-        timestamp = DateTime.timestamp();
-
-  /// Create a new price record from a json map.
-  factory MarketPrice.fromJson(Map<String, dynamic> json) {
-    return MarketPrice(
-      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-      symbol: TradeSymbol.fromJson(json['symbol'] as String)!,
-      supply: MarketTradeGoodSupplyEnum.fromJson(json['supply'] as String)!,
-      purchasePrice: json['purchasePrice'] as int,
-      sellPrice: json['sellPrice'] as int,
-      tradeVolume: json['tradeVolume'] as int,
-      timestamp: DateTime.parse(json['timestamp'] as String),
-    );
-  }
-
-  /// Serialize Price as a json map.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'waypointSymbol': waypointSymbol.toJson(),
-      'symbol': symbol.toJson(),
-      'supply': supply.toJson(),
-      'purchasePrice': purchasePrice,
-      'sellPrice': sellPrice,
-      'tradeVolume': tradeVolume,
-      'timestamp': timestamp.toUtc().toIso8601String(),
-    };
-  }
-
-  /// The waypoint of the market where this price was recorded.
-  final WaypointSymbol waypointSymbol;
-
-  /// The symbol of the trade good.
-  // rename to tradeSymbol.
-  final TradeSymbol symbol;
-
-  /// The symbol of the trade good.
-  TradeSymbol get tradeSymbol => symbol;
-
-  /// The supply level of the trade good.
-  final MarketTradeGoodSupplyEnum supply;
-
-  /// The price at which this good can be purchased from the market.
-  final int purchasePrice;
-
-  /// The price at which this good can be sold to the market.
-  final int sellPrice;
-
-  /// The trade volume of the trade good.
-  final int tradeVolume;
-
-  /// The timestamp of the price record.
-  final DateTime timestamp;
-
+/// Add prediction capabilities to MarketPrice
+extension MarketPricePredications on MarketPrice {
   /// Predict the price of buying the Nth unit of this good.
   /// Unit is a 0-based index of the unit being purchased.
   int predictPurchasePriceForUnit(int unit) {
@@ -156,7 +72,10 @@ class MarketPrice {
     }
     return predictedPrice;
   }
+}
 
+/// Logic for predicting the next price for a market.
+extension MarketPricePredictions on MarketPrice {
   /// Predict the total price of buying [units] of this good.
   int totalPurchasePriceFor(int units) {
     var totalPrice = 0;
@@ -174,29 +93,6 @@ class MarketPrice {
     }
     return totalPrice;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MarketPrice &&
-          runtimeType == other.runtimeType &&
-          waypointSymbol == other.waypointSymbol &&
-          symbol == other.symbol &&
-          supply == other.supply &&
-          purchasePrice == other.purchasePrice &&
-          sellPrice == other.sellPrice &&
-          tradeVolume == other.tradeVolume &&
-          timestamp == other.timestamp;
-
-  @override
-  int get hashCode =>
-      waypointSymbol.hashCode ^
-      symbol.hashCode ^
-      supply.hashCode ^
-      purchasePrice.hashCode ^
-      sellPrice.hashCode ^
-      tradeVolume.hashCode ^
-      timestamp.hashCode;
 }
 
 /// A collection of price records.
@@ -310,7 +206,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// Get the percentile for the sell price (you sell to them) of a trade good.
   int? percentileForSellPrice(TradeSymbol symbol, int sellPrice) {
     const compareTo = _sellPriceAcending;
-    final price = MarketPrice._compareOnly(sellPrice: sellPrice);
+    final price = MarketPrice.compareOnly(sellPrice: sellPrice);
     final pricesForSymbol = pricesFor(symbol);
     if (pricesForSymbol.isEmpty) {
       return null;

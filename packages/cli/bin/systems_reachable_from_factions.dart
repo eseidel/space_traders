@@ -6,7 +6,8 @@ import 'package:types/types.dart';
 Future<void> command(FileSystem fs, List<String> args) async {
   final db = await defaultDatabase();
   final systemsCache = await SystemsCache.load(fs);
-  final factions = await loadFactions(db);
+  final factionsApi = FactionsApi();
+  final factions = await loadFactions(db, factionsApi);
 
   final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
   for (final faction in factions) {

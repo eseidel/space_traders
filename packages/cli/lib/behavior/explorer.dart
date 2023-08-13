@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -188,13 +187,13 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
 
 Future<WaypointSymbol> _nearestHeadquarters(
   Database db,
+  List<Faction> factions,
   SystemConnectivity systemConnectivity,
   SystemsCache systemsCache,
   AgentCache agentCache,
   Ship ship,
 ) async {
-  final factionHqs =
-      (await loadFactions(db)).map((e) => e.headquartersSymbol).toList();
+  final factionHqs = factions.map((e) => e.headquartersSymbol).toList();
   final startSystem = systemsCache.systemBySymbol(ship.systemSymbol);
   final reachableHqs = factionHqs
       .where(
@@ -241,6 +240,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
     shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
     destination = await _nearestHeadquarters(
       db,
+      caches.factions,
       caches.systemConnectivity,
       caches.systems,
       caches.agent,

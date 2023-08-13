@@ -6,7 +6,6 @@ import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';

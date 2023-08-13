@@ -48,6 +48,7 @@ class Caches {
     required this.behaviors,
     required this.charting,
     required this.routePlanner,
+    required this.factions,
   });
 
   /// The agent cache.
@@ -89,6 +90,10 @@ class Caches {
   /// The route planner.
   final RoutePlanner routePlanner;
 
+  /// Factions cache.  Factions never change, so just holding them
+  /// directly as a list.
+  final List<Faction> factions;
+
   /// Load the cache from disk and network.
   static Future<Caches> load(
     FileSystem fs,
@@ -119,7 +124,7 @@ class Caches {
     );
 
     // Make sure factions are loaded.
-    await loadFactions(db);
+    final factions = await loadFactions(db, api.factions);
 
     // We rarely modify contracts, so save them out here too.
     contracts.save();
@@ -138,6 +143,7 @@ class Caches {
       behaviors: behaviors,
       charting: charting,
       routePlanner: routePlanner,
+      factions: factions,
     );
   }
 
@@ -166,8 +172,7 @@ class Caches {
 /// Load all factions from the API.
 // With our out-of-process rate limiting, this won't matter that it uses
 // a separate API client.
-Future<List<Faction>> allFactionsUnauthenticated() async {
-  final factionsApi = FactionsApi();
+Future<List<Faction>> allFactions(FactionsApi factionsApi) async {
   final factions = await fetchAllPages(factionsApi, (factionsApi, page) async {
     final response = await factionsApi.getFactions(page: page);
     return (response!.data, response.meta);
@@ -177,12 +182,12 @@ Future<List<Faction>> allFactionsUnauthenticated() async {
 
 /// Loads the factions from the database, or fetches them from the API if
 /// they're not cached.
-Future<List<Faction>> loadFactions(Database db) async {
+Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
   final cachedFactions = await db.allFactions();
   if (cachedFactions.isNotEmpty) {
     return Future.value(cachedFactions);
   }
-  final factions = await allFactionsUnauthenticated();
+  final factions = await allFactions(factionsApi);
   await db.cacheFactions(factions);
   return factions;
 }

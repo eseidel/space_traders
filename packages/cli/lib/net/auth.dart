@@ -28,11 +28,12 @@ QueuedClient getQueuedClient(
   return QueuedClient(db)..getPriority = getPriority;
 }
 
+/// Create an API client with priority function.
 CountingApiClient getApiClient(
   Database db, {
   required int Function() getPriority,
 }) =>
-    CountingApiClient()..client = getQueuedClient(db, getPriority: () => 0);
+    CountingApiClient()..client = getQueuedClient(db, getPriority: getPriority);
 
 /// apiFromAuthToken creates an Api with the given auth token.
 Api apiFromAuthToken(
