@@ -255,9 +255,6 @@ class NetQueue {
     );
     await _listenIfNeeded();
     while (true) {
-      final _ = await _db.connection.notifications.firstWhere(
-        (notification) => notification.channel == 'response_',
-      );
       // TODO(eseidel): This does not yet handle queuing multiple requests
       // and waiting on all of them.
       // TODO(eseidel): Move this into db package.
@@ -267,8 +264,11 @@ class NetQueue {
           'requestId': requestId,
         },
       );
+      // If we don't yet have a response, wait for one.
       if (result.isEmpty) {
-        continue;
+        final _ = await _db.connection.notifications.firstWhere(
+          (notification) => notification.channel == 'response_',
+        );
       }
       final queued = QueuedResponse.fromJson(
         result[0][0] as Map<String, dynamic>,
