@@ -3,7 +3,8 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/counts.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/net/queries.dart';
-import 'package:cli/net/rate_limit.dart';
+import 'package:cli/net/queue.dart';
+import 'package:db/db.dart';
 import 'package:file/file.dart';
 
 /// The default path to the auth token.
@@ -19,39 +20,46 @@ String loadAuthToken(FileSystem fs, {String path = defaultAuthTokenPath}) {
   return token;
 }
 
-/// ClientType is the type of ApiClient to use.
-enum ClientType {
-  /// Use an in-process queue to rate limit requests.
-  localLimits,
-
-  /// Don't limit requests.
-  unlimited,
+/// Create a queued client with the given priority function.
+QueuedClient getQueuedClient(
+  Database db, {
+  required int Function() getPriority,
+}) {
+  return QueuedClient(db)..getPriority = getPriority;
 }
 
-CountingApiClient _apiClientByType(ClientType clientType, Authentication auth) {
-  switch (clientType) {
-    case ClientType.localLimits:
-      return RateLimitedApiClient(authentication: auth);
-    case ClientType.unlimited:
-      return CountingApiClient(authentication: auth);
-  }
-}
+CountingApiClient getApiClient(
+  Database db, {
+  required int Function() getPriority,
+}) =>
+    CountingApiClient()..client = getQueuedClient(db, getPriority: () => 0);
 
 /// apiFromAuthToken creates an Api with the given auth token.
-Api apiFromAuthToken(String token, ClientType clientType) {
+Api apiFromAuthToken(
+  String token,
+  Database db, {
+  required int Function() getPriority,
+}) {
   final auth = HttpBearerAuth()..accessToken = token;
-  return Api(_apiClientByType(clientType, auth));
+  final api = Api(CountingApiClient(authentication: auth));
+  api.apiClient.client = getQueuedClient(db, getPriority: getPriority);
+  return api;
 }
 
 /// defaultApi creates an Api with the default auth token read from the
 /// given file system.
-Api defaultApi(FileSystem fs, ClientType clientType) =>
-    apiFromAuthToken(loadAuthToken(fs), clientType);
+Api defaultApi(
+  FileSystem fs,
+  Database db, {
+  required int Function() getPriority,
+}) =>
+    apiFromAuthToken(loadAuthToken(fs), db, getPriority: getPriority);
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.
 Future<String> loadAuthTokenOrRegister(
-  FileSystem fs, {
+  FileSystem fs,
+  Database db, {
   String? callsign,
   String? email,
   String path = defaultAuthTokenPath,
@@ -62,7 +70,7 @@ Future<String> loadAuthTokenOrRegister(
     logger.info('No auth token found.');
     // Otherwise, register a new user.
     final handle = callsign ?? logger.prompt('What is your call sign?');
-    final token = await register(callsign: handle, email: email);
+    final token = await register(db, callsign: handle, email: email);
     final file = fs.file(path);
     await file.create(recursive: true);
     await file.writeAsString(token);
@@ -89,8 +97,12 @@ Future<String> _tryRegister(
 /// returns the auth token which should be saved and used for future requests.
 /// If the call sign is already taken, it will prompt for the email address
 /// associated with the call sign.
-Future<String> register({required String callsign, String? email}) async {
-  final client = RateLimitedApiClient();
+Future<String> register(
+  Database db, {
+  required String callsign,
+  String? email,
+}) async {
+  final client = getApiClient(db, getPriority: () => 0);
   final defaultApi = DefaultApi(client);
 
   final factions = await fetchAllPages(FactionsApi(client), (api, page) async {

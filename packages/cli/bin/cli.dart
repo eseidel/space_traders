@@ -7,7 +7,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/logic.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/counts.dart';
-import 'package:cli/net/queue.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:file/local.dart';
@@ -44,32 +43,9 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
   return (Ship ship) => onlyShips.contains(ship.shipSymbol);
 }
 
-Api getApi(
-  String token,
-  Database db, {
-  required bool useOutOfProcessNetwork,
-}) {
-  // TODO(eseidel): This is wrong.  This needs to check that
-  // that there is a network executor running, not just that we have
-  // a connection to the database.
-  if (!useOutOfProcessNetwork) {
-    return apiFromAuthToken(token, ClientType.localLimits);
-  }
-  final api = apiFromAuthToken(token, ClientType.unlimited);
-  final queuedClient = QueuedClient(db)..getPriority = () => 0;
-  api.apiClient.client = queuedClient;
-  return api;
-}
-
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
-    ..addFlag(
-      'local',
-      abbr: 'l',
-      negatable: false,
-      help: 'Use in-process rate limiting instead of database queue.',
-    )
     ..addMultiOption(
       'only',
       abbr: 'o',
@@ -82,16 +58,16 @@ Future<void> cliMain(List<String> args) async {
   logger.info('Welcome to Space Traders! 🚀');
   // Use package:file to make things mockable.
   const fs = LocalFileSystem();
+  final db = await defaultDatabase();
 
   final env = Platform.environment;
   final callsign = env['SPACETRADERS_CALLSIGN'];
   final email = env['SPACETRADERS_EMAIL'];
   final token =
-      await loadAuthTokenOrRegister(fs, callsign: callsign, email: email);
+      await loadAuthTokenOrRegister(fs, db, callsign: callsign, email: email);
 
-  final db = await defaultDatabase();
-  final api =
-      getApi(token, db, useOutOfProcessNetwork: !(results['local'] as bool));
+  // Api client should move to per-ship with a per-ship priority function.
+  final api = apiFromAuthToken(token, db, getPriority: () => 0);
 
   final caches = await Caches.load(fs, api, db);
   logger.info(
