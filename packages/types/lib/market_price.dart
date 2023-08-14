@@ -102,12 +102,13 @@ class MarketPrice {
           timestamp == other.timestamp;
 
   @override
-  int get hashCode =>
-      waypointSymbol.hashCode ^
-      symbol.hashCode ^
-      supply.hashCode ^
-      purchasePrice.hashCode ^
-      sellPrice.hashCode ^
-      tradeVolume.hashCode ^
-      timestamp.hashCode;
+  int get hashCode => Object.hash(
+        waypointSymbol,
+        symbol,
+        supply,
+        purchasePrice,
+        sellPrice,
+        tradeVolume,
+        timestamp,
+      );
 }

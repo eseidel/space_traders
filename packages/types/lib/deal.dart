@@ -71,12 +71,13 @@ class ContractDelivery {
           maxUnits == other.maxUnits;
 
   @override
-  int get hashCode =>
-      contractId.hashCode ^
-      destination.hashCode ^
-      tradeSymbol.hashCode ^
-      rewardPerUnit.hashCode ^
-      maxUnits.hashCode;
+  int get hashCode => Object.hash(
+        contractId,
+        destination,
+        tradeSymbol,
+        rewardPerUnit,
+        maxUnits,
+      );
 }
 
 /// Record of a possible arbitrage opportunity.
@@ -236,10 +237,11 @@ class Deal {
           contractDelivery == other.contractDelivery;
 
   @override
-  int get hashCode =>
-      sourcePrice.hashCode ^
-      destinationPrice.hashCode ^
-      contractDelivery.hashCode;
+  int get hashCode => Object.hash(
+        sourcePrice,
+        destinationPrice,
+        contractDelivery,
+      );
 }
 
 /// A deal between two markets which considers flight cost and time.

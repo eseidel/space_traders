@@ -245,16 +245,17 @@ class Transaction {
           accounting == other.accounting;
 
   @override
-  int get hashCode =>
-      transactionType.hashCode ^
-      shipSymbol.hashCode ^
-      waypointSymbol.hashCode ^
-      tradeSymbol.hashCode ^
-      shipType.hashCode ^
-      quantity.hashCode ^
-      tradeType.hashCode ^
-      perUnitPrice.hashCode ^
-      timestamp.hashCode ^
-      agentCredits.hashCode ^
-      accounting.hashCode;
+  int get hashCode => Object.hash(
+        transactionType,
+        shipSymbol,
+        waypointSymbol,
+        tradeSymbol,
+        shipType,
+        quantity,
+        tradeType,
+        perUnitPrice,
+        timestamp,
+        agentCredits,
+        accounting,
+      );
 }

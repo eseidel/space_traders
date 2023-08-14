@@ -195,7 +195,7 @@ class ShipSymbol implements Comparable<ShipSymbol> {
           number == other.number;
 
   @override
-  int get hashCode => agentName.hashCode ^ number.hashCode;
+  int get hashCode => Object.hash(agentName, number);
 }
 
 /// Extensions onto System to make it easier to work with.

@@ -46,11 +46,12 @@ class JobException implements Exception {
       explicitBehavior == other.explicitBehavior;
 
   @override
-  int get hashCode =>
-      message.hashCode ^
-      timeout.hashCode ^
-      disable.hashCode ^
-      explicitBehavior.hashCode;
+  int get hashCode => Object.hash(
+        message,
+        timeout,
+        disable,
+        explicitBehavior,
+      );
 }
 
 /// Exception thrown from a Job if the condition is not met.

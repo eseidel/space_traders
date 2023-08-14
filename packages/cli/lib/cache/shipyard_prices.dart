@@ -75,11 +75,12 @@ class ShipyardPrice {
           timestamp == other.timestamp;
 
   @override
-  int get hashCode =>
-      waypointSymbol.hashCode ^
-      shipType.hashCode ^
-      purchasePrice.hashCode ^
-      timestamp.hashCode;
+  int get hashCode => Object.hash(
+        waypointSymbol,
+        shipType,
+        purchasePrice,
+        timestamp,
+      );
 }
 
 /// A collection of price records.
