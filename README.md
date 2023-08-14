@@ -638,12 +638,26 @@ Invalid argument (marketSymbol): ESEIDEL-6F is not at X1-YA22-87615D, X1-YA22-92
 
 ## Teach late-start clients how to purchase traders instead of miners?
 
-
-### Types
-Move Transaction and other custom model objects down to that layer.
-Remove api.dart re-export of types.
-
 ### Surveys
 Miners will likely fight over surveys, probably all grabbing the "best"
 survey and possibly exhausting it at the same time and having to restart
 the mining operation?
+
+### Add a /healthz cli and monitor it.
+
+### Teach net_execute to recover from IO errors:
+
+Unhandled exception: (ClientException)
+Connection reset by peer
+#0      IOClient.send (package:http/src/io_client.dart:96:7)
+<asynchronous suspension>
+#1      BaseClient._sendUnstreamed (package:http/src/base_client.dart:93:32)
+<asynchronous suspension>
+#2      NetExecutor.sendRequest (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:55:9)
+<asynchronous suspension>
+#3      NetExecutor.run (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:92:24)
+<asynchronous suspension>
+#4      command (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:128:3)
+<asynchronous suspension>
+#5      main (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:132:3)
+<asynchronous suspension>

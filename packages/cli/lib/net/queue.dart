@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:http/http.dart';
 
@@ -266,9 +267,13 @@ class NetQueue {
       );
       // If we don't yet have a response, wait for one.
       if (result.isEmpty) {
-        final _ = await _db.connection.notifications.firstWhere(
-          (notification) => notification.channel == 'response_',
-        );
+        try {
+          await _db.connection.notifications
+              .firstWhere((notification) => notification.channel == 'response_')
+              .timeout(const Duration(minutes: 1));
+        } on TimeoutException {
+          logger.err('Timed out waiting for response?');
+        }
         continue;
       }
       final queued = QueuedResponse.fromJson(
@@ -339,8 +344,12 @@ class NetQueue {
   Future<void> waitForRequest() async {
     assert(role == QueueRole.responder, 'Only responders can wait.');
     await _listenIfNeeded();
-    await _db.connection.notifications.firstWhere(
-      (notification) => notification.channel == 'request_',
-    );
+    try {
+      await _db.connection.notifications
+          .firstWhere((notification) => notification.channel == 'request_')
+          .timeout(const Duration(minutes: 1));
+    } on TimeoutException {
+      logger.err('Timed out waiting for request?');
+    }
   }
 }
