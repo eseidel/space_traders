@@ -324,7 +324,7 @@ Future<DateTime?> advanceMiner(
     final response = await extractResources(api, ship, survey: maybeSurvey);
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
-    caches.extractions.log(
+    await db.insertExtraction(
       ExtractionRecord(
         shipSymbol: ship.shipSymbol,
         waypointSymbol: mineSymbol,

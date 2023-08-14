@@ -19,8 +19,6 @@ class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
 
-class _MockExtractionLog extends Mock implements ExtractionLog {}
-
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -184,8 +182,6 @@ void main() {
     when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
     when(() => caches.systems).thenReturn(systemsCache);
-    final extractionLog = _MockExtractionLog();
-    when(() => caches.extractions).thenReturn(extractionLog);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -252,6 +248,8 @@ void main() {
     );
     when(() => db.recentSurveysAtWaypoint(symbol, count: 100))
         .thenAnswer((_) => Future.value([]));
+    registerFallbackValue(ExtractionRecord.fallbackValue());
+    when(() => db.insertExtraction(any())).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

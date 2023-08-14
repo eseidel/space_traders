@@ -1,3 +1,4 @@
+import 'package:db/extraction.dart';
 import 'package:db/faction.dart';
 import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
@@ -112,5 +113,14 @@ class Database {
         );
       }
     });
+  }
+
+  /// Insert an extraction into the database.
+  Future<void> insertExtraction(ExtractionRecord extraction) async {
+    final query = insertExtractionQuery(extraction);
+    await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
   }
 }

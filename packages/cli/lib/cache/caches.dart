@@ -3,7 +3,6 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
-import 'package:cli/cache/extraction_log.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
@@ -22,7 +21,6 @@ export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
-export 'package:cli/cache/extraction_log.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
@@ -41,7 +39,6 @@ class Caches {
     required this.shipyardPrices,
     required this.systems,
     required this.systemConnectivity,
-    required this.extractions,
     required this.waypoints,
     required this.markets,
     required this.contracts,
@@ -71,9 +68,6 @@ class Caches {
 
   /// Cache of system reachability.
   final SystemConnectivity systemConnectivity;
-
-  /// The extraction log.
-  final ExtractionLog extractions;
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
@@ -107,7 +101,6 @@ class Caches {
     final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
     final shipyard = ShipyardPrices.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
-    final extractions = ExtractionLog.load(fs);
     final charting = ChartingCache.load(fs);
     final waypoints = WaypointCache(api, systems, charting);
     final markets = MarketCache(waypoints);
@@ -136,7 +129,6 @@ class Caches {
       shipyardPrices: shipyard,
       systems: systems,
       systemConnectivity: systemConnectivity,
-      extractions: extractions,
       waypoints: waypoints,
       markets: markets,
       contracts: contracts,

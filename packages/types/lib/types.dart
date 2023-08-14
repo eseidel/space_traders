@@ -3,6 +3,7 @@ export 'package:openapi/api.dart';
 export 'api.dart';
 export 'behavior.dart';
 export 'deal.dart';
+export 'extraction.dart';
 export 'jobs.dart';
 export 'market_price.dart';
 export 'route.dart';

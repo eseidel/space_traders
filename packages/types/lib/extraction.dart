@@ -1,5 +1,3 @@
-import 'package:cli/cache/json_log.dart';
-import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -16,6 +14,19 @@ class ExtractionRecord {
     required this.surveySignature,
     required this.timestamp,
   });
+
+  /// A record filled with dummy data to provide to the mocking system.
+  @visibleForTesting
+  ExtractionRecord.fallbackValue()
+      : this(
+          shipSymbol: const ShipSymbol('A', 1),
+          waypointSymbol: WaypointSymbol.fromString('A-B-C'),
+          tradeSymbol: TradeSymbol.IRON_ORE,
+          quantity: 1,
+          power: 10,
+          surveySignature: null,
+          timestamp: DateTime(2021),
+        );
 
   /// Create a new extraction from a JSON map.
   factory ExtractionRecord.fromJson(Map<String, dynamic> json) {
@@ -63,35 +74,5 @@ class ExtractionRecord {
       'surveySignature': surveySignature,
       'timestamp': timestamp.toIso8601String(),
     };
-  }
-}
-
-/// A class to manage a extraction log file.
-class ExtractionLog extends JsonLog<ExtractionRecord> {
-  /// Create a new extraction log.
-  ExtractionLog(
-    super.entries, {
-    required super.fs,
-    required super.path,
-  }) : super(recordToJson: (record) => record.toJson());
-
-  /// The default path to the extraction log.
-  static const String defaultPath = 'data/extractions.json';
-
-  /// Load the extraction log from the file system.
-  // ignore: prefer_constructors_over_static_methods
-  static ExtractionLog load(
-    FileSystem fs, {
-    String path = defaultPath,
-  }) {
-    final entries =
-        JsonLog.load<ExtractionRecord>(fs, path, ExtractionRecord.fromJson);
-    return ExtractionLog(entries, fs: fs, path: path);
-  }
-
-  /// Return extractions with the given filter applied.
-  List<ExtractionRecord> where(bool Function(ExtractionRecord t) filter) {
-    return entries.where(filter).toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
   }
 }
