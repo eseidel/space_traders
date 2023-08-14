@@ -240,9 +240,10 @@ class NetQueue {
         'json': jsonEncode(request),
       },
     );
+    final requestId = result[0][0] as int;
     // TODO(eseidel): This could be a trigger.
-    await _db.connection.execute('NOTIFY request_');
-    return result[0][0] as int;
+    await _db.connection.execute('NOTIFY request_, $requestId');
+    return requestId;
   }
 
   /// Waits for a response to be available for the given request id, returning
@@ -337,7 +338,7 @@ class NetQueue {
       },
     );
     // TODO(eseidel): This could be a trigger.
-    await _db.connection.execute('NOTIFY response_');
+    await _db.connection.execute("NOTIFY response_, '${request.id}'");
   }
 
   /// Waits for a notification that a new request is available.
