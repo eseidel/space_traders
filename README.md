@@ -645,19 +645,50 @@ the mining operation?
 
 ### Add a /healthz cli and monitor it.
 
-### Teach net_execute to recover from IO errors:
+### Network Queue Exception?
 
-Unhandled exception: (ClientException)
-Connection reset by peer
-#0      IOClient.send (package:http/src/io_client.dart:96:7)
-<asynchronous suspension>
-#1      BaseClient._sendUnstreamed (package:http/src/base_client.dart:93:32)
-<asynchronous suspension>
-#2      NetExecutor.sendRequest (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:55:9)
-<asynchronous suspension>
-#3      NetExecutor.run (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:92:24)
-<asynchronous suspension>
-#4      command (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:128:3)
-<asynchronous suspension>
-#5      main (file:///Users/eseidel/Documents/GitHub/space_traders/packages/cli/bin/network_execute.dart:132:3)
-<asynchronous suspension>
+🛸#54 ✍️  market data @ X1-TM41-05300A
+Unhandled exception:
+Bad state: No element
+#0      Stream.firstWhere.<anonymous closure> (dart:async/stream.dart:1703:9)
+#1      _rootRun (dart:async/zone.dart:1391:47)
+#2      _CustomZone.run (dart:async/zone.dart:1301:19)
+#3      _CustomZone.runGuarded (dart:async/zone.dart:1209:7)
+#4      _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:392:13)
+#5      _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:402:7)
+#6      _DelayedDone.perform (dart:async/stream_impl.dart:534:14)
+#7      _PendingEvents.handleNext (dart:async/stream_impl.dart:620:11)
+#8      _PendingEvents.schedule.<anonymous closure> (dart:async/stream_impl.dart:591:7)
+#9      _rootRun (dart:async/zone.dart:1399:13)
+#10     _CustomZone.run (dart:async/zone.dart:1301:19)
+#11     _CustomZone.bindCallback.<anonymous closure> (dart:async/zone.dart:1233:23)
+#12     _microtaskLoop (dart:async/schedule_microtask.dart:40:21)
+#13     _startMicrotaskLoop (dart:async/schedule_microtask.dart:49:5)
+#14     _runPendingImmediateCallback (dart:isolate-patch/isolate_patch.dart:123:13)
+#15     _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:190:5)
+
+On both:
+
+Unhandled exception:
+Bad state: No element
+#0      Stream.firstWhere.<anonymous closure> (dart:async/stream.dart:1703:9)
+#1      _rootRun (dart:async/zone.dart:1391:47)
+#2      _CustomZone.run (dart:async/zone.dart:1301:19)
+#3      _CustomZone.runGuarded (dart:async/zone.dart:1209:7)
+#4      _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:392:13)
+#5      _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:402:7)
+#6      _DelayedDone.perform (dart:async/stream_impl.dart:534:14)
+#7      _PendingEvents.handleNext (dart:async/stream_impl.dart:620:11)
+#8      _PendingEvents.schedule.<anonymous closure> (dart:async/stream_impl.dart:591:7)
+#9      _rootRun (dart:async/zone.dart:1399:13)
+#10     _CustomZone.run (dart:async/zone.dart:1301:19)
+#11     _CustomZone.bindCallback.<anonymous closure> (dart:async/zone.dart:1233:23)
+#12     _microtaskLoop (dart:async/schedule_microtask.dart:40:21)
+#13     _startMicrotaskLoop (dart:async/schedule_microtask.dart:49:5)
+#14     _runPendingImmediateCallback (dart:isolate-patch/isolate_patch.dart:123:13)
+
+### Write a script to print db stats.
+
+### Write a test for stability of the network queue.
+
+### Teach network backoffs to have a limit (e.g. 128s).

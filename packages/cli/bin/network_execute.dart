@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 import 'package:cli/net/rate_limit.dart';
@@ -83,13 +85,29 @@ class NetExecutor {
       // end up pulling a request we don't need to send or is low priority.
       final request = await queue.nextRequest();
       if (request == null) {
-        await queue.waitForRequest();
+        final timeoutSeconds = backoffSeconds * 30;
+        try {
+          await queue.waitForRequest(timeoutSeconds);
+        } on TimeoutException {
+          logger.err('Timed out (${timeoutSeconds}s) waiting for request?');
+          backoffSeconds *= 2;
+        }
         continue;
       }
       final before = DateTime.timestamp();
       final path = _removeExpectedPrefix(request.request.url);
       nextRequestTime = DateTime.timestamp().add(minWaitTime);
-      final response = await sendRequest(request.request);
+      final Response response;
+      try {
+        response = await sendRequest(request.request);
+      } on ClientException catch (e) {
+        logger.err(
+          'Network error: ${e.message}'
+          'Waiting for $backoffSeconds seconds.',
+        );
+        backoffSeconds *= 2;
+        continue;
+      }
       stats.record(response);
       final duration = DateTime.timestamp().difference(before);
       logger.detail(
@@ -112,6 +130,7 @@ class NetExecutor {
         // No need to reply to the request, since it will be retried.
         continue;
       }
+
       await queue.deleteRequest(request);
       await queue.respondToRequest(
         request,
@@ -119,6 +138,11 @@ class NetExecutor {
       );
       // Success, reset the backoff.
       backoffSeconds = 1;
+
+      // Delete all responses older than 5 minutes.
+      await queue.deleteResponsesBefore(
+        DateTime.timestamp().subtract(const Duration(minutes: 5)),
+      );
     }
   }
 }

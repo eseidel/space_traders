@@ -242,20 +242,19 @@ class NetQueue {
     );
     final requestId = result[0][0] as int;
     // TODO(eseidel): This could be a trigger.
-    await _db.connection.execute('NOTIFY request_, $requestId');
+    await _db.connection.execute("NOTIFY request_, '$requestId'");
     return requestId;
   }
 
   /// Waits for a response to be available for the given request id, returning
   /// the response.
-  Future<Response> _waitForResponse(
-    int requestId,
-  ) async {
+  Future<Response> _waitForResponse(int requestId) async {
     assert(
       role == QueueRole.requestor,
       'Only requestors can wait for responses.',
     );
     await _listenIfNeeded();
+    var timeoutSeconds = 1;
     while (true) {
       // TODO(eseidel): This does not yet handle queuing multiple requests
       // and waiting on all of them.
@@ -271,9 +270,10 @@ class NetQueue {
         try {
           await _db.connection.notifications
               .firstWhere((notification) => notification.channel == 'response_')
-              .timeout(const Duration(minutes: 1));
+              .timeout(Duration(seconds: timeoutSeconds));
         } on TimeoutException {
-          logger.err('Timed out waiting for response?');
+          logger.err('Timed out (${timeoutSeconds}s) waiting for response?');
+          timeoutSeconds *= 2;
         }
         continue;
       }
@@ -342,15 +342,21 @@ class NetQueue {
   }
 
   /// Waits for a notification that a new request is available.
-  Future<void> waitForRequest() async {
+  Future<void> waitForRequest(int timeoutSeconds) async {
     assert(role == QueueRole.responder, 'Only responders can wait.');
     await _listenIfNeeded();
-    try {
-      await _db.connection.notifications
-          .firstWhere((notification) => notification.channel == 'request_')
-          .timeout(const Duration(minutes: 1));
-    } on TimeoutException {
-      logger.err('Timed out waiting for request?');
-    }
+    await _db.connection.notifications
+        .firstWhere((notification) => notification.channel == 'request_')
+        .timeout(Duration(seconds: timeoutSeconds));
+  }
+
+  /// Delete responses older than the given age.
+  Future<void> deleteResponsesBefore(DateTime timestamp) {
+    return _db.connection.execute(
+      'DELETE FROM response_ WHERE created_at < @timestamp',
+      substitutionValues: {
+        'timestamp': timestamp,
+      },
+    );
   }
 }
