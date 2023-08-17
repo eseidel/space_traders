@@ -55,8 +55,8 @@ Transaction transactionFromResultRow(PostgreSQLResultRow row) {
 
 /// Get unique ship symbols from the transaction table.
 Future<Set<String>> uniqueShipSymbols(Database db) async {
-  final result =
-      await db.connection.query('SELECT DISTINCT shipSymbol FROM transaction_');
+  final result = await db.connection
+      .query('SELECT DISTINCT ship_symbol FROM transaction_');
   return result.map((r) => r.first as String).toSet();
 }
 

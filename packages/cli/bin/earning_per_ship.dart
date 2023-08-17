@@ -62,7 +62,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
 
   final db = await defaultDatabase();
 
-  final shipSymbols = (await uniqueShipSymbols(db)).map(ShipSymbol.fromString);
+  final shipSymbols =
+      (await uniqueShipSymbols(db)).map(ShipSymbol.fromString).toList()..sort();
   final behaviorCache = BehaviorCache.load(fs);
 
   final longestHexNumber = shipSymbols.fold(
@@ -120,6 +121,8 @@ Future<void> command(FileSystem fs, List<String> args) async {
     final average = (total / count).round();
     logger.info('$stateName: $count ships, ${c(average)} c/s');
   }
+  // Required or main will hang.
+  await db.close();
 }
 
 void main(List<String> args) async {
