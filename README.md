@@ -692,3 +692,34 @@ Bad state: No element
 ### Write a test for stability of the network queue.
 
 ### Teach network backoffs to have a limit (e.g. 128s).
+
+
+### 500s should not take down the client.
+
+🛸#6D Beginning route to X1-QH21-95970X
+Unhandled exception:
+ApiException 500: {"error":{"code":500,"message":"Something unexpected went wrong! If you want to help you can file an issue here: https://github.com/SpaceTradersAPI/api-docs"}}
+#0      FleetApi.orbitShip (package:openapi/api/fleet_api.dart:1328:7)
+<asynchronous suspension>
+#1      undockIfNeeded (package:cli/net/actions.dart:315:22)
+<asynchronous suspension>
+#2      continueNavigationIfNeeded (package:cli/nav/navigation.dart:196:3)
+<asynchronous suspension>
+#3      beingRouteAndLog (package:cli/nav/navigation.dart:73:21)
+<asynchronous suspension>
+#4      beingNewRouteAndLog (package:cli/nav/navigation.dart:43:20)
+<asynchronous suspension>
+#5      advanceTrader (package:cli/behavior/trader.dart:706:23)
+<asynchronous suspension>
+#6      advanceShipBehavior (package:cli/behavior/advance.dart:88:23)
+<asynchronous suspension>
+#7      advanceShips (package:cli/logic.dart:52:25)
+<asynchronous suspension>
+#8      logic (package:cli/logic.dart:152:7)
+<asynchronous suspension>
+#9      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:106:3)
+<asynchronous suspension>
+#10     main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:112:7)
+<asynchronous suspension>
+#11     main (file:///root/space_traders/packages/cli/bin/cli.dart:110:3)
+<asynchronous suspension>
