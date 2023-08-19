@@ -32,19 +32,30 @@ QueuedClient getQueuedClient(
 CountingApiClient getApiClient(
   Database db, {
   required int Function() getPriority,
-}) =>
-    CountingApiClient()..client = getQueuedClient(db, getPriority: getPriority);
+  String? overrideBaseUrl,
+  Authentication? auth,
+}) {
+  final CountingApiClient apiClient;
+  if (overrideBaseUrl != null) {
+    apiClient =
+        CountingApiClient(authentication: auth, basePath: overrideBaseUrl);
+  } else {
+    apiClient = CountingApiClient(authentication: auth);
+  }
+  apiClient.client = getQueuedClient(db, getPriority: getPriority);
+  return apiClient;
+}
 
 /// apiFromAuthToken creates an Api with the given auth token.
 Api apiFromAuthToken(
   String token,
   Database db, {
   required int Function() getPriority,
+  String? overrideBaseUrl,
 }) {
   final auth = HttpBearerAuth()..accessToken = token;
-  final api = Api(CountingApiClient(authentication: auth));
-  api.apiClient.client = getQueuedClient(db, getPriority: getPriority);
-  return api;
+  final apiClient = getApiClient(db, getPriority: getPriority, auth: auth);
+  return Api(apiClient);
 }
 
 /// defaultApi creates an Api with the default auth token read from the

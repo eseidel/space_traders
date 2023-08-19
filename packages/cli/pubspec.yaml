@@ -32,6 +32,7 @@ dependencies:
   stats: ^2.0.0
   types:
     path: ../types
+  yaml: ^3.1.2
 
 dev_dependencies:
   mocktail: ^0.3.0

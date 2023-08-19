@@ -27,7 +27,7 @@ class RequestCounts {
 /// ApiClient that counts the number of requests made.
 class CountingApiClient extends ApiClient {
   /// Construct a rate limited api client.
-  CountingApiClient({super.authentication});
+  CountingApiClient({super.authentication, super.basePath});
 
   /// RequestCounts tracks the number of requests made to each path.
   final RequestCounts requestCounts = RequestCounts();
