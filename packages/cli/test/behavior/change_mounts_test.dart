@@ -9,8 +9,6 @@ import 'package:more/collection.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockBehaviorState extends Mock implements BehaviorState {}

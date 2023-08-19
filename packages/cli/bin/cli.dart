@@ -90,7 +90,7 @@ Future<void> cliMain(List<String> args) async {
     exit(0);
   });
 
-  final agent = caches.agent.agent;
+  final agent = await loadMyAgent(db, api);
   logger
     ..info(
       'Welcome ${agent.symbol} of the ${agent.startingFaction}!'

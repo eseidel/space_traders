@@ -1,5 +1,4 @@
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';

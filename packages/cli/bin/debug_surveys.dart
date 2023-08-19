@@ -7,10 +7,10 @@ import 'package:types/types.dart';
 Future<void> command(FileSystem fs, List<String> args) async {
   final db = await defaultDatabase();
   final marketPrices = MarketPrices.load(fs);
-  final agentCache = AgentCache.loadCached(fs)!;
   final systemsCache = await SystemsCache.load(fs);
 
-  final hq = agentCache.agent.headquartersSymbol;
+  final agent = await db.myCachedAgent();
+  final hq = agent!.headquartersSymbol;
   final hqSystemSymbol = hq.systemSymbol;
   final systemSymbol = hqSystemSymbol;
 

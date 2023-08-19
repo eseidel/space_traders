@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:cli/api.dart';
-import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';

@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
@@ -17,7 +16,6 @@ import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 
 export 'package:cli/api.dart';
-export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
@@ -33,7 +31,6 @@ export 'package:file/file.dart';
 /// Container for all the caches.
 class Caches {
   Caches._({
-    required this.agent,
     required this.marketPrices,
     required this.ships,
     required this.shipyardPrices,
@@ -47,9 +44,6 @@ class Caches {
     required this.routePlanner,
     required this.factions,
   });
-
-  /// The agent cache.
-  final AgentCache agent;
 
   /// The historical market price data.
   final MarketPrices marketPrices;
@@ -182,4 +176,15 @@ Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
   final factions = await allFactions(factionsApi);
   await db.cacheFactions(factions);
   return factions;
+}
+
+/// Loads my agent from the database or the network.
+Future<Agent> loadMyAgent(Database db, Api api) async {
+  final agent = await db.getMyAgent();
+  if (agent != null) {
+    return agent;
+  }
+  final myAgent = await api.agents.getMyAgent();
+  await db.cacheAgent(myAgent!);
+  return myAgent;
 }

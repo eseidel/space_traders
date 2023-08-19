@@ -660,10 +660,10 @@ class CentralCommand {
 
   /// Procurment contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
-    AgentCache agentCache,
+    Agent agent,
     ContractCache contractCache,
   ) sync* {
-    for (final contract in affordableContracts(agentCache, contractCache)) {
+    for (final contract in affordableContracts(agent, contractCache)) {
       for (final good in contract.terms.deliver) {
         final unitsNeeded = remainingUnitsNeededForContract(
           contract,

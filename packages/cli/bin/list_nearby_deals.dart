@@ -4,6 +4,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
+import 'package:db/db.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
 import 'package:types/types.dart';
@@ -34,6 +35,8 @@ Future<void> cliMain(List<String> args) async {
   }
 
   const fs = LocalFileSystem();
+  final db = await defaultDatabase();
+  final agent = await db.myCachedAgent();
   final systemsCache = SystemsCache.loadCached(fs)!;
   final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
 
@@ -41,12 +44,11 @@ Future<void> cliMain(List<String> args) async {
 
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
-  final agentCache = AgentCache.loadCached(fs)!;
   final contractCache = ContractCache.loadCached(fs)!;
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
   final extraSellOpps =
-      centralCommand.contractSellOpps(agentCache, contractCache).toList();
+      centralCommand.contractSellOpps(agent!, contractCache).toList();
 
   for (final extraOpp in extraSellOpps) {
     logger.info('Extra: ${extraOpp.tradeSymbol} ${extraOpp.maxUnits} '
@@ -59,9 +61,9 @@ Future<void> cliMain(List<String> args) async {
   // const shipSpeed = 30;
   // const fuelCapacity = 1200;
   // final agentCache = AgentCache.loadCached(fs)!;
-  final start = results.rest.isEmpty
-      ? agentCache.headquarters(systemsCache)
-      : systemsCache.waypointFromString(results.rest.first)!;
+  final startString =
+      results.rest.isEmpty ? agent.headquarters : results.rest.first;
+  final start = systemsCache.waypointFromString(startString)!;
 
   // Finding deals with start: X1-SB93-93497E, max jumps: 5,
   // max outlay: 1172797, max units: 120, fuel capacity: 1700, ship speed: 10

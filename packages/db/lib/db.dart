@@ -1,3 +1,4 @@
+import 'package:db/agent.dart';
 import 'package:db/extraction.dart';
 import 'package:db/faction.dart';
 import 'package:db/survey.dart';
@@ -122,5 +123,18 @@ class Database {
       query.fmtString,
       substitutionValues: query.substitutionValues,
     );
+  }
+
+  /// Loads my cached agent.
+  Future<Agent?> myCachedAgent() async {
+    final query = myCachedAgentQuery();
+    final result = await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+    if (result.isEmpty) {
+      return null;
+    }
+    return agentFromResultRow(result.first);
   }
 }
