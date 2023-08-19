@@ -1206,15 +1206,12 @@ int _minimumFloatRequired(Contract contract) {
 /// Returns the contracts we should consider for trading.
 /// This is a subset of the active contracts that we have enough money to
 /// complete.
-Iterable<Contract> affordableContracts(
-  AgentCache agentCache,
-  ContractCache contractsCache,
-) {
+Iterable<Contract> affordableContracts(ContractCache contractsCache,
+    {required int credits}) {
   // We should only use the contract trader when we have enough credits to
   // complete the entire contract.  Otherwise we're just sinking credits into a
   // contract we can't complete yet when we could be using that money for other
   // trading.
-  final credits = agentCache.agent.credits;
   return contractsCache.activeContracts
       .where((c) => _minimumFloatRequired(c) <= credits);
 }
