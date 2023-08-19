@@ -116,7 +116,7 @@ void main() {
         symbol: WaypointTraitSymbolEnum.MARKETPLACE,
         name: '',
         description: '',
-      )
+      ),
     ]);
     when(() => marketCache.marketForSymbol(start)).thenAnswer(
       (_) => Future.value(
@@ -129,7 +129,7 @@ void main() {
               supply: MarketTradeGoodSupplyEnum.ABUNDANT,
               purchasePrice: 100,
               sellPrice: 101,
-            )
+            ),
           ],
         ),
       ),
@@ -182,7 +182,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
-          )
+          ),
         ],
         fuelCapacity: 10,
         fuelUsed: 10,
@@ -345,7 +345,7 @@ void main() {
         symbol: WaypointTraitSymbolEnum.MARKETPLACE,
         name: '',
         description: '',
-      )
+      ),
     ]);
     registerFallbackValue(Duration.zero);
     when(
@@ -387,7 +387,7 @@ void main() {
           endSymbol: end,
           type: RouteActionType.navCruise,
           duration: 10,
-        )
+        ),
       ],
       fuelCapacity: 10,
       fuelUsed: 10,
@@ -445,7 +445,7 @@ void main() {
         name: '',
         description: '',
         units: 10,
-      )
+      ),
     ]);
 
     final agent = _MockAgent();
@@ -540,7 +540,7 @@ void main() {
         sellPrice: 101,
         tradeVolume: 10,
         timestamp: DateTime(2021),
-      )
+      ),
     ]);
 
     when(
@@ -687,7 +687,7 @@ void main() {
           endSymbol: end,
           type: RouteActionType.navCruise,
           duration: 10,
-        )
+        ),
       ],
       fuelCapacity: 10,
       fuelUsed: 10,

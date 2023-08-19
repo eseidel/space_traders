@@ -83,7 +83,7 @@ Rejection? findDifferenceBetweenStrings(
       return Rejection(
         which: [
           'is too long with unexpected trailing characters:',
-          _trailing(escapedActual, i)
+          _trailing(escapedActual, i),
         ],
       );
     } else {
@@ -92,14 +92,14 @@ Rejection? findDifferenceBetweenStrings(
           actual: ['an empty string'],
           which: [
             'is missing all expected characters:',
-            _trailing(escapedExpected, 0)
+            _trailing(escapedExpected, 0),
           ],
         );
       }
       return Rejection(
         which: [
           'is too short with missing trailing characters:',
-          _trailing(escapedExpected, i)
+          _trailing(escapedExpected, i),
         ],
       );
     }
@@ -110,7 +110,7 @@ Rejection? findDifferenceBetweenStrings(
         'differs at offset $i:',
         '${_leading(escapedExpected, i)}${_trailing(escapedExpected, i)}',
         '${_leading(escapedActual, i)}${_trailing(escapedActual, i)}',
-        '$indentation^'
+        '$indentation^',
       ],
     );
   }

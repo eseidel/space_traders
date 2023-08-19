@@ -242,7 +242,7 @@ class CentralCommand {
       mounts: Multiset.from([
         ShipMountSymbolEnum.MINING_LASER_II,
         ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SURVEYOR_I
+        ShipMountSymbolEnum.SURVEYOR_I,
       ]),
     );
 

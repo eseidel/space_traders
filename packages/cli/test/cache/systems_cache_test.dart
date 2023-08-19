@@ -28,7 +28,7 @@ void main() {
               type: WaypointType.JUMP_GATE,
               x: 0,
               y: 0,
-            )
+            ),
           ],
         ),
     ];
@@ -62,7 +62,7 @@ void main() {
               type: WaypointType.JUMP_GATE,
               x: 0,
               y: 0,
-            )
+            ),
           ],
         ),
     ];

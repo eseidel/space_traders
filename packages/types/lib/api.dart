@@ -579,7 +579,7 @@ extension MarketUtils on Market {
     final symbols = <TradeSymbol>{
       ...imports.map((g) => g.symbol),
       ...exports.map((g) => g.symbol),
-      ...exchange.map((g) => g.symbol)
+      ...exchange.map((g) => g.symbol),
     };
     return symbols;
   }

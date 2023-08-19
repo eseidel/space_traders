@@ -209,7 +209,7 @@ void main() {
           supply: MarketTradeGoodSupplyEnum.ABUNDANT,
           purchasePrice: 1,
           sellPrice: 2,
-        )
+        ),
       ],
     );
     await recordMarketData(marketPrices, market);
@@ -230,7 +230,7 @@ void main() {
           supply: MarketTradeGoodSupplyEnum.ABUNDANT,
           purchasePrice: 1,
           sellPrice: 2,
-        )
+        ),
       ],
     );
     await recordMarketData(marketPrices, market);

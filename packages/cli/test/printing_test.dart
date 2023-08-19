@@ -24,7 +24,7 @@ void main() {
           description: 't',
           name: 'n',
           symbol: WaypointTraitSymbolEnum.CORRUPT,
-        )
+        ),
       ],
     );
     expect(waypointDescription(waypoint), 'a - PLANET - uncharted - n');
@@ -149,7 +149,7 @@ void main() {
             destinationSymbol: 'W',
             unitsFulfilled: 0,
             unitsRequired: 10,
-          )
+          ),
         ],
       ),
       expiration: deadline,
@@ -186,7 +186,7 @@ void main() {
         sellPrice: 2,
         tradeVolume: 100,
         timestamp: DateTime.timestamp(),
-      )
+      ),
     ]);
 
     expect(

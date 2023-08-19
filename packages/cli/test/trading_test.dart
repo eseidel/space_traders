@@ -102,7 +102,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
-          )
+          ),
         ],
         fuelCapacity: 10,
         fuelUsed: 10,
@@ -160,7 +160,7 @@ void main() {
             endSymbol: end.waypointSymbol,
             type: RouteActionType.navCruise,
             duration: 15,
-          )
+          ),
         ],
         fuelUsed: 0,
       ),
@@ -210,7 +210,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
-          )
+          ),
         ],
         fuelCapacity: 10,
         fuelUsed: 0,
@@ -467,7 +467,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
-          )
+          ),
         ],
         fuelCapacity: 10,
         fuelUsed: 10,
@@ -541,7 +541,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
-          )
+          ),
         ],
         fuelCapacity: 10,
         fuelUsed: 10,
@@ -613,7 +613,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: duration,
-          )
+          ),
         ],
         fuelUsed: 1,
       );
@@ -719,7 +719,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: duration,
-          )
+          ),
         ],
         fuelUsed: 1,
       );
@@ -806,7 +806,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             duration: 10,
-          )
+          ),
         ],
         fuelCapacity: 10,
         fuelUsed: 10,

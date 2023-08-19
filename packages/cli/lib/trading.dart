@@ -60,7 +60,7 @@ List<Deal> buildDealsFromScan(
     final sells = extraSellOpps != null
         ? [
             ...scanSells,
-            ...extraSellOpps.where((o) => o.tradeSymbol == tradeSymbol)
+            ...extraSellOpps.where((o) => o.tradeSymbol == tradeSymbol),
           ]
         : scanSells;
     for (final buy in buys) {

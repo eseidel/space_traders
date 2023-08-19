@@ -138,7 +138,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.jump,
             duration: 10,
-          )
+          ),
         ],
         fuelUsed: 10,
       );
@@ -214,7 +214,7 @@ void main() {
             destinationSymbol: 'W',
             unitsFulfilled: 0,
             unitsRequired: 1,
-          )
+          ),
         ],
       ),
       expiration: hourFromNow,
@@ -233,7 +233,7 @@ void main() {
             destinationSymbol: 'W',
             unitsFulfilled: 0,
             unitsRequired: 10,
-          )
+          ),
         ],
       ),
       expiration: hourFromNow,

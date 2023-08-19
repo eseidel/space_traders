@@ -69,7 +69,7 @@ void main() {
         symbol: ShipMountSymbolEnum.SURVEYOR_I,
         name: '',
         requirements: ShipRequirements(),
-      )
+      ),
     ]);
 
     when(() => centralCommand.mineJobForShip(systemsCache, agentCache, ship))

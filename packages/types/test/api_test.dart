@@ -57,7 +57,7 @@ void main() {
           symbol: WaypointTraitSymbolEnum.ASH_CLOUDS,
           name: '',
           description: '',
-        )
+        ),
       ],
     );
     expect(waypoint.hasTrait(WaypointTraitSymbolEnum.ASH_CLOUDS), isTrue);

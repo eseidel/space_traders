@@ -26,7 +26,7 @@ void main() {
             destinationSymbol: 'W',
             unitsFulfilled: 0,
             unitsRequired: 10,
-          )
+          ),
         ],
       ),
       expiration: moonLanding,

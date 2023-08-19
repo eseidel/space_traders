@@ -18,10 +18,10 @@ void main() {
                 'shipSymbol': 'ESEIDEL2-1',
                 'totalSeconds': 70,
                 'remainingSeconds': 6,
-                'expiration': '2023-05-20T22:53:30.735Z'
-              }
-            }
-          }
+                'expiration': '2023-05-20T22:53:30.735Z',
+              },
+            },
+          },
         }),
       ),
     );
@@ -41,10 +41,10 @@ void main() {
                 'shipSymbol': 'ESEIDEL2-1',
                 'totalSeconds': 70,
                 'remainingSeconds': 10,
-                'expiration': '2023-05-21T00:17:14.284Z'
-              }
-            }
-          }
+                'expiration': '2023-05-21T00:17:14.284Z',
+              },
+            },
+          },
         }),
       ),
     );
@@ -64,8 +64,8 @@ void main() {
         'error': {
           'message': 'Ship extract failed. '
               'Survey X1-VS75-67965Z-D0F7C6 has been exhausted.',
-          'code': 4224
-        }
+          'code': 4224,
+        },
       }),
     );
     expect(isSurveyExhaustedException(exception), isTrue);
@@ -78,8 +78,8 @@ void main() {
         'error': {
           'message': 'Ship survey failed. '
               'Target signature is no longer in range or valid.',
-          'code': 4221
-        }
+          'code': 4221,
+        },
       }),
     );
     expect(isSurveyExpiredException(exception), isTrue);
@@ -97,10 +97,10 @@ void main() {
               'shipSymbol': 'ESEIDEL2-1',
               'totalSeconds': 70,
               'remainingSeconds': 6,
-              'expiration': '2023-05-20T22:53:30.735Z'
-            }
-          }
-        }
+              'expiration': '2023-05-20T22:53:30.735Z',
+            },
+          },
+        },
       }),
     );
     expect(isAPIExceptionWithCode(exception, 4000), isTrue);

@@ -76,7 +76,7 @@ void main() {
         symbol: ShipMountSymbolEnum.SURVEYOR_I,
         name: '',
         requirements: ShipRequirements(),
-      )
+      ),
     ]);
     when(() => agentCache.headquartersSymbol).thenReturn(symbol);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
@@ -92,7 +92,7 @@ void main() {
         description: '',
         name: '',
         symbol: WaypointTraitSymbolEnum.SHIPYARD,
-      )
+      ),
     ]);
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);

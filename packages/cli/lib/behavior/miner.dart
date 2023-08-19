@@ -156,7 +156,7 @@ Future<Survey?> surveyWorthMining(
 final _laserMountSymbols = {
   ShipMountSymbolEnum.MINING_LASER_I,
   ShipMountSymbolEnum.MINING_LASER_II,
-  ShipMountSymbolEnum.MINING_LASER_III
+  ShipMountSymbolEnum.MINING_LASER_III,
 };
 
 int _laserMountStrength(Ship ship) {

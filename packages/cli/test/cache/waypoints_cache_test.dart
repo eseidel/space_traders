@@ -46,7 +46,7 @@ void main() {
         type: WaypointType.PLANET,
         x: 0,
         y: 0,
-      )
+      ),
     ]);
     final chartingCache = _MockChartingCache();
     final waypointCache = WaypointCache(api, systemsCache, chartingCache);

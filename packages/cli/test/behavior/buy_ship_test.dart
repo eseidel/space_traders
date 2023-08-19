@@ -103,7 +103,7 @@ void main() {
         symbol: WaypointTraitSymbolEnum.SHIPYARD,
         name: '',
         description: '',
-      )
+      ),
     ]);
 
     final agent = _MockAgent();
@@ -135,7 +135,7 @@ void main() {
         shipType: shipType,
         purchasePrice: 1,
         timestamp: DateTime(2021),
-      )
+      ),
     ]);
 
     when(

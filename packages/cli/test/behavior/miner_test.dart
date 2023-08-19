@@ -78,7 +78,7 @@ void main() {
             ],
             size: SurveySizeEnum.SMALL,
           ),
-        )
+        ),
     ];
     when(() => db.recentSurveysAtWaypoint(waypointSymbol, count: 100))
         .thenAnswer((_) => Future.value(surveys));
@@ -112,7 +112,7 @@ void main() {
           symbol: WaypointTraitSymbolEnum.MARKETPLACE,
           name: '',
           description: '',
-        )
+        ),
       ],
     );
     final nearest = await nearestWaypointWithMarket(waypointCache, start);
@@ -158,7 +158,7 @@ void main() {
           symbol: WaypointTraitSymbolEnum.MARKETPLACE,
           name: '',
           description: '',
-        )
+        ),
       ],
     );
     final nearest = await nearestWaypointWithMarket(waypointCache, start);
