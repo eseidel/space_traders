@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 /// Query to insert an extraction.
 Query insertExtractionQuery(ExtractionRecord extraction) {
   return Query(
-    'INSERT INTO extractions (ship_symbol, waypoint_symbol, trade_symbol, '
+    'INSERT INTO extraction_ (ship_symbol, waypoint_symbol, trade_symbol, '
     'quantity, power, survey_signature, timestamp) VALUES (@shipSymbol, '
     '@waypointSymbol, @tradeSymbol, @quantity, @power, @surveySignature, '
     '@timestamp)',
