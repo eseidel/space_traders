@@ -77,6 +77,6 @@ void main() {
       logger,
       () async => Caches.load(fs, api, db, httpGet: httpGet),
     );
-    expect(caches.agent, isNotNull);
+    expect(caches.factions, isNotEmpty);
   });
 }
