@@ -197,9 +197,17 @@ class MineJob {
   /// The mine to extract from.
   final WaypointSymbol mine;
 
-  /// The market to sell to.
+  /// The market to value goods against.
   final WaypointSymbol market;
 }
+
+// Miner stages
+// - Empty cargo if needed
+// - Navigate to mine
+// - Survey if needed
+// - Mine
+// - Navigate to market
+// - Sell
 
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(

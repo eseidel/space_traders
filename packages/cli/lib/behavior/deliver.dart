@@ -9,6 +9,7 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:db/db.dart';
+import 'package:meta/meta.dart';
 import 'package:more/collection.dart';
 import 'package:types/types.dart';
 
@@ -414,72 +415,87 @@ Future<JobResult> doInitJob(
   return JobResult.complete();
 }
 
-/// Advance the behavior of the given ship.
-Future<DateTime?> advanceDeliver(
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  BehaviorState state,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  final jobFunctions = <Future<JobResult> Function(
-    BehaviorState,
-    Api,
-    Database,
-    CentralCommand,
-    Caches,
-    Ship, {
-    DateTime Function() getNow,
-  })>[
-    doInitJob,
-    doBuyJob,
-    doDeliverJob,
-  ];
+/// Creates a behavior from jobs.
+@immutable
+class MultiJob {
+  /// Create a new multi-job.
+  const MultiJob(this.name, this.jobFunctions);
 
-  for (var i = 0; i < 10; i++) {
-    shipInfo(ship, 'DELIVER ${state.jobIndex}');
-    if (state.jobIndex < 0 || state.jobIndex >= jobFunctions.length) {
-      centralCommand.disableBehaviorForShip(
-        ship,
-        'No behavior state.',
-        const Duration(hours: 1),
-      );
-      return null;
-    }
+  /// The name of this multi-job.
+  final String name;
 
-    final jobFunction = jobFunctions[state.jobIndex];
-    final result = await jobFunction(
-      state,
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-    );
-    shipInfo(ship, 'DELIVER ${state.jobIndex} $result');
-    if (result.isComplete) {
-      state.jobIndex++;
-      if (state.jobIndex < jobFunctions.length) {
-        centralCommand.setBehavior(ship.shipSymbol, state);
-      } else {
-        centralCommand.completeBehavior(ship.shipSymbol);
-        shipInfo(ship, 'Delivery complete!');
+  /// The job functions to run.
+  final List<
+      Future<JobResult> Function(
+        BehaviorState,
+        Api,
+        Database,
+        CentralCommand,
+        Caches,
+        Ship, {
+        DateTime Function() getNow,
+      })> jobFunctions;
+
+  /// Run the multi-job.
+  Future<DateTime?> run(
+    Api api,
+    Database db,
+    CentralCommand centralCommand,
+    Caches caches,
+    BehaviorState state,
+    Ship ship, {
+    DateTime Function() getNow = defaultGetNow,
+  }) async {
+    for (var i = 0; i < 10; i++) {
+      shipInfo(ship, '$name ${state.jobIndex}');
+      if (state.jobIndex < 0 || state.jobIndex >= jobFunctions.length) {
+        centralCommand.disableBehaviorForShip(
+          ship,
+          'No behavior state.',
+          const Duration(hours: 1),
+        );
         return null;
       }
+
+      final jobFunction = jobFunctions[state.jobIndex];
+      final result = await jobFunction(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+      );
+      shipInfo(ship, '$name ${state.jobIndex} $result');
+      if (result.isComplete) {
+        state.jobIndex++;
+        if (state.jobIndex < jobFunctions.length) {
+          centralCommand.setBehavior(ship.shipSymbol, state);
+        } else {
+          centralCommand.completeBehavior(ship.shipSymbol);
+          shipInfo(ship, '$name complete!');
+          return null;
+        }
+      }
+      if (result.shouldReturn) {
+        return result.waitTime;
+      }
     }
-    if (result.shouldReturn) {
-      return result.waitTime;
-    }
+    centralCommand.disableBehaviorForAll(
+      ship,
+      'Too many $name job iterations',
+      const Duration(hours: 1),
+    );
+    return null;
   }
-  centralCommand.disableBehaviorForAll(
-    ship,
-    'Too many deliver job iterations',
-    const Duration(hours: 1),
-  );
-  return null;
 }
+
+/// Advance the behavior of the given ship.
+final advanceDeliver = const MultiJob('Deliver', [
+  doInitJob,
+  doBuyJob,
+  doDeliverJob,
+]).run;
 
 // This seems related to using haulers for delivery of trade goods.
 // They get loaded by miners.

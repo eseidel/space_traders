@@ -23,6 +23,7 @@ class ShipBuyJob {
   final WaypointSymbol shipyardSymbol;
 }
 
+/// CostedTrip for ShipyardPrice.
 typedef ShipyardTrip = CostedTrip<ShipyardPrice>;
 
 List<ShipyardTrip> _shipyardsSellingByDistance(
