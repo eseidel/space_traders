@@ -5,7 +5,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:more/collection.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -109,14 +108,14 @@ void main() {
     when(() => centralCommand.templateForShip(ship)).thenReturn(
       ShipTemplate(
         frameSymbol: ShipFrameSymbolEnum.CARRIER,
-        mounts: Multiset.from([
+        mounts: MountSymbolSet.from([
           ShipMountSymbolEnum.SURVEYOR_I,
           ShipMountSymbolEnum.SURVEYOR_II,
         ]),
       ),
     );
     when(() => centralCommand.unclaimedMountsAt(symbol))
-        .thenReturn(Multiset.from([ShipMountSymbolEnum.SURVEYOR_II]));
+        .thenReturn(MountSymbolSet.from([ShipMountSymbolEnum.SURVEYOR_II]));
 
     final state = _MockBehaviorState();
 

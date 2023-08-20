@@ -13,7 +13,6 @@ import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
-import 'package:more/collection.dart';
 import 'package:types/types.dart';
 
 // Central command sets behavior for all ships.
@@ -63,21 +62,6 @@ class _ShipTimeout {
   final ShipSymbol shipSymbol;
   final Behavior behavior;
   final DateTime timeout;
-}
-
-/// Mounts template for a ship.
-class ShipTemplate {
-  /// Create a new ship template.
-  const ShipTemplate({
-    required this.frameSymbol,
-    required this.mounts,
-  });
-
-  /// Frame type that this template is for.
-  final ShipFrameSymbolEnum frameSymbol;
-
-  /// Mounts that this template has.
-  final Multiset<ShipMountSymbolEnum> mounts;
 }
 
 /// Where are we in the phases of the reset.
@@ -199,7 +183,7 @@ class CentralCommand {
   ShipTemplate? templateForShip(Ship ship) {
     final genericMiner = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.MINER,
-      mounts: Multiset.from([
+      mounts: MountSymbolSet.from([
         ShipMountSymbolEnum.MINING_LASER_II,
         ShipMountSymbolEnum.MINING_LASER_II,
         ShipMountSymbolEnum.SURVEYOR_I,
@@ -209,14 +193,14 @@ class CentralCommand {
     // According to SAF: Surveyor = 2x mk2s,  miner = 2x mk2 + 1x mk1
     final surveyOnly = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.MINER,
-      mounts: Multiset.from([
+      mounts: MountSymbolSet.from([
         ShipMountSymbolEnum.SURVEYOR_II,
         ShipMountSymbolEnum.SURVEYOR_II,
       ]),
     );
     // final mineOnly = ShipTemplate(
     //   frameSymbol: ShipFrameSymbolEnum.MINER,
-    //   mounts: Multiset.from([
+    //   mounts: MountSymbolSet.from([
     //     ShipMountSymbolEnum.MINING_LASER_II,
     //     ShipMountSymbolEnum.MINING_LASER_II,
     //     ShipMountSymbolEnum.MINING_LASER_I,
@@ -240,8 +224,8 @@ class CentralCommand {
   }
 
   /// Add up all mounts needed for current ships based on current templating.
-  Multiset<ShipMountSymbolEnum> mountsNeededForAllShips() {
-    final totalNeeded = Multiset<ShipMountSymbolEnum>();
+  MountSymbolSet mountsNeededForAllShips() {
+    final totalNeeded = MountSymbolSet();
     for (final ship in _shipCache.ships) {
       final template = templateForShip(ship);
       if (template == null) {
@@ -427,8 +411,8 @@ class CentralCommand {
   }
 
   /// Returns the counts of mounts already claimed.
-  Multiset<ShipMountSymbolEnum> claimedMounts() {
-    final claimed = Multiset<ShipMountSymbolEnum>();
+  MountSymbolSet claimedMounts() {
+    final claimed = MountSymbolSet();
     for (final state in _behaviorCache.states) {
       final behavior = state.behavior;
       if (behavior != Behavior.changeMounts) {
@@ -444,13 +428,13 @@ class CentralCommand {
   }
 
   /// Returns the number of mounts available at the waypoint.
-  Multiset<ShipMountSymbolEnum> unclaimedMountsAt(WaypointSymbol waypoint) {
+  MountSymbolSet unclaimedMountsAt(WaypointSymbol waypoint) {
     // Get all the ships at that symbol
     final ships = _shipCache.ships
         .where((s) => s.waypointSymbol == waypoint && !s.isInTransit);
 
     // That have behavior delivery.
-    final available = Multiset<ShipMountSymbolEnum>();
+    final available = MountSymbolSet();
     for (final ship in ships) {
       final state = _behaviorCache.getBehavior(ship.shipSymbol);
       if (state == null || state.behavior != Behavior.deliver) {

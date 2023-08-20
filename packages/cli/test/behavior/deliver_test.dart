@@ -5,7 +5,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:more/collection.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -119,7 +118,7 @@ void main() {
     );
 
     when(centralCommand.mountsNeededForAllShips)
-        .thenReturn(Multiset.from([ShipMountSymbolEnum.GAS_SIPHON_I]));
+        .thenReturn(MountSymbolSet.from([ShipMountSymbolEnum.GAS_SIPHON_I]));
     final routePlanner = _MockRoutePlanner();
     when(() => caches.routePlanner).thenReturn(routePlanner);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);

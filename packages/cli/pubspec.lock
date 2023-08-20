@@ -77,10 +77,10 @@ packages:
     dependency: "direct main"
     description:
       name: collection
-      sha256: f092b211a4319e98e5ff58223576de6c2803db36221657b46c82574721240687
+      sha256: ee67cb0715911d28db6bf4af1026078bd6f0128b07a5f66fb2ed94ec6783c09a
       url: "https://pub.dev"
     source: hosted
-    version: "1.17.2"
+    version: "1.18.0"
   convert:
     dependency: transitive
     description:
@@ -249,13 +249,13 @@ packages:
     source: hosted
     version: "0.3.0"
   more:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: more
-      sha256: "74d7379587be84284e9e1a15b4c296351bfdac0370bf2e55de996f13c93a2dc3"
+      sha256: a06e9e78bd1446612c9fbb033612176f252bcb9ab905a778202d9f8212000c5a
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   node_preamble:
     dependency: transitive
     description:

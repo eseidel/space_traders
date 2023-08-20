@@ -12,6 +12,7 @@ dependencies:
   intl: ^0.17.0
   # We only want the model types.
   meta: ^1.9.1
+  more: ^4.0.1
   openapi:
     path: ../openapi
 

@@ -7,12 +7,11 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
-import 'package:more/collection.dart';
 import 'package:types/types.dart';
 
 ShipMountSymbolEnum? _pickMountFromAvailable(
-  Multiset<ShipMountSymbolEnum> available,
-  Multiset<ShipMountSymbolEnum> needed,
+  MountSymbolSet available,
+  MountSymbolSet needed,
 ) {
   // We could do something more sophisticated here.
   return needed.firstWhereOrNull((mount) => available[mount] > 0);

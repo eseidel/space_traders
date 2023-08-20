@@ -9,15 +9,14 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:db/db.dart';
-import 'package:more/collection.dart';
 import 'package:types/types.dart';
 
 // Go buy and deliver.
 // Used for modules.
 
 /// Compute the mounts in the given ship's inventory.
-Multiset<ShipMountSymbolEnum> countMountsInInventory(Ship ship) {
-  final counts = Multiset<ShipMountSymbolEnum>();
+MountSymbolSet countMountsInInventory(Ship ship) {
+  final counts = MountSymbolSet();
   for (final item in ship.cargo.inventory) {
     final mountSymbol = mountSymbolForTradeSymbol(item.tradeSymbol);
     // Will be null if the item isn't a mount.
@@ -30,22 +29,19 @@ Multiset<ShipMountSymbolEnum> countMountsInInventory(Ship ship) {
 }
 
 /// Compute the mounts mounted on the given ship.
-Multiset<ShipMountSymbolEnum> countMountedMounts(Ship ship) {
-  return Multiset<ShipMountSymbolEnum>.fromIterable(
+MountSymbolSet countMountedMounts(Ship ship) {
+  return MountSymbolSet.fromIterable(
     ship.mounts.map((m) => m.symbol),
   );
 }
 
 /// Mounts to add to make [ship] match [template].
-Multiset<ShipMountSymbolEnum> mountsToAddToShip(
-  Ship ship,
-  ShipTemplate template,
-) {
+MountSymbolSet mountsToAddToShip(Ship ship, ShipTemplate template) {
   return template.mounts.difference(countMountedMounts(ship));
 }
 
 /// Mounts to remove to make [ship] match [template].
-Multiset<ShipMountSymbolEnum> mountsToRemoveFromShip(
+MountSymbolSet mountsToRemoveFromShip(
   Ship ship,
   ShipTemplate template,
 ) {
@@ -62,7 +58,7 @@ class _BuyRequest {
   final int units;
 }
 
-_BuyRequest? _buyRequestFromNeededMounts(Multiset<ShipMountSymbolEnum> needed) {
+_BuyRequest? _buyRequestFromNeededMounts(MountSymbolSet needed) {
   if (needed.isEmpty) {
     return null;
   }
