@@ -7,6 +7,7 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/trading.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -22,39 +23,9 @@ class ShipBuyJob {
   final WaypointSymbol shipyardSymbol;
 }
 
-/// Calculated trip cost of going and buying something.
-class CostedTrip {
-  /// Create a new costed trip.
-  CostedTrip({required this.route, required this.price});
+typedef ShipyardTrip = CostedTrip<ShipyardPrice>;
 
-  /// The route to get there.
-  final RoutePlan route;
-
-  /// The historical price for the item at a given market.
-  final ShipyardPrice price;
-}
-
-/// Compute the cost of going to and buying from a specific MarketPrice record.
-CostedTrip? costTrip(
-  Ship ship,
-  RoutePlanner planner,
-  ShipyardPrice price,
-  WaypointSymbol start,
-  WaypointSymbol end,
-) {
-  final route = planner.planRoute(
-    start: start,
-    end: end,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
-  );
-  if (route == null) {
-    return null;
-  }
-  return CostedTrip(route: route, price: price);
-}
-
-List<CostedTrip> _marketsTradingSortedByDistance(
+List<ShipyardTrip> _shipyardsSellingByDistance(
   ShipyardPrices shipyardPrices,
   RoutePlanner routePlanner,
   Ship ship,
@@ -72,7 +43,7 @@ List<CostedTrip> _marketsTradingSortedByDistance(
   // Find the closest 10 prices which are median or below.
   // final medianOrBelow = prices.where((e) => e.purchasePrice <= medianPrice);
 
-  final costed = <CostedTrip>[];
+  final costed = <ShipyardTrip>[];
   for (final price in prices) {
     final end = price.waypointSymbol;
     final trip = costTrip(ship, routePlanner, price, start, end);
@@ -91,14 +62,14 @@ List<CostedTrip> _marketsTradingSortedByDistance(
 /// Find the best market to buy a given item from.
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
 /// used for evaluating the trade-off between "closest" vs. "cheapest".
-CostedTrip? findBestShipyardToBuy(
+ShipyardTrip? findBestShipyardToBuy(
   ShipyardPrices shipyardPrices,
   RoutePlanner routePlanner,
   Ship ship,
   ShipType shipType, {
   required int expectedCreditsPerSecond,
 }) {
-  final sorted = _marketsTradingSortedByDistance(
+  final sorted = _shipyardsSellingByDistance(
     shipyardPrices,
     routePlanner,
     ship,

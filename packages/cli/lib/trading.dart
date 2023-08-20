@@ -457,22 +457,25 @@ CostedDeal? findDealFor(
 }
 
 /// Calculated trip cost of going and buying something.
-class CostedTrip {
+class CostedTrip<Price> {
   /// Create a new costed trip.
   CostedTrip({required this.route, required this.price});
 
   /// The route to get there.
   final RoutePlan route;
 
-  /// The historical price for the item at a given market.
-  final MarketPrice price;
+  /// The price of the item at the destination.
+  final Price price;
 }
 
+/// A trip to a market.
+typedef MarketTrip = CostedTrip<MarketPrice>;
+
 /// Compute the cost of going to and buying from a specific MarketPrice record.
-CostedTrip? costTrip(
+CostedTrip<T>? costTrip<T>(
   Ship ship,
   RoutePlanner planner,
-  MarketPrice price,
+  T price,
   WaypointSymbol start,
   WaypointSymbol end,
 ) {
@@ -488,7 +491,7 @@ CostedTrip? costTrip(
   return CostedTrip(route: route, price: price);
 }
 
-List<CostedTrip> _marketsTradingSortedByDistance(
+List<MarketTrip> _marketsTradingSortedByDistance(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
@@ -506,10 +509,10 @@ List<CostedTrip> _marketsTradingSortedByDistance(
   // Find the closest 10 prices which are median or below.
   // final medianOrBelow = prices.where((e) => e.purchasePrice <= medianPrice);
 
-  final costed = <CostedTrip>[];
+  final costed = <MarketTrip>[];
   for (final price in prices) {
     final end = price.waypointSymbol;
-    final trip = costTrip(ship, routePlanner, price, start, end);
+    final trip = costTrip<MarketPrice>(ship, routePlanner, price, start, end);
     if (trip != null) {
       costed.add(trip);
     } else {
@@ -525,7 +528,7 @@ List<CostedTrip> _marketsTradingSortedByDistance(
 /// Find the best market to buy a given item from.
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
 /// used for evaluating the trade-off between "closest" vs. "cheapest".
-CostedTrip? findBestMarketToBuy(
+MarketTrip? findBestMarketToBuy(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
@@ -561,7 +564,7 @@ CostedTrip? findBestMarketToBuy(
 /// Find the best market to sell a given item to.
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
 /// used for evaluating the trade-off between "closest" vs. "cheapest".\
-CostedTrip? findBestMarketToSell(
+MarketTrip? findBestMarketToSell(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
