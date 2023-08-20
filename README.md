@@ -723,3 +723,149 @@ ApiException 500: {"error":{"code":500,"message":"Something unexpected went wron
 <asynchronous suspension>
 #11     main (file:///root/space_traders/packages/cli/bin/cli.dart:110:3)
 <asynchronous suspension>
+
+### Mounting failed?
+🛸#31 Changing mounts. Mounting MOUNT_MINING_LASER_II.
+Unhandled exception:
+ApiException 400: {"error":{"message":"Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1 unit(s) of MOUNT_MINING_LASER_II. Ship has 0 unit(s) of MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1","tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
+#0      FleetApi.transferCargo (package:openapi/api/fleet_api.dart:1910:7)
+<asynchronous suspension>
+#1      transferCargoAndLog (package:cli/net/actions.dart:516:20)
+<asynchronous suspension>
+#2      advanceChangeMounts (package:cli/behavior/change_mounts.dart:84:7)
+<asynchronous suspension>
+#3      advanceShipBehavior (package:cli/behavior/advance.dart:88:23)
+<asynchronous suspension>
+#4      advanceShips (package:cli/logic.dart:52:25)
+<asynchronous suspension>
+#5      logic (package:cli/logic.dart:152:7)
+<asynchronous suspension>
+#6      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:106:3)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:112:7)
+<asynchronous suspension>
+#8      main (file:///root/space_traders/packages/cli/bin/cli.dart:110:3)
+<asynchronous suspension>
+
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#4A No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-4A for 10m.
+🛸#45 🤝  21 AMMONIA_ICE          -7%  -3c per  21 x     38c =   +798c -> 🏦 3,252,627c
+🛸#45 🤝  27 IRON_ORE             -2%  -1c per  27 x     42c = +1,134c -> 🏦 3,253,761c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#45 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-45 for 10m.
+🛸#47 🤝  51 SILICON_CRYSTALS               ⚖️   51 x     33c = +1,683c -> 🏦 3,255,444c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#47 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-47 for 10m.
+🛸#10 🤝  51 COPPER_ORE          -11%  -6c per  51 x     47c = +2,397c -> 🏦 3,257,841c
+[WARN] 🛸#10 No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-10 for 1h.
+🛸#1  DELIVER 2
+🛸#1  DELIVER 2 Wait until 2023-08-20T14:34:58.213008Z
+🛸#11 🤝  44 AMMONIA_ICE          -7%  -3c per  44 x     38c = +1,672c -> 🏦 3,259,513c
+[WARN] 🛸#11 No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-11 for 1h.
+🛸#A  🤝  45 AMMONIA_ICE          -7%  -3c per  45 x     38c = +1,710c -> 🏦 3,261,223c
+[WARN] 🛸#A  No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-A for 1h.
+🛸#40 🤝  43 IRON_ORE             -2%  -1c per  43 x     42c = +1,806c -> 🏦 3,263,029c
+[WARN] 🛸#40 No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-40 for 1h.
+🛸#7  🤝  44 IRON_ORE             -2%  -1c per  44 x     42c = +1,848c -> 🏦 3,264,877c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+🛸#7  Claiming mount: MOUNT_SURVEYOR_II.
+🛸#7  Beginning route to X1-MU55-51307E
+🛸#7  🛫 to X1-MU55-51307E ORBITAL_STATION (47s) spent 22 fuel
+🛸#43 🤝  30 SILICON_CRYSTALS               ⚖️   30 x     33c =   +990c -> 🏦 3,265,867c
+🛸#43 🤝  25 AMMONIA_ICE          -7%  -3c per  25 x     38c =   +950c -> 🏦 3,266,817c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#43 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-43 for 10m.
+🛸#20 🤝  20 ICE_WATER                      ⚖️   20 x     13c =   +260c -> 🏦 3,267,077c
+🛸#20 🤝  28 COPPER_ORE          -11%  -6c per  28 x     47c = +1,316c -> 🏦 3,268,393c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#20 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-20 for 10m.
+🛸#24 🤝  28 AMMONIA_ICE          -7%  -3c per  28 x     38c = +1,064c -> 🏦 3,269,457c
+🛸#24 🤝  22 IRON_ORE             -2%  -1c per  22 x     42c =   +924c -> 🏦 3,270,381c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#24 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-24 for 10m.
+🛸#4  🤝  49 ICE_WATER                      ⚖️   49 x     13c =   +637c -> 🏦 3,271,018c
+[WARN] 🛸#4  No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-4 for 1h.
+🛸#21 🤝  30 ICE_WATER                      ⚖️   30 x     13c =   +390c -> 🏦 3,271,408c
+🛸#21 🤝  29 AMMONIA_ICE          -7%  -3c per  29 x     38c = +1,102c -> 🏦 3,272,510c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#21 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-21 for 10m.
+🛸#21 🔭 1x at X1-MU55-79315D
+🛸#16 🔭 1x at X1-MU55-79315D
+🛸#41 🤝  30 QUARTZ_SAND                    ⚖️   30 x     18c =   +540c -> 🏦 3,273,050c
+🛸#41 🤝  27 AMMONIA_ICE          -7%  -3c per  27 x     38c = +1,026c -> 🏦 3,274,076c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#41 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-41 for 10m.
+🛸#23 🤝  47 IRON_ORE             -2%  -1c per  47 x     42c = +1,974c -> 🏦 3,276,050c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#23 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-23 for 10m.
+🛸#F  🤝  51 ICE_WATER                      ⚖️   51 x     13c =   +663c -> 🏦 3,276,713c
+[WARN] 🛸#F  No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-F for 1h.
+🛸#22 🤝  46 ICE_WATER                      ⚖️   46 x     13c =   +598c -> 🏦 3,277,311c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#22 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-22 for 10m.
+🛸#22 🔭 1x at X1-MU55-79315D
+🛸#2D 🔭 1x at X1-MU55-79315D
+🛸#28 🔭 1x at X1-MU55-79315D
+🛸#15 🤝  49 AMMONIA_ICE          -7%  -3c per  49 x     38c = +1,862c -> 🏦 3,279,173c
+[WARN] 🛸#15 No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-15 for 1h.
+🛸#15 🔭 1x at X1-MU55-79315D
+🛸#3  🤝  52 ICE_WATER                      ⚖️   52 x     13c =   +676c -> 🏦 3,279,849c
+[WARN] 🛸#3  No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-3 for 1h.
+🛸#3  🔭 1x at X1-MU55-79315D
+🛸#12 🤝  50 ICE_WATER                      ⚖️   50 x     13c =   +650c -> 🏦 3,280,499c
+[WARN] 🛸#12 No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-12 for 1h.
+🛸#12 🔭 1x at X1-MU55-79315D
+🛸#27 🤝  20 IRON_ORE             -2%  -1c per  20 x     42c =   +840c -> 🏦 3,281,339c
+🛸#27 🤝  30 COPPER_ORE          -11%  -6c per  30 x     47c = +1,410c -> 🏦 3,282,749c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#27 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-27 for 10m.
+🛸#8  🤝  50 IRON_ORE             -2%  -1c per  50 x     42c = +2,100c -> 🏦 3,284,849c
+[WARN] 🛸#8  No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-8 for 1h.
+🛸#14 🤝  47 AMMONIA_ICE          -7%  -3c per  47 x     38c = +1,786c -> 🏦 3,286,635c
+[WARN] 🛸#14 No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-14 for 1h.
+🛸#2B 🤝  46 COPPER_ORE          -11%  -6c per  46 x     47c = +2,162c -> 🏦 3,288,797c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#2B No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-2B for 10m.
+[WARN] 🛸#2B (miner) took 1s (2 requests) expected 0.7s
+🛸#13 🤝  48 COPPER_ORE          -11%  -6c per  48 x     47c = +2,256c -> 🏦 3,291,053c
+[WARN] 🛸#13 No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-13 for 1h.
+🛸#2A 🤝  22 ICE_WATER                      ⚖️   22 x     13c =   +286c -> 🏦 3,291,339c
+🛸#2A 🤝  23 IRON_ORE             -2%  -1c per  23 x     42c =   +966c -> 🏦 3,292,305c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#2A No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-2A for 10m.
+🛸#19 🤝  25 AMMONIA_ICE          -7%  -3c per  25 x     38c =   +950c -> 🏦 3,293,255c
+🛸#19 🤝  22 COPPER_ORE          -11%  -6c per  22 x     47c = +1,034c -> 🏦 3,294,289c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#19 No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-19 for 10m.
+🛸#2  ✈️  to X1-QC63-33425X, 3m left
+🛸#2F 🤝  27 COPPER_ORE          -11%  -6c per  27 x     47c = +1,269c -> 🏦 3,295,558c
+🛸#2F 🤝  26 IRON_ORE             -2%  -1c per  26 x     42c = +1,092c -> 🏦 3,296,650c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#2F No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-2F for 10m.
+🛸#B  🤝  49 ICE_WATER                      ⚖️   49 x     13c =   +637c -> 🏦 3,297,287c
+[WARN] 🛸#B  No mounts needed. Disabling Behavior.changeMounts for ESEIDEL-B for 1h.
+🛸#1E 🤝  26 AMMONIA_ICE          -7%  -3c per  26 x     38c =   +988c -> 🏦 3,298,275c
+🛸#1E 🤝  29 COPPER_ORE          -11%  -6c per  29 x     47c = +1,363c -> 🏦 3,299,638c
+[WARN] More mounts claimed than available at X1-MU55-51307E: 1 > 0
+[WARN] 🛸#1E No unclaimed mounts at X1-MU55-51307E. Disabling Behavior.changeMounts for ESEIDEL-1E for 10m.
+🛸#31 Changing mounts. Mounting MOUNT_MINING_LASER_II.
+Unhandled exception:
+ApiException 400: {"error":{"message":"Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1 unit(s) of MOUNT_MINING_LASER_II. Ship has 0 unit(s) of MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1","tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
+#0      FleetApi.transferCargo (package:openapi/api/fleet_api.dart:1910:7)
+<asynchronous suspension>
+#1      transferCargoAndLog (package:cli/net/actions.dart:516:20)
+<asynchronous suspension>
+#2      advanceChangeMounts (package:cli/behavior/change_mounts.dart:84:7)
+<asynchronous suspension>
+#3      advanceShipBehavior (package:cli/behavior/advance.dart:88:23)
+<asynchronous suspension>
+#4      advanceShips (package:cli/logic.dart:52:25)
+<asynchronous suspension>
+#5      logic (package:cli/logic.dart:152:7)
+<asynchronous suspension>
+#6      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:106:3)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:112:7)
+<asynchronous suspension>
+#8      main (file:///root/space_traders/packages/cli/bin/cli.dart:110:3)
+<asynchronous suspension>
