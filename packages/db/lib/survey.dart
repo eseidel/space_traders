@@ -51,10 +51,20 @@ Query recentSurveysAtWaypointQuery({
 
 /// Insert a survey into the database.
 Query insertSurveyQuery(HistoricalSurvey survey) {
+  // The server will return duplicate signatures.  When it does that we
+  // just replace the one we have.
+  // Insert the survey or update it if it already exists.
   return Query(
     'INSERT INTO survey_ (signature, waypoint_symbol, deposits, expiration, '
     'size, timestamp, exhausted) VALUES (@signature, @waypoint_symbol, '
-    '@deposits, @expiration, @size, @timestamp, @exhausted)',
+    '@deposits, @expiration, @size, @timestamp, @exhausted) '
+    'ON CONFLICT (signature) DO UPDATE SET '
+    'waypoint_symbol = @waypoint_symbol, '
+    'deposits = @deposits, '
+    'expiration = @expiration, '
+    'size = @size, '
+    'timestamp = @timestamp, '
+    'exhausted = @exhausted',
     substitutionValues: surveyToColumnMap(survey),
   );
 }
