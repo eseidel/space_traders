@@ -383,22 +383,6 @@ class CentralCommand {
     return _behaviorCache.deleteBehavior(shipSymbol);
   }
 
-  /// Returns any mount that's been queued for adding to this ship.
-  ShipMountSymbolEnum? getMountToAdd(ShipSymbol shipSymbol) {
-    final state = _behaviorCache.getBehavior(shipSymbol);
-    return state?.mountToAdd;
-  }
-
-  /// Saves the given mount to be added to the ship.
-  void claimMount(ShipSymbol shipSymbol, ShipMountSymbolEnum mountSymbol) {
-    final state = _behaviorCache.getBehavior(shipSymbol);
-    if (state == null) {
-      logger.warn('No state for $shipSymbol');
-      return;
-    }
-    state.mountToAdd = mountSymbol;
-  }
-
   /// Returns the delivery ship bringing the mounts.
   Ship? getDeliveryShip(ShipSymbol shipSymbol, TradeSymbol item) {
     final deliveryShip = _shipCache.ships.first;
@@ -453,62 +437,6 @@ class CentralCommand {
       }
     }
     return available.difference(claimed);
-  }
-
-  /// Sets the deliver state for the given ship.
-  void setBuyJob(Ship ship, BuyJob buyJob) {
-    final shipSymbol = ship.shipSymbol;
-    final state = _behaviorCache.getBehavior(shipSymbol);
-    if (state == null) {
-      shipWarn(ship, 'No state for $shipSymbol');
-      return;
-    }
-    state.buyJob = buyJob;
-  }
-
-  /// Returns the DeliverState for the given ship.
-  BuyJob? getBuyJob(Ship ship) {
-    final shipSymbol = ship.shipSymbol;
-    final state = _behaviorCache.getBehavior(shipSymbol);
-    return state?.buyJob;
-  }
-
-  /// Sets the deliver state for the given ship.
-  void setDeliverJob(Ship ship, DeliverJob deliverJob) {
-    final shipSymbol = ship.shipSymbol;
-    final state = _behaviorCache.getBehavior(shipSymbol);
-    if (state == null) {
-      shipWarn(ship, 'No state for $shipSymbol');
-      return;
-    }
-    state.deliverJob = deliverJob;
-  }
-
-  /// Returns the DeliverState for the given ship.
-  DeliverJob? getDeliverJob(Ship ship) {
-    final shipSymbol = ship.shipSymbol;
-    final state = _behaviorCache.getBehavior(shipSymbol);
-    return state?.deliverJob;
-  }
-
-  /// Set the [RoutePlan] for the ship.
-  void setRoutePlan(Ship ship, RoutePlan routePlan) {
-    final state = _behaviorCache.getBehavior(ship.shipSymbol)!
-      ..routePlan = routePlan;
-    _behaviorCache.setBehavior(ship.shipSymbol, state);
-  }
-
-  /// Get the current [RoutePlan] for the given ship.
-  RoutePlan? currentRoutePlan(Ship ship) {
-    final state = _behaviorCache.getBehavior(ship.shipSymbol);
-    return state?.routePlan;
-  }
-
-  /// The [ship] has reached its destination.
-  void reachedEndOfRoutePlan(Ship ship) {
-    final state = _behaviorCache.getBehavior(ship.shipSymbol)!
-      ..routePlan = null;
-    _behaviorCache.setBehavior(ship.shipSymbol, state);
   }
 
   /// Record the given [transactions] for the current deal for [ship].

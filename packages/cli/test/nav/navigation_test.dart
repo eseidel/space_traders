@@ -38,8 +38,8 @@ void main() {
     final centralCommand = _MockCentralCommand();
 
     /// The behavior doesn't matter, just needs to have a null destination.
-    when(() => centralCommand.getBehavior(shipSymbol))
-        .thenAnswer((_) => BehaviorState(shipSymbol, Behavior.idle));
+    final state = BehaviorState(shipSymbol, Behavior.idle);
+    when(() => centralCommand.getBehavior(shipSymbol)).thenAnswer((_) => state);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -56,6 +56,7 @@ void main() {
       () => continueNavigationIfNeeded(
         api,
         ship,
+        state,
         shipCache,
         systemsCache,
         centralCommand,
@@ -79,6 +80,7 @@ void main() {
       () => continueNavigationIfNeeded(
         api,
         ship,
+        state,
         shipCache,
         systemsCache,
         centralCommand,

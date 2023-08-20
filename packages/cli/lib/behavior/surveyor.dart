@@ -25,6 +25,7 @@ Future<DateTime?> advanceSurveyor(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,

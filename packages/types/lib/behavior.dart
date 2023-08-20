@@ -51,7 +51,7 @@ class BehaviorState {
     this.buyJob,
     this.deliverJob,
     this.jobIndex = 0,
-  });
+  }) : isComplete = false;
 
   /// Create a new behavior state from JSON.
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
@@ -108,6 +108,10 @@ class BehaviorState {
 
   /// Mount to add.
   ShipMountSymbolEnum? mountToAdd;
+
+  /// This behavior is complete.
+  /// Never written to disk (instead the behavior state is deleted).
+  bool isComplete;
 
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {

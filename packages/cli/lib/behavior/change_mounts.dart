@@ -38,7 +38,7 @@ Future<DateTime?> advanceChangeMounts(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final toMount = centralCommand.getMountToAdd(ship.shipSymbol);
+  final toMount = state.mountToAdd;
 
   // Re-validate every loop in case resuming from error.
   final template = assertNotNull(
@@ -170,12 +170,13 @@ Future<DateTime?> advanceChangeMounts(
     const Duration(minutes: 10),
   );
   shipInfo(ship, 'Claiming mount: $toClaim.');
-  centralCommand.claimMount(ship.shipSymbol, toClaim);
+  state.mountToAdd = toClaim;
 
   // Go to the shipyard.
   final waitUntil = beingNewRouteAndLog(
     api,
     ship,
+    state,
     caches.ships,
     caches.systems,
     caches.routePlanner,

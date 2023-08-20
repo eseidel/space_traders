@@ -265,6 +265,7 @@ Future<DateTime?> advanceBuyShip(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,

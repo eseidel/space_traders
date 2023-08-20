@@ -73,6 +73,7 @@ Future<DateTime?> advanceShipBehavior(
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
+    state,
     caches.ships,
     caches.systems,
     centralCommand,
@@ -94,6 +95,13 @@ Future<DateTime?> advanceShipBehavior(
       ship,
       getNow: getNow,
     );
+    if (state.isComplete) {
+      // If the behavior is complete, clear it.
+      centralCommand.completeBehavior(ship.shipSymbol);
+    } else {
+      // Otherwise update the behavior state.
+      centralCommand.setBehavior(ship.shipSymbol, state);
+    }
     return waitUntil;
   } on JobException catch (error) {
     centralCommand.disableBehaviorForShip(

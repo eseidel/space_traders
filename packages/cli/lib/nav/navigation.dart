@@ -14,6 +14,7 @@ import 'package:types/types.dart';
 Future<DateTime?> beingNewRouteAndLog(
   Api api,
   Ship ship,
+  BehaviorState state,
   ShipCache shipCache,
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
@@ -43,6 +44,7 @@ Future<DateTime?> beingNewRouteAndLog(
   final waitTime = await beingRouteAndLog(
     api,
     ship,
+    state,
     shipCache,
     systemsCache,
     centralCommand,
@@ -57,6 +59,7 @@ Future<DateTime?> beingNewRouteAndLog(
 Future<DateTime?> beingRouteAndLog(
   Api api,
   Ship ship,
+  BehaviorState state,
   ShipCache shipCache,
   SystemsCache systemsCache,
   CentralCommand centralCommand,
@@ -67,12 +70,13 @@ Future<DateTime?> beingRouteAndLog(
     return null;
   }
 
-  centralCommand.setRoutePlan(ship, routePlan);
+  state.routePlan = routePlan;
   // TODO(eseidel): Should this buy fuel first if we need it?
   shipInfo(ship, 'Beginning route to ${routePlan.endSymbol}');
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
+    state,
     shipCache,
     systemsCache,
     centralCommand,
@@ -150,6 +154,7 @@ void _verifyJumpTime(
 Future<NavResult> continueNavigationIfNeeded(
   Api api,
   Ship ship,
+  BehaviorState state,
   ShipCache shipCache,
   SystemsCache systemsCache,
   CentralCommand centralCommand, {
@@ -173,21 +178,21 @@ Future<NavResult> continueNavigationIfNeeded(
     // has arrived before we got a chance to update it here.
     ship.nav.status = ShipNavStatus.IN_ORBIT;
   }
-  final routePlan = centralCommand.currentRoutePlan(ship);
+  final routePlan = state.routePlan;
   if (routePlan == null) {
     // We don't have a routePlan, so we can't navigate.
     return NavResult._continueAction();
   }
   if (routePlan.actions.isEmpty) {
     shipWarn(ship, "Route plan is empty, assuming we're already there.");
-    centralCommand.reachedEndOfRoutePlan(ship);
+    state.routePlan = null;
     return NavResult._continueAction();
   }
 
   // We've reached the routePlan, so we can stop navigating.
   if (ship.waypointSymbol == routePlan.endSymbol) {
     // Remove the destination from the ship's state or it will try to come back.
-    centralCommand.reachedEndOfRoutePlan(ship);
+    state.routePlan = null;
     return NavResult._continueAction();
   }
   final action = routePlan.nextActionFrom(ship.waypointSymbol);

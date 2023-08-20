@@ -222,6 +222,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   CentralCommand centralCommand,
   Waypoint waypoint,
   Ship ship,
+  BehaviorState state,
 ) async {
   if (ship.fuelPercentage > 0.4) {
     return null;
@@ -250,6 +251,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   final waitUntil = await beingNewRouteAndLog(
     api,
     ship,
+    state,
     caches.ships,
     caches.systems,
     caches.routePlanner,
@@ -314,6 +316,7 @@ Future<DateTime?> advanceExplorer(
     centralCommand,
     waypoint,
     ship,
+    state,
   );
   if (refuelWaitTime != null) {
     return refuelWaitTime;
@@ -350,6 +353,7 @@ Future<DateTime?> advanceExplorer(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,

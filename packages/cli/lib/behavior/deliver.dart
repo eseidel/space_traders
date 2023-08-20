@@ -187,6 +187,7 @@ Future<JobResult> doBuyJob(
     centralCommand,
     caches,
     ship,
+    state,
     maybeMarket,
     buyJob.tradeSymbol,
   );
@@ -199,6 +200,7 @@ Future<JobResult> doBuyJob(
     final waitUntil = await beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,
@@ -309,6 +311,7 @@ Future<JobResult> doDeliverJob(
     final waitUntil = await beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,
@@ -346,7 +349,7 @@ Future<JobResult> doInitJob(
     const Duration(minutes: 20),
   );
 
-  centralCommand.setBuyJob(ship, buyJob);
+  state.buyJob = buyJob;
 
   final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
   final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
@@ -356,7 +359,7 @@ Future<JobResult> doInitJob(
     tradeSymbol: buyJob.tradeSymbol,
     waypointSymbol: shipyard.waypointSymbol,
   );
-  centralCommand.setDeliverJob(ship, deliverJob);
+  state.deliverJob = deliverJob;
   return JobResult.complete();
 }
 

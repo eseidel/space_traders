@@ -206,8 +206,8 @@ class MineJob {
 // - Navigate to mine
 // - Survey if needed
 // - Mine
+// - Handle cargo (navigate to market, sell, jettison, etc)
 // - Navigate to market
-// - Sell
 
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
@@ -272,6 +272,7 @@ Future<DateTime?> advanceMiner(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,
@@ -289,6 +290,7 @@ Future<DateTime?> advanceMiner(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,
@@ -324,6 +326,8 @@ Future<DateTime?> advanceMiner(
     if (ship.isCommand) {
       centralCommand.completeBehavior(ship.shipSymbol);
     }
+    // We wait the full cooldown because our next action will be either
+    // surveying or mining, both of which require the reactor cooldown.
     return response.cooldown.expiration;
   }
 

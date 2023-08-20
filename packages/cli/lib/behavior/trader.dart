@@ -129,6 +129,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
+  BehaviorState state,
   Market currentMarket,
   CostedDeal costedDeal,
 ) async {
@@ -192,6 +193,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
   return beingNewRouteAndLog(
     api,
     ship,
+    state,
     caches.ships,
     caches.systems,
     caches.routePlanner,
@@ -344,6 +346,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
+  BehaviorState state,
   CostedDeal costedDeal,
 ) {
   final haveDealCargo = ship.cargo.countUnits(costedDeal.tradeSymbol) > 0;
@@ -352,6 +355,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,
@@ -365,6 +369,7 @@ Future<DateTime?> _handleOffCourseWithDeal(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,
@@ -380,6 +385,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
+  BehaviorState state,
   Market currentMarket,
   CostedDeal costedDeal,
 ) {
@@ -390,6 +396,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
     return beingNewRouteAndLog(
       api,
       ship,
+      state,
       caches.ships,
       caches.systems,
       caches.routePlanner,
@@ -425,6 +432,7 @@ Future<DateTime?> _handleDeal(
   Caches caches,
   CostedDeal costedDeal,
   Ship ship,
+  BehaviorState state,
   Market? currentMarket,
 ) async {
   // If we're at the source buy the cargo.
@@ -440,6 +448,7 @@ Future<DateTime?> _handleDeal(
       centralCommand,
       caches,
       ship,
+      state,
       currentMarket,
       costedDeal,
     );
@@ -457,6 +466,7 @@ Future<DateTime?> _handleDeal(
       centralCommand,
       caches,
       ship,
+      state,
       currentMarket,
       costedDeal,
     );
@@ -466,6 +476,7 @@ Future<DateTime?> _handleDeal(
     centralCommand,
     caches,
     ship,
+    state,
     costedDeal,
   );
 }
@@ -536,6 +547,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   MarketPrices marketPrices,
   ShipCache shipCache,
   Ship ship,
+  BehaviorState state,
   String why,
 ) async {
   shipWarn(ship, why);
@@ -556,6 +568,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   final waitUntil = await beingNewRouteAndLog(
     api,
     ship,
+    state,
     shipCache,
     systemsCache,
     routePlanner,
@@ -572,6 +585,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
+  BehaviorState state,
   Market? currentMarket,
   TradeSymbol? wantedTradeSymbol,
 ) async {
@@ -629,6 +643,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   final waitUntil = await beingRouteAndLog(
     api,
     ship,
+    state,
     caches.ships,
     caches.systems,
     centralCommand,
@@ -693,6 +708,7 @@ Future<DateTime?> advanceTrader(
     centralCommand,
     caches,
     ship,
+    state,
     currentMarket,
     pastDeal?.tradeSymbol,
   );
@@ -709,6 +725,7 @@ Future<DateTime?> advanceTrader(
       caches,
       pastDeal,
       ship,
+      state,
       currentMarket,
     );
     return waitUntil;
@@ -739,6 +756,7 @@ Future<DateTime?> advanceTrader(
       caches.marketPrices,
       caches.ships,
       ship,
+      state,
       why,
     );
     return waitUntil;
@@ -768,6 +786,7 @@ Future<DateTime?> advanceTrader(
     caches,
     newDeal,
     ship,
+    state,
     currentMarket,
   );
   return waitUntil;
