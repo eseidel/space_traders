@@ -419,38 +419,6 @@ class CentralCommand {
     return Behavior.idle;
   }
 
-  /// Disable the given behavior for timeout.
-  // This should be a return type from the advance function instead of a
-  // callback to the central command.
-  // explicitBehavior is only used for shared code like buyShipIfPossible.
-  void disableBehaviorForAll(
-    Ship ship,
-    String why,
-    Duration timeout, {
-    Behavior? explicitBehavior,
-  }) {
-    final shipSymbol = ship.shipSymbol;
-    final currentState = _behaviorCache.getBehavior(shipSymbol);
-    final behavior = explicitBehavior ?? currentState?.behavior;
-    if (behavior == null) {
-      shipWarn(ship, '$shipSymbol has no behavior to disable.');
-      return;
-    }
-    shipWarn(
-      ship,
-      '$why Disabling $behavior for ${approximateDuration(timeout)}.',
-    );
-
-    if (currentState == null || currentState.behavior == behavior) {
-      _behaviorCache.deleteBehavior(shipSymbol);
-    } else {
-      shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
-    }
-
-    final expiration = DateTime.timestamp().add(timeout);
-    _behaviorTimeouts[behavior] = expiration;
-  }
-
   /// Disable the given behavior for [ship] for [duration].
   void disableBehaviorForShip(
     Ship ship,
@@ -994,21 +962,12 @@ class CentralCommand {
       // Catch any job error from buyShipIfPossible and explicitly
       // disable the buyShip behavior rather than whatever behavior
       // we happen to be running.
-      if (error.disable == DisableBehavior.thisShip) {
-        disableBehaviorForShip(
-          ship,
-          error.message,
-          error.timeout,
-          explicitBehavior: Behavior.buyShip,
-        );
-      } else {
-        disableBehaviorForAll(
-          ship,
-          error.message,
-          error.timeout,
-          explicitBehavior: Behavior.buyShip,
-        );
-      }
+      disableBehaviorForShip(
+        ship,
+        error.message,
+        error.timeout,
+        explicitBehavior: Behavior.buyShip,
+      );
     }
   }
 

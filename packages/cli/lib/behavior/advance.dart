@@ -96,21 +96,12 @@ Future<DateTime?> advanceShipBehavior(
     );
     return waitUntil;
   } on JobException catch (error) {
-    if (error.disable == DisableBehavior.thisShip) {
-      centralCommand.disableBehaviorForShip(
-        ship,
-        error.message,
-        error.timeout,
-        explicitBehavior: error.explicitBehavior,
-      );
-    } else {
-      centralCommand.disableBehaviorForAll(
-        ship,
-        error.message,
-        error.timeout,
-        explicitBehavior: error.explicitBehavior,
-      );
-    }
+    centralCommand.disableBehaviorForShip(
+      ship,
+      error.message,
+      error.timeout,
+      explicitBehavior: error.explicitBehavior,
+    );
   }
   return null;
 }

@@ -34,29 +34,6 @@ class _MockShipNav extends Mock implements ShipNav {}
 class _MockShipFrame extends Mock implements ShipFrame {}
 
 void main() {
-  test('CentralCommand.isDisabledForAll', () async {
-    final behaviorCache = _MockBehhaviorCache();
-    final shipCache = _MockShipCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-    expect(centralCommand.isBehaviorDisabled(Behavior.trader), false);
-
-    final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('S-1');
-    final logger = _MockLogger();
-
-    await runWithLogger(
-      logger,
-      () async => centralCommand.disableBehaviorForAll(
-        ship,
-        'why',
-        const Duration(hours: 1),
-        explicitBehavior: Behavior.trader,
-      ),
-    );
-    expect(centralCommand.isBehaviorDisabled(Behavior.trader), true);
-  });
-
   test('CentralCommand.isDisabledForShip', () async {
     final fs = MemoryFileSystem.test();
     final behaviorCache = BehaviorCache.load(fs);

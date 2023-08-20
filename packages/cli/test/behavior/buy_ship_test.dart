@@ -225,7 +225,6 @@ void main() {
         const JobException(
           'Purchased A-1 (SHIP_HEAVY_FREIGHTER)!',
           Duration(minutes: 10),
-          disable: DisableBehavior.allShips,
         ),
       ),
     );

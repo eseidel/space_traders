@@ -116,7 +116,6 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
     shipyardPrices.medianPurchasePrice(shipType),
     'Failed to buy ship, no median price for $shipType.',
     const Duration(minutes: 10),
-    disable: DisableBehavior.allShips,
   );
   final maxMedianMultiplier = maxMedianShipPriceMultipler;
   final maxPrice = (medianPrice * maxMedianMultiplier).round();
@@ -130,7 +129,6 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
     'Can not buy $shipType, budget ${creditsString(credits)} '
     '< max price ${creditsString(maxPrice)}.',
     const Duration(minutes: 10),
-    disable: DisableBehavior.allShips,
   );
 
   final recentPrice = assertNotNull(
@@ -236,7 +234,6 @@ Future<DateTime?> advanceBuyShip(
     caches.shipyardPrices.medianPurchasePrice(shipType),
     'Failed to buy ship, no median price for $shipType.',
     const Duration(minutes: 20),
-    disable: DisableBehavior.allShips,
   );
 
   // Separate out the number of credits needed to go check
@@ -261,7 +258,6 @@ Future<DateTime?> advanceBuyShip(
     'credits ${creditsString(credits)} < '
     '$priceAdjustment * price = ${creditsString(maxPriceToCheck)}.',
     const Duration(minutes: 10),
-    disable: DisableBehavior.allShips,
   );
 
   if (currentWaypoint.waypointSymbol != shipyardSymbol) {
@@ -321,7 +317,6 @@ Future<DateTime?> advanceBuyShip(
     false,
     'Purchased ${result.ship.symbol} ($shipType)!',
     const Duration(minutes: 10),
-    disable: DisableBehavior.allShips,
   );
   return null;
 }
