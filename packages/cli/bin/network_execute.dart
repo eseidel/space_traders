@@ -111,7 +111,7 @@ class NetExecutor {
       stats.record(response);
       final duration = DateTime.timestamp().difference(before);
       logger.detail(
-        '${approximateDuration(duration)} ${request.priority} '
+        '${approximateDuration(duration).padRight(5)} ${request.priority} '
         '${response.statusCode} ${request.request.method.padRight(5)} $path',
       );
       if (response.statusCode == 429) {
