@@ -187,14 +187,15 @@ class CentralCommand {
     if (_shipCache.ships.length < 30) {
       return GamePhase.early;
     }
-    final traderCount = _shipCache.ships
-        .where((s) => s.registration.role == ShipRole.HAULER)
-        .length;
-    if (traderCount < 30) {
-      return GamePhase.ramp;
-    }
-    // When is GamePhase.exploring?
-    return GamePhase.tradingTransition;
+    // final traderCount = _shipCache.ships
+    //     .where((s) => s.registration.role == ShipRole.HAULER)
+    //     .length;
+    // if (traderCount < 30) {
+    //   return GamePhase.ramp;
+    // }
+    // // When is GamePhase.exploring?
+    // return GamePhase.tradingTransition;
+    return GamePhase.ramp;
   }
 
   /// Minimum profit per second we expect this ship to make.
@@ -863,13 +864,13 @@ class CentralCommand {
     // - We have money to spare.
     // - We don't have better uses for the money (e.g. trading or modules)
 
-    bool shipyardHas(ShipType shipType) {
-      return shipyardPrices.recentPurchasePrice(
-            shipyardSymbol: shipyardSymbol,
-            shipType: shipType,
-          ) !=
-          null;
-    }
+    // bool shipyardHas(ShipType shipType) {
+    //   return shipyardPrices.recentPurchasePrice(
+    //         shipyardSymbol: shipyardSymbol,
+    //         shipType: shipType,
+    //       ) !=
+    //       null;
+    // }
 
     // Buy ships based on earnings of that ship type over the last N hours?
     final systemSymbol = ship.systemSymbol;
@@ -882,7 +883,7 @@ class CentralCommand {
     // No haulers until we have 100+ markets?
     // At some point start buying heavy freighters intead of light haulers?
 
-    final probeCount = _shipCache.countOfType(ShipType.PROBE);
+    // final probeCount = _shipCache.countOfType(ShipType.PROBE);
     final houndCount = _shipCache.countOfType(ShipType.ORE_HOUND);
 
     // Early game can stop when we have enough miners going and markets
@@ -891,70 +892,76 @@ class CentralCommand {
     // Loaded 364 prices from 61 markets and 7 prices from 2 shipyards.
     // Probably need a couple hundred markets.
 
-    // We will buy miners in the start system.
-    // Or probes anywhere (once we have enough miners).
-    if (phase == GamePhase.early) {
-      if (houndCount < 20 && inStartSystem) {
-        // Mining drones are never worth it.  They cost 80k a piece and pay
-        // for themselves in ~5 hours.  But ore hounds only cost 160k a piece
-        // pay for themselves in the same 5 hours, but also come with a laser 2
-        // and can mount a second laser 2 for only 80k more.  So you end up with
-        // 2 laser 2s for 240k, which is a better deal than 1 laser 1 for 80k.
-        return ShipType.ORE_HOUND;
-      } else if (houndCount > 5 && probeCount < 10) {
-        // If our probe happens to explore to another system which sells probes
-        // we could buy a few more probes.
-        return ShipType.PROBE;
-      }
-      // We will not buy traders until we have enough miners to support a base
-      // income and enough probes to have found deals for us to trade.
-      // We exit early game at 30 ships and enter ramp.
-      return null;
-    }
-
-    // SafPlusPlus limits to 50 probes and 40 miners
-    final targetCounts = {
-      ShipType.ORE_HOUND: 40,
-      // Not sure what the right number of probes is.
-      ShipType.PROBE: 20,
-      ShipType.LIGHT_HAULER: 20,
-      ShipType.HEAVY_FREIGHTER: 30,
-    };
-    final typesToBuy = targetCounts.keys.where((shipType) {
-      if (!shipyardHas(shipType)) {
-        logger.info("Shipyard doesn't have $shipType");
-        return false;
-      }
-      return _shipCache.countOfType(shipType) < targetCounts[shipType]!;
-    }).toList();
-    logger.info('typesToBuy: $typesToBuy');
-    if (typesToBuy.isEmpty) {
-      return null;
-    }
-
-    final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
-    logger.info('${idleHaulers.length} idle haulers');
-    final buyTraders = idleHaulers.length < 4;
-
-    // We should buy ore-hounds only if we're at a system which has good mining.
-    if (typesToBuy.contains(ShipType.ORE_HOUND) && inStartSystem) {
+    if (houndCount < 90 && inStartSystem) {
       return ShipType.ORE_HOUND;
+    } else {
+      return null;
     }
-    // We should buy probes if we have fewer than X of them.  We need probes
-    // first to explore before traders are useful.
-    if (typesToBuy.contains(ShipType.PROBE)) {
-      return ShipType.PROBE;
-    }
-    // We should buy haulers if we have fewer than X haulers idle and we have
-    // enough extra cash on hand to support trading.
-    if (typesToBuy.contains(ShipType.LIGHT_HAULER) && buyTraders) {
-      return ShipType.LIGHT_HAULER;
-    }
-    // Heavy traders are the last option after other types have been filled?
-    if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER) && buyTraders) {
-      return ShipType.HEAVY_FREIGHTER;
-    }
-    return null;
+
+    // // We will buy miners in the start system.
+    // // Or probes anywhere (once we have enough miners).
+    // if (phase == GamePhase.early) {
+    //   if (houndCount < 20 && inStartSystem) {
+    //     // Mining drones are never worth it.  They cost 80k a piece and pay
+    //     // for themselves in ~5 hours.  But ore hounds only cost 160k a piece
+    //     // pay for themselves in the same 5 hours, but also come with a laser 2
+    //     // and can mount a second laser 2 for only 80k more.  So you end up with
+    //     // 2 laser 2s for 240k, which is a better deal than 1 laser 1 for 80k.
+    //     return ShipType.ORE_HOUND;
+    //   } else if (houndCount > 5 && probeCount < 10) {
+    //     // If our probe happens to explore to another system which sells probes
+    //     // we could buy a few more probes.
+    //     return ShipType.PROBE;
+    //   }
+    //   // We will not buy traders until we have enough miners to support a base
+    //   // income and enough probes to have found deals for us to trade.
+    //   // We exit early game at 30 ships and enter ramp.
+    //   return null;
+    // }
+
+    // // SafPlusPlus limits to 50 probes and 40 miners
+    // final targetCounts = {
+    //   ShipType.ORE_HOUND: 40,
+    //   // Not sure what the right number of probes is.
+    //   ShipType.PROBE: 20,
+    //   ShipType.LIGHT_HAULER: 20,
+    //   ShipType.HEAVY_FREIGHTER: 30,
+    // };
+    // final typesToBuy = targetCounts.keys.where((shipType) {
+    //   if (!shipyardHas(shipType)) {
+    //     logger.info("Shipyard doesn't have $shipType");
+    //     return false;
+    //   }
+    //   return _shipCache.countOfType(shipType) < targetCounts[shipType]!;
+    // }).toList();
+    // logger.info('typesToBuy: $typesToBuy');
+    // if (typesToBuy.isEmpty) {
+    //   return null;
+    // }
+
+    // final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
+    // logger.info('${idleHaulers.length} idle haulers');
+    // final buyTraders = idleHaulers.length < 4;
+
+    // // We should buy ore-hounds only if we're at a system which has good mining.
+    // if (typesToBuy.contains(ShipType.ORE_HOUND) && inStartSystem) {
+    //   return ShipType.ORE_HOUND;
+    // }
+    // // We should buy probes if we have fewer than X of them.  We need probes
+    // // first to explore before traders are useful.
+    // if (typesToBuy.contains(ShipType.PROBE)) {
+    //   return ShipType.PROBE;
+    // }
+    // // We should buy haulers if we have fewer than X haulers idle and we have
+    // // enough extra cash on hand to support trading.
+    // if (typesToBuy.contains(ShipType.LIGHT_HAULER) && buyTraders) {
+    //   return ShipType.LIGHT_HAULER;
+    // }
+    // // Heavy traders are the last option after other types have been filled?
+    // if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER) && buyTraders) {
+    //   return ShipType.HEAVY_FREIGHTER;
+    // }
+    // return null;
   }
 
   /// Visits the local shipyard if we're at a waypoint with a shipyard.
@@ -1057,8 +1064,7 @@ class CentralCommand {
       shipyardPrices,
       agentCache,
       ship,
-      shipyardSymbol,
-      shipType,
+      ShipBuyJob(shipType, shipyardSymbol),
       maxMedianShipPriceMultipler: maxMedianShipPriceMultipler,
       minimumCreditsForTrading: minimumCreditsForTrading,
     );

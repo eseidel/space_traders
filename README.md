@@ -687,8 +687,6 @@ Bad state: No element
 #13     _startMicrotaskLoop (dart:async/schedule_microtask.dart:49:5)
 #14     _runPendingImmediateCallback (dart:isolate-patch/isolate_patch.dart:123:13)
 
-### Write a script to print db stats.
-
 ### Write a test for stability of the network queue.
 
 ### Teach network backoffs to have a limit (e.g. 128s).
