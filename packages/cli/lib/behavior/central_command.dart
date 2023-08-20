@@ -80,24 +80,6 @@ class ShipTemplate {
   final Multiset<ShipMountSymbolEnum> mounts;
 }
 
-/// Lets us order enums by their index.
-mixin EnumIndexOrdering<T extends Enum> on Enum implements Comparable<T> {
-  @override
-  int compareTo(T other) => index.compareTo(other.index);
-
-  /// Returns true if this enum is less than [other].
-  bool operator <(T other) => index < other.index;
-
-  /// Returns true if this enum is greater than [other].
-  bool operator >(T other) => index > other.index;
-
-  /// Returns true if this enum is greater than or equal to [other].
-  bool operator >=(T other) => index >= other.index;
-
-  /// Returns true if this enum is less than or equal to [other].
-  bool operator <=(T other) => index <= other.index;
-}
-
 /// Where are we in the phases of the reset.
 enum GamePhase with EnumIndexOrdering<GamePhase> {
   /// Early, we have little money, lots of request space.
@@ -135,29 +117,6 @@ enum GamePhase with EnumIndexOrdering<GamePhase> {
   /// We don't want to start new long contracts at this point (or long trades)?
   /// Sell all mounts?
   end;
-}
-
-/// A request for a delivery.
-class DeliveryRequest {
-  /// Create a new delivery request.
-  DeliveryRequest({
-    required this.requester,
-    required this.tradeSymbol,
-    required this.destination,
-    required this.units,
-  });
-
-  /// Who is requesting this delivery?
-  final ShipSymbol requester;
-
-  /// What are we delivering?
-  final TradeSymbol tradeSymbol;
-
-  /// Where are we delivering it?
-  final WaypointSymbol destination;
-
-  /// How many units are we delivering?
-  final int units;
 }
 
 /// Central command for the fleet.
@@ -348,20 +307,6 @@ class CentralCommand {
         return Behavior.idle;
       }
     }
-
-    // Only use the first 20 probes.
-    // const activeProbes = 20;
-    // var probeCount = 0;
-    // for (final ship in _shipCache.ships) {
-    //   if (ship.frame.symbol == ShipFrameSymbolEnum.PROBE) {
-    //     probeCount++;
-    //     if (probeCount < activeProbes) {
-    //       return Behavior.explorer;
-    //     } else {
-    //       return Behavior.idle;
-    //     }
-    //   }
-    // }
 
     final shipCount = _shipCache.ships.length;
 
@@ -627,7 +572,7 @@ class CentralCommand {
     }
   }
 
-  /// Procurment contracts converted to sell opps.
+  /// Procurement contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
     ContractCache contractCache,
