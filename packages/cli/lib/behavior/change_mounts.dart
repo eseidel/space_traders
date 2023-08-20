@@ -80,15 +80,24 @@ Future<DateTime?> advanceChangeMounts(
     await dockIfNeeded(api, caches.ships, ship);
 
     if (ship.countUnits(tradeSymbol) < 1) {
-      // Get it from the delivery ship.
-      await transferCargoAndLog(
-        api,
-        caches.ships,
-        from: deliveryShip,
-        to: ship,
-        tradeSymbol: tradeSymbol,
-        units: 1,
-      );
+      try {
+        // Get it from the delivery ship.
+        await transferCargoAndLog(
+          api,
+          caches.ships,
+          from: deliveryShip,
+          to: ship,
+          tradeSymbol: tradeSymbol,
+          units: 1,
+        );
+      } on ApiException catch (e) {
+        shipErr(ship, 'Failed to transfer mount: $e');
+        jobAssert(
+          false,
+          'Failed to transfer mount.',
+          const Duration(minutes: 10),
+        );
+      }
     }
 
     // TODO(eseidel): This should only remove mounts if we absolutely need to.
