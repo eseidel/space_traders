@@ -11,16 +11,16 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Job to buy a ship.
-// class ShipBuyJob {
-//   /// Create a new ship buy job.
-//   ShipBuyJob(this.shipType, this.waypointSymbol);
+class ShipBuyJob {
+  /// Create a new ship buy job.
+  ShipBuyJob(this.shipType, this.shipyardSymbol);
 
-//   /// The type of ship to buy.
-//   final ShipType shipType;
+  /// The type of ship to buy.
+  final ShipType shipType;
 
-//   /// The waypoint to buy the ship at.
-//   final String waypointSymbol;
-// }
+  /// The waypoint to buy the ship at.
+  final WaypointSymbol shipyardSymbol;
+}
 
 /// Calculated trip cost of going and buying something.
 class CostedTrip {
@@ -133,11 +133,12 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
   ShipyardPrices shipyardPrices,
   AgentCache agentCache,
   Ship ship,
-  WaypointSymbol shipyardSymbol,
-  ShipType shipType, {
+  ShipBuyJob job, {
   required double maxMedianShipPriceMultipler,
   required int minimumCreditsForTrading,
 }) async {
+  final shipyardSymbol = job.shipyardSymbol;
+  final shipType = job.shipType;
   // Get our median price before updating shipyard prices.
   final medianPrice = assertNotNull(
     shipyardPrices.medianPurchasePrice(shipType),
@@ -190,20 +191,15 @@ Future<PurchaseShip201ResponseData> doBuyShipJob(
   return result;
 }
 
-/// Apply the buy ship behavior.
-Future<DateTime?> advanceBuyShip(
-  Api api,
-  Database db,
+Future<ShipBuyJob?> _getShipBuyJob(
   CentralCommand centralCommand,
-  Caches caches,
-  BehaviorState state,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-
-  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
-  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
+  WaypointCache waypointCache,
+  AgentCache agentCache,
+  ShipyardPrices shipyardPrices,
+  Ship ship,
+) async {
+  final hqSystem = agentCache.headquartersSymbol.systemSymbol;
+  final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
   // const wantedType = ShipType.HEAVY_FREIGHTER;
   // final trip = assertNotNull(
   //   findBestShipyardToBuy(
@@ -220,16 +216,44 @@ Future<DateTime?> advanceBuyShip(
   final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
   final shipyardSymbol = shipyardWaypoint.waypointSymbol;
   // final shipyardSymbol = trip.price.waypointSymbol;
-  final shipType = assertNotNull(
-    centralCommand.shipTypeToBuy(
-      ship,
-      caches.shipyardPrices,
+  final shipType = centralCommand.shipTypeToBuy(
+    ship,
+    shipyardPrices,
+    agentCache,
+    shipyardSymbol,
+  );
+  if (shipType == null) {
+    return null;
+  }
+
+  return ShipBuyJob(shipType, shipyardSymbol);
+}
+
+/// Apply the buy ship behavior.
+Future<DateTime?> advanceBuyShip(
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  BehaviorState state,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+
+  final job = assertNotNull(
+    await _getShipBuyJob(
+      centralCommand,
+      caches.waypoints,
       caches.agent,
-      shipyardSymbol,
+      caches.shipyardPrices,
+      ship,
     ),
-    'No ship to buy at $shipyardSymbol.',
+    'No ship buy job.',
     const Duration(minutes: 10),
   );
+  final shipyardSymbol = job.shipyardSymbol;
+  final shipType = job.shipType;
 
   // Get our median price before updating shipyard prices.
   // TODO(eseidel): As written, this can never buy a ship immediately on spawn.
