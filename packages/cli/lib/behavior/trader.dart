@@ -156,7 +156,9 @@ Future<DateTime?> _handleAtSourceWithDeal(
     );
 
     if (transaction != null) {
-      centralCommand.recordDealTransactions(ship, [transaction]);
+      // Record the transaction in our deal.
+      // TODO(eseidel): Probably better to add a DealId to Transaction?
+      state.deal = state.deal!.byAddingTransactions([transaction]);
       final leftToBuy = unitsToPurchase(good, ship, costedDeal.maxUnitsToBuy);
       if (leftToBuy > 0) {
         shipInfo(
@@ -183,7 +185,7 @@ Future<DateTime?> _handleAtSourceWithDeal(
       ship,
       'Unable to purchase $dealTradeSymbol, giving up on this trade.',
     );
-    centralCommand.completeBehavior(ship.shipSymbol);
+    state.isComplete = true;
     return null;
   }
   // Otherwise we've bought what we can here, deliver what we have.
@@ -237,6 +239,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
+  BehaviorState state,
   Market currentMarket,
   CostedDeal costedDeal,
 ) async {
@@ -253,7 +256,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   // We don't yet record the completed deal anywhere.
   final completedDeal = costedDeal.byAddingTransactions(transactions);
   _logCompletedDeal(ship, completedDeal);
-  centralCommand.completeBehavior(ship.shipSymbol);
+  state.isComplete = true;
   return null;
 }
 
@@ -263,6 +266,7 @@ Future<DateTime?> _handleContractDealAtDestination(
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
+  BehaviorState state,
   Market currentMarket,
   CostedDeal costedDeal,
 ) async {
@@ -280,7 +284,7 @@ Future<DateTime?> _handleContractDealAtDestination(
 
   // Delivering the goods counts as completing the behavior, we'll
   // decide next loop if we need to do more.
-  centralCommand.completeBehavior(ship.shipSymbol);
+  state.isComplete = true;
 
   if (maybeResponse != null) {
     // Update our cargo counts after fulfilling the contract.
@@ -410,6 +414,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
       centralCommand,
       caches,
       ship,
+      state,
       currentMarket,
       costedDeal,
     );
@@ -420,6 +425,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
     centralCommand,
     caches,
     ship,
+    state,
     currentMarket,
     costedDeal,
   );
@@ -778,7 +784,6 @@ Future<DateTime?> advanceTrader(
 
   shipInfo(ship, 'Found deal: ${describeCostedDeal(newDeal)}');
   state.deal = newDeal;
-  centralCommand.setBehavior(ship.shipSymbol, state);
   final waitUntil = await _handleDeal(
     api,
     db,

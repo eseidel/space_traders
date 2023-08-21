@@ -63,10 +63,4 @@ class BehaviorCache extends JsonStore<_Record> {
     _stateByShipSymbol[shipSymbol] = behaviorState;
     save();
   }
-
-  /// Clear the behavior state for the given ship.
-  void completeBehavior(ShipSymbol shipSymbol) {
-    _stateByShipSymbol.remove(shipSymbol);
-    save();
-  }
 }

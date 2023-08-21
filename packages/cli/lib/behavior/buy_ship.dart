@@ -313,7 +313,7 @@ Future<DateTime?> advanceBuyShip(
   );
 
   // Record our success!
-  centralCommand.completeBehavior(ship.shipSymbol);
+  state.isComplete = true;
   jobAssert(
     false,
     'Purchased ${result.ship.symbol} ($shipType)!',

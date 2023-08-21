@@ -44,6 +44,6 @@ Future<DateTime?> advanceSurveyor(
   await undockIfNeeded(api, caches.ships, ship);
   final response = await surveyAndLog(api, db, ship, getNow: getNow);
   // Each survey is the whole behavior.
-  centralCommand.completeBehavior(ship.shipSymbol);
+  state.isComplete = true;
   return response.cooldown.expiration;
 }

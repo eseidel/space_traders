@@ -10,15 +10,17 @@ import 'package:types/types.dart';
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
-class _MockApi extends Mock implements Api {}
+class _MockAgent extends Mock implements Agent {}
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
+class _MockApi extends Mock implements Api {}
 
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
+
+class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
@@ -63,15 +65,23 @@ void main() {
     when(() => caches.markets).thenReturn(marketCache);
     when(() => caches.marketPrices).thenReturn(marketPrices);
     when(() => caches.agent).thenReturn(agentCache);
+    final agent = _MockAgent();
+    when(() => agent.credits).thenReturn(1000000);
+    when(() => agentCache.agent).thenReturn(agent);
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.ships).thenReturn(shipCache);
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
-    when(() => ship.symbol).thenReturn('S-1');
+    const shipSymbol = ShipSymbol('S', 1);
+    final shipCargo = ShipCargo(capacity: 100, units: 0);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => ship.cargo).thenReturn(shipCargo);
 
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => agentCache.headquartersSymbol).thenReturn(symbol);
@@ -95,6 +105,11 @@ void main() {
         name: '',
         description: '',
       ),
+      WaypointTrait(
+        symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+        name: '',
+        description: '',
+      ),
     ]);
 
     registerFallbackValue(symbol);
@@ -107,15 +122,13 @@ void main() {
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
 
-    final state = _MockBehaviorState();
-    when(() => state.jobIndex).thenReturn(0);
-    when(() => state.buyJob).thenReturn(
-      BuyJob(
+    final state = BehaviorState(shipSymbol, Behavior.deliver)
+      ..jobIndex = 0
+      ..buyJob = BuyJob(
         tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
         units: 10,
         buyLocation: symbol,
-      ),
-    );
+      );
 
     when(centralCommand.mountsNeededForAllShips)
         .thenReturn(MountSymbolSet.from([ShipMountSymbolEnum.GAS_SIPHON_I]));
@@ -123,8 +136,19 @@ void main() {
     when(() => caches.routePlanner).thenReturn(routePlanner);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     when(
+      () => centralCommand.visitLocalShipyard(
+        api,
+        db,
+        shipyardPrices,
+        agentCache,
+        waypoint,
+        ship,
+      ),
+    ).thenAnswer(Future.value);
+    const tradeSymbol = TradeSymbol.MOUNT_GAS_SIPHON_I;
+    when(
       () => marketPrices.pricesFor(
-        TradeSymbol.MOUNT_GAS_SIPHON_I,
+        tradeSymbol,
         marketSymbol: any(named: 'marketSymbol'),
       ),
     ).thenReturn([
@@ -138,6 +162,13 @@ void main() {
         timestamp: DateTime(2021),
       ),
     ]);
+    registerFallbackValue(Duration.zero);
+    when(
+      () => marketPrices.hasRecentMarketData(
+        any(),
+        maxAge: any(named: 'maxAge'),
+      ),
+    ).thenReturn(true);
 
     when(
       () => routePlanner.planRoute(
@@ -154,6 +185,50 @@ void main() {
         fuelUsed: 10,
       ),
     );
+    when(() => marketCache.marketForSymbol(symbol)).thenAnswer(
+      (_) => Future.value(
+        Market(
+          symbol: symbol.waypoint,
+          tradeGoods: [
+            MarketTradeGood(
+              symbol: tradeSymbol.value,
+              tradeVolume: 100,
+              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+              purchasePrice: 100,
+              sellPrice: 101,
+            )
+          ],
+        ),
+      ),
+    );
+    when(
+      () => fleetApi.purchaseCargo(
+        shipSymbol.symbol,
+        purchaseCargoRequest:
+            PurchaseCargoRequest(symbol: tradeSymbol, units: 1),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        PurchaseCargo201Response(
+          data: SellCargo201ResponseData(
+            agent: agent,
+            cargo: shipCargo,
+            transaction: MarketTransaction(
+              tradeSymbol: tradeSymbol.value,
+              type: MarketTransactionTypeEnum.PURCHASE,
+              units: 1,
+              pricePerUnit: 1,
+              totalPrice: 1,
+              waypointSymbol: symbol.waypoint,
+              shipSymbol: shipSymbol.symbol,
+              timestamp: DateTime(2021),
+            ),
+          ),
+        ),
+      ),
+    );
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

@@ -24,7 +24,7 @@ Future<DateTime?> _advanceIdle(
 }) async {
   shipDetail(ship, 'Idling');
   // Make sure ships don't stay idle forever.
-  caches.behaviors.completeBehavior(ship.shipSymbol);
+  state.isComplete = true;
   // Return a time in the future so we don't spin hot.
   return DateTime.now().add(const Duration(minutes: 10));
 }
@@ -97,10 +97,10 @@ Future<DateTime?> advanceShipBehavior(
     );
     if (state.isComplete) {
       // If the behavior is complete, clear it.
-      centralCommand.completeBehavior(ship.shipSymbol);
+      caches.behaviors.deleteBehavior(ship.shipSymbol);
     } else {
       // Otherwise update the behavior state.
-      centralCommand.setBehavior(ship.shipSymbol, state);
+      caches.behaviors.setBehavior(ship.shipSymbol, state);
     }
     return waitUntil;
   } on JobException catch (error) {

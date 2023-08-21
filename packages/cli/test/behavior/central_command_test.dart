@@ -128,16 +128,16 @@ void main() {
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final shipA = _MockShip();
     final shipNavA = _MockShipNav();
-    final aSymbol = ShipSymbol.fromString('X-A');
-    when(() => shipA.symbol).thenReturn(aSymbol.symbol);
+    final shipASymbol = ShipSymbol.fromString('X-A');
+    when(() => shipA.symbol).thenReturn(shipASymbol.symbol);
     when(() => shipNavA.systemSymbol).thenReturn('S-A');
     when(() => shipA.nav).thenReturn(shipNavA);
-    final stateA = BehaviorState(aSymbol, Behavior.explorer);
-    centralCommand.setBehavior(aSymbol, stateA);
+    final stateA = BehaviorState(shipASymbol, Behavior.explorer);
 
     final saa = WaypointSymbol.fromString('S-A-A');
     final saw = WaypointSymbol.fromString('S-A-W');
     stateA.routePlan = fakeJump(saa, saw);
+    behaviorCache.setBehavior(shipASymbol, stateA);
     final shipB = _MockShip();
     final shipBSymbol = ShipSymbol.fromString('X-B');
     when(() => shipB.symbol).thenReturn(shipBSymbol.symbol);
@@ -145,21 +145,24 @@ void main() {
     when(() => shipNavB.systemSymbol).thenReturn('S-C');
     when(() => shipB.nav).thenReturn(shipNavB);
     final stateB = BehaviorState(shipBSymbol, Behavior.explorer);
-    centralCommand.setBehavior(shipBSymbol, stateB);
     final sbw = WaypointSymbol.fromString('S-B-W');
     stateB.routePlan = fakeJump(saa, sbw);
+    behaviorCache.setBehavior(shipBSymbol, stateB);
     when(() => shipCache.ship(shipBSymbol)).thenReturn(shipB);
 
-    final otherSystems = centralCommand.otherExplorerSystems(aSymbol).toList();
+    final otherSystems =
+        centralCommand.otherExplorerSystems(shipASymbol).toList();
     expect(otherSystems, [sbw.systemSymbol]); // From destination
     stateB.routePlan = null;
-    final otherSystems2 = centralCommand.otherExplorerSystems(aSymbol).toList();
+    final otherSystems2 =
+        centralCommand.otherExplorerSystems(shipASymbol).toList();
     expect(
       otherSystems2,
       [SystemSymbol.fromString('S-C')],
     ); // From nav.systemSymbol
-    centralCommand.completeBehavior(shipBSymbol);
-    final otherSystems3 = centralCommand.otherExplorerSystems(aSymbol).toList();
+    behaviorCache.deleteBehavior(shipBSymbol);
+    final otherSystems3 =
+        centralCommand.otherExplorerSystems(shipASymbol).toList();
     expect(otherSystems3, <SystemSymbol>[]);
   });
 

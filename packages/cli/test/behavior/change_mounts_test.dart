@@ -12,8 +12,6 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -117,7 +115,7 @@ void main() {
     when(() => centralCommand.unclaimedMountsAt(symbol))
         .thenReturn(MountSymbolSet.from([ShipMountSymbolEnum.SURVEYOR_II]));
 
-    final state = _MockBehaviorState();
+    final state = BehaviorState(shipSymbol, Behavior.changeMounts);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

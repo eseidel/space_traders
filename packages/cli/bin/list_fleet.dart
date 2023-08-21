@@ -1,4 +1,3 @@
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/route.dart';
@@ -66,13 +65,13 @@ Duration timeToArrival(
 
 void logShip(
   SystemsCache systemsCache,
-  CentralCommand centralCommand,
+  BehaviorCache behaviorCache,
   MarketPrices marketPrices,
   SystemConnectivity systemConnectivity,
   JumpCache jumpCache,
   Ship ship,
 ) {
-  final behavior = centralCommand.getBehavior(ship.shipSymbol);
+  final behavior = behaviorCache.getBehavior(ship.shipSymbol);
   logger
     ..info('${ship.symbol}: ${behavior?.behavior}')
     ..info('  ${_shipStatusLine(ship, systemsCache)}');
@@ -110,8 +109,6 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
 
-  final centralCommand =
-      CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
   logger.info(describeFleet(shipCache));
   final ships = shipCache.ships;
   final matchingShips = ships.where(filter).toList();
@@ -130,7 +127,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   for (final ship in matchingShips) {
     logShip(
       systemsCache,
-      centralCommand,
+      behaviorCache,
       marketPrices,
       systemConnectivity,
       jumpCache,

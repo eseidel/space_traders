@@ -39,7 +39,6 @@ void main() {
 
     /// The behavior doesn't matter, just needs to have a null destination.
     final state = BehaviorState(shipSymbol, Behavior.idle);
-    when(() => centralCommand.getBehavior(shipSymbol)).thenAnswer((_) => state);
 
     final now = DateTime(2021);
     DateTime getNow() => now;

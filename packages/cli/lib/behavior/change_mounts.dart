@@ -56,7 +56,7 @@ Future<DateTime?> advanceChangeMounts(
         await caches.waypoints.waypoint(ship.waypointSymbol);
     if (!currentWaypoint.hasShipyard) {
       shipErr(ship, 'Unexpectedly off course during change mount.');
-      centralCommand.completeBehavior(ship.shipSymbol);
+      state.isComplete = true;
       return null;
     }
 
@@ -72,8 +72,6 @@ Future<DateTime?> advanceChangeMounts(
       shipErr(ship, 'Delivery ship undocked during change mount, docking it.');
       // Terrible hack.
       await dockIfNeeded(api, caches.ships, deliveryShip);
-      // centralCommand.completeBehavior(ship.shipSymbol);
-      // return null;
     }
 
     await dockIfNeeded(api, caches.ships, ship);

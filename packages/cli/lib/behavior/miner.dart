@@ -242,7 +242,7 @@ Future<DateTime?> advanceMiner(
       if (ship.cargo.isEmpty) {
         // Success!  We mined and sold all our cargo!
         // Reset our state now that we've mined + sold once.
-        centralCommand.completeBehavior(ship.shipSymbol);
+        state.isComplete = true;
         return null;
       }
       shipWarn(ship, 'Failed to sell some cargo, trying a different market.');
@@ -254,21 +254,17 @@ Future<DateTime?> advanceMiner(
     }
 
     final largestCargo = ship.largestCargo();
-    final nearestMarket = await nearbyMarketWhichTrades(
-      caches.systems,
-      caches.waypoints,
-      caches.markets,
-      currentWaypoint.waypointSymbol,
-      largestCargo!.tradeSymbol,
+    final nearestMarket = assertNotNull(
+      await nearbyMarketWhichTrades(
+        caches.systems,
+        caches.waypoints,
+        caches.markets,
+        currentWaypoint.waypointSymbol,
+        largestCargo!.tradeSymbol,
+      ),
+      'No nearby market which trades ${largestCargo.symbol}.',
+      const Duration(hours: 1),
     );
-    if (nearestMarket == null) {
-      centralCommand.disableBehaviorForShip(
-        ship,
-        'No nearby market which trades ${largestCargo.symbol}.',
-        const Duration(hours: 1),
-      );
-      return null;
-    }
     return beingNewRouteAndLog(
       api,
       ship,
@@ -324,7 +320,7 @@ Future<DateTime?> advanceMiner(
     // surveying for a long time before checking other behaviors.
     // We don't need to do this for miners since they don't change as often.
     if (ship.isCommand) {
-      centralCommand.completeBehavior(ship.shipSymbol);
+      state.isComplete = true;
     }
     // We wait the full cooldown because our next action will be either
     // surveying or mining, both of which require the reactor cooldown.

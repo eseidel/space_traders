@@ -11,8 +11,6 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -213,7 +211,7 @@ void main() {
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
-    final state = _MockBehaviorState();
+    final state = BehaviorState(shipSymbol, Behavior.miner);
 
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);

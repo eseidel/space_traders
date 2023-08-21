@@ -15,8 +15,6 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -119,7 +117,7 @@ void main() {
         .thenAnswer((_) => Future.value([waypoint]));
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
-    final state = _MockBehaviorState();
+    final state = BehaviorState(shipSymbol, Behavior.buyShip);
 
     const shipType = ShipType.HEAVY_FREIGHTER;
     when(() => shipyardPrices.medianPurchasePrice(shipType)).thenReturn(1);

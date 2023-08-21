@@ -378,15 +378,10 @@ class CentralCommand {
     _shipTimeouts.add(_ShipTimeout(ship.shipSymbol, behavior, expiration));
   }
 
-  /// Complete the current behavior for the given ship.
-  void completeBehavior(ShipSymbol shipSymbol) {
-    return _behaviorCache.deleteBehavior(shipSymbol);
-  }
-
   /// Returns the delivery ship bringing the mounts.
   Ship? getDeliveryShip(ShipSymbol shipSymbol, TradeSymbol item) {
     final deliveryShip = _shipCache.ships.first;
-    final deliveryState = getBehavior(deliveryShip.shipSymbol);
+    final deliveryState = _behaviorCache.getBehavior(deliveryShip.shipSymbol);
     if (deliveryState?.behavior != Behavior.deliver) {
       return null;
     }
@@ -439,17 +434,6 @@ class CentralCommand {
     return available.difference(claimed);
   }
 
-  /// Record the given [transactions] for the current deal for [ship].
-  void recordDealTransactions(
-    Ship ship,
-    List<Transaction> transactions,
-  ) {
-    final behaviorState = getBehavior(ship.shipSymbol)!;
-    final deal = behaviorState.deal!;
-    behaviorState.deal = deal.byAddingTransactions(transactions);
-    setBehavior(ship.shipSymbol, behaviorState);
-  }
-
   // This feels wrong.
   /// Load or create the right behavior state for [ship].
   Future<BehaviorState> loadBehaviorState(Ship ship) async {
@@ -461,17 +445,6 @@ class CentralCommand {
       _behaviorCache.setBehavior(shipSymbol, newState);
     }
     return _behaviorCache.getBehavior(shipSymbol)!;
-  }
-
-  // Needs refactoring, provided for compatiblity with old BehaviorManager.
-  /// Get the current [BehaviorState] for the  [shipSymbol].
-  BehaviorState? getBehavior(ShipSymbol shipSymbol) {
-    return _behaviorCache.getBehavior(shipSymbol);
-  }
-
-  /// Set the current [BehaviorState] for the [shipSymbol].
-  void setBehavior(ShipSymbol shipSymbol, BehaviorState state) {
-    _behaviorCache.setBehavior(shipSymbol, state);
   }
 
   /// Returns all deals in progress.

@@ -156,14 +156,11 @@ class MultiJob {
   }) async {
     for (var i = 0; i < 10; i++) {
       shipInfo(ship, '$name ${state.jobIndex}');
-      if (state.jobIndex < 0 || state.jobIndex >= jobFunctions.length) {
-        centralCommand.disableBehaviorForShip(
-          ship,
-          'No behavior state.',
-          const Duration(hours: 1),
-        );
-        return null;
-      }
+      jobAssert(
+        state.jobIndex >= 0 && state.jobIndex < jobFunctions.length,
+        'Invalid job index ${state.jobIndex}',
+        const Duration(hours: 1),
+      );
 
       final jobFunction = jobFunctions[state.jobIndex];
       final result = await jobFunction(
@@ -177,10 +174,8 @@ class MultiJob {
       shipInfo(ship, '$name ${state.jobIndex} $result');
       if (result.isComplete) {
         state.jobIndex++;
-        if (state.jobIndex < jobFunctions.length) {
-          centralCommand.setBehavior(ship.shipSymbol, state);
-        } else {
-          centralCommand.completeBehavior(ship.shipSymbol);
+        if (state.jobIndex >= jobFunctions.length) {
+          state.isComplete = true;
           shipInfo(ship, '$name complete!');
           return null;
         }
@@ -189,8 +184,8 @@ class MultiJob {
         return result.waitTime;
       }
     }
-    centralCommand.disableBehaviorForShip(
-      ship,
+    jobAssert(
+      false,
       'Too many $name job iterations',
       const Duration(hours: 1),
     );

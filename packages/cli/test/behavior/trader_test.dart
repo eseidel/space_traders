@@ -14,8 +14,6 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockBehaviorState extends Mock implements BehaviorState {}
-
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -48,6 +46,8 @@ class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipNavRoute extends Mock implements ShipNavRoute {}
+
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
@@ -62,7 +62,6 @@ void main() {
   test('advanceTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
     const shipSymbol = ShipSymbol('S', 1);
-    registerFallbackValue(BehaviorState(shipSymbol, Behavior.trader));
 
     final api = _MockApi();
     final db = _MockDatabase();
@@ -160,10 +159,6 @@ void main() {
       ),
     ).thenReturn([]);
 
-    when(() => centralCommand.getBehavior(shipSymbol)).thenAnswer(
-      (_) => BehaviorState(shipSymbol, Behavior.trader),
-    );
-
     final costedDeal = CostedDeal(
       deal: Deal.test(
         sourceSymbol: start,
@@ -225,7 +220,7 @@ void main() {
     final agent = _MockAgent();
     when(() => agentCache.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
-    final state = _MockBehaviorState();
+    final state = BehaviorState(shipSymbol, Behavior.trader);
 
     when(
       () => fleetApi.purchaseCargo(
@@ -329,6 +324,11 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(start.system);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
+    // Needed by navigateShipAndLog to show time left.
+    final shipNavRoute = _MockShipNavRoute();
+    when(() => shipNav.route).thenReturn(shipNavRoute);
+    final arrivalTime = DateTime(2022);
+    when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
 
     final shipEngine = _MockShipEngine();
     const shipSpeed = 10;
@@ -431,10 +431,6 @@ void main() {
     when(() => marketCache.marketForSymbol(start))
         .thenAnswer((_) => Future.value(market));
 
-    when(() => centralCommand.getBehavior(shipSymbol)).thenAnswer(
-      (_) => BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal),
-    );
-
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => shipCargo.units).thenReturn(10);
@@ -497,7 +493,7 @@ void main() {
         any(),
       ),
     ).thenReturn(true);
-    final state = _MockBehaviorState();
+    final state = BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal);
 
     when(
       () => fleetApi.sellCargo(
@@ -520,6 +516,30 @@ void main() {
               type: MarketTransactionTypeEnum.SELL,
               timestamp: DateTime(2021),
             ),
+          ),
+        ),
+      ),
+    );
+    when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
+      (_) => Future.value(
+        OrbitShip200Response(
+          data: OrbitShip200ResponseData(
+            nav: shipNav..status = ShipNavStatus.IN_ORBIT,
+          ),
+        ),
+      ),
+    );
+    when(
+      () => fleetApi.navigateShip(
+        shipSymbol.symbol,
+        navigateShipRequest: NavigateShipRequest(waypointSymbol: end.waypoint),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        NavigateShip200Response(
+          data: NavigateShip200ResponseData(
+            fuel: shipFuel,
+            nav: shipNav..status = ShipNavStatus.IN_TRANSIT,
           ),
         ),
       ),
@@ -573,14 +593,12 @@ void main() {
         refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
-    expect(waitUntil, isNull);
+    expect(waitUntil, arrivalTime);
   });
 
   test('trade contracts smoke test', () async {
     registerFallbackValue(Duration.zero);
     const shipSymbol = ShipSymbol('S', 1);
-
-    registerFallbackValue(BehaviorState(shipSymbol, Behavior.trader));
 
     final api = _MockApi();
     final db = _MockDatabase();
@@ -678,8 +696,6 @@ void main() {
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
-    when(() => centralCommand.getBehavior(shipSymbol))
-        .thenAnswer((_) => BehaviorState(shipSymbol, Behavior.trader));
     final routePlan = RoutePlan(
       actions: [
         RouteAction(
@@ -731,7 +747,7 @@ void main() {
         ship,
       ),
     ).thenAnswer((_) => Future.value());
-    final state = _MockBehaviorState();
+    final state = BehaviorState(shipSymbol, Behavior.trader);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
