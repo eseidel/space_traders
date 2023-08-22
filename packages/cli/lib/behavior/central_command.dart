@@ -671,9 +671,9 @@ class CentralCommand {
     // }
 
     // Buy ships based on earnings of that ship type over the last N hours?
-    final systemSymbol = ship.systemSymbol;
-    final hqSystemSymbol = agentCache.headquartersSymbol.systemSymbol;
-    final inStartSystem = systemSymbol == hqSystemSymbol;
+    // final systemSymbol = ship.systemSymbol;
+    // final hqSystemSymbol = agentCache.headquartersSymbol.systemSymbol;
+    // final inStartSystem = systemSymbol == hqSystemSymbol;
 
     // Early game should be:
     // ~10 miners
@@ -681,20 +681,26 @@ class CentralCommand {
     // No haulers until we have 100+ markets?
     // At some point start buying heavy freighters intead of light haulers?
 
-    // final probeCount = _shipCache.countOfType(ShipType.PROBE);
-    final houndCount = _shipCache.countOfType(ShipType.ORE_HOUND);
-
-    // Early game can stop when we have enough miners going and markets
-    // mapped to start trading.
-    // This is not enough:
-    // Loaded 364 prices from 61 markets and 7 prices from 2 shipyards.
-    // Probably need a couple hundred markets.
-
-    if (houndCount < 90 && inStartSystem) {
-      return ShipType.ORE_HOUND;
+    if (_shipCache.countOfType(ShipType.HEAVY_FREIGHTER) < 3) {
+      return ShipType.HEAVY_FREIGHTER;
     } else {
       return null;
     }
+
+    // final probeCount = _shipCache.countOfType(ShipType.PROBE);
+    // final houndCount = _shipCache.countOfType(ShipType.ORE_HOUND);
+
+    // // Early game can stop when we have enough miners going and markets
+    // // mapped to start trading.
+    // // This is not enough:
+    // // Loaded 364 prices from 61 markets and 7 prices from 2 shipyards.
+    // // Probably need a couple hundred markets.
+
+    // if (houndCount < 90 && inStartSystem) {
+    //   return ShipType.ORE_HOUND;
+    // } else {
+    //   return null;
+    // }
 
     // // We will buy miners in the start system.
     // // Or probes anywhere (once we have enough miners).
