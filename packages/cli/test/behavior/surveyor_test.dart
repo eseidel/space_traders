@@ -1,5 +1,4 @@
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';

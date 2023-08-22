@@ -189,18 +189,6 @@ int maxExtractedUnits(Ship ship) {
   return min(laserStrength + variance, ship.cargo.capacity);
 }
 
-/// Extract resources from a mine.
-class MineJob {
-  /// Create a new mine job.
-  MineJob({required this.mine, required this.market});
-
-  /// The mine to extract from.
-  final WaypointSymbol mine;
-
-  /// The market to value goods against.
-  final WaypointSymbol market;
-}
-
 // Miner stages
 // - Empty cargo if needed
 // - Navigate to mine
@@ -208,6 +196,231 @@ class MineJob {
 // - Mine
 // - Handle cargo (navigate to market, sell, jettison, etc)
 // - Navigate to market
+
+/// Initialize the miner behavior.
+Future<JobResult> initJob(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  state.mineJob =
+      centralCommand.mineJobForShip(caches.systems, caches.agent, ship);
+  return JobResult.complete();
+}
+
+// This should try to get best price for the cargo?
+// We would need some expected c/s for the ship to evaluate opportunity cost.
+/// Attempts to sell all cargo at the local market or will travel to a nearby
+/// market if the local market does not buy the cargo.
+Future<JobResult> emptyCargo(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  if (ship.cargo.isEmpty) {
+    return JobResult.complete();
+  }
+  // Sell if our next extraction could overflow our cargo.
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+  // Sell cargo and refuel if needed.
+  final currentMarket =
+      await visitLocalMarket(api, db, caches, currentWaypoint, ship);
+  if (currentMarket != null) {
+    await sellAllCargoAndLog(
+      api,
+      db,
+      caches.marketPrices,
+      caches.agent,
+      currentMarket,
+      ship,
+      AccountingType.goods,
+    );
+    shipWarn(ship, 'Failed to sell some cargo, trying a different market.');
+  } else {
+    shipInfo(
+      ship,
+      'No market at ${currentWaypoint.symbol}, navigating to nearest.',
+    );
+  }
+
+  final largestCargo = ship.largestCargo();
+  final nearestMarket = assertNotNull(
+    await nearbyMarketWhichTrades(
+      caches.systems,
+      caches.waypoints,
+      caches.markets,
+      currentWaypoint.waypointSymbol,
+      largestCargo!.tradeSymbol,
+    ),
+    'No nearby market which trades ${largestCargo.symbol}.',
+    const Duration(hours: 1),
+  );
+  final waitUntil = await beingNewRouteAndLog(
+    api,
+    ship,
+    state,
+    caches.ships,
+    caches.systems,
+    caches.routePlanner,
+    centralCommand,
+    nearestMarket.waypointSymbol,
+  );
+  return JobResult.wait(waitUntil);
+}
+
+/// Looks up the mine from the mine job and navigates to it.
+Future<JobResult> travelToMine(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final job =
+      assertNotNull(state.mineJob, 'No mine job.', const Duration(minutes: 1));
+  if (ship.waypointSymbol == job.mine) {
+    return JobResult.complete();
+  }
+
+  final waitUntil = await beingNewRouteAndLog(
+    api,
+    ship,
+    state,
+    caches.ships,
+    caches.systems,
+    caches.routePlanner,
+    centralCommand,
+    job.mine,
+  );
+  return JobResult.wait(waitUntil);
+}
+
+/// Attempts to survey the current waypoint and then mine it.
+/// These are currently linked because mining can fail and need to go back
+/// to surveying after.
+Future<JobResult> surveyAndMine(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final job =
+      assertNotNull(state.mineJob, 'No mine job.', const Duration(minutes: 1));
+
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+
+  jobAssert(
+    currentWaypoint.canBeMined,
+    "${waypointDescription(currentWaypoint)} can't be mined.",
+    const Duration(hours: 1),
+  );
+
+  // Both surveying and mining require being undocked.
+  await undockIfNeeded(api, caches.ships, ship);
+
+  // See if we have a good survey to mine.
+  final maybeSurvey = await surveyWorthMining(
+    db,
+    caches.marketPrices,
+    surveyWaypointSymbol: currentWaypoint.waypointSymbol,
+    nearbyMarketSymbol: job.market,
+    minimumSurveys: centralCommand.minimumSurveys,
+    percentileThreshold: centralCommand.surveyPercentileThreshold,
+  );
+  // If not, add some new surveys.
+  if (maybeSurvey == null && ship.hasSurveyor) {
+    final response = await surveyAndLog(api, db, ship, getNow: getNow);
+    // Count completion of survey as a success, otherwise we could end up
+    // surveying for a long time before checking other behaviors.
+    // We don't need to do this for miners since they don't change as often.
+    if (ship.isCommand) {
+      return JobResult.complete(response.cooldown.expiration);
+    } else {
+      // We wait the full cooldown because our next action will be either
+      // surveying or mining, both of which require the reactor cooldown.
+      return JobResult.wait(response.cooldown.expiration);
+    }
+  }
+
+  // If we either have a survey or don't have a surveyer, mine.
+  try {
+    final response = await extractResources(api, ship, survey: maybeSurvey);
+    final yield_ = response.extraction.yield_;
+    final cargo = response.cargo;
+    await db.insertExtraction(
+      ExtractionRecord(
+        shipSymbol: ship.shipSymbol,
+        waypointSymbol: job.mine,
+        tradeSymbol: yield_.symbol,
+        quantity: yield_.units,
+        power: _laserMountStrength(ship),
+        surveySignature: maybeSurvey?.signature,
+        timestamp: getNow(),
+      ),
+    );
+    // Could use TradeSymbol.values.reduce() to find the longest symbol.
+    shipDetail(
+        ship,
+        // pickaxe requires an extra space on mac?
+        '⛏️  ${yield_.units.toString().padLeft(2)} '
+        '${yield_.symbol.value.padRight(18)} '
+        // Space after emoji is needed on windows to not bleed together.
+        '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+
+    // We could sell here before putting ourselves to sleep.
+    // If we've bought enough to sell, complete this job.
+    if (ship.availableSpace < maxExtractedUnits(ship)) {
+      return JobResult.complete(response.cooldown.expiration);
+    }
+    // Otherwise loop to survey/mine more.
+    return JobResult.wait(response.cooldown.expiration);
+  } on ApiException catch (e) {
+    /// ApiException 400: {"error":{"message":
+    /// Ship ESEIDEL-1B does not have a required mining laser mount.",
+    /// "code":4243,"data":{"shipSymbol":"ESEIDEL-1B",
+    /// "miningLasers":["MOUNT_MINING_LASER_I","MOUNT_MINING_LASER_II",
+    /// "MOUNT_MINING_LASER_III"]}}}
+
+    if (isSurveyExhaustedException(e)) {
+      // If the survey is exhausted, record it as such and try again.
+      shipDetail(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
+      await db.markSurveyExhausted(maybeSurvey);
+      return JobResult.wait(null);
+    }
+    // This should have been caught before using the survey, but we'll
+    // just mark it exhausted and try again.
+    if (isSurveyExpiredException(e)) {
+      shipWarn(ship, 'Survey ${maybeSurvey!.signature} expired.');
+      // It's not technically exhausted, but that's our easy way to disable
+      // the survey.  We use a warning to catch if we're doing this often.
+      await db.markSurveyExhausted(maybeSurvey);
+      return JobResult.wait(null);
+    }
+    rethrow;
+  }
+}
+
+/// Apply the miner behavior to the ship.
+final advanceMinerNew = const MultiJob('Miner', [
+  initJob,
+  emptyCargo,
+  travelToMine,
+  surveyAndMine,
+  emptyCargo,
+]).run;
 
 /// Apply the miner behavior to the ship.
 Future<DateTime?> advanceMiner(
@@ -245,7 +458,10 @@ Future<DateTime?> advanceMiner(
         state.isComplete = true;
         return null;
       }
-      shipWarn(ship, 'Failed to sell some cargo, trying a different market.');
+      shipWarn(
+        ship,
+        'Failed to sell some cargo, trying a different market.',
+      );
     } else {
       shipInfo(
         ship,
