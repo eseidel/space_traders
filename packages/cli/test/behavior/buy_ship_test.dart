@@ -15,6 +15,8 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorCache extends Mock implements BehaviorCache {}
+
 class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -64,7 +66,9 @@ void main() {
     final shipyardPrices = _MockShipyardPrices();
     final shipCache = _MockShipCache();
     final centralCommand = _MockCentralCommand();
+    final behaviorCache = _MockBehaviorCache();
     final caches = _MockCaches();
+    when(() => caches.behaviors).thenReturn(behaviorCache);
     when(() => caches.waypoints).thenReturn(waypointCache);
     when(() => caches.markets).thenReturn(marketCache);
     when(() => caches.agent).thenReturn(agentCache);
@@ -135,15 +139,6 @@ void main() {
         timestamp: DateTime(2021),
       ),
     ]);
-
-    when(
-      () => centralCommand.shipTypeToBuy(
-        ship,
-        shipyardPrices,
-        agentCache,
-        symbol,
-      ),
-    ).thenReturn(shipType);
 
     final systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);

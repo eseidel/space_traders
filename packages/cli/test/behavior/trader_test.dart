@@ -200,16 +200,6 @@ void main() {
       ),
     ).thenReturn(costedDeal);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(1);
-    when(
-      () => centralCommand.visitLocalShipyard(
-        api,
-        db,
-        shipyardPrices,
-        agentCache,
-        waypoint,
-        ship,
-      ),
-    ).thenAnswer((_) => Future.value());
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -474,16 +464,6 @@ void main() {
         ),
       ),
     );
-    when(
-      () => centralCommand.visitLocalShipyard(
-        api,
-        db,
-        shipyardPrices,
-        agentCache,
-        waypoint,
-        ship,
-      ),
-    ).thenAnswer((_) => Future.value());
     when(() => systemsCache.waypointsInSystem(start.systemSymbol))
         .thenReturn([]);
     registerFallbackValue(start.systemSymbol);
@@ -737,16 +717,6 @@ void main() {
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenReturn(costedDeal);
-    when(
-      () => centralCommand.visitLocalShipyard(
-        api,
-        db,
-        shipyardPrices,
-        agentCache,
-        waypoint,
-        ship,
-      ),
-    ).thenAnswer((_) => Future.value());
     final state = BehaviorState(shipSymbol, Behavior.trader);
 
     final logger = _MockLogger();

@@ -75,3 +75,43 @@ class DeliverJob {
     };
   }
 }
+
+/// Extract resources from a mine.
+class MineJob {
+  /// Create a new mine job.
+  MineJob({
+    required this.mine,
+    required this.market,
+    this.surveySignature,
+  });
+
+  /// Create a new mine job from JSON.
+  factory MineJob.fromJson(Map<String, dynamic> json) {
+    final mine = WaypointSymbol.fromJson(json['mine'] as String);
+    final market = WaypointSymbol.fromJson(json['market'] as String);
+    final surveySignature = json['surveySignature'] as String?;
+    return MineJob(
+      mine: mine,
+      market: market,
+      surveySignature: surveySignature,
+    );
+  }
+
+  /// The mine to extract from.
+  final WaypointSymbol mine;
+
+  /// The market to value goods against.
+  final WaypointSymbol market;
+
+  /// The signature of the survey to use.
+  final String? surveySignature;
+
+  /// Convert this to JSON.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'mine': mine.toJson(),
+      'market': market.toJson(),
+      'surveySignature': surveySignature,
+    };
+  }
+}

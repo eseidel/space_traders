@@ -50,6 +50,7 @@ class BehaviorState {
     this.mountToAdd,
     this.buyJob,
     this.deliverJob,
+    this.mineJob,
     this.jobIndex = 0,
   }) : isComplete = false;
 
@@ -73,6 +74,9 @@ class BehaviorState {
         ? null
         : DeliverJob.fromJson(json['deliverJob'] as Map<String, dynamic>);
     final jobIndex = json['jobIndex'] as int? ?? 0;
+    final mineJob = json['mineJob'] == null
+        ? null
+        : MineJob.fromJson(json['mineJob'] as Map<String, dynamic>);
     return BehaviorState(
       shipSymbol,
       behavior,
@@ -82,6 +86,7 @@ class BehaviorState {
       buyJob: buyJob,
       deliverJob: deliverJob,
       jobIndex: jobIndex,
+      mineJob: mineJob,
     );
   }
 
@@ -106,6 +111,9 @@ class BehaviorState {
   /// Used by Behavior.deliver for delivering items.
   DeliverJob? deliverJob;
 
+  /// Used by Behavior.miner for mining.
+  MineJob? mineJob;
+
   /// Mount to add.
   ShipMountSymbolEnum? mountToAdd;
 
@@ -124,6 +132,7 @@ class BehaviorState {
       'buyJob': buyJob?.toJson(),
       'deliverJob': deliverJob?.toJson(),
       'jobIndex': jobIndex,
+      'mineJob': mineJob?.toJson(),
     };
   }
 }

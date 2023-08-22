@@ -1,17 +1,12 @@
 import 'dart:math';
 
-import 'package:cli/behavior/behavior.dart';
-import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/deliver.dart';
-import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
-import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -647,160 +642,6 @@ class CentralCommand {
   Iterable<SystemSymbol> _otherTraderSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
-// This is a hack for now, we need real planning.
-  /// Determine what type of ship to buy.
-  // TODO(eseidel): This should consider pricing in it so that we can by
-  // other ship types if they're not overpriced?
-  ShipType? shipTypeToBuy(
-    Ship ship,
-    ShipyardPrices shipyardPrices,
-    AgentCache agentCache,
-    WaypointSymbol shipyardSymbol,
-  ) {
-    // We should buy a new ship when:
-    // - We have request capacity to spare
-    // - We have money to spare.
-    // - We don't have better uses for the money (e.g. trading or modules)
-
-    // bool shipyardHas(ShipType shipType) {
-    //   return shipyardPrices.recentPurchasePrice(
-    //         shipyardSymbol: shipyardSymbol,
-    //         shipType: shipType,
-    //       ) !=
-    //       null;
-    // }
-
-    // Buy ships based on earnings of that ship type over the last N hours?
-    final systemSymbol = ship.systemSymbol;
-    final hqSystemSymbol = agentCache.headquartersSymbol.systemSymbol;
-    final inStartSystem = systemSymbol == hqSystemSymbol;
-
-    // Early game should be:
-    // ~10 miners
-    // 10 probes
-    // No haulers until we have 100+ markets?
-    // At some point start buying heavy freighters intead of light haulers?
-
-    // final probeCount = _shipCache.countOfType(ShipType.PROBE);
-    final houndCount = _shipCache.countOfType(ShipType.ORE_HOUND);
-
-    // Early game can stop when we have enough miners going and markets
-    // mapped to start trading.
-    // This is not enough:
-    // Loaded 364 prices from 61 markets and 7 prices from 2 shipyards.
-    // Probably need a couple hundred markets.
-
-    if (houndCount < 90 && inStartSystem) {
-      return ShipType.ORE_HOUND;
-    } else {
-      return null;
-    }
-
-    // // We will buy miners in the start system.
-    // // Or probes anywhere (once we have enough miners).
-    // if (phase == GamePhase.early) {
-    //   if (houndCount < 20 && inStartSystem) {
-    //     // Mining drones are never worth it.  They cost 80k a piece and pay
-    //     // for themselves in ~5 hours.  But ore hounds only cost 160k a piece
-    //     // pay for themselves in the same 5 hours, but also come with a laser 2
-    //     // and can mount a second laser 2 for only 80k more.  So you end up with
-    //     // 2 laser 2s for 240k, which is a better deal than 1 laser 1 for 80k.
-    //     return ShipType.ORE_HOUND;
-    //   } else if (houndCount > 5 && probeCount < 10) {
-    //     // If our probe happens to explore to another system which sells probes
-    //     // we could buy a few more probes.
-    //     return ShipType.PROBE;
-    //   }
-    //   // We will not buy traders until we have enough miners to support a base
-    //   // income and enough probes to have found deals for us to trade.
-    //   // We exit early game at 30 ships and enter ramp.
-    //   return null;
-    // }
-
-    // // SafPlusPlus limits to 50 probes and 40 miners
-    // final targetCounts = {
-    //   ShipType.ORE_HOUND: 40,
-    //   // Not sure what the right number of probes is.
-    //   ShipType.PROBE: 20,
-    //   ShipType.LIGHT_HAULER: 20,
-    //   ShipType.HEAVY_FREIGHTER: 30,
-    // };
-    // final typesToBuy = targetCounts.keys.where((shipType) {
-    //   if (!shipyardHas(shipType)) {
-    //     logger.info("Shipyard doesn't have $shipType");
-    //     return false;
-    //   }
-    //   return _shipCache.countOfType(shipType) < targetCounts[shipType]!;
-    // }).toList();
-    // logger.info('typesToBuy: $typesToBuy');
-    // if (typesToBuy.isEmpty) {
-    //   return null;
-    // }
-
-    // final idleHaulers = idleHaulerSymbols(_shipCache, _behaviorCache);
-    // logger.info('${idleHaulers.length} idle haulers');
-    // final buyTraders = idleHaulers.length < 4;
-
-    // // We should buy ore-hounds only if we're at a system which has good mining.
-    // if (typesToBuy.contains(ShipType.ORE_HOUND) && inStartSystem) {
-    //   return ShipType.ORE_HOUND;
-    // }
-    // // We should buy probes if we have fewer than X of them.  We need probes
-    // // first to explore before traders are useful.
-    // if (typesToBuy.contains(ShipType.PROBE)) {
-    //   return ShipType.PROBE;
-    // }
-    // // We should buy haulers if we have fewer than X haulers idle and we have
-    // // enough extra cash on hand to support trading.
-    // if (typesToBuy.contains(ShipType.LIGHT_HAULER) && buyTraders) {
-    //   return ShipType.LIGHT_HAULER;
-    // }
-    // // Heavy traders are the last option after other types have been filled?
-    // if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER) && buyTraders) {
-    //   return ShipType.HEAVY_FREIGHTER;
-    // }
-    // return null;
-  }
-
-  /// Visits the local shipyard if we're at a waypoint with a shipyard.
-  /// Records shipyard data if needed.
-  Future<void> visitLocalShipyard(
-    Api api,
-    Database db,
-    ShipyardPrices shipyardPrices,
-    AgentCache agentCache,
-    Waypoint waypoint,
-    Ship ship,
-  ) async {
-    if (!waypoint.hasShipyard) {
-      return;
-    }
-    final shipyard = await getShipyard(api, waypoint);
-    recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
-
-    // Buy ship if we should. Important to do this after
-    // recordShipyardDataAndLog as it depends on having price data.
-    try {
-      await buyShipIfPossible(
-        api,
-        db,
-        shipyardPrices,
-        agentCache,
-        ship,
-      );
-    } on JobException catch (error) {
-      // Catch any job error from buyShipIfPossible and explicitly
-      // disable the buyShip behavior rather than whatever behavior
-      // we happen to be running.
-      disableBehaviorForShip(
-        ship,
-        error.message,
-        error.timeout,
-        explicitBehavior: Behavior.buyShip,
-      );
-    }
-  }
-
   /// What the max multiplier of median we would pay for a ship.
   double get maxMedianShipPriceMultipler => 1.1;
 
@@ -810,63 +651,6 @@ class CentralCommand {
 
   /// The minimum credits we should have to buy a new ship.
   int get minimumCreditsForTrading => numberOfHaulers * 10000;
-
-  /// Attempt to buy a ship for the given [ship].
-  // TODO(eseidel): Unify this with buyShip behavior.
-  Future<bool> buyShipIfPossible(
-    Api api,
-    Database db,
-    ShipyardPrices shipyardPrices,
-    AgentCache agentCache,
-    Ship ship,
-  ) async {
-    if (isBehaviorDisabled(Behavior.buyShip) ||
-        isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
-      return false;
-    }
-
-    // This assumes the ship in question is at a shipyard and already docked.
-    final shipyardSymbol = ship.waypointSymbol;
-    // This only works if we've recorded prices from this shipyard before.
-    final knownPrices = shipyardPrices.pricesAtShipyard(ship.waypointSymbol);
-    final availableTypes = knownPrices.map((p) => p.shipType);
-    shipInfo(
-      ship,
-      'Visiting shipyard $shipyardSymbol, available: $availableTypes',
-    );
-
-    final shipType = assertNotNull(
-      shipTypeToBuy(
-        ship,
-        shipyardPrices,
-        agentCache,
-        shipyardSymbol,
-      ),
-      'No ship to buy at $shipyardSymbol.',
-      const Duration(minutes: 5),
-    );
-
-    final result = await doBuyShipJob(
-      api,
-      db,
-      _shipCache,
-      shipyardPrices,
-      agentCache,
-      ship,
-      ShipBuyJob(shipType, shipyardSymbol),
-      maxMedianShipPriceMultipler: maxMedianShipPriceMultipler,
-      minimumCreditsForTrading: minimumCreditsForTrading,
-    );
-
-    // Abusing jobAssert a little here to throw an exception on success
-    // which will clear only the buyShip behavior.
-    jobAssert(
-      false,
-      'Purchased ${result.ship.symbol} ($shipType)!',
-      const Duration(minutes: 10),
-    );
-    return true;
-  }
 
   /// Computes the number of units needed to fulfill the given [contract].
   /// Includes units in flight.

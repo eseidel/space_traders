@@ -170,7 +170,7 @@ Future<JobResult> doBuyJob(
     // We want to always be using super up-to-date market prices for the trader.
     maxAge: const Duration(seconds: 5),
   );
-  await centralCommand.visitLocalShipyard(
+  await visitLocalShipyard(
     api,
     db,
     caches.shipyardPrices,

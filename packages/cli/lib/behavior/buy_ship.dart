@@ -96,97 +96,33 @@ ShipyardTrip? findBestShipyardToBuy(
   return best;
 }
 
-/// Called by CentralCommand.buyShipIfPossible.  Moved to this file
-/// to try and share code.
-Future<PurchaseShip201ResponseData> doBuyShipJob(
-  Api api,
-  Database db,
+Future<ShipBuyJob?> _buySpecificShip(
+  ShipyardPrices shipyardPrices,
+  RoutePlanner routePlanner,
+  Ship ship,
   ShipCache shipCache,
-  ShipyardPrices shipyardPrices,
+  BehaviorCache behaviorCache,
   AgentCache agentCache,
-  Ship ship,
-  ShipBuyJob job, {
-  required double maxMedianShipPriceMultipler,
-  required int minimumCreditsForTrading,
-}) async {
-  final shipyardSymbol = job.shipyardSymbol;
-  final shipType = job.shipType;
-  // Get our median price before updating shipyard prices.
-  final medianPrice = assertNotNull(
-    shipyardPrices.medianPurchasePrice(shipType),
-    'Failed to buy ship, no median price for $shipType.',
-    const Duration(minutes: 10),
-  );
-  final maxMedianMultiplier = maxMedianShipPriceMultipler;
-  final maxPrice = (medianPrice * maxMedianMultiplier).round();
-
-  // We should only try to buy new ships if we have enough money to keep
-  // our traders trading.
-  final budget = agentCache.agent.credits - minimumCreditsForTrading;
-  final credits = budget;
-  jobAssert(
-    credits >= maxPrice,
-    'Can not buy $shipType, budget ${creditsString(credits)} '
-    '< max price ${creditsString(maxPrice)}.',
-    const Duration(minutes: 10),
-  );
-
-  final recentPrice = assertNotNull(
-    shipyardPrices.recentPurchasePrice(
-      shipyardSymbol: shipyardSymbol,
-      shipType: shipType,
-    ),
-    'Shipyard at $shipyardSymbol does not sell $shipType.',
-    const Duration(minutes: 10),
-  );
-
-  final recentPriceString = creditsString(recentPrice);
-  jobAssert(
-    recentPrice <= maxPrice,
-    'Failed to buy $shipType at $shipyardSymbol, '
-    '$recentPriceString > max price ${creditsString(maxPrice)}.',
-    const Duration(minutes: 10),
-  );
-
-  // Do we need to catch exceptions about insufficient credits?
-  final result = await purchaseShipAndLog(
-    api,
-    db,
-    shipCache,
-    agentCache,
-    ship,
-    shipyardSymbol,
-    shipType,
-  );
-  return result;
-}
-
-Future<ShipBuyJob?> _getShipBuyJob(
-  CentralCommand centralCommand,
-  WaypointCache waypointCache,
-  AgentCache agentCache,
-  ShipyardPrices shipyardPrices,
-  Ship ship,
+  ShipType wantedType,
 ) async {
-  final hqSystem = agentCache.headquartersSymbol.systemSymbol;
-  final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
-  // const wantedType = ShipType.HEAVY_FREIGHTER;
-  // final trip = assertNotNull(
-  //   findBestShipyardToBuy(
-  //     caches.shipyardPrices,
-  //     caches.routePlanner,
-  //     ship,
-  //     wantedType,
-  //     expectedCreditsPerSecond: 7,
-  //   ),
-  //   'No shipyards found to buy $wantedType.',
-  //   const Duration(minutes: 10),
-  // );
+  final trip = assertNotNull(
+    findBestShipyardToBuy(
+      shipyardPrices,
+      routePlanner,
+      ship,
+      wantedType,
+      expectedCreditsPerSecond: 7,
+    ),
+    'No shipyards found to buy $wantedType.',
+    const Duration(minutes: 10),
+  );
 
-  final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
-  final shipyardSymbol = shipyardWaypoint.waypointSymbol;
-  // final shipyardSymbol = trip.price.waypointSymbol;
-  final shipType = centralCommand.shipTypeToBuy(
+  // final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
+  // final shipyardSymbol = shipyardWaypoint.waypointSymbol;
+  final shipyardSymbol = trip.price.waypointSymbol;
+  final shipType = _shipTypeToBuy(
+    behaviorCache,
+    shipCache,
     ship,
     shipyardPrices,
     agentCache,
@@ -197,6 +133,103 @@ Future<ShipBuyJob?> _getShipBuyJob(
   }
 
   return ShipBuyJob(shipType, shipyardSymbol);
+}
+
+ShipType? _shipTypeToBuy(
+  BehaviorCache behaviorCache,
+  ShipCache shipCache,
+  Ship ship,
+  ShipyardPrices shipyardPrices,
+  AgentCache agentCache,
+  WaypointSymbol shipyardSymbol,
+) {
+  // We should buy a new ship when:
+  // - We have request capacity to spare
+  // - We have money to spare.
+  // - We don't have better uses for the money (e.g. trading or modules)
+
+  bool shipyardHas(ShipType shipType) {
+    return shipyardPrices.recentPurchasePrice(
+          shipyardSymbol: shipyardSymbol,
+          shipType: shipType,
+        ) !=
+        null;
+  }
+
+  // Buy ships based on earnings of that ship type over the last N hours?
+  final systemSymbol = ship.systemSymbol;
+  final hqSystemSymbol = agentCache.headquartersSymbol.systemSymbol;
+  final inStartSystem = systemSymbol == hqSystemSymbol;
+
+  // Early game can stop when we have enough miners going and markets
+  // mapped to start trading.
+  // This is not enough:
+  // Loaded 364 prices from 61 markets and 7 prices from 2 shipyards.
+  // Probably need a couple hundred markets.
+
+  final targetCounts = {
+    ShipType.ORE_HOUND: 90,
+    // ShipType.PROBE: 0,
+    // ShipType.LIGHT_HAULER: 0,
+    ShipType.HEAVY_FREIGHTER: 5,
+  };
+  final typesToBuy = targetCounts.keys.where((shipType) {
+    if (!shipyardHas(shipType)) {
+      logger.info("Shipyard doesn't have $shipType");
+      return false;
+    }
+    return shipCache.countOfType(shipType) < targetCounts[shipType]!;
+  }).toList();
+  logger.info('typesToBuy: $typesToBuy');
+  if (typesToBuy.isEmpty) {
+    return null;
+  }
+
+  final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
+  logger.info('${idleHaulers.length} idle haulers');
+  final buyTraders = idleHaulers.length < 2;
+
+  // We should buy ore-hounds only if we're at a system which has good mining.
+  if (typesToBuy.contains(ShipType.ORE_HOUND) && inStartSystem) {
+    return ShipType.ORE_HOUND;
+  }
+  // // We should buy probes if we have fewer than X of them.  We need probes
+  // // first to explore before traders are useful.
+  // if (typesToBuy.contains(ShipType.PROBE)) {
+  //   return ShipType.PROBE;
+  // }
+  // // We should buy haulers if we have fewer than X haulers idle and we have
+  // // enough extra cash on hand to support trading.
+  // if (typesToBuy.contains(ShipType.LIGHT_HAULER) && buyTraders) {
+  //   return ShipType.LIGHT_HAULER;
+  // }
+  // Heavy traders are the last option after other types have been filled?
+  if (typesToBuy.contains(ShipType.HEAVY_FREIGHTER) && buyTraders) {
+    return ShipType.HEAVY_FREIGHTER;
+  }
+  return null;
+}
+
+Future<ShipBuyJob?> _getShipBuyJob(
+  ShipCache shipCache,
+  BehaviorCache behaviorCache,
+  WaypointCache waypointCache,
+  AgentCache agentCache,
+  ShipyardPrices shipyardPrices,
+  RoutePlanner routePlanner,
+  Ship ship,
+) async {
+  // final hqSystem = agentCache.headquartersSymbol.systemSymbol;
+  // final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
+  return _buySpecificShip(
+    shipyardPrices,
+    routePlanner,
+    ship,
+    shipCache,
+    behaviorCache,
+    agentCache,
+    ShipType.HEAVY_FREIGHTER,
+  );
 }
 
 /// Apply the buy ship behavior.
@@ -213,10 +246,12 @@ Future<DateTime?> advanceBuyShip(
 
   final job = assertNotNull(
     await _getShipBuyJob(
-      centralCommand,
+      caches.ships,
+      caches.behaviors,
       caches.waypoints,
       caches.agent,
       caches.shipyardPrices,
+      caches.routePlanner,
       ship,
     ),
     'No ship buy job.',
