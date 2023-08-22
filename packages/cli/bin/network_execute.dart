@@ -71,6 +71,7 @@ class NetExecutor {
     final minWaitTime = const Duration(seconds: 1) ~/ targetRequestsPerSecond;
     final stats = RateLimitStatPrinter();
     DateTime? nextRequestTime;
+    var serverErrorRetryLimit = 5;
     var backoffSeconds = 1;
     while (true) {
       stats.printIfNeeded();
@@ -130,6 +131,17 @@ class NetExecutor {
         // No need to reply to the request, since it will be retried.
         continue;
       }
+      if (response.statusCode >= 500) {
+        logger.err(
+          'Server error ${response.statusCode}, waiting for $backoffSeconds '
+          'seconds.',
+        );
+        backoffSeconds *= 2;
+        if (serverErrorRetryLimit-- > 0) {
+          continue;
+        }
+        logger.err('Too many server errors, giving up.');
+      }
 
       await queue.deleteRequest(request);
       await queue.respondToRequest(
@@ -138,6 +150,7 @@ class NetExecutor {
       );
       // Success, reset the backoff.
       backoffSeconds = 1;
+      serverErrorRetryLimit = 5;
 
       // Delete all responses older than 5 minutes.
       await queue.deleteResponsesBefore(

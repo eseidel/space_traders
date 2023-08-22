@@ -867,3 +867,37 @@ ApiException 400: {"error":{"message":"Failed to update ship cargo. Ship ESEIDEL
 <asynchronous suspension>
 #8      main (file:///root/space_traders/packages/cli/bin/cli.dart:110:3)
 <asynchronous suspension>
+
+
+### Navigate error after network interrupt
+
+ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-MU55-23072X to X1-MU55-79315D and arrives in 19 seconds.","code":4214,"data":{"departureSymbol
+":"X1-MU55-23072X","destinationSymbol":"X1-MU55-79315D","arrival":"2023-08-22T05:14:17.353Z","departureTime":"2023-08-22T05:13:49.353Z","secondsToArrival":19}}}
+#0      FleetApi.navigateShip (package:openapi/api/fleet_api.dart:1194:7)
+<asynchronous suspension>
+#1      navigateShip (package:cli/net/direct.dart:58:7)
+<asynchronous suspension>
+#2      navigateToLocalWaypoint (package:cli/net/actions.dart:35:23)
+<asynchronous suspension>
+#3      navigateToLocalWaypointAndLog (package:cli/net/actions.dart:333:18)
+<asynchronous suspension>
+#4      continueNavigationIfNeeded (package:cli/nav/navigation.dart:219:11)
+<asynchronous suspension>
+#5      beingRouteAndLog (package:cli/nav/navigation.dart:76:21)
+<asynchronous suspension>
+#6      beingNewRouteAndLog (package:cli/nav/navigation.dart:44:20)
+<asynchronous suspension>
+#7      advanceTrader (package:cli/behavior/trader.dart:787:21)
+<asynchronous suspension>
+#8      advanceShipBehavior (package:cli/behavior/advance.dart:89:23)
+<asynchronous suspension>
+#9      advanceShips (package:cli/logic.dart:52:25)
+<asynchronous suspension>
+#10     logic (package:cli/logic.dart:152:7)
+<asynchronous suspension>
+#11     cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:137:3)
+<asynchronous suspension>
+#12     main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:143:7)
+<asynchronous suspension>
+#13     main (file:///root/space_traders/packages/cli/bin/cli.dart:141:3)
+<asynchronous suspension>
