@@ -681,7 +681,7 @@ class CentralCommand {
     // No haulers until we have 100+ markets?
     // At some point start buying heavy freighters intead of light haulers?
 
-    if (_shipCache.countOfType(ShipType.HEAVY_FREIGHTER) < 3) {
+    if (_shipCache.countOfType(ShipType.HEAVY_FREIGHTER) < 10) {
       return ShipType.HEAVY_FREIGHTER;
     } else {
       return null;
