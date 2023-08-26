@@ -15,6 +15,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
     final reachable = clusterCache.connectedSystemCount(hq.systemSymbol);
     logger.info('${faction.symbol}: $reachable');
   }
+  await db.close();
 }
 
 void main(List<String> args) async {
