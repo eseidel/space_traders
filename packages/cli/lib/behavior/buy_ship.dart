@@ -169,24 +169,24 @@ Future<ShipBuyJob?> _getShipBuyJob(
   RoutePlanner routePlanner,
   Ship ship,
 ) async {
-  // final hqSystem = agentCache.headquartersSymbol.systemSymbol;
-  // final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
-  const wantedType = ShipType.HEAVY_FREIGHTER;
-  final trip = assertNotNull(
-    findBestShipyardToBuy(
-      shipyardPrices,
-      routePlanner,
-      ship,
-      wantedType,
-      expectedCreditsPerSecond: 7,
-    ),
-    'No shipyards found to buy $wantedType.',
-    const Duration(minutes: 10),
-  );
+  final hqSystem = agentCache.headquartersSymbol.systemSymbol;
+  final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
+  // const wantedType = ShipType.HEAVY_FREIGHTER;
+  // final trip = assertNotNull(
+  //   findBestShipyardToBuy(
+  //     shipyardPrices,
+  //     routePlanner,
+  //     ship,
+  //     wantedType,
+  //     expectedCreditsPerSecond: 7,
+  //   ),
+  //   'No shipyards found to buy $wantedType.',
+  //   const Duration(minutes: 10),
+  // );
 
-  // final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
-  // final shipyardSymbol = shipyardWaypoint.waypointSymbol;
-  final shipyardSymbol = trip.price.waypointSymbol;
+  final shipyardWaypoint = hqWaypoints.firstWhere((w) => w.hasShipyard);
+  final shipyardSymbol = shipyardWaypoint.waypointSymbol;
+  // final shipyardSymbol = trip.price.waypointSymbol;
   final shipType = centralCommand.shipTypeToBuy(
     ship,
     shipyardPrices,
