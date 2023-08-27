@@ -109,6 +109,8 @@ Then modified:
 ### Todo
 
 Most impact:
+* Teach miners to move to sell goods if needed.
+* Teach miners to buy their own laser IIs.
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.

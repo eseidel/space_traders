@@ -569,7 +569,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
       maxWaypoints: _maxWaypoints,
     ),
     'Failed to find better location for trader.',
-    const Duration(hours: 1),
+    const Duration(minutes: 10),
   );
   final waitUntil = await beingNewRouteAndLog(
     api,

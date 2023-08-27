@@ -299,10 +299,11 @@ class CentralCommand {
       // Should mine until we have one ore-hound, then switch to survey-only?
 
       ShipRole.COMMAND: [
+        // We should deliver first, but deliver can get stuck, so we'll
+        // try to buy a ship first.
+        Behavior.buyShip,
         // If we can get mounts for our ships, that's the best thing we can do.
         Behavior.deliver,
-        // Otherwise buying more ships is best.
-        Behavior.buyShip,
         // Will only trade if we can make 6/s or more.
         // There are commonly 20c/s trades in the starting system, and at
         // the minimum we want to accept the contract.
@@ -755,7 +756,7 @@ class CentralCommand {
     jobAssert(
       false,
       'Purchased ${result.ship.symbol} ($shipType)!',
-      const Duration(minutes: 10),
+      const Duration(minutes: 5),
     );
     return true;
   }
