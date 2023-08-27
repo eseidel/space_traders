@@ -677,6 +677,7 @@ class CentralCommand {
     }
   }
 
+  // TODO(eseidel): Move out commandCenter.  Will require fixing unit tests.
   /// Visits the local shipyard if we're at a waypoint with a shipyard.
   /// Records shipyard data if needed.
   Future<void> visitLocalShipyard(
