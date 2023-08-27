@@ -167,13 +167,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
         if (newPrice.timestamp.isBefore(existingPrice.timestamp)) {
           continue;
         }
-        if (existingPrice.tradeVolume != newPrice.tradeVolume) {
-          logger.warn(
-            'Trade volume changed for ${newPrice.symbol} at '
-            '${newPrice.waypointSymbol} from '
-            '${existingPrice.tradeVolume} to ${newPrice.tradeVolume}',
-          );
-        }
+        // Trade volumes can and will change between price updates.
         // If the new price is newer than the existing price, replace it.
         _prices[index] = newPrice;
       } else {
