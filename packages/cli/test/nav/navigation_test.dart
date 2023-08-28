@@ -10,6 +10,8 @@ import 'package:types/types.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockFleetApi extends Mock implements FleetApi {}
+
 class _MockShip extends Mock implements Ship {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
@@ -88,7 +90,159 @@ void main() {
     );
     expect(afterResult.shouldReturn(), true);
     expect(afterResult.waitTime, after);
-    // This should be 0, I must not be understanding mocktail correctly.
     verifyNever(() => shipNav.status = ShipNavStatus.IN_ORBIT);
+  });
+
+  test('continueNavigationIfNeeded sets reactorCooldown after jump', () async {
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final ship = _MockShip();
+    final systemsCache = _MockSystemsCache();
+    final shipCache = _MockShipCache();
+    final shipNav = _MockShipNav();
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.nav).thenReturn(shipNav);
+    final centralCommand = _MockCentralCommand();
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+
+    /// The behavior doesn't matter, just needs to have a null destination.
+    final state = BehaviorState(shipSymbol, Behavior.idle);
+
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    final logger = _MockLogger();
+
+    final startSymbol = WaypointSymbol.fromString('A-B-C');
+    final endSymbol = WaypointSymbol.fromString('D-E-F');
+
+    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(startSymbol.system);
+
+    state.routePlan = RoutePlan(
+      fuelCapacity: 100,
+      shipSpeed: 100,
+      actions: [
+        RouteAction(
+          startSymbol: startSymbol,
+          endSymbol: endSymbol,
+          type: RouteActionType.jump,
+          duration: 100,
+        ),
+      ],
+      fuelUsed: 100,
+    );
+    final reactorExpiry = now.add(const Duration(seconds: 100));
+
+    when(() => systemsCache.waypointFromSymbol(startSymbol)).thenReturn(
+      SystemWaypoint(
+        symbol: startSymbol.waypoint,
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => systemsCache.systemBySymbol(startSymbol.systemSymbol))
+        .thenReturn(
+      System(
+        symbol: startSymbol.system,
+        sectorSymbol: startSymbol.sector,
+        type: SystemType.BLACK_HOLE,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => systemsCache.waypointFromSymbol(endSymbol)).thenReturn(
+      SystemWaypoint(
+        symbol: endSymbol.waypoint,
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => systemsCache.systemBySymbol(endSymbol.systemSymbol)).thenReturn(
+      System(
+        symbol: endSymbol.system,
+        sectorSymbol: endSymbol.sector,
+        type: SystemType.BLACK_HOLE,
+        x: 0,
+        y: 0,
+      ),
+    );
+
+    when(
+      () => fleetApi.jumpShip(
+        shipSymbol.symbol,
+        jumpShipRequest: JumpShipRequest(systemSymbol: endSymbol.system),
+      ),
+    ).thenAnswer(
+      (_) async => JumpShip200Response(
+        data: JumpShip200ResponseData(
+          cooldown: Cooldown(
+            shipSymbol: shipSymbol.symbol,
+            totalSeconds: 100,
+            remainingSeconds: 100,
+            expiration: reactorExpiry,
+          ),
+          nav: shipNav,
+        ),
+      ),
+    );
+
+    final singleJumpResult = await runWithLogger(
+      logger,
+      () => continueNavigationIfNeeded(
+        api,
+        ship,
+        state,
+        shipCache,
+        systemsCache,
+        centralCommand,
+        getNow: getNow,
+      ),
+    );
+    // We don't need to return after this jump since the next action may not
+    // need the reactor.
+    expect(singleJumpResult.shouldReturn(), false);
+    verify(() => shipCache.setReactorCooldown(ship, reactorExpiry)).called(1);
+
+    final jumpTwoSymbol = WaypointSymbol.fromString('G-H-I');
+    state.routePlan = RoutePlan(
+      fuelCapacity: 100,
+      shipSpeed: 100,
+      actions: [
+        RouteAction(
+          startSymbol: startSymbol,
+          endSymbol: endSymbol,
+          type: RouteActionType.jump,
+          duration: 100,
+        ),
+        RouteAction(
+          startSymbol: endSymbol,
+          endSymbol: jumpTwoSymbol,
+          type: RouteActionType.jump,
+          duration: 10,
+        ),
+      ],
+      fuelUsed: 100,
+    );
+
+    final betweenJumpsResult = await runWithLogger(
+      logger,
+      () => continueNavigationIfNeeded(
+        api,
+        ship,
+        state,
+        shipCache,
+        systemsCache,
+        centralCommand,
+        getNow: getNow,
+      ),
+    );
+    // We don't need to return after this jump since the next action may not
+    // need the reactor.
+    expect(betweenJumpsResult.shouldReturn(), true);
+    verify(() => shipCache.setReactorCooldown(ship, reactorExpiry)).called(1);
   });
 }

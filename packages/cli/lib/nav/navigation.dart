@@ -210,8 +210,19 @@ Future<NavResult> continueNavigationIfNeeded(
         actionEnd.systemSymbol,
         response.cooldown,
       );
-      // We can't continue the current action, we have more navigation to do
-      // but it's better to figure that out from the top of the loop again.
+      // We don't return the cooldown time here because that would needlessly
+      // delay the next action if the next action does not require a cooldown.
+      final reactorCooloff = response.cooldown.expiration!;
+      shipCache.setReactorCooldown(ship, reactorCooloff);
+      final nextAction = routePlan.actionAfter(action);
+      if (nextAction == null) {
+        return NavResult._continueAction();
+      }
+      if (nextAction.usesReactor()) {
+        // We need to wait for the reactor to cool down.
+        return NavResult._wait(reactorCooloff);
+      }
+      // Otherwise loop immediately since we don't need to wait for the reactor.
       return NavResult._loop();
     case RouteActionType.navCruise:
       // We're in the same system as the end, so we can just navigate there.

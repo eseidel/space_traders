@@ -376,6 +376,7 @@ Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
   Ship ship,
   SystemSymbol systemSymbol,
 ) async {
+  shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $systemSymbol');
   final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol.system);
   final response =
       await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);

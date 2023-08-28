@@ -9,9 +9,19 @@ enum RouteActionType {
   // NAV_DRIFT,
   // NAV_BURN,
   /// Travel between two waypoints in the same system at cruise speed.
-  navCruise,
+  navCruise;
   // WARP_DRIFT,
   // WARP_CRUISE,
+
+  /// Returns true if this action uses the reactor.
+  bool usesReactor() {
+    switch (this) {
+      case RouteActionType.jump:
+        return true;
+      case RouteActionType.navCruise:
+        return false;
+    }
+  }
 }
 
 /// An action taken in a route.
@@ -51,6 +61,9 @@ class RouteAction {
   /// The duration of this action in seconds.
   final int duration;
   // final int cooldown;
+
+  /// Returns true if this action uses the reactor.
+  bool usesReactor() => type.usesReactor();
 
   /// Convert this action to JSON.
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -114,6 +127,18 @@ class RoutePlan {
       throw ArgumentError('No action starting from $waypointSymbol');
     }
     return actions[index];
+  }
+
+  /// Returns the action after the given action or null if there is none.
+  RouteAction? actionAfter(RouteAction action) {
+    final index = actions.indexOf(action);
+    if (index == -1) {
+      throw ArgumentError('No action $action in $actions');
+    }
+    if (index + 1 >= actions.length) {
+      return null;
+    }
+    return actions[index + 1];
   }
 
   /// Convert this route plan to JSON.

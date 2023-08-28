@@ -20,6 +20,31 @@ class ShipCache extends ResponseListCache<Ship> {
           refreshEntries: (Api api) => allMyShips(api).toList(),
         );
 
+  // Keeps a map from ship symbol to the time the reactor will be off cooldown.
+  final Map<String, DateTime> _reactorCooldowns = {};
+
+  /// Returns true if the reactor is on cooldown for the given [ship].
+  bool reactorIsOnCooldown(Ship ship) => reactorCooldown(ship) != null;
+
+  /// Returns the time the reactor will be off cooldown for the given [ship].
+  /// Returns null if the reactor is not on cooldown.
+  DateTime? reactorCooldown(Ship ship) {
+    final cooldown = _reactorCooldowns[ship.symbol];
+    if (cooldown == null) {
+      return cooldown;
+    }
+    final isOnCooldown = cooldown.isAfter(DateTime.timestamp());
+    if (!isOnCooldown) {
+      _reactorCooldowns.remove(ship.symbol);
+    }
+    return cooldown;
+  }
+
+  /// Sets the reactor cooldown for the given [ship] to [cooldown].
+  void setReactorCooldown(Ship ship, DateTime cooldown) {
+    _reactorCooldowns[ship.symbol] = cooldown;
+  }
+
   /// Loads a ShipCache from cache if it exists.
   static ShipCache? loadCached(
     FileSystem fs, {

@@ -83,6 +83,7 @@ Future<void> advanceShips(
         rethrow;
       }
       final difference = expiration.difference(DateTime.timestamp());
+      // shipInfo(ship, '${e.message} $stackTrace');
       shipInfo(ship, '🥶 for ${approximateDuration(difference)}');
       waiter.scheduleShip(shipSymbol, expiration);
     }
