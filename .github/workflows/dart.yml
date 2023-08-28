@@ -33,15 +33,8 @@ jobs:
       - name: Analyze project source
         run: dart analyze
 
-      - name: Run tests
-        run: dart test --coverage=coverage 
-
-      # https://www.bradcypert.com/how-to-upload-coverage-to-codecov-for-dart/
-      - name: Install coverage tools
-        run: dart pub global activate coverage
-
-      - name: format coverage
-        run: $HOME/.pub-cache/bin/format_coverage --lcov --in=coverage --out=coverage.lcov --report-on=lib
+      - name: Run tests with coverage
+        run: ./coverage.sh
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
