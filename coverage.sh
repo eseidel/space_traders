@@ -5,6 +5,8 @@
 
 PACKAGES='cli db server types ui'
 
+pub global activate coverage
+
 for PACKAGE_DIR in $PACKAGES
 do
     echo $PACKAGE_DIR
