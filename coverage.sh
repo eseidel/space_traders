@@ -12,14 +12,8 @@ for PACKAGE_DIR in $PACKAGES
 do
     echo $PACKAGE_DIR
     cd packages/$PACKAGE_DIR
-    if [ $PACKAGE_DIR="ui" ]
-    then
-        flutter pub get
-        flutter test --coverage
-    else
-        dart pub get
-        dart test --coverage=coverage
-    fi
+    dart pub get
+    dart test --coverage=coverage
     dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --packages=.dart_tool/package_config.json --report-on=lib --check-ignore
     cd ../..
 done
