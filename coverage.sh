@@ -3,7 +3,8 @@
 # A script for computing combined coverage for all packages in the repo.
 # This can be used for viewing coverage locally in your editor.
 
-PACKAGES='cli db server types ui'
+# No ui tests yet, so not testing ui package.
+PACKAGES='cli db server types'
 
 dart pub global activate coverage
 
@@ -11,8 +12,14 @@ for PACKAGE_DIR in $PACKAGES
 do
     echo $PACKAGE_DIR
     cd packages/$PACKAGE_DIR
-    dart pub get
-    dart test --coverage=coverage
+    if [ $PACKAGE_DIR="ui" ]
+    then
+        flutter pub get
+        flutter test --coverage
+    else
+        dart pub get
+        dart test --coverage=coverage
+    fi
     dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --packages=.dart_tool/package_config.json --report-on=lib --check-ignore
     cd ../..
 done

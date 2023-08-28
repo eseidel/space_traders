@@ -12,7 +12,9 @@ dependencies:
   intl: ^0.17.0
   # We only want the model types.
   meta: ^1.9.1
-  more: ^4.0.1
+  # Flutter 3.13.0 is pinned to collection 1.17.2
+  # So we can't use more 4.0.1+ until Flutter upgrades collection.
+  more: ^4.0.0
   openapi:
     path: ../openapi
 
