@@ -6,7 +6,7 @@
 # No ui tests yet, so not testing ui package.
 PACKAGES='cli db server types'
 
-dart pub global activate coverage
+dart pub global activate coverage combine_coverage
 
 for PACKAGE_DIR in $PACKAGES
 do
