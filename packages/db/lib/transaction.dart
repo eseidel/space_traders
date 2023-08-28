@@ -1,6 +1,5 @@
 import 'package:db/db.dart';
 import 'package:db/query.dart';
-import 'package:postgres/postgres.dart';
 import 'package:types/types.dart';
 
 /// Create the insertion query for a transaction.
@@ -33,8 +32,7 @@ Map<String, dynamic> transactionToColumnMap(Transaction transaction) {
 }
 
 /// Create a new transaction from a result row.
-Transaction transactionFromResultRow(PostgreSQLResultRow row) {
-  final values = row.toColumnMap();
+Transaction transactionFromColumnMap(Map<String, dynamic> values) {
   return Transaction(
     transactionType:
         TransactionType.fromName(values['transaction_type'] as String),
@@ -63,7 +61,7 @@ Future<Set<String>> uniqueShipSymbols(Database db) async {
 /// Get all transactions from the database.
 Future<Iterable<Transaction>> allTransactions(Database db) async {
   final result = await db.connection.query('SELECT * FROM transaction_');
-  return result.map(transactionFromResultRow);
+  return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
 }
 
 /// Get transactions after a given timestamp.
@@ -75,5 +73,5 @@ Future<Iterable<Transaction>> transactionsAfter(
     'SELECT * FROM transaction_ WHERE timestamp > @timestamp',
     substitutionValues: {'timestamp': timestamp},
   );
-  return result.map(transactionFromResultRow);
+  return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
 }

@@ -1,5 +1,4 @@
 import 'package:db/query.dart';
-import 'package:postgres/postgres.dart';
 import 'package:types/types.dart';
 
 /// Query all factions.
@@ -25,12 +24,11 @@ Query insertFactionQuery(Faction faction) => Query(
 
 /// Convert a faction to a column map.
 Map<String, dynamic> factionToColumnMap(Faction faction) => {
-      'symbol': faction.symbol.toString(),
+      'symbol': faction.symbol.toJson(),
       'json': faction.toJson(),
     };
 
 /// Convert a result row to a faction.
-Faction factionFromResultRow(PostgreSQLResultRow row) {
-  final values = row.toColumnMap();
+Faction factionFromColumnMap(Map<String, dynamic> values) {
   return Faction.fromJson(values['json'] as Map<String, dynamic>)!;
 }

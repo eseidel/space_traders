@@ -71,7 +71,9 @@ class Database {
       query.fmtString,
       substitutionValues: query.substitutionValues,
     );
-    return result.map<HistoricalSurvey>(surveyFromResultRow);
+    return result
+        .map((r) => r.toColumnMap())
+        .map<HistoricalSurvey>(surveyFromColumnMap);
   }
 
   /// Mark the given survey as exhausted.
@@ -91,7 +93,7 @@ class Database {
     final query = factionBySymbolQuery(symbol);
     return connection
         .query(query.fmtString, substitutionValues: query.substitutionValues)
-        .then((result) => factionFromResultRow(result.first));
+        .then((result) => factionFromColumnMap(result.first.toColumnMap()));
   }
 
   /// Gets all factions.
@@ -99,7 +101,12 @@ class Database {
     final query = allFactionsQuery();
     return connection
         .query(query.fmtString, substitutionValues: query.substitutionValues)
-        .then((result) => result.map(factionFromResultRow).toList());
+        .then(
+          (result) => result
+              .map((r) => r.toColumnMap())
+              .map(factionFromColumnMap)
+              .toList(),
+        );
   }
 
   /// Cache the given factions.

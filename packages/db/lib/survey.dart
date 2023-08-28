@@ -1,10 +1,8 @@
 import 'package:db/query.dart';
-import 'package:postgres/postgres.dart';
 import 'package:types/types.dart';
 
 /// Convert a row result into a survey.
-HistoricalSurvey surveyFromResultRow(PostgreSQLResultRow row) {
-  final values = row.toColumnMap();
+HistoricalSurvey surveyFromColumnMap(Map<String, dynamic> values) {
   return HistoricalSurvey(
     survey: Survey(
       signature: values['signature'] as String,

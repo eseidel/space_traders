@@ -1,5 +1,4 @@
 import 'package:db/query.dart';
-import 'package:postgres/postgres.dart';
 import 'package:types/types.dart';
 
 /// Query a ship behavior state by symbol.
@@ -17,7 +16,6 @@ Map<String, dynamic> behaviorStateToColumnMap(BehaviorState state) => {
     };
 
 /// Convert a result row to a BehaviorState.
-BehaviorState behaviorStateFromResultRow(PostgreSQLResultRow row) {
-  final values = row.toColumnMap();
+BehaviorState behaviorStateFromColumnMap(Map<String, dynamic> values) {
   return BehaviorState.fromJson(values['json'] as Map<String, dynamic>);
 }
