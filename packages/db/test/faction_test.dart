@@ -14,8 +14,7 @@ void main() {
     );
     final map = factionToColumnMap(faction);
     expect(map, isNotNull);
-    // Fails because map['json']['symbol'] != r'AEGIS' but toString would be.
-    // final newFaction = factionFromColumnMap(map);
-    // expect(newFaction.symbol, equals(faction.symbol));
+    final newFaction = factionFromColumnMap(map);
+    expect(newFaction.symbol, equals(faction.symbol));
   });
 }
