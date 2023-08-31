@@ -36,21 +36,6 @@ _BuyRequest? _buyRequestFromNeededMounts(MountSymbolSet needed) {
   return _BuyRequest(tradeSymbol: tradeSymbol, units: units);
 }
 
-/// This is an attempt towards a compound job.
-class DeliverState {
-  /// Create a new deliver state.
-  DeliverState(
-    this.buyJob, {
-    this.jobIndex = 0,
-  });
-
-  /// Which job are we on?
-  int jobIndex;
-
-  /// The buy job state.
-  final BuyJob buyJob;
-}
-
 /// Determine what BuyJob to issue, if any.
 Future<BuyJob?> computeBuyJob(
   CentralCommand centralCommand,
