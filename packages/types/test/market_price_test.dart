@@ -17,6 +17,7 @@ void main() {
     final price2 = MarketPrice.fromJson(json);
     final json2 = price2.toJson();
     expect(price2, price);
+    expect(price2.hashCode, price.hashCode);
     expect(json2, json);
   });
 }

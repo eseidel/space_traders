@@ -22,6 +22,7 @@ void main() {
     final json2 = transaction2.toJson();
     expect(json2, json);
     expect(transaction2, transaction);
+    expect(transaction2.hashCode, transaction.hashCode);
   });
 
   // We don't actually care that hashCode is correct, we just implement it
