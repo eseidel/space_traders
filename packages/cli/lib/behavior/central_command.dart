@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/behavior/behavior.dart';
-import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -703,63 +701,6 @@ class CentralCommand {
 
   /// The minimum credits we should have to buy a new ship.
   int get minimumCreditsForTrading => numberOfHaulers * 10000;
-
-  /// Attempt to buy a ship for the given [ship].
-  // TODO(eseidel): Unify this with buyShip behavior.
-  Future<bool> buyShipIfPossible(
-    Api api,
-    Database db,
-    ShipyardPrices shipyardPrices,
-    AgentCache agentCache,
-    Ship ship,
-  ) async {
-    if (isBehaviorDisabled(Behavior.buyShip) ||
-        isBehaviorDisabledForShip(ship, Behavior.buyShip)) {
-      return false;
-    }
-
-    // This assumes the ship in question is at a shipyard and already docked.
-    final shipyardSymbol = ship.waypointSymbol;
-    // This only works if we've recorded prices from this shipyard before.
-    final knownPrices = shipyardPrices.pricesAtShipyard(ship.waypointSymbol);
-    final availableTypes = knownPrices.map((p) => p.shipType);
-    shipInfo(
-      ship,
-      'Visiting shipyard $shipyardSymbol, available: $availableTypes',
-    );
-
-    final shipType = assertNotNull(
-      shipTypeToBuy(
-        ship,
-        shipyardPrices,
-        agentCache,
-        shipyardSymbol,
-      ),
-      'No ship to buy at $shipyardSymbol.',
-      const Duration(minutes: 5),
-    );
-
-    final result = await doBuyShipJob(
-      api,
-      db,
-      _shipCache,
-      shipyardPrices,
-      agentCache,
-      ship,
-      ShipBuyJob(shipType, shipyardSymbol),
-      maxMedianShipPriceMultipler: maxMedianShipPriceMultipler,
-      minimumCreditsForTrading: minimumCreditsForTrading,
-    );
-
-    // Abusing jobAssert a little here to throw an exception on success
-    // which will clear only the buyShip behavior.
-    jobAssert(
-      false,
-      'Purchased ${result.ship.symbol} ($shipType)!',
-      const Duration(minutes: 5),
-    );
-    return true;
-  }
 
   /// Computes the number of units needed to fulfill the given [contract].
   /// Includes units in flight.
