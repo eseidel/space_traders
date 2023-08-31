@@ -15,8 +15,13 @@ do
     cd packages/$PACKAGE_DIR
     dart pub get
     dart test --coverage=coverage
+    # --report-on is wanted to exclude openapi generated code from coverage.
     dart pub global run coverage:format_coverage --lcov --in=coverage \
         --out=coverage/lcov.info --packages=.dart_tool/package_config.json \
+        --report-on=../cli/lib/ \
+        --report-on=../db/lib/ \
+        --report-on=../server/lib/ \
+        --report-on=../types/lib/ \
         --check-ignore
     cd ../..
 done
