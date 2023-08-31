@@ -26,7 +26,7 @@ Map<String, dynamic> extractionToColumnMap(ExtractionRecord extraction) {
 }
 
 /// Convert a row result into an extraction.
-ExtractionRecord extractionFromRowResult(Map<String, dynamic> values) {
+ExtractionRecord extractionFromColumnMap(Map<String, dynamic> values) {
   return ExtractionRecord(
     shipSymbol: ShipSymbol.fromString(values['ship_symbol'] as String),
     waypointSymbol:

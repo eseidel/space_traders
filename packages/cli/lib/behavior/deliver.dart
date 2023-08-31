@@ -14,40 +14,6 @@ import 'package:types/types.dart';
 // Go buy and deliver.
 // Used for modules.
 
-/// Compute the mounts in the given ship's inventory.
-MountSymbolSet countMountsInInventory(Ship ship) {
-  final counts = MountSymbolSet();
-  for (final item in ship.cargo.inventory) {
-    final mountSymbol = mountSymbolForTradeSymbol(item.tradeSymbol);
-    // Will be null if the item isn't a mount.
-    if (mountSymbol == null) {
-      continue;
-    }
-    counts.add(mountSymbol, item.units);
-  }
-  return counts;
-}
-
-/// Compute the mounts mounted on the given ship.
-MountSymbolSet countMountedMounts(Ship ship) {
-  return MountSymbolSet.fromIterable(
-    ship.mounts.map((m) => m.symbol),
-  );
-}
-
-/// Mounts to add to make [ship] match [template].
-MountSymbolSet mountsToAddToShip(Ship ship, ShipTemplate template) {
-  return template.mounts.difference(countMountedMounts(ship));
-}
-
-/// Mounts to remove to make [ship] match [template].
-MountSymbolSet mountsToRemoveFromShip(
-  Ship ship,
-  ShipTemplate template,
-) {
-  return countMountedMounts(ship).difference(template.mounts);
-}
-
 class _BuyRequest {
   _BuyRequest({
     required this.tradeSymbol,

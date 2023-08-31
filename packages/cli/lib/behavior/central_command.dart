@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
-import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -420,7 +419,7 @@ class CentralCommand {
       if (state == null || state.behavior != Behavior.deliver) {
         continue;
       }
-      available.addAll(countMountsInInventory(ship));
+      available.addAll(ship.mountSymbolsInInventory);
     }
     final claimed = claimedMounts();
     // Unclear where this warning belongs.
