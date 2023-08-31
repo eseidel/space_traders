@@ -245,8 +245,9 @@ class Deal {
 }
 
 /// A deal between two markets which considers flight cost and time.
-// This could be made immutable with a bit of work.  Currently we edit
-// transactions in place.
+// This could be made immutable with a bit of work.
+// Currently this contains Transactions, which should instead be held separately
+// in the db.
 class CostedDeal {
   /// Create a new CostedDeal.
   CostedDeal({

@@ -14,6 +14,24 @@ void main() {
     final deal2 = Deal.fromJson(json);
     final json2 = deal2.toJson();
     expect(deal, deal2);
+    expect(deal.hashCode, deal2.hashCode);
+    expect(json, json2);
+  });
+
+  // Deal.test does not include a ContractDelivery, so testing that separately.
+  test('ContractDelivery JSON roundtrip', () {
+    final delivery = ContractDelivery(
+      contractId: 'abc',
+      destination: WaypointSymbol.fromString('S-A-B'),
+      tradeSymbol: TradeSymbol.FUEL,
+      rewardPerUnit: 10,
+      maxUnits: 100,
+    );
+    final json = delivery.toJson();
+    final delivery2 = ContractDelivery.fromJson(json);
+    final json2 = delivery2.toJson();
+    expect(delivery, delivery2);
+    expect(delivery.hashCode, delivery2.hashCode);
     expect(json, json2);
   });
 
