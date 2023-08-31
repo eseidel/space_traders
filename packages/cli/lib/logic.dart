@@ -48,7 +48,7 @@ Future<void> advanceShips(
     }
     try {
       final before = DateTime.timestamp();
-      final requestsBefore = api.requestCounts.totalRequests();
+      final requestsBefore = api.requestCounts.totalRequests;
       final waitUntil = await advanceShipBehavior(
         api,
         db,
@@ -58,7 +58,7 @@ Future<void> advanceShips(
       );
       final after = DateTime.timestamp();
       final duration = after.difference(before);
-      final requestsAfter = api.requestCounts.totalRequests();
+      final requestsAfter = api.requestCounts.totalRequests;
       final requests = requestsAfter - requestsBefore;
       final behaviorState = caches.behaviors.getBehavior(shipSymbol);
       final expectedSeconds = requests / api.maxRequestsPerSecond;
@@ -96,7 +96,7 @@ class RateLimitTracker {
   RateLimitTracker(Api api, {this.printEvery = const Duration(minutes: 2)})
       : _api = api,
         _lastPrintTime = DateTime.timestamp() {
-    _lastRequestCount = _api.requestCounts.totalRequests();
+    _lastRequestCount = _api.requestCounts.totalRequests;
   }
 
   /// The rate limit stats are printed every this often.
@@ -112,7 +112,7 @@ class RateLimitTracker {
     final timeSinceLastPrint = now.difference(_lastPrintTime);
     final requestCounts = _api.requestCounts;
     if (timeSinceLastPrint > printEvery) {
-      final requestCount = requestCounts.totalRequests();
+      final requestCount = requestCounts.totalRequests;
       final requestsSinceLastPrint = requestCount - _lastRequestCount;
       _lastRequestCount = requestCount;
       final requestsPerSecond =

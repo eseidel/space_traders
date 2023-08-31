@@ -14,9 +14,7 @@ class RequestCounts {
   }
 
   /// Get the total number of requests made.
-  int totalRequests() {
-    return counts.values.fold(0, (a, b) => a + b);
-  }
+  int get totalRequests => counts.values.fold(0, (a, b) => a + b);
 
   /// Reset the counts.
   void reset() {

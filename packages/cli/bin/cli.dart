@@ -31,7 +31,7 @@ void printRequestStats(RequestCounts requestCounts) {
   for (final entry in sortedCounts) {
     logger.info('${entry.value} ${entry.key}');
   }
-  logger.info('Total: ${requestCounts.totalRequests()} requests.');
+  logger.info('Total: ${requestCounts.totalRequests} requests.');
 }
 
 bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
