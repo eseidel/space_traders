@@ -5,8 +5,8 @@ import 'package:types/types.dart';
 Query insertExtractionQuery(ExtractionRecord extraction) {
   return Query(
     'INSERT INTO extraction_ (ship_symbol, waypoint_symbol, trade_symbol, '
-    'quantity, power, survey_signature, timestamp) VALUES (@shipSymbol, '
-    '@waypointSymbol, @tradeSymbol, @quantity, @power, @surveySignature, '
+    'quantity, power, survey_signature, timestamp) VALUES (@ship_symbol, '
+    '@waypoint_symbol, @trade_symbol, @quantity, @power, @survey_signature, '
     '@timestamp)',
     substitutionValues: extractionToColumnMap(extraction),
   );
@@ -15,12 +15,12 @@ Query insertExtractionQuery(ExtractionRecord extraction) {
 /// Convert an extraction to a column map.
 Map<String, dynamic> extractionToColumnMap(ExtractionRecord extraction) {
   return {
-    'shipSymbol': extraction.shipSymbol.toJson(),
-    'waypointSymbol': extraction.waypointSymbol.toJson(),
-    'tradeSymbol': extraction.tradeSymbol.toJson(),
+    'ship_symbol': extraction.shipSymbol.toJson(),
+    'waypoint_symbol': extraction.waypointSymbol.toJson(),
+    'trade_symbol': extraction.tradeSymbol.toJson(),
     'quantity': extraction.quantity,
     'power': extraction.power,
-    'surveySignature': extraction.surveySignature,
+    'survey_signature': extraction.surveySignature,
     'timestamp': extraction.timestamp,
   };
 }
