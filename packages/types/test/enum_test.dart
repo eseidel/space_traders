@@ -10,5 +10,7 @@ void main() {
     expect(_Enum.three >= _Enum.three, isTrue);
     expect(_Enum.three >= _Enum.two, isTrue);
     expect(_Enum.three > _Enum.two, isTrue);
+    final list = [_Enum.three, _Enum.one, _Enum.two]..sort();
+    expect(list, [_Enum.one, _Enum.two, _Enum.three]);
   });
 }
