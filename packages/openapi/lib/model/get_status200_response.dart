@@ -121,14 +121,14 @@ class GetStatus200Response {
         serverResets:
             GetStatus200ResponseServerResets.fromJson(json[r'serverResets'])!,
         announcements: GetStatus200ResponseAnnouncementsInner.listFromJson(
-            json[r'announcements'])!,
-        links: GetStatus200ResponseLinksInner.listFromJson(json[r'links'])!,
+            json[r'announcements']),
+        links: GetStatus200ResponseLinksInner.listFromJson(json[r'links']),
       );
     }
     return null;
   }
 
-  static List<GetStatus200Response>? listFromJson(
+  static List<GetStatus200Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -165,15 +165,13 @@ class GetStatus200Response {
   }) {
     final map = <String, List<GetStatus200Response>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = GetStatus200Response.listFromJson(
+        map[entry.key] = GetStatus200Response.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

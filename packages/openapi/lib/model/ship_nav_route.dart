@@ -15,6 +15,7 @@ class ShipNavRoute {
   ShipNavRoute({
     required this.destination,
     required this.departure,
+    required this.origin,
     required this.departureTime,
     required this.arrival,
   });
@@ -22,6 +23,8 @@ class ShipNavRoute {
   ShipNavRouteWaypoint destination;
 
   ShipNavRouteWaypoint departure;
+
+  ShipNavRouteWaypoint origin;
 
   /// The date time of the ship's departure.
   DateTime departureTime;
@@ -35,6 +38,7 @@ class ShipNavRoute {
       other is ShipNavRoute &&
           other.destination == destination &&
           other.departure == departure &&
+          other.origin == origin &&
           other.departureTime == departureTime &&
           other.arrival == arrival;
 
@@ -43,17 +47,19 @@ class ShipNavRoute {
       // ignore: unnecessary_parenthesis
       (destination.hashCode) +
       (departure.hashCode) +
+      (origin.hashCode) +
       (departureTime.hashCode) +
       (arrival.hashCode);
 
   @override
   String toString() =>
-      'ShipNavRoute[destination=$destination, departure=$departure, departureTime=$departureTime, arrival=$arrival]';
+      'ShipNavRoute[destination=$destination, departure=$departure, origin=$origin, departureTime=$departureTime, arrival=$arrival]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'destination'] = this.destination;
     json[r'departure'] = this.departure;
+    json[r'origin'] = this.origin;
     json[r'departureTime'] = this.departureTime.toUtc().toIso8601String();
     json[r'arrival'] = this.arrival.toUtc().toIso8601String();
     return json;
@@ -82,6 +88,7 @@ class ShipNavRoute {
       return ShipNavRoute(
         destination: ShipNavRouteWaypoint.fromJson(json[r'destination'])!,
         departure: ShipNavRouteWaypoint.fromJson(json[r'departure'])!,
+        origin: ShipNavRouteWaypoint.fromJson(json[r'origin'])!,
         departureTime: mapDateTime(json, r'departureTime', '')!,
         arrival: mapDateTime(json, r'arrival', '')!,
       );
@@ -89,7 +96,7 @@ class ShipNavRoute {
     return null;
   }
 
-  static List<ShipNavRoute>? listFromJson(
+  static List<ShipNavRoute> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -126,15 +133,13 @@ class ShipNavRoute {
   }) {
     final map = <String, List<ShipNavRoute>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipNavRoute.listFromJson(
+        map[entry.key] = ShipNavRoute.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -144,6 +149,7 @@ class ShipNavRoute {
   static const requiredKeys = <String>{
     'destination',
     'departure',
+    'origin',
     'departureTime',
     'arrival',
   };

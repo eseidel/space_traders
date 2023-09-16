@@ -92,7 +92,7 @@ class RegisterRequest {
     return null;
   }
 
-  static List<RegisterRequest>? listFromJson(
+  static List<RegisterRequest> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -129,15 +129,13 @@ class RegisterRequest {
   }) {
     final map = <String, List<RegisterRequest>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = RegisterRequest.listFromJson(
+        map[entry.key] = RegisterRequest.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

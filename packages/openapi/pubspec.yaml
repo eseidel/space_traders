@@ -6,6 +6,8 @@ name: 'openapi'
 version: '1.0.0'
 description: 'SpaceTraders API'
 homepage: 'homepage'
+repository: https://github.com/eseidel/space_traders
+publish_to: none
 environment:
   sdk: '>=2.12.0 <3.0.0'
 dependencies:

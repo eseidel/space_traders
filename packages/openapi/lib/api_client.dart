@@ -493,6 +493,8 @@ class ApiClient {
           return Shipyard.fromJson(value);
         case 'ShipyardShip':
           return ShipyardShip.fromJson(value);
+        case 'ShipyardShipCrew':
+          return ShipyardShipCrew.fromJson(value);
         case 'ShipyardShipTypesInner':
           return ShipyardShipTypesInner.fromJson(value);
         case 'ShipyardTransaction':

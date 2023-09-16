@@ -71,7 +71,7 @@ class NavigateShip200ResponseData {
     return null;
   }
 
-  static List<NavigateShip200ResponseData>? listFromJson(
+  static List<NavigateShip200ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -108,15 +108,13 @@ class NavigateShip200ResponseData {
   }) {
     final map = <String, List<NavigateShip200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = NavigateShip200ResponseData.listFromJson(
+        map[entry.key] = NavigateShip200ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

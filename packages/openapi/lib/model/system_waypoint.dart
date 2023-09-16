@@ -17,6 +17,8 @@ class SystemWaypoint {
     required this.type,
     required this.x,
     required this.y,
+    this.orbitals = const [],
+    this.orbits,
   });
 
   /// The symbol of the waypoint.
@@ -24,11 +26,23 @@ class SystemWaypoint {
 
   WaypointType type;
 
-  /// Position in the universe in the x axis.
+  /// Relative position of the waypoint on the system's x axis. This is not an absolute position in the universe.
   int x;
 
-  /// Position in the universe in the y axis.
+  /// Relative position of the waypoint on the system's y axis. This is not an absolute position in the universe.
   int y;
+
+  /// Waypoints that orbit this waypoint.
+  List<WaypointOrbital> orbitals;
+
+  /// The symbol of the parent waypoint, if this waypoint is in orbit around another waypoint. Otherwise this value is undefined.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? orbits;
 
   @override
   bool operator ==(Object other) =>
@@ -37,15 +51,23 @@ class SystemWaypoint {
           other.symbol == symbol &&
           other.type == type &&
           other.x == x &&
-          other.y == y;
+          other.y == y &&
+          other.orbitals == orbitals &&
+          other.orbits == orbits;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (symbol.hashCode) + (type.hashCode) + (x.hashCode) + (y.hashCode);
+      (symbol.hashCode) +
+      (type.hashCode) +
+      (x.hashCode) +
+      (y.hashCode) +
+      (orbitals.hashCode) +
+      (orbits == null ? 0 : orbits!.hashCode);
 
   @override
-  String toString() => 'SystemWaypoint[symbol=$symbol, type=$type, x=$x, y=$y]';
+  String toString() =>
+      'SystemWaypoint[symbol=$symbol, type=$type, x=$x, y=$y, orbitals=$orbitals, orbits=$orbits]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -53,6 +75,12 @@ class SystemWaypoint {
     json[r'type'] = this.type;
     json[r'x'] = this.x;
     json[r'y'] = this.y;
+    json[r'orbitals'] = this.orbitals;
+    if (this.orbits != null) {
+      json[r'orbits'] = this.orbits;
+    } else {
+      json[r'orbits'] = null;
+    }
     return json;
   }
 
@@ -81,12 +109,14 @@ class SystemWaypoint {
         type: WaypointType.fromJson(json[r'type'])!,
         x: mapValueOfType<int>(json, r'x')!,
         y: mapValueOfType<int>(json, r'y')!,
+        orbitals: WaypointOrbital.listFromJson(json[r'orbitals']),
+        orbits: mapValueOfType<String>(json, r'orbits'),
       );
     }
     return null;
   }
 
-  static List<SystemWaypoint>? listFromJson(
+  static List<SystemWaypoint> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -123,15 +153,13 @@ class SystemWaypoint {
   }) {
     final map = <String, List<SystemWaypoint>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = SystemWaypoint.listFromJson(
+        map[entry.key] = SystemWaypoint.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -143,5 +171,6 @@ class SystemWaypoint {
     'type',
     'x',
     'y',
+    'orbitals',
   };
 }

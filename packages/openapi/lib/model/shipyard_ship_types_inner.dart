@@ -74,7 +74,7 @@ class ShipyardShipTypesInner {
     return null;
   }
 
-  static List<ShipyardShipTypesInner>? listFromJson(
+  static List<ShipyardShipTypesInner> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -111,15 +111,13 @@ class ShipyardShipTypesInner {
   }) {
     final map = <String, List<ShipyardShipTypesInner>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipyardShipTypesInner.listFromJson(
+        map[entry.key] = ShipyardShipTypesInner.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

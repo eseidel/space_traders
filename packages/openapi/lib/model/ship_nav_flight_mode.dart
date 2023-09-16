@@ -39,7 +39,7 @@ class ShipNavFlightMode {
   static ShipNavFlightMode? fromJson(dynamic value) =>
       ShipNavFlightModeTypeTransformer().decode(value);
 
-  static List<ShipNavFlightMode>? listFromJson(
+  static List<ShipNavFlightMode> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

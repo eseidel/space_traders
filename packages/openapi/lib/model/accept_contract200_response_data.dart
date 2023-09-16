@@ -72,7 +72,7 @@ class AcceptContract200ResponseData {
     return null;
   }
 
-  static List<AcceptContract200ResponseData>? listFromJson(
+  static List<AcceptContract200ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -109,15 +109,13 @@ class AcceptContract200ResponseData {
   }) {
     final map = <String, List<AcceptContract200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = AcceptContract200ResponseData.listFromJson(
+        map[entry.key] = AcceptContract200ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

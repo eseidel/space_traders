@@ -167,6 +167,7 @@ part 'model/ship_role.dart';
 part 'model/ship_type.dart';
 part 'model/shipyard.dart';
 part 'model/shipyard_ship.dart';
+part 'model/shipyard_ship_crew.dart';
 part 'model/shipyard_ship_types_inner.dart';
 part 'model/shipyard_transaction.dart';
 part 'model/survey.dart';

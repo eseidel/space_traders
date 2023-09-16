@@ -141,6 +141,7 @@ doc/ShipRole.md
 doc/ShipType.md
 doc/Shipyard.md
 doc/ShipyardShip.md
+doc/ShipyardShipCrew.md
 doc/ShipyardShipTypesInner.md
 doc/ShipyardTransaction.md
 doc/Survey.md
@@ -308,6 +309,7 @@ lib/model/ship_role.dart
 lib/model/ship_type.dart
 lib/model/shipyard.dart
 lib/model/shipyard_ship.dart
+lib/model/shipyard_ship_crew.dart
 lib/model/shipyard_ship_types_inner.dart
 lib/model/shipyard_transaction.dart
 lib/model/survey.dart
@@ -462,6 +464,7 @@ test/ship_requirements_test.dart
 test/ship_role_test.dart
 test/ship_test.dart
 test/ship_type_test.dart
+test/shipyard_ship_crew_test.dart
 test/shipyard_ship_test.dart
 test/shipyard_ship_types_inner_test.dart
 test/shipyard_test.dart

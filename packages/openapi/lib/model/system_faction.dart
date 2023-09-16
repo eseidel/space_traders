@@ -64,7 +64,7 @@ class SystemFaction {
     return null;
   }
 
-  static List<SystemFaction>? listFromJson(
+  static List<SystemFaction> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -101,15 +101,13 @@ class SystemFaction {
   }) {
     final map = <String, List<SystemFaction>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = SystemFaction.listFromJson(
+        map[entry.key] = SystemFaction.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

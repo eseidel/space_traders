@@ -65,7 +65,7 @@ class ScannedShipMountsInner {
     return null;
   }
 
-  static List<ScannedShipMountsInner>? listFromJson(
+  static List<ScannedShipMountsInner> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -102,15 +102,13 @@ class ScannedShipMountsInner {
   }) {
     final map = <String, List<ScannedShipMountsInner>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ScannedShipMountsInner.listFromJson(
+        map[entry.key] = ScannedShipMountsInner.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

@@ -59,7 +59,7 @@ class ShipRole {
   static ShipRole? fromJson(dynamic value) =>
       ShipRoleTypeTransformer().decode(value);
 
-  static List<ShipRole>? listFromJson(
+  static List<ShipRole> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

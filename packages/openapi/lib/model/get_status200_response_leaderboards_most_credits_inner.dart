@@ -75,7 +75,7 @@ class GetStatus200ResponseLeaderboardsMostCreditsInner {
     return null;
   }
 
-  static List<GetStatus200ResponseLeaderboardsMostCreditsInner>? listFromJson(
+  static List<GetStatus200ResponseLeaderboardsMostCreditsInner> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -117,16 +117,14 @@ class GetStatus200ResponseLeaderboardsMostCreditsInner {
     final map =
         <String, List<GetStatus200ResponseLeaderboardsMostCreditsInner>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value =
+        map[entry.key] =
             GetStatus200ResponseLeaderboardsMostCreditsInner.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

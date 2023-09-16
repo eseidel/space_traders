@@ -121,15 +121,14 @@ class ShipMount {
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description'),
         strength: mapValueOfType<int>(json, r'strength'),
-        deposits:
-            ShipMountDepositsEnum.listFromJson(json[r'deposits']) ?? const [],
+        deposits: ShipMountDepositsEnum.listFromJson(json[r'deposits']),
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
       );
     }
     return null;
   }
 
-  static List<ShipMount>? listFromJson(
+  static List<ShipMount> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -166,15 +165,13 @@ class ShipMount {
   }) {
     final map = <String, List<ShipMount>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipMount.listFromJson(
+        map[entry.key] = ShipMount.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -244,7 +241,7 @@ class ShipMountSymbolEnum {
   static ShipMountSymbolEnum? fromJson(dynamic value) =>
       ShipMountSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipMountSymbolEnum>? listFromJson(
+  static List<ShipMountSymbolEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -373,7 +370,7 @@ class ShipMountDepositsEnum {
   static ShipMountDepositsEnum? fromJson(dynamic value) =>
       ShipMountDepositsEnumTypeTransformer().decode(value);
 
-  static List<ShipMountDepositsEnum>? listFromJson(
+  static List<ShipMountDepositsEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

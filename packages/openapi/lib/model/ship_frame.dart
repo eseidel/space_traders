@@ -141,7 +141,7 @@ class ShipFrame {
     return null;
   }
 
-  static List<ShipFrame>? listFromJson(
+  static List<ShipFrame> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -178,15 +178,13 @@ class ShipFrame {
   }) {
     final map = <String, List<ShipFrame>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipFrame.listFromJson(
+        map[entry.key] = ShipFrame.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -257,7 +255,7 @@ class ShipFrameSymbolEnum {
   static ShipFrameSymbolEnum? fromJson(dynamic value) =>
       ShipFrameSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipFrameSymbolEnum>? listFromJson(
+  static List<ShipFrameSymbolEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

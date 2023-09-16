@@ -79,13 +79,13 @@ class ShipCargo {
       return ShipCargo(
         capacity: mapValueOfType<int>(json, r'capacity')!,
         units: mapValueOfType<int>(json, r'units')!,
-        inventory: ShipCargoItem.listFromJson(json[r'inventory'])!,
+        inventory: ShipCargoItem.listFromJson(json[r'inventory']),
       );
     }
     return null;
   }
 
-  static List<ShipCargo>? listFromJson(
+  static List<ShipCargo> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -122,15 +122,13 @@ class ShipCargo {
   }) {
     final map = <String, List<ShipCargo>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipCargo.listFromJson(
+        map[entry.key] = ShipCargo.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

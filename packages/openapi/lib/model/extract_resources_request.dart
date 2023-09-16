@@ -74,7 +74,7 @@ class ExtractResourcesRequest {
     return null;
   }
 
-  static List<ExtractResourcesRequest>? listFromJson(
+  static List<ExtractResourcesRequest> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -111,15 +111,13 @@ class ExtractResourcesRequest {
   }) {
     final map = <String, List<ExtractResourcesRequest>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ExtractResourcesRequest.listFromJson(
+        map[entry.key] = ExtractResourcesRequest.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

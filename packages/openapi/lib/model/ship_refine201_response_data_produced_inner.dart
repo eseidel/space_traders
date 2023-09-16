@@ -74,7 +74,7 @@ class ShipRefine201ResponseDataProducedInner {
     return null;
   }
 
-  static List<ShipRefine201ResponseDataProducedInner>? listFromJson(
+  static List<ShipRefine201ResponseDataProducedInner> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -114,15 +114,13 @@ class ShipRefine201ResponseDataProducedInner {
   }) {
     final map = <String, List<ShipRefine201ResponseDataProducedInner>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipRefine201ResponseDataProducedInner.listFromJson(
+        map[entry.key] = ShipRefine201ResponseDataProducedInner.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

@@ -96,11 +96,11 @@ Welcome to Space Traders! 🚀
 ### Generating `space_traders_api` package
 ```
 dart pub global activate openapi_generator_cli
-rm -rf packages/openapi/
+rmdir packages/openapi/
 openapi-generator generate -c open_api_config.yaml
 ```
 Then modified:
-* `rm -rf packages/openapi/test` directory since it was just TODOs.
+* `rmdir packages/openapi/test` directory since it was just TODOs.
 * Fixed handling of required num fields:
     * `packages/openapi/lib/model/jump_gate.dart`
   Due to: https://github.com/OpenAPITools/openapi-generator/pull/10637#pullrequestreview-1425351014

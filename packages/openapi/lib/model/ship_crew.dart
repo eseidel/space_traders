@@ -112,7 +112,7 @@ class ShipCrew {
     return null;
   }
 
-  static List<ShipCrew>? listFromJson(
+  static List<ShipCrew> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -149,15 +149,13 @@ class ShipCrew {
   }) {
     final map = <String, List<ShipCrew>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipCrew.listFromJson(
+        map[entry.key] = ShipCrew.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -199,7 +197,7 @@ class ShipCrewRotationEnum {
   static ShipCrewRotationEnum? fromJson(dynamic value) =>
       ShipCrewRotationEnumTypeTransformer().decode(value);
 
-  static List<ShipCrewRotationEnum>? listFromJson(
+  static List<ShipCrewRotationEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

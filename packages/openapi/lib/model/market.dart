@@ -97,19 +97,17 @@ class Market {
 
       return Market(
         symbol: mapValueOfType<String>(json, r'symbol')!,
-        exports: TradeGood.listFromJson(json[r'exports'])!,
-        imports: TradeGood.listFromJson(json[r'imports'])!,
-        exchange: TradeGood.listFromJson(json[r'exchange'])!,
-        transactions:
-            MarketTransaction.listFromJson(json[r'transactions']) ?? const [],
-        tradeGoods:
-            MarketTradeGood.listFromJson(json[r'tradeGoods']) ?? const [],
+        exports: TradeGood.listFromJson(json[r'exports']),
+        imports: TradeGood.listFromJson(json[r'imports']),
+        exchange: TradeGood.listFromJson(json[r'exchange']),
+        transactions: MarketTransaction.listFromJson(json[r'transactions']),
+        tradeGoods: MarketTradeGood.listFromJson(json[r'tradeGoods']),
       );
     }
     return null;
   }
 
-  static List<Market>? listFromJson(
+  static List<Market> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -146,15 +144,13 @@ class Market {
   }) {
     final map = <String, List<Market>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Market.listFromJson(
+        map[entry.key] = Market.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

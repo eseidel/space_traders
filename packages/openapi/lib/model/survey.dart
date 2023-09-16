@@ -26,7 +26,7 @@ class Survey {
   /// The symbol of the waypoint that this survey is for.
   String symbol;
 
-  /// A list of deposits that can be found at this location.
+  /// A list of deposits that can be found at this location. A ship will extract one of these deposits when using this survey in an extraction request. If multiple deposits of the same type are present, the chance of extracting that deposit is increased.
   List<SurveyDeposit> deposits;
 
   /// The date and time when the survey expires. After this date and time, the survey will no longer be available for extraction.
@@ -91,7 +91,7 @@ class Survey {
       return Survey(
         signature: mapValueOfType<String>(json, r'signature')!,
         symbol: mapValueOfType<String>(json, r'symbol')!,
-        deposits: SurveyDeposit.listFromJson(json[r'deposits'])!,
+        deposits: SurveyDeposit.listFromJson(json[r'deposits']),
         expiration: mapDateTime(json, r'expiration', '')!,
         size: SurveySizeEnum.fromJson(json[r'size'])!,
       );
@@ -99,7 +99,7 @@ class Survey {
     return null;
   }
 
-  static List<Survey>? listFromJson(
+  static List<Survey> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -136,15 +136,13 @@ class Survey {
   }) {
     final map = <String, List<Survey>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Survey.listFromJson(
+        map[entry.key] = Survey.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -187,7 +185,7 @@ class SurveySizeEnum {
   static SurveySizeEnum? fromJson(dynamic value) =>
       SurveySizeEnumTypeTransformer().decode(value);
 
-  static List<SurveySizeEnum>? listFromJson(
+  static List<SurveySizeEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

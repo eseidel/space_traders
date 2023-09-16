@@ -78,7 +78,7 @@ class SellCargo201ResponseData {
     return null;
   }
 
-  static List<SellCargo201ResponseData>? listFromJson(
+  static List<SellCargo201ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -115,15 +115,13 @@ class SellCargo201ResponseData {
   }) {
     final map = <String, List<SellCargo201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = SellCargo201ResponseData.listFromJson(
+        map[entry.key] = SellCargo201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

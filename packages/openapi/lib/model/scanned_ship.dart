@@ -124,14 +124,13 @@ class ScannedShip {
         frame: ScannedShipFrame.fromJson(json[r'frame']),
         reactor: ScannedShipReactor.fromJson(json[r'reactor']),
         engine: ScannedShipEngine.fromJson(json[r'engine'])!,
-        mounts:
-            ScannedShipMountsInner.listFromJson(json[r'mounts']) ?? const [],
+        mounts: ScannedShipMountsInner.listFromJson(json[r'mounts']),
       );
     }
     return null;
   }
 
-  static List<ScannedShip>? listFromJson(
+  static List<ScannedShip> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -168,15 +167,13 @@ class ScannedShip {
   }) {
     final map = <String, List<ScannedShip>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ScannedShip.listFromJson(
+        map[entry.key] = ScannedShip.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

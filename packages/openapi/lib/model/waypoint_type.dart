@@ -49,7 +49,7 @@ class WaypointType {
   static WaypointType? fromJson(dynamic value) =>
       WaypointTypeTypeTransformer().decode(value);
 
-  static List<WaypointType>? listFromJson(
+  static List<WaypointType> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

@@ -17,6 +17,7 @@ class Shipyard {
     this.shipTypes = const [],
     this.transactions = const [],
     this.ships = const [],
+    required this.modificationsFee,
   });
 
   /// The symbol of the shipyard. The symbol is the same as the waypoint where the shipyard is located.
@@ -31,6 +32,9 @@ class Shipyard {
   /// The ships that are currently available for purchase at the shipyard.
   List<ShipyardShip> ships;
 
+  /// The fee to modify a ship at this shipyard. This includes installing or removing modules and mounts on a ship. In the case of mounts, the fee is a flat rate per mount. In the case of modules, the fee is per slot the module occupies.
+  int modificationsFee;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -38,7 +42,8 @@ class Shipyard {
           other.symbol == symbol &&
           other.shipTypes == shipTypes &&
           other.transactions == transactions &&
-          other.ships == ships;
+          other.ships == ships &&
+          other.modificationsFee == modificationsFee;
 
   @override
   int get hashCode =>
@@ -46,11 +51,12 @@ class Shipyard {
       (symbol.hashCode) +
       (shipTypes.hashCode) +
       (transactions.hashCode) +
-      (ships.hashCode);
+      (ships.hashCode) +
+      (modificationsFee.hashCode);
 
   @override
   String toString() =>
-      'Shipyard[symbol=$symbol, shipTypes=$shipTypes, transactions=$transactions, ships=$ships]';
+      'Shipyard[symbol=$symbol, shipTypes=$shipTypes, transactions=$transactions, ships=$ships, modificationsFee=$modificationsFee]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -58,6 +64,7 @@ class Shipyard {
     json[r'shipTypes'] = this.shipTypes;
     json[r'transactions'] = this.transactions;
     json[r'ships'] = this.ships;
+    json[r'modificationsFee'] = this.modificationsFee;
     return json;
   }
 
@@ -83,16 +90,16 @@ class Shipyard {
 
       return Shipyard(
         symbol: mapValueOfType<String>(json, r'symbol')!,
-        shipTypes: ShipyardShipTypesInner.listFromJson(json[r'shipTypes'])!,
-        transactions:
-            ShipyardTransaction.listFromJson(json[r'transactions']) ?? const [],
-        ships: ShipyardShip.listFromJson(json[r'ships']) ?? const [],
+        shipTypes: ShipyardShipTypesInner.listFromJson(json[r'shipTypes']),
+        transactions: ShipyardTransaction.listFromJson(json[r'transactions']),
+        ships: ShipyardShip.listFromJson(json[r'ships']),
+        modificationsFee: mapValueOfType<int>(json, r'modificationsFee')!,
       );
     }
     return null;
   }
 
-  static List<Shipyard>? listFromJson(
+  static List<Shipyard> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -129,15 +136,13 @@ class Shipyard {
   }) {
     final map = <String, List<Shipyard>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Shipyard.listFromJson(
+        map[entry.key] = Shipyard.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -147,5 +152,6 @@ class Shipyard {
   static const requiredKeys = <String>{
     'symbol',
     'shipTypes',
+    'modificationsFee',
   };
 }

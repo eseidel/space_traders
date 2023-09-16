@@ -106,7 +106,7 @@ class ScannedSystem {
     return null;
   }
 
-  static List<ScannedSystem>? listFromJson(
+  static List<ScannedSystem> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -143,15 +143,13 @@ class ScannedSystem {
   }) {
     final map = <String, List<ScannedSystem>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ScannedSystem.listFromJson(
+        map[entry.key] = ScannedSystem.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

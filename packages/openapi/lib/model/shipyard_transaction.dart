@@ -101,7 +101,7 @@ class ShipyardTransaction {
     return null;
   }
 
-  static List<ShipyardTransaction>? listFromJson(
+  static List<ShipyardTransaction> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -138,15 +138,13 @@ class ShipyardTransaction {
   }) {
     final map = <String, List<ShipyardTransaction>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipyardTransaction.listFromJson(
+        map[entry.key] = ShipyardTransaction.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

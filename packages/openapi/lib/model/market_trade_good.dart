@@ -105,7 +105,7 @@ class MarketTradeGood {
     return null;
   }
 
-  static List<MarketTradeGood>? listFromJson(
+  static List<MarketTradeGood> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -142,15 +142,13 @@ class MarketTradeGood {
   }) {
     final map = <String, List<MarketTradeGood>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = MarketTradeGood.listFromJson(
+        map[entry.key] = MarketTradeGood.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -195,7 +193,7 @@ class MarketTradeGoodSupplyEnum {
   static MarketTradeGoodSupplyEnum? fromJson(dynamic value) =>
       MarketTradeGoodSupplyEnumTypeTransformer().decode(value);
 
-  static List<MarketTradeGoodSupplyEnum>? listFromJson(
+  static List<MarketTradeGoodSupplyEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

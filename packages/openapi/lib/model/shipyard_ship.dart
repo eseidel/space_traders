@@ -22,6 +22,7 @@ class ShipyardShip {
     required this.engine,
     this.modules = const [],
     this.mounts = const [],
+    required this.crew,
   });
 
   ///
@@ -48,6 +49,8 @@ class ShipyardShip {
 
   List<ShipMount> mounts;
 
+  ShipyardShipCrew crew;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -60,7 +63,8 @@ class ShipyardShip {
           other.reactor == reactor &&
           other.engine == engine &&
           other.modules == modules &&
-          other.mounts == mounts;
+          other.mounts == mounts &&
+          other.crew == crew;
 
   @override
   int get hashCode =>
@@ -73,11 +77,12 @@ class ShipyardShip {
       (reactor.hashCode) +
       (engine.hashCode) +
       (modules.hashCode) +
-      (mounts.hashCode);
+      (mounts.hashCode) +
+      (crew.hashCode);
 
   @override
   String toString() =>
-      'ShipyardShip[type=$type, name=$name, description=$description, purchasePrice=$purchasePrice, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts]';
+      'ShipyardShip[type=$type, name=$name, description=$description, purchasePrice=$purchasePrice, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, crew=$crew]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -94,6 +99,7 @@ class ShipyardShip {
     json[r'engine'] = this.engine;
     json[r'modules'] = this.modules;
     json[r'mounts'] = this.mounts;
+    json[r'crew'] = this.crew;
     return json;
   }
 
@@ -125,14 +131,15 @@ class ShipyardShip {
         frame: ShipFrame.fromJson(json[r'frame'])!,
         reactor: ShipReactor.fromJson(json[r'reactor'])!,
         engine: ShipEngine.fromJson(json[r'engine'])!,
-        modules: ShipModule.listFromJson(json[r'modules'])!,
-        mounts: ShipMount.listFromJson(json[r'mounts'])!,
+        modules: ShipModule.listFromJson(json[r'modules']),
+        mounts: ShipMount.listFromJson(json[r'mounts']),
+        crew: ShipyardShipCrew.fromJson(json[r'crew'])!,
       );
     }
     return null;
   }
 
-  static List<ShipyardShip>? listFromJson(
+  static List<ShipyardShip> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -169,15 +176,13 @@ class ShipyardShip {
   }) {
     final map = <String, List<ShipyardShip>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipyardShip.listFromJson(
+        map[entry.key] = ShipyardShip.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -193,5 +198,6 @@ class ShipyardShip {
     'engine',
     'modules',
     'mounts',
+    'crew',
   };
 }

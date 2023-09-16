@@ -83,15 +83,15 @@ class ShipRefine201ResponseData {
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         produced: ShipRefine201ResponseDataProducedInner.listFromJson(
-            json[r'produced'])!,
+            json[r'produced']),
         consumed: ShipRefine201ResponseDataProducedInner.listFromJson(
-            json[r'consumed'])!,
+            json[r'consumed']),
       );
     }
     return null;
   }
 
-  static List<ShipRefine201ResponseData>? listFromJson(
+  static List<ShipRefine201ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -128,15 +128,13 @@ class ShipRefine201ResponseData {
   }) {
     final map = <String, List<ShipRefine201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipRefine201ResponseData.listFromJson(
+        map[entry.key] = ShipRefine201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

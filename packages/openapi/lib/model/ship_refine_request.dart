@@ -65,7 +65,7 @@ class ShipRefineRequest {
     return null;
   }
 
-  static List<ShipRefineRequest>? listFromJson(
+  static List<ShipRefineRequest> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -102,15 +102,13 @@ class ShipRefineRequest {
   }) {
     final map = <String, List<ShipRefineRequest>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipRefineRequest.listFromJson(
+        map[entry.key] = ShipRefineRequest.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -161,7 +159,7 @@ class ShipRefineRequestProduceEnum {
   static ShipRefineRequestProduceEnum? fromJson(dynamic value) =>
       ShipRefineRequestProduceEnumTypeTransformer().decode(value);
 
-  static List<ShipRefineRequestProduceEnum>? listFromJson(
+  static List<ShipRefineRequestProduceEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

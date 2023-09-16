@@ -72,7 +72,7 @@ class CreateChart201ResponseData {
     return null;
   }
 
-  static List<CreateChart201ResponseData>? listFromJson(
+  static List<CreateChart201ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -109,15 +109,13 @@ class CreateChart201ResponseData {
   }) {
     final map = <String, List<CreateChart201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = CreateChart201ResponseData.listFromJson(
+        map[entry.key] = CreateChart201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

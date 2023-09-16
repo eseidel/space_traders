@@ -81,7 +81,7 @@ class WaypointTrait {
     return null;
   }
 
-  static List<WaypointTrait>? listFromJson(
+  static List<WaypointTrait> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -118,15 +118,13 @@ class WaypointTrait {
   }) {
     final map = <String, List<WaypointTrait>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = WaypointTrait.listFromJson(
+        map[entry.key] = WaypointTrait.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -297,7 +295,7 @@ class WaypointTraitSymbolEnum {
   static WaypointTraitSymbolEnum? fromJson(dynamic value) =>
       WaypointTraitSymbolEnumTypeTransformer().decode(value);
 
-  static List<WaypointTraitSymbolEnum>? listFromJson(
+  static List<WaypointTraitSymbolEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

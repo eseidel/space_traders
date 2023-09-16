@@ -64,7 +64,7 @@ class PurchaseShip201Response {
     return null;
   }
 
-  static List<PurchaseShip201Response>? listFromJson(
+  static List<PurchaseShip201Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -101,15 +101,13 @@ class PurchaseShip201Response {
   }) {
     final map = <String, List<PurchaseShip201Response>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = PurchaseShip201Response.listFromJson(
+        map[entry.key] = PurchaseShip201Response.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

@@ -65,7 +65,7 @@ class ScannedShipFrame {
     return null;
   }
 
-  static List<ScannedShipFrame>? listFromJson(
+  static List<ScannedShipFrame> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -102,15 +102,13 @@ class ScannedShipFrame {
   }) {
     final map = <String, List<ScannedShipFrame>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ScannedShipFrame.listFromJson(
+        map[entry.key] = ScannedShipFrame.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

@@ -67,13 +67,13 @@ class CreateShipSystemScan201ResponseData {
 
       return CreateShipSystemScan201ResponseData(
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
-        systems: ScannedSystem.listFromJson(json[r'systems'])!,
+        systems: ScannedSystem.listFromJson(json[r'systems']),
       );
     }
     return null;
   }
 
-  static List<CreateShipSystemScan201ResponseData>? listFromJson(
+  static List<CreateShipSystemScan201ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -111,15 +111,13 @@ class CreateShipSystemScan201ResponseData {
   }) {
     final map = <String, List<CreateShipSystemScan201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = CreateShipSystemScan201ResponseData.listFromJson(
+        map[entry.key] = CreateShipSystemScan201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

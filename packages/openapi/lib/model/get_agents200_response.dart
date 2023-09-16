@@ -62,14 +62,14 @@ class GetAgents200Response {
       }());
 
       return GetAgents200Response(
-        data: Agent.listFromJson(json[r'data'])!,
+        data: Agent.listFromJson(json[r'data']),
         meta: Meta.fromJson(json[r'meta'])!,
       );
     }
     return null;
   }
 
-  static List<GetAgents200Response>? listFromJson(
+  static List<GetAgents200Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -106,15 +106,13 @@ class GetAgents200Response {
   }) {
     final map = <String, List<GetAgents200Response>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = GetAgents200Response.listFromJson(
+        map[entry.key] = GetAgents200Response.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

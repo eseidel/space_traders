@@ -64,7 +64,7 @@ class Jettison200ResponseData {
     return null;
   }
 
-  static List<Jettison200ResponseData>? listFromJson(
+  static List<Jettison200ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -101,15 +101,13 @@ class Jettison200ResponseData {
   }) {
     final map = <String, List<Jettison200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Jettison200ResponseData.listFromJson(
+        map[entry.key] = Jettison200ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

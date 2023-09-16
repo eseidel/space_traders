@@ -67,13 +67,13 @@ class CreateShipWaypointScan201ResponseData {
 
       return CreateShipWaypointScan201ResponseData(
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
-        waypoints: ScannedWaypoint.listFromJson(json[r'waypoints'])!,
+        waypoints: ScannedWaypoint.listFromJson(json[r'waypoints']),
       );
     }
     return null;
   }
 
-  static List<CreateShipWaypointScan201ResponseData>? listFromJson(
+  static List<CreateShipWaypointScan201ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -113,15 +113,13 @@ class CreateShipWaypointScan201ResponseData {
   }) {
     final map = <String, List<CreateShipWaypointScan201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = CreateShipWaypointScan201ResponseData.listFromJson(
+        map[entry.key] = CreateShipWaypointScan201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

@@ -74,7 +74,7 @@ class GetStatus200ResponseServerResets {
     return null;
   }
 
-  static List<GetStatus200ResponseServerResets>? listFromJson(
+  static List<GetStatus200ResponseServerResets> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -112,15 +112,13 @@ class GetStatus200ResponseServerResets {
   }) {
     final map = <String, List<GetStatus200ResponseServerResets>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = GetStatus200ResponseServerResets.listFromJson(
+        map[entry.key] = GetStatus200ResponseServerResets.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

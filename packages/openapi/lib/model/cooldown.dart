@@ -105,7 +105,7 @@ class Cooldown {
     return null;
   }
 
-  static List<Cooldown>? listFromJson(
+  static List<Cooldown> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -142,15 +142,13 @@ class Cooldown {
   }) {
     final map = <String, List<Cooldown>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Cooldown.listFromJson(
+        map[entry.key] = Cooldown.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

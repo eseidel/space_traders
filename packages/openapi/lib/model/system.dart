@@ -30,10 +30,10 @@ class System {
 
   SystemType type;
 
-  /// Position in the universe in the x axis.
+  /// Relative position of the system in the sector in the x axis.
   int x;
 
-  /// Position in the universe in the y axis.
+  /// Relative position of the system in the sector in the y axis.
   int y;
 
   /// Waypoints in this system.
@@ -107,14 +107,14 @@ class System {
         type: SystemType.fromJson(json[r'type'])!,
         x: mapValueOfType<int>(json, r'x')!,
         y: mapValueOfType<int>(json, r'y')!,
-        waypoints: SystemWaypoint.listFromJson(json[r'waypoints'])!,
-        factions: SystemFaction.listFromJson(json[r'factions'])!,
+        waypoints: SystemWaypoint.listFromJson(json[r'waypoints']),
+        factions: SystemFaction.listFromJson(json[r'factions']),
       );
     }
     return null;
   }
 
-  static List<System>? listFromJson(
+  static List<System> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -151,15 +151,13 @@ class System {
   }) {
     final map = <String, List<System>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = System.listFromJson(
+        map[entry.key] = System.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

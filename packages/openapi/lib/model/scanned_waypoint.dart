@@ -139,16 +139,16 @@ class ScannedWaypoint {
         systemSymbol: mapValueOfType<String>(json, r'systemSymbol')!,
         x: mapValueOfType<int>(json, r'x')!,
         y: mapValueOfType<int>(json, r'y')!,
-        orbitals: WaypointOrbital.listFromJson(json[r'orbitals'])!,
+        orbitals: WaypointOrbital.listFromJson(json[r'orbitals']),
         faction: WaypointFaction.fromJson(json[r'faction']),
-        traits: WaypointTrait.listFromJson(json[r'traits'])!,
+        traits: WaypointTrait.listFromJson(json[r'traits']),
         chart: Chart.fromJson(json[r'chart']),
       );
     }
     return null;
   }
 
-  static List<ScannedWaypoint>? listFromJson(
+  static List<ScannedWaypoint> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -185,15 +185,13 @@ class ScannedWaypoint {
   }) {
     final map = <String, List<ScannedWaypoint>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ScannedWaypoint.listFromJson(
+        map[entry.key] = ScannedWaypoint.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

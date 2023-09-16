@@ -419,7 +419,7 @@ class FleetApi {
 
   /// Extract Resources
   ///
-  /// Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.  The ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.
+  /// Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.  The ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.  The survey property is now deprecated. See the `extract/survey` endpoint for more details.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -459,7 +459,7 @@ class FleetApi {
 
   /// Extract Resources
   ///
-  /// Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.  The ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.
+  /// Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.  The ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.  The survey property is now deprecated. See the `extract/survey` endpoint for more details.
   ///
   /// Parameters:
   ///
@@ -474,6 +474,80 @@ class FleetApi {
     final response = await extractResourcesWithHttpInfo(
       shipSymbol,
       extractResourcesRequest: extractResourcesRequest,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ExtractResources201Response',
+      ) as ExtractResources201Response;
+    }
+    return null;
+  }
+
+  /// Extract Resources with Survey
+  ///
+  /// Use a survey when extracting resources from a waypoint. This endpoint requires a survey as the payload, which allows your ship to extract specific yields.  Send the full survey object as the payload which will be validated according to the signature. If the signature is invalid, or any properties of the survey are changed, the request will fail.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  ///
+  /// * [Survey] survey:
+  Future<Response> extractResourcesWithSurveyWithHttpInfo(
+    String shipSymbol, {
+    Survey? survey,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/extract/survey'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody = survey;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Extract Resources with Survey
+  ///
+  /// Use a survey when extracting resources from a waypoint. This endpoint requires a survey as the payload, which allows your ship to extract specific yields.  Send the full survey object as the payload which will be validated according to the signature. If the signature is invalid, or any properties of the survey are changed, the request will fail.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  ///
+  /// * [Survey] survey:
+  Future<ExtractResources201Response?> extractResourcesWithSurvey(
+    String shipSymbol, {
+    Survey? survey,
+  }) async {
+    final response = await extractResourcesWithSurveyWithHttpInfo(
+      shipSymbol,
+      survey: survey,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));

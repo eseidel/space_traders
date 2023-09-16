@@ -65,7 +65,7 @@ class RemoveMountRequest {
     return null;
   }
 
-  static List<RemoveMountRequest>? listFromJson(
+  static List<RemoveMountRequest> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -102,15 +102,13 @@ class RemoveMountRequest {
   }) {
     final map = <String, List<RemoveMountRequest>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = RemoveMountRequest.listFromJson(
+        map[entry.key] = RemoveMountRequest.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

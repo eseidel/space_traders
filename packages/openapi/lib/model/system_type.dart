@@ -51,7 +51,7 @@ class SystemType {
   static SystemType? fromJson(dynamic value) =>
       SystemTypeTypeTransformer().decode(value);
 
-  static List<SystemType>? listFromJson(
+  static List<SystemType> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

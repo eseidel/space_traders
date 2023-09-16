@@ -64,7 +64,7 @@ class GetMyShipCargo200Response {
     return null;
   }
 
-  static List<GetMyShipCargo200Response>? listFromJson(
+  static List<GetMyShipCargo200Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -101,15 +101,13 @@ class GetMyShipCargo200Response {
   }) {
     final map = <String, List<GetMyShipCargo200Response>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = GetMyShipCargo200Response.listFromJson(
+        map[entry.key] = GetMyShipCargo200Response.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

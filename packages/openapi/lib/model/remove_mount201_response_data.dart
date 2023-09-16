@@ -80,7 +80,7 @@ class RemoveMount201ResponseData {
 
       return RemoveMount201ResponseData(
         agent: Agent.fromJson(json[r'agent'])!,
-        mounts: ShipMount.listFromJson(json[r'mounts'])!,
+        mounts: ShipMount.listFromJson(json[r'mounts']),
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
         transaction:
             ShipModificationTransaction.fromJson(json[r'transaction'])!,
@@ -89,7 +89,7 @@ class RemoveMount201ResponseData {
     return null;
   }
 
-  static List<RemoveMount201ResponseData>? listFromJson(
+  static List<RemoveMount201ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -126,15 +126,13 @@ class RemoveMount201ResponseData {
   }) {
     final map = <String, List<RemoveMount201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = RemoveMount201ResponseData.listFromJson(
+        map[entry.key] = RemoveMount201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

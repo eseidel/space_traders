@@ -74,13 +74,13 @@ class ContractTerms {
       return ContractTerms(
         deadline: mapDateTime(json, r'deadline', '')!,
         payment: ContractPayment.fromJson(json[r'payment'])!,
-        deliver: ContractDeliverGood.listFromJson(json[r'deliver']) ?? const [],
+        deliver: ContractDeliverGood.listFromJson(json[r'deliver']),
       );
     }
     return null;
   }
 
-  static List<ContractTerms>? listFromJson(
+  static List<ContractTerms> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -117,15 +117,13 @@ class ContractTerms {
   }) {
     final map = <String, List<ContractTerms>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ContractTerms.listFromJson(
+        map[entry.key] = ContractTerms.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

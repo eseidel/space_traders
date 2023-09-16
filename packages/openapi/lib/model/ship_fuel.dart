@@ -96,7 +96,7 @@ class ShipFuel {
     return null;
   }
 
-  static List<ShipFuel>? listFromJson(
+  static List<ShipFuel> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -133,15 +133,13 @@ class ShipFuel {
   }) {
     final map = <String, List<ShipFuel>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipFuel.listFromJson(
+        map[entry.key] = ShipFuel.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

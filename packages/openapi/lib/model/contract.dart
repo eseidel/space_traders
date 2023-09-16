@@ -133,7 +133,7 @@ class Contract {
     return null;
   }
 
-  static List<Contract>? listFromJson(
+  static List<Contract> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -170,15 +170,13 @@ class Contract {
   }) {
     final map = <String, List<Contract>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Contract.listFromJson(
+        map[entry.key] = Contract.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -223,7 +221,7 @@ class ContractTypeEnum {
   static ContractTypeEnum? fromJson(dynamic value) =>
       ContractTypeEnumTypeTransformer().decode(value);
 
-  static List<ContractTypeEnum>? listFromJson(
+  static List<ContractTypeEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

@@ -81,7 +81,7 @@ class FactionTrait {
     return null;
   }
 
-  static List<FactionTrait>? listFromJson(
+  static List<FactionTrait> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -118,15 +118,13 @@ class FactionTrait {
   }) {
     final map = <String, List<FactionTrait>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = FactionTrait.listFromJson(
+        map[entry.key] = FactionTrait.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -280,7 +278,7 @@ class FactionTraitSymbolEnum {
   static FactionTraitSymbolEnum? fromJson(dynamic value) =>
       FactionTraitSymbolEnumTypeTransformer().decode(value);
 
-  static List<FactionTraitSymbolEnum>? listFromJson(
+  static List<FactionTraitSymbolEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

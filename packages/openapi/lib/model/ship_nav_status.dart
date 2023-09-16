@@ -37,7 +37,7 @@ class ShipNavStatus {
   static ShipNavStatus? fromJson(dynamic value) =>
       ShipNavStatusTypeTransformer().decode(value);
 
-  static List<ShipNavStatus>? listFromJson(
+  static List<ShipNavStatus> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

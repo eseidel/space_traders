@@ -64,14 +64,14 @@ class GetSystemWaypoints200Response {
       }());
 
       return GetSystemWaypoints200Response(
-        data: Waypoint.listFromJson(json[r'data'])!,
+        data: Waypoint.listFromJson(json[r'data']),
         meta: Meta.fromJson(json[r'meta'])!,
       );
     }
     return null;
   }
 
-  static List<GetSystemWaypoints200Response>? listFromJson(
+  static List<GetSystemWaypoints200Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -108,15 +108,13 @@ class GetSystemWaypoints200Response {
   }) {
     final map = <String, List<GetSystemWaypoints200Response>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = GetSystemWaypoints200Response.listFromJson(
+        map[entry.key] = GetSystemWaypoints200Response.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

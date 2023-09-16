@@ -127,7 +127,7 @@ class Agent {
     return null;
   }
 
-  static List<Agent>? listFromJson(
+  static List<Agent> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -164,15 +164,13 @@ class Agent {
   }) {
     final map = <String, List<Agent>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Agent.listFromJson(
+        map[entry.key] = Agent.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

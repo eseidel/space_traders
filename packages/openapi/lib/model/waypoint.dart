@@ -19,6 +19,7 @@ class Waypoint {
     required this.x,
     required this.y,
     this.orbitals = const [],
+    this.orbits,
     this.faction,
     this.traits = const [],
     this.chart,
@@ -32,14 +33,23 @@ class Waypoint {
   /// The symbol of the system this waypoint belongs to.
   String systemSymbol;
 
-  /// Position in the universe in the x axis.
+  /// Relative position of the waypoint on the system's x axis. This is not an absolute position in the universe.
   int x;
 
-  /// Position in the universe in the Y axis.
+  /// Relative position of the waypoint on the system's y axis. This is not an absolute position in the universe.
   int y;
 
   /// Waypoints that orbit this waypoint.
   List<WaypointOrbital> orbitals;
+
+  /// The symbol of the parent waypoint, if this waypoint is in orbit around another waypoint. Otherwise this value is undefined.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? orbits;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -70,6 +80,7 @@ class Waypoint {
           other.x == x &&
           other.y == y &&
           other.orbitals == orbitals &&
+          other.orbits == orbits &&
           other.faction == faction &&
           other.traits == traits &&
           other.chart == chart;
@@ -83,13 +94,14 @@ class Waypoint {
       (x.hashCode) +
       (y.hashCode) +
       (orbitals.hashCode) +
+      (orbits == null ? 0 : orbits!.hashCode) +
       (faction == null ? 0 : faction!.hashCode) +
       (traits.hashCode) +
       (chart == null ? 0 : chart!.hashCode);
 
   @override
   String toString() =>
-      'Waypoint[symbol=$symbol, type=$type, systemSymbol=$systemSymbol, x=$x, y=$y, orbitals=$orbitals, faction=$faction, traits=$traits, chart=$chart]';
+      'Waypoint[symbol=$symbol, type=$type, systemSymbol=$systemSymbol, x=$x, y=$y, orbitals=$orbitals, orbits=$orbits, faction=$faction, traits=$traits, chart=$chart]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -99,6 +111,11 @@ class Waypoint {
     json[r'x'] = this.x;
     json[r'y'] = this.y;
     json[r'orbitals'] = this.orbitals;
+    if (this.orbits != null) {
+      json[r'orbits'] = this.orbits;
+    } else {
+      json[r'orbits'] = null;
+    }
     if (this.faction != null) {
       json[r'faction'] = this.faction;
     } else {
@@ -139,16 +156,17 @@ class Waypoint {
         systemSymbol: mapValueOfType<String>(json, r'systemSymbol')!,
         x: mapValueOfType<int>(json, r'x')!,
         y: mapValueOfType<int>(json, r'y')!,
-        orbitals: WaypointOrbital.listFromJson(json[r'orbitals'])!,
+        orbitals: WaypointOrbital.listFromJson(json[r'orbitals']),
+        orbits: mapValueOfType<String>(json, r'orbits'),
         faction: WaypointFaction.fromJson(json[r'faction']),
-        traits: WaypointTrait.listFromJson(json[r'traits'])!,
+        traits: WaypointTrait.listFromJson(json[r'traits']),
         chart: Chart.fromJson(json[r'chart']),
       );
     }
     return null;
   }
 
-  static List<Waypoint>? listFromJson(
+  static List<Waypoint> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -185,15 +203,13 @@ class Waypoint {
   }) {
     final map = <String, List<Waypoint>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Waypoint.listFromJson(
+        map[entry.key] = Waypoint.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

@@ -20,6 +20,7 @@ class Ship {
     required this.frame,
     required this.reactor,
     required this.engine,
+    required this.cooldown,
     this.modules = const [],
     this.mounts = const [],
     required this.cargo,
@@ -40,6 +41,8 @@ class Ship {
   ShipReactor reactor;
 
   ShipEngine engine;
+
+  Cooldown cooldown;
 
   /// Modules installed in this ship.
   List<ShipModule> modules;
@@ -62,6 +65,7 @@ class Ship {
           other.frame == frame &&
           other.reactor == reactor &&
           other.engine == engine &&
+          other.cooldown == cooldown &&
           other.modules == modules &&
           other.mounts == mounts &&
           other.cargo == cargo &&
@@ -77,6 +81,7 @@ class Ship {
       (frame.hashCode) +
       (reactor.hashCode) +
       (engine.hashCode) +
+      (cooldown.hashCode) +
       (modules.hashCode) +
       (mounts.hashCode) +
       (cargo.hashCode) +
@@ -84,7 +89,7 @@ class Ship {
 
   @override
   String toString() =>
-      'Ship[symbol=$symbol, registration=$registration, nav=$nav, crew=$crew, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, cargo=$cargo, fuel=$fuel]';
+      'Ship[symbol=$symbol, registration=$registration, nav=$nav, crew=$crew, frame=$frame, reactor=$reactor, engine=$engine, cooldown=$cooldown, modules=$modules, mounts=$mounts, cargo=$cargo, fuel=$fuel]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -95,6 +100,7 @@ class Ship {
     json[r'frame'] = this.frame;
     json[r'reactor'] = this.reactor;
     json[r'engine'] = this.engine;
+    json[r'cooldown'] = this.cooldown;
     json[r'modules'] = this.modules;
     json[r'mounts'] = this.mounts;
     json[r'cargo'] = this.cargo;
@@ -130,8 +136,9 @@ class Ship {
         frame: ShipFrame.fromJson(json[r'frame'])!,
         reactor: ShipReactor.fromJson(json[r'reactor'])!,
         engine: ShipEngine.fromJson(json[r'engine'])!,
-        modules: ShipModule.listFromJson(json[r'modules'])!,
-        mounts: ShipMount.listFromJson(json[r'mounts'])!,
+        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
+        modules: ShipModule.listFromJson(json[r'modules']),
+        mounts: ShipMount.listFromJson(json[r'mounts']),
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
         fuel: ShipFuel.fromJson(json[r'fuel'])!,
       );
@@ -139,7 +146,7 @@ class Ship {
     return null;
   }
 
-  static List<Ship>? listFromJson(
+  static List<Ship> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -176,15 +183,13 @@ class Ship {
   }) {
     final map = <String, List<Ship>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = Ship.listFromJson(
+        map[entry.key] = Ship.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -199,6 +204,7 @@ class Ship {
     'frame',
     'reactor',
     'engine',
+    'cooldown',
     'modules',
     'mounts',
     'cargo',

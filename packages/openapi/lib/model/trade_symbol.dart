@@ -264,7 +264,7 @@ class TradeSymbol {
   static TradeSymbol? fromJson(dynamic value) =>
       TradeSymbolTypeTransformer().decode(value);
 
-  static List<TradeSymbol>? listFromJson(
+  static List<TradeSymbol> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

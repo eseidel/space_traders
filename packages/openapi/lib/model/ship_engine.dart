@@ -121,7 +121,7 @@ class ShipEngine {
     return null;
   }
 
-  static List<ShipEngine>? listFromJson(
+  static List<ShipEngine> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -158,15 +158,13 @@ class ShipEngine {
   }) {
     final map = <String, List<ShipEngine>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ShipEngine.listFromJson(
+        map[entry.key] = ShipEngine.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;
@@ -212,7 +210,7 @@ class ShipEngineSymbolEnum {
   static ShipEngineSymbolEnum? fromJson(dynamic value) =>
       ShipEngineSymbolEnumTypeTransformer().decode(value);
 
-  static List<ShipEngineSymbolEnum>? listFromJson(
+  static List<ShipEngineSymbolEnum> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {

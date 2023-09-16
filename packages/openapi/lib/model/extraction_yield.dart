@@ -72,7 +72,7 @@ class ExtractionYield {
     return null;
   }
 
-  static List<ExtractionYield>? listFromJson(
+  static List<ExtractionYield> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
@@ -109,15 +109,13 @@ class ExtractionYield {
   }) {
     final map = <String, List<ExtractionYield>>{};
     if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
+      // ignore: parameter_assignments
+      json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        final value = ExtractionYield.listFromJson(
+        map[entry.key] = ExtractionYield.listFromJson(
           entry.value,
           growable: growable,
         );
-        if (value != null) {
-          map[entry.key] = value;
-        }
       }
     }
     return map;

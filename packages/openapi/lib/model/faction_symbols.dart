@@ -69,7 +69,7 @@ class FactionSymbols {
   static FactionSymbols? fromJson(dynamic value) =>
       FactionSymbolsTypeTransformer().decode(value);
 
-  static List<FactionSymbols>? listFromJson(
+  static List<FactionSymbols> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
