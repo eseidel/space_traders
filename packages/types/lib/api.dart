@@ -236,9 +236,6 @@ extension SystemWaypointUtils on SystemWaypoint {
   /// Returns true if the waypoint has the given type.
   bool isType(WaypointType type) => this.type == type;
 
-  /// Returns true if the waypoint is a jump gate.
-  bool get isJumpGate => isType(WaypointType.JUMP_GATE);
-
   /// Returns true if the waypoint is an asteroid field.
   bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
 
@@ -289,20 +286,11 @@ extension WaypointUtils on Waypoint {
   /// Returns true if the waypoint can be mined.
   bool get canBeMined => isAsteroidField;
 
-  /// Returns true if the waypoint is a jump gate.
-  bool get isJumpGate => isType(WaypointType.JUMP_GATE);
-
   /// Returns true if the waypoint has a shipyard.
   bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
 
   /// Returns true if the waypoint has a marketplace.
   bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
-
-  /// Returns the WaypointPosition of the waypoint.
-  WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);
-
-  /// Returns the distance to the given waypoint.
-  int distanceTo(Waypoint other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto ShipCargo to make it easier to work with.
@@ -381,9 +369,6 @@ extension ShipUtils on Ship {
     cargo.cargoItem(tradeSymbol)!.units += units;
   }
 
-  /// Returns true if the ship if full on fuel.
-  bool get isFuelFull => fuel.current >= fuel.capacity;
-
   /// Returns true if the ship is out of fuel.  Nothing to do at this point.
   bool get isOutOfFuel => usesFuel && fuel.current == 0;
 
@@ -397,9 +382,6 @@ extension ShipUtils on Ship {
 
   /// Returns true if the ship is a command ship.
   bool get isCommand => registration.role == ShipRole.COMMAND;
-
-  /// Returns true if the ship is an excavator.
-  bool get isExcavator => registration.role == ShipRole.EXCAVATOR;
 
   /// Returns true if the ship is a probe.
   bool get isProbe => frame.symbol == ShipFrameSymbolEnum.PROBE;

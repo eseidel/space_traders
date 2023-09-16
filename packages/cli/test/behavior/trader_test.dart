@@ -763,4 +763,27 @@ void main() {
     );
     expect(waitUntil, isNull);
   });
+
+  test('handleUnwatedCargoIfNeeded smoke test', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final centralCommand = _MockCentralCommand();
+    final caches = _MockCaches();
+    final ship = _MockShip();
+    final shipCargo = ShipCargo(capacity: 10, units: 0);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader);
+
+    final result = await handleUnwantedCargoIfNeeded(
+      api,
+      db,
+      centralCommand,
+      caches,
+      ship,
+      state,
+      null,
+      null,
+    );
+    expect(result.isComplete, isTrue);
+  });
 }

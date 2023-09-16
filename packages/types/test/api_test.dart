@@ -22,9 +22,7 @@ void main() {
       y: 0,
     );
     expect(jumpGate.isType(WaypointType.JUMP_GATE), isTrue);
-    expect(jumpGate.isJumpGate, isTrue);
     expect(jumpGate.isType(WaypointType.PLANET), isFalse);
-    expect(planet.isJumpGate, isFalse);
     expect(asteroidField.isAsteroidField, isTrue);
     expect(planet.canBeMined, isFalse);
     expect(asteroidField.canBeMined, isTrue);
@@ -63,7 +61,6 @@ void main() {
     expect(waypoint.hasTrait(WaypointTraitSymbolEnum.ASH_CLOUDS), isTrue);
     expect(waypoint.hasTrait(WaypointTraitSymbolEnum.BARREN), isFalse);
     final systemWaypoint = waypoint.toSystemWaypoint();
-    expect(systemWaypoint.isJumpGate, isTrue);
     expect(systemWaypoint.symbol, waypoint.symbol);
   });
 

@@ -75,7 +75,7 @@ void logShip(
   logger
     ..info('${ship.symbol}: ${behavior?.behavior}')
     ..info('  ${_shipStatusLine(ship, systemsCache)}');
-  if (ship.cargo.inventory.isNotEmpty) {
+  if (ship.cargo.isNotEmpty) {
     logger.info(
       describeInventory(marketPrices, ship.cargo.inventory, indent: '  '),
     );
