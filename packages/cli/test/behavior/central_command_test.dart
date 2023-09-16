@@ -255,4 +255,29 @@ void main() {
       40,
     );
   });
+
+  test('idleHaulerSymbols', () {
+    final shipCache = _MockShipCache();
+    when(() => shipCache.ships).thenReturn([]);
+    final behaviorCache = _MockBehhaviorCache();
+    when(() => behaviorCache.states).thenReturn([]);
+    final symbols = idleHaulerSymbols(shipCache, behaviorCache);
+    expect(symbols, isEmpty);
+
+    final ship = _MockShip();
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol)
+        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(() => ship.frame).thenReturn(shipFrame);
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => shipCache.ships).thenReturn([ship]);
+    when(() => behaviorCache.states).thenReturn(
+      // "explorer" and "idle" are both the "idle" states for a hauler.
+      [BehaviorState(shipSymbol, Behavior.explorer)],
+    );
+    final symbols2 = idleHaulerSymbols(shipCache, behaviorCache);
+    expect(symbols2, [shipSymbol]);
+  });
 }
