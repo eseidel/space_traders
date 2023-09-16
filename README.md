@@ -903,3 +903,13 @@ ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-MU55
 <asynchronous suspension>
 #13     main (file:///root/space_traders/packages/cli/bin/cli.dart:141:3)
 <asynchronous suspension>
+
+
+### Buy first orehound immediately:
+
+[WARN] 🛸#1  Can not buy SHIP_ORE_HOUND at X1-AG30-04017A, credits 150,000c < 1.05 * price = 167,932c. Disabling Behavior.buyShip for ESEIDEL-1 for 10m.
+🛸#1  Deliver 0
+[WARN] 🛸#1  No deliveries needed. Disabling Behavior.deliver for ESEIDEL-1 for 10m.
+🛸#1  ✍️  market data @ X1-AG30-65570X
+Accepted: deliver 1060  COPPER_ORE to X1-AG30-29102A in 6d for 160,272c with 34,344c upfront.
+received 34,344c
