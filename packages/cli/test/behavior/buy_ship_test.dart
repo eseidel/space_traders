@@ -153,6 +153,7 @@ void main() {
         GetShipyard200Response(
           data: Shipyard(
             symbol: symbol.waypoint,
+            modificationsFee: 0,
             shipTypes: [
               ShipyardShipTypesInner(type: shipType),
             ],

@@ -80,6 +80,13 @@ void main() {
     final api = _MockApi();
     final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
     final fs = MemoryFileSystem.test();
+    final origin = ShipNavRouteWaypoint(
+      symbol: 'a',
+      type: WaypointType.PLANET,
+      systemSymbol: 'c',
+      x: 1,
+      y: 2,
+    );
     final ship = Ship(
       symbol: 'A',
       registration: ShipRegistration(
@@ -87,6 +94,7 @@ void main() {
         name: 'name',
         role: ShipRole.COMMAND,
       ),
+      cooldown: Cooldown(shipSymbol: 'A', remainingSeconds: 0, totalSeconds: 0),
       nav: ShipNav(
         systemSymbol: 'c',
         waypointSymbol: 'symbol',
@@ -98,13 +106,8 @@ void main() {
             x: 1,
             y: 2,
           ),
-          departure: ShipNavRouteWaypoint(
-            symbol: 'a',
-            type: WaypointType.PLANET,
-            systemSymbol: 'c',
-            x: 1,
-            y: 2,
-          ),
+          origin: origin,
+          departure: origin,
           arrival: moonLanding,
           departureTime: moonLanding,
         ),

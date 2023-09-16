@@ -32,6 +32,13 @@ void main() {
 
   test('shipDescription', () {
     final moonLanding = DateTime.utc(1969, 7, 20, 20, 18, 04);
+    final origin = ShipNavRouteWaypoint(
+      symbol: 'S-A-W',
+      type: WaypointType.PLANET,
+      systemSymbol: 'S-A',
+      x: 1,
+      y: 2,
+    );
     final ship = Ship(
       symbol: 'A',
       registration: ShipRegistration(
@@ -39,6 +46,7 @@ void main() {
         name: 'name',
         role: ShipRole.COMMAND,
       ),
+      cooldown: Cooldown(shipSymbol: 'A', remainingSeconds: 0, totalSeconds: 0),
       nav: ShipNav(
         systemSymbol: 'S-A',
         waypointSymbol: 'S-A-B',
@@ -50,13 +58,8 @@ void main() {
             x: 1,
             y: 2,
           ),
-          departure: ShipNavRouteWaypoint(
-            symbol: 'S-A-W',
-            type: WaypointType.PLANET,
-            systemSymbol: 'S-A',
-            x: 1,
-            y: 2,
-          ),
+          departure: origin, // Will be changed to a time next release.
+          origin: origin,
           arrival: moonLanding,
           departureTime: moonLanding,
         ),
