@@ -60,4 +60,82 @@ void main() {
     // Note: Quanity and agentCredits are swapped relative to transaction1:
     expect(transaction.hashCode, isNot(transaction2.hashCode));
   });
+
+  test('Transaction.fromMarketTransaction', () {
+    final marketTransaction = MarketTransaction(
+      waypointSymbol: 'A-B-C',
+      shipSymbol: 'S-1',
+      tradeSymbol: 'FUEL',
+      type: MarketTransactionTypeEnum.PURCHASE,
+      units: 10,
+      pricePerUnit: 10,
+      totalPrice: 100,
+      timestamp: DateTime(2021),
+    );
+    final transaction = Transaction.fromMarketTransaction(
+      marketTransaction,
+      100,
+      AccountingType.goods,
+    );
+    expect(transaction.transactionType, TransactionType.market);
+    expect(transaction.waypointSymbol, WaypointSymbol.fromString('A-B-C'));
+    expect(transaction.shipSymbol, const ShipSymbol('S', 1));
+    expect(transaction.tradeSymbol, TradeSymbol.FUEL);
+    expect(transaction.shipType, null);
+    expect(transaction.quantity, 10);
+    expect(transaction.tradeType, MarketTransactionTypeEnum.PURCHASE);
+    expect(transaction.perUnitPrice, 10);
+    expect(transaction.timestamp, DateTime(2021));
+    expect(transaction.agentCredits, 100);
+    expect(transaction.accounting, AccountingType.goods);
+  });
+
+  test('Transaction.fromShipyardTransaction', () {
+    final shipyardTransaction = ShipyardTransaction(
+      waypointSymbol: 'A-B-C',
+      // shipSymbol is actually shipType.  See:
+      // https://github.com/SpaceTradersAPI/api-docs/issues/68
+      shipSymbol: ShipType.EXPLORER.value,
+      price: 100,
+      agentSymbol: 'A',
+      timestamp: DateTime(2021),
+    );
+    final transaction = Transaction.fromShipyardTransaction(
+      shipyardTransaction,
+      100,
+      const ShipSymbol('A', 1),
+    );
+    expect(transaction.transactionType, TransactionType.shipyard);
+    expect(transaction.waypointSymbol, WaypointSymbol.fromString('A-B-C'));
+    expect(transaction.shipSymbol, const ShipSymbol('A', 1));
+    expect(transaction.tradeSymbol, null);
+    expect(transaction.shipType, ShipType.EXPLORER);
+    expect(transaction.quantity, 1);
+    expect(transaction.tradeType, MarketTransactionTypeEnum.PURCHASE);
+    expect(transaction.perUnitPrice, 100);
+    expect(transaction.timestamp, DateTime(2021));
+    expect(transaction.agentCredits, 100);
+    expect(transaction.accounting, AccountingType.capital);
+  });
+
+  test('Transaction.fromShipModificationTransaction', () {
+    final shipModificationTransaction = ShipModificationTransaction(
+      waypointSymbol: 'A-B-C',
+      shipSymbol: 'S-1',
+      tradeSymbol: ShipMountSymbolEnum.GAS_SIPHON_I.value,
+      totalPrice: 100,
+      timestamp: DateTime(2021),
+    );
+    final transaction = Transaction.fromShipModificationTransaction(
+      shipModificationTransaction,
+      100,
+    );
+    expect(transaction.transactionType, TransactionType.shipModification);
+    expect(transaction.waypointSymbol, WaypointSymbol.fromString('A-B-C'));
+    expect(transaction.shipSymbol, const ShipSymbol('S', 1));
+    expect(transaction.tradeSymbol, TradeSymbol.MOUNT_GAS_SIPHON_I);
+    expect(transaction.shipType, null);
+    expect(transaction.quantity, 1);
+    expect(transaction.tradeType, MarketTransactionTypeEnum.PURCHASE);
+  });
 }

@@ -123,7 +123,6 @@ class Transaction {
     // shipSymbol is the trade symbol for the shipyard transaction, not
     // the new ship's id.
     // Using a local to force non-null.
-    final shipType = ShipType.fromJson(transaction.shipSymbol)!;
     return Transaction(
       transactionType: TransactionType.shipyard,
       // .shipSymbol is the new ship type, not a ShipSymbol involved
@@ -131,7 +130,7 @@ class Transaction {
       // https://github.com/SpaceTradersAPI/api-docs/issues/68
       shipSymbol: purchaser,
       waypointSymbol: transaction.waypointSymbolObject,
-      shipType: shipType,
+      shipType: transaction.shipType,
       tradeSymbol: null,
       quantity: 1,
       tradeType: MarketTransactionTypeEnum.PURCHASE,

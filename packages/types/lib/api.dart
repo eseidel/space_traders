@@ -322,11 +322,10 @@ extension ShipUtils on Ship {
   ShipSymbol get shipSymbol => ShipSymbol.fromString(symbol);
 
   /// Returns the current SystemSymbol of the ship.
-  SystemSymbol get systemSymbol => SystemSymbol.fromString(nav.systemSymbol);
+  SystemSymbol get systemSymbol => nav.systemSymbolObject;
 
   /// Returns the current WaypointSymbol of the ship.
-  WaypointSymbol get waypointSymbol =>
-      WaypointSymbol.fromString(nav.waypointSymbol);
+  WaypointSymbol get waypointSymbol => nav.waypointSymbolObject;
 
   /// Returns the emoji name of the ship.
   String get emojiName {
@@ -534,6 +533,7 @@ extension MarketUtils on Market {
 
   /// Returns the TradeType for the given trade symbol or null if the market
   /// doesn't trade that good.
+  // TODO(eseidel): remove when nearbyMarketWhichTrades is removed.
   ExchangeType? exchangeType(TradeSymbol tradeSymbol) {
     if (imports.any((g) => g.symbol == tradeSymbol)) {
       return ExchangeType.imports;
@@ -555,16 +555,6 @@ extension MarketUtils on Market {
   /// doesn't trade that good.
   MarketTradeGood? marketTradeGood(TradeSymbol tradeSymbol) =>
       tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol.value);
-
-  /// Returns all TradeSymbols that the market trades.
-  Set<TradeSymbol> get allTradeSymbols {
-    final symbols = <TradeSymbol>{
-      ...imports.map((g) => g.symbol),
-      ...exports.map((g) => g.symbol),
-      ...exchange.map((g) => g.symbol),
-    };
-    return symbols;
-  }
 }
 
 /// Extensions onto MarketTradeGood to make it easier to work with.
