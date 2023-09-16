@@ -327,9 +327,14 @@ Future<DateTime?> advanceMiner(
     return response.cooldown.expiration;
   }
 
-  // If we either have a survey or don't have a surveyer, mine.
+  // If we either have a survey or don't have a surveyor, mine.
   try {
-    final response = await extractResources(api, ship, survey: maybeSurvey);
+    final ExtractResources201ResponseData response;
+    if (maybeSurvey != null) {
+      response = await extractResourcesWithSurvey(api, ship, maybeSurvey);
+    } else {
+      response = await extractResources(api, ship);
+    }
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
     await db.insertExtraction(

@@ -65,19 +65,25 @@ Future<NavigateShip200ResponseData> navigateShip(
 }
 
 /// Extract resources from asteroid with [ship]
+/// Does not use a survey.
 Future<ExtractResources201ResponseData> extractResources(
   Api api,
-  Ship ship, {
-  Survey? survey,
-}) async {
-  ExtractResourcesRequest? request;
-  if (survey != null) {
-    request = ExtractResourcesRequest(
-      survey: survey,
-    );
-  }
-  final response = await api.fleet
-      .extractResources(ship.symbol, extractResourcesRequest: request);
+  Ship ship,
+) async {
+  final response = await api.fleet.extractResources(ship.symbol);
+  ship.cargo = response!.data.cargo;
+  return response.data;
+}
+
+/// Extract resources from asteroid with [ship]
+/// Uses a survey.
+Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
+  Api api,
+  Ship ship,
+  Survey survey,
+) async {
+  final response =
+      await api.fleet.extractResourcesWithSurvey(ship.symbol, survey: survey);
   ship.cargo = response!.data.cargo;
   return response.data;
 }
