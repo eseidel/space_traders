@@ -10,6 +10,35 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
+extension on BehaviorCache {
+  /// Returns the counts of mounts already claimed.
+  MountSymbolSet claimedMounts() {
+    final claimed = MountSymbolSet();
+    for (final state in states) {
+      final behavior = state.behavior;
+      if (behavior != Behavior.changeMounts) {
+        continue;
+      }
+      final mountSymbol = state.mountToAdd;
+      if (mountSymbol == null) {
+        continue;
+      }
+      claimed.add(mountSymbol);
+    }
+    return claimed;
+  }
+
+  /// Returns all deals in progress.
+  Iterable<CostedDeal> dealsInProgress() sync* {
+    for (final state in states) {
+      final deal = state.deal;
+      if (deal != null) {
+        yield deal;
+      }
+    }
+  }
+}
+
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
@@ -173,23 +202,6 @@ class CentralCommand {
     return deliveryShip;
   }
 
-  /// Returns the counts of mounts already claimed.
-  MountSymbolSet claimedMounts() {
-    final claimed = MountSymbolSet();
-    for (final state in _behaviorCache.states) {
-      final behavior = state.behavior;
-      if (behavior != Behavior.changeMounts) {
-        continue;
-      }
-      final mountSymbol = state.mountToAdd;
-      if (mountSymbol == null) {
-        continue;
-      }
-      claimed.add(mountSymbol);
-    }
-    return claimed;
-  }
-
   /// Returns the number of mounts available at the waypoint.
   MountSymbolSet unclaimedMountsAt(WaypointSymbol waypoint) {
     // Get all the ships at that symbol
@@ -205,7 +217,7 @@ class CentralCommand {
       }
       available.addAll(ship.mountSymbolsInInventory);
     }
-    final claimed = claimedMounts();
+    final claimed = _behaviorCache.claimedMounts();
     // Unclear where this warning belongs.
     for (final symbol in claimed.distinct) {
       if (claimed[symbol] > available[symbol]) {
@@ -229,16 +241,6 @@ class CentralCommand {
       _behaviorCache.setBehavior(shipSymbol, newState);
     }
     return _behaviorCache.getBehavior(shipSymbol)!;
-  }
-
-  /// Returns all deals in progress.
-  Iterable<CostedDeal> _dealsInProgress() sync* {
-    for (final state in _behaviorCache.states) {
-      final deal = state.deal;
-      if (deal != null) {
-        yield deal;
-      }
-    }
   }
 
   /// Procurement contracts converted to sell opps.
@@ -283,7 +285,7 @@ class CentralCommand {
         ? overrideStartSymbol.systemSymbol
         : ship.systemSymbol;
 
-    final inProgress = _dealsInProgress().toList();
+    final inProgress = _behaviorCache.dealsInProgress().toList();
     // Avoid having two ships working on the same deal since by the time the
     // second one gets there the prices will have changed.
     // Note this does not check destination, so should still allow two
