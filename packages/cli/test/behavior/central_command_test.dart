@@ -242,14 +242,49 @@ void main() {
   });
 
   test('claimedMounts smoke test', () {
-    final cache = BehaviorCache({}, fs: MemoryFileSystem.test());
+    final cache = BehaviorCache(
+      {
+        ShipSymbol.fromString('X-A'):
+            BehaviorState(ShipSymbol.fromString('X-A'), Behavior.explorer),
+        ShipSymbol.fromString('X-B'):
+            BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
+        ShipSymbol.fromString('X-C'):
+            BehaviorState(ShipSymbol.fromString('X-C'), Behavior.changeMounts)
+              ..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
+        ShipSymbol.fromString('X-D'):
+            BehaviorState(ShipSymbol.fromString('X-D'), Behavior.changeMounts)
+              ..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
+        ShipSymbol.fromString('X-E'):
+            BehaviorState(ShipSymbol.fromString('X-E'), Behavior.changeMounts)
+              ..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_II,
+      },
+      fs: MemoryFileSystem.test(),
+    );
     final claimed = cache.claimedMounts();
-    expect(claimed, isEmpty);
+    expect(claimed.length, 3);
+    expect(claimed, [
+      ShipMountSymbolEnum.GAS_SIPHON_I,
+      ShipMountSymbolEnum.GAS_SIPHON_I,
+      ShipMountSymbolEnum.GAS_SIPHON_II,
+    ]);
   });
 
   test('dealsInProgress smoke test', () {
-    final cache = BehaviorCache({}, fs: MemoryFileSystem.test());
+    final deal = _MockCostedDeal();
+    final cache = BehaviorCache(
+      {
+        ShipSymbol.fromString('X-A'):
+            BehaviorState(ShipSymbol.fromString('X-A'), Behavior.explorer),
+        ShipSymbol.fromString('X-B'):
+            BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
+        ShipSymbol.fromString('X-C'):
+            BehaviorState(ShipSymbol.fromString('X-C'), Behavior.trader)
+              ..deal = deal,
+      },
+      fs: MemoryFileSystem.test(),
+    );
     final deals = cache.dealsInProgress();
-    expect(deals, isEmpty);
+    expect(deals.length, 1);
+    expect(deals.first, deal);
   });
 }
