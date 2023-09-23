@@ -108,7 +108,6 @@ Future<DateTime?> advanceShipBehavior(
       ship,
       error.message,
       error.timeout,
-      explicitBehavior: error.explicitBehavior,
     );
   }
   return null;

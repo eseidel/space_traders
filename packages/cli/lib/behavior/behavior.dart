@@ -9,11 +9,7 @@ import 'package:types/types.dart';
 @immutable
 class JobException implements Exception {
   /// Create a new job exception.
-  const JobException(
-    this.message,
-    this.timeout, {
-    this.explicitBehavior,
-  });
+  const JobException(this.message, this.timeout);
 
   /// Why did the job error?
   final String message;
@@ -21,25 +17,19 @@ class JobException implements Exception {
   /// How long should the calling behavior be disabled
   final Duration timeout;
 
-  /// Was this exception thrown in a behavior other than the current one?
-  final Behavior? explicitBehavior;
-
   @override
-  String toString() => 'JobException: $message, timeout: $timeout, '
-      'explicitBehavior: $explicitBehavior';
+  String toString() => 'JobException: $message, timeout: $timeout';
 
   @override
   bool operator ==(Object other) =>
       other is JobException &&
       message == other.message &&
-      timeout == other.timeout &&
-      explicitBehavior == other.explicitBehavior;
+      timeout == other.timeout;
 
   @override
   int get hashCode => Object.hash(
         message,
         timeout,
-        explicitBehavior,
       );
 }
 

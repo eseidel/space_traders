@@ -60,16 +60,6 @@ class CentralCommand {
   /// Shorten the max age for explorer data.
   Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
 
-  // To tell a given explorer what to do.
-  // Figure out what squad they're in (are they watching a waypoint for us
-  // or are they exploring? and if so what jump gate network?)
-  // Then figure out what the next waypoint is for them to explore.
-  // If we don't have a cache of places to explore, collect a list
-  // of systems needing a visit.
-  // If there still aren't any places to explore, then we need to see if there
-  // is a place for them to watch.
-  // If there still isn't, then we print a warning and have them idle.
-
   /// What template should we use for the given ship?
   ShipTemplate? templateForShip(Ship ship) {
     final genericMiner = ShipTemplate(
@@ -159,14 +149,11 @@ class CentralCommand {
     return true;
   }
 
-// Consider having a config file like:
-// https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
-// instead of having this dynamic behavior function.
-// At the top of the file because I change this so often.
+  // Consider a config file like:
+  // https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
+  // instead of having this dynamic behavior function.
   /// What behavior should the given ship be doing?
-  Behavior behaviorFor(
-    Ship ship,
-  ) {
+  Behavior behaviorFor(Ship ship) {
     if (ship.isOutOfFuel) {
       return Behavior.idle;
     }
@@ -174,9 +161,6 @@ class CentralCommand {
     final shipCount = _shipCache.ships.length;
 
     final behaviors = {
-      // TODO(eseidel): Evaluate based on expected value, not just order.
-      // Should mine until we have one ore-hound, then switch to survey-only?
-
       ShipRole.COMMAND: [
         // We should deliver first, but deliver can get stuck, so we'll
         // try to buy a ship first.
@@ -226,15 +210,10 @@ class CentralCommand {
   }
 
   /// Disable the given behavior for [ship] for [duration].
-  void disableBehaviorForShip(
-    Ship ship,
-    String why,
-    Duration duration, {
-    Behavior? explicitBehavior,
-  }) {
+  void disableBehaviorForShip(Ship ship, String why, Duration duration) {
     final shipSymbol = ship.shipSymbol;
     final currentState = _behaviorCache.getBehavior(shipSymbol);
-    final behavior = explicitBehavior ?? currentState?.behavior;
+    final behavior = currentState?.behavior;
     if (behavior == null) {
       shipWarn(ship, '$shipSymbol has no behavior to disable.');
       return;
