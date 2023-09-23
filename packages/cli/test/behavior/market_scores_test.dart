@@ -45,7 +45,6 @@ void main() {
     }
 
     final logger = _MockLogger();
-    // Ship types we've never heard of, just return idle.
     final result = runWithLogger(
       logger,
       () => findBetterTradeLocation(
