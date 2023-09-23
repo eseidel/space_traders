@@ -30,7 +30,6 @@ class CentralCommand {
   })  : _behaviorCache = behaviorCache,
         _shipCache = shipCache;
 
-  final Map<Behavior, DateTime> _behaviorTimeouts = {};
   final List<_ShipTimeout> _shipTimeouts = [];
 
   final BehaviorCache _behaviorCache;
@@ -117,19 +116,6 @@ class CentralCommand {
     return totalNeeded;
   }
 
-  /// Check if the given behavior is globally disabled.
-  bool isBehaviorDisabled(Behavior behavior) {
-    final expiration = _behaviorTimeouts[behavior];
-    if (expiration == null) {
-      return false;
-    }
-    if (DateTime.timestamp().isAfter(expiration)) {
-      _behaviorTimeouts.remove(behavior);
-      return false;
-    }
-    return true;
-  }
-
   /// Check if the given behavior is disabled for the given ship.
   bool isBehaviorDisabledForShip(Ship ship, Behavior behavior) {
     bool matches(_ShipTimeout timeout) {
@@ -196,8 +182,7 @@ class CentralCommand {
     }[ship.registration.role];
     if (behaviors != null) {
       for (final behavior in behaviors) {
-        if (!isBehaviorDisabled(behavior) &&
-            !isBehaviorDisabledForShip(ship, behavior)) {
+        if (!isBehaviorDisabledForShip(ship, behavior)) {
           return behavior;
         }
       }

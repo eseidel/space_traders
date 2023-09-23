@@ -141,9 +141,10 @@ Future<DateTime?> advanceChangeMounts(
     }
 
     // We're done.
-    centralCommand.disableBehaviorForShip(
-      ship,
-      'Mounting complete.',
+    state.isComplete = true;
+    jobAssert(
+      false,
+      'Mounting complete!',
       const Duration(hours: 1),
     );
     return null;
