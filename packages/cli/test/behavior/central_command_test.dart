@@ -240,4 +240,16 @@ void main() {
     final symbols2 = idleHaulerSymbols(shipCache, behaviorCache);
     expect(symbols2, [shipSymbol]);
   });
+
+  test('claimedMounts smoke test', () {
+    final cache = BehaviorCache({}, fs: MemoryFileSystem.test());
+    final claimed = cache.claimedMounts();
+    expect(claimed, isEmpty);
+  });
+
+  test('dealsInProgress smoke test', () {
+    final cache = BehaviorCache({}, fs: MemoryFileSystem.test());
+    final deals = cache.dealsInProgress();
+    expect(deals, isEmpty);
+  });
 }

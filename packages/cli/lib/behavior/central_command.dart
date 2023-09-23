@@ -10,7 +10,8 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-extension on BehaviorCache {
+/// BehaviorCache extension methods for CentralCommand.
+extension BehaviorCacheExtensions on BehaviorCache {
   /// Returns the counts of mounts already claimed.
   MountSymbolSet claimedMounts() {
     final claimed = MountSymbolSet();
