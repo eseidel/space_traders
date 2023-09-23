@@ -40,6 +40,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 
+class _MockSystemsApi extends Mock implements SystemsApi {}
+
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
@@ -73,6 +75,8 @@ void main() {
     when(() => caches.ships).thenReturn(shipCache);
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
+    final systemsApi = _MockSystemsApi();
+    when(() => api.systems).thenReturn(systemsApi);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -87,6 +91,17 @@ void main() {
     when(() => agentCache.headquartersSymbol).thenReturn(symbol);
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+
+    when(() => systemsApi.getShipyard(any(), any())).thenAnswer(
+      (_) => Future.value(
+        GetShipyard200Response(
+          data: Shipyard(
+            symbol: symbol.waypoint,
+            modificationsFee: 10,
+          ),
+        ),
+      ),
+    );
 
     const fuelCapacity = 100;
     when(() => ship.fuel)
@@ -135,16 +150,6 @@ void main() {
     final routePlanner = _MockRoutePlanner();
     when(() => caches.routePlanner).thenReturn(routePlanner);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
-    when(
-      () => centralCommand.visitLocalShipyard(
-        api,
-        db,
-        shipyardPrices,
-        agentCache,
-        waypoint,
-        ship,
-      ),
-    ).thenAnswer(Future.value);
     const tradeSymbol = TradeSymbol.MOUNT_GAS_SIPHON_I;
     when(
       () => marketPrices.pricesFor(
@@ -196,7 +201,7 @@ void main() {
               supply: MarketTradeGoodSupplyEnum.ABUNDANT,
               purchasePrice: 100,
               sellPrice: 101,
-            )
+            ),
           ],
         ),
       ),

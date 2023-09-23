@@ -4,11 +4,9 @@ import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
-import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -433,10 +431,7 @@ class CentralCommand {
   Iterable<SystemSymbol> _otherTraderSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
-// This is a hack for now, we need real planning.
   /// Determine what type of ship to buy.
-  // TODO(eseidel): This should consider pricing in it so that we can by
-  // other ship types if they're not overpriced?
   ShipType? shipTypeToBuy(
     Ship ship,
     ShipyardPrices shipyardPrices,
@@ -460,24 +455,6 @@ class CentralCommand {
     } else {
       return null;
     }
-  }
-
-  // TODO(eseidel): Move out commandCenter.  Will require fixing unit tests.
-  /// Visits the local shipyard if we're at a waypoint with a shipyard.
-  /// Records shipyard data if needed.
-  Future<void> visitLocalShipyard(
-    Api api,
-    Database db,
-    ShipyardPrices shipyardPrices,
-    AgentCache agentCache,
-    Waypoint waypoint,
-    Ship ship,
-  ) async {
-    if (!waypoint.hasShipyard) {
-      return;
-    }
-    final shipyard = await getShipyard(api, waypoint);
-    recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
   }
 
   /// What the max multiplier of median we would pay for a ship.

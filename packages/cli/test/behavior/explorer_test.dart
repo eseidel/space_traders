@@ -89,16 +89,6 @@ void main() {
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
-    when(
-      () => centralCommand.visitLocalShipyard(
-        api,
-        db,
-        shipyardPrices,
-        agentCache,
-        waypoint,
-        ship,
-      ),
-    ).thenAnswer((_) => Future.value());
     when(() => centralCommand.maxAgeForExplorerData)
         .thenReturn(const Duration(days: 3));
     final state = BehaviorState(shipSymbol, Behavior.explorer);

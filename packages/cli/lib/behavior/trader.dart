@@ -685,7 +685,7 @@ Future<DateTime?> advanceTrader(
     // and thus not having to update?
     maxAge: const Duration(milliseconds: 300),
   );
-  await centralCommand.visitLocalShipyard(
+  await visitLocalShipyard(
     api,
     db,
     caches.shipyardPrices,

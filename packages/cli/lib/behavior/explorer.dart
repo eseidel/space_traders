@@ -3,6 +3,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/net/queries.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
@@ -83,6 +84,23 @@ Future<Market?> visitLocalMarket(
     );
   }
   return market;
+}
+
+/// Visits the local shipyard if we're at a waypoint with a shipyard.
+/// Records shipyard data if needed.
+Future<void> visitLocalShipyard(
+  Api api,
+  Database db,
+  ShipyardPrices shipyardPrices,
+  AgentCache agentCache,
+  Waypoint waypoint,
+  Ship ship,
+) async {
+  if (!waypoint.hasShipyard) {
+    return;
+  }
+  final shipyard = await getShipyard(api, waypoint);
+  recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
 }
 
 /// Returns the symbol of a waypoint in the system missing a chart.
@@ -291,7 +309,7 @@ Future<DateTime?> advanceExplorer(
   // If we don't visit the market, we won't refuel (even when low).
   await visitLocalMarket(api, db, caches, waypoint, ship);
   // We might buy a ship if we're at a ship yard.
-  await centralCommand.visitLocalShipyard(
+  await visitLocalShipyard(
     api,
     db,
     caches.shipyardPrices,
