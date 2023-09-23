@@ -61,31 +61,6 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   }
 
   // Do we need to guard against insufficient credits here?
-  // e.g.
-//     final creditsNeeded = unitsToPurchase * maybeGood.purchasePrice;
-//     if (caches.agent.agent.credits < creditsNeeded) {
-//       // If we have some to deliver, deliver it.
-//       if (unitsInCargo > 0) {
-//         shipInfo(
-//           ship,
-//           'Not enough credits to purchase $unitsToPurchase '
-//           '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}, '
-//           'but we have $unitsInCargo in cargo, delivering.',
-//         );
-//       } else {
-//         // This should print the pricing of the good we're trying to buy.
-//         await centralCommand.disableBehavior(
-//           ship,
-//           Behavior.contractTrader,
-//           'Not enough credits to purchase $unitsToPurchase '
-//           '${neededGood.tradeSymbol} at ${currentWaypoint.symbol}',
-//           const Duration(hours: 1),
-//         );
-//         return null;
-//       }
-//     }
-//   }
-
   final result = await purchaseCargoAndLog(
     api,
     db,
