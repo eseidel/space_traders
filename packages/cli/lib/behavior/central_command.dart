@@ -12,46 +12,6 @@ import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-// Central command sets behavior for all ships.
-// Groups ships into squads.
-// Can hold queues of work to distribute among squads.
-// Need to figure out what disableBehavior looks like for squads.
-
-// Central command can also plan sourcing of modules for ships even
-// across long distances to bring back mounts for our ships?
-
-// Central command can also prioritize which ships get serviced based
-// on some sort of priority function?  (e.g. earnings per request)
-
-// Examples:
-// Mining Squad
-// - N miners
-// - M haulers
-// Decisions made as to if something should sell at the local market
-// or be put on the hauler, or jettisoned?
-// I guess if you're full you just keep surveying until a hauler comes?
-
-// Exploration Squad
-// - N explorers
-// Work from a single queue of systems to explore.
-// Are given new work based on proximity to systems in queue.
-
-// Exploration Squad
-// - N explorers
-// Go and sit at the most important waypoints to watch (e.g. shipyards/markets)
-// And scan them into our cache every N minutes.
-
-// Trading Squad
-// - N haulers?
-// Work from a queue of deals so as not to over-saturate any one deal.
-// Could estimate how much price is going to raise from a deal?
-
-// Contract Squad
-// - N haulers?
-// Work from a single contract, but might source from multiple markets.
-// instead of sending all of the haulers to the same market.  Again
-// approximating how much price is going to raise from a deal?
-
 @immutable
 class _ShipTimeout {
   const _ShipTimeout(this.shipSymbol, this.behavior, this.timeout);
@@ -59,45 +19,6 @@ class _ShipTimeout {
   final ShipSymbol shipSymbol;
   final Behavior behavior;
   final DateTime timeout;
-}
-
-/// Where are we in the phases of the reset.
-enum GamePhase with EnumIndexOrdering<GamePhase> {
-  /// Early, we have little money, lots of request space.
-  /// What matters most at this point is that we buy ships as fast as we can.
-  /// We don't care a ton about price, more about opportunity cost (so we can
-  /// spend our requests faster).
-  /// Command center is trading when it can, but only near the starting system?
-  /// The starting probe is parked at the starting shipyard or at least knows
-  /// how to be back in time to buy things.
-  /// We transition to Ramp when we can buy 1 module every 10 minutes?
-  early,
-
-  /// Ramp, we have money flowing in, but we haven't upgraded our ships yet.
-  /// Our fleet is not yet full either.  We're buying modules when we can fit
-  /// them (they're cheaper) and ships when we need more module space.
-  /// We're trying to get to max efficiency as fast as possible.
-  /// We transition to mid when we're at the request limit.
-  ramp,
-
-  /// We're at the request limit at this point. We're trying to maximize
-  /// for profit per second.  Still mostly mining.  We're exploring so we can
-  /// prepare for trading.
-  /// We transition to trading transition when we turn off our first miner
-  /// in favor of a trader?
-  exploring,
-
-  /// We're at the request limit.  We're trying to maximize profit per request
-  /// Slowly converting from a mining based economy to a trading one.
-  /// We transition to "end" when we have less than 4 hours until the end of
-  /// the game.
-  tradingTransition,
-
-  /// The game has a fixed time limit and all actions should be optimized
-  /// to maximize total credits at the end of that time.
-  /// We don't want to start new long contracts at this point (or long trades)?
-  /// Sell all mounts?
-  end;
 }
 
 /// Central command for the fleet.
@@ -120,41 +41,14 @@ class CentralCommand {
   /// We will only accept and start new contracts when this is true.
   /// We will continue to deliver current contract deals even if this is false,
   /// but will not start new deals involving contracts.
+  /// Mostly this makes unit-testing easier by allowing us to disable contract
+  /// trading.
   bool get isContractTradingEnabled => true;
-
-  /// What phase of the game we think we're in.
-  GamePhase get phase {
-    if (_shipCache.ships.length < 30) {
-      return GamePhase.early;
-    }
-    // final traderCount = _shipCache.ships
-    //     .where((s) => s.registration.role == ShipRole.HAULER)
-    //     .length;
-    // if (traderCount < 30) {
-    //   return GamePhase.ramp;
-    // }
-    // // When is GamePhase.exploring?
-    // return GamePhase.tradingTransition;
-    return GamePhase.ramp;
-  }
 
   /// Minimum profit per second we expect this ship to make.
   // Should set this based on the ship type and how much we expect to earn
   // from other sources (e.g. hauling mining goods?)
   int expectedCreditsPerSecond(Ship ship) {
-    // Command makes a bit less than either miners or haulers due to its
-    // worse cargo capacity and laser.
-    if (ship.registration.role == ShipRole.COMMAND) {
-      // We want to strongly prefer surveying for the mining drones early.
-      // We increase their value by ~3c/s each, so 9c/s total?
-      // But drones only get 5c/s anyway, so maybe not worth it?
-      if (phase == GamePhase.early) {
-        return 9;
-      }
-      // After we stop being a useful surveyor (once we have ore hounds)
-      // We're not a great trader, but we'll take trades I guess?
-      return 6;
-    }
     // This should depend on phase and ship type?
     return 7;
   }
@@ -277,18 +171,6 @@ class CentralCommand {
       return Behavior.idle;
     }
 
-    // Disable drones after ramping to a full fleet.
-    if (phase > GamePhase.ramp) {
-      if (ship.frame.symbol == ShipFrameSymbolEnum.DRONE) {
-        return Behavior.idle;
-      }
-    }
-    if (phase >= GamePhase.tradingTransition) {
-      if (ship.frame.symbol == ShipFrameSymbolEnum.MINER) {
-        return Behavior.idle;
-      }
-    }
-
     final shipCount = _shipCache.ships.length;
 
     final behaviors = {
@@ -322,11 +204,8 @@ class CentralCommand {
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
         Behavior.changeMounts,
-        if (phase < GamePhase.tradingTransition && ship.canMine) Behavior.miner,
-        if (phase < GamePhase.tradingTransition &&
-            !ship.canMine &&
-            ship.hasSurveyor)
-          Behavior.surveyor,
+        if (ship.canMine) Behavior.miner,
+        if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
         Behavior.idle,
       ],
       ShipRole.SATELLITE: [Behavior.explorer],
