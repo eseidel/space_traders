@@ -104,7 +104,7 @@ Future<DateTime?> advanceShipBehavior(
     }
     return waitUntil;
   } on JobException catch (error) {
-    centralCommand.disableBehaviorForShip(
+    caches.behaviors.disableBehaviorForShip(
       ship,
       error.message,
       error.timeout,

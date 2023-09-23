@@ -12,15 +12,6 @@ import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-@immutable
-class _ShipTimeout {
-  const _ShipTimeout(this.shipSymbol, this.behavior, this.timeout);
-
-  final ShipSymbol shipSymbol;
-  final Behavior behavior;
-  final DateTime timeout;
-}
-
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
@@ -29,8 +20,6 @@ class CentralCommand {
     required ShipCache shipCache,
   })  : _behaviorCache = behaviorCache,
         _shipCache = shipCache;
-
-  final List<_ShipTimeout> _shipTimeouts = [];
 
   final BehaviorCache _behaviorCache;
   final ShipCache _shipCache;
@@ -116,25 +105,6 @@ class CentralCommand {
     return totalNeeded;
   }
 
-  /// Check if the given behavior is disabled for the given ship.
-  bool isBehaviorDisabledForShip(Ship ship, Behavior behavior) {
-    bool matches(_ShipTimeout timeout) {
-      return timeout.shipSymbol == ship.shipSymbol &&
-          timeout.behavior == behavior;
-    }
-
-    final timeouts = _shipTimeouts.where(matches).toList();
-    if (timeouts.isEmpty) {
-      return false;
-    }
-    final expiration = timeouts.first.timeout;
-    if (DateTime.timestamp().isAfter(expiration)) {
-      _shipTimeouts.removeWhere(matches);
-      return false;
-    }
-    return true;
-  }
-
   // Consider a config file like:
   // https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
   // instead of having this dynamic behavior function.
@@ -182,7 +152,7 @@ class CentralCommand {
     }[ship.registration.role];
     if (behaviors != null) {
       for (final behavior in behaviors) {
-        if (!isBehaviorDisabledForShip(ship, behavior)) {
+        if (!_behaviorCache.isBehaviorDisabledForShip(ship, behavior)) {
           return behavior;
         }
       }
@@ -192,31 +162,6 @@ class CentralCommand {
       );
     }
     return Behavior.idle;
-  }
-
-  /// Disable the given behavior for [ship] for [duration].
-  void disableBehaviorForShip(Ship ship, String why, Duration duration) {
-    final shipSymbol = ship.shipSymbol;
-    final currentState = _behaviorCache.getBehavior(shipSymbol);
-    final behavior = currentState?.behavior;
-    if (behavior == null) {
-      shipWarn(ship, '$shipSymbol has no behavior to disable.');
-      return;
-    }
-    shipWarn(
-      ship,
-      '$why Disabling $behavior for $shipSymbol '
-      'for ${approximateDuration(duration)}.',
-    );
-
-    if (currentState == null || currentState.behavior == behavior) {
-      _behaviorCache.deleteBehavior(shipSymbol);
-    } else {
-      shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
-    }
-
-    final expiration = DateTime.timestamp().add(duration);
-    _shipTimeouts.add(_ShipTimeout(ship.shipSymbol, behavior, expiration));
   }
 
   /// Returns the delivery ship bringing the mounts.
