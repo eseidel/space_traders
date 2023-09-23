@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/explorer.dart';
+import 'package:cli/behavior/market_scores.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
@@ -557,16 +558,29 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   String why,
 ) async {
   shipWarn(ship, why);
-  final destinationSymbol = assertNotNull(
-    centralCommand.findBetterTradeLocation(
-      systemsCache,
-      routePlanner,
+  CostedDeal? findDeal(Ship ship, WaypointSymbol startSymbol) {
+    return centralCommand.findNextDeal(
       agentCache,
       contractCache,
       marketPrices,
+      systemsCache,
+      routePlanner,
       ship,
+      overrideStartSymbol: startSymbol,
       maxJumps: _maxJumps,
+      maxTotalOutlay: agentCache.agent.credits,
       maxWaypoints: _maxWaypoints,
+    );
+  }
+
+  final destinationSymbol = assertNotNull(
+    findBetterTradeLocation(
+      systemsCache,
+      marketPrices,
+      findDeal,
+      ship,
+      avoidSystems: centralCommand.otherTraderSystems(ship.shipSymbol).toSet(),
+      profitPerSecondThreshold: centralCommand.expectedCreditsPerSecond(ship),
     ),
     'Failed to find better location for trader.',
     const Duration(minutes: 10),

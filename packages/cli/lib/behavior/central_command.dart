@@ -335,72 +335,6 @@ class CentralCommand {
     return maybeDeal;
   }
 
-  _ShipPlacement? _findBetterSystemForTrader(
-    SystemsCache systemsCache,
-    RoutePlanner routePlanner,
-    AgentCache agentCache,
-    ContractCache contractCache,
-    MarketPrices marketPrices,
-    _MarketSearch search,
-    Ship ship, {
-    required int maxJumps,
-    required int maxWaypoints,
-    required int profitPerSecondThreshold,
-  }) {
-    final shipSymbol = ship.symbol;
-    final shipSystem = systemsCache.systemBySymbol(ship.systemSymbol);
-    while (true) {
-      final closest = search.closestAvailableSystem(systemsCache, shipSystem);
-      if (closest == null) {
-        logger.info('No nearby markets for $shipSymbol');
-        return null;
-      }
-      search.markUsed(closest);
-      final score = search.scoreFor(closest.systemSymbol);
-      final systemJumpGate =
-          systemsCache.jumpGateWaypointForSystem(closest.systemSymbol)!;
-      final deal = findNextDeal(
-        agentCache,
-        contractCache,
-        marketPrices,
-        systemsCache,
-        routePlanner,
-        ship,
-        overrideStartSymbol: systemJumpGate.waypointSymbol,
-        maxJumps: maxJumps,
-        maxTotalOutlay: agentCache.agent.credits,
-        maxWaypoints: maxWaypoints,
-      );
-      if (deal == null) {
-        shipDetail(ship, 'No deal found for $shipSymbol at ${closest.symbol}');
-        search.markUsed(closest);
-        continue;
-      }
-      final profitPerSecond = deal.expectedProfitPerSecond;
-      if (profitPerSecond < profitPerSecondThreshold) {
-        shipDetail(
-            ship,
-            'Profit per second too low for $shipSymbol at '
-            '${closest.symbol}, $profitPerSecond < $profitPerSecondThreshold');
-        search.markUsed(closest);
-        continue;
-      }
-      final placement = _ShipPlacement(
-        score: score,
-        distance: shipSystem.distanceTo(closest),
-        profitPerSecond: profitPerSecond,
-        destinationSymbol: systemJumpGate.waypointSymbol,
-      );
-      shipInfo(
-          ship,
-          'Found placement: ${creditsString(profitPerSecond)}/s '
-          '${placement.score} ${placement.distance} '
-          '${placement.destinationSymbol}');
-      shipInfo(ship, 'Potential: ${describeCostedDeal(deal)}');
-      return placement;
-    }
-  }
-
   /// Returns other systems containing ships with [behavior].
   Iterable<SystemSymbol> _otherSystemsWithBehavior(
     ShipSymbol thisShipSymbol,
@@ -428,7 +362,7 @@ class CentralCommand {
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
 
   /// Returns all systems containing traders or trader destinations.
-  Iterable<SystemSymbol> _otherTraderSystems(ShipSymbol thisShipSymbol) =>
+  Iterable<SystemSymbol> otherTraderSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
   /// Determine what type of ship to buy.
@@ -523,38 +457,6 @@ class CentralCommand {
     return MineJob(mine: mine, market: mine);
     // If the ship is in a system without a mine go to the HQ?
   }
-
-  /// Find a better destination for the given trader [ship].
-  WaypointSymbol? findBetterTradeLocation(
-    SystemsCache systemsCache,
-    RoutePlanner routePlanner,
-    AgentCache agentCache,
-    ContractCache contractCache,
-    MarketPrices marketPrices,
-    Ship ship, {
-    required int maxJumps,
-    required int maxWaypoints,
-  }) {
-    final traderSystems = _otherTraderSystems(ship.shipSymbol).toList();
-    final search = _MarketSearch.start(
-      marketPrices,
-      systemsCache,
-      avoidSystems: traderSystems.toSet(),
-    );
-    final placement = _findBetterSystemForTrader(
-      systemsCache,
-      routePlanner,
-      agentCache,
-      contractCache,
-      marketPrices,
-      search,
-      ship,
-      maxJumps: maxJumps,
-      maxWaypoints: maxWaypoints,
-      profitPerSecondThreshold: expectedCreditsPerSecond(ship),
-    );
-    return placement?.destinationSymbol;
-  }
 }
 
 int _maxWorthwhileUnitPurchasePrice(
@@ -613,42 +515,6 @@ Iterable<Contract> affordableContracts(
       .where((c) => _minimumFloatRequired(c) <= credits);
 }
 
-/// Compute the score for each market based on the distance of each good's
-/// price from the median price.
-Map<SystemSymbol, int> scoreMarketSystems(
-  MarketPrices marketPrices, {
-  int limit = 200,
-}) {
-  // Walk all markets in the market prices.  Get all goods for each market
-  // compute the absolute distance for each good from the median price
-  // sum up that value for the market and record that as the "market score".
-
-  // First calculate median prices for all goods.
-  final medianPurchasePrices = <TradeSymbol, int?>{};
-  final medianSellPrices = <TradeSymbol, int?>{};
-  for (final tradeSymbol in TradeSymbol.values) {
-    medianPurchasePrices[tradeSymbol] =
-        marketPrices.medianPurchasePrice(tradeSymbol);
-    medianSellPrices[tradeSymbol] = marketPrices.medianSellPrice(tradeSymbol);
-  }
-
-  final marketSystemScores = <SystemSymbol, int>{};
-  for (final price in marketPrices.prices) {
-    final market = price.waypointSymbol;
-    final system = market.systemSymbol;
-    final medianPurchasePrice = medianPurchasePrices[price.tradeSymbol]!;
-    final medianSellPrice = medianSellPrices[price.tradeSymbol]!;
-    final purchaseScore = (price.purchasePrice - medianPurchasePrice).abs();
-    final sellScore = (price.sellPrice - medianSellPrice).abs();
-    final score = purchaseScore + sellScore;
-    marketSystemScores[system] = (marketSystemScores[system] ?? 0) + score;
-  }
-
-  final sortedScores = marketSystemScores.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
-  return Map.fromEntries(sortedScores.take(limit));
-}
-
 /// Returns the ship symbols for all idle haulers.
 List<ShipSymbol> idleHaulerSymbols(
   ShipCache shipCache,
@@ -662,76 +528,4 @@ List<ShipSymbol> idleHaulerSymbols(
       .where((s) => idleBehaviors.contains(s.behavior))
       .toList();
   return idleHaulerStates.map((s) => s.shipSymbol).toList();
-}
-
-System? _closestSystem(
-  SystemsCache systemsCache,
-  System start,
-  List<System> systems,
-) {
-  var bestDistance = double.infinity;
-  System? bestSystem;
-  for (final system in systems) {
-    final distance = start.distanceTo(system);
-    if (distance < bestDistance) {
-      bestDistance = distance.toDouble();
-      bestSystem = system;
-    }
-  }
-  return bestSystem;
-}
-
-class _ShipPlacement {
-  _ShipPlacement({
-    required this.score,
-    required this.distance,
-    required this.profitPerSecond,
-    required this.destinationSymbol,
-  });
-
-  final int score;
-  final int distance;
-  final int profitPerSecond;
-  final WaypointSymbol destinationSymbol;
-}
-
-class _MarketSearch {
-  _MarketSearch({
-    required this.marketSystems,
-    required this.marketSystemScores,
-    required this.claimedSystemSymbols,
-  });
-
-  factory _MarketSearch.start(
-    MarketPrices marketPrices,
-    SystemsCache systemsCache, {
-    Set<SystemSymbol>? avoidSystems,
-  }) {
-    final marketSystemScores = scoreMarketSystems(marketPrices);
-    final marketSystems =
-        marketSystemScores.keys.map(systemsCache.systemBySymbol).toList();
-    return _MarketSearch(
-      marketSystems: marketSystems,
-      marketSystemScores: marketSystemScores,
-      claimedSystemSymbols: avoidSystems ?? {},
-    );
-  }
-
-  final List<System> marketSystems;
-  final Map<SystemSymbol, int> marketSystemScores;
-  final Set<SystemSymbol> claimedSystemSymbols;
-
-  System? closestAvailableSystem(
-    SystemsCache systemsCache,
-    System startSystem,
-  ) {
-    final availableSystems = marketSystems
-        .where((system) => !claimedSystemSymbols.contains(system.systemSymbol))
-        .toList();
-    return _closestSystem(systemsCache, startSystem, availableSystems);
-  }
-
-  void markUsed(System system) => claimedSystemSymbols.add(system.systemSymbol);
-
-  int scoreFor(SystemSymbol systemSymbol) => marketSystemScores[systemSymbol]!;
 }

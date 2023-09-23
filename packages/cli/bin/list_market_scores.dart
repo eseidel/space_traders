@@ -1,4 +1,4 @@
-import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/market_scores.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
 
