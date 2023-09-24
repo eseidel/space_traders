@@ -89,7 +89,8 @@ Welcome to Space Traders! 🚀
 ## Development
 
 ## Reset day checklist
-* run `dart run bin/reset.dart`
+* run `cd packages/cli`, `dart run bin/reset.dart`
+* run `cd packages/db`, `docker exec spacetraders_postgres /scripts/init_db.sh spacetraders`
 * Update open_api_config.yaml to have the latest git hash.
 * regenerate space_traders_api
 
@@ -116,12 +117,7 @@ Most impact:
 * Make saving take less time (log rolling or db?), also avoids dataloss.
 * Confirm planRoute is using PriorityQueue correctly.
 * Could await on somehting other than the network (e.g. a priority queue).
-* Add atmomic writes (write to a temp file and then rename).
-
-Early Game:
-* Probe should probably stay close to the main system to help find trades?
-* buy ship behavior on shipyard visit is causing us to buy ships instead of
-  modules when we'd prefer modules.
+* Add atomic writes (write to a temp file and then rename).
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.

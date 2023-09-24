@@ -1,8 +1,8 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
