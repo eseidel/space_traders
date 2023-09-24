@@ -32,6 +32,11 @@ void main() {
         fuelUsed: 10,
       ),
       mountToAdd: ShipMountSymbolEnum.GAS_SIPHON_I,
+      shipBuyJob: ShipBuyJob(
+        minCreditsNeeded: 100,
+        shipyardSymbol: WaypointSymbol.fromString('W-A-Y'),
+        shipType: ShipType.EXPLORER,
+      ),
     );
     final json = state.toJson();
     final newState = BehaviorState.fromJson(json);
