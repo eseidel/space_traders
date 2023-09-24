@@ -394,6 +394,9 @@ class CentralCommand {
   /// Returns the next ship buy job.
   ShipBuyJob? get nextShipBuyJob => _nextShipBuyJob;
 
+  @visibleForTesting
+  set nextShipBuyJob(ShipBuyJob? job) => _nextShipBuyJob = job;
+
   /// Takes and clears the next ship buy job.
   ShipBuyJob? takeShipBuyJob() {
     final job = _nextShipBuyJob;

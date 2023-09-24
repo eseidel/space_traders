@@ -290,4 +290,32 @@ void main() {
     expect(deals.length, 1);
     expect(deals.first, deal);
   });
+
+  test('CentralCommand.shouldBuyShip', () {
+    final shipCache = _MockShipCache();
+    final behaviorCache = _MockBehhaviorCache();
+    when(() => behaviorCache.states).thenReturn([]);
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final ship = _MockShip();
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipNav = _MockShipNav();
+    when(() => shipNav.systemSymbol).thenReturn('W-A');
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipCache.ships).thenReturn([ship]);
+    centralCommand.nextShipBuyJob = ShipBuyJob(
+      shipyardSymbol: WaypointSymbol.fromString('W-A-Y'),
+      shipType: ShipType.HEAVY_FREIGHTER,
+      minCreditsNeeded: 100,
+    );
+    final shouldBuy = centralCommand.shouldBuyShip(ship, 100000);
+    expect(shouldBuy, true);
+
+    // But stops if someone else is already buying.
+    when(() => behaviorCache.states).thenReturn([
+      BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip),
+    ]);
+    expect(centralCommand.shouldBuyShip(ship, 100000), false);
+  });
 }
