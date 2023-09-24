@@ -1,4 +1,6 @@
+import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
+import 'package:file/local.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -92,90 +94,110 @@ void main() {
     expect(() => cooldownTimeForJumpDistance(-2001), throwsArgumentError);
   });
 
-  // Will need to update to a newer systems cache.
-  // test('planRoute', () {
-  //   const fs = LocalFileSystem();
-  //   final systemsCache = SystemsCache.loadCached(
-  //     fs,
-  //     path: 'test/nav/fixtures/systems-06-24-2023.json',
-  //   )!;
-  //   final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
-  //   RoutePlan? planRoute(
-  //     String startString,
-  //     String endString, {
-  //     int fuelCapacity = 1200,
-  //     int shipSpeed = 30,
-  //   }) =>
-  //       routePlanner.planRoute(
-  //         start: WaypointSymbol.fromString(startString),
-  //         end: WaypointSymbol.fromString(endString),
-  //         fuelCapacity: fuelCapacity,
-  //         shipSpeed: shipSpeed,
-  //       );
+  test('planRoute', () {
+    const fs = LocalFileSystem();
+    // This test originally was written with hard-coded waypoint symbols names
+    // but when the SystemWaypoint format changed, it wasn't easy to update, so
+    // I made it dynamically compute the waypoint symbols to use from the first
+    // waypoint symbol in the file.  Which makes it probably a less good test,
+    // but much easier to update in the future if the format changes again.
+    final systemsCache = SystemsCache.loadCached(
+      fs,
+      path: 'test/nav/fixtures/systems-09-24-2023.json',
+    )!;
+    final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+    RoutePlan? planRoute(
+      String startString,
+      String endString, {
+      int fuelCapacity = 1200,
+      int shipSpeed = 30,
+    }) =>
+        routePlanner.planRoute(
+          start: WaypointSymbol.fromString(startString),
+          end: WaypointSymbol.fromString(endString),
+          fuelCapacity: fuelCapacity,
+          shipSpeed: shipSpeed,
+        );
 
-  //   void expectRoute(
-  //     String startString,
-  //     String endString,
-  //     int expectedSeconds,
-  //   ) {
-  //     final route = planRoute(startString, endString);
-  //     expect(route, isNotNull);
-  //     expect(route!.duration.inSeconds, expectedSeconds);
+    void expectRoute(
+      String startString,
+      String endString,
+      int expectedSeconds,
+    ) {
+      final route = planRoute(startString, endString);
+      expect(route, isNotNull);
+      expect(route!.duration.inSeconds, expectedSeconds);
 
-  //     // No need to test caching of the empty route.
-  //     if (route.actions.isEmpty) {
-  //       return;
-  //     }
+      // No need to test caching of the empty route.
+      if (route.actions.isEmpty) {
+        return;
+      }
 
-  //     // Also verify that our caching works:
-  //     // This actually isn't triggered ever since we're only using local
-  //     // navigation in this test so far.
-  //     final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
-  //       ..add(route.actions.last.endSymbol);
-  //     final route2 = planRoute(startString, endString)!;
-  //     final routeSymbols2 = route2.actions.map((w) => w.startSymbol).toList()
-  //       ..add(route.actions.last.endSymbol);
-  //     // Should be identical when coming from cache.
-  //     expect(routeSymbols2, routeSymbols);
-  //   }
+      // Also verify that our caching works:
+      // This actually isn't triggered ever since we're only using local
+      // navigation in this test so far.
+      final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
+        ..add(route.actions.last.endSymbol);
+      final route2 = planRoute(startString, endString)!;
+      final routeSymbols2 = route2.actions.map((w) => w.startSymbol).toList()
+        ..add(route.actions.last.endSymbol);
+      // Should be identical when coming from cache.
+      expect(routeSymbols2, routeSymbols);
+    }
 
-  //   // Same place
-  //   expectRoute('X1-YU85-99640B', 'X1-YU85-99640B', 0);
+    // Same place
+    const waypoint1 = 'X1-V94-96191X'; // first waypoint in systems.json
+    expectRoute(waypoint1, waypoint1, 0);
 
-  //   // Within one system
-  //   expectRoute('X1-YU85-99640B', 'X1-YU85-07121B', 30);
+    // Within one system
+    final system = systemsCache
+        .systemBySymbol(WaypointSymbol.fromString(waypoint1).systemSymbol);
+    final waypointObject2 =
+        system.waypoints.firstWhere((w) => w.symbol != waypoint1);
+    final waypoint2 = waypointObject2.symbol;
+    expectRoute(waypoint1, waypoint2, 20);
 
-  //   final route = planRoute('X1-YU85-99640B', 'X1-YU85-07121B');
-  //   expect(route!.startSymbol, WaypointSymbol.fromString('X1-YU85-99640B'));
-  //   expect(route.endSymbol, WaypointSymbol.fromString('X1-YU85-07121B'));
-  //   expect(
-  //     () => route.nextActionFrom(
-  //       // No actions after the last one.
-  //       WaypointSymbol.fromString('X1-YU85-07121B'),
-  //     ),
-  //     throwsArgumentError,
-  //   );
-  //   // Make a sub-plan starting from the same starting point.
-  //   final subPlan = route.subPlanStartingFrom(
-  //     systemsCache,
-  //     // Not in the route.
-  //     WaypointSymbol.fromString('X1-YU85-99640B'),
-  //   );
-  //   expect(subPlan.actions.length, route.actions.length);
-  //   expect(
-  //     () => route.subPlanStartingFrom(
-  //       systemsCache,
-  //       // Not in the route.
-  //       WaypointSymbol.fromString('X1-RG48-59920X'),
-  //     ),
-  //     throwsArgumentError,
-  //   );
+    final route = planRoute(waypoint1, waypoint2);
+    expect(route!.startSymbol.waypoint, waypoint1);
+    expect(route.endSymbol.waypoint, waypoint2);
+    expect(
+      () => route.nextActionFrom(
+        // No actions after the last one.
+        WaypointSymbol.fromString(waypoint2),
+      ),
+      throwsArgumentError,
+    );
+    // Make a sub-plan starting from the same starting point.
+    final subPlan = route.subPlanStartingFrom(
+      systemsCache,
+      WaypointSymbol.fromString(waypoint1),
+    );
+    expect(subPlan.actions.length, route.actions.length);
 
-  //   // Exactly one jump, jump duration doesn't matter since it doesn't stop
-  //   // navigation.
-  //   expectRoute('X1-RG48-59920X', 'X1-TV72-74710F', 129);
+    // Make a sub-plan with an unrelated waypoint.
+    const waypoint3 = 'X1-TC51-68991C'; // random other waypoint in file.
+    expect(
+      () => route.subPlanStartingFrom(
+        systemsCache,
+        // Not in the route.
+        WaypointSymbol.fromString(waypoint3),
+      ),
+      throwsArgumentError,
+    );
 
-  //   // We don't know how to plan warps yet.
-  //   expect(planRoute('X1-YU85-07121B', 'X1-RG48-59920X'), isNull);
-  // });
+    // Exactly one jump, jump duration doesn't matter since it doesn't stop
+    // navigation.
+    final connectedSystem = systemsCache
+        .connectedSystems(
+          WaypointSymbol.fromString(waypoint1).systemSymbol,
+        )
+        .first
+        .systemSymbol;
+    final waypoint4 =
+        systemsCache.waypointsInSystem(connectedSystem).first.symbol;
+    expectRoute(waypoint1, waypoint4, 118);
+
+    // We don't know how to plan warps yet.
+    expect(planRoute(waypoint1, waypoint3), isNull);
+  });
 }
