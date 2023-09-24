@@ -29,129 +29,16 @@ extension on Ship {
   }
 }
 
-/// Change mounts on a ship.
-Future<DateTime?> advanceMountFromDelivery(
+/// Init the change-mounts job.
+Future<JobResult> doInitJob(
+  BehaviorState state,
   Api api,
   Database db,
   CentralCommand centralCommand,
   Caches caches,
-  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final toMount = state.mountToAdd;
-
-  // Re-validate every loop in case resuming from error.
-  final template = assertNotNull(
-    centralCommand.templateForShip(ship),
-    'No template.',
-    const Duration(hours: 1),
-  );
-  final needed = mountsToAddToShip(ship, template);
-  jobAssert(needed.isNotEmpty, 'No mounts needed.', const Duration(hours: 1));
-
-  // We've already started a change-mount job, continue.
-  if (toMount != null) {
-    shipInfo(ship, 'Changing mounts. Mounting $toMount.');
-    final currentWaypoint =
-        await caches.waypoints.waypoint(ship.waypointSymbol);
-    if (!currentWaypoint.hasShipyard) {
-      shipErr(ship, 'Unexpectedly off course during change mount.');
-      state.isComplete = true;
-      return null;
-    }
-
-    final tradeSymbol = tradeSymbolForMountSymbol(toMount);
-    final deliveryShip = assertNotNull(
-      centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol),
-      'No delivery ship for $tradeSymbol.',
-      const Duration(minutes: 10),
-    );
-
-    // We could match the docking status instead.
-    if (!deliveryShip.isDocked) {
-      shipErr(ship, 'Delivery ship undocked during change mount, docking it.');
-      // Terrible hack.
-      await dockIfNeeded(api, caches.ships, deliveryShip);
-    }
-
-    await dockIfNeeded(api, caches.ships, ship);
-
-    if (ship.countUnits(tradeSymbol) < 1) {
-      try {
-        // Get it from the delivery ship.
-        await transferCargoAndLog(
-          api,
-          caches.ships,
-          from: deliveryShip,
-          to: ship,
-          tradeSymbol: tradeSymbol,
-          units: 1,
-        );
-      } on ApiException catch (e) {
-        shipErr(ship, 'Failed to transfer mount: $e');
-        jobAssert(
-          false,
-          'Failed to transfer mount.',
-          const Duration(minutes: 10),
-        );
-      }
-    }
-
-    // TODO(eseidel): This should only remove mounts if we absolutely need to.
-    // This could end up removing mounts before we need to.
-    final toRemove = mountsToRemoveFromShip(ship, template);
-    if (toRemove.isNotEmpty) {
-      // Unmount existing mounts if needed.
-      for (final mount in toRemove) {
-        await removeMountAndLog(
-          api,
-          db,
-          caches.agent,
-          caches.ships,
-          ship,
-          mount,
-        );
-      }
-    }
-
-    // 🛸#6  🔧 MOUNT_MINING_LASER_II on ESEIDEL-6 for 3,600c -> 🏦 89,172c
-    // Mount the new mount.
-    await installMountAndLog(
-      api,
-      db,
-      caches.agent,
-      caches.ships,
-      ship,
-      toMount,
-    );
-
-    // Give the delivery ship our extra mount if we have one.
-    final extraMounts = ship.mountsInCargo();
-    if (extraMounts.isNotEmpty) {
-      // This could send more items than deliveryShip has space for.
-      for (final cargoItem in extraMounts) {
-        await transferCargoAndLog(
-          api,
-          caches.ships,
-          from: ship,
-          to: deliveryShip,
-          tradeSymbol: cargoItem.tradeSymbol,
-          units: cargoItem.units,
-        );
-      }
-    }
-
-    // We're done.
-    state.isComplete = true;
-    jobAssert(
-      false,
-      'Mounting complete!',
-      const Duration(hours: 1),
-    );
-    return null;
-  }
-
   final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
   final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
   final shipyard = assertNotNull(
@@ -160,6 +47,14 @@ Future<DateTime?> advanceMountFromDelivery(
     const Duration(days: 1),
   );
   final shipyardSymbol = shipyard.waypointSymbol;
+
+  final template = assertNotNull(
+    centralCommand.templateForShip(ship),
+    'No template.',
+    const Duration(hours: 1),
+  );
+  final needed = mountsToAddToShip(ship, template);
+  jobAssert(needed.isNotEmpty, 'No mounts needed.', const Duration(hours: 1));
 
   final available = centralCommand.unclaimedMountsAt(shipyardSymbol);
   // If there is a mount ready for us to claim, claim it?
@@ -171,17 +66,175 @@ Future<DateTime?> advanceMountFromDelivery(
   );
   shipInfo(ship, 'Claiming mount: $toClaim.');
   state.mountToAdd = toClaim;
-
-  // Go to the shipyard.
-  final waitUntil = beingNewRouteAndLog(
-    api,
-    ship,
-    state,
-    caches.ships,
-    caches.systems,
-    caches.routePlanner,
-    centralCommand,
-    shipyardSymbol,
-  );
-  return waitUntil;
+  return JobResult.complete();
 }
+
+/// Pickup the mount from the delivery ship.
+Future<JobResult> doPickupJob(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  // TODO(eseidel): Pickup location should be saved in state.
+  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
+  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
+  final shipyard = assertNotNull(
+    hqWaypoints.firstWhereOrNull((w) => w.hasShipyard),
+    'No shipyard in $hqSystem',
+    const Duration(days: 1),
+  );
+  final shipyardSymbol = shipyard.waypointSymbol;
+
+  if (ship.waypointSymbol != shipyardSymbol) {
+    final waitUntil = await beingNewRouteAndLog(
+      api,
+      ship,
+      state,
+      caches.ships,
+      caches.systems,
+      caches.routePlanner,
+      centralCommand,
+      shipyardSymbol,
+    );
+    return JobResult.wait(waitUntil);
+  }
+
+  final tradeSymbol = tradeSymbolForMountSymbol(state.mountToAdd!);
+  final deliveryShip = assertNotNull(
+    centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol),
+    'No delivery ship for $tradeSymbol.',
+    const Duration(minutes: 10),
+  );
+
+  // We could match the docking status instead.
+  if (!deliveryShip.isDocked) {
+    shipErr(ship, 'Delivery ship undocked during change mount, docking it.');
+    // Terrible hack.
+    await dockIfNeeded(api, caches.ships, deliveryShip);
+  }
+
+  await dockIfNeeded(api, caches.ships, ship);
+
+  if (ship.countUnits(tradeSymbol) < 1) {
+    try {
+      // Get it from the delivery ship.
+      await transferCargoAndLog(
+        api,
+        caches.ships,
+        from: deliveryShip,
+        to: ship,
+        tradeSymbol: tradeSymbol,
+        units: 1,
+      );
+    } on ApiException catch (e) {
+      shipErr(ship, 'Failed to transfer mount: $e');
+      jobAssert(
+        false,
+        'Failed to transfer mount.',
+        const Duration(minutes: 10),
+      );
+    }
+  }
+  return JobResult.complete();
+}
+
+/// Actually change the mounts on the ship.
+Future<JobResult> doChangeMounts(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final template = assertNotNull(
+    centralCommand.templateForShip(ship),
+    'No template.',
+    const Duration(hours: 1),
+  );
+
+  // TODO(eseidel): This should only remove mounts if we absolutely need to.
+  // This could end up removing mounts before we need to.
+  final toRemove = mountsToRemoveFromShip(ship, template);
+  if (toRemove.isNotEmpty) {
+    // Unmount existing mounts if needed.
+    for (final mount in toRemove) {
+      await removeMountAndLog(
+        api,
+        db,
+        caches.agent,
+        caches.ships,
+        ship,
+        mount,
+      );
+    }
+  }
+
+  // 🛸#6  🔧 MOUNT_MINING_LASER_II on ESEIDEL-6 for 3,600c -> 🏦 89,172c
+  // Mount the new mount.
+  await installMountAndLog(
+    api,
+    db,
+    caches.agent,
+    caches.ships,
+    ship,
+    state.mountToAdd!,
+  );
+  return JobResult.complete();
+}
+
+/// Give the delivery ship any extra mounts we have.
+Future<JobResult> doGiveExtraMounts(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final tradeSymbol = tradeSymbolForMountSymbol(state.mountToAdd!);
+  final deliveryShip = assertNotNull(
+    centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol),
+    'No delivery ship for $tradeSymbol.',
+    const Duration(minutes: 10),
+  );
+
+  // Give the delivery ship our extra mount if we have one.
+  final extraMounts = ship.mountsInCargo();
+  if (extraMounts.isNotEmpty) {
+    // This could send more items than deliveryShip has space for.
+    for (final cargoItem in extraMounts) {
+      await transferCargoAndLog(
+        api,
+        caches.ships,
+        from: ship,
+        to: deliveryShip,
+        tradeSymbol: cargoItem.tradeSymbol,
+        units: cargoItem.units,
+      );
+    }
+  }
+
+  // We're done.
+  state.isComplete = true;
+  jobAssert(
+    false,
+    'Mounting complete!',
+    const Duration(hours: 1),
+  );
+  return JobResult.complete();
+}
+
+/// Advance the behavior of the given ship.
+final advanceMountFromDelivery = const MultiJob('Mount from Delivery', [
+  doInitJob,
+  doPickupJob,
+  doChangeMounts,
+  doGiveExtraMounts,
+]).run;

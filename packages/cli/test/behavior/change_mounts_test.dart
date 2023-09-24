@@ -1,3 +1,4 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/mount_from_delivery.dart';
 import 'package:cli/cache/caches.dart';
@@ -7,6 +8,8 @@ import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
+
+class _MockAgent extends Mock implements Agent {}
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
@@ -45,6 +48,9 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final agentCache = _MockAgentCache();
+    final agent = _MockAgent();
+    when(() => agentCache.agent).thenReturn(agent);
+    when(() => agent.credits).thenReturn(1000000);
     final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
@@ -61,10 +67,10 @@ void main() {
 
     final now = DateTime(2021);
     DateTime getNow() => now;
-    const shipSymbol = ShipSymbol('S', 1);
+    const shipSymbol = ShipSymbol('S', 2);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
@@ -80,6 +86,19 @@ void main() {
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
     when(() => ship.engine).thenReturn(shipEngine);
+    const toMount = TradeSymbol.MOUNT_SURVEYOR_II;
+    final cargoItem = ShipCargoItem(
+      symbol: toMount.value,
+      name: '',
+      description: '',
+      units: 1,
+    );
+    final shipCargo = ShipCargo(
+      capacity: 10,
+      units: 1,
+      inventory: [cargoItem],
+    );
+    when(() => ship.cargo).thenReturn(shipCargo);
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
@@ -115,21 +134,92 @@ void main() {
     when(() => centralCommand.unclaimedMountsAt(symbol))
         .thenReturn(MountSymbolSet.from([ShipMountSymbolEnum.SURVEYOR_II]));
 
+    final deliveryShip = _MockShip();
+    const deliveryShipSymbol = ShipSymbol('S', 1);
+    when(() => deliveryShip.symbol).thenReturn(deliveryShipSymbol.symbol);
+    final deliveryShipNav = _MockShipNav();
+    when(() => deliveryShip.nav).thenReturn(deliveryShipNav);
+    when(() => deliveryShipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(
+      () => centralCommand.getDeliveryShip(shipSymbol, toMount),
+    ).thenReturn(deliveryShip);
+    // Empty, just needed for the "transfer extra" step.
+    final deliveryShipCargo = ShipCargo(capacity: 10, units: 10);
+    when(() => deliveryShip.cargo).thenReturn(deliveryShipCargo);
+
+    when(
+      () => fleetApi.installMount(
+        shipSymbol.symbol,
+        installMountRequest: InstallMountRequest(symbol: toMount.value),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        InstallMount201Response(
+          data: InstallMount201ResponseData(
+            agent: agent,
+            cargo: shipCargo,
+            transaction: ShipModificationTransaction(
+              waypointSymbol: symbol.waypoint,
+              tradeSymbol: TradeSymbol.MOUNT_SURVEYOR_II.value,
+              totalPrice: 100,
+              shipSymbol: shipSymbol.symbol,
+              timestamp: DateTime(2021),
+            ),
+          ),
+        ),
+      ),
+    );
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+
+    // This shouldn't be needed, it's trying to transfer the "extra mount"
+    // back to the delivery ship, because our mocks never update the
+    // inventory of the ship after performing the install to no longer include
+    // the mount we just installed.
+    when(
+      () => fleetApi.transferCargo(
+        shipSymbol.symbol,
+        transferCargoRequest: TransferCargoRequest(
+          shipSymbol: deliveryShipSymbol.symbol,
+          tradeSymbol: toMount,
+          units: 1,
+        ),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        TransferCargo200Response(
+          data: Jettison200ResponseData(
+            cargo: shipCargo,
+          ),
+        ),
+      ),
+    );
+
     final state = BehaviorState(shipSymbol, Behavior.mountFromDelivery);
 
     final logger = _MockLogger();
-    final waitUntil = await runWithLogger(
-      logger,
-      () => advanceMountFromDelivery(
-        api,
-        db,
-        centralCommand,
-        caches,
-        state,
-        ship,
-        getNow: getNow,
+    expect(
+      () async {
+        final waitUntil = await runWithLogger(
+          logger,
+          () => advanceMountFromDelivery(
+            api,
+            db,
+            centralCommand,
+            caches,
+            state,
+            ship,
+            getNow: getNow,
+          ),
+        );
+        return waitUntil;
+      },
+      throwsA(
+        const JobException(
+          'Mounting complete!',
+          Duration(hours: 1),
+        ),
       ),
     );
-    expect(waitUntil, isNull);
   });
 }
