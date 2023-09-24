@@ -22,7 +22,7 @@ enum Behavior {
   deliver,
 
   /// Change mounts on this ship.
-  changeMounts,
+  mountFromDelivery,
 
   /// Explore the universe.
   explorer;

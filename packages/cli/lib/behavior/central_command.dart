@@ -17,7 +17,7 @@ extension BehaviorCacheExtensions on BehaviorCache {
     final claimed = MountSymbolSet();
     for (final state in states) {
       final behavior = state.behavior;
-      if (behavior != Behavior.changeMounts) {
+      if (behavior != Behavior.mountFromDelivery) {
         continue;
       }
       final mountSymbol = state.mountToAdd;
@@ -190,7 +190,7 @@ class CentralCommand {
       ],
       ShipRole.EXCAVATOR: [
         // We'll always upgrade the ship as our best option.
-        Behavior.changeMounts,
+        Behavior.mountFromDelivery,
         if (ship.canMine) Behavior.miner,
         if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
         Behavior.idle,

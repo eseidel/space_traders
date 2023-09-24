@@ -1,5 +1,5 @@
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/change_mounts.dart';
+import 'package:cli/behavior/mount_from_delivery.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
@@ -115,12 +115,12 @@ void main() {
     when(() => centralCommand.unclaimedMountsAt(symbol))
         .thenReturn(MountSymbolSet.from([ShipMountSymbolEnum.SURVEYOR_II]));
 
-    final state = BehaviorState(shipSymbol, Behavior.changeMounts);
+    final state = BehaviorState(shipSymbol, Behavior.mountFromDelivery);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
-      () => advanceChangeMounts(
+      () => advanceMountFromDelivery(
         api,
         db,
         centralCommand,

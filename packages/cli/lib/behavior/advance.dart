@@ -1,10 +1,10 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/change_mounts.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/miner.dart';
+import 'package:cli/behavior/mount_from_delivery.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
@@ -51,8 +51,8 @@ Future<DateTime?> Function(
       return advanceExplorer;
     case Behavior.deliver:
       return advanceDeliver;
-    case Behavior.changeMounts:
-      return advanceChangeMounts;
+    case Behavior.mountFromDelivery:
+      return advanceMountFromDelivery;
     case Behavior.idle:
       return _advanceIdle;
   }

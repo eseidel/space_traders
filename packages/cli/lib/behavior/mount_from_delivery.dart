@@ -16,19 +16,21 @@ ShipMountSymbolEnum? _pickMountFromAvailable(
   return needed.firstWhereOrNull((mount) => available[mount] > 0);
 }
 
-/// Returns ShipCargoItems for mounts in our cargo if any.
-/// Used for getting rid of extra mounts at the end of a change-mounts job.
-Iterable<ShipCargoItem> mountsInCargo(Ship ship) sync* {
-  for (final cargoItem in ship.cargo.inventory) {
-    final isMount = mountSymbolForTradeSymbol(cargoItem.tradeSymbol) != null;
-    if (isMount) {
-      yield cargoItem;
+extension on Ship {
+  /// Returns ShipCargoItems for mounts in our cargo if any.
+  /// Used for getting rid of extra mounts at the end of a change-mounts job.
+  Iterable<ShipCargoItem> mountsInCargo() sync* {
+    for (final cargoItem in cargo.inventory) {
+      final isMount = mountSymbolForTradeSymbol(cargoItem.tradeSymbol) != null;
+      if (isMount) {
+        yield cargoItem;
+      }
     }
   }
 }
 
 /// Change mounts on a ship.
-Future<DateTime?> advanceChangeMounts(
+Future<DateTime?> advanceMountFromDelivery(
   Api api,
   Database db,
   CentralCommand centralCommand,
@@ -125,7 +127,7 @@ Future<DateTime?> advanceChangeMounts(
     );
 
     // Give the delivery ship our extra mount if we have one.
-    final extraMounts = mountsInCargo(ship).toList();
+    final extraMounts = ship.mountsInCargo();
     if (extraMounts.isNotEmpty) {
       // This could send more items than deliveryShip has space for.
       for (final cargoItem in extraMounts) {
