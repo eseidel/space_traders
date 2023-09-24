@@ -17,6 +17,20 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     super.path = defaultCacheFilePath,
   });
 
+  /// Load the price data from the cache or from the url.
+  factory ShipyardPrices.load(
+    FileSystem fs, {
+    String path = defaultCacheFilePath,
+  }) {
+    final prices = JsonListStore.load<ShipyardPrice>(
+          fs,
+          path,
+          ShipyardPrice.fromJson,
+        ) ??
+        [];
+    return ShipyardPrices(prices, fs: fs);
+  }
+
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'data/shipyard_prices.json';
 
@@ -36,21 +50,6 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
 
   /// Get the raw pricing data.
   List<ShipyardPrice> get prices => _prices;
-
-  /// Load the price data from the cache or from the url.
-  // ignore: prefer_constructors_over_static_methods
-  static ShipyardPrices load(
-    FileSystem fs, {
-    String path = defaultCacheFilePath,
-  }) {
-    final prices = JsonListStore.load<ShipyardPrice>(
-          fs,
-          path,
-          ShipyardPrice.fromJson,
-        ) ??
-        [];
-    return ShipyardPrices(prices, fs: fs);
-  }
 
   /// Add new prices to the shipyard price data.
   void addPrices(List<ShipyardPrice> newPrices) {

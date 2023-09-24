@@ -26,8 +26,6 @@ class WaypointCache {
   // uncharted waypoints for a single loop, we could explicitly cache
   // uncharted waypoints for a set amount of time instead?
   final Map<SystemSymbol, List<Waypoint>> _waypointsBySystem = {};
-  // TODO(eseidel): remove _connectedSystemsBySystem.
-  final Map<SystemSymbol, List<ConnectedSystem>> _connectedSystemsBySystem = {};
   final Api _api;
   final SystemsCache _systemsCache;
   final ChartingCache _chartingCache;
@@ -97,44 +95,6 @@ class WaypointCache {
         .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
   }
 
-  /// Fetch the waypoints with the given symbols.
-  Stream<Waypoint> waypointsForSymbols(
-    Iterable<WaypointSymbol> waypointSymbols,
-  ) async* {
-    for (final symbol in waypointSymbols) {
-      yield await waypoint(symbol);
-    }
-  }
-
-  /// Return all connected systems in the given system.
-  Stream<ConnectedSystem> connectedSystems(SystemSymbol systemSymbol) async* {
-    // Don't really need the _connectdSystemsBySystem with the SystemsCache.
-    var cachedSystems = _connectedSystemsBySystem[systemSymbol];
-    if (cachedSystems == null) {
-      cachedSystems = _systemsCache.connectedSystems(systemSymbol);
-      _connectedSystemsBySystem[systemSymbol] = cachedSystems;
-    }
-    for (final system in cachedSystems) {
-      yield system;
-    }
-  }
-
-  /// Returns a list of waypoints in the system with a shipyard.
-  Future<List<Waypoint>> shipyardWaypointsForSystem(
-    SystemSymbol systemSymbol,
-  ) async {
-    final waypoints = await waypointsInSystem(systemSymbol);
-    return waypoints.where((w) => w.hasShipyard).toList();
-  }
-
-  /// Returns a list of waypoints in the system with a marketplace.
-  Future<List<Waypoint>> marketWaypointsForSystem(
-    SystemSymbol systemSymbol,
-  ) async {
-    final waypoints = await waypointsInSystem(systemSymbol);
-    return waypoints.where((w) => w.hasMarketplace).toList();
-  }
-
   /// Yields a stream of Waypoints that are within n jumps of the given system.
   /// Waypoints from the start system are included in the stream.
   /// The stream is roughly ordered by distance from the start.
@@ -167,9 +127,9 @@ class MarketCache {
   final Map<WaypointSymbol, Market?> _marketsBySymbol = {};
   final WaypointCache _waypointCache;
 
-  // TODO(eseidel): This should not exist.  Callers should instead distinguish
-  // between if they want market trade data (which is only availble when
-  // a ship is in orbit).  If they don't, we shouldn't ever return it
+  // TODO(eseidel): MarketCache should not exist. Callers should instead
+  // distinguish between if they want market trade data (which is only available
+  // when a ship is in orbit).  If they don't, we shouldn't ever return it
   // and if we do, we should always fetch from the server.
   /// Used to reset part of the MarketCache every loop over the ships.
   void resetForLoop() {

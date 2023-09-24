@@ -252,14 +252,17 @@ void main() {
         ShipSymbol.fromString('X-B'):
             BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
         ShipSymbol.fromString('X-C'): BehaviorState(
-            ShipSymbol.fromString('X-C'), Behavior.mountFromDelivery)
-          ..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
+          ShipSymbol.fromString('X-C'),
+          Behavior.mountFromDelivery,
+        )..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
         ShipSymbol.fromString('X-D'): BehaviorState(
-            ShipSymbol.fromString('X-D'), Behavior.mountFromDelivery)
-          ..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
+          ShipSymbol.fromString('X-D'),
+          Behavior.mountFromDelivery,
+        )..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
         ShipSymbol.fromString('X-E'): BehaviorState(
-            ShipSymbol.fromString('X-E'), Behavior.mountFromDelivery)
-          ..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_II,
+          ShipSymbol.fromString('X-E'),
+          Behavior.mountFromDelivery,
+        )..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_II,
       },
       fs: MemoryFileSystem.test(),
     );

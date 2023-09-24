@@ -148,9 +148,7 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Return connected systems for the given [systemSymbol].
-  List<ConnectedSystem> connectedSystems(
-    SystemSymbol systemSymbol,
-  ) {
+  List<ConnectedSystem> connectedSystems(SystemSymbol systemSymbol) {
     final cached = _connectedSystems[systemSymbol];
     if (cached != null) {
       return cached;

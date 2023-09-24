@@ -111,8 +111,6 @@ void main() {
     registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
-    when(() => waypointCache.shipyardWaypointsForSystem(symbol.systemSymbol))
-        .thenAnswer((_) => Future.value([waypoint]));
     when(() => waypointCache.waypointsInSystem(symbol.systemSymbol))
         .thenAnswer((_) => Future.value([waypoint]));
     when(() => shipCache.ships).thenReturn([ship]);

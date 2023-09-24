@@ -4,7 +4,8 @@ import 'package:types/types.dart';
 
 void main() {
   test('Behavior round trip', () {
-    // TODO(eseidel): test more BehaviorState fields.
+    // Behavior state fields are all covered by BehaviorState round trip tests
+    // at the types level.
     final behavior = BehaviorState(const ShipSymbol('S', 1), Behavior.idle);
     final map = behaviorStateToColumnMap(behavior);
     final newBehavior = behaviorStateFromColumnMap(map);

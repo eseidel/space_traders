@@ -16,12 +16,8 @@ class WaypointTraitCache extends JsonStore<_Record> {
               r.map((key, value) => MapEntry(key.toJson(), value.toJson())),
         );
 
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/waypoint_traits.json';
-
   /// Load waypoint traits from the cache.
-  // ignore: prefer_constructors_over_static_methods
-  static WaypointTraitCache load(
+  factory WaypointTraitCache.load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
@@ -38,6 +34,9 @@ class WaypointTraitCache extends JsonStore<_Record> {
         {};
     return WaypointTraitCache(valuesBySymbol, fs: fs, path: path);
   }
+
+  /// The default path to the cache file.
+  static const String defaultCacheFilePath = 'data/waypoint_traits.json';
 
   /// The charted values by waypoint symbol.
   Map<WaypointTraitSymbolEnum, WaypointTrait> get _valuesBySymbol => record;

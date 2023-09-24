@@ -101,16 +101,8 @@ class ChartingCache extends JsonStore<_Record> {
           ),
         );
 
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/charts.json';
-
-  /// The cache of waypoint traits.
-  final WaypointTraitCache waypointTraits;
-
   /// Load the charted values from the cache.
-  // TODO(eseidel): Maybe this should be a constructor?
-  // ignore: prefer_constructors_over_static_methods
-  static ChartingCache load(
+  factory ChartingCache.load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
@@ -128,6 +120,12 @@ class ChartingCache extends JsonStore<_Record> {
     final waypointTraits = WaypointTraitCache.load(fs);
     return ChartingCache(valuesBySymbol, waypointTraits, fs: fs, path: path);
   }
+
+  /// The default path to the cache file.
+  static const String defaultCacheFilePath = 'data/charts.json';
+
+  /// The cache of waypoint traits.
+  final WaypointTraitCache waypointTraits;
 
   /// The charted values by waypoint symbol.
   Map<WaypointSymbol, ChartedValues> get _valuesBySymbol => record;

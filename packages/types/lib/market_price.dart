@@ -27,16 +27,6 @@ class MarketPrice {
         tradeVolume = good.tradeVolume,
         timestamp = DateTime.timestamp();
 
-  /// Make a MarketPrice used for comparisons.
-  // TODO(eseidel): remove eventually.
-  MarketPrice.compareOnly({required this.sellPrice})
-      : waypointSymbol = WaypointSymbol.fromString('A-B-C'),
-        symbol = TradeSymbol.COPPER,
-        supply = MarketTradeGoodSupplyEnum.ABUNDANT,
-        tradeVolume = 0,
-        purchasePrice = 0,
-        timestamp = DateTime.timestamp();
-
   /// Create a new price record from a json map.
   factory MarketPrice.fromJson(Map<String, dynamic> json) {
     return MarketPrice(

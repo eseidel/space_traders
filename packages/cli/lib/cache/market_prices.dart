@@ -105,12 +105,8 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     super.path = defaultCacheFilePath,
   });
 
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/prices.json';
-
   /// Load the price data from the cache.
-  // ignore: prefer_constructors_over_static_methods
-  static MarketPrices load(
+  factory MarketPrices.load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
@@ -122,6 +118,9 @@ class MarketPrices extends JsonListStore<MarketPrice> {
         [];
     return MarketPrices(prices, fs: fs, path: path);
   }
+
+  /// The default path to the cache file.
+  static const String defaultCacheFilePath = 'data/prices.json';
 
   /// Get the count of unique waypoints.
   int get waypointCount {
@@ -200,7 +199,6 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// Get the percentile for the sell price (you sell to them) of a trade good.
   int? percentileForSellPrice(TradeSymbol symbol, int sellPrice) {
     const compareTo = _sellPriceAcending;
-    final price = MarketPrice.compareOnly(sellPrice: sellPrice);
     final pricesForSymbol = pricesFor(symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
@@ -209,8 +207,8 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // Find the first index where the sorted price is greater than the price
     // being compared.
-    var index =
-        pricesForSymbolSorted.indexWhere((e) => compareTo(e, price) > 0);
+    var index = pricesForSymbolSorted
+        .indexWhere((e) => e.sellPrice.compareTo(sellPrice) > 0);
     // If we ran off the end, we know that the price is greater than all
     // the prices in the list. i.e. 100th percentile.
     if (index == -1) {

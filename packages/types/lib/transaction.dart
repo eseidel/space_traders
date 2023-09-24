@@ -146,9 +146,12 @@ class Transaction {
     ShipModificationTransaction transaction,
     int agentCredits,
   ) {
-    // TODO(eseidel): Is this a ShipMountSymbol?
     // Using a local to force non-null.
     final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol)!;
+    assert(
+      mountSymbolForTradeSymbol(tradeSymbol) != null,
+      'Shipyard transaction with unknown mount symbol: $tradeSymbol',
+    );
     return Transaction(
       transactionType: TransactionType.shipModification,
       // shipSymbol is the new ship, not the ship that made the transaction.
