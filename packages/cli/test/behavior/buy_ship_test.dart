@@ -117,33 +117,14 @@ void main() {
         .thenAnswer((_) => Future.value([waypoint]));
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => shipCache.frameCounts).thenReturn({});
-    final state = BehaviorState(shipSymbol, Behavior.buyShip);
 
     const shipType = ShipType.HEAVY_FREIGHTER;
-    when(() => shipyardPrices.medianPurchasePrice(shipType)).thenReturn(1);
-    when(
-      () => shipyardPrices.recentPurchasePrice(
+    final state = BehaviorState(shipSymbol, Behavior.buyShip)
+      ..shipBuyJob = ShipBuyJob(
+        shipType: shipType,
         shipyardSymbol: symbol,
-        shipType: shipType,
-      ),
-    ).thenReturn(1);
-    when(() => shipyardPrices.pricesFor(shipType)).thenReturn([
-      ShipyardPrice(
-        waypointSymbol: symbol,
-        shipType: shipType,
-        purchasePrice: 1,
-        timestamp: DateTime(2021),
-      ),
-    ]);
-
-    when(
-      () => centralCommand.shipTypeToBuy(
-        ship,
-        shipyardPrices,
-        agentCache,
-        symbol,
-      ),
-    ).thenReturn(shipType);
+        minCreditsNeeded: 10000,
+      );
 
     final systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
@@ -187,8 +168,6 @@ void main() {
       ),
     );
     when(() => api.fleet).thenReturn(fleetApi);
-
-    when(() => centralCommand.maxMedianShipPriceMultipler).thenReturn(1.05);
 
     final route = _MockRoutePlan();
     when(

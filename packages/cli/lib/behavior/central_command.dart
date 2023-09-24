@@ -51,7 +51,14 @@ class CentralCommand {
 
   final BehaviorCache _behaviorCache;
   final ShipCache _shipCache;
+
+  /// How old can explorer data be before we refresh it?
   Duration _maxAgeForExplorerData = const Duration(days: 3);
+
+  /// The next planned ship buy job.
+  /// This is the start of an imagined job queue system, whereby we pre-populate
+  /// BehaviorStates with jobs when handing them out to ships.
+  ShipBuyJob? _nextShipBuyJob;
 
   /// Returns true if contract trading is enabled.
   /// We will only accept and start new contracts when this is true.
@@ -133,22 +140,34 @@ class CentralCommand {
     return totalNeeded;
   }
 
+  /// Returns an initialized behavior state for the given [ship] to start
+  /// its next job.
+  BehaviorState getJobForShip(Ship ship, int credits) {
+    BehaviorState toState(Behavior behavior) {
+      return BehaviorState(ship.shipSymbol, behavior);
+    }
+
+    if (ship.isOutOfFuel) {
+      return toState(Behavior.idle);
+    }
+    if (shouldBuyShip(ship, credits)) {
+      return BehaviorState(ship.shipSymbol, Behavior.buyShip)
+        ..shipBuyJob = takeShipBuyJob();
+    }
+    return toState(chooseNewBehaviorFor(ship, credits));
+  }
+
   // Consider a config file like:
   // https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
   // instead of having this dynamic behavior function.
   /// What behavior should the given ship be doing?
-  Behavior behaviorFor(Ship ship) {
-    if (ship.isOutOfFuel) {
-      return Behavior.idle;
-    }
-
+  Behavior chooseNewBehaviorFor(Ship ship, int credits) {
     final shipCount = _shipCache.ships.length;
 
     final behaviors = {
       ShipRole.COMMAND: [
         // We should deliver first, but deliver can get stuck, so we'll
         // try to buy a ship first.
-        Behavior.buyShip,
         // If we can get mounts for our ships, that's the best thing we can do.
         Behavior.deliver,
         // Will only trade if we can make 6/s or more.
@@ -233,12 +252,11 @@ class CentralCommand {
 
   // This feels wrong.
   /// Load or create the right behavior state for [ship].
-  Future<BehaviorState> loadBehaviorState(Ship ship) async {
+  Future<BehaviorState> loadBehaviorState(Ship ship, int credits) async {
     final shipSymbol = ship.shipSymbol;
     final state = _behaviorCache.getBehavior(shipSymbol);
     if (state == null) {
-      final behavior = behaviorFor(ship);
-      final newState = BehaviorState(ship.shipSymbol, behavior);
+      final newState = getJobForShip(ship, credits);
       _behaviorCache.setBehavior(shipSymbol, newState);
     }
     return _behaviorCache.getBehavior(shipSymbol)!;
@@ -368,34 +386,69 @@ class CentralCommand {
   Iterable<SystemSymbol> otherTraderSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
-  /// Determine what type of ship to buy.
-  ShipType? shipTypeToBuy(
-    Ship ship,
-    ShipyardPrices shipyardPrices,
-    AgentCache agentCache,
-    WaypointSymbol shipyardSymbol,
-  ) {
-    // Buy ships based on earnings of that ship type over the last N hours?
-    final systemSymbol = ship.systemSymbol;
-    final hqSystemSymbol = agentCache.headquartersSymbol.systemSymbol;
-    final inStartSystem = systemSymbol == hqSystemSymbol;
-
-    final houndCount = _shipCache.countOfType(ShipType.ORE_HOUND);
-    if (houndCount < 80) {
-      if (inStartSystem) {
-        return ShipType.ORE_HOUND;
-      } else {
-        return null;
-      }
-    } else if (_shipCache.countOfType(ShipType.HEAVY_FREIGHTER) < 10) {
-      return ShipType.HEAVY_FREIGHTER;
-    } else {
-      return null;
-    }
+  /// Give central planning a chance to advance.
+  Future<void> advanceCentralPlanning(Api api, Caches caches) async {
+    _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
   }
 
-  /// What the max multiplier of median we would pay for a ship.
-  double get maxMedianShipPriceMultipler => 1.1;
+  /// Returns the next ship buy job.
+  ShipBuyJob? get nextShipBuyJob => _nextShipBuyJob;
+
+  /// Takes and clears the next ship buy job.
+  ShipBuyJob? takeShipBuyJob() {
+    final job = _nextShipBuyJob;
+    _nextShipBuyJob = null;
+    return job;
+  }
+
+  /// Computes the next ship buy job.
+  Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
+    final agentCache = caches.agent;
+    final waypointCache = caches.waypoints;
+    final shipCount = _shipCache.ships.length;
+    if (shipCount > 80) {
+      return null;
+    }
+    // if our ship count is < 80, return an ore hound.
+    final hqSystem = agentCache.headquartersSymbol.systemSymbol;
+    final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
+    final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
+    final recentPrice = caches.shipyardPrices.recentPurchasePrice(
+      shipType: ShipType.ORE_HOUND,
+      shipyardSymbol: shipyard.waypointSymbol,
+    );
+    if (recentPrice == null) {
+      return null;
+    }
+    return ShipBuyJob(
+      shipType: ShipType.ORE_HOUND,
+      shipyardSymbol: shipyard.waypointSymbol,
+      minCreditsNeeded: (recentPrice * 1.05).toInt(),
+    );
+  }
+
+  /// Returns true if [ship] should start the buyShip behavior.
+  bool shouldBuyShip(Ship ship, int credits) {
+    // Are there any other ships actively buying a ship?
+    if (_behaviorCache.states.any((s) => s.behavior == Behavior.buyShip)) {
+      return false;
+    }
+    // Do we have a ship we want to buy?
+    final buyJob = nextShipBuyJob;
+    if (buyJob == null) {
+      return false;
+    }
+    // Do we have enough credits to buy a ship
+    if (credits < buyJob.minCreditsNeeded) {
+      return false;
+    }
+    // Is this ship within the same system or the command ship?
+    if (ship.systemSymbol != buyJob.shipyardSymbol.systemSymbol &&
+        !ship.isCommand) {
+      return false;
+    }
+    return true;
+  }
 
   /// How many haulers do we have?
   int get numberOfHaulers =>

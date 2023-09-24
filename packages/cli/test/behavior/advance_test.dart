@@ -9,6 +9,10 @@ import 'package:types/types.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockAgent extends Mock implements Agent {}
+
+class _MockAgentCache extends Mock implements AgentCache {}
+
 class _MockBehaviorCache extends Mock implements BehaviorCache {}
 
 class _MockCaches extends Mock implements Caches {}
@@ -52,10 +56,15 @@ void main() {
     when(() => caches.behaviors).thenReturn(behaviorCache);
     final shipCache = _MockShipCache();
     when(() => caches.ships).thenReturn(shipCache);
+    final agentCache = _MockAgentCache();
+    when(() => caches.agent).thenReturn(agentCache);
+    final agent = _MockAgent();
+    when(() => agentCache.agent).thenReturn(agent);
+    when(() => agent.credits).thenReturn(1000000);
 
     final behaviorState = BehaviorState(shipSymbol, Behavior.idle);
     final centralCommand = _MockCentralCommand();
-    when(() => centralCommand.loadBehaviorState(ship))
+    when(() => centralCommand.loadBehaviorState(ship, any()))
         .thenAnswer((_) => Future.value(behaviorState));
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -86,6 +95,11 @@ void main() {
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
     final shipCache = _MockShipCache();
     when(() => caches.ships).thenReturn(shipCache);
+    final agentCache = _MockAgentCache();
+    when(() => caches.agent).thenReturn(agentCache);
+    final agent = _MockAgent();
+    when(() => agentCache.agent).thenReturn(agent);
+    when(() => agent.credits).thenReturn(1000000);
 
     final now = DateTime(2021);
     final arrivalTime = now.add(const Duration(seconds: 1));
@@ -99,7 +113,7 @@ void main() {
     when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
     final centralCommand = _MockCentralCommand();
 
-    when(() => centralCommand.loadBehaviorState(ship)).thenAnswer(
+    when(() => centralCommand.loadBehaviorState(ship, any())).thenAnswer(
       (_) => Future.value(BehaviorState(shipSymbol, Behavior.idle)),
     );
 

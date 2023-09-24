@@ -34,8 +34,9 @@ class _MockShipNav extends Mock implements ShipNav {}
 class _MockShipFrame extends Mock implements ShipFrame {}
 
 void main() {
-  test('CentralCommand.behaviorFor', () async {
+  test('CentralCommand.chooseNewBehaviorFor', () async {
     final behaviorCache = _MockBehhaviorCache();
+    when(() => behaviorCache.states).thenReturn([]);
     final shipCache = _MockShipCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
@@ -59,8 +60,10 @@ void main() {
     when(() => ship.fuel).thenReturn(shipFuel);
     final logger = _MockLogger();
     // Ship types we've never heard of, just return idle.
-    final behavior =
-        runWithLogger(logger, () => centralCommand.behaviorFor(ship));
+    final behavior = runWithLogger(
+      logger,
+      () => centralCommand.chooseNewBehaviorFor(ship, 100),
+    );
     expect(behavior, Behavior.idle);
   });
 

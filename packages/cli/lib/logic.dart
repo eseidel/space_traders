@@ -32,6 +32,7 @@ Future<void> advanceShips(
   // loopCount is only used to control how often we reset our waypoint and
   // market caches.  If we got rid of those we could get rid of loopCount.
   await caches.updateAtTopOfLoop(api);
+  await centralCommand.advanceCentralPlanning(api, caches);
 
   // loop over all ships and advance them.
   for (var i = 0; i < loopCount; i++) {

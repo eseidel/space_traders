@@ -50,6 +50,7 @@ class BehaviorState {
     this.routePlan,
     this.mountToAdd,
     this.buyJob,
+    this.shipBuyJob,
     this.deliverJob,
     this.jobIndex = 0,
   }) : isComplete = false;
@@ -73,6 +74,9 @@ class BehaviorState {
     final deliverJob = json['deliverJob'] == null
         ? null
         : DeliverJob.fromJson(json['deliverJob'] as Map<String, dynamic>);
+    final shipBuyJob = json['shipBuyJob'] == null
+        ? null
+        : ShipBuyJob.fromJson(json['shipBuyJob'] as Map<String, dynamic>);
     final jobIndex = json['jobIndex'] as int? ?? 0;
     return BehaviorState(
       shipSymbol,
@@ -82,6 +86,7 @@ class BehaviorState {
       mountToAdd: mountToAdd,
       buyJob: buyJob,
       deliverJob: deliverJob,
+      shipBuyJob: shipBuyJob,
       jobIndex: jobIndex,
     );
   }
@@ -110,6 +115,9 @@ class BehaviorState {
   /// Mount to add.
   ShipMountSymbolEnum? mountToAdd;
 
+  /// Used by Behavior.buyShip for buying a ship.
+  ShipBuyJob? shipBuyJob;
+
   /// This behavior is complete.
   /// Never written to disk (instead the behavior state is deleted).
   bool isComplete;
@@ -124,6 +132,7 @@ class BehaviorState {
       'mountToAdd': mountToAdd?.toJson(),
       'buyJob': buyJob?.toJson(),
       'deliverJob': deliverJob?.toJson(),
+      'shipBuyJob': shipBuyJob?.toJson(),
       'jobIndex': jobIndex,
     };
   }
@@ -200,6 +209,47 @@ class DeliverJob {
     return <String, dynamic>{
       'tradeSymbol': tradeSymbol.toJson(),
       'waypointSymbol': waypointSymbol.toJson(),
+    };
+  }
+}
+
+/// Job to buy a ship.
+class ShipBuyJob {
+  /// Create a new ship buy job.
+  ShipBuyJob({
+    required this.shipType,
+    required this.shipyardSymbol,
+    required this.minCreditsNeeded,
+  });
+
+  /// Create a new ship buy job from JSON.
+  factory ShipBuyJob.fromJson(Map<String, dynamic> json) {
+    final shipType = ShipType.fromJson(json['shipType'] as String)!;
+    final shipyardSymbol =
+        WaypointSymbol.fromJson(json['shipyardSymbol'] as String);
+    final minCreditsNeeded = json['minCreditsNeeded'] as int;
+    return ShipBuyJob(
+      shipType: shipType,
+      shipyardSymbol: shipyardSymbol,
+      minCreditsNeeded: minCreditsNeeded,
+    );
+  }
+
+  /// The type of ship to buy.
+  final ShipType shipType;
+
+  /// The waypoint to buy the ship at.
+  final WaypointSymbol shipyardSymbol;
+
+  /// Number of credits we expect to need to do this buy.
+  final int minCreditsNeeded;
+
+  /// Convert this to JSON.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'shipType': shipType.toJson(),
+      'shipyardSymbol': shipyardSymbol.toJson(),
+      'minCreditsNeeded': minCreditsNeeded,
     };
   }
 }

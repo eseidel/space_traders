@@ -69,7 +69,8 @@ Future<DateTime?> advanceShipBehavior(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final state = await centralCommand.loadBehaviorState(ship);
+  final state =
+      await centralCommand.loadBehaviorState(ship, caches.agent.agent.credits);
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,
