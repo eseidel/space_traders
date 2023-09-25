@@ -294,6 +294,14 @@ Future<JobResult> doMineJob(
   // Both surveying and mining require being undocked.
   await undockIfNeeded(api, caches.ships, ship);
 
+  // We need to be off cooldown to continue.
+  final expiration = ship.cooldown.expiration;
+  if (expiration != null && expiration.isAfter(getNow())) {
+    final duration = expiration.difference(getNow());
+    shipDetail(ship, 'Waiting ${approximateDuration(duration)} on cooldown.');
+    return JobResult.wait(expiration);
+  }
+
   // See if we have a good survey to mine.
   final maybeSurvey = await surveyWorthMining(
     db,

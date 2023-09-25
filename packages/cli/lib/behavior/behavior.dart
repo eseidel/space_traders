@@ -145,7 +145,7 @@ class MultiJob {
     DateTime Function() getNow = defaultGetNow,
   }) async {
     for (var i = 0; i < 10; i++) {
-      shipInfo(ship, '$name ${state.jobIndex}');
+      shipDetail(ship, '$name ${state.jobIndex}');
       jobAssert(
         state.jobIndex >= 0 && state.jobIndex < jobFunctions.length,
         'Invalid job index ${state.jobIndex}',
@@ -161,12 +161,12 @@ class MultiJob {
         caches,
         ship,
       );
-      shipInfo(ship, '$name ${state.jobIndex} $result');
+      shipDetail(ship, '$name ${state.jobIndex} $result');
       if (result.isComplete) {
         state.jobIndex++;
         if (state.jobIndex >= jobFunctions.length) {
           state.isComplete = true;
-          shipInfo(ship, '$name complete!');
+          shipDetail(ship, '$name complete!');
           return null;
         }
       }
