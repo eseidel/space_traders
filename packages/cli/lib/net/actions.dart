@@ -380,7 +380,9 @@ Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
   final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol.system);
   final response =
       await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
-  ship.nav = response!.data.nav;
+  ship
+    ..nav = response!.data.nav
+    ..cooldown = response.data.cooldown;
   shipCache.updateShip(ship);
   // shipDetail(ship, 'Used Jump Gate to $systemSymbol');
   return response.data;
@@ -559,11 +561,14 @@ void recordSurveys(
 Future<CreateSurvey201ResponseData> surveyAndLog(
   Api api,
   Database db,
+  ShipCache shipCache,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final outer = await api.fleet.createSurvey(ship.symbol);
   final response = outer!.data;
+  ship.cooldown = response.cooldown;
+  shipCache.updateShip(ship);
   final count = response.surveys.length;
   shipInfo(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
   recordSurveys(db, response.surveys, getNow: getNow);

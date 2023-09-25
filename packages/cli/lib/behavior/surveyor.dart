@@ -42,7 +42,8 @@ Future<DateTime?> advanceSurveyor(
 
   // Surveying requires being undocked.
   await undockIfNeeded(api, caches.ships, ship);
-  final response = await surveyAndLog(api, db, ship, getNow: getNow);
+  final response =
+      await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
   // Each survey is the whole behavior.
   state.isComplete = true;
   return response.cooldown.expiration;

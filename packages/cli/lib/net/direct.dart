@@ -69,9 +69,13 @@ Future<NavigateShip200ResponseData> navigateShip(
 Future<ExtractResources201ResponseData> extractResources(
   Api api,
   Ship ship,
+  ShipCache shipCache,
 ) async {
   final response = await api.fleet.extractResources(ship.symbol);
-  ship.cargo = response!.data.cargo;
+  ship
+    ..cargo = response!.data.cargo
+    ..cooldown = response.data.cooldown;
+  shipCache.updateShip(ship);
   return response.data;
 }
 
@@ -80,11 +84,15 @@ Future<ExtractResources201ResponseData> extractResources(
 Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
   Api api,
   Ship ship,
+  ShipCache shipCache,
   Survey survey,
 ) async {
   final response =
       await api.fleet.extractResourcesWithSurvey(ship.symbol, survey: survey);
-  ship.cargo = response!.data.cargo;
+  ship
+    ..cargo = response!.data.cargo
+    ..cooldown = response.data.cooldown;
+  shipCache.updateShip(ship);
   return response.data;
 }
 

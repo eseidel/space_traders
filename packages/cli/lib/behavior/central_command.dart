@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';

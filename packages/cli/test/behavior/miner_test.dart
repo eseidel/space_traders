@@ -228,9 +228,9 @@ void main() {
           data: ExtractResources201ResponseData(
             cooldown: Cooldown(
               shipSymbol: shipSymbol.symbol,
-              remainingSeconds: 0,
+              remainingSeconds: 10,
               expiration: now,
-              totalSeconds: 0,
+              totalSeconds: 21,
             ),
             extraction: Extraction(
               shipSymbol: shipSymbol.symbol,
@@ -262,7 +262,16 @@ void main() {
         getNow: getNow,
       ),
     );
-    expect(waitUntil, DateTime(2021));
+    // Does not wait after mining, but does set cooldown.
+    expect(waitUntil, null);
+    verify(
+      () => ship.cooldown = Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        remainingSeconds: 10,
+        expiration: DateTime(2021),
+        totalSeconds: 21,
+      ),
+    ).called(1);
   });
 
   test('maxExtractedUnits', () {

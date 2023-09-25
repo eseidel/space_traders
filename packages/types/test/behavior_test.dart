@@ -44,6 +44,10 @@ void main() {
         shipyardSymbol: WaypointSymbol.fromString('W-A-Y'),
         shipType: ShipType.EXPLORER,
       ),
+      mineJob: MineJob(
+        mine: WaypointSymbol.fromString('S-A-W'),
+        market: WaypointSymbol.fromString('S-A-W'),
+      ),
     );
     final json = state.toJson();
     final newState = BehaviorState.fromJson(json);

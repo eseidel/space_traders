@@ -33,11 +33,6 @@ enum Behavior {
 }
 
 /// Class holding the persistent state for a behavior.
-// Want this to be lifetime managed in way such that Behavior's can clear it
-// as well as that it's auto-cleaned up if not acknowledged by the behavior
-// or on error.
-// Also want a way for Behavior's to vote that they should not be the current
-// behavior for that ship or ship-type for some timeout.
 class BehaviorState {
   /// Create a new behavior state.
   BehaviorState(
@@ -50,6 +45,7 @@ class BehaviorState {
     this.deliverJob,
     this.pickupJob,
     this.mountJob,
+    this.mineJob,
     this.jobIndex = 0,
   }) : isComplete = false;
 
@@ -78,6 +74,9 @@ class BehaviorState {
     final mountJob = json['mountJob'] == null
         ? null
         : MountJob.fromJson(json['mountJob'] as Map<String, dynamic>);
+    final mineJob = json['mineJob'] == null
+        ? null
+        : MineJob.fromJson(json['mineJob'] as Map<String, dynamic>);
     final jobIndex = json['jobIndex'] as int? ?? 0;
     return BehaviorState(
       shipSymbol,
@@ -89,6 +88,7 @@ class BehaviorState {
       shipBuyJob: shipBuyJob,
       pickupJob: pickupJob,
       mountJob: mountJob,
+      mineJob: mineJob,
       jobIndex: jobIndex,
     );
   }
@@ -123,6 +123,9 @@ class BehaviorState {
   /// Used by Behavior.buyShip for buying a ship.
   ShipBuyJob? shipBuyJob;
 
+  /// Used by Behavior.miner for mining.
+  MineJob? mineJob;
+
   /// This behavior is complete.
   /// Never written to disk (instead the behavior state is deleted).
   bool isComplete;
@@ -139,6 +142,7 @@ class BehaviorState {
       'shipBuyJob': shipBuyJob?.toJson(),
       'mountJob': mountJob?.toJson(),
       'pickupJob': pickupJob?.toJson(),
+      'mineJob': mineJob?.toJson(),
       'jobIndex': jobIndex,
     };
   }
@@ -186,9 +190,10 @@ class BuyJob {
 }
 
 /// Deliver tradeSymbol to waypointSymbol and wait until they're all gone.
+@immutable
 class DeliverJob {
   /// Create a new deliver job.
-  DeliverJob({
+  const DeliverJob({
     required this.tradeSymbol,
     required this.waypointSymbol,
   });
@@ -220,9 +225,10 @@ class DeliverJob {
 }
 
 /// Pickup tradeSymbol from deliveryShip at waypointSymbol.
+@immutable
 class PickupJob {
   /// Create a new pickup job.
-  PickupJob({
+  const PickupJob({
     required this.tradeSymbol,
     required this.waypointSymbol,
   });
@@ -256,9 +262,10 @@ class PickupJob {
 }
 
 /// Mount the given mountSymbol at the given shipyardSymbol.
+@immutable
 class MountJob {
   /// Create a new mount job.
-  MountJob({
+  const MountJob({
     required this.mountSymbol,
     required this.shipyardSymbol,
   });
@@ -292,9 +299,10 @@ class MountJob {
 }
 
 /// Job to buy a ship.
+@immutable
 class ShipBuyJob {
   /// Create a new ship buy job.
-  ShipBuyJob({
+  const ShipBuyJob({
     required this.shipType,
     required this.shipyardSymbol,
     required this.minCreditsNeeded,
@@ -328,6 +336,34 @@ class ShipBuyJob {
       'shipType': shipType.toJson(),
       'shipyardSymbol': shipyardSymbol.toJson(),
       'minCreditsNeeded': minCreditsNeeded,
+    };
+  }
+}
+
+/// Extract resources from a mine.
+@immutable
+class MineJob {
+  /// Create a new mine job.
+  const MineJob({required this.mine, required this.market});
+
+  /// Create a new mine job from JSON.
+  factory MineJob.fromJson(Map<String, dynamic> json) {
+    final mine = WaypointSymbol.fromJson(json['mine'] as String);
+    final market = WaypointSymbol.fromJson(json['market'] as String);
+    return MineJob(mine: mine, market: market);
+  }
+
+  /// The mine to extract from.
+  final WaypointSymbol mine;
+
+  /// The market to value goods against.
+  final WaypointSymbol market;
+
+  /// Convert this to JSON.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'mine': mine.toJson(),
+      'market': market.toJson(),
     };
   }
 }

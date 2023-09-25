@@ -215,15 +215,15 @@ Future<NavResult> continueNavigationIfNeeded(
       );
       // We don't return the cooldown time here because that would needlessly
       // delay the next action if the next action does not require a cooldown.
-      final reactorCooloff = response.cooldown.expiration!;
-      shipCache.setReactorCooldown(ship, reactorCooloff);
       final nextAction = routePlan.actionAfter(action);
       if (nextAction == null) {
         return NavResult._continueAction();
       }
       if (nextAction.usesReactor()) {
         // We need to wait for the reactor to cool down.
-        return NavResult._wait(reactorCooloff);
+        // We know that ship.cooldown.expiration is non-null because it
+        // was just set by useJumpGateAndLog.
+        return NavResult._wait(ship.cooldown.expiration!);
       }
       // Otherwise loop immediately since we don't need to wait for the reactor.
       return NavResult._loop();

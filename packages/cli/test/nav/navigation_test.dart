@@ -10,21 +10,35 @@ import 'package:types/types.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockCentralCommand extends Mock implements CentralCommand {}
+
 class _MockFleetApi extends Mock implements FleetApi {}
+
+class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
+class _MockShipCache extends Mock implements ShipCache {}
 
-class _MockLogger extends Mock implements Logger {}
+class _MockShipCargo extends Mock implements ShipCargo {}
+
+class _MockShipCrew extends Mock implements ShipCrew {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
+
+class _MockShipFrame extends Mock implements ShipFrame {}
+
+class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockCentralCommand extends Mock implements CentralCommand {}
+class _MockShipReactor extends Mock implements ShipReactor {}
 
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockShipRegistration extends Mock implements ShipRegistration {}
+
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
@@ -93,17 +107,32 @@ void main() {
     verifyNever(() => shipNav.status = ShipNavStatus.IN_ORBIT);
   });
 
-  test('continueNavigationIfNeeded sets reactorCooldown after jump', () async {
+  test('continueNavigationIfNeeded sets cooldown after jump', () async {
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    final ship = _MockShip();
     final systemsCache = _MockSystemsCache();
     final shipCache = _MockShipCache();
     final shipNav = _MockShipNav();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    when(() => ship.nav).thenReturn(shipNav);
+    // We use a real Ship to allow setting/reading from cooldown.
+    final ship = Ship(
+      symbol: shipSymbol.symbol,
+      cooldown: Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        totalSeconds: 0,
+        remainingSeconds: 0,
+      ),
+      nav: shipNav,
+      reactor: _MockShipReactor(),
+      engine: _MockShipEngine(),
+      registration: _MockShipRegistration(),
+      frame: _MockShipFrame(),
+      crew: _MockShipCrew(),
+      cargo: _MockShipCargo(),
+      fuel: _MockShipFuel(),
+    );
+
     final centralCommand = _MockCentralCommand();
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
 
@@ -205,7 +234,15 @@ void main() {
     // We don't need to return after this jump since the next action may not
     // need the reactor.
     expect(singleJumpResult.shouldReturn(), false);
-    verify(() => shipCache.setReactorCooldown(ship, reactorExpiry)).called(1);
+    expect(
+      ship.cooldown,
+      Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        remainingSeconds: 100,
+        expiration: reactorExpiry,
+        totalSeconds: 100,
+      ),
+    );
 
     final jumpTwoSymbol = WaypointSymbol.fromString('G-H-I');
     state.routePlan = RoutePlan(
@@ -228,6 +265,12 @@ void main() {
       fuelUsed: 100,
     );
 
+    // Reset the cooldown.
+    ship.cooldown = Cooldown(
+      shipSymbol: shipSymbol.symbol,
+      totalSeconds: 0,
+      remainingSeconds: 0,
+    );
     final betweenJumpsResult = await runWithLogger(
       logger,
       () => continueNavigationIfNeeded(
@@ -243,6 +286,6 @@ void main() {
     // We don't need to return after this jump since the next action may not
     // need the reactor.
     expect(betweenJumpsResult.shouldReturn(), true);
-    verify(() => shipCache.setReactorCooldown(ship, reactorExpiry)).called(1);
+    expect(ship.cooldown.expiration, reactorExpiry);
   });
 }
