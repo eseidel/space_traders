@@ -190,7 +190,14 @@ void main() {
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
-    when(() => ship.mounts).thenReturn([]);
+    when(() => ship.mounts).thenReturn([
+      ShipMount(
+        symbol: ShipMountSymbolEnum.MINING_LASER_II,
+        name: '',
+        requirements: ShipRequirements(),
+        strength: 10,
+      ),
+    ]);
 
     when(() => centralCommand.mineJobForShip(systemsCache, agentCache, ship))
         .thenReturn(MineJob(mine: symbol, market: symbol));
