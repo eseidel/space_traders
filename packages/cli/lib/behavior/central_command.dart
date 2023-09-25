@@ -12,18 +12,16 @@ import 'package:types/types.dart';
 
 /// BehaviorCache extension methods for CentralCommand.
 extension BehaviorCacheExtensions on BehaviorCache {
-  /// Returns the counts of mounts already claimed.
+  /// Returns the counts of mounts already claimed for pickup.
   MountSymbolSet claimedMounts() {
     final claimed = MountSymbolSet();
     for (final state in states) {
-      final behavior = state.behavior;
-      if (behavior != Behavior.mountFromDelivery) {
+      final pickupSymbol = state.pickupJob?.tradeSymbol;
+      if (pickupSymbol == null) {
         continue;
       }
-      final mountSymbol = state.mountToAdd;
-      if (mountSymbol == null) {
-        continue;
-      }
+      // TODO(eseidel): Fix to use TradeSymbol instead of MountSymbol.
+      final mountSymbol = mountSymbolForTradeSymbol(pickupSymbol)!;
       claimed.add(mountSymbol);
     }
     return claimed;

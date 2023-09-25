@@ -4,6 +4,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/deliver.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/miner.dart';
+import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/behavior/mount_from_delivery.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/behavior/trader.dart';
@@ -53,6 +54,8 @@ Future<DateTime?> Function(
       return advanceDeliver;
     case Behavior.mountFromDelivery:
       return advanceMountFromDelivery;
+    case Behavior.mountFromBuy:
+      return advanceMountFromBuy;
     case Behavior.idle:
       return _advanceIdle;
   }

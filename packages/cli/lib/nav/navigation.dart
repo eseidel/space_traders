@@ -200,6 +200,9 @@ Future<NavResult> continueNavigationIfNeeded(
   final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
   await undockIfNeeded(api, shipCache, ship);
   switch (action.type) {
+    case RouteActionType.emptyRoute:
+      shipWarn(ship, 'Empty route action, assuming we are already there.');
+      return NavResult._continueAction();
     case RouteActionType.jump:
       final response =
           await useJumpGateAndLog(api, shipCache, ship, actionEnd.systemSymbol);

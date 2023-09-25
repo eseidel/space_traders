@@ -295,11 +295,10 @@ class RoutePlanner {
     // TODO(eseidel): This is wrong.  An empty route is not valid.
     if (start.waypoint == end.waypoint) {
       // throw ArgumentError('Cannot plan route between same waypoint');
-      return RoutePlan(
-        actions: const [],
+      return RoutePlan.empty(
+        symbol: start,
         fuelCapacity: fuelCapacity,
         shipSpeed: shipSpeed,
-        fuelUsed: 0,
       );
     }
 

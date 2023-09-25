@@ -3,6 +3,11 @@ import 'package:types/types.dart';
 
 /// Enum describing the type of action taken in a action in a route.
 enum RouteActionType {
+  /// Lets us have a RoutePlan which does nothing.
+  /// Used by apis which ask "what route do I take to get to this waypoint?"
+  /// and there is no action to take.
+  emptyRoute,
+
   /// Jump between two jump gates.
   jump,
   // REFUEL,
@@ -16,6 +21,8 @@ enum RouteActionType {
   /// Returns true if this action uses the reactor.
   bool usesReactor() {
     switch (this) {
+      case RouteActionType.emptyRoute:
+        return false;
       case RouteActionType.jump:
         return true;
       case RouteActionType.navCruise:
@@ -85,6 +92,21 @@ class RoutePlan {
     required this.actions,
     required this.fuelUsed,
   });
+
+  /// Create a new empty route plan that does nothing.
+  RoutePlan.empty({
+    required WaypointSymbol symbol,
+    required this.fuelCapacity,
+    required this.shipSpeed,
+  })  : actions = <RouteAction>[
+          RouteAction(
+            startSymbol: symbol,
+            endSymbol: symbol,
+            type: RouteActionType.jump,
+            duration: 0,
+          ),
+        ],
+        fuelUsed = 0;
 
   /// Create a new route plan from JSON.
   factory RoutePlan.fromJson(Map<String, dynamic> json) {

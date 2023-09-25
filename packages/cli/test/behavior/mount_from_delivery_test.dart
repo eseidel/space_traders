@@ -111,7 +111,6 @@ void main() {
       ),
     ]);
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
-    when(() => waypoint.systemSymbol).thenReturn(symbol.system);
 
     registerFallbackValue(symbol);
     when(() => waypointCache.waypoint(any()))
@@ -195,7 +194,15 @@ void main() {
       ),
     );
 
-    final state = BehaviorState(shipSymbol, Behavior.mountFromDelivery);
+    final state = BehaviorState(shipSymbol, Behavior.mountFromDelivery)
+      ..pickupJob = PickupJob(
+        tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
+        waypointSymbol: symbol,
+      )
+      ..mountJob = MountJob(
+        mountSymbol: ShipMountSymbolEnum.GAS_SIPHON_I,
+        shipyardSymbol: symbol,
+      );
 
     final logger = _MockLogger();
     expect(

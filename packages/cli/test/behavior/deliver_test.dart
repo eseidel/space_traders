@@ -136,7 +136,6 @@ void main() {
     when(() => shipCache.frameCounts).thenReturn({});
 
     final state = BehaviorState(shipSymbol, Behavior.deliver)
-      ..jobIndex = 0
       ..buyJob = BuyJob(
         tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
         units: 10,

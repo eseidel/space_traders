@@ -21,8 +21,11 @@ enum Behavior {
   /// Fetch an item, bring it somewhere and wait.
   deliver,
 
-  /// Change mounts on this ship.
+  /// Pick-up mount from delivery and mount it.
   mountFromDelivery,
+
+  /// Go buy our own mount and mount it.
+  mountFromBuy,
 
   /// Explore the universe.
   explorer;
@@ -48,10 +51,11 @@ class BehaviorState {
     this.behavior, {
     this.deal,
     this.routePlan,
-    this.mountToAdd,
     this.buyJob,
     this.shipBuyJob,
     this.deliverJob,
+    this.pickupJob,
+    this.mountJob,
     this.jobIndex = 0,
   }) : isComplete = false;
 
@@ -65,9 +69,6 @@ class BehaviorState {
     final routePlan = json['routePlan'] == null
         ? null
         : RoutePlan.fromJson(json['routePlan'] as Map<String, dynamic>);
-    final mountToAdd = json['mountToAdd'] == null
-        ? null
-        : ShipMountSymbolEnum.fromJson(json['mountToAdd'] as String);
     final buyJob = json['buyJob'] == null
         ? null
         : BuyJob.fromJson(json['buyJob'] as Map<String, dynamic>);
@@ -77,16 +78,23 @@ class BehaviorState {
     final shipBuyJob = json['shipBuyJob'] == null
         ? null
         : ShipBuyJob.fromJson(json['shipBuyJob'] as Map<String, dynamic>);
+    final pickupJob = json['pickupJob'] == null
+        ? null
+        : PickupJob.fromJson(json['pickupJob'] as Map<String, dynamic>);
+    final mountJob = json['mountJob'] == null
+        ? null
+        : MountJob.fromJson(json['mountJob'] as Map<String, dynamic>);
     final jobIndex = json['jobIndex'] as int? ?? 0;
     return BehaviorState(
       shipSymbol,
       behavior,
       deal: deal,
       routePlan: routePlan,
-      mountToAdd: mountToAdd,
       buyJob: buyJob,
       deliverJob: deliverJob,
       shipBuyJob: shipBuyJob,
+      pickupJob: pickupJob,
+      mountJob: mountJob,
       jobIndex: jobIndex,
     );
   }
@@ -112,8 +120,11 @@ class BehaviorState {
   /// Used by Behavior.deliver for delivering items.
   DeliverJob? deliverJob;
 
-  /// Mount to add.
-  ShipMountSymbolEnum? mountToAdd;
+  /// Used by Behavior.mountFromDelivery for picking up the mount.
+  PickupJob? pickupJob;
+
+  /// Used by mount jobs for mounting.
+  MountJob? mountJob;
 
   /// Used by Behavior.buyShip for buying a ship.
   ShipBuyJob? shipBuyJob;
@@ -129,10 +140,11 @@ class BehaviorState {
       'shipSymbol': shipSymbol.toJson(),
       'deal': deal?.toJson(),
       'routePlan': routePlan?.toJson(),
-      'mountToAdd': mountToAdd?.toJson(),
       'buyJob': buyJob?.toJson(),
       'deliverJob': deliverJob?.toJson(),
       'shipBuyJob': shipBuyJob?.toJson(),
+      'mountJob': mountJob?.toJson(),
+      'pickupJob': pickupJob?.toJson(),
       'jobIndex': jobIndex,
     };
   }
@@ -209,6 +221,78 @@ class DeliverJob {
     return <String, dynamic>{
       'tradeSymbol': tradeSymbol.toJson(),
       'waypointSymbol': waypointSymbol.toJson(),
+    };
+  }
+}
+
+/// Pickup tradeSymbol from deliveryShip at waypointSymbol.
+class PickupJob {
+  /// Create a new pickup job.
+  PickupJob({
+    required this.tradeSymbol,
+    required this.waypointSymbol,
+  });
+
+  /// Create a new pickup job from JSON.
+  factory PickupJob.fromJson(Map<String, dynamic> json) {
+    final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!;
+    final waypointSymbol =
+        WaypointSymbol.fromJson(json['waypointSymbol'] as String);
+    return PickupJob(
+      tradeSymbol: tradeSymbol,
+      waypointSymbol: waypointSymbol,
+    );
+  }
+
+  /// The item to pickup from delivery ship.
+  // This should support multiple items.
+  final TradeSymbol tradeSymbol;
+
+  /// Where we plan to pickup from.
+  // Should this have the ship symbol too?
+  final WaypointSymbol waypointSymbol;
+
+  /// Convert this to JSON.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'tradeSymbol': tradeSymbol.toJson(),
+      'waypointSymbol': waypointSymbol.toJson(),
+    };
+  }
+}
+
+/// Mount the given mountSymbol at the given shipyardSymbol.
+class MountJob {
+  /// Create a new mount job.
+  MountJob({
+    required this.mountSymbol,
+    required this.shipyardSymbol,
+  });
+
+  /// Create a new mount job from JSON.
+  factory MountJob.fromJson(Map<String, dynamic> json) {
+    final mountSymbol =
+        ShipMountSymbolEnum.fromJson(json['mountSymbol'] as String)!;
+    final shipyardSymbol =
+        WaypointSymbol.fromJson(json['shipyardSymbol'] as String);
+    return MountJob(
+      mountSymbol: mountSymbol,
+      shipyardSymbol: shipyardSymbol,
+    );
+  }
+
+  /// The item we plan to mount (needs to be in inventory).
+  // Should this support multiple mounts?
+  final ShipMountSymbolEnum mountSymbol;
+
+  /// What shipyard we plan to use for doing the mounting.
+  final WaypointSymbol shipyardSymbol;
+
+  /// Convert this to JSON.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'mountSymbol': mountSymbol.toJson(),
+      'shipyardSymbol': shipyardSymbol.toJson(),
     };
   }
 }

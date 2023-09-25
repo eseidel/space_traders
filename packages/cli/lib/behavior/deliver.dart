@@ -106,6 +106,8 @@ Future<JobResult> doBuyJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  // TODO(eseidel): Add a way for jobs to get their job name from the MultiJob.
+  const jobName = 'BuyJob';
   final buyJob =
       assertNotNull(state.buyJob, 'No buy job', const Duration(hours: 1));
 
@@ -182,14 +184,17 @@ Future<JobResult> doBuyJob(
 
   final existingUnits = ship.countUnits(buyJob.tradeSymbol);
   if (existingUnits >= buyJob.units) {
-    shipWarn(ship, 'Deliver already has ${buyJob.units} ${buyJob.tradeSymbol}');
+    shipWarn(
+      ship,
+      '$jobName already has ${buyJob.units} ${buyJob.tradeSymbol}',
+    );
     return JobResult.complete();
   }
 
   if (units <= 0 && existingUnits > 0) {
     shipWarn(
       ship,
-      'Deliver already has $existingUnits ${buyJob.tradeSymbol},'
+      '$jobName already has $existingUnits ${buyJob.tradeSymbol},'
       " can't afford more.",
     );
     return JobResult.complete();

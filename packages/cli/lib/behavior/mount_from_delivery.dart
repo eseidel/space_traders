@@ -16,21 +16,8 @@ ShipMountSymbolEnum? _pickMountFromAvailable(
   return needed.firstWhereOrNull((mount) => available[mount] > 0);
 }
 
-extension on Ship {
-  /// Returns ShipCargoItems for mounts in our cargo if any.
-  /// Used for getting rid of extra mounts at the end of a change-mounts job.
-  Iterable<ShipCargoItem> mountsInCargo() sync* {
-    for (final cargoItem in cargo.inventory) {
-      final isMount = mountSymbolForTradeSymbol(cargoItem.tradeSymbol) != null;
-      if (isMount) {
-        yield cargoItem;
-      }
-    }
-  }
-}
-
 /// Init the change-mounts job.
-Future<JobResult> doInitJob(
+Future<JobResult> _initMountFromDelivery(
   BehaviorState state,
   Api api,
   Database db,
@@ -65,7 +52,15 @@ Future<JobResult> doInitJob(
     const Duration(minutes: 10),
   );
   shipInfo(ship, 'Claiming mount: $toClaim.');
-  state.mountToAdd = toClaim;
+  state
+    ..pickupJob = PickupJob(
+      tradeSymbol: tradeSymbolForMountSymbol(toClaim),
+      waypointSymbol: shipyardSymbol,
+    )
+    ..mountJob = MountJob(
+      mountSymbol: toClaim,
+      shipyardSymbol: shipyardSymbol,
+    );
   return JobResult.complete();
 }
 
@@ -79,17 +74,13 @@ Future<JobResult> doPickupJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  // TODO(eseidel): Pickup location should be saved in state.
-  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
-  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
-  final shipyard = assertNotNull(
-    hqWaypoints.firstWhereOrNull((w) => w.hasShipyard),
-    'No shipyard in $hqSystem',
-    const Duration(days: 1),
+  final pickupJob = assertNotNull(
+    state.pickupJob,
+    'No pickup job',
+    const Duration(hours: 1),
   );
-  final shipyardSymbol = shipyard.waypointSymbol;
-
-  if (ship.waypointSymbol != shipyardSymbol) {
+  final pickupLocation = pickupJob.waypointSymbol;
+  if (ship.waypointSymbol != pickupLocation) {
     final waitUntil = await beingNewRouteAndLog(
       api,
       ship,
@@ -98,12 +89,12 @@ Future<JobResult> doPickupJob(
       caches.systems,
       caches.routePlanner,
       centralCommand,
-      shipyardSymbol,
+      pickupLocation,
     );
     return JobResult.wait(waitUntil);
   }
 
-  final tradeSymbol = tradeSymbolForMountSymbol(state.mountToAdd!);
+  final tradeSymbol = pickupJob.tradeSymbol;
   final deliveryShip = assertNotNull(
     centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol),
     'No delivery ship for $tradeSymbol.',
@@ -143,7 +134,7 @@ Future<JobResult> doPickupJob(
 }
 
 /// Actually change the mounts on the ship.
-Future<JobResult> doChangeMounts(
+Future<JobResult> doMountJob(
   BehaviorState state,
   Api api,
   Database db,
@@ -152,11 +143,32 @@ Future<JobResult> doChangeMounts(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  final mountJob = assertNotNull(
+    state.mountJob,
+    'No mount job',
+    const Duration(hours: 1),
+  );
+
   final template = assertNotNull(
     centralCommand.templateForShip(ship),
     'No template.',
     const Duration(hours: 1),
   );
+
+  final mountLocation = mountJob.shipyardSymbol;
+  if (ship.waypointSymbol != mountLocation) {
+    final waitUntil = await beingNewRouteAndLog(
+      api,
+      ship,
+      state,
+      caches.ships,
+      caches.systems,
+      caches.routePlanner,
+      centralCommand,
+      mountLocation,
+    );
+    return JobResult.wait(waitUntil);
+  }
 
   // TODO(eseidel): This should only remove mounts if we absolutely need to.
   // This could end up removing mounts before we need to.
@@ -183,58 +195,17 @@ Future<JobResult> doChangeMounts(
     caches.agent,
     caches.ships,
     ship,
-    state.mountToAdd!,
+    mountJob.mountSymbol,
   );
-  return JobResult.complete();
-}
-
-/// Give the delivery ship any extra mounts we have.
-Future<JobResult> doGiveExtraMounts(
-  BehaviorState state,
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  final tradeSymbol = tradeSymbolForMountSymbol(state.mountToAdd!);
-  final deliveryShip = assertNotNull(
-    centralCommand.getDeliveryShip(ship.shipSymbol, tradeSymbol),
-    'No delivery ship for $tradeSymbol.',
-    const Duration(minutes: 10),
-  );
-
-  // Give the delivery ship our extra mount if we have one.
-  final extraMounts = ship.mountsInCargo();
-  if (extraMounts.isNotEmpty) {
-    // This could send more items than deliveryShip has space for.
-    for (final cargoItem in extraMounts) {
-      await transferCargoAndLog(
-        api,
-        caches.ships,
-        from: ship,
-        to: deliveryShip,
-        tradeSymbol: cargoItem.tradeSymbol,
-        units: cargoItem.units,
-      );
-    }
-  }
-
   // We're done.
   state.isComplete = true;
-  jobAssert(
-    false,
-    'Mounting complete!',
-    const Duration(hours: 1),
-  );
+  jobAssert(false, 'Mounting complete!', const Duration(hours: 1));
   return JobResult.complete();
 }
 
 /// Advance the behavior of the given ship.
 final advanceMountFromDelivery = const MultiJob('Mount from Delivery', [
-  doInitJob,
+  _initMountFromDelivery,
   doPickupJob,
-  doChangeMounts,
-  doGiveExtraMounts,
+  doMountJob,
 ]).run;

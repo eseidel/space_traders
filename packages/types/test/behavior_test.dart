@@ -31,7 +31,14 @@ void main() {
         shipSpeed: 10,
         fuelUsed: 10,
       ),
-      mountToAdd: ShipMountSymbolEnum.GAS_SIPHON_I,
+      pickupJob: PickupJob(
+        tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+        waypointSymbol: WaypointSymbol.fromString('S-A-W'),
+      ),
+      mountJob: MountJob(
+        mountSymbol: ShipMountSymbolEnum.GAS_SIPHON_I,
+        shipyardSymbol: WaypointSymbol.fromString('S-A-W'),
+      ),
       shipBuyJob: ShipBuyJob(
         minCreditsNeeded: 100,
         shipyardSymbol: WaypointSymbol.fromString('W-A-Y'),

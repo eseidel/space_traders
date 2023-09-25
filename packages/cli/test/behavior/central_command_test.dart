@@ -245,6 +245,7 @@ void main() {
   });
 
   test('claimedMounts smoke test', () {
+    final pickupSymbol = WaypointSymbol.fromString('W-A-Y');
     final cache = BehaviorCache(
       {
         ShipSymbol.fromString('X-A'):
@@ -254,15 +255,24 @@ void main() {
         ShipSymbol.fromString('X-C'): BehaviorState(
           ShipSymbol.fromString('X-C'),
           Behavior.mountFromDelivery,
-        )..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
+        )..pickupJob = PickupJob(
+            tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
+            waypointSymbol: pickupSymbol,
+          ),
         ShipSymbol.fromString('X-D'): BehaviorState(
           ShipSymbol.fromString('X-D'),
           Behavior.mountFromDelivery,
-        )..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_I,
+        )..pickupJob = PickupJob(
+            tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
+            waypointSymbol: pickupSymbol,
+          ),
         ShipSymbol.fromString('X-E'): BehaviorState(
           ShipSymbol.fromString('X-E'),
           Behavior.mountFromDelivery,
-        )..mountToAdd = ShipMountSymbolEnum.GAS_SIPHON_II,
+        )..pickupJob = PickupJob(
+            tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_II,
+            waypointSymbol: pickupSymbol,
+          ),
       },
       fs: MemoryFileSystem.test(),
     );
