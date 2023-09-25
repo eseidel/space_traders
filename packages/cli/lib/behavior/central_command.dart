@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/behavior/miner.dart';
+import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
@@ -57,6 +58,9 @@ class CentralCommand {
   /// This is the start of an imagined job queue system, whereby we pre-populate
   /// BehaviorStates with jobs when handing them out to ships.
   ShipBuyJob? _nextShipBuyJob;
+
+  /// The planned mount buy jobs for any ships that need them.
+  final List<MountRequest> _mountRequests = [];
 
   /// Returns true if contract trading is enabled.
   /// We will only accept and start new contracts when this is true.
@@ -148,10 +152,20 @@ class CentralCommand {
     if (ship.isOutOfFuel) {
       return toState(Behavior.idle);
     }
+    // We'll always upgrade a ship as our best option.
+    if (shouldBuyMount(ship, credits)) {
+      final request = _takeMountRequest(ship);
+      return BehaviorState(ship.shipSymbol, Behavior.mountFromBuy)
+        ..buyJob = request.buyJob
+        ..mountJob = request.mountJob;
+    }
+    // Otherwise buy a ship if we can.
     if (shouldBuyShip(ship, credits)) {
       return BehaviorState(ship.shipSymbol, Behavior.buyShip)
         ..shipBuyJob = takeShipBuyJob();
     }
+
+    // Otherwise start any other job.
     return toState(chooseNewBehaviorFor(ship, credits));
   }
 
@@ -164,10 +178,6 @@ class CentralCommand {
 
     final behaviors = {
       ShipRole.COMMAND: [
-        // We should deliver first, but deliver can get stuck, so we'll
-        // try to buy a ship first.
-        // If we can get mounts for our ships, that's the best thing we can do.
-        Behavior.deliver,
         // Will only trade if we can make 6/s or more.
         // There are commonly 20c/s trades in the starting system, and at
         // the minimum we want to accept the contract.
@@ -187,8 +197,6 @@ class CentralCommand {
         Behavior.explorer,
       ],
       ShipRole.EXCAVATOR: [
-        // We'll always upgrade the ship as our best option.
-        Behavior.mountFromDelivery,
         if (ship.canMine) Behavior.miner,
         if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
         Behavior.idle,
@@ -255,6 +263,8 @@ class CentralCommand {
     final state = _behaviorCache.getBehavior(shipSymbol);
     if (state == null) {
       final newState = getJobForShip(ship, credits);
+      // Important to set the state in the cache immediately, so that if we
+      // yield, other ships can see what we're doing.
       _behaviorCache.setBehavior(shipSymbol, newState);
     }
     return _behaviorCache.getBehavior(shipSymbol)!;
@@ -384,9 +394,35 @@ class CentralCommand {
   Iterable<SystemSymbol> otherTraderSystems(ShipSymbol thisShipSymbol) =>
       _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
 
+  Future<void> _queueMountRequests(
+    Caches caches,
+  ) async {
+    for (final ship in _shipCache.ships) {
+      if (_mountRequests.any((m) => m.shipSymbol == ship.shipSymbol)) {
+        return;
+      }
+      final template = templateForShip(ship);
+      if (template == null) {
+        continue;
+      }
+      final expectedCreditsPerSecond = this.expectedCreditsPerSecond(ship);
+      final request = await mountRequestForShip(
+        this,
+        caches,
+        ship,
+        template,
+        expectedCreditsPerSecond: expectedCreditsPerSecond,
+      );
+      if (request != null) {
+        _mountRequests.add(request);
+      }
+    }
+  }
+
   /// Give central planning a chance to advance.
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
     _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
+    await _queueMountRequests(caches);
   }
 
   /// Returns the next ship buy job.
@@ -400,6 +436,16 @@ class CentralCommand {
     final job = _nextShipBuyJob;
     _nextShipBuyJob = null;
     return job;
+  }
+
+  /// Takes and clears the next mount buy job for the given [ship].
+  MountRequest _takeMountRequest(Ship ship) {
+    final mountRequest = _mountRequests.firstWhere(
+      (m) => m.shipSymbol == ship.shipSymbol,
+      orElse: () => throw ArgumentError('No mount request for $ship'),
+    );
+    _mountRequests.remove(mountRequest);
+    return mountRequest;
   }
 
   /// Computes the next ship buy job.
@@ -446,6 +492,28 @@ class CentralCommand {
     // Is this ship within the same system or the command ship?
     if (ship.systemSymbol != buyJob.shipyardSymbol.systemSymbol &&
         !ship.isCommand) {
+      return false;
+    }
+    return true;
+  }
+
+  /// Returns true if [ship] should start the mountFromBuy behavior.
+  bool shouldBuyMount(Ship ship, int credits) {
+    // Are there any other ships actively buying mounts?
+    if (_behaviorCache.states.any(
+      (s) =>
+          s.behavior == Behavior.mountFromBuy || s.behavior == Behavior.deliver,
+    )) {
+      return false;
+    }
+    // Does this ship have a mount it needs?
+    final mountRequest =
+        _mountRequests.firstWhereOrNull((m) => m.shipSymbol == ship.shipSymbol);
+    if (mountRequest == null) {
+      return false;
+    }
+    // Do we have enough credits to buy a ship
+    if (credits < mountRequest.creditsNeeded) {
       return false;
     }
     return true;

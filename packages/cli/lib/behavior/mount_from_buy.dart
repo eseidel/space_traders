@@ -5,11 +5,103 @@ import 'package:cli/behavior/mount_from_delivery.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
-import 'package:db/db.dart';
 import 'package:types/types.dart';
 
+/// A queued request to buy and mount a mount on a ship.
+class MountRequest {
+  /// Create a new mount request.
+  MountRequest({
+    required this.shipSymbol,
+    required this.mountSymbol,
+    required this.marketSymbol,
+    required this.shipyardSymbol,
+    required this.creditsNeeded,
+  });
+
+  /// The ship that needs this mount.
+  final ShipSymbol shipSymbol;
+
+  /// The mount we need to buy.
+  final ShipMountSymbolEnum mountSymbol;
+
+  /// The market we need to buy the mount from.
+  final WaypointSymbol marketSymbol;
+
+  /// The shipyard we will use to install the mount.
+  final WaypointSymbol shipyardSymbol;
+
+  /// The credits we need to buy the mount and install it.
+  final int creditsNeeded;
+
+  /// The buy job for this mount request.
+  BuyJob get buyJob => BuyJob(
+        tradeSymbol: tradeSymbolForMountSymbol(mountSymbol),
+        units: 1,
+        buyLocation: marketSymbol,
+      );
+
+  /// The mount job for this mount request.
+  MountJob get mountJob => MountJob(
+        mountSymbol: mountSymbol,
+        shipyardSymbol: shipyardSymbol,
+      );
+}
+
+/// Compute a mount request for the given ship and template.
+Future<MountRequest?> mountRequestForShip(
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship,
+  ShipTemplate template, {
+  required int expectedCreditsPerSecond,
+}) async {
+  final needed = mountsToAddToShip(ship, template);
+  if (needed.isEmpty) {
+    return null;
+  }
+  final buyJob = buyJobForMount(
+    needed,
+    caches.marketPrices,
+    caches.routePlanner,
+    ship,
+    expectedCreditsPerSecond: expectedCreditsPerSecond,
+  );
+  if (buyJob == null) {
+    return null;
+  }
+  final mountSymbol = mountSymbolForTradeSymbol(buyJob.tradeSymbol)!;
+
+  // Shouldn't be null after buyJob comes back non-null.  We could add a
+  // budget to BuyJob instead, that might be better?
+  final buyCost = caches.marketPrices.recentPurchasePrice(
+    buyJob.tradeSymbol,
+    marketSymbol: buyJob.buyLocation,
+  );
+  if (buyCost == null) {
+    return null;
+  }
+  // Mount costs should be about 3k?  But we don't want to be wrong, as our
+  // mount logic will currently just sell the mount right after buying and
+  // could get stuck in a loop if we're too tight on credits. We also could
+  // record mount credits from the shipyard prices, but don't do that yet.
+  const mountCost = 100000;
+  final creditsNeeded = buyCost + mountCost;
+
+  // TODO(eseidel): Use a nearestShipyard function.
+  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
+  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
+  final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
+  return MountRequest(
+    shipSymbol: ship.shipSymbol,
+    mountSymbol: mountSymbol,
+    marketSymbol: buyJob.buyLocation,
+    shipyardSymbol: shipyard.waypointSymbol,
+    creditsNeeded: creditsNeeded,
+  );
+}
+
 /// Generates a buy job for the first mount we know how to find a buy job for.
-BuyJob? _buyJobForMount(
+BuyJob? buyJobForMount(
   MountSymbolSet needed,
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
@@ -38,42 +130,8 @@ BuyJob? _buyJobForMount(
   return null;
 }
 
-/// Init the mount-from-buy job.
-Future<JobResult> _initMountFromBuy(
-  BehaviorState state,
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  final template = assertNotNull(
-    centralCommand.templateForShip(ship),
-    'No template.',
-    const Duration(hours: 1),
-  );
-  final needed = mountsToAddToShip(ship, template);
-  jobAssert(needed.isNotEmpty, 'No mounts needed.', const Duration(hours: 1));
-
-  final buyJob = assertNotNull(
-    _buyJobForMount(
-      needed,
-      caches.marketPrices,
-      caches.routePlanner,
-      ship,
-      expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
-    ),
-    'No buy job for mounts.',
-    const Duration(minutes: 10),
-  );
-  state.buyJob = buyJob;
-  return JobResult.complete();
-}
-
 /// Advance the behavior of the given ship.
 final advanceMountFromBuy = const MultiJob('Mount from Buy', [
-  _initMountFromBuy,
   doBuyJob,
   doMountJob,
 ]).run;
