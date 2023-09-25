@@ -250,6 +250,40 @@ void main() {
     when(() => db.insertExtraction(any())).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
+
+    // With the reactor expiration, we should wait.
+    final reactorExpiration = now.add(const Duration(seconds: 10));
+    when(() => ship.cooldown).thenReturn(
+      Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        totalSeconds: 0,
+        remainingSeconds: 0,
+        expiration: reactorExpiration,
+      ),
+    );
+    final reactorWait = await runWithLogger(
+      logger,
+      () => advanceMiner(
+        api,
+        db,
+        centralCommand,
+        caches,
+        state,
+        ship,
+        getNow: getNow,
+      ),
+    );
+    expect(reactorWait, reactorExpiration);
+
+    // With no wait, we should be able to complete the mining.
+    when(() => ship.cooldown).thenReturn(
+      Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        totalSeconds: 0,
+        remainingSeconds: 0,
+      ),
+    );
+
     final waitUntil = await runWithLogger(
       logger,
       () => advanceMiner(

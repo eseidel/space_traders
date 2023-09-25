@@ -160,6 +160,7 @@ class MultiJob {
         centralCommand,
         caches,
         ship,
+        getNow: getNow,
       );
       shipDetail(ship, '$name ${state.jobIndex} $result');
       if (result.isComplete) {
