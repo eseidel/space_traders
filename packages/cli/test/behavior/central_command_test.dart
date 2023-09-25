@@ -244,47 +244,6 @@ void main() {
     expect(symbols2, [shipSymbol]);
   });
 
-  test('claimedMounts smoke test', () {
-    final pickupSymbol = WaypointSymbol.fromString('W-A-Y');
-    final cache = BehaviorCache(
-      {
-        ShipSymbol.fromString('X-A'):
-            BehaviorState(ShipSymbol.fromString('X-A'), Behavior.explorer),
-        ShipSymbol.fromString('X-B'):
-            BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
-        ShipSymbol.fromString('X-C'): BehaviorState(
-          ShipSymbol.fromString('X-C'),
-          Behavior.mountFromDelivery,
-        )..pickupJob = PickupJob(
-            tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
-            waypointSymbol: pickupSymbol,
-          ),
-        ShipSymbol.fromString('X-D'): BehaviorState(
-          ShipSymbol.fromString('X-D'),
-          Behavior.mountFromDelivery,
-        )..pickupJob = PickupJob(
-            tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
-            waypointSymbol: pickupSymbol,
-          ),
-        ShipSymbol.fromString('X-E'): BehaviorState(
-          ShipSymbol.fromString('X-E'),
-          Behavior.mountFromDelivery,
-        )..pickupJob = PickupJob(
-            tradeSymbol: TradeSymbol.MOUNT_GAS_SIPHON_II,
-            waypointSymbol: pickupSymbol,
-          ),
-      },
-      fs: MemoryFileSystem.test(),
-    );
-    final claimed = cache.claimedMounts();
-    expect(claimed.length, 3);
-    expect(claimed, [
-      ShipMountSymbolEnum.GAS_SIPHON_I,
-      ShipMountSymbolEnum.GAS_SIPHON_I,
-      ShipMountSymbolEnum.GAS_SIPHON_II,
-    ]);
-  });
-
   test('dealsInProgress smoke test', () {
     final deal = _MockCostedDeal();
     final cache = BehaviorCache(

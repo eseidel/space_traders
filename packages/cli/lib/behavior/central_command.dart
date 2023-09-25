@@ -217,45 +217,6 @@ class CentralCommand {
     return Behavior.idle;
   }
 
-  /// Returns the delivery ship bringing the mounts.
-  Ship? getDeliveryShip(ShipSymbol shipSymbol, TradeSymbol item) {
-    final deliveryShip = _shipCache.ships.first;
-    final deliveryState = _behaviorCache.getBehavior(deliveryShip.shipSymbol);
-    if (deliveryState?.behavior != Behavior.deliver) {
-      return null;
-    }
-    // Check if it's at the shipyard?
-    return deliveryShip;
-  }
-
-  /// Returns the number of mounts available at the waypoint.
-  MountSymbolSet unclaimedMountsAt(WaypointSymbol waypoint) {
-    // Get all the ships at that symbol
-    final ships = _shipCache.ships
-        .where((s) => s.waypointSymbol == waypoint && !s.isInTransit);
-
-    // That have behavior delivery.
-    final available = MountSymbolSet();
-    for (final ship in ships) {
-      final state = _behaviorCache.getBehavior(ship.shipSymbol);
-      if (state == null || state.behavior != Behavior.deliver) {
-        continue;
-      }
-      available.addAll(ship.mountSymbolsInInventory);
-    }
-    final claimed = _behaviorCache.claimedMounts();
-    // Unclear where this warning belongs.
-    for (final symbol in claimed.distinct) {
-      if (claimed[symbol] > available[symbol]) {
-        logger.warn(
-          'More mounts claimed than available at $waypoint: '
-          '${claimed[symbol]} > ${available[symbol]}',
-        );
-      }
-    }
-    return available.difference(claimed);
-  }
-
   // This feels wrong.
   /// Load or create the right behavior state for [ship].
   Future<BehaviorState> loadBehaviorState(Ship ship, int credits) async {
@@ -501,8 +462,7 @@ class CentralCommand {
   bool shouldBuyMount(Ship ship, int credits) {
     // Are there any other ships actively buying mounts?
     if (_behaviorCache.states.any(
-      (s) =>
-          s.behavior == Behavior.mountFromBuy || s.behavior == Behavior.deliver,
+      (s) => s.behavior == Behavior.mountFromBuy,
     )) {
       return false;
     }

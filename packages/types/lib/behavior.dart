@@ -18,12 +18,6 @@ enum Behavior {
   /// Idle.
   idle,
 
-  /// Fetch an item, bring it somewhere and wait.
-  deliver,
-
-  /// Pick-up mount from delivery and mount it.
-  mountFromDelivery,
-
   /// Go buy our own mount and mount it.
   mountFromBuy,
 

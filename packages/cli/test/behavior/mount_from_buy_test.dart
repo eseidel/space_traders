@@ -234,7 +234,7 @@ void main() {
       ),
     );
 
-    final state = BehaviorState(shipSymbol, Behavior.mountFromDelivery)
+    final state = BehaviorState(shipSymbol, Behavior.mountFromBuy)
       ..buyJob = BuyJob(
         tradeSymbol: toMount,
         units: 1,
