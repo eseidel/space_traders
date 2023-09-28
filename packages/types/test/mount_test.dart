@@ -93,4 +93,25 @@ void main() {
       ]),
     );
   });
+
+  test('ShipTemplate equality', () {
+    final a = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+      ]),
+    );
+    final b = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+        ShipMountSymbolEnum.MINING_LASER_II,
+      ]),
+    );
+    expect(a, equals(a));
+    expect(a.hashCode, equals(a.hashCode));
+    expect(a, equals(b));
+    expect(a.hashCode, equals(b.hashCode));
+  });
 }

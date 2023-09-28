@@ -290,4 +290,51 @@ void main() {
     ]);
     expect(centralCommand.shouldBuyShip(ship, 100000), false);
   });
+
+  test('CentralCommand.templateForShip', () {
+    Ship makeMiner() {
+      final miner = _MockShip();
+      final minerFrame = _MockShipFrame();
+      when(() => minerFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+      when(() => miner.frame).thenReturn(minerFrame);
+      return miner;
+    }
+
+    // Miners should have a standard laser1, laser2, surveyor1 setup.
+    final surveyAndMine = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.MINER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.SURVEYOR_I,
+      ]),
+    );
+    final shipCache = _MockShipCache();
+    final behaviorCache = _MockBehhaviorCache();
+    final centralCommand =
+        CentralCommand(shipCache: shipCache, behaviorCache: behaviorCache);
+    when(() => shipCache.countOfType(ShipType.ORE_HOUND)).thenReturn(0);
+    final ship = makeMiner();
+    final template = centralCommand.templateForShip(ship);
+    expect(template, surveyAndMine);
+    // final surveyor = ShipTemplate(
+    //   frameSymbol: ShipFrameSymbolEnum.MINER,
+    //   mounts: MountSymbolSet.from([
+    //     ShipMountSymbolEnum.SURVEYOR_II,
+    //     ShipMountSymbolEnum.SURVEYOR_II,
+    //   ]),
+    // );
+    // // Move to survey2s once:
+    // // - found survey2s
+    // // - at least 10 ore hounds
+    // // Once we have surveyor2s we should move miners to only laser2s.
+    // final mineOnly = ShipTemplate(
+    //   frameSymbol: ShipFrameSymbolEnum.MINER,
+    //   mounts: MountSymbolSet.from([
+    //     ShipMountSymbolEnum.MINING_LASER_I,
+    //     ShipMountSymbolEnum.MINING_LASER_II,
+    //     ShipMountSymbolEnum.MINING_LASER_II,
+    //   ]),
+    // );
+  });
 }
