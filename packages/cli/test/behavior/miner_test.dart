@@ -223,6 +223,12 @@ void main() {
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
+    final cooldownAfterMining = Cooldown(
+      shipSymbol: shipSymbol.symbol,
+      remainingSeconds: 10,
+      expiration: now.add(const Duration(seconds: 10)),
+      totalSeconds: 21,
+    );
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     when(
@@ -233,12 +239,7 @@ void main() {
       (_) => Future.value(
         ExtractResources201Response(
           data: ExtractResources201ResponseData(
-            cooldown: Cooldown(
-              shipSymbol: shipSymbol.symbol,
-              remainingSeconds: 10,
-              expiration: now,
-              totalSeconds: 21,
-            ),
+            cooldown: cooldownAfterMining,
             extraction: Extraction(
               shipSymbol: shipSymbol.symbol,
               yield_: ExtractionYield(
@@ -303,15 +304,10 @@ void main() {
         getNow: getNow,
       ),
     );
-    // Does not wait after mining, but does set cooldown.
-    expect(waitUntil, null);
+    // Will wait after mining to mine again if cargo is not full.
+    expect(waitUntil, cooldownAfterMining.expiration);
     verify(
-      () => ship.cooldown = Cooldown(
-        shipSymbol: shipSymbol.symbol,
-        remainingSeconds: 10,
-        expiration: DateTime(2021),
-        totalSeconds: 21,
-      ),
+      () => ship.cooldown = cooldownAfterMining,
     ).called(1);
   });
 
