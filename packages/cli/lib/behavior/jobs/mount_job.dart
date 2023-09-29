@@ -43,6 +43,9 @@ Future<JobResult> doMountJob(
     return JobResult.wait(waitUntil);
   }
 
+  // We must be docked at the shipyard to mount.
+  await dockIfNeeded(api, caches.ships, ship);
+
   // TODO(eseidel): This should only remove mounts if we absolutely need to.
   // This could end up removing mounts before we need to.
   final toRemove = mountsToRemoveFromShip(ship, template);
