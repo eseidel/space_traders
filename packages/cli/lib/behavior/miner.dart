@@ -301,7 +301,13 @@ Future<JobResult> extractAndLog(
         '${yield_.symbol.value.padRight(18)} '
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
-    return JobResult.complete();
+
+    // Complete this job (go sell) if an extraction could overflow our cargo.
+    if (ship.availableSpace >= maxExtractedUnits(ship)) {
+      return JobResult.complete();
+    }
+    // Otherwise do another survey/mining cycle.
+    return JobResult.wait(null);
   } on ApiException catch (e) {
     /// ApiException 400: {"error":{"message":
     /// Ship ESEIDEL-1B does not have a required mining laser mount.",
@@ -495,6 +501,89 @@ Future<JobResult> emptyCargoIfNeeded(
   return JobResult.wait(waitTime);
 }
 
+/// Attempt to sell cargo at the best price.
+Future<JobResult> sellCargoIfNeeded(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final largestCargo = ship.largestCargo();
+  if (largestCargo == null) {
+    return JobResult.complete();
+  }
+
+  // FIXME(eseidel): We should decide if this cargo is even worth selling.
+  // This currently optimizes for price and does not consider requests.
+  // Some cargo should jettison and some should transfer to haulers.
+
+  // FIXME(eseidel): This does not consider the round-trip cost, or that it will
+  // take ship.cooldown until we can mine again.
+  final costedTrip = assertNotNull(
+    findBestMarketToSell(
+      caches.marketPrices,
+      caches.routePlanner,
+      ship,
+      largestCargo.tradeSymbol,
+      expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
+    ),
+    'No market for ${largestCargo.symbol}.',
+    const Duration(minutes: 10),
+  );
+
+  if (costedTrip.route.endSymbol != ship.waypointSymbol) {
+    final waitTime = await beingNewRouteAndLog(
+      api,
+      ship,
+      state,
+      caches.ships,
+      caches.systems,
+      caches.routePlanner,
+      centralCommand,
+      costedTrip.route.endSymbol,
+    );
+    return JobResult.wait(waitTime);
+  }
+
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+  final currentMarket = assertNotNull(
+    await visitLocalMarket(api, db, caches, currentWaypoint, ship),
+    'No market at ${currentWaypoint.symbol}.',
+    const Duration(minutes: 10),
+  );
+
+  await sellAllCargoAndLog(
+    api,
+    db,
+    caches.marketPrices,
+    caches.agent,
+    currentMarket,
+    ship,
+    // We don't have a good way to know what type of cargo this is.
+    // Assuming it's goods (rather than captial) is probably fine.
+    AccountingType.goods,
+  );
+
+  if (ship.cargo.isEmpty) {
+    return JobResult.complete();
+  }
+
+  final nextLargestCargo = assertNotNull(
+    ship.largestCargo(),
+    'No cargo to sell?',
+    const Duration(minutes: 10),
+  );
+  shipInfo(
+    ship,
+    'Cargo hold still not empty, finding '
+    'market to sell ${nextLargestCargo.symbol}.',
+  );
+  return JobResult.wait(null);
+}
+
 // Miner stages
 // - Empty cargo if needed
 // - Navigate to mine
@@ -506,9 +595,9 @@ Future<JobResult> emptyCargoIfNeeded(
 /// Advance the miner.
 final advanceMiner = const MultiJob('Miner', [
   _initMineJob,
+  // Is this step needed?  Or should we just have mining fail if we don't have
+  // space?
   emptyCargoIfNeeded,
   doMineJob,
-  // TODO(eseidel): replace this with fancier cargo handling that tries
-  // to get the best deal.
-  emptyCargoIfNeeded,
+  sellCargoIfNeeded,
 ]).run;
