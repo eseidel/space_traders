@@ -79,6 +79,14 @@ class MarketPrice {
   final DateTime timestamp;
 
   @override
+  String toString() {
+    return 'MarketPrice{waypointSymbol: $waypointSymbol, symbol: $symbol, '
+        'supply: $supply, purchasePrice: $purchasePrice, '
+        'sellPrice: $sellPrice, tradeVolume: $tradeVolume, '
+        'timestamp: $timestamp}';
+  }
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MarketPrice &&

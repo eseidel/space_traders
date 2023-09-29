@@ -271,6 +271,14 @@ Future<JobResult> extractAndLog(
   Survey? maybeSurvey, {
   required DateTime Function() getNow,
 }) async {
+  // If we somehow got into a bad state, just complete this job and loop.
+  jobAssert(
+    ship.availableSpace >= maxExtractedUnits(ship),
+    'Not enough space (${ship.availableSpace}) to extract '
+    '(expecting ${maxExtractedUnits(ship)})',
+    const Duration(minutes: 1),
+  );
+
   // If we either have a survey or don't have a surveyor, mine.
   try {
     final ExtractResources201ResponseData response;
@@ -302,12 +310,12 @@ Future<JobResult> extractAndLog(
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
 
-    // Complete this job (go sell) if an extraction could overflow our cargo.
+    // If we still have space wait the cooldown and continue mining.
     if (ship.availableSpace >= maxExtractedUnits(ship)) {
-      return JobResult.complete();
+      return JobResult.wait(response.cooldown.expiration);
     }
-    // Otherwise do another survey/mining cycle.
-    return JobResult.wait(null);
+    // Complete this job (go sell) if an extraction could overflow our cargo.
+    return JobResult.complete();
   } on ApiException catch (e) {
     /// ApiException 400: {"error":{"message":
     /// Ship ESEIDEL-1B does not have a required mining laser mount.",
@@ -536,6 +544,7 @@ Future<JobResult> sellCargoIfNeeded(
   );
 
   if (costedTrip.route.endSymbol != ship.waypointSymbol) {
+    shipInfo(ship, 'Traveling to ${costedTrip.route.endSymbol} to sell.');
     final waitTime = await beingNewRouteAndLog(
       api,
       ship,
@@ -600,5 +609,5 @@ final advanceMiner = const MultiJob('Miner', [
   // space?
   emptyCargoIfNeeded,
   doMineJob,
-  sellCargoIfNeeded,
+  emptyCargoIfNeeded,
 ]).run;

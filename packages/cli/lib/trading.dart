@@ -466,6 +466,9 @@ class CostedTrip<Price> {
 
   /// The price of the item at the destination.
   final Price price;
+
+  @override
+  String toString() => '$price in ${route.duration}';
 }
 
 /// A trip to a market.
