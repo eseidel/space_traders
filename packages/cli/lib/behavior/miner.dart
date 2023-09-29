@@ -511,6 +511,7 @@ Future<JobResult> sellCargoIfNeeded(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  // This picks largest, but maybe should pick most valuable?
   final largestCargo = ship.largestCargo();
   if (largestCargo == null) {
     return JobResult.complete();
