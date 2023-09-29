@@ -292,12 +292,22 @@ void main() {
   });
 
   test('CentralCommand.templateForShip', () {
-    Ship makeMiner() {
+    Ship makeMiner(String shipSymbol) {
       final miner = _MockShip();
+      when(() => miner.symbol).thenReturn(shipSymbol);
       final minerFrame = _MockShipFrame();
       when(() => minerFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
       when(() => miner.frame).thenReturn(minerFrame);
+      when(() => miner.mounts).thenReturn([]);
       return miner;
+    }
+
+    List<Ship> makeMiners(int count) {
+      final miners = <Ship>[];
+      for (var i = 0; i < count; i++) {
+        miners.add(makeMiner('M-$i'));
+      }
+      return miners;
     }
 
     // Miners should have a standard laser1, laser2, surveyor1 setup.
@@ -313,28 +323,89 @@ void main() {
     final behaviorCache = _MockBehhaviorCache();
     final centralCommand =
         CentralCommand(shipCache: shipCache, behaviorCache: behaviorCache);
-    when(() => shipCache.countOfType(ShipType.ORE_HOUND)).thenReturn(0);
-    final ship = makeMiner();
-    final template = centralCommand.templateForShip(ship);
-    expect(template, surveyAndMine);
-    // final surveyor = ShipTemplate(
-    //   frameSymbol: ShipFrameSymbolEnum.MINER,
-    //   mounts: MountSymbolSet.from([
-    //     ShipMountSymbolEnum.SURVEYOR_II,
-    //     ShipMountSymbolEnum.SURVEYOR_II,
-    //   ]),
-    // );
-    // // Move to survey2s once:
-    // // - found survey2s
-    // // - at least 10 ore hounds
-    // // Once we have surveyor2s we should move miners to only laser2s.
-    // final mineOnly = ShipTemplate(
-    //   frameSymbol: ShipFrameSymbolEnum.MINER,
-    //   mounts: MountSymbolSet.from([
-    //     ShipMountSymbolEnum.MINING_LASER_I,
-    //     ShipMountSymbolEnum.MINING_LASER_II,
-    //     ShipMountSymbolEnum.MINING_LASER_II,
-    //   ]),
-    // );
+
+    final tenMiners = makeMiners(10);
+    when(() => shipCache.ships).thenReturn(tenMiners);
+    for (final miner in tenMiners) {
+      expect(centralCommand.templateForShip(miner), surveyAndMine);
+    }
+
+    final surveyor = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.MINER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.SURVEYOR_II,
+        ShipMountSymbolEnum.SURVEYOR_II,
+      ]),
+    );
+    // Move to survey2s once we have found survey2s
+    centralCommand.setAvailableMounts(ShipMountSymbolEnum.values);
+    // Every 5th miner should be a surveyor.
+    for (var i = 0; i < tenMiners.length; i++) {
+      final template = centralCommand.templateForShip(tenMiners[i]);
+      if (i % 5 == 0) {
+        expect(template, surveyor);
+      } else {
+        expect(template, surveyAndMine);
+      }
+    }
+
+    // Once we have surveyor2s we should move miners to only laser2s.
+    final surveyorOne = tenMiners[0];
+    final surveyorTwo = tenMiners[5];
+    final surveyorMount = ShipMount(
+      symbol: ShipMountSymbolEnum.SURVEYOR_II,
+      name: '',
+      requirements: ShipRequirements(),
+    );
+    when(() => surveyorOne.mounts).thenReturn([surveyorMount, surveyorMount]);
+    when(() => surveyorTwo.mounts).thenReturn([surveyorMount, surveyorMount]);
+    final mineOnly = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.MINER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.MINING_LASER_I,
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.MINING_LASER_II,
+      ]),
+    );
+    // Every 5th miner should be a surveyor.
+    for (var i = 0; i < tenMiners.length; i++) {
+      final template = centralCommand.templateForShip(tenMiners[i]);
+      if (i % 5 == 0) {
+        expect(template, surveyor);
+      } else {
+        expect(template, mineOnly);
+      }
+    }
+
+    /// Even when we have surveyor2s, we should not to surveyOnly if we
+    /// only have a single ship in a squad.
+    final sixShips = makeMiners(6);
+    when(() => shipCache.ships).thenReturn(sixShips);
+    // Ships 2-5 won't mineOnly until the surveyor has its mounts.
+    when(() => sixShips[0].mounts).thenReturn([surveyorMount, surveyorMount]);
+    expect(centralCommand.templateForShip(sixShips[0]), surveyor);
+    expect(centralCommand.templateForShip(sixShips[1]), mineOnly);
+    expect(centralCommand.templateForShip(sixShips[2]), mineOnly);
+    expect(centralCommand.templateForShip(sixShips[3]), mineOnly);
+    expect(centralCommand.templateForShip(sixShips[4]), mineOnly);
+    // Even if we already have surveyors mounted on the first ship of a squad,
+    // we should not specialize until we have two ships in a squad.
+    when(() => sixShips[5].mounts).thenReturn([surveyorMount, surveyorMount]);
+    expect(centralCommand.templateForShip(sixShips[5]), surveyAndMine);
+
+    // Once we have two ships in a squad then it's OK to specialize:
+    final sevenShips = makeMiners(7);
+    when(() => shipCache.ships).thenReturn(sevenShips);
+    // Ships 2-5 won't mineOnly until the surveyor has its mounts.
+    when(() => sevenShips[0].mounts).thenReturn([surveyorMount, surveyorMount]);
+    expect(centralCommand.templateForShip(sevenShips[0]), surveyor);
+    expect(centralCommand.templateForShip(sevenShips[1]), mineOnly);
+    expect(centralCommand.templateForShip(sevenShips[2]), mineOnly);
+    expect(centralCommand.templateForShip(sevenShips[3]), mineOnly);
+    expect(centralCommand.templateForShip(sevenShips[4]), mineOnly);
+    // Ships 2+ won't mineOnly until the surveyor has its mounts.
+    when(() => sevenShips[5].mounts).thenReturn([surveyorMount, surveyorMount]);
+    expect(centralCommand.templateForShip(sevenShips[5]), surveyor);
+    expect(centralCommand.templateForShip(sevenShips[6]), mineOnly);
   });
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/behavior/buy_ship.dart';
+import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -44,6 +45,17 @@ class CentralCommand {
   /// BehaviorStates with jobs when handing them out to ships.
   ShipBuyJob? _nextShipBuyJob;
 
+  /// Mounts we know of a place we can buy.
+  final Set<ShipMountSymbolEnum> _availableMounts = {};
+
+  /// Sets the available mounts for testing.
+  @visibleForTesting
+  void setAvailableMounts(Iterable<ShipMountSymbolEnum> mounts) {
+    _availableMounts
+      ..clear()
+      ..addAll(mounts);
+  }
+
   /// The planned mount buy jobs for any ships that need them.
   final List<MountRequest> _mountRequests = [];
 
@@ -70,48 +82,28 @@ class CentralCommand {
   /// Shorten the max age for explorer data.
   Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
 
+  /// Returns the mining squads for the fleet.
+  Iterable<MiningSquad> miningSquads() {
+    return _shipCache.ships
+        .where((s) => s.isMiner)
+        .slices(5)
+        .map(MiningSquad.new);
+  }
+
+  /// Returns the mining squad for the given [ship].
+  MiningSquad? squadForShip(Ship ship) {
+    return miningSquads().firstWhereOrNull((s) => s.contains(ship));
+  }
+
   /// What template should we use for the given ship?
-  ShipTemplate? templateForShip(Ship ship) {
-    final genericMiner = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.MINER,
-      mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SURVEYOR_I,
-      ]),
-    );
-
-    // According to SAF: Surveyor = 2x mk2s,  miner = 2x mk2 + 1x mk1
-    final surveyOnly = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.MINER,
-      mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.SURVEYOR_II,
-        ShipMountSymbolEnum.SURVEYOR_II,
-      ]),
-    );
-    // final mineOnly = ShipTemplate(
-    //   frameSymbol: ShipFrameSymbolEnum.MINER,
-    //   mounts: MountSymbolSet.from([
-    //     ShipMountSymbolEnum.MINING_LASER_II,
-    //     ShipMountSymbolEnum.MINING_LASER_II,
-    //     ShipMountSymbolEnum.MINING_LASER_I,
-    //   ]),
-    // );
-
-    // Hack to test a new template.
-    final minerCount = _shipCache.countOfType(ShipType.ORE_HOUND);
-    final surveyors = [
-      'ESEIDEL-5',
-      'ESEIDEL-6',
-      'ESEIDEL-7',
-    ];
-    if (minerCount > 20 && surveyors.contains(ship.symbol)) {
-      return surveyOnly;
+  ShipTemplate? templateForShip(
+    Ship ship,
+  ) {
+    final squad = squadForShip(ship);
+    if (squad == null) {
+      return null;
     }
-
-    final genericTemplates = [genericMiner];
-    return genericTemplates
-        .firstWhereOrNull((e) => e.frameSymbol == ship.frame.symbol);
+    return squad.templateForShip(ship, availableMounts: _availableMounts);
   }
 
   /// Add up all mounts needed for current ships based on current templating.
@@ -365,9 +357,25 @@ class CentralCommand {
     }
   }
 
+  /// Updates _availableMounts with any mounts we know of a place to buy.
+  void updateAvailableMounts(MarketPrices marketPrices) {
+    for (final mountSymbol in ShipMountSymbolEnum.values) {
+      if (_availableMounts.contains(mountSymbol)) {
+        continue;
+      }
+      final isAvailable = marketPrices.havePriceFor(
+        tradeSymbolForMountSymbol(mountSymbol),
+      );
+      if (isAvailable) {
+        _availableMounts.add(mountSymbol);
+      }
+    }
+  }
+
   /// Give central planning a chance to advance.
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
     _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
+    updateAvailableMounts(caches.marketPrices);
     await _queueMountRequests(caches);
   }
 

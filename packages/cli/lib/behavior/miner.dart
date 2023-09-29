@@ -14,6 +14,79 @@ import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
+// According to SAF: Surveyor = 2x mk2s,  miner = 2x mk2 + 1x mk1
+/// A template for a ship which mines and surveys.
+final kMineAndSurveyTemplate = ShipTemplate(
+  frameSymbol: ShipFrameSymbolEnum.MINER,
+  mounts: MountSymbolSet.from([
+    ShipMountSymbolEnum.MINING_LASER_II,
+    ShipMountSymbolEnum.MINING_LASER_II,
+    ShipMountSymbolEnum.SURVEYOR_I,
+  ]),
+);
+
+/// A template for a ship which only surveys.
+/// Only available after we've found SURVEYOR_II modules to buy.
+final kSurveyOnlyTemplate = ShipTemplate(
+  frameSymbol: ShipFrameSymbolEnum.MINER,
+  mounts: MountSymbolSet.from([
+    ShipMountSymbolEnum.SURVEYOR_II,
+    ShipMountSymbolEnum.SURVEYOR_II,
+  ]),
+);
+
+/// A template for a ship which only mines.
+/// Only used after we have dedicated surveyors.
+final kMineOnlyTemplate = ShipTemplate(
+  frameSymbol: ShipFrameSymbolEnum.MINER,
+  mounts: MountSymbolSet.from([
+    ShipMountSymbolEnum.MINING_LASER_II,
+    ShipMountSymbolEnum.MINING_LASER_II,
+    ShipMountSymbolEnum.MINING_LASER_I,
+  ]),
+);
+
+/// A group of ships which mine and survey together.
+class MiningSquad {
+  /// Creates a new mining squad from a list of ships.
+  MiningSquad(this.ships);
+
+  /// Determines the template to use for [ship].
+  ShipTemplate templateForShip(
+    Ship ship, {
+    required Set<ShipMountSymbolEnum> availableMounts,
+  }) {
+    if (!ships.any((s) => s.symbol == ship.symbol)) {
+      throw ArgumentError('Ship ${ship.symbol} not in squad.');
+    }
+    // If we're the only ship in this squad, we need to both mine and survey.
+    if (ships.length == 1) {
+      return kMineAndSurveyTemplate;
+    }
+    // If we have SURVEYOR_II, our first ship should be a surveyor.
+    final surveyor = ships.first;
+    if (surveyor.symbol == ship.symbol) {
+      if (availableMounts.contains(ShipMountSymbolEnum.SURVEYOR_II)) {
+        return kSurveyOnlyTemplate;
+      } else {
+        return kMineAndSurveyTemplate;
+      }
+    }
+    // If our first ship has already mounted surveyors, we should only mine.
+    if (kSurveyOnlyTemplate.matches(surveyor)) {
+      return kMineOnlyTemplate;
+    }
+    // Otherwise we also need to survey.
+    return kMineAndSurveyTemplate;
+  }
+
+  /// Returns true if this squad contains [ship].
+  bool contains(Ship ship) => ships.any((s) => s.symbol == ship.symbol);
+
+  /// The ships in this squad.
+  final List<Ship> ships;
+}
+
 // my evaluation logic actually just assumes I'll get 10 extracts from each
 // survey regardless of size - so room for improvement.... I just don't have the
 // data on how many extracts to exhaust a deposit

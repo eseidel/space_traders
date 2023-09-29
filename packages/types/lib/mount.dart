@@ -3,6 +3,8 @@ import 'package:more/collection.dart';
 import 'package:types/api.dart';
 
 /// Set of ship mount symbols.
+/// Caution: equals and hashCode are not defined for this type.
+/// Use [ShipTemplate.mountsSymbolSetEquals] instead.
 typedef MountSymbolSet = Multiset<ShipMountSymbolEnum>;
 
 /// Mounts template for a ship.
@@ -20,6 +22,27 @@ class ShipTemplate {
   /// Mounts that this template has.
   final MountSymbolSet mounts;
 
+  /// Returns true if we know how to purchase all needed mounts.
+  bool canPurchaseAllMounts(Set<ShipMountSymbolEnum> availableMounts) {
+    for (final mountSymbol in mounts) {
+      if (!availableMounts.contains(mountSymbol)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Returns true if the given ship matches this template.
+  bool matches(Ship ship) {
+    return ship.frame.symbol == frameSymbol &&
+        mountsSymbolSetEquals(ship.mountedMountSymbols, mounts);
+  }
+
+  /// Returns true if [a] and [b] have the same mounts.
+  static bool mountsSymbolSetEquals(MountSymbolSet a, MountSymbolSet b) {
+    return a.length == b.length && a.intersection(b).length == a.length;
+  }
+
   @override
   String toString() => 'ShipTemplate($frameSymbol, $mounts)';
 
@@ -27,7 +50,7 @@ class ShipTemplate {
   bool operator ==(Object other) =>
       other is ShipTemplate &&
       frameSymbol == other.frameSymbol &&
-      mounts.intersection(other.mounts).length == mounts.length;
+      mountsSymbolSetEquals(mounts, other.mounts);
 
   @override
   int get hashCode => Object.hash(

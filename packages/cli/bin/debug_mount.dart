@@ -8,11 +8,15 @@ import 'package:types/types.dart';
 Future<void> command(FileSystem fs, List<String> args) async {
   final shipCache = ShipCache.loadCached(fs)!;
   final behaviorCache = BehaviorCache.load(fs);
+  final marketPrices = MarketPrices.load(fs);
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
 
   final symbolWidth =
       ShipMountSymbolEnum.values.fold(0, (s, e) => max(s, e.value.length)) + 1;
+
+  // Must be called before we can call templateForShip.
+  centralCommand.updateAvailableMounts(marketPrices);
 
   for (final ship in shipCache.ships) {
     final template = centralCommand.templateForShip(ship);

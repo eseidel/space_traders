@@ -382,6 +382,9 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is a command ship.
   bool get isCommand => registration.role == ShipRole.COMMAND;
 
+  /// Returns true if the ship is a miner frame.
+  bool get isMiner => frame.symbol == ShipFrameSymbolEnum.MINER;
+
   /// Returns true if the ship is a probe.
   bool get isProbe => frame.symbol == ShipFrameSymbolEnum.PROBE;
 

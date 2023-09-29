@@ -244,6 +244,12 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     return prices.where((e) => e.waypointSymbol == marketSymbol);
   }
 
+  /// Returns true if there is a price for a given trade good.
+  /// Used for detecting if we can buy/sell a good in the known markets.
+  bool havePriceFor(TradeSymbol tradeSymbol) {
+    return _prices.any((element) => element.symbol == tradeSymbol);
+  }
+
   MarketPrice? _priceAtPercentile(
     TradeSymbol symbol,
     int percentile,

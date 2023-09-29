@@ -4,6 +4,8 @@ import 'package:types/types.dart';
 
 class _MockShip extends Mock implements Ship {}
 
+class _MockShipFrame extends Mock implements ShipFrame {}
+
 void main() {
   test('Mount extensions', () {
     final ship = _MockShip();
@@ -94,6 +96,53 @@ void main() {
     );
   });
 
+  test('ShipTemplate.matches', () {
+    final template = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+      ]),
+    );
+    final ship = _MockShip();
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
+
+    when(() => ship.mounts).thenReturn([
+      ShipMount(
+        symbol: ShipMountSymbolEnum.MINING_LASER_II,
+        name: '',
+        description: '',
+        requirements: ShipRequirements(),
+      ),
+      ShipMount(
+        symbol: ShipMountSymbolEnum.SENSOR_ARRAY_III,
+        name: '',
+        description: '',
+        requirements: ShipRequirements(),
+      ),
+    ]);
+    expect(template.matches(ship), isTrue);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.EXPLORER);
+    expect(template.matches(ship), isFalse);
+
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
+    final otherTemplate = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.SENSOR_ARRAY_II,
+      ]),
+    );
+    expect(otherTemplate.matches(ship), isFalse);
+
+    final emptyShip = _MockShip();
+    when(() => emptyShip.frame).thenReturn(shipFrame);
+    when(() => emptyShip.mounts).thenReturn([]);
+    expect(template.matches(emptyShip), isFalse);
+  });
+
   test('ShipTemplate equality', () {
     final a = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.FIGHTER,
@@ -113,5 +162,31 @@ void main() {
     expect(a.hashCode, equals(a.hashCode));
     expect(a, equals(b));
     expect(a.hashCode, equals(b.hashCode));
+  });
+
+  test('ShipTemplate.mountsSymbolSetEquals', () {
+    final a = MountSymbolSet.from([
+      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbolEnum.SENSOR_ARRAY_III,
+    ]);
+    final b = MountSymbolSet.from([
+      ShipMountSymbolEnum.SENSOR_ARRAY_III,
+      ShipMountSymbolEnum.MINING_LASER_II,
+    ]);
+    expect(ShipTemplate.mountsSymbolSetEquals(a, b), isTrue);
+    expect(ShipTemplate.mountsSymbolSetEquals(a, MountSymbolSet()), isFalse);
+    expect(ShipTemplate.mountsSymbolSetEquals(MountSymbolSet(), a), isFalse);
+
+    final c = MountSymbolSet.from([
+      ShipMountSymbolEnum.GAS_SIPHON_I,
+      ShipMountSymbolEnum.MINING_LASER_II,
+    ]);
+    expect(ShipTemplate.mountsSymbolSetEquals(a, c), isFalse);
+    final d = MountSymbolSet.from([
+      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbolEnum.SENSOR_ARRAY_III,
+      ShipMountSymbolEnum.SENSOR_ARRAY_III,
+    ]);
+    expect(ShipTemplate.mountsSymbolSetEquals(a, d), isFalse);
   });
 }
