@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -393,15 +394,9 @@ class CentralCommand {
     return mountRequest;
   }
 
-  /// Computes the next ship buy job.
-  Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
+  Future<ShipBuyJob?> _oreHoundBuyJob(Caches caches) async {
     final agentCache = caches.agent;
     final waypointCache = caches.waypoints;
-    final shipCount = _shipCache.ships.length;
-    if (shipCount > 80) {
-      return null;
-    }
-    // if our ship count is < 80, return an ore hound.
     final hqSystem = agentCache.headquartersSymbol.systemSymbol;
     final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
     final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
@@ -417,6 +412,46 @@ class CentralCommand {
       shipyardSymbol: shipyard.waypointSymbol,
       minCreditsNeeded: (recentPrice * 1.05).toInt(),
     );
+  }
+
+  Future<ShipBuyJob?> _heavyFreighterBuyJob(Caches caches) async {
+    const shipType = ShipType.HEAVY_FREIGHTER;
+    final commandShip = _shipCache.ships.firstWhere((s) => s.isCommand);
+    final trip = findBestShipyardToBuy(
+      caches.shipyardPrices,
+      caches.routePlanner,
+      commandShip,
+      shipType,
+      expectedCreditsPerSecond: expectedCreditsPerSecond(commandShip),
+    );
+    if (trip == null) {
+      return null;
+    }
+    final recentPrice = caches.shipyardPrices.recentPurchasePrice(
+      shipType: shipType,
+      shipyardSymbol: trip.route.endSymbol,
+    );
+    // This should never happen if we found a trip.
+    if (recentPrice == null) {
+      return null;
+    }
+    return ShipBuyJob(
+      shipType: shipType,
+      shipyardSymbol: trip.route.endSymbol,
+      minCreditsNeeded: (recentPrice * 1.05).toInt(),
+    );
+  }
+
+  /// Computes the next ship buy job.
+  Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
+    final shipCount = _shipCache.ships.length;
+    if (shipCount < 80) {
+      // if our ship count is < 80, return an ore hound.
+      return _oreHoundBuyJob(caches);
+    } else if (shipCount < 90) {
+      return _heavyFreighterBuyJob(caches);
+    }
+    return null;
   }
 
   /// Returns true if [ship] should start the buyShip behavior.
