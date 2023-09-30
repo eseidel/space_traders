@@ -72,7 +72,10 @@ Future<DateTime?> beingRouteAndLog(
 
   state.routePlan = routePlan;
   // TODO(eseidel): Should this buy fuel first if we need it?
-  shipInfo(ship, 'Beginning route to ${routePlan.endSymbol}');
+  shipInfo(
+      ship,
+      'Beginning route to ${routePlan.endSymbol} '
+      '(${approximateDuration(routePlan.duration)})');
   final navResult = await continueNavigationIfNeeded(
     api,
     ship,

@@ -587,6 +587,11 @@ MarketTrip? findBestMarketToSell(
   /// If true, we'll include the cost of returning to the current location
   /// in the calculation, which makes longer distances less attractive.
   bool includeRoundTripCost = false,
+
+  /// If true, we'll require that the destination market has fuel for sale
+  /// otherwise we'll skip it.  This should probably always be true
+  /// but leaving it as an option for now to not break existing callers.
+  bool requireFuelAtDestination = false,
 }) {
   // Some callers might want to use a round trip cost?
   // e.g. if just trying to empty inventory and return to current location.
@@ -605,11 +610,16 @@ MarketTrip? findBestMarketToSell(
         : minimumDuration;
   }
 
-  var printCount = 5;
-  void log(String message) {
+  var printCount = 3;
+  void info(String message) {
+    if (printCount > 0) {
+      shipInfo(ship, message);
+    }
+  }
+
+  void detail(String message) {
     if (printCount > 0) {
       shipDetail(ship, message);
-      printCount--;
     }
   }
 
@@ -619,21 +629,42 @@ MarketTrip? findBestMarketToSell(
   // Pick any one further that earns more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
     final priceDiff = trip.price.sellPrice - nearest.price.sellPrice;
-    final extraEarnings = priceDiff * unitsToSell;
+    var extraEarnings = priceDiff * unitsToSell;
     final extraTime =
         applyMin(trip.route.duration) - applyMin(nearest.route.duration);
+
+    final costPerFuelUnit = marketPrices.recentPurchasePrice(
+      TradeSymbol.FUEL,
+      marketSymbol: trip.route.endSymbol,
+    );
+    final extraFuel = (trip.route.fuelUsed - nearest.route.fuelUsed) * 2;
+    final extraFuelCost = costPerFuelUnit != null
+        ? costPerFuelUnit * (extraFuel / 100).ceil()
+        : 0;
+    if (costPerFuelUnit != null) {
+      extraEarnings -= extraFuelCost;
+    } else if (costPerFuelUnit == null && requireFuelAtDestination) {
+      detail('Skipping ${trip.price.waypointSymbol} due to unknown fuel cost');
+      continue;
+    }
+
+    // TODO(eseidel): if extraTime is zero, earningsPerSecond ends up infinity.
+    // In that case we want to compare absolute earnings of trip vs. nearest.
+    // That would require refactoring our fuel cost logic to be used as part
+    // of computing the absolute earnings for nearest.
     final earningsPerSecond =
         extraEarnings / (extraTime.inSeconds * roundTripMultiplier);
     if (earningsPerSecond > expectedCreditsPerSecond) {
-      log('Selecting ${trip.price.waypointSymbol} earns '
+      info('Selecting ${trip.price.waypointSymbol} earns '
           '${creditsString(extraEarnings)} extra '
           'over ${approximateDuration(extraTime)} '
           '($earningsPerSecond/s)');
       best = trip;
       break;
     } else {
-      log('Skipping ${trip.price.waypointSymbol} would add '
-          '${creditsString(extraEarnings)} '
+      detail('Skipping ${trip.price.waypointSymbol} earns '
+          '${creditsString(extraEarnings)} extra '
+          '(${creditsString(-extraFuelCost)} for fuel) '
           'for ${approximateDuration(extraTime)} '
           '($earningsPerSecond/s)');
     }
