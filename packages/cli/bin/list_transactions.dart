@@ -22,6 +22,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   for (final transaction in transactions) {
     logger.info(describeTransaction(transaction));
   }
+  await db.close();
 }
 
 void main(List<String> args) async {
