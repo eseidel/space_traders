@@ -566,13 +566,24 @@ MarketTrip? findBestMarketToBuy(
 
 /// Find the best market to sell a given item to.
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
-/// used for evaluating the trade-off between "closest" vs. "cheapest".\
+/// used for evaluating the trade-off between "closest" vs. "cheapest".
+/// This does not account for fuel costs.
 MarketTrip? findBestMarketToSell(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
   TradeSymbol tradeSymbol, {
   required int expectedCreditsPerSecond,
+  required int unitsToSell,
+
+  /// Used to express the minimum time until the next action.  This is useful
+  /// for modeling when the next thing we plan to do involves the cooldown and
+  /// lets us consider longer routes as the same cost as shorter routes.
+  Duration? minimumDuration,
+
+  /// If true, we'll include the cost of returning to the current location
+  /// in the calculation, which makes longer distances less attractive.
+  bool includeRoundTripCost = false,
 }) {
   // Some callers might want to use a round trip cost?
   // e.g. if just trying to empty inventory and return to current location.
@@ -585,18 +596,44 @@ MarketTrip? findBestMarketToSell(
   if (sorted.isEmpty) {
     return null;
   }
+  Duration applyMin(Duration duration) {
+    return minimumDuration == null || duration > minimumDuration
+        ? duration
+        : minimumDuration;
+  }
+
+  var printCount = 5;
+  void log(String message) {
+    if (printCount > 0) {
+      shipDetail(ship, message);
+      printCount--;
+    }
+  }
+
+  final roundTripMultiplier = includeRoundTripCost ? 2 : 1;
   final nearest = sorted.first;
   var best = nearest;
   // Pick any one further that earns more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
     final priceDiff = trip.price.sellPrice - nearest.price.sellPrice;
-    final earnings = priceDiff;
-    final extraTime = trip.route.duration - nearest.route.duration;
-    final earningsPerSecond = earnings / extraTime.inSeconds;
+    final extraEarnings = priceDiff * unitsToSell;
+    final extraTime =
+        applyMin(trip.route.duration) - applyMin(nearest.route.duration);
+    final earningsPerSecond =
+        extraEarnings / (extraTime.inSeconds * roundTripMultiplier);
     if (earningsPerSecond > expectedCreditsPerSecond) {
+      log('Selecting ${trip.price.waypointSymbol} earns '
+          '${creditsString(extraEarnings)} extra '
+          'over ${approximateDuration(extraTime)} '
+          '($earningsPerSecond/s)');
       best = trip;
       break;
+    } else {
+      log('Skipping ${trip.price.waypointSymbol} would add '
+          '${creditsString(extraEarnings)} for ${approximateDuration(extraTime)} '
+          '($earningsPerSecond/s)');
     }
+    printCount--;
   }
 
   return best;

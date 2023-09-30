@@ -459,6 +459,22 @@ extension ShipUtils on Ship {
     }
     return 'Unknown';
   }
+
+  /// Returns the Duration until the ship is ready to use its reactor again.
+  /// Will never return a negative duration, will instead return null.
+  /// Use this instead of cooldown.remainingSeconds since that can be stale
+  /// and does not reflect the current time.
+  Duration? remainingCooldown(DateTime now) {
+    final expiration = cooldown.expiration;
+    if (expiration == null) {
+      return null;
+    }
+    final duration = expiration.difference(now);
+    if (duration.isNegative) {
+      return null;
+    }
+    return duration;
+  }
 }
 
 /// Extensions onto ShipNav to make it easier to work with.

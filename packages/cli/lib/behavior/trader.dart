@@ -633,6 +633,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       ship,
       unwantedCargo.tradeSymbol,
       expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
+      unitsToSell: unwantedCargo.units,
     ),
     'No market for ${unwantedCargo.symbol}.',
     const Duration(hours: 1),

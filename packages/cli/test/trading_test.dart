@@ -643,6 +643,7 @@ void main() {
         ship,
         TradeSymbol.ALUMINUM,
         expectedCreditsPerSecond: 1,
+        unitsToSell: 1,
       ),
     );
 

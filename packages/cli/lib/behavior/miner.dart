@@ -534,8 +534,6 @@ Future<JobResult> sellCargoIfNeeded(
   // This currently optimizes for price and does not consider requests.
   // Some cargo should jettison and some should transfer to haulers.
 
-  // FIXME(eseidel): This does not consider the round-trip cost, or that it will
-  // take ship.cooldown until we can mine again.
   final costedTrip = assertNotNull(
     findBestMarketToSell(
       caches.marketPrices,
@@ -543,6 +541,10 @@ Future<JobResult> sellCargoIfNeeded(
       ship,
       largestCargo.tradeSymbol,
       expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
+      unitsToSell: largestCargo.units,
+      // Don't use ship.cooldown.remainingSeconds because it may be stale.
+      minimumDuration: ship.remainingCooldown(getNow()),
+      includeRoundTripCost: true,
     ),
     'No market for ${largestCargo.symbol}.',
     const Duration(minutes: 10),
@@ -615,5 +617,5 @@ final advanceMiner = const MultiJob('Miner', [
   // space?
   emptyCargoIfNeeded,
   doMineJob,
-  emptyCargoIfNeeded,
+  sellCargoIfNeeded,
 ]).run;
