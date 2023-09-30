@@ -309,7 +309,6 @@ void main() {
         systemsCache,
         routePlanner,
         marketScan,
-        maxJumps: 1,
         maxTotalOutlay: 100000,
         startSymbol: ship.waypointSymbol,
         fuelCapacity: ship.fuel.capacity,

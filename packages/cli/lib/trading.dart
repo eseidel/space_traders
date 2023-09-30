@@ -356,19 +356,23 @@ MarketScan scanNearbyMarkets(
   return MarketScan.fromMarketPrices(
     marketPrices,
     waypointFilter: allowedWaypoints.contains,
+    description:
+        '$maxJumps jumps of $systemSymbol (limit $maxWaypoints waypoints)',
   );
 }
 
 CostedDeal? _filterDealsAndLog(
   Iterable<CostedDeal> costedDeals, {
-  required int maxJumps,
+  required String rangeDescription,
   required int maxTotalOutlay,
   required SystemSymbol systemSymbol,
   bool Function(CostedDeal deal)? filter,
 }) {
   final filtered = filter != null ? costedDeals.where(filter) : costedDeals;
 
-  final withinRange = 'within $maxJumps jumps of $systemSymbol';
+  // findDealFor does not use maxJumps, but it's passed in a MarketScan which
+  // was built with maxJumps, so we log it here.
+  final withinRange = 'within $rangeDescription';
   if (filtered.isEmpty) {
     logger.detail('No deals $withinRange.');
     return null;
@@ -404,7 +408,6 @@ CostedDeal? findDealFor(
   required int fuelCapacity,
   required int cargoCapacity,
   required int shipSpeed,
-  required int maxJumps,
   required int maxTotalOutlay,
   List<SellOpp>? extraSellOpps,
   bool Function(CostedDeal deal)? filter,
@@ -412,7 +415,7 @@ CostedDeal? findDealFor(
   logger.detail(
     'Finding deals with '
     'start: $startSymbol, '
-    'max jumps: $maxJumps, '
+    'from scan: ${scan.description}, '
     'max outlay: $maxTotalOutlay, '
     'max units: $cargoCapacity, '
     'fuel capacity: $fuelCapacity, '
@@ -449,7 +452,7 @@ CostedDeal? findDealFor(
   }
   return _filterDealsAndLog(
     costedDeals,
-    maxJumps: maxJumps,
+    rangeDescription: scan.description,
     maxTotalOutlay: maxTotalOutlay,
     systemSymbol: startSymbol.systemSymbol,
     filter: filter,
@@ -630,7 +633,8 @@ MarketTrip? findBestMarketToSell(
       break;
     } else {
       log('Skipping ${trip.price.waypointSymbol} would add '
-          '${creditsString(extraEarnings)} for ${approximateDuration(extraTime)} '
+          '${creditsString(extraEarnings)} '
+          'for ${approximateDuration(extraTime)} '
           '($earningsPerSecond/s)');
     }
     printCount--;

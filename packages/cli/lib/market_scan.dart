@@ -46,6 +46,7 @@ class MarketScan {
   MarketScan._({
     required Map<TradeSymbol, List<BuyOpp>> buyOpps,
     required Map<TradeSymbol, List<SellOpp>> sellOpps,
+    required this.description,
   })  : _buyOpps = Map.unmodifiable(buyOpps),
         _sellOpps = Map.unmodifiable(sellOpps);
 
@@ -55,12 +56,14 @@ class MarketScan {
     required List<BuyOpp> buyOpps,
     required List<SellOpp> sellOpps,
   })  : _buyOpps = groupBy(buyOpps, (b) => b.tradeSymbol),
-        _sellOpps = groupBy(sellOpps, (s) => s.tradeSymbol);
+        _sellOpps = groupBy(sellOpps, (s) => s.tradeSymbol),
+        description = 'test';
 
   /// Given a set of historical market prices, will collect the top N buy and
   /// sell opportunities for each trade symbol regardless of distance.
   factory MarketScan.fromMarketPrices(
     MarketPrices marketPrices, {
+    required String description,
     bool Function(WaypointSymbol waypointSymbol)? waypointFilter,
   }) {
     final builder = _MarketScanBuilder(topLimit: 5);
@@ -71,11 +74,18 @@ class MarketScan {
       }
       builder.visitMarketPrice(marketPrice);
     }
-    return MarketScan._(buyOpps: builder.buyOpps, sellOpps: builder.sellOpps);
+    return MarketScan._(
+      buyOpps: builder.buyOpps,
+      sellOpps: builder.sellOpps,
+      description: description,
+    );
   }
 
   final Map<TradeSymbol, List<BuyOpp>> _buyOpps;
   final Map<TradeSymbol, List<SellOpp>> _sellOpps;
+
+  /// A description of how this market scan was created.
+  final String description;
 
   /// The trade symbols for which we found opportunities.
   List<TradeSymbol> get tradeSymbols => _buyOpps.keys.toList();

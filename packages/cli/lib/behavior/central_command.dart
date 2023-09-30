@@ -258,6 +258,8 @@ class CentralCommand {
     bool filter(CostedDeal deal) {
       return inProgress.every(
         (d) =>
+            // Deals need to differ in their source *or* their trade symbol
+            // for us to consider them.
             d.deal.sourceSymbol != deal.deal.sourceSymbol ||
             d.deal.tradeSymbol != deal.deal.tradeSymbol,
       );
@@ -288,13 +290,12 @@ class CentralCommand {
       systemsCache,
       routePlanner,
       marketScan,
-      maxJumps: maxJumps,
       maxTotalOutlay: maxTotalOutlay,
       extraSellOpps: extraSellOpps,
       filter: filter,
       startSymbol: startSymbol,
       fuelCapacity: ship.fuel.capacity,
-      // Currently using capacity, rather than availableSpace, since the
+      // Using capacity, rather than availableSpace, since the
       // trader logic tries to clear out the hold.
       cargoCapacity: ship.cargo.capacity,
       shipSpeed: ship.engine.speed,

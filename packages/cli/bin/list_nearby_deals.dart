@@ -98,7 +98,6 @@ Future<void> cliMain(List<String> args) async {
     systemsCache,
     routePlanner,
     marketScan,
-    maxJumps: maxJumps,
     maxTotalOutlay: maxOutlay,
     cargoCapacity: cargoCapacity,
     fuelCapacity: fuelCapacity,
