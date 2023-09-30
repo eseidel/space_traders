@@ -544,6 +544,7 @@ void main() {
 
   test('findBestMarketToSell smoke test', () {
     final ship = _MockShip();
+    when(() => ship.symbol).thenReturn('S-1');
     final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
