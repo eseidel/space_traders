@@ -96,6 +96,37 @@ void main() {
     );
   });
 
+  test('mountsToRemoveFromShip', () {
+    final ship = _MockShip();
+    final mountSymbols = [
+      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbolEnum.SURVEYOR_I,
+      ShipMountSymbolEnum.MINING_LASER_II,
+    ];
+    ShipMount mountForSymbol(ShipMountSymbolEnum symbol) {
+      return ShipMount(
+        symbol: symbol,
+        name: '',
+        description: '',
+        requirements: ShipRequirements(),
+      );
+    }
+
+    when(() => ship.mounts)
+        .thenReturn(mountSymbols.map(mountForSymbol).toList());
+    final template = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.MINER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.MINING_LASER_I,
+      ]),
+    );
+    final toRemove = mountsToRemoveFromShip(ship, template);
+    expect(toRemove, isNotEmpty);
+    expect(toRemove, MountSymbolSet.from([ShipMountSymbolEnum.SURVEYOR_I]));
+  });
+
   test('ShipTemplate.matches', () {
     final template = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.FIGHTER,

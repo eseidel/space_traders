@@ -125,6 +125,7 @@ Future<SellCargo201ResponseData> sellCargo(
   Api api,
   AgentCache agentCache,
   Ship ship,
+  ShipCache shipCache,
   TradeSymbol tradeSymbol,
   int units,
 ) async {
@@ -135,6 +136,7 @@ Future<SellCargo201ResponseData> sellCargo(
   final response =
       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
   ship.cargo = response!.data.cargo;
+  shipCache.updateShip(ship);
   agentCache.agent = response.data.agent;
   return response.data;
 }

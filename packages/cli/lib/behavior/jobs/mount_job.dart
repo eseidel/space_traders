@@ -63,6 +63,13 @@ Future<JobResult> doMountJob(
     }
   }
 
+  final needed = mountsToAddToShip(ship, template);
+  jobAssert(
+    needed.contains(mountJob.mountSymbol),
+    'Ship does not need ${mountJob.mountSymbol}?',
+    const Duration(minutes: 10),
+  );
+
   // 🛸#6  🔧 MOUNT_MINING_LASER_II on ESEIDEL-6 for 3,600c -> 🏦 89,172c
   // Mount the new mount.
   await installMountAndLog(

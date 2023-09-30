@@ -52,6 +52,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
   Api api,
   AgentCache agentCache,
   Market market,
+  ShipCache shipCache,
   Ship ship, {
   bool Function(TradeSymbol tradeSymbol)? where,
 }) async* {
@@ -82,6 +83,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
         api,
         agentCache,
         ship,
+        shipCache,
         item.tradeSymbol,
         toSell,
       );
@@ -99,6 +101,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
   MarketPrices marketPrices,
   AgentCache agentCache,
   Market market,
+  ShipCache shipCache,
   Ship ship,
   AccountingType accounting, {
   bool Function(TradeSymbol tradeSymbol)? where,
@@ -110,7 +113,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
 
   final transactions = <Transaction>[];
   await for (final response
-      in sellAllCargo(api, agentCache, market, ship, where: where)) {
+      in sellAllCargo(api, agentCache, market, shipCache, ship, where: where)) {
     final marketTransaction = response.transaction;
     final agent = response.agent;
     logMarketTransaction(ship, marketPrices, agent, marketTransaction);
@@ -123,6 +126,29 @@ Future<List<Transaction>> sellAllCargoAndLog(
     transactions.add(transaction);
   }
   return transactions;
+}
+
+/// Jettison all cargo.
+Future<void> jettisonAllCargoAndLog(
+  Api api,
+  ShipCache shipCache,
+  Ship ship,
+) async {
+  if (ship.cargo.inventory.isEmpty) {
+    shipInfo(ship, 'No cargo to jettison');
+    return;
+  }
+
+  for (final item in ship.cargo.inventory) {
+    shipWarn(ship, 'Jettisoning ${item.units} ${item.symbol}');
+    final response = await api.fleet.jettison(
+      ship.symbol,
+      jettisonRequest:
+          JettisonRequest(symbol: item.tradeSymbol, units: item.units),
+    );
+    ship.cargo = response!.data.cargo;
+    shipCache.updateShip(ship);
+  }
 }
 
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.

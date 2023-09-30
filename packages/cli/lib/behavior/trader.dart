@@ -226,6 +226,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
     caches.marketPrices,
     caches.agent,
     currentMarket,
+    caches.ships,
     ship,
     AccountingType.goods,
   );
@@ -606,6 +607,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       caches.marketPrices,
       caches.agent,
       currentMarket,
+      caches.ships,
       ship,
       // We don't have a good way to know what type of cargo this is.
       // Assuming it's goods (rather than captial) is probably fine.

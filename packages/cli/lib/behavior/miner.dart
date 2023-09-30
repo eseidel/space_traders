@@ -467,6 +467,7 @@ Future<JobResult> emptyCargoIfNeeded(
       caches.marketPrices,
       caches.agent,
       currentMarket,
+      caches.ships,
       ship,
       AccountingType.goods,
     );
@@ -485,17 +486,21 @@ Future<JobResult> emptyCargoIfNeeded(
   }
 
   final largestCargo = ship.largestCargo();
-  final nearestMarket = assertNotNull(
-    await nearbyMarketWhichTrades(
-      caches.systems,
-      caches.waypoints,
-      caches.markets,
-      currentWaypoint.waypointSymbol,
-      largestCargo!.tradeSymbol,
-    ),
-    'No nearby market which trades ${largestCargo.symbol}.',
-    const Duration(hours: 1),
+  final nearestMarket = await nearbyMarketWhichTrades(
+    caches.systems,
+    caches.waypoints,
+    caches.markets,
+    currentWaypoint.waypointSymbol,
+    largestCargo!.tradeSymbol,
   );
+  if (nearestMarket == null) {
+    shipErr(
+      ship,
+      'No nearby market to sell ${largestCargo.symbol}, jetisoning cargo!',
+    );
+    await jettisonAllCargoAndLog(api, caches.ships, ship);
+    return JobResult.complete();
+  }
   final waitTime = await beingNewRouteAndLog(
     api,
     ship,
@@ -571,6 +576,7 @@ Future<JobResult> sellCargoIfNeeded(
     caches.marketPrices,
     caches.agent,
     currentMarket,
+    caches.ships,
     ship,
     // We don't have a good way to know what type of cargo this is.
     // Assuming it's goods (rather than captial) is probably fine.
