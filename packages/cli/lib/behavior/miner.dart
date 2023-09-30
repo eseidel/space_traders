@@ -73,8 +73,10 @@ class MiningSquad {
         return kMineAndSurveyTemplate;
       }
     }
-    // If our first ship has already mounted surveyors, we should only mine.
-    if (kSurveyOnlyTemplate.matches(surveyor)) {
+    // If our first ship has already mounted at least one surveyor, we should
+    // only mine.
+    if (surveyor.mountedMountSymbols
+        .contains(ShipMountSymbolEnum.SURVEYOR_II)) {
       return kMineOnlyTemplate;
     }
     // Otherwise we also need to survey.
