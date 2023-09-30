@@ -335,6 +335,7 @@ void main() {
       mounts: MountSymbolSet.from([
         ShipMountSymbolEnum.SURVEYOR_II,
         ShipMountSymbolEnum.SURVEYOR_II,
+        ShipMountSymbolEnum.SURVEYOR_II,
       ]),
     );
     // Move to survey2s once we have found survey2s
@@ -357,8 +358,9 @@ void main() {
       name: '',
       requirements: ShipRequirements(),
     );
-    when(() => surveyorOne.mounts).thenReturn([surveyorMount, surveyorMount]);
-    when(() => surveyorTwo.mounts).thenReturn([surveyorMount, surveyorMount]);
+    final surveyorOnlyMounts = [surveyorMount, surveyorMount, surveyorMount];
+    when(() => surveyorOne.mounts).thenReturn(surveyorOnlyMounts);
+    when(() => surveyorTwo.mounts).thenReturn(surveyorOnlyMounts);
     final mineOnly = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.MINER,
       mounts: MountSymbolSet.from([
@@ -382,7 +384,7 @@ void main() {
     final sixShips = makeMiners(6);
     when(() => shipCache.ships).thenReturn(sixShips);
     // Ships 2-5 won't mineOnly until the surveyor has its mounts.
-    when(() => sixShips[0].mounts).thenReturn([surveyorMount, surveyorMount]);
+    when(() => sixShips[0].mounts).thenReturn(surveyorOnlyMounts);
     expect(centralCommand.templateForShip(sixShips[0]), surveyor);
     expect(centralCommand.templateForShip(sixShips[1]), mineOnly);
     expect(centralCommand.templateForShip(sixShips[2]), mineOnly);
@@ -390,21 +392,21 @@ void main() {
     expect(centralCommand.templateForShip(sixShips[4]), mineOnly);
     // Even if we already have surveyors mounted on the first ship of a squad,
     // we should not specialize until we have two ships in a squad.
-    when(() => sixShips[5].mounts).thenReturn([surveyorMount, surveyorMount]);
+    when(() => sixShips[5].mounts).thenReturn(surveyorOnlyMounts);
     expect(centralCommand.templateForShip(sixShips[5]), surveyAndMine);
 
     // Once we have two ships in a squad then it's OK to specialize:
     final sevenShips = makeMiners(7);
     when(() => shipCache.ships).thenReturn(sevenShips);
     // Ships 2-5 won't mineOnly until the surveyor has its mounts.
-    when(() => sevenShips[0].mounts).thenReturn([surveyorMount, surveyorMount]);
+    when(() => sevenShips[0].mounts).thenReturn(surveyorOnlyMounts);
     expect(centralCommand.templateForShip(sevenShips[0]), surveyor);
     expect(centralCommand.templateForShip(sevenShips[1]), mineOnly);
     expect(centralCommand.templateForShip(sevenShips[2]), mineOnly);
     expect(centralCommand.templateForShip(sevenShips[3]), mineOnly);
     expect(centralCommand.templateForShip(sevenShips[4]), mineOnly);
     // Ships 2+ won't mineOnly until the surveyor has its mounts.
-    when(() => sevenShips[5].mounts).thenReturn([surveyorMount, surveyorMount]);
+    when(() => sevenShips[5].mounts).thenReturn(surveyorOnlyMounts);
     expect(centralCommand.templateForShip(sevenShips[5]), surveyor);
     expect(centralCommand.templateForShip(sevenShips[6]), mineOnly);
   });
