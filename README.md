@@ -114,7 +114,7 @@ Most impact:
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
 * Confirm planRoute is using PriorityQueue correctly.
-* Could await on somehting other than the network (e.g. a priority queue).
+* Could await on sometime other than the network (e.g. a priority queue).
 * Add atomic writes (write to a temp file and then rename).
 
 Earning:
