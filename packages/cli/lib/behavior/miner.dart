@@ -545,6 +545,7 @@ Future<JobResult> sellCargoIfNeeded(
       // Don't use ship.cooldown.remainingSeconds because it may be stale.
       minimumDuration: ship.remainingCooldown(getNow()),
       includeRoundTripCost: true,
+      requireFuelAtDestination: true,
     ),
     'No market for ${largestCargo.symbol}.',
     const Duration(minutes: 10),
