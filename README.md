@@ -672,3 +672,11 @@ ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-MU55
 🛸#1  ✍️  market data @ X1-AG30-65570X
 Accepted: deliver 1060  COPPER_ORE to X1-AG30-29102A in 6d for 160,272c with 34,344c upfront.
 received 34,344c
+
+### mount_from_buy seems to sometimes end up with an extra mount?
+
+ESEIDEL-4E: null
+  Orbiting X1-AV52-62175B ASTEROID_FIELD EXCAVATOR 1/60
+  MOUNT_SURVEYOR_II         1 x 17,478c  = 17,478c
+
+null in this case is a surveyor.
