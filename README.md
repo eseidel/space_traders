@@ -110,7 +110,6 @@ Then modified:
 ### Todo
 
 Most impact:
-* Teach miners to move to sell goods if needed.
 * Be able to support miners across multiple systems.
 * Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
@@ -121,7 +120,6 @@ Most impact:
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
 * Use recent earnings-per-second in ship behavior planning.
-* Fix miners to know how to travel to nearby markets to sell.
 * Fix miners to know when to leave a system (when prices are too low).
 * Teach miners how to coordinate with haulers to sell their goods further away.
 * Add refining
