@@ -489,9 +489,13 @@ class CentralCommand {
   /// Returns true if [ship] should start the mountFromBuy behavior.
   bool shouldBuyMount(Ship ship, int credits) {
     // Are there any other ships actively buying mounts?
-    if (_behaviorCache.states.any(
+    bool otherShipsAreBuyingMounts = _behaviorCache.states.any(
       (s) => s.behavior == Behavior.mountFromBuy,
-    )) {
+    );
+    // Only enforce the "one at a time" when we have less than 10M credits.
+    // The 10M is mostly a hack to allow deploying changes to mounts quickly
+    // late game.
+    if (credits < 10000000 || otherShipsAreBuyingMounts) {
       return false;
     }
     // Does this ship have a mount it needs?
