@@ -32,12 +32,19 @@ class ShipWaiter {
   final _queue = PriorityQueue<ShipWaiterEntry>(_compareEntries);
 
   /// Schedules any ships that are missing.
-  void scheduleMissingShips(List<Ship> ships, {bool suppressWarnings = false}) {
+  void scheduleMissingShips(
+    List<Ship> ships, {
+    bool suppressWarnings = false,
+    bool Function(Ship ship)? shipFilter,
+  }) {
     // Get the set of existing ships we've scheduled.
     // schedule any missing.
     final existing = _queue.toUnorderedList().map((e) => e.shipSymbol).toSet();
     for (final ship in ships) {
       if (!existing.contains(ship.shipSymbol)) {
+        if (shipFilter != null && !shipFilter(ship)) {
+          continue;
+        }
         if (!suppressWarnings) {
           logger.warn('Adding missing ship ${ship.shipSymbol}');
         }

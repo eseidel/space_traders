@@ -37,7 +37,7 @@ Future<void> advanceShips(
   // loop over all ships and advance them.
   for (var i = 0; i < loopCount; i++) {
     // Make sure we check every time in case a ship was added.
-    waiter.scheduleMissingShips(caches.ships.ships);
+    waiter.scheduleMissingShips(caches.ships.ships, shipFilter: shipFilter);
 
     final entry = waiter.nextShip();
     final shipSymbol = entry.shipSymbol;
@@ -148,7 +148,11 @@ Future<void> logic(
   bool Function(Ship ship)? shipFilter,
 }) async {
   final waiter = ShipWaiter()
-    ..scheduleMissingShips(caches.ships.ships, suppressWarnings: true);
+    ..scheduleMissingShips(
+      caches.ships.ships,
+      suppressWarnings: true,
+      shipFilter: shipFilter,
+    );
   final rateLimitTracker = RateLimitTracker(api);
 
   while (true) {
