@@ -89,6 +89,14 @@ Future<void> advanceShips(
       waiter.scheduleShip(shipSymbol, expiration);
     }
   }
+
+  // Print a warning about any ships that have been waiting too long.
+  final oneMinuteAgo =
+      DateTime.timestamp().subtract(const Duration(minutes: 1));
+  final starvedShips = waiter.starvedShips(oneMinuteAgo);
+  if (starvedShips.isNotEmpty) {
+    logger.warn('⚠️  ${starvedShips.length} starved ships: $starvedShips');
+  }
 }
 
 /// RateLimitTracker tracks the rate limit usage and prints stats.

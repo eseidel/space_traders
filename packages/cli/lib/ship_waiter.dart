@@ -53,4 +53,14 @@ class ShipWaiter {
 
   /// Returns the next ship to be processed.
   ShipWaiterEntry nextShip() => _queue.removeFirst();
+
+  /// Returns a list of ShipSymbols that have been waiting too long.
+  Iterable<ShipSymbol> starvedShips(DateTime starvationThreshold) sync* {
+    for (final entry in _queue.toUnorderedList()) {
+      if (entry.waitUntil != null &&
+          entry.waitUntil!.isBefore(starvationThreshold)) {
+        yield entry.shipSymbol;
+      }
+    }
+  }
 }
