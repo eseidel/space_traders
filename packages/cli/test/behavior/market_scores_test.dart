@@ -1,7 +1,7 @@
-import 'package:cli/behavior/market_scores.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/market_scores.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';

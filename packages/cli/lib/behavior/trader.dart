@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/market_scores.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/market_scores.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
