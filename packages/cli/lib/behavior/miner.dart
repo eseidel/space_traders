@@ -32,6 +32,7 @@ final kSurveyOnlyTemplate = ShipTemplate(
   mounts: MountSymbolSet.from([
     ShipMountSymbolEnum.SURVEYOR_II,
     ShipMountSymbolEnum.SURVEYOR_II,
+    ShipMountSymbolEnum.SURVEYOR_II,
   ]),
 );
 
