@@ -51,7 +51,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final credits = creditsString(last.agentCredits).padLeft(creditsWidth);
     logger.info('-$sinceLast $credits');
   }
-  // Print per-ship data.
+  // Required or main will hang.
+  await db.close();
 }
 
 void main(List<String> args) async {

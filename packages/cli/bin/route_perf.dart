@@ -79,4 +79,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       'took ${result.duration.inMilliseconds}ms',
     );
   }
+
+  // Required or main will hang.
+  await db.close();
 }

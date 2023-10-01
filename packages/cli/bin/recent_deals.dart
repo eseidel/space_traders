@@ -181,5 +181,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     logger.info(describeTransaction(transaction));
   }
 
+  // Required or main will hang.
   await db.close();
 }
