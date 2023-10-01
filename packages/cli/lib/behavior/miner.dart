@@ -235,6 +235,12 @@ final _laserMountSymbols = {
   ShipMountSymbolEnum.MINING_LASER_III,
 };
 
+final _surveyMountSymbols = {
+  ShipMountSymbolEnum.SURVEYOR_I,
+  ShipMountSymbolEnum.SURVEYOR_II,
+  ShipMountSymbolEnum.SURVEYOR_III,
+};
+
 /// Compute the total strength of all laser mounts on [ship].
 int _laserMountStrength(Ship ship) {
   return ship.mounts.fold(0, (sum, m) {
@@ -245,19 +251,34 @@ int _laserMountStrength(Ship ship) {
   });
 }
 
+/// Compute the total power of all mounts on [ship]
+/// with symbols in [mountSymbols].
+int _powerUsedByMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
+  return ship.mounts.fold(0, (sum, m) {
+    final power = m.requirements.power ?? 0;
+    return mountSymbols.contains(m.symbol) ? sum + power : sum;
+  });
+}
+
 /// Compute the total power of all laser mounts on [ship].
 int _powerUsedByLasers(Ship ship) {
-  return ship.mounts.fold(0, (sum, m) {
-    if (_laserMountSymbols.contains(m.symbol)) {
-      return sum + (m.requirements.power ?? 0);
-    }
-    return sum;
-  });
+  return _powerUsedByMounts(ship, _laserMountSymbols);
+}
+
+/// Compute the total power of all survey mounts on [ship].
+int _powerUsedBySurveyors(Ship ship) {
+  return _powerUsedByMounts(ship, _surveyMountSymbols);
 }
 
 /// Compute the cooldown time for an extraction by [ship].
 int cooldownTimeForExtraction(Ship ship) {
   final power = _powerUsedByLasers(ship);
+  return 60 + 10 * power;
+}
+
+/// Compute the cooldown time for a survey by [ship].
+int cooldownTimeForSurvey(Ship ship) {
+  final power = _powerUsedBySurveyors(ship);
   return 60 + 10 * power;
 }
 
@@ -280,6 +301,16 @@ int maxExtractedUnits(Ship ship) {
     }
   }
   return min(laserStrength + variance, ship.cargo.capacity);
+}
+
+/// Log a warning if [cooldown] is not [expected].
+void verifyCooldown(Ship ship, String label, int expected, Cooldown cooldown) {
+  if (cooldown.totalSeconds != expected) {
+    shipWarn(
+        ship,
+        '$label expected $expected second cooldown, '
+        'got ${cooldown.totalSeconds}.');
+  }
 }
 
 /// Tell [ship] to extract resources and log the result.
@@ -331,15 +362,12 @@ Future<JobResult> extractAndLog(
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
 
-    final expectedCooldown = cooldownTimeForExtraction(ship);
-    final actualCooldown = response.cooldown.totalSeconds;
-    if (expectedCooldown != actualCooldown) {
-      shipWarn(
-          ship,
-          'Extracted with laser strength $laserStrength. '
-          'Expected $expectedCooldown second cooldown, '
-          'got $actualCooldown.');
-    }
+    verifyCooldown(
+      ship,
+      'Extraction',
+      cooldownTimeForExtraction(ship),
+      response.cooldown,
+    );
 
     // If we still have space wait the cooldown and continue mining.
     if (ship.availableSpace >= maxExtractedUnits(ship)) {
@@ -433,6 +461,14 @@ Future<JobResult> doMineJob(
   if (maybeSurvey == null && ship.hasSurveyor) {
     final response =
         await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
+
+    verifyCooldown(
+      ship,
+      'Survey',
+      cooldownTimeForSurvey(ship),
+      response.cooldown,
+    );
+
     // Count completion of survey as a success, otherwise we could end up
     // surveying for a long time before checking other behaviors.
     // We don't need to do this for miners since they don't change as often.

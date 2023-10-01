@@ -1,5 +1,6 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
@@ -44,6 +45,14 @@ Future<DateTime?> advanceSurveyor(
   await undockIfNeeded(api, caches.ships, ship);
   final response =
       await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
+
+  verifyCooldown(
+    ship,
+    'Survey',
+    cooldownTimeForSurvey(ship),
+    response.cooldown,
+  );
+
   // Each survey is the whole behavior.
   state.isComplete = true;
   return response.cooldown.expiration;
