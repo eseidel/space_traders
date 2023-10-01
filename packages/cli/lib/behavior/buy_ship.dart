@@ -5,6 +5,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/net/exceptions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/trading.dart';
 import 'package:db/db.dart';
@@ -118,21 +119,36 @@ Future<DateTime?> advanceBuyShip(
   recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
   // TODO(eseidel): Catch exceptions about insufficient credits.
-  final result = await purchaseShipAndLog(
-    api,
-    db,
-    caches.ships,
-    caches.agent,
-    ship,
-    shipyard.waypointSymbol,
-    shipType,
-  );
+  final PurchaseShip201ResponseData result;
+  try {
+    result = await purchaseShipAndLog(
+      api,
+      db,
+      caches.ships,
+      caches.agent,
+      ship,
+      shipyard.waypointSymbol,
+      shipType,
+    );
+  } on ApiException catch (e) {
+    // ApiException 400: {"error":{"message":"Failed to purchase ship.
+    // Agent has insufficient funds.","code":4216,
+    // "data":{"creditsAvailable":116103,"creditsNeeded":172355}}}
+    final neededCredits = neededCreditsFromPurchaseShipException(e);
+    if (neededCredits == null) {
+      // Was not an insufficient credits exception.
+      rethrow;
+    }
+    failJob(
+      'Failed to purchase ship ${caches.agent.agent.credits} < $neededCredits',
+      const Duration(minutes: 10),
+    );
+  }
+
   // Record our success!
   state.isComplete = true;
-  jobAssert(
-    false,
+  failJob(
     'Purchased ${result.ship.symbol} ($shipType)!',
     const Duration(minutes: 10),
   );
-  return null;
 }

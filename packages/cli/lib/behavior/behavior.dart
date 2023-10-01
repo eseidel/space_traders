@@ -48,6 +48,10 @@ void jobAssert(
   }
 }
 
+/// Throw a job exception.
+Never failJob(String message, Duration timeout) =>
+    throw JobException(message, timeout);
+
 /// Exception thrown from a Job if the condition is not met.
 T assertNotNull<T>(
   T? value,
@@ -175,11 +179,9 @@ class MultiJob {
         return result.waitTime;
       }
     }
-    jobAssert(
-      false,
+    failJob(
       'Too many $name job iterations',
       const Duration(hours: 1),
     );
-    return null;
   }
 }

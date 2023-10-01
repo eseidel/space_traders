@@ -148,3 +148,33 @@ bool isInsufficientCreditsException(ApiException e) {
 bool isShipNotInOrbitException(ApiException e) {
   return isAPIExceptionWithCode(e, 4236);
 }
+
+// ApiException 400: {"error":{"message":"Failed to purchase ship.
+// Agent has insufficient funds.","code":4216,
+// "data":{"creditsAvailable":116103,"creditsNeeded":172355}}}
+// bool isInsufficientCreditsToPurchaseShipException(ApiException e) {
+//   return isAPIExceptionWithCode(e, 4216);
+// }
+
+int? neededCreditsFromPurchaseShipException(ApiException e) {
+  final jsonString = e.message;
+  if (jsonString != null) {
+    Map<String, dynamic> exceptionJson;
+    try {
+      exceptionJson = jsonDecode(jsonString) as Map<String, dynamic>;
+    } on FormatException catch (e) {
+      // Catch any json decode errors, so the original exception can be
+      // rethrown by the caller instead of a json decode error.
+      logger.warn('Failed to parse exception json: $e');
+      return null;
+    }
+    final error = mapCastOfType<String, dynamic>(exceptionJson, 'error');
+    final code = mapValueOfType<int>(error, 'code');
+    if (code != 4216) {
+      return null;
+    }
+    final errorData = mapCastOfType<String, dynamic>(error, 'data');
+    return mapValueOfType<int>(errorData, 'creditsNeeded');
+  }
+  return null;
+}

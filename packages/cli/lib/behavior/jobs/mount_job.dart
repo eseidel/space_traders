@@ -82,6 +82,5 @@ Future<JobResult> doMountJob(
   );
   // We're done.
   state.isComplete = true;
-  jobAssert(false, 'Mounting complete!', const Duration(hours: 1));
-  return JobResult.complete();
+  failJob('Mounting complete!', const Duration(hours: 1));
 }
