@@ -270,4 +270,37 @@ void main() {
       ),
     );
   });
+
+  test('mountRequestForShip', () async {
+    final ship = _MockShip();
+    when(() => ship.mounts).thenReturn([]);
+    final centralCommand = _MockCentralCommand();
+    final caches = _MockCaches();
+    final shipCache = _MockShipCache();
+    when(() => caches.ships).thenReturn(shipCache);
+    final marketPrices = _MockMarketPrices();
+    when(() => caches.marketPrices).thenReturn(marketPrices);
+    final routePlanner = _MockRoutePlanner();
+    when(() => caches.routePlanner).thenReturn(routePlanner);
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => marketPrices.pricesFor(any())).thenReturn([]);
+
+    final template = ShipTemplate(
+      frameSymbol: ShipFrameSymbolEnum.CARRIER,
+      mounts: MountSymbolSet.from([
+        ShipMountSymbolEnum.SURVEYOR_I,
+        ShipMountSymbolEnum.SURVEYOR_II,
+      ]),
+    );
+
+    final request = await mountRequestForShip(
+      centralCommand,
+      caches,
+      ship,
+      template,
+      expectedCreditsPerSecond: 7,
+    );
+    // We would need to return prices above for this to be non-null.
+    expect(request, isNull);
+  });
 }
