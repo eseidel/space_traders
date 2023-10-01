@@ -31,3 +31,31 @@ Future<R> runOffline<R>(
     values: {loggerRef},
   );
 }
+
+/// Run command with a logger, and ArgParser.
+// This should replace runOffline for all callers.
+Future<R> runOfflineArgs<R>(
+  List<String> args,
+  Future<R> Function(FileSystem fs, ArgResults argResults) fn,
+  void Function(ArgParser parser)? addArgs,
+) async {
+  final parser = ArgParser()
+    ..addFlag(
+      'verbose',
+      abbr: 'v',
+      help: 'Verbose logging',
+      negatable: false,
+    );
+  addArgs?.call(parser);
+  final results = parser.parse(args);
+  const fs = LocalFileSystem();
+  return runScoped(
+    () async {
+      if (results['verbose'] as bool) {
+        setVerboseLogging();
+      }
+      return fn(fs, results);
+    },
+    values: {loggerRef},
+  );
+}

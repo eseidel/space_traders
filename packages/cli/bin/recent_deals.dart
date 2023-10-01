@@ -180,4 +180,6 @@ Future<void> command(FileSystem fs, List<String> args) async {
   for (final transaction in ignoredTransactions) {
     logger.info(describeTransaction(transaction));
   }
+
+  await db.close();
 }

@@ -1,40 +1,69 @@
+import 'package:args/args.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
+import 'package:types/types.dart';
 
-Future<void> command(FileSystem fs, List<String> args) async {
-  final contractCache = ContractCache.loadCached(fs)!;
-  final marketPrices = MarketPrices.load(fs);
-  final completed = contractCache.completedContracts;
-  if (completed.isNotEmpty) {
-    logger.info('${completed.length} completed.');
+void printContracts(
+  String label,
+  List<Contract> contracts,
+  MarketPrices marketPrices, {
+  required bool describeContracts,
+}) {
+  if (contracts.isEmpty) {
+    return;
   }
-  final expired = contractCache.expiredContracts;
-  if (expired.isNotEmpty) {
-    logger.info('${expired.length} expired.');
+  final punctuation = describeContracts ? ':' : '.';
+  logger.info('${contracts.length} $label$punctuation');
+  if (!describeContracts) {
+    return;
   }
-  final active = contractCache.activeContracts;
-  if (active.isNotEmpty) {
-    logger.info('${active.length} active:');
-    for (final contract in active) {
-      logger
-        ..info(contractDescription(contract))
-        ..info(describeExpectedContractProfit(marketPrices, contract));
-    }
-  }
-  final unaccepted = contractCache.unacceptedContracts;
-  if (unaccepted.isNotEmpty) {
-    logger.info('${unaccepted.length} unaccepted:');
-    for (final contract in unaccepted) {
-      logger
-        ..info(contractDescription(contract))
-        ..info(describeExpectedContractProfit(marketPrices, contract));
-    }
+  for (final contract in contracts) {
+    logger
+      ..info(contractDescription(contract))
+      ..info(describeExpectedContractProfit(marketPrices, contract));
   }
 }
 
+Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final printAll = argResults['all'] as bool;
+  final contractCache = ContractCache.loadCached(fs)!;
+  final marketPrices = MarketPrices.load(fs);
+  printContracts(
+    'completed',
+    contractCache.completedContracts,
+    marketPrices,
+    describeContracts: printAll,
+  );
+  printContracts(
+    'expired',
+    contractCache.expiredContracts,
+    marketPrices,
+    describeContracts: printAll,
+  );
+  printContracts(
+    'active',
+    contractCache.activeContracts,
+    marketPrices,
+    describeContracts: true,
+  );
+  printContracts(
+    'unaccepted',
+    contractCache.unacceptedContracts,
+    marketPrices,
+    describeContracts: true,
+  );
+}
+
 void main(List<String> args) async {
-  await runOffline(args, command);
+  await runOfflineArgs(args, command, (parser) {
+    parser.addFlag(
+      'all',
+      abbr: 'a',
+      help: 'Print all contracts, not just active ones.',
+      negatable: false,
+    );
+  });
 }
