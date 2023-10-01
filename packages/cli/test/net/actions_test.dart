@@ -205,4 +205,64 @@ void main() {
       ),
     ).called(1);
   });
+
+  test('transferCargoAndLog', () async {
+    final shipCargo = ShipCargo(capacity: 10, units: 10);
+    final fromSymbol = ShipSymbol.fromString('S-1');
+    final fromShip = _MockShip();
+    when(() => fromShip.symbol).thenReturn(fromSymbol.symbol);
+    when(() => fromShip.cargo).thenReturn(shipCargo);
+
+    final toSymbol = ShipSymbol.fromString('S-2');
+    final toShip = _MockShip();
+    when(() => toShip.symbol).thenReturn(toSymbol.symbol);
+    when(() => toShip.cargo).thenReturn(shipCargo);
+
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final shipCache = _MockShipCache();
+    final logger = _MockLogger();
+
+    when(
+      () => fleetApi.transferCargo(
+        fromSymbol.symbol,
+        transferCargoRequest: TransferCargoRequest(
+          tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          units: 10,
+          shipSymbol: toSymbol.symbol,
+        ),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        TransferCargo200Response(
+          data: Jettison200ResponseData(
+            cargo: ShipCargo(capacity: 10, units: 10),
+          ),
+        ),
+      ),
+    );
+
+    final _ = await runWithLogger(
+      logger,
+      () => transferCargoAndLog(
+        api,
+        shipCache,
+        from: fromShip,
+        to: toShip,
+        tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+        units: 10,
+      ),
+    );
+    verify(
+      () => fleetApi.transferCargo(
+        fromSymbol.symbol,
+        transferCargoRequest: TransferCargoRequest(
+          tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          units: 10,
+          shipSymbol: toSymbol.symbol,
+        ),
+      ),
+    ).called(1);
+  });
 }

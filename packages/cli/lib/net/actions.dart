@@ -540,7 +540,7 @@ Future<Jettison200ResponseData> transferCargoAndLog(
   final request = TransferCargoRequest(
     shipSymbol: to.symbol,
     tradeSymbol: tradeSymbol,
-    units: 1,
+    units: units,
   );
   final response = await api.fleet.transferCargo(
     from.symbol,
