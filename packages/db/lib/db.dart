@@ -76,6 +76,18 @@ class Database {
         .map<HistoricalSurvey>(surveyFromColumnMap);
   }
 
+  /// Return all surveys.
+  Future<Iterable<HistoricalSurvey>> allSurveys() async {
+    final query = allSurveysQuery();
+    final result = await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+    return result
+        .map((r) => r.toColumnMap())
+        .map<HistoricalSurvey>(surveyFromColumnMap);
+  }
+
   /// Mark the given survey as exhausted.
   Future<void> markSurveyExhausted(Survey survey) async {
     final query = markSurveyExhaustedQuery(survey);

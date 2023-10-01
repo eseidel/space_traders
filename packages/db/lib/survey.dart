@@ -47,6 +47,13 @@ Query recentSurveysAtWaypointQuery({
   );
 }
 
+/// Return all surveys.
+Query allSurveysQuery() {
+  return const Query(
+    'SELECT * FROM survey_',
+  );
+}
+
 /// Insert a survey into the database.
 Query insertSurveyQuery(HistoricalSurvey survey) {
   // The server will return duplicate signatures.  When it does that we
