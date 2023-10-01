@@ -1,4 +1,3 @@
-import 'package:args/args.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
@@ -58,12 +57,16 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 }
 
 void main(List<String> args) async {
-  await runOfflineArgs(args, command, (parser) {
-    parser.addFlag(
-      'all',
-      abbr: 'a',
-      help: 'Print all contracts, not just active ones.',
-      negatable: false,
-    );
-  });
+  await runOffline(
+    args,
+    command,
+    addArgs: (parser) {
+      parser.addFlag(
+        'all',
+        abbr: 'a',
+        help: 'Print all contracts, not just active ones.',
+        negatable: false,
+      );
+    },
+  );
 }

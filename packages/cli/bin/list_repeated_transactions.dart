@@ -11,7 +11,7 @@ void printDiffs(List<int> data) {
   logger.info(diffs.toString());
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final transactions = await allTransactions(db);
   // final marketPrices = MarketPrices.load(fs);

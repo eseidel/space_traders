@@ -52,10 +52,10 @@ Behavior? behaviorFromFrame(Ship ship) {
   }[ship.frame.symbol];
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
-  final lookbackMinutesString = args.firstOrNull;
+  final lookbackMinutesString = argResults.rest.firstOrNull;
   final lookbackMinutes =
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);

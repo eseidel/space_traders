@@ -5,7 +5,7 @@ void main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
   final tradeVolumesBySymbol = <TradeSymbol, Set<int>>{};
   for (final price in marketPrices.prices) {

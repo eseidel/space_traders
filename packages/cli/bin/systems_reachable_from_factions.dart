@@ -3,7 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final systemsCache = await SystemsCache.load(fs);
   final factionsApi = FactionsApi();

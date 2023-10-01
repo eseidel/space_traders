@@ -4,41 +4,16 @@ import 'package:cli/logger.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
 
+export 'package:args/args.dart';
 export 'package:cli/logger.dart';
 export 'package:file/file.dart';
 
 /// Run command with a logger, but without an Api.
 Future<R> runOffline<R>(
   List<String> args,
-  Future<R> Function(FileSystem fs, List<String> args) fn,
-) async {
-  final parser = ArgParser()
-    ..addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Verbose logging',
-      negatable: false,
-    );
-  final results = parser.parse(args);
-  const fs = LocalFileSystem();
-  return runScoped(
-    () async {
-      if (results['verbose'] as bool) {
-        setVerboseLogging();
-      }
-      return fn(fs, results.rest);
-    },
-    values: {loggerRef},
-  );
-}
-
-/// Run command with a logger, and ArgParser.
-// This should replace runOffline for all callers.
-Future<R> runOfflineArgs<R>(
-  List<String> args,
-  Future<R> Function(FileSystem fs, ArgResults argResults) fn,
+  Future<R> Function(FileSystem fs, ArgResults argResults) fn, {
   void Function(ArgParser parser)? addArgs,
-) async {
+}) async {
   final parser = ArgParser()
     ..addFlag(
       'verbose',

@@ -4,7 +4,7 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
   final systemsCache = SystemsCache.loadCached(fs)!;
   final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);

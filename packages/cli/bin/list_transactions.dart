@@ -8,7 +8,8 @@ String describeTransaction(Transaction t) {
       '${t.shipSymbol} ${t.waypointSymbol} ${t.creditChange} ${t.accounting}';
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final args = argResults.rest;
   final shipNumber = args.firstOrNull;
   final shipSymbol = ShipSymbol.fromString('ESEIDEL-$shipNumber');
 

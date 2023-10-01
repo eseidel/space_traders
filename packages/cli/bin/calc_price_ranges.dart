@@ -20,7 +20,7 @@ void printPriceRanges(List<MarketPrice> gameStats) {
   }
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   const fs = LocalFileSystem();
   final prices = MarketPrices.load(fs);
 

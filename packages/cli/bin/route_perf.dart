@@ -22,7 +22,7 @@ class Result {
   final Duration duration;
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   const count = 5000;
 
   final db = await defaultDatabase();

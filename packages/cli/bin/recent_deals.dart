@@ -101,9 +101,9 @@ bool Function(Transaction t) filterFromArgs(List<String> args) {
   return (Transaction t) => t.shipSymbol == shipSymbol;
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-  final filter = filterFromArgs(args);
+  final filter = filterFromArgs(argResults.rest);
   final deals = <SyntheticDeal>[];
   final openDeals = <ShipSymbol, List<Transaction>>{};
   final ignoredTransactions = <Transaction>[];

@@ -11,7 +11,7 @@ int hoursAgo(DateTime time) {
   return DateTime.now().difference(time).inHours;
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   // Credits per hour.
   final oneDayAgoAsHour =

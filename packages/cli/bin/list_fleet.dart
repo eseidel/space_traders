@@ -104,8 +104,8 @@ bool Function(Ship) filterFromArgs(List<String> args) {
   return (ship) => ship.symbol == symbol;
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
-  final filter = filterFromArgs(args);
+Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final filter = filterFromArgs(argResults.rest);
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
 
@@ -114,7 +114,7 @@ Future<void> command(FileSystem fs, List<String> args) async {
   final matchingShips = ships.where(filter).toList();
   if (matchingShips.isEmpty) {
     logger
-      ..info('No ships matching ${args.firstOrNull}.')
+      ..info('No ships matching ${argResults.rest.firstOrNull}.')
       ..info('Usage: list_fleet [ship_symbol]')
       ..info('Example: list_fleet ${shipCache.ships.first.symbol}');
     return;

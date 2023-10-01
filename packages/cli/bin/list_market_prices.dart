@@ -5,7 +5,7 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
 
   logger.info(

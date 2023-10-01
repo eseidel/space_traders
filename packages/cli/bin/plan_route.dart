@@ -54,7 +54,8 @@ void planRouteAndLog(
   }
 }
 
-Future<void> command(FileSystem fs, List<String> args) async {
+Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final args = argResults.rest;
   if (args.length != 2) {
     logger.err('Usage: plan_route START END');
     return;
