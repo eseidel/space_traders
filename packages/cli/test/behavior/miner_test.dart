@@ -348,4 +348,24 @@ void main() {
     when(() => ship.cargo).thenReturn(ShipCargo(capacity: 120, units: 0));
     expect(maxExtractedUnits(ship), 110);
   });
+
+  test('cooldownTimeForExtraction', () {
+    final ship = _MockShip();
+    final laser1 = ShipMount(
+      symbol: ShipMountSymbolEnum.MINING_LASER_I,
+      name: '',
+      description: '',
+      strength: 10,
+      requirements: ShipRequirements(power: 1),
+    );
+    final laser2 = ShipMount(
+      symbol: ShipMountSymbolEnum.MINING_LASER_II,
+      name: '',
+      description: '',
+      strength: 10,
+      requirements: ShipRequirements(power: 2),
+    );
+    when(() => ship.mounts).thenReturn([laser1, laser2]);
+    expect(cooldownTimeForExtraction(ship), 90);
+  });
 }

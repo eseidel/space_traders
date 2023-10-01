@@ -235,6 +235,7 @@ final _laserMountSymbols = {
   ShipMountSymbolEnum.MINING_LASER_III,
 };
 
+/// Compute the total strength of all laser mounts on [ship].
 int _laserMountStrength(Ship ship) {
   return ship.mounts.fold(0, (sum, m) {
     if (_laserMountSymbols.contains(m.symbol)) {
@@ -242,6 +243,22 @@ int _laserMountStrength(Ship ship) {
     }
     return sum;
   });
+}
+
+/// Compute the total power of all laser mounts on [ship].
+int _powerUsedByLasers(Ship ship) {
+  return ship.mounts.fold(0, (sum, m) {
+    if (_laserMountSymbols.contains(m.symbol)) {
+      return sum + (m.requirements.power ?? 0);
+    }
+    return sum;
+  });
+}
+
+/// Compute the cooldown time for an extraction by [ship].
+int cooldownTimeForExtraction(Ship ship) {
+  final power = _powerUsedByLasers(ship);
+  return 60 + 10 * power;
 }
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1132761138849923092
@@ -293,13 +310,14 @@ Future<JobResult> extractAndLog(
     }
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
+    final laserStrength = _laserMountStrength(ship);
     await db.insertExtraction(
       ExtractionRecord(
         shipSymbol: ship.shipSymbol,
         waypointSymbol: ship.waypointSymbol,
         tradeSymbol: yield_.symbol,
         quantity: yield_.units,
-        power: _laserMountStrength(ship),
+        power: laserStrength,
         surveySignature: maybeSurvey?.signature,
         timestamp: getNow(),
       ),
@@ -312,6 +330,16 @@ Future<JobResult> extractAndLog(
         '${yield_.symbol.value.padRight(18)} '
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+
+    final expectedCooldown = cooldownTimeForExtraction(ship);
+    final actualCooldown = response.cooldown.totalSeconds;
+    if (expectedCooldown != actualCooldown) {
+      shipWarn(
+          ship,
+          'Extracted with laser strength $laserStrength. '
+          'Expected $expectedCooldown second cooldown, '
+          'got $actualCooldown.');
+    }
 
     // If we still have space wait the cooldown and continue mining.
     if (ship.availableSpace >= maxExtractedUnits(ship)) {

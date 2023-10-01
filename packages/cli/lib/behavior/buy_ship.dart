@@ -118,7 +118,6 @@ Future<DateTime?> advanceBuyShip(
   final shipyard = await getShipyard(api, currentWaypoint);
   recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
-  // TODO(eseidel): Catch exceptions about insufficient credits.
   final PurchaseShip201ResponseData result;
   try {
     result = await purchaseShipAndLog(

@@ -156,6 +156,9 @@ bool isShipNotInOrbitException(ApiException e) {
 //   return isAPIExceptionWithCode(e, 4216);
 // }
 
+/// Returns the number of credits needed to purchase a ship from the
+/// exception, or null if the exception is not an insufficient credits
+/// exception.
 int? neededCreditsFromPurchaseShipException(ApiException e) {
   final jsonString = e.message;
   if (jsonString != null) {
