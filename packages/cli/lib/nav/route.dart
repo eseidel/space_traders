@@ -80,7 +80,7 @@ int cooldownTimeForJumpDistance(int distance) {
   if (distance < 0) {
     throw ArgumentError('Distance $distance is negative.');
   }
-  if (distance > 2000) {
+  if (distance > kJumpGateRange) {
     throw ArgumentError('Distance $distance is too far to jump.');
   }
   return max(60, (distance / 10).round());
@@ -92,7 +92,7 @@ int cooldownTimeForJumpBetweenSystems(System a, System b) {
     throw ArgumentError('Cannot jump between the same system ${a.symbol}.');
   }
   final distance = a.distanceTo(b);
-  if (distance > 2000) {
+  if (distance > kJumpGateRange) {
     throw ArgumentError(
       'Distance ${a.symbol} to ${b.symbol} is too far $distance to jump.',
     );

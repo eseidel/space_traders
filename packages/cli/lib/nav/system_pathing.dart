@@ -43,7 +43,7 @@ int _timeBetween(
 ) {
   final distance = aSystem.distanceTo(bSystem);
   assert(
-    distance <= 2000,
+    distance <= kJumpGateRange,
     'Distance between ${aSystem.symbol} and ${bSystem.symbol} is $distance',
   );
   return cooldownTimeForJumpDistance(distance);

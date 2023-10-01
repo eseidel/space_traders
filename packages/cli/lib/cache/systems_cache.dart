@@ -8,6 +8,9 @@ import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:types/types.dart';
 
+/// Constant specifying the range of jump gates.
+const kJumpGateRange = 2500;
+
 /// A cache of the systems in the game.
 class SystemsCache extends JsonListStore<System> {
   /// Create a new [SystemsCache] with the given [systems] and file system.
@@ -119,7 +122,6 @@ class SystemsCache extends JsonListStore<System> {
       systemBySymbol(systemSymbol).waypoints;
 
   List<ConnectedSystem> _computeConnectedSystems(SystemSymbol systemSymbol) {
-    const jumpGateRange = 2000;
     final system = systemBySymbol(systemSymbol);
     if (!system.hasJumpGate) {
       return [];
@@ -128,7 +130,7 @@ class SystemsCache extends JsonListStore<System> {
     final inRange = _systems
         .where((s) => s.symbol != systemSymbol.system)
         .where((s) => s.hasJumpGate)
-        .where((s) => system.distanceTo(s) <= jumpGateRange)
+        .where((s) => system.distanceTo(s) <= kJumpGateRange)
         .toList();
     final connected = inRange
         .map(
