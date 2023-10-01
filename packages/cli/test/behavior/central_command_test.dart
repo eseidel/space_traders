@@ -1,8 +1,5 @@
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/cache/agent_cache.dart';
-import 'package:cli/cache/behavior_cache.dart';
-import 'package:cli/cache/contract_cache.dart';
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
@@ -11,7 +8,13 @@ import 'package:types/types.dart';
 
 class _MockAgent extends Mock implements Agent {}
 
+class _MockAgentCache extends Mock implements AgentCache {}
+
+class _MockApi extends Mock implements Api {}
+
 class _MockBehhaviorCache extends Mock implements BehaviorCache {}
+
+class _MockCaches extends Mock implements Caches {}
 
 class _MockContract extends Mock implements Contract {}
 
@@ -23,15 +26,21 @@ class _MockDeal extends Mock implements Deal {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketPrices extends Mock implements MarketPrices {}
+
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipCache extends Mock implements ShipCache {}
+
+class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockShipFrame extends Mock implements ShipFrame {}
+class _MockShipyardPrices extends Mock implements ShipyardPrices {}
+
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('CentralCommand.chooseNewBehaviorFor', () async {
@@ -409,5 +418,52 @@ void main() {
     when(() => sevenShips[5].mounts).thenReturn(surveyorOnlyMounts);
     expect(centralCommand.templateForShip(sevenShips[5]), surveyor);
     expect(centralCommand.templateForShip(sevenShips[6]), mineOnly);
+  });
+
+  test('advanceCentralPlanning smoke test', () async {
+    final shipCache = _MockShipCache();
+    when(() => shipCache.ships).thenReturn([]);
+    final behaviorCache = _MockBehhaviorCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final api = _MockApi();
+    final caches = _MockCaches();
+    final agentCache = _MockAgentCache();
+    final hqSymbol = WaypointSymbol.fromString('W-H-Q');
+    when(() => agentCache.headquartersSymbol).thenReturn(hqSymbol);
+    when(() => caches.agent).thenReturn(agentCache);
+    final waypointCache = _MockWaypointCache();
+    when(() => waypointCache.waypointsInSystem(hqSymbol.systemSymbol))
+        .thenAnswer(
+      (_) => Future.value([
+        Waypoint(
+          symbol: hqSymbol.waypoint,
+          type: WaypointType.PLANET,
+          systemSymbol: hqSymbol.system,
+          x: 0,
+          y: 0,
+          traits: [
+            WaypointTrait(
+              symbol: WaypointTraitSymbolEnum.SHIPYARD,
+              name: 'name',
+              description: 'description',
+            ),
+          ],
+        ),
+      ]),
+    );
+    when(() => caches.waypoints).thenReturn(waypointCache);
+    final shipyardPrices = _MockShipyardPrices();
+    when(() => shipyardPrices.prices).thenReturn([]);
+    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
+
+    final marketPrices = _MockMarketPrices();
+    when(() => marketPrices.prices).thenReturn([]);
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => marketPrices.havePriceFor(any())).thenReturn(false);
+    when(() => caches.marketPrices).thenReturn(marketPrices);
+
+    await centralCommand.advanceCentralPlanning(api, caches);
+    expect(centralCommand.nextShipBuyJob, isNull);
   });
 }
