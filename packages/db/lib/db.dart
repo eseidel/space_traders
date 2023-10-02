@@ -134,6 +134,18 @@ class Database {
     });
   }
 
+  /// Return all extractions.
+  Future<Iterable<ExtractionRecord>> allExtractions() async {
+    final query = allExtractionsQuery();
+    final result = await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+    return result
+        .map((r) => r.toColumnMap())
+        .map<ExtractionRecord>(extractionFromColumnMap);
+  }
+
   /// Insert an extraction into the database.
   Future<void> insertExtraction(ExtractionRecord extraction) async {
     final query = insertExtractionQuery(extraction);

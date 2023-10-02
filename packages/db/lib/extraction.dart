@@ -1,6 +1,14 @@
 import 'package:db/query.dart';
 import 'package:types/types.dart';
 
+/// Query to get all extractions.
+Query allExtractionsQuery() {
+  return const Query(
+    'SELECT ship_symbol, waypoint_symbol, trade_symbol, quantity, power, '
+    'survey_signature, timestamp FROM extraction_',
+  );
+}
+
 /// Query to insert an extraction.
 Query insertExtractionQuery(ExtractionRecord extraction) {
   return Query(
