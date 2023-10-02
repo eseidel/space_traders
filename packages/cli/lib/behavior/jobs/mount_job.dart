@@ -1,6 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:db/db.dart';
@@ -82,5 +83,6 @@ Future<JobResult> doMountJob(
   );
   // We're done.
   state.isComplete = true;
-  failJob('Mounting complete!', const Duration(hours: 1));
+  shipInfo(ship, 'Mounted ${mountJob.mountSymbol}.');
+  return JobResult.complete();
 }
