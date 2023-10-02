@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
@@ -247,27 +246,19 @@ void main() {
 
     final logger = _MockLogger();
     expect(
-      () async {
-        final waitUntil = await runWithLogger(
-          logger,
-          () => advanceMountFromBuy(
-            api,
-            db,
-            centralCommand,
-            caches,
-            state,
-            ship,
-            getNow: getNow,
-          ),
-        );
-        return waitUntil;
-      },
-      throwsA(
-        const JobException(
-          'Mounting complete!',
-          Duration(hours: 1),
+      await runWithLogger(
+        logger,
+        () => advanceMountFromBuy(
+          api,
+          db,
+          centralCommand,
+          caches,
+          state,
+          ship,
+          getNow: getNow,
         ),
       ),
+      isNull,
     );
   });
 
