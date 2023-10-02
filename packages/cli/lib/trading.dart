@@ -657,6 +657,7 @@ MarketTrip? findBestMarketToSell(
     if (earningsPerSecond > expectedCreditsPerSecond) {
       info('Selecting ${trip.price.waypointSymbol} earns '
           '${creditsString(extraEarnings)} extra '
+          '(including ${creditsString(-extraFuelCost)} for fuel) '
           'over ${approximateDuration(extraTime)} '
           '($earningsPerSecond/s)');
       best = trip;
