@@ -4,6 +4,7 @@ import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 

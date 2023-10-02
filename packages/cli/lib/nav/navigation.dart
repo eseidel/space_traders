@@ -141,15 +141,13 @@ void _verifyJumpTime(
 ) {
   final from = systemsCache.systemBySymbol(fromSystem);
   final to = systemsCache.systemBySymbol(toSystem);
-  final expectedCooldown = cooldownTimeForJumpBetweenSystems(from, to);
   final distance = from.distanceTo(to);
-  final actualCooldown = cooldown.totalSeconds;
-  if (expectedCooldown != actualCooldown) {
-    shipWarn(
-        ship,
-        'Jump ${from.symbol} to ${to.symbol} ($distance) '
-        'expected $expectedCooldown, got $actualCooldown.');
-  }
+  verifyCooldown(
+    ship,
+    'Jump ${from.symbol} to ${to.symbol} ($distance)',
+    cooldownTimeForJumpBetweenSystems(from, to),
+    cooldown,
+  );
 }
 
 /// Continue navigation if needed, returning the wait time if so.

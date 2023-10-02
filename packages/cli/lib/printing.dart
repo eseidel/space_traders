@@ -299,3 +299,13 @@ void printStatus(GetStatus200Response s) {
 String cargoDescription(ShipCargo cargo) {
   return cargo.inventory.map((e) => '${e.units} ${e.name}').join(', ');
 }
+
+/// Log a warning if [cooldown] is not [expected].
+void verifyCooldown(Ship ship, String label, int expected, Cooldown cooldown) {
+  if (cooldown.totalSeconds != expected) {
+    shipWarn(
+        ship,
+        '$label expected $expected second cooldown, '
+        'got ${cooldown.totalSeconds}.');
+  }
+}

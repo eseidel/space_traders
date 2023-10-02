@@ -303,16 +303,6 @@ int maxExtractedUnits(Ship ship) {
   return min(laserStrength + variance, ship.cargo.capacity);
 }
 
-/// Log a warning if [cooldown] is not [expected].
-void verifyCooldown(Ship ship, String label, int expected, Cooldown cooldown) {
-  if (cooldown.totalSeconds != expected) {
-    shipWarn(
-        ship,
-        '$label expected $expected second cooldown, '
-        'got ${cooldown.totalSeconds}.');
-  }
-}
-
 /// Tell [ship] to extract resources and log the result.
 Future<JobResult> extractAndLog(
   Api api,
