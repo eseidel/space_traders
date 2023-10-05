@@ -54,6 +54,10 @@ Future<DateTime?> advanceSurveyor(
     response.cooldown,
   );
 
+  for (final survey in response.surveys) {
+    printSurvey(survey, caches.marketPrices, mineJob.market);
+  }
+
   // Each survey is the whole behavior.
   state.isComplete = true;
   return response.cooldown.expiration;

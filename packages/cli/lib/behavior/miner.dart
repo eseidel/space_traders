@@ -229,6 +229,21 @@ Future<Survey?> surveyWorthMining(
   return best?.survey;
 }
 
+/// Prints a survey to the log.
+void printSurvey(
+  Survey survey,
+  MarketPrices marketPrices,
+  WaypointSymbol marketSymbol,
+) {
+  final expectedValue =
+      expectedValueFromSurvey(marketPrices, survey, marketSymbol: marketSymbol);
+  logger.info(
+    '${survey.signature} ${survey.size} '
+    '${survey.deposits.map((d) => d.symbol).join(', ')} '
+    'ev ${creditsString(expectedValue)}',
+  );
+}
+
 final _laserMountSymbols = {
   ShipMountSymbolEnum.MINING_LASER_I,
   ShipMountSymbolEnum.MINING_LASER_II,
@@ -452,6 +467,10 @@ Future<JobResult> doMineJob(
     final response =
         await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
 
+    for (final survey in response.surveys) {
+      printSurvey(survey, caches.marketPrices, marketSymbol);
+    }
+
     verifyCooldown(
       ship,
       'Survey',
@@ -468,6 +487,10 @@ Future<JobResult> doMineJob(
     // We wait the full cooldown because our next action will be either
     // surveying or mining, both of which require the reactor cooldown.
     return JobResult.wait(response.cooldown.expiration);
+  }
+
+  if (maybeSurvey != null) {
+    printSurvey(maybeSurvey, caches.marketPrices, marketSymbol);
   }
 
   // Regardless of whether we have a survey, we should try to mine.
