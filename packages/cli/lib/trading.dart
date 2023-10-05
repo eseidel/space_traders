@@ -497,7 +497,9 @@ CostedTrip<T>? costTrip<T>(
   return CostedTrip(route: route, price: price);
 }
 
-List<MarketTrip> _marketsTradingSortedByDistance(
+/// Returns a list of MarketTrips for markets which trade the given symbol
+/// sorted by distance.
+List<MarketTrip> marketsTradingSortedByDistance(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
   Ship ship,
@@ -541,7 +543,7 @@ MarketTrip? findBestMarketToBuy(
   TradeSymbol tradeSymbol, {
   required int expectedCreditsPerSecond,
 }) {
-  final sorted = _marketsTradingSortedByDistance(
+  final sorted = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
     ship,
@@ -595,7 +597,7 @@ MarketTrip? findBestMarketToSell(
 }) {
   // Some callers might want to use a round trip cost?
   // e.g. if just trying to empty inventory and return to current location.
-  final sorted = _marketsTradingSortedByDistance(
+  final sorted = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
     ship,
