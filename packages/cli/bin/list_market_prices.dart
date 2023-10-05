@@ -16,7 +16,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final maxNameLength =
       TradeSymbol.values.fold(0, (m, t) => max(m, t.value.length));
 
-  for (final tradeSymbol in TradeSymbol.values) {
+  final sortedSymbols = TradeSymbol.values.toList()
+    ..sort((a, b) => a.value.compareTo(b.value));
+  for (final tradeSymbol in sortedSymbols) {
     final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol);
     final priceString =
         (medianPrice == null ? '' : creditsString(medianPrice)).padLeft(13);
