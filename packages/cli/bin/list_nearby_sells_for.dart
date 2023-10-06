@@ -5,6 +5,11 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:types/types.dart';
 
+extension on Ship {
+  /// Returns a copy of this ship with the same properties.
+  Ship deepCopy() => Ship.fromJson(toJson())!;
+}
+
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
   final systemsCache = SystemsCache.loadCached(fs)!;
@@ -20,9 +25,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       .firstWhere((w) => w.isAsteroidField)
       .waypointSymbol;
 
-  final ship = shipCache.ships.firstWhere((s) => s.isMiner);
-
-  // This hack is OK so long as we don't write the ShipCache to disk.
+  final miner = shipCache.ships.firstWhere((s) => s.isMiner);
+  final ship = miner.deepCopy();
   ship.nav.waypointSymbol = hqMine.waypoint;
   ship.nav.systemSymbol = hqMine.system;
   logger.info('Finding markets which buy $tradeSymbol near $hqMine.');
