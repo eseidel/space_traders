@@ -341,6 +341,11 @@ class CentralCommand {
       if (_mountRequests.any((m) => m.shipSymbol == ship.shipSymbol)) {
         return;
       }
+      // Don't queue a new mount request if we're currently executing one.
+      if (_behaviorCache.getBehavior(ship.shipSymbol)?.behavior ==
+          Behavior.mountFromBuy) {
+        continue;
+      }
       final template = templateForShip(ship);
       if (template == null) {
         continue;

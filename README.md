@@ -705,3 +705,21 @@ zero cost, at some amount of time to produce?
 ### No debugging tools for surveys.
 
 Write a tool to list how many surveys deep we have?
+
+
+### Optimize requests:
+
+^CRequest stats:
+6508 /my/ships/N/navigate
+6323 /my/ships/N/dock
+6322 /my/ships/N/orbit
+5797 /my/ships/N/sell
+5753 /my/ships/N/extract/survey
+3118 /my/ships/N/refuel
+2522 /systems/N/waypoints/N/market
+1422 /my/ships/N/survey
+756 /my/ships/N/jump
+677 /my/ships/N/purchase
+122 /systems/N/waypoints/N/shipyard
+36 /my/ships
+29 /systems/N/waypoints
