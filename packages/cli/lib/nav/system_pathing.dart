@@ -46,15 +46,18 @@ List<SystemSymbol>? findSystemPath(
 ) {
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
+  // This code is hot enough that SystemSymbol.fromString shows up!
   final frontier =
       PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
         ..add((start.systemSymbol, 0));
   final cameFrom = <SystemSymbol, SystemSymbol>{};
   final costSoFar = <SystemSymbol, int>{};
+  final startSymbol = start.systemSymbol;
+  final endSymbol = end.systemSymbol;
   costSoFar[start.systemSymbol] = 0;
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
-    if (current.$1 == end.systemSymbol) {
+    if (current.$1 == endSymbol) {
       break;
     }
     final currentSystem = systemsCache.systemBySymbol(current.$1);
@@ -71,17 +74,17 @@ List<SystemSymbol>? findSystemPath(
       }
     }
   }
-  if (cameFrom[end.systemSymbol] == null) {
+  if (cameFrom[endSymbol] == null) {
     return null;
   }
 
   final symbols = <SystemSymbol>[];
-  var current = end.systemSymbol;
-  while (current != start.systemSymbol) {
+  var current = endSymbol;
+  while (current != startSymbol) {
     symbols.add(current);
     current = cameFrom[current]!;
   }
-  symbols.add(start.systemSymbol);
+  symbols.add(startSymbol);
   return symbols.reversed.toList();
 }
 
