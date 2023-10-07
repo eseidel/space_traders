@@ -14,6 +14,15 @@ import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
+/// This is mostly used for reference.
+final kOreHoundDefault = ShipTemplate(
+  frameSymbol: ShipFrameSymbolEnum.MINER,
+  mounts: MountSymbolSet.from([
+    ShipMountSymbolEnum.MINING_LASER_I,
+    ShipMountSymbolEnum.SURVEYOR_I,
+  ]),
+);
+
 // According to SAF: Surveyor = 2x mk2s,  miner = 2x mk2 + 1x mk1
 /// A template for a ship which mines and surveys.
 final kMineAndSurveyTemplate = ShipTemplate(

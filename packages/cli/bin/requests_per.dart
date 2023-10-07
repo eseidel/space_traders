@@ -1,10 +1,40 @@
+import 'dart:convert';
+
+import 'package:cli/behavior/miner.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/trading.dart';
+import 'package:types/types.dart';
 
 class Request {
   Request(this.name, [this.duration = Duration.zero]);
   final String name;
   final Duration duration;
+}
+
+const minerNavRoundTrip = Duration(minutes: 2);
+
+Duration half(Duration duration) {
+  return Duration(
+    microseconds: duration.inMicroseconds ~/ 2,
+  );
+}
+
+List<Request> routeToRequests(RoutePlan plan) {
+  final requests = <Request>[];
+  for (final action in plan.actions) {
+    switch (action.type) {
+      case RouteActionType.emptyRoute:
+        break;
+      case RouteActionType.navCruise:
+        requests.add(Request('nav', Duration(seconds: action.duration)));
+      case RouteActionType.jump:
+        requests.add(Request('jump', Duration(seconds: action.duration)));
+    }
+  }
+  return requests;
 }
 
 // time = 60 + 10 * power, this is for 2xL2 + 1xL1 extractors
@@ -16,9 +46,15 @@ final sell = Request('sell');
 // flightTimeWithinSystemInSeconds
 // flightTimeByDistanceAndSpeed
 // OreHounds to the nearest market is typically about 1 minute.
-final nav = Request('nav', const Duration(seconds: 60));
+final minerNav = Request('nav', half(minerNavRoundTrip));
+final transferCargo = Request('transferCargo');
+
 // time = 60 + 10 * power, this is for 3xL2 surveyors
 final survey = Request('survey', const Duration(seconds: 120));
+
+final minerLocalSale = [extract, dock, sell, undock];
+final minerSystemSale = [extract, minerNav, dock, sell, undock, minerNav];
+final minerTransfer = [extract, transferCargo];
 
 Duration cycleTime(List<Request> requests) {
   return requests.fold<Duration>(
@@ -27,59 +63,78 @@ Duration cycleTime(List<Request> requests) {
   );
 }
 
-// RoutePlan _sameSystemRoute() {
-//   final ignored = WaypointSymbol.fromString('W-A-Y');
-//   final routeToMarket = RoutePlan(
-//     fuelCapacity: 0,
-//     shipSpeed: 0,
-//     actions: [
-//       RouteAction(
-//         startSymbol: ignored,
-//         endSymbol: ignored,
-//         type: RouteActionType.navCruise,
-//         duration: const Duration(seconds: 60),
-//       ),
-//     ],
-//     fuelUsed: 0,
-//   );
-//   return routeToMarket;
-// }
+Ship exampleShip(
+  ShipCache shipCache, {
+  required ShipFrameSymbolEnum frame,
+  required WaypointSymbol overrideLocation,
+}) {
+  final miner = shipCache.ships.firstWhere((s) => s.frame.symbol == frame);
+  final json = miner.toJson();
+  // OpenAPI enums have to round trip through strings to parse correctly.
+  final reparsed = jsonDecode(jsonEncode(json));
+  final ship = Ship.fromJson(reparsed)!;
+  ship.nav.waypointSymbol = overrideLocation.waypoint;
+  ship.nav.systemSymbol = overrideLocation.system;
+  return ship;
+}
+
+String c(double value) {
+  return creditsString(value.toInt());
+}
+
+String cps(double value) {
+  return '${creditsString(value.toInt())}/s';
+}
+
+String cpm(double value) {
+  return '${creditsString(value.toInt())}/m';
+}
+
+int costOutMounts(
+  MarketPrices marketPrices,
+  MountSymbolSet mounts,
+) {
+  return mounts.fold<int>(
+    0,
+    (previousValue, mountSymbol) =>
+        previousValue +
+        marketPrices
+            .medianPurchasePrice(tradeSymbolForMountSymbol(mountSymbol))!,
+  );
+}
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  // Write out the requests needed for various strategies.
-  // e.g. single miner loop (starting orbiting mine)
-  // survey x N, extract x M, dock, sell, undock, repeat
+  final marketPrices = MarketPrices.load(fs);
+  final systemsCache = SystemsCache.loadCached(fs)!;
+  final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+  final agentCache = AgentCache.loadCached(fs)!;
+  final shipCache = ShipCache.loadCached(fs)!;
+  final shipyardPrices = ShipyardPrices.load(fs);
 
-  // traveling miner loop (starting in orbit)
-  // survey x N, extract x M, nav, dock, sell, undock, nav, repeat
+  final hq = agentCache.headquarters(systemsCache);
+  final hqMine = systemsCache
+      .waypointsInSystem(hq.systemSymbol)
+      .firstWhere((w) => w.isAsteroidField)
+      .waypointSymbol;
 
-  // surveyor loop (starting in orbit)
-  // survey, repeat
+  const tradeSymbol = TradeSymbol.DIAMONDS;
 
-  // I'm trying to answer the question of, given a diamond mining strategy,
-  // how many credits per request does the fleet make.  And how many copies
-  // of said fleet could one expect to have.
+  // TODO(eseidel): Try light haulers?
+  const haulerType = ShipType.HEAVY_FREIGHTER;
+  const haulerFrame = ShipFrameSymbolEnum.HEAVY_FREIGHTER;
+  const unitsPerHaulerCycle = 180;
 
-  String c(double value) {
-    return creditsString(value.toInt());
-  }
+  const surveyorType = ShipType.ORE_HOUND;
+  // const surveyorFrame = ShipFrameSymbolEnum.MINER;
+  final surveyorDefaultMounts = kOreHoundDefault.mounts;
+  final surveyorMounts = kSurveyOnlyTemplate.mounts;
+  const surveysPerCycle = 6; // 3xL2 surveyors
 
-  String cps(double value) {
-    return '${creditsString(value.toInt())}/s';
-  }
-
-  String cpm(double value) {
-    return '${creditsString(value.toInt())}/m';
-  }
-
-  // One billion credits in a week.
-  const goalCredits = 1000000000;
-  const timeToGoal = Duration(days: 6); // Assume ramp takes a day.
-  final goalCreditsPerSecond = goalCredits / timeToGoal.inSeconds;
-  logger.info('Goal credits per second: ${cps(goalCreditsPerSecond)}');
-
-  final goalCreditsPerTenMinutes = goalCreditsPerSecond * 60 * 10;
-  logger.info('Goal credits per 10m: ${c(goalCreditsPerTenMinutes)}');
+  const minerType = ShipType.ORE_HOUND;
+  // const minerFrame = ShipFrameSymbolEnum.MINER;
+  final minerDefaultMounts = kOreHoundDefault.mounts;
+  final minerMounts = kMineOnlyTemplate.mounts;
+  const unitsPerMineCycle = 60;
 
   // https://discord.com/channels/792864705139048469/792864705139048472/1159170353738825781
   // const diamondRatioToDeposits =
@@ -91,15 +146,53 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   const diamondChancePerExtract = diamondRatePerDiamondSurvey;
 
   const extractionsPerSurvey = 19;
-  const surveysPerCycle = 6; // 3xL2 surveyors
-  const diamondMedianSellPrice = 468;
-  const unitsPerMineCycle = 60;
+  final diamondMedianSellPrice = marketPrices.medianSellPrice(tradeSymbol)!;
 
   const maxRequestsPerMinute = 170; // Assuming no room for other actions.
 
+  final miner = minerTransfer;
   final surveyor = [survey];
+
+  final ship = exampleShip(
+    shipCache,
+    frame: haulerFrame,
+    overrideLocation: hqMine,
+  );
+  final trips = marketsTradingSortedByDistance(
+    marketPrices,
+    routePlanner,
+    ship,
+    tradeSymbol,
+  );
+
+  final haulerRoute = trips[1].route;
+  final haulerNav = routeToRequests(haulerRoute);
+  final haulerSell = <Request>[...haulerNav, dock, sell, undock, ...haulerNav];
+
+  // One billion credits in a week.
+  const goalCredits = 1000000000;
+  const timeToGoal = Duration(days: 6); // Assume ramp takes a day.
+  final goalCreditsPerSecond = goalCredits / timeToGoal.inSeconds;
+  logger.info('Goal credits per second: ${cps(goalCreditsPerSecond)}');
+
+  final goalCreditsPerTenMinutes = goalCreditsPerSecond * 60 * 10;
+  logger.info('Goal credits per 10m: ${c(goalCreditsPerTenMinutes)}');
+
+  final minerCycleTime = cycleTime(minerTransfer);
+  final minerRequestsPerCycle = miner.length;
+  logger.info('Miner cycle time: $minerCycleTime');
+
+  final minerReqeustsPerMinute = minerRequestsPerCycle *
+      (const Duration(minutes: 1).inSeconds / minerCycleTime.inSeconds);
+  final minerRequestsPerSecond = minerReqeustsPerMinute / 60;
+  logger.info('Miner requests per second: $minerRequestsPerSecond');
+
+  final minerCyclesPerMinute =
+      const Duration(minutes: 1).inSeconds / minerCycleTime.inSeconds;
+  logger.info('Miner cycles per minute: $minerCyclesPerMinute');
+
   final surveyorCycleTime = cycleTime(surveyor);
-  logger.info('Surveyor cycle time: $surveyorCycleTime');
+  logger.info('\nSurveyor cycle time: $surveyorCycleTime');
 
   final surveyorRequestsPerCycle = surveyor.length;
   final surveyorRequestsPerMinute = surveyorRequestsPerCycle *
@@ -117,36 +210,36 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final diamondSurveysPerMinute = surveysPerMinute / surveysUntilDiamond;
   logger.info('Diamond surveys per minute: $diamondSurveysPerMinute');
 
-  // final miner = [extract, dock, sell, undock];
-  final miner = [extract, nav, dock, sell, undock, nav];
-  final minerCycleTime = cycleTime(miner);
-  final minerRequestsPerCycle = miner.length;
-  logger.info('Miner cycle time: $minerCycleTime');
-
-  final minerReqeustsPerMinute = minerRequestsPerCycle *
-      (const Duration(minutes: 1).inSeconds / minerCycleTime.inSeconds);
-  final minerRequestsPerSecond = minerReqeustsPerMinute / 60;
-  logger.info('Miner requests per second: $minerRequestsPerSecond');
-
-  final minerCyclesPerMinute =
-      const Duration(minutes: 1).inSeconds / minerCycleTime.inSeconds;
-  logger.info('Miner cycles per minute: $minerCyclesPerMinute');
-
   final surveysNeededPerMinute = minerCyclesPerMinute / extractionsPerSurvey;
   logger.info('Surveys needed per minute: $surveysNeededPerMinute');
 
-  final surveyorsNeeded = surveysNeededPerMinute / diamondSurveysPerMinute;
-  logger.info('Surveyors per squad: $surveyorsNeeded');
+  final surveyorsNeededDouble =
+      surveysNeededPerMinute / diamondSurveysPerMinute;
+  logger.info('Surveyors per squad: $surveyorsNeededDouble');
+  final surveyorsNeeded = surveyorsNeededDouble.ceil();
 
-  const minersNeeded = 1;
-  final shipsPerSquad = (surveyorsNeeded + minersNeeded).ceil();
-  logger.info('Ships needed per squad: $shipsPerSquad');
+  // Figure out the haulers needed.
+  final timeToSellLocation = haulerRoute.duration;
+  logger.info('\nTime to sell location: $timeToSellLocation');
+
+  final haulerCycleTime = cycleTime(haulerSell);
+  logger.info('Hauler cycle time: $haulerCycleTime');
+
+  final timeToFillHauler =
+      minerCycleTime * (unitsPerHaulerCycle / unitsPerMineCycle);
+  logger.info('Time to fill hauler: $timeToFillHauler');
+
+  // +1 because you always need a hauler sitting being filled.
+  final haulersNeededDouble =
+      haulerCycleTime.inSeconds / timeToFillHauler.inSeconds + 1;
+  logger.info('Haulers per squad: $haulersNeededDouble');
+  final haulersNeeded = haulersNeededDouble.ceil();
 
   final unitsPerMinute = minerCyclesPerMinute * unitsPerMineCycle;
   // This assumes that any non-diamond extraction is worth 0.
   final creditsPerMinute =
       unitsPerMinute * diamondMedianSellPrice * diamondChancePerExtract;
-  logger.info('Credits per minute per squad: ${cpm(creditsPerMinute)}');
+  logger.info('\nCredits per minute per squad: ${cpm(creditsPerMinute)}');
 
   final creditsPerTenMinutes = creditsPerMinute * 10;
   logger.info('Credits per 10m per squad: ${c(creditsPerTenMinutes)}');
@@ -154,21 +247,26 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final creditsPerSecond = creditsPerMinute / 60;
   logger.info('Credits per second per squad: ${cps(creditsPerSecond)}');
 
-  final creditsPerSecondPerShip = creditsPerSecond / shipsPerSquad;
-  logger.info('Credits per second per ship: ${cps(creditsPerSecondPerShip)}');
+  // final creditsPerSecondPerShip = creditsPerSecond / shipsPerSquad;
+  // logger.info('c/s per ship: ${cps(creditsPerSecondPerShip)}');
 
   final requestsPerMinute = surveyorRequestsPerMinute + minerReqeustsPerMinute;
   final creditsPerRequest = creditsPerMinute / requestsPerMinute;
   logger.info('Credits per request: $creditsPerRequest');
 
-  final squadsForGoal = goalCreditsPerTenMinutes / creditsPerTenMinutes;
-  logger.info('Squads needed for goal: $squadsForGoal');
+  const minersNeeded = 1;
+  final shipsPerSquad = surveyorsNeeded + haulersNeeded + minersNeeded;
+  logger.info('\nShips needed per squad: $shipsPerSquad');
+
+  final squadsForGoalDouble = goalCreditsPerTenMinutes / creditsPerTenMinutes;
+  logger.info('Squads needed for goal: $squadsForGoalDouble');
+  final squadsForGoal = squadsForGoalDouble.ceil();
 
   final shipsForGoal = squadsForGoal * shipsPerSquad;
   logger.info('Ships needed for goal: $shipsForGoal');
 
   final maxSquads = maxRequestsPerMinute / requestsPerMinute;
-  logger.info('Max squads (in $maxRequestsPerMinute r/m budget): $maxSquads');
+  logger.info('\nMax squads (in $maxRequestsPerMinute r/m budget): $maxSquads');
 
   final maxShips = maxSquads * shipsPerSquad;
   logger.info('Max ships: $maxShips');
@@ -181,6 +279,37 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final maxCreditsPerTenMinutes = maxCreditsPerMinute * 10;
   logger.info('Max credits per 10m: ${c(maxCreditsPerTenMinutes)}');
+
+  // Costs
+  // Ship costs
+  final minerPrice = shipyardPrices.medianPurchasePrice(minerType)!;
+  logger.info('\nMiner price: ${creditsString(minerPrice)}');
+  final haulerPrice = shipyardPrices.medianPurchasePrice(haulerType)!;
+  logger.info('Hauler price: ${creditsString(haulerPrice)}');
+  final surveyorPrice = shipyardPrices.medianPurchasePrice(surveyorType)!;
+  logger.info('Surveyor price: ${creditsString(surveyorPrice)}');
+
+  final totalShipCost = minerPrice * minersNeeded +
+      haulerPrice * haulersNeeded +
+      surveyorPrice * surveyorsNeeded;
+  logger.info('Total ship cost: ${creditsString(totalShipCost)}');
+
+  // Mount costs
+  final minerMountsNeeded = minerMounts.difference(minerDefaultMounts);
+  final minerMountCost = costOutMounts(marketPrices, minerMountsNeeded);
+  logger.info('Miner mount cost: ${creditsString(minerMountCost)}');
+  final surveyorMountsNeeded = surveyorMounts.difference(surveyorDefaultMounts);
+  final surveyorMountCost = costOutMounts(marketPrices, surveyorMountsNeeded);
+  logger.info('Surveyor mount cost: ${creditsString(surveyorMountCost)}');
+  final totalMountCosts =
+      minerMountCost * minersNeeded + surveyorMountCost * surveyorsNeeded;
+  logger.info('Total mount cost: ${creditsString(totalMountCosts)}');
+
+  final costPerSquad = totalShipCost + totalMountCosts;
+  logger.info('Cost per squad: ${creditsString(costPerSquad)}');
+
+  final totalCosts = costPerSquad * squadsForGoal;
+  logger.info('Total costs for goal: ${creditsString(totalCosts)}');
 }
 
 void main(List<String> args) {
