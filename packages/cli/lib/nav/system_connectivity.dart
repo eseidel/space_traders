@@ -24,11 +24,12 @@ class _ClusterFinder {
     if (_clusterForSystem.containsKey(startSystemSymbol)) {
       return;
     }
-    final queue = [startSystemSymbol];
+    final queue = {startSystemSymbol};
     final cluster = _nextClusterId++;
 
     while (queue.isNotEmpty) {
-      final systemSymbol = queue.removeAt(0);
+      final systemSymbol = queue.first;
+      queue.remove(systemSymbol);
       final maybeCluster = _clusterForSystem[systemSymbol];
       if (maybeCluster != null) {
         if (maybeCluster != cluster) {
@@ -39,8 +40,14 @@ class _ClusterFinder {
         continue;
       }
       _clusterForSystem[systemSymbol] = cluster;
+      // The first time we run this, it builds the connectedSystems
+      // cache on demand, which takes about 2s on my machine.
       final connected = systemsCache.connectedSystems(systemSymbol);
-      queue.addAll(connected.map((s) => s.systemSymbol));
+      for (final symbol in connected.map((s) => s.systemSymbol)) {
+        if (!_clusterForSystem.containsKey(symbol)) {
+          queue.add(symbol);
+        }
+      }
     }
   }
 }
