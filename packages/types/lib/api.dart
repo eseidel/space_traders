@@ -499,7 +499,8 @@ extension ContractUtils on Contract {
   }
 
   /// Returns the duration until the contract deadline.
-  Duration get timeUntilDeadline => terms.deadline.difference(DateTime.now());
+  Duration get timeUntilDeadline =>
+      terms.deadline.difference(DateTime.timestamp());
 
   /// Returns true if the contract has expired.
   bool get isExpired => timeUntilDeadline.isNegative;
