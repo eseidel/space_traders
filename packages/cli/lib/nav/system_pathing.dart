@@ -3,24 +3,24 @@ import 'package:cli/nav/route.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
+int _distanceBetween(System a, ConnectedSystem b) {
+  return a.position.distanceTo(b.position);
+}
+
 int _approximateTimeBetween(
   SystemsCache systemsCache,
   System aSystem,
-  SystemSymbol bSymbol,
+  ConnectedSystem bSystem,
   int shipSpeed,
 ) {
-  final aSymbol = aSystem.systemSymbol;
-  if (aSymbol == bSymbol) {
+  if (aSystem.symbol == bSystem.symbol) {
     return 0;
   }
-  final bSystem = systemsCache.systemBySymbol(bSymbol);
-  assert(aSystem.hasJumpGate, 'System $aSymbol has no jump gate');
-  assert(bSystem.hasJumpGate, 'System $bSymbol has no jump gate');
-  final systemDistance = aSystem.distanceTo(bSystem);
+  assert(aSystem.hasJumpGate, 'System ${aSystem.symbol} has no jump gate');
   // Cooldown time for jumps is Math.max(60, distance / 10)
   // distance / 10 is an approximation of the cooldown time for a jump gate.
   // This assumes there are direct jumps in a line.
-  return systemDistance ~/ 10;
+  return _distanceBetween(aSystem, bSystem) ~/ 10;
 }
 
 int _timeBetween(
@@ -29,7 +29,7 @@ int _timeBetween(
   ConnectedSystem bSystem,
   int shipSpeed,
 ) {
-  final distance = aSystem.position.distanceTo(bSystem.position);
+  final distance = _distanceBetween(aSystem, bSystem);
   assert(
     distance <= kJumpGateRange,
     'Distance between ${aSystem.symbol} and ${bSystem.symbol} is $distance',
@@ -47,30 +47,31 @@ List<SystemSymbol>? findSystemPath(
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   // This code is hot enough that SystemSymbol.fromString shows up!
-  final frontier =
-      PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((start.systemSymbol, 0));
-  final cameFrom = <SystemSymbol, SystemSymbol>{};
-  final costSoFar = <SystemSymbol, int>{};
   final startSymbol = start.systemSymbol;
   final endSymbol = end.systemSymbol;
-  costSoFar[start.systemSymbol] = 0;
+  final frontier =
+      PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
+        ..add((startSymbol, 0));
+  final cameFrom = <SystemSymbol, SystemSymbol>{};
+  final costSoFar = <SystemSymbol, int>{};
+  costSoFar[startSymbol] = 0;
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
-    if (current.$1 == endSymbol) {
+    final currentSymbol = current.$1;
+    if (currentSymbol == endSymbol) {
       break;
     }
-    final currentSystem = systemsCache.systemBySymbol(current.$1);
-    for (final nextSystem in systemsCache.connectedSystems(current.$1)) {
+    final currentSystem = systemsCache.systemBySymbol(currentSymbol);
+    for (final nextSystem in systemsCache.connectedSystems(currentSymbol)) {
       final next = nextSystem.systemSymbol;
-      final newCost = costSoFar[current.$1]! +
+      final newCost = costSoFar[currentSymbol]! +
           _timeBetween(systemsCache, currentSystem, nextSystem, shipSpeed);
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
         final priority = newCost +
-            _approximateTimeBetween(systemsCache, end, next, shipSpeed);
+            _approximateTimeBetween(systemsCache, end, nextSystem, shipSpeed);
         frontier.add((next, priority));
-        cameFrom[next] = current.$1;
+        cameFrom[next] = currentSymbol;
       }
     }
   }
