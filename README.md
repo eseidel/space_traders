@@ -673,29 +673,6 @@ ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-MU55
 Accepted: deliver 1060  COPPER_ORE to X1-AG30-29102A in 6d for 160,272c with 34,344c upfront.
 received 34,344c
 
-### mount_from_buy seems to always end up with an extra mount?
-
-ESEIDEL-4E: null
-  Orbiting X1-AV52-62175B ASTEROID_FIELD EXCAVATOR 1/60
-  MOUNT_SURVEYOR_II         1 x 17,478c  = 17,478c
-
-null in this case is a surveyor.
-
-
-### Mount confusion?
-
-🛸#B  ✈️  to X1-FQ44-02917D, -24s left
-🛸#B  ✍️  market data @ X1-FQ44-02917D
-🛸#B  ⛽   2 FUEL                 -8% -10c per   2 x    112c =   -224c -> 🏦 208,829c
-🛸#B  ✍️  shipyard data @ X1-FQ44-02917D
-🛸#B  💸   1 MOUNT_MINING_LASER_II             ⚖️    1 x 78,294c = -78,294c -> 🏦 130,535c
-🛸#B  Purchased 1 MOUNT_MINING_LASER_II @ 78294 -78,294c
-[WARN] 🛸#B  Ship does not need MOUNT_MINING_LASER_II? Disabling Behavior.mountFromBuy for ESEIDEL-B for 10m.
-🛸#B  🤝   1 MOUNT_MINING_LASER_II   +0% +11c per   1 x 39,054c = +39,054c -> 🏦 169,589c
-🛸#B  Beginning route to X1-FQ44-62905F (2m)
-🛸#B  🛫 to X1-FQ44-62905F ASTEROID_FIELD (2m) spent 91 fuel
-
-
 ### Wiring up hauling for miners
 
 Somehow represent the miners in deals, producting a given tradeSymbol for

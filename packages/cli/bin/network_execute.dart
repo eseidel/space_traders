@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cli/api.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 import 'package:cli/net/rate_limit.dart';
@@ -66,17 +67,16 @@ class NetExecutor {
     return url.substring(expectedPrefix.length);
   }
 
-  Future<void> run() async {
+  Future<void> run({DateTime Function() getNow = defaultGetNow}) async {
     logger.info('Servicing network requests...');
     final minWaitTime = const Duration(seconds: 1) ~/ targetRequestsPerSecond;
     final stats = RateLimitStatPrinter();
     DateTime? nextRequestTime;
     var serverErrorRetryLimit = 5;
-    var backoffSeconds = 1;
     while (true) {
       stats.printIfNeeded();
       if (nextRequestTime != null) {
-        final waitTime = nextRequestTime.difference(DateTime.timestamp());
+        final waitTime = nextRequestTime.difference(getNow());
         if (waitTime > Duration.zero) {
           // logger.detail('Waiting until $nextRequestTime');
           await Future<void>.delayed(waitTime);
@@ -86,31 +86,26 @@ class NetExecutor {
       // end up pulling a request we don't need to send or is low priority.
       final request = await queue.nextRequest();
       if (request == null) {
-        final timeoutSeconds = backoffSeconds * 30;
+        const timeoutSeconds = 30;
         try {
           await queue.waitForRequest(timeoutSeconds);
         } on TimeoutException {
           logger.err('Timed out (${timeoutSeconds}s) waiting for request?');
-          backoffSeconds *= 2;
         }
         continue;
       }
-      final before = DateTime.timestamp();
+      final before = getNow();
       final path = _removeExpectedPrefix(request.request.url);
-      nextRequestTime = DateTime.timestamp().add(minWaitTime);
+      nextRequestTime = getNow().add(minWaitTime);
       final Response response;
       try {
         response = await sendRequest(request.request);
       } on ClientException catch (e) {
-        logger.err(
-          'Network error: ${e.message}'
-          'Waiting for $backoffSeconds seconds.',
-        );
-        backoffSeconds *= 2;
+        logger.err('Network error: ${e.message}');
         continue;
       }
       stats.record(response);
-      final duration = DateTime.timestamp().difference(before);
+      final duration = getNow().difference(before);
       logger.detail(
         '${approximateDuration(duration).padRight(5)} ${request.priority} '
         '${response.statusCode} ${request.request.method.padRight(5)} $path',
@@ -118,25 +113,17 @@ class NetExecutor {
       if (response.statusCode == 429) {
         final resetTime = _parseResetTime(response);
         if (resetTime != null) {
-          final duration = resetTime.difference(DateTime.timestamp());
+          final duration = resetTime.difference(getNow());
           logger.warn('Rate limited, waiting ${approximateDuration(duration)}');
           await Future<void>.delayed(duration);
         } else {
-          logger.err(
-            'Rate limited, but no reset time found? '
-            'Waiting for $backoffSeconds seconds.',
-          );
-          backoffSeconds *= 2;
+          logger.err('Rate limited, but no reset time found?');
         }
         // No need to reply to the request, since it will be retried.
         continue;
       }
       if (response.statusCode >= 500) {
-        logger.err(
-          'Server error ${response.statusCode}, waiting for $backoffSeconds '
-          'seconds.',
-        );
-        backoffSeconds *= 2;
+        logger.err('Server error ${response.statusCode}.');
         if (serverErrorRetryLimit-- > 0) {
           continue;
         }
@@ -148,13 +135,12 @@ class NetExecutor {
         request,
         QueuedResponse.fromResponse(response),
       );
-      // Success, reset the backoff.
-      backoffSeconds = 1;
+      // Success, reset the retry limit.
       serverErrorRetryLimit = 5;
 
       // Delete all responses older than 5 minutes.
       await queue.deleteResponsesBefore(
-        DateTime.timestamp().subtract(const Duration(minutes: 5)),
+        getNow().subtract(const Duration(minutes: 5)),
       );
     }
   }
