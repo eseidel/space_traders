@@ -75,6 +75,8 @@ class NetExecutor {
     var serverErrorRetryLimit = 5;
     while (true) {
       stats.printIfNeeded();
+      await queue.reconnectIfNeeded();
+
       if (nextRequestTime != null) {
         final waitTime = nextRequestTime.difference(getNow());
         if (waitTime > Duration.zero) {

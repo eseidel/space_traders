@@ -207,6 +207,12 @@ class NetQueue {
 
   final Database _db;
 
+  /// Reconnects to the database if it's been more than an hour.
+  /// Working around an unknown leak in postgres.
+  Future<void> reconnectIfNeeded() {
+    return _db.reconnectIfNeeded();
+  }
+
   /// Role of the user of this queue.
   final QueueRole role;
 

@@ -5,24 +5,68 @@ import 'package:db/transaction.dart';
 import 'package:postgres/postgres.dart';
 import 'package:types/types.dart';
 
-/// Connect to the default local database.
-/// Logs and returns null on failure.
-Future<Database> defaultDatabase() async {
-  final connection = PostgreSQLConnection(
-    'localhost',
-    5432,
-    'spacetraders',
+/// Connection information for the database.
+/// This is split off from Database to allow Database to re-connect
+/// if needed.
+class DatabaseConfig {
+  /// Create a new database config.
+  DatabaseConfig({
+    required this.host,
+    required this.port,
+    required this.database,
+    required this.username,
+    required this.password,
+  });
+
+  /// Host of the database.
+  final String host;
+
+  /// Port of the database.
+  final int port;
+
+  /// Name of the database.
+  final String database;
+
+  /// Username to connect to the database.
+  final String username;
+
+  /// Password to connect to the database.
+  final String password;
+}
+
+DatabaseConfig _defaultConfig() {
+  return DatabaseConfig(
+    host: 'localhost',
+    port: 5432,
+    database: 'spacetraders',
     username: 'postgres',
     password: 'password',
   );
-  await connection.open();
-  return Database(connection);
+}
+
+/// Connect to the default local database.
+/// Logs and returns null on failure.
+Future<Database> defaultDatabase() async {
+  final db = Database(_defaultConfig());
+  await db.open();
+  return db;
 }
 
 /// Abstraction around a database connection.
 class Database {
   /// Create a new database connection.
-  Database(this.connection);
+  Database(this.config) : _connection = connectionFromConfig(config);
+
+  /// Create a connection from the given config.
+  static PostgreSQLConnection connectionFromConfig(DatabaseConfig config) {
+    return PostgreSQLConnection(
+      config.host,
+      config.port,
+      config.database,
+      username: config.username,
+      password: config.password,
+    );
+  }
 
   /// Insert a transaction into the database.
   Future<void> insertTransaction(Transaction transaction) async {
@@ -36,13 +80,49 @@ class Database {
   /// The underlying connection.
   // TODO(eseidel): This shoudn't be public.
   // Make it private and move all callers into the db package.
-  final PostgreSQLConnection connection;
+  PostgreSQLConnection get connection => _connection;
+
+  /// Not final so we can reset it.
+  PostgreSQLConnection _connection;
+
+  /// When the connection was opened.
+  DateTime? _connectionOpenTime;
+
+  /// Configure the database connection.
+  final DatabaseConfig config;
 
   /// Open the database connection.
-  Future<void> open() => connection.open();
+  Future<void> open() {
+    _connectionOpenTime = DateTime.timestamp();
+    return connection.open();
+  }
 
   /// Close the database connection.
   Future<void> close() => connection.close();
+
+  /// Reset the database connection.
+  // This is a hack around the fact that our long connections to postgres
+  // seem to cause a leak on the server side?
+  Future<void> reconnect() async {
+    if (!connection.isClosed) {
+      await close();
+    }
+    _connection = connectionFromConfig(config);
+    return open();
+  }
+
+  /// Reconnect if the connection has been open for more than an hour.
+  /// This is a hack around a unknown leak we're triggering in postgres.
+  Future<void> reconnectIfNeeded() async {
+    final openTime = _connectionOpenTime;
+    if (openTime == null) {
+      return;
+    }
+    if (DateTime.timestamp().difference(openTime) < const Duration(hours: 1)) {
+      return;
+    }
+    await reconnect();
+  }
 
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
