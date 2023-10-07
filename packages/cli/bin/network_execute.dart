@@ -115,6 +115,7 @@ class NetExecutor {
         if (resetTime != null) {
           final duration = resetTime.difference(getNow());
           logger.warn('Rate limited, waiting ${approximateDuration(duration)}');
+          // TODO(eseidel): Just set nextRequestTime to resetTime?
           await Future<void>.delayed(duration);
         } else {
           logger.err('Rate limited, but no reset time found?');

@@ -398,7 +398,7 @@ Future<JobResult> extractAndLog(
 
     if (isSurveyExhaustedException(e)) {
       // If the survey is exhausted, record it as such and try again.
-      shipDetail(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
+      shipInfo(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
       await db.markSurveyExhausted(maybeSurvey);
       return JobResult.wait(null);
     }
