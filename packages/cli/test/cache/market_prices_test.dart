@@ -178,6 +178,52 @@ void main() {
     );
   });
 
+  test('recentSellPrice', () {
+    final fs = MemoryFileSystem();
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    final price = makePrice(
+      waypointSymbol: 'S-S-A',
+      symbol: TradeSymbol.FUEL,
+      sellPrice: 100,
+      timestamp: now,
+    );
+    final marketPrices = MarketPrices([price], fs: fs);
+    expect(
+      marketPrices.recentSellPrice(
+        marketSymbol: price.waypointSymbol,
+        price.symbol,
+        getNow: getNow,
+      ),
+      price.sellPrice,
+    );
+    final oneMinuteAgo = now.subtract(const Duration(minutes: 1));
+    final price2 = makePrice(
+      waypointSymbol: 'S-S-A',
+      symbol: TradeSymbol.CLOTHING,
+      sellPrice: 200,
+      timestamp: oneMinuteAgo,
+    );
+    marketPrices.addPrices([price2]);
+    expect(
+      marketPrices.recentSellPrice(
+        marketSymbol: price2.waypointSymbol,
+        price2.symbol,
+        getNow: getNow,
+      ),
+      price2.sellPrice,
+    );
+    expect(
+      marketPrices.recentSellPrice(
+        marketSymbol: price2.waypointSymbol,
+        price2.symbol,
+        getNow: getNow,
+        maxAge: const Duration(seconds: 1),
+      ),
+      isNull,
+    );
+  });
+
   test('recordMarketData', () async {
     final fs = MemoryFileSystem();
     final marketPrices = MarketPrices([], fs: fs);

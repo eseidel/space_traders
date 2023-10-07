@@ -289,6 +289,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   bool hasRecentMarketData(
     WaypointSymbol marketSymbol, {
     Duration maxAge = defaultMaxAge,
+    DateTime Function() getNow = defaultGetNow,
   }) {
     final prices = pricesAtMarket(marketSymbol);
     if (prices.isEmpty) {
@@ -297,8 +298,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     final sortedPrices = prices.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    return DateTime.timestamp().difference(sortedPrices.last.timestamp) <
-        maxAge;
+    return getNow().difference(sortedPrices.last.timestamp) < maxAge;
   }
 
   /// Most recent price a good can be sold to the market for.
@@ -309,6 +309,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     TradeSymbol tradeSymbol, {
     required WaypointSymbol marketSymbol,
     Duration maxAge = defaultMaxAge,
+    DateTime Function() getNow = defaultGetNow,
   }) {
     final pricesForSymbol = pricesFor(tradeSymbol, marketSymbol: marketSymbol);
     if (pricesForSymbol.isEmpty) {
@@ -316,8 +317,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     }
     final pricesForSymbolSorted = pricesForSymbol.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    if (pricesForSymbolSorted.last.timestamp.difference(DateTime.now()) >
-        maxAge) {
+    if (getNow().difference(pricesForSymbolSorted.last.timestamp) > maxAge) {
       return null;
     }
     return pricesForSymbolSorted.last.sellPrice;
@@ -331,6 +331,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     TradeSymbol tradeSymbol, {
     required WaypointSymbol marketSymbol,
     Duration maxAge = defaultMaxAge,
+    DateTime Function() getNow = defaultGetNow,
   }) {
     final pricesForSymbol = pricesFor(
       tradeSymbol,
@@ -341,8 +342,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     }
     final pricesForSymbolSorted = pricesForSymbol.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    if (pricesForSymbolSorted.last.timestamp.difference(DateTime.now()) >
-        maxAge) {
+    if (getNow().difference(pricesForSymbolSorted.last.timestamp) > maxAge) {
       return null;
     }
     return pricesForSymbolSorted.last.purchasePrice;
@@ -358,6 +358,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
   Ship ship,
   WaypointSymbol marketSymbol, {
   Duration maxAge = const Duration(minutes: 5),
+  DateTime Function() getNow = defaultGetNow,
 }) async {
   if (ship.waypointSymbol != marketSymbol) {
     throw ArgumentError.value(
@@ -368,7 +369,11 @@ Future<Market> recordMarketDataIfNeededAndLog(
   }
   // If we have market data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (marketPrices.hasRecentMarketData(marketSymbol, maxAge: maxAge)) {
+  if (marketPrices.hasRecentMarketData(
+    marketSymbol,
+    maxAge: maxAge,
+    getNow: getNow,
+  )) {
     final market = await marketCache.marketForSymbol(marketSymbol);
     return market!;
   }

@@ -15,6 +15,7 @@ Future<Market?> visitLocalMarket(
   Waypoint waypoint,
   Ship ship, {
   Duration maxAge = const Duration(minutes: 5),
+  DateTime Function() getNow = defaultGetNow,
 }) async {
   // If we're currently at a market, record the prices and refuel.
   if (!waypoint.hasMarketplace) {
@@ -30,6 +31,7 @@ Future<Market?> visitLocalMarket(
     ship,
     waypoint.waypointSymbol,
     maxAge: maxAge,
+    getNow: getNow,
   );
   if (ship.usesFuel) {
     await refuelIfNeededAndLog(

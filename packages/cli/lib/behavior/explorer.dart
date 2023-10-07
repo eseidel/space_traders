@@ -247,7 +247,7 @@ Future<DateTime?> advanceExplorer(
     await chartWaypointAndLog(api, caches.charting, ship);
   }
   // If we don't visit the market, we won't refuel (even when low).
-  await visitLocalMarket(api, db, caches, waypoint, ship);
+  await visitLocalMarket(api, db, caches, waypoint, ship, getNow: getNow);
   // We might buy a ship if we're at a ship yard.
   await visitLocalShipyard(
     api,

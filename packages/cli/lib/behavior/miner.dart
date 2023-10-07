@@ -541,8 +541,14 @@ Future<JobResult> emptyCargoIfNeeded(
 
   // Sell cargo and refuel if needed.
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-  final currentMarket =
-      await visitLocalMarket(api, db, caches, currentWaypoint, ship);
+  final currentMarket = await visitLocalMarket(
+    api,
+    db,
+    caches,
+    currentWaypoint,
+    ship,
+    getNow: getNow,
+  );
   if (currentMarket != null) {
     await sellAllCargoAndLog(
       api,
@@ -651,7 +657,14 @@ Future<JobResult> sellCargoIfNeeded(
 
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   final currentMarket = assertNotNull(
-    await visitLocalMarket(api, db, caches, currentWaypoint, ship),
+    await visitLocalMarket(
+      api,
+      db,
+      caches,
+      currentWaypoint,
+      ship,
+      getNow: getNow,
+    ),
     'No market at ${currentWaypoint.symbol}.',
     const Duration(minutes: 10),
   );
