@@ -110,8 +110,6 @@ Then modified:
 ### Todo
 
 Most impact:
-* Be able to support miners across multiple systems.
-* Be able to move miners between systems (squads).
 * Make saving take less time (log rolling or db?), also avoids dataloss.
 * Confirm planRoute is using PriorityQueue correctly.
 * Could await on sometime other than the network (e.g. a priority queue).
@@ -700,3 +698,9 @@ Write a tool to list how many surveys deep we have?
 122 /systems/N/waypoints/N/shipyard
 36 /my/ships
 29 /systems/N/waypoints
+
+
+### Use RefuelShipRequest to specify units to refuel.
+
+Should just take the number of missing units and round down to the closest
+hundred.

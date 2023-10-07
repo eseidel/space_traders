@@ -3,18 +3,6 @@ import 'package:cli/nav/route.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
-Iterable<System> _neighborsFor(
-  SystemsCache systemsCache,
-  System startSystem,
-) sync* {
-  assert(startSystem.hasJumpGate, 'System $startSystem has no jump gate');
-  final systems = systemsCache.connectedSystems(startSystem.systemSymbol);
-  for (final system in systems) {
-    // Could also write a ConnectedSystem.toSystem() method.
-    yield systemsCache.systemBySymbol(system.systemSymbol);
-  }
-}
-
 int _approximateTimeBetween(
   SystemsCache systemsCache,
   System aSystem,
@@ -38,10 +26,10 @@ int _approximateTimeBetween(
 int _timeBetween(
   SystemsCache systemsCache,
   System aSystem,
-  System bSystem,
+  ConnectedSystem bSystem,
   int shipSpeed,
 ) {
-  final distance = aSystem.distanceTo(bSystem);
+  final distance = aSystem.position.distanceTo(bSystem.position);
   assert(
     distance <= kJumpGateRange,
     'Distance between ${aSystem.symbol} and ${bSystem.symbol} is $distance',
@@ -70,7 +58,7 @@ List<SystemSymbol>? findSystemPath(
       break;
     }
     final currentSystem = systemsCache.systemBySymbol(current.$1);
-    for (final nextSystem in _neighborsFor(systemsCache, currentSystem)) {
+    for (final nextSystem in systemsCache.connectedSystems(current.$1)) {
       final next = nextSystem.systemSymbol;
       final newCost = costSoFar[current.$1]! +
           _timeBetween(systemsCache, currentSystem, nextSystem, shipSpeed);
