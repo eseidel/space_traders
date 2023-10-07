@@ -694,3 +694,14 @@ null in this case is a surveyor.
 🛸#B  🤝   1 MOUNT_MINING_LASER_II   +0% +11c per   1 x 39,054c = +39,054c -> 🏦 169,589c
 🛸#B  Beginning route to X1-FQ44-62905F (2m)
 🛸#B  🛫 to X1-FQ44-62905F ASTEROID_FIELD (2m) spent 91 fuel
+
+
+### Wiring up hauling for miners
+
+Somehow represent the miners in deals, producting a given tradeSymbol for
+zero cost, at some amount of time to produce?
+
+
+### No debugging tools for surveys.
+
+Write a tool to list how many surveys deep we have?
