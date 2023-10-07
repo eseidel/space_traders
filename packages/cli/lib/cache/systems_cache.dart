@@ -127,11 +127,14 @@ class SystemsCache extends JsonListStore<System> {
       return [];
     }
     // Get all systems within X distance of the given system.
+    // This code is hot during init, so it's important to trim the list of
+    // systems as fast as possible, so we first cull by distance.
     final inRange = _systems
-        .where((s) => s.symbol != systemSymbol.system)
-        .where((s) => s.hasJumpGate)
         .where((s) => system.distanceTo(s) <= kJumpGateRange)
-        .toList();
+        .where((s) => s.symbol != systemSymbol.system)
+        // hasJumpGate is not cached (we just check traits), so only calling it
+        // on systems that are in range makes this about 2x faster.
+        .where((s) => s.hasJumpGate);
     final connected = inRange
         .map(
           (s) => ConnectedSystem(
