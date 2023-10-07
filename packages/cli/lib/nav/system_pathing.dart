@@ -7,8 +7,8 @@ int _distanceBetween(System a, ConnectedSystem b) {
   return a.position.distanceTo(b.position);
 }
 
+// TODO(eseidel): I suspect we could delete this and use _timeBetween.
 int _approximateTimeBetween(
-  SystemsCache systemsCache,
   System aSystem,
   ConnectedSystem bSystem,
   int shipSpeed,
@@ -24,7 +24,6 @@ int _approximateTimeBetween(
 }
 
 int _timeBetween(
-  SystemsCache systemsCache,
   System aSystem,
   ConnectedSystem bSystem,
   int shipSpeed,
@@ -65,11 +64,11 @@ List<SystemSymbol>? findSystemPath(
     for (final nextSystem in systemsCache.connectedSystems(currentSymbol)) {
       final next = nextSystem.systemSymbol;
       final newCost = costSoFar[currentSymbol]! +
-          _timeBetween(systemsCache, currentSystem, nextSystem, shipSpeed);
+          _timeBetween(currentSystem, nextSystem, shipSpeed);
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
-        final priority = newCost +
-            _approximateTimeBetween(systemsCache, end, nextSystem, shipSpeed);
+        final priority =
+            newCost + _approximateTimeBetween(end, nextSystem, shipSpeed);
         frontier.add((next, priority));
         cameFrom[next] = currentSymbol;
       }

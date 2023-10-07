@@ -67,7 +67,7 @@ class WaypointSymbol {
 
   /// Create a WaypointSymbol from a string.
   factory WaypointSymbol.fromString(String symbol) {
-    if (symbol.split('-').length != 3) {
+    if (_countHyphens(symbol) != 2) {
       throw ArgumentError('Invalid waypoint symbol: $symbol');
     }
     return WaypointSymbol._(symbol);
@@ -105,6 +105,18 @@ class WaypointSymbol {
   int get hashCode => waypoint.hashCode;
 }
 
+// We used to use split(), but that shows up in hot code paths.
+/// Returns the number of hypens in the given string.
+int _countHyphens(String str) {
+  var count = 0;
+  for (var i = 0; i < str.length; i++) {
+    if (str[i] == '-') {
+      count++;
+    }
+  }
+  return count;
+}
+
 /// Type-safe representation of a System Symbol
 @immutable
 class SystemSymbol {
@@ -112,7 +124,7 @@ class SystemSymbol {
 
   /// Create a SystemSymbol from a string.
   factory SystemSymbol.fromString(String symbol) {
-    if (symbol.split('-').length != 2) {
+    if (_countHyphens(symbol) != 1) {
       throw ArgumentError('Invalid system symbol: $symbol');
     }
     return SystemSymbol._(symbol);
