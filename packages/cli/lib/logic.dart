@@ -33,10 +33,10 @@ Future<void> advanceShips(
   // market caches.  If we got rid of those we could get rid of loopCount.
   await caches.updateAtTopOfLoop(api);
   await centralCommand.advanceCentralPlanning(api, caches);
-  final didReconnect = await db.reconnectIfNeeded();
-  if (didReconnect) {
-    logger.warn('Reconnected to database.');
-  }
+  // final didReconnect = await db.reconnectIfNeeded();
+  // if (didReconnect) {
+  //   logger.warn('Reconnected to database.');
+  // }
 
   // loop over all ships and advance them.
   for (var i = 0; i < loopCount; i++) {

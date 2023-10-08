@@ -74,10 +74,10 @@ class NetExecutor {
     var serverErrorRetryLimit = 5;
     while (true) {
       stats.printIfNeeded();
-      final didReconnect = await queue.reconnectIfNeeded();
-      if (didReconnect) {
-        logger.warn('Reconnected to database.');
-      }
+      // final didReconnect = await queue.reconnectIfNeeded();
+      // if (didReconnect) {
+      //   logger.warn('Reconnected to database.');
+      // }
 
       if (nextRequestTime != null) {
         final waitTime = nextRequestTime.difference(getNow());
