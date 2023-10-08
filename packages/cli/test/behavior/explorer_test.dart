@@ -35,6 +35,8 @@ class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
@@ -62,6 +64,8 @@ void main() {
     when(() => caches.systems).thenReturn(systemsCache);
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     when(() => caches.charting).thenReturn(chartingCache);
+    final systemConnectivity = _MockSystemConnectivity();
+    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
 
     final waypoint = _MockWaypoint();
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
@@ -69,6 +73,21 @@ void main() {
     when(() => waypoint.systemSymbol).thenReturn('S-A');
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
     when(() => waypoint.traits).thenReturn([]);
+    when(() => waypoint.chart).thenReturn(Chart());
+
+    final system = System(
+      symbol: waypointSymbol.system,
+      sectorSymbol: waypointSymbol.sector,
+      type: SystemType.BLACK_HOLE,
+      x: 0,
+      y: 0,
+    );
+    when(() => systemsCache.systemBySymbol(waypointSymbol.systemSymbol))
+        .thenReturn(system);
+    registerFallbackValue(waypointSymbol.systemSymbol);
+    when(() => systemConnectivity.clusterIdForSystem(any())).thenReturn(0);
+    when(() => systemConnectivity.systemSymbolsByClusterId(0))
+        .thenReturn([waypointSymbol.systemSymbol]);
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.createChart(any())).thenAnswer(
@@ -83,7 +102,10 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    final shipFuel = ShipFuel(capacity: 100, current: 100);
+    when(() => ship.fuel).thenReturn(shipFuel);
 
     registerFallbackValue(waypointSymbol);
     when(() => waypointCache.waypoint(any()))
@@ -91,6 +113,9 @@ void main() {
 
     when(() => centralCommand.maxAgeForExplorerData)
         .thenReturn(const Duration(days: 3));
+    when(centralCommand.shortenMaxAgeForExplorerData)
+        .thenReturn(const Duration(days: 1));
+    when(() => centralCommand.otherExplorerSystems(shipSymbol)).thenReturn([]);
     final state = BehaviorState(shipSymbol, Behavior.explorer);
 
     final logger = _MockLogger();
