@@ -209,7 +209,7 @@ class NetQueue {
 
   /// Reconnects to the database if it's been more than an hour.
   /// Working around an unknown leak in postgres.
-  Future<void> reconnectIfNeeded() {
+  Future<bool> reconnectIfNeeded() {
     return _db.reconnectIfNeeded();
   }
 

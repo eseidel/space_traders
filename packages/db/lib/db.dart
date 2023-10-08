@@ -113,15 +113,16 @@ class Database {
 
   /// Reconnect if the connection has been open for more than an hour.
   /// This is a hack around a unknown leak we're triggering in postgres.
-  Future<void> reconnectIfNeeded() async {
+  Future<bool> reconnectIfNeeded() async {
     final openTime = _connectionOpenTime;
     if (openTime == null) {
-      return;
+      return false;
     }
     if (DateTime.timestamp().difference(openTime) < const Duration(hours: 1)) {
-      return;
+      return false;
     }
     await reconnect();
+    return true;
   }
 
   /// Listen for notifications on a channel.
