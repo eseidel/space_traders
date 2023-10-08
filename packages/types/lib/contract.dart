@@ -21,6 +21,14 @@ enum ContractAction {
   static ContractAction fromName(String name) {
     return ContractAction.values.firstWhere((e) => e.name == name);
   }
+
+  /// The name of the contract action.
+  static ContractAction? fromNameOrNull(String? name) {
+    if (name == null) {
+      return null;
+    }
+    return ContractAction.values.firstWhere((e) => e.name == name);
+  }
 }
 
 /// A class to hold transaction data from a contract.

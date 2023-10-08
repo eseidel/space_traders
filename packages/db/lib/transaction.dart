@@ -35,7 +35,6 @@ Map<String, dynamic> transactionToColumnMap(Transaction transaction) {
 
 /// Create a new transaction from a result row.
 Transaction transactionFromColumnMap(Map<String, dynamic> values) {
-  final contractAction = values['contract_action'] as String?;
   return Transaction(
     transactionType:
         TransactionType.fromName(values['transaction_type'] as String),
@@ -52,7 +51,7 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
     agentCredits: values['agent_credits'] as int,
     accounting: AccountingType.fromName(values['accounting'] as String),
     contractAction:
-        contractAction == null ? null : ContractAction.fromName(contractAction),
+        ContractAction.fromNameOrNull(values['contract_action'] as String?),
     contractId: values['contract_id'] as String?,
   );
 }

@@ -110,8 +110,8 @@ class Transaction {
       accounting: AccountingType.values
           .firstWhere((e) => e.name == json['accounting'] as String),
       contractId: json['contractId'] as String?,
-      contractAction: ContractAction.values
-          .firstWhere((e) => e.name == json['contractAction'] as String?),
+      contractAction:
+          ContractAction.fromNameOrNull(json['contractAction'] as String?),
     );
   }
 
