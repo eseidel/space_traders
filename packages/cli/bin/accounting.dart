@@ -12,20 +12,28 @@ void reconcile(List<Transaction> transactions) {
   var credits = startingCredits;
   // Skip the first transaction, since agentCredits already includes the
   // credits change from that transaction.
-  for (final t in transactions.skip(1)) {
+  final toReconcile = transactions.skip(1).toList();
+  for (var i = 0; i < toReconcile.length; i++) {
+    final t = toReconcile[i];
     credits += t.creditsChange;
-    if (credits != t.agentCredits) {
+    final diff = credits - t.agentCredits;
+    if (diff != 0) {
       logger
-        ..warn('Credits $credits does not match '
-            'agentCredits ${t.agentCredits} ')
-        ..info(describeTransaction(t));
+        ..warn('Computed ${creditsString(credits)} differs $diff from '
+            'agentCredits ${t.agentCredits}')
+        ..info('Before: ${describeTransaction(toReconcile[i - 1])}')
+        ..info('After: ${describeTransaction(t)}');
       credits = t.agentCredits;
     }
   }
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  const lookback = Duration(minutes: 10);
+  final lookbackMinutesString = argResults.rest.firstOrNull;
+  final lookbackMinutes =
+      lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
+  final lookback = Duration(minutes: lookbackMinutes);
+
   final db = await defaultDatabase();
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await transactionsAfter(db, startTime)).toList();
@@ -34,11 +42,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final firstCredits = transactions.first.agentCredits;
   final creditDiff = lastCredits - firstCredits;
   final diffSign = creditDiff.isNegative ? '' : '+';
-  logger.info(
-    '$diffSign${creditsString(creditDiff)} '
-    'over ${approximateDuration(lookback)} '
-    'now ${creditsString(lastCredits)}',
-  );
+  logger
+    ..info('Lookback ${approximateDuration(lookback)}')
+    ..info('$diffSign${creditsString(creditDiff)}')
+    ..info('now ${creditsString(lastCredits)}');
   final transactionCount = transactions.length;
   logger.info('$transactionCount transactions');
 
@@ -55,24 +62,34 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     reconcile(transactions);
   }
   // Print the counts by accounting type.
+  logger.info('By accounting:');
   final counts = <AccountingType, int>{};
+  final accNameLength = AccountingType.values
+      .map((type) => type.name.length)
+      .reduce((a, b) => a > b ? a : b);
   for (final t in transactions) {
     counts[t.accounting] = (counts[t.accounting] ?? 0) + 1;
   }
   for (final type in AccountingType.values) {
     final count = counts[type] ?? 0;
-    logger.info('$count $type');
+    if (count == 0) continue;
+    logger.info('  ${type.name.padRight(accNameLength)} $count');
   }
 
   // Print the counts by transaction type.
+  logger.info('By transaction:');
   final transactionCounts = <TransactionType, int>{};
+  final transNameLength = AccountingType.values
+      .map((type) => type.name.length)
+      .reduce((a, b) => a > b ? a : b);
   for (final t in transactions) {
     transactionCounts[t.transactionType] =
         (transactionCounts[t.transactionType] ?? 0) + 1;
   }
   for (final type in TransactionType.values) {
     final count = transactionCounts[type] ?? 0;
-    logger.info('$count $type');
+    if (count == 0) continue;
+    logger.info('  ${type.name.padRight(transNameLength)} $count');
   }
 
   await db.close();
