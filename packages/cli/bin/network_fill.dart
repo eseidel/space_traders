@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
-import 'package:db/db.dart';
 
 // We can delete this command once we have multiple processes.
 Future<void> command(FileSystem fs, ArgResults argResults) async {

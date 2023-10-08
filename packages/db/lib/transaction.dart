@@ -52,7 +52,7 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
 }
 
 /// Get unique ship symbols from the transaction table.
-Future<Set<ShipSymbol>> uniqueShipSymbols(Database db) async {
+Future<Set<ShipSymbol>> uniqueShipSymbolsInTransactions(Database db) async {
   final result = await db.connection
       .query('SELECT DISTINCT ship_symbol FROM transaction_');
   return result.map((r) => ShipSymbol.fromString(r.first as String)).toSet();

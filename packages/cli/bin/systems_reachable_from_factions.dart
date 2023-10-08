@@ -1,7 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:db/db.dart';
-import 'package:types/api.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();

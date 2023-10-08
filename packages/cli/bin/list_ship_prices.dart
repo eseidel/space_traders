@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/api.dart';
 import 'package:cli/cache/shipyard_prices.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';

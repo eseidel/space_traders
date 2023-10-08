@@ -5,10 +5,8 @@ import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
-import 'package:db/db.dart';
 import 'package:db/transaction.dart';
 import 'package:intl/intl.dart';
-import 'package:types/types.dart';
 
 class TransactionSummary {
   TransactionSummary(Iterable<Transaction> transactions)
@@ -64,7 +62,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final db = await defaultDatabase();
 
-  final shipSymbols = (await uniqueShipSymbols(db)).toList()..sort();
+  final shipSymbols = (await uniqueShipSymbolsInTransactions(db)).toList()
+    ..sort();
   final behaviorCache = BehaviorCache.load(fs);
 
   final longestHexNumber =

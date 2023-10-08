@@ -2,7 +2,6 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
 import 'package:file/local.dart';
 import 'package:stats/stats.dart';
-import 'package:types/types.dart';
 
 void printPriceRanges(List<MarketPrice> gameStats) {
   void printStats(String label, Iterable<int> values) {

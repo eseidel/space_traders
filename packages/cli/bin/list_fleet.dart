@@ -3,7 +3,6 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
-import 'package:types/types.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);

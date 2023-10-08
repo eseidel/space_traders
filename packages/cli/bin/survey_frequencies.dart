@@ -1,6 +1,5 @@
 import 'package:cli/cli.dart';
 import 'package:collection/collection.dart';
-import 'package:db/db.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Load up historical surveys from the db.

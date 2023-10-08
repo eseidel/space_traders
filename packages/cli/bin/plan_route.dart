@@ -1,7 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/route.dart';
-import 'package:types/types.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440
 // Planned route from X1-CX76-69886Z to X1-XH63-75510F under fuel: 1200

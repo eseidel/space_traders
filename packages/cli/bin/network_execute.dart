@@ -5,7 +5,6 @@ import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 import 'package:cli/net/rate_limit.dart';
 import 'package:cli/printing.dart';
-import 'package:db/db.dart';
 import 'package:http/http.dart';
 
 class NetExecutor {

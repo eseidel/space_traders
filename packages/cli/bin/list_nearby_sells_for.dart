@@ -3,7 +3,6 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
-import 'package:types/types.dart';
 
 extension on Ship {
   /// Returns a copy of this ship with the same properties.

@@ -6,7 +6,11 @@ import 'package:scoped/scoped.dart';
 
 export 'package:args/args.dart';
 export 'package:cli/logger.dart';
+export 'package:db/db.dart';
 export 'package:file/file.dart';
+export 'package:types/types.dart';
+
+/// This file should be included by any bin/ script.
 
 /// Run command with a logger, but without an Api.
 Future<R> runOffline<R>(
