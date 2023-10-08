@@ -23,16 +23,19 @@ Map<String, dynamic> transactionToColumnMap(Transaction transaction) {
     'trade_symbol': transaction.tradeSymbol?.toJson(),
     'ship_type': transaction.shipType?.toJson(),
     'quantity': transaction.quantity,
-    'trade_type': transaction.tradeType.value,
+    'trade_type': transaction.tradeType?.value,
     'per_unit_price': transaction.perUnitPrice,
     'timestamp': transaction.timestamp,
     'agent_credits': transaction.agentCredits,
     'accounting': transaction.accounting.name,
+    'contract_action': transaction.contractAction?.name,
+    'contract_id': transaction.contractId,
   };
 }
 
 /// Create a new transaction from a result row.
 Transaction transactionFromColumnMap(Map<String, dynamic> values) {
+  final contractAction = values['contract_action'] as String?;
   return Transaction(
     transactionType:
         TransactionType.fromName(values['transaction_type'] as String),
@@ -43,11 +46,14 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
     shipType: ShipType.fromJson(values['ship_type'] as String?),
     quantity: values['quantity'] as int,
     tradeType:
-        MarketTransactionTypeEnum.fromJson(values['trade_type'] as String)!,
+        MarketTransactionTypeEnum.fromJson(values['trade_type'] as String),
     perUnitPrice: values['per_unit_price'] as int,
     timestamp: values['timestamp'] as DateTime,
     agentCredits: values['agent_credits'] as int,
     accounting: AccountingType.fromName(values['accounting'] as String),
+    contractAction:
+        contractAction == null ? null : ContractAction.fromName(contractAction),
+    contractId: values['contract_id'] as String?,
   );
 }
 

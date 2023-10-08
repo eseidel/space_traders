@@ -3,7 +3,7 @@ import 'package:db/transaction.dart';
 
 String describeTransaction(Transaction t) {
   return '${t.timestamp} ${t.tradeSymbol} ${t.quantity} ${t.tradeType} '
-      '${t.shipSymbol} ${t.waypointSymbol} ${t.creditChange} ${t.accounting}';
+      '${t.shipSymbol} ${t.waypointSymbol} ${t.creditsChange} ${t.accounting}';
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {

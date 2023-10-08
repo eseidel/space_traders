@@ -116,6 +116,8 @@ void main() {
       timestamp: DateTime(2021),
       agentCredits: 10,
       accounting: AccountingType.fuel,
+      contractAction: null,
+      contractId: null,
     );
     final transaction2 = Transaction(
       transactionType: TransactionType.market,
@@ -129,6 +131,8 @@ void main() {
       timestamp: DateTime(2021),
       agentCredits: 10,
       accounting: AccountingType.fuel,
+      contractAction: null,
+      contractId: null,
     );
     final costed2 = costed.byAddingTransactions([transaction1]);
     expect(costed2.transactions, [transaction1]);

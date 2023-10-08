@@ -240,7 +240,7 @@ extension CostedDealPrediction on CostedDeal {
   int get actualRevenue {
     return transactions
         .where((t) => t.tradeType == MarketTransactionTypeEnum.SELL)
-        .fold(0, (a, b) => a + b.creditChange);
+        .fold(0, (a, b) => a + b.creditsChange);
   }
 
   /// The actual cost of goods sold.
@@ -248,7 +248,7 @@ extension CostedDealPrediction on CostedDeal {
     return transactions
         .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
         .where((t) => t.accounting == AccountingType.goods)
-        .fold(0, (a, b) => a + -b.creditChange);
+        .fold(0, (a, b) => a + -b.creditsChange);
   }
 
   /// The actual operational expenses of the deal.
@@ -256,7 +256,7 @@ extension CostedDealPrediction on CostedDeal {
     return transactions
         .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
         .where((t) => t.accounting == AccountingType.fuel)
-        .fold(0, (a, b) => a + -b.creditChange);
+        .fold(0, (a, b) => a + -b.creditsChange);
   }
 
   /// The actual profit of the deal.

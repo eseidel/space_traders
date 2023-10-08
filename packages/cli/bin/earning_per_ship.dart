@@ -15,7 +15,7 @@ class TransactionSummary {
 
   bool get isEmpty => transactions.isEmpty;
 
-  int get creditDiff => transactions.fold(0, (m, t) => m + t.creditChange);
+  int get creditDiff => transactions.fold(0, (m, t) => m + t.creditsChange);
   Duration get duration => transactions.isEmpty
       ? Duration.zero
       : transactions.last.timestamp.difference(transactions.first.timestamp);

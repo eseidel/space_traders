@@ -9,7 +9,7 @@ void main(List<String> args) async {
 
 String describeTransaction(Transaction t) {
   return '${t.timestamp} ${t.tradeSymbol} ${t.quantity} ${t.tradeType} '
-      '${t.shipSymbol} ${t.waypointSymbol} ${t.creditChange}';
+      '${t.shipSymbol} ${t.waypointSymbol} ${t.creditsChange}';
 }
 
 class SyntheticDeal {
@@ -46,11 +46,11 @@ class SyntheticDeal {
   int get units => goodsBuys.fold<int>(0, (sum, t) => sum + t.quantity);
 
   int get costOfGoodsSold =>
-      goodsBuys.fold<int>(0, (sum, t) => sum + t.creditChange);
+      goodsBuys.fold<int>(0, (sum, t) => sum + t.creditsChange);
 
   int get revenue => transactions
       .where((t) => t.tradeType == MarketTransactionTypeEnum.SELL)
-      .fold<int>(0, (sum, t) => sum + t.creditChange);
+      .fold<int>(0, (sum, t) => sum + t.creditsChange);
 
   int get operatingExpenses => transactions
       .where(
@@ -58,7 +58,7 @@ class SyntheticDeal {
             t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
             t.accounting == AccountingType.fuel,
       )
-      .fold<int>(0, (sum, t) => sum + t.creditChange);
+      .fold<int>(0, (sum, t) => sum + t.creditsChange);
 
   int get profit => revenue + costOfGoodsSold + operatingExpenses;
 

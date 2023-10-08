@@ -216,6 +216,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   shipErr(ship, 'Bought ship: ${result.ship.symbol}');
   final transaction = Transaction.fromShipyardTransaction(
     result.transaction,
+    // purchaseShip updated the agentCache
     agentCache.agent.credits,
     ship.shipSymbol,
   );
@@ -456,19 +457,34 @@ Future<Contract> negotiateContractAndLog(
 /// Accept [contract] and log.
 Future<AcceptContract200ResponseData> acceptContractAndLog(
   Api api,
+  Database db,
   ContractCache contractCache,
   AgentCache agentCache,
+  Ship ship,
   Contract contract,
 ) async {
   final response = await api.contracts.acceptContract(contract.id);
   final data = response!.data;
   agentCache.agent = data.agent;
   contractCache.updateContract(data.contract);
-  logger
-    ..info('Accepted: ${contractDescription(contract)}.')
-    ..info(
-      'received ${creditsString(contract.terms.payment.onAccepted)}',
-    );
+  shipInfo(ship, 'Accepted: ${contractDescription(contract)}.');
+  shipInfo(
+    ship,
+    'received ${creditsString(contract.terms.payment.onAccepted)}',
+  );
+
+  final contactTransaction = ContractTransaction.accept(
+    contract: contract,
+    shipSymbol: ship.shipSymbol,
+    waypointSymbol: ship.waypointSymbol,
+    timestamp: DateTime.timestamp(),
+  );
+  final transaction = Transaction.fromContractTransaction(
+    contactTransaction,
+    agentCache.agent.credits,
+  );
+  await db.insertTransaction(transaction);
+
   return data;
 }
 

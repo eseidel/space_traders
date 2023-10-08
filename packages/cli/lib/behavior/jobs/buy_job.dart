@@ -147,7 +147,7 @@ Future<JobResult> doBuyJob(
       ship,
       'Purchased ${transaction.quantity} ${transaction.tradeSymbol} '
       '@ ${transaction.perUnitPrice} '
-      '${creditsString(transaction.creditChange)}',
+      '${creditsString(transaction.creditsChange)}',
     );
   }
   jobAssert(

@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
+import 'package:types/contract.dart';
 
 /// The accounting type of a transaction.
 enum AccountingType {
@@ -18,16 +19,30 @@ enum AccountingType {
   }
 }
 
+// Saf uses:
+// TRADEGOOD_TRANSACTION_TYPE_CHOICES = (
+//     (-3, 'ship modification'),
+//     (-2, 'ship purchase'),
+//     (-1, 'purchase'),
+//     (0, 'unknown'),
+//     (1, 'sell'),
+//     (2, 'contract delivery'),
+// )
+// https://discord.com/channels/792864705139048469/792864705139048472/1157736812819787776
+
 /// The type of transaction which created this transaction.
 enum TransactionType {
-  /// A market transaction.
+  /// A market transaction (buy or sell goods or refuel).
   market,
 
-  /// A shipyard transaction.
+  /// A shipyard transaction (ship purchase).
   shipyard,
 
-  /// A ship modification transaction.
-  shipModification;
+  /// A ship modification transaction (mount).
+  shipModification,
+
+  /// A contract transaction
+  contract;
 
   /// Lookup a transaction type by index.
   static TransactionType fromName(String name) {
@@ -51,9 +66,13 @@ class Transaction {
     required this.timestamp,
     required this.agentCredits,
     required this.accounting,
+    required this.contractId,
+    required this.contractAction,
   });
 
   /// Create a new transaction to allow any() use in mocks.
+  /// Can also be used for round-trip tests.  Uses all fields, but is not
+  /// a valid transaction.
   @visibleForTesting
   Transaction.fallbackValue()
       : this(
@@ -61,13 +80,15 @@ class Transaction {
           shipSymbol: const ShipSymbol('A', 1),
           waypointSymbol: WaypointSymbol.fromString('S-E-P'),
           tradeSymbol: TradeSymbol.FUEL,
-          shipType: null,
+          shipType: ShipType.EXPLORER,
           quantity: 1,
           tradeType: MarketTransactionTypeEnum.PURCHASE,
           perUnitPrice: 2,
           timestamp: DateTime(2021),
           agentCredits: 3,
           accounting: AccountingType.goods,
+          contractId: 'abcd',
+          contractAction: ContractAction.delivery,
         );
 
   /// Create a new transaction from json.
@@ -88,6 +109,9 @@ class Transaction {
       agentCredits: json['agentCredits'] as int,
       accounting: AccountingType.values
           .firstWhere((e) => e.name == json['accounting'] as String),
+      contractId: json['contractId'] as String?,
+      contractAction: ContractAction.values
+          .firstWhere((e) => e.name == json['contractAction'] as String?),
     );
   }
 
@@ -111,6 +135,8 @@ class Transaction {
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
       accounting: accounting,
+      contractId: null,
+      contractAction: null,
     );
   }
 
@@ -138,6 +164,8 @@ class Transaction {
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
       accounting: AccountingType.capital,
+      contractId: null,
+      contractAction: null,
     );
   }
 
@@ -166,6 +194,30 @@ class Transaction {
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
       accounting: AccountingType.capital,
+      contractId: null,
+      contractAction: null,
+    );
+  }
+
+  /// Create a new transaction from a contract transaction.
+  factory Transaction.fromContractTransaction(
+    ContractTransaction transaction,
+    int agentCredits,
+  ) {
+    return Transaction(
+      transactionType: TransactionType.contract,
+      shipSymbol: transaction.shipSymbol,
+      waypointSymbol: transaction.waypointSymbol,
+      tradeSymbol: null,
+      shipType: null,
+      quantity: transaction.unitsDelivered ?? 0,
+      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      perUnitPrice: 0,
+      timestamp: DateTime.now(),
+      agentCredits: agentCredits,
+      accounting: AccountingType.capital,
+      contractId: transaction.contractId,
+      contractAction: transaction.contractAction,
     );
   }
 
@@ -188,7 +240,7 @@ class Transaction {
   final int quantity;
 
   /// Market transaction type (e.g. PURCHASE, SELL)
-  final MarketTransactionTypeEnum tradeType;
+  final MarketTransactionTypeEnum? tradeType;
 
   /// Per-unit price of the transaction.
   final int perUnitPrice;
@@ -202,8 +254,14 @@ class Transaction {
   /// The accounting classification of the transaction.
   final AccountingType accounting;
 
+  /// The id of the contract involved in the transaction.
+  final String? contractId;
+
+  /// The action of the contract involved in the transaction.
+  final ContractAction? contractAction;
+
   /// The change in credits from this transaction.
-  int get creditChange {
+  int get creditsChange {
     if (tradeType == MarketTransactionTypeEnum.PURCHASE) {
       return -perUnitPrice * quantity;
     } else {
@@ -221,11 +279,13 @@ class Transaction {
       'tradeSymbol': tradeSymbol?.toJson(),
       'shipType': shipType?.toJson(),
       'quantity': quantity,
-      'tradeType': tradeType.value,
+      'tradeType': tradeType?.value,
       'perUnitPrice': perUnitPrice,
       'timestamp': timestamp.toUtc().toIso8601String(),
       'agentCredits': agentCredits,
       'accounting': accounting.name,
+      'contractId': contractId,
+      'contractAction': contractAction?.name,
     };
   }
 
@@ -244,7 +304,9 @@ class Transaction {
           perUnitPrice == other.perUnitPrice &&
           timestamp == other.timestamp &&
           agentCredits == other.agentCredits &&
-          accounting == other.accounting;
+          accounting == other.accounting &&
+          contractId == other.contractId &&
+          contractAction == other.contractAction;
 
   @override
   int get hashCode => Object.hash(
@@ -259,5 +321,7 @@ class Transaction {
         timestamp,
         agentCredits,
         accounting,
+        contractId,
+        contractAction,
       );
 }

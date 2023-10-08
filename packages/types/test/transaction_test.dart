@@ -16,6 +16,8 @@ void main() {
       timestamp: moonLanding,
       agentCredits: 3,
       accounting: AccountingType.capital,
+      contractAction: ContractAction.accept,
+      contractId: '1234',
     );
     final json = transaction.toJson();
     final transaction2 = Transaction.fromJson(json);
@@ -43,6 +45,8 @@ void main() {
       timestamp: moonLanding,
       agentCredits: 3,
       accounting: AccountingType.capital,
+      contractAction: null,
+      contractId: null,
     );
     final transaction2 = Transaction(
       transactionType: TransactionType.market,
@@ -56,6 +60,8 @@ void main() {
       timestamp: moonLanding,
       agentCredits: 1,
       accounting: AccountingType.capital,
+      contractAction: null,
+      contractId: null,
     );
     // Note: Quanity and agentCredits are swapped relative to transaction1:
     expect(transaction.hashCode, isNot(transaction2.hashCode));
