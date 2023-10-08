@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
@@ -62,14 +64,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final db = await defaultDatabase();
 
-  final shipSymbols =
-      (await uniqueShipSymbols(db)).map(ShipSymbol.fromString).toList()..sort();
+  final shipSymbols = (await uniqueShipSymbols(db)).toList()..sort();
   final behaviorCache = BehaviorCache.load(fs);
 
-  final longestHexNumber = shipSymbols.fold(
-    0,
-    (m, s) => m > s.hexNumber.length ? m : s.hexNumber.length,
-  );
+  final longestHexNumber =
+      shipSymbols.map((s) => s.hexNumber.length).reduce(max);
 
   final shipCache = ShipCache.loadCached(fs)!;
   final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
@@ -80,10 +79,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         'last ${approximateDuration(lookback)}:');
 
   String c(num? n) {
-    if (n == null) {
-      return '';
-    }
-    return n.isFinite ? NumberFormat().format(n.round()) : n.toString();
+    if (n == null) return '';
+    if (!n.isFinite) return n.toString();
+    return NumberFormat().format(n.round());
   }
 
   final behaviorCounts = <String, int>{};
@@ -91,9 +89,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await transactionsAfter(db, startTime)).where(
-    (t) =>
-        t.accounting == AccountingType.goods ||
-        t.accounting == AccountingType.fuel,
+    (t) => [AccountingType.goods, AccountingType.fuel].contains(t.accounting),
   );
 
   for (final shipSymbol in shipSymbols) {
