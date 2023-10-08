@@ -7,46 +7,6 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:types/types.dart';
 
-/// A queued request to buy and mount a mount on a ship.
-class MountRequest {
-  /// Create a new mount request.
-  MountRequest({
-    required this.shipSymbol,
-    required this.mountSymbol,
-    required this.marketSymbol,
-    required this.shipyardSymbol,
-    required this.creditsNeeded,
-  });
-
-  /// The ship that needs this mount.
-  final ShipSymbol shipSymbol;
-
-  /// The mount we need to buy.
-  final ShipMountSymbolEnum mountSymbol;
-
-  /// The market we need to buy the mount from.
-  final WaypointSymbol marketSymbol;
-
-  /// The shipyard we will use to install the mount.
-  final WaypointSymbol shipyardSymbol;
-
-  /// The credits we need to buy the mount and install it.
-  final int creditsNeeded;
-
-  /// The buy job for this mount request.
-  BuyJob get buyJob => BuyJob(
-        tradeSymbol: tradeSymbolForMountSymbol(mountSymbol),
-        units: 1,
-        buyLocation: marketSymbol,
-      );
-
-  /// The mount job for this mount request.
-  MountJob get mountJob => MountJob(
-        mountSymbol: mountSymbol,
-        shipyardSymbol: shipyardSymbol,
-      );
-}
-
 /// Compute a mount request for the given ship and template.
 Future<MountRequest?> mountRequestForShip(
   CentralCommand centralCommand,

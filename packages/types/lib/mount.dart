@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:more/collection.dart';
 import 'package:types/api.dart';
+import 'package:types/behavior.dart';
 
 /// Set of ship mount symbols.
 /// Caution: equals and hashCode are not defined for this type.
@@ -89,4 +90,44 @@ MountSymbolSet mountsToAddToShip(Ship ship, ShipTemplate template) {
 /// Mounts to remove to make [ship] match [template].
 MountSymbolSet mountsToRemoveFromShip(Ship ship, ShipTemplate template) {
   return ship.mountedMountSymbols.difference(template.mounts);
+}
+
+/// A queued request to buy and mount a mount on a ship.
+class MountRequest {
+  /// Create a new mount request.
+  MountRequest({
+    required this.shipSymbol,
+    required this.mountSymbol,
+    required this.marketSymbol,
+    required this.shipyardSymbol,
+    required this.creditsNeeded,
+  });
+
+  /// The ship that needs this mount.
+  final ShipSymbol shipSymbol;
+
+  /// The mount we need to buy.
+  final ShipMountSymbolEnum mountSymbol;
+
+  /// The market we need to buy the mount from.
+  final WaypointSymbol marketSymbol;
+
+  /// The shipyard we will use to install the mount.
+  final WaypointSymbol shipyardSymbol;
+
+  /// The credits we need to buy the mount and install it.
+  final int creditsNeeded;
+
+  /// The buy job for this mount request.
+  BuyJob get buyJob => BuyJob(
+        tradeSymbol: tradeSymbolForMountSymbol(mountSymbol),
+        units: 1,
+        buyLocation: marketSymbol,
+      );
+
+  /// The mount job for this mount request.
+  MountJob get mountJob => MountJob(
+        mountSymbol: mountSymbol,
+        shipyardSymbol: shipyardSymbol,
+      );
 }

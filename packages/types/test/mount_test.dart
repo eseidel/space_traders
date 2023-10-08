@@ -220,4 +220,26 @@ void main() {
     ]);
     expect(ShipTemplate.mountsSymbolSetEquals(a, d), isFalse);
   });
+
+  test('MountRequest', () {
+    const shipSymbol = ShipSymbol('S', 1);
+    const mountSymbol = ShipMountSymbolEnum.MINING_LASER_II;
+    final marketSymbol = WaypointSymbol.fromString('M-A-R');
+    final shipyardSymbol = WaypointSymbol.fromString('S-A-B');
+    const creditsNeeded = 100000;
+    final request = MountRequest(
+      shipSymbol: shipSymbol,
+      mountSymbol: mountSymbol,
+      marketSymbol: marketSymbol,
+      shipyardSymbol: shipyardSymbol,
+      creditsNeeded: creditsNeeded,
+    );
+    final buyJob = request.buyJob;
+    expect(buyJob.tradeSymbol, equals(tradeSymbolForMountSymbol(mountSymbol)));
+    expect(buyJob.units, equals(1));
+    expect(buyJob.buyLocation, equals(marketSymbol));
+    final mountJob = request.mountJob;
+    expect(mountJob.mountSymbol, equals(mountSymbol));
+    expect(mountJob.shipyardSymbol, equals(shipyardSymbol));
+  });
 }
