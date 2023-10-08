@@ -1,6 +1,7 @@
 import 'package:openapi/api.dart';
 
 /// Record of a historcial survey.
+// This can't be @immutable because Survey is not.
 class HistoricalSurvey {
   /// Create a HistoricalSurvey
   HistoricalSurvey({
@@ -28,19 +29,6 @@ class HistoricalSurvey {
   // Unclear if this should be saved in this class or not, it's the
   // only mutable value.
   final bool exhausted;
-
-  /// Create a copy of this HistoricalSurvey with the given fields replaced.
-  HistoricalSurvey copyWith({
-    DateTime? timestamp,
-    Survey? survey,
-    bool? exhausted,
-  }) {
-    return HistoricalSurvey(
-      timestamp: timestamp ?? this.timestamp,
-      survey: survey ?? this.survey,
-      exhausted: exhausted ?? this.exhausted,
-    );
-  }
 
   /// Convert to JSON.
   Map<String, dynamic> toJson() {

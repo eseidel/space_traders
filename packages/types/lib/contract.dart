@@ -24,10 +24,7 @@ enum ContractAction {
 
   /// The name of the contract action.
   static ContractAction? fromNameOrNull(String? name) {
-    if (name == null) {
-      return null;
-    }
-    return ContractAction.values.firstWhere((e) => e.name == name);
+    return name == null ? null : fromName(name);
   }
 }
 
