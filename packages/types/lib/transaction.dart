@@ -204,18 +204,24 @@ class Transaction {
     ContractTransaction transaction,
     int agentCredits,
   ) {
+    // This is a bit of a hack, using "creditsChange" as the per-unit-price
+    // creditsChange is only non-zero for fullfillment transactions.
+    final quantity = transaction.unitsDelivered ??
+        (transaction.contractAction == ContractAction.fulfillment ? 1 : 0);
+    final perUnitPrice = transaction.creditsChange;
+
     return Transaction(
       transactionType: TransactionType.contract,
       shipSymbol: transaction.shipSymbol,
       waypointSymbol: transaction.waypointSymbol,
       tradeSymbol: null,
       shipType: null,
-      quantity: transaction.unitsDelivered ?? 0,
-      tradeType: MarketTransactionTypeEnum.PURCHASE,
-      perUnitPrice: 0,
-      timestamp: DateTime.now(),
+      quantity: quantity,
+      tradeType: null,
+      perUnitPrice: perUnitPrice,
+      timestamp: transaction.timestamp,
       agentCredits: agentCredits,
-      accounting: AccountingType.capital,
+      accounting: AccountingType.goods,
       contractId: transaction.contractId,
       contractAction: transaction.contractAction,
     );

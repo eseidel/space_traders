@@ -25,7 +25,7 @@ void reconcile(List<Transaction> transactions) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  const lookback = Duration(minutes: 60);
+  const lookback = Duration(minutes: 10);
   final db = await defaultDatabase();
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await transactionsAfter(db, startTime)).toList();
@@ -54,13 +54,24 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     );
     reconcile(transactions);
   }
-  // Print the counts by transaction type.
+  // Print the counts by accounting type.
   final counts = <AccountingType, int>{};
   for (final t in transactions) {
     counts[t.accounting] = (counts[t.accounting] ?? 0) + 1;
   }
   for (final type in AccountingType.values) {
     final count = counts[type] ?? 0;
+    logger.info('$count $type');
+  }
+
+  // Print the counts by transaction type.
+  final transactionCounts = <TransactionType, int>{};
+  for (final t in transactions) {
+    transactionCounts[t.transactionType] =
+        (transactionCounts[t.transactionType] ?? 0) + 1;
+  }
+  for (final type in TransactionType.values) {
+    final count = transactionCounts[type] ?? 0;
     logger.info('$count $type');
   }
 
