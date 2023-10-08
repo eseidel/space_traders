@@ -95,6 +95,7 @@ class Transaction {
   /// This only exists to support CostedDeal.fromJson and should be removed.
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
+      // TODO(eseidel): This should use TransactionType.fromName.
       transactionType: TransactionType.values
           .firstWhere((e) => e.index == json['transactionType'] as int),
       shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
@@ -103,7 +104,7 @@ class Transaction {
       shipType: ShipType.fromJson(json['shipType'] as String?),
       quantity: json['quantity'] as int,
       tradeType: MarketTransactionTypeEnum.values
-          .firstWhere((e) => e.value == json['tradeType'] as String),
+          .firstWhere((e) => e.value == json['tradeType'] as String?),
       perUnitPrice: json['perUnitPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
       agentCredits: json['agentCredits'] as int,
