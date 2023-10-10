@@ -136,17 +136,6 @@ class MarketCache {
     _marketsBySymbol.clear();
   }
 
-  /// Fetch all markets in the given system.
-  Stream<Market> marketsInSystem(SystemSymbol systemSymbol) async* {
-    final waypoints = await _waypointCache.waypointsInSystem(systemSymbol);
-    for (final waypoint in waypoints) {
-      final maybeMarket = await marketForSymbol(waypoint.waypointSymbol);
-      if (maybeMarket != null) {
-        yield maybeMarket;
-      }
-    }
-  }
-
   /// Fetch the waypoint with the given symbol.
   Future<Market?> marketForSymbol(
     WaypointSymbol marketSymbol, {

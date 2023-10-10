@@ -23,6 +23,7 @@ Future<Waypoint?> nearbyMarketWhichTrades(
   int maxJumps = 1,
 }) async {
   final start = await waypointCache.waypoint(startSymbol);
+  // TODO(eseidel): Use MarketPrices instead of MarketCache.
   if (start.hasMarketplace) {
     final startMarket = await marketCache.marketForSymbol(start.waypointSymbol);
     if (startMarket!.allowsTradeOf(tradeSymbol)) {
@@ -33,6 +34,7 @@ Future<Waypoint?> nearbyMarketWhichTrades(
     startSystem: start.systemSymbolObject,
     maxJumps: maxJumps,
   )) {
+    // TODO(eseidel): Use MarketPrices instead of MarketCache.
     final market = await marketCache.marketForSymbol(waypoint.waypointSymbol);
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
       return waypoint;
