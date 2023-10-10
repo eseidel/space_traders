@@ -44,13 +44,9 @@ class ShipCache extends ResponseListCache<Ship> {
     bool forceRefresh = false,
   }) async {
     if (!forceRefresh) {
-      final ships = JsonListStore.load<Ship>(
-        fs,
-        path,
-        (j) => Ship.fromJson(j)!,
-      );
-      if (ships != null) {
-        return ShipCache(ships, fs: fs, path: path);
+      final cached = loadCached(fs, path: path);
+      if (cached != null) {
+        return cached;
       }
     }
     final ships = await allMyShips(api).toList();
