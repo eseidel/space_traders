@@ -149,26 +149,6 @@ int expectedValueFromSurvey(
   return totalValue ~/ survey.deposits.length;
 }
 
-/// Returns the nearest waypoint with a marketplace.
-Future<Waypoint?> nearestWaypointWithMarket(
-  WaypointCache waypointCache,
-  Waypoint start, {
-  int maxJumps = 1,
-}) async {
-  if (start.hasMarketplace) {
-    return start;
-  }
-  await for (final waypoint in waypointCache.waypointsInJumpRadius(
-    startSystem: start.systemSymbolObject,
-    maxJumps: maxJumps,
-  )) {
-    if (waypoint.hasMarketplace) {
-      return waypoint;
-    }
-  }
-  return null;
-}
-
 class _ValuedSurvey {
   _ValuedSurvey({
     required this.expectedValue,

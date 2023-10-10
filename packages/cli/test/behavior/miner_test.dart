@@ -101,68 +101,6 @@ void main() {
     );
     expect(maybeSurvey!.deposits.first.symbol, 'DIAMONDS');
   });
-  test('nearestWaypointWithMarket returns start', () async {
-    final waypointCache = _MockWaypointCache();
-    final start = _MockWaypoint();
-    when(() => start.traits).thenReturn(
-      [
-        WaypointTrait(
-          symbol: WaypointTraitSymbolEnum.MARKETPLACE,
-          name: '',
-          description: '',
-        ),
-      ],
-    );
-    final nearest = await nearestWaypointWithMarket(waypointCache, start);
-    expect(nearest, start);
-  });
-
-  test('nearestWaypointWithMarket null', () async {
-    final waypointCache = _MockWaypointCache();
-    final start = _MockWaypoint();
-    final market = _MockWaypoint();
-    when(() => start.traits).thenReturn([]);
-    final symbol = WaypointSymbol.fromString('S-E-W');
-    when(() => start.symbol).thenReturn(symbol.waypoint);
-    when(() => start.systemSymbol).thenReturn(symbol.system);
-    when(
-      () => waypointCache.waypointsInJumpRadius(
-        startSystem: symbol.systemSymbol,
-        maxJumps: any(named: 'maxJumps'),
-      ),
-    ).thenAnswer((_) => Stream.fromIterable([market]));
-    when(() => market.traits).thenReturn([]);
-    final nearest = await nearestWaypointWithMarket(waypointCache, start);
-    expect(nearest, isNull);
-  });
-
-  test('nearestWaypointWithMarket', () async {
-    final waypointCache = _MockWaypointCache();
-    final start = _MockWaypoint();
-    final market = _MockWaypoint();
-    when(() => start.traits).thenReturn([]);
-    final symbol = WaypointSymbol.fromString('S-E-W');
-    when(() => start.symbol).thenReturn(symbol.waypoint);
-    when(() => start.systemSymbol).thenReturn(symbol.system);
-    when(
-      () => waypointCache.waypointsInJumpRadius(
-        startSystem: symbol.systemSymbol,
-        maxJumps: any(named: 'maxJumps'),
-      ),
-    ).thenAnswer((_) => Stream.fromIterable([market]));
-    when(() => market.traits).thenReturn(
-      [
-        WaypointTrait(
-          symbol: WaypointTraitSymbolEnum.MARKETPLACE,
-          name: '',
-          description: '',
-        ),
-      ],
-    );
-    final nearest = await nearestWaypointWithMarket(waypointCache, start);
-    expect(nearest, market);
-  });
-
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
