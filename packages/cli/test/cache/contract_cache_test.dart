@@ -41,5 +41,47 @@ void main() {
       jsonEncode(contractCache2.contracts.first),
       jsonEncode(contracts.first),
     );
+
+    // If the system clock is ever before the moon landing, some of these
+    // may fail.
+    expect(contractCache2.completedContracts, isEmpty);
+    expect(contractCache2.unacceptedContracts.length, 1);
+
+    expect(contractCache2.activeContracts, isEmpty);
+    expect(contractCache2.expiredContracts.length, 1);
+    // Contract == isn't implemented, so we would need to use
+    // contractCache if we wanted the same object.  Instead we check id.
+    expect(contractCache2.expiredContracts.first.id, contracts.first.id);
+    expect(
+      contractCache2.contract(contract.id)?.factionSymbol,
+      contract.factionSymbol,
+    );
+    expect(contractCache2.contract('nope'), isNull);
+
+    final updatedContract = Contract(
+      id: 'id',
+      factionSymbol: 'faction2',
+      type: ContractTypeEnum.PROCUREMENT,
+      terms: ContractTerms(
+        deadline: moonLanding,
+        payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
+        deliver: [
+          ContractDeliverGood(
+            tradeSymbol: 'T',
+            destinationSymbol: 'W',
+            unitsFulfilled: 0,
+            unitsRequired: 10,
+          ),
+        ],
+      ),
+      expiration: moonLanding,
+      deadlineToAccept: moonLanding,
+    );
+    contractCache2.updateContract(updatedContract);
+    expect(contractCache2.contracts.length, contracts.length);
+    expect(
+      contractCache2.contract(contract.id)?.factionSymbol,
+      updatedContract.factionSymbol,
+    );
   });
 }

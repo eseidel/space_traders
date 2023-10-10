@@ -2,6 +2,7 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
 import 'package:cli/net/queries.dart';
+import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 
@@ -39,13 +40,9 @@ class ContractCache extends ResponseListCache<Contract> {
     bool forceRefresh = false,
   }) async {
     if (!forceRefresh) {
-      final contracts = JsonListStore.load<Contract>(
-        fs,
-        path,
-        (j) => Contract.fromJson(j)!,
-      );
-      if (contracts != null) {
-        return ContractCache(contracts, fs: fs, path: path);
+      final cached = loadCached(fs, path: path);
+      if (cached != null) {
+        return cached;
       }
     }
     final contracts = await allMyContracts(api).toList();
@@ -86,5 +83,6 @@ class ContractCache extends ResponseListCache<Contract> {
       contracts.where((c) => !c.accepted).toList();
 
   /// Looks up the contract by id.
-  Contract? contract(String id) => contracts.firstWhere((c) => c.id == id);
+  Contract? contract(String id) =>
+      contracts.firstWhereOrNull((c) => c.id == id);
 }
