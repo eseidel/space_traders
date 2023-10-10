@@ -22,12 +22,6 @@ class JsonStore<Record> {
 
   final Map<String, dynamic> Function(Record) _toJson;
 
-  /// Replace the root object of the store.
-  void setRecord(Record newRecord) {
-    record = newRecord;
-    save();
-  }
-
   final String _path;
 
   /// The file system to use.
