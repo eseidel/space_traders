@@ -21,6 +21,9 @@ import 'package:cli/trading.dart';
 // - 47084 times COPPER_ORE deposit, 7.14% of deposits, 35.73% of surveys
 // - 918 times DIAMONDS deposit, 0.14% of deposits, 0.70% of surveys
 
+// SAF on simulating surveys:
+// https://discord.com/channels/792864705139048469/792864705139048472/1159409252172050472
+
 // From Flowi:
 // https://discord.com/channels/792864705139048469/792864705139048472/1159399297540960256
 // +-----------+-------------------+
