@@ -51,8 +51,5 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 }
 
 void main(List<String> args) async {
-  await runOffline(
-    args,
-    command,
-  );
+  await runOffline(args, command);
 }
