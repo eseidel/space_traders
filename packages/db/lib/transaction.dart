@@ -69,6 +69,19 @@ Future<Iterable<Transaction>> allTransactions(Database db) async {
   return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
 }
 
+/// Get all transactions matching accountingType from the database.
+Future<Iterable<Transaction>> transactionsWithAccountingType(
+  Database db,
+  AccountingType accountingType,
+) async {
+  final result = await db.connection.query(
+    'SELECT * FROM transaction_ WHERE '
+    'accounting = @accounting',
+    substitutionValues: {'accounting': accountingType.name},
+  );
+  return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
+}
+
 /// Get transactions after a given timestamp.
 Future<Iterable<Transaction>> transactionsAfter(
   Database db,
