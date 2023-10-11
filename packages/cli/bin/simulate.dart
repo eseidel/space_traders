@@ -158,10 +158,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   const diamondRatioToSurveys =
       0.64 / 100; // 0.64% of all surveys have a diamond.
   const surveysUntilDiamond = 1 / diamondRatioToSurveys;
+  // Only 1 in 5 of the symbols in the survey will be a diamond,
+  // technically (18.6%) according to survey_frequencies.dart.
   const diamondRatePerDiamondSurvey = 1 / 5;
   const diamondChancePerExtract = diamondRatePerDiamondSurvey;
 
-  const extractionsPerSurvey = 19;
+  // 10.4 per survey across 286k extractions, survey_extraction_counts.dart
+  const extractionsPerSurvey = 10;
   final diamondMedianSellPrice = marketPrices.medianSellPrice(tradeSymbol)!;
 
   const maxRequestsPerMinute = 170; // Assuming no room for other actions.
