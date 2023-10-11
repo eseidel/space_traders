@@ -7,6 +7,30 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
+// From SAF, surveyor ii stats:
+// https://discord.com/channels/792864705139048469/792864705139048472/1159022831355576350
+// ##### Survey statistics for X1-AX88-91095A with MOUNT_SURVEYOR_II #####
+// In 131770 surveys I got 5.002 deposit per survey and these deposits:
+// - 187818 times ICE_WATER deposit, 28.50% of deposits, 142.53% of surveys
+// - 93997 times QUARTZ_SAND deposit, 14.26% of deposits, 71.33% of surveys
+// - 93948 times AMMONIA_ICE deposit, 14.25% of deposits, 71.30% of surveys
+// - 93568 times SILICON_CRYSTALS deposit, 14.20% of deposits, 71.01% of surveys
+// - 47370 times ALUMINUM_ORE deposit, 7.19% of deposits, 35.95% of surveys
+// - 47238 times IRON_ORE deposit, 7.17% of deposits, 35.85% of surveys
+// - 47119 times PRECIOUS_STONES deposit, 7.15% of deposits, 35.76% of surveys
+// - 47084 times COPPER_ORE deposit, 7.14% of deposits, 35.73% of surveys
+// - 918 times DIAMONDS deposit, 0.14% of deposits, 0.70% of surveys
+
+// From Flowi:
+// https://discord.com/channels/792864705139048469/792864705139048472/1159399297540960256
+// +-----------+-------------------+
+// |survey_size|num_diamond_surveys|
+// +-----------+-------------------+
+// |LARGE      |14                 |
+// |MODERATE   |96                 |
+// |SMALL      |379                |
+// +-----------+-------------------+
+
 class Request {
   Request(this.name, [this.duration = Duration.zero]);
   final String name;
