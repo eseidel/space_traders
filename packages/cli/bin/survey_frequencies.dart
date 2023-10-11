@@ -12,12 +12,19 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final surveyBySymbol = <String, int>{};
   // Of all values across all surveys, how many were the trade symbol.
   final depositBySymbol = <String, int>{};
+  // The total deposits for surveys containing this trade symbol.
+  // Used for computing the expected # of deposits of a trade symbol given
+  // its known to be in a survey.
+  final totalDepositsByUniqueSymbol = <String, int>{};
   final totalSurveys = surveys.length;
   var totalDeposits = 0;
   for (final survey in surveys) {
     final uniqueSymbols = survey.survey.deposits.map((e) => e.symbol).toSet();
     for (final symbol in uniqueSymbols) {
       surveyBySymbol[symbol] = (surveyBySymbol[symbol] ?? 0) + 1;
+      totalDepositsByUniqueSymbol[symbol] =
+          (totalDepositsByUniqueSymbol[symbol] ?? 0) +
+              survey.survey.deposits.length;
     }
     for (final deposit in survey.survey.deposits) {
       depositBySymbol[deposit.symbol] =
@@ -46,14 +53,19 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final symbol in symbols) {
     final surveyCount = surveyBySymbol[symbol] ?? 0;
     final depositCount = depositBySymbol[symbol] ?? 0;
+    final depositCountInSurveys = totalDepositsByUniqueSymbol[symbol] ?? 0;
     final surveyPercent = surveyCount / totalSurveys;
-    final depositPercent = depositCount / totalDeposits;
+    final depositOverallPercent = depositCount / totalDeposits;
+    final depositPerSurveyPercent = depositCount / depositCountInSurveys;
     logger.info(
       '${symbol.padRight(symbolLength)} '
       '${count(surveyCount)} ${percent(surveyPercent)}% '
-      '${count(depositCount)} ${percent(depositPercent)}%',
+      '${count(depositCount)} ${percent(depositOverallPercent)}% '
+      '(${percent(depositPerSurveyPercent)}%)',
     );
   }
+  logger.info('number in () is the expected number of deposits per survey '
+      'if the symbol is known to be in the survey');
 
   await db.close();
 }
