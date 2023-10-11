@@ -714,3 +714,13 @@ Write a tool to list how many surveys deep we have?
 
 Should just take the number of missing units and round down to the closest
 hundred.
+
+
+### Implement missing bits of SAF's strat
+
+"At the start of a reset my miners sell themselves and only locally, after that
+I add haulers to which the miners transfers the cargo and they sell locally or
+nearby. currently running 20 surveyors, 50 extractors, 20 or so heavy freighter
+haulers 30 backup light haulers and an army of probes trying to update markets
+around the primary partition if there are requests left to spend."
+https://discord.com/channels/792864705139048469/792864705139048472/1160644392185503774
