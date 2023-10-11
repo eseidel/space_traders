@@ -115,16 +115,15 @@ Most impact:
 * Add atomic writes (write to a temp file and then rename).
 
 To sort:
-* Record requests per-ship?  Calculate number of requests used per cycle?
 * Add a "storage" behavior to have a place to put unused mounts.
+* Make it easier to re-spec miners mid cycle (without throwing away mounts).
+* Record requests per-ship?  Calculate number of requests used per cycle?
 * Simulate refining
 * Simulate gas siphoning
 * Teach Haulers how to pick up from miners.
-* Make it easier to re-spec miners mid cycle (without throwing away mounts).
 * Add mounts to survey results (so we can compute diamond frequency).
 * Compute survey frequency per-trade symbol.
 * Confirm survey sizes have consistent extraction rates across trade symbols.
-
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
