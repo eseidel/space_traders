@@ -24,16 +24,6 @@ import 'package:cli/trading.dart';
 // SAF on simulating surveys:
 // https://discord.com/channels/792864705139048469/792864705139048472/1159409252172050472
 
-// From Flowi:
-// https://discord.com/channels/792864705139048469/792864705139048472/1159399297540960256
-// +-----------+-------------------+
-// |survey_size|num_diamond_surveys|
-// +-----------+-------------------+
-// |LARGE      |14                 |
-// |MODERATE   |96                 |
-// |SMALL      |379                |
-// +-----------+-------------------+
-
 class Request {
   Request(this.name, [this.duration = Duration.zero]);
   final String name;
