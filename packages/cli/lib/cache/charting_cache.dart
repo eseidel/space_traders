@@ -13,15 +13,10 @@ class ChartedValues {
     required this.chart,
     required this.faction,
     required this.traitSymbols,
-    required this.orbitals,
   });
 
   /// Creates a new charted values from JSON data.
   factory ChartedValues.fromJson(Map<String, dynamic> json) {
-    final orbitals = (json['orbitals'] as List<dynamic>)
-        .cast<Map<String, dynamic>>()
-        .map((j) => WaypointOrbital.fromJson(j)!)
-        .toList();
     final faction =
         WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
     final traitSymbols = (json['traitSymbols'] as List<dynamic>)
@@ -33,7 +28,6 @@ class ChartedValues {
         WaypointSymbol.fromJson(json['waypointSymbol'] as String);
     return ChartedValues(
       waypointSymbol: waypointSymbol,
-      orbitals: orbitals,
       faction: faction,
       traitSymbols: traitSymbols,
       chart: chart,
@@ -42,11 +36,6 @@ class ChartedValues {
 
   /// Symbol for this waypoint.
   final WaypointSymbol waypointSymbol;
-
-  /// Waypoints that orbit this waypoint.
-  // TODO(eseidel): It's not clear if we should store orbitals. I think they're
-  // computable from the SystemsCache.
-  final List<WaypointOrbital> orbitals;
 
   /// Faction for this waypoint.
   final WaypointFaction? faction;
@@ -61,7 +50,6 @@ class ChartedValues {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'waypointSymbol': waypointSymbol.toJson(),
-      'orbitals': orbitals.map((o) => o.toJson()).toList(),
       'faction': faction?.toJson(),
       'traitSymbols': traitSymbols.map((e) => e.value).toList(),
       'chart': chart.toJson(),
@@ -135,7 +123,6 @@ class ChartingCache extends JsonStore<_Record> {
     }
     final chartedValues = ChartedValues(
       waypointSymbol: waypoint.waypointSymbol,
-      orbitals: waypoint.orbitals,
       faction: waypoint.faction,
       traitSymbols: waypoint.traits.map((e) => e.symbol).toList(),
       chart: chart,
@@ -183,7 +170,7 @@ class ChartingCache extends JsonStore<_Record> {
       y: systemWaypoint.y,
       chart: values.chart,
       faction: values.faction,
-      orbitals: values.orbitals,
+      orbitals: systemWaypoint.orbitals,
       traits: traits,
     );
   }

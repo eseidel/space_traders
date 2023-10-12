@@ -24,11 +24,6 @@ void main() {
       traitSymbols: const [
         WaypointTraitSymbolEnum.ASH_CLOUDS,
       ],
-      orbitals: [
-        WaypointOrbital(
-          symbol: 'S-A-F',
-        ),
-      ],
     );
     final waypointTraits = _MockWaypointTraitCache();
     final valuesBySymbol = {values.waypointSymbol: values};
@@ -43,6 +38,5 @@ void main() {
       loaded.values.first.traitSymbols.first,
       WaypointTraitSymbolEnum.ASH_CLOUDS,
     );
-    expect(loaded.values.first.orbitals, hasLength(1));
   });
 }
