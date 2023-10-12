@@ -7,31 +7,6 @@ Future<void> main(List<String> args) async {
   await runOffline(args, command);
 }
 
-ShipType _shipTypeFromFrame(ShipFrameSymbolEnum frame) {
-  switch (frame) {
-    case ShipFrameSymbolEnum.MINER:
-      return ShipType.ORE_HOUND;
-    case ShipFrameSymbolEnum.DRONE:
-      return ShipType.MINING_DRONE;
-    case ShipFrameSymbolEnum.LIGHT_FREIGHTER:
-      return ShipType.LIGHT_HAULER;
-    case ShipFrameSymbolEnum.HEAVY_FREIGHTER:
-      return ShipType.HEAVY_FREIGHTER;
-    case ShipFrameSymbolEnum.PROBE:
-    case ShipFrameSymbolEnum.INTERCEPTOR:
-    case ShipFrameSymbolEnum.RACER:
-    case ShipFrameSymbolEnum.FIGHTER:
-    case ShipFrameSymbolEnum.FRIGATE:
-    case ShipFrameSymbolEnum.SHUTTLE:
-    case ShipFrameSymbolEnum.EXPLORER:
-    case ShipFrameSymbolEnum.TRANSPORT:
-    case ShipFrameSymbolEnum.DESTROYER:
-    case ShipFrameSymbolEnum.CRUISER:
-    case ShipFrameSymbolEnum.CARRIER:
-  }
-  throw UnimplementedError('Ship type not implemented: $frame');
-}
-
 int _costOutMounts(
   MarketPrices marketPrices,
   MountSymbolSet mounts,
@@ -49,7 +24,7 @@ int _costOutMounts(
 Map<ShipType, int> _shipTypeCounts(List<Ship> ships) {
   final typeCounts = <ShipType, int>{};
   for (final ship in ships) {
-    final type = _shipTypeFromFrame(ship.frame.symbol);
+    final type = shipTypeFromFrame(ship.frame.symbol)!;
     typeCounts[type] = (typeCounts[type] ?? 0) + 1;
   }
   return typeCounts;
@@ -66,7 +41,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final purchasedShips = shipCache.ships.skip(2).toList();
   final purchaseShipTypes =
-      purchasedShips.map((s) => _shipTypeFromFrame(s.frame.symbol)).toList();
+      purchasedShips.map((s) => shipTypeFromFrame(s.frame.symbol)!).toList();
   final purchaseShipTypeCounts = _shipTypeCounts(purchasedShips);
   final shipTypes = purchaseShipTypeCounts.keys.toList()
     ..sortBy((t) => t.value);

@@ -82,13 +82,7 @@ class ShipCache extends ResponseListCache<Ship> {
 
   /// Returns the number of ships of the given [shipType] in the fleet.
   int countOfType(ShipType shipType) {
-    final frameForType = {
-      ShipType.ORE_HOUND: ShipFrameSymbolEnum.MINER,
-      ShipType.PROBE: ShipFrameSymbolEnum.PROBE,
-      ShipType.LIGHT_HAULER: ShipFrameSymbolEnum.LIGHT_FREIGHTER,
-      ShipType.HEAVY_FREIGHTER: ShipFrameSymbolEnum.HEAVY_FREIGHTER,
-      ShipType.MINING_DRONE: ShipFrameSymbolEnum.DRONE,
-    }[shipType];
+    final frameForType = shipFrameFromType(shipType);
     if (frameForType == null) {
       logger.err('Unknown frame mapping for type: $shipType');
     }
