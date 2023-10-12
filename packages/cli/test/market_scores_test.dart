@@ -20,6 +20,7 @@ void main() {
   test('findBetterTradeLocation smoke test', () {
     final systemsCache = _MockSystemsCache();
     final marketPrices = _MockMarketPrices();
+    // TODO(eseidel): return multiple MarketPrices to test more of the logic.
     when(() => marketPrices.prices).thenReturn([]);
 
     final shipLocation = WaypointSymbol.fromString('W-A-Y');

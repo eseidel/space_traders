@@ -466,4 +466,16 @@ void main() {
     await centralCommand.advanceCentralPlanning(api, caches);
     expect(centralCommand.nextShipBuyJob, isNull);
   });
+
+  test('CentralCommand.shortenMaxAgeForExplorerData', () {
+    final shipCache = _MockShipCache();
+    final behaviorCache = _MockBehhaviorCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final maxAge = centralCommand.maxAgeForExplorerData;
+    final newMaxAge = centralCommand.shortenMaxAgeForExplorerData();
+    final newMaxAge2 = centralCommand.maxAgeForExplorerData;
+    expect(newMaxAge, lessThan(maxAge));
+    expect(newMaxAge2, newMaxAge);
+  });
 }
