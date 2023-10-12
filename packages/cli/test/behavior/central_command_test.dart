@@ -18,6 +18,8 @@ class _MockCaches extends Mock implements Caches {}
 
 class _MockContract extends Mock implements Contract {}
 
+class _MockContractCache extends Mock implements ContractCache {}
+
 class _MockContractTerms extends Mock implements ContractTerms {}
 
 class _MockCostedDeal extends Mock implements CostedDeal {}
@@ -477,5 +479,29 @@ void main() {
     final newMaxAge2 = centralCommand.maxAgeForExplorerData;
     expect(newMaxAge, lessThan(maxAge));
     expect(newMaxAge2, newMaxAge);
+  });
+
+  test('sellOppsForContracts', () {
+    final contractCache = _MockContractCache();
+    when(() => contractCache.activeContracts).thenReturn([]);
+
+    final agentCache = _MockAgentCache();
+    final agent = _MockAgent();
+    when(() => agent.credits).thenReturn(100000);
+    when(() => agentCache.agent).thenReturn(agent);
+
+    int remainingUnitsNeededForContract(
+      Contract contract,
+      TradeSymbol tradeSymbol,
+    ) {
+      return 1;
+    }
+
+    final sellOpps = sellOppsForContracts(
+      agentCache,
+      contractCache,
+      remainingUnitsNeededForContract: remainingUnitsNeededForContract,
+    );
+    expect(sellOpps, isEmpty);
   });
 }

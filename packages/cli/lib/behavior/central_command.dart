@@ -213,24 +213,12 @@ class CentralCommand {
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
     ContractCache contractCache,
-  ) sync* {
-    for (final contract in affordableContracts(agentCache, contractCache)) {
-      for (final good in contract.terms.deliver) {
-        final unitsNeeded = remainingUnitsNeededForContract(
-          contract,
-          good.tradeSymbolObject,
-        );
-        if (unitsNeeded > 0) {
-          yield SellOpp.fromContract(
-            marketSymbol: good.destination,
-            tradeSymbol: good.tradeSymbolObject,
-            contractId: contract.id,
-            price: _maxWorthwhileUnitPurchasePrice(contract, good),
-            maxUnits: unitsNeeded,
-          );
-        }
-      }
-    }
+  ) {
+    return sellOppsForContracts(
+      agentCache,
+      contractCache,
+      remainingUnitsNeededForContract: remainingUnitsNeededForContract,
+    );
   }
 
   /// Find next deal for the given [ship], considering all deals in progress.
@@ -622,6 +610,31 @@ int _minimumFloatRequired(Contract contract) {
   final remainingUnits = good.unitsRequired - good.unitsFulfilled;
   // TODO(eseidel): 100000 is an arbitrary minimum we should remove!
   return max(100000, maxUnitPrice * remainingUnits + creditsBuffer);
+}
+
+/// Procurement contracts converted to sell opps.
+Iterable<SellOpp> sellOppsForContracts(
+  AgentCache agentCache,
+  ContractCache contractCache, {
+  required int Function(Contract, TradeSymbol) remainingUnitsNeededForContract,
+}) sync* {
+  for (final contract in affordableContracts(agentCache, contractCache)) {
+    for (final good in contract.terms.deliver) {
+      final unitsNeeded = remainingUnitsNeededForContract(
+        contract,
+        good.tradeSymbolObject,
+      );
+      if (unitsNeeded > 0) {
+        yield SellOpp.fromContract(
+          marketSymbol: good.destination,
+          tradeSymbol: good.tradeSymbolObject,
+          contractId: contract.id,
+          price: _maxWorthwhileUnitPurchasePrice(contract, good),
+          maxUnits: unitsNeeded,
+        );
+      }
+    }
+  }
 }
 
 /// Returns the contracts we should consider for trading.
