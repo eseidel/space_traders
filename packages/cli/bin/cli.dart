@@ -35,6 +35,52 @@ void printRequestStats(RequestCounts requestCounts) {
   logger.info('Total: ${requestCounts.totalRequests} requests.');
 }
 
+/// Print the status of the server.
+void printStatus(GetStatus200Response s) {
+  final mostCreditsString = s.leaderboards.mostCredits
+      .map(
+        (e) => '${e.agentSymbol.padLeft(14)} '
+            '${creditsString(e.credits).padLeft(14)}',
+      )
+      .join(', ');
+  final mostChartsString = s.leaderboards.mostSubmittedCharts
+      .map(
+        (e) => '${e.agentSymbol.padLeft(14)} '
+            '${e.chartCount.toString().padLeft(14)}',
+      )
+      .join(', ');
+  final now = DateTime.now();
+  final resetDate = DateTime.tryParse(s.resetDate)!;
+  final sinceLastReset = approximateDuration(now.difference(resetDate));
+  final nextResetDate = DateTime.tryParse(s.serverResets.next)!;
+  final untilNextReset = approximateDuration(nextResetDate.difference(now));
+  final statsParts = [
+    '${s.stats.agents} agents',
+    '${s.stats.ships} ships',
+    '${s.stats.systems} systems',
+    '${s.stats.waypoints} waypoints',
+  ].map((e) => e.padLeft(20)).toList();
+
+  logger
+    ..info(
+      'Stats: ${statsParts.join(' ')}',
+    )
+    ..info('Most Credits: $mostCreditsString')
+    ..info('Most Charts:  $mostChartsString')
+    ..info(
+      'Last reset $sinceLastReset ago, '
+      'next reset: $untilNextReset, '
+      'cadence: ${s.serverResets.frequency}',
+    );
+  final knownAnnouncementTitles = ['Server Resets', 'Discord', 'Support Us'];
+  for (final announcement in s.announcements) {
+    if (knownAnnouncementTitles.contains(announcement.title)) {
+      continue;
+    }
+    logger.info('Announcement: ${announcement.title}');
+  }
+}
+
 bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
   if (only.isEmpty) {
     return null;

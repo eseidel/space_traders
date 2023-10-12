@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cli/api.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
@@ -12,14 +10,6 @@ String waypointDescription(Waypoint waypoint) {
   final chartedString = waypoint.chart != null ? '' : 'uncharted - ';
   return '${waypoint.symbol} - ${waypoint.type} - $chartedString'
       "${waypoint.traits.map((w) => w.name).join(', ')}";
-}
-
-/// Log a string describing the given [waypoints].
-void printWaypoints(List<Waypoint> waypoints, {String indent = ''}) {
-  for (final waypoint in waypoints) {
-    final description = waypointDescription(waypoint);
-    logger.info('$indent$description');
-  }
 }
 
 /// Return a string describing the given [ship].
@@ -36,28 +26,6 @@ String shipDescription(Ship ship, SystemsCache systemsCache) {
     string += ' (condition: ${ship.averageCondition})';
   }
   return string;
-}
-
-/// Log a string describing the given [ships].
-void printShips(List<Ship> ships, SystemsCache systemsCache) {
-  for (final ship in ships) {
-    logger.info('  ${shipDescription(ship, systemsCache)}');
-  }
-}
-
-/// Log the provided [json] as pretty-printed JSON (indented).
-void prettyPrintJson(Map<String, dynamic> json) {
-  const encoder = JsonEncoder.withIndent('  ');
-  final prettyprint = encoder.convert(json);
-  logger.info(prettyprint);
-}
-
-/// Log the given [ship]'s cargo.
-void logCargo(Ship ship) {
-  logger.info('Cargo:');
-  for (final item in ship.cargo.inventory) {
-    logger.info('  ${item.units.toString().padLeft(3)} ${item.name}');
-  }
 }
 
 /// Format the given [credits] as a string.
@@ -213,22 +181,6 @@ DateTime logRemainingTransitTime(
   return arrival;
 }
 
-/// Choose a ship from a list of ships
-Future<Ship> chooseShip(
-  Api api,
-  SystemsCache systemsCache,
-  List<Ship> ships,
-) async {
-  // Can't just return the result of chooseOne directly without triggering
-  // a type error?
-  final ship = logger.chooseOne(
-    'Which ship?',
-    choices: ships,
-    display: (ship) => shipDescription(ship, systemsCache),
-  );
-  return ship;
-}
-
 // TODO(eseidel): This should round, e.g. 0:02:43.000000 should be 3m not 2m.
 /// Create an approximate string for the given [duration].
 String approximateDuration(Duration duration) {
@@ -246,52 +198,6 @@ String approximateDuration(Duration duration) {
     return '${duration.inSeconds}s';
   } else {
     return '${duration.inMilliseconds}ms';
-  }
-}
-
-/// Print the status of the server.
-void printStatus(GetStatus200Response s) {
-  final mostCreditsString = s.leaderboards.mostCredits
-      .map(
-        (e) => '${e.agentSymbol.padLeft(14)} '
-            '${creditsString(e.credits).padLeft(14)}',
-      )
-      .join(', ');
-  final mostChartsString = s.leaderboards.mostSubmittedCharts
-      .map(
-        (e) => '${e.agentSymbol.padLeft(14)} '
-            '${e.chartCount.toString().padLeft(14)}',
-      )
-      .join(', ');
-  final now = DateTime.now();
-  final resetDate = DateTime.tryParse(s.resetDate)!;
-  final sinceLastReset = approximateDuration(now.difference(resetDate));
-  final nextResetDate = DateTime.tryParse(s.serverResets.next)!;
-  final untilNextReset = approximateDuration(nextResetDate.difference(now));
-  final statsParts = [
-    '${s.stats.agents} agents',
-    '${s.stats.ships} ships',
-    '${s.stats.systems} systems',
-    '${s.stats.waypoints} waypoints',
-  ].map((e) => e.padLeft(20)).toList();
-
-  logger
-    ..info(
-      'Stats: ${statsParts.join(' ')}',
-    )
-    ..info('Most Credits: $mostCreditsString')
-    ..info('Most Charts:  $mostChartsString')
-    ..info(
-      'Last reset $sinceLastReset ago, '
-      'next reset: $untilNextReset, '
-      'cadence: ${s.serverResets.frequency}',
-    );
-  final knownAnnouncementTitles = ['Server Resets', 'Discord', 'Support Us'];
-  for (final announcement in s.announcements) {
-    if (knownAnnouncementTitles.contains(announcement.title)) {
-      continue;
-    }
-    logger.info('Announcement: ${announcement.title}');
   }
 }
 
