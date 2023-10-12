@@ -27,6 +27,8 @@ void main() {
     shipyardPrices.save();
     final shipyardPrices2 = ShipyardPrices.load(fs);
     expect(shipyardPrices2.prices, [a, b]);
+
+    expect(shipyardPrices2.waypointCount, 2);
   });
 
   test('ShipyardPrices.hasRecentShipyardData', () {

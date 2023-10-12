@@ -124,6 +124,7 @@ To sort:
 * Add mounts to survey results (so we can compute diamond frequency).
 * Compute survey frequency per-trade symbol.
 * Confirm survey sizes have consistent extraction rates across trade symbols.
+* Share code between MarketPrices and ShipyardPrices.
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
