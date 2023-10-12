@@ -78,8 +78,4 @@ class WaypointTraitCache extends JsonStore<_Record> {
     }
     save();
   }
-
-  /// Gets the WaypointTrait for the given symbol.
-  WaypointTrait? traitForSymbol(WaypointTraitSymbolEnum traitSymbol) =>
-      _valuesBySymbol[traitSymbol];
 }
