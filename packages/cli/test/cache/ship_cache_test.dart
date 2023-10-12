@@ -5,6 +5,7 @@ import 'package:cli/cache/ship_cache.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockApi extends Mock implements Api {}
 
@@ -17,11 +18,11 @@ void main() {
     final one = _MockShip();
     final oneFrame = _MockShipFrame();
     when(() => one.frame).thenReturn(oneFrame);
-    when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
+    when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
     final two = _MockShip();
     final twoFrame = _MockShipFrame();
     when(() => two.frame).thenReturn(twoFrame);
-    when(() => twoFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
+    when(() => twoFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
     final three = _MockShip();
     final threeFrame = _MockShipFrame();
     when(() => three.frame).thenReturn(threeFrame);
@@ -30,8 +31,10 @@ void main() {
     final shipCache = ShipCache([one, two, three], fs: fs);
     expect(
       shipCache.frameCounts,
-      {ShipFrameSymbolEnum.CARRIER: 2, ShipFrameSymbolEnum.FIGHTER: 1},
+      {ShipFrameSymbolEnum.MINER: 2, ShipFrameSymbolEnum.FIGHTER: 1},
     );
+
+    expect(shipCache.countOfType(ShipType.ORE_HOUND), 2);
   });
 
   test('describeFleet', () {
@@ -87,14 +90,19 @@ void main() {
       x: 1,
       y: 2,
     );
+    const shipSymbol = ShipSymbol('A', 1);
     final ship = Ship(
-      symbol: 'A',
+      symbol: shipSymbol.symbol,
       registration: ShipRegistration(
         factionSymbol: FactionSymbols.AEGIS.value,
         name: 'name',
         role: ShipRole.COMMAND,
       ),
-      cooldown: Cooldown(shipSymbol: 'A', remainingSeconds: 0, totalSeconds: 0),
+      cooldown: Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        remainingSeconds: 0,
+        totalSeconds: 0,
+      ),
       nav: ShipNav(
         systemSymbol: 'c',
         waypointSymbol: 'symbol',
@@ -163,5 +171,8 @@ void main() {
     expect(shipCache2.ships.length, ships.length);
     // Ship.toJson doesn't recurse (openapi gen bug), so use jsonEncode.
     expect(jsonEncode(shipCache2.ships.first), jsonEncode(ship));
+
+    expect(shipCache2.shipSymbols, [shipSymbol]);
+    expect(shipCache2.ship(shipSymbol).shipSymbol, shipSymbol);
   });
 }
