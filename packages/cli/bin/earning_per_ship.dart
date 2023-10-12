@@ -44,14 +44,6 @@ class TransactionSummary {
   }
 }
 
-Behavior? behaviorFromFrame(Ship ship) {
-  return {
-    ShipFrameSymbolEnum.PROBE: Behavior.explorer,
-    ShipFrameSymbolEnum.MINER: Behavior.miner,
-    ShipFrameSymbolEnum.LIGHT_FREIGHTER: Behavior.trader,
-  }[ship.frame.symbol];
-}
-
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
@@ -97,8 +89,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     if (ship.isProbe) {
       continue;
     }
-    final stateName =
-        state?.behavior.name ?? behaviorFromFrame(ship)?.name ?? 'Unknown';
+    final stateName = state?.behavior.name ?? 'Unknown';
     final summary = TransactionSummary(
       transactions.where((t) => t.shipSymbol == shipSymbol),
     );
