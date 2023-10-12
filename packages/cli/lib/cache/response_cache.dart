@@ -73,5 +73,6 @@ class ResponseListCache<T> extends JsonListStore<T> {
     entries
       ..clear()
       ..addAll(newEntries);
+    save();
   }
 }

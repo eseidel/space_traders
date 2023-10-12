@@ -16,6 +16,7 @@ class JsonListStore<Record> {
 
   /// The entries in the store.
   @protected
+  @visibleForTesting
   final List<Record> entries;
 
   /// The number of entries in the store.
