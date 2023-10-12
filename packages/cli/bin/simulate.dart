@@ -137,17 +137,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   // TODO(eseidel): Try light haulers?
   const haulerType = ShipType.HEAVY_FREIGHTER;
-  const haulerFrame = ShipFrameSymbolEnum.HEAVY_FREIGHTER;
   const unitsPerHaulerCycle = 180;
 
   const surveyorType = ShipType.ORE_HOUND;
-  // const surveyorFrame = ShipFrameSymbolEnum.MINER;
   final surveyorDefaultMounts = kOreHoundDefault.mounts;
   final surveyorMounts = kSurveyOnlyTemplate.mounts;
   const surveysPerCycle = 6; // 3xL2 surveyors
 
   const minerType = ShipType.ORE_HOUND;
-  // const minerFrame = ShipFrameSymbolEnum.MINER;
   final minerDefaultMounts = kOreHoundDefault.mounts;
   final minerMounts = kMineOnlyTemplate.mounts;
   const unitsPerMineCycle = 60;
@@ -174,7 +171,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final ship = exampleShip(
     shipCache,
-    frame: haulerFrame,
+    frame: shipFrameFromType(haulerType)!,
     overrideLocation: hqMine,
   );
   final trips = marketsTradingSortedByDistance(
