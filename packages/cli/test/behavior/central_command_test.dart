@@ -300,6 +300,10 @@ void main() {
       BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip),
     ]);
     expect(centralCommand.shouldBuyShip(ship, 100000), false);
+
+    final buyJob = centralCommand.takeShipBuyJob();
+    expect(buyJob, isNotNull);
+    expect(centralCommand.nextShipBuyJob, isNull);
   });
 
   test('CentralCommand.templateForShip', () {
