@@ -10,9 +10,12 @@ import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
-// Not sure where this blongs?
+// Not sure where this belongs?
 /// Returns a waypoint nearby which trades the good.
 /// This is not necessarily the nearest, but could be improved to be.
+/// Unlike findBestMarketToSell or findBestMarketToBuy, this could find
+/// markets we've never visited before (e.g. for emergency fuel purchases
+/// or when we're just starting out and don't have a lot of data yet).
 // TODO(eseidel): replace with findBestMarketToSell in all places?
 Future<Waypoint?> nearbyMarketWhichTrades(
   SystemsCache systemsCache,
