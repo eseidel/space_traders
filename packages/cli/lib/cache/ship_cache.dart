@@ -72,12 +72,12 @@ class ShipCache extends ResponseListCache<Ship> {
 
   /// Returns a map of ship frame type to count in fleet.
   Map<ShipFrameSymbolEnum, int> get frameCounts {
-    final typeCounts = <ShipFrameSymbolEnum, int>{};
+    final frameCounts = <ShipFrameSymbolEnum, int>{};
     for (final ship in ships) {
       final type = ship.frame.symbol;
-      typeCounts[type] = (typeCounts[type] ?? 0) + 1;
+      frameCounts[type] = (frameCounts[type] ?? 0) + 1;
     }
-    return typeCounts;
+    return frameCounts;
   }
 
   /// Returns the number of ships of the given [shipType] in the fleet.
