@@ -24,7 +24,10 @@ class ChartedValues {
         .toList();
     final faction =
         WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
-    final traitSymbols = _loadTraitSymbols(json);
+    final traitSymbols = (json['traitSymbols'] as List<dynamic>)
+        .cast<String>()
+        .map((e) => WaypointTraitSymbolEnum.fromJson(e)!)
+        .toList();
     final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
     final waypointSymbol =
         WaypointSymbol.fromJson(json['waypointSymbol'] as String);
@@ -35,22 +38,6 @@ class ChartedValues {
       traitSymbols: traitSymbols,
       chart: chart,
     );
-  }
-
-  static List<WaypointTraitSymbolEnum> _loadTraitSymbols(
-    Map<String, dynamic> json,
-  ) {
-    final maybeNames = json['traitSymbols'] as List<dynamic>?;
-    if (maybeNames == null) {
-      return (json['traits'] as List<dynamic>)
-          .cast<Map<String, dynamic>>()
-          .map((j) => WaypointTrait.fromJson(j)!.symbol)
-          .toList();
-    }
-    return maybeNames
-        .cast<String>()
-        .map((e) => WaypointTraitSymbolEnum.fromJson(e)!)
-        .toList();
   }
 
   /// Symbol for this waypoint.
