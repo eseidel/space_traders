@@ -31,6 +31,8 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
+
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
@@ -66,6 +68,8 @@ void main() {
     when(() => caches.charting).thenReturn(chartingCache);
     final systemConnectivity = _MockSystemConnectivity();
     when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
+    final shipyardShips = _MockShipyardShipCache();
+    when(() => caches.shipyardShips).thenReturn(shipyardShips);
 
     final waypoint = _MockWaypoint();
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');

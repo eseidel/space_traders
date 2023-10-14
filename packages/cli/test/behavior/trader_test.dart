@@ -50,6 +50,8 @@ class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 
+class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
+
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
@@ -93,6 +95,8 @@ void main() {
     when(() => caches.routePlanner).thenReturn(routePlanner);
     final shipCache = _MockShipCache();
     when(() => caches.ships).thenReturn(shipCache);
+    final shipyardShips = _MockShipyardShipCache();
+    when(() => caches.shipyardShips).thenReturn(shipyardShips);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -294,6 +298,8 @@ void main() {
     when(() => caches.routePlanner).thenReturn(routePlanner);
     final shipCache = _MockShipCache();
     when(() => caches.ships).thenReturn(shipCache);
+    final shipyardShips = _MockShipyardShipCache();
+    when(() => caches.shipyardShips).thenReturn(shipyardShips);
 
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
@@ -619,6 +625,8 @@ void main() {
         payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
       ),
     );
+    final shipyardShips = _MockShipyardShipCache();
+    when(() => caches.shipyardShips).thenReturn(shipyardShips);
 
     final agent = _MockAgent();
     when(() => agentCache.agent).thenReturn(agent);

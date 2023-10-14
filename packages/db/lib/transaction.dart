@@ -88,7 +88,8 @@ Future<Iterable<Transaction>> transactionsAfter(
   DateTime timestamp,
 ) async {
   final result = await db.connection.query(
-    'SELECT * FROM transaction_ WHERE timestamp > @timestamp ORDER BY timestamp',
+    'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
+    'ORDER BY timestamp',
     substitutionValues: {'timestamp': timestamp},
   );
   return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);

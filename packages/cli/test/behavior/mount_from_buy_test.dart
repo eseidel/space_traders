@@ -40,6 +40,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 
+class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
+
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
@@ -77,6 +79,8 @@ void main() {
     when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
     final marketCache = _MockMarketCache();
     when(() => caches.markets).thenReturn(marketCache);
+    final shipyardShips = _MockShipyardShipCache();
+    when(() => caches.shipyardShips).thenReturn(shipyardShips);
 
     final now = DateTime(2021);
     DateTime getNow() => now;

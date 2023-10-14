@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/route.dart';
@@ -6,7 +8,10 @@ import 'package:cli/trading.dart';
 
 extension on Ship {
   /// Returns a copy of this ship with the same properties.
-  Ship deepCopy() => Ship.fromJson(toJson())!;
+  Ship deepCopy() {
+    // Ship.toJson doesn't recurse (openapi gen bug), so use jsonEncode.
+    return Ship.fromJson(jsonDecode(jsonEncode(toJson())))!;
+  }
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {

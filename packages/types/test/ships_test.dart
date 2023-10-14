@@ -1,10 +1,5 @@
-import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
-
-class _MockShip extends Mock implements Ship {}
-
-class _MockShipFrame extends Mock implements ShipFrame {}
 
 void main() {
   test('shipTypeFromFrame', () {

@@ -253,6 +253,7 @@ Future<DateTime?> advanceExplorer(
     api,
     db,
     caches.shipyardPrices,
+    caches.shipyardShips,
     caches.agent,
     waypoint,
     ship,
