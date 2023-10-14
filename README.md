@@ -725,3 +725,16 @@ nearby. currently running 20 surveyors, 50 extractors, 20 or so heavy freighter
 haulers 30 backup light haulers and an army of probes trying to update markets
 around the primary partition if there are requests left to spend."
 https://discord.com/channels/792864705139048469/792864705139048472/1160644392185503774
+
+
+### Survey EVs are 0 at the very beginning:
+X1-DK86-91295E-BA7460 SMALL SILICON_CRYSTALS, IRON_ORE, ICE_WATER, ICE_WATER, ICE_WATER, PRECIOUS_STONES, ICE_WATER ev 0c
+⏱️  1m until 2023-10-14 16:50:26.838
+🛸#1  🔭 1x at X1-DK86-91295E
+X1-DK86-91295E-78D652 SMALL PRECIOUS_STONES, ALUMINUM_ORE, ALUMINUM_ORE, COPPER_ORE ev 0c
+⏱️  1m until 2023-10-14 16:51:36.927
+🛸#1  🔭 1x at X1-DK86-91295E
+X1-DK86-91295E-DC6E8D SMALL ICE_WATER, QUARTZ_SAND, AMMONIA_ICE, ICE_WATER ev 0c
+⏱️  1m until 2023-10-14 16:52:47.013
+🛸#1  🔭 1x at X1-DK86-91295E
+X1-DK86-91295E-D0E02B SMALL ICE_WATER, ICE_WATER, SILICON_CRYSTALS, SILICON_CRYSTALS, SILICON_CRYSTALS ev 0c
