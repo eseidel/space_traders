@@ -15,7 +15,7 @@ bool _agentsMatch(Agent actual, Agent expected) {
     jsonEncode(expected.toJson()),
   );
   if (diff != null) {
-    logger.info('Agent differs from expected: $diff');
+    logger.info('Agent differs from expected: ${diff.which}');
     return false;
   }
   return true;

@@ -84,6 +84,17 @@ ShipyardTrip? findBestShipyardToBuy(
   return best;
 }
 
+/// Log a warning if the purchased ship does not match the expected template.
+// void verifyShipMatchesTemplate(Ship ship, ShipType shipType) {
+//   final fromTemplate = makeShip(
+//     type: shipType,
+//     shipSymbol: ship.shipSymbol,
+//     factionSymbol: ship.registration.factionSymbol,
+//     origin: ship.nav.route.origin,
+//     now: ship.nav.route.arrival,
+//   );
+// }
+
 /// Apply the buy ship behavior.
 Future<DateTime?> advanceBuyShip(
   Api api,
@@ -129,6 +140,7 @@ Future<DateTime?> advanceBuyShip(
       shipyard.waypointSymbol,
       shipType,
     );
+    // verifyShipMatchesTemplate(ship, shipType);
   } on ApiException catch (e) {
     // ApiException 400: {"error":{"message":"Failed to purchase ship.
     // Agent has insufficient funds.","code":4216,
