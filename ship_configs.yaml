@@ -1,0 +1,70 @@
+ships:
+  PROBE:
+    role: SATELLITE
+    frame: PROBE
+    reactor: SOLAR_I
+    engine: IMPULSE_DRIVE_I
+    fuelCapacity: 0
+  COMMAND_FRIGATE:
+    role: COMMAND
+    frame: COMMAND
+    reactor: FISSION_I
+    engine: ION_DRIVE_II
+    fuelCapacity: 1200
+    modules:
+      - CARGO_HOLD_I
+      - CARGO_HOLD_I
+      - CREW_QUARTERS_I
+      - CREW_QUARTERS_I
+      - MINERAL_PROCESSOR_I
+      - JUMP_DRIVE_I
+      - WARP_DRIVE_I
+    mounts:
+      - SENSOR_ARRAY_I
+      - MINING_LASER_I
+      - SURVEYOR_I
+frames:
+  PROBE:
+    name: 'Frame Probe'
+    description: 'A small, unmanned spacecraft used for exploration, reconnaissance, and scientific research.'
+    requirements:
+      crew: 0
+      power: 1
+  FRIGATE:
+    name: 'Frame Frigate'
+    description: 'A medium-sized, multi-purpose spacecraft, often used for combat, transport, or support operations.'
+    requirements:
+      crew: 25
+      power: 8
+    moduleSlots: 8
+    mountingPoints: 5
+reactors:
+  SOLAR_I:
+    name: 'Solar Reactor I'
+    description: 'A basic solar power reactor, used to generate electricity from solar energy.'
+    powerOutput: 3
+    requirements:
+      crew: 0
+  FISSION_1:
+    name: 'Fission Reactor I'
+    description: 'A basic fission power reactor, used to generate electricity from nuclear fission reactions.'
+    powerOutput: 31
+    requirements:
+      crew: 8
+engines:
+  IMPULSE_DRIVE_1:
+    name: 'Impulse Drive I'
+    description: 'A basic low-energy propulsion system that generates thrust for interplanetary travel.'
+    speed: 2
+    requirements:
+      crew: 0
+      power: 1
+  ION_DRIVE_II:
+    name: 'Ion Drive II'
+    description: 'An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.'
+    speed: 30
+    requirements:
+      crew: 8
+      power: 6
+mounts:
+modules:

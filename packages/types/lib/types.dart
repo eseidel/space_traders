@@ -9,6 +9,7 @@ export 'extraction.dart';
 export 'market_price.dart';
 export 'mount.dart';
 export 'route.dart';
+export 'ship_configs.dart';
 export 'ships.dart';
 export 'shipyard_price.dart';
 export 'survey.dart';
