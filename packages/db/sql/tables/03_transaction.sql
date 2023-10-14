@@ -32,5 +32,5 @@ CREATE TABLE IF NOT EXISTS "transaction_" (
   "contract_id" text,
   -- The contract action of the transaction.
   -- Contract action is null for non-contract transactions.
-  "contract_action" text,
+  "contract_action" text
 );
