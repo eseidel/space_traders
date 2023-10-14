@@ -738,3 +738,15 @@ X1-DK86-91295E-DC6E8D SMALL ICE_WATER, QUARTZ_SAND, AMMONIA_ICE, ICE_WATER ev 0c
 ⏱️  1m until 2023-10-14 16:52:47.013
 🛸#1  🔭 1x at X1-DK86-91295E
 X1-DK86-91295E-D0E02B SMALL ICE_WATER, ICE_WATER, SILICON_CRYSTALS, SILICON_CRYSTALS, SILICON_CRYSTALS ev 0c
+
+# Mount buying and ship-buying compete at the beginning
+
+🛸#6  Starting buy mount MOUNT_MINING_LASER_II
+🛸#6  Beginning route to X1-DK86-32917D (1m)
+🛸#6  🛫 to X1-DK86-32917D ORBITAL_STATION (1m) spent 68 fuel
+🛸#2  ✈️  to X1-DB41-95854C, 1m left
+🛸#5  ✍️  shipyard data @ X1-DK86-32917D
+🛸#5  Purchased SHIP_ORE_HOUND for 165,220c -> 🏦 14,731c
+🛸#5  Bought ship: ESEIDEL-B
+[WARN] 🛸#5  Purchased ESEIDEL-B (SHIP_ORE_HOUND)! Disabling Behavior.buyShip for ESEIDEL-5 for 10m.
+[WARN] Adding missing ship ESEIDEL-B
