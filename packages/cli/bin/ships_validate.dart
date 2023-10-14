@@ -41,9 +41,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       type: shipType,
       shipSymbol: ship.shipSymbol,
       factionSymbol: FactionSymbols.fromJson(ship.registration.factionSymbol)!,
+      cooldown: ship.cooldown,
       nav: ship.nav,
       fuel: ship.fuel,
       cargo: ship.cargo,
+      moduleSymbols: ship.modules.map((m) => m.symbol).toList(),
+      mountSymbols: ship.mounts.map((m) => m.symbol).toList(),
     );
     if (exampleShip == null) {
       logger.info('Failed to make example ship for $shipType');

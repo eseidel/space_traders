@@ -20,11 +20,15 @@ class _FrameConfig {
     required this.name,
     required this.description,
     required this.requirements,
+    required this.moduleSlots,
+    required this.mountingPoints,
   });
   final ShipFrameSymbolEnum frameSymbol;
   final String name;
   final String description;
   final ShipRequirements requirements;
+  final int moduleSlots;
+  final int mountingPoints;
 }
 
 final _frameConfigs = [
@@ -35,6 +39,18 @@ final _frameConfigs = [
         'A small, unmanned spacecraft used for exploration, reconnaissance, '
         'and scientific research.',
     requirements: ShipRequirements(crew: 0, power: 1),
+    moduleSlots: 0,
+    mountingPoints: 0,
+  ),
+  _FrameConfig(
+    frameSymbol: ShipFrameSymbolEnum.FRIGATE,
+    name: 'Frame Frigate',
+    description:
+        'A medium-sized, multi-purpose spacecraft, often used for combat, '
+        'transport, or support operations.',
+    requirements: ShipRequirements(crew: 25, power: 8),
+    moduleSlots: 8,
+    mountingPoints: 5,
   ),
 ];
 
@@ -69,6 +85,15 @@ final _reactorConfigs = [
         'solar energy.',
     powerOutput: 3,
     requirements: ShipRequirements(crew: 0),
+  ),
+  _ReactorConfig(
+    reactorSymbol: ShipReactorSymbolEnum.FISSION_I,
+    name: 'Fission Reactor I',
+    description:
+        'A basic fission power reactor, used to generate electricity from '
+        'nuclear fission reactions.',
+    powerOutput: 31,
+    requirements: ShipRequirements(crew: 8),
   ),
 ];
 
@@ -105,6 +130,15 @@ final _engineConfigs = [
         'interplanetary travel.',
     speed: 2,
     requirements: ShipRequirements(crew: 0, power: 1),
+  ),
+  _EngineConfig(
+    engineSymbol: ShipEngineSymbolEnum.ION_DRIVE_II,
+    name: 'Ion Drive II',
+    description: 'An advanced propulsion system that uses ionized particles to '
+        'generate high-speed, low-thrust acceleration, with improved '
+        'efficiency and performance.',
+    speed: 30,
+    requirements: ShipRequirements(crew: 8, power: 6),
   ),
 ];
 
@@ -187,8 +221,8 @@ class ShipConfig {
       description: description,
       condition: 100,
       requirements: frameConfig?.requirements ?? ShipRequirements(crew: 0),
-      moduleSlots: 0,
-      mountingPoints: 0,
+      moduleSlots: frameConfig?.moduleSlots ?? 0,
+      mountingPoints: frameConfig?.mountingPoints ?? 0,
       fuelCapacity: fuelCapacity,
     );
   }
@@ -210,13 +244,25 @@ class ShipConfig {
   }
 
   /// Get the initial ship crew for this config.
-  ShipCrew get crew => ShipCrew(
+  ShipCrew get crew {
+    if (shipTypeFromFrame(frameSymbol) == ShipType.PROBE) {
+      return ShipCrew(
         current: 0,
         required_: 0,
         capacity: 0,
         morale: 100,
         wages: 0,
       );
+    }
+    // Hack until we can compute this from modules/mounts.
+    return ShipCrew(
+      current: 59,
+      required_: 59,
+      capacity: 80,
+      morale: 100,
+      wages: 0,
+    );
+  }
 
   /// Get the ship engine for this config.
   ShipEngine get engine {
@@ -244,6 +290,15 @@ const _shipConfigs = [
     engineSymbol: ShipEngineSymbolEnum.IMPULSE_DRIVE_I,
     cargoCapacity: 0,
     fuelCapacity: 0,
+  ),
+  ShipConfig(
+    type: ShipType.COMMAND_FRIGATE,
+    frameSymbol: ShipFrameSymbolEnum.FRIGATE,
+    role: ShipRole.COMMAND,
+    reactorSymbol: ShipReactorSymbolEnum.FISSION_I,
+    engineSymbol: ShipEngineSymbolEnum.ION_DRIVE_II,
+    cargoCapacity: 60,
+    fuelCapacity: 1200,
   ),
 ];
 
@@ -314,6 +369,26 @@ Ship? makeShipForTest({
   );
 }
 
+/// Make an example ShipMount for a given mount symbol.
+ShipMount makeMount(ShipMountSymbolEnum mountSymbol) {
+  return ShipMount(
+    symbol: mountSymbol,
+    name: mountSymbol.value,
+    description: mountSymbol.value,
+    requirements: ShipRequirements(crew: 0),
+  );
+}
+
+/// Make an example ShipModule for a given module symbol.
+ShipModule makeModule(ShipModuleSymbolEnum moduleSymbol) {
+  return ShipModule(
+    symbol: moduleSymbol,
+    name: moduleSymbol.value,
+    description: moduleSymbol.value,
+    requirements: ShipRequirements(crew: 0),
+  );
+}
+
 /// Make Ship for comparison with an existing ship.
 /// Uses the volatile parts of the existing ship, and the template for the
 /// ship type to avoid needless differences.
@@ -324,6 +399,9 @@ Ship? makeShipForComparison({
   required ShipNav nav,
   required ShipFuel fuel,
   required ShipCargo cargo,
+  required Cooldown cooldown,
+  required List<ShipModuleSymbolEnum> moduleSymbols,
+  required List<ShipMountSymbolEnum> mountSymbols,
 }) {
   final config = shipConfigForType(type);
   if (config == null) return null;
@@ -335,11 +413,7 @@ Ship? makeShipForComparison({
       name: shipSymbol.symbol,
       role: config.role,
     ),
-    cooldown: Cooldown(
-      shipSymbol: shipSymbol.symbol,
-      remainingSeconds: 0,
-      totalSeconds: 0,
-    ),
+    cooldown: cooldown,
     nav: nav,
     crew: config.crew,
     frame: config.frame,
@@ -347,5 +421,7 @@ Ship? makeShipForComparison({
     engine: config.engine,
     cargo: cargo,
     fuel: fuel,
+    modules: moduleSymbols.map(makeModule).toList(),
+    mounts: mountSymbols.map(makeMount).toList(),
   );
 }
