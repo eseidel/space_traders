@@ -82,6 +82,14 @@ class ShipyardShipCache extends JsonListStore<ShipyardShip> {
     }
   }
 
+  @override
+  void save() {
+    // Make sure the entries are always sorted by type to avoid needless
+    // diffs in the cache.
+    entries.sort((a, b) => a.type!.value.compareTo(b.type!.value));
+    super.save();
+  }
+
   /// Adds a list of traits to the cache.
   void addShipyardShips(Iterable<ShipyardShip> ships) {
     for (final ship in ships) {
