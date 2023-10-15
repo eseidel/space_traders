@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   test('WaypointTraitsCache', () {
     final fs = MemoryFileSystem();
-    fs.file('data/waypoint_traits.json')
+    fs.file(WaypointTraitCache.defaultPath)
       ..createSync(recursive: true)
       ..writeAsStringSync('[]');
     final waypointTraitCache = WaypointTraitCache.load(fs);

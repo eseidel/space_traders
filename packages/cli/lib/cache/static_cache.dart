@@ -90,7 +90,7 @@ class ShipMountCache extends StaticCache<ShipMountSymbolEnum, ShipMount> {
       );
 
   /// The default path to the cache file.
-  static const defaultPath = 'data/mounts.json';
+  static const defaultPath = 'static_data/mounts.json';
 
   @override
   ShipMount copyAndNormalize(ShipMount record) =>
@@ -118,7 +118,7 @@ class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
       );
 
   /// The default path to the cache file.
-  static const defaultPath = 'data/modules.json';
+  static const defaultPath = 'static_data/modules.json';
 
   @override
   ShipModule copyAndNormalize(ShipModule record) =>
@@ -150,7 +150,7 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
       );
 
   /// The default path to the cache file.
-  static const defaultPath = 'data/shipyard_ships.json';
+  static const defaultPath = 'static_data/shipyard_ships.json';
 
   @override
   ShipyardShip copyAndNormalize(ShipyardShip record) {
@@ -180,7 +180,7 @@ class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
       );
 
   /// The default path to the cache file.
-  static const defaultPath = 'data/engines.json';
+  static const defaultPath = 'static_data/engines.json';
 
   @override
   ShipEngine copyAndNormalize(ShipEngine record) =>
@@ -208,7 +208,7 @@ class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
       );
 
   /// The default path to the cache file.
-  static const defaultPath = 'data/reactors.json';
+  static const defaultPath = 'static_data/reactors.json';
 
   @override
   ShipReactor copyAndNormalize(ShipReactor record) =>
@@ -237,7 +237,7 @@ class WaypointTraitCache
       );
 
   /// The default path to the cache file.
-  static const defaultPath = 'data/waypoint_traits.json';
+  static const defaultPath = 'static_data/waypoint_traits.json';
 
   @override
   WaypointTrait copyAndNormalize(WaypointTrait record) =>

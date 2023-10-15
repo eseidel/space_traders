@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   test('ShipyardShipCache', () {
     final fs = MemoryFileSystem();
-    fs.file('data/shipyard_ships.json')
+    fs.file(ShipyardShipCache.defaultPath)
       ..createSync(recursive: true)
       ..writeAsStringSync('[]');
     final shipyardShipCache = ShipyardShipCache.load(fs);
