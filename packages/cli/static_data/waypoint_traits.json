@@ -45,6 +45,11 @@
   "description": "A center of innovation and cutting-edge technology, driving progress and attracting skilled individuals from around the galaxy."
  },
  {
+  "symbol": "INDUSTRIAL",
+  "name": "Industrial",
+  "description": "A waypoint dominated by factories, refineries, and other heavy industries, often accompanied by pollution and a bustling workforce."
+ },
+ {
   "symbol": "JUNGLE",
   "name": "Jungle",
   "description": "A lush, tropical world with dense vegetation and a thriving ecosystem, offering a wealth of resources and unique opportunities for research and exploration."
@@ -65,6 +70,16 @@
   "description": "Abundant mineral resources, attracting mining operations and providing valuable materials such as silicon crystals and quartz sand for various industries."
  },
  {
+  "symbol": "OCEAN",
+  "name": "Ocean",
+  "description": "A world dominated by vast, interconnected bodies of water, presenting unique challenges for habitation and resource extraction while supporting a diverse array of marine life."
+ },
+ {
+  "symbol": "OUTPOST",
+  "name": "Outpost",
+  "description": "A small, remote settlement providing essential services and a safe haven for travelers passing through."
+ },
+ {
   "symbol": "OVERCROWDED",
   "name": "Overcrowded",
   "description": "A waypoint teeming with inhabitants, leading to cramped living conditions and a high demand for resources."
@@ -78,6 +93,16 @@
   "symbol": "RESEARCH_FACILITY",
   "name": "Research Facility",
   "description": "A state-of-the-art institution dedicated to scientific research and development, often focusing on specific areas of expertise."
+ },
+ {
+  "symbol": "ROCKY",
+  "name": "Rocky",
+  "description": "A world with a rugged, rocky landscape, rich in minerals and other resources, providing a variety of opportunities for mining, research, and exploration."
+ },
+ {
+  "symbol": "SCATTERED_SETTLEMENTS",
+  "name": "Scattered Settlements",
+  "description": "A collection of dispersed communities, each independent yet connected through trade and communication networks."
  },
  {
   "symbol": "SHIPYARD",
@@ -98,6 +123,11 @@
   "symbol": "STRONG_MAGNETOSPHERE",
   "name": "Strong Magnetosphere",
   "description": "A waypoint enveloped in a powerful magnetic field, potentially affecting spacecraft systems, and creating unique phenomena such as the concentration of exotic matter and graviton emitters."
+ },
+ {
+  "symbol": "SWAMP",
+  "name": "Swamp",
+  "description": "A damp, murky world characterized by its wetlands and abundant vegetation, fostering a diverse ecosystem and offering potential resources like hydrocarbons and exotic plant life."
  },
  {
   "symbol": "TEMPERATE",
