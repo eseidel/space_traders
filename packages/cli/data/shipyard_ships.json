@@ -1,5 +1,93 @@
 [
  {
+  "type": "SHIP_INTERCEPTOR",
+  "name": "Interceptor",
+  "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
+  "purchasePrice": 0,
+  "frame": {
+   "symbol": "FRAME_INTERCEPTOR",
+   "name": "Frame Interceptor",
+   "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
+   "condition": null,
+   "moduleSlots": 2,
+   "mountingPoints": 2,
+   "fuelCapacity": 500,
+   "requirements": {
+    "power": 1,
+    "crew": 5,
+    "slots": null
+   }
+  },
+  "reactor": {
+   "symbol": "REACTOR_CHEMICAL_I",
+   "name": "Chemical Reactor I",
+   "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
+   "condition": null,
+   "powerOutput": 15,
+   "requirements": {
+    "power": null,
+    "crew": 3,
+    "slots": null
+   }
+  },
+  "engine": {
+   "symbol": "ENGINE_ION_DRIVE_I",
+   "name": "Ion Drive I",
+   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
+   "condition": null,
+   "speed": 10,
+   "requirements": {
+    "power": 3,
+    "crew": 3,
+    "slots": null
+   }
+  },
+  "modules": [
+   {
+    "symbol": "MODULE_CREW_QUARTERS_I",
+    "capacity": 40,
+    "range": null,
+    "name": "Crew Quarters",
+    "description": "A module that provides living space and amenities for the crew.",
+    "requirements": {
+     "power": 1,
+     "crew": 2,
+     "slots": 1
+    }
+   }
+  ],
+  "mounts": [
+   {
+    "symbol": "MOUNT_TURRET_I",
+    "name": "Rotary Cannon",
+    "description": "A rotary cannon is a type of mounted turret that is designed to fire a high volume of rounds in rapid succession.",
+    "strength": null,
+    "deposits": [],
+    "requirements": {
+     "power": 1,
+     "crew": 1,
+     "slots": null
+    }
+   },
+   {
+    "symbol": "MOUNT_MISSILE_LAUNCHER_I",
+    "name": "Missile Launcher",
+    "description": "A basic missile launcher that fires guided missiles with a variety of warheads for different targets.",
+    "strength": null,
+    "deposits": [],
+    "requirements": {
+     "power": 1,
+     "crew": 2,
+     "slots": null
+    }
+   }
+  ],
+  "crew": {
+   "required": 16,
+   "capacity": 40
+  }
+ },
+ {
   "type": "SHIP_LIGHT_HAULER",
   "name": "Light Hauler",
   "description": "A small, fast cargo ship that is designed for short-range transport of light loads.",
