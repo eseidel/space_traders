@@ -36,6 +36,18 @@
   }
  },
  {
+  "symbol": "MOUNT_SENSOR_ARRAY_I",
+  "name": "Sensor Array I",
+  "description": "A basic sensor array that improves a ship's ability to detect and track other objects in space.",
+  "strength": 1,
+  "deposits": [],
+  "requirements": {
+   "power": 1,
+   "crew": 0,
+   "slots": null
+  }
+ },
+ {
   "symbol": "MOUNT_SURVEYOR_I",
   "name": "Surveyor I",
   "description": "A basic survey probe that can be used to gather information about a mineral deposit.",

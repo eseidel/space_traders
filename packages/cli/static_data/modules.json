@@ -24,6 +24,18 @@
   }
  },
  {
+  "symbol": "MODULE_JUMP_DRIVE_I",
+  "capacity": null,
+  "range": 500,
+  "name": "Jump Drive I",
+  "description": "A basic antimatter jump drive that allows for instantaneous short-range interdimensional travel.",
+  "requirements": {
+   "power": 4,
+   "crew": 10,
+   "slots": 1
+  }
+ },
+ {
   "symbol": "MODULE_MINERAL_PROCESSOR_I",
   "capacity": null,
   "range": null,
@@ -45,6 +57,18 @@
    "power": 12,
    "crew": 20,
    "slots": 4
+  }
+ },
+ {
+  "symbol": "MODULE_WARP_DRIVE_I",
+  "capacity": null,
+  "range": 2000,
+  "name": "Warp Drive I",
+  "description": "A basic warp drive that allows for short-range interstellar travel.",
+  "requirements": {
+   "power": 3,
+   "crew": 2,
+   "slots": 1
   }
  }
 ]
