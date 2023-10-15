@@ -1,0 +1,91 @@
+[ {
+    "symbol": "TOXIC_ATMOSPHERE",
+    "name": "Toxic Atmosphere",
+    "description": "A waypoint with a poisonous atmosphere, necessitating the use of specialized equipment and technology to protect inhabitants and visitors from harmful substances."
+   },
+  {
+    "symbol": "VOLCANIC",
+    "name": "Volcanic",
+    "description": "A volatile world marked by intense volcanic activity, creating a hazardous environment with the potential for valuable resource extraction, such as rare metals and geothermal energy."
+   },
+   {
+    "symbol": "WEAK_GRAVITY",
+    "name": "Weak Gravity",
+    "description": "A waypoint with a low gravitational pull, providing unique opportunities for research and industry while also challenging the adaptation of life forms and technology."
+   },
+  {
+    "symbol": "OVERCROWDED",
+    "name": "Overcrowded",
+    "description": "A waypoint teeming with inhabitants, leading to cramped living conditions and a high demand for resources."
+   },
+  {
+    "symbol": "HIGH_TECH",
+    "name": "High-Tech",
+    "description": "A center of innovation and cutting-edge technology, driving progress and attracting skilled individuals from around the galaxy."
+   },
+   {
+    "symbol": "BUREAUCRATIC",
+    "name": "Bureaucratic",
+    "description": "A waypoint governed by complex regulations, red tape, and layers of administration, often leading to inefficiencies and frustration."
+   },
+  {
+    "symbol": "TEMPERATE",
+    "name": "Temperate",
+    "description": "A world with a mild climate and balanced ecosystem, providing a comfortable environment for a variety of life forms and supporting diverse industries."
+   },
+   {
+    "symbol": "MARKETPLACE",
+    "name": "Marketplace",
+    "description": "A thriving center of commerce where traders from across the galaxy gather to buy, sell, and exchange goods."
+   },
+  {
+    "symbol": "BARREN",
+    "name": "Barren",
+    "description": "A desolate world with little to no vegetation or water, presenting unique challenges for habitation and resource extraction."
+   },
+  {
+    "symbol": "FROZEN",
+    "name": "Frozen",
+    "description": "An ice-covered world with frigid temperatures, providing unique research opportunities and resources such as ice water, ammonia ice, and other frozen compounds."
+   },
+  {
+    "symbol": "MINERAL_DEPOSITS",
+    "name": "Mineral Deposits",
+    "description": "Abundant mineral resources, attracting mining operations and providing valuable materials such as silicon crystals and quartz sand for various industries."
+   },
+   {
+    "symbol": "COMMON_METAL_DEPOSITS",
+    "name": "Common Metal Deposits",
+    "description": "A waypoint rich in common metal ores like iron, copper, and aluminum, essential for construction and manufacturing."
+   },
+  {
+    "symbol": "STRIPPED",
+    "name": "Stripped",
+    "description": "A waypoint that has been heavily exploited for its resources, leaving a scarred and depleted landscape with diminished opportunities for future development."
+   },
+  {
+    "symbol": "VIBRANT_AURORAS",
+    "name": "Vibrant Auroras",
+    "description": "A celestial light show caused by the interaction of charged particles with the waypoint's atmosphere, creating a mesmerizing spectacle and attracting tourists from across the galaxy."
+   },
+   {
+    "symbol": "STRONG_MAGNETOSPHERE",
+    "name": "Strong Magnetosphere",
+    "description": "A waypoint enveloped in a powerful magnetic field, potentially affecting spacecraft systems, and creating unique phenomena such as the concentration of exotic matter and graviton emitters."
+   },
+   {
+    "symbol": "MILITARY_BASE",
+    "name": "Military Base",
+    "description": "A fortified stronghold housing armed forces, advanced weaponry, and strategic assets for defense or offense."
+   },
+  {
+    "symbol": "SHIPYARD",
+    "name": "Shipyard",
+    "description": "A bustling hub for the construction, repair, and sale of various spacecraft, from humble shuttles to mighty warships."
+   },
+   {
+    "symbol": "DRY_SEABEDS",
+    "name": "Dry Seabeds",
+    "description": "Vast, desolate landscapes that once held oceans, now exposing the remnants of ancient marine life and providing opportunities for the discovery of valuable resources."
+   }
+  ]
