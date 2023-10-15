@@ -165,6 +165,11 @@
   "description": "A waypoint with a poisonous atmosphere, necessitating the use of specialized equipment and technology to protect inhabitants and visitors from harmful substances."
  },
  {
+  "symbol": "TRADING_HUB",
+  "name": "Trading Hub",
+  "description": "A critical junction in the galaxy's trade network, with countless goods and services flowing through daily."
+ },
+ {
   "symbol": "VIBRANT_AURORAS",
   "name": "Vibrant Auroras",
   "description": "A celestial light show caused by the interaction of charged particles with the waypoint's atmosphere, creating a mesmerizing spectacle and attracting tourists from across the galaxy."
