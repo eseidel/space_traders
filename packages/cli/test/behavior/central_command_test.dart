@@ -38,8 +38,6 @@ class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockWaypointCache extends Mock implements WaypointCache {}
-
 void main() {
   test('CentralCommand.chooseNewBehaviorFor', () async {
     final behaviorCache = _MockBehhaviorCache();

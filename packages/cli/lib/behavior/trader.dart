@@ -738,7 +738,7 @@ Future<DateTime?> advanceTrader(
     api,
     db,
     caches.shipyardPrices,
-    caches.static.shipyardShips,
+    caches.static,
     caches.agent,
     currentWaypoint,
     ship,

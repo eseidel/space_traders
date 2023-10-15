@@ -53,7 +53,7 @@ Future<void> visitLocalShipyard(
   Api api,
   Database db,
   ShipyardPrices shipyardPrices,
-  ShipyardShipCache shipyardShips,
+  StaticCaches staticCaches,
   AgentCache agentCache,
   Waypoint waypoint,
   Ship ship,
@@ -65,5 +65,5 @@ Future<void> visitLocalShipyard(
   // TODO(eseidel): We should only visit the shipyard if we don't
   // have recent prices.
   recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
-  shipyardShips.addAll(shipyard.ships);
+  recordShipyardShips(staticCaches, shipyard.ships);
 }

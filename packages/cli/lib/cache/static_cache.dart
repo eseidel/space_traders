@@ -294,3 +294,14 @@ class StaticCaches {
   /// The waypoint trait cache.
   final WaypointTraitCache waypointTraits;
 }
+
+/// Records ShipyardShips and their components into the caches.
+void recordShipyardShips(StaticCaches staticCaches, List<ShipyardShip> ships) {
+  staticCaches.shipyardShips.addAll(ships);
+  for (final ship in ships) {
+    staticCaches.mounts.addAll(ship.mounts);
+    staticCaches.modules.addAll(ship.modules);
+    staticCaches.engines.add(ship.engine);
+    staticCaches.reactors.add(ship.reactor);
+  }
+}

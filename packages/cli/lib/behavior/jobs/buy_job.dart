@@ -41,7 +41,7 @@ Future<JobResult> doBuyJob(
     api,
     db,
     caches.shipyardPrices,
-    caches.static.shipyardShips,
+    caches.static,
     caches.agent,
     currentWaypoint,
     ship,

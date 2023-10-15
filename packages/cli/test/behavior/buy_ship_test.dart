@@ -12,8 +12,6 @@ import '../cache/caches_mock.dart';
 
 class _MockAgent extends Mock implements Agent {}
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -28,8 +26,6 @@ class _MockRoutePlan extends Mock implements RoutePlan {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockShipCache extends Mock implements ShipCache {}
-
 class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipNav extends Mock implements ShipNav {}
@@ -39,8 +35,6 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceBuyShip smoke test', () async {
