@@ -450,9 +450,9 @@ Future<JobResult> doMineJob(
     final response =
         await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
 
-    for (final survey in response.surveys) {
-      printSurvey(survey, caches.marketPrices, marketSymbol);
-    }
+    // for (final survey in response.surveys) {
+    //   printSurvey(survey, caches.marketPrices, marketSymbol);
+    // }
 
     verifyCooldown(
       ship,
@@ -472,9 +472,9 @@ Future<JobResult> doMineJob(
     return JobResult.wait(response.cooldown.expiration);
   }
 
-  if (maybeSurvey != null) {
-    printSurvey(maybeSurvey, caches.marketPrices, marketSymbol);
-  }
+  // if (maybeSurvey != null) {
+  //   printSurvey(maybeSurvey, caches.marketPrices, marketSymbol);
+  // }
 
   // Regardless of whether we have a survey, we should try to mine.
   final result = await extractAndLog(
