@@ -25,7 +25,8 @@ List<Value> _loadJson<Value>(
 
 /// A cache of static data that does not typically change between resets and
 /// thus can be checked into source control.
-abstract class StaticCache<Symbol, Record> extends JsonListStore<Record> {
+abstract class StaticCache<Symbol extends Object, Record extends Object>
+    extends JsonListStore<Record> {
   /// Creates a new static cache.
   StaticCache(super.records, {required super.fs, required super.path});
 
@@ -191,7 +192,7 @@ class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
 
   @override
   ShipEngine copyAndNormalize(ShipEngine record) =>
-      ShipEngine.fromJson(jsonDecode(jsonEncode(record)))!;
+      ShipEngine.fromJson(jsonDecode(jsonEncode(record)))!..condition = null;
 
   @override
   int compare(ShipEngine a, ShipEngine b) =>
@@ -223,7 +224,7 @@ class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
 
   @override
   ShipReactor copyAndNormalize(ShipReactor record) =>
-      ShipReactor.fromJson(jsonDecode(jsonEncode(record)))!;
+      ShipReactor.fromJson(jsonDecode(jsonEncode(record)))!..condition = null;
 
   @override
   int compare(ShipReactor a, ShipReactor b) =>
