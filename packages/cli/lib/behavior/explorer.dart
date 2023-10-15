@@ -55,25 +55,22 @@ Future<WaypointSymbol?> _waypointSymbolNeedingExploration(
   System system, {
   required Duration maxAge,
   required bool Function(SystemSymbol systemSymbol)? filter,
-  required WaypointCache? waypointCache,
+  required WaypointCache waypointCache,
 }) async {
   for (final systemWaypoint in system.waypoints) {
     final waypointSymbol = systemWaypoint.waypointSymbol;
     if (filter != null && !filter(systemWaypoint.systemSymbol)) {
       continue;
     }
-    var values = chartingCache.valuesForSymbol(waypointSymbol);
-    // Maybe the system is already charted and our cache is out of date?
-    if (values == null && waypointCache != null) {
-      await waypointCache.waypoint(waypointSymbol);
-      values = chartingCache.valuesForSymbol(waypointSymbol);
-    }
+    // Try and fetch the waypoint from the server or our cache.
+    final waypoint = await waypointCache.waypoint(waypointSymbol);
+    // We know we've updated the waypoint at this point, so if it's not
+    // stored in our charting cache, we know it has no chart.
+    final values = chartingCache.valuesForSymbol(waypointSymbol);
     if (values == null) {
       shipInfo(ship, '$waypointSymbol is missing chart, routing.');
       return waypointSymbol;
     }
-    final waypoint =
-        chartingCache.waypointFromSymbol(systemsCache, waypointSymbol)!;
     if (waypoint.hasMarketplace &&
         !marketPrices.hasRecentMarketData(waypointSymbol, maxAge: maxAge)) {
       shipInfo(
@@ -107,7 +104,7 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   ShipyardPrices shipyardPrices,
   Ship ship, {
   required SystemSymbol startSystemSymbol,
-  WaypointCache? waypointCache,
+  required WaypointCache waypointCache,
   bool Function(SystemSymbol systemSymbol)? filter,
   Duration maxAge = defaultMaxAge,
 }) async {
