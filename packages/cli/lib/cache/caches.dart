@@ -6,7 +6,7 @@ import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
-import 'package:cli/cache/shipyard_ships.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/nav/jump_cache.dart';
@@ -16,6 +16,7 @@ import 'package:cli/net/queries.dart';
 import 'package:db/db.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 
 export 'package:cli/api.dart';
 export 'package:cli/cache/agent_cache.dart';
@@ -25,16 +26,19 @@ export 'package:cli/cache/contract_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
-export 'package:cli/cache/shipyard_ships.dart';
+export 'package:cli/cache/static_cache.dart';
 export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
+export 'package:cli/nav/route.dart';
 export 'package:cli/nav/system_connectivity.dart';
 export 'package:file/file.dart';
 
 /// Container for all the caches.
 class Caches {
-  Caches._({
+  /// Creates a new cache.
+  @visibleForTesting
+  Caches({
     required this.agent,
     required this.marketPrices,
     required this.ships,
@@ -48,7 +52,7 @@ class Caches {
     required this.charting,
     required this.routePlanner,
     required this.factions,
-    required this.shipyardShips,
+    required this.static,
   });
 
   /// The agent cache.
@@ -84,11 +88,11 @@ class Caches {
   /// The cache of charting data.
   final ChartingCache charting;
 
-  /// The ShipyardShip cache.
-  final ShipyardShipCache shipyardShips;
-
   /// The route planner.
   final RoutePlanner routePlanner;
+
+  /// Cache of static data from the server.
+  final StaticCaches static;
 
   /// Factions cache.  Factions never change, so just holding them
   /// directly as a list.
@@ -113,7 +117,7 @@ class Caches {
     // Intentionally force refresh contracts in case we've been offline.
     final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);
     final behaviors = BehaviorCache.load(fs);
-    final shipyardShips = ShipyardShipCache.load(fs);
+    final static = StaticCaches.load(fs);
 
     final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
     final jumps = JumpCache();
@@ -129,7 +133,7 @@ class Caches {
     // We rarely modify contracts, so save them out here too.
     contracts.save();
 
-    return Caches._(
+    return Caches(
       agent: agent,
       marketPrices: prices,
       ships: ships,
@@ -141,7 +145,7 @@ class Caches {
       contracts: contracts,
       behaviors: behaviors,
       charting: charting,
-      shipyardShips: shipyardShips,
+      static: static,
       routePlanner: routePlanner,
       factions: factions,
     );

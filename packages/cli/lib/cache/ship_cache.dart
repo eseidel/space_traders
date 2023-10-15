@@ -15,10 +15,7 @@ class ShipCache extends ResponseListCache<Ship> {
     required super.fs,
     super.checkEvery = 100,
     super.path = defaultPath,
-  }) : super(
-          entryToJson: (s) => s.toJson(),
-          refreshEntries: (Api api) => allMyShips(api).toList(),
-        );
+  }) : super(refreshEntries: (Api api) => allMyShips(api).toList());
 
   /// Loads a ShipCache from cache if it exists.
   static ShipCache? loadCached(

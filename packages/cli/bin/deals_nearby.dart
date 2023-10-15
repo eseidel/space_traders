@@ -2,7 +2,6 @@ import 'package:args/args.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/route.dart';
 import 'package:cli/trading.dart';
 import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';

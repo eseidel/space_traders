@@ -1,20 +1,6 @@
-import 'dart:convert';
-
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/third_party/compare.dart';
-
-bool _jsonCompare(Ship actual, Ship expected) {
-  final diff = findDifferenceBetweenStrings(
-    jsonEncode(actual.toJson()),
-    jsonEncode(expected.toJson()),
-  );
-  if (diff != null) {
-    logger.info('Ship differs from expected: ${diff.which}');
-    return false;
-  }
-  return true;
-}
+import 'package:cli/compare.dart';
 
 /// Log a warning if the purchased ship does not match the expected template.
 // void verifyShipMatchesTemplate(Ship ship, ShipType shipType) {
@@ -52,7 +38,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       logger.info('Failed to make example ship for $shipType');
       continue;
     }
-    _jsonCompare(ship, exampleShip);
+    jsonCompare(ship, exampleShip);
   }
 }
 

@@ -1,25 +1,11 @@
-import 'dart:convert';
-
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_store.dart';
 import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/compare.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
-import 'package:cli/third_party/compare.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
-
-bool _agentsMatch(Agent actual, Agent expected) {
-  final diff = findDifferenceBetweenStrings(
-    jsonEncode(actual.toJson()),
-    jsonEncode(expected.toJson()),
-  );
-  if (diff != null) {
-    logger.info('Agent differs from expected: ${diff.which}');
-    return false;
-  }
-  return true;
-}
 
 /// Holds the Agent object between requests.
 /// The "Agent" api object doesn't have a way to be updated, so this
@@ -86,7 +72,7 @@ class AgentCache extends JsonStore<Agent> {
     }
     final newAgent = await getMyAgent(api);
     _requestsSinceLastCheck = 0;
-    if (_agentsMatch(agent, newAgent)) {
+    if (jsonCompare(agent, newAgent)) {
       return;
     }
     logger.warn('Agent changed, updating cache.');

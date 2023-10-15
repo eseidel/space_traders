@@ -33,9 +33,7 @@ class JsonListStore<Record> {
   ) {
     final parsed = jsonDecode(contents) as List<dynamic>;
     return parsed
-        .map<Record>(
-          (e) => recordFromJson(e as Map<String, dynamic>),
-        )
+        .map<Record>((e) => recordFromJson(e as Map<String, dynamic>))
         .toList();
   }
 

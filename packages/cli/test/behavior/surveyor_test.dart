@@ -7,11 +7,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
+import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
-
-class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
@@ -23,15 +21,9 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockShipCache extends Mock implements ShipCache {}
-
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceSurveyor smoke test', () async {
@@ -39,18 +31,10 @@ void main() {
     final db = _MockDatabase();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    final agentCache = _MockAgentCache();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
-    final caches = _MockCaches();
-    final shipCache = _MockShipCache();
-    when(() => caches.ships).thenReturn(shipCache);
-    when(() => caches.waypoints).thenReturn(waypointCache);
-    when(() => caches.agent).thenReturn(agentCache);
-    when(() => caches.systems).thenReturn(systemsCache);
+    final caches = mockCaches();
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -69,8 +53,9 @@ void main() {
       ),
     ]);
 
-    when(() => centralCommand.mineJobForShip(systemsCache, agentCache, ship))
-        .thenReturn(MineJob(mine: symbol, market: symbol));
+    when(
+      () => centralCommand.mineJobForShip(caches.systems, caches.agent, ship),
+    ).thenReturn(MineJob(mine: symbol, market: symbol));
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
@@ -79,12 +64,12 @@ void main() {
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
 
     registerFallbackValue(symbol);
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
     registerFallbackValue(symbol.systemSymbol);
 
     when(
-      () => waypointCache.waypointsInSystem(any()),
+      () => caches.waypoints.waypointsInSystem(any()),
     ).thenAnswer((_) => Future.value([waypoint]));
 
     when(() => fleetApi.createSurvey(shipSymbol.symbol)).thenAnswer(

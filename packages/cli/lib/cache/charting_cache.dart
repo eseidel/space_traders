@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_store.dart';
-import 'package:cli/cache/waypoint_traits.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -127,7 +126,7 @@ class ChartingCache extends JsonStore<_Record> {
       traitSymbols: waypoint.traits.map((e) => e.symbol).toList(),
       chart: chart,
     );
-    waypointTraits.addTraits(waypoint.traits);
+    waypointTraits.addAll(waypoint.traits);
     _valuesBySymbol[waypoint.waypointSymbol] = chartedValues;
     // This is just a minor optimization to allow addWaypoints to only
     // save once.
@@ -159,7 +158,7 @@ class ChartingCache extends JsonStore<_Record> {
     }
     final systemWaypoint = systemsCache.waypointFromSymbol(waypointSymbol);
     final traits = values.traitSymbols
-        .map(waypointTraits.traitFromSymbol)
+        .map((s) => waypointTraits[s])
         .whereType<WaypointTrait>()
         .toList();
     return Waypoint(

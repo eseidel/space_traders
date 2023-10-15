@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/response_cache.dart';
+import 'package:cli/compare.dart';
 import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
@@ -15,10 +16,10 @@ void main() {
     final a = {'a': 1, 'b': 2};
     final b = {'a': 1, 'b': 2};
     final c = {'a': 1, 'b': 3};
-    expect(jsonListMatch([a, b], [a, b], (t) => t), true);
-    expect(jsonListMatch([a, b], [b, a], (t) => t), true);
+    expect(jsonListMatch([a, b], [a, b]), true);
+    expect(jsonListMatch([a, b], [b, a]), true);
     expect(
-      runWithLogger(logger, () => jsonListMatch([a, b], [a, c], (t) => t)),
+      runWithLogger(logger, () => jsonListMatch([a, b], [a, c])),
       false,
     );
     verify(
@@ -29,7 +30,7 @@ void main() {
 
     reset(logger);
     expect(
-      runWithLogger(logger, () => jsonListMatch([a, b], [a, b, b], (t) => t)),
+      runWithLogger(logger, () => jsonListMatch([a, b], [a, b, b])),
       false,
     );
     verify(
@@ -43,7 +44,6 @@ void main() {
 
     final responseCache = ResponseListCache(
       [1],
-      entryToJson: (t) => {'a': t},
       refreshEntries: (_) async => [2],
       fs: fs,
       path: 'test.json',

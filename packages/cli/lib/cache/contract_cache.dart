@@ -14,10 +14,7 @@ class ContractCache extends ResponseListCache<Contract> {
     required super.fs,
     super.checkEvery = 100,
     super.path = defaultPath,
-  }) : super(
-          entryToJson: (c) => c.toJson(),
-          refreshEntries: (Api api) => allMyContracts(api).toList(),
-        );
+  }) : super(refreshEntries: (Api api) => allMyContracts(api).toList());
 
   /// Load the ContractCache from the file system.
   static ContractCache? loadCached(FileSystem fs, {String path = defaultPath}) {

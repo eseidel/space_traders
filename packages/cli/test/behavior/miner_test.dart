@@ -7,11 +7,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
+import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
-
-class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
@@ -21,21 +19,13 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockMarketCache extends Mock implements MarketCache {}
-
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockShipCache extends Mock implements ShipCache {}
-
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('surveyWorthMining with no surveys', () async {
@@ -104,20 +94,10 @@ void main() {
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
-    final agentCache = _MockAgentCache();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
-    final marketCache = _MockMarketCache();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
-    final caches = _MockCaches();
-    when(() => caches.waypoints).thenReturn(waypointCache);
-    when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.marketPrices).thenReturn(marketPrices);
-    when(() => caches.agent).thenReturn(agentCache);
-    when(() => caches.systems).thenReturn(systemsCache);
+    final caches = mockCaches();
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -137,8 +117,9 @@ void main() {
       ),
     ]);
 
-    when(() => centralCommand.mineJobForShip(systemsCache, agentCache, ship))
-        .thenReturn(MineJob(mine: symbol, market: symbol));
+    when(
+      () => centralCommand.mineJobForShip(caches.systems, caches.agent, ship),
+    ).thenReturn(MineJob(mine: symbol, market: symbol));
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
@@ -147,12 +128,10 @@ void main() {
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
 
     registerFallbackValue(symbol);
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
-    final shipCache = _MockShipCache();
-    when(() => shipCache.ships).thenReturn([ship]);
-    when(() => caches.ships).thenReturn(shipCache);
+    when(() => caches.ships.ships).thenReturn([ship]);
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);

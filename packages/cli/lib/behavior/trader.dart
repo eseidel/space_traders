@@ -7,7 +7,6 @@ import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scores.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
@@ -739,7 +738,7 @@ Future<DateTime?> advanceTrader(
     api,
     db,
     caches.shipyardPrices,
-    caches.shipyardShips,
+    caches.static.shipyardShips,
     caches.agent,
     currentWaypoint,
     ship,

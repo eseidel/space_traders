@@ -2,19 +2,16 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/route.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
+import '../cache/caches_mock.dart';
+
 class _MockAgent extends Mock implements Agent {}
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockApi extends Mock implements Api {}
-
-class _MockCaches extends Mock implements Caches {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
@@ -24,31 +21,15 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockMarketCache extends Mock implements MarketCache {}
-
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
-class _MockRoutePlanner extends Mock implements RoutePlanner {}
-
 class _MockShip extends Mock implements Ship {}
-
-class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockShipyardPrices extends Mock implements ShipyardPrices {}
-
-class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
-
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceMountFromBuy smoke test', () async {
@@ -56,31 +37,13 @@ void main() {
     final db = _MockDatabase();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    final agentCache = _MockAgentCache();
+    final caches = mockCaches();
     final agent = _MockAgent();
-    when(() => agentCache.agent).thenReturn(agent);
+    when(() => caches.agent.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
-    final caches = _MockCaches();
-    final shipCache = _MockShipCache();
-    when(() => caches.ships).thenReturn(shipCache);
-    when(() => caches.waypoints).thenReturn(waypointCache);
-    when(() => caches.agent).thenReturn(agentCache);
-    when(() => caches.systems).thenReturn(systemsCache);
-    final routePlanner = _MockRoutePlanner();
-    when(() => caches.routePlanner).thenReturn(routePlanner);
-    final marketPrices = _MockMarketPrices();
-    when(() => caches.marketPrices).thenReturn(marketPrices);
-    final shipyardPrices = _MockShipyardPrices();
-    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
-    final marketCache = _MockMarketCache();
-    when(() => caches.markets).thenReturn(marketCache);
-    final shipyardShips = _MockShipyardShipCache();
-    when(() => caches.shipyardShips).thenReturn(shipyardShips);
 
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -98,7 +61,7 @@ void main() {
         requirements: ShipRequirements(),
       ),
     ]);
-    when(() => agentCache.headquartersSymbol).thenReturn(symbol);
+    when(() => caches.agent.headquartersSymbol).thenReturn(symbol);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
@@ -124,10 +87,10 @@ void main() {
       purchasePrice: 100,
       sellPrice: 101,
     );
-    when(() => marketPrices.pricesFor(toMount)).thenReturn([
+    when(() => caches.marketPrices.pricesFor(toMount)).thenReturn([
       MarketPrice.fromMarketTradeGood(tradeGood, symbol),
     ]);
-    when(() => marketCache.marketForSymbol(symbol)).thenAnswer(
+    when(() => caches.markets.marketForSymbol(symbol)).thenAnswer(
       (_) => Future.value(
         Market(
           symbol: symbol.waypoint,
@@ -139,7 +102,7 @@ void main() {
     );
     registerFallbackValue(Duration.zero);
     when(
-      () => marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentMarketData(
         symbol,
         maxAge: any(named: 'maxAge'),
       ),
@@ -163,12 +126,12 @@ void main() {
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
 
     registerFallbackValue(symbol);
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
     registerFallbackValue(symbol.systemSymbol);
 
     when(
-      () => waypointCache.waypointsInSystem(any()),
+      () => caches.waypoints.waypointsInSystem(any()),
     ).thenAnswer((_) => Future.value([waypoint]));
 
     when(() => centralCommand.templateForShip(ship)).thenReturn(
@@ -223,7 +186,7 @@ void main() {
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
     when(
-      () => routePlanner.planRoute(
+      () => caches.routePlanner.planRoute(
         start: symbol,
         end: symbol,
         fuelCapacity: any(named: 'fuelCapacity'),
@@ -270,15 +233,9 @@ void main() {
     final ship = _MockShip();
     when(() => ship.mounts).thenReturn([]);
     final centralCommand = _MockCentralCommand();
-    final caches = _MockCaches();
-    final shipCache = _MockShipCache();
-    when(() => caches.ships).thenReturn(shipCache);
-    final marketPrices = _MockMarketPrices();
-    when(() => caches.marketPrices).thenReturn(marketPrices);
-    final routePlanner = _MockRoutePlanner();
-    when(() => caches.routePlanner).thenReturn(routePlanner);
+    final caches = mockCaches();
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => marketPrices.pricesFor(any())).thenReturn([]);
+    when(() => caches.marketPrices.pricesFor(any())).thenReturn([]);
 
     final template = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.CARRIER,

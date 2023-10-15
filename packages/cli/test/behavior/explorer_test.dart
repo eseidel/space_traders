@@ -7,15 +7,11 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
+import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
-class _MockCaches extends Mock implements Caches {}
-
 class _MockCentralCommand extends Mock implements CentralCommand {}
-
-class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockDatabase extends Mock implements Database {}
 
@@ -23,53 +19,21 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockMarketCache extends Mock implements MarketCache {}
-
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
-
-class _MockShipyardPrices extends Mock implements ShipyardPrices {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceExplorer smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
-    final agentCache = _MockAgentCache();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
-    final marketCache = _MockMarketCache();
     final shipNav = _MockShipNav();
-    final shipyardPrices = _MockShipyardPrices();
     final fleetApi = _MockFleetApi();
     final centralCommand = _MockCentralCommand();
-    final caches = _MockCaches();
-    final chartingCache = _MockChartingCache();
-    when(() => caches.waypoints).thenReturn(waypointCache);
-    when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.marketPrices).thenReturn(marketPrices);
-    when(() => caches.agent).thenReturn(agentCache);
-    when(() => caches.systems).thenReturn(systemsCache);
-    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
-    when(() => caches.charting).thenReturn(chartingCache);
-    final systemConnectivity = _MockSystemConnectivity();
-    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
-    final shipyardShips = _MockShipyardShipCache();
-    when(() => caches.shipyardShips).thenReturn(shipyardShips);
+    final caches = mockCaches();
 
     final waypoint = _MockWaypoint();
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
@@ -86,11 +50,12 @@ void main() {
       x: 0,
       y: 0,
     );
-    when(() => systemsCache.systemBySymbol(waypointSymbol.systemSymbol))
+    when(() => caches.systems.systemBySymbol(waypointSymbol.systemSymbol))
         .thenReturn(system);
     registerFallbackValue(waypointSymbol.systemSymbol);
-    when(() => systemConnectivity.clusterIdForSystem(any())).thenReturn(0);
-    when(() => systemConnectivity.systemSymbolsByClusterId(0))
+    when(() => caches.systemConnectivity.clusterIdForSystem(any()))
+        .thenReturn(0);
+    when(() => caches.systemConnectivity.systemSymbolsByClusterId(0))
         .thenReturn([waypointSymbol.systemSymbol]);
 
     when(() => api.fleet).thenReturn(fleetApi);
@@ -112,7 +77,7 @@ void main() {
     when(() => ship.fuel).thenReturn(shipFuel);
 
     registerFallbackValue(waypointSymbol);
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
     when(() => centralCommand.maxAgeForExplorerData)

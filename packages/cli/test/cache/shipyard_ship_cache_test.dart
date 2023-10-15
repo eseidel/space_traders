@@ -1,5 +1,5 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/shipyard_ships.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
 
@@ -46,7 +46,7 @@ void main() {
         requirements: ShipRequirements(crew: 0, power: 0, slots: 0),
       ),
     );
-    shipyardShipCache.addShipyardShips([shipyardShip]);
+    shipyardShipCache.addAll([shipyardShip]);
     expect(shipyardShipCache.entries, hasLength(1));
   });
 }

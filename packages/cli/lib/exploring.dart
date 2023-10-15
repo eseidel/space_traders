@@ -65,5 +65,5 @@ Future<void> visitLocalShipyard(
   // TODO(eseidel): We should only visit the shipyard if we don't
   // have recent prices.
   recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
-  shipyardShips.addShipyardShips(shipyard.ships);
+  shipyardShips.addAll(shipyard.ships);
 }

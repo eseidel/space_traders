@@ -1,6 +1,6 @@
 import 'package:cli/cache/charting_cache.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_traits.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

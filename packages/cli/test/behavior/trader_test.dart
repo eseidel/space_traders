@@ -2,23 +2,18 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/route.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockAgent extends Mock implements Agent {}
+import '../cache/caches_mock.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
+class _MockAgent extends Mock implements Agent {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockCaches extends Mock implements Caches {}
-
 class _MockCentralCommand extends Mock implements CentralCommand {}
-
-class _MockContractCache extends Mock implements ContractCache {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
@@ -28,15 +23,7 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockMarketCache extends Mock implements MarketCache {}
-
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
-class _MockRoutePlanner extends Mock implements RoutePlanner {}
-
 class _MockShip extends Mock implements Ship {}
-
-class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockShipCargo extends Mock implements ShipCargo {}
 
@@ -48,17 +35,7 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockShipyardPrices extends Mock implements ShipyardPrices {}
-
-class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
-
-class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceTrader smoke test', () async {
@@ -67,36 +44,14 @@ void main() {
 
     final api = _MockApi();
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
-    final agentCache = _MockAgentCache();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final systemConnectivity = _MockSystemConnectivity();
-    final waypointCache = _MockWaypointCache();
-    final marketCache = _MockMarketCache();
-    final shipyardPrices = _MockShipyardPrices();
-    final contractCache = _MockContractCache();
-    final routePlanner = _MockRoutePlanner();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final centralCommand = _MockCentralCommand();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
-    final caches = _MockCaches();
-    when(() => caches.waypoints).thenReturn(waypointCache);
-    when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.marketPrices).thenReturn(marketPrices);
-    when(() => caches.agent).thenReturn(agentCache);
-    when(() => caches.systems).thenReturn(systemsCache);
-    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
-    when(() => caches.contracts).thenReturn(contractCache);
-    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
-    when(() => caches.routePlanner).thenReturn(routePlanner);
-    final shipCache = _MockShipCache();
-    when(() => caches.ships).thenReturn(shipCache);
-    final shipyardShips = _MockShipyardShipCache();
-    when(() => caches.shipyardShips).thenReturn(shipyardShips);
+    final caches = mockCaches();
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -121,7 +76,7 @@ void main() {
         description: '',
       ),
     ]);
-    when(() => marketCache.marketForSymbol(start)).thenAnswer(
+    when(() => caches.markets.marketForSymbol(start)).thenAnswer(
       (_) => Future.value(
         Market(
           symbol: end.waypoint,
@@ -138,26 +93,26 @@ void main() {
       ),
     );
     when(
-      () => marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentMarketData(
         start,
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
 
     registerFallbackValue(start);
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
     when(
-      () => systemsCache.systemSymbolsInJumpRadius(
+      () => caches.systems.systemSymbolsInJumpRadius(
         startSystem: start.systemSymbol,
         maxJumps: 1,
       ),
     ).thenReturn([]);
 
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
     when(
-      () => systemsCache.systemSymbolsInJumpRadius(
+      () => caches.systems.systemSymbolsInJumpRadius(
         startSystem: start.systemSymbol,
         maxJumps: 1,
       ),
@@ -192,11 +147,11 @@ void main() {
 
     when(
       () => centralCommand.findNextDeal(
-        agentCache,
-        contractCache,
-        marketPrices,
-        systemsCache,
-        routePlanner,
+        caches.agent,
+        caches.contracts,
+        caches.marketPrices,
+        caches.systems,
+        caches.routePlanner,
         ship,
         maxJumps: any(named: 'maxJumps'),
         maxWaypoints: any(named: 'maxWaypoints'),
@@ -212,7 +167,7 @@ void main() {
     when(() => shipCargo.inventory).thenReturn([]);
 
     final agent = _MockAgent();
-    when(() => agentCache.agent).thenReturn(agent);
+    when(() => caches.agent.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
     final state = BehaviorState(shipSymbol, Behavior.trader);
 
@@ -272,34 +227,14 @@ void main() {
 
     final api = _MockApi();
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
-    final agentCache = _MockAgentCache();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
-    final marketCache = _MockMarketCache();
-    final shipyardPrices = _MockShipyardPrices();
-    final systemConnectivity = _MockSystemConnectivity();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
 
     final centralCommand = _MockCentralCommand();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
-    final caches = _MockCaches();
-    when(() => caches.waypoints).thenReturn(waypointCache);
-    when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.marketPrices).thenReturn(marketPrices);
-    when(() => caches.agent).thenReturn(agentCache);
-    when(() => caches.systems).thenReturn(systemsCache);
-    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
-    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
-    final routePlanner = _MockRoutePlanner();
-    when(() => caches.routePlanner).thenReturn(routePlanner);
-    final shipCache = _MockShipCache();
-    when(() => caches.ships).thenReturn(shipCache);
-    final shipyardShips = _MockShipyardShipCache();
-    when(() => caches.shipyardShips).thenReturn(shipyardShips);
+    final caches = mockCaches();
 
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
@@ -345,21 +280,21 @@ void main() {
     ]);
     registerFallbackValue(Duration.zero);
     when(
-      () => marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentMarketData(
         start,
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
 
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
     when(
-      () => systemsCache.systemSymbolsInJumpRadius(
+      () => caches.systems.systemSymbolsInJumpRadius(
         startSystem: start.systemSymbol,
         maxJumps: 1,
       ),
     ).thenReturn([]);
-    when(() => systemsCache.waypointFromSymbol(start)).thenReturn(
+    when(() => caches.systems.waypointFromSymbol(start)).thenReturn(
       SystemWaypoint(
         symbol: start.waypoint,
         type: WaypointType.ASTEROID_FIELD,
@@ -367,7 +302,7 @@ void main() {
         y: 0,
       ),
     );
-    when(() => systemsCache.waypointFromSymbol(end)).thenReturn(
+    when(() => caches.systems.waypointFromSymbol(end)).thenReturn(
       SystemWaypoint(
         symbol: end.waypoint,
         type: WaypointType.ASTEROID_FIELD,
@@ -424,7 +359,7 @@ void main() {
         ),
       ],
     );
-    when(() => marketCache.marketForSymbol(start))
+    when(() => caches.markets.marketForSymbol(start))
         .thenAnswer((_) => Future.value(market));
 
     final shipCargo = _MockShipCargo();
@@ -441,7 +376,7 @@ void main() {
     ]);
 
     final agent = _MockAgent();
-    when(() => agentCache.agent).thenReturn(agent);
+    when(() => caches.agent.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
 
     final transaction = MarketTransaction(
@@ -470,11 +405,11 @@ void main() {
         ),
       ),
     );
-    when(() => systemsCache.waypointsInSystem(start.systemSymbol))
+    when(() => caches.systems.waypointsInSystem(start.systemSymbol))
         .thenReturn([]);
     registerFallbackValue(start.systemSymbol);
     when(
-      () => systemConnectivity.canJumpBetweenSystemSymbols(
+      () => caches.systemConnectivity.canJumpBetweenSystemSymbols(
         any(),
         any(),
       ),
@@ -533,7 +468,7 @@ void main() {
 
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     when(
-      () => marketPrices.pricesFor(
+      () => caches.marketPrices.pricesFor(
         TradeSymbol.ADVANCED_CIRCUITRY,
         marketSymbol: any(named: 'marketSymbol'),
       ),
@@ -550,7 +485,7 @@ void main() {
     ]);
 
     when(
-      () => routePlanner.planRoute(
+      () => caches.routePlanner.planRoute(
         start: any(named: 'start'),
         end: any(named: 'end'),
         fuelCapacity: fuelCapacity,
@@ -588,33 +523,13 @@ void main() {
 
     final api = _MockApi();
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
-    final agentCache = _MockAgentCache();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final systemConnectivity = _MockSystemConnectivity();
-    final waypointCache = _MockWaypointCache();
-    final marketCache = _MockMarketCache();
-    final shipyardPrices = _MockShipyardPrices();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
-    final contractCache = _MockContractCache();
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(1);
-    final caches = _MockCaches();
-    when(() => caches.waypoints).thenReturn(waypointCache);
-    when(() => caches.markets).thenReturn(marketCache);
-    when(() => caches.marketPrices).thenReturn(marketPrices);
-    when(() => caches.agent).thenReturn(agentCache);
-    when(() => caches.systems).thenReturn(systemsCache);
-    when(() => caches.shipyardPrices).thenReturn(shipyardPrices);
-    when(() => caches.contracts).thenReturn(contractCache);
-    when(() => contractCache.activeContracts).thenReturn([]);
-    when(() => caches.systemConnectivity).thenReturn(systemConnectivity);
-    final shipCache = _MockShipCache();
-    when(() => caches.ships).thenReturn(shipCache);
-    final routePlanner = _MockRoutePlanner();
-    when(() => caches.routePlanner).thenReturn(routePlanner);
+    final caches = mockCaches();
+    when(() => caches.contracts.activeContracts).thenReturn([]);
     final contract = Contract(
       id: 'id',
       factionSymbol: 'factionSymbol',
@@ -625,11 +540,9 @@ void main() {
         payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
       ),
     );
-    final shipyardShips = _MockShipyardShipCache();
-    when(() => caches.shipyardShips).thenReturn(shipyardShips);
 
     final agent = _MockAgent();
-    when(() => agentCache.agent).thenReturn(agent);
+    when(() => caches.agent.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
 
     final contractsApi = _MockContractsApi();
@@ -681,7 +594,7 @@ void main() {
     when(() => waypoint.systemSymbol).thenReturn(start.system);
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
     when(() => waypoint.traits).thenReturn([]);
-    when(() => waypointCache.waypoint(any()))
+    when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
     final routePlan = RoutePlan(
@@ -714,11 +627,11 @@ void main() {
     );
     when(
       () => centralCommand.findNextDeal(
-        agentCache,
-        contractCache,
-        marketPrices,
-        systemsCache,
-        routePlanner,
+        caches.agent,
+        caches.contracts,
+        caches.marketPrices,
+        caches.systems,
+        caches.routePlanner,
         ship,
         maxWaypoints: any(named: 'maxWaypoints'),
         maxJumps: any(named: 'maxJumps'),
@@ -746,7 +659,7 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final centralCommand = _MockCentralCommand();
-    final caches = _MockCaches();
+    final caches = mockCaches();
     final ship = _MockShip();
     final shipCargo = ShipCargo(capacity: 10, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
