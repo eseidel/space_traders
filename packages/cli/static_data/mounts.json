@@ -1,0 +1,74 @@
+[
+ {
+  "symbol": "MOUNT_MINING_LASER_I",
+  "name": "Mining Laser I",
+  "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects.",
+  "strength": 10,
+  "deposits": [],
+  "requirements": {
+   "power": 1,
+   "crew": 0,
+   "slots": null
+  }
+ },
+ {
+  "symbol": "MOUNT_MINING_LASER_II",
+  "name": "Mining Laser II",
+  "description": "An advanced mining laser that is more efficient and effective at extracting valuable minerals from asteroids and other space objects.",
+  "strength": 25,
+  "deposits": [],
+  "requirements": {
+   "power": 2,
+   "crew": 2,
+   "slots": null
+  }
+ },
+ {
+  "symbol": "MOUNT_MISSILE_LAUNCHER_I",
+  "name": "Missile Launcher",
+  "description": "A basic missile launcher that fires guided missiles with a variety of warheads for different targets.",
+  "strength": null,
+  "deposits": [],
+  "requirements": {
+   "power": 1,
+   "crew": 2,
+   "slots": null
+  }
+ },
+ {
+  "symbol": "MOUNT_SURVEYOR_I",
+  "name": "Surveyor I",
+  "description": "A basic survey probe that can be used to gather information about a mineral deposit.",
+  "strength": 1,
+  "deposits": [
+   "QUARTZ_SAND",
+   "SILICON_CRYSTALS",
+   "PRECIOUS_STONES",
+   "ICE_WATER",
+   "AMMONIA_ICE",
+   "IRON_ORE",
+   "COPPER_ORE",
+   "SILVER_ORE",
+   "ALUMINUM_ORE",
+   "GOLD_ORE",
+   "PLATINUM_ORE"
+  ],
+  "requirements": {
+   "power": 1,
+   "crew": 2,
+   "slots": null
+  }
+ },
+ {
+  "symbol": "MOUNT_TURRET_I",
+  "name": "Rotary Cannon",
+  "description": "A rotary cannon is a type of mounted turret that is designed to fire a high volume of rounds in rapid succession.",
+  "strength": null,
+  "deposits": [],
+  "requirements": {
+   "power": 1,
+   "crew": 1,
+   "slots": null
+  }
+ }
+]

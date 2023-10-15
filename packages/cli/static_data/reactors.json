@@ -1,0 +1,50 @@
+[
+ {
+  "symbol": "REACTOR_CHEMICAL_I",
+  "name": "Chemical Reactor I",
+  "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
+  "condition": null,
+  "powerOutput": 15,
+  "requirements": {
+   "power": null,
+   "crew": 3,
+   "slots": null
+  }
+ },
+ {
+  "symbol": "REACTOR_FISSION_I",
+  "name": "Fission Reactor I",
+  "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions.",
+  "condition": null,
+  "powerOutput": 31,
+  "requirements": {
+   "power": null,
+   "crew": 8,
+   "slots": null
+  }
+ },
+ {
+  "symbol": "REACTOR_FUSION_I",
+  "name": "Fusion Reactor I",
+  "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions.",
+  "condition": null,
+  "powerOutput": 40,
+  "requirements": {
+   "power": null,
+   "crew": 12,
+   "slots": null
+  }
+ },
+ {
+  "symbol": "REACTOR_SOLAR_I",
+  "name": "Solar Reactor I",
+  "description": "A basic solar power reactor, used to generate electricity from solar energy.",
+  "condition": null,
+  "powerOutput": 3,
+  "requirements": {
+   "power": null,
+   "crew": 0,
+   "slots": null
+  }
+ }
+]

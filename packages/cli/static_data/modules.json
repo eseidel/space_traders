@@ -1,0 +1,50 @@
+[
+ {
+  "symbol": "MODULE_CARGO_HOLD_I",
+  "capacity": 30,
+  "range": null,
+  "name": "Cargo Hold",
+  "description": "A module that increases a ship's cargo capacity.",
+  "requirements": {
+   "power": 1,
+   "crew": 0,
+   "slots": 1
+  }
+ },
+ {
+  "symbol": "MODULE_CREW_QUARTERS_I",
+  "capacity": 40,
+  "range": null,
+  "name": "Crew Quarters",
+  "description": "A module that provides living space and amenities for the crew.",
+  "requirements": {
+   "power": 1,
+   "crew": 2,
+   "slots": 1
+  }
+ },
+ {
+  "symbol": "MODULE_MINERAL_PROCESSOR_I",
+  "capacity": null,
+  "range": null,
+  "name": "Mineral Processor",
+  "description": "Crushes and processes extracted minerals and ores into their component parts, filters out impurities, and containerizes them into raw storage units.",
+  "requirements": {
+   "power": 1,
+   "crew": 0,
+   "slots": 2
+  }
+ },
+ {
+  "symbol": "MODULE_ORE_REFINERY_I",
+  "capacity": null,
+  "range": null,
+  "name": "Ore Refinery",
+  "description": "A specialized module that can refine raw ores into usable metals and other materials.",
+  "requirements": {
+   "power": 12,
+   "crew": 20,
+   "slots": 4
+  }
+ }
+]
