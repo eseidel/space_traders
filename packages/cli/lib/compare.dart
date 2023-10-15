@@ -2,27 +2,23 @@ import 'dart:convert';
 
 import 'package:cli/logger.dart';
 import 'package:cli/third_party/compare.dart';
+import 'package:json_diff/json_diff.dart';
 
 export 'third_party/compare.dart';
 
 /// Compare two objects via json encoding.
-bool jsonCompare<T>(T actual, T expected) {
-  final diff = findDifferenceBetweenStrings(
-    jsonEncode(actual),
-    jsonEncode(expected),
-  );
-  if (diff != null) {
-    logger.info('$T differs from expected: ${diff.which}');
-    return false;
+bool jsonCompare<T extends Object>(T actual, T expected) {
+  final differ = JsonDiffer(jsonEncode(actual), jsonEncode(expected));
+  final diff = differ.diff();
+  if (diff.hasNothing) {
+    return true;
   }
+  logger.info('$T differs from expected: $diff');
   return true;
 }
 
 /// Returns true if the two lists of T match when converted to Json.
-bool jsonListMatch<T>(
-  List<T> actual,
-  List<T> expected,
-) {
+bool jsonListMatch<T extends Object>(List<T> actual, List<T> expected) {
   if (actual.length != expected.length) {
     logger.info(
       "$T list lengths don't match: "

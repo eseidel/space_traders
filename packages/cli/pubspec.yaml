@@ -18,6 +18,7 @@ dependencies:
   file: ^6.1.4
   http: ^0.13.6
   intl: ^0.17.0
+  json_diff: ^0.2.1
   mason_logger: ^0.2.5
   meta: ^1.9.1
   openapi:

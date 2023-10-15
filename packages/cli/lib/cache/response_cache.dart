@@ -4,7 +4,7 @@ import 'package:cli/compare.dart';
 import 'package:cli/logger.dart';
 
 /// Cache of response values which can be refreshed.
-class ResponseListCache<T> extends JsonListStore<T> {
+class ResponseListCache<T extends Object> extends JsonListStore<T> {
   /// Creates a new ResponseListCache.
   ResponseListCache(
     super.entries, {

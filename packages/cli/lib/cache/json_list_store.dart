@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 
 /// A class to manage a file containing a list of json objects.
 /// The resulting file is valid json.
-class JsonListStore<Record> {
+class JsonListStore<Record extends Object> {
   /// Create a new JsonListStore.
   JsonListStore(
     this.entries, {
