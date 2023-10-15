@@ -22,14 +22,4 @@ void main() {
     waypointTraitCache.addAll([trait]);
     expect(waypointTraitCache[trait.symbol], trait);
   });
-
-  test('lookup never fails', () {
-    final logger = _MockLogger();
-    final cache = WaypointTraitCache([], fs: MemoryFileSystem());
-    // Even when empty, we return a stub and log a warning.
-    final trait =
-        runWithLogger(logger, () => cache[WaypointTraitSymbolEnum.VAST_RUINS]);
-    verify(() => logger.warn(any())).called(1);
-    expect(trait, isNotNull);
-  });
 }

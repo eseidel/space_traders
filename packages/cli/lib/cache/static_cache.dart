@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/compare.dart';
-import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 
 // Not using named parameters to save repetition at call sites.
@@ -41,25 +40,15 @@ abstract class StaticCache<Symbol, Record> extends JsonListStore<Record> {
 
   /// Lookup the entry by its symbol.
   Record? operator [](Symbol symbol) =>
-      lookupWithoutStub(symbol) ?? recordIfMissing(symbol);
-
-  /// Lookup the entry by its symbol, do not return a stub.
-  Record? lookupWithoutStub(Symbol symbol) => entries.firstWhereOrNull(
-        (record) => keyFor(record) == symbol,
-      );
+      entries.firstWhereOrNull((record) => keyFor(record) == symbol);
 
   /// Returns the list of values in the cache.
   List<Record> get values => entries;
 
-  /// Returns a record for the given symbol if it is missing from the cache.
-  /// Override this to return a record for a missing symbol and make lookups
-  /// never return null.
-  Record? recordIfMissing(Symbol symbol) => null;
-
   /// Adds a shipyard ship to the cache.
   void add(Record value, {bool shouldSave = true}) {
     final copy = copyAndNormalize(value);
-    final cached = lookupWithoutStub(keyFor(value));
+    final cached = this[keyFor(value)];
     if (cached != null && jsonCompare(cached, copy)) {
       return;
     }
@@ -264,16 +253,6 @@ class WaypointTraitCache
 
   /// The default path to the cache file.
   static const defaultPath = 'static_data/waypoint_traits.json';
-
-  @override
-  WaypointTrait recordIfMissing(WaypointTraitSymbolEnum symbol) {
-    logger.warn('No trait found for symbol: $symbol using stub.');
-    return WaypointTrait(
-      symbol: symbol,
-      name: symbol.value,
-      description: symbol.value,
-    );
-  }
 
   @override
   WaypointTrait copyAndNormalize(WaypointTrait record) =>

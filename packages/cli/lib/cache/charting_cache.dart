@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_store.dart';
+import 'package:cli/logger.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -157,10 +158,16 @@ class ChartingCache extends JsonStore<_Record> {
       return null;
     }
     final systemWaypoint = systemsCache.waypointFromSymbol(waypointSymbol);
-    final traits = values.traitSymbols
-        .map((s) => waypointTraits[s])
-        .whereType<WaypointTrait>()
-        .toList();
+    final traits = <WaypointTrait>[];
+    for (final traitSymbol in values.traitSymbols) {
+      final trait = waypointTraits[traitSymbol];
+      if (trait == null) {
+        logger.warn('Traits cache missing trait: $traitSymbol');
+        return null;
+      }
+      traits.add(trait);
+    }
+
     return Waypoint(
       symbol: systemWaypoint.symbol,
       type: systemWaypoint.type,
