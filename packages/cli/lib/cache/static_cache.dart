@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/compare.dart';
+import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 
 // Not using named parameters to save repetition at call sites.
@@ -27,7 +28,7 @@ List<Value> _loadJson<Value>(
 /// thus can be checked into source control.
 abstract class StaticCache<Symbol, Record> extends JsonListStore<Record> {
   /// Creates a new static cache.
-  StaticCache(super.map, {required super.fs, required super.path});
+  StaticCache(super.records, {required super.fs, required super.path});
 
   /// The key for the given record.
   Symbol keyFor(Record record);
@@ -40,12 +41,25 @@ abstract class StaticCache<Symbol, Record> extends JsonListStore<Record> {
 
   /// Lookup the entry by its symbol.
   Record? operator [](Symbol symbol) =>
-      entries.firstWhereOrNull((record) => keyFor(record) == symbol);
+      lookupWithoutStub(symbol) ?? recordIfMissing(symbol);
+
+  /// Lookup the entry by its symbol, do not return a stub.
+  Record? lookupWithoutStub(Symbol symbol) => entries.firstWhereOrNull(
+        (record) => keyFor(record) == symbol,
+      );
+
+  /// Returns the list of values in the cache.
+  List<Record> get values => entries;
+
+  /// Returns a record for the given symbol if it is missing from the cache.
+  /// Override this to return a record for a missing symbol and make lookups
+  /// never return null.
+  Record? recordIfMissing(Symbol symbol) => null;
 
   /// Adds a shipyard ship to the cache.
   void add(Record value, {bool shouldSave = true}) {
     final copy = copyAndNormalize(value);
-    final cached = this[keyFor(value)];
+    final cached = lookupWithoutStub(keyFor(value));
     if (cached != null && jsonCompare(cached, copy)) {
       return;
     }
@@ -79,7 +93,7 @@ abstract class StaticCache<Symbol, Record> extends JsonListStore<Record> {
 /// A cache of ship mounts.
 class ShipMountCache extends StaticCache<ShipMountSymbolEnum, ShipMount> {
   /// Creates a new ship mount cache.
-  ShipMountCache(super.map, {required super.fs, super.path = defaultPath});
+  ShipMountCache(super.mounts, {required super.fs, super.path = defaultPath});
 
   /// Load ship mount cache from disk.
   factory ShipMountCache.load(FileSystem fs, {String path = defaultPath}) =>
@@ -107,7 +121,7 @@ class ShipMountCache extends StaticCache<ShipMountSymbolEnum, ShipMount> {
 /// A cache of ship modules.
 class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
   /// Creates a new ship module cache.
-  ShipModuleCache(super.map, {required super.fs, super.path = defaultPath});
+  ShipModuleCache(super.modules, {required super.fs, super.path = defaultPath});
 
   /// Load ship module cache from disk.
   factory ShipModuleCache.load(FileSystem fs, {String path = defaultPath}) =>
@@ -139,7 +153,11 @@ class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
 /// A cache of shipyard ships.
 class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
   /// Creates a new shipyard ship cache.
-  ShipyardShipCache(super.map, {required super.fs, super.path = defaultPath});
+  ShipyardShipCache(
+    super.shipyardShips, {
+    required super.fs,
+    super.path = defaultPath,
+  });
 
   /// Load shipyard ship cache from disk.
   factory ShipyardShipCache.load(FileSystem fs, {String path = defaultPath}) =>
@@ -169,7 +187,7 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
 /// A cache of ship engines.
 class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
   /// Creates a new ship engine cache.
-  ShipEngineCache(super.map, {required super.fs, super.path = defaultPath});
+  ShipEngineCache(super.engines, {required super.fs, super.path = defaultPath});
 
   /// Load ship engine cache from disk.
   factory ShipEngineCache.load(FileSystem fs, {String path = defaultPath}) =>
@@ -197,7 +215,11 @@ class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
 /// A cache of ship reactors.
 class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
   /// Creates a new ship reactor cache.
-  ShipReactorCache(super.map, {required super.fs, super.path = defaultPath});
+  ShipReactorCache(
+    super.reactors, {
+    required super.fs,
+    super.path = defaultPath,
+  });
 
   /// Load ship reactor cache from disk.
   factory ShipReactorCache.load(FileSystem fs, {String path = defaultPath}) =>
@@ -226,7 +248,11 @@ class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
 class WaypointTraitCache
     extends StaticCache<WaypointTraitSymbolEnum, WaypointTrait> {
   /// Creates a new waypoint trait cache.
-  WaypointTraitCache(super.map, {required super.fs, super.path = defaultPath});
+  WaypointTraitCache(
+    super.traits, {
+    required super.fs,
+    super.path = defaultPath,
+  });
 
   /// Load waypoint trait cache from disk.
   factory WaypointTraitCache.load(FileSystem fs, {String path = defaultPath}) =>
@@ -238,6 +264,16 @@ class WaypointTraitCache
 
   /// The default path to the cache file.
   static const defaultPath = 'static_data/waypoint_traits.json';
+
+  @override
+  WaypointTrait recordIfMissing(WaypointTraitSymbolEnum symbol) {
+    logger.warn('No trait found for symbol: $symbol using stub.');
+    return WaypointTrait(
+      symbol: symbol,
+      name: symbol.value,
+      description: symbol.value,
+    );
+  }
 
   @override
   WaypointTrait copyAndNormalize(WaypointTrait record) =>
