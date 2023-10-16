@@ -72,6 +72,32 @@
   }
  },
  {
+  "symbol": "MOUNT_SURVEYOR_II",
+  "name": "Surveyor II",
+  "description": "An advanced survey probe that can be used to gather information about a mineral deposit with greater accuracy.",
+  "strength": 2,
+  "deposits": [
+   "QUARTZ_SAND",
+   "SILICON_CRYSTALS",
+   "PRECIOUS_STONES",
+   "ICE_WATER",
+   "AMMONIA_ICE",
+   "IRON_ORE",
+   "COPPER_ORE",
+   "SILVER_ORE",
+   "ALUMINUM_ORE",
+   "GOLD_ORE",
+   "PLATINUM_ORE",
+   "DIAMONDS",
+   "URANITE_ORE"
+  ],
+  "requirements": {
+   "power": 3,
+   "crew": 4,
+   "slots": null
+  }
+ },
+ {
   "symbol": "MOUNT_TURRET_I",
   "name": "Rotary Cannon",
   "description": "A rotary cannon is a type of mounted turret that is designed to fire a high volume of rounds in rapid succession.",
