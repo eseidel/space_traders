@@ -157,8 +157,7 @@ Future<DateTime?> advanceBuyShip(
 
   // Record our success!
   state.isComplete = true;
-  failJob(
-    'Purchased ${result.ship.symbol} ($shipType)!',
-    const Duration(minutes: 10),
-  );
+  // Rate limiting for ship buying is done by CentralCommand.
+  shipWarn(ship, 'Purchased ${result.ship.symbol} ($shipType)!');
+  return null;
 }

@@ -1,4 +1,3 @@
-import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
@@ -164,27 +163,20 @@ void main() {
 
     final logger = _MockLogger();
     expect(
-      () async {
-        final waitUntil = await runWithLogger(
-          logger,
-          () => advanceBuyShip(
-            api,
-            db,
-            centralCommand,
-            caches,
-            state,
-            ship,
-            getNow: getNow,
-          ),
-        );
-        return waitUntil;
-      },
-      throwsA(
-        const JobException(
-          'Purchased A-1 (SHIP_HEAVY_FREIGHTER)!',
-          Duration(minutes: 10),
+      await runWithLogger(
+        logger,
+        () => advanceBuyShip(
+          api,
+          db,
+          centralCommand,
+          caches,
+          state,
+          ship,
+          getNow: getNow,
         ),
       ),
+      isNull,
     );
+    verify(() => logger.warn('🛸#1  Purchased A-1 (SHIP_HEAVY_FREIGHTER)!'));
   });
 }
