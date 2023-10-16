@@ -80,6 +80,11 @@
   "description": "A thriving center of commerce where traders from across the galaxy gather to buy, sell, and exchange goods."
  },
  {
+  "symbol": "MEGA_STRUCTURES",
+  "name": "Mega Structures",
+  "description": "Colossal feats of engineering, these structures house entire cities, industries, or even ecosystems within their vast interiors."
+ },
+ {
   "symbol": "MILITARY_BASE",
   "name": "Military Base",
   "description": "A fortified stronghold housing armed forces, advanced weaponry, and strategic assets for defense or offense."
