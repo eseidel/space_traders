@@ -5,34 +5,19 @@ import 'package:types/types.dart';
 /// A ship that is waiting to be processed.
 class ShipWaiterEntry {
   /// Creates a new ship waiter entry.
-  ShipWaiterEntry(this.shipSymbol, this.waitUntil, this.priority);
+  ShipWaiterEntry(this.shipSymbol, this.waitUntil);
 
   /// The ship symbol.
   final ShipSymbol shipSymbol;
 
   /// The time to wait until.
   final DateTime? waitUntil;
-
-  /// The priority of this entry.
-  /// Elements which compare less have higher priority.
-  final int priority;
-}
-
-/// Returns the priority for a ship.
-int priorityForShip(Ship ship) {
-  if (ship.isProbe) {
-    return 1;
-  }
-  return 0;
 }
 
 // Elements which compare less have higher priority.
 // null sorts first (highest priority).
 // Otherwise sorts by waitUntil with sooner times having higher priority.
 int _compareEntries(ShipWaiterEntry a, ShipWaiterEntry b) {
-  if (a.priority != b.priority) {
-    return a.priority.compareTo(b.priority);
-  }
   if (a.waitUntil == null) {
     return -1;
   }
@@ -63,16 +48,14 @@ class ShipWaiter {
         if (!suppressWarnings) {
           logger.warn('Adding missing ship ${ship.shipSymbol}');
         }
-        scheduleShip(ship, null);
+        scheduleShip(ship.shipSymbol, null);
       }
     }
   }
 
   /// Updates the wait time for a ship.
-  void scheduleShip(Ship ship, DateTime? waitUntil) {
-    _queue.add(
-      ShipWaiterEntry(ship.shipSymbol, waitUntil, priorityForShip(ship)),
-    );
+  void scheduleShip(ShipSymbol shipSymbol, DateTime? waitUntil) {
+    _queue.add(ShipWaiterEntry(shipSymbol, waitUntil));
   }
 
   /// Returns the next ship to be processed.
