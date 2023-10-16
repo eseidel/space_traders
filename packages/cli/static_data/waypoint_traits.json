@@ -145,6 +145,11 @@
   "description": "A waypoint that has been heavily exploited for its resources, leaving a scarred and depleted landscape with diminished opportunities for future development."
  },
  {
+  "symbol": "STRONG_GRAVITY",
+  "name": "Strong Gravity",
+  "description": "A waypoint with a powerful gravitational force, requiring specialized technology and infrastructure to support habitation and resource extraction."
+ },
+ {
   "symbol": "STRONG_MAGNETOSPHERE",
   "name": "Strong Magnetosphere",
   "description": "A waypoint enveloped in a powerful magnetic field, potentially affecting spacecraft systems, and creating unique phenomena such as the concentration of exotic matter and graviton emitters."
