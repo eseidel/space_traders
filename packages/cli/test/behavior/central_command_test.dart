@@ -453,6 +453,10 @@ void main() {
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => caches.marketPrices.havePriceFor(any())).thenReturn(false);
+    when(() => caches.ships.countOfType(ShipType.ORE_HOUND)).thenReturn(0);
+    when(() => caches.ships.countOfType(ShipType.HEAVY_FREIGHTER))
+        .thenReturn(0);
+    when(() => caches.ships.countOfType(ShipType.PROBE)).thenReturn(0);
 
     await centralCommand.advanceCentralPlanning(api, caches);
     expect(centralCommand.nextShipBuyJob, isNull);
