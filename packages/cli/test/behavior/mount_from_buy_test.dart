@@ -61,6 +61,16 @@ void main() {
         requirements: ShipRequirements(),
       ),
     ]);
+    when(() => ship.modules).thenReturn([]);
+    when(() => ship.reactor).thenReturn(
+      ShipReactor(
+        symbol: ShipReactorSymbolEnum.ANTIMATTER_I,
+        name: 'name',
+        description: 'description',
+        powerOutput: 0,
+        requirements: ShipRequirements(),
+      ),
+    );
     when(() => caches.agent.headquartersSymbol).thenReturn(symbol);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     final shipEngine = _MockShipEngine();

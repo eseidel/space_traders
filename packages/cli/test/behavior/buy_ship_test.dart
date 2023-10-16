@@ -58,6 +58,17 @@ void main() {
     when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
     when(() => shipEngine.speed).thenReturn(shipSpeed);
+    when(() => ship.mounts).thenReturn([]);
+    when(() => ship.modules).thenReturn([]);
+    when(() => ship.reactor).thenReturn(
+      ShipReactor(
+        symbol: ShipReactorSymbolEnum.ANTIMATTER_I,
+        name: 'name',
+        description: 'description',
+        powerOutput: 0,
+        requirements: ShipRequirements(),
+      ),
+    );
 
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => caches.agent.headquartersSymbol).thenReturn(symbol);
