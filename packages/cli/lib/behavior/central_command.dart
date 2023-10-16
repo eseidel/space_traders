@@ -416,8 +416,10 @@ class CentralCommand {
     );
   }
 
-  Future<ShipBuyJob?> _heavyFreighterBuyJob(Caches caches) async {
-    const shipType = ShipType.HEAVY_FREIGHTER;
+  Future<ShipBuyJob?> _findBestPlaceToBuy(
+    Caches caches,
+    ShipType shipType,
+  ) async {
     final commandShip = _shipCache.ships.firstWhere((s) => s.isCommand);
     final trip = findBestShipyardToBuy(
       caches.shipyardPrices,
@@ -446,12 +448,19 @@ class CentralCommand {
 
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
-    final shipCount = _shipCache.ships.length;
-    if (shipCount < 80) {
-      // if our ship count is < 80, return an ore hound.
+    final oreHoundCount = _shipCache.countOfType(ShipType.ORE_HOUND);
+    final heavyFreighterCount =
+        _shipCache.countOfType(ShipType.HEAVY_FREIGHTER);
+    final probeCount = _shipCache.countOfType(ShipType.PROBE);
+    // This should be a multiple of our squad size so we always have
+    // full squads.
+    if (oreHoundCount < 80) {
+      // oreHoundBuyJob currently only looks in our system.
       return _oreHoundBuyJob(caches);
-    } else if (shipCount < 90) {
-      return _heavyFreighterBuyJob(caches);
+    } else if (heavyFreighterCount < 10) {
+      return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
+    } else if (probeCount < 10) {
+      return _findBestPlaceToBuy(caches, ShipType.PROBE);
     }
     return null;
   }
