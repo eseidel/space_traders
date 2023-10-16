@@ -186,6 +186,12 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     }
     return prices.where((e) => e.waypointSymbol == shipyardSymbol);
   }
+
+  /// Returns true if there is a price for a given ship type,
+  /// Used for detecting if we can buy a given ship type yet.
+  bool havePriceFor(ShipType shipType) {
+    return _prices.any((element) => element.shipType == shipType);
+  }
 }
 
 /// Record shipyard data and log the result.

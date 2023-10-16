@@ -450,18 +450,19 @@ class CentralCommand {
 
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
-    final oreHoundCount = _shipCache.countOfType(ShipType.ORE_HOUND);
-    final heavyFreighterCount =
-        _shipCache.countOfType(ShipType.HEAVY_FREIGHTER);
-    final probeCount = _shipCache.countOfType(ShipType.PROBE);
+    bool _shouldBuy(ShipType shipType, int count) {
+      return caches.shipyardPrices.havePriceFor(shipType) &&
+          _shipCache.countOfType(shipType) < count;
+    }
+
     // This should be a multiple of our squad size so we always have
     // full squads.
-    if (oreHoundCount < 80) {
+    if (_shouldBuy(ShipType.ORE_HOUND, 80)) {
       // oreHoundBuyJob currently only looks in our system.
       return _oreHoundBuyJob(caches);
-    } else if (heavyFreighterCount < 10) {
+    } else if (_shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
-    } else if (probeCount < 10) {
+    } else if (_shouldBuy(ShipType.PROBE, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.PROBE);
     }
     return null;
