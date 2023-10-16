@@ -160,6 +160,11 @@
   "description": "A waypoint enveloped in a powerful magnetic field, potentially affecting spacecraft systems, and creating unique phenomena such as the concentration of exotic matter and graviton emitters."
  },
  {
+  "symbol": "SURVEILLANCE_OUTPOST",
+  "name": "Surveillance Outpost",
+  "description": "A covert installation tasked with monitoring and collecting intelligence on nearby regions and potential threats."
+ },
+ {
   "symbol": "SWAMP",
   "name": "Swamp",
   "description": "A damp, murky world characterized by its wetlands and abundant vegetation, fostering a diverse ecosystem and offering potential resources like hydrocarbons and exotic plant life."
