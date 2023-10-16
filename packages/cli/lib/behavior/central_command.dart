@@ -517,13 +517,6 @@ class CentralCommand {
     return true;
   }
 
-  /// How many haulers do we have?
-  int get numberOfHaulers =>
-      _shipCache.frameCounts[ShipFrameSymbolEnum.LIGHT_FREIGHTER] ?? 0;
-
-  /// The minimum credits we should have to buy a new ship.
-  int get minimumCreditsForTrading => numberOfHaulers * 10000;
-
   /// Computes the number of units needed to fulfill the given [contract].
   /// Includes units in flight.
   @visibleForTesting
