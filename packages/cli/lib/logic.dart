@@ -38,7 +38,7 @@ Future<void> advanceShips(
   //   logger.warn('Reconnected to database.');
   // }
 
-  const allowableScheduleLag = Duration(milliseconds: 500);
+  const allowableScheduleLag = Duration(milliseconds: 1000);
 
   // loop over all ships and advance them.
   for (var i = 0; i < loopCount; i++) {

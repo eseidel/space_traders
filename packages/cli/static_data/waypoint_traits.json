@@ -20,6 +20,11 @@
   "description": "A waypoint rich in common metal ores like iron, copper, and aluminum, essential for construction and manufacturing."
  },
  {
+  "symbol": "CORROSIVE_ATMOSPHERE",
+  "name": "Corrosive Atmosphere",
+  "description": "A hostile environment with an atmosphere that can rapidly degrade materials and equipment, requiring advanced engineering solutions to ensure the safety and longevity of structures and vehicles."
+ },
+ {
   "symbol": "CORRUPT",
   "name": "Corrupt",
   "description": "Plagued by underhanded dealings and illicit activities, this waypoint has a reputation for its pervasive criminal element."
