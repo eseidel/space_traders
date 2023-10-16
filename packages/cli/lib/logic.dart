@@ -38,6 +38,8 @@ Future<void> advanceShips(
   //   logger.warn('Reconnected to database.');
   // }
 
+  const allowableScheduleLag = Duration(milliseconds: 500);
+
   // loop over all ships and advance them.
   for (var i = 0; i < loopCount; i++) {
     // Make sure we check every time in case a ship was added.
@@ -45,6 +47,7 @@ Future<void> advanceShips(
 
     final entry = waiter.nextShip();
     final shipSymbol = entry.shipSymbol;
+    final waitUntil = entry.waitUntil;
 
     await _waitIfNeeded(entry);
     final ship = caches.ships.ship(shipSymbol);
@@ -53,8 +56,19 @@ Future<void> advanceShips(
     }
     try {
       final before = DateTime.timestamp();
+      if (waitUntil != null) {
+        final lag = before.difference(waitUntil);
+        if (lag > allowableScheduleLag) {
+          shipWarn(
+            ship,
+            'scheduled for ${waitUntil.toLocal()} '
+            'but it is ${approximateDuration(lag)} late',
+          );
+        }
+      }
+
       final requestsBefore = api.requestCounts.totalRequests;
-      final waitUntil = await advanceShipBehavior(
+      final nextWaitUntil = await advanceShipBehavior(
         api,
         db,
         centralCommand,
@@ -77,7 +91,7 @@ Future<void> advanceShips(
           'expected ${expectedSeconds.toStringAsFixed(1)}s',
         );
       }
-      waiter.scheduleShip(shipSymbol, waitUntil);
+      waiter.scheduleShip(shipSymbol, nextWaitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when
       // running the script fresh with no state while a ship is still on
