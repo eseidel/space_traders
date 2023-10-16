@@ -8,21 +8,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   // Import all info from our current ships.
   for (final ship in shipCache.ships) {
-    staticCaches.mounts.addAll(ship.mounts);
-    staticCaches.modules.addAll(ship.modules);
-    staticCaches.engines.add(ship.engine);
-    staticCaches.reactors.add(ship.reactor);
+    recordShip(staticCaches, ship);
   }
 
   // Import all info from cached shipyard ships (which for whatever reason
   // didn't import into parts caches earlier).  This is likely no longer
   // needed, was only added during bringup of the static_data caches.
-  for (final ship in staticCaches.shipyardShips.values) {
-    staticCaches.mounts.addAll(ship.mounts);
-    staticCaches.modules.addAll(ship.modules);
-    staticCaches.engines.add(ship.engine);
-    staticCaches.reactors.add(ship.reactor);
-  }
+  recordShipyardShips(staticCaches, staticCaches.shipyardShips.values);
 }
 
 void main(List<String> args) async {

@@ -139,7 +139,7 @@ Future<DateTime?> advanceBuyShip(
       shipyard.waypointSymbol,
       shipType,
     );
-    // verifyShipMatchesTemplate(ship, shipType);
+    recordShip(caches.static, result.ship);
   } on ApiException catch (e) {
     // ApiException 400: {"error":{"message":"Failed to purchase ship.
     // Agent has insufficient funds.","code":4216,

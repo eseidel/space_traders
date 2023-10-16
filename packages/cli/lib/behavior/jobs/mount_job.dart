@@ -82,7 +82,7 @@ Future<JobResult> doMountJob(
     mountJob.mountSymbol,
   );
   // Add the new mount to our static_data cache in case it's new to us.
-  caches.static.mounts.addAll(ship.mounts);
+  recordShip(caches.static, ship);
   // We're done.
   state.isComplete = true;
   shipInfo(ship, 'Mounted ${mountJob.mountSymbol}.');

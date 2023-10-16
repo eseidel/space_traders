@@ -321,3 +321,11 @@ void recordShipyardShips(StaticCaches staticCaches, List<ShipyardShip> ships) {
     staticCaches.reactors.add(ship.reactor);
   }
 }
+
+/// Records a Ship's components into the caches.
+void recordShip(StaticCaches staticCaches, Ship ship) {
+  staticCaches.mounts.addAll(ship.mounts);
+  staticCaches.modules.addAll(ship.modules);
+  staticCaches.engines.add(ship.engine);
+  staticCaches.reactors.add(ship.reactor);
+}
