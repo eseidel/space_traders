@@ -666,7 +666,7 @@ MarketTrip? findBestMarketToSell(
           '${creditsString(extraEarnings)} extra '
           '(including ${creditsString(-extraFuelCost)} for fuel) '
           'over ${approximateDuration(extraTime)} '
-          '($earningsPerSecond/s)');
+          '(${earningsPerSecond.toStringAsFixed(1)}/s)');
       best = trip;
       break;
     } else {
