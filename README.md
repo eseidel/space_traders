@@ -739,7 +739,7 @@ X1-DK86-91295E-DC6E8D SMALL ICE_WATER, QUARTZ_SAND, AMMONIA_ICE, ICE_WATER ev 0c
 🛸#1  🔭 1x at X1-DK86-91295E
 X1-DK86-91295E-D0E02B SMALL ICE_WATER, ICE_WATER, SILICON_CRYSTALS, SILICON_CRYSTALS, SILICON_CRYSTALS ev 0c
 
-# Mount buying and ship-buying compete at the beginning
+### Mount buying and ship-buying compete at the beginning
 
 🛸#6  Starting buy mount MOUNT_MINING_LASER_II
 🛸#6  Beginning route to X1-DK86-32917D (1m)
@@ -750,3 +750,13 @@ X1-DK86-91295E-D0E02B SMALL ICE_WATER, ICE_WATER, SILICON_CRYSTALS, SILICON_CRYS
 🛸#5  Bought ship: ESEIDEL-B
 [WARN] 🛸#5  Purchased ESEIDEL-B (SHIP_ORE_HOUND)! Disabling Behavior.buyShip for ESEIDEL-5 for 10m.
 [WARN] Adding missing ship ESEIDEL-B
+
+### Check to see if ships are more common at certain waypoint types
+
+e.g. orbital stations.
+
+If they are, we might prioritize those first in exploration.
+
+### Write a tool to see how many waypoints have certain traits.
+
+### Examine RARE_METAL_DEPOSITS sites and see if they might be worth mining.
