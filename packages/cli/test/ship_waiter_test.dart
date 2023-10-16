@@ -46,8 +46,8 @@ void main() {
         DateTime.now().add(const Duration(seconds: 1000)),
       )
       ..scheduleShip(nullTime, null);
-    expect(waiter.nextShip().shipSymbol, nullTime);
-    expect(waiter.nextShip().shipSymbol, short);
-    expect(waiter.nextShip().shipSymbol, long);
+    expect(waiter.nextShip().shipSymbol, nullTimeSymbol);
+    expect(waiter.nextShip().shipSymbol, shortSymbol);
+    expect(waiter.nextShip().shipSymbol, longSymbol);
   });
 }
