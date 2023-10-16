@@ -91,7 +91,7 @@ Future<void> advanceShips(
           'expected ${expectedSeconds.toStringAsFixed(1)}s',
         );
       }
-      waiter.scheduleShip(shipSymbol, nextWaitUntil);
+      waiter.scheduleShip(ship, nextWaitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when
       // running the script fresh with no state while a ship is still on
@@ -104,7 +104,7 @@ Future<void> advanceShips(
       final difference = expiration.difference(DateTime.timestamp());
       // shipInfo(ship, '${e.message} $stackTrace');
       shipInfo(ship, '🥶 for ${approximateDuration(difference)}');
-      waiter.scheduleShip(shipSymbol, expiration);
+      waiter.scheduleShip(ship, expiration);
     }
   }
 
