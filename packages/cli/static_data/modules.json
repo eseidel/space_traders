@@ -24,6 +24,18 @@
   }
  },
  {
+  "symbol": "MODULE_ENVOY_QUARTERS_I",
+  "capacity": 1,
+  "range": null,
+  "name": "Envoy Quarters",
+  "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys.",
+  "requirements": {
+   "power": 2,
+   "crew": 5,
+   "slots": 1
+  }
+ },
+ {
   "symbol": "MODULE_JUMP_DRIVE_I",
   "capacity": null,
   "range": 500,
@@ -60,6 +72,42 @@
   }
  },
  {
+  "symbol": "MODULE_PASSENGER_CABIN_I",
+  "capacity": 30,
+  "range": null,
+  "name": "Passenger Cabin",
+  "description": "A module that provides living space and amenities for passengers.",
+  "requirements": {
+   "power": 2,
+   "crew": 2,
+   "slots": 1
+  }
+ },
+ {
+  "symbol": "MODULE_SCIENCE_LAB_I",
+  "capacity": null,
+  "range": null,
+  "name": "Science Lab",
+  "description": "A specialized module equipped with advanced instruments and equipment for scientific research and analysis.",
+  "requirements": {
+   "power": 2,
+   "crew": 6,
+   "slots": 2
+  }
+ },
+ {
+  "symbol": "MODULE_SHIELD_GENERATOR_I",
+  "capacity": null,
+  "range": null,
+  "name": "Shield Generator",
+  "description": "A basic shield generator that provides protection against incoming weapons fire and other hazards.",
+  "requirements": {
+   "power": 3,
+   "crew": 2,
+   "slots": 1
+  }
+ },
+ {
   "symbol": "MODULE_WARP_DRIVE_I",
   "capacity": null,
   "range": 2000,
@@ -69,6 +117,18 @@
    "power": 3,
    "crew": 2,
    "slots": 1
+  }
+ },
+ {
+  "symbol": "MODULE_WARP_DRIVE_II",
+  "capacity": null,
+  "range": 6000,
+  "name": "Warp Drive II",
+  "description": "An advanced warp drive that allows for longer-range interstellar travel with improved reliability.",
+  "requirements": {
+   "power": 5,
+   "crew": 8,
+   "slots": 2
   }
  }
 ]

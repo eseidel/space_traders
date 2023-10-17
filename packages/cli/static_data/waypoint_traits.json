@@ -120,6 +120,11 @@
   "description": "A source of valuable metals like gold, silver, and platinum, as well as their ores, prized for their rarity, beauty, and various applications."
  },
  {
+  "symbol": "RARE_METAL_DEPOSITS",
+  "name": "Rare Metal Deposits",
+  "description": "A treasure trove of scarce metal ores such as uranite and meritium, highly sought after for their unique properties and uses."
+ },
+ {
   "symbol": "RESEARCH_FACILITY",
   "name": "Research Facility",
   "description": "A state-of-the-art institution dedicated to scientific research and development, often focusing on specific areas of expertise."
