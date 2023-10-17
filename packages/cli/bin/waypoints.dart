@@ -12,10 +12,17 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       traitCounts[trait] = (traitCounts[trait] ?? 0) + 1;
     }
   }
-  for (final trait in WaypointTraitSymbolEnum.values) {
+  final symbols = WaypointTraitSymbolEnum.values.toList()
+    ..sort((a, b) {
+      final aCount = traitCounts[b] ?? 0;
+      final bCount = traitCounts[a] ?? 0;
+      return aCount.compareTo(bCount);
+    });
+
+  for (final trait in symbols) {
     final count = traitCounts[trait];
     if (count != null) {
-      logger.info('Waypoint trait $trait: $count');
+      logger.info('$trait: $count');
     }
   }
 }

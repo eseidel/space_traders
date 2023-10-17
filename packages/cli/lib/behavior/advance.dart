@@ -68,15 +68,23 @@ Future<DateTime?> advanceShipBehavior(
 }) async {
   final state =
       await centralCommand.loadBehaviorState(ship, caches.agent.agent.credits);
-  final navResult = await continueNavigationIfNeeded(
-    api,
-    ship,
-    state,
-    caches.ships,
-    caches.systems,
-    centralCommand,
-    getNow: getNow,
-  );
+
+  final NavResult navResult;
+  try {
+    navResult = await continueNavigationIfNeeded(
+      api,
+      ship,
+      state,
+      caches.ships,
+      caches.systems,
+      centralCommand,
+      getNow: getNow,
+    );
+  } on NavigationException catch (e) {
+    logger.err('Error advancing ship behavior: $e');
+    caches.behaviors.deleteBehavior(ship.shipSymbol);
+    return null;
+  }
   if (navResult.shouldReturn()) {
     return navResult.waitTime;
   }

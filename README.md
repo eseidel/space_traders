@@ -760,3 +760,23 @@ If they are, we might prioritize those first in exploration.
 ### Write a tool to see how many waypoints have certain traits.
 
 ### Examine RARE_METAL_DEPOSITS sites and see if they might be worth mining.
+
+### Died during navigation?
+
+🛸#3D ✈️  to X1-DK86-14693D, -48s left
+Unhandled exception:
+Invalid argument(s): No action starting from X1-DK86-14693D
+#0      RoutePlan.nextActionFrom (package:types/route.dart:149:7)
+#1      continueNavigationIfNeeded (package:cli/nav/navigation.dart:199:28)
+#2      advanceShipBehavior (package:cli/behavior/advance.dart:71:27)
+<asynchronous suspension>
+#3      advanceShips (package:cli/logic.dart:71:29)
+<asynchronous suspension>
+#4      logic (package:cli/logic.dart:184:7)
+<asynchronous suspension>
+#5      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:184:3)
+<asynchronous suspension>
+#6      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:190:7)
+<asynchronous suspension>
+#7      main (file:///root/space_traders/packages/cli/bin/cli.dart:188:3)
+<asynchronous suspension>

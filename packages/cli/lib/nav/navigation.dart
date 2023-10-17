@@ -150,6 +150,15 @@ void _verifyJumpTime(
   );
 }
 
+class NavigationException implements Exception {
+  NavigationException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'NavigationException: $message';
+}
+
 /// Continue navigation if needed, returning the wait time if so.
 /// Reads the destination from the ship's behavior state.
 Future<NavResult> continueNavigationIfNeeded(
@@ -197,6 +206,10 @@ Future<NavResult> continueNavigationIfNeeded(
     return NavResult._continueAction();
   }
   final action = routePlan.nextActionFrom(ship.waypointSymbol);
+  if (action == null) {
+    throw NavigationException('No action for ${ship.waypointSymbol} '
+        'in route plan, likely off course.');
+  }
   final actionStart = systemsCache.waypointFromSymbol(action.startSymbol);
   final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
   await undockIfNeeded(api, shipCache, ship);

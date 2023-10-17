@@ -143,10 +143,10 @@ class RoutePlan {
       Duration(seconds: actions.fold<int>(0, (a, b) => a + b.duration));
 
   /// Returns the next action to take from the given waypoint.
-  RouteAction nextActionFrom(WaypointSymbol waypointSymbol) {
+  RouteAction? nextActionFrom(WaypointSymbol waypointSymbol) {
     final index = actions.indexWhere((e) => e.startSymbol == waypointSymbol);
     if (index == -1) {
-      throw ArgumentError('No action starting from $waypointSymbol');
+      return null;
     }
     return actions[index];
   }
