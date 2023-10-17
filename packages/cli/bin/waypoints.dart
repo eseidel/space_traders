@@ -6,16 +6,16 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final waypointCount = chartingCache.waypointCount;
   logger.info('Waypoint count: $waypointCount');
 
-  final traitCounts = <String, int>{};
-  for (final waypoint in chartingCache.waypoints) {
-    for (final trait in waypoint.traits) {
+  final traitCounts = <WaypointTraitSymbolEnum, int>{};
+  for (final value in chartingCache.values) {
+    for (final trait in value.traitSymbols) {
       traitCounts[trait] = (traitCounts[trait] ?? 0) + 1;
     }
   }
   for (final trait in WaypointTraitSymbolEnum.values) {
-    final count = traitCounts[trait.value];
+    final count = traitCounts[trait];
     if (count != null) {
-      logger.info('Waypoint trait ${trait.value}: $count');
+      logger.info('Waypoint trait $trait: $count');
     }
   }
 }

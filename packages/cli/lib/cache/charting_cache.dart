@@ -106,7 +106,6 @@ class ChartingCache extends JsonStore<_Record> {
   Map<WaypointSymbol, ChartedValues> get _valuesBySymbol => record;
 
   /// The charted values.
-  @visibleForTesting
   Iterable<ChartedValues> get values => _valuesBySymbol.values;
 
   /// The number of waypoints in the cache.
