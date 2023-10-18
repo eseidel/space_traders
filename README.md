@@ -757,11 +757,11 @@ e.g. orbital stations.
 
 If they are, we might prioritize those first in exploration.
 
-### Write a tool to see how many waypoints have certain traits.
-
 ### Examine RARE_METAL_DEPOSITS sites and see if they might be worth mining.
 
 ### Died during navigation?
+
+This is fixed but needs a test.
 
 🛸#3D ✈️  to X1-DK86-14693D, -48s left
 Unhandled exception:
