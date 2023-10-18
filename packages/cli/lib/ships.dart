@@ -25,6 +25,56 @@ extension ShipTypeToFrame on ShipyardShipCache {
   ShipFrameSymbolEnum? shipFrameFromType(ShipType type) {
     return this[type]?.frame.symbol;
   }
+
+  /// Make a new ship of a given type.
+  @visibleForTesting
+  Ship? shipForTest(
+    ShipType shipType, {
+    ShipSymbol? shipSymbol,
+    FactionSymbols? factionSymbol,
+    SystemWaypoint? origin,
+    DateTime? now,
+  }) {
+    final symbolString = shipSymbol?.symbol ?? 'S-1';
+    final factionString = factionSymbol?.value ?? 'COSMIC';
+    final waypoint = origin ??
+        SystemWaypoint(
+          symbol: 'A-B-C',
+          type: WaypointType.PLANET,
+          x: 0,
+          y: 0,
+        );
+    final arrival = now ?? DateTime.utc(2021);
+
+    final shipyardShip = this[shipType];
+    if (shipyardShip == null) return null;
+
+    final config = _shipConfigs.firstWhereOrNull((c) => c.type == shipType);
+    if (config == null) return null;
+
+    return Ship(
+      symbol: symbolString,
+      registration: ShipRegistration(
+        factionSymbol: factionString,
+        name: symbolString,
+        role: config.role,
+      ),
+      cooldown: Cooldown(
+        shipSymbol: symbolString,
+        remainingSeconds: 0,
+        totalSeconds: 0,
+      ),
+      nav: _makeShipNav(origin: waypoint, now: arrival),
+      crew: _crewFromShipyardShip(shipyardShip),
+      frame: shipyardShip.frame,
+      reactor: shipyardShip.reactor,
+      engine: shipyardShip.engine,
+      cargo: _cargoFromShipyardShip(shipyardShip),
+      fuel: _fuelFromShipyardShip(shipyardShip),
+      modules: shipyardShip.modules,
+      mounts: shipyardShip.mounts,
+    );
+  }
 }
 
 /// Provides Ship data that ShipyardShip does not.
@@ -43,7 +93,15 @@ class _ShipConfig {
 
 const _shipConfigs = [
   _ShipConfig(type: ShipType.PROBE, role: ShipRole.SATELLITE),
+  _ShipConfig(type: ShipType.MINING_DRONE, role: ShipRole.EXCAVATOR),
+  _ShipConfig(type: ShipType.INTERCEPTOR, role: ShipRole.INTERCEPTOR),
+  _ShipConfig(type: ShipType.LIGHT_HAULER, role: ShipRole.HAULER),
   _ShipConfig(type: ShipType.COMMAND_FRIGATE, role: ShipRole.COMMAND),
+  _ShipConfig(type: ShipType.EXPLORER, role: ShipRole.EXPLORER),
+  _ShipConfig(type: ShipType.HEAVY_FREIGHTER, role: ShipRole.HAULER),
+  _ShipConfig(type: ShipType.LIGHT_SHUTTLE, role: ShipRole.TRANSPORT),
+  _ShipConfig(type: ShipType.ORE_HOUND, role: ShipRole.EXCAVATOR),
+  _ShipConfig(type: ShipType.REFINING_FREIGHTER, role: ShipRole.REFINERY),
 ];
 
 ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
@@ -107,45 +165,5 @@ ShipFuel _fuelFromShipyardShip(ShipyardShip ship) {
   return ShipFuel(
     current: ship.frame.fuelCapacity,
     capacity: ship.frame.fuelCapacity,
-  );
-}
-
-/// Make a new ship of a given type.
-@visibleForTesting
-Ship? makeShipForTest({
-  required StaticCaches caches,
-  required ShipType type,
-  required ShipSymbol shipSymbol,
-  required FactionSymbols factionSymbol,
-  required SystemWaypoint origin,
-  required DateTime now,
-}) {
-  final shipyardShip = caches.shipyardShips[type];
-  if (shipyardShip == null) return null;
-
-  final config = _shipConfigs.firstWhereOrNull((c) => c.type == type);
-  if (config == null) return null;
-
-  return Ship(
-    symbol: shipSymbol.symbol,
-    registration: ShipRegistration(
-      factionSymbol: factionSymbol.value,
-      name: shipSymbol.symbol,
-      role: config.role,
-    ),
-    cooldown: Cooldown(
-      shipSymbol: shipSymbol.symbol,
-      remainingSeconds: 0,
-      totalSeconds: 0,
-    ),
-    nav: _makeShipNav(origin: origin, now: now),
-    crew: _crewFromShipyardShip(shipyardShip),
-    frame: shipyardShip.frame,
-    reactor: shipyardShip.reactor,
-    engine: shipyardShip.engine,
-    cargo: _cargoFromShipyardShip(shipyardShip),
-    fuel: _fuelFromShipyardShip(shipyardShip),
-    modules: shipyardShip.modules,
-    mounts: shipyardShip.mounts,
   );
 }

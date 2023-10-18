@@ -42,4 +42,10 @@ void main() {
       expect(frame, isNotNull, reason: 'no frame for type $type');
     }
   });
+
+  test('makeShip crew', () {
+    final ship = shipyardShips.shipForTest(ShipType.ORE_HOUND);
+    expect(ship!.crew.current, 32);
+    // Also check COMMAND_FRIGATE has 59 crew.
+  });
 }
