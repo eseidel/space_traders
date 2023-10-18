@@ -780,3 +780,31 @@ Invalid argument(s): No action starting from X1-DK86-14693D
 <asynchronous suspension>
 #7      main (file:///root/space_traders/packages/cli/bin/cli.dart:188:3)
 <asynchronous suspension>
+
+
+### Handshake exception brought down client.
+
+Unhandled exception:
+HandshakeException: Connection terminated during handshake
+
+[WARN] Failed to parse exception json: FormatException: Unexpected character (at character 1)
+Exception occurred: POST /my/ships/ESEIDEL-7/jump
+^
+
+Unhandled exception:
+ApiException 400: Exception occurred: POST /my/ships/ESEIDEL-7/jump (Inner exception: TimeoutException after 0:00:30.000000: Future not completed)
+
+
+#0      ApiClient.invokeAPI (package:openapi/api_client.dart:164:7)
+<asynchronous suspension>
+#1      FleetApi.jumpShip (package:openapi/api/fleet_api.dart:1187:22)
+<asynchronous suspension>
+#2      _useJumpGateAndLogInner (package:cli/net/actions.dart:409:7)
+<asynchronous suspension>
+#3      useJumpGateAndLog (package:cli/net/actions.dart:427:9)
+<asynchronous suspension>
+#4      continueNavigationIfNeeded (package:cli/nav/navigation.dart:222:11)
+<asynchronous suspension>
+#5      advanceShipBehavior (package:cli/behavior/advance.dart:74:17)
+<asynchronous suspension>
+#6      advanceShips (package:cli/logic.dart:71:29)
