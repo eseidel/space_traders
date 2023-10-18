@@ -150,9 +150,12 @@ void _verifyJumpTime(
   );
 }
 
+/// Exception thrown when navigation fails.
 class NavigationException implements Exception {
+  /// Create a new navigation exception.
   NavigationException(this.message);
 
+  /// Message for this exception.
   final String message;
 
   @override

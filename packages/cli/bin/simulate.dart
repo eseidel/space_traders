@@ -127,6 +127,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipCache = ShipCache.loadCached(fs)!;
   final shipyardPrices = ShipyardPrices.load(fs);
   final shipyardShips = ShipyardShipCache.load(fs);
+  final shipMounts = ShipMountCache.load(fs);
 
   final hq = agentCache.headquarters(systemsCache);
   final hqMine = systemsCache
@@ -138,17 +139,18 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   // TODO(eseidel): Try light haulers?
   const haulerType = ShipType.HEAVY_FREIGHTER;
-  const unitsPerHaulerCycle = 180;
+  final unitsPerHaulerCycle = shipyardShips.capacityForShipType(haulerType)!;
 
   const surveyorType = ShipType.ORE_HOUND;
   final surveyorDefaultMounts = kOreHoundDefault.mounts;
   final surveyorMounts = kSurveyOnlyTemplate.mounts;
-  const surveysPerCycle = 6; // 3xL2 surveyors
+  final surveysPerCycle =
+      surveysExpectedPerSurveyWithMounts(shipMounts, surveyorMounts);
 
   const minerType = ShipType.ORE_HOUND;
   final minerDefaultMounts = kOreHoundDefault.mounts;
   final minerMounts = kMineOnlyTemplate.mounts;
-  const unitsPerMineCycle = 60;
+  final unitsPerMineCycle = shipyardShips.capacityForShipType(minerType)!;
 
   // https://discord.com/channels/792864705139048469/792864705139048472/1159170353738825781
   // const diamondRatioToDeposits =

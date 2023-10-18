@@ -2,6 +2,7 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
+import 'package:types/mount.dart';
 
 /// Map from ship type to ship frame symbol.
 extension ShipTypeToFrame on ShipyardShipCache {
@@ -26,8 +27,12 @@ extension ShipTypeToFrame on ShipyardShipCache {
     return this[type]?.frame.symbol;
   }
 
+  /// Map from ship type to cargo capacity.
+  int? capacityForShipType(ShipType shipType) {
+    return shipForTest(shipType)?.cargo.capacity;
+  }
+
   /// Make a new ship of a given type.
-  @visibleForTesting
   Ship? shipForTest(
     ShipType shipType, {
     ShipSymbol? shipSymbol,
@@ -52,6 +57,8 @@ extension ShipTypeToFrame on ShipyardShipCache {
     final config = _shipConfigs.firstWhereOrNull((c) => c.type == shipType);
     if (config == null) return null;
 
+    // We're not copying the sub-objects here, which could be a problem
+    // if callers start to modify them.
     return Ship(
       symbol: symbolString,
       registration: ShipRegistration(
@@ -147,11 +154,9 @@ ShipCrew _crewFromShipyardShip(ShipyardShip ship) {
 }
 
 ShipCargo _cargoFromShipyardShip(ShipyardShip ship) {
-  // There is only one cargo module for now.
-  final cargoModules = [ShipModuleSymbolEnum.CARGO_HOLD_I];
   // Sum up the cargo from modules.
   final cargoCapacity = ship.modules
-      .where((m) => cargoModules.contains(m.symbol))
+      .where((m) => kCargoModules.contains(m.symbol))
       .map((m) => m.capacity!)
       .sum;
 

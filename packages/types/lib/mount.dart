@@ -3,6 +3,23 @@ import 'package:more/collection.dart';
 import 'package:types/api.dart';
 import 'package:types/behavior.dart';
 
+/// There is only one cargo module for now.
+final kCargoModules = {ShipModuleSymbolEnum.CARGO_HOLD_I};
+
+/// The symbols of all laser mounts.
+final kLaserMountSymbols = {
+  ShipMountSymbolEnum.MINING_LASER_I,
+  ShipMountSymbolEnum.MINING_LASER_II,
+  ShipMountSymbolEnum.MINING_LASER_III,
+};
+
+/// The symbols of all survey mounts.
+final kSurveyMountSymbols = {
+  ShipMountSymbolEnum.SURVEYOR_I,
+  ShipMountSymbolEnum.SURVEYOR_II,
+  ShipMountSymbolEnum.SURVEYOR_III,
+};
+
 /// Set of ship mount symbols.
 /// Caution: equals and hashCode are not defined for this type.
 /// Use [ShipTemplate.mountsSymbolSetEquals] instead.

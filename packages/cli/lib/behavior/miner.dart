@@ -233,25 +233,32 @@ void printSurvey(
   );
 }
 
-final _laserMountSymbols = {
-  ShipMountSymbolEnum.MINING_LASER_I,
-  ShipMountSymbolEnum.MINING_LASER_II,
-  ShipMountSymbolEnum.MINING_LASER_III,
-};
-
-final _surveyMountSymbols = {
-  ShipMountSymbolEnum.SURVEYOR_I,
-  ShipMountSymbolEnum.SURVEYOR_II,
-  ShipMountSymbolEnum.SURVEYOR_III,
-};
+/// Compute the total strength of all mounts on [ship]
+/// with symbols in [mountSymbols].
+int _strengthOfMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
+  return ship.mounts.fold(0, (sum, m) {
+    final strength = m.strength ?? 0;
+    return mountSymbols.contains(m.symbol) ? sum + strength : sum;
+  });
+}
 
 /// Compute the total strength of all laser mounts on [ship].
 int _laserMountStrength(Ship ship) {
-  return ship.mounts.fold(0, (sum, m) {
-    if (_laserMountSymbols.contains(m.symbol)) {
-      return sum + (m.strength ?? 0);
+  return _strengthOfMounts(ship, kLaserMountSymbols);
+}
+
+/// Compute the number of surveys we can expect to complete with [mounts].
+/// This is used when you have a template you want to know how many surveys
+/// you can expect to complete with, rather than a specific ship.
+int surveysExpectedPerSurveyWithMounts(
+  ShipMountCache mountCache,
+  MountSymbolSet mounts,
+) {
+  return mounts.fold(0, (sum, mountSymbol) {
+    if (!kSurveyMountSymbols.contains(mountSymbol)) {
+      return sum;
     }
-    return sum;
+    return sum + mountCache[mountSymbol]!.strength!;
   });
 }
 
@@ -266,12 +273,12 @@ int _powerUsedByMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
 
 /// Compute the total power of all laser mounts on [ship].
 int _powerUsedByLasers(Ship ship) {
-  return _powerUsedByMounts(ship, _laserMountSymbols);
+  return _powerUsedByMounts(ship, kLaserMountSymbols);
 }
 
 /// Compute the total power of all survey mounts on [ship].
 int _powerUsedBySurveyors(Ship ship) {
-  return _powerUsedByMounts(ship, _surveyMountSymbols);
+  return _powerUsedByMounts(ship, kSurveyMountSymbols);
 }
 
 /// Compute the cooldown time for an extraction by [ship].
@@ -294,7 +301,7 @@ int maxExtractedUnits(Ship ship) {
   var laserStrength = 0;
   var variance = 0;
   for (final mount in ship.mounts) {
-    if (_laserMountSymbols.contains(mount.symbol)) {
+    if (kLaserMountSymbols.contains(mount.symbol)) {
       final strength = mount.strength;
       // We could log here, this should never happen.
       if (strength == null) {

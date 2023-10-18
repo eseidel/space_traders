@@ -3,6 +3,7 @@ import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:file/local.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -284,5 +285,23 @@ void main() {
     );
     when(() => ship.mounts).thenReturn([laser1, laser2]);
     expect(cooldownTimeForExtraction(ship), 90);
+  });
+
+  test('surveysExpectedPerSurveyWithMounts', () {
+    final shipMounts = ShipMountCache.load(const LocalFileSystem());
+    expect(
+      surveysExpectedPerSurveyWithMounts(
+        shipMounts,
+        kSurveyOnlyTemplate.mounts,
+      ),
+      6,
+    );
+    expect(
+      surveysExpectedPerSurveyWithMounts(
+        shipMounts,
+        kMineAndSurveyTemplate.mounts,
+      ),
+      1,
+    );
   });
 }
