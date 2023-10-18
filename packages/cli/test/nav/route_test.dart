@@ -169,13 +169,8 @@ void main() {
     final route = planRoute(waypoint1, waypoint2);
     expect(route!.startSymbol.waypoint, waypoint1);
     expect(route.endSymbol.waypoint, waypoint2);
-    expect(
-      () => route.nextActionFrom(
-        // No actions after the last one.
-        WaypointSymbol.fromString(waypoint2),
-      ),
-      throwsArgumentError,
-    );
+    // No actions after the last one.
+    expect(route.nextActionFrom(WaypointSymbol.fromString(waypoint2)), isNull);
     // Make a sub-plan starting from the same starting point.
     final subPlan = route.subPlanStartingFrom(
       systemsCache,
