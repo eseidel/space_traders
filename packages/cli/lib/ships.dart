@@ -3,50 +3,36 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
 
-// TODO(eseidel): Move to using StaticCaches.shipyardShips instead.
-const _typeFramePairs = [
-  (ShipType.PROBE, ShipFrameSymbolEnum.PROBE),
-  (ShipType.MINING_DRONE, ShipFrameSymbolEnum.DRONE),
-  (ShipType.INTERCEPTOR, ShipFrameSymbolEnum.INTERCEPTOR),
-  (ShipType.LIGHT_HAULER, ShipFrameSymbolEnum.LIGHT_FREIGHTER),
-  (ShipType.COMMAND_FRIGATE, ShipFrameSymbolEnum.FRIGATE),
-  (ShipType.EXPLORER, ShipFrameSymbolEnum.EXPLORER),
-  (ShipType.HEAVY_FREIGHTER, ShipFrameSymbolEnum.HEAVY_FREIGHTER),
-  (ShipType.LIGHT_SHUTTLE, ShipFrameSymbolEnum.SHUTTLE),
-  (ShipType.ORE_HOUND, ShipFrameSymbolEnum.MINER),
-  (ShipType.REFINING_FREIGHTER, ShipFrameSymbolEnum.HEAVY_FREIGHTER),
-];
-
 /// Map from ship type to ship frame symbol.
-ShipType? shipTypeFromFrame(ShipFrameSymbolEnum frameSymbol) {
-  ShipType? shipType;
-  for (final pair in _typeFramePairs) {
-    if (pair.$2 != frameSymbol) {
-      continue;
+extension ShipTypeToFrame on ShipyardShipCache {
+  /// Map from ship type to ship frame symbol.
+  ShipType? shipTypeFromFrame(ShipFrameSymbolEnum frameSymbol) {
+    ShipType? shipType;
+    for (final ship in values) {
+      if (ship.frame.symbol != frameSymbol) {
+        continue;
+      }
+      if (shipType != null) {
+        // Multiple frames map to the same ship type.
+        return null;
+      }
+      shipType = ship.type;
     }
-    if (shipType != null) {
-      // Multiple frames map to the same ship type.
-      return null;
-    }
-    shipType = pair.$1;
+    return shipType;
   }
-  return shipType;
-}
 
-/// Map from ship type to ship frame symbol.
-ShipFrameSymbolEnum? shipFrameFromType(ShipType type) {
-  for (final pair in _typeFramePairs) {
-    if (pair.$1 == type) return pair.$2;
+  /// Map from ship type to ship frame symbol.
+  ShipFrameSymbolEnum? shipFrameFromType(ShipType type) {
+    return this[type]?.frame.symbol;
   }
-  return null;
 }
 
 /// Provides Ship data that ShipyardShip does not.
 /// Right now that's only Role, but it could be more in the future.
 @immutable
-class ShipConfig {
+class _ShipConfig {
   /// Create a new ship config.
-  const ShipConfig({required this.type, required this.role});
+  const _ShipConfig({required this.type, required this.role});
 
   /// ShipType this config is for.
   final ShipType type;
@@ -56,8 +42,8 @@ class ShipConfig {
 }
 
 const _shipConfigs = [
-  ShipConfig(type: ShipType.PROBE, role: ShipRole.SATELLITE),
-  ShipConfig(type: ShipType.COMMAND_FRIGATE, role: ShipRole.COMMAND),
+  _ShipConfig(type: ShipType.PROBE, role: ShipRole.SATELLITE),
+  _ShipConfig(type: ShipType.COMMAND_FRIGATE, role: ShipRole.COMMAND),
 ];
 
 ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
@@ -161,25 +147,5 @@ Ship? makeShipForTest({
     fuel: _fuelFromShipyardShip(shipyardShip),
     modules: shipyardShip.modules,
     mounts: shipyardShip.mounts,
-  );
-}
-
-/// Make an example ShipMount for a given mount symbol.
-ShipMount makeMount(ShipMountSymbolEnum mountSymbol) {
-  return ShipMount(
-    symbol: mountSymbol,
-    name: mountSymbol.value,
-    description: mountSymbol.value,
-    requirements: ShipRequirements(crew: 0),
-  );
-}
-
-/// Make an example ShipModule for a given module symbol.
-ShipModule makeModule(ShipModuleSymbolEnum moduleSymbol) {
-  return ShipModule(
-    symbol: moduleSymbol,
-    name: moduleSymbol.value,
-    description: moduleSymbol.value,
-    requirements: ShipRequirements(crew: 0),
   );
 }

@@ -126,6 +126,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final agentCache = AgentCache.loadCached(fs)!;
   final shipCache = ShipCache.loadCached(fs)!;
   final shipyardPrices = ShipyardPrices.load(fs);
+  final shipyardShips = ShipyardShipCache.load(fs);
 
   final hq = agentCache.headquarters(systemsCache);
   final hqMine = systemsCache
@@ -171,7 +172,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final ship = exampleShip(
     shipCache,
-    frame: shipFrameFromType(haulerType)!,
+    frame: shipyardShips.shipFrameFromType(haulerType)!,
     overrideLocation: hqMine,
   );
   final trips = marketsTradingSortedByDistance(

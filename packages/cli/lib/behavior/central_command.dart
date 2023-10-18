@@ -6,6 +6,7 @@ import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/ships.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -451,8 +452,11 @@ class CentralCommand {
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
     bool shouldBuy(ShipType shipType, int count) {
-      return caches.shipyardPrices.havePriceFor(shipType) &&
-          _shipCache.countOfType(shipType) < count;
+      // This should never be null for real code, but makes unit testing easier
+      // to allow a null frame here.
+      final frame = caches.static.shipyardShips.shipFrameFromType(shipType);
+      final frameCount = frame == null ? 0 : _shipCache.countOfFrame(frame);
+      return caches.shipyardPrices.havePriceFor(shipType) && frameCount < count;
     }
 
     // This should be a multiple of our squad size so we always have

@@ -1,9 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
-import 'package:cli/ships.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 
@@ -78,13 +76,9 @@ class ShipCache extends ResponseListCache<Ship> {
     return frameCounts;
   }
 
-  /// Returns the number of ships of the given [shipType] in the fleet.
-  int countOfType(ShipType shipType) {
-    final frameForType = shipFrameFromType(shipType);
-    if (frameForType == null) {
-      logger.err('Unknown frame mapping for type: $shipType');
-    }
-    return frameCounts[frameForType] ?? 0;
+  /// Returns the number of ships with the given [frame].
+  int countOfFrame(ShipFrameSymbolEnum frame) {
+    return frameCounts[frame] ?? 0;
   }
 
   /// Returns all ship symbols.

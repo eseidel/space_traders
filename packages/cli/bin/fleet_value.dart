@@ -22,10 +22,13 @@ int _costOutMounts(
 }
 
 /// Returns a map of ship frame type to count in fleet.
-Map<ShipType, int> _shipTypeCounts(List<Ship> ships) {
+Map<ShipType, int> _shipTypeCounts(
+  ShipyardShipCache shipyardShips,
+  List<Ship> ships,
+) {
   final typeCounts = <ShipType, int>{};
   for (final ship in ships) {
-    final type = shipTypeFromFrame(ship.frame.symbol)!;
+    final type = shipyardShips.shipTypeFromFrame(ship.frame.symbol)!;
     typeCounts[type] = (typeCounts[type] ?? 0) + 1;
   }
   return typeCounts;
@@ -35,15 +38,17 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipCache = ShipCache.loadCached(fs)!;
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
+  final shipyardShips = ShipyardShipCache.load(fs);
 
   logger
     ..info('Estimating fleet value at current median prices.')
     ..info('Excluding intial ships.');
 
   final purchasedShips = shipCache.ships.skip(2).toList();
-  final purchaseShipTypes =
-      purchasedShips.map((s) => shipTypeFromFrame(s.frame.symbol)!).toList();
-  final purchaseShipTypeCounts = _shipTypeCounts(purchasedShips);
+  final purchaseShipTypes = purchasedShips
+      .map((s) => shipyardShips.shipTypeFromFrame(s.frame.symbol)!)
+      .toList();
+  final purchaseShipTypeCounts = _shipTypeCounts(shipyardShips, purchasedShips);
   final shipTypes = purchaseShipTypeCounts.keys.toList()
     ..sortBy((t) => t.value);
   for (final type in shipTypes) {

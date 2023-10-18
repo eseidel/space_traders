@@ -34,7 +34,7 @@ void main() {
       {ShipFrameSymbolEnum.MINER: 2, ShipFrameSymbolEnum.FIGHTER: 1},
     );
 
-    expect(shipCache.countOfType(ShipType.ORE_HOUND), 2);
+    expect(shipCache.countOfFrame(ShipFrameSymbolEnum.MINER), 2);
   });
 
   test('describeFleet', () {
