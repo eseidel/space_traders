@@ -1,3 +1,4 @@
+import 'package:cli/ships.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

@@ -4,6 +4,7 @@ import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/ships.dart';
 import 'package:cli/trading.dart';
 
 // From SAF, surveyor ii stats:

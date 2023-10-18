@@ -3,6 +3,7 @@ import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
+import 'package:cli/ships.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 

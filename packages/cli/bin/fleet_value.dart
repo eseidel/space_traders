@@ -1,6 +1,7 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/ships.dart';
 import 'package:collection/collection.dart';
 
 Future<void> main(List<String> args) async {
