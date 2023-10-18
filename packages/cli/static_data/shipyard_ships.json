@@ -1,5 +1,189 @@
 [
  {
+  "type": "SHIP_COMMAND_FRIGATE",
+  "name": "Command Frigate",
+  "description": "A medium-sized warship that is designed for command and control operations and can be fitted with a variety of weapons and other systems.",
+  "purchasePrice": 0,
+  "frame": {
+   "symbol": "FRAME_FRIGATE",
+   "name": "Frame Frigate",
+   "description": "A medium-sized, multi-purpose spacecraft, often used for combat, transport, or support operations.",
+   "condition": null,
+   "moduleSlots": 8,
+   "mountingPoints": 5,
+   "fuelCapacity": 1200,
+   "requirements": {
+    "power": 8,
+    "crew": 25,
+    "slots": null
+   }
+  },
+  "reactor": {
+   "symbol": "REACTOR_FISSION_I",
+   "name": "Fission Reactor I",
+   "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions.",
+   "condition": null,
+   "powerOutput": 31,
+   "requirements": {
+    "power": null,
+    "crew": 8,
+    "slots": null
+   }
+  },
+  "engine": {
+   "symbol": "ENGINE_ION_DRIVE_II",
+   "name": "Ion Drive II",
+   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
+   "condition": null,
+   "speed": 30,
+   "requirements": {
+    "power": 6,
+    "crew": 8,
+    "slots": null
+   }
+  },
+  "modules": [
+   {
+    "symbol": "MODULE_CARGO_HOLD_I",
+    "capacity": 30,
+    "range": null,
+    "name": "Cargo Hold",
+    "description": "A module that increases a ship's cargo capacity.",
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": 1
+    }
+   },
+   {
+    "symbol": "MODULE_CARGO_HOLD_I",
+    "capacity": 30,
+    "range": null,
+    "name": "Cargo Hold",
+    "description": "A module that increases a ship's cargo capacity.",
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": 1
+    }
+   },
+   {
+    "symbol": "MODULE_CREW_QUARTERS_I",
+    "capacity": 40,
+    "range": null,
+    "name": "Crew Quarters",
+    "description": "A module that provides living space and amenities for the crew.",
+    "requirements": {
+     "power": 1,
+     "crew": 2,
+     "slots": 1
+    }
+   },
+   {
+    "symbol": "MODULE_CREW_QUARTERS_I",
+    "capacity": 40,
+    "range": null,
+    "name": "Crew Quarters",
+    "description": "A module that provides living space and amenities for the crew.",
+    "requirements": {
+     "power": 1,
+     "crew": 2,
+     "slots": 1
+    }
+   },
+   {
+    "symbol": "MODULE_MINERAL_PROCESSOR_I",
+    "capacity": null,
+    "range": null,
+    "name": "Mineral Processor",
+    "description": "Crushes and processes extracted minerals and ores into their component parts, filters out impurities, and containerizes them into raw storage units.",
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": 2
+    }
+   },
+   {
+    "symbol": "MODULE_JUMP_DRIVE_I",
+    "capacity": null,
+    "range": 500,
+    "name": "Jump Drive I",
+    "description": "A basic antimatter jump drive that allows for instantaneous short-range interdimensional travel.",
+    "requirements": {
+     "power": 4,
+     "crew": 10,
+     "slots": 1
+    }
+   },
+   {
+    "symbol": "MODULE_WARP_DRIVE_I",
+    "capacity": null,
+    "range": 2000,
+    "name": "Warp Drive I",
+    "description": "A basic warp drive that allows for short-range interstellar travel.",
+    "requirements": {
+     "power": 3,
+     "crew": 2,
+     "slots": 1
+    }
+   }
+  ],
+  "mounts": [
+   {
+    "symbol": "MOUNT_SENSOR_ARRAY_I",
+    "name": "Sensor Array I",
+    "description": "A basic sensor array that improves a ship's ability to detect and track other objects in space.",
+    "strength": 1,
+    "deposits": [],
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": null
+    }
+   },
+   {
+    "symbol": "MOUNT_MINING_LASER_I",
+    "name": "Mining Laser I",
+    "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects.",
+    "strength": 10,
+    "deposits": [],
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": null
+    }
+   },
+   {
+    "symbol": "MOUNT_SURVEYOR_I",
+    "name": "Surveyor I",
+    "description": "A basic survey probe that can be used to gather information about a mineral deposit.",
+    "strength": 1,
+    "deposits": [
+     "QUARTZ_SAND",
+     "SILICON_CRYSTALS",
+     "PRECIOUS_STONES",
+     "ICE_WATER",
+     "AMMONIA_ICE",
+     "IRON_ORE",
+     "COPPER_ORE",
+     "SILVER_ORE",
+     "ALUMINUM_ORE",
+     "GOLD_ORE",
+     "PLATINUM_ORE"
+    ],
+    "requirements": {
+     "power": 1,
+     "crew": 2,
+     "slots": null
+    }
+   }
+  ],
+  "crew": {
+   "required": 59,
+   "capacity": 80
+  }
+ },
+ {
   "type": "SHIP_EXPLORER",
   "name": "Explorer",
   "description": "A large, long-range spacecraft designed for deep space exploration and scientific research.",
