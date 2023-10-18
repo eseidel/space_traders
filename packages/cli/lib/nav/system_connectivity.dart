@@ -73,6 +73,8 @@ class SystemConnectivity {
   }
 
   final Map<SystemSymbol, int> _clusterBySystemSymbol;
+  final Map<int, int> _systemCountByClusterId = {};
+  final Map<int, int> _waypointCountByClusterId = {};
 
   /// Returns the number of systems reachable from [systemSymbol].
   int connectedSystemCount(SystemSymbol systemSymbol) {
@@ -80,9 +82,31 @@ class SystemConnectivity {
     if (systemClusterId == null) {
       throw ArgumentError('System $systemSymbol has no cluster');
     }
-    return _clusterBySystemSymbol.values
-        .where((v) => v == systemClusterId)
-        .length;
+    if (!_systemCountByClusterId.containsKey(systemClusterId)) {
+      _systemCountByClusterId[systemClusterId] = _clusterBySystemSymbol.values
+          .where((v) => v == systemClusterId)
+          .length;
+    }
+    return _systemCountByClusterId[systemClusterId]!;
+  }
+
+  /// Returns the number of waypoints reachable from [systemSymbol].
+  int connectedWaypointCount(
+    SystemsCache systemsCache,
+    SystemSymbol systemSymbol,
+  ) {
+    final systemClusterId = _clusterBySystemSymbol[systemSymbol];
+    if (systemClusterId == null) {
+      throw ArgumentError('System $systemSymbol has no cluster');
+    }
+    if (!_waypointCountByClusterId.containsKey(systemClusterId)) {
+      _waypointCountByClusterId[systemClusterId] = _clusterBySystemSymbol
+          .entries
+          .where((e) => e.value == systemClusterId)
+          .expand((e) => systemsCache.waypointsInSystem(e.key))
+          .length;
+    }
+    return _waypointCountByClusterId[systemClusterId]!;
   }
 
   /// Returns the cluster id for the given system.
