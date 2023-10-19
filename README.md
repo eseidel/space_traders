@@ -119,12 +119,12 @@ To sort:
 * Make it easier to re-spec miners mid cycle (without throwing away mounts).
 * Record requests per-ship?  Calculate number of requests used per cycle?
 * Simulate refining
-* Simulate gas siphoning
 * Teach Haulers how to pick up from miners.
 * Add mounts to survey results (so we can compute diamond frequency).
 * Compute survey frequency per-trade symbol.
 * Confirm survey sizes have consistent extraction rates across trade symbols.
 * Share code between MarketPrices and ShipyardPrices.
+* Make shipInfo include an emoji for the behavior.
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
@@ -132,23 +132,17 @@ Earning:
 * Fix miners to know when to leave a system (when prices are too low).
 * Teach miners how to coordinate with haulers to sell their goods further away.
 * Add refining
-* Add gas siphoning
 * Buy traders when trading is more profitable than mining, and vice versa.
 * Remove all use of maxJumps and use distance or maxWaypoints instead.
   Jumps will get the wrong answers in dense areas of the galaxy.
 * Be able to buy miners outside of the main system.
-* Calculate "wait time" when servicing a ship.
 * Try changing deal finding heuristic to only consider buy price.
 * Spread out traders across the galaxy better.
 * buy-in-a-loop for small tradeVolumes gets worse as we have more ships.
   This is likely the #1 contributor to "wait time".
   Every place we return null to loop has the same problem.
-* Record which ship generated a survey?
+* Record which ship generated a survey and with what mounts?
 * Allow ships to buy from the same location at high trade volumes?
-* Have one thread be generating instructions and another thread executing.
-  When execution hits an error, just throw it back to the generator thread.
-  Run each of the ships as separate "programs".
-  Unclear if multi-threaded will work OK with json files.
 * Make Survey selection find a value point and then look back further than
   the last 100 surveys for surveys above that value.
 * Print warnings when our predicted buy/sell price differs from actual.
@@ -181,49 +175,10 @@ Automation:
   Should disable buying behavior for less time early on?
 * Surveys.  How much surveying should we do before we start mining?
 
-UI:
-* Make shipInfo include an emoji for the behavior.
-* Add a Flutter UI.
-* Make it possible to filter for a sub-set of systems (e.g. ones with a market and a mine).
-* Show where all ships currently are.
-* Show which waypoints are charted vs. not.
-* Show which systems have a market vs. not.
-* Show which systems have a mine vs. not.
-* Show which systems have a shipyard vs. not.
-* Show which systems have a jump gate vs. not.
-
 Thoughts
 * Miners are just the "find me where to sell this" problem
 * Contracts are just the "find me where to buy this" problem
 * Arbitrage is both of those problems, should be able to share code.
-
-
-### Handle 500 errors better:
-
-🛸#20 ✈️  to X1-AP26-80647B, 00:00:00 left
-[WARN] Failed to parse exception json: FormatException: Unexpected character (at line 2, character 1)
-<html><head>
-^
-
-[WARN] Failed to parse exception json: FormatException: Unexpected character (at line 2, character 1)
-<html><head>
-^
-
-Unhandled exception:
-ApiException 500:
-<html><head>
-<meta http-equiv="content-type" content="text/html;charset=utf-8">
-<title>500 Server Error</title>
-</head>
-<body text=#000000 bgcolor=#ffffff>
-<h1>Error: Server Error</h1>
-<h2>The server encountered an error and could not complete your request.<p>Please try again in 30 seconds.</h2>
-<h2></h2>
-</body></html>
-
-#0      SystemsApi.getSystemWaypoints (package:openapi/api/systems_api.dart:394:7)
-<asynchronous suspension>
-
 
 ### Automatically handle resets:
 ApiException 401: {"error":{"message":"Failed to parse token. Token reset_date does not match the server. Server resets happen on a weekly to bi-weekly frequency during alpha. After a reset, you should re-register your agent. Expected: 2023-07-08, Actual: 2023-06-24","code":401,"data":{"expected":"2023-07-08","actual":"2023-06-24"}}}
@@ -367,58 +322,6 @@ ApiException 400: {"error":{"message":"Failed to execute jump. Ship cannot execu
 deliver 1210  COPPER_ORE to X1-FA31-74322Z in 6d for 161,510c with 32,985c upfront
 Expected profit: 125,525c
 
-### Crashed due to 500
-
-🛸#3B ✍️  market data @ X1-UK74-29935F
-🛸#3B ⛽   4 FUEL                           ⚖️    4 x    122c =   -488c -> 🏦 12,239,210c
-Unhandled exception:
-ApiException 500: {"error":{"code":500,"message":"Something unexpected went wrong! If you want to help you can file an issue here: https://github.com/SpaceTradersAPI/api-docs"}}
-#0      SystemsApi.getShipyard (package:openapi/api/systems_api.dart:235:7)
-<asynchronous suspension>
-#1      getShipyard (package:cli/net/queries.dart:55:20)
-<asynchronous suspension>
-#2      CentralCommand.visitLocalShipyard (package:cli/behavior/central_command.dart:826:22)
-<asynchronous suspension>
-#3      advanceTrader (package:cli/behavior/trader.dart:512:3)
-<asynchronous suspension>
-#4      advanceShips (package:cli/logic.dart:36:25)
-<asynchronous suspension>
-#5      logic (package:cli/logic.dart:128:7)
-<asynchronous suspension>
-#6      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:79:3)
-<asynchronous suspension>
-#7      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:85:7)
-<asynchronous suspension>
-#8      main (file:///root/space_traders/packages/cli/bin/cli.dart:83:3)
-<asynchronous suspension>
-
-And another:
-
-Unhandled exception:
-ApiException 500: {"error":{"code":500,"message":"Something unexpected went wrong! If you want to help you can file an issue here: https://github.com/SpaceTradersAPI/api-docs"}}
-#0      FleetApi.purchaseCargo (package:openapi/api/fleet_api.dart:1476:7)
-<asynchronous suspension>
-#1      purchaseCargo (package:cli/net/direct.dart:143:7)
-<asynchronous suspension>
-#2      purchaseCargoAndLog (package:cli/net/actions.dart:140:18)
-<asynchronous suspension>
-#3      purchaseTradeGoodIfPossible (package:cli/behavior/trader.dart:82:18)
-<asynchronous suspension>
-#4      _handleAtSourceWithDeal (package:cli/behavior/trader.dart:129:25)
-<asynchronous suspension>
-#5      advanceTrader (package:cli/behavior/trader.dart:680:23)
-<asynchronous suspension>
-#6      advanceShipBehavior (package:cli/behavior/advance.dart:83:23)
-<asynchronous suspension>
-#7      advanceShips (package:cli/logic.dart:51:25)
-<asynchronous suspension>
-#8      logic (package:cli/logic.dart:150:7)
-<asynchronous suspension>
-#9      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:101:3)
-<asynchronous suspension>
-#10     main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:107:7)
-<asynchronous suspension>
-#11     main (file:///root/space_traders/packages/cli/bin/cli.dart:105:3)
 
 ### Show how many more units we would by:
 🛸#61 Purchased 10 of MODULE_CREW_QUARTERS_I, still have 10 units we would like to buy, looping.
@@ -513,19 +416,6 @@ Maybe show the list of ships on it in the output?
 e.g. did the price change since when the trade was scoped vs. when it was executed?
 
 
-### Confirm System.json validity against /stats
-"The /status endpoint also gives you the total number of entities in the stats node. You could compare against that and retrigger the download."
-```
-{
-  "stats": {
-    "agents": 199,
-    "ships": 1757,
-    "systems": 12000,
-    "waypoints": 66798
-  }
-}
-```
-
 ## Confused
 
 🛸#54 🛫 to X1-UC71-90215B JUMP_GATE (39s) spent 49 fuel
@@ -550,8 +440,6 @@ Invalid argument (marketSymbol): ESEIDEL-6F is not at X1-YA22-87615D, X1-YA22-92
 #8      main (file:///root/space_traders/packages/cli/bin/cli.dart:105:3)
 <asynchronous suspension>
 
-## Use best-place-to-buy logic for ships:
-[WARN] 🛸#1  Can not buy SHIP_ORE_HOUND at X1-YA22-18767C, credits 318,996c < 1.05 * price = 1,334,568c. Disabling Behavior.buyShip for 10m.
 
 ## Teach late-start clients how to purchase traders instead of miners?
 
@@ -607,37 +495,6 @@ Bad state: No element
 ### Write a test for stability of the network queue.
 
 ### Teach network backoffs to have a limit (e.g. 128s).
-
-
-### 500s should not take down the client.
-
-🛸#6D Beginning route to X1-QH21-95970X
-Unhandled exception:
-ApiException 500: {"error":{"code":500,"message":"Something unexpected went wrong! If you want to help you can file an issue here: https://github.com/SpaceTradersAPI/api-docs"}}
-#0      FleetApi.orbitShip (package:openapi/api/fleet_api.dart:1328:7)
-<asynchronous suspension>
-#1      undockIfNeeded (package:cli/net/actions.dart:315:22)
-<asynchronous suspension>
-#2      continueNavigationIfNeeded (package:cli/nav/navigation.dart:196:3)
-<asynchronous suspension>
-#3      beingRouteAndLog (package:cli/nav/navigation.dart:73:21)
-<asynchronous suspension>
-#4      beingNewRouteAndLog (package:cli/nav/navigation.dart:43:20)
-<asynchronous suspension>
-#5      advanceTrader (package:cli/behavior/trader.dart:706:23)
-<asynchronous suspension>
-#6      advanceShipBehavior (package:cli/behavior/advance.dart:88:23)
-<asynchronous suspension>
-#7      advanceShips (package:cli/logic.dart:52:25)
-<asynchronous suspension>
-#8      logic (package:cli/logic.dart:152:7)
-<asynchronous suspension>
-#9      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:106:3)
-<asynchronous suspension>
-#10     main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:112:7)
-<asynchronous suspension>
-#11     main (file:///root/space_traders/packages/cli/bin/cli.dart:110:3)
-<asynchronous suspension>
 
 ### Navigate error after network interrupt
 
