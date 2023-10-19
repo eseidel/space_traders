@@ -179,10 +179,15 @@ Future<DateTime?> _handleAtSourceWithDeal(
   );
 }
 
-void _logCompletedDeal(Ship ship, CostedDeal completedDeal) {
+/// Logs a completed deal.
+void logCompletedDeal(
+  Ship ship,
+  CostedDeal completedDeal, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
   const cpsSlop = 1; // credits/s
   const durationSlop = 0.1; // Percent;
-  final duration = DateTime.timestamp().difference(completedDeal.startTime);
+  final duration = getNow().difference(completedDeal.startTime);
   final expectedDuration = completedDeal.expectedTime;
   final message =
       'Expected ${creditsString(completedDeal.expectedProfit)} profit '
@@ -231,7 +236,7 @@ Future<DateTime?> _handleArbitrageDealAtDestination(
   );
   // We don't yet record the completed deal anywhere.
   final completedDeal = costedDeal.byAddingTransactions(transactions);
-  _logCompletedDeal(ship, completedDeal);
+  logCompletedDeal(ship, completedDeal);
   state.isComplete = true;
   return null;
 }

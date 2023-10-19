@@ -677,4 +677,51 @@ void main() {
     );
     expect(result.isComplete, isTrue);
   });
+
+  test('logCompletedDeal', () {
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+    final costedDeal = CostedDeal(
+      deal: Deal.test(
+        sourceSymbol: start,
+        destinationSymbol: end,
+        tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+        purchasePrice: 10,
+        sellPrice: 200,
+      ),
+      cargoSize: 10,
+      transactions: [
+        Transaction.fallbackValue(),
+        Transaction.fallbackValue(),
+      ],
+      startTime: DateTime(2021).toUtc(),
+      route: RoutePlan(
+        actions: [
+          RouteAction(
+            startSymbol: start,
+            endSymbol: end,
+            type: RouteActionType.navCruise,
+            duration: 10,
+          ),
+        ],
+        fuelCapacity: 10,
+        fuelUsed: 10,
+        shipSpeed: 10,
+      ),
+      costPerFuelUnit: 100,
+    );
+    final ship = _MockShip();
+    when(() => ship.symbol).thenReturn('S-1');
+    final logger = _MockLogger();
+    DateTime getNow() => DateTime(2021).toUtc();
+    runWithLogger(
+      logger,
+      () => logCompletedDeal(ship, costedDeal, getNow: getNow),
+    );
+    verify(
+      () => logger.err(
+        '🛸#1  Expected 1,800c profit (180c/s), got -4c (-4c/s) in 00:00:00, expected 00:00:10',
+      ),
+    ).called(1);
+  });
 }

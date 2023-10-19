@@ -84,7 +84,7 @@ class Transaction {
           quantity: 1,
           tradeType: MarketTransactionTypeEnum.PURCHASE,
           perUnitPrice: 2,
-          timestamp: DateTime(2021),
+          timestamp: DateTime(2021).toUtc(),
           agentCredits: 3,
           accounting: AccountingType.goods,
           contractId: 'abcd',
