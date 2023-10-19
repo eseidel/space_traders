@@ -2,6 +2,7 @@ import 'package:db/extraction.dart';
 import 'package:db/faction.dart';
 import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
+import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart';
 import 'package:types/types.dart';
 
@@ -46,27 +47,35 @@ DatabaseConfig _defaultConfig() {
 
 /// Connect to the default local database.
 /// Logs and returns null on failure.
-Future<Database> defaultDatabase() async {
-  final db = Database(_defaultConfig());
+Future<Database> defaultDatabase({
+  PostgreSQLConnection Function(DatabaseConfig config) createConnection =
+      connectionFromConfig,
+}) async {
+  final db = Database(_defaultConfig(), createConnection: createConnection);
   await db.open();
   return db;
+}
+
+/// Create a connection from the given config.
+PostgreSQLConnection connectionFromConfig(DatabaseConfig config) {
+  return PostgreSQLConnection(
+    config.host,
+    config.port,
+    config.database,
+    username: config.username,
+    password: config.password,
+  );
 }
 
 /// Abstraction around a database connection.
 class Database {
   /// Create a new database connection.
-  Database(this.config) : _connection = connectionFromConfig(config);
-
-  /// Create a connection from the given config.
-  static PostgreSQLConnection connectionFromConfig(DatabaseConfig config) {
-    return PostgreSQLConnection(
-      config.host,
-      config.port,
-      config.database,
-      username: config.username,
-      password: config.password,
-    );
-  }
+  Database(
+    this.config, {
+    @visibleForTesting
+    PostgreSQLConnection Function(DatabaseConfig config) createConnection =
+        connectionFromConfig,
+  }) : _connection = createConnection(config);
 
   /// Insert a transaction into the database.
   Future<void> insertTransaction(Transaction transaction) async {
