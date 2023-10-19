@@ -83,7 +83,7 @@ class CentralCommand {
   Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
 
   /// Returns the mining squads for the fleet.
-  Iterable<MiningSquad> miningSquads() {
+  Iterable<MiningSquad> get miningSquads {
     return _shipCache.ships
         .where((s) => s.isMiner)
         .slices(5)
@@ -92,7 +92,7 @@ class CentralCommand {
 
   /// Returns the mining squad for the given [ship].
   MiningSquad? squadForShip(Ship ship) {
-    return miningSquads().firstWhereOrNull((s) => s.contains(ship));
+    return miningSquads.firstWhereOrNull((s) => s.contains(ship));
   }
 
   /// What template should we use for the given ship?
