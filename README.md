@@ -567,6 +567,25 @@ Write a tool to list how many surveys deep we have?
 36 /my/ships
 29 /systems/N/waypoints
 
+4482 /my/ships/N/navigate
+2991 /my/ships/N/dock
+2990 /my/ships/N/orbit
+2680 /my/ships/N/sell
+2627 /my/ships/N/extract/survey
+1571 /systems/N/waypoints/N/market
+1274 /my/ships/N/refuel
+676 /my/ships/N/jump
+652 /my/ships/N/survey
+372 /my/ships/N/purchase
+85 /systems/N/waypoints
+53 /systems/N/waypoints/N/shipyard
+22 /my/ships
+7 /my/ships/N/chart
+4 /my/contracts
+2 /my/agent
+1 /
+Total: 20489 requests.
+
 
 ### Use RefuelShipRequest to specify units to refuel.
 

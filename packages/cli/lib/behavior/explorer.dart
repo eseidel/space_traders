@@ -140,14 +140,13 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   return null;
 }
 
-Future<WaypointSymbol> _nearestHeadquarters(
-  Database db,
-  List<Faction> factions,
+/// Find the nearest headquarters to the ship's current location.
+WaypointSymbol nearestHeadquarters(
   SystemConnectivity systemConnectivity,
   SystemsCache systemsCache,
-  AgentCache agentCache,
+  List<Faction> factions,
   Ship ship,
-) async {
+) {
   final factionHqs = factions.map((e) => e.headquartersSymbol).toList();
   final startSystem = systemsCache.systemBySymbol(ship.systemSymbol);
   final reachableHqs = factionHqs
@@ -194,12 +193,10 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
       ?.waypointSymbol;
   if (destination == null) {
     shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
-    destination = await _nearestHeadquarters(
-      db,
-      caches.factions,
+    destination = nearestHeadquarters(
       caches.systemConnectivity,
       caches.systems,
-      caches.agent,
+      caches.factions,
       ship,
     );
   }
