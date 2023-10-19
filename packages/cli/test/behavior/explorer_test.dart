@@ -3,6 +3,7 @@ import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -22,6 +23,8 @@ class _MockLogger extends Mock implements Logger {}
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockSystem extends Mock implements System {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
 
@@ -101,5 +104,31 @@ void main() {
       ),
     );
     expect(waitUntil, isNull);
+  });
+
+  test('nearestHeadquarters', () {
+    final startSystemSymbol = SystemSymbol.fromString('A-B');
+    final systemConnectivity = SystemConnectivity({startSystemSymbol: 1});
+    final system = _MockSystem();
+    final fs = MemoryFileSystem.test();
+    final systems = <System>[system];
+    when(() => system.symbol).thenReturn(startSystemSymbol.system);
+    final systemsCache = SystemsCache(systems: systems, fs: fs);
+    final factions = <Faction>[
+      Faction(
+        symbol: FactionSymbols.AEGIS,
+        name: 'Aegis',
+        headquarters: 'A-B-C',
+        description: 'Aegis',
+        isRecruiting: false,
+      ),
+    ];
+    final hq = nearestHeadquarters(
+      systemConnectivity,
+      systemsCache,
+      factions,
+      startSystemSymbol,
+    );
+    expect(hq, WaypointSymbol.fromString('A-B-C'));
   });
 }

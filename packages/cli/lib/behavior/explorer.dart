@@ -145,14 +145,14 @@ WaypointSymbol nearestHeadquarters(
   SystemConnectivity systemConnectivity,
   SystemsCache systemsCache,
   List<Faction> factions,
-  Ship ship,
+  SystemSymbol startSystemSymbol,
 ) {
   final factionHqs = factions.map((e) => e.headquartersSymbol).toList();
-  final startSystem = systemsCache.systemBySymbol(ship.systemSymbol);
+  final startSystem = systemsCache.systemBySymbol(startSystemSymbol);
   final reachableHqs = factionHqs
       .where(
         (hq) => systemConnectivity.canJumpBetweenSystemSymbols(
-          ship.systemSymbol,
+          startSystemSymbol,
           hq.systemSymbol,
         ),
       )
@@ -197,7 +197,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
       caches.systemConnectivity,
       caches.systems,
       caches.factions,
-      ship,
+      ship.systemSymbol,
     );
   }
   final waitUntil = await beingNewRouteAndLog(
