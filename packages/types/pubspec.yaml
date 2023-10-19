@@ -6,15 +6,14 @@ publish_to: none
 environment:
   sdk: ^3.0.6
 
+# dependency versions should match Flutter to allow `ui` to depend on Flutter.
 dependencies:
-  # Must match Flutter verion dependencies.
   collection: ^1.17.1
-  intl: ^0.17.0
-  # We only want the model types.
+  # http is only needed for Response object for QueueResponse.
+  http: ^0.13.6
   meta: ^1.9.1
-  # Flutter 3.13.0 is pinned to collection 1.17.2
-  # So we can't use more 4.0.1+ until Flutter upgrades collection.
   more: ^4.0.0
+  # Ideally we'd only import the OpenAPI model types.
   openapi:
     path: ../openapi
 

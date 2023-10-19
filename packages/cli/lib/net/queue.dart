@@ -3,7 +3,11 @@ import 'dart:convert';
 
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:db/queue.dart';
 import 'package:http/http.dart';
+import 'package:types/queue.dart';
+
+export 'package:types/queue.dart';
 
 /// An http Client implementation which sends requests to another process
 /// through a postgres queue.
@@ -46,147 +50,6 @@ class QueuedClient extends BaseClient {
 
   @override
   void close() => _db.close();
-}
-
-/// Request queued for later execution.
-// TODO(eseidel): Move this into db package?
-class RequestRecord {
-  /// Creates a new [RequestRecord].
-  const RequestRecord({
-    required this.id,
-    required this.priority,
-    required this.request,
-  });
-
-  /// id of the request in the database, or 0 if not yet inserted.
-  final int id;
-
-  /// Priority of the request
-  final int priority;
-
-  /// The queued request
-  final QueuedRequest request;
-}
-
-/// Request queued for later execution.
-class QueuedRequest {
-  /// Creates a new [QueuedRequest].
-  const QueuedRequest({
-    required this.method,
-    required this.url,
-    required this.body,
-    required this.headers,
-  });
-
-  /// Creates an empty [QueuedRequest] with the given [url].
-  factory QueuedRequest.empty(String url) {
-    return QueuedRequest(
-      method: 'GET',
-      url: url,
-      body: '',
-      headers: {},
-    );
-  }
-
-  /// Creates a [QueuedRequest] from json.
-  factory QueuedRequest.fromJson(Map<String, dynamic> json) {
-    return QueuedRequest(
-      method: json['method'] as String,
-      url: json['url'] as String,
-      body: json['body'] as String,
-      headers: (json['headers'] as Map<String, dynamic>).cast(),
-    );
-  }
-
-  /// Converts this to json.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'method': method,
-      'url': url,
-      'body': body,
-      'headers': headers,
-    };
-  }
-
-  /// HTTP method of the request.
-  final String method;
-
-  /// URL of the request.
-  final String url;
-
-  /// Body of the request.
-  final String body;
-
-  /// Headers of the request.
-  final Map<String, String> headers;
-}
-
-/// Response record in the database.
-// TODO(eseidel): Move this into db package?
-class ResponseRecord {
-  /// Creates a new [ResponseRecord].
-  ResponseRecord({
-    required this.id,
-    required this.requestId,
-    required this.response,
-  });
-
-  /// id of the request in the database, or 0 if not yet inserted.
-  final int id;
-
-  /// request this is responding too
-  final int requestId;
-
-  /// The queued response
-  final QueuedResponse response;
-}
-
-/// Response queued for later execution.
-class QueuedResponse {
-  /// Creates a new [QueuedResponse].
-  QueuedResponse({
-    required this.body,
-    required this.statusCode,
-    required this.headers,
-  });
-
-  /// Creates a [QueuedResponse] from json.
-  factory QueuedResponse.fromJson(Map<String, dynamic> json) {
-    return QueuedResponse(
-      body: json['body'] as String,
-      statusCode: json['statusCode'] as int,
-      headers: (json['headers'] as Map<String, dynamic>).cast(),
-    );
-  }
-
-  /// Creates a [QueuedResponse] from a [Response].
-  QueuedResponse.fromResponse(Response response)
-      : this(
-          body: response.body,
-          statusCode: response.statusCode,
-          headers: response.headers,
-        );
-
-  /// Body of the response.
-  final String body;
-
-  /// Status code of the response.
-  final int statusCode;
-
-  /// Headers of the response.
-  final Map<String, String> headers;
-
-  /// Converts this to a [Response].
-  Response toResponse() => Response(body, statusCode, headers: headers);
-
-  /// Converts this to json.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'body': body,
-      'statusCode': statusCode,
-      'headers': headers,
-    };
-  }
 }
 
 /// Role of the user of this queue.

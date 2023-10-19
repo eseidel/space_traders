@@ -1,5 +1,5 @@
-import 'package:cli/net/queue.dart';
 import 'package:test/test.dart';
+import 'package:types/queue.dart';
 
 void main() {
   test('QueuedRequest roundtrip', () {
