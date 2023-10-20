@@ -265,7 +265,8 @@ extension CostedDealPrediction on CostedDeal {
   }
 
   /// The actual profit of the deal.
-  int get actualProfit => actualRevenue - actualCostOfGoodsSold;
+  int get actualProfit =>
+      actualRevenue - actualCostOfGoodsSold - actualOperationalExpenses;
 
   /// The actual profit per second of the deal.
   int get actualProfitPerSecond {
