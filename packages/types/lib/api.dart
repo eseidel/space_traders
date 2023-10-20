@@ -599,10 +599,6 @@ extension MarketTradeGoodUtils on MarketTradeGood {
 extension ShipyardUtils on Shipyard {
   /// Returns the WaypointSymbol for the shipyard.
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
-
-  /// Returns true if the Shipyard has the given ship type.
-  bool hasShipType(ShipType shipType) =>
-      shipTypes.any((s) => s.type == shipType);
 }
 
 /// Extensions onto MarketTransaction to make it easier to work with.
