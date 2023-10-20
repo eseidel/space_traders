@@ -166,4 +166,21 @@ void main() {
     // Non-mount symbols will fail however:
     expect(mountSymbolForTradeSymbol(TradeSymbol.ADVANCED_CIRCUITRY), isNull);
   });
+
+  test('Market.allowsTradeOf', () {
+    final market = Market(
+      symbol: 'S-A-W',
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: 'FUEL',
+          tradeVolume: 1,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+        ),
+      ],
+    );
+    expect(market.allowsTradeOf(TradeSymbol.FABRICS), isFalse);
+    expect(market.allowsTradeOf(TradeSymbol.FUEL), isTrue);
+  });
 }
