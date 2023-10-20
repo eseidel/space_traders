@@ -149,4 +149,45 @@ void main() {
     );
     expect(isReservedHandleException(exception), isTrue);
   });
+
+  test('isWaypointAlreadyChartedException', () {
+    final exception = ApiException(
+      400,
+      '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E", '
+      '"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
+    );
+    expect(isWaypointAlreadyChartedException(exception), isTrue);
+  });
+
+  test('isInsufficientCreditsException', () {
+    final exception = ApiException(
+      400,
+      '{"error":{"message":"Market purchase failed. Agent does not have '
+      'sufficient credits to purchase 10 unit(s) of '
+      'MODULE_MINERAL_PROCESSOR_I","code":4600,"data": '
+      '{"agentCredits":44815,"totalPrice":44930,"tradeSymbol":'
+      '"MODULE_MINERAL_PROCESSOR_I","units":10,"purchasePrice":4493}}}',
+    );
+    expect(isInsufficientCreditsException(exception), isTrue);
+  });
+
+  test('isShipNotInOrbitException', () {
+    final exception = ApiException(
+      400,
+      '{"error":{"message":"Ship action failed. Ship is not currently in '
+      'orbit at X1-PA79-91721F.","code":4236,"data":{"waypointSymbol" '
+      ':"X1-PA79-91721F"}}}',
+    );
+    expect(isShipNotInOrbitException(exception), isTrue);
+  });
+
+  test('neededCreditsFromPurchaseShipException', () {
+    final exception = ApiException(
+      400,
+      '{"error":{"message":"Failed to purchase ship. Agent has insufficient '
+      'funds.","code":4216, "data":{"creditsAvailable":116103, '
+      '"creditsNeeded":172355}}}',
+    );
+    expect(neededCreditsFromPurchaseShipException(exception), 172355);
+  });
 }
