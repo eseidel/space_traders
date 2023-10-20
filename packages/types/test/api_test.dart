@@ -170,13 +170,11 @@ void main() {
   test('Market.allowsTradeOf', () {
     final market = Market(
       symbol: 'S-A-W',
-      tradeGoods: [
-        MarketTradeGood(
-          symbol: 'FUEL',
-          tradeVolume: 1,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
-          purchasePrice: 1,
-          sellPrice: 2,
+      exports: [
+        TradeGood(
+          symbol: TradeSymbol.FUEL,
+          name: '',
+          description: '',
         ),
       ],
     );
