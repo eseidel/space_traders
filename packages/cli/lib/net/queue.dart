@@ -183,7 +183,7 @@ class NetQueue {
   /// Deletes the given request from the queue.
   Future<void> deleteRequest(RequestRecord request) async {
     // TODO(eseidel): Move this into db package.
-    await _db.connection.query(
+    await _db.connection.execute(
       'DELETE FROM request_ WHERE id = @id',
       substitutionValues: {
         'id': request.id,
@@ -198,7 +198,7 @@ class NetQueue {
   ) async {
     assert(role == QueueRole.responder, 'Only responders can respond.');
     // TODO(eseidel): Move this into db package.
-    await _db.connection.query(
+    await _db.connection.execute(
       'INSERT INTO response_ (request_id, json) '
       'VALUES (@requestId, @json)',
       substitutionValues: {
