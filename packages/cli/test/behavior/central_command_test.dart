@@ -476,7 +476,26 @@ void main() {
 
   test('sellOppsForContracts', () {
     final contractCache = _MockContractCache();
-    when(() => contractCache.activeContracts).thenReturn([]);
+    final contract = Contract(
+      id: '2',
+      factionSymbol: 'faction',
+      type: ContractTypeEnum.PROCUREMENT,
+      terms: ContractTerms(
+        deadline: DateTime(2021),
+        payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
+        deliver: [
+          ContractDeliverGood(
+            tradeSymbol: 'FUEL',
+            destinationSymbol: 'A-B-C',
+            unitsFulfilled: 0,
+            unitsRequired: 10,
+          ),
+        ],
+      ),
+      expiration: DateTime(2021),
+      deadlineToAccept: DateTime(2021),
+    );
+    when(() => contractCache.activeContracts).thenReturn([contract]);
 
     final agentCache = _MockAgentCache();
     final agent = _MockAgent();
@@ -495,6 +514,6 @@ void main() {
       contractCache,
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
     );
-    expect(sellOpps, isEmpty);
+    expect(sellOpps.toList().length, 1);
   });
 }
