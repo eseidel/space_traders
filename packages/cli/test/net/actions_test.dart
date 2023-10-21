@@ -25,6 +25,8 @@ class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
 
+class _MockShipFrame extends Mock implements ShipFrame {}
+
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
@@ -274,6 +276,9 @@ void main() {
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     const tradeSymbol = TradeSymbol.FUEL;
     final ship = _MockShip();
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
@@ -413,9 +418,124 @@ void main() {
     clearInteractions(fleetApi);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
     await refuelShip(api, agentCache, shipCache, ship, topUp: true);
+    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
+
+    // Verify our "don't refuel for short miner trips" logic.
+    clearInteractions(fleetApi);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => ship.fuel).thenReturn(
+      ShipFuel(
+        capacity: 1000,
+        current: 501,
+        // A short trip is currently < 20% of fuel capacity.
+        consumed: ShipFuelConsumed(amount: 100, timestamp: DateTime(2021)),
+      ),
+    );
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
+    verifyNever(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: any(named: 'refuelShipRequest'),
+      ),
+    );
+
+    // It does refuel if our recent trip data is missing
+    clearInteractions(fleetApi);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => ship.fuel).thenReturn(
+      ShipFuel(capacity: 1000, current: 501),
+    );
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
     verify(
       () => fleetApi.refuelShip(
         shipSymbol.symbol,
+        refuelShipRequest: RefuelShipRequest(units: 400),
+      ),
+    ).called(1);
+
+    // It does refuel if our recent trip data has a large trip
+    clearInteractions(fleetApi);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => ship.fuel).thenReturn(
+      ShipFuel(
+        capacity: 1000,
+        current: 501,
+        consumed: ShipFuelConsumed(
+          amount: 300,
+          timestamp: DateTime(2021),
+        ),
+      ),
+    );
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: RefuelShipRequest(units: 400),
+      ),
+    ).called(1);
+
+    // It will also refuel if our fuel is < 50% of capacity
+    clearInteractions(fleetApi);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => ship.fuel).thenReturn(
+      ShipFuel(
+        capacity: 1000,
+        current: 499,
+        consumed: ShipFuelConsumed(
+          amount: 100,
+          timestamp: DateTime(2021),
+        ),
+      ),
+    );
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: RefuelShipRequest(units: 500),
       ),
     ).called(1);
   });

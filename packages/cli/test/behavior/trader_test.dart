@@ -29,6 +29,8 @@ class _MockShipCargo extends Mock implements ShipCargo {}
 
 class _MockShipEngine extends Mock implements ShipEngine {}
 
+class _MockShipFrame extends Mock implements ShipFrame {}
+
 class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
@@ -246,6 +248,10 @@ void main() {
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol)
+        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');

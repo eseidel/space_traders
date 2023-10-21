@@ -263,6 +263,20 @@ bool _shouldRefuelAfterCheckingPrice(
   return true; // Refuel.
 }
 
+// Hack to prevent miners taking short trips from refueling constantly.
+bool _shouldRefuelBasedOnUsage(Ship ship) {
+  final recentFuelSpend = ship.fuel.consumed?.amount;
+  // This is currently 900 * 0.2 = 180 which is medium length trip.
+  final twentyPercentTank = ship.fuel.capacity * 0.2;
+  final takingShortTrips =
+      recentFuelSpend != null && recentFuelSpend < twentyPercentTank;
+  if (ship.isMiner && takingShortTrips) {
+    // If we're a miner, we should only refuel if we're below 50% fuel.
+    return ship.fuelPercentage < 0.5;
+  }
+  return true;
+}
+
 /// Refuel the ship if needed and log the transaction
 Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Api api,
@@ -280,6 +294,10 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   final fuelGood = market.marketTradeGood(TradeSymbol.FUEL);
   if (fuelGood == null) {
     shipWarn(ship, 'Market does not sell fuel, not refueling.');
+    return null;
+  }
+  if (!_shouldRefuelBasedOnUsage(ship)) {
+    shipInfo(ship, 'Not refueling yet due to recent fuel usage patterns.');
     return null;
   }
   if (!_shouldRefuelAfterCheckingPrice(

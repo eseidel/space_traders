@@ -178,7 +178,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   Ship ship,
   BehaviorState state,
 ) async {
-  if (ship.fuelPercentage > 0.4) {
+  if (ship.fuelPercentage > 0.3) {
     return null;
   }
   shipWarn(ship, 'Fuel critically low, routing to market.');

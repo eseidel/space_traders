@@ -22,6 +22,8 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
 
+class _MockShipEngine extends Mock implements ShipEngine {}
+
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystem extends Mock implements System {}
@@ -130,5 +132,84 @@ void main() {
       startSystemSymbol,
     );
     expect(hq, WaypointSymbol.fromString('A-B-C'));
+  });
+
+  test('routeForEmergencyFuelingIfNeeded', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final ship = _MockShip();
+    final waypointSymbol = WaypointSymbol.fromString('S-A-B');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipEngine = _MockShipEngine();
+    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.speed).thenReturn(10);
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+    final waypoint = _MockWaypoint();
+    when(() => waypoint.traits).thenReturn([
+      WaypointTrait(
+        symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+        name: 'name',
+        description: 'description',
+      ),
+    ]);
+    when(() => waypoint.symbol).thenReturn(waypointSymbol.waypoint);
+    final state = BehaviorState(const ShipSymbol('S', 1), Behavior.explorer);
+    when(() => caches.waypoints.waypoint(waypointSymbol))
+        .thenAnswer((_) => Future.value(waypoint));
+    when(() => caches.markets.marketForSymbol(waypointSymbol)).thenAnswer(
+      (_) async => Market(
+        symbol: waypointSymbol.waypoint,
+        exchange: [
+          TradeGood(
+            symbol: TradeSymbol.FUEL,
+            name: 'name',
+            description: 'description',
+          ),
+        ],
+      ),
+    );
+
+    // More than the 0.3 threshold should return null.
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 350));
+    expect(
+      await routeForEmergencyFuelingIfNeeded(
+        api,
+        db,
+        caches,
+        centralCommand,
+        waypoint,
+        ship,
+        state,
+      ),
+      isNull,
+    );
+
+    // Slightly more sophisticated smoke test.  I believe it returns null
+    // because we're already at the waypoint.
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 300));
+    final logger = _MockLogger();
+    expect(
+      await runWithLogger(
+        logger,
+        () async {
+          final result = await routeForEmergencyFuelingIfNeeded(
+            api,
+            db,
+            caches,
+            centralCommand,
+            waypoint,
+            ship,
+            state,
+          );
+          return result;
+        },
+      ),
+      isNull,
+    );
   });
 }
