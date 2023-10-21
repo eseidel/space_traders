@@ -272,6 +272,10 @@ bool _shouldRefuelBasedOnUsage(Ship ship) {
       recentFuelSpend != null && recentFuelSpend < twentyPercentTank;
   if (ship.isMiner && takingShortTrips) {
     // If we're a miner, we should only refuel if we're below 50% fuel.
+    shipDetail(
+        ship,
+        'Not refueling yet, last trip was short ($recentFuelSpend fuel)'
+        ' and at ${(100.0 * ship.fuelPercentage).toStringAsFixed(1)}% fuel.');
     return ship.fuelPercentage < 0.5;
   }
   return true;
@@ -297,7 +301,6 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
     return null;
   }
   if (!_shouldRefuelBasedOnUsage(ship)) {
-    shipInfo(ship, 'Not refueling yet due to recent fuel usage patterns.');
     return null;
   }
   if (!_shouldRefuelAfterCheckingPrice(
