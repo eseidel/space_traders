@@ -695,3 +695,11 @@ ApiException 400: Exception occurred: POST /my/ships/ESEIDEL-7/jump (Inner excep
   * Travel and sell
   * Transfer to a hauler
   * Jettison
+
+
+### Make sure drift-of-shame logic works and remove/reduce fuel guards
+
+Right now we're over aggressive at avoiding 0 fuel, when we should instead run
+our ships down to at least 25% or lower, and just make sure we have working
+DRIFT logic for when we have < 20 fuel.  2 Fuel + drifting and jump gates should
+be enough to get to fuel from pretty much anywhere in the galaxy.
