@@ -31,6 +31,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
     shipInfo(ship, 'Does not use fuel, setting flight mode to burn.');
     await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.BURN);
   }
+  // TODO: Guard against ending up with exactly 0 fuel.
   try {
     final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
     return waitUntil;
