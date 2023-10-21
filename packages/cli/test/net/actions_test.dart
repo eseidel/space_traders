@@ -1,8 +1,7 @@
-import 'package:cli/api.dart';
-import 'package:cli/cache/agent_cache.dart';
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
+import 'package:db/db.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -10,11 +9,21 @@ import 'package:types/types.dart';
 
 class _MockAgent extends Mock implements Agent {}
 
+class _MockAgentCache extends Mock implements AgentCache {}
+
 class _MockApi extends Mock implements Api {}
+
+class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
+
+class _MockMarket extends Mock implements Market {}
+
+class _MockMarketPrices extends Mock implements MarketPrices {}
+
+class _MockMarketTransaction extends Mock implements MarketTransaction {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -262,6 +271,111 @@ void main() {
           units: 10,
           shipSymbol: toSymbol.symbol,
         ),
+      ),
+    ).called(1);
+  });
+
+  test('refuelIfNeededAndLog', () async {
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    const tradeSymbol = TradeSymbol.FUEL;
+    final shipFuel = _MockShipFuel();
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.fuel).thenReturn(shipFuel);
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final shipCache = _MockShipCache();
+    final logger = _MockLogger();
+
+    final agent = _MockAgent();
+    when(() => agent.credits).thenReturn(100000);
+    final agentCache = _MockAgentCache();
+    when(() => agentCache.agent).thenReturn(agent);
+    final marketTransaction = MarketTransaction(
+      waypointSymbol: waypointSymbol.waypoint,
+      shipSymbol: shipSymbol.symbol,
+      tradeSymbol: tradeSymbol.value,
+      type: MarketTransactionTypeEnum.PURCHASE,
+      units: 100,
+      pricePerUnit: 10,
+      totalPrice: 1000,
+      timestamp: DateTime(2021),
+    );
+    final db = _MockDatabase();
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    final market = _MockMarket();
+    when(() => market.tradeGoods).thenReturn([]);
+    final marketPrices = _MockMarketPrices();
+
+    when(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: any(named: 'refuelShipRequest'),
+      ),
+    ).thenAnswer(
+      (invocation) => Future.value(
+        RefuelShip200Response(
+          data: RefuelShip200ResponseData(
+            agent: agent,
+            transaction: marketTransaction,
+            fuel: shipFuel,
+          ),
+        ),
+      ),
+    );
+
+    when(() => shipFuel.capacity).thenReturn(900);
+    when(() => shipFuel.current).thenReturn(634);
+
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
+    verify(() => logger.warn('🛸#1  Market does not sell fuel, not refueling.'))
+        .called(1);
+
+    when(() => market.tradeGoods).thenReturn([
+      MarketTradeGood(
+        symbol: tradeSymbol.value,
+        tradeVolume: 100,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 10,
+        sellPrice: 11,
+      ),
+    ]);
+
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        // TODO(eseidel): Should refill a specific number of units!
       ),
     ).called(1);
   });

@@ -684,3 +684,14 @@ ApiException 400: Exception occurred: POST /my/ships/ESEIDEL-7/jump (Inner excep
 #5      advanceShipBehavior (package:cli/behavior/advance.dart:74:17)
 <asynchronous suspension>
 #6      advanceShips (package:cli/logic.dart:71:29)
+
+### Refuel less often.
+
+### Change everything to support c/r in addition to c/s
+
+* Create a new hauler behavior that sends haulers to mines to take goods.
+* Teach Miners to decide whether to:
+  * Sell local
+  * Travel and sell
+  * Transfer to a hauler
+  * Jettison
