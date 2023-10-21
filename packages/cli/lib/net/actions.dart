@@ -290,38 +290,28 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
     return null;
   }
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
-  try {
-    final data = await refuelShip(api, agentCache, shipCache, ship);
-    final marketTransaction = data.transaction;
-    final agent = agentCache.agent;
-    logMarketTransaction(
-      ship,
-      marketPrices,
-      agent,
-      marketTransaction,
-      transactionEmoji: '⛽',
-    );
-    final transaction = Transaction.fromMarketTransaction(
-      marketTransaction,
-      agent.credits,
-      AccountingType.fuel,
-    );
-    await db.insertTransaction(transaction);
-    // Reset flight mode on refueling.
-    if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
-      shipInfo(ship, 'Resetting flight mode to cruise');
-      await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.CRUISE);
-    }
-    return data;
-  } on ApiException catch (e) {
-    // This should no longer be needed now that we check if the market sells
-    // fuel before trying to purchase.
-    if (!isMarketDoesNotSellFuelException(e)) {
-      rethrow;
-    }
-    shipInfo(ship, 'Market does not sell fuel, not refueling.');
+  final data = await refuelShip(api, agentCache, shipCache, ship);
+  final marketTransaction = data.transaction;
+  final agent = agentCache.agent;
+  logMarketTransaction(
+    ship,
+    marketPrices,
+    agent,
+    marketTransaction,
+    transactionEmoji: '⛽',
+  );
+  final transaction = Transaction.fromMarketTransaction(
+    marketTransaction,
+    agent.credits,
+    AccountingType.fuel,
+  );
+  await db.insertTransaction(transaction);
+  // Reset flight mode on refueling.
+  if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
+    shipInfo(ship, 'Resetting flight mode to cruise');
+    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.CRUISE);
   }
-  return null;
+  return data;
 }
 
 /// Dock the ship if needed and log the transaction

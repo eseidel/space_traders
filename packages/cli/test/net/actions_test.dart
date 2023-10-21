@@ -23,8 +23,6 @@ class _MockMarket extends Mock implements Market {}
 
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
-class _MockMarketTransaction extends Mock implements MarketTransaction {}
-
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
@@ -32,8 +30,6 @@ class _MockShipNav extends Mock implements ShipNav {}
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockShipCache extends Mock implements ShipCache {}
-
-class _MockShipFuel extends Mock implements ShipFuel {}
 
 void main() {
   test('purchaseShip', () async {
@@ -163,9 +159,8 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn('A');
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    final shipFuel = _MockShipFuel();
+    final shipFuel = ShipFuel(current: 0, capacity: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
-    when(() => shipFuel.capacity).thenReturn(0);
     final shipCache = _MockShipCache();
 
     when(
@@ -278,7 +273,6 @@ void main() {
   test('refuelIfNeededAndLog', () async {
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     const tradeSymbol = TradeSymbol.FUEL;
-    final shipFuel = _MockShipFuel();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
@@ -287,7 +281,6 @@ void main() {
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    when(() => ship.fuel).thenReturn(shipFuel);
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -326,15 +319,13 @@ void main() {
           data: RefuelShip200ResponseData(
             agent: agent,
             transaction: marketTransaction,
-            fuel: shipFuel,
+            fuel: ShipFuel(capacity: 1000, current: 1000),
           ),
         ),
       ),
     );
 
-    when(() => shipFuel.capacity).thenReturn(900);
-    when(() => shipFuel.current).thenReturn(634);
-
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 634));
     await runWithLogger(
       logger,
       () => refuelIfNeededAndLog(
@@ -359,6 +350,7 @@ void main() {
         sellPrice: 11,
       ),
     ]);
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 634));
 
     await runWithLogger(
       logger,
@@ -375,7 +367,55 @@ void main() {
     verify(
       () => fleetApi.refuelShip(
         shipSymbol.symbol,
-        // TODO(eseidel): Should refill a specific number of units!
+        refuelShipRequest: RefuelShipRequest(units: 300),
+      ),
+    ).called(1);
+
+    clearInteractions(fleetApi);
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
+    // Trying to refuel with less than 100 needed, should not refuel.
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
+    verifyNever(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: any(named: 'refuelShipRequest'),
+      ),
+    );
+
+    // Directly calling refuelShip with topUp=false and less than 100 needed
+    // should throw an exception.
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
+    expect(
+      () async => refuelShip(api, agentCache, shipCache, ship),
+      throwsA(
+        predicate(
+          (e) =>
+              e is StateError &&
+              e.message ==
+                  'refuelShip called with topUp = false and < 100 fuel needed',
+        ),
+      ),
+    );
+
+    // Directly calling refuelShip with topUp=true and less than 100 needed
+    // should refuel.
+    clearInteractions(fleetApi);
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
+    await refuelShip(api, agentCache, shipCache, ship, topUp: true);
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
       ),
     ).called(1);
   });

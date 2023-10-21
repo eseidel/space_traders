@@ -388,6 +388,11 @@ extension ShipUtils on Ship {
   // For repeated short trips, avoiding buying fuel when we're close to full.
   bool get shouldRefuel => fuel.current < (fuel.capacity - 100);
 
+  /// Returns the number of units of fuel needed to top up the ship.
+  /// This is in ship fuel units, not market fuel units.
+  /// 1 unit of market fuel = 100 units of ship fuel.
+  int get fuelUnitsNeeded => fuel.capacity - fuel.current;
+
   /// Returns the amount of space available on the ship.
   int get availableSpace => cargo.availableSpace;
 
