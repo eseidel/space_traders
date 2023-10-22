@@ -72,7 +72,7 @@ void main() {
     expect(behavior, Behavior.idle);
   });
 
-  test('CentralCommand.otherExplorerSystems', () async {
+  test('CentralCommand.otherExplorerSystems', () {
     RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
       return RoutePlan(
         fuelCapacity: 10,
@@ -132,6 +132,18 @@ void main() {
     final otherSystems3 =
         centralCommand.otherExplorerSystems(shipASymbol).toList();
     expect(otherSystems3, <SystemSymbol>[]);
+  });
+
+  test('CentralCommand.otherTraderSystems', () {
+    final behaviorCache = _MockBehhaviorCache();
+    when(() => behaviorCache.states).thenReturn([]);
+    final shipCache = _MockShipCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    expect(
+      centralCommand.otherTraderSystems(ShipSymbol.fromString('X-A')),
+      isEmpty,
+    );
   });
 
   test('CentralCommand.affordableContracts', () {
