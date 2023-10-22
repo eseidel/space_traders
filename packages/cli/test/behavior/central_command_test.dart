@@ -516,4 +516,13 @@ void main() {
     );
     expect(sellOpps.toList().length, 1);
   });
+
+  test('mountsNeededForAllShips', () {
+    final shipCache = _MockShipCache();
+    when(() => shipCache.ships).thenReturn([]);
+    final behaviorCache = _MockBehhaviorCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    expect(centralCommand.mountsNeededForAllShips(), isEmpty);
+  });
 }

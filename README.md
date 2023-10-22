@@ -494,7 +494,7 @@ Bad state: No element
 
 ### Write a test for stability of the network queue.
 
-### Teach network backoffs to have a limit (e.g. 128s).
+### Teach network back-offs to have a limit (e.g. 128s).
 
 ### Navigate error after network interrupt
 
@@ -541,14 +541,12 @@ received 34,344c
 
 ### Wiring up hauling for miners
 
-Somehow represent the miners in deals, producting a given tradeSymbol for
+Somehow represent the miners in deals, producing a given tradeSymbol for
 zero cost, at some amount of time to produce?
-
 
 ### No debugging tools for surveys.
 
 Write a tool to list how many surveys deep we have?
-
 
 ### Optimize requests:
 
@@ -585,12 +583,6 @@ Write a tool to list how many surveys deep we have?
 2 /my/agent
 1 /
 Total: 20489 requests.
-
-
-### Use RefuelShipRequest to specify units to refuel.
-
-Should just take the number of missing units and round down to the closest
-hundred.
 
 
 ### Implement missing bits of SAF's strat
@@ -703,3 +695,5 @@ Right now we're over aggressive at avoiding 0 fuel, when we should instead run
 our ships down to at least 25% or lower, and just make sure we have working
 DRIFT logic for when we have < 20 fuel.  2 Fuel + drifting and jump gates should
 be enough to get to fuel from pretty much anywhere in the galaxy.
+
+### Add callback to RequestCounterApi and have it record requests in behavior.
