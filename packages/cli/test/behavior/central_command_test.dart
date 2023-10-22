@@ -550,4 +550,18 @@ void main() {
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     expect(centralCommand.mountsNeededForAllShips(), isEmpty);
   });
+
+  test('getJobForShip', () {
+    final shipCache = _MockShipCache();
+    final behaviorCache = _MockBehhaviorCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    final ship = _MockShip();
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 0, capacity: 1000));
+    final job = centralCommand.getJobForShip(ship, 1000000);
+    // Can't do anything when out of fuel.
+    expect(job.behavior, Behavior.idle);
+  });
 }

@@ -565,6 +565,7 @@ class CentralCommand {
   }
 
   /// Returns the mining plan for the given [ship].
+  // TODO(eseidel): call from or merge into getJobForShip.
   MineJob mineJobForShip(
     SystemsCache systemsCache,
     AgentCache agentCache,
