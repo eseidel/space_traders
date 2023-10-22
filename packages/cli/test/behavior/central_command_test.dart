@@ -515,6 +515,19 @@ void main() {
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
     );
     expect(sellOpps.toList().length, 1);
+
+    final shipCache = _MockShipCache();
+    when(() => shipCache.shipSymbols).thenReturn([]);
+    final behaviorCache = _MockBehhaviorCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    expect(
+      centralCommand
+          .contractSellOpps(agentCache, contractCache)
+          .toList()
+          .length,
+      1,
+    );
   });
 
   test('mountsNeededForAllShips', () {
