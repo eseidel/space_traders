@@ -2,13 +2,12 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scores.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
 class _MockLogger extends Mock implements Logger {}
-
-class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -18,12 +17,35 @@ class _MockSystemsCache extends Mock implements SystemsCache {}
 
 void main() {
   test('findBetterTradeLocation smoke test', () {
-    final systemsCache = _MockSystemsCache();
-    final marketPrices = _MockMarketPrices();
-    // TODO(eseidel): return multiple MarketPrices to test more of the logic.
-    when(() => marketPrices.prices).thenReturn([]);
-
-    final shipLocation = WaypointSymbol.fromString('W-A-Y');
+    final fs = MemoryFileSystem.test();
+    final aSymbol = WaypointSymbol.fromString('S-A-A');
+    final bSymbol = WaypointSymbol.fromString('S-A-B');
+    final cSymbol = WaypointSymbol.fromString('S-A-C');
+    final dSymbol = WaypointSymbol.fromString('S-A-D');
+    final marketPrices = MarketPrices(
+      [
+        MarketPrice(
+          waypointSymbol: aSymbol,
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+          tradeVolume: 100,
+          timestamp: DateTime.timestamp(),
+        ),
+        MarketPrice(
+          waypointSymbol: bSymbol,
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          purchasePrice: 100,
+          sellPrice: 200,
+          tradeVolume: 100,
+          timestamp: DateTime.timestamp(),
+        ),
+      ],
+      fs: fs,
+    );
+    final shipLocation = cSymbol;
     const shipSymbol = ShipSymbol('A', 1);
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -31,15 +53,44 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.systemSymbol).thenReturn(shipLocation.system);
 
-    final system = System(
-      symbol: shipLocation.system,
-      sectorSymbol: shipLocation.sector,
-      type: SystemType.BLUE_STAR,
-      x: 0,
-      y: 0,
+    final systemsCache = SystemsCache(
+      [
+        System(
+          symbol: shipLocation.system,
+          sectorSymbol: shipLocation.sector,
+          type: SystemType.BLUE_STAR,
+          x: 0,
+          y: 0,
+          waypoints: [
+            SystemWaypoint(
+              symbol: aSymbol.waypoint,
+              type: WaypointType.PLANET,
+              x: 0,
+              y: 0,
+            ),
+            SystemWaypoint(
+              symbol: bSymbol.waypoint,
+              type: WaypointType.PLANET,
+              x: 0,
+              y: 0,
+            ),
+            SystemWaypoint(
+              symbol: shipLocation.waypoint,
+              type: WaypointType.PLANET,
+              x: 0,
+              y: 0,
+            ),
+            SystemWaypoint(
+              symbol: dSymbol.waypoint,
+              type: WaypointType.JUMP_GATE,
+              x: 0,
+              y: 0,
+            ),
+          ],
+        ),
+      ],
+      fs: fs,
     );
-    when(() => systemsCache.systemBySymbol(shipLocation.systemSymbol))
-        .thenReturn(system);
 
     CostedDeal? findNextDeal(Ship ship, WaypointSymbol startSymbol) {
       return null;

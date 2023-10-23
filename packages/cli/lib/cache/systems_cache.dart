@@ -14,13 +14,12 @@ const kJumpGateRange = 2500;
 /// A cache of the systems in the game.
 class SystemsCache extends JsonListStore<System> {
   /// Create a new [SystemsCache] with the given [systems] and file system.
-  SystemsCache({
-    required List<System> systems,
+  SystemsCache(
+    super.systems, {
     required super.fs,
     super.path = defaultCacheFilePath,
-  })  : _index =
-            Map.fromEntries(systems.map((e) => MapEntry(e.systemSymbol, e))),
-        super(systems);
+  }) : _index =
+            Map.fromEntries(systems.map((e) => MapEntry(e.systemSymbol, e)));
 
   /// All systems in the game.
   List<System> get systems => List.unmodifiable(entries);
@@ -57,7 +56,7 @@ class SystemsCache extends JsonListStore<System> {
     if (systems == null) {
       return null;
     }
-    return SystemsCache(systems: systems, fs: fs, path: path);
+    return SystemsCache(systems, fs: fs, path: path);
   }
 
   /// Load the cache from disk or fall back to fetching from the url.
@@ -82,7 +81,7 @@ class SystemsCache extends JsonListStore<System> {
         throw ApiException(response.statusCode, response.body);
       }
       final systems = _parseSystems(response.body);
-      final data = SystemsCache(systems: systems, fs: fs, path: path)..save();
+      final data = SystemsCache(systems, fs: fs, path: path)..save();
       return data;
     } catch (e) {
       logger.warn('Failed to load systems from $uri: $e');

@@ -34,7 +34,7 @@ void main() {
     ];
 
     final fs = MemoryFileSystem.test();
-    final systemsCache = SystemsCache(systems: inputSystems, fs: fs);
+    final systemsCache = SystemsCache(inputSystems, fs: fs);
     final systems = systemsCache
         .systemSymbolsInJumpRadius(
           startSystem: SystemSymbol.fromString('S-A'),
@@ -68,7 +68,7 @@ void main() {
     ];
 
     final fs = MemoryFileSystem.test();
-    final systemsCache = SystemsCache(systems: inputSystems, fs: fs);
+    final systemsCache = SystemsCache(inputSystems, fs: fs);
 
     final systems = systemsCache
         .systemSymbolsInJumpRadius(

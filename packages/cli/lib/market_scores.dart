@@ -85,6 +85,7 @@ _ShipPlacement? _findBetterSystemForTrader(
     }
     search.markUsed(closest);
     final score = search.scoreFor(closest.systemSymbol);
+    // This code assumes we're on the jump gate network.
     final systemJumpGate =
         systemsCache.jumpGateWaypointForSystem(closest.systemSymbol)!;
     final deal = findDeal(ship, systemJumpGate.waypointSymbol);

@@ -115,7 +115,7 @@ void main() {
     final fs = MemoryFileSystem.test();
     final systems = <System>[system];
     when(() => system.symbol).thenReturn(startSystemSymbol.system);
-    final systemsCache = SystemsCache(systems: systems, fs: fs);
+    final systemsCache = SystemsCache(systems, fs: fs);
     final factions = <Faction>[
       Faction(
         symbol: FactionSymbols.AEGIS,
