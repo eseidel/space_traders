@@ -108,7 +108,8 @@ void main() {
         profitPerSecondThreshold: 6,
       ),
     );
-
+    verify(() => logger.detail('🛸#1  No deal found for A-1 at S-A')).called(1);
+    verify(() => logger.info('No nearby markets for A-1')).called(1);
     expect(result, isNull);
   });
 }
