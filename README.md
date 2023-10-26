@@ -697,3 +697,20 @@ DRIFT logic for when we have < 20 fuel.  2 Fuel + drifting and jump gates should
 be enough to get to fuel from pretty much anywhere in the galaxy.
 
 ### Add callback to RequestCounterApi and have it record requests in behavior.
+
+### Avoid catastrophic trades
+
+🛸#65 ✍️  shipyard data @ X1-ZP28-72377A
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II +107% +20,769c per   1 x 40,214c = +40,214c -> 🏦 287,136,414c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II  +95% +18,415c per   1 x 37,860c = +37,860c -> 🏦 287,174,274c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II  +80% +15,516c per   1 x 34,961c = +34,961c -> 🏦 287,209,235c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II  +61% +11,948c per   1 x 31,393c = +31,393c -> 🏦 287,240,628c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II  +39% +7,555c per   1 x 27,000c = +27,000c -> 🏦 287,267,628c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II  +11% +2,146c per   1 x 21,591c = +21,591c -> 🏦 287,289,219c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II  -23% -4,513c per   1 x 14,932c = +14,932c -> 🏦 287,304,151c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II  -65% -12,712c per   1 x  6,733c = +6,733c -> 🏦 287,310,884c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II -100% -19,444c per   1 x      1c =     +1c -> 🏦 287,310,885c
+🛸#65 🤝   1 ENGINE_ION_DRIVE_II -100% -19,444c per   1 x      1c =     +1c -> 🏦 287,310,886c
+🛸#65 Expected 18,669c profit (71c/s), got -147,134c (-311c/s) in 00:07:53, expected 00:04:22
+
+If nothing else, each interval should be evaluted against the possibility of moving to sell?
