@@ -15,6 +15,12 @@ class _MockApi extends Mock implements Api {}
 
 class _MockDatabase extends Mock implements Database {}
 
+class _MockContract extends Mock implements Contract {}
+
+class _MockContractCache extends Mock implements ContractCache {}
+
+class _MockContractsApi extends Mock implements ContractsApi {}
+
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -795,5 +801,60 @@ void main() {
       }),
       throwsA(predicate((e) => e is ApiException)),
     );
+  });
+
+  test('acceptContractAndLog', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final contractsApi = _MockContractsApi();
+    when(() => api.contracts).thenReturn(contractsApi);
+    final ship = _MockShip();
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    final contractCache = _MockContractCache();
+    final contract = _MockContract();
+    when(() => contract.id).thenReturn('C-1');
+    when(() => contract.terms).thenReturn(
+      ContractTerms(
+        deadline: DateTime(2021),
+        payment: ContractPayment(onAccepted: 100, onFulfilled: 1000),
+      ),
+    );
+    final agentCache = _MockAgentCache();
+    final agent = _MockAgent();
+    when(() => agent.credits).thenReturn(100000);
+    when(() => agentCache.agent).thenReturn(agent);
+
+    final logger = _MockLogger();
+
+    when(
+      () => contractsApi.acceptContract(any()),
+    ).thenAnswer(
+      (invocation) => Future.value(
+        AcceptContract200Response(
+          data: AcceptContract200ResponseData(
+            contract: contract,
+            agent: _MockAgent(),
+          ),
+        ),
+      ),
+    );
+
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+
+    await runWithLogger(logger, () async {
+      await acceptContractAndLog(
+        api,
+        db,
+        contractCache,
+        agentCache,
+        ship,
+        contract,
+      );
+    });
+    verify(() => contractsApi.acceptContract(any())).called(1);
   });
 }
