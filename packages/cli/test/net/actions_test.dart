@@ -729,4 +729,61 @@ void main() {
       ),
     ).called(2);
   });
+
+  test('chartWaypointAndLog', () async {
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    final ship = _MockShip();
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    final fs = MemoryFileSystem.test();
+    final chartingCache =
+        ChartingCache({}, WaypointTraitCache([], fs: fs), fs: fs);
+
+    when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
+      (invocation) => Future.value(
+        CreateChart201Response(
+          data: CreateChart201ResponseData(
+            waypoint: Waypoint(
+              symbol: waypointSymbol.waypoint,
+              systemSymbol: waypointSymbol.system,
+              type: WaypointType.ASTEROID_FIELD,
+              x: 0,
+              y: 0,
+              traits: [],
+            ),
+            chart: Chart(
+              waypointSymbol: waypointSymbol.waypoint,
+              submittedBy: 'S',
+              submittedOn: DateTime(2021),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final logger = _MockLogger();
+    await runWithLogger(logger, () async {
+      await chartWaypointAndLog(api, chartingCache, ship);
+    });
+
+    when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
+      (invocation) => throw ApiException(
+        400,
+        '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E" '
+        ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
+      ),
+    );
+
+    await runWithLogger(logger, () async {
+      await chartWaypointAndLog(api, chartingCache, ship);
+    });
+
+    verify(() => logger.warn('🛸#1  S-A-W was already charted')).called(1);
+  });
 }
