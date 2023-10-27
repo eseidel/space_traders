@@ -544,8 +544,8 @@ void main() {
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    final shipCargo = ShipCargo(capacity: 10, units: 10);
-    when(() => ship.cargo).thenReturn(shipCargo);
+    final emptyCargo = ShipCargo(capacity: 10, units: 0);
+    when(() => ship.cargo).thenReturn(emptyCargo);
     final shipCache = _MockShipCache();
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
@@ -557,10 +557,26 @@ void main() {
     when(() => agentCache.agent).thenReturn(agent);
     final db = _MockDatabase();
     final market = _MockMarket();
+    when(() => market.tradeGoods).thenReturn([
+      MarketTradeGood(
+        symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+        tradeVolume: 100,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 10,
+        sellPrice: 11,
+      ),
+      MarketTradeGood(
+        symbol: TradeSymbol.FABRICS.value,
+        tradeVolume: 100,
+        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        purchasePrice: 10,
+        sellPrice: 11,
+      ),
+    ]);
     final marketPrices = _MockMarketPrices();
     const accountingType = AccountingType.goods;
 
-    await runWithLogger(logger, () async {
+    final emptyTransactions = await runWithLogger(logger, () async {
       final result = await sellAllCargoAndLog(
         api,
         db,
@@ -573,6 +589,7 @@ void main() {
       );
       return result;
     });
+    expect(emptyTransactions, isEmpty);
     verifyNever(
       () => fleetApi.sellCargo(
         any(),
@@ -580,5 +597,67 @@ void main() {
       ),
     );
     verify(() => logger.info('🛸#1  No cargo to sell')).called(1);
+
+    when(
+      () => fleetApi.sellCargo(
+        any(),
+        sellCargoRequest: any(named: 'sellCargoRequest'),
+      ),
+    ).thenAnswer(
+      (invocation) => Future.value(
+        SellCargo201Response(
+          data: SellCargo201ResponseData(
+            agent: agent,
+            cargo: ShipCargo(capacity: 10, units: 0),
+            transaction: MarketTransaction(
+              waypointSymbol: 'S-A-W',
+              shipSymbol: shipSymbol.symbol,
+              tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+              type: MarketTransactionTypeEnum.SELL,
+              units: 5,
+              pricePerUnit: 10,
+              totalPrice: 50,
+              timestamp: DateTime(2021),
+            ),
+          ),
+        ),
+      ),
+    );
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+
+    final shipCargo = ShipCargo(
+      capacity: 10,
+      units: 10,
+      inventory: [
+        ShipCargoItem(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+          units: 5,
+          description: '',
+          name: '',
+        ),
+        ShipCargoItem(
+          symbol: TradeSymbol.FABRICS.value,
+          units: 5,
+          description: '',
+          name: '',
+        ),
+      ],
+    );
+    when(() => ship.cargo).thenReturn(shipCargo);
+
+    final transactions = await runWithLogger(logger, () async {
+      final result = await sellAllCargoAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        market,
+        shipCache,
+        ship,
+        accountingType,
+      );
+      return result;
+    });
+    expect(transactions.length, 2);
   });
 }
