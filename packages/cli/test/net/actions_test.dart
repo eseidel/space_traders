@@ -772,6 +772,7 @@ void main() {
       await chartWaypointAndLog(api, chartingCache, ship);
     });
 
+    // Waypoint already charted exceptions are caught and logged.
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
       (invocation) => throw ApiException(
         400,
@@ -779,11 +780,20 @@ void main() {
         ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
       ),
     );
-
     await runWithLogger(logger, () async {
       await chartWaypointAndLog(api, chartingCache, ship);
     });
-
     verify(() => logger.warn('🛸#1  S-A-W was already charted')).called(1);
+
+    // Any other exception is thrown.
+    when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
+      (invocation) => throw ApiException(401, 'other exception'),
+    );
+    expect(
+      () => runWithLogger(logger, () async {
+        await chartWaypointAndLog(api, chartingCache, ship);
+      }),
+      throwsA(predicate((e) => e is ApiException)),
+    );
   });
 }
