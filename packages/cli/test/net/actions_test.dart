@@ -539,4 +539,46 @@ void main() {
       ),
     ).called(1);
   });
+
+  test('sellAllCargoAndLog', () async {
+    final ship = _MockShip();
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipCargo = ShipCargo(capacity: 10, units: 10);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    final shipCache = _MockShipCache();
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final logger = _MockLogger();
+    final agent = _MockAgent();
+    when(() => agent.credits).thenReturn(100000);
+    final agentCache = _MockAgentCache();
+    when(() => agentCache.agent).thenReturn(agent);
+    final db = _MockDatabase();
+    final market = _MockMarket();
+    final marketPrices = _MockMarketPrices();
+    const accountingType = AccountingType.goods;
+
+    await runWithLogger(logger, () async {
+      final result = await sellAllCargoAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        market,
+        shipCache,
+        ship,
+        accountingType,
+      );
+      return result;
+    });
+    verifyNever(
+      () => fleetApi.sellCargo(
+        any(),
+        sellCargoRequest: any(named: 'sellCargoRequest'),
+      ),
+    );
+    verify(() => logger.info('🛸#1  No cargo to sell')).called(1);
+  });
 }

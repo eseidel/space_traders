@@ -104,7 +104,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
   Market market,
   ShipCache shipCache,
   Ship ship,
-  AccountingType accounting, {
+  AccountingType accountingType, {
   bool Function(TradeSymbol tradeSymbol)? where,
 }) async {
   if (ship.cargo.inventory.isEmpty) {
@@ -121,7 +121,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
       agent.credits,
-      accounting,
+      accountingType,
     );
     await db.insertTransaction(transaction);
     transactions.add(transaction);
