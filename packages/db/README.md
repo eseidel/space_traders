@@ -1,5 +1,8 @@
-## setup
+# Database
 
+package:db is an internal package for storing state in a Postgres database.
+
+## Setup
 ```
 docker pull postgres
 docker run \
