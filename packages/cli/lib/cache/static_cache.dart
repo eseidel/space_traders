@@ -50,7 +50,7 @@ abstract class StaticCache<Symbol extends Object, Record extends Object>
   void add(Record value, {bool shouldSave = true}) {
     final copy = copyAndNormalize(value);
     final cached = this[keyFor(value)];
-    if (cached != null && jsonCompare(cached, copy)) {
+    if (cached != null && !jsonMatches(cached, copy)) {
       return;
     }
     entries

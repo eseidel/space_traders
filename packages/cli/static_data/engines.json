@@ -4,7 +4,7 @@
   "name": "Impulse Drive I",
   "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
   "condition": null,
-  "speed": 2,
+  "speed": 3,
   "requirements": {
    "power": 1,
    "crew": 0,

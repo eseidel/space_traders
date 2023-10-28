@@ -651,17 +651,17 @@
   "type": "SHIP_LIGHT_HAULER",
   "name": "Light Hauler",
   "description": "A small, fast cargo ship that is designed for short-range transport of light loads.",
-  "supply": "ABUNDANT",
-  "activity": null,
+  "supply": "HIGH",
+  "activity": "STRONG",
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_LIGHT_FREIGHTER",
-   "name": "Frame Light Freighter",
+   "name": "Light Freighter",
    "description": "A small, versatile spacecraft used for cargo transport and other commercial operations.",
    "condition": null,
    "moduleSlots": 6,
    "mountingPoints": 1,
-   "fuelCapacity": 1700,
+   "fuelCapacity": 600,
    "requirements": {
     "power": 5,
     "crew": 40,
@@ -694,51 +694,27 @@
   },
   "modules": [
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_II",
+    "capacity": 35,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Expanded Cargo Hold",
+    "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 2,
+     "crew": 2,
+     "slots": 2
     }
    },
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_II",
+    "capacity": 35,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Expanded Cargo Hold",
+    "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 2,
+     "crew": 2,
+     "slots": 2
     }
    },
    {
@@ -768,32 +744,20 @@
   ],
   "mounts": [
    {
-    "symbol": "MOUNT_SURVEYOR_I",
-    "name": "Surveyor I",
-    "description": "A basic survey probe that can be used to gather information about a mineral deposit.",
-    "strength": 1,
-    "deposits": [
-     "QUARTZ_SAND",
-     "SILICON_CRYSTALS",
-     "PRECIOUS_STONES",
-     "ICE_WATER",
-     "AMMONIA_ICE",
-     "IRON_ORE",
-     "COPPER_ORE",
-     "SILVER_ORE",
-     "ALUMINUM_ORE",
-     "GOLD_ORE",
-     "PLATINUM_ORE"
-    ],
+    "symbol": "MOUNT_TURRET_I",
+    "name": "Rotary Cannon",
+    "description": "A rotary cannon is a type of mounted turret that is designed to fire a high volume of rounds in rapid succession.",
+    "strength": null,
+    "deposits": [],
     "requirements": {
      "power": 1,
-     "crew": 2,
+     "crew": 1,
      "slots": null
     }
    }
   ],
   "crew": {
-   "required": 52,
+   "required": 55,
    "capacity": 80
   }
  },
@@ -915,20 +879,20 @@
   "type": "SHIP_MINING_DRONE",
   "name": "Mining Drone",
   "description": "A small, unmanned spacecraft that can be used for mining operations, such as extracting valuable minerals from asteroids.",
-  "supply": "ABUNDANT",
-  "activity": null,
+  "supply": "HIGH",
+  "activity": "WEAK",
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_DRONE",
-   "name": "Frame Drone",
+   "name": "Drone",
    "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
    "condition": null,
    "moduleSlots": 3,
    "mountingPoints": 2,
-   "fuelCapacity": 100,
+   "fuelCapacity": 80,
    "requirements": {
     "power": 1,
-    "crew": -3,
+    "crew": -4,
     "slots": null
    }
   },
@@ -949,7 +913,7 @@
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
    "condition": null,
-   "speed": 2,
+   "speed": 3,
    "requirements": {
     "power": 1,
     "crew": 0,
@@ -959,7 +923,7 @@
   "modules": [
    {
     "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "capacity": 10,
     "range": null,
     "name": "Cargo Hold",
     "description": "A module that increases a ship's cargo capacity.",
@@ -987,11 +951,11 @@
     "symbol": "MOUNT_MINING_LASER_I",
     "name": "Mining Laser I",
     "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects.",
-    "strength": 10,
+    "strength": 3,
     "deposits": [],
     "requirements": {
      "power": 1,
-     "crew": 0,
+     "crew": 1,
      "slots": null
     }
    }
@@ -1143,12 +1107,12 @@
   "type": "SHIP_PROBE",
   "name": "Probe Satellite",
   "description": "A small, unmanned spacecraft that can be launched into orbit to gather data and perform basic tasks.",
-  "supply": "ABUNDANT",
-  "activity": null,
+  "supply": "HIGH",
+  "activity": "WEAK",
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_PROBE",
-   "name": "Frame Probe",
+   "name": "Probe",
    "description": "A small, unmanned spacecraft used for exploration, reconnaissance, and scientific research.",
    "condition": null,
    "moduleSlots": 0,
@@ -1177,7 +1141,7 @@
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
    "condition": null,
-   "speed": 2,
+   "speed": 3,
    "requirements": {
     "power": 1,
     "crew": 0,

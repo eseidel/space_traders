@@ -27,11 +27,11 @@
   "symbol": "MOUNT_MINING_LASER_I",
   "name": "Mining Laser I",
   "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects.",
-  "strength": 10,
+  "strength": 3,
   "deposits": [],
   "requirements": {
    "power": 1,
-   "crew": 0,
+   "crew": 1,
    "slots": null
   }
  },
@@ -103,7 +103,7 @@
   ],
   "requirements": {
    "power": 1,
-   "crew": 2,
+   "crew": 1,
    "slots": null
   }
  },

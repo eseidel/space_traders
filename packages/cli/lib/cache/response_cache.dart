@@ -29,7 +29,7 @@ class ResponseListCache<T extends Object> extends JsonListStore<T> {
     }
     final newEntries = await _refreshEntries(api);
     _iterationsSinceLastCheck = 0;
-    if (jsonListMatch(entries, newEntries)) {
+    if (jsonListMatches(entries, newEntries)) {
       return;
     }
     logger.warn('$T list changed, updating cache.');

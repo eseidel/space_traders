@@ -11,15 +11,15 @@ class _MockApi extends Mock implements Api {}
 class _MockLogger extends Mock implements Logger {}
 
 void main() {
-  test('jsonListMatch smoke test', () {
+  test('jsonListMatches smoke test', () {
     final logger = _MockLogger();
     final a = {'a': 1, 'b': 2};
     final b = {'a': 1, 'b': 2};
     final c = {'a': 1, 'b': 3};
-    expect(jsonListMatch([a, b], [a, b]), true);
-    expect(jsonListMatch([a, b], [b, a]), true);
+    expect(jsonListMatches([a, b], [a, b]), true);
+    expect(jsonListMatches([a, b], [b, a]), true);
     expect(
-      runWithLogger(logger, () => jsonListMatch([a, b], [a, c])),
+      runWithLogger(logger, () => jsonListMatches([a, b], [a, c])),
       false,
     );
     verify(
@@ -30,7 +30,7 @@ void main() {
 
     reset(logger);
     expect(
-      runWithLogger(logger, () => jsonListMatch([a, b], [a, b, b])),
+      runWithLogger(logger, () => jsonListMatches([a, b], [a, b, b])),
       false,
     );
     verify(

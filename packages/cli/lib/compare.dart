@@ -7,7 +7,7 @@ import 'package:json_diff/json_diff.dart';
 export 'third_party/compare.dart';
 
 /// Compare two objects via json encoding.
-bool jsonCompare<T extends Object>(T actual, T expected) {
+bool jsonMatches<T extends Object>(T actual, T expected) {
   final differ = JsonDiffer(jsonEncode(actual), jsonEncode(expected));
   final diff = differ.diff();
   if (diff.hasNothing) {
@@ -18,7 +18,7 @@ bool jsonCompare<T extends Object>(T actual, T expected) {
 }
 
 /// Returns true if the two lists of T match when converted to Json.
-bool jsonListMatch<T extends Object>(List<T> actual, List<T> expected) {
+bool jsonListMatches<T extends Object>(List<T> actual, List<T> expected) {
   if (actual.length != expected.length) {
     logger.info(
       "$T list lengths don't match: "

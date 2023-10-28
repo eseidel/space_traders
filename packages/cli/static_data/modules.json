@@ -1,7 +1,7 @@
 [
  {
   "symbol": "MODULE_CARGO_HOLD_I",
-  "capacity": 30,
+  "capacity": 10,
   "range": null,
   "name": "Cargo Hold",
   "description": "A module that increases a ship's cargo capacity.",

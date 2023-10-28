@@ -72,7 +72,7 @@ class AgentCache extends JsonStore<Agent> {
     }
     final newAgent = await getMyAgent(api);
     _requestsSinceLastCheck = 0;
-    if (jsonCompare(agent, newAgent)) {
+    if (jsonMatches(agent, newAgent)) {
       return;
     }
     logger.warn('Agent changed, updating cache.');
