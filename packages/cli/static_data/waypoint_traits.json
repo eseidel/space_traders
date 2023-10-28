@@ -1,5 +1,10 @@
 [
  {
+  "symbol": "ASH_CLOUDS",
+  "name": "Ash Clouds",
+  "description": "A location filled with a dense cloud of ash and debris. Sometimes difficult to navigate, and may be hazardous to ships and other vessels. Sometimes able to provide shelter or protection from other hazards."
+ },
+ {
   "symbol": "BARREN",
   "name": "Barren",
   "description": "A desolate world with little to no vegetation or water, presenting unique challenges for habitation and resource extraction."
@@ -10,9 +15,19 @@
   "description": "A hidden network of illegal trade, where outlaws and opportunists gather to exchange contraband and forbidden goods."
  },
  {
+  "symbol": "BREATHABLE_ATMOSPHERE",
+  "name": "Breathable Atmosphere",
+  "description": "A waypoint with a life-sustaining atmosphere, allowing for easy colonization and the flourishing of diverse ecosystems without the need for advanced life support systems."
+ },
+ {
   "symbol": "BUREAUCRATIC",
   "name": "Bureaucratic",
   "description": "A waypoint governed by complex regulations, red tape, and layers of administration, often leading to inefficiencies and frustration."
+ },
+ {
+  "symbol": "CANYONS",
+  "name": "Canyons",
+  "description": "Deep, winding ravines carved into the landscape by natural forces, providing shelter for settlements and hosting diverse ecosystems."
  },
  {
   "symbol": "COMMON_METAL_DEPOSITS",
@@ -28,6 +43,16 @@
   "symbol": "CORRUPT",
   "name": "Corrupt",
   "description": "Plagued by underhanded dealings and illicit activities, this waypoint has a reputation for its pervasive criminal element."
+ },
+ {
+  "symbol": "DEBRIS_CLUSTER",
+  "name": "Debris Cluster",
+  "description": "A region filled with hazardous debris and remnants of celestial bodies or man-made objects, requiring advanced navigational capabilities for ships passing through."
+ },
+ {
+  "symbol": "DEEP_CRATERS",
+  "name": "Deep Craters",
+  "description": "Marked by deep, expansive craters, potentially formed by ancient meteor impacts. These formations may offer hidden resources but also pose challenges for mobility and construction."
  },
  {
   "symbol": "DIVERSE_LIFE",
@@ -60,6 +85,11 @@
   "description": "A waypoint with scorching heat or freezing cold, requiring specialized equipment and technology to survive and thrive in these harsh environments."
  },
  {
+  "symbol": "FOSSILS",
+  "name": "Fossils",
+  "description": "A waypoint rich in the remains of ancient life, offering a valuable window into the past and the potential for scientific discovery."
+ },
+ {
   "symbol": "FROZEN",
   "name": "Frozen",
   "description": "An ice-covered world with frigid temperatures, providing unique research opportunities and resources such as ice water, ammonia ice, and other frozen compounds."
@@ -68,6 +98,16 @@
   "symbol": "HIGH_TECH",
   "name": "High-Tech",
   "description": "A center of innovation and cutting-edge technology, driving progress and attracting skilled individuals from around the galaxy."
+ },
+ {
+  "symbol": "HOLLOWED_INTERIOR",
+  "name": "Hollowed Interior",
+  "description": "A location with large hollow spaces beneath its surface, providing unique opportunities for subterranean construction and resource extraction, but also posing risks of structural instability."
+ },
+ {
+  "symbol": "ICE_CRYSTALS",
+  "name": "Ice Crystals",
+  "description": "Expansive fields of ice, providing a vital source of water and other resources such as ammonia ice, liquid hydrogen, and liquid nitrogen for local populations and industries."
  },
  {
   "symbol": "INDUSTRIAL",
@@ -80,6 +120,11 @@
   "description": "A lush, tropical world with dense vegetation and a thriving ecosystem, offering a wealth of resources and unique opportunities for research and exploration."
  },
  {
+  "symbol": "MAGMA_SEAS",
+  "name": "Magma Seas",
+  "description": "A waypoint dominated by molten rock and intense heat, creating inhospitable conditions and requiring specialized technology to navigate and harvest resources."
+ },
+ {
   "symbol": "MARKETPLACE",
   "name": "Marketplace",
   "description": "A thriving center of commerce where traders from across the galaxy gather to buy, sell, and exchange goods."
@@ -88,6 +133,16 @@
   "symbol": "MEGA_STRUCTURES",
   "name": "Mega Structures",
   "description": "Colossal feats of engineering, these structures house entire cities, industries, or even ecosystems within their vast interiors."
+ },
+ {
+  "symbol": "METHANE_POOLS",
+  "name": "Methane Pools",
+  "description": "Large reservoirs of methane gas, used for fuel and in various industrial processes such as the production of hydrocarbons."
+ },
+ {
+  "symbol": "MICRO_GRAVITY_ANOMALIES",
+  "name": "Micro-Gravity Anomalies",
+  "description": "Unpredictable gravity fields, making navigation and construction particularly challenging. These anomalies may also yield unique scientific research opportunities."
  },
  {
   "symbol": "MILITARY_BASE",
@@ -115,9 +170,19 @@
   "description": "A waypoint teeming with inhabitants, leading to cramped living conditions and a high demand for resources."
  },
  {
+  "symbol": "PERPETUAL_DAYLIGHT",
+  "name": "Perpetual Daylight",
+  "description": "A waypoint that never experiences darkness, providing abundant solar energy and unique living conditions for its inhabitants."
+ },
+ {
   "symbol": "PRECIOUS_METAL_DEPOSITS",
   "name": "Precious Metal Deposits",
   "description": "A source of valuable metals like gold, silver, and platinum, as well as their ores, prized for their rarity, beauty, and various applications."
+ },
+ {
+  "symbol": "RADIOACTIVE",
+  "name": "Radioactive",
+  "description": "A hazardous location with elevated levels of radiation, requiring specialized equipment and shielding for safe habitation and exploration."
  },
  {
   "symbol": "RARE_METAL_DEPOSITS",
@@ -135,9 +200,24 @@
   "description": "A world with a rugged, rocky landscape, rich in minerals and other resources, providing a variety of opportunities for mining, research, and exploration."
  },
  {
+  "symbol": "SALT_FLATS",
+  "name": "Salt Flats",
+  "description": "Expansive, barren plains covered in a thick layer of salt, offering unique opportunities for resource extraction, scientific research, and other activities."
+ },
+ {
+  "symbol": "SCARCE_LIFE",
+  "name": "Scarce Life",
+  "description": "A waypoint with sparse signs of life, often presenting unique challenges for survival and adaptation in a harsh environment."
+ },
+ {
   "symbol": "SCATTERED_SETTLEMENTS",
   "name": "Scattered Settlements",
   "description": "A collection of dispersed communities, each independent yet connected through trade and communication networks."
+ },
+ {
+  "symbol": "SHALLOW_CRATERS",
+  "name": "Shallow Craters",
+  "description": "Numerous shallow craters, offering easier access to sub-surface resources but also creating an uneven terrain that can complicate land-based activities."
  },
  {
   "symbol": "SHIPYARD",
@@ -185,6 +265,11 @@
   "description": "A waypoint that has been artificially transformed to support life, showcasing the engineering prowess of its inhabitants and providing a hospitable environment for colonization."
  },
  {
+  "symbol": "THIN_ATMOSPHERE",
+  "name": "Thin Atmosphere",
+  "description": "A location with a sparse atmosphere, making it difficult to support life without specialized life-support systems."
+ },
+ {
   "symbol": "TOXIC_ATMOSPHERE",
   "name": "Toxic Atmosphere",
   "description": "A waypoint with a poisonous atmosphere, necessitating the use of specialized equipment and technology to protect inhabitants and visitors from harmful substances."
@@ -193,6 +278,11 @@
   "symbol": "TRADING_HUB",
   "name": "Trading Hub",
   "description": "A critical junction in the galaxy's trade network, with countless goods and services flowing through daily."
+ },
+ {
+  "symbol": "UNSTABLE_COMPOSITION",
+  "name": "Unstable Composition",
+  "description": "A location with volatile geological composition, making it prone to frequent seismic activities and necessitating specialized construction techniques for long-term habitation or activity."
  },
  {
   "symbol": "VIBRANT_AURORAS",
