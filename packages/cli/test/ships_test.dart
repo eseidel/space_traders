@@ -11,6 +11,8 @@ void main() {
     final expectedNullTypes = [
       // Two ship types use heavy freighters, so we can't map back to a type.
       ShipFrameSymbolEnum.HEAVY_FREIGHTER,
+      // Two ship types use drone, so we can't map back to a type.
+      ShipFrameSymbolEnum.DRONE,
       // Unused frames:
       ShipFrameSymbolEnum.RACER,
       ShipFrameSymbolEnum.FIGHTER,
@@ -33,14 +35,6 @@ void main() {
 
   test('shipFrameFromType', () {
     for (final type in ShipType.values) {
-      final newShipTypes = [
-        ShipType.SIPHON_DRONE,
-        ShipType.SURVEYOR,
-      ];
-      if (newShipTypes.contains(type)) {
-        continue;
-      }
-
       final frame = shipyardShips.shipFrameFromType(type);
       expect(frame, isNotNull, reason: 'no frame for type $type');
     }
