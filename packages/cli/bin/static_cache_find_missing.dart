@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
@@ -21,14 +22,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       routePlanner,
       ship,
       tradeSymbol,
-      // We don't really care about the value of the trade, we just want to
-      expectedCreditsPerSecond: 0,
+      // We don't really care about the value of the "trade".
+      expectedCreditsPerSecond: 7,
     );
     if (marketTrip == null) {
       print('No market for $tradeSymbol');
       continue;
     }
-    print('Market for $tradeSymbol: ${marketTrip.price.waypointSymbol}');
+    print('$tradeSymbol in ${approximateDuration(marketTrip.route.duration)} '
+        ' ${marketTrip.price.waypointSymbol}');
   }
 }
 
