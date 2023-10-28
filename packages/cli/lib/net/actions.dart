@@ -13,6 +13,22 @@ export 'package:cli/net/direct.dart';
 // Importantly, these actions *should* modify the state objects passed in
 // e.g. if it docks the ship, it should update the ship's nav object.
 
+bool _canCruiseTo(
+  SystemsCache systemsCache,
+  Ship ship,
+  WaypointSymbol waypointSymbol,
+) {
+  if (!ship.usesFuel) {
+    return true;
+  }
+  final start = systemsCache.waypointFromSymbol(ship.waypointSymbol);
+  final end = systemsCache.waypointFromSymbol(waypointSymbol);
+  final distance = start.distanceTo(end);
+  final expectedFuel = fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
+  // Use > and a buffer (10) to avoid ever having zero fuel.
+  return ship.fuel.current > expectedFuel + 10;
+}
+
 /// Navigate [ship] to [waypointSymbol] will retry in drift mode if
 /// there is insufficient fuel.
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
@@ -23,12 +39,8 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   WaypointSymbol waypointSymbol,
 ) async {
   await undockIfNeeded(api, shipCache, ship);
-  final start = systemsCache.waypointFromSymbol(ship.waypointSymbol);
-  final end = systemsCache.waypointFromSymbol(waypointSymbol);
-  final distance = start.distanceTo(end);
-  final expectedFuel = fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
-  // Use > and a buffer (10) to avoid ever having zero fuel.
-  final canCruise = ship.fuel.current > expectedFuel + 10;
+
+  final canCruise = _canCruiseTo(systemsCache, ship, waypointSymbol);
   final flightMode =
       canCruise ? ShipNavFlightMode.CRUISE : ShipNavFlightMode.DRIFT;
   await setShipFlightModeIfNeeded(api, shipCache, ship, flightMode);
