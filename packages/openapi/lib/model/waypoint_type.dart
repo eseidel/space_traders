@@ -29,9 +29,15 @@ class WaypointType {
   static const ORBITAL_STATION = WaypointType._(r'ORBITAL_STATION');
   static const JUMP_GATE = WaypointType._(r'JUMP_GATE');
   static const ASTEROID_FIELD = WaypointType._(r'ASTEROID_FIELD');
+  static const ASTEROID = WaypointType._(r'ASTEROID');
+  static const ENGINEERED_ASTEROID = WaypointType._(r'ENGINEERED_ASTEROID');
+  static const ASTEROID_BASE = WaypointType._(r'ASTEROID_BASE');
   static const NEBULA = WaypointType._(r'NEBULA');
   static const DEBRIS_FIELD = WaypointType._(r'DEBRIS_FIELD');
   static const GRAVITY_WELL = WaypointType._(r'GRAVITY_WELL');
+  static const ARTIFICIAL_GRAVITY_WELL =
+      WaypointType._(r'ARTIFICIAL_GRAVITY_WELL');
+  static const FUEL_STATION = WaypointType._(r'FUEL_STATION');
 
   /// List of all possible values in this [enum][WaypointType].
   static const values = <WaypointType>[
@@ -41,9 +47,14 @@ class WaypointType {
     ORBITAL_STATION,
     JUMP_GATE,
     ASTEROID_FIELD,
+    ASTEROID,
+    ENGINEERED_ASTEROID,
+    ASTEROID_BASE,
     NEBULA,
     DEBRIS_FIELD,
     GRAVITY_WELL,
+    ARTIFICIAL_GRAVITY_WELL,
+    FUEL_STATION,
   ];
 
   static WaypointType? fromJson(dynamic value) =>
@@ -99,12 +110,22 @@ class WaypointTypeTypeTransformer {
           return WaypointType.JUMP_GATE;
         case r'ASTEROID_FIELD':
           return WaypointType.ASTEROID_FIELD;
+        case r'ASTEROID':
+          return WaypointType.ASTEROID;
+        case r'ENGINEERED_ASTEROID':
+          return WaypointType.ENGINEERED_ASTEROID;
+        case r'ASTEROID_BASE':
+          return WaypointType.ASTEROID_BASE;
         case r'NEBULA':
           return WaypointType.NEBULA;
         case r'DEBRIS_FIELD':
           return WaypointType.DEBRIS_FIELD;
         case r'GRAVITY_WELL':
           return WaypointType.GRAVITY_WELL;
+        case r'ARTIFICIAL_GRAVITY_WELL':
+          return WaypointType.ARTIFICIAL_GRAVITY_WELL;
+        case r'FUEL_STATION':
+          return WaypointType.FUEL_STATION;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

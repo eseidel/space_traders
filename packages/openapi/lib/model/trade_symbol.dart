@@ -65,6 +65,7 @@ class TradeSymbol {
   static const AMMUNITION = TradeSymbol._(r'AMMUNITION');
   static const ELECTRONICS = TradeSymbol._(r'ELECTRONICS');
   static const SHIP_PLATING = TradeSymbol._(r'SHIP_PLATING');
+  static const SHIP_PARTS = TradeSymbol._(r'SHIP_PARTS');
   static const EQUIPMENT = TradeSymbol._(r'EQUIPMENT');
   static const FUEL = TradeSymbol._(r'FUEL');
   static const MEDICINE = TradeSymbol._(r'MEDICINE');
@@ -72,6 +73,7 @@ class TradeSymbol {
   static const CLOTHING = TradeSymbol._(r'CLOTHING');
   static const MICROPROCESSORS = TradeSymbol._(r'MICROPROCESSORS');
   static const PLASTICS = TradeSymbol._(r'PLASTICS');
+  static const QUANTUM_STABILIZERS = TradeSymbol._(r'QUANTUM_STABILIZERS');
   static const POLYNUCLEOTIDES = TradeSymbol._(r'POLYNUCLEOTIDES');
   static const BIOCOMPOSITES = TradeSymbol._(r'BIOCOMPOSITES');
   static const NANOBOTS = TradeSymbol._(r'NANOBOTS');
@@ -105,6 +107,8 @@ class TradeSymbol {
   static const ENGINE_HYPER_DRIVE_I = TradeSymbol._(r'ENGINE_HYPER_DRIVE_I');
   static const MODULE_MINERAL_PROCESSOR_I =
       TradeSymbol._(r'MODULE_MINERAL_PROCESSOR_I');
+  static const MODULE_GAS_PROCESSOR_I =
+      TradeSymbol._(r'MODULE_GAS_PROCESSOR_I');
   static const MODULE_CARGO_HOLD_I = TradeSymbol._(r'MODULE_CARGO_HOLD_I');
   static const MODULE_CREW_QUARTERS_I =
       TradeSymbol._(r'MODULE_CREW_QUARTERS_I');
@@ -191,6 +195,7 @@ class TradeSymbol {
     AMMUNITION,
     ELECTRONICS,
     SHIP_PLATING,
+    SHIP_PARTS,
     EQUIPMENT,
     FUEL,
     MEDICINE,
@@ -198,6 +203,7 @@ class TradeSymbol {
     CLOTHING,
     MICROPROCESSORS,
     PLASTICS,
+    QUANTUM_STABILIZERS,
     POLYNUCLEOTIDES,
     BIOCOMPOSITES,
     NANOBOTS,
@@ -228,6 +234,7 @@ class TradeSymbol {
     ENGINE_ION_DRIVE_II,
     ENGINE_HYPER_DRIVE_I,
     MODULE_MINERAL_PROCESSOR_I,
+    MODULE_GAS_PROCESSOR_I,
     MODULE_CARGO_HOLD_I,
     MODULE_CREW_QUARTERS_I,
     MODULE_ENVOY_QUARTERS_I,
@@ -386,6 +393,8 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.ELECTRONICS;
         case r'SHIP_PLATING':
           return TradeSymbol.SHIP_PLATING;
+        case r'SHIP_PARTS':
+          return TradeSymbol.SHIP_PARTS;
         case r'EQUIPMENT':
           return TradeSymbol.EQUIPMENT;
         case r'FUEL':
@@ -400,6 +409,8 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.MICROPROCESSORS;
         case r'PLASTICS':
           return TradeSymbol.PLASTICS;
+        case r'QUANTUM_STABILIZERS':
+          return TradeSymbol.QUANTUM_STABILIZERS;
         case r'POLYNUCLEOTIDES':
           return TradeSymbol.POLYNUCLEOTIDES;
         case r'BIOCOMPOSITES':
@@ -460,6 +471,8 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.ENGINE_HYPER_DRIVE_I;
         case r'MODULE_MINERAL_PROCESSOR_I':
           return TradeSymbol.MODULE_MINERAL_PROCESSOR_I;
+        case r'MODULE_GAS_PROCESSOR_I':
+          return TradeSymbol.MODULE_GAS_PROCESSOR_I;
         case r'MODULE_CARGO_HOLD_I':
           return TradeSymbol.MODULE_CARGO_HOLD_I;
         case r'MODULE_CREW_QUARTERS_I':

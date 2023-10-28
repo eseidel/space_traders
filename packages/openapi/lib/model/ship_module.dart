@@ -203,7 +203,12 @@ class ShipModuleSymbolEnum {
 
   static const MINERAL_PROCESSOR_I =
       ShipModuleSymbolEnum._(r'MODULE_MINERAL_PROCESSOR_I');
+  static const GAS_PROCESSOR_I =
+      ShipModuleSymbolEnum._(r'MODULE_GAS_PROCESSOR_I');
   static const CARGO_HOLD_I = ShipModuleSymbolEnum._(r'MODULE_CARGO_HOLD_I');
+  static const CARGO_HOLD_II = ShipModuleSymbolEnum._(r'MODULE_CARGO_HOLD_II');
+  static const CARGO_HOLD_III =
+      ShipModuleSymbolEnum._(r'MODULE_CARGO_HOLD_III');
   static const CREW_QUARTERS_I =
       ShipModuleSymbolEnum._(r'MODULE_CREW_QUARTERS_I');
   static const ENVOY_QUARTERS_I =
@@ -233,7 +238,10 @@ class ShipModuleSymbolEnum {
   /// List of all possible values in this [enum][ShipModuleSymbolEnum].
   static const values = <ShipModuleSymbolEnum>[
     MINERAL_PROCESSOR_I,
+    GAS_PROCESSOR_I,
     CARGO_HOLD_I,
+    CARGO_HOLD_II,
+    CARGO_HOLD_III,
     CREW_QUARTERS_I,
     ENVOY_QUARTERS_I,
     PASSENGER_CABIN_I,
@@ -294,8 +302,14 @@ class ShipModuleSymbolEnumTypeTransformer {
       switch (data) {
         case r'MODULE_MINERAL_PROCESSOR_I':
           return ShipModuleSymbolEnum.MINERAL_PROCESSOR_I;
+        case r'MODULE_GAS_PROCESSOR_I':
+          return ShipModuleSymbolEnum.GAS_PROCESSOR_I;
         case r'MODULE_CARGO_HOLD_I':
           return ShipModuleSymbolEnum.CARGO_HOLD_I;
+        case r'MODULE_CARGO_HOLD_II':
+          return ShipModuleSymbolEnum.CARGO_HOLD_II;
+        case r'MODULE_CARGO_HOLD_III':
+          return ShipModuleSymbolEnum.CARGO_HOLD_III;
         case r'MODULE_CREW_QUARTERS_I':
           return ShipModuleSymbolEnum.CREW_QUARTERS_I;
         case r'MODULE_ENVOY_QUARTERS_I':

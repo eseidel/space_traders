@@ -229,12 +229,16 @@ class ApiClient {
           return AcceptContract200Response.fromJson(value);
         case 'AcceptContract200ResponseData':
           return AcceptContract200ResponseData.fromJson(value);
+        case 'ActivityLevel':
+          return ActivityLevelTypeTransformer().decode(value);
         case 'Agent':
           return Agent.fromJson(value);
         case 'Chart':
           return Chart.fromJson(value);
-        case 'ConnectedSystem':
-          return ConnectedSystem.fromJson(value);
+        case 'Construction':
+          return Construction.fromJson(value);
+        case 'ConstructionMaterial':
+          return ConstructionMaterial.fromJson(value);
         case 'Contract':
           return Contract.fromJson(value);
         case 'ContractDeliverGood':
@@ -293,6 +297,8 @@ class ApiClient {
           return FulfillContract200Response.fromJson(value);
         case 'GetAgents200Response':
           return GetAgents200Response.fromJson(value);
+        case 'GetConstruction200Response':
+          return GetConstruction200Response.fromJson(value);
         case 'GetContract200Response':
           return GetContract200Response.fromJson(value);
         case 'GetContracts200Response':
@@ -343,6 +349,8 @@ class ApiClient {
           return GetSystem200Response.fromJson(value);
         case 'GetSystemWaypoints200Response':
           return GetSystemWaypoints200Response.fromJson(value);
+        case 'GetSystemWaypointsTraitsParameter':
+          return GetSystemWaypointsTraitsParameter.fromJson(value);
         case 'GetSystems200Response':
           return GetSystems200Response.fromJson(value);
         case 'GetWaypoint200Response':
@@ -499,6 +507,22 @@ class ApiClient {
           return ShipyardShipTypesInner.fromJson(value);
         case 'ShipyardTransaction':
           return ShipyardTransaction.fromJson(value);
+        case 'Siphon':
+          return Siphon.fromJson(value);
+        case 'SiphonResources201Response':
+          return SiphonResources201Response.fromJson(value);
+        case 'SiphonResources201ResponseData':
+          return SiphonResources201ResponseData.fromJson(value);
+        case 'SiphonYield':
+          return SiphonYield.fromJson(value);
+        case 'SupplyConstruction200Response':
+          return SupplyConstruction200Response.fromJson(value);
+        case 'SupplyConstruction200ResponseData':
+          return SupplyConstruction200ResponseData.fromJson(value);
+        case 'SupplyConstructionRequest':
+          return SupplyConstructionRequest.fromJson(value);
+        case 'SupplyLevel':
+          return SupplyLevelTypeTransformer().decode(value);
         case 'Survey':
           return Survey.fromJson(value);
         case 'SurveyDeposit':
@@ -523,6 +547,8 @@ class ApiClient {
           return Waypoint.fromJson(value);
         case 'WaypointFaction':
           return WaypointFaction.fromJson(value);
+        case 'WaypointModifier':
+          return WaypointModifier.fromJson(value);
         case 'WaypointOrbital':
           return WaypointOrbital.fromJson(value);
         case 'WaypointTrait':

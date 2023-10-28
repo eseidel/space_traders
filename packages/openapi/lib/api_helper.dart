@@ -65,6 +65,9 @@ String parameterToString(dynamic value) {
   if (value is DateTime) {
     return value.toUtc().toIso8601String();
   }
+  if (value is ActivityLevel) {
+    return ActivityLevelTypeTransformer().encode(value).toString();
+  }
   if (value is FactionSymbols) {
     return FactionSymbolsTypeTransformer().encode(value).toString();
   }
@@ -79,6 +82,9 @@ String parameterToString(dynamic value) {
   }
   if (value is ShipType) {
     return ShipTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is SupplyLevel) {
+    return SupplyLevelTypeTransformer().encode(value).toString();
   }
   if (value is SystemType) {
     return SystemTypeTypeTransformer().encode(value).toString();

@@ -13,28 +13,28 @@ part of openapi;
 class JumpShipRequest {
   /// Returns a new [JumpShipRequest] instance.
   JumpShipRequest({
-    required this.systemSymbol,
+    required this.waypointSymbol,
   });
 
-  /// The system symbol to jump to.
-  String systemSymbol;
+  /// The symbol of the waypoint to jump to. The destination must be a connected waypoint.
+  String waypointSymbol;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is JumpShipRequest && other.systemSymbol == systemSymbol;
+      other is JumpShipRequest && other.waypointSymbol == waypointSymbol;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (systemSymbol.hashCode);
+      (waypointSymbol.hashCode);
 
   @override
-  String toString() => 'JumpShipRequest[systemSymbol=$systemSymbol]';
+  String toString() => 'JumpShipRequest[waypointSymbol=$waypointSymbol]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'systemSymbol'] = this.systemSymbol;
+    json[r'waypointSymbol'] = this.waypointSymbol;
     return json;
   }
 
@@ -59,7 +59,7 @@ class JumpShipRequest {
       }());
 
       return JumpShipRequest(
-        systemSymbol: mapValueOfType<String>(json, r'systemSymbol')!,
+        waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol')!,
       );
     }
     return null;
@@ -116,6 +116,6 @@ class JumpShipRequest {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'systemSymbol',
+    'waypointSymbol',
   };
 }

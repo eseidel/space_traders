@@ -10,49 +10,49 @@
 
 part of openapi;
 
-class JumpShip200ResponseData {
-  /// Returns a new [JumpShip200ResponseData] instance.
-  JumpShip200ResponseData({
-    required this.nav,
+class SiphonResources201ResponseData {
+  /// Returns a new [SiphonResources201ResponseData] instance.
+  SiphonResources201ResponseData({
     required this.cooldown,
-    required this.transaction,
+    required this.siphon,
+    required this.cargo,
   });
-
-  ShipNav nav;
 
   Cooldown cooldown;
 
-  MarketTransaction transaction;
+  Siphon siphon;
+
+  ShipCargo cargo;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is JumpShip200ResponseData &&
-          other.nav == nav &&
+      other is SiphonResources201ResponseData &&
           other.cooldown == cooldown &&
-          other.transaction == transaction;
+          other.siphon == siphon &&
+          other.cargo == cargo;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (nav.hashCode) + (cooldown.hashCode) + (transaction.hashCode);
+      (cooldown.hashCode) + (siphon.hashCode) + (cargo.hashCode);
 
   @override
   String toString() =>
-      'JumpShip200ResponseData[nav=$nav, cooldown=$cooldown, transaction=$transaction]';
+      'SiphonResources201ResponseData[cooldown=$cooldown, siphon=$siphon, cargo=$cargo]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'nav'] = this.nav;
     json[r'cooldown'] = this.cooldown;
-    json[r'transaction'] = this.transaction;
+    json[r'siphon'] = this.siphon;
+    json[r'cargo'] = this.cargo;
     return json;
   }
 
-  /// Returns a new [JumpShip200ResponseData] instance and imports its values from
+  /// Returns a new [SiphonResources201ResponseData] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static JumpShip200ResponseData? fromJson(dynamic value) {
+  static SiphonResources201ResponseData? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -62,30 +62,30 @@ class JumpShip200ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "JumpShip200ResponseData[$key]" is missing from JSON.');
+              'Required key "SiphonResources201ResponseData[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "JumpShip200ResponseData[$key]" has a null value in JSON.');
+              'Required key "SiphonResources201ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return JumpShip200ResponseData(
-        nav: ShipNav.fromJson(json[r'nav'])!,
+      return SiphonResources201ResponseData(
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
-        transaction: MarketTransaction.fromJson(json[r'transaction'])!,
+        siphon: Siphon.fromJson(json[r'siphon'])!,
+        cargo: ShipCargo.fromJson(json[r'cargo'])!,
       );
     }
     return null;
   }
 
-  static List<JumpShip200ResponseData> listFromJson(
+  static List<SiphonResources201ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <JumpShip200ResponseData>[];
+    final result = <SiphonResources201ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = JumpShip200ResponseData.fromJson(row);
+        final value = SiphonResources201ResponseData.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -94,12 +94,12 @@ class JumpShip200ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, JumpShip200ResponseData> mapFromJson(dynamic json) {
-    final map = <String, JumpShip200ResponseData>{};
+  static Map<String, SiphonResources201ResponseData> mapFromJson(dynamic json) {
+    final map = <String, SiphonResources201ResponseData>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = JumpShip200ResponseData.fromJson(entry.value);
+        final value = SiphonResources201ResponseData.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,17 +108,17 @@ class JumpShip200ResponseData {
     return map;
   }
 
-  // maps a json object with a list of JumpShip200ResponseData-objects as value to a dart map
-  static Map<String, List<JumpShip200ResponseData>> mapListFromJson(
+  // maps a json object with a list of SiphonResources201ResponseData-objects as value to a dart map
+  static Map<String, List<SiphonResources201ResponseData>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<JumpShip200ResponseData>>{};
+    final map = <String, List<SiphonResources201ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = JumpShip200ResponseData.listFromJson(
+        map[entry.key] = SiphonResources201ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -129,8 +129,8 @@ class JumpShip200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'nav',
     'cooldown',
-    'transaction',
+    'siphon',
+    'cargo',
   };
 }

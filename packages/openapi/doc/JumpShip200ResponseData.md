@@ -8,8 +8,9 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**cooldown** | [**Cooldown**](Cooldown.md) |  | 
 **nav** | [**ShipNav**](ShipNav.md) |  | 
+**cooldown** | [**Cooldown**](Cooldown.md) |  | 
+**transaction** | [**MarketTransaction**](MarketTransaction.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

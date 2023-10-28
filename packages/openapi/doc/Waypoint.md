@@ -17,7 +17,9 @@ Name | Type | Description | Notes
 **orbits** | **String** | The symbol of the parent waypoint, if this waypoint is in orbit around another waypoint. Otherwise this value is undefined. | [optional] 
 **faction** | [**WaypointFaction**](WaypointFaction.md) |  | [optional] 
 **traits** | [**List<WaypointTrait>**](WaypointTrait.md) | The traits of the waypoint. | [default to const []]
+**modifiers** | [**List<WaypointModifier>**](WaypointModifier.md) | The modifiers of the waypoint. | [optional] [default to const []]
 **chart** | [**Chart**](Chart.md) |  | [optional] 
+**isUnderConstruction** | **bool** | True if the waypoint is under construction. | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

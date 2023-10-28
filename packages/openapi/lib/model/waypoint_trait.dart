@@ -152,6 +152,8 @@ class WaypointTraitSymbolEnum {
   String toJson() => value;
 
   static const UNCHARTED = WaypointTraitSymbolEnum._(r'UNCHARTED');
+  static const UNDER_CONSTRUCTION =
+      WaypointTraitSymbolEnum._(r'UNDER_CONSTRUCTION');
   static const MARKETPLACE = WaypointTraitSymbolEnum._(r'MARKETPLACE');
   static const SHIPYARD = WaypointTraitSymbolEnum._(r'SHIPYARD');
   static const OUTPOST = WaypointTraitSymbolEnum._(r'OUTPOST');
@@ -218,6 +220,7 @@ class WaypointTraitSymbolEnum {
       WaypointTraitSymbolEnum._(r'CORROSIVE_ATMOSPHERE');
   static const BREATHABLE_ATMOSPHERE =
       WaypointTraitSymbolEnum._(r'BREATHABLE_ATMOSPHERE');
+  static const THIN_ATMOSPHERE = WaypointTraitSymbolEnum._(r'THIN_ATMOSPHERE');
   static const JOVIAN = WaypointTraitSymbolEnum._(r'JOVIAN');
   static const ROCKY = WaypointTraitSymbolEnum._(r'ROCKY');
   static const VOLCANIC = WaypointTraitSymbolEnum._(r'VOLCANIC');
@@ -227,11 +230,22 @@ class WaypointTraitSymbolEnum {
   static const TEMPERATE = WaypointTraitSymbolEnum._(r'TEMPERATE');
   static const JUNGLE = WaypointTraitSymbolEnum._(r'JUNGLE');
   static const OCEAN = WaypointTraitSymbolEnum._(r'OCEAN');
+  static const RADIOACTIVE = WaypointTraitSymbolEnum._(r'RADIOACTIVE');
+  static const MICRO_GRAVITY_ANOMALIES =
+      WaypointTraitSymbolEnum._(r'MICRO_GRAVITY_ANOMALIES');
+  static const DEBRIS_CLUSTER = WaypointTraitSymbolEnum._(r'DEBRIS_CLUSTER');
+  static const DEEP_CRATERS = WaypointTraitSymbolEnum._(r'DEEP_CRATERS');
+  static const SHALLOW_CRATERS = WaypointTraitSymbolEnum._(r'SHALLOW_CRATERS');
+  static const UNSTABLE_COMPOSITION =
+      WaypointTraitSymbolEnum._(r'UNSTABLE_COMPOSITION');
+  static const HOLLOWED_INTERIOR =
+      WaypointTraitSymbolEnum._(r'HOLLOWED_INTERIOR');
   static const STRIPPED = WaypointTraitSymbolEnum._(r'STRIPPED');
 
   /// List of all possible values in this [enum][WaypointTraitSymbolEnum].
   static const values = <WaypointTraitSymbolEnum>[
     UNCHARTED,
+    UNDER_CONSTRUCTION,
     MARKETPLACE,
     SHIPYARD,
     OUTPOST,
@@ -280,6 +294,7 @@ class WaypointTraitSymbolEnum {
     TOXIC_ATMOSPHERE,
     CORROSIVE_ATMOSPHERE,
     BREATHABLE_ATMOSPHERE,
+    THIN_ATMOSPHERE,
     JOVIAN,
     ROCKY,
     VOLCANIC,
@@ -289,6 +304,13 @@ class WaypointTraitSymbolEnum {
     TEMPERATE,
     JUNGLE,
     OCEAN,
+    RADIOACTIVE,
+    MICRO_GRAVITY_ANOMALIES,
+    DEBRIS_CLUSTER,
+    DEEP_CRATERS,
+    SHALLOW_CRATERS,
+    UNSTABLE_COMPOSITION,
+    HOLLOWED_INTERIOR,
     STRIPPED,
   ];
 
@@ -335,6 +357,8 @@ class WaypointTraitSymbolEnumTypeTransformer {
       switch (data) {
         case r'UNCHARTED':
           return WaypointTraitSymbolEnum.UNCHARTED;
+        case r'UNDER_CONSTRUCTION':
+          return WaypointTraitSymbolEnum.UNDER_CONSTRUCTION;
         case r'MARKETPLACE':
           return WaypointTraitSymbolEnum.MARKETPLACE;
         case r'SHIPYARD':
@@ -431,6 +455,8 @@ class WaypointTraitSymbolEnumTypeTransformer {
           return WaypointTraitSymbolEnum.CORROSIVE_ATMOSPHERE;
         case r'BREATHABLE_ATMOSPHERE':
           return WaypointTraitSymbolEnum.BREATHABLE_ATMOSPHERE;
+        case r'THIN_ATMOSPHERE':
+          return WaypointTraitSymbolEnum.THIN_ATMOSPHERE;
         case r'JOVIAN':
           return WaypointTraitSymbolEnum.JOVIAN;
         case r'ROCKY':
@@ -449,6 +475,20 @@ class WaypointTraitSymbolEnumTypeTransformer {
           return WaypointTraitSymbolEnum.JUNGLE;
         case r'OCEAN':
           return WaypointTraitSymbolEnum.OCEAN;
+        case r'RADIOACTIVE':
+          return WaypointTraitSymbolEnum.RADIOACTIVE;
+        case r'MICRO_GRAVITY_ANOMALIES':
+          return WaypointTraitSymbolEnum.MICRO_GRAVITY_ANOMALIES;
+        case r'DEBRIS_CLUSTER':
+          return WaypointTraitSymbolEnum.DEBRIS_CLUSTER;
+        case r'DEEP_CRATERS':
+          return WaypointTraitSymbolEnum.DEEP_CRATERS;
+        case r'SHALLOW_CRATERS':
+          return WaypointTraitSymbolEnum.SHALLOW_CRATERS;
+        case r'UNSTABLE_COMPOSITION':
+          return WaypointTraitSymbolEnum.UNSTABLE_COMPOSITION;
+        case r'HOLLOWED_INTERIOR':
+          return WaypointTraitSymbolEnum.HOLLOWED_INTERIOR;
         case r'STRIPPED':
           return WaypointTraitSymbolEnum.STRIPPED;
         default:

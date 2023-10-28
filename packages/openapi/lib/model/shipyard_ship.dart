@@ -16,6 +16,8 @@ class ShipyardShip {
     this.type,
     required this.name,
     required this.description,
+    required this.supply,
+    this.activity,
     required this.purchasePrice,
     required this.frame,
     required this.reactor,
@@ -36,6 +38,16 @@ class ShipyardShip {
   String name;
 
   String description;
+
+  SupplyLevel supply;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  ActivityLevel? activity;
 
   int purchasePrice;
 
@@ -58,6 +70,8 @@ class ShipyardShip {
           other.type == type &&
           other.name == name &&
           other.description == description &&
+          other.supply == supply &&
+          other.activity == activity &&
           other.purchasePrice == purchasePrice &&
           other.frame == frame &&
           other.reactor == reactor &&
@@ -72,6 +86,8 @@ class ShipyardShip {
       (type == null ? 0 : type!.hashCode) +
       (name.hashCode) +
       (description.hashCode) +
+      (supply.hashCode) +
+      (activity == null ? 0 : activity!.hashCode) +
       (purchasePrice.hashCode) +
       (frame.hashCode) +
       (reactor.hashCode) +
@@ -82,7 +98,7 @@ class ShipyardShip {
 
   @override
   String toString() =>
-      'ShipyardShip[type=$type, name=$name, description=$description, purchasePrice=$purchasePrice, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, crew=$crew]';
+      'ShipyardShip[type=$type, name=$name, description=$description, supply=$supply, activity=$activity, purchasePrice=$purchasePrice, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, crew=$crew]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -93,6 +109,12 @@ class ShipyardShip {
     }
     json[r'name'] = this.name;
     json[r'description'] = this.description;
+    json[r'supply'] = this.supply;
+    if (this.activity != null) {
+      json[r'activity'] = this.activity;
+    } else {
+      json[r'activity'] = null;
+    }
     json[r'purchasePrice'] = this.purchasePrice;
     json[r'frame'] = this.frame;
     json[r'reactor'] = this.reactor;
@@ -127,6 +149,8 @@ class ShipyardShip {
         type: ShipType.fromJson(json[r'type']),
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
+        supply: SupplyLevel.fromJson(json[r'supply'])!,
+        activity: ActivityLevel.fromJson(json[r'activity']),
         purchasePrice: mapValueOfType<int>(json, r'purchasePrice')!,
         frame: ShipFrame.fromJson(json[r'frame'])!,
         reactor: ShipReactor.fromJson(json[r'reactor'])!,
@@ -192,6 +216,7 @@ class ShipyardShip {
   static const requiredKeys = <String>{
     'name',
     'description',
+    'supply',
     'purchasePrice',
     'frame',
     'reactor',

@@ -13,54 +13,28 @@ part of openapi;
 class JumpGate {
   /// Returns a new [JumpGate] instance.
   JumpGate({
-    required this.jumpRange,
-    this.factionSymbol,
-    this.connectedSystems = const [],
+    this.connections = const [],
   });
 
-  /// The maximum jump range of the gate.
-  num jumpRange;
-
-  /// The symbol of the faction that owns the gate.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? factionSymbol;
-
-  /// The systems within range of the gate that have a corresponding gate.
-  List<ConnectedSystem> connectedSystems;
+  /// All the gates that are connected to this waypoint.
+  List<String> connections;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is JumpGate &&
-          other.jumpRange == jumpRange &&
-          other.factionSymbol == factionSymbol &&
-          other.connectedSystems == connectedSystems;
+      other is JumpGate && other.connections == connections;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (jumpRange.hashCode) +
-      (factionSymbol == null ? 0 : factionSymbol!.hashCode) +
-      (connectedSystems.hashCode);
+      (connections.hashCode);
 
   @override
-  String toString() =>
-      'JumpGate[jumpRange=$jumpRange, factionSymbol=$factionSymbol, connectedSystems=$connectedSystems]';
+  String toString() => 'JumpGate[connections=$connections]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'jumpRange'] = this.jumpRange;
-    if (this.factionSymbol != null) {
-      json[r'factionSymbol'] = this.factionSymbol;
-    } else {
-      json[r'factionSymbol'] = null;
-    }
-    json[r'connectedSystems'] = this.connectedSystems;
+    json[r'connections'] = this.connections;
     return json;
   }
 
@@ -85,10 +59,9 @@ class JumpGate {
       }());
 
       return JumpGate(
-        jumpRange: num.parse(json[r'jumpRange'].toString()),
-        factionSymbol: mapValueOfType<String>(json, r'factionSymbol'),
-        connectedSystems:
-            ConnectedSystem.listFromJson(json[r'connectedSystems']),
+        connections: json[r'connections'] is List
+            ? (json[r'connections'] as List).cast<String>()
+            : const [],
       );
     }
     return null;
@@ -145,7 +118,6 @@ class JumpGate {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'jumpRange',
-    'connectedSystems',
+    'connections',
   };
 }

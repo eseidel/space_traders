@@ -169,16 +169,18 @@ VSCode.  Mostly I just use codecov for viewing coverage.
 
 ### Generating `space_traders_api` package
 ```
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 dart pub global activate openapi_generator_cli
-rmdir packages/openapi/
+rm -rf packages/openapi/
 openapi-generator generate -c open_api_config.yaml
+rm -rf packages/openapi/test
+dart format packages/openapi
+git add packages/openapi
 ```
 Then modified:
-* `rmdir packages/openapi/test` directory since it was just TODOs.
 * Fixed handling of required num fields:
     * `packages/openapi/lib/model/jump_gate.dart`
   Due to: https://github.com/OpenAPITools/openapi-generator/pull/10637#pullrequestreview-1425351014
-* Ran `dart format packages/openapi`
 
 #### Bugs to report to OpenAPI
 * Required arguments in request body should make body required/non-nullable.

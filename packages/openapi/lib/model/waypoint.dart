@@ -22,7 +22,9 @@ class Waypoint {
     this.orbits,
     this.faction,
     this.traits = const [],
+    this.modifiers = const [],
     this.chart,
+    required this.isUnderConstruction,
   });
 
   /// Symbol fo the waypoint.
@@ -62,6 +64,9 @@ class Waypoint {
   /// The traits of the waypoint.
   List<WaypointTrait> traits;
 
+  /// The modifiers of the waypoint.
+  List<WaypointModifier> modifiers;
+
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -69,6 +74,9 @@ class Waypoint {
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
   Chart? chart;
+
+  /// True if the waypoint is under construction.
+  bool isUnderConstruction;
 
   @override
   bool operator ==(Object other) =>
@@ -83,7 +91,9 @@ class Waypoint {
           other.orbits == orbits &&
           other.faction == faction &&
           other.traits == traits &&
-          other.chart == chart;
+          other.modifiers == modifiers &&
+          other.chart == chart &&
+          other.isUnderConstruction == isUnderConstruction;
 
   @override
   int get hashCode =>
@@ -97,11 +107,13 @@ class Waypoint {
       (orbits == null ? 0 : orbits!.hashCode) +
       (faction == null ? 0 : faction!.hashCode) +
       (traits.hashCode) +
-      (chart == null ? 0 : chart!.hashCode);
+      (modifiers.hashCode) +
+      (chart == null ? 0 : chart!.hashCode) +
+      (isUnderConstruction.hashCode);
 
   @override
   String toString() =>
-      'Waypoint[symbol=$symbol, type=$type, systemSymbol=$systemSymbol, x=$x, y=$y, orbitals=$orbitals, orbits=$orbits, faction=$faction, traits=$traits, chart=$chart]';
+      'Waypoint[symbol=$symbol, type=$type, systemSymbol=$systemSymbol, x=$x, y=$y, orbitals=$orbitals, orbits=$orbits, faction=$faction, traits=$traits, modifiers=$modifiers, chart=$chart, isUnderConstruction=$isUnderConstruction]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -122,11 +134,13 @@ class Waypoint {
       json[r'faction'] = null;
     }
     json[r'traits'] = this.traits;
+    json[r'modifiers'] = this.modifiers;
     if (this.chart != null) {
       json[r'chart'] = this.chart;
     } else {
       json[r'chart'] = null;
     }
+    json[r'isUnderConstruction'] = this.isUnderConstruction;
     return json;
   }
 
@@ -160,7 +174,10 @@ class Waypoint {
         orbits: mapValueOfType<String>(json, r'orbits'),
         faction: WaypointFaction.fromJson(json[r'faction']),
         traits: WaypointTrait.listFromJson(json[r'traits']),
+        modifiers: WaypointModifier.listFromJson(json[r'modifiers']),
         chart: Chart.fromJson(json[r'chart']),
+        isUnderConstruction:
+            mapValueOfType<bool>(json, r'isUnderConstruction')!,
       );
     }
     return null;
@@ -224,5 +241,6 @@ class Waypoint {
     'y',
     'orbitals',
     'traits',
+    'isUnderConstruction',
   };
 }

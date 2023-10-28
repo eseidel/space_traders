@@ -10,49 +10,51 @@
 
 part of openapi;
 
-class JumpShip200ResponseData {
-  /// Returns a new [JumpShip200ResponseData] instance.
-  JumpShip200ResponseData({
-    required this.nav,
-    required this.cooldown,
-    required this.transaction,
+class ConstructionMaterial {
+  /// Returns a new [ConstructionMaterial] instance.
+  ConstructionMaterial({
+    required this.tradeSymbol,
+    required this.required_,
+    required this.fulfilled,
   });
 
-  ShipNav nav;
+  TradeSymbol tradeSymbol;
 
-  Cooldown cooldown;
+  /// The number of units required.
+  int required_;
 
-  MarketTransaction transaction;
+  /// The number of units fulfilled toward the required amount.
+  int fulfilled;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is JumpShip200ResponseData &&
-          other.nav == nav &&
-          other.cooldown == cooldown &&
-          other.transaction == transaction;
+      other is ConstructionMaterial &&
+          other.tradeSymbol == tradeSymbol &&
+          other.required_ == required_ &&
+          other.fulfilled == fulfilled;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (nav.hashCode) + (cooldown.hashCode) + (transaction.hashCode);
+      (tradeSymbol.hashCode) + (required_.hashCode) + (fulfilled.hashCode);
 
   @override
   String toString() =>
-      'JumpShip200ResponseData[nav=$nav, cooldown=$cooldown, transaction=$transaction]';
+      'ConstructionMaterial[tradeSymbol=$tradeSymbol, required_=$required_, fulfilled=$fulfilled]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'nav'] = this.nav;
-    json[r'cooldown'] = this.cooldown;
-    json[r'transaction'] = this.transaction;
+    json[r'tradeSymbol'] = this.tradeSymbol;
+    json[r'required'] = this.required_;
+    json[r'fulfilled'] = this.fulfilled;
     return json;
   }
 
-  /// Returns a new [JumpShip200ResponseData] instance and imports its values from
+  /// Returns a new [ConstructionMaterial] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static JumpShip200ResponseData? fromJson(dynamic value) {
+  static ConstructionMaterial? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -62,30 +64,30 @@ class JumpShip200ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "JumpShip200ResponseData[$key]" is missing from JSON.');
+              'Required key "ConstructionMaterial[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "JumpShip200ResponseData[$key]" has a null value in JSON.');
+              'Required key "ConstructionMaterial[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return JumpShip200ResponseData(
-        nav: ShipNav.fromJson(json[r'nav'])!,
-        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
-        transaction: MarketTransaction.fromJson(json[r'transaction'])!,
+      return ConstructionMaterial(
+        tradeSymbol: TradeSymbol.fromJson(json[r'tradeSymbol'])!,
+        required_: mapValueOfType<int>(json, r'required')!,
+        fulfilled: mapValueOfType<int>(json, r'fulfilled')!,
       );
     }
     return null;
   }
 
-  static List<JumpShip200ResponseData> listFromJson(
+  static List<ConstructionMaterial> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <JumpShip200ResponseData>[];
+    final result = <ConstructionMaterial>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = JumpShip200ResponseData.fromJson(row);
+        final value = ConstructionMaterial.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -94,12 +96,12 @@ class JumpShip200ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, JumpShip200ResponseData> mapFromJson(dynamic json) {
-    final map = <String, JumpShip200ResponseData>{};
+  static Map<String, ConstructionMaterial> mapFromJson(dynamic json) {
+    final map = <String, ConstructionMaterial>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = JumpShip200ResponseData.fromJson(entry.value);
+        final value = ConstructionMaterial.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,17 +110,17 @@ class JumpShip200ResponseData {
     return map;
   }
 
-  // maps a json object with a list of JumpShip200ResponseData-objects as value to a dart map
-  static Map<String, List<JumpShip200ResponseData>> mapListFromJson(
+  // maps a json object with a list of ConstructionMaterial-objects as value to a dart map
+  static Map<String, List<ConstructionMaterial>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<JumpShip200ResponseData>>{};
+    final map = <String, List<ConstructionMaterial>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = JumpShip200ResponseData.listFromJson(
+        map[entry.key] = ConstructionMaterial.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -129,8 +131,8 @@ class JumpShip200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'nav',
-    'cooldown',
-    'transaction',
+    'tradeSymbol',
+    'required',
+    'fulfilled',
   };
 }

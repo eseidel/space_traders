@@ -25,6 +25,7 @@ class ShipType {
 
   static const PROBE = ShipType._(r'SHIP_PROBE');
   static const MINING_DRONE = ShipType._(r'SHIP_MINING_DRONE');
+  static const SIPHON_DRONE = ShipType._(r'SHIP_SIPHON_DRONE');
   static const INTERCEPTOR = ShipType._(r'SHIP_INTERCEPTOR');
   static const LIGHT_HAULER = ShipType._(r'SHIP_LIGHT_HAULER');
   static const COMMAND_FRIGATE = ShipType._(r'SHIP_COMMAND_FRIGATE');
@@ -33,11 +34,13 @@ class ShipType {
   static const LIGHT_SHUTTLE = ShipType._(r'SHIP_LIGHT_SHUTTLE');
   static const ORE_HOUND = ShipType._(r'SHIP_ORE_HOUND');
   static const REFINING_FREIGHTER = ShipType._(r'SHIP_REFINING_FREIGHTER');
+  static const SURVEYOR = ShipType._(r'SHIP_SURVEYOR');
 
   /// List of all possible values in this [enum][ShipType].
   static const values = <ShipType>[
     PROBE,
     MINING_DRONE,
+    SIPHON_DRONE,
     INTERCEPTOR,
     LIGHT_HAULER,
     COMMAND_FRIGATE,
@@ -46,6 +49,7 @@ class ShipType {
     LIGHT_SHUTTLE,
     ORE_HOUND,
     REFINING_FREIGHTER,
+    SURVEYOR,
   ];
 
   static ShipType? fromJson(dynamic value) =>
@@ -93,6 +97,8 @@ class ShipTypeTypeTransformer {
           return ShipType.PROBE;
         case r'SHIP_MINING_DRONE':
           return ShipType.MINING_DRONE;
+        case r'SHIP_SIPHON_DRONE':
+          return ShipType.SIPHON_DRONE;
         case r'SHIP_INTERCEPTOR':
           return ShipType.INTERCEPTOR;
         case r'SHIP_LIGHT_HAULER':
@@ -109,6 +115,8 @@ class ShipTypeTypeTransformer {
           return ShipType.ORE_HOUND;
         case r'SHIP_REFINING_FREIGHTER':
           return ShipType.REFINING_FREIGHTER;
+        case r'SHIP_SURVEYOR':
+          return ShipType.SURVEYOR;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

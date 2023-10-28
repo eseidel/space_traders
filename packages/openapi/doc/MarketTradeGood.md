@@ -9,8 +9,10 @@ import 'package:openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **symbol** | **String** | The symbol of the trade good. | 
-**tradeVolume** | **int** | The typical volume flowing through the market for this type of good. The larger the trade volume, the more stable prices will be. | 
-**supply** | **String** | A rough estimate of the total supply of this good in the marketplace. | 
+**type** | **String** | The type of trade good (export, import, or exchange). | 
+**tradeVolume** | **int** | This is the maximum number of units that can be purchased or sold at this market in a single trade for this good. Trade volume also gives an indication of price volatility. A market with a low trade volume will have large price swings, while high trade volume will be more resilient to price changes. | 
+**supply** | [**SupplyLevel**](SupplyLevel.md) |  | 
+**activity** | [**ActivityLevel**](ActivityLevel.md) |  | [optional] 
 **purchasePrice** | **int** | The price at which this good can be purchased from the market. | 
 **sellPrice** | **int** | The price at which this good can be sold to the market. | 
 

@@ -11,6 +11,8 @@ Name | Type | Description | Notes
 **type** | [**ShipType**](ShipType.md) |  | [optional] 
 **name** | **String** |  | 
 **description** | **String** |  | 
+**supply** | [**SupplyLevel**](SupplyLevel.md) |  | 
+**activity** | [**ActivityLevel**](ActivityLevel.md) |  | [optional] 
 **purchasePrice** | **int** |  | 
 **frame** | [**ShipFrame**](ShipFrame.md) |  | 
 **reactor** | [**ShipReactor**](ShipReactor.md) |  | 

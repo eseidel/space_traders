@@ -16,9 +16,87 @@ class SystemsApi {
 
   final ApiClient apiClient;
 
+  /// Get Construction Site
+  ///
+  /// Get construction details for a waypoint. Requires a waypoint with a property of `isUnderConstruction` to be true.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] systemSymbol (required):
+  ///   The system symbol
+  ///
+  /// * [String] waypointSymbol (required):
+  ///   The waypoint symbol
+  Future<Response> getConstructionWithHttpInfo(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction'
+            .replaceAll('{systemSymbol}', systemSymbol)
+            .replaceAll('{waypointSymbol}', waypointSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Construction Site
+  ///
+  /// Get construction details for a waypoint. Requires a waypoint with a property of `isUnderConstruction` to be true.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] systemSymbol (required):
+  ///   The system symbol
+  ///
+  /// * [String] waypointSymbol (required):
+  ///   The waypoint symbol
+  Future<GetConstruction200Response?> getConstruction(
+    String systemSymbol,
+    String waypointSymbol,
+  ) async {
+    final response = await getConstructionWithHttpInfo(
+      systemSymbol,
+      waypointSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetConstruction200Response',
+      ) as GetConstruction200Response;
+    }
+    return null;
+  }
+
   /// Get Jump Gate
   ///
-  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  The response will return all systems that are have a Jump Gate in range of this Jump Gate. Those systems can be jumped to from this Jump Gate.
+  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -60,7 +138,7 @@ class SystemsApi {
 
   /// Get Jump Gate
   ///
-  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  The response will return all systems that are have a Jump Gate in range of this Jump Gate. Those systems can be jumped to from this Jump Gate.
+  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be
   ///
   /// Parameters:
   ///
@@ -330,10 +408,18 @@ class SystemsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
+  ///
+  /// * [WaypointType] type:
+  ///   Filter waypoints by type.
+  ///
+  /// * [GetSystemWaypointsTraitsParameter] traits:
+  ///   Filter waypoints by one or more traits.
   Future<Response> getSystemWaypointsWithHttpInfo(
     String systemSymbol, {
     int? page,
     int? limit,
+    WaypointType? type,
+    GetSystemWaypointsTraitsParameter? traits,
   }) async {
     // ignore: prefer_const_declarations
     final path = r'/systems/{systemSymbol}/waypoints'
@@ -351,6 +437,12 @@ class SystemsApi {
     }
     if (limit != null) {
       queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+    if (type != null) {
+      queryParams.addAll(_queryParams('', 'type', type));
+    }
+    if (traits != null) {
+      queryParams.addAll(_queryParams('', 'traits', traits));
     }
 
     const contentTypes = <String>[];
@@ -380,15 +472,25 @@ class SystemsApi {
   ///
   /// * [int] limit:
   ///   How many entries to return per page
+  ///
+  /// * [WaypointType] type:
+  ///   Filter waypoints by type.
+  ///
+  /// * [GetSystemWaypointsTraitsParameter] traits:
+  ///   Filter waypoints by one or more traits.
   Future<GetSystemWaypoints200Response?> getSystemWaypoints(
     String systemSymbol, {
     int? page,
     int? limit,
+    WaypointType? type,
+    GetSystemWaypointsTraitsParameter? traits,
   }) async {
     final response = await getSystemWaypointsWithHttpInfo(
       systemSymbol,
       page: page,
       limit: limit,
+      type: type,
+      traits: traits,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -561,6 +663,93 @@ class SystemsApi {
         await _decodeBodyBytes(response),
         'GetWaypoint200Response',
       ) as GetWaypoint200Response;
+    }
+    return null;
+  }
+
+  /// Supply Construction Site
+  ///
+  /// Supply a construction site with the specified good. Requires a waypoint with a property of `isUnderConstruction` to be true.  The good must be in your ship's cargo. The good will be removed from your ship's cargo and added to the construction site's materials.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] systemSymbol (required):
+  ///   The system symbol
+  ///
+  /// * [String] waypointSymbol (required):
+  ///   The waypoint symbol
+  ///
+  /// * [SupplyConstructionRequest] supplyConstructionRequest:
+  ///
+  Future<Response> supplyConstructionWithHttpInfo(
+    String systemSymbol,
+    String waypointSymbol, {
+    SupplyConstructionRequest? supplyConstructionRequest,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction/supply'
+            .replaceAll('{systemSymbol}', systemSymbol)
+            .replaceAll('{waypointSymbol}', waypointSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody = supplyConstructionRequest;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Supply Construction Site
+  ///
+  /// Supply a construction site with the specified good. Requires a waypoint with a property of `isUnderConstruction` to be true.  The good must be in your ship's cargo. The good will be removed from your ship's cargo and added to the construction site's materials.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] systemSymbol (required):
+  ///   The system symbol
+  ///
+  /// * [String] waypointSymbol (required):
+  ///   The waypoint symbol
+  ///
+  /// * [SupplyConstructionRequest] supplyConstructionRequest:
+  ///
+  Future<SupplyConstruction200Response?> supplyConstruction(
+    String systemSymbol,
+    String waypointSymbol, {
+    SupplyConstructionRequest? supplyConstructionRequest,
+  }) async {
+    final response = await supplyConstructionWithHttpInfo(
+      systemSymbol,
+      waypointSymbol,
+      supplyConstructionRequest: supplyConstructionRequest,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'SupplyConstruction200Response',
+      ) as SupplyConstruction200Response;
     }
     return null;
   }

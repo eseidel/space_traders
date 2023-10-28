@@ -9,6 +9,7 @@ All URIs are relative to *https://api.spacetraders.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**getConstruction**](SystemsApi.md#getconstruction) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/construction | Get Construction Site
 [**getJumpGate**](SystemsApi.md#getjumpgate) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/jump-gate | Get Jump Gate
 [**getMarket**](SystemsApi.md#getmarket) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/market | Get Market
 [**getShipyard**](SystemsApi.md#getshipyard) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol}/shipyard | Get Shipyard
@@ -16,14 +17,66 @@ Method | HTTP request | Description
 [**getSystemWaypoints**](SystemsApi.md#getsystemwaypoints) | **GET** /systems/{systemSymbol}/waypoints | List Waypoints in System
 [**getSystems**](SystemsApi.md#getsystems) | **GET** /systems | List Systems
 [**getWaypoint**](SystemsApi.md#getwaypoint) | **GET** /systems/{systemSymbol}/waypoints/{waypointSymbol} | Get Waypoint
+[**supplyConstruction**](SystemsApi.md#supplyconstruction) | **POST** /systems/{systemSymbol}/waypoints/{waypointSymbol}/construction/supply | Supply Construction Site
 
+
+# **getConstruction**
+> GetConstruction200Response getConstruction(systemSymbol, waypointSymbol)
+
+Get Construction Site
+
+Get construction details for a waypoint. Requires a waypoint with a property of `isUnderConstruction` to be true.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = SystemsApi();
+final systemSymbol = systemSymbol_example; // String | The system symbol
+final waypointSymbol = waypointSymbol_example; // String | The waypoint symbol
+
+try {
+    final result = api_instance.getConstruction(systemSymbol, waypointSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling SystemsApi->getConstruction: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **systemSymbol** | **String**| The system symbol | 
+ **waypointSymbol** | **String**| The waypoint symbol | 
+
+### Return type
+
+[**GetConstruction200Response**](GetConstruction200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getJumpGate**
 > GetJumpGate200Response getJumpGate(systemSymbol, waypointSymbol)
 
 Get Jump Gate
 
-Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  The response will return all systems that are have a Jump Gate in range of this Jump Gate. Those systems can be jumped to from this Jump Gate.
+Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be 
 
 ### Example
 ```dart
@@ -221,7 +274,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getSystemWaypoints**
-> GetSystemWaypoints200Response getSystemWaypoints(systemSymbol, page, limit)
+> GetSystemWaypoints200Response getSystemWaypoints(systemSymbol, page, limit, type, traits)
 
 List Waypoints in System
 
@@ -241,9 +294,11 @@ final api_instance = SystemsApi();
 final systemSymbol = systemSymbol_example; // String | The system symbol
 final page = 56; // int | What entry offset to request
 final limit = 56; // int | How many entries to return per page
+final type = ; // WaypointType | Filter waypoints by type.
+final traits = ; // GetSystemWaypointsTraitsParameter | Filter waypoints by one or more traits.
 
 try {
-    final result = api_instance.getSystemWaypoints(systemSymbol, page, limit);
+    final result = api_instance.getSystemWaypoints(systemSymbol, page, limit, type, traits);
     print(result);
 } catch (e) {
     print('Exception when calling SystemsApi->getSystemWaypoints: $e\n');
@@ -257,6 +312,8 @@ Name | Type | Description  | Notes
  **systemSymbol** | **String**| The system symbol | 
  **page** | **int**| What entry offset to request | [optional] [default to 1]
  **limit** | **int**| How many entries to return per page | [optional] [default to 10]
+ **type** | [**WaypointType**](.md)| Filter waypoints by type. | [optional] 
+ **traits** | [**GetSystemWaypointsTraitsParameter**](.md)| Filter waypoints by one or more traits. | [optional] 
 
 ### Return type
 
@@ -371,6 +428,59 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **supplyConstruction**
+> SupplyConstruction200Response supplyConstruction(systemSymbol, waypointSymbol, supplyConstructionRequest)
+
+Supply Construction Site
+
+Supply a construction site with the specified good. Requires a waypoint with a property of `isUnderConstruction` to be true.  The good must be in your ship's cargo. The good will be removed from your ship's cargo and added to the construction site's materials.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = SystemsApi();
+final systemSymbol = systemSymbol_example; // String | The system symbol
+final waypointSymbol = waypointSymbol_example; // String | The waypoint symbol
+final supplyConstructionRequest = SupplyConstructionRequest(); // SupplyConstructionRequest | 
+
+try {
+    final result = api_instance.supplyConstruction(systemSymbol, waypointSymbol, supplyConstructionRequest);
+    print(result);
+} catch (e) {
+    print('Exception when calling SystemsApi->supplyConstruction: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **systemSymbol** | **String**| The system symbol | 
+ **waypointSymbol** | **String**| The waypoint symbol | 
+ **supplyConstructionRequest** | [**SupplyConstructionRequest**](SupplyConstructionRequest.md)|  | [optional] 
+
+### Return type
+
+[**SupplyConstruction200Response**](SupplyConstruction200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
