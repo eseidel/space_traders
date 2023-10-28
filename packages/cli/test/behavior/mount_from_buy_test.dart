@@ -55,8 +55,15 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
     when(() => ship.mounts).thenReturn([
+      // A mount in our template, we will leave it be.
       ShipMount(
         symbol: ShipMountSymbolEnum.SURVEYOR_I,
+        name: '',
+        requirements: ShipRequirements(),
+      ),
+      // A mount not in our template (we will remove it)
+      ShipMount(
+        symbol: ShipMountSymbolEnum.LASER_CANNON_I,
         name: '',
         requirements: ShipRequirements(),
       ),
@@ -184,6 +191,30 @@ void main() {
             transaction: ShipModificationTransaction(
               waypointSymbol: symbol.waypoint,
               tradeSymbol: TradeSymbol.MOUNT_SURVEYOR_II.value,
+              totalPrice: 100,
+              shipSymbol: shipSymbol.symbol,
+              timestamp: DateTime(2021),
+            ),
+          ),
+        ),
+      ),
+    );
+    when(
+      () => fleetApi.removeMount(
+        shipSymbol.symbol,
+        removeMountRequest: RemoveMountRequest(
+          symbol: ShipMountSymbolEnum.LASER_CANNON_I.value,
+        ),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        RemoveMount201Response(
+          data: RemoveMount201ResponseData(
+            agent: agent,
+            cargo: shipCargo,
+            transaction: ShipModificationTransaction(
+              waypointSymbol: symbol.waypoint,
+              tradeSymbol: TradeSymbol.MOUNT_LASER_CANNON_I.value,
               totalPrice: 100,
               shipSymbol: shipSymbol.symbol,
               timestamp: DateTime(2021),
