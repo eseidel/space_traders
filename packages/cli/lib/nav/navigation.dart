@@ -215,7 +215,8 @@ Future<NavResult> continueNavigationIfNeeded(
   }
   final actionStart = systemsCache.waypointFromSymbol(action.startSymbol);
   final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
-  await undockIfNeeded(api, shipCache, ship);
+  // All navigation actions require being undocked, but the action functions
+  // will handle that for us.
   switch (action.type) {
     case RouteActionType.emptyRoute:
       shipWarn(ship, 'Empty route action, assuming we are already there.');

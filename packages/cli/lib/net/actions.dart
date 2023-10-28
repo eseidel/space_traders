@@ -409,12 +409,16 @@ Future<void> chartWaypointAndLog(
   }
 }
 
-Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
+/// Use the jump gate to travel to [systemSymbol] and log.
+Future<JumpShip200ResponseData> useJumpGateAndLog(
   Api api,
   ShipCache shipCache,
   Ship ship,
   SystemSymbol systemSymbol,
 ) async {
+  // Using a jump gate requires us to be in orbit.
+  await undockIfNeeded(api, shipCache, ship);
+
   shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $systemSymbol');
   final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol.system);
   final response =
@@ -425,29 +429,6 @@ Future<JumpShip200ResponseData> _useJumpGateAndLogInner(
   shipCache.updateShip(ship);
   // shipDetail(ship, 'Used Jump Gate to $systemSymbol');
   return response.data;
-}
-
-/// Use the jump gate to travel to [systemSymbol] and log.
-Future<JumpShip200ResponseData> useJumpGateAndLog(
-  Api api,
-  ShipCache shipCache,
-  Ship ship,
-  SystemSymbol systemSymbol,
-) async {
-  try {
-    final waitUntil =
-        await _useJumpGateAndLogInner(api, shipCache, ship, systemSymbol);
-    return waitUntil;
-  } on ApiException catch (e) {
-    if (!isShipNotInOrbitException(e)) {
-      rethrow;
-    }
-    // This is an error in the surrounding code (or possibly our cached state).
-    shipWarn(ship, 'Ship tried to jump while not in orbit?!');
-    final waitUntil =
-        await _useJumpGateAndLogInner(api, shipCache, ship, systemSymbol);
-    return waitUntil;
-  }
 }
 
 /// Negotiate a contract for [ship] and log.
