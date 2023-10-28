@@ -381,7 +381,45 @@ void main() {
         refuelShipRequest: RefuelShipRequest(units: 300),
       ),
     ).called(1);
+    verifyNever(
+      () => fleetApi.patchShipNav(
+        any(),
+        patchShipNavRequest: any(named: 'patchShipNavRequest'),
+      ),
+    );
 
+    // Refueling will reset the flight mode to cruise.
+    when(
+      () => fleetApi.patchShipNav(
+        any(),
+        patchShipNavRequest: any(named: 'patchShipNavRequest'),
+      ),
+    ).thenAnswer(
+      (invocation) => Future.value(GetShipNav200Response(data: shipNav)),
+    );
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.BURN);
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.BURN);
+    await runWithLogger(
+      logger,
+      () => refuelIfNeededAndLog(
+        api,
+        db,
+        marketPrices,
+        agentCache,
+        shipCache,
+        market,
+        ship,
+      ),
+    );
+    verify(
+      () => fleetApi.patchShipNav(
+        shipSymbol.symbol,
+        patchShipNavRequest:
+            PatchShipNavRequest(flightMode: ShipNavFlightMode.CRUISE),
+      ),
+    ).called(1);
+
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     clearInteractions(fleetApi);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
     // Trying to refuel with less than 100 needed, should not refuel.
