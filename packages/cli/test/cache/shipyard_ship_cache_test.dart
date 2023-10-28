@@ -11,6 +11,7 @@ void main() {
       ..writeAsStringSync('[]');
     final shipyardShipCache = ShipyardShipCache.load(fs);
     final shipyardShip = ShipyardShip(
+      supply: SupplyLevel.ABUNDANT,
       type: ShipType.COMMAND_FRIGATE,
       name: 'name',
       description: 'description',

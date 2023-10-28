@@ -32,7 +32,7 @@ class MarketPrice {
     return MarketPrice(
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       symbol: TradeSymbol.fromJson(json['symbol'] as String)!,
-      supply: MarketTradeGoodSupplyEnum.fromJson(json['supply'] as String)!,
+      supply: SupplyLevel.fromJson(json['supply'] as String)!,
       purchasePrice: json['purchasePrice'] as int,
       sellPrice: json['sellPrice'] as int,
       tradeVolume: json['tradeVolume'] as int,
@@ -64,7 +64,7 @@ class MarketPrice {
   TradeSymbol get tradeSymbol => symbol;
 
   /// The supply level of the trade good.
-  final MarketTradeGoodSupplyEnum supply;
+  final SupplyLevel supply;
 
   /// The price at which this good can be purchased from the market.
   final int purchasePrice;

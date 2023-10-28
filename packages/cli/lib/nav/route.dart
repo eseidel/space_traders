@@ -1,9 +1,6 @@
 import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
-import 'package:cli/logger.dart';
-import 'package:cli/nav/system_pathing.dart';
-import 'package:cli/printing.dart';
 import 'package:types/types.dart';
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
@@ -181,45 +178,45 @@ RoutePlan routePlanFromJumpPlan(
   );
 }
 
-class _JumpPlanBuilder {
-  _JumpPlanBuilder();
+// class _JumpPlanBuilder {
+//   _JumpPlanBuilder();
 
-  final List<SystemSymbol> _systems = [];
+//   final List<SystemSymbol> _systems = [];
 
-  bool get isNotEmpty => _systems.isNotEmpty;
+//   bool get isNotEmpty => _systems.isNotEmpty;
 
-  void addWaypoint(WaypointSymbol waypointSymbol) {
-    _systems.add(waypointSymbol.systemSymbol);
-  }
+//   void addWaypoint(WaypointSymbol waypointSymbol) {
+//     _systems.add(waypointSymbol.systemSymbol);
+//   }
 
-  JumpPlan build() {
-    final plan = JumpPlan(_systems);
-    _systems.clear();
-    return plan;
-  }
-}
+//   JumpPlan build() {
+//     final plan = JumpPlan(_systems);
+//     _systems.clear();
+//     return plan;
+//   }
+// }
 
-void _saveJumpsInCache(JumpCache jumpCache, List<RouteAction> actions) {
-  // Walk through actions, find any jump sequences, turn those into JumpPlans
-  // which are then given to the JumpCache.
-  final builder = _JumpPlanBuilder();
-  for (var i = 0; i < actions.length; i++) {
-    final action = actions[i];
-    if (action.type == RouteActionType.jump) {
-      builder.addWaypoint(action.startSymbol);
-    } else {
-      if (builder.isNotEmpty) {
-        builder.addWaypoint(action.startSymbol);
-        jumpCache.addJumpPlan(builder.build());
-      }
-    }
-  }
-  // This only happens when the last action is a jump e.g. we're at a jumpgate.
-  if (builder.isNotEmpty) {
-    builder.addWaypoint(actions.last.endSymbol);
-    jumpCache.addJumpPlan(builder.build());
-  }
-}
+// void _saveJumpsInCache(JumpCache jumpCache, List<RouteAction> actions) {
+//   // Walk through actions, find any jump sequences, turn those into JumpPlans
+//   // which are then given to the JumpCache.
+//   final builder = _JumpPlanBuilder();
+//   for (var i = 0; i < actions.length; i++) {
+//     final action = actions[i];
+//     if (action.type == RouteActionType.jump) {
+//       builder.addWaypoint(action.startSymbol);
+//     } else {
+//       if (builder.isNotEmpty) {
+//         builder.addWaypoint(action.startSymbol);
+//         jumpCache.addJumpPlan(builder.build());
+//       }
+//     }
+//   }
+//   // This only happens when the last action is a jump e.g. we're at a jumpgate.
+//   if (builder.isNotEmpty) {
+//     builder.addWaypoint(actions.last.endSymbol);
+//     jumpCache.addJumpPlan(builder.build());
+//   }
+// }
 
 RouteAction _navigationAction(
   SystemWaypoint start,
@@ -267,23 +264,24 @@ class RoutePlanner {
   /// Create a new route planner.
   RoutePlanner({
     required SystemsCache systemsCache,
-    required SystemConnectivity systemConnectivity,
-    required JumpCache jumpCache,
-  })  : _systemsCache = systemsCache,
-        _systemConnectivity = systemConnectivity,
-        _jumpCache = jumpCache;
+    // required SystemConnectivity systemConnectivity,
+    // required JumpCache jumpCache,
+  }) : _systemsCache = systemsCache;
+  // _systemConnectivity = systemConnectivity,
+  // _jumpCache = jumpCache;
 
   /// Create a new route planner from a systems cache.
   RoutePlanner.fromSystemsCache(SystemsCache systemsCache)
       : this(
           systemsCache: systemsCache,
-          systemConnectivity: SystemConnectivity.fromSystemsCache(systemsCache),
-          jumpCache: JumpCache(),
+          // systemConnectivity: SystemConnectivity
+          //    .fromSystemsCache(systemsCache),
+          // jumpCache: JumpCache(),
         );
 
   final SystemsCache _systemsCache;
-  final SystemConnectivity _systemConnectivity;
-  final JumpCache _jumpCache;
+  // final SystemConnectivity _systemConnectivity;
+  // final JumpCache _jumpCache;
 
   /// Plan a route between two waypoints.
   RoutePlan? planRoute({
@@ -305,87 +303,95 @@ class RoutePlanner {
     // We only handle jumps at the moment.
     // We fail out quickly from our reachability cache if these system waypoints
     // are not in the same system cluster.
-    if (!_systemConnectivity.canJumpBetweenSystemSymbols(
-      start.systemSymbol,
-      end.systemSymbol,
-    )) {
+    // if (!_systemConnectivity.canJumpBetweenSystemSymbols(
+    //   start.systemSymbol,
+    //   end.systemSymbol,
+    // )) {
+    //   return null;
+    // }
+    if (start.systemSymbol != end.systemSymbol) {
       return null;
     }
 
     // Look up in the jump cache, if so, create a plan from that.
-    final jumpPlan = _jumpCache.lookupJumpPlan(
-      fromSystem: start.systemSymbol,
-      toSystem: end.systemSymbol,
-    );
-    if (jumpPlan != null) {
-      return routePlanFromJumpPlan(
-        _systemsCache,
-        start: start,
-        end: end,
-        jumpPlan: jumpPlan,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
-      );
-    }
+    // final jumpPlan = _jumpCache.lookupJumpPlan(
+    //   fromSystem: start.systemSymbol,
+    //   toSystem: end.systemSymbol,
+    // );
+    // if (jumpPlan != null) {
+    //   return routePlanFromJumpPlan(
+    //     _systemsCache,
+    //     start: start,
+    //     end: end,
+    //     jumpPlan: jumpPlan,
+    //     fuelCapacity: fuelCapacity,
+    //     shipSpeed: shipSpeed,
+    //   );
+    // }
 
-    final startTime = DateTime.timestamp();
+    // final startTime = DateTime.timestamp();
 
-    // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
-    // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
-    final symbols = findWaypointPathJumpsOnly(
-      _systemsCache,
-      start,
-      end,
-      shipSpeed,
-    );
-    if (symbols == null) {
-      return null;
-    }
+    // // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
+    // // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
+    // final symbols = findWaypointPathJumpsOnly(
+    //   _systemsCache,
+    //   start,
+    //   end,
+    //   shipSpeed,
+    // );
+    // if (symbols == null) {
+    //   return null;
+    // }
 
-    final endTime = DateTime.timestamp();
-    final planningDuration = endTime.difference(startTime);
-    if (planningDuration.inSeconds > 1) {
-      logger.warn('planning $start to $end '
-          'took ${approximateDuration(planningDuration)}');
-    }
+    // final endTime = DateTime.timestamp();
+    // final planningDuration = endTime.difference(startTime);
+    // if (planningDuration.inSeconds > 1) {
+    //   logger.warn('planning $start to $end '
+    //       'took ${approximateDuration(planningDuration)}');
+    // }
 
-    // walk backwards from end through symbols to build the route
-    // we could alternatively build it forward and then fix the jump durations
-    // after.
-    final route = <RouteAction>[];
-    var isLastJump = true;
-    for (var i = symbols.length - 1; i > 0; i--) {
-      final current = symbols[i];
-      final previous = symbols[i - 1];
-      final previousWaypoint = _systemsCache.waypointFromSymbol(previous);
-      final currentWaypoint = _systemsCache.waypointFromSymbol(current);
-      if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
-        // Assume we jumped.
-        route.add(
-          _jumpAction(
-            _systemsCache,
-            previousWaypoint,
-            currentWaypoint,
-            shipSpeed,
-            isLastJump: isLastJump,
-          ),
-        );
-        isLastJump = false;
-      } else {
-        route.add(
-          _navigationAction(
-            previousWaypoint,
-            currentWaypoint,
-            shipSpeed,
-          ),
-        );
-      }
-    }
+    // // walk backwards from end through symbols to build the route
+    // // we could alternatively build it forward and then fix the jump durations
+    // // after.
+    // final route = <RouteAction>[];
+    // var isLastJump = true;
+    // for (var i = symbols.length - 1; i > 0; i--) {
+    //   final current = symbols[i];
+    //   final previous = symbols[i - 1];
+    //   final previousWaypoint = _systemsCache.waypointFromSymbol(previous);
+    //   final currentWaypoint = _systemsCache.waypointFromSymbol(current);
+    //   if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
+    //     // Assume we jumped.
+    //     route.add(
+    //       _jumpAction(
+    //         _systemsCache,
+    //         previousWaypoint,
+    //         currentWaypoint,
+    //         shipSpeed,
+    //         isLastJump: isLastJump,
+    //       ),
+    //     );
+    //     isLastJump = false;
+    //   } else {
+    //     route.add(
+    //       _navigationAction(
+    //         previousWaypoint,
+    //         currentWaypoint,
+    //         shipSpeed,
+    //       ),
+    //     );
+    //   }
+    // }
 
-    final actions = route.reversed.toList();
+    // final actions = route.reversed.toList();
+    // final fuelUsed = _fuelUsedByActions(_systemsCache, actions);
+
+    // _saveJumpsInCache(_jumpCache, actions);
+
+    final startWaypoint = _systemsCache.waypointFromSymbol(start);
+    final endWaypoint = _systemsCache.waypointFromSymbol(end);
+    final actions = [_navigationAction(startWaypoint, endWaypoint, shipSpeed)];
     final fuelUsed = _fuelUsedByActions(_systemsCache, actions);
-
-    _saveJumpsInCache(_jumpCache, actions);
 
     return RoutePlan(
       fuelCapacity: fuelCapacity,

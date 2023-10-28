@@ -11,6 +11,7 @@ void main() {
     // Need two records with unique keys to test sorting.
     final ships = [
       ShipyardShip(
+        supply: SupplyLevel.ABUNDANT,
         name: 'Test',
         description: 'Test ship',
         type: ShipType.COMMAND_FRIGATE,
@@ -58,6 +59,7 @@ void main() {
         ],
       ),
       ShipyardShip(
+        supply: SupplyLevel.ABUNDANT,
         name: 'Test2',
         description: 'Test ship 2',
         type: ShipType.EXPLORER,

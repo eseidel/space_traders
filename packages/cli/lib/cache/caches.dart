@@ -9,9 +9,7 @@ import 'package:cli/cache/shipyard_prices.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
-import 'package:cli/nav/jump_cache.dart';
 import 'package:cli/nav/route.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/queries.dart';
 import 'package:db/db.dart';
 import 'package:file/file.dart';
@@ -31,7 +29,6 @@ export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/route.dart';
-export 'package:cli/nav/system_connectivity.dart';
 export 'package:file/file.dart';
 
 /// Container for all the caches.
@@ -44,7 +41,6 @@ class Caches {
     required this.ships,
     required this.shipyardPrices,
     required this.systems,
-    required this.systemConnectivity,
     required this.waypoints,
     required this.markets,
     required this.contracts,
@@ -72,9 +68,6 @@ class Caches {
 
   /// The cache of systems.
   final SystemsCache systems;
-
-  /// Cache of system reachability.
-  final SystemConnectivity systemConnectivity;
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
@@ -119,12 +112,12 @@ class Caches {
     final behaviors = BehaviorCache.load(fs);
     final static = StaticCaches.load(fs);
 
-    final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
-    final jumps = JumpCache();
+    // final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
+    // final jumps = JumpCache();
     final routePlanner = RoutePlanner(
-      jumpCache: jumps,
+      // jumpCache: jumps,
       systemsCache: systems,
-      systemConnectivity: systemConnectivity,
+      // systemConnectivity: systemConnectivity,
     );
 
     // Make sure factions are loaded.
@@ -139,7 +132,6 @@ class Caches {
       ships: ships,
       shipyardPrices: shipyard,
       systems: systems,
-      systemConnectivity: systemConnectivity,
       waypoints: waypoints,
       markets: markets,
       contracts: contracts,

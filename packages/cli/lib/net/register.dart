@@ -3,7 +3,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:db/db.dart';
-import 'package:types/api.dart';
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.
@@ -53,8 +52,8 @@ Future<String> register(
   required String callsign,
   String? email,
 }) async {
-  final systemsCache = await SystemsCache.load(fs);
-  final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
+  // final systemsCache = await SystemsCache.load(fs);
+  // final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
 
   final client = getApiClient(db, getPriority: () => 0);
   final defaultApi = DefaultApi(client);
@@ -71,9 +70,9 @@ Future<String> register(
     choices: recruitingFactions,
     display: (faction) {
       final f = factions.firstWhere((f) => f.symbol == faction.symbol);
-      final reachable =
-          clusterCache.connectedSystemCount(f.headquartersSymbol.systemSymbol);
-      return '${f.symbol} - connected to $reachable systems';
+      // final reachable =
+      // clusterCache.connectedSystemCount(f.headquartersSymbol.systemSymbol);
+      return '${f.symbol}'; // - connected to $reachable systems';
     },
   );
 

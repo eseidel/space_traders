@@ -172,14 +172,14 @@ class CentralCommand {
       // things mapping.
       ShipRole.HAULER: [
         Behavior.trader,
-        Behavior.explorer,
+        // Behavior.explorer,
       ],
       ShipRole.EXCAVATOR: [
         if (ship.canMine) Behavior.miner,
         if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
         Behavior.idle,
       ],
-      ShipRole.SATELLITE: [Behavior.explorer],
+      // ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
     if (behaviors != null) {
       for (final behavior in behaviors) {
@@ -315,8 +315,8 @@ class CentralCommand {
   }
 
   /// Returns all systems containing explorers or explorer destinations.
-  Iterable<SystemSymbol> otherExplorerSystems(ShipSymbol thisShipSymbol) =>
-      _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
+  // Iterable<SystemSymbol> otherExplorerSystems(ShipSymbol thisShipSymbol) =>
+  //     _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
 
   /// Returns all systems containing traders or trader destinations.
   Iterable<SystemSymbol> otherTraderSystems(ShipSymbol thisShipSymbol) =>
@@ -669,7 +669,10 @@ List<ShipSymbol> idleHaulerSymbols(
 ) {
   final haulerSymbols =
       shipCache.ships.where((s) => s.isHauler).map((s) => s.shipSymbol);
-  final idleBehaviors = [Behavior.idle, Behavior.explorer];
+  final idleBehaviors = [
+    Behavior.idle,
+    // Behavior.explorer,
+  ];
   final idleHaulerStates = behaviorCache.states
       .where((s) => haulerSymbols.contains(s.shipSymbol))
       .where((s) => idleBehaviors.contains(s.behavior))

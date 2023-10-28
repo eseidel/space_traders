@@ -191,15 +191,15 @@ void main() {
 
     // Exactly one jump, jump duration doesn't matter since it doesn't stop
     // navigation.
-    final connectedSystem = systemsCache
-        .connectedSystems(
-          WaypointSymbol.fromString(waypoint1).systemSymbol,
-        )
-        .first
-        .systemSymbol;
-    final waypoint4 =
-        systemsCache.waypointsInSystem(connectedSystem).first.symbol;
-    expectRoute(waypoint1, waypoint4, 118);
+    // final connectedSystem = systemsCache
+    //     .connectedSystems(
+    //       WaypointSymbol.fromString(waypoint1).systemSymbol,
+    //     )
+    //     .first
+    //     .systemSymbol;
+    // final waypoint4 =
+    //     systemsCache.waypointsInSystem(connectedSystem).first.symbol;
+    // expectRoute(waypoint1, waypoint4, 118);
 
     // We don't know how to plan warps yet.
     expect(planRoute(waypoint1, waypoint3), isNull);

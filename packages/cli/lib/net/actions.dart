@@ -31,7 +31,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
     shipInfo(ship, 'Does not use fuel, setting flight mode to burn.');
     await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.BURN);
   }
-  // TODO: Guard against ending up with exactly 0 fuel.
+  // TODO(eseidel): Guard against ending up with exactly 0 fuel.
   try {
     final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
     return waitUntil;
@@ -409,27 +409,28 @@ Future<void> chartWaypointAndLog(
   }
 }
 
-/// Use the jump gate to travel to [systemSymbol] and log.
-Future<JumpShip200ResponseData> useJumpGateAndLog(
-  Api api,
-  ShipCache shipCache,
-  Ship ship,
-  SystemSymbol systemSymbol,
-) async {
-  // Using a jump gate requires us to be in orbit.
-  await undockIfNeeded(api, shipCache, ship);
+/// Use the jump gate to travel to systemSymbol and log.
+// Future<JumpShip200ResponseData> useJumpGateAndLog(
+//   Api api,
+//   ShipCache shipCache,
+//   Ship ship,
+//   SystemSymbol systemSymbol,
+// ) async {
+//   // Using a jump gate requires us to be in orbit.
+//   await undockIfNeeded(api, shipCache, ship);
 
-  shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $systemSymbol');
-  final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol.system);
-  final response =
-      await api.fleet.jumpShip(ship.symbol, jumpShipRequest: jumpShipRequest);
-  ship
-    ..nav = response!.data.nav
-    ..cooldown = response.data.cooldown;
-  shipCache.updateShip(ship);
-  // shipDetail(ship, 'Used Jump Gate to $systemSymbol');
-  return response.data;
-}
+//   shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $systemSymbol');
+//   final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol.system);
+//   final response =
+//       await api.fleet.jumpShip(ship.symbol,
+//          jumpShipRequest: jumpShipRequest);
+//   ship
+//     ..nav = response!.data.nav
+//     ..cooldown = response.data.cooldown;
+//   shipCache.updateShip(ship);
+//   // shipDetail(ship, 'Used Jump Gate to $systemSymbol');
+//   return response.data;
+// }
 
 /// Negotiate a contract for [ship] and log.
 Future<Contract> negotiateContractAndLog(

@@ -71,6 +71,7 @@ void main() {
         submittedBy: 'ESEIDEL',
         submittedOn: DateTime(2021),
       ),
+      isUnderConstruction: false,
     );
     final unchartedWaypoint = Waypoint(
       symbol: waypointSymbol.waypoint,
@@ -78,6 +79,7 @@ void main() {
       systemSymbol: unchartedSymbol.system,
       x: 0,
       y: 0,
+      isUnderConstruction: false,
       // No chart, so this won't be cached.
     );
     final chartingCache = ChartingCache({}, waypointTraits, fs: fs)

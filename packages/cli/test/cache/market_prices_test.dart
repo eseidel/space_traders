@@ -11,7 +11,7 @@ class _MockLogger extends Mock implements Logger {}
 MarketPrice makePrice({
   required String waypointSymbol,
   required TradeSymbol symbol,
-  MarketTradeGoodSupplyEnum supply = MarketTradeGoodSupplyEnum.ABUNDANT,
+  SupplyLevel supply = SupplyLevel.ABUNDANT,
   int purchasePrice = 1,
   int sellPrice = 1,
   int tradeVolume = 1,
@@ -105,9 +105,10 @@ void main() {
     final good = MarketTradeGood(
       symbol: 'FUEL',
       tradeVolume: 1,
-      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      supply: SupplyLevel.ABUNDANT,
       purchasePrice: 1,
       sellPrice: 2,
+      type: MarketTradeGoodTypeEnum.EXCHANGE,
     );
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     final price = MarketPrice.fromMarketTradeGood(
@@ -117,7 +118,7 @@ void main() {
     expect(price.symbol, TradeSymbol.FUEL);
     expect(price.waypointSymbol, waypointSymbol);
     expect(price.tradeVolume, 1);
-    expect(price.supply, MarketTradeGoodSupplyEnum.ABUNDANT);
+    expect(price.supply, SupplyLevel.ABUNDANT);
     expect(price.purchasePrice, 1);
     expect(price.timestamp, isNotNull);
   });
@@ -234,7 +235,8 @@ void main() {
         MarketTradeGood(
           symbol: 'FUEL',
           tradeVolume: 1,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
           purchasePrice: 1,
           sellPrice: 2,
         ),
@@ -255,7 +257,8 @@ void main() {
         MarketTradeGood(
           symbol: 'FUEL',
           tradeVolume: 1,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
           purchasePrice: 1,
           sellPrice: 2,
         ),

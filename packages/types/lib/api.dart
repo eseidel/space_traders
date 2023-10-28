@@ -231,18 +231,6 @@ extension SystemUtils on System {
   int distanceTo(System other) => position.distanceTo(other.position);
 }
 
-/// Extensions onto ConnectedSystem to make it easier to work with.
-extension ConnectedSystemUtils on ConnectedSystem {
-  /// Returns the SystemSymbol of the system.
-  SystemSymbol get systemSymbol => SystemSymbol.fromString(symbol);
-
-  /// Returns the SystemPosition of the system.
-  SystemPosition get position => SystemPosition(x, y);
-
-  /// Returns the distance to the given system.
-  int distanceTo(ConnectedSystem other) => position.distanceTo(other.position);
-}
-
 /// Extensions onto SystemWaypoint to make it easier to work with.
 extension SystemWaypointUtils on SystemWaypoint {
   /// Returns true if the waypoint has the given type.
@@ -652,18 +640,6 @@ extension AgentUtils on Agent {
   /// Returns the WaypointSymbol for the agent headquarters.
   WaypointSymbol get headquartersSymbol =>
       WaypointSymbol.fromString(headquarters);
-}
-
-/// Creates a ConnectedSystem from a System and a distance.
-ConnectedSystem connectedSystemFromSystem(System system, int distance) {
-  return ConnectedSystem(
-    distance: distance,
-    symbol: system.symbol,
-    sectorSymbol: system.sectorSymbol,
-    type: system.type,
-    x: system.x,
-    y: system.y,
-  );
 }
 
 /// Compute the trade symbol for the given mount symbol.

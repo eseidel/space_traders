@@ -7,7 +7,7 @@ void main() {
     final price = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-W'),
       symbol: TradeSymbol.FUEL,
-      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      supply: SupplyLevel.ABUNDANT,
       purchasePrice: 1,
       sellPrice: 2,
       tradeVolume: 10,

@@ -93,7 +93,7 @@ Future<DateTime?> beingRouteAndLog(
 enum _NavResultType {
   wait,
   continueAction,
-  loop,
+  // loop,
 }
 
 /// The result from continueNavigationIfNeeded
@@ -113,9 +113,9 @@ class NavResult {
   /// Loop tells the caller to loop back to the top of the loop immediately.
   /// Typically this means returning null from the action.
   /// We likely need to do more navigation.
-  NavResult._loop()
-      : _type = _NavResultType.loop,
-        _waitTime = null;
+  // NavResult._loop()
+  //     : _type = _NavResultType.loop,
+  //       _waitTime = null;
 
   final _NavResultType _type;
   final DateTime? _waitTime;
@@ -132,23 +132,23 @@ class NavResult {
   }
 }
 
-void _verifyJumpTime(
-  SystemsCache systemsCache,
-  Ship ship,
-  SystemSymbol fromSystem,
-  SystemSymbol toSystem,
-  Cooldown cooldown,
-) {
-  final from = systemsCache.systemBySymbol(fromSystem);
-  final to = systemsCache.systemBySymbol(toSystem);
-  final distance = from.distanceTo(to);
-  verifyCooldown(
-    ship,
-    'Jump ${from.symbol} to ${to.symbol} ($distance)',
-    cooldownTimeForJumpBetweenSystems(from, to),
-    cooldown,
-  );
-}
+// void _verifyJumpTime(
+//   SystemsCache systemsCache,
+//   Ship ship,
+//   SystemSymbol fromSystem,
+//   SystemSymbol toSystem,
+//   Cooldown cooldown,
+// ) {
+//   final from = systemsCache.systemBySymbol(fromSystem);
+//   final to = systemsCache.systemBySymbol(toSystem);
+//   final distance = from.distanceTo(to);
+//   verifyCooldown(
+//     ship,
+//     'Jump ${from.symbol} to ${to.symbol} ($distance)',
+//     cooldownTimeForJumpBetweenSystems(from, to),
+//     cooldown,
+//   );
+// }
 
 /// Exception thrown when navigation fails.
 class NavigationException implements Exception {
@@ -222,29 +222,31 @@ Future<NavResult> continueNavigationIfNeeded(
       shipWarn(ship, 'Empty route action, assuming we are already there.');
       return NavResult._continueAction();
     case RouteActionType.jump:
-      final response =
-          await useJumpGateAndLog(api, shipCache, ship, actionEnd.systemSymbol);
-      _verifyJumpTime(
-        systemsCache,
-        ship,
-        actionStart.systemSymbol,
-        actionEnd.systemSymbol,
-        response.cooldown,
-      );
-      // We don't return the cooldown time here because that would needlessly
-      // delay the next action if the next action does not require a cooldown.
-      final nextAction = routePlan.actionAfter(action);
-      if (nextAction == null) {
-        return NavResult._continueAction();
-      }
-      if (nextAction.usesReactor()) {
-        // We need to wait for the reactor to cool down.
-        // We know that ship.cooldown.expiration is non-null because it
-        // was just set by useJumpGateAndLog.
-        return NavResult._wait(ship.cooldown.expiration!);
-      }
-      // Otherwise loop immediately since we don't need to wait for the reactor.
-      return NavResult._loop();
+      throw UnimplementedError('Jump not implemented');
+    //   final response =
+    //       await useJumpGateAndLog(api, shipCache,
+    //           ship, actionEnd.systemSymbol);
+    //   _verifyJumpTime(
+    //     systemsCache,
+    //     ship,
+    //     actionStart.systemSymbol,
+    //     actionEnd.systemSymbol,
+    //     response.cooldown,
+    //   );
+    //   // We don't return the cooldown time here because that would needlessly
+    //   // delay the next action if the next action does not require a cooldown.
+    //   final nextAction = routePlan.actionAfter(action);
+    //   if (nextAction == null) {
+    //     return NavResult._continueAction();
+    //   }
+    //   if (nextAction.usesReactor()) {
+    //     // We need to wait for the reactor to cool down.
+    //     // We know that ship.cooldown.expiration is non-null because it
+    //     // was just set by useJumpGateAndLog.
+    //     return NavResult._wait(ship.cooldown.expiration!);
+    //   }
+    //   // Otherwise loop immediately since we don't need to wait for the reactor.
+    //   return NavResult._loop();
     case RouteActionType.navCruise:
       // We're in the same system as the end, so we can just navigate there.
       final arrivalTime =

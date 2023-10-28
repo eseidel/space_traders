@@ -65,7 +65,6 @@ void logShip(
   SystemsCache systemsCache,
   BehaviorCache behaviorCache,
   MarketPrices marketPrices,
-  SystemConnectivity systemConnectivity,
   JumpCache jumpCache,
   Ship ship,
 ) {
@@ -120,14 +119,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final systemsCache = SystemsCache.loadCached(fs)!;
   final marketPrices = MarketPrices.load(fs);
-  final systemConnectivity = SystemConnectivity.fromSystemsCache(systemsCache);
   final jumpCache = JumpCache();
   for (final ship in matchingShips) {
     logShip(
       systemsCache,
       behaviorCache,
       marketPrices,
-      systemConnectivity,
       jumpCache,
       ship,
     );

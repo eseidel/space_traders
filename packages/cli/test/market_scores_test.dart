@@ -13,8 +13,6 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 void main() {
   test('findBetterTradeLocation smoke test', () {
     final fs = MemoryFileSystem.test();
@@ -27,7 +25,7 @@ void main() {
         MarketPrice(
           waypointSymbol: aSymbol,
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          supply: SupplyLevel.ABUNDANT,
           purchasePrice: 1,
           sellPrice: 2,
           tradeVolume: 100,
@@ -36,7 +34,7 @@ void main() {
         MarketPrice(
           waypointSymbol: bSymbol,
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          supply: SupplyLevel.ABUNDANT,
           purchasePrice: 100,
           sellPrice: 200,
           tradeVolume: 100,

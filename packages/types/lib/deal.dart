@@ -135,7 +135,7 @@ class Deal {
       sourcePrice: MarketPrice(
         waypointSymbol: sourceSymbol,
         symbol: tradeSymbol,
-        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        supply: SupplyLevel.ABUNDANT,
         purchasePrice: purchasePrice,
         sellPrice: purchasePrice + 1,
         tradeVolume: 100,
@@ -146,7 +146,7 @@ class Deal {
       destinationPrice: MarketPrice(
         waypointSymbol: destinationSymbol,
         symbol: tradeSymbol,
-        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        supply: SupplyLevel.ABUNDANT,
         purchasePrice: sellPrice - 1,
         sellPrice: sellPrice,
         tradeVolume: 100,

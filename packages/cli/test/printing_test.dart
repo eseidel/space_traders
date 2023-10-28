@@ -26,6 +26,7 @@ void main() {
           symbol: WaypointTraitSymbolEnum.CORRUPT,
         ),
       ],
+      isUnderConstruction: true,
     );
     expect(waypointDescription(waypoint), 'a - PLANET - uncharted - n');
   });
@@ -184,7 +185,7 @@ void main() {
       MarketPrice(
         waypointSymbol: WaypointSymbol.fromString('S-A-W'),
         symbol: a,
-        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        supply: SupplyLevel.ABUNDANT,
         purchasePrice: 1,
         sellPrice: 2,
         tradeVolume: 100,

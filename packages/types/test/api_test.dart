@@ -45,6 +45,7 @@ void main() {
 
   test('Waypoint.hasTrait', () {
     final waypoint = Waypoint(
+      isUnderConstruction: false,
       symbol: 'S-E-J',
       systemSymbol: 'S-E',
       type: WaypointType.JUMP_GATE,
@@ -95,29 +96,6 @@ void main() {
     expect(b.distanceTo(a), 5);
     final c = WaypointPosition(3, 0, SystemSymbol.fromString('S-F'));
     expect(() => a.distanceTo(c), throwsArgumentError);
-  });
-  test('System distance', () {
-    final a = System(
-      symbol: 'S-A',
-      sectorSymbol: 'S',
-      type: SystemType.BLUE_STAR,
-      x: 0,
-      y: 0,
-      waypoints: [],
-    );
-    final b = System(
-      symbol: 'S-B',
-      sectorSymbol: 'S',
-      type: SystemType.BLUE_STAR,
-      x: 10,
-      y: 10,
-      waypoints: [],
-    );
-    expect(a.distanceTo(b), 14);
-    expect(b.distanceTo(a), 14);
-    final aConnected = connectedSystemFromSystem(a, 0);
-    final bConnected = connectedSystemFromSystem(b, 0);
-    expect(aConnected.distanceTo(bConnected), 14);
   });
   test('ShipSymbol sorting', () {
     final symbols = [

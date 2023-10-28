@@ -4,6 +4,7 @@
   "name": "Command Frigate",
   "description": "A medium-sized warship that is designed for command and control operations and can be fitted with a variety of weapons and other systems.",
   "purchasePrice": 0,
+  "supply": "ABUNDANT",
   "frame": {
    "symbol": "FRAME_FRIGATE",
    "name": "Frame Frigate",
@@ -188,7 +189,7 @@
   "name": "Explorer",
   "description": "A large, long-range spacecraft designed for deep space exploration and scientific research.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_EXPLORER",
    "name": "Frame Explorer",
    "description": "A large, long-range spacecraft designed for deep space exploration and scientific research.",
@@ -336,7 +337,7 @@
   "name": "Heavy Freighter",
   "description": "The heavy freighter is a massive spacecraft designed for carrying large amounts of cargo across long distances. With its reinforced hull and advanced propulsion systems, the freighter is capable of navigating through harsh environments and hazardous conditions. It is equipped with a jump drive for faster-than-light travel, as well as a range of modules and mounts for handling a variety of cargo and defensive needs. The heavy freighter is a reliable and indispensable vessel for traders and haulers looking to transport goods and resources across the vast expanse of space.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_HEAVY_FREIGHTER",
    "name": "Frame Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
@@ -556,7 +557,7 @@
   "name": "Interceptor",
   "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_INTERCEPTOR",
    "name": "Frame Interceptor",
    "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
@@ -644,7 +645,7 @@
   "name": "Light Hauler",
   "description": "A small, fast cargo ship that is designed for short-range transport of light loads.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_LIGHT_FREIGHTER",
    "name": "Frame Light Freighter",
    "description": "A small, versatile spacecraft used for cargo transport and other commercial operations.",
@@ -792,7 +793,7 @@
   "name": "Light Shuttle",
   "description": "The light shuttle is a versatile spacecraft designed for exploration, diplomacy, and light cargo transport. With its compact size and agile maneuverability, the shuttle is capable of navigating through tight spaces and challenging environments.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_SHUTTLE",
    "name": "Frame Shuttle",
    "description": "A small, reusable spacecraft designed for short-range, low-speed travel between spacecraft or planetary surfaces.",
@@ -904,7 +905,7 @@
   "name": "Mining Drone",
   "description": "A small, unmanned spacecraft that can be used for mining operations, such as extracting valuable minerals from asteroids.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_DRONE",
    "name": "Frame Drone",
    "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
@@ -992,7 +993,7 @@
   "name": "Ore Hound",
   "description": "The Ore Hound is a specialized mining ship designed for extracting valuable ores and minerals from asteroids and other celestial bodies. With its advanced mining lasers and reinforced hull, the Ore Hound is capable of excavating large amounts of ore and minerals from even the toughest asteroids. It is equipped with a range of modules and mounts for handling a variety of mining and defensive needs, and is an essential vessel for miners and traders looking to profit from the rich resources of the galaxy.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_MINER",
    "name": "Frame Miner",
    "description": "A medium-sized spacecraft designed for mining operations and resource extraction.",
@@ -1128,7 +1129,7 @@
   "name": "Probe Satellite",
   "description": "A small, unmanned spacecraft that can be launched into orbit to gather data and perform basic tasks.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_PROBE",
    "name": "Frame Probe",
    "description": "A small, unmanned spacecraft used for exploration, reconnaissance, and scientific research.",
@@ -1178,7 +1179,7 @@
   "name": "Refining Freighter",
   "description": "A large cargo ship designed specifically for refining raw materials. Equipped with a powerful reactor and space for large modules, the refining freighter is a versatile and convenient tool for industrial operations in remote or difficult-to-reach locations.",
   "purchasePrice": 0,
-  "frame": {
+  "supply": "ABUNDANT",  "frame": {
    "symbol": "FRAME_HEAVY_FREIGHTER",
    "name": "Frame Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",

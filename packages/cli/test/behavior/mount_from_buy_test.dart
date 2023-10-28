@@ -98,9 +98,10 @@ void main() {
     when(() => ship.cargo).thenReturn(shipCargo);
 
     final tradeGood = MarketTradeGood(
+      type: MarketTradeGoodTypeEnum.EXCHANGE,
       symbol: toMount.value,
       tradeVolume: 100,
-      supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+      supply: SupplyLevel.ABUNDANT,
       purchasePrice: 100,
       sellPrice: 101,
     );

@@ -41,7 +41,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     ship,
     tradeSymbol,
   );
-  final supplyWidth = MarketTradeGoodSupplyEnum.values.fold(0, (max, e) {
+  final supplyWidth = SupplyLevel.values.fold(0, (max, e) {
     final width = e.toString().length;
     return width > max ? width : max;
   });

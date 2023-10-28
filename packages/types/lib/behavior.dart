@@ -22,7 +22,8 @@ enum Behavior {
   mountFromBuy,
 
   /// Explore the universe.
-  explorer;
+  // explorer
+  ;
 
   /// encode the enum as Json.
   String toJson() => name;

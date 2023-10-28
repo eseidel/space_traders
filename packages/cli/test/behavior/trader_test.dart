@@ -86,7 +86,8 @@ void main() {
             MarketTradeGood(
               symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
               tradeVolume: 100,
-              supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+              supply: SupplyLevel.ABUNDANT,
+              type: MarketTradeGoodTypeEnum.EXCHANGE,
               purchasePrice: 100,
               sellPrice: 101,
             ),
@@ -351,7 +352,8 @@ void main() {
         MarketTradeGood(
           symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
           tradeVolume: 10,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
           purchasePrice: 10,
           sellPrice: 20,
         ),
@@ -359,7 +361,8 @@ void main() {
         MarketTradeGood(
           symbol: TradeSymbol.FUEL.value,
           tradeVolume: 100,
-          supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
           purchasePrice: 100,
           sellPrice: 110,
         ),
@@ -414,12 +417,12 @@ void main() {
     when(() => caches.systems.waypointsInSystem(start.systemSymbol))
         .thenReturn([]);
     registerFallbackValue(start.systemSymbol);
-    when(
-      () => caches.systemConnectivity.canJumpBetweenSystemSymbols(
-        any(),
-        any(),
-      ),
-    ).thenReturn(true);
+    // when(
+    //   () => caches.systemConnectivity.canJumpBetweenSystemSymbols(
+    //     any(),
+    //     any(),
+    //   ),
+    // ).thenReturn(true);
     final state = BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal);
 
     when(
@@ -482,7 +485,7 @@ void main() {
       MarketPrice(
         waypointSymbol: start,
         symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-        supply: MarketTradeGoodSupplyEnum.ABUNDANT,
+        supply: SupplyLevel.ABUNDANT,
         purchasePrice: 100,
         sellPrice: 101,
         tradeVolume: 10,

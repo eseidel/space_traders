@@ -24,10 +24,9 @@ class SystemsCache extends JsonListStore<System> {
   /// All systems in the game.
   List<System> get systems => List.unmodifiable(entries);
 
-  List<System> get _systems => entries;
+  // List<System> get _systems => entries;
 
   final Map<SystemSymbol, System> _index;
-  final Map<SystemSymbol, List<ConnectedSystem>> _connectedSystems = {};
 
   /// Default cache location.
   static const String defaultCacheFilePath = 'data/systems.json';
@@ -120,48 +119,6 @@ class SystemsCache extends JsonListStore<System> {
   List<SystemWaypoint> waypointsInSystem(SystemSymbol systemSymbol) =>
       systemBySymbol(systemSymbol).waypoints;
 
-  List<ConnectedSystem> _computeConnectedSystems(SystemSymbol systemSymbol) {
-    final system = systemBySymbol(systemSymbol);
-    if (!system.hasJumpGate) {
-      return [];
-    }
-    // Get all systems within X distance of the given system.
-    // This code is hot during init, so it's important to trim the list of
-    // systems as fast as possible, so we first cull by distance.
-    final inRange = _systems
-        .where((s) => system.distanceTo(s) <= kJumpGateRange)
-        .where((s) => s.symbol != systemSymbol.system)
-        // hasJumpGate is not cached (we just check traits), so only calling it
-        // on systems that are in range makes this about 2x faster.
-        .where((s) => s.hasJumpGate);
-    final connected = inRange
-        .map(
-          (s) => ConnectedSystem(
-            symbol: s.symbol,
-            sectorSymbol: s.sectorSymbol,
-            type: s.type,
-            x: s.x,
-            y: s.y,
-            distance: system.distanceTo(s),
-          ),
-        )
-        .toList()
-      ..sortBy<num>((e) => e.distance);
-    // TODO(eseidel): sort by distance than symbol to be stable.
-    return connected;
-  }
-
-  /// Return connected systems for the given [systemSymbol].
-  List<ConnectedSystem> connectedSystems(SystemSymbol systemSymbol) {
-    final cached = _connectedSystems[systemSymbol];
-    if (cached != null) {
-      return cached;
-    }
-    final connected = _computeConnectedSystems(systemSymbol);
-    _connectedSystems[systemSymbol] = connected;
-    return connected;
-  }
-
   /// Yields a stream of system symbols that are within n jumps of the system.
   /// The system itself is included in the stream with distance 0.
   /// The stream is roughly ordered by distance from the start.
@@ -181,18 +138,18 @@ class SystemsCache extends JsonListStore<System> {
         yield (jumpFrom, maxJumps - jumpsLeft);
         // Don't bother to check connections if we're out of jumps.
         if (jumpsLeft > 0) {
-          final connectedSystems = this.connectedSystems(jumpFrom).toList();
-          final sortedSystems =
-              connectedSystems.sortedBy<num>((s) => s.distance);
-          for (final connectedSystem in sortedSystems) {
-            // Don't add systems we've already examined or are already in the
-            // list to examine next.
-            if (!systemsExamined.contains(connectedSystem.systemSymbol) &&
-                !currentSystemsToJumpFrom
-                    .contains(connectedSystem.systemSymbol)) {
-              oneJumpFurther.add(connectedSystem.systemSymbol);
-            }
-          }
+          // final connectedSystems = this.connectedSystems(jumpFrom).toList();
+          // final sortedSystems =
+          //     connectedSystems.sortedBy<num>((s) => s.distance);
+          // for (final connectedSystem in sortedSystems) {
+          //   // Don't add systems we've already examined or are already in the
+          //   // list to examine next.
+          //   if (!systemsExamined.contains(connectedSystem.systemSymbol) &&
+          //       !currentSystemsToJumpFrom
+          //           .contains(connectedSystem.systemSymbol)) {
+          //     oneJumpFurther.add(connectedSystem.systemSymbol);
+          //   }
+          // }
         }
       }
       currentSystemsToJumpFrom.addAll(oneJumpFurther);
@@ -201,22 +158,9 @@ class SystemsCache extends JsonListStore<System> {
     }
   }
 
-  /// Yields a stream of Systems that are within n jumps of the given system.
-  /// Waypoints from the start system are included in the stream.
+  /// Yields a stream of WaypointSymbols that are within n jumps of the given
+  /// system. Waypoints from the start system are included in the stream.
   /// The stream is roughly ordered by distance from the start.
-  // Iterable<System> systemsInJumpRadius({
-  //   required String startSystem,
-  //   required int maxJumps,
-  // }) sync* {
-  //   for (final (String system, int _)
-  //       in systemSymbolsInJumpRadius(
-  //     startSystem: startSystem,
-  //     maxJumps: maxJumps,
-  //   )) {
-  //     yield systemBySymbol(system);
-  //   }
-  // }
-
   Iterable<WaypointSymbol> waypointSymbolsInJumpRadius({
     required SystemSymbol startSystem,
     required int maxJumps,
@@ -239,8 +183,7 @@ class SystemsCache extends JsonListStore<System> {
   //   required String startSystem,
   //   required int maxJumps,
   // }) sync* {
-  //   for (final (String system, int _)
-  //       in systemSymbolsInJumpRadius(
+  //   for (final (String system, int _) in systemSymbolsInJumpRadius(
   //     startSystem: startSystem,
   //     maxJumps: maxJumps,
   //   )) {

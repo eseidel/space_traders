@@ -25,6 +25,7 @@ void main() {
       type: WaypointType.PLANET,
       x: 0,
       y: 0,
+      isUnderConstruction: false,
     );
     when(
       () => systemsApi.getSystemWaypoints(

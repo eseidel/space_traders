@@ -177,6 +177,8 @@ class ChartingCache extends JsonStore<_Record> {
       faction: values.faction,
       orbitals: systemWaypoint.orbitals,
       traits: traits,
+      // TODO(eseidel): this is a hack.
+      isUnderConstruction: false,
     );
   }
 }

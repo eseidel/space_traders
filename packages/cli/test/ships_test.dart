@@ -33,8 +33,11 @@ void main() {
 
   test('shipFrameFromType', () {
     for (final type in ShipType.values) {
-      // TODO(eseidel): Remove this once we have data on COMMAND_FRIGATE
-      if (type == ShipType.COMMAND_FRIGATE) {
+      final newShipTypes = [
+        ShipType.SIPHON_DRONE,
+        ShipType.SURVEYOR,
+      ];
+      if (newShipTypes.contains(type)) {
         continue;
       }
 
