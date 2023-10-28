@@ -25,7 +25,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final hq = agentCache.headquarters(systemsCache);
   final hqMine = systemsCache
       .waypointsInSystem(hq.systemSymbol)
-      .firstWhere((w) => w.isAsteroidField)
+      .firstWhere((w) => w.isAsteroid)
       .waypointSymbol;
 
   final miner = shipCache.ships.firstWhere((s) => s.isMiner);

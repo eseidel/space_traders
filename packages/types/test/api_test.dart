@@ -15,17 +15,17 @@ void main() {
       x: 0,
       y: 0,
     );
-    final asteroidField = SystemWaypoint(
+    final asteroid = SystemWaypoint(
       symbol: 'S-E-A',
-      type: WaypointType.ASTEROID_FIELD,
+      type: WaypointType.ASTEROID,
       x: 0,
       y: 0,
     );
     expect(jumpGate.isType(WaypointType.JUMP_GATE), isTrue);
     expect(jumpGate.isType(WaypointType.PLANET), isFalse);
-    expect(asteroidField.isAsteroidField, isTrue);
+    expect(asteroid.isAsteroid, isTrue);
     expect(planet.canBeMined, isFalse);
-    expect(asteroidField.canBeMined, isTrue);
+    expect(asteroid.canBeMined, isTrue);
     expect(jumpGate.systemSymbol, SystemSymbol.fromString('S-E'));
 
     final system = System(
@@ -37,7 +37,7 @@ void main() {
       waypoints: [
         jumpGate,
         planet,
-        asteroidField,
+        asteroid,
       ],
     );
     expect(system.jumpGateWaypoint, jumpGate);
