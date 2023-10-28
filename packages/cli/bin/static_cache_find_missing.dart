@@ -2,6 +2,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
+import 'package:collection/collection.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
@@ -15,6 +16,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final missingSymbols = ShipMountSymbolEnum.values
       .where((s) => staticCaches.mounts[s] == null)
       .toList();
+  final trips = <MarketTrip>[];
   for (final mountSymbol in missingSymbols) {
     final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
     final marketTrip = findBestMarketToBuy(
@@ -26,11 +28,17 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       expectedCreditsPerSecond: 7,
     );
     if (marketTrip == null) {
-      print('No market for $tradeSymbol');
-      continue;
+      logger.info('No market for $tradeSymbol');
+    } else {
+      trips.add(marketTrip);
     }
-    print('$tradeSymbol in ${approximateDuration(marketTrip.route.duration)} '
-        ' ${marketTrip.price.waypointSymbol}');
+  }
+  trips.sortBy((trip) => trip.route.duration);
+  for (final trip in trips) {
+    logger.info(
+      '${trip.price.tradeSymbol} in '
+      '${approximateDuration(trip.route.duration)}',
+    );
   }
 }
 
