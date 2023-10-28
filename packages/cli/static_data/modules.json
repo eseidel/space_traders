@@ -12,6 +12,18 @@
   }
  },
  {
+  "symbol": "MODULE_CARGO_HOLD_II",
+  "capacity": 35,
+  "range": null,
+  "name": "Expanded Cargo Hold",
+  "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
+  "requirements": {
+   "power": 2,
+   "crew": 2,
+   "slots": 2
+  }
+ },
+ {
   "symbol": "MODULE_CREW_QUARTERS_I",
   "capacity": 40,
   "range": null,
@@ -33,6 +45,18 @@
    "power": 2,
    "crew": 5,
    "slots": 1
+  }
+ },
+ {
+  "symbol": "MODULE_GAS_PROCESSOR_I",
+  "capacity": null,
+  "range": null,
+  "name": "Gas Processor",
+  "description": "Filters and processes extracted gases into their component parts, filters out impurities, and containerizes them into raw storage units.",
+  "requirements": {
+   "power": 1,
+   "crew": 0,
+   "slots": 2
   }
  },
  {

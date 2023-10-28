@@ -3,8 +3,9 @@
   "type": "SHIP_COMMAND_FRIGATE",
   "name": "Command Frigate",
   "description": "A medium-sized warship that is designed for command and control operations and can be fitted with a variety of weapons and other systems.",
-  "purchasePrice": 0,
   "supply": "ABUNDANT",
+  "activity": null,
+  "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_FRIGATE",
    "name": "Frame Frigate",
@@ -188,8 +189,10 @@
   "type": "SHIP_EXPLORER",
   "name": "Explorer",
   "description": "A large, long-range spacecraft designed for deep space exploration and scientific research.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_EXPLORER",
    "name": "Frame Explorer",
    "description": "A large, long-range spacecraft designed for deep space exploration and scientific research.",
@@ -336,8 +339,10 @@
   "type": "SHIP_HEAVY_FREIGHTER",
   "name": "Heavy Freighter",
   "description": "The heavy freighter is a massive spacecraft designed for carrying large amounts of cargo across long distances. With its reinforced hull and advanced propulsion systems, the freighter is capable of navigating through harsh environments and hazardous conditions. It is equipped with a jump drive for faster-than-light travel, as well as a range of modules and mounts for handling a variety of cargo and defensive needs. The heavy freighter is a reliable and indispensable vessel for traders and haulers looking to transport goods and resources across the vast expanse of space.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_HEAVY_FREIGHTER",
    "name": "Frame Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
@@ -556,8 +561,10 @@
   "type": "SHIP_INTERCEPTOR",
   "name": "Interceptor",
   "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_INTERCEPTOR",
    "name": "Frame Interceptor",
    "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
@@ -644,8 +651,10 @@
   "type": "SHIP_LIGHT_HAULER",
   "name": "Light Hauler",
   "description": "A small, fast cargo ship that is designed for short-range transport of light loads.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_LIGHT_FREIGHTER",
    "name": "Frame Light Freighter",
    "description": "A small, versatile spacecraft used for cargo transport and other commercial operations.",
@@ -792,8 +801,10 @@
   "type": "SHIP_LIGHT_SHUTTLE",
   "name": "Light Shuttle",
   "description": "The light shuttle is a versatile spacecraft designed for exploration, diplomacy, and light cargo transport. With its compact size and agile maneuverability, the shuttle is capable of navigating through tight spaces and challenging environments.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_SHUTTLE",
    "name": "Frame Shuttle",
    "description": "A small, reusable spacecraft designed for short-range, low-speed travel between spacecraft or planetary surfaces.",
@@ -904,8 +915,10 @@
   "type": "SHIP_MINING_DRONE",
   "name": "Mining Drone",
   "description": "A small, unmanned spacecraft that can be used for mining operations, such as extracting valuable minerals from asteroids.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_DRONE",
    "name": "Frame Drone",
    "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
@@ -992,8 +1005,10 @@
   "type": "SHIP_ORE_HOUND",
   "name": "Ore Hound",
   "description": "The Ore Hound is a specialized mining ship designed for extracting valuable ores and minerals from asteroids and other celestial bodies. With its advanced mining lasers and reinforced hull, the Ore Hound is capable of excavating large amounts of ore and minerals from even the toughest asteroids. It is equipped with a range of modules and mounts for handling a variety of mining and defensive needs, and is an essential vessel for miners and traders looking to profit from the rich resources of the galaxy.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_MINER",
    "name": "Frame Miner",
    "description": "A medium-sized spacecraft designed for mining operations and resource extraction.",
@@ -1128,8 +1143,10 @@
   "type": "SHIP_PROBE",
   "name": "Probe Satellite",
   "description": "A small, unmanned spacecraft that can be launched into orbit to gather data and perform basic tasks.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_PROBE",
    "name": "Frame Probe",
    "description": "A small, unmanned spacecraft used for exploration, reconnaissance, and scientific research.",
@@ -1178,8 +1195,10 @@
   "type": "SHIP_REFINING_FREIGHTER",
   "name": "Refining Freighter",
   "description": "A large cargo ship designed specifically for refining raw materials. Equipped with a powerful reactor and space for large modules, the refining freighter is a versatile and convenient tool for industrial operations in remote or difficult-to-reach locations.",
+  "supply": "ABUNDANT",
+  "activity": null,
   "purchasePrice": 0,
-  "supply": "ABUNDANT",  "frame": {
+  "frame": {
    "symbol": "FRAME_HEAVY_FREIGHTER",
    "name": "Frame Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
@@ -1368,6 +1387,173 @@
   "crew": {
    "required": 152,
    "capacity": 160
+  }
+ },
+ {
+  "type": "SHIP_SIPHON_DRONE",
+  "name": "Mining Drone",
+  "description": "A small, unmanned spacecraft that can be used for siphoning operations, such as extracting valuable gases from gas giants.",
+  "supply": "HIGH",
+  "activity": "WEAK",
+  "purchasePrice": 0,
+  "frame": {
+   "symbol": "FRAME_DRONE",
+   "name": "Drone",
+   "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
+   "condition": null,
+   "moduleSlots": 3,
+   "mountingPoints": 2,
+   "fuelCapacity": 80,
+   "requirements": {
+    "power": 1,
+    "crew": -4,
+    "slots": null
+   }
+  },
+  "reactor": {
+   "symbol": "REACTOR_CHEMICAL_I",
+   "name": "Chemical Reactor I",
+   "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
+   "condition": null,
+   "powerOutput": 15,
+   "requirements": {
+    "power": null,
+    "crew": 3,
+    "slots": null
+   }
+  },
+  "engine": {
+   "symbol": "ENGINE_IMPULSE_DRIVE_I",
+   "name": "Impulse Drive I",
+   "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
+   "condition": null,
+   "speed": 3,
+   "requirements": {
+    "power": 1,
+    "crew": 0,
+    "slots": null
+   }
+  },
+  "modules": [
+   {
+    "symbol": "MODULE_CARGO_HOLD_I",
+    "capacity": 10,
+    "range": null,
+    "name": "Cargo Hold",
+    "description": "A module that increases a ship's cargo capacity.",
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": 1
+    }
+   },
+   {
+    "symbol": "MODULE_GAS_PROCESSOR_I",
+    "capacity": null,
+    "range": null,
+    "name": "Gas Processor",
+    "description": "Filters and processes extracted gases into their component parts, filters out impurities, and containerizes them into raw storage units.",
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": 2
+    }
+   }
+  ],
+  "mounts": [
+   {
+    "symbol": "MOUNT_GAS_SIPHON_I",
+    "name": "Gas Siphon I",
+    "description": "A basic gas siphon that can extract gas from gas giants and other gas-rich bodies.",
+    "strength": 10,
+    "deposits": [],
+    "requirements": {
+     "power": 1,
+     "crew": 0,
+     "slots": null
+    }
+   }
+  ],
+  "crew": {
+   "required": -1,
+   "capacity": 0
+  }
+ },
+ {
+  "type": "SHIP_SURVEYOR",
+  "name": "Surveyor Craft",
+  "description": "A specialized spacecraft equipped with surveying mounts, designed for detailed surveying of celestial bodies, resource identification, and scientific research.",
+  "supply": "HIGH",
+  "activity": "STRONG",
+  "purchasePrice": 0,
+  "frame": {
+   "symbol": "FRAME_DRONE",
+   "name": "Drone",
+   "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
+   "condition": null,
+   "moduleSlots": 3,
+   "mountingPoints": 2,
+   "fuelCapacity": 80,
+   "requirements": {
+    "power": 1,
+    "crew": -4,
+    "slots": null
+   }
+  },
+  "reactor": {
+   "symbol": "REACTOR_CHEMICAL_I",
+   "name": "Chemical Reactor I",
+   "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
+   "condition": null,
+   "powerOutput": 15,
+   "requirements": {
+    "power": null,
+    "crew": 3,
+    "slots": null
+   }
+  },
+  "engine": {
+   "symbol": "ENGINE_IMPULSE_DRIVE_I",
+   "name": "Impulse Drive I",
+   "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
+   "condition": null,
+   "speed": 3,
+   "requirements": {
+    "power": 1,
+    "crew": 0,
+    "slots": null
+   }
+  },
+  "modules": [],
+  "mounts": [
+   {
+    "symbol": "MOUNT_SURVEYOR_I",
+    "name": "Surveyor I",
+    "description": "A basic survey probe that can be used to gather information about a mineral deposit.",
+    "strength": 1,
+    "deposits": [
+     "QUARTZ_SAND",
+     "SILICON_CRYSTALS",
+     "PRECIOUS_STONES",
+     "ICE_WATER",
+     "AMMONIA_ICE",
+     "IRON_ORE",
+     "COPPER_ORE",
+     "SILVER_ORE",
+     "ALUMINUM_ORE",
+     "GOLD_ORE",
+     "PLATINUM_ORE"
+    ],
+    "requirements": {
+     "power": 1,
+     "crew": 1,
+     "slots": null
+    }
+   }
+  ],
+  "crew": {
+   "required": 0,
+   "capacity": 0
   }
  }
 ]
