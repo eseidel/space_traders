@@ -179,7 +179,7 @@ class CentralCommand {
         if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
         Behavior.idle,
       ],
-      // ShipRole.SATELLITE: [Behavior.explorer],
+      ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
     if (behaviors != null) {
       for (final behavior in behaviors) {
@@ -315,8 +315,8 @@ class CentralCommand {
   }
 
   /// Returns all systems containing explorers or explorer destinations.
-  // Iterable<SystemSymbol> otherExplorerSystems(ShipSymbol thisShipSymbol) =>
-  //     _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
+  Iterable<SystemSymbol> otherExplorerSystems(ShipSymbol thisShipSymbol) =>
+      _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
 
   /// Returns all systems containing traders or trader destinations.
   Iterable<SystemSymbol> otherTraderSystems(ShipSymbol thisShipSymbol) =>
