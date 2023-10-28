@@ -172,7 +172,7 @@ class CentralCommand {
       // things mapping.
       ShipRole.HAULER: [
         Behavior.trader,
-        // Behavior.explorer,
+        Behavior.explorer,
       ],
       ShipRole.EXCAVATOR: [
         if (ship.canMine) Behavior.miner,
@@ -464,11 +464,11 @@ class CentralCommand {
     if (shouldBuy(ShipType.ORE_HOUND, 10)) {
       // oreHoundBuyJob currently only looks in our system.
       return _oreHoundBuyJob(caches);
-    } else if (shouldBuy(ShipType.LIGHT_HAULER, 10)) {
+    } else if (shouldBuy(ShipType.LIGHT_HAULER, 3)) {
       return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
     } else if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
-    } else if (shouldBuy(ShipType.PROBE, 10)) {
+    } else if (shouldBuy(ShipType.PROBE, 5)) {
       return _findBestPlaceToBuy(caches, ShipType.PROBE);
     }
     return null;
@@ -673,7 +673,7 @@ List<ShipSymbol> idleHaulerSymbols(
       shipCache.ships.where((s) => s.isHauler).map((s) => s.shipSymbol);
   final idleBehaviors = [
     Behavior.idle,
-    // Behavior.explorer,
+    Behavior.explorer,
   ];
   final idleHaulerStates = behaviorCache.states
       .where((s) => haulerSymbols.contains(s.shipSymbol))
