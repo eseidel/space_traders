@@ -608,3 +608,7 @@ be enough to get to fuel from pretty much anywhere in the galaxy.
 If nothing else, each interval should be evaluted against the possibility of moving to sell?
 
 ### Log error rates from network executor
+
+### Write a script to find and mount (and re-sell) mounts
+
+For getting the last of the mount data.
