@@ -8,6 +8,7 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
+import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 bool _isMissingChartOrRecentPriceData(
@@ -46,7 +47,8 @@ bool _isMissingRecentShipyardData(
 }
 
 /// Returns the symbol of a waypoint in the system missing a chart.
-Future<WaypointSymbol?> _waypointSymbolNeedingExploration(
+@visibleForTesting
+Future<WaypointSymbol?> waypointSymbolNeedingExploration(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
   MarketPrices marketPrices,
@@ -57,7 +59,22 @@ Future<WaypointSymbol?> _waypointSymbolNeedingExploration(
   required bool Function(SystemSymbol systemSymbol)? filter,
   required WaypointCache waypointCache,
 }) async {
-  for (final systemWaypoint in system.waypoints) {
+  final WaypointSymbol? start;
+  if (ship.systemSymbol == system.systemSymbol) {
+    start = ship.waypointSymbol;
+  } else {
+    start = system.jumpGateWaypoint?.waypointSymbol;
+  }
+  final systemWaypoints = system.waypoints;
+  if (start != null) {
+    final startWaypoint = systemsCache.waypointFromSymbol(start);
+    systemWaypoints.sort(
+      (a, b) =>
+          a.distanceTo(startWaypoint).compareTo(b.distanceTo(startWaypoint)),
+    );
+  }
+
+  for (final systemWaypoint in systemWaypoints) {
     final waypointSymbol = systemWaypoint.waypointSymbol;
     if (filter != null && !filter(systemWaypoint.systemSymbol)) {
       continue;
@@ -123,7 +140,7 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   final sortedSystems = [startSystem];
   // Walk through the list finding one missing either a chart or market data.
   for (final system in sortedSystems) {
-    final symbol = await _waypointSymbolNeedingExploration(
+    final symbol = await waypointSymbolNeedingExploration(
       systemsCache,
       chartingCache,
       marketPrices,

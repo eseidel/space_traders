@@ -1,11 +1,6 @@
 import 'dart:math';
 
-import 'package:cli/api.dart';
-import 'package:cli/cache/agent_cache.dart';
-import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/contract_cache.dart';
-import 'package:cli/cache/market_prices.dart';
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';
 import 'package:cli/net/exceptions.dart';
@@ -22,12 +17,22 @@ export 'package:cli/net/direct.dart';
 /// there is insufficient fuel.
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Api api,
+  SystemsCache systemsCache,
   ShipCache shipCache,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
   await undockIfNeeded(api, shipCache, ship);
-  // TODO(eseidel): Guard against ending up with exactly 0 fuel.
+  final start = systemsCache.waypointFromSymbol(ship.waypointSymbol);
+  final end = systemsCache.waypointFromSymbol(waypointSymbol);
+  final distance = start.distanceTo(end);
+  final expectedFuel = fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
+  // Use > and a buffer (10) to avoid ever having zero fuel.
+  final canCruise = ship.fuel.current > expectedFuel + 10;
+  final flightMode =
+      canCruise ? ShipNavFlightMode.CRUISE : ShipNavFlightMode.DRIFT;
+  await setShipFlightModeIfNeeded(api, shipCache, ship, flightMode);
+
   try {
     final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
     return waitUntil;
@@ -356,6 +361,7 @@ Future<void> undockIfNeeded(Api api, ShipCache shipCache, Ship ship) async {
 /// Navigate to the waypoint and log to the ship's log
 Future<DateTime> navigateToLocalWaypointAndLog(
   Api api,
+  SystemsCache systemsCache,
   ShipCache shipCache,
   Ship ship,
   SystemWaypoint waypoint,
@@ -367,6 +373,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
 
   final result = await navigateToLocalWaypoint(
     api,
+    systemsCache,
     shipCache,
     ship,
     waypoint.waypointSymbol,
@@ -605,4 +612,18 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
   shipInfo(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
   recordSurveys(db, response.surveys, getNow: getNow);
   return response;
+}
+
+/// Set the [flightMode] of [ship] if it is not already set to [flightMode]
+Future<ShipNav?> setShipFlightModeIfNeeded(
+  Api api,
+  ShipCache shipCache,
+  Ship ship,
+  ShipNavFlightMode flightMode,
+) async {
+  if (ship.nav.flightMode == flightMode) {
+    return null;
+  }
+  shipInfo(ship, 'Setting flightMode to $flightMode');
+  return setShipFlightMode(api, shipCache, ship, flightMode);
 }

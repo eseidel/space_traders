@@ -39,6 +39,8 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockShipCache extends Mock implements ShipCache {}
 
+class _MockSystemsCache extends Mock implements SystemsCache {}
+
 void main() {
   test('purchaseShip', () async {
     final Api api = _MockApi();
@@ -170,6 +172,7 @@ void main() {
     final shipFuel = ShipFuel(current: 0, capacity: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
     final shipCache = _MockShipCache();
+    final systemsCache = _MockSystemsCache();
 
     when(
       () => fleetApi.patchShipNav(
@@ -203,6 +206,7 @@ void main() {
       logger,
       () => navigateToLocalWaypoint(
         api,
+        systemsCache,
         shipCache,
         ship,
         WaypointSymbol.fromString('S-A-W'),

@@ -14,11 +14,15 @@ class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockChartingCache extends Mock implements ChartingCache {}
+
 class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
+
+class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -26,9 +30,13 @@ class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipyardPrices extends Mock implements ShipyardPrices {}
+
 class _MockSystem extends Mock implements System {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
+
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceExplorer smoke test', () async {
