@@ -95,6 +95,14 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  diff_match_patch:
+    dependency: transitive
+    description:
+      name: diff_match_patch
+      sha256: "2efc9e6e8f449d0abe15be240e2c2a3bcd977c8d126cfd70598aee60af35c0a4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1"
   fake_async:
     dependency: transitive
     description:
@@ -166,6 +174,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.8.1"
+  json_diff:
+    dependency: transitive
+    description:
+      name: json_diff
+      sha256: "10d82dd4455109bc4dd66335db2d34b4bdf4441dc8fdd6ad6fb914395b9f9e95"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   logging:
     dependency: transitive
     description:
