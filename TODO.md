@@ -606,3 +606,5 @@ be enough to get to fuel from pretty much anywhere in the galaxy.
 🛸#65 Expected 18,669c profit (71c/s), got -147,134c (-311c/s) in 00:07:53, expected 00:04:22
 
 If nothing else, each interval should be evaluted against the possibility of moving to sell?
+
+### Log error rates from network executor
