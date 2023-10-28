@@ -156,7 +156,7 @@ void main() {
     verify(() => fleetApi.dockShip(any())).called(1);
   });
 
-  test('navigateToLocalWaypoint sets probes to burn', () async {
+  test('navigateToLocalWaypoint does not change nav mode for probes', () async {
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -209,13 +209,12 @@ void main() {
       ),
     );
 
-    verify(
+    verifyNever(
       () => fleetApi.patchShipNav(
         any(),
-        patchShipNavRequest:
-            PatchShipNavRequest(flightMode: ShipNavFlightMode.BURN),
+        patchShipNavRequest: any(named: 'patchShipNavRequest'),
       ),
-    ).called(1);
+    );
   });
 
   test('transferCargoAndLog', () async {

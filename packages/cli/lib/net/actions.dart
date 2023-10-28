@@ -27,10 +27,6 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   WaypointSymbol waypointSymbol,
 ) async {
   await undockIfNeeded(api, shipCache, ship);
-  if (!ship.usesFuel && ship.nav.flightMode != ShipNavFlightMode.BURN) {
-    shipInfo(ship, 'Does not use fuel, setting flight mode to burn.');
-    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.BURN);
-  }
   // TODO(eseidel): Guard against ending up with exactly 0 fuel.
   try {
     final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
