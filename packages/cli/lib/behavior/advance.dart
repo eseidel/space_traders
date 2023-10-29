@@ -9,6 +9,7 @@ import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
+import 'package:cli/net/exceptions.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -114,6 +115,15 @@ Future<DateTime?> advanceShipBehavior(
       ship,
       error.message,
       error.timeout,
+    );
+  } on ApiException catch (e) {
+    if (!isInsufficientCreditsException(e)) {
+      rethrow;
+    }
+    caches.behaviors.disableBehaviorForShip(
+      ship,
+      'Insufficient credits: ${e.message}',
+      const Duration(minutes: 10),
     );
   }
   return null;
