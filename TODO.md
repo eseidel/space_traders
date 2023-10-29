@@ -612,3 +612,7 @@ If nothing else, each interval should be evaluted against the possibility of mov
 ### Write a script to find and mount (and re-sell) mounts
 
 For getting the last of the mount data.
+
+### Record minable traits with surveys
+
+### Record surveyor type with surveys
