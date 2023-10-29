@@ -175,6 +175,11 @@
   "description": "A waypoint that never experiences darkness, providing abundant solar energy and unique living conditions for its inhabitants."
  },
  {
+  "symbol": "PERPETUAL_OVERCAST",
+  "name": "Perpetual Overcast",
+  "description": "A location with a constant cloud cover, resulting in a perpetually dim and shadowy environment, often impacting local weather and ecosystems."
+ },
+ {
   "symbol": "PRECIOUS_METAL_DEPOSITS",
   "name": "Precious Metal Deposits",
   "description": "A source of valuable metals like gold, silver, and platinum, as well as their ores, prized for their rarity, beauty, and various applications."

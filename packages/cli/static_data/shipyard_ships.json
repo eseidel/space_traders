@@ -1447,7 +1447,7 @@
   "type": "SHIP_SURVEYOR",
   "name": "Surveyor Craft",
   "description": "A specialized spacecraft equipped with surveying mounts, designed for detailed surveying of celestial bodies, resource identification, and scientific research.",
-  "supply": "HIGH",
+  "supply": "ABUNDANT",
   "activity": "STRONG",
   "purchasePrice": 0,
   "frame": {
