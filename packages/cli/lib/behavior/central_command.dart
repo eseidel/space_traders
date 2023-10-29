@@ -73,9 +73,9 @@ class CentralCommand {
   // from other sources (e.g. hauling mining goods?)
   int expectedCreditsPerSecond(Ship ship) {
     // If we're stuck in our own system, any trades are better than exploring.
-    if (!_haveEscapedStartingSystem && ship.isHauler) {
-      return 1;
-    }
+    // if (!_haveEscapedStartingSystem && ship.isHauler) {
+    //   return 1;
+    // }
     // This should depend on phase and ship type?
     return 7;
   }
@@ -157,7 +157,7 @@ class CentralCommand {
   // instead of having this dynamic behavior function.
   /// What behavior should the given ship be doing?
   Behavior chooseNewBehaviorFor(Ship ship, int credits) {
-    final shipCount = _shipCache.ships.length;
+    // final shipCount = _shipCache.ships.length;
 
     final behaviors = {
       ShipRole.COMMAND: [
@@ -170,14 +170,15 @@ class CentralCommand {
         // Early on the command ship makes about 5c/s vs. ore hounds making
         // 6c/s. It's a better surveyor than miner. Especially when enabling
         // mining drones.
-        if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
+        // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         Behavior.miner,
       ],
       // Haulers are terrible explorers, but early game we just need
       // things mapping.
       ShipRole.HAULER: [
         Behavior.trader,
-        Behavior.explorer,
+        // Would rather have Haulers idle, than explore, at least early game.
+        // Behavior.explorer,
       ],
       ShipRole.EXCAVATOR: [
         if (ship.canMine) Behavior.miner,
@@ -462,7 +463,7 @@ class CentralCommand {
       return caches.shipyardPrices.havePriceFor(shipType) && frameCount < count;
     }
 
-    // This should be a multiple of our squad size so we always have
+    // These numbers should be based on squad sizes so that we always have
     // full squads.
     if (shouldBuy(ShipType.ORE_HOUND, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
@@ -576,16 +577,18 @@ class CentralCommand {
   // TODO(eseidel): call from or merge into getJobForShip.
   Future<MineJob> mineJobForShip(
     WaypointCache waypointCache,
+    MarketCache marketCache,
     AgentCache agentCache,
     Ship ship,
   ) async {
     final hq = agentCache.agent.headquartersSymbol;
-    final hqSystemSymbol = hq.systemSymbol;
-    final systemSymbol = hqSystemSymbol;
-    final mine =
-        (await evaluateWaypointsForMining(waypointCache, systemSymbol)).first;
+    final mine = (await evaluateWaypointsForMining(
+      waypointCache,
+      marketCache,
+      hq.systemSymbol,
+    ))
+        .firstWhere((m) => m.marketTradesAllProducedGoods);
     return MineJob(mine: mine.mine, market: mine.market);
-    // If the ship is in a system without a mine go to the HQ?
   }
 }
 

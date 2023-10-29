@@ -567,25 +567,17 @@ extension MarketUtils on Market {
   /// Returns the SystemSymbol of the market.
   SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
 
-  /// Returns the TradeType for the given trade symbol or null if the market
-  /// doesn't trade that good.
-  // TODO(eseidel): remove when nearbyMarketWhichTrades is removed.
-  ExchangeType? exchangeType(TradeSymbol tradeSymbol) {
-    if (imports.any((g) => g.symbol == tradeSymbol)) {
-      return ExchangeType.imports;
-    }
-    if (exports.any((g) => g.symbol == tradeSymbol)) {
-      return ExchangeType.exports;
-    }
-    if (exchange.any((g) => g.symbol == tradeSymbol)) {
-      return ExchangeType.exchange;
-    }
-    return null;
+  /// Returns all TradeSymbols traded by the market.
+  Iterable<TradeSymbol> get tradeSymbols {
+    return imports
+        .followedBy(exports)
+        .followedBy(exchange)
+        .map((t) => t.symbol);
   }
 
   /// Returns true if the market allows trading of the given trade symbol.
   bool allowsTradeOf(TradeSymbol tradeSymbol) =>
-      exchangeType(tradeSymbol) != null;
+      tradeSymbols.contains(tradeSymbol);
 
   /// Returns [MarketTradeGood] for the given trade symbol or null if the market
   /// doesn't trade that good.

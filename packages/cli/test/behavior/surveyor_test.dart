@@ -54,7 +54,12 @@ void main() {
     ]);
 
     when(
-      () => centralCommand.mineJobForShip(caches.waypoints, caches.agent, ship),
+      () => centralCommand.mineJobForShip(
+        caches.waypoints,
+        caches.markets,
+        caches.agent,
+        ship,
+      ),
     ).thenAnswer((_) => Future.value(MineJob(mine: symbol, market: symbol)));
 
     final waypoint = _MockWaypoint();

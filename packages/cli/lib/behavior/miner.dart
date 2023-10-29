@@ -505,8 +505,12 @@ Future<JobResult> _initMineJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final mineJob =
-      await centralCommand.mineJobForShip(caches.waypoints, caches.agent, ship);
+  final mineJob = await centralCommand.mineJobForShip(
+    caches.waypoints,
+    caches.markets,
+    caches.agent,
+    ship,
+  );
   state.mineJob = mineJob;
   return JobResult.complete();
 }
@@ -712,6 +716,7 @@ class MineAndSell {
     required this.market,
     required this.mineTraits,
     required this.distanceBetweenMineAndMarket,
+    required this.tradedGoods,
   });
 
   /// The symbol of the mine.
@@ -723,12 +728,33 @@ class MineAndSell {
   /// The symbol of the market.
   final WaypointSymbol market;
 
+  /// Goods traded at the market.
+  final Set<TradeSymbol> tradedGoods;
+
   /// The distance between the mine and the market.
   final int distanceBetweenMineAndMarket;
 
   /// The names of the traits of the mine.
   List<String> get mineTraitNames {
     return mineTraits.map((t) => t.value.replaceAll('_DEPOSITS', '')).toList();
+  }
+
+  /// Goods produced at the mine.
+  Set<TradeSymbol> get producedGoods {
+    return mineTraits
+        .map((t) => tradeSymbolsByTrait[t] ?? [])
+        .expand((e) => e)
+        .toSet();
+  }
+
+  /// True if the market trades all goods produced at the mine.
+  bool get marketTradesAllProducedGoods {
+    return producedGoods.every(tradedGoods.contains);
+  }
+
+  /// Goods produced at the mine which are not traded at the market.
+  Set<TradeSymbol> get goodsMissingFromMarket {
+    return producedGoods.difference(tradedGoods);
   }
 
   /// The score of this MineAndSell. Lower is better.
@@ -740,6 +766,7 @@ class MineAndSell {
 /// Evaluate all possible Mine and Market pairings for a given system.
 Future<List<MineAndSell>> evaluateWaypointsForMining(
   WaypointCache waypointCache,
+  MarketCache marketCache,
   SystemSymbol systemSymbol,
 ) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
@@ -747,15 +774,19 @@ Future<List<MineAndSell>> evaluateWaypointsForMining(
   final mines = waypoints.where((w) => w.canBeMined);
   final mineAndSells = <MineAndSell>[];
   for (final mine in mines) {
-    for (final market in marketWaypoints) {
-      final distance = mine.position.distanceTo(market.position);
+    for (final marketWaypoint in marketWaypoints) {
+      final distance = mine.distanceTo(marketWaypoint);
       final mineTraits =
           mine.traits.map((t) => t.symbol).where(isMinableTrait).toList();
+      final market =
+          await marketCache.marketForSymbol(marketWaypoint.waypointSymbol);
+      final marketGoods = market?.tradeSymbols.toSet() ?? {};
       mineAndSells.add(
         MineAndSell(
           mine: mine.waypointSymbol,
           mineTraits: mineTraits,
-          market: market.waypointSymbol,
+          market: marketWaypoint.waypointSymbol,
+          tradedGoods: marketGoods,
           distanceBetweenMineAndMarket: distance,
         ),
       );
@@ -764,3 +795,44 @@ Future<List<MineAndSell>> evaluateWaypointsForMining(
   mineAndSells.sortBy<num>((m) => m.score);
   return mineAndSells;
 }
+
+final tradeSymbolsByTrait = {
+  WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS: [
+    TradeSymbol.IRON_ORE,
+    TradeSymbol.COPPER_ORE,
+    TradeSymbol.ALUMINUM_ORE,
+  ],
+  WaypointTraitSymbolEnum.MINERAL_DEPOSITS: [
+    TradeSymbol.SILICON_CRYSTALS,
+    TradeSymbol.QUARTZ_SAND,
+  ],
+  WaypointTraitSymbolEnum.PRECIOUS_METAL_DEPOSITS: [
+    TradeSymbol.PLATINUM_ORE,
+    TradeSymbol.GOLD_ORE,
+    TradeSymbol.SILVER_ORE,
+  ],
+  WaypointTraitSymbolEnum.RARE_METAL_DEPOSITS: [
+    TradeSymbol.URANITE_ORE,
+    TradeSymbol.MERITIUM_ORE,
+  ],
+  WaypointTraitSymbolEnum.FROZEN: [
+    TradeSymbol.ICE_WATER,
+    TradeSymbol.AMMONIA_ICE,
+  ],
+  WaypointTraitSymbolEnum.ICE_CRYSTALS: [
+    TradeSymbol.ICE_WATER,
+    TradeSymbol.AMMONIA_ICE,
+    TradeSymbol.LIQUID_HYDROGEN,
+    TradeSymbol.LIQUID_NITROGEN,
+  ],
+  WaypointTraitSymbolEnum.EXPLOSIVE_GASES: [
+    TradeSymbol.HYDROCARBON,
+  ],
+  WaypointTraitSymbolEnum.SWAMP: [
+    TradeSymbol.HYDROCARBON,
+  ],
+  WaypointTraitSymbolEnum.STRONG_MAGNETOSPHERE: [
+    TradeSymbol.EXOTIC_MATTER,
+    TradeSymbol.GRAVITON_EMITTERS,
+  ],
+};

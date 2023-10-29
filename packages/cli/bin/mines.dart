@@ -17,19 +17,28 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final waypointCache = WaypointCache(api, systems, charting, construction);
   final agentCache = AgentCache.loadCached(fs)!;
   final hqSystem = agentCache.agent.headquartersSymbol.systemSymbol;
+  final marketCache = MarketCache(waypointCache);
 
-  final mines = await evaluateWaypointsForMining(waypointCache, hqSystem);
+  final mines =
+      await evaluateWaypointsForMining(waypointCache, marketCache, hqSystem);
 
   final table = Table(
     header: ['Mine', 'Traits', 'Market', 'Score'],
     style: const TableStyle(compact: true),
   );
 
-  // Limit to only the closest for each (eventually this should use
-  // information about what the mine produces and the market buys).
+  // Limit to only the closest for each.
   final seenMines = <WaypointSymbol>{};
   for (final mine in mines) {
     if (seenMines.contains(mine.mine)) {
+      continue;
+    }
+    // Only consider markets that trade all goods produced by the mine.
+    if (!mine.marketTradesAllProducedGoods) {
+      logger
+        ..warn('${mine.market} does not trade ${mine.goodsMissingFromMarket}'
+            ' produced by ${mine.mine}')
+        ..info('${mine.market} trades ${mine.tradedGoods}');
       continue;
     }
     seenMines.add(mine.mine);
