@@ -397,26 +397,6 @@ class CentralCommand {
     return mountRequest;
   }
 
-  Future<ShipBuyJob?> _oreHoundBuyJob(Caches caches) async {
-    final agentCache = caches.agent;
-    final waypointCache = caches.waypoints;
-    final hqSystem = agentCache.headquartersSymbol.systemSymbol;
-    final hqWaypoints = await waypointCache.waypointsInSystem(hqSystem);
-    final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
-    final recentPrice = caches.shipyardPrices.recentPurchasePrice(
-      shipType: ShipType.ORE_HOUND,
-      shipyardSymbol: shipyard.waypointSymbol,
-    );
-    if (recentPrice == null) {
-      return null;
-    }
-    return ShipBuyJob(
-      shipType: ShipType.ORE_HOUND,
-      shipyardSymbol: shipyard.waypointSymbol,
-      minCreditsNeeded: (recentPrice * 1.05).toInt(),
-    );
-  }
-
   Future<ShipBuyJob?> _findBestPlaceToBuy(
     Caches caches,
     ShipType shipType,
@@ -462,8 +442,9 @@ class CentralCommand {
     // This should be a multiple of our squad size so we always have
     // full squads.
     if (shouldBuy(ShipType.ORE_HOUND, 10)) {
-      // oreHoundBuyJob currently only looks in our system.
-      return _oreHoundBuyJob(caches);
+      return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
+    } else if (shouldBuy(ShipType.MINING_DRONE, 3)) {
+      return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
     } else if (shouldBuy(ShipType.LIGHT_HAULER, 3)) {
       return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
     } else if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {

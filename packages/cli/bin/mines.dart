@@ -21,7 +21,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final mines = await evaluateWaypointsForMining(waypointCache, hqSystem);
 
   final table = Table(
-    header: ['Mine', 'Market', 'Score'],
+    header: ['Mine', 'Traits', 'Market', 'Score'],
     style: const TableStyle(compact: true),
   );
 
@@ -33,7 +33,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       continue;
     }
     seenMines.add(mine.mine);
-    table.add([mine.mine.toString(), mine.market.toString(), mine.score]);
+    table.add([
+      mine.mine.toString(),
+      mine.mineTraitNames.join(', '),
+      mine.market.toString(),
+      mine.score,
+    ]);
   }
   logger.info(table.toString());
 

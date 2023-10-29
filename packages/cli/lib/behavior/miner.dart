@@ -710,17 +710,26 @@ class MineAndSell {
   MineAndSell({
     required this.mine,
     required this.market,
+    required this.mineTraits,
     required this.distanceBetweenMineAndMarket,
   });
 
   /// The symbol of the mine.
   final WaypointSymbol mine;
 
+  /// The traits of the mine.
+  final List<WaypointTraitSymbolEnum> mineTraits;
+
   /// The symbol of the market.
   final WaypointSymbol market;
 
   /// The distance between the mine and the market.
   final int distanceBetweenMineAndMarket;
+
+  /// The names of the traits of the mine.
+  List<String> get mineTraitNames {
+    return mineTraits.map((t) => t.value.replaceAll('_DEPOSITS', '')).toList();
+  }
 
   /// The score of this MineAndSell. Lower is better.
   int get score {
@@ -740,9 +749,12 @@ Future<List<MineAndSell>> evaluateWaypointsForMining(
   for (final mine in mines) {
     for (final market in marketWaypoints) {
       final distance = mine.position.distanceTo(market.position);
+      final mineTraits =
+          mine.traits.map((t) => t.symbol).where(isMinableTrait).toList();
       mineAndSells.add(
         MineAndSell(
           mine: mine.waypointSymbol,
+          mineTraits: mineTraits,
           market: market.waypointSymbol,
           distanceBetweenMineAndMarket: distance,
         ),
