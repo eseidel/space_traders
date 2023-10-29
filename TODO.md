@@ -616,3 +616,9 @@ For getting the last of the mount data.
 ### Record minable traits with surveys
 
 ### Record surveyor type with surveys
+
+### Explorers are all chasing each other
+
+They don't know how to avoid each other within the same system.
+
+### Have too many haulers with not enough worth doing
