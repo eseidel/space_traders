@@ -239,6 +239,9 @@ extension SystemWaypointUtils on SystemWaypoint {
   /// Returns true if the waypoint is an asteroid field.
   bool get isAsteroid => isType(WaypointType.ASTEROID);
 
+  /// Returns true if the waypoint is a jump gate.
+  bool get isJumpGate => isType(WaypointType.JUMP_GATE);
+
   /// symbol as a WaypointSymbol.
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
 

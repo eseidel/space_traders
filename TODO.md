@@ -622,3 +622,7 @@ For getting the last of the mount data.
 They don't know how to avoid each other within the same system.
 
 ### Have too many haulers with not enough worth doing
+
+### Need fuel-aware routing.
+
+e.g. so we don't think we could CRUISE somewhere when we'd actually DRIFT.

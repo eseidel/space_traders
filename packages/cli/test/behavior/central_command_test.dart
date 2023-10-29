@@ -119,18 +119,18 @@ void main() {
     when(() => shipCache.ship(shipBSymbol)).thenReturn(shipB);
 
     final otherSystems =
-        centralCommand.otherExplorerSystems(shipASymbol).toList();
+        centralCommand.otherExplorerWaypoints(shipASymbol).toList();
     expect(otherSystems, [sbw.systemSymbol]); // From destination
     stateB.routePlan = null;
     final otherSystems2 =
-        centralCommand.otherExplorerSystems(shipASymbol).toList();
+        centralCommand.otherExplorerWaypoints(shipASymbol).toList();
     expect(
       otherSystems2,
       [SystemSymbol.fromString('S-C')],
     ); // From nav.systemSymbol
     behaviorCache.deleteBehavior(shipBSymbol);
     final otherSystems3 =
-        centralCommand.otherExplorerSystems(shipASymbol).toList();
+        centralCommand.otherExplorerWaypoints(shipASymbol).toList();
     expect(otherSystems3, <SystemSymbol>[]);
   });
 

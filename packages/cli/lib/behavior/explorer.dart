@@ -56,7 +56,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
   Ship ship,
   System system, {
   required Duration maxAge,
-  required bool Function(SystemSymbol systemSymbol)? filter,
+  required bool Function(WaypointSymbol waypointSymbol)? filter,
   required WaypointCache waypointCache,
 }) async {
   final WaypointSymbol? start;
@@ -76,7 +76,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
 
   for (final systemWaypoint in systemWaypoints) {
     final waypointSymbol = systemWaypoint.waypointSymbol;
-    if (filter != null && !filter(systemWaypoint.systemSymbol)) {
+    if (filter != null && !filter(waypointSymbol)) {
       continue;
     }
     // Try and fetch the waypoint from the server or our cache.
@@ -122,7 +122,7 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   Ship ship, {
   required SystemSymbol startSystemSymbol,
   required WaypointCache waypointCache,
-  bool Function(SystemSymbol systemSymbol)? filter,
+  bool Function(WaypointSymbol waypointSymbol)? filter,
   Duration maxAge = defaultMaxAge,
 }) async {
   // Find all systems in the jumpgate network.
@@ -294,8 +294,13 @@ Future<DateTime?> advanceExplorer(
     return refuelWaitTime;
   }
 
-  // final probeSystems =
-  //     centralCommand.otherExplorerSystems(ship.shipSymbol).toSet();
+  final explorerWaypoints = centralCommand
+      .otherExplorerWaypoints(ship.shipSymbol)
+      .toSet()
+      // It's OK for multiple explorers to use the same jumpgate.
+      .where(caches.systems.isJumpGate)
+      .toSet();
+
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
   final startTime = getNow();
@@ -307,8 +312,9 @@ Future<DateTime?> advanceExplorer(
     caches.shipyardPrices,
     ship,
     startSystemSymbol: ship.systemSymbol,
-    // filter: (SystemSymbol systemSymbol)
-    // => !probeSystems.contains(systemSymbol),
+    // TODO(eseidel): Once we leave the initial system, explorers should stay
+    // at least a system apart.
+    filter: (waypointSymbol) => !explorerWaypoints.contains(waypointSymbol),
     maxAge: maxAge,
     waypointCache: caches.waypoints,
   );

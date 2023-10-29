@@ -301,6 +301,15 @@ class CentralCommand {
   Iterable<SystemSymbol> _otherSystemsWithBehavior(
     ShipSymbol thisShipSymbol,
     Behavior behavior,
+  ) {
+    return _otherWaypointsWithBehavior(thisShipSymbol, behavior)
+        .map((s) => s.systemSymbol);
+  }
+
+  /// Returns other systems containing ships with [behavior].
+  Iterable<WaypointSymbol> _otherWaypointsWithBehavior(
+    ShipSymbol thisShipSymbol,
+    Behavior behavior,
   ) sync* {
     for (final state in _behaviorCache.states) {
       if (state.shipSymbol == thisShipSymbol) {
@@ -311,17 +320,17 @@ class CentralCommand {
       }
       final destination = state.routePlan?.endSymbol;
       if (destination != null) {
-        yield destination.systemSymbol;
+        yield destination;
       } else {
         final ship = _shipCache.ship(state.shipSymbol);
-        yield ship.systemSymbol;
+        yield ship.waypointSymbol;
       }
     }
   }
 
   /// Returns all systems containing explorers or explorer destinations.
-  Iterable<SystemSymbol> otherExplorerSystems(ShipSymbol thisShipSymbol) =>
-      _otherSystemsWithBehavior(thisShipSymbol, Behavior.explorer);
+  Iterable<WaypointSymbol> otherExplorerWaypoints(ShipSymbol thisShipSymbol) =>
+      _otherWaypointsWithBehavior(thisShipSymbol, Behavior.explorer);
 
   /// Returns all systems containing traders or trader destinations.
   Iterable<SystemSymbol> otherTraderSystems(ShipSymbol thisShipSymbol) =>
