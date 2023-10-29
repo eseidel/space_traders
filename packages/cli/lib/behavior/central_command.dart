@@ -319,12 +319,13 @@ class CentralCommand {
       if (state.behavior != behavior) {
         continue;
       }
+      // Yield both the ship's current waypoint and its destination.
+      final ship = _shipCache.ship(state.shipSymbol);
+      yield ship.waypointSymbol;
+
       final destination = state.routePlan?.endSymbol;
       if (destination != null) {
         yield destination;
-      } else {
-        final ship = _shipCache.ship(state.shipSymbol);
-        yield ship.waypointSymbol;
       }
     }
   }
