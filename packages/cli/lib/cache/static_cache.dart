@@ -163,7 +163,9 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
   @override
   ShipyardShip copyAndNormalize(ShipyardShip record) {
     return ShipyardShip.fromJson(jsonDecode(jsonEncode(record)))!
-      ..purchasePrice = 0;
+      ..purchasePrice = 0
+      ..activity = null
+      ..supply = SupplyLevel.ABUNDANT;
   }
 
   @override
