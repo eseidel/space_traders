@@ -576,9 +576,9 @@ class CentralCommand {
     final hq = agentCache.agent.headquartersSymbol;
     final hqSystemSymbol = hq.systemSymbol;
     final systemSymbol = hqSystemSymbol;
-    final systemWaypoints = await waypointCache.waypointsInSystem(systemSymbol);
-    final mine = systemWaypoints.firstWhere((w) => w.canBeMined).waypointSymbol;
-    return MineJob(mine: mine, market: mine);
+    final mine =
+        (await evaluateWaypointsForMining(waypointCache, systemSymbol)).first;
+    return MineJob(mine: mine.mine, market: mine.market);
     // If the ship is in a system without a mine go to the HQ?
   }
 }
