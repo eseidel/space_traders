@@ -36,6 +36,7 @@ class CentralCommand {
 
   final BehaviorCache _behaviorCache;
   final ShipCache _shipCache;
+  bool _haveEscapedStartingSystem = false;
 
   /// How old can explorer data be before we refresh it?
   Duration _maxAgeForExplorerData = const Duration(days: 3);
@@ -71,6 +72,10 @@ class CentralCommand {
   // Should set this based on the ship type and how much we expect to earn
   // from other sources (e.g. hauling mining goods?)
   int expectedCreditsPerSecond(Ship ship) {
+    // If we're stuck in our own system, any trades are better than exploring.
+    if (!_haveEscapedStartingSystem && ship.isHauler) {
+      return 1;
+    }
     // This should depend on phase and ship type?
     return 7;
   }
@@ -372,6 +377,14 @@ class CentralCommand {
     _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
     updateAvailableMounts(caches.marketPrices);
     await _queueMountRequests(caches);
+    // We'll assume that if all the ships are in the same system we've
+    // not yet constructed our jump gate.
+    if (!_haveEscapedStartingSystem) {
+      final systemSymbols = Set<SystemSymbol>.from(
+        _shipCache.ships.map((s) => s.nav.systemSymbolObject),
+      );
+      _haveEscapedStartingSystem = systemSymbols.length > 1;
+    }
   }
 
   /// Returns the next ship buy job.
