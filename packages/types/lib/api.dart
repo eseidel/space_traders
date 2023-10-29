@@ -594,6 +594,12 @@ extension ShipyardUtils on Shipyard {
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
 }
 
+/// Extensions onto Construction to make it easier to work with.
+extension ConstructionUtils on Construction {
+  /// Returns the WaypointSymbol for the construction.
+  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+}
+
 /// Extensions onto MarketTransaction to make it easier to work with.
 extension MarketTransactionUtils on MarketTransaction {
   /// Returns the TradeSymbol for the given transaction.

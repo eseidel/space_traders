@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_store.dart';
-import 'package:cli/logger.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -146,39 +145,4 @@ class ChartingCache extends JsonStore<_Record> {
   /// Gets the charted values for the given waypoint symbol.
   ChartedValues? valuesForSymbol(WaypointSymbol waypointSymbol) =>
       _valuesBySymbol[waypointSymbol];
-
-  /// Sythesizes a waypoint from cached values if possible.
-  Waypoint? waypointFromSymbol(
-    SystemsCache systemsCache,
-    WaypointSymbol waypointSymbol,
-  ) {
-    final values = valuesForSymbol(waypointSymbol);
-    if (values == null) {
-      return null;
-    }
-    final systemWaypoint = systemsCache.waypointFromSymbol(waypointSymbol);
-    final traits = <WaypointTrait>[];
-    for (final traitSymbol in values.traitSymbols) {
-      final trait = waypointTraits[traitSymbol];
-      if (trait == null) {
-        logger.warn('Traits cache missing trait: $traitSymbol');
-        return null;
-      }
-      traits.add(trait);
-    }
-
-    return Waypoint(
-      symbol: systemWaypoint.symbol,
-      type: systemWaypoint.type,
-      systemSymbol: systemWaypoint.systemSymbol.system,
-      x: systemWaypoint.x,
-      y: systemWaypoint.y,
-      chart: values.chart,
-      faction: values.faction,
-      orbitals: systemWaypoint.orbitals,
-      traits: traits,
-      // TODO(eseidel): this is a hack.
-      isUnderConstruction: false,
-    );
-  }
 }

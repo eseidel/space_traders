@@ -1,15 +1,9 @@
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/static_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
-
-class _MockLogger extends Mock implements Logger {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
@@ -90,31 +84,5 @@ void main() {
     expect(chartingCache.waypointCount, 1);
     expect(chartingCache.valuesForSymbol(waypointSymbol), isNotNull);
     expect(chartingCache.valuesForSymbol(unchartedSymbol), isNull);
-
-    final systemsCache = _MockSystemsCache();
-    when(() => systemsCache.waypointFromSymbol(waypointSymbol))
-        .thenReturn(chartedWaypoint.toSystemWaypoint());
-    final waypoint2 =
-        chartingCache.waypointFromSymbol(systemsCache, waypointSymbol);
-    expect(waypoint2?.chart, isNotNull);
-
-    final uncharted2 =
-        chartingCache.waypointFromSymbol(systemsCache, unchartedSymbol);
-    expect(uncharted2, isNull);
-
-    // Lookups will fail if the trait cache is missing a trait.
-    final logger = _MockLogger();
-    when(() => waypointTraits[WaypointTraitSymbolEnum.ASH_CLOUDS])
-        .thenReturn(null);
-    final waypoint3 = runWithLogger(
-      logger,
-      () => chartingCache.waypointFromSymbol(
-        systemsCache,
-        waypointSymbol,
-      ),
-    );
-    verify(() => logger.warn('Traits cache missing trait: ASH_CLOUDS'))
-        .called(1);
-    expect(waypoint3, isNull);
   });
 }

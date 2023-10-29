@@ -2,6 +2,7 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
+import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
@@ -105,7 +106,8 @@ class Caches {
     final shipyard = ShipyardPrices.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
     final charting = ChartingCache.load(fs);
-    final waypoints = WaypointCache(api, systems, charting);
+    final construction = ConstructionCache.load(fs);
+    final waypoints = WaypointCache(api, systems, charting, construction);
     final markets = MarketCache(waypoints);
     // Intentionally force refresh contracts in case we've been offline.
     final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);

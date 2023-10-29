@@ -73,3 +73,13 @@ Future<Market> getMarket(Api api, Waypoint waypoint) async {
       await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
   return response!.data;
 }
+
+/// Fetches Construction for a given Waypoint.
+Future<Construction> getConstruction(
+  Api api,
+  WaypointSymbol waypointSymbol,
+) async {
+  final response = await api.systems
+      .getConstruction(waypointSymbol.system, waypointSymbol.waypoint);
+  return response!.data;
+}
