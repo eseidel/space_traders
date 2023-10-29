@@ -1,7 +1,9 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/response_cache.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:cli/net/queries.dart';
+import 'package:cli/ships.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 
@@ -77,8 +79,42 @@ class ShipCache extends ResponseListCache<Ship> {
   }
 
   /// Returns the number of ships with the given [frame].
-  int countOfFrame(ShipFrameSymbolEnum frame) {
-    return frameCounts[frame] ?? 0;
+  int? countOfFrame(ShipFrameSymbolEnum frame) {
+    return frameCounts[frame];
+  }
+
+  /// Returns true if the given [ship] matches the given [shipyardShip].
+  static bool matchesShipyardShipMounts(Ship ship, ShipyardShip shipyardShip) {
+    if (ship.frame.symbol != shipyardShip.frame.symbol) {
+      return false;
+    }
+    return ShipTemplate.mountsSymbolSetEquals(
+      ship.mountedMountSymbols,
+      shipyardShip.mountedMountSymbols,
+    );
+  }
+
+  /// Returns the number of ships with the given [type].
+  int? countOfType(ShipyardShipCache shipyardShips, ShipType shipType) {
+    final frame = shipyardShips.shipFrameFromType(shipType);
+    // If we can't identify the frame, we can't identify the count.
+    if (frame == null) {
+      return null;
+    }
+    // In the easy case this type is the only one of its frame.
+    if (shipType == shipyardShips.shipTypeFromFrame(frame)) {
+      return countOfFrame(frame);
+    }
+    // Otherwise we count up all the ships which match this frame
+    // and match the mounts. This breaks in the case of multiple ships with
+    // the same frame who have swapped mounts, but it's better than nothing.
+    final shipyardShip = shipyardShips[shipType];
+    if (shipyardShip == null) {
+      return null;
+    }
+    return ships
+        .where((s) => matchesShipyardShipMounts(s, shipyardShip))
+        .length;
   }
 
   /// Returns all ship symbols.

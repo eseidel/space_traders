@@ -99,6 +99,14 @@ extension ShipMountsExtension on Ship {
   }
 }
 
+/// Extensions for dealing with mounts on ShipyardShips.
+extension ShipyardShipMountsExtension on ShipyardShip {
+  /// Compute the mounts mounted on the given ShipyardShip.
+  MountSymbolSet get mountedMountSymbols {
+    return MountSymbolSet.fromIterable(mounts.map((m) => m.symbol));
+  }
+}
+
 /// Mounts to add to make [ship] match [template].
 MountSymbolSet mountsToAddToShip(Ship ship, ShipTemplate template) {
   return template.mounts.difference(ship.mountedMountSymbols);

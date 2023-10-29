@@ -6,7 +6,6 @@ import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:cli/ships.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -455,27 +454,24 @@ class CentralCommand {
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
     bool shouldBuy(ShipType shipType, int count) {
-      // This should never be null for real code, but makes unit testing easier
-      // to allow a null frame here.
-      // TODO(eseidel): This will break for drones.
-      final frame = caches.static.shipyardShips.shipFrameFromType(shipType);
-      final frameCount = frame == null ? 0 : _shipCache.countOfFrame(frame);
-      return caches.shipyardPrices.havePriceFor(shipType) && frameCount < count;
+      final typeCount =
+          _shipCache.countOfType(caches.static.shipyardShips, shipType) ?? 0;
+      return caches.shipyardPrices.havePriceFor(shipType) && typeCount < count;
     }
 
     // These numbers should be based on squad sizes so that we always have
     // full squads.
     if (shouldBuy(ShipType.ORE_HOUND, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
-    } else if (shouldBuy(ShipType.MINING_DRONE, 3)) {
+    } else if (shouldBuy(ShipType.MINING_DRONE, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
-    } else if (shouldBuy(ShipType.SURVEYOR, 3)) {
+    } else if (shouldBuy(ShipType.SURVEYOR, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
     } else if (shouldBuy(ShipType.LIGHT_HAULER, 3)) {
       return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
     } else if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
-    } else if (shouldBuy(ShipType.PROBE, 5)) {
+    } else if (shouldBuy(ShipType.PROBE, 3)) {
       return _findBestPlaceToBuy(caches, ShipType.PROBE);
     }
     return null;
