@@ -291,6 +291,12 @@ extension WaypointUtils on Waypoint {
 
   /// Returns true if the waypoint has a marketplace.
   bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
+
+  /// Returns the WaypointPosition of the waypoint.
+  WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);
+
+  /// Returns the distance to the given waypoint.
+  int distanceTo(Waypoint other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto ShipCargo to make it easier to work with.

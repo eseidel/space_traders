@@ -703,3 +703,52 @@ final advanceMiner = const MultiJob('Miner', [
   doMineJob,
   sellCargoIfNeeded,
 ]).run;
+
+/// Evaluate a Mine and Market pairing
+class MineAndSell {
+  /// Creates a new MineAndSell.
+  MineAndSell({
+    required this.mine,
+    required this.market,
+    required this.distanceBetweenMineAndMarket,
+  });
+
+  /// The symbol of the mine.
+  final WaypointSymbol mine;
+
+  /// The symbol of the market.
+  final WaypointSymbol market;
+
+  /// The distance between the mine and the market.
+  final int distanceBetweenMineAndMarket;
+
+  /// The score of this MineAndSell. Lower is better.
+  int get score {
+    return distanceBetweenMineAndMarket;
+  }
+}
+
+/// Evaluate all possible Mine and Market pairings for a given system.
+Future<List<MineAndSell>> evaluateWaypointsForMining(
+  WaypointCache waypointCache,
+  SystemSymbol systemSymbol,
+) async {
+  final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
+  final marketWaypoints = waypoints.where((w) => w.hasMarketplace);
+  final mines = waypoints.where((w) => w.canBeMined);
+  final mineAndSells = <MineAndSell>[];
+  for (final mine in mines) {
+    for (final market in marketWaypoints) {
+      final distance = mine.position.distanceTo(market.position);
+      mineAndSells.add(
+        MineAndSell(
+          mine: mine.waypointSymbol,
+          market: market.waypointSymbol,
+          distanceBetweenMineAndMarket: distance,
+        ),
+      );
+    }
+  }
+  mineAndSells.sortBy<num>((m) => m.score);
+  return mineAndSells;
+}

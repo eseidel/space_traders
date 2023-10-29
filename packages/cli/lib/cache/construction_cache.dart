@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
@@ -81,7 +80,6 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
     required Construction? construction,
     DateTime Function() getNow = defaultGetNow,
   }) {
-    logger.info('Recording construction: $waypointSymbol');
     final index = entries.indexWhere(
       (record) => record.waypointSymbol == waypointSymbol,
     );
