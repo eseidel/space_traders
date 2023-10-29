@@ -1,4 +1,5 @@
 import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/queries.dart';
 import 'package:db/db.dart';
@@ -34,15 +35,19 @@ Future<Market?> visitLocalMarket(
     getNow: getNow,
   );
   if (ship.usesFuel) {
-    await refuelIfNeededAndLog(
-      api,
-      db,
-      caches.marketPrices,
-      caches.agent,
-      caches.ships,
-      market,
-      ship,
-    );
+    try {
+      await refuelIfNeededAndLog(
+        api,
+        db,
+        caches.marketPrices,
+        caches.agent,
+        caches.ships,
+        market,
+        ship,
+      );
+    } on ApiException catch (e) {
+      shipErr(ship, 'Failed to refuel: $e');
+    }
   }
   return market;
 }
