@@ -11,10 +11,8 @@ import 'package:cli/net/register.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:file/local.dart';
-import 'package:meta/meta.dart';
 import 'package:scoped/scoped.dart';
 import 'package:types/types.dart';
-import 'package:yaml/yaml.dart';
 
 void printRequestStats(RequestCounts requestCounts) {
   final counts = requestCounts.counts;
@@ -93,28 +91,6 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
   return (Ship ship) => onlyShips.contains(ship.shipSymbol);
 }
 
-@immutable
-class Config {
-  const Config({this.callsign, this.email, this.url});
-
-  factory Config.loadFromFile(FileSystem fs) {
-    final file = fs.file('config.yaml');
-    if (!file.existsSync()) {
-      return const Config();
-    }
-    final yaml = loadYaml(file.readAsStringSync()) as YamlMap;
-    return Config(
-      callsign: yaml['callsign'] as String?,
-      email: yaml['email'] as String?,
-      url: yaml['url'] as String?,
-    );
-  }
-
-  final String? callsign;
-  final String? email;
-  final String? url;
-}
-
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
@@ -131,22 +107,10 @@ Future<void> cliMain(List<String> args) async {
   // Use package:file to make things mockable.
   const fs = LocalFileSystem();
   final db = await defaultDatabase();
-
-  final config = Config.loadFromFile(fs);
-  final token = await loadAuthTokenOrRegister(
-    fs,
-    db,
-    callsign: config.callsign,
-    email: config.email,
-  );
+  final token = await loadAuthTokenOrRegister(fs, db);
 
   // Api client should move to per-ship with a per-ship priority function.
-  final api = apiFromAuthToken(
-    token,
-    db,
-    getPriority: () => 0,
-    overrideBaseUrl: config.url,
-  );
+  final api = apiFromAuthToken(token, db, getPriority: () => 0);
 
   final caches = await Caches.load(fs, api, db);
   logger.info(

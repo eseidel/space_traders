@@ -6,6 +6,7 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
+import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
@@ -18,9 +19,23 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final hqSystem = agentCache.agent.headquartersSymbol.systemSymbol;
 
   final mines = await evaluateWaypointsForMining(waypointCache, hqSystem);
+
+  final table = Table(
+    header: ['Mine', 'Market', 'Score'],
+    style: const TableStyle(compact: true),
+  );
+
+  // Limit to only the closest for each (eventually this should use
+  // information about what the mine produces and the market buys).
+  final seenMines = <WaypointSymbol>{};
   for (final mine in mines) {
-    logger.info('${mine.mine} ${mine.market} ${mine.score}');
+    if (seenMines.contains(mine.mine)) {
+      continue;
+    }
+    seenMines.add(mine.mine);
+    table.add([mine.mine.toString(), mine.market.toString(), mine.score]);
   }
+  logger.info(table.toString());
 
   // Required or main will hang.
   await db.close();
