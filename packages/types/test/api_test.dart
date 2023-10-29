@@ -24,8 +24,6 @@ void main() {
     expect(jumpGate.isType(WaypointType.JUMP_GATE), isTrue);
     expect(jumpGate.isType(WaypointType.PLANET), isFalse);
     expect(asteroid.isAsteroid, isTrue);
-    expect(planet.canBeMined, isFalse);
-    expect(asteroid.canBeMined, isTrue);
     expect(jumpGate.systemSymbol, SystemSymbol.fromString('S-E'));
 
     final system = System(
@@ -158,5 +156,16 @@ void main() {
     );
     expect(market.allowsTradeOf(TradeSymbol.FABRICS), isFalse);
     expect(market.allowsTradeOf(TradeSymbol.FUEL), isTrue);
+  });
+
+  test('isMinableTrait', () {
+    final minable =
+        WaypointTraitSymbolEnum.values.where(isMinableTrait).toList();
+    expect(minable, [
+      WaypointTraitSymbolEnum.MINERAL_DEPOSITS,
+      WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS,
+      WaypointTraitSymbolEnum.PRECIOUS_METAL_DEPOSITS,
+      WaypointTraitSymbolEnum.RARE_METAL_DEPOSITS,
+    ]);
   });
 }

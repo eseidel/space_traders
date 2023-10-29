@@ -239,9 +239,6 @@ extension SystemWaypointUtils on SystemWaypoint {
   /// Returns true if the waypoint is an asteroid field.
   bool get isAsteroid => isType(WaypointType.ASTEROID);
 
-  /// Returns true if the waypoint can be mined.
-  bool get canBeMined => isAsteroid;
-
   /// symbol as a WaypointSymbol.
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
 
@@ -253,6 +250,11 @@ extension SystemWaypointUtils on SystemWaypoint {
 
   /// Returns the distance to the given waypoint.
   int distanceTo(SystemWaypoint other) => position.distanceTo(other.position);
+}
+
+/// Returns true if the given trait is minable.
+bool isMinableTrait(WaypointTraitSymbolEnum trait) {
+  return trait.value.endsWith('DEPOSITS');
 }
 
 /// Extensions onto Waypoint to make it easier to work with.
@@ -284,7 +286,7 @@ extension WaypointUtils on Waypoint {
   bool get isAsteroid => isType(WaypointType.ASTEROID);
 
   /// Returns true if the waypoint can be mined.
-  bool get canBeMined => isAsteroid;
+  bool get canBeMined => traits.any((t) => isMinableTrait(t.symbol));
 
   /// Returns true if the waypoint has a shipyard.
   bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
