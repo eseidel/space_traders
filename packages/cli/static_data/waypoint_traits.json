@@ -232,7 +232,7 @@
  {
   "symbol": "STRIPPED",
   "name": "Stripped",
-  "description": "A waypoint that has been heavily exploited for its resources, leaving a scarred and depleted landscape with diminished opportunities for future development."
+  "description": "A location that has been over-mined or over-harvested, resulting in depleted resources and barren landscapes."
  },
  {
   "symbol": "STRONG_GRAVITY",
