@@ -568,15 +568,15 @@ class CentralCommand {
 
   /// Returns the mining plan for the given [ship].
   // TODO(eseidel): call from or merge into getJobForShip.
-  MineJob mineJobForShip(
-    SystemsCache systemsCache,
+  Future<MineJob> mineJobForShip(
+    WaypointCache waypointCache,
     AgentCache agentCache,
     Ship ship,
-  ) {
+  ) async {
     final hq = agentCache.agent.headquartersSymbol;
     final hqSystemSymbol = hq.systemSymbol;
     final systemSymbol = hqSystemSymbol;
-    final systemWaypoints = systemsCache.waypointsInSystem(systemSymbol);
+    final systemWaypoints = await waypointCache.waypointsInSystem(systemSymbol);
     final mine = systemWaypoints.firstWhere((w) => w.canBeMined).waypointSymbol;
     return MineJob(mine: mine, market: mine);
     // If the ship is in a system without a mine go to the HQ?

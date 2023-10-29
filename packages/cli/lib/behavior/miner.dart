@@ -506,7 +506,7 @@ Future<JobResult> _initMineJob(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final mineJob =
-      centralCommand.mineJobForShip(caches.systems, caches.agent, ship);
+      await centralCommand.mineJobForShip(caches.waypoints, caches.agent, ship);
   state.mineJob = mineJob;
   return JobResult.complete();
 }

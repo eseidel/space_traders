@@ -119,8 +119,8 @@ void main() {
     ]);
 
     when(
-      () => centralCommand.mineJobForShip(caches.systems, caches.agent, ship),
-    ).thenReturn(MineJob(mine: symbol, market: symbol));
+      () => centralCommand.mineJobForShip(caches.waypoints, caches.agent, ship),
+    ).thenAnswer((_) => Future.value(MineJob(mine: symbol, market: symbol)));
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);

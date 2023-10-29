@@ -21,7 +21,7 @@ Future<DateTime?> advanceSurveyor(
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   final mineJob =
-      centralCommand.mineJobForShip(caches.systems, caches.agent, ship);
+      await centralCommand.mineJobForShip(caches.waypoints, caches.agent, ship);
   final mineSymbol = mineJob.mine;
   if (ship.waypointSymbol != mineSymbol) {
     return beingNewRouteAndLog(
