@@ -124,8 +124,14 @@ void main() {
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
-    when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
-    when(() => waypoint.traits).thenReturn([]);
+    when(() => waypoint.type).thenReturn(WaypointType.ASTEROID);
+    when(() => waypoint.traits).thenReturn([
+      WaypointTrait(
+        symbol: WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS,
+        name: 'name',
+        description: 'description',
+      ),
+    ]);
     when(() => waypoint.systemSymbol).thenReturn(symbol.system);
 
     registerFallbackValue(symbol);

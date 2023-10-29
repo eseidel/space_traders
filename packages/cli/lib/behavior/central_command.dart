@@ -425,7 +425,7 @@ class CentralCommand {
   ) async {
     // TODO(eseidel): This uses command ship to compute the job, but
     // will happily give out the job to a non-command ship for execution.
-    final commandShip = _shipCache.ships.firstWhere((s) => s.isCommand);
+    final commandShip = _shipCache.ships.first;
     final trip = findBestShipyardToBuy(
       caches.shipyardPrices,
       caches.routePlanner,

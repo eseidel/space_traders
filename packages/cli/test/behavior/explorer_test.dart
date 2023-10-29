@@ -97,8 +97,8 @@ void main() {
         .thenReturn(const Duration(days: 3));
     when(centralCommand.shortenMaxAgeForExplorerData)
         .thenReturn(const Duration(days: 1));
-    // when(() => centralCommand.otherExplorerSystems(shipSymbol))
-    //  .thenReturn([]);
+    when(() => centralCommand.otherExplorerWaypoints(shipSymbol))
+        .thenReturn([]);
     final state = BehaviorState(shipSymbol, Behavior.explorer);
 
     final logger = _MockLogger();

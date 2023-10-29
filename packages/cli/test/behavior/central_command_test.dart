@@ -110,7 +110,9 @@ void main() {
     final shipBSymbol = ShipSymbol.fromString('X-B');
     when(() => shipB.symbol).thenReturn(shipBSymbol.symbol);
     final shipNavB = _MockShipNav();
-    when(() => shipNavB.systemSymbol).thenReturn('S-C');
+    final sca = WaypointSymbol.fromString('S-C-A');
+    when(() => shipNavB.waypointSymbol).thenReturn(sca.waypoint);
+    when(() => shipNavB.systemSymbol).thenReturn(sca.system);
     when(() => shipB.nav).thenReturn(shipNavB);
     final stateB = BehaviorState(shipBSymbol, Behavior.explorer);
     final sbw = WaypointSymbol.fromString('S-B-W');
@@ -120,18 +122,15 @@ void main() {
 
     final otherSystems =
         centralCommand.otherExplorerWaypoints(shipASymbol).toList();
-    expect(otherSystems, [sbw.systemSymbol]); // From destination
+    expect(otherSystems, [sbw]); // From destination
     stateB.routePlan = null;
     final otherSystems2 =
         centralCommand.otherExplorerWaypoints(shipASymbol).toList();
-    expect(
-      otherSystems2,
-      [SystemSymbol.fromString('S-C')],
-    ); // From nav.systemSymbol
+    expect(otherSystems2, [sca]); // From nav.waypointSymbol
     behaviorCache.deleteBehavior(shipBSymbol);
     final otherSystems3 =
         centralCommand.otherExplorerWaypoints(shipASymbol).toList();
-    expect(otherSystems3, <SystemSymbol>[]);
+    expect(otherSystems3, <WaypointSymbol>[]);
   });
 
   test('CentralCommand.otherTraderSystems', () {
@@ -434,7 +433,18 @@ void main() {
 
   test('advanceCentralPlanning smoke test', () async {
     final caches = mockCaches();
-    when(() => caches.ships.ships).thenReturn([]);
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    when(() => shipNav.systemSymbol).thenReturn('W-A');
+    when(() => ship.nav).thenReturn(shipNav);
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol)
+        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => caches.ships.ships).thenReturn([ship]);
     final centralCommand = CentralCommand(
       behaviorCache: caches.behaviors,
       shipCache: caches.ships,
@@ -463,6 +473,8 @@ void main() {
       ]),
     );
     when(() => caches.shipyardPrices.prices).thenReturn([]);
+    when(() => caches.shipyardPrices.pricesFor(ShipType.ORE_HOUND))
+        .thenReturn([]);
     when(() => caches.shipyardPrices.havePriceFor(ShipType.ORE_HOUND))
         .thenReturn(true);
     when(() => caches.marketPrices.prices).thenReturn([]);
