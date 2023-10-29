@@ -281,10 +281,10 @@ extension WaypointUtils on Waypoint {
   bool isType(WaypointType type) => this.type == type;
 
   /// Returns true if the waypoint is an asteroid field.
-  bool get isAsteroidField => isType(WaypointType.ASTEROID_FIELD);
+  bool get isAsteroid => isType(WaypointType.ASTEROID);
 
   /// Returns true if the waypoint can be mined.
-  bool get canBeMined => isAsteroidField;
+  bool get canBeMined => isAsteroid;
 
   /// Returns true if the waypoint has a shipyard.
   bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
