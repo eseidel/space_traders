@@ -1,6 +1,7 @@
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:file/local.dart';
+import 'package:file/memory.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -203,5 +204,82 @@ void main() {
 
     // We don't know how to plan warps yet.
     expect(planRoute(waypoint1, waypoint3), isNull);
+  });
+
+  test('planRoute, fuel constratints', () {
+    final fs = MemoryFileSystem.test();
+    final start = SystemWaypoint(
+      symbol: 'A-B-A',
+      type: WaypointType.ASTEROID,
+      x: 0,
+      y: 0,
+    );
+    final fuelStation = SystemWaypoint(
+      symbol: 'A-B-B',
+      type: WaypointType.ASTEROID,
+      x: 50,
+      y: 0,
+    );
+    final end = SystemWaypoint(
+      symbol: 'A-B-C',
+      type: WaypointType.ASTEROID,
+      x: 100,
+      y: 0,
+    );
+
+    final systemsCache = SystemsCache(
+      [
+        System(
+          symbol: 'A-B',
+          sectorSymbol: 'A',
+          type: SystemType.BLUE_STAR,
+          x: 0,
+          y: 0,
+          waypoints: [start, fuelStation, end],
+        ),
+      ],
+      fs: fs,
+    );
+
+    final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+    RoutePlan? planRoute(
+      SystemWaypoint start,
+      SystemWaypoint end, {
+      required int fuelCapacity,
+      int shipSpeed = 30,
+    }) =>
+        routePlanner.planRoute(
+          start: start.waypointSymbol,
+          end: end.waypointSymbol,
+          fuelCapacity: fuelCapacity,
+          shipSpeed: shipSpeed,
+        );
+    // If tank is large enough, we just go direct.
+    final big = planRoute(start, end, fuelCapacity: 101)!.actions;
+    expect(big.length, 1);
+    expect(big[0].startSymbol, start.symbol);
+    expect(big[0].endSymbol, end.symbol);
+    expect(big[0].type, RouteActionType.navCruise);
+
+    // If it's large enough to make it to the fuel station, we go there
+    // refuel and continue to our destination.
+    // Note that we'll never plan a route that exactly uses up all the fuel
+    // in the tank, so we'll always have some left over.
+    final medium = planRoute(start, end, fuelCapacity: 100)!.actions;
+    expect(medium.length, 2);
+    expect(medium[0].startSymbol, start.symbol);
+    expect(medium[0].endSymbol, fuelStation.symbol);
+    expect(medium[0].type, RouteActionType.navCruise);
+    expect(medium[1].startSymbol, fuelStation.symbol);
+    expect(medium[1].endSymbol, end.symbol);
+    expect(medium[1].type, RouteActionType.navCruise);
+
+    // If it's not large enough to make it to the fuel station, we just
+    // drift straight there.
+    final little = planRoute(start, end, fuelCapacity: 20)!.actions;
+    expect(little.length, 1);
+    expect(little[0].startSymbol, start.symbol);
+    expect(little[0].endSymbol, fuelStation.symbol);
+    expect(little[0].type, RouteActionType.navCruise);
   });
 }
