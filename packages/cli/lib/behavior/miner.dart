@@ -709,9 +709,9 @@ final advanceMiner = const MultiJob('Miner', [
 ]).run;
 
 /// Evaluate a Mine and Market pairing
-class MineAndSell {
+class MineScore {
   /// Creates a new MineAndSell.
-  MineAndSell({
+  MineScore({
     required this.mine,
     required this.market,
     required this.mineTraits,
@@ -764,7 +764,7 @@ class MineAndSell {
 }
 
 /// Evaluate all possible Mine and Market pairings for a given system.
-Future<List<MineAndSell>> evaluateWaypointsForMining(
+Future<List<MineScore>> evaluateWaypointsForMining(
   WaypointCache waypointCache,
   MarketCache marketCache,
   SystemSymbol systemSymbol,
@@ -772,7 +772,7 @@ Future<List<MineAndSell>> evaluateWaypointsForMining(
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
   final marketWaypoints = waypoints.where((w) => w.hasMarketplace);
   final mines = waypoints.where((w) => w.canBeMined);
-  final mineAndSells = <MineAndSell>[];
+  final mineAndSells = <MineScore>[];
   for (final mine in mines) {
     for (final marketWaypoint in marketWaypoints) {
       final distance = mine.distanceTo(marketWaypoint);
@@ -782,7 +782,7 @@ Future<List<MineAndSell>> evaluateWaypointsForMining(
           await marketCache.marketForSymbol(marketWaypoint.waypointSymbol);
       final marketGoods = market?.tradeSymbols.toSet() ?? {};
       mineAndSells.add(
-        MineAndSell(
+        MineScore(
           mine: mine.waypointSymbol,
           mineTraits: mineTraits,
           market: marketWaypoint.waypointSymbol,
