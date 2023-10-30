@@ -626,3 +626,31 @@ They don't know how to avoid each other within the same system.
 ### Need fuel-aware routing.
 
 e.g. so we don't think we could CRUISE somewhere when we'd actually DRIFT.
+
+
+### Out of cargo?
+
+Unhandled exception:
+ApiException 400: {"error":{"message":"Failed to update ship cargo. Ship is at maximum capacity and has 0 units of available space.","code":4228,"data":{"shipSymbol":"ESEIDEL-12"}}}
+#0      FleetApi.extractResourcesWithSurvey (package:openapi/api/fleet_api.dart:553:7)
+<asynchronous suspension>
+#1      extractResourcesWithSurvey (package:cli/net/direct.dart:91:7)
+<asynchronous suspension>
+#2      extractAndLog (package:cli/behavior/miner.dart:339:11)
+<asynchronous suspension>
+#3      doMineJob (package:cli/behavior/miner.dart:487:18)
+<asynchronous suspension>
+#4      MultiJob.run (package:cli/behavior/behavior.dart:160:22)
+<asynchronous suspension>
+#5      advanceShipBehavior (package:cli/behavior/advance.dart:96:23)
+<asynchronous suspension>
+#6      advanceShips (package:cli/logic.dart:71:29)
+<asynchronous suspension>
+#7      logic (package:cli/logic.dart:184:7)
+<asynchronous suspension>
+#8      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:148:3)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:154:7)
+<asynchronous suspension>
+#10     main (file:///root/space_traders/packages/cli/bin/cli.dart:152:3)
+<asynchronous suspension>
