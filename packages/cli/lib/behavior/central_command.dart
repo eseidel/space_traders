@@ -173,8 +173,6 @@ class CentralCommand {
         // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         Behavior.miner,
       ],
-      // Haulers are terrible explorers, but early game we just need
-      // things mapping.
       ShipRole.HAULER: [
         Behavior.trader,
         // Would rather have Haulers idle, than explore, at least early game.
@@ -183,8 +181,8 @@ class CentralCommand {
       ShipRole.EXCAVATOR: [
         if (ship.canMine) Behavior.miner,
         if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
-        Behavior.idle,
       ],
+      ShipRole.SURVEYOR: [Behavior.surveyor],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
     if (behaviors != null) {
