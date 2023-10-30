@@ -122,7 +122,7 @@ void main() {
 
     final otherSystems =
         centralCommand.otherExplorerWaypoints(shipASymbol).toList();
-    expect(otherSystems, [sbw]); // From destination
+    expect(otherSystems, [sca, sbw]); // Source and destination
     stateB.routePlan = null;
     final otherSystems2 =
         centralCommand.otherExplorerWaypoints(shipASymbol).toList();
