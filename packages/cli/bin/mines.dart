@@ -9,6 +9,15 @@ import 'package:cli/net/auth.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final mineCountLimit = int.tryParse(argResults['limit'] as String);
+  if (mineCountLimit == null) {
+    throw ArgumentError.value(
+      argResults['limit'],
+      'limit',
+      'Must be an integer.',
+    );
+  }
+
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => 0);
   final systems = await SystemsCache.load(fs);
@@ -48,6 +57,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       mine.market.toString(),
       mine.score,
     ]);
+    if (seenMines.length >= mineCountLimit) {
+      break;
+    }
   }
   logger.info(table.toString());
 
@@ -56,5 +68,16 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 }
 
 void main(List<String> args) async {
-  await runOffline(args, command);
+  await runOffline(
+    args,
+    command,
+    addArgs: (parser) {
+      parser.addOption(
+        'limit',
+        abbr: 'l',
+        help: 'Limit the number of markets to look at.',
+        defaultsTo: '10',
+      );
+    },
+  );
 }
