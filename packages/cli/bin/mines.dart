@@ -1,10 +1,10 @@
-import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/mine_scores.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli_table/cli_table.dart';
 
