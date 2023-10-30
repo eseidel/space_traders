@@ -56,6 +56,15 @@ void main() {
     when(() => waypoint.traits).thenReturn([]);
     when(() => waypoint.chart).thenReturn(Chart());
 
+    final systemWaypoint = SystemWaypoint(
+      symbol: 'S-A-B',
+      type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
+      x: 0,
+      y: 0,
+    );
+    when(() => caches.systems.waypointFromSymbol(waypointSymbol))
+        .thenReturn(systemWaypoint);
+
     final system = System(
       symbol: waypointSymbol.system,
       sectorSymbol: waypointSymbol.sector,

@@ -65,7 +65,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
   } else {
     start = system.jumpGateWaypoint?.waypointSymbol;
   }
-  final systemWaypoints = system.waypoints;
+  final systemWaypoints = system.waypoints.toList(); // Copy so we can sort.
   if (start != null) {
     final startWaypoint = systemsCache.waypointFromSymbol(start);
     systemWaypoints.sort(
