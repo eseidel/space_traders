@@ -94,7 +94,7 @@ class ShipCache extends ResponseListCache<Ship> {
     );
   }
 
-  /// Returns the number of ships with the given [type].
+  /// Returns the number of ships with the given [shipType].
   int? countOfType(ShipyardShipCache shipyardShips, ShipType shipType) {
     final frame = shipyardShips.shipFrameFromType(shipType);
     // If we can't identify the frame, we can't identify the count.

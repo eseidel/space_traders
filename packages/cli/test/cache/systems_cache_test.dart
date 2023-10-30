@@ -11,7 +11,8 @@ class _MockLogger extends Mock implements Logger {}
 void main() {
   // test('systemSymbolsInJumpRadius depth', () async {
   //   final systemStrings = ['S-A', 'S-B', 'S-C', 'S-D', 'S-E'];
-  //   final expectedSystems = systemStrings.map(SystemSymbol.fromString).toList();
+  //   final expectedSystems =
+  //      systemStrings.map(SystemSymbol.fromString).toList();
   //   const jumpDistance = 200;
   //   var i = 0;
   //   final inputSystems = [
@@ -47,7 +48,8 @@ void main() {
 
   // test('systemSymbolsInJumpRadius all connected', () async {
   //   final systemStrings = ['S-A', 'S-B', 'S-C', 'S-D', 'S-E'];
-  //   final expectedSystems = systemStrings.map(SystemSymbol.fromString).toList();
+  //   final expectedSystems =
+  //      systemStrings.map(SystemSymbol.fromString).toList();
   //   final inputSystems = [
   //     for (final system in expectedSystems)
   //       System(

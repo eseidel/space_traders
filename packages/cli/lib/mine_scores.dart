@@ -90,6 +90,9 @@ Future<List<MineScore>> evaluateWaypointsForMining(
   return mineAndSells;
 }
 
+/// TradeSymbols available for extraction based on WaypointTraits.
+/// This is unlikely to be a correct/complete list.
+/// This was created by reading the WaypointTrait descriptions.
 final tradeSymbolsByTrait = {
   WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS: [
     TradeSymbol.IRON_ORE,

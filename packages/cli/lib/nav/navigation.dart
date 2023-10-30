@@ -250,7 +250,12 @@ Future<NavResult> continueNavigationIfNeeded(
     case RouteActionType.navCruise:
       // We're in the same system as the end, so we can just navigate there.
       final arrivalTime = await navigateToLocalWaypointAndLog(
-          api, systemsCache, shipCache, ship, actionEnd);
+        api,
+        systemsCache,
+        shipCache,
+        ship,
+        actionEnd,
+      );
       final flightTime = arrivalTime.difference(DateTime.timestamp());
 
       final expectedFlightTime = Duration(
