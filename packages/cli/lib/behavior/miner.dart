@@ -331,6 +331,10 @@ Future<JobResult> extractAndLog(
     const Duration(minutes: 1),
   );
 
+  shipInfo(
+    ship,
+    'Mining, cargo space: ${ship.cargo.units}/${ship.cargo.capacity}',
+  );
   // If we either have a survey or don't have a surveyor, mine.
   try {
     final ExtractResources201ResponseData response;
@@ -390,6 +394,11 @@ Future<JobResult> extractAndLog(
       // It's not technically exhausted, but that's our easy way to disable
       // the survey.  We use a warning to catch if we're doing this often.
       await db.markSurveyExhausted(maybeSurvey);
+      return JobResult.wait(null);
+    }
+    // https://discord.com/channels/792864705139048469/1168786078866604053
+    if (isAPIExceptionWithCode(e, 4228)) {
+      shipWarn(ship, 'Spurious cargo warning, retrying.');
       return JobResult.wait(null);
     }
     rethrow;
