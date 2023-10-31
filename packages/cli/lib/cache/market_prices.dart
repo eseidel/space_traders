@@ -358,6 +358,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
   Ship ship,
   WaypointSymbol marketSymbol, {
   Duration maxAge = const Duration(minutes: 5),
+  bool requireTradeGoods = false,
   DateTime Function() getNow = defaultGetNow,
 }) async {
   if (ship.waypointSymbol != marketSymbol) {
@@ -374,7 +375,13 @@ Future<Market> recordMarketDataIfNeededAndLog(
     maxAge: maxAge,
     getNow: getNow,
   )) {
-    final market = await marketCache.marketForSymbol(marketSymbol);
+    var market = await marketCache.marketForSymbol(marketSymbol);
+    if (market!.tradeGoods.isEmpty) {
+      market = await marketCache.marketForSymbol(
+        marketSymbol,
+        forceRefresh: true,
+      );
+    }
     return market!;
   }
   final market = await marketCache.marketForSymbol(

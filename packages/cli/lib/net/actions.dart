@@ -77,6 +77,8 @@ Stream<SellCargo201ResponseData> sellAllCargo(
     if (where != null && !where(item.tradeSymbol)) {
       continue;
     }
+    // TODO: This may be wrong if the market was passed in without
+    // full data (e.g. cached from when a ship wasn't there).
     final good = market.marketTradeGood(item.tradeSymbol);
     if (good == null) {
       shipInfo(
