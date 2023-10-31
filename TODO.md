@@ -654,3 +654,137 @@ ApiException 400: {"error":{"message":"Failed to update ship cargo. Ship is at m
 <asynchronous suspension>
 #10     main (file:///root/space_traders/packages/cli/bin/cli.dart:152:3)
 <asynchronous suspension>
+
+
+### Miner sell confusion:
+
+⏱️  9s until 2023-10-31 03:03:08.910
+🛸#9  ✈️  to X1-HV58-B6, -1ms left
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+[WARN] 🛸#9  Market does not sell fuel, not refueling.
+🛸#9  Market at X1-HV58-B6 doesn't buy PRECIOUS_STONES
+🛸#9  Cargo hold still not empty, finding market to sell PRECIOUS_STONES.
+🛸#9  ⛽   1 FUEL                +16% +20c per   1 x    142c =   -142c -> 🏦 205,551c
+🛸#9  🤝   3 PRECIOUS_STONES     -52% -56c per   3 x     52c =   +156c -> 🏦 205,707c
+🛸#9  Beginning route to X1-HV58-B7 (1m)
+🛸#9  🛫 to X1-HV58-B7 ASTEROID (1m) spent 19 fuel
+
+I think the bug is that MarketCache doesn't differntiate between fully-cached
+Market data and partially-cached Market data.  In this case, trader's version of
+this requests the Market data with a tiny max-age, avoiding this bug (mostly)
+and the miner's version of this request has a large max-age, thus allowing this
+race where miner is only getting back partial MarketData (from when no ship is
+at the market) instead of the full market data it needs to grab TradeGood from.
