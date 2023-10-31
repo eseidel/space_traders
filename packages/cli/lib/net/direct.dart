@@ -176,7 +176,8 @@ Future<RefuelShip200ResponseData> refuelShip(
   bool topUp = false,
 }) async {
   RefuelShipRequest? refuelShipRequest;
-  if (!topUp) {
+  // Ships with fuel capacity < 100 will always be topped up.
+  if (!topUp && ship.fuel.capacity > 100) {
     // If we're not topping up, round down to the closest unit.
     // units needed is specified in ship fuel units, but we are actually
     // charged in market units.  One market unit = 100 ship fuel units.
