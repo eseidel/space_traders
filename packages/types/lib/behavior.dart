@@ -12,6 +12,9 @@ enum Behavior {
   /// Mine asteroids and sell the ore.
   miner,
 
+  /// Siphon gas giants and sell the hydrocarbons.
+  siphoner,
+
   /// Survey indefinitely.
   surveyor,
 

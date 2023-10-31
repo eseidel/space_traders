@@ -131,7 +131,7 @@ class SiphonScore {
 }
 
 /// Evaluate all possible siphon location and Market pairings for a system.
-Future<List<SiphonScore>> evaluteWaypointsForSiphoning(
+Future<List<SiphonScore>> evaluateWaypointsForSiphoning(
   WaypointCache waypointCache,
   MarketCache marketCache,
   SystemSymbol systemSymbol,

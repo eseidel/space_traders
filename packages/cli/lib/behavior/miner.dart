@@ -233,20 +233,6 @@ void printSurvey(
   );
 }
 
-/// Compute the total strength of all mounts on [ship]
-/// with symbols in [mountSymbols].
-int _strengthOfMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
-  return ship.mounts.fold(0, (sum, m) {
-    final strength = m.strength ?? 0;
-    return mountSymbols.contains(m.symbol) ? sum + strength : sum;
-  });
-}
-
-/// Compute the total strength of all laser mounts on [ship].
-int _laserMountStrength(Ship ship) {
-  return _strengthOfMounts(ship, kLaserMountSymbols);
-}
-
 /// Compute the number of surveys we can expect to complete with [mounts].
 /// This is used when you have a template you want to know how many surveys
 /// you can expect to complete with, rather than a specific ship.
@@ -346,7 +332,7 @@ Future<JobResult> extractAndLog(
     }
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
-    final laserStrength = _laserMountStrength(ship);
+    final laserStrength = laserMountStrength(ship);
     await db.insertExtraction(
       ExtractionRecord(
         shipSymbol: ship.shipSymbol,

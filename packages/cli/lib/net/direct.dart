@@ -64,6 +64,20 @@ Future<NavigateShip200ResponseData> navigateShip(
   return data;
 }
 
+/// Siphon resources from gas giant with [ship]
+Future<SiphonResources201ResponseData> siphonResources(
+  Api api,
+  Ship ship,
+  ShipCache shipCache,
+) async {
+  final response = await api.fleet.siphonResources(ship.symbol);
+  ship
+    ..cargo = response!.data.cargo
+    ..cooldown = response.data.cooldown;
+  shipCache.updateShip(ship);
+  return response.data;
+}
+
 /// Extract resources from asteroid with [ship]
 /// Does not use a survey.
 Future<ExtractResources201ResponseData> extractResources(

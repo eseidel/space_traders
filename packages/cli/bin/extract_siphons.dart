@@ -29,7 +29,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketCache = MarketCache(waypointCache);
 
   final targets =
-      await evaluteWaypointsForSiphoning(waypointCache, marketCache, hqSystem);
+      await evaluateWaypointsForSiphoning(waypointCache, marketCache, hqSystem);
 
   final table = Table(
     header: ['Waypoint', 'Market', 'Score'],

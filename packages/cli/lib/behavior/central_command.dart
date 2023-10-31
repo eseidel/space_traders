@@ -183,6 +183,7 @@ class CentralCommand {
         if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
       ],
       ShipRole.SURVEYOR: [Behavior.surveyor],
+      ShipRole.HARVESTER: [Behavior.siphoner],
       ShipRole.SATELLITE: [Behavior.explorer],
     }[ship.registration.role];
     if (behaviors != null) {
@@ -465,6 +466,8 @@ class CentralCommand {
       return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
     } else if (shouldBuy(ShipType.MINING_DRONE, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
+    } else if (shouldBuy(ShipType.SIPHON_DRONE, 1)) {
+      return _findBestPlaceToBuy(caches, ShipType.SIPHON_DRONE);
     } else if (shouldBuy(ShipType.SURVEYOR, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
     } else if (shouldBuy(ShipType.LIGHT_HAULER, 3)) {
@@ -586,6 +589,25 @@ class CentralCommand {
         .firstWhere((m) => m.marketTradesAllProducedGoods);
     return MineJob(mine: mine.mine, market: mine.market);
   }
+}
+
+/// Returns the siphon plan for the given [ship].
+// TODO(eseidel): call from or merge into getJobForShip.
+Future<MineJob> siphonJobForShip(
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  AgentCache agentCache,
+  Ship ship,
+) async {
+  final hq = agentCache.agent.headquartersSymbol;
+  final score = (await evaluateWaypointsForSiphoning(
+    waypointCache,
+    marketCache,
+    hq.systemSymbol,
+  ))
+      .firstWhere((m) => m.marketTradesAllProducedGoods);
+  // Currently reusing MineJob.
+  return MineJob(mine: score.target, market: score.market);
 }
 
 int _maxWorthwhileUnitPurchasePrice(

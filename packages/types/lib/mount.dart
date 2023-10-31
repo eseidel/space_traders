@@ -13,6 +13,13 @@ final kLaserMountSymbols = {
   ShipMountSymbolEnum.MINING_LASER_III,
 };
 
+/// The symbols of all gas siphon mounts.
+final kSiphonMountSymbols = {
+  ShipMountSymbolEnum.GAS_SIPHON_I,
+  ShipMountSymbolEnum.GAS_SIPHON_II,
+  ShipMountSymbolEnum.GAS_SIPHON_III,
+};
+
 /// The symbols of all survey mounts.
 final kSurveyMountSymbols = {
   ShipMountSymbolEnum.SURVEYOR_I,
@@ -156,3 +163,35 @@ class MountRequest {
         shipyardSymbol: shipyardSymbol,
       );
 }
+
+/// Compute the total strength of all mounts on [ship]
+/// with symbols in [mountSymbols].
+int strengthOfMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
+  return ship.mounts.fold(0, (sum, m) {
+    final strength = m.strength ?? 0;
+    return mountSymbols.contains(m.symbol) ? sum + strength : sum;
+  });
+}
+
+/// Compute the total strength of all laser mounts on [ship].
+int laserMountStrength(Ship ship) => strengthOfMounts(ship, kLaserMountSymbols);
+
+/// Compute the total strength of all siphon mounts on [ship].
+int siphonMountStrength(Ship ship) =>
+    strengthOfMounts(ship, kSiphonMountSymbols);
+
+/// Compute the total power of all mounts on [ship]
+/// with symbols in [mountSymbols].
+int powerUsedByMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
+  return ship.mounts.fold(0, (sum, m) {
+    final power = m.requirements.power ?? 0;
+    return mountSymbols.contains(m.symbol) ? sum + power : sum;
+  });
+}
+
+/// Compute the total power of all laser mounts on [ship].
+int powerUsedByLasers(Ship ship) => powerUsedByMounts(ship, kLaserMountSymbols);
+
+/// Compute the total power of all siphon mounts on [ship].
+int powerUsedBySiphons(Ship ship) =>
+    powerUsedByMounts(ship, kSiphonMountSymbols);
