@@ -28,36 +28,36 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final hqSystem = agentCache.agent.headquartersSymbol.systemSymbol;
   final marketCache = MarketCache(waypointCache);
 
-  final mines =
-      await evaluateWaypointsForMining(waypointCache, marketCache, hqSystem);
+  final targets =
+      await evaluteWaypointsForSiphoning(waypointCache, marketCache, hqSystem);
 
   final table = Table(
-    header: ['Mine', 'Traits', 'Market', 'Score'],
+    header: ['Waypoint', 'Market', 'Score'],
     style: const TableStyle(compact: true),
   );
 
   // Limit to only the closest for each.
-  final seenMines = <WaypointSymbol>{};
-  for (final mine in mines) {
-    if (seenMines.contains(mine.mine)) {
+  final seen = <WaypointSymbol>{};
+  for (final target in targets) {
+    if (seen.contains(target.target)) {
       continue;
     }
     // Only consider markets that trade all goods produced by the mine.
-    if (!mine.marketTradesAllProducedGoods) {
+    if (!target.marketTradesAllProducedGoods) {
       logger
-        ..warn('${mine.market} does not trade ${mine.goodsMissingFromMarket}'
-            ' produced by ${mine.mine}')
-        ..info('${mine.market} trades ${mine.tradedGoods}');
+        ..warn(
+            '${target.market} does not trade ${target.goodsMissingFromMarket}'
+            ' produced by ${target.target}')
+        ..info('${target.market} trades ${target.marketGoods}');
       continue;
     }
-    seenMines.add(mine.mine);
+    seen.add(target.target);
     table.add([
-      mine.mine.toString(),
-      mine.mineTraitNames.join(', '),
-      mine.market.toString(),
-      mine.score,
+      target.target.toString(),
+      target.market.toString(),
+      target.score,
     ]);
-    if (seenMines.length >= countLimit) {
+    if (seen.length >= countLimit) {
       break;
     }
   }

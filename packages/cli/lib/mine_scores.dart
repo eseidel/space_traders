@@ -90,6 +90,78 @@ Future<List<MineScore>> evaluateWaypointsForMining(
   return mineAndSells;
 }
 
+/// Evaluate a siphon location and Market pairing
+class SiphonScore {
+  /// Creates a new SiphonScore.
+  SiphonScore({
+    required this.target,
+    required this.market,
+    required this.producedGoods,
+    required this.distanceBetween,
+    required this.marketGoods,
+  });
+
+  /// The symbol of the siphon location.
+  final WaypointSymbol target;
+
+  /// The symbol of the market.
+  final WaypointSymbol market;
+
+  /// Goods produced at the target.
+  final Set<TradeSymbol> producedGoods;
+
+  /// Goods traded at the market.
+  final Set<TradeSymbol> marketGoods;
+
+  /// The distance between the target and the market.
+  final int distanceBetween;
+
+  /// True if the market trades all goods produced at the mine.
+  bool get marketTradesAllProducedGoods {
+    return producedGoods.every(marketGoods.contains);
+  }
+
+  /// Goods produced at the target which are not traded at the market.
+  Set<TradeSymbol> get goodsMissingFromMarket {
+    return producedGoods.difference(marketGoods);
+  }
+
+  /// The score. Lower is better.
+  int get score => distanceBetween;
+}
+
+/// Evaluate all possible siphon location and Market pairings for a system.
+Future<List<SiphonScore>> evaluteWaypointsForSiphoning(
+  WaypointCache waypointCache,
+  MarketCache marketCache,
+  SystemSymbol systemSymbol,
+) async {
+  final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
+  final marketWaypoints = waypoints.where((w) => w.hasMarketplace);
+  final targets = waypoints.where((w) => w.canBeSiphoned);
+  final scores = <SiphonScore>[];
+  for (final target in targets) {
+    for (final marketWaypoint in marketWaypoints) {
+      final distance = target.distanceTo(marketWaypoint);
+      final producedGoods = {TradeSymbol.HYDROCARBON};
+      final market =
+          await marketCache.marketForSymbol(marketWaypoint.waypointSymbol);
+      final marketGoods = market?.tradeSymbols.toSet() ?? {};
+      scores.add(
+        SiphonScore(
+          target: target.waypointSymbol,
+          producedGoods: producedGoods,
+          market: marketWaypoint.waypointSymbol,
+          marketGoods: marketGoods,
+          distanceBetween: distance,
+        ),
+      );
+    }
+  }
+  scores.sortBy<num>((m) => m.score);
+  return scores;
+}
+
 /// TradeSymbols available for extraction based on WaypointTraits.
 /// This is unlikely to be a correct/complete list.
 /// This was created by reading the WaypointTrait descriptions.

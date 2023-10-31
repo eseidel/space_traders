@@ -291,6 +291,9 @@ extension WaypointUtils on Waypoint {
   /// Returns true if the waypoint can be mined.
   bool get canBeMined => traits.any((t) => isMinableTrait(t.symbol));
 
+  /// Returns true if the waypoint can be siphoned.
+  bool get canBeSiphoned => isType(WaypointType.GAS_GIANT);
+
   /// Returns true if the waypoint has a shipyard.
   bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
 
