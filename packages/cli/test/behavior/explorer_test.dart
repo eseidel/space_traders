@@ -171,16 +171,11 @@ void main() {
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.explorer);
     when(() => caches.waypoints.waypoint(waypointSymbol))
         .thenAnswer((_) => Future.value(waypoint));
-    when(() => caches.markets.marketForSymbol(waypointSymbol)).thenAnswer(
-      (_) async => Market(
-        symbol: waypointSymbol.waypoint,
-        exchange: [
-          TradeGood(
-            symbol: TradeSymbol.FUEL,
-            name: 'name',
-            description: 'description',
-          ),
-        ],
+    when(() => caches.marketListings.marketListingForSymbol(waypointSymbol))
+        .thenReturn(
+      MarketListing(
+        symbol: waypointSymbol,
+        exchange: const [TradeSymbol.FUEL],
       ),
     );
 

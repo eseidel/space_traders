@@ -1,6 +1,8 @@
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
+import 'package:cli/cache/market_cache.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
@@ -21,15 +23,17 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => 0);
   final systems = await SystemsCache.load(fs);
-  final charting = ChartingCache.load(fs);
+  final waypointTraits = WaypointTraitCache.load(fs);
+  final charting = ChartingCache.load(fs, waypointTraits);
   final construction = ConstructionCache.load(fs);
   final waypointCache = WaypointCache(api, systems, charting, construction);
   final agentCache = AgentCache.loadCached(fs)!;
   final hqSystem = agentCache.agent.headquartersSymbol.systemSymbol;
-  final marketCache = MarketCache(waypointCache);
+  final tradeGoods = TradeGoodCache.load(fs);
+  final marketListings = MarketListingCache.load(fs, tradeGoods);
 
   final mines =
-      await evaluateWaypointsForMining(waypointCache, marketCache, hqSystem);
+      await evaluateWaypointsForMining(waypointCache, marketListings, hqSystem);
 
   final table = Table(
     header: ['Mine', 'Traits', 'Market', 'Score'],

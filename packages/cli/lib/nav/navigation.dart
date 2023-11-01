@@ -1,11 +1,10 @@
-import 'package:cli/api.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/cache/ship_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/route.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Begins a new nagivation action for [ship] to [destinationSymbol].
@@ -13,16 +12,15 @@ import 'package:types/types.dart';
 /// Saves the destination to the ship's behavior state.
 Future<DateTime?> beingNewRouteAndLog(
   Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
   Ship ship,
   BehaviorState state,
-  ShipCache shipCache,
-  SystemsCache systemsCache,
-  RoutePlanner routePlanner,
-  CentralCommand centralCommand,
   WaypointSymbol destinationSymbol,
 ) async {
   final start = ship.waypointSymbol;
-  final route = routePlanner.planRoute(
+  final route = caches.routePlanner.planRoute(
     start: start,
     end: destinationSymbol,
     fuelCapacity: ship.fuel.capacity,
@@ -43,11 +41,11 @@ Future<DateTime?> beingNewRouteAndLog(
   }
   final waitTime = await beingRouteAndLog(
     api,
+    db,
+    centralCommand,
+    caches,
     ship,
     state,
-    shipCache,
-    systemsCache,
-    centralCommand,
     route,
   );
   return waitTime;
@@ -58,11 +56,11 @@ Future<DateTime?> beingNewRouteAndLog(
 /// Saves the route to the ship's behavior state.
 Future<DateTime?> beingRouteAndLog(
   Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
   Ship ship,
   BehaviorState state,
-  ShipCache shipCache,
-  SystemsCache systemsCache,
-  CentralCommand centralCommand,
   RoutePlan routePlan,
 ) async {
   if (routePlan.actions.isEmpty) {
@@ -78,11 +76,11 @@ Future<DateTime?> beingRouteAndLog(
       '(${approximateDuration(routePlan.duration)})');
   final navResult = await continueNavigationIfNeeded(
     api,
+    db,
+    centralCommand,
+    caches,
     ship,
     state,
-    shipCache,
-    systemsCache,
-    centralCommand,
   );
   if (navResult.shouldReturn()) {
     return navResult.waitTime;
@@ -166,11 +164,11 @@ class NavigationException implements Exception {
 /// Reads the destination from the ship's behavior state.
 Future<NavResult> continueNavigationIfNeeded(
   Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
   Ship ship,
-  BehaviorState state,
-  ShipCache shipCache,
-  SystemsCache systemsCache,
-  CentralCommand centralCommand, {
+  BehaviorState state, {
   // Hook for overriding the current time in tests.
   DateTime Function() getNow = defaultGetNow,
 }) async {
@@ -213,9 +211,9 @@ Future<NavResult> continueNavigationIfNeeded(
     throw NavigationException('No action for ${ship.waypointSymbol} '
         'in route plan, likely off course.');
   }
-  final actionStart = systemsCache.waypointFromSymbol(action.startSymbol);
-  final actionEnd = systemsCache.waypointFromSymbol(action.endSymbol);
-  // All navigation actions require being undocked, but the action functions
+  final actionStart = caches.systems.waypointFromSymbol(action.startSymbol);
+  final actionEnd = caches.systems.waypointFromSymbol(action.endSymbol);
+  // All navigation actions require being un-docked, but the action functions
   // will handle that for us.
   switch (action.type) {
     case RouteActionType.emptyRoute:
@@ -247,12 +245,30 @@ Future<NavResult> continueNavigationIfNeeded(
     //   }
     //   // Otherwise loop immediately since we don't need to wait for the reactor.
     //   return NavResult._loop();
+    case RouteActionType.refuel:
+      final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+      final market = await visitLocalMarket(api, db, caches, waypoint, ship);
+      if (market == null) {
+        shipErr(ship, 'No market at ${ship.waypointSymbol}, cannot refuel');
+        return NavResult._continueAction();
+      }
+      await refuelIfNeededAndLog(
+        api,
+        db,
+        caches.marketPrices,
+        caches.agent,
+        caches.ships,
+        market,
+        ship,
+      );
+      return NavResult._continueAction();
+    case RouteActionType.navDrift:
     case RouteActionType.navCruise:
       // We're in the same system as the end, so we can just navigate there.
       final arrivalTime = await navigateToLocalWaypointAndLog(
         api,
-        systemsCache,
-        shipCache,
+        caches.systems,
+        caches.ships,
         ship,
         actionEnd,
       );

@@ -269,6 +269,38 @@ class WaypointTraitCache
   WaypointTraitSymbolEnum keyFor(WaypointTrait record) => record.symbol;
 }
 
+/// A cache of trade good descriptions.
+class TradeGoodCache extends StaticCache<TradeSymbol, TradeGood> {
+  /// Creates a new waypoint trait cache.
+  TradeGoodCache(
+    super.tradeGoods, {
+    required super.fs,
+    super.path = defaultPath,
+  });
+
+  /// Load waypoint trait cache from disk.
+  factory TradeGoodCache.load(FileSystem fs, {String path = defaultPath}) =>
+      TradeGoodCache(
+        _loadJson(fs, path, TradeGood.fromJson),
+        fs: fs,
+        path: path,
+      );
+
+  /// The default path to the cache file.
+  static const defaultPath = 'static_data/trade_goods.json';
+
+  @override
+  TradeGood copyAndNormalize(TradeGood record) =>
+      TradeGood.fromJson(jsonDecode(jsonEncode(record)))!;
+
+  @override
+  int compare(TradeGood a, TradeGood b) =>
+      a.symbol.value.compareTo(b.symbol.value);
+
+  @override
+  TradeSymbol keyFor(TradeGood record) => record.symbol;
+}
+
 /// Caches of static server data that does not typically change between
 /// resets and thus can be checked into source control.
 class StaticCaches {
@@ -280,6 +312,7 @@ class StaticCaches {
     required this.engines,
     required this.reactors,
     required this.waypointTraits,
+    required this.tradeGoods,
   });
 
   /// Load the caches from disk.
@@ -291,6 +324,7 @@ class StaticCaches {
       engines: ShipEngineCache.load(fs),
       reactors: ShipReactorCache.load(fs),
       waypointTraits: WaypointTraitCache.load(fs),
+      tradeGoods: TradeGoodCache.load(fs),
     );
   }
 
@@ -311,6 +345,9 @@ class StaticCaches {
 
   /// The waypoint trait cache.
   final WaypointTraitCache waypointTraits;
+
+  /// The trade good cache.
+  final TradeGoodCache tradeGoods;
 }
 
 /// Records ShipyardShips and their components into the caches.

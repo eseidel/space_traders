@@ -56,7 +56,7 @@ void main() {
     when(
       () => centralCommand.mineJobForShip(
         caches.waypoints,
-        caches.markets,
+        caches.marketListings,
         caches.agent,
         ship,
       ),

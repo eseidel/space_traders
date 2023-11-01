@@ -22,7 +22,7 @@ Future<DateTime?> advanceSurveyor(
 
   final mineJob = await centralCommand.mineJobForShip(
     caches.waypoints,
-    caches.markets,
+    caches.marketListings,
     caches.agent,
     ship,
   );
@@ -30,12 +30,11 @@ Future<DateTime?> advanceSurveyor(
   if (ship.waypointSymbol != mineSymbol) {
     return beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       mineSymbol,
     );
   }

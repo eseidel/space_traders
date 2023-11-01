@@ -571,17 +571,12 @@ extension MarketUtils on Market {
   /// Returns the SystemSymbol of the market.
   SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
 
-  /// Returns all TradeSymbols traded by the market.
-  Iterable<TradeSymbol> get tradeSymbols {
-    return imports
-        .followedBy(exports)
-        .followedBy(exchange)
-        .map((t) => t.symbol);
-  }
-
-  /// Returns true if the market allows trading of the given trade symbol.
-  bool allowsTradeOf(TradeSymbol tradeSymbol) =>
-      tradeSymbols.contains(tradeSymbol);
+  /// Returns the all trade goods for the market.
+  /// Unknown if there can be duplicates or not.
+  Iterable<TradeGood> get listedTradeGoods =>
+      imports.followedBy(exports).followedBy(
+            exchange,
+          );
 
   /// Returns [MarketTradeGood] for the given trade symbol or null if the market
   /// doesn't trade that good.

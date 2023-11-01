@@ -33,12 +33,11 @@ Future<JobResult> doMountJob(
   if (ship.waypointSymbol != mountLocation) {
     final waitUntil = await beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       mountLocation,
     );
     return JobResult.wait(waitUntil);

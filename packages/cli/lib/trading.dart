@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -20,15 +21,15 @@ import 'package:types/types.dart';
 Future<Waypoint?> nearbyMarketWhichTrades(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
-  MarketCache marketCache,
+  MarketListingCache marketListings,
   WaypointSymbol startSymbol,
   TradeSymbol tradeSymbol, {
   int maxJumps = 1,
 }) async {
   final start = await waypointCache.waypoint(startSymbol);
-  // TODO(eseidel): Use MarketPrices instead of MarketCache.
   if (start.hasMarketplace) {
-    final startMarket = await marketCache.marketForSymbol(start.waypointSymbol);
+    final startMarket =
+        marketListings.marketListingForSymbol(start.waypointSymbol);
     if (startMarket!.allowsTradeOf(tradeSymbol)) {
       return start;
     }
@@ -37,8 +38,8 @@ Future<Waypoint?> nearbyMarketWhichTrades(
     startSystem: start.systemSymbolObject,
     maxJumps: maxJumps,
   )) {
-    // TODO(eseidel): Use MarketPrices instead of MarketCache.
-    final market = await marketCache.marketForSymbol(waypoint.waypointSymbol);
+    final market =
+        marketListings.marketListingForSymbol(waypoint.waypointSymbol);
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
       return waypoint;
     }

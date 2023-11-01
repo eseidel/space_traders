@@ -35,14 +35,18 @@ int _timeBetween(
 
 /// Returns the path from [start] to [end] as a list of waypoint symbols.
 /// Only works if [start] and [end] are in the same system.
-Future<List<WaypointSymbol>?> findWaypointPathWithinSystem(
+/// This relies on MarketListingCache to determine if a waypoint sells fuel.
+/// If a waypoint is not cached, it's assumed *not* to sell fuel and will
+/// be ignored for pathing, thus the path may change depending on which
+/// markets are cached.
+List<WaypointSymbol>? findWaypointPathWithinSystem(
   SystemsCache systemsCache,
-  MarketCache marketCache,
+  MarketListingCache marketListings,
   WaypointSymbol start,
   WaypointSymbol end,
   int shipSpeed,
   int fuelCapacity,
-) async {
+) {
   final startWaypoint = systemsCache.waypointFromSymbol(start);
   final endWaypoint = systemsCache.waypointFromSymbol(end);
   if (start.systemSymbol != end.systemSymbol) {
@@ -63,7 +67,8 @@ Future<List<WaypointSymbol>?> findWaypointPathWithinSystem(
     if (waypoint.waypointSymbol == start || waypoint.waypointSymbol == end) {
       waypoints.add(waypoint);
     }
-    final market = await marketCache.marketForSymbol(waypoint.waypointSymbol);
+    final market =
+        marketListings.marketListingForSymbol(waypoint.waypointSymbol);
     if (market != null && market.allowsTradeOf(TradeSymbol.FUEL)) {
       waypoints.add(waypoint);
     }

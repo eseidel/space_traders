@@ -409,12 +409,11 @@ Future<JobResult> doMineJob(
   if (ship.waypointSymbol != mineSymbol) {
     final waitTime = await beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       mineSymbol,
     );
     return JobResult.wait(waitTime);
@@ -502,7 +501,7 @@ Future<JobResult> _initMineJob(
 }) async {
   final mineJob = await centralCommand.mineJobForShip(
     caches.waypoints,
-    caches.markets,
+    caches.marketListings,
     caches.agent,
     ship,
   );
@@ -564,7 +563,7 @@ Future<JobResult> emptyCargoIfNeeded(
   final nearestMarket = await nearbyMarketWhichTrades(
     caches.systems,
     caches.waypoints,
-    caches.markets,
+    caches.marketListings,
     currentWaypoint.waypointSymbol,
     largestCargo!.tradeSymbol,
   );
@@ -578,12 +577,11 @@ Future<JobResult> emptyCargoIfNeeded(
   }
   final waitTime = await beingNewRouteAndLog(
     api,
+    db,
+    centralCommand,
+    caches,
     ship,
     state,
-    caches.ships,
-    caches.systems,
-    caches.routePlanner,
-    centralCommand,
     nearestMarket.waypointSymbol,
   );
   return JobResult.wait(waitTime);
@@ -630,12 +628,11 @@ Future<JobResult> sellCargoIfNeeded(
     shipInfo(ship, 'Traveling to ${costedTrip.route.endSymbol} to sell.');
     final waitTime = await beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       costedTrip.route.endSymbol,
     );
     return JobResult.wait(waitTime);

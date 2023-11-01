@@ -10,23 +10,46 @@ enum RouteActionType {
 
   /// Jump between two jump gates.
   jump,
-  // REFUEL,
-  // NAV_DRIFT,
-  // NAV_BURN,
+
+  /// Refuel at a the local market.
+  refuel,
+
+  /// Travel between two waypoints in the same system at drift speed.
+  navDrift,
+
   /// Travel between two waypoints in the same system at cruise speed.
   navCruise;
+
+  // NAV_BURN,
   // WARP_DRIFT,
   // WARP_CRUISE,
 
   /// Returns true if this action uses the reactor.
   bool usesReactor() {
     switch (this) {
-      case RouteActionType.emptyRoute:
-        return false;
       case RouteActionType.jump:
         return true;
+      case RouteActionType.emptyRoute:
+      case RouteActionType.navDrift:
+      case RouteActionType.refuel:
       case RouteActionType.navCruise:
         return false;
+    }
+  }
+
+  /// Number of requests this action expects to take to execute.
+  int get requestCount {
+    switch (this) {
+      case RouteActionType.emptyRoute:
+        return 0;
+      case RouteActionType.jump:
+      case RouteActionType.navCruise:
+      case RouteActionType.navDrift:
+        return 1;
+      case RouteActionType.refuel:
+        // Dock, refuel, undock.
+        // Possibly even one more for fetching the market.
+        return 3;
     }
   }
 }
@@ -71,6 +94,9 @@ class RouteAction {
 
   /// Returns true if this action uses the reactor.
   bool usesReactor() => type.usesReactor();
+
+  /// Number of requests this action expects to take to execute.
+  int get requestCount => type.requestCount;
 
   /// Convert this action to JSON.
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -141,6 +167,9 @@ class RoutePlan {
   /// The total time of this route in seconds.
   Duration get duration =>
       Duration(seconds: actions.fold<int>(0, (a, b) => a + b.duration));
+
+  /// The number of requests this route expects to take to execute.
+  int get requestCount => actions.fold<int>(0, (a, b) => a + b.requestCount);
 
   /// Returns the next action to take from the given waypoint.
   RouteAction? nextActionFrom(WaypointSymbol waypointSymbol) {

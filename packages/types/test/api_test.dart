@@ -143,21 +143,6 @@ void main() {
     expect(mountSymbolForTradeSymbol(TradeSymbol.ADVANCED_CIRCUITRY), isNull);
   });
 
-  test('Market.allowsTradeOf', () {
-    final market = Market(
-      symbol: 'S-A-W',
-      exports: [
-        TradeGood(
-          symbol: TradeSymbol.FUEL,
-          name: '',
-          description: '',
-        ),
-      ],
-    );
-    expect(market.allowsTradeOf(TradeSymbol.FABRICS), isFalse);
-    expect(market.allowsTradeOf(TradeSymbol.FUEL), isTrue);
-  });
-
   test('isMinableTrait', () {
     final minable =
         WaypointTraitSymbolEnum.values.where(isMinableTrait).toList();

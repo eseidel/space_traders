@@ -77,7 +77,8 @@ class ChartingCache extends JsonStore<_Record> {
 
   /// Load the charted values from the cache.
   factory ChartingCache.load(
-    FileSystem fs, {
+    FileSystem fs,
+    WaypointTraitCache waypointTraits, {
     String path = defaultCacheFilePath,
   }) {
     final valuesBySymbol = JsonStore.load<_Record>(
@@ -91,7 +92,6 @@ class ChartingCache extends JsonStore<_Record> {
           ),
         ) ??
         {};
-    final waypointTraits = WaypointTraitCache.load(fs);
     return ChartingCache(valuesBySymbol, waypointTraits, fs: fs, path: path);
   }
 

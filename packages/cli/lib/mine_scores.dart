@@ -60,7 +60,7 @@ class MineScore {
 /// Evaluate all possible Mine and Market pairings for a given system.
 Future<List<MineScore>> evaluateWaypointsForMining(
   WaypointCache waypointCache,
-  MarketCache marketCache,
+  MarketListingCache marketListings,
   SystemSymbol systemSymbol,
 ) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
@@ -73,7 +73,7 @@ Future<List<MineScore>> evaluateWaypointsForMining(
       final mineTraits =
           mine.traits.map((t) => t.symbol).where(isMinableTrait).toList();
       final market =
-          await marketCache.marketForSymbol(marketWaypoint.waypointSymbol);
+          marketListings.marketListingForSymbol(marketWaypoint.waypointSymbol);
       final marketGoods = market?.tradeSymbols.toSet() ?? {};
       mineAndSells.add(
         MineScore(
@@ -133,7 +133,7 @@ class SiphonScore {
 /// Evaluate all possible siphon location and Market pairings for a system.
 Future<List<SiphonScore>> evaluateWaypointsForSiphoning(
   WaypointCache waypointCache,
-  MarketCache marketCache,
+  MarketListingCache marketListings,
   SystemSymbol systemSymbol,
 ) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
@@ -145,7 +145,7 @@ Future<List<SiphonScore>> evaluateWaypointsForSiphoning(
       final distance = target.distanceTo(marketWaypoint);
       final producedGoods = {TradeSymbol.HYDROCARBON};
       final market =
-          await marketCache.marketForSymbol(marketWaypoint.waypointSymbol);
+          marketListings.marketListingForSymbol(marketWaypoint.waypointSymbol);
       final marketGoods = market?.tradeSymbols.toSet() ?? {};
       scores.add(
         SiphonScore(

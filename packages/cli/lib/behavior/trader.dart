@@ -169,12 +169,11 @@ Future<DateTime?> _handleAtSourceWithDeal(
   // it also includes the work to get to source.
   return beingNewRouteAndLog(
     api,
+    db,
+    centralCommand,
+    caches,
     ship,
     state,
-    caches.ships,
-    caches.systems,
-    caches.routePlanner,
-    centralCommand,
     costedDeal.route.endSymbol,
   );
 }
@@ -377,6 +376,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
 
 Future<DateTime?> _handleOffCourseWithDeal(
   Api api,
+  Database db,
   CentralCommand centralCommand,
   Caches caches,
   Ship ship,
@@ -388,12 +388,11 @@ Future<DateTime?> _handleOffCourseWithDeal(
     // We don't have the cargo we need, so go get it.
     return beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       costedDeal.deal.sourceSymbol,
     );
   } else {
@@ -402,12 +401,11 @@ Future<DateTime?> _handleOffCourseWithDeal(
     // TODO(eseidel): Could this use beginRouteAndLog instead?
     return beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       costedDeal.route.endSymbol,
     );
   }
@@ -429,12 +427,11 @@ Future<DateTime?> _handleAtDestinationWithDeal(
     // deal which *ends* here, but we haven't gotten the cargo yet, go get it.
     return beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       costedDeal.deal.sourceSymbol,
     );
   }
@@ -510,6 +507,7 @@ Future<DateTime?> _handleDeal(
   }
   return _handleOffCourseWithDeal(
     api,
+    db,
     centralCommand,
     caches,
     ship,
@@ -584,13 +582,9 @@ Future<DateTime?> acceptContractsIfNeeded(
 
 Future<DateTime?> _navigateToBetterTradeLocation(
   Api api,
+  Database db,
   CentralCommand centralCommand,
-  SystemsCache systemsCache,
-  RoutePlanner routePlanner,
-  AgentCache agentCache,
-  ContractCache contractCache,
-  MarketPrices marketPrices,
-  ShipCache shipCache,
+  Caches caches,
   Ship ship,
   BehaviorState state,
   String why,
@@ -598,23 +592,23 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   shipWarn(ship, why);
   CostedDeal? findDeal(Ship ship, WaypointSymbol startSymbol) {
     return centralCommand.findNextDeal(
-      agentCache,
-      contractCache,
-      marketPrices,
-      systemsCache,
-      routePlanner,
+      caches.agent,
+      caches.contracts,
+      caches.marketPrices,
+      caches.systems,
+      caches.routePlanner,
       ship,
       overrideStartSymbol: startSymbol,
       maxJumps: _maxJumps,
-      maxTotalOutlay: agentCache.agent.credits,
+      maxTotalOutlay: caches.agent.agent.credits,
       maxWaypoints: _maxWaypoints,
     );
   }
 
   final destinationSymbol = assertNotNull(
     findBetterTradeLocation(
-      systemsCache,
-      marketPrices,
+      caches.systems,
+      caches.marketPrices,
       findDeal,
       ship,
       avoidSystems: centralCommand.otherTraderSystems(ship.shipSymbol).toSet(),
@@ -625,12 +619,11 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   );
   final waitUntil = await beingNewRouteAndLog(
     api,
+    db,
+    centralCommand,
+    caches,
     ship,
     state,
-    shipCache,
-    systemsCache,
-    routePlanner,
-    centralCommand,
     destinationSymbol,
   );
   return waitUntil;
@@ -702,11 +695,11 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   );
   final waitUntil = await beingRouteAndLog(
     api,
+    db,
+    centralCommand,
+    caches,
     ship,
     state,
-    caches.ships,
-    caches.systems,
-    centralCommand,
     costedTrip.route,
   );
   return JobResult.wait(waitUntil);
@@ -810,13 +803,9 @@ Future<DateTime?> advanceTrader(
   Future<DateTime?> findBetterLocation(String why) async {
     final waitUntil = await _navigateToBetterTradeLocation(
       api,
+      db,
       centralCommand,
-      caches.systems,
-      caches.routePlanner,
-      caches.agent,
-      caches.contracts,
-      caches.marketPrices,
-      caches.ships,
+      caches,
       ship,
       state,
       why,

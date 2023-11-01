@@ -45,9 +45,15 @@ List<Request> routeToRequests(RoutePlan plan) {
       case RouteActionType.emptyRoute:
         break;
       case RouteActionType.navCruise:
-        requests.add(Request('nav', Duration(seconds: action.duration)));
+        requests.add(Request('navCruise', Duration(seconds: action.duration)));
+      case RouteActionType.navDrift:
+        requests.add(Request('navDrift', Duration(seconds: action.duration)));
       case RouteActionType.jump:
         requests.add(Request('jump', Duration(seconds: action.duration)));
+      case RouteActionType.refuel:
+        requests.add(Request('dock', Duration(seconds: action.duration)));
+        requests.add(Request('refuel', Duration(seconds: action.duration)));
+        requests.add(Request('orbit', Duration(seconds: action.duration)));
     }
   }
   return requests;

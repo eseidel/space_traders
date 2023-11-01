@@ -77,11 +77,11 @@ Future<DateTime?> advanceShipBehavior(
   try {
     navResult = await continueNavigationIfNeeded(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      centralCommand,
       getNow: getNow,
     );
   } on NavigationException catch (e) {

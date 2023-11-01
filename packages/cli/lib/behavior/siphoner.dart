@@ -115,7 +115,7 @@ Future<JobResult> _initSiphonJob(
 }) async {
   final siphonJob = await centralCommand.siphonJobForShip(
     caches.waypoints,
-    caches.markets,
+    caches.marketListings,
     caches.agent,
     ship,
   );
@@ -140,12 +140,11 @@ Future<JobResult> doSiphonJob(
   if (ship.waypointSymbol != targetSymbol) {
     final waitTime = await beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       targetSymbol,
     );
     return JobResult.wait(waitTime);

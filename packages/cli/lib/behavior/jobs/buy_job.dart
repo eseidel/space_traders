@@ -67,12 +67,11 @@ Future<JobResult> doBuyJob(
   if (ship.waypointSymbol != buyJob.buyLocation) {
     final waitUntil = await beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       buyJob.buyLocation,
     );
     return JobResult.wait(waitUntil);

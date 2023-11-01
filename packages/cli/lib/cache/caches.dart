@@ -4,6 +4,7 @@ import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
@@ -22,6 +23,7 @@ export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
+export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
@@ -50,6 +52,7 @@ class Caches {
     required this.routePlanner,
     required this.factions,
     required this.static,
+    required this.marketListings,
   });
 
   /// The agent cache.
@@ -72,6 +75,9 @@ class Caches {
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
+
+  /// The cache of markets descriptions.
+  final MarketListingCache marketListings;
 
   /// The cache of markets.
   final MarketCache markets;
@@ -105,14 +111,15 @@ class Caches {
     final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
     final shipyard = ShipyardPrices.load(fs);
     final systems = await SystemsCache.load(fs, httpGet: httpGet);
-    final charting = ChartingCache.load(fs);
+    final static = StaticCaches.load(fs);
+    final charting = ChartingCache.load(fs, static.waypointTraits);
     final construction = ConstructionCache.load(fs);
+    final marketListings = MarketListingCache.load(fs, static.tradeGoods);
     final waypoints = WaypointCache(api, systems, charting, construction);
-    final markets = MarketCache(waypoints);
+    final markets = MarketCache(api, marketListings, waypoints);
     // Intentionally force refresh contracts in case we've been offline.
     final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);
     final behaviors = BehaviorCache.load(fs);
-    final static = StaticCaches.load(fs);
 
     // final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
     // final jumps = JumpCache();
@@ -142,6 +149,7 @@ class Caches {
       static: static,
       routePlanner: routePlanner,
       factions: factions,
+      marketListings: marketListings,
     );
   }
 

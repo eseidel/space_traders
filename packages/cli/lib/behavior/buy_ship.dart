@@ -112,12 +112,11 @@ Future<DateTime?> advanceBuyShip(
     // We're not there, go to the shipyard to purchase.
     final waitTime = await beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       shipyardSymbol,
     );
     return waitTime;

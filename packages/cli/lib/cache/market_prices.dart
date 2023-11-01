@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
@@ -358,7 +358,6 @@ Future<Market> recordMarketDataIfNeededAndLog(
   Ship ship,
   WaypointSymbol marketSymbol, {
   Duration maxAge = const Duration(minutes: 5),
-  bool requireTradeGoods = false,
   DateTime Function() getNow = defaultGetNow,
 }) async {
   if (ship.waypointSymbol != marketSymbol) {

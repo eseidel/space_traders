@@ -28,7 +28,7 @@ void main() {
     final waypointTraits = _MockWaypointTraitCache();
     final valuesBySymbol = {values.waypointSymbol: values};
     ChartingCache(valuesBySymbol, waypointTraits, fs: fs).save();
-    final loaded = ChartingCache.load(fs);
+    final loaded = ChartingCache.load(fs, waypointTraits);
     expect(loaded.waypointCount, 1);
     expect(loaded.values.first.waypointSymbol, a);
     expect(loaded.values.first.chart.submittedBy, 'ESEIDEL');

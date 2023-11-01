@@ -33,7 +33,11 @@ class _MockShipEngineCache extends Mock implements ShipEngineCache {}
 
 class _MockShipReactorCache extends Mock implements ShipReactorCache {}
 
+class _MockTradeGoodCache extends Mock implements TradeGoodCache {}
+
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
+
+class _MockMarketListingCache extends Mock implements MarketListingCache {}
 
 Caches mockCaches() {
   final mounts = _MockShipMountCache();
@@ -42,6 +46,7 @@ Caches mockCaches() {
   final engines = _MockShipEngineCache();
   final reactors = _MockShipReactorCache();
   final waypointTraits = _MockWaypointTraitCache();
+  final tradeGoods = _MockTradeGoodCache();
   final staticCache = StaticCaches(
     mounts: mounts,
     modules: modules,
@@ -49,6 +54,7 @@ Caches mockCaches() {
     engines: engines,
     reactors: reactors,
     waypointTraits: waypointTraits,
+    tradeGoods: tradeGoods,
   );
   return Caches(
     agent: _MockAgentCache(),
@@ -58,6 +64,7 @@ Caches mockCaches() {
     systems: _MockSystemsCache(),
     waypoints: _MockWaypointCache(),
     markets: _MockMarketCache(),
+    marketListings: _MockMarketListingCache(),
     contracts: _MockContractCache(),
     behaviors: _MockBehaviorCache(),
     charting: _MockChartingCache(),

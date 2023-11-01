@@ -1,8 +1,10 @@
 import 'package:cli/cache/charting_cache.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final chartingCache = ChartingCache.load(fs);
+  final waypointTraits = WaypointTraitCache.load(fs);
+  final chartingCache = ChartingCache.load(fs, waypointTraits);
   final waypointCount = chartingCache.waypointCount;
   logger.info('Waypoint count: $waypointCount');
 

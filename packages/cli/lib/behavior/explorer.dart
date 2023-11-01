@@ -204,7 +204,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   var destination = (await nearbyMarketWhichTrades(
     caches.systems,
     caches.waypoints,
-    caches.markets,
+    caches.marketListings,
     waypoint.waypointSymbol,
     TradeSymbol.FUEL,
     maxJumps: 5,
@@ -221,12 +221,11 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   }
   final waitUntil = await beingNewRouteAndLog(
     api,
+    db,
+    centralCommand,
+    caches,
     ship,
     state,
-    caches.ships,
-    caches.systems,
-    caches.routePlanner,
-    centralCommand,
     destination,
   );
   return waitUntil;
@@ -329,12 +328,11 @@ Future<DateTime?> advanceExplorer(
   if (destinationSymbol != null) {
     return beingNewRouteAndLog(
       api,
+      db,
+      centralCommand,
+      caches,
       ship,
       state,
-      caches.ships,
-      caches.systems,
-      caches.routePlanner,
-      centralCommand,
       destinationSymbol,
     );
   }

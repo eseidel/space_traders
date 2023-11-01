@@ -283,23 +283,12 @@ class RoutePlanner {
   // final SystemConnectivity _systemConnectivity;
   // final JumpCache _jumpCache;
 
-  /// Plan a route between two waypoints.
-  RoutePlan? planRoute({
+  RoutePlan? _planJump({
     required WaypointSymbol start,
     required WaypointSymbol end,
     required int fuelCapacity,
     required int shipSpeed,
   }) {
-    // TODO(eseidel): This is wrong.  An empty route is not valid.
-    if (start.waypoint == end.waypoint) {
-      // throw ArgumentError('Cannot plan route between same waypoint');
-      return RoutePlan.empty(
-        symbol: start,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
-      );
-    }
-
     // We only handle jumps at the moment.
     // We fail out quickly from our reachability cache if these system waypoints
     // are not in the same system cluster.
@@ -309,9 +298,6 @@ class RoutePlanner {
     // )) {
     //   return null;
     // }
-    if (start.systemSymbol != end.systemSymbol) {
-      return null;
-    }
 
     // Look up in the jump cache, if so, create a plan from that.
     // final jumpPlan = _jumpCache.lookupJumpPlan(
@@ -388,6 +374,26 @@ class RoutePlanner {
 
     // _saveJumpsInCache(_jumpCache, actions);
 
+    // return RoutePlan(
+    //   fuelCapacity: fuelCapacity,
+    //   shipSpeed: shipSpeed,
+    //   actions: actions,
+    //   fuelUsed: fuelUsed,
+    // );
+
+    return null;
+  }
+
+  RoutePlan? _planWithinSystem({
+    required WaypointSymbol start,
+    required WaypointSymbol end,
+    required int fuelCapacity,
+    required int shipSpeed,
+  }) {
+    if (start.systemSymbol != end.systemSymbol) {
+      return null;
+    }
+    // TODO(eseidel): use findWaypointPathWithinSystem instead.
     final startWaypoint = _systemsCache.waypointFromSymbol(start);
     final endWaypoint = _systemsCache.waypointFromSymbol(end);
     final actions = [_navigationAction(startWaypoint, endWaypoint, shipSpeed)];
@@ -398,6 +404,41 @@ class RoutePlanner {
       shipSpeed: shipSpeed,
       actions: actions,
       fuelUsed: fuelUsed,
+    );
+  }
+
+  /// Plan a route between two waypoints.
+  RoutePlan? planRoute({
+    required WaypointSymbol start,
+    required WaypointSymbol end,
+    required int fuelCapacity,
+    required int shipSpeed,
+  }) {
+    // TODO(eseidel): This is wrong.  An empty route is not valid.
+    if (start.waypoint == end.waypoint) {
+      // throw ArgumentError('Cannot plan route between same waypoint');
+      return RoutePlan.empty(
+        symbol: start,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      );
+    }
+
+    if (start.systemSymbol == end.systemSymbol) {
+      // plan a route within a system
+      return _planWithinSystem(
+        start: start,
+        end: end,
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      );
+    }
+    // plan a route between systems
+    return _planJump(
+      start: start,
+      end: end,
+      fuelCapacity: fuelCapacity,
+      shipSpeed: shipSpeed,
     );
   }
 }

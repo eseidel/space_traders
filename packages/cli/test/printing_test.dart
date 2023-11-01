@@ -1,13 +1,9 @@
 import 'package:cli/cache/market_prices.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/printing.dart';
 import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
 
 void main() {
   test('waypointDescription', () {

@@ -1,41 +1,40 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/cache/ship_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
+
+import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockDatabase extends Mock implements Database {}
+
 class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
-
-class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final ship = _MockShip();
-    final systemsCache = _MockSystemsCache();
-    final shipCache = _MockShipCache();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
-    final centralCommand = _MockCentralCommand();
 
     /// The behavior doesn't matter, just needs to have a null destination.
     final state = BehaviorState(shipSymbol, Behavior.idle);
@@ -54,11 +53,11 @@ void main() {
       logger,
       () => continueNavigationIfNeeded(
         api,
+        db,
+        centralCommand,
+        caches,
         ship,
         state,
-        shipCache,
-        systemsCache,
-        centralCommand,
         getNow: getNow,
       ),
     );
@@ -78,11 +77,11 @@ void main() {
       logger,
       () => continueNavigationIfNeeded(
         api,
+        db,
+        centralCommand,
+        caches,
         ship,
         state,
-        shipCache,
-        systemsCache,
-        centralCommand,
         getNow: getNow,
       ),
     );

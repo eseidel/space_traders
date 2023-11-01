@@ -573,14 +573,14 @@ class CentralCommand {
   // TODO(eseidel): call from or merge into getJobForShip.
   Future<MineJob> mineJobForShip(
     WaypointCache waypointCache,
-    MarketCache marketCache,
+    MarketListingCache marketListings,
     AgentCache agentCache,
     Ship ship,
   ) async {
     final hq = agentCache.agent.headquartersSymbol;
     final mine = (await evaluateWaypointsForMining(
       waypointCache,
-      marketCache,
+      marketListings,
       hq.systemSymbol,
     ))
         .firstWhere((m) => m.marketTradesAllProducedGoods);
@@ -591,14 +591,14 @@ class CentralCommand {
 // TODO(eseidel): call from or merge into getJobForShip.
   Future<MineJob> siphonJobForShip(
     WaypointCache waypointCache,
-    MarketCache marketCache,
+    MarketListingCache marketListings,
     AgentCache agentCache,
     Ship ship,
   ) async {
     final hq = agentCache.agent.headquartersSymbol;
     final score = (await evaluateWaypointsForSiphoning(
       waypointCache,
-      marketCache,
+      marketListings,
       hq.systemSymbol,
     ))
         .firstWhere((m) => m.marketTradesAllProducedGoods);
