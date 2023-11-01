@@ -55,6 +55,10 @@ void main() {
         role: ShipRole.CARRIER,
       ),
     );
+    registerFallbackValue(Behavior.explorer);
+    when(() => behaviorCache.isBehaviorDisabledForShip(ship, any()))
+        .thenReturn(false);
+
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
     when(() => shipFrame.symbol)
@@ -64,12 +68,13 @@ void main() {
     when(() => shipFuel.current).thenReturn(100);
     when(() => ship.fuel).thenReturn(shipFuel);
     final logger = _MockLogger();
-    // Ship types we've never heard of, just return idle.
     final behavior = runWithLogger(
       logger,
       () => centralCommand.chooseNewBehaviorFor(ship, 100),
     );
-    expect(behavior, Behavior.idle);
+    // trader is the default for a light freighter.
+    expect(ship.fleetRole, FleetRole.trader);
+    expect(behavior, Behavior.trader);
   });
 
   test('CentralCommand.otherExplorerSystems', () {
