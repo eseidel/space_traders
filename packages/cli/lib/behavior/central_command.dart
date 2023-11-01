@@ -160,32 +160,31 @@ class CentralCommand {
     // final shipCount = _shipCache.ships.length;
 
     final behaviors = {
-      ShipRole.COMMAND: [
+      FleetRole.command: [
         // Will only trade if we can make 6/s or more.
         // There are commonly 20c/s trades in the starting system, and at
         // the minimum we want to accept the contract.
         // Might want to consider limiting to short trades (< 5 mins) to avoid
         // tying up capital early.
         Behavior.trader,
+        // Mostly to test the logic out.
+        Behavior.siphoner,
         // Early on the command ship makes about 5c/s vs. ore hounds making
         // 6c/s. It's a better surveyor than miner. Especially when enabling
         // mining drones.
         // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         Behavior.miner,
       ],
-      ShipRole.HAULER: [
+      FleetRole.trader: [
         Behavior.trader,
         // Would rather have Haulers idle, than explore, at least early game.
         // Behavior.explorer,
       ],
-      ShipRole.EXCAVATOR: [
-        if (ship.canMine) Behavior.miner,
-        if (!ship.canMine && ship.hasSurveyor) Behavior.surveyor,
-      ],
-      ShipRole.SURVEYOR: [Behavior.surveyor],
-      ShipRole.HARVESTER: [Behavior.siphoner],
-      ShipRole.SATELLITE: [Behavior.explorer],
-    }[ship.registration.role];
+      FleetRole.miner: [Behavior.miner],
+      FleetRole.surveyor: [Behavior.surveyor],
+      FleetRole.siphoner: [Behavior.siphoner],
+      FleetRole.explorer: [Behavior.explorer],
+    }[ship.fleetRole];
     if (behaviors != null) {
       for (final behavior in behaviors) {
         if (!_behaviorCache.isBehaviorDisabledForShip(ship, behavior)) {
@@ -193,9 +192,7 @@ class CentralCommand {
         }
       }
     } else {
-      logger.warn(
-        '${ship.registration.role} has no specified behaviors, idling.',
-      );
+      logger.warn('${ship.fleetRole} has no specified behaviors, idling.');
     }
     return Behavior.idle;
   }
@@ -589,25 +586,25 @@ class CentralCommand {
         .firstWhere((m) => m.marketTradesAllProducedGoods);
     return MineJob(mine: mine.mine, market: mine.market);
   }
-}
 
-/// Returns the siphon plan for the given [ship].
+  /// Returns the siphon plan for the given [ship].
 // TODO(eseidel): call from or merge into getJobForShip.
-Future<MineJob> siphonJobForShip(
-  WaypointCache waypointCache,
-  MarketCache marketCache,
-  AgentCache agentCache,
-  Ship ship,
-) async {
-  final hq = agentCache.agent.headquartersSymbol;
-  final score = (await evaluateWaypointsForSiphoning(
-    waypointCache,
-    marketCache,
-    hq.systemSymbol,
-  ))
-      .firstWhere((m) => m.marketTradesAllProducedGoods);
-  // Currently reusing MineJob.
-  return MineJob(mine: score.target, market: score.market);
+  Future<MineJob> siphonJobForShip(
+    WaypointCache waypointCache,
+    MarketCache marketCache,
+    AgentCache agentCache,
+    Ship ship,
+  ) async {
+    final hq = agentCache.agent.headquartersSymbol;
+    final score = (await evaluateWaypointsForSiphoning(
+      waypointCache,
+      marketCache,
+      hq.systemSymbol,
+    ))
+        .firstWhere((m) => m.marketTradesAllProducedGoods);
+    // Currently reusing MineJob.
+    return MineJob(mine: score.target, market: score.market);
+  }
 }
 
 int _maxWorthwhileUnitPurchasePrice(

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart';
+import 'package:types/mount.dart';
 
 export 'package:openapi/api.dart';
 
@@ -420,15 +421,17 @@ extension ShipUtils on Ship {
       frame.symbol == ShipFrameSymbolEnum.LIGHT_FREIGHTER ||
       frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER;
 
-  /// Returns true if the ship can mine.
-  bool get canMine {
-    const minerMounts = [
-      ShipMountSymbolEnum.MINING_LASER_I,
-      ShipMountSymbolEnum.MINING_LASER_II,
-      ShipMountSymbolEnum.MINING_LASER_III,
-    ];
-    return mounts.any((m) => minerMounts.contains(m.symbol));
-  }
+  /// Returns true if the ship has a mining mount.
+  bool get hasMiningLaser =>
+      mounts.any((m) => kLaserMountSymbols.contains(m.symbol));
+
+  /// Returns true if the ship has a survey mount.
+  bool get hasSurveyor =>
+      mounts.any((m) => kSurveyMountSymbols.contains(m.symbol));
+
+  /// Returns true if the ship has a siphon mount.
+  bool get hasSiphon =>
+      mounts.any((m) => kSiphonMountSymbols.contains(m.symbol));
 
   /// Returns true if the ship is in transit.
   bool get isInTransit => nav.status == ShipNavStatus.IN_TRANSIT;
@@ -451,16 +454,6 @@ extension ShipUtils on Ship {
       return 1;
     }
     return fuel.current / fuel.capacity;
-  }
-
-  /// Returns true if the ship has a surveyor module.
-  bool get hasSurveyor {
-    const surveyerMounts = {
-      ShipMountSymbolEnum.SURVEYOR_I,
-      ShipMountSymbolEnum.SURVEYOR_II,
-      ShipMountSymbolEnum.SURVEYOR_III,
-    };
-    return mounts.any((m) => surveyerMounts.contains(m.symbol));
   }
 
   /// Returns the average condition of the ship with 100 being perfect and 0

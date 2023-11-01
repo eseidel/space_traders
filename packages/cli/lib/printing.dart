@@ -12,22 +12,6 @@ String waypointDescription(Waypoint waypoint) {
       "${waypoint.traits.map((w) => w.name).join(', ')}";
 }
 
-/// Return a string describing the given [ship].
-/// systemWaypoints is used to look up the waypoint for the ship's
-/// waypointSymbol.
-String shipDescription(Ship ship, SystemsCache systemsCache) {
-  final waypoint = systemsCache.waypointFromSymbol(ship.waypointSymbol);
-  var string =
-      '${ship.symbol} - ${ship.navStatusString} ${waypoint.type} ${ship.registration.role} ${ship.cargo.units}/${ship.cargo.capacity}';
-  if (ship.crew.morale != 100) {
-    string += ' (morale: ${ship.crew.morale})';
-  }
-  if (ship.averageCondition != 100) {
-    string += ' (condition: ${ship.averageCondition})';
-  }
-  return string;
-}
-
 /// Format the given [credits] as a string.
 String creditsString(int credits) {
   final creditsFormat = NumberFormat();

@@ -53,7 +53,10 @@ Future<JobResult> siphonAndLog(
     const Duration(minutes: 1),
   );
 
-  // If we either have a survey or don't have a surveyor, mine.
+  shipInfo(
+    ship,
+    'Siphoning, cargo space: ${ship.cargo.units}/${ship.cargo.capacity}',
+  );
   try {
     final response = await siphonResources(api, ship, shipCache);
     final yield_ = response.siphon.yield_;
@@ -84,8 +87,8 @@ Future<JobResult> siphonAndLog(
       response.cooldown,
     );
 
-    // If we still have space wait the cooldown and continue mining.
-    if (ship.availableSpace >= maxExtractedUnits(ship)) {
+    // If we still have space wait the cooldown and continue siphoning.
+    if (ship.availableSpace >= maxSiphonedUnits(ship)) {
       return JobResult.wait(response.cooldown.expiration);
     }
     // Complete this job (go sell) if an extraction could overflow our cargo.
