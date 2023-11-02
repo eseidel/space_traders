@@ -144,27 +144,22 @@ Future<List<Transaction>> sellAllCargoAndLog(
   return transactions;
 }
 
-/// Jettison all cargo.
-Future<void> jettisonAllCargoAndLog(
+/// Jettison a specific cargo item.
+Future<void> jettisonCargoAndLog(
   Api api,
   ShipCache shipCache,
   Ship ship,
+  // This could be a tradeSymbol, but using the item seems less error prone?
+  ShipCargoItem item,
 ) async {
-  if (ship.cargo.inventory.isEmpty) {
-    shipInfo(ship, 'No cargo to jettison');
-    return;
-  }
-
-  for (final item in ship.cargo.inventory) {
-    shipWarn(ship, 'Jettisoning ${item.units} ${item.symbol}');
-    final response = await api.fleet.jettison(
-      ship.symbol,
-      jettisonRequest:
-          JettisonRequest(symbol: item.tradeSymbol, units: item.units),
-    );
-    ship.cargo = response!.data.cargo;
-    shipCache.updateShip(ship);
-  }
+  shipWarn(ship, 'Jettisoning ${item.units} ${item.symbol}');
+  final response = await api.fleet.jettison(
+    ship.symbol,
+    jettisonRequest:
+        JettisonRequest(symbol: item.tradeSymbol, units: item.units),
+  );
+  ship.cargo = response!.data.cargo;
+  shipCache.updateShip(ship);
 }
 
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.

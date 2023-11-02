@@ -178,10 +178,32 @@ Future<JobResult> doSiphonJob(
   return result;
 }
 
+/// Attempt to empty cargo if needed, will navigate to a market if needed.
+Future<JobResult> emptyCargoIfNeededForSiphoning(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  return emptyCargoIfNeeded(
+    state,
+    api,
+    db,
+    centralCommand,
+    caches,
+    ship,
+    minSpaceNeeded: maxSiphonedUnits(ship),
+    getNow: getNow,
+  );
+}
+
 /// Advance the siphoner.
 final advanceSiphoner = const MultiJob('Siphoner', [
   _initSiphonJob,
-  emptyCargoIfNeeded,
+  emptyCargoIfNeededForSiphoning,
   doSiphonJob,
   sellCargoIfNeeded,
 ]).run;

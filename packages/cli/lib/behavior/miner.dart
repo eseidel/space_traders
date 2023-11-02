@@ -510,7 +510,7 @@ Future<JobResult> _initMineJob(
 }
 
 /// Attempt to empty cargo if needed, will navigate to a market if needed.
-Future<JobResult> emptyCargoIfNeeded(
+Future<JobResult> emptyCargoIfNeededForMining(
   BehaviorState state,
   Api api,
   Database db,
@@ -519,8 +519,31 @@ Future<JobResult> emptyCargoIfNeeded(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  return emptyCargoIfNeeded(
+    state,
+    api,
+    db,
+    centralCommand,
+    caches,
+    ship,
+    minSpaceNeeded: maxExtractedUnits(ship),
+    getNow: getNow,
+  );
+}
+
+/// Attempt to empty cargo if needed, will navigate to a market if needed.
+Future<JobResult> emptyCargoIfNeeded(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  required int minSpaceNeeded,
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   // Sell if an extraction could overflow our cargo.
-  if (ship.availableSpace >= maxExtractedUnits(ship)) {
+  if (ship.availableSpace >= minSpaceNeeded) {
     return JobResult.complete();
   }
 
@@ -572,8 +595,13 @@ Future<JobResult> emptyCargoIfNeeded(
       ship,
       'No nearby market to sell ${largestCargo.symbol}, jetisoning cargo!',
     );
-    await jettisonAllCargoAndLog(api, caches.ships, ship);
-    return JobResult.complete();
+    // Only jettison the item we don't know how to sell, others might sell.
+    await jettisonCargoAndLog(api, caches.ships, ship, largestCargo);
+    if (ship.cargo.isEmpty) {
+      return JobResult.complete();
+    }
+    // If we still have cargo to off-load, loop again.
+    return JobResult.wait(null);
   }
   final waitTime = await beingNewRouteAndLog(
     api,
@@ -695,7 +723,7 @@ final advanceMiner = const MultiJob('Miner', [
   _initMineJob,
   // Is this step needed?  Or should we just have mining fail if we don't have
   // space?
-  emptyCargoIfNeeded,
+  emptyCargoIfNeededForMining,
   doMineJob,
   sellCargoIfNeeded,
 ]).run;

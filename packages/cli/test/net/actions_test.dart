@@ -711,53 +711,40 @@ void main() {
     expect(transactions.length, 2);
   });
 
-  test('jettisonAllCargoAndLog', () async {
+  test('jettisonCargoAndLog', () async {
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    final emptyCargo = ShipCargo(capacity: 10, units: 0);
-    when(() => ship.cargo).thenReturn(emptyCargo);
     final shipCache = _MockShipCache();
     final logger = _MockLogger();
 
-    await runWithLogger(logger, () async {
-      await jettisonAllCargoAndLog(api, shipCache, ship);
-    });
-    verifyNever(
-      () => fleetApi.jettison(
-        any(),
-        jettisonRequest: any(named: 'jettisonRequest'),
-      ),
+    final itemOne = ShipCargoItem(
+      symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+      units: 5,
+      description: '',
+      name: '',
     );
-    verify(() => logger.info('🛸#1  No cargo to jettison')).called(1);
-
+    final itemTwo = ShipCargoItem(
+      symbol: TradeSymbol.FABRICS.value,
+      units: 5,
+      description: '',
+      name: '',
+    );
     final shipCargo = ShipCargo(
       capacity: 10,
       units: 10,
-      inventory: [
-        ShipCargoItem(
-          symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
-          units: 5,
-          description: '',
-          name: '',
-        ),
-        ShipCargoItem(
-          symbol: TradeSymbol.FABRICS.value,
-          units: 5,
-          description: '',
-          name: '',
-        ),
-      ],
+      inventory: [itemOne, itemTwo],
     );
     when(() => ship.cargo).thenReturn(shipCargo);
 
     when(
       () => fleetApi.jettison(
-        any(),
-        jettisonRequest: any(named: 'jettisonRequest'),
+        shipSymbol.symbol,
+        jettisonRequest:
+            JettisonRequest(symbol: itemOne.tradeSymbol, units: itemOne.units),
       ),
     ).thenAnswer(
       (invocation) => Future.value(
@@ -770,14 +757,14 @@ void main() {
     );
 
     await runWithLogger(logger, () async {
-      await jettisonAllCargoAndLog(api, shipCache, ship);
+      await jettisonCargoAndLog(api, shipCache, ship, itemOne);
     });
     verify(
       () => fleetApi.jettison(
         any(),
         jettisonRequest: any(named: 'jettisonRequest'),
       ),
-    ).called(2);
+    ).called(1);
   });
 
   test('chartWaypointAndLog', () async {
