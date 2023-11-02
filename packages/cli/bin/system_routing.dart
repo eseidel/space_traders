@@ -52,7 +52,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final distance = shipyard.distanceTo(waypoint);
     table.add([waypoint.symbol, distance, durationString, actions]);
   }
-  table.sortedBy<num>((a) => (a as List<dynamic>)[1] as num);
+  table.sortBy<num>((a) => (a as List<dynamic>)[1] as num);
   logger.info(table.toString());
 
   // required or main will hang
