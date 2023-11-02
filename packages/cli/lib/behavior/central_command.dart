@@ -583,6 +583,9 @@ class CentralCommand {
       marketListings,
       hq.systemSymbol,
     ))
+        // TODO(eseidel): Add dynamic planning of where to send squads.
+        // This is just a hack to move us off the first mine for now.
+        .skip(1)
         .firstWhereOrNull((m) => m.marketTradesAllProducedGoods);
     if (score == null) {
       return null;
