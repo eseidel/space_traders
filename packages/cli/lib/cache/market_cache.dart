@@ -63,7 +63,7 @@ class MarketListingCache extends JsonStore<_Record> {
 
   /// Add a market to the cache.
   void addMarket(Market market) {
-    final symbol = WaypointSymbol.fromString(market.symbol);
+    final symbol = market.waypointSymbol;
     final marketListing = MarketListing(
       symbol: symbol,
       imports: market.imports.map((t) => t.symbol).toList(),
@@ -72,6 +72,27 @@ class MarketListingCache extends JsonStore<_Record> {
     );
     tradeGoods.addAll(market.listedTradeGoods);
     _listingBySymbol[symbol] = marketListing;
+    save();
+  }
+
+  /// Fill the cache from the given prices.
+  void fillFromPrices(MarketPrices marketPrices) {
+    final waypointSymbols =
+        marketPrices.prices.map((p) => p.waypointSymbol).toSet();
+
+    for (final waypointSymbol in waypointSymbols) {
+      if (_listingBySymbol.containsKey(waypointSymbol)) {
+        continue;
+      }
+
+      final prices = marketPrices.pricesAtMarket(waypointSymbol);
+      final tradeSymbols = prices.map((p) => p.tradeSymbol).toSet();
+      final listing = MarketListing(
+        symbol: waypointSymbol,
+        exchange: tradeSymbols.toList(),
+      );
+      _listingBySymbol[waypointSymbol] = listing;
+    }
     save();
   }
 }
