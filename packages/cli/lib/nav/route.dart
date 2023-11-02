@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
+import 'package:cli/logger.dart';
+import 'package:cli/nav/waypoint_pathing.dart';
+import 'package:cli/printing.dart';
 import 'package:types/types.dart';
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
@@ -266,22 +269,28 @@ class RoutePlanner {
     required SystemsCache systemsCache,
     // required SystemConnectivity systemConnectivity,
     // required JumpCache jumpCache,
-  }) : _systemsCache = systemsCache;
+    required bool Function(WaypointSymbol) sellsFuel,
+  })  : _systemsCache = systemsCache,
+        _sellsFuel = sellsFuel;
   // _systemConnectivity = systemConnectivity,
-  // _jumpCache = jumpCache;
+  // _jumpCache = jumpCache
 
   /// Create a new route planner from a systems cache.
-  RoutePlanner.fromSystemsCache(SystemsCache systemsCache)
-      : this(
+  RoutePlanner.fromSystemsCache(
+    SystemsCache systemsCache, {
+    required bool Function(WaypointSymbol) sellsFuel,
+  }) : this(
           systemsCache: systemsCache,
           // systemConnectivity: SystemConnectivity
           //    .fromSystemsCache(systemsCache),
           // jumpCache: JumpCache(),
+          sellsFuel: sellsFuel,
         );
 
   final SystemsCache _systemsCache;
   // final SystemConnectivity _systemConnectivity;
   // final JumpCache _jumpCache;
+  final bool Function(WaypointSymbol) _sellsFuel;
 
   RoutePlan? _planJump({
     required WaypointSymbol start,
@@ -393,12 +402,31 @@ class RoutePlanner {
     if (start.systemSymbol != end.systemSymbol) {
       return null;
     }
-    // TODO(eseidel): use findWaypointPathWithinSystem instead.
-    final startWaypoint = _systemsCache.waypointFromSymbol(start);
-    final endWaypoint = _systemsCache.waypointFromSymbol(end);
-    final actions = [_navigationAction(startWaypoint, endWaypoint, shipSpeed)];
-    final fuelUsed = _fuelUsedByActions(_systemsCache, actions);
 
+    final startTime = DateTime.timestamp();
+    final actions = findWaypointPathWithinSystem(
+      _systemsCache,
+      start: start,
+      end: end,
+      shipSpeed: shipSpeed,
+      fuelCapacity: fuelCapacity,
+      sellsFuel: _sellsFuel,
+    );
+    if (actions == null) {
+      return null;
+    }
+
+    final endTime = DateTime.timestamp();
+    final planningDuration = endTime.difference(startTime);
+    if (planningDuration.inSeconds > 1) {
+      logger.warn('planning $start to $end '
+          'took ${approximateDuration(planningDuration)}');
+    }
+
+    // walk backwards from end through symbols to build the route
+    // we could alternatively build it forward and then fix the jump durations
+    // after.
+    final fuelUsed = _fuelUsedByActions(_systemsCache, actions);
     return RoutePlan(
       fuelCapacity: fuelCapacity,
       shipSpeed: shipSpeed,

@@ -63,7 +63,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final endSymbol = args[1];
 
   final systemsCache = SystemsCache.loadCached(fs)!;
-  final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+  final routePlanner =
+      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
 
   final start = WaypointSymbol.fromString(startSymbol);
   final end = WaypointSymbol.fromString(endSymbol);

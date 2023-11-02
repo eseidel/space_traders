@@ -115,7 +115,8 @@ void main() {
       fs,
       path: 'test/nav/fixtures/systems-09-24-2023.json',
     )!;
-    final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+    final routePlanner =
+        RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
     RoutePlan? planRoute(
       String startString,
       String endString, {
@@ -241,7 +242,11 @@ void main() {
       fs: fs,
     );
 
-    final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+    final routePlanner = RoutePlanner.fromSystemsCache(
+      systemsCache,
+      // Allow refueling at waypoints or this test will fail.
+      sellsFuel: (_) => true,
+    );
     RoutePlan? planRoute(
       SystemWaypoint start,
       SystemWaypoint end, {
@@ -263,16 +268,16 @@ void main() {
 
     // If it's large enough to make it to the fuel station, we go there
     // refuel and continue to our destination.
-    // Note that we'll never plan a route that exactly uses up all the fuel
-    // in the tank, so we'll always have some left over.
-    // final medium = planRoute(start, end, fuelCapacity: 100)!.actions;
-    // expect(medium.length, 2);
-    // expect(medium[0].startSymbol, start.waypointSymbol);
-    // expect(medium[0].endSymbol, fuelStation.waypointSymbol);
-    // expect(medium[0].type, RouteActionType.navCruise);
-    // expect(medium[1].startSymbol, fuelStation.waypointSymbol);
-    // expect(medium[1].endSymbol, end.waypointSymbol);
-    // expect(medium[1].type, RouteActionType.navCruise);
+    // TODO(eseidel): We should never plan a route that uses exactly all fuel.
+    // 100 should fail here, right now we use <=.
+    final medium = planRoute(start, end, fuelCapacity: 99)!.actions;
+    expect(medium[0].type, RouteActionType.navCruise);
+    expect(medium[0].startSymbol, start.waypointSymbol);
+    expect(medium[0].endSymbol, fuelStation.waypointSymbol);
+    expect(medium.length, 2);
+    expect(medium[1].type, RouteActionType.navCruise);
+    expect(medium[1].startSymbol, fuelStation.waypointSymbol);
+    expect(medium[1].endSymbol, end.waypointSymbol);
 
     // If it's not large enough to make it to the fuel station, we just
     // drift straight there.
@@ -280,7 +285,6 @@ void main() {
     expect(little.length, 1);
     expect(little[0].startSymbol, start.waypointSymbol);
     expect(little[0].endSymbol, end.waypointSymbol);
-    // Should be navDrift, but we don't know how to plan that yet.
-    // expect(little[0].type, RouteActionType.navDrift);
+    expect(little[0].type, RouteActionType.navDrift);
   });
 }

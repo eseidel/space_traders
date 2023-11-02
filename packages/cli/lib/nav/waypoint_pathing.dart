@@ -7,29 +7,22 @@ int _approximateTimeBetween(
   SystemWaypoint a,
   SystemWaypoint b,
   int shipSpeed,
+  ShipNavFlightMode flightMode,
 ) {
-  return flightTimeWithinSystemInSeconds(
-    a,
-    b,
-    shipSpeed: shipSpeed,
-  );
+  return _timeBetween(a, b, shipSpeed, flightMode);
 }
 
 int _timeBetween(
   SystemWaypoint a,
   SystemWaypoint b,
   int shipSpeed,
-  int fuelCapacity,
+  ShipNavFlightMode flightMode,
 ) {
-  final distance = a.position.distanceTo(b.position);
-  assert(
-    distance <= fuelCapacity,
-    'Distance between ${a.symbol} and ${b.symbol} is $distance',
-  );
   return flightTimeWithinSystemInSeconds(
     a,
     b,
     shipSpeed: shipSpeed,
+    flightMode: flightMode,
   );
 }
 
@@ -39,14 +32,14 @@ int _timeBetween(
 /// If a waypoint is not cached, it's assumed *not* to sell fuel and will
 /// be ignored for pathing, thus the path may change depending on which
 /// markets are cached.
-List<WaypointSymbol>? findWaypointPathWithinSystem(
-  SystemsCache systemsCache,
-  MarketListingCache marketListings,
-  WaypointSymbol start,
-  WaypointSymbol end,
-  int shipSpeed,
-  int fuelCapacity,
-) {
+List<RouteAction>? findWaypointPathWithinSystem(
+  SystemsCache systemsCache, {
+  required WaypointSymbol start,
+  required WaypointSymbol end,
+  required int shipSpeed,
+  required int fuelCapacity,
+  required bool Function(WaypointSymbol) sellsFuel,
+}) {
   final startWaypoint = systemsCache.waypointFromSymbol(start);
   final endWaypoint = systemsCache.waypointFromSymbol(end);
   if (start.systemSymbol != end.systemSymbol) {
@@ -56,28 +49,35 @@ List<WaypointSymbol>? findWaypointPathWithinSystem(
   }
 
   if (startWaypoint.distanceTo(endWaypoint) <= fuelCapacity) {
-    return [start, end];
+    return [
+      RouteAction(
+        startSymbol: start,
+        endSymbol: end,
+        type: RouteActionType.navCruise,
+        duration: flightTimeWithinSystemInSeconds(
+          startWaypoint,
+          endWaypoint,
+          shipSpeed: shipSpeed,
+        ),
+      ),
+    ];
   }
 
   final system = systemsCache.systemBySymbol(start.systemSymbol);
   // We only consider waypoints that have markets that sell fuel.
   // Also include the start and end waypoints.
-  final waypoints = <SystemWaypoint>[];
-  for (final waypoint in system.waypoints) {
-    if (waypoint.waypointSymbol == start || waypoint.waypointSymbol == end) {
-      waypoints.add(waypoint);
-    }
-    final market =
-        marketListings.marketListingForSymbol(waypoint.waypointSymbol);
-    if (market != null && market.allowsTradeOf(TradeSymbol.FUEL)) {
-      waypoints.add(waypoint);
-    }
-  }
-  List<SystemWaypoint> reachableFrom(SystemWaypoint waypoint) {
-    return waypoints.where((w) {
-      final distance = waypoint.position.distanceTo(w.position);
-      return distance <= fuelCapacity;
-    }).toList();
+  final waypoints = system.waypoints.where((w) {
+    final symbol = w.waypointSymbol;
+    return sellsFuel(symbol) || symbol == start || symbol == end;
+  }).toList();
+
+  ShipNavFlightMode flightModeRequired({
+    required SystemWaypoint from,
+    required SystemWaypoint to,
+  }) {
+    return from.distanceTo(to) <= fuelCapacity
+        ? ShipNavFlightMode.CRUISE
+        : ShipNavFlightMode.DRIFT;
   }
 
   // This is A* search, thanks to
@@ -86,7 +86,7 @@ List<WaypointSymbol>? findWaypointPathWithinSystem(
   final frontier =
       PriorityQueue<(WaypointSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
         ..add((start, 0));
-  final cameFrom = <WaypointSymbol, WaypointSymbol>{};
+  final cameFrom = <WaypointSymbol, RouteAction>{};
   final costSoFar = <WaypointSymbol, int>{};
   costSoFar[start] = 0;
   while (frontier.isNotEmpty) {
@@ -96,17 +96,34 @@ List<WaypointSymbol>? findWaypointPathWithinSystem(
       break;
     }
     final currentWaypoint = systemsCache.waypointFromSymbol(currentSymbol);
-    final reachable = reachableFrom(currentWaypoint);
-    for (final nextWaypoint in reachable) {
+    // All waypoints are always reachable, just a question of what flight mode.
+    for (final nextWaypoint in waypoints) {
+      final flightMode =
+          flightModeRequired(from: currentWaypoint, to: nextWaypoint);
       final next = nextWaypoint.waypointSymbol;
-      final newCost = costSoFar[currentSymbol]! +
-          _timeBetween(currentWaypoint, nextWaypoint, shipSpeed, fuelCapacity);
+      final duration =
+          _timeBetween(currentWaypoint, nextWaypoint, shipSpeed, flightMode);
+      final newCost = costSoFar[currentSymbol]! + duration;
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
         final priority = newCost +
-            _approximateTimeBetween(endWaypoint, nextWaypoint, shipSpeed);
+            _approximateTimeBetween(
+              endWaypoint,
+              nextWaypoint,
+              shipSpeed,
+              flightMode,
+            );
         frontier.add((next, priority));
-        cameFrom[next] = currentSymbol;
+        final type = flightMode == ShipNavFlightMode.CRUISE
+            ? RouteActionType.navCruise
+            : RouteActionType.navDrift;
+        final action = RouteAction(
+          startSymbol: currentSymbol,
+          endSymbol: nextWaypoint.waypointSymbol,
+          type: type,
+          duration: duration,
+        );
+        cameFrom[next] = action;
       }
     }
   }
@@ -115,12 +132,11 @@ List<WaypointSymbol>? findWaypointPathWithinSystem(
     return null;
   }
 
-  final symbols = <WaypointSymbol>[];
-  var current = end;
-  while (current != start) {
-    symbols.add(current);
-    current = cameFrom[current]!;
-  }
-  symbols.add(start);
-  return symbols.reversed.toList();
+  final actions = <RouteAction>[];
+  do {
+    final action = cameFrom[end]!;
+    actions.add(action);
+    end = action.startSymbol;
+  } while (cameFrom[end] != null);
+  return actions.reversed.toList();
 }

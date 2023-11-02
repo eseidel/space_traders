@@ -106,6 +106,11 @@ class RouteAction {
         'duration': duration,
         // 'cooldown': cooldown,
       };
+
+  @override
+  String toString() {
+    return '$startSymbol -> $endSymbol $type (${duration}s)}';
+  }
 }
 
 /// A plan for a route between two waypoints.

@@ -7,6 +7,17 @@ import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
+/// Default implementation of sellsFuel for passing to routePlanner.
+/// Returns a function which will return true if market at a given waypoint
+/// symbol is known to sell fuel and false if we either don't know or
+/// know it doesn't sell fuel.
+bool Function(WaypointSymbol) defaultSellsFuel(MarketListingCache listings) {
+  return (WaypointSymbol symbol) {
+    final listing = listings.marketListingForSymbol(symbol);
+    return listing?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
+  };
+}
+
 /// Begins a new nagivation action for [ship] to [destinationSymbol].
 /// Returns the wait time if the ship should wait or null if no wait is needed.
 /// Saves the destination to the ship's behavior state.

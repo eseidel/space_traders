@@ -11,6 +11,7 @@ import 'package:cli/cache/shipyard_prices.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/net/queries.dart';
 import 'package:db/db.dart';
@@ -127,6 +128,7 @@ class Caches {
       // jumpCache: jumps,
       systemsCache: systems,
       // systemConnectivity: systemConnectivity,
+      sellsFuel: defaultSellsFuel(marketListings),
     );
 
     // Make sure factions are loaded.

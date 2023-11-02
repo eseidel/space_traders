@@ -128,7 +128,8 @@ int costOutMounts(
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
   final systemsCache = SystemsCache.loadCached(fs)!;
-  final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+  final routePlanner =
+      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
   final agentCache = AgentCache.loadCached(fs)!;
   final shipCache = ShipCache.loadCached(fs)!;
   final shipyardPrices = ShipyardPrices.load(fs);

@@ -34,7 +34,8 @@ Future<void> cliMain(List<String> args) async {
 
   const fs = LocalFileSystem();
   final systemsCache = SystemsCache.loadCached(fs)!;
-  final routePlanner = RoutePlanner.fromSystemsCache(systemsCache);
+  final routePlanner =
+      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
 
   final marketPrices = MarketPrices.load(fs);
 
