@@ -75,8 +75,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     return NumberFormat().format(n.round());
   }
 
-  final behaviorCounts = <String, int>{};
-  final behaviorCreditPerSecondTotals = <String, double>{};
+  final roleCounts = <FleetRole, int>{};
+  final roleCreditPerSecondTotals = <FleetRole, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await transactionsAfter(db, startTime)).where(
@@ -85,27 +85,28 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   for (final shipSymbol in shipSymbols) {
     final ship = shipCache.ship(shipSymbol);
-    final state = behaviorCache.getBehavior(shipSymbol);
     if (ship.isProbe) {
       continue;
     }
-    final stateName = state?.behavior.name ?? 'Unknown';
+    final role = ship.fleetRole;
     final summary = TransactionSummary(
       transactions.where((t) => t.shipSymbol == shipSymbol),
     );
-    behaviorCounts[stateName] = (behaviorCounts[stateName] ?? 0) + 1;
-    behaviorCreditPerSecondTotals[stateName] =
-        (behaviorCreditPerSecondTotals[stateName] ?? 0) + summary.perSecond;
+    roleCounts[role] = (roleCounts[role] ?? 0) + 1;
+    roleCreditPerSecondTotals[role] =
+        (roleCreditPerSecondTotals[role] ?? 0) + summary.perSecond;
     logger.info('${shipSymbol.hexNumber.padRight(longestHexNumber)}  '
         '${c(summary.perMinute).padLeft(5)} c/m '
         '${c(summary.perSecond).padLeft(4)} c/s '
-        '  ${stateName.padRight(10)}');
+        '${role.name.padRight(10)}');
   }
-  for (final stateName in behaviorCounts.keys.toList()..sort()) {
-    final count = behaviorCounts[stateName]!;
-    final total = behaviorCreditPerSecondTotals[stateName]!;
+  final sortedRoles = roleCounts.keys.toList()
+    ..sort((a, b) => a.name.compareTo(b.name));
+  for (final role in sortedRoles) {
+    final count = roleCounts[role]!;
+    final total = roleCreditPerSecondTotals[role]!;
     final average = (total / count).round();
-    logger.info('$stateName: $count ships, ${c(average)} c/s');
+    logger.info('${role.name}: $count ships, ${c(average)} c/s');
   }
   // Required or main will hang.
   await db.close();
