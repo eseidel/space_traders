@@ -15,6 +15,11 @@
   "description": "A valuable substance used in the production of fertilizers and other chemical products."
  },
  {
+  "symbol": "ANTIMATTER",
+  "name": "Antimatter",
+  "description": "A highly valuable and dangerous substance used for advanced propulsion and weapons systems."
+ },
+ {
   "symbol": "CLOTHING",
   "name": "Clothing",
   "description": "A wide range of clothing and fashion items, including garments, accessories, and textiles."
@@ -115,6 +120,16 @@
   "description": "Medical products, including drugs, treatments, and medical equipment."
  },
  {
+  "symbol": "MERITIUM",
+  "name": "Meritium",
+  "description": "A precious, metallic element used in the manufacture of luxury goods and high-tech equipment."
+ },
+ {
+  "symbol": "MERITIUM_ORE",
+  "name": "Meritium Ore",
+  "description": "A raw, unprocessed form of meritium, often found in deep space and on inhospitable planets."
+ },
+ {
   "symbol": "MICROPROCESSORS",
   "name": "Microprocessors",
   "description": "High-powered and energy-efficient microprocessors used in advanced electronic devices and systems."
@@ -170,6 +185,11 @@
   "description": "Various components and hardware required for spacecraft maintenance, upgrades, and construction."
  },
  {
+  "symbol": "SHIP_PLATING",
+  "name": "Ship Plating",
+  "description": "High-quality metal plating used in the construction of ship hulls and other structural components."
+ },
+ {
   "symbol": "SILICON_CRYSTALS",
   "name": "Silicon Crystals",
   "description": "High-quality silicon crystals used in the production of advanced electronic components and solar panels."
@@ -183,5 +203,15 @@
   "symbol": "SILVER_ORE",
   "name": "Silver Ore",
   "description": "A raw, unprocessed form of silver, often found in mines and underground deposits on planets and moons."
+ },
+ {
+  "symbol": "URANITE",
+  "name": "Uranite",
+  "description": "A rare, radioactive mineral used in the production of advanced technologies and weaponry."
+ },
+ {
+  "symbol": "URANITE_ORE",
+  "name": "Uranite Ore",
+  "description": "A raw, unprocessed form of uranite, often found in asteroid belts and other remote locations."
  }
 ]
