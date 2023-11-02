@@ -1,0 +1,187 @@
+[
+ {
+  "symbol": "ALUMINUM",
+  "name": "Aluminum",
+  "description": "Aluminum is an essential component in the construction of ship hulls and other structural components."
+ },
+ {
+  "symbol": "ALUMINUM_ORE",
+  "name": "Aluminum Ore",
+  "description": "A valuable ore used in the production of aluminum and other alloys. Aluminum ore is an essential component in the construction of ship hulls and other structural components."
+ },
+ {
+  "symbol": "AMMONIA_ICE",
+  "name": "Ammonia Ice",
+  "description": "A valuable substance used in the production of fertilizers and other chemical products."
+ },
+ {
+  "symbol": "CLOTHING",
+  "name": "Clothing",
+  "description": "A wide range of clothing and fashion items, including garments, accessories, and textiles."
+ },
+ {
+  "symbol": "COPPER",
+  "name": "Copper",
+  "description": "Copper is an essential component in the production of electronic components and wiring."
+ },
+ {
+  "symbol": "COPPER_ORE",
+  "name": "Copper Ore",
+  "description": "A valuable ore used in the production of copper and other alloys. Copper ore is an essential component in the production of electronic components and wiring."
+ },
+ {
+  "symbol": "DIAMONDS",
+  "name": "Diamonds",
+  "description": "Rare and valuable crystals used in the production of high-end jewelry and other luxury goods."
+ },
+ {
+  "symbol": "ELECTRONICS",
+  "name": "Electronic Components",
+  "description": "Advanced electronic components used in the construction of advanced technologies."
+ },
+ {
+  "symbol": "EQUIPMENT",
+  "name": "Equipment",
+  "description": "Tools and equipment used in various industries and applications."
+ },
+ {
+  "symbol": "FERTILIZERS",
+  "name": "Fertilizers",
+  "description": "Specialized chemicals used to enrich the soil and promote plant growth on newly-colonized planets."
+ },
+ {
+  "symbol": "FOOD",
+  "name": "Galactic Cuisine",
+  "description": "A diverse range of foods from different planets, including fresh produce, meats, and prepared meals."
+ },
+ {
+  "symbol": "FUEL",
+  "name": "Fuel",
+  "description": "High-energy fuel used in spacecraft propulsion systems to enable long-distance space travel."
+ },
+ {
+  "symbol": "GOLD",
+  "name": "Gold",
+  "description": "Gold is often used in the production of jewelry, coins, and other decorative items, as well as in the production of electronics and other high-tech applications."
+ },
+ {
+  "symbol": "GOLD_ORE",
+  "name": "Gold Ore",
+  "description": "A valuable ore used in the production of gold and other precious metals. Gold ore is often used in the production of jewelry, coins, and other decorative items, as well as in the production of electronics and other high-tech applications."
+ },
+ {
+  "symbol": "HYDROCARBON",
+  "name": "Hydrocarbons",
+  "description": "A highly-valued substance used in the production of fuels, plastics, and other industrial products."
+ },
+ {
+  "symbol": "ICE_WATER",
+  "name": "Fresh Water",
+  "description": "High-quality fresh water, essential for life support and hydroponic agriculture."
+ },
+ {
+  "symbol": "IRON",
+  "name": "Iron",
+  "description": "A common and valuable metal often used in the construction of ship hulls and other structural components."
+ },
+ {
+  "symbol": "IRON_ORE",
+  "name": "Iron Ore",
+  "description": "A common and valuable ore used in the production of steel and other alloys."
+ },
+ {
+  "symbol": "JEWELRY",
+  "name": "Jewelry",
+  "description": "Exquisite and valuable pieces of jewelry made from rare materials and precious gems."
+ },
+ {
+  "symbol": "LASER_RIFLES",
+  "name": "Laser Rifles",
+  "description": "Advanced weapons that use focused beams of light to deliver highly destructive energy to a target."
+ },
+ {
+  "symbol": "LIQUID_NITROGEN",
+  "name": "Liquid Nitrogen",
+  "description": "A cryogenic fluid used in a variety of applications, including refrigeration and cryogenic freezing."
+ },
+ {
+  "symbol": "MACHINERY",
+  "name": "Machinery",
+  "description": "A variety of mechanical devices and equipment, used for industrial, construction, and other practical purposes."
+ },
+ {
+  "symbol": "MEDICINE",
+  "name": "Medicine",
+  "description": "Medical products, including drugs, treatments, and medical equipment."
+ },
+ {
+  "symbol": "MICROPROCESSORS",
+  "name": "Microprocessors",
+  "description": "High-powered and energy-efficient microprocessors used in advanced electronic devices and systems."
+ },
+ {
+  "symbol": "MICRO_FUSION_GENERATORS",
+  "name": "Micro Fusion Generators",
+  "description": "Compact fusion reactors that provide a clean, reliable, and virtually unlimited source of energy."
+ },
+ {
+  "symbol": "MOUNT_GAS_SIPHON_I",
+  "name": "Gas Siphon I",
+  "description": "A basic gas siphon that can extract gas from gas giants and other gas-rich bodies."
+ },
+ {
+  "symbol": "MOUNT_MINING_LASER_I",
+  "name": "Mining Laser I",
+  "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects."
+ },
+ {
+  "symbol": "MOUNT_SURVEYOR_I",
+  "name": "Surveyor I",
+  "description": "A basic survey probe that can be used to gather information about a mineral deposit."
+ },
+ {
+  "symbol": "PLASTICS",
+  "name": "Plastics",
+  "description": "A wide range of plastic materials used in various applications, including packaging, construction, and manufacturing."
+ },
+ {
+  "symbol": "PLATINUM",
+  "name": "Platinum",
+  "description": "Platinum is often used in the production of catalysts and other industrial applications."
+ },
+ {
+  "symbol": "PLATINUM_ORE",
+  "name": "Platinum Ore",
+  "description": "A valuable ore used in the production of platinum and other precious metals. Platinum ore is often used in the production of catalysts and other industrial applications."
+ },
+ {
+  "symbol": "PRECIOUS_STONES",
+  "name": "Precious Stones",
+  "description": "A collection of valuable gems and diamonds, often used in jewelry and other decorative objects."
+ },
+ {
+  "symbol": "QUARTZ_SAND",
+  "name": "Quartz Sand",
+  "description": "High-purity quartz sand used in the production of glass and ceramics."
+ },
+ {
+  "symbol": "SHIP_PARTS",
+  "name": "Ship Parts",
+  "description": "Various components and hardware required for spacecraft maintenance, upgrades, and construction."
+ },
+ {
+  "symbol": "SILICON_CRYSTALS",
+  "name": "Silicon Crystals",
+  "description": "High-quality silicon crystals used in the production of advanced electronic components and solar panels."
+ },
+ {
+  "symbol": "SILVER",
+  "name": "Silver",
+  "description": "A shiny, metallic element used in the production of coins, jewelry, and other high-value items."
+ },
+ {
+  "symbol": "SILVER_ORE",
+  "name": "Silver Ore",
+  "description": "A raw, unprocessed form of silver, often found in mines and underground deposits on planets and moons."
+ }
+]
