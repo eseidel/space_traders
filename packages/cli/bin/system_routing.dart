@@ -4,6 +4,7 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
+import 'package:collection/collection.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Evalute the navigability of the starting system by ship type.
@@ -51,7 +52,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final distance = shipyard.distanceTo(waypoint);
     table.add([waypoint.symbol, distance, durationString, actions]);
   }
-  table.sort((a, b) => (a[1] as int).compareTo(b[1] as int));
+  table.sortedBy<num>((a) => (a as List<dynamic>)[1] as num);
   logger.info(table.toString());
 
   // required or main will hang
