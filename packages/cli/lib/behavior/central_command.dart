@@ -453,7 +453,7 @@ class CentralCommand {
       return _findBestPlaceToBuy(caches, ShipType.SIPHON_DRONE);
     } else if (shouldBuy(ShipType.SURVEYOR, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
-    } else if (shouldBuy(ShipType.LIGHT_HAULER, 3)) {
+    } else if (shouldBuy(ShipType.LIGHT_HAULER, 4)) {
       return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
     } else if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
