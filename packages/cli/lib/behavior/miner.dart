@@ -317,10 +317,6 @@ Future<JobResult> extractAndLog(
     const Duration(minutes: 1),
   );
 
-  shipInfo(
-    ship,
-    'Mining, cargo space: ${ship.cargo.units}/${ship.cargo.capacity}',
-  );
   // If we either have a survey or don't have a surveyor, mine.
   try {
     final ExtractResources201ResponseData response;

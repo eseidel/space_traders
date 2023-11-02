@@ -44,7 +44,7 @@ void main() {
 
     final behaviorState = BehaviorState(shipSymbol, Behavior.idle);
     final centralCommand = _MockCentralCommand();
-    when(() => centralCommand.loadBehaviorState(ship, any()))
+    when(() => caches.behaviors.putIfAbsent(shipSymbol, any()))
         .thenAnswer((_) => Future.value(behaviorState));
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -85,7 +85,7 @@ void main() {
     when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
     final centralCommand = _MockCentralCommand();
 
-    when(() => centralCommand.loadBehaviorState(ship, any())).thenAnswer(
+    when(() => caches.behaviors.putIfAbsent(shipSymbol, any())).thenAnswer(
       (_) => Future.value(BehaviorState(shipSymbol, Behavior.idle)),
     );
 

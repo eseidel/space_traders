@@ -50,7 +50,9 @@ Future<DateTime?> beingNewRouteAndLog(
     );
     return null;
   }
-  shipInfo(ship, 'Starting: ${describeRoutePlan(route)}');
+  if (route.actions.length > 1) {
+    shipInfo(ship, 'Starting: ${describeRoutePlan(route)}');
+  }
   final waitTime = await beingRouteAndLog(
     api,
     db,
@@ -82,10 +84,13 @@ Future<DateTime?> beingRouteAndLog(
 
   state.routePlan = routePlan;
   // TODO(eseidel): Should this buy fuel first if we need it?
-  shipInfo(
-      ship,
-      'Beginning route to ${routePlan.endSymbol} '
-      '(${approximateDuration(routePlan.duration)})');
+  final message = 'Beginning route to ${routePlan.endSymbol} '
+      '(${approximateDuration(routePlan.duration)})';
+  if (routePlan.duration.inMinutes > 2) {
+    shipWarn(ship, message);
+  } else {
+    shipInfo(ship, message);
+  }
   final navResult = await continueNavigationIfNeeded(
     api,
     db,

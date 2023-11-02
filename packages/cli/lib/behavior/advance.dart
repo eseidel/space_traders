@@ -70,8 +70,10 @@ Future<DateTime?> advanceShipBehavior(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final state =
-      await centralCommand.loadBehaviorState(ship, caches.agent.agent.credits);
+  final state = await caches.behaviors.putIfAbsent(ship.shipSymbol, () async {
+    final credits = caches.agent.agent.credits;
+    return centralCommand.getJobForShip(ship, credits);
+  });
 
   final NavResult navResult;
   try {

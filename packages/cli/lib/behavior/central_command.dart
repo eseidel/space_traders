@@ -197,20 +197,6 @@ class CentralCommand {
     return Behavior.idle;
   }
 
-  // This feels wrong.
-  /// Load or create the right behavior state for [ship].
-  Future<BehaviorState> loadBehaviorState(Ship ship, int credits) async {
-    final shipSymbol = ship.shipSymbol;
-    final state = _behaviorCache.getBehavior(shipSymbol);
-    if (state == null) {
-      final newState = getJobForShip(ship, credits);
-      // Important to set the state in the cache immediately, so that if we
-      // yield, other ships can see what we're doing.
-      _behaviorCache.setBehavior(shipSymbol, newState);
-    }
-    return _behaviorCache.getBehavior(shipSymbol)!;
-  }
-
   /// Procurement contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,

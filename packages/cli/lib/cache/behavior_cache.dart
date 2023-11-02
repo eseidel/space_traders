@@ -122,4 +122,19 @@ class BehaviorCache extends JsonStore<_Record> {
     final expiration = DateTime.timestamp().add(duration);
     _shipTimeouts.add(_ShipTimeout(ship.shipSymbol, behavior, expiration));
   }
+
+  /// Get the behavior state for the given ship, or call [ifAbsent] to create it
+  /// if it doesn't exist.
+  Future<BehaviorState> putIfAbsent(
+    ShipSymbol shipSymbol,
+    Future<BehaviorState> Function() ifAbsent,
+  ) async {
+    final currentState = getBehavior(shipSymbol);
+    if (currentState != null) {
+      return currentState;
+    }
+    final newState = await ifAbsent();
+    setBehavior(shipSymbol, newState);
+    return newState;
+  }
 }

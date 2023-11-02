@@ -53,10 +53,6 @@ Future<JobResult> siphonAndLog(
     const Duration(minutes: 1),
   );
 
-  shipInfo(
-    ship,
-    'Siphoning, cargo space: ${ship.cargo.units}/${ship.cargo.capacity}',
-  );
   try {
     final response = await siphonResources(api, ship, shipCache);
     final yield_ = response.siphon.yield_;
