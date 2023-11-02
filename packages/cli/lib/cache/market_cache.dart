@@ -51,7 +51,7 @@ class MarketListingCache extends JsonStore<_Record> {
   final TradeGoodCache tradeGoods;
 
   /// The default path to the cache file.
-  static const defaultPath = 'data/market_descriptions.json';
+  static const defaultPath = 'data/market_listings.json';
 
   /// The MarketListings by waypoint symbol.
   Map<WaypointSymbol, MarketListing> get _listingBySymbol => record;
