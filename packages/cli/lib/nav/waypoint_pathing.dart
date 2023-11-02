@@ -54,7 +54,7 @@ List<RouteAction>? findWaypointPathWithinSystem(
         startSymbol: start,
         endSymbol: end,
         type: RouteActionType.navCruise,
-        duration: flightTimeWithinSystemInSeconds(
+        seconds: flightTimeWithinSystemInSeconds(
           startWaypoint,
           endWaypoint,
           shipSpeed: shipSpeed,
@@ -75,6 +75,10 @@ List<RouteAction>? findWaypointPathWithinSystem(
     required SystemWaypoint from,
     required SystemWaypoint to,
   }) {
+    // Ships that don't use fuel can just always cruise.
+    if (fuelCapacity == 0) {
+      return ShipNavFlightMode.CRUISE;
+    }
     return from.distanceTo(to) <= fuelCapacity
         ? ShipNavFlightMode.CRUISE
         : ShipNavFlightMode.DRIFT;
@@ -121,7 +125,7 @@ List<RouteAction>? findWaypointPathWithinSystem(
           startSymbol: currentSymbol,
           endSymbol: nextWaypoint.waypointSymbol,
           type: type,
-          duration: duration,
+          seconds: duration,
         );
         cameFrom[next] = action;
       }

@@ -286,5 +286,12 @@ void main() {
     expect(little[0].startSymbol, start.waypointSymbol);
     expect(little[0].endSymbol, end.waypointSymbol);
     expect(little[0].type, RouteActionType.navDrift);
+
+    // Ships that don't use fuel always just cruise.
+    final noFuel = planRoute(start, end, fuelCapacity: 0)!.actions;
+    expect(noFuel.length, 1);
+    expect(noFuel[0].startSymbol, start.waypointSymbol);
+    expect(noFuel[0].endSymbol, end.waypointSymbol);
+    expect(noFuel[0].type, RouteActionType.navCruise);
   });
 }

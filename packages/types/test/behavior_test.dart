@@ -24,7 +24,7 @@ void main() {
             startSymbol: WaypointSymbol.fromString('S-A-W'),
             endSymbol: WaypointSymbol.fromString('S-A-C'),
             type: RouteActionType.navCruise,
-            duration: 10,
+            seconds: 10,
           ),
         ],
         fuelCapacity: 10,

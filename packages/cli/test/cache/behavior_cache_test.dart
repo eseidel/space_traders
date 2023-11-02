@@ -22,7 +22,7 @@ void main() {
           startSymbol: WaypointSymbol.fromString('S-E-A'),
           endSymbol: WaypointSymbol.fromString('S-E-B'),
           type: RouteActionType.navCruise,
-          duration: 30,
+          seconds: 30,
         ),
       ],
       fuelUsed: 20,

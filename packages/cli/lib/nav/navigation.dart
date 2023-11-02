@@ -50,6 +50,7 @@ Future<DateTime?> beingNewRouteAndLog(
     );
     return null;
   }
+  shipInfo(ship, 'Starting: ${describeRoutePlan(route)}');
   final waitTime = await beingRouteAndLog(
     api,
     db,

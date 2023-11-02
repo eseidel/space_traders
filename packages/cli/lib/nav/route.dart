@@ -226,7 +226,7 @@ RouteAction _navigationAction(
   SystemWaypoint end,
   int shipSpeed,
 ) {
-  final duration = flightTimeWithinSystemInSeconds(
+  final seconds = flightTimeWithinSystemInSeconds(
     start,
     end,
     shipSpeed: shipSpeed,
@@ -235,7 +235,7 @@ RouteAction _navigationAction(
     startSymbol: start.waypointSymbol,
     endSymbol: end.waypointSymbol,
     type: RouteActionType.navCruise,
-    duration: duration,
+    seconds: seconds,
   );
 }
 
@@ -252,12 +252,12 @@ RouteAction _jumpAction(
   // This isn't quite right to use cooldown as duration, but it's
   // close enough for now.  This isLastJump hack also would break
   // if we had two separate series of jumps in the route.
-  final duration = isLastJump ? 0 : cooldown;
+  final seconds = isLastJump ? 0 : cooldown;
   return RouteAction(
     startSymbol: start.waypointSymbol,
     endSymbol: end.waypointSymbol,
     type: RouteActionType.jump,
-    duration: duration,
+    seconds: seconds,
   );
 }
 
@@ -535,13 +535,13 @@ RoutePlan? planRouteThrough(
 /// Returns a string describing the route plan.
 String describeRoutePlan(RoutePlan plan) {
   final buffer = StringBuffer()
-    ..writeln('Route ${plan.startSymbol} to ${plan.endSymbol} '
+    ..writeln('${plan.startSymbol} to ${plan.endSymbol} '
         'speed: ${plan.shipSpeed} max-fuel: ${plan.fuelCapacity}');
   for (final action in plan.actions) {
     buffer.writeln('${action.type.name.padRight(14)}  ${action.startSymbol}  '
         '${action.endSymbol}  '
         '${action.duration}s');
   }
-  buffer.writeln('Total duration ${plan.duration}s');
+  buffer.writeln('in ${approximateDuration(plan.duration)}');
   return buffer.toString();
 }

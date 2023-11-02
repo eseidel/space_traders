@@ -62,7 +62,7 @@ class RouteAction {
     required this.startSymbol,
     required this.endSymbol,
     required this.type,
-    required this.duration,
+    required this.seconds,
     // required this.cooldown,
   });
 
@@ -74,7 +74,7 @@ class RouteAction {
       type: RouteActionType.values.firstWhere(
         (e) => e.name == json['type'] as String,
       ),
-      duration: json['duration'] as int,
+      seconds: json['seconds'] as int? ?? json['duration'] as int,
       // cooldown: json['cooldown'] as int,
     );
   }
@@ -89,8 +89,11 @@ class RouteAction {
   final RouteActionType type;
 
   /// The duration of this action in seconds.
-  final int duration;
+  final int seconds;
   // final int cooldown;
+
+  /// The duration of this action.
+  Duration get duration => Duration(seconds: seconds);
 
   /// Returns true if this action uses the reactor.
   bool usesReactor() => type.usesReactor();
@@ -103,13 +106,13 @@ class RouteAction {
         'startSymbol': startSymbol.toJson(),
         'endSymbol': endSymbol.toJson(),
         'type': type.name,
-        'duration': duration,
+        'seconds': seconds,
         // 'cooldown': cooldown,
       };
 
   @override
   String toString() {
-    return '$startSymbol -> $endSymbol $type (${duration}s)}';
+    return '$startSymbol -> $endSymbol $type (${seconds}s)}';
   }
 }
 
@@ -134,7 +137,7 @@ class RoutePlan {
             startSymbol: symbol,
             endSymbol: symbol,
             type: RouteActionType.jump,
-            duration: 0,
+            seconds: 0,
           ),
         ],
         fuelUsed = 0;
@@ -171,7 +174,7 @@ class RoutePlan {
 
   /// The total time of this route in seconds.
   Duration get duration =>
-      Duration(seconds: actions.fold<int>(0, (a, b) => a + b.duration));
+      Duration(seconds: actions.fold<int>(0, (a, b) => a + b.seconds));
 
   /// The number of requests this route expects to take to execute.
   int get requestCount => actions.fold<int>(0, (a, b) => a + b.requestCount);

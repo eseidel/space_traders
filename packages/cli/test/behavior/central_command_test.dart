@@ -87,7 +87,7 @@ void main() {
             startSymbol: start,
             endSymbol: end,
             type: RouteActionType.jump,
-            duration: 10,
+            seconds: 10,
           ),
         ],
         fuelUsed: 10,
