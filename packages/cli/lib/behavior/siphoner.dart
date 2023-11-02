@@ -113,11 +113,15 @@ Future<JobResult> _initSiphonJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final siphonJob = await centralCommand.siphonJobForShip(
-    caches.waypoints,
-    caches.marketListings,
-    caches.agent,
-    ship,
+  final siphonJob = assertNotNull(
+    await centralCommand.siphonJobForShip(
+      caches.waypoints,
+      caches.marketListings,
+      caches.agent,
+      ship,
+    ),
+    'Requires a siphon job.',
+    const Duration(minutes: 10),
   );
   state.mineJob = siphonJob;
   return JobResult.complete();

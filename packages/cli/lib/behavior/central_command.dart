@@ -571,25 +571,28 @@ class CentralCommand {
 
   /// Returns the mining plan for the given [ship].
   // TODO(eseidel): call from or merge into getJobForShip.
-  Future<MineJob> mineJobForShip(
+  Future<MineJob?> mineJobForShip(
     WaypointCache waypointCache,
     MarketListingCache marketListings,
     AgentCache agentCache,
     Ship ship,
   ) async {
     final hq = agentCache.agent.headquartersSymbol;
-    final mine = (await evaluateWaypointsForMining(
+    final score = (await evaluateWaypointsForMining(
       waypointCache,
       marketListings,
       hq.systemSymbol,
     ))
-        .firstWhere((m) => m.marketTradesAllProducedGoods);
-    return MineJob(mine: mine.mine, market: mine.market);
+        .firstWhereOrNull((m) => m.marketTradesAllProducedGoods);
+    if (score == null) {
+      return null;
+    }
+    return MineJob(mine: score.mine, market: score.market);
   }
 
   /// Returns the siphon plan for the given [ship].
 // TODO(eseidel): call from or merge into getJobForShip.
-  Future<MineJob> siphonJobForShip(
+  Future<MineJob?> siphonJobForShip(
     WaypointCache waypointCache,
     MarketListingCache marketListings,
     AgentCache agentCache,
@@ -601,7 +604,10 @@ class CentralCommand {
       marketListings,
       hq.systemSymbol,
     ))
-        .firstWhere((m) => m.marketTradesAllProducedGoods);
+        .firstWhereOrNull((m) => m.marketTradesAllProducedGoods);
+    if (score == null) {
+      return null;
+    }
     // Currently reusing MineJob.
     return MineJob(mine: score.target, market: score.market);
   }

@@ -20,11 +20,15 @@ Future<DateTime?> advanceSurveyor(
 }) async {
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
-  final mineJob = await centralCommand.mineJobForShip(
-    caches.waypoints,
-    caches.marketListings,
-    caches.agent,
-    ship,
+  final mineJob = assertNotNull(
+    await centralCommand.mineJobForShip(
+      caches.waypoints,
+      caches.marketListings,
+      caches.agent,
+      ship,
+    ),
+    'Requires a mine job.',
+    const Duration(minutes: 10),
   );
   final mineSymbol = mineJob.mine;
   if (ship.waypointSymbol != mineSymbol) {
