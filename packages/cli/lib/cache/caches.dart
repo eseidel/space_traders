@@ -23,6 +23,7 @@ export 'package:cli/api.dart';
 export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
+export 'package:cli/cache/construction_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/market_prices.dart';
