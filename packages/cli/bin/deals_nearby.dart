@@ -6,9 +6,12 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
 Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
-  final maxJumps = int.parse(argResults['jumps'] as String);
-  const shipType = ShipType.LIGHT_HAULER;
+  final shipType = shipTypeFromArg(argResults['ship'] as String);
   final limit = int.parse(argResults['limit'] as String);
+  final maxJumps = int.parse(argResults['jumps'] as String);
+  final startArg = argResults['start'] as String?;
+  const maxWaypoints = 200;
+  const maxOutlay = 1000000;
 
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.loadCached(fs)!;
@@ -28,12 +31,10 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final extraSellOpps =
       centralCommand.contractSellOpps(agentCache, contractCache).toList();
 
-  final start = argResults.rest.isEmpty
+  final start = startArg == null
       ? agentCache.headquarters(systemsCache)
-      : systemsCache.waypointFromString(argResults.rest.first)!;
+      : systemsCache.waypointFromString(startArg)!;
 
-  const maxWaypoints = 200;
-  const maxOutlay = 1000000;
   final ship = staticCaches.shipyardShips[shipType]!;
   final cargoCapacity = ship.cargoCapacity;
   final shipSpeed = ship.engine.speed;
@@ -86,6 +87,16 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   }
 }
 
+ShipType shipTypeFromArg(String arg) {
+  final upper = arg.toUpperCase();
+  final name = upper.startsWith('SHIP_') ? upper : 'SHIP_$upper';
+  return ShipType.values.firstWhere((e) => e.value == name);
+}
+
+String argFromShipType(ShipType shipType) {
+  return shipType.value.substring('SHIP_'.length);
+}
+
 void main(List<String> args) async {
   await runOffline(
     args,
@@ -112,9 +123,9 @@ void main(List<String> args) async {
         ..addOption(
           'ship',
           abbr: 't',
-          help: 'Ship type (defaults to ${ShipType.LIGHT_HAULER})',
-          allowed: ShipType.values.map((e) => e.toString()).toList(),
-          defaultsTo: ShipType.LIGHT_HAULER.toString(),
+          help: 'Ship type used for calculations',
+          allowed: ShipType.values.map(argFromShipType),
+          defaultsTo: argFromShipType(ShipType.LIGHT_HAULER),
         );
     },
   );

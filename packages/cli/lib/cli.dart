@@ -13,9 +13,9 @@ export 'package:types/types.dart';
 /// This file should be included by any bin/ script.
 
 /// Run command with a logger, but without an Api.
-Future<R> runOffline<R>(
+Future<void> runOffline(
   List<String> args,
-  Future<R> Function(FileSystem fs, ArgResults argResults) fn, {
+  Future<void> Function(FileSystem fs, ArgResults argResults) fn, {
   void Function(ArgParser parser)? addArgs,
 }) async {
   final parser = ArgParser()
@@ -23,6 +23,12 @@ Future<R> runOffline<R>(
       'verbose',
       abbr: 'v',
       help: 'Verbose logging',
+      negatable: false,
+    )
+    ..addFlag(
+      'help',
+      abbr: 'h',
+      help: 'Show help',
       negatable: false,
     );
   addArgs?.call(parser);
@@ -32,6 +38,10 @@ Future<R> runOffline<R>(
     () async {
       if (results['verbose'] as bool) {
         setVerboseLogging();
+      }
+      if (results['help'] as bool) {
+        logger.info(parser.usage);
+        return;
       }
       return fn(fs, results);
     },
