@@ -3,8 +3,12 @@ import 'package:more/collection.dart';
 import 'package:types/api.dart';
 import 'package:types/behavior.dart';
 
-/// There is only one cargo module for now.
-final kCargoModules = {ShipModuleSymbolEnum.CARGO_HOLD_I};
+/// Symbols of all cargo modules.
+final kCargoModules = {
+  ShipModuleSymbolEnum.CARGO_HOLD_I,
+  ShipModuleSymbolEnum.CARGO_HOLD_II,
+  ShipModuleSymbolEnum.CARGO_HOLD_III,
+};
 
 /// The symbols of all laser mounts.
 final kLaserMountSymbols = {

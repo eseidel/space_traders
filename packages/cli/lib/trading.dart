@@ -368,7 +368,7 @@ MarketScan scanNearbyMarkets(
   );
 }
 
-CostedDeal? _filterDealsAndLog(
+Iterable<CostedDeal> _filterDealsAndLog(
   Iterable<CostedDeal> costedDeals, {
   required String rangeDescription,
   required int maxTotalOutlay,
@@ -382,31 +382,22 @@ CostedDeal? _filterDealsAndLog(
   final withinRange = 'within $rangeDescription';
   if (filtered.isEmpty) {
     logger.detail('No deals $withinRange.');
-    return null;
+    return [];
   }
   final affordable = filtered.where((d) => d.expectedCosts < maxTotalOutlay);
   if (affordable.isEmpty) {
     logger.detail('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
-    return null;
-  }
-  final sortedDeals =
-      affordable.sortedBy<num>((e) => e.expectedProfitPerSecond);
-
-  logger.detail('Top 3 deals (of ${sortedDeals.length}) $withinRange:');
-  for (final deal in sortedDeals.reversed.take(3).toList().reversed) {
-    logger.detail(describeCostedDeal(deal));
+    return [];
   }
 
-  final profitable = sortedDeals.where((d) => d.expectedProfitPerSecond > 0);
-  if (profitable.isEmpty) {
-    logger.detail('No profitable deals $withinRange.');
-    return null;
-  }
-  return profitable.last;
+  return affordable
+      .sortedBy<num>((e) => -e.expectedProfitPerSecond)
+      .where((d) => d.expectedProfitPerSecond > 0);
 }
 
-/// Returns the best deal for the given parameters.
-CostedDeal? findDealFor(
+/// Returns the best deals for the given parameters,
+/// sorted by profit per second, with most profitable first.
+Iterable<CostedDeal> findDealsFor(
   MarketPrices marketPrices,
   SystemsCache systemsCache,
   RoutePlanner routePlanner,

@@ -2,7 +2,6 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
-import 'package:types/mount.dart';
 
 /// Map from ship type to ship frame symbol.
 extension ShipTypeToFrame on ShipyardShipCache {
@@ -28,9 +27,7 @@ extension ShipTypeToFrame on ShipyardShipCache {
   }
 
   /// Map from ship type to cargo capacity.
-  int? capacityForShipType(ShipType shipType) {
-    return shipForTest(shipType)?.cargo.capacity;
-  }
+  int? capacityForShipType(ShipType shipType) => this[shipType]?.cargoCapacity;
 
   /// Make a new ship of a given type.
   Ship? shipForTest(
@@ -57,8 +54,7 @@ extension ShipTypeToFrame on ShipyardShipCache {
     final config = _shipConfigs.firstWhereOrNull((c) => c.type == shipType);
     if (config == null) return null;
 
-    // We're not copying the sub-objects here, which could be a problem
-    // if callers start to modify them.
+    // Use deepCopy to ensure callers don't accidentally modify static data.
     return Ship(
       symbol: symbolString,
       registration: ShipRegistration(
@@ -72,15 +68,24 @@ extension ShipTypeToFrame on ShipyardShipCache {
         totalSeconds: 0,
       ),
       nav: _makeShipNav(origin: waypoint, now: arrival),
-      crew: _crewFromShipyardShip(shipyardShip),
+      crew: ShipCrew(
+        current: shipyardShip.currentCrew,
+        required_: shipyardShip.crew.required_,
+        capacity: shipyardShip.crew.capacity,
+        morale: 100,
+        wages: 0,
+      ),
       frame: shipyardShip.frame,
       reactor: shipyardShip.reactor,
       engine: shipyardShip.engine,
-      cargo: _cargoFromShipyardShip(shipyardShip),
-      fuel: _fuelFromShipyardShip(shipyardShip),
+      cargo: ShipCargo(capacity: shipyardShip.cargoCapacity, units: 0),
+      fuel: ShipFuel(
+        current: shipyardShip.frame.fuelCapacity,
+        capacity: shipyardShip.frame.fuelCapacity,
+      ),
       modules: shipyardShip.modules,
       mounts: shipyardShip.mounts,
-    );
+    ).deepCopy();
   }
 }
 
@@ -133,42 +138,5 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
     ),
     status: ShipNavStatus.DOCKED,
     flightMode: ShipNavFlightMode.CRUISE,
-  );
-}
-
-ShipCrew _crewFromShipyardShip(ShipyardShip ship) {
-  var current = 0;
-  current += ship.frame.requirements.crew ?? 0;
-  current += ship.reactor.requirements.crew ?? 0;
-  current += ship.engine.requirements.crew ?? 0;
-  current += ship.mounts.map((m) => m.requirements.crew ?? 0).sum;
-  current += ship.modules.map((m) => m.requirements.crew ?? 0).sum;
-
-  return ShipCrew(
-    current: current,
-    required_: ship.crew.required_,
-    capacity: ship.crew.capacity,
-    morale: 100,
-    wages: 0,
-  );
-}
-
-ShipCargo _cargoFromShipyardShip(ShipyardShip ship) {
-  // Sum up the cargo from modules.
-  final cargoCapacity = ship.modules
-      .where((m) => kCargoModules.contains(m.symbol))
-      .map((m) => m.capacity!)
-      .sum;
-
-  return ShipCargo(
-    capacity: cargoCapacity,
-    units: 0,
-  );
-}
-
-ShipFuel _fuelFromShipyardShip(ShipyardShip ship) {
-  return ShipFuel(
-    current: ship.frame.fuelCapacity,
-    capacity: ship.frame.fuelCapacity,
   );
 }

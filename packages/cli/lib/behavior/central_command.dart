@@ -262,7 +262,7 @@ class CentralCommand {
       maxJumps: maxJumps,
       maxWaypoints: maxWaypoints,
     );
-    final maybeDeal = findDealFor(
+    final maybeDeal = findDealsFor(
       marketPrices,
       systemsCache,
       routePlanner,
@@ -276,7 +276,7 @@ class CentralCommand {
       // trader logic tries to clear out the hold.
       cargoCapacity: ship.cargo.capacity,
       shipSpeed: ship.engine.speed,
-    );
+    ).firstOrNull;
     return maybeDeal;
   }
 

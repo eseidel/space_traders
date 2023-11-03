@@ -1,42 +1,22 @@
-import 'package:args/args.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
-import 'package:cli/logger.dart';
+import 'package:cli/cli.dart';
+import 'package:cli/nav/navigation.dart';
+import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
-import 'package:file/local.dart';
-import 'package:scoped/scoped.dart';
-import 'package:types/types.dart';
 
-Future<void> cliMain(List<String> args) async {
-  final parser = ArgParser()
-    ..addOption(
-      'jumps',
-      abbr: 'j',
-      help: 'Maximum number of jumps to walk out',
-      defaultsTo: '5',
-    )
-    ..addOption(
-      'start',
-      abbr: 's',
-      help: 'Starting system (defaults to agent headquarters)',
-    )
-    ..addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Verbose logging',
-      negatable: false,
-    );
-  final results = parser.parse(args);
-  // final maxJumps = int.parse(results['jumps'] as String);
-  if (results['verbose'] as bool) {
-    setVerboseLogging();
-  }
+Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
+  final maxJumps = int.parse(argResults['jumps'] as String);
+  const shipType = ShipType.LIGHT_HAULER;
+  final limit = int.parse(argResults['limit'] as String);
 
-  const fs = LocalFileSystem();
+  final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.loadCached(fs)!;
-  final routePlanner =
-      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
-
+  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+  final routePlanner = RoutePlanner.fromSystemsCache(
+    systemsCache,
+    sellsFuel: defaultSellsFuel(marketListings),
+  );
   final marketPrices = MarketPrices.load(fs);
 
   final behaviorCache = BehaviorCache.load(fs);
@@ -48,41 +28,32 @@ Future<void> cliMain(List<String> args) async {
   final extraSellOpps =
       centralCommand.contractSellOpps(agentCache, contractCache).toList();
 
-  for (final extraOpp in extraSellOpps) {
-    logger.info('Extra: ${extraOpp.tradeSymbol} ${extraOpp.maxUnits} '
-        '${extraOpp.price} => ${extraOpp.marketSymbol}');
-  }
-
-  // const maxWaypoints = 100;
-  // const maxOutlay = 100000;
-  // const cargoCapacity = 120;
-  // const shipSpeed = 30;
-  // const fuelCapacity = 1200;
-  // final agentCache = AgentCache.loadCached(fs)!;
-  final start = results.rest.isEmpty
+  final start = argResults.rest.isEmpty
       ? agentCache.headquarters(systemsCache)
-      : systemsCache.waypointFromString(results.rest.first)!;
+      : systemsCache.waypointFromString(argResults.rest.first)!;
 
-  // Finding deals with start: X1-SB93-93497E, max jumps: 5,
-  // max outlay: 1172797, max units: 120, fuel capacity: 1700, ship speed: 10
-  const maxJumps = 10;
   const maxWaypoints = 200;
-  const maxOutlay = 1172797;
-  const cargoCapacity = 120;
-  const shipSpeed = 10;
-  const fuelCapacity = 1700;
-  // final start = systemsCache.waypointFromSymbol('X1-SB93-93497E');
+  const maxOutlay = 1000000;
+  final ship = staticCaches.shipyardShips[shipType]!;
+  final cargoCapacity = ship.cargoCapacity;
+  final shipSpeed = ship.engine.speed;
+  final fuelCapacity = ship.frame.fuelCapacity;
 
-  logger.info(
-    'Finding deals with '
-    'start: ${start.symbol}, '
-    'max jumps: $maxJumps, '
-    'max waypoints: $maxWaypoints, '
-    'max outlay: $maxOutlay, '
-    'max units: $cargoCapacity, '
-    'fuel capacity: $fuelCapacity, '
-    'ship speed: $shipSpeed',
-  );
+  logger.info('$shipType @ ${start.symbol}, '
+      'speed = $shipSpeed '
+      'capacity = $cargoCapacity, '
+      'fuel <= $fuelCapacity, '
+      'outlay <= $maxOutlay, '
+      'jumps <= $maxJumps, '
+      'waypoints <= $maxWaypoints ');
+
+  if (extraSellOpps.isNotEmpty) {
+    logger.info('Contract opps:');
+    for (final extraOpp in extraSellOpps) {
+      logger.info('  ${extraOpp.maxUnits} ${extraOpp.tradeSymbol} -> '
+          '${extraOpp.marketSymbol} @ ${creditsString(extraOpp.price)}');
+    }
+  }
 
   final marketScan = scanNearbyMarkets(
     systemsCache,
@@ -91,9 +62,8 @@ Future<void> cliMain(List<String> args) async {
     maxJumps: maxJumps,
     maxWaypoints: maxWaypoints,
   );
-  logger
-      .info('Found opps for ${marketScan.tradeSymbols.length} trade symbols.');
-  final maybeDeal = findDealFor(
+  logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
+  final deals = findDealsFor(
     marketPrices,
     systemsCache,
     routePlanner,
@@ -106,13 +76,46 @@ Future<void> cliMain(List<String> args) async {
     extraSellOpps: extraSellOpps,
   );
 
-  if (maybeDeal == null) {
+  if (deals.isEmpty) {
     logger.info('No deal found.');
     return;
   }
-  logger.info(describeCostedDeal(maybeDeal));
+  logger.info('Top $limit deals:');
+  for (final deal in deals.take(limit)) {
+    logger.info(describeCostedDeal(deal));
+  }
 }
 
 void main(List<String> args) async {
-  await runScoped(() => cliMain(args), values: {loggerRef});
+  await runOffline(
+    args,
+    cliMain,
+    addArgs: (ArgParser parser) {
+      parser
+        ..addOption(
+          'jumps',
+          abbr: 'j',
+          help: 'Maximum number of jumps to walk out',
+          defaultsTo: '10',
+        )
+        ..addOption(
+          'start',
+          abbr: 's',
+          help: 'Starting system (defaults to agent headquarters)',
+        )
+        ..addOption(
+          'limit',
+          abbr: 'l',
+          help: 'Maximum number of deals to show',
+          defaultsTo: '10',
+        )
+        ..addOption(
+          'ship',
+          abbr: 't',
+          help: 'Ship type (defaults to ${ShipType.LIGHT_HAULER})',
+          allowed: ShipType.values.map((e) => e.toString()).toList(),
+          defaultsTo: ShipType.LIGHT_HAULER.toString(),
+        );
+    },
+  );
 }

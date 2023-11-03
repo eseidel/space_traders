@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
@@ -494,6 +495,34 @@ extension ShipUtils on Ship {
       return null;
     }
     return duration;
+  }
+
+  /// Returns a copy of this ship with the same properties.
+  Ship deepCopy() {
+    // Ship.toJson doesn't recurse (openapi gen bug), so use jsonEncode.
+    return Ship.fromJson(jsonDecode(jsonEncode(toJson())))!;
+  }
+}
+
+/// Extensions onto ShipyardShip to make it easier to work with.
+extension ShipyardShipUtils on ShipyardShip {
+  /// Compute the cargo capacity of the ship.
+  int get cargoCapacity {
+    return modules
+        .where((m) => kCargoModules.contains(m.symbol))
+        .map((m) => m.capacity!)
+        .sum;
+  }
+
+  /// Compute the current crew of the ship.
+  int get currentCrew {
+    var current = 0;
+    current += frame.requirements.crew ?? 0;
+    current += reactor.requirements.crew ?? 0;
+    current += engine.requirements.crew ?? 0;
+    current += mounts.map((m) => m.requirements.crew ?? 0).sum;
+    current += modules.map((m) => m.requirements.crew ?? 0).sum;
+    return current;
   }
 }
 
