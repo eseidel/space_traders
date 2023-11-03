@@ -250,6 +250,20 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     return _prices.any((element) => element.symbol == tradeSymbol);
   }
 
+  /// Returns the age of the cache for a given market.
+  Duration? cacheAgeFor(
+    WaypointSymbol waypointSymbol, {
+    DateTime Function() getNow = defaultGetNow,
+  }) {
+    final prices = pricesAtMarket(waypointSymbol);
+    if (prices.isEmpty) {
+      return null;
+    }
+    final sortedPrices = prices.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return getNow().difference(sortedPrices.last.timestamp);
+  }
+
   MarketPrice? _priceAtPercentile(
     TradeSymbol symbol,
     int percentile,

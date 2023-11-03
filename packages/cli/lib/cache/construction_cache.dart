@@ -114,4 +114,16 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
       values.firstWhereOrNull(
         (record) => record.waypointSymbol == waypointSymbol,
       );
+
+  /// Returns the age of the cache for a given waypoint.
+  Duration? cacheAgeFor(
+    WaypointSymbol waypointSymbol, {
+    DateTime Function() getNow = defaultGetNow,
+  }) {
+    final record = recordForSymbol(waypointSymbol);
+    if (record == null) {
+      return null;
+    }
+    return getNow().difference(record.timestamp);
+  }
 }

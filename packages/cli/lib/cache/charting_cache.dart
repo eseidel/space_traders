@@ -54,6 +54,14 @@ class ChartedValues {
       'chart': chart.toJson(),
     };
   }
+
+  /// Whether this waypoint has a shipyard.
+  bool get hasShipyard =>
+      traitSymbols.contains(WaypointTraitSymbolEnum.SHIPYARD);
+
+  /// Whether this waypoint has a market.
+  bool get hasMarket =>
+      traitSymbols.contains(WaypointTraitSymbolEnum.MARKETPLACE);
 }
 
 typedef _Record = Map<WaypointSymbol, ChartedValues>;

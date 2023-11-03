@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/market_prices.dart'; // just for maxAge.
 import 'package:cli/logger.dart';
@@ -130,6 +131,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   bool hasRecentShipyardData(
     WaypointSymbol marketSymbol, {
     Duration maxAge = defaultMaxAge,
+    DateTime Function() getNow = defaultGetNow,
   }) {
     final pricesForMarket =
         _prices.where((e) => e.waypointSymbol == marketSymbol);
@@ -139,9 +141,21 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     final pricesForMarketSorted = pricesForMarket.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    return DateTime.timestamp()
-            .difference(pricesForMarketSorted.last.timestamp) <
-        maxAge;
+    return getNow().difference(pricesForMarketSorted.last.timestamp) < maxAge;
+  }
+
+  /// Returns the age of the cache for a given shipyard.
+  Duration? cacheAgeFor(
+    WaypointSymbol waypointSymbol, {
+    DateTime Function() getNow = defaultGetNow,
+  }) {
+    final prices = pricesAtShipyard(waypointSymbol);
+    if (prices.isEmpty) {
+      return null;
+    }
+    final sortedPrices = prices.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return DateTime.now().difference(sortedPrices.last.timestamp);
   }
 
   /// The most recent price can be purchased from the shipyard.

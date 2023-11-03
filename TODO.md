@@ -627,13 +627,10 @@ They don't know how to avoid each other within the same system.
 
 ### Teach Trader about Construction as another type of SellOpp
 
+Probably need to refactor Trader to be a MultiJob first.
+
 ### Divide Miners and Surveyors into squads and assign one squad per mine.
 
 Once this is working can buy more of each.
 
 ### Add some sort of dynamic evaluation of the quality of a mine (every hour?)
-
-### Write a script to show waypoint cache ages
-
-The explorers seem to think they're covering all waypoints in under an hour
-which doesn't seem right.
