@@ -1,5 +1,10 @@
 [
  {
+  "symbol": "ADVANCED_CIRCUITRY",
+  "name": "Advanced Circuitry",
+  "description": "Highly advanced and complex electronic components used in advanced technologies and systems."
+ },
+ {
   "symbol": "ALUMINUM",
   "name": "Aluminum",
   "description": "Aluminum is an essential component in the construction of ship hulls and other structural components."
@@ -28,6 +33,11 @@
   "symbol": "ASSAULT_RIFLES",
   "name": "Assault Rifles",
   "description": "High-powered rifles designed for rapid-fire combat and used by military forces and other trained personnel."
+ },
+ {
+  "symbol": "BIOCOMPOSITES",
+  "name": "Biocomposites",
+  "description": "Composite materials made from natural and synthetic materials, used in various applications, such as medical implants and biodegradable packaging."
  },
  {
   "symbol": "CLOTHING",
@@ -138,6 +148,11 @@
   "symbol": "JEWELRY",
   "name": "Jewelry",
   "description": "Exquisite and valuable pieces of jewelry made from rare materials and precious gems."
+ },
+ {
+  "symbol": "LAB_INSTRUMENTS",
+  "name": "Lab Instruments",
+  "description": "A wide range of scientific instruments and equipment used in research and development."
  },
  {
   "symbol": "LASER_RIFLES",
