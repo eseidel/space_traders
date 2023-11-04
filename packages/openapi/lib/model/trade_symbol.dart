@@ -23,6 +23,7 @@ class TradeSymbol {
 
   String toJson() => value;
 
+  static const FAB_MATS = TradeSymbol._(r'FAB_MATS');
   static const PRECIOUS_STONES = TradeSymbol._(r'PRECIOUS_STONES');
   static const QUARTZ_SAND = TradeSymbol._(r'QUARTZ_SAND');
   static const SILICON_CRYSTALS = TradeSymbol._(r'SILICON_CRYSTALS');
@@ -155,6 +156,7 @@ class TradeSymbol {
 
   /// List of all possible values in this [enum][TradeSymbol].
   static const values = <TradeSymbol>[
+    FAB_MATS,
     PRECIOUS_STONES,
     QUARTZ_SAND,
     SILICON_CRYSTALS,
@@ -313,6 +315,8 @@ class TradeSymbolTypeTransformer {
   TradeSymbol? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
+        case r'FAB_MATS':
+          return TradeSymbol.FAB_MATS;
         case r'PRECIOUS_STONES':
           return TradeSymbol.PRECIOUS_STONES;
         case r'QUARTZ_SAND':
