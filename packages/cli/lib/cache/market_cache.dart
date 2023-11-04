@@ -74,27 +74,6 @@ class MarketListingCache extends JsonStore<_Record> {
     _listingBySymbol[symbol] = marketListing;
     save();
   }
-
-  /// Fill the cache from the given prices.
-  void fillFromPrices(MarketPrices marketPrices) {
-    final waypointSymbols =
-        marketPrices.prices.map((p) => p.waypointSymbol).toSet();
-
-    for (final waypointSymbol in waypointSymbols) {
-      if (_listingBySymbol.containsKey(waypointSymbol)) {
-        continue;
-      }
-
-      final prices = marketPrices.pricesAtMarket(waypointSymbol);
-      final tradeSymbols = prices.map((p) => p.tradeSymbol).toSet();
-      final listing = MarketListing(
-        symbol: waypointSymbol,
-        exchange: tradeSymbols.toList(),
-      );
-      _listingBySymbol[waypointSymbol] = listing;
-    }
-    save();
-  }
 }
 
 /// Stores Market objects fetched recently from the API.
