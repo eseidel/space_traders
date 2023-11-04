@@ -63,6 +63,7 @@ class RouteAction {
     required this.endSymbol,
     required this.type,
     required this.seconds,
+    required this.fuelUsed,
     // required this.cooldown,
   });
 
@@ -74,7 +75,9 @@ class RouteAction {
       type: RouteActionType.values.firstWhere(
         (e) => e.name == json['type'] as String,
       ),
+      // Nullability can be removed later.
       seconds: json['seconds'] as int? ?? json['duration'] as int,
+      fuelUsed: json['fuelUsed'] as int? ?? 0,
       // cooldown: json['cooldown'] as int,
     );
   }
@@ -92,6 +95,9 @@ class RouteAction {
   final int seconds;
   // final int cooldown;
 
+  /// The amount of fuel used during this action.
+  final int fuelUsed;
+
   /// The duration of this action.
   Duration get duration => Duration(seconds: seconds);
 
@@ -107,6 +113,7 @@ class RouteAction {
         'endSymbol': endSymbol.toJson(),
         'type': type.name,
         'seconds': seconds,
+        'fuelUsed': fuelUsed,
         // 'cooldown': cooldown,
       };
 
@@ -138,6 +145,7 @@ class RoutePlan {
             endSymbol: symbol,
             type: RouteActionType.jump,
             seconds: 0,
+            fuelUsed: 0,
           ),
         ],
         fuelUsed = 0;

@@ -1,3 +1,4 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/exploring.dart';
@@ -278,16 +279,55 @@ Future<NavResult> continueNavigationIfNeeded(
         ship,
       );
       return NavResult._continueAction();
-    case RouteActionType.navDrift:
     case RouteActionType.navCruise:
-      // We're in the same system as the end, so we can just navigate there.
-      final arrivalTime = await navigateToLocalWaypointAndLog(
-        api,
-        caches.systems,
-        caches.ships,
-        ship,
-        actionEnd,
+      final fuelNeeded = action.fuelUsed;
+      jobAssert(
+        fuelNeeded < ship.fuel.capacity,
+        'Planned navigation requires more fuel than ship can hold '
+        '(${ship.fuel.capacity} < $fuelNeeded)',
+        const Duration(minutes: 10),
       );
-      return NavResult._wait(arrivalTime);
+      if (fuelNeeded > ship.fuel.current) {
+        final market = assertNotNull(
+          await visitLocalMarket(
+            api,
+            db,
+            caches,
+            await caches.waypoints.waypoint(ship.waypointSymbol),
+            ship,
+          ),
+          'Planned navigation requires more fuel and ship has but '
+          'no market at ${ship.waypointSymbol}, cannot refuel',
+          const Duration(minutes: 10),
+        );
+        await refuelIfNeededAndLog(
+          api,
+          db,
+          caches.marketPrices,
+          caches.agent,
+          caches.ships,
+          market,
+          ship,
+        );
+      }
+      return NavResult._wait(
+        await navigateToLocalWaypointAndLog(
+          api,
+          caches.systems,
+          caches.ships,
+          ship,
+          actionEnd,
+        ),
+      );
+    case RouteActionType.navDrift:
+      return NavResult._wait(
+        await navigateToLocalWaypointAndLog(
+          api,
+          caches.systems,
+          caches.ships,
+          ship,
+          actionEnd,
+        ),
+      );
   }
 }

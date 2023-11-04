@@ -418,11 +418,6 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   Ship ship,
   SystemWaypoint waypoint,
 ) async {
-  // Should this dock and refuel and reset the flight mode if needed?
-  // if (ship.shouldRefuel) {
-  //   await refuelIfNeededAndLog(api, marketPrices, agent, ship);
-  // }
-
   final result = await navigateToLocalWaypoint(
     api,
     systemsCache,

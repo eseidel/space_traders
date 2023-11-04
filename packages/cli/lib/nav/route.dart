@@ -235,11 +235,13 @@ RouteAction _navigationAction(
     end,
     shipSpeed: shipSpeed,
   );
+  final fuelUsed = fuelUsedWithinSystem(start, end);
   return RouteAction(
     startSymbol: start.waypointSymbol,
     endSymbol: end.waypointSymbol,
     type: RouteActionType.navCruise,
     seconds: seconds,
+    fuelUsed: fuelUsed,
   );
 }
 
@@ -262,6 +264,7 @@ RouteAction _jumpAction(
     endSymbol: end.waypointSymbol,
     type: RouteActionType.jump,
     seconds: seconds,
+    fuelUsed: 0,
   );
 }
 

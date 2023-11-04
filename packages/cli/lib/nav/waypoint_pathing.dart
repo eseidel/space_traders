@@ -45,7 +45,10 @@ List<RouteAction>? findRouteWithinSystem(
     );
   }
 
-  if (startWaypoint.distanceTo(endWaypoint) <= fuelCapacity) {
+  final startToEndDistance = startWaypoint.distanceTo(endWaypoint);
+  final fuelUsedByDirectCruise =
+      fuelUsedByDistance(startToEndDistance, ShipNavFlightMode.CRUISE);
+  if (fuelUsedByDirectCruise <= fuelCapacity) {
     return [
       RouteAction(
         startSymbol: start,
@@ -56,6 +59,7 @@ List<RouteAction>? findRouteWithinSystem(
           endWaypoint,
           shipSpeed: shipSpeed,
         ),
+        fuelUsed: fuelUsedByDirectCruise,
       ),
     ];
   }
@@ -123,6 +127,10 @@ List<RouteAction>? findRouteWithinSystem(
           endSymbol: nextWaypoint.waypointSymbol,
           type: type,
           seconds: duration,
+          fuelUsed: fuelUsedByDistance(
+            currentWaypoint.distanceTo(nextWaypoint),
+            flightMode,
+          ),
         );
         cameFrom[next] = action;
       }

@@ -139,6 +139,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             seconds: 10,
+            fuelUsed: 10,
           ),
         ],
         fuelCapacity: 10,
@@ -239,7 +240,6 @@ void main() {
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
     final caches = mockCaches();
 
-    final shipFuel = _MockShipFuel();
     // This ship uses fuel.
     const fuelCapacity = 1000;
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 1000));
@@ -340,6 +340,7 @@ void main() {
           endSymbol: end,
           type: RouteActionType.navCruise,
           seconds: 10,
+          fuelUsed: 10,
         ),
       ],
       fuelCapacity: fuelCapacity,
@@ -633,6 +634,7 @@ void main() {
           endSymbol: end,
           type: RouteActionType.navCruise,
           seconds: 10,
+          fuelUsed: 10,
         ),
       ],
       fuelCapacity: 10,
@@ -731,6 +733,7 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             seconds: 10,
+            fuelUsed: 10,
           ),
         ],
         fuelCapacity: 10,
