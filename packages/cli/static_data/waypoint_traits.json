@@ -155,6 +155,11 @@
   "description": "Abundant mineral resources, attracting mining operations and providing valuable materials such as silicon crystals and quartz sand for various industries."
  },
  {
+  "symbol": "MUTATED_FLORA",
+  "name": "Mutated Flora",
+  "description": "A waypoint teeming with plant life that has undergone dramatic genetic changes, creating a unique and diverse ecosystem with potential for scientific research and discovery."
+ },
+ {
   "symbol": "OCEAN",
   "name": "Ocean",
   "description": "A world dominated by vast, interconnected bodies of water, presenting unique challenges for habitation and resource extraction while supporting a diverse array of marine life."
