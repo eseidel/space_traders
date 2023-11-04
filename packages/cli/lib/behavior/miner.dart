@@ -149,20 +149,27 @@ int expectedValueFromSurvey(
   return totalValue ~/ survey.deposits.length;
 }
 
-class _ValuedSurvey {
-  _ValuedSurvey({
+/// A survey with an expected value against a given market.
+class ValuedSurvey {
+  /// Creates a new valued survey.
+  ValuedSurvey({
     required this.expectedValue,
     required this.survey,
     required this.isActive,
   });
 
+  /// The expected value of the survey.
   final int expectedValue;
+
+  /// The survey.
   final Survey survey;
+
+  /// True if the survey is still active (not expired or exhausted).
   final bool isActive;
 }
 
 /// Finds a recent survey
-Future<Survey?> surveyWorthMining(
+Future<List<ValuedSurvey>> surveysWorthMining(
   Database db,
   MarketPrices marketPrices, {
   required WaypointSymbol surveyWaypointSymbol,
@@ -176,9 +183,9 @@ Future<Survey?> surveyWorthMining(
     surveyWaypointSymbol,
     count: 100,
   );
-  // If we don't have enough surveys to compare, return null.
+  // If we don't have enough surveys to compare, return empty.
   if (recentSurveys.length < minimumSurveys) {
-    return null;
+    return [];
   }
   // Compute the expected values of the surveys using the local market.
   // Note: this will fail if the passed market doesn't sell everything.
@@ -187,7 +194,7 @@ Future<Survey?> surveyWorthMining(
   final oneMinuteFromNow = getNow().add(const Duration(minutes: 1));
   final valuedSurveys = recentSurveys
       .map((s) {
-        return _ValuedSurvey(
+        return ValuedSurvey(
           expectedValue: expectedValueFromSurvey(
             marketPrices,
             s.survey,
@@ -203,19 +210,9 @@ Future<Survey?> surveyWorthMining(
   // Find the index at the desired percentile threshold.
   final percentileIndex = (valuedSurveys.length * percentileThreshold).floor();
   // If we have active survey which is above the threshold, return it.
-  final best =
-      valuedSurveys.sublist(percentileIndex).lastWhereOrNull((s) => s.isActive);
+  final best = valuedSurveys.sublist(percentileIndex);
 
-  // if (best != null) {
-  //   final survey = best.survey;
-  //   logger.info(
-  //     'Selected '
-  //     '${survey.signature} ${survey.size} '
-  //     '${survey.deposits.map((d) => d.symbol).join(', ')} '
-  //     '${creditsString(best.expectedValue)}',
-  //   );
-  // }
-  return best?.survey;
+  return best.where((s) => s.isActive).toList().reversed.toList();
 }
 
 /// Prints a survey to the log.
@@ -434,7 +431,7 @@ Future<JobResult> doMineJob(
   }
 
   // See if we have a good survey to mine.
-  final maybeSurvey = await surveyWorthMining(
+  final worthMining = await surveysWorthMining(
     db,
     caches.marketPrices,
     surveyWaypointSymbol: currentWaypoint.waypointSymbol,
@@ -442,6 +439,7 @@ Future<JobResult> doMineJob(
     minimumSurveys: centralCommand.minimumSurveys,
     percentileThreshold: centralCommand.surveyPercentileThreshold,
   );
+  final maybeSurvey = worthMining.firstOrNull?.survey;
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
     final response =

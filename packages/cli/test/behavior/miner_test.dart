@@ -35,13 +35,13 @@ void main() {
     final symbol = WaypointSymbol.fromString('S-E-A');
     when(() => db.recentSurveysAtWaypoint(symbol, count: 100))
         .thenAnswer((_) => Future.value([]));
-    final maybeSurvey = await surveyWorthMining(
+    final surveys = await surveysWorthMining(
       db,
       marketPrices,
       surveyWaypointSymbol: symbol,
       nearbyMarketSymbol: symbol,
     );
-    expect(maybeSurvey, isNull);
+    expect(surveys, isEmpty);
   });
 
   test('surveyWorthMining', () async {
@@ -83,14 +83,14 @@ void main() {
         marketSymbol: waypointSymbol,
       ),
     ).thenReturn(10);
-    final maybeSurvey = await surveyWorthMining(
+    final worthMining = await surveysWorthMining(
       db,
       marketPrices,
       surveyWaypointSymbol: waypointSymbol,
       nearbyMarketSymbol: waypointSymbol,
       getNow: getNow,
     );
-    expect(maybeSurvey!.deposits.first.symbol, 'DIAMONDS');
+    expect(worthMining.first.survey.deposits.first.symbol, 'DIAMONDS');
   });
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
