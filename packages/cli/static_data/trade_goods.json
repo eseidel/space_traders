@@ -15,9 +15,19 @@
   "description": "A valuable substance used in the production of fertilizers and other chemical products."
  },
  {
+  "symbol": "AMMUNITION",
+  "name": "Ammunition",
+  "description": "A wide range of ammunition for various firearms, including bullets, shells, and other projectiles."
+ },
+ {
   "symbol": "ANTIMATTER",
   "name": "Antimatter",
   "description": "A highly valuable and dangerous substance used for advanced propulsion and weapons systems."
+ },
+ {
+  "symbol": "ASSAULT_RIFLES",
+  "name": "Assault Rifles",
+  "description": "High-powered rifles designed for rapid-fire combat and used by military forces and other trained personnel."
  },
  {
   "symbol": "CLOTHING",
@@ -40,6 +50,11 @@
   "description": "Rare and valuable crystals used in the production of high-end jewelry and other luxury goods."
  },
  {
+  "symbol": "DRUGS",
+  "name": "Pharmaceuticals",
+  "description": "A wide range of drugs and other medical treatments used to treat various conditions and illnesses."
+ },
+ {
   "symbol": "ELECTRONICS",
   "name": "Electronic Components",
   "description": "Advanced electronic components used in the construction of advanced technologies."
@@ -50,9 +65,29 @@
   "description": "Tools and equipment used in various industries and applications."
  },
  {
+  "symbol": "EXPLOSIVES",
+  "name": "Explosives",
+  "description": "High-powered explosives used for mining, construction, and military operations."
+ },
+ {
+  "symbol": "FABRICS",
+  "name": "Synthetic Fabrics",
+  "description": "High-tech fabrics used in the production of clothing and other products for everyday use."
+ },
+ {
+  "symbol": "FAB_MATS",
+  "name": "Fabrication Materials",
+  "description": "Industrial materials essential in the construction of planetary habitats, space stations, and interstellar infrastructure."
+ },
+ {
   "symbol": "FERTILIZERS",
   "name": "Fertilizers",
   "description": "Specialized chemicals used to enrich the soil and promote plant growth on newly-colonized planets."
+ },
+ {
+  "symbol": "FIREARMS",
+  "name": "Galactic Arms",
+  "description": "A wide range of weapons, including pistols, rifles, and shotguns, used for self-defense and military purposes."
  },
  {
   "symbol": "FOOD",
@@ -63,6 +98,11 @@
   "symbol": "FUEL",
   "name": "Fuel",
   "description": "High-energy fuel used in spacecraft propulsion systems to enable long-distance space travel."
+ },
+ {
+  "symbol": "GENE_THERAPEUTICS",
+  "name": "Gene Therapeutics",
+  "description": "Medical treatments that use genetic engineering to treat or prevent diseases, or to enhance the human body."
  },
  {
   "symbol": "GOLD",
@@ -103,6 +143,11 @@
   "symbol": "LASER_RIFLES",
   "name": "Laser Rifles",
   "description": "Advanced weapons that use focused beams of light to deliver highly destructive energy to a target."
+ },
+ {
+  "symbol": "LIQUID_HYDROGEN",
+  "name": "Liquid Hydrogen",
+  "description": "A highly efficient and lightweight fuel used in advanced propulsion systems."
  },
  {
   "symbol": "LIQUID_NITROGEN",
@@ -155,6 +200,11 @@
   "description": "A basic survey probe that can be used to gather information about a mineral deposit."
  },
  {
+  "symbol": "NOVEL_LIFEFORMS",
+  "name": "Novel Lifeforms",
+  "description": "New and unique species of plants or animals discovered on distant worlds, often of interest to scientists and collectors."
+ },
+ {
   "symbol": "PLASTICS",
   "name": "Plastics",
   "description": "A wide range of plastic materials used in various applications, including packaging, construction, and manufacturing."
@@ -168,6 +218,11 @@
   "symbol": "PLATINUM_ORE",
   "name": "Platinum Ore",
   "description": "A valuable ore used in the production of platinum and other precious metals. Platinum ore is often used in the production of catalysts and other industrial applications."
+ },
+ {
+  "symbol": "POLYNUCLEOTIDES",
+  "name": "Polynucleotides",
+  "description": "A complex and highly valuable substance used in advanced medical treatments and biotechnology."
  },
  {
   "symbol": "PRECIOUS_STONES",
@@ -213,5 +268,10 @@
   "symbol": "URANITE_ORE",
   "name": "Uranite Ore",
   "description": "A raw, unprocessed form of uranite, often found in asteroid belts and other remote locations."
+ },
+ {
+  "symbol": "VIRAL_AGENTS",
+  "name": "Viral Agents",
+  "description": "Viruses or other biological agents that are used for various purposes, such as medical treatments, weapons, or environmental remediation."
  }
 ]
