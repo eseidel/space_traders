@@ -26,13 +26,10 @@ int _timeBetween(
   );
 }
 
-/// Returns the path from [start] to [end] as a list of waypoint symbols.
+/// Returns the path from [start] to [end] as a list of RouteActions.
 /// Only works if [start] and [end] are in the same system.
-/// This relies on MarketListingCache to determine if a waypoint sells fuel.
-/// If a waypoint is not cached, it's assumed *not* to sell fuel and will
-/// be ignored for pathing, thus the path may change depending on which
-/// markets are cached.
-List<RouteAction>? findWaypointPathWithinSystem(
+/// This relies on sellFuel callback to determine if a waypoint sells fuel.
+List<RouteAction>? findRouteWithinSystem(
   SystemsCache systemsCache, {
   required WaypointSymbol start,
   required WaypointSymbol end,

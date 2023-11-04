@@ -404,7 +404,7 @@ class RoutePlanner {
     }
 
     final startTime = DateTime.timestamp();
-    final actions = findWaypointPathWithinSystem(
+    final actions = findRouteWithinSystem(
       _systemsCache,
       start: start,
       end: end,
