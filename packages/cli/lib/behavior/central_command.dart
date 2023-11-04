@@ -167,13 +167,13 @@ class CentralCommand {
         // Might want to consider limiting to short trades (< 5 mins) to avoid
         // tying up capital early.
         Behavior.trader,
-        // Mostly to test the logic out.
-        Behavior.siphoner,
         // Early on the command ship makes about 5c/s vs. ore hounds making
         // 6c/s. It's a better surveyor than miner. Especially when enabling
         // mining drones.
         // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
+        // Mining is more profitable than siphoning I think?
         Behavior.miner,
+        Behavior.siphoner,
       ],
       FleetRole.trader: [
         Behavior.trader,
