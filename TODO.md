@@ -634,3 +634,5 @@ Probably need to refactor Trader to be a MultiJob first.
 Once this is working can buy more of each.
 
 ### Add some sort of dynamic evaluation of the quality of a mine (every hour?)
+
+### Route planner is not actually inserting Refuel actions.

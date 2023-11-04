@@ -87,16 +87,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   }
 }
 
-ShipType shipTypeFromArg(String arg) {
-  final upper = arg.toUpperCase();
-  final name = upper.startsWith('SHIP_') ? upper : 'SHIP_$upper';
-  return ShipType.values.firstWhere((e) => e.value == name);
-}
-
-String argFromShipType(ShipType shipType) {
-  return shipType.value.substring('SHIP_'.length);
-}
-
 void main(List<String> args) async {
   await runOffline(
     args,

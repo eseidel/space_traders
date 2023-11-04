@@ -26,33 +26,23 @@ import 'package:cli/cli.dart';
 // Total duration 10242s
 
 void main(List<String> args) async {
-  await runOffline(args, command);
-}
-
-void planRouteAndLog(
-  RoutePlanner planner,
-  WaypointSymbol start,
-  WaypointSymbol end,
-) {
-  final routeStart = DateTime.now();
-  final plan = planner.planRoute(
-    start: start,
-    end: end,
-    fuelCapacity: 1200,
-    shipSpeed: 30,
+  await runOffline(
+    args,
+    command,
+    addArgs: (ArgParser parser) {
+      parser.addOption(
+        'ship',
+        abbr: 't',
+        help: 'Ship type used for calculations',
+        allowed: ShipType.values.map(argFromShipType),
+        defaultsTo: argFromShipType(ShipType.COMMAND_FRIGATE),
+      );
+    },
   );
-  final routeEnd = DateTime.now();
-  final duration = routeEnd.difference(routeStart);
-  if (plan == null) {
-    logger.err('No route found (${duration.inMilliseconds}ms)');
-  } else {
-    logger
-      ..info('Route found (${duration.inMilliseconds}ms)')
-      ..info(describeRoutePlan(plan));
-  }
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final shipType = shipTypeFromArg(argResults['ship'] as String);
   final args = argResults.rest;
   if (args.length != 2) {
     logger.err('Usage: plan_route START END');
@@ -66,7 +56,27 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final routePlanner =
       RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
 
+  final staticCaches = StaticCaches.load(fs);
+  final ship = staticCaches.shipyardShips[shipType]!;
+  final shipSpeed = ship.engine.speed;
+  final fuelCapacity = ship.frame.fuelCapacity;
+
   final start = WaypointSymbol.fromString(startSymbol);
   final end = WaypointSymbol.fromString(endSymbol);
-  planRouteAndLog(routePlanner, start, end);
+  final routeStart = DateTime.now();
+  final plan = routePlanner.planRoute(
+    start: start,
+    end: end,
+    fuelCapacity: fuelCapacity,
+    shipSpeed: shipSpeed,
+  );
+  final routeEnd = DateTime.now();
+  final duration = routeEnd.difference(routeStart);
+  if (plan == null) {
+    logger.err('No route found (${duration.inMilliseconds}ms)');
+  } else {
+    logger
+      ..info('Route found (${duration.inMilliseconds}ms)')
+      ..info(describeRoutePlan(plan));
+  }
 }
