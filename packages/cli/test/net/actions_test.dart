@@ -357,7 +357,7 @@ void main() {
 
     when(() => market.tradeGoods).thenReturn([
       MarketTradeGood(
-        symbol: tradeSymbol.value,
+        symbol: tradeSymbol,
         tradeVolume: 100,
         supply: SupplyLevel.ABUNDANT,
         type: MarketTradeGoodTypeEnum.EXCHANGE,
@@ -607,7 +607,7 @@ void main() {
     final market = _MockMarket();
     when(() => market.tradeGoods).thenReturn([
       MarketTradeGood(
-        symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+        symbol: TradeSymbol.ADVANCED_CIRCUITRY,
         tradeVolume: 100,
         supply: SupplyLevel.ABUNDANT,
         type: MarketTradeGoodTypeEnum.EXCHANGE,
@@ -615,7 +615,7 @@ void main() {
         sellPrice: 11,
       ),
       MarketTradeGood(
-        symbol: TradeSymbol.FABRICS.value,
+        symbol: TradeSymbol.FABRICS,
         tradeVolume: 100,
         supply: SupplyLevel.ABUNDANT,
         type: MarketTradeGoodTypeEnum.EXCHANGE,
@@ -680,13 +680,13 @@ void main() {
       units: 10,
       inventory: [
         ShipCargoItem(
-          symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
           units: 5,
           description: '',
           name: '',
         ),
         ShipCargoItem(
-          symbol: TradeSymbol.FABRICS.value,
+          symbol: TradeSymbol.FABRICS,
           units: 5,
           description: '',
           name: '',
@@ -722,13 +722,13 @@ void main() {
     final logger = _MockLogger();
 
     final itemOne = ShipCargoItem(
-      symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+      symbol: TradeSymbol.ADVANCED_CIRCUITRY,
       units: 5,
       description: '',
       name: '',
     );
     final itemTwo = ShipCargoItem(
-      symbol: TradeSymbol.FABRICS.value,
+      symbol: TradeSymbol.FABRICS,
       units: 5,
       description: '',
       name: '',

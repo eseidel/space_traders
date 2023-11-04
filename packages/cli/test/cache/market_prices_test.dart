@@ -103,7 +103,7 @@ void main() {
 
   test('fromMarketTradeGood', () {
     final good = MarketTradeGood(
-      symbol: 'FUEL',
+      symbol: TradeSymbol.FUEL,
       tradeVolume: 1,
       supply: SupplyLevel.ABUNDANT,
       purchasePrice: 1,
@@ -233,7 +233,7 @@ void main() {
       symbol: marketSymbol.waypoint,
       tradeGoods: [
         MarketTradeGood(
-          symbol: 'FUEL',
+          symbol: TradeSymbol.FUEL,
           tradeVolume: 1,
           supply: SupplyLevel.ABUNDANT,
           type: MarketTradeGoodTypeEnum.EXCHANGE,
@@ -255,7 +255,7 @@ void main() {
       symbol: marketSymbol.waypoint,
       tradeGoods: [
         MarketTradeGood(
-          symbol: 'FUEL',
+          symbol: TradeSymbol.FUEL,
           tradeVolume: 1,
           supply: SupplyLevel.ABUNDANT,
           type: MarketTradeGoodTypeEnum.EXCHANGE,

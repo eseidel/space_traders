@@ -15,19 +15,19 @@ void main() {
         units: 6,
         inventory: [
           ShipCargoItem(
-            symbol: TradeSymbol.IRON_ORE.value,
+            symbol: TradeSymbol.IRON_ORE,
             name: '',
             description: '',
             units: 1,
           ),
           ShipCargoItem(
-            symbol: TradeSymbol.MOUNT_GAS_SIPHON_I.value,
+            symbol: TradeSymbol.MOUNT_GAS_SIPHON_I,
             name: '',
             description: '',
             units: 2,
           ),
           ShipCargoItem(
-            symbol: TradeSymbol.MOUNT_LASER_CANNON_I.value,
+            symbol: TradeSymbol.MOUNT_LASER_CANNON_I,
             name: '',
             description: '',
             units: 3,

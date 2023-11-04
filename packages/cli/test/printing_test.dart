@@ -167,8 +167,18 @@ void main() {
       capacity: 10,
       units: 10,
       inventory: [
-        ShipCargoItem(symbol: 'A', name: 'name', description: '', units: 1),
-        ShipCargoItem(symbol: 'B', name: 'name2', description: '', units: 2),
+        ShipCargoItem(
+          symbol: TradeSymbol.FUEL,
+          name: 'name',
+          description: '',
+          units: 1,
+        ),
+        ShipCargoItem(
+          symbol: TradeSymbol.FABRICS,
+          name: 'name2',
+          description: '',
+          units: 2,
+        ),
       ],
     );
     expect(cargoDescription(cargo), '1 name, 2 name2');

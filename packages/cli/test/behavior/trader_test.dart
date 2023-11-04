@@ -84,7 +84,7 @@ void main() {
           symbol: end.waypoint,
           tradeGoods: [
             MarketTradeGood(
-              symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+              symbol: TradeSymbol.ADVANCED_CIRCUITRY,
               tradeVolume: 100,
               supply: SupplyLevel.ABUNDANT,
               type: MarketTradeGoodTypeEnum.EXCHANGE,
@@ -350,7 +350,7 @@ void main() {
       symbol: start.waypoint,
       tradeGoods: [
         MarketTradeGood(
-          symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
           tradeVolume: 10,
           supply: SupplyLevel.ABUNDANT,
           type: MarketTradeGoodTypeEnum.EXCHANGE,
@@ -359,7 +359,7 @@ void main() {
         ),
         // Sells fuel so we can refuel.
         MarketTradeGood(
-          symbol: TradeSymbol.FUEL.value,
+          symbol: TradeSymbol.FUEL,
           tradeVolume: 100,
           supply: SupplyLevel.ABUNDANT,
           type: MarketTradeGoodTypeEnum.EXCHANGE,
@@ -377,7 +377,7 @@ void main() {
     when(() => shipCargo.capacity).thenReturn(10);
     when(() => shipCargo.inventory).thenReturn([
       ShipCargoItem(
-        symbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
+        symbol: TradeSymbol.ADVANCED_CIRCUITRY,
         name: '',
         description: '',
         units: 10,

@@ -174,6 +174,7 @@ dart pub global activate openapi_generator_cli
 rm -rf packages/openapi/
 openapi-generator generate -c open_api_config.yaml
 rm -rf packages/openapi/test
+dart pub -C packages/openapi get
 dart format packages/openapi
 git add packages/openapi
 ```

@@ -85,7 +85,7 @@ void main() {
     when(() => ship.engine).thenReturn(shipEngine);
     const toMount = TradeSymbol.MOUNT_SURVEYOR_II;
     final cargoItem = ShipCargoItem(
-      symbol: toMount.value,
+      symbol: toMount,
       name: '',
       description: '',
       units: 1,
@@ -99,7 +99,7 @@ void main() {
 
     final tradeGood = MarketTradeGood(
       type: MarketTradeGoodTypeEnum.EXCHANGE,
-      symbol: toMount.value,
+      symbol: toMount,
       tradeVolume: 100,
       supply: SupplyLevel.ABUNDANT,
       purchasePrice: 100,

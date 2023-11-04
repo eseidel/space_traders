@@ -328,7 +328,7 @@ extension CargoUtils on ShipCargo {
   /// Returns the ShipCargoItem for the given trade good or null if the cargo
   /// doesn't have that good.
   ShipCargoItem? cargoItem(TradeSymbol tradeSymbol) {
-    return inventory.firstWhereOrNull((i) => i.symbol == tradeSymbol.value);
+    return inventory.firstWhereOrNull((i) => i.symbol == tradeSymbol);
   }
 }
 
@@ -371,7 +371,7 @@ extension ShipUtils on Ship {
       final inventory = cargo.inventory.toList()
         ..add(
           ShipCargoItem(
-            symbol: tradeSymbol.value,
+            symbol: tradeSymbol,
             name: tradeSymbol.value,
             description: tradeSymbol.value,
             units: 0,
@@ -587,7 +587,7 @@ extension SurveyDepositUtils on SurveyDeposit {
 /// Extensions onto ShipCargoItem to make it easier to work with.
 extension ShipCargoItemUtils on ShipCargoItem {
   /// Returns symbol as a TradeSymbol object.
-  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
+  TradeSymbol get tradeSymbol => symbol;
 }
 
 /// Enum representing the type of trades available for a good at a market.
@@ -620,13 +620,13 @@ extension MarketUtils on Market {
   /// Returns [MarketTradeGood] for the given trade symbol or null if the market
   /// doesn't trade that good.
   MarketTradeGood? marketTradeGood(TradeSymbol tradeSymbol) =>
-      tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol.value);
+      tradeGoods.firstWhereOrNull((g) => g.symbol == tradeSymbol);
 }
 
 /// Extensions onto MarketTradeGood to make it easier to work with.
 extension MarketTradeGoodUtils on MarketTradeGood {
   /// Returns symbol as a TradeSymbol object.
-  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
+  TradeSymbol get tradeSymbol => symbol;
 }
 
 /// Extensions onto Shipyard to make it easier to work with.
