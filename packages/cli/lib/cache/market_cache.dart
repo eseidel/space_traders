@@ -56,6 +56,9 @@ class MarketListingCache extends JsonStore<_Record> {
   /// The MarketListings by waypoint symbol.
   Map<WaypointSymbol, MarketListing> get _listingBySymbol => record;
 
+  /// The MarketListings.
+  Iterable<MarketListing> get listings => _listingBySymbol.values;
+
   /// Fetch the waypoint with the given symbol.
   MarketListing? marketListingForSymbol(WaypointSymbol marketSymbol) {
     return _listingBySymbol[marketSymbol];

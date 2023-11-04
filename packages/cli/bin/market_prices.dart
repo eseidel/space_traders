@@ -1,16 +1,23 @@
 import 'dart:math';
 
-import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
+  final tradeGoods = TradeGoodCache.load(fs);
+  final marketListings = MarketListingCache.load(fs, tradeGoods);
 
   logger.info(
     'Loaded ${marketPrices.count} prices from '
     '${marketPrices.waypointCount} waypoints.',
   );
+
+  final listedSymbols = <TradeSymbol>{};
+  for (final listing in marketListings.listings) {
+    listedSymbols.addAll(listing.tradeSymbols);
+  }
 
   final maxNameLength =
       TradeSymbol.values.fold(0, (m, t) => max(m, t.value.length));
@@ -19,8 +26,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     ..sort((a, b) => a.value.compareTo(b.value));
   for (final tradeSymbol in sortedSymbols) {
     final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol);
+    final hasListing = listedSymbols.contains(tradeSymbol);
+    final noPriceString = hasListing ? '?' : '';
     final priceString =
-        (medianPrice == null ? '' : creditsString(medianPrice)).padLeft(13);
+        (medianPrice == null ? noPriceString : creditsString(medianPrice))
+            .padLeft(13);
     final name = tradeSymbol.value;
     logger.info('${name.padRight(maxNameLength)} $priceString');
   }
