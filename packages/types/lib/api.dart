@@ -568,6 +568,16 @@ extension ContractDeliverGoodUtils on ContractDeliverGood {
   TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
 }
 
+/// Extensions onto Survey to make it easier to work with.
+extension SurveyUtils on Survey {
+  /// Returns the WaypointSymbol of the survey.
+  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+
+  /// Returns tradeSymbols for all deposits.
+  Set<TradeSymbol> get tradeSymbols =>
+      Set.from(deposits.map((d) => d.tradeSymbol));
+}
+
 /// Extensions onto SurveyDeposit to make it easier to work with.
 extension SurveyDepositUtils on SurveyDeposit {
   /// Returns symbol as a TradeSymbol object.
