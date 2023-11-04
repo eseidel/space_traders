@@ -242,10 +242,7 @@ void main() {
     final shipFuel = _MockShipFuel();
     // This ship uses fuel.
     const fuelCapacity = 1000;
-    when(() => shipFuel.capacity).thenReturn(fuelCapacity);
-    // And needs refueling.
-    when(() => shipFuel.current).thenReturn(100);
-    when(() => ship.fuel).thenReturn(shipFuel);
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 1000));
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
@@ -345,7 +342,7 @@ void main() {
           seconds: 10,
         ),
       ],
-      fuelCapacity: 10,
+      fuelCapacity: fuelCapacity,
       fuelUsed: 10,
       shipSpeed: 10,
     );
@@ -426,7 +423,7 @@ void main() {
         RefuelShip200Response(
           data: RefuelShip200ResponseData(
             agent: agent,
-            fuel: shipFuel,
+            fuel: ShipFuel(current: fuelCapacity, capacity: fuelCapacity),
             transaction: transaction,
           ),
         ),
@@ -486,7 +483,12 @@ void main() {
       (_) => Future.value(
         NavigateShip200Response(
           data: NavigateShip200ResponseData(
-            fuel: shipFuel,
+            fuel: ShipFuel(
+              current: fuelCapacity - 100,
+              capacity: fuelCapacity,
+              consumed:
+                  ShipFuelConsumed(amount: 100, timestamp: DateTime(2020)),
+            ),
             nav: shipNav..status = ShipNavStatus.IN_TRANSIT,
           ),
         ),
