@@ -45,7 +45,7 @@ class WaypointPosition extends Position {
   final SystemSymbol system;
 
   /// Returns the distance between this position and the given position.
-  int distanceTo(WaypointPosition other) {
+  double distanceTo(WaypointPosition other) {
     if (system != other.system) {
       throw ArgumentError(
         'Waypoints must be in the same system: $this, $other',
@@ -54,7 +54,7 @@ class WaypointPosition extends Position {
     // Use euclidean distance.
     final dx = other.x - x;
     final dy = other.y - y;
-    return sqrt(dx * dx + dy * dy).round();
+    return sqrt(dx * dx + dy * dy);
   }
 }
 
@@ -254,7 +254,8 @@ extension SystemWaypointUtils on SystemWaypoint {
   WaypointPosition get position => WaypointPosition(x, y, systemSymbol);
 
   /// Returns the distance to the given waypoint.
-  int distanceTo(SystemWaypoint other) => position.distanceTo(other.position);
+  double distanceTo(SystemWaypoint other) =>
+      position.distanceTo(other.position);
 }
 
 /// Returns true if the given trait is minable.
@@ -306,7 +307,7 @@ extension WaypointUtils on Waypoint {
   WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);
 
   /// Returns the distance to the given waypoint.
-  int distanceTo(Waypoint other) => position.distanceTo(other.position);
+  double distanceTo(Waypoint other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto ShipCargo to make it easier to work with.
@@ -534,6 +535,35 @@ extension ShipNavUtils on ShipNav {
   /// Returns the current WaypointSymbol of the ship.
   WaypointSymbol get waypointSymbolObject =>
       WaypointSymbol.fromString(waypointSymbol);
+}
+
+/// Extensions onto ShipNavRoute to make it easier to work with.
+extension ShipNavRouteUtils on ShipNavRoute {
+  /// Returns the WaypointSymbol of the origin of the route.
+  WaypointSymbol get originSymbol => WaypointSymbol.fromString(origin.symbol);
+
+  /// Returns the WaypointSymbol of the destination of the route.
+  WaypointSymbol get destinationSymbol =>
+      WaypointSymbol.fromString(destination.symbol);
+
+  /// Returns the distance between the origin and destination.
+  double get distance => origin.distanceTo(destination);
+}
+
+/// Extensions onto ShipNavRouteWaypointUtils to make it easier to work with.
+extension ShipNavRouteWaypointUtils on ShipNavRouteWaypoint {
+  /// Returns the WaypointSymbol of the waypoint.
+  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+
+  /// Returns the SystemSymbol of the waypoint.
+  SystemSymbol get systemSymbolObject => SystemSymbol.fromString(systemSymbol);
+
+  /// Returns the WaypointPosition of the waypoint.
+  WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);
+
+  /// Returns the distance to the given waypoint.
+  double distanceTo(ShipNavRouteWaypoint other) =>
+      position.distanceTo(other.position);
 }
 
 /// Extensions onto Contract to make it easier to work with.

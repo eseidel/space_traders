@@ -367,6 +367,49 @@ Future<void> undockIfNeeded(Api api, ShipCache shipCache, Ship ship) async {
   }
 }
 
+void _checkFlightTime(
+  Duration flightTime,
+  Ship ship,
+  NavigateShip200ResponseData result,
+) {
+  final route = result.nav.route;
+  final expectedFlightTime = Duration(
+    seconds: flightTimeByDistanceAndSpeed(
+      distance: route.distance,
+      shipSpeed: ship.engine.speed,
+      flightMode: ship.nav.flightMode,
+    ),
+  );
+  final delta = (flightTime - expectedFlightTime).inSeconds.abs();
+  if (delta > 1) {
+    shipWarn(
+      ship,
+      'Flight time ${durationString(flightTime)} '
+      'does not match predicted ${durationString(expectedFlightTime)} '
+      'speed: ${ship.engine.speed} mode: ${ship.nav.flightMode} '
+      'distance: ${route.distance}',
+    );
+  }
+}
+
+void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
+  final route = result.nav.route;
+  final expectedFuel = fuelUsedByDistance(
+    route.distance,
+    ship.nav.flightMode,
+  );
+  final delta = (result.fuel.consumed!.amount - expectedFuel).abs();
+  if (delta > 1) {
+    shipWarn(
+      ship,
+      'Fuel usage ${result.fuel.consumed!.amount} '
+      'does not match predicted $expectedFuel '
+      'mode: ${ship.nav.flightMode} '
+      'distance: ${route.distance}',
+    );
+  }
+}
+
 /// Navigate to the waypoint and log to the ship's log
 Future<DateTime> navigateToLocalWaypointAndLog(
   Api api,
@@ -398,6 +441,8 @@ Future<DateTime> navigateToLocalWaypointAndLog(
     '🛫 to ${waypoint.symbol} ${waypoint.type} '
     '(${approximateDuration(flightTime)})$fuelString',
   );
+  _checkFlightTime(flightTime, ship, result);
+  _checkFuelUsage(ship, result);
   return result.nav.route.arrival;
 }
 

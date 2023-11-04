@@ -81,7 +81,7 @@ Future<List<MineScore>> evaluateWaypointsForMining(
           mineTraits: mineTraits,
           market: marketWaypoint.waypointSymbol,
           tradedGoods: marketGoods,
-          distanceBetweenMineAndMarket: distance,
+          distanceBetweenMineAndMarket: distance.ceil(),
         ),
       );
     }
@@ -153,7 +153,7 @@ Future<List<SiphonScore>> evaluateWaypointsForSiphoning(
           producedGoods: producedGoods,
           market: marketWaypoint.waypointSymbol,
           marketGoods: marketGoods,
-          distanceBetween: distance,
+          distanceBetween: distance.ceil(),
         ),
       );
     }

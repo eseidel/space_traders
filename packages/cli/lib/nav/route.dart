@@ -9,18 +9,19 @@ import 'package:types/types.dart';
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 /// Returns the fuel used for with a flight mode and the given distance.
 int fuelUsedByDistance(
-  int distance,
+  double distance,
   ShipNavFlightMode flightMode,
 ) {
+  final intDistance = distance.ceil();
   switch (flightMode) {
     case ShipNavFlightMode.DRIFT:
       return 1;
     case ShipNavFlightMode.STEALTH:
-      return distance;
+      return intDistance;
     case ShipNavFlightMode.CRUISE:
-      return distance;
+      return intDistance;
     case ShipNavFlightMode.BURN:
-      return 2 * distance;
+      return 2 * intDistance;
   }
   throw UnimplementedError('Unknown flight mode: $flightMode');
 }
@@ -51,11 +52,11 @@ double _speedMultiplier(ShipNavFlightMode flightMode) {
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 /// Returns the flight time to the given distance.
-int flightTimeByDistanceAndSpeed(
-  double distance,
-  int shipSpeed,
-  ShipNavFlightMode flightMode,
-) {
+int flightTimeByDistanceAndSpeed({
+  required double distance,
+  required int shipSpeed,
+  required ShipNavFlightMode flightMode,
+}) {
   final double roundedDistance = max(1, distance.roundToDouble());
 
   /// Wiki says round(), but that doesn't match observed behavior with probes.
@@ -70,9 +71,12 @@ int flightTimeWithinSystemInSeconds(
   required int shipSpeed,
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
-  // TODO(eseidel): We should move to double distances.
-  final distance = a.distanceTo(b).toDouble();
-  return flightTimeByDistanceAndSpeed(distance, shipSpeed, flightMode);
+  final distance = a.distanceTo(b);
+  return flightTimeByDistanceAndSpeed(
+    distance: distance,
+    shipSpeed: shipSpeed,
+    flightMode: flightMode,
+  );
 }
 
 /// Returns the cooldown time after jumping a given distance.

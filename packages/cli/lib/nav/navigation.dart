@@ -228,7 +228,6 @@ Future<NavResult> continueNavigationIfNeeded(
     throw NavigationException('No action for ${ship.waypointSymbol} '
         'in route plan, likely off course.');
   }
-  final actionStart = caches.systems.waypointFromSymbol(action.startSymbol);
   final actionEnd = caches.systems.waypointFromSymbol(action.endSymbol);
   // All navigation actions require being un-docked, but the action functions
   // will handle that for us.
@@ -289,26 +288,6 @@ Future<NavResult> continueNavigationIfNeeded(
         ship,
         actionEnd,
       );
-      final flightTime = arrivalTime.difference(DateTime.timestamp());
-
-      final expectedFlightTime = Duration(
-        seconds: flightTimeWithinSystemInSeconds(
-          actionStart,
-          actionEnd,
-          shipSpeed: ship.engine.speed,
-          flightMode: ship.nav.flightMode,
-        ),
-      );
-      final delta = (flightTime - expectedFlightTime).inSeconds.abs();
-      if (delta > 1) {
-        shipWarn(
-          ship,
-          'Flight time ${durationString(flightTime)} '
-          'does not match predicted ${durationString(expectedFlightTime)} '
-          'speed: ${ship.engine.speed} mode: ${ship.nav.flightMode} '
-          'distance: ${actionStart.distanceTo(actionEnd)}',
-        );
-      }
       return NavResult._wait(arrivalTime);
   }
 }
