@@ -8,7 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | **String** | The unique identifier of the cargo item type. | 
+**symbol** | [**TradeSymbol**](TradeSymbol.md) |  | 
 **name** | **String** | The name of the cargo item type. | 
 **description** | **String** | The description of the cargo item type. | 
 **units** | **int** | The number of units of the cargo item. | 

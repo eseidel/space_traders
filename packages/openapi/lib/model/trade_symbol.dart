@@ -110,6 +110,8 @@ class TradeSymbol {
   static const MODULE_GAS_PROCESSOR_I =
       TradeSymbol._(r'MODULE_GAS_PROCESSOR_I');
   static const MODULE_CARGO_HOLD_I = TradeSymbol._(r'MODULE_CARGO_HOLD_I');
+  static const MODULE_CARGO_HOLD_II = TradeSymbol._(r'MODULE_CARGO_HOLD_II');
+  static const MODULE_CARGO_HOLD_III = TradeSymbol._(r'MODULE_CARGO_HOLD_III');
   static const MODULE_CREW_QUARTERS_I =
       TradeSymbol._(r'MODULE_CREW_QUARTERS_I');
   static const MODULE_ENVOY_QUARTERS_I =
@@ -236,6 +238,8 @@ class TradeSymbol {
     MODULE_MINERAL_PROCESSOR_I,
     MODULE_GAS_PROCESSOR_I,
     MODULE_CARGO_HOLD_I,
+    MODULE_CARGO_HOLD_II,
+    MODULE_CARGO_HOLD_III,
     MODULE_CREW_QUARTERS_I,
     MODULE_ENVOY_QUARTERS_I,
     MODULE_PASSENGER_CABIN_I,
@@ -475,6 +479,10 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.MODULE_GAS_PROCESSOR_I;
         case r'MODULE_CARGO_HOLD_I':
           return TradeSymbol.MODULE_CARGO_HOLD_I;
+        case r'MODULE_CARGO_HOLD_II':
+          return TradeSymbol.MODULE_CARGO_HOLD_II;
+        case r'MODULE_CARGO_HOLD_III':
+          return TradeSymbol.MODULE_CARGO_HOLD_III;
         case r'MODULE_CREW_QUARTERS_I':
           return TradeSymbol.MODULE_CREW_QUARTERS_I;
         case r'MODULE_ENVOY_QUARTERS_I':

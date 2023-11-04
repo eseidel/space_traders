@@ -22,8 +22,7 @@ class MarketTradeGood {
     required this.sellPrice,
   });
 
-  /// The symbol of the trade good.
-  String symbol;
+  TradeSymbol symbol;
 
   /// The type of trade good (export, import, or exchange).
   MarketTradeGoodTypeEnum type;
@@ -117,7 +116,7 @@ class MarketTradeGood {
       }());
 
       return MarketTradeGood(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: TradeSymbol.fromJson(json[r'symbol'])!,
         type: MarketTradeGoodTypeEnum.fromJson(json[r'type'])!,
         tradeVolume: mapValueOfType<int>(json, r'tradeVolume')!,
         supply: SupplyLevel.fromJson(json[r'supply'])!,

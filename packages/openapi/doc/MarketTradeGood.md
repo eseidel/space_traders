@@ -8,7 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | **String** | The symbol of the trade good. | 
+**symbol** | [**TradeSymbol**](TradeSymbol.md) |  | 
 **type** | **String** | The type of trade good (export, import, or exchange). | 
 **tradeVolume** | **int** | This is the maximum number of units that can be purchased or sold at this market in a single trade for this good. Trade volume also gives an indication of price volatility. A market with a low trade volume will have large price swings, while high trade volume will be more resilient to price changes. | 
 **supply** | [**SupplyLevel**](SupplyLevel.md) |  | 

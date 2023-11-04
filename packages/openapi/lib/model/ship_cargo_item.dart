@@ -19,8 +19,7 @@ class ShipCargoItem {
     required this.units,
   });
 
-  /// The unique identifier of the cargo item type.
-  String symbol;
+  TradeSymbol symbol;
 
   /// The name of the cargo item type.
   String name;
@@ -84,7 +83,7 @@ class ShipCargoItem {
       }());
 
       return ShipCargoItem(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: TradeSymbol.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
         units: mapValueOfType<int>(json, r'units')!,
