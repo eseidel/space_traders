@@ -280,35 +280,37 @@ Future<NavResult> continueNavigationIfNeeded(
       );
       return NavResult._continueAction();
     case RouteActionType.navCruise:
-      final fuelNeeded = action.fuelUsed;
-      jobAssert(
-        fuelNeeded < ship.fuel.capacity,
-        'Planned navigation requires more fuel than ship can hold '
-        '(${ship.fuel.capacity} < $fuelNeeded)',
-        const Duration(minutes: 10),
-      );
-      if (fuelNeeded > ship.fuel.current) {
-        final market = assertNotNull(
-          await visitLocalMarket(
-            api,
-            db,
-            caches,
-            await caches.waypoints.waypoint(ship.waypointSymbol),
-            ship,
-          ),
-          'Planned navigation requires more fuel and ship has but '
-          'no market at ${ship.waypointSymbol}, cannot refuel',
+      if (ship.usesFuel) {
+        final fuelNeeded = action.fuelUsed;
+        jobAssert(
+          fuelNeeded < ship.fuel.capacity,
+          'Planned navigation requires more fuel than ship can hold '
+          '(${ship.fuel.capacity} < $fuelNeeded)',
           const Duration(minutes: 10),
         );
-        await refuelIfNeededAndLog(
-          api,
-          db,
-          caches.marketPrices,
-          caches.agent,
-          caches.ships,
-          market,
-          ship,
-        );
+        if (fuelNeeded > ship.fuel.current) {
+          final market = assertNotNull(
+            await visitLocalMarket(
+              api,
+              db,
+              caches,
+              await caches.waypoints.waypoint(ship.waypointSymbol),
+              ship,
+            ),
+            'Planned navigation requires more fuel and ship has but '
+            'no market at ${ship.waypointSymbol}, cannot refuel',
+            const Duration(minutes: 10),
+          );
+          await refuelIfNeededAndLog(
+            api,
+            db,
+            caches.marketPrices,
+            caches.agent,
+            caches.ships,
+            market,
+            ship,
+          );
+        }
       }
       return NavResult._wait(
         await navigateToLocalWaypointAndLog(

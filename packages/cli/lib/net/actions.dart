@@ -394,10 +394,12 @@ void _checkFlightTime(
 
 void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
   final route = result.nav.route;
-  final expectedFuel = fuelUsedByDistance(
-    route.distance,
-    ship.nav.flightMode,
-  );
+  final expectedFuel = ship.usesFuel
+      ? fuelUsedByDistance(
+          route.distance,
+          ship.nav.flightMode,
+        )
+      : 0;
   final delta = (result.fuel.consumed!.amount - expectedFuel).abs();
   if (delta > 1) {
     shipWarn(
