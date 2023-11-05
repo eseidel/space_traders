@@ -51,22 +51,58 @@ void main() {
         );
 
     expect(flightTime(1, 30, ShipNavFlightMode.CRUISE), 15);
-    expect(flightTime(1, 30, ShipNavFlightMode.DRIFT), 20);
-    expect(flightTime(1, 30, ShipNavFlightMode.BURN), 15);
+    expect(flightTime(1, 30, ShipNavFlightMode.DRIFT), 23);
 
     // Zero is rounded up to one.
     expect(flightTime(0, 30, ShipNavFlightMode.CRUISE), 15);
-    expect(flightTime(0, 30, ShipNavFlightMode.DRIFT), 20);
-    expect(flightTime(0, 30, ShipNavFlightMode.BURN), 15);
+    expect(flightTime(0, 30, ShipNavFlightMode.DRIFT), 23);
 
     // Probe zero times.
-    expect(flightTime(0, 2, ShipNavFlightMode.CRUISE), 22);
-    expect(flightTime(0, 2, ShipNavFlightMode.BURN), 18);
+    expect(flightTime(0, 2, ShipNavFlightMode.CRUISE), 27);
 
+    expect(
+      () => flightTime(1, 30, ShipNavFlightMode.BURN),
+      throwsUnimplementedError,
+    );
     expect(
       () => flightTime(1, 30, ShipNavFlightMode.STEALTH),
       throwsUnimplementedError,
     );
+
+    void check(
+      int expected,
+      int shipSpeed,
+      ShipNavFlightMode flightMode,
+      double distance,
+    ) {
+      final actual = flightTimeByDistanceAndSpeed(
+        distance: distance,
+        shipSpeed: shipSpeed,
+        flightMode: flightMode,
+      );
+      // TODO(eseidel): Remove this delta. When these were collected we were
+      // still comparing current time on the client, now we use server time
+      // for both arrival and departure and no longer require slop.
+      final delta = (actual - expected).abs();
+      expect(delta <= 1, true, reason: '$actual != $expected');
+    }
+
+    /// From failure logs:
+    check(22, 30, ShipNavFlightMode.CRUISE, 9.43);
+    check(22, 3, ShipNavFlightMode.CRUISE, 0);
+    check(52, 30, ShipNavFlightMode.CRUISE, 45.71);
+    check(89, 3, ShipNavFlightMode.CRUISE, 9.43);
+    check(91, 30, ShipNavFlightMode.CRUISE, 92.44);
+    check(189, 3, ShipNavFlightMode.CRUISE, 20.81);
+    check(267, 30, ShipNavFlightMode.CRUISE, 303.96);
+    check(372, 3, ShipNavFlightMode.CRUISE, 43.32);
+    check(397, 3, ShipNavFlightMode.CRUISE, 45.71);
+    check(406, 3, ShipNavFlightMode.CRUISE, 47.01);
+    check(531, 3, ShipNavFlightMode.CRUISE, 62.43);
+    check(697, 3, ShipNavFlightMode.CRUISE, 81.88);
+    check(972, 3, ShipNavFlightMode.CRUISE, 115.45);
+    check(1181, 3, ShipNavFlightMode.CRUISE, 139.81);
+    check(3022, 30, ShipNavFlightMode.DRIFT, 360.81);
   });
 
   test('cooldownTime', () {
@@ -177,7 +213,7 @@ void main() {
     final waypointObject2 =
         system.waypoints.firstWhere((w) => w.symbol != waypoint1);
     final waypoint2 = waypointObject2.symbol;
-    expectRoute(waypoint1, waypoint2, 20);
+    expectRoute(waypoint1, waypoint2, 23);
 
     final route = planRoute(waypoint1, waypoint2);
     expect(route!.startSymbol.waypoint, waypoint1);

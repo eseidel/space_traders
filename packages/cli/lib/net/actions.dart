@@ -381,7 +381,7 @@ void _checkFlightTime(
     ),
   );
   final delta = (flightTime - expectedFlightTime).inSeconds.abs();
-  if (delta > 1) {
+  if (delta != 0) {
     shipWarn(
       ship,
       'Flight time ${durationString(flightTime)} '
@@ -427,7 +427,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
     ship,
     waypoint.waypointSymbol,
   );
-  final flightTime = result.nav.route.arrival.difference(DateTime.timestamp());
+  final flightTime = result.nav.route.duration;
   if (ship.fuelPercentage < 0.5) {
     shipWarn(ship, 'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}');
   }

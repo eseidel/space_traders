@@ -548,6 +548,9 @@ extension ShipNavRouteUtils on ShipNavRoute {
 
   /// Returns the distance between the origin and destination.
   double get distance => origin.distanceTo(destination);
+
+  /// Returns the duration of the route.
+  Duration get duration => arrival.difference(departureTime);
 }
 
 /// Extensions onto ShipNavRouteWaypointUtils to make it easier to work with.

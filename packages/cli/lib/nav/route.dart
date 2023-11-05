@@ -39,13 +39,12 @@ int fuelUsedWithinSystem(
 double _speedMultiplier(ShipNavFlightMode flightMode) {
   switch (flightMode) {
     case ShipNavFlightMode.CRUISE:
-      return 15;
+      return 25;
     case ShipNavFlightMode.DRIFT:
-      return 150;
+      return 250;
     case ShipNavFlightMode.BURN:
-      return 7.5;
     case ShipNavFlightMode.STEALTH:
-      throw UnimplementedError('STEALTH speed multiplier not implemented');
+      throw UnimplementedError('$flightMode speed multiplier not implemented');
   }
   throw UnimplementedError('Unknown flight mode: $flightMode');
 }

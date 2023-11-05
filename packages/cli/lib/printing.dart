@@ -154,12 +154,12 @@ DateTime logRemainingTransitTime(
 }) {
   final arrival = ship.nav.route.arrival;
   final now = getNow();
-  final flightTime = arrival.difference(now);
+  final remaining = arrival.difference(now);
   shipInfo(
     ship,
     // Extra space after emoji is needed for windows powershell.
     '✈️  to ${ship.waypointSymbol}, '
-    '${approximateDuration(flightTime)} left',
+    '${approximateDuration(remaining)} left',
   );
   return arrival;
 }
