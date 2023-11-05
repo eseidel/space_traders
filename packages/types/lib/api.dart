@@ -90,6 +90,18 @@ class WaypointSymbol {
   /// The full waypoint symbol.
   final String waypoint;
 
+  /// Just the waypoint name (no sector or system)
+  String get waypointName {
+    final parts = waypoint.split('-');
+    return parts[2];
+  }
+
+  /// Just the system and waypoint name (no sector)
+  String get sectorLocalName {
+    final parts = waypoint.split('-');
+    return '${parts[1]}-${parts[2]}';
+  }
+
   @override
   String toString() => waypoint;
 

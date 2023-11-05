@@ -4,6 +4,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
+import 'package:cli_table/cli_table.dart';
 
 Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
@@ -82,9 +83,58 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     return;
   }
   logger.info('Top $limit deals:');
-  for (final deal in deals.take(limit)) {
-    logger.info(describeCostedDeal(deal));
+
+  final table = Table(
+    header: [
+      'Symbol',
+      'Start',
+      'Buy',
+      'End',
+      'Sell',
+      'Profit',
+      'Gain',
+      'Time',
+      'c/s',
+      'Outlay',
+    ],
+    style: const TableStyle(compact: true),
+  );
+
+  final allSameSystem = deals.every(
+    (deal) =>
+        deal.deal.sourceSymbol.systemSymbol == start.systemSymbol &&
+        deal.deal.destinationSymbol.systemSymbol == start.systemSymbol,
+  );
+  String w(WaypointSymbol symbol) =>
+      allSameSystem ? symbol.waypointName : symbol.sectorLocalName;
+  Map<String, dynamic> rightAlign(String content) => <String, dynamic>{
+        'content': content,
+        'hAlign': HorizontalAlign.right,
+      };
+  Map<String, dynamic> c(int credits) => rightAlign(creditsString(credits));
+  for (final costed in deals.take(limit)) {
+    final deal = costed.deal;
+    final profit = costed.expectedProfit;
+    final sign = profit > 0 ? '+' : '';
+    final profitPercent = (profit / costed.expectedCosts) * 100;
+    final tradeSymbol = deal.tradeSymbol.value;
+    final name =
+        costed.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
+
+    table.add([
+      name,
+      w(deal.sourceSymbol),
+      c(costed.expectedInitialBuyPrice),
+      w(deal.destinationSymbol),
+      c(costed.expectedInitialSellPrice),
+      c(profit),
+      rightAlign('$sign${profitPercent.toStringAsFixed(0)}%'),
+      rightAlign(approximateDuration(costed.expectedTime)),
+      rightAlign(costed.expectedProfitPerSecond.toString()),
+      c(costed.expectedCosts),
+    ]);
   }
+  logger.info(table.toString());
 }
 
 void main(List<String> args) async {
