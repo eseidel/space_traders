@@ -228,10 +228,6 @@ class CentralCommand {
         : ship.systemSymbol;
 
     final inProgress = _behaviorCache.dealsInProgress().toList();
-    logger.info('${inProgress.length} deals in progress');
-    for (final deal in inProgress) {
-      logger.detail(describeCostedDeal(deal));
-    }
     // Avoid having two ships working on the same deal since by the time the
     // second one gets there the prices will have changed.
     // Note this does not check destination, so should still allow two

@@ -44,6 +44,9 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   final flightMode =
       canCruise ? ShipNavFlightMode.CRUISE : ShipNavFlightMode.DRIFT;
   await setShipFlightModeIfNeeded(api, shipCache, ship, flightMode);
+  if (!canCruise) {
+    shipWarn(ship, 'Insufficient fuel, drifting to $waypointSymbol');
+  }
 
   try {
     final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
