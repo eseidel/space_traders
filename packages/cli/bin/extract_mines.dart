@@ -32,7 +32,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final tradeGoods = TradeGoodCache.load(fs);
   final marketListings = MarketListingCache.load(fs, tradeGoods);
 
-  final mines =
+  final scores =
       await evaluateWaypointsForMining(waypointCache, marketListings, hqSystem);
 
   final table = Table(
@@ -42,24 +42,24 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   // Limit to only the closest for each.
   final seenMines = <WaypointSymbol>{};
-  for (final mine in mines) {
-    if (seenMines.contains(mine.mine)) {
+  for (final score in scores) {
+    if (seenMines.contains(score.mine)) {
       continue;
     }
     // Only consider markets that trade all goods produced by the mine.
-    if (!mine.marketTradesAllProducedGoods) {
+    if (!score.marketTradesAllProducedGoods) {
       logger
-        ..warn('${mine.market} does not trade ${mine.goodsMissingFromMarket}'
-            ' produced by ${mine.mine}')
-        ..info('${mine.market} trades ${mine.tradedGoods}');
+        ..warn('${score.market} does not trade ${score.goodsMissingFromMarket}'
+            ' produced by ${score.mine}')
+        ..info('${score.market} trades ${score.tradedGoods}');
       continue;
     }
-    seenMines.add(mine.mine);
+    seenMines.add(score.mine);
     table.add([
-      mine.mine.toString(),
-      mine.mineTraitNames.join(', '),
-      mine.market.toString(),
-      mine.score,
+      score.mine.toString(),
+      score.mineTraitNames.join(', '),
+      score.market.toString(),
+      score.score,
     ]);
     if (seenMines.length >= countLimit) {
       break;
