@@ -96,6 +96,8 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       'Time',
       'c/s',
       'Outlay',
+      'COGS',
+      'OpEx',
     ],
     style: const TableStyle(compact: true),
   );
@@ -132,6 +134,8 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       rightAlign(approximateDuration(costed.expectedTime)),
       rightAlign(costed.expectedProfitPerSecond.toString()),
       c(costed.expectedCosts),
+      c(costed.expectedCostOfGoodsSold),
+      c(costed.expectedOperationalExpenses),
     ]);
   }
   logger.info(table.toString());
