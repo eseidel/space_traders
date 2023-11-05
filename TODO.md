@@ -638,3 +638,26 @@ Once this is working can buy more of each.
 ### Route planner is not actually inserting Refuel actions.
 
 ### Keep per-ship action logs
+
+### Be able to plan trades with less than full cargo.
+
+e.g. 
+SHIP_COMMAND_FRIGATE @ X1-QP91-B7, speed = 30 capacity = 60, fuel <= 1200, outlay <= 1000000, jumps <= 10, waypoints <= 200 
+Opps for 51 trade symbols.
+Top 100 deals:
+MEDICINE                   X1-QP91-D47     12,505c -> X1-QP91-A1      16,664c +204,814c (27%) 3m 930c/s 770,456c
+CLOTHING                   X1-QP91-K83     14,338c -> X1-QP91-A1      18,548c +201,726c (23%) 5m 663c/s 883,794c
+MACHINERY                  X1-QP91-E50      1,968c -> X1-QP91-D48      2,459c  +25,055c (20%) 4m  90c/s 122,485c
+ELECTRONICS                X1-QP91-F52      2,072c -> X1-QP91-A3       2,510c  +18,374c (14%) 3m  89c/s 128,576c
+ELECTRONICS                X1-QP91-F52      2,072c -> X1-QP91-D47      2,455c  +18,425c (14%) 4m  76c/s 128,875c
+ELECTRONICS                X1-QP91-F52      2,072c -> X1-QP91-D48      2,446c  +17,885c (14%) 4m  74c/s 128,875c
+ELECTRONICS                X1-QP91-F52      2,072c -> X1-QP91-H56      2,439c  +14,224c (11%) 3m  64c/s 128,576c
+MICROPROCESSORS            X1-QP91-A3       2,900c -> X1-QP91-D47      3,193c  +11,725c  (7%) 3m  49c/s 179,855c
+ELECTRONICS                X1-QP91-F52      2,072c -> X1-QP91-C45      2,394c  +11,016c  (9%) 4m  37c/s 129,174c
+EQUIPMENT                  X1-QP91-K83      2,516c -> X1-QP91-A1       2,854c  +10,586c  (7%) 5m  34c/s 156,514c
+EQUIPMENT                  X1-QP91-K83      2,516c -> X1-QP91-D47      2,721c   +6,447c  (4%) 5m  18c/s 156,813c
+GOLD                       X1-QP91-B6         266c -> X1-QP91-H58        332c   +2,464c (14%) 3m  13c/s  17,456c
+SILVER                     X1-QP91-B6         231c -> X1-QP91-H58        277c   +1,264c  (8%) 3m   6c/s  15,356c
+ALUMINUM                   X1-QP91-H55        161c -> X1-QP91-K83        202c     +815c  (7%) 4m   3c/s  11,305c
+
+I should be able to do some partial trades of the high-value items for decent money.

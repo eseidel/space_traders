@@ -286,14 +286,14 @@ String describeCostedDeal(CostedDeal costedDeal) {
   final profit = costedDeal.expectedProfit;
   final sign = profit > 0 ? '+' : '';
   final profitPercent = (profit / costedDeal.expectedCosts) * 100;
-  final profitCreditsString = '$sign${c(profit)}'.padLeft(8);
+  final profitCreditsString = '$sign${c(profit)}'.padLeft(9);
   final profitPercentString =
       '(${profitPercent.toStringAsFixed(0)}%)'.padLeft(5);
   final profitString = '$profitCreditsString $profitPercentString';
   final coloredProfitString =
       profit > 0 ? lightGreen.wrap(profitString) : lightRed.wrap(profitString);
   final timeString = '${approximateDuration(costedDeal.expectedTime)} '
-      '${c(costedDeal.expectedProfitPerSecond)}/s';
+      '${c(costedDeal.expectedProfitPerSecond).padLeft(4)}/s';
   final tradeSymbol = deal.tradeSymbol.value;
   final name =
       costedDeal.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
@@ -305,7 +305,8 @@ String describeCostedDeal(CostedDeal costedDeal) {
       '-> '
       '${deal.destinationSymbol.waypoint.padRight(14)} '
       '${c(costedDeal.expectedInitialSellPrice).padLeft(8)} '
-      '$coloredProfitString $timeString ${c(costedDeal.expectedCosts)}';
+      '$coloredProfitString $timeString '
+      '${c(costedDeal.expectedCosts).padLeft(8)}';
 }
 
 /// Returns a CostedDeal for a given deal.
@@ -381,12 +382,12 @@ Iterable<CostedDeal> _filterDealsAndLog(
   // was built with maxJumps, so we log it here.
   final withinRange = 'within $rangeDescription';
   if (filtered.isEmpty) {
-    logger.detail('No deals $withinRange.');
+    logger.info('No deals $withinRange.');
     return [];
   }
   final affordable = filtered.where((d) => d.expectedCosts < maxTotalOutlay);
   if (affordable.isEmpty) {
-    logger.detail('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
+    logger.info('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
     return [];
   }
 
