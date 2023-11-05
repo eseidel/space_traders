@@ -439,38 +439,87 @@ class CentralCommand {
     );
   }
 
+  ShipType? _shipToBuyFromPlan(
+    List<ShipType> shipPlan,
+    ShipyardPrices shipyardPrices,
+    ShipyardShipCache shipyardShips,
+  ) {
+    final counts = <ShipType, int>{};
+    for (final shipType in shipPlan) {
+      counts[shipType] = (counts[shipType] ?? 0) + 1;
+      final fleetCount = _shipCache.countOfType(shipyardShips, shipType);
+      if (fleetCount == null) {
+        logger.warn('Unknown count for $shipType');
+        return null;
+      }
+      // If we have bought this ship type enough times, go next.
+      if (fleetCount >= counts[shipType]!) {
+        continue;
+      }
+      // If we should buy this one but haven't found it yet, buy nothing.
+      if (!shipyardPrices.havePriceFor(shipType)) {
+        return null;
+      }
+      // Buy this one!
+      return shipType;
+    }
+    // We walked off the end of our plan.
+    return null;
+  }
+
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
-    bool shouldBuy(ShipType shipType, int count) {
-      final typeCount =
-          _shipCache.countOfType(caches.static.shipyardShips, shipType) ?? 0;
-      return caches.shipyardPrices.havePriceFor(shipType) && typeCount < count;
+    final buyPlan = [
+      ShipType.LIGHT_HAULER,
+      ShipType.MINING_DRONE,
+      ShipType.SURVEYOR,
+      ShipType.SIPHON_DRONE,
+      ShipType.LIGHT_HAULER,
+      ShipType.MINING_DRONE,
+      ShipType.SURVEYOR,
+      ShipType.SIPHON_DRONE,
+      ShipType.LIGHT_HAULER,
+      ShipType.MINING_DRONE,
+      ShipType.SURVEYOR,
+      ShipType.SIPHON_DRONE,
+      ShipType.LIGHT_HAULER,
+      ShipType.MINING_DRONE,
+      ShipType.SURVEYOR,
+      ShipType.SIPHON_DRONE,
+    ];
+    final shipType = _shipToBuyFromPlan(
+      buyPlan,
+      caches.shipyardPrices,
+      caches.static.shipyardShips,
+    );
+    if (shipType == null) {
+      return null;
     }
+    return _findBestPlaceToBuy(caches, shipType);
 
-    if (shouldBuy(ShipType.LIGHT_HAULER, 6)) {
-      return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
-    }
-    // These numbers should be based on squad sizes so that we always have
-    // full squads.
-    if (shouldBuy(ShipType.ORE_HOUND, 10)) {
-      return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
-    }
-    if (shouldBuy(ShipType.MINING_DRONE, 10)) {
-      return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
-    }
-    if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
-      return _findBestPlaceToBuy(caches, ShipType.SIPHON_DRONE);
-    }
-    if (shouldBuy(ShipType.SURVEYOR, 10)) {
-      return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
-    }
-    if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
-      return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
-    }
-    if (shouldBuy(ShipType.PROBE, 3)) {
-      return _findBestPlaceToBuy(caches, ShipType.PROBE);
-    }
-    return null;
+    // if (shouldBuy(ShipType.LIGHT_HAULER, 6)) {
+    //   return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
+    // }
+    // // These numbers should be based on squad sizes so that we always have
+    // // full squads.
+    // if (shouldBuy(ShipType.ORE_HOUND, 10)) {
+    //   return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
+    // }
+    // if (shouldBuy(ShipType.MINING_DRONE, 10)) {
+    //   return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
+    // }
+    // if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
+    //   return _findBestPlaceToBuy(caches, ShipType.SIPHON_DRONE);
+    // }
+    // if (shouldBuy(ShipType.SURVEYOR, 10)) {
+    //   return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
+    // }
+    // if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
+    //   return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
+    // }
+    // if (shouldBuy(ShipType.PROBE, 3)) {
+    //   return _findBestPlaceToBuy(caches, ShipType.PROBE);
+    // }
   }
 
   /// Returns true if [ship] should start the buyShip behavior.

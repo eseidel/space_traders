@@ -79,8 +79,9 @@ class ShipCache extends ResponseListCache<Ship> {
   }
 
   /// Returns the number of ships with the given [frame].
-  int? countOfFrame(ShipFrameSymbolEnum frame) {
-    return frameCounts[frame];
+  int countOfFrame(ShipFrameSymbolEnum frame) {
+    // Frame is always a valid way to look up a ship, so null means 0 here.
+    return frameCounts[frame] ?? 0;
   }
 
   /// Returns true if the given [ship] matches the given [shipyardShip].
@@ -99,6 +100,7 @@ class ShipCache extends ResponseListCache<Ship> {
     final frame = shipyardShips.shipFrameFromType(shipType);
     // If we can't identify the frame, we can't identify the count.
     if (frame == null) {
+      // This should only happen if our shipyard ship cache is missing data.
       return null;
     }
     // In the easy case this type is the only one of its frame.
@@ -110,6 +112,7 @@ class ShipCache extends ResponseListCache<Ship> {
     // the same frame who have swapped mounts, but it's better than nothing.
     final shipyardShip = shipyardShips[shipType];
     if (shipyardShip == null) {
+      // This should only happen if our ShipyardShipCache is missing data.
       return null;
     }
     return ships
