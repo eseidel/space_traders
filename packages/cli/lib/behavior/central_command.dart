@@ -470,6 +470,9 @@ class CentralCommand {
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
     final buyPlan = [
+      ShipType.MINING_DRONE,
+      ShipType.SIPHON_DRONE,
+      ShipType.SURVEYOR,
       ShipType.LIGHT_HAULER,
       ShipType.MINING_DRONE,
       ShipType.SURVEYOR,
@@ -483,9 +486,6 @@ class CentralCommand {
       ShipType.SURVEYOR,
       ShipType.SIPHON_DRONE,
       ShipType.LIGHT_HAULER,
-      ShipType.MINING_DRONE,
-      ShipType.SURVEYOR,
-      ShipType.SIPHON_DRONE,
     ];
     final shipType = _shipToBuyFromPlan(
       buyPlan,
