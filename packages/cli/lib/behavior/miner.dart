@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
@@ -281,20 +279,18 @@ int cooldownTimeForSurvey(Ship ship) {
 // 60 for laser III. So for example laser I plus laser II is 35 +- 10"
 /// Compute the maximum number of units we can expect from an extraction.
 int maxExtractedUnits(Ship ship) {
-  var laserStrength = 0;
-  var variance = 0;
-  for (final mount in ship.mounts) {
-    if (kLaserMountSymbols.contains(mount.symbol)) {
-      final strength = mount.strength;
-      // We could log here, this should never happen.
-      if (strength == null) {
-        continue;
-      }
-      laserStrength += strength;
-      variance += 5;
-    }
-  }
-  return min(laserStrength + variance, ship.cargo.capacity);
+  const variancePerLaser = 5;
+  return expectedExtractedUnits(ship) +
+      ship.mountedMiningLasers.length * variancePerLaser;
+}
+
+/// Compute the number of units we can expect from an extraction.
+int expectedExtractedUnits(Ship ship) =>
+    ship.mountedMiningLasers.map((m) => m.strength!).sum;
+
+int _minSpaceForExtraction(Ship ship) {
+  // Currently we'd rather overflow occasionally, than waste time and fuel.
+  return expectedExtractedUnits(ship);
 }
 
 /// Tell [ship] to extract resources and log the result.
@@ -308,9 +304,9 @@ Future<JobResult> extractAndLog(
 }) async {
   // If we somehow got into a bad state, just complete this job and loop.
   jobAssert(
-    ship.availableSpace >= maxExtractedUnits(ship),
+    ship.availableSpace >= _minSpaceForExtraction(ship),
     'Not enough space (${ship.availableSpace}) to extract '
-    '(expecting ${maxExtractedUnits(ship)})',
+    '(expecting ${_minSpaceForExtraction(ship)})',
     const Duration(minutes: 1),
   );
 
@@ -354,7 +350,7 @@ Future<JobResult> extractAndLog(
     );
 
     // If we still have space wait the cooldown and continue mining.
-    if (ship.availableSpace >= maxExtractedUnits(ship)) {
+    if (ship.availableSpace >= _minSpaceForExtraction(ship)) {
       return JobResult.wait(response.cooldown.expiration);
     }
     // Complete this job (go sell) if an extraction could overflow our cargo.
@@ -520,7 +516,7 @@ Future<JobResult> emptyCargoIfNeededForMining(
     centralCommand,
     caches,
     ship,
-    minSpaceNeeded: maxExtractedUnits(ship),
+    minSpaceNeeded: _minSpaceForExtraction(ship),
     getNow: getNow,
   );
 }
