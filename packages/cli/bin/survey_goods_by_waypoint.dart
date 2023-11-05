@@ -25,9 +25,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   for (final waypointSymbol in statsByWaypoint.keys) {
     final stats = statsByWaypoint[waypointSymbol]!;
-    final tradeSymbolsString = stats.tradeSymbols
-        .map((tradeSymbol) => tradeSymbol.toString())
-        .join(', ');
+    final tradeSymbolsString =
+        stats.tradeSymbols.map((tradeSymbol) => tradeSymbol.toString()).toList()
+          ..sort()
+          ..join(', ');
     final values = chartingCache.valuesForSymbol(waypointSymbol);
     logger.info('$waypointSymbol: $tradeSymbolsString ${values?.traitSymbols} '
         '(${stats.count})');
