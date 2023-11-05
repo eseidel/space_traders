@@ -424,8 +424,11 @@ extension ShipUtils on Ship {
       frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER;
 
   /// Returns true if the ship has a mining mount.
-  bool get hasMiningLaser =>
-      mounts.any((m) => kLaserMountSymbols.contains(m.symbol));
+  bool get hasMiningLaser => mountedMiningLasers.isNotEmpty;
+
+  /// Returns true if the ship has a mining mount.
+  Iterable<ShipMount> get mountedMiningLasers =>
+      mounts.where((m) => kLaserMountSymbols.contains(m.symbol));
 
   /// Returns true if the ship has a survey mount.
   bool get hasSurveyor =>

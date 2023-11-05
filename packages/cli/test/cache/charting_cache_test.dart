@@ -21,9 +21,9 @@ void main() {
       faction: WaypointFaction(
         symbol: FactionSymbols.AEGIS,
       ),
-      traitSymbols: const [
+      traitSymbols: const {
         WaypointTraitSymbolEnum.ASH_CLOUDS,
-      ],
+      },
     );
     final waypointTraits = _MockWaypointTraitCache();
     final valuesBySymbol = {values.waypointSymbol: values};

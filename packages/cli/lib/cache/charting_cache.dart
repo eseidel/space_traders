@@ -21,7 +21,7 @@ class ChartedValues {
     final traitSymbols = (json['traitSymbols'] as List<dynamic>)
         .cast<String>()
         .map((e) => WaypointTraitSymbolEnum.fromJson(e)!)
-        .toList();
+        .toSet();
     final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
     final waypointSymbol =
         WaypointSymbol.fromJson(json['waypointSymbol'] as String);
@@ -40,17 +40,18 @@ class ChartedValues {
   final WaypointFaction? faction;
 
   /// The traits of the waypoint.
-  final List<WaypointTraitSymbolEnum> traitSymbols;
+  final Set<WaypointTraitSymbolEnum> traitSymbols;
 
   /// Chart for this waypoint.
   final Chart chart;
 
   /// Converts this charted values to JSON data.
   Map<String, dynamic> toJson() {
+    final sortedTradeSymbols = traitSymbols.toList()..sort();
     return <String, dynamic>{
       'waypointSymbol': waypointSymbol.toJson(),
       'faction': faction?.toJson(),
-      'traitSymbols': traitSymbols.map((e) => e.value).toList(),
+      'traitSymbols': sortedTradeSymbols,
       'chart': chart.toJson(),
     };
   }
@@ -130,7 +131,7 @@ class ChartingCache extends JsonStore<_Record> {
     final chartedValues = ChartedValues(
       waypointSymbol: waypoint.waypointSymbol,
       faction: waypoint.faction,
-      traitSymbols: waypoint.traits.map((e) => e.symbol).toList(),
+      traitSymbols: waypoint.traits.map((e) => e.symbol).toSet(),
       chart: chart,
     );
     waypointTraits.addAll(waypoint.traits);
