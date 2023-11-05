@@ -454,6 +454,9 @@ Iterable<CostedDeal> findDealsFor(
   final affordable = costedDeals
       .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
       .where((d) => d.cargoSize > 0)
+      // TODO(eseidel): This should not be necessary, limitUnitsByMaxSpend
+      // should have already done this.
+      .where((d) => d.expectedCosts <= maxTotalOutlay)
       .toList();
   if (affordable.isEmpty) {
     logger.info('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
