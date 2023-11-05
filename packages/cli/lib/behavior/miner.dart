@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
@@ -280,13 +282,20 @@ int cooldownTimeForSurvey(Ship ship) {
 /// Compute the maximum number of units we can expect from an extraction.
 int maxExtractedUnits(Ship ship) {
   const variancePerLaser = 5;
-  return expectedExtractedUnits(ship) +
-      ship.mountedMiningLasers.length * variancePerLaser;
+  return min(
+    ship.cargo.capacity,
+    expectedExtractedUnits(ship) +
+        ship.mountedMiningLasers.length * variancePerLaser,
+  );
 }
 
 /// Compute the number of units we can expect from an extraction.
-int expectedExtractedUnits(Ship ship) =>
-    ship.mountedMiningLasers.map((m) => m.strength!).sum;
+int expectedExtractedUnits(Ship ship) {
+  return min(
+    ship.cargo.capacity,
+    ship.mountedMiningLasers.map((m) => m.strength!).sum,
+  );
+}
 
 int _minSpaceForExtraction(Ship ship) {
   // Currently we'd rather overflow occasionally, than waste time and fuel.
