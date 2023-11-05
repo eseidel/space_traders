@@ -228,18 +228,28 @@ class CentralCommand {
         : ship.systemSymbol;
 
     final inProgress = _behaviorCache.dealsInProgress().toList();
+    logger.info('${inProgress.length} deals in progress');
+    for (final deal in inProgress) {
+      logger.detail(describeCostedDeal(deal));
+    }
     // Avoid having two ships working on the same deal since by the time the
     // second one gets there the prices will have changed.
     // Note this does not check destination, so should still allow two
     // ships to work on the same contract.
     bool filter(CostedDeal deal) {
-      return inProgress.every(
-        (d) =>
-            // Deals need to differ in their source *or* their trade symbol
-            // for us to consider them.
-            d.deal.sourceSymbol != deal.deal.sourceSymbol ||
-            d.deal.tradeSymbol != deal.deal.tradeSymbol,
-      );
+      return inProgress.every((d) {
+        // Deals need to differ in their source *or* their trade symbol
+        // for us to consider them.
+        final allowed = d.deal.sourceSymbol != deal.deal.sourceSymbol ||
+            d.deal.tradeSymbol != deal.deal.tradeSymbol;
+        if (!allowed) {
+          logger.detail(
+            'Skipping ${describeCostedDeal(deal)} because '
+            '${describeCostedDeal(d)} is already in progress',
+          );
+        }
+        return allowed;
+      });
     }
 
     /// This should decide if contract trading is enabled, and if it is
@@ -262,7 +272,7 @@ class CentralCommand {
       maxJumps: maxJumps,
       maxWaypoints: maxWaypoints,
     );
-    final maybeDeal = findDealsFor(
+    final deals = findDealsFor(
       marketPrices,
       systemsCache,
       routePlanner,
@@ -276,8 +286,13 @@ class CentralCommand {
       // trader logic tries to clear out the hold.
       cargoCapacity: ship.cargo.capacity,
       shipSpeed: ship.engine.speed,
-    ).firstOrNull;
-    return maybeDeal;
+    );
+    logger.info('Found ${deals.length} deals for ${ship.shipSymbol} from '
+        '$startSymbol');
+    for (final deal in deals) {
+      logger.detail(describeCostedDeal(deal));
+    }
+    return deals.firstOrNull;
   }
 
   /// Returns other systems containing ships with [behavior].
@@ -475,7 +490,8 @@ class CentralCommand {
       return false;
     }
     // Do we have enough credits to buy a ship
-    if (credits < buyJob.minCreditsNeeded) {
+    // FIXME(eseidel): Keep around 100,000 for trading
+    if (credits < buyJob.minCreditsNeeded + 100000) {
       return false;
     }
     // Is this ship within the same system or the command ship?
@@ -569,9 +585,6 @@ class CentralCommand {
       marketListings,
       hq.systemSymbol,
     ))
-        // TODO(eseidel): Add dynamic planning of where to send squads.
-        // This is just a hack to move us off the first mine for now.
-        .skip(1)
         .firstWhereOrNull((m) => m.marketTradesAllProducedGoods);
     if (score == null) {
       return null;
