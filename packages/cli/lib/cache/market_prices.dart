@@ -56,6 +56,18 @@ extension MarketPricePredications on MarketPrice {
     return predictedPrice;
   }
 
+  /// Predict the number of units that can be purchased for [maxSpend].
+  int predictUnitsPurchasableFor(int maxSpend) {
+    var units = 0;
+    var totalCost = 0;
+    // This is not efficient, but works for now.
+    while (totalCost < maxSpend) {
+      totalCost += predictPurchasePriceForUnit(units);
+      units++;
+    }
+    return units;
+  }
+
   /// Predict the price of buying the Nth unit of this good.
   /// Unit is a 0-based index of the unit being purchased.
   int predictSellPriceForUnit(int unit) {

@@ -661,3 +661,8 @@ SILVER                     X1-QP91-B6         231c -> X1-QP91-H58        277c   
 ALUMINUM                   X1-QP91-H55        161c -> X1-QP91-K83        202c     +815c  (7%) 4m   3c/s  11,305c
 
 I should be able to do some partial trades of the high-value items for decent money.
+
+### CostedDeal.limitUnitsByMaxSpend doesn't seem to fit under limit.
+
+If you pass it 1000000, CostedDeal.expectedCosts will end up slightly
+higher than that?

@@ -236,19 +236,12 @@ class CentralCommand {
     // second one gets there the prices will have changed.
     // Note this does not check destination, so should still allow two
     // ships to work on the same contract.
-    bool filter(CostedDeal deal) {
+    bool filter(Deal deal) {
       return inProgress.every((d) {
         // Deals need to differ in their source *or* their trade symbol
         // for us to consider them.
-        final allowed = d.deal.sourceSymbol != deal.deal.sourceSymbol ||
-            d.deal.tradeSymbol != deal.deal.tradeSymbol;
-        if (!allowed) {
-          logger.detail(
-            'Skipping ${describeCostedDeal(deal)} because '
-            '${describeCostedDeal(d)} is already in progress',
-          );
-        }
-        return allowed;
+        return d.deal.sourceSymbol != deal.sourceSymbol ||
+            d.deal.tradeSymbol != deal.tradeSymbol;
       });
     }
 
@@ -458,21 +451,27 @@ class CentralCommand {
       return caches.shipyardPrices.havePriceFor(shipType) && typeCount < count;
     }
 
+    if (shouldBuy(ShipType.LIGHT_HAULER, 6)) {
+      return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
+    }
     // These numbers should be based on squad sizes so that we always have
     // full squads.
     if (shouldBuy(ShipType.ORE_HOUND, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
-    } else if (shouldBuy(ShipType.MINING_DRONE, 10)) {
+    }
+    if (shouldBuy(ShipType.MINING_DRONE, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
-    } else if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
+    }
+    if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.SIPHON_DRONE);
-    } else if (shouldBuy(ShipType.SURVEYOR, 10)) {
+    }
+    if (shouldBuy(ShipType.SURVEYOR, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
-    } else if (shouldBuy(ShipType.LIGHT_HAULER, 6)) {
-      return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
-    } else if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
+    }
+    if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
-    } else if (shouldBuy(ShipType.PROBE, 3)) {
+    }
+    if (shouldBuy(ShipType.PROBE, 3)) {
       return _findBestPlaceToBuy(caches, ShipType.PROBE);
     }
     return null;

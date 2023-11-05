@@ -10,8 +10,8 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final limit = int.parse(argResults['limit'] as String);
   final maxJumps = int.parse(argResults['jumps'] as String);
   final startArg = argResults['start'] as String?;
+  final credits = int.parse(argResults['credits'] as String);
   const maxWaypoints = 200;
-  const maxOutlay = 1000000;
 
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.loadCached(fs)!;
@@ -44,7 +44,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       'speed = $shipSpeed '
       'capacity = $cargoCapacity, '
       'fuel <= $fuelCapacity, '
-      'outlay <= $maxOutlay, '
+      'outlay <= $credits, '
       'jumps <= $maxJumps, '
       'waypoints <= $maxWaypoints ');
 
@@ -69,7 +69,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     systemsCache,
     routePlanner,
     marketScan,
-    maxTotalOutlay: maxOutlay,
+    maxTotalOutlay: credits,
     cargoCapacity: cargoCapacity,
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
@@ -116,6 +116,12 @@ void main(List<String> args) async {
           help: 'Ship type used for calculations',
           allowed: ShipType.values.map(argFromShipType),
           defaultsTo: argFromShipType(ShipType.LIGHT_HAULER),
+        )
+        ..addOption(
+          'credits',
+          abbr: 'c',
+          help: 'Credit limit used for calculations',
+          defaultsTo: '1000000',
         );
     },
   );

@@ -153,7 +153,8 @@ extension CostedDealPrediction on CostedDeal {
   int get expectedOperationalExpenses => expectedFuelCost;
 
   /// The total upfront cost of the deal, including fuel.
-  int get expectedCosts => expectedCostOfGoodsSold + expectedFuelCost;
+  int get expectedCosts =>
+      expectedCostOfGoodsSold + expectedOperationalExpenses;
 
   /// The total income of the deal, including fuel.
   int get expectedRevenue {
@@ -277,6 +278,24 @@ extension CostedDealPrediction on CostedDeal {
     }
     return actualProfit ~/ actualSeconds;
   }
+
+  /// Get a limited version of this CostedDeal by limiting the number of units
+  /// of cargo to the given maxSpend.
+  CostedDeal limitUnitsByMaxSpend(int maxSpend) {
+    final goodsBudget = maxSpend - expectedOperationalExpenses;
+    final maxUnits = deal.sourcePrice.predictUnitsPurchasableFor(goodsBudget);
+    if (maxUnits < cargoSize) {
+      return CostedDeal(
+        deal: deal,
+        cargoSize: maxUnits,
+        transactions: transactions,
+        startTime: startTime,
+        route: route,
+        costPerFuelUnit: costPerFuelUnit,
+      );
+    }
+    return this;
+  }
 }
 
 /// Returns a string describing the given CostedDeal
@@ -369,33 +388,6 @@ MarketScan scanNearbyMarkets(
   );
 }
 
-Iterable<CostedDeal> _filterDealsAndLog(
-  Iterable<CostedDeal> costedDeals, {
-  required String rangeDescription,
-  required int maxTotalOutlay,
-  required SystemSymbol systemSymbol,
-  bool Function(CostedDeal deal)? filter,
-}) {
-  final filtered = filter != null ? costedDeals.where(filter) : costedDeals;
-
-  // findDealFor does not use maxJumps, but it's passed in a MarketScan which
-  // was built with maxJumps, so we log it here.
-  final withinRange = 'within $rangeDescription';
-  if (filtered.isEmpty) {
-    logger.info('No deals $withinRange.');
-    return [];
-  }
-  final affordable = filtered.where((d) => d.expectedCosts < maxTotalOutlay);
-  if (affordable.isEmpty) {
-    logger.info('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
-    return [];
-  }
-
-  return affordable
-      .sortedBy<num>((e) => -e.expectedProfitPerSecond)
-      .where((d) => d.expectedProfitPerSecond > 0);
-}
-
 /// Returns the best deals for the given parameters,
 /// sorted by profit per second, with most profitable first.
 Iterable<CostedDeal> findDealsFor(
@@ -409,7 +401,7 @@ Iterable<CostedDeal> findDealsFor(
   required int shipSpeed,
   required int maxTotalOutlay,
   List<SellOpp>? extraSellOpps,
-  bool Function(CostedDeal deal)? filter,
+  bool Function(Deal deal)? filter,
 }) {
   logger.detail(
     'Finding deals with '
@@ -424,8 +416,16 @@ Iterable<CostedDeal> findDealsFor(
   final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
   logger.detail('Found ${deals.length} potential deals.');
 
+  final filtered = filter != null ? deals.where(filter) : deals;
+
+  final withinRange = 'within ${scan.description}';
+  if (filtered.isEmpty) {
+    logger.info('No deals $withinRange.');
+    return [];
+  }
+
   final before = DateTime.now();
-  final costedDeals = deals
+  final costedDeals = filtered
       .map(
         (deal) => costOutDeal(
           shipSpeed: shipSpeed,
@@ -440,6 +440,7 @@ Iterable<CostedDeal> findDealsFor(
         ),
       )
       .toList();
+
   // toList is used to force resolution of the list before we log.
   final after = DateTime.now();
   final elapsed = after.difference(before);
@@ -449,13 +450,19 @@ Iterable<CostedDeal> findDealsFor(
       'Costed ${deals.length} deals in ${approximateDuration(elapsed)}',
     );
   }
-  return _filterDealsAndLog(
-    costedDeals,
-    rangeDescription: scan.description,
-    maxTotalOutlay: maxTotalOutlay,
-    systemSymbol: startSymbol.systemSymbol,
-    filter: filter,
-  );
+
+  final affordable = costedDeals
+      .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
+      .where((d) => d.cargoSize > 0)
+      .toList();
+  if (affordable.isEmpty) {
+    logger.info('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
+    return [];
+  }
+
+  return affordable
+      .sortedBy<num>((e) => -e.expectedProfitPerSecond)
+      .where((d) => d.expectedProfitPerSecond > 0);
 }
 
 /// Calculated trip cost of going and buying something.
