@@ -77,7 +77,7 @@ class CentralCommand {
     //   return 1;
     // }
     // This should depend on phase and ship type?
-    return 7;
+    return 4;
   }
 
   /// Data older than this will be refreshed by explorers.
@@ -172,12 +172,12 @@ class CentralCommand {
         // mining drones.
         // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         // Mining is more profitable than siphoning I think?
-        Behavior.miner,
         Behavior.siphoner,
+        Behavior.miner,
       ],
       FleetRole.trader: [
         Behavior.trader,
-        // Would rather have Haulers idle, than explore, at least early game.
+        // Would rather have Haulers idle, than explore if fuel costs are high.
         // Behavior.explorer,
       ],
       FleetRole.miner: [Behavior.miner],
