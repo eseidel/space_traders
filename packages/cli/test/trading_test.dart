@@ -161,11 +161,11 @@ void main() {
       ),
       costPerFuelUnit: 100,
     );
-    final profit = lightGreen.wrap('     +1c (100%)');
+    final profit = lightGreen.wrap('      +1c (100%)');
     expect(
       describeCostedDeal(costed),
       'ADVANCED_CIRCUITRY         S-A-B                '
-      '1c -> S-A-C                2c $profit 10s 0c/s 1c',
+      '1c -> S-A-C                2c $profit 10s   0c/s       1c',
     );
   });
 

@@ -260,26 +260,28 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(start.system);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     // Needed by navigateShipAndLog to show time left.
-    final shipNavRoute = _MockShipNavRoute();
-    when(() => shipNav.route).thenReturn(shipNavRoute);
     final arrivalTime = DateTime(2022);
-    when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
-    when(() => shipNavRoute.origin).thenReturn(
-      ShipNavRouteWaypoint(
-        symbol: start.waypoint,
-        type: WaypointType.ASTEROID,
-        systemSymbol: start.system,
-        x: 0,
-        y: 0,
-      ),
+    final departureTime = DateTime(2021);
+    final departure = ShipNavRouteWaypoint(
+      symbol: start.waypoint,
+      type: WaypointType.ASTEROID,
+      systemSymbol: start.system,
+      x: 0,
+      y: 0,
     );
-    when(() => shipNavRoute.destination).thenReturn(
-      ShipNavRouteWaypoint(
-        symbol: end.waypoint,
-        type: WaypointType.ASTEROID,
-        systemSymbol: end.system,
-        x: 0,
-        y: 0,
+    when(() => shipNav.route).thenReturn(
+      ShipNavRoute(
+        destination: ShipNavRouteWaypoint(
+          symbol: end.waypoint,
+          type: WaypointType.ASTEROID,
+          systemSymbol: end.system,
+          x: 0,
+          y: 0,
+        ),
+        departure: departure,
+        origin: departure,
+        departureTime: departureTime,
+        arrival: arrivalTime,
       ),
     );
 

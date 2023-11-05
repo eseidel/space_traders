@@ -303,7 +303,9 @@ void main() {
       shipType: ShipType.HEAVY_FREIGHTER,
       minCreditsNeeded: 100,
     );
-    final shouldBuy = centralCommand.shouldBuyShip(ship, 100000);
+    // Currently we pad with 100k for trading.
+    const paddingCredits = 100000;
+    final shouldBuy = centralCommand.shouldBuyShip(ship, paddingCredits + 100);
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
@@ -481,8 +483,9 @@ void main() {
     when(() => caches.shipyardPrices.prices).thenReturn([]);
     when(() => caches.shipyardPrices.pricesFor(ShipType.ORE_HOUND))
         .thenReturn([]);
-    when(() => caches.shipyardPrices.havePriceFor(ShipType.ORE_HOUND))
-        .thenReturn(true);
+    registerFallbackValue(ShipType.ORE_HOUND);
+    when(() => caches.shipyardPrices.havePriceFor(any())).thenReturn(true);
+    when(() => caches.shipyardPrices.pricesFor(any())).thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => caches.marketPrices.havePriceFor(any())).thenReturn(false);
