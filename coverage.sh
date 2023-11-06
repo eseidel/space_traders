@@ -6,14 +6,14 @@
 # No ui tests yet, so not testing ui package.
 PACKAGES='cli db server types'
 
-dart pub global activate coverage
-dart pub global activate combine_coverage
+# dart pub global activate coverage
+# dart pub global activate combine_coverage
 
 for PACKAGE_DIR in $PACKAGES
 do
     echo $PACKAGE_DIR
     cd packages/$PACKAGE_DIR
-    dart pub get
+    # dart pub get
     dart test --coverage=coverage
     # --report-on is wanted to exclude openapi generated code from coverage.
     dart pub global run coverage:format_coverage --lcov --in=coverage \
