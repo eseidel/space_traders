@@ -471,38 +471,44 @@ class CentralCommand {
 
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
-    final buyPlan = [
-      ShipType.MINING_DRONE,
-      ShipType.SIPHON_DRONE,
-      ShipType.SURVEYOR,
-      ShipType.LIGHT_HAULER,
-      ShipType.MINING_DRONE,
-      ShipType.SURVEYOR,
-      ShipType.SIPHON_DRONE,
-      ShipType.LIGHT_HAULER,
-      ShipType.MINING_DRONE,
-      ShipType.SURVEYOR,
-      ShipType.SIPHON_DRONE,
-      ShipType.LIGHT_HAULER,
-      ShipType.MINING_DRONE,
-      ShipType.SURVEYOR,
-      ShipType.SIPHON_DRONE,
-      ShipType.LIGHT_HAULER,
-    ];
-    final shipType = shipToBuyFromPlan(
-      buyPlan,
-      caches.shipyardPrices,
-      caches.static.shipyardShips,
-    );
-    if (shipType == null) {
-      return null;
-    }
-    logger.info('Planning to buy $shipType');
-    return _findBestPlaceToBuy(caches, shipType);
-
-    // if (shouldBuy(ShipType.LIGHT_HAULER, 6)) {
-    //   return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
+    // final buyPlan = [
+    //   ShipType.MINING_DRONE,
+    //   ShipType.SIPHON_DRONE,
+    //   ShipType.SURVEYOR,
+    //   ShipType.LIGHT_HAULER,
+    //   ShipType.MINING_DRONE,
+    //   ShipType.SURVEYOR,
+    //   ShipType.SIPHON_DRONE,
+    //   ShipType.LIGHT_HAULER,
+    //   ShipType.MINING_DRONE,
+    //   ShipType.SURVEYOR,
+    //   ShipType.SIPHON_DRONE,
+    //   ShipType.LIGHT_HAULER,
+    //   ShipType.MINING_DRONE,
+    //   ShipType.SURVEYOR,
+    //   ShipType.SIPHON_DRONE,
+    //   ShipType.LIGHT_HAULER,
+    // ];
+    // final shipType = shipToBuyFromPlan(
+    //   buyPlan,
+    //   caches.shipyardPrices,
+    //   caches.static.shipyardShips,
+    // );
+    // if (shipType == null) {
+    //   return null;
     // }
+    // logger.info('Planning to buy $shipType');
+    // return _findBestPlaceToBuy(caches, shipType);
+
+    bool shouldBuy(ShipType shipType, int count) {
+      final typeCount =
+          _shipCache.countOfType(caches.static.shipyardShips, shipType) ?? 0;
+      return caches.shipyardPrices.havePriceFor(shipType) && typeCount < count;
+    }
+
+    if (shouldBuy(ShipType.LIGHT_HAULER, 5)) {
+      return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
+    }
     // // These numbers should be based on squad sizes so that we always have
     // // full squads.
     // if (shouldBuy(ShipType.ORE_HOUND, 10)) {
@@ -523,6 +529,7 @@ class CentralCommand {
     // if (shouldBuy(ShipType.PROBE, 3)) {
     //   return _findBestPlaceToBuy(caches, ShipType.PROBE);
     // }
+    return null;
   }
 
   /// Returns true if [ship] should start the buyShip behavior.
@@ -546,7 +553,9 @@ class CentralCommand {
         !ship.isCommand) {
       return false;
     }
-    return true;
+    // TODO(eseidel): See how far it is to the shipyard, only go if < 10 mins?
+    // For now just hacking to be command ship.
+    return ship.isCommand;
   }
 
   /// Returns true if [ship] should start the mountFromBuy behavior.
