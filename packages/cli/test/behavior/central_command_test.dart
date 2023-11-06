@@ -32,7 +32,11 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipCache extends Mock implements ShipCache {}
 
+class _MockShipyardPrices extends Mock implements ShipyardPrices {}
+
 class _MockShipFrame extends Mock implements ShipFrame {}
+
+class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 class _MockShipFuel extends Mock implements ShipFuel {}
 
@@ -592,5 +596,70 @@ void main() {
     final job = centralCommand.getJobForShip(ship, 1000000);
     // Can't do anything when out of fuel.
     expect(job.behavior, Behavior.idle);
+  });
+
+  test('shipToBuyFromPlan', () {
+    final shipyardShips = _MockShipyardShipCache();
+    final shipyardPrices = _MockShipyardPrices();
+    final shipCache = _MockShipCache();
+    final behaviorCache = _MockBehhaviorCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    when(() => shipyardPrices.havePriceFor(any())).thenReturn(true);
+
+    expect(
+      centralCommand
+          .shipToBuyFromPlan(<ShipType>[], shipyardPrices, shipyardShips),
+      isNull,
+    );
+
+    final buySecond = [ShipType.COMMAND_FRIGATE, ShipType.EXPLORER];
+    when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
+        .thenReturn(1);
+    when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
+        .thenReturn(0);
+    expect(
+      centralCommand.shipToBuyFromPlan(
+        buySecond,
+        shipyardPrices,
+        shipyardShips,
+      ),
+      ShipType.EXPLORER,
+    );
+
+    final buyFirst = [ShipType.EXPLORER, ShipType.COMMAND_FRIGATE];
+    when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
+        .thenReturn(1);
+    when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
+        .thenReturn(0);
+    expect(
+      centralCommand.shipToBuyFromPlan(
+        buyFirst,
+        shipyardPrices,
+        shipyardShips,
+      ),
+      ShipType.EXPLORER,
+    );
+
+    final buyFourth = [
+      ShipType.EXPLORER,
+      ShipType.COMMAND_FRIGATE,
+      ShipType.EXPLORER,
+      ShipType.ORE_HOUND,
+    ];
+    when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
+        .thenReturn(1);
+    when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
+        .thenReturn(2);
+    when(() => shipCache.countOfType(shipyardShips, ShipType.ORE_HOUND))
+        .thenReturn(0);
+    expect(
+      centralCommand.shipToBuyFromPlan(
+        buyFourth,
+        shipyardPrices,
+        shipyardShips,
+      ),
+      ShipType.ORE_HOUND,
+    );
   });
 }
