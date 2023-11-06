@@ -294,6 +294,13 @@ void main() {
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('X-A');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.registration).thenReturn(
+      ShipRegistration(
+        name: shipSymbol.symbol,
+        factionSymbol: 'F',
+        role: ShipRole.COMMAND,
+      ),
+    );
     final shipNav = _MockShipNav();
     when(() => shipNav.systemSymbol).thenReturn('W-A');
     when(() => ship.nav).thenReturn(shipNav);
