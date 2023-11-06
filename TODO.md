@@ -666,3 +666,36 @@ I should be able to do some partial trades of the high-value items for decent mo
 
 If you pass it 1000000, CostedDeal.expectedCosts will end up slightly
 higher than that?
+
+
+### Will unintentionally drift instead of routing to refuel.
+
+I don't know if B6 sells fuel.  But it drifted when it should have refueled:
+
+🛸#1  ✈️  to X1-QP91-B6, 0ms left
+🛸#1  ✍️  market data @ X1-QP91-B6
+🛸#1  🤝  10 FUEL               +158% +342c per  10 x    558c = +5,580c -> 🏦 3,855,281c
+🛸#1  🤝  10 FUEL               +130% +281c per  10 x    497c = +4,970c -> 🏦 3,860,251c
+🛸#1  🤝  10 FUEL               +106% +229c per  10 x    445c = +4,450c -> 🏦 3,864,701c
+🛸#1  🤝   5 FUEL                +85% +183c per   5 x    399c = +1,995c -> 🏦 3,866,696c
+[WARN] 🛸#1  Expected 9,542c profit (30c/s), got 9,255c (3c/s) in 00:45:06, expected 00:05:18
+[WARN] 🛸#1  Beginning route to X1-QP91-A3 (4m)
+[WARN] 🛸#1  Insufficient fuel, drifting to X1-QP91-A3
+🛸#1  🛫 to X1-QP91-A3 MOON (45m) spent 1 fuel
+[WARN] 🛸#1  Flight time 00:45:57 does not match predicted 00:45:56 speed: 30 mode: DRIFT distance: 328.9331239021087
+
+% dart run bin/routing_plan.dart X1-QP91-B6 X1-QP91-A3
+Route found (5ms)
+X1-QP91-B6 to X1-QP91-A3 speed: 30 max-fuel: 1200
+navCruise       X1-QP91-B6  X1-QP91-A3  0:04:49.000000s
+in 4m uses 329 fuel
+
+
+### Catastrophic trades
+
+🛸#1  ✍️  shipyard data @ X1-QP91-C45
+🛸#1  🤝  10 SHIP_PLATING        +33% +5,941c per  10 x 23,834c = +238,340c -> 🏦 905,407c
+🛸#1  🤝  10 SHIP_PLATING        +19% +3,337c per  10 x 21,230c = +212,300c -> 🏦 1,117,707c
+🛸#1  🤝  10 SHIP_PLATING         +1% +131c per  10 x 18,024c = +180,240c -> 🏦 1,297,947c
+🛸#1  Expected 11,331c profit (52c/s), got -73,430c (-299c/s) in 00:04:05, expected 00:03:35
+
