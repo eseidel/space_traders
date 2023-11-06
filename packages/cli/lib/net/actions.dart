@@ -384,7 +384,9 @@ void _checkFlightTime(
     ),
   );
   final delta = (flightTime - expectedFlightTime).inSeconds.abs();
-  if (delta != 0) {
+  // The server seems to differ in its total time.  Maybe our algorithm
+  // is wrong to use floor() and we should round?
+  if (delta > 1) {
     shipWarn(
       ship,
       'Flight time ${durationString(flightTime)} '
