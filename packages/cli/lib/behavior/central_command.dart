@@ -439,7 +439,9 @@ class CentralCommand {
     );
   }
 
-  ShipType? _shipToBuyFromPlan(
+  /// Returns the next ship to buy from the given [shipPlan].
+  @visibleForTesting
+  ShipType? shipToBuyFromPlan(
     List<ShipType> shipPlan,
     ShipyardPrices shipyardPrices,
     ShipyardShipCache shipyardShips,
@@ -487,7 +489,7 @@ class CentralCommand {
       ShipType.SIPHON_DRONE,
       ShipType.LIGHT_HAULER,
     ];
-    final shipType = _shipToBuyFromPlan(
+    final shipType = shipToBuyFromPlan(
       buyPlan,
       caches.shipyardPrices,
       caches.static.shipyardShips,
@@ -495,6 +497,7 @@ class CentralCommand {
     if (shipType == null) {
       return null;
     }
+    logger.info('Planning to buy $shipType');
     return _findBestPlaceToBuy(caches, shipType);
 
     // if (shouldBuy(ShipType.LIGHT_HAULER, 6)) {
