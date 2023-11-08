@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/nav/navigation.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440
 // Planned route from X1-CX76-69886Z to X1-XH63-75510F under fuel: 1200
@@ -30,13 +31,20 @@ void main(List<String> args) async {
     args,
     command,
     addArgs: (ArgParser parser) {
-      parser.addOption(
-        'ship',
-        abbr: 't',
-        help: 'Ship type used for calculations',
-        allowed: ShipType.values.map(argFromShipType),
-        defaultsTo: argFromShipType(ShipType.COMMAND_FRIGATE),
-      );
+      parser
+        ..addOption(
+          'ship',
+          abbr: 't',
+          help: 'Ship type used for calculations',
+          allowed: ShipType.values.map(argFromShipType),
+          defaultsTo: argFromShipType(ShipType.COMMAND_FRIGATE),
+        )
+        ..addOption(
+          'fuel',
+          allowed: ['true', 'false', 'cache'],
+          defaultsTo: 'false',
+          help: 'Whether to assume all waypoints sell fuel, or use cached data',
+        );
     },
   );
 }
@@ -52,11 +60,23 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final startSymbol = args[0];
   final endSymbol = args[1];
 
-  final systemsCache = SystemsCache.loadCached(fs)!;
-  final routePlanner =
-      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
-
   final staticCaches = StaticCaches.load(fs);
+  final systemsCache = SystemsCache.loadCached(fs)!;
+  final bool Function(WaypointSymbol _) sellsFuel;
+  if (argResults['fuel'] == 'true') {
+    sellsFuel = (_) => true;
+  } else if (argResults['fuel'] == 'false') {
+    sellsFuel = (_) => false;
+  } else if (argResults['fuel'] == 'cache') {
+    final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+    sellsFuel = defaultSellsFuel(marketListings);
+  } else {
+    throw UnimplementedError();
+  }
+
+  final routePlanner =
+      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: sellsFuel);
+
   final ship = staticCaches.shipyardShips[shipType]!;
   final shipSpeed = ship.engine.speed;
   final fuelCapacity = ship.frame.fuelCapacity;
