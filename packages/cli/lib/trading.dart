@@ -71,14 +71,14 @@ List<Deal> buildDealsFromScan(
         : scanSells;
     for (final buy in buys) {
       for (final sell in sells) {
-        if (buy.marketSymbol == sell.marketSymbol) {
+        if (buy.waypointSymbol == sell.waypointSymbol) {
           continue;
         }
         final profit = sell.price - buy.price;
         if (profit <= 0) {
           continue;
         }
-        deals.add(Deal.fromOpps(buy, sell));
+        deals.add(Deal(source: buy, destination: sell));
       }
     }
   }
@@ -118,16 +118,14 @@ extension CostedDealPrediction on CostedDeal {
   /// more unit yet that unit not being worth carrying in an otherwise empty
   /// ship.
   int get expectedUnits {
-    final destinationPrice = deal.destinationPrice;
-    // Contract deal
-    if (destinationPrice == null) {
+    if (isContractDeal) {
       return cargoSize;
     }
     return min(
       cargoSize,
       profitableVolumeBetween(
-        deal.sourcePrice,
-        destinationPrice,
+        deal.source.marketPrice,
+        deal.destination.marketPrice!,
         maxVolume: cargoSize,
       ),
     );
@@ -147,7 +145,7 @@ extension CostedDealPrediction on CostedDeal {
 
   /// The expected cost of goods sold, not including fuel.
   int get expectedCostOfGoodsSold =>
-      deal.sourcePrice.totalPurchasePriceFor(expectedUnits);
+      deal.source.marketPrice.totalPurchasePriceFor(expectedUnits);
 
   /// The expected non-goods expenses of the deal, including fuel.
   int get expectedOperationalExpenses => expectedFuelCost;
@@ -156,30 +154,29 @@ extension CostedDealPrediction on CostedDeal {
   int get expectedCosts =>
       expectedCostOfGoodsSold + expectedOperationalExpenses;
 
-  /// The total income of the deal, including fuel.
+  /// The total income of the deal, excluding any costs.
   int get expectedRevenue {
     // Contract rewards don't move with market state.
-    final contract = deal.contractDelivery;
-    if (contract != null) {
-      return contract.rewardPerUnit * expectedUnits;
+    // TODO(eseidel): Move this all onto SellOpp?
+    final isContract = deal.destination.isContractDelivery;
+    if (isContract) {
+      return deal.destination.price * expectedUnits;
     }
-    if (deal.isConstructionDelivery) {
-      return contract.rewardPerUnit * expectedUnits;
-    }
-    return deal.destinationPrice!.totalSellPriceFor(expectedUnits);
+    return deal.destination.marketPrice!.totalSellPriceFor(expectedUnits);
   }
 
   /// The expected initial per-unit buy price.
   int get expectedInitialBuyPrice =>
-      deal.sourcePrice.predictPurchasePriceForUnit(0);
+      deal.source.marketPrice.predictPurchasePriceForUnit(0);
 
   /// The expected initial per-unit sell price.
   int get expectedInitialSellPrice {
-    final contract = deal.contractDelivery;
-    if (contract != null) {
-      return contract.rewardPerUnit;
+    // TODO(eseidel): Move this all onto SellOpp?
+    final isContract = deal.isContractDeal;
+    if (isContract) {
+      return deal.destination.price;
     }
-    return deal.destinationPrice!.predictSellPriceForUnit(0);
+    return deal.destination.marketPrice!.predictSellPriceForUnit(0);
   }
 
   /// Max we would spend per unit and still expect to break even.
@@ -226,9 +223,10 @@ extension CostedDealPrediction on CostedDeal {
   int get predictNextPurchasePrice {
     if (isContractDeal) {
       // Contract deals don't move with market state.
-      return deal.sourcePrice.purchasePrice;
+      return deal.source.marketPrice.purchasePrice;
     }
-    return deal.sourcePrice.predictPurchasePriceForUnit(unitsPurchased + 1);
+    return deal.source.marketPrice
+        .predictPurchasePriceForUnit(unitsPurchased + 1);
   }
 
   /// The total profit of the deal, including fuel.
@@ -286,7 +284,7 @@ extension CostedDealPrediction on CostedDeal {
   /// of cargo to the given maxSpend.
   CostedDeal limitUnitsByMaxSpend(int maxSpend) {
     final goodsBudget = maxSpend - expectedOperationalExpenses;
-    final affordableUnits = deal.sourcePrice
+    final affordableUnits = deal.source.marketPrice
         .predictUnitsPurchasableFor(maxSpend: goodsBudget, maxUnits: cargoSize);
     if (affordableUnits < cargoSize) {
       return CostedDeal(

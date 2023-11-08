@@ -147,7 +147,7 @@ class BehaviorState {
   /// The current behavior.
   final Behavior behavior;
 
-  /// Used for compound jobs (Deliver is the only one so far).
+  /// Used for MultiJobs
   int jobIndex;
 
   /// Current deal.

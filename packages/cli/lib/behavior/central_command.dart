@@ -277,7 +277,7 @@ class CentralCommand {
       final opp = extraSellOpps.first;
       logger.detail(
         'Including contract sell opp: ${opp.maxUnits} ${opp.tradeSymbol} '
-        '@ ${creditsString(opp.price)} -> ${opp.marketSymbol}',
+        '@ ${creditsString(opp.price)} -> ${opp.waypointSymbol}',
       );
     }
 
@@ -649,7 +649,7 @@ class CentralCommand {
       if (deal == null) {
         continue;
       }
-      if (deal.deal.constructionDestination != construction.waypointSymbol) {
+      if (deal.deal.destinationSymbol != construction.waypointSymbol) {
         continue;
       }
       unitsAssigned += deal.maxUnitsToBuy;
@@ -776,7 +776,7 @@ Iterable<SellOpp> sellOppsForContracts(
       );
       if (unitsNeeded > 0) {
         yield SellOpp.fromContract(
-          marketSymbol: good.destination,
+          waypointSymbol: good.destination,
           tradeSymbol: good.tradeSymbolObject,
           contractId: contract.id,
           price: _maxContractUnitPurchasePrice(contract, good),
@@ -823,7 +823,7 @@ Iterable<SellOpp> sellOppsForConstruction(
     final unitsNeeded = remainingUnitsNeeded(material.tradeSymbol);
     if (unitsNeeded > 0) {
       yield SellOpp.fromConstruction(
-        marketSymbol: construction.waypointSymbol,
+        waypointSymbol: construction.waypointSymbol,
         tradeSymbol: material.tradeSymbol,
         price: maxPurchasePrice[material.tradeSymbol]!,
         maxUnits: unitsNeeded,

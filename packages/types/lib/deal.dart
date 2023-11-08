@@ -1,149 +1,22 @@
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-/// A delivery for a contract.
-@immutable
-class ContractDelivery {
-  /// Create a new ContractDelivery.
-  const ContractDelivery({
-    required this.contractId,
-    required this.destination,
-    required this.tradeSymbol,
-    required this.rewardPerUnit,
-    required this.maxUnits,
-  });
-
-  /// Create a ContractDelivery from a SellOpp.
-  factory ContractDelivery.fromSellOpp(SellOpp sellOpp) {
-    return ContractDelivery(
-      tradeSymbol: sellOpp.tradeSymbol,
-      contractId: sellOpp.contractId!,
-      destination: sellOpp.marketSymbol,
-      rewardPerUnit: sellOpp.price,
-      maxUnits: sellOpp.maxUnits!,
-    );
-  }
-
-  /// Create a ContractDelivery from JSON.
-  factory ContractDelivery.fromJson(Map<String, dynamic> json) {
-    return ContractDelivery(
-      contractId: json['contractId'] as String,
-      destination: WaypointSymbol.fromJson(json['destination'] as String),
-      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
-      rewardPerUnit: json['rewardPerUnit'] as int,
-      maxUnits: json['maxUnits'] as int,
-    );
-  }
-
-  /// Create a ContractDelivery from JSON or null.
-  static ContractDelivery? fromJsonOrNull(Map<String, dynamic>? json) =>
-      json == null ? null : ContractDelivery.fromJson(json);
-
-  /// Which contract this delivery is a part of.
-  final String contractId;
-
-  /// The destination of this delivery.
-  final WaypointSymbol destination;
-
-  /// The trade symbol of the cargo to deliver.
-  final TradeSymbol tradeSymbol;
-
-  /// The maximum number of units of cargo to deliver.
-  final int maxUnits;
-
-  /// The reward per unit of cargo delivered.
-  final int rewardPerUnit;
-
-  /// Encode this ContractDelivery as JSON.
-  Map<String, dynamic> toJson() => {
-        'contractId': contractId,
-        'destination': destination.toJson(),
-        'tradeSymbol': tradeSymbol.toJson(),
-        'rewardPerUnit': rewardPerUnit,
-        'maxUnits': maxUnits,
-      };
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ContractDelivery &&
-          runtimeType == other.runtimeType &&
-          contractId == other.contractId &&
-          destination == other.destination &&
-          tradeSymbol == other.tradeSymbol &&
-          rewardPerUnit == other.rewardPerUnit &&
-          maxUnits == other.maxUnits;
-
-  @override
-  int get hashCode => Object.hash(
-        contractId,
-        destination,
-        tradeSymbol,
-        rewardPerUnit,
-        maxUnits,
-      );
-}
-
-/// Record of a possible arbitrage opportunity.
-// This should also include expected cost of fuel and cost of time.
+/// Record of a possible arbitrage opportunity pairing a BuyOpp and SellOpp.
+/// CostedDeal is a wrapper which includes the cost of travel.
 @immutable
 class Deal {
-  /// Create a new deal for a contract delivery.
-  Deal.fromContractDelivery({
-    required this.sourcePrice,
-    required ContractDelivery this.contractDelivery,
-  })  : destinationPrice = null,
-        constructionDestination = null,
-        assert(
-          sourcePrice.tradeSymbol == contractDelivery.tradeSymbol,
-          'sourcePrice and contractDelivery must be for the same tradeSymbol',
-        );
-
-  /// Create a new deal for an arbitrage opportunity.
-  Deal.fromMarketPrices({
-    required this.sourcePrice,
-    required MarketPrice this.destinationPrice,
-  })  : contractDelivery = null,
-        constructionDestination = null,
-        assert(
-          sourcePrice.waypointSymbol != destinationPrice.waypointSymbol,
-          'sourcePrice and destinationPrice must be for different markets',
+  /// Create a new Deal from a source and destination.
+  Deal({
+    required this.source,
+    required this.destination,
+  })  : assert(
+          source.waypointSymbol != destination.waypointSymbol,
+          'source and destination must be different',
         ),
         assert(
-          sourcePrice.tradeSymbol == destinationPrice.tradeSymbol,
-          'sourcePrice and destinationPrice must be for the same tradeSymbol',
+          source.tradeSymbol == destination.tradeSymbol,
+          'source and destination must have the same tradeSymbol',
         );
-
-  /// Create a new deal for a construction delivery.
-  Deal.fromConstructionDelivery({
-    required this.sourcePrice,
-    required this.constructionDestination,
-  })  : destinationPrice = null,
-        contractDelivery = null,
-        assert(
-          sourcePrice.waypointSymbol != constructionDestination,
-          'sourcePrice and constructionDestination must be different',
-        );
-
-  /// Create a new deal from a BuyOpp and SellOpp.
-  factory Deal.fromOpps(BuyOpp buyOpp, SellOpp sellOpp) {
-    if (sellOpp.contractId != null) {
-      return Deal.fromContractDelivery(
-        sourcePrice: buyOpp.marketPrice,
-        contractDelivery: ContractDelivery.fromSellOpp(sellOpp),
-      );
-    }
-    if (sellOpp.isConstructionDelivery) {
-      return Deal.fromConstructionDelivery(
-        sourcePrice: buyOpp.marketPrice,
-        constructionDestination: sellOpp.marketSymbol,
-      );
-    }
-    return Deal.fromMarketPrices(
-      sourcePrice: buyOpp.marketPrice,
-      destinationPrice: sellOpp.marketPrice!,
-    );
-  }
 
   /// Create a test deal.
   @visibleForTesting
@@ -154,65 +27,66 @@ class Deal {
     required int purchasePrice,
     required int sellPrice,
   }) {
-    return Deal.fromMarketPrices(
-      sourcePrice: MarketPrice(
-        waypointSymbol: sourceSymbol,
-        symbol: tradeSymbol,
-        supply: SupplyLevel.ABUNDANT,
-        purchasePrice: purchasePrice,
-        sellPrice: purchasePrice + 1,
-        tradeVolume: 100,
-        // If these aren't UTC, they won't roundtrip through JSON correctly
-        // because MarketPrice always converts to UTC in toJson.
-        timestamp: DateTime(2021).toUtc(),
+    return Deal(
+      source: BuyOpp(
+        MarketPrice(
+          waypointSymbol: sourceSymbol,
+          symbol: tradeSymbol,
+          supply: SupplyLevel.ABUNDANT,
+          purchasePrice: purchasePrice,
+          sellPrice: purchasePrice + 1,
+          tradeVolume: 100,
+          // If these aren't UTC, they won't roundtrip through JSON correctly
+          // because MarketPrice always converts to UTC in toJson.
+          timestamp: DateTime(2021).toUtc(),
+        ),
       ),
-      destinationPrice: MarketPrice(
-        waypointSymbol: destinationSymbol,
-        symbol: tradeSymbol,
-        supply: SupplyLevel.ABUNDANT,
-        purchasePrice: sellPrice - 1,
-        sellPrice: sellPrice,
-        tradeVolume: 100,
-        timestamp: DateTime(2021).toUtc(),
+      destination: SellOpp.fromMarketPrice(
+        MarketPrice(
+          waypointSymbol: destinationSymbol,
+          symbol: tradeSymbol,
+          supply: SupplyLevel.ABUNDANT,
+          purchasePrice: sellPrice - 1,
+          sellPrice: sellPrice,
+          tradeVolume: 100,
+          timestamp: DateTime(2021).toUtc(),
+        ),
       ),
     );
   }
 
-  const Deal._({
-    required this.sourcePrice,
-    required this.destinationPrice,
-    required this.contractDelivery,
-    required this.constructionDestination,
-  });
-
   /// Create a deal from JSON.
   factory Deal.fromJson(Map<String, dynamic> json) {
-    return Deal._(
-      sourcePrice: MarketPrice.fromJson(
-        json['sourcePrice'] as Map<String, dynamic>,
-      ),
-      destinationPrice: MarketPrice.fromJsonOrNull(
-        json['destinationPrice'] as Map<String, dynamic>?,
-      ),
-      contractDelivery: ContractDelivery.fromJsonOrNull(
-        json['contractDelivery'] as Map<String, dynamic>?,
-      ),
-      constructionDestination: WaypointSymbol.fromJsonOrNull(
-        json['constructionDestination'] as String?,
-      ),
+    return Deal(
+      source: BuyOpp.fromJson(json['source'] as Map<String, dynamic>),
+      destination:
+          SellOpp.fromJson(json['destination'] as Map<String, dynamic>),
     );
   }
 
   /// The trade symbol that we're selling.
-  TradeSymbol get tradeSymbol => sourcePrice.tradeSymbol;
+  TradeSymbol get tradeSymbol => source.tradeSymbol;
 
-  /// Market state at the source.
-  final MarketPrice sourcePrice;
+  /// Where we get the goods from.
+  final BuyOpp source;
 
-  /// Market state at the destination.
-  final MarketPrice? destinationPrice;
+  /// Where we take the goods to.
+  final SellOpp destination;
 
-  /// The contract this deal is a part of.
+  /// The symbol of the market we're buying from.
+  WaypointSymbol get sourceSymbol => source.waypointSymbol;
+
+  /// The symbol of where this deal is going.
+  WaypointSymbol get destinationSymbol => destination.waypointSymbol;
+
+  /// The id of the contract this deal is a part of.
+  String? get contractId => destination.contractId;
+
+  /// The maximum number of units we can trade in this deal.
+  /// This is only used for contract deliveries.  Null means unlimited.
+  int? get maxUnits => destination.maxUnits;
+
+  /// Whether this deal is a contract deal.
   /// Contract deals are very similar to arbitrage deals except:
   /// 1. The destination market is predetermined.
   /// 2. Trade volume is predetermined and coordinated across all ships.
@@ -222,45 +96,15 @@ class Deal {
   /// 4. Behavior at destinations is different ("fulfill" instead of "sell").
   /// 5. We treat the "sell" price as the total reward of contract divided by
   ///    the number of units of cargo we need to deliver.
-  final ContractDelivery? contractDelivery;
-
-  /// The destination of a construction deal.
-  final WaypointSymbol? constructionDestination;
-
-  /// The symbol of the market we're buying from.
-  WaypointSymbol get sourceSymbol => sourcePrice.waypointSymbol;
-
-  /// The symbol of where this deal is going.
-  WaypointSymbol get destinationSymbol {
-    final contract = contractDelivery;
-    if (contract != null) {
-      return contract.destination;
-    }
-    if (constructionDestination != null) {
-      return constructionDestination!;
-    }
-    return destinationPrice!.waypointSymbol;
-  }
-
-  /// The id of the contract this deal is a part of.
-  String? get contractId => contractDelivery?.contractId;
-
-  /// The maximum number of units we can trade in this deal.
-  /// This is only used for contract deliveries.  Null means unlimited.
-  int? get maxUnits => contractDelivery?.maxUnits;
-
-  /// Whether this deal is a contract deal.
-  bool get isContractDeal => contractDelivery != null;
+  bool get isContractDeal => destination.isContractDelivery;
 
   /// Whether this deal is a construction deal.
-  bool get isConstructionDelivery => constructionDestination != null;
+  bool get isConstructionDelivery => destination.isConstructionDelivery;
 
   /// Encode the deal as JSON.
   Map<String, dynamic> toJson() => {
-        'sourcePrice': sourcePrice.toJson(),
-        'destinationPrice': destinationPrice?.toJson(),
-        'contractDelivery': contractDelivery?.toJson(),
-        'constructionDestination': constructionDestination?.toJson(),
+        'source': source.toJson(),
+        'destination': destination.toJson(),
       };
 
   @override
@@ -268,17 +112,13 @@ class Deal {
       identical(this, other) ||
       other is Deal &&
           runtimeType == other.runtimeType &&
-          sourcePrice == other.sourcePrice &&
-          destinationPrice == other.destinationPrice &&
-          contractDelivery == other.contractDelivery &&
-          constructionDestination == other.constructionDestination;
+          source == other.source &&
+          destination == other.destination;
 
   @override
   int get hashCode => Object.hash(
-        sourcePrice,
-        destinationPrice,
-        contractDelivery,
-        constructionDestination,
+        source,
+        destination,
       );
 }
 

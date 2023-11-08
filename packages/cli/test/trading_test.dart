@@ -372,7 +372,7 @@ void main() {
 
     final extraSellOpps = [
       SellOpp.fromContract(
-        marketSymbol: c,
+        waypointSymbol: c,
         tradeSymbol: trade2,
         price: 4,
         contractId: 'foo',
@@ -390,21 +390,23 @@ void main() {
   test('Deal.maxUnits', () {
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
-    final deal = Deal.fromContractDelivery(
-      sourcePrice: MarketPrice(
-        waypointSymbol: start,
-        symbol: TradeSymbol.FUEL,
-        supply: SupplyLevel.ABUNDANT,
-        purchasePrice: 1,
-        sellPrice: 2,
-        tradeVolume: 10,
-        timestamp: DateTime(2021),
+    final deal = Deal(
+      source: BuyOpp(
+        MarketPrice(
+          waypointSymbol: start,
+          symbol: TradeSymbol.FUEL,
+          supply: SupplyLevel.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+          tradeVolume: 10,
+          timestamp: DateTime(2021),
+        ),
       ),
-      contractDelivery: ContractDelivery(
-        destination: end,
+      destination: SellOpp.fromContract(
+        waypointSymbol: end,
         tradeSymbol: TradeSymbol.FUEL,
         contractId: 'foo',
-        rewardPerUnit: 2,
+        price: 2,
         maxUnits: 10,
       ),
     );
@@ -656,26 +658,30 @@ void main() {
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
     const tradeSymbol = TradeSymbol.MODULE_CARGO_HOLD_I;
-    final deal = Deal.fromMarketPrices(
-      sourcePrice: MarketPrice(
-        waypointSymbol: start,
-        symbol: tradeSymbol,
-        supply: SupplyLevel.ABUNDANT,
-        purchasePrice: 10000,
-        sellPrice: 10200,
-        tradeVolume: 10,
-        // If these aren't UTC, they won't roundtrip through JSON correctly
-        // because MarketPrice always converts to UTC in toJson.
-        timestamp: DateTime(2021).toUtc(),
+    final deal = Deal(
+      source: BuyOpp(
+        MarketPrice(
+          waypointSymbol: start,
+          symbol: tradeSymbol,
+          supply: SupplyLevel.ABUNDANT,
+          purchasePrice: 10000,
+          sellPrice: 10200,
+          tradeVolume: 10,
+          // If these aren't UTC, they won't roundtrip through JSON correctly
+          // because MarketPrice always converts to UTC in toJson.
+          timestamp: DateTime(2021).toUtc(),
+        ),
       ),
-      destinationPrice: MarketPrice(
-        waypointSymbol: end,
-        symbol: tradeSymbol,
-        supply: SupplyLevel.ABUNDANT,
-        purchasePrice: 10200,
-        sellPrice: 10400,
-        tradeVolume: 10,
-        timestamp: DateTime(2021).toUtc(),
+      destination: SellOpp.fromMarketPrice(
+        MarketPrice(
+          waypointSymbol: end,
+          symbol: tradeSymbol,
+          supply: SupplyLevel.ABUNDANT,
+          purchasePrice: 10200,
+          sellPrice: 10400,
+          tradeVolume: 10,
+          timestamp: DateTime(2021).toUtc(),
+        ),
       ),
     );
     final costedDeal = CostedDeal(

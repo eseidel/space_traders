@@ -220,6 +220,7 @@ void main() {
     final deal = _MockDeal();
     when(() => costedDeal.deal).thenReturn(deal);
     when(() => costedDeal.cargoSize).thenReturn(120);
+    when(() => costedDeal.isContractDeal).thenReturn(true);
     when(() => deal.maxUnits).thenReturn(10);
     when(() => costedDeal.contractId).thenReturn('C');
     const tradeSymbol = TradeSymbol.FUEL;

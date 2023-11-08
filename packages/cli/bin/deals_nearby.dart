@@ -63,7 +63,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       final type =
           extraOpp.isConstructionDelivery ? 'construction' : 'contract';
       logger.info('  $type: ${extraOpp.maxUnits} ${extraOpp.tradeSymbol} -> '
-          '${extraOpp.marketSymbol} @ ${creditsString(extraOpp.price)}');
+          '${extraOpp.waypointSymbol} @ ${creditsString(extraOpp.price)}');
     }
   }
 
