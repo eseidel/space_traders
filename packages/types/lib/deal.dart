@@ -249,6 +249,12 @@ class Deal {
   /// This is only used for contract deliveries.  Null means unlimited.
   int? get maxUnits => contractDelivery?.maxUnits;
 
+  /// Whether this deal is a contract deal.
+  bool get isContractDeal => contractDelivery != null;
+
+  /// Whether this deal is a construction deal.
+  bool get isConstructionDelivery => constructionDestination != null;
+
   /// Encode the deal as JSON.
   Map<String, dynamic> toJson() => {
         'sourcePrice': sourcePrice.toJson(),
@@ -312,7 +318,10 @@ class CostedDeal {
   String? get contractId => deal.contractId;
 
   /// Whether this deal is a contract deal.
-  bool get isContractDeal => deal.contractId != null;
+  bool get isContractDeal => deal.isContractDeal;
+
+  /// Whether this deal is a construction deal.
+  bool get isConstructionDeal => deal.isConstructionDelivery;
 
   /// The deal being considered.
   final Deal deal;

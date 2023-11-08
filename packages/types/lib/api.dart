@@ -691,6 +691,14 @@ extension ShipyardUtils on Shipyard {
 extension ConstructionUtils on Construction {
   /// Returns the WaypointSymbol for the construction.
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
+
+  /// Returns the SystemSymbol for the construction.
+  SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
+
+  /// Returns the amount of the given trade good the construction needs.
+  ConstructionMaterial? materialNeeded(TradeSymbol tradeSymbol) {
+    return materials.firstWhereOrNull((m) => m.tradeSymbol == tradeSymbol);
+  }
 }
 
 /// Extensions onto MarketTransaction to make it easier to work with.

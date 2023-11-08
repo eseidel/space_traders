@@ -124,7 +124,7 @@ class WaypointCache {
       final construction = waypoint.isUnderConstruction
           ? await getConstruction(_api, waypoint.waypointSymbol)
           : null;
-      _constructionCache.recordConstruction(
+      _constructionCache.updateConstruction(
         waypointSymbol: waypoint.waypointSymbol,
         construction: construction,
       );

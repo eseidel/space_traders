@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
+import 'package:types/construction.dart';
 import 'package:types/contract.dart';
 
 /// The accounting type of a transaction.
@@ -42,7 +43,10 @@ enum TransactionType {
   shipModification,
 
   /// A contract transaction
-  contract;
+  contract,
+
+  /// Construction delivery
+  consturction;
 
   /// Lookup a transaction type by index.
   static TransactionType fromName(String name) {
@@ -225,6 +229,28 @@ class Transaction {
       accounting: AccountingType.goods,
       contractId: transaction.contractId,
       contractAction: transaction.contractAction,
+    );
+  }
+
+  /// Create a new transaction from a construction delivery.
+  factory Transaction.fromConstructionDelivery(
+    ConstructionDelivery delivery,
+    int agentCredits,
+  ) {
+    return Transaction(
+      transactionType: TransactionType.consturction,
+      shipSymbol: delivery.shipSymbol,
+      waypointSymbol: delivery.waypointSymbol,
+      tradeSymbol: delivery.tradeSymbol,
+      shipType: null,
+      quantity: delivery.unitsDelivered,
+      tradeType: null,
+      perUnitPrice: 0,
+      timestamp: delivery.timestamp,
+      agentCredits: agentCredits,
+      accounting: AccountingType.goods,
+      contractId: null,
+      contractAction: null,
     );
   }
 

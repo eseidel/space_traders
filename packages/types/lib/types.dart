@@ -2,6 +2,7 @@ export 'package:openapi/api.dart';
 
 export 'api.dart';
 export 'behavior.dart';
+export 'construction.dart';
 export 'contract.dart';
 export 'deal.dart';
 export 'enum.dart';

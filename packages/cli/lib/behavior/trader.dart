@@ -248,7 +248,6 @@ Future<DateTime?> _handleContractDealAtDestination(
   Caches caches,
   Ship ship,
   BehaviorState state,
-  Market currentMarket,
   CostedDeal costedDeal,
 ) async {
   final contractGood = costedDeal.tradeSymbol;
@@ -374,6 +373,96 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   return response;
 }
 
+/// Handle construction deal at destination.
+Future<DateTime?> _handleConstructionDealAtDelivery(
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship,
+  BehaviorState state,
+  CostedDeal costedDeal,
+) async {
+  await _deliverConstructionMaterialsIfPosible(
+    api,
+    db,
+    caches.agent,
+    caches.construction,
+    caches.ships,
+    ship,
+    caches.construction
+        .constructionForSymbol(costedDeal.deal.destinationSymbol)!,
+    costedDeal.tradeSymbol,
+  );
+  // Delivering the goods counts as completing the behavior, we'll
+  // decide next loop if we need to do more.
+  state.isComplete = true;
+  return null;
+}
+
+Future<SupplyConstruction200ResponseData?>
+    _deliverConstructionMaterialsIfPosible(
+  Api api,
+  Database db,
+  AgentCache agentCache,
+  ConstructionCache constructionCache,
+  ShipCache shipCache,
+  Ship ship,
+  Construction construction,
+  TradeSymbol tradeSymbol,
+) async {
+  final units = ship.countUnits(tradeSymbol);
+  if (units < 1) {
+    return null;
+  }
+  if (construction.isComplete) {
+    shipWarn(
+      ship,
+      'Construction @ ${construction.symbol} already complete, ignoring.',
+    );
+    // Caller will complete behavior.
+    return null;
+  }
+
+  final unitsBefore = ship.countUnits(tradeSymbol);
+  // And we have the desired cargo.
+  final response = await supplyConstruction(
+    api,
+    ship,
+    shipCache,
+    constructionCache,
+    construction,
+    tradeSymbol: tradeSymbol,
+    units: units,
+  );
+  final material = response.construction.materialNeeded(tradeSymbol)!;
+  shipInfo(
+    ship,
+    'Supplied $units $tradeSymbol '
+    'to ${construction.symbol}; '
+    '${material.fulfilled}/${material.required_}',
+  );
+
+  // Update our cargo counts after delivering the contract goods.
+  final unitsAfter = ship.countUnits(tradeSymbol);
+  final unitsDelivered = unitsAfter - unitsBefore;
+
+  // Record the delivery transaction.
+  final delivery = ConstructionDelivery(
+    shipSymbol: ship.shipSymbol,
+    waypointSymbol: ship.waypointSymbol,
+    unitsDelivered: unitsDelivered,
+    tradeSymbol: tradeSymbol,
+    timestamp: DateTime.timestamp(),
+  );
+  final transaction = Transaction.fromConstructionDelivery(
+    delivery,
+    agentCache.agent.credits,
+  );
+  await db.insertTransaction(transaction);
+  return response;
+}
+
 Future<DateTime?> _handleOffCourseWithDeal(
   Api api,
   Database db,
@@ -443,7 +532,17 @@ Future<DateTime?> _handleAtDestinationWithDeal(
       caches,
       ship,
       state,
-      currentMarket,
+      costedDeal,
+    );
+  }
+  if (costedDeal.isConstructionDeal) {
+    return _handleConstructionDealAtDelivery(
+      api,
+      db,
+      centralCommand,
+      caches,
+      ship,
+      state,
       costedDeal,
     );
   }

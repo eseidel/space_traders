@@ -74,8 +74,8 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
   /// The number of waypoints in the cache.
   int get waypointCount => values.length;
 
-  /// Adds a construction to the cache.
-  void recordConstruction({
+  /// Updates a [construction] to the cache.
+  void updateConstruction({
     required WaypointSymbol waypointSymbol,
     required Construction? construction,
     DateTime Function() getNow = defaultGetNow,
@@ -109,11 +109,15 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
   bool? isUnderConstruction(WaypointSymbol waypointSymbol) =>
       recordForSymbol(waypointSymbol)?.isUnderConstruction;
 
-  /// Gets the Construction for the given waypoint symbol.
+  /// Gets the ConstructionRecord for the given waypoint symbol.
   ConstructionRecord? recordForSymbol(WaypointSymbol waypointSymbol) =>
       values.firstWhereOrNull(
         (record) => record.waypointSymbol == waypointSymbol,
       );
+
+  /// Gets the Construction for the given waypoint symbol.
+  Construction? constructionForSymbol(WaypointSymbol waypointSymbol) =>
+      recordForSymbol(waypointSymbol)?.construction;
 
   /// Returns the age of the cache for a given waypoint.
   Duration? cacheAgeFor(

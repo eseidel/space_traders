@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:types/types.dart';
@@ -129,6 +130,36 @@ Future<DeliverContract200ResponseData> deliverContract(
       .deliverContract(contract.id, deliverContractRequest: request);
   final data = response!.data;
   contractCache.updateContract(data.contract);
+  ship.cargo = data.cargo;
+  shipCache.updateShip(ship);
+  return data;
+}
+
+/// Deliver [units] of [tradeSymbol] to [construction]
+Future<SupplyConstruction200ResponseData> supplyConstruction(
+  Api api,
+  Ship ship,
+  ShipCache shipCache,
+  ConstructionCache constructionCache,
+  Construction construction, {
+  required TradeSymbol tradeSymbol,
+  required int units,
+}) async {
+  final request = SupplyConstructionRequest(
+    shipSymbol: ship.symbol,
+    tradeSymbol: tradeSymbol.value,
+    units: units,
+  );
+  final response = await api.systems.supplyConstruction(
+    construction.waypointSymbol.system,
+    construction.waypointSymbol.waypoint,
+    supplyConstructionRequest: request,
+  );
+  final data = response!.data;
+  constructionCache.updateConstruction(
+    waypointSymbol: construction.waypointSymbol,
+    construction: data.construction,
+  );
   ship.cargo = data.cargo;
   shipCache.updateShip(ship);
   return data;
