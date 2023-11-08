@@ -55,6 +55,7 @@ class Caches {
     required this.factions,
     required this.static,
     required this.marketListings,
+    required this.construction,
   });
 
   /// The agent cache.
@@ -74,6 +75,9 @@ class Caches {
 
   /// The cache of systems.
   final SystemsCache systems;
+
+  /// The cache of construction data.
+  final ConstructionCache construction;
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
@@ -153,6 +157,7 @@ class Caches {
       routePlanner: routePlanner,
       factions: factions,
       marketListings: marketListings,
+      construction: construction,
     );
   }
 

@@ -593,6 +593,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
   CostedDeal? findDeal(Ship ship, WaypointSymbol startSymbol) {
     return centralCommand.findNextDeal(
       caches.agent,
+      caches.construction,
       caches.contracts,
       caches.marketPrices,
       caches.systems,
@@ -790,6 +791,7 @@ Future<DateTime?> advanceTrader(
   // Consider all deals starting at any market within our consideration range.
   final newDeal = centralCommand.findNextDeal(
     caches.agent,
+    caches.construction,
     caches.contracts,
     caches.marketPrices,
     caches.systems,

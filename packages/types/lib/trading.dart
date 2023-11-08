@@ -40,10 +40,18 @@ class SellOpp {
     required this.maxUnits,
   }) : marketPrice = null;
 
+  const SellOpp.fromConstruction({
+    required this.marketSymbol,
+    required this.tradeSymbol,
+    required this.price,
+    required this.maxUnits,
+  })  : marketPrice = null,
+        contractId = null;
+
   /// State of the market where this sell opportunity was found.
   final MarketPrice? marketPrice;
 
-  /// The symbol of the market where the good can be sold.
+  /// The symbol of the good can be delivered.
   final WaypointSymbol marketSymbol;
 
   /// The symbol of the good offered for sold.

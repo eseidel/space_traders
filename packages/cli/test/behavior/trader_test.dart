@@ -152,6 +152,7 @@ void main() {
     when(
       () => centralCommand.findNextDeal(
         caches.agent,
+        caches.construction,
         caches.contracts,
         caches.marketPrices,
         caches.systems,
@@ -661,6 +662,7 @@ void main() {
     when(
       () => centralCommand.findNextDeal(
         caches.agent,
+        caches.construction,
         caches.contracts,
         caches.marketPrices,
         caches.systems,

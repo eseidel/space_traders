@@ -46,6 +46,9 @@ class CentralCommand {
   /// BehaviorStates with jobs when handing them out to ships.
   ShipBuyJob? _nextShipBuyJob;
 
+  /// The current construction job.
+  Construction? _activeConstruction;
+
   /// Mounts we know of a place we can buy.
   final Set<ShipMountSymbolEnum> _availableMounts = {};
 
@@ -209,9 +212,17 @@ class CentralCommand {
     );
   }
 
+  Iterable<SellOpp> constructionSellOpps() {
+    if (_activeConstruction == null) {
+      return [];
+    }
+    return [];
+  }
+
   /// Find next deal for the given [ship], considering all deals in progress.
   CostedDeal? findNextDeal(
     AgentCache agentCache,
+    ConstructionCache constructionCache,
     ContractCache contractCache,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
@@ -243,9 +254,11 @@ class CentralCommand {
 
     /// This should decide if contract trading is enabled, and if it is
     /// include extra SellOpps for the contract goods.
-    final extraSellOpps = isContractTradingEnabled
-        ? contractSellOpps(agentCache, contractCache).toList()
-        : <SellOpp>[];
+    final extraSellOpps = <SellOpp>[...constructionSellOpps()];
+    if (isContractTradingEnabled) {
+      extraSellOpps.addAll(contractSellOpps(agentCache, contractCache));
+    }
+
     if (extraSellOpps.isNotEmpty) {
       final opp = extraSellOpps.first;
       logger.detail(
@@ -671,7 +684,7 @@ class CentralCommand {
   }
 }
 
-int _maxWorthwhileUnitPurchasePrice(
+int _maxContractUnitPurchasePrice(
   Contract contract,
   ContractDeliverGood good,
 ) {
@@ -704,7 +717,7 @@ int _minimumFloatRequired(Contract contract) {
   final good = contract.terms.deliver.first;
   // MaxUnitPrice is the max we'd pay, which isn't the max they're likely to
   // cost.  We could instead use median price of the good in question.
-  final maxUnitPrice = _maxWorthwhileUnitPurchasePrice(contract, good);
+  final maxUnitPrice = _maxContractUnitPurchasePrice(contract, good);
   const creditsBuffer = 20000;
   final remainingUnits = good.unitsRequired - good.unitsFulfilled;
   // TODO(eseidel): 100000 is an arbitrary minimum we should remove!
@@ -728,7 +741,7 @@ Iterable<SellOpp> sellOppsForContracts(
           marketSymbol: good.destination,
           tradeSymbol: good.tradeSymbolObject,
           contractId: contract.id,
-          price: _maxWorthwhileUnitPurchasePrice(contract, good),
+          price: _maxContractUnitPurchasePrice(contract, good),
           maxUnits: unitsNeeded,
         );
       }
@@ -750,6 +763,35 @@ Iterable<Contract> affordableContracts(
   final credits = agentCache.agent.credits;
   return contractsCache.activeContracts
       .where((c) => _minimumFloatRequired(c) <= credits);
+}
+
+/// Procurement contracts converted to sell opps.
+Iterable<SellOpp> sellOppsForConstruction(
+  Construction construction, {
+  required int Function(TradeSymbol) remainingUnitsNeeded,
+}) sync* {
+  if (construction.isComplete) {
+    return;
+  }
+  // We could put some "total value" on the idea of the gate being open
+  // and change that over time to encourage building it sooner.
+  // For now we're just hard-coding a price for each needed good.
+  final maxPurchasePrice = {
+    TradeSymbol.FAB_MATS: 1200,
+    TradeSymbol.ADVANCED_CIRCUITRY: 16000,
+  };
+
+  for (final material in construction.materials) {
+    final unitsNeeded = remainingUnitsNeeded(material.tradeSymbol);
+    if (unitsNeeded > 0) {
+      yield SellOpp.fromConstruction(
+        marketSymbol: construction.waypointSymbol,
+        tradeSymbol: material.tradeSymbol,
+        price: maxPurchasePrice[material.tradeSymbol]!,
+        maxUnits: unitsNeeded,
+      );
+    }
+  }
 }
 
 /// Returns the ship symbols for all idle haulers.

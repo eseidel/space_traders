@@ -3,41 +3,43 @@ import 'package:mocktail/mocktail.dart';
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
+class _MockBehaviorCache extends Mock implements BehaviorCache {}
+
 class _MockChartingCache extends Mock implements ChartingCache {}
 
-class _MockMarketCache extends Mock implements MarketCache {}
-
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
-class _MockShipyardPrices extends Mock implements ShipyardPrices {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
-
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockConstructionCache extends Mock implements ConstructionCache {}
 
 class _MockContractCache extends Mock implements ContractCache {}
 
-class _MockBehaviorCache extends Mock implements BehaviorCache {}
+class _MockMarketCache extends Mock implements MarketCache {}
+
+class _MockMarketListingCache extends Mock implements MarketListingCache {}
+
+class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
-class _MockShipMountCache extends Mock implements ShipMountCache {}
-
-class _MockShipModuleCache extends Mock implements ShipModuleCache {}
-
-class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
+class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockShipEngineCache extends Mock implements ShipEngineCache {}
 
+class _MockShipModuleCache extends Mock implements ShipModuleCache {}
+
+class _MockShipMountCache extends Mock implements ShipMountCache {}
+
 class _MockShipReactorCache extends Mock implements ShipReactorCache {}
+
+class _MockShipyardPrices extends Mock implements ShipyardPrices {}
+
+class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
+
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockTradeGoodCache extends Mock implements TradeGoodCache {}
 
-class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
-class _MockMarketListingCache extends Mock implements MarketListingCache {}
+class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
 Caches mockCaches() {
   final mounts = _MockShipMountCache();
@@ -71,5 +73,6 @@ Caches mockCaches() {
     routePlanner: _MockRoutePlanner(),
     factions: [],
     static: staticCache,
+    construction: _MockConstructionCache(),
   );
 }
