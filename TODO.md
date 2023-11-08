@@ -704,3 +704,6 @@ in 4m uses 329 fuel
 
 That way we can run our "where should we sell this" in between lots.
 
+### Standardize fooForBar vs fooOfBar, etc, use foo[bar] more, etc.
+
+waypointForSymbol, waypointAtSymbol, etc.
