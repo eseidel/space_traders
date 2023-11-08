@@ -35,8 +35,6 @@ class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockShipNavRoute extends Mock implements ShipNavRoute {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
 
 void main() {
