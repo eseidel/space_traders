@@ -283,11 +283,12 @@ extension CostedDealPrediction on CostedDeal {
   /// of cargo to the given maxSpend.
   CostedDeal limitUnitsByMaxSpend(int maxSpend) {
     final goodsBudget = maxSpend - expectedOperationalExpenses;
-    final maxUnits = deal.sourcePrice.predictUnitsPurchasableFor(goodsBudget);
-    if (maxUnits < cargoSize) {
+    final affordableUnits = deal.sourcePrice
+        .predictUnitsPurchasableFor(maxSpend: goodsBudget, maxUnits: cargoSize);
+    if (affordableUnits < cargoSize) {
       return CostedDeal(
         deal: deal,
-        cargoSize: maxUnits,
+        cargoSize: affordableUnits,
         transactions: transactions,
         startTime: startTime,
         route: route,

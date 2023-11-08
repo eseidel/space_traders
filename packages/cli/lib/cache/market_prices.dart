@@ -57,11 +57,17 @@ extension MarketPricePredications on MarketPrice {
   }
 
   /// Predict the number of units that can be purchased for [maxSpend].
-  int predictUnitsPurchasableFor(int maxSpend) {
+  int predictUnitsPurchasableFor({
+    required int maxSpend,
+    required int maxUnits,
+  }) {
     var units = 0;
     var totalCost = 0;
     // This is not efficient, but works for now.
     while (totalCost < maxSpend) {
+      if (units >= maxUnits) {
+        break;
+      }
       totalCost += predictPurchasePriceForUnit(units);
       units++;
     }
