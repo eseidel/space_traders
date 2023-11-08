@@ -75,6 +75,10 @@ class WaypointSymbol {
     return WaypointSymbol._(symbol);
   }
 
+  /// Create a WaypointSymbol from json or null if the json is null.
+  static WaypointSymbol? fromJsonOrNull(String? json) =>
+      json == null ? null : WaypointSymbol.fromJson(json);
+
   /// The sector symbol of the waypoint.
   String get sector => system.split('-')[0];
 

@@ -109,30 +109,22 @@ class BehaviorState {
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
     final behavior = Behavior.fromJson(json['behavior'] as String);
     final shipSymbol = ShipSymbol.fromJson(json['shipSymbol'] as String);
-    final deal = json['deal'] == null
-        ? null
-        : CostedDeal.fromJson(json['deal'] as Map<String, dynamic>);
-    final routePlan = json['routePlan'] == null
-        ? null
-        : RoutePlan.fromJson(json['routePlan'] as Map<String, dynamic>);
-    final buyJob = json['buyJob'] == null
-        ? null
-        : BuyJob.fromJson(json['buyJob'] as Map<String, dynamic>);
-    final deliverJob = json['deliverJob'] == null
-        ? null
-        : DeliverJob.fromJson(json['deliverJob'] as Map<String, dynamic>);
-    final shipBuyJob = json['shipBuyJob'] == null
-        ? null
-        : ShipBuyJob.fromJson(json['shipBuyJob'] as Map<String, dynamic>);
-    final pickupJob = json['pickupJob'] == null
-        ? null
-        : PickupJob.fromJson(json['pickupJob'] as Map<String, dynamic>);
-    final mountJob = json['mountJob'] == null
-        ? null
-        : MountJob.fromJson(json['mountJob'] as Map<String, dynamic>);
-    final mineJob = json['mineJob'] == null
-        ? null
-        : MineJob.fromJson(json['mineJob'] as Map<String, dynamic>);
+    final deal =
+        CostedDeal.fromJsonOrNull(json['deal'] as Map<String, dynamic>?);
+    final routePlan =
+        RoutePlan.fromJsonOrNull(json['routePlan'] as Map<String, dynamic>?);
+    final buyJob =
+        BuyJob.fromJsonOrNull(json['buyJob'] as Map<String, dynamic>?);
+    final deliverJob =
+        DeliverJob.fromJsonOrNull(json['deliverJob'] as Map<String, dynamic>?);
+    final shipBuyJob =
+        ShipBuyJob.fromJsonOrNull(json['shipBuyJob'] as Map<String, dynamic>?);
+    final pickupJob =
+        PickupJob.fromJsonOrNull(json['pickupJob'] as Map<String, dynamic>?);
+    final mountJob =
+        MountJob.fromJsonOrNull(json['mountJob'] as Map<String, dynamic>?);
+    final mineJob =
+        MineJob.fromJsonOrNull(json['mineJob'] as Map<String, dynamic>?);
     final jobIndex = json['jobIndex'] as int? ?? 0;
     return BehaviorState(
       shipSymbol,
@@ -226,6 +218,10 @@ class BuyJob {
     );
   }
 
+  /// Create a new buy job from JSON, or null if the JSON is null.
+  static BuyJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : BuyJob.fromJson(json);
+
   /// The item to buy.
   final TradeSymbol tradeSymbol;
 
@@ -265,6 +261,10 @@ class DeliverJob {
     );
   }
 
+  /// Create a new deliver job from JSON, or null if the JSON is null.
+  static DeliverJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : DeliverJob.fromJson(json);
+
   /// The item to deliver (and wait until empty).
   final TradeSymbol tradeSymbol;
 
@@ -299,6 +299,10 @@ class PickupJob {
       waypointSymbol: waypointSymbol,
     );
   }
+
+  /// Create a new pickup job from JSON, or null if the JSON is null.
+  static PickupJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : PickupJob.fromJson(json);
 
   /// The item to pickup from delivery ship.
   // This should support multiple items.
@@ -337,6 +341,10 @@ class MountJob {
       shipyardSymbol: shipyardSymbol,
     );
   }
+
+  /// Create a new mount job from JSON, or null if the JSON is null.
+  static MountJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : MountJob.fromJson(json);
 
   /// The item we plan to mount (needs to be in inventory).
   // Should this support multiple mounts?
@@ -377,6 +385,10 @@ class ShipBuyJob {
     );
   }
 
+  /// Create a new ship buy job from JSON, or null if the JSON is null.
+  static ShipBuyJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : ShipBuyJob.fromJson(json);
+
   /// The type of ship to buy.
   final ShipType shipType;
 
@@ -408,6 +420,10 @@ class MineJob {
     final market = WaypointSymbol.fromJson(json['market'] as String);
     return MineJob(mine: mine, market: market);
   }
+
+  /// Create a new mine job from JSON, or null if the JSON is null.
+  static MineJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : MineJob.fromJson(json);
 
   /// The mine to extract from.
   final WaypointSymbol mine;

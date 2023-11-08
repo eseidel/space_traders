@@ -162,6 +162,10 @@ class RoutePlan {
     );
   }
 
+  /// Create a new route plan from JSON, or null if the JSON is null.
+  static RoutePlan? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : RoutePlan.fromJson(json);
+
   /// The fuel capacity the route was planned for.
   final int fuelCapacity;
 

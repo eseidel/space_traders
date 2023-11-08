@@ -35,6 +35,10 @@ class ContractDelivery {
     );
   }
 
+  /// Create a ContractDelivery from JSON or null.
+  static ContractDelivery? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : ContractDelivery.fromJson(json);
+
   /// Which contract this delivery is a part of.
   final String contractId;
 
@@ -89,6 +93,7 @@ class Deal {
     required this.sourcePrice,
     required ContractDelivery this.contractDelivery,
   })  : destinationPrice = null,
+        constructionDestination = null,
         assert(
           sourcePrice.tradeSymbol == contractDelivery.tradeSymbol,
           'sourcePrice and contractDelivery must be for the same tradeSymbol',
@@ -99,6 +104,7 @@ class Deal {
     required this.sourcePrice,
     required MarketPrice this.destinationPrice,
   })  : contractDelivery = null,
+        constructionDestination = null,
         assert(
           sourcePrice.waypointSymbol != destinationPrice.waypointSymbol,
           'sourcePrice and destinationPrice must be for different markets',
@@ -108,12 +114,29 @@ class Deal {
           'sourcePrice and destinationPrice must be for the same tradeSymbol',
         );
 
+  /// Create a new deal for a construction delivery.
+  Deal.fromConstructionDelivery({
+    required this.sourcePrice,
+    required this.constructionDestination,
+  })  : destinationPrice = null,
+        contractDelivery = null,
+        assert(
+          sourcePrice.waypointSymbol != constructionDestination,
+          'sourcePrice and constructionDestination must be different',
+        );
+
   /// Create a new deal from a BuyOpp and SellOpp.
   factory Deal.fromOpps(BuyOpp buyOpp, SellOpp sellOpp) {
     if (sellOpp.contractId != null) {
       return Deal.fromContractDelivery(
         sourcePrice: buyOpp.marketPrice,
         contractDelivery: ContractDelivery.fromSellOpp(sellOpp),
+      );
+    }
+    if (sellOpp.isConstructionDelivery) {
+      return Deal.fromConstructionDelivery(
+        sourcePrice: buyOpp.marketPrice,
+        constructionDestination: sellOpp.marketSymbol,
       );
     }
     return Deal.fromMarketPrices(
@@ -159,6 +182,7 @@ class Deal {
     required this.sourcePrice,
     required this.destinationPrice,
     required this.contractDelivery,
+    required this.constructionDestination,
   });
 
   /// Create a deal from JSON.
@@ -167,16 +191,15 @@ class Deal {
       sourcePrice: MarketPrice.fromJson(
         json['sourcePrice'] as Map<String, dynamic>,
       ),
-      destinationPrice: json['destinationPrice'] == null
-          ? null
-          : MarketPrice.fromJson(
-              json['destinationPrice'] as Map<String, dynamic>,
-            ),
-      contractDelivery: json['contractDelivery'] == null
-          ? null
-          : ContractDelivery.fromJson(
-              json['contractDelivery'] as Map<String, dynamic>,
-            ),
+      destinationPrice: MarketPrice.fromJsonOrNull(
+        json['destinationPrice'] as Map<String, dynamic>?,
+      ),
+      contractDelivery: ContractDelivery.fromJsonOrNull(
+        json['contractDelivery'] as Map<String, dynamic>?,
+      ),
+      constructionDestination: WaypointSymbol.fromJsonOrNull(
+        json['constructionDestination'] as String?,
+      ),
     );
   }
 
@@ -201,14 +224,20 @@ class Deal {
   ///    the number of units of cargo we need to deliver.
   final ContractDelivery? contractDelivery;
 
+  /// The destination of a construction deal.
+  final WaypointSymbol? constructionDestination;
+
   /// The symbol of the market we're buying from.
   WaypointSymbol get sourceSymbol => sourcePrice.waypointSymbol;
 
-  /// The symbol of the market we're selling to.
+  /// The symbol of where this deal is going.
   WaypointSymbol get destinationSymbol {
     final contract = contractDelivery;
     if (contract != null) {
       return contract.destination;
+    }
+    if (constructionDestination != null) {
+      return constructionDestination!;
     }
     return destinationPrice!.waypointSymbol;
   }
@@ -225,6 +254,7 @@ class Deal {
         'sourcePrice': sourcePrice.toJson(),
         'destinationPrice': destinationPrice?.toJson(),
         'contractDelivery': contractDelivery?.toJson(),
+        'constructionDestination': constructionDestination?.toJson(),
       };
 
   @override
@@ -234,13 +264,15 @@ class Deal {
           runtimeType == other.runtimeType &&
           sourcePrice == other.sourcePrice &&
           destinationPrice == other.destinationPrice &&
-          contractDelivery == other.contractDelivery;
+          contractDelivery == other.contractDelivery &&
+          constructionDestination == other.constructionDestination;
 
   @override
   int get hashCode => Object.hash(
         sourcePrice,
         destinationPrice,
         contractDelivery,
+        constructionDestination,
       );
 }
 
@@ -271,6 +303,10 @@ class CostedDeal {
             .toList(),
         costPerFuelUnit: json['costPerFuelUnit'] as int,
       );
+
+  /// Create a CostedDeal from JSON or null.
+  static CostedDeal? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : CostedDeal.fromJson(json);
 
   /// The id of the contract this deal is a part of.
   String? get contractId => deal.contractId;

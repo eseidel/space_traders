@@ -40,6 +40,10 @@ class MarketPrice {
     );
   }
 
+  /// Create a new price record from a json map, or null if the map is null.
+  static MarketPrice? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : MarketPrice.fromJson(json);
+
   /// Serialize Price as a json map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

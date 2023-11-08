@@ -212,11 +212,20 @@ class CentralCommand {
     );
   }
 
+  /// SellOpps to complete the current construction job.
   Iterable<SellOpp> constructionSellOpps() {
     if (_activeConstruction == null) {
       return [];
     }
-    return [];
+    return sellOppsForConstruction(
+      _activeConstruction!,
+      remainingUnitsNeeded: (tradeSymbol) {
+        return remainingUnitsNeededForConstruction(
+          _activeConstruction!,
+          tradeSymbol,
+        );
+      },
+    );
   }
 
   /// Find next deal for the given [ship], considering all deals in progress.
@@ -620,6 +629,30 @@ class CentralCommand {
     return neededGood!.unitsRequired -
         neededGood.unitsFulfilled -
         unitsAssigned;
+  }
+
+  /// Computes the number of units needed to fulfill the given [construction].
+  /// Includes units in flight.
+  @visibleForTesting
+  int remainingUnitsNeededForConstruction(
+    Construction construction,
+    TradeSymbol tradeSymbol,
+  ) {
+    var unitsAssigned = 0;
+    for (final shipSymbol in _shipCache.shipSymbols) {
+      final deal = _behaviorCache.getBehavior(shipSymbol)?.deal;
+      if (deal == null) {
+        continue;
+      }
+      if (deal.deal.constructionDestination != construction.waypointSymbol) {
+        continue;
+      }
+      unitsAssigned += deal.maxUnitsToBuy;
+    }
+    final neededGood = construction.materials.firstWhere(
+      (m) => m.tradeSymbol == tradeSymbol,
+    );
+    return neededGood.required_ - neededGood.fulfilled - unitsAssigned;
   }
 
   /// Returns the minimum number of surveys to examine before mining

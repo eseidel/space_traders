@@ -40,6 +40,7 @@ class SellOpp {
     required this.maxUnits,
   }) : marketPrice = null;
 
+  /// Create a new SellOpp from a construction.
   const SellOpp.fromConstruction({
     required this.marketSymbol,
     required this.tradeSymbol,
@@ -63,8 +64,15 @@ class SellOpp {
   /// Set to the contractId for contract deliveries.
   final String? contractId;
 
-  /// The maximum number of units we can sell.
-  /// This is only used for contract deliveries towards the very end of
-  /// a contract.
+  /// True if this is a construction delivery.
+  // This is kinda hacky, might need a better way to distinguish between
+  // contract deliveries and construction deliveries.
+  bool get isConstructionDelivery {
+    return contractId == null && marketPrice == null;
+  }
+
+  /// The maximum number of units we can sell/deliver.
+  /// This is only used for contract or construction deliveries when the
+  /// delivery is nearly complete.
   final int? maxUnits;
 }
