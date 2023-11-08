@@ -707,3 +707,4 @@ That way we can run our "where should we sell this" in between lots.
 ### Standardize fooForBar vs fooOfBar, etc, use foo[bar] more, etc.
 
 waypointForSymbol, waypointAtSymbol, etc.
+Similarly load and loadCached, should be load or loadOrFetch.

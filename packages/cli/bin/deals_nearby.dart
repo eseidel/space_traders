@@ -32,9 +32,17 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final extraSellOpps =
       centralCommand.contractSellOpps(agentCache, contractCache).toList();
 
+  final constructionCache = ConstructionCache.load(fs);
+
   final start = startArg == null
       ? agentCache.headquarters(systemsCache)
       : systemsCache.waypointFromString(startArg)!;
+
+  final jumpGate = systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
+  final construction =
+      constructionCache.constructionForSymbol(jumpGate.waypointSymbol);
+  centralCommand.setActiveConstruction(construction);
+  extraSellOpps.addAll(centralCommand.constructionSellOpps());
 
   final ship = staticCaches.shipyardShips[shipType]!;
   final cargoCapacity = ship.cargoCapacity;
@@ -50,9 +58,11 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       'waypoints <= $maxWaypoints ');
 
   if (extraSellOpps.isNotEmpty) {
-    logger.info('Contract opps:');
+    logger.info('Extra sell opps:');
     for (final extraOpp in extraSellOpps) {
-      logger.info('  ${extraOpp.maxUnits} ${extraOpp.tradeSymbol} -> '
+      final type =
+          extraOpp.isConstructionDelivery ? 'construction' : 'contract';
+      logger.info('  $type: ${extraOpp.maxUnits} ${extraOpp.tradeSymbol} -> '
           '${extraOpp.marketSymbol} @ ${creditsString(extraOpp.price)}');
     }
   }

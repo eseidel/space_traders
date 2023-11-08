@@ -163,6 +163,9 @@ extension CostedDealPrediction on CostedDeal {
     if (contract != null) {
       return contract.rewardPerUnit * expectedUnits;
     }
+    if (deal.isConstructionDelivery) {
+      return contract.rewardPerUnit * expectedUnits;
+    }
     return deal.destinationPrice!.totalSellPriceFor(expectedUnits);
   }
 

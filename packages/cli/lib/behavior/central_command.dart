@@ -49,6 +49,11 @@ class CentralCommand {
   /// The current construction job.
   Construction? _activeConstruction;
 
+  /// The current construction job, temporary hack.
+  void setActiveConstruction(Construction? construction) {
+    _activeConstruction = construction;
+  }
+
   /// Mounts we know of a place we can buy.
   final Set<ShipMountSymbolEnum> _availableMounts = {};
 
