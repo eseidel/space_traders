@@ -6,10 +6,8 @@ import 'package:types/types.dart';
 @immutable
 class Deal {
   /// Create a new Deal from a source and destination.
-  Deal({
-    required this.source,
-    required this.destination,
-  })  : assert(
+  Deal({required this.source, required this.destination})
+      : assert(
           source.waypointSymbol != destination.waypointSymbol,
           'source and destination must be different',
         ),
