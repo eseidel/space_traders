@@ -180,6 +180,12 @@ class MarketPrices extends JsonListStore<MarketPrice> {
         }
         // Trade volumes can and will change between price updates.
         // If the new price is newer than the existing price, replace it.
+        if (_prices[index].tradeVolume != newPrice.tradeVolume) {
+          logger.warn('${newPrice.waypointSymbol.sectorLocalName} changed '
+              '${newPrice.symbol} from '
+              '${_prices[index].supply} (${_prices[index].tradeVolume}) '
+              'to  ${newPrice.supply} (${newPrice.tradeVolume})');
+        }
         _prices[index] = newPrice;
       } else {
         _prices.add(newPrice);

@@ -699,3 +699,8 @@ in 4m uses 329 fuel
 🛸#1  🤝  10 SHIP_PLATING         +1% +131c per  10 x 18,024c = +180,240c -> 🏦 1,297,947c
 🛸#1  Expected 11,331c profit (52c/s), got -73,430c (-299c/s) in 00:04:05, expected 00:03:35
 
+
+### Refactor sellAllCargo to only sell on lot at a time.
+
+That way we can run our "where should we sell this" in between lots.
+
