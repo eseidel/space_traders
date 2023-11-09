@@ -248,6 +248,7 @@ Future<DateTime?> _handleContractDealAtDestination(
   Caches caches,
   Ship ship,
   BehaviorState state,
+  Market currentMarket,
   CostedDeal costedDeal,
 ) async {
   final contractGood = costedDeal.tradeSymbol;
@@ -381,6 +382,7 @@ Future<DateTime?> _handleConstructionDealAtDelivery(
   Caches caches,
   Ship ship,
   BehaviorState state,
+  Market currentMarket,
   CostedDeal costedDeal,
 ) async {
   await _deliverConstructionMaterialsIfPosible(
@@ -500,6 +502,25 @@ Future<DateTime?> _handleOffCourseWithDeal(
   }
 }
 
+Future<DateTime?> Function(
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship,
+  BehaviorState state,
+  Market currentMarket,
+  CostedDeal costedDeal,
+) _getDeliveryHandler(CostedDeal costedDeal) {
+  if (costedDeal.isContractDeal) {
+    return _handleContractDealAtDestination;
+  } else if (costedDeal.isConstructionDeal) {
+    return _handleConstructionDealAtDelivery;
+  } else {
+    return _handleArbitrageDealAtDestination;
+  }
+}
+
 Future<DateTime?> _handleAtDestinationWithDeal(
   Api api,
   Database db,
@@ -524,29 +545,7 @@ Future<DateTime?> _handleAtDestinationWithDeal(
       costedDeal.deal.sourceSymbol,
     );
   }
-  if (costedDeal.isContractDeal) {
-    return _handleContractDealAtDestination(
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-      state,
-      costedDeal,
-    );
-  }
-  if (costedDeal.isConstructionDeal) {
-    return _handleConstructionDealAtDelivery(
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-      state,
-      costedDeal,
-    );
-  }
-  return _handleArbitrageDealAtDestination(
+  return _getDeliveryHandler(costedDeal)(
     api,
     db,
     centralCommand,
