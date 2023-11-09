@@ -118,7 +118,7 @@ extension CostedDealPrediction on CostedDeal {
   /// more unit yet that unit not being worth carrying in an otherwise empty
   /// ship.
   int get expectedUnits {
-    if (isContractDeal) {
+    if (isContractDeal || isConstructionDeal) {
       return cargoSize;
     }
     return min(
@@ -158,8 +158,8 @@ extension CostedDealPrediction on CostedDeal {
   int get expectedRevenue {
     // Contract rewards don't move with market state.
     // TODO(eseidel): Move this all onto SellOpp?
-    final isContract = deal.destination.isContractDelivery;
-    if (isContract) {
+    // totalSellPriceFor isn't accessible down in package:types though.
+    if (deal.isConstructionDelivery || deal.isContractDeal) {
       return deal.destination.price * expectedUnits;
     }
     return deal.destination.marketPrice!.totalSellPriceFor(expectedUnits);
