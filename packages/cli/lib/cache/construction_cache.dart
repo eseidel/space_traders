@@ -1,13 +1,15 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 // Can't be immutable because Construction is not immutable.
 /// A cached construction value or null known to be not under construction.
+@immutable
 class ConstructionRecord {
   /// Creates a new construction record.
-  ConstructionRecord({
+  const ConstructionRecord({
     required this.waypointSymbol,
     required this.construction,
     required this.timestamp,
@@ -40,6 +42,18 @@ class ConstructionRecord {
         'construction': construction?.toJson(),
         'waypointSymbol': waypointSymbol.toJson(),
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ConstructionRecord &&
+          runtimeType == other.runtimeType &&
+          waypointSymbol == other.waypointSymbol &&
+          timestamp == other.timestamp &&
+          construction == other.construction;
+
+  @override
+  int get hashCode => Object.hashAll([waypointSymbol, timestamp, construction]);
 }
 
 /// A cached of construction values from Waypoints.
