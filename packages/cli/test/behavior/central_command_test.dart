@@ -504,6 +504,15 @@ void main() {
     when(() => caches.ships.countOfFrame(ShipFrameSymbolEnum.MINER))
         .thenReturn(0);
 
+    when(() => caches.agent.headquarters(caches.systems)).thenReturn(
+      SystemWaypoint(
+        symbol: 'W-A-Y',
+        type: WaypointType.ASTEROID,
+        x: 0,
+        y: 0,
+      ),
+    );
+
     await centralCommand.advanceCentralPlanning(api, caches);
     expect(centralCommand.nextShipBuyJob, isNull);
   });
