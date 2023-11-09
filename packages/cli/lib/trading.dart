@@ -171,11 +171,11 @@ extension CostedDealPrediction on CostedDeal {
 
   /// The expected initial per-unit sell price.
   int get expectedInitialSellPrice {
-    // TODO(eseidel): Move this all onto SellOpp?
-    final isContract = deal.isContractDeal;
-    if (isContract) {
+    if (isContractDeal || isConstructionDeal) {
       return deal.destination.price;
     }
+    // predictSellPriceForUnit isn't available in package:types or we'd
+    // move this all onto SellOpp.
     return deal.destination.marketPrice!.predictSellPriceForUnit(0);
   }
 
