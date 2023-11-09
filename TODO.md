@@ -708,3 +708,9 @@ That way we can run our "where should we sell this" in between lots.
 
 waypointForSymbol, waypointAtSymbol, etc.
 Similarly load and loadCached, should be load or loadOrFetch.
+
+### Route planning is not aware of partial tanks of fuel.
+
+If you don't have a full tank of fuel, it will plan a route that will
+cause you to end up drifting, what it should do is plan an early refuel in it
+and when it refuels re-set to a full capacity.

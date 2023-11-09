@@ -398,6 +398,13 @@ class CentralCommand {
 
   /// Give central planning a chance to advance.
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
+    final systemSymbol = caches.agent.headquarters(caches.systems).systemSymbol;
+    final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
+    final construction = jumpGate == null
+        ? null
+        : caches.construction.constructionForSymbol(jumpGate.waypointSymbol);
+    _activeConstruction = construction;
+
     _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
     updateAvailableMounts(caches.marketPrices);
     await _queueMountRequests(caches);
@@ -816,7 +823,7 @@ Iterable<SellOpp> sellOppsForConstruction(
   // For now we're just hard-coding a price for each needed good.
   final maxPurchasePrice = {
     TradeSymbol.FAB_MATS: 1300,
-    TradeSymbol.ADVANCED_CIRCUITRY: 17000,
+    TradeSymbol.ADVANCED_CIRCUITRY: 16800,
   };
 
   for (final material in construction.materials) {
