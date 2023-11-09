@@ -1,11 +1,7 @@
 import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/cache/static_cache.dart';
 import 'package:file/memory.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
-
-class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
 void main() {
   test('ConstructionCache load/save', () async {

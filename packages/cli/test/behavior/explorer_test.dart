@@ -175,7 +175,7 @@ void main() {
         .thenReturn(
       MarketListing(
         symbol: waypointSymbol,
-        exchange: const [TradeSymbol.FUEL],
+        exchange: const {TradeSymbol.FUEL},
       ),
     );
 

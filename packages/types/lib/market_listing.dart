@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -7,9 +8,9 @@ class MarketListing {
   /// Creates a new market listing.
   const MarketListing({
     required this.symbol,
-    this.exports = const [],
-    this.imports = const [],
-    this.exchange = const [],
+    this.exports = const {},
+    this.imports = const {},
+    this.exchange = const {},
   });
 
   /// Creates a new market description from JSON data.
@@ -29,9 +30,9 @@ class MarketListing {
         .toList();
     return MarketListing(
       symbol: symbol,
-      exports: exports,
-      imports: imports,
-      exchange: exchange,
+      exports: exports.toSet(),
+      imports: imports.toSet(),
+      exchange: exchange.toSet(),
     );
   }
 
@@ -40,13 +41,13 @@ class MarketListing {
   final WaypointSymbol symbol;
 
   /// The list of goods that are exported from this market.
-  final List<TradeSymbol> exports;
+  final Set<TradeSymbol> exports;
 
   /// The list of goods that are sought as imports in this market.
-  final List<TradeSymbol> imports;
+  final Set<TradeSymbol> imports;
 
   /// The list of goods that are bought and sold between agents at this market.
-  final List<TradeSymbol> exchange;
+  final Set<TradeSymbol> exchange;
 
   /// Returns all TradeSymbols traded by the market.
   Iterable<TradeSymbol> get tradeSymbols {
@@ -61,9 +62,29 @@ class MarketListing {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'symbol': symbol.toJson(),
-      'exports': exports.map((e) => e.toJson()).toList(),
-      'imports': imports.map((e) => e.toJson()).toList(),
-      'exchange': exchange.map((e) => e.toJson()).toList(),
+      'exports': exports.map((e) => e.toJson()).toList()..sort(),
+      'imports': imports.map((e) => e.toJson()).toList()..sort(),
+      'exchange': exchange.map((e) => e.toJson()).toList()..sort(),
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    const equality = SetEquality<TradeSymbol>();
+    return identical(this, other) ||
+        other is MarketListing &&
+            runtimeType == other.runtimeType &&
+            symbol == other.symbol &&
+            equality.equals(exports, other.exports) &&
+            equality.equals(imports, other.imports) &&
+            equality.equals(exchange, other.exchange);
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        symbol,
+        exports,
+        imports,
+        exchange,
+      ]);
 }

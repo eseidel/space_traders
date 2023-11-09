@@ -10,7 +10,7 @@ Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
 void addSymbols(
   Table table,
   String category,
-  List<TradeSymbol> tradeSymbols,
+  Set<TradeSymbol> tradeSymbols,
   WaypointSymbol marketSymbol,
   MarketPrices marketPrices,
 ) {

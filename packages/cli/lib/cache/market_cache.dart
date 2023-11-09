@@ -69,9 +69,9 @@ class MarketListingCache extends JsonStore<_Record> {
     final symbol = market.waypointSymbol;
     final marketListing = MarketListing(
       symbol: symbol,
-      imports: market.imports.map((t) => t.symbol).toList(),
-      exports: market.exports.map((t) => t.symbol).toList(),
-      exchange: market.exchange.map((t) => t.symbol).toList(),
+      imports: market.imports.map((t) => t.symbol).toSet(),
+      exports: market.exports.map((t) => t.symbol).toSet(),
+      exchange: market.exchange.map((t) => t.symbol).toSet(),
     );
     tradeGoods.addAll(market.listedTradeGoods);
     _listingBySymbol[symbol] = marketListing;
