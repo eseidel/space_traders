@@ -714,3 +714,7 @@ Similarly load and loadCached, should be load or loadOrFetch.
 If you don't have a full tank of fuel, it will plan a route that will
 cause you to end up drifting, what it should do is plan an early refuel in it
 and when it refuels re-set to a full capacity.
+
+### Make sure construction handles completion correctly.
+
+I'm not sure we have any guards for when construction is completed.

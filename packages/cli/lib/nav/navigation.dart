@@ -297,8 +297,7 @@ Future<NavResult> continueNavigationIfNeeded(
               await caches.waypoints.waypoint(ship.waypointSymbol),
               ship,
             ),
-            'Planned navigation requires more fuel and ship has but '
-            'no market at ${ship.waypointSymbol}, cannot refuel',
+            'No market at ${ship.waypointSymbol}, cannot refuel',
             const Duration(minutes: 10),
           );
           await refuelIfNeededAndLog(
