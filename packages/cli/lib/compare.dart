@@ -14,7 +14,7 @@ bool jsonMatches<T extends Object>(T actual, T expected) {
     return true;
   }
   logger.info('$T differs from expected: $diff');
-  return true;
+  return false;
 }
 
 /// Returns true if the two lists of T match when converted to Json.
