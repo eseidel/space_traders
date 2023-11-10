@@ -12,31 +12,90 @@ class _MockMarketListingCache extends Mock implements MarketListingCache {}
 void main() {
   test('evaluateWaypointsForMining', () async {
     final waypointCache = _MockWaypointCache();
-    final marketLisingCache = _MockMarketListingCache();
+    final marketListingCache = _MockMarketListingCache();
     final systemSymbol = SystemSymbol.fromString('W-A');
-    when(() => waypointCache.waypointsInSystem(systemSymbol))
-        .thenAnswer((_) => Future.value(<Waypoint>[]));
+    when(() => waypointCache.waypointsInSystem(systemSymbol)).thenAnswer(
+      (_) => Future.value([
+        Waypoint(
+          symbol: 'W-A-A',
+          systemSymbol: 'W-A',
+          type: WaypointType.ASTEROID,
+          traits: [
+            WaypointTrait(
+              symbol: WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS,
+              name: 'name',
+              description: 'description',
+            ),
+          ],
+          x: 0,
+          y: 0,
+          isUnderConstruction: false,
+        ),
+        Waypoint(
+          symbol: 'W-A-B',
+          systemSymbol: 'W-A',
+          type: WaypointType.ASTEROID,
+          traits: [
+            WaypointTrait(
+              symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+              name: 'name',
+              description: 'description',
+            ),
+          ],
+          x: 10,
+          y: 0,
+          isUnderConstruction: false,
+        ),
+      ]),
+    );
 
-    final waypoints = await evaluateWaypointsForMining(
+    final scores = await evaluateWaypointsForMining(
       waypointCache,
-      marketLisingCache,
+      marketListingCache,
       systemSymbol,
     );
-    expect(waypoints, isEmpty);
+    expect(scores.length, 1);
+    expect(scores.first.score, 10);
   });
 
   test('evaluateWaypointsForSiphoning', () async {
     final waypointCache = _MockWaypointCache();
-    final marketLisingCache = _MockMarketListingCache();
+    final marketListingCache = _MockMarketListingCache();
     final systemSymbol = SystemSymbol.fromString('W-A');
-    when(() => waypointCache.waypointsInSystem(systemSymbol))
-        .thenAnswer((_) => Future.value(<Waypoint>[]));
+    when(() => waypointCache.waypointsInSystem(systemSymbol)).thenAnswer(
+      (_) => Future.value([
+        Waypoint(
+          symbol: 'W-A-A',
+          systemSymbol: 'W-A',
+          type: WaypointType.GAS_GIANT,
+          x: 0,
+          y: 0,
+          isUnderConstruction: false,
+        ),
+        Waypoint(
+          symbol: 'W-A-B',
+          systemSymbol: 'W-A',
+          type: WaypointType.ASTEROID,
+          traits: [
+            WaypointTrait(
+              symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+              name: 'name',
+              description: 'description',
+            ),
+          ],
+          x: 10,
+          y: 0,
+          isUnderConstruction: false,
+        ),
+      ]),
+    );
 
-    final waypoints = await evaluateWaypointsForSiphoning(
+    final scores = await evaluateWaypointsForSiphoning(
       waypointCache,
-      marketLisingCache,
+      marketListingCache,
       systemSymbol,
     );
-    expect(waypoints, isEmpty);
+    expect(scores.length, 1);
+    expect(scores.first.score, 10);
   });
 }
