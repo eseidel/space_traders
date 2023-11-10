@@ -51,7 +51,7 @@
   "symbol": "MOUNT_MINING_LASER_II",
   "name": "Mining Laser II",
   "description": "An advanced mining laser that is more efficient and effective at extracting valuable minerals from asteroids and other space objects.",
-  "strength": 25,
+  "strength": 5,
   "deposits": [],
   "requirements": {
    "power": 2,
