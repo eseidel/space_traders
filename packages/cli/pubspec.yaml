@@ -13,6 +13,7 @@ dependencies:
   collection: ^1.17.1
   db:
     path: ../db
+  equatable: ^2.0.5
   file: ^6.1.4
   http: ^0.13.6
   intl: ^0.17.0

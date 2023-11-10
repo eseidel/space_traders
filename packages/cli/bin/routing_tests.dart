@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:collection/collection.dart';
+import 'package:cli/compare.dart';
+import 'package:equatable/equatable.dart';
 import 'package:file/memory.dart';
 import 'package:path/path.dart' as path;
 
@@ -78,6 +79,40 @@ class TestWaypoint {
   final int y;
 }
 
+class TestRouteAction extends Equatable {
+  const TestRouteAction({
+    required this.start,
+    required this.end,
+    required this.action,
+  });
+
+  factory TestRouteAction.fromJson(Map<String, dynamic> json) {
+    return TestRouteAction(
+      start: json['start'] as String,
+      end: json['end'] as String,
+      action: json['action'] as String,
+    );
+  }
+
+  final String start;
+  final String end;
+  final String action;
+
+  @override
+  List<Object> get props => [start, end, action];
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'start': start,
+      'end': end,
+      'action': action,
+    };
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+}
+
 class TestSystem {
   TestSystem({
     required this.symbol,
@@ -106,13 +141,15 @@ class TestExpect {
 
   factory TestExpect.fromJson(Map<String, dynamic> json) {
     return TestExpect(
-      route: (json['route'] as List<dynamic>).cast<String>(),
+      route: (json['route'] as List<dynamic>)
+          .map((e) => TestRouteAction.fromJson(e as Map<String, dynamic>))
+          .toList(),
       fuelUsed: json['fuelUsed'] as int,
       time: json['time'] as int,
     );
   }
 
-  final List<String> route;
+  final List<TestRouteAction> route;
   final int fuelUsed;
   final int time;
 }
@@ -159,6 +196,21 @@ class TestSuite {
   final TestShip ship;
   final List<TestSystem> systems;
   final List<Test> tests;
+}
+
+String toActionString(RouteActionType type) {
+  switch (type) {
+    case RouteActionType.jump:
+      return 'JUMP';
+    case RouteActionType.refuel:
+      return 'REFUEL';
+    case RouteActionType.navCruise:
+      return 'NAV-CRUISE';
+    case RouteActionType.navDrift:
+      return 'NAV-DRIFT';
+    case RouteActionType.emptyRoute:
+      throw UnimplementedError();
+  }
 }
 
 void runTests(TestSuite suite, String path) {
@@ -216,20 +268,21 @@ void runTests(TestSuite suite, String path) {
       logger.err('No route found for $start to $end');
       continue;
     }
-    var route = <String>[];
+    final route = <TestRouteAction>[];
     for (final action in plan.actions) {
       if (action.type == RouteActionType.emptyRoute) {
         continue;
       }
-      if (route.isEmpty) {
-        route.add(action.startSymbol.waypoint);
-      }
-      route.add(action.endSymbol.waypoint);
+      route.add(
+        TestRouteAction(
+          start: action.startSymbol.sectorLocalName,
+          end: action.endSymbol.sectorLocalName,
+          action: toActionString(action.type),
+        ),
+      );
     }
-    // Remove the sector.
-    route = route.map((e) => e.substring(e.indexOf('-') + 1)).toList();
     var failure = false;
-    if (!const ListEquality<String>().equals(route, test.expect.route)) {
+    if (!jsonMatches(route, test.expect.route)) {
       logger
         ..err('Route mismatch for ${test.start} to ${test.end}')
         ..err('Expected: ${test.expect.route}')
