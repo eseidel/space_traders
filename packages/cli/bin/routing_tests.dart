@@ -27,6 +27,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     if (testFile is! File) {
       continue;
     }
+    if (!testFile.path.endsWith('.json')) {
+      continue;
+    }
     final suite = TestSuite.fromJson(
       jsonDecode(testFile.readAsStringSync()) as Map<String, dynamic>,
     );
@@ -215,6 +218,9 @@ void runTests(TestSuite suite, String path) {
     }
     var route = <String>[];
     for (final action in plan.actions) {
+      if (action.type == RouteActionType.emptyRoute) {
+        continue;
+      }
       if (route.isEmpty) {
         route.add(action.startSymbol.waypoint);
       }
