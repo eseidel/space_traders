@@ -4,6 +4,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/waypoint_pathing.dart';
 import 'package:cli/printing.dart';
+import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
@@ -117,10 +118,7 @@ extension RoutePlanPlanning on RoutePlan {
       throw ArgumentError('No action starting from $waypointSymbol');
     }
     final newActions = actions.sublist(index);
-    final fuelUsed = _fuelUsedByActions(
-      systemsCache,
-      newActions,
-    );
+    final fuelUsed = _fuelUsedByActions(newActions);
     return RoutePlan(
       fuelCapacity: fuelCapacity,
       shipSpeed: shipSpeed,
@@ -175,7 +173,7 @@ RoutePlan routePlanFromJumpPlan(
     actions.add(_navigationAction(endJumpGate, endWaypoint, shipSpeed));
   }
 
-  final fuelUsed = _fuelUsedByActions(systemsCache, actions);
+  final fuelUsed = _fuelUsedByActions(actions);
   return RoutePlan(
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
@@ -385,7 +383,7 @@ class RoutePlanner {
     // }
 
     // final actions = route.reversed.toList();
-    // final fuelUsed = _fuelUsedByActions(_systemsCache, actions);
+    // final fuelUsed = _fuelUsedByActions(actions);
 
     // _saveJumpsInCache(_jumpCache, actions);
 
@@ -432,7 +430,7 @@ class RoutePlanner {
     // walk backwards from end through symbols to build the route
     // we could alternatively build it forward and then fix the jump durations
     // after.
-    final fuelUsed = _fuelUsedByActions(_systemsCache, actions);
+    final fuelUsed = _fuelUsedByActions(actions);
     return RoutePlan(
       fuelCapacity: fuelCapacity,
       shipSpeed: shipSpeed,
@@ -477,19 +475,8 @@ class RoutePlanner {
   }
 }
 
-int _fuelUsedByActions(SystemsCache systemsCache, List<RouteAction> actions) {
-  var fuelUsed = 0;
-  for (final action in actions) {
-    if (action.type != RouteActionType.navCruise) {
-      continue;
-    }
-    final start = action.startSymbol;
-    final end = action.endSymbol;
-    final startWaypoint = systemsCache.waypointFromSymbol(start);
-    final endWaypoint = systemsCache.waypointFromSymbol(end);
-    fuelUsed += fuelUsedWithinSystem(startWaypoint, endWaypoint);
-  }
-  return fuelUsed;
+int _fuelUsedByActions(List<RouteAction> actions) {
+  return actions.map((a) => a.fuelUsed).sum;
 }
 
 /// Plan a route through a series of waypoints.
@@ -529,7 +516,7 @@ RoutePlan? planRouteThrough(
   for (final segment in segments) {
     actions.addAll(segment.actions);
   }
-  final fuelUsed = _fuelUsedByActions(systemsCache, actions);
+  final fuelUsed = _fuelUsedByActions(actions);
   return RoutePlan(
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
