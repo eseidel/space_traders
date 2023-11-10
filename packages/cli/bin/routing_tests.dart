@@ -64,6 +64,7 @@ class TestWaypoint {
     required this.symbol,
     required this.x,
     required this.y,
+    required this.sellsFuel,
   });
 
   factory TestWaypoint.fromJson(Map<String, dynamic> json) {
@@ -71,12 +72,14 @@ class TestWaypoint {
       symbol: json['symbol'] as String,
       x: json['x'] as int,
       y: json['y'] as int,
+      sellsFuel: json['sellsFuel'] as bool? ?? false,
     );
   }
 
   final String symbol;
   final int x;
   final int y;
+  final bool sellsFuel;
 }
 
 class TestRouteAction extends Equatable {
@@ -248,9 +251,29 @@ void runTests(TestSuite suite, String path) {
     );
   }
 
+  TestWaypoint lookupWaypoint(WaypointSymbol waypointSymbol) {
+    final parts = waypointSymbol.waypoint.split('-');
+    final systemName = parts[1];
+    final waypointName = parts[2];
+
+    for (final system in suite.systems) {
+      if (system.symbol != systemName) {
+        continue;
+      }
+      for (final waypoint in system.waypoints) {
+        if (waypointName == waypoint.symbol) {
+          return waypoint;
+        }
+      }
+    }
+    throw ArgumentError('Waypoint not found: $waypointSymbol');
+  }
+
   final systemsCache = SystemsCache(systems, fs: fs);
-  final routePlanner =
-      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
+  final routePlanner = RoutePlanner.fromSystemsCache(
+    systemsCache,
+    sellsFuel: (WaypointSymbol w) => lookupWaypoint(w).sellsFuel,
+  );
 
   final ship = suite.ship;
 
@@ -285,22 +308,22 @@ void runTests(TestSuite suite, String path) {
     if (!jsonMatches(route, test.expect.route)) {
       logger
         ..err('Route mismatch for ${test.start} to ${test.end}')
-        ..err('Expected: ${test.expect.route}')
-        ..err('Actual: $route');
+        ..err('  Expected: ${test.expect.route}')
+        ..err('  Actual: $route');
       failure = true;
     }
     if (plan.fuelUsed != test.expect.fuelUsed) {
       logger
         ..err('Fuel used mismatch for ${test.start} to ${test.end}')
-        ..err('Expected: ${test.expect.fuelUsed}')
-        ..err('Actual: ${plan.fuelUsed}');
+        ..err('  Expected: ${test.expect.fuelUsed}')
+        ..err('  Actual: ${plan.fuelUsed}');
       failure = true;
     }
     if (plan.duration.inSeconds != test.expect.time) {
       logger
         ..err('Time mismatch for ${test.start} to ${test.end}')
-        ..err('Expected: ${test.expect.time}')
-        ..err('Actual: ${plan.duration.inSeconds}');
+        ..err('  Expected: ${test.expect.time}')
+        ..err('  Actual: ${plan.duration.inSeconds}');
       failure = true;
     }
     if (failure) {
