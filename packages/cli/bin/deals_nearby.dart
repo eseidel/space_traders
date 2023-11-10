@@ -9,7 +9,6 @@ import 'package:cli_table/cli_table.dart';
 Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
   final limit = int.parse(argResults['limit'] as String);
-  final maxJumps = int.parse(argResults['jumps'] as String);
   final startArg = argResults['start'] as String?;
   final credits = int.parse(argResults['credits'] as String);
   const maxWaypoints = 200;
@@ -54,7 +53,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       'capacity = $cargoCapacity, '
       'fuel <= $fuelCapacity, '
       'outlay <= $credits, '
-      'jumps <= $maxJumps, '
       'waypoints <= $maxWaypoints ');
 
   if (extraSellOpps.isNotEmpty) {
@@ -71,7 +69,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     systemsCache,
     marketPrices,
     systemSymbol: start.systemSymbol,
-    maxJumps: maxJumps,
     maxWaypoints: maxWaypoints,
   );
   logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
@@ -157,12 +154,6 @@ void main(List<String> args) async {
     cliMain,
     addArgs: (ArgParser parser) {
       parser
-        ..addOption(
-          'jumps',
-          abbr: 'j',
-          help: 'Maximum number of jumps to walk out',
-          defaultsTo: '10',
-        )
         ..addOption(
           'start',
           abbr: 's',

@@ -143,7 +143,6 @@ void main() {
         caches.systems,
         caches.routePlanner,
         ship,
-        maxJumps: any(named: 'maxJumps'),
         maxWaypoints: any(named: 'maxWaypoints'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
@@ -646,7 +645,6 @@ void main() {
         caches.routePlanner,
         ship,
         maxWaypoints: any(named: 'maxWaypoints'),
-        maxJumps: any(named: 'maxJumps'),
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenReturn(costedDeal);

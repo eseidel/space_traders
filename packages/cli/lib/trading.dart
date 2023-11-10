@@ -23,9 +23,8 @@ Future<Waypoint?> nearbyMarketWhichTrades(
   WaypointCache waypointCache,
   MarketListingCache marketListings,
   WaypointSymbol startSymbol,
-  TradeSymbol tradeSymbol, {
-  int maxJumps = 1,
-}) async {
+  TradeSymbol tradeSymbol,
+) async {
   final start = await waypointCache.waypoint(startSymbol);
   if (start.hasMarketplace) {
     final startMarket =
@@ -365,12 +364,11 @@ CostedDeal costOutDeal(
 }
 
 /// Builds a MarketScan from a starting system outwards limiting to
-/// maxJumps and maxWaypoints.
+/// maxWaypoints.
 MarketScan scanNearbyMarkets(
   SystemsCache systemsCache,
   MarketPrices marketPrices, {
   required SystemSymbol systemSymbol,
-  required int maxJumps,
   required int maxWaypoints,
 }) {
   final allowedWaypoints =
@@ -380,8 +378,7 @@ MarketScan scanNearbyMarkets(
   return MarketScan.fromMarketPrices(
     marketPrices,
     waypointFilter: allowedWaypoints.contains,
-    description:
-        '$maxJumps jumps of $systemSymbol (limit $maxWaypoints waypoints)',
+    description: 'near $systemSymbol (limit $maxWaypoints waypoints)',
   );
 }
 

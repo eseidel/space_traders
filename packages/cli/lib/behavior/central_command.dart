@@ -242,7 +242,6 @@ class CentralCommand {
     SystemsCache systemsCache,
     RoutePlanner routePlanner,
     Ship ship, {
-    required int maxJumps,
     required int maxTotalOutlay,
     required int maxWaypoints,
     WaypointSymbol? overrideStartSymbol,
@@ -285,7 +284,6 @@ class CentralCommand {
       systemsCache,
       marketPrices,
       systemSymbol: systemSymbol,
-      maxJumps: maxJumps,
       maxWaypoints: maxWaypoints,
     );
     final deals = findDealsFor(

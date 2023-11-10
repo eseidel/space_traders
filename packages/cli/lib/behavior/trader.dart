@@ -13,7 +13,6 @@ import 'package:cli/trading.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-const _maxJumps = 10;
 // TODO(eseidel): Make maxWaypoints bigger as routing gets faster.
 const _maxWaypoints = 100;
 
@@ -698,7 +697,6 @@ Future<DateTime?> _navigateToBetterTradeLocation(
       caches.routePlanner,
       ship,
       overrideStartSymbol: startSymbol,
-      maxJumps: _maxJumps,
       maxTotalOutlay: caches.agent.agent.credits,
       maxWaypoints: _maxWaypoints,
     );
@@ -895,7 +893,6 @@ Future<DateTime?> advanceTrader(
     caches.systems,
     caches.routePlanner,
     ship,
-    maxJumps: _maxJumps,
     maxWaypoints: _maxWaypoints,
     maxTotalOutlay: caches.agent.agent.credits,
   );
@@ -914,9 +911,9 @@ Future<DateTime?> advanceTrader(
   }
 
   if (newDeal == null) {
-    final waitUntil =
-        await findBetterLocation('No profitable deals within $_maxJumps jumps '
-            'of ${ship.systemSymbol}.');
+    final waitUntil = await findBetterLocation(
+      'No profitable deals near ${ship.systemSymbol}.',
+    );
     return waitUntil;
   }
   if (newDeal.expectedProfitPerSecond <

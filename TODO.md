@@ -25,8 +25,6 @@ Earning:
 * Teach miners how to coordinate with haulers to sell their goods further away.
 * Add refining
 * Buy traders when trading is more profitable than mining, and vice versa.
-* Remove all use of maxJumps and use distance or maxWaypoints instead.
-  Jumps will get the wrong answers in dense areas of the galaxy.
 * Be able to buy miners outside of the main system.
 * Try changing deal finding heuristic to only consider buy price.
 * Spread out traders across the galaxy better.

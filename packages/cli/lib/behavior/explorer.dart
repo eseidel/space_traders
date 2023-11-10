@@ -207,7 +207,6 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
     caches.marketListings,
     waypoint.waypointSymbol,
     TradeSymbol.FUEL,
-    maxJumps: 5,
   ))
       ?.waypointSymbol;
   if (destination == null) {
