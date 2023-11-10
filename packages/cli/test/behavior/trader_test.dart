@@ -103,21 +103,9 @@ void main() {
     registerFallbackValue(start);
     when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
-    when(
-      () => caches.systems.systemSymbolsInJumpRadius(
-        startSystem: start.systemSymbol,
-        maxJumps: 1,
-      ),
-    ).thenReturn([]);
 
     when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
-    when(
-      () => caches.systems.systemSymbolsInJumpRadius(
-        startSystem: start.systemSymbol,
-        maxJumps: 1,
-      ),
-    ).thenReturn([]);
 
     final costedDeal = CostedDeal(
       deal: Deal.test(
@@ -310,12 +298,6 @@ void main() {
 
     when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
-    when(
-      () => caches.systems.systemSymbolsInJumpRadius(
-        startSystem: start.systemSymbol,
-        maxJumps: 1,
-      ),
-    ).thenReturn([]);
     when(() => caches.systems.waypointFromSymbol(start)).thenReturn(
       SystemWaypoint(
         symbol: start.waypoint,

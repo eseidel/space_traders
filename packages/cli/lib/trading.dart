@@ -34,10 +34,10 @@ Future<Waypoint?> nearbyMarketWhichTrades(
       return start;
     }
   }
-  await for (final waypoint in waypointCache.waypointsInJumpRadius(
-    startSystem: start.systemSymbolObject,
-    maxJumps: maxJumps,
-  )) {
+  // TODO(eseidel): Handle jumps again!
+  final waypoints =
+      await waypointCache.waypointsInSystem(start.systemSymbolObject);
+  for (final waypoint in waypoints) {
     final market =
         marketListings.marketListingForSymbol(waypoint.waypointSymbol);
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
@@ -373,13 +373,8 @@ MarketScan scanNearbyMarkets(
   required int maxJumps,
   required int maxWaypoints,
 }) {
-  final allowedWaypoints = systemsCache
-      .waypointSymbolsInJumpRadius(
-        startSystem: systemSymbol,
-        maxJumps: maxJumps,
-      )
-      .take(maxWaypoints)
-      .toSet();
+  final allowedWaypoints =
+      systemsCache.waypointsInSystem(systemSymbol).take(maxWaypoints).toSet();
   logger.detail('Considering ${allowedWaypoints.length} waypoints');
 
   return MarketScan.fromMarketPrices(

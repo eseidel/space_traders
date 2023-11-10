@@ -151,25 +151,4 @@ class WaypointCache {
     return waypoints
         .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
   }
-
-  /// Yields a stream of Waypoints that are within n jumps of the given system.
-  /// Waypoints from the start system are included in the stream.
-  /// The stream is roughly ordered by distance from the start.
-  // TODO(eseidel): Delete waypointsInJumpRadius, it has one caller
-  // nearbyMarketWhichTrades which is also deprecated.
-  Stream<Waypoint> waypointsInJumpRadius({
-    required SystemSymbol startSystem,
-    required int maxJumps,
-  }) async* {
-    for (final (SystemSymbol system, int _)
-        in _systemsCache.systemSymbolsInJumpRadius(
-      startSystem: startSystem,
-      maxJumps: maxJumps,
-    )) {
-      final waypoints = await waypointsInSystem(system);
-      for (final waypoint in waypoints) {
-        yield waypoint;
-      }
-    }
-  }
 }
