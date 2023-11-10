@@ -4,7 +4,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/waypoint_pathing.dart';
 import 'package:cli/printing.dart';
-import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
@@ -118,12 +117,10 @@ extension RoutePlanPlanning on RoutePlan {
       throw ArgumentError('No action starting from $waypointSymbol');
     }
     final newActions = actions.sublist(index);
-    final fuelUsed = _fuelUsedByActions(newActions);
     return RoutePlan(
       fuelCapacity: fuelCapacity,
       shipSpeed: shipSpeed,
       actions: newActions,
-      fuelUsed: fuelUsed,
     );
   }
 }
@@ -173,12 +170,10 @@ RoutePlan routePlanFromJumpPlan(
     actions.add(_navigationAction(endJumpGate, endWaypoint, shipSpeed));
   }
 
-  final fuelUsed = _fuelUsedByActions(actions);
   return RoutePlan(
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
     actions: actions,
-    fuelUsed: fuelUsed,
   );
 }
 
@@ -430,12 +425,10 @@ class RoutePlanner {
     // walk backwards from end through symbols to build the route
     // we could alternatively build it forward and then fix the jump durations
     // after.
-    final fuelUsed = _fuelUsedByActions(actions);
     return RoutePlan(
       fuelCapacity: fuelCapacity,
       shipSpeed: shipSpeed,
       actions: actions,
-      fuelUsed: fuelUsed,
     );
   }
 
@@ -475,10 +468,6 @@ class RoutePlanner {
   }
 }
 
-int _fuelUsedByActions(List<RouteAction> actions) {
-  return actions.map((a) => a.fuelUsed).sum;
-}
-
 /// Plan a route through a series of waypoints.
 RoutePlan? planRouteThrough(
   SystemsCache systemsCache,
@@ -516,12 +505,10 @@ RoutePlan? planRouteThrough(
   for (final segment in segments) {
     actions.addAll(segment.actions);
   }
-  final fuelUsed = _fuelUsedByActions(actions);
   return RoutePlan(
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
     actions: actions,
-    fuelUsed: fuelUsed,
   );
 }
 

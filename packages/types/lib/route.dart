@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -127,12 +128,11 @@ class RouteAction {
 @immutable
 class RoutePlan {
   /// Create a new route plan.
-  const RoutePlan({
+  RoutePlan({
     required this.fuelCapacity,
     required this.shipSpeed,
     required this.actions,
-    required this.fuelUsed,
-  });
+  }) : fuelUsed = actions.map((a) => a.fuelUsed).sum;
 
   /// Create a new empty route plan that does nothing.
   RoutePlan.empty({
@@ -158,7 +158,6 @@ class RoutePlan {
       actions: (json['actions'] as List<dynamic>)
           .map((e) => RouteAction.fromJson(e as Map<String, dynamic>))
           .toList(),
-      fuelUsed: json['fuelUsed'] as int,
     );
   }
 
@@ -217,6 +216,5 @@ class RoutePlan {
         'fuelCapacity': fuelCapacity,
         'shipSpeed': shipSpeed,
         'actions': actions.map((e) => e.toJson()).toList(),
-        'fuelUsed': fuelUsed,
       };
 }

@@ -30,7 +30,6 @@ void main() {
         ],
         fuelCapacity: 10,
         shipSpeed: 10,
-        fuelUsed: 10,
       ),
       pickupJob: PickupJob(
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,

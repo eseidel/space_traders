@@ -104,7 +104,6 @@ void main() {
             fuelUsed: 10,
           ),
         ],
-        fuelUsed: 0,
       ),
     );
 
@@ -126,7 +125,7 @@ void main() {
       costPerFuelUnit: 100,
     );
 
-    expect(costed.expectedFuelCost, 0);
+    expect(costed.expectedFuelCost, 100);
     expect(costed.cargoSize, 1);
     expect(costed.expectedTime.inSeconds, 15);
   });
@@ -152,11 +151,10 @@ void main() {
             endSymbol: end,
             type: RouteActionType.navCruise,
             seconds: 10,
-            fuelUsed: 10,
+            fuelUsed: 0,
           ),
         ],
         fuelCapacity: 10,
-        fuelUsed: 0,
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
@@ -426,7 +424,6 @@ void main() {
           ),
         ],
         fuelCapacity: 10,
-        fuelUsed: 10,
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
@@ -498,7 +495,6 @@ void main() {
             fuelUsed: 10,
           ),
         ],
-        fuelUsed: 1,
       );
     }
 
@@ -606,7 +602,6 @@ void main() {
             fuelUsed: 10,
           ),
         ],
-        fuelUsed: 1,
       );
     }
 
@@ -700,7 +695,6 @@ void main() {
           ),
         ],
         fuelCapacity: 10,
-        fuelUsed: 10,
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,

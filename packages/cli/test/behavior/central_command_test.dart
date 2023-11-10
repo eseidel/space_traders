@@ -92,10 +92,9 @@ void main() {
             endSymbol: end,
             type: RouteActionType.jump,
             seconds: 10,
-            fuelUsed: 0,
+            fuelUsed: 10,
           ),
         ],
-        fuelUsed: 10,
       );
     }
 

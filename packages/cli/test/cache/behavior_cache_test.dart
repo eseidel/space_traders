@@ -26,7 +26,6 @@ void main() {
           fuelUsed: 10,
         ),
       ],
-      fuelUsed: 20,
     );
     state.routePlan = route;
     final deal = Deal.test(

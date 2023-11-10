@@ -141,7 +141,6 @@ void main() {
           ),
         ],
         fuelCapacity: 10,
-        fuelUsed: 10,
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
@@ -345,7 +344,6 @@ void main() {
         ),
       ],
       fuelCapacity: fuelCapacity,
-      fuelUsed: 10,
       shipSpeed: 10,
     );
     final costedDeal = CostedDeal(
@@ -639,7 +637,6 @@ void main() {
         ),
       ],
       fuelCapacity: 10,
-      fuelUsed: 10,
       shipSpeed: 10,
     );
 
@@ -739,7 +736,6 @@ void main() {
           ),
         ],
         fuelCapacity: 10,
-        fuelUsed: 10,
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
