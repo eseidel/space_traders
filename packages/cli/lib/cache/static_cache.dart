@@ -165,7 +165,8 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
     return ShipyardShip.fromJson(jsonDecode(jsonEncode(record)))!
       ..purchasePrice = 0
       ..activity = null
-      ..supply = SupplyLevel.ABUNDANT;
+      ..supply = SupplyLevel.ABUNDANT
+      ..frame.condition = null;
   }
 
   @override

@@ -8,12 +8,12 @@
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_FRIGATE",
-   "name": "Frame Frigate",
+   "name": "Frigate",
    "description": "A medium-sized, multi-purpose spacecraft, often used for combat, transport, or support operations.",
    "condition": null,
    "moduleSlots": 8,
    "mountingPoints": 5,
-   "fuelCapacity": 1200,
+   "fuelCapacity": 400,
    "requirements": {
     "power": 8,
     "crew": 25,
@@ -46,27 +46,15 @@
   },
   "modules": [
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_II",
+    "capacity": 35,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Expanded Cargo Hold",
+    "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 2,
+     "crew": 2,
+     "slots": 2
     }
    },
    {
@@ -106,27 +94,15 @@
     }
    },
    {
-    "symbol": "MODULE_JUMP_DRIVE_I",
+    "symbol": "MODULE_GAS_PROCESSOR_I",
     "capacity": null,
-    "range": 500,
-    "name": "Jump Drive I",
-    "description": "A basic antimatter jump drive that allows for instantaneous short-range interdimensional travel.",
+    "range": null,
+    "name": "Gas Processor",
+    "description": "Filters and processes extracted gases into their component parts, filters out impurities, and containerizes them into raw storage units.",
     "requirements": {
-     "power": 4,
-     "crew": 10,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_WARP_DRIVE_I",
-    "capacity": null,
-    "range": 2000,
-    "name": "Warp Drive I",
-    "description": "A basic warp drive that allows for short-range interstellar travel.",
-    "requirements": {
-     "power": 3,
-     "crew": 2,
-     "slots": 1
+     "power": 1,
+     "crew": 0,
+     "slots": 2
     }
    }
   ],
@@ -147,11 +123,11 @@
     "symbol": "MOUNT_MINING_LASER_I",
     "name": "Mining Laser I",
     "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects.",
-    "strength": 10,
+    "strength": 3,
     "deposits": [],
     "requirements": {
      "power": 1,
-     "crew": 0,
+     "crew": 1,
      "slots": null
     }
    },
@@ -175,7 +151,7 @@
     ],
     "requirements": {
      "power": 1,
-     "crew": 2,
+     "crew": 1,
      "slots": null
     }
    }
