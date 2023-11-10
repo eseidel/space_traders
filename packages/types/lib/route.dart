@@ -143,7 +143,7 @@ class RoutePlan {
           RouteAction(
             startSymbol: symbol,
             endSymbol: symbol,
-            type: RouteActionType.jump,
+            type: RouteActionType.emptyRoute,
             seconds: 0,
             fuelUsed: 0,
           ),
