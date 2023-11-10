@@ -88,7 +88,7 @@ class MarketScan {
   final String description;
 
   /// The trade symbols for which we found opportunities.
-  List<TradeSymbol> get tradeSymbols => _buyOpps.keys.toList();
+  Set<TradeSymbol> get tradeSymbols => _buyOpps.keys.toSet();
 
   /// Lookup the buy opportunities for the given trade symbol.
   List<BuyOpp> buyOppsForTradeSymbol(TradeSymbol tradeSymbol) =>
