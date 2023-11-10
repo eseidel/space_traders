@@ -199,3 +199,7 @@ int powerUsedByLasers(Ship ship) => powerUsedByMounts(ship, kLaserMountSymbols);
 /// Compute the total power of all siphon mounts on [ship].
 int powerUsedBySiphons(Ship ship) =>
     powerUsedByMounts(ship, kSiphonMountSymbols);
+
+/// Compute the total power of all survey mounts on [ship].
+int powerUsedBySurveyors(Ship ship) =>
+    powerUsedByMounts(ship, kSurveyMountSymbols);

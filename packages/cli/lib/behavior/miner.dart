@@ -245,34 +245,15 @@ int surveysExpectedPerSurveyWithMounts(
   });
 }
 
-/// Compute the total power of all mounts on [ship]
-/// with symbols in [mountSymbols].
-int _powerUsedByMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
-  return ship.mounts.fold(0, (sum, m) {
-    final power = m.requirements.power ?? 0;
-    return mountSymbols.contains(m.symbol) ? sum + power : sum;
-  });
-}
-
-/// Compute the total power of all laser mounts on [ship].
-int _powerUsedByLasers(Ship ship) {
-  return _powerUsedByMounts(ship, kLaserMountSymbols);
-}
-
-/// Compute the total power of all survey mounts on [ship].
-int _powerUsedBySurveyors(Ship ship) {
-  return _powerUsedByMounts(ship, kSurveyMountSymbols);
-}
-
 /// Compute the cooldown time for an extraction by [ship].
 int cooldownTimeForExtraction(Ship ship) {
-  final power = _powerUsedByLasers(ship);
+  final power = powerUsedByLasers(ship);
   return 60 + 10 * power;
 }
 
 /// Compute the cooldown time for a survey by [ship].
 int cooldownTimeForSurvey(Ship ship) {
-  final power = _powerUsedBySurveyors(ship);
+  final power = powerUsedBySurveyors(ship);
   return 60 + 10 * power;
 }
 
