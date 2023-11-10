@@ -11,10 +11,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     recordShip(staticCaches, ship);
   }
 
-  // Import all info from cached shipyard ships (which for whatever reason
-  // didn't import into parts caches earlier).  This is likely no longer
-  // needed, was only added during bringup of the static_data caches.
-  recordShipyardShips(staticCaches, staticCaches.shipyardShips.values);
+  // We don't import info from cached shipyard ships into parts as
+  // ShipyardShips only update when we visit a Shipyard, where as parts can
+  // update from live ships (via this script).
+  // If we saved dates with our static data we could be more sophisticated
+  // and update based on data freshness.
 }
 
 void main(List<String> args) async {

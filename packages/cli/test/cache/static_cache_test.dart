@@ -1,7 +1,11 @@
 import 'package:cli/cache/static_cache.dart';
+import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/api.dart';
+
+class _MockLogger extends Mock implements Logger {}
 
 void main() {
   test('StaticCaches load/save smoke test', () {
@@ -121,5 +125,26 @@ void main() {
     staticCaches.reactors.save();
     staticCaches.shipyardShips.save();
     staticCaches.mounts.save();
+  });
+
+  test('StaticCache.add', () {
+    final logger = _MockLogger();
+    // Test that adding replaces existing data.
+    final fs = MemoryFileSystem.test();
+    final original = TradeGood(
+      symbol: TradeSymbol.ALUMINUM,
+      name: 'name',
+      description: 'description',
+    );
+    final cache = TradeGoodCache([original], fs: fs);
+    expect(cache[TradeSymbol.ALUMINUM]?.name, 'name');
+    final changed = TradeGood(
+      symbol: TradeSymbol.ALUMINUM,
+      name: 'name2',
+      description: 'description',
+    );
+    cache.addAll([original]); // No change.
+    runWithLogger(logger, () => cache.addAll([changed]));
+    expect(cache[TradeSymbol.ALUMINUM]?.name, 'name2');
   });
 }
