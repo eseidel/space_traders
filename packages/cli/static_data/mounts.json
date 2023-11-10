@@ -12,6 +12,18 @@
   }
  },
  {
+  "symbol": "MOUNT_GAS_SIPHON_II",
+  "name": "Gas Siphon II",
+  "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies more efficiently and at a higher rate.",
+  "strength": 20,
+  "deposits": [],
+  "requirements": {
+   "power": 2,
+   "crew": 2,
+   "slots": null
+  }
+ },
+ {
   "symbol": "MOUNT_LASER_CANNON_I",
   "name": "Laser Cannon",
   "description": "A basic laser weapon that fires concentrated beams of energy at high speed and accuracy.",
