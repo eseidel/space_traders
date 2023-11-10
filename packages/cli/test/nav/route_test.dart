@@ -321,10 +321,13 @@ void main() {
     expect(medium[0].type, RouteActionType.navCruise);
     expect(medium[0].startSymbol, start.waypointSymbol);
     expect(medium[0].endSymbol, fuelStation.waypointSymbol);
-    expect(medium.length, 2);
-    expect(medium[1].type, RouteActionType.navCruise);
+    expect(medium.length, 3);
+    expect(medium[1].type, RouteActionType.refuel);
     expect(medium[1].startSymbol, fuelStation.waypointSymbol);
-    expect(medium[1].endSymbol, end.waypointSymbol);
+    expect(medium[1].endSymbol, fuelStation.waypointSymbol);
+    expect(medium[2].type, RouteActionType.navCruise);
+    expect(medium[2].startSymbol, fuelStation.waypointSymbol);
+    expect(medium[2].endSymbol, end.waypointSymbol);
 
     // If it's not large enough to make it to the fuel station, we just
     // drift straight there.
