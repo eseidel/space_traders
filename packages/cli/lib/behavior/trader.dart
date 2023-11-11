@@ -384,7 +384,7 @@ Future<DateTime?> _handleConstructionDealAtDelivery(
   Market currentMarket,
   CostedDeal costedDeal,
 ) async {
-  await _deliverConstructionMaterialsIfPosible(
+  await _deliverConstructionMaterialsIfPossible(
     api,
     db,
     caches.agent,
@@ -402,7 +402,7 @@ Future<DateTime?> _handleConstructionDealAtDelivery(
 }
 
 Future<SupplyConstruction200ResponseData?>
-    _deliverConstructionMaterialsIfPosible(
+    _deliverConstructionMaterialsIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
@@ -762,7 +762,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       caches.ships,
       ship,
       // We don't have a good way to know what type of cargo this is.
-      // Assuming it's goods (rather than captial) is probably fine.
+      // Assuming it's goods (rather than capital) is probably fine.
       AccountingType.goods,
       where: isNotWantedCargo,
     );
