@@ -328,8 +328,8 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
 
-    final start = WaypointSymbol.fromString('A-B-C');
-    final end = WaypointSymbol.fromString('X-Y-Z');
+    final start = WaypointSymbol.fromString('A-B-A');
+    final end = WaypointSymbol.fromString('A-B-B');
     final state = BehaviorState(shipSymbol, Behavior.idle)
       ..routePlan = RoutePlan(
         fuelCapacity: 100,
@@ -366,5 +366,61 @@ void main() {
     );
     expect(state.routePlan, isNull);
     expect(result.shouldReturn(), false);
+  });
+
+  test('continueNavigationIfNeeded off course', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final ship = _MockShip();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+    final shipNav = _MockShipNav();
+    final shipNavRoute = _MockShipNavRoute();
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.nav).thenReturn(shipNav);
+
+    final start = WaypointSymbol.fromString('A-B-A');
+    final end = WaypointSymbol.fromString('A-B-B');
+    final other = WaypointSymbol.fromString('A-B-C');
+    final state = BehaviorState(shipSymbol, Behavior.idle)
+      ..routePlan = RoutePlan(
+        fuelCapacity: 100,
+        shipSpeed: 10,
+        actions: [
+          RouteAction(
+            startSymbol: start,
+            endSymbol: end,
+            type: RouteActionType.navCruise,
+            seconds: 10,
+            fuelUsed: 10,
+          ),
+        ],
+      );
+
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    final logger = _MockLogger();
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.route).thenReturn(shipNavRoute);
+    when(() => shipNav.waypointSymbol).thenReturn(other.waypoint);
+
+    expect(
+      () async => await runWithLogger(
+        logger,
+        () => continueNavigationIfNeeded(
+          api,
+          db,
+          centralCommand,
+          caches,
+          ship,
+          state,
+          getNow: getNow,
+        ),
+      ),
+      throwsA(isA<NavigationException>()),
+    );
+    // Maybe it should clear the route?
+    expect(state.routePlan, isNotNull);
   });
 }
