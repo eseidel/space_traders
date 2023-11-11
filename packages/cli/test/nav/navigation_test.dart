@@ -1,5 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/central_command.dart';
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:db/db.dart';
@@ -22,6 +23,8 @@ class _MockShip extends Mock implements Ship {}
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
+
+class _MockMarketListingCache extends Mock implements MarketListingCache {}
 
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
@@ -422,5 +425,22 @@ void main() {
     );
     // Maybe it should clear the route?
     expect(state.routePlan, isNotNull);
+  });
+
+  test('defaultSellsFuel', () {
+    final listings = _MockMarketListingCache();
+    final sellsFuel = defaultSellsFuel(listings);
+    final waypointSymbol = WaypointSymbol.fromString('A-B-C');
+    when(() => listings.marketListingForSymbol(waypointSymbol))
+        .thenReturn(MarketListing(symbol: waypointSymbol));
+    expect(sellsFuel(waypointSymbol), false);
+
+    when(() => listings.marketListingForSymbol(waypointSymbol)).thenReturn(
+      MarketListing(
+        symbol: waypointSymbol,
+        exchange: const {TradeSymbol.FUEL},
+      ),
+    );
+    expect(sellsFuel(waypointSymbol), true);
   });
 }
