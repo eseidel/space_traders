@@ -383,4 +383,15 @@ void main() {
     expect(one.usesReactor, false);
     expect(one.duration, const Duration(seconds: 10));
   });
+
+  test('describeRoutePlan', () {
+    final start = WaypointSymbol.fromString('A-B-A');
+    final plan =
+        RoutePlan.empty(symbol: start, fuelCapacity: 10, shipSpeed: 30);
+    expect(
+        describeRoutePlan(plan),
+        'A-B-A to A-B-A speed: 30 max-fuel: 10\n'
+        'emptyRoute      A-B-A  A-B-A  0:00:00.000000s\n'
+        'in 0ms uses 0 fuel\n');
+  });
 }

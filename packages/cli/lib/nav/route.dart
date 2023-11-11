@@ -23,6 +23,7 @@ int fuelUsedByDistance(
     case ShipNavFlightMode.BURN:
       return 2 * intDistance;
   }
+  // This is only needed because ShipNavFlightMode is not an enum.
   throw UnimplementedError('Unknown flight mode: $flightMode');
 }
 
@@ -46,6 +47,8 @@ double _speedMultiplier(ShipNavFlightMode flightMode) {
     case ShipNavFlightMode.STEALTH:
       throw UnimplementedError('$flightMode speed multiplier not implemented');
   }
+
+  /// This is only needed because ShipNavFlightMode is not an enum.
   throw UnimplementedError('Unknown flight mode: $flightMode');
 }
 
