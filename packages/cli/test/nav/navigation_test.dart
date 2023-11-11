@@ -272,4 +272,46 @@ void main() {
   //   expect(betweenJumpsResult.shouldReturn(), true);
   //   expect(ship.cooldown.expiration, reactorExpiry);
   // });
+
+  test('continueNavigationIfNeeded empty plan', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final ship = _MockShip();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+    final shipNav = _MockShipNav();
+    final shipNavRoute = _MockShipNavRoute();
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.nav).thenReturn(shipNav);
+
+    final waypointSymbol = WaypointSymbol.fromString('A-B-C');
+    final state = BehaviorState(shipSymbol, Behavior.idle)
+      ..routePlan = RoutePlan.empty(
+        symbol: waypointSymbol,
+        fuelCapacity: 0,
+        shipSpeed: 10,
+      );
+
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    final logger = _MockLogger();
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.route).thenReturn(shipNavRoute);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+
+    final beforeResult = await runWithLogger(
+      logger,
+      () => continueNavigationIfNeeded(
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        state,
+        getNow: getNow,
+      ),
+    );
+    expect(beforeResult.shouldReturn(), false);
+  });
 }
