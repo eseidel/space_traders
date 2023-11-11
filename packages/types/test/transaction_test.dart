@@ -144,4 +144,25 @@ void main() {
     expect(transaction.quantity, 1);
     expect(transaction.tradeType, MarketTransactionTypeEnum.PURCHASE);
   });
+
+  test('Transaction.fromConstructionDelivery', () {
+    final delivery = ConstructionDelivery(
+      unitsDelivered: 100,
+      tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+      waypointSymbol: WaypointSymbol.fromString('A-B-C'),
+      shipSymbol: const ShipSymbol('S', 1),
+      timestamp: DateTime(2021),
+    );
+    final transaction = Transaction.fromConstructionDelivery(
+      delivery,
+      100,
+    );
+    expect(transaction.transactionType, TransactionType.construction);
+    expect(transaction.waypointSymbol, WaypointSymbol.fromString('A-B-C'));
+    expect(transaction.shipSymbol, const ShipSymbol('S', 1));
+    expect(transaction.tradeSymbol, TradeSymbol.ADVANCED_CIRCUITRY);
+    expect(transaction.shipType, null);
+    expect(transaction.quantity, 100);
+    expect(transaction.tradeType, null);
+  });
 }

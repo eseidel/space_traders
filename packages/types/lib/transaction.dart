@@ -46,7 +46,7 @@ enum TransactionType {
   contract,
 
   /// Construction delivery
-  consturction;
+  construction;
 
   /// Lookup a transaction type by index.
   static TransactionType fromName(String name) {
@@ -238,7 +238,7 @@ class Transaction {
     int agentCredits,
   ) {
     return Transaction(
-      transactionType: TransactionType.consturction,
+      transactionType: TransactionType.construction,
       shipSymbol: delivery.shipSymbol,
       waypointSymbol: delivery.waypointSymbol,
       tradeSymbol: delivery.tradeSymbol,
