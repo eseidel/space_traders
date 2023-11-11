@@ -5,6 +5,11 @@ include: package:very_good_analysis/analysis_options.yaml
 
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
+linter:
+  rules:
+    # This lint is wrong.  It changes behavior to pass the future
+    # out, making exceptions happen in the outer scope.
+    unnecessary_await_in_return: false
 
 # For additional information about configuring this file, see
 # https://dart.dev/guides/language/analysis-options

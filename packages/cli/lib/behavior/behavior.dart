@@ -80,12 +80,10 @@ class JobResult {
       : _type = _JobResultType.waitOrLoop,
         _waitTime = wait;
 
-  /// Complete tells the caller this job is complete.  If wait is null
-  /// the caller may continue to the next job, otherwise it should wait
-  /// until the given time.
-  JobResult.complete([DateTime? wait])
+  /// Complete tells the caller this job is complete.
+  JobResult.complete()
       : _type = _JobResultType.complete,
-        _waitTime = wait;
+        _waitTime = null;
 
   final _JobResultType _type;
   final DateTime? _waitTime;
@@ -122,6 +120,8 @@ class JobResult {
 class MultiJob {
   /// Create a new multi-job.
   const MultiJob(this.name, this.jobFunctions);
+  // This seems to always throw?
+  // : assert(jobFunctions.length > 0, 'Must have at least one job');
 
   /// The name of this multi-job.
   final String name;
@@ -179,6 +179,8 @@ class MultiJob {
         return result.waitTime;
       }
     }
+    // This only should happen if jobFunctions > 10.  We don't currently
+    // support looping the same function multiple times (we used to).
     failJob(
       'Too many $name job iterations',
       const Duration(hours: 1),
