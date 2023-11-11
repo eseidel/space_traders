@@ -254,7 +254,7 @@ Future<NavResult> continueNavigationIfNeeded(
     //   if (nextAction == null) {
     //     return NavResult._continueAction();
     //   }
-    //   if (nextAction.usesReactor()) {
+    //   if (nextAction.usesReactor) {
     //     // We need to wait for the reactor to cool down.
     //     // We know that ship.cooldown.expiration is non-null because it
     //     // was just set by useJumpGateAndLog.

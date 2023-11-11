@@ -26,7 +26,7 @@ enum RouteActionType {
   // WARP_CRUISE,
 
   /// Returns true if this action uses the reactor.
-  bool usesReactor() {
+  bool get usesReactor {
     switch (this) {
       case RouteActionType.jump:
         return true;
@@ -103,7 +103,7 @@ class RouteAction {
   Duration get duration => Duration(seconds: seconds);
 
   /// Returns true if this action uses the reactor.
-  bool usesReactor() => type.usesReactor();
+  bool get usesReactor => type.usesReactor;
 
   /// Number of requests this action expects to take to execute.
   int get requestCount => type.requestCount;

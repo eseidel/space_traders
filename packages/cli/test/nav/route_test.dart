@@ -254,7 +254,7 @@ void main() {
     expect(planRoute(waypoint1, waypoint3), isNull);
   });
 
-  test('planRoute, fuel constratints', () {
+  test('planRoute, fuel constraints', () {
     final fs = MemoryFileSystem.test();
     final start = SystemWaypoint(
       symbol: 'A-B-A',
@@ -343,5 +343,44 @@ void main() {
     expect(noFuel[0].startSymbol, start.waypointSymbol);
     expect(noFuel[0].endSymbol, end.waypointSymbol);
     expect(noFuel[0].type, RouteActionType.navCruise);
+  });
+
+  test('RoutePlan', () {
+    final one = RouteAction(
+      type: RouteActionType.navCruise,
+      startSymbol: WaypointSymbol.fromString('A-B-A'),
+      endSymbol: WaypointSymbol.fromString('A-B-B'),
+      seconds: 10,
+      fuelUsed: 10,
+    );
+    final two = RouteAction(
+      type: RouteActionType.refuel,
+      startSymbol: WaypointSymbol.fromString('A-B-B'),
+      endSymbol: WaypointSymbol.fromString('A-B-B'),
+      seconds: 10,
+      fuelUsed: 0,
+    );
+    final three = RouteAction(
+      type: RouteActionType.navCruise,
+      startSymbol: WaypointSymbol.fromString('A-B-B'),
+      endSymbol: WaypointSymbol.fromString('A-B-C'),
+      seconds: 10,
+      fuelUsed: 10,
+    );
+
+    final plan = RoutePlan(
+      actions: [one, two, three],
+      fuelCapacity: 100,
+      shipSpeed: 30,
+    );
+    expect(plan.nextActionFrom(one.endSymbol), two);
+    expect(plan.nextActionFrom(three.endSymbol), isNull);
+    expect(plan.actionAfter(one), two);
+    expect(plan.actionAfter(two), three);
+    expect(plan.actionAfter(three), isNull);
+
+    expect(plan.requestCount, 5);
+    expect(one.usesReactor, false);
+    expect(one.duration, const Duration(seconds: 10));
   });
 }
