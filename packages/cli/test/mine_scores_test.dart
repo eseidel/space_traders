@@ -55,7 +55,20 @@ void main() {
       systemSymbol,
     );
     expect(scores.length, 1);
-    expect(scores.first.score, 10);
+    final score = scores.first;
+    expect(score.score, 10);
+    expect(score.mineTraitNames, ['COMMON_METAL']);
+    expect(score.producedGoods, {
+      TradeSymbol.IRON_ORE,
+      TradeSymbol.COPPER_ORE,
+      TradeSymbol.ALUMINUM_ORE,
+    });
+    expect(score.marketTradesAllProducedGoods, false);
+    expect(score.goodsMissingFromMarket, {
+      TradeSymbol.IRON_ORE,
+      TradeSymbol.COPPER_ORE,
+      TradeSymbol.ALUMINUM_ORE,
+    });
   });
 
   test('evaluateWaypointsForSiphoning', () async {
