@@ -64,10 +64,10 @@ List<RouteAction>? findRouteWithinSystem(
     ];
   }
 
-  final system = systemsCache.systemBySymbol(start.systemSymbol);
+  final systemWaypoints = systemsCache.waypointsInSystem(start.systemSymbol);
   // We only consider waypoints that have markets that sell fuel.
   // Also include the start and end waypoints.
-  final waypoints = system.waypoints.where((w) {
+  final waypoints = systemWaypoints.where((w) {
     final symbol = w.waypointSymbol;
     return sellsFuel(symbol) || symbol == start || symbol == end;
   }).toList();

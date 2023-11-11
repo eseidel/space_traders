@@ -22,6 +22,8 @@ class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
+class _MockShipCargo extends Mock implements ShipCargo {}
+
 BuyOpp _makeBuyOpp({
   required WaypointSymbol marketSymbol,
   required TradeSymbol tradeSymbol,
@@ -167,153 +169,133 @@ void main() {
     );
   });
 
-  // test('findDealFor includes time to source', () async {
-  //   // findDealFor used to not consider time to get to the source system.
-  //   // which meant if there was a very far away system with a great deal
-  //   // we would try to do that, even if it took forever to get there and thus
-  //   // the profit per second was poor.
-  //   // S-A-A and S-A-B are close but have poor deals, S-A-C is far away but
-  //   // has a great deal, but we still choose S-A-B because it's faster and
-  //   // thus has a better profit per second.
-  //   final marketPrices = _MockMarketPrices();
-  //   final systemsCache = _MockSystemsCache();
-  //   final saa = SystemWaypoint(
-  //     symbol: 'S-A-A',
-  //     type: WaypointType.ASTEROID_FIELD,
-  //     x: 0,
-  //     y: 0,
-  //   );
-  //   final sab = SystemWaypoint(
-  //     symbol: 'S-A-B',
-  //     type: WaypointType.ASTEROID_FIELD,
-  //     x: 0,
-  //     y: 0,
-  //   );
-  //   final sac = SystemWaypoint(
-  //     symbol: 'S-A-C',
-  //     type: WaypointType.ASTEROID_FIELD,
-  //     x: 1000,
-  //     y: 1000,
-  //   );
-  //   final waypoints = [saa, sab, sac];
-  //   when(() => systemsCache.waypointFromSymbol(saa.waypointSymbol))
-  //       .thenReturn(saa);
-  //   when(() => systemsCache.waypointFromSymbol(sab.waypointSymbol))
-  //       .thenReturn(sab);
-  //   when(() => systemsCache.waypointFromSymbol(sac.waypointSymbol))
-  //       .thenReturn(sac);
-  //   when(() => systemsCache.waypointsInSystem(saa.systemSymbol))
-  //       .thenReturn(waypoints);
-  //   when(
-  //     () => systemsCache.waypointSymbolsInJumpRadius(
-  //       startSystem: saa.systemSymbol,
-  //       maxJumps: 1,
-  //     ),
-  //   ).thenAnswer((invocation) => waypoints.map((w) => w.waypointSymbol));
-  //   const tradeSymbol = TradeSymbol.FUEL;
-  //   final now = DateTime.timestamp();
-  //   final prices = [
-  //     MarketPrice(
-  //       waypointSymbol: saa.waypointSymbol,
-  //       symbol: tradeSymbol,
-  //       supply: SupplyLevel.ABUNDANT,
-  //       purchasePrice: 200,
-  //       sellPrice: 201,
-  //       tradeVolume: 100,
-  //       timestamp: now,
-  //     ),
-  //     MarketPrice(
-  //       waypointSymbol: sab.waypointSymbol,
-  //       symbol: tradeSymbol,
-  //       supply: SupplyLevel.ABUNDANT,
-  //       purchasePrice: 100,
-  //       sellPrice: 101,
-  //       tradeVolume: 100,
-  //       timestamp: now,
-  //     ),
-  //     MarketPrice(
-  //       waypointSymbol: sac.waypointSymbol,
-  //       symbol: tradeSymbol,
-  //       supply: SupplyLevel.ABUNDANT,
-  //       purchasePrice: 1000,
-  //       sellPrice: 1001,
-  //       tradeVolume: 100,
-  //       timestamp: now,
-  //     ),
-  //   ];
-  //   when(() => marketPrices.prices).thenReturn(prices);
-  //   final ship = _MockShip();
-  //   final shipNav = _MockShipNav();
-  //   final shipEngine = _MockShipEngine();
-  //   final shipCargo = _MockShipCargo();
-  //   when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
-  //   when(() => ship.nav).thenReturn(shipNav);
-  //   when(() => shipNav.waypointSymbol).thenReturn('S-A-A');
-  //   when(() => shipNav.systemSymbol).thenReturn('S-A');
-  //   when(() => ship.engine).thenReturn(shipEngine);
-  //   when(() => shipEngine.speed).thenReturn(30);
-  //   when(() => ship.cargo).thenReturn(shipCargo);
-  //   when(() => shipCargo.capacity).thenReturn(1);
-  //   when(() => shipCargo.units).thenReturn(0);
+  test('findDealFor includes time to source', () async {
+    // findDealFor used to not consider time to get to the source system.
+    // which meant if there was a very far away system with a great deal
+    // we would try to do that, even if it took forever to get there and thus
+    // the profit per second was poor.
+    // S-A-A and S-A-B are close but have poor deals, S-A-C is far away but
+    // has a great deal, but we still choose S-A-B because it's faster and
+    // thus has a better profit per second.
+    final marketPrices = _MockMarketPrices();
+    final systemsCache = _MockSystemsCache();
+    final saa = SystemWaypoint(
+      symbol: 'S-A-A',
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+    );
+    final sab = SystemWaypoint(
+      symbol: 'S-A-B',
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+    );
+    final sac = SystemWaypoint(
+      symbol: 'S-A-C',
+      type: WaypointType.ASTEROID_FIELD,
+      x: 1000,
+      y: 1000,
+    );
+    final waypoints = [saa, sab, sac];
+    when(() => systemsCache.waypointFromSymbol(saa.waypointSymbol))
+        .thenReturn(saa);
+    when(() => systemsCache.waypointFromSymbol(sab.waypointSymbol))
+        .thenReturn(sab);
+    when(() => systemsCache.waypointFromSymbol(sac.waypointSymbol))
+        .thenReturn(sac);
+    when(() => systemsCache.waypointsInSystem(saa.systemSymbol))
+        .thenReturn(waypoints);
+    const tradeSymbol = TradeSymbol.FUEL;
+    final now = DateTime.timestamp();
+    final prices = [
+      MarketPrice(
+        waypointSymbol: saa.waypointSymbol,
+        symbol: tradeSymbol,
+        supply: SupplyLevel.ABUNDANT,
+        purchasePrice: 200,
+        sellPrice: 201,
+        tradeVolume: 100,
+        timestamp: now,
+      ),
+      MarketPrice(
+        waypointSymbol: sab.waypointSymbol,
+        symbol: tradeSymbol,
+        supply: SupplyLevel.ABUNDANT,
+        purchasePrice: 100,
+        sellPrice: 101,
+        tradeVolume: 100,
+        timestamp: now,
+      ),
+      MarketPrice(
+        waypointSymbol: sac.waypointSymbol,
+        symbol: tradeSymbol,
+        supply: SupplyLevel.ABUNDANT,
+        purchasePrice: 1000,
+        sellPrice: 1001,
+        tradeVolume: 100,
+        timestamp: now,
+      ),
+    ];
+    when(() => marketPrices.prices).thenReturn(prices);
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    final shipEngine = _MockShipEngine();
+    final shipCargo = _MockShipCargo();
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-A');
+    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.speed).thenReturn(30);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => shipCargo.capacity).thenReturn(1);
+    when(() => shipCargo.units).thenReturn(0);
 
-  //   final systemConnectivity = _MockSystemConnectivity();
-  //   final jumpCache = JumpCache();
-  //   registerFallbackValue(SystemSymbol.fromString('S-A'));
-  //   when(
-  //     () => systemConnectivity.canJumpBetweenSystemSymbols(
-  //       any(),
-  //       any(),
-  //     ),
-  //   ).thenReturn(true);
-  //   when(() => systemsCache.systemBySymbol(saa.systemSymbol)).thenReturn(
-  //     System(
-  //       symbol: 'S-A',
-  //       sectorSymbol: 'S',
-  //       x: 0,
-  //       y: 0,
-  //       type: SystemType.RED_STAR,
-  //     ),
-  //   );
+    when(() => systemsCache.systemBySymbol(saa.systemSymbol)).thenReturn(
+      System(
+        symbol: 'S-A',
+        sectorSymbol: 'S',
+        x: 0,
+        y: 0,
+        type: SystemType.RED_STAR,
+      ),
+    );
 
-  //   final routePlanner = RoutePlanner(
-  //     systemConnectivity: systemConnectivity,
-  //     jumpCache: jumpCache,
-  //     systemsCache: systemsCache,
-  //   );
+    final routePlanner =
+        RoutePlanner(systemsCache: systemsCache, sellsFuel: (_) => true);
 
-  //   final logger = _MockLogger();
+    final logger = _MockLogger();
 
-  //   const maxJumps = 1;
-  //   const maxWaypoints = 10;
-  //   final marketScan = runWithLogger(
-  //     logger,
-  //     () => scanNearbyMarkets(
-  //       systemsCache,
-  //       marketPrices,
-  //       systemSymbol: ship.systemSymbol,
-  //       maxJumps: maxJumps,
-  //       maxWaypoints: maxWaypoints,
-  //     ),
-  //   );
+    const maxWaypoints = 10;
+    final marketScan = runWithLogger(
+      logger,
+      () => scanNearbyMarkets(
+        systemsCache,
+        marketPrices,
+        systemSymbol: ship.systemSymbol,
+        maxWaypoints: maxWaypoints,
+      ),
+    );
 
-  //   final costed = runWithLogger(
-  //     logger,
-  //     () => findDealFor(
-  //       marketPrices,
-  //       systemsCache,
-  //       routePlanner,
-  //       marketScan,
-  //       maxTotalOutlay: 100000,
-  //       startSymbol: ship.waypointSymbol,
-  //       fuelCapacity: ship.fuel.capacity,
-  //       cargoCapacity: ship.cargo.capacity,
-  //       shipSpeed: ship.engine.speed,
-  //     ),
-  //   );
-  //   expect(costed, isNotNull);
-  //   expect(costed?.expectedProfitPerSecond, 3);
-  //   expect(costed?.expectedProfit, 101);
-  // });
+    final costed = runWithLogger(
+      logger,
+      () => findDealsFor(
+        marketPrices,
+        systemsCache,
+        routePlanner,
+        marketScan,
+        maxTotalOutlay: 100000,
+        startSymbol: ship.waypointSymbol,
+        fuelCapacity: ship.fuel.capacity,
+        cargoCapacity: ship.cargo.capacity,
+        shipSpeed: ship.engine.speed,
+      ).firstOrNull,
+    );
+    expect(costed, isNotNull);
+    expect(costed!.expectedProfitPerSecond, 3);
+    expect(costed.expectedProfit, 101);
+  });
 
   test('buildDealsFromScan empty', () {
     final scan = MarketScan.test(buyOpps: [], sellOpps: []);

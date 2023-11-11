@@ -339,18 +339,22 @@ CostedDeal costOutDeal(
   required WaypointSymbol shipWaypointSymbol,
   required int shipFuelCapacity,
   required int costPerFuelUnit,
-  ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
+  final waypointSymbols = [
+    shipWaypointSymbol,
+    deal.sourceSymbol,
+    deal.destinationSymbol,
+  ];
   final route = planRouteThrough(
     systemsCache,
     routePlanner,
-    [shipWaypointSymbol, deal.sourceSymbol, deal.destinationSymbol],
+    waypointSymbols,
     fuelCapacity: shipFuelCapacity,
     shipSpeed: shipSpeed,
   );
 
   if (route == null) {
-    throw Exception('No route found for $deal');
+    throw Exception('No route found for $deal through $waypointSymbols');
   }
 
   return CostedDeal(
@@ -371,8 +375,11 @@ MarketScan scanNearbyMarkets(
   required SystemSymbol systemSymbol,
   required int maxWaypoints,
 }) {
-  final allowedWaypoints =
-      systemsCache.waypointsInSystem(systemSymbol).take(maxWaypoints).toSet();
+  final allowedWaypoints = systemsCache
+      .waypointsInSystem(systemSymbol)
+      .take(maxWaypoints)
+      .map((w) => w.waypointSymbol)
+      .toSet();
   logger.detail('Considering ${allowedWaypoints.length} waypoints');
 
   return MarketScan.fromMarketPrices(

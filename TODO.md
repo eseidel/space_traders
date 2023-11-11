@@ -716,3 +716,12 @@ and when it refuels re-set to a full capacity.
 ### Make sure construction handles completion correctly.
 
 I'm not sure we have any guards for when construction is completed.
+
+### Plan route through fails if the first leg eats all fuel.
+
+e.g.
+fuelCapacity: 100
+A -> B = 100
+B -> C = 1000 (so drift)
+Try to plan [A, B, C] = fails but it should find a [DRIFT, DRIFT] route, or
+if B has fuel, a [CRUISE, DRIFT] route.
