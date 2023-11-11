@@ -300,7 +300,7 @@ void main() {
     when(() => shipNav.route).thenReturn(shipNavRoute);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
 
-    final beforeResult = await runWithLogger(
+    final result = await runWithLogger(
       logger,
       () => continueNavigationIfNeeded(
         api,
@@ -312,6 +312,59 @@ void main() {
         getNow: getNow,
       ),
     );
-    expect(beforeResult.shouldReturn(), false);
+    expect(state.routePlan, isNull);
+    expect(result.shouldReturn(), false);
+  });
+
+  test('continueNavigationIfNeeded already at end', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final ship = _MockShip();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+    final shipNav = _MockShipNav();
+    final shipNavRoute = _MockShipNavRoute();
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.nav).thenReturn(shipNav);
+
+    final start = WaypointSymbol.fromString('A-B-C');
+    final end = WaypointSymbol.fromString('X-Y-Z');
+    final state = BehaviorState(shipSymbol, Behavior.idle)
+      ..routePlan = RoutePlan(
+        fuelCapacity: 100,
+        shipSpeed: 10,
+        actions: [
+          RouteAction(
+            startSymbol: start,
+            endSymbol: end,
+            type: RouteActionType.navCruise,
+            seconds: 10,
+            fuelUsed: 10,
+          ),
+        ],
+      );
+
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    final logger = _MockLogger();
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.route).thenReturn(shipNavRoute);
+    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
+
+    final result = await runWithLogger(
+      logger,
+      () => continueNavigationIfNeeded(
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        state,
+        getNow: getNow,
+      ),
+    );
+    expect(state.routePlan, isNull);
+    expect(result.shouldReturn(), false);
   });
 }
