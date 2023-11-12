@@ -38,6 +38,7 @@ BuyOpp _makeBuyOpp({
       sellPrice: price + 1,
       tradeVolume: 10,
       timestamp: DateTime(2021),
+      activity: ActivityLevel.WEAK,
     ),
   );
 }
@@ -56,6 +57,7 @@ SellOpp _makeSellOpp({
       sellPrice: price,
       tradeVolume: 10,
       timestamp: DateTime(2021),
+      activity: ActivityLevel.WEAK,
     ),
   );
 }
@@ -217,6 +219,7 @@ void main() {
         sellPrice: 201,
         tradeVolume: 100,
         timestamp: now,
+        activity: ActivityLevel.WEAK,
       ),
       MarketPrice(
         waypointSymbol: sab.waypointSymbol,
@@ -226,6 +229,7 @@ void main() {
         sellPrice: 101,
         tradeVolume: 100,
         timestamp: now,
+        activity: ActivityLevel.WEAK,
       ),
       MarketPrice(
         waypointSymbol: sac.waypointSymbol,
@@ -235,6 +239,7 @@ void main() {
         sellPrice: 1001,
         tradeVolume: 100,
         timestamp: now,
+        activity: ActivityLevel.WEAK,
       ),
     ];
     when(() => marketPrices.prices).thenReturn(prices);
@@ -320,6 +325,7 @@ void main() {
           sellPrice: 2,
           tradeVolume: 10,
           timestamp: DateTime(2021),
+          activity: ActivityLevel.WEAK,
         ),
       ),
     ];
@@ -380,6 +386,7 @@ void main() {
           sellPrice: 2,
           tradeVolume: 10,
           timestamp: DateTime(2021),
+          activity: ActivityLevel.WEAK,
         ),
       ),
       destination: SellOpp.fromContract(
@@ -441,6 +448,7 @@ void main() {
       sellPrice: 1,
       tradeVolume: 10,
       timestamp: now,
+      activity: ActivityLevel.WEAK,
     );
     final mid = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-MID'),
@@ -450,6 +458,7 @@ void main() {
       sellPrice: 1,
       tradeVolume: 10,
       timestamp: now,
+      activity: ActivityLevel.WEAK,
     );
     final far = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-FAR'),
@@ -459,6 +468,7 @@ void main() {
       sellPrice: 1,
       tradeVolume: 10,
       timestamp: now,
+      activity: ActivityLevel.WEAK,
     );
 
     when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM))
@@ -548,6 +558,7 @@ void main() {
       sellPrice: 10,
       tradeVolume: 10,
       timestamp: now,
+      activity: ActivityLevel.WEAK,
     );
     final mid = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-MID'),
@@ -557,6 +568,7 @@ void main() {
       sellPrice: 100,
       tradeVolume: 10,
       timestamp: now,
+      activity: ActivityLevel.WEAK,
     );
     final far = MarketPrice(
       waypointSymbol: WaypointSymbol.fromString('S-A-FAR'),
@@ -566,6 +578,7 @@ void main() {
       sellPrice: 1000,
       tradeVolume: 10,
       timestamp: now,
+      activity: ActivityLevel.WEAK,
     );
 
     when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM))
@@ -647,6 +660,7 @@ void main() {
           // If these aren't UTC, they won't roundtrip through JSON correctly
           // because MarketPrice always converts to UTC in toJson.
           timestamp: DateTime(2021).toUtc(),
+          activity: ActivityLevel.WEAK,
         ),
       ),
       destination: SellOpp.fromMarketPrice(
@@ -658,6 +672,7 @@ void main() {
           sellPrice: 10400,
           tradeVolume: 10,
           timestamp: DateTime(2021).toUtc(),
+          activity: ActivityLevel.WEAK,
         ),
       ),
     );

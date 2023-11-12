@@ -25,6 +25,7 @@ MarketPrice makePrice({
     sellPrice: sellPrice,
     tradeVolume: tradeVolume,
     timestamp: timestamp ?? DateTime.timestamp(),
+    activity: ActivityLevel.WEAK,
   );
 }
 

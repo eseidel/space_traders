@@ -30,6 +30,7 @@ void main() {
           sellPrice: 2,
           tradeVolume: 100,
           timestamp: DateTime.timestamp(),
+          activity: ActivityLevel.WEAK,
         ),
         MarketPrice(
           waypointSymbol: bSymbol,
@@ -39,6 +40,7 @@ void main() {
           sellPrice: 200,
           tradeVolume: 100,
           timestamp: DateTime.timestamp(),
+          activity: ActivityLevel.WEAK,
         ),
       ],
       fs: fs,

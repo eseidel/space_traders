@@ -491,6 +491,7 @@ void main() {
         sellPrice: 101,
         tradeVolume: 10,
         timestamp: DateTime(2021),
+        activity: ActivityLevel.WEAK,
       ),
     ]);
 

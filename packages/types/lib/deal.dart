@@ -37,6 +37,7 @@ class Deal {
           // If these aren't UTC, they won't roundtrip through JSON correctly
           // because MarketPrice always converts to UTC in toJson.
           timestamp: DateTime(2021).toUtc(),
+          activity: ActivityLevel.WEAK,
         ),
       ),
       destination: SellOpp.fromMarketPrice(
@@ -48,6 +49,7 @@ class Deal {
           sellPrice: sellPrice,
           tradeVolume: 100,
           timestamp: DateTime(2021).toUtc(),
+          activity: ActivityLevel.WEAK,
         ),
       ),
     );

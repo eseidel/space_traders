@@ -36,6 +36,7 @@ void addSymbols(
         tradeSymbol.toString(),
         price.supply.toString(),
         rightAlign(price.tradeVolume),
+        rightAlign(price.activity),
         rightAlign(price.purchasePrice),
         rightAlign(price.sellPrice),
       ]);
@@ -60,6 +61,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       'symbol',
       'supply',
       'volume',
+      'activity',
       'buy',
       'sell',
     ],

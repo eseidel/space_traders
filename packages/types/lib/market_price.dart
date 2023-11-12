@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -16,6 +18,7 @@ class MarketPrice {
     required this.sellPrice,
     required this.tradeVolume,
     required this.timestamp,
+    this.activity,
   });
 
   /// Create a new price record from a market trade good.
@@ -25,7 +28,8 @@ class MarketPrice {
         purchasePrice = good.purchasePrice,
         sellPrice = good.sellPrice,
         tradeVolume = good.tradeVolume,
-        timestamp = DateTime.timestamp();
+        timestamp = DateTime.timestamp(),
+        activity = good.activity;
 
   /// Create a new price record from a json map.
   factory MarketPrice.fromJson(Map<String, dynamic> json) {
@@ -37,6 +41,7 @@ class MarketPrice {
       sellPrice: json['sellPrice'] as int,
       tradeVolume: json['tradeVolume'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
+      activity: ActivityLevel.fromJson(json['activity'] as String?),
     );
   }
 
@@ -54,6 +59,7 @@ class MarketPrice {
       'sellPrice': sellPrice,
       'tradeVolume': tradeVolume,
       'timestamp': timestamp.toUtc().toIso8601String(),
+      'activity': activity?.toJson(),
     };
   }
 
@@ -70,6 +76,9 @@ class MarketPrice {
   /// The supply level of the trade good.
   final SupplyLevel supply;
 
+  /// The activity level of the trade good.
+  final ActivityLevel? activity;
+
   /// The price at which this good can be purchased from the market.
   final int purchasePrice;
 
@@ -83,12 +92,7 @@ class MarketPrice {
   final DateTime timestamp;
 
   @override
-  String toString() {
-    return 'MarketPrice{waypointSymbol: $waypointSymbol, symbol: $symbol, '
-        'supply: $supply, purchasePrice: $purchasePrice, '
-        'sellPrice: $sellPrice, tradeVolume: $tradeVolume, '
-        'timestamp: $timestamp}';
-  }
+  String toString() => jsonEncode(toJson());
 
   @override
   bool operator ==(Object other) =>
@@ -101,7 +105,8 @@ class MarketPrice {
           purchasePrice == other.purchasePrice &&
           sellPrice == other.sellPrice &&
           tradeVolume == other.tradeVolume &&
-          timestamp == other.timestamp;
+          timestamp == other.timestamp &&
+          activity == other.activity;
 
   @override
   int get hashCode => Object.hash(
@@ -112,5 +117,6 @@ class MarketPrice {
         sellPrice,
         tradeVolume,
         timestamp,
+        activity,
       );
 }

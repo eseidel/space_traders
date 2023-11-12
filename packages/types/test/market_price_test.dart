@@ -12,6 +12,7 @@ void main() {
       sellPrice: 2,
       tradeVolume: 10,
       timestamp: moonLanding,
+      activity: ActivityLevel.WEAK,
     );
     final json = price.toJson();
     final price2 = MarketPrice.fromJson(json);

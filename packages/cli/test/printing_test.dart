@@ -89,6 +89,7 @@ void main() {
         sellPrice: 2,
         tradeVolume: 100,
         timestamp: DateTime.timestamp(),
+        activity: ActivityLevel.WEAK,
       ),
     ]);
 
