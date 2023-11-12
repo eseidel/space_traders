@@ -84,10 +84,9 @@ Future<DateTime?> beingRouteAndLog(
   }
 
   state.routePlan = routePlan;
-  // TODO(eseidel): Should this buy fuel first if we need it?
   final message = 'Beginning route to ${routePlan.endSymbol} '
       '(${approximateDuration(routePlan.duration)})';
-  if (routePlan.duration.inMinutes > 2) {
+  if (routePlan.duration.inMinutes > 5) {
     shipWarn(ship, message);
   } else {
     shipInfo(ship, message);
