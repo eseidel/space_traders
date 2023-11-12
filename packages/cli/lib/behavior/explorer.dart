@@ -126,7 +126,7 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   Duration maxAge = defaultMaxAge,
 }) async {
   // Find all systems in the jumpgate network.
-  final startSystem = systemsCache.systemBySymbol(startSystemSymbol);
+  final startSystem = systemsCache[startSystemSymbol];
   // final clusterId = systemConnectivity.clusterIdForSystem(startSystemSymbol);
   // final reachableSystemSymbols =
   //     systemConnectivity.systemSymbolsByClusterId(clusterId);
@@ -166,7 +166,7 @@ WaypointSymbol nearestHeadquarters(
   SystemSymbol startSystemSymbol,
 ) {
   final factionHqs = factions.map((e) => e.headquartersSymbol).toList();
-  final startSystem = systemsCache.systemBySymbol(startSystemSymbol);
+  final startSystem = systemsCache[startSystemSymbol];
   final reachableHqs =
       factionHqs.where((hq) => hq.systemSymbol == startSystemSymbol).toList();
   // .where(
@@ -178,9 +178,7 @@ WaypointSymbol nearestHeadquarters(
   // .toList();
   final sortedHqs = reachableHqs
       .sortedBy<num>(
-        (hq) => systemsCache
-            .systemBySymbol(hq.systemSymbol)
-            .distanceTo(startSystem),
+        (hq) => systemsCache[hq.systemSymbol].distanceTo(startSystem),
       )
       .toList();
   // There is always a reacahble HQ since we don't warp yet.

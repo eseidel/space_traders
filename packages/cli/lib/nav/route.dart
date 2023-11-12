@@ -247,8 +247,8 @@ RouteAction _jumpAction(
   int shipSpeed, {
   required bool isLastJump,
 }) {
-  final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
-  final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
+  final startSystem = systemsCache[start.systemSymbol];
+  final endSystem = systemsCache[end.systemSymbol];
   final cooldown = cooldownTimeForJumpBetweenSystems(startSystem, endSystem);
   // This isn't quite right to use cooldown as duration, but it's
   // close enough for now.  This isLastJump hack also would break

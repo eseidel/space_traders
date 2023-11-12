@@ -64,8 +64,7 @@ void main() {
       x: 0,
       y: 0,
     );
-    when(() => caches.systems.systemBySymbol(waypointSymbol.systemSymbol))
-        .thenReturn(system);
+    when(() => caches.systems[waypointSymbol.systemSymbol]).thenReturn(system);
     registerFallbackValue(waypointSymbol.systemSymbol);
     // when(() => caches.systemConnectivity.clusterIdForSystem(any()))
     //     .thenReturn(0);

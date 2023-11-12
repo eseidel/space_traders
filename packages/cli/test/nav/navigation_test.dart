@@ -158,7 +158,7 @@ void main() {
   //       y: 0,
   //     ),
   //   );
-  //   when(() => systemsCache.systemBySymbol(startSymbol.systemSymbol))
+  //   when(() => systemsCache[startSymbol.systemSymbol])
   //       .thenReturn(
   //     System(
   //       symbol: startSymbol.system,
@@ -176,7 +176,7 @@ void main() {
   //       y: 0,
   //     ),
   //   );
-  //   when(() => systemsCache.systemBySymbol(endSymbol.systemSymbol))
+  //   when(() => systemsCache[endSymbol.systemSymbol])
   //        .thenReturn(
   //     System(
   //       symbol: endSymbol.system,

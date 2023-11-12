@@ -154,8 +154,8 @@ class NavResult {
 //   SystemSymbol toSystem,
 //   Cooldown cooldown,
 // ) {
-//   final from = systemsCache.systemBySymbol(fromSystem);
-//   final to = systemsCache.systemBySymbol(toSystem);
+//   final from = systemsCache[fromSystem];
+//   final to = systemsCache[toSystem];
 //   final distance = from.distanceTo(to);
 //   verifyCooldown(
 //     ship,

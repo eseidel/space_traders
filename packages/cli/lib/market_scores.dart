@@ -76,7 +76,7 @@ _ShipPlacement? _findBetterSystemForTrader(
   required int profitPerSecondThreshold,
 }) {
   final shipSymbol = ship.symbol;
-  final shipSystem = systemsCache.systemBySymbol(ship.systemSymbol);
+  final shipSystem = systemsCache[ship.systemSymbol];
   while (true) {
     final closest = search.closestAvailableSystem(systemsCache, shipSystem);
     if (closest == null) {

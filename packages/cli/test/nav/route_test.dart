@@ -208,8 +208,8 @@ void main() {
     expectRoute(waypoint1, waypoint1, 0);
 
     // Within one system
-    final system = systemsCache
-        .systemBySymbol(WaypointSymbol.fromString(waypoint1).systemSymbol);
+    final system =
+        systemsCache[WaypointSymbol.fromString(waypoint1).systemSymbol];
     final waypointObject2 =
         system.waypoints.firstWhere((w) => w.symbol != waypoint1);
     final waypoint2 = waypointObject2.symbol;

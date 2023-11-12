@@ -257,7 +257,7 @@ void main() {
     when(() => shipCargo.capacity).thenReturn(1);
     when(() => shipCargo.units).thenReturn(0);
 
-    when(() => systemsCache.systemBySymbol(saa.systemSymbol)).thenReturn(
+    when(() => systemsCache[saa.systemSymbol]).thenReturn(
       System(
         symbol: 'S-A',
         sectorSymbol: 'S',

@@ -90,13 +90,13 @@ class SystemsCache extends JsonListStore<System> {
 
   /// Return the jump gate waypoint for the given [symbol].
   SystemWaypoint? jumpGateWaypointForSystem(SystemSymbol symbol) {
-    final system = systemBySymbol(symbol);
-    return system.waypoints
+    return this[symbol]
+        .waypoints
         .firstWhereOrNull((w) => w.type == WaypointType.JUMP_GATE);
   }
 
   /// Return the system with the given [symbol].
-  // Remove in favor of operator [].
+  // Remove in favor of operator [], only used for mocking.
   System systemBySymbol(SystemSymbol symbol) =>
       _index[symbol] ?? (throw ArgumentError('Unknown system $symbol'));
 
@@ -125,5 +125,5 @@ class SystemsCache extends JsonListStore<System> {
   /// Return the SystemWaypoints for the given [systemSymbol].
   /// Mostly exists for compatibility with WaypointCache.
   List<SystemWaypoint> waypointsInSystem(SystemSymbol systemSymbol) =>
-      systemBySymbol(systemSymbol).waypoints;
+      this[systemSymbol].waypoints;
 }
