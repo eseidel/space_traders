@@ -58,13 +58,7 @@ Future<JobResult> _initMineJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final mineJob = await centralCommand.mineJobForShip(
-    caches.waypoints,
-    caches.marketListings,
-    caches.agent,
-    ship,
-  );
-  state.mineJob = mineJob;
+  state.mineJob = centralCommand.squadForShip(ship)?.job;
   return JobResult.complete();
 }
 

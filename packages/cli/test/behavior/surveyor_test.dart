@@ -2,6 +2,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/mining.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -53,14 +54,9 @@ void main() {
       ),
     ]);
 
-    when(
-      () => centralCommand.mineJobForShip(
-        caches.waypoints,
-        caches.marketListings,
-        caches.agent,
-        ship,
-      ),
-    ).thenAnswer((_) => Future.value(MineJob(mine: symbol, market: symbol)));
+    when(() => centralCommand.squadForShip(ship)).thenReturn(
+      MiningSquad(MineJob(mine: symbol, market: symbol)),
+    );
 
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);

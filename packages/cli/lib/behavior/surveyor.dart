@@ -1,7 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/mining.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
@@ -21,12 +21,7 @@ Future<DateTime?> advanceSurveyor(
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   final mineJob = assertNotNull(
-    await centralCommand.mineJobForShip(
-      caches.waypoints,
-      caches.marketListings,
-      caches.agent,
-      ship,
-    ),
+    centralCommand.squadForShip(ship)?.job,
     'Requires a mine job.',
     const Duration(minutes: 10),
   );

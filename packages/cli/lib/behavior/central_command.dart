@@ -1,11 +1,11 @@
 import 'dart:math';
 
 import 'package:cli/behavior/buy_ship.dart';
-import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/mine_scores.dart';
+import 'package:cli/mining.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
@@ -48,6 +48,9 @@ class CentralCommand {
 
   /// The current construction job.
   Construction? _activeConstruction;
+
+  /// The current mining squads.
+  List<MiningSquad> miningSquads = [];
 
   /// The current construction job, temporary hack.
   void setActiveConstruction(Construction? construction) {
@@ -94,14 +97,6 @@ class CentralCommand {
 
   /// Shorten the max age for explorer data.
   Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
-
-  /// Returns the mining squads for the fleet.
-  Iterable<MiningSquad> get miningSquads {
-    return _shipCache.ships
-        .where((s) => s.isMiner)
-        .slices(5)
-        .map(MiningSquad.new);
-  }
 
   /// Returns the mining squad for the given [ship].
   MiningSquad? squadForShip(Ship ship) {
@@ -394,26 +389,82 @@ class CentralCommand {
     }
   }
 
-  /// Give central planning a chance to advance.
-  Future<void> advanceCentralPlanning(Api api, Caches caches) async {
+  /// Compute the correct squad for the given [ship].
+  @visibleForTesting
+  MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
+    if (squads.isEmpty) {
+      return null;
+    }
+    // Score all squads based on how much they need this type of ship?
+    // Add to the squad with the lowest score?
+    final fleetRole = ship.fleetRole;
+    final lowestCount = squads.first.countOfRole(fleetRole);
+    for (final squad in squads) {
+      final count = squad.countOfRole(fleetRole);
+      if (count < lowestCount) {
+        return squad;
+      }
+    }
+    // If we didn't find a squad, just return the first one.
+    return squads.first;
+  }
+
+  /// Compute what our current mining squads should be.
+  @visibleForTesting
+  Future<List<MiningSquad>> computeMiningSquads(Caches caches) async {
+    // Look at the top N mining scores.
+    final hq = caches.agent.agent.headquartersSymbol;
+    final scores = (await evaluateWaypointsForMining(
+      caches.waypoints,
+      caches.marketListings,
+      hq.systemSymbol,
+    ))
+        .where((m) => m.marketTradesAllProducedGoods)
+        .where((m) => m.score < 80)
+        .toList();
+    // Divide our current ships into N squads.
+    final squads = List.generate(scores.length, (index) {
+      final score = scores[index];
+      final job = MineJob(mine: score.mine, market: score.market);
+      return MiningSquad(job);
+    });
+    // Go through and assign all ships to squads.
+    for (final ship in _shipCache.ships) {
+      findSquadForShip(miningSquads, ship)?.ships.add(ship);
+    }
+    return squads;
+  }
+
+  Construction? _computeActiveConstruction(Caches caches) {
     final systemSymbol = caches.agent.headquarters(caches.systems).systemSymbol;
     final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
-    final construction = jumpGate == null
+    return jumpGate == null
         ? null
         : caches.construction.constructionForSymbol(jumpGate.waypointSymbol);
-    _activeConstruction = construction;
+  }
+
+  bool _computeHaveEscapedStartingSystem(Caches caches) {
+    if (_haveEscapedStartingSystem) {
+      return true;
+    }
+    // We'll assume that if all the ships are in the same system we've
+    // not yet constructed our jump gate.
+    final systemSymbols = Set<SystemSymbol>.from(
+      _shipCache.ships.map((s) => s.nav.systemSymbolObject),
+    );
+    return systemSymbols.length > 1;
+  }
+
+  /// Give central planning a chance to advance.
+  Future<void> advanceCentralPlanning(Api api, Caches caches) async {
+    miningSquads = await computeMiningSquads(caches);
 
     _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
     updateAvailableMounts(caches.marketPrices);
     await _queueMountRequests(caches);
-    // We'll assume that if all the ships are in the same system we've
-    // not yet constructed our jump gate.
-    if (!_haveEscapedStartingSystem) {
-      final systemSymbols = Set<SystemSymbol>.from(
-        _shipCache.ships.map((s) => s.nav.systemSymbolObject),
-      );
-      _haveEscapedStartingSystem = systemSymbols.length > 1;
-    }
+
+    _activeConstruction = _computeActiveConstruction(caches);
+    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(caches);
   }
 
   /// Returns the next ship buy job.
@@ -681,27 +732,6 @@ class CentralCommand {
     //   return 0.5;
     // }
     return 0.9;
-  }
-
-  /// Returns the mining plan for the given [ship].
-  // TODO(eseidel): call from or merge into getJobForShip.
-  Future<MineJob?> mineJobForShip(
-    WaypointCache waypointCache,
-    MarketListingCache marketListings,
-    AgentCache agentCache,
-    Ship ship,
-  ) async {
-    final hq = agentCache.agent.headquartersSymbol;
-    final score = (await evaluateWaypointsForMining(
-      waypointCache,
-      marketListings,
-      hq.systemSymbol,
-    ))
-        .firstWhereOrNull((m) => m.marketTradesAllProducedGoods);
-    if (score == null) {
-      return null;
-    }
-    return MineJob(mine: score.mine, market: score.market);
   }
 
   /// Returns the siphon plan for the given [ship].
