@@ -96,8 +96,12 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Return the system with the given [symbol].
+  // Remove in favor of operator [].
   System systemBySymbol(SystemSymbol symbol) =>
       _index[symbol] ?? (throw ArgumentError('Unknown system $symbol'));
+
+  /// Return the system with the given [symbol].
+  System operator [](SystemSymbol symbol) => systemBySymbol(symbol);
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   SystemWaypoint? waypointOrNull(WaypointSymbol waypointSymbol) {
