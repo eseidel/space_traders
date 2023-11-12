@@ -549,6 +549,8 @@ class CentralCommand {
       return caches.shipyardPrices.havePriceFor(shipType) && typeCount < count;
     }
 
+    final squadCount = miningSquads.length;
+
     if (shouldBuy(ShipType.LIGHT_HAULER, 5)) {
       return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
     }
@@ -557,15 +559,15 @@ class CentralCommand {
     // if (shouldBuy(ShipType.ORE_HOUND, 10)) {
     //   return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
     // }
-    // if (shouldBuy(ShipType.MINING_DRONE, 10)) {
-    //   return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
-    // }
+    if (shouldBuy(ShipType.MINING_DRONE, squadCount)) {
+      return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
+    }
     // if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
     //   return _findBestPlaceToBuy(caches, ShipType.SIPHON_DRONE);
     // }
-    // if (shouldBuy(ShipType.SURVEYOR, 10)) {
-    //   return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
-    // }
+    if (shouldBuy(ShipType.SURVEYOR, squadCount)) {
+      return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
+    }
     // if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
     //   return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
     // }
