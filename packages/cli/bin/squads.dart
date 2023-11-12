@@ -37,6 +37,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       );
     }
   }
+
+  // Required or main will hang.
+  await db.close();
 }
 
 void main(List<String> args) async {

@@ -854,6 +854,11 @@ MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
   // Score all squads based on how much they need this type of ship?
   // Add to the squad with the lowest score?
   final fleetRole = ship.fleetRole;
+  // Hack for now to restrict to miners / surveyors.
+  if (fleetRole != FleetRole.miner && fleetRole != FleetRole.surveyor) {
+    return null;
+  }
+
   final lowestCount = squads.first.countOfRole(fleetRole);
   for (final squad in squads) {
     final count = squad.countOfRole(fleetRole);
