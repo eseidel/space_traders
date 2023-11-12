@@ -389,52 +389,6 @@ class CentralCommand {
     }
   }
 
-  /// Compute the correct squad for the given [ship].
-  @visibleForTesting
-  MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
-    if (squads.isEmpty) {
-      return null;
-    }
-    // Score all squads based on how much they need this type of ship?
-    // Add to the squad with the lowest score?
-    final fleetRole = ship.fleetRole;
-    final lowestCount = squads.first.countOfRole(fleetRole);
-    for (final squad in squads) {
-      final count = squad.countOfRole(fleetRole);
-      if (count < lowestCount) {
-        return squad;
-      }
-    }
-    // If we didn't find a squad, just return the first one.
-    return squads.first;
-  }
-
-  /// Compute what our current mining squads should be.
-  @visibleForTesting
-  Future<List<MiningSquad>> computeMiningSquads(Caches caches) async {
-    // Look at the top N mining scores.
-    final hq = caches.agent.agent.headquartersSymbol;
-    final scores = (await evaluateWaypointsForMining(
-      caches.waypoints,
-      caches.marketListings,
-      hq.systemSymbol,
-    ))
-        .where((m) => m.marketTradesAllProducedGoods)
-        .where((m) => m.score < 80)
-        .toList();
-    // Divide our current ships into N squads.
-    final squads = List.generate(scores.length, (index) {
-      final score = scores[index];
-      final job = MineJob(mine: score.mine, market: score.market);
-      return MiningSquad(job);
-    });
-    // Go through and assign all ships to squads.
-    for (final ship in _shipCache.ships) {
-      findSquadForShip(miningSquads, ship)?.ships.add(ship);
-    }
-    return squads;
-  }
-
   Construction? _computeActiveConstruction(Caches caches) {
     final systemSymbol = caches.agent.headquarters(caches.systems).systemSymbol;
     final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
@@ -457,7 +411,13 @@ class CentralCommand {
 
   /// Give central planning a chance to advance.
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
-    miningSquads = await computeMiningSquads(caches);
+    final hq = caches.agent.agent.headquartersSymbol;
+    miningSquads = await assignShipsToSquads(
+      caches.waypoints,
+      caches.marketListings,
+      _shipCache,
+      systemSymbol: hq.systemSymbol,
+    );
 
     _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
     updateAvailableMounts(caches.marketPrices);
@@ -883,4 +843,53 @@ List<ShipSymbol> idleHaulerSymbols(
       .where((s) => idleBehaviors.contains(s.behavior))
       .toList();
   return idleHaulerStates.map((s) => s.shipSymbol).toList();
+}
+
+/// Compute the correct squad for the given [ship].
+@visibleForTesting
+MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
+  if (squads.isEmpty) {
+    return null;
+  }
+  // Score all squads based on how much they need this type of ship?
+  // Add to the squad with the lowest score?
+  final fleetRole = ship.fleetRole;
+  final lowestCount = squads.first.countOfRole(fleetRole);
+  for (final squad in squads) {
+    final count = squad.countOfRole(fleetRole);
+    if (count < lowestCount) {
+      return squad;
+    }
+  }
+  // If we didn't find a squad, just return the first one.
+  return squads.first;
+}
+
+/// Compute what our current mining squads should be.
+Future<List<MiningSquad>> assignShipsToSquads(
+  WaypointCache waypointCache,
+  MarketListingCache marketListings,
+  ShipCache shipCache, {
+  required SystemSymbol systemSymbol,
+}) async {
+  // Look at the top N mining scores.
+  final scores = (await evaluateWaypointsForMining(
+    waypointCache,
+    marketListings,
+    systemSymbol,
+  ))
+      .where((m) => m.marketTradesAllProducedGoods)
+      .where((m) => m.score < 80)
+      .toList();
+  // Divide our current ships into N squads.
+  final squads = List.generate(scores.length, (index) {
+    final score = scores[index];
+    final job = MineJob(mine: score.mine, market: score.market);
+    return MiningSquad(job);
+  });
+  // Go through and assign all ships to squads.
+  for (final ship in shipCache.ships) {
+    findSquadForShip(squads, ship)?.ships.add(ship);
+  }
+  return squads;
 }
