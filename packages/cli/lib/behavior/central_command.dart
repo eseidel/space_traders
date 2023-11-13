@@ -100,7 +100,13 @@ class CentralCommand {
 
   /// Returns the mining squad for the given [ship].
   MiningSquad? squadForShip(Ship ship) {
-    return miningSquads.firstWhereOrNull((s) => s.contains(ship));
+    var squad = miningSquads.firstWhereOrNull((s) => s.contains(ship));
+    // Handle the case of a newly purchased ship.
+    if (squad == null) {
+      squad = findSquadForShip(miningSquads, ship);
+      squad?.ships.add(ship);
+    }
+    return squad;
   }
 
   /// What template should we use for the given ship?

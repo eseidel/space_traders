@@ -723,3 +723,34 @@ A -> B = 100
 B -> C = 1000 (so drift)
 Try to plan [A, B, C] = fails but it should find a [DRIFT, DRIFT] route, or
 if B has fuel, a [CRUISE, DRIFT] route.
+
+
+### Can we plan better routes than this?
+
+🛸#F  Starting: X1-QP91-H56 to X1-QP91-B11 speed: 3 max-fuel: 80
+navCruise       X1-QP91-H56  X1-QP91-A3  0:06:38.000000s
+refuel          X1-QP91-A3  X1-QP91-A3  0:00:00.000000s
+navCruise       X1-QP91-A3  X1-QP91-F51  0:07:36.000000s
+refuel          X1-QP91-F51  X1-QP91-F51  0:00:00.000000s
+navDrift        X1-QP91-F51  X1-QP91-B11  6:16:38.000000s
+in 6h uses 101 fuel
+
+🛸#C  Starting: X1-QP91-H56 to X1-QP91-B13 speed: 3 max-fuel: 80
+navCruise       X1-QP91-H56  X1-QP91-D48  0:06:13.000000s
+refuel          X1-QP91-D48  X1-QP91-D48  0:00:00.000000s
+navDrift        X1-QP91-D48  X1-QP91-B13  6:09:41.000000s
+in 6h uses 45 fuel
+
+🛸#D  Starting: X1-QP91-H56 to X1-QP91-B16 speed: 3 max-fuel: 80
+navCruise       X1-QP91-H56  X1-QP91-A3  0:06:38.000000s
+refuel          X1-QP91-A3  X1-QP91-A3  0:00:00.000000s
+navCruise       X1-QP91-A3  X1-QP91-F51  0:07:36.000000s
+refuel          X1-QP91-F51  X1-QP91-F51  0:00:00.000000s
+navDrift        X1-QP91-F51  X1-QP91-B16  7:03:51.000000s
+in 7h uses 101 fuel
+
+🛸#E  Starting: X1-QP91-H56 to X1-QP91-B14 speed: 3 max-fuel: 80
+navCruise       X1-QP91-H56  X1-QP91-D47  0:06:13.000000s
+refuel          X1-QP91-D47  X1-QP91-D47  0:00:00.000000s
+navDrift        X1-QP91-D47  X1-QP91-B14  5:54:25.000000s
+in 6h uses 45 fuel
