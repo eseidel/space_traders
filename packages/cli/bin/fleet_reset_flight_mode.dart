@@ -9,7 +9,7 @@ Future<void> main(List<String> args) async {
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => 0);
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final ships = shipCache.ships;
   for (final ship in ships) {
     final flightMode = ship.nav.flightMode;

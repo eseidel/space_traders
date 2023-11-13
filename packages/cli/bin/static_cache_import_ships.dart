@@ -6,7 +6,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final staticCaches = StaticCaches.load(fs);
 
   // Import all info from our current ships.

@@ -5,7 +5,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final behaviorCache = BehaviorCache.load(fs);
   final marketPrices = MarketPrices.load(fs);
   final centralCommand =

@@ -35,7 +35,7 @@ Map<ShipType, int> _shipTypeCounts(
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
   final shipyardShips = ShipyardShipCache.load(fs);

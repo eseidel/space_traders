@@ -9,7 +9,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final routePlanner =
       RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final staticCaches = StaticCaches.load(fs);
 
   final ship = shipCache.ships.first;

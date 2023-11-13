@@ -19,7 +19,7 @@ class ShipCache extends ResponseListCache<Ship> {
   }) : super(refreshEntries: (Api api) => allMyShips(api).toList());
 
   /// Loads a ShipCache from cache if it exists.
-  static ShipCache? loadCached(
+  static ShipCache? load(
     FileSystem fs, {
     String path = defaultPath,
   }) {
@@ -35,14 +35,14 @@ class ShipCache extends ResponseListCache<Ship> {
   }
 
   /// Creates a new ShipCache from the Api or FileSystem if provided.
-  static Future<ShipCache> load(
+  static Future<ShipCache> loadOrFetch(
     Api api, {
     required FileSystem fs,
     String path = defaultPath,
     bool forceRefresh = false,
   }) async {
     if (!forceRefresh) {
-      final cached = loadCached(fs, path: path);
+      final cached = load(fs, path: path);
       if (cached != null) {
         return cached;
       }

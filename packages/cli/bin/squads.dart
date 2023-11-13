@@ -17,7 +17,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final charting = ChartingCache.load(fs, waypointTraits);
   final construction = ConstructionCache.load(fs);
   final waypointCache = WaypointCache(api, systems, charting, construction);
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final tradeGoods = TradeGoodCache.load(fs);
   final marketListings = MarketListingCache.load(fs, tradeGoods);
 

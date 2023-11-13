@@ -105,7 +105,7 @@ bool Function(Ship) filterFromArgs(List<String> args) {
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final filter = filterFromArgs(argResults.rest);
   final behaviorCache = BehaviorCache.load(fs);
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
 
   logger.info(describeFleet(shipCache));
   final ships = shipCache.ships;

@@ -23,7 +23,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
 
   final behaviorCache = BehaviorCache.load(fs);
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final agentCache = AgentCache.loadCached(fs)!;
   final contractCache = ContractCache.load(fs)!;
   final centralCommand =

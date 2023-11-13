@@ -114,7 +114,7 @@ class Caches {
     final agent = await AgentCache.load(api, fs: fs);
     final prices = MarketPrices.load(fs);
     // Intentionally do not load ships from disk (they change too often).
-    final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
+    final ships = await ShipCache.loadOrFetch(api, fs: fs, forceRefresh: true);
     final shipyard = ShipyardPrices.load(fs);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);

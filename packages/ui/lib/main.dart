@@ -16,13 +16,13 @@ late ShipCache shipCache;
 const shipsUrl = 'http://localhost:8080/ships';
 
 Future<ShipCache> loadShips() async {
-  final cached = ShipCache.loadCached(fs);
+  final cached = ShipCache.load(fs);
   if (cached != null) {
     return cached;
   }
   final response = await http.get(Uri.parse(shipsUrl));
   File(ShipCache.defaultPath).writeAsBytesSync(response.bodyBytes);
-  return ShipCache.loadCached(fs)!;
+  return ShipCache.load(fs)!;
 }
 
 void main() async {

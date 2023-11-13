@@ -61,7 +61,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final longestHexNumber =
       shipSymbols.map((s) => s.hexNumber.length).reduce(max);
 
-  final shipCache = ShipCache.loadCached(fs)!;
+  final shipCache = ShipCache.load(fs)!;
   final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
   logger
     ..info(describeFleet(shipCache))
