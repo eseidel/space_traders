@@ -116,7 +116,7 @@ class Caches {
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.load(api, fs: fs, forceRefresh: true);
     final shipyard = ShipyardPrices.load(fs);
-    final systems = await SystemsCache.load(fs, httpGet: httpGet);
+    final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
     final charting = ChartingCache.load(fs, static.waypointTraits);
     final construction = ConstructionCache.load(fs);

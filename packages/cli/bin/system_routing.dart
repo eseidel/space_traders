@@ -14,7 +14,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final api = defaultApi(fs, db, getPriority: () => 0);
 
   final staticCache = StaticCaches.load(fs);
-  final systemsCache = SystemsCache.loadCached(fs)!;
+  final systemsCache = SystemsCache.load(fs)!;
   final chartingCache = ChartingCache.load(fs, staticCache.waypointTraits);
   final constrctionCache = ConstructionCache.load(fs);
   final waypointCache =

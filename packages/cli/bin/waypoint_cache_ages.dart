@@ -5,7 +5,7 @@ import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final staticCache = StaticCaches.load(fs);
-  final systemsCache = SystemsCache.loadCached(fs)!;
+  final systemsCache = SystemsCache.load(fs)!;
   final chartingCache = ChartingCache.load(fs, staticCache.waypointTraits);
   final constrctionCache = ConstructionCache.load(fs);
   final agentCache = AgentCache.loadCached(fs)!;

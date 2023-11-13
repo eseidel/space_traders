@@ -158,7 +158,7 @@ void main() {
     // I made it dynamically compute the waypoint symbols to use from the first
     // waypoint symbol in the file.  Which makes it probably a less good test,
     // but much easier to update in the future if the format changes again.
-    final systemsCache = SystemsCache.loadCached(
+    final systemsCache = SystemsCache.load(
       fs,
       path: 'test/nav/fixtures/systems-09-24-2023.json',
     )!;

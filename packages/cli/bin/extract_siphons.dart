@@ -22,7 +22,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => 0);
-  final systems = await SystemsCache.load(fs);
+  final systems = await SystemsCache.loadOrFetch(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
   final charting = ChartingCache.load(fs, waypointTraits);
   final construction = ConstructionCache.load(fs);

@@ -14,7 +14,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   const maxWaypoints = 200;
 
   final staticCaches = StaticCaches.load(fs);
-  final systemsCache = SystemsCache.loadCached(fs)!;
+  final systemsCache = SystemsCache.load(fs)!;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,

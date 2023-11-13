@@ -28,7 +28,7 @@ Future<ShipCache> loadShips() async {
 void main() async {
   await runScoped(
     () async {
-      systemsCache = await SystemsCache.load(fs);
+      systemsCache = await SystemsCache.loadOrFetch(fs);
     },
     values: {loggerRef},
   );

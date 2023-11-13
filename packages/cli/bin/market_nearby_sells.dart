@@ -5,7 +5,7 @@ import 'package:cli/trading.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
-  final systemsCache = SystemsCache.loadCached(fs)!;
+  final systemsCache = SystemsCache.load(fs)!;
   final routePlanner =
       RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
   final agentCache = AgentCache.loadCached(fs)!;

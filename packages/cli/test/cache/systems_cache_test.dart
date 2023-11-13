@@ -19,7 +19,7 @@ void main() {
     try {
       await runWithLogger(
         logger,
-        () => SystemsCache.load(fs, httpGet: mockGet),
+        () => SystemsCache.loadOrFetch(fs, httpGet: mockGet),
       );
       fail('exception not thrown');
     } on ApiException catch (e) {

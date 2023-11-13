@@ -118,7 +118,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     return;
   }
 
-  final systemsCache = SystemsCache.loadCached(fs)!;
+  final systemsCache = SystemsCache.load(fs)!;
   final marketPrices = MarketPrices.load(fs);
   final jumpCache = JumpCache();
   for (final ship in matchingShips) {
