@@ -90,6 +90,9 @@ class MiningSquad {
     return ships.where((s) => s.fleetRole == role).length;
   }
 
+  /// Haulers in this squad.
+  Iterable<Ship> get haulers => ships.where((s) => s.isHauler);
+
   /// The ships in this squad.
   final List<Ship> ships;
 

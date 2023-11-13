@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
@@ -455,8 +457,18 @@ Future<JobResult> emptyCargoIfNeeded(
   return JobResult.wait(waitTime);
 }
 
-/// Attempt to sell cargo at the best price.
-Future<JobResult> sellCargoIfNeeded(
+DateTime? _nextHaulerArrivalTime(List<Ship> haulers, WaypointSymbol here) {
+  if (haulers.isEmpty) {
+    return null;
+  }
+  final haulersInTransit = haulers
+      .where((h) => h.waypointSymbol == here && h.isInTransit)
+      .sortedBy((h) => h.nav.route.arrival);
+  return haulersInTransit.firstOrNull?.nav.route.arrival;
+}
+
+/// Attempt to sell cargo ourselves by traveling to a market.
+Future<JobResult> travelAndSellCargo(
   BehaviorState state,
   Api api,
   Database db,
@@ -470,10 +482,6 @@ Future<JobResult> sellCargoIfNeeded(
   if (largestCargo == null) {
     return JobResult.complete();
   }
-
-  // FIXME(eseidel): We should decide if this cargo is even worth selling.
-  // This currently optimizes for price and does not consider requests.
-  // Some cargo should jettison and some should transfer to haulers.
 
   final costedTrip = assertNotNull(
     findBestMarketToSell(
@@ -548,6 +556,98 @@ Future<JobResult> sellCargoIfNeeded(
     'market to sell ${nextLargestCargo.symbol}.',
   );
   return JobResult.wait(null);
+}
+
+/// Attempt to transfer cargo to haulers, or wait for them to arrive.
+Future<JobResult> transferToHaulersOrWait(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final haulers = assertNotNull(
+    centralCommand.squadForShip(ship)?.haulers.toList(),
+    'No haulers.',
+    const Duration(minutes: 1),
+  );
+
+  // If there are haulers for this squad, and they are here, transfer to them.
+  final haulersHere = haulers
+      .where((h) => h.waypointSymbol == ship.waypointSymbol)
+      .sortedBy<num>((h) => h.cargo.availableSpace);
+  // If they are not here, wait.
+  if (haulersHere.isEmpty) {
+    final waitTime = _nextHaulerArrivalTime(haulers, ship.waypointSymbol) ??
+        getNow().add(const Duration(minutes: 1));
+    shipInfo(ship, 'No haulers here, waiting until $waitTime.');
+    return JobResult.wait(waitTime);
+  }
+  // If they are here, transfer to them.
+  for (final item in ship.cargo.inventory) {
+    for (final hauler in haulersHere) {
+      final transferAmount = min(
+        item.units,
+        ship.cargo.availableSpace,
+      );
+      if (transferAmount > 0) {
+        await transferCargoAndLog(
+          api,
+          caches.ships,
+          from: ship,
+          to: hauler,
+          tradeSymbol: item.symbol,
+          units: transferAmount,
+        );
+      }
+    }
+  }
+  if (ship.cargo.isEmpty) {
+    return JobResult.complete();
+  }
+  // If we still have cargo to off-load, wait for an empty hauler to arrive.
+  final waitTime = _nextHaulerArrivalTime(haulers, ship.waypointSymbol) ??
+      getNow().add(const Duration(minutes: 1));
+  shipInfo(ship, 'Waiting until $waitTime for hauler.');
+  return JobResult.wait(waitTime);
+}
+
+/// Attempt to sell cargo at the best price.
+Future<JobResult> sellCargoIfNeeded(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  // This picks largest, but maybe should pick most valuable?
+  final largestCargo = ship.largestCargo();
+  if (largestCargo == null) {
+    return JobResult.complete();
+  }
+
+  // FIXME(eseidel): We should decide if this cargo is even worth selling.
+  // This currently optimizes for price and does not consider requests.
+  // Some cargo should jettison and some should transfer to haulers.
+
+  final haulers = centralCommand.squadForShip(ship)?.haulers.toList() ?? [];
+  if (haulers.isNotEmpty) {
+    return transferToHaulersOrWait(
+      state,
+      api,
+      db,
+      centralCommand,
+      caches,
+      ship,
+      getNow: getNow,
+    );
+  }
+
+  return travelAndSellCargo(state, api, db, centralCommand, caches, ship);
 }
 
 // Miner stages
