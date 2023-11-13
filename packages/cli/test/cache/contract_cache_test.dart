@@ -34,7 +34,7 @@ void main() {
     );
     final contracts = [contract];
     ContractCache(contracts, fs: fs).save();
-    final contractCache2 = await ContractCache.load(api, fs: fs);
+    final contractCache2 = await ContractCache.loadOrFetch(api, fs: fs);
     expect(contractCache2.contracts.length, contracts.length);
     // Contract.toJson doesn't recurse (openapi gen bug), so use jsonEncode.
     expect(

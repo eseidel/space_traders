@@ -25,7 +25,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.loadCached(fs)!;
   final agentCache = AgentCache.loadCached(fs)!;
-  final contractCache = ContractCache.loadCached(fs)!;
+  final contractCache = ContractCache.load(fs)!;
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
   final extraSellOpps =

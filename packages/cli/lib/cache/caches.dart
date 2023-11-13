@@ -124,7 +124,8 @@ class Caches {
     final waypoints = WaypointCache(api, systems, charting, construction);
     final markets = MarketCache(api, marketListings, waypoints);
     // Intentionally force refresh contracts in case we've been offline.
-    final contracts = await ContractCache.load(api, fs: fs, forceRefresh: true);
+    final contracts =
+        await ContractCache.loadOrFetch(api, fs: fs, forceRefresh: true);
     final behaviors = BehaviorCache.load(fs);
 
     // final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);

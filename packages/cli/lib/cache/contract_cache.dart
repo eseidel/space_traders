@@ -17,7 +17,7 @@ class ContractCache extends ResponseListCache<Contract> {
   }) : super(refreshEntries: (Api api) => allMyContracts(api).toList());
 
   /// Load the ContractCache from the file system.
-  static ContractCache? loadCached(FileSystem fs, {String path = defaultPath}) {
+  static ContractCache? load(FileSystem fs, {String path = defaultPath}) {
     final contracts = JsonListStore.loadRecords<Contract>(
       fs,
       path,
@@ -30,14 +30,14 @@ class ContractCache extends ResponseListCache<Contract> {
   }
 
   /// Creates a new ContractCache from the Api or FileSystem if provided.
-  static Future<ContractCache> load(
+  static Future<ContractCache> loadOrFetch(
     Api api, {
     required FileSystem fs,
     String path = defaultPath,
     bool forceRefresh = false,
   }) async {
     if (!forceRefresh) {
-      final cached = loadCached(fs, path: path);
+      final cached = load(fs, path: path);
       if (cached != null) {
         return cached;
       }
