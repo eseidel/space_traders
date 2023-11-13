@@ -48,7 +48,7 @@ void addSymbols(
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final staticCache = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final agentCache = AgentCache.loadCached(fs)!;
+  final agentCache = AgentCache.load(fs)!;
   final hqSystem = agentCache.headquartersSymbol.systemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
 

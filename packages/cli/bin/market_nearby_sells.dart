@@ -8,7 +8,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final routePlanner =
       RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
-  final agentCache = AgentCache.loadCached(fs)!;
+  final agentCache = AgentCache.load(fs)!;
   final shipCache = ShipCache.load(fs)!;
 
   const tradeSymbol = TradeSymbol.DIAMONDS;

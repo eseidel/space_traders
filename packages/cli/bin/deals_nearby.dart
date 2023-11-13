@@ -24,7 +24,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
 
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.load(fs)!;
-  final agentCache = AgentCache.loadCached(fs)!;
+  final agentCache = AgentCache.load(fs)!;
   final contractCache = ContractCache.load(fs)!;
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);

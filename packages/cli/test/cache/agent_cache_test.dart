@@ -43,7 +43,7 @@ void main() {
     );
     final fs = MemoryFileSystem.test();
     AgentCache(agent, fs: fs).save();
-    final loaded = AgentCache.loadCached(fs);
+    final loaded = AgentCache.load(fs);
     expect(loaded, isNotNull);
     expect(loaded!.agent.credits, agent.credits);
   });

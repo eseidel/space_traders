@@ -50,7 +50,6 @@ Exploring:
 Tech Debt:
 * Fix all uses of DateTime.now() to be DateTime.timestamp() and test.
 * Write a test suite for routing.
-* Make all load/loadCached functions consistent.
 
 Efficiency:
 * Make dart run .\bin\percentage_mapped.dart -v make zero requests.
@@ -705,7 +704,6 @@ That way we can run our "where should we sell this" in between lots.
 ### Standardize fooForBar vs fooOfBar, etc, use foo[bar] more, etc.
 
 waypointForSymbol, waypointAtSymbol, etc.
-Similarly load and loadCached, should be load or loadOrFetch.
 
 ### Route planning is not aware of partial tanks of fuel.
 

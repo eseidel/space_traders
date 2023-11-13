@@ -20,7 +20,7 @@ class AgentCache extends JsonStore<Agent> {
   }) : super(recordToJson: (a) => a.toJson());
 
   /// Creates a new AgentCache from a file.
-  static AgentCache? loadCached(FileSystem fs, {String path = defaultPath}) {
+  static AgentCache? load(FileSystem fs, {String path = defaultPath}) {
     final agent = JsonStore.loadRecord<Agent>(
       fs,
       path,
@@ -33,7 +33,7 @@ class AgentCache extends JsonStore<Agent> {
   }
 
   /// Creates a new AgentCache from the API.
-  static Future<AgentCache> load(
+  static Future<AgentCache> loadOrFetch(
     Api api, {
     required FileSystem fs,
     String path = defaultPath,

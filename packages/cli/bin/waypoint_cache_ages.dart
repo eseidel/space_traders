@@ -8,7 +8,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final chartingCache = ChartingCache.load(fs, staticCache.waypointTraits);
   final constrctionCache = ConstructionCache.load(fs);
-  final agentCache = AgentCache.loadCached(fs)!;
+  final agentCache = AgentCache.load(fs)!;
   final hq = agentCache.headquartersSymbol;
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);

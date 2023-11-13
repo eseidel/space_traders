@@ -19,7 +19,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final constrctionCache = ConstructionCache.load(fs);
   final waypointCache =
       WaypointCache(api, systemsCache, chartingCache, constrctionCache);
-  final agentCache = AgentCache.loadCached(fs)!;
+  final agentCache = AgentCache.load(fs)!;
   final hq = agentCache.headquartersSymbol;
   final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
   final routePlanner = RoutePlanner(
