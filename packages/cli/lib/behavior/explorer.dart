@@ -83,7 +83,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
     final waypoint = await waypointCache.waypoint(waypointSymbol);
     // We know we've updated the waypoint at this point, so if it's not
     // stored in our charting cache, we know it has no chart.
-    final values = chartingCache.valuesForSymbol(waypointSymbol);
+    final values = chartingCache[waypointSymbol];
     if (values == null) {
       shipInfo(ship, '$waypointSymbol is missing chart, routing.');
       return waypointSymbol;

@@ -49,7 +49,7 @@ class WaypointCache {
 
   /// Sythesizes a waypoint from cached values if possible.
   Waypoint? waypointFromCaches(WaypointSymbol waypointSymbol) {
-    final values = _chartingCache.valuesForSymbol(waypointSymbol);
+    final values = _chartingCache[waypointSymbol];
     if (values == null) {
       return null;
     }

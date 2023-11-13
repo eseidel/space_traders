@@ -82,7 +82,7 @@ void main() {
         unchartedWaypoint,
       ]);
     expect(chartingCache.waypointCount, 1);
-    expect(chartingCache.valuesForSymbol(waypointSymbol), isNotNull);
-    expect(chartingCache.valuesForSymbol(unchartedSymbol), isNull);
+    expect(chartingCache[waypointSymbol], isNotNull);
+    expect(chartingCache[unchartedSymbol], isNull);
   });
 }

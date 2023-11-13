@@ -152,6 +152,6 @@ class ChartingCache extends JsonStore<_Record> {
   }
 
   /// Gets the charted values for the given waypoint symbol.
-  ChartedValues? valuesForSymbol(WaypointSymbol waypointSymbol) =>
+  ChartedValues? operator [](WaypointSymbol waypointSymbol) =>
       _valuesBySymbol[waypointSymbol];
 }

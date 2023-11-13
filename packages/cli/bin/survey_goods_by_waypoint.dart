@@ -29,7 +29,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         stats.tradeSymbols.map((tradeSymbol) => tradeSymbol.toString()).toList()
           ..sort()
           ..join(', ');
-    final values = chartingCache.valuesForSymbol(waypointSymbol);
+    final values = chartingCache[waypointSymbol];
     logger.info('$waypointSymbol: $tradeSymbolsString ${values?.traitSymbols} '
         '(${stats.count})');
   }

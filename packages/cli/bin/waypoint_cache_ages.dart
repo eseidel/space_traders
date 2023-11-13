@@ -32,7 +32,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   for (final waypoint in waypoints) {
     final waypointSymbol = waypoint.waypointSymbol;
-    final values = chartingCache.valuesForSymbol(waypointSymbol);
+    final values = chartingCache[waypointSymbol];
     final marketAge = marketPrices.cacheAgeFor(waypointSymbol);
     final shipyardAge = shipyardPrices.cacheAgeFor(waypointSymbol);
     final constructionAge = constrctionCache.cacheAgeFor(waypointSymbol);
