@@ -28,7 +28,7 @@ class MarketListingCache extends JsonStore<_Record> {
     TradeGoodCache tradeGoods, {
     String path = defaultPath,
   }) {
-    final valuesBySymbol = JsonStore.load<_Record>(
+    final valuesBySymbol = JsonStore.loadRecord<_Record>(
           fs,
           path,
           (Map<String, dynamic> j) => j.map(

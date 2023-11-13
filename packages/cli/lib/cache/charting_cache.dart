@@ -90,7 +90,7 @@ class ChartingCache extends JsonStore<_Record> {
     WaypointTraitCache waypointTraits, {
     String path = defaultCacheFilePath,
   }) {
-    final valuesBySymbol = JsonStore.load<_Record>(
+    final valuesBySymbol = JsonStore.loadRecord<_Record>(
           fs,
           path,
           (Map<String, dynamic> j) => j.map(

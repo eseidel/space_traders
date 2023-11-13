@@ -21,7 +21,7 @@ class AgentCache extends JsonStore<Agent> {
 
   /// Creates a new AgentCache from a file.
   static AgentCache? loadCached(FileSystem fs, {String path = defaultPath}) {
-    final agent = JsonStore.load<Agent>(
+    final agent = JsonStore.loadRecord<Agent>(
       fs,
       path,
       (j) => Agent.fromJson(j)!,

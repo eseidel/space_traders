@@ -27,7 +27,7 @@ class JsonStore<Record> {
   /// The file system to use.
   final FileSystem _fs;
 
-  /// Save entries to a file.
+  /// Save record to a file.
   void save() {
     final file = _fs.file(_path)..createSync(recursive: true);
     const encoder = JsonEncoder.withIndent(' ');
@@ -35,8 +35,8 @@ class JsonStore<Record> {
     file.writeAsStringSync(prettyprint);
   }
 
-  /// Load entries from a file.
-  static Record? load<Record>(
+  /// Load record from a file.
+  static Record? loadRecord<Record>(
     FileSystem fs,
     String path,
     Record Function(Map<String, dynamic>) recordFromJson,

@@ -37,7 +37,7 @@ class BehaviorCache extends JsonStore<_Record> {
     FileSystem fs, {
     String path = defaultPath,
   }) {
-    final record = JsonStore.load<_Record>(
+    final record = JsonStore.loadRecord<_Record>(
           fs,
           path,
           (Map<String, dynamic> j) => j.map(
