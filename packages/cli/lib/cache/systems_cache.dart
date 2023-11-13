@@ -15,14 +15,14 @@ const kJumpGateRange = 2500;
 class SystemsCache extends JsonListStore<System> {
   /// Create a new [SystemsCache] with the given [systems] and file system.
   SystemsCache(
-    super.systems, {
+    super.records, {
     required super.fs,
     super.path = defaultCacheFilePath,
   }) : _index =
-            Map.fromEntries(systems.map((e) => MapEntry(e.systemSymbol, e)));
+            Map.fromEntries(records.map((e) => MapEntry(e.systemSymbol, e)));
 
   /// All systems in the game.
-  List<System> get systems => List.unmodifiable(entries);
+  List<System> get systems => List.unmodifiable(records);
 
   // List<System> get _systems => entries;
 
@@ -47,7 +47,7 @@ class SystemsCache extends JsonListStore<System> {
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
-    final systems = JsonListStore.load<System>(
+    final systems = JsonListStore.loadRecords<System>(
       fs,
       path,
       (json) => System.fromJson(json)!,

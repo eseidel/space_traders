@@ -15,7 +15,7 @@ List<Value> _loadJson<Value>(
   // This is nullable because OpenApi's fromJson are nullable.
   Value? Function(dynamic) valueFromJson,
 ) {
-  return JsonListStore.load(
+  return JsonListStore.loadRecords(
         fs,
         path,
         (Map<String, dynamic> j) => valueFromJson(j) as Value,
@@ -41,10 +41,10 @@ abstract class StaticCache<Symbol extends Object, Record extends Object>
 
   /// Lookup the entry by its symbol.
   Record? operator [](Symbol symbol) =>
-      entries.firstWhereOrNull((record) => keyFor(record) == symbol);
+      records.firstWhereOrNull((record) => keyFor(record) == symbol);
 
   /// Returns the list of values in the cache.
-  List<Record> get values => entries;
+  List<Record> get values => records;
 
   /// Adds a shipyard ship to the cache.
   void add(Record value, {bool shouldSave = true}) {
@@ -53,7 +53,7 @@ abstract class StaticCache<Symbol extends Object, Record extends Object>
     if (cached != null && jsonMatches(cached, copy)) {
       return;
     }
-    entries
+    records
       ..removeWhere((record) => keyFor(record) == keyFor(copy))
       ..add(copy);
 
@@ -75,7 +75,7 @@ abstract class StaticCache<Symbol extends Object, Record extends Object>
   void save() {
     // Make sure the entries are always sorted by type to avoid needless
     // diffs in the cache.
-    entries.sort(compare);
+    records.sort(compare);
     super.save();
   }
 }
@@ -137,7 +137,7 @@ class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
 
   /// Returns the module with the given symbol.
   ShipModule? moduleFromSymbol(ShipModuleSymbolEnum symbol) =>
-      entries.firstWhereOrNull((m) => m.symbol == symbol);
+      records.firstWhereOrNull((m) => m.symbol == symbol);
 }
 
 /// A cache of shipyard ships.

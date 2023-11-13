@@ -48,6 +48,6 @@ void main() {
       ),
     );
     shipyardShipCache.addAll([shipyardShip]);
-    expect(shipyardShipCache.entries, hasLength(1));
+    expect(shipyardShipCache.records, hasLength(1));
   });
 }

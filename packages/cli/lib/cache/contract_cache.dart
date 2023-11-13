@@ -18,7 +18,7 @@ class ContractCache extends ResponseListCache<Contract> {
 
   /// Load the ContractCache from the file system.
   static ContractCache? loadCached(FileSystem fs, {String path = defaultPath}) {
-    final contracts = JsonListStore.load<Contract>(
+    final contracts = JsonListStore.loadRecords<Contract>(
       fs,
       path,
       (j) => Contract.fromJson(j)!,
@@ -50,7 +50,7 @@ class ContractCache extends ResponseListCache<Contract> {
   static const String defaultPath = 'data/contracts.json';
 
   /// Contracts in the cache.
-  List<Contract> get contracts => entries;
+  List<Contract> get contracts => records;
 
   /// Updates a single contract in the cache.
   void updateContract(Contract contract) {

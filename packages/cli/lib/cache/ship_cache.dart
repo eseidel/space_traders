@@ -23,7 +23,7 @@ class ShipCache extends ResponseListCache<Ship> {
     FileSystem fs, {
     String path = defaultPath,
   }) {
-    final ships = JsonListStore.load<Ship>(
+    final ships = JsonListStore.loadRecords<Ship>(
       fs,
       path,
       (j) => Ship.fromJson(j)!,
@@ -55,7 +55,7 @@ class ShipCache extends ResponseListCache<Ship> {
   static const String defaultPath = 'data/ships.json';
 
   /// Ships in the cache.
-  List<Ship> get ships => entries;
+  List<Ship> get ships => records;
 
   /// Updates a single ship in the cache.
   void updateShip(Ship ship) {

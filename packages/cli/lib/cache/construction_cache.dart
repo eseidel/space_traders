@@ -70,7 +70,7 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
-    final records = JsonListStore.load<ConstructionRecord>(
+    final records = JsonListStore.loadRecords<ConstructionRecord>(
           fs,
           path,
           ConstructionRecord.fromJson,
@@ -83,7 +83,7 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
   static const String defaultCacheFilePath = 'data/construction.json';
 
   /// The Construction values.
-  List<ConstructionRecord> get values => entries;
+  List<ConstructionRecord> get values => records;
 
   /// The number of waypoints in the cache.
   int get waypointCount => values.length;
@@ -94,7 +94,7 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
     required Construction? construction,
     DateTime Function() getNow = defaultGetNow,
   }) {
-    final index = entries.indexWhere(
+    final index = records.indexWhere(
       (record) => record.waypointSymbol == waypointSymbol,
     );
 
@@ -104,9 +104,9 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
       timestamp: getNow(),
     );
     if (index >= 0) {
-      entries[index] = newRecord;
+      records[index] = newRecord;
     } else {
-      entries.add(newRecord);
+      records.add(newRecord);
     }
 
     save();

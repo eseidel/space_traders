@@ -13,7 +13,7 @@ import 'package:types/types.dart';
 class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   /// Create a new price data collection.
   ShipyardPrices(
-    super.prices, {
+    super.records, {
     required super.fs,
     super.path = defaultCacheFilePath,
   });
@@ -23,7 +23,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
-    final prices = JsonListStore.load<ShipyardPrice>(
+    final prices = JsonListStore.loadRecords<ShipyardPrice>(
           fs,
           path,
           ShipyardPrice.fromJson,
@@ -38,7 +38,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
   // This might not actually be true!  I've never seen a 0 in the data.
   // These may contain 0s and duplicates, best to access it through one
   // of the accessors which knows how to filter.
-  List<ShipyardPrice> get _prices => entries;
+  List<ShipyardPrice> get _prices => records;
 
   /// Get the count of unique waypoints.
   int get waypointCount {

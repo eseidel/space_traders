@@ -58,13 +58,13 @@ void main() {
       return logger;
     }
 
-    expect(responseCache.entries.first, 1);
+    expect(responseCache.records.first, 1);
     await ensureUpToDate();
-    expect(responseCache.entries.first, 1);
+    expect(responseCache.records.first, 1);
     await ensureUpToDate();
-    expect(responseCache.entries.first, 1);
+    expect(responseCache.records.first, 1);
     final logger = await ensureUpToDate();
-    expect(responseCache.entries.first, 2);
+    expect(responseCache.records.first, 2);
     verify(
       () => logger.warn(
         'int list changed, updating cache.',
@@ -76,6 +76,6 @@ void main() {
     expect(file.readAsStringSync(), '[\n 2\n]');
 
     responseCache.replaceEntries([3]);
-    expect(responseCache.entries.first, 3);
+    expect(responseCache.records.first, 3);
   });
 }

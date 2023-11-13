@@ -7,7 +7,7 @@ import 'package:cli/logger.dart';
 class ResponseListCache<T extends Object> extends JsonListStore<T> {
   /// Creates a new ResponseListCache.
   ResponseListCache(
-    super.entries, {
+    super.records, {
     required Future<List<T>> Function(Api api) refreshEntries,
     required super.fs,
     required super.path,
@@ -29,7 +29,7 @@ class ResponseListCache<T extends Object> extends JsonListStore<T> {
     }
     final newEntries = await _refreshEntries(api);
     _iterationsSinceLastCheck = 0;
-    if (jsonListMatches(entries, newEntries)) {
+    if (jsonListMatches(records, newEntries)) {
       return;
     }
     logger.warn('$T list changed, updating cache.');
@@ -38,7 +38,7 @@ class ResponseListCache<T extends Object> extends JsonListStore<T> {
 
   /// Updates the entries in the cache.
   void replaceEntries(List<T> newEntries) {
-    entries
+    records
       ..clear()
       ..addAll(newEntries);
     save();

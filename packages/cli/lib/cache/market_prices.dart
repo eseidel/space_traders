@@ -118,7 +118,7 @@ extension MarketPricePredictions on MarketPrice {
 class MarketPrices extends JsonListStore<MarketPrice> {
   /// Create a new price data collection.
   MarketPrices(
-    super.prices, {
+    super.records, {
     required super.fs,
     super.path = defaultCacheFilePath,
   });
@@ -128,7 +128,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
-    final prices = JsonListStore.load<MarketPrice>(
+    final prices = JsonListStore.loadRecords<MarketPrice>(
           fs,
           path,
           MarketPrice.fromJson,
@@ -143,16 +143,16 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// Get the count of unique waypoints.
   int get waypointCount {
     final waypoints = <WaypointSymbol>{};
-    for (final price in entries) {
+    for (final price in records) {
       waypoints.add(price.waypointSymbol);
     }
     return waypoints.length;
   }
 
   /// Get the raw pricing data.
-  List<MarketPrice> get prices => List.unmodifiable(entries);
+  List<MarketPrice> get prices => List.unmodifiable(records);
 
-  List<MarketPrice> get _prices => entries;
+  List<MarketPrice> get _prices => records;
 
   /// Add new prices to the price data.
   Future<void> addPrices(

@@ -8,19 +8,19 @@ import 'package:meta/meta.dart';
 class JsonListStore<Record extends Object> {
   /// Create a new JsonListStore.
   JsonListStore(
-    this.entries, {
+    this.records, {
     required FileSystem fs,
     required String path,
   })  : _fs = fs,
         _path = path;
 
-  /// The entries in the store.
+  /// The records in the store.
   @protected
   @visibleForTesting
-  final List<Record> entries;
+  final List<Record> records;
 
-  /// The number of entries in the store.
-  int get count => entries.length;
+  /// The number of records in the store.
+  int get count => records.length;
 
   final String _path;
 
@@ -37,16 +37,16 @@ class JsonListStore<Record extends Object> {
         .toList();
   }
 
-  /// Save entries to a file.
+  /// Save records to a file.
   void save() {
     final file = _fs.file(_path)..createSync(recursive: true);
     const encoder = JsonEncoder.withIndent(' ');
-    final prettyprint = encoder.convert(entries);
+    final prettyprint = encoder.convert(records);
     file.writeAsStringSync(prettyprint);
   }
 
-  /// Load entries from a file.
-  static List<R>? load<R>(
+  /// Load records from a file.
+  static List<R>? loadRecords<R>(
     FileSystem fs,
     String path,
     R Function(Map<String, dynamic>) recordFromJson,
