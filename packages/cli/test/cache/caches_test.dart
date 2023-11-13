@@ -75,7 +75,7 @@ void main() {
     Never httpGet(f) => throw UnimplementedError();
     final caches = await runWithLogger(
       logger,
-      () async => Caches.load(fs, api, db, httpGet: httpGet),
+      () async => Caches.loadOrFetch(fs, api, db, httpGet: httpGet),
     );
     expect(caches.agent, isNotNull);
   });

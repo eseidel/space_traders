@@ -42,7 +42,7 @@ class FetchQueue {
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => 0);
-  final caches = await Caches.load(fs, api, db);
+  final caches = await Caches.loadOrFetch(fs, api, db);
 
   final systemSymbol = caches.agent.agent.headquartersSymbol.systemSymbol;
   final queue = FetchQueue(api, db, caches)..queueSystem(systemSymbol);

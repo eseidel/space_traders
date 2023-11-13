@@ -112,7 +112,7 @@ Future<void> cliMain(List<String> args) async {
   // Api client should move to per-ship with a per-ship priority function.
   final api = apiFromAuthToken(token, db, getPriority: () => 0);
 
-  final caches = await Caches.load(fs, api, db);
+  final caches = await Caches.loadOrFetch(fs, api, db);
   logger.info(
     'Loaded ${caches.marketPrices.count} prices from '
     '${caches.marketPrices.waypointCount} markets and '

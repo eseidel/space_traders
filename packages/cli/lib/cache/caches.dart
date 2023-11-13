@@ -105,7 +105,7 @@ class Caches {
   final List<Faction> factions;
 
   /// Load the cache from disk and network.
-  static Future<Caches> load(
+  static Future<Caches> loadOrFetch(
     FileSystem fs,
     Api api,
     Database db, {
