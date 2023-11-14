@@ -44,15 +44,15 @@ String contractDescription(
 /// Returns a string describing the price deviance of a given [price] from
 /// the median price of a given [tradeSymbol].
 String stringForPriceDeviance(
-  MarketPrices data,
+  MarketPrices marketPrices,
   TradeSymbol tradeSymbol,
   int price,
   MarketTransactionTypeEnum type,
 ) {
   const expectedWidth = 14;
   final median = type == MarketTransactionTypeEnum.SELL
-      ? data.medianSellPrice(tradeSymbol)
-      : data.medianPurchasePrice(tradeSymbol);
+      ? marketPrices.medianSellPrice(tradeSymbol)
+      : marketPrices.medianPurchasePrice(tradeSymbol);
   if (median == null) {
     return '🤷'.padLeft(expectedWidth);
   }

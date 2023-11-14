@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
@@ -38,7 +39,23 @@ void addSymbols(
         rightAlign(price.tradeVolume),
         rightAlign(price.activity),
         rightAlign(price.purchasePrice),
+        rightAlign(
+          stringForPriceDeviance(
+            marketPrices,
+            price.tradeSymbol,
+            price.purchasePrice,
+            MarketTransactionTypeEnum.PURCHASE,
+          ),
+        ),
         rightAlign(price.sellPrice),
+        rightAlign(
+          stringForPriceDeviance(
+            marketPrices,
+            price.tradeSymbol,
+            price.sellPrice,
+            MarketTransactionTypeEnum.SELL,
+          ),
+        ),
       ]);
       haveAddedHeader = true;
     }
@@ -55,34 +72,35 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final waypoints = systemsCache.waypointsInSystem(hqSystem);
   final marketPrices = MarketPrices.load(fs);
 
-  final table = Table(
-    header: [
-      'trade',
-      'symbol',
-      'supply',
-      'volume',
-      'activity',
-      'buy',
-      'sell',
-    ],
-  );
-
   for (final waypoint in waypoints) {
     final marketSymbol = waypoint.waypointSymbol;
+
     // Adding a price to MarketPrices updates our listing, so if we don't
     // have a listing we won't have a price.
     final listing = marketListings.marketListingForSymbol(marketSymbol);
     if (listing == null) {
       continue;
     }
-    table.add([
-      {'colSpan': 6, 'content': marketSymbol.toString()},
-    ]);
+
+    final table = Table(
+      header: [
+        marketSymbol.sectorLocalName,
+        'symbol',
+        'supply',
+        'volume',
+        'activity',
+        'buy',
+        'buy diff',
+        'sell',
+        'sell diff',
+      ],
+    );
+
     addSymbols(table, 'imports', listing.imports, marketSymbol, marketPrices);
     addSymbols(table, 'exports', listing.exports, marketSymbol, marketPrices);
     addSymbols(table, 'exchange', listing.exchange, marketSymbol, marketPrices);
+    logger.info(table.toString());
   }
-  logger.info(table.toString());
 }
 
 void main(List<String> args) async {
