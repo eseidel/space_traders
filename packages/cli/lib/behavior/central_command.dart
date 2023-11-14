@@ -565,7 +565,7 @@ class CentralCommand {
     // if (shouldBuy(ShipType.ORE_HOUND, 10)) {
     //   return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
     // }
-    if (shouldBuy(ShipType.MINING_DRONE, squadCount)) {
+    if (shouldBuy(ShipType.MINING_DRONE, squadCount * 2)) {
       return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
     }
     // if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
