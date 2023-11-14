@@ -20,6 +20,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     );
   }
 
+  final maxDistance = int.tryParse(argResults['max-distance'] as String);
+  if (maxDistance == null) {
+    throw ArgumentError.value(
+      argResults['max-distance'],
+      'max-distance',
+      'Must be an integer.',
+    );
+  }
+
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => 0);
   final systems = await SystemsCache.loadOrFetch(fs);
@@ -54,6 +63,20 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         ..info('${score.market} trades ${score.tradedGoods}');
       continue;
     }
+    if (score.score > maxDistance) {
+      logger
+        ..warn('${score.mine} is too far from ${score.market}')
+        ..info('Distance: ${score.score}');
+      continue;
+    }
+    // Should check mine too.
+    if (!score.tradedGoods.contains(TradeSymbol.FUEL)) {
+      logger
+        ..warn('${score.market} does not trade fuel.')
+        ..info('${score.market} trades ${score.tradedGoods}');
+      continue;
+    }
+
     seenMines.add(score.mine);
     table.add([
       score.mine.toString(),
@@ -76,12 +99,19 @@ void main(List<String> args) async {
     args,
     command,
     addArgs: (parser) {
-      parser.addOption(
-        'limit',
-        abbr: 'l',
-        help: 'Limit the number of markets to look at.',
-        defaultsTo: '10',
-      );
+      parser
+        ..addOption(
+          'limit',
+          abbr: 'l',
+          help: 'Limit the number of markets to look at.',
+          defaultsTo: '10',
+        )
+        ..addOption(
+          'max-distance',
+          abbr: 'd',
+          help: 'Limit the travel distance between the mine and market.',
+          defaultsTo: '80',
+        );
     },
   );
 }
