@@ -754,3 +754,32 @@ navCruise       X1-QP91-H56  X1-QP91-D47  0:06:13.000000s
 refuel          X1-QP91-D47  X1-QP91-D47  0:00:00.000000s
 navDrift        X1-QP91-D47  X1-QP91-B14  5:54:25.000000s
 in 6h uses 45 fuel
+
+### Contract failure?
+
+Unhandled exception:
+ApiException 400: {"error":{"message":"Agent ESEIDEL already has an active contract.","code":4511,"data":{"agentSymbol":"ESEIDEL","contractId":"clon2tb9m00dqs60cmjrptyet"}}}
+#0      FleetApi.negotiateContract (package:openapi/api/fleet_api.dart:1335:7)
+<asynchronous suspension>
+#1      negotiateContractAndLog (package:cli/net/actions.dart:502:20)
+<asynchronous suspension>
+#2      acceptContractsIfNeeded (package:cli/behavior/trader.dart:663:9)
+<asynchronous suspension>
+#3      advanceTrader (package:cli/behavior/trader.dart:843:5)
+<asynchronous suspension>
+#4      advanceShipBehavior (package:cli/behavior/advance.dart:101:23)
+<asynchronous suspension>
+#5      advanceShips (package:cli/logic.dart:71:29)
+<asynchronous suspension>
+#6      logic (package:cli/logic.dart:184:7)
+<asynchronous suspension>
+#7      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:148:3)
+<asynchronous suspension>
+#8      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:154:7)
+<asynchronous suspension>
+#9      main (file:///root/space_traders/packages/cli/bin/cli.dart:152:3)
+<asynchronous suspension>
+
+I think this happened due to time skew with the server during Contact expiration.
+
+Our local check though the contract was expired.  But the server didn't.
