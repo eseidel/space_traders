@@ -50,6 +50,10 @@ enum TransactionType {
 
   /// Lookup a transaction type by index.
   static TransactionType fromName(String name) {
+    // TODO(eseidel): remove next reset.
+    if (name == 'consturction') {
+      return TransactionType.construction;
+    }
     return TransactionType.values.firstWhere((e) => e.name == name);
   }
 }
