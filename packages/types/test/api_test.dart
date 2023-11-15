@@ -1,5 +1,8 @@
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
+
+class _MockShip extends Mock implements Ship {}
 
 void main() {
   test('SystemWaypoint.isType', () {
@@ -152,5 +155,34 @@ void main() {
       WaypointTraitSymbolEnum.PRECIOUS_METAL_DEPOSITS,
       WaypointTraitSymbolEnum.RARE_METAL_DEPOSITS,
     ]);
+  });
+
+  test('updateCacheWithAddedCargo', () {
+    final ship = _MockShip();
+    when(() => ship.cargo).thenReturn(ShipCargo(capacity: 100, units: 0));
+    ship.updateCacheWithAddedCargo(TradeSymbol.ADVANCED_CIRCUITRY, 2);
+    expect(ship.cargo.units, 2);
+    expect(ship.cargo.inventory.length, 1);
+    expect(ship.cargo.inventory.first.symbol, TradeSymbol.ADVANCED_CIRCUITRY);
+    expect(ship.cargo.inventory.first.units, 2);
+
+    ship.updateCacheWithAddedCargo(TradeSymbol.ADVANCED_CIRCUITRY, 3);
+    expect(ship.cargo.units, 5);
+    expect(ship.cargo.inventory.length, 1);
+    expect(ship.cargo.inventory.first.symbol, TradeSymbol.ADVANCED_CIRCUITRY);
+    expect(ship.cargo.inventory.first.units, 5);
+
+    ship.updateCacheWithAddedCargo(TradeSymbol.ALUMINUM, 3);
+    expect(ship.cargo.units, 8);
+    expect(ship.cargo.inventory.length, 2);
+    expect(ship.cargo.inventory.first.symbol, TradeSymbol.ADVANCED_CIRCUITRY);
+    expect(ship.cargo.inventory.first.units, 5);
+    expect(ship.cargo.inventory.last.symbol, TradeSymbol.ALUMINUM);
+    expect(ship.cargo.inventory.last.units, 3);
+
+    expect(
+      () => ship.updateCacheWithAddedCargo(TradeSymbol.ALUMINUM, 100),
+      throwsArgumentError,
+    );
   });
 }

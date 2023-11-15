@@ -383,6 +383,11 @@ extension ShipUtils on Ship {
 
   /// Attempt to munge ths ship's cache to reflect the added cargo.
   void updateCacheWithAddedCargo(TradeSymbol tradeSymbol, int units) {
+    if (cargo.availableSpace < units) {
+      throw ArgumentError(
+        'Not enough space for $units units of $tradeSymbol in $cargo',
+      );
+    }
     final item = cargo.cargoItem(tradeSymbol);
     if (item == null) {
       final inventory = cargo.inventory.toList()
@@ -399,6 +404,7 @@ extension ShipUtils on Ship {
       cargo.inventory = inventory;
     }
     cargo.cargoItem(tradeSymbol)!.units += units;
+    cargo.units += units;
   }
 
   /// Returns true if the ship is out of fuel.  Nothing to do at this point.
