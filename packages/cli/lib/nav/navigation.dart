@@ -288,26 +288,29 @@ Future<NavResult> continueNavigationIfNeeded(
           const Duration(minutes: 10),
         );
         if (fuelNeeded > ship.fuel.current) {
-          final market = assertNotNull(
-            await visitLocalMarket(
-              api,
-              db,
-              caches,
-              await caches.waypoints.waypoint(ship.waypointSymbol),
-              ship,
-            ),
-            'No market at ${ship.waypointSymbol}, cannot refuel',
-            const Duration(minutes: 10),
-          );
-          await refuelIfNeededAndLog(
+          final market = await visitLocalMarket(
             api,
             db,
-            caches.marketPrices,
-            caches.agent,
-            caches.ships,
-            market,
+            caches,
+            await caches.waypoints.waypoint(ship.waypointSymbol),
             ship,
           );
+          if (market != null) {
+            await refuelIfNeededAndLog(
+              api,
+              db,
+              caches.marketPrices,
+              caches.agent,
+              caches.ships,
+              market,
+              ship,
+            );
+          } else {
+            shipErr(
+                ship,
+                'No market at ${ship.waypointSymbol}, '
+                'cannot refuel, drifting anyway');
+          }
         }
       }
       return NavResult._wait(
