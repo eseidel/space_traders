@@ -222,7 +222,7 @@ void main() {
   });
 
   test('transferCargoAndLog', () async {
-    final shipCargo = ShipCargo(capacity: 10, units: 10);
+    final shipCargo = ShipCargo(capacity: 100, units: 10);
     final fromSymbol = ShipSymbol.fromString('S-1');
     final fromShip = _MockShip();
     when(() => fromShip.symbol).thenReturn(fromSymbol.symbol);
@@ -252,7 +252,7 @@ void main() {
       (_) => Future.value(
         TransferCargo200Response(
           data: Jettison200ResponseData(
-            cargo: ShipCargo(capacity: 10, units: 10),
+            cargo: ShipCargo(capacity: 100, units: 0),
           ),
         ),
       ),
