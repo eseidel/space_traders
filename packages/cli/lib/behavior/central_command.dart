@@ -157,6 +157,17 @@ class CentralCommand {
         ..shipBuyJob = takeShipBuyJob();
     }
 
+    final squad = squadForShip(ship);
+    if (squad != null) {
+      if (ship.fleetRole == FleetRole.miner) {
+        return BehaviorState(ship.shipSymbol, Behavior.miner)
+          ..mineJob = squad.job;
+      } else if (ship.fleetRole == FleetRole.surveyor) {
+        return BehaviorState(ship.shipSymbol, Behavior.surveyor)
+          ..mineJob = squad.job;
+      }
+    }
+
     // Otherwise start any other job.
     return toState(chooseNewBehaviorFor(ship, credits));
   }

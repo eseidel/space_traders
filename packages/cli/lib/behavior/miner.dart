@@ -337,20 +337,6 @@ Future<JobResult> doMineJob(
   return result;
 }
 
-/// Init the MineJob.
-Future<JobResult> _initMineJob(
-  BehaviorState state,
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  state.mineJob = centralCommand.squadForShip(ship)?.job;
-  return JobResult.complete();
-}
-
 /// Attempt to empty cargo if needed, will navigate to a market if needed.
 Future<JobResult> emptyCargoIfNeededForMining(
   BehaviorState state,
@@ -660,7 +646,6 @@ Future<JobResult> sellCargoIfNeeded(
 
 /// Advance the miner.
 final advanceMiner = const MultiJob('Miner', [
-  _initMineJob,
   // Is this step needed?  Or should we just have mining fail if we don't have
   // space?
   emptyCargoIfNeededForMining,

@@ -2,7 +2,6 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/mining.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -54,10 +53,6 @@ void main() {
       ),
     ]);
 
-    when(() => centralCommand.squadForShip(ship)).thenReturn(
-      MiningSquad(MineJob(mine: symbol, market: symbol)),
-    );
-
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
     when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
@@ -95,7 +90,8 @@ void main() {
       ),
     );
 
-    final state = BehaviorState(shipSymbol, Behavior.surveyor);
+    final state = BehaviorState(shipSymbol, Behavior.surveyor)
+      ..mineJob = MineJob(mine: symbol, market: symbol);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

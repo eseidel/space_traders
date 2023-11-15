@@ -21,7 +21,7 @@ Future<DateTime?> advanceSurveyor(
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   final mineJob = assertNotNull(
-    centralCommand.squadForShip(ship)?.job,
+    state.mineJob,
     'Requires a mine job.',
     const Duration(minutes: 10),
   );

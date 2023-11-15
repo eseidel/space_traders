@@ -119,10 +119,6 @@ void main() {
       ),
     ]);
 
-    when(() => centralCommand.squadForShip(ship)).thenReturn(
-      MiningSquad(MineJob(mine: symbol, market: symbol)),
-    );
-
     final waypoint = _MockWaypoint();
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
     when(() => waypoint.type).thenReturn(WaypointType.ASTEROID);
@@ -143,7 +139,8 @@ void main() {
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
-    final state = BehaviorState(shipSymbol, Behavior.miner);
+    final state = BehaviorState(shipSymbol, Behavior.miner)
+      ..mineJob = MineJob(mine: symbol, market: symbol);
 
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
