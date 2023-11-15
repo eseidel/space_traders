@@ -571,7 +571,7 @@ class CentralCommand {
 
     final squadCount = miningSquads.length;
 
-    if (shouldBuy(ShipType.LIGHT_HAULER, 10)) {
+    if (shouldBuy(ShipType.LIGHT_HAULER, 15)) {
       return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
     }
     // // These numbers should be based on squad sizes so that we always have
@@ -579,7 +579,7 @@ class CentralCommand {
     // if (shouldBuy(ShipType.ORE_HOUND, 10)) {
     //   return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
     // }
-    if (shouldBuy(ShipType.MINING_DRONE, squadCount * 2)) {
+    if (shouldBuy(ShipType.MINING_DRONE, squadCount * 3)) {
       return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
     }
     // if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
