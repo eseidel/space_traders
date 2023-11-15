@@ -650,6 +650,7 @@ Future<JobResult> transferToHaulersOrWait(
           tradeSymbol: item.symbol,
           units: transferAmount,
         );
+        break; // Exit the inner for loop and move to the next item.
       }
     }
   }
@@ -665,7 +666,7 @@ Future<JobResult> transferToHaulersOrWait(
 }
 
 /// Attempt to sell cargo at the best price.
-Future<JobResult> sellCargoIfNeeded(
+Future<JobResult> transferOrSellCargo(
   BehaviorState state,
   Api api,
   Database db,
@@ -711,5 +712,5 @@ Future<JobResult> sellCargoIfNeeded(
 /// Advance the miner.
 final advanceMiner = const MultiJob('Miner', [
   doMineJob,
-  sellCargoIfNeeded,
+  transferOrSellCargo,
 ]).run;

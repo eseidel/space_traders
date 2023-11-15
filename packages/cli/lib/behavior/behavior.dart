@@ -153,7 +153,9 @@ class MultiJob {
       jobAssert(
         state.jobIndex >= 0 && state.jobIndex < jobFunctions.length,
         'Invalid job index ${state.jobIndex}',
-        const Duration(hours: 1),
+        // This only ever happens when we're changing the client code and
+        // loading a stale state, so recover quickly.
+        const Duration(minutes: 1),
       );
 
       final jobFunction = jobFunctions[state.jobIndex];

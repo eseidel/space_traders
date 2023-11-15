@@ -6,10 +6,9 @@ import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
-import 'package:db/db.dart';
-import 'package:types/types.dart';
 
 /// Go wait to be filled by miners.
 Future<JobResult> goWaitForGoods(
@@ -24,6 +23,13 @@ Future<JobResult> goWaitForGoods(
   final mineJob =
       assertNotNull(state.mineJob, 'No mine job.', const Duration(hours: 1));
   final mineSymbol = mineJob.mine;
+
+  final currentMineJob = centralCommand.squadForShip(ship)?.job;
+  jobAssert(
+    currentMineJob == mineJob,
+    'Mine job changed',
+    const Duration(minutes: 1),
+  );
 
   if (ship.waypointSymbol != mineSymbol) {
     final waitTime = await beingNewRouteAndLog(
@@ -48,24 +54,9 @@ Future<JobResult> goWaitForGoods(
   return JobResult.complete();
 }
 
-/// Init the MineJob for the miner hauler.
-Future<JobResult> _initMineJob(
-  BehaviorState state,
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  state.mineJob = centralCommand.squadForShip(ship)?.job;
-  return JobResult.complete();
-}
-
 /// Advance the miner hauler.
 final advanceMinerHauler = const MultiJob('MinerHauler', [
-  _initMineJob,
   emptyCargoIfNeededForMining,
   goWaitForGoods,
-  sellCargoIfNeeded,
+  travelAndSellCargo,
 ]).run;

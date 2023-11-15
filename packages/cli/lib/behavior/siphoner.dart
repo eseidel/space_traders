@@ -205,5 +205,5 @@ final advanceSiphoner = const MultiJob('Siphoner', [
   _initSiphonJob,
   emptyCargoIfNeededForSiphoning,
   doSiphonJob,
-  sellCargoIfNeeded,
+  transferOrSellCargo,
 ]).run;

@@ -441,4 +441,18 @@ class MineJob {
       'market': market.toJson(),
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MineJob &&
+          runtimeType == other.runtimeType &&
+          mine == other.mine &&
+          market == other.market;
+
+  @override
+  int get hashCode => Object.hashAll([
+        mine,
+        market,
+      ]);
 }
