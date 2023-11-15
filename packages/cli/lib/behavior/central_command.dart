@@ -568,7 +568,7 @@ class CentralCommand {
 
     final squadCount = miningSquads.length;
 
-    if (shouldBuy(ShipType.LIGHT_HAULER, 5)) {
+    if (shouldBuy(ShipType.LIGHT_HAULER, 10)) {
       return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
     }
     // // These numbers should be based on squad sizes so that we always have
@@ -829,7 +829,7 @@ Iterable<SellOpp> sellOppsForConstruction(
   // and change that over time to encourage building it sooner.
   // For now we're just hard-coding a price for each needed good.
   final maxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 1700,
+    TradeSymbol.FAB_MATS: 1800,
     TradeSymbol.ADVANCED_CIRCUITRY: 18000,
   };
 
