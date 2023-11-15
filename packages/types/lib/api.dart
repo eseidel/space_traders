@@ -183,8 +183,13 @@ class ShipSymbol implements Comparable<ShipSymbol> {
   /// Create a ShipSymbol from a json string.
   factory ShipSymbol.fromJson(String json) => ShipSymbol.fromString(json);
 
-  static String _parseAgentName(String name) {
-    final parts = name.split('-');
+  static String _parseAgentName(String symbol) {
+    final parts = symbol.split('-');
+    // Hyphens are allowed in the agent name, but the last part is always the
+    // number, there must be at least one hyphen.
+    if (parts.length < 2) {
+      throw ArgumentError('Invalid ship symbol: $symbol');
+    }
     final nameParts = parts.sublist(0, parts.length - 1);
     return nameParts.join('-');
   }
@@ -396,6 +401,7 @@ extension ShipUtils on Ship {
             symbol: tradeSymbol,
             name: tradeSymbol.value,
             description: tradeSymbol.value,
+            // Add intially with zero, we're about to add units below.
             units: 0,
           ),
         );

@@ -3,6 +3,7 @@ import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/explorer.dart';
 import 'package:cli/behavior/miner.dart';
+import 'package:cli/behavior/miner_hauler.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/behavior/siphoner.dart';
 import 'package:cli/behavior/surveyor.dart';
@@ -50,6 +51,8 @@ Future<DateTime?> Function(
       return advanceMiner;
     case Behavior.surveyor:
       return advanceSurveyor;
+    case Behavior.minerHauler:
+      return advanceMinerHauler;
     case Behavior.explorer:
       return advanceExplorer;
     case Behavior.mountFromBuy:

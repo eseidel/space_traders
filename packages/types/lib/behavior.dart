@@ -74,6 +74,9 @@ enum Behavior {
   /// Idle.
   idle,
 
+  /// pickup goods from miners and sell them
+  minerHauler,
+
   /// Go buy our own mount and mount it.
   mountFromBuy,
 

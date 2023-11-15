@@ -165,6 +165,9 @@ class CentralCommand {
       } else if (ship.fleetRole == FleetRole.surveyor) {
         return BehaviorState(ship.shipSymbol, Behavior.surveyor)
           ..mineJob = squad.job;
+      } else if (ship.isHauler) {
+        return BehaviorState(ship.shipSymbol, Behavior.minerHauler)
+          ..mineJob = squad.job;
       }
     }
 
@@ -870,11 +873,24 @@ MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
   if (squads.isEmpty) {
     return null;
   }
+  final minerHaulerSymbols = [
+    '7',
+    '8',
+    '9',
+    '17',
+    '18',
+    '19',
+    '1A',
+    '1B',
+  ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
+
   // Score all squads based on how much they need this type of ship?
   // Add to the squad with the lowest score?
   final fleetRole = ship.fleetRole;
   // Hack for now to restrict to miners / surveyors.
-  if (fleetRole != FleetRole.miner && fleetRole != FleetRole.surveyor) {
+  if (fleetRole != FleetRole.miner &&
+      fleetRole != FleetRole.surveyor &&
+      !minerHaulerSymbols.contains(ship.shipSymbol)) {
     return null;
   }
 

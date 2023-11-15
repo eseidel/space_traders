@@ -161,12 +161,14 @@ Future<JobResult> extractAndLog(
   required DateTime Function() getNow,
 }) async {
   // If we somehow got into a bad state, just complete this job and loop.
-  jobAssert(
-    ship.availableSpace >= _minSpaceForExtraction(ship),
-    'Not enough space (${ship.availableSpace}) to extract '
-    '(expecting ${_minSpaceForExtraction(ship)})',
-    const Duration(minutes: 1),
-  );
+  if (ship.availableSpace < _minSpaceForExtraction(ship)) {
+    shipWarn(
+      ship,
+      'Not enough space (${ship.availableSpace}) to extract '
+      '(expecting ${_minSpaceForExtraction(ship)})',
+    );
+    return JobResult.complete();
+  }
 
   // If we either have a survey or don't have a surveyor, mine.
   try {
@@ -443,14 +445,42 @@ Future<JobResult> emptyCargoIfNeeded(
   return JobResult.wait(waitTime);
 }
 
-DateTime? _nextHaulerArrivalTime(List<Ship> haulers, WaypointSymbol here) {
+Ship? _nextArrivingHauler(
+  List<Ship> haulers,
+  WaypointSymbol here, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
   if (haulers.isEmpty) {
     return null;
   }
+  // Don't ever return an "arrival" time before now to avoid callers who want
+  // to use this as a wait time needlessly looping (starving the hauler itself
+  // from updating its transit status).
+  Ship? ensureFutureArrival(Ship? ship) {
+    if (ship == null) {
+      return null;
+    }
+    if (ship.nav.route.arrival.isBefore(getNow())) {
+      return null;
+    }
+    return ship;
+  }
+
   final haulersInTransit = haulers
       .where((h) => h.waypointSymbol == here && h.isInTransit)
       .sortedBy((h) => h.nav.route.arrival);
-  return haulersInTransit.firstOrNull?.nav.route.arrival;
+  final arrivalTime = haulersInTransit.firstOrNull?.nav.route.arrival;
+
+  if (arrivalTime != null) {
+    return ensureFutureArrival(haulersInTransit.firstOrNull);
+  }
+  // If none of the haulers are headed towards us, return the one which is
+  // soonest to finish its current route, since that's a reasonable time to
+  // check next.
+  final haulersNotHere = haulers.where((h) => h.waypointSymbol != here);
+  final haulersNotHereSorted =
+      haulersNotHere.sortedBy((h) => h.nav.route.arrival);
+  return ensureFutureArrival(haulersNotHereSorted.firstOrNull);
 }
 
 /// Attempt to sell cargo ourselves by traveling to a market.
@@ -544,6 +574,41 @@ Future<JobResult> travelAndSellCargo(
   return JobResult.wait(null);
 }
 
+JobResult _waitForHauler(
+  List<Ship> haulers,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
+  final nextHauler = _nextArrivingHauler(haulers, ship.waypointSymbol);
+  if (nextHauler != null) {
+    final waitTime = nextHauler.nav.route.arrival;
+    final duration = waitTime.difference(getNow());
+    shipInfo(
+      ship,
+      'Waiting ${approximateDuration(duration)} for hauler arrival.',
+    );
+    return JobResult.wait(waitTime);
+  } else {
+    final haulerSymbols = haulers.map((h) => h.symbol).join(', ');
+    shipInfo(
+      ship,
+      'No haulers at ${ship.waypointSymbol}, unknown next arrival time for '
+      '$haulerSymbols, checking in 1 minute.',
+    );
+    for (final hauler in haulers) {
+      final arrivalDuration = hauler.nav.route.arrival.difference(getNow());
+      shipInfo(
+        ship,
+        'Hauler ${hauler.symbol} is ${hauler.nav.status} '
+        'to ${hauler.waypointSymbol} '
+        'arrival ${approximateDuration(arrivalDuration)}, '
+        'with ${hauler.cargo.availableSpace} space available.',
+      );
+    }
+    return JobResult.wait(getNow().add(const Duration(minutes: 1)));
+  }
+}
+
 /// Attempt to transfer cargo to haulers, or wait for them to arrive.
 Future<JobResult> transferToHaulersOrWait(
   BehaviorState state,
@@ -562,21 +627,19 @@ Future<JobResult> transferToHaulersOrWait(
 
   // If there are haulers for this squad, and they are here, transfer to them.
   final haulersHere = haulers
-      .where((h) => h.waypointSymbol == ship.waypointSymbol)
+      .where((h) => h.waypointSymbol == ship.waypointSymbol && !h.isInTransit)
+      // Sort the haulers by available space, so we fill the smallest first.
       .sortedBy<num>((h) => h.cargo.availableSpace);
   // If they are not here, wait.
   if (haulersHere.isEmpty) {
-    final waitTime = _nextHaulerArrivalTime(haulers, ship.waypointSymbol) ??
-        getNow().add(const Duration(minutes: 1));
-    shipInfo(ship, 'No haulers here, waiting until $waitTime.');
-    return JobResult.wait(waitTime);
+    return _waitForHauler(haulers, ship, getNow: getNow);
   }
   // If they are here, transfer to them.
   for (final item in ship.cargo.inventory) {
     for (final hauler in haulersHere) {
       final transferAmount = min(
         item.units,
-        ship.cargo.availableSpace,
+        hauler.cargo.availableSpace,
       );
       if (transferAmount > 0) {
         await transferCargoAndLog(
@@ -593,11 +656,12 @@ Future<JobResult> transferToHaulersOrWait(
   if (ship.cargo.isEmpty) {
     return JobResult.complete();
   }
+  shipInfo(
+    ship,
+    'Still have ${ship.cargo.units} cargo, waiting for hauler to arrive.',
+  );
   // If we still have cargo to off-load, wait for an empty hauler to arrive.
-  final waitTime = _nextHaulerArrivalTime(haulers, ship.waypointSymbol) ??
-      getNow().add(const Duration(minutes: 1));
-  shipInfo(ship, 'Waiting until $waitTime for hauler.');
-  return JobResult.wait(waitTime);
+  return _waitForHauler(haulers, ship, getNow: getNow);
 }
 
 /// Attempt to sell cargo at the best price.
@@ -646,9 +710,6 @@ Future<JobResult> sellCargoIfNeeded(
 
 /// Advance the miner.
 final advanceMiner = const MultiJob('Miner', [
-  // Is this step needed?  Or should we just have mining fail if we don't have
-  // space?
-  emptyCargoIfNeededForMining,
   doMineJob,
   sellCargoIfNeeded,
 ]).run;
