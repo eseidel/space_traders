@@ -30,7 +30,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   logger.info('${squads.length} squads');
   for (var i = 0; i < squads.length; i++) {
     final squad = squads[i];
-    logger.info('Squad $i:');
+    logger
+      ..info('Squad $i:')
+      ..info('  mine: ${squad.job.mine}')
+      ..info('  market: ${squad.job.market}');
     for (final ship in squad.ships) {
       logger.info(
         '  ${ship.symbol} ${ship.frame.symbol} ${ship.mountedMountSymbols}',
