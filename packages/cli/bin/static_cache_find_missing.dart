@@ -23,10 +23,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final marketTrip = findBestMarketToBuy(
       marketPrices,
       routePlanner,
-      ship,
       tradeSymbol,
       // We don't really care about the value of the "trade".
       expectedCreditsPerSecond: 7,
+      start: ship.waypointSymbol,
+      fuelCapacity: ship.fuel.capacity,
+      shipSpeed: ship.engine.speed,
     );
     if (marketTrip == null) {
       logger.info('No market for $tradeSymbol');

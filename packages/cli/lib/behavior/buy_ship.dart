@@ -34,7 +34,14 @@ List<ShipyardTrip> _shipyardsSellingByDistance(
   final costed = <ShipyardTrip>[];
   for (final price in prices) {
     final end = price.waypointSymbol;
-    final trip = costTrip(ship, routePlanner, price, start, end);
+    final trip = costTrip(
+      routePlanner,
+      price,
+      start: start,
+      end: end,
+      fuelCapacity: ship.fuel.capacity,
+      shipSpeed: ship.engine.speed,
+    );
     if (trip != null) {
       costed.add(trip);
     } else {

@@ -521,9 +521,11 @@ void main() {
       () => findBestMarketToBuy(
         marketPrices,
         routePlanner,
-        ship,
         TradeSymbol.ALUMINUM,
         expectedCreditsPerSecond: 1,
+        start: ship.waypointSymbol,
+        fuelCapacity: ship.fuel.capacity,
+        shipSpeed: ship.engine.speed,
       ),
     );
 

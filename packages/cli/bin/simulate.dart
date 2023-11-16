@@ -187,8 +187,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final trips = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
-    ship,
     tradeSymbol,
+    start: ship.waypointSymbol,
+    fuelCapacity: ship.fuel.capacity,
+    shipSpeed: ship.engine.speed,
   );
 
   final haulerRoute = trips[1].route;

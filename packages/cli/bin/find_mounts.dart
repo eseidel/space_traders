@@ -23,9 +23,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final best = findBestMarketToBuy(
       marketPrices,
       routePlanner,
-      ship,
       tradeSymbol,
       expectedCreditsPerSecond: 7,
+      start: ship.waypointSymbol,
+      fuelCapacity: ship.fuel.capacity,
+      shipSpeed: ship.engine.speed,
     );
     if (best == null) {
       logger.info('No market to buy $tradeSymbol');

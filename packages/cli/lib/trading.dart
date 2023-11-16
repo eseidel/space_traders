@@ -489,17 +489,18 @@ typedef MarketTrip = CostedTrip<MarketPrice>;
 
 /// Compute the cost of going to and buying from a specific MarketPrice record.
 CostedTrip<T>? costTrip<T>(
-  Ship ship,
   RoutePlanner planner,
-  T price,
-  WaypointSymbol start,
-  WaypointSymbol end,
-) {
+  T price, {
+  required WaypointSymbol start,
+  required WaypointSymbol end,
+  required int fuelCapacity,
+  required int shipSpeed,
+}) {
   final route = planner.planRoute(
     start: start,
     end: end,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
+    fuelCapacity: fuelCapacity,
+    shipSpeed: shipSpeed,
   );
   if (route == null) {
     return null;
@@ -512,15 +513,15 @@ CostedTrip<T>? costTrip<T>(
 List<MarketTrip> marketsTradingSortedByDistance(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
-  Ship ship,
-  TradeSymbol tradeSymbol,
-) {
+  TradeSymbol tradeSymbol, {
+  required WaypointSymbol start,
+  required int shipSpeed,
+  required int fuelCapacity,
+}) {
   final prices = marketPrices.pricesFor(tradeSymbol).toList();
   if (prices.isEmpty) {
     return [];
   }
-  final start = ship.waypointSymbol;
-
   // If there are a lot of prices we could cut down the search space by only
   // looking at prices at or below median?
   // final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol)!;
@@ -530,7 +531,14 @@ List<MarketTrip> marketsTradingSortedByDistance(
   final costed = <MarketTrip>[];
   for (final price in prices) {
     final end = price.waypointSymbol;
-    final trip = costTrip<MarketPrice>(ship, routePlanner, price, start, end);
+    final trip = costTrip<MarketPrice>(
+      routePlanner,
+      price,
+      start: start,
+      end: end,
+      shipSpeed: shipSpeed,
+      fuelCapacity: fuelCapacity,
+    );
     if (trip != null) {
       costed.add(trip);
     } else {
@@ -549,15 +557,19 @@ List<MarketTrip> marketsTradingSortedByDistance(
 MarketTrip? findBestMarketToBuy(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,
-  Ship ship,
   TradeSymbol tradeSymbol, {
+  required WaypointSymbol start,
+  required int shipSpeed,
+  required int fuelCapacity,
   required int expectedCreditsPerSecond,
 }) {
   final sorted = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
-    ship,
     tradeSymbol,
+    start: start,
+    fuelCapacity: fuelCapacity,
+    shipSpeed: shipSpeed,
   );
   if (sorted.isEmpty) {
     return null;
@@ -565,6 +577,8 @@ MarketTrip? findBestMarketToBuy(
   final nearest = sorted.first;
   var best = nearest;
   // Pick any one further that saves more than expectedCreditsPerSecond
+  // TODO(eseidel): This does not take fuel costs into account.
+  // That might be OK? since it should be a constant multiplier?
   for (final trip in sorted.sublist(1)) {
     final priceDiff = trip.price.purchasePrice - nearest.price.purchasePrice;
     final savings = -priceDiff;
@@ -610,8 +624,10 @@ MarketTrip? findBestMarketToSell(
   final sorted = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
-    ship,
     tradeSymbol,
+    start: ship.waypointSymbol,
+    fuelCapacity: ship.fuel.capacity,
+    shipSpeed: ship.engine.speed,
   );
   if (sorted.isEmpty) {
     return null;

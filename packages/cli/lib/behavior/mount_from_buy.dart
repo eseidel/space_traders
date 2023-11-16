@@ -74,9 +74,11 @@ BuyJob? buyJobForMount(
     final marketTrip = findBestMarketToBuy(
       marketPrices,
       routePlanner,
-      ship,
       tradeSymbol,
       expectedCreditsPerSecond: expectedCreditsPerSecond,
+      start: ship.waypointSymbol,
+      fuelCapacity: ship.fuel.capacity,
+      shipSpeed: ship.engine.speed,
     );
     if (marketTrip != null) {
       return BuyJob(

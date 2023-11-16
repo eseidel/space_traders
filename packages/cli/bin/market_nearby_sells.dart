@@ -29,8 +29,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final trips = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
-    ship,
     tradeSymbol,
+    start: ship.waypointSymbol,
+    fuelCapacity: ship.fuel.capacity,
+    shipSpeed: ship.engine.speed,
   );
   final supplyWidth = SupplyLevel.values.fold(0, (max, e) {
     final width = e.toString().length;

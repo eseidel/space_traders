@@ -4,6 +4,7 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/logger.dart';
+import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 
@@ -320,6 +321,13 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// Returns all known prices for a given market.
   List<MarketPrice> pricesAtMarket(WaypointSymbol marketSymbol) {
     return _prices.where((e) => e.waypointSymbol == marketSymbol).toList();
+  }
+
+  /// Returns the most recent price for a given trade good at a given market.
+  MarketPrice? priceAt(WaypointSymbol marketSymbol, TradeSymbol tradeSymbol) {
+    return _prices.firstWhereOrNull(
+      (e) => e.symbol == tradeSymbol && e.waypointSymbol == marketSymbol,
+    );
   }
 
   /// Returns true if there is recent market data for a given market.

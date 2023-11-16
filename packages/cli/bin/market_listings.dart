@@ -21,9 +21,7 @@ void addSymbols(
 
   var haveAddedHeader = false;
   for (final tradeSymbol in tradeSymbols) {
-    final price = marketPrices
-        .pricesFor(tradeSymbol, marketSymbol: marketSymbol)
-        .firstOrNull;
+    final price = marketPrices.priceAt(marketSymbol, tradeSymbol);
     if (price == null) {
       table.add([tradeSymbol.toString()]);
     } else {
