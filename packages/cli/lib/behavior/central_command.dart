@@ -250,7 +250,7 @@ class CentralCommand {
 
   /// Returns a deal filter function which avoids deals in progress.
   /// Optionally takes an additional [filter] function to apply.
-  bool Function(Deal) _avoidDealsInProgres([bool Function(Deal)? filter]) {
+  bool Function(Deal) _avoidDealsInProgress([bool Function(Deal)? filter]) {
     final inProgress = _behaviorCache.dealsInProgress().toList();
     // Avoid having two ships working on the same deal since by the time the
     // second one gets there the prices will have changed.
@@ -270,7 +270,9 @@ class CentralCommand {
     };
   }
 
-  Iterable<CostedDeal> _scanAndFindDeals(
+  /// This is visible for scripts, generally you want to use
+  /// [findNextDealAndLog] instead.
+  Iterable<CostedDeal> scanAndFindDeals(
     SystemsCache systemsCache,
     MarketPrices marketPrices,
     RoutePlanner routePlanner, {
@@ -295,7 +297,7 @@ class CentralCommand {
       marketScan,
       maxTotalOutlay: maxTotalOutlay,
       extraSellOpps: extraSellOpps,
-      filter: _avoidDealsInProgres(filter),
+      filter: _avoidDealsInProgress(filter),
       startSymbol: startSymbol,
       fuelCapacity: shipSpec.fuelCapacity,
       cargoCapacity: shipSpec.cargoCapacity,
@@ -330,7 +332,7 @@ class CentralCommand {
         '@ ${creditsString(opp.price)} -> ${opp.waypointSymbol}',
       );
     }
-    final deals = _scanAndFindDeals(
+    final deals = scanAndFindDeals(
       systemsCache,
       marketPrices,
       routePlanner,
@@ -363,9 +365,9 @@ class CentralCommand {
     required List<TradeSymbol> tradeSymbols,
     required int maxTotalOutlay,
     required int maxWaypoints,
-    int minProfitPerSecond = -5,
+    int minProfitPerSecond = -10,
   }) {
-    final deals = _scanAndFindDeals(
+    final deals = scanAndFindDeals(
       systemsCache,
       marketPrices,
       routePlanner,

@@ -1,3 +1,4 @@
+import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
@@ -16,11 +17,16 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   );
   final staticCaches = StaticCaches.load(fs);
 
+  final agentCache = AgentCache.load(fs)!;
+  final behaviorCache = BehaviorCache.load(fs);
+  final shipCache = ShipCache.load(fs)!;
+  final centralCommand =
+      CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+
   const shipType = ShipType.LIGHT_HAULER;
   final ship = staticCaches.shipyardShips[shipType]!;
-  final shipSpeed = ship.engine.speed;
-  final fuelCapacity = ship.frame.fuelCapacity;
-  final cargoCapacity = ship.cargoCapacity;
+  final shipSpec = ship.shipSpec;
+  final credits = agentCache.agent.credits;
 
   // Given a desired export.  Find a market to feed.
   final export = TradeSymbol.fromJson(argResults['export'] as String)!;
@@ -32,34 +38,37 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   // Look up what trade symbols are required dto produce the export.
-  final targetImports = [
+  final tradeSymbols = [
     TradeSymbol.IRON,
     TradeSymbol.QUARTZ_SAND,
     TradeSymbol.PLASTICS,
   ];
+  const minProfitPerSecond = -100;
+  const maxWaypoints = 100;
+  final waypointSymbol = listing.waypointSymbol;
 
-  final marketScan = scanNearbyMarkets(
+  logger.info('$shipType @ $waypointSymbol, '
+      'speed = ${shipSpec.speed} '
+      'capacity = ${shipSpec.cargoCapacity}, '
+      'fuel <= ${shipSpec.fuelCapacity}, '
+      'outlay <= $credits, '
+      'waypoints <= $maxWaypoints ');
+
+  final deals = centralCommand.scanAndFindDeals(
     systemsCache,
     marketPrices,
-    systemSymbol: listing.waypointSymbol.systemSymbol,
-    maxWaypoints: 100,
-  );
-  final deals = findDealsFor(
-    marketPrices,
-    systemsCache,
     routePlanner,
-    marketScan,
-    maxTotalOutlay: 1000000,
-    startSymbol: listing.waypointSymbol,
-    fuelCapacity: fuelCapacity,
-    cargoCapacity: cargoCapacity,
-    shipSpeed: shipSpeed,
+    maxTotalOutlay: credits,
+    maxWaypoints: maxWaypoints,
+    startSymbol: waypointSymbol,
+    shipSpec: shipSpec,
     filter: (Deal deal) {
-      return deal.destinationSymbol == listing.waypointSymbol &&
-          targetImports.contains(deal.tradeSymbol);
+      return deal.destinationSymbol == waypointSymbol &&
+          tradeSymbols.contains(deal.tradeSymbol);
     },
-    minProfitPerSecond: -5,
+    minProfitPerSecond: minProfitPerSecond,
   );
+
   for (final deal in deals) {
     logger.info(describeCostedDeal(deal));
   }
