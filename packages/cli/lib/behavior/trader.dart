@@ -105,12 +105,13 @@ Future<DateTime?> _handleAtSourceWithDeal(
   Ship ship,
   BehaviorState state,
   Market currentMarket,
-  CostedDeal costedDeal,
-) async {
+  CostedDeal costedDeal, {
+  required bool isFeeder,
+}) async {
   final dealTradeSymbol = costedDeal.tradeSymbol;
   final good = currentMarket.marketTradeGood(dealTradeSymbol)!;
 
-  final maxPerUnitPrice = costedDeal.maxPurchaseUnitPrice;
+  final maxPerUnitPrice = isFeeder ? null : costedDeal.maxPurchaseUnitPrice;
   final nextExpectedPrice = costedDeal.predictNextPurchasePrice;
 
   // Could this get confused by having other cargo in our hold?
@@ -564,8 +565,9 @@ Future<DateTime?> _handleDeal(
   CostedDeal costedDeal,
   Ship ship,
   BehaviorState state,
-  Market? currentMarket,
-) async {
+  Market? currentMarket, {
+  required bool isFeeder,
+}) async {
   // If we're at the source buy the cargo.
   if (costedDeal.deal.sourceSymbol == ship.waypointSymbol) {
     if (currentMarket == null) {
@@ -582,6 +584,7 @@ Future<DateTime?> _handleDeal(
       state,
       currentMarket,
       costedDeal,
+      isFeeder: isFeeder,
     );
   }
   // If we're at the destination of the deal, sell.
@@ -868,6 +871,8 @@ Future<DateTime?> advanceTrader(
     return result.waitTime;
   }
 
+  final isFeeder = ['26', '23', 'A'].contains(ship.shipSymbol.hexNumber);
+
   // We already have a deal, handle it.
   if (pastDeal != null) {
     final waitUntil = await _handleDeal(
@@ -879,13 +884,13 @@ Future<DateTime?> advanceTrader(
       ship,
       state,
       currentMarket,
+      isFeeder: isFeeder,
     );
     return waitUntil;
   }
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
-  final isFeeder = ['26', '23', 'A'].contains(ship.shipSymbol.hexNumber);
   final CostedDeal? newDeal;
   if (!isFeeder) {
     newDeal = centralCommand.findNextDealAndLog(
@@ -961,6 +966,7 @@ Future<DateTime?> advanceTrader(
     ship,
     state,
     currentMarket,
+    isFeeder: isFeeder,
   );
   return waitUntil;
 }
