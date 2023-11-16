@@ -113,9 +113,12 @@ Future<DateTime?> _handleAtSourceWithDeal(
 
   final maxPerUnitPrice = isFeeder ? null : costedDeal.maxPurchaseUnitPrice;
   final nextExpectedPrice = costedDeal.predictNextPurchasePrice;
+  // TODO(eseidel): Move "isFeeder" down into CostedDeal.
+  // If we don't do this, unitsToPurchase returns 0 for negative profit deals.
+  final maxUnits = isFeeder ? ship.availableSpace : costedDeal.maxUnitsToBuy;
 
   // Could this get confused by having other cargo in our hold?
-  final units = unitsToPurchase(good, ship, costedDeal.maxUnitsToBuy);
+  final units = unitsToPurchase(good, ship, maxUnits);
   if (units > 0) {
     final transaction = await purchaseTradeGoodIfPossible(
       api,
@@ -922,6 +925,7 @@ Future<DateTime?> advanceTrader(
       ship,
       waypointSymbol: waypointSymbol,
       tradeSymbols: tradeSymbols,
+      desiredSupply: SupplyLevel.ABUNDANT,
       maxTotalOutlay: caches.agent.agent.credits,
       maxWaypoints: _maxWaypoints,
     );
