@@ -55,6 +55,7 @@ Future<Waypoint?> nearbyMarketWhichTrades(
 List<Deal> buildDealsFromScan(
   MarketScan scan, {
   List<SellOpp>? extraSellOpps,
+  int? minProfitPerUnit,
 }) {
   final deals = <Deal>[];
   // final fuelPrice = _priceData.medianPurchasePrice(TradeSymbol.FUEL.value);
@@ -74,7 +75,7 @@ List<Deal> buildDealsFromScan(
           continue;
         }
         final profit = sell.price - buy.price;
-        if (profit <= 0) {
+        if (minProfitPerUnit != null && profit <= minProfitPerUnit) {
           continue;
         }
         deals.add(Deal(source: buy, destination: sell));
@@ -414,8 +415,14 @@ Iterable<CostedDeal> findDealsFor(
     'fuel capacity: $fuelCapacity, '
     'ship speed: $shipSpeed',
   );
-
-  final deals = buildDealsFromScan(scan, extraSellOpps: extraSellOpps);
+  // Allow negative unit profits in search when we're allowing negative
+  // per-second profits.
+  final minProfitPerUnit = (minProfitPerSecond < 0) ? null : 0;
+  final deals = buildDealsFromScan(
+    scan,
+    extraSellOpps: extraSellOpps,
+    minProfitPerUnit: minProfitPerUnit,
+  );
   logger.detail('Found ${deals.length} potential deals.');
 
   final filtered = filter != null ? deals.where(filter) : deals;
