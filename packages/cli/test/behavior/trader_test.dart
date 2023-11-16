@@ -135,7 +135,7 @@ void main() {
     );
 
     when(
-      () => centralCommand.findNextDeal(
+      () => centralCommand.findNextDealAndLog(
         caches.agent,
         caches.construction,
         caches.contracts,
@@ -637,7 +637,7 @@ void main() {
       costPerFuelUnit: 100,
     );
     when(
-      () => centralCommand.findNextDeal(
+      () => centralCommand.findNextDealAndLog(
         caches.agent,
         caches.construction,
         caches.contracts,

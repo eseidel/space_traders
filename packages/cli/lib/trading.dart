@@ -403,6 +403,7 @@ Iterable<CostedDeal> findDealsFor(
   required int maxTotalOutlay,
   List<SellOpp>? extraSellOpps,
   bool Function(Deal deal)? filter,
+  int minProfitPerSecond = 0,
 }) {
   logger.detail(
     'Finding deals with '
@@ -466,7 +467,7 @@ Iterable<CostedDeal> findDealsFor(
 
   return affordable
       .sortedBy<num>((e) => -e.expectedProfitPerSecond)
-      .where((d) => d.expectedProfitPerSecond > 0);
+      .where((d) => d.expectedProfitPerSecond > minProfitPerSecond);
 }
 
 /// Calculated trip cost of going and buying something.

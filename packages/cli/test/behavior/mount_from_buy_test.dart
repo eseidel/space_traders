@@ -273,7 +273,15 @@ void main() {
 
   test('mountRequestForShip', () async {
     final ship = _MockShip();
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
     when(() => ship.mounts).thenReturn([]);
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
+    final shipEngine = _MockShipEngine();
+    when(() => shipEngine.speed).thenReturn(10);
+    when(() => ship.engine).thenReturn(shipEngine);
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);

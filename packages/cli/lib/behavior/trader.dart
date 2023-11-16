@@ -688,7 +688,7 @@ Future<DateTime?> _navigateToBetterTradeLocation(
 ) async {
   shipWarn(ship, why);
   CostedDeal? findDeal(Ship ship, WaypointSymbol startSymbol) {
-    return centralCommand.findNextDeal(
+    return centralCommand.findNextDealAndLog(
       caches.agent,
       caches.construction,
       caches.contracts,
@@ -885,7 +885,7 @@ Future<DateTime?> advanceTrader(
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
-  final newDeal = centralCommand.findNextDeal(
+  final newDeal = centralCommand.findNextDealAndLog(
     caches.agent,
     caches.construction,
     caches.contracts,

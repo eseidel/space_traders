@@ -248,8 +248,64 @@ class CentralCommand {
     );
   }
 
+  /// Returns a deal filter function which avoids deals in progress.
+  /// Optionally takes an additional [filter] function to apply.
+  bool Function(Deal) _avoidDealsInProgres([bool Function(Deal)? filter]) {
+    final inProgress = _behaviorCache.dealsInProgress().toList();
+    // Avoid having two ships working on the same deal since by the time the
+    // second one gets there the prices will have changed.
+    // Note this does not check destination, so should still allow two
+    // ships to work on the same contract.
+    // We could consider enforcing destination difference for arbitrage deals.
+    return (Deal deal) {
+      return inProgress.every((d) {
+        // Deals need to differ in their source *or* their trade symbol
+        // for us to consider them.
+        if (d.deal.sourceSymbol == deal.sourceSymbol &&
+            d.deal.tradeSymbol == deal.tradeSymbol) {
+          return false;
+        }
+        return filter?.call(deal) ?? true;
+      });
+    };
+  }
+
+  Iterable<CostedDeal> _scanAndFindDeals(
+    SystemsCache systemsCache,
+    MarketPrices marketPrices,
+    RoutePlanner routePlanner, {
+    required WaypointSymbol startSymbol,
+    required int maxTotalOutlay,
+    required int maxWaypoints,
+    required ShipSpec shipSpec,
+    bool Function(Deal)? filter,
+    List<SellOpp>? extraSellOpps,
+    int minProfitPerSecond = 0,
+  }) {
+    final marketScan = scanNearbyMarkets(
+      systemsCache,
+      marketPrices,
+      systemSymbol: startSymbol.systemSymbol,
+      maxWaypoints: maxWaypoints,
+    );
+    return findDealsFor(
+      marketPrices,
+      systemsCache,
+      routePlanner,
+      marketScan,
+      maxTotalOutlay: maxTotalOutlay,
+      extraSellOpps: extraSellOpps,
+      filter: _avoidDealsInProgres(filter),
+      startSymbol: startSymbol,
+      fuelCapacity: shipSpec.fuelCapacity,
+      cargoCapacity: shipSpec.cargoCapacity,
+      shipSpeed: shipSpec.speed,
+      minProfitPerSecond: minProfitPerSecond,
+    );
+  }
+
   /// Find next deal for the given [ship], considering all deals in progress.
-  CostedDeal? findNextDeal(
+  CostedDeal? findNextDealAndLog(
     AgentCache agentCache,
     ConstructionCache constructionCache,
     ContractCache contractCache,
@@ -262,31 +318,11 @@ class CentralCommand {
     WaypointSymbol? overrideStartSymbol,
   }) {
     final startSymbol = overrideStartSymbol ?? ship.waypointSymbol;
-    final systemSymbol = overrideStartSymbol != null
-        ? overrideStartSymbol.systemSymbol
-        : ship.systemSymbol;
 
-    final inProgress = _behaviorCache.dealsInProgress().toList();
-    // Avoid having two ships working on the same deal since by the time the
-    // second one gets there the prices will have changed.
-    // Note this does not check destination, so should still allow two
-    // ships to work on the same contract.
-    bool filter(Deal deal) {
-      return inProgress.every((d) {
-        // Deals need to differ in their source *or* their trade symbol
-        // for us to consider them.
-        return d.deal.sourceSymbol != deal.sourceSymbol ||
-            d.deal.tradeSymbol != deal.tradeSymbol;
-      });
-    }
-
-    /// This should decide if contract trading is enabled, and if it is
-    /// include extra SellOpps for the contract goods.
     final extraSellOpps = <SellOpp>[...constructionSellOpps()];
     if (isContractTradingEnabled) {
       extraSellOpps.addAll(contractSellOpps(agentCache, contractCache));
     }
-
     if (extraSellOpps.isNotEmpty) {
       final opp = extraSellOpps.first;
       logger.detail(
@@ -294,30 +330,58 @@ class CentralCommand {
         '@ ${creditsString(opp.price)} -> ${opp.waypointSymbol}',
       );
     }
-
-    final marketScan = scanNearbyMarkets(
+    final deals = _scanAndFindDeals(
       systemsCache,
       marketPrices,
-      systemSymbol: systemSymbol,
-      maxWaypoints: maxWaypoints,
-    );
-    final deals = findDealsFor(
-      marketPrices,
-      systemsCache,
       routePlanner,
-      marketScan,
       maxTotalOutlay: maxTotalOutlay,
-      extraSellOpps: extraSellOpps,
-      filter: filter,
+      maxWaypoints: maxWaypoints,
       startSymbol: startSymbol,
-      fuelCapacity: ship.fuel.capacity,
-      // Using capacity, rather than availableSpace, since the
-      // trader logic tries to clear out the hold.
-      cargoCapacity: ship.cargo.capacity,
-      shipSpeed: ship.engine.speed,
+      extraSellOpps: extraSellOpps,
+      shipSpec: ship.shipSpec,
     );
+
     logger.info('Found ${deals.length} deals for ${ship.shipSymbol} from '
         '$startSymbol');
+    for (final deal in deals) {
+      logger.detail(describeCostedDeal(deal));
+    }
+    return deals.firstOrNull;
+  }
+
+  /// Find next feeder deal for the given [ship], considering all deals in
+  /// progress.
+  CostedDeal? findNextFeederDeal(
+    AgentCache agentCache,
+    ConstructionCache constructionCache,
+    ContractCache contractCache,
+    MarketPrices marketPrices,
+    SystemsCache systemsCache,
+    RoutePlanner routePlanner,
+    Ship ship, {
+    required WaypointSymbol waypointSymbol,
+    required List<TradeSymbol> tradeSymbols,
+    required int maxTotalOutlay,
+    required int maxWaypoints,
+    int minProfitPerSecond = -5,
+  }) {
+    final deals = _scanAndFindDeals(
+      systemsCache,
+      marketPrices,
+      routePlanner,
+      maxTotalOutlay: maxTotalOutlay,
+      maxWaypoints: maxWaypoints,
+      startSymbol: waypointSymbol,
+      shipSpec: ship.shipSpec,
+      filter: (Deal deal) {
+        return deal.destinationSymbol == waypointSymbol &&
+            tradeSymbols.contains(deal.tradeSymbol);
+      },
+      minProfitPerSecond: minProfitPerSecond,
+    );
+    logger
+        .info('Found ${deals.length} feeder deals for ${ship.shipSymbol} from '
+            '$waypointSymbol');
     for (final deal in deals) {
       logger.detail(describeCostedDeal(deal));
     }

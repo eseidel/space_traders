@@ -354,6 +354,25 @@ extension CargoUtils on ShipCargo {
   }
 }
 
+/// Class to hold common ship traits needed for route planning.
+class ShipSpec {
+  /// Construct a ShipSpec.
+  const ShipSpec({
+    required this.cargoCapacity,
+    required this.fuelCapacity,
+    required this.speed,
+  });
+
+  /// The fuel capacity of the ship.
+  final int fuelCapacity;
+
+  /// The cargo capacity of the ship.
+  final int cargoCapacity;
+
+  /// The speed of the ship.
+  final int speed;
+}
+
 /// Extensions onto Ship to make it easier to work with.
 extension ShipUtils on Ship {
   /// Returns the ShipSymbol of the ship.
@@ -371,6 +390,13 @@ extension ShipUtils on Ship {
     final number = symbol.split('-').last;
     return '🛸#$number';
   }
+
+  /// Returns the ShipSpec for the ship.
+  ShipSpec get shipSpec => ShipSpec(
+        cargoCapacity: cargo.capacity,
+        fuelCapacity: fuel.capacity,
+        speed: engine.speed,
+      );
 
   /// Returns the amount of the given trade good the ship has.
   int countUnits(TradeSymbol tradeSymbol) => cargo.countUnits(tradeSymbol);
@@ -545,6 +571,13 @@ extension ShipyardShipUtils on ShipyardShip {
         .map((m) => m.capacity!)
         .sum;
   }
+
+  /// Returns the ShipSpec for the ship.
+  ShipSpec get shipSpec => ShipSpec(
+        cargoCapacity: cargoCapacity,
+        fuelCapacity: frame.fuelCapacity,
+        speed: engine.speed,
+      );
 
   /// Compute the current crew of the ship.
   int get currentCrew {
