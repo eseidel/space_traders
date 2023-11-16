@@ -885,17 +885,42 @@ Future<DateTime?> advanceTrader(
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
-  final newDeal = centralCommand.findNextDealAndLog(
-    caches.agent,
-    caches.construction,
-    caches.contracts,
-    caches.marketPrices,
-    caches.systems,
-    caches.routePlanner,
-    ship,
-    maxWaypoints: _maxWaypoints,
-    maxTotalOutlay: caches.agent.agent.credits,
-  );
+  final isFeeder = ['26', '23', 'A'].contains(ship.shipSymbol.hexNumber);
+  final CostedDeal? newDeal;
+  if (!isFeeder) {
+    newDeal = centralCommand.findNextDealAndLog(
+      caches.agent,
+      caches.construction,
+      caches.contracts,
+      caches.marketPrices,
+      caches.systems,
+      caches.routePlanner,
+      ship,
+      maxWaypoints: _maxWaypoints,
+      maxTotalOutlay: caches.agent.agent.credits,
+    );
+  } else {
+    shipWarn(ship, 'Getting feeder deal.');
+    final waypointSymbol = WaypointSymbol.fromString('X1-QP91-F52');
+    final tradeSymbols = [
+      TradeSymbol.IRON,
+      TradeSymbol.QUARTZ_SAND,
+      TradeSymbol.PLASTICS,
+    ];
+    newDeal = centralCommand.findNextFeederDeal(
+      caches.agent,
+      caches.construction,
+      caches.contracts,
+      caches.marketPrices,
+      caches.systems,
+      caches.routePlanner,
+      ship,
+      waypointSymbol: waypointSymbol,
+      tradeSymbols: tradeSymbols,
+      maxTotalOutlay: caches.agent.agent.credits,
+      maxWaypoints: _maxWaypoints,
+    );
+  }
 
   Future<DateTime?> findBetterLocation(String why) async {
     final waitUntil = await _navigateToBetterTradeLocation(
@@ -916,8 +941,9 @@ Future<DateTime?> advanceTrader(
     );
     return waitUntil;
   }
-  if (newDeal.expectedProfitPerSecond <
-      centralCommand.expectedCreditsPerSecond(ship)) {
+  if (!isFeeder &&
+      newDeal.expectedProfitPerSecond <
+          centralCommand.expectedCreditsPerSecond(ship)) {
     final waitUntil =
         await findBetterLocation('Deal expected profit per second too low: '
             '${creditsString(newDeal.expectedProfitPerSecond)}/s');
