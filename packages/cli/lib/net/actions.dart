@@ -628,7 +628,7 @@ Future<Jettison200ResponseData> transferCargoAndLog(
   cache
     ..updateShip(from)
     ..updateShip(to);
-  shipInfo(
+  shipDetail(
       from,
       'Transferred $units $tradeSymbol from ${from.symbol} to '
       '${to.symbol}');
