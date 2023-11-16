@@ -365,8 +365,26 @@ class CentralCommand {
     required List<TradeSymbol> tradeSymbols,
     required int maxTotalOutlay,
     required int maxWaypoints,
+    required SupplyLevel desiredSupply,
     int minProfitPerSecond = -10,
   }) {
+    final neededSymbols = <TradeSymbol>[];
+    for (final tradeSymbol in tradeSymbols) {
+      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
+      if (price != null &&
+          SupplyLevel.values.indexOf(price.supply) <
+              SupplyLevel.values.indexOf(desiredSupply)) {
+        neededSymbols.add(tradeSymbol);
+      }
+      shipInfo(
+        ship,
+        'Feeding $tradeSymbol (${price?.supply} < $desiredSupply)',
+      );
+    }
+    if (neededSymbols.isEmpty) {
+      return null;
+    }
+
     final deals = scanAndFindDeals(
       systemsCache,
       marketPrices,
@@ -377,13 +395,14 @@ class CentralCommand {
       shipSpec: ship.shipSpec,
       filter: (Deal deal) {
         return deal.destinationSymbol == waypointSymbol &&
-            tradeSymbols.contains(deal.tradeSymbol);
+            neededSymbols.contains(deal.tradeSymbol);
       },
       minProfitPerSecond: minProfitPerSecond,
     );
-    logger
-        .info('Found ${deals.length} feeder deals for ${ship.shipSymbol} from '
-            '$waypointSymbol');
+    shipInfo(
+        ship,
+        'Found ${deals.length} feeder deals for ${ship.shipSymbol} from '
+        '$waypointSymbol');
     for (final deal in deals) {
       logger.detail(describeCostedDeal(deal));
     }
