@@ -54,6 +54,17 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       'outlay <= $credits, '
       'waypoints <= $maxWaypoints ');
 
+  final neededSymbols = <TradeSymbol>[];
+  for (final tradeSymbol in tradeSymbols) {
+    final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
+    if (price != null &&
+        SupplyLevel.values.indexOf(price.supply) <
+            SupplyLevel.values.indexOf(SupplyLevel.ABUNDANT)) {
+      neededSymbols.add(tradeSymbol);
+    }
+    logger.info('$tradeSymbol : ${price?.supply}');
+  }
+
   final deals = centralCommand.scanAndFindDeals(
     systemsCache,
     marketPrices,
@@ -64,13 +75,27 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     shipSpec: shipSpec,
     filter: (Deal deal) {
       return deal.destinationSymbol == waypointSymbol &&
-          tradeSymbols.contains(deal.tradeSymbol);
+          neededSymbols.contains(deal.tradeSymbol);
     },
     minProfitPerSecond: minProfitPerSecond,
   );
 
+  logger.info('Available:');
   for (final deal in deals) {
-    logger.info(describeCostedDeal(deal));
+    logger.info('  ${describeCostedDeal(deal)}');
+  }
+
+  final dealsInProgress = behaviorCache.dealsInProgress();
+  final feederDeals = dealsInProgress.where(
+    (deal) => deal.deal.destinationSymbol == waypointSymbol,
+  );
+  if (feederDeals.isEmpty) {
+    logger.info('In progress: None');
+    return;
+  }
+  logger.info('In progress:');
+  for (final deal in feederDeals) {
+    logger.info('  ${describeCostedDeal(deal)}');
   }
 }
 
