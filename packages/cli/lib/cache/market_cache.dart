@@ -68,7 +68,7 @@ class MarketListingCache extends JsonStore<_Record> {
   void addMarket(Market market) {
     final symbol = market.waypointSymbol;
     final marketListing = MarketListing(
-      symbol: symbol,
+      waypointSymbol: symbol,
       imports: market.imports.map((t) => t.symbol).toSet(),
       exports: market.exports.map((t) => t.symbol).toSet(),
       exchange: market.exchange.map((t) => t.symbol).toSet(),

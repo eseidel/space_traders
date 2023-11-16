@@ -7,7 +7,7 @@ import 'package:types/types.dart';
 class MarketListing {
   /// Creates a new market listing.
   const MarketListing({
-    required this.symbol,
+    required this.waypointSymbol,
     this.exports = const {},
     this.imports = const {},
     this.exchange = const {},
@@ -15,7 +15,10 @@ class MarketListing {
 
   /// Creates a new market description from JSON data.
   factory MarketListing.fromJson(Map<String, dynamic> json) {
-    final symbol = WaypointSymbol.fromJson(json['symbol'] as String);
+    final symbol = WaypointSymbol.fromJson(
+      // TODO(eseidel): remove symbol on next reset.
+      json['symbol'] as String? ?? json['waypointSymbol'] as String,
+    );
     final exports = (json['exports'] as List<dynamic>)
         .cast<String>()
         .map((e) => TradeSymbol.fromJson(e)!)
@@ -29,7 +32,7 @@ class MarketListing {
         .map((e) => TradeSymbol.fromJson(e)!)
         .toList();
     return MarketListing(
-      symbol: symbol,
+      waypointSymbol: symbol,
       exports: exports.toSet(),
       imports: imports.toSet(),
       exchange: exchange.toSet(),
@@ -38,7 +41,7 @@ class MarketListing {
 
   /// The symbol of the market. The symbol is the same as the waypoint where the
   /// market is located.
-  final WaypointSymbol symbol;
+  final WaypointSymbol waypointSymbol;
 
   /// The list of goods that are exported from this market.
   final Set<TradeSymbol> exports;
@@ -61,7 +64,7 @@ class MarketListing {
   /// Converts this market description to JSON data.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'symbol': symbol.toJson(),
+      'waypointSymbol': waypointSymbol.toJson(),
       'exports': exports.map((e) => e.toJson()).toList()..sort(),
       'imports': imports.map((e) => e.toJson()).toList()..sort(),
       'exchange': exchange.map((e) => e.toJson()).toList()..sort(),
@@ -74,7 +77,7 @@ class MarketListing {
     return identical(this, other) ||
         other is MarketListing &&
             runtimeType == other.runtimeType &&
-            symbol == other.symbol &&
+            waypointSymbol == other.waypointSymbol &&
             equality.equals(exports, other.exports) &&
             equality.equals(imports, other.imports) &&
             equality.equals(exchange, other.exchange);
@@ -82,7 +85,7 @@ class MarketListing {
 
   @override
   int get hashCode => Object.hashAll([
-        symbol,
+        waypointSymbol,
         exports,
         imports,
         exchange,

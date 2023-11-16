@@ -432,12 +432,12 @@ void main() {
     final sellsFuel = defaultSellsFuel(listings);
     final waypointSymbol = WaypointSymbol.fromString('A-B-C');
     when(() => listings.marketListingForSymbol(waypointSymbol))
-        .thenReturn(MarketListing(symbol: waypointSymbol));
+        .thenReturn(MarketListing(waypointSymbol: waypointSymbol));
     expect(sellsFuel(waypointSymbol), false);
 
     when(() => listings.marketListingForSymbol(waypointSymbol)).thenReturn(
       MarketListing(
-        symbol: waypointSymbol,
+        waypointSymbol: waypointSymbol,
         exchange: const {TradeSymbol.FUEL},
       ),
     );

@@ -13,7 +13,7 @@ void main() {
     final tradeGoods = _MockTradeGoodsCache();
     final waypointSymbol = WaypointSymbol.fromString('W-A-Y');
     final listing = MarketListing(
-      symbol: waypointSymbol,
+      waypointSymbol: waypointSymbol,
     );
     MarketListingCache({waypointSymbol: listing}, tradeGoods, fs: fs).save();
     final loaded = MarketListingCache.load(fs, tradeGoods);

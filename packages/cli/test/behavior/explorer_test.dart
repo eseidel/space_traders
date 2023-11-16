@@ -173,7 +173,7 @@ void main() {
     when(() => caches.marketListings.marketListingForSymbol(waypointSymbol))
         .thenReturn(
       MarketListing(
-        symbol: waypointSymbol,
+        waypointSymbol: waypointSymbol,
         exchange: const {TradeSymbol.FUEL},
       ),
     );
