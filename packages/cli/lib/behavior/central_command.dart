@@ -917,8 +917,8 @@ Iterable<SellOpp> sellOppsForConstruction(
   // and change that over time to encourage building it sooner.
   // For now we're just hard-coding a price for each needed good.
   final maxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 1800,
-    TradeSymbol.ADVANCED_CIRCUITRY: 18000,
+    TradeSymbol.FAB_MATS: 2000,
+    TradeSymbol.ADVANCED_CIRCUITRY: 20000,
   };
 
   for (final material in construction.materials) {
