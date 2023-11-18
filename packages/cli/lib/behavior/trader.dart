@@ -913,7 +913,7 @@ Future<DateTime?> advanceTrader(
 
   if (newDeal == null) {
     final waitUntil = await findBetterLocation(
-      'No profitable deals near ${ship.systemSymbol}.',
+      'No profitable deals near ${ship.nav.waypointSymbol}.',
     );
     return waitUntil;
   }
