@@ -625,35 +625,26 @@ class CentralCommand {
 
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
-    return null;
-    // final buyPlan = [
-    //   ShipType.MINING_DRONE,
-    //   ShipType.SIPHON_DRONE,
-    //   ShipType.SURVEYOR,
-    //   ShipType.LIGHT_HAULER,
-    //   ShipType.MINING_DRONE,
-    //   ShipType.SURVEYOR,
-    //   ShipType.SIPHON_DRONE,
-    //   ShipType.LIGHT_HAULER,
-    //   ShipType.MINING_DRONE,
-    //   ShipType.SURVEYOR,
-    //   ShipType.SIPHON_DRONE,
-    //   ShipType.LIGHT_HAULER,
-    //   ShipType.MINING_DRONE,
-    //   ShipType.SURVEYOR,
-    //   ShipType.SIPHON_DRONE,
-    //   ShipType.LIGHT_HAULER,
-    // ];
-    // final shipType = shipToBuyFromPlan(
-    //   buyPlan,
-    //   caches.shipyardPrices,
-    //   caches.static.shipyardShips,
-    // );
-    // if (shipType == null) {
-    //   return null;
-    // }
-    // logger.info('Planning to buy $shipType');
-    // return _findBestPlaceToBuy(caches, shipType);
+    final buyPlan = [
+      ShipType.LIGHT_SHUTTLE,
+      ShipType.MINING_DRONE,
+      ShipType.SIPHON_DRONE,
+      ShipType.SURVEYOR,
+      ShipType.LIGHT_SHUTTLE,
+      ShipType.MINING_DRONE,
+      ShipType.SIPHON_DRONE,
+      ShipType.SURVEYOR,
+    ];
+    final shipType = shipToBuyFromPlan(
+      buyPlan,
+      caches.shipyardPrices,
+      caches.static.shipyardShips,
+    );
+    if (shipType == null) {
+      return null;
+    }
+    logger.info('Planning to buy $shipType');
+    return _findBestPlaceToBuy(caches, shipType);
 
     bool shouldBuy(ShipType shipType, int count) {
       final typeCount =
