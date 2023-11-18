@@ -874,7 +874,7 @@ Future<DateTime?> advanceTrader(
     return result.waitTime;
   }
 
-  final isFeeder = ['26', '23', 'A'].contains(ship.shipSymbol.hexNumber);
+  const isFeeder = false;
 
   // We already have a deal, handle it.
   if (pastDeal != null) {
