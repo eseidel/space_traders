@@ -475,7 +475,8 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is a hauler.
   bool get isHauler =>
       frame.symbol == ShipFrameSymbolEnum.LIGHT_FREIGHTER ||
-      frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER;
+      frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER ||
+      frame.symbol == ShipFrameSymbolEnum.SHUTTLE;
 
   /// Returns true if the ship has a mining mount.
   bool get hasMiningLaser => mountedMiningLasers.isNotEmpty;

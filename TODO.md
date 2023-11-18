@@ -783,3 +783,17 @@ ApiException 400: {"error":{"message":"Agent ESEIDEL already has an active contr
 I think this happened due to time skew with the server during Contact expiration.
 
 Our local check though the contract was expired.  But the server didn't.
+
+# BuyShip job can race:
+
+🛸#1  Purchased SHIP_LIGHT_SHUTTLE for 83,956c -> 🏦 260,176c
+🛸#1  Bought ship: ESEIDEL-4
+[WARN] 🛸#1  Purchased ESEIDEL-4 (SHIP_LIGHT_SHUTTLE)!
+[WARN] Adding missing ship ESEIDEL-4
+[WARN] FleetRole.unknown has no specified behaviors, idling.
+🛸#1  ✍️  shipyard data @ X1-RK11-A2
+🛸#1  Purchased SHIP_LIGHT_SHUTTLE for 88,259c -> 🏦 171,917c
+🛸#1  Bought ship: ESEIDEL-5
+[WARN] 🛸#1  Purchased ESEIDEL-5 (SHIP_LIGHT_SHUTTLE)!
+[WARN] Adding missing ship ESEIDEL-5
+[WARN] FleetRole.unknown has no specified behaviors, idling.
