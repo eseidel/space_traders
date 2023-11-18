@@ -22,6 +22,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketListings = MarketListingCache.load(fs, tradeGoods);
 
   final squads = await assignShipsToSquads(
+    systems,
     waypointCache,
     marketListings,
     shipCache,

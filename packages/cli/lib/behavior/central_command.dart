@@ -523,6 +523,7 @@ class CentralCommand {
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
     final hq = caches.agent.agent.headquartersSymbol;
     miningSquads = await assignShipsToSquads(
+      caches.systems,
       caches.waypoints,
       caches.marketListings,
       _shipCache,
@@ -998,6 +999,7 @@ MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
 
 /// Compute what our current mining squads should be.
 Future<List<MiningSquad>> assignShipsToSquads(
+  SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketListingCache marketListings,
   ShipCache shipCache, {
@@ -1012,6 +1014,22 @@ Future<List<MiningSquad>> assignShipsToSquads(
       .where((m) => m.marketTradesAllProducedGoods)
       .where((m) => m.score < 80)
       .toList();
+
+  // Sort by distance from center of the system.
+  final origin = WaypointPosition(0, 0, systemSymbol);
+  scores.sortBy<num>((score) {
+    final mineWaypoint = systemsCache.waypointFromSymbol(score.mine);
+    final distance = mineWaypoint.position.distanceTo(origin);
+    return distance.toInt();
+  });
+  for (final score in scores) {
+    final mineWaypoint = systemsCache.waypointFromSymbol(score.mine);
+    final distance = mineWaypoint.position.distanceTo(origin);
+    logger.info(
+      'Mining score: ${score.score} ${score.mine} ${score.market} '
+      '${score.marketTradesAllProducedGoods} ${distance.toInt()}',
+    );
+  }
   // Divide our current ships into N squads.
   final squads = List.generate(scores.length, (index) {
     final score = scores[index];
