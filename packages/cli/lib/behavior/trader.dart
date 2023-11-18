@@ -105,17 +105,14 @@ Future<DateTime?> _handleAtSourceWithDeal(
   Ship ship,
   BehaviorState state,
   Market currentMarket,
-  CostedDeal costedDeal, {
-  required bool isFeeder,
-}) async {
+  CostedDeal costedDeal,
+) async {
   final dealTradeSymbol = costedDeal.tradeSymbol;
   final good = currentMarket.marketTradeGood(dealTradeSymbol)!;
 
-  final maxPerUnitPrice = isFeeder ? null : costedDeal.maxPurchaseUnitPrice;
+  final maxPerUnitPrice = costedDeal.maxPurchaseUnitPrice;
   final nextExpectedPrice = costedDeal.predictNextPurchasePrice;
-  // TODO(eseidel): Move "isFeeder" down into CostedDeal.
-  // If we don't do this, unitsToPurchase returns 0 for negative profit deals.
-  final maxUnits = isFeeder ? ship.availableSpace : costedDeal.maxUnitsToBuy;
+  final maxUnits = costedDeal.maxUnitsToBuy;
 
   // Could this get confused by having other cargo in our hold?
   final units = unitsToPurchase(good, ship, maxUnits);
@@ -568,9 +565,8 @@ Future<DateTime?> _handleDeal(
   CostedDeal costedDeal,
   Ship ship,
   BehaviorState state,
-  Market? currentMarket, {
-  required bool isFeeder,
-}) async {
+  Market? currentMarket,
+) async {
   // If we're at the source buy the cargo.
   if (costedDeal.deal.sourceSymbol == ship.waypointSymbol) {
     if (currentMarket == null) {
@@ -587,7 +583,6 @@ Future<DateTime?> _handleDeal(
       state,
       currentMarket,
       costedDeal,
-      isFeeder: isFeeder,
     );
   }
   // If we're at the destination of the deal, sell.
@@ -874,8 +869,6 @@ Future<DateTime?> advanceTrader(
     return result.waitTime;
   }
 
-  const isFeeder = false;
-
   // We already have a deal, handle it.
   if (pastDeal != null) {
     final waitUntil = await _handleDeal(
@@ -887,49 +880,23 @@ Future<DateTime?> advanceTrader(
       ship,
       state,
       currentMarket,
-      isFeeder: isFeeder,
     );
     return waitUntil;
   }
 
   // We don't have a current deal, so get a new one:
   // Consider all deals starting at any market within our consideration range.
-  final CostedDeal? newDeal;
-  if (!isFeeder) {
-    newDeal = centralCommand.findNextDealAndLog(
-      caches.agent,
-      caches.construction,
-      caches.contracts,
-      caches.marketPrices,
-      caches.systems,
-      caches.routePlanner,
-      ship,
-      maxWaypoints: _maxWaypoints,
-      maxTotalOutlay: caches.agent.agent.credits,
-    );
-  } else {
-    shipWarn(ship, 'Getting feeder deal.');
-    final waypointSymbol = WaypointSymbol.fromString('X1-QP91-F52');
-    final tradeSymbols = [
-      TradeSymbol.IRON,
-      TradeSymbol.QUARTZ_SAND,
-      TradeSymbol.PLASTICS,
-    ];
-    newDeal = centralCommand.findNextFeederDeal(
-      caches.agent,
-      caches.construction,
-      caches.contracts,
-      caches.marketPrices,
-      caches.systems,
-      caches.routePlanner,
-      ship,
-      waypointSymbol: waypointSymbol,
-      tradeSymbols: tradeSymbols,
-      desiredSupply: SupplyLevel.ABUNDANT,
-      maxTotalOutlay: caches.agent.agent.credits,
-      maxWaypoints: _maxWaypoints,
-    );
-  }
+  final newDeal = centralCommand.findNextDealAndLog(
+    caches.agent,
+    caches.construction,
+    caches.contracts,
+    caches.marketPrices,
+    caches.systems,
+    caches.routePlanner,
+    ship,
+    maxWaypoints: _maxWaypoints,
+    maxTotalOutlay: caches.agent.agent.credits,
+  );
 
   Future<DateTime?> findBetterLocation(String why) async {
     final waitUntil = await _navigateToBetterTradeLocation(
@@ -950,7 +917,7 @@ Future<DateTime?> advanceTrader(
     );
     return waitUntil;
   }
-  if (!isFeeder &&
+  if (!newDeal.isFeeder &&
       newDeal.expectedProfitPerSecond <
           centralCommand.expectedCreditsPerSecond(ship)) {
     final waitUntil =
@@ -970,7 +937,6 @@ Future<DateTime?> advanceTrader(
     ship,
     state,
     currentMarket,
-    isFeeder: isFeeder,
   );
   return waitUntil;
 }

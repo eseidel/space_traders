@@ -118,7 +118,7 @@ extension CostedDealPrediction on CostedDeal {
   /// more unit yet that unit not being worth carrying in an otherwise empty
   /// ship.
   int get expectedUnits {
-    if (isContractDeal || isConstructionDeal) {
+    if (isContractDeal || isConstructionDeal || isFeeder) {
       return cargoSize;
     }
     return min(
@@ -180,8 +180,13 @@ extension CostedDealPrediction on CostedDeal {
   }
 
   /// Max we would spend per unit and still expect to break even.
-  int get maxPurchaseUnitPrice =>
-      (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
+  int? get maxPurchaseUnitPrice {
+    if (deal.isFeeder) {
+      // We will spend any amount in a feeder deal.
+      return null;
+    }
+    return (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
+  }
 
   // This does not acount for any expected profit.
   /// The expected per-unit purchase price for the next lot of units.

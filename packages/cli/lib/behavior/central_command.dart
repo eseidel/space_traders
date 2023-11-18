@@ -46,16 +46,11 @@ class CentralCommand {
   /// BehaviorStates with jobs when handing them out to ships.
   ShipBuyJob? _nextShipBuyJob;
 
-  /// The current construction job.
-  Construction? _activeConstruction;
+  /// The current construction job.  Visible so that a script can set it.
+  Construction? activeConstruction;
 
   /// The current mining squads.
   List<MiningSquad> miningSquads = [];
-
-  /// The current construction job, temporary hack.
-  void setActiveConstruction(Construction? construction) {
-    _activeConstruction = construction;
-  }
 
   /// Mounts we know of a place we can buy.
   final Set<ShipMountSymbolEnum> _availableMounts = {};
@@ -79,6 +74,7 @@ class CentralCommand {
   /// trading.
   bool get isContractTradingEnabled => true;
 
+  /// Returns true if construction trading is enabled.
   bool get isConstructionTradingEnabled => false;
 
   /// Minimum profit per second we expect this ship to make.
@@ -236,18 +232,40 @@ class CentralCommand {
 
   /// SellOpps to complete the current construction job.
   Iterable<SellOpp> constructionSellOpps() {
-    if (_activeConstruction == null) {
+    if (activeConstruction == null) {
       return [];
     }
     return sellOppsForConstruction(
-      _activeConstruction!,
+      activeConstruction!,
       remainingUnitsNeeded: (tradeSymbol) {
         return remainingUnitsNeededForConstruction(
-          _activeConstruction!,
+          activeConstruction!,
           tradeSymbol,
         );
       },
     );
+  }
+
+  /// SellOpps to complete the current construction job.
+  Iterable<SellOpp> feederOpps(MarketPrices marketPrices) sync* {
+    final waypointSymbol = WaypointSymbol.fromString('X1-QP91-F52');
+    final tradeSymbols = [
+      TradeSymbol.IRON,
+      TradeSymbol.QUARTZ_SAND,
+      TradeSymbol.PLASTICS,
+    ];
+    const desiredSupply = SupplyLevel.ABUNDANT;
+    for (final tradeSymbol in tradeSymbols) {
+      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
+      if (price == null) {
+        continue;
+      }
+      if (SupplyLevel.values.indexOf(price.supply) >=
+          SupplyLevel.values.indexOf(desiredSupply)) {
+        continue;
+      }
+      yield SellOpp.fromMarketPrice(price, isFeeder: true);
+    }
   }
 
   /// Returns a deal filter function which avoids deals in progress.
@@ -534,7 +552,7 @@ class CentralCommand {
     updateAvailableMounts(caches.marketPrices);
     await _queueMountRequests(caches);
 
-    _activeConstruction = _computeActiveConstruction(caches);
+    activeConstruction = _computeActiveConstruction(caches);
     _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(caches);
   }
 
@@ -645,39 +663,6 @@ class CentralCommand {
     }
     logger.info('Planning to buy $shipType');
     return _findBestPlaceToBuy(caches, shipType);
-
-    bool shouldBuy(ShipType shipType, int count) {
-      final typeCount =
-          _shipCache.countOfType(caches.static.shipyardShips, shipType) ?? 0;
-      return caches.shipyardPrices.havePriceFor(shipType) && typeCount < count;
-    }
-
-    final squadCount = miningSquads.length;
-
-    if (shouldBuy(ShipType.LIGHT_HAULER, 15)) {
-      return _findBestPlaceToBuy(caches, ShipType.LIGHT_HAULER);
-    }
-    // // These numbers should be based on squad sizes so that we always have
-    // // full squads.
-    // if (shouldBuy(ShipType.ORE_HOUND, 10)) {
-    //   return _findBestPlaceToBuy(caches, ShipType.ORE_HOUND);
-    // }
-    if (shouldBuy(ShipType.MINING_DRONE, squadCount * 3)) {
-      return _findBestPlaceToBuy(caches, ShipType.MINING_DRONE);
-    }
-    // if (shouldBuy(ShipType.SIPHON_DRONE, 10)) {
-    //   return _findBestPlaceToBuy(caches, ShipType.SIPHON_DRONE);
-    // }
-    if (shouldBuy(ShipType.SURVEYOR, squadCount)) {
-      return _findBestPlaceToBuy(caches, ShipType.SURVEYOR);
-    }
-    // if (shouldBuy(ShipType.HEAVY_FREIGHTER, 10)) {
-    //   return _findBestPlaceToBuy(caches, ShipType.HEAVY_FREIGHTER);
-    // }
-    // if (shouldBuy(ShipType.PROBE, 3)) {
-    //   return _findBestPlaceToBuy(caches, ShipType.PROBE);
-    // }
-    return null;
   }
 
   /// Returns true if [ship] should start the buyShip behavior.

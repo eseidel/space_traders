@@ -40,7 +40,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final jumpGate = systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
   final construction =
       constructionCache.constructionForSymbol(jumpGate.waypointSymbol);
-  centralCommand.setActiveConstruction(construction);
+  centralCommand.activeConstruction = construction;
   extraSellOpps.addAll(centralCommand.constructionSellOpps());
 
   final ship = staticCaches.shipyardShips[shipType]!;

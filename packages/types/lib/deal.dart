@@ -101,6 +101,9 @@ class Deal {
   /// Whether this deal is a construction deal.
   bool get isConstructionDelivery => destination.isConstructionDelivery;
 
+  /// Whether this deal is a feeder deal allowed to go negative.
+  bool get isFeeder => destination.isFeeder;
+
   /// Encode the deal as JSON.
   Map<String, dynamic> toJson() => {
         'source': source.toJson(),
@@ -162,6 +165,9 @@ class CostedDeal {
 
   /// Whether this deal is a construction deal.
   bool get isConstructionDeal => deal.isConstructionDelivery;
+
+  /// Whether this deal is a feeder deal allowed to go negative.
+  bool get isFeeder => deal.isFeeder;
 
   /// The deal being considered.
   final Deal deal;

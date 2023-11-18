@@ -46,8 +46,10 @@ class BuyOpp {
 @immutable
 class SellOpp {
   /// Create a new SellOpp from a MarketPrice.
-  SellOpp.fromMarketPrice(MarketPrice this.marketPrice)
-      : waypointSymbol = marketPrice.waypointSymbol,
+  SellOpp.fromMarketPrice(
+    MarketPrice this.marketPrice, {
+    this.isFeeder = false,
+  })  : waypointSymbol = marketPrice.waypointSymbol,
         tradeSymbol = marketPrice.tradeSymbol,
         price = marketPrice.sellPrice,
         contractId = null,
@@ -60,7 +62,8 @@ class SellOpp {
     required this.price,
     required this.contractId,
     required this.maxUnits,
-  }) : marketPrice = null;
+  })  : marketPrice = null,
+        isFeeder = false;
 
   /// Create a new SellOpp from a construction.
   const SellOpp.fromConstruction({
@@ -69,7 +72,8 @@ class SellOpp {
     required this.price,
     required this.maxUnits,
   })  : marketPrice = null,
-        contractId = null;
+        contractId = null,
+        isFeeder = false;
 
   /// Create a new SellOpp from JSON.
   SellOpp.fromJson(Map<String, dynamic> json)
@@ -82,7 +86,8 @@ class SellOpp {
         tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
         price = json['price'] as int,
         contractId = json['contractId'] as String?,
-        maxUnits = json['maxUnits'] as int?;
+        maxUnits = json['maxUnits'] as int?,
+        isFeeder = json['isFeeder'] as bool? ?? false;
 
   /// State of the market where this sell opportunity was found.
   final MarketPrice? marketPrice;
@@ -98,6 +103,9 @@ class SellOpp {
 
   /// Set to the contractId for contract deliveries.
   final String? contractId;
+
+  /// True if this is a market feeding job (allowed to go negative).
+  final bool isFeeder;
 
   /// True if this is a contract delivery.
   bool get isContractDelivery => contractId != null;
