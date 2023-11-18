@@ -66,8 +66,9 @@ part 'model/extract_resources_request.dart';
 part 'model/extraction.dart';
 part 'model/extraction_yield.dart';
 part 'model/faction.dart';
-part 'model/faction_symbols.dart';
+part 'model/faction_symbol.dart';
 part 'model/faction_trait.dart';
+part 'model/faction_trait_symbol.dart';
 part 'model/fulfill_contract200_response.dart';
 part 'model/get_agents200_response.dart';
 part 'model/get_construction200_response.dart';
@@ -197,6 +198,7 @@ part 'model/waypoint_faction.dart';
 part 'model/waypoint_modifier.dart';
 part 'model/waypoint_orbital.dart';
 part 'model/waypoint_trait.dart';
+part 'model/waypoint_trait_symbol.dart';
 part 'model/waypoint_type.dart';
 
 const _delimiters = {'csv': ',', 'ssv': ' ', 'tsv': '\t', 'pipes': '|'};

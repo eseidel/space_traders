@@ -10,7 +10,7 @@
 
 part of openapi;
 
-/// The type of waypoint.
+/// The type of system.
 class SystemType {
   /// Instantiate a new enum with the provided [value].
   const SystemType._(this.value);

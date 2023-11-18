@@ -8,7 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | [**FactionSymbols**](FactionSymbols.md) |  | 
+**symbol** | [**FactionSymbol**](FactionSymbol.md) |  | 
 **name** | **String** | Name of the faction. | 
 **description** | **String** | Description of the faction. | 
 **headquarters** | **String** | The waypoint in which the faction's HQ is located in. | 

@@ -23,7 +23,6 @@ class TradeSymbol {
 
   String toJson() => value;
 
-  static const FAB_MATS = TradeSymbol._(r'FAB_MATS');
   static const PRECIOUS_STONES = TradeSymbol._(r'PRECIOUS_STONES');
   static const QUARTZ_SAND = TradeSymbol._(r'QUARTZ_SAND');
   static const SILICON_CRYSTALS = TradeSymbol._(r'SILICON_CRYSTALS');
@@ -53,6 +52,7 @@ class TradeSymbol {
   static const MERITIUM_ORE = TradeSymbol._(r'MERITIUM_ORE');
   static const HYDROCARBON = TradeSymbol._(r'HYDROCARBON');
   static const ANTIMATTER = TradeSymbol._(r'ANTIMATTER');
+  static const FAB_MATS = TradeSymbol._(r'FAB_MATS');
   static const FERTILIZERS = TradeSymbol._(r'FERTILIZERS');
   static const FABRICS = TradeSymbol._(r'FABRICS');
   static const FOOD = TradeSymbol._(r'FOOD');
@@ -74,9 +74,9 @@ class TradeSymbol {
   static const CLOTHING = TradeSymbol._(r'CLOTHING');
   static const MICROPROCESSORS = TradeSymbol._(r'MICROPROCESSORS');
   static const PLASTICS = TradeSymbol._(r'PLASTICS');
-  static const QUANTUM_STABILIZERS = TradeSymbol._(r'QUANTUM_STABILIZERS');
   static const POLYNUCLEOTIDES = TradeSymbol._(r'POLYNUCLEOTIDES');
   static const BIOCOMPOSITES = TradeSymbol._(r'BIOCOMPOSITES');
+  static const QUANTUM_STABILIZERS = TradeSymbol._(r'QUANTUM_STABILIZERS');
   static const NANOBOTS = TradeSymbol._(r'NANOBOTS');
   static const AI_MAINFRAMES = TradeSymbol._(r'AI_MAINFRAMES');
   static const QUANTUM_DRIVES = TradeSymbol._(r'QUANTUM_DRIVES');
@@ -96,6 +96,21 @@ class TradeSymbol {
   static const NOVEL_LIFEFORMS = TradeSymbol._(r'NOVEL_LIFEFORMS');
   static const BOTANICAL_SPECIMENS = TradeSymbol._(r'BOTANICAL_SPECIMENS');
   static const CULTURAL_ARTIFACTS = TradeSymbol._(r'CULTURAL_ARTIFACTS');
+  static const FRAME_PROBE = TradeSymbol._(r'FRAME_PROBE');
+  static const FRAME_DRONE = TradeSymbol._(r'FRAME_DRONE');
+  static const FRAME_INTERCEPTOR = TradeSymbol._(r'FRAME_INTERCEPTOR');
+  static const FRAME_RACER = TradeSymbol._(r'FRAME_RACER');
+  static const FRAME_FIGHTER = TradeSymbol._(r'FRAME_FIGHTER');
+  static const FRAME_FRIGATE = TradeSymbol._(r'FRAME_FRIGATE');
+  static const FRAME_SHUTTLE = TradeSymbol._(r'FRAME_SHUTTLE');
+  static const FRAME_EXPLORER = TradeSymbol._(r'FRAME_EXPLORER');
+  static const FRAME_MINER = TradeSymbol._(r'FRAME_MINER');
+  static const FRAME_LIGHT_FREIGHTER = TradeSymbol._(r'FRAME_LIGHT_FREIGHTER');
+  static const FRAME_HEAVY_FREIGHTER = TradeSymbol._(r'FRAME_HEAVY_FREIGHTER');
+  static const FRAME_TRANSPORT = TradeSymbol._(r'FRAME_TRANSPORT');
+  static const FRAME_DESTROYER = TradeSymbol._(r'FRAME_DESTROYER');
+  static const FRAME_CRUISER = TradeSymbol._(r'FRAME_CRUISER');
+  static const FRAME_CARRIER = TradeSymbol._(r'FRAME_CARRIER');
   static const REACTOR_SOLAR_I = TradeSymbol._(r'REACTOR_SOLAR_I');
   static const REACTOR_FUSION_I = TradeSymbol._(r'REACTOR_FUSION_I');
   static const REACTOR_FISSION_I = TradeSymbol._(r'REACTOR_FISSION_I');
@@ -121,9 +136,6 @@ class TradeSymbol {
       TradeSymbol._(r'MODULE_PASSENGER_CABIN_I');
   static const MODULE_MICRO_REFINERY_I =
       TradeSymbol._(r'MODULE_MICRO_REFINERY_I');
-  static const MODULE_ORE_REFINERY_I = TradeSymbol._(r'MODULE_ORE_REFINERY_I');
-  static const MODULE_FUEL_REFINERY_I =
-      TradeSymbol._(r'MODULE_FUEL_REFINERY_I');
   static const MODULE_SCIENCE_LAB_I = TradeSymbol._(r'MODULE_SCIENCE_LAB_I');
   static const MODULE_JUMP_DRIVE_I = TradeSymbol._(r'MODULE_JUMP_DRIVE_I');
   static const MODULE_JUMP_DRIVE_II = TradeSymbol._(r'MODULE_JUMP_DRIVE_II');
@@ -135,6 +147,9 @@ class TradeSymbol {
       TradeSymbol._(r'MODULE_SHIELD_GENERATOR_I');
   static const MODULE_SHIELD_GENERATOR_II =
       TradeSymbol._(r'MODULE_SHIELD_GENERATOR_II');
+  static const MODULE_ORE_REFINERY_I = TradeSymbol._(r'MODULE_ORE_REFINERY_I');
+  static const MODULE_FUEL_REFINERY_I =
+      TradeSymbol._(r'MODULE_FUEL_REFINERY_I');
   static const MOUNT_GAS_SIPHON_I = TradeSymbol._(r'MOUNT_GAS_SIPHON_I');
   static const MOUNT_GAS_SIPHON_II = TradeSymbol._(r'MOUNT_GAS_SIPHON_II');
   static const MOUNT_GAS_SIPHON_III = TradeSymbol._(r'MOUNT_GAS_SIPHON_III');
@@ -153,10 +168,22 @@ class TradeSymbol {
   static const MOUNT_MISSILE_LAUNCHER_I =
       TradeSymbol._(r'MOUNT_MISSILE_LAUNCHER_I');
   static const MOUNT_TURRET_I = TradeSymbol._(r'MOUNT_TURRET_I');
+  static const SHIP_PROBE = TradeSymbol._(r'SHIP_PROBE');
+  static const SHIP_MINING_DRONE = TradeSymbol._(r'SHIP_MINING_DRONE');
+  static const SHIP_SIPHON_DRONE = TradeSymbol._(r'SHIP_SIPHON_DRONE');
+  static const SHIP_INTERCEPTOR = TradeSymbol._(r'SHIP_INTERCEPTOR');
+  static const SHIP_LIGHT_HAULER = TradeSymbol._(r'SHIP_LIGHT_HAULER');
+  static const SHIP_COMMAND_FRIGATE = TradeSymbol._(r'SHIP_COMMAND_FRIGATE');
+  static const SHIP_EXPLORER = TradeSymbol._(r'SHIP_EXPLORER');
+  static const SHIP_HEAVY_FREIGHTER = TradeSymbol._(r'SHIP_HEAVY_FREIGHTER');
+  static const SHIP_LIGHT_SHUTTLE = TradeSymbol._(r'SHIP_LIGHT_SHUTTLE');
+  static const SHIP_ORE_HOUND = TradeSymbol._(r'SHIP_ORE_HOUND');
+  static const SHIP_REFINING_FREIGHTER =
+      TradeSymbol._(r'SHIP_REFINING_FREIGHTER');
+  static const SHIP_SURVEYOR = TradeSymbol._(r'SHIP_SURVEYOR');
 
   /// List of all possible values in this [enum][TradeSymbol].
   static const values = <TradeSymbol>[
-    FAB_MATS,
     PRECIOUS_STONES,
     QUARTZ_SAND,
     SILICON_CRYSTALS,
@@ -186,6 +213,7 @@ class TradeSymbol {
     MERITIUM_ORE,
     HYDROCARBON,
     ANTIMATTER,
+    FAB_MATS,
     FERTILIZERS,
     FABRICS,
     FOOD,
@@ -207,9 +235,9 @@ class TradeSymbol {
     CLOTHING,
     MICROPROCESSORS,
     PLASTICS,
-    QUANTUM_STABILIZERS,
     POLYNUCLEOTIDES,
     BIOCOMPOSITES,
+    QUANTUM_STABILIZERS,
     NANOBOTS,
     AI_MAINFRAMES,
     QUANTUM_DRIVES,
@@ -228,6 +256,21 @@ class TradeSymbol {
     NOVEL_LIFEFORMS,
     BOTANICAL_SPECIMENS,
     CULTURAL_ARTIFACTS,
+    FRAME_PROBE,
+    FRAME_DRONE,
+    FRAME_INTERCEPTOR,
+    FRAME_RACER,
+    FRAME_FIGHTER,
+    FRAME_FRIGATE,
+    FRAME_SHUTTLE,
+    FRAME_EXPLORER,
+    FRAME_MINER,
+    FRAME_LIGHT_FREIGHTER,
+    FRAME_HEAVY_FREIGHTER,
+    FRAME_TRANSPORT,
+    FRAME_DESTROYER,
+    FRAME_CRUISER,
+    FRAME_CARRIER,
     REACTOR_SOLAR_I,
     REACTOR_FUSION_I,
     REACTOR_FISSION_I,
@@ -246,8 +289,6 @@ class TradeSymbol {
     MODULE_ENVOY_QUARTERS_I,
     MODULE_PASSENGER_CABIN_I,
     MODULE_MICRO_REFINERY_I,
-    MODULE_ORE_REFINERY_I,
-    MODULE_FUEL_REFINERY_I,
     MODULE_SCIENCE_LAB_I,
     MODULE_JUMP_DRIVE_I,
     MODULE_JUMP_DRIVE_II,
@@ -257,6 +298,8 @@ class TradeSymbol {
     MODULE_WARP_DRIVE_III,
     MODULE_SHIELD_GENERATOR_I,
     MODULE_SHIELD_GENERATOR_II,
+    MODULE_ORE_REFINERY_I,
+    MODULE_FUEL_REFINERY_I,
     MOUNT_GAS_SIPHON_I,
     MOUNT_GAS_SIPHON_II,
     MOUNT_GAS_SIPHON_III,
@@ -272,6 +315,18 @@ class TradeSymbol {
     MOUNT_LASER_CANNON_I,
     MOUNT_MISSILE_LAUNCHER_I,
     MOUNT_TURRET_I,
+    SHIP_PROBE,
+    SHIP_MINING_DRONE,
+    SHIP_SIPHON_DRONE,
+    SHIP_INTERCEPTOR,
+    SHIP_LIGHT_HAULER,
+    SHIP_COMMAND_FRIGATE,
+    SHIP_EXPLORER,
+    SHIP_HEAVY_FREIGHTER,
+    SHIP_LIGHT_SHUTTLE,
+    SHIP_ORE_HOUND,
+    SHIP_REFINING_FREIGHTER,
+    SHIP_SURVEYOR,
   ];
 
   static TradeSymbol? fromJson(dynamic value) =>
@@ -315,8 +370,6 @@ class TradeSymbolTypeTransformer {
   TradeSymbol? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'FAB_MATS':
-          return TradeSymbol.FAB_MATS;
         case r'PRECIOUS_STONES':
           return TradeSymbol.PRECIOUS_STONES;
         case r'QUARTZ_SAND':
@@ -375,6 +428,8 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.HYDROCARBON;
         case r'ANTIMATTER':
           return TradeSymbol.ANTIMATTER;
+        case r'FAB_MATS':
+          return TradeSymbol.FAB_MATS;
         case r'FERTILIZERS':
           return TradeSymbol.FERTILIZERS;
         case r'FABRICS':
@@ -417,12 +472,12 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.MICROPROCESSORS;
         case r'PLASTICS':
           return TradeSymbol.PLASTICS;
-        case r'QUANTUM_STABILIZERS':
-          return TradeSymbol.QUANTUM_STABILIZERS;
         case r'POLYNUCLEOTIDES':
           return TradeSymbol.POLYNUCLEOTIDES;
         case r'BIOCOMPOSITES':
           return TradeSymbol.BIOCOMPOSITES;
+        case r'QUANTUM_STABILIZERS':
+          return TradeSymbol.QUANTUM_STABILIZERS;
         case r'NANOBOTS':
           return TradeSymbol.NANOBOTS;
         case r'AI_MAINFRAMES':
@@ -459,6 +514,36 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.BOTANICAL_SPECIMENS;
         case r'CULTURAL_ARTIFACTS':
           return TradeSymbol.CULTURAL_ARTIFACTS;
+        case r'FRAME_PROBE':
+          return TradeSymbol.FRAME_PROBE;
+        case r'FRAME_DRONE':
+          return TradeSymbol.FRAME_DRONE;
+        case r'FRAME_INTERCEPTOR':
+          return TradeSymbol.FRAME_INTERCEPTOR;
+        case r'FRAME_RACER':
+          return TradeSymbol.FRAME_RACER;
+        case r'FRAME_FIGHTER':
+          return TradeSymbol.FRAME_FIGHTER;
+        case r'FRAME_FRIGATE':
+          return TradeSymbol.FRAME_FRIGATE;
+        case r'FRAME_SHUTTLE':
+          return TradeSymbol.FRAME_SHUTTLE;
+        case r'FRAME_EXPLORER':
+          return TradeSymbol.FRAME_EXPLORER;
+        case r'FRAME_MINER':
+          return TradeSymbol.FRAME_MINER;
+        case r'FRAME_LIGHT_FREIGHTER':
+          return TradeSymbol.FRAME_LIGHT_FREIGHTER;
+        case r'FRAME_HEAVY_FREIGHTER':
+          return TradeSymbol.FRAME_HEAVY_FREIGHTER;
+        case r'FRAME_TRANSPORT':
+          return TradeSymbol.FRAME_TRANSPORT;
+        case r'FRAME_DESTROYER':
+          return TradeSymbol.FRAME_DESTROYER;
+        case r'FRAME_CRUISER':
+          return TradeSymbol.FRAME_CRUISER;
+        case r'FRAME_CARRIER':
+          return TradeSymbol.FRAME_CARRIER;
         case r'REACTOR_SOLAR_I':
           return TradeSymbol.REACTOR_SOLAR_I;
         case r'REACTOR_FUSION_I':
@@ -495,10 +580,6 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.MODULE_PASSENGER_CABIN_I;
         case r'MODULE_MICRO_REFINERY_I':
           return TradeSymbol.MODULE_MICRO_REFINERY_I;
-        case r'MODULE_ORE_REFINERY_I':
-          return TradeSymbol.MODULE_ORE_REFINERY_I;
-        case r'MODULE_FUEL_REFINERY_I':
-          return TradeSymbol.MODULE_FUEL_REFINERY_I;
         case r'MODULE_SCIENCE_LAB_I':
           return TradeSymbol.MODULE_SCIENCE_LAB_I;
         case r'MODULE_JUMP_DRIVE_I':
@@ -517,6 +598,10 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.MODULE_SHIELD_GENERATOR_I;
         case r'MODULE_SHIELD_GENERATOR_II':
           return TradeSymbol.MODULE_SHIELD_GENERATOR_II;
+        case r'MODULE_ORE_REFINERY_I':
+          return TradeSymbol.MODULE_ORE_REFINERY_I;
+        case r'MODULE_FUEL_REFINERY_I':
+          return TradeSymbol.MODULE_FUEL_REFINERY_I;
         case r'MOUNT_GAS_SIPHON_I':
           return TradeSymbol.MOUNT_GAS_SIPHON_I;
         case r'MOUNT_GAS_SIPHON_II':
@@ -547,6 +632,30 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.MOUNT_MISSILE_LAUNCHER_I;
         case r'MOUNT_TURRET_I':
           return TradeSymbol.MOUNT_TURRET_I;
+        case r'SHIP_PROBE':
+          return TradeSymbol.SHIP_PROBE;
+        case r'SHIP_MINING_DRONE':
+          return TradeSymbol.SHIP_MINING_DRONE;
+        case r'SHIP_SIPHON_DRONE':
+          return TradeSymbol.SHIP_SIPHON_DRONE;
+        case r'SHIP_INTERCEPTOR':
+          return TradeSymbol.SHIP_INTERCEPTOR;
+        case r'SHIP_LIGHT_HAULER':
+          return TradeSymbol.SHIP_LIGHT_HAULER;
+        case r'SHIP_COMMAND_FRIGATE':
+          return TradeSymbol.SHIP_COMMAND_FRIGATE;
+        case r'SHIP_EXPLORER':
+          return TradeSymbol.SHIP_EXPLORER;
+        case r'SHIP_HEAVY_FREIGHTER':
+          return TradeSymbol.SHIP_HEAVY_FREIGHTER;
+        case r'SHIP_LIGHT_SHUTTLE':
+          return TradeSymbol.SHIP_LIGHT_SHUTTLE;
+        case r'SHIP_ORE_HOUND':
+          return TradeSymbol.SHIP_ORE_HOUND;
+        case r'SHIP_REFINING_FREIGHTER':
+          return TradeSymbol.SHIP_REFINING_FREIGHTER;
+        case r'SHIP_SURVEYOR':
+          return TradeSymbol.SHIP_SURVEYOR;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

@@ -1,4 +1,4 @@
-# openapi.model.GetSystemWaypointsTraitsParameter
+# openapi.model.FactionTraitSymbol
 
 ## Load the model package
 ```dart

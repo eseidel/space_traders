@@ -1,4 +1,4 @@
-# openapi.model.FactionSymbols
+# openapi.model.FactionSymbol
 
 ## Load the model package
 ```dart

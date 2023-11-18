@@ -10,7 +10,7 @@
 
 part of openapi;
 
-/// The activity level of a trade good. If the good is an import, this represents how strong consumption is for the good. If the good is an export, this represents how strong the production is for the good.
+/// The activity level of a trade good. If the good is an import, this represents how strong consumption is. If the good is an export, this represents how strong the production is for the good. When activity is strong, consumption or production is near maximum capacity. When activity is weak, consumption or production is near minimum capacity.
 class ActivityLevel {
   /// Instantiate a new enum with the provided [value].
   const ActivityLevel._(this.value);
@@ -26,12 +26,14 @@ class ActivityLevel {
   static const WEAK = ActivityLevel._(r'WEAK');
   static const GROWING = ActivityLevel._(r'GROWING');
   static const STRONG = ActivityLevel._(r'STRONG');
+  static const RESTRICTED = ActivityLevel._(r'RESTRICTED');
 
   /// List of all possible values in this [enum][ActivityLevel].
   static const values = <ActivityLevel>[
     WEAK,
     GROWING,
     STRONG,
+    RESTRICTED,
   ];
 
   static ActivityLevel? fromJson(dynamic value) =>
@@ -81,6 +83,8 @@ class ActivityLevelTypeTransformer {
           return ActivityLevel.GROWING;
         case r'STRONG':
           return ActivityLevel.STRONG;
+        case r'RESTRICTED':
+          return ActivityLevel.RESTRICTED;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

@@ -38,8 +38,9 @@ doc/ExtractResourcesRequest.md
 doc/Extraction.md
 doc/ExtractionYield.md
 doc/Faction.md
-doc/FactionSymbols.md
+doc/FactionSymbol.md
 doc/FactionTrait.md
+doc/FactionTraitSymbol.md
 doc/FactionsApi.md
 doc/FleetApi.md
 doc/FulfillContract200Response.md
@@ -172,6 +173,7 @@ doc/WaypointFaction.md
 doc/WaypointModifier.md
 doc/WaypointOrbital.md
 doc/WaypointTrait.md
+doc/WaypointTraitSymbol.md
 doc/WaypointType.md
 git_push.sh
 lib/api.dart
@@ -221,8 +223,9 @@ lib/model/extract_resources_request.dart
 lib/model/extraction.dart
 lib/model/extraction_yield.dart
 lib/model/faction.dart
-lib/model/faction_symbols.dart
+lib/model/faction_symbol.dart
 lib/model/faction_trait.dart
+lib/model/faction_trait_symbol.dart
 lib/model/fulfill_contract200_response.dart
 lib/model/get_agents200_response.dart
 lib/model/get_construction200_response.dart
@@ -352,6 +355,7 @@ lib/model/waypoint_faction.dart
 lib/model/waypoint_modifier.dart
 lib/model/waypoint_orbital.dart
 lib/model/waypoint_trait.dart
+lib/model/waypoint_trait_symbol.dart
 lib/model/waypoint_type.dart
 pubspec.yaml
 test/accept_contract200_response_data_test.dart
@@ -388,8 +392,9 @@ test/extract_resources201_response_test.dart
 test/extract_resources_request_test.dart
 test/extraction_test.dart
 test/extraction_yield_test.dart
-test/faction_symbols_test.dart
+test/faction_symbol_test.dart
 test/faction_test.dart
+test/faction_trait_symbol_test.dart
 test/faction_trait_test.dart
 test/factions_api_test.dart
 test/fleet_api_test.dart
@@ -522,5 +527,6 @@ test/waypoint_faction_test.dart
 test/waypoint_modifier_test.dart
 test/waypoint_orbital_test.dart
 test/waypoint_test.dart
+test/waypoint_trait_symbol_test.dart
 test/waypoint_trait_test.dart
 test/waypoint_type_test.dart

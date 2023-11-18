@@ -16,7 +16,7 @@ class SystemFaction {
     required this.symbol,
   });
 
-  FactionSymbols symbol;
+  FactionSymbol symbol;
 
   @override
   bool operator ==(Object other) =>
@@ -58,7 +58,7 @@ class SystemFaction {
       }());
 
       return SystemFaction(
-        symbol: FactionSymbols.fromJson(json[r'symbol'])!,
+        symbol: FactionSymbol.fromJson(json[r'symbol'])!,
       );
     }
     return null;

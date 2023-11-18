@@ -68,8 +68,11 @@ String parameterToString(dynamic value) {
   if (value is ActivityLevel) {
     return ActivityLevelTypeTransformer().encode(value).toString();
   }
-  if (value is FactionSymbols) {
-    return FactionSymbolsTypeTransformer().encode(value).toString();
+  if (value is FactionSymbol) {
+    return FactionSymbolTypeTransformer().encode(value).toString();
+  }
+  if (value is FactionTraitSymbol) {
+    return FactionTraitSymbolTypeTransformer().encode(value).toString();
   }
   if (value is ShipNavFlightMode) {
     return ShipNavFlightModeTypeTransformer().encode(value).toString();
@@ -91,6 +94,9 @@ String parameterToString(dynamic value) {
   }
   if (value is TradeSymbol) {
     return TradeSymbolTypeTransformer().encode(value).toString();
+  }
+  if (value is WaypointTraitSymbol) {
+    return WaypointTraitSymbolTypeTransformer().encode(value).toString();
   }
   if (value is WaypointType) {
     return WaypointTypeTypeTransformer().encode(value).toString();

@@ -18,7 +18,7 @@ class RegisterRequest {
     this.email,
   });
 
-  FactionSymbols faction;
+  FactionSymbol faction;
 
   /// Your desired agent symbol. This will be a unique name used to represent your agent, and will be the prefix for your ships.
   String symbol;
@@ -84,7 +84,7 @@ class RegisterRequest {
       }());
 
       return RegisterRequest(
-        faction: FactionSymbols.fromJson(json[r'faction'])!,
+        faction: FactionSymbol.fromJson(json[r'faction'])!,
         symbol: mapValueOfType<String>(json, r'symbol')!,
         email: mapValueOfType<String>(json, r'email'),
       );

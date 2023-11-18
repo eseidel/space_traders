@@ -167,8 +167,9 @@ Class | Method | HTTP request | Description
  - [Extraction](doc//Extraction.md)
  - [ExtractionYield](doc//ExtractionYield.md)
  - [Faction](doc//Faction.md)
- - [FactionSymbols](doc//FactionSymbols.md)
+ - [FactionSymbol](doc//FactionSymbol.md)
  - [FactionTrait](doc//FactionTrait.md)
+ - [FactionTraitSymbol](doc//FactionTraitSymbol.md)
  - [FulfillContract200Response](doc//FulfillContract200Response.md)
  - [GetAgents200Response](doc//GetAgents200Response.md)
  - [GetConstruction200Response](doc//GetConstruction200Response.md)
@@ -298,6 +299,7 @@ Class | Method | HTTP request | Description
  - [WaypointModifier](doc//WaypointModifier.md)
  - [WaypointOrbital](doc//WaypointOrbital.md)
  - [WaypointTrait](doc//WaypointTrait.md)
+ - [WaypointTraitSymbol](doc//WaypointTraitSymbol.md)
  - [WaypointType](doc//WaypointType.md)
 
 

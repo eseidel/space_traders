@@ -21,7 +21,7 @@ class Faction {
     required this.isRecruiting,
   });
 
-  FactionSymbols symbol;
+  FactionSymbol symbol;
 
   /// Name of the faction.
   String name;
@@ -95,7 +95,7 @@ class Faction {
       }());
 
       return Faction(
-        symbol: FactionSymbols.fromJson(json[r'symbol'])!,
+        symbol: FactionSymbol.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
         headquarters: mapValueOfType<String>(json, r'headquarters')!,

@@ -289,10 +289,12 @@ class ApiClient {
           return ExtractionYield.fromJson(value);
         case 'Faction':
           return Faction.fromJson(value);
-        case 'FactionSymbols':
-          return FactionSymbolsTypeTransformer().decode(value);
+        case 'FactionSymbol':
+          return FactionSymbolTypeTransformer().decode(value);
         case 'FactionTrait':
           return FactionTrait.fromJson(value);
+        case 'FactionTraitSymbol':
+          return FactionTraitSymbolTypeTransformer().decode(value);
         case 'FulfillContract200Response':
           return FulfillContract200Response.fromJson(value);
         case 'GetAgents200Response':
@@ -553,6 +555,8 @@ class ApiClient {
           return WaypointOrbital.fromJson(value);
         case 'WaypointTrait':
           return WaypointTrait.fromJson(value);
+        case 'WaypointTraitSymbol':
+          return WaypointTraitSymbolTypeTransformer().decode(value);
         case 'WaypointType':
           return WaypointTypeTypeTransformer().decode(value);
         default:
