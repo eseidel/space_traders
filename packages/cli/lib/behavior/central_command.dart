@@ -619,6 +619,7 @@ class CentralCommand {
 
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
+    return false;
     // final buyPlan = [
     //   ShipType.MINING_DRONE,
     //   ShipType.SIPHON_DRONE,
