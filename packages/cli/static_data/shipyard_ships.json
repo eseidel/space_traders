@@ -671,7 +671,7 @@
   "modules": [
    {
     "symbol": "MODULE_CARGO_HOLD_II",
-    "capacity": 35,
+    "capacity": 40,
     "range": null,
     "name": "Expanded Cargo Hold",
     "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
@@ -683,7 +683,7 @@
    },
    {
     "symbol": "MODULE_CARGO_HOLD_II",
-    "capacity": 35,
+    "capacity": 40,
     "range": null,
     "name": "Expanded Cargo Hold",
     "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
@@ -746,12 +746,12 @@
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_SHUTTLE",
-   "name": "Frame Shuttle",
+   "name": "Shuttle",
    "description": "A small, reusable spacecraft designed for short-range, low-speed travel between spacecraft or planetary surfaces.",
    "condition": null,
-   "moduleSlots": 4,
+   "moduleSlots": 3,
    "mountingPoints": 1,
-   "fuelCapacity": 900,
+   "fuelCapacity": 300,
    "requirements": {
     "power": 1,
     "crew": 10,
@@ -775,7 +775,7 @@
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
    "condition": null,
-   "speed": 2,
+   "speed": 3,
    "requirements": {
     "power": 1,
     "crew": 0,
@@ -784,15 +784,15 @@
   },
   "modules": [
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_II",
+    "capacity": 40,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Expanded Cargo Hold",
+    "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 2,
+     "crew": 2,
+     "slots": 2
     }
    },
    {
@@ -804,30 +804,6 @@
     "requirements": {
      "power": 1,
      "crew": 2,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_PASSENGER_CABIN_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Passenger Cabin",
-    "description": "A module that provides living space and amenities for passengers.",
-    "requirements": {
-     "power": 2,
-     "crew": 2,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_ENVOY_QUARTERS_I",
-    "capacity": 1,
-    "range": null,
-    "name": "Envoy Quarters",
-    "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys.",
-    "requirements": {
-     "power": 2,
-     "crew": 5,
      "slots": 1
     }
    }
@@ -847,7 +823,7 @@
    }
   ],
   "crew": {
-   "required": 23,
+   "required": 18,
    "capacity": 40
   }
  },
