@@ -79,6 +79,8 @@ class CentralCommand {
   /// trading.
   bool get isContractTradingEnabled => true;
 
+  bool get isConstructionTradingEnabled => false;
+
   /// Minimum profit per second we expect this ship to make.
   // Should set this based on the ship type and how much we expect to earn
   // from other sources (e.g. hauling mining goods?)
@@ -321,7 +323,10 @@ class CentralCommand {
   }) {
     final startSymbol = overrideStartSymbol ?? ship.waypointSymbol;
 
-    final extraSellOpps = <SellOpp>[...constructionSellOpps()];
+    final extraSellOpps = <SellOpp>[];
+    if (isConstructionTradingEnabled) {
+      extraSellOpps.addAll(constructionSellOpps());
+    }
     if (isContractTradingEnabled) {
       extraSellOpps.addAll(contractSellOpps(agentCache, contractCache));
     }
