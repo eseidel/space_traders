@@ -511,6 +511,12 @@ void main() {
     when(() => caches.ships.countOfFrame(ShipFrameSymbolEnum.MINER))
         .thenReturn(0);
 
+    when(
+      () => caches.ships.countOfType(
+        caches.static.shipyardShips,
+        ShipType.LIGHT_SHUTTLE,
+      ),
+    ).thenReturn(0);
     when(() => caches.agent.headquarters(caches.systems)).thenReturn(
       SystemWaypoint(
         symbol: 'W-A-Y',
@@ -527,8 +533,12 @@ void main() {
         startingFaction: faction,
       ),
     );
+    final logger = _MockLogger();
 
-    await centralCommand.advanceCentralPlanning(api, caches);
+    await runWithLogger(
+      logger,
+      () async => await centralCommand.advanceCentralPlanning(api, caches),
+    );
     expect(centralCommand.nextShipBuyJob, isNull);
   });
 

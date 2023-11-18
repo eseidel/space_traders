@@ -1013,14 +1013,6 @@ Future<List<MiningSquad>> assignShipsToSquads(
     final distance = mineWaypoint.position.distanceTo(origin);
     return distance.toInt();
   });
-  for (final score in scores) {
-    final mineWaypoint = systemsCache.waypointFromSymbol(score.mine);
-    final distance = mineWaypoint.position.distanceTo(origin);
-    logger.info(
-      'Mining score: ${score.score} ${score.mine} ${score.market} '
-      '${score.marketTradesAllProducedGoods} ${distance.toInt()}',
-    );
-  }
   // Divide our current ships into N squads.
   final squads = List.generate(scores.length, (index) {
     final score = scores[index];
