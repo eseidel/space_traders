@@ -197,8 +197,8 @@ class CentralCommand {
         // mining drones.
         // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
         // Mining is more profitable than siphoning I think?
-        Behavior.siphoner,
         Behavior.miner,
+        Behavior.siphoner,
       ],
       FleetRole.trader: [
         Behavior.trader,
