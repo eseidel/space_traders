@@ -1,7 +1,7 @@
 [
  {
   "symbol": "MODULE_CARGO_HOLD_I",
-  "capacity": 10,
+  "capacity": 15,
   "range": null,
   "name": "Cargo Hold",
   "description": "A module that increases a ship's cargo capacity.",
@@ -13,7 +13,7 @@
  },
  {
   "symbol": "MODULE_CARGO_HOLD_II",
-  "capacity": 35,
+  "capacity": 40,
   "range": null,
   "name": "Expanded Cargo Hold",
   "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",

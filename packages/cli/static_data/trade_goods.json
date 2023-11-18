@@ -75,6 +75,11 @@
   "description": "Tools and equipment used in various industries and applications."
  },
  {
+  "symbol": "EXOTIC_MATTER",
+  "name": "Exotic Matter",
+  "description": "A rare and highly valuable substance with unique properties, used in advanced technologies and weapons systems."
+ },
+ {
   "symbol": "EXPLOSIVES",
   "name": "Explosives",
   "description": "High-powered explosives used for mining, construction, and military operations."
@@ -248,6 +253,11 @@
   "symbol": "QUARTZ_SAND",
   "name": "Quartz Sand",
   "description": "High-purity quartz sand used in the production of glass and ceramics."
+ },
+ {
+  "symbol": "RELIC_TECH",
+  "name": "Relic Tech",
+  "description": "Advanced technology from ancient or extinct civilizations, often sought by collectors or researchers."
  },
  {
   "symbol": "SHIP_PARTS",

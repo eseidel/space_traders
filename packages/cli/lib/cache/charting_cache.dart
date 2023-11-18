@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_store.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -47,7 +48,7 @@ class ChartedValues {
 
   /// Converts this charted values to JSON data.
   Map<String, dynamic> toJson() {
-    final sortedTradeSymbols = traitSymbols.toList()..sort();
+    final sortedTradeSymbols = traitSymbols.sortedBy((s) => s.value);
     return <String, dynamic>{
       'waypointSymbol': waypointSymbol.toJson(),
       'faction': faction?.toJson(),

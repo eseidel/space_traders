@@ -185,6 +185,11 @@
   "description": "A location with a constant cloud cover, resulting in a perpetually dim and shadowy environment, often impacting local weather and ecosystems."
  },
  {
+  "symbol": "PIRATE_BASE",
+  "name": "Pirate Base",
+  "description": "A hidden stronghold for pirates and other outlaws, providing a safe haven for their illicit activities and a base of operations for raids and other criminal activities. You wouldn't support pirates against your faction, would you?"
+ },
+ {
   "symbol": "PRECIOUS_METAL_DEPOSITS",
   "name": "Precious Metal Deposits",
   "description": "A source of valuable metals like gold, silver, and platinum, as well as their ores, prized for their rarity, beauty, and various applications."
