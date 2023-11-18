@@ -22,7 +22,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   _printMissing(ShipType.values, staticCaches.shipyardShips);
   _printMissing(ShipEngineSymbolEnum.values, staticCaches.engines);
   _printMissing(ShipReactorSymbolEnum.values, staticCaches.reactors);
-  _printMissing(WaypointTraitSymbolEnum.values, staticCaches.waypointTraits);
+  _printMissing(WaypointTraitSymbol.values, staticCaches.waypointTraits);
 }
 
 void main(List<String> args) async {

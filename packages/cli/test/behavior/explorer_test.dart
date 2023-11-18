@@ -127,7 +127,7 @@ void main() {
     final systemsCache = SystemsCache(systems, fs: fs);
     final factions = <Faction>[
       Faction(
-        symbol: FactionSymbols.AEGIS,
+        symbol: FactionSymbol.AEGIS,
         name: 'Aegis',
         headquarters: 'A-B-C',
         description: 'Aegis',
@@ -161,7 +161,7 @@ void main() {
     final waypoint = _MockWaypoint();
     when(() => waypoint.traits).thenReturn([
       WaypointTrait(
-        symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+        symbol: WaypointTraitSymbol.MARKETPLACE,
         name: 'name',
         description: 'description',
       ),

@@ -94,7 +94,7 @@ void main() {
     final ship = Ship(
       symbol: shipSymbol.symbol,
       registration: ShipRegistration(
-        factionSymbol: FactionSymbols.AEGIS.value,
+        factionSymbol: FactionSymbol.AEGIS.value,
         name: 'name',
         role: ShipRole.COMMAND,
       ),

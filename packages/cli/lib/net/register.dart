@@ -30,7 +30,7 @@ Future<String> loadAuthTokenOrRegister(
 Future<String> _tryRegister(
   DefaultApi api, {
   required String symbol,
-  required FactionSymbols faction,
+  required FactionSymbol faction,
   String? email,
 }) async {
   final registerRequest = RegisterRequest(

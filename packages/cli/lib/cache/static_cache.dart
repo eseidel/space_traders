@@ -239,7 +239,7 @@ class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
 
 /// A cache of waypoint traits.
 class WaypointTraitCache
-    extends StaticCache<WaypointTraitSymbolEnum, WaypointTrait> {
+    extends StaticCache<WaypointTraitSymbol, WaypointTrait> {
   /// Creates a new waypoint trait cache.
   WaypointTraitCache(
     super.traits, {
@@ -267,7 +267,7 @@ class WaypointTraitCache
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  WaypointTraitSymbolEnum keyFor(WaypointTrait record) => record.symbol;
+  WaypointTraitSymbol keyFor(WaypointTrait record) => record.symbol;
 }
 
 /// A cache of trade good descriptions.

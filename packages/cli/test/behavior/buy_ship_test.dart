@@ -79,7 +79,7 @@ void main() {
     when(() => waypoint.symbol).thenReturn(symbol.waypoint);
     when(() => waypoint.traits).thenReturn([
       WaypointTrait(
-        symbol: WaypointTraitSymbolEnum.SHIPYARD,
+        symbol: WaypointTraitSymbol.SHIPYARD,
         name: '',
         description: '',
       ),

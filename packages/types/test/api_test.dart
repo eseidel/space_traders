@@ -54,14 +54,14 @@ void main() {
       y: 0,
       traits: [
         WaypointTrait(
-          symbol: WaypointTraitSymbolEnum.ASH_CLOUDS,
+          symbol: WaypointTraitSymbol.ASH_CLOUDS,
           name: '',
           description: '',
         ),
       ],
     );
-    expect(waypoint.hasTrait(WaypointTraitSymbolEnum.ASH_CLOUDS), isTrue);
-    expect(waypoint.hasTrait(WaypointTraitSymbolEnum.BARREN), isFalse);
+    expect(waypoint.hasTrait(WaypointTraitSymbol.ASH_CLOUDS), isTrue);
+    expect(waypoint.hasTrait(WaypointTraitSymbol.BARREN), isFalse);
     final systemWaypoint = waypoint.toSystemWaypoint();
     expect(systemWaypoint.symbol, waypoint.symbol);
   });
@@ -120,7 +120,7 @@ void main() {
   test('FactionUtils', () {
     final faction = Faction(
       description: '',
-      symbol: FactionSymbols.AEGIS,
+      symbol: FactionSymbol.AEGIS,
       name: '',
       headquarters: 'S-A-W',
       traits: [],
@@ -133,7 +133,7 @@ void main() {
       symbol: 'A-1',
       headquarters: 'S-A-W',
       credits: 0,
-      startingFaction: FactionSymbols.AEGIS.value,
+      startingFaction: FactionSymbol.AEGIS.value,
     );
     expect(agent.headquartersSymbol, WaypointSymbol.fromString('S-A-W'));
   });
@@ -147,13 +147,12 @@ void main() {
   });
 
   test('isMinableTrait', () {
-    final minable =
-        WaypointTraitSymbolEnum.values.where(isMinableTrait).toList();
+    final minable = WaypointTraitSymbol.values.where(isMinableTrait).toList();
     expect(minable, [
-      WaypointTraitSymbolEnum.MINERAL_DEPOSITS,
-      WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS,
-      WaypointTraitSymbolEnum.PRECIOUS_METAL_DEPOSITS,
-      WaypointTraitSymbolEnum.RARE_METAL_DEPOSITS,
+      WaypointTraitSymbol.MINERAL_DEPOSITS,
+      WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
+      WaypointTraitSymbol.PRECIOUS_METAL_DEPOSITS,
+      WaypointTraitSymbol.RARE_METAL_DEPOSITS,
     ]);
   });
 

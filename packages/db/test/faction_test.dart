@@ -5,7 +5,7 @@ import 'package:types/types.dart';
 void main() {
   test('Faction round trip', () {
     final faction = Faction(
-      symbol: FactionSymbols.AEGIS,
+      symbol: FactionSymbol.AEGIS,
       name: 'Aegis',
       description: 'Aegis is a faction.',
       headquarters: 'Foo',

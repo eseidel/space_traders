@@ -454,7 +454,7 @@ void main() {
     final caches = mockCaches();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
-    final faction = FactionSymbols.AEGIS.value;
+    final faction = FactionSymbol.AEGIS.value;
     when(() => shipNav.systemSymbol).thenReturn('W-A');
     when(() => ship.nav).thenReturn(shipNav);
     final shipSymbol = ShipSymbol.fromString('X-A');
@@ -491,7 +491,7 @@ void main() {
           isUnderConstruction: false,
           traits: [
             WaypointTrait(
-              symbol: WaypointTraitSymbolEnum.SHIPYARD,
+              symbol: WaypointTraitSymbol.SHIPYARD,
               name: 'name',
               description: 'description',
             ),

@@ -58,7 +58,7 @@ void main() {
     when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
     when(() => waypoint.traits).thenReturn([
       WaypointTrait(
-        symbol: WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS,
+        symbol: WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
         name: 'name',
         description: 'description',
       ),

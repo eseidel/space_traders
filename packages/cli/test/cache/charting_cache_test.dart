@@ -19,10 +19,10 @@ void main() {
         submittedOn: DateTime(2021),
       ),
       faction: WaypointFaction(
-        symbol: FactionSymbols.AEGIS,
+        symbol: FactionSymbol.AEGIS,
       ),
       traitSymbols: const {
-        WaypointTraitSymbolEnum.ASH_CLOUDS,
+        WaypointTraitSymbol.ASH_CLOUDS,
       },
     );
     final waypointTraits = _MockWaypointTraitCache();
@@ -32,11 +32,11 @@ void main() {
     expect(loaded.waypointCount, 1);
     expect(loaded.values.first.waypointSymbol, a);
     expect(loaded.values.first.chart.submittedBy, 'ESEIDEL');
-    expect(loaded.values.first.faction?.symbol, FactionSymbols.AEGIS);
+    expect(loaded.values.first.faction?.symbol, FactionSymbol.AEGIS);
     expect(loaded.values.first.traitSymbols, hasLength(1));
     expect(
       loaded.values.first.traitSymbols.first,
-      WaypointTraitSymbolEnum.ASH_CLOUDS,
+      WaypointTraitSymbol.ASH_CLOUDS,
     );
   });
 
@@ -46,11 +46,11 @@ void main() {
     final waypointSymbol = WaypointSymbol.fromString('A-A-A');
     final unchartedSymbol = WaypointSymbol.fromString('B-B-B');
     final waypointTrait = WaypointTrait(
-      symbol: WaypointTraitSymbolEnum.ASH_CLOUDS,
+      symbol: WaypointTraitSymbol.ASH_CLOUDS,
       name: 'Ash Clouds',
       description: 'Ash Clouds',
     );
-    when(() => waypointTraits[WaypointTraitSymbolEnum.ASH_CLOUDS])
+    when(() => waypointTraits[WaypointTraitSymbol.ASH_CLOUDS])
         .thenReturn(waypointTrait);
     final chartedWaypoint = Waypoint(
       symbol: waypointSymbol.waypoint,

@@ -191,7 +191,7 @@ class Database {
   }
 
   /// Gets the faction with the given symbol.
-  Future<Faction> factionBySymbol(FactionSymbols symbol) {
+  Future<Faction> factionBySymbol(FactionSymbol symbol) {
     final query = factionBySymbolQuery(symbol);
     return connection
         .query(query.fmtString, substitutionValues: query.substitutionValues)

@@ -14,12 +14,12 @@ void main() {
       x: 1,
       y: 2,
       orbitals: [],
-      faction: WaypointFaction(symbol: FactionSymbols.AEGIS),
+      faction: WaypointFaction(symbol: FactionSymbol.AEGIS),
       traits: [
         WaypointTrait(
           description: 't',
           name: 'n',
-          symbol: WaypointTraitSymbolEnum.CORRUPT,
+          symbol: WaypointTraitSymbol.CORRUPT,
         ),
       ],
       isUnderConstruction: true,

@@ -133,10 +133,10 @@ void main() {
       WaypointTrait(
         description: '',
         name: '',
-        symbol: WaypointTraitSymbolEnum.SHIPYARD,
+        symbol: WaypointTraitSymbol.SHIPYARD,
       ),
       WaypointTrait(
-        symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+        symbol: WaypointTraitSymbol.MARKETPLACE,
         name: '',
         description: '',
       ),

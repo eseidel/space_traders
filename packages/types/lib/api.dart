@@ -280,7 +280,7 @@ extension SystemWaypointUtils on SystemWaypoint {
 }
 
 /// Returns true if the given trait is minable.
-bool isMinableTrait(WaypointTraitSymbolEnum trait) {
+bool isMinableTrait(WaypointTraitSymbol trait) {
   return trait.value.endsWith('DEPOSITS');
 }
 
@@ -303,7 +303,7 @@ extension WaypointUtils on Waypoint {
   }
 
   /// Returns true if the waypoint has the given trait.
-  bool hasTrait(WaypointTraitSymbolEnum trait) =>
+  bool hasTrait(WaypointTraitSymbol trait) =>
       traits.any((t) => t.symbol == trait);
 
   /// Returns true if the waypoint has the given type.
@@ -319,10 +319,10 @@ extension WaypointUtils on Waypoint {
   bool get canBeSiphoned => isType(WaypointType.GAS_GIANT);
 
   /// Returns true if the waypoint has a shipyard.
-  bool get hasShipyard => hasTrait(WaypointTraitSymbolEnum.SHIPYARD);
+  bool get hasShipyard => hasTrait(WaypointTraitSymbol.SHIPYARD);
 
   /// Returns true if the waypoint has a marketplace.
-  bool get hasMarketplace => hasTrait(WaypointTraitSymbolEnum.MARKETPLACE);
+  bool get hasMarketplace => hasTrait(WaypointTraitSymbol.MARKETPLACE);
 
   /// Returns the WaypointPosition of the waypoint.
   WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);

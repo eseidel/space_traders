@@ -22,7 +22,7 @@ void main() {
           type: WaypointType.ASTEROID,
           traits: [
             WaypointTrait(
-              symbol: WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS,
+              symbol: WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
               name: 'name',
               description: 'description',
             ),
@@ -37,7 +37,7 @@ void main() {
           type: WaypointType.ASTEROID,
           traits: [
             WaypointTrait(
-              symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+              symbol: WaypointTraitSymbol.MARKETPLACE,
               name: 'name',
               description: 'description',
             ),
@@ -91,7 +91,7 @@ void main() {
           type: WaypointType.ASTEROID,
           traits: [
             WaypointTrait(
-              symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+              symbol: WaypointTraitSymbol.MARKETPLACE,
               name: 'name',
               description: 'description',
             ),

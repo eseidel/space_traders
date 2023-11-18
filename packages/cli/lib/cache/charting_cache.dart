@@ -20,7 +20,7 @@ class ChartedValues {
         WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
     final traitSymbols = (json['traitSymbols'] as List<dynamic>)
         .cast<String>()
-        .map((e) => WaypointTraitSymbolEnum.fromJson(e)!)
+        .map((e) => WaypointTraitSymbol.fromJson(e)!)
         .toSet();
     final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
     final waypointSymbol =
@@ -40,7 +40,7 @@ class ChartedValues {
   final WaypointFaction? faction;
 
   /// The traits of the waypoint.
-  final Set<WaypointTraitSymbolEnum> traitSymbols;
+  final Set<WaypointTraitSymbol> traitSymbols;
 
   /// Chart for this waypoint.
   final Chart chart;
@@ -57,12 +57,10 @@ class ChartedValues {
   }
 
   /// Whether this waypoint has a shipyard.
-  bool get hasShipyard =>
-      traitSymbols.contains(WaypointTraitSymbolEnum.SHIPYARD);
+  bool get hasShipyard => traitSymbols.contains(WaypointTraitSymbol.SHIPYARD);
 
   /// Whether this waypoint has a market.
-  bool get hasMarket =>
-      traitSymbols.contains(WaypointTraitSymbolEnum.MARKETPLACE);
+  bool get hasMarket => traitSymbols.contains(WaypointTraitSymbol.MARKETPLACE);
 }
 
 typedef _Record = Map<WaypointSymbol, ChartedValues>;

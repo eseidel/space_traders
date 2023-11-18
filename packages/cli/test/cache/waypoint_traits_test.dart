@@ -11,7 +11,7 @@ void main() {
       ..writeAsStringSync('[]');
     final waypointTraitCache = WaypointTraitCache.load(fs);
     final trait = WaypointTrait(
-      symbol: WaypointTraitSymbolEnum.VAST_RUINS,
+      symbol: WaypointTraitSymbol.VAST_RUINS,
       name: 'Vast Ruins',
       description: 'Vast Ruins',
     );

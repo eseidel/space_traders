@@ -17,7 +17,7 @@ class MineScore {
   final WaypointSymbol mine;
 
   /// The traits of the mine.
-  final List<WaypointTraitSymbolEnum> mineTraits;
+  final List<WaypointTraitSymbol> mineTraits;
 
   /// The symbol of the market.
   final WaypointSymbol market;
@@ -166,41 +166,41 @@ Future<List<SiphonScore>> evaluateWaypointsForSiphoning(
 /// This is unlikely to be a correct/complete list.
 /// This was created by reading the WaypointTrait descriptions.
 final tradeSymbolsByTrait = {
-  WaypointTraitSymbolEnum.COMMON_METAL_DEPOSITS: [
+  WaypointTraitSymbol.COMMON_METAL_DEPOSITS: [
     TradeSymbol.IRON_ORE,
     TradeSymbol.COPPER_ORE,
     TradeSymbol.ALUMINUM_ORE,
   ],
-  WaypointTraitSymbolEnum.MINERAL_DEPOSITS: [
+  WaypointTraitSymbol.MINERAL_DEPOSITS: [
     TradeSymbol.SILICON_CRYSTALS,
     TradeSymbol.QUARTZ_SAND,
   ],
-  WaypointTraitSymbolEnum.PRECIOUS_METAL_DEPOSITS: [
+  WaypointTraitSymbol.PRECIOUS_METAL_DEPOSITS: [
     TradeSymbol.PLATINUM_ORE,
     TradeSymbol.GOLD_ORE,
     TradeSymbol.SILVER_ORE,
   ],
-  WaypointTraitSymbolEnum.RARE_METAL_DEPOSITS: [
+  WaypointTraitSymbol.RARE_METAL_DEPOSITS: [
     TradeSymbol.URANITE_ORE,
     TradeSymbol.MERITIUM_ORE,
   ],
-  WaypointTraitSymbolEnum.FROZEN: [
+  WaypointTraitSymbol.FROZEN: [
     TradeSymbol.ICE_WATER,
     TradeSymbol.AMMONIA_ICE,
   ],
-  WaypointTraitSymbolEnum.ICE_CRYSTALS: [
+  WaypointTraitSymbol.ICE_CRYSTALS: [
     TradeSymbol.ICE_WATER,
     TradeSymbol.AMMONIA_ICE,
     TradeSymbol.LIQUID_HYDROGEN,
     TradeSymbol.LIQUID_NITROGEN,
   ],
-  WaypointTraitSymbolEnum.EXPLOSIVE_GASES: [
+  WaypointTraitSymbol.EXPLOSIVE_GASES: [
     TradeSymbol.HYDROCARBON,
   ],
-  WaypointTraitSymbolEnum.SWAMP: [
+  WaypointTraitSymbol.SWAMP: [
     TradeSymbol.HYDROCARBON,
   ],
-  WaypointTraitSymbolEnum.STRONG_MAGNETOSPHERE: [
+  WaypointTraitSymbol.STRONG_MAGNETOSPHERE: [
     TradeSymbol.EXOTIC_MATTER,
     TradeSymbol.GRAVITON_EMITTERS,
   ],

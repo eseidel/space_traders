@@ -71,7 +71,7 @@ void main() {
     when(() => waypoint.type).thenReturn(WaypointType.PLANET);
     when(() => waypoint.traits).thenReturn([
       WaypointTrait(
-        symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+        symbol: WaypointTraitSymbol.MARKETPLACE,
         name: '',
         description: '',
       ),
@@ -282,7 +282,7 @@ void main() {
     // We have a marketplace.
     when(() => waypoint.traits).thenReturn([
       WaypointTrait(
-        symbol: WaypointTraitSymbolEnum.MARKETPLACE,
+        symbol: WaypointTraitSymbol.MARKETPLACE,
         name: '',
         description: '',
       ),

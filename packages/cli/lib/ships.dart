@@ -33,7 +33,7 @@ extension ShipTypeToFrame on ShipyardShipCache {
   Ship? shipForTest(
     ShipType shipType, {
     ShipSymbol? shipSymbol,
-    FactionSymbols? factionSymbol,
+    FactionSymbol? factionSymbol,
     SystemWaypoint? origin,
     DateTime? now,
   }) {

@@ -8,7 +8,7 @@ Query allFactionsQuery() => const Query(
     );
 
 /// Query a faction by symbol.
-Query factionBySymbolQuery(FactionSymbols symbol) => Query(
+Query factionBySymbolQuery(FactionSymbol symbol) => Query(
       'SELECT * FROM faction_ WHERE symbol = @symbol',
       substitutionValues: {
         'symbol': symbol.toString(),
