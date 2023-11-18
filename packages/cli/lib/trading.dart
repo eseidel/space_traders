@@ -715,3 +715,39 @@ MarketTrip? findBestMarketToSell(
 
   return best;
 }
+
+/// This is visible for scripts, generally you want to use
+/// [CentralCommand.findNextDealAndLog] instead.
+Iterable<CostedDeal> scanAndFindDeals(
+  SystemsCache systemsCache,
+  MarketPrices marketPrices,
+  RoutePlanner routePlanner, {
+  required WaypointSymbol startSymbol,
+  required int maxTotalOutlay,
+  required int maxWaypoints,
+  required ShipSpec shipSpec,
+  bool Function(Deal)? filter,
+  List<SellOpp>? extraSellOpps,
+  int minProfitPerSecond = 0,
+}) {
+  final marketScan = scanNearbyMarkets(
+    systemsCache,
+    marketPrices,
+    systemSymbol: startSymbol.systemSymbol,
+    maxWaypoints: maxWaypoints,
+  );
+  return findDealsFor(
+    marketPrices,
+    systemsCache,
+    routePlanner,
+    marketScan,
+    maxTotalOutlay: maxTotalOutlay,
+    extraSellOpps: extraSellOpps,
+    filter: filter,
+    startSymbol: startSymbol,
+    fuelCapacity: shipSpec.fuelCapacity,
+    cargoCapacity: shipSpec.cargoCapacity,
+    shipSpeed: shipSpec.speed,
+    minProfitPerSecond: minProfitPerSecond,
+  );
+}

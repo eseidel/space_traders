@@ -65,7 +65,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     logger.info('$tradeSymbol : ${price?.supply}');
   }
 
-  final deals = centralCommand.scanAndFindDeals(
+  final deals = scanAndFindDeals(
     systemsCache,
     marketPrices,
     routePlanner,
@@ -73,10 +73,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     maxWaypoints: maxWaypoints,
     startSymbol: waypointSymbol,
     shipSpec: shipSpec,
-    filter: (Deal deal) {
+    filter: centralCommand.avoidDealsInProgress((Deal deal) {
       return deal.destinationSymbol == waypointSymbol &&
           neededSymbols.contains(deal.tradeSymbol);
-    },
+    }),
     minProfitPerSecond: minProfitPerSecond,
   );
 
