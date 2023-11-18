@@ -190,6 +190,7 @@ Then modified:
   It doesn't end up mattering because they're singletons though.
 * Generated toJson methods are not recursive (e.g. Survey.toJson doesn't call
   SurveyDeposit.toJson).
+* Seems to lack anyOf support (GetSystemWaypointsTraitsParameter).
 
 ## TODO
 
