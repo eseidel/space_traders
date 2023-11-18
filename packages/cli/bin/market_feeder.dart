@@ -19,9 +19,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final agentCache = AgentCache.load(fs)!;
   final behaviorCache = BehaviorCache.load(fs);
-  final shipCache = ShipCache.load(fs)!;
-  final centralCommand =
-      CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
 
   const shipType = ShipType.LIGHT_HAULER;
   final ship = staticCaches.shipyardShips[shipType]!;
@@ -73,10 +70,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     maxWaypoints: maxWaypoints,
     startSymbol: waypointSymbol,
     shipSpec: shipSpec,
-    filter: centralCommand.avoidDealsInProgress((Deal deal) {
-      return deal.destinationSymbol == waypointSymbol &&
-          neededSymbols.contains(deal.tradeSymbol);
-    }),
+    filter: avoidDealsInProgress(
+      behaviorCache.dealsInProgress(),
+      filter: (Deal deal) {
+        return deal.destinationSymbol == waypointSymbol &&
+            neededSymbols.contains(deal.tradeSymbol);
+      },
+    ),
     minProfitPerSecond: minProfitPerSecond,
   );
 

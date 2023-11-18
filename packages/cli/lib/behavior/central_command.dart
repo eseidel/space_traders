@@ -268,28 +268,6 @@ class CentralCommand {
     }
   }
 
-  /// Returns a deal filter function which avoids deals in progress.
-  /// Optionally takes an additional [filter] function to apply.
-  bool Function(Deal) avoidDealsInProgress([bool Function(Deal)? filter]) {
-    final inProgress = _behaviorCache.dealsInProgress().toList();
-    // Avoid having two ships working on the same deal since by the time the
-    // second one gets there the prices will have changed.
-    // Note this does not check destination, so should still allow two
-    // ships to work on the same contract.
-    // We could consider enforcing destination difference for arbitrage deals.
-    return (Deal deal) {
-      return inProgress.every((d) {
-        // Deals need to differ in their source *or* their trade symbol
-        // for us to consider them.
-        if (d.deal.sourceSymbol == deal.sourceSymbol &&
-            d.deal.tradeSymbol == deal.tradeSymbol) {
-          return false;
-        }
-        return filter?.call(deal) ?? true;
-      });
-    };
-  }
-
   /// Find next deal for the given [ship], considering all deals in progress.
   CostedDeal? findNextDealAndLog(
     AgentCache agentCache,
@@ -328,7 +306,7 @@ class CentralCommand {
       startSymbol: startSymbol,
       extraSellOpps: extraSellOpps,
       shipSpec: ship.shipSpec,
-      filter: avoidDealsInProgress(),
+      filter: avoidDealsInProgress(_behaviorCache.dealsInProgress()),
     );
 
     logger.info('Found ${deals.length} deals for ${ship.shipSymbol} from '

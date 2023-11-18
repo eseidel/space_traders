@@ -716,6 +716,30 @@ MarketTrip? findBestMarketToSell(
   return best;
 }
 
+/// Returns a deal filter function which avoids deals in progress.
+/// Optionally takes an additional [filter] function to apply.
+bool Function(Deal) avoidDealsInProgress(
+  Iterable<CostedDeal> dealsInProgress, {
+  bool Function(Deal)? filter,
+}) {
+  // Avoid having two ships working on the same deal since by the time the
+  // second one gets there the prices will have changed.
+  // Note this does not check destination, so should still allow two
+  // ships to work on the same contract.
+  // We could consider enforcing destination difference for arbitrage deals.
+  return (Deal deal) {
+    return dealsInProgress.every((d) {
+      // Deals need to differ in their source *or* their trade symbol
+      // for us to consider them.
+      if (d.deal.sourceSymbol == deal.sourceSymbol &&
+          d.deal.tradeSymbol == deal.tradeSymbol) {
+        return false;
+      }
+      return filter?.call(deal) ?? true;
+    });
+  };
+}
+
 /// This is visible for scripts, generally you want to use
 /// [CentralCommand.findNextDealAndLog] instead.
 Iterable<CostedDeal> scanAndFindDeals(
