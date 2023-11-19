@@ -35,6 +35,8 @@ class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockSystemsApi extends Mock implements SystemsApi {}
+
 class _MockWaypoint extends Mock implements Waypoint {}
 
 void main() {
@@ -1018,7 +1020,18 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(end.system);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    final shipCargo = ShipCargo(capacity: 10, units: 10);
+    final shipCargo = ShipCargo(
+      capacity: 10,
+      units: 10,
+      inventory: [
+        ShipCargoItem(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          name: '',
+          description: '',
+          units: 10,
+        ),
+      ],
+    );
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
 
@@ -1128,6 +1141,34 @@ void main() {
       ),
     ).thenReturn(true);
 
+    final contractsApi = _MockContractsApi();
+    when(() => api.contracts).thenReturn(contractsApi);
+    when(
+      () => contractsApi.deliverContract(
+        contract.id,
+        deliverContractRequest: DeliverContractRequest(
+          shipSymbol: shipSymbol.symbol,
+          units: 10,
+          tradeSymbol: tradeSymbol.value,
+        ),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        DeliverContract200Response(
+          data: DeliverContract200ResponseData(
+            contract: contract,
+            cargo: shipCargo,
+          ),
+        ),
+      ),
+    );
+
+    final agent = _MockAgent();
+    when(() => caches.agent.agent).thenReturn(agent);
+    when(() => agent.credits).thenReturn(1000000);
+
+    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
 
@@ -1165,7 +1206,18 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(end.system);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    final shipCargo = ShipCargo(capacity: 10, units: 10);
+    final shipCargo = ShipCargo(
+      capacity: 10,
+      units: 10,
+      inventory: [
+        ShipCargoItem(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          name: '',
+          description: '',
+          units: 10,
+        ),
+      ],
+    );
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
 
@@ -1267,6 +1319,45 @@ void main() {
         isComplete: false,
       ),
     );
+
+    final systemsApi = _MockSystemsApi();
+    when(() => api.systems).thenReturn(systemsApi);
+    when(
+      () => systemsApi.supplyConstruction(
+        end.system,
+        end.waypoint,
+        supplyConstructionRequest: SupplyConstructionRequest(
+          shipSymbol: shipSymbol.symbol,
+          tradeSymbol: tradeSymbol.value,
+          units: 10,
+        ),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        SupplyConstruction200Response(
+          data: SupplyConstruction200ResponseData(
+            construction: Construction(
+              symbol: end.waypoint,
+              materials: [
+                ConstructionMaterial(
+                  tradeSymbol: tradeSymbol,
+                  required_: 100,
+                  fulfilled: 20,
+                ),
+              ],
+              isComplete: false,
+            ),
+            cargo: shipCargo,
+          ),
+        ),
+      ),
+    );
+
+    final agent = _MockAgent();
+    when(() => caches.agent.agent).thenReturn(agent);
+    when(() => agent.credits).thenReturn(1000000);
+
+    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;

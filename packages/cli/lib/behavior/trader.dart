@@ -313,21 +313,23 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   Contract contract,
   ContractDeliverGood goods,
 ) async {
-  final units = ship.countUnits(goods.tradeSymbolObject);
-  if (units < 1) {
-    return null;
-  }
-  if (contract.fulfilled) {
-    // Prevent exceptions from racing ships:
-    // ApiException 400: {"error":{"message":"Failed to update contract.
-    // Contract has already been fulfilled.","code":4504,"data":
-    // {"contractId":"cljysnr2wt47as60cvz377bhh"}}}
-    shipWarn(ship, 'Contract ${contract.id} already fulfilled, ignoring.');
-    // Caller will complete behavior.
-    return null;
-  }
+  final tradeSymbol = goods.tradeSymbolObject;
+  final unitsBefore = ship.countUnits(tradeSymbol);
+  jobAssert(
+    unitsBefore > 0,
+    'No $tradeSymbol to deliver.',
+    const Duration(minutes: 10),
+  );
+  // Prevent exceptions from racing ships:
+  // ApiException 400: {"error":{"message":"Failed to update contract.
+  // Contract has already been fulfilled.","code":4504,"data":
+  // {"contractId":"cljysnr2wt47as60cvz377bhh"}}}
+  jobAssert(
+    !contract.fulfilled,
+    'Contract ${contract.id} already fulfilled.',
+    const Duration(minutes: 10),
+  );
 
-  final unitsBefore = ship.countUnits(goods.tradeSymbolObject);
   // And we have the desired cargo.
   final response = await deliverContract(
     api,
@@ -335,20 +337,24 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
     shipCache,
     contractCache,
     contract,
-    tradeSymbol: goods.tradeSymbolObject,
-    units: units,
+    tradeSymbol: tradeSymbol,
+    units: unitsBefore,
   );
-  final deliver = response.contract.goodNeeded(goods.tradeSymbolObject)!;
+  final deliver = assertNotNull(
+    response.contract.goodNeeded(tradeSymbol),
+    'No ContractDeliverGood for $tradeSymbol?',
+    const Duration(minutes: 10),
+  );
   shipInfo(
     ship,
-    'Delivered $units ${goods.tradeSymbol} '
+    'Delivered $unitsBefore ${goods.tradeSymbol} '
     'to ${goods.destinationSymbol}; '
     '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
     '${approximateDuration(contract.timeUntilDeadline)} to deadline',
   );
 
   // Update our cargo counts after delivering the contract goods.
-  final unitsAfter = ship.countUnits(goods.tradeSymbolObject);
+  final unitsAfter = ship.countUnits(tradeSymbol);
   final unitsDelivered = unitsAfter - unitsBefore;
 
   // Record the delivery transaction.
@@ -409,20 +415,18 @@ Future<SupplyConstruction200ResponseData?>
   Construction construction,
   TradeSymbol tradeSymbol,
 ) async {
-  final units = ship.countUnits(tradeSymbol);
-  if (units < 1) {
-    return null;
-  }
-  if (construction.isComplete) {
-    shipWarn(
-      ship,
-      'Construction @ ${construction.symbol} already complete, ignoring.',
-    );
-    // Caller will complete behavior.
-    return null;
-  }
-
   final unitsBefore = ship.countUnits(tradeSymbol);
+  jobAssert(
+    unitsBefore > 0,
+    'No $tradeSymbol to deliver.',
+    const Duration(minutes: 10),
+  );
+  jobAssert(
+    !construction.isComplete,
+    'Construction @ ${construction.symbol} already complete.',
+    const Duration(minutes: 10),
+  );
+
   // And we have the desired cargo.
   final response = await supplyConstruction(
     api,
@@ -431,12 +435,12 @@ Future<SupplyConstruction200ResponseData?>
     constructionCache,
     construction,
     tradeSymbol: tradeSymbol,
-    units: units,
+    units: unitsBefore,
   );
   final material = response.construction.materialNeeded(tradeSymbol)!;
   shipInfo(
     ship,
-    'Supplied $units $tradeSymbol '
+    'Supplied $unitsBefore $tradeSymbol '
     'to ${construction.symbol}; '
     '${material.fulfilled}/${material.required_}',
   );
