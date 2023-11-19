@@ -507,14 +507,14 @@ void main() {
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
-    final waitUntil = await runWithLogger(
+    final result = await runWithLogger(
       logger,
-      () => advanceTrader(
+      () => doTrader(
+        state,
         api,
         db,
         centralCommand,
         caches,
-        state,
         ship,
         getNow: () => DateTime(2021),
       ),
@@ -525,7 +525,7 @@ void main() {
         refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
-    expect(waitUntil, arrivalTime);
+    expect(result.waitTime, arrivalTime);
   });
 
   test('trade contracts smoke test', () async {

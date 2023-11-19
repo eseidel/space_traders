@@ -12,8 +12,8 @@ typedef FindDeal = CostedDeal? Function(Ship ship, WaypointSymbol startSymbol);
 WaypointSymbol? findBetterTradeLocation(
   SystemsCache systemsCache,
   MarketPrices marketPrices,
-  FindDeal findNextDeal,
   Ship ship, {
+  required FindDeal findDeal,
   required Set<SystemSymbol> avoidSystems,
   required int profitPerSecondThreshold,
 }) {
@@ -26,7 +26,7 @@ WaypointSymbol? findBetterTradeLocation(
     systemsCache,
     search,
     ship,
-    findDeal: findNextDeal,
+    findDeal: findDeal,
     profitPerSecondThreshold: profitPerSecondThreshold,
   );
   return placement?.destinationSymbol;

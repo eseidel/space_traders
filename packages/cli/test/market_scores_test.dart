@@ -102,8 +102,8 @@ void main() {
       () => findBetterTradeLocation(
         systemsCache,
         marketPrices,
-        findNextDeal,
         ship,
+        findDeal: findNextDeal,
         avoidSystems: <SystemSymbol>{},
         profitPerSecondThreshold: 6,
       ),
