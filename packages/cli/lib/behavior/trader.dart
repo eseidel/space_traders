@@ -241,8 +241,17 @@ Future<JobResult> _handleContractDealAtDestination(
   CostedDeal costedDeal,
 ) async {
   final contractGood = costedDeal.tradeSymbol;
-  final contract = caches.contracts.contract(costedDeal.contractId!);
-  final neededGood = contract!.goodNeeded(costedDeal.tradeSymbol);
+  final contractId = assertNotNull(
+    costedDeal.contractId,
+    'No contract id.',
+    const Duration(minutes: 10),
+  );
+  final contract = assertNotNull(
+    caches.contracts.contract(contractId),
+    'No contract.',
+    const Duration(minutes: 10),
+  );
+  final neededGood = contract.goodNeeded(costedDeal.tradeSymbol);
   final maybeResponse = await _deliverContractGoodsIfPossible(
     api,
     db,
