@@ -1,3 +1,4 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/cache/caches.dart';
@@ -24,6 +25,8 @@ class _MockLogger extends Mock implements Logger {}
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockShip extends Mock implements Ship {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
@@ -306,6 +309,70 @@ void main() {
         kMineAndSurveyTemplate.mounts,
       ),
       1,
+    );
+  });
+
+  test('travelAndSellCargo smoke test', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    final symbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    const tradeSymbol = TradeSymbol.DIAMONDS;
+    final shipCargo = ShipCargo(
+      capacity: 60,
+      units: 10,
+      inventory: [
+        ShipCargoItem(
+          symbol: tradeSymbol,
+          name: 'name',
+          description: 'description',
+          units: 10,
+        ),
+      ],
+    );
+    when(() => ship.cargo).thenReturn(shipCargo);
+    final cooldown = Cooldown(
+      shipSymbol: shipSymbol.symbol,
+      remainingSeconds: 10,
+      expiration: now.add(const Duration(seconds: 10)),
+      totalSeconds: 21,
+    );
+    when(() => ship.cooldown).thenReturn(cooldown);
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
+    final shipEngine = _MockShipEngine();
+    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.speed).thenReturn(10);
+    when(() => caches.marketPrices.pricesFor(tradeSymbol)).thenReturn([]);
+
+    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
+
+    final state = BehaviorState(shipSymbol, Behavior.miner)
+      ..mineJob = MineJob(mine: symbol, market: symbol);
+
+    expect(
+      () async => await travelAndSellCargo(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        getNow: getNow,
+      ),
+      // No market for diamonds (would need to mock markets above).
+      throwsA(isA<JobException>()),
     );
   });
 }

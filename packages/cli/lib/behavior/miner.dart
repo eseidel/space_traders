@@ -15,34 +15,6 @@ import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-// my evaluation logic actually just assumes I'll get 10 extracts from each
-// survey regardless of size - so room for improvement.... I just don't have the
-// data on how many extracts to exhaust a deposit
-
-// what I'd recommend as a fast solution is using taavi's evaluation logic on
-// each survey you make, keep a record of the scores, and then only mine out
-// surveys that historically would have been in the top third (edited)
-
-// do you not divide by the number of deposits in the survey? Aren't you
-// favouring the 5 deposit surveys too much here?
-
-// scoreSurvey(
-//     survey: Survey,
-//     favourItemSymbols: ItemSymbol[] | undefined,
-//     averageSellPrices: Record<ItemSymbol, number>,
-//   ): number {
-//     return survey.deposits.reduce(
-//       (score, item) =>
-//         (score +=
-//           (averageSellPrices[item] ?? 1) *
-//          (favourItemSymbols && favourItemSymbols.includes(item) ? 1000 : 1)),
-//       0,
-//     );
-//   }
-
-// Expected survey rates:
-// https://discord.com/channels/792864705139048469/792864705139048472/1112766963601645628
-
 /// Returns the expected value of the survey.
 int expectedValueFromSurvey(
   MarketPrices marketPrices,
@@ -700,14 +672,6 @@ Future<JobResult> transferOrSellCargo(
 
   return travelAndSellCargo(state, api, db, centralCommand, caches, ship);
 }
-
-// Miner stages
-// - Empty cargo if needed
-// - Navigate to mine
-// - Survey if needed
-// - Mine
-// - Handle cargo (navigate to market, sell, jettison, etc)
-// - Navigate to market
 
 /// Advance the miner.
 final advanceMiner = const MultiJob('Miner', [

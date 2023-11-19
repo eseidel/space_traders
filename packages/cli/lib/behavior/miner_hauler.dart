@@ -58,5 +58,7 @@ Future<JobResult> goWaitForGoods(
 final advanceMinerHauler = const MultiJob('MinerHauler', [
   emptyCargoIfNeededForMining,
   goWaitForGoods,
+  // TODO(eseidel): travelAndSellCargo is likely wrong, it includes
+  // minier-specific logic like checking the reactor cooldown.
   travelAndSellCargo,
 ]).run;
