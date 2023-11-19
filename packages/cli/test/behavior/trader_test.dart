@@ -104,9 +104,6 @@ void main() {
     when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
-
     final costedDeal = CostedDeal(
       deal: Deal.test(
         sourceSymbol: start,
@@ -509,7 +506,7 @@ void main() {
     final logger = _MockLogger();
     final result = await runWithLogger(
       logger,
-      () => doTrader(
+      () => doTraderGetCargo(
         state,
         api,
         db,
@@ -525,7 +522,7 @@ void main() {
         refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
-    expect(result.waitTime, arrivalTime);
+    expect(result.isComplete, isTrue);
   });
 
   test('trade contracts smoke test', () async {
@@ -666,7 +663,7 @@ void main() {
     expect(waitUntil, isNull);
   });
 
-  test('handleUnwatedCargoIfNeeded smoke test', () async {
+  test('handleUnwantedCargoIfNeeded smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
     final centralCommand = _MockCentralCommand();
@@ -734,5 +731,164 @@ void main() {
         '🛸#1  Expected 1,800c profit (180c/s), got -4c (-4c/s) in 00:00:00, expected 00:00:10',
       ),
     ).called(1);
+  });
+
+  test('doTraderDeliverCargo travels to destination', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-B');
+    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipCargo = ShipCargo(capacity: 10, units: 10);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    const fuelCapacity = 100;
+    when(() => ship.fuel)
+        .thenReturn(ShipFuel(current: fuelCapacity, capacity: fuelCapacity));
+    final shipEngine = _MockShipEngine();
+    const shipSpeed = 10;
+    when(() => shipEngine.speed).thenReturn(shipSpeed);
+    when(() => ship.engine).thenReturn(shipEngine);
+
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+    final routePlan = RoutePlan(
+      actions: [
+        RouteAction(
+          startSymbol: start,
+          endSymbol: end,
+          type: RouteActionType.navCruise,
+          seconds: 10,
+          fuelUsed: 10,
+        ),
+      ],
+      fuelCapacity: 10,
+      shipSpeed: 10,
+    );
+    final costedDeal = CostedDeal(
+      deal: Deal.test(
+        sourceSymbol: start,
+        destinationSymbol: end,
+        tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+        purchasePrice: 10,
+        sellPrice: 200,
+      ),
+      cargoSize: 10,
+      transactions: [
+        Transaction.fallbackValue(),
+        Transaction.fallbackValue(),
+      ],
+      startTime: DateTime(2021).toUtc(),
+      route: routePlan,
+      costPerFuelUnit: 100,
+    );
+
+    when(
+      () => caches.routePlanner.planRoute(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+        fuelCapacity: fuelCapacity,
+        shipSpeed: shipSpeed,
+      ),
+    ).thenReturn(routePlan);
+
+    when(() => caches.systems.waypointFromSymbol(start)).thenReturn(
+      SystemWaypoint(
+        symbol: start.waypoint,
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => caches.systems.waypointFromSymbol(end)).thenReturn(
+      SystemWaypoint(
+        symbol: end.waypoint,
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
+
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
+      (_) => Future.value(
+        OrbitShip200Response(
+          data: OrbitShip200ResponseData(
+            nav: shipNav..status = ShipNavStatus.IN_ORBIT,
+          ),
+        ),
+      ),
+    );
+    when(
+      () => fleetApi.navigateShip(
+        shipSymbol.symbol,
+        navigateShipRequest: NavigateShipRequest(waypointSymbol: end.waypoint),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        NavigateShip200Response(
+          data: NavigateShip200ResponseData(
+            fuel: ShipFuel(
+              current: fuelCapacity - 100,
+              capacity: fuelCapacity,
+              consumed:
+                  ShipFuelConsumed(amount: 100, timestamp: DateTime(2020)),
+            ),
+            nav: shipNav..status = ShipNavStatus.IN_TRANSIT,
+          ),
+        ),
+      ),
+    );
+    // Needed by navigateShipAndLog to show time left.
+    final arrivalTime = DateTime(2022);
+    final departureTime = DateTime(2021);
+    final departure = ShipNavRouteWaypoint(
+      symbol: start.waypoint,
+      type: WaypointType.ASTEROID,
+      systemSymbol: start.system,
+      x: 0,
+      y: 0,
+    );
+    when(() => shipNav.route).thenReturn(
+      ShipNavRoute(
+        destination: ShipNavRouteWaypoint(
+          symbol: end.waypoint,
+          type: WaypointType.ASTEROID,
+          systemSymbol: end.system,
+          x: 0,
+          y: 0,
+        ),
+        departure: departure,
+        origin: departure,
+        departureTime: departureTime,
+        arrival: arrivalTime,
+      ),
+    );
+
+    final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
+      ..deal = costedDeal;
+
+    final logger = _MockLogger();
+    final result = await runWithLogger(
+      logger,
+      () => doTraderDeliverCargo(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        getNow: () => DateTime(2021),
+      ),
+    );
+    expect(result.waitTime, arrivalTime);
   });
 }

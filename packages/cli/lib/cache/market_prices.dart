@@ -397,7 +397,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
 
 /// Record market data and log the result.
 /// Returns the market.
-/// This is the prefered way to get the local Market.
+/// This is the preferred way to get the local Market.
 Future<Market> recordMarketDataIfNeededAndLog(
   MarketPrices marketPrices,
   MarketCache marketCache,

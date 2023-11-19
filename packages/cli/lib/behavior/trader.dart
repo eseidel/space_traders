@@ -159,21 +159,8 @@ Future<JobResult> _handleAtSourceWithDeal(
     'Unable to purchase $dealTradeSymbol, giving up on this trade.',
     const Duration(seconds: 1),
   );
-  // Otherwise we've bought what we can here, deliver what we have.
-  // TODO(eseidel): Could use beginRouteAndLog instead?
-  // That might work?  Note costedDeal.route is more than just source->dest
-  // it also includes the work to get to source.
-  return JobResult.wait(
-    await beingNewRouteAndLog(
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-      state,
-      costedDeal.route.endSymbol,
-    ),
-  );
+  // Otherwise we've bought what we can here, this part of the job is done.
+  return JobResult.complete();
 }
 
 /// Logs a completed deal.
@@ -217,9 +204,14 @@ Future<JobResult> _handleArbitrageDealAtDestination(
   Caches caches,
   Ship ship,
   BehaviorState state,
-  Market currentMarket,
+  Market? maybeMarket,
   CostedDeal costedDeal,
 ) async {
+  final currentMarket = assertNotNull(
+    maybeMarket,
+    'No market at trade destination for $ship at ${ship.waypointSymbol}',
+    const Duration(minutes: 10),
+  );
   // We're at the destination, sell and clear the deal.
   final transactions = await sellAllCargoAndLog(
     api,
@@ -245,7 +237,7 @@ Future<JobResult> _handleContractDealAtDestination(
   Caches caches,
   Ship ship,
   BehaviorState state,
-  Market currentMarket,
+  Market? maybeMarket,
   CostedDeal costedDeal,
 ) async {
   final contractGood = costedDeal.tradeSymbol;
@@ -374,7 +366,7 @@ Future<JobResult> _handleConstructionDealAtDelivery(
   Caches caches,
   Ship ship,
   BehaviorState state,
-  Market currentMarket,
+  Market? maybeMarket,
   CostedDeal costedDeal,
 ) async {
   await _deliverConstructionMaterialsIfPossible(
@@ -452,154 +444,6 @@ Future<SupplyConstruction200ResponseData?>
   );
   await db.insertTransaction(transaction);
   return response;
-}
-
-Future<JobResult> _handleOffCourseWithDeal(
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  Ship ship,
-  BehaviorState state,
-  CostedDeal costedDeal,
-) async {
-  final haveDealCargo = ship.cargo.countUnits(costedDeal.tradeSymbol) > 0;
-  final WaypointSymbol destination;
-  if (!haveDealCargo) {
-    // We don't have the cargo we need, so go get it.
-    destination = costedDeal.deal.sourceSymbol;
-  } else {
-    shipInfo(ship, 'Off course in route to deal, resuming route.');
-    // We have the cargo we need, so go sell it.
-    // TODO(eseidel): Could this use beginRouteAndLog instead?
-    destination = costedDeal.route.endSymbol;
-  }
-  return JobResult.wait(
-    await beingNewRouteAndLog(
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-      state,
-      destination,
-    ),
-  );
-}
-
-Future<JobResult> Function(
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  Ship ship,
-  BehaviorState state,
-  Market currentMarket,
-  CostedDeal costedDeal,
-) _getDeliveryHandler(CostedDeal costedDeal) {
-  if (costedDeal.isContractDeal) {
-    return _handleContractDealAtDestination;
-  } else if (costedDeal.isConstructionDeal) {
-    return _handleConstructionDealAtDelivery;
-  } else {
-    return _handleArbitrageDealAtDestination;
-  }
-}
-
-Future<JobResult> _handleAtDestinationWithDeal(
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  Ship ship,
-  BehaviorState state,
-  Market currentMarket,
-  CostedDeal costedDeal,
-) async {
-  final haveDealCargo = ship.cargo.countUnits(costedDeal.tradeSymbol) > 0;
-  if (!haveDealCargo) {
-    // We don't have any deal cargo, so we must have just gotten a new
-    // deal which *ends* here, but we haven't gotten the cargo yet, go get it.
-    return JobResult.wait(
-      await beingNewRouteAndLog(
-        api,
-        db,
-        centralCommand,
-        caches,
-        ship,
-        state,
-        costedDeal.deal.sourceSymbol,
-      ),
-    );
-  }
-  return _getDeliveryHandler(costedDeal)(
-    api,
-    db,
-    centralCommand,
-    caches,
-    ship,
-    state,
-    currentMarket,
-    costedDeal,
-  );
-}
-
-Future<JobResult> _handleDeal(
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  CostedDeal costedDeal,
-  Ship ship,
-  BehaviorState state,
-  Market? currentMarket,
-) async {
-  // If we're at the source buy the cargo.
-  if (costedDeal.deal.sourceSymbol == ship.waypointSymbol) {
-    if (currentMarket == null) {
-      throw StateError(
-        'No currentMarket for $ship at ${ship.waypointSymbol}',
-      );
-    }
-    return _handleAtSourceWithDeal(
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-      state,
-      currentMarket,
-      costedDeal,
-    );
-  }
-  // If we're at the destination of the deal, sell.
-  if (costedDeal.deal.destinationSymbol == ship.waypointSymbol) {
-    // TODO(eseidel): This is wrong for construction and contract deals!
-    if (currentMarket == null) {
-      throw StateError(
-        'No currentMarket for $ship at ${ship.waypointSymbol}',
-      );
-    }
-    return _handleAtDestinationWithDeal(
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-      state,
-      currentMarket,
-      costedDeal,
-    );
-  }
-  return _handleOffCourseWithDeal(
-    api,
-    db,
-    centralCommand,
-    caches,
-    ship,
-    state,
-    costedDeal,
-  );
 }
 
 int? _expectedContractProfit(Contract contract, MarketPrices marketPrices) {
@@ -713,8 +557,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   }
   shipInfo(
     ship,
-    'Cargo hold still not empty, finding '
-    'market to sell ${unwantedCargo.symbol}.',
+    'Cargo hold not empty, finding market to sell ${unwantedCargo.symbol}.',
   );
   // We can't sell this cargo anywhere so give up?
 
@@ -742,8 +585,8 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   return JobResult.wait(waitUntil);
 }
 
-/// One loop of the trading logic
-Future<JobResult> doTrader(
+/// Sell unwanted cargo before beginning deal.
+Future<JobResult> sellUnwantedCargo(
   BehaviorState state,
   Api api,
   Database db,
@@ -752,10 +595,70 @@ Future<JobResult> doTrader(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  final deal =
+      assertNotNull(state.deal, 'No deal.', const Duration(minutes: 10));
+
+  final unwantedCargo = ship.largestCargo(
+    where: (i) => i.tradeSymbol != deal.tradeSymbol,
+  );
+  if (unwantedCargo == null) {
+    return JobResult.complete();
+  }
+
   final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
 
   // If we're currently at a market, record the prices and refuel.
   final currentMarket = await visitLocalMarket(
+    api,
+    db,
+    caches,
+    currentWaypoint,
+    ship,
+  );
+
+  final cargoResult = await handleUnwantedCargoIfNeeded(
+    api,
+    db,
+    centralCommand,
+    caches,
+    ship,
+    state,
+    currentMarket,
+    deal.tradeSymbol,
+  );
+  return cargoResult;
+}
+
+/// One loop of pick-up logic.
+Future<JobResult> doTraderGetCargo(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  // Can this ever happen?  Doesn't the route system prevent this?
+  if (ship.waypointSymbol != state.deal!.deal.sourceSymbol) {
+    shipWarn(ship, 'Off course in route to deal, resuming route.');
+    return JobResult.wait(
+      await beingNewRouteAndLog(
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        state,
+        state.deal!.deal.destinationSymbol,
+      ),
+    );
+  }
+
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+
+  // If we're currently at a market, record the prices and refuel.
+  final maybeMarket = await visitLocalMarket(
     api,
     db,
     caches,
@@ -779,50 +682,111 @@ Future<JobResult> doTrader(
     ship,
   );
 
-  // Should centralCommand do this in its own loop?
-  if (centralCommand.isContractTradingEnabled) {
-    await acceptContractsIfNeeded(
-      api,
-      db,
-      caches.contracts,
-      caches.marketPrices,
-      caches.agent,
-      caches.ships,
-      ship,
+  final deal =
+      assertNotNull(state.deal, 'No deal.', const Duration(minutes: 10));
+
+  // If we ever add support for picking up from haulers this won't be valid.
+  final currentMarket = assertNotNull(
+    maybeMarket,
+    'No market at trade source for $ship at ${ship.waypointSymbol}',
+    const Duration(minutes: 10),
+  );
+  return _handleAtSourceWithDeal(
+    api,
+    db,
+    centralCommand,
+    caches,
+    ship,
+    state,
+    currentMarket,
+    deal,
+  );
+}
+
+/// One loop of drop-off logic.
+Future<JobResult> doTraderDeliverCargo(
+  BehaviorState state,
+  Api api,
+  Database db,
+  CentralCommand centralCommand,
+  Caches caches,
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  // doTraderPickupCargo always just completes after purchasing cargo.
+  // It's our job to get us to the destination.
+  if (ship.waypointSymbol != state.deal!.deal.destinationSymbol) {
+    return JobResult.wait(
+      await beingNewRouteAndLog(
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        state,
+        state.deal!.deal.destinationSymbol,
+      ),
     );
   }
+
+  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+
+  // If we're currently at a market, record the prices and refuel.
+  final maybeMarket = await visitLocalMarket(
+    api,
+    db,
+    caches,
+    currentWaypoint,
+    ship,
+    // We want to always be using super up-to-date market prices for the trader.
+    // If we don't do this, we will end up buying based on stale prices
+    // which will make us think the goods are cheaper than they are
+    // and buy too many of them.
+    // TODO(eseidel): We can fix this by modeling the change in price
+    // and thus not having to update?
+    maxAge: const Duration(milliseconds: 300),
+  );
+  await visitLocalShipyard(
+    api,
+    db,
+    caches.shipyardPrices,
+    caches.static,
+    caches.agent,
+    currentWaypoint,
+    ship,
+  );
 
   final deal =
       assertNotNull(state.deal, 'No deal.', const Duration(minutes: 10));
 
-  // Regardless of where we are, if we have cargo that isn't part of our deal,
-  // try to sell it.
-  final cargoResult = await handleUnwantedCargoIfNeeded(
-    api,
-    db,
-    centralCommand,
-    caches,
-    ship,
-    state,
-    currentMarket,
-    deal.tradeSymbol,
-  );
-  if (!cargoResult.isComplete) {
-    return cargoResult;
+  final Future<JobResult> Function(
+    Api api,
+    Database db,
+    CentralCommand centralCommand,
+    Caches caches,
+    Ship ship,
+    BehaviorState state,
+    Market? maybeMarket,
+    CostedDeal costedDeal,
+  ) handler;
+  if (deal.isContractDeal) {
+    handler = _handleContractDealAtDestination;
+  } else if (deal.isConstructionDeal) {
+    handler = _handleConstructionDealAtDelivery;
+  } else {
+    handler = _handleArbitrageDealAtDestination;
   }
 
-  // We already have a deal, handle it.
-  final dealResult = await _handleDeal(
+  return handler(
     api,
     db,
     centralCommand,
     caches,
-    deal,
     ship,
     state,
-    currentMarket,
+    maybeMarket,
+    deal,
   );
-  return dealResult;
 }
 
 /// Initialize a new deal.
@@ -835,6 +799,21 @@ Future<JobResult> _initDeal(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  if (centralCommand.isContractTradingEnabled) {
+    // This requires a ship, hence is done in trader rather than centralCommand.
+    // We may need to be in the faction system to accept contracts.
+    // This will dock us at the current waypoint if needed.
+    await acceptContractsIfNeeded(
+      api,
+      db,
+      caches.contracts,
+      caches.marketPrices,
+      caches.agent,
+      caches.ships,
+      ship,
+    );
+  }
+
   // Consider all deals starting at any market within our consideration range.
   var newDeal = centralCommand.findNextDealAndLog(
     caches.agent,
@@ -906,5 +885,7 @@ Future<JobResult> _initDeal(
 /// Advance the trader.
 final advanceTrader = const MultiJob('Trader', [
   _initDeal,
-  doTrader,
+  sellUnwantedCargo,
+  doTraderGetCargo,
+  doTraderDeliverCargo,
 ]).run;

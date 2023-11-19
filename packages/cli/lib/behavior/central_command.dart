@@ -423,6 +423,7 @@ class CentralCommand {
   }
 
   /// Give central planning a chance to advance.
+  /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
     final hq = caches.agent.agent.headquartersSymbol;
     miningSquads = await assignShipsToSquads(
