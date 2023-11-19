@@ -669,7 +669,7 @@ Future<JobResult> doTraderGetCargo(
         caches,
         ship,
         state,
-        state.deal!.deal.destinationSymbol,
+        state.deal!.deal.sourceSymbol,
       ),
     );
   }
