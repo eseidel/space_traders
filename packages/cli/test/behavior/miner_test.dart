@@ -484,6 +484,21 @@ void main() {
       return result;
     });
     expect(result.waitTime, arrival);
+
+    // transferOrSellCargo is just a wrapper and should work too.
+    final orSell = await runWithLogger(logger, () async {
+      final result = await transferOrSellCargo(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        getNow: getNow,
+      );
+      return result;
+    });
+    expect(orSell.waitTime, arrival);
   });
 
   test('describeSurvey', () {
