@@ -741,7 +741,7 @@ bool Function(Deal) avoidDealsInProgress(
 }
 
 /// This is visible for scripts, generally you want to use
-/// [CentralCommand.findNextDealAndLog] instead.
+/// CentralCommand.findNextDealAndLog instead.
 Iterable<CostedDeal> scanAndFindDeals(
   SystemsCache systemsCache,
   MarketPrices marketPrices,
