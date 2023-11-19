@@ -28,9 +28,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final contractCache = ContractCache.load(fs)!;
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-  final extraSellOpps =
-      centralCommand.contractSellOpps(agentCache, contractCache).toList();
-
   final constructionCache = ConstructionCache.load(fs);
 
   final start = startArg == null
@@ -41,7 +38,15 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final construction =
       constructionCache.constructionForSymbol(jumpGate.waypointSymbol);
   centralCommand.activeConstruction = construction;
-  extraSellOpps.addAll(centralCommand.constructionSellOpps());
+
+  final extraSellOpps = <SellOpp>[];
+  if (centralCommand.isContractTradingEnabled) {
+    extraSellOpps
+        .addAll(centralCommand.contractSellOpps(agentCache, contractCache));
+  }
+  if (centralCommand.isConstructionTradingEnabled) {
+    extraSellOpps.addAll(centralCommand.constructionSellOpps());
+  }
 
   final ship = staticCaches.shipyardShips[shipType]!;
   final cargoCapacity = ship.cargoCapacity;
