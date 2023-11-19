@@ -75,7 +75,7 @@ class CentralCommand {
   bool get isContractTradingEnabled => true;
 
   /// Returns true if construction trading is enabled.
-  bool get isConstructionTradingEnabled => false;
+  bool get isConstructionTradingEnabled => true;
 
   /// Minimum profit per second we expect this ship to make.
   // Should set this based on the ship type and how much we expect to earn
