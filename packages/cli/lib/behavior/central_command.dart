@@ -538,6 +538,9 @@ class CentralCommand {
       ShipType.MINING_DRONE,
       ShipType.SIPHON_DRONE,
       ShipType.SURVEYOR,
+      ShipType.MINING_DRONE,
+      ShipType.MINING_DRONE,
+      ShipType.MINING_DRONE,
     ];
     final shipType = shipToBuyFromPlan(
       buyPlan,
@@ -827,16 +830,8 @@ MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
   if (squads.isEmpty) {
     return null;
   }
-  final minerHaulerSymbols = [
-    '7',
-    '8',
-    '9',
-    '17',
-    '18',
-    '19',
-    '1A',
-    '1B',
-  ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
+  final minerHaulerSymbols =
+      <String>[].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   // Score all squads based on how much they need this type of ship?
   // Add to the squad with the lowest score?
