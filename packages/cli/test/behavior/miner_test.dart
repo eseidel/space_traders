@@ -485,4 +485,27 @@ void main() {
     });
     expect(result.waitTime, arrival);
   });
+
+  test('describeSurvey', () {
+    final marketPrices = _MockMarketPrices();
+    final marketSymbol = WaypointSymbol.fromString('S-A-W');
+    const tradeSymbol = TradeSymbol.DIAMONDS;
+    when(
+      () =>
+          marketPrices.recentSellPrice(tradeSymbol, marketSymbol: marketSymbol),
+    ).thenReturn(100);
+    final survey = Survey(
+      expiration: DateTime(2021),
+      signature: 'sig',
+      symbol: marketSymbol.waypoint,
+      deposits: [SurveyDeposit(symbol: tradeSymbol.value)],
+      size: SurveySizeEnum.SMALL,
+    );
+    final description = describeSurvey(
+      survey,
+      marketPrices,
+      marketSymbol,
+    );
+    expect(description, 'sig SMALL DIAMONDS ev 100c');
+  });
 }

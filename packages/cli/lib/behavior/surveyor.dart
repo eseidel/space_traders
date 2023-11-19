@@ -57,7 +57,7 @@ Future<DateTime?> advanceSurveyor(
   );
 
   // for (final survey in response.surveys) {
-  //   printSurvey(survey, caches.marketPrices, mineJob.market);
+  //   logger.info(describeSurvey(survey, caches.marketPrices, marketSymbol));
   // }
 
   // Each survey is the whole behavior.

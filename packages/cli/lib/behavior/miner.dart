@@ -103,19 +103,17 @@ Future<List<ValuedSurvey>> surveysWorthMining(
   return best.where((s) => s.isActive).toList().reversed.toList();
 }
 
-/// Prints a survey to the log.
-void printSurvey(
+/// Returns a string for a survey.
+String describeSurvey(
   Survey survey,
   MarketPrices marketPrices,
   WaypointSymbol marketSymbol,
 ) {
   final expectedValue =
       expectedValueFromSurvey(marketPrices, survey, marketSymbol: marketSymbol);
-  logger.info(
-    '${survey.signature} ${survey.size} '
-    '${survey.deposits.map((d) => d.symbol).join(', ')} '
-    'ev ${creditsString(expectedValue)}',
-  );
+  return '${survey.signature} ${survey.size} '
+      '${survey.deposits.map((d) => d.symbol).join(', ')} '
+      'ev ${creditsString(expectedValue)}';
 }
 
 int _minSpaceForExtraction(Ship ship) {
@@ -274,7 +272,7 @@ Future<JobResult> doMineJob(
         await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
 
     // for (final survey in response.surveys) {
-    //   printSurvey(survey, caches.marketPrices, marketSymbol);
+    //   logger.info(describeSurvey(survey, caches.marketPrices, marketSymbol));
     // }
 
     verifyCooldown(
@@ -296,7 +294,7 @@ Future<JobResult> doMineJob(
   }
 
   // if (maybeSurvey != null) {
-  //   printSurvey(maybeSurvey, caches.marketPrices, marketSymbol);
+  //   logger.info(describeSurvey(survey, caches.marketPrices, marketSymbol));
   // }
 
   // Regardless of whether we have a survey, we should try to mine.
