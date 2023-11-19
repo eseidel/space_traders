@@ -28,7 +28,11 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipEngine extends Mock implements ShipEngine {}
 
+class _MockShipFrame extends Mock implements ShipFrame {}
+
 class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
 
@@ -374,5 +378,111 @@ void main() {
       // No market for diamonds (would need to mock markets above).
       throwsA(isA<JobException>()),
     );
+  });
+
+  test('transferToHaulersOrWait', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    final symbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    const tradeSymbol = TradeSymbol.DIAMONDS;
+    final shipCargo = ShipCargo(
+      capacity: 60,
+      units: 10,
+      inventory: [
+        ShipCargoItem(
+          symbol: tradeSymbol,
+          name: 'name',
+          description: 'description',
+          units: 10,
+        ),
+      ],
+    );
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
+    final shipEngine = _MockShipEngine();
+    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.speed).thenReturn(10);
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+
+    when(() => caches.marketPrices.pricesFor(tradeSymbol)).thenReturn([]);
+
+    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
+
+    final state = BehaviorState(shipSymbol, Behavior.miner)
+      ..mineJob = MineJob(mine: symbol, market: symbol);
+
+    final hauler = _MockShip();
+    final haulerFrame = _MockShipFrame();
+    when(() => hauler.frame).thenReturn(haulerFrame);
+    when(() => haulerFrame.symbol).thenReturn(ShipFrameSymbolEnum.SHUTTLE);
+    final haulerNav = shipNav; // Can just share for now.
+    when(() => hauler.nav).thenReturn(haulerNav);
+    final haulerCargo = ShipCargo(
+      capacity: 60,
+      units: 0,
+      inventory: [],
+    );
+    final haulerNavRoute = _MockShipNavRoute();
+    when(() => haulerNav.route).thenReturn(haulerNavRoute);
+    final arrival = now.add(const Duration(minutes: 1));
+    when(() => haulerNavRoute.arrival).thenReturn(arrival);
+    when(() => hauler.cargo).thenReturn(haulerCargo);
+    const haulerSymbol = ShipSymbol('S', 2);
+    when(() => hauler.symbol).thenReturn(haulerSymbol.symbol);
+
+    final squad = MiningSquad(state.mineJob!)..ships.addAll([ship, hauler]);
+    when(() => centralCommand.squadForShip(ship)).thenReturn(squad);
+
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    when(
+      () => fleetApi.transferCargo(
+        shipSymbol.symbol,
+        transferCargoRequest: TransferCargoRequest(
+          shipSymbol: haulerSymbol.symbol,
+          tradeSymbol: tradeSymbol,
+          units: 10,
+        ),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        TransferCargo200Response(
+          data: Jettison200ResponseData(
+            cargo: shipCargo,
+          ),
+        ),
+      ),
+    );
+
+    final logger = _MockLogger();
+
+    final result = await runWithLogger(logger, () async {
+      final result = await transferToHaulersOrWait(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        getNow: getNow,
+      );
+      return result;
+    });
+    expect(result.waitTime, arrival);
   });
 }
