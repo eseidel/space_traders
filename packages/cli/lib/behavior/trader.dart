@@ -378,6 +378,13 @@ Future<JobResult> _handleConstructionDealAtDelivery(
   Market? maybeMarket,
   CostedDeal costedDeal,
 ) async {
+  final construction = assertNotNull(
+    caches.construction
+        .constructionForSymbol(costedDeal.deal.destinationSymbol),
+    'No construction.',
+    const Duration(minutes: 10),
+  );
+
   await _deliverConstructionMaterialsIfPossible(
     api,
     db,
@@ -385,8 +392,7 @@ Future<JobResult> _handleConstructionDealAtDelivery(
     caches.construction,
     caches.ships,
     ship,
-    caches.construction
-        .constructionForSymbol(costedDeal.deal.destinationSymbol)!,
+    construction,
     costedDeal.tradeSymbol,
   );
   return JobResult.complete();
