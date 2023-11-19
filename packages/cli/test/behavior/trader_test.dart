@@ -732,7 +732,6 @@ void main() {
       ),
     ).called(1);
   });
-
   test('doTraderDeliverCargo travels to destination', () async {
     final api = _MockApi();
     final db = _MockDatabase();
@@ -890,5 +889,117 @@ void main() {
       ),
     );
     expect(result.waitTime, arrivalTime);
+  });
+
+  test('doTraderDeliverCargo arbitrage', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+
+    final start = WaypointSymbol.fromString('S-A-B');
+    final end = WaypointSymbol.fromString('S-A-C');
+
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
+    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(end.system);
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipCargo = ShipCargo(capacity: 10, units: 10);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
+
+    final routePlan = RoutePlan(
+      actions: [
+        RouteAction(
+          startSymbol: start,
+          endSymbol: end,
+          type: RouteActionType.navCruise,
+          seconds: 10,
+          fuelUsed: 10,
+        ),
+      ],
+      fuelCapacity: 10,
+      shipSpeed: 10,
+    );
+    final costedDeal = CostedDeal(
+      deal: Deal.test(
+        sourceSymbol: start,
+        destinationSymbol: end,
+        tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
+        purchasePrice: 10,
+        sellPrice: 200,
+      ),
+      cargoSize: 10,
+      transactions: [
+        Transaction.fallbackValue(),
+        Transaction.fallbackValue(),
+      ],
+      startTime: DateTime(2021).toUtc(),
+      route: routePlan,
+      costPerFuelUnit: 100,
+    );
+
+    final waypoint = _MockWaypoint();
+    when(() => waypoint.symbol).thenReturn(end.waypoint);
+    when(() => waypoint.systemSymbol).thenReturn(end.system);
+    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
+    when(() => waypoint.traits).thenReturn([
+      WaypointTrait(
+        symbol: WaypointTraitSymbol.MARKETPLACE,
+        name: '',
+        description: '',
+      ),
+    ]);
+    when(() => caches.waypoints.waypoint(end))
+        .thenAnswer((_) => Future.value(waypoint));
+    when(() => caches.markets.marketForSymbol(end)).thenAnswer(
+      (_) => Future.value(
+        Market(
+          symbol: end.waypoint,
+          tradeGoods: [
+            MarketTradeGood(
+              symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+              tradeVolume: 100,
+              supply: SupplyLevel.ABUNDANT,
+              type: MarketTradeGoodTypeEnum.EXCHANGE,
+              purchasePrice: 100,
+              sellPrice: 101,
+            ),
+          ],
+        ),
+      ),
+    );
+    when(
+      () => caches.marketPrices.hasRecentMarketData(
+        end,
+        maxAge: any(named: 'maxAge'),
+      ),
+    ).thenReturn(true);
+
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+
+    final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
+      ..deal = costedDeal;
+
+    final logger = _MockLogger();
+    final result = await runWithLogger(
+      logger,
+      () => doTraderDeliverCargo(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        getNow: () => DateTime(2021),
+      ),
+    );
+    expect(result.isComplete, isTrue);
   });
 }
