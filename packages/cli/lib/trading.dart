@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
@@ -18,29 +17,23 @@ import 'package:types/types.dart';
 /// markets we've never visited before (e.g. for emergency fuel purchases
 /// or when we're just starting out and don't have a lot of data yet).
 // TODO(eseidel): replace with findBestMarketToSell in all places?
-Future<Waypoint?> nearbyMarketWhichTrades(
+WaypointSymbol? nearbyMarketWhichTrades(
   SystemsCache systemsCache,
-  WaypointCache waypointCache,
   MarketListingCache marketListings,
   WaypointSymbol startSymbol,
   TradeSymbol tradeSymbol,
-) async {
-  final start = await waypointCache.waypoint(startSymbol);
-  if (start.hasMarketplace) {
-    final startMarket =
-        marketListings.marketListingForSymbol(start.waypointSymbol);
-    if (startMarket!.allowsTradeOf(tradeSymbol)) {
-      return start;
-    }
+) {
+  final startMarket = marketListings.marketListingForSymbol(startSymbol);
+  if (startMarket != null && startMarket.allowsTradeOf(tradeSymbol)) {
+    return startSymbol;
   }
   // TODO(eseidel): Handle jumps again!
-  final waypoints =
-      await waypointCache.waypointsInSystem(start.systemSymbolObject);
+  final waypoints = systemsCache.waypointsInSystem(startSymbol.systemSymbol);
   for (final waypoint in waypoints) {
     final market =
         marketListings.marketListingForSymbol(waypoint.waypointSymbol);
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
-      return waypoint;
+      return waypoint.waypointSymbol;
     }
   }
   return null;

@@ -383,14 +383,13 @@ Future<JobResult> emptyCargoIfNeeded(
   }
 
   final largestCargo = ship.largestCargo();
-  final nearestMarket = await nearbyMarketWhichTrades(
+  final nearestMarketSymbol = nearbyMarketWhichTrades(
     caches.systems,
-    caches.waypoints,
     caches.marketListings,
     currentWaypoint.waypointSymbol,
     largestCargo!.tradeSymbol,
   );
-  if (nearestMarket == null) {
+  if (nearestMarketSymbol == null) {
     shipErr(
       ship,
       'No nearby market to sell ${largestCargo.symbol}, jetisoning cargo!',
@@ -410,7 +409,7 @@ Future<JobResult> emptyCargoIfNeeded(
     caches,
     ship,
     state,
-    nearestMarket.waypointSymbol,
+    nearestMarketSymbol,
   );
   return JobResult.wait(waitTime);
 }

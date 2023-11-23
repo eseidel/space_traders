@@ -34,12 +34,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     return;
   }
 
-  // Look up what trade symbols are required dto produce the export.
-  final tradeSymbols = [
-    TradeSymbol.IRON,
-    TradeSymbol.QUARTZ_SAND,
-    TradeSymbol.PLASTICS,
-  ];
+  // Look up what trade symbols are required to produce the export.
+  final tradeSymbols = staticCaches.exports[export]!.imports;
   const minProfitPerSecond = -100;
   const maxWaypoints = 100;
   final waypointSymbol = listing.waypointSymbol;

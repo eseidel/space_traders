@@ -199,17 +199,15 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
     return null;
   }
   shipWarn(ship, 'Fuel critically low, routing to market.');
-  var destination = (await nearbyMarketWhichTrades(
+  var marketSymbol = nearbyMarketWhichTrades(
     caches.systems,
-    caches.waypoints,
     caches.marketListings,
     waypoint.waypointSymbol,
     TradeSymbol.FUEL,
-  ))
-      ?.waypointSymbol;
-  if (destination == null) {
+  );
+  if (marketSymbol == null) {
     shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
-    destination = nearestHeadquarters(
+    marketSymbol = nearestHeadquarters(
       // caches.systemConnectivity,
       caches.systems,
       caches.factions,
@@ -223,7 +221,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
     caches,
     ship,
     state,
-    destination,
+    marketSymbol,
   );
   return waitUntil;
 }
