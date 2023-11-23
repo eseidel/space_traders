@@ -478,9 +478,10 @@ void main() {
     );
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
-    when(() => caches.agent.headquartersSymbol).thenReturn(hqSymbol);
-    when(() => caches.waypoints.waypointsInSystem(hqSymbol.systemSymbol))
-        .thenAnswer(
+    final hqSystemSymbol = hqSymbol.systemSymbol;
+    when(() => caches.agent.headquartersSystemSymbol)
+        .thenReturn(hqSystemSymbol);
+    when(() => caches.waypoints.waypointsInSystem(hqSystemSymbol)).thenAnswer(
       (_) => Future.value([
         Waypoint(
           symbol: hqSymbol.waypoint,
