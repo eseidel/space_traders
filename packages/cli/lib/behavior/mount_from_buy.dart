@@ -47,7 +47,7 @@ Future<MountRequest?> mountRequestForShip(
   final creditsNeeded = buyCost + mountCost;
 
   // TODO(eseidel): Use a nearestShipyard function.
-  final hqSystem = caches.agent.headquartersSymbol.systemSymbol;
+  final hqSystem = caches.agent.headquartersSystemSymbol;
   final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
   final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
   return MountRequest(

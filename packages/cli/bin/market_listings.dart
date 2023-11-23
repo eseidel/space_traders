@@ -64,7 +64,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final staticCache = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final agentCache = AgentCache.load(fs)!;
-  final hqSystem = agentCache.headquartersSymbol.systemSymbol;
+  final hqSystem = agentCache.headquartersSystemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
 
   final waypoints = systemsCache.waypointsInSystem(hqSystem);

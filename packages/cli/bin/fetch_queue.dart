@@ -44,7 +44,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final api = defaultApi(fs, db, getPriority: () => 0);
   final caches = await Caches.loadOrFetch(fs, api, db);
 
-  final systemSymbol = caches.agent.agent.headquartersSymbol.systemSymbol;
+  final systemSymbol = caches.agent.headquartersSystemSymbol;
   final queue = FetchQueue(api, db, caches)..queueSystem(systemSymbol);
   await queue.run();
 

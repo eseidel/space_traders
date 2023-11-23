@@ -425,13 +425,12 @@ class CentralCommand {
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
-    final hq = caches.agent.agent.headquartersSymbol;
     miningSquads = await assignShipsToSquads(
       caches.systems,
       caches.waypoints,
       caches.marketListings,
       _shipCache,
-      systemSymbol: hq.systemSymbol,
+      systemSymbol: caches.agent.headquartersSystemSymbol,
     );
 
     _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
@@ -681,11 +680,10 @@ class CentralCommand {
     AgentCache agentCache,
     Ship ship,
   ) async {
-    final hq = agentCache.agent.headquartersSymbol;
     final score = (await evaluateWaypointsForSiphoning(
       waypointCache,
       marketListings,
-      hq.systemSymbol,
+      agentCache.headquartersSystemSymbol,
     ))
         .firstWhereOrNull((m) => m.marketTradesAllProducedGoods);
     if (score == null) {

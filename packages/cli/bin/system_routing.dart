@@ -20,13 +20,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final waypointCache =
       WaypointCache(api, systemsCache, chartingCache, constrctionCache);
   final agentCache = AgentCache.load(fs)!;
-  final hq = agentCache.headquartersSymbol;
+  final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
   final routePlanner = RoutePlanner(
     systemsCache: systemsCache,
     sellsFuel: defaultSellsFuel(marketListings),
   );
-  final waypoints = await waypointCache.waypointsInSystem(hq.systemSymbol);
+  final waypoints = await waypointCache.waypointsInSystem(hqSystemSymbol);
   final shipyard = waypoints.firstWhere((w) => w.hasShipyard);
 
   const shipType = ShipType.LIGHT_HAULER;

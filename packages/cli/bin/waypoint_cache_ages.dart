@@ -9,11 +9,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final chartingCache = ChartingCache.load(fs, staticCache.waypointTraits);
   final constrctionCache = ConstructionCache.load(fs);
   final agentCache = AgentCache.load(fs)!;
-  final hq = agentCache.headquartersSymbol;
+  final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
 
-  final waypoints = systemsCache.waypointsInSystem(hq.systemSymbol);
+  final waypoints = systemsCache.waypointsInSystem(hqSystemSymbol);
 
   final table = Table(
     header: ['Waypoint', 'Market', 'Shipyard', 'Construction', 'Chart'],
