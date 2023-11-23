@@ -35,6 +35,8 @@ class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
+class _MockTradeExportCache extends Mock implements TradeExportCache {}
+
 class _MockTradeGoodCache extends Mock implements TradeGoodCache {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
@@ -49,6 +51,7 @@ Caches mockCaches() {
   final reactors = _MockShipReactorCache();
   final waypointTraits = _MockWaypointTraitCache();
   final tradeGoods = _MockTradeGoodCache();
+  final exports = _MockTradeExportCache();
   final staticCache = StaticCaches(
     mounts: mounts,
     modules: modules,
@@ -57,6 +60,7 @@ Caches mockCaches() {
     reactors: reactors,
     waypointTraits: waypointTraits,
     tradeGoods: tradeGoods,
+    exports: exports,
   );
   return Caches(
     agent: _MockAgentCache(),

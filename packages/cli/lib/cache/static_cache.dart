@@ -7,18 +7,27 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/compare.dart';
 import 'package:collection/collection.dart';
+import 'package:types/export.dart';
 
 // Not using named parameters to save repetition at call sites.
-List<Value> _loadJson<Value>(
+List<Value> _loadJsonNullable<Value>(
   FileSystem fs,
   String path,
   // This is nullable because OpenApi's fromJson are nullable.
   Value? Function(dynamic) valueFromJson,
+) =>
+    _loadJson(fs, path, (json) => valueFromJson(json)!);
+
+List<Value> _loadJson<Value>(
+  FileSystem fs,
+  String path,
+  // This is nullable because OpenApi's fromJson are nullable.
+  Value Function(dynamic) valueFromJson,
 ) {
   return JsonListStore.loadRecords(
         fs,
         path,
-        (Map<String, dynamic> j) => valueFromJson(j) as Value,
+        (Map<String, dynamic> j) => valueFromJson(j),
       ) ??
       [];
 }
@@ -88,7 +97,7 @@ class ShipMountCache extends StaticCache<ShipMountSymbolEnum, ShipMount> {
   /// Load ship mount cache from disk.
   factory ShipMountCache.load(FileSystem fs, {String path = defaultPath}) =>
       ShipMountCache(
-        _loadJson(fs, path, ShipMount.fromJson),
+        _loadJsonNullable(fs, path, ShipMount.fromJson),
         fs: fs,
         path: path,
       );
@@ -116,7 +125,7 @@ class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
   /// Load ship module cache from disk.
   factory ShipModuleCache.load(FileSystem fs, {String path = defaultPath}) =>
       ShipModuleCache(
-        _loadJson(fs, path, ShipModule.fromJson),
+        _loadJsonNullable(fs, path, ShipModule.fromJson),
         fs: fs,
         path: path,
       );
@@ -152,7 +161,7 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
   /// Load shipyard ship cache from disk.
   factory ShipyardShipCache.load(FileSystem fs, {String path = defaultPath}) =>
       ShipyardShipCache(
-        _loadJson(fs, path, ShipyardShip.fromJson),
+        _loadJsonNullable(fs, path, ShipyardShip.fromJson),
         fs: fs,
         path: path,
       );
@@ -185,7 +194,7 @@ class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
   /// Load ship engine cache from disk.
   factory ShipEngineCache.load(FileSystem fs, {String path = defaultPath}) =>
       ShipEngineCache(
-        _loadJson(fs, path, ShipEngine.fromJson),
+        _loadJsonNullable(fs, path, ShipEngine.fromJson),
         fs: fs,
         path: path,
       );
@@ -217,7 +226,7 @@ class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
   /// Load ship reactor cache from disk.
   factory ShipReactorCache.load(FileSystem fs, {String path = defaultPath}) =>
       ShipReactorCache(
-        _loadJson(fs, path, ShipReactor.fromJson),
+        _loadJsonNullable(fs, path, ShipReactor.fromJson),
         fs: fs,
         path: path,
       );
@@ -250,7 +259,7 @@ class WaypointTraitCache
   /// Load waypoint trait cache from disk.
   factory WaypointTraitCache.load(FileSystem fs, {String path = defaultPath}) =>
       WaypointTraitCache(
-        _loadJson(fs, path, WaypointTrait.fromJson),
+        _loadJsonNullable(fs, path, WaypointTrait.fromJson),
         fs: fs,
         path: path,
       );
@@ -282,7 +291,7 @@ class TradeGoodCache extends StaticCache<TradeSymbol, TradeGood> {
   /// Load waypoint trait cache from disk.
   factory TradeGoodCache.load(FileSystem fs, {String path = defaultPath}) =>
       TradeGoodCache(
-        _loadJson(fs, path, TradeGood.fromJson),
+        _loadJsonNullable(fs, path, TradeGood.fromJson),
         fs: fs,
         path: path,
       );
@@ -302,6 +311,38 @@ class TradeGoodCache extends StaticCache<TradeSymbol, TradeGood> {
   TradeSymbol keyFor(TradeGood record) => record.symbol;
 }
 
+/// A cache of trade good descriptions.
+class TradeExportCache extends StaticCache<TradeSymbol, TradeExport> {
+  /// Creates a new waypoint trait cache.
+  TradeExportCache(
+    super.exports, {
+    required super.fs,
+    super.path = defaultPath,
+  });
+
+  /// Load waypoint trait cache from disk.
+  factory TradeExportCache.load(FileSystem fs, {String path = defaultPath}) =>
+      TradeExportCache(
+        _loadJson(fs, path, TradeExport.fromJson),
+        fs: fs,
+        path: path,
+      );
+
+  /// The default path to the cache file.
+  static const defaultPath = 'static_data/exports.json';
+
+  @override
+  TradeExport copyAndNormalize(TradeExport record) =>
+      TradeExport.fromJson(jsonDecode(jsonEncode(record)));
+
+  @override
+  int compare(TradeExport a, TradeExport b) =>
+      a.export.value.compareTo(b.export.value);
+
+  @override
+  TradeSymbol keyFor(TradeExport record) => record.export;
+}
+
 /// Caches of static server data that does not typically change between
 /// resets and thus can be checked into source control.
 class StaticCaches {
@@ -314,6 +355,7 @@ class StaticCaches {
     required this.reactors,
     required this.waypointTraits,
     required this.tradeGoods,
+    required this.exports,
   });
 
   /// Load the caches from disk.
@@ -326,6 +368,7 @@ class StaticCaches {
       reactors: ShipReactorCache.load(fs),
       waypointTraits: WaypointTraitCache.load(fs),
       tradeGoods: TradeGoodCache.load(fs),
+      exports: TradeExportCache.load(fs),
     );
   }
 
@@ -349,6 +392,9 @@ class StaticCaches {
 
   /// The trade good cache.
   final TradeGoodCache tradeGoods;
+
+  /// Cache mapping exports to needed imports.
+  final TradeExportCache exports;
 }
 
 /// Records ShipyardShips and their components into the caches.

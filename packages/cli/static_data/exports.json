@@ -1,0 +1,896 @@
+[
+ {
+  "export": "ADVANCED_CIRCUITRY",
+  "imports": [
+   "ELECTRONICS",
+   "MICROPROCESSORS"
+  ]
+ },
+ {
+  "export": "AI_MAINFRAMES",
+  "imports": [
+   "ADVANCED_CIRCUITRY",
+   "MICROPROCESSORS"
+  ]
+ },
+ {
+  "export": "ALUMINUM",
+  "imports": [
+   "ALUMINUM_ORE"
+  ]
+ },
+ {
+  "export": "ALUMINUM_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "AMMONIA_ICE",
+  "imports": [
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "AMMUNITION",
+  "imports": [
+   "IRON",
+   "LIQUID_NITROGEN"
+  ]
+ },
+ {
+  "export": "ANTIMATTER",
+  "imports": [
+   "LAB_INSTRUMENTS",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "ASSAULT_RIFLES",
+  "imports": [
+   "ALUMINUM",
+   "AMMUNITION"
+  ]
+ },
+ {
+  "export": "BIOCOMPOSITES",
+  "imports": [
+   "FABRICS",
+   "POLYNUCLEOTIDES"
+  ]
+ },
+ {
+  "export": "BOTANICAL_SPECIMENS",
+  "imports": [
+   "LAB_INSTRUMENTS",
+   "EQUIPMENT"
+  ]
+ },
+ {
+  "export": "CLOTHING",
+  "imports": [
+   "FABRICS"
+  ]
+ },
+ {
+  "export": "COPPER",
+  "imports": [
+   "COPPER_ORE"
+  ]
+ },
+ {
+  "export": "COPPER_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "CULTURAL_ARTIFACTS",
+  "imports": [
+   "LAB_INSTRUMENTS"
+  ]
+ },
+ {
+  "export": "CYBER_IMPLANTS",
+  "imports": [
+   "ADVANCED_CIRCUITRY",
+   "BIOCOMPOSITES"
+  ]
+ },
+ {
+  "export": "DIAMONDS",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "DRUGS",
+  "imports": [
+   "AMMONIA_ICE",
+   "POLYNUCLEOTIDES"
+  ]
+ },
+ {
+  "export": "ELECTRONICS",
+  "imports": [
+   "SILICON_CRYSTALS",
+   "COPPER"
+  ]
+ },
+ {
+  "export": "ENGINE_HYPER_DRIVE_I",
+  "imports": [
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "ENGINE_IMPULSE_DRIVE_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "ENGINE_ION_DRIVE_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "ENGINE_ION_DRIVE_II",
+  "imports": [
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "EQUIPMENT",
+  "imports": [
+   "ALUMINUM",
+   "PLASTICS"
+  ]
+ },
+ {
+  "export": "EXOTIC_MATTER",
+  "imports": [
+   "LAB_INSTRUMENTS",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "EXPLOSIVES",
+  "imports": [
+   "LIQUID_HYDROGEN",
+   "LIQUID_NITROGEN"
+  ]
+ },
+ {
+  "export": "FABRICS",
+  "imports": [
+   "FERTILIZERS"
+  ]
+ },
+ {
+  "export": "FAB_MATS",
+  "imports": [
+   "IRON",
+   "QUARTZ_SAND"
+  ]
+ },
+ {
+  "export": "FERTILIZERS",
+  "imports": [
+   "LIQUID_NITROGEN"
+  ]
+ },
+ {
+  "export": "FIREARMS",
+  "imports": [
+   "IRON",
+   "AMMUNITION"
+  ]
+ },
+ {
+  "export": "FOOD",
+  "imports": [
+   "FERTILIZERS"
+  ]
+ },
+ {
+  "export": "FUEL",
+  "imports": [
+   "HYDROCARBON"
+  ]
+ },
+ {
+  "export": "GENE_THERAPEUTICS",
+  "imports": [
+   "POLYNUCLEOTIDES",
+   "LAB_INSTRUMENTS"
+  ]
+ },
+ {
+  "export": "GOLD",
+  "imports": [
+   "GOLD_ORE"
+  ]
+ },
+ {
+  "export": "GOLD_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "GRAVITON_EMITTERS",
+  "imports": [
+   "ADVANCED_CIRCUITRY",
+   "MERITIUM"
+  ]
+ },
+ {
+  "export": "HOLOGRAPHICS",
+  "imports": [
+   "GOLD",
+   "SILVER",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "HYDROCARBON",
+  "imports": [
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "ICE_WATER",
+  "imports": [
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "IRON",
+  "imports": [
+   "IRON_ORE"
+  ]
+ },
+ {
+  "export": "IRON_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "JEWELRY",
+  "imports": [
+   "GOLD",
+   "SILVER",
+   "PRECIOUS_STONES",
+   "DIAMONDS"
+  ]
+ },
+ {
+  "export": "LAB_INSTRUMENTS",
+  "imports": [
+   "ELECTRONICS",
+   "EQUIPMENT"
+  ]
+ },
+ {
+  "export": "LASER_RIFLES",
+  "imports": [
+   "DIAMONDS",
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "LIQUID_HYDROGEN",
+  "imports": [
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "LIQUID_NITROGEN",
+  "imports": [
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MACHINERY",
+  "imports": [
+   "IRON"
+  ]
+ },
+ {
+  "export": "MEDICINE",
+  "imports": [
+   "FABRICS",
+   "POLYNUCLEOTIDES"
+  ]
+ },
+ {
+  "export": "MERITIUM",
+  "imports": [
+   "MERITIUM_ORE"
+  ]
+ },
+ {
+  "export": "MERITIUM_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "MICROPROCESSORS",
+  "imports": [
+   "SILICON_CRYSTALS",
+   "COPPER"
+  ]
+ },
+ {
+  "export": "MICRO_FUSION_GENERATORS",
+  "imports": [
+   "ADVANCED_CIRCUITRY",
+   "PLATINUM",
+   "DIAMONDS"
+  ]
+ },
+ {
+  "export": "MILITARY_EQUIPMENT",
+  "imports": [
+   "ALUMINUM",
+   "ELECTRONICS"
+  ]
+ },
+ {
+  "export": "MODULE_CARGO_HOLD_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MODULE_CARGO_HOLD_II",
+  "imports": [
+   "ALUMINUM",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MODULE_CARGO_HOLD_III",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "MODULE_CREW_QUARTERS_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "FABRICS"
+  ]
+ },
+ {
+  "export": "MODULE_ENVOY_QUARTERS_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "FABRICS"
+  ]
+ },
+ {
+  "export": "MODULE_FUEL_REFINERY_I",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MODULE_GAS_PROCESSOR_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MODULE_JUMP_DRIVE_I",
+  "imports": [
+   "IRON",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "MODULE_JUMP_DRIVE_II",
+  "imports": [
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY",
+   "GOLD"
+  ]
+ },
+ {
+  "export": "MODULE_JUMP_DRIVE_III",
+  "imports": [
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY",
+   "GOLD",
+   "MERITIUM"
+  ]
+ },
+ {
+  "export": "MODULE_MICRO_REFINERY_I",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MODULE_MINERAL_PROCESSOR_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MODULE_ORE_REFINERY_I",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MODULE_PASSENGER_CABIN_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "FABRICS"
+  ]
+ },
+ {
+  "export": "MODULE_SCIENCE_LAB_I",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "MODULE_SHIELD_GENERATOR_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "URANITE"
+  ]
+ },
+ {
+  "export": "MODULE_SHIELD_GENERATOR_II",
+  "imports": [
+   "ALUMINUM",
+   "MACHINERY",
+   "URANITE"
+  ]
+ },
+ {
+  "export": "MODULE_WARP_DRIVE_I",
+  "imports": [
+   "IRON",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "MODULE_WARP_DRIVE_II",
+  "imports": [
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY",
+   "URANITE"
+  ]
+ },
+ {
+  "export": "MODULE_WARP_DRIVE_III",
+  "imports": [
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY",
+   "MERITIUM"
+  ]
+ },
+ {
+  "export": "MOOD_REGULATORS",
+  "imports": [
+   "POLYNUCLEOTIDES",
+   "LAB_INSTRUMENTS"
+  ]
+ },
+ {
+  "export": "MOUNT_GAS_SIPHON_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MOUNT_GAS_SIPHON_II",
+  "imports": [
+   "ALUMINUM",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MOUNT_GAS_SIPHON_III",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "MOUNT_LASER_CANNON_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "DIAMONDS"
+  ]
+ },
+ {
+  "export": "MOUNT_MINING_LASER_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "DIAMONDS"
+  ]
+ },
+ {
+  "export": "MOUNT_MINING_LASER_II",
+  "imports": [
+   "ALUMINUM",
+   "MACHINERY",
+   "DIAMONDS"
+  ]
+ },
+ {
+  "export": "MOUNT_MINING_LASER_III",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY",
+   "ADVANCED_CIRCUITRY",
+   "URANITE"
+  ]
+ },
+ {
+  "export": "MOUNT_MISSILE_LAUNCHER_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "MOUNT_SENSOR_ARRAY_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "ELECTRONICS"
+  ]
+ },
+ {
+  "export": "MOUNT_SENSOR_ARRAY_II",
+  "imports": [
+   "ALUMINUM",
+   "MACHINERY",
+   "ELECTRONICS"
+  ]
+ },
+ {
+  "export": "MOUNT_SENSOR_ARRAY_III",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY",
+   "ADVANCED_CIRCUITRY",
+   "URANITE"
+  ]
+ },
+ {
+  "export": "MOUNT_SURVEYOR_I",
+  "imports": [
+   "IRON",
+   "MACHINERY",
+   "ELECTRONICS"
+  ]
+ },
+ {
+  "export": "MOUNT_SURVEYOR_II",
+  "imports": [
+   "ALUMINUM",
+   "MACHINERY",
+   "ELECTRONICS"
+  ]
+ },
+ {
+  "export": "MOUNT_SURVEYOR_III",
+  "imports": [
+   "PLATINUM",
+   "MACHINERY",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "MOUNT_TURRET_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "NANOBOTS",
+  "imports": [
+   "POLYNUCLEOTIDES",
+   "LAB_INSTRUMENTS"
+  ]
+ },
+ {
+  "export": "NEURAL_CHIPS",
+  "imports": [
+   "POLYNUCLEOTIDES",
+   "ADVANCED_CIRCUITRY"
+  ]
+ },
+ {
+  "export": "NOVEL_LIFEFORMS",
+  "imports": [
+   "LAB_INSTRUMENTS",
+   "EQUIPMENT"
+  ]
+ },
+ {
+  "export": "PLASTICS",
+  "imports": [
+   "LIQUID_HYDROGEN"
+  ]
+ },
+ {
+  "export": "PLATINUM",
+  "imports": [
+   "PLATINUM_ORE"
+  ]
+ },
+ {
+  "export": "PLATINUM_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "POLYNUCLEOTIDES",
+  "imports": [
+   "LIQUID_HYDROGEN",
+   "LIQUID_NITROGEN"
+  ]
+ },
+ {
+  "export": "PRECIOUS_STONES",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "QUANTUM_DRIVES",
+  "imports": [
+   "ADVANCED_CIRCUITRY",
+   "URANITE"
+  ]
+ },
+ {
+  "export": "QUANTUM_STABILIZERS",
+  "imports": [
+   "PLATINUM",
+   "ADVANCED_CIRCUITRY",
+   "URANITE"
+  ]
+ },
+ {
+  "export": "QUARTZ_SAND",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "REACTOR_ANTIMATTER_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "REACTOR_CHEMICAL_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "REACTOR_FISSION_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "REACTOR_FUSION_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "REACTOR_SOLAR_I",
+  "imports": [
+   "IRON",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "RELIC_TECH",
+  "imports": [
+   "LAB_INSTRUMENTS",
+   "EQUIPMENT"
+  ]
+ },
+ {
+  "export": "ROBOTIC_DRONES",
+  "imports": [
+   "ADVANCED_CIRCUITRY",
+   "ALUMINUM"
+  ]
+ },
+ {
+  "export": "SHIP_COMMAND_FRIGATE",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_EXPLORER",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_HEAVY_FREIGHTER",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_INTERCEPTOR",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_LIGHT_HAULER",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_LIGHT_SHUTTLE",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_MINING_DRONE",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_ORE_HOUND",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_PARTS",
+  "imports": [
+   "EQUIPMENT",
+   "ELECTRONICS"
+  ]
+ },
+ {
+  "export": "SHIP_PLATING",
+  "imports": [
+   "ALUMINUM",
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "SHIP_PROBE",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_REFINING_FREIGHTER",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_SALVAGE",
+  "imports": [
+   "MACHINERY"
+  ]
+ },
+ {
+  "export": "SHIP_SIPHON_DRONE",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SHIP_SURVEYOR",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
+  ]
+ },
+ {
+  "export": "SILICON_CRYSTALS",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "SILVER",
+  "imports": [
+   "SILVER_ORE"
+  ]
+ },
+ {
+  "export": "SILVER_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "SUPERGRAINS",
+  "imports": [
+   "FERTILIZERS",
+   "POLYNUCLEOTIDES",
+   "LAB_INSTRUMENTS"
+  ]
+ },
+ {
+  "export": "URANITE",
+  "imports": [
+   "URANITE_ORE"
+  ]
+ },
+ {
+  "export": "URANITE_ORE",
+  "imports": [
+   "EXPLOSIVES"
+  ]
+ },
+ {
+  "export": "VIRAL_AGENTS",
+  "imports": [
+   "POLYNUCLEOTIDES",
+   "LAB_INSTRUMENTS"
+  ]
+ }
+]

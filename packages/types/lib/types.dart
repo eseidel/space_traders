@@ -6,6 +6,7 @@ export 'construction.dart';
 export 'contract.dart';
 export 'deal.dart';
 export 'enum.dart';
+export 'export.dart';
 export 'extraction.dart';
 export 'market_listing.dart';
 export 'market_price.dart';
