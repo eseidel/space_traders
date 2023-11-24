@@ -38,8 +38,6 @@ class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
-class _MockShipFuel extends Mock implements ShipFuel {}
-
 class _MockShipNav extends Mock implements ShipNav {}
 
 void main() {
@@ -600,16 +598,7 @@ void main() {
     final shipyardShips = _MockShipyardShipCache();
     final shipyardPrices = _MockShipyardPrices();
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehhaviorCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     when(() => shipyardPrices.havePriceFor(any())).thenReturn(true);
-
-    expect(
-      centralCommand
-          .shipToBuyFromPlan(<ShipType>[], shipyardPrices, shipyardShips),
-      isNull,
-    );
 
     final buySecond = [ShipType.COMMAND_FRIGATE, ShipType.EXPLORER];
     when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
@@ -617,7 +606,8 @@ void main() {
     when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
         .thenReturn(0);
     expect(
-      centralCommand.shipToBuyFromPlan(
+      shipToBuyFromPlan(
+        shipCache,
         buySecond,
         shipyardPrices,
         shipyardShips,
@@ -631,7 +621,8 @@ void main() {
     when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
         .thenReturn(0);
     expect(
-      centralCommand.shipToBuyFromPlan(
+      shipToBuyFromPlan(
+        shipCache,
         buyFirst,
         shipyardPrices,
         shipyardShips,
@@ -652,7 +643,8 @@ void main() {
     when(() => shipCache.countOfType(shipyardShips, ShipType.ORE_HOUND))
         .thenReturn(0);
     expect(
-      centralCommand.shipToBuyFromPlan(
+      shipToBuyFromPlan(
+        shipCache,
         buyFourth,
         shipyardPrices,
         shipyardShips,

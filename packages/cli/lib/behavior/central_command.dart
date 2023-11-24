@@ -440,39 +440,10 @@ class CentralCommand {
     );
   }
 
-  /// Returns the next ship to buy from the given [shipPlan].
-  @visibleForTesting
-  ShipType? shipToBuyFromPlan(
-    List<ShipType> shipPlan,
-    ShipyardPrices shipyardPrices,
-    ShipyardShipCache shipyardShips,
-  ) {
-    final counts = <ShipType, int>{};
-    for (final shipType in shipPlan) {
-      counts[shipType] = (counts[shipType] ?? 0) + 1;
-      final fleetCount = _shipCache.countOfType(shipyardShips, shipType);
-      if (fleetCount == null) {
-        logger.warn('Unknown count for $shipType');
-        return null;
-      }
-      // If we have bought this ship type enough times, go next.
-      if (fleetCount >= counts[shipType]!) {
-        continue;
-      }
-      // If we should buy this one but haven't found it yet, buy nothing.
-      if (!shipyardPrices.havePriceFor(shipType)) {
-        return null;
-      }
-      // Buy this one!
-      return shipType;
-    }
-    // We walked off the end of our plan.
-    return null;
-  }
-
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
     final shipType = shipToBuyFromPlan(
+      _shipCache,
       config.buyPlan,
       caches.shipyardPrices,
       caches.static.shipyardShips,
@@ -806,4 +777,36 @@ Future<List<MiningSquad>> assignShipsToSquads(
     findSquadForShip(squads, ship)?.ships.add(ship);
   }
   return squads;
+}
+
+/// Returns the next ship to buy from the given [shipPlan].
+ShipType? shipToBuyFromPlan(
+  ShipCache shipCache,
+  List<ShipType> shipPlan,
+  ShipyardPrices shipyardPrices,
+  ShipyardShipCache shipyardShips,
+) {
+  final counts = <ShipType, int>{};
+  for (final shipType in shipPlan) {
+    counts[shipType] = (counts[shipType] ?? 0) + 1;
+    final fleetCount = shipCache.countOfType(shipyardShips, shipType);
+    if (fleetCount == null) {
+      logger.warn('Unknown count for $shipType');
+      return null;
+    }
+    // If we have bought this ship type enough times, go next.
+    if (fleetCount >= counts[shipType]!) {
+      continue;
+    }
+    // If we should buy this one but haven't found it yet, buy nothing.
+    if (!shipyardPrices.havePriceFor(shipType)) {
+      logger.warn('No prices for $shipType');
+      return null;
+    }
+    // Buy this one!
+    return shipType;
+  }
+  logger.info('All ships already purchased in plan.');
+  // We walked off the end of our plan.
+  return null;
 }
