@@ -59,12 +59,16 @@ class MarketListingCache extends JsonStore<_Record> {
   /// The MarketListings.
   Iterable<MarketListing> get listings => _listingBySymbol.values;
 
-  /// Fetch the waypoint with the given symbol.
+  /// Fetch the MarketListing for the given waypoint symbol.
   MarketListing? marketListingForSymbol(WaypointSymbol marketSymbol) {
     return _listingBySymbol[marketSymbol];
   }
 
-  /// Add a market to the cache.
+  /// Fetch the MarketListing for the given waypoint symbol.
+  MarketListing? operator [](WaypointSymbol marketSymbol) =>
+      marketListingForSymbol(marketSymbol);
+
+  /// Add MarketListings for the given Market to the cache.
   void addMarket(Market market) {
     final symbol = market.waypointSymbol;
     final marketListing = MarketListing(

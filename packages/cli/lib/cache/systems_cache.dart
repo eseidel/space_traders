@@ -111,6 +111,10 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Return the SystemWaypoint for the given [symbol].
+  SystemWaypoint waypoint(WaypointSymbol symbol) => waypointOrNull(symbol)!;
+
+  /// Return the SystemWaypoint for the given [symbol].
+  // Remove in favor of waypoint().
   SystemWaypoint waypointFromSymbol(WaypointSymbol symbol) =>
       waypointOrNull(symbol)!;
 
