@@ -29,6 +29,8 @@ class Config {
   ];
 
   /// A list of which haulers should be used as miner haulers.
+  // This should instead be some min count of light-haulers before we
+  // start making miner haulers, and then some max count of miner haulers?
   final minerHaulerSymbols = <String>['12', '13', '14']
       .map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
@@ -67,7 +69,7 @@ class Config {
   /// Used by sellOppsForConstruction to determine what SellOpps for
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 1500,
+    TradeSymbol.FAB_MATS: 1700,
     TradeSymbol.ADVANCED_CIRCUITRY: 13000,
   };
 
