@@ -188,7 +188,7 @@ Future<void> logic(
         caches,
         waiter,
         shipFilter: shipFilter,
-        loopCount: 50,
+        loopCount: 20,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {
