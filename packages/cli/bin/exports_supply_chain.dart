@@ -78,8 +78,17 @@ class Sourcer {
       logger.warn('No export for $tradeSymbol for $waypointSymbol');
       return;
     }
+    final closestPrice = marketPrices.priceAt(
+      closest.waypointSymbol,
+      tradeSymbol,
+    );
+    final destinationPrice = marketPrices.priceAt(
+      waypointSymbol,
+      tradeSymbol,
+    );
     logger.info('Shuttle $tradeSymbol from '
-        '${closest.waypointSymbol} to $waypointSymbol');
+        '${closest.waypointSymbol} (${closestPrice?.supply}) '
+        'to $waypointSymbol (${destinationPrice?.supply})');
     sourceViaManufacture(tradeSymbol, closest.waypointSymbol);
   }
 
@@ -126,9 +135,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpgate = systemsCache
       .jumpGateWaypointForSystem(agentCache.headquartersSystemSymbol)!;
   const tradeSymbol = TradeSymbol.FAB_MATS;
-
   final waypointSymbol = jumpgate.waypointSymbol;
-  logger.info('$tradeSymbol for $waypointSymbol');
+
+  logger.info('Sourcing $tradeSymbol for $waypointSymbol');
   Sourcer(
     marketListings: marketListings,
     systemsCache: systemsCache,
