@@ -8,7 +8,7 @@ void main(List<String> args) async {
 }
 
 String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
-  final waypoint = systemsCache.waypointFromSymbol(ship.waypointSymbol);
+  final waypoint = systemsCache.waypoint(ship.waypointSymbol);
   var string = '${ship.navStatusString} ${waypoint.type} '
       '${ship.registration.role} ${ship.fleetRole.name} '
       '${ship.cargo.units}/${ship.cargo.capacity}';

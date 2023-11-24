@@ -873,7 +873,7 @@ Future<List<MiningSquad>> assignShipsToSquads(
   // Sort by distance from center of the system.
   final origin = WaypointPosition(0, 0, systemSymbol);
   scores.sortBy<num>((score) {
-    final mineWaypoint = systemsCache.waypointFromSymbol(score.mine);
+    final mineWaypoint = systemsCache.waypoint(score.mine);
     final distance = mineWaypoint.position.distanceTo(origin);
     return distance.toInt();
   });

@@ -296,7 +296,7 @@ void main() {
 
     when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
-    when(() => caches.systems.waypointFromSymbol(start)).thenReturn(
+    when(() => caches.systems.waypoint(start)).thenReturn(
       SystemWaypoint(
         symbol: start.waypoint,
         type: WaypointType.ASTEROID_FIELD,
@@ -304,7 +304,7 @@ void main() {
         y: 0,
       ),
     );
-    when(() => caches.systems.waypointFromSymbol(end)).thenReturn(
+    when(() => caches.systems.waypoint(end)).thenReturn(
       SystemWaypoint(
         symbol: end.waypoint,
         type: WaypointType.ASTEROID_FIELD,
@@ -800,7 +800,7 @@ void main() {
       ),
     ).thenReturn(routePlan);
 
-    when(() => caches.systems.waypointFromSymbol(start)).thenReturn(
+    when(() => caches.systems.waypoint(start)).thenReturn(
       SystemWaypoint(
         symbol: start.waypoint,
         type: WaypointType.ASTEROID_FIELD,
@@ -808,7 +808,7 @@ void main() {
         y: 0,
       ),
     );
-    when(() => caches.systems.waypointFromSymbol(end)).thenReturn(
+    when(() => caches.systems.waypoint(end)).thenReturn(
       SystemWaypoint(
         symbol: end.waypoint,
         type: WaypointType.ASTEROID_FIELD,

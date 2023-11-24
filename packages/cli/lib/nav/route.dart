@@ -144,7 +144,7 @@ RoutePlan routePlanFromJumpPlan(
   if (jumpPlan.route.last != end.systemSymbol) {
     throw ArgumentError('Jump plan does not end at ${end.systemSymbol}');
   }
-  final startWaypoint = systemsCache.waypointFromSymbol(start);
+  final startWaypoint = systemsCache.waypoint(start);
   final startJumpGate =
       systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
   if (startJumpGate.symbol != start.waypoint) {
@@ -167,7 +167,7 @@ RoutePlan routePlanFromJumpPlan(
       ),
     );
   }
-  final endWaypoint = systemsCache.waypointFromSymbol(end);
+  final endWaypoint = systemsCache.waypoint(end);
   final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
   if (endJumpGate.symbol != end.waypoint) {
     actions.add(_navigationAction(endJumpGate, endWaypoint, shipSpeed));
@@ -355,8 +355,8 @@ class RoutePlanner {
     // for (var i = symbols.length - 1; i > 0; i--) {
     //   final current = symbols[i];
     //   final previous = symbols[i - 1];
-    //   final previousWaypoint = _systemsCache.waypointFromSymbol(previous);
-    //   final currentWaypoint = _systemsCache.waypointFromSymbol(current);
+    //   final previousWaypoint = _systemsCache.waypoint(previous);
+    //   final currentWaypoint = _systemsCache.waypoint(current);
     //   if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
     //     // Assume we jumped.
     //     route.add(

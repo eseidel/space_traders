@@ -54,7 +54,7 @@ void main() {
       x: 0,
       y: 0,
     );
-    when(() => caches.systems.waypointFromSymbol(waypointSymbol))
+    when(() => caches.systems.waypoint(waypointSymbol))
         .thenReturn(systemWaypoint);
 
     final system = System(

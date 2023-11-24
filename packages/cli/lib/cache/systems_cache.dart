@@ -114,17 +114,12 @@ class SystemsCache extends JsonListStore<System> {
   SystemWaypoint waypoint(WaypointSymbol symbol) => waypointOrNull(symbol)!;
 
   /// Return the SystemWaypoint for the given [symbol].
-  // Remove in favor of waypoint().
-  SystemWaypoint waypointFromSymbol(WaypointSymbol symbol) =>
-      waypointOrNull(symbol)!;
-
-  /// Return the SystemWaypoint for the given [symbol].
   SystemWaypoint? waypointFromString(String symbol) =>
       waypointOrNull(WaypointSymbol.fromString(symbol));
 
   /// Returns true if the given [symbol] is a jump gate.
   bool isJumpGate(WaypointSymbol symbol) =>
-      waypointFromSymbol(symbol).type == WaypointType.JUMP_GATE;
+      waypoint(symbol).type == WaypointType.JUMP_GATE;
 
   /// Return the SystemWaypoints for the given [systemSymbol].
   /// Mostly exists for compatibility with WaypointCache.

@@ -59,7 +59,7 @@ class AgentCache extends JsonStore<Agent> {
 
   /// The headquarters of the agent.
   SystemWaypoint headquarters(SystemsCache systems) =>
-      systems.waypointFromSymbol(agent.headquartersSymbol);
+      systems.waypoint(agent.headquartersSymbol);
 
   /// The symbol of the agent's headquarters.
   WaypointSymbol get headquartersSymbol => agent.headquartersSymbol;

@@ -53,7 +53,7 @@ class WaypointCache {
     if (values == null) {
       return null;
     }
-    final systemWaypoint = _systemsCache.waypointFromSymbol(waypointSymbol);
+    final systemWaypoint = _systemsCache.waypoint(waypointSymbol);
     final traits = <WaypointTrait>[];
     for (final traitSymbol in values.traitSymbols) {
       final trait = _chartingCache.waypointTraits[traitSymbol];

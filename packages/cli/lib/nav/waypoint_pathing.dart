@@ -37,8 +37,8 @@ List<RouteAction>? findRouteWithinSystem(
   required int fuelCapacity,
   required bool Function(WaypointSymbol) sellsFuel,
 }) {
-  final startWaypoint = systemsCache.waypointFromSymbol(start);
-  final endWaypoint = systemsCache.waypointFromSymbol(end);
+  final startWaypoint = systemsCache.waypoint(start);
+  final endWaypoint = systemsCache.waypoint(end);
   if (start.systemSymbol != end.systemSymbol) {
     throw ArgumentError(
       'Cannot find path between ${start.systemSymbol} and ${end.systemSymbol}',
@@ -100,7 +100,7 @@ List<RouteAction>? findRouteWithinSystem(
     if (currentSymbol == end) {
       break;
     }
-    final currentWaypoint = systemsCache.waypointFromSymbol(currentSymbol);
+    final currentWaypoint = systemsCache.waypoint(currentSymbol);
     // All waypoints are always reachable, just a question of what flight mode.
     for (final nextWaypoint in waypoints) {
       final flightMode =

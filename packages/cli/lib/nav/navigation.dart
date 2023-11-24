@@ -228,7 +228,7 @@ Future<NavResult> continueNavigationIfNeeded(
     throw NavigationException('No action for ${ship.waypointSymbol} '
         'in route plan, likely off course.');
   }
-  final actionEnd = caches.systems.waypointFromSymbol(action.endSymbol);
+  final actionEnd = caches.systems.waypoint(action.endSymbol);
   // All navigation actions require being un-docked, but the action functions
   // will handle that for us.
   switch (action.type) {

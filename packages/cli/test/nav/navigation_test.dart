@@ -150,7 +150,7 @@ void main() {
   //   );
   //   final reactorExpiry = now.add(const Duration(seconds: 100));
 
-  //   when(() => systemsCache.waypointFromSymbol(startSymbol)).thenReturn(
+  //   when(() => systemsCache.waypoint(startSymbol)).thenReturn(
   //     SystemWaypoint(
   //       symbol: startSymbol.waypoint,
   //       type: WaypointType.ASTEROID_FIELD,
@@ -168,7 +168,7 @@ void main() {
   //       y: 0,
   //     ),
   //   );
-  //   when(() => systemsCache.waypointFromSymbol(endSymbol)).thenReturn(
+  //   when(() => systemsCache.waypoint(endSymbol)).thenReturn(
   //     SystemWaypoint(
   //       symbol: endSymbol.waypoint,
   //       type: WaypointType.ASTEROID_FIELD,

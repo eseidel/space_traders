@@ -21,8 +21,8 @@ bool _canCruiseTo(
   if (!ship.usesFuel) {
     return true;
   }
-  final start = systemsCache.waypointFromSymbol(ship.waypointSymbol);
-  final end = systemsCache.waypointFromSymbol(waypointSymbol);
+  final start = systemsCache.waypoint(ship.waypointSymbol);
+  final end = systemsCache.waypoint(waypointSymbol);
   final distance = start.distanceTo(end);
   final expectedFuel = fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
   // Use > and a buffer (10) to avoid ever having zero fuel.

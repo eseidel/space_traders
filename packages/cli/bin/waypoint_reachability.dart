@@ -24,7 +24,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final plural = waypointSymbols.length == 1 ? '' : 's';
     logger.info('${waypointSymbols.length} waypoint$plural:');
     for (final waypointSymbol in waypointSymbols) {
-      final waypoint = systemsCache.waypointFromSymbol(waypointSymbol);
+      final waypoint = systemsCache.waypoint(waypointSymbol);
       logger.info(
         '  ${waypointSymbol.waypoint.padRight(11)} '
         '@ ${waypoint.x},${waypoint.y}',

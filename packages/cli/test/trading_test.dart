@@ -77,10 +77,8 @@ void main() {
       x: 0,
       y: 0,
     );
-    when(() => systemsCache.waypointFromSymbol(start.waypointSymbol))
-        .thenReturn(start);
-    when(() => systemsCache.waypointFromSymbol(end.waypointSymbol))
-        .thenReturn(end);
+    when(() => systemsCache.waypoint(start.waypointSymbol)).thenReturn(start);
+    when(() => systemsCache.waypoint(end.waypointSymbol)).thenReturn(end);
     when(() => systemsCache.waypointsInSystem(start.systemSymbol))
         .thenReturn([start, end]);
 
@@ -200,12 +198,9 @@ void main() {
       y: 1000,
     );
     final waypoints = [saa, sab, sac];
-    when(() => systemsCache.waypointFromSymbol(saa.waypointSymbol))
-        .thenReturn(saa);
-    when(() => systemsCache.waypointFromSymbol(sab.waypointSymbol))
-        .thenReturn(sab);
-    when(() => systemsCache.waypointFromSymbol(sac.waypointSymbol))
-        .thenReturn(sac);
+    when(() => systemsCache.waypoint(saa.waypointSymbol)).thenReturn(saa);
+    when(() => systemsCache.waypoint(sab.waypointSymbol)).thenReturn(sab);
+    when(() => systemsCache.waypoint(sac.waypointSymbol)).thenReturn(sac);
     when(() => systemsCache.waypointsInSystem(saa.systemSymbol))
         .thenReturn(waypoints);
     const tradeSymbol = TradeSymbol.FUEL;

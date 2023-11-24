@@ -67,7 +67,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
   }
   final systemWaypoints = system.waypoints.toList(); // Copy so we can sort.
   if (start != null) {
-    final startWaypoint = systemsCache.waypointFromSymbol(start);
+    final startWaypoint = systemsCache.waypoint(start);
     systemWaypoints.sort(
       (a, b) =>
           a.distanceTo(startWaypoint).compareTo(b.distanceTo(startWaypoint)),
