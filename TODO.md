@@ -418,61 +418,9 @@ ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-MU55
 #13     main (file:///root/space_traders/packages/cli/bin/cli.dart:141:3)
 <asynchronous suspension>
 
-
-### Buy first orehound immediately:
-
-[WARN] 🛸#1  Can not buy SHIP_ORE_HOUND at X1-AG30-04017A, credits 150,000c < 1.05 * price = 167,932c. Disabling Behavior.buyShip for ESEIDEL-1 for 10m.
-🛸#1  Deliver 0
-[WARN] 🛸#1  No deliveries needed. Disabling Behavior.deliver for ESEIDEL-1 for 10m.
-🛸#1  ✍️  market data @ X1-AG30-65570X
-Accepted: deliver 1060  COPPER_ORE to X1-AG30-29102A in 6d for 160,272c with 34,344c upfront.
-received 34,344c
-
-### Wiring up hauling for miners
-
-Somehow represent the miners in deals, producing a given tradeSymbol for
-zero cost, at some amount of time to produce?
-
 ### No debugging tools for surveys.
 
 Write a tool to list how many surveys deep we have?
-
-### Optimize requests:
-
-^CRequest stats:
-6508 /my/ships/N/navigate
-6323 /my/ships/N/dock
-6322 /my/ships/N/orbit
-5797 /my/ships/N/sell
-5753 /my/ships/N/extract/survey
-3118 /my/ships/N/refuel
-2522 /systems/N/waypoints/N/market
-1422 /my/ships/N/survey
-756 /my/ships/N/jump
-677 /my/ships/N/purchase
-122 /systems/N/waypoints/N/shipyard
-36 /my/ships
-29 /systems/N/waypoints
-
-4482 /my/ships/N/navigate
-2991 /my/ships/N/dock
-2990 /my/ships/N/orbit
-2680 /my/ships/N/sell
-2627 /my/ships/N/extract/survey
-1571 /systems/N/waypoints/N/market
-1274 /my/ships/N/refuel
-676 /my/ships/N/jump
-652 /my/ships/N/survey
-372 /my/ships/N/purchase
-85 /systems/N/waypoints
-53 /systems/N/waypoints/N/shipyard
-22 /my/ships
-7 /my/ships/N/chart
-4 /my/contracts
-2 /my/agent
-1 /
-Total: 20489 requests.
-
 
 ### Implement missing bits of SAF's strat
 
@@ -620,19 +568,13 @@ They don't know how to avoid each other within the same system.
 
 ### Have too many haulers with not enough worth doing
 
-### Remove more uses of MarketCache
+### Remove MarketCache
 
-### Teach Trader about Construction as another type of SellOpp
-
-Probably need to refactor Trader to be a MultiJob first.
-
-### Divide Miners and Surveyors into squads and assign one squad per mine.
+### Divide Surveyors into squads and assign one squad per mine.
 
 Once this is working can buy more of each.
 
 ### Add some sort of dynamic evaluation of the quality of a mine (every hour?)
-
-### Route planner is not actually inserting Refuel actions.
 
 ### Keep per-ship action logs
 
@@ -793,3 +735,7 @@ Our local check though the contract was expired.  But the server didn't.
 [WARN] 🛸#1  Purchased ESEIDEL-5 (SHIP_LIGHT_SHUTTLE)!
 [WARN] Adding missing ship ESEIDEL-5
 [WARN] FleetRole.unknown has no specified behaviors, idling.
+
+### Make MineSquad locations more dynamic
+
+Should be possible with making scores more dynamic?
