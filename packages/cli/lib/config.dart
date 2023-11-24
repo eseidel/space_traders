@@ -1,5 +1,6 @@
 import 'package:types/types.dart';
 
+/// Class for holding our hard-coded configuration values.
 class Config {
   /// Our ship buy plan for computeNextShipToBuy.
   final buyPlan = [
@@ -78,4 +79,5 @@ class Config {
   final contractMinBuffer = 20000;
 }
 
+/// Our global configuration object.
 final config = Config();
