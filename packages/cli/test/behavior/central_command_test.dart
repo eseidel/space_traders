@@ -43,44 +43,6 @@ class _MockShipFuel extends Mock implements ShipFuel {}
 class _MockShipNav extends Mock implements ShipNav {}
 
 void main() {
-  test('CentralCommand.chooseNewBehaviorFor', () async {
-    final behaviorCache = _MockBehhaviorCache();
-    when(() => behaviorCache.states).thenReturn([]);
-    final shipCache = _MockShipCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-    final ship = _MockShip();
-    when(() => ship.mounts).thenReturn([]);
-    when(() => shipCache.ships).thenReturn([ship]);
-    when(() => ship.registration).thenReturn(
-      ShipRegistration(
-        name: 'S',
-        factionSymbol: 'F',
-        role: ShipRole.CARRIER,
-      ),
-    );
-    registerFallbackValue(Behavior.explorer);
-    when(() => behaviorCache.isBehaviorDisabledForShip(ship, any()))
-        .thenReturn(false);
-
-    final shipFrame = _MockShipFrame();
-    when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol)
-        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
-    final shipFuel = _MockShipFuel();
-    when(() => shipFuel.capacity).thenReturn(100);
-    when(() => shipFuel.current).thenReturn(100);
-    when(() => ship.fuel).thenReturn(shipFuel);
-    final logger = _MockLogger();
-    final behavior = runWithLogger(
-      logger,
-      () => centralCommand.chooseNewBehaviorFor(ship, 100),
-    );
-    // trader is the default for a light freighter.
-    expect(ship.fleetRole, FleetRole.trader);
-    expect(behavior, Behavior.trader);
-  });
-
   test('CentralCommand.otherExplorerSystems', () {
     RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
       return RoutePlan(

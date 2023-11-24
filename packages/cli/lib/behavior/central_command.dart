@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/mine_scores.dart';
 import 'package:cli/mining.dart';
@@ -170,52 +171,17 @@ class CentralCommand {
     }
 
     // Otherwise start any other job.
-    return toState(chooseNewBehaviorFor(ship, credits));
-  }
-
-  // Consider a config file like:
-  // https://gist.github.com/whyando/fed97534173437d8234be10ac03595e0
-  // instead of having this dynamic behavior function.
-  /// What behavior should the given ship be doing?
-  Behavior chooseNewBehaviorFor(Ship ship, int credits) {
-    // final shipCount = _shipCache.ships.length;
-
-    final behaviors = {
-      FleetRole.command: [
-        // Will only trade if we can make 6/s or more.
-        // There are commonly 20c/s trades in the starting system, and at
-        // the minimum we want to accept the contract.
-        // Might want to consider limiting to short trades (< 5 mins) to avoid
-        // tying up capital early.
-        Behavior.trader,
-        // Early on the command ship makes about 5c/s vs. ore hounds making
-        // 6c/s. It's a better surveyor than miner. Especially when enabling
-        // mining drones.
-        // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
-        // Mining is more profitable than siphoning I think?
-        Behavior.miner,
-        Behavior.siphoner,
-      ],
-      FleetRole.trader: [
-        Behavior.trader,
-        // Would rather have Haulers idle, than explore if fuel costs are high.
-        // Behavior.explorer,
-      ],
-      FleetRole.miner: [Behavior.miner],
-      FleetRole.surveyor: [Behavior.surveyor],
-      FleetRole.siphoner: [Behavior.siphoner],
-      FleetRole.explorer: [Behavior.explorer],
-    }[ship.fleetRole];
+    final behaviors = config.behaviorsByFleetRole[ship.fleetRole];
     if (behaviors != null) {
       for (final behavior in behaviors) {
         if (!_behaviorCache.isBehaviorDisabledForShip(ship, behavior)) {
-          return behavior;
+          return toState(behavior);
         }
       }
     } else {
       logger.warn('${ship.fleetRole} has no specified behaviors, idling.');
     }
-    return Behavior.idle;
+    return toState(Behavior.idle);
   }
 
   /// Procurement contracts converted to sell opps.
@@ -244,28 +210,6 @@ class CentralCommand {
         );
       },
     );
-  }
-
-  /// SellOpps to complete the current construction job.
-  Iterable<SellOpp> feederOpps(MarketPrices marketPrices) sync* {
-    final waypointSymbol = WaypointSymbol.fromString('X1-QP91-F52');
-    final tradeSymbols = [
-      TradeSymbol.IRON,
-      TradeSymbol.QUARTZ_SAND,
-      TradeSymbol.PLASTICS,
-    ];
-    const desiredSupply = SupplyLevel.ABUNDANT;
-    for (final tradeSymbol in tradeSymbols) {
-      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
-      if (price == null) {
-        continue;
-      }
-      if (SupplyLevel.values.indexOf(price.supply) >=
-          SupplyLevel.values.indexOf(desiredSupply)) {
-        continue;
-      }
-      yield SellOpp.fromMarketPrice(price, isFeeder: true);
-    }
   }
 
   /// Find next deal for the given [ship], considering all deals in progress.
@@ -528,27 +472,8 @@ class CentralCommand {
 
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
-    final buyPlan = [
-      ShipType.LIGHT_SHUTTLE,
-      ShipType.MINING_DRONE,
-      ShipType.SIPHON_DRONE,
-      ShipType.SURVEYOR,
-      ShipType.LIGHT_SHUTTLE,
-      ShipType.MINING_DRONE,
-      ShipType.SIPHON_DRONE,
-      ShipType.SURVEYOR,
-      ShipType.MINING_DRONE,
-      ShipType.MINING_DRONE,
-      ShipType.MINING_DRONE,
-      ShipType.LIGHT_HAULER,
-      ShipType.LIGHT_HAULER,
-      ShipType.LIGHT_HAULER,
-      ShipType.LIGHT_HAULER,
-      ShipType.LIGHT_HAULER,
-      ShipType.LIGHT_HAULER,
-    ];
     final shipType = shipToBuyFromPlan(
-      buyPlan,
+      config.buyPlan,
       caches.shipyardPrices,
       caches.static.shipyardShips,
     );
@@ -571,8 +496,7 @@ class CentralCommand {
       return false;
     }
     // Do we have enough credits to buy a ship
-    // FIXME(eseidel): Keep around 100,000 for trading
-    if (credits < buyJob.minCreditsNeeded + 100000) {
+    if (credits < buyJob.minCreditsNeeded + config.shipBuyBufferForTrading) {
       return false;
     }
     // Is this ship within the same system or the command ship?
@@ -587,17 +511,13 @@ class CentralCommand {
 
   /// Returns true if [ship] should start the mountFromBuy behavior.
   bool shouldBuyMount(Ship ship, int credits) {
-    // Only enforce the "one at a time" when we have less than 10M credits.
-    // The 10M is mostly a hack to allow deploying changes to mounts quickly
-    // late game.
-    if (credits < 10000000) {
-      // Are there any other ships actively buying mounts?
-      final otherShipsAreBuyingMounts = _behaviorCache.states.any(
-        (s) => s.behavior == Behavior.mountFromBuy,
-      );
-      if (otherShipsAreBuyingMounts) {
-        return false;
-      }
+    // Only enforce "one at a time" until we some sort purchase authoriziation.
+    // Are there any other ships actively buying mounts?
+    final otherShipsAreBuyingMounts = _behaviorCache.states.any(
+      (s) => s.behavior == Behavior.mountFromBuy,
+    );
+    if (otherShipsAreBuyingMounts) {
+      return false;
     }
     // Does this ship have a mount it needs?
     final mountRequest =
@@ -734,10 +654,11 @@ int _minimumFloatRequired(Contract contract) {
   // MaxUnitPrice is the max we'd pay, which isn't the max they're likely to
   // cost.  We could instead use median price of the good in question.
   final maxUnitPrice = _maxContractUnitPurchasePrice(contract, good);
-  const creditsBuffer = 20000;
   final remainingUnits = good.unitsRequired - good.unitsFulfilled;
-  // TODO(eseidel): 100000 is an arbitrary minimum we should remove!
-  return max(100000, maxUnitPrice * remainingUnits + creditsBuffer);
+  return max(
+    config.contractMinFloat,
+    maxUnitPrice * remainingUnits + config.contractMinBuffer,
+  );
 }
 
 /// Procurement contracts converted to sell opps.
@@ -789,13 +710,6 @@ Iterable<SellOpp> sellOppsForConstruction(
   if (construction.isComplete) {
     return;
   }
-  // We could put some "total value" on the idea of the gate being open
-  // and change that over time to encourage building it sooner.
-  // For now we're just hard-coding a price for each needed good.
-  final maxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 1500,
-    TradeSymbol.ADVANCED_CIRCUITRY: 13000,
-  };
 
   for (final material in construction.materials) {
     final unitsNeeded = remainingUnitsNeeded(material.tradeSymbol);
@@ -803,7 +717,7 @@ Iterable<SellOpp> sellOppsForConstruction(
       yield SellOpp.fromConstruction(
         waypointSymbol: construction.waypointSymbol,
         tradeSymbol: material.tradeSymbol,
-        price: maxPurchasePrice[material.tradeSymbol]!,
+        price: config.constructionMaxPurchasePrice[material.tradeSymbol]!,
         maxUnits: unitsNeeded,
       );
     }
@@ -834,8 +748,6 @@ MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
   if (squads.isEmpty) {
     return null;
   }
-  final minerHaulerSymbols = <String>['12', '13', '14']
-      .map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   // Score all squads based on how much they need this type of ship?
   // Add to the squad with the lowest score?
@@ -843,7 +755,7 @@ MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
   // Hack for now to restrict to miners / surveyors.
   if (fleetRole != FleetRole.miner &&
       fleetRole != FleetRole.surveyor &&
-      !minerHaulerSymbols.contains(ship.shipSymbol)) {
+      !config.minerHaulerSymbols.contains(ship.shipSymbol)) {
     return null;
   }
 
