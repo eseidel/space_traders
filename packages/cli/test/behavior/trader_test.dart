@@ -78,7 +78,12 @@ void main() {
         description: '',
       ),
     ]);
-    when(() => caches.markets.marketForSymbol(start)).thenAnswer(
+    when(
+      () => caches.markets.marketForSymbol(
+        start,
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer(
       (_) => Future.value(
         Market(
           symbol: end.waypoint,
@@ -363,8 +368,12 @@ void main() {
         ),
       ],
     );
-    when(() => caches.markets.marketForSymbol(start))
-        .thenAnswer((_) => Future.value(market));
+    when(
+      () => caches.markets.marketForSymbol(
+        start,
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) => Future.value(market));
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -959,7 +968,12 @@ void main() {
     ]);
     when(() => caches.waypoints.waypoint(end))
         .thenAnswer((_) => Future.value(waypoint));
-    when(() => caches.markets.marketForSymbol(end)).thenAnswer(
+    when(
+      () => caches.markets.marketForSymbol(
+        end,
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer(
       (_) => Future.value(
         Market(
           symbol: end.waypoint,
@@ -1117,7 +1131,12 @@ void main() {
     ]);
     when(() => caches.waypoints.waypoint(end))
         .thenAnswer((_) => Future.value(waypoint));
-    when(() => caches.markets.marketForSymbol(end)).thenAnswer(
+    when(
+      () => caches.markets.marketForSymbol(
+        end,
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer(
       (_) => Future.value(
         Market(
           symbol: end.waypoint,
@@ -1283,7 +1302,12 @@ void main() {
     ]);
     when(() => caches.waypoints.waypoint(end))
         .thenAnswer((_) => Future.value(waypoint));
-    when(() => caches.markets.marketForSymbol(end)).thenAnswer(
+    when(
+      () => caches.markets.marketForSymbol(
+        end,
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer(
       (_) => Future.value(
         Market(
           symbol: end.waypoint,

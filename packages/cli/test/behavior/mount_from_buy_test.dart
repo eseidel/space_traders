@@ -108,7 +108,12 @@ void main() {
     when(() => caches.marketPrices.pricesFor(toMount)).thenReturn([
       MarketPrice.fromMarketTradeGood(tradeGood, symbol),
     ]);
-    when(() => caches.markets.marketForSymbol(symbol)).thenAnswer(
+    when(
+      () => caches.markets.marketForSymbol(
+        symbol,
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer(
       (_) => Future.value(
         Market(
           symbol: symbol.waypoint,

@@ -116,7 +116,7 @@ class MarketCache {
   /// Fetch the waypoint with the given symbol.
   Future<Market?> marketForSymbol(
     WaypointSymbol marketSymbol, {
-    bool forceRefresh = false,
+    required bool forceRefresh,
   }) async {
     if (!forceRefresh && _marketsBySymbol.containsKey(marketSymbol)) {
       return _marketsBySymbol[marketSymbol];

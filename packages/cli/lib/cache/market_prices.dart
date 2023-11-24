@@ -420,7 +420,8 @@ Future<Market> recordMarketDataIfNeededAndLog(
     maxAge: maxAge,
     getNow: getNow,
   )) {
-    var market = await marketCache.marketForSymbol(marketSymbol);
+    var market =
+        await marketCache.marketForSymbol(marketSymbol, forceRefresh: false);
     if (market!.tradeGoods.isEmpty) {
       market = await marketCache.marketForSymbol(
         marketSymbol,
