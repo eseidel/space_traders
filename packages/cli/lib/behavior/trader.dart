@@ -385,8 +385,7 @@ Future<JobResult> _handleConstructionDealAtDelivery(
   CostedDeal costedDeal,
 ) async {
   final construction = assertNotNull(
-    caches.construction
-        .constructionForSymbol(costedDeal.deal.destinationSymbol),
+    caches.construction[costedDeal.deal.destinationSymbol],
     'No construction.',
     const Duration(minutes: 10),
   );

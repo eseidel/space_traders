@@ -35,8 +35,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       : systemsCache.waypointFromString(startArg)!;
 
   final jumpGate = systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
-  final construction =
-      constructionCache.constructionForSymbol(jumpGate.waypointSymbol);
+  final construction = constructionCache[jumpGate.waypointSymbol];
   centralCommand.activeConstruction = construction;
 
   final extraSellOpps = <SellOpp>[];

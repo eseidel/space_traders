@@ -407,7 +407,7 @@ class CentralCommand {
     final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
     return jumpGate == null
         ? null
-        : caches.construction.constructionForSymbol(jumpGate.waypointSymbol);
+        : caches.construction[jumpGate.waypointSymbol];
   }
 
   bool _computeHaveEscapedStartingSystem(Caches caches) {

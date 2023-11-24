@@ -130,8 +130,13 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
       );
 
   /// Gets the Construction for the given waypoint symbol.
+  // Exposed fro mocking.
   Construction? constructionForSymbol(WaypointSymbol waypointSymbol) =>
       recordForSymbol(waypointSymbol)?.construction;
+
+  /// Gets the Construction for the given waypoint symbol.
+  Construction? operator [](WaypointSymbol waypointSymbol) =>
+      constructionForSymbol(waypointSymbol);
 
   /// Returns the age of the cache for a given waypoint.
   Duration? cacheAgeFor(

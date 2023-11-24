@@ -151,8 +151,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final jumpgate = systemsCache
       .jumpGateWaypointForSystem(agentCache.headquartersSystemSymbol)!;
-  // final construction =
-  //     constructionCache.constructionForSymbol(jumpgate.waypointSymbol);
+  // final construction = constructionCache[jumpgate.waypointSymbol];
   const tradeSymbol = TradeSymbol.FAB_MATS;
 
   final waypointSymbol = jumpgate.waypointSymbol;

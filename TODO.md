@@ -701,10 +701,6 @@ in 4m uses 329 fuel
 
 That way we can run our "where should we sell this" in between lots.
 
-### Standardize fooForBar vs fooOfBar, etc, use foo[bar] more, etc.
-
-waypointForSymbol, waypointAtSymbol, etc.
-
 ### Route planning is not aware of partial tanks of fuel.
 
 If you don't have a full tank of fuel, it will plan a route that will
