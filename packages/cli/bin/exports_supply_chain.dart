@@ -80,6 +80,21 @@ MarketListing? nearestListingWithExport(
   return listings.firstOrNull;
 }
 
+// Returns the distance between two waypoints, or null if they are in different
+// systems.
+int? distanceBetween(
+  SystemsCache systemsCache,
+  WaypointSymbol a,
+  WaypointSymbol b,
+) {
+  final aWaypoint = systemsCache.waypoint(a);
+  final bWaypoint = systemsCache.waypoint(b);
+  if (aWaypoint.systemSymbol != bWaypoint.systemSymbol) {
+    return null;
+  }
+  return aWaypoint.distanceTo(bWaypoint).toInt();
+}
+
 class Sourcer {
   const Sourcer({
     required this.marketListings,
@@ -99,6 +114,12 @@ class Sourcer {
     int indent = 0,
   }) {
     final prefix = ' ' * indent;
+
+    final destinationPrice = marketPrices.priceAt(
+      waypointSymbol,
+      tradeSymbol,
+    );
+
     // No need to manufacture if we can extract.
     if (extractable.contains(tradeSymbol)) {
       // Find the nearest extraction location?
@@ -107,7 +128,12 @@ class Sourcer {
         tradeSymbol,
         waypointSymbol,
       );
-      logger.info('${prefix}Extract $tradeSymbol from $location');
+      final distance = location == null
+          ? null
+          : distanceBetween(systemsCache, waypointSymbol, location);
+      logger.info('${prefix}Extract $tradeSymbol from $location, '
+          'deliver to $waypointSymbol (${destinationPrice?.supply}) '
+          'distance = $distance');
       return;
     }
 
@@ -126,13 +152,15 @@ class Sourcer {
       closest.waypointSymbol,
       tradeSymbol,
     );
-    final destinationPrice = marketPrices.priceAt(
+    final distance = distanceBetween(
+      systemsCache,
+      closest.waypointSymbol,
       waypointSymbol,
-      tradeSymbol,
     );
     logger.info('${prefix}Shuttle $tradeSymbol from '
         '${closest.waypointSymbol} (${closestPrice?.supply}) '
-        'to $waypointSymbol (${destinationPrice?.supply})');
+        'to $waypointSymbol (${destinationPrice?.supply}) '
+        'distance = $distance');
     sourceViaManufacture(
       tradeSymbol,
       closest.waypointSymbol,
@@ -146,7 +174,13 @@ class Sourcer {
     int indent = 0,
   }) {
     final prefix = ' ' * indent;
-    logger.info('${prefix}Manufacture $tradeSymbol at $waypointSymbol');
+    final destinationPrice = marketPrices.priceAt(
+      waypointSymbol,
+      tradeSymbol,
+    );
+    logger
+        .info('${prefix}Manufacture $tradeSymbol (${destinationPrice?.supply}) '
+            'at $waypointSymbol');
     final listing = marketListings[waypointSymbol];
     if (listing == null) {
       logger.warn('${prefix}No listing for $waypointSymbol');
