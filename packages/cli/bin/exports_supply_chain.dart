@@ -95,6 +95,13 @@ int? distanceBetween(
   return aWaypoint.distanceTo(bWaypoint).toInt();
 }
 
+String describeMarket(WaypointSymbol waypointSymbol, MarketPrice? price) {
+  if (price == null) {
+    return '$waypointSymbol (no market)';
+  }
+  return '$waypointSymbol (${price.supply}, ${price.activity})';
+}
+
 class Sourcer {
   const Sourcer({
     required this.marketListings,
@@ -132,7 +139,7 @@ class Sourcer {
           ? null
           : distanceBetween(systemsCache, waypointSymbol, location);
       logger.info('${prefix}Extract $tradeSymbol from $location, '
-          'deliver to $waypointSymbol (${destinationPrice?.supply}) '
+          'deliver to ${describeMarket(waypointSymbol, destinationPrice)} '
           'distance = $distance');
       return;
     }
@@ -158,8 +165,8 @@ class Sourcer {
       waypointSymbol,
     );
     logger.info('${prefix}Shuttle $tradeSymbol from '
-        '${closest.waypointSymbol} (${closestPrice?.supply}) '
-        'to $waypointSymbol (${destinationPrice?.supply}) '
+        '${describeMarket(closest.waypointSymbol, closestPrice)} '
+        'to ${describeMarket(waypointSymbol, destinationPrice)} '
         'distance = $distance');
     sourceViaManufacture(
       tradeSymbol,
@@ -178,9 +185,10 @@ class Sourcer {
       waypointSymbol,
       tradeSymbol,
     );
-    logger
-        .info('${prefix}Manufacture $tradeSymbol (${destinationPrice?.supply}) '
-            'at $waypointSymbol');
+    logger.info(
+      '${prefix}Manufacture $tradeSymbol at '
+      '${describeMarket(waypointSymbol, destinationPrice)}',
+    );
     final listing = marketListings[waypointSymbol];
     if (listing == null) {
       logger.warn('${prefix}No listing for $waypointSymbol');
@@ -200,14 +208,14 @@ class Sourcer {
     final listing = marketListings[waypointSymbol];
     // If the end isn't a market this must be a shuttle step.
     if (listing == null) {
-      sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent + 1);
+      sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent);
     } else {
       // If we're sourcing for an export, this must be a manufacture step.
       if (listing.exports.contains(tradeSymbol)) {
-        sourceViaManufacture(tradeSymbol, waypointSymbol, indent: indent + 1);
+        sourceViaManufacture(tradeSymbol, waypointSymbol, indent: indent);
       } else {
         // If we're sourcing for an import, this must be a shuttle step.
-        sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent + 1);
+        sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent);
       }
     }
   }
