@@ -1,21 +1,58 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
-final extractable = <TradeSymbol>{
+final minable = <TradeSymbol>{
   TradeSymbol.ALUMINUM_ORE,
-  TradeSymbol.AMMONIA_ICE,
   TradeSymbol.COPPER_ORE,
   TradeSymbol.GOLD_ORE,
-  TradeSymbol.ICE_WATER,
   TradeSymbol.IRON_ORE,
-  TradeSymbol.LIQUID_HYDROGEN,
-  TradeSymbol.LIQUID_NITROGEN,
   TradeSymbol.MERITIUM_ORE,
+  TradeSymbol.SILVER_ORE,
+  TradeSymbol.AMMONIA_ICE,
+  TradeSymbol.ICE_WATER,
   TradeSymbol.PRECIOUS_STONES,
   TradeSymbol.QUARTZ_SAND,
   TradeSymbol.SILICON_CRYSTALS,
-  TradeSymbol.SILVER_ORE,
 };
+
+final siphonable = <TradeSymbol>{
+  TradeSymbol.LIQUID_HYDROGEN,
+  TradeSymbol.LIQUID_NITROGEN,
+};
+
+final extractable = <TradeSymbol>{
+  ...minable,
+  ...siphonable,
+};
+
+Set<TradeSymbol> extractableFrom(SystemWaypoint waypoint) {
+  if (waypoint.isAsteroid) {
+    return minable;
+  }
+  if (waypoint.type == WaypointType.GAS_GIANT) {
+    return siphonable;
+  }
+  return {};
+}
+
+WaypointSymbol? nearestExtractionSiteFor(
+  SystemsCache systemsCache,
+  TradeSymbol tradeSymbol,
+  WaypointSymbol waypointSymbol,
+) {
+  final destination = systemsCache.waypoint(waypointSymbol);
+  final candidates = systemsCache
+      .waypointsInSystem(waypointSymbol.systemSymbol)
+      .where(
+        (waypoint) =>
+            waypoint.isAsteroid || waypoint.type == WaypointType.GAS_GIANT,
+      )
+      .toList()
+    ..sort(
+      (a, b) => a.distanceTo(destination).compareTo(b.distanceTo(destination)),
+    );
+  return candidates.firstOrNull?.waypointSymbol;
+}
 
 MarketListing? nearestListingWithExport(
   SystemsCache systemsCache,
@@ -58,12 +95,19 @@ class Sourcer {
 
   void sourceViaShuttle(
     TradeSymbol tradeSymbol,
-    WaypointSymbol waypointSymbol,
-  ) {
+    WaypointSymbol waypointSymbol, {
+    int indent = 0,
+  }) {
+    final prefix = ' ' * indent;
     // No need to manufacture if we can extract.
     if (extractable.contains(tradeSymbol)) {
       // Find the nearest extraction location?
-      logger.info('Extract $tradeSymbol');
+      final location = nearestExtractionSiteFor(
+        systemsCache,
+        tradeSymbol,
+        waypointSymbol,
+      );
+      logger.info('${prefix}Extract $tradeSymbol from $location');
       return;
     }
 
@@ -75,7 +119,7 @@ class Sourcer {
       waypointSymbol,
     );
     if (closest == null) {
-      logger.warn('No export for $tradeSymbol for $waypointSymbol');
+      logger.warn('${prefix}No export for $tradeSymbol for $waypointSymbol');
       return;
     }
     final closestPrice = marketPrices.priceAt(
@@ -86,40 +130,50 @@ class Sourcer {
       waypointSymbol,
       tradeSymbol,
     );
-    logger.info('Shuttle $tradeSymbol from '
+    logger.info('${prefix}Shuttle $tradeSymbol from '
         '${closest.waypointSymbol} (${closestPrice?.supply}) '
         'to $waypointSymbol (${destinationPrice?.supply})');
-    sourceViaManufacture(tradeSymbol, closest.waypointSymbol);
+    sourceViaManufacture(
+      tradeSymbol,
+      closest.waypointSymbol,
+      indent: indent + 1,
+    );
   }
 
   void sourceViaManufacture(
     TradeSymbol tradeSymbol,
-    WaypointSymbol waypointSymbol,
-  ) {
-    logger.info('Manufacture $tradeSymbol at $waypointSymbol');
+    WaypointSymbol waypointSymbol, {
+    int indent = 0,
+  }) {
+    final prefix = ' ' * indent;
+    logger.info('${prefix}Manufacture $tradeSymbol at $waypointSymbol');
     final listing = marketListings[waypointSymbol];
     if (listing == null) {
-      logger.warn('No listing for $waypointSymbol');
+      logger.warn('${prefix}No listing for $waypointSymbol');
       return;
     }
     final imports = staticCaches.exports[tradeSymbol]!.imports;
     for (final import in imports) {
-      sourceGoodsFor(import, waypointSymbol);
+      sourceGoodsFor(import, waypointSymbol, indent: indent + 1);
     }
   }
 
-  void sourceGoodsFor(TradeSymbol tradeSymbol, WaypointSymbol waypointSymbol) {
+  void sourceGoodsFor(
+    TradeSymbol tradeSymbol,
+    WaypointSymbol waypointSymbol, {
+    int indent = 0,
+  }) {
     final listing = marketListings[waypointSymbol];
     // If the end isn't a market this must be a shuttle step.
     if (listing == null) {
-      sourceViaShuttle(tradeSymbol, waypointSymbol);
+      sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent + 1);
     } else {
       // If we're sourcing for an export, this must be a manufacture step.
       if (listing.exports.contains(tradeSymbol)) {
-        sourceViaManufacture(tradeSymbol, waypointSymbol);
+        sourceViaManufacture(tradeSymbol, waypointSymbol, indent: indent + 1);
       } else {
         // If we're sourcing for an import, this must be a shuttle step.
-        sourceViaShuttle(tradeSymbol, waypointSymbol);
+        sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent + 1);
       }
     }
   }
