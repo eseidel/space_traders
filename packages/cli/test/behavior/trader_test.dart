@@ -1306,7 +1306,7 @@ void main() {
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
-    when(() => caches.construction.constructionForSymbol(end)).thenReturn(
+    when(() => caches.construction[end]).thenReturn(
       Construction(
         symbol: end.waypoint,
         materials: [

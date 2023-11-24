@@ -96,7 +96,7 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Return the system with the given [symbol].
-  // Remove in favor of operator [], only used for mocking.
+  /// Exposed for passing to lists for mapping.
   System systemBySymbol(SystemSymbol symbol) =>
       _index[symbol] ?? (throw ArgumentError('Unknown system $symbol'));
 
