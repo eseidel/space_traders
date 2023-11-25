@@ -69,7 +69,7 @@ class Config {
   /// Used by sellOppsForConstruction to determine what SellOpps for
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 1700,
+    TradeSymbol.FAB_MATS: 2000,
     TradeSymbol.ADVANCED_CIRCUITRY: 13000,
   };
 
