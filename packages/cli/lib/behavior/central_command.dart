@@ -510,17 +510,10 @@ class CentralCommand {
     Contract contract,
     TradeSymbol tradeSymbol,
   ) {
-    var unitsAssigned = 0;
-    for (final shipSymbol in _shipCache.shipSymbols) {
-      final deal = _behaviorCache.getBehavior(shipSymbol)?.deal;
-      if (deal == null) {
-        continue;
-      }
-      if (deal.contractId != contract.id) {
-        continue;
-      }
-      unitsAssigned += deal.maxUnitsToBuy;
-    }
+    final unitsAssigned = _behaviorCache
+        .dealsInProgress()
+        .where((d) => d.contractId == contract.id)
+        .fold<int>(0, (sum, deal) => sum + deal.maxUnitsToBuy);
     final neededGood = contract.goodNeeded(tradeSymbol);
     return neededGood!.unitsRequired -
         neededGood.unitsFulfilled -
@@ -534,17 +527,11 @@ class CentralCommand {
     Construction construction,
     TradeSymbol tradeSymbol,
   ) {
-    var unitsAssigned = 0;
-    for (final shipSymbol in _shipCache.shipSymbols) {
-      final deal = _behaviorCache.getBehavior(shipSymbol)?.deal;
-      if (deal == null) {
-        continue;
-      }
-      if (deal.deal.destinationSymbol != construction.waypointSymbol) {
-        continue;
-      }
-      unitsAssigned += deal.maxUnitsToBuy;
-    }
+    final unitsAssigned = _behaviorCache
+        .dealsInProgress()
+        .where((d) => d.isConstructionDeal)
+        .where((d) => d.deal.destinationSymbol == construction.waypointSymbol)
+        .fold<int>(0, (sum, deal) => sum + deal.maxUnitsToBuy);
     final neededGood = construction.materials.firstWhere(
       (m) => m.tradeSymbol == tradeSymbol,
     );

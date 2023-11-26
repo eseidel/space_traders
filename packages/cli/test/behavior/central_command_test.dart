@@ -205,6 +205,46 @@ void main() {
     );
   });
 
+  test('CentralCommand.remainingUnitsNeededForConstruction', () {
+    final behaviorCache = _MockBehhaviorCache();
+    final shipCache = _MockShipCache();
+    final shipASymbol = ShipSymbol.fromString('X-A');
+    when(() => shipCache.shipSymbols).thenReturn([shipASymbol]);
+    final waypointSymbol = WaypointSymbol.fromString('W-A-Y');
+
+    final costedDeal = _MockCostedDeal();
+    final deal = _MockDeal();
+    when(() => costedDeal.deal).thenReturn(deal);
+    when(() => costedDeal.cargoSize).thenReturn(120);
+    when(() => costedDeal.isConstructionDeal).thenReturn(true);
+    when(() => deal.destinationSymbol).thenReturn(waypointSymbol);
+    when(() => deal.maxUnits).thenReturn(10);
+    const tradeSymbol = TradeSymbol.FAB_MATS;
+    when(() => behaviorCache.getBehavior(shipASymbol)).thenReturn(
+      BehaviorState(shipASymbol, Behavior.trader, deal: costedDeal),
+    );
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final construction = Construction(
+      symbol: waypointSymbol.waypoint,
+      isComplete: false,
+      materials: [
+        ConstructionMaterial(
+          tradeSymbol: tradeSymbol,
+          required_: 100,
+          fulfilled: 30,
+        ),
+      ],
+    );
+    expect(
+      centralCommand.remainingUnitsNeededForConstruction(
+        construction,
+        tradeSymbol,
+      ),
+      60,
+    );
+  });
+
   // test('idleHaulerSymbols', () {
   //   final shipCache = _MockShipCache();
   //   when(() => shipCache.ships).thenReturn([]);
