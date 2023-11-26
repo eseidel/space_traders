@@ -14,7 +14,7 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockBehhaviorCache extends Mock implements BehaviorCache {}
+class _MockBehaviorCache extends Mock implements BehaviorCache {}
 
 class _MockContract extends Mock implements Contract {}
 
@@ -103,7 +103,7 @@ void main() {
   });
 
   test('CentralCommand.otherTraderSystems', () {
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     when(() => behaviorCache.states).thenReturn([]);
     final shipCache = _MockShipCache();
     final centralCommand =
@@ -171,7 +171,7 @@ void main() {
   });
 
   test('CentralCommand.remainingUnitsNeededForContract', () {
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     final shipCache = _MockShipCache();
     final shipASymbol = ShipSymbol.fromString('X-A');
     when(() => shipCache.shipSymbols).thenReturn([shipASymbol]);
@@ -206,7 +206,7 @@ void main() {
   });
 
   test('CentralCommand.remainingUnitsNeededForConstruction', () {
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     final shipCache = _MockShipCache();
     final shipASymbol = ShipSymbol.fromString('X-A');
     when(() => shipCache.shipSymbols).thenReturn([shipASymbol]);
@@ -248,7 +248,7 @@ void main() {
   test('idleHaulerSymbols', () {
     final shipCache = _MockShipCache();
     when(() => shipCache.ships).thenReturn([]);
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     when(() => behaviorCache.states).thenReturn([]);
     final symbols = idleHaulerSymbols(shipCache, behaviorCache);
     expect(symbols, isEmpty);
@@ -291,7 +291,7 @@ void main() {
 
   test('CentralCommand.shouldBuyShip', () {
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     when(() => behaviorCache.states).thenReturn([]);
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
@@ -359,7 +359,7 @@ void main() {
       ]),
     );
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     final centralCommand =
         CentralCommand(shipCache: shipCache, behaviorCache: behaviorCache);
 
@@ -545,7 +545,7 @@ void main() {
 
   test('CentralCommand.shortenMaxAgeForExplorerData', () {
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final maxAge = centralCommand.maxAgeForExplorerData;
@@ -599,7 +599,7 @@ void main() {
 
     final shipCache = _MockShipCache();
     when(() => shipCache.shipSymbols).thenReturn([]);
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     expect(
@@ -614,7 +614,7 @@ void main() {
   test('mountsNeededForAllShips', () {
     final shipCache = _MockShipCache();
     when(() => shipCache.ships).thenReturn([]);
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     expect(centralCommand.mountsNeededForAllShips(), isEmpty);
@@ -622,7 +622,7 @@ void main() {
 
   test('getJobForShip', () {
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehhaviorCache();
+    final behaviorCache = _MockBehaviorCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     final shipSymbol = ShipSymbol.fromString('X-A');
