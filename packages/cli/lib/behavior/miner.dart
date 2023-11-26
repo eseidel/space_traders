@@ -221,7 +221,7 @@ Future<JobResult> doMineJob(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final mineJob =
-      assertNotNull(state.mineJob, 'No mine job.', const Duration(hours: 1));
+      assertNotNull(state.mineJob, 'No mine job.', const Duration(minutes: 10));
   final mineSymbol = mineJob.mine;
   final marketSymbol = mineJob.market;
 
@@ -649,17 +649,25 @@ Future<JobResult> transferOrSellCargo(
   // This currently optimizes for price and does not consider requests.
   // Some cargo should jettison and some should transfer to haulers.
 
-  final haulers = centralCommand.squadForShip(ship)?.haulers.toList() ?? [];
-  if (haulers.isNotEmpty) {
-    return transferToHaulersOrWait(
-      state,
-      api,
-      db,
-      centralCommand,
-      caches,
-      ship,
-      getNow: getNow,
-    );
+  final mineJob =
+      assertNotNull(state.mineJob, 'No mine job.', const Duration(minutes: 10));
+
+  // Only wait for haulers at the mine, otherwise we can deadlock where
+  // haulers are waiting for our return and we're somewhere else waiting for
+  // hauer to arrive.
+  if (ship.waypointSymbol == mineJob.mine) {
+    final haulers = centralCommand.squadForShip(ship)?.haulers.toList() ?? [];
+    if (haulers.isNotEmpty) {
+      return transferToHaulersOrWait(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        getNow: getNow,
+      );
+    }
   }
 
   return travelAndSellCargo(state, api, db, centralCommand, caches, ship);
