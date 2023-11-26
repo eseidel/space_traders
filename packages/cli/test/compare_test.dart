@@ -9,10 +9,9 @@ void main() {
   test('jsonMatches', () {
     final logger = _MockLogger();
     runWithLogger(logger, () {
-      expect(jsonMatches([1], [2]), false);
-      expect(jsonMatches([1], [1]), true);
-      // FIXME(eseidel): This should be true!
-      expect(jsonMatches(1, 1), false);
+      expect(jsonMatches([1], [2]), isFalse);
+      expect(jsonMatches([1], [1]), isTrue);
+      expect(jsonMatches(1, 1), isTrue);
     });
   });
 }

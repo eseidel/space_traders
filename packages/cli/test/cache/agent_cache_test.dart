@@ -1,14 +1,17 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
+import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 class _MockAgent extends Mock implements Agent {}
 
+class _MockAgentsApi extends Mock implements AgentsApi {}
+
 class _MockApi extends Mock implements Api {}
 
-class _MockAgentsApi extends Mock implements AgentsApi {}
+class _MockLogger extends Mock implements Logger {}
 
 void main() {
   test('AgentCache smoke test', () {
@@ -29,7 +32,10 @@ void main() {
     verifyNever(agents.getMyAgent);
     cache.ensureAgentUpToDate(api);
     verifyNever(agents.getMyAgent);
-    cache.ensureAgentUpToDate(api);
+    final logger = _MockLogger();
+    runWithLogger(logger, () {
+      cache.ensureAgentUpToDate(api);
+    });
     verify(agents.getMyAgent).called(1);
   });
 

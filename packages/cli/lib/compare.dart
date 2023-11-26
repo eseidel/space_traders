@@ -8,7 +8,7 @@ export 'third_party/compare.dart';
 
 /// Compare two objects via json encoding.
 bool jsonMatches<T extends Object>(T actual, T expected) {
-  final differ = JsonDiffer(jsonEncode(actual), jsonEncode(expected));
+  final differ = JsonDiffer.fromJson(actual, expected);
   final diff = differ.diff();
   if (diff.hasNothing) {
     return true;

@@ -267,10 +267,11 @@ packages:
   json_diff:
     dependency: "direct main"
     description:
-      name: json_diff
-      sha256: "10d82dd4455109bc4dd66335db2d34b4bdf4441dc8fdd6ad6fb914395b9f9e95"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "50293237d4e7c96dc109489302f32af9d1eec583"
+      url: "https://github.com/eseidel/dart-json_diff.git"
+    source: git
     version: "0.2.1"
   logging:
     dependency: transitive
