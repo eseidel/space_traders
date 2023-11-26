@@ -98,6 +98,21 @@ void main() {
     final c = WaypointPosition(3, 0, SystemSymbol.fromString('S-F'));
     expect(() => a.distanceTo(c), throwsArgumentError);
   });
+  test('WaypointSymbol.fromJsonOrNull', () {
+    final symbol = WaypointSymbol.fromJsonOrNull('S-E-J');
+    expect(symbol, WaypointSymbol.fromJsonOrNull('S-E-J'));
+    expect(WaypointSymbol.fromJsonOrNull(null), isNull);
+
+    // Invalid still throws.
+    expect(() => WaypointSymbol.fromJsonOrNull('S-E'), throwsArgumentError);
+    expect(() => WaypointSymbol.fromJsonOrNull('S-E-A-F'), throwsArgumentError);
+  });
+
+  test('WaypointSymbol.waypoinName and localSectorName', () {
+    final symbol = WaypointSymbol.fromString('S-E-J');
+    expect(symbol.waypointName, 'J');
+    expect(symbol.sectorLocalName, 'E-J');
+  });
   test('ShipSymbol sorting', () {
     final symbols = [
       ShipSymbol.fromString('A-1A'),
