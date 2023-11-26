@@ -13,12 +13,14 @@ Future<Market?> visitLocalMarket(
   Api api,
   Database db,
   Caches caches,
-  Waypoint waypoint,
   Ship ship, {
   Duration maxAge = const Duration(minutes: 5),
   DateTime Function() getNow = defaultGetNow,
 }) async {
   // If we're currently at a market, record the prices and refuel.
+  // TODO(eseidel): Use a MarketListing lookup instead?
+  final waypointSymbol = ship.waypointSymbol;
+  final waypoint = await caches.waypoints.waypoint(waypointSymbol);
   if (!waypoint.hasMarketplace) {
     return null;
   }
@@ -30,7 +32,7 @@ Future<Market?> visitLocalMarket(
     caches.marketPrices,
     caches.markets,
     ship,
-    waypoint.waypointSymbol,
+    waypointSymbol,
     maxAge: maxAge,
     getNow: getNow,
   );
@@ -57,16 +59,19 @@ Future<Market?> visitLocalMarket(
 Future<void> visitLocalShipyard(
   Api api,
   Database db,
+  WaypointCache waypoints,
   ShipyardPrices shipyardPrices,
   StaticCaches staticCaches,
   AgentCache agentCache,
-  Waypoint waypoint,
   Ship ship,
 ) async {
+  // TODO(eseidel): Use a ChartingCache lookup instead?
+  final waypointSymbol = ship.waypointSymbol;
+  final waypoint = await waypoints.waypoint(waypointSymbol);
   if (!waypoint.hasShipyard) {
     return;
   }
-  final shipyard = await getShipyard(api, waypoint);
+  final shipyard = await getShipyard(api, waypointSymbol);
   // TODO(eseidel): We should only visit the shipyard if we don't
   // have recent prices.
   recordShipyardDataAndLog(shipyardPrices, shipyard, ship);

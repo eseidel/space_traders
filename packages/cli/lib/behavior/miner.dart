@@ -348,12 +348,10 @@ Future<JobResult> emptyCargoIfNeeded(
   }
 
   // Sell cargo and refuel if needed.
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   final currentMarket = await visitLocalMarket(
     api,
     db,
     caches,
-    currentWaypoint,
     ship,
     getNow: getNow,
   );
@@ -378,7 +376,7 @@ Future<JobResult> emptyCargoIfNeeded(
   } else {
     shipInfo(
       ship,
-      'No market at ${currentWaypoint.symbol}, navigating to nearest.',
+      'No market at ${ship.waypointSymbol}, navigating to nearest.',
     );
   }
 
@@ -386,7 +384,7 @@ Future<JobResult> emptyCargoIfNeeded(
   final nearestMarketSymbol = nearbyMarketWhichTrades(
     caches.systems,
     caches.marketListings,
-    currentWaypoint.waypointSymbol,
+    ship.waypointSymbol,
     largestCargo!.tradeSymbol,
   );
   if (nearestMarketSymbol == null) {
@@ -499,17 +497,15 @@ Future<JobResult> travelAndSellCargo(
     return JobResult.wait(waitTime);
   }
 
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   final currentMarket = assertNotNull(
     await visitLocalMarket(
       api,
       db,
       caches,
-      currentWaypoint,
       ship,
       getNow: getNow,
     ),
-    'No market at ${currentWaypoint.symbol}.',
+    'No market at ${ship.waypointSymbol}.',
     const Duration(minutes: 10),
   );
 

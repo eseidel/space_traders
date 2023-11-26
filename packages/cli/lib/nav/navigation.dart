@@ -262,8 +262,7 @@ Future<NavResult> continueNavigationIfNeeded(
     //   // Otherwise loop immediately since we don't need to wait for the reactor.
     //   return NavResult._loop();
     case RouteActionType.refuel:
-      final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-      final market = await visitLocalMarket(api, db, caches, waypoint, ship);
+      final market = await visitLocalMarket(api, db, caches, ship);
       if (market == null) {
         shipErr(ship, 'No market at ${ship.waypointSymbol}, cannot refuel');
         return NavResult._continueAction();
@@ -292,7 +291,6 @@ Future<NavResult> continueNavigationIfNeeded(
             api,
             db,
             caches,
-            await caches.waypoints.waypoint(ship.waypointSymbol),
             ship,
           );
           if (market != null) {

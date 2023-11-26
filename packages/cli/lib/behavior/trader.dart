@@ -623,14 +623,11 @@ Future<JobResult> sellUnwantedCargo(
     return JobResult.complete();
   }
 
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-
   // If we're currently at a market, record the prices and refuel.
   final currentMarket = await visitLocalMarket(
     api,
     db,
     caches,
-    currentWaypoint,
     ship,
   );
 
@@ -673,14 +670,11 @@ Future<JobResult> doTraderGetCargo(
     );
   }
 
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-
   // If we're currently at a market, record the prices and refuel.
   final maybeMarket = await visitLocalMarket(
     api,
     db,
     caches,
-    currentWaypoint,
     ship,
     // We want to always be using super up-to-date market prices for the trader.
     // If we don't do this, we will end up buying based on stale prices
@@ -693,10 +687,10 @@ Future<JobResult> doTraderGetCargo(
   await visitLocalShipyard(
     api,
     db,
+    caches.waypoints,
     caches.shipyardPrices,
     caches.static,
     caches.agent,
-    currentWaypoint,
     ship,
   );
 
@@ -747,14 +741,11 @@ Future<JobResult> doTraderDeliverCargo(
     );
   }
 
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-
   // If we're currently at a market, record the prices and refuel.
   final maybeMarket = await visitLocalMarket(
     api,
     db,
     caches,
-    currentWaypoint,
     ship,
     // We want to always be using super up-to-date market prices for the trader.
     // If we don't do this, we will end up buying based on stale prices
@@ -767,10 +758,10 @@ Future<JobResult> doTraderDeliverCargo(
   await visitLocalShipyard(
     api,
     db,
+    caches.waypoints,
     caches.shipyardPrices,
     caches.static,
     caches.agent,
-    currentWaypoint,
     ship,
   );
 

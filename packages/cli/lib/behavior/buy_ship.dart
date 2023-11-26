@@ -131,7 +131,7 @@ Future<DateTime?> advanceBuyShip(
   // Otherwise we're at the shipyard we intended to be at.
 
   // Update our shipyard prices regardless of any later errors.
-  final shipyard = await getShipyard(api, currentWaypoint);
+  final shipyard = await getShipyard(api, currentWaypoint.waypointSymbol);
   recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
   final PurchaseShip201ResponseData result;

@@ -123,7 +123,7 @@ class MarketCache {
     }
     final waypoint = await _waypoints.waypoint(marketSymbol);
     final maybeMarket =
-        waypoint.hasMarketplace ? await getMarket(_api, waypoint) : null;
+        waypoint.hasMarketplace ? await getMarket(_api, marketSymbol) : null;
     _marketsBySymbol[marketSymbol] = maybeMarket;
     if (maybeMarket != null) {
       _marketListings.addMarket(maybeMarket);

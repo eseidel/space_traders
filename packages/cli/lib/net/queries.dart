@@ -52,10 +52,10 @@ Future<Agent> getMyAgent(Api api) async {
 
 /// Fetch shipyard for a given waypoint, will throw if the waypoint does not
 /// have a shipyard.
-Future<Shipyard> getShipyard(Api api, Waypoint waypoint) async {
+Future<Shipyard> getShipyard(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems.getShipyard(
-    waypoint.systemSymbol,
-    waypoint.symbol,
+    waypointSymbol.system,
+    waypointSymbol.waypoint,
   );
   return response!.data;
 }
@@ -68,9 +68,9 @@ Future<JumpGate> getJumpGate(Api api, SystemWaypoint waypoint) async {
 }
 
 /// Fetches Market for a given Waypoint.
-Future<Market> getMarket(Api api, Waypoint waypoint) async {
-  final response =
-      await api.systems.getMarket(waypoint.systemSymbol, waypoint.symbol);
+Future<Market> getMarket(Api api, WaypointSymbol waypointSymbol) async {
+  final response = await api.systems
+      .getMarket(waypointSymbol.system, waypointSymbol.waypoint);
   return response!.data;
 }
 

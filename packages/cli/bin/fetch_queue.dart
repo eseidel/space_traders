@@ -22,7 +22,7 @@ class FetchQueue {
         final listing = caches.marketListings
             .marketListingForSymbol(waypoint.waypointSymbol);
         if (listing == null) {
-          final market = await getMarket(api, waypoint);
+          final market = await getMarket(api, waypoint.waypointSymbol);
           caches.marketListings.addMarket(market);
         }
       }

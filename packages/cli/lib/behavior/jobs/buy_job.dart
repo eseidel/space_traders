@@ -25,14 +25,11 @@ Future<JobResult> doBuyJob(
   final buyJob =
       assertNotNull(state.buyJob, 'No buy job', const Duration(hours: 1));
 
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-
   // If we're currently at a market, record the prices and refuel.
   final maybeMarket = await visitLocalMarket(
     api,
     db,
     caches,
-    currentWaypoint,
     ship,
     // We want to always be using super up-to-date market prices for the trader.
     maxAge: const Duration(seconds: 5),
@@ -40,10 +37,10 @@ Future<JobResult> doBuyJob(
   await visitLocalShipyard(
     api,
     db,
+    caches.waypoints,
     caches.shipyardPrices,
     caches.static,
     caches.agent,
-    currentWaypoint,
     ship,
   );
 
