@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/response_cache.dart';
-import 'package:cli/compare.dart';
 import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
@@ -11,33 +10,6 @@ class _MockApi extends Mock implements Api {}
 class _MockLogger extends Mock implements Logger {}
 
 void main() {
-  test('jsonListMatches smoke test', () {
-    final logger = _MockLogger();
-    final a = {'a': 1, 'b': 2};
-    final b = {'a': 1, 'b': 2};
-    final c = {'a': 1, 'b': 3};
-    expect(jsonListMatches([a, b], [a, b]), true);
-    expect(jsonListMatches([a, b], [b, a]), true);
-    expect(
-      runWithLogger(logger, () => jsonListMatches([a, b], [a, c])),
-      false,
-    );
-    verify(
-      () => logger.info(
-        any(that: startsWith('Map<String, int> list differs at index 1')),
-      ),
-    ).called(1);
-
-    reset(logger);
-    expect(
-      runWithLogger(logger, () => jsonListMatches([a, b], [a, b, b])),
-      false,
-    );
-    verify(
-      () => logger.info("Map<String, int> list lengths don't match: 2 != 3"),
-    ).called(1);
-  });
-
   test('ResponseListCache', () async {
     final fs = MemoryFileSystem.test();
     final api = _MockApi();
