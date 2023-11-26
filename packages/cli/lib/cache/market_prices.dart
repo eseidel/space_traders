@@ -311,21 +311,14 @@ Future<Market> recordMarketDataIfNeededAndLog(
     maxAge: maxAge,
     getNow: getNow,
   )) {
-    var market =
-        await marketCache.marketForSymbol(marketSymbol, forceRefresh: false);
-    if (market!.tradeGoods.isEmpty) {
-      market = await marketCache.marketForSymbol(
-        marketSymbol,
-        forceRefresh: true,
-      );
+    var market = marketCache.fromCache(marketSymbol)!;
+    if (market.tradeGoods.isEmpty) {
+      market = await marketCache.refreshMarket(marketSymbol);
     }
-    return market!;
+    return market;
   }
-  final market = await marketCache.marketForSymbol(
-    ship.waypointSymbol,
-    forceRefresh: true,
-  );
-  await recordMarketData(marketPrices, market!, getNow: getNow);
+  final market = await marketCache.refreshMarket(marketSymbol);
+  await recordMarketData(marketPrices, market, getNow: getNow);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  market data @ ${market.symbol}');
   return market;

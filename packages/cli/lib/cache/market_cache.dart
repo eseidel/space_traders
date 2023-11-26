@@ -89,14 +89,11 @@ class MarketCache {
   MarketCache(
     Api api,
     MarketListingCache marketListings,
-    WaypointCache waypoints,
   )   : _api = api,
-        _marketListings = marketListings,
-        _waypoints = waypoints;
+        _marketListings = marketListings;
 
   final Api _api;
   final MarketListingCache _marketListings;
-  final WaypointCache _waypoints;
 
   // This needs to be careful, this caches Market which can differ in
   // response depending on if we have a ship there or not.
@@ -113,21 +110,18 @@ class MarketCache {
     _marketsBySymbol.clear();
   }
 
+  /// Get the market for the given waypoint symbol from the cache.
+  Market? fromCache(WaypointSymbol marketSymbol) {
+    return _marketsBySymbol[marketSymbol];
+  }
+
   /// Fetch the waypoint with the given symbol.
-  Future<Market?> marketForSymbol(
-    WaypointSymbol marketSymbol, {
-    required bool forceRefresh,
-  }) async {
-    if (!forceRefresh && _marketsBySymbol.containsKey(marketSymbol)) {
-      return _marketsBySymbol[marketSymbol];
-    }
-    final waypoint = await _waypoints.waypoint(marketSymbol);
-    final maybeMarket =
-        waypoint.hasMarketplace ? await getMarket(_api, marketSymbol) : null;
-    _marketsBySymbol[marketSymbol] = maybeMarket;
-    if (maybeMarket != null) {
-      _marketListings.addMarket(maybeMarket);
-    }
-    return maybeMarket;
+  Future<Market> refreshMarket(
+    WaypointSymbol marketSymbol,
+  ) async {
+    final market = await getMarket(_api, marketSymbol);
+    _marketsBySymbol[marketSymbol] = market;
+    _marketListings.addMarket(market);
+    return market;
   }
 }

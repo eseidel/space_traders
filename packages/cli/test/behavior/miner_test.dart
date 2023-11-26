@@ -584,27 +584,23 @@ void main() {
       ),
     ).thenReturn(true);
 
-    when(
-      () => caches.markets.marketForSymbol(
-        waypointSymbol,
-        forceRefresh: any(named: 'forceRefresh'),
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        Market(
-          symbol: waypointSymbol.waypoint,
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: tradeSymbol,
-              type: MarketTradeGoodTypeEnum.IMPORT,
-              tradeVolume: 100,
-              supply: SupplyLevel.ABUNDANT,
-              purchasePrice: 100,
-              sellPrice: 100,
-            ),
-          ],
+    final market = Market(
+      symbol: waypointSymbol.waypoint,
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: tradeSymbol,
+          type: MarketTradeGoodTypeEnum.IMPORT,
+          tradeVolume: 100,
+          supply: SupplyLevel.ABUNDANT,
+          purchasePrice: 100,
+          sellPrice: 100,
         ),
-      ),
+      ],
+    );
+
+    when(() => caches.markets.fromCache(waypointSymbol)).thenReturn(market);
+    when(() => caches.markets.refreshMarket(waypointSymbol)).thenAnswer(
+      (_) => Future.value(market),
     );
     final fleetApi = _MockFleetApi();
     final agent = _MockAgent();

@@ -65,28 +65,24 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(start.system);
 
-    when(
-      () => caches.markets.marketForSymbol(
-        start,
-        forceRefresh: any(named: 'forceRefresh'),
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        Market(
-          symbol: end.waypoint,
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-              tradeVolume: 100,
-              supply: SupplyLevel.ABUNDANT,
-              type: MarketTradeGoodTypeEnum.EXCHANGE,
-              purchasePrice: 100,
-              sellPrice: 101,
-            ),
-          ],
+    final market = Market(
+      symbol: start.waypoint,
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          tradeVolume: 100,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          purchasePrice: 100,
+          sellPrice: 101,
         ),
-      ),
+      ],
     );
+    when(() => caches.markets.fromCache(start)).thenReturn(market);
+    when(() => caches.markets.refreshMarket(start)).thenAnswer(
+      (_) => Future.value(market),
+    );
+
     when(
       () => caches.marketPrices.hasRecentData(
         start,
@@ -339,12 +335,10 @@ void main() {
         ),
       ],
     );
-    when(
-      () => caches.markets.marketForSymbol(
-        start,
-        forceRefresh: any(named: 'forceRefresh'),
-      ),
-    ).thenAnswer((_) => Future.value(market));
+    when(() => caches.markets.fromCache(start)).thenReturn(market);
+    when(() => caches.markets.refreshMarket(start)).thenAnswer(
+      (_) => Future.value(market),
+    );
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -922,28 +916,25 @@ void main() {
         .thenAnswer((_) async => true);
     when(() => caches.waypoints.hasShipyard(end))
         .thenAnswer((_) async => false);
-    when(
-      () => caches.markets.marketForSymbol(
-        end,
-        forceRefresh: any(named: 'forceRefresh'),
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        Market(
-          symbol: end.waypoint,
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-              tradeVolume: 100,
-              supply: SupplyLevel.ABUNDANT,
-              type: MarketTradeGoodTypeEnum.EXCHANGE,
-              purchasePrice: 100,
-              sellPrice: 101,
-            ),
-          ],
+
+    final market = Market(
+      symbol: end.waypoint,
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          tradeVolume: 100,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          purchasePrice: 100,
+          sellPrice: 101,
         ),
-      ),
+      ],
     );
+    when(() => caches.markets.fromCache(end)).thenReturn(market);
+    when(() => caches.markets.refreshMarket(end)).thenAnswer(
+      (_) => Future.value(market),
+    );
+
     when(
       () => caches.marketPrices.hasRecentData(
         end,
@@ -1076,28 +1067,24 @@ void main() {
         .thenAnswer((_) async => true);
     when(() => caches.waypoints.hasShipyard(end))
         .thenAnswer((_) async => false);
-    when(
-      () => caches.markets.marketForSymbol(
-        end,
-        forceRefresh: any(named: 'forceRefresh'),
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        Market(
-          symbol: end.waypoint,
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-              tradeVolume: 100,
-              supply: SupplyLevel.ABUNDANT,
-              type: MarketTradeGoodTypeEnum.EXCHANGE,
-              purchasePrice: 100,
-              sellPrice: 101,
-            ),
-          ],
+    final market = Market(
+      symbol: end.waypoint,
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          tradeVolume: 100,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          purchasePrice: 100,
+          sellPrice: 101,
         ),
-      ),
+      ],
     );
+    when(() => caches.markets.fromCache(end)).thenReturn(market);
+    when(() => caches.markets.refreshMarket(end)).thenAnswer(
+      (_) => Future.value(market),
+    );
+
     when(
       () => caches.marketPrices.hasRecentData(
         end,
@@ -1238,28 +1225,24 @@ void main() {
         .thenAnswer((_) async => true);
     when(() => caches.waypoints.hasShipyard(end))
         .thenAnswer((_) async => false);
-    when(
-      () => caches.markets.marketForSymbol(
-        end,
-        forceRefresh: any(named: 'forceRefresh'),
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        Market(
-          symbol: end.waypoint,
-          tradeGoods: [
-            MarketTradeGood(
-              symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-              tradeVolume: 100,
-              supply: SupplyLevel.ABUNDANT,
-              type: MarketTradeGoodTypeEnum.EXCHANGE,
-              purchasePrice: 100,
-              sellPrice: 101,
-            ),
-          ],
+    final market = Market(
+      symbol: end.waypoint,
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          tradeVolume: 100,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          purchasePrice: 100,
+          sellPrice: 101,
         ),
-      ),
+      ],
     );
+    when(() => caches.markets.fromCache(end)).thenReturn(market);
+    when(() => caches.markets.refreshMarket(end)).thenAnswer(
+      (_) => Future.value(market),
+    );
+
     when(
       () => caches.marketPrices.hasRecentData(
         end,

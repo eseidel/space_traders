@@ -122,7 +122,7 @@ class Caches {
     final construction = ConstructionCache.load(fs);
     final marketListings = MarketListingCache.load(fs, static.tradeGoods);
     final waypoints = WaypointCache(api, systems, charting, construction);
-    final markets = MarketCache(api, marketListings, waypoints);
+    final markets = MarketCache(api, marketListings);
     // Intentionally force refresh contracts in case we've been offline.
     final contracts =
         await ContractCache.loadOrFetch(api, fs: fs, forceRefresh: true);

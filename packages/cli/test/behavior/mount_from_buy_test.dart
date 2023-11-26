@@ -106,20 +106,15 @@ void main() {
     when(() => caches.marketPrices.pricesFor(toMount)).thenReturn([
       MarketPrice.fromMarketTradeGood(tradeGood, waypointSymbol),
     ]);
-    when(
-      () => caches.markets.marketForSymbol(
-        waypointSymbol,
-        forceRefresh: any(named: 'forceRefresh'),
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        Market(
-          symbol: waypointSymbol.waypoint,
-          tradeGoods: [
-            tradeGood,
-          ],
-        ),
-      ),
+    final market = Market(
+      symbol: waypointSymbol.waypoint,
+      tradeGoods: [
+        tradeGood,
+      ],
+    );
+    when(() => caches.markets.fromCache(waypointSymbol)).thenReturn(market);
+    when(() => caches.markets.refreshMarket(waypointSymbol)).thenAnswer(
+      (_) => Future.value(market),
     );
     registerFallbackValue(Duration.zero);
     when(
