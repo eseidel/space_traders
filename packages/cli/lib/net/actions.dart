@@ -295,6 +295,17 @@ bool _shouldRefuelBasedOnUsage(Ship ship) {
   return true;
 }
 
+bool _shouldRefuelBasedOnCapacity(Ship ship) {
+  final fuel = ship.fuel;
+  if (fuel.capacity == 0) {
+    return false;
+  }
+  if (fuel.capacity < 100) {
+    return fuel.current < fuel.capacity;
+  }
+  return fuel.current <= (fuel.capacity - 100);
+}
+
 /// Refuel the ship if needed and log the transaction
 Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Api api,
@@ -305,7 +316,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Market market,
   Ship ship,
 ) async {
-  if (!ship.shouldRefuel) {
+  if (!_shouldRefuelBasedOnCapacity(ship)) {
     return null;
   }
   // Ensure the fuel here is not wildly overpriced (as is sometimes the case).

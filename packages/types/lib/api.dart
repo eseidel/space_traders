@@ -433,19 +433,6 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is out of fuel.  Nothing to do at this point.
   bool get isOutOfFuel => usesFuel && fuel.current == 0;
 
-  /// Returns true if the ship should refuel.
-  // One fuel bought from the market is 100 units of fuel in the ship.
-  // For repeated short trips, avoiding buying fuel when we're close to full.
-  bool get shouldRefuel {
-    if (fuel.capacity == 0) {
-      return false;
-    }
-    if (fuel.capacity < 100) {
-      return fuel.current < fuel.capacity;
-    }
-    return fuel.current < (fuel.capacity - 100);
-  }
-
   /// Returns the number of units of fuel needed to top up the ship.
   /// This is in ship fuel units, not market fuel units.
   /// 1 unit of market fuel = 100 units of ship fuel.
