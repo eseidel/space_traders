@@ -12,6 +12,10 @@ import 'package:types/types.dart';
 
 import '../cache/caches_mock.dart';
 
+class _MockAgent extends Mock implements Agent {}
+
+class _MockMarketTransaction extends Mock implements MarketTransaction {}
+
 class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -522,5 +526,195 @@ void main() {
       marketSymbol,
     );
     expect(description, 'sig SMALL DIAMONDS ev 100c');
+  });
+
+  test('emptyCargoIfNeededForMining', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final ship = _MockShip();
+    final shipNav = _MockShipNav();
+    final centralCommand = _MockCentralCommand();
+    final caches = mockCaches();
+
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    when(() => ship.mounts).thenReturn([
+      ShipMount(
+        symbol: ShipMountSymbolEnum.MINING_LASER_II,
+        name: '',
+        requirements: ShipRequirements(),
+        strength: 10,
+      ),
+    ]);
+
+    const tradeSymbol = TradeSymbol.DIAMONDS;
+    const cargoCapacity = 60;
+    final shipCargo = ShipCargo(
+      capacity: cargoCapacity,
+      units: cargoCapacity,
+      inventory: [
+        ShipCargoItem(
+          symbol: tradeSymbol,
+          name: 'name',
+          description: 'description',
+          units: cargoCapacity,
+        ),
+      ],
+    );
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
+    final shipEngine = _MockShipEngine();
+    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.speed).thenReturn(10);
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+
+    when(() => caches.marketPrices.pricesFor(tradeSymbol)).thenReturn([]);
+
+    when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
+
+    when(() => caches.waypoints.waypoint(waypointSymbol)).thenAnswer(
+      (_) => Future.value(
+        Waypoint(
+          x: 0,
+          y: 0,
+          isUnderConstruction: false,
+          symbol: waypointSymbol.waypoint,
+          systemSymbol: waypointSymbol.system,
+          type: WaypointType.ASTEROID,
+          traits: [
+            WaypointTrait(
+              symbol: WaypointTraitSymbol.MARKETPLACE,
+              name: 'name',
+              description: 'description',
+            ),
+          ],
+        ),
+      ),
+    );
+
+    registerFallbackValue(Duration.zero);
+    when(
+      () => caches.marketPrices.hasRecentMarketData(
+        waypointSymbol,
+        maxAge: any(named: 'maxAge'),
+        getNow: getNow,
+      ),
+    ).thenReturn(true);
+
+    when(
+      () => caches.markets.marketForSymbol(
+        waypointSymbol,
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        Market(
+          symbol: waypointSymbol.waypoint,
+          tradeGoods: [
+            MarketTradeGood(
+              symbol: tradeSymbol,
+              type: MarketTradeGoodTypeEnum.IMPORT,
+              tradeVolume: 100,
+              supply: SupplyLevel.ABUNDANT,
+              purchasePrice: 100,
+              sellPrice: 100,
+            ),
+          ],
+        ),
+      ),
+    );
+    final fleetApi = _MockFleetApi();
+    final agent = _MockAgent();
+    when(() => agent.credits).thenReturn(1000000);
+    final transaction = MarketTransaction(
+      tradeSymbol: tradeSymbol.value,
+      units: cargoCapacity,
+      pricePerUnit: 100,
+      totalPrice: cargoCapacity * 100,
+      type: MarketTransactionTypeEnum.SELL,
+      shipSymbol: shipSymbol.symbol,
+      waypointSymbol: waypointSymbol.waypoint,
+      timestamp: now,
+    );
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+
+    when(() => api.fleet).thenReturn(fleetApi);
+    when(
+      () => fleetApi.sellCargo(
+        shipSymbol.symbol,
+        sellCargoRequest:
+            SellCargoRequest(symbol: tradeSymbol, units: cargoCapacity),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        SellCargo201Response(
+          data: SellCargo201ResponseData(
+            agent: agent,
+            cargo: ShipCargo(capacity: cargoCapacity, units: 0),
+            transaction: transaction,
+          ),
+        ),
+      ),
+    );
+
+    when(
+      () => caches.marketPrices.recentSellPrice(
+        tradeSymbol,
+        marketSymbol: waypointSymbol,
+      ),
+    ).thenReturn(100);
+
+    // Returning no systems will find no nearby markets, thus will jettison.
+    when(() => caches.systems.waypointsInSystem(waypointSymbol.systemSymbol))
+        .thenReturn([]);
+
+    when(
+      () => fleetApi.jettison(
+        shipSymbol.symbol,
+        jettisonRequest:
+            JettisonRequest(symbol: tradeSymbol, units: cargoCapacity),
+      ),
+    ).thenAnswer(
+      (_) => Future.value(
+        Jettison200Response(
+          data: Jettison200ResponseData(
+            cargo: ShipCargo(capacity: cargoCapacity, units: 0),
+          ),
+        ),
+      ),
+    );
+
+    when(() => centralCommand.minimumSurveys).thenReturn(10);
+    when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
+
+    final state = BehaviorState(shipSymbol, Behavior.miner)
+      ..mineJob = MineJob(mine: waypointSymbol, market: waypointSymbol);
+
+    final logger = _MockLogger();
+
+    final result = await runWithLogger(logger, () async {
+      final result = await emptyCargoIfNeededForMining(
+        state,
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        getNow: getNow,
+      );
+      return result;
+    });
+
+    expect(result.shouldReturn, true);
   });
 }
