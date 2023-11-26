@@ -93,6 +93,11 @@ void main() {
     when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
 
+    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
+        .thenAnswer((_) async => false);
+    when(() => caches.waypoints.hasShipyard(waypointSymbol))
+        .thenAnswer((_) async => false);
+
     when(() => centralCommand.maxAgeForExplorerData)
         .thenReturn(const Duration(days: 3));
     when(centralCommand.shortenMaxAgeForExplorerData)

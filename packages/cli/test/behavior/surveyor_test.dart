@@ -42,9 +42,9 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbolEnum.SURVEYOR_I,
@@ -53,26 +53,16 @@ void main() {
       ),
     ]);
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(symbol.waypoint);
-    when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
-        name: 'name',
-        description: 'description',
-      ),
-    ]);
-    when(() => waypoint.systemSymbol).thenReturn(symbol.system);
-
-    registerFallbackValue(symbol);
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
-    registerFallbackValue(symbol.systemSymbol);
+    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(waypointSymbol))
+        .thenAnswer((_) async => false);
+    when(() => caches.waypoints.canBeMined(waypointSymbol))
+        .thenAnswer((_) async => true);
 
     when(
-      () => caches.waypoints.waypointsInSystem(any()),
-    ).thenAnswer((_) => Future.value([waypoint]));
+      () => caches.waypoints.waypointsInSystem(waypointSymbol.systemSymbol),
+    ).thenAnswer((_) => Future.value([]));
 
     when(() => fleetApi.createSurvey(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
@@ -91,7 +81,7 @@ void main() {
     );
 
     final state = BehaviorState(shipSymbol, Behavior.surveyor)
-      ..mineJob = MineJob(mine: symbol, market: symbol);
+      ..mineJob = MineJob(mine: waypointSymbol, market: waypointSymbol);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

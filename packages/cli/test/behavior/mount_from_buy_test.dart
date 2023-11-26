@@ -51,9 +51,9 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
     when(() => ship.mounts).thenReturn([
       // A mount in our template, we will leave it be.
       ShipMount(
@@ -78,7 +78,7 @@ void main() {
         requirements: ShipRequirements(),
       ),
     );
-    when(() => caches.agent.headquartersSymbol).thenReturn(symbol);
+    when(() => caches.agent.headquartersSymbol).thenReturn(waypointSymbol);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
@@ -106,17 +106,17 @@ void main() {
       sellPrice: 101,
     );
     when(() => caches.marketPrices.pricesFor(toMount)).thenReturn([
-      MarketPrice.fromMarketTradeGood(tradeGood, symbol),
+      MarketPrice.fromMarketTradeGood(tradeGood, waypointSymbol),
     ]);
     when(
       () => caches.markets.marketForSymbol(
-        symbol,
+        waypointSymbol,
         forceRefresh: any(named: 'forceRefresh'),
       ),
     ).thenAnswer(
       (_) => Future.value(
         Market(
-          symbol: symbol.waypoint,
+          symbol: waypointSymbol.waypoint,
           tradeGoods: [
             tradeGood,
           ],
@@ -126,36 +126,19 @@ void main() {
     registerFallbackValue(Duration.zero);
     when(
       () => caches.marketPrices.hasRecentMarketData(
-        symbol,
+        waypointSymbol,
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(symbol.waypoint);
-    when(() => waypoint.type).thenReturn(WaypointType.ASTEROID_FIELD);
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        description: '',
-        name: '',
-        symbol: WaypointTraitSymbol.SHIPYARD,
-      ),
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.MARKETPLACE,
-        name: '',
-        description: '',
-      ),
-    ]);
-    when(() => waypoint.systemSymbol).thenReturn(symbol.system);
-
-    registerFallbackValue(symbol);
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
-    registerFallbackValue(symbol.systemSymbol);
+    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(waypointSymbol))
+        .thenAnswer((_) async => true);
 
     when(
-      () => caches.waypoints.waypointsInSystem(any()),
-    ).thenAnswer((_) => Future.value([waypoint]));
+      () => caches.waypoints.waypointsInSystem(waypointSymbol.systemSymbol),
+    ).thenAnswer((_) => Future.value([]));
 
     when(() => centralCommand.templateForShip(ship)).thenReturn(
       ShipTemplate(
@@ -170,12 +153,16 @@ void main() {
 
     final systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
-    when(() => systemsApi.getShipyard(symbol.system, symbol.waypoint))
-        .thenAnswer(
+    when(
+      () => systemsApi.getShipyard(
+        waypointSymbol.system,
+        waypointSymbol.waypoint,
+      ),
+    ).thenAnswer(
       (_) => Future.value(
         GetShipyard200Response(
           data: Shipyard(
-            symbol: symbol.waypoint,
+            symbol: waypointSymbol.waypoint,
             modificationsFee: 10,
             shipTypes: [],
           ),
@@ -195,7 +182,7 @@ void main() {
             agent: agent,
             cargo: shipCargo,
             transaction: ShipModificationTransaction(
-              waypointSymbol: symbol.waypoint,
+              waypointSymbol: waypointSymbol.waypoint,
               tradeSymbol: TradeSymbol.MOUNT_SURVEYOR_II.value,
               totalPrice: 100,
               shipSymbol: shipSymbol.symbol,
@@ -219,7 +206,7 @@ void main() {
             agent: agent,
             cargo: shipCargo,
             transaction: ShipModificationTransaction(
-              waypointSymbol: symbol.waypoint,
+              waypointSymbol: waypointSymbol.waypoint,
               tradeSymbol: TradeSymbol.MOUNT_LASER_CANNON_I.value,
               totalPrice: 100,
               shipSymbol: shipSymbol.symbol,
@@ -234,14 +221,14 @@ void main() {
 
     when(
       () => caches.routePlanner.planRoute(
-        start: symbol,
-        end: symbol,
+        start: waypointSymbol,
+        end: waypointSymbol,
         fuelCapacity: any(named: 'fuelCapacity'),
         shipSpeed: any(named: 'shipSpeed'),
       ),
     ).thenReturn(
       RoutePlan.empty(
-        symbol: symbol,
+        symbol: waypointSymbol,
         fuelCapacity: 100,
         shipSpeed: 30,
       ),
@@ -251,11 +238,11 @@ void main() {
       ..buyJob = BuyJob(
         tradeSymbol: toMount,
         units: 1,
-        buyLocation: symbol,
+        buyLocation: waypointSymbol,
       )
       ..mountJob = MountJob(
         mountSymbol: mountSymbolForTradeSymbol(toMount)!,
-        shipyardSymbol: symbol,
+        shipyardSymbol: waypointSymbol,
       );
 
     final logger = _MockLogger();
