@@ -74,26 +74,12 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.system);
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.systemSymbol).thenReturn(symbol.system);
-    when(() => waypoint.symbol).thenReturn(symbol.waypoint);
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.SHIPYARD,
-        name: '',
-        description: '',
-      ),
-    ]);
-
     final agent = _MockAgent();
     when(() => caches.agent.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
 
-    registerFallbackValue(symbol);
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
     when(() => caches.waypoints.waypointsInSystem(symbol.systemSymbol))
-        .thenAnswer((_) => Future.value([waypoint]));
+        .thenAnswer((_) => Future.value([]));
     when(() => caches.ships.ships).thenReturn([ship]);
     when(() => caches.ships.frameCounts).thenReturn({});
 

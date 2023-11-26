@@ -191,7 +191,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   Database db,
   Caches caches,
   CentralCommand centralCommand,
-  Waypoint waypoint,
+  WaypointSymbol startSymbol,
   Ship ship,
   BehaviorState state,
 ) async {
@@ -202,7 +202,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   var marketSymbol = nearbyMarketWhichTrades(
     caches.systems,
     caches.marketListings,
-    waypoint.waypointSymbol,
+    startSymbol,
     TradeSymbol.FUEL,
   );
   if (marketSymbol == null) {
@@ -280,7 +280,7 @@ Future<DateTime?> advanceExplorer(
     db,
     caches,
     centralCommand,
-    waypoint,
+    waypoint.waypointSymbol,
     ship,
     state,
   );

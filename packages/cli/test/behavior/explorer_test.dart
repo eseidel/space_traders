@@ -163,18 +163,7 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.MARKETPLACE,
-        name: 'name',
-        description: 'description',
-      ),
-    ]);
-    when(() => waypoint.symbol).thenReturn(waypointSymbol.waypoint);
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.explorer);
-    when(() => caches.waypoints.waypoint(waypointSymbol))
-        .thenAnswer((_) => Future.value(waypoint));
     when(() => caches.marketListings.marketListingForSymbol(waypointSymbol))
         .thenReturn(
       MarketListing(
@@ -191,7 +180,7 @@ void main() {
         db,
         caches,
         centralCommand,
-        waypoint,
+        waypointSymbol,
         ship,
         state,
       ),
@@ -211,7 +200,7 @@ void main() {
             db,
             caches,
             centralCommand,
-            waypoint,
+            waypointSymbol,
             ship,
             state,
           );

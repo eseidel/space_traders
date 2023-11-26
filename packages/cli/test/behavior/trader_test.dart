@@ -581,14 +581,6 @@ void main() {
     final end = WaypointSymbol.fromString('S-A-C');
     registerFallbackValue(start);
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(start.waypoint);
-    when(() => waypoint.systemSymbol).thenReturn(start.system);
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([]);
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
-
     final routePlan = RoutePlan(
       actions: [
         RouteAction(
