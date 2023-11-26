@@ -654,9 +654,7 @@ Future<JobResult> doTraderGetCargo(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  // Can this ever happen?  Doesn't the route system prevent this?
   if (ship.waypointSymbol != state.deal!.deal.sourceSymbol) {
-    shipWarn(ship, 'Off course in route to deal, resuming route.');
     return JobResult.wait(
       await beingNewRouteAndLog(
         api,
