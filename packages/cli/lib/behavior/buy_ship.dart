@@ -111,11 +111,10 @@ Future<DateTime?> advanceBuyShip(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   final shipyardSymbol = state.shipBuyJob!.shipyardSymbol;
   final shipType = state.shipBuyJob!.shipType;
 
-  if (currentWaypoint.waypointSymbol != shipyardSymbol) {
+  if (ship.waypointSymbol != shipyardSymbol) {
     // We're not there, go to the shipyard to purchase.
     final waitTime = await beingNewRouteAndLog(
       api,
@@ -131,7 +130,7 @@ Future<DateTime?> advanceBuyShip(
   // Otherwise we're at the shipyard we intended to be at.
 
   // Update our shipyard prices regardless of any later errors.
-  final shipyard = await getShipyard(api, currentWaypoint.waypointSymbol);
+  final shipyard = await getShipyard(api, ship.waypointSymbol);
   recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
 
   final PurchaseShip201ResponseData result;

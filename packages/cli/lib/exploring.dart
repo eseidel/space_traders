@@ -18,10 +18,9 @@ Future<Market?> visitLocalMarket(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   // If we're currently at a market, record the prices and refuel.
-  // TODO(eseidel): Use a MarketListing lookup instead?
   final waypointSymbol = ship.waypointSymbol;
-  final waypoint = await caches.waypoints.waypoint(waypointSymbol);
-  if (!waypoint.hasMarketplace) {
+  final hasMarketplace = await caches.waypoints.hasMarketplace(waypointSymbol);
+  if (!hasMarketplace) {
     return null;
   }
   // This could avoid the dock and market lookup if the caller
@@ -65,10 +64,9 @@ Future<void> visitLocalShipyard(
   AgentCache agentCache,
   Ship ship,
 ) async {
-  // TODO(eseidel): Use a ChartingCache lookup instead?
   final waypointSymbol = ship.waypointSymbol;
-  final waypoint = await waypoints.waypoint(waypointSymbol);
-  if (!waypoint.hasShipyard) {
+  final hasShipyard = await waypoints.hasShipyard(waypointSymbol);
+  if (!hasShipyard) {
     return;
   }
   final shipyard = await getShipyard(api, waypointSymbol);

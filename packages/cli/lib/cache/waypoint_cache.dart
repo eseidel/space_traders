@@ -151,4 +151,24 @@ class WaypointCache {
     return waypoints
         .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
   }
+
+  /// Returns true if the given waypoint has a shipyard.
+  Future<bool> hasShipyard(WaypointSymbol waypointSymbol) async {
+    return (await waypoint(waypointSymbol)).hasShipyard;
+  }
+
+  /// Returns true if the given waypoint has a marketplace.
+  Future<bool> hasMarketplace(WaypointSymbol waypointSymbol) async {
+    return (await waypoint(waypointSymbol)).hasMarketplace;
+  }
+
+  /// Returns true if the given waypoint can be mined.
+  Future<bool> canBeMined(WaypointSymbol waypointSymbol) async {
+    return (await waypoint(waypointSymbol)).canBeMined;
+  }
+
+  /// Returns true if the given waypoint can be siphoned.
+  Future<bool> canBeSiphoned(WaypointSymbol waypointSymbol) async {
+    return (await waypoint(waypointSymbol)).canBeSiphoned;
+  }
 }

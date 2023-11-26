@@ -18,8 +18,6 @@ Future<DateTime?> advanceSurveyor(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-
   final mineJob = assertNotNull(
     state.mineJob,
     'Requires a mine job.',
@@ -38,7 +36,7 @@ Future<DateTime?> advanceSurveyor(
     );
   }
   jobAssert(
-    currentWaypoint.canBeMined,
+    await caches.waypoints.canBeMined(ship.waypointSymbol),
     'Requires a mineable waypoint.',
     const Duration(minutes: 10),
   );

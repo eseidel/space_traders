@@ -143,8 +143,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       .waypointSymbol;
 
   const tradeSymbol = TradeSymbol.DIAMONDS;
-
-  // TODO(eseidel): Try light haulers?
   const haulerType = ShipType.HEAVY_FREIGHTER;
   final unitsPerHaulerCycle = shipyardShips.capacityForShipType(haulerType)!;
 

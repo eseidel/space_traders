@@ -150,10 +150,9 @@ Future<JobResult> doSiphonJob(
     return JobResult.wait(waitTime);
   }
 
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   jobAssert(
-    currentWaypoint.canBeSiphoned,
-    "${waypointDescription(currentWaypoint)} can't be siphoned.",
+    await caches.waypoints.canBeSiphoned(ship.waypointSymbol),
+    "${ship.waypointSymbol} can't be siphoned.",
     const Duration(hours: 1),
   );
 

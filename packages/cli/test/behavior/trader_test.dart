@@ -67,17 +67,6 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(start.system);
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(start.waypoint);
-    when(() => waypoint.systemSymbol).thenReturn(start.system);
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.MARKETPLACE,
-        name: '',
-        description: '',
-      ),
-    ]);
     when(
       () => caches.markets.marketForSymbol(
         start,
@@ -108,8 +97,14 @@ void main() {
     ).thenReturn(true);
 
     registerFallbackValue(start);
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
+    when(() => caches.waypoints.hasMarketplace(start))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(start))
+        .thenAnswer((_) async => false);
+    when(() => caches.waypoints.hasMarketplace(end))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(end))
+        .thenAnswer((_) async => false);
 
     final costedDeal = CostedDeal(
       deal: Deal.test(
@@ -279,18 +274,6 @@ void main() {
     when(() => shipEngine.speed).thenReturn(shipSpeed);
     when(() => ship.engine).thenReturn(shipEngine);
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(start.waypoint);
-    when(() => waypoint.systemSymbol).thenReturn(start.system);
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    // We have a marketplace.
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.MARKETPLACE,
-        name: '',
-        description: '',
-      ),
-    ]);
     registerFallbackValue(Duration.zero);
     when(
       () => caches.marketPrices.hasRecentMarketData(
@@ -299,24 +282,14 @@ void main() {
       ),
     ).thenReturn(true);
 
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
-    when(() => caches.systems.waypoint(start)).thenReturn(
-      SystemWaypoint(
-        symbol: start.waypoint,
-        type: WaypointType.ASTEROID_FIELD,
-        x: 0,
-        y: 0,
-      ),
-    );
-    when(() => caches.systems.waypoint(end)).thenReturn(
-      SystemWaypoint(
-        symbol: end.waypoint,
-        type: WaypointType.ASTEROID_FIELD,
-        x: 0,
-        y: 0,
-      ),
-    );
+    when(() => caches.waypoints.hasMarketplace(start))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(start))
+        .thenAnswer((_) async => false);
+    when(() => caches.waypoints.hasMarketplace(end))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(end))
+        .thenAnswer((_) async => false);
 
     final routePlan = RoutePlan(
       actions: [
@@ -955,19 +928,10 @@ void main() {
       costPerFuelUnit: 100,
     );
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(end.waypoint);
-    when(() => waypoint.systemSymbol).thenReturn(end.system);
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.MARKETPLACE,
-        name: '',
-        description: '',
-      ),
-    ]);
-    when(() => caches.waypoints.waypoint(end))
-        .thenAnswer((_) => Future.value(waypoint));
+    when(() => caches.waypoints.hasMarketplace(end))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(end))
+        .thenAnswer((_) async => false);
     when(
       () => caches.markets.marketForSymbol(
         end,
@@ -1118,19 +1082,10 @@ void main() {
       costPerFuelUnit: 100,
     );
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(end.waypoint);
-    when(() => waypoint.systemSymbol).thenReturn(end.system);
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.MARKETPLACE,
-        name: '',
-        description: '',
-      ),
-    ]);
-    when(() => caches.waypoints.waypoint(end))
-        .thenAnswer((_) => Future.value(waypoint));
+    when(() => caches.waypoints.hasMarketplace(end))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(end))
+        .thenAnswer((_) async => false);
     when(
       () => caches.markets.marketForSymbol(
         end,
@@ -1289,19 +1244,10 @@ void main() {
       costPerFuelUnit: 100,
     );
 
-    final waypoint = _MockWaypoint();
-    when(() => waypoint.symbol).thenReturn(end.waypoint);
-    when(() => waypoint.systemSymbol).thenReturn(end.system);
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([
-      WaypointTrait(
-        symbol: WaypointTraitSymbol.MARKETPLACE,
-        name: '',
-        description: '',
-      ),
-    ]);
-    when(() => caches.waypoints.waypoint(end))
-        .thenAnswer((_) => Future.value(waypoint));
+    when(() => caches.waypoints.hasMarketplace(end))
+        .thenAnswer((_) async => true);
+    when(() => caches.waypoints.hasShipyard(end))
+        .thenAnswer((_) async => false);
     when(
       () => caches.markets.marketForSymbol(
         end,

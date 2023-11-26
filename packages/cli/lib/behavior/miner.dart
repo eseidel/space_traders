@@ -238,10 +238,9 @@ Future<JobResult> doMineJob(
     return JobResult.wait(waitTime);
   }
 
-  final currentWaypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   jobAssert(
-    currentWaypoint.canBeMined,
-    "${waypointDescription(currentWaypoint)} can't be mined.",
+    await caches.waypoints.canBeMined(ship.waypointSymbol),
+    "${ship.waypointSymbol} can't be mined.",
     const Duration(hours: 1),
   );
 
@@ -260,7 +259,7 @@ Future<JobResult> doMineJob(
   final worthMining = await surveysWorthMining(
     db,
     caches.marketPrices,
-    surveyWaypointSymbol: currentWaypoint.waypointSymbol,
+    surveyWaypointSymbol: ship.waypointSymbol,
     nearbyMarketSymbol: marketSymbol,
     minimumSurveys: centralCommand.minimumSurveys,
     percentileThreshold: centralCommand.surveyPercentileThreshold,
