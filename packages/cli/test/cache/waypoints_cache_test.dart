@@ -66,5 +66,20 @@ void main() {
         limit: any(named: 'limit'),
       ),
     ).called(1);
+
+    // For coverage.
+    expect(await waypointCache.hasMarketplace(symbol), false);
+    expect(await waypointCache.hasShipyard(symbol), false);
+    expect(await waypointCache.canBeMined(symbol), false);
+    expect(await waypointCache.canBeSiphoned(symbol), false);
+
+    // The has getters still throw if the waypoint doesn't exist.
+    when(() => systemsCache.waypointsInSystem(SystemSymbol.fromString('A-B')))
+        .thenReturn([]);
+    expect(
+      () async => await waypointCache
+          .hasMarketplace(WaypointSymbol.fromString('A-B-C')),
+      throwsArgumentError,
+    );
   });
 }
