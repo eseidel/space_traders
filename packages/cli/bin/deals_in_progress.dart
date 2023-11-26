@@ -1,3 +1,4 @@
+import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
@@ -81,6 +82,24 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     ]);
   }
   logger.info(table.toString());
+
+  final shipCache = ShipCache.load(fs)!;
+  final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache)
+      .map((s) => s.hexNumber)
+      .toList();
+  if (idleHaulers.isNotEmpty) {
+    logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
+  }
+
+  final minerHaulers = behaviorCache.states
+      .where((state) => state.behavior == Behavior.minerHauler)
+      .map((state) => state.shipSymbol.hexNumber)
+      .toList();
+  if (minerHaulers.isNotEmpty) {
+    logger.info(
+      '${minerHaulers.length} miner haulers: ${minerHaulers.join(', ')}',
+    );
+  }
 }
 
 void main(List<String> args) async {
