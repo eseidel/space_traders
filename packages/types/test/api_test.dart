@@ -159,7 +159,7 @@ void main() {
   test('CargoUtils', () {
     final cargo = ShipCargo(
       capacity: 100,
-      units: 0,
+      units: 2,
       inventory: [
         ShipCargoItem(
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
