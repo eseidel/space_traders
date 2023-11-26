@@ -311,8 +311,8 @@ Future<Market> recordMarketDataIfNeededAndLog(
     maxAge: maxAge,
     getNow: getNow,
   )) {
-    var market = marketCache.fromCache(marketSymbol)!;
-    if (market.tradeGoods.isEmpty) {
+    var market = marketCache.fromCache(marketSymbol);
+    if (market == null || market.tradeGoods.isEmpty) {
       market = await marketCache.refreshMarket(marketSymbol);
     }
     return market;
