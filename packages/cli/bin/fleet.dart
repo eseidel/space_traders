@@ -19,9 +19,22 @@ int _averageCondition(Ship ship) {
   return total ~/ 3;
 }
 
+/// Returns a string representing the current navigation status of the ship.
+String _describeShipNav(ShipNav nav) {
+  switch (nav.status) {
+    case ShipNavStatus.DOCKED:
+      return 'Docked at ${nav.waypointSymbol}';
+    case ShipNavStatus.IN_ORBIT:
+      return 'Orbiting ${nav.waypointSymbol}';
+    case ShipNavStatus.IN_TRANSIT:
+      return 'In transit to ${nav.waypointSymbol}';
+  }
+  return 'Unknown';
+}
+
 String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
   final waypoint = systemsCache.waypoint(ship.waypointSymbol);
-  var string = '${ship.navStatusString} ${waypoint.type} '
+  var string = '${_describeShipNav(ship.nav)} ${waypoint.type} '
       '${ship.registration.role} ${ship.fleetRole.name} '
       '${ship.cargo.units}/${ship.cargo.capacity}';
   if (ship.crew.morale != 100) {

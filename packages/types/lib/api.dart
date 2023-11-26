@@ -494,19 +494,6 @@ extension ShipUtils on Ship {
     return fuel.current / fuel.capacity;
   }
 
-  /// Returns a string representing the current navigation status of the ship.
-  String get navStatusString {
-    switch (nav.status) {
-      case ShipNavStatus.DOCKED:
-        return 'Docked at ${nav.waypointSymbol}';
-      case ShipNavStatus.IN_ORBIT:
-        return 'Orbiting ${nav.waypointSymbol}';
-      case ShipNavStatus.IN_TRANSIT:
-        return 'In transit to ${nav.waypointSymbol}';
-    }
-    return 'Unknown';
-  }
-
   /// Returns the Duration until the ship is ready to use its reactor again.
   /// Will never return a negative duration, will instead return null.
   /// Use this instead of cooldown.remainingSeconds since that can be stale
