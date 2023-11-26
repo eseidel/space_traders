@@ -31,6 +31,7 @@ class Config {
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
+    ShipType.LIGHT_HAULER,
   ];
 
   /// A list of which haulers should be used as miner haulers.
