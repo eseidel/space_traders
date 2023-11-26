@@ -238,10 +238,6 @@ extension SystemUtils on System {
   /// Returns the SystemSymbol of the system.
   SystemSymbol get systemSymbol => SystemSymbol.fromString(symbol);
 
-  /// Returns true if the system has a jump gate.
-  bool get hasJumpGate =>
-      waypoints.any((w) => w.type == WaypointType.JUMP_GATE);
-
   /// Returns the the SystemWaypoint for the jump gate if it has one.
   SystemWaypoint? get jumpGateWaypoint => waypoints.firstWhereOrNull(
         (w) => w.type == WaypointType.JUMP_GATE,
@@ -309,9 +305,6 @@ extension WaypointUtils on Waypoint {
   /// Returns true if the waypoint has the given type.
   bool isType(WaypointType type) => this.type == type;
 
-  /// Returns true if the waypoint is an asteroid field.
-  bool get isAsteroid => isType(WaypointType.ASTEROID);
-
   /// Returns true if the waypoint can be mined.
   bool get canBeMined => traits.any((t) => isMinableTrait(t.symbol));
 
@@ -343,9 +336,7 @@ extension CargoUtils on ShipCargo {
   bool get isNotEmpty => !isEmpty;
 
   /// Returns the amount of the given trade good the cargo has.
-  int countUnits(TradeSymbol tradeSymbol) {
-    return cargoItem(tradeSymbol)?.units ?? 0;
-  }
+  int countUnits(TradeSymbol tradeSymbol) => cargoItem(tradeSymbol)?.units ?? 0;
 
   /// Returns the ShipCargoItem for the given trade good or null if the cargo
   /// doesn't have that good.

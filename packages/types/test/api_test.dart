@@ -25,6 +25,7 @@ void main() {
       y: 0,
     );
     expect(jumpGate.isType(WaypointType.JUMP_GATE), isTrue);
+    expect(jumpGate.isJumpGate, isTrue);
     expect(jumpGate.isType(WaypointType.PLANET), isFalse);
     expect(asteroid.isAsteroid, isTrue);
     expect(jumpGate.systemSymbol, SystemSymbol.fromString('S-E'));
@@ -130,6 +131,9 @@ void main() {
   test('ShipSymbol agentName with hyphen', () {
     final symbol = ShipSymbol.fromString('A-1-A');
     expect(symbol.agentName, 'A-1');
+
+    // At least one hyphen is required.
+    expect(() => ShipSymbol.fromString('A1'), throwsArgumentError);
   });
 
   test('FactionUtils', () {
@@ -152,6 +156,26 @@ void main() {
     );
     expect(agent.headquartersSymbol, WaypointSymbol.fromString('S-A-W'));
   });
+  test('CargoUtils', () {
+    final cargo = ShipCargo(
+      capacity: 100,
+      units: 0,
+      inventory: [
+        ShipCargoItem(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          name: '',
+          description: '',
+          units: 2,
+        ),
+      ],
+    );
+    expect(cargo.countUnits(TradeSymbol.ADVANCED_CIRCUITRY), 2);
+    expect(cargo.countUnits(TradeSymbol.ALUMINUM), 0);
+    expect(cargo.isEmpty, isFalse);
+    expect(cargo.isNotEmpty, isTrue);
+    expect(cargo.availableSpace, 98);
+  });
+
   test('tradeSymbolForMountSymbol', () {
     for (final mountSymbol in ShipMountSymbolEnum.values) {
       final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
