@@ -36,8 +36,6 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 void main() {
   test('surveyWorthMining with no surveys', () async {
     final db = _MockDatabase();
@@ -579,7 +577,7 @@ void main() {
 
     registerFallbackValue(Duration.zero);
     when(
-      () => caches.marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentData(
         waypointSymbol,
         maxAge: any(named: 'maxAge'),
         getNow: getNow,

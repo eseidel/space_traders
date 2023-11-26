@@ -28,7 +28,7 @@ bool _isMissingRecentMarketData(
   required Duration maxAge,
 }) {
   return waypoint.hasMarketplace &&
-      !marketPrices.hasRecentMarketData(
+      !marketPrices.hasRecentData(
         waypoint.waypointSymbol,
         maxAge: maxAge,
       );
@@ -40,7 +40,7 @@ bool _isMissingRecentShipyardData(
   required Duration maxAge,
 }) {
   return waypoint.hasShipyard &&
-      !shipyardPrices.hasRecentShipyardData(
+      !shipyardPrices.hasRecentData(
         waypoint.waypointSymbol,
         maxAge: maxAge,
       );
@@ -89,7 +89,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
       return waypointSymbol;
     }
     if (waypoint.hasMarketplace &&
-        !marketPrices.hasRecentMarketData(waypointSymbol, maxAge: maxAge)) {
+        !marketPrices.hasRecentData(waypointSymbol, maxAge: maxAge)) {
       shipInfo(
         ship,
         '$waypointSymbol is missing recent '
@@ -99,7 +99,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
       return waypointSymbol;
     }
     if (waypoint.hasShipyard &&
-        !shipyardPrices.hasRecentShipyardData(waypointSymbol, maxAge: maxAge)) {
+        !shipyardPrices.hasRecentData(waypointSymbol, maxAge: maxAge)) {
       shipInfo(
         ship,
         '$waypointSymbol is missing recent '

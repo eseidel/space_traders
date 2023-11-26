@@ -3,14 +3,14 @@ import 'dart:math';
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/market_prices.dart'; // just for maxAge.
+import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 
 /// A collection of price records.
-// Could consider sharding this by system if it gets too big.
-class ShipyardPrices extends JsonListStore<ShipyardPrice> {
+class ShipyardPrices extends PricesCache<ShipType, ShipyardPrice> {
   /// Create a new price data collection.
   ShipyardPrices(
     super.records, {
@@ -34,53 +34,6 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
 
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'data/shipyard_prices.json';
-
-  // This might not actually be true!  I've never seen a 0 in the data.
-  // These may contain 0s and duplicates, best to access it through one
-  // of the accessors which knows how to filter.
-  List<ShipyardPrice> get _prices => records;
-
-  /// Get the count of unique waypoints.
-  int get waypointCount {
-    final waypoints = <WaypointSymbol>{};
-    for (final price in _prices) {
-      waypoints.add(price.waypointSymbol);
-    }
-    return waypoints.length;
-  }
-
-  /// Get the raw pricing data.
-  List<ShipyardPrice> get prices => _prices;
-
-  /// Add new prices to the shipyard price data.
-  void addPrices(List<ShipyardPrice> newPrices) {
-    for (final newPrice in newPrices) {
-      // This doesn't account for existing duplicates.
-      final index = _prices.indexWhere(
-        (element) =>
-            element.waypointSymbol == newPrice.waypointSymbol &&
-            element.shipType == newPrice.shipType,
-      );
-
-      if (index >= 0) {
-        // This date logic is necessary to make sure we don't replace
-        // more recent local prices with older server data.
-        final existingPrice = _prices[index];
-        if (DateTime.timestamp().isBefore(newPrice.timestamp)) {
-          logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
-          continue;
-        }
-        if (newPrice.timestamp.isBefore(existingPrice.timestamp)) {
-          continue;
-        }
-        // If the new price is newer than the existing price, replace it.
-        _prices[index] = newPrice;
-      } else {
-        _prices.add(newPrice);
-      }
-    }
-    save();
-  }
 
   /// Get the median purchase price for a [ShipType].
   int? medianPurchasePrice(ShipType shipType) =>
@@ -123,39 +76,7 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
             e.shipType == shipType &&
             e.purchasePrice > 0 &&
             e.waypointSymbol == shipyardSymbol;
-    return _prices.where(filter);
-  }
-
-  /// Returns true if there is recent market data for a given market.
-  /// Does not check if the passed in market is a valid market.
-  bool hasRecentShipyardData(
-    WaypointSymbol marketSymbol, {
-    Duration maxAge = defaultMaxAge,
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    final pricesForMarket =
-        _prices.where((e) => e.waypointSymbol == marketSymbol);
-    if (pricesForMarket.isEmpty) {
-      return false;
-    }
-    final pricesForMarketSorted = pricesForMarket.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    return getNow().difference(pricesForMarketSorted.last.timestamp) < maxAge;
-  }
-
-  /// Returns the age of the cache for a given shipyard.
-  Duration? cacheAgeFor(
-    WaypointSymbol waypointSymbol, {
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    final prices = pricesAtShipyard(waypointSymbol);
-    if (prices.isEmpty) {
-      return null;
-    }
-    final sortedPrices = prices.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    return DateTime.now().difference(sortedPrices.last.timestamp);
+    return prices.where(filter);
   }
 
   /// The most recent price can be purchased from the shipyard.
@@ -182,30 +103,6 @@ class ShipyardPrices extends JsonListStore<ShipyardPrice> {
     }
     return pricesForSymbolSorted.last.purchasePrice;
   }
-
-  /// Returns all known prices for a given shipyard.
-  List<ShipyardPrice> pricesAtShipyard(WaypointSymbol shipyardSymbol) {
-    return _prices.where((e) => e.waypointSymbol == shipyardSymbol).toList();
-  }
-
-  /// Returns all known prices for a ship type,
-  /// optionally restricted to a specific waypoint.
-  Iterable<ShipyardPrice> pricesFor(
-    ShipType shipType, {
-    WaypointSymbol? shipyardSymbol,
-  }) {
-    final prices = _prices.where((e) => e.shipType == shipType);
-    if (shipyardSymbol == null) {
-      return prices;
-    }
-    return prices.where((e) => e.waypointSymbol == shipyardSymbol);
-  }
-
-  /// Returns true if there is a price for a given ship type,
-  /// Used for detecting if we can buy a given ship type yet.
-  bool havePriceFor(ShipType shipType) {
-    return _prices.any((element) => element.shipType == shipType);
-  }
 }
 
 /// Record shipyard data and log the result.
@@ -222,13 +119,14 @@ void recordShipyardDataAndLog(
 /// Record shipyard data.
 void recordShipyardData(
   ShipyardPrices shipyardPrices,
-  Shipyard shipyard,
-) {
+  Shipyard shipyard, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
   final prices = shipyard.ships
       .map((s) => ShipyardPrice.fromShipyardShip(s, shipyard.waypointSymbol))
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${shipyard.symbol}!');
   }
-  shipyardPrices.addPrices(prices);
+  shipyardPrices.addPrices(prices, getNow: getNow);
 }

@@ -54,7 +54,7 @@ void main() {
 
     const b = TradeSymbol.FOOD;
     final bPrice = makePrice(waypointSymbol: 'S-S-B', symbol: b);
-    await marketPrices.addPrices([bPrice]);
+    marketPrices.addPrices([bPrice]);
     expect(marketPrices.count, 2);
     expect(marketPrices.waypointCount, 2);
 
@@ -65,7 +65,7 @@ void main() {
       timestamp: DateTime.now().add(const Duration(days: 1)),
     );
     final logger = _MockLogger();
-    await runWithLogger(logger, () => marketPrices.addPrices([c]));
+    runWithLogger(logger, () => marketPrices.addPrices([c]));
     expect(marketPrices.count, 2);
     expect(marketPrices.waypointCount, 2);
 
@@ -80,7 +80,7 @@ void main() {
       symbol: a,
       purchasePrice: 20,
     );
-    await runWithLogger(logger, () => marketPrices.addPrices([d]));
+    runWithLogger(logger, () => marketPrices.addPrices([d]));
     expect(marketPrices.count, 2);
     expect(marketPrices.waypointCount, 2);
     expect(
@@ -95,7 +95,7 @@ void main() {
       purchasePrice: 5,
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
     );
-    await runWithLogger(logger, () => marketPrices.addPrices([e]));
+    runWithLogger(logger, () => marketPrices.addPrices([e]));
     expect(
       marketPrices.recentPurchasePrice(marketSymbol: market, a),
       20,
@@ -155,7 +155,7 @@ void main() {
     const a = TradeSymbol.FUEL;
     final marketPrices = MarketPrices([], fs: fs);
     final marketSymbol = WaypointSymbol.fromString('S-A-W');
-    expect(marketPrices.hasRecentMarketData(marketSymbol), false);
+    expect(marketPrices.hasRecentData(marketSymbol), false);
     final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
     final aPrice = makePrice(
       waypointSymbol: marketSymbol.waypoint,
@@ -163,16 +163,16 @@ void main() {
       timestamp: oneMinuteAgo,
     );
     marketPrices.addPrices([aPrice]);
-    expect(marketPrices.hasRecentMarketData(marketSymbol), true);
+    expect(marketPrices.hasRecentData(marketSymbol), true);
     expect(
-      marketPrices.hasRecentMarketData(
+      marketPrices.hasRecentData(
         marketSymbol,
         maxAge: const Duration(seconds: 1),
       ),
       false,
     );
     expect(
-      marketPrices.hasRecentMarketData(
+      marketPrices.hasRecentData(
         marketSymbol,
         maxAge: const Duration(hours: 1),
       ),
@@ -244,7 +244,7 @@ void main() {
       ],
     );
     await recordMarketData(marketPrices, market);
-    expect(marketPrices.hasRecentMarketData(marketSymbol), true);
+    expect(marketPrices.hasRecentData(marketSymbol), true);
     expect(marketPrices.count, 1);
   });
 
@@ -266,11 +266,11 @@ void main() {
       ],
     );
     await recordMarketData(marketPrices, market);
-    expect(marketPrices.hasRecentMarketData(marketSymbol), true);
+    expect(marketPrices.hasRecentData(marketSymbol), true);
     expect(marketPrices.count, 1);
 
     final marketPrices2 = MarketPrices.load(fs);
-    expect(marketPrices2.hasRecentMarketData(marketSymbol), true);
+    expect(marketPrices2.hasRecentData(marketSymbol), true);
     expect(marketPrices2.count, 1);
   });
 }

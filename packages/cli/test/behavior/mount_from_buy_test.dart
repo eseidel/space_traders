@@ -29,8 +29,6 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 void main() {
   test('advanceMountFromBuy smoke test', () async {
     final api = _MockApi();
@@ -125,7 +123,7 @@ void main() {
     );
     registerFallbackValue(Duration.zero);
     when(
-      () => caches.marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentData(
         waypointSymbol,
         maxAge: any(named: 'maxAge'),
       ),

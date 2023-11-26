@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:meta/meta.dart';
+import 'package:types/price.dart';
 import 'package:types/types.dart';
 
 // {"waypointSymbol": "X1-ZS60-53675E", "symbol": "IRON_ORE", "supply":
@@ -8,28 +9,34 @@ import 'package:types/types.dart';
 // "timestamp": "2023-05-14T21:52:56.530126100+00:00"}
 /// Transaction data for a single trade symbol at a single waypoint.
 @immutable
-class MarketPrice {
+class MarketPrice extends PriceBase<TradeSymbol> {
   /// Create a new price record.
   const MarketPrice({
-    required this.waypointSymbol,
-    required this.symbol,
+    required super.waypointSymbol,
+    required super.symbol,
     required this.supply,
     required this.purchasePrice,
     required this.sellPrice,
     required this.tradeVolume,
-    required this.timestamp,
+    required super.timestamp,
     this.activity,
   });
 
   /// Create a new price record from a market trade good.
-  MarketPrice.fromMarketTradeGood(MarketTradeGood good, this.waypointSymbol)
-      : symbol = good.tradeSymbol,
-        supply = good.supply,
-        purchasePrice = good.purchasePrice,
-        sellPrice = good.sellPrice,
-        tradeVolume = good.tradeVolume,
-        timestamp = DateTime.timestamp(),
-        activity = good.activity;
+  factory MarketPrice.fromMarketTradeGood(
+    MarketTradeGood good,
+    WaypointSymbol waypointSymbol,
+  ) =>
+      MarketPrice(
+        waypointSymbol: waypointSymbol,
+        symbol: good.symbol,
+        supply: good.supply,
+        purchasePrice: good.purchasePrice,
+        sellPrice: good.sellPrice,
+        tradeVolume: good.tradeVolume,
+        timestamp: DateTime.now(),
+        activity: good.activity,
+      );
 
   /// Create a new price record from a json map.
   factory MarketPrice.fromJson(Map<String, dynamic> json) {
@@ -63,13 +70,6 @@ class MarketPrice {
     };
   }
 
-  /// The waypoint of the market where this price was recorded.
-  final WaypointSymbol waypointSymbol;
-
-  /// The symbol of the trade good.
-  // rename to tradeSymbol.
-  final TradeSymbol symbol;
-
   /// The symbol of the trade good.
   TradeSymbol get tradeSymbol => symbol;
 
@@ -87,9 +87,6 @@ class MarketPrice {
 
   /// The trade volume of the trade good.
   final int tradeVolume;
-
-  /// The timestamp of the price record.
-  final DateTime timestamp;
 
   @override
   String toString() => jsonEncode(toJson());

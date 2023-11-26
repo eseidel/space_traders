@@ -37,8 +37,6 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 void main() {
   test('advanceTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
@@ -90,7 +88,7 @@ void main() {
       ),
     );
     when(
-      () => caches.marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentData(
         start,
         maxAge: any(named: 'maxAge'),
       ),
@@ -276,7 +274,7 @@ void main() {
 
     registerFallbackValue(Duration.zero);
     when(
-      () => caches.marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentData(
         start,
         maxAge: any(named: 'maxAge'),
       ),
@@ -461,7 +459,7 @@ void main() {
     when(
       () => caches.marketPrices.pricesFor(
         TradeSymbol.ADVANCED_CIRCUITRY,
-        marketSymbol: any(named: 'marketSymbol'),
+        waypointSymbol: any(named: 'waypointSymbol'),
       ),
     ).thenReturn([
       MarketPrice(
@@ -947,7 +945,7 @@ void main() {
       ),
     );
     when(
-      () => caches.marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentData(
         end,
         maxAge: any(named: 'maxAge'),
       ),
@@ -1101,7 +1099,7 @@ void main() {
       ),
     );
     when(
-      () => caches.marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentData(
         end,
         maxAge: any(named: 'maxAge'),
       ),
@@ -1263,7 +1261,7 @@ void main() {
       ),
     );
     when(
-      () => caches.marketPrices.hasRecentMarketData(
+      () => caches.marketPrices.hasRecentData(
         end,
         maxAge: any(named: 'maxAge'),
       ),

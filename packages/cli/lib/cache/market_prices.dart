@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/market_cache.dart';
+import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:file/file.dart';
@@ -116,7 +117,7 @@ extension MarketPricePredictions on MarketPrice {
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class MarketPrices extends JsonListStore<MarketPrice> {
+class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
   /// Create a new price data collection.
   MarketPrices(
     super.records, {
@@ -141,64 +142,19 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   /// The default path to the cache file.
   static const String defaultCacheFilePath = 'data/prices.json';
 
-  /// Get the count of unique waypoints.
-  int get waypointCount {
-    final waypoints = <WaypointSymbol>{};
-    for (final price in records) {
-      waypoints.add(price.waypointSymbol);
+  @override
+  void priceChanged({
+    required MarketPrice oldPrice,
+    required MarketPrice newPrice,
+  }) {
+    // Trade volumes can and will change between price updates.
+    // If the new price is newer than the existing price, replace it.
+    if (oldPrice.tradeVolume != newPrice.tradeVolume) {
+      logger.warn('${newPrice.waypointSymbol.sectorLocalName} changed '
+          '${newPrice.symbol} from '
+          '${oldPrice.supply} (${oldPrice.tradeVolume}) '
+          'to  ${newPrice.supply} (${newPrice.tradeVolume})');
     }
-    return waypoints.length;
-  }
-
-  /// Get the raw pricing data.
-  List<MarketPrice> get prices => List.unmodifiable(records);
-
-  List<MarketPrice> get _prices => records;
-
-  /// Add new prices to the price data.
-  Future<void> addPrices(
-    List<MarketPrice> newPrices, {
-    DateTime Function() getNow = defaultGetNow,
-  }) async {
-    // Go through the list, see if we already have a price for this pair
-    // if so, replace it, otherwise add to the end?
-    // Probably this should add them to a separate buffer, which is then
-    // compacted into the main list at some specific point.
-    for (final newPrice in newPrices) {
-      // logger.detail('Recording price: ${describePrice(newPrice)}');
-      // This doesn't account for duplicates.
-      final index = _prices.indexWhere(
-        (element) =>
-            element.waypointSymbol == newPrice.waypointSymbol &&
-            element.symbol == newPrice.symbol,
-      );
-
-      if (getNow().isBefore(newPrice.timestamp)) {
-        logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
-        continue;
-      }
-
-      if (index >= 0) {
-        // This date logic is necessary to make sure we don't replace
-        // more recent local prices with older server data.
-        final existingPrice = _prices[index];
-        if (newPrice.timestamp.isBefore(existingPrice.timestamp)) {
-          continue;
-        }
-        // Trade volumes can and will change between price updates.
-        // If the new price is newer than the existing price, replace it.
-        if (_prices[index].tradeVolume != newPrice.tradeVolume) {
-          logger.warn('${newPrice.waypointSymbol.sectorLocalName} changed '
-              '${newPrice.symbol} from '
-              '${_prices[index].supply} (${_prices[index].tradeVolume}) '
-              'to  ${newPrice.supply} (${newPrice.tradeVolume})');
-        }
-        _prices[index] = newPrice;
-      } else {
-        _prices.add(newPrice);
-      }
-    }
-    save();
   }
 
   static int _sellPriceAcending(MarketPrice a, MarketPrice b) =>
@@ -256,39 +212,6 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     return maybePrice?.sellPrice;
   }
 
-  /// Returns all known prices for a trade good,
-  /// optionally restricted to a specific waypoint.
-  Iterable<MarketPrice> pricesFor(
-    TradeSymbol tradeSymbol, {
-    WaypointSymbol? marketSymbol,
-  }) {
-    final prices = _prices.where((e) => e.symbol == tradeSymbol);
-    if (marketSymbol == null) {
-      return prices;
-    }
-    return prices.where((e) => e.waypointSymbol == marketSymbol);
-  }
-
-  /// Returns true if there is a price for a given trade good.
-  /// Used for detecting if we can buy/sell a good in the known markets.
-  bool havePriceFor(TradeSymbol tradeSymbol) {
-    return _prices.any((element) => element.symbol == tradeSymbol);
-  }
-
-  /// Returns the age of the cache for a given market.
-  Duration? cacheAgeFor(
-    WaypointSymbol waypointSymbol, {
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    final prices = pricesAtMarket(waypointSymbol);
-    if (prices.isEmpty) {
-      return null;
-    }
-    final sortedPrices = prices.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    return getNow().difference(sortedPrices.last.timestamp);
-  }
-
   MarketPrice? _priceAtPercentile(
     TradeSymbol symbol,
     int percentile,
@@ -320,31 +243,14 @@ class MarketPrices extends JsonListStore<MarketPrice> {
 
   /// Returns all known prices for a given market.
   List<MarketPrice> pricesAtMarket(WaypointSymbol marketSymbol) {
-    return _prices.where((e) => e.waypointSymbol == marketSymbol).toList();
+    return prices.where((e) => e.waypointSymbol == marketSymbol).toList();
   }
 
   /// Returns the most recent price for a given trade good at a given market.
   MarketPrice? priceAt(WaypointSymbol marketSymbol, TradeSymbol tradeSymbol) {
-    return _prices.firstWhereOrNull(
+    return prices.firstWhereOrNull(
       (e) => e.symbol == tradeSymbol && e.waypointSymbol == marketSymbol,
     );
-  }
-
-  /// Returns true if there is recent market data for a given market.
-  /// Does not check if the passed in market is a valid market.
-  bool hasRecentMarketData(
-    WaypointSymbol marketSymbol, {
-    Duration maxAge = defaultMaxAge,
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    final prices = pricesAtMarket(marketSymbol);
-    if (prices.isEmpty) {
-      return false;
-    }
-    final sortedPrices = prices.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    return getNow().difference(sortedPrices.last.timestamp) < maxAge;
   }
 
   /// Most recent price a good can be sold to the market for.
@@ -357,7 +263,8 @@ class MarketPrices extends JsonListStore<MarketPrice> {
     Duration maxAge = defaultMaxAge,
     DateTime Function() getNow = defaultGetNow,
   }) {
-    final pricesForSymbol = pricesFor(tradeSymbol, marketSymbol: marketSymbol);
+    final pricesForSymbol =
+        pricesFor(tradeSymbol, waypointSymbol: marketSymbol);
     if (pricesForSymbol.isEmpty) {
       return null;
     }
@@ -381,7 +288,7 @@ class MarketPrices extends JsonListStore<MarketPrice> {
   }) {
     final pricesForSymbol = pricesFor(
       tradeSymbol,
-      marketSymbol: marketSymbol,
+      waypointSymbol: marketSymbol,
     );
     if (pricesForSymbol.isEmpty) {
       return null;
@@ -415,7 +322,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
   }
   // If we have market data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (marketPrices.hasRecentMarketData(
+  if (marketPrices.hasRecentData(
     marketSymbol,
     maxAge: maxAge,
     getNow: getNow,
@@ -434,7 +341,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
     ship.waypointSymbol,
     forceRefresh: true,
   );
-  await recordMarketDataAndLog(marketPrices, market!, ship);
+  await recordMarketDataAndLog(marketPrices, market!, ship, getNow: getNow);
   return market;
 }
 
@@ -442,20 +349,25 @@ Future<Market> recordMarketDataIfNeededAndLog(
 Future<void> recordMarketDataAndLog(
   MarketPrices marketPrices,
   Market market,
-  Ship ship,
-) async {
-  await recordMarketData(marketPrices, market);
+  Ship ship, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  await recordMarketData(marketPrices, market, getNow: getNow);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  market data @ ${market.symbol}');
 }
 
 /// Record market data silently.
-Future<void> recordMarketData(MarketPrices marketPrices, Market market) async {
+Future<void> recordMarketData(
+  MarketPrices marketPrices,
+  Market market, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
   final prices = market.tradeGoods
       .map((g) => MarketPrice.fromMarketTradeGood(g, market.waypointSymbol))
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${market.symbol}!');
   }
-  await marketPrices.addPrices(prices);
+  marketPrices.addPrices(prices, getNow: getNow);
 }

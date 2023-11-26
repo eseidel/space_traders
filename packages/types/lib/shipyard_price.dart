@@ -1,16 +1,17 @@
 import 'package:meta/meta.dart';
+import 'package:types/price.dart';
 import 'package:types/types.dart';
 
 /// Price data for a single ship type in a shipyard.
 @immutable
-class ShipyardPrice {
+class ShipyardPrice extends PriceBase<ShipType> {
   /// Create a new price record.
   const ShipyardPrice({
-    required this.waypointSymbol,
-    required this.shipType,
+    required super.waypointSymbol,
+    required ShipType shipType,
     required this.purchasePrice,
-    required this.timestamp,
-  });
+    required super.timestamp,
+  }) : super(symbol: shipType);
 
   /// Create a new price record from a ShipyardShip.
   factory ShipyardPrice.fromShipyardShip(
@@ -35,17 +36,11 @@ class ShipyardPrice {
     );
   }
 
-  /// The waypoint of the market where this price was recorded.
-  final WaypointSymbol waypointSymbol;
-
   /// The symbol of the ship type.
-  final ShipType shipType;
+  ShipType get shipType => symbol;
 
   /// The price at which this good can be purchased from the market.
   final int purchasePrice;
-
-  /// The timestamp of the price record.
-  final DateTime timestamp;
 
   /// Convert this price record to JSON.
   Map<String, dynamic> toJson() {

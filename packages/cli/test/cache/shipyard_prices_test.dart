@@ -35,7 +35,7 @@ void main() {
     final fs = MemoryFileSystem();
     final shipyardPrices = ShipyardPrices([], fs: fs);
     final symbol = WaypointSymbol.fromString('S-A-W');
-    expect(shipyardPrices.hasRecentShipyardData(symbol), false);
+    expect(shipyardPrices.hasRecentData(symbol), false);
     final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
     expect(
       shipyardPrices.recentPurchasePrice(
@@ -52,7 +52,7 @@ void main() {
       timestamp: oneMinuteAgo,
     );
     shipyardPrices.addPrices([a]);
-    expect(shipyardPrices.hasRecentShipyardData(symbol), true);
+    expect(shipyardPrices.hasRecentData(symbol), true);
     expect(
       shipyardPrices.recentPurchasePrice(
         shipyardSymbol: symbol,
@@ -62,14 +62,14 @@ void main() {
       1,
     );
     expect(
-      shipyardPrices.hasRecentShipyardData(
+      shipyardPrices.hasRecentData(
         symbol,
         maxAge: const Duration(seconds: 1),
       ),
       false,
     );
     expect(
-      shipyardPrices.hasRecentShipyardData(
+      shipyardPrices.hasRecentData(
         symbol,
         maxAge: const Duration(hours: 1),
       ),

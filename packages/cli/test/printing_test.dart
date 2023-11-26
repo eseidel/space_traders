@@ -80,18 +80,23 @@ void main() {
       ),
       '            🤷',
     );
-    marketPrices.addPrices([
-      MarketPrice(
-        waypointSymbol: WaypointSymbol.fromString('S-A-W'),
-        symbol: a,
-        supply: SupplyLevel.ABUNDANT,
-        purchasePrice: 1,
-        sellPrice: 2,
-        tradeVolume: 100,
-        timestamp: DateTime.timestamp(),
-        activity: ActivityLevel.WEAK,
-      ),
-    ]);
+    final now = DateTime(2021);
+    DateTime getNow() => DateTime(2021);
+    marketPrices.addPrices(
+      [
+        MarketPrice(
+          waypointSymbol: WaypointSymbol.fromString('S-A-W'),
+          symbol: a,
+          supply: SupplyLevel.ABUNDANT,
+          purchasePrice: 1,
+          sellPrice: 2,
+          tradeVolume: 100,
+          timestamp: now,
+          activity: ActivityLevel.WEAK,
+        ),
+      ],
+      getNow: getNow,
+    );
 
     expect(
       stringForPriceDeviance(
