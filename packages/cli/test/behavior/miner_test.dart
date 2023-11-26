@@ -14,8 +14,6 @@ import '../cache/caches_mock.dart';
 
 class _MockAgent extends Mock implements Agent {}
 
-class _MockMarketTransaction extends Mock implements MarketTransaction {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}

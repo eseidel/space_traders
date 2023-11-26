@@ -41,7 +41,7 @@ String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
     string += ' (morale: ${ship.crew.morale})';
   }
   if (_averageCondition(ship) != 100) {
-    string += ' (condition: ${ship.averageCondition})';
+    string += ' (condition: ${_averageCondition(ship)})';
   }
   return string;
 }
