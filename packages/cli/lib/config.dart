@@ -18,20 +18,7 @@ class Config {
     ShipType.SURVEYOR,
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
-    ShipType.LIGHT_HAULER,
+    for (int i = 0; i < 15; i++) ShipType.LIGHT_HAULER,
   ];
 
   /// A list of which haulers should be used as miner haulers.
