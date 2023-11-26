@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/cache/market_prices.dart'; // just for maxAge.
 import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';

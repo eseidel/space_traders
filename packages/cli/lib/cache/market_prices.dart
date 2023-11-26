@@ -5,12 +5,8 @@ import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/logger.dart';
-import 'package:collection/collection.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
-
-/// default max age for "recent" prices is 3 days
-const defaultMaxAge = Duration(days: 3);
 
 /// Predict the next price based on the current price and the trade volume.
 int expectedPriceMovement({
@@ -241,18 +237,6 @@ class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
     return pricesForSymbolSorted[index];
   }
 
-  /// Returns all known prices for a given market.
-  List<MarketPrice> pricesAtMarket(WaypointSymbol marketSymbol) {
-    return prices.where((e) => e.waypointSymbol == marketSymbol).toList();
-  }
-
-  /// Returns the most recent price for a given trade good at a given market.
-  MarketPrice? priceAt(WaypointSymbol marketSymbol, TradeSymbol tradeSymbol) {
-    return prices.firstWhereOrNull(
-      (e) => e.symbol == tradeSymbol && e.waypointSymbol == marketSymbol,
-    );
-  }
-
   /// Most recent price a good can be sold to the market for.
   /// [marketSymbol] is the symbol for the market.
   /// [tradeSymbol] is the symbol for the trade good.
@@ -341,20 +325,10 @@ Future<Market> recordMarketDataIfNeededAndLog(
     ship.waypointSymbol,
     forceRefresh: true,
   );
-  await recordMarketDataAndLog(marketPrices, market!, ship, getNow: getNow);
-  return market;
-}
-
-/// Record market data and log the result.
-Future<void> recordMarketDataAndLog(
-  MarketPrices marketPrices,
-  Market market,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  await recordMarketData(marketPrices, market, getNow: getNow);
+  await recordMarketData(marketPrices, market!, getNow: getNow);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  market data @ ${market.symbol}');
+  return market;
 }
 
 /// Record market data silently.

@@ -1,10 +1,13 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/cache/market_prices.dart'; // just for maxAge.
 import 'package:cli/logger.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/price.dart';
 import 'package:types/types.dart';
+
+/// default max age for "recent" prices is 3 days
+const defaultMaxAge = Duration(days: 3);
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
@@ -103,6 +106,13 @@ class PricesCache<Symbol, Record extends PriceBase<Symbol>>
   /// Returns all known prices for a given shipyard.
   List<Record> pricesAt(WaypointSymbol waypointSymbol) {
     return prices.where((e) => e.waypointSymbol == waypointSymbol).toList();
+  }
+
+  /// Returns the most recent price for a given trade good at a given market.
+  Record? priceAt(WaypointSymbol waypointSymbol, Symbol symbol) {
+    return prices.firstWhereOrNull(
+      (e) => e.symbol == symbol && e.waypointSymbol == waypointSymbol,
+    );
   }
 
   /// Returns all known prices for a good, optionally restricted to a specific
