@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 class _MockLogger extends Mock implements Logger {}
 
 void main() {
-  test('setVerboseLogging', () {
+  test('jsonMatches', () {
     final logger = _MockLogger();
     runWithLogger(logger, () {
       expect(jsonMatches([1], [2]), false);

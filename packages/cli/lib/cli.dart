@@ -2,6 +2,7 @@ import 'package:args/args.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:file/local.dart';
+import 'package:meta/meta.dart';
 import 'package:scoped/scoped.dart';
 
 export 'package:args/args.dart';
@@ -17,6 +18,7 @@ Future<void> runOffline(
   List<String> args,
   Future<void> Function(FileSystem fs, ArgResults argResults) fn, {
   void Function(ArgParser parser)? addArgs,
+  @visibleForTesting Logger? overrideLogger,
 }) async {
   final parser = ArgParser()
     ..addFlag(
@@ -45,7 +47,12 @@ Future<void> runOffline(
       }
       return fn(fs, results);
     },
-    values: {loggerRef},
+    values: {
+      if (overrideLogger == null)
+        loggerRef
+      else
+        loggerRef.overrideWith(() => overrideLogger),
+    },
   );
 }
 
