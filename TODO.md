@@ -10,20 +10,15 @@ To sort:
 * Add a "storage" behavior to have a place to put unused mounts.
 * Make it easier to re-spec miners mid cycle (without throwing away mounts).
 * Record requests per-ship?  Calculate number of requests used per cycle?
-* Simulate refining
-* Teach Haulers how to pick up from miners.
 * Add mounts to survey results (so we can compute diamond frequency).
 * Compute survey frequency per-trade symbol.
 * Confirm survey sizes have consistent extraction rates across trade symbols.
-* Share code between MarketPrices and ShipyardPrices.
 * Make shipInfo include an emoji for the behavior.
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
 * Use recent earnings-per-second in ship behavior planning.
 * Fix miners to know when to leave a system (when prices are too low).
-* Teach miners how to coordinate with haulers to sell their goods further away.
-* Add refining
 * Buy traders when trading is more profitable than mining, and vice versa.
 * Be able to buy miners outside of the main system.
 * Try changing deal finding heuristic to only consider buy price.
@@ -565,8 +560,6 @@ For getting the last of the mount data.
 ### Explorers are all chasing each other
 
 They don't know how to avoid each other within the same system.
-
-### Have too many haulers with not enough worth doing
 
 ### Remove MarketCache
 
