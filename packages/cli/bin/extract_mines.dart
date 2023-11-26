@@ -57,16 +57,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
     // Only consider markets that trade all goods produced by the mine.
     if (!score.marketTradesAllProducedGoods) {
-      logger
-        ..warn('${score.market} does not trade ${score.goodsMissingFromMarket}'
-            ' produced by ${score.mine}')
-        ..info('${score.market} trades ${score.tradedGoods}');
+      logger.detail(
+          '${score.market} does not trade ${score.goodsMissingFromMarket}'
+          ' produced by ${score.mine}, only ${score.tradedGoods}.');
       continue;
     }
     if (score.score > maxDistance) {
-      logger
-        ..warn('${score.mine} is too far from ${score.market}')
-        ..info('Distance: ${score.score}');
+      logger.detail(
+        '${score.mine} is too far (${score.score}) from ${score.market}',
+      );
       continue;
     }
     // Should check mine too.
