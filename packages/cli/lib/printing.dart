@@ -155,11 +155,13 @@ DateTime logRemainingTransitTime(
   final arrival = ship.nav.route.arrival;
   final now = getNow();
   final remaining = arrival.difference(now);
+  final coloredRemaining = remaining.inHours > 1
+      ? red.wrap(approximateDuration(remaining))!
+      : approximateDuration(remaining);
   shipInfo(
     ship,
     // Extra space after emoji is needed for windows powershell.
-    '✈️  to ${ship.waypointSymbol}, '
-    '${approximateDuration(remaining)} left',
+    '✈️  to ${ship.waypointSymbol}, $coloredRemaining left',
   );
   return arrival;
 }
