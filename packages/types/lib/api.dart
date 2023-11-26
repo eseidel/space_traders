@@ -494,17 +494,6 @@ extension ShipUtils on Ship {
     return fuel.current / fuel.capacity;
   }
 
-  /// Returns the average condition of the ship with 100 being perfect and 0
-  /// being destroyed. This is the average of the engine, frame, and reactor
-  /// conditions.
-  int get averageCondition {
-    var total = 0;
-    total += engine.condition ?? 100;
-    total += frame.condition ?? 100;
-    total += reactor.condition ?? 100;
-    return total ~/ 3;
-  }
-
   /// Returns a string representing the current navigation status of the ship.
   String get navStatusString {
     switch (nav.status) {

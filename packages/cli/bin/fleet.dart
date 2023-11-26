@@ -7,6 +7,18 @@ void main(List<String> args) async {
   await runOffline(args, command);
 }
 
+/// Returns the average condition of the ship with 100 being perfect and 0
+/// being destroyed. This is the average of the engine, frame, and reactor
+/// conditions.
+// If the game ever uses condition we can move this to api.dart.
+int _averageCondition(Ship ship) {
+  var total = 0;
+  total += ship.engine.condition ?? 100;
+  total += ship.frame.condition ?? 100;
+  total += ship.reactor.condition ?? 100;
+  return total ~/ 3;
+}
+
 String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
   final waypoint = systemsCache.waypoint(ship.waypointSymbol);
   var string = '${ship.navStatusString} ${waypoint.type} '
@@ -15,7 +27,7 @@ String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
   if (ship.crew.morale != 100) {
     string += ' (morale: ${ship.crew.morale})';
   }
-  if (ship.averageCondition != 100) {
+  if (_averageCondition(ship) != 100) {
     string += ' (condition: ${ship.averageCondition})';
   }
   return string;
