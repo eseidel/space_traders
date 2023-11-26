@@ -30,12 +30,13 @@ class Config {
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
+    ShipType.LIGHT_HAULER,
   ];
 
   /// A list of which haulers should be used as miner haulers.
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
-  final minerHaulerSymbols = <String>['12', '13', '14', '18', '20']
+  final minerHaulerSymbols = <String>['12', '13', '14', '18', '1E']
       .map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
