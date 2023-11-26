@@ -83,9 +83,9 @@ class CentralCommand {
   // from other sources (e.g. hauling mining goods?)
   int expectedCreditsPerSecond(Ship ship) {
     // If we're stuck in our own system, any trades are better than exploring.
-    // if (!_haveEscapedStartingSystem && ship.isHauler) {
-    //   return 1;
-    // }
+    if (!_haveEscapedStartingSystem && ship.isHauler) {
+      return 1;
+    }
     // This should depend on phase and ship type?
     return 4;
   }
