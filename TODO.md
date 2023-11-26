@@ -739,3 +739,21 @@ Our local check though the contract was expired.  But the server didn't.
 ### Make MineSquad locations more dynamic
 
 Should be possible with making scores more dynamic?
+
+### Make Siphon Squads
+
+### Remove auto-drifting.
+
+Just clogs up trade routes.
+
+ESEIDEL-4: Behavior.trader
+  In transit to X1-RK11-I57 JUMP_GATE TRANSPORT trader 0/40
+  destination: X1-RK11-E46, arrives in 5h
+  ASSAULT_RIFLES             X1-RK11-E46      2,049c -> X1-RK11-J60      4,760c +104,594c (126%) 3h   9c/s  82,996c
+ duration: 2h
+ESEIDEL-5: Behavior.trader
+  In transit to X1-RK11-I58 FUEL_STATION TRANSPORT trader 0/40
+  destination: X1-RK11-D45, arrives in 3h
+  ADVANCED_CIRCUITRY         X1-RK11-D45      2,801c -> X1-RK11-I57     13,000c +405,466c (354%) 2h  45c/s 114,534c
+ duration: 2h
+

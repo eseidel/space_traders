@@ -38,6 +38,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final exports = <TradeSymbol, WaypointSymbol>{};
   final imports = <TradeSymbol, WaypointSymbol>{};
   for (final listing in listings) {
+    // This is wrong because the last waypoint "wins", even if we have multiple.
     for (final export in listing.exports) {
       exports[export] = listing.waypointSymbol;
     }
