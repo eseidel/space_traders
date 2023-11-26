@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -30,4 +31,18 @@ class TradeExport {
       'imports': imports.map((i) => i.toJson()).toList(),
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TradeExport &&
+          runtimeType == other.runtimeType &&
+          export == other.export &&
+          const ListEquality<TradeSymbol>().equals(imports, other.imports);
+
+  @override
+  int get hashCode => Object.hashAll([
+        export,
+        ...imports,
+      ]);
 }
