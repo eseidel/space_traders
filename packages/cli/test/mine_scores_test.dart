@@ -62,12 +62,18 @@ void main() {
       TradeSymbol.IRON_ORE,
       TradeSymbol.COPPER_ORE,
       TradeSymbol.ALUMINUM_ORE,
+      TradeSymbol.ICE_WATER,
+      TradeSymbol.SILICON_CRYSTALS,
+      TradeSymbol.QUARTZ_SAND,
     });
     expect(score.marketTradesAllProducedGoods, false);
     expect(score.goodsMissingFromMarket, {
       TradeSymbol.IRON_ORE,
       TradeSymbol.COPPER_ORE,
       TradeSymbol.ALUMINUM_ORE,
+      TradeSymbol.ICE_WATER,
+      TradeSymbol.SILICON_CRYSTALS,
+      TradeSymbol.QUARTZ_SAND,
     });
   });
 
