@@ -750,3 +750,13 @@ ESEIDEL-5: Behavior.trader
   ADVANCED_CIRCUITRY         X1-RK11-D45      2,801c -> X1-RK11-I57     13,000c +405,466c (354%) 2h  45c/s 114,534c
  duration: 2h
 
+### Add Extraction validation logic
+
+Validate extractableByMount, against what is actually extracted and
+expectedGoodsForWaypoint against what is actually surveyed.
+
+### Teach MineScore about multiple markets.
+
+### Teach MineScore about WaypointType
+
+### Unify MineScore and SiphonScore?
