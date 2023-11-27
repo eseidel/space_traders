@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/mine_scores.dart';
 
 class _Stats {
   Set<TradeSymbol> tradeSymbols = {};
@@ -11,6 +12,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final surveys = await db.allSurveys();
   final staticCaches = StaticCaches.load(fs);
   final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
+  final systems = SystemsCache.load(fs)!;
 
   // For each waypoint, record what tradeSymbols are found there.
   final statsByWaypoint = <WaypointSymbol, _Stats>{};
@@ -23,14 +25,37 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     stats.count++;
   }
 
+  final extractionMounts = {
+    staticCaches.mounts[ShipMountSymbolEnum.MINING_LASER_I]!,
+  };
+
   for (final waypointSymbol in statsByWaypoint.keys) {
     final stats = statsByWaypoint[waypointSymbol]!;
     final tradeSymbolsString =
         stats.tradeSymbols.map((tradeSymbol) => tradeSymbol.toString()).toList()
           ..sort()
           ..join(', ');
+    final waypointType = systems.waypoint(waypointSymbol).type;
+    final expectedSymbols = expectedGoodsForWaypoint(
+      waypointType,
+      chartingCache[waypointSymbol]?.traitSymbols ?? {},
+      extractionMounts: extractionMounts,
+    );
+    final missingSymbols = stats.tradeSymbols.difference(expectedSymbols);
+    if (missingSymbols.isNotEmpty) {
+      logger.warn(
+        '$waypointSymbol, prediction missed: ${missingSymbols.toList()}',
+      );
+    }
+    final extraSymbols = expectedSymbols.difference(stats.tradeSymbols);
+    if (extraSymbols.isNotEmpty) {
+      logger.warn(
+        '$waypointSymbol, prediction had extra: ${extraSymbols.toList()}',
+      );
+    }
     final values = chartingCache[waypointSymbol];
-    logger.info('$waypointSymbol: $tradeSymbolsString ${values?.traitSymbols} '
+    logger.info('$waypointSymbol: $waypointType '
+        '$tradeSymbolsString ${values?.traitSymbols} '
         '(${stats.count})');
   }
 
