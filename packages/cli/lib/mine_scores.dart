@@ -26,6 +26,7 @@ Set<TradeSymbol> extractableByMount(ShipMount mount) {
     return {
       TradeSymbol.LIQUID_HYDROGEN,
       TradeSymbol.LIQUID_NITROGEN,
+      TradeSymbol.HYDROCARBON,
     };
   }
   return {};
