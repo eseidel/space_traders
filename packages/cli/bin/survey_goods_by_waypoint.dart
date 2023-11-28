@@ -25,10 +25,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     stats.count++;
   }
 
-  final extractionMounts = {
-    staticCaches.mounts[ShipMountSymbolEnum.MINING_LASER_I]!,
-  };
-
   for (final waypointSymbol in statsByWaypoint.keys) {
     final stats = statsByWaypoint[waypointSymbol]!;
     final tradeSymbolsString =
@@ -39,7 +35,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final expectedSymbols = expectedGoodsForWaypoint(
       waypointType,
       chartingCache[waypointSymbol]?.traitSymbols ?? {},
-      extractionMounts: extractionMounts,
+      ExtractionType.mining,
     );
     final missingSymbols = stats.tradeSymbols.difference(expectedSymbols);
     if (missingSymbols.isNotEmpty) {

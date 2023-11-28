@@ -19,7 +19,7 @@ import 'package:types/types.dart';
 int expectedValueFromSurvey(
   MarketPrices marketPrices,
   Survey survey, {
-  required WaypointSymbol marketSymbol,
+  required Map<TradeSymbol, WaypointSymbol> marketForGood,
 }) {
   // I'm not yet sure what to do with deposit size.
   // Look at each of the possible returns.
@@ -27,6 +27,7 @@ int expectedValueFromSurvey(
   // This will fail if the passed in market doesn't sell everything.
 
   final totalValue = survey.deposits.fold<int>(0, (total, deposit) {
+    final marketSymbol = marketForGood[deposit.tradeSymbol]!;
     final sellPrice = marketPrices.recentSellPrice(
           deposit.tradeSymbol,
           marketSymbol: marketSymbol,
@@ -61,7 +62,7 @@ Future<List<ValuedSurvey>> surveysWorthMining(
   Database db,
   MarketPrices marketPrices, {
   required WaypointSymbol surveyWaypointSymbol,
-  required WaypointSymbol nearbyMarketSymbol,
+  required Map<TradeSymbol, WaypointSymbol> marketForGood,
   int minimumSurveys = 10,
   double percentileThreshold = 0.9,
   DateTime Function() getNow = defaultGetNow,
@@ -86,7 +87,7 @@ Future<List<ValuedSurvey>> surveysWorthMining(
           expectedValue: expectedValueFromSurvey(
             marketPrices,
             s.survey,
-            marketSymbol: nearbyMarketSymbol,
+            marketForGood: marketForGood,
           ),
           survey: s.survey,
           isActive:
@@ -101,19 +102,6 @@ Future<List<ValuedSurvey>> surveysWorthMining(
   final best = valuedSurveys.sublist(percentileIndex);
 
   return best.where((s) => s.isActive).toList().reversed.toList();
-}
-
-/// Returns a string for a survey.
-String describeSurvey(
-  Survey survey,
-  MarketPrices marketPrices,
-  WaypointSymbol marketSymbol,
-) {
-  final expectedValue =
-      expectedValueFromSurvey(marketPrices, survey, marketSymbol: marketSymbol);
-  return '${survey.signature} ${survey.size} '
-      '${survey.deposits.map((d) => d.symbol).join(', ')} '
-      'ev ${creditsString(expectedValue)}';
 }
 
 int _minSpaceForExtraction(Ship ship) {
@@ -223,7 +211,6 @@ Future<JobResult> doMineJob(
   final mineJob =
       assertNotNull(state.mineJob, 'No mine job.', const Duration(minutes: 10));
   final mineSymbol = mineJob.mine;
-  final marketSymbol = mineJob.market;
 
   if (ship.waypointSymbol != mineSymbol) {
     final waitTime = await beingNewRouteAndLog(
@@ -260,7 +247,7 @@ Future<JobResult> doMineJob(
     db,
     caches.marketPrices,
     surveyWaypointSymbol: ship.waypointSymbol,
-    nearbyMarketSymbol: marketSymbol,
+    marketForGood: mineJob.marketForGood,
     minimumSurveys: centralCommand.minimumSurveys,
     percentileThreshold: centralCommand.surveyPercentileThreshold,
   );
@@ -269,10 +256,6 @@ Future<JobResult> doMineJob(
   if (maybeSurvey == null && ship.hasSurveyor) {
     final response =
         await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
-
-    // for (final survey in response.surveys) {
-    //   logger.info(describeSurvey(survey, caches.marketPrices, marketSymbol));
-    // }
 
     verifyCooldown(
       ship,
@@ -291,10 +274,6 @@ Future<JobResult> doMineJob(
     // surveying or mining, both of which require the reactor cooldown.
     return JobResult.wait(response.cooldown.expiration);
   }
-
-  // if (maybeSurvey != null) {
-  //   logger.info(describeSurvey(survey, caches.marketPrices, marketSymbol));
-  // }
 
   // Regardless of whether we have a survey, we should try to mine.
   final result = await extractAndLog(

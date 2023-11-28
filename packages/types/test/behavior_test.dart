@@ -46,7 +46,9 @@ void main() {
       ),
       mineJob: MineJob(
         mine: WaypointSymbol.fromString('S-A-W'),
-        market: WaypointSymbol.fromString('S-A-W'),
+        marketForGood: {
+          TradeSymbol.ADVANCED_CIRCUITRY: WaypointSymbol.fromString('S-A-W'),
+        },
       ),
     );
     final json = state.toJson();

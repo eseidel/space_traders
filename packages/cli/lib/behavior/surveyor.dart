@@ -54,10 +54,6 @@ Future<DateTime?> advanceSurveyor(
     response.cooldown,
   );
 
-  // for (final survey in response.surveys) {
-  //   logger.info(describeSurvey(survey, caches.marketPrices, marketSymbol));
-  // }
-
   // Each survey is the whole behavior.
   state.isComplete = true;
   return response.cooldown.expiration;

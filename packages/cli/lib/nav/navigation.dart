@@ -19,7 +19,7 @@ bool Function(WaypointSymbol) defaultSellsFuel(MarketListingCache listings) {
   };
 }
 
-/// Begins a new nagivation action for [ship] to [destinationSymbol].
+/// Begins a new navigation action for [ship] to [destinationSymbol].
 /// Returns the wait time if the ship should wait or null if no wait is needed.
 /// Saves the destination to the ship's behavior state.
 Future<DateTime?> beingNewRouteAndLog(

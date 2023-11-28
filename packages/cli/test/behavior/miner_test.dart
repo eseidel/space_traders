@@ -47,7 +47,7 @@ void main() {
       db,
       marketPrices,
       surveyWaypointSymbol: symbol,
-      nearbyMarketSymbol: symbol,
+      marketForGood: {},
     );
     expect(surveys, isEmpty);
   });
@@ -95,7 +95,10 @@ void main() {
       db,
       marketPrices,
       surveyWaypointSymbol: waypointSymbol,
-      nearbyMarketSymbol: waypointSymbol,
+      marketForGood: {
+        TradeSymbol.DIAMONDS: waypointSymbol,
+        TradeSymbol.ALUMINUM: waypointSymbol,
+      },
       getNow: getNow,
     );
     expect(worthMining.first.survey.deposits.first.symbol, 'DIAMONDS');
@@ -138,7 +141,7 @@ void main() {
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: waypointSymbol, market: waypointSymbol);
+      ..mineJob = MineJob(mine: waypointSymbol, marketForGood: const {});
 
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
@@ -354,7 +357,7 @@ void main() {
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: symbol, market: symbol);
+      ..mineJob = MineJob(mine: symbol, marketForGood: const {});
 
     expect(
       () async => await travelAndSellCargo(
@@ -415,7 +418,7 @@ void main() {
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: symbol, market: symbol);
+      ..mineJob = MineJob(mine: symbol, marketForGood: const {});
 
     final hauler = _MockShip();
     final haulerFrame = _MockShipFrame();
@@ -490,29 +493,6 @@ void main() {
       return result;
     });
     expect(orSell.waitTime, arrival);
-  });
-
-  test('describeSurvey', () {
-    final marketPrices = _MockMarketPrices();
-    final marketSymbol = WaypointSymbol.fromString('S-A-W');
-    const tradeSymbol = TradeSymbol.DIAMONDS;
-    when(
-      () =>
-          marketPrices.recentSellPrice(tradeSymbol, marketSymbol: marketSymbol),
-    ).thenReturn(100);
-    final survey = Survey(
-      expiration: DateTime(2021),
-      signature: 'sig',
-      symbol: marketSymbol.waypoint,
-      deposits: [SurveyDeposit(symbol: tradeSymbol.value)],
-      size: SurveySizeEnum.SMALL,
-    );
-    final description = describeSurvey(
-      survey,
-      marketPrices,
-      marketSymbol,
-    );
-    expect(description, 'sig SMALL DIAMONDS ev 100c');
   });
 
   test('emptyCargoIfNeededForMining', () async {
@@ -668,7 +648,7 @@ void main() {
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: waypointSymbol, market: waypointSymbol);
+      ..mineJob = MineJob(mine: waypointSymbol, marketForGood: const {});
 
     final logger = _MockLogger();
 

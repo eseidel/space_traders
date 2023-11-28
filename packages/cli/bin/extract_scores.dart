@@ -14,14 +14,14 @@ import 'package:collection/collection.dart';
 
 /// Given a set of trade symbols, compute the percentage sell price
 /// across the set.
-double _scoreMarket(
+double _scoreMarkets(
   MarketPrices marketPrices,
-  WaypointSymbol marketSymbol,
-  Set<TradeSymbol> symbols,
+  Map<TradeSymbol, WaypointSymbol> marketForGood,
 ) {
   // Walk the prices for the given symbols at the given market, and compute
   // the average percentage sell price relative to global median sell prices.
-  final percentiles = symbols.map((tradeSymbol) {
+  final percentiles = marketForGood.keys.map((tradeSymbol) {
+    final marketSymbol = marketForGood[tradeSymbol]!;
     final sellPrice =
         marketPrices.recentSellPrice(tradeSymbol, marketSymbol: marketSymbol);
     if (sellPrice == null) {
@@ -56,6 +56,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     );
   }
 
+  final isSiphon = argResults['siphon'] as bool;
+
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => 0);
   final systems = await SystemsCache.loadOrFetch(fs);
@@ -69,61 +71,73 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketListings = MarketListingCache.load(fs, tradeGoods);
   final marketPrices = MarketPrices.load(fs);
 
-  final scores =
-      await evaluateWaypointsForMining(waypointCache, marketListings, hqSystem);
+  final List<ExtractionScore> scores;
+  if (isSiphon) {
+    scores = await evaluateWaypointsForSiphoning(
+      waypointCache,
+      systems,
+      marketListings,
+      hqSystem,
+    );
+  } else {
+    scores = await evaluateWaypointsForMining(
+      waypointCache,
+      systems,
+      marketListings,
+      hqSystem,
+    );
+  }
 
+  final sourceName = isSiphon ? 'Siphon' : 'Mine';
   final table = Table(
-    header: ['Mine', 'Traits', 'Market', 'Distance', 'Goods', 'Market Score'],
+    header: [
+      sourceName,
+      'Traits',
+      'Market',
+      'Distance',
+      'Goods',
+      'Market Score',
+    ],
     style: const TableStyle(compact: true),
   );
 
   // Limit to only the closest for each.
-  final seenMines = <WaypointSymbol>{};
+  final seenSources = <WaypointSymbol>{};
   for (final score in scores) {
-    if (seenMines.contains(score.mine)) {
+    if (seenSources.contains(score.source)) {
       continue;
     }
     // Only consider markets that trade all goods produced by the mine.
-    if (!score.marketTradesAllProducedGoods) {
-      // If the market doesn't trade any goods from the mine, don't even
-      // bother logging.
-      if (score.goodsMissingFromMarket.length != score.producedGoods.length) {
-        logger.detail(
-            '${score.market} does not trade ${score.goodsMissingFromMarket}'
-            ' produced by ${score.mine}, only ${score.tradedGoods}.');
-      }
+    if (!score.marketsTradeAllProducedGoods) {
+      logger.detail(
+          'Could not find places to sell ${score.goodsMissingFromMarkets}'
+          ' produced by ${score.source}.');
       continue;
     }
-    if (score.score > maxDistance) {
+    if (score.deliveryDistance > maxDistance) {
       logger.detail(
-        '${score.mine} is too far (${score.score}) from ${score.market}',
+        '${score.source} is too far (${score.deliveryDistance}) from markets.',
       );
       continue;
     }
-    // Should check mine too.
-    if (!score.tradedGoods.contains(TradeSymbol.FUEL)) {
-      logger
-        ..warn('${score.market} does not trade fuel.')
-        ..info('${score.market} trades ${score.producedGoods}');
-      continue;
-    }
+    // Check if route sells fuel at all?
 
-    final marketScore = _scoreMarket(
+    // Score each good at each market.
+    final marketScore = _scoreMarkets(
       marketPrices,
-      score.market,
-      score.producedGoods,
+      score.marketForGood,
     );
 
-    seenMines.add(score.mine);
+    seenSources.add(score.source);
     table.add([
-      score.mine.toString(),
-      score.mineTraitNames.join(', '),
-      score.market.toString(),
+      score.source.toString(),
+      score.sourceTraits.join(', '),
+      score.markets.map((m) => m.sectorLocalName).join(', '),
       score.score,
       score.producedGoods.join(', '),
       marketScore,
     ]);
-    if (seenMines.length >= countLimit) {
+    if (seenSources.length >= countLimit) {
       break;
     }
   }
@@ -150,7 +164,8 @@ void main(List<String> args) async {
           abbr: 'd',
           help: 'Limit the travel distance between the mine and market.',
           defaultsTo: '80',
-        );
+        )
+        ..addFlag('siphon', help: 'Show siphons instead of mining.');
     },
   );
 }

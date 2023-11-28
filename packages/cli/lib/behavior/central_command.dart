@@ -560,21 +560,23 @@ class CentralCommand {
 // TODO(eseidel): call from or merge into getJobForShip.
   Future<MineJob?> siphonJobForShip(
     WaypointCache waypointCache,
+    SystemsCache systemsCache,
     MarketListingCache marketListings,
     AgentCache agentCache,
     Ship ship,
   ) async {
     final score = (await evaluateWaypointsForSiphoning(
       waypointCache,
+      systemsCache,
       marketListings,
       agentCache.headquartersSystemSymbol,
     ))
-        .firstWhereOrNull((m) => m.marketTradesAllProducedGoods);
+        .firstOrNull;
     if (score == null) {
       return null;
     }
     // Currently reusing MineJob.
-    return MineJob(mine: score.target, market: score.market);
+    return MineJob(mine: score.source, marketForGood: score.marketForGood);
   }
 }
 
@@ -739,24 +741,25 @@ Future<List<MiningSquad>> assignShipsToSquads(
   // Look at the top N mining scores.
   final scores = (await evaluateWaypointsForMining(
     waypointCache,
+    systemsCache,
     marketListings,
     systemSymbol,
   ))
-      .where((m) => m.marketTradesAllProducedGoods)
+      .where((m) => m.marketsTradeAllProducedGoods)
       .where((m) => m.score < 80)
       .toList();
 
   // Sort by distance from center of the system.
   final origin = WaypointPosition(0, 0, systemSymbol);
   scores.sortBy<num>((score) {
-    final mineWaypoint = systemsCache.waypoint(score.mine);
+    final mineWaypoint = systemsCache.waypoint(score.source);
     final distance = mineWaypoint.position.distanceTo(origin);
     return distance.toInt();
   });
   // Divide our current ships into N squads.
   final squads = List.generate(scores.length, (index) {
     final score = scores[index];
-    final job = MineJob(mine: score.mine, market: score.market);
+    final job = MineJob(mine: score.source, marketForGood: score.marketForGood);
     return MiningSquad(job);
   });
   // Go through and assign all ships to squads.

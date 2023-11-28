@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -411,17 +412,44 @@ class ShipBuyJob {
   }
 }
 
+Map<String, dynamic> _marketForGoodToJson(
+  Map<TradeSymbol, WaypointSymbol> marketForGood,
+) {
+  return Map.fromEntries(
+    marketForGood.entries.map(
+      (e) => MapEntry(
+        e.key.toJson(),
+        e.value.toJson(),
+      ),
+    ),
+  );
+}
+
+Map<TradeSymbol, WaypointSymbol> _marketForGoodFromJson(
+  Map<String, dynamic> json,
+) {
+  return Map.fromEntries(
+    json.entries.map(
+      (e) => MapEntry(
+        TradeSymbol.fromJson(e.key)!,
+        WaypointSymbol.fromJson(e.value as String),
+      ),
+    ),
+  );
+}
+
 /// Extract resources from a mine.
 @immutable
 class MineJob {
   /// Create a new mine job.
-  const MineJob({required this.mine, required this.market});
+  const MineJob({required this.mine, required this.marketForGood});
 
   /// Create a new mine job from JSON.
   factory MineJob.fromJson(Map<String, dynamic> json) {
     final mine = WaypointSymbol.fromJson(json['mine'] as String);
-    final market = WaypointSymbol.fromJson(json['market'] as String);
-    return MineJob(mine: mine, market: market);
+    final marketForGood =
+        _marketForGoodFromJson(json['marketForGood'] as Map<String, dynamic>);
+    return MineJob(mine: mine, marketForGood: marketForGood);
   }
 
   /// Create a new mine job from JSON, or null if the JSON is null.
@@ -431,14 +459,14 @@ class MineJob {
   /// The mine to extract from.
   final WaypointSymbol mine;
 
-  /// The market to value goods against.
-  final WaypointSymbol market;
+  /// Where we expect to sell each good produced by the mine.
+  final Map<TradeSymbol, WaypointSymbol> marketForGood;
 
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'mine': mine.toJson(),
-      'market': market.toJson(),
+      'marketForGood': _marketForGoodToJson(marketForGood),
     };
   }
 
@@ -448,11 +476,12 @@ class MineJob {
       other is MineJob &&
           runtimeType == other.runtimeType &&
           mine == other.mine &&
-          market == other.market;
+          const MapEquality<TradeSymbol, WaypointSymbol>()
+              .equals(marketForGood, other.marketForGood);
 
   @override
   int get hashCode => Object.hashAll([
         mine,
-        market,
+        const MapEquality<TradeSymbol, WaypointSymbol>().hash(marketForGood),
       ]);
 }

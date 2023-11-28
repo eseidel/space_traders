@@ -4,7 +4,36 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/waypoint_pathing.dart';
 import 'package:cli/printing.dart';
+import 'package:collection/collection.dart';
 import 'package:types/types.dart';
+
+/// Given a start location and a set of waypoint symbols find the approximate
+/// round trip distance to visit all symbols and return to the start.
+int approximateRoundTripDistanceWithinSystem(
+  SystemsCache systemsCache,
+  WaypointSymbol startSymbol,
+  Set<WaypointSymbol> symbols,
+) {
+  final start = systemsCache.waypoint(startSymbol);
+  final waypoints = symbols
+      // ignore start symbol in the symbols list. Could also throw.
+      .where((s) => s != startSymbol)
+      .map((s) => systemsCache.waypoint(s))
+      .toList();
+  if (waypoints.any((w) => w.systemSymbol != start.systemSymbol)) {
+    throw ArgumentError('All waypoints must be in the same system.');
+  }
+  var distance = 0.0;
+  var current = start;
+  while (waypoints.isNotEmpty) {
+    final next = minBy(waypoints, (w) => w.distanceTo(current))!;
+    distance += current.distanceTo(next);
+    waypoints.remove(next);
+    current = next;
+  }
+  distance += current.distanceTo(start);
+  return distance.ceil();
+}
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 /// Returns the fuel used for with a flight mode and the given distance.

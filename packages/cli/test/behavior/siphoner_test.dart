@@ -23,8 +23,6 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 void main() {
   test('advanceSiphoner smoke test', () async {
     final api = _MockApi();
@@ -55,13 +53,14 @@ void main() {
     when(
       () => centralCommand.siphonJobForShip(
         caches.waypoints,
+        caches.systems,
         caches.marketListings,
         caches.agent,
         ship,
       ),
     ).thenAnswer(
       (_) =>
-          Future.value(MineJob(mine: waypointSymbol, market: waypointSymbol)),
+          Future.value(MineJob(mine: waypointSymbol, marketForGood: const {})),
     );
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))

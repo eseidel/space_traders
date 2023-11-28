@@ -23,8 +23,6 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 void main() {
   test('advanceSurveyor smoke test', () async {
     final api = _MockApi();
@@ -81,7 +79,7 @@ void main() {
     );
 
     final state = BehaviorState(shipSymbol, Behavior.surveyor)
-      ..mineJob = MineJob(mine: waypointSymbol, market: waypointSymbol);
+      ..mineJob = MineJob(mine: waypointSymbol, marketForGood: const {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

@@ -6,6 +6,81 @@ import 'package:test/test.dart';
 import 'package:types/types.dart';
 
 void main() {
+  test('approximateRoundTripDistanceWithinSystem', () {
+    final a =
+        SystemWaypoint(symbol: 'a-b-a', type: WaypointType.PLANET, x: 0, y: 0);
+    final b =
+        SystemWaypoint(symbol: 'a-b-b', type: WaypointType.PLANET, x: 10, y: 0);
+    final c =
+        SystemWaypoint(symbol: 'a-b-c', type: WaypointType.PLANET, x: 20, y: 0);
+    final otherSystem =
+        SystemWaypoint(symbol: 'a-c-c', type: WaypointType.PLANET, x: 20, y: 0);
+    final fs = MemoryFileSystem.test();
+    final systemsCache = SystemsCache(
+      [
+        System(
+          sectorSymbol: a.waypointSymbol.sector,
+          symbol: a.waypointSymbol.system,
+          type: SystemType.BLUE_STAR,
+          x: 0,
+          y: 0,
+          waypoints: [a, b, c],
+        ),
+      ],
+      fs: fs,
+    );
+    expect(
+      approximateRoundTripDistanceWithinSystem(
+        systemsCache,
+        a.waypointSymbol,
+        {b.waypointSymbol},
+      ),
+      20,
+    );
+    expect(
+      approximateRoundTripDistanceWithinSystem(
+        systemsCache,
+        a.waypointSymbol,
+        {c.waypointSymbol},
+      ),
+      40,
+    );
+    expect(
+      approximateRoundTripDistanceWithinSystem(
+        systemsCache,
+        a.waypointSymbol,
+        {b.waypointSymbol, c.waypointSymbol},
+      ),
+      40,
+    );
+    expect(
+      approximateRoundTripDistanceWithinSystem(
+        systemsCache,
+        a.waypointSymbol,
+        {},
+      ),
+      0,
+    );
+    // Doesn't get confused by having a in the list:
+    expect(
+      approximateRoundTripDistanceWithinSystem(
+        systemsCache,
+        a.waypointSymbol,
+        {a.waypointSymbol, b.waypointSymbol, c.waypointSymbol},
+      ),
+      40,
+    );
+    // Only works with a single system:
+    expect(
+      () => approximateRoundTripDistanceWithinSystem(
+        systemsCache,
+        a.waypointSymbol,
+        {otherSystem.waypointSymbol},
+      ),
+      throwsArgumentError,
+    );
+  });
+
   test('fuelUsedWithinSystem', () {
     final a =
         SystemWaypoint(symbol: 'a-b-c', type: WaypointType.PLANET, x: 0, y: 0);
