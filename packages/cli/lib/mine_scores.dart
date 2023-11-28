@@ -58,7 +58,8 @@ Set<TradeSymbol> expectedGoodsForWaypoint(
 class MineScore {
   /// Creates a new MineAndSell.
   MineScore({
-    required this.mine,
+    required this.source,
+    required this.sourceType,
     required this.market,
     required this.mineTraits,
     required this.distanceBetweenMineAndMarket,
@@ -66,49 +67,52 @@ class MineScore {
   });
 
   /// The symbol of the mine.
-  final WaypointSymbol mine;
+  final WaypointSymbol source;
+
+  /// The WaypointType of the mine.
+  final WaypointType sourceType;
 
   /// The traits of the mine.
-  final List<WaypointTraitSymbol> mineTraits;
+  final Set<WaypointTraitSymbol> sourceTraits;
 
-  /// The symbol of the market.
-  final WaypointSymbol market;
+  /// Nearest import market for each good produced.
+  final Map<TradeSymbol, WaypointSymbol> marketForGood;
 
-  /// Goods traded at the market.
-  final Set<TradeSymbol> tradedGoods;
+  /// Round trip distance of delivering all goods.
+  final int deliveryDistance;
 
-  /// The distance between the mine and the market.
-  final int distanceBetweenMineAndMarket;
+  /// The set of all markets used in this score.
+  Set<WaypointSymbol> get markets {
+    return marketForGood.values.toSet();
+  }
 
   /// The names of the traits of the mine.
   List<String> get mineTraitNames {
-    return mineTraits.map((t) => t.value.replaceAll('_DEPOSITS', '')).toList();
+    return sourceTraits
+        .map((t) => t.value.replaceAll('_DEPOSITS', ''))
+        .toList();
   }
 
   /// Goods produced at the mine.
   Set<TradeSymbol> get producedGoods {
-    return expectedGoodsForWaypoint(
-      // Should cache the WaypointType and use it here.
-      WaypointType.ASTEROID,
-      mineTraits.toSet(),
-    );
+    return expectedGoodsForWaypoint(sourceType, sourceTraits);
   }
 
-  /// True if the market trades all goods produced at the mine.
-  bool get marketTradesAllProducedGoods {
-    return producedGoods.every(tradedGoods.contains);
+  /// True if the markets trade all goods produced at the mine.
+  bool get marketsTradeAllProducedGoods {
+    return producedGoods.length == marketForGood.length;
   }
 
   /// Goods produced at the mine which are not traded at the market.
-  Set<TradeSymbol> get goodsMissingFromMarket {
-    return producedGoods.difference(tradedGoods);
+  Set<TradeSymbol> get goodsMissingFromMarkets {
+    return producedGoods.difference(marketForGood.keys.toSet());
   }
 
   /// The score of this MineAndSell. Lower is better.
   int get score {
     // TODO(eseidel): Score should adjust based on "stripped" trate for mine
     // as well as the average value of goods at the market.
-    return distanceBetweenMineAndMarket;
+    return deliveryDistance;
   }
 }
 

@@ -80,45 +80,36 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Limit to only the closest for each.
   final seenMines = <WaypointSymbol>{};
   for (final score in scores) {
-    if (seenMines.contains(score.mine)) {
+    if (seenMines.contains(score.source)) {
       continue;
     }
     // Only consider markets that trade all goods produced by the mine.
-    if (!score.marketTradesAllProducedGoods) {
-      // If the market doesn't trade any goods from the mine, don't even
-      // bother logging.
-      if (score.goodsMissingFromMarket.length != score.producedGoods.length) {
-        logger.detail(
-            '${score.market} does not trade ${score.goodsMissingFromMarket}'
-            ' produced by ${score.mine}, only ${score.tradedGoods}.');
-      }
+    if (!score.marketsTradeAllProducedGoods) {
+      logger.detail(
+          'Could not find places to sell ${score.goodsMissingFromMarkets}'
+          ' produced by ${score.source}.');
       continue;
     }
-    if (score.score > maxDistance) {
+    if (score.deliveryDistance > maxDistance) {
       logger.detail(
-        '${score.mine} is too far (${score.score}) from ${score.market}',
+        '${score.source} is too far (${score.deliveryDistance}) from markets.',
       );
       continue;
     }
-    // Should check mine too.
-    if (!score.tradedGoods.contains(TradeSymbol.FUEL)) {
-      logger
-        ..warn('${score.market} does not trade fuel.')
-        ..info('${score.market} trades ${score.producedGoods}');
-      continue;
-    }
+    // Check if route sells fuel at all?
 
+    // Score each good at each market.
     final marketScore = _scoreMarket(
       marketPrices,
       score.market,
       score.producedGoods,
     );
 
-    seenMines.add(score.mine);
+    seenMines.add(score.source);
     table.add([
-      score.mine.toString(),
+      score.source.toString(),
       score.mineTraitNames.join(', '),
-      score.market.toString(),
+      score.markets.map((m) => m.sectorLocalName).join(', '),
       score.score,
       score.producedGoods.join(', '),
       marketScore,

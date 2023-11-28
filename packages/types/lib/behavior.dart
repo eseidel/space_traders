@@ -415,13 +415,12 @@ class ShipBuyJob {
 @immutable
 class MineJob {
   /// Create a new mine job.
-  const MineJob({required this.mine, required this.market});
+  const MineJob({required this.mine});
 
   /// Create a new mine job from JSON.
   factory MineJob.fromJson(Map<String, dynamic> json) {
     final mine = WaypointSymbol.fromJson(json['mine'] as String);
-    final market = WaypointSymbol.fromJson(json['market'] as String);
-    return MineJob(mine: mine, market: market);
+    return MineJob(mine: mine);
   }
 
   /// Create a new mine job from JSON, or null if the JSON is null.
@@ -431,15 +430,9 @@ class MineJob {
   /// The mine to extract from.
   final WaypointSymbol mine;
 
-  /// The market to value goods against.
-  final WaypointSymbol market;
-
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'mine': mine.toJson(),
-      'market': market.toJson(),
-    };
+    return <String, dynamic>{'mine': mine.toJson()};
   }
 
   @override
