@@ -760,3 +760,30 @@ expectedGoodsForWaypoint against what is actually surveyed.
 ### Teach MineScore about WaypointType
 
 ### Unify MineScore and SiphonScore?
+
+### Dies delivering construction materials:
+
+Unhandled exception:
+ApiException 400: {"error":{"message":"Construction material requirements for ADVANCED_CIRCUITRY have been met.","code":4801}}
+#0      SystemsApi.supplyConstruction (package:openapi/api/systems_api.dart:742:7)
+<asynchronous suspension>
+#1      supplyConstruction (package:cli/net/direct.dart:153:20)
+<asynchronous suspension>
+#2      _deliverConstructionMaterialsIfPossible (package:cli/behavior/trader.dart:430:20)
+<asynchronous suspension>
+#3      _handleConstructionDealAtDelivery (package:cli/behavior/trader.dart:393:3)
+<asynchronous suspension>
+#4      MultiJob.run (package:cli/behavior/behavior.dart:162:22)
+<asynchronous suspension>
+#5      advanceShipBehavior (package:cli/behavior/advance.dart:104:23)
+<asynchronous suspension>
+#6      advanceShips (package:cli/logic.dart:71:29)
+<asynchronous suspension>
+#7      logic (package:cli/logic.dart:184:7)
+<asynchronous suspension>
+#8      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:148:3)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:154:7)
+<asynchronous suspension>
+#10     main (file:///root/space_traders/packages/cli/bin/cli.dart:152:3)
+<asynchronous suspension>

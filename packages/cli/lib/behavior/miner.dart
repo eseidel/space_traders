@@ -649,13 +649,15 @@ Future<JobResult> transferOrSellCargo(
   // This currently optimizes for price and does not consider requests.
   // Some cargo should jettison and some should transfer to haulers.
 
-  final mineJob =
-      assertNotNull(state.mineJob, 'No mine job.', const Duration(minutes: 10));
+  // Don't use the job on the behavior state, since our squad assignment might
+  // have changed and we don't want to wait for a hauler which isn't coming to
+  // this location.
+  final waitLocation = centralCommand.squadForShip(ship)?.job.mine;
 
   // Only wait for haulers at the mine, otherwise we can deadlock where
   // haulers are waiting for our return and we're somewhere else waiting for
   // hauer to arrive.
-  if (ship.waypointSymbol == mineJob.mine) {
+  if (ship.waypointSymbol == waitLocation) {
     final haulers = centralCommand.squadForShip(ship)?.haulers.toList() ?? [];
     if (haulers.isNotEmpty) {
       return transferToHaulersOrWait(
