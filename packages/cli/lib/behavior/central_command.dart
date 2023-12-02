@@ -746,7 +746,7 @@ Future<List<MiningSquad>> assignShipsToSquads(
     systemSymbol,
   ))
       .where((m) => m.marketsTradeAllProducedGoods)
-      .where((m) => m.score < 80)
+      .where((m) => m.deliveryDistance < config.maxExtractionDeliveryDistance)
       .toList();
 
   // Sort by distance from center of the system.

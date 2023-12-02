@@ -7,6 +7,7 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/mine_scores.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
@@ -159,7 +160,7 @@ void main(List<String> args) async {
           'max-distance',
           abbr: 'd',
           help: 'Limit the round trip distance between the mine and markets.',
-          defaultsTo: '1000',
+          defaultsTo: config.maxExtractionDeliveryDistance.toString(),
         )
         ..addFlag('siphon', help: 'Show siphons instead of mining.');
     },

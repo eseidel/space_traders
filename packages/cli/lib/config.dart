@@ -77,6 +77,9 @@ class Config {
   /// Used by _minimumBufferRequired to ensure we over-estimate how much we
   /// need in reserve for contract completion.
   final contractMinBuffer = 20000;
+
+  /// Maximum distance for ExtractionScores we will consider.
+  final maxExtractionDeliveryDistance = 160;
 }
 
 /// Our global configuration object.
