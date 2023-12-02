@@ -120,7 +120,7 @@ Future<JobResult> _initSiphonJob(
     'Requires a siphon job.',
     const Duration(minutes: 10),
   );
-  state.mineJob = siphonJob;
+  state.extractionJob = siphonJob;
   return JobResult.complete();
 }
 
@@ -134,9 +134,12 @@ Future<JobResult> doSiphonJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final siphonJob =
-      assertNotNull(state.mineJob, 'No siphon job.', const Duration(hours: 1));
-  final targetSymbol = siphonJob.mine;
+  final siphonJob = assertNotNull(
+    state.extractionJob,
+    'No siphon job.',
+    const Duration(hours: 1),
+  );
+  final targetSymbol = siphonJob.source;
 
   if (ship.waypointSymbol != targetSymbol) {
     final waitTime = await beingNewRouteAndLog(

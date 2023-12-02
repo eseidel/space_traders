@@ -8,6 +8,12 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
 
+String describeJob(ExtractionJob job) {
+  final action = job.extractionType.name;
+  final sourceName = job.source.sectorLocalName;
+  return '$action @ $sourceName';
+}
+
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
@@ -31,7 +37,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final squad = squads[i];
     logger
       ..info('Squad $i:')
-      ..info('  mine: ${squad.job.mine}');
+      ..info('  job: ${describeJob(squad.job)}');
     for (final ship in squad.ships) {
       logger.info(
         '  ${ship.symbol} ${ship.frame.symbol} ${ship.mountedMountSymbols}',

@@ -208,9 +208,12 @@ Future<JobResult> doMineJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final mineJob =
-      assertNotNull(state.mineJob, 'No mine job.', const Duration(minutes: 10));
-  final mineSymbol = mineJob.mine;
+  final mineJob = assertNotNull(
+    state.extractionJob,
+    'No mine job.',
+    const Duration(minutes: 10),
+  );
+  final mineSymbol = mineJob.source;
 
   if (ship.waypointSymbol != mineSymbol) {
     final waitTime = await beingNewRouteAndLog(
@@ -631,7 +634,7 @@ Future<JobResult> transferOrSellCargo(
   // Don't use the job on the behavior state, since our squad assignment might
   // have changed and we don't want to wait for a hauler which isn't coming to
   // this location.
-  final waitLocation = centralCommand.squadForShip(ship)?.job.mine;
+  final waitLocation = centralCommand.squadForShip(ship)?.job.source;
 
   // Only wait for haulers at the mine, otherwise we can deadlock where
   // haulers are waiting for our return and we're somewhere else waiting for

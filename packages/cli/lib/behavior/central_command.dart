@@ -51,7 +51,7 @@ class CentralCommand {
   Construction? activeConstruction;
 
   /// The current mining squads.
-  List<MiningSquad> miningSquads = [];
+  List<ExtractionSquad> miningSquads = [];
 
   /// Mounts we know of a place we can buy.
   final Set<ShipMountSymbolEnum> _availableMounts = {};
@@ -98,7 +98,7 @@ class CentralCommand {
   Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
 
   /// Returns the mining squad for the given [ship].
-  MiningSquad? squadForShip(Ship ship) {
+  ExtractionSquad? squadForShip(Ship ship) {
     var squad = miningSquads.firstWhereOrNull((s) => s.contains(ship));
     // Handle the case of a newly purchased ship.
     if (squad == null) {
@@ -160,13 +160,13 @@ class CentralCommand {
     if (squad != null) {
       if (ship.fleetRole == FleetRole.miner) {
         return BehaviorState(ship.shipSymbol, Behavior.miner)
-          ..mineJob = squad.job;
+          ..extractionJob = squad.job;
       } else if (ship.fleetRole == FleetRole.surveyor) {
         return BehaviorState(ship.shipSymbol, Behavior.surveyor)
-          ..mineJob = squad.job;
+          ..extractionJob = squad.job;
       } else if (ship.isHauler) {
         return BehaviorState(ship.shipSymbol, Behavior.minerHauler)
-          ..mineJob = squad.job;
+          ..extractionJob = squad.job;
       }
     }
 
@@ -558,7 +558,7 @@ class CentralCommand {
 
   /// Returns the siphon plan for the given [ship].
 // TODO(eseidel): call from or merge into getJobForShip.
-  Future<MineJob?> siphonJobForShip(
+  Future<ExtractionJob?> siphonJobForShip(
     WaypointCache waypointCache,
     SystemsCache systemsCache,
     MarketListingCache marketListings,
@@ -575,8 +575,11 @@ class CentralCommand {
     if (score == null) {
       return null;
     }
-    // Currently reusing MineJob.
-    return MineJob(mine: score.source, marketForGood: score.marketForGood);
+    return ExtractionJob(
+      source: score.source,
+      marketForGood: score.marketForGood,
+      extractionType: ExtractionType.siphon,
+    );
   }
 }
 
@@ -704,7 +707,7 @@ List<ShipSymbol> idleHaulerSymbols(
 
 /// Compute the correct squad for the given [ship].
 @visibleForTesting
-MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
+ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
   if (squads.isEmpty) {
     return null;
   }
@@ -731,7 +734,7 @@ MiningSquad? findSquadForShip(List<MiningSquad> squads, Ship ship) {
 }
 
 /// Compute what our current mining squads should be.
-Future<List<MiningSquad>> assignShipsToSquads(
+Future<List<ExtractionSquad>> assignShipsToSquads(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   MarketListingCache marketListings,
@@ -759,8 +762,12 @@ Future<List<MiningSquad>> assignShipsToSquads(
   // Divide our current ships into N squads.
   final squads = List.generate(scores.length, (index) {
     final score = scores[index];
-    final job = MineJob(mine: score.source, marketForGood: score.marketForGood);
-    return MiningSquad(job);
+    final job = ExtractionJob(
+      source: score.source,
+      marketForGood: score.marketForGood,
+      extractionType: ExtractionType.mine,
+    );
+    return ExtractionSquad(job);
   });
   // Go through and assign all ships to squads.
   for (final ship in shipCache.ships) {

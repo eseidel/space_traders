@@ -19,11 +19,11 @@ Future<DateTime?> advanceSurveyor(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final mineJob = assertNotNull(
-    state.mineJob,
+    state.extractionJob,
     'Requires a mine job.',
     const Duration(minutes: 10),
   );
-  final mineSymbol = mineJob.mine;
+  final mineSymbol = mineJob.source;
   if (ship.waypointSymbol != mineSymbol) {
     return beingNewRouteAndLog(
       api,

@@ -105,7 +105,7 @@ class BehaviorState {
     this.deliverJob,
     this.pickupJob,
     this.mountJob,
-    this.mineJob,
+    this.extractionJob,
     this.jobIndex = 0,
   }) : isComplete = false;
 
@@ -127,8 +127,9 @@ class BehaviorState {
         PickupJob.fromJsonOrNull(json['pickupJob'] as Map<String, dynamic>?);
     final mountJob =
         MountJob.fromJsonOrNull(json['mountJob'] as Map<String, dynamic>?);
-    final mineJob =
-        MineJob.fromJsonOrNull(json['mineJob'] as Map<String, dynamic>?);
+    final extractionJson = json['extractionJob'] as Map<String, dynamic>? ??
+        json['mineJob'] as Map<String, dynamic>?;
+    final extractionJob = ExtractionJob.fromJsonOrNull(extractionJson);
     final jobIndex = json['jobIndex'] as int? ?? 0;
     return BehaviorState(
       shipSymbol,
@@ -140,7 +141,7 @@ class BehaviorState {
       shipBuyJob: shipBuyJob,
       pickupJob: pickupJob,
       mountJob: mountJob,
-      mineJob: mineJob,
+      extractionJob: extractionJob,
       jobIndex: jobIndex,
     );
   }
@@ -176,7 +177,7 @@ class BehaviorState {
   ShipBuyJob? shipBuyJob;
 
   /// Used by Behavior.miner for mining.
-  MineJob? mineJob;
+  ExtractionJob? extractionJob;
 
   /// This behavior is complete.
   /// Never written to disk (instead the behavior state is deleted).
@@ -194,7 +195,7 @@ class BehaviorState {
       'shipBuyJob': shipBuyJob?.toJson(),
       'mountJob': mountJob?.toJson(),
       'pickupJob': pickupJob?.toJson(),
-      'mineJob': mineJob?.toJson(),
+      'extractionJob': extractionJob?.toJson(),
       'jobIndex': jobIndex,
     };
   }
@@ -438,34 +439,63 @@ Map<TradeSymbol, WaypointSymbol> _marketForGoodFromJson(
   );
 }
 
-/// Extract resources from a mine.
+/// Type of extraction.
+enum ExtractionType {
+  /// Mining with a laser.
+  mine,
+
+  /// Siphoning with a siphon.
+  siphon;
+
+  /// Create from JSON.
+  factory ExtractionType.fromJson(String json) =>
+      values.firstWhere((b) => b.name == json);
+
+  /// Convert this to JSON.
+  String toJson() => name;
+}
+
+/// Extract resources.
 @immutable
-class MineJob {
-  /// Create a new mine job.
-  const MineJob({required this.mine, required this.marketForGood});
+class ExtractionJob {
+  /// Create a new extraction job.
+  const ExtractionJob({
+    required this.source,
+    required this.marketForGood,
+    required this.extractionType,
+  });
 
   /// Create a new mine job from JSON.
-  factory MineJob.fromJson(Map<String, dynamic> json) {
-    final mine = WaypointSymbol.fromJson(json['mine'] as String);
+  factory ExtractionJob.fromJson(Map<String, dynamic> json) {
+    final sourceString = json['source'] as String? ?? json['mine'] as String;
+    final source = WaypointSymbol.fromJson(sourceString);
     final marketForGood =
         _marketForGoodFromJson(json['marketForGood'] as Map<String, dynamic>);
-    return MineJob(mine: mine, marketForGood: marketForGood);
+    return ExtractionJob(
+      source: source,
+      marketForGood: marketForGood,
+      extractionType: ExtractionType.mine,
+    );
   }
 
   /// Create a new mine job from JSON, or null if the JSON is null.
-  static MineJob? fromJsonOrNull(Map<String, dynamic>? json) =>
-      json == null ? null : MineJob.fromJson(json);
+  static ExtractionJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : ExtractionJob.fromJson(json);
 
   /// The mine to extract from.
-  final WaypointSymbol mine;
+  final WaypointSymbol source;
 
   /// Where we expect to sell each good produced by the mine.
   final Map<TradeSymbol, WaypointSymbol> marketForGood;
 
+  /// The type of extraction.
+  final ExtractionType extractionType;
+
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'mine': mine.toJson(),
+      'source': source.toJson(),
+      'extractionType': extractionType.toJson(),
       'marketForGood': _marketForGoodToJson(marketForGood),
     };
   }
@@ -473,15 +503,17 @@ class MineJob {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MineJob &&
+      other is ExtractionJob &&
           runtimeType == other.runtimeType &&
-          mine == other.mine &&
+          source == other.source &&
+          extractionType == other.extractionType &&
           const MapEquality<TradeSymbol, WaypointSymbol>()
               .equals(marketForGood, other.marketForGood);
 
   @override
   int get hashCode => Object.hashAll([
-        mine,
+        source,
+        extractionType,
         const MapEquality<TradeSymbol, WaypointSymbol>().hash(marketForGood),
       ]);
 }

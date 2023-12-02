@@ -20,9 +20,12 @@ Future<JobResult> goWaitForGoods(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final mineJob =
-      assertNotNull(state.mineJob, 'No mine job.', const Duration(hours: 1));
-  final mineSymbol = mineJob.mine;
+  final mineJob = assertNotNull(
+    state.extractionJob,
+    'No mine job.',
+    const Duration(hours: 1),
+  );
+  final mineSymbol = mineJob.source;
 
   final currentMineJob = centralCommand.squadForShip(ship)?.job;
   jobAssert(

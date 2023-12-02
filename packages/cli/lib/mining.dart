@@ -47,9 +47,9 @@ final kMineOnlyTemplate = ShipTemplate(
 );
 
 /// A group of ships which mine and survey together.
-class MiningSquad {
+class ExtractionSquad {
   /// Creates a new mining squad from a list of ships.
-  MiningSquad(this.job) : ships = [];
+  ExtractionSquad(this.job) : ships = [];
 
   /// Determines the template to use for [ship].
   ShipTemplate templateForShip(
@@ -97,7 +97,7 @@ class MiningSquad {
   final List<Ship> ships;
 
   /// The job this squad is currently working on.
-  MineJob job;
+  ExtractionJob job;
 }
 
 /// Compute the number of surveys we can expect to complete with [mounts].

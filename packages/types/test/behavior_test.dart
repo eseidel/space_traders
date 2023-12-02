@@ -44,11 +44,12 @@ void main() {
         shipyardSymbol: WaypointSymbol.fromString('W-A-Y'),
         shipType: ShipType.EXPLORER,
       ),
-      mineJob: MineJob(
-        mine: WaypointSymbol.fromString('S-A-W'),
+      extractionJob: ExtractionJob(
+        source: WaypointSymbol.fromString('S-A-W'),
         marketForGood: {
           TradeSymbol.ADVANCED_CIRCUITRY: WaypointSymbol.fromString('S-A-W'),
         },
+        extractionType: ExtractionType.mine,
       ),
     );
     final json = state.toJson();

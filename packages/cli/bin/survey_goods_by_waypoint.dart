@@ -35,7 +35,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final expectedSymbols = expectedGoodsForWaypoint(
       waypointType,
       chartingCache[waypointSymbol]?.traitSymbols ?? {},
-      ExtractionType.mining,
+      ExtractionType.mine,
     );
     final missingSymbols = stats.tradeSymbols.difference(expectedSymbols);
     if (missingSymbols.isNotEmpty) {

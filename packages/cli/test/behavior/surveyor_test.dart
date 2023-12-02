@@ -79,7 +79,11 @@ void main() {
     );
 
     final state = BehaviorState(shipSymbol, Behavior.surveyor)
-      ..mineJob = MineJob(mine: waypointSymbol, marketForGood: const {});
+      ..extractionJob = ExtractionJob(
+        source: waypointSymbol,
+        marketForGood: const {},
+        extractionType: ExtractionType.mine,
+      );
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

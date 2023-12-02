@@ -52,8 +52,10 @@ void main() {
     ).called(1);
   });
   test('jsonMatches non-json objects', () {
-    const json =
-        '{"symbol":"MOUNT_GAS_SIPHON_I","name":"Gas Siphon I","description":"A basic gas siphon that can extract gas from gas giants and other gas-rich bodies.","strength":10,"deposits":[],"requirements":{"power":1,"crew":0,"slots":null}}';
+    const json = '{"symbol":"MOUNT_GAS_SIPHON_I","name":"Gas Siphon I", '
+        '"description":"A basic gas siphon that can extract gas from '
+        'gas giants and other gas-rich bodies.","strength":10, '
+        '"deposits":[],"requirements":{"power":1,"crew":0,"slots":null}}';
     final a = ShipMount.fromJson(jsonDecode(json))!;
     final b = ShipMount.fromJson(jsonDecode(json))!;
 

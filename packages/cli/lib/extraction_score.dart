@@ -2,22 +2,13 @@ import 'package:cli/cache/caches.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
-/// Type of extraction.
-enum ExtractionType {
-  /// Mining with a laser.
-  mining,
-
-  /// Siphoning with a siphon.
-  siphoning,
-}
-
 /// Returns the TradeSymbols extractable by the given mount.
 Set<TradeSymbol> extractableSymbols(ExtractionType type) {
   // Surveyors have a .deposits field, but other mounts do not so we hard-code
   // based on extraction type.  All lasers and all siphons yield the same
   // symbols, just at different size loads.
   switch (type) {
-    case ExtractionType.mining:
+    case ExtractionType.mine:
       return {
         TradeSymbol.ALUMINUM_ORE,
         TradeSymbol.AMMONIA_ICE,
@@ -33,7 +24,7 @@ Set<TradeSymbol> extractableSymbols(ExtractionType type) {
         TradeSymbol.SILVER_ORE,
         TradeSymbol.URANITE_ORE,
       };
-    case ExtractionType.siphoning:
+    case ExtractionType.siphon:
       return {
         TradeSymbol.HYDROCARBON,
         TradeSymbol.LIQUID_HYDROGEN,
@@ -230,7 +221,7 @@ Future<List<ExtractionScore>> evaluateWaypointsForMining(
     marketListings,
     systemSymbol,
     (w) => w.canBeMined,
-    ExtractionType.mining,
+    ExtractionType.mine,
   );
 }
 
@@ -247,7 +238,7 @@ Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
     marketListings,
     systemSymbol,
     (w) => w.canBeSiphoned,
-    ExtractionType.siphoning,
+    ExtractionType.siphon,
   );
 }
 

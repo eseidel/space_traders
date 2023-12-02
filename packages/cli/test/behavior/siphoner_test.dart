@@ -59,8 +59,13 @@ void main() {
         ship,
       ),
     ).thenAnswer(
-      (_) =>
-          Future.value(MineJob(mine: waypointSymbol, marketForGood: const {})),
+      (_) => Future.value(
+        ExtractionJob(
+          source: waypointSymbol,
+          marketForGood: const {},
+          extractionType: ExtractionType.siphon,
+        ),
+      ),
     );
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))

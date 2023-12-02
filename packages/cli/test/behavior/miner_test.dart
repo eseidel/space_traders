@@ -141,7 +141,11 @@ void main() {
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: waypointSymbol, marketForGood: const {});
+      ..extractionJob = ExtractionJob(
+        source: waypointSymbol,
+        marketForGood: const {},
+        extractionType: ExtractionType.mine,
+      );
 
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
@@ -357,7 +361,11 @@ void main() {
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: symbol, marketForGood: const {});
+      ..extractionJob = ExtractionJob(
+        source: symbol,
+        marketForGood: const {},
+        extractionType: ExtractionType.mine,
+      );
 
     expect(
       () async => await travelAndSellCargo(
@@ -418,7 +426,11 @@ void main() {
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: symbol, marketForGood: const {});
+      ..extractionJob = ExtractionJob(
+        source: symbol,
+        marketForGood: const {},
+        extractionType: ExtractionType.mine,
+      );
 
     final hauler = _MockShip();
     final haulerFrame = _MockShipFrame();
@@ -439,7 +451,8 @@ void main() {
     const haulerSymbol = ShipSymbol('S', 2);
     when(() => hauler.symbol).thenReturn(haulerSymbol.symbol);
 
-    final squad = MiningSquad(state.mineJob!)..ships.addAll([ship, hauler]);
+    final squad = ExtractionSquad(state.extractionJob!)
+      ..ships.addAll([ship, hauler]);
     when(() => centralCommand.squadForShip(ship)).thenReturn(squad);
 
     final fleetApi = _MockFleetApi();
@@ -648,7 +661,11 @@ void main() {
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
-      ..mineJob = MineJob(mine: waypointSymbol, marketForGood: const {});
+      ..extractionJob = ExtractionJob(
+        source: waypointSymbol,
+        marketForGood: const {},
+        extractionType: ExtractionType.mine,
+      );
 
     final logger = _MockLogger();
 

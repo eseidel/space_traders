@@ -33,8 +33,6 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 void main() {
   test('advanceBuyShip smoke test', () async {
     final api = _MockApi();
