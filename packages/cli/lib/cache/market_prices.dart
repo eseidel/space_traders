@@ -8,6 +8,19 @@ import 'package:cli/logger.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 
+double _expectedPercentageChangeByVolume(int tradeVolume) {
+  if (tradeVolume < 100) {
+    return 0.01;
+  }
+  if (tradeVolume < 500) {
+    return 0.05;
+  }
+  if (tradeVolume < 10) {
+    return 0.1;
+  }
+  return 0;
+}
+
 /// Predict the next price based on the current price and the trade volume.
 int expectedPriceMovement({
   required int currentPrice,
@@ -25,14 +38,9 @@ int expectedPriceMovement({
   // These price changes most notably affect "shallow" markets, where the
   // trade volume is low.
   // I don't have good data for tradeVolume = 1, it likely moves faster?
-  if (tradeVolume <= 10) {
-    final onePercent = currentPrice ~/ 100;
-    if (action == MarketTransactionTypeEnum.PURCHASE) {
-      return onePercent;
-    }
-    return -onePercent;
-  }
-  return 0;
+  final sign = action == MarketTransactionTypeEnum.PURCHASE ? 1 : -1;
+  final percentChange = _expectedPercentageChangeByVolume(tradeVolume);
+  return sign * (percentChange * currentPrice).round();
 }
 
 /// Add prediction capabilities to MarketPrice
