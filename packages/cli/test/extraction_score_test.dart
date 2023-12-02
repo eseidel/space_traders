@@ -1,7 +1,7 @@
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
-import 'package:cli/mine_scores.dart';
+import 'package:cli/extraction_score.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
