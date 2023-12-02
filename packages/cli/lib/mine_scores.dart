@@ -221,10 +221,10 @@ Future<List<ExtractionScore>> evaluateWaypointsForMining(
   SystemSymbol systemSymbol,
 ) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
-  final mines = waypoints.where((w) => w.canBeMined).toList();
+  final sources = waypoints.where((w) => w.canBeMined).toList();
   return _evaluateWaypointsForExtraction(
     systemsCache,
-    mines,
+    sources,
     marketListings,
     systemSymbol,
     ExtractionType.mining,
@@ -239,10 +239,10 @@ Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
   SystemSymbol systemSymbol,
 ) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
-  final mines = waypoints.where((w) => w.canBeSiphoned).toList();
+  final sources = waypoints.where((w) => w.canBeSiphoned).toList();
   return _evaluateWaypointsForExtraction(
     systemsCache,
-    mines,
+    sources,
     marketListings,
     systemSymbol,
     ExtractionType.siphoning,

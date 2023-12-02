@@ -129,7 +129,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
     seenSources.add(score.source);
     table.add([
-      score.source.toString(),
+      score.source.waypointName,
       score.displayTraitNames.join(', '),
       score.markets.map((m) => m.waypointName).join(', '),
       score.score,
@@ -158,8 +158,8 @@ void main(List<String> args) async {
         ..addOption(
           'max-distance',
           abbr: 'd',
-          help: 'Limit the travel distance between the mine and market.',
-          defaultsTo: '80',
+          help: 'Limit the round trip distance between the mine and markets.',
+          defaultsTo: '1000',
         )
         ..addFlag('siphon', help: 'Show siphons instead of mining.');
     },
