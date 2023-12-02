@@ -5,6 +5,8 @@ class Config {
   /// Our ship buy plan for computeNextShipToBuy.
   final buyPlan = [
     ShipType.LIGHT_HAULER,
+    ShipType.LIGHT_HAULER,
+    ShipType.LIGHT_HAULER,
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
     ShipType.SIPHON_DRONE,
@@ -63,8 +65,8 @@ class Config {
   /// Used by sellOppsForConstruction to determine what SellOpps for
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 4000,
-    TradeSymbol.ADVANCED_CIRCUITRY: 13000,
+    TradeSymbol.FAB_MATS: 2000,
+    TradeSymbol.ADVANCED_CIRCUITRY: 10000,
   };
 
   /// Used by _computeActiveConstruction to compute if we should be doing
