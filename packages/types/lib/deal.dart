@@ -1,10 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 /// Record of a possible arbitrage opportunity pairing a BuyOpp and SellOpp.
 /// CostedDeal is a wrapper which includes the cost of travel.
 @immutable
-class Deal {
+class Deal extends Equatable {
   /// Create a new Deal from a source and destination.
   Deal({required this.source, required this.destination})
       : assert(
@@ -73,6 +74,9 @@ class Deal {
   /// Where we take the goods to.
   final SellOpp destination;
 
+  @override
+  List<Object> get props => [source, destination];
+
   /// The symbol of the market we're buying from.
   WaypointSymbol get sourceSymbol => source.waypointSymbol;
 
@@ -109,20 +113,6 @@ class Deal {
         'source': source.toJson(),
         'destination': destination.toJson(),
       };
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Deal &&
-          runtimeType == other.runtimeType &&
-          source == other.source &&
-          destination == other.destination;
-
-  @override
-  int get hashCode => Object.hash(
-        source,
-        destination,
-      );
 }
 
 /// A deal between two markets which considers flight cost and time.

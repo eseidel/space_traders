@@ -9,6 +9,7 @@ environment:
 # dependency versions should match Flutter to allow `ui` to depend on Flutter.
 dependencies:
   collection: ^1.17.1
+  equatable: ^2.0.5
   # http is only needed for Response object for QueueResponse.
   http: ^0.13.6
   meta: ^1.9.1

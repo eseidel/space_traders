@@ -36,11 +36,15 @@ class ShipyardPrice extends PriceBase<ShipType> {
     );
   }
 
-  /// The symbol of the ship type.
-  ShipType get shipType => symbol;
-
   /// The price at which this good can be purchased from the market.
   final int purchasePrice;
+
+  @override
+  List<Object> get props =>
+      [waypointSymbol, shipType, purchasePrice, timestamp];
+
+  /// The symbol of the ship type.
+  ShipType get shipType => symbol;
 
   /// Convert this price record to JSON.
   Map<String, dynamic> toJson() {
@@ -51,22 +55,4 @@ class ShipyardPrice extends PriceBase<ShipType> {
     json['timestamp'] = timestamp.toUtc().toIso8601String();
     return json;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ShipyardPrice &&
-          runtimeType == other.runtimeType &&
-          waypointSymbol == other.waypointSymbol &&
-          shipType == other.shipType &&
-          purchasePrice == other.purchasePrice &&
-          timestamp == other.timestamp;
-
-  @override
-  int get hashCode => Object.hash(
-        waypointSymbol,
-        shipType,
-        purchasePrice,
-        timestamp,
-      );
 }

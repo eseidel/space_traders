@@ -11,7 +11,7 @@ const defaultMaxAge = Duration(days: 3);
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class PricesCache<Symbol, Record extends PriceBase<Symbol>>
+class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>>
     extends JsonListStore<Record> {
   /// Create a new price data collection.
   PricesCache(

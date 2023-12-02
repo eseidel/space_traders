@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 /// A class to hold extraction data from a ship.
 @immutable
-class ExtractionRecord {
+class ExtractionRecord extends Equatable {
   /// Create a new extraction.
   const ExtractionRecord({
     required this.shipSymbol,
@@ -63,6 +64,17 @@ class ExtractionRecord {
   /// What survey, if any, was used.
   final String? surveySignature;
 
+  @override
+  List<Object?> get props => [
+        shipSymbol,
+        waypointSymbol,
+        tradeSymbol,
+        quantity,
+        power,
+        surveySignature,
+        timestamp,
+      ];
+
   /// Return a JSON map for this extraction.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -75,30 +87,4 @@ class ExtractionRecord {
       'timestamp': timestamp.toIso8601String(),
     };
   }
-
-  // Mostly these exists to make testing easier.
-  @override
-  bool operator ==(Object other) {
-    if (other is ExtractionRecord) {
-      return shipSymbol == other.shipSymbol &&
-          waypointSymbol == other.waypointSymbol &&
-          tradeSymbol == other.tradeSymbol &&
-          quantity == other.quantity &&
-          power == other.power &&
-          surveySignature == other.surveySignature &&
-          timestamp == other.timestamp;
-    }
-    return false;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-        shipSymbol,
-        waypointSymbol,
-        tradeSymbol,
-        quantity,
-        power,
-        surveySignature,
-        timestamp,
-      );
 }

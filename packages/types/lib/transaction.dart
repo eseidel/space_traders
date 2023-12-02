@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
 import 'package:types/construction.dart';
@@ -22,17 +23,6 @@ enum AccountingType {
   /// Convert the accounting type to json.
   String toJson() => name;
 }
-
-// Saf uses:
-// TRADEGOOD_TRANSACTION_TYPE_CHOICES = (
-//     (-3, 'ship modification'),
-//     (-2, 'ship purchase'),
-//     (-1, 'purchase'),
-//     (0, 'unknown'),
-//     (1, 'sell'),
-//     (2, 'contract delivery'),
-// )
-// https://discord.com/channels/792864705139048469/792864705139048472/1157736812819787776
 
 /// The type of transaction which created this transaction.
 enum TransactionType {
@@ -62,7 +52,7 @@ enum TransactionType {
 
 /// A class to hold transaction data from a ship.
 @immutable
-class Transaction {
+class Transaction extends Equatable {
   /// Create a new transaction.
   const Transaction({
     required this.transactionType,
@@ -304,6 +294,23 @@ class Transaction {
   /// The action of the contract involved in the transaction.
   final ContractAction? contractAction;
 
+  @override
+  List<Object?> get props => [
+        transactionType,
+        shipSymbol,
+        waypointSymbol,
+        tradeSymbol,
+        shipType,
+        quantity,
+        tradeType,
+        perUnitPrice,
+        timestamp,
+        agentCredits,
+        accounting,
+        contractId,
+        contractAction,
+      ];
+
   /// The change in credits from this transaction.
   int get creditsChange {
     final sign = tradeType == MarketTransactionTypeEnum.PURCHASE ? -1 : 1;
@@ -329,40 +336,4 @@ class Transaction {
       'contractAction': contractAction?.name,
     };
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Transaction &&
-          runtimeType == other.runtimeType &&
-          transactionType == other.transactionType &&
-          shipSymbol == other.shipSymbol &&
-          waypointSymbol == other.waypointSymbol &&
-          tradeSymbol == other.tradeSymbol &&
-          shipType == other.shipType &&
-          quantity == other.quantity &&
-          tradeType == other.tradeType &&
-          perUnitPrice == other.perUnitPrice &&
-          timestamp == other.timestamp &&
-          agentCredits == other.agentCredits &&
-          accounting == other.accounting &&
-          contractId == other.contractId &&
-          contractAction == other.contractAction;
-
-  @override
-  int get hashCode => Object.hash(
-        transactionType,
-        shipSymbol,
-        waypointSymbol,
-        tradeSymbol,
-        shipType,
-        quantity,
-        tradeType,
-        perUnitPrice,
-        timestamp,
-        agentCredits,
-        accounting,
-        contractId,
-        contractAction,
-      );
 }

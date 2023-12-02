@@ -1,13 +1,14 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 // Can't be immutable because Construction is not immutable.
 /// A cached construction value or null known to be not under construction.
 @immutable
-class ConstructionRecord {
+class ConstructionRecord extends Equatable {
   /// Creates a new construction record.
   const ConstructionRecord({
     required this.waypointSymbol,
@@ -33,6 +34,9 @@ class ConstructionRecord {
   /// The construction value if under construction.
   final Construction? construction;
 
+  @override
+  List<Object?> get props => [waypointSymbol, timestamp, construction];
+
   /// Whether the waypoint is under construction.
   bool get isUnderConstruction => construction != null;
 
@@ -42,18 +46,6 @@ class ConstructionRecord {
         'construction': construction?.toJson(),
         'waypointSymbol': waypointSymbol.toJson(),
       };
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ConstructionRecord &&
-          runtimeType == other.runtimeType &&
-          waypointSymbol == other.waypointSymbol &&
-          timestamp == other.timestamp &&
-          construction == other.construction;
-
-  @override
-  int get hashCode => Object.hashAll([waypointSymbol, timestamp, construction]);
 }
 
 /// A cached of construction values from Waypoints.

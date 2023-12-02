@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart';
 import 'package:types/mount.dart';
@@ -60,7 +61,7 @@ class WaypointPosition extends Position {
 
 /// Type-safe representation of a Waypoint Symbol
 @immutable
-class WaypointSymbol {
+class WaypointSymbol extends Equatable {
   const WaypointSymbol._(this.waypoint);
 
   /// Create a WaypointSymbol from a json string.
@@ -79,6 +80,12 @@ class WaypointSymbol {
   static WaypointSymbol? fromJsonOrNull(String? json) =>
       json == null ? null : WaypointSymbol.fromJson(json);
 
+  /// The full waypoint symbol.
+  final String waypoint;
+
+  @override
+  List<Object> get props => [waypoint];
+
   /// The sector symbol of the waypoint.
   String get sector => system.split('-')[0];
 
@@ -90,9 +97,6 @@ class WaypointSymbol {
 
   /// The SystemSymbol of the waypoint.
   SystemSymbol get systemSymbol => SystemSymbol.fromString(system);
-
-  /// The full waypoint symbol.
-  final String waypoint;
 
   /// Just the waypoint name (no sector or system)
   String get waypointName {
@@ -111,16 +115,6 @@ class WaypointSymbol {
 
   /// Returns the json representation of the waypoint.
   String toJson() => waypoint;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WaypointSymbol &&
-          runtimeType == other.runtimeType &&
-          waypoint == other.waypoint;
-
-  @override
-  int get hashCode => waypoint.hashCode;
 }
 
 // We used to use split(), but that shows up in hot code paths.
@@ -137,7 +131,7 @@ int _countHyphens(String str) {
 
 /// Type-safe representation of a System Symbol
 @immutable
-class SystemSymbol {
+class SystemSymbol extends Equatable {
   const SystemSymbol._(this.system);
 
   /// Create a SystemSymbol from a string.
@@ -155,22 +149,15 @@ class SystemSymbol {
   final String system;
 
   @override
+  List<Object> get props => [system];
+
+  @override
   String toString() => system;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SystemSymbol &&
-          runtimeType == other.runtimeType &&
-          system == other.system;
-
-  @override
-  int get hashCode => system.hashCode;
 }
 
 /// Parsed ShipSymbol which can be compared/sorted.
 @immutable
-class ShipSymbol implements Comparable<ShipSymbol> {
+class ShipSymbol extends Equatable implements Comparable<ShipSymbol> {
   /// Create a ShipSymbol from name and number part.
   /// The number part is given in decimal, but will be represented in hex.
   const ShipSymbol(this.agentName, this.number);
@@ -200,6 +187,9 @@ class ShipSymbol implements Comparable<ShipSymbol> {
   /// The number part of the ship symbol.
   final int number;
 
+  @override
+  List<Object> get props => [agentName, number];
+
   /// The number part in hex.
   String get hexNumber => number.toRadixString(16).toUpperCase();
 
@@ -220,17 +210,6 @@ class ShipSymbol implements Comparable<ShipSymbol> {
 
   /// Returns the json representation of the ship symbol.
   String toJson() => symbol;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ShipSymbol &&
-          runtimeType == other.runtimeType &&
-          agentName == other.agentName &&
-          number == other.number;
-
-  @override
-  int get hashCode => Object.hash(agentName, number);
 }
 
 /// Extensions onto System to make it easier to work with.

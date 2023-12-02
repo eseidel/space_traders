@@ -2,12 +2,13 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 /// Exception thrown from a Job.
 @immutable
-class JobException implements Exception {
+class JobException extends Equatable implements Exception {
   /// Create a new job exception.
   const JobException(this.message, this.timeout);
 
@@ -18,19 +19,10 @@ class JobException implements Exception {
   final Duration timeout;
 
   @override
+  List<Object> get props => [message, timeout];
+
+  @override
   String toString() => 'JobException: $message, timeout: $timeout';
-
-  @override
-  bool operator ==(Object other) =>
-      other is JobException &&
-      message == other.message &&
-      timeout == other.timeout;
-
-  @override
-  int get hashCode => Object.hash(
-        message,
-        timeout,
-      );
 }
 
 /// Exception thrown from a Job if the condition is not met.

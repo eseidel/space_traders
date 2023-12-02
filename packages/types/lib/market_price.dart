@@ -70,9 +70,6 @@ class MarketPrice extends PriceBase<TradeSymbol> {
     };
   }
 
-  /// The symbol of the trade good.
-  TradeSymbol get tradeSymbol => symbol;
-
   /// The supply level of the trade good.
   final SupplyLevel supply;
 
@@ -89,24 +86,7 @@ class MarketPrice extends PriceBase<TradeSymbol> {
   final int tradeVolume;
 
   @override
-  String toString() => jsonEncode(toJson());
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MarketPrice &&
-          runtimeType == other.runtimeType &&
-          waypointSymbol == other.waypointSymbol &&
-          symbol == other.symbol &&
-          supply == other.supply &&
-          purchasePrice == other.purchasePrice &&
-          sellPrice == other.sellPrice &&
-          tradeVolume == other.tradeVolume &&
-          timestamp == other.timestamp &&
-          activity == other.activity;
-
-  @override
-  int get hashCode => Object.hash(
+  List<Object?> get props => [
         waypointSymbol,
         symbol,
         supply,
@@ -115,5 +95,11 @@ class MarketPrice extends PriceBase<TradeSymbol> {
         tradeVolume,
         timestamp,
         activity,
-      );
+      ];
+
+  /// The symbol of the trade good.
+  TradeSymbol get tradeSymbol => symbol;
+
+  @override
+  String toString() => jsonEncode(toJson());
 }

@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 /// A potential pickup opportunity.
 @immutable
-class BuyOpp {
+class BuyOpp extends Equatable {
   /// Create a new BuyOpp.
   const BuyOpp(this.marketPrice);
 
@@ -16,6 +17,9 @@ class BuyOpp {
 
   /// State of the market where this buy opportunity was found.
   final MarketPrice marketPrice;
+
+  @override
+  List<Object> get props => [marketPrice];
 
   /// The symbol of the market where the good can be purchased.
   WaypointSymbol get waypointSymbol => marketPrice.waypointSymbol;
@@ -32,19 +36,11 @@ class BuyOpp {
       'marketPrice': marketPrice.toJson(),
     };
   }
-
-  @override
-  bool operator ==(Object other) {
-    return other is BuyOpp && marketPrice == other.marketPrice;
-  }
-
-  @override
-  int get hashCode => marketPrice.hashCode;
 }
 
 /// A potential delivery opportunity.
 @immutable
-class SellOpp {
+class SellOpp extends Equatable {
   /// Create a new SellOpp from a MarketPrice.
   SellOpp.fromMarketPrice(
     MarketPrice this.marketPrice, {
@@ -107,6 +103,22 @@ class SellOpp {
   /// True if this is a market feeding job (allowed to go negative).
   final bool isFeeder;
 
+  /// The maximum number of units we can sell/deliver.
+  /// This is only used for contract or construction deliveries when the
+  /// delivery is nearly complete.
+  final int? maxUnits;
+
+  @override
+  List<Object?> get props => [
+        marketPrice,
+        waypointSymbol,
+        tradeSymbol,
+        price,
+        contractId,
+        maxUnits,
+        isFeeder,
+      ];
+
   /// True if this is a contract delivery.
   bool get isContractDelivery => contractId != null;
 
@@ -116,11 +128,6 @@ class SellOpp {
   bool get isConstructionDelivery {
     return contractId == null && marketPrice == null;
   }
-
-  /// The maximum number of units we can sell/deliver.
-  /// This is only used for contract or construction deliveries when the
-  /// delivery is nearly complete.
-  final int? maxUnits;
 
   /// Convert to JSON.
   Map<String, dynamic> toJson() {
@@ -132,28 +139,5 @@ class SellOpp {
       'contractId': contractId,
       'maxUnits': maxUnits,
     };
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is SellOpp &&
-        marketPrice == other.marketPrice &&
-        waypointSymbol == other.waypointSymbol &&
-        tradeSymbol == other.tradeSymbol &&
-        price == other.price &&
-        contractId == other.contractId &&
-        maxUnits == other.maxUnits;
-  }
-
-  @override
-  int get hashCode {
-    return Object.hash(
-      marketPrice,
-      waypointSymbol,
-      tradeSymbol,
-      price,
-      contractId,
-      maxUnits,
-    );
   }
 }
