@@ -625,7 +625,7 @@ void main() {
     expect(centralCommand.mountsNeededForAllShips(), isEmpty);
   });
 
-  test('getJobForShip', () {
+  test('getJobForShip out of fuel', () {
     final shipCache = _MockShipCache();
     final behaviorCache = _MockBehaviorCache();
     final centralCommand =

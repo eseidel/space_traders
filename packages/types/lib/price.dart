@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:types/types.dart';
 
 /// A price record.
-class PriceBase<Symbol extends Object> extends Equatable {
+abstract class PriceBase<Symbol extends Object> extends Equatable {
   /// Create a new price record.
   const PriceBase({
     required this.waypointSymbol,
@@ -18,9 +18,4 @@ class PriceBase<Symbol extends Object> extends Equatable {
 
   /// The timestamp of the price.
   final DateTime timestamp;
-
-  // Use Object? rather than Object? to allow subclasses to have
-  // optional types in their props.
-  @override
-  List<Object?> get props => [waypointSymbol, symbol, timestamp];
 }
