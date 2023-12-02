@@ -804,6 +804,8 @@ ShipType? shipToBuyFromPlan(
       continue;
     }
     // If we should buy this one but haven't found it yet, buy nothing.
+    // TODO(eseidel): This fails early before we have prices.
+    // We should store ShipListings separate from ShipyardPrices.
     if (!shipyardPrices.havePriceFor(shipType)) {
       logger.warn('No prices for $shipType');
       return null;

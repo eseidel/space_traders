@@ -69,7 +69,7 @@ class Config {
 
   /// Used by _computeActiveConstruction to compute if we should be doing
   /// construction yet or not.
-  final constructionMinCredits = 100000;
+  final constructionMinCredits = 1000000;
 
   /// Used by shouldBuyShip to make sure we don't buy a ship when it would
   /// affect our ability to trade.

@@ -787,3 +787,11 @@ ApiException 400: {"error":{"message":"Construction material requirements for AD
 <asynchronous suspension>
 #10     main (file:///root/space_traders/packages/cli/bin/cli.dart:152:3)
 <asynchronous suspension>
+
+### Add ShipyardListing separate from ShipyardPrices
+
+And scan for ShipyardListings as part of fetch_queue.dart
+
+### Integrate fetch_queue into the client
+
+Right now lots of things fail before we have scaned for market listings.
