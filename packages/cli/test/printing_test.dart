@@ -166,6 +166,16 @@ void main() {
       approximateDuration(const Duration(seconds: -3600 * 24 * 365 * 3)),
       '-3y',
     );
+
+    // Rounding
+    expect(
+      approximateDuration(const Duration(minutes: 2, seconds: 45)),
+      '3m',
+    );
+    expect(
+      approximateDuration(const Duration(minutes: -2, seconds: -45)),
+      '-3m',
+    );
   });
 
   test('cargoDescription', () {
