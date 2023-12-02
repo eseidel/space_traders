@@ -347,6 +347,14 @@ class CentralCommand {
   }
 
   Construction? _computeActiveConstruction(Caches caches) {
+    if (!isConstructionTradingEnabled) {
+      return null;
+    }
+
+    if (caches.agent.agent.credits < config.constructionMinCredits) {
+      return null;
+    }
+
     final systemSymbol = caches.agent.headquarters(caches.systems).systemSymbol;
     final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
     return jumpGate == null

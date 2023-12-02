@@ -151,6 +151,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.5"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.5"
   fake_async:
     dependency: transitive
     description:
@@ -225,10 +233,11 @@ packages:
   json_diff:
     dependency: transitive
     description:
-      name: json_diff
-      sha256: "10d82dd4455109bc4dd66335db2d34b4bdf4441dc8fdd6ad6fb914395b9f9e95"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "50293237d4e7c96dc109489302f32af9d1eec583"
+      url: "https://github.com/eseidel/dart-json_diff.git"
+    source: git
     version: "0.2.1"
   logging:
     dependency: transitive

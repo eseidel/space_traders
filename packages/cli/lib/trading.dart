@@ -603,6 +603,7 @@ MarketTrip? findBestMarketToBuy(
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
 /// used for evaluating the trade-off between "closest" vs. "cheapest".
 /// This does not account for fuel costs.
+// TODO(eseidel): This does not work with no pricing data.
 MarketTrip? findBestMarketToSell(
   MarketPrices marketPrices,
   RoutePlanner routePlanner,

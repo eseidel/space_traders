@@ -4,14 +4,14 @@ import 'package:types/types.dart';
 class Config {
   /// Our ship buy plan for computeNextShipToBuy.
   final buyPlan = [
-    ShipType.LIGHT_SHUTTLE,
+    ShipType.LIGHT_HAULER,
     ShipType.MINING_DRONE,
-    ShipType.SIPHON_DRONE,
     ShipType.SURVEYOR,
-    ShipType.LIGHT_SHUTTLE,
+    ShipType.SIPHON_DRONE,
+    ShipType.LIGHT_HAULER,
     ShipType.MINING_DRONE,
-    ShipType.SIPHON_DRONE,
     ShipType.SURVEYOR,
+    ShipType.LIGHT_HAULER,
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
     ShipType.MINING_DRONE,
@@ -24,8 +24,9 @@ class Config {
   /// A list of which haulers should be used as miner haulers.
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
-  final minerHaulerSymbols = <String>['12', '13', '14', '18', '1E']
-      .map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
+  // final minerHaulerSymbols = <String>['12', '13', '14', '18', '1E']
+  //     .map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
+  final minerHaulerSymbols = <ShipSymbol>[];
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
   /// logic in getJobForShip.
@@ -56,7 +57,7 @@ class Config {
     FleetRole.explorer: [Behavior.explorer],
   };
 
-// We could put some "total value" on the idea of the gate being open
+  // We could put some "total value" on the idea of the gate being open
   // and change that over time to encourage building it sooner.
   // For now we're just hard-coding a price for each needed good.
   /// Used by sellOppsForConstruction to determine what SellOpps for
@@ -65,6 +66,10 @@ class Config {
     TradeSymbol.FAB_MATS: 4000,
     TradeSymbol.ADVANCED_CIRCUITRY: 13000,
   };
+
+  /// Used by _computeActiveConstruction to compute if we should be doing
+  /// construction yet or not.
+  final constructionMinCredits = 100000;
 
   /// Used by shouldBuyShip to make sure we don't buy a ship when it would
   /// affect our ability to trade.
