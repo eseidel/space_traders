@@ -26,9 +26,8 @@ class Config {
   /// A list of which haulers should be used as miner haulers.
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
-  // final minerHaulerSymbols = <String>['12', '13', '14', '18', '1E']
-  //     .map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
-  final minerHaulerSymbols = <ShipSymbol>[];
+  final minerHaulerSymbols =
+      <String>['7', '8'].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
   /// logic in getJobForShip.
@@ -66,12 +65,12 @@ class Config {
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
     TradeSymbol.FAB_MATS: 2000,
-    TradeSymbol.ADVANCED_CIRCUITRY: 10000,
+    TradeSymbol.ADVANCED_CIRCUITRY: 8000,
   };
 
   /// Used by _computeActiveConstruction to compute if we should be doing
   /// construction yet or not.
-  final constructionMinCredits = 1000000;
+  final constructionMinCredits = 500000;
 
   /// Used by shouldBuyShip to make sure we don't buy a ship when it would
   /// affect our ability to trade.

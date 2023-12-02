@@ -135,7 +135,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       score.markets.map((m) => m.waypointName).join(', '),
       score.score,
       score.producedGoods.join(', '),
-      marketScore,
+      marketScore.toStringAsPrecision(2),
     ]);
     if (seenSources.length >= countLimit) {
       break;

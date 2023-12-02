@@ -161,7 +161,7 @@ DateTime logRemainingTransitTime(
   shipInfo(
     ship,
     // Extra space after emoji is needed for windows powershell.
-    '✈️  to ${ship.waypointSymbol}, $coloredRemaining left',
+    '✈️  to ${ship.waypointSymbol.sectorLocalName}, $coloredRemaining left',
   );
   return arrival;
 }
