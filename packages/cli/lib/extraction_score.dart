@@ -171,15 +171,19 @@ Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
 }
 
 /// Evaluate all possible source and Market pairings.
-List<ExtractionScore> _evaluateWaypointsForExtraction(
+Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
+  WaypointCache waypointCache,
   SystemsCache systemsCache,
-  List<Waypoint> extractionSites,
   MarketListingCache marketListings,
   SystemSymbol systemSymbol,
+  bool Function(Waypoint) sourcePredicate,
   ExtractionType extractionType,
-) {
+) async {
+  final sources = (await waypointCache.waypointsInSystem(systemSymbol))
+      .where(sourcePredicate)
+      .toList();
   final scores = <ExtractionScore>[];
-  for (final source in extractionSites) {
+  for (final source in sources) {
     final expectedGoods = expectedGoodsForWaypoint(
       source.type,
       source.traits.map((t) => t.symbol).toSet(),
@@ -220,13 +224,12 @@ Future<List<ExtractionScore>> evaluateWaypointsForMining(
   MarketListingCache marketListings,
   SystemSymbol systemSymbol,
 ) async {
-  final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
-  final sources = waypoints.where((w) => w.canBeMined).toList();
   return _evaluateWaypointsForExtraction(
+    waypointCache,
     systemsCache,
-    sources,
     marketListings,
     systemSymbol,
+    (w) => w.canBeMined,
     ExtractionType.mining,
   );
 }
@@ -238,13 +241,12 @@ Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
   MarketListingCache marketListings,
   SystemSymbol systemSymbol,
 ) async {
-  final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
-  final sources = waypoints.where((w) => w.canBeSiphoned).toList();
   return _evaluateWaypointsForExtraction(
+    waypointCache,
     systemsCache,
-    sources,
     marketListings,
     systemSymbol,
+    (w) => w.canBeSiphoned,
     ExtractionType.siphoning,
   );
 }
