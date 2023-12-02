@@ -27,7 +27,11 @@ int expectedValueFromSurvey(
   // This will fail if the passed in market doesn't sell everything.
 
   final totalValue = survey.deposits.fold<int>(0, (total, deposit) {
-    final marketSymbol = marketForGood[deposit.tradeSymbol]!;
+    final marketSymbol = marketForGood[deposit.tradeSymbol];
+    // TODO(eseidel): Remove this nullability check next release.
+    if (marketSymbol == null) {
+      return total;
+    }
     final sellPrice = marketPrices.recentSellPrice(
           deposit.tradeSymbol,
           marketSymbol: marketSymbol,

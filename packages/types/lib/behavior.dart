@@ -469,12 +469,16 @@ class ExtractionJob {
   factory ExtractionJob.fromJson(Map<String, dynamic> json) {
     final sourceString = json['source'] as String? ?? json['mine'] as String;
     final source = WaypointSymbol.fromJson(sourceString);
-    final marketForGood =
-        _marketForGoodFromJson(json['marketForGood'] as Map<String, dynamic>);
+    // TODO(eseidel): Make these non-nullable after another release.
+    final extractionTypeJson = json['extractionType'] as String? ?? 'mine';
+    final extractionType = ExtractionType.fromJson(extractionTypeJson);
+    final marketFroGoodJson =
+        json['marketForGood'] as Map<String, dynamic>? ?? {};
+    final marketForGood = _marketForGoodFromJson(marketFroGoodJson);
     return ExtractionJob(
       source: source,
       marketForGood: marketForGood,
-      extractionType: ExtractionType.mine,
+      extractionType: extractionType,
     );
   }
 
