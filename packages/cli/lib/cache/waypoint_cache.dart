@@ -29,11 +29,21 @@ class WaypointCache {
         _chartingCache = charting,
         _constructionCache = construction;
 
+  /// Create a new WaypointCache which only uses cached values.
+  WaypointCache.cachedOnly(
+    SystemsCache systems,
+    ChartingCache charting,
+    ConstructionCache construction,
+  )   : _api = null,
+        _systemsCache = systems,
+        _chartingCache = charting,
+        _constructionCache = construction;
+
   // _waypointsBySystem is no longer very useful, mostly it holds onto
   // uncharted waypoints for a single loop, we could explicitly cache
   // uncharted waypoints for a set amount of time instead?
   final Map<SystemSymbol, List<Waypoint>> _waypointsBySystem = {};
-  final Api _api;
+  final Api? _api;
   final SystemsCache _systemsCache;
   final ChartingCache _chartingCache;
   final ConstructionCache _constructionCache;
@@ -110,19 +120,23 @@ class WaypointCache {
       _waypointsBySystem[systemSymbol] = cachedWaypoints;
       return cachedWaypoints;
     }
+    final api = _api;
+    if (api == null) {
+      throw StateError('$systemSymbol not in cache and no API to fetch it.');
+    }
 
-    final waypoints = await _allWaypointsInSystem(_api, systemSymbol).toList();
+    final waypoints = await _allWaypointsInSystem(api, systemSymbol).toList();
     _waypointsBySystem[systemSymbol] = waypoints;
-    await _addWaypointsToCaches(waypoints);
+    await _addWaypointsToCaches(api, waypoints);
     return waypoints;
   }
 
-  Future<void> _addWaypointsToCaches(List<Waypoint> waypoints) async {
+  Future<void> _addWaypointsToCaches(Api api, List<Waypoint> waypoints) async {
     _chartingCache.addWaypoints(waypoints);
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?
       final construction = waypoint.isUnderConstruction
-          ? await getConstruction(_api, waypoint.waypointSymbol)
+          ? await getConstruction(api, waypoint.waypointSymbol)
           : null;
       _constructionCache.updateConstruction(
         waypointSymbol: waypoint.waypointSymbol,

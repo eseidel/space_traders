@@ -8,7 +8,6 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/mine_scores.dart';
-import 'package:cli/net/auth.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
 
@@ -25,11 +24,13 @@ double _scoreMarkets(
     final sellPrice =
         marketPrices.recentSellPrice(tradeSymbol, marketSymbol: marketSymbol);
     if (sellPrice == null) {
+      logger.warn('No sell price for $tradeSymbol at $marketSymbol');
       return 0.0;
     }
     final percentile =
         marketPrices.percentileForSellPrice(tradeSymbol, sellPrice);
     if (percentile == null) {
+      logger.warn('No percentile for $tradeSymbol at $marketSymbol');
       return 0.0;
     }
     return percentile;
@@ -58,13 +59,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final isSiphon = argResults['siphon'] as bool;
 
-  final db = await defaultDatabase();
-  final api = defaultApi(fs, db, getPriority: () => 0);
   final systems = await SystemsCache.loadOrFetch(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
   final charting = ChartingCache.load(fs, waypointTraits);
   final construction = ConstructionCache.load(fs);
-  final waypointCache = WaypointCache(api, systems, charting, construction);
+  final waypointCache =
+      WaypointCache.cachedOnly(systems, charting, construction);
   final agentCache = AgentCache.load(fs)!;
   final hqSystem = agentCache.headquartersSystemSymbol;
   final tradeGoods = TradeGoodCache.load(fs);
@@ -88,15 +88,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     );
   }
 
-  final sourceName = isSiphon ? 'Siphon' : 'Mine';
   final table = Table(
     header: [
-      sourceName,
-      'Traits',
-      'Market',
-      'Distance',
+      'Source',
+      'Source Traits',
+      'Markets',
+      'Dist',
       'Goods',
-      'Market Score',
+      'Score',
     ],
     style: const TableStyle(compact: true),
   );
@@ -131,8 +130,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     seenSources.add(score.source);
     table.add([
       score.source.toString(),
-      score.sourceTraits.join(', '),
-      score.markets.map((m) => m.sectorLocalName).join(', '),
+      score.displayTraitNames.join(', '),
+      score.markets.map((m) => m.waypointName).join(', '),
       score.score,
       score.producedGoods.join(', '),
       marketScore,
@@ -142,9 +141,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
   }
   logger.info(table.toString());
-
-  // Required or main will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -119,37 +119,13 @@ class ExtractionScore {
     // as well as the average value of goods at the market.
     return deliveryDistance;
   }
-}
 
-/// Evaluate a mine location and Market pairing
-class MineScore extends ExtractionScore {
-  /// Creates a new MineScore.
-  MineScore({
-    required super.source,
-    required super.sourceType,
-    required super.sourceTraits,
-    required super.marketForGood,
-    required super.deliveryDistance,
-  }) : super(extractionType: ExtractionType.mining);
-
-  /// The names of the traits of the mine.
-  List<String> get mineTraitNames {
+  /// The names of the traits with boilderplate removed.
+  List<String> get displayTraitNames {
     return sourceTraits
         .map((t) => t.value.replaceAll('_DEPOSITS', ''))
         .toList();
   }
-}
-
-/// Evaluate a siphon location and Market pairing
-class SiphonScore extends ExtractionScore {
-  /// Creates a new SiphonScore.
-  SiphonScore({
-    required super.source,
-    required super.sourceType,
-    required super.sourceTraits,
-    required super.marketForGood,
-    required super.deliveryDistance,
-  }) : super(extractionType: ExtractionType.siphoning);
 }
 
 /// Returns the nearest WaypointSymbol in the same system which matches the
@@ -181,7 +157,10 @@ Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
   final markets = <TradeSymbol, WaypointSymbol>{};
   for (final good in goods) {
     final market = nearestTo(systemsCache, start, (waypoint) {
-      return marketListings[waypoint.waypointSymbol]?.imports.contains(good) ??
+      return marketListings[waypoint.waypointSymbol]
+              // TODO(eseidel): This should only be imports.
+              ?.tradeSymbols
+              .contains(good) ??
           false;
     });
     if (market != null) {
@@ -192,21 +171,14 @@ Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
 }
 
 /// Evaluate all possible source and Market pairings.
-List<Type> _evaluateWaypointsForExtraction<Type extends ExtractionScore>(
+List<ExtractionScore> _evaluateWaypointsForExtraction(
   SystemsCache systemsCache,
   List<Waypoint> extractionSites,
   MarketListingCache marketListings,
   SystemSymbol systemSymbol,
-  Type Function({
-    required WaypointSymbol source,
-    required WaypointType sourceType,
-    required Set<WaypointTraitSymbol> sourceTraits,
-    required Map<TradeSymbol, WaypointSymbol> marketForGood,
-    required int deliveryDistance,
-  }) createScore,
   ExtractionType extractionType,
 ) {
-  final scores = <Type>[];
+  final scores = <ExtractionScore>[];
   for (final source in extractionSites) {
     final expectedGoods = expectedGoodsForWaypoint(
       source.type,
@@ -227,12 +199,13 @@ List<Type> _evaluateWaypointsForExtraction<Type extends ExtractionScore>(
       marketSymbols,
     );
     scores.add(
-      createScore(
+      ExtractionScore(
         source: source.waypointSymbol,
         sourceType: source.type,
         sourceTraits: sourceTraitSymbols,
         marketForGood: marketForGood,
         deliveryDistance: deliveryDistance,
+        extractionType: extractionType,
       ),
     );
   }
@@ -241,7 +214,7 @@ List<Type> _evaluateWaypointsForExtraction<Type extends ExtractionScore>(
 }
 
 /// Evaluate all possible source and Market pairings for mining.
-Future<List<MineScore>> evaluateWaypointsForMining(
+Future<List<ExtractionScore>> evaluateWaypointsForMining(
   WaypointCache waypointCache,
   SystemsCache systemsCache,
   MarketListingCache marketListings,
@@ -249,31 +222,17 @@ Future<List<MineScore>> evaluateWaypointsForMining(
 ) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
   final mines = waypoints.where((w) => w.canBeMined).toList();
-  return _evaluateWaypointsForExtraction<MineScore>(
+  return _evaluateWaypointsForExtraction(
     systemsCache,
     mines,
     marketListings,
     systemSymbol,
-    ({
-      required WaypointSymbol source,
-      required WaypointType sourceType,
-      required Set<WaypointTraitSymbol> sourceTraits,
-      required Map<TradeSymbol, WaypointSymbol> marketForGood,
-      required int deliveryDistance,
-    }) =>
-        MineScore(
-      source: source,
-      sourceType: sourceType,
-      sourceTraits: sourceTraits,
-      marketForGood: marketForGood,
-      deliveryDistance: deliveryDistance,
-    ),
     ExtractionType.mining,
   );
 }
 
 /// Evaluate all possible source and Market pairings for siphoning.
-Future<List<SiphonScore>> evaluateWaypointsForSiphoning(
+Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
   WaypointCache waypointCache,
   SystemsCache systemsCache,
   MarketListingCache marketListings,
@@ -281,29 +240,16 @@ Future<List<SiphonScore>> evaluateWaypointsForSiphoning(
 ) async {
   final waypoints = await waypointCache.waypointsInSystem(systemSymbol);
   final mines = waypoints.where((w) => w.canBeSiphoned).toList();
-  return _evaluateWaypointsForExtraction<SiphonScore>(
+  return _evaluateWaypointsForExtraction(
     systemsCache,
     mines,
     marketListings,
     systemSymbol,
-    ({
-      required WaypointSymbol source,
-      required WaypointType sourceType,
-      required Set<WaypointTraitSymbol> sourceTraits,
-      required Map<TradeSymbol, WaypointSymbol> marketForGood,
-      required int deliveryDistance,
-    }) =>
-        SiphonScore(
-      source: source,
-      sourceType: sourceType,
-      sourceTraits: sourceTraits,
-      marketForGood: marketForGood,
-      deliveryDistance: deliveryDistance,
-    ),
     ExtractionType.siphoning,
   );
 }
 
+/// Trade symbols for extraction based on waypoint type.
 final tradeSymbolsByType = {
   WaypointType.GAS_GIANT: {
     TradeSymbol.HYDROCARBON,

@@ -113,7 +113,7 @@ void main() {
     expect(scores.length, 1);
     final score = scores.first;
     expect(score.score, 53);
-    expect(score.mineTraitNames, ['COMMON_METAL']);
+    expect(score.displayTraitNames, ['COMMON_METAL']);
     expect(score.producedGoods, producedGoods);
   });
 
