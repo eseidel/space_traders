@@ -1,7 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/net/auth.dart';
 import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
@@ -10,20 +9,18 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Evalute the navigability of the starting system by ship type.
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
-  final db = await defaultDatabase();
-  final api = defaultApi(fs, db, getPriority: () => 0);
 
   final staticCache = StaticCaches.load(fs);
-  final systemsCache = SystemsCache.load(fs)!;
-  final chartingCache = ChartingCache.load(fs, staticCache.waypointTraits);
-  final constrctionCache = ConstructionCache.load(fs);
+  final systems = SystemsCache.load(fs)!;
+  final charting = ChartingCache.load(fs, staticCache.waypointTraits);
+  final construction = ConstructionCache.load(fs);
   final waypointCache =
-      WaypointCache(api, systemsCache, chartingCache, constrctionCache);
+      WaypointCache.cachedOnly(systems, charting, construction);
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
   final routePlanner = RoutePlanner(
-    systemsCache: systemsCache,
+    systemsCache: systems,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final waypoints = await waypointCache.waypointsInSystem(hqSystemSymbol);
@@ -54,9 +51,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
   table.sortBy<num>((a) => (a as List<dynamic>)[1] as num);
   logger.info(table.toString());
-
-  // required or main will hang
-  await db.close();
 }
 
 void main(List<String> args) async {

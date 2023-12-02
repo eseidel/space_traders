@@ -7,16 +7,14 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/net/auth.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
-  final api = defaultApi(fs, db, getPriority: () => 0);
   final systems = await SystemsCache.loadOrFetch(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
   final charting = ChartingCache.load(fs, waypointTraits);
   final construction = ConstructionCache.load(fs);
-  final waypointCache = WaypointCache(api, systems, charting, construction);
+  final waypointCache =
+      WaypointCache.cachedOnly(systems, charting, construction);
   final shipCache = ShipCache.load(fs)!;
   final tradeGoods = TradeGoodCache.load(fs);
   final marketListings = MarketListingCache.load(fs, tradeGoods);
@@ -40,9 +38,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       );
     }
   }
-
-  // Required or main will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {
