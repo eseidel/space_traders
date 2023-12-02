@@ -58,4 +58,19 @@ void main() {
     expect(newState.behavior, Behavior.buyShip);
     expect(newState.toJson(), json);
   });
+
+  test('ExtractionJob immutable', () {
+    final job = ExtractionJob(
+      source: WaypointSymbol.fromString('S-A-W'),
+      marketForGood: {
+        TradeSymbol.ADVANCED_CIRCUITRY: WaypointSymbol.fromString('S-A-W'),
+      },
+      extractionType: ExtractionType.mine,
+    );
+    final json = job.toJson();
+    final newJob = ExtractionJob.fromJson(json);
+    expect(newJob, job);
+    expect(newJob.toJson(), json);
+    expect(newJob.hashCode, job.hashCode);
+  });
 }
