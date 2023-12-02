@@ -15,10 +15,7 @@ class MarketListing {
 
   /// Creates a new market description from JSON data.
   factory MarketListing.fromJson(Map<String, dynamic> json) {
-    final symbol = WaypointSymbol.fromJson(
-      // TODO(eseidel): remove symbol on next reset.
-      json['symbol'] as String? ?? json['waypointSymbol'] as String,
-    );
+    final symbol = WaypointSymbol.fromJson(json['waypointSymbol'] as String);
     final exports = (json['exports'] as List<dynamic>)
         .cast<String>()
         .map((e) => TradeSymbol.fromJson(e)!)

@@ -17,7 +17,7 @@ Query insertTransactionQuery(Transaction record) {
 /// Convert the transaction to substitution values for insertion.
 Map<String, dynamic> transactionToColumnMap(Transaction transaction) {
   return {
-    'transaction_type': transaction.transactionType.name,
+    'transaction_type': transaction.transactionType.toJson(),
     'ship_symbol': transaction.shipSymbol.toJson(),
     'waypoint_symbol': transaction.waypointSymbol.toJson(),
     'trade_symbol': transaction.tradeSymbol?.toJson(),
@@ -27,7 +27,7 @@ Map<String, dynamic> transactionToColumnMap(Transaction transaction) {
     'per_unit_price': transaction.perUnitPrice,
     'timestamp': transaction.timestamp,
     'agent_credits': transaction.agentCredits,
-    'accounting': transaction.accounting.name,
+    'accounting': transaction.accounting.toJson(),
     'contract_action': transaction.contractAction?.name,
     'contract_id': transaction.contractId,
   };
@@ -37,7 +37,7 @@ Map<String, dynamic> transactionToColumnMap(Transaction transaction) {
 Transaction transactionFromColumnMap(Map<String, dynamic> values) {
   return Transaction(
     transactionType:
-        TransactionType.fromName(values['transaction_type'] as String),
+        TransactionType.fromJson(values['transaction_type'] as String),
     shipSymbol: ShipSymbol.fromJson(values['ship_symbol'] as String),
     waypointSymbol:
         WaypointSymbol.fromJson(values['waypoint_symbol'] as String),
@@ -49,9 +49,9 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
     perUnitPrice: values['per_unit_price'] as int,
     timestamp: values['timestamp'] as DateTime,
     agentCredits: values['agent_credits'] as int,
-    accounting: AccountingType.fromName(values['accounting'] as String),
+    accounting: AccountingType.fromJson(values['accounting'] as String),
     contractAction:
-        ContractAction.fromNameOrNull(values['contract_action'] as String?),
+        ContractAction.fromJsonOrNull(values['contract_action'] as String?),
     contractId: values['contract_id'] as String?,
   );
 }

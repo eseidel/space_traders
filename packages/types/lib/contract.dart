@@ -17,14 +17,14 @@ enum ContractAction {
   /// account for it on *every* transaction.  This is not worth the effort.
   // failure;
 
-  /// Lookup a contract action by name.
-  static ContractAction fromName(String name) {
-    return ContractAction.values.firstWhere((e) => e.name == name);
+  /// Construct a contract action from a string.
+  static ContractAction fromJson(String json) {
+    return ContractAction.values.firstWhere((e) => e.name == json);
   }
 
-  /// The name of the contract action.
-  static ContractAction? fromNameOrNull(String? name) {
-    return name == null ? null : fromName(name);
+  /// Construct a contract action from a string, or null if the string is null.
+  static ContractAction? fromJsonOrNull(String? json) {
+    return json == null ? null : fromJson(json);
   }
 }
 

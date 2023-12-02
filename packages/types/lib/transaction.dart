@@ -14,10 +14,13 @@ enum AccountingType {
   /// Goods transaction (e.g. buying/selling trade goods).
   goods;
 
-  /// Lookup an accounting type by name.
-  static AccountingType fromName(String name) {
+  /// Construct an accounting type from json.
+  static AccountingType fromJson(String name) {
     return AccountingType.values.firstWhere((e) => e.name == name);
   }
+
+  /// Convert the accounting type to json.
+  String toJson() => name;
 }
 
 // Saf uses:
@@ -48,14 +51,13 @@ enum TransactionType {
   /// Construction delivery
   construction;
 
-  /// Lookup a transaction type by index.
-  static TransactionType fromName(String name) {
-    // TODO(eseidel): remove next reset.
-    if (name == 'consturction') {
-      return TransactionType.construction;
-    }
+  /// Construct a transaction type from json.
+  static TransactionType fromJson(String name) {
     return TransactionType.values.firstWhere((e) => e.name == name);
   }
+
+  /// Convert the transaction type to json.
+  String toJson() => name;
 }
 
 /// A class to hold transaction data from a ship.
@@ -102,10 +104,16 @@ class Transaction {
   /// Create a new transaction from json.
   /// This only exists to support CostedDeal.fromJson and should be removed.
   factory Transaction.fromJson(Map<String, dynamic> json) {
+    final transactionTypeJson = json['transactionType'];
+    final TransactionType transactionType;
+    // TODO(eseidel): Remove int check on next reset.
+    if (transactionTypeJson is int) {
+      transactionType = TransactionType.values[transactionTypeJson];
+    } else {
+      transactionType = TransactionType.fromJson(transactionTypeJson as String);
+    }
     return Transaction(
-      // TODO(eseidel): This should use TransactionType.fromName.
-      transactionType: TransactionType.values
-          .firstWhere((e) => e.index == json['transactionType'] as int),
+      transactionType: transactionType,
       shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String?),
@@ -116,11 +124,10 @@ class Transaction {
       perUnitPrice: json['perUnitPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
       agentCredits: json['agentCredits'] as int,
-      accounting: AccountingType.values
-          .firstWhere((e) => e.name == json['accounting'] as String),
+      accounting: AccountingType.fromJson(json['accounting'] as String),
       contractId: json['contractId'] as String?,
       contractAction:
-          ContractAction.fromNameOrNull(json['contractAction'] as String?),
+          ContractAction.fromJsonOrNull(json['contractAction'] as String?),
     );
   }
 
@@ -299,18 +306,15 @@ class Transaction {
 
   /// The change in credits from this transaction.
   int get creditsChange {
-    if (tradeType == MarketTransactionTypeEnum.PURCHASE) {
-      return -perUnitPrice * quantity;
-    } else {
-      return perUnitPrice * quantity;
-    }
+    final sign = tradeType == MarketTransactionTypeEnum.PURCHASE ? -1 : 1;
+    return sign * perUnitPrice * quantity;
   }
 
   /// Convert the transaction to json.
   /// This only exists to support CostedDeal.toJson and should be removed.
   Map<String, dynamic> toJson() {
     return {
-      'transactionType': transactionType.index,
+      'transactionType': transactionType.toJson(),
       'shipSymbol': shipSymbol.toJson(),
       'waypointSymbol': waypointSymbol.toJson(),
       'tradeSymbol': tradeSymbol?.toJson(),
@@ -320,7 +324,7 @@ class Transaction {
       'perUnitPrice': perUnitPrice,
       'timestamp': timestamp.toUtc().toIso8601String(),
       'agentCredits': agentCredits,
-      'accounting': accounting.name,
+      'accounting': accounting.toJson(),
       'contractId': contractId,
       'contractAction': contractAction?.name,
     };

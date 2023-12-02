@@ -57,7 +57,7 @@ class WaypointCache {
     // agentHeadquarters, connectedSystems, and jumpGates don't ever change.
   }
 
-  /// Sythesizes a waypoint from cached values if possible.
+  /// Synthesizes a waypoint from cached values if possible.
   Waypoint? waypointFromCaches(WaypointSymbol waypointSymbol) {
     final values = _chartingCache[waypointSymbol];
     if (values == null) {
@@ -111,6 +111,9 @@ class WaypointCache {
 
   /// Fetch all waypoints in the given system.
   Future<List<Waypoint>> waypointsInSystem(SystemSymbol systemSymbol) async {
+    // We can't currently remove this check, since charting cache doesn't
+    // have uncharted waypoints.  We would need to have charting cache keep
+    // track of uncharted waypoints and last time they were updated.
     if (_waypointsBySystem.containsKey(systemSymbol)) {
       return _waypointsBySystem[systemSymbol]!;
     }

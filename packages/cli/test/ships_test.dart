@@ -22,11 +22,6 @@ void main() {
       ShipFrameSymbolEnum.CARRIER,
     ];
     for (final frame in ShipFrameSymbolEnum.values) {
-      // TODO(eseidel): Remove this once we have data on COMMAND_FRIGATE
-      if (frame == ShipFrameSymbolEnum.FRIGATE) {
-        continue;
-      }
-
       final type = shipyardShips.shipTypeFromFrame(frame);
       final matcher = expectedNullTypes.contains(frame) ? isNull : isNotNull;
       expect(type, matcher, reason: 'no shipType with frame $frame');
