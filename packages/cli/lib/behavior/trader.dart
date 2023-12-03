@@ -412,7 +412,8 @@ Future<JobResult> _handleConstructionDealAtDelivery(
     if (isConstructionRequirementsMet(e)) {
       shipWarn(
         ship,
-        'Unable to deliver ${costedDeal.tradeSymbol} to $waypointSymbol.',
+        'Construction at $waypointSymbol already fulfilled '
+        '${costedDeal.tradeSymbol}.',
       );
       return JobResult.complete();
     }
