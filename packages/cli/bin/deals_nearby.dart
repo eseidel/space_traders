@@ -93,6 +93,10 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     logger.info('No deal found.');
     return;
   }
+
+  final dealNotInProgress =
+      avoidDealsInProgress(behaviorCache.dealsInProgress());
+
   logger.info('Top $limit deals:');
 
   final table = Table(
@@ -134,8 +138,10 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     final name =
         costed.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
 
+    final inProgresMarker = dealNotInProgress(deal) ? '' : '*';
+
     table.add([
-      name,
+      '$name$inProgresMarker',
       w(deal.sourceSymbol),
       c(costed.expectedInitialBuyPrice),
       w(deal.destinationSymbol),
