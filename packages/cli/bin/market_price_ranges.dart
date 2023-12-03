@@ -1,6 +1,5 @@
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
-import 'package:file/local.dart';
 import 'package:stats/stats.dart';
 
 void printPriceRanges(List<MarketPrice> gameStats) {
@@ -20,7 +19,6 @@ void printPriceRanges(List<MarketPrice> gameStats) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  const fs = LocalFileSystem();
   final prices = MarketPrices.load(fs);
 
   logger.info('${prices.count} prices loaded.');
