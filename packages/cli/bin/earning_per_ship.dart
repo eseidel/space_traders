@@ -96,9 +96,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     roleCreditPerSecondTotals[role] =
         (roleCreditPerSecondTotals[role] ?? 0) + summary.perSecond;
     logger.info('${shipSymbol.hexNumber.padRight(longestHexNumber)}  '
-        '${c(summary.perMinute).padLeft(5)} c/m '
+        '${c(summary.perMinute).padLeft(6)} c/m '
         '${c(summary.perSecond).padLeft(4)} c/s '
-        '${role.name.padRight(10)}');
+        '${role.name.padRight(10)} '
+        '${summary.transactions.length.toString().padLeft(4)}');
   }
   final sortedRoles = roleCounts.keys.toList()
     ..sort((a, b) => a.name.compareTo(b.name));
@@ -106,7 +107,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final count = roleCounts[role]!;
     final total = roleCreditPerSecondTotals[role]!;
     final average = (total / count).round();
-    logger.info('${role.name}: $count ships, ${c(average)} c/s');
+    logger.info('${role.name.padRight(9)} '
+        '${count.toString().padLeft(2)} ships '
+        '${c(average).padLeft(3)} c/s');
   }
   // Required or main will hang.
   await db.close();
