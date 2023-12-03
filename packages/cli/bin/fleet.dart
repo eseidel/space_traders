@@ -1,3 +1,4 @@
+import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
@@ -7,43 +8,18 @@ void main(List<String> args) async {
   await runOffline(args, command);
 }
 
-/// Returns the average condition of the ship with 100 being perfect and 0
-/// being destroyed. This is the average of the engine, frame, and reactor
-/// conditions.
-// If the game ever uses condition we can move this to api.dart.
-int _averageCondition(Ship ship) {
-  var total = 0;
-  total += ship.engine.condition ?? 100;
-  total += ship.frame.condition ?? 100;
-  total += ship.reactor.condition ?? 100;
-  return total ~/ 3;
-}
-
 /// Returns a string representing the current navigation status of the ship.
 String _describeShipNav(ShipNav nav) {
+  final waypoint = nav.waypointSymbolObject.sectorLocalName;
   switch (nav.status) {
     case ShipNavStatus.DOCKED:
-      return 'Docked at ${nav.waypointSymbol}';
+      return 'Docked at $waypoint';
     case ShipNavStatus.IN_ORBIT:
-      return 'Orbiting ${nav.waypointSymbol}';
+      return 'Orbiting $waypoint';
     case ShipNavStatus.IN_TRANSIT:
-      return 'In transit to ${nav.waypointSymbol}';
+      return 'Transit to $waypoint';
   }
   return 'Unknown';
-}
-
-String _shipStatusLine(Ship ship, SystemsCache systemsCache) {
-  final waypoint = systemsCache.waypoint(ship.waypointSymbol);
-  var string = '${_describeShipNav(ship.nav)} ${waypoint.type} '
-      '${ship.registration.role} ${ship.fleetRole.name} '
-      '${ship.cargo.units}/${ship.cargo.capacity}';
-  if (ship.crew.morale != 100) {
-    string += ' (morale: ${ship.crew.morale})';
-  }
-  if (_averageCondition(ship) != 100) {
-    string += ' (condition: ${_averageCondition(ship)})';
-  }
-  return string;
 }
 
 String describeInventory(
@@ -87,6 +63,27 @@ Duration timeToArrival(
   return timeLeft;
 }
 
+String _behaviorOrTypeString(Ship ship, BehaviorState? behavior) {
+  if (ship.fleetRole.name == behavior?.behavior.name) {
+    return ship.fleetRole.name;
+  }
+  // Surveyors have a single-pass loop so they sit in null commonly.
+  if (ship.fleetRole == FleetRole.surveyor && behavior?.behavior == null) {
+    return 'surveyor';
+  }
+  // No need to show the registration if it's the same as the role.
+  if (ship.fleetRole.name == ship.registration.role.value.toLowerCase()) {
+    return '${ship.fleetRole.name} (${behavior?.behavior.name})';
+  }
+  // Hauler == trader, so don't show the registration.
+  if (ship.fleetRole == FleetRole.trader &&
+      ship.registration.role == ShipRole.HAULER) {
+    return '${ship.fleetRole.name} (${behavior?.behavior.name})';
+  }
+  return '${ship.fleetRole.name} (${behavior?.behavior.name}) '
+      '${ship.registration.role}';
+}
+
 void logShip(
   SystemsCache systemsCache,
   BehaviorCache behaviorCache,
@@ -94,28 +91,34 @@ void logShip(
   JumpCache jumpCache,
   Ship ship,
 ) {
+  const indent = '   ';
   final behavior = behaviorCache.getBehavior(ship.shipSymbol);
-  logger
-    ..info('${ship.symbol}: ${behavior?.behavior}')
-    ..info('  ${_shipStatusLine(ship, systemsCache)}');
+  final waypoint = systemsCache.waypoint(ship.waypointSymbol);
+  final cargoStatus = ship.cargo.capacity == 0
+      ? ''
+      : '${ship.cargo.units}/${ship.cargo.capacity}';
+  logger.info('${ship.shipSymbol.hexNumber} '
+      '${_behaviorOrTypeString(ship, behavior)} $cargoStatus');
   if (ship.cargo.isNotEmpty) {
     logger.info(
-      describeInventory(marketPrices, ship.cargo.inventory, indent: '  '),
+      describeInventory(marketPrices, ship.cargo.inventory, indent: indent),
     );
   }
   final routePlan = behavior?.routePlan;
   if (routePlan != null) {
     final timeLeft = timeToArrival(systemsCache, routePlan, ship);
-    final destination = routePlan.endSymbol;
+    final destination = routePlan.endSymbol.sectorLocalName;
     final arrival = approximateDuration(timeLeft);
-    logger.info('  destination: $destination, '
+    logger.info('${indent}in transit to $destination, '
         'arrives in $arrival');
+  } else {
+    logger.info('$indent${_describeShipNav(ship.nav)} ${waypoint.type}');
   }
   final deal = behavior?.deal;
   if (deal != null) {
-    logger.info('  ${describeCostedDeal(deal)}');
+    logger.info('$indent${describeCostedDeal(deal)}');
     final since = DateTime.timestamp().difference(deal.startTime);
-    logger.info(' duration: ${approximateDuration(since)}');
+    logger.info('${indent}duration: ${approximateDuration(since)}');
   }
 }
 
@@ -154,5 +157,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       jumpCache,
       ship,
     );
+  }
+
+  final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache)
+      .map((s) => s.hexNumber)
+      .toList();
+  if (idleHaulers.isNotEmpty) {
+    logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }
 }

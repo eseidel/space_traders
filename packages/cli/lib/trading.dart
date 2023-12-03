@@ -317,12 +317,12 @@ String describeCostedDeal(CostedDeal costedDeal) {
   final name =
       costedDeal.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
   return '${name.padRight(25)} '
-      ' ${deal.sourceSymbol.waypoint.padRight(14)} '
+      ' ${deal.sourceSymbol.sectorLocalName.padRight(11)} '
       // This could use the average expected purchase/sell price across the
       // whole deal volume.
       '${c(costedDeal.expectedInitialBuyPrice).padLeft(8)} '
       '-> '
-      '${deal.destinationSymbol.waypoint.padRight(14)} '
+      '${deal.destinationSymbol.sectorLocalName.padRight(11)} '
       '${c(costedDeal.expectedInitialSellPrice).padLeft(8)} '
       '$coloredProfitString $timeString '
       '${c(costedDeal.expectedCosts).padLeft(8)}';
