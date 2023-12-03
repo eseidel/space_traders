@@ -181,3 +181,11 @@ int? neededCreditsFromPurchaseShipException(ApiException e) {
   }
   return null;
 }
+
+// ApiException 400: {"error":{"message":
+// "Construction material requirements for ADVANCED_CIRCUITRY have been met.",
+// "code":4801}}
+/// Returns true if the exception is a construction requirements met exception.
+bool isConstructionRequirementsMet(ApiException e) {
+  return isAPIExceptionWithCode(e, 4801);
+}

@@ -8,6 +8,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/market_scores.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:db/db.dart';
@@ -384,22 +385,39 @@ Future<JobResult> _handleConstructionDealAtDelivery(
   Market? maybeMarket,
   CostedDeal costedDeal,
 ) async {
+  jobAssert(
+    costedDeal.deal.destinationSymbol == ship.waypointSymbol,
+    'Not at destination.',
+    const Duration(minutes: 10),
+  );
+  final waypointSymbol = costedDeal.deal.destinationSymbol;
+
   final construction = assertNotNull(
-    caches.construction[costedDeal.deal.destinationSymbol],
+    caches.construction[waypointSymbol],
     'No construction.',
     const Duration(minutes: 10),
   );
-
-  await _deliverConstructionMaterialsIfPossible(
-    api,
-    db,
-    caches.agent,
-    caches.construction,
-    caches.ships,
-    ship,
-    construction,
-    costedDeal.tradeSymbol,
-  );
+  try {
+    await _deliverConstructionMaterialsIfPossible(
+      api,
+      db,
+      caches.agent,
+      caches.construction,
+      caches.ships,
+      ship,
+      construction,
+      costedDeal.tradeSymbol,
+    );
+  } on ApiException catch (e) {
+    if (isConstructionRequirementsMet(e)) {
+      shipWarn(
+        ship,
+        'Unable to deliver ${costedDeal.tradeSymbol} to $waypointSymbol.',
+      );
+      return JobResult.complete();
+    }
+    rethrow;
+  }
   return JobResult.complete();
 }
 
@@ -412,17 +430,31 @@ Future<SupplyConstruction200ResponseData?>
   ShipCache shipCache,
   Ship ship,
   Construction construction,
-  TradeSymbol tradeSymbol,
-) async {
-  final unitsBefore = ship.countUnits(tradeSymbol);
+  TradeSymbol tradeSymbol, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final unitsInCargo = ship.countUnits(tradeSymbol);
+  final waypointName = construction.symbol;
   jobAssert(
-    unitsBefore > 0,
+    unitsInCargo > 0,
     'No $tradeSymbol to deliver.',
     const Duration(minutes: 10),
   );
   jobAssert(
     !construction.isComplete,
-    'Construction @ ${construction.symbol} already complete.',
+    'Construction at $waypointName already complete.',
+    const Duration(minutes: 10),
+  );
+
+  final materialBefore = assertNotNull(
+    construction.materialNeeded(tradeSymbol),
+    'Construction at $waypointName does not need $tradeSymbol?',
+    const Duration(minutes: 10),
+  );
+  final unitsToDeliver = min(unitsInCargo, materialBefore.unitsNeeded);
+  jobAssert(
+    unitsToDeliver > 0,
+    'Construction at $waypointName already fulfilled $tradeSymbol.',
     const Duration(minutes: 10),
   );
 
@@ -434,19 +466,20 @@ Future<SupplyConstruction200ResponseData?>
     constructionCache,
     construction,
     tradeSymbol: tradeSymbol,
-    units: unitsBefore,
+    units: unitsToDeliver,
   );
   final material = response.construction.materialNeeded(tradeSymbol)!;
+  final unitsAfter = ship.countUnits(tradeSymbol);
+  final unitsDelivered = unitsAfter - unitsInCargo;
   shipInfo(
     ship,
-    'Supplied $unitsBefore $tradeSymbol '
-    'to ${construction.symbol}; '
+    'Supplied $unitsDelivered $tradeSymbol to $waypointName; '
     '${material.fulfilled}/${material.required_}',
   );
 
   // Update our cargo counts after delivering the contract goods.
-  final unitsAfter = ship.countUnits(tradeSymbol);
-  final unitsDelivered = unitsAfter - unitsBefore;
+  ship.cargo = response.cargo;
+  shipCache.updateShip(ship);
 
   // Record the delivery transaction.
   final delivery = ConstructionDelivery(
@@ -454,7 +487,7 @@ Future<SupplyConstruction200ResponseData?>
     waypointSymbol: ship.waypointSymbol,
     unitsDelivered: unitsDelivered,
     tradeSymbol: tradeSymbol,
-    timestamp: DateTime.timestamp(),
+    timestamp: getNow(),
   );
   final transaction = Transaction.fromConstructionDelivery(
     delivery,

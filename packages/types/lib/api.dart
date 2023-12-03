@@ -680,6 +680,12 @@ extension ConstructionUtils on Construction {
   }
 }
 
+/// Extensions onto ConstructionMaterial to make it easier to work with.
+extension ConstructionMaterialUtils on ConstructionMaterial {
+  /// Returns the amount of the given trade good the construction still needs.
+  int get unitsNeeded => required_ - fulfilled;
+}
+
 /// Extensions onto MarketTransaction to make it easier to work with.
 extension MarketTransactionUtils on MarketTransaction {
   /// Returns the TradeSymbol for the given transaction.
