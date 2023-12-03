@@ -451,7 +451,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
   shipInfo(
     ship,
-    '🛫 to ${waypoint.symbol} ${waypoint.type} '
+    '🛫 to ${waypoint.waypointSymbol} ${waypoint.type} '
     '(${approximateDuration(flightTime)})$fuelString',
   );
   _checkFlightTime(flightTime, ship, result);

@@ -328,7 +328,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
   final market = await marketCache.refreshMarket(marketSymbol);
   await recordMarketData(marketPrices, market, getNow: getNow);
   // Powershell needs an extra space after the emoji.
-  shipInfo(ship, '✍️  market data @ ${market.symbol}');
+  shipInfo(ship, '✍️  market data @ ${market.waypointSymbol.sectorLocalName}');
   return market;
 }
 

@@ -111,7 +111,7 @@ class WaypointSymbol extends Equatable {
   }
 
   @override
-  String toString() => waypoint;
+  String toString() => sectorLocalName;
 
   /// Returns the json representation of the waypoint.
   String toJson() => waypoint;

@@ -84,7 +84,7 @@ Future<DateTime?> beingRouteAndLog(
   }
 
   state.routePlan = routePlan;
-  final message = 'Beginning route to ${routePlan.endSymbol} '
+  final message = 'Beginning route to ${routePlan.endSymbol.sectorLocalName} '
       '(${approximateDuration(routePlan.duration)})';
   if (routePlan.duration.inMinutes > 5) {
     shipWarn(ship, message);
