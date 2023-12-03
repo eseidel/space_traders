@@ -164,8 +164,8 @@ void main() {
     final profit = lightGreen.wrap('      +1c (100%)');
     expect(
       describeCostedDeal(costed),
-      'ADVANCED_CIRCUITRY         S-A-B                '
-      '1c -> S-A-C                2c $profit 10s   0c/s       1c',
+      'ADVANCED_CIRCUITRY         A-B               '
+      '1c -> A-C               2c $profit 10s   0c/s       1c',
     );
   });
 
@@ -694,6 +694,6 @@ void main() {
       costPerFuelUnit: 100,
     );
     expect(costedDeal.cargoSize, 100);
-    expect(costedDeal.expectedUnits, 20);
+    expect(costedDeal.expectedUnits, 10);
   });
 }

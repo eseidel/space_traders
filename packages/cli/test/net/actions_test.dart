@@ -821,7 +821,7 @@ void main() {
     await runWithLogger(logger, () async {
       await chartWaypointAndLog(api, chartingCache, ship);
     });
-    verify(() => logger.warn('🛸#1  S-A-W was already charted')).called(1);
+    verify(() => logger.warn('🛸#1  A-W was already charted')).called(1);
 
     // Any other exception is thrown.
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
