@@ -10,13 +10,16 @@ import 'package:types/types.dart';
 
 double _expectedPercentageChangeByVolume(int tradeVolume) {
   if (tradeVolume < 10) {
-    return 0.1;
+    return 1;
+  }
+  if (tradeVolume < 25) {
+    return 0.50;
   }
   if (tradeVolume < 50) {
-    return 0.05;
+    return 0.30;
   }
   if (tradeVolume < 100) {
-    return 0.01;
+    return 0.10;
   }
   return 0;
 }
