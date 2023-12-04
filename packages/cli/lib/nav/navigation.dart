@@ -304,10 +304,12 @@ Future<NavResult> continueNavigationIfNeeded(
               ship,
             );
           } else {
-            shipErr(
-                ship,
-                'No market at ${ship.waypointSymbol}, '
-                'cannot refuel, drifting anyway');
+            jobAssert(
+              false,
+              'No market at ${ship.waypointSymbol}, '
+              'cannot refuel, need to replan.',
+              const Duration(minutes: 10),
+            );
           }
         }
       }
