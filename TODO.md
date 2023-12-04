@@ -795,3 +795,13 @@ And scan for ShipyardListings as part of fetch_queue.dart
 ### Integrate fetch_queue into the client
 
 Right now lots of things fail before we have scaned for market listings.
+
+### Confused hauler transfers
+
+[WARN] 🛸#D  scheduled for 2023-12-04 00:22:33.750 but it is 2s late
+🛸#D  Still have 2 cargo, waiting for hauler to arrive.
+🛸#D  No haulers at JX78-XF5X, unknown next arrival time for ESEIDEL-7, ESEIDEL-9, checking in 1 minute.
+🛸#D  Hauler ESEIDEL-7 is IN_ORBIT to JX78-XF5X arrival -17m, with 0 space available.
+🛸#D  Hauler ESEIDEL-9 is IN_ORBIT to JX78-XF5X arrival -7m, with 75 space available.
+
+I think this must have come because squads recently changed?
