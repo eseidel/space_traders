@@ -11,7 +11,7 @@ Query allFactionsQuery() => const Query(
 Query factionBySymbolQuery(FactionSymbol symbol) => Query(
       'SELECT * FROM faction_ WHERE symbol = @symbol',
       substitutionValues: {
-        'symbol': symbol.toString(),
+        'symbol': symbol.toJson(),
       },
     );
 

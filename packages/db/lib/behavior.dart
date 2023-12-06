@@ -5,13 +5,13 @@ import 'package:types/types.dart';
 Query behaviorBySymbolQuery(ShipSymbol shipSymbol) => Query(
       'SELECT * FROM behavior_ WHERE ship_symbol = @ship_symbol',
       substitutionValues: {
-        'ship_symbol': shipSymbol.toString(),
+        'ship_symbol': shipSymbol.toJson(),
       },
     );
 
 /// Convert a BehaviorState to a column map.
 Map<String, dynamic> behaviorStateToColumnMap(BehaviorState state) => {
-      'ship_symbol': state.shipSymbol.toString(),
+      'ship_symbol': state.shipSymbol.toJson(),
       'json': state.toJson(),
     };
 
