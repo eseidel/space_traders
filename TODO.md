@@ -755,12 +755,6 @@ ESEIDEL-5: Behavior.trader
 Validate extractableByMount, against what is actually extracted and
 expectedGoodsForWaypoint against what is actually surveyed.
 
-### Teach MineScore about multiple markets.
-
-### Teach MineScore about WaypointType
-
-### Unify MineScore and SiphonScore?
-
 ### Dies delivering construction materials:
 
 Unhandled exception:
@@ -794,7 +788,7 @@ And scan for ShipyardListings as part of fetch_queue.dart
 
 ### Integrate fetch_queue into the client
 
-Right now lots of things fail before we have scaned for market listings.
+Right now lots of things fail before we have scanned for market listings.
 
 ### Confused hauler transfers
 
