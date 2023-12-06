@@ -89,7 +89,7 @@ Future<DateTime?> advanceShipBehavior(
       state,
       getNow: getNow,
     );
-  } on NavigationException catch (e) {
+  } on JobException catch (e) {
     logger.err('Error advancing ship behavior: $e');
     caches.behaviors.deleteBehavior(ship.shipSymbol);
     return null;

@@ -165,18 +165,6 @@ class NavResult {
 //   );
 // }
 
-/// Exception thrown when navigation fails.
-class NavigationException implements Exception {
-  /// Create a new navigation exception.
-  NavigationException(this.message);
-
-  /// Message for this exception.
-  final String message;
-
-  @override
-  String toString() => 'NavigationException: $message';
-}
-
 /// Continue navigation if needed, returning the wait time if so.
 /// Reads the destination from the ship's behavior state.
 Future<NavResult> continueNavigationIfNeeded(
@@ -225,8 +213,11 @@ Future<NavResult> continueNavigationIfNeeded(
   }
   final action = routePlan.nextActionFrom(ship.waypointSymbol);
   if (action == null) {
-    throw NavigationException('No action for ${ship.waypointSymbol} '
-        'in route plan, likely off course.');
+    throw JobException(
+      'No action for ${ship.waypointSymbol} '
+      'in route plan, likely off course.',
+      const Duration(minutes: 5),
+    );
   }
   final actionEnd = caches.systems.waypoint(action.endSymbol);
   // All navigation actions require being un-docked, but the action functions
@@ -281,10 +272,10 @@ Future<NavResult> continueNavigationIfNeeded(
       if (ship.usesFuel) {
         final fuelNeeded = action.fuelUsed;
         jobAssert(
-          fuelNeeded < ship.fuel.capacity,
-          'Planned navigation requires more fuel than ship can hold '
-          '(${ship.fuel.capacity} < $fuelNeeded)',
-          const Duration(minutes: 10),
+          fuelNeeded <= ship.fuel.capacity,
+          'Planned navigation requires more fuel '
+          'than ship can hold (${ship.fuel.capacity} < $fuelNeeded)',
+          const Duration(minutes: 5),
         );
         if (fuelNeeded > ship.fuel.current) {
           final market = await visitLocalMarket(
@@ -304,12 +295,16 @@ Future<NavResult> continueNavigationIfNeeded(
               ship,
             );
           } else {
-            jobAssert(
-              false,
-              'No market at ${ship.waypointSymbol}, '
-              'cannot refuel, need to replan.',
-              const Duration(minutes: 10),
-            );
+            // TODO(eseidel): Make this throw once we're better about fuel.
+            shipErr(
+                ship,
+                'No market at ${ship.waypointSymbol}, '
+                'cannot refuel, need to replan.');
+            // throw JobException(
+            //   'No market at ${ship.waypointSymbol}, '
+            //   'cannot refuel, need to replan.',
+            //   const Duration(minutes: 5),
+            // );
           }
         }
       }

@@ -1,4 +1,5 @@
 import 'package:cli/api.dart';
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/logger.dart';
@@ -421,7 +422,7 @@ void main() {
           getNow: getNow,
         ),
       ),
-      throwsA(isA<NavigationException>()),
+      throwsA(isA<JobException>()),
     );
     // Maybe it should clear the route?
     expect(state.routePlan, isNotNull);
