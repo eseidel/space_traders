@@ -78,9 +78,9 @@ class ExtractionRecord extends Equatable {
   /// Return a JSON map for this extraction.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'shipSymbol': shipSymbol.toString(),
-      'waypointSymbol': waypointSymbol.toString(),
-      'tradeSymbol': tradeSymbol.toString(),
+      'shipSymbol': shipSymbol.toJson(),
+      'waypointSymbol': waypointSymbol.toJson(),
+      'tradeSymbol': tradeSymbol.toJson(),
       'quantity': quantity,
       'power': power,
       'surveySignature': surveySignature,
