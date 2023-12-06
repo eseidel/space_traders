@@ -804,4 +804,32 @@ Right now lots of things fail before we have scaned for market listings.
 🛸#D  Hauler ESEIDEL-7 is IN_ORBIT to JX78-XF5X arrival -17m, with 0 space available.
 🛸#D  Hauler ESEIDEL-9 is IN_ORBIT to JX78-XF5X arrival -7m, with 75 space available.
 
-I think this must have come because squads recently changed?
+
+🛸#11 Still have 4 cargo, waiting for hauler to arrive.
+🛸#11 No haulers at JX78-XF5X, unknown next arrival time for ESEIDEL-7, ESEIDEL-9, checking in 1 minute.
+🛸#11 Hauler ESEIDEL-7 is IN_ORBIT to JX78-XF5X arrival -7m, with 80 space available.
+🛸#11 Hauler ESEIDEL-9 is IN_ORBIT to JX78-XF5X arrival -18m, with 0 space available.
+
+11 is in orbit at X1-JX78-XF5X.  7 is in orbit at X1-JX78-XF5X.
+
+I think this is due to miner haulers not running often? And thus not updating
+their transit status?
+
+### Unify JobException and NavigationException.
+
+Throwing a JobException from within continueNavigationIfNeeded will cause
+an infinte loop.
+
+### Construction doens't seem to avoid over-buying.
+
+If you disable the "avoid from same source" construction will buy multiple
+times of the same final set of units for a contract.  e.g. if only 40 more
+are needed, you'll still end up with two 40-sized trades going.
+
+### Find a way to record where jump gates go.
+
+### Resurrect jump planner and teach it that jumps cost money.
+
+### Teach satelites to stick to a single system?
+
+### Teach satalites to ignore exchange-only markets?

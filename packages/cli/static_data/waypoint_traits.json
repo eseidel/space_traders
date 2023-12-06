@@ -260,6 +260,11 @@
   "description": "A waypoint enveloped in a powerful magnetic field, potentially affecting spacecraft systems, and creating unique phenomena such as the concentration of exotic matter and graviton emitters."
  },
  {
+  "symbol": "SUPERVOLCANOES",
+  "name": "Supervolcanoes",
+  "description": "Gargantuan volcanic structures capable of cataclysmic eruptions, shaping the environment and posing a constant threat to nearby settlements."
+ },
+ {
   "symbol": "SURVEILLANCE_OUTPOST",
   "name": "Surveillance Outpost",
   "description": "A covert installation tasked with monitoring and collecting intelligence on nearby regions and potential threats."
