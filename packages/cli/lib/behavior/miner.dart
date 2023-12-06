@@ -399,23 +399,10 @@ Future<JobResult> emptyCargoIfNeeded(
 
 Ship? _nextArrivingHauler(
   List<Ship> haulers,
-  WaypointSymbol here, {
-  DateTime Function() getNow = defaultGetNow,
-}) {
+  WaypointSymbol here,
+) {
   if (haulers.isEmpty) {
     return null;
-  }
-  // Don't ever return an "arrival" time before now to avoid callers who want
-  // to use this as a wait time needlessly looping (starving the hauler itself
-  // from updating its transit status).
-  Ship? ensureFutureArrival(Ship? ship) {
-    if (ship == null) {
-      return null;
-    }
-    if (ship.nav.route.arrival.isBefore(getNow())) {
-      return null;
-    }
-    return ship;
   }
 
   final haulersInTransit = haulers
@@ -424,7 +411,7 @@ Ship? _nextArrivingHauler(
   final arrivalTime = haulersInTransit.firstOrNull?.nav.route.arrival;
 
   if (arrivalTime != null) {
-    return ensureFutureArrival(haulersInTransit.firstOrNull);
+    return haulersInTransit.firstOrNull;
   }
   // If none of the haulers are headed towards us, return the one which is
   // soonest to finish its current route, since that's a reasonable time to
@@ -432,7 +419,7 @@ Ship? _nextArrivingHauler(
   final haulersNotHere = haulers.where((h) => h.waypointSymbol != here);
   final haulersNotHereSorted =
       haulersNotHere.sortedBy((h) => h.nav.route.arrival);
-  return ensureFutureArrival(haulersNotHereSorted.firstOrNull);
+  return haulersNotHereSorted.firstOrNull;
 }
 
 /// Attempt to sell cargo ourselves by traveling to a market.
@@ -533,6 +520,13 @@ JobResult _waitForHauler(
   if (nextHauler != null) {
     final waitTime = nextHauler.nav.route.arrival;
     final duration = waitTime.difference(getNow());
+    if (duration.isNegative) {
+      shipWarn(
+        ship,
+        'Hauler ${nextHauler.symbol} is already here, waiting 1 minute.',
+      );
+      return JobResult.wait(getNow().add(const Duration(minutes: 1)));
+    }
     shipInfo(
       ship,
       'Waiting ${approximateDuration(duration)} for hauler arrival.',
