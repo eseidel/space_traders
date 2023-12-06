@@ -726,9 +726,10 @@ bool Function(Deal) avoidDealsInProgress(
       // Deals need to differ in their source *or* their trade symbol
       // for us to consider them.
       if (d.deal.sourceSymbol == deal.sourceSymbol &&
-          d.deal.tradeSymbol == deal.tradeSymbol &&
+              d.deal.tradeSymbol == deal.tradeSymbol
           // Hack to help finish construction.
-          !deal.isConstructionDelivery) {
+          // && !deal.isConstructionDelivery
+          ) {
         return false;
       }
       return filter?.call(deal) ?? true;
