@@ -115,7 +115,7 @@ Future<JobResult> doSystemWatcher(
     );
     return JobResult.wait(waitTime);
   }
-  shipWarn(ship, 'No stale markets near waypoints near $waypoint.');
+  shipWarn(ship, 'No stale markets near waypoints near ${waypoint.symbol}.');
   final newMaxAge = centralCommand.shoretenMaxPriceAgeForSystem(systemSymbol);
   shipWarn(
     ship,
