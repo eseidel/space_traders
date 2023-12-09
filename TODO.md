@@ -814,7 +814,7 @@ their transit status?
 Throwing a JobException from within continueNavigationIfNeeded will cause
 an infinte loop.
 
-### Construction doens't seem to avoid over-buying.
+### Construction doesn't seem to avoid over-buying.
 
 If you disable the "avoid from same source" construction will buy multiple
 times of the same final set of units for a contract.  e.g. if only 40 more
@@ -824,8 +824,8 @@ are needed, you'll still end up with two 40-sized trades going.
 
 ### Resurrect jump planner and teach it that jumps cost money.
 
-### Teach satelites to stick to a single system?
+### Teach satellites to stick to a single system?
 
-### Teach satalites to ignore exchange-only markets?
+### Teach satellites to ignore exchange-only markets?
 
 ### Reduce manual construction of CostedDeal in tests.
