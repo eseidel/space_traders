@@ -183,11 +183,11 @@ extension CostedDealPrediction on CostedDeal {
     return (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
   }
 
-  // This does not acount for any expected profit.
+  // This does not account for any expected profit.
   /// The expected per-unit purchase price for the next lot of units.
   /// For each additional unit (or batch of) we buy, we expect to:
   /// - spend more to buy it (prices go up at source market)
-  /// - less to transport it (opex is amortized over more units)
+  /// - less to transport it (OpEx is amortized over more units)
   /// - and sell it for less (prices go down at destination market)
   /// This function answers the question "what's the max we would pay
   /// perUnit for this next lot of unit and still expect to profit".
