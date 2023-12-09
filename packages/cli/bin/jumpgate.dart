@@ -1,6 +1,7 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
+import 'package:cli/printing.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Load up the jump gate for the main system.
@@ -26,9 +27,17 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpGate = await jumpGateCache.getOrFetch(api, jumpGateSymbol);
   logger.info('$jumpGateSymbol:');
   for (final connection in jumpGate.connections) {
-    final waypoint = await waypointCache.waypoint(connection);
-    final status =
-        waypoint.isUnderConstruction ? 'under construction' : 'ready';
+    final isUnderConstrustion =
+        await waypointCache.isUnderConstruction(connection);
+
+    final String status;
+    if (isUnderConstrustion) {
+      final construction = constructionCache[connection];
+      final progress = describeConstructionProgress(construction);
+      status = 'under construction ($progress)';
+    } else {
+      status = 'ready';
+    }
     logger.info('  ${connection.sectorLocalName.padRight(9)} $status');
   }
 

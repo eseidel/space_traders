@@ -169,6 +169,18 @@ class WaypointCache {
         .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
   }
 
+  /// Returns true if the given waypoint is under construction.
+  Future<bool> isUnderConstruction(WaypointSymbol waypointSymbol) async {
+    // If we've cached a false result that can never change.
+    final maybe = _constructionCache.isUnderConstruction(waypointSymbol);
+    if (maybe == false) {
+      return false;
+    }
+    // Could take a maxAge and only hit the network if we don't have a cached
+    // value or it's too old.
+    return (await waypoint(waypointSymbol)).isUnderConstruction;
+  }
+
   /// Returns true if the given waypoint has a shipyard.
   Future<bool> hasShipyard(WaypointSymbol waypointSymbol) async {
     return (await waypoint(waypointSymbol)).hasShipyard;

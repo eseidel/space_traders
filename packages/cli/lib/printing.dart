@@ -218,3 +218,23 @@ void verifyCooldown(Ship ship, String label, int expected, Cooldown cooldown) {
         'got ${cooldown.totalSeconds}.');
   }
 }
+
+/// Return a string describing the given [construction] progress.
+String describeConstructionProgress(Construction? construction) {
+  if (construction == null) {
+    return 'null';
+  }
+  if (construction.isComplete) {
+    return 'complete';
+  }
+  final materials = construction.materials;
+  final buffer = StringBuffer();
+  for (final material in materials) {
+    if (buffer.isNotEmpty) {
+      buffer.write(', ');
+    }
+    buffer.write('${material.tradeSymbol}: '
+        '${material.fulfilled} / ${material.required_}');
+  }
+  return buffer.toString();
+}
