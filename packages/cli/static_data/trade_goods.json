@@ -40,6 +40,11 @@
   "description": "Composite materials made from natural and synthetic materials, used in various applications, such as medical implants and biodegradable packaging."
  },
  {
+  "symbol": "BOTANICAL_SPECIMENS",
+  "name": "Botanical Specimens",
+  "description": "Samples of plants or other vegetation collected from various locations, often used for research or study."
+ },
+ {
   "symbol": "CLOTHING",
   "name": "Clothing",
   "description": "A wide range of clothing and fashion items, including garments, accessories, and textiles."
@@ -130,6 +135,11 @@
   "description": "A valuable ore used in the production of gold and other precious metals. Gold ore is often used in the production of jewelry, coins, and other decorative items, as well as in the production of electronics and other high-tech applications."
  },
  {
+  "symbol": "HOLOGRAPHICS",
+  "name": "Holographics",
+  "description": "Advanced technology that allows for the creation of three-dimensional images using light and other electromagnetic fields."
+ },
+ {
   "symbol": "HYDROCARBON",
   "name": "Hydrocarbons",
   "description": "A highly-valued substance used in the production of fuels, plastics, and other industrial products."
@@ -205,9 +215,19 @@
   "description": "Compact fusion reactors that provide a clean, reliable, and virtually unlimited source of energy."
  },
  {
+  "symbol": "MOOD_REGULATORS",
+  "name": "Mood Regulators",
+  "description": "Drugs or other medical treatments that are used to control or regulate mood and emotions."
+ },
+ {
   "symbol": "MOUNT_GAS_SIPHON_I",
   "name": "Gas Siphon I",
   "description": "A basic gas siphon that can extract gas from gas giants and other gas-rich bodies."
+ },
+ {
+  "symbol": "MOUNT_GAS_SIPHON_II",
+  "name": "Gas Siphon II",
+  "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies more efficiently and at a higher rate."
  },
  {
   "symbol": "MOUNT_MINING_LASER_I",
@@ -215,9 +235,29 @@
   "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects."
  },
  {
+  "symbol": "MOUNT_MINING_LASER_II",
+  "name": "Mining Laser II",
+  "description": "An advanced mining laser that is more efficient and effective at extracting valuable minerals from asteroids and other space objects."
+ },
+ {
   "symbol": "MOUNT_SURVEYOR_I",
   "name": "Surveyor I",
   "description": "A basic survey probe that can be used to gather information about a mineral deposit."
+ },
+ {
+  "symbol": "MOUNT_SURVEYOR_II",
+  "name": "Surveyor II",
+  "description": "An advanced survey probe that can be used to gather information about a mineral deposit with greater accuracy."
+ },
+ {
+  "symbol": "NANOBOTS",
+  "name": "Nanobots",
+  "description": "Tiny robots at the nanoscale, used in various applications, such as medical treatments, manufacturing, and environmental cleanup."
+ },
+ {
+  "symbol": "NEURAL_CHIPS",
+  "name": "Neural Chips",
+  "description": "Microchips that are implanted in the brain to enhance cognitive abilities, such as memory, learning, and decision-making."
  },
  {
   "symbol": "NOVEL_LIFEFORMS",
@@ -248,6 +288,11 @@
   "symbol": "PRECIOUS_STONES",
   "name": "Precious Stones",
   "description": "A collection of valuable gems and diamonds, often used in jewelry and other decorative objects."
+ },
+ {
+  "symbol": "QUANTUM_DRIVES",
+  "name": "Quantum Drives",
+  "description": "Advanced propulsion systems that use quantum mechanics to enable near-instantaneous travel over long distances."
  },
  {
   "symbol": "QUARTZ_SAND",
@@ -283,6 +328,11 @@
   "symbol": "SILVER_ORE",
   "name": "Silver Ore",
   "description": "A raw, unprocessed form of silver, often found in mines and underground deposits on planets and moons."
+ },
+ {
+  "symbol": "SUPERGRAINS",
+  "name": "Supergrains",
+  "description": "Genetically modified grains with enhanced nutritional value, yield, and resistance to pests and diseases."
  },
  {
   "symbol": "URANITE",
