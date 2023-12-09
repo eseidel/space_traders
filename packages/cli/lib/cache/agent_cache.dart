@@ -52,6 +52,13 @@ class AgentCache extends JsonStore<Agent> {
     save();
   }
 
+  /// Adjust the credits of the agent.
+  // All callers of this are probably wrong.
+  void adjustCredits(int adjustment) {
+    agent.credits += adjustment;
+    save();
+  }
+
   /// Number of requests between checks to ensure ships are up to date.
   final int requestsBetweenChecks;
 

@@ -480,27 +480,55 @@ Future<void> chartWaypointAndLog(
 }
 
 /// Use the jump gate to travel to systemSymbol and log.
-// Future<JumpShip200ResponseData> useJumpGateAndLog(
-//   Api api,
-//   ShipCache shipCache,
-//   Ship ship,
-//   SystemSymbol systemSymbol,
-// ) async {
-//   // Using a jump gate requires us to be in orbit.
-//   await undockIfNeeded(api, shipCache, ship);
+Future<JumpShip200ResponseData> useJumpGateAndLog(
+  Api api,
+  Database db,
+  MarketPrices marketPrices,
+  AgentCache agentCache,
+  ShipCache shipCache,
+  Ship ship,
+  WaypointSymbol destination,
+) async {
+  // Using a jump gate requires us to be in orbit.
+  await undockIfNeeded(api, shipCache, ship);
 
-//   shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $systemSymbol');
-//   final jumpShipRequest = JumpShipRequest(systemSymbol: systemSymbol.system);
-//   final response =
-//       await api.fleet.jumpShip(ship.symbol,
-//          jumpShipRequest: jumpShipRequest);
-//   ship
-//     ..nav = response!.data.nav
-//     ..cooldown = response.data.cooldown;
-//   shipCache.updateShip(ship);
-//   // shipDetail(ship, 'Used Jump Gate to $systemSymbol');
-//   return response.data;
-// }
+  final destinationSystem = destination.systemSymbol;
+  shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $destinationSystem');
+  final jumpShipRequest = JumpShipRequest(waypointSymbol: destination.waypoint);
+  final response = await api.fleet.jumpShip(
+    ship.symbol,
+    jumpShipRequest: jumpShipRequest,
+  );
+  ship
+    ..nav = response!.data.nav
+    ..cooldown = response.data.cooldown;
+  shipCache.updateShip(ship);
+
+  final data = response.data;
+  final marketTransaction = data.transaction;
+  // TODO(eseidel): JumpShip200Response does not include the agent.
+  // so we modify the agent ourselves.
+  // agentCache.agent = response.data.agent;
+  agentCache.adjustCredits(-marketTransaction.totalPrice);
+
+  final agent = agentCache.agent;
+  logMarketTransaction(
+    ship,
+    marketPrices,
+    agent,
+    marketTransaction,
+    transactionEmoji: '☢️',
+  );
+  final transaction = Transaction.fromMarketTransaction(
+    marketTransaction,
+    agent.credits,
+    AccountingType.fuel,
+  );
+  await db.insertTransaction(transaction);
+
+  shipInfo(ship, 'Used Jump Gate to $destinationSystem');
+  return response.data;
+}
 
 /// Negotiate a contract for [ship] and log.
 Future<Contract> negotiateContractAndLog(
