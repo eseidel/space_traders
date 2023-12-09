@@ -42,7 +42,7 @@ void main() {
         asteroid,
       ],
     );
-    expect(system.jumpGateWaypoint, jumpGate);
+    expect(system.jumpGateWaypoints.first, jumpGate);
   });
 
   test('Waypoint.hasTrait', () {

@@ -8,9 +8,6 @@ import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:types/types.dart';
 
-/// Constant specifying the range of jump gates.
-const kJumpGateRange = 2500;
-
 /// A cache of the systems in the game.
 class SystemsCache extends JsonListStore<System> {
   /// Create a new [SystemsCache] with the given [systems] and file system.
@@ -43,6 +40,7 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Load the cache from disk.
+  // TODO(eseidel): Make non-nullable.
   static SystemsCache? load(
     FileSystem fs, {
     String path = defaultCacheFilePath,

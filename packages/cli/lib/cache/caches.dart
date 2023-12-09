@@ -4,6 +4,7 @@ import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
+import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
@@ -25,6 +26,7 @@ export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/construction_cache.dart';
 export 'package:cli/cache/contract_cache.dart';
+export 'package:cli/cache/jump_gate_cache.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
@@ -128,12 +130,10 @@ class Caches {
         await ContractCache.loadOrFetch(api, fs: fs, forceRefresh: true);
     final behaviors = BehaviorCache.load(fs);
 
-    // final systemConnectivity = SystemConnectivity.fromSystemsCache(systems);
-    // final jumps = JumpCache();
-    final routePlanner = RoutePlanner(
-      // jumpCache: jumps,
-      systemsCache: systems,
-      // systemConnectivity: systemConnectivity,
+    final jumpGateCache = JumpGateCache.load(fs);
+    final routePlanner = RoutePlanner.fromCaches(
+      systems,
+      jumpGateCache,
       sellsFuel: defaultSellsFuel(marketListings),
     );
 

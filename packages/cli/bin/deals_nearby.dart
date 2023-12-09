@@ -16,8 +16,10 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
-  final routePlanner = RoutePlanner.fromSystemsCache(
+  final jumpGateCache = JumpGateCache.load(fs);
+  final routePlanner = RoutePlanner.fromCaches(
     systemsCache,
+    jumpGateCache,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final marketPrices = MarketPrices.load(fs);

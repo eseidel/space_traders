@@ -11,8 +11,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
 
   final marketPrices = MarketPrices.load(fs);
-  final routePlanner = RoutePlanner(
-    systemsCache: systemsCache,
+  final jumpGateCache = JumpGateCache.load(fs);
+  final routePlanner = RoutePlanner.fromCaches(
+    systemsCache,
+    jumpGateCache,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final staticCaches = StaticCaches.load(fs);

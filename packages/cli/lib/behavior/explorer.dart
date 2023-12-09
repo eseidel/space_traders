@@ -64,7 +64,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
   if (ship.systemSymbol == system.systemSymbol) {
     start = ship.waypointSymbol;
   } else {
-    start = system.jumpGateWaypoint?.waypointSymbol;
+    start = system.jumpGateWaypoints.firstOrNull?.waypointSymbol;
   }
   final systemWaypoints = system.waypoints.toList(); // Copy so we can sort.
   if (start != null) {

@@ -3,6 +3,7 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -10,19 +11,21 @@ import 'package:types/types.dart';
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketPrices extends Mock implements MarketPrices {}
+
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
+class _MockShip extends Mock implements Ship {}
+
+class _MockShipCargo extends Mock implements ShipCargo {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
+
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class _MockMarketPrices extends Mock implements MarketPrices {}
-
-class _MockShip extends Mock implements Ship {}
-
-class _MockShipEngine extends Mock implements ShipEngine {}
-
-class _MockRoutePlanner extends Mock implements RoutePlanner {}
-
-class _MockShipCargo extends Mock implements ShipCargo {}
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 BuyOpp _makeBuyOpp({
   required WaypointSymbol marketSymbol,
@@ -262,8 +265,12 @@ void main() {
       ),
     );
 
-    final routePlanner =
-        RoutePlanner(systemsCache: systemsCache, sellsFuel: (_) => true);
+    final systemConnectivity = _MockSystemConnectivity();
+    final routePlanner = RoutePlanner.fromSystemsCache(
+      systemsCache,
+      systemConnectivity,
+      sellsFuel: (_) => true,
+    );
 
     final logger = _MockLogger();
 

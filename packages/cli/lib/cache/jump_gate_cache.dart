@@ -16,6 +16,19 @@ class JumpGateRecord extends Equatable {
     required this.timestamp,
   });
 
+  /// Creates a new JumpGateRecord from a JumpGate.
+  factory JumpGateRecord.fromJumpGate(
+    WaypointSymbol waypointSymbol,
+    JumpGate jumpGate,
+    DateTime now,
+  ) {
+    return JumpGateRecord(
+      connections: jumpGate.connections.map(WaypointSymbol.fromString).toSet(),
+      timestamp: now,
+      waypointSymbol: waypointSymbol,
+    );
+  }
+
   /// Creates a new JumpGateRecord from JSON.
   factory JumpGateRecord.fromJson(Map<String, dynamic> json) {
     return JumpGateRecord(
@@ -36,6 +49,11 @@ class JumpGateRecord extends Equatable {
 
   /// The connections for this jump gate.
   final Set<WaypointSymbol> connections;
+
+  /// Converts this object to JumpGate model object.
+  JumpGate toJumpGate() => JumpGate(
+        connections: connections.map((e) => e.toString()).sorted(),
+      );
 
   @override
   List<Object?> get props => [waypointSymbol, timestamp, connections];
@@ -92,11 +110,8 @@ class JumpGateCache extends JsonListStore<JumpGateRecord> {
       (record) => record.waypointSymbol == waypointSymbol,
     );
 
-    final newRecord = JumpGateRecord(
-      waypointSymbol: waypointSymbol,
-      connections: jumpGate.connections.map(WaypointSymbol.fromString).toSet(),
-      timestamp: getNow(),
-    );
+    final newRecord =
+        JumpGateRecord.fromJumpGate(waypointSymbol, jumpGate, getNow());
     if (index >= 0) {
       records[index] = newRecord;
     } else {
@@ -104,6 +119,12 @@ class JumpGateCache extends JsonListStore<JumpGateRecord> {
     }
 
     save();
+  }
+
+  /// Gets all jump gates for the given system.
+  Iterable<JumpGateRecord> recordsForSystem(SystemSymbol systemSymbol) {
+    return values
+        .where((record) => record.waypointSymbol.systemSymbol == systemSymbol);
   }
 
   /// Gets the connections for the jump gate with the given symbol.
@@ -136,9 +157,7 @@ class JumpGateCache extends JsonListStore<JumpGateRecord> {
   }) async {
     final record = recordForSymbol(waypointSymbol);
     if (record != null) {
-      return JumpGate(
-        connections: record.connections.map((e) => e.toString()).sorted(),
-      );
+      return record.toJumpGate();
     }
     final jumpGate = await getJumpGate(api, waypointSymbol);
     updateJumpGate(

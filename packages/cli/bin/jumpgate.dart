@@ -1,5 +1,4 @@
 import 'package:cli/cache/caches.dart';
-import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
 

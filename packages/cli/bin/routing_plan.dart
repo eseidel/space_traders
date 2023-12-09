@@ -74,8 +74,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     throw UnimplementedError();
   }
 
-  final routePlanner =
-      RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: sellsFuel);
+  final jumpGateCache = JumpGateCache.load(fs);
+  final routePlanner = RoutePlanner.fromCaches(
+    systemsCache,
+    jumpGateCache,
+    sellsFuel: sellsFuel,
+  );
 
   final ship = staticCaches.shipyardShips[shipType]!;
   final shipSpeed = ship.engine.speed;

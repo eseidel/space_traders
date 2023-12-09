@@ -1,3 +1,4 @@
+import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:file/local.dart';
@@ -191,23 +192,20 @@ void main() {
     final b = System(
       sectorSymbol: 'S',
       symbol: 'b',
-      x: kJumpGateRange,
+      x: 2500,
       y: 0,
       type: SystemType.RED_STAR,
     );
     final c = System(
       sectorSymbol: 'S',
       symbol: 'c',
-      x: kJumpGateRange + 1,
+      x: 2501,
       y: 0,
       type: SystemType.RED_STAR,
     );
-    // These constants vary with kJumpGateRange.
     expect(cooldownTimeForJumpBetweenSystems(a, b), 250);
     expect(cooldownTimeForJumpBetweenSystems(b, a), 250);
 
-    expect(() => cooldownTimeForJumpBetweenSystems(a, c), throwsArgumentError);
-    expect(() => cooldownTimeForJumpBetweenSystems(a, a), throwsArgumentError);
     expect(cooldownTimeForJumpBetweenSystems(b, c), 60);
 
     expect(cooldownTimeForJumpDistance(2000), 200);
@@ -215,15 +213,7 @@ void main() {
     // Server seems to round, rather than floor:
     expect(cooldownTimeForJumpDistance(1527), 153);
 
-    expect(
-      () => cooldownTimeForJumpDistance(kJumpGateRange + 1),
-      throwsArgumentError,
-    );
     expect(() => cooldownTimeForJumpDistance(-20), throwsArgumentError);
-    expect(
-      () => cooldownTimeForJumpDistance(-kJumpGateRange - 1),
-      throwsArgumentError,
-    );
   });
 
   test('planRoute', () {
@@ -237,8 +227,12 @@ void main() {
       fs,
       path: 'test/nav/fixtures/systems-09-24-2023.json',
     )!;
-    final routePlanner =
-        RoutePlanner.fromSystemsCache(systemsCache, sellsFuel: (_) => false);
+    final jumpGateCache = JumpGateCache([], fs: fs);
+    final routePlanner = RoutePlanner.fromCaches(
+      systemsCache,
+      jumpGateCache,
+      sellsFuel: (_) => false,
+    );
     RoutePlan? planRoute(
       String startString,
       String endString, {
@@ -364,8 +358,10 @@ void main() {
       fs: fs,
     );
 
-    final routePlanner = RoutePlanner.fromSystemsCache(
+    final jumpGateCache = JumpGateCache([], fs: fs);
+    final routePlanner = RoutePlanner.fromCaches(
       systemsCache,
+      jumpGateCache,
       // Allow refueling at waypoints or this test will fail.
       sellsFuel: (_) => true,
     );

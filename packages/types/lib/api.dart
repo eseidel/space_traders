@@ -218,9 +218,11 @@ extension SystemUtils on System {
   SystemSymbol get systemSymbol => SystemSymbol.fromString(symbol);
 
   /// Returns the the SystemWaypoint for the jump gate if it has one.
-  SystemWaypoint? get jumpGateWaypoint => waypoints.firstWhereOrNull(
-        (w) => w.type == WaypointType.JUMP_GATE,
-      );
+  Iterable<SystemWaypoint> get jumpGateWaypoints =>
+      waypoints.where((w) => w.isJumpGate);
+
+  /// Returns true if the system has a jump gate.
+  bool get hasJumpGate => waypoints.any((w) => w.isJumpGate);
 
   /// Returns the SystemPosition of the system.
   SystemPosition get position => SystemPosition(x, y);
