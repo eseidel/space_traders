@@ -9,6 +9,10 @@ import 'package:types/mount.dart';
 
 export 'package:openapi/api.dart';
 
+/// The default implementation of getNow for production.
+/// Used for tests for overriding the current time.
+DateTime defaultGetNow() => DateTime.timestamp();
+
 /// A position within an unspecified coordinate space.
 @immutable
 class Position {
@@ -557,6 +561,16 @@ extension ShipNavRouteUtils on ShipNavRoute {
 
   /// Returns the duration of the route.
   Duration get duration => arrival.difference(departureTime);
+
+  /// Returns the duration until the ship arrives at the destination or
+  /// Duration.zero if the ship has already arrived.
+  Duration timeUntilArrival({DateTime Function() getNow = defaultGetNow}) {
+    final now = getNow();
+    if (now.isAfter(arrival)) {
+      return Duration.zero;
+    }
+    return arrival.difference(now);
+  }
 }
 
 /// Extensions onto ShipNavRouteWaypointUtils to make it easier to work with.

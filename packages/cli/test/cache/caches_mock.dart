@@ -58,7 +58,7 @@ Caches mockCaches() {
   final waypointTraits = _MockWaypointTraitCache();
   final tradeGoods = _MockTradeGoodCache();
   final exports = _MockTradeExportCache();
-  final staticCache = StaticCaches(
+  final staticCaches = StaticCaches(
     mounts: mounts,
     modules: modules,
     shipyardShips: shipyardShips,
@@ -82,7 +82,7 @@ Caches mockCaches() {
     charting: _MockChartingCache(),
     routePlanner: _MockRoutePlanner(),
     factions: [],
-    static: staticCache,
+    static: staticCaches,
     construction: _MockConstructionCache(),
     systemConnectivity: _MockSystemConnectivity(),
     jumpGates: _MockJumpGateCache(),

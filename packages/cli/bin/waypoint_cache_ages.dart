@@ -4,9 +4,9 @@ import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final staticCache = StaticCaches.load(fs);
+  final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final chartingCache = ChartingCache.load(fs, staticCache.waypointTraits);
+  final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
   final constrctionCache = ConstructionCache.load(fs);
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;

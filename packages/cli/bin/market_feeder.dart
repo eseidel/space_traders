@@ -6,9 +6,9 @@ import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final staticCache = StaticCaches.load(fs);
+  final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
+  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
 
   final marketPrices = MarketPrices.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
@@ -17,7 +17,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     jumpGateCache,
     sellsFuel: defaultSellsFuel(marketListings),
   );
-  final staticCaches = StaticCaches.load(fs);
 
   final agentCache = AgentCache.load(fs)!;
   final behaviorCache = BehaviorCache.load(fs);

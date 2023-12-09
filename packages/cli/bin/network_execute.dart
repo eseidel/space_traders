@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cli/api.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/queue.dart';
 import 'package:cli/net/rate_limit.dart';

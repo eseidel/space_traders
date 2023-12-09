@@ -10,15 +10,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
 
-  final staticCache = StaticCaches.load(fs);
+  final staticCaches = StaticCaches.load(fs);
   final systems = SystemsCache.load(fs)!;
-  final charting = ChartingCache.load(fs, staticCache.waypointTraits);
+  final charting = ChartingCache.load(fs, staticCaches.waypointTraits);
   final construction = ConstructionCache.load(fs);
   final waypointCache =
       WaypointCache.cachedOnly(systems, charting, construction);
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;
-  final marketListings = MarketListingCache.load(fs, staticCache.tradeGoods);
+  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
   final jumpGateCache = JumpGateCache.load(fs);
   final routePlanner = RoutePlanner.fromCaches(
     systems,
@@ -29,7 +29,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipyard = waypoints.firstWhere((w) => w.hasShipyard);
 
   const shipType = ShipType.LIGHT_HAULER;
-  final ship = staticCache.shipyardShips[shipType]!;
+  final ship = staticCaches.shipyardShips[shipType]!;
   logger.info('Routes from ${shipyard.symbol} with $shipType');
 
   final table = Table(
