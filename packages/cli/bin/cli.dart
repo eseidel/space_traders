@@ -110,7 +110,7 @@ Future<void> cliMain(List<String> args) async {
   final token = await loadAuthTokenOrRegister(fs, db);
 
   // Api client should move to per-ship with a per-ship priority function.
-  final api = apiFromAuthToken(token, db, getPriority: () => 0);
+  final api = apiFromAuthToken(token, db);
 
   final caches = await Caches.loadOrFetch(fs, api, db);
   logger.info(

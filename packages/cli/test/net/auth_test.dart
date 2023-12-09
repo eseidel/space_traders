@@ -12,14 +12,14 @@ void main() {
     final fs = MemoryFileSystem.test();
     final db = _MockDatabase();
     expect(() => loadAuthToken(fs), throwsException);
-    expect(() => defaultApi(fs, db, getPriority: () => 0), throwsException);
+    expect(() => defaultApi(fs, db), throwsException);
 
     fs.file(defaultAuthTokenPath)
       ..createSync(recursive: true)
       ..writeAsStringSync('token\n\n');
     expect(loadAuthToken(fs), 'token');
 
-    final api = defaultApi(fs, db, getPriority: () => 0);
+    final api = defaultApi(fs, db);
     expect(api.apiClient, isA<CountingApiClient>());
   });
 }

@@ -7,7 +7,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // List its connections.
   // Check if each is constructed.
   final db = await defaultDatabase();
-  final api = defaultApi(fs, db, getPriority: () => -1);
+  final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
 
   final agentCache = AgentCache.load(fs)!;
   final hqSystem = agentCache.headquartersSystemSymbol;
@@ -26,11 +26,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpGate = await jumpGateCache.getOrFetch(api, jumpGateSymbol);
   logger.info('$jumpGateSymbol:');
   for (final connection in jumpGate.connections) {
-    final symbol = WaypointSymbol.fromString(connection);
-    final waypoint = await waypointCache.waypoint(symbol);
+    final waypoint = await waypointCache.waypoint(connection);
     final status =
         waypoint.isUnderConstruction ? 'under construction' : 'ready';
-    logger.info('  ${symbol.sectorLocalName.padRight(9)} $status');
+    logger.info('  ${connection.sectorLocalName.padRight(9)} $status');
   }
 
   // Required or main() will hang.

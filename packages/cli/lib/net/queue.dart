@@ -9,6 +9,13 @@ import 'package:types/queue.dart';
 
 export 'package:types/queue.dart';
 
+/// Default priority for executing network requests.
+// Belongs in NetworkQueue?
+const int networkPriorityDefault = 0;
+
+/// Low priority for executing network requests.
+const int networkPriorityLow = -1;
+
 /// An http Client implementation which sends requests to another process
 /// through a postgres queue.
 class QueuedClient extends BaseClient {
@@ -34,7 +41,7 @@ class QueuedClient extends BaseClient {
       body: String.fromCharCodes(body),
       headers: request.headers,
     );
-    final priority = getPriority?.call() ?? 0;
+    final priority = getPriority?.call() ?? networkPriorityDefault;
     final response = await _queue.sendAndWait(priority, queuedRequest);
     return StreamedResponse(
       Stream.fromIterable([response.bodyBytes]),

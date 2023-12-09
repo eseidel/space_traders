@@ -55,7 +55,7 @@ Future<String> register(
   // final systemsCache = await SystemsCache.load(fs);
   // final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
 
-  final client = getApiClient(db, getPriority: () => 0);
+  final client = getApiClient(db);
   final defaultApi = DefaultApi(client);
 
   final factionsApi = FactionsApi(client);

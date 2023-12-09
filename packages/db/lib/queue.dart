@@ -13,7 +13,7 @@ class RequestRecord {
   /// id of the request in the database, or 0 if not yet inserted.
   final int id;
 
-  /// Priority of the request
+  /// Priority of the request.  Higher priority requests are executed first.
   final int priority;
 
   /// The queued request

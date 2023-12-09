@@ -4,6 +4,9 @@ import 'package:cli/net/queue.dart';
 import 'package:db/db.dart';
 import 'package:file/file.dart';
 
+export 'package:cli/net/queue.dart'
+    show networkPriorityDefault, networkPriorityLow;
+
 /// The default path to the auth token.
 const String defaultAuthTokenPath = 'data/auth_token.txt';
 
@@ -17,6 +20,9 @@ String loadAuthToken(FileSystem fs, {String path = defaultAuthTokenPath}) {
   return token;
 }
 
+/// Default priority function.
+int defaultGetPriority() => networkPriorityDefault;
+
 /// Create a queued client with the given priority function.
 QueuedClient getQueuedClient(
   Database db, {
@@ -28,7 +34,7 @@ QueuedClient getQueuedClient(
 /// Create an API client with priority function.
 CountingApiClient getApiClient(
   Database db, {
-  required int Function() getPriority,
+  int Function() getPriority = defaultGetPriority,
   String? overrideBaseUrl,
   Authentication? auth,
 }) {
@@ -47,7 +53,7 @@ CountingApiClient getApiClient(
 Api apiFromAuthToken(
   String token,
   Database db, {
-  required int Function() getPriority,
+  int Function() getPriority = defaultGetPriority,
   String? overrideBaseUrl,
 }) {
   final auth = HttpBearerAuth()..accessToken = token;
@@ -60,6 +66,6 @@ Api apiFromAuthToken(
 Api defaultApi(
   FileSystem fs,
   Database db, {
-  required int Function() getPriority,
+  int Function() getPriority = defaultGetPriority,
 }) =>
     apiFromAuthToken(loadAuthToken(fs), db, getPriority: getPriority);
