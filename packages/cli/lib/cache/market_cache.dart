@@ -53,32 +53,32 @@ class MarketListingCache extends JsonStore<_Record> {
   /// The default path to the cache file.
   static const defaultPath = 'data/market_listings.json';
 
-  /// The MarketListings by waypoint symbol.
+  /// The MarketListings by WaypointSymbol.
   Map<WaypointSymbol, MarketListing> get _listingBySymbol => record;
 
   /// The MarketListings.
   Iterable<MarketListing> get listings => _listingBySymbol.values;
 
-  /// Fetch the MarketListing for the given waypoint symbol.
-  MarketListing? marketListingForSymbol(WaypointSymbol marketSymbol) {
-    return _listingBySymbol[marketSymbol];
+  /// Fetch the MarketListing for the given WaypointSymbol.
+  MarketListing? listingForSymbol(WaypointSymbol waypointSymbol) {
+    return _listingBySymbol[waypointSymbol];
   }
 
-  /// Fetch the MarketListing for the given waypoint symbol.
-  MarketListing? operator [](WaypointSymbol marketSymbol) =>
-      marketListingForSymbol(marketSymbol);
+  /// Fetch the MarketListing for the given WaypointSymbol.
+  MarketListing? operator [](WaypointSymbol waypointSymbol) =>
+      listingForSymbol(waypointSymbol);
 
   /// Add MarketListings for the given Market to the cache.
   void addMarket(Market market) {
     final symbol = market.waypointSymbol;
-    final marketListing = MarketListing(
+    final listing = MarketListing(
       waypointSymbol: symbol,
       imports: market.imports.map((t) => t.symbol).toSet(),
       exports: market.exports.map((t) => t.symbol).toSet(),
       exchange: market.exchange.map((t) => t.symbol).toSet(),
     );
     tradeGoods.addAll(market.listedTradeGoods);
-    _listingBySymbol[symbol] = marketListing;
+    _listingBySymbol[symbol] = listing;
     save();
   }
 }
@@ -111,16 +111,16 @@ class MarketCache {
   }
 
   /// Get the market for the given waypoint symbol from the cache.
-  Market? fromCache(WaypointSymbol marketSymbol) {
-    return _marketsBySymbol[marketSymbol];
+  Market? fromCache(WaypointSymbol waypointSymbol) {
+    return _marketsBySymbol[waypointSymbol];
   }
 
   /// Fetch the waypoint with the given symbol.
   Future<Market> refreshMarket(
-    WaypointSymbol marketSymbol,
+    WaypointSymbol waypointSymbol,
   ) async {
-    final market = await getMarket(_api, marketSymbol);
-    _marketsBySymbol[marketSymbol] = market;
+    final market = await getMarket(_api, waypointSymbol);
+    _marketsBySymbol[waypointSymbol] = market;
     _marketListings.addMarket(market);
     return market;
   }

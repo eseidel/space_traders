@@ -1,7 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
-import 'package:cli/net/queries.dart';
 
 class FetchQueue {
   FetchQueue(this.api, this.db, this.caches);
@@ -26,11 +25,10 @@ class FetchQueue {
     final waypoints = await caches.waypoints.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       if (waypoint.hasMarketplace) {
-        final listing = caches.marketListings
-            .marketListingForSymbol(waypoint.waypointSymbol);
+        final listing =
+            caches.marketListings.listingForSymbol(waypoint.waypointSymbol);
         if (listing == null) {
-          final market = await getMarket(api, waypoint.waypointSymbol);
-          caches.marketListings.addMarket(market);
+          await caches.markets.refreshMarket(waypoint.waypointSymbol);
         }
       }
       // TODO(eseidel): Record Shipyard listings.
