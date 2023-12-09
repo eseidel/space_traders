@@ -1,7 +1,7 @@
 import 'package:cli/cache/caches.dart';
+import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
-import 'package:cli/net/queries.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Load up the jump gate for the main system.
@@ -23,7 +23,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final constructionCache = ConstructionCache.load(fs);
   final waypointCache =
       WaypointCache(api, systemsCache, chartingCache, constructionCache);
-  final jumpGate = await getJumpGate(api, jumpGateSymbol);
+  final jumpGateCache = JumpGateCache.load(fs);
+  final jumpGate = await jumpGateCache.getOrFetch(api, jumpGateSymbol);
   logger.info('$jumpGateSymbol:');
   for (final connection in jumpGate.connections) {
     final symbol = WaypointSymbol.fromString(connection);
