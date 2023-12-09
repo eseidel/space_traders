@@ -9,10 +9,11 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
-import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-bool _isMissingChartOrRecentPriceData(
+/// Returns true if the given waypoint is missing either a chart or recent
+/// market data.
+bool isMissingChartOrRecentPriceData(
   MarketPrices marketPrices,
   ShipyardPrices shipyardPrices,
   Waypoint waypoint, {
@@ -48,7 +49,6 @@ bool _isMissingRecentShipyardData(
 }
 
 /// Returns the symbol of a waypoint in the system missing a chart.
-@visibleForTesting
 Future<WaypointSymbol?> waypointSymbolNeedingExploration(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
@@ -242,7 +242,7 @@ Future<DateTime?> advanceExplorer(
   // either it's the first time and we need to set a destination, or we've just
   // completed a loop.  This _isMissingChartOrRecentPriceData is really our
   // check for "did we just do a loop"?  If so, we complete the behavior.
-  final willCompleteBehavior = _isMissingChartOrRecentPriceData(
+  final willCompleteBehavior = isMissingChartOrRecentPriceData(
     caches.marketPrices,
     caches.shipyardPrices,
     waypoint,
@@ -254,7 +254,7 @@ Future<DateTime?> advanceExplorer(
     await chartWaypointAndLog(api, caches.charting, ship);
   }
   // If we don't visit the market, we won't refuel (even when low).
-  await visitLocalMarket(api, db, caches, ship, getNow: getNow);
+  await visitLocalMarket(api, db, caches, ship, maxAge: maxAge, getNow: getNow);
   // We might buy a ship if we're at a ship yard.
   await visitLocalShipyard(
     api,

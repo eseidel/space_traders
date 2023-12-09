@@ -40,7 +40,10 @@ class CentralCommand {
   bool _haveEscapedStartingSystem = false;
 
   /// How old can explorer data be before we refresh it?
-  Duration _maxAgeForExplorerData = const Duration(days: 3);
+  Duration _maxAgeForExplorerData = config.defaultMaxAgeForPriceData;
+
+  /// Per-system price age data used by system watchers.
+  final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
 
   /// The next planned ship buy job.
   /// This is the start of an imagined job queue system, whereby we pre-populate
@@ -55,6 +58,9 @@ class CentralCommand {
 
   /// Mounts we know of a place we can buy.
   final Set<ShipMountSymbolEnum> _availableMounts = {};
+
+  final Map<ShipSymbol, SystemSymbol> _assignedSystemsForSatellites =
+      Map.from(config.probeAssignments);
 
   /// Sets the available mounts for testing.
   @visibleForTesting
@@ -96,6 +102,32 @@ class CentralCommand {
 
   /// Shorten the max age for explorer data.
   Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
+
+  /// Returns the max age for price data for the given [systemSymbol].
+  Duration maxPriceAgeForSystem(SystemSymbol systemSymbol) {
+    final maybeAge = _maxPriceAgeForSystem[systemSymbol];
+    if (maybeAge != null) {
+      return maybeAge;
+    }
+    return config.defaultMaxAgeForPriceData;
+  }
+
+  /// Shorten the max age for price data for the given [systemSymbol].
+  Duration shoretenMaxPriceAgeForSystem(SystemSymbol systemSymbol) {
+    final age = maxPriceAgeForSystem(systemSymbol);
+    _maxPriceAgeForSystem[systemSymbol] = age ~/ 2;
+    return age;
+  }
+
+  /// Returns the system symbol we should assign the given [ship] to.
+  SystemSymbol assignedSystemForSatellite(AgentCache agentCache, Ship ship) {
+    final assignedSystem = _assignedSystemsForSatellites[ship.shipSymbol];
+    if (assignedSystem != null) {
+      return assignedSystem;
+    }
+    // Should CentralCommand cache headquartersSystemSymbol?
+    return agentCache.headquartersSystemSymbol;
+  }
 
   /// Returns the mining squad for the given [ship].
   ExtractionSquad? squadForShip(Ship ship) {
@@ -294,6 +326,14 @@ class CentralCommand {
   }
 
   /// Returns all systems containing explorers or explorer destinations.
+  Iterable<WaypointSymbol> waypointsToAvoidInSystem(
+    SystemSymbol systemSymbol,
+    ShipSymbol thisShipSymbol,
+  ) =>
+      _otherWaypointsWithBehavior(thisShipSymbol, Behavior.systemWatcher)
+          .where((s) => s.systemSymbol == systemSymbol);
+
+  /// Returns all systems containing explorers or explorer destinations.
   Iterable<WaypointSymbol> otherExplorerWaypoints(ShipSymbol thisShipSymbol) =>
       _otherWaypointsWithBehavior(thisShipSymbol, Behavior.explorer);
 
@@ -355,7 +395,7 @@ class CentralCommand {
       return null;
     }
 
-    final systemSymbol = caches.agent.headquarters(caches.systems).systemSymbol;
+    final systemSymbol = caches.agent.headquartersSystemSymbol;
     final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
     return jumpGate == null
         ? null

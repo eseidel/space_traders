@@ -7,6 +7,7 @@ import 'package:cli/behavior/miner_hauler.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/behavior/siphoner.dart';
 import 'package:cli/behavior/surveyor.dart';
+import 'package:cli/behavior/system_watcher.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
@@ -53,6 +54,8 @@ Future<DateTime?> Function(
       return advanceSurveyor;
     case Behavior.minerHauler:
       return advanceMinerHauler;
+    case Behavior.systemWatcher:
+      return advanceSystemWatcher;
     case Behavior.explorer:
       return advanceExplorer;
     case Behavior.mountFromBuy:

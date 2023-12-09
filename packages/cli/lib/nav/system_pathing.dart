@@ -115,6 +115,7 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   if (systemSymbols == null) {
     return null;
   }
+  // TODO(eseidel): This will fail if systems have more than one jump gate.
   final jumpGateSymbols = systemSymbols
       .map((s) => systemsCache.jumpGateWaypointForSystem(s)!.waypointSymbol);
   return [

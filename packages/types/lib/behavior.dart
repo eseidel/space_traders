@@ -81,6 +81,9 @@ enum Behavior {
   /// Go buy our own mount and mount it.
   mountFromBuy,
 
+  /// Watch prices within a single system.
+  systemWatcher,
+
   /// Explore the universe.
   explorer;
 

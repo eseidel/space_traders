@@ -22,6 +22,8 @@ class Config {
     ShipType.SURVEYOR,
     ShipType.PROBE,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
+    ShipType.PROBE,
+    ShipType.PROBE,
   ];
 
   /// A list of which haulers should be used as miner haulers.
@@ -93,6 +95,20 @@ class Config {
 
   /// Assumed antimatter cost when we don't have price information.
   final defaultAntimatterCost = 10000;
+
+  /// Initial max age for price data in any given system.
+  final defaultMaxAgeForPriceData = const Duration(days: 3);
+
+  /// System assignments for probes.
+  final probeAssignments = {
+    '29': 'X1-NB34',
+    '30': 'X1-RA9',
+  }.map(
+    (k, v) => MapEntry(
+      ShipSymbol.fromString('ESEIDEL-$k'),
+      SystemSymbol.fromString(v),
+    ),
+  );
 }
 
 /// Our global configuration object.
