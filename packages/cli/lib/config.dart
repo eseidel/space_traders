@@ -58,7 +58,7 @@ class Config {
     FleetRole.miner: [Behavior.miner],
     FleetRole.surveyor: [Behavior.surveyor],
     FleetRole.siphoner: [Behavior.siphoner],
-    FleetRole.explorer: [Behavior.explorer],
+    FleetRole.explorer: [Behavior.systemWatcher],
   };
 
   // We could put some "total value" on the idea of the gate being open
