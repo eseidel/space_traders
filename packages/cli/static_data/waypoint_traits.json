@@ -305,6 +305,11 @@
   "description": "A location with volatile geological composition, making it prone to frequent seismic activities and necessitating specialized construction techniques for long-term habitation or activity."
  },
  {
+  "symbol": "VAST_RUINS",
+  "name": "Vast Ruins",
+  "description": "The remnants of a long-lost civilization, these ancient structures hold secrets waiting to be uncovered and offer a glimpse into the history of the galaxy."
+ },
+ {
   "symbol": "VIBRANT_AURORAS",
   "name": "Vibrant Auroras",
   "description": "A celestial light show caused by the interaction of charged particles with the waypoint's atmosphere, creating a mesmerizing spectacle and attracting tourists from across the galaxy."
