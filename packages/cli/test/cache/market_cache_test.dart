@@ -17,7 +17,7 @@ void main() {
     );
     MarketListingCache({waypointSymbol: listing}, tradeGoods, fs: fs).save();
     final loaded = MarketListingCache.load(fs, tradeGoods);
-    expect(loaded.marketListingForSymbol(waypointSymbol), listing);
+    expect(loaded[waypointSymbol], listing);
 
     final newSymbol = WaypointSymbol.fromString('T-W-O');
     final market = Market(
@@ -31,10 +31,7 @@ void main() {
       ],
     );
     loaded.addMarket(market);
-    expect(loaded.marketListingForSymbol(newSymbol), isNotNull);
-    expect(
-      loaded.marketListingForSymbol(newSymbol)!.exports,
-      [TradeSymbol.ALUMINUM],
-    );
+    expect(loaded[newSymbol], isNotNull);
+    expect(loaded[newSymbol]!.exports, [TradeSymbol.ALUMINUM]);
   });
 }

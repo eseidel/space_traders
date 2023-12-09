@@ -24,15 +24,14 @@ WaypointSymbol? nearbyMarketWhichTrades(
   WaypointSymbol startSymbol,
   TradeSymbol tradeSymbol,
 ) {
-  final startMarket = marketListings.marketListingForSymbol(startSymbol);
+  final startMarket = marketListings[startSymbol];
   if (startMarket != null && startMarket.allowsTradeOf(tradeSymbol)) {
     return startSymbol;
   }
   // TODO(eseidel): Handle jumps again!
   final waypoints = systemsCache.waypointsInSystem(startSymbol.systemSymbol);
   for (final waypoint in waypoints) {
-    final market =
-        marketListings.marketListingForSymbol(waypoint.waypointSymbol);
+    final market = marketListings[waypoint.waypointSymbol];
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
       return waypoint.waypointSymbol;
     }
@@ -704,8 +703,7 @@ MarketTrip? findBestMarketToSell(
   var best = nearest;
   // Pick any one further that earns more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
-    final listing =
-        marketListings.marketListingForSymbol(trip.price.waypointSymbol);
+    final listing = marketListings[trip.price.waypointSymbol];
     if (listing == null) {
       detail('Skipping ${trip.price.waypointSymbol} due to no market data');
       continue;

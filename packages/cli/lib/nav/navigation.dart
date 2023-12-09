@@ -14,8 +14,7 @@ import 'package:types/types.dart';
 /// know it doesn't sell fuel.
 bool Function(WaypointSymbol) defaultSellsFuel(MarketListingCache listings) {
   return (WaypointSymbol symbol) {
-    final listing = listings.marketListingForSymbol(symbol);
-    return listing?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
+    return listings[symbol]?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
   };
 }
 

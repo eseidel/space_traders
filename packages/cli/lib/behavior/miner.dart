@@ -626,7 +626,7 @@ Future<JobResult> transferOrSellCargo(
     return JobResult.complete();
   }
 
-  // FIXME(eseidel): We should decide if this cargo is even worth selling.
+  // TODO(eseidel): We should decide if this cargo is even worth selling.
   // This currently optimizes for price and does not consider requests.
   // Some cargo should jettison and some should transfer to haulers.
 

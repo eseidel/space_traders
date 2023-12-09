@@ -75,7 +75,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
     // Adding a price to MarketPrices updates our listing, so if we don't
     // have a listing we won't have a price.
-    final listing = marketListings.marketListingForSymbol(marketSymbol);
+    final listing = marketListings[marketSymbol];
     if (listing == null) {
       continue;
     }

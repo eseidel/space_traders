@@ -432,11 +432,11 @@ void main() {
     final listings = _MockMarketListingCache();
     final sellsFuel = defaultSellsFuel(listings);
     final waypointSymbol = WaypointSymbol.fromString('A-B-C');
-    when(() => listings.marketListingForSymbol(waypointSymbol))
+    when(() => listings[waypointSymbol])
         .thenReturn(MarketListing(waypointSymbol: waypointSymbol));
     expect(sellsFuel(waypointSymbol), false);
 
-    when(() => listings.marketListingForSymbol(waypointSymbol)).thenReturn(
+    when(() => listings[waypointSymbol]).thenReturn(
       MarketListing(
         waypointSymbol: waypointSymbol,
         exchange: const {TradeSymbol.FUEL},

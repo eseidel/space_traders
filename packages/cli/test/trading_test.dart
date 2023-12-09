@@ -638,24 +638,16 @@ void main() {
     ).thenReturn(fakePlan(nearSymbol, farSymbol, 10000000));
 
     final marketListings = _MockMarketListingCache();
-    when(() => marketListings.marketListingForSymbol(nearSymbol)).thenReturn(
-      MarketListing(
-        waypointSymbol: nearSymbol,
+    MarketListing listing(WaypointSymbol symbol) {
+      return MarketListing(
+        waypointSymbol: symbol,
         exchange: const {TradeSymbol.ALUMINUM, TradeSymbol.FUEL},
-      ),
-    );
-    when(() => marketListings.marketListingForSymbol(midSymbol)).thenReturn(
-      MarketListing(
-        waypointSymbol: midSymbol,
-        exchange: const {TradeSymbol.ALUMINUM, TradeSymbol.FUEL},
-      ),
-    );
-    when(() => marketListings.marketListingForSymbol(farSymbol)).thenReturn(
-      MarketListing(
-        waypointSymbol: farSymbol,
-        exchange: const {TradeSymbol.ALUMINUM, TradeSymbol.FUEL},
-      ),
-    );
+      );
+    }
+
+    when(() => marketListings[nearSymbol]).thenReturn(listing(nearSymbol));
+    when(() => marketListings[midSymbol]).thenReturn(listing(midSymbol));
+    when(() => marketListings[farSymbol]).thenReturn(listing(farSymbol));
 
     final logger = _MockLogger();
     final market = runWithLogger(

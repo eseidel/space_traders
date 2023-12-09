@@ -164,8 +164,7 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.explorer);
-    when(() => caches.marketListings.marketListingForSymbol(waypointSymbol))
-        .thenReturn(
+    when(() => caches.marketListings[waypointSymbol]).thenReturn(
       MarketListing(
         waypointSymbol: waypointSymbol,
         exchange: const {TradeSymbol.FUEL},
