@@ -11,7 +11,6 @@ class RequestCounts {
 
   /// Get the number of requests made to the given path.
   void recordRequest(String path) {
-    logger.detail(path);
     counts[path] = (counts[path] ?? 0) + 1;
   }
 
@@ -42,6 +41,7 @@ class CountingApiClient extends ApiClient {
     Map<String, String> formParams,
     String? contentType,
   ) async {
+    logger.detail(path);
     requestCounts.recordRequest(path);
     return super.invokeAPI(
       path,
