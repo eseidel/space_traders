@@ -125,6 +125,7 @@ void main() {
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     when(
@@ -311,6 +312,7 @@ void main() {
       startTime: DateTime(2021),
       route: routePlan,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     final market = Market(
@@ -600,6 +602,7 @@ void main() {
       startTime: DateTime(2021),
       route: routePlan,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
     when(
       () => centralCommand.findNextDealAndLog(
@@ -685,6 +688,7 @@ void main() {
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn('S-1');
@@ -755,6 +759,7 @@ void main() {
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     when(
@@ -910,6 +915,7 @@ void main() {
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     when(() => caches.waypoints.hasMarketplace(end))
@@ -1061,6 +1067,7 @@ void main() {
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     when(() => caches.waypoints.hasMarketplace(end))
@@ -1219,6 +1226,7 @@ void main() {
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     when(() => caches.waypoints.hasMarketplace(end))

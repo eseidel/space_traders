@@ -131,6 +131,7 @@ void main() {
       shipFuelCapacity: fuelCapacity,
       shipWaypointSymbol: start.waypointSymbol,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     expect(costed.expectedFuelCost, 100);
@@ -166,6 +167,7 @@ void main() {
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
     final profit = lightGreen.wrap('      +1c (100%)');
     expect(
@@ -421,6 +423,7 @@ void main() {
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
     expect(costedDeal.cargoSize, 100);
     expect(costedDeal.expectedUnits, 100);
@@ -725,6 +728,7 @@ void main() {
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
     expect(costedDeal.cargoSize, 100);
     expect(costedDeal.expectedUnits, 10);

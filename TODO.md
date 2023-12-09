@@ -827,3 +827,5 @@ are needed, you'll still end up with two 40-sized trades going.
 ### Teach satelites to stick to a single system?
 
 ### Teach satalites to ignore exchange-only markets?
+
+### Reduce manual construction of CostedDeal in tests.

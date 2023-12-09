@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
@@ -141,7 +142,8 @@ extension CostedDealPrediction on CostedDeal {
       deal.source.marketPrice.totalPurchasePriceFor(expectedUnits);
 
   /// The expected non-goods expenses of the deal, including fuel.
-  int get expectedOperationalExpenses => expectedFuelCost;
+  int get expectedOperationalExpenses =>
+      expectedFuelCost + expectedAntimatterCost;
 
   /// The total upfront cost of the deal, including fuel.
   int get expectedCosts =>
@@ -292,6 +294,7 @@ extension CostedDealPrediction on CostedDeal {
         startTime: startTime,
         route: route,
         costPerFuelUnit: costPerFuelUnit,
+        costPerAntimatterUnit: costPerAntimatterUnit,
       );
     }
     return this;
@@ -338,6 +341,7 @@ CostedDeal costOutDeal(
   required WaypointSymbol shipWaypointSymbol,
   required int shipFuelCapacity,
   required int costPerFuelUnit,
+  required int costPerAntimatterUnit,
 }) {
   final waypointSymbols = [
     shipWaypointSymbol,
@@ -363,6 +367,7 @@ CostedDeal costOutDeal(
     startTime: DateTime.timestamp(),
     route: route,
     costPerFuelUnit: costPerFuelUnit,
+    costPerAntimatterUnit: costPerAntimatterUnit,
   );
 }
 
@@ -442,8 +447,11 @@ Iterable<CostedDeal> findDealsFor(
           cargoSize: cargoCapacity,
           shipWaypointSymbol: startSymbol,
           shipFuelCapacity: fuelCapacity,
-          costPerFuelUnit:
-              marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ?? 100,
+          costPerFuelUnit: marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
+              config.defaultFuelCost,
+          costPerAntimatterUnit:
+              marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
+                  config.defaultAntimatterCost,
         ),
       )
       .toList();
@@ -605,7 +613,10 @@ int estimateRoutePlanCost({
   required int costPerFuelUnit,
   required int costPerAntimatterUnit,
 }) {
-  final fuelCost = costPerFuelUnit * (route.fuelUsed / 100).ceil();
+  final fuelCost = fuelUsedCost(
+    tankUnits: route.fuelUsed,
+    costPerMarketFuelUnit: costPerFuelUnit,
+  );
   final antimatterCost = costPerAntimatterUnit * route.antimatterUsed;
   return fuelCost + antimatterCost;
 }

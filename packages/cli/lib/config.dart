@@ -87,6 +87,12 @@ class Config {
 
   /// Maximum distance for ExtractionScores we will consider.
   final maxExtractionDeliveryDistance = 160;
+
+  /// Assumed fuel cost when we don't have price information.
+  final defaultFuelCost = 100;
+
+  /// Assumed antimatter cost when we don't have price information.
+  final defaultAntimatterCost = 10000;
 }
 
 /// Our global configuration object.

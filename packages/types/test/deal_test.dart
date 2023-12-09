@@ -47,6 +47,7 @@ void main() {
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
 
     final json = costed.toJson();
@@ -85,6 +86,7 @@ void main() {
         shipSpeed: 10,
       ),
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
     const shipSymbol = ShipSymbol('S', 1);
     final transaction1 = Transaction(

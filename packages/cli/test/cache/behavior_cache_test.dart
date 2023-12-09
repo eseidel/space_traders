@@ -42,6 +42,7 @@ void main() {
       route: route,
       cargoSize: 100,
       costPerFuelUnit: 100,
+      costPerAntimatterUnit: 10000,
     );
     final stateByShipSymbol = {
       shipSymbol: state,

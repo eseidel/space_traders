@@ -2,6 +2,14 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
+/// Expected cost of fuel for a given number of tank units.
+int fuelUsedCost({
+  required int tankUnits,
+  required int costPerMarketFuelUnit,
+}) {
+  return (tankUnits / 100).ceil() * costPerMarketFuelUnit;
+}
+
 /// Record of a possible arbitrage opportunity pairing a BuyOpp and SellOpp.
 /// CostedDeal is a wrapper which includes the cost of travel.
 @immutable
@@ -128,6 +136,7 @@ class CostedDeal {
     required this.route,
     required this.cargoSize,
     required this.costPerFuelUnit,
+    required this.costPerAntimatterUnit,
   })  : transactions = List.unmodifiable(transactions),
         assert(cargoSize > 0, 'cargoSize must be > 0');
 
@@ -141,6 +150,8 @@ class CostedDeal {
             .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
             .toList(),
         costPerFuelUnit: json['costPerFuelUnit'] as int,
+        // TODO(eseidel): Remove null check once we've migrated all deals.
+        costPerAntimatterUnit: json['costPerAntimatterUnit'] as int? ?? 0,
       );
 
   /// Create a CostedDeal from JSON or null.
@@ -168,11 +179,25 @@ class CostedDeal {
   /// The cost per unit of fuel used for computing expected fuel costs.
   final int costPerFuelUnit;
 
+  /// The cost per unit of antimatter used for computing expected antimatter
+  /// costs.
+  final int costPerAntimatterUnit;
+
   /// The units of fuel to travel along the route.
   int get expectedFuelUsed => route.fuelUsed;
 
   /// The cost of fuel to travel along the route.
-  int get expectedFuelCost => (expectedFuelUsed / 100).ceil() * costPerFuelUnit;
+  int get expectedFuelCost => fuelUsedCost(
+        tankUnits: expectedFuelUsed,
+        costPerMarketFuelUnit: costPerFuelUnit,
+      );
+
+  /// The units of antimatter to travel along the route.
+  int get expectedAntimatterUsed => route.antimatterUsed;
+
+  /// The cost of antimatter to travel along the route.
+  int get expectedAntimatterCost =>
+      expectedAntimatterUsed * costPerAntimatterUnit;
 
   /// The time in seconds to travel between the two markets.
   Duration get expectedTime => route.duration;
@@ -214,6 +239,7 @@ class CostedDeal {
       startTime: startTime,
       route: route,
       costPerFuelUnit: costPerFuelUnit,
+      costPerAntimatterUnit: costPerAntimatterUnit,
     );
   }
 }
