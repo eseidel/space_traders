@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cli/api.dart';
+import 'package:cli/logger.dart';
 import 'package:http/http.dart';
 
 /// RequestCounts tracks the number of requests made to each path.
@@ -10,6 +11,7 @@ class RequestCounts {
 
   /// Get the number of requests made to the given path.
   void recordRequest(String path) {
+    logger.detail(path);
     counts[path] = (counts[path] ?? 0) + 1;
   }
 
