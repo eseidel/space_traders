@@ -14,6 +14,7 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/queries.dart';
 import 'package:db/db.dart';
 import 'package:file/file.dart';
@@ -36,6 +37,7 @@ export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/route.dart';
+export 'package:cli/nav/system_connectivity.dart';
 export 'package:file/file.dart';
 
 /// Container for all the caches.
@@ -58,6 +60,7 @@ class Caches {
     required this.static,
     required this.marketListings,
     required this.construction,
+    required this.systemConnectivity,
   });
 
   /// The agent cache.
@@ -77,6 +80,9 @@ class Caches {
 
   /// The cache of systems.
   final SystemsCache systems;
+
+  /// The cache of system connectivity.
+  final SystemConnectivity systemConnectivity;
 
   /// The cache of construction data.
   final ConstructionCache construction;
@@ -131,9 +137,12 @@ class Caches {
     final behaviors = BehaviorCache.load(fs);
 
     final jumpGateCache = JumpGateCache.load(fs);
-    final routePlanner = RoutePlanner.fromCaches(
-      systems,
+    final systemConnectivity = SystemConnectivity.fromJumpGateCache(
       jumpGateCache,
+    );
+    final routePlanner = RoutePlanner.fromSystemsCache(
+      systems,
+      systemConnectivity,
       sellsFuel: defaultSellsFuel(marketListings),
     );
 
@@ -159,6 +168,7 @@ class Caches {
       factions: factions,
       marketListings: marketListings,
       construction: construction,
+      systemConnectivity: systemConnectivity,
     );
   }
 

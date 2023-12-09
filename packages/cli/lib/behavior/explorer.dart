@@ -161,28 +161,27 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
 
 /// Find the nearest headquarters to the ship's current location.
 WaypointSymbol nearestHeadquarters(
-  // SystemConnectivity systemConnectivity,
+  SystemConnectivity systemConnectivity,
   SystemsCache systemsCache,
   List<Faction> factions,
   SystemSymbol startSystemSymbol,
 ) {
   final factionHqs = factions.map((e) => e.headquartersSymbol).toList();
   final startSystem = systemsCache[startSystemSymbol];
-  final reachableHqs =
-      factionHqs.where((hq) => hq.systemSymbol == startSystemSymbol).toList();
-  // .where(
-  //   (hq) => systemConnectivity.canJumpBetweenSystemSymbols(
-  //     startSystemSymbol,
-  //     hq.systemSymbol,
-  //   ),
-  // )
-  // .toList();
+  final reachableHqs = factionHqs
+      .where(
+        (hq) => systemConnectivity.existsJumpPathBetween(
+          startSystemSymbol,
+          hq.systemSymbol,
+        ),
+      )
+      .toList();
   final sortedHqs = reachableHqs
       .sortedBy<num>(
         (hq) => systemsCache[hq.systemSymbol].distanceTo(startSystem),
       )
       .toList();
-  // There is always a reacahble HQ since we don't warp yet.
+  // There is always a reachable HQ since we don't warp yet.
   return sortedHqs.first;
 }
 
@@ -209,7 +208,7 @@ Future<DateTime?> routeForEmergencyFuelingIfNeeded(
   if (marketSymbol == null) {
     shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
     marketSymbol = nearestHeadquarters(
-      // caches.systemConnectivity,
+      caches.systemConnectivity,
       caches.systems,
       caches.factions,
       ship.systemSymbol,

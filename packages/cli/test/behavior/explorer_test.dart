@@ -124,7 +124,7 @@ void main() {
 
   test('nearestHeadquarters', () {
     final startSystemSymbol = SystemSymbol.fromString('A-B');
-    // final systemConnectivity = SystemConnectivity({startSystemSymbol: 1});
+    final systemConnectivity = SystemConnectivity.test({});
     final system = _MockSystem();
     final fs = MemoryFileSystem.test();
     final systems = <System>[system];
@@ -140,7 +140,7 @@ void main() {
       ),
     ];
     final hq = nearestHeadquarters(
-      // systemConnectivity,
+      systemConnectivity,
       systemsCache,
       factions,
       startSystemSymbol,

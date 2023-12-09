@@ -35,6 +35,8 @@ class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
 class _MockTradeExportCache extends Mock implements TradeExportCache {}
 
 class _MockTradeGoodCache extends Mock implements TradeGoodCache {}
@@ -78,5 +80,6 @@ Caches mockCaches() {
     factions: [],
     static: staticCache,
     construction: _MockConstructionCache(),
+    systemConnectivity: _MockSystemConnectivity(),
   );
 }

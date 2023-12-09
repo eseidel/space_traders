@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/nav/system_pathing.dart';
 import 'package:cli/nav/waypoint_pathing.dart';
 import 'package:cli/printing.dart';
@@ -345,6 +344,9 @@ class RoutePlanner {
     required int fuelCapacity,
     required int shipSpeed,
   }) {
+    if (start.systemSymbol == end.systemSymbol) {
+      throw ArgumentError('Cannot plan a jump within the same system.');
+    }
     // We only handle jumps at the moment.
     // We fail out quickly from our reachability cache if these system waypoints
     // are not in the same system cluster.

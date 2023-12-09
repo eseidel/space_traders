@@ -1,5 +1,6 @@
 import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
+import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 typedef _ClusterId = int;
@@ -50,30 +51,35 @@ class _ClusterFinder {
   }
 }
 
+Map<SystemSymbol, Set<SystemSymbol>> _fullyConnect(
+  Map<SystemSymbol, Set<SystemSymbol>> partial,
+) {
+  final fullyConnected = <SystemSymbol, Set<SystemSymbol>>{};
+  for (final systemSymbol in partial.keys) {
+    final connectedSymbols = partial[systemSymbol] ?? {};
+    for (final connectedSymbol in connectedSymbols) {
+      fullyConnected.putIfAbsent(systemSymbol, () => {}).add(connectedSymbol);
+      fullyConnected.putIfAbsent(connectedSymbol, () => {}).add(systemSymbol);
+    }
+  }
+  return fullyConnected;
+}
+
 Map<SystemSymbol, Set<SystemSymbol>> _findAllConnections(
   JumpGateCache jumpGateCache,
 ) {
   // JumpGateCache caches responses from the server.  We may not yet have
   // cached both sides of a jump gate, so this method fills in the gaps.
-  final directConnections = <SystemSymbol, Set<SystemSymbol>>{};
-  for (final record in jumpGateCache.values) {
-    final systemSymbol = record.waypointSymbol.systemSymbol;
-
-    final connected = jumpGateCache
-        .recordsForSystem(systemSymbol)
-        .expand<WaypointSymbol>((j) => j.connections)
-        .map<SystemSymbol>((e) => e.systemSymbol)
-        .toSet();
-    for (final connectedSymbol in connected) {
-      directConnections
-          .putIfAbsent(systemSymbol, () => {})
-          .add(connectedSymbol);
-      directConnections
-          .putIfAbsent(connectedSymbol, () => {})
-          .add(systemSymbol);
-    }
-  }
-  return directConnections;
+  final partial = jumpGateCache.values.fold(
+    <SystemSymbol, Set<SystemSymbol>>{},
+    (map, record) {
+      map
+          .putIfAbsent(record.waypointSymbol.systemSymbol, () => {})
+          .addAll(record.connections.map((c) => c.systemSymbol));
+      return map;
+    },
+  );
+  return _fullyConnect(partial);
 }
 
 Map<SystemSymbol, int> _findClusters(
@@ -91,6 +97,18 @@ Map<SystemSymbol, int> _findClusters(
 class SystemConnectivity {
   /// Creates a new SystemConnectivity.
   SystemConnectivity._(this._clusterBySystemSymbol, this._directConnections);
+
+  /// Creates a new SystemConnectivity from the given connections.
+  @visibleForTesting
+  factory SystemConnectivity.test(
+    Map<SystemSymbol, Set<SystemSymbol>> partialConnections,
+  ) {
+    final directConnections = _fullyConnect(partialConnections);
+    return SystemConnectivity._(
+      _findClusters(directConnections),
+      directConnections,
+    );
+  }
 
   /// Creates a new SystemConnectivity from the systemsCache.
   factory SystemConnectivity.fromJumpGateCache(JumpGateCache jumpGateCache) {
@@ -160,15 +178,21 @@ class SystemConnectivity {
   bool existsDirectJumpBetween(
     SystemSymbol startSymbol,
     SystemSymbol endSymbol,
-  ) =>
-      _directConnections[startSymbol]?.contains(endSymbol) ?? false;
+  ) {
+    return _directConnections[startSymbol]?.contains(endSymbol) ?? false;
+  }
 
   /// Returns true if there exists a path in the jumpgate network between
-  /// [startSymbol] and [endSymbol]
+  /// [startSymbol] and [endSymbol] or they are the same.
   bool existsJumpPathBetween(
     SystemSymbol startSymbol,
     SystemSymbol endSymbol,
   ) {
+    // Even if we don't have a cluster for the start or end, we can still
+    // check if they are the same.
+    if (startSymbol == endSymbol) {
+      return true;
+    }
     final startCluster = _clusterBySystemSymbol[startSymbol];
     final endCluster = _clusterBySystemSymbol[endSymbol];
     return startCluster != null && startCluster == endCluster;
