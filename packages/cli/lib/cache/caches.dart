@@ -61,6 +61,7 @@ class Caches {
     required this.marketListings,
     required this.construction,
     required this.systemConnectivity,
+    required this.jumpGates,
   });
 
   /// The agent cache.
@@ -89,6 +90,9 @@ class Caches {
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
+
+  /// The cache of jump gates.
+  final JumpGateCache jumpGates;
 
   /// The cache of markets descriptions.
   final MarketListingCache marketListings;
@@ -136,9 +140,9 @@ class Caches {
         await ContractCache.loadOrFetch(api, fs: fs, forceRefresh: true);
     final behaviors = BehaviorCache.load(fs);
 
-    final jumpGateCache = JumpGateCache.load(fs);
+    final jumpGates = JumpGateCache.load(fs);
     final systemConnectivity = SystemConnectivity.fromJumpGateCache(
-      jumpGateCache,
+      jumpGates,
     );
     final routePlanner = RoutePlanner.fromSystemsCache(
       systems,
@@ -169,6 +173,7 @@ class Caches {
       marketListings: marketListings,
       construction: construction,
       systemConnectivity: systemConnectivity,
+      jumpGates: jumpGates,
     );
   }
 

@@ -50,6 +50,10 @@ class JumpGateRecord extends Equatable {
   /// The connections for this jump gate.
   final Set<WaypointSymbol> connections;
 
+  /// The connected system symbols.
+  Set<SystemSymbol> get connectedSystemSymbols =>
+      connections.map((e) => e.systemSymbol).toSet();
+
   /// Converts this object to JumpGate model object.
   JumpGate toJumpGate() => JumpGate(
         connections: connections.map((e) => e.toString()).sorted(),
@@ -101,21 +105,15 @@ class JumpGateCache extends JsonListStore<JumpGateRecord> {
   int get waypointCount => values.length;
 
   /// Updates a [JumpGate] in the cache.
-  void updateJumpGate({
-    required WaypointSymbol waypointSymbol,
-    required JumpGate jumpGate,
-    DateTime Function() getNow = defaultGetNow,
-  }) {
+  void updateJumpGate(JumpGateRecord jumpGateRecord) {
     final index = records.indexWhere(
-      (record) => record.waypointSymbol == waypointSymbol,
+      (record) => record.waypointSymbol == jumpGateRecord.waypointSymbol,
     );
 
-    final newRecord =
-        JumpGateRecord.fromJumpGate(waypointSymbol, jumpGate, getNow());
     if (index >= 0) {
-      records[index] = newRecord;
+      records[index] = jumpGateRecord;
     } else {
-      records.add(newRecord);
+      records.add(jumpGateRecord);
     }
 
     save();
@@ -150,21 +148,20 @@ class JumpGateCache extends JsonListStore<JumpGateRecord> {
   }
 
   /// Gets the JumpGate for the given waypoint symbol.
-  Future<JumpGate> getOrFetch(
+  Future<JumpGateRecord> getOrFetch(
     Api api,
     WaypointSymbol waypointSymbol, {
     DateTime Function() getNow = defaultGetNow,
   }) async {
-    final record = recordForSymbol(waypointSymbol);
-    if (record != null) {
-      return record.toJumpGate();
+    final cached = recordForSymbol(waypointSymbol);
+    if (cached != null) {
+      return cached;
     }
     final jumpGate = await getJumpGate(api, waypointSymbol);
-    updateJumpGate(
-      waypointSymbol: waypointSymbol,
-      jumpGate: jumpGate,
-      getNow: getNow,
-    );
-    return jumpGate;
+
+    final record =
+        JumpGateRecord.fromJumpGate(waypointSymbol, jumpGate, getNow());
+    updateJumpGate(record);
+    return record;
   }
 }

@@ -292,6 +292,12 @@ extension WaypointUtils on Waypoint {
   /// Returns true if the waypoint can be siphoned.
   bool get canBeSiphoned => isType(WaypointType.GAS_GIANT);
 
+  /// Returns true if the waypoint is a jump gate.
+  bool get isJumpGate => isType(WaypointType.JUMP_GATE);
+
+  /// Returns true if the waypoint has been charted.
+  bool get isCharted => chart != null;
+
   /// Returns true if the waypoint has a shipyard.
   bool get hasShipyard => hasTrait(WaypointTraitSymbol.SHIPYARD);
 
