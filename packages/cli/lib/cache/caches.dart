@@ -8,6 +8,7 @@ import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/shipyard_listing_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
@@ -31,6 +32,7 @@ export 'package:cli/cache/jump_gate_cache.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/market_prices.dart';
 export 'package:cli/cache/ship_cache.dart';
+export 'package:cli/cache/shipyard_listing_cache.dart';
 export 'package:cli/cache/shipyard_prices.dart';
 export 'package:cli/cache/static_cache.dart';
 export 'package:cli/cache/systems_cache.dart';
@@ -62,6 +64,7 @@ class Caches {
     required this.construction,
     required this.systemConnectivity,
     required this.jumpGates,
+    required this.shipyardListings,
   });
 
   /// The agent cache.
@@ -75,6 +78,9 @@ class Caches {
 
   /// The contract cache.
   final ContractCache contracts;
+
+  /// Known shipyard listings.
+  final ShipyardListingCache shipyardListings;
 
   /// The historical shipyard prices.
   final ShipyardPrices shipyardPrices;
@@ -128,6 +134,7 @@ class Caches {
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.loadOrFetch(api, fs: fs, forceRefresh: true);
     final shipyard = ShipyardPrices.load(fs);
+    final shipyardListings = ShipyardListingCache.load(fs);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
     final charting = ChartingCache.load(fs, static.waypointTraits);
@@ -174,6 +181,7 @@ class Caches {
       construction: construction,
       systemConnectivity: systemConnectivity,
       jumpGates: jumpGates,
+      shipyardListings: shipyardListings,
     );
   }
 

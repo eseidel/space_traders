@@ -1,6 +1,7 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
+import 'package:cli/net/queries.dart';
 
 class FetchQueue {
   FetchQueue(this.api, this.db, this.caches);
@@ -15,7 +16,7 @@ class FetchQueue {
     if (_seen.contains(systemSymbol)) {
       return;
     }
-    logger.info('Add: $systemSymbol');
+    logger.info('Queuing: $systemSymbol');
     _systems.add(systemSymbol);
   }
 
@@ -24,14 +25,22 @@ class FetchQueue {
     _seen.add(systemSymbol);
     final waypoints = await caches.waypoints.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
+      final waypointSymbol = waypoint.waypointSymbol;
       if (waypoint.hasMarketplace) {
-        final listing =
-            caches.marketListings.listingForSymbol(waypoint.waypointSymbol);
+        final listing = caches.marketListings[waypointSymbol];
         if (listing == null) {
-          await caches.markets.refreshMarket(waypoint.waypointSymbol);
+          logger.info(' Market: $waypointSymbol');
+          await caches.markets.refreshMarket(waypointSymbol);
         }
       }
-      // TODO(eseidel): Record Shipyard listings.
+      if (waypoint.hasShipyard) {
+        final listing = caches.shipyardListings[waypointSymbol];
+        if (listing == null) {
+          logger.info(' Shipyard: $waypointSymbol');
+          final shipyard = await getShipyard(api, waypointSymbol);
+          caches.shipyardListings.addShipyard(shipyard);
+        }
+      }
 
       // Can only fetch jump gates for waypoints which are charted or have
       // a ship there.
