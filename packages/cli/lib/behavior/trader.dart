@@ -616,6 +616,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   final costedTrip = assertNotNull(
     findBestMarketToSell(
       caches.marketPrices,
+      caches.marketListings,
       caches.routePlanner,
       ship,
       unwantedCargo.tradeSymbol,

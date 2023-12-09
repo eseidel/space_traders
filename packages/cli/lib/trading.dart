@@ -599,6 +599,17 @@ MarketTrip? findBestMarketToBuy(
   return best;
 }
 
+/// Returns the cost of a route plan in credits.
+int estimateRoutePlanCost({
+  required RoutePlan route,
+  required int costPerFuelUnit,
+  required int costPerAntimatterUnit,
+}) {
+  final fuelCost = costPerFuelUnit * (route.fuelUsed / 100).ceil();
+  final antimatterCost = costPerAntimatterUnit * route.antimatterUsed;
+  return fuelCost + antimatterCost;
+}
+
 /// Find the best market to sell a given item to.
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
 /// used for evaluating the trade-off between "closest" vs. "cheapest".
@@ -606,6 +617,7 @@ MarketTrip? findBestMarketToBuy(
 // TODO(eseidel): This does not work with no pricing data.
 MarketTrip? findBestMarketToSell(
   MarketPrices marketPrices,
+  MarketListingCache marketListings,
   RoutePlanner routePlanner,
   Ship ship,
   TradeSymbol tradeSymbol, {
@@ -660,28 +672,46 @@ MarketTrip? findBestMarketToSell(
 
   final roundTripMultiplier = includeRoundTripCost ? 2 : 1;
   final nearest = sorted.first;
+  // We could do per-destination fuel cost planning, but that seems overkill.
+  final costPerFuelUnit = marketPrices.medianPurchasePrice(
+        TradeSymbol.FUEL,
+      ) ??
+      100;
+  final costPerUnitAntimatter = marketPrices.medianPurchasePrice(
+        TradeSymbol.ANTIMATTER,
+      ) ??
+      10000;
+
+  int estimateTripCost(MarketTrip trip) {
+    return estimateRoutePlanCost(
+      route: trip.route,
+      costPerFuelUnit: costPerFuelUnit,
+      costPerAntimatterUnit: costPerUnitAntimatter,
+    );
+  }
+
   var best = nearest;
   // Pick any one further that earns more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
+    final listing =
+        marketListings.marketListingForSymbol(trip.price.waypointSymbol);
+    if (listing == null) {
+      detail('Skipping ${trip.price.waypointSymbol} due to no market data');
+      continue;
+    }
+    if (requireFuelAtDestination && !listing.allowsTradeOf(TradeSymbol.FUEL)) {
+      detail('Skipping ${trip.price.waypointSymbol} due to no fuel');
+      continue;
+    }
+
     final priceDiff = trip.price.sellPrice - nearest.price.sellPrice;
-    var extraEarnings = priceDiff * unitsToSell;
+    final extraEarnings = priceDiff * unitsToSell;
     final extraTime =
         applyMin(trip.route.duration) - applyMin(nearest.route.duration);
 
-    final costPerFuelUnit = marketPrices.recentPurchasePrice(
-      TradeSymbol.FUEL,
-      marketSymbol: trip.route.endSymbol,
-    );
-    final extraFuel = (trip.route.fuelUsed - nearest.route.fuelUsed) * 2;
-    final extraFuelCost = costPerFuelUnit != null
-        ? costPerFuelUnit * (extraFuel / 100).ceil()
-        : 0;
-    if (costPerFuelUnit != null) {
-      extraEarnings -= extraFuelCost;
-    } else if (costPerFuelUnit == null && requireFuelAtDestination) {
-      detail('Skipping ${trip.price.waypointSymbol} due to unknown fuel cost');
-      continue;
-    }
+    final nearestCost = estimateTripCost(nearest);
+    final tripCost = estimateTripCost(trip);
+    final extraFuelCost = tripCost - nearestCost;
 
     // TODO(eseidel): if extraTime is zero, earningsPerSecond ends up infinity.
     // In that case we want to compare absolute earnings of trip vs. nearest.

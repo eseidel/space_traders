@@ -441,6 +441,7 @@ Future<JobResult> travelAndSellCargo(
   final costedTrip = assertNotNull(
     findBestMarketToSell(
       caches.marketPrices,
+      caches.marketListings,
       caches.routePlanner,
       ship,
       largestCargo.tradeSymbol,

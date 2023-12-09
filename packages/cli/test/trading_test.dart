@@ -1,3 +1,4 @@
+import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
@@ -10,6 +11,8 @@ import 'package:test/test.dart';
 import 'package:types/types.dart';
 
 class _MockLogger extends Mock implements Logger {}
+
+class _MockMarketListingCache extends Mock implements MarketListingCache {}
 
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
@@ -538,6 +541,8 @@ void main() {
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn('S-1');
     final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
+    final midSymbol = WaypointSymbol.fromString('S-A-MID');
+    final farSymbol = WaypointSymbol.fromString('S-A-FAR');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
@@ -565,7 +570,7 @@ void main() {
       activity: ActivityLevel.WEAK,
     );
     final mid = MarketPrice(
-      waypointSymbol: WaypointSymbol.fromString('S-A-MID'),
+      waypointSymbol: midSymbol,
       symbol: TradeSymbol.ALUMINUM,
       supply: SupplyLevel.ABUNDANT,
       purchasePrice: 1,
@@ -575,7 +580,7 @@ void main() {
       activity: ActivityLevel.WEAK,
     );
     final far = MarketPrice(
-      waypointSymbol: WaypointSymbol.fromString('S-A-FAR'),
+      waypointSymbol: farSymbol,
       symbol: TradeSymbol.ALUMINUM,
       supply: SupplyLevel.ABUNDANT,
       purchasePrice: 1,
@@ -615,25 +620,46 @@ void main() {
     when(
       () => routePlanner.planRoute(
         start: nearSymbol,
-        end: mid.waypointSymbol,
+        end: midSymbol,
         fuelCapacity: fuelCapacity,
         shipSpeed: shipSpeed,
       ),
-    ).thenReturn(fakePlan(nearSymbol, mid.waypointSymbol, 10));
+    ).thenReturn(fakePlan(nearSymbol, midSymbol, 10));
     when(
       () => routePlanner.planRoute(
         start: nearSymbol,
-        end: far.waypointSymbol,
+        end: farSymbol,
         fuelCapacity: fuelCapacity,
         shipSpeed: shipSpeed,
       ),
-    ).thenReturn(fakePlan(nearSymbol, far.waypointSymbol, 10000000));
+    ).thenReturn(fakePlan(nearSymbol, farSymbol, 10000000));
+
+    final marketListings = _MockMarketListingCache();
+    when(() => marketListings.marketListingForSymbol(nearSymbol)).thenReturn(
+      MarketListing(
+        waypointSymbol: nearSymbol,
+        exchange: const {TradeSymbol.ALUMINUM, TradeSymbol.FUEL},
+      ),
+    );
+    when(() => marketListings.marketListingForSymbol(midSymbol)).thenReturn(
+      MarketListing(
+        waypointSymbol: midSymbol,
+        exchange: const {TradeSymbol.ALUMINUM, TradeSymbol.FUEL},
+      ),
+    );
+    when(() => marketListings.marketListingForSymbol(farSymbol)).thenReturn(
+      MarketListing(
+        waypointSymbol: farSymbol,
+        exchange: const {TradeSymbol.ALUMINUM, TradeSymbol.FUEL},
+      ),
+    );
 
     final logger = _MockLogger();
     final market = runWithLogger(
       logger,
       () => findBestMarketToSell(
         marketPrices,
+        marketListings,
         routePlanner,
         ship,
         TradeSymbol.ALUMINUM,

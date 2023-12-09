@@ -174,6 +174,10 @@ class RoutePlan {
   /// The total fuel used during this route.
   final int fuelUsed;
 
+  /// The total antimatter used during this route.
+  int get antimatterUsed =>
+      actions.where((e) => e.type == RouteActionType.jump).length;
+
   /// The actions to take to travel between the two waypoints.
   final List<RouteAction> actions;
 
