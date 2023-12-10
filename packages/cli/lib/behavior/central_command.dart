@@ -156,11 +156,15 @@ class CentralCommand {
       return BehaviorState(shipSymbol, behavior);
     }
 
+    bool enabled(Behavior behavior) {
+      return !_behaviorCache.isBehaviorDisabledForShip(ship, behavior);
+    }
+
     if (ship.isOutOfFuel) {
       return toState(Behavior.idle);
     }
     // We'll always upgrade a ship as our best option.
-    if (shouldBuyMount(ship, credits)) {
+    if (enabled(Behavior.mountFromBuy) && shouldBuyMount(ship, credits)) {
       final request = _takeMountRequest(ship);
       shipInfo(ship, 'Starting buy mount ${request.mountSymbol}');
       return BehaviorState(
@@ -171,7 +175,7 @@ class CentralCommand {
       );
     }
     // Otherwise buy a ship if we can.
-    if (shouldBuyShip(ship, credits)) {
+    if (enabled(Behavior.buyShip) && shouldBuyShip(ship, credits)) {
       return BehaviorState(
         shipSymbol,
         Behavior.buyShip,
@@ -186,7 +190,7 @@ class CentralCommand {
         FleetRole.surveyor: Behavior.surveyor,
         FleetRole.siphoner: Behavior.siphoner,
       }[ship.fleetRole];
-      if (behavior != null) {
+      if (behavior != null && enabled(behavior)) {
         return BehaviorState(
           shipSymbol,
           behavior,
@@ -197,14 +201,16 @@ class CentralCommand {
 
     if (ship.isProbe) {
       final assignedSystem = assignedSystemForSatellite(ship);
-      if (assignedSystem != null) {
+      if (assignedSystem != null && enabled(Behavior.systemWatcher)) {
         return BehaviorState(
           shipSymbol,
           Behavior.systemWatcher,
           systemWatcherJob: SystemWatcherJob(systemSymbol: assignedSystem),
         );
       }
-      return toState(Behavior.charter);
+      if (enabled(Behavior.charter)) {
+        return toState(Behavior.charter);
+      }
     }
 
     // Otherwise start any other job.
@@ -443,6 +449,8 @@ class CentralCommand {
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
+    caches.updateRoutingCaches();
+
     miningSquads = await assignShipsToSquads(
       caches.systems,
       caches.waypoints,
