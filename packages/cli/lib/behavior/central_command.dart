@@ -120,13 +120,13 @@ class CentralCommand {
   }
 
   /// Returns the system symbol we should assign the given [ship] to.
-  SystemSymbol assignedSystemForSatellite(AgentCache agentCache, Ship ship) {
+  SystemSymbol assignedSystemForSatellite(Ship ship) {
     final assignedSystem = _assignedSystemsForSatellites[ship.shipSymbol];
     if (assignedSystem != null) {
       return assignedSystem;
     }
-    // Should CentralCommand cache headquartersSystemSymbol?
-    return agentCache.headquartersSystemSymbol;
+    // If we don't have an assignment, stay where we are.
+    return ship.systemSymbol;
   }
 
   /// Returns the mining squad for the given [ship].

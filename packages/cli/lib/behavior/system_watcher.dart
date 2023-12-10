@@ -120,8 +120,7 @@ Future<JobResult> _travelToAssignedSystem(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final systemSymbol =
-      centralCommand.assignedSystemForSatellite(caches.agent, ship);
+  final systemSymbol = centralCommand.assignedSystemForSatellite(ship);
   if (ship.systemSymbol != systemSymbol) {
     // We're not in the system we're supposed to be in, so we need to route
     // there.
