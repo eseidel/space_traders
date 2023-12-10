@@ -10,10 +10,3 @@ linter:
     # This lint is wrong.  It changes behavior to pass the future
     # out, making exceptions happen in the outer scope.
     unnecessary_await_in_return: false
-
-# For additional information about configuring this file, see
-# https://dart.dev/guides/language/analysis-options
-analyzer:
-  errors:
-    collection_methods_unrelated_type: warning
-    unrelated_type_equality_checks: warning
