@@ -1,3 +1,4 @@
+import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
@@ -228,9 +229,11 @@ void main() {
       path: 'test/nav/fixtures/systems-09-24-2023.json',
     )!;
     final jumpGateCache = JumpGateCache([], fs: fs);
+    final constructionCache = ConstructionCache([], fs: fs);
     final routePlanner = RoutePlanner.fromCaches(
       systemsCache,
       jumpGateCache,
+      constructionCache,
       sellsFuel: (_) => false,
     );
     RoutePlan? planRoute(
@@ -359,9 +362,11 @@ void main() {
     );
 
     final jumpGateCache = JumpGateCache([], fs: fs);
+    final constructionCache = ConstructionCache([], fs: fs);
     final routePlanner = RoutePlanner.fromCaches(
       systemsCache,
       jumpGateCache,
+      constructionCache,
       // Allow refueling at waypoints or this test will fail.
       sellsFuel: (_) => true,
     );

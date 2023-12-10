@@ -75,9 +75,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   final jumpGateCache = JumpGateCache.load(fs);
+  final constructionCache = ConstructionCache.load(fs);
   final routePlanner = RoutePlanner.fromCaches(
     systemsCache,
     jumpGateCache,
+    constructionCache,
     sellsFuel: sellsFuel,
   );
 

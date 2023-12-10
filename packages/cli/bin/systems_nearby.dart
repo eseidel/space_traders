@@ -14,9 +14,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
   final jumpGateCache = JumpGateCache.load(fs);
-
+  final constructionCache = ConstructionCache.load(fs);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGateCache(jumpGateCache);
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
 
   final connectedSystemSymbols =
       systemConnectivity.directlyConnectedSystemSymbols(startSystemSymbol);

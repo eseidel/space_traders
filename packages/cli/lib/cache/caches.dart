@@ -148,9 +148,9 @@ class Caches {
     final behaviors = BehaviorCache.load(fs);
 
     final jumpGates = JumpGateCache.load(fs);
-    final systemConnectivity = SystemConnectivity.fromJumpGateCache(
-      jumpGates,
-    );
+    final constructionCache = ConstructionCache.load(fs);
+    final systemConnectivity =
+        SystemConnectivity.fromJumpGates(jumpGates, constructionCache);
     final routePlanner = RoutePlanner.fromSystemsCache(
       systems,
       systemConnectivity,

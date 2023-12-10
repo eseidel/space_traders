@@ -12,9 +12,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final marketPrices = MarketPrices.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
+  final constructionCache = ConstructionCache.load(fs);
   final routePlanner = RoutePlanner.fromCaches(
     systemsCache,
     jumpGateCache,
+    constructionCache,
     sellsFuel: defaultSellsFuel(marketListings),
   );
 

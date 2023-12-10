@@ -38,7 +38,8 @@ class ConstructionRecord extends Equatable {
   List<Object?> get props => [waypointSymbol, timestamp, construction];
 
   /// Whether the waypoint is under construction.
-  bool get isUnderConstruction => construction != null;
+  bool get isUnderConstruction =>
+      construction != null && !construction!.isComplete;
 
   /// Converts this object to a JSON encodable object.
   Map<String, dynamic> toJson() => <String, dynamic>{

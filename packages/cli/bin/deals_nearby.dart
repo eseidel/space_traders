@@ -16,9 +16,11 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
   final jumpGateCache = JumpGateCache.load(fs);
+  final constructionCache = ConstructionCache.load(fs);
   final routePlanner = RoutePlanner.fromCaches(
     systemsCache,
     jumpGateCache,
+    constructionCache,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final marketPrices = MarketPrices.load(fs);
@@ -29,7 +31,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final contractCache = ContractCache.load(fs)!;
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-  final constructionCache = ConstructionCache.load(fs);
 
   final start = startArg == null
       ? agentCache.headquarters(systemsCache)

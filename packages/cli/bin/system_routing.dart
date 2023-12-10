@@ -19,10 +19,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
-  final jumpGateCache = JumpGateCache.load(fs);
+  final jumpGates = JumpGateCache.load(fs);
+  final constructionCache = ConstructionCache.load(fs);
   final routePlanner = RoutePlanner.fromCaches(
     systems,
-    jumpGateCache,
+    jumpGates,
+    constructionCache,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final waypoints = await waypointCache.waypointsInSystem(hqSystemSymbol);

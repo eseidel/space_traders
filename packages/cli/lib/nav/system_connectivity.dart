@@ -1,5 +1,5 @@
+import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/jump_gate_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -51,78 +51,19 @@ class _ClusterFinder {
   }
 }
 
-Map<SystemSymbol, Set<SystemSymbol>> _fullyConnect(
-  Map<SystemSymbol, Set<SystemSymbol>> partial,
-) {
-  final fullyConnected = <SystemSymbol, Set<SystemSymbol>>{};
-  for (final systemSymbol in partial.keys) {
-    final connectedSymbols = partial[systemSymbol] ?? {};
-    for (final connectedSymbol in connectedSymbols) {
-      fullyConnected.putIfAbsent(systemSymbol, () => {}).add(connectedSymbol);
-      fullyConnected.putIfAbsent(connectedSymbol, () => {}).add(systemSymbol);
+class _Clusters {
+  _Clusters(this._clusterBySystemSymbol);
+
+  factory _Clusters.fromConnections(_Connections connections) {
+    final clusterFinder = _ClusterFinder(connections.systems);
+    for (final systemSymbol in connections.systems.keys) {
+      clusterFinder.paintCluster(systemSymbol);
     }
-  }
-  return fullyConnected;
-}
-
-Map<SystemSymbol, Set<SystemSymbol>> _findAllConnections(
-  JumpGateCache jumpGateCache,
-) {
-  // JumpGateCache caches responses from the server.  We may not yet have
-  // cached both sides of a jump gate, so this method fills in the gaps.
-  final partial = jumpGateCache.values.fold(
-    <SystemSymbol, Set<SystemSymbol>>{},
-    (map, record) {
-      map
-          .putIfAbsent(record.waypointSymbol.systemSymbol, () => {})
-          .addAll(record.connections.map((c) => c.systemSymbol));
-      return map;
-    },
-  );
-  return _fullyConnect(partial);
-}
-
-Map<SystemSymbol, int> _findClusters(
-  Map<SystemSymbol, Set<SystemSymbol>> directConnections,
-) {
-  final clusterFinder = _ClusterFinder(directConnections);
-  for (final systemSymbol in directConnections.keys) {
-    clusterFinder.paintCluster(systemSymbol);
-  }
-  return clusterFinder.clusterBySystemSymbol;
-}
-
-/// Holds the results from finding clusters of systems on the jumpgate
-/// networks.
-class SystemConnectivity {
-  /// Creates a new SystemConnectivity.
-  SystemConnectivity._(this._clusterBySystemSymbol, this._directConnections);
-
-  /// Creates a new SystemConnectivity from the given connections.
-  @visibleForTesting
-  factory SystemConnectivity.test(
-    Map<SystemSymbol, Set<SystemSymbol>> partialConnections,
-  ) {
-    final directConnections = _fullyConnect(partialConnections);
-    return SystemConnectivity._(
-      _findClusters(directConnections),
-      directConnections,
-    );
+    return _Clusters(clusterFinder.clusterBySystemSymbol);
   }
 
-  /// Creates a new SystemConnectivity from the systemsCache.
-  factory SystemConnectivity.fromJumpGateCache(JumpGateCache jumpGateCache) {
-    final directConnections = _findAllConnections(jumpGateCache);
-    return SystemConnectivity._(
-      _findClusters(directConnections),
-      directConnections,
-    );
-  }
-
-  final Map<SystemSymbol, Set<SystemSymbol>> _directConnections;
   final Map<SystemSymbol, int> _clusterBySystemSymbol;
   final Map<int, int> _systemCountByClusterId = {};
-  final Map<int, int> _waypointCountByClusterId = {};
 
   /// Returns the number of systems reachable from [systemSymbol].
   int connectedSystemCount(SystemSymbol systemSymbol) {
@@ -138,25 +79,6 @@ class SystemConnectivity {
     return _systemCountByClusterId[systemClusterId]!;
   }
 
-  /// Returns the number of waypoints reachable from [systemSymbol].
-  int connectedWaypointCount(
-    SystemsCache systemsCache,
-    SystemSymbol systemSymbol,
-  ) {
-    final systemClusterId = _clusterBySystemSymbol[systemSymbol];
-    if (systemClusterId == null) {
-      throw ArgumentError('System $systemSymbol has no cluster');
-    }
-    if (!_waypointCountByClusterId.containsKey(systemClusterId)) {
-      _waypointCountByClusterId[systemClusterId] = _clusterBySystemSymbol
-          .entries
-          .where((e) => e.value == systemClusterId)
-          .expand((e) => systemsCache.waypointsInSystem(e.key))
-          .length;
-    }
-    return _waypointCountByClusterId[systemClusterId]!;
-  }
-
   /// Returns the cluster id for the given system.
   int? clusterIdForSystem(SystemSymbol systemSymbol) =>
       _clusterBySystemSymbol[systemSymbol];
@@ -168,33 +90,131 @@ class SystemConnectivity {
       _clusterBySystemSymbol.entries
           .where((e) => e.value == clusterId)
           .map((e) => e.key);
+}
+
+// Used for converting a partial graph to a fully connected graph.
+// Makes it easy to write tests listing just single direction connections.
+// Map<SystemSymbol, Set<SystemSymbol>> _fullyConnect(
+//   Map<SystemSymbol, Set<SystemSymbol>> partial,
+// ) {
+//   final fullyConnected = <SystemSymbol, Set<SystemSymbol>>{};
+//   for (final systemSymbol in partial.keys) {
+//     final connectedSymbols = partial[systemSymbol] ?? {};
+//     for (final connectedSymbol in connectedSymbols) {
+//       fullyConnected.putIfAbsent(systemSymbol, () => {}).add(connectedSymbol);
+//       fullyConnected.putIfAbsent(connectedSymbol, () => {}).add(systemSymbol);
+//     }
+//   }
+//   return fullyConnected;
+// }
+
+// This could be simplified by storing waypoints instead.
+class _Connections {
+  _Connections.fromPartial(
+    Map<WaypointSymbol, Set<WaypointSymbol>> partialConnections,
+  ) {
+    for (final from in partialConnections.keys) {
+      final fromSystem = from.systemSymbol;
+      for (final to in partialConnections[from]!) {
+        final toSystem = to.systemSymbol;
+        systems.putIfAbsent(fromSystem, () => {}).add(toSystem);
+        systems.putIfAbsent(toSystem, () => {}).add(fromSystem);
+      }
+    }
+  }
+
+  _Connections.fromCaches(
+    JumpGateCache jumpGateCache,
+    ConstructionCache constructionCache,
+  ) {
+    // JumpGateCache caches responses from the server.  We may not yet have
+    // cached both sides of a jump gate, so this fills in the gaps.
+    for (final record in jumpGateCache.values) {
+      final from = record.waypointSymbol;
+      final fromUnderConstruction = constructionCache.isUnderConstruction(from);
+      // If we don't know or it's not complete, we can't jump.
+      if (fromUnderConstruction == null || fromUnderConstruction == true) {
+        continue;
+      }
+      final fromSystem = from.systemSymbol;
+      for (final to in record.connections) {
+        final toUnderConstruction = constructionCache.isUnderConstruction(to);
+        // If we don't know or it's not complete, we can't jump.
+        if (toUnderConstruction == null || toUnderConstruction == true) {
+          continue;
+        }
+        final toSystem = to.systemSymbol;
+        systems.putIfAbsent(fromSystem, () => {}).add(toSystem);
+        systems.putIfAbsent(toSystem, () => {}).add(fromSystem);
+      }
+    }
+  }
+
+  /// Maps a waypoint to the set of waypoints it has direct connections to.
+  // final Map<WaypointSymbol, Set<WaypointSymbol>> waypoints = {};
+  // Maps a system to the set of systems it has direct connections to.
+  final Map<SystemSymbol, Set<SystemSymbol>> systems = {};
+}
+
+/// Holds connectivity information between systems.
+class SystemConnectivity {
+  /// Creates a new SystemConnectivity.
+  SystemConnectivity._(this._connections)
+      : _clusters = _Clusters.fromConnections(_connections);
+
+  /// Creates a new SystemConnectivity from the given connections.
+  @visibleForTesting
+  factory SystemConnectivity.test(
+    Map<WaypointSymbol, Set<WaypointSymbol>> partial,
+  ) {
+    return SystemConnectivity._(_Connections.fromPartial(partial));
+  }
+
+  /// Creates a new SystemConnectivity from the systemsCache.
+  factory SystemConnectivity.fromJumpGates(
+    JumpGateCache jumpGates,
+    ConstructionCache construction,
+  ) {
+    final connections = _Connections.fromCaches(jumpGates, construction);
+    return SystemConnectivity._(connections);
+  }
+
+  _Connections _connections;
+  _Clusters _clusters;
+
+  /// Returns the number of systems reachable from [systemSymbol].
+  int connectedSystemCount(SystemSymbol systemSymbol) =>
+      _clusters.connectedSystemCount(systemSymbol);
+
+  /// Returns the cluster id for the given system.
+  int? clusterIdForSystem(SystemSymbol systemSymbol) =>
+      _clusters.clusterIdForSystem(systemSymbol);
+
+  /// Returns all the systemSymbols in a given cluster. This is most useful when
+  /// looking up a cluster for a specific system first, then you can use this
+  /// method to find all the systems in that cluster.
+  Iterable<SystemSymbol> systemSymbolsByClusterId(int clusterId) =>
+      _clusters.systemSymbolsByClusterId(clusterId);
 
   /// Returns systems that are directly connected to [systemSymbol].
   Set<SystemSymbol> directlyConnectedSystemSymbols(SystemSymbol systemSymbol) =>
-      _directConnections[systemSymbol] ?? {};
+      _connections.systems[systemSymbol] ?? {};
 
-  /// Returns true if there exists a direct jump between [startSymbol] and
-  /// [endSymbol].
-  bool existsDirectJumpBetween(
-    SystemSymbol startSymbol,
-    SystemSymbol endSymbol,
-  ) {
-    return _directConnections[startSymbol]?.contains(endSymbol) ?? false;
+  /// Returns true if there exists a direct jump between [start] and [end].
+  bool existsDirectJumpBetween(SystemSymbol start, SystemSymbol end) {
+    return _connections.systems[start]?.contains(end) ?? false;
   }
 
   /// Returns true if there exists a path in the jumpgate network between
-  /// [startSymbol] and [endSymbol] or they are the same.
-  bool existsJumpPathBetween(
-    SystemSymbol startSymbol,
-    SystemSymbol endSymbol,
-  ) {
+  /// [start] and [end] or they are the same.
+  bool existsJumpPathBetween(SystemSymbol start, SystemSymbol end) {
     // Even if we don't have a cluster for the start or end, we can still
     // check if they are the same.
-    if (startSymbol == endSymbol) {
+    if (start == end) {
       return true;
     }
-    final startCluster = _clusterBySystemSymbol[startSymbol];
-    final endCluster = _clusterBySystemSymbol[endSymbol];
+    final startCluster = _clusters._clusterBySystemSymbol[start];
+    final endCluster = _clusters._clusterBySystemSymbol[end];
     return startCluster != null && startCluster == endCluster;
   }
 }
