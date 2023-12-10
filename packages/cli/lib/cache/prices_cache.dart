@@ -19,14 +19,12 @@ class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>>
     required super.path,
   });
 
+  /// WaypointSymbols for all markets in the cache.
+  Set<WaypointSymbol> get waypointSymbols =>
+      prices.map((e) => e.waypointSymbol).toSet();
+
   /// Get the count of unique waypoints.
-  int get waypointCount {
-    final waypoints = <WaypointSymbol>{};
-    for (final price in prices) {
-      waypoints.add(price.waypointSymbol);
-    }
-    return waypoints.length;
-  }
+  int get waypointCount => waypointSymbols.length;
 
   /// Get the raw pricing data.
   List<Record> get prices => records;

@@ -254,7 +254,6 @@ class CentralCommand {
     RoutePlanner routePlanner,
     Ship ship, {
     required int maxTotalOutlay,
-    required int maxWaypoints,
     WaypointSymbol? overrideStartSymbol,
   }) {
     final startSymbol = overrideStartSymbol ?? ship.waypointSymbol;
@@ -278,7 +277,6 @@ class CentralCommand {
       marketPrices,
       routePlanner,
       maxTotalOutlay: maxTotalOutlay,
-      maxWaypoints: maxWaypoints,
       startSymbol: startSymbol,
       extraSellOpps: extraSellOpps,
       shipSpec: ship.shipSpec,

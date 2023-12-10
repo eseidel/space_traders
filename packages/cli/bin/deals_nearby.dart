@@ -11,7 +11,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final limit = int.parse(argResults['limit'] as String);
   final startArg = argResults['start'] as String?;
   final credits = int.parse(argResults['credits'] as String);
-  const maxWaypoints = 200;
 
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
@@ -58,8 +57,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       'speed = $shipSpeed '
       'capacity = $cargoCapacity, '
       'fuel <= $fuelCapacity, '
-      'outlay <= $credits, '
-      'waypoints <= $maxWaypoints ');
+      'outlay <= $credits');
 
   if (extraSellOpps.isNotEmpty) {
     logger.info('Extra sell opps:');
@@ -71,12 +69,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     }
   }
 
-  final marketScan = scanNearbyMarkets(
-    systemsCache,
-    marketPrices,
-    systemSymbol: start.systemSymbol,
-    maxWaypoints: maxWaypoints,
-  );
+  final marketScan = scanAllKnownMarkets(systemsCache, marketPrices);
   logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
   final deals = findDealsFor(
     marketPrices,

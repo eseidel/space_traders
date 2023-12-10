@@ -14,9 +14,6 @@ import 'package:cli/trading.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-// TODO(eseidel): Make maxWaypoints bigger as routing gets faster.
-const _maxWaypoints = 100;
-
 // This is split out from the main function to allow early returns.
 /// Public to allow sharing with contract trader (for now).
 Future<Transaction?> purchaseTradeGoodIfPossible(
@@ -865,7 +862,6 @@ Future<JobResult> _initDeal(
     caches.systems,
     caches.routePlanner,
     ship,
-    maxWaypoints: _maxWaypoints,
     maxTotalOutlay: caches.agent.agent.credits,
   );
 
@@ -901,7 +897,6 @@ Future<JobResult> _initDeal(
           ship,
           overrideStartSymbol: startSymbol,
           maxTotalOutlay: caches.agent.agent.credits,
-          maxWaypoints: _maxWaypoints,
         );
       },
       ship,

@@ -38,15 +38,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Look up what trade symbols are required to produce the export.
   final tradeSymbols = staticCaches.exports[export]!.imports;
   const minProfitPerSecond = -100;
-  const maxWaypoints = 100;
   final waypointSymbol = listing.waypointSymbol;
 
   logger.info('$shipType @ $waypointSymbol, '
       'speed = ${shipSpec.speed} '
       'capacity = ${shipSpec.cargoCapacity}, '
       'fuel <= ${shipSpec.fuelCapacity}, '
-      'outlay <= $credits, '
-      'waypoints <= $maxWaypoints ');
+      'outlay <= $credits');
 
   final neededSymbols = <TradeSymbol>[];
   for (final tradeSymbol in tradeSymbols) {
@@ -64,7 +62,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     marketPrices,
     routePlanner,
     maxTotalOutlay: credits,
-    maxWaypoints: maxWaypoints,
     startSymbol: waypointSymbol,
     shipSpec: shipSpec,
     filter: avoidDealsInProgress(

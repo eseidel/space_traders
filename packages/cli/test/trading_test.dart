@@ -279,15 +279,9 @@ void main() {
 
     final logger = _MockLogger();
 
-    const maxWaypoints = 10;
     final marketScan = runWithLogger(
       logger,
-      () => scanNearbyMarkets(
-        systemsCache,
-        marketPrices,
-        systemSymbol: ship.systemSymbol,
-        maxWaypoints: maxWaypoints,
-      ),
+      () => scanAllKnownMarkets(systemsCache, marketPrices),
     );
 
     final costed = runWithLogger(

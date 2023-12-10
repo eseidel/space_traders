@@ -370,25 +370,19 @@ CostedDeal costOutDeal(
   );
 }
 
-/// Builds a MarketScan from a starting system outwards limiting to
-/// maxWaypoints.
-MarketScan scanNearbyMarkets(
+/// Builds a MarketScan from all known markets.
+MarketScan scanAllKnownMarkets(
   SystemsCache systemsCache,
-  MarketPrices marketPrices, {
-  required SystemSymbol systemSymbol,
-  required int maxWaypoints,
-}) {
-  final allowedWaypoints = systemsCache
-      .waypointsInSystem(systemSymbol)
-      .take(maxWaypoints)
-      .map((w) => w.waypointSymbol)
-      .toSet();
+  MarketPrices marketPrices,
+) {
+  // For now just using all market prices.
+  final allowedWaypoints = marketPrices.waypointSymbols;
   logger.detail('Considering ${allowedWaypoints.length} waypoints');
 
   return MarketScan.fromMarketPrices(
     marketPrices,
     waypointFilter: allowedWaypoints.contains,
-    description: 'near $systemSymbol (limit $maxWaypoints waypoints)',
+    description: 'all known markets',
   );
 }
 
@@ -784,18 +778,12 @@ Iterable<CostedDeal> scanAndFindDeals(
   RoutePlanner routePlanner, {
   required WaypointSymbol startSymbol,
   required int maxTotalOutlay,
-  required int maxWaypoints,
   required ShipSpec shipSpec,
   bool Function(Deal)? filter,
   List<SellOpp>? extraSellOpps,
   int minProfitPerSecond = 0,
 }) {
-  final marketScan = scanNearbyMarkets(
-    systemsCache,
-    marketPrices,
-    systemSymbol: startSymbol.systemSymbol,
-    maxWaypoints: maxWaypoints,
-  );
+  final marketScan = scanAllKnownMarkets(systemsCache, marketPrices);
   return findDealsFor(
     marketPrices,
     systemsCache,
