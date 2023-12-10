@@ -2,8 +2,14 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final agentCache = AgentCache.load(fs)!;
-  final hqSystemSymbol = agentCache.headquartersSystemSymbol;
+  final SystemSymbol startSystemSymbol;
+  if (argResults.rest.isNotEmpty) {
+    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
+  } else {
+    final agentCache = AgentCache.load(fs)!;
+    startSystemSymbol = agentCache.headquartersSystemSymbol;
+  }
+
   final staticCaches = StaticCaches.load(fs);
 
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
@@ -13,11 +19,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       SystemConnectivity.fromJumpGateCache(jumpGateCache);
 
   final connectedSystemSymbols =
-      systemConnectivity.directlyConnectedSystemSymbols(hqSystemSymbol);
-  for (final systemSymbol in connectedSystemSymbols) {
-    final marketCount = marketListings.listingsInSystem(systemSymbol).length;
+      systemConnectivity.directlyConnectedSystemSymbols(startSystemSymbol);
+  for (final connectedSystemSymbol in connectedSystemSymbols) {
+    final marketCount =
+        marketListings.listingsInSystem(connectedSystemSymbol).length;
     logger.info(
-      '${systemSymbol.system.padRight(9)} $marketCount markets',
+      '${connectedSystemSymbol.system.padRight(9)} $marketCount markets',
     );
   }
 }
