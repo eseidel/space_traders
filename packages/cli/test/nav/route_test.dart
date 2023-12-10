@@ -467,7 +467,7 @@ void main() {
     expect(
         describeRoutePlan(plan),
         'B-A to B-A speed: 30 max-fuel: 10\n'
-        'emptyRoute      B-A  B-A  0:00:00.000000s\n'
+        'emptyRoute      B-A  B-A 0ms 0 fuel\n'
         'in 0ms uses 0 fuel\n');
   });
 }
