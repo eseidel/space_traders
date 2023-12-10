@@ -56,8 +56,8 @@ Future<DateTime?> Function(
       return advanceMinerHauler;
     case Behavior.systemWatcher:
       return advanceSystemWatcher;
-    case Behavior.explorer:
-      return advanceExplorer;
+    case Behavior.charter:
+      return advanceCharter;
     case Behavior.mountFromBuy:
       return advanceMountFromBuy;
     case Behavior.idle:

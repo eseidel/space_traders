@@ -84,8 +84,8 @@ enum Behavior {
   /// Watch prices within a single system.
   systemWatcher,
 
-  /// Explore the universe.
-  explorer;
+  /// Chart the universe.
+  charter;
 
   /// encode the enum as Json.
   String toJson() => name;

@@ -850,3 +850,13 @@ in 7m uses 456 fuel
 [WARN] 🛸#1  Beginning route to NB34-F48 (7m)
 🛸#1  ⛽   3 FUEL                           ⚖️    3 x     72c =   -216c -> 🏦 116,259,971c
 [WARN] 🛸#1  Fuel low: 95 / 400
+
+
+### Miner Haulers still confused:
+
+⏱️  2s until 2023-12-10 16:18:27.064
+🛸#F  Still have 5 cargo, waiting for hauler to arrive.
+🛸#F  No haulers at JX78-B37, unknown next arrival time for ESEIDEL-8, ESEIDEL-15, checking in 1 minute.
+🛸#F  Hauler ESEIDEL-8 is IN_ORBIT to JX78-B37 arrival -15m, with 0 space available.
+🛸#F  Hauler ESEIDEL-15 is IN_ORBIT to JX78-B37 arrival -3m, with 73 space available.
+⏱️  3s until 2023-12-10 16:18:31.255

@@ -1,5 +1,7 @@
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/jump_gate_cache.dart';
+import 'package:cli/cache/systems_cache.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -101,8 +103,10 @@ class _Clusters {
 //   for (final systemSymbol in partial.keys) {
 //     final connectedSymbols = partial[systemSymbol] ?? {};
 //     for (final connectedSymbol in connectedSymbols) {
-//       fullyConnected.putIfAbsent(systemSymbol, () => {}).add(connectedSymbol);
-//       fullyConnected.putIfAbsent(connectedSymbol, () => {}).add(systemSymbol);
+//       fullyConnected.putIfAbsent(systemSymbol,
+//        () => {}).add(connectedSymbol);
+//       fullyConnected.putIfAbsent(connectedSymbol,
+//        () => {}).add(systemSymbol);
 //     }
 //   }
 //   return fullyConnected;
@@ -196,6 +200,15 @@ class SystemConnectivity {
   Iterable<SystemSymbol> systemSymbolsByClusterId(int clusterId) =>
       _clusters.systemSymbolsByClusterId(clusterId);
 
+  /// Returns a list of all systems known to be reachable from [systemSymbol].
+  Iterable<SystemSymbol> systemsReachableFrom(SystemSymbol systemSymbol) {
+    final clusterId = clusterIdForSystem(systemSymbol);
+    if (clusterId == null) {
+      return [];
+    }
+    return systemSymbolsByClusterId(clusterId);
+  }
+
   /// Returns systems that are directly connected to [systemSymbol].
   Set<SystemSymbol> directlyConnectedSystemSymbols(SystemSymbol systemSymbol) =>
       _connections.systems[systemSymbol] ?? {};
@@ -216,5 +229,50 @@ class SystemConnectivity {
     final startCluster = _clusters._clusterBySystemSymbol[start];
     final endCluster = _clusters._clusterBySystemSymbol[end];
     return startCluster != null && startCluster == endCluster;
+  }
+
+  /// Yields a stream of system symbols that are within n jumps of the system.
+  /// The system itself is included in the stream with distance 0.
+  /// The stream is roughly ordered by distance from the start.
+  Iterable<(SystemSymbol systemSymbol, int jumps)> systemSymbolsInJumpRadius(
+    SystemsCache systemsCache, {
+    required SystemSymbol startSystem,
+    required int maxJumps,
+  }) sync* {
+    var jumpsLeft = maxJumps;
+    final currentSystemsToJumpFrom = <SystemSymbol>{startSystem};
+    final oneJumpFurther = <SystemSymbol>{};
+    final systemsExamined = <SystemSymbol>{};
+    while (jumpsLeft >= 0) {
+      while (currentSystemsToJumpFrom.isNotEmpty) {
+        final jumpFrom = currentSystemsToJumpFrom.first;
+        currentSystemsToJumpFrom.remove(jumpFrom);
+        systemsExamined.add(jumpFrom);
+        yield (jumpFrom, maxJumps - jumpsLeft);
+        // Don't bother to check connections if we're out of jumps.
+        if (jumpsLeft <= 0) {
+          continue;
+        }
+        // Don't add systems we've already examined or are already in the
+        // list to examine next.
+        final connectedSystems = directlyConnectedSystemSymbols(jumpFrom)
+            .where(
+              (s) =>
+                  !systemsExamined.contains(s) &&
+                  !currentSystemsToJumpFrom.contains(s) &&
+                  !oneJumpFurther.contains(s),
+            )
+            .map((s) => systemsCache[s]);
+        final jumpFromSystem = systemsCache[jumpFrom];
+        final sortedSystems =
+            connectedSystems.sortedBy<num>((s) => s.distanceTo(jumpFromSystem));
+        for (final connectedSystem in sortedSystems) {
+          oneJumpFurther.add(connectedSystem.systemSymbol);
+        }
+      }
+      currentSystemsToJumpFrom.addAll(oneJumpFurther);
+      oneJumpFurther.clear();
+      jumpsLeft--;
+    }
   }
 }

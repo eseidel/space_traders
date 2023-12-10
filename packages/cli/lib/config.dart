@@ -24,6 +24,8 @@ class Config {
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
     ShipType.PROBE,
     ShipType.PROBE,
+    ShipType.PROBE,
+    ShipType.PROBE,
   ];
 
   /// A list of which haulers should be used as miner haulers.
@@ -50,11 +52,7 @@ class Config {
       Behavior.miner,
       Behavior.siphoner,
     ],
-    FleetRole.trader: [
-      Behavior.trader,
-      // Would rather have Haulers idle, than explore if fuel costs are high.
-      // Behavior.explorer,
-    ],
+    FleetRole.trader: [Behavior.trader],
     FleetRole.miner: [Behavior.miner],
     FleetRole.surveyor: [Behavior.surveyor],
     FleetRole.siphoner: [Behavior.siphoner],
@@ -99,15 +97,15 @@ class Config {
   /// Initial max age for price data in any given system.
   final defaultMaxAgeForPriceData = const Duration(days: 3);
 
-  /// System assignments for probes.
+  /// System assignments for probes.  All other probes are set to "explorer".
   final probeAssignments = {
-    '29': 'X1-NB34',
-    '2A': 'X1-NB34',
-    // '2A': 'X1-RA9',
+    '2': 'JX78',
+    '29': 'NB34',
+    // '2A': 'RA9',
   }.map(
     (k, v) => MapEntry(
       ShipSymbol.fromString('ESEIDEL-$k'),
-      SystemSymbol.fromString(v),
+      SystemSymbol.fromString('X1-$v'),
     ),
   );
 }

@@ -169,6 +169,16 @@ class WaypointCache {
         .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
   }
 
+  /// Returns true if the given waypoint is known to be charted, will
+  /// otherwise fetch the waypoint, update our caches and return that value.
+  Future<bool> isCharted(WaypointSymbol waypointSymbol) async {
+    final values = _chartingCache[waypointSymbol];
+    if (values != null) {
+      return true;
+    }
+    return (await waypoint(waypointSymbol)).chart != null;
+  }
+
   /// Returns true if the given waypoint is under construction.
   Future<bool> isUnderConstruction(WaypointSymbol waypointSymbol) async {
     // If we've cached a false result that can never change.

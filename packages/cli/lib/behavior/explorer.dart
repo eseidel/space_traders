@@ -1,79 +1,29 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
-import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
-import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-/// Returns true if the given waypoint is missing either a chart or recent
-/// market data.
-bool isMissingChartOrRecentPriceData(
-  MarketPrices marketPrices,
-  ShipyardPrices shipyardPrices,
-  Waypoint waypoint, {
-  required Duration maxAge,
-}) {
-  return waypoint.chart == null ||
-      _isMissingRecentMarketData(marketPrices, waypoint, maxAge: maxAge) ||
-      _isMissingRecentShipyardData(shipyardPrices, waypoint, maxAge: maxAge);
-}
-
-bool _isMissingRecentMarketData(
-  MarketPrices marketPrices,
-  Waypoint waypoint, {
-  required Duration maxAge,
-}) {
-  return waypoint.hasMarketplace &&
-      !marketPrices.hasRecentData(
-        waypoint.waypointSymbol,
-        maxAge: maxAge,
-      );
-}
-
-bool _isMissingRecentShipyardData(
-  ShipyardPrices shipyardPrices,
-  Waypoint waypoint, {
-  required Duration maxAge,
-}) {
-  return waypoint.hasShipyard &&
-      !shipyardPrices.hasRecentData(
-        waypoint.waypointSymbol,
-        maxAge: maxAge,
-      );
-}
-
 /// Returns the symbol of a waypoint in the system missing a chart.
-Future<WaypointSymbol?> waypointSymbolNeedingExploration(
+Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   SystemsCache systemsCache,
-  ChartingCache chartingCache,
-  MarketPrices marketPrices,
-  ShipyardPrices shipyardPrices,
+  WaypointCache waypointCache,
   Ship ship,
   System system, {
-  required Duration maxAge,
   required bool Function(WaypointSymbol waypointSymbol)? filter,
-  required WaypointCache waypointCache,
 }) async {
-  final WaypointSymbol? start;
-  if (ship.systemSymbol == system.systemSymbol) {
-    start = ship.waypointSymbol;
-  } else {
-    start = system.jumpGateWaypoints.firstOrNull?.waypointSymbol;
-  }
-  final systemWaypoints = system.waypoints.toList(); // Copy so we can sort.
-  if (start != null) {
-    final startWaypoint = systemsCache.waypoint(start);
-    systemWaypoints.sort(
-      (a, b) =>
-          a.distanceTo(startWaypoint).compareTo(b.distanceTo(startWaypoint)),
-    );
-  }
+  final start = ship.systemSymbol == system.systemSymbol
+      ? ship.waypointSymbol
+      // This is only ever called with systems with waypoints.
+      : system.jumpGateWaypoints.first.waypointSymbol;
+  final startWaypoint = systemsCache.waypoint(start);
+  final systemWaypoints =
+      system.waypoints.sortedBy<num>((w) => w.distanceTo(startWaypoint));
 
   for (final systemWaypoint in systemWaypoints) {
     final waypointSymbol = systemWaypoint.waypointSymbol;
@@ -81,32 +31,9 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
       continue;
     }
     // Try and fetch the waypoint from the server or our cache.
-    final waypoint = await waypointCache.waypoint(waypointSymbol);
-    // We know we've updated the waypoint at this point, so if it's not
-    // stored in our charting cache, we know it has no chart.
-    final values = chartingCache[waypointSymbol];
-    if (values == null) {
+    final isCharted = await waypointCache.isCharted(waypointSymbol);
+    if (isCharted) {
       shipInfo(ship, '$waypointSymbol is missing chart, routing.');
-      return waypointSymbol;
-    }
-    if (waypoint.hasMarketplace &&
-        !marketPrices.hasRecentData(waypointSymbol, maxAge: maxAge)) {
-      shipInfo(
-        ship,
-        '$waypointSymbol is missing recent '
-        '(${approximateDuration(maxAge)}) market data, '
-        'routing.',
-      );
-      return waypointSymbol;
-    }
-    if (waypoint.hasShipyard &&
-        !shipyardPrices.hasRecentData(waypointSymbol, maxAge: maxAge)) {
-      shipInfo(
-        ship,
-        '$waypointSymbol is missing recent '
-        '(${approximateDuration(maxAge)}) shipyard data, '
-        'routing.',
-      );
       return waypointSymbol;
     }
   }
@@ -116,40 +43,30 @@ Future<WaypointSymbol?> waypointSymbolNeedingExploration(
 /// Returns the closet waypoint worth exploring.
 Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   SystemsCache systemsCache,
-  // SystemConnectivity systemConnectivity,
-  ChartingCache chartingCache,
-  MarketPrices marketPrices,
-  ShipyardPrices shipyardPrices,
+  WaypointCache waypointCache,
+  SystemConnectivity systemConnectivity,
   Ship ship, {
   required SystemSymbol startSystemSymbol,
-  required WaypointCache waypointCache,
   bool Function(WaypointSymbol waypointSymbol)? filter,
-  Duration maxAge = defaultMaxAge,
 }) async {
-  // Find all systems in the jumpgate network.
-  final startSystem = systemsCache[startSystemSymbol];
-  // final clusterId = systemConnectivity.clusterIdForSystem(startSystemSymbol);
-  // final reachableSystemSymbols =
-  //     systemConnectivity.systemSymbolsByClusterId(clusterId);
-  // // Sort them by distance from where we are.
-  // final reachableSystems =
-  //     reachableSystemSymbols.map(systemsCache.systemBySymbol).toList();
+  // Find all systems we know how to reach.
+  final reachableSystemSymbols =
+      systemConnectivity.systemsReachableFrom(startSystemSymbol);
+  final reachableSystems =
+      reachableSystemSymbols.map(systemsCache.systemBySymbol).toList();
 
-  // final sortedSystems = reachableSystems
-  //     .sortedBy<num>((system) => system.distanceTo(startSystem))
-  //     .toList();
-  final sortedSystems = [startSystem];
+  // Sort systems by distance from the start system.
+  final startSystem = systemsCache[startSystemSymbol];
+  final sortedSystems = reachableSystems
+      .sortedBy<num>((system) => system.distanceTo(startSystem))
+      .toList();
   // Walk through the list finding one missing either a chart or market data.
   for (final system in sortedSystems) {
-    final symbol = await waypointSymbolNeedingExploration(
+    final symbol = await waypointSymbolNeedingCharting(
       systemsCache,
-      chartingCache,
-      marketPrices,
-      shipyardPrices,
+      waypointCache,
       ship,
       system,
-      waypointCache: waypointCache,
-      maxAge: maxAge,
       filter: filter,
     );
     if (symbol != null) {
@@ -159,75 +76,8 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
   return null;
 }
 
-/// Find the nearest headquarters to the ship's current location.
-WaypointSymbol nearestHeadquarters(
-  SystemConnectivity systemConnectivity,
-  SystemsCache systemsCache,
-  List<Faction> factions,
-  SystemSymbol startSystemSymbol,
-) {
-  final factionHqs = factions.map((e) => e.headquartersSymbol).toList();
-  final startSystem = systemsCache[startSystemSymbol];
-  final reachableHqs = factionHqs
-      .where(
-        (hq) => systemConnectivity.existsJumpPathBetween(
-          startSystemSymbol,
-          hq.systemSymbol,
-        ),
-      )
-      .toList();
-  final sortedHqs = reachableHqs
-      .sortedBy<num>(
-        (hq) => systemsCache[hq.systemSymbol].distanceTo(startSystem),
-      )
-      .toList();
-  // There is always a reachable HQ since we don't warp yet.
-  return sortedHqs.first;
-}
-
-/// If we're low on fuel, route to the nearest market which trades fuel.
-Future<DateTime?> routeForEmergencyFuelingIfNeeded(
-  Api api,
-  Database db,
-  Caches caches,
-  CentralCommand centralCommand,
-  WaypointSymbol startSymbol,
-  Ship ship,
-  BehaviorState state,
-) async {
-  if (ship.fuelPercentage > 0.3) {
-    return null;
-  }
-  shipWarn(ship, 'Fuel critically low, routing to market.');
-  var marketSymbol = nearbyMarketWhichTrades(
-    caches.systems,
-    caches.marketListings,
-    startSymbol,
-    TradeSymbol.FUEL,
-  );
-  if (marketSymbol == null) {
-    shipErr(ship, 'No nearby market trades fuel, routing to nearest hq.');
-    marketSymbol = nearestHeadquarters(
-      caches.systemConnectivity,
-      caches.systems,
-      caches.factions,
-      ship.systemSymbol,
-    );
-  }
-  final waitUntil = await beingNewRouteAndLog(
-    api,
-    db,
-    centralCommand,
-    caches,
-    ship,
-    state,
-    marketSymbol,
-  );
-  return waitUntil;
-}
-
-/// One loop of the exploring logic.
-Future<DateTime?> advanceExplorer(
+/// One loop of the charting logic.
+Future<DateTime?> advanceCharter(
   Api api,
   Database db,
   CentralCommand centralCommand,
@@ -238,24 +88,13 @@ Future<DateTime?> advanceExplorer(
 }) async {
   final maxAge = centralCommand.maxAgeForExplorerData;
   final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-  // advanceExplorer is only ever called when we're idle at a location, so
-  // either it's the first time and we need to set a destination, or we've just
-  // completed a loop.  This _isMissingChartOrRecentPriceData is really our
-  // check for "did we just do a loop"?  If so, we complete the behavior.
-  final willCompleteBehavior = isMissingChartOrRecentPriceData(
-    caches.marketPrices,
-    caches.shipyardPrices,
-    waypoint,
-    maxAge: maxAge,
-  );
-  // We still do our charting and market visits even if this isn't going to
-  // cause us to complete the behavior (e.g. we're refueling).
-  if (waypoint.chart == null) {
+  // Save neededChart to decide if this stop completes the behavior.
+  final neededChart = waypoint.chart == null;
+  if (neededChart) {
     await chartWaypointAndLog(api, caches.charting, ship);
   }
-  // If we don't visit the market, we won't refuel (even when low).
+  // We still do market visits even if we've already charted this waypoint.
   await visitLocalMarket(api, db, caches, ship, maxAge: maxAge, getNow: getNow);
-  // We might buy a ship if we're at a ship yard.
   await visitLocalShipyard(
     api,
     db,
@@ -266,51 +105,28 @@ Future<DateTime?> advanceExplorer(
     ship,
   );
 
-  if (willCompleteBehavior) {
+  if (neededChart) {
     // Explore behavior never changes, but it's still the correct thing to
     // reset our state after completing on loop of "explore".
     state.isComplete = true;
     return null;
   }
 
-  // So far this is only needed for Explorers since they go to waypoints
-  // which do not have markets.  Other behaviors always stick to markets.
-  final refuelWaitTime = await routeForEmergencyFuelingIfNeeded(
-    api,
-    db,
-    caches,
-    centralCommand,
-    waypoint.waypointSymbol,
-    ship,
-    state,
-  );
-  if (refuelWaitTime != null) {
-    return refuelWaitTime;
-  }
-
-  final explorerWaypoints = centralCommand
-      .otherExplorerWaypoints(ship.shipSymbol)
-      .toSet()
-      // It's OK for multiple explorers to use the same jumpgate.
-      .where(caches.systems.isJumpGate)
-      .toSet();
+  final charterSystems =
+      centralCommand.otherCharterSystems(ship.shipSymbol).toSet();
 
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
   final startTime = getNow();
   final destinationSymbol = await findNewWaypointSymbolToExplore(
     caches.systems,
-    // caches.systemConnectivity,
-    caches.charting,
-    caches.marketPrices,
-    caches.shipyardPrices,
+    caches.waypoints,
+    caches.systemConnectivity,
     ship,
     startSystemSymbol: ship.systemSymbol,
     // TODO(eseidel): Once we leave the initial system, explorers should stay
     // at least a system apart.
-    filter: (waypointSymbol) => !explorerWaypoints.contains(waypointSymbol),
-    maxAge: maxAge,
-    waypointCache: caches.waypoints,
+    filter: (waypointSymbol) => !charterSystems.contains(waypointSymbol),
   );
   final endTime = getNow();
   final elapsed = endTime.difference(startTime);

@@ -3,7 +3,6 @@ import 'package:cli/behavior/explorer.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -22,11 +21,7 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockShipEngine extends Mock implements ShipEngine {}
-
 class _MockShipNav extends Mock implements ShipNav {}
-
-class _MockSystem extends Mock implements System {}
 
 class _MockWaypoint extends Mock implements Waypoint {}
 
@@ -102,14 +97,13 @@ void main() {
         .thenReturn(const Duration(days: 3));
     when(centralCommand.shortenMaxAgeForExplorerData)
         .thenReturn(const Duration(days: 1));
-    when(() => centralCommand.otherExplorerWaypoints(shipSymbol))
-        .thenReturn([]);
-    final state = BehaviorState(shipSymbol, Behavior.explorer);
+    when(() => centralCommand.otherCharterSystems(shipSymbol)).thenReturn([]);
+    final state = BehaviorState(shipSymbol, Behavior.charter);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
-      () => advanceExplorer(
+      () => advanceCharter(
         api,
         db,
         centralCommand,
@@ -120,93 +114,5 @@ void main() {
       ),
     );
     expect(waitUntil, isNull);
-  });
-
-  test('nearestHeadquarters', () {
-    final startSystemSymbol = SystemSymbol.fromString('A-B');
-    final systemConnectivity = SystemConnectivity.test({});
-    final system = _MockSystem();
-    final fs = MemoryFileSystem.test();
-    final systems = <System>[system];
-    when(() => system.symbol).thenReturn(startSystemSymbol.system);
-    final systemsCache = SystemsCache(systems, fs: fs);
-    final factions = <Faction>[
-      Faction(
-        symbol: FactionSymbol.AEGIS,
-        name: 'Aegis',
-        headquarters: 'A-B-C',
-        description: 'Aegis',
-        isRecruiting: false,
-      ),
-    ];
-    final hq = nearestHeadquarters(
-      systemConnectivity,
-      systemsCache,
-      factions,
-      startSystemSymbol,
-    );
-    expect(hq, WaypointSymbol.fromString('A-B-C'));
-  });
-
-  test('routeForEmergencyFuelingIfNeeded', () async {
-    final api = _MockApi();
-    final db = _MockDatabase();
-    final ship = _MockShip();
-    final waypointSymbol = WaypointSymbol.fromString('S-A-B');
-    const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    final shipEngine = _MockShipEngine();
-    when(() => ship.engine).thenReturn(shipEngine);
-    when(() => shipEngine.speed).thenReturn(10);
-    final shipNav = _MockShipNav();
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    final centralCommand = _MockCentralCommand();
-    final caches = mockCaches();
-    final state = BehaviorState(const ShipSymbol('S', 1), Behavior.explorer);
-    when(() => caches.marketListings[waypointSymbol]).thenReturn(
-      MarketListing(
-        waypointSymbol: waypointSymbol,
-        exchange: const {TradeSymbol.FUEL},
-      ),
-    );
-
-    // More than the 0.3 threshold should return null.
-    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 350));
-    expect(
-      await routeForEmergencyFuelingIfNeeded(
-        api,
-        db,
-        caches,
-        centralCommand,
-        waypointSymbol,
-        ship,
-        state,
-      ),
-      isNull,
-    );
-
-    // Slightly more sophisticated smoke test.  I believe it returns null
-    // because we're already at the waypoint.
-    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 300));
-    final logger = _MockLogger();
-    expect(
-      await runWithLogger(
-        logger,
-        () async {
-          final result = await routeForEmergencyFuelingIfNeeded(
-            api,
-            db,
-            caches,
-            centralCommand,
-            waypointSymbol,
-            ship,
-            state,
-          );
-          return result;
-        },
-      ),
-      isNull,
-    );
   });
 }

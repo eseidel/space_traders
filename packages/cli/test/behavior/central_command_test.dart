@@ -41,7 +41,7 @@ class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 void main() {
-  test('CentralCommand.otherExplorerSystems', () {
+  test('CentralCommand.otherCharterSystems', () {
     RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
       return RoutePlan(
         fuelCapacity: 10,
@@ -69,7 +69,7 @@ void main() {
     when(() => shipA.symbol).thenReturn(shipASymbol.symbol);
     when(() => shipNavA.systemSymbol).thenReturn('S-A');
     when(() => shipA.nav).thenReturn(shipNavA);
-    final stateA = BehaviorState(shipASymbol, Behavior.explorer);
+    final stateA = BehaviorState(shipASymbol, Behavior.charter);
 
     final saa = WaypointSymbol.fromString('S-A-A');
     final saw = WaypointSymbol.fromString('S-A-W');
@@ -83,23 +83,26 @@ void main() {
     when(() => shipNavB.waypointSymbol).thenReturn(sca.waypoint);
     when(() => shipNavB.systemSymbol).thenReturn(sca.system);
     when(() => shipB.nav).thenReturn(shipNavB);
-    final stateB = BehaviorState(shipBSymbol, Behavior.explorer);
+    final stateB = BehaviorState(shipBSymbol, Behavior.charter);
     final sbw = WaypointSymbol.fromString('S-B-W');
     stateB.routePlan = fakeJump(saa, sbw);
     behaviorCache.setBehavior(shipBSymbol, stateB);
     when(() => shipCache.ship(shipBSymbol)).thenReturn(shipB);
 
     final otherSystems =
-        centralCommand.otherExplorerWaypoints(shipASymbol).toList();
-    expect(otherSystems, [sca, sbw]); // Source and destination
+        centralCommand.otherCharterSystems(shipASymbol).toList();
+    expect(
+      otherSystems,
+      [sca.systemSymbol, sbw.systemSymbol], // Source and destination
+    );
     stateB.routePlan = null;
     final otherSystems2 =
-        centralCommand.otherExplorerWaypoints(shipASymbol).toList();
-    expect(otherSystems2, [sca]); // From nav.waypointSymbol
+        centralCommand.otherCharterSystems(shipASymbol).toList();
+    expect(otherSystems2, [sca.systemSymbol]); // From nav.waypointSymbol
     behaviorCache.deleteBehavior(shipBSymbol);
     final otherSystems3 =
-        centralCommand.otherExplorerWaypoints(shipASymbol).toList();
-    expect(otherSystems3, <WaypointSymbol>[]);
+        centralCommand.otherCharterSystems(shipASymbol).toList();
+    expect(otherSystems3, <SystemSymbol>[]);
   });
 
   test('CentralCommand.otherTraderSystems', () {
@@ -264,8 +267,7 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => shipCache.ships).thenReturn([ship]);
     when(() => behaviorCache.states).thenReturn(
-      // "explorer" and "idle" are both the "idle" states for a hauler.
-      [BehaviorState(shipSymbol, Behavior.explorer)],
+      [BehaviorState(shipSymbol, Behavior.idle)],
     );
     final symbols2 = idleHaulerSymbols(shipCache, behaviorCache);
     expect(symbols2, [shipSymbol]);
