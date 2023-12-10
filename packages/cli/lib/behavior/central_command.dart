@@ -313,7 +313,8 @@ class CentralCommand {
       connectivity,
       ship,
       startSystemSymbol: ship.systemSymbol,
-      filter: (waypointSymbol) => !charterSystems.contains(waypointSymbol),
+      filter: (waypointSymbol) =>
+          !charterSystems.contains(waypointSymbol.systemSymbol),
     );
     return destinationSymbol;
   }
