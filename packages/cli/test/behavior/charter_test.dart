@@ -1,5 +1,5 @@
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/behavior/explorer.dart';
+import 'package:cli/behavior/charter.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
