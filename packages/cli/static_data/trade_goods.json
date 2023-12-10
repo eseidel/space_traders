@@ -305,6 +305,11 @@
   "description": "Advanced technology from ancient or extinct civilizations, often sought by collectors or researchers."
  },
  {
+  "symbol": "ROBOTIC_DRONES",
+  "name": "Robotic Drones",
+  "description": "Small, autonomous robots equipped with sensors and cameras, used for surveillance, exploration, and other tasks."
+ },
+ {
   "symbol": "SHIP_PARTS",
   "name": "Ship Parts",
   "description": "Various components and hardware required for spacecraft maintenance, upgrades, and construction."
