@@ -107,6 +107,11 @@ class Config {
       SystemSymbol.fromString('X1-$v'),
     ),
   );
+
+  /// List of gates known to have a broken antimatter market.
+  final knownBadGates = <String>{
+    'X1-RJ35-CF7C',
+  }.map(WaypointSymbol.fromString);
 }
 
 /// Our global configuration object.

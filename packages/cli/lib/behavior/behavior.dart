@@ -1,6 +1,7 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -22,7 +23,8 @@ class JobException extends Equatable implements Exception {
   List<Object> get props => [message, timeout];
 
   @override
-  String toString() => 'JobException: $message, timeout: $timeout';
+  String toString() =>
+      'JobException: $message, timeout: ${approximateDuration(timeout)}';
 }
 
 /// Exception thrown from a Job if the condition is not met.
