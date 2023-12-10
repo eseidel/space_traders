@@ -566,8 +566,8 @@ String describeRoutePlan(RoutePlan plan) {
         'speed: ${plan.shipSpeed} max-fuel: ${plan.fuelCapacity}');
   for (final action in plan.actions) {
     buffer.writeln('${action.type.name.padRight(14)}  ${action.startSymbol}  '
-        '${action.endSymbol}  '
-        '${action.duration}s');
+        '${action.endSymbol} ${approximateDuration(action.duration)}'
+        ' ${action.fuelUsed} fuel');
   }
   buffer.writeln(
     'in ${approximateDuration(plan.duration)} uses ${plan.fuelUsed} fuel',
