@@ -39,9 +39,6 @@ class CentralCommand {
   final ShipCache _shipCache;
   bool _haveEscapedStartingSystem = false;
 
-  /// How old can explorer data be before we refresh it?
-  Duration _maxAgeForExplorerData = config.defaultMaxAgeForPriceData;
-
   /// Per-system price age data used by system watchers.
   final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
 
@@ -96,13 +93,6 @@ class CentralCommand {
     return 4;
   }
 
-  /// Data older than this will be refreshed by explorers.
-  /// Explorers will shorten this time if they run out of places to explore.
-  Duration get maxAgeForExplorerData => _maxAgeForExplorerData;
-
-  /// Shorten the max age for explorer data.
-  Duration shortenMaxAgeForExplorerData() => _maxAgeForExplorerData ~/= 2;
-
   /// Returns the max age for price data for the given [systemSymbol].
   Duration maxPriceAgeForSystem(SystemSymbol systemSymbol) {
     final maybeAge = _maxPriceAgeForSystem[systemSymbol];
@@ -113,10 +103,9 @@ class CentralCommand {
   }
 
   /// Shorten the max age for price data for the given [systemSymbol].
-  Duration shoretenMaxPriceAgeForSystem(SystemSymbol systemSymbol) {
+  Duration shortenMaxPriceAgeForSystem(SystemSymbol systemSymbol) {
     final age = maxPriceAgeForSystem(systemSymbol);
-    _maxPriceAgeForSystem[systemSymbol] = age ~/ 2;
-    return age;
+    return _maxPriceAgeForSystem[systemSymbol] = age ~/ 2;
   }
 
   /// Returns the system symbol we should assign the given [ship] to.

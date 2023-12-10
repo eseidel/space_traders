@@ -550,16 +550,20 @@ void main() {
     expect(centralCommand.nextShipBuyJob, isNull);
   });
 
-  test('CentralCommand.shortenMaxAgeForExplorerData', () {
+  test('CentralCommand.shortenMaxPriceAgeForSystem', () {
     final shipCache = _MockShipCache();
     final behaviorCache = _MockBehaviorCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-    final maxAge = centralCommand.maxAgeForExplorerData;
-    final newMaxAge = centralCommand.shortenMaxAgeForExplorerData();
-    final newMaxAge2 = centralCommand.maxAgeForExplorerData;
+    final systemSymbol = SystemSymbol.fromString('S-A');
+    final maxAge = centralCommand.maxPriceAgeForSystem(systemSymbol);
+    final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);
+    final newMaxAge2 = centralCommand.maxPriceAgeForSystem(systemSymbol);
     expect(newMaxAge, lessThan(maxAge));
     expect(newMaxAge2, newMaxAge);
+    final otherSystem = SystemSymbol.fromString('S-B');
+    final otherMaxAge = centralCommand.maxPriceAgeForSystem(otherSystem);
+    expect(otherMaxAge, maxAge);
   });
 
   test('sellOppsForContracts', () {

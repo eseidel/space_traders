@@ -1,3 +1,4 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/charter.dart';
 import 'package:cli/cache/caches.dart';
@@ -26,7 +27,7 @@ class _MockShipNav extends Mock implements ShipNav {}
 class _MockWaypoint extends Mock implements Waypoint {}
 
 void main() {
-  test('advanceExplorer smoke test', () async {
+  test('advanceCharter smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
@@ -61,10 +62,10 @@ void main() {
     );
     when(() => caches.systems[waypointSymbol.systemSymbol]).thenReturn(system);
     registerFallbackValue(waypointSymbol.systemSymbol);
-    // when(() => caches.systemConnectivity.clusterIdForSystem(any()))
-    //     .thenReturn(0);
-    // when(() => caches.systemConnectivity.systemSymbolsByClusterId(0))
-    //     .thenReturn([waypointSymbol.systemSymbol]);
+    when(() => caches.systemConnectivity.clusterIdForSystem(any()))
+        .thenReturn(0);
+    when(() => caches.systemConnectivity.systemSymbolsByClusterId(0))
+        .thenReturn([waypointSymbol.systemSymbol]);
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.createChart(any())).thenAnswer(
@@ -81,7 +82,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
-    final shipFuel = ShipFuel(capacity: 100, current: 100);
+    final shipFuel = ShipFuel(capacity: 0, current: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
 
     registerFallbackValue(waypointSymbol);
@@ -93,26 +94,29 @@ void main() {
     when(() => caches.waypoints.hasShipyard(waypointSymbol))
         .thenAnswer((_) async => false);
 
-    when(() => centralCommand.maxAgeForExplorerData)
-        .thenReturn(const Duration(days: 3));
-    when(centralCommand.shortenMaxAgeForExplorerData)
-        .thenReturn(const Duration(days: 1));
+    when(
+      () => caches.systemConnectivity
+          .systemsReachableFrom(waypointSymbol.systemSymbol),
+    ).thenReturn([]);
+
     when(() => centralCommand.otherCharterSystems(shipSymbol)).thenReturn([]);
     final state = BehaviorState(shipSymbol, Behavior.charter);
 
     final logger = _MockLogger();
-    final waitUntil = await runWithLogger(
-      logger,
-      () => advanceCharter(
-        api,
-        db,
-        centralCommand,
-        caches,
-        state,
-        ship,
-        getNow: () => DateTime(2021),
+    expect(
+      () async => await runWithLogger(
+        logger,
+        () => advanceCharter(
+          api,
+          db,
+          centralCommand,
+          caches,
+          state,
+          ship,
+          getNow: () => DateTime(2021),
+        ),
       ),
+      throwsA(isA<JobException>()),
     );
-    expect(waitUntil, isNull);
   });
 }

@@ -1,10 +1,10 @@
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
-import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
@@ -77,16 +77,15 @@ Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
 }
 
 /// One loop of the charting logic.
-Future<DateTime?> advanceCharter(
+Future<JobResult> doCharter(
+  BehaviorState state,
   Api api,
   Database db,
   CentralCommand centralCommand,
   Caches caches,
-  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final maxAge = centralCommand.maxAgeForExplorerData;
   final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
   // Save neededChart to decide if this stop completes the behavior.
   final neededChart = waypoint.chart == null;
@@ -94,7 +93,7 @@ Future<DateTime?> advanceCharter(
     await chartWaypointAndLog(api, caches.charting, ship);
   }
   // We still do market visits even if we've already charted this waypoint.
-  await visitLocalMarket(api, db, caches, ship, maxAge: maxAge, getNow: getNow);
+  await visitLocalMarket(api, db, caches, ship, getNow: getNow);
   await visitLocalShipyard(
     api,
     db,
@@ -106,10 +105,9 @@ Future<DateTime?> advanceCharter(
   );
 
   if (neededChart) {
-    // Explore behavior never changes, but it's still the correct thing to
-    // reset our state after completing on loop of "explore".
-    state.isComplete = true;
-    return null;
+    // Charter behavior never changes, but it's still the correct thing to
+    // reset our state after completing on loop of "charter".
+    return JobResult.complete();
   }
 
   final charterSystems =
@@ -117,27 +115,17 @@ Future<DateTime?> advanceCharter(
 
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
-  final startTime = getNow();
   final destinationSymbol = await findNewWaypointSymbolToExplore(
     caches.systems,
     caches.waypoints,
     caches.systemConnectivity,
     ship,
     startSystemSymbol: ship.systemSymbol,
-    // TODO(eseidel): Once we leave the initial system, explorers should stay
-    // at least a system apart.
     filter: (waypointSymbol) => !charterSystems.contains(waypointSymbol),
   );
-  final endTime = getNow();
-  final elapsed = endTime.difference(startTime);
-  if (elapsed > const Duration(seconds: 5)) {
-    shipErr(
-      ship,
-      'Took ${approximateDuration(elapsed)} to find next system to explore.',
-    );
-  }
+
   if (destinationSymbol != null) {
-    return beingNewRouteAndLog(
+    final waitTime = await beingNewRouteAndLog(
       api,
       db,
       centralCommand,
@@ -146,14 +134,13 @@ Future<DateTime?> advanceCharter(
       state,
       destinationSymbol,
     );
+    return JobResult.wait(waitTime);
   }
-  // If we get here, we've explored all systems within maxJumpDistance jumps
-  // of this system.
-  shipWarn(ship, 'No unexplored systems near ${waypoint.systemSymbol}.');
-  final newMaxAge = centralCommand.shortenMaxAgeForExplorerData();
-  shipWarn(
-    ship,
-    'Shortened maxAge to ${approximateDuration(newMaxAge)} and resuming.',
-  );
-  return null;
+  // If we get here, we've explored all systems we can reach.
+  throw const JobException('Charted all known systems', Duration(hours: 1));
 }
+
+/// Advance the system watcher.
+final advanceCharter = const MultiJob('Charter', [
+  doCharter,
+]).run;
