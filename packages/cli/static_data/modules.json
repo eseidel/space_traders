@@ -24,6 +24,18 @@
   }
  },
  {
+  "symbol": "MODULE_CARGO_HOLD_III",
+  "capacity": 75,
+  "range": null,
+  "name": "Advanced Cargo Hold",
+  "description": "A large cargo hold module with advanced robotics that provides more efficient storage space for a ship's cargo.",
+  "requirements": {
+   "power": 4,
+   "crew": 6,
+   "slots": 3
+  }
+ },
+ {
   "symbol": "MODULE_CREW_QUARTERS_I",
   "capacity": 40,
   "range": null,
@@ -90,9 +102,9 @@
   "name": "Ore Refinery",
   "description": "A specialized module that can refine raw ores into usable metals and other materials.",
   "requirements": {
-   "power": 12,
-   "crew": 20,
-   "slots": 4
+   "power": 9,
+   "crew": 15,
+   "slots": 3
   }
  },
  {

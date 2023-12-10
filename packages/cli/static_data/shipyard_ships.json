@@ -170,12 +170,12 @@
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_EXPLORER",
-   "name": "Frame Explorer",
+   "name": "Explorer",
    "description": "A large, long-range spacecraft designed for deep space exploration and scientific research.",
    "condition": null,
    "moduleSlots": 8,
    "mountingPoints": 2,
-   "fuelCapacity": 1500,
+   "fuelCapacity": 800,
    "requirements": {
     "power": 5,
     "crew": 30,
@@ -208,51 +208,39 @@
   },
   "modules": [
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CREW_QUARTERS_I",
+    "symbol": "MODULE_CARGO_HOLD_II",
     "capacity": 40,
     "range": null,
-    "name": "Crew Quarters",
-    "description": "A module that provides living space and amenities for the crew.",
-    "requirements": {
-     "power": 1,
-     "crew": 2,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CREW_QUARTERS_I",
-    "capacity": 40,
-    "range": null,
-    "name": "Crew Quarters",
-    "description": "A module that provides living space and amenities for the crew.",
-    "requirements": {
-     "power": 1,
-     "crew": 2,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_SCIENCE_LAB_I",
-    "capacity": null,
-    "range": null,
-    "name": "Science Lab",
-    "description": "A specialized module equipped with advanced instruments and equipment for scientific research and analysis.",
+    "name": "Expanded Cargo Hold",
+    "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
     "requirements": {
      "power": 2,
-     "crew": 6,
+     "crew": 2,
      "slots": 2
+    }
+   },
+   {
+    "symbol": "MODULE_CREW_QUARTERS_I",
+    "capacity": 40,
+    "range": null,
+    "name": "Crew Quarters",
+    "description": "A module that provides living space and amenities for the crew.",
+    "requirements": {
+     "power": 1,
+     "crew": 2,
+     "slots": 1
+    }
+   },
+   {
+    "symbol": "MODULE_CREW_QUARTERS_I",
+    "capacity": 40,
+    "range": null,
+    "name": "Crew Quarters",
+    "description": "A module that provides living space and amenities for the crew.",
+    "requirements": {
+     "power": 1,
+     "crew": 2,
+     "slots": 1
     }
    },
    {
@@ -268,15 +256,15 @@
     }
    },
    {
-    "symbol": "MODULE_SHIELD_GENERATOR_I",
+    "symbol": "MODULE_GAS_PROCESSOR_I",
     "capacity": null,
     "range": null,
-    "name": "Shield Generator",
-    "description": "A basic shield generator that provides protection against incoming weapons fire and other hazards.",
+    "name": "Gas Processor",
+    "description": "Filters and processes extracted gases into their component parts, filters out impurities, and containerizes them into raw storage units.",
     "requirements": {
-     "power": 3,
-     "crew": 2,
-     "slots": 1
+     "power": 1,
+     "crew": 0,
+     "slots": 2
     }
    }
   ],
@@ -294,20 +282,20 @@
     }
    },
    {
-    "symbol": "MOUNT_LASER_CANNON_I",
-    "name": "Laser Cannon",
-    "description": "A basic laser weapon that fires concentrated beams of energy at high speed and accuracy.",
-    "strength": null,
+    "symbol": "MOUNT_GAS_SIPHON_II",
+    "name": "Gas Siphon II",
+    "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies more efficiently and at a higher rate.",
+    "strength": 20,
     "deposits": [],
     "requirements": {
      "power": 2,
-     "crew": 1,
+     "crew": 2,
      "slots": null
     }
    }
   ],
   "crew": {
-   "required": 67,
+   "required": 62,
    "capacity": 80
   }
  },
@@ -926,12 +914,12 @@
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_MINER",
-   "name": "Frame Miner",
+   "name": "Miner",
    "description": "A medium-sized spacecraft designed for mining operations and resource extraction.",
    "condition": null,
    "moduleSlots": 5,
    "mountingPoints": 3,
-   "fuelCapacity": 900,
+   "fuelCapacity": 300,
    "requirements": {
     "power": 5,
     "crew": 15,
@@ -964,27 +952,15 @@
   },
   "modules": [
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_II",
+    "capacity": 40,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Expanded Cargo Hold",
+    "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 2,
+     "crew": 2,
+     "slots": 2
     }
    },
    {
@@ -1017,7 +993,7 @@
     "symbol": "MOUNT_MINING_LASER_II",
     "name": "Mining Laser II",
     "description": "An advanced mining laser that is more efficient and effective at extracting valuable minerals from asteroids and other space objects.",
-    "strength": 25,
+    "strength": 5,
     "deposits": [],
     "requirements": {
      "power": 2,
@@ -1045,13 +1021,13 @@
     ],
     "requirements": {
      "power": 1,
-     "crew": 2,
+     "crew": 1,
      "slots": null
     }
    }
   ],
   "crew": {
-   "required": 32,
+   "required": 33,
    "capacity": 40
   }
  },
@@ -1116,10 +1092,10 @@
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_HEAVY_FREIGHTER",
-   "name": "Frame Heavy Freighter",
+   "name": "Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
    "condition": null,
-   "moduleSlots": 12,
+   "moduleSlots": 13,
    "mountingPoints": 3,
    "fuelCapacity": 2300,
    "requirements": {
@@ -1154,51 +1130,27 @@
   },
   "modules": [
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_III",
+    "capacity": 75,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Advanced Cargo Hold",
+    "description": "A large cargo hold module with advanced robotics that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 4,
+     "crew": 6,
+     "slots": 3
     }
    },
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_III",
+    "capacity": 75,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Advanced Cargo Hold",
+    "description": "A large cargo hold module with advanced robotics that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 4,
+     "crew": 6,
+     "slots": 3
     }
    },
    {
@@ -1256,9 +1208,9 @@
     "name": "Ore Refinery",
     "description": "A specialized module that can refine raw ores into usable metals and other materials.",
     "requirements": {
-     "power": 12,
-     "crew": 20,
-     "slots": 4
+     "power": 9,
+     "crew": 15,
+     "slots": 3
     }
    }
   ],
@@ -1301,7 +1253,7 @@
    }
   ],
   "crew": {
-   "required": 152,
+   "required": 159,
    "capacity": 160
   }
  },
