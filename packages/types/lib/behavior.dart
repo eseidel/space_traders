@@ -109,6 +109,7 @@ class BehaviorState {
     this.pickupJob,
     this.mountJob,
     this.extractionJob,
+    this.systemWatcherJob,
     this.jobIndex = 0,
   }) : isComplete = false;
 
@@ -130,9 +131,12 @@ class BehaviorState {
         PickupJob.fromJsonOrNull(json['pickupJob'] as Map<String, dynamic>?);
     final mountJob =
         MountJob.fromJsonOrNull(json['mountJob'] as Map<String, dynamic>?);
-    final extractionJson = json['extractionJob'] as Map<String, dynamic>? ??
-        json['mineJob'] as Map<String, dynamic>?;
-    final extractionJob = ExtractionJob.fromJsonOrNull(extractionJson);
+    final extractionJob = ExtractionJob.fromJsonOrNull(
+      json['extractionJob'] as Map<String, dynamic>?,
+    );
+    final systemWatcherJob = SystemWatcherJob.fromJsonOrNull(
+      json['systemWatcherJob'] as Map<String, dynamic>?,
+    );
     final jobIndex = json['jobIndex'] as int? ?? 0;
     return BehaviorState(
       shipSymbol,
@@ -145,6 +149,7 @@ class BehaviorState {
       pickupJob: pickupJob,
       mountJob: mountJob,
       extractionJob: extractionJob,
+      systemWatcherJob: systemWatcherJob,
       jobIndex: jobIndex,
     );
   }
@@ -182,6 +187,9 @@ class BehaviorState {
   /// Used by Behavior.miner for mining.
   ExtractionJob? extractionJob;
 
+  /// Used by Behavior.systemWatcher for watching a system.
+  SystemWatcherJob? systemWatcherJob;
+
   /// This behavior is complete.
   /// Never written to disk (instead the behavior state is deleted).
   bool isComplete;
@@ -199,6 +207,7 @@ class BehaviorState {
       'mountJob': mountJob?.toJson(),
       'pickupJob': pickupJob?.toJson(),
       'extractionJob': extractionJob?.toJson(),
+      'systemWatcherJob': systemWatcherJob?.toJson(),
       'jobIndex': jobIndex,
     };
   }
@@ -468,16 +477,13 @@ class ExtractionJob {
     required this.extractionType,
   });
 
-  /// Create a new mine job from JSON.
+  /// Create a new ExtractionJob from JSON.
   factory ExtractionJob.fromJson(Map<String, dynamic> json) {
-    final sourceString = json['source'] as String? ?? json['mine'] as String;
-    final source = WaypointSymbol.fromJson(sourceString);
-    // TODO(eseidel): Make these non-nullable after another release.
-    final extractionTypeJson = json['extractionType'] as String? ?? 'mine';
-    final extractionType = ExtractionType.fromJson(extractionTypeJson);
-    final marketFroGoodJson =
-        json['marketForGood'] as Map<String, dynamic>? ?? {};
-    final marketForGood = _marketForGoodFromJson(marketFroGoodJson);
+    final source = WaypointSymbol.fromJson(json['source'] as String);
+    final extractionType =
+        ExtractionType.fromJson(json['extractionType'] as String);
+    final marketForGood =
+        _marketForGoodFromJson(json['marketForGood'] as Map<String, dynamic>);
     return ExtractionJob(
       source: source,
       marketForGood: marketForGood,
@@ -523,4 +529,35 @@ class ExtractionJob {
         extractionType,
         const MapEquality<TradeSymbol, WaypointSymbol>().hash(marketForGood),
       ]);
+}
+
+/// Watch a system's markets.
+@immutable
+class SystemWatcherJob {
+  /// Create a new SystemWatcherJob.
+  const SystemWatcherJob({
+    required this.systemSymbol,
+  });
+
+  /// Create a new SystemWatcherJob from JSON.
+  factory SystemWatcherJob.fromJson(Map<String, dynamic> json) {
+    final systemSymbol = SystemSymbol.fromJson(json['systemSymbol'] as String);
+    return SystemWatcherJob(
+      systemSymbol: systemSymbol,
+    );
+  }
+
+  /// Create a new SystemWatcherJob from JSON, or null if the JSON is null.
+  static SystemWatcherJob? fromJsonOrNull(Map<String, dynamic>? json) =>
+      json == null ? null : SystemWatcherJob.fromJson(json);
+
+  /// The system to watch.
+  final SystemSymbol systemSymbol;
+
+  /// Convert this to JSON.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'systemSymbol': systemSymbol.toJson(),
+    };
+  }
 }

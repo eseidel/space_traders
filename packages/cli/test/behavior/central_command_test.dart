@@ -63,46 +63,70 @@ void main() {
     final shipCache = _MockShipCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-    final shipA = _MockShip();
-    final shipNavA = _MockShipNav();
+
+    void setupShip({
+      required ShipSymbol shipSymbol,
+      required WaypointSymbol start,
+      required WaypointSymbol end,
+    }) {
+      final ship = _MockShip();
+      final shipNav = _MockShipNav();
+      when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+      when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
+      when(() => shipNav.systemSymbol).thenReturn(start.system);
+      when(() => ship.nav).thenReturn(shipNav);
+      behaviorCache.setBehavior(
+        shipSymbol,
+        BehaviorState(
+          shipSymbol,
+          Behavior.charter,
+          routePlan: fakeJump(start, end),
+        ),
+      );
+      when(() => shipCache.ship(shipSymbol)).thenReturn(ship);
+    }
+
+    // Sets up a ship X-A with a route from S-A-A to S-A-W.
     final shipASymbol = ShipSymbol.fromString('X-A');
-    when(() => shipA.symbol).thenReturn(shipASymbol.symbol);
-    when(() => shipNavA.systemSymbol).thenReturn('S-A');
-    when(() => shipA.nav).thenReturn(shipNavA);
-    final stateA = BehaviorState(shipASymbol, Behavior.charter);
+    final aStart = WaypointSymbol.fromString('S-A-A');
+    final aEnd = WaypointSymbol.fromString('S-A-W');
+    setupShip(shipSymbol: shipASymbol, start: aStart, end: aEnd);
 
-    final saa = WaypointSymbol.fromString('S-A-A');
-    final saw = WaypointSymbol.fromString('S-A-W');
-    stateA.routePlan = fakeJump(saa, saw);
-    behaviorCache.setBehavior(shipASymbol, stateA);
-    final shipB = _MockShip();
+    /// Sets up a ship X-B with a route from S-C-A to S-B-W.
     final shipBSymbol = ShipSymbol.fromString('X-B');
-    when(() => shipB.symbol).thenReturn(shipBSymbol.symbol);
-    final shipNavB = _MockShipNav();
-    final sca = WaypointSymbol.fromString('S-C-A');
-    when(() => shipNavB.waypointSymbol).thenReturn(sca.waypoint);
-    when(() => shipNavB.systemSymbol).thenReturn(sca.system);
-    when(() => shipB.nav).thenReturn(shipNavB);
-    final stateB = BehaviorState(shipBSymbol, Behavior.charter);
-    final sbw = WaypointSymbol.fromString('S-B-W');
-    stateB.routePlan = fakeJump(saa, sbw);
-    behaviorCache.setBehavior(shipBSymbol, stateB);
-    when(() => shipCache.ship(shipBSymbol)).thenReturn(shipB);
+    final bStart = WaypointSymbol.fromString('S-C-A');
+    final bEnd = WaypointSymbol.fromString('S-B-W');
+    setupShip(shipSymbol: shipBSymbol, start: bStart, end: bEnd);
 
+    // Test that from S-A-A we avoid S-A-W and S-B-W.
     final otherSystems =
         centralCommand.otherCharterSystems(shipASymbol).toList();
     expect(
       otherSystems,
-      [sca.systemSymbol, sbw.systemSymbol], // Source and destination
+      [bStart.systemSymbol, bEnd.systemSymbol], // Source and destination
     );
-    stateB.routePlan = null;
+    // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
+    behaviorCache.getBehavior(shipBSymbol)!.routePlan = null;
     final otherSystems2 =
         centralCommand.otherCharterSystems(shipASymbol).toList();
-    expect(otherSystems2, [sca.systemSymbol]); // From nav.waypointSymbol
+    expect(otherSystems2, [bStart.systemSymbol]); // From nav.waypointSymbol
+
+    // Remove shipB and we should avoid nothing.
     behaviorCache.deleteBehavior(shipBSymbol);
     final otherSystems3 =
         centralCommand.otherCharterSystems(shipASymbol).toList();
     expect(otherSystems3, <SystemSymbol>[]);
+
+    final shipCSymbol = ShipSymbol.fromString('X-C');
+    final cStart = WaypointSymbol.fromString('S-D-A');
+    final cEnd = WaypointSymbol.fromString('S-E-W');
+    setupShip(shipSymbol: shipCSymbol, start: cStart, end: cEnd);
+    final otherSystems4 =
+        centralCommand.otherCharterSystems(shipASymbol).toList();
+    expect(
+      otherSystems4,
+      <SystemSymbol>[cStart.systemSymbol, cEnd.systemSymbol],
+    );
   });
 
   test('CentralCommand.otherTraderSystems', () {

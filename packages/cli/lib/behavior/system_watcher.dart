@@ -120,7 +120,11 @@ Future<JobResult> _travelToAssignedSystem(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final systemSymbol = centralCommand.assignedSystemForSatellite(ship);
+  final systemSymbol = assertNotNull(
+    centralCommand.assignedSystemForSatellite(ship),
+    'No assigned system for $ship.',
+    const Duration(minutes: 10),
+  );
   if (ship.systemSymbol != systemSymbol) {
     // We're not in the system we're supposed to be in, so we need to route
     // there.

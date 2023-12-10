@@ -32,7 +32,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
     }
     // Try and fetch the waypoint from the server or our cache.
     final isCharted = await waypointCache.isCharted(waypointSymbol);
-    if (isCharted) {
+    if (!isCharted) {
       shipInfo(ship, '$waypointSymbol is missing chart, routing.');
       return waypointSymbol;
     }
@@ -41,7 +41,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
 }
 
 /// Returns the closet waypoint worth exploring.
-Future<WaypointSymbol?> findNewWaypointSymbolToExplore(
+Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   SystemConnectivity systemConnectivity,
@@ -110,18 +110,13 @@ Future<JobResult> doCharter(
     return JobResult.complete();
   }
 
-  final charterSystems =
-      centralCommand.otherCharterSystems(ship.shipSymbol).toSet();
-
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
-  final destinationSymbol = await findNewWaypointSymbolToExplore(
+  final destinationSymbol = await centralCommand.nextWaypointToChart(
     caches.systems,
     caches.waypoints,
     caches.systemConnectivity,
     ship,
-    startSystemSymbol: ship.systemSymbol,
-    filter: (waypointSymbol) => !charterSystems.contains(waypointSymbol),
   );
 
   if (destinationSymbol != null) {

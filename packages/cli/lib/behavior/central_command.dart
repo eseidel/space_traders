@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/behavior/buy_ship.dart';
+import 'package:cli/behavior/charter.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/config.dart';
@@ -109,14 +110,8 @@ class CentralCommand {
   }
 
   /// Returns the system symbol we should assign the given [ship] to.
-  SystemSymbol assignedSystemForSatellite(Ship ship) {
-    final assignedSystem = _assignedSystemsForSatellites[ship.shipSymbol];
-    if (assignedSystem != null) {
-      return assignedSystem;
-    }
-    // If we don't have an assignment, stay where we are.
-    return ship.systemSymbol;
-  }
+  SystemSymbol? assignedSystemForSatellite(Ship ship) =>
+      _assignedSystemsForSatellites[ship.shipSymbol];
 
   /// Returns the mining squad for the given [ship].
   ExtractionSquad? squadForShip(Ship ship) {
@@ -156,8 +151,9 @@ class CentralCommand {
   /// Returns an initialized behavior state for the given [ship] to start
   /// its next job.
   BehaviorState getJobForShip(Ship ship, int credits) {
+    final shipSymbol = ship.shipSymbol;
     BehaviorState toState(Behavior behavior) {
-      return BehaviorState(ship.shipSymbol, behavior);
+      return BehaviorState(shipSymbol, behavior);
     }
 
     if (ship.isOutOfFuel) {
@@ -167,28 +163,48 @@ class CentralCommand {
     if (shouldBuyMount(ship, credits)) {
       final request = _takeMountRequest(ship);
       shipInfo(ship, 'Starting buy mount ${request.mountSymbol}');
-      return BehaviorState(ship.shipSymbol, Behavior.mountFromBuy)
-        ..buyJob = request.buyJob
-        ..mountJob = request.mountJob;
+      return BehaviorState(
+        shipSymbol,
+        Behavior.mountFromBuy,
+        buyJob: request.buyJob,
+        mountJob: request.mountJob,
+      );
     }
     // Otherwise buy a ship if we can.
     if (shouldBuyShip(ship, credits)) {
-      return BehaviorState(ship.shipSymbol, Behavior.buyShip)
-        ..shipBuyJob = takeShipBuyJob();
+      return BehaviorState(
+        shipSymbol,
+        Behavior.buyShip,
+        shipBuyJob: takeShipBuyJob(),
+      );
     }
 
     final squad = squadForShip(ship);
     if (squad != null) {
-      if (ship.fleetRole == FleetRole.miner) {
-        return BehaviorState(ship.shipSymbol, Behavior.miner)
-          ..extractionJob = squad.job;
-      } else if (ship.fleetRole == FleetRole.surveyor) {
-        return BehaviorState(ship.shipSymbol, Behavior.surveyor)
-          ..extractionJob = squad.job;
-      } else if (ship.isHauler) {
-        return BehaviorState(ship.shipSymbol, Behavior.minerHauler)
-          ..extractionJob = squad.job;
+      final behavior = {
+        FleetRole.miner: Behavior.miner,
+        FleetRole.surveyor: Behavior.surveyor,
+        FleetRole.siphoner: Behavior.siphoner,
+      }[ship.fleetRole];
+      if (behavior != null) {
+        return BehaviorState(
+          shipSymbol,
+          behavior,
+          extractionJob: squad.job,
+        );
       }
+    }
+
+    if (ship.isProbe) {
+      final assignedSystem = assignedSystemForSatellite(ship);
+      if (assignedSystem != null) {
+        return BehaviorState(
+          shipSymbol,
+          Behavior.systemWatcher,
+          systemWatcherJob: SystemWatcherJob(systemSymbol: assignedSystem),
+        );
+      }
+      return toState(Behavior.charter);
     }
 
     // Otherwise start any other job.
@@ -278,6 +294,28 @@ class CentralCommand {
       logger.detail(describeCostedDeal(deal));
     }
     return deals.firstOrNull;
+  }
+
+  /// Returns the next waypoint symbol to chart.
+  Future<WaypointSymbol?> nextWaypointToChart(
+    SystemsCache systems,
+    WaypointCache waypoints,
+    SystemConnectivity connectivity,
+    Ship ship,
+  ) async {
+    final charterSystems = otherCharterSystems(ship.shipSymbol).toSet();
+
+    // Walk waypoints as far out as we can see until we find one missing
+    // a chart or market data and route to there.
+    final destinationSymbol = await nextUnchartedWaypointSymbol(
+      systems,
+      waypoints,
+      connectivity,
+      ship,
+      startSystemSymbol: ship.systemSymbol,
+      filter: (waypointSymbol) => !charterSystems.contains(waypointSymbol),
+    );
+    return destinationSymbol;
   }
 
   /// Returns other systems containing ships with [behavior].

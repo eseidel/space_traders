@@ -146,6 +146,9 @@ class SystemSymbol extends Equatable {
     return SystemSymbol._(symbol);
   }
 
+  /// Create a SystemSymbol from a json string.
+  factory SystemSymbol.fromJson(String json) => SystemSymbol.fromString(json);
+
   /// The sector symbol of the system.
   String get sector => system.split('-')[0];
 
@@ -154,6 +157,9 @@ class SystemSymbol extends Equatable {
 
   @override
   List<Object> get props => [system];
+
+  /// Convert to JSON.
+  String toJson() => system;
 
   @override
   String toString() => system;

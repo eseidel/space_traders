@@ -860,3 +860,8 @@ in 7m uses 456 fuel
 🛸#F  Hauler ESEIDEL-8 is IN_ORBIT to JX78-B37 arrival -15m, with 0 space available.
 🛸#F  Hauler ESEIDEL-15 is IN_ORBIT to JX78-B37 arrival -3m, with 73 space available.
 ⏱️  3s until 2023-12-10 16:18:31.255
+
+🛸#A  Still have 3 cargo, waiting for hauler to arrive.
+🛸#A  No haulers at JX78-B37, unknown next arrival time for ESEIDEL-8, ESEIDEL-15, checking in 1 minute.
+🛸#A  Hauler ESEIDEL-8 is IN_ORBIT to JX78-B37 arrival -13m, with 0 space available.
+🛸#A  Hauler ESEIDEL-15 is IN_ORBIT to JX78-B37 arrival -5m, with 77 space available.
