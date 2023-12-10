@@ -33,6 +33,9 @@ class ShipyardListing {
   /// Ships which are sold at the shipyard.
   final Set<ShipType> shipTypes;
 
+  /// Whether this shipyard sells the given ship type.
+  bool hasShip(ShipType shipType) => shipTypes.contains(shipType);
+
   /// Converts this shipyard description to JSON data.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -107,6 +110,17 @@ class ShipyardListingCache extends JsonStore<_Record> {
 
   /// The ShipyardListings.
   Iterable<ShipyardListing> get listings => _listingBySymbol.values;
+
+  /// The number of ShipyardListings.
+  int get count => _listingBySymbol.length;
+
+  /// The number of waypoints with ShipyardListings.
+  int get waypointCount => _listingBySymbol.keys.length;
+
+  /// The ShipyardListings which sell the given ship type.
+  Iterable<ShipyardListing> listingsWithShip(ShipType shipType) {
+    return listings.where((listing) => listing.hasShip(shipType));
+  }
 
   /// Fetch the ShipyardListing for the given WaypointSymbol.
   ShipyardListing? listingForSymbol(WaypointSymbol waypointSymbol) {

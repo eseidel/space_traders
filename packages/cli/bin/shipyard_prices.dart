@@ -1,3 +1,4 @@
+import 'package:cli/cache/shipyard_listing_cache.dart';
 import 'package:cli/cache/shipyard_prices.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
@@ -5,41 +6,54 @@ import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final shipyardPrices = ShipyardPrices.load(fs);
-  final shipyardShips = ShipyardShipCache.load(fs);
   final showAll = argResults['all'] as bool;
 
+  final shipyardPrices = ShipyardPrices.load(fs);
   logger.info(
     'Loaded ${shipyardPrices.count} prices from '
     '${shipyardPrices.waypointCount} waypoints.',
   );
+  final shipyardListings = ShipyardListingCache.load(fs);
+  logger.info(
+    'Loaded ${shipyardListings.count} listings from '
+    '${shipyardListings.waypointCount} waypoints.',
+  );
+  final shipyardShips = ShipyardShipCache.load(fs);
 
   final table = Table(
     header: [
       'Type',
-      'Price',
+      '# Loc',
+      'Med. Price',
       'Cargo',
       'Fuel',
       'Speed',
-      'Mount Points',
+      'Mounts',
     ],
     style: const TableStyle(compact: true),
   );
 
+  Map<String, dynamic> r(Object? content) => <String, dynamic>{
+        'content': content.toString(),
+        'hAlign': HorizontalAlign.right,
+      };
+
   for (final shipType in ShipType.values) {
-    final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
-    if (medianPrice == null && !showAll) {
+    final listings = shipyardListings.listingsWithShip(shipType);
+    if (!showAll && listings.isEmpty) {
       continue;
     }
+    final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
     final name = shipType.value.substring('SHIP_'.length);
     final ship = shipyardShips[shipType];
     table.add([
       name,
-      if (medianPrice == null) '' else creditsString(medianPrice),
-      ship?.cargoCapacity,
-      ship?.frame.fuelCapacity,
-      ship?.engine.speed,
-      ship?.frame.mountingPoints,
+      r(listings.length),
+      if (medianPrice == null) '' else r(creditsString(medianPrice)),
+      r(ship?.cargoCapacity),
+      r(ship?.frame.fuelCapacity),
+      r(ship?.engine.speed),
+      r(ship?.frame.mountingPoints),
     ]);
   }
   logger.info(table.toString());
