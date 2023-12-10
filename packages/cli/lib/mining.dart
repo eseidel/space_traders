@@ -52,12 +52,15 @@ class ExtractionSquad {
   ExtractionSquad(this.job) : ships = [];
 
   /// Determines the template to use for [ship].
-  ShipTemplate templateForShip(
+  ShipTemplate? templateForShip(
     Ship ship, {
     required Set<ShipMountSymbolEnum> availableMounts,
   }) {
     if (!ships.any((s) => s.symbol == ship.symbol)) {
       throw ArgumentError('Ship ${ship.symbol} not in squad.');
+    }
+    if (ship.frame.symbol != ShipFrameSymbolEnum.MINER) {
+      return null;
     }
     // If we're the only ship in this squad, we need to both mine and survey.
     if (ships.length == 1) {

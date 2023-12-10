@@ -23,6 +23,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       'Speed',
       'Mount Points',
     ],
+    style: const TableStyle(compact: true),
   );
 
   for (final shipType in ShipType.values) {
