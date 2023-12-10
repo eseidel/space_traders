@@ -42,7 +42,7 @@ void main(List<String> args) async {
         ..addOption(
           'fuel',
           allowed: ['true', 'false', 'cache'],
-          defaultsTo: 'false',
+          defaultsTo: 'cache',
           help: 'Whether to assume all waypoints sell fuel, or use cached data',
         );
     },
