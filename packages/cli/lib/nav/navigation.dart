@@ -247,6 +247,7 @@ Future<NavResult> continueNavigationIfNeeded(
             'no antimatter for sale',
           );
           caches.jumpGates.markBroken(action.startSymbol);
+          caches.updateRoutingCaches();
           throw JobException(
             'Jumpgate ${action.startSymbol} is broken',
             const Duration(minutes: 1),

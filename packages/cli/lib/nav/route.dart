@@ -340,6 +340,12 @@ class RoutePlanner {
   final JumpCache _jumpCache;
   final bool Function(WaypointSymbol) _sellsFuel;
 
+  /// Clear any cached routing data.  Called when jump gate availability changes
+  /// because a jump gate is constructed or found broken.
+  void clearRoutingCaches() {
+    _jumpCache.clear();
+  }
+
   RoutePlan? _planJump({
     required WaypointSymbol start,
     required WaypointSymbol end,

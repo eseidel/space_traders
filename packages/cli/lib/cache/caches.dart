@@ -185,6 +185,13 @@ class Caches {
     );
   }
 
+  /// Called when routing information changes (e.g. when we complete
+  /// a jump gate, find a new jump gate, or a jump gate breaks).
+  void updateRoutingCaches() {
+    systemConnectivity.updateFromJumpGates(jumpGates, construction);
+    routePlanner.clearRoutingCaches();
+  }
+
   /// Update the caches at the top of the loop.
   Future<void> updateAtTopOfLoop(Api api) async {
     // WaypointCache and MarketCache only live for one loop over the ships.

@@ -24,6 +24,9 @@ class JumpPlan {
 class JumpCache {
   final List<JumpPlan> _plans = [];
 
+  /// Clear the cache.
+  void clear() => _plans.clear();
+
   /// Check to see if a route exists between two systems.
   JumpPlan? lookupJumpPlan({
     required SystemSymbol fromSystem,

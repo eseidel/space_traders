@@ -134,6 +134,9 @@ class _Connections {
     // JumpGateCache caches responses from the server.  We may not yet have
     // cached both sides of a jump gate, so this fills in the gaps.
     for (final record in jumpGateCache.values) {
+      if (record.isBroken) {
+        continue;
+      }
       final from = record.waypointSymbol;
       final fromUnderConstruction = constructionCache.isUnderConstruction(from);
       // If we don't know or it's not complete, we can't jump.
@@ -145,6 +148,10 @@ class _Connections {
         final toUnderConstruction = constructionCache.isUnderConstruction(to);
         // If we don't know or it's not complete, we can't jump.
         if (toUnderConstruction == null || toUnderConstruction == true) {
+          continue;
+        }
+        final toGate = jumpGateCache.recordForSymbol(to);
+        if (toGate != null && toGate.isBroken) {
           continue;
         }
         final toSystem = to.systemSymbol;
@@ -183,8 +190,20 @@ class SystemConnectivity {
     return SystemConnectivity._(connections);
   }
 
+  // We could make SystemConnectivity immutable, but then we would need
+  // to be careful never to hold onto it.  For now making it internally
+  // mutable is easier.
   _Connections _connections;
   _Clusters _clusters;
+
+  /// Updates the SystemConnectivity from the given caches.
+  void updateFromJumpGates(
+    JumpGateCache jumpGates,
+    ConstructionCache construction,
+  ) {
+    _connections = _Connections.fromCaches(jumpGates, construction);
+    _clusters = _Clusters.fromConnections(_connections);
+  }
 
   /// Returns the number of systems reachable from [systemSymbol].
   int connectedSystemCount(SystemSymbol systemSymbol) =>
