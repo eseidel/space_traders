@@ -829,3 +829,24 @@ are needed, you'll still end up with two 40-sized trades going.
 ### Teach satellites to ignore exchange-only markets?
 
 ### Reduce manual construction of CostedDeal in tests.
+
+### Planned navigation requires more fuel than we have.
+
+Probably the fuel specs on the COMMAND ship are wrong?
+
+🛸#1  ✈️  to JX78-I60, 0ms left
+🛸#1  ☢️   1 ANTIMATTER           +0% +46c per   1 x 14,190c = -14,190c -> 🏦 116,260,187c
+🛸#1  Used Jump Gate to X1-NB34
+[WARN] 🛸#1  Jump X1-JX78 to X1-NB34 (6663) expected 666 second cooldown, got 945.
+Error advancing ship behavior: JobException: Planned navigation requires more fuel than ship can hold (400 < 486), timeout: 0:05:00.000000
+Found 11 deals for ESEIDEL-1 from NB34-I55
+🛸#1  Found deal: AMMUNITION                 NB34-F48      1,075c -> NB34-E46      1,639c  +22,128c (51%) 9m  43c/s  43,432c
+🛸#1  Starting: NB34-I55 to NB34-F48 speed: 30 max-fuel: 400
+navCruise       NB34-I55  NB34-I56  0:03:17.000000s
+refuel          NB34-I56  NB34-I56  0:00:00.000000s
+navCruise       NB34-I56  NB34-F48  0:03:32.000000s
+in 7m uses 456 fuel
+
+[WARN] 🛸#1  Beginning route to NB34-F48 (7m)
+🛸#1  ⛽   3 FUEL                           ⚖️    3 x     72c =   -216c -> 🏦 116,259,971c
+[WARN] 🛸#1  Fuel low: 95 / 400
