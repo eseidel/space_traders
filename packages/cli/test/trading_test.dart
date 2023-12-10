@@ -6,6 +6,7 @@ import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -185,7 +186,6 @@ void main() {
     // S-A-A and S-A-B are close but have poor deals, S-A-C is far away but
     // has a great deal, but we still choose S-A-B because it's faster and
     // thus has a better profit per second.
-    final marketPrices = _MockMarketPrices();
     final systemsCache = _MockSystemsCache();
     final saa = SystemWaypoint(
       symbol: 'S-A-A',
@@ -245,7 +245,8 @@ void main() {
         activity: ActivityLevel.WEAK,
       ),
     ];
-    when(() => marketPrices.prices).thenReturn(prices);
+    final fs = MemoryFileSystem.test();
+    final marketPrices = MarketPrices(prices, fs: fs);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final shipEngine = _MockShipEngine();

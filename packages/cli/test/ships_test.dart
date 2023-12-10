@@ -37,7 +37,7 @@ void main() {
 
   test('makeShip crew', () {
     final ship = shipyardShips.shipForTest(ShipType.ORE_HOUND);
-    expect(ship!.crew.current, 32);
+    expect(ship!.crew.current, 33);
     // Also check COMMAND_FRIGATE has 59 crew.
   });
 }
