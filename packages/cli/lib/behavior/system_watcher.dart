@@ -219,6 +219,13 @@ Future<JobResult> doSystemWatcher(
     return JobResult.wait(waitTime);
   }
   shipWarn(ship, 'No stale markets near waypoints near ${waypoint.symbol}.');
+
+  jobAssert(
+    maxAge > const Duration(minutes: 10),
+    'Max age for $systemSymbol is already too short, giving up on system.',
+    const Duration(minutes: 30),
+  );
+
   final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);
   shipWarn(
     ship,
