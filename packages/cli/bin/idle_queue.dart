@@ -1,6 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/fetch_queue.dart';
+import 'package:cli/idle_queue.dart';
 import 'package:cli/net/auth.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
@@ -9,7 +9,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final caches = await Caches.loadOrFetch(fs, api, db);
 
   final systemSymbol = caches.agent.headquartersSystemSymbol;
-  final queue = FetchQueue()..queueSystem(systemSymbol);
+  final queue = IdleQueue()..queueSystem(systemSymbol);
   while (!queue.isDone) {
     await queue.runOne(api, caches);
   }

@@ -3,9 +3,9 @@ import 'package:cli/cli.dart';
 import 'package:cli/net/queries.dart';
 
 /// A queue for fetching system information.
-class FetchQueue {
+class IdleQueue {
   /// Create a new fetch queue.
-  FetchQueue();
+  IdleQueue();
 
   final List<SystemSymbol> _systems = [];
   final Set<SystemSymbol> _seen = {};
@@ -15,7 +15,7 @@ class FetchQueue {
     if (_seen.contains(systemSymbol)) {
       return;
     }
-    logger.info('Queuing: $systemSymbol');
+    logger.detail('Queuing: $systemSymbol');
     _systems.add(systemSymbol);
   }
 
@@ -24,7 +24,7 @@ class FetchQueue {
     Caches caches,
     SystemSymbol systemSymbol,
   ) async {
-    logger.info('Process: $systemSymbol');
+    logger.detail('Process: $systemSymbol');
     _seen.add(systemSymbol);
     final waypoints = await caches.waypoints.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
@@ -48,14 +48,23 @@ class FetchQueue {
       // Can only fetch jump gates for waypoints which are charted or have
       // a ship there.
       if (waypoint.isJumpGate && waypoint.isCharted) {
-        final jumpGateRecord =
+        final fromRecord =
             await caches.jumpGates.getOrFetch(api, waypoint.waypointSymbol);
-        for (final systemSymbol in jumpGateRecord.connectedSystemSymbols) {
-          queueSystem(systemSymbol);
+        final from = fromRecord.waypointSymbol;
+        if (!canJumpFrom(caches.jumpGates, caches.construction, from)) {
+          continue;
+        }
+        for (final to in fromRecord.connections) {
+          if (canJumpTo(caches.jumpGates, caches.construction, to)) {
+            queueSystem(to.systemSymbol);
+          }
         }
       }
     }
   }
+
+  /// A guess at the minimum time we need to do one loop.
+  Duration get minProcessingTime => const Duration(seconds: 1);
 
   /// Run one fetch.
   Future<void> runOne(Api api, Caches caches) async {

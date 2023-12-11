@@ -112,6 +112,58 @@ class _Clusters {
 //   return fullyConnected;
 // }
 
+/// Returns true if it's possible to jump from the provided jumpgate.
+/// it's important to also check if it's possible to jump to the destination.
+bool canJumpFrom(
+  JumpGateCache jumpGateCache,
+  ConstructionCache constructionCache,
+  WaypointSymbol from,
+) {
+  final fromRecord = jumpGateCache.recordForSymbol(from);
+  // If we don't know about the fromGate or it's broken, we can't jump.
+  if (fromRecord == null || fromRecord.isBroken) {
+    return false;
+  }
+  final fromUnderConstruction = constructionCache.isUnderConstruction(from);
+  // If we don't know or it's not complete, assume we can't jump.
+  if (fromUnderConstruction == null || fromUnderConstruction == true) {
+    return false;
+  }
+  return true;
+}
+
+/// Returns true if it's possible to jump to the provided jumpgate.
+/// it's important to also check if it's possible to jump from the origin.
+bool canJumpTo(
+  JumpGateCache jumpGateCache,
+  ConstructionCache constructionCache,
+  WaypointSymbol to,
+) {
+  final toUnderConstruction = constructionCache.isUnderConstruction(to);
+  // If we don't know or it's not complete, assume we can't jump.
+  if (toUnderConstruction == null || toUnderConstruction == true) {
+    return false;
+  }
+  // If the toGate is broken, we technically could jump there, but we couldn't
+  // get back.
+  final toGate = jumpGateCache.recordForSymbol(to);
+  if (toGate != null && toGate.isBroken) {
+    return false;
+  }
+  return true;
+}
+
+/// Returns true if we know it's possible to jump between the two waypoints.
+bool canJumpBetween(
+  JumpGateCache jumpGateCache,
+  ConstructionCache constructionCache, {
+  required WaypointSymbol from,
+  required WaypointSymbol to,
+}) {
+  return canJumpFrom(jumpGateCache, constructionCache, from) &&
+      canJumpTo(jumpGateCache, constructionCache, to);
+}
+
 // This could be simplified by storing waypoints instead.
 class _Connections {
   _Connections.fromPartial(
@@ -134,24 +186,13 @@ class _Connections {
     // JumpGateCache caches responses from the server.  We may not yet have
     // cached both sides of a jump gate, so this fills in the gaps.
     for (final record in jumpGateCache.values) {
-      if (record.isBroken) {
-        continue;
-      }
       final from = record.waypointSymbol;
-      final fromUnderConstruction = constructionCache.isUnderConstruction(from);
-      // If we don't know or it's not complete, we can't jump.
-      if (fromUnderConstruction == null || fromUnderConstruction == true) {
+      if (!canJumpFrom(jumpGateCache, constructionCache, from)) {
         continue;
       }
       final fromSystem = from.systemSymbol;
       for (final to in record.connections) {
-        final toUnderConstruction = constructionCache.isUnderConstruction(to);
-        // If we don't know or it's not complete, we can't jump.
-        if (toUnderConstruction == null || toUnderConstruction == true) {
-          continue;
-        }
-        final toGate = jumpGateCache.recordForSymbol(to);
-        if (toGate != null && toGate.isBroken) {
+        if (!canJumpTo(jumpGateCache, constructionCache, to)) {
           continue;
         }
         final toSystem = to.systemSymbol;

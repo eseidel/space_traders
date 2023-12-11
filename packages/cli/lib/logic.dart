@@ -1,6 +1,7 @@
 import 'package:cli/behavior/advance.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/idle_queue.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
@@ -19,7 +20,23 @@ Future<void> _waitIfNeeded(ShipWaiterEntry entry) async {
   }
 }
 
-/// One loop of the logic.
+Future<void> _runIdleTasksIfPossible(
+  ShipWaiterEntry entry,
+  IdleQueue queue,
+  Api api,
+  Caches caches,
+) async {
+  final waitUntil = entry.waitUntil;
+  if (waitUntil == null) {
+    return;
+  }
+  while (
+      DateTime.timestamp().add(queue.minProcessingTime).isBefore(waitUntil)) {
+    await queue.runOne(api, caches);
+  }
+}
+
+/// Loop over our ships and advance them.  Runs until error.
 Future<void> advanceShips(
   Api api,
   Database db,
@@ -29,6 +46,9 @@ Future<void> advanceShips(
   required int loopCount,
   bool Function(Ship ship)? shipFilter,
 }) async {
+  // TODO(eseidel): Should this move out to the caller?
+  final queue = IdleQueue()..queueSystem(caches.agent.headquartersSystemSymbol);
+
   // loopCount is only used to control how often we reset our waypoint and
   // market caches.  If we got rid of those we could get rid of loopCount.
   await caches.updateAtTopOfLoop(api);
@@ -49,6 +69,7 @@ Future<void> advanceShips(
     final shipSymbol = entry.shipSymbol;
     final waitUntil = entry.waitUntil;
 
+    await _runIdleTasksIfPossible(entry, queue, api, caches);
     await _waitIfNeeded(entry);
     final ship = caches.ships.ship(shipSymbol);
     if (shipFilter != null && !shipFilter(ship)) {
