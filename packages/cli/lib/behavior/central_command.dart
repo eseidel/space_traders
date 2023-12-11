@@ -210,6 +210,12 @@ class CentralCommand {
       }
       if (enabled(Behavior.charter)) {
         return toState(Behavior.charter);
+      } else if (enabled(Behavior.systemWatcher)) {
+        return BehaviorState(
+          shipSymbol,
+          Behavior.systemWatcher,
+          systemWatcherJob: SystemWatcherJob(systemSymbol: ship.systemSymbol),
+        );
       }
     }
 
@@ -262,6 +268,7 @@ class CentralCommand {
     ContractCache contractCache,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
+    SystemConnectivity systemConnectivity,
     RoutePlanner routePlanner,
     Ship ship, {
     required int maxTotalOutlay,
@@ -285,6 +292,7 @@ class CentralCommand {
     }
     final deals = scanAndFindDeals(
       systemsCache,
+      systemConnectivity,
       marketPrices,
       routePlanner,
       maxTotalOutlay: maxTotalOutlay,
