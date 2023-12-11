@@ -223,7 +223,7 @@ class SystemConnectivity {
   Iterable<SystemSymbol> systemsReachableFrom(SystemSymbol systemSymbol) {
     final clusterId = clusterIdForSystem(systemSymbol);
     if (clusterId == null) {
-      return [];
+      return [systemSymbol];
     }
     return systemSymbolsByClusterId(clusterId);
   }
