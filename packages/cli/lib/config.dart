@@ -28,6 +28,12 @@ class Config {
     ShipType.PROBE,
     ShipType.PROBE,
     ShipType.PROBE,
+    ShipType.PROBE,
+    ShipType.PROBE,
+    ShipType.PROBE,
+    ShipType.PROBE,
+    ShipType.PROBE,
+    ShipType.PROBE,
   ];
 
   /// A list of which haulers should be used as miner haulers.
