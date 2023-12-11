@@ -712,6 +712,9 @@ extension ConstructionUtils on Construction {
 extension ConstructionMaterialUtils on ConstructionMaterial {
   /// Returns the amount of the given trade good the construction still needs.
   int get unitsNeeded => required_ - fulfilled;
+
+  /// Returns true if this construction material has been fulfilled.
+  bool get isFulfilled => unitsNeeded == 0;
 }
 
 /// Extensions onto MarketTransaction to make it easier to work with.

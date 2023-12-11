@@ -251,10 +251,11 @@ void main() {
     final shipNav = _MockShipNav();
     final shipEngine = _MockShipEngine();
     final shipCargo = _MockShipCargo();
+    final waypointSymbol = WaypointSymbol.fromString('S-A-A');
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-A');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
     when(() => ship.engine).thenReturn(shipEngine);
     when(() => shipEngine.speed).thenReturn(30);
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -263,8 +264,8 @@ void main() {
 
     when(() => systemsCache[saa.systemSymbol]).thenReturn(
       System(
-        symbol: 'S-A',
-        sectorSymbol: 'S',
+        symbol: waypointSymbol.system,
+        sectorSymbol: waypointSymbol.sector,
         x: 0,
         y: 0,
         type: SystemType.RED_STAR,
@@ -282,7 +283,12 @@ void main() {
 
     final marketScan = runWithLogger(
       logger,
-      () => scanAllKnownMarkets(systemsCache, marketPrices),
+      () => scanReachableMarkets(
+        systemsCache,
+        systemConnectivity,
+        marketPrices,
+        startSystem: waypointSymbol.systemSymbol,
+      ),
     );
 
     final costed = runWithLogger(

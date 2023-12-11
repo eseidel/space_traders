@@ -13,10 +13,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionCache = ConstructionCache.load(fs);
-  final routePlanner = RoutePlanner.fromCaches(
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
+  final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
-    jumpGateCache,
-    constructionCache,
+    systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
 
@@ -61,6 +62,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final deals = scanAndFindDeals(
     systemsCache,
+    systemConnectivity,
     marketPrices,
     routePlanner,
     maxTotalOutlay: credits,

@@ -15,12 +15,13 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
-  final jumpGateCache = JumpGateCache.load(fs);
+  final jumpGates = JumpGateCache.load(fs);
   final constructionCache = ConstructionCache.load(fs);
-  final routePlanner = RoutePlanner.fromCaches(
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGates, constructionCache);
+  final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
-    jumpGateCache,
-    constructionCache,
+    systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final marketPrices = MarketPrices.load(fs);
@@ -70,7 +71,12 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     }
   }
 
-  final marketScan = scanAllKnownMarkets(systemsCache, marketPrices);
+  final marketScan = scanReachableMarkets(
+    systemsCache,
+    systemConnectivity,
+    marketPrices,
+    startSystem: start.systemSymbol,
+  );
   logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
   final deals = findDealsFor(
     marketPrices,

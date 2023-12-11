@@ -7,6 +7,7 @@ import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
@@ -371,12 +372,18 @@ CostedDeal costOutDeal(
 }
 
 /// Builds a MarketScan from all known markets.
-MarketScan scanAllKnownMarkets(
+MarketScan scanReachableMarkets(
   SystemsCache systemsCache,
-  MarketPrices marketPrices,
-) {
+  SystemConnectivity systemConnectivity,
+  MarketPrices marketPrices, {
+  required SystemSymbol startSystem,
+}) {
   // For now just using all market prices.
-  final allowedWaypoints = marketPrices.waypointSymbols;
+  final reachableSystems =
+      systemConnectivity.systemsReachableFrom(startSystem).toSet();
+
+  final allowedWaypoints = marketPrices.waypointSymbols
+      .where((w) => reachableSystems.contains(w.systemSymbol));
   logger.detail('Considering ${allowedWaypoints.length} waypoints');
 
   return MarketScan.fromMarketPrices(
@@ -774,6 +781,7 @@ bool Function(Deal) avoidDealsInProgress(
 /// CentralCommand.findNextDealAndLog instead.
 Iterable<CostedDeal> scanAndFindDeals(
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   MarketPrices marketPrices,
   RoutePlanner routePlanner, {
   required WaypointSymbol startSymbol,
@@ -783,7 +791,12 @@ Iterable<CostedDeal> scanAndFindDeals(
   List<SellOpp>? extraSellOpps,
   int minProfitPerSecond = 0,
 }) {
-  final marketScan = scanAllKnownMarkets(systemsCache, marketPrices);
+  final marketScan = scanReachableMarkets(
+    systemsCache,
+    systemConnectivity,
+    marketPrices,
+    startSystem: startSymbol.systemSymbol,
+  );
   return findDealsFor(
     marketPrices,
     systemsCache,

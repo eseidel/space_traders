@@ -4,6 +4,7 @@ import 'package:cli/behavior/charter.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -24,7 +25,13 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
+class _MockSystemsCache extends Mock implements SystemsCache {}
+
 class _MockWaypoint extends Mock implements Waypoint {}
+
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceCharter smoke test', () async {
@@ -99,7 +106,14 @@ void main() {
           .systemsReachableFrom(waypointSymbol.systemSymbol),
     ).thenReturn([]);
 
-    when(() => centralCommand.otherCharterSystems(shipSymbol)).thenReturn([]);
+    when(
+      () => centralCommand.nextWaypointToChart(
+        caches.systems,
+        caches.waypoints,
+        caches.systemConnectivity,
+        ship,
+      ),
+    ).thenAnswer((_) async => null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
 
     final logger = _MockLogger();
@@ -118,5 +132,103 @@ void main() {
       ),
       throwsA(isA<JobException>()),
     );
+  });
+
+  test('nextUnchartedWaypointSymbol', () async {
+    // Make sure nextUnchartedWaypointSymbol returns waypoints in our current
+    // system when they exist, otherwise a nearby system, otherwise null.
+
+    final fs = MemoryFileSystem.test();
+
+    const shipSymbol = ShipSymbol('S', 1);
+    final systemASymbol = SystemSymbol.fromString('S-A');
+    final waypointAASymbol = WaypointSymbol.fromString('S-A-A');
+    final waypointABSymbol = WaypointSymbol.fromString('S-A-B');
+    final systemBSymbol = SystemSymbol.fromString('S-B');
+    final waypointBASymbol = WaypointSymbol.fromString('S-B-A');
+
+    final ship = _MockShip();
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.systemSymbol).thenReturn(systemASymbol.system);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointAASymbol.waypoint);
+
+    final systemsCache = SystemsCache(
+      [
+        System(
+          symbol: systemASymbol.system,
+          sectorSymbol: systemASymbol.sector,
+          type: SystemType.BLACK_HOLE,
+          x: 0,
+          y: 0,
+          waypoints: [
+            SystemWaypoint(
+              symbol: waypointAASymbol.waypoint,
+              type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
+              x: 0,
+              y: 0,
+            ),
+            SystemWaypoint(
+              symbol: waypointABSymbol.waypoint,
+              type: WaypointType.JUMP_GATE,
+              x: 0,
+              y: 0,
+            ),
+          ],
+        ),
+        System(
+          symbol: systemBSymbol.system,
+          sectorSymbol: systemBSymbol.sector,
+          type: SystemType.BLACK_HOLE,
+          x: 10,
+          y: 10,
+          waypoints: [
+            SystemWaypoint(
+              symbol: waypointBASymbol.waypoint,
+              type: WaypointType.JUMP_GATE,
+              x: 0,
+              y: 0,
+            ),
+          ],
+        ),
+      ],
+      fs: fs,
+    );
+    final waypointCache = _MockWaypointCache();
+    final systemConnectivity = SystemConnectivity.test({
+      waypointBASymbol: {waypointABSymbol},
+    });
+
+    when(() => waypointCache.isCharted(waypointAASymbol))
+        .thenAnswer((_) async => true);
+    when(() => waypointCache.isCharted(waypointABSymbol))
+        .thenAnswer((_) async => false);
+    when(() => waypointCache.isCharted(waypointBASymbol))
+        .thenAnswer((_) async => false);
+
+    final logger = _MockLogger();
+
+    await runWithLogger(logger, () async {
+      final intraSystem = await nextUnchartedWaypointSymbol(
+        systemsCache,
+        waypointCache,
+        systemConnectivity,
+        ship,
+        startSystemSymbol: systemASymbol,
+      );
+      expect(intraSystem, equals(waypointABSymbol));
+
+      when(() => waypointCache.isCharted(waypointABSymbol))
+          .thenAnswer((_) async => true);
+      final interSystem = await nextUnchartedWaypointSymbol(
+        systemsCache,
+        waypointCache,
+        systemConnectivity,
+        ship,
+        startSystemSymbol: systemASymbol,
+      );
+      expect(interSystem, equals(waypointBASymbol));
+    });
   });
 }
