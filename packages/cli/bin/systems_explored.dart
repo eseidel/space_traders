@@ -31,6 +31,16 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   logger.info(table.toString());
+
+  final jumpGateCache = JumpGateCache.load(fs);
+  final constructionCache = ConstructionCache.load(fs);
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
+  final agentCache = AgentCache.load(fs)!;
+  final headquartersSystemSymbol = agentCache.headquartersSystemSymbol;
+  final connectedSystemCount =
+      systemConnectivity.connectedSystemCount(headquartersSystemSymbol);
+  logger.info('$connectedSystemCount systems known reachable from HQ.');
 }
 
 void main(List<String> args) async {
