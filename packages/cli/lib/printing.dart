@@ -229,6 +229,9 @@ String describeConstructionProgress(Construction? construction) {
   final materials = construction.materials;
   final buffer = StringBuffer();
   for (final material in materials) {
+    if (material.isFulfilled) {
+      continue;
+    }
     if (buffer.isNotEmpty) {
       buffer.write(', ');
     }
