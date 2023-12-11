@@ -22,18 +22,7 @@ class Config {
     ShipType.SURVEYOR,
     ShipType.PROBE,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
-    ShipType.PROBE,
+    for (int i = 0; i < 12; i++) ShipType.PROBE,
   ];
 
   /// A list of which haulers should be used as miner haulers.

@@ -185,11 +185,14 @@ class CentralCommand {
 
     final squad = squadForShip(ship);
     if (squad != null) {
-      final behavior = {
+      var behavior = {
         FleetRole.miner: Behavior.miner,
         FleetRole.surveyor: Behavior.surveyor,
         FleetRole.siphoner: Behavior.siphoner,
       }[ship.fleetRole];
+      if (behavior == null && ship.isHauler && enabled(Behavior.minerHauler)) {
+        behavior = Behavior.minerHauler;
+      }
       if (behavior != null && enabled(behavior)) {
         return BehaviorState(
           shipSymbol,

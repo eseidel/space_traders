@@ -409,17 +409,11 @@ Ship? _nextArrivingHauler(
       .where((h) => h.waypointSymbol == here && h.isInTransit)
       .sortedBy((h) => h.nav.route.arrival);
   final arrivalTime = haulersInTransit.firstOrNull?.nav.route.arrival;
-
   if (arrivalTime != null) {
     return haulersInTransit.firstOrNull;
   }
-  // If none of the haulers are headed towards us, return the one which is
-  // soonest to finish its current route, since that's a reasonable time to
-  // check next.
-  final haulersNotHere = haulers.where((h) => h.waypointSymbol != here);
-  final haulersNotHereSorted =
-      haulersNotHere.sortedBy((h) => h.nav.route.arrival);
-  return haulersNotHereSorted.firstOrNull;
+  // Otherwise none of the haulers are headed towards us.
+  return null;
 }
 
 /// Attempt to sell cargo ourselves by traveling to a market.
