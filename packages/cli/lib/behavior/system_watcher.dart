@@ -222,8 +222,8 @@ Future<JobResult> doSystemWatcher(
 
   jobAssert(
     maxAge > const Duration(minutes: 10),
-    'Max age for $systemSymbol is already too short, giving up on system.',
-    const Duration(minutes: 30),
+    'Max age for $systemSymbol is already too short, giving up.',
+    const Duration(hours: 1),
   );
 
   final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);

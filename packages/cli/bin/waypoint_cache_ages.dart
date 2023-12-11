@@ -4,16 +4,22 @@ import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final SystemSymbol startSystemSymbol;
+  if (argResults.rest.isNotEmpty) {
+    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
+  } else {
+    final agentCache = AgentCache.load(fs)!;
+    startSystemSymbol = agentCache.headquartersSystemSymbol;
+  }
+
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
   final constrctionCache = ConstructionCache.load(fs);
-  final agentCache = AgentCache.load(fs)!;
-  final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
 
-  final waypoints = systemsCache.waypointsInSystem(hqSystemSymbol);
+  final waypoints = systemsCache.waypointsInSystem(startSystemSymbol);
 
   final table = Table(
     header: ['Waypoint', 'Market', 'Shipyard', 'Construction', 'Chart'],

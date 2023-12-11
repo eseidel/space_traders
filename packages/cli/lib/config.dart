@@ -102,7 +102,6 @@ class Config {
   final probeAssignments = {
     '2': 'JX78',
     '29': 'NB34',
-    // '2A': 'RA9',
   }.map(
     (k, v) => MapEntry(
       ShipSymbol.fromString('ESEIDEL-$k'),

@@ -4,17 +4,20 @@ import 'package:cli/net/auth.dart';
 import 'package:cli/printing.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  // Load up the jump gate for the main system.
-  // List its connections.
-  // Check if each is constructed.
+  final SystemSymbol startSystemSymbol;
+  if (argResults.rest.isNotEmpty) {
+    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
+  } else {
+    final agentCache = AgentCache.load(fs)!;
+    startSystemSymbol = agentCache.headquartersSystemSymbol;
+  }
+
   final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
 
-  final agentCache = AgentCache.load(fs)!;
-  final hqSystem = agentCache.headquartersSystemSymbol;
   final systemsCache = SystemsCache.load(fs)!;
   final jumpGateSymbol = systemsCache
-      .waypointsInSystem(hqSystem)
+      .waypointsInSystem(startSystemSymbol)
       .firstWhere((w) => w.isJumpGate)
       .waypointSymbol;
   final staticCaches = StaticCaches.load(fs);
@@ -25,23 +28,26 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       WaypointCache(api, systemsCache, chartingCache, constructionCache);
   final jumpGateCache = JumpGateCache.load(fs);
   final jumpGate = await jumpGateCache.getOrFetch(api, jumpGateSymbol);
-  logger.info('$jumpGateSymbol:');
-  for (final connection in jumpGate.connections) {
+
+  Future<String> statusString(WaypointSymbol jumpGateSymbol) async {
     final isUnderConstrustion =
-        await waypointCache.isUnderConstruction(connection);
+        await waypointCache.isUnderConstruction(jumpGateSymbol);
 
-    final record = jumpGateCache.recordForSymbol(connection);
-
-    final String status;
+    final record = jumpGateCache.recordForSymbol(jumpGateSymbol);
     if (record != null && record.isBroken) {
-      status = 'broken';
-    } else if (isUnderConstrustion) {
-      final construction = constructionCache[connection];
-      final progress = describeConstructionProgress(construction);
-      status = 'under construction ($progress)';
-    } else {
-      status = 'ready';
+      return 'broken';
     }
+    if (isUnderConstrustion) {
+      final construction = constructionCache[jumpGateSymbol];
+      final progress = describeConstructionProgress(construction);
+      return 'under construction ($progress)';
+    }
+    return 'ready';
+  }
+
+  logger.info('$jumpGateSymbol: ${await statusString(jumpGateSymbol)}');
+  for (final connection in jumpGate.connections) {
+    final status = await statusString(connection);
     logger.info('  ${connection.sectorLocalName.padRight(9)} $status');
   }
 

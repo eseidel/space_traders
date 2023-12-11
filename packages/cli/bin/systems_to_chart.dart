@@ -4,8 +4,13 @@ import 'package:cli/cli.dart';
 /// Walks our known system graph, starting from HQ and prints systems needing
 /// exploration.
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final agentCache = AgentCache.load(fs)!;
-  final startSystemSymbol = agentCache.headquartersSystemSymbol;
+  final SystemSymbol startSystemSymbol;
+  if (argResults.rest.isNotEmpty) {
+    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
+  } else {
+    final agentCache = AgentCache.load(fs)!;
+    startSystemSymbol = agentCache.headquartersSystemSymbol;
+  }
 
   final staticCaches = StaticCaches.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
@@ -22,12 +27,23 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         .length;
   }
 
-  for (final (systemSymbol, jumps)
-      in systemConnectivity.systemSymbolsInJumpRadius(
-    systemsCache,
-    startSystem: startSystemSymbol,
-    maxJumps: 3,
-  )) {
+  final connectedSystems = systemConnectivity
+      .systemSymbolsInJumpRadius(
+        systemsCache,
+        startSystem: startSystemSymbol,
+        maxJumps: 3,
+      )
+      .toList();
+  if (connectedSystems.isEmpty) {
+    logger.info('No systems connected to $startSystemSymbol.');
+    final records = jumpGateCache.recordsForSystem(startSystemSymbol);
+    if (records.first.isBroken) {
+      logger.info('  Jump gate is broken.');
+    }
+    return;
+  }
+
+  for (final (systemSymbol, jumps) in connectedSystems) {
     final unchartedCount = unchartedWaypointCount(systemSymbol);
     if (unchartedCount == 0) {
       continue;
