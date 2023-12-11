@@ -75,6 +75,11 @@
   "description": "Advanced electronic components used in the construction of advanced technologies."
  },
  {
+  "symbol": "ENGINE_ION_DRIVE_I",
+  "name": "Ion Drive I",
+  "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration."
+ },
+ {
   "symbol": "EQUIPMENT",
   "name": "Equipment",
   "description": "Tools and equipment used in various industries and applications."
