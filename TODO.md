@@ -851,6 +851,38 @@ in 7m uses 456 fuel
 🛸#1  ⛽   3 FUEL                           ⚖️    3 x     72c =   -216c -> 🏦 116,259,971c
 [WARN] 🛸#1  Fuel low: 95 / 400
 
+🛸#1  Found deal: SHIP_PLATING               NB34-D45      6,345c -> NB34-A2       7,209c   +4,968c (13%) 3m  24c/s  38,286c
+🛸#1  Market at NB34-C42 doesn't buy ANTIMATTER
+🛸#1  Cargo hold not empty, finding market to sell ANTIMATTER.
+🛸#1  Selecting JX78-I60 earns 86,590c extra (including -13,924c for fuel) over 6m (261.6/s)
+[WARN] 🛸#1  Beginning route to JX78-I60 (8m)
+[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.trader for ESEIDEL-1 for 5m.
+[WARN] 🛸#1  No mine job. Disabling Behavior.miner for ESEIDEL-1 for 10m.
+🛸#1  Starting: NB34-C42 to JX78-C43 speed: 30 max-fuel: 400
+navCruise       NB34-C42  NB34-I55 8m 545 fuel
+jump            NB34-I55  JX78-I60 0ms 0 fuel
+navCruise       JX78-I60  JX78-C43 8m 539 fuel
+in 16m uses 1084 fuel
+
+[WARN] 🛸#1  Beginning route to JX78-C43 (16m)
+[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.siphoner for ESEIDEL-1 for 5m.
+
+🛸#1  Found deal: SHIP_PLATING               NB34-D45      6,345c -> NB34-H52      7,279c   +5,460c (14%) 3m  30c/s  38,214c
+🛸#1  ✍️  market data @ NB34-C42
+🛸#1  Market at NB34-C42 doesn't buy ANTIMATTER
+🛸#1  Cargo hold not empty, finding market to sell ANTIMATTER.
+🛸#1  Selecting JX78-I60 earns 86,590c extra (including -14,415c for fuel) over 6m (261.6/s)
+[WARN] 🛸#1  Beginning route to JX78-I60 (8m)
+[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.trader for ESEIDEL-1 for 5m.
+[WARN] 🛸#1  No mine job. Disabling Behavior.miner for ESEIDEL-1 for 10m.
+🛸#1  Starting: NB34-C42 to JX78-C43 speed: 30 max-fuel: 400
+navCruise       NB34-C42  NB34-I55 8m 545 fuel
+jump            NB34-I55  JX78-I60 0ms 0 fuel
+navCruise       JX78-I60  JX78-C43 8m 539 fuel
+in 16m uses 1084 fuel
+
+[WARN] 🛸#1  Beginning route to JX78-C43 (16m)
+[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.siphoner for ESEIDEL-1 for 5m.
 
 ### Miner Haulers still confused:
 
@@ -865,3 +897,19 @@ in 7m uses 456 fuel
 🛸#A  No haulers at JX78-B37, unknown next arrival time for ESEIDEL-8, ESEIDEL-15, checking in 1 minute.
 🛸#A  Hauler ESEIDEL-8 is IN_ORBIT to JX78-B37 arrival -13m, with 0 space available.
 🛸#A  Hauler ESEIDEL-15 is IN_ORBIT to JX78-B37 arrival -5m, with 77 space available.
+
+### Don't know how to jettison when stuck:
+
+Found 43 deals for ESEIDEL-7 from JX78-H58
+🛸#7  Found deal: FUEL                       JX78-G54         62c -> JX78-C44         88c   +1,936c (38%) 8m   4c/s   5,104c
+🛸#7  Market at JX78-H58 doesn't buy MOUNT_MINING_LASER_II
+🛸#7  Market at JX78-H58 doesn't buy MOUNT_TURRET_I
+🛸#7  Cargo hold not empty, finding market to sell MOUNT_TURRET_I.
+[WARN] 🛸#7  No market for MOUNT_TURRET_I. Disabling Behavior.trader for ESEIDEL-7 for 1h.
+
+Which then cascades:
+[WARN] 🛸#4  Hauler ESEIDEL-7 is already here, waiting 1 minute.
+[WARN] 🛸#D  Hauler ESEIDEL-7 is already here, waiting 1 minute.
+[WARN] 🛸#11 Hauler ESEIDEL-7 is already here, waiting 1 minute.
+[WARN] 🛸#4  Hauler ESEIDEL-7 is already here, waiting 1 minute.
+[WARN] 🛸#D  Hauler ESEIDEL-7 is already here, waiting 1 minute.
