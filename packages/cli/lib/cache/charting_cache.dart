@@ -118,6 +118,9 @@ class ChartingCache extends JsonStore<_Record> {
   /// The number of waypoints in the cache.
   int get waypointCount => _valuesBySymbol.length;
 
+  /// The waypoint symbols in the cache.
+  Iterable<WaypointSymbol> get waypointSymbols => _valuesBySymbol.keys;
+
   /// Adds a waypoint to the cache.
   void addWaypoint(Waypoint waypoint, {bool shouldSave = true}) {
     final chart = waypoint.chart;
