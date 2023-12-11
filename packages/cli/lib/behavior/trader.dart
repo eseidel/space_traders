@@ -559,7 +559,7 @@ Future<DateTime?> acceptContractsIfNeeded(
   return null;
 }
 
-/// Sell any cargo we don't need.
+/// Sell or jettison any cargo we don't need.
 Future<JobResult> handleUnwantedCargoIfNeeded(
   Api api,
   Database db,
@@ -610,19 +610,29 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   );
   // We can't sell this cargo anywhere so give up?
 
-  final costedTrip = assertNotNull(
-    findBestMarketToSell(
-      caches.marketPrices,
-      caches.marketListings,
-      caches.routePlanner,
-      ship,
-      unwantedCargo.tradeSymbol,
-      expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
-      unitsToSell: unwantedCargo.units,
-    ),
-    'No market for ${unwantedCargo.symbol}.',
-    const Duration(hours: 1),
+  final costedTrip = findBestMarketToSell(
+    caches.marketPrices,
+    caches.marketListings,
+    caches.routePlanner,
+    ship,
+    unwantedCargo.tradeSymbol,
+    expectedCreditsPerSecond: centralCommand.expectedCreditsPerSecond(ship),
+    unitsToSell: unwantedCargo.units,
   );
+  if (costedTrip == null) {
+    shipErr(
+      ship,
+      'No nearby market to sell ${unwantedCargo.symbol}, jetisoning cargo!',
+    );
+    // Only jettison the item we don't know how to sell, others might sell.
+    await jettisonCargoAndLog(api, caches.ships, ship, unwantedCargo);
+    if (ship.cargo.isEmpty) {
+      return JobResult.complete();
+    }
+    // If we still have cargo to off-load, loop again.
+    return JobResult.wait(null);
+  }
+
   final waitUntil = await beingRouteAndLog(
     api,
     db,
@@ -860,6 +870,7 @@ Future<JobResult> _initDeal(
     caches.contracts,
     caches.marketPrices,
     caches.systems,
+    caches.systemConnectivity,
     caches.routePlanner,
     ship,
     maxTotalOutlay: caches.agent.agent.credits,
@@ -893,6 +904,7 @@ Future<JobResult> _initDeal(
           caches.contracts,
           caches.marketPrices,
           caches.systems,
+          caches.systemConnectivity,
           caches.routePlanner,
           ship,
           overrideStartSymbol: startSymbol,
