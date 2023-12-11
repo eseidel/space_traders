@@ -273,6 +273,9 @@ void main() {
     );
 
     final systemConnectivity = _MockSystemConnectivity();
+    when(() => systemConnectivity.systemsReachableFrom(saa.systemSymbol))
+        .thenReturn([saa.systemSymbol]);
+
     final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,
       systemConnectivity,
