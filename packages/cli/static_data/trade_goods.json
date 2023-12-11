@@ -250,6 +250,11 @@
   "description": "An advanced survey probe that can be used to gather information about a mineral deposit with greater accuracy."
  },
  {
+  "symbol": "MOUNT_TURRET_I",
+  "name": "Rotary Cannon",
+  "description": "A rotary cannon is a type of mounted turret that is designed to fire a high volume of rounds in rapid succession."
+ },
+ {
   "symbol": "NANOBOTS",
   "name": "Nanobots",
   "description": "Tiny robots at the nanoscale, used in various applications, such as medical treatments, manufacturing, and environmental cleanup."
