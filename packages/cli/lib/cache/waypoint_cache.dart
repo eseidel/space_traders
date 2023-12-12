@@ -7,15 +7,6 @@ import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
-/// Fetches all waypoints in a system.  Handles pagination from the server.
-Stream<Waypoint> _allWaypointsInSystem(Api api, SystemSymbol system) {
-  return fetchAllPages(api, (api, page) async {
-    final response =
-        await api.systems.getSystemWaypoints(system.system, page: page);
-    return (response!.data, response.meta);
-  });
-}
-
 /// Stores Waypoint objects fetched recently from the API.
 class WaypointCache {
   /// Create a new WaypointCache.
@@ -128,7 +119,7 @@ class WaypointCache {
       throw StateError('$systemSymbol not in cache and no API to fetch it.');
     }
 
-    final waypoints = await _allWaypointsInSystem(api, systemSymbol).toList();
+    final waypoints = await allWaypointsInSystem(api, systemSymbol).toList();
     _waypointsBySystem[systemSymbol] = waypoints;
     await _addWaypointsToCaches(api, waypoints);
     return waypoints;

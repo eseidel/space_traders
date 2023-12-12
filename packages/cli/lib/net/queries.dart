@@ -1,6 +1,10 @@
 import 'package:cli/api.dart';
 import 'package:types/types.dart';
 
+/// The default page size for API requests.
+// The default size in the OpenAPI spec is 10, but the max is 20.
+const int pageLimit = 20;
+
 /// Fetches all pages from the given fetchPage function.
 Stream<T> fetchAllPages<T, A>(
   A api,
@@ -20,10 +24,19 @@ Stream<T> fetchAllPages<T, A>(
   } while (remaining > 0);
 }
 
+/// Fetches all waypoints in a system.  Handles pagination from the server.
+Stream<Waypoint> allWaypointsInSystem(Api api, SystemSymbol system) {
+  return fetchAllPages(api, (api, page) async {
+    final response = await api.systems
+        .getSystemWaypoints(system.system, page: page, limit: pageLimit);
+    return (response!.data, response.meta);
+  });
+}
+
 /// Fetches all of the user's ships.  Handles pagination from the server.
 Stream<Ship> allMyShips(Api api) {
   return fetchAllPages(api, (api, page) async {
-    final response = await api.fleet.getMyShips(page: page);
+    final response = await api.fleet.getMyShips(page: page, limit: pageLimit);
     return (response!.data, response.meta);
   });
 }
@@ -31,7 +44,8 @@ Stream<Ship> allMyShips(Api api) {
 /// Fetches all of the user's contracts.  Handles pagination from the server.
 Stream<Contract> allMyContracts(Api api) {
   return fetchAllPages(api, (api, page) async {
-    final response = await api.contracts.getContracts(page: page);
+    final response =
+        await api.contracts.getContracts(page: page, limit: pageLimit);
     return (response!.data, response.meta);
   });
 }
@@ -39,7 +53,8 @@ Stream<Contract> allMyContracts(Api api) {
 /// Fetches all factions.  Handles pagination from the server.
 Stream<Faction> getAllFactions(Api api) {
   return fetchAllPages(api, (api, page) async {
-    final response = await api.factions.getFactions(page: page);
+    final response =
+        await api.factions.getFactions(page: page, limit: pageLimit);
     return (response!.data, response.meta);
   });
 }
