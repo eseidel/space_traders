@@ -913,3 +913,22 @@ Which then cascades:
 [WARN] 🛸#11 Hauler ESEIDEL-7 is already here, waiting 1 minute.
 [WARN] 🛸#4  Hauler ESEIDEL-7 is already here, waiting 1 minute.
 [WARN] 🛸#D  Hauler ESEIDEL-7 is already here, waiting 1 minute.
+
+### Infinite looping
+
+[WARN] 🛸#22 No profitable deals near X1-ZA48-ZE9C.
+No deals within all known markets.
+Found 0 deals for ESEIDEL-22 from ZA48-ZE9C
+Found 1 deals for ESEIDEL-22 from MR11-EF9A
+🛸#22 Found placement: 9c/s 1023 1911 MR11-EF9A
+🛸#22 Potential: DRUGS                      NB34-J58      4,846c -> NB34-H51      5,356c  +25,866c  (6%) 43m   9c/s 402,614c
+🛸#22 No route to MR11-EF9A!?
+No deals within all known markets.
+Found 0 deals for ESEIDEL-22 from ZA48-ZE9C
+[WARN] 🛸#22 No profitable deals near X1-ZA48-ZE9C.
+No deals within all known markets.
+Found 0 deals for ESEIDEL-22 from ZA48-ZE9C
+Found 1 deals for ESEIDEL-22 from MR11-EF9A
+🛸#22 Found placement: 9c/s 1023 1911 MR11-EF9A
+🛸#22 Potential: DRUGS                      NB34-J58      4,846c -> NB34-H51      5,356c  +25,866c  (6%) 43m   9c/s 402,614c
+🛸#22 No route to MR11-EF9A!?

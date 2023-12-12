@@ -11,6 +11,7 @@ typedef FindDeal = CostedDeal? Function(Ship ship, WaypointSymbol startSymbol);
 /// Find a better destination for the given trader [ship].
 WaypointSymbol? findBetterTradeLocation(
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   MarketPrices marketPrices,
   Ship ship, {
   required FindDeal findDeal,
@@ -24,6 +25,7 @@ WaypointSymbol? findBetterTradeLocation(
   );
   final placement = _findBetterSystemForTrader(
     systemsCache,
+    systemConnectivity,
     search,
     ship,
     findDeal: findDeal,
@@ -70,6 +72,7 @@ Map<SystemSymbol, int> scoreMarketSystems(
 
 _ShipPlacement? _findBetterSystemForTrader(
   SystemsCache systemsCache,
+  SystemConnectivity systemConnectivity,
   _MarketSearch search,
   Ship ship, {
   required FindDeal findDeal,
@@ -77,6 +80,10 @@ _ShipPlacement? _findBetterSystemForTrader(
 }) {
   final shipSymbol = ship.symbol;
   final shipSystem = systemsCache[ship.systemSymbol];
+
+  final reachableSystems =
+      systemConnectivity.systemsReachableFrom(ship.systemSymbol).toSet();
+
   while (true) {
     final closest = search.closestAvailableSystem(systemsCache, shipSystem);
     if (closest == null) {
@@ -84,6 +91,12 @@ _ShipPlacement? _findBetterSystemForTrader(
       return null;
     }
     search.markUsed(closest);
+
+    if (!reachableSystems.contains(closest.systemSymbol)) {
+      shipDetail(ship, 'Not reachable: $shipSymbol -> ${closest.symbol}');
+      continue;
+    }
+
     final score = search.scoreFor(closest.systemSymbol);
     // This code assumes we're on the jump gate network.
     final systemJumpGate =

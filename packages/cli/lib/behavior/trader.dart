@@ -896,6 +896,7 @@ Future<JobResult> _initDeal(
   final destinationSymbol = assertNotNull(
     findBetterTradeLocation(
       caches.systems,
+      caches.systemConnectivity,
       caches.marketPrices,
       findDeal: (Ship ship, WaypointSymbol startSymbol) {
         return centralCommand.findNextDealAndLog(

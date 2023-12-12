@@ -220,6 +220,11 @@
   "description": "Compact fusion reactors that provide a clean, reliable, and virtually unlimited source of energy."
  },
  {
+  "symbol": "MODULE_SCIENCE_LAB_I",
+  "name": "Science Lab",
+  "description": "A specialized module equipped with advanced instruments and equipment for scientific research and analysis."
+ },
+ {
   "symbol": "MOOD_REGULATORS",
   "name": "Mood Regulators",
   "description": "Drugs or other medical treatments that are used to control or regulate mood and emotions."

@@ -2,6 +2,7 @@ import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/market_scores.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -12,6 +13,8 @@ class _MockLogger extends Mock implements Logger {}
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 void main() {
   test('findBetterTradeLocation smoke test', () {
@@ -92,6 +95,8 @@ void main() {
       fs: fs,
     );
 
+    final systemConnectivity = _MockSystemConnectivity();
+
     CostedDeal? findNextDeal(Ship ship, WaypointSymbol startSymbol) {
       return null;
     }
@@ -101,6 +106,7 @@ void main() {
       logger,
       () => findBetterTradeLocation(
         systemsCache,
+        systemConnectivity,
         marketPrices,
         ship,
         findDeal: findNextDeal,
