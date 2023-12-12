@@ -23,6 +23,8 @@ class Config {
     ShipType.PROBE,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
     for (int i = 0; i < 12; i++) ShipType.PROBE,
+    ShipType.REFINING_FREIGHTER,
+    ShipType.EXPLORER,
   ];
 
   /// A list of which haulers should be used as miner haulers.
