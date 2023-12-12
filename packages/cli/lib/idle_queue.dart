@@ -26,17 +26,17 @@ class IdleQueue {
   ) async {
     logger.detail('Process: $systemSymbol');
     _seen.add(systemSymbol);
-    final waypoints = await caches.waypoints.waypointsInSystem(systemSymbol);
+    final waypoints = caches.systems.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.waypointSymbol;
-      if (waypoint.hasMarketplace) {
+      if (await caches.waypoints.hasMarketplace(waypointSymbol)) {
         final listing = caches.marketListings[waypointSymbol];
         if (listing == null) {
           logger.info(' Market: $waypointSymbol');
           await caches.markets.refreshMarket(waypointSymbol);
         }
       }
-      if (waypoint.hasShipyard) {
+      if (await caches.waypoints.hasShipyard(waypointSymbol)) {
         final listing = caches.shipyardListings[waypointSymbol];
         if (listing == null) {
           logger.info(' Shipyard: $waypointSymbol');
@@ -47,7 +47,8 @@ class IdleQueue {
 
       // Can only fetch jump gates for waypoints which are charted or have
       // a ship there.
-      if (waypoint.isJumpGate && waypoint.isCharted) {
+      if (waypoint.isJumpGate &&
+          (await caches.waypoints.isCharted(waypointSymbol))) {
         final fromRecord =
             await caches.jumpGates.getOrFetch(api, waypoint.waypointSymbol);
         final from = fromRecord.waypointSymbol;
