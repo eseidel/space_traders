@@ -782,14 +782,6 @@ ApiException 400: {"error":{"message":"Construction material requirements for AD
 #10     main (file:///root/space_traders/packages/cli/bin/cli.dart:152:3)
 <asynchronous suspension>
 
-### Add ShipyardListing separate from ShipyardPrices
-
-And scan for ShipyardListings as part of fetch_queue.dart
-
-### Integrate fetch_queue into the client
-
-Right now lots of things fail before we have scanned for market listings.
-
 ### Confused hauler transfers
 
 [WARN] 🛸#D  scheduled for 2023-12-04 00:22:33.750 but it is 2s late
@@ -819,12 +811,6 @@ an infinte loop.
 If you disable the "avoid from same source" construction will buy multiple
 times of the same final set of units for a contract.  e.g. if only 40 more
 are needed, you'll still end up with two 40-sized trades going.
-
-### Find a way to record where jump gates go.
-
-### Resurrect jump planner and teach it that jumps cost money.
-
-### Teach satellites to stick to a single system?
 
 ### Teach satellites to ignore exchange-only markets?
 
@@ -897,38 +883,3 @@ in 16m uses 1084 fuel
 🛸#A  No haulers at JX78-B37, unknown next arrival time for ESEIDEL-8, ESEIDEL-15, checking in 1 minute.
 🛸#A  Hauler ESEIDEL-8 is IN_ORBIT to JX78-B37 arrival -13m, with 0 space available.
 🛸#A  Hauler ESEIDEL-15 is IN_ORBIT to JX78-B37 arrival -5m, with 77 space available.
-
-### Don't know how to jettison when stuck:
-
-Found 43 deals for ESEIDEL-7 from JX78-H58
-🛸#7  Found deal: FUEL                       JX78-G54         62c -> JX78-C44         88c   +1,936c (38%) 8m   4c/s   5,104c
-🛸#7  Market at JX78-H58 doesn't buy MOUNT_MINING_LASER_II
-🛸#7  Market at JX78-H58 doesn't buy MOUNT_TURRET_I
-🛸#7  Cargo hold not empty, finding market to sell MOUNT_TURRET_I.
-[WARN] 🛸#7  No market for MOUNT_TURRET_I. Disabling Behavior.trader for ESEIDEL-7 for 1h.
-
-Which then cascades:
-[WARN] 🛸#4  Hauler ESEIDEL-7 is already here, waiting 1 minute.
-[WARN] 🛸#D  Hauler ESEIDEL-7 is already here, waiting 1 minute.
-[WARN] 🛸#11 Hauler ESEIDEL-7 is already here, waiting 1 minute.
-[WARN] 🛸#4  Hauler ESEIDEL-7 is already here, waiting 1 minute.
-[WARN] 🛸#D  Hauler ESEIDEL-7 is already here, waiting 1 minute.
-
-### Infinite looping
-
-[WARN] 🛸#22 No profitable deals near X1-ZA48-ZE9C.
-No deals within all known markets.
-Found 0 deals for ESEIDEL-22 from ZA48-ZE9C
-Found 1 deals for ESEIDEL-22 from MR11-EF9A
-🛸#22 Found placement: 9c/s 1023 1911 MR11-EF9A
-🛸#22 Potential: DRUGS                      NB34-J58      4,846c -> NB34-H51      5,356c  +25,866c  (6%) 43m   9c/s 402,614c
-🛸#22 No route to MR11-EF9A!?
-No deals within all known markets.
-Found 0 deals for ESEIDEL-22 from ZA48-ZE9C
-[WARN] 🛸#22 No profitable deals near X1-ZA48-ZE9C.
-No deals within all known markets.
-Found 0 deals for ESEIDEL-22 from ZA48-ZE9C
-Found 1 deals for ESEIDEL-22 from MR11-EF9A
-🛸#22 Found placement: 9c/s 1023 1911 MR11-EF9A
-🛸#22 Potential: DRUGS                      NB34-J58      4,846c -> NB34-H51      5,356c  +25,866c  (6%) 43m   9c/s 402,614c
-🛸#22 No route to MR11-EF9A!?
