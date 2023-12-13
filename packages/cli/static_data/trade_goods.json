@@ -5,6 +5,11 @@
   "description": "Highly advanced and complex electronic components used in advanced technologies and systems."
  },
  {
+  "symbol": "AI_MAINFRAMES",
+  "name": "AI Mainframes",
+  "description": "High-powered computer systems designed to support advanced artificial intelligence and machine learning algorithms."
+ },
+ {
   "symbol": "ALUMINUM",
   "name": "Aluminum",
   "description": "Aluminum is an essential component in the construction of ship hulls and other structural components."
@@ -240,6 +245,11 @@
   "description": "A specialized module equipped with advanced instruments and equipment for scientific research and analysis."
  },
  {
+  "symbol": "MODULE_SHIELD_GENERATOR_I",
+  "name": "Shield Generator",
+  "description": "A basic shield generator that provides protection against incoming weapons fire and other hazards."
+ },
+ {
   "symbol": "MOOD_REGULATORS",
   "name": "Mood Regulators",
   "description": "Drugs or other medical treatments that are used to control or regulate mood and emotions."
@@ -333,6 +343,11 @@
   "symbol": "QUARTZ_SAND",
   "name": "Quartz Sand",
   "description": "High-purity quartz sand used in the production of glass and ceramics."
+ },
+ {
+  "symbol": "REACTOR_FISSION_I",
+  "name": "Fission Reactor I",
+  "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions."
  },
  {
   "symbol": "RELIC_TECH",

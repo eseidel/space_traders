@@ -530,12 +530,12 @@
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_INTERCEPTOR",
-   "name": "Frame Interceptor",
+   "name": "Interceptor",
    "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
    "condition": null,
    "moduleSlots": 2,
    "mountingPoints": 2,
-   "fuelCapacity": 500,
+   "fuelCapacity": 160,
    "requirements": {
     "power": 1,
     "crew": 5,
