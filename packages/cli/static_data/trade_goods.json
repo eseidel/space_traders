@@ -225,6 +225,11 @@
   "description": "Compact fusion reactors that provide a clean, reliable, and virtually unlimited source of energy."
  },
  {
+  "symbol": "MILITARY_EQUIPMENT",
+  "name": "Military Gear",
+  "description": "A wide range of equipment used by military forces, including armor, vehicles, and advanced technologies."
+ },
+ {
   "symbol": "MODULE_ENVOY_QUARTERS_I",
   "name": "Envoy Quarters",
   "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys."
