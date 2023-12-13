@@ -64,7 +64,33 @@ class ChartedValues {
   bool get hasMarket => traitSymbols.contains(WaypointTraitSymbol.MARKETPLACE);
 }
 
-typedef _Record = Map<WaypointSymbol, ChartedValues>;
+/// Charting record for a given waypoint.
+class ChartingRecord {
+  /// Creates a new charting record.
+  const ChartingRecord({
+    required this.values,
+    required this.timestamp,
+  });
+
+  /// Creates a new charting record from JSON data.
+  ChartingRecord.fromJson(Map<String, dynamic> json)
+      : values = ChartedValues.fromJson(json['values'] as Map<String, dynamic>),
+        timestamp = DateTime.parse(json['timestamp'] as String);
+
+  /// The charted values.  Will be null for uncharted waypoints.
+  final ChartedValues? values;
+
+  /// The timestamp for this record.
+  final DateTime timestamp;
+
+  /// Converts this charting record to JSON data.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'values': values?.toJson(),
+        'timestamp': timestamp.toIso8601String(),
+      };
+}
+
+typedef _Record = Map<WaypointSymbol, ChartingRecord>;
 
 /// A cached of charted values from Waypoints.
 class ChartingCache extends JsonStore<_Record> {
@@ -95,7 +121,7 @@ class ChartingCache extends JsonStore<_Record> {
           (Map<String, dynamic> j) => j.map(
             (key, value) => MapEntry(
               WaypointSymbol.fromJson(key),
-              ChartedValues.fromJson(value as Map<String, dynamic>),
+              ChartingRecord.fromJson(value as Map<String, dynamic>),
             ),
           ),
         ) ??
