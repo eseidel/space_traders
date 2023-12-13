@@ -39,17 +39,18 @@ Future<DateTime?> beingNewRouteAndLog(
     shipSpeed: ship.engine.speed,
   );
   if (route == null) {
-    shipErr(ship, 'No route to $destinationSymbol!?');
-    return null;
+    throw JobException(
+      'No route to $destinationSymbol!?',
+      const Duration(minutes: 10),
+    );
   }
   final action = route.actions.firstOrNull;
   if (action == null) {
     // Was the caller supposed to check for this case and not ask to route?
-    shipErr(
-      ship,
+    throw JobException(
       'No actions in route to $destinationSymbol from $start!?',
+      const Duration(minutes: 10),
     );
-    return null;
   }
   if (route.actions.length > 1) {
     shipInfo(ship, 'Starting: ${describeRoutePlan(route)}');
