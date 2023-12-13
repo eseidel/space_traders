@@ -135,7 +135,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.load(fs)!;
 
-  logger.info(describeFleet(shipCache));
+  logger.info('Fleet: ${describeShips(shipCache.ships)}');
   final ships = shipCache.ships;
   final matchingShips = ships.where(filter).toList();
   if (matchingShips.isEmpty) {

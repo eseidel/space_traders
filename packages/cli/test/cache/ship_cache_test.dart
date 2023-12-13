@@ -37,7 +37,7 @@ void main() {
     expect(shipCache.countOfFrame(ShipFrameSymbolEnum.MINER), 2);
   });
 
-  test('describeFleet', () {
+  test('describeShips', () {
     final one = _MockShip();
     final oneFrame = _MockShipFrame();
     when(() => one.frame).thenReturn(oneFrame);
@@ -55,18 +55,14 @@ void main() {
     when(() => four.frame).thenReturn(fourFrame);
     when(() => fourFrame.symbol)
         .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
-    final fs = MemoryFileSystem.test();
-    final shipCache = ShipCache([one, two, three, four], fs: fs);
     expect(
-      describeFleet(shipCache),
-      'Fleet: 2 Carrier, 1 Fighter, 1 Light Freighter',
+      describeShips([one, two, three, four]),
+      '2 Carrier, 1 Fighter, 1 Light Freighter',
     );
   });
 
-  test('describeFleet empty', () {
-    final fs = MemoryFileSystem.test();
-    final shipCache = ShipCache([], fs: fs);
-    expect(describeFleet(shipCache), 'Fleet: 0 ships');
+  test('describeShips empty', () {
+    expect(describeShips([]), '0 ships');
   });
 
   test('describeFleet one', () {
@@ -74,9 +70,7 @@ void main() {
     final oneFrame = _MockShipFrame();
     when(() => one.frame).thenReturn(oneFrame);
     when(() => oneFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
-    final fs = MemoryFileSystem.test();
-    final shipCache = ShipCache([one], fs: fs);
-    expect(describeFleet(shipCache), 'Fleet: 1 Carrier');
+    expect(describeShips([one]), '1 Carrier');
   });
 
   test('ShipCache load save', () async {

@@ -64,7 +64,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipCache = ShipCache.load(fs)!;
   final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
   logger
-    ..info(describeFleet(shipCache))
+    ..info('Fleet: ${describeShips(shipCache.ships)}')
     ..info('${idleHaulers.length} idle traders')
     ..info('Credits per minute for ships over the '
         'last ${approximateDuration(lookback)}:');
