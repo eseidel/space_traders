@@ -75,6 +75,11 @@
   "description": "Advanced electronic components used in the construction of advanced technologies."
  },
  {
+  "symbol": "ENGINE_IMPULSE_DRIVE_I",
+  "name": "Impulse Drive I",
+  "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel."
+ },
+ {
   "symbol": "ENGINE_ION_DRIVE_I",
   "name": "Ion Drive I",
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration."
@@ -220,6 +225,11 @@
   "description": "Compact fusion reactors that provide a clean, reliable, and virtually unlimited source of energy."
  },
  {
+  "symbol": "MODULE_ENVOY_QUARTERS_I",
+  "name": "Envoy Quarters",
+  "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys."
+ },
+ {
   "symbol": "MODULE_SCIENCE_LAB_I",
   "name": "Science Lab",
   "description": "A specialized module equipped with advanced instruments and equipment for scientific research and analysis."
@@ -248,6 +258,11 @@
   "symbol": "MOUNT_MINING_LASER_II",
   "name": "Mining Laser II",
   "description": "An advanced mining laser that is more efficient and effective at extracting valuable minerals from asteroids and other space objects."
+ },
+ {
+  "symbol": "MOUNT_MISSILE_LAUNCHER_I",
+  "name": "Missile Launcher",
+  "description": "A basic missile launcher that fires guided missiles with a variety of warheads for different targets."
  },
  {
   "symbol": "MOUNT_SURVEYOR_I",
