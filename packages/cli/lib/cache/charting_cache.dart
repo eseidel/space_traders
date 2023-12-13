@@ -75,7 +75,7 @@ class ChartingCache extends JsonStore<_Record> {
     required super.fs,
     super.path = defaultCacheFilePath,
   }) : super(
-          recordToJson: (r) => r.map(
+          recordToJson: (_Record r) => r.map(
             (key, value) => MapEntry(
               key.toJson(),
               value.toJson(),

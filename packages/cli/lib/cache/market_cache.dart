@@ -14,7 +14,7 @@ class MarketListingCache extends JsonStore<_Record> {
     required super.fs,
     super.path = defaultPath,
   }) : super(
-          recordToJson: (r) => r.map(
+          recordToJson: (_Record r) => r.map(
             (key, value) => MapEntry(
               key.toJson(),
               value.toJson(),

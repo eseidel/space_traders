@@ -15,7 +15,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   WaypointCache waypointCache,
   Ship ship,
   System system, {
-  required bool Function(WaypointSymbol waypointSymbol)? filter,
+  required bool Function(SystemWaypoint waypointSymbol)? filter,
 }) async {
   final start = ship.systemSymbol == system.systemSymbol
       ? ship.waypointSymbol
@@ -26,10 +26,10 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
       system.waypoints.sortedBy<num>((w) => w.distanceTo(startWaypoint));
 
   for (final systemWaypoint in systemWaypoints) {
-    final waypointSymbol = systemWaypoint.waypointSymbol;
-    if (filter != null && !filter(waypointSymbol)) {
+    if (filter != null && !filter(systemWaypoint)) {
       continue;
     }
+    final waypointSymbol = systemWaypoint.waypointSymbol;
     // Try and fetch the waypoint from the server or our cache.
     final isCharted = await waypointCache.isCharted(waypointSymbol);
     if (!isCharted) {
@@ -47,7 +47,7 @@ Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
   SystemConnectivity systemConnectivity,
   Ship ship, {
   required SystemSymbol startSystemSymbol,
-  bool Function(WaypointSymbol waypointSymbol)? filter,
+  bool Function(SystemWaypoint waypointSymbol)? filter,
 }) async {
   // Find all systems we know how to reach.
   final reachableSystemSymbols =

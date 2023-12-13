@@ -203,7 +203,8 @@ Future<JobResult> doSystemWatcher(
     caches.systems[systemSymbol],
     waypointCache: caches.waypoints,
     maxAge: maxAge,
-    filter: (waypointSymbol) => !avoidWaypoints.contains(waypointSymbol),
+    filter: (WaypointSymbol waypointSymbol) =>
+        !avoidWaypoints.contains(waypointSymbol),
   );
 
   if (destinationSymbol != null) {

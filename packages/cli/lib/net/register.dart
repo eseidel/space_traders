@@ -68,7 +68,7 @@ Future<String> register(
   final faction = logger.chooseOne(
     'Choose a faction:',
     choices: recruitingFactions,
-    display: (faction) {
+    display: (Faction faction) {
       final f = factions.firstWhere((f) => f.symbol == faction.symbol);
       // final reachable =
       // clusterCache.connectedSystemCount(f.headquartersSymbol.systemSymbol);

@@ -330,8 +330,14 @@ class CentralCommand {
       connectivity,
       ship,
       startSystemSymbol: ship.systemSymbol,
-      filter: (waypointSymbol) =>
-          !charterSystems.contains(waypointSymbol.systemSymbol),
+      filter: (SystemWaypoint waypoint) {
+        // Don't bother charting Asteroids for now.
+        if (waypoint.isAsteroid) {
+          return false;
+        }
+        // Don't visit systems we already have a charter in.
+        return !charterSystems.contains(waypoint.systemSymbol);
+      },
     );
     return destinationSymbol;
   }

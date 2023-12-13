@@ -59,7 +59,7 @@ void main(List<String> args) async {
   await runOffline(
     args,
     command,
-    addArgs: (parser) {
+    addArgs: (ArgParser parser) {
       parser.addFlag(
         'all',
         abbr: 'a',
