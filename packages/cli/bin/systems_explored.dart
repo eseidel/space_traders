@@ -50,6 +50,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemsWithCharts = reachableSystems
       .where((s) => chartingCache.waypointsWithChartInSystem(s).isNotEmpty);
   logger.info('${systemsWithCharts.length} reachable systems with charts.');
+
+  final unexploredSystems = reachableSystems
+      .where((s) => chartingCache.waypointsWithChartInSystem(s).isEmpty);
+  logger.info('${unexploredSystems.length} reachable systems unexplored:');
+  for (final system in unexploredSystems) {
+    logger.info('  $system');
+  }
 }
 
 void main(List<String> args) async {
