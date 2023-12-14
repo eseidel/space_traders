@@ -110,6 +110,9 @@ class Config {
   final knownBadGates = <String>{
     'X1-RJ35-CF7C',
   }.map(WaypointSymbol.fromString);
+
+  /// Should charters chart asteroids?
+  final chartAsteroids = true;
 }
 
 /// Our global configuration object.

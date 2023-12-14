@@ -331,8 +331,8 @@ class CentralCommand {
       ship,
       startSystemSymbol: ship.systemSymbol,
       filter: (SystemWaypoint waypoint) {
-        // Don't bother charting Asteroids for now.
-        if (waypoint.isAsteroid) {
+        // Don't bother charting Asteroids if disabled.
+        if (!config.chartAsteroids && waypoint.isAsteroid) {
           return false;
         }
         // Don't visit systems we already have a charter in.
