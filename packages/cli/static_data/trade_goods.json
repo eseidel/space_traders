@@ -240,6 +240,11 @@
   "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys."
  },
  {
+  "symbol": "MODULE_PASSENGER_CABIN_I",
+  "name": "Passenger Cabin",
+  "description": "A module that provides living space and amenities for passengers."
+ },
+ {
   "symbol": "MODULE_SCIENCE_LAB_I",
   "name": "Science Lab",
   "description": "A specialized module equipped with advanced instruments and equipment for scientific research and analysis."
