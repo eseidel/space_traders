@@ -883,3 +883,8 @@ in 16m uses 1084 fuel
 🛸#A  No haulers at JX78-B37, unknown next arrival time for ESEIDEL-8, ESEIDEL-15, checking in 1 minute.
 🛸#A  Hauler ESEIDEL-8 is IN_ORBIT to JX78-B37 arrival -13m, with 0 space available.
 🛸#A  Hauler ESEIDEL-15 is IN_ORBIT to JX78-B37 arrival -5m, with 77 space available.
+
+### Chart jump gates right after arriving via jump
+
+Right now we don't AFAICT, which means we'll only chart them when we come back
+to them.
