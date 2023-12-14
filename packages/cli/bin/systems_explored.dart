@@ -9,8 +9,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final chartingCache = ChartingCache.load(fs, waypointTraits);
 
   // Having market price data is a good proxy for if we've explored something.
-  final systemSymbols =
-      marketPrices.waypointSymbols.map((e) => e.system).toSet();
+  final systemsWithMarketPrices =
+      marketPrices.waypointSymbols.map((e) => e.systemSymbol).toSet();
   final table = Table(
     header: [
       'Symbol',
@@ -21,16 +21,21 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     style: const TableStyle(compact: true),
   );
 
-  for (final system in systemSymbols) {
+  for (final system in systemsWithMarketPrices) {
     table.add([
-      system,
-      marketPrices.waypointSymbols.where((e) => e.system == system).length,
-      shipyardPrices.waypointSymbols.where((e) => e.system == system).length,
-      chartingCache.waypointSymbols.where((e) => e.system == system).length,
+      system.systemName,
+      marketPrices.waypointsWithPricesInSystem(system).length,
+      shipyardPrices.waypointsWithPricesInSystem(system).length,
+      chartingCache.waypointsWithChartInSystem(system).length,
     ]);
   }
 
-  logger.info(table.toString());
+  logger
+    ..info(table.toString())
+    ..info(
+      '${systemsWithMarketPrices.length} reachable systems '
+      'with market prices.',
+    );
 
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionCache = ConstructionCache.load(fs);
@@ -38,9 +43,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
   final agentCache = AgentCache.load(fs)!;
   final headquartersSystemSymbol = agentCache.headquartersSystemSymbol;
-  final connectedSystemCount =
-      systemConnectivity.connectedSystemCount(headquartersSystemSymbol);
-  logger.info('$connectedSystemCount systems known reachable from HQ.');
+  final reachableSystems =
+      systemConnectivity.systemsReachableFrom(headquartersSystemSymbol);
+  logger.info('${reachableSystems.length} systems known reachable from HQ.');
+
+  final systemsWithCharts = reachableSystems
+      .where((s) => chartingCache.waypointsWithChartInSystem(s).isNotEmpty);
+  logger.info('${systemsWithCharts.length} reachable systems with charts.');
 }
 
 void main(List<String> args) async {

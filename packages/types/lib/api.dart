@@ -103,10 +103,7 @@ class WaypointSymbol extends Equatable {
   SystemSymbol get systemSymbol => SystemSymbol.fromString(system);
 
   /// Just the waypoint name (no sector or system)
-  String get waypointName {
-    final parts = waypoint.split('-');
-    return parts[2];
-  }
+  String get waypointName => waypoint.split('-')[2];
 
   /// Just the system and waypoint name (no sector)
   String get sectorLocalName {
@@ -151,6 +148,9 @@ class SystemSymbol extends Equatable {
 
   /// The sector symbol of the system.
   String get sector => system.split('-')[0];
+
+  /// Just the system name (no sector)
+  String get systemName => system.split('-')[1];
 
   /// The full system symbol.
   final String system;

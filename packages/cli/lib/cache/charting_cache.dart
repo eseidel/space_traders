@@ -121,6 +121,14 @@ class ChartingCache extends JsonStore<_Record> {
   /// The waypoint symbols in the cache.
   Iterable<WaypointSymbol> get waypointSymbols => _valuesBySymbol.keys;
 
+  /// The waypoint symbols with charts in the given system.
+  // If ChartingCache changes to cache negative values (e.g. "no chart")
+  // this will need to be updated.
+  Iterable<WaypointSymbol> waypointsWithChartInSystem(
+    SystemSymbol systemSymbol,
+  ) =>
+      waypointSymbols.where((s) => s.systemSymbol == systemSymbol);
+
   /// Adds a waypoint to the cache.
   void addWaypoint(Waypoint waypoint, {bool shouldSave = true}) {
     final chart = waypoint.chart;
