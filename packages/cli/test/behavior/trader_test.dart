@@ -37,6 +37,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
+class _MockShipNavRoute extends Mock implements ShipNavRoute {}
+
 void main() {
   test('advanceTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
@@ -561,22 +563,55 @@ void main() {
     when(() => shipCargo.capacity).thenReturn(10);
     when(() => shipCargo.inventory).thenReturn([]);
 
+    final shipLocation = WaypointSymbol.fromString('S-A-W');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => shipNav.waypointSymbol).thenReturn(shipLocation.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(shipLocation.system);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
     when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
     registerFallbackValue(start);
 
+    final startWaypoint = SystemWaypoint(
+      symbol: start.waypoint,
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+    );
+    final endWaypoint = SystemWaypoint(
+      symbol: end.waypoint,
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+    );
+    final shipLocationWaypoint = SystemWaypoint(
+      symbol: shipLocation.waypoint,
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+    );
+
+    when(() => caches.systems.waypoint(start)).thenReturn(startWaypoint);
+    when(() => caches.systems.waypoint(end)).thenReturn(endWaypoint);
+    when(() => caches.systems.waypoint(shipLocation))
+        .thenReturn(shipLocationWaypoint);
+
     final routePlan = RoutePlan(
       actions: [
+        RouteAction(
+          startSymbol: shipLocation,
+          endSymbol: start,
+          type: RouteActionType.navCruise,
+          seconds: 10,
+          fuelUsed: 10,
+        ),
         RouteAction(
           startSymbol: start,
           endSymbol: end,
@@ -617,7 +652,74 @@ void main() {
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenReturn(costedDeal);
+    when(() => centralCommand.otherTraderSystems(shipSymbol)).thenReturn([]);
+    when(() => caches.marketPrices.prices).thenReturn([]);
+
     final state = BehaviorState(shipSymbol, Behavior.trader);
+
+    when(
+      () => caches.routePlanner.planRoute(
+        start: shipLocation,
+        end: start,
+        fuelCapacity: any(named: 'fuelCapacity'),
+        shipSpeed: any(named: 'shipSpeed'),
+      ),
+    ).thenReturn(routePlan);
+
+    when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
+      (_) async =>
+          OrbitShip200Response(data: OrbitShip200ResponseData(nav: shipNav)),
+    );
+    final now = DateTime(2021);
+    when(
+      () => fleetApi.navigateShip(
+        shipSymbol.symbol,
+        navigateShipRequest:
+            NavigateShipRequest(waypointSymbol: start.waypoint),
+      ),
+    ).thenAnswer(
+      (_) async => NavigateShip200Response(
+        data: NavigateShip200ResponseData(
+          fuel: ShipFuel(
+            capacity: 100,
+            current: 100,
+            consumed: ShipFuelConsumed(amount: 100, timestamp: now),
+          ),
+          nav: shipNav,
+        ),
+      ),
+    );
+    final shipNavRoute = _MockShipNavRoute();
+    when(() => shipNav.route).thenReturn(shipNavRoute);
+    when(() => shipNavRoute.arrival).thenReturn(now);
+    when(() => shipNavRoute.departureTime).thenReturn(now);
+    when(() => shipNavRoute.departure).thenReturn(
+      ShipNavRouteWaypoint(
+        symbol: shipLocation.waypoint,
+        type: WaypointType.ASTEROID,
+        systemSymbol: shipLocation.system,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => shipNavRoute.origin).thenReturn(
+      ShipNavRouteWaypoint(
+        symbol: shipLocation.waypoint,
+        type: WaypointType.ASTEROID,
+        systemSymbol: shipLocation.system,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => shipNavRoute.destination).thenReturn(
+      ShipNavRouteWaypoint(
+        symbol: start.waypoint,
+        type: WaypointType.ASTEROID,
+        systemSymbol: start.system,
+        x: 0,
+        y: 0,
+      ),
+    );
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -631,7 +733,7 @@ void main() {
         ship,
       ),
     );
-    expect(waitUntil, isNull);
+    expect(waitUntil, now);
   });
 
   test('handleUnwantedCargoIfNeeded smoke test', () async {

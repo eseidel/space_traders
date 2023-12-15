@@ -56,46 +56,44 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.systemSymbol).thenReturn(shipLocation.system);
 
-    final systemsCache = SystemsCache(
-      [
-        System(
-          symbol: shipLocation.system,
-          sectorSymbol: shipLocation.sector,
-          type: SystemType.BLUE_STAR,
+    final system = System(
+      symbol: shipLocation.system,
+      sectorSymbol: shipLocation.sector,
+      type: SystemType.BLUE_STAR,
+      x: 0,
+      y: 0,
+      waypoints: [
+        SystemWaypoint(
+          symbol: aSymbol.waypoint,
+          type: WaypointType.PLANET,
           x: 0,
           y: 0,
-          waypoints: [
-            SystemWaypoint(
-              symbol: aSymbol.waypoint,
-              type: WaypointType.PLANET,
-              x: 0,
-              y: 0,
-            ),
-            SystemWaypoint(
-              symbol: bSymbol.waypoint,
-              type: WaypointType.PLANET,
-              x: 0,
-              y: 0,
-            ),
-            SystemWaypoint(
-              symbol: shipLocation.waypoint,
-              type: WaypointType.PLANET,
-              x: 0,
-              y: 0,
-            ),
-            SystemWaypoint(
-              symbol: dSymbol.waypoint,
-              type: WaypointType.JUMP_GATE,
-              x: 0,
-              y: 0,
-            ),
-          ],
+        ),
+        SystemWaypoint(
+          symbol: bSymbol.waypoint,
+          type: WaypointType.PLANET,
+          x: 0,
+          y: 0,
+        ),
+        SystemWaypoint(
+          symbol: shipLocation.waypoint,
+          type: WaypointType.PLANET,
+          x: 0,
+          y: 0,
+        ),
+        SystemWaypoint(
+          symbol: dSymbol.waypoint,
+          type: WaypointType.JUMP_GATE,
+          x: 0,
+          y: 0,
         ),
       ],
-      fs: fs,
     );
-
+    final systems = [system];
+    final systemsCache = SystemsCache(systems, fs: fs);
     final systemConnectivity = _MockSystemConnectivity();
+    when(() => systemConnectivity.systemsReachableFrom(system.systemSymbol))
+        .thenReturn(systems.map((s) => s.systemSymbol));
 
     CostedDeal? findNextDeal(Ship ship, WaypointSymbol startSymbol) {
       return null;

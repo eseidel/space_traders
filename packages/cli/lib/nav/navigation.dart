@@ -40,7 +40,7 @@ Future<DateTime?> beingNewRouteAndLog(
   );
   if (route == null) {
     throw JobException(
-      'No route to $destinationSymbol!?',
+      'No route from $start to $destinationSymbol!?',
       const Duration(minutes: 10),
     );
   }
