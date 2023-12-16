@@ -30,7 +30,7 @@ Future<void> _runIdleTasksIfPossible(
   if (waitUntil == null) {
     return;
   }
-  while (
+  while (!queue.isDone &&
       DateTime.timestamp().add(queue.minProcessingTime).isBefore(waitUntil)) {
     await queue.runOne(api, caches);
   }
