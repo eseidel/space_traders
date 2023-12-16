@@ -888,3 +888,84 @@ in 16m uses 1084 fuel
 
 Right now we don't AFAICT, which means we'll only chart them when we come back
 to them.
+
+### Add a deal cache.
+
+Found 0 deals for ESEIDEL-25 from SA91-F21B
+[WARN] 🛸#25 No profitable deals near X1-SA91-F21B.
+Found 0 deals for ESEIDEL-25 from SA91-F21B
+Found 0 deals for ESEIDEL-25 from CM2-FE8A
+Found 0 deals for ESEIDEL-25 from VX52-C19B
+Found 0 deals for ESEIDEL-25 from KN11-CD8C
+Found 0 deals for ESEIDEL-25 from PR56-E21B
+Found 0 deals for ESEIDEL-25 from VJ34-D25C
+Found 0 deals for ESEIDEL-25 from SS12-E23C
+Found 0 deals for ESEIDEL-25 from XK65-Z22D
+Found 0 deals for ESEIDEL-25 from XG74-D28D
+Found 1 deals for ESEIDEL-25 from UG86-XF4D
+Found 0 deals for ESEIDEL-25 from UV60-X25E
+Found 1 deals for ESEIDEL-25 from UG2-BZ7A
+Found 2 deals for ESEIDEL-25 from ZA48-ZE9C
+Found 0 deals for ESEIDEL-25 from MR97-BD5B
+Found 0 deals for ESEIDEL-25 from MR11-EF9A
+Found 0 deals for ESEIDEL-25 from DU30-E23D
+Found 0 deals for ESEIDEL-25 from JR48-ZZ6B
+Found 0 deals for ESEIDEL-25 from CH36-CE9E
+Found 0 deals for ESEIDEL-25 from RQ80-Z10C
+Found 0 deals for ESEIDEL-25 from RJ35-CF7C
+Found 0 deals for ESEIDEL-25 from XY32-E22X
+Found 0 deals for ESEIDEL-25 from SA11-X20A
+Found 0 deals for ESEIDEL-25 from NB49-ZX9F
+Found 0 deals for ESEIDEL-25 from FQ47-XX8B
+Found 0 deals for ESEIDEL-25 from K12-AX8E
+Found 0 deals for ESEIDEL-25 from PZ26-B10B
+Found 0 deals for ESEIDEL-25 from ZV29-CD9B
+Found 0 deals for ESEIDEL-25 from UN50-E31F
+Found 0 deals for ESEIDEL-25 from FC60-A21Z
+Found 0 deals for ESEIDEL-25 from MJ51-CD5A
+Found 0 deals for ESEIDEL-25 from JC61-E11F
+Found 0 deals for ESEIDEL-25 from UY94-F10C
+Found 5 deals for ESEIDEL-25 from RN21-X11Z
+Found 0 deals for ESEIDEL-25 from YK67-DX5B
+Found 2 deals for ESEIDEL-25 from ZU42-BB8C
+Found 0 deals for ESEIDEL-25 from DR61-F21C
+Found 0 deals for ESEIDEL-25 from GF21-B23F
+Found 0 deals for ESEIDEL-25 from KB84-EA5B
+Found 0 deals for ESEIDEL-25 from HT92-FF8E
+Found 0 deals for ESEIDEL-25 from JD23-B22B
+Found 0 deals for ESEIDEL-25 from BZ48-DB9E
+Found 0 deals for ESEIDEL-25 from YG19-X24E
+Found 0 deals for ESEIDEL-25 from GS85-X12C
+Found 0 deals for ESEIDEL-25 from NN43-X25X
+Found 0 deals for ESEIDEL-25 from PG23-D25Z
+Found 0 deals for ESEIDEL-25 from JC44-A28B
+Found 0 deals for ESEIDEL-25 from DK25-E20C
+Found 0 deals for ESEIDEL-25 from YA53-FA8E
+Found 0 deals for ESEIDEL-25 from RC89-F22B
+Found 0 deals for ESEIDEL-25 from SV64-C24Z
+Found 0 deals for ESEIDEL-25 from MR51-X18D
+Found 0 deals for ESEIDEL-25 from GV91-Z20Z
+Found 0 deals for ESEIDEL-25 from KS8-BF9C
+Found 0 deals for ESEIDEL-25 from KV83-A23E
+Found 0 deals for ESEIDEL-25 from MR47-ZB7E
+Found 3 deals for ESEIDEL-25 from SB18-CC5B
+Found 0 deals for ESEIDEL-25 from AP97-ZA9Z
+Found 0 deals for ESEIDEL-25 from ZZ78-CD5C
+Found 2 deals for ESEIDEL-25 from UB21-CE7C
+Found 0 deals for ESEIDEL-25 from ZK58-ZD5A
+Found 0 deals for ESEIDEL-25 from PM62-CB5Z
+Found 0 deals for ESEIDEL-25 from GT14-XZ8B
+Found 0 deals for ESEIDEL-25 from DQ95-A27B
+Found 0 deals for ESEIDEL-25 from AN36-F20X
+Found 0 deals for ESEIDEL-25 from KX96-AD6E
+Found 0 deals for ESEIDEL-25 from B40-BF7E
+Found 0 deals for ESEIDEL-25 from UX31-AD6E
+No nearby markets for ESEIDEL-25
+[WARN] 🛸#25 Failed to find better location for trader. Disabling Behavior.trader for ESEIDEL-25 for 10m.
+[WARN] 🛸#25 took 17s (0 requests) expected 0.0s
+
+### Double check reachability calculations.
+
+I'm not confident that we're correctly computing reachability.  I think
+uncharted jumpgates might be ignored?
+
