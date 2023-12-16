@@ -25,10 +25,6 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockWaypoint extends Mock implements Waypoint {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}

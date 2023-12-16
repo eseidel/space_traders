@@ -95,6 +95,9 @@ String parameterToString(dynamic value) {
   if (value is TradeSymbol) {
     return TradeSymbolTypeTransformer().encode(value).toString();
   }
+  if (value is WaypointModifierSymbol) {
+    return WaypointModifierSymbolTypeTransformer().encode(value).toString();
+  }
   if (value is WaypointTraitSymbol) {
     return WaypointTraitSymbolTypeTransformer().encode(value).toString();
   }

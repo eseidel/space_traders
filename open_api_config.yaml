@@ -1,6 +1,6 @@
 # These names I inferred from https://github.com/OpenAPITools/openapi-generator/blob/master/docs/configuration.md
 # but they seem to work:
-inputSpec: https://raw.githubusercontent.com/SpaceTradersAPI/api-docs/e3f70c77290918953d19b121e1e9b75c39ad6c5f/reference/SpaceTraders.json
+inputSpec: https://raw.githubusercontent.com/SpaceTradersAPI/api-docs/beecdb0453f1532b14506ffe62faf976e08f2b43/reference/SpaceTraders.json
 outputDir: packages/openapi
 generatorName: dart
 

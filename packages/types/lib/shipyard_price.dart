@@ -20,7 +20,7 @@ class ShipyardPrice extends PriceBase<ShipType> {
   ) {
     return ShipyardPrice(
       waypointSymbol: waypoint,
-      shipType: ship.type!,
+      shipType: ship.type,
       purchasePrice: ship.purchasePrice,
       timestamp: DateTime.timestamp(),
     );

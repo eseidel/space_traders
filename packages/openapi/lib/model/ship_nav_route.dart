@@ -14,15 +14,12 @@ class ShipNavRoute {
   /// Returns a new [ShipNavRoute] instance.
   ShipNavRoute({
     required this.destination,
-    required this.departure,
     required this.origin,
     required this.departureTime,
     required this.arrival,
   });
 
   ShipNavRouteWaypoint destination;
-
-  ShipNavRouteWaypoint departure;
 
   ShipNavRouteWaypoint origin;
 
@@ -37,7 +34,6 @@ class ShipNavRoute {
       identical(this, other) ||
       other is ShipNavRoute &&
           other.destination == destination &&
-          other.departure == departure &&
           other.origin == origin &&
           other.departureTime == departureTime &&
           other.arrival == arrival;
@@ -46,19 +42,17 @@ class ShipNavRoute {
   int get hashCode =>
       // ignore: unnecessary_parenthesis
       (destination.hashCode) +
-      (departure.hashCode) +
       (origin.hashCode) +
       (departureTime.hashCode) +
       (arrival.hashCode);
 
   @override
   String toString() =>
-      'ShipNavRoute[destination=$destination, departure=$departure, origin=$origin, departureTime=$departureTime, arrival=$arrival]';
+      'ShipNavRoute[destination=$destination, origin=$origin, departureTime=$departureTime, arrival=$arrival]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'destination'] = this.destination;
-    json[r'departure'] = this.departure;
     json[r'origin'] = this.origin;
     json[r'departureTime'] = this.departureTime.toUtc().toIso8601String();
     json[r'arrival'] = this.arrival.toUtc().toIso8601String();
@@ -87,7 +81,6 @@ class ShipNavRoute {
 
       return ShipNavRoute(
         destination: ShipNavRouteWaypoint.fromJson(json[r'destination'])!,
-        departure: ShipNavRouteWaypoint.fromJson(json[r'departure'])!,
         origin: ShipNavRouteWaypoint.fromJson(json[r'origin'])!,
         departureTime: mapDateTime(json, r'departureTime', '')!,
         arrival: mapDateTime(json, r'arrival', '')!,
@@ -148,7 +141,6 @@ class ShipNavRoute {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'destination',
-    'departure',
     'origin',
     'departureTime',
     'arrival',

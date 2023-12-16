@@ -8,8 +8,9 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**waypointSymbol** | **String** | The symbol of the waypoint where the transaction took place. | 
+**waypointSymbol** | **String** | The symbol of the waypoint. | 
 **shipSymbol** | **String** | The symbol of the ship that was the subject of the transaction. | 
+**shipType** | **String** | The symbol of the ship that was the subject of the transaction. | 
 **price** | **int** | The price of the transaction. | 
 **agentSymbol** | **String** | The symbol of the agent that made the transaction. | 
 **timestamp** | [**DateTime**](DateTime.md) | The timestamp of the transaction. | 

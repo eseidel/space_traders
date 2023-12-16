@@ -562,6 +562,7 @@ void main() {
         symbol: shipSymbol.agentName,
         headquarters: 'W-A-Y',
         credits: 100000,
+        shipCount: 1,
         startingFaction: faction,
       ),
     );

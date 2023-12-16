@@ -8,7 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**type** | [**ShipType**](ShipType.md) |  | [optional] 
+**type** | [**ShipType**](ShipType.md) |  | 
 **name** | **String** |  | 
 **description** | **String** |  | 
 **supply** | [**SupplyLevel**](SupplyLevel.md) |  | 

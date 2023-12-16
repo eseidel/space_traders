@@ -15,16 +15,20 @@ class ShipyardTransaction {
   ShipyardTransaction({
     required this.waypointSymbol,
     required this.shipSymbol,
+    required this.shipType,
     required this.price,
     required this.agentSymbol,
     required this.timestamp,
   });
 
-  /// The symbol of the waypoint where the transaction took place.
+  /// The symbol of the waypoint.
   String waypointSymbol;
 
   /// The symbol of the ship that was the subject of the transaction.
   String shipSymbol;
+
+  /// The symbol of the ship that was the subject of the transaction.
+  String shipType;
 
   /// The price of the transaction.
   ///
@@ -43,6 +47,7 @@ class ShipyardTransaction {
       other is ShipyardTransaction &&
           other.waypointSymbol == waypointSymbol &&
           other.shipSymbol == shipSymbol &&
+          other.shipType == shipType &&
           other.price == price &&
           other.agentSymbol == agentSymbol &&
           other.timestamp == timestamp;
@@ -52,18 +57,20 @@ class ShipyardTransaction {
       // ignore: unnecessary_parenthesis
       (waypointSymbol.hashCode) +
       (shipSymbol.hashCode) +
+      (shipType.hashCode) +
       (price.hashCode) +
       (agentSymbol.hashCode) +
       (timestamp.hashCode);
 
   @override
   String toString() =>
-      'ShipyardTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, price=$price, agentSymbol=$agentSymbol, timestamp=$timestamp]';
+      'ShipyardTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, shipType=$shipType, price=$price, agentSymbol=$agentSymbol, timestamp=$timestamp]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'waypointSymbol'] = this.waypointSymbol;
     json[r'shipSymbol'] = this.shipSymbol;
+    json[r'shipType'] = this.shipType;
     json[r'price'] = this.price;
     json[r'agentSymbol'] = this.agentSymbol;
     json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
@@ -93,6 +100,7 @@ class ShipyardTransaction {
       return ShipyardTransaction(
         waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol')!,
         shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
+        shipType: mapValueOfType<String>(json, r'shipType')!,
         price: mapValueOfType<int>(json, r'price')!,
         agentSymbol: mapValueOfType<String>(json, r'agentSymbol')!,
         timestamp: mapDateTime(json, r'timestamp', '')!,
@@ -154,6 +162,7 @@ class ShipyardTransaction {
   static const requiredKeys = <String>{
     'waypointSymbol',
     'shipSymbol',
+    'shipType',
     'price',
     'agentSymbol',
     'timestamp',

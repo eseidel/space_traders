@@ -162,7 +162,7 @@ class Transaction extends Equatable {
       // https://github.com/SpaceTradersAPI/api-docs/issues/68
       shipSymbol: purchaser,
       waypointSymbol: transaction.waypointSymbolObject,
-      shipType: transaction.shipType,
+      shipType: transaction.shipTypeObject,
       tradeSymbol: null,
       quantity: 1,
       tradeType: MarketTransactionTypeEnum.PURCHASE,

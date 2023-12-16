@@ -45,6 +45,7 @@ void main() {
       symbol: 'symbol',
       headquarters: 'headquarters',
       credits: 100,
+      shipCount: 1,
       startingFaction: 'startingFaction',
     );
     final fs = MemoryFileSystem.test();

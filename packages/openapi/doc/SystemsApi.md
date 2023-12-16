@@ -433,7 +433,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **supplyConstruction**
-> SupplyConstruction200Response supplyConstruction(systemSymbol, waypointSymbol, supplyConstructionRequest)
+> SupplyConstruction201Response supplyConstruction(systemSymbol, waypointSymbol, supplyConstructionRequest)
 
 Supply Construction Site
 
@@ -472,7 +472,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**SupplyConstruction200Response**](SupplyConstruction200Response.md)
+[**SupplyConstruction201Response**](SupplyConstruction201Response.md)
 
 ### Authorization
 

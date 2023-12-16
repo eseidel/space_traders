@@ -13,7 +13,7 @@ part of openapi;
 class ShipyardShip {
   /// Returns a new [ShipyardShip] instance.
   ShipyardShip({
-    this.type,
+    required this.type,
     required this.name,
     required this.description,
     required this.supply,
@@ -27,13 +27,7 @@ class ShipyardShip {
     required this.crew,
   });
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  ShipType? type;
+  ShipType type;
 
   String name;
 
@@ -83,7 +77,7 @@ class ShipyardShip {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (type == null ? 0 : type!.hashCode) +
+      (type.hashCode) +
       (name.hashCode) +
       (description.hashCode) +
       (supply.hashCode) +
@@ -102,11 +96,7 @@ class ShipyardShip {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.type != null) {
-      json[r'type'] = this.type;
-    } else {
-      json[r'type'] = null;
-    }
+    json[r'type'] = this.type;
     json[r'name'] = this.name;
     json[r'description'] = this.description;
     json[r'supply'] = this.supply;
@@ -146,7 +136,7 @@ class ShipyardShip {
       }());
 
       return ShipyardShip(
-        type: ShipType.fromJson(json[r'type']),
+        type: ShipType.fromJson(json[r'type'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
         supply: SupplyLevel.fromJson(json[r'supply'])!,
@@ -214,6 +204,7 @@ class ShipyardShip {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'type',
     'name',
     'description',
     'supply',

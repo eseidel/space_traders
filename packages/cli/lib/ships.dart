@@ -132,7 +132,6 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
     route: ShipNavRoute(
       destination: waypoint,
       origin: waypoint,
-      departure: waypoint,
       arrival: now,
       departureTime: now,
     ),

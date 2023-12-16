@@ -10,44 +10,37 @@
 
 part of openapi;
 
-class SupplyConstruction200ResponseData {
-  /// Returns a new [SupplyConstruction200ResponseData] instance.
-  SupplyConstruction200ResponseData({
-    required this.construction,
-    required this.cargo,
+class SupplyConstruction201Response {
+  /// Returns a new [SupplyConstruction201Response] instance.
+  SupplyConstruction201Response({
+    required this.data,
   });
 
-  Construction construction;
-
-  ShipCargo cargo;
+  SupplyConstruction201ResponseData data;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SupplyConstruction200ResponseData &&
-          other.construction == construction &&
-          other.cargo == cargo;
+      other is SupplyConstruction201Response && other.data == data;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (construction.hashCode) + (cargo.hashCode);
+      (data.hashCode);
 
   @override
-  String toString() =>
-      'SupplyConstruction200ResponseData[construction=$construction, cargo=$cargo]';
+  String toString() => 'SupplyConstruction201Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'construction'] = this.construction;
-    json[r'cargo'] = this.cargo;
+    json[r'data'] = this.data;
     return json;
   }
 
-  /// Returns a new [SupplyConstruction200ResponseData] instance and imports its values from
+  /// Returns a new [SupplyConstruction201Response] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static SupplyConstruction200ResponseData? fromJson(dynamic value) {
+  static SupplyConstruction201Response? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -57,29 +50,28 @@ class SupplyConstruction200ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "SupplyConstruction200ResponseData[$key]" is missing from JSON.');
+              'Required key "SupplyConstruction201Response[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "SupplyConstruction200ResponseData[$key]" has a null value in JSON.');
+              'Required key "SupplyConstruction201Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return SupplyConstruction200ResponseData(
-        construction: Construction.fromJson(json[r'construction'])!,
-        cargo: ShipCargo.fromJson(json[r'cargo'])!,
+      return SupplyConstruction201Response(
+        data: SupplyConstruction201ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;
   }
 
-  static List<SupplyConstruction200ResponseData> listFromJson(
+  static List<SupplyConstruction201Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <SupplyConstruction200ResponseData>[];
+    final result = <SupplyConstruction201Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = SupplyConstruction200ResponseData.fromJson(row);
+        final value = SupplyConstruction201Response.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -88,13 +80,12 @@ class SupplyConstruction200ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, SupplyConstruction200ResponseData> mapFromJson(
-      dynamic json) {
-    final map = <String, SupplyConstruction200ResponseData>{};
+  static Map<String, SupplyConstruction201Response> mapFromJson(dynamic json) {
+    final map = <String, SupplyConstruction201Response>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = SupplyConstruction200ResponseData.fromJson(entry.value);
+        final value = SupplyConstruction201Response.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -103,17 +94,17 @@ class SupplyConstruction200ResponseData {
     return map;
   }
 
-  // maps a json object with a list of SupplyConstruction200ResponseData-objects as value to a dart map
-  static Map<String, List<SupplyConstruction200ResponseData>> mapListFromJson(
+  // maps a json object with a list of SupplyConstruction201Response-objects as value to a dart map
+  static Map<String, List<SupplyConstruction201Response>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<SupplyConstruction200ResponseData>>{};
+    final map = <String, List<SupplyConstruction201Response>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = SupplyConstruction200ResponseData.listFromJson(
+        map[entry.key] = SupplyConstruction201Response.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -124,7 +115,6 @@ class SupplyConstruction200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'construction',
-    'cargo',
+    'data',
   };
 }

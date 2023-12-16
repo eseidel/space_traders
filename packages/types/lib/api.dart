@@ -732,9 +732,8 @@ extension MarketTransactionUtils on MarketTransaction {
 
 /// Extensions onto ShipyardTransaction to make it easier to work with.
 extension ShipyardTransactionUtils on ShipyardTransaction {
-  // Note: shipSymbol on the transaction is actually shipType.
   /// Returns the ShipType purchased in the transaction.
-  ShipType get shipType => ShipType.fromJson(shipSymbol)!;
+  ShipType get shipTypeObject => ShipType.fromJson(shipType)!;
 
   /// Returns the WaypointSymbol for the given transaction.
   WaypointSymbol get waypointSymbolObject =>

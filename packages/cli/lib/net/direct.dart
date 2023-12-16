@@ -136,7 +136,7 @@ Future<DeliverContract200ResponseData> deliverContract(
 }
 
 /// Deliver [units] of [tradeSymbol] to [construction]
-Future<SupplyConstruction200ResponseData> supplyConstruction(
+Future<SupplyConstruction201ResponseData> supplyConstruction(
   Api api,
   Ship ship,
   ShipCache shipCache,

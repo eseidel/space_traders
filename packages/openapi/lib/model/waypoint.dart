@@ -27,12 +27,12 @@ class Waypoint {
     required this.isUnderConstruction,
   });
 
-  /// Symbol fo the waypoint.
+  /// The symbol of the waypoint.
   String symbol;
 
   WaypointType type;
 
-  /// The symbol of the system this waypoint belongs to.
+  /// The symbol of the system.
   String systemSymbol;
 
   /// Relative position of the waypoint on the system's x axis. This is not an absolute position in the universe.

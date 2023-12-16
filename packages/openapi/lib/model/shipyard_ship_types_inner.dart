@@ -13,16 +13,10 @@ part of openapi;
 class ShipyardShipTypesInner {
   /// Returns a new [ShipyardShipTypesInner] instance.
   ShipyardShipTypesInner({
-    this.type,
+    required this.type,
   });
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  ShipType? type;
+  ShipType type;
 
   @override
   bool operator ==(Object other) =>
@@ -32,18 +26,14 @@ class ShipyardShipTypesInner {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (type == null ? 0 : type!.hashCode);
+      (type.hashCode);
 
   @override
   String toString() => 'ShipyardShipTypesInner[type=$type]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.type != null) {
-      json[r'type'] = this.type;
-    } else {
-      json[r'type'] = null;
-    }
+    json[r'type'] = this.type;
     return json;
   }
 
@@ -68,7 +58,7 @@ class ShipyardShipTypesInner {
       }());
 
       return ShipyardShipTypesInner(
-        type: ShipType.fromJson(json[r'type']),
+        type: ShipType.fromJson(json[r'type'])!,
       );
     }
     return null;
@@ -124,5 +114,7 @@ class ShipyardShipTypesInner {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{};
+  static const requiredKeys = <String>{
+    'type',
+  };
 }

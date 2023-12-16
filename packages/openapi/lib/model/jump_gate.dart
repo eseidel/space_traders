@@ -13,8 +13,12 @@ part of openapi;
 class JumpGate {
   /// Returns a new [JumpGate] instance.
   JumpGate({
+    required this.symbol,
     this.connections = const [],
   });
+
+  /// The symbol of the waypoint.
+  String symbol;
 
   /// All the gates that are connected to this waypoint.
   List<String> connections;
@@ -22,18 +26,21 @@ class JumpGate {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is JumpGate && other.connections == connections;
+      other is JumpGate &&
+          other.symbol == symbol &&
+          other.connections == connections;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (connections.hashCode);
+      (symbol.hashCode) + (connections.hashCode);
 
   @override
-  String toString() => 'JumpGate[connections=$connections]';
+  String toString() => 'JumpGate[symbol=$symbol, connections=$connections]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    json[r'symbol'] = this.symbol;
     json[r'connections'] = this.connections;
     return json;
   }
@@ -59,6 +66,7 @@ class JumpGate {
       }());
 
       return JumpGate(
+        symbol: mapValueOfType<String>(json, r'symbol')!,
         connections: json[r'connections'] is List
             ? (json[r'connections'] as List).cast<String>()
             : const [],
@@ -118,6 +126,7 @@ class JumpGate {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'symbol',
     'connections',
   };
 }

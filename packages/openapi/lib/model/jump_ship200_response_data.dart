@@ -16,6 +16,7 @@ class JumpShip200ResponseData {
     required this.nav,
     required this.cooldown,
     required this.transaction,
+    required this.agent,
   });
 
   ShipNav nav;
@@ -24,28 +25,35 @@ class JumpShip200ResponseData {
 
   MarketTransaction transaction;
 
+  Agent agent;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is JumpShip200ResponseData &&
           other.nav == nav &&
           other.cooldown == cooldown &&
-          other.transaction == transaction;
+          other.transaction == transaction &&
+          other.agent == agent;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (nav.hashCode) + (cooldown.hashCode) + (transaction.hashCode);
+      (nav.hashCode) +
+      (cooldown.hashCode) +
+      (transaction.hashCode) +
+      (agent.hashCode);
 
   @override
   String toString() =>
-      'JumpShip200ResponseData[nav=$nav, cooldown=$cooldown, transaction=$transaction]';
+      'JumpShip200ResponseData[nav=$nav, cooldown=$cooldown, transaction=$transaction, agent=$agent]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'nav'] = this.nav;
     json[r'cooldown'] = this.cooldown;
     json[r'transaction'] = this.transaction;
+    json[r'agent'] = this.agent;
     return json;
   }
 
@@ -73,6 +81,7 @@ class JumpShip200ResponseData {
         nav: ShipNav.fromJson(json[r'nav'])!,
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         transaction: MarketTransaction.fromJson(json[r'transaction'])!,
+        agent: Agent.fromJson(json[r'agent'])!,
       );
     }
     return null;
@@ -132,5 +141,6 @@ class JumpShip200ResponseData {
     'nav',
     'cooldown',
     'transaction',
+    'agent',
   };
 }

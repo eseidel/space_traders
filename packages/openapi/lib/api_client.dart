@@ -517,10 +517,10 @@ class ApiClient {
           return SiphonResources201ResponseData.fromJson(value);
         case 'SiphonYield':
           return SiphonYield.fromJson(value);
-        case 'SupplyConstruction200Response':
-          return SupplyConstruction200Response.fromJson(value);
-        case 'SupplyConstruction200ResponseData':
-          return SupplyConstruction200ResponseData.fromJson(value);
+        case 'SupplyConstruction201Response':
+          return SupplyConstruction201Response.fromJson(value);
+        case 'SupplyConstruction201ResponseData':
+          return SupplyConstruction201ResponseData.fromJson(value);
         case 'SupplyConstructionRequest':
           return SupplyConstructionRequest.fromJson(value);
         case 'SupplyLevel':
@@ -551,6 +551,8 @@ class ApiClient {
           return WaypointFaction.fromJson(value);
         case 'WaypointModifier':
           return WaypointModifier.fromJson(value);
+        case 'WaypointModifierSymbol':
+          return WaypointModifierSymbolTypeTransformer().decode(value);
         case 'WaypointOrbital':
           return WaypointOrbital.fromJson(value);
         case 'WaypointTrait':

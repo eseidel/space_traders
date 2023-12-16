@@ -25,7 +25,7 @@ class ShipNavRouteWaypoint {
 
   WaypointType type;
 
-  /// The symbol of the system the waypoint is in.
+  /// The symbol of the system.
   String systemSymbol;
 
   /// Position in the universe in the x axis.

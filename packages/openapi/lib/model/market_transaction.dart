@@ -23,7 +23,7 @@ class MarketTransaction {
     required this.timestamp,
   });
 
-  /// The symbol of the waypoint where the transaction took place.
+  /// The symbol of the waypoint.
   String waypointSymbol;
 
   /// The symbol of the ship that made the transaction.

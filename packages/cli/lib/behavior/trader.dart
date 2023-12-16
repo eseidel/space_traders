@@ -419,7 +419,7 @@ Future<JobResult> _handleConstructionDealAtDelivery(
   return JobResult.complete();
 }
 
-Future<SupplyConstruction200ResponseData?>
+Future<SupplyConstruction201ResponseData?>
     _deliverConstructionMaterialsIfPossible(
   Api api,
   Database db,

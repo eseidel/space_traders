@@ -62,6 +62,7 @@ class JumpGateRecord extends Equatable {
 
   /// Converts this object to JumpGate model object.
   JumpGate toJumpGate() => JumpGate(
+        symbol: waypointSymbol.waypoint,
         connections: connections.map((e) => e.toString()).sorted(),
       );
 

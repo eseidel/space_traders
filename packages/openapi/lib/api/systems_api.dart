@@ -728,7 +728,7 @@ class SystemsApi {
   ///
   /// * [SupplyConstructionRequest] supplyConstructionRequest:
   ///
-  Future<SupplyConstruction200Response?> supplyConstruction(
+  Future<SupplyConstruction201Response?> supplyConstruction(
     String systemSymbol,
     String waypointSymbol, {
     SupplyConstructionRequest? supplyConstructionRequest,
@@ -748,8 +748,8 @@ class SystemsApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'SupplyConstruction200Response',
-      ) as SupplyConstruction200Response;
+        'SupplyConstruction201Response',
+      ) as SupplyConstruction201Response;
     }
     return null;
   }

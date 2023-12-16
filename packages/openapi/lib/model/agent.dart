@@ -18,7 +18,7 @@ class Agent {
     required this.headquarters,
     required this.credits,
     required this.startingFaction,
-    this.shipCount,
+    required this.shipCount,
   });
 
   /// Account ID that is tied to this agent. Only included on your own agent.
@@ -43,13 +43,7 @@ class Agent {
   String startingFaction;
 
   /// How many ships are owned by the agent.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  int? shipCount;
+  int shipCount;
 
   @override
   bool operator ==(Object other) =>
@@ -70,7 +64,7 @@ class Agent {
       (headquarters.hashCode) +
       (credits.hashCode) +
       (startingFaction.hashCode) +
-      (shipCount == null ? 0 : shipCount!.hashCode);
+      (shipCount.hashCode);
 
   @override
   String toString() =>
@@ -87,11 +81,7 @@ class Agent {
     json[r'headquarters'] = this.headquarters;
     json[r'credits'] = this.credits;
     json[r'startingFaction'] = this.startingFaction;
-    if (this.shipCount != null) {
-      json[r'shipCount'] = this.shipCount;
-    } else {
-      json[r'shipCount'] = null;
-    }
+    json[r'shipCount'] = this.shipCount;
     return json;
   }
 
@@ -121,7 +111,7 @@ class Agent {
         headquarters: mapValueOfType<String>(json, r'headquarters')!,
         credits: mapValueOfType<int>(json, r'credits')!,
         startingFaction: mapValueOfType<String>(json, r'startingFaction')!,
-        shipCount: mapValueOfType<int>(json, r'shipCount'),
+        shipCount: mapValueOfType<int>(json, r'shipCount')!,
       );
     }
     return null;
@@ -182,5 +172,6 @@ class Agent {
     'headquarters',
     'credits',
     'startingFaction',
+    'shipCount',
   };
 }

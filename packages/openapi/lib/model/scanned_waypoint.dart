@@ -24,12 +24,12 @@ class ScannedWaypoint {
     this.chart,
   });
 
-  /// Symbol of the waypoint.
+  /// The symbol of the waypoint.
   String symbol;
 
   WaypointType type;
 
-  /// Symbol of the system.
+  /// The symbol of the system.
   String systemSymbol;
 
   /// Position in the universe in the x axis.

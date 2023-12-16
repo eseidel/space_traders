@@ -180,10 +180,10 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
 
   @override
   int compare(ShipyardShip a, ShipyardShip b) =>
-      a.type!.value.compareTo(b.type!.value);
+      a.type.value.compareTo(b.type.value);
 
   @override
-  ShipType keyFor(ShipyardShip record) => record.type!;
+  ShipType keyFor(ShipyardShip record) => record.type;
 }
 
 /// A cache of ship engines.

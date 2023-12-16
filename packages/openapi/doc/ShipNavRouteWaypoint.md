@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **symbol** | **String** | The symbol of the waypoint. | 
 **type** | [**WaypointType**](WaypointType.md) |  | 
-**systemSymbol** | **String** | The symbol of the system the waypoint is in. | 
+**systemSymbol** | **String** | The symbol of the system. | 
 **x** | **int** | Position in the universe in the x axis. | 
 **y** | **int** | Position in the universe in the y axis. | 
 

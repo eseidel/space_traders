@@ -136,7 +136,7 @@ class ShipyardListingCache extends JsonStore<_Record> {
     final symbol = shipyard.waypointSymbol;
     final listing = ShipyardListing(
       waypointSymbol: symbol,
-      shipTypes: shipyard.shipTypes.map((inner) => inner.type!).toSet(),
+      shipTypes: shipyard.shipTypes.map((inner) => inner.type).toSet(),
     );
     _listingBySymbol[symbol] = listing;
     save();

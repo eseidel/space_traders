@@ -18,8 +18,7 @@ class WaypointModifier {
     required this.description,
   });
 
-  /// The unique identifier of the modifier.
-  WaypointModifierSymbolEnum symbol;
+  WaypointModifierSymbol symbol;
 
   /// The name of the trait.
   String name;
@@ -73,7 +72,7 @@ class WaypointModifier {
       }());
 
       return WaypointModifier(
-        symbol: WaypointModifierSymbolEnum.fromJson(json[r'symbol'])!,
+        symbol: WaypointModifierSymbol.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
       );
@@ -136,96 +135,4 @@ class WaypointModifier {
     'name',
     'description',
   };
-}
-
-/// The unique identifier of the modifier.
-class WaypointModifierSymbolEnum {
-  /// Instantiate a new enum with the provided [value].
-  const WaypointModifierSymbolEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const STRIPPED = WaypointModifierSymbolEnum._(r'STRIPPED');
-  static const UNSTABLE = WaypointModifierSymbolEnum._(r'UNSTABLE');
-  static const RADIATION_LEAK = WaypointModifierSymbolEnum._(r'RADIATION_LEAK');
-  static const CRITICAL_LIMIT = WaypointModifierSymbolEnum._(r'CRITICAL_LIMIT');
-  static const CIVIL_UNREST = WaypointModifierSymbolEnum._(r'CIVIL_UNREST');
-
-  /// List of all possible values in this [enum][WaypointModifierSymbolEnum].
-  static const values = <WaypointModifierSymbolEnum>[
-    STRIPPED,
-    UNSTABLE,
-    RADIATION_LEAK,
-    CRITICAL_LIMIT,
-    CIVIL_UNREST,
-  ];
-
-  static WaypointModifierSymbolEnum? fromJson(dynamic value) =>
-      WaypointModifierSymbolEnumTypeTransformer().decode(value);
-
-  static List<WaypointModifierSymbolEnum> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <WaypointModifierSymbolEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = WaypointModifierSymbolEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [WaypointModifierSymbolEnum] to String,
-/// and [decode] dynamic data back to [WaypointModifierSymbolEnum].
-class WaypointModifierSymbolEnumTypeTransformer {
-  factory WaypointModifierSymbolEnumTypeTransformer() =>
-      _instance ??= const WaypointModifierSymbolEnumTypeTransformer._();
-
-  const WaypointModifierSymbolEnumTypeTransformer._();
-
-  String encode(WaypointModifierSymbolEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a WaypointModifierSymbolEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  WaypointModifierSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'STRIPPED':
-          return WaypointModifierSymbolEnum.STRIPPED;
-        case r'UNSTABLE':
-          return WaypointModifierSymbolEnum.UNSTABLE;
-        case r'RADIATION_LEAK':
-          return WaypointModifierSymbolEnum.RADIATION_LEAK;
-        case r'CRITICAL_LIMIT':
-          return WaypointModifierSymbolEnum.CRITICAL_LIMIT;
-        case r'CIVIL_UNREST':
-          return WaypointModifierSymbolEnum.CIVIL_UNREST;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [WaypointModifierSymbolEnumTypeTransformer] instance.
-  static WaypointModifierSymbolEnumTypeTransformer? _instance;
 }

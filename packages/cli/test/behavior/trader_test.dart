@@ -259,7 +259,6 @@ void main() {
           x: 0,
           y: 0,
         ),
-        departure: departure,
         origin: departure,
         departureTime: departureTime,
         arrival: arrivalTime,
@@ -693,15 +692,6 @@ void main() {
     when(() => shipNav.route).thenReturn(shipNavRoute);
     when(() => shipNavRoute.arrival).thenReturn(now);
     when(() => shipNavRoute.departureTime).thenReturn(now);
-    when(() => shipNavRoute.departure).thenReturn(
-      ShipNavRouteWaypoint(
-        symbol: shipLocation.waypoint,
-        type: WaypointType.ASTEROID,
-        systemSymbol: shipLocation.system,
-        x: 0,
-        y: 0,
-      ),
-    );
     when(() => shipNavRoute.origin).thenReturn(
       ShipNavRouteWaypoint(
         symbol: shipLocation.waypoint,
@@ -940,7 +930,6 @@ void main() {
           x: 0,
           y: 0,
         ),
-        departure: departure,
         origin: departure,
         departureTime: departureTime,
         arrival: arrivalTime,
@@ -1387,8 +1376,8 @@ void main() {
       ),
     ).thenAnswer(
       (_) => Future.value(
-        SupplyConstruction200Response(
-          data: SupplyConstruction200ResponseData(
+        SupplyConstruction201Response(
+          data: SupplyConstruction201ResponseData(
             construction: Construction(
               symbol: end.waypoint,
               materials: [

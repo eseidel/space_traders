@@ -109,7 +109,6 @@ void main() {
             y: 2,
           ),
           origin: origin,
-          departure: origin,
           arrival: moonLanding,
           departureTime: moonLanding,
         ),

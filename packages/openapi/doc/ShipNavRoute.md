@@ -9,7 +9,6 @@ import 'package:openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **destination** | [**ShipNavRouteWaypoint**](ShipNavRouteWaypoint.md) |  | 
-**departure** | [**ShipNavRouteWaypoint**](ShipNavRouteWaypoint.md) |  | 
 **origin** | [**ShipNavRouteWaypoint**](ShipNavRouteWaypoint.md) |  | 
 **departureTime** | [**DateTime**](DateTime.md) | The date time of the ship's departure. | 
 **arrival** | [**DateTime**](DateTime.md) | The date time of the ship's arrival. If the ship is in-transit, this is the expected time of arrival. | 

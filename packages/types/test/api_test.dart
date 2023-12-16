@@ -152,6 +152,7 @@ void main() {
       symbol: 'A-1',
       headquarters: 'S-A-W',
       credits: 0,
+      shipCount: 0,
       startingFaction: FactionSymbol.AEGIS.value,
     );
     expect(agent.headquartersSymbol, WaypointSymbol.fromString('S-A-W'));

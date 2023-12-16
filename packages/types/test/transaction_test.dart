@@ -99,9 +99,8 @@ void main() {
   test('Transaction.fromShipyardTransaction', () {
     final shipyardTransaction = ShipyardTransaction(
       waypointSymbol: 'A-B-C',
-      // shipSymbol is actually shipType.  See:
-      // https://github.com/SpaceTradersAPI/api-docs/issues/68
-      shipSymbol: ShipType.EXPLORER.value,
+      shipSymbol: 'S-1',
+      shipType: ShipType.EXPLORER.value,
       price: 100,
       agentSymbol: 'A',
       timestamp: DateTime(2021),

@@ -153,8 +153,8 @@ doc/Siphon.md
 doc/SiphonResources201Response.md
 doc/SiphonResources201ResponseData.md
 doc/SiphonYield.md
-doc/SupplyConstruction200Response.md
-doc/SupplyConstruction200ResponseData.md
+doc/SupplyConstruction201Response.md
+doc/SupplyConstruction201ResponseData.md
 doc/SupplyConstructionRequest.md
 doc/SupplyLevel.md
 doc/Survey.md
@@ -171,6 +171,7 @@ doc/TransferCargoRequest.md
 doc/Waypoint.md
 doc/WaypointFaction.md
 doc/WaypointModifier.md
+doc/WaypointModifierSymbol.md
 doc/WaypointOrbital.md
 doc/WaypointTrait.md
 doc/WaypointTraitSymbol.md
@@ -336,8 +337,8 @@ lib/model/siphon.dart
 lib/model/siphon_resources201_response.dart
 lib/model/siphon_resources201_response_data.dart
 lib/model/siphon_yield.dart
-lib/model/supply_construction200_response.dart
-lib/model/supply_construction200_response_data.dart
+lib/model/supply_construction201_response.dart
+lib/model/supply_construction201_response_data.dart
 lib/model/supply_construction_request.dart
 lib/model/supply_level.dart
 lib/model/survey.dart
@@ -353,6 +354,7 @@ lib/model/transfer_cargo_request.dart
 lib/model/waypoint.dart
 lib/model/waypoint_faction.dart
 lib/model/waypoint_modifier.dart
+lib/model/waypoint_modifier_symbol.dart
 lib/model/waypoint_orbital.dart
 lib/model/waypoint_trait.dart
 lib/model/waypoint_trait_symbol.dart
@@ -508,8 +510,8 @@ test/siphon_resources201_response_data_test.dart
 test/siphon_resources201_response_test.dart
 test/siphon_test.dart
 test/siphon_yield_test.dart
-test/supply_construction200_response_data_test.dart
-test/supply_construction200_response_test.dart
+test/supply_construction201_response_data_test.dart
+test/supply_construction201_response_test.dart
 test/supply_construction_request_test.dart
 test/supply_level_test.dart
 test/survey_deposit_test.dart
@@ -524,6 +526,7 @@ test/trade_symbol_test.dart
 test/transfer_cargo200_response_test.dart
 test/transfer_cargo_request_test.dart
 test/waypoint_faction_test.dart
+test/waypoint_modifier_symbol_test.dart
 test/waypoint_modifier_test.dart
 test/waypoint_orbital_test.dart
 test/waypoint_test.dart

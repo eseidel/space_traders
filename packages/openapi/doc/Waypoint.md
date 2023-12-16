@@ -8,9 +8,9 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | **String** | Symbol fo the waypoint. | 
+**symbol** | **String** | The symbol of the waypoint. | 
 **type** | [**WaypointType**](WaypointType.md) |  | 
-**systemSymbol** | **String** | The symbol of the system this waypoint belongs to. | 
+**systemSymbol** | **String** | The symbol of the system. | 
 **x** | **int** | Relative position of the waypoint on the system's x axis. This is not an absolute position in the universe. | 
 **y** | **int** | Relative position of the waypoint on the system's y axis. This is not an absolute position in the universe. | 
 **orbitals** | [**List<WaypointOrbital>**](WaypointOrbital.md) | Waypoints that orbit this waypoint. | [default to const []]
