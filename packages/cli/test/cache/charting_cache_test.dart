@@ -11,8 +11,8 @@ void main() {
   test('ChartingCache load/save', () async {
     final fs = MemoryFileSystem.test();
     final a = WaypointSymbol.fromString('S-S-A');
+    final b = WaypointSymbol.fromString('S-S-B');
     final values = ChartedValues(
-      waypointSymbol: a,
       chart: Chart(
         waypointSymbol: a.waypoint,
         submittedBy: 'ESEIDEL',
@@ -26,11 +26,24 @@ void main() {
       },
     );
     final waypointTraits = _MockWaypointTraitCache();
-    final valuesBySymbol = {values.waypointSymbol: values};
+    final valuesBySymbol = {
+      a: ChartingRecord(
+        waypointSymbol: a,
+        values: values,
+        timestamp: DateTime(2021),
+      ),
+      b: ChartingRecord(
+        waypointSymbol: b,
+        values: null,
+        timestamp: DateTime(2021),
+      ),
+    };
     ChartingCache(valuesBySymbol, waypointTraits, fs: fs).save();
     final loaded = ChartingCache.load(fs, waypointTraits);
-    expect(loaded.waypointCount, 1);
-    expect(loaded.values.first.waypointSymbol, a);
+    expect(loaded.records, hasLength(2));
+    expect(loaded.records.first.waypointSymbol, a);
+    expect(loaded.waypointCount, 2);
+    expect(loaded.values.length, 1);
     expect(loaded.values.first.chart.submittedBy, 'ESEIDEL');
     expect(loaded.values.first.faction?.symbol, FactionSymbol.AEGIS);
     expect(loaded.values.first.traitSymbols, hasLength(1));
@@ -38,6 +51,8 @@ void main() {
       loaded.values.first.traitSymbols.first,
       WaypointTraitSymbol.ASH_CLOUDS,
     );
+    expect(loaded.records.last.waypointSymbol, b);
+    expect(loaded.records.last.values, isNull);
   });
 
   test('ChartingCache', () async {
@@ -59,7 +74,6 @@ void main() {
       x: 0,
       y: 0,
       traits: [waypointTrait],
-      // Chart is required for the cache to work.
       chart: Chart(
         waypointSymbol: waypointSymbol.waypoint,
         submittedBy: 'ESEIDEL',
@@ -68,20 +82,22 @@ void main() {
       isUnderConstruction: false,
     );
     final unchartedWaypoint = Waypoint(
-      symbol: waypointSymbol.waypoint,
+      symbol: unchartedSymbol.waypoint,
       type: WaypointType.ASTEROID_FIELD,
       systemSymbol: unchartedSymbol.system,
       x: 0,
       y: 0,
       isUnderConstruction: false,
-      // No chart, so this won't be cached.
+      // No chart, but will still be cached.
     );
     final chartingCache = ChartingCache({}, waypointTraits, fs: fs)
       ..addWaypoints([
         chartedWaypoint,
         unchartedWaypoint,
       ]);
-    expect(chartingCache.waypointCount, 1);
+    expect(chartingCache.waypointCount, 2);
+    expect(chartingCache.getRecord(waypointSymbol), isNotNull);
+    expect(chartingCache.getRecord(unchartedSymbol), isNotNull);
     expect(chartingCache[waypointSymbol], isNotNull);
     expect(chartingCache[unchartedSymbol], isNull);
   });
