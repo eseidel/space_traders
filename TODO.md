@@ -969,3 +969,4 @@ No nearby markets for ESEIDEL-25
 I'm not confident that we're correctly computing reachability.  I think
 uncharted jumpgates might be ignored?
 
+### Scan the initial system before starting the rest of the client?

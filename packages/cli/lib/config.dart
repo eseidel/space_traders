@@ -29,8 +29,12 @@ class Config {
   /// A list of which haulers should be used as miner haulers.
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
-  final minerHaulerSymbols = <String>['7', '8', '9', '15']
-      .map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
+  final minerHaulerSymbols = <String>[
+    // '7',
+    // '8',
+    // '9',
+    // '15',
+  ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
   /// logic in getJobForShip.
@@ -49,6 +53,8 @@ class Config {
       // Mining is more profitable than siphoning I think?
       Behavior.miner,
       Behavior.siphoner,
+      // Early game we can use the command ship to explore if needed.
+      Behavior.systemWatcher,
     ],
     FleetRole.trader: [Behavior.trader],
     FleetRole.miner: [Behavior.miner],
@@ -95,20 +101,15 @@ class Config {
   final defaultMaxAgeForPriceData = const Duration(days: 3);
 
   /// System assignments for probes.  All other probes are set to "explorer".
-  final probeAssignments = {
-    '2': 'JX78',
-    '29': 'NB34',
+  final probeAssignments = <String, String>{
+    // '2': 'JX78',
+    // '29': 'NB34',
   }.map(
     (k, v) => MapEntry(
       ShipSymbol.fromString('ESEIDEL-$k'),
       SystemSymbol.fromString('X1-$v'),
     ),
   );
-
-  /// List of gates known to have a broken antimatter market.
-  final knownBadGates = <String>{
-    'X1-RJ35-CF7C',
-  }.map(WaypointSymbol.fromString);
 
   /// Should charters chart asteroids?
   final chartAsteroids = true;
