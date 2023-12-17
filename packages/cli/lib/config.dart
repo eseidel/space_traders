@@ -10,30 +10,26 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
     ShipType.SIPHON_DRONE,
-    // ShipType.LIGHT_HAULER,
-    // ShipType.MINING_DRONE,
-    // ShipType.SURVEYOR,
-    // ShipType.LIGHT_HAULER,
-    // ShipType.MINING_DRONE,
-    // ShipType.SURVEYOR,
-    // ShipType.MINING_DRONE,
-    // ShipType.SURVEYOR,
-    // ShipType.MINING_DRONE,
-    // ShipType.SURVEYOR,
-    for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
-    for (int i = 0; i < 20; i++) ShipType.PROBE,
-    ShipType.REFINING_FREIGHTER,
-    ShipType.EXPLORER,
+    ShipType.MINING_DRONE,
+    ShipType.SURVEYOR,
+    ShipType.MINING_DRONE,
+    ShipType.SURVEYOR,
+    ShipType.MINING_DRONE,
+    ShipType.MINING_DRONE,
+    ShipType.MINING_DRONE,
+    for (int i = 0; i < 10; i++) ShipType.LIGHT_HAULER,
+    // for (int i = 0; i < 20; i++) ShipType.PROBE,
+    // ShipType.REFINING_FREIGHTER,
+    // ShipType.EXPLORER,
   ];
 
   /// A list of which haulers should be used as miner haulers.
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
   final minerHaulerSymbols = <String>[
-    // '7',
-    // '8',
-    // '9',
-    // '15',
+    '4',
+    '6',
+    '7',
   ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
@@ -46,6 +42,11 @@ class Config {
       // Might want to consider limiting to short trades (< 5 mins) to avoid
       // tying up capital early.
       Behavior.trader,
+      // Early game we can use the command ship to explore if needed.
+      // This is perfered over mining and siphoning in case those are far away
+      // on the assumption the command ship should be trading early and all
+      // it's missing is price data to do so.
+      Behavior.charter,
       // Early on the command ship makes about 5c/s vs. ore hounds making
       // 6c/s. It's a better surveyor than miner. Especially when enabling
       // mining drones.
@@ -53,8 +54,6 @@ class Config {
       // Mining is more profitable than siphoning I think?
       Behavior.miner,
       Behavior.siphoner,
-      // Early game we can use the command ship to explore if needed.
-      Behavior.systemWatcher,
     ],
     FleetRole.trader: [Behavior.trader],
     FleetRole.miner: [Behavior.miner],
@@ -110,9 +109,6 @@ class Config {
       SystemSymbol.fromString('X1-$v'),
     ),
   );
-
-  /// Should charters chart asteroids?
-  final chartAsteroids = true;
 }
 
 /// Our global configuration object.

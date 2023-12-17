@@ -43,6 +43,9 @@ class CentralCommand {
   /// Per-system price age data used by system watchers.
   final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
 
+  /// Should we chart asteroids?
+  bool chartAsteroids = false;
+
   /// The next planned ship buy job.
   /// This is the start of an imagined job queue system, whereby we pre-populate
   /// BehaviorStates with jobs when handing them out to ships.
@@ -322,6 +325,9 @@ class CentralCommand {
   ) async {
     final charterSystems = otherCharterSystems(ship.shipSymbol).toSet();
 
+    // Only probes should ever chart asteroids.
+    final chartAsteroids = this.chartAsteroids && ship.isProbe;
+
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
     final destinationSymbol = await nextUnchartedWaypointSymbol(
@@ -332,7 +338,7 @@ class CentralCommand {
       startSystemSymbol: ship.systemSymbol,
       filter: (SystemWaypoint waypoint) {
         // Don't bother charting Asteroids if disabled.
-        if (!config.chartAsteroids && waypoint.isAsteroid) {
+        if (!chartAsteroids && waypoint.isAsteroid) {
           return false;
         }
         // Don't visit systems we already have a charter in.

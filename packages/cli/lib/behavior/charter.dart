@@ -131,6 +131,12 @@ Future<JobResult> doCharter(
     );
     return JobResult.wait(waitTime);
   }
+  if (!centralCommand.chartAsteroids) {
+    logger.warn('Charted all known systems, starting asteroid charting.');
+    centralCommand.chartAsteroids = true;
+    return JobResult.wait(null);
+  }
+
   // If we get here, we've explored all systems we can reach.
   throw const JobException('Charted all known systems', Duration(hours: 1));
 }
