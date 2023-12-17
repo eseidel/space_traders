@@ -102,6 +102,7 @@ void main() {
           .systemsReachableFrom(waypointSymbol.systemSymbol),
     ).thenReturn([]);
 
+    when(() => centralCommand.chartAsteroids).thenReturn(true);
     when(
       () => centralCommand.nextWaypointToChart(
         caches.systems,
