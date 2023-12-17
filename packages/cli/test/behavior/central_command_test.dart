@@ -670,6 +670,34 @@ void main() {
     expect(job.behavior, Behavior.idle);
   });
 
+  test('getJobForShip no behaviors', () {
+    final shipCache = _MockShipCache();
+    final behaviorCache = _MockBehaviorCache();
+    final centralCommand =
+        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    final ship = _MockShip();
+    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    final shipFrame = _MockShipFrame();
+    when(() => shipFrame.symbol)
+        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => ship.registration).thenReturn(
+      ShipRegistration(
+        name: shipSymbol.symbol,
+        factionSymbol: 'F',
+        role: ShipRole.COMMAND,
+      ),
+    );
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 1000, capacity: 1000));
+    registerFallbackValue(Behavior.idle);
+    when(() => behaviorCache.isBehaviorDisabledForShip(ship, any()))
+        .thenReturn(true);
+    final job = centralCommand.getJobForShip(ship, 1000000);
+    // Nothing specified for this ship, so it should be idle.
+    expect(job.behavior, Behavior.idle);
+  });
+
   test('shipToBuyFromPlan', () {
     final shipyardShips = _MockShipyardShipCache();
     final shipyardPrices = _MockShipyardPrices();
