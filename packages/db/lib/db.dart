@@ -92,47 +92,16 @@ class Database {
   PostgreSQLConnection get connection => _connection;
 
   /// Not final so we can reset it.
-  PostgreSQLConnection _connection;
-
-  /// When the connection was opened.
-  DateTime? _connectionOpenTime;
+  final PostgreSQLConnection _connection;
 
   /// Configure the database connection.
   final DatabaseConfig config;
 
   /// Open the database connection.
-  Future<void> open() {
-    _connectionOpenTime = DateTime.timestamp();
-    return connection.open();
-  }
+  Future<void> open() => connection.open();
 
   /// Close the database connection.
   Future<void> close() => connection.close();
-
-  /// Reset the database connection.
-  // This is a hack around the fact that our long connections to postgres
-  // seem to cause a leak on the server side?
-  Future<void> reconnect() async {
-    if (!connection.isClosed) {
-      await close();
-    }
-    _connection = connectionFromConfig(config);
-    return open();
-  }
-
-  /// Reconnect if the connection has been open for more than an hour.
-  /// This is a hack around a unknown leak we're triggering in postgres.
-  Future<bool> reconnectIfNeeded() async {
-    final openTime = _connectionOpenTime;
-    if (openTime == null) {
-      return false;
-    }
-    if (DateTime.timestamp().difference(openTime) < const Duration(hours: 1)) {
-      return false;
-    }
-    await reconnect();
-    return true;
-  }
 
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
