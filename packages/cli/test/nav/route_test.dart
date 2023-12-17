@@ -2,6 +2,7 @@ import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
+import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/local.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
@@ -228,33 +229,43 @@ void main() {
       fs,
       path: 'test/nav/fixtures/systems-09-24-2023.json',
     )!;
-    final jumpGateCache = JumpGateCache([], fs: fs);
-    final constructionCache = ConstructionCache([], fs: fs);
-    final routePlanner = RoutePlanner.fromCaches(
+    final waypoint1 = WaypointSymbol.fromString(
+      'X1-V94-96191X',
+    ); // first waypoint in systems.json
+    final waypoint3 = WaypointSymbol.fromString(
+      'X1-TC51-68991C',
+    ); // random other waypoint in file.
+    final waypoint4 = WaypointSymbol.fromString(
+      'X1-CH89-70689B',
+    ); // another random other waypoint in file.
+
+    final systemConnnectivity = SystemConnectivity.test({
+      waypoint1: {waypoint4},
+    });
+    final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,
-      jumpGateCache,
-      constructionCache,
+      systemConnnectivity,
       sellsFuel: (_) => false,
     );
     RoutePlan? planRoute(
-      String startString,
-      String endString, {
+      WaypointSymbol start,
+      WaypointSymbol end, {
       int fuelCapacity = 1200,
       int shipSpeed = 30,
     }) =>
         routePlanner.planRoute(
-          start: WaypointSymbol.fromString(startString),
-          end: WaypointSymbol.fromString(endString),
+          start: start,
+          end: end,
           fuelCapacity: fuelCapacity,
           shipSpeed: shipSpeed,
         );
 
     void expectRoute(
-      String startString,
-      String endString,
+      WaypointSymbol start,
+      WaypointSymbol end,
       int expectedSeconds,
     ) {
-      final route = planRoute(startString, endString);
+      final route = planRoute(start, end);
       expect(route, isNotNull);
       expect(route!.duration.inSeconds, expectedSeconds);
 
@@ -268,7 +279,7 @@ void main() {
       // navigation in this test so far.
       final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
         ..add(route.actions.last.endSymbol);
-      final route2 = planRoute(startString, endString)!;
+      final route2 = planRoute(start, end)!;
       final routeSymbols2 = route2.actions.map((w) => w.startSymbol).toList()
         ..add(route.actions.last.endSymbol);
       // Should be identical when coming from cache.
@@ -276,51 +287,37 @@ void main() {
     }
 
     // Same place
-    const waypoint1 = 'X1-V94-96191X'; // first waypoint in systems.json
     expectRoute(waypoint1, waypoint1, 0);
 
     // Within one system
-    final system =
-        systemsCache[WaypointSymbol.fromString(waypoint1).systemSymbol];
-    final waypointObject2 =
-        system.waypoints.firstWhere((w) => w.symbol != waypoint1);
-    final waypoint2 = waypointObject2.symbol;
+    final system = systemsCache[waypoint1.systemSymbol];
+    final waypoint2 = system.waypoints
+        .firstWhere((w) => w.waypointSymbol != waypoint1)
+        .waypointSymbol;
     expectRoute(waypoint1, waypoint2, 23);
 
     final route = planRoute(waypoint1, waypoint2);
-    expect(route!.startSymbol.waypoint, waypoint1);
-    expect(route.endSymbol.waypoint, waypoint2);
+    expect(route!.startSymbol, waypoint1);
+    expect(route.endSymbol, waypoint2);
     // No actions after the last one.
-    expect(route.nextActionFrom(WaypointSymbol.fromString(waypoint2)), isNull);
+    expect(route.nextActionFrom(waypoint2), isNull);
     // Make a sub-plan starting from the same starting point.
-    final subPlan = route.subPlanStartingFrom(
-      systemsCache,
-      WaypointSymbol.fromString(waypoint1),
-    );
+    final subPlan = route.subPlanStartingFrom(systemsCache, waypoint1);
     expect(subPlan.actions.length, route.actions.length);
 
     // Make a sub-plan with an unrelated waypoint.
-    const waypoint3 = 'X1-TC51-68991C'; // random other waypoint in file.
     expect(
       () => route.subPlanStartingFrom(
         systemsCache,
         // Not in the route.
-        WaypointSymbol.fromString(waypoint3),
+        waypoint3,
       ),
       throwsArgumentError,
     );
 
     // Exactly one jump, jump duration doesn't matter since it doesn't stop
     // navigation.
-    // final connectedSystem = systemsCache
-    //     .connectedSystems(
-    //       WaypointSymbol.fromString(waypoint1).systemSymbol,
-    //     )
-    //     .first
-    //     .systemSymbol;
-    // final waypoint4 =
-    //     systemsCache.waypointsInSystem(connectedSystem).first.symbol;
-    // expectRoute(waypoint1, waypoint4, 118);
+    expectRoute(waypoint1, waypoint4, 80);
 
     // We don't know how to plan warps yet.
     expect(planRoute(waypoint1, waypoint3), isNull);
