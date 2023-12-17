@@ -1,36 +1,21 @@
 
 ### Todo
 
-Most impact:
-* Make saving take less time (log rolling or db?), also avoids dataloss.
-* Could await on sometime other than the network (e.g. a priority queue).
-* Add atomic writes (write to a temp file and then rename).
-
 To sort:
-* Add a "storage" behavior to have a place to put unused mounts.
-* Make it easier to re-spec miners mid cycle (without throwing away mounts).
 * Record requests per-ship?  Calculate number of requests used per cycle?
-* Add mounts to survey results (so we can compute diamond frequency).
-* Compute survey frequency per-trade symbol.
 * Confirm survey sizes have consistent extraction rates across trade symbols.
 * Make shipInfo include an emoji for the behavior.
 
 Earning:
 * Keep per-ship logs, so can calculate per-ship efficiency.
 * Use recent earnings-per-second in ship behavior planning.
-* Fix miners to know when to leave a system (when prices are too low).
-* Buy traders when trading is more profitable than mining, and vice versa.
 * Be able to buy miners outside of the main system.
 * Try changing deal finding heuristic to only consider buy price.
 * Spread out traders across the galaxy better.
-* buy-in-a-loop for small tradeVolumes gets worse as we have more ships.
-  This is likely the #1 contributor to "wait time".
-  Every place we return null to loop has the same problem.
 * Record which ship generated a survey and with what mounts?
 * Allow ships to buy from the same location at high trade volumes?
 * Make Survey selection find a value point and then look back further than
   the last 100 surveys for surveys above that value.
-* Print warnings when our predicted buy/sell price differs from actual.
 * Do we correctly navigate right away after the last jump?
 * Use the closest ship to a shipyard when buying a ship.
 
@@ -47,8 +32,6 @@ Tech Debt:
 * Write a test suite for routing.
 
 Efficiency:
-* Make dart run .\bin\percentage_mapped.dart -v make zero requests.
-* Write a better rate-limiting model.
 * Make the script robust to network failures.
 * Teach route planner how to warp.
 
@@ -57,7 +40,6 @@ Automation:
 * Need logic for planning which faction to be (random)?
 * Logic for planning what to do with money (e.g. buy ships, by mods)
   Should disable buying behavior for less time early on?
-* Surveys.  How much surveying should we do before we start mining?
 
 Thoughts
 * Miners are just the "find me where to sell this" problem
@@ -451,37 +433,6 @@ X1-DK86-91295E-D0E02B SMALL ICE_WATER, ICE_WATER, SILICON_CRYSTALS, SILICON_CRYS
 [WARN] 🛸#5  Purchased ESEIDEL-B (SHIP_ORE_HOUND)! Disabling Behavior.buyShip for ESEIDEL-5 for 10m.
 [WARN] Adding missing ship ESEIDEL-B
 
-### Check to see if ships are more common at certain waypoint types
-
-e.g. orbital stations.
-
-If they are, we might prioritize those first in exploration.
-
-### Examine RARE_METAL_DEPOSITS sites and see if they might be worth mining.
-
-### Died during navigation?
-
-This is fixed but needs a test.
-
-🛸#3D ✈️  to X1-DK86-14693D, -48s left
-Unhandled exception:
-Invalid argument(s): No action starting from X1-DK86-14693D
-#0      RoutePlan.nextActionFrom (package:types/route.dart:149:7)
-#1      continueNavigationIfNeeded (package:cli/nav/navigation.dart:199:28)
-#2      advanceShipBehavior (package:cli/behavior/advance.dart:71:27)
-<asynchronous suspension>
-#3      advanceShips (package:cli/logic.dart:71:29)
-<asynchronous suspension>
-#4      logic (package:cli/logic.dart:184:7)
-<asynchronous suspension>
-#5      cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:184:3)
-<asynchronous suspension>
-#6      main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:190:7)
-<asynchronous suspension>
-#7      main (file:///root/space_traders/packages/cli/bin/cli.dart:188:3)
-<asynchronous suspension>
-
-
 ### Handshake exception brought down client.
 
 Unhandled exception:
@@ -521,13 +472,6 @@ ApiException 400: Exception occurred: POST /my/ships/ESEIDEL-7/jump (Inner excep
   * Jettison
 
 
-### Make sure drift-of-shame logic works and remove/reduce fuel guards
-
-Right now we're over aggressive at avoiding 0 fuel, when we should instead run
-our ships down to at least 25% or lower, and just make sure we have working
-DRIFT logic for when we have < 20 fuel.  2 Fuel + drifting and jump gates should
-be enough to get to fuel from pretty much anywhere in the galaxy.
-
 ### Add callback to RequestCounterApi and have it record requests in behavior.
 
 ### Avoid catastrophic trades
@@ -549,17 +493,9 @@ If nothing else, each interval should be evaluted against the possibility of mov
 
 ### Log error rates from network executor
 
-### Write a script to find and mount (and re-sell) mounts
-
-For getting the last of the mount data.
-
 ### Record minable traits with surveys
 
 ### Record surveyor type with surveys
-
-### Explorers are all chasing each other
-
-They don't know how to avoid each other within the same system.
 
 ### Remove MarketCache
 
@@ -970,3 +906,42 @@ I'm not confident that we're correctly computing reachability.  I think
 uncharted jumpgates might be ignored?
 
 ### Scan the initial system before starting the rest of the client?
+
+### Command ship no longer knows how to mine (no mine job)
+
+### Failing to find market when no prices?
+
+findBestMarketToSell relies on prices, it probably doesn't need to.
+
+[WARN] 🛸#1  No market for HYDROCARBON. Disabling Behavior.siphoner for ESEIDEL-1 for 10m.
+Found 14 deals for ESEIDEL-1 from AC35-C43
+🛸#1  Found deal: EQUIPMENT                  AC35-K90      2,191c -> AC35-A1       3,135c  +37,472c (43%) 5m 127c/s  87,928c
+🛸#1  Cargo hold not empty, finding market to sell HYDROCARBON.
+🛸#1  No nearby market to sell HYDROCARBON, jetisoning cargo!
+[WARN] 🛸#1  Jettisoning 40 HYDROCARBON
+🛸#1  Beginning route to AC35-K90 (3m)
+🛸#1  No market at AC35-C43, cannot refuel, need to replan.
+🛸#1  Setting flightMode to DRIFT
+🛸#1  Insufficient fuel, drifting to AC35-K90
+[WARN] 🛸#1  Fuel low: 126 / 400
+
+
+### Include cooldowns in route planning.
+
+e.g.
+
+] showRoute X1-GN97-A1 X1-JX78-A1 RDDEV-1
+ hops:11 eta:42m46s cost:-45,975 debug:32ms/1,457
+  eta  fuelCost  fuelB  lvFuel  act       mode    from          to              arCd  arFuel
+--------------------------------------------------------------------------------------------
+  37s         0      0     222  nav       BURN    X1-GN97-A1    X1-GN97-E54      0ms     116
+1m30s      -225      3     400  nav       BURN    X1-GN97-E54   X1-GN97-I63      0ms      42
+3m18s      -225      3     342  nav       CRUISE  X1-GN97-I63   X1-GN97-I62      0ms     123
+  0ms   -15,000      0     123  jump      CRUISE  X1-GN97-I62   X1-Z62-X19E      16m     123
+  16m         0      0     123  cooldown  CRUISE  X1-Z62-X19E   X1-Z62-X19E      0ms     123
+  0ms   -15,000      0     123  jump      CRUISE  X1-Z62-X19E   X1-MR11-EF9A     16m     123
+  16m         0      0     123  cooldown  CRUISE  X1-MR11-EF9A  X1-MR11-EF9A     0ms     123
+  0ms   -15,000      0     123  jump      CRUISE  X1-MR11-EF9A  X1-JX78-I60      16m     123
+3m18s      -150      2     323  nav       CRUISE  X1-JX78-I60   X1-JX78-I61   12m42s     104
+ 1m9s      -150      2     304  nav       BURN    X1-JX78-I61   X1-JX78-K91   11m33s      46
+  54s      -225      3     346  nav       BURN    X1-JX78-K91   X1-JX78-A1    10m39s     158
