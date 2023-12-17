@@ -13,6 +13,24 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockAgent extends Mock implements Agent {}
+
+class _MockFleetApi extends Mock implements FleetApi {}
+
+class _MockShipReactor extends Mock implements ShipReactor {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
+
+class _MockShipRegistration extends Mock implements ShipRegistration {}
+
+class _MockShipFrame extends Mock implements ShipFrame {}
+
+class _MockShipCrew extends Mock implements ShipCrew {}
+
+class _MockShipCargo extends Mock implements ShipCargo {}
+
+class _MockShipFuel extends Mock implements ShipFuel {}
+
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
@@ -94,188 +112,204 @@ void main() {
     verifyNever(() => shipNav.status = ShipNavStatus.IN_ORBIT);
   });
 
-  // test('continueNavigationIfNeeded sets cooldown after jump', () async {
-  //   final api = _MockApi();
-  //   final fleetApi = _MockFleetApi();
-  //   when(() => api.fleet).thenReturn(fleetApi);
-  //   final systemsCache = _MockSystemsCache();
-  //   final shipCache = _MockShipCache();
-  //   final shipNav = _MockShipNav();
-  //   const shipSymbol = ShipSymbol('S', 1);
-  //   // We use a real Ship to allow setting/reading from cooldown.
-  //   final ship = Ship(
-  //     symbol: shipSymbol.symbol,
-  //     cooldown: Cooldown(
-  //       shipSymbol: shipSymbol.symbol,
-  //       totalSeconds: 0,
-  //       remainingSeconds: 0,
-  //     ),
-  //     nav: shipNav,
-  //     reactor: _MockShipReactor(),
-  //     engine: _MockShipEngine(),
-  //     registration: _MockShipRegistration(),
-  //     frame: _MockShipFrame(),
-  //     crew: _MockShipCrew(),
-  //     cargo: _MockShipCargo(),
-  //     fuel: _MockShipFuel(),
-  //   );
+  test('continueNavigationIfNeeded sets cooldown after jump', () async {
+    final api = _MockApi();
+    final caches = mockCaches();
+    final db = _MockDatabase();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final shipNav = _MockShipNav();
+    final agent = _MockAgent();
+    when(() => agent.credits).thenReturn(10000000);
+    when(() => caches.agent.agent).thenReturn(agent);
+    const shipSymbol = ShipSymbol('S', 1);
+    // We use a real Ship to allow setting/reading from cooldown.
+    final ship = Ship(
+      symbol: shipSymbol.symbol,
+      cooldown: Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        totalSeconds: 0,
+        remainingSeconds: 0,
+      ),
+      nav: shipNav,
+      reactor: _MockShipReactor(),
+      engine: _MockShipEngine(),
+      registration: _MockShipRegistration(),
+      frame: _MockShipFrame(),
+      crew: _MockShipCrew(),
+      cargo: _MockShipCargo(),
+      fuel: _MockShipFuel(),
+    );
 
-  //   final centralCommand = _MockCentralCommand();
-  //   when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    final centralCommand = _MockCentralCommand();
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
 
-  //   /// The behavior doesn't matter, just needs to have a null destination.
-  //   final state = BehaviorState(shipSymbol, Behavior.idle);
+    /// The behavior doesn't matter, just needs to have a null destination.
+    final state = BehaviorState(shipSymbol, Behavior.idle);
 
-  //   final now = DateTime(2021);
-  //   DateTime getNow() => now;
-  //   final logger = _MockLogger();
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    final logger = _MockLogger();
 
-  //   final startSymbol = WaypointSymbol.fromString('A-B-C');
-  //   final endSymbol = WaypointSymbol.fromString('D-E-F');
+    final startSymbol = WaypointSymbol.fromString('A-B-C');
+    final endSymbol = WaypointSymbol.fromString('D-E-F');
 
-  //   when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
-  //   when(() => shipNav.systemSymbol).thenReturn(startSymbol.system);
+    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(startSymbol.system);
 
-  //   state.routePlan = RoutePlan(
-  //     fuelCapacity: 100,
-  //     shipSpeed: 100,
-  //     actions: [
-  //       RouteAction(
-  //         startSymbol: startSymbol,
-  //         endSymbol: endSymbol,
-  //         type: RouteActionType.jump,
-  //         duration: 100,
-  //       ),
-  //     ],
-  //     fuelUsed: 100,
-  //   );
-  //   final reactorExpiry = now.add(const Duration(seconds: 100));
+    state.routePlan = RoutePlan(
+      fuelCapacity: 100,
+      shipSpeed: 100,
+      actions: [
+        RouteAction(
+          startSymbol: startSymbol,
+          endSymbol: endSymbol,
+          type: RouteActionType.jump,
+          seconds: 100,
+          fuelUsed: 0,
+        ),
+      ],
+    );
+    final reactorExpiry = now.add(const Duration(seconds: 100));
 
-  //   when(() => systemsCache.waypoint(startSymbol)).thenReturn(
-  //     SystemWaypoint(
-  //       symbol: startSymbol.waypoint,
-  //       type: WaypointType.ASTEROID_FIELD,
-  //       x: 0,
-  //       y: 0,
-  //     ),
-  //   );
-  //   when(() => systemsCache[startSymbol.systemSymbol])
-  //       .thenReturn(
-  //     System(
-  //       symbol: startSymbol.system,
-  //       sectorSymbol: startSymbol.sector,
-  //       type: SystemType.BLACK_HOLE,
-  //       x: 0,
-  //       y: 0,
-  //     ),
-  //   );
-  //   when(() => systemsCache.waypoint(endSymbol)).thenReturn(
-  //     SystemWaypoint(
-  //       symbol: endSymbol.waypoint,
-  //       type: WaypointType.ASTEROID_FIELD,
-  //       x: 0,
-  //       y: 0,
-  //     ),
-  //   );
-  //   when(() => systemsCache[endSymbol.systemSymbol])
-  //        .thenReturn(
-  //     System(
-  //       symbol: endSymbol.system,
-  //       sectorSymbol: endSymbol.sector,
-  //       type: SystemType.BLACK_HOLE,
-  //       x: 0,
-  //       y: 0,
-  //     ),
-  //   );
+    when(() => caches.systems.waypoint(startSymbol)).thenReturn(
+      SystemWaypoint(
+        symbol: startSymbol.waypoint,
+        type: WaypointType.ASTEROID_FIELD,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => caches.systems[startSymbol.systemSymbol]).thenReturn(
+      System(
+        symbol: startSymbol.system,
+        sectorSymbol: startSymbol.sector,
+        type: SystemType.BLACK_HOLE,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => caches.systems.waypoint(endSymbol)).thenReturn(
+      SystemWaypoint(
+        symbol: endSymbol.waypoint,
+        type: WaypointType.JUMP_GATE,
+        x: 0,
+        y: 0,
+      ),
+    );
+    when(() => caches.systems[endSymbol.systemSymbol]).thenReturn(
+      System(
+        symbol: endSymbol.system,
+        sectorSymbol: endSymbol.sector,
+        type: SystemType.BLACK_HOLE,
+        x: 0,
+        y: 0,
+      ),
+    );
 
-  //   when(
-  //     () => fleetApi.jumpShip(
-  //       shipSymbol.symbol,
-  //       jumpShipRequest: JumpShipRequest(systemSymbol: endSymbol.system),
-  //     ),
-  //   ).thenAnswer(
-  //     (_) async => JumpShip200Response(
-  //       data: JumpShip200ResponseData(
-  //         cooldown: Cooldown(
-  //           shipSymbol: shipSymbol.symbol,
-  //           totalSeconds: 100,
-  //           remainingSeconds: 100,
-  //           expiration: reactorExpiry,
-  //         ),
-  //         nav: shipNav,
-  //       ),
-  //     ),
-  //   );
+    when(
+      () => fleetApi.jumpShip(
+        shipSymbol.symbol,
+        jumpShipRequest: JumpShipRequest(waypointSymbol: endSymbol.waypoint),
+      ),
+    ).thenAnswer(
+      (_) async => JumpShip200Response(
+        data: JumpShip200ResponseData(
+          cooldown: Cooldown(
+            shipSymbol: shipSymbol.symbol,
+            totalSeconds: 100,
+            remainingSeconds: 100,
+            expiration: reactorExpiry,
+          ),
+          nav: shipNav,
+          transaction: MarketTransaction(
+            waypointSymbol: startSymbol.waypoint,
+            shipSymbol: shipSymbol.symbol,
+            tradeSymbol: TradeSymbol.ANTIMATTER.value,
+            type: MarketTransactionTypeEnum.PURCHASE,
+            units: 1,
+            pricePerUnit: 10000,
+            totalPrice: 10000,
+            timestamp: now,
+          ),
+          agent: agent,
+        ),
+      ),
+    );
 
-  //   final singleJumpResult = await runWithLogger(
-  //     logger,
-  //     () => continueNavigationIfNeeded(
-  //       api,
-  //       ship,
-  //       state,
-  //       shipCache,
-  //       systemsCache,
-  //       centralCommand,
-  //       getNow: getNow,
-  //     ),
-  //   );
-  //   // We don't need to return after this jump since the next action may not
-  //   // need the reactor.
-  //   expect(singleJumpResult.shouldReturn(), false);
-  //   expect(
-  //     ship.cooldown,
-  //     Cooldown(
-  //       shipSymbol: shipSymbol.symbol,
-  //       remainingSeconds: 100,
-  //       expiration: reactorExpiry,
-  //       totalSeconds: 100,
-  //     ),
-  //   );
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
 
-  //   final jumpTwoSymbol = WaypointSymbol.fromString('G-H-I');
-  //   state.routePlan = RoutePlan(
-  //     fuelCapacity: 100,
-  //     shipSpeed: 100,
-  //     actions: [
-  //       RouteAction(
-  //         startSymbol: startSymbol,
-  //         endSymbol: endSymbol,
-  //         type: RouteActionType.jump,
-  //         duration: 100,
-  //       ),
-  //       RouteAction(
-  //         startSymbol: endSymbol,
-  //         endSymbol: jumpTwoSymbol,
-  //         type: RouteActionType.jump,
-  //         duration: 10,
-  //       ),
-  //     ],
-  //     fuelUsed: 100,
-  //   );
+    final singleJumpResult = await runWithLogger(
+      logger,
+      () => continueNavigationIfNeeded(
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        state,
+        getNow: getNow,
+      ),
+    );
+    // We don't need to return after this jump since the next action may not
+    // need the reactor.
+    expect(singleJumpResult.shouldReturn(), false);
+    expect(
+      ship.cooldown,
+      Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        remainingSeconds: 100,
+        expiration: reactorExpiry,
+        totalSeconds: 100,
+      ),
+    );
 
-  //   // Reset the cooldown.
-  //   ship.cooldown = Cooldown(
-  //     shipSymbol: shipSymbol.symbol,
-  //     totalSeconds: 0,
-  //     remainingSeconds: 0,
-  //   );
-  //   final betweenJumpsResult = await runWithLogger(
-  //     logger,
-  //     () => continueNavigationIfNeeded(
-  //       api,
-  //       ship,
-  //       state,
-  //       shipCache,
-  //       systemsCache,
-  //       centralCommand,
-  //       getNow: getNow,
-  //     ),
-  //   );
-  //   // We don't need to return after this jump since the next action may not
-  //   // need the reactor.
-  //   expect(betweenJumpsResult.shouldReturn(), true);
-  //   expect(ship.cooldown.expiration, reactorExpiry);
-  // });
+    final jumpTwoSymbol = WaypointSymbol.fromString('G-H-I');
+    state.routePlan = RoutePlan(
+      fuelCapacity: 100,
+      shipSpeed: 100,
+      actions: [
+        RouteAction(
+          startSymbol: startSymbol,
+          endSymbol: endSymbol,
+          type: RouteActionType.jump,
+          seconds: 100,
+          fuelUsed: 0,
+        ),
+        RouteAction(
+          startSymbol: endSymbol,
+          endSymbol: jumpTwoSymbol,
+          type: RouteActionType.jump,
+          seconds: 10,
+          fuelUsed: 0,
+        ),
+      ],
+    );
+
+    // Reset the cooldown.
+    ship.cooldown = Cooldown(
+      shipSymbol: shipSymbol.symbol,
+      totalSeconds: 0,
+      remainingSeconds: 0,
+    );
+    final betweenJumpsResult = await runWithLogger(
+      logger,
+      () => continueNavigationIfNeeded(
+        api,
+        db,
+        centralCommand,
+        caches,
+        ship,
+        state,
+        getNow: getNow,
+      ),
+    );
+    // We don't need to return after this jump since the next action may not
+    // need the reactor.
+    expect(betweenJumpsResult.shouldReturn(), true);
+    expect(ship.cooldown.expiration, reactorExpiry);
+  });
 
   test('continueNavigationIfNeeded empty plan', () async {
     final api = _MockApi();
