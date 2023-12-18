@@ -1,6 +1,5 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:equatable/equatable.dart';
@@ -143,7 +142,6 @@ class MultiJob {
     DateTime Function() getNow = defaultGetNow,
   }) async {
     for (var i = 0; i < 10; i++) {
-      shipDetail(ship, '$name ${state.jobIndex}');
       jobAssert(
         state.jobIndex >= 0 && state.jobIndex < jobFunctions.length,
         'Invalid job index ${state.jobIndex}',
@@ -162,12 +160,10 @@ class MultiJob {
         ship,
         getNow: getNow,
       );
-      shipDetail(ship, '$name ${state.jobIndex} $result');
       if (result.isComplete) {
         state.jobIndex++;
         if (state.jobIndex >= jobFunctions.length) {
           state.isComplete = true;
-          shipDetail(ship, '$name complete!');
           return null;
         }
       }
