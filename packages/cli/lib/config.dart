@@ -27,9 +27,9 @@ class Config {
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
   final minerHaulerSymbols = <String>[
+    '3',
     '4',
-    '6',
-    '7',
+    '5',
   ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
