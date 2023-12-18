@@ -7,11 +7,29 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/ships.dart';
 
 String describeJob(ExtractionJob job) {
   final action = job.extractionType.name;
   final sourceName = job.source.sectorLocalName;
   return '$action @ $sourceName';
+}
+
+ShipType? guessType(ShipyardShipCache shipyardShipCache, Ship ship) {
+  final frame = ship.frame;
+  final type = shipyardShipCache.shipTypeFromFrame(frame.symbol);
+  if (type != null) {
+    return type;
+  }
+  if (frame.symbol == ShipFrameSymbolEnum.DRONE) {
+    if (ship.hasMiningLaser) {
+      return ShipType.MINING_DRONE;
+    }
+    if (ship.hasSurveyor) {
+      return ShipType.SURVEYOR;
+    }
+  }
+  return null;
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
@@ -24,6 +42,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipCache = ShipCache.load(fs)!;
   final tradeGoods = TradeGoodCache.load(fs);
   final marketListings = MarketListingCache.load(fs, tradeGoods);
+  final shipyardShipCache = ShipyardShipCache.load(fs);
 
   final squads = await assignShipsToSquads(
     systems,
@@ -33,15 +52,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     systemSymbol: shipCache.ships.first.systemSymbol,
   );
   logger.info('${squads.length} squads');
+
   for (var i = 0; i < squads.length; i++) {
     final squad = squads[i];
-    logger
-      ..info('Squad $i:')
-      ..info('  job: ${describeJob(squad.job)}');
+    logger.info('Squad $i: ${describeJob(squad.job)}');
     for (final ship in squad.ships) {
-      logger.info(
-        '  ${ship.symbol} ${ship.frame.symbol} ${ship.mountedMountSymbols}',
-      );
+      final type = guessType(shipyardShipCache, ship)!;
+      final typeName = type.value.substring('SHIP_'.length);
+      logger.info('  ${ship.shipSymbol.hexNumber.padLeft(2)} $typeName');
     }
   }
 }
