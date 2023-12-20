@@ -766,10 +766,14 @@ bool Function(Deal) avoidDealsInProgress(
       // Deals need to differ in their source *or* their trade symbol
       // for us to consider them.
       if (d.deal.sourceSymbol == deal.sourceSymbol &&
-              d.deal.tradeSymbol == deal.tradeSymbol
-          // Hack to help finish construction.
-          // && !deal.isConstructionDelivery
-          ) {
+          d.deal.tradeSymbol == deal.tradeSymbol
+          // Sometimes we want to allow parallel construction deliveries
+          // as a hack to let construction finish faster.  If that's not the
+          // case or this is not a construction delivery, than we should enforce
+          // our no-parallel rule.
+          &&
+          (!config.allowParallelConstructionDelivery ||
+              !d.deal.isConstructionDelivery)) {
         return false;
       }
       return filter?.call(deal) ?? true;

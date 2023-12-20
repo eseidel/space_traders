@@ -17,7 +17,7 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
-    for (int i = 0; i < 10; i++) ShipType.LIGHT_HAULER,
+    for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
     // for (int i = 0; i < 20; i++) ShipType.PROBE,
     // ShipType.REFINING_FREIGHTER,
     // ShipType.EXPLORER,
@@ -67,7 +67,7 @@ class Config {
   /// Used by sellOppsForConstruction to determine what SellOpps for
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 2000,
+    TradeSymbol.FAB_MATS: 3000,
     TradeSymbol.ADVANCED_CIRCUITRY: 8000,
   };
 
@@ -109,6 +109,11 @@ class Config {
       SystemSymbol.fromString('X1-$v'),
     ),
   );
+
+  /// Allow multiple ships to be assigned to the same construction job.
+  // This is mostly a hack around the fact that our construction can get
+  // stuck with auto-drifting ships holding the lock for 6hrs.
+  final allowParallelConstructionDelivery = true;
 }
 
 /// Our global configuration object.
