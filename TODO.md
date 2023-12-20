@@ -945,3 +945,8 @@ e.g.
 3m18s      -150      2     323  nav       CRUISE  X1-JX78-I60   X1-JX78-I61   12m42s     104
  1m9s      -150      2     304  nav       BURN    X1-JX78-I61   X1-JX78-K91   11m33s      46
   54s      -225      3     346  nav       BURN    X1-JX78-K91   X1-JX78-A1    10m39s     158
+
+  ### Teach extract_scores to consider jettisoning.
+
+  Try planning out various simulations for each mine and judge based on expected
+  total c/s? (or maybe c/r?) rather than median prices at the markets.
