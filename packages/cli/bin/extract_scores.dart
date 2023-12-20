@@ -60,6 +60,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final isSiphon = argResults['siphon'] as bool;
 
+  logger.info("Top $countLimit ${isSiphon ? 'siphon targets' : 'mines'}"
+      ' with matching markets within $maxDistance total round-trip:');
+
   final systems = await SystemsCache.loadOrFetch(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
   final charting = ChartingCache.load(fs, waypointTraits);
