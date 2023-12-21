@@ -235,6 +235,11 @@
   "description": "A wide range of equipment used by military forces, including armor, vehicles, and advanced technologies."
  },
  {
+  "symbol": "MODULE_CARGO_HOLD_I",
+  "name": "Cargo Hold",
+  "description": "A module that increases a ship's cargo capacity."
+ },
+ {
   "symbol": "MODULE_ENVOY_QUARTERS_I",
   "name": "Envoy Quarters",
   "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys."

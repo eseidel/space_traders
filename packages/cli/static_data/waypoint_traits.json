@@ -300,6 +300,11 @@
   "description": "A critical junction in the galaxy's trade network, with countless goods and services flowing through daily."
  },
  {
+  "symbol": "UNCHARTED",
+  "name": "Uncharted",
+  "description": "An unexplored region of space, full of potential discoveries and hidden dangers."
+ },
+ {
   "symbol": "UNSTABLE_COMPOSITION",
   "name": "Unstable Composition",
   "description": "A location with volatile geological composition, making it prone to frequent seismic activities and necessitating specialized construction techniques for long-term habitation or activity."
