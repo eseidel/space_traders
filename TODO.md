@@ -971,3 +971,8 @@ This might be fixed by considering jettisoning goods.
 
 The client doesn't seem to do this right now.  But did do so once I ran the
 jumpgates.dart script.
+
+### Add a way to queue a jump gate for evaluation.
+
+Right now when we complete a jump gate (or chart one) we don't have any way
+to queue the idle fetcher to process it.
