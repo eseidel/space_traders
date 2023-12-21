@@ -33,7 +33,11 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
     // Try and fetch the waypoint from the server or our cache.
     final isCharted = await waypointCache.isCharted(waypointSymbol);
     if (!isCharted) {
-      shipInfo(ship, '$waypointSymbol is missing chart, routing.');
+      shipInfo(
+        ship,
+        '$waypointSymbol (${systemWaypoint.type}) is '
+        'missing chart, routing.',
+      );
       return waypointSymbol;
     }
   }
@@ -132,7 +136,7 @@ Future<JobResult> doCharter(
     return JobResult.wait(waitTime);
   }
   if (!centralCommand.chartAsteroids) {
-    logger.warn('Charted all known systems, starting asteroid charting.');
+    logger.err('Charted all known systems, starting asteroid charting.');
     centralCommand.chartAsteroids = true;
     return JobResult.wait(null);
   }
