@@ -308,8 +308,11 @@ class CentralCommand {
       filter: avoidDealsInProgress(_behaviorCache.dealsInProgress()),
     );
 
-    logger.info('Found ${deals.length} deals for ${ship.shipSymbol} from '
-        '$startSymbol');
+    // A hack to avoid spamming the console until we add a deals cache.
+    if (deals.isNotEmpty) {
+      logger.info('Found ${deals.length} deals for ${ship.shipSymbol} from '
+          '$startSymbol');
+    }
     for (final deal in deals) {
       logger.detail(describeCostedDeal(deal));
     }
