@@ -90,6 +90,11 @@
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration."
  },
  {
+  "symbol": "ENGINE_ION_DRIVE_II",
+  "name": "Ion Drive II",
+  "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance."
+ },
+ {
   "symbol": "EQUIPMENT",
   "name": "Equipment",
   "description": "Tools and equipment used in various industries and applications."
@@ -243,6 +248,11 @@
   "symbol": "MODULE_ENVOY_QUARTERS_I",
   "name": "Envoy Quarters",
   "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys."
+ },
+ {
+  "symbol": "MODULE_MINERAL_PROCESSOR_I",
+  "name": "Mineral Processor",
+  "description": "Crushes and processes extracted minerals and ores into their component parts, filters out impurities, and containerizes them into raw storage units."
  },
  {
   "symbol": "MODULE_PASSENGER_CABIN_I",
