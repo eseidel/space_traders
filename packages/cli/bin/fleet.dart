@@ -108,9 +108,10 @@ void logShip(
   if (routePlan != null) {
     final timeLeft = timeToArrival(systemsCache, routePlan, ship);
     final destination = routePlan.endSymbol.sectorLocalName;
+    final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
     final arrival = approximateDuration(timeLeft);
-    logger.info('${indent}in transit to $destination, '
-        'arrives in $arrival');
+    logger.info('${indent}enroute to $destination $destinationType '
+        'in $arrival');
   } else {
     logger.info('$indent${_describeShipNav(ship.nav)} ${waypoint.type}');
   }
