@@ -994,3 +994,13 @@ to queue the idle fetcher to process it.
 [WARN] 🛸#B  Jump X1-AC35 to X1-UN98 (3047) expected 305 second cooldown, got 452.
 [WARN] 🛸#34 Jump X1-GQ34 to X1-ZU81 (4040) expected 404 second cooldown, got 584.
 [WARN] 🛸#2B Jump X1-RT41 to X1-XV24 (2902) expected 290 second cooldown, got 586.
+
+
+### Idle queue should use a priority queue and not just FIFO.
+
+The priority should be jumps-from-hq?
+
+### Waypoint cache is not using maxAge.
+
+We should be scanning a system before we travel to it.  But right now we
+don't respect the maxAge so we'll think it's always uncharted.
