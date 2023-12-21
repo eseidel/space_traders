@@ -12,10 +12,10 @@ class IdleQueue {
 
   /// Queue a system for fetching.
   void queueSystem(SystemSymbol systemSymbol) {
-    if (_seen.contains(systemSymbol)) {
+    if (_seen.contains(systemSymbol) || _systems.contains(systemSymbol)) {
       return;
     }
-    logger.detail('Queuing: $systemSymbol');
+    logger.info('Queuing (${_systems.length}): $systemSymbol');
     _systems.add(systemSymbol);
   }
 
@@ -24,7 +24,7 @@ class IdleQueue {
     Caches caches,
     SystemSymbol systemSymbol,
   ) async {
-    logger.detail('Process: $systemSymbol');
+    logger.detail('Process (${_systems.length}): $systemSymbol');
     _seen.add(systemSymbol);
     final waypoints = caches.systems.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {

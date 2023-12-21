@@ -115,19 +115,6 @@ bool isWaypointAlreadyChartedException(ApiException e) {
   return isAPIExceptionWithCode(e, 4230);
 }
 
-/// Returns true if the inner exception is a windows semaphore timeout.
-/// This is a workaround for some behavior in windows I do not understand.
-/// These seem to occur only once every few hours at random.
-bool isWindowsSemaphoreTimeout(ApiException e) {
-  final innerException = e.innerException;
-  if (innerException == null) {
-    return false;
-  }
-  return innerException
-      .toString()
-      .contains('The semaphore timeout period has expired.');
-}
-
 // ApiException 400: {"error":{"message":"Market purchase failed. Agent
 // does not have sufficient credits to purchase 10 unit(s) of
 // MODULE_MINERAL_PROCESSOR_I","code":4600,"data":{"agentCredits":44815,

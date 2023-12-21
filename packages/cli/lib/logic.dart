@@ -42,21 +42,34 @@ Future<void> advanceShips(
   Database db,
   CentralCommand centralCommand,
   Caches caches,
+  IdleQueue queue,
   ShipWaiter waiter, {
   required int loopCount,
   bool Function(Ship ship)? shipFilter,
 }) async {
-  // TODO(eseidel): Should this move out to the caller?
-  final queue = IdleQueue()..queueSystem(caches.agent.headquartersSystemSymbol);
-
   // loopCount is only used to control how often we reset our waypoint and
   // market caches.  If we got rid of those we could get rid of loopCount.
   await caches.updateAtTopOfLoop(api);
+  final reachableSystems = caches.systemConnectivity
+      .systemsReachableFrom(caches.agent.headquartersSystemSymbol)
+      .toSet();
   await centralCommand.advanceCentralPlanning(api, caches);
-  // final didReconnect = await db.reconnectIfNeeded();
-  // if (didReconnect) {
-  //   logger.warn('Reconnected to database.');
-  // }
+  // TODO(eseidel): I'm not sure this will actually work, but trying:
+  // If the queue is done yet our reachability just changed, queue the newly
+  // reachable systems for continuing.
+  if (queue.isDone) {
+    final newReachableSystems = caches.systemConnectivity
+        .systemsReachableFrom(caches.agent.headquartersSystemSymbol)
+        .toSet();
+    final newlyReachable = newReachableSystems.difference(reachableSystems);
+    if (newlyReachable.isNotEmpty) {
+      logger.info('🚀  ${newlyReachable.length} newly reachable systems: '
+          '$newlyReachable');
+    }
+    for (final system in newlyReachable) {
+      queue.queueSystem(system);
+    }
+  }
 
   const allowableScheduleLag = Duration(milliseconds: 1000);
 
@@ -179,7 +192,7 @@ class RateLimitTracker {
 }
 
 /// Run the logic loop forever.
-Future<void> logic(
+Future<Never> logic(
   Api api,
   Database db,
   CentralCommand centralCommand,
@@ -193,20 +206,17 @@ Future<void> logic(
       shipFilter: shipFilter,
     );
   final rateLimitTracker = RateLimitTracker(api);
+  final queue = IdleQueue()..queueSystem(caches.agent.headquartersSystemSymbol);
 
   while (true) {
     rateLimitTracker.printStatsIfNeeded();
-    // Get the next ship from the priority queue.
-    // Figure out what the next time it's ready is.
-    // Wait until then?
-    // advance the ship
-    // loop.
     try {
       await advanceShips(
         api,
         db,
         centralCommand,
         caches,
+        queue,
         waiter,
         shipFilter: shipFilter,
         loopCount: 20,
@@ -224,19 +234,7 @@ Future<void> logic(
       // weekly to bi-weekly frequency during alpha. After a reset, you should
       // re-register your agent. Expected: 2023-06-03, Actual: 2023-05-20",
       // "code":401,"data":{"expected":"2023-06-03","actual":"2023-05-20"}}}
-
-      // Need to handle temporary service unavailable.
-      // ApiException 503: Service Unavailable
-      // Just use exponential backoff until it comes back.
-
-      if (!isWindowsSemaphoreTimeout(e)) {
-        rethrow;
-      }
-      // ignore windows semaphore timeout
-      logger.warn('Ignoring windows semaphore timeout exception, waiting 5s.');
-      // I've seen up to 4 of these happen in a row, so wait a few seconds for
-      // the system to recover.
-      await Future<void>.delayed(const Duration(seconds: 2));
+      rethrow;
     }
   }
 }
