@@ -87,6 +87,9 @@ class ChartingRecord {
   /// The timestamp for this record.
   final DateTime timestamp;
 
+  /// Whether this waypoint was charted at record time.
+  bool get isCharted => values != null;
+
   /// Converts this charting record to JSON data.
   Map<String, dynamic> toJson() => <String, dynamic>{
         'values': values?.toJson(),
@@ -249,13 +252,19 @@ class ChartingCache extends JsonStore<_Record> {
   /// The waypoint symbols in the cache.
   Iterable<WaypointSymbol> get waypointSymbols => _valuesBySymbol.keys;
 
+  /// Charting records for the given system.
+  Iterable<ChartingRecord> recordsInSystem(SystemSymbol systemSymbol) =>
+      records.where((r) => r.waypointSymbol.systemSymbol == systemSymbol);
+
   /// The waypoint symbols with charts in the given system.
   // If ChartingCache changes to cache negative values (e.g. "no chart")
   // this will need to be updated.
   Iterable<WaypointSymbol> waypointsWithChartInSystem(
     SystemSymbol systemSymbol,
   ) =>
-      waypointSymbols.where((s) => s.systemSymbol == systemSymbol);
+      recordsInSystem(systemSymbol)
+          .where((r) => r.isCharted)
+          .map((r) => r.waypointSymbol);
 
   /// Adds a charting record to the cache.
   void addRecord(
