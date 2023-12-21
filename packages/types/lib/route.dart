@@ -12,6 +12,8 @@ enum RouteActionType {
   /// Jump between two jump gates.
   jump,
 
+  // TODO(eseidel): Add cooldown type for waiting for cooldown?
+
   /// Refuel at a the local market.
   refuel,
 
@@ -20,10 +22,6 @@ enum RouteActionType {
 
   /// Travel between two waypoints in the same system at cruise speed.
   navCruise;
-
-  // NAV_BURN,
-  // WARP_DRIFT,
-  // WARP_CRUISE,
 
   /// Returns true if this action uses the reactor.
   bool get usesReactor {
@@ -76,9 +74,8 @@ class RouteAction {
       type: RouteActionType.values.firstWhere(
         (e) => e.name == json['type'] as String,
       ),
-      // Nullability can be removed later.
-      seconds: json['seconds'] as int? ?? json['duration'] as int,
-      fuelUsed: json['fuelUsed'] as int? ?? 0,
+      seconds: json['seconds'] as int,
+      fuelUsed: json['fuelUsed'] as int,
       // cooldown: json['cooldown'] as int,
     );
   }

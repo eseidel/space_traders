@@ -94,24 +94,6 @@ class _Clusters {
           .map((e) => e.key);
 }
 
-// Used for converting a partial graph to a fully connected graph.
-// Makes it easy to write tests listing just single direction connections.
-// Map<SystemSymbol, Set<SystemSymbol>> _fullyConnect(
-//   Map<SystemSymbol, Set<SystemSymbol>> partial,
-// ) {
-//   final fullyConnected = <SystemSymbol, Set<SystemSymbol>>{};
-//   for (final systemSymbol in partial.keys) {
-//     final connectedSymbols = partial[systemSymbol] ?? {};
-//     for (final connectedSymbol in connectedSymbols) {
-//       fullyConnected.putIfAbsent(systemSymbol,
-//        () => {}).add(connectedSymbol);
-//       fullyConnected.putIfAbsent(connectedSymbol,
-//        () => {}).add(systemSymbol);
-//     }
-//   }
-//   return fullyConnected;
-// }
-
 /// Returns true if it's possible to jump from the provided jumpgate.
 /// it's important to also check if it's possible to jump to the destination.
 bool canJumpFrom(
