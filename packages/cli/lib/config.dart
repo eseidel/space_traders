@@ -18,9 +18,9 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
-    for (int i = 0; i < 20; i++) ShipType.PROBE,
-    // ShipType.REFINING_FREIGHTER,
-    // ShipType.EXPLORER,
+    for (int i = 0; i < 40; i++) ShipType.PROBE,
+    ShipType.REFINING_FREIGHTER,
+    ShipType.EXPLORER,
   ];
 
   /// A list of which haulers should be used as miner haulers.
