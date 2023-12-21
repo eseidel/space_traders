@@ -18,7 +18,7 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
-    // for (int i = 0; i < 20; i++) ShipType.PROBE,
+    for (int i = 0; i < 20; i++) ShipType.PROBE,
     // ShipType.REFINING_FREIGHTER,
     // ShipType.EXPLORER,
   ];
@@ -67,7 +67,7 @@ class Config {
   /// Used by sellOppsForConstruction to determine what SellOpps for
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 3000,
+    TradeSymbol.FAB_MATS: 4000,
     TradeSymbol.ADVANCED_CIRCUITRY: 8000,
   };
 
