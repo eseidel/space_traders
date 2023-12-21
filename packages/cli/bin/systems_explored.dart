@@ -7,6 +7,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipyardPrices = ShipyardPrices.load(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
   final chartingCache = ChartingCache.load(fs, waypointTraits);
+  final systemsCache = SystemsCache.load(fs)!;
 
   // Having market price data is a good proxy for if we've explored something.
   final systemsWithMarketPrices =
@@ -16,17 +17,33 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       'Symbol',
       'Markets',
       'Shipyards',
-      'Charts',
+      'Charted',
+      'Asteroids',
     ],
     style: const TableStyle(compact: true),
   );
 
-  for (final system in systemsWithMarketPrices) {
+  String progressString(int count, int total) {
+    if (count == total) return '✅';
+    return '$count/$total';
+  }
+
+  for (final systemSymbol in systemsWithMarketPrices) {
+    final system = systemsCache[systemSymbol];
+    final chartedSymbols =
+        chartingCache.waypointsWithChartInSystem(systemSymbol);
+    final waypointCount = system.waypoints.length;
+    final asteroidSymbols = system.waypoints
+        .where((w) => w.isAsteroid)
+        .map((a) => a.waypointSymbol);
+    final chartedAsteroids = asteroidSymbols.where(chartedSymbols.contains);
+
     table.add([
-      system.systemName,
-      marketPrices.waypointsWithPricesInSystem(system).length,
-      shipyardPrices.waypointsWithPricesInSystem(system).length,
-      chartingCache.waypointsWithChartInSystem(system).length,
+      systemSymbol.systemName,
+      marketPrices.waypointsWithPricesInSystem(systemSymbol).length,
+      shipyardPrices.waypointsWithPricesInSystem(systemSymbol).length,
+      progressString(chartedSymbols.length, waypointCount),
+      progressString(chartedAsteroids.length, asteroidSymbols.length),
     ]);
   }
 
