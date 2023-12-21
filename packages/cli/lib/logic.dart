@@ -3,6 +3,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/idle_queue.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/net/counts.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/ship_waiter.dart';
@@ -32,7 +33,18 @@ Future<void> _runIdleTasksIfPossible(
   }
   while (!queue.isDone &&
       DateTime.timestamp().add(queue.minProcessingTime).isBefore(waitUntil)) {
-    await queue.runOne(api, caches);
+    await captureTimeAndRequests(
+      api.requestCounts,
+      () async => await queue.runOne(api, caches),
+      onComplete: (duration, requestCount) {
+        if (duration > queue.minProcessingTime) {
+          logger.warn(
+            'idle queue took too long ${duration.inMilliseconds}ms '
+            '($requestCount requests)',
+          );
+        }
+      },
+    );
   }
 }
 
@@ -101,30 +113,31 @@ Future<void> advanceShips(
         }
       }
 
-      final requestsBefore = api.requestCounts.totalRequests;
-      final nextWaitUntil = await advanceShipBehavior(
-        api,
-        db,
-        centralCommand,
-        caches,
-        ship,
-      );
-      final after = DateTime.timestamp();
-      final duration = after.difference(before);
-      final requestsAfter = api.requestCounts.totalRequests;
-      final requests = requestsAfter - requestsBefore;
-      final behaviorState = caches.behaviors.getBehavior(shipSymbol);
-      final expectedSeconds = requests / api.maxRequestsPerSecond;
-      if (duration.inSeconds > expectedSeconds * 1.2) {
-        final behaviorName = behaviorState?.behavior.name;
-        final behaviorString = behaviorName == null ? '' : '($behaviorName) ';
-        shipWarn(
+      final nextWaitUntil = await captureTimeAndRequests(
+        api.requestCounts,
+        () async => await advanceShipBehavior(
+          api,
+          db,
+          centralCommand,
+          caches,
           ship,
-          '$behaviorString'
-          'took ${duration.inSeconds}s ($requests requests) '
-          'expected ${expectedSeconds.toStringAsFixed(1)}s',
-        );
-      }
+        ),
+        onComplete: (duration, requestCount) {
+          final behaviorState = caches.behaviors.getBehavior(shipSymbol);
+          final expectedSeconds = requestCount / api.maxRequestsPerSecond;
+          if (duration.inSeconds > expectedSeconds * 1.2) {
+            final behaviorName = behaviorState?.behavior.name;
+            final behaviorString =
+                behaviorName == null ? '' : '($behaviorName) ';
+            shipWarn(
+              ship,
+              '$behaviorString'
+              'took ${duration.inSeconds}s ($requestCount requests) '
+              'expected ${expectedSeconds.toStringAsFixed(1)}s',
+            );
+          }
+        },
+      );
       waiter.scheduleShip(shipSymbol, nextWaitUntil);
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when

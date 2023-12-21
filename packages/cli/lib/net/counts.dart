@@ -54,3 +54,20 @@ class CountingApiClient extends ApiClient {
     );
   }
 }
+
+/// Run a function and record time and request count.
+Future<T> captureTimeAndRequests<T>(
+  RequestCounts requestCounts,
+  Future<T> Function() fn, {
+  required void Function(Duration duration, int requestCount) onComplete,
+}) async {
+  final before = DateTime.timestamp();
+  final requestsBefore = requestCounts.totalRequests;
+  final result = await fn();
+  final after = DateTime.timestamp();
+  final duration = after.difference(before);
+  final requestsAfter = requestCounts.totalRequests;
+  final requests = requestsAfter - requestsBefore;
+  onComplete(duration, requests);
+  return result;
+}
