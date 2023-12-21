@@ -69,6 +69,7 @@ class IdleQueue {
 
   Future<void> _processNextJumpGate(Api api, Caches caches) async {
     final to = _jumpGates.take();
+    logger.detail('Process (${_jumpGates.length}): $to');
     // Make sure we have construction data for the destination before
     // checking if we can jump there.
     await caches.waypoints.isUnderConstruction(to);
@@ -124,16 +125,16 @@ class IdleQueue {
     if (isDone) {
       return;
     }
-    if (_jumpGates.isNotEmpty) {
-      await _processNextJumpGate(api, caches);
-      return;
-    }
     if (_systems.isNotEmpty) {
       await _processNextSystem(api, caches);
+      return;
+    }
+    if (_jumpGates.isNotEmpty) {
+      await _processNextJumpGate(api, caches);
       return;
     }
   }
 
   /// Returns true when the queue is empty.
-  bool get isDone => _systems.isEmpty;
+  bool get isDone => _systems.isEmpty && _jumpGates.isEmpty;
 }
