@@ -279,8 +279,9 @@ Future<NavResult> continueNavigationIfNeeded(
         final fuelNeeded = action.fuelUsed;
         jobAssert(
           fuelNeeded <= ship.fuel.capacity,
-          'Planned navigation requires more fuel '
-          'than ship can hold (${ship.fuel.capacity} < $fuelNeeded)',
+          'Planned navigation from ${action.startSymbol} to ${action.endSymbol} '
+          'requires more fuel than ${ship.symbol} can hold '
+          '(${ship.fuel.capacity} < $fuelNeeded)',
           const Duration(minutes: 5),
         );
         if (fuelNeeded > ship.fuel.current) {
