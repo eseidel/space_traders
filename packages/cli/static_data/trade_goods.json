@@ -245,9 +245,19 @@
   "description": "A module that increases a ship's cargo capacity."
  },
  {
+  "symbol": "MODULE_CARGO_HOLD_II",
+  "name": "Expanded Cargo Hold",
+  "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo."
+ },
+ {
   "symbol": "MODULE_ENVOY_QUARTERS_I",
   "name": "Envoy Quarters",
   "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys."
+ },
+ {
+  "symbol": "MODULE_GAS_PROCESSOR_I",
+  "name": "Gas Processor",
+  "description": "Filters and processes extracted gases into their component parts, filters out impurities, and containerizes them into raw storage units."
  },
  {
   "symbol": "MODULE_MINERAL_PROCESSOR_I",
@@ -285,6 +295,11 @@
   "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies more efficiently and at a higher rate."
  },
  {
+  "symbol": "MOUNT_LASER_CANNON_I",
+  "name": "Laser Cannon",
+  "description": "A basic laser weapon that fires concentrated beams of energy at high speed and accuracy."
+ },
+ {
   "symbol": "MOUNT_MINING_LASER_I",
   "name": "Mining Laser I",
   "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects."
@@ -298,6 +313,11 @@
   "symbol": "MOUNT_MISSILE_LAUNCHER_I",
   "name": "Missile Launcher",
   "description": "A basic missile launcher that fires guided missiles with a variety of warheads for different targets."
+ },
+ {
+  "symbol": "MOUNT_SENSOR_ARRAY_I",
+  "name": "Sensor Array I",
+  "description": "A basic sensor array that improves a ship's ability to detect and track other objects in space."
  },
  {
   "symbol": "MOUNT_SURVEYOR_I",
@@ -365,9 +385,19 @@
   "description": "High-purity quartz sand used in the production of glass and ceramics."
  },
  {
+  "symbol": "REACTOR_CHEMICAL_I",
+  "name": "Chemical Reactor I",
+  "description": "A basic chemical power reactor, used to generate electricity from chemical reactions."
+ },
+ {
   "symbol": "REACTOR_FISSION_I",
   "name": "Fission Reactor I",
   "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions."
+ },
+ {
+  "symbol": "REACTOR_SOLAR_I",
+  "name": "Solar Reactor I",
+  "description": "A basic solar power reactor, used to generate electricity from solar energy."
  },
  {
   "symbol": "RELIC_TECH",
