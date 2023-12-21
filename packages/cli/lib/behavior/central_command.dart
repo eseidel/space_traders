@@ -44,7 +44,7 @@ class CentralCommand {
   final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
 
   /// Should we chart asteroids?
-  bool chartAsteroids = false;
+  bool chartAsteroids = true;
 
   /// The next planned ship buy job.
   /// This is the start of an imagined job queue system, whereby we pre-populate
