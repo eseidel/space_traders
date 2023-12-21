@@ -946,7 +946,28 @@ e.g.
  1m9s      -150      2     304  nav       BURN    X1-JX78-I61   X1-JX78-K91   11m33s      46
   54s      -225      3     346  nav       BURN    X1-JX78-K91   X1-JX78-A1    10m39s     158
 
-  ### Teach extract_scores to consider jettisoning.
+### Teach extract_scores to consider jettisoning.
 
-  Try planning out various simulations for each mine and judge based on expected
-  total c/s? (or maybe c/r?) rather than median prices at the markets.
+Try planning out various simulations for each mine and judge based on expected
+total c/s? (or maybe c/r?) rather than median prices at the markets.
+
+### Add a script to examine extract/market scores of a single market:
+
+So I can better understand why we don't chose specific mining locations, e.g.
+for a supply chain.
+
+% dart run bin/exports_supply_chain.dart 
+Sourcing FAB_MATS for AC35-I59
+Shuttle FAB_MATS from AC35-F51 (SCARCE, RESTRICTED) to AC35-I59 (no market) distance = 449
+ Manufacture FAB_MATS at AC35-F51 (SCARCE, RESTRICTED)
+  Shuttle IRON from AC35-H55 (SCARCE, RESTRICTED) to AC35-F51 (LIMITED, GROWING) distance = 90
+   Manufacture IRON at AC35-H55 (SCARCE, RESTRICTED)
+    Extract IRON_ORE from AC35-C43, deliver to AC35-H55 (SCARCE, GROWING) distance = 158
+  Extract QUARTZ_SAND from AC35-C43, deliver to AC35-F51 (SCARCE, WEAK) distance = 229
+
+This might be fixed by considering jettisoning goods.
+
+### Support jumping when the other side of the gate is uncharted.
+
+The client doesn't seem to do this right now.  But did do so once I ran the
+jumpgates.dart script.
