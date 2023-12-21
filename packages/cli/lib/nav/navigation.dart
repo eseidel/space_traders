@@ -4,7 +4,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
-import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
@@ -228,34 +227,16 @@ Future<NavResult> continueNavigationIfNeeded(
       shipWarn(ship, 'Empty route action, assuming we are already there.');
       return NavResult._continueAction();
     case RouteActionType.jump:
-      final JumpShip200ResponseData response;
-      try {
-        response = await useJumpGateAndLog(
-          api,
-          db,
-          caches.marketPrices,
-          caches.agent,
-          caches.ships,
-          ship,
-          actionEnd.waypointSymbol,
-        );
-      } on ApiException catch (e) {
-        // There is a bug where some markets don't have antimatter.
-        if (isMarketDoesNotSellAntimatterException(e)) {
-          shipErr(
-            ship,
-            'Jumpgate ${action.startSymbol} is broken, '
-            'no antimatter for sale',
-          );
-          caches.jumpGates.markBroken(action.startSymbol);
-          caches.updateRoutingCaches();
-          throw JobException(
-            'Jumpgate ${action.startSymbol} is broken',
-            const Duration(minutes: 1),
-          );
-        }
-        rethrow;
-      }
+      final response = await useJumpGateAndLog(
+        api,
+        db,
+        caches.marketPrices,
+        caches.agent,
+        caches.ships,
+        ship,
+        actionEnd.waypointSymbol,
+      );
+
       _verifyJumpTime(
         caches.systems,
         ship,

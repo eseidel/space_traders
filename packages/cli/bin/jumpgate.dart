@@ -33,10 +33,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final isUnderConstrustion =
         await waypointCache.isUnderConstruction(jumpGateSymbol);
 
-    final record = jumpGateCache.recordForSymbol(jumpGateSymbol);
-    if (record != null && record.isBroken) {
-      return 'broken';
-    }
     if (isUnderConstrustion) {
       final construction = constructionCache[jumpGateSymbol];
       final progress = describeConstructionProgress(construction);

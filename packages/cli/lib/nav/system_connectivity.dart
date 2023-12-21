@@ -120,8 +120,8 @@ bool canJumpFrom(
   WaypointSymbol from,
 ) {
   final fromRecord = jumpGateCache.recordForSymbol(from);
-  // If we don't know about the fromGate or it's broken, we can't jump.
-  if (fromRecord == null || fromRecord.isBroken) {
+  // If we don't know about the fromGate, we can't jump.
+  if (fromRecord == null) {
     return false;
   }
   final fromUnderConstruction = constructionCache.isUnderConstruction(from);
@@ -142,12 +142,6 @@ bool canJumpTo(
   final toUnderConstruction = constructionCache.isUnderConstruction(to);
   // If we don't know or it's not complete, assume we can't jump.
   if (toUnderConstruction == null || toUnderConstruction == true) {
-    return false;
-  }
-  // If the toGate is broken, we technically could jump there, but we couldn't
-  // get back.
-  final toGate = jumpGateCache.recordForSymbol(to);
-  if (toGate != null && toGate.isBroken) {
     return false;
   }
   return true;

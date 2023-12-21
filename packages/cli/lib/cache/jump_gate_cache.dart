@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -15,7 +14,6 @@ class JumpGateRecord extends Equatable {
     required this.waypointSymbol,
     required this.connections,
     required this.timestamp,
-    this.isBroken = false,
   });
 
   /// Creates a new JumpGateRecord from a JumpGate.
@@ -40,7 +38,6 @@ class JumpGateRecord extends Equatable {
           .toSet(),
       timestamp: DateTime.parse(json['timestamp'] as String),
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-      isBroken: json['isBroken'] as bool? ?? false,
     );
   }
 
@@ -53,9 +50,6 @@ class JumpGateRecord extends Equatable {
   /// The connections for this jump gate.
   final Set<WaypointSymbol> connections;
 
-  /// Record that a jump gate is broken (bug in the game).
-  final bool isBroken;
-
   /// The connected system symbols.
   Set<SystemSymbol> get connectedSystemSymbols =>
       connections.map((e) => e.systemSymbol).toSet();
@@ -67,14 +61,13 @@ class JumpGateRecord extends Equatable {
       );
 
   @override
-  List<Object?> get props => [waypointSymbol, timestamp, connections, isBroken];
+  List<Object?> get props => [waypointSymbol, timestamp, connections];
 
   /// Converts this object to a JSON encodable object.
   Map<String, dynamic> toJson() => <String, dynamic>{
         'timestamp': timestamp.toIso8601String(),
         'connections': connections.map((e) => e.toJson()).sorted(),
         'waypointSymbol': waypointSymbol.toJson(),
-        'isBroken': isBroken,
       };
 }
 
@@ -153,23 +146,6 @@ class JumpGateCache extends JsonListStore<JumpGateRecord> {
       return null;
     }
     return getNow().difference(record.timestamp);
-  }
-
-  /// Marks a jump gate as broken.
-  void markBroken(WaypointSymbol waypointSymbol) {
-    final record = recordForSymbol(waypointSymbol);
-    if (record == null) {
-      logger.err('Unable to mark broken: $waypointSymbol');
-      return;
-    }
-    updateJumpGate(
-      JumpGateRecord(
-        connections: record.connections,
-        timestamp: record.timestamp,
-        waypointSymbol: record.waypointSymbol,
-        isBroken: true,
-      ),
-    );
   }
 
   /// Gets the JumpGate for the given waypoint symbol.

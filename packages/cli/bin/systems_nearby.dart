@@ -22,10 +22,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       systemConnectivity.directlyConnectedSystemSymbols(startSystemSymbol);
   if (connectedSystemSymbols.isEmpty) {
     logger.info('No systems connected to $startSystemSymbol.');
-    final records = jumpGateCache.recordsForSystem(startSystemSymbol);
-    if (records.first.isBroken) {
-      logger.info('  Jump gate is broken.');
-    }
     return;
   }
   for (final connectedSystemSymbol in connectedSystemSymbols) {
