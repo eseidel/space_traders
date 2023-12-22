@@ -1,12 +1,10 @@
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
+import 'package:db/config.dart';
 import 'package:meta/meta.dart';
 import 'package:types/price.dart';
 import 'package:types/types.dart';
-
-/// default max age for "recent" prices is 3 days
-const defaultMaxAge = Duration(days: 3);
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.

@@ -4,6 +4,7 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
+import 'package:db/config.dart';
 import 'package:db/construction.dart';
 import 'package:types/types.dart';
 
@@ -49,7 +50,10 @@ class WaypointCache {
   }
 
   /// Synthesizes a waypoint from cached values if possible.
-  Future<Waypoint?> waypointFromCaches(WaypointSymbol waypointSymbol) async {
+  Future<Waypoint?> waypointFromCaches(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
     final values = _chartingCache[waypointSymbol];
     if (values == null) {
       return null;
@@ -67,6 +71,7 @@ class WaypointCache {
 
     final isUnderConstruction = await _constructionCache.isUnderConstruction(
       waypointSymbol,
+      maxAge: maxAge,
     );
     if (isUnderConstruction == null) {
       logger.warn('Construction cache missing construction: $waypointSymbol');

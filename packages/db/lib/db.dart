@@ -1,3 +1,4 @@
+import 'package:db/config.dart';
 import 'package:db/construction.dart';
 import 'package:db/extraction.dart';
 import 'package:db/faction.dart';
@@ -8,44 +9,7 @@ import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart';
 import 'package:types/types.dart';
 
-/// Connection information for the database.
-/// This is split off from Database to allow Database to re-connect
-/// if needed.
-class DatabaseConfig {
-  /// Create a new database config.
-  DatabaseConfig({
-    required this.host,
-    required this.port,
-    required this.database,
-    required this.username,
-    required this.password,
-  });
-
-  /// Host of the database.
-  final String host;
-
-  /// Port of the database.
-  final int port;
-
-  /// Name of the database.
-  final String database;
-
-  /// Username to connect to the database.
-  final String username;
-
-  /// Password to connect to the database.
-  final String password;
-}
-
-DatabaseConfig _defaultConfig() {
-  return DatabaseConfig(
-    host: 'localhost',
-    port: 5432,
-    database: 'spacetraders',
-    username: 'postgres',
-    password: 'password',
-  );
-}
+export 'package:db/config.dart';
 
 /// Connect to the default local database.
 /// Logs and returns null on failure.
@@ -53,7 +17,8 @@ Future<Database> defaultDatabase({
   PostgreSQLConnection Function(DatabaseConfig config) createConnection =
       connectionFromConfig,
 }) async {
-  final db = Database(_defaultConfig(), createConnection: createConnection);
+  final db =
+      Database(defaultDatabaseConfig, createConnection: createConnection);
   await db.open();
   return db;
 }
@@ -205,6 +170,16 @@ class Database {
   /// Insert an extraction into the database.
   Future<void> insertExtraction(ExtractionRecord extraction) async =>
       insertOne(insertExtractionQuery(extraction));
+
+  /// Get a construction record from the database.
+  Future<ConstructionRecord?> getConstruction(
+    WaypointSymbol waypointSymbol,
+    Duration maxAge,
+  ) =>
+      queryOne(
+        getConstructionQuery(waypointSymbol, maxAge),
+        constructionFromColumnMap,
+      );
 
   /// Return all construction records.
   Future<Iterable<ConstructionRecord>> allConstructionRecords() async =>

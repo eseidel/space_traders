@@ -4,6 +4,7 @@ import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
+import 'package:db/config.dart';
 import 'package:file/file.dart';
 import 'package:types/types.dart';
 

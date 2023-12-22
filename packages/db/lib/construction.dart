@@ -38,6 +38,19 @@ Query upsertConstructionQuery(ConstructionRecord record) {
   );
 }
 
+/// Get a ConstructionRecord from the database.
+Query getConstructionQuery(WaypointSymbol waypointSymbol, Duration maxAge) {
+  return Query(
+    'SELECT * FROM construction_ '
+    'WHERE waypoint_symbol = @waypoint_symbol '
+    'AND timestamp > @timestamp',
+    substitutionValues: {
+      'waypoint_symbol': waypointSymbol.toJson(),
+      'timestamp': DateTime.timestamp().subtract(maxAge),
+    },
+  );
+}
+
 /// Select all ConstructionRecords from the database.
 Query allConstructionQuery() {
   return const Query('SELECT * FROM construction_');
@@ -58,13 +71,18 @@ class ConstructionCache {
   }
 
   /// Load a ConstructionRecord from the database.
-  Future<ConstructionRecord?> getRecord(WaypointSymbol waypointSymbol) async {
-    return null;
-  }
+  Future<ConstructionRecord?> getRecord(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async =>
+      _db.getConstruction(waypointSymbol, maxAge);
 
   /// Load the Construction value for the given waypoint symbol.
-  Future<Construction?> getConstruction(WaypointSymbol waypointSymbol) async {
-    return (await getRecord(waypointSymbol))?.construction;
+  Future<Construction?> getConstruction(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
+    return (await getRecord(waypointSymbol, maxAge: maxAge))?.construction;
   }
 
   /// Returns the age of the cache for the given waypoint symbol.
@@ -79,8 +97,12 @@ class ConstructionCache {
   /// Returns true if the given waypoint symbol is under construction.
   /// Returns false if the given waypoint symbol is not under construction.
   /// Returns null if the given waypoint symbol is not in the cache.
-  Future<bool?> isUnderConstruction(WaypointSymbol waypointSymbol) async {
-    return (await getRecord(waypointSymbol))?.isUnderConstruction;
+  Future<bool?> isUnderConstruction(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
+    return (await getRecord(waypointSymbol, maxAge: maxAge))
+        ?.isUnderConstruction;
   }
 
   /// Update the construction value for the given waypoint symbol.
