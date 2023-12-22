@@ -752,60 +752,6 @@ are needed, you'll still end up with two 40-sized trades going.
 
 ### Reduce manual construction of CostedDeal in tests.
 
-### Planned navigation requires more fuel than we have.
-
-Probably the fuel specs on the COMMAND ship are wrong?
-
-🛸#1  ✈️  to JX78-I60, 0ms left
-🛸#1  ☢️   1 ANTIMATTER           +0% +46c per   1 x 14,190c = -14,190c -> 🏦 116,260,187c
-🛸#1  Used Jump Gate to X1-NB34
-[WARN] 🛸#1  Jump X1-JX78 to X1-NB34 (6663) expected 666 second cooldown, got 945.
-Error advancing ship behavior: JobException: Planned navigation requires more fuel than ship can hold (400 < 486), timeout: 0:05:00.000000
-Found 11 deals for ESEIDEL-1 from NB34-I55
-🛸#1  Found deal: AMMUNITION                 NB34-F48      1,075c -> NB34-E46      1,639c  +22,128c (51%) 9m  43c/s  43,432c
-🛸#1  Starting: NB34-I55 to NB34-F48 speed: 30 max-fuel: 400
-navCruise       NB34-I55  NB34-I56  0:03:17.000000s
-refuel          NB34-I56  NB34-I56  0:00:00.000000s
-navCruise       NB34-I56  NB34-F48  0:03:32.000000s
-in 7m uses 456 fuel
-
-[WARN] 🛸#1  Beginning route to NB34-F48 (7m)
-🛸#1  ⛽   3 FUEL                           ⚖️    3 x     72c =   -216c -> 🏦 116,259,971c
-[WARN] 🛸#1  Fuel low: 95 / 400
-
-🛸#1  Found deal: SHIP_PLATING               NB34-D45      6,345c -> NB34-A2       7,209c   +4,968c (13%) 3m  24c/s  38,286c
-🛸#1  Market at NB34-C42 doesn't buy ANTIMATTER
-🛸#1  Cargo hold not empty, finding market to sell ANTIMATTER.
-🛸#1  Selecting JX78-I60 earns 86,590c extra (including -13,924c for fuel) over 6m (261.6/s)
-[WARN] 🛸#1  Beginning route to JX78-I60 (8m)
-[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.trader for ESEIDEL-1 for 5m.
-[WARN] 🛸#1  No mine job. Disabling Behavior.miner for ESEIDEL-1 for 10m.
-🛸#1  Starting: NB34-C42 to JX78-C43 speed: 30 max-fuel: 400
-navCruise       NB34-C42  NB34-I55 8m 545 fuel
-jump            NB34-I55  JX78-I60 0ms 0 fuel
-navCruise       JX78-I60  JX78-C43 8m 539 fuel
-in 16m uses 1084 fuel
-
-[WARN] 🛸#1  Beginning route to JX78-C43 (16m)
-[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.siphoner for ESEIDEL-1 for 5m.
-
-🛸#1  Found deal: SHIP_PLATING               NB34-D45      6,345c -> NB34-H52      7,279c   +5,460c (14%) 3m  30c/s  38,214c
-🛸#1  ✍️  market data @ NB34-C42
-🛸#1  Market at NB34-C42 doesn't buy ANTIMATTER
-🛸#1  Cargo hold not empty, finding market to sell ANTIMATTER.
-🛸#1  Selecting JX78-I60 earns 86,590c extra (including -14,415c for fuel) over 6m (261.6/s)
-[WARN] 🛸#1  Beginning route to JX78-I60 (8m)
-[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.trader for ESEIDEL-1 for 5m.
-[WARN] 🛸#1  No mine job. Disabling Behavior.miner for ESEIDEL-1 for 10m.
-🛸#1  Starting: NB34-C42 to JX78-C43 speed: 30 max-fuel: 400
-navCruise       NB34-C42  NB34-I55 8m 545 fuel
-jump            NB34-I55  JX78-I60 0ms 0 fuel
-navCruise       JX78-I60  JX78-C43 8m 539 fuel
-in 16m uses 1084 fuel
-
-[WARN] 🛸#1  Beginning route to JX78-C43 (16m)
-[WARN] 🛸#1  Planned navigation requires more fuel than ship can hold (400 < 545) Disabling Behavior.siphoner for ESEIDEL-1 for 5m.
-
 ### Miner Haulers still confused:
 
 ⏱️  2s until 2023-12-10 16:18:27.064
@@ -1005,77 +951,7 @@ The priority should be jumps-from-hq?
 We should be scanning a system before we travel to it.  But right now we
 don't respect the maxAge so we'll think it's always uncharted.
 
+### Idle queue should do all jump=1 jumpGates and Systems before jump=2.
 
-### Fuel planning error
-
-
-[WARN] 🛸#1  No profitable deals near X1-ZH60-BD5B.
-Found 1 deals for ESEIDEL-1 from TR6-E20C
-🛸#1  Found placement: 5c/s 1037 2366 TR6-E20C
-🛸#1  Potential: ANTIMATTER                 TR6-E20C     13,935c -> AC35-I59     14,707c   +2,592c  (0%) 8m   5c/s 585,688c
-🛸#1  Starting: ZH60-BD5B to TR6-E20C speed: 30 max-fuel: 400
-navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
-jump            ZH60-EF7Z  U3-X22D 6m 0 fuel
-jump            U3-X22D  QH24-CX9Z 5m 0 fuel
-jump            QH24-CX9Z  VJ15-D20Z 2m 0 fuel
-jump            VJ15-D20Z  TR6-E20C 0ms 0 fuel
-in 20m uses 493 fuel
-
-[WARN] 🛸#1  Beginning route to TR6-E20C (20m)
-[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.trader for ESEIDEL-1 for 5m.
-[WARN] 🛸#1  took 15s (0 requests) expected 0.0s
-🛸#1  ✍️  market data @ ZH60-BD5B
-🛸#1  GA36-FB7C (JUMP_GATE) is missing chart, routing.
-🛸#1  Starting: ZH60-BD5B to GA36-FB7C speed: 30 max-fuel: 400
-navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
-jump            ZH60-EF7Z  U3-X22D 6m 0 fuel
-jump            U3-X22D  PM49-DE4D 3m 0 fuel
-jump            PM49-DE4D  UY6-D23D 1m 0 fuel
-jump            UY6-D23D  JZ63-CX8B 1m 0 fuel
-jump            JZ63-CX8B  TZ44-C23A 11m 0 fuel
-jump            TZ44-C23A  GA36-FB7C 0ms 0 fuel
-in 30m uses 493 fuel
-
-[WARN] 🛸#1  Beginning route to GA36-FB7C (30m)
-[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.charter for ESEIDEL-1 for 5m.
-[WARN] 🛸#1  No mine job. Disabling Behavior.miner for ESEIDEL-1 for 10m.
-🛸#1  Starting: ZH60-BD5B to AC35-C43 speed: 30 max-fuel: 400
-navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
-jump            ZH60-EF7Z  RD58-ZB8X 7m 0 fuel
-jump            RD58-ZB8X  AC35-I59 0ms 0 fuel
-navCruise       AC35-I59  AC35-C43 7m 486 fuel
-in 22m uses 979 fuel
-
-[WARN] 🛸#1  Beginning route to AC35-C43 (22m)
-[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.siphoner for ESEIDEL-1 for 5m.
-🛸#40 🗺️  X1-GC65-B13X - ASTEROID - Common Metal Deposits, Radioactive
-[WARN] No prices for SHIP_REFINING_FREIGHTER
-🛸#40 NT23-E21D (JUMP_GATE) is missing chart, routing.
-🛸#40 Starting: GC65-B13X to NT23-E21D speed: 3 max-fuel: 0
-navCruise       GC65-B13X  GC65-E27A 15m 108 fuel
-jump            GC65-E27A  JZ51-D22C 11m 0 fuel
-jump            JZ51-D22C  U3-X22D 4m 0 fuel
-jump            U3-X22D  SQ23-CC7B 1m 0 fuel
-jump            SQ23-CC7B  ST82-BE8Z 3m 0 fuel
-jump            ST82-BE8Z  AD18-A31F 6m 0 fuel
-jump            AD18-A31F  NT23-E21D 0ms 0 fuel
-in 41m uses 108 fuel
-
-
-Including contract sell opp: 45 PLATINUM_ORE @ 197c -> AC35-B7
-Considering 883 waypoints
-Finding deals with start: ZH60-BD5B, from scan: all known markets, max outlay: 8370351, max units: 40, fuel capacity: 400, ship speed: 30
-Found 789 potential deals.
-Found 1 deals for ESEIDEL-1 from ZH60-BD5B
-ASSAULT_RIFLES             AC35-E48      2,423c -> AC35-J62      3,563c  +16,158c (13%) 30m   8c/s 126,362c
-🛸#1  Found deal: ASSAULT_RIFLES             AC35-E48      2,423c -> AC35-J62      3,563c  +16,158c (13%) 30m   8c/s 126,362c
-🛸#1  Starting: ZH60-BD5B to AC35-E48 speed: 30 max-fuel: 400
-navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
-jump            ZH60-EF7Z  RD58-ZB8X 7m 0 fuel
-jump            RD58-ZB8X  AC35-I59 0ms 0 fuel
-navCruise       AC35-I59  AC35-E48 6m 401 fuel
-in 20m uses 894 fuel
-
-[WARN] 🛸#1  Beginning route to AC35-E48 (20m)
-[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.trader for ESEIDEL-1 for 5m.
-[WARN] 🛸#1  took 1s (0 requests) expected 0.0s
+Right now it just does all systems before all jumpgates.  It needs to learn
+to interleave them.
