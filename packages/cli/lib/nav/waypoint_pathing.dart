@@ -80,6 +80,7 @@ List<RouteAction>? findRouteWithinSystem(
     if (fuelCapacity == 0) {
       return ShipNavFlightMode.CRUISE;
     }
+    // Careful, this assumes that CRUISE uses one fuel per distance unit.
     return from.distanceTo(to) <= fuelCapacity
         ? ShipNavFlightMode.CRUISE
         : ShipNavFlightMode.DRIFT;

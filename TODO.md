@@ -1004,3 +1004,60 @@ The priority should be jumps-from-hq?
 
 We should be scanning a system before we travel to it.  But right now we
 don't respect the maxAge so we'll think it's always uncharted.
+
+
+### Fuel planning error
+
+
+[WARN] 🛸#1  No profitable deals near X1-ZH60-BD5B.
+Found 1 deals for ESEIDEL-1 from TR6-E20C
+🛸#1  Found placement: 5c/s 1037 2366 TR6-E20C
+🛸#1  Potential: ANTIMATTER                 TR6-E20C     13,935c -> AC35-I59     14,707c   +2,592c  (0%) 8m   5c/s 585,688c
+🛸#1  Starting: ZH60-BD5B to TR6-E20C speed: 30 max-fuel: 400
+navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
+jump            ZH60-EF7Z  U3-X22D 6m 0 fuel
+jump            U3-X22D  QH24-CX9Z 5m 0 fuel
+jump            QH24-CX9Z  VJ15-D20Z 2m 0 fuel
+jump            VJ15-D20Z  TR6-E20C 0ms 0 fuel
+in 20m uses 493 fuel
+
+[WARN] 🛸#1  Beginning route to TR6-E20C (20m)
+[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.trader for ESEIDEL-1 for 5m.
+[WARN] 🛸#1  took 15s (0 requests) expected 0.0s
+🛸#1  ✍️  market data @ ZH60-BD5B
+🛸#1  GA36-FB7C (JUMP_GATE) is missing chart, routing.
+🛸#1  Starting: ZH60-BD5B to GA36-FB7C speed: 30 max-fuel: 400
+navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
+jump            ZH60-EF7Z  U3-X22D 6m 0 fuel
+jump            U3-X22D  PM49-DE4D 3m 0 fuel
+jump            PM49-DE4D  UY6-D23D 1m 0 fuel
+jump            UY6-D23D  JZ63-CX8B 1m 0 fuel
+jump            JZ63-CX8B  TZ44-C23A 11m 0 fuel
+jump            TZ44-C23A  GA36-FB7C 0ms 0 fuel
+in 30m uses 493 fuel
+
+[WARN] 🛸#1  Beginning route to GA36-FB7C (30m)
+[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.charter for ESEIDEL-1 for 5m.
+[WARN] 🛸#1  No mine job. Disabling Behavior.miner for ESEIDEL-1 for 10m.
+🛸#1  Starting: ZH60-BD5B to AC35-C43 speed: 30 max-fuel: 400
+navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
+jump            ZH60-EF7Z  RD58-ZB8X 7m 0 fuel
+jump            RD58-ZB8X  AC35-I59 0ms 0 fuel
+navCruise       AC35-I59  AC35-C43 7m 486 fuel
+in 22m uses 979 fuel
+
+[WARN] 🛸#1  Beginning route to AC35-C43 (22m)
+[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.siphoner for ESEIDEL-1 for 5m.
+🛸#40 🗺️  X1-GC65-B13X - ASTEROID - Common Metal Deposits, Radioactive
+[WARN] No prices for SHIP_REFINING_FREIGHTER
+🛸#40 NT23-E21D (JUMP_GATE) is missing chart, routing.
+🛸#40 Starting: GC65-B13X to NT23-E21D speed: 3 max-fuel: 0
+navCruise       GC65-B13X  GC65-E27A 15m 108 fuel
+jump            GC65-E27A  JZ51-D22C 11m 0 fuel
+jump            JZ51-D22C  U3-X22D 4m 0 fuel
+jump            U3-X22D  SQ23-CC7B 1m 0 fuel
+jump            SQ23-CC7B  ST82-BE8Z 3m 0 fuel
+jump            ST82-BE8Z  AD18-A31F 6m 0 fuel
+jump            AD18-A31F  NT23-E21D 0ms 0 fuel
+in 41m uses 108 fuel
+
