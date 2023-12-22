@@ -250,6 +250,11 @@
   "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo."
  },
  {
+  "symbol": "MODULE_CREW_QUARTERS_I",
+  "name": "Crew Quarters",
+  "description": "A module that provides living space and amenities for the crew."
+ },
+ {
   "symbol": "MODULE_ENVOY_QUARTERS_I",
   "name": "Envoy Quarters",
   "description": "A module that provides living space and amenities for VIP passengers or diplomatic envoys."
@@ -318,6 +323,11 @@
   "symbol": "MOUNT_SENSOR_ARRAY_I",
   "name": "Sensor Array I",
   "description": "A basic sensor array that improves a ship's ability to detect and track other objects in space."
+ },
+ {
+  "symbol": "MOUNT_SENSOR_ARRAY_II",
+  "name": "Sensor Array II",
+  "description": "An advanced sensor array that improves a ship's ability to detect and track other objects in space with greater accuracy and range."
  },
  {
   "symbol": "MOUNT_SURVEYOR_I",
@@ -393,6 +403,11 @@
   "symbol": "REACTOR_FISSION_I",
   "name": "Fission Reactor I",
   "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions."
+ },
+ {
+  "symbol": "REACTOR_FUSION_I",
+  "name": "Fusion Reactor I",
+  "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions."
  },
  {
   "symbol": "REACTOR_SOLAR_I",
