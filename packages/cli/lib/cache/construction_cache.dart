@@ -1,38 +1,7 @@
 import 'package:cli/cache/caches.dart';
-import 'package:cli/cache/json_list_store.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
-
-/// A cached of construction values from Waypoints.
-class OldConstructionCache extends JsonListStore<ConstructionRecord> {
-  /// Creates a new construction cache.
-  OldConstructionCache(
-    super.records, {
-    required super.fs,
-    super.path = defaultCacheFilePath,
-  });
-
-  /// Load the Construction values from the cache.
-  factory OldConstructionCache.load(
-    FileSystem fs, {
-    String path = defaultCacheFilePath,
-  }) {
-    final records = JsonListStore.loadRecords<ConstructionRecord>(
-          fs,
-          path,
-          ConstructionRecord.fromJson,
-        ) ??
-        [];
-    return OldConstructionCache(records, fs: fs, path: path);
-  }
-
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/construction.json';
-
-  /// The Construction values.
-  List<ConstructionRecord> get values => records;
-}
 
 /// Static view onto the ConstructionCache.
 class ConstructionSnapshot {
