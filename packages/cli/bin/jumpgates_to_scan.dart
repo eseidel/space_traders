@@ -38,8 +38,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         continue;
       }
       for (final to in fromRecord.connections) {
-        final toConstruction = constructionSnapshot[to];
-        if (toConstruction == null) {
+        if (!constructionSnapshot.hasRecentData(to)) {
           needsConstructionCheck.add(to);
         } else {
           jumpGates.queue(to);

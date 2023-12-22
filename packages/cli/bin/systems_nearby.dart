@@ -32,6 +32,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       '${connectedSystemSymbol.system.padRight(9)} $marketCount markets',
     );
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {

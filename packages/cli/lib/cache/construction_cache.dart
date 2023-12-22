@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
+import 'package:cli/cache/prices_cache.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
@@ -45,6 +46,18 @@ class ConstructionSnapshot {
   /// Loads the ConstructionSnapshot from the database.
   static Future<ConstructionSnapshot> load(Database db) async {
     return ConstructionCache(db).snapshot();
+  }
+
+  /// Returns true if we have recent data for the given waypoint symbol.
+  bool hasRecentData(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) {
+    final record = _recordForSymbol(waypointSymbol);
+    if (record == null) {
+      return false;
+    }
+    return record.timestamp.isAfter(DateTime.timestamp().subtract(maxAge));
   }
 
   /// Gets the ConstructionRecord for the given waypoint symbol.
