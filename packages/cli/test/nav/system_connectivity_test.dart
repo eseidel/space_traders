@@ -6,7 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockConstructionCache extends Mock implements ConstructionCache {}
+class _MockConstructionSnapshot extends Mock implements ConstructionSnapshot {}
 
 void main() {
   test('SystemConnectivity.fromJumpGates', () async {
@@ -14,8 +14,8 @@ void main() {
     final a = WaypointSymbol.fromString('X-A-A');
     final b = WaypointSymbol.fromString('X-B-B');
     final now = DateTime(2021);
-    final constructionCache = _MockConstructionCache();
-    when(() => constructionCache.isUnderConstruction(a)).thenReturn(false);
+    final constructionSnapshot = _MockConstructionSnapshot();
+    when(() => constructionSnapshot.isUnderConstruction(a)).thenReturn(false);
     final jumpGateCache = JumpGateCache(
       [
         JumpGateRecord(waypointSymbol: a, connections: {b}, timestamp: now),
@@ -25,7 +25,7 @@ void main() {
 
     final unknownB = SystemConnectivity.fromJumpGates(
       jumpGateCache,
-      constructionCache,
+      constructionSnapshot,
     );
     // If construction status of 'b' is not known, then there is no path.
     expect(
@@ -33,10 +33,10 @@ void main() {
       isFalse,
     );
 
-    when(() => constructionCache.isUnderConstruction(b)).thenReturn(false);
+    when(() => constructionSnapshot.isUnderConstruction(b)).thenReturn(false);
     final knownB = SystemConnectivity.fromJumpGates(
       jumpGateCache,
-      constructionCache,
+      constructionSnapshot,
     );
     expect(
       knownB.existsJumpPathBetween(a.systemSymbol, b.systemSymbol),

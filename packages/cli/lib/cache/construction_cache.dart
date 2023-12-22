@@ -1,19 +1,20 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// A cached of construction values from Waypoints.
-class ConstructionCache extends JsonListStore<ConstructionRecord> {
+class OldConstructionCache extends JsonListStore<ConstructionRecord> {
   /// Creates a new construction cache.
-  ConstructionCache(
+  OldConstructionCache(
     super.records, {
     required super.fs,
     super.path = defaultCacheFilePath,
   });
 
   /// Load the Construction values from the cache.
-  factory ConstructionCache.load(
+  factory OldConstructionCache.load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
@@ -23,7 +24,7 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
           ConstructionRecord.fromJson,
         ) ??
         [];
-    return ConstructionCache(records, fs: fs, path: path);
+    return OldConstructionCache(records, fs: fs, path: path);
   }
 
   /// The default path to the cache file.
@@ -31,64 +32,51 @@ class ConstructionCache extends JsonListStore<ConstructionRecord> {
 
   /// The Construction values.
   List<ConstructionRecord> get values => records;
+}
 
-  /// The number of waypoints in the cache.
-  int get waypointCount => values.length;
+/// Static view onto the ConstructionCache.
+class ConstructionSnapshot {
+  /// Creates a new ConstructionSnapshot.
+  ConstructionSnapshot(Iterable<ConstructionRecord> records)
+      : _records = records.toList();
 
-  /// Updates a [construction] to the cache.
-  void updateConstruction({
-    required WaypointSymbol waypointSymbol,
-    required Construction? construction,
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    final index = records.indexWhere(
-      (record) => record.waypointSymbol == waypointSymbol,
-    );
+  final List<ConstructionRecord> _records;
 
-    final newRecord = ConstructionRecord(
-      waypointSymbol: waypointSymbol,
-      construction: construction,
-      timestamp: getNow(),
-    );
-    if (index >= 0) {
-      records[index] = newRecord;
-    } else {
-      records.add(newRecord);
-    }
-
-    save();
+  /// Loads the ConstructionSnapshot from the database.
+  static Future<ConstructionSnapshot> load(Database db) async {
+    return ConstructionCache(db).snapshot();
   }
 
-  /// Returns all the waypointSymbols under construction.
-  Iterable<WaypointSymbol> waypointSymbolsUnderConstruction() => values
-      .where((record) => record.isUnderConstruction)
-      .map((record) => record.waypointSymbol);
+  /// Gets the ConstructionRecord for the given waypoint symbol.
+  ConstructionRecord? _recordForSymbol(WaypointSymbol waypointSymbol) =>
+      _records.firstWhereOrNull(
+        (record) => record.waypointSymbol == waypointSymbol,
+      );
 
   /// Returns true if the given waypoint symbol is under construction.
   /// Returns false if the given waypoint symbol is not under construction.
   /// Returns null if the given waypoint symbol is not in the cache.
   bool? isUnderConstruction(WaypointSymbol waypointSymbol) =>
-      recordForSymbol(waypointSymbol)?.isUnderConstruction;
-
-  /// Gets the ConstructionRecord for the given waypoint symbol.
-  ConstructionRecord? recordForSymbol(WaypointSymbol waypointSymbol) =>
-      values.firstWhereOrNull(
-        (record) => record.waypointSymbol == waypointSymbol,
-      );
+      _recordForSymbol(waypointSymbol)?.isUnderConstruction;
 
   /// Gets the Construction for the given waypoint symbol.
   Construction? operator [](WaypointSymbol waypointSymbol) =>
-      recordForSymbol(waypointSymbol)?.construction;
+      _recordForSymbol(waypointSymbol)?.construction;
 
-  /// Returns the age of the cache for a given waypoint.
-  Duration? cacheAgeFor(
-    WaypointSymbol waypointSymbol, {
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    final record = recordForSymbol(waypointSymbol);
-    if (record == null) {
+  /// Returns the age of the cache for the given waypoint symbol.
+  Duration? cacheAgeFor(WaypointSymbol waypointSymbol) {
+    final timestamp = _recordForSymbol(waypointSymbol)?.timestamp;
+    if (timestamp == null) {
       return null;
     }
-    return getNow().difference(record.timestamp);
+    return DateTime.timestamp().difference(timestamp);
+  }
+}
+
+/// Helper for constructing a ConstructionSnapshot.
+extension ConstructionCacheSnapshot on ConstructionCache {
+  /// Creates a new ConstructionSnapshot.
+  Future<ConstructionSnapshot> snapshot() async {
+    return ConstructionSnapshot(await allRecords());
   }
 }

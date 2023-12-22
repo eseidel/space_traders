@@ -133,7 +133,6 @@ void main() {
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
-        caches.construction,
         caches.contracts,
         caches.marketPrices,
         caches.systems,
@@ -641,7 +640,6 @@ void main() {
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
-        caches.construction,
         caches.contracts,
         caches.marketPrices,
         caches.systems,
@@ -1348,8 +1346,8 @@ void main() {
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
-    when(() => caches.construction[end]).thenReturn(
-      Construction(
+    when(() => caches.construction.getConstruction(end)).thenAnswer(
+      (_) async => Construction(
         symbol: end.waypoint,
         materials: [
           ConstructionMaterial(
@@ -1364,6 +1362,17 @@ void main() {
 
     final systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
+    final construction = Construction(
+      symbol: end.waypoint,
+      materials: [
+        ConstructionMaterial(
+          tradeSymbol: tradeSymbol,
+          required_: 100,
+          fulfilled: 20,
+        ),
+      ],
+      isComplete: false,
+    );
     when(
       () => systemsApi.supplyConstruction(
         end.system,
@@ -1378,17 +1387,7 @@ void main() {
       (_) => Future.value(
         SupplyConstruction201Response(
           data: SupplyConstruction201ResponseData(
-            construction: Construction(
-              symbol: end.waypoint,
-              materials: [
-                ConstructionMaterial(
-                  tradeSymbol: tradeSymbol,
-                  required_: 100,
-                  fulfilled: 20,
-                ),
-              ],
-              isComplete: false,
-            ),
+            construction: construction,
             cargo: shipCargo,
           ),
         ),
@@ -1400,6 +1399,11 @@ void main() {
     when(() => agent.credits).thenReturn(1000000);
 
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+
+    when(caches.construction.allRecords).thenAnswer((_) async => []);
+    when(
+      () => caches.construction.updateConstruction(end, construction),
+    ).thenAnswer((_) async => {});
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;

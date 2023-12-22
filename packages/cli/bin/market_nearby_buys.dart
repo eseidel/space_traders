@@ -4,14 +4,16 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final marketPrices = MarketPrices.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
-  final routePlanner = RoutePlanner.fromCaches(
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
-    jumpGateCache,
-    constructionCache,
+    systemConnectivity,
     sellsFuel: (_) => false,
   );
   final shipCache = ShipCache.load(fs)!;
@@ -39,6 +41,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       ' (${best.price.tradeVolume} at a time)',
     );
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {

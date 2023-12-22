@@ -10,21 +10,24 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
 
+  final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final systems = SystemsCache.load(fs)!;
   final charting = ChartingCache.load(fs, staticCaches.waypointTraits);
-  final construction = ConstructionCache.load(fs);
+  // TODO(eseidel): This should not need ConstructionCache.
+  final construction = ConstructionCache(db);
   final waypointCache =
       WaypointCache.cachedOnly(systems, charting, construction);
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
-  final jumpGates = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
-  final routePlanner = RoutePlanner.fromCaches(
+  final jumpGateCache = JumpGateCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final routePlanner = RoutePlanner.fromSystemsCache(
     systems,
-    jumpGates,
-    constructionCache,
+    systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final waypoints = await waypointCache.waypointsInSystem(hqSystemSymbol);
@@ -55,6 +58,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
   table.sortBy<num>((a) => (a as List<dynamic>)[1] as num);
   logger.info(table.toString());
+
+  await db.close();
 }
 
 void main(List<String> args) async {

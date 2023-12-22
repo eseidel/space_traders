@@ -270,12 +270,10 @@ void runTests(TestSuite suite, String path) {
   }
 
   final systemsCache = SystemsCache(systems, fs: fs);
-  final jumpGateCache = JumpGateCache([], fs: fs);
-  final constructionCache = ConstructionCache([], fs: fs);
-  final routePlanner = RoutePlanner.fromCaches(
+  final systemConnectivity = SystemConnectivity.test({});
+  final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
-    jumpGateCache,
-    constructionCache,
+    systemConnectivity,
     sellsFuel: (WaypointSymbol w) => lookupWaypoint(w).sellsFuel,
   );
 

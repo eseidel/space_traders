@@ -6,15 +6,16 @@ import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
 
   final marketPrices = MarketPrices.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
     systemConnectivity,
@@ -95,6 +96,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final deal in feederDeals) {
     logger.info('  ${describeCostedDeal(deal)}');
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {

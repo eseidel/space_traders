@@ -176,12 +176,3 @@ int? neededCreditsFromPurchaseShipException(ApiException e) {
 bool isConstructionRequirementsMet(ApiException e) {
   return isAPIExceptionWithCode(e, 4801);
 }
-
-// ApiException 400: {"error":{"message": "Market purchase failed. "
-// "Trade good ANTIMATTER is not available at X1-RJ35-CF7C.","code":4601,
-// "data":{"waypointSymbol":"X1-RJ35-CF7C","tradeSymbol":"ANTIMATTER"}}}
-/// Returns true if the exception is a market does not sell antimatter exception.
-/// This happens due to a bug in the game.
-bool isMarketDoesNotSellAntimatterException(ApiException e) {
-  return isAPIExceptionWithCode(e, 4601);
-}

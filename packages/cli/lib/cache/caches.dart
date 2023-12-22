@@ -17,6 +17,7 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/queries.dart';
+import 'package:db/construction.dart';
 import 'package:db/db.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
@@ -40,6 +41,7 @@ export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/route.dart';
 export 'package:cli/nav/system_connectivity.dart';
+export 'package:db/construction.dart';
 export 'package:file/file.dart';
 
 /// Container for all the caches.
@@ -138,7 +140,7 @@ class Caches {
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
     final charting = ChartingCache.load(fs, static.waypointTraits);
-    final construction = ConstructionCache.load(fs);
+    final construction = ConstructionCache(db);
     final marketListings = MarketListingCache.load(fs, static.tradeGoods);
     final waypoints = WaypointCache(api, systems, charting, construction);
     final markets = MarketCache(api, marketListings);
@@ -148,9 +150,9 @@ class Caches {
     final behaviors = BehaviorCache.load(fs);
 
     final jumpGates = JumpGateCache.load(fs);
-    final constructionCache = ConstructionCache.load(fs);
+    final constructionSnapshot = await ConstructionSnapshot.load(db);
     final systemConnectivity =
-        SystemConnectivity.fromJumpGates(jumpGates, constructionCache);
+        SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);
     final routePlanner = RoutePlanner.fromSystemsCache(
       systems,
       systemConnectivity,
@@ -187,8 +189,11 @@ class Caches {
 
   /// Called when routing information changes (e.g. when we complete
   /// a jump gate, find a new jump gate, or a jump gate breaks).
-  void updateRoutingCaches() {
-    systemConnectivity.updateFromJumpGates(jumpGates, construction);
+  Future<void> updateRoutingCaches() async {
+    systemConnectivity.updateFromJumpGates(
+      jumpGates,
+      await construction.snapshot(),
+    );
     routePlanner.clearRoutingCaches();
   }
 
@@ -226,7 +231,7 @@ Future<List<Faction>> allFactions(FactionsApi factionsApi) async {
 Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
   final cachedFactions = await db.allFactions();
   if (cachedFactions.isNotEmpty) {
-    return Future.value(cachedFactions);
+    return Future.value(cachedFactions.toList());
   }
   final factions = await allFactions(factionsApi);
   await db.cacheFactions(factions);

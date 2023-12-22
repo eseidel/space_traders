@@ -1,6 +1,5 @@
 import 'package:cli/cache/caches.dart';
-import 'package:cli/logger.dart';
-import 'package:db/db.dart';
+import 'package:cli/cli.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -67,6 +66,8 @@ void main() {
     );
     when(db.allFactions).thenAnswer((_) => Future.value(<Faction>[]));
     when(() => db.cacheFactions(any())).thenAnswer((_) => Future.value());
+    when(db.allConstructionRecords)
+        .thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
     final fs = MemoryFileSystem.test();
     fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);

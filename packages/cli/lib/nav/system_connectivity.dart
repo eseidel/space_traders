@@ -2,7 +2,7 @@ import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
+import 'package:db/construction.dart';
 import 'package:types/types.dart';
 
 typedef _ClusterId = int;
@@ -98,17 +98,37 @@ class _Clusters {
 /// it's important to also check if it's possible to jump to the destination.
 bool canJumpFrom(
   JumpGateCache jumpGateCache,
-  ConstructionCache constructionCache,
+  ConstructionSnapshot constructionSnapshot,
   WaypointSymbol from,
 ) {
-  final fromRecord = jumpGateCache.recordForSymbol(from);
+  final record = jumpGateCache.recordForSymbol(from);
   // If we don't know about the fromGate, we can't jump.
-  if (fromRecord == null) {
+  if (record == null) {
     return false;
   }
-  final fromUnderConstruction = constructionCache.isUnderConstruction(from);
+  final underConstruction = constructionSnapshot.isUnderConstruction(from);
   // If we don't know or it's not complete, assume we can't jump.
-  if (fromUnderConstruction == null || fromUnderConstruction == true) {
+  if (underConstruction ?? true) {
+    return false;
+  }
+  return true;
+}
+
+/// Returns true if it's possible to jump from the provided jumpgate.
+/// it's important to also check if it's possible to jump to the destination.
+Future<bool> canJumpFromAsync(
+  JumpGateCache jumpGateCache,
+  ConstructionCache constructionCache,
+  WaypointSymbol from,
+) async {
+  final record = jumpGateCache.recordForSymbol(from);
+  // If we don't know about the fromGate, we can't jump.
+  if (record == null) {
+    return false;
+  }
+  final underConstruction = await constructionCache.isUnderConstruction(from);
+  // If we don't know or it's not complete, assume we can't jump.
+  if (underConstruction ?? true) {
     return false;
   }
   return true;
@@ -117,13 +137,12 @@ bool canJumpFrom(
 /// Returns true if it's possible to jump to the provided jumpgate.
 /// it's important to also check if it's possible to jump from the origin.
 bool canJumpTo(
-  JumpGateCache jumpGateCache,
-  ConstructionCache constructionCache,
+  ConstructionSnapshot constructionSnapshot,
   WaypointSymbol to,
 ) {
-  final toUnderConstruction = constructionCache.isUnderConstruction(to);
+  final underConstruction = constructionSnapshot.isUnderConstruction(to);
   // If we don't know or it's not complete, assume we can't jump.
-  if (toUnderConstruction == null || toUnderConstruction == true) {
+  if (underConstruction ?? true) {
     return false;
   }
   return true;
@@ -132,12 +151,12 @@ bool canJumpTo(
 /// Returns true if we know it's possible to jump between the two waypoints.
 bool canJumpBetween(
   JumpGateCache jumpGateCache,
-  ConstructionCache constructionCache, {
+  ConstructionSnapshot constructionSnapshot, {
   required WaypointSymbol from,
   required WaypointSymbol to,
 }) {
-  return canJumpFrom(jumpGateCache, constructionCache, from) &&
-      canJumpTo(jumpGateCache, constructionCache, to);
+  return canJumpFrom(jumpGateCache, constructionSnapshot, from) &&
+      canJumpTo(constructionSnapshot, to);
 }
 
 // This could be simplified by storing waypoints instead.
@@ -155,20 +174,20 @@ class _Connections {
     }
   }
 
-  _Connections.fromCaches(
+  _Connections.fromSnapshots(
     JumpGateCache jumpGateCache,
-    ConstructionCache constructionCache,
+    ConstructionSnapshot constructionSnapshot,
   ) {
     // JumpGateCache caches responses from the server.  We may not yet have
     // cached both sides of a jump gate, so this fills in the gaps.
     for (final record in jumpGateCache.values) {
       final from = record.waypointSymbol;
-      if (!canJumpFrom(jumpGateCache, constructionCache, from)) {
+      if (!canJumpFrom(jumpGateCache, constructionSnapshot, from)) {
         continue;
       }
       final fromSystem = from.systemSymbol;
       for (final to in record.connections) {
-        if (!canJumpTo(jumpGateCache, constructionCache, to)) {
+        if (!canJumpTo(constructionSnapshot, to)) {
           continue;
         }
         final toSystem = to.systemSymbol;
@@ -191,7 +210,6 @@ class SystemConnectivity {
       : _clusters = _Clusters.fromConnections(_connections);
 
   /// Creates a new SystemConnectivity from the given connections.
-  @visibleForTesting
   factory SystemConnectivity.test(
     Map<WaypointSymbol, Set<WaypointSymbol>> partial,
   ) {
@@ -201,9 +219,10 @@ class SystemConnectivity {
   /// Creates a new SystemConnectivity from the systemsCache.
   factory SystemConnectivity.fromJumpGates(
     JumpGateCache jumpGates,
-    ConstructionCache construction,
+    ConstructionSnapshot constructionSnapshot,
   ) {
-    final connections = _Connections.fromCaches(jumpGates, construction);
+    final connections =
+        _Connections.fromSnapshots(jumpGates, constructionSnapshot);
     return SystemConnectivity._(connections);
   }
 
@@ -216,9 +235,9 @@ class SystemConnectivity {
   /// Updates the SystemConnectivity from the given caches.
   void updateFromJumpGates(
     JumpGateCache jumpGates,
-    ConstructionCache construction,
+    ConstructionSnapshot constructionSnapshot,
   ) {
-    _connections = _Connections.fromCaches(jumpGates, construction);
+    _connections = _Connections.fromSnapshots(jumpGates, constructionSnapshot);
     _clusters = _Clusters.fromConnections(_connections);
   }
 

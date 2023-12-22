@@ -12,10 +12,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     startSystemSymbol = agentCache.headquartersSystemSymbol;
   }
 
+  final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
-  final constrctionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
 
@@ -41,7 +42,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final values = chartingCache[waypointSymbol];
     final marketAge = marketPrices.cacheAgeFor(waypointSymbol);
     final shipyardAge = shipyardPrices.cacheAgeFor(waypointSymbol);
-    final constructionAge = constrctionCache.cacheAgeFor(waypointSymbol);
+    final constructionAge = constructionSnapshot.cacheAgeFor(waypointSymbol);
 
     table.add([
       waypointSymbol.waypoint,

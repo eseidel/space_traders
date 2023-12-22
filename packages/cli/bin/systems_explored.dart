@@ -10,6 +10,7 @@ String _typeName(SystemType type) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
@@ -17,9 +18,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
 
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
   final agentCache = AgentCache.load(fs)!;
   final headquartersSystemSymbol = agentCache.headquartersSystemSymbol;
   final reachableSystems =
@@ -85,6 +86,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     '${systemsWithCharts.length} systems with 1+ charts of '
     '${reachableSystems.length} known reachable.',
   );
+
+  await db.close();
 }
 
 void main(List<String> args) async {

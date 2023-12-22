@@ -2,6 +2,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final SystemSymbol startSystemSymbol;
   if (argResults.rest.isNotEmpty) {
     startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
@@ -14,9 +15,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
 
   final connectedSystemSymbols =
       systemConnectivity.directlyConnectedSystemSymbols(startSystemSymbol);

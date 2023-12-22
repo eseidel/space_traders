@@ -20,30 +20,29 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       .waypointsInSystem(startSystemSymbol)
       .firstWhere((w) => w.isJumpGate)
       .waypointSymbol;
-  final staticCaches = StaticCaches.load(fs);
 
-  final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
-  final constructionCache = ConstructionCache.load(fs);
-  final waypointCache =
-      WaypointCache(api, systemsCache, chartingCache, constructionCache);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final jumpGateCache = JumpGateCache.load(fs);
   final jumpGate = await jumpGateCache.getOrFetch(api, jumpGateSymbol);
 
-  Future<String> statusString(WaypointSymbol jumpGateSymbol) async {
-    final isUnderConstrustion =
-        await waypointCache.isUnderConstruction(jumpGateSymbol);
+  String statusString(WaypointSymbol jumpGateSymbol) {
+    final isUnderConstruction =
+        constructionSnapshot.isUnderConstruction(jumpGateSymbol);
 
-    if (isUnderConstrustion) {
-      final construction = constructionCache[jumpGateSymbol];
+    if (isUnderConstruction == null) {
+      return 'unknown';
+    }
+    if (isUnderConstruction) {
+      final construction = constructionSnapshot[jumpGateSymbol];
       final progress = describeConstructionProgress(construction);
       return 'under construction ($progress)';
     }
     return 'ready';
   }
 
-  logger.info('$jumpGateSymbol: ${await statusString(jumpGateSymbol)}');
+  logger.info('$jumpGateSymbol: ${statusString(jumpGateSymbol)}');
   for (final connection in jumpGate.connections) {
-    final status = await statusString(connection);
+    final status = statusString(connection);
     logger.info('  ${connection.sectorLocalName.padRight(9)} $status');
   }
 

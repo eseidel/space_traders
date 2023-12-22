@@ -7,6 +7,7 @@ import 'package:cli/trading.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final shipType = shipTypeFromArg(argResults['ship'] as String);
   final limit = int.parse(argResults['limit'] as String);
   final startArg = argResults['start'] as String?;
@@ -16,9 +17,9 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
   final jumpGates = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGates, constructionCache);
+      SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
     systemConnectivity,
@@ -38,7 +39,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       : systemsCache.waypointFromString(startArg)!;
 
   final jumpGate = systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
-  final construction = constructionCache[jumpGate.waypointSymbol];
+  final construction = constructionSnapshot[jumpGate.waypointSymbol];
   centralCommand.activeConstruction = construction;
 
   final extraSellOpps = <SellOpp>[];
@@ -158,6 +159,8 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     ]);
   }
   logger.info(table.toString());
+
+  await db.close();
 }
 
 void main(List<String> args) async {

@@ -1,5 +1,7 @@
+import 'package:db/construction.dart';
 import 'package:db/extraction.dart';
 import 'package:db/faction.dart';
+import 'package:db/query.dart';
 import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
 import 'package:meta/meta.dart';
@@ -77,15 +79,6 @@ class Database {
         connectionFromConfig,
   }) : _connection = createConnection(config);
 
-  /// Insert a transaction into the database.
-  Future<void> insertTransaction(Transaction transaction) async {
-    final query = insertTransactionQuery(transaction);
-    await connection.query(
-      query.fmtString,
-      substitutionValues: query.substitutionValues,
-    );
-  }
-
   /// The underlying connection.
   // TODO(eseidel): This shoudn't be public.
   // Make it private and move all callers into the db package.
@@ -108,13 +101,56 @@ class Database {
     await connection.query('LISTEN $channel');
   }
 
-  /// Insert a survey into the database.
-  Future<void> insertSurvey(HistoricalSurvey survey) async {
-    final query = insertSurveyQuery(survey);
-    await connection.query(
+  /// Insert one record using the provided query.
+  @protected
+  Future<void> insertOne(Query query) {
+    return connection.query(
       query.fmtString,
       substitutionValues: query.substitutionValues,
     );
+  }
+
+  /// Query for multiple records using the provided query.
+  @protected
+  Future<Iterable<T>> queryMany<T>(
+    Query query,
+    T Function(Map<String, dynamic>) fromColumnMap,
+  ) {
+    return connection
+        .query(
+          query.fmtString,
+          substitutionValues: query.substitutionValues,
+        )
+        .then(
+          (result) => result.map((r) => r.toColumnMap()).map(fromColumnMap),
+        );
+  }
+
+  /// Query for a single record using the provided query.
+  @protected
+  Future<T?> queryOne<T>(
+    Query query,
+    T Function(Map<String, dynamic>) fromColumnMap,
+  ) {
+    return connection
+        .query(
+          query.fmtString,
+          substitutionValues: query.substitutionValues,
+        )
+        .then(
+          (result) =>
+              result.isEmpty ? null : fromColumnMap(result.first.toColumnMap()),
+        );
+  }
+
+  /// Insert a transaction into the database.
+  Future<void> insertTransaction(Transaction transaction) async {
+    await insertOne(insertTransactionQuery(transaction));
+  }
+
+  /// Insert a survey into the database.
+  Future<void> insertSurvey(HistoricalSurvey survey) async {
+    await insertOne(insertSurveyQuery(survey));
   }
 
   /// Return the most recent surveys.
@@ -126,26 +162,12 @@ class Database {
       waypointSymbol: waypointSymbol,
       count: count,
     );
-    final result = await connection.query(
-      query.fmtString,
-      substitutionValues: query.substitutionValues,
-    );
-    return result
-        .map((r) => r.toColumnMap())
-        .map<HistoricalSurvey>(surveyFromColumnMap);
+    return queryMany(query, surveyFromColumnMap);
   }
 
   /// Return all surveys.
-  Future<Iterable<HistoricalSurvey>> allSurveys() async {
-    final query = allSurveysQuery();
-    final result = await connection.query(
-      query.fmtString,
-      substitutionValues: query.substitutionValues,
-    );
-    return result
-        .map((r) => r.toColumnMap())
-        .map<HistoricalSurvey>(surveyFromColumnMap);
-  }
+  Future<Iterable<HistoricalSurvey>> allSurveys() async =>
+      queryMany(allSurveysQuery(), surveyFromColumnMap);
 
   /// Mark the given survey as exhausted.
   Future<void> markSurveyExhausted(Survey survey) async {
@@ -159,26 +181,9 @@ class Database {
     }
   }
 
-  /// Gets the faction with the given symbol.
-  Future<Faction> factionBySymbol(FactionSymbol symbol) {
-    final query = factionBySymbolQuery(symbol);
-    return connection
-        .query(query.fmtString, substitutionValues: query.substitutionValues)
-        .then((result) => factionFromColumnMap(result.first.toColumnMap()));
-  }
-
   /// Gets all factions.
-  Future<List<Faction>> allFactions() {
-    final query = allFactionsQuery();
-    return connection
-        .query(query.fmtString, substitutionValues: query.substitutionValues)
-        .then(
-          (result) => result
-              .map((r) => r.toColumnMap())
-              .map(factionFromColumnMap)
-              .toList(),
-        );
-  }
+  Future<Iterable<Faction>> allFactions() =>
+      queryMany(allFactionsQuery(), factionFromColumnMap);
 
   /// Cache the given factions.
   Future<void> cacheFactions(List<Faction> factions) async {
@@ -194,23 +199,14 @@ class Database {
   }
 
   /// Return all extractions.
-  Future<Iterable<ExtractionRecord>> allExtractions() async {
-    final query = allExtractionsQuery();
-    final result = await connection.query(
-      query.fmtString,
-      substitutionValues: query.substitutionValues,
-    );
-    return result
-        .map((r) => r.toColumnMap())
-        .map<ExtractionRecord>(extractionFromColumnMap);
-  }
+  Future<Iterable<ExtractionRecord>> allExtractions() async =>
+      queryMany(allExtractionsQuery(), extractionFromColumnMap);
 
   /// Insert an extraction into the database.
-  Future<void> insertExtraction(ExtractionRecord extraction) async {
-    final query = insertExtractionQuery(extraction);
-    await connection.query(
-      query.fmtString,
-      substitutionValues: query.substitutionValues,
-    );
-  }
+  Future<void> insertExtraction(ExtractionRecord extraction) async =>
+      insertOne(insertExtractionQuery(extraction));
+
+  /// Return all construction records.
+  Future<Iterable<ConstructionRecord>> allConstructionRecords() async =>
+      queryMany(allConstructionQuery(), constructionFromColumnMap);
 }

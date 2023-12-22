@@ -7,14 +7,6 @@ Query allFactionsQuery() => const Query(
       substitutionValues: {},
     );
 
-/// Query a faction by symbol.
-Query factionBySymbolQuery(FactionSymbol symbol) => Query(
-      'SELECT * FROM faction_ WHERE symbol = @symbol',
-      substitutionValues: {
-        'symbol': symbol.toJson(),
-      },
-    );
-
 /// insert a faction.
 Query insertFactionQuery(Faction faction) => Query(
       'INSERT INTO faction_ (symbol, json) '

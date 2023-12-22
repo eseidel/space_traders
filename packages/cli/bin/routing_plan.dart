@@ -60,6 +60,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final startSymbol = args[0];
   final endSymbol = args[1];
 
+  final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final bool Function(WaypointSymbol _) sellsFuel;
@@ -75,11 +76,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
-  final routePlanner = RoutePlanner.fromCaches(
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
-    jumpGateCache,
-    constructionCache,
+    systemConnectivity,
     sellsFuel: sellsFuel,
   );
 
@@ -105,4 +107,5 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       ..info('Route found (${duration.inMilliseconds}ms)')
       ..info(describeRoutePlan(plan));
   }
+  await db.close();
 }

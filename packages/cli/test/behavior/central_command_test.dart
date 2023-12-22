@@ -566,8 +566,10 @@ void main() {
         startingFaction: faction,
       ),
     );
-    final logger = _MockLogger();
 
+    when(caches.construction.allRecords).thenAnswer((_) async => []);
+
+    final logger = _MockLogger();
     await runWithLogger(
       logger,
       () async => await centralCommand.advanceCentralPlanning(api, caches),

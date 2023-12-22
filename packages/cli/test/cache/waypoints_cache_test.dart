@@ -1,8 +1,8 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
+import 'package:db/construction.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -22,9 +22,10 @@ void main() {
     final api = _MockApi();
     final SystemsApi systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
+    final waypointSymbol = WaypointSymbol.fromString('S-E-A');
     final expectedWaypoint = Waypoint(
-      symbol: 'S-E-A',
-      systemSymbol: 'S-E',
+      symbol: waypointSymbol.waypoint,
+      systemSymbol: waypointSymbol.system,
       type: WaypointType.PLANET,
       x: 0,
       y: 0,
@@ -43,10 +44,10 @@ void main() {
       );
     });
     final systemsCache = _MockSystemsCache();
-    final symbol = WaypointSymbol.fromString('S-E-A');
-    when(() => systemsCache.waypointsInSystem(symbol.systemSymbol)).thenReturn([
+    when(() => systemsCache.waypointsInSystem(waypointSymbol.systemSymbol))
+        .thenReturn([
       SystemWaypoint(
-        symbol: 'S-E-A',
+        symbol: waypointSymbol.waypoint,
         type: WaypointType.PLANET,
         x: 0,
         y: 0,
@@ -54,11 +55,15 @@ void main() {
     ]);
     final chartingCache = _MockChartingCache();
     final constructionCache = _MockConstructionCache();
+    when(
+      () => constructionCache.updateConstruction(waypointSymbol, null),
+    ).thenAnswer((_) async => {});
+
     final waypointCache =
         WaypointCache(api, systemsCache, chartingCache, constructionCache);
-    expect(await waypointCache.waypoint(symbol), expectedWaypoint);
+    expect(await waypointCache.waypoint(waypointSymbol), expectedWaypoint);
     // Call it twice, it should cache.
-    expect(await waypointCache.waypoint(symbol), expectedWaypoint);
+    expect(await waypointCache.waypoint(waypointSymbol), expectedWaypoint);
     verify(
       () => systemsApi.getSystemWaypoints(
         any(),
@@ -68,10 +73,10 @@ void main() {
     ).called(1);
 
     // For coverage.
-    expect(await waypointCache.hasMarketplace(symbol), false);
-    expect(await waypointCache.hasShipyard(symbol), false);
-    expect(await waypointCache.canBeMined(symbol), false);
-    expect(await waypointCache.canBeSiphoned(symbol), false);
+    expect(await waypointCache.hasMarketplace(waypointSymbol), false);
+    expect(await waypointCache.hasShipyard(waypointSymbol), false);
+    expect(await waypointCache.canBeMined(waypointSymbol), false);
+    expect(await waypointCache.canBeSiphoned(waypointSymbol), false);
 
     // The has getters still throw if the waypoint doesn't exist.
     when(() => systemsCache.waypointsInSystem(SystemSymbol.fromString('A-B')))

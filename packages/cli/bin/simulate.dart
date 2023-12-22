@@ -126,14 +126,16 @@ int costOutMounts(
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final marketPrices = MarketPrices.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
-  final routePlanner = RoutePlanner.fromCaches(
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
-    jumpGateCache,
-    constructionCache,
+    systemConnectivity,
     sellsFuel: (_) => false,
   );
   final agentCache = AgentCache.load(fs)!;
@@ -342,6 +344,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final totalCosts = costPerSquad * squadsForGoal;
   logger.info('Total costs for goal: ${creditsString(totalCosts)}');
+
+  await db.close();
 }
 
 void main(List<String> args) {

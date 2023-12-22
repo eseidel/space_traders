@@ -1,6 +1,5 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/static_cache.dart';
@@ -8,6 +7,7 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';
+import 'package:db/construction.dart';
 
 String describeJob(ExtractionJob job) {
   final action = job.extractionType.name;
@@ -33,10 +33,12 @@ ShipType? guessType(ShipyardShipCache shipyardShipCache, Ship ship) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final systems = await SystemsCache.loadOrFetch(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
   final charting = ChartingCache.load(fs, waypointTraits);
-  final construction = ConstructionCache.load(fs);
+  // TODO(eseidel): This should not need a ConstructionCache.
+  final construction = ConstructionCache(db);
   final waypointCache =
       WaypointCache.cachedOnly(systems, charting, construction);
   final shipCache = ShipCache.load(fs)!;
@@ -66,6 +68,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
           '${ship.nav.waypointSymbolObject} $cargoStatus');
     }
   }
+  await db.close();
 }
 
 void main(List<String> args) async {

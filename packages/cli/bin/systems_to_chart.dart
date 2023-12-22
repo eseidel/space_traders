@@ -12,11 +12,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     startSystemSymbol = agentCache.headquartersSystemSymbol;
   }
 
+  final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
   final systemsCache = SystemsCache.load(fs)!;
   final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
 
@@ -49,6 +50,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       '$unchartedCount uncharted ($jumps jumps)',
     );
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {

@@ -88,8 +88,9 @@ class IdleQueue {
     logger.detail('Process (${_jumpGates.length}): $to ($jumpDistance)');
     // Make sure we have construction data for the destination before
     // checking if we can jump there.
-    await caches.waypoints.isUnderConstruction(to);
-    if (canJumpTo(caches.jumpGates, caches.construction, to)) {
+    final underConstruction = await caches.waypoints.isUnderConstruction(to);
+    // Match canJumpTo and check if we can jump from the other side.
+    if (!underConstruction) {
       queueSystem(to.systemSymbol, jumpDistance: jumpDistance + 1);
     }
   }
@@ -124,7 +125,11 @@ class IdleQueue {
         final fromRecord =
             await caches.jumpGates.getOrFetch(api, waypoint.waypointSymbol);
         final from = fromRecord.waypointSymbol;
-        if (!canJumpFrom(caches.jumpGates, caches.construction, from)) {
+        if (!await canJumpFromAsync(
+          caches.jumpGates,
+          caches.construction,
+          from,
+        )) {
           continue;
         }
         // Queue each jumpGate as it might fetch construction data which could

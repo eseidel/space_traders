@@ -314,22 +314,6 @@ class RoutePlanner {
           sellsFuel: sellsFuel,
         );
 
-  /// Create a new route planner from a systems cache and jump gate cache.
-  RoutePlanner.fromCaches(
-    SystemsCache systemsCache,
-    JumpGateCache jumpGateCache,
-    ConstructionCache constructionCache, {
-    required bool Function(WaypointSymbol) sellsFuel,
-  }) : this(
-          systemsCache: systemsCache,
-          systemConnectivity: SystemConnectivity.fromJumpGates(
-            jumpGateCache,
-            constructionCache,
-          ),
-          jumpCache: JumpCache(),
-          sellsFuel: sellsFuel,
-        );
-
   // SystemsCache knows all the systems and where they are.
   final SystemsCache _systemsCache;
   // SystemConnectivity and JumpCache are related perf optimizations.

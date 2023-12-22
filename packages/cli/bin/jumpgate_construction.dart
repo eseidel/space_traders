@@ -2,6 +2,8 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
+
   final SystemSymbol startSystemSymbol;
   if (argResults.rest.isNotEmpty) {
     startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
@@ -12,10 +14,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final systemsCache = SystemsCache.load(fs)!;
 
-  final constructionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final jumpGateCache = JumpGateCache.load(fs);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionCache);
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
 
   // Find all reachable jumpgates that are under construction.
   final systemSymbols =
@@ -23,18 +25,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpGates = systemSymbols
       .expand(systemsCache.waypointsInSystem)
       .where((w) => w.isJumpGate)
-      .toList();
+      .map((w) => w.waypointSymbol);
   final underConstruction = jumpGates
-      .where(
-        (w) => constructionCache.isUnderConstruction(w.waypointSymbol) ?? false,
-      )
-      .toList();
-
+      .where((s) => constructionSnapshot.isUnderConstruction(s) ?? false);
   logger.info(
     '${underConstruction.length} reachable jumpgates under construction:',
   );
-  for (final waypoint in underConstruction) {
-    logger.info(waypoint.waypointSymbol.sectorLocalName);
+  for (final waypointSymbol in underConstruction) {
+    logger.info(waypointSymbol.sectorLocalName);
   }
 }
 

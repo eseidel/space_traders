@@ -270,7 +270,6 @@ class CentralCommand {
   /// Find next deal for the given [ship], considering all deals in progress.
   CostedDeal? findNextDealAndLog(
     AgentCache agentCache,
-    ConstructionCache constructionCache,
     ContractCache contractCache,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
@@ -445,7 +444,7 @@ class CentralCommand {
     }
   }
 
-  Construction? _computeActiveConstruction(Caches caches) {
+  Future<Construction?> _computeActiveConstruction(Caches caches) async {
     if (!isConstructionTradingEnabled) {
       return null;
     }
@@ -456,9 +455,10 @@ class CentralCommand {
 
     final systemSymbol = caches.agent.headquartersSystemSymbol;
     final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
-    return jumpGate == null
-        ? null
-        : caches.construction[jumpGate.waypointSymbol];
+    if (jumpGate == null) {
+      return null;
+    }
+    return await caches.construction.getConstruction(jumpGate.waypointSymbol);
   }
 
   bool _computeHaveEscapedStartingSystem(Caches caches) {
@@ -476,7 +476,7 @@ class CentralCommand {
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
-    caches.updateRoutingCaches();
+    await caches.updateRoutingCaches();
 
     miningSquads = await assignShipsToSquads(
       caches.systems,
@@ -490,7 +490,7 @@ class CentralCommand {
     updateAvailableMounts(caches.marketPrices);
     await _queueMountRequests(caches);
 
-    activeConstruction = _computeActiveConstruction(caches);
+    activeConstruction = await _computeActiveConstruction(caches);
     _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(caches);
   }
 
@@ -845,6 +845,7 @@ ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
 /// Compute what our current mining squads should be.
 Future<List<ExtractionSquad>> assignShipsToSquads(
   SystemsCache systemsCache,
+  // TODO(eseidel): This should not need a WaypointCache.
   WaypointCache waypointCache,
   MarketListingCache marketListings,
   ShipCache shipCache, {

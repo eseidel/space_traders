@@ -390,7 +390,7 @@ Future<JobResult> _handleConstructionDealAtDelivery(
   final waypointSymbol = costedDeal.deal.destinationSymbol;
 
   final construction = assertNotNull(
-    caches.construction[waypointSymbol],
+    await caches.construction.getConstruction(waypointSymbol),
     'No construction.',
     const Duration(minutes: 10),
   );
@@ -866,7 +866,6 @@ Future<JobResult> _initDeal(
   // Consider all deals starting at any market within our consideration range.
   var newDeal = centralCommand.findNextDealAndLog(
     caches.agent,
-    caches.construction,
     caches.contracts,
     caches.marketPrices,
     caches.systems,
@@ -901,7 +900,6 @@ Future<JobResult> _initDeal(
       findDeal: (Ship ship, WaypointSymbol startSymbol) {
         return centralCommand.findNextDealAndLog(
           caches.agent,
-          caches.construction,
           caches.contracts,
           caches.marketPrices,
           caches.systems,

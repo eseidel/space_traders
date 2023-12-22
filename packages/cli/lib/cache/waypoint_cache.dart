@@ -1,10 +1,10 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
+import 'package:db/construction.dart';
 import 'package:types/types.dart';
 
 /// Stores Waypoint objects fetched recently from the API.
@@ -49,7 +49,7 @@ class WaypointCache {
   }
 
   /// Synthesizes a waypoint from cached values if possible.
-  Waypoint? waypointFromCaches(WaypointSymbol waypointSymbol) {
+  Future<Waypoint?> waypointFromCaches(WaypointSymbol waypointSymbol) async {
     final values = _chartingCache[waypointSymbol];
     if (values == null) {
       return null;
@@ -65,7 +65,7 @@ class WaypointCache {
       traits.add(trait);
     }
 
-    final isUnderConstruction = _constructionCache.isUnderConstruction(
+    final isUnderConstruction = await _constructionCache.isUnderConstruction(
       waypointSymbol,
     );
     if (isUnderConstruction == null) {
@@ -87,11 +87,15 @@ class WaypointCache {
     );
   }
 
-  List<Waypoint>? _waypointsInSystemFromCache(SystemSymbol systemSymbol) {
+  Future<List<Waypoint>?> _waypointsInSystemFromCache(
+    SystemSymbol systemSymbol,
+  ) async {
     final systemWaypoints = _systemsCache.waypointsInSystem(systemSymbol);
     final cachedWaypoints = <Waypoint>[];
     for (final systemWaypoint in systemWaypoints) {
-      final waypoint = waypointFromCaches(systemWaypoint.waypointSymbol);
+      // TODO(eseidel): Could make this a single db query by fetching all
+      // construction records up front.
+      final waypoint = await waypointFromCaches(systemWaypoint.waypointSymbol);
       if (waypoint == null) {
         return null;
       }
@@ -109,7 +113,7 @@ class WaypointCache {
       return _waypointsBySystem[systemSymbol]!;
     }
     // Check if all waypoints are in the charting cache.
-    final cachedWaypoints = _waypointsInSystemFromCache(systemSymbol);
+    final cachedWaypoints = await _waypointsInSystemFromCache(systemSymbol);
     if (cachedWaypoints != null) {
       _waypointsBySystem[systemSymbol] = cachedWaypoints;
       return cachedWaypoints;
@@ -132,9 +136,9 @@ class WaypointCache {
       final construction = waypoint.isUnderConstruction
           ? await getConstruction(api, waypoint.waypointSymbol)
           : null;
-      _constructionCache.updateConstruction(
-        waypointSymbol: waypoint.waypointSymbol,
-        construction: construction,
+      await _constructionCache.updateConstruction(
+        waypoint.waypointSymbol,
+        construction,
       );
     }
   }
@@ -151,7 +155,7 @@ class WaypointCache {
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   Future<Waypoint?> _waypointOrNull(WaypointSymbol waypointSymbol) async {
     final systemSymbol = waypointSymbol.systemSymbol;
-    final cachedWaypoint = waypointFromCaches(waypointSymbol);
+    final cachedWaypoint = await waypointFromCaches(waypointSymbol);
     if (cachedWaypoint != null) {
       return cachedWaypoint;
     }
@@ -173,7 +177,7 @@ class WaypointCache {
   /// Returns true if the given waypoint is under construction.
   Future<bool> isUnderConstruction(WaypointSymbol waypointSymbol) async {
     // If we've cached a false result that can never change.
-    final maybe = _constructionCache.isUnderConstruction(waypointSymbol);
+    final maybe = await _constructionCache.isUnderConstruction(waypointSymbol);
     if (maybe == false) {
       return false;
     }

@@ -1,8 +1,8 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
+import 'package:db/construction.dart';
 import 'package:types/types.dart';
 
 // This is for direct non-logging actions
@@ -156,9 +156,9 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
     supplyConstructionRequest: request,
   );
   final data = response!.data;
-  constructionCache.updateConstruction(
-    waypointSymbol: construction.waypointSymbol,
-    construction: data.construction,
+  await constructionCache.updateConstruction(
+    construction.waypointSymbol,
+    data.construction,
   );
   ship.cargo = data.cargo;
   shipCache.updateShip(ship);

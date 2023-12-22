@@ -1,5 +1,3 @@
-import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
@@ -358,12 +356,10 @@ void main() {
       fs: fs,
     );
 
-    final jumpGateCache = JumpGateCache([], fs: fs);
-    final constructionCache = ConstructionCache([], fs: fs);
-    final routePlanner = RoutePlanner.fromCaches(
+    final systemConnetivity = SystemConnectivity.test({});
+    final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,
-      jumpGateCache,
-      constructionCache,
+      systemConnetivity,
       // Allow refueling at waypoints or this test will fail.
       sellsFuel: (_) => true,
     );

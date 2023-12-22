@@ -5,11 +5,12 @@ import 'package:cli/idle_queue.dart';
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Start at the agent's headquarters system.
   // Walk the web of jump gates to find endpoints we should scan.
+  final db = await defaultDatabase();
   final agentCache = AgentCache.load(fs)!;
   final systemSymbol = agentCache.headquartersSystemSymbol;
   final systemsCache = SystemsCache.load(fs)!;
   final jumpGateCache = JumpGateCache.load(fs);
-  final constructionCache = ConstructionCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
   final waypointTraits = WaypointTraitCache.load(fs);
   final chartingCache = ChartingCache.load(fs, waypointTraits);
 
@@ -33,11 +34,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         }
         continue;
       }
-      if (!canJumpFrom(jumpGateCache, constructionCache, from)) {
+      if (!canJumpFrom(jumpGateCache, constructionSnapshot, from)) {
         continue;
       }
       for (final to in fromRecord.connections) {
-        final toConstruction = constructionCache.recordForSymbol(to);
+        final toConstruction = constructionSnapshot[to];
         if (toConstruction == null) {
           needsConstructionCheck.add(to);
         } else {
@@ -72,6 +73,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final waypoint in needsConstructionCheck) {
     logger.info('  $waypoint');
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {
