@@ -98,99 +98,6 @@ class ChartingRecord {
       };
 }
 
-// Existing json:
-// {
-//   "waypointSymbol": "X1-JX78-B11",
-//   "faction": {
-//    "symbol": "AEGIS"
-//   },
-//   "traitSymbols": [
-//    "MINERAL_DEPOSITS"
-//   ],
-//   "chart": {
-//    "waypointSymbol": null,
-//    "submittedBy": "AEGIS",
-//    "submittedOn": "2023-12-02T18:47:27.627Z"
-//   }
-//  }
-
-/// A charted value.
-class OldChartedValues {
-  /// Creates a new charted values.
-  const OldChartedValues({
-    required this.waypointSymbol,
-    required this.chart,
-    required this.faction,
-    required this.traitSymbols,
-  });
-
-  /// Creates a new charted values from JSON data.
-  factory OldChartedValues.fromJson(Map<String, dynamic> json) {
-    final faction =
-        WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
-    final traitSymbols = (json['traitSymbols'] as List<dynamic>)
-        .cast<String>()
-        .map((e) => WaypointTraitSymbol.fromJson(e)!)
-        .toSet();
-    final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
-    final waypointSymbol =
-        WaypointSymbol.fromJson(json['waypointSymbol'] as String);
-    return OldChartedValues(
-      waypointSymbol: waypointSymbol,
-      faction: faction,
-      traitSymbols: traitSymbols,
-      chart: chart,
-    );
-  }
-
-  /// Symbol for this waypoint.
-  final WaypointSymbol waypointSymbol;
-
-  /// Faction for this waypoint.
-  final WaypointFaction? faction;
-
-  /// The traits of the waypoint.
-  final Set<WaypointTraitSymbol> traitSymbols;
-
-  /// Chart for this waypoint.
-  final Chart chart;
-
-  /// Converts this charted values to JSON data.
-  Map<String, dynamic> toJson() {
-    final sortedTradeSymbols = traitSymbols.sortedBy((s) => s.value);
-    return <String, dynamic>{
-      'waypointSymbol': waypointSymbol.toJson(),
-      'faction': faction?.toJson(),
-      'traitSymbols': sortedTradeSymbols,
-      'chart': chart.toJson(),
-    };
-  }
-
-  /// Whether this waypoint has a shipyard.
-  bool get hasShipyard => traitSymbols.contains(WaypointTraitSymbol.SHIPYARD);
-
-  /// Whether this waypoint has a market.
-  bool get hasMarket => traitSymbols.contains(WaypointTraitSymbol.MARKETPLACE);
-}
-
-/// Temporary shim to allow loading old charting cache.
-ChartingRecord compatShim(Map<String, dynamic> json) {
-  if (json['timestamp'] != null) {
-    return ChartingRecord.fromJson(json);
-  }
-  final old = OldChartedValues.fromJson(json);
-  final values = ChartedValues(
-    faction: old.faction,
-    traitSymbols: old.traitSymbols,
-    chart: old.chart,
-  );
-  return ChartingRecord(
-    waypointSymbol: old.waypointSymbol,
-    values: values,
-    timestamp: DateTime.timestamp(),
-  );
-}
-
 typedef _Record = Map<WaypointSymbol, ChartingRecord>;
 
 /// A cached of charted values from Waypoints.
@@ -222,7 +129,7 @@ class ChartingCache extends JsonStore<_Record> {
           (Map<String, dynamic> j) => j.map(
             (key, value) => MapEntry(
               WaypointSymbol.fromJson(key),
-              compatShim(value as Map<String, dynamic>),
+              ChartingRecord.fromJson(value as Map<String, dynamic>),
             ),
           ),
         ) ??
