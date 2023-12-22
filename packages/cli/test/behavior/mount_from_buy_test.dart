@@ -30,6 +30,10 @@ class _MockShipNav extends Mock implements ShipNav {}
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(ShipSpec.fallbackValue());
+  });
+
   test('advanceMountFromBuy smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();

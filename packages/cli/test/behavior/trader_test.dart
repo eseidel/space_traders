@@ -40,6 +40,10 @@ class _MockSystemsApi extends Mock implements SystemsApi {}
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(ShipSpec.fallbackValue());
+  });
+
   test('advanceTrader smoke test', () async {
     registerFallbackValue(Duration.zero);
     const shipSymbol = ShipSymbol('S', 1);

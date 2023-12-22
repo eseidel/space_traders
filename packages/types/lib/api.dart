@@ -351,6 +351,11 @@ class ShipSpec {
     required this.speed,
   });
 
+  /// Fallback value for mocking.
+  @visibleForTesting
+  ShipSpec.fallbackValue()
+      : this(cargoCapacity: 0, fuelCapacity: 100, speed: 10);
+
   /// The fuel capacity of the ship.
   final int fuelCapacity;
 

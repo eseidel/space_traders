@@ -70,6 +70,10 @@ SellOpp _makeSellOpp({
 }
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(ShipSpec.fallbackValue());
+  });
+
   test('costOutDeal basic', () {
     final systemsCache = _MockSystemsCache();
     final start = SystemWaypoint(
