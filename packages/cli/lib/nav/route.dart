@@ -118,7 +118,7 @@ int cooldownTimeForJumpDistance(int distance) {
   }
   // There is no longer a limit on jump distance, just a question
   // of if two systems are connected by a jumpgate.
-  return max(60, (distance / 10).round());
+  return max(60, distance);
 }
 
 /// Returns the cooldown time after jumping between two systems.
@@ -129,7 +129,7 @@ int cooldownTimeForJumpBetweenSystems(System a, System b) {
   // There is no longer a limit on jump distance, just a question
   // of if two systems are connected by a jumpgate.
   // This would need to check that this two are connected by a jumpgate.
-  return max(60, (a.distanceTo(b) / 10).round());
+  return cooldownTimeForJumpDistance(a.distanceTo(b));
 }
 
 /// Logic for modifying RoutePlans

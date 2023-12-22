@@ -2,33 +2,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
-int _distanceBetween(System a, System b) {
-  return a.position.distanceTo(b.position);
-}
-
-// TODO(eseidel): I suspect we could delete this and use _timeBetween.
-int _approximateTimeBetween(
-  System aSystem,
-  System bSystem,
-) {
-  if (aSystem.symbol == bSystem.symbol) {
-    return 0;
-  }
-  assert(aSystem.hasJumpGate, 'System ${aSystem.symbol} has no jump gate');
-  // Cooldown time for jumps is Math.max(60, distance / 10)
-  // distance / 10 is an approximation of the cooldown time for a jump gate.
-  // This assumes there are direct jumps in a line.
-  return _distanceBetween(aSystem, bSystem) ~/ 10;
-}
-
-int _timeBetween(
-  System aSystem,
-  System bSystem,
-) {
-  final distance = _distanceBetween(aSystem, bSystem);
-  return cooldownTimeForJumpDistance(distance);
-}
-
 /// Returns the path from [start] to [end] as a list of system symbols.
 List<SystemSymbol>? findSystemPath(
   SystemsCache systemsCache,
@@ -47,6 +20,12 @@ List<SystemSymbol>? findSystemPath(
   final cameFrom = <SystemSymbol, SystemSymbol>{};
   final costSoFar = <SystemSymbol, int>{};
   costSoFar[startSymbol] = 0;
+
+  const timeBetween = cooldownTimeForJumpBetweenSystems;
+  // A* only requires approximate weights, but we use the real weights here
+  // because it's just as fast to compute.
+  const approximateTimeBetween = cooldownTimeForJumpBetweenSystems;
+
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
     final currentSymbol = current.$1;
@@ -61,10 +40,10 @@ List<SystemSymbol>? findSystemPath(
     for (final nextSystem in connectedSystems) {
       final next = nextSystem.systemSymbol;
       final newCost =
-          costSoFar[currentSymbol]! + _timeBetween(currentSystem, nextSystem);
+          costSoFar[currentSymbol]! + timeBetween(currentSystem, nextSystem);
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
-        final priority = newCost + _approximateTimeBetween(end, nextSystem);
+        final priority = newCost + approximateTimeBetween(end, nextSystem);
         frontier.add((next, priority));
         cameFrom[next] = currentSymbol;
       }
