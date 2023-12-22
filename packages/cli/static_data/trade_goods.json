@@ -265,6 +265,11 @@
   "description": "Filters and processes extracted gases into their component parts, filters out impurities, and containerizes them into raw storage units."
  },
  {
+  "symbol": "MODULE_MICRO_REFINERY_I",
+  "name": "Micro Refinery",
+  "description": "A small-scale refining module that processes raw materials into refined products."
+ },
+ {
   "symbol": "MODULE_MINERAL_PROCESSOR_I",
   "name": "Mineral Processor",
   "description": "Crushes and processes extracted minerals and ores into their component parts, filters out impurities, and containerizes them into raw storage units."
