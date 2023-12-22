@@ -135,10 +135,9 @@ void main() {
     final route = _MockRoutePlan();
     when(
       () => caches.routePlanner.planRoute(
+        any(),
         start: symbol,
         end: symbol,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(route);
 

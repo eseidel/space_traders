@@ -25,10 +25,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   Duration travelTimeTo(Ship ship, WaypointSymbol waypoint) {
     final route = routePlanner.planRoute(
+      ship.shipSpec,
       start: ship.waypointSymbol,
       end: waypoint,
-      fuelCapacity: ship.frame.fuelCapacity,
-      shipSpeed: ship.engine.speed,
     );
     final routeDuration = route!.duration;
     if (ship.isInTransit) {

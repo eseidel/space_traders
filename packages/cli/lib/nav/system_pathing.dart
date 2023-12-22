@@ -10,7 +10,6 @@ int _distanceBetween(System a, System b) {
 int _approximateTimeBetween(
   System aSystem,
   System bSystem,
-  int shipSpeed,
 ) {
   if (aSystem.symbol == bSystem.symbol) {
     return 0;
@@ -25,7 +24,6 @@ int _approximateTimeBetween(
 int _timeBetween(
   System aSystem,
   System bSystem,
-  int shipSpeed,
 ) {
   final distance = _distanceBetween(aSystem, bSystem);
   return cooldownTimeForJumpDistance(distance);
@@ -37,7 +35,6 @@ List<SystemSymbol>? findSystemPath(
   SystemConnectivity systemConnectivity,
   System start,
   System end,
-  int shipSpeed,
 ) {
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -63,12 +60,11 @@ List<SystemSymbol>? findSystemPath(
 
     for (final nextSystem in connectedSystems) {
       final next = nextSystem.systemSymbol;
-      final newCost = costSoFar[currentSymbol]! +
-          _timeBetween(currentSystem, nextSystem, shipSpeed);
+      final newCost =
+          costSoFar[currentSymbol]! + _timeBetween(currentSystem, nextSystem);
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
-        final priority =
-            newCost + _approximateTimeBetween(end, nextSystem, shipSpeed);
+        final priority = newCost + _approximateTimeBetween(end, nextSystem);
         frontier.add((next, priority));
         cameFrom[next] = currentSymbol;
       }
@@ -94,11 +90,11 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   SystemConnectivity systemConnectivity,
   WaypointSymbol start,
   WaypointSymbol end,
-  int shipSpeed,
 ) {
   final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
   final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
   if (start.systemSymbol == end.systemSymbol) {
+    // The caller needs to turn this into a real intra-system path.
     return [start, end];
   }
   if (!startSystem.hasJumpGate || !endSystem.hasJumpGate) {
@@ -110,7 +106,6 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
     systemConnectivity,
     startSystem,
     endSystem,
-    shipSpeed,
   );
   if (systemSymbols == null) {
     return null;

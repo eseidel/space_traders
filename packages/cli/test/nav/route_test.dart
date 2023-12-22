@@ -252,10 +252,13 @@ void main() {
       int shipSpeed = 30,
     }) =>
         routePlanner.planRoute(
+          ShipSpec(
+            cargoCapacity: 0,
+            fuelCapacity: fuelCapacity,
+            speed: shipSpeed,
+          ),
           start: start,
           end: end,
-          fuelCapacity: fuelCapacity,
-          shipSpeed: shipSpeed,
         );
 
     void expectRoute(
@@ -370,10 +373,13 @@ void main() {
       int shipSpeed = 30,
     }) =>
         routePlanner.planRoute(
+          ShipSpec(
+            cargoCapacity: 0,
+            fuelCapacity: fuelCapacity,
+            speed: shipSpeed,
+          ),
           start: start.waypointSymbol,
           end: end.waypointSymbol,
-          fuelCapacity: fuelCapacity,
-          shipSpeed: shipSpeed,
         );
     // If tank is large enough, we just go direct.
     final big = planRoute(start, end, fuelCapacity: 101)!.actions;

@@ -30,13 +30,14 @@ int _timeBetween(
 /// Only works if [start] and [end] are in the same system.
 /// This relies on sellFuel callback to determine if a waypoint sells fuel.
 List<RouteAction>? findRouteWithinSystem(
-  SystemsCache systemsCache, {
+  SystemsCache systemsCache,
+  ShipSpec shipSpec, {
   required WaypointSymbol start,
   required WaypointSymbol end,
-  required int shipSpeed,
-  required int fuelCapacity,
   required bool Function(WaypointSymbol) sellsFuel,
 }) {
+  final fuelCapacity = shipSpec.fuelCapacity;
+  final shipSpeed = shipSpec.speed;
   final startWaypoint = systemsCache.waypoint(start);
   final endWaypoint = systemsCache.waypoint(end);
   if (start.systemSymbol != end.systemSymbol) {

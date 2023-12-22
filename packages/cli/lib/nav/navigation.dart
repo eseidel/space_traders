@@ -32,10 +32,9 @@ Future<DateTime?> beingNewRouteAndLog(
 ) async {
   final start = ship.waypointSymbol;
   final route = caches.routePlanner.planRoute(
+    ship.shipSpec,
     start: start,
     end: destinationSymbol,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
   );
   if (route == null) {
     throw JobException(

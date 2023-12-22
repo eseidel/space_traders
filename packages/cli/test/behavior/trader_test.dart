@@ -472,10 +472,9 @@ void main() {
 
     when(
       () => caches.routePlanner.planRoute(
+        any(),
         start: any(named: 'start'),
         end: any(named: 'end'),
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(routePlan);
     registerFallbackValue(Transaction.fallbackValue());
@@ -656,10 +655,9 @@ void main() {
 
     when(
       () => caches.routePlanner.planRoute(
+        any(),
         start: shipLocation,
         end: start,
-        fuelCapacity: any(named: 'fuelCapacity'),
-        shipSpeed: any(named: 'shipSpeed'),
       ),
     ).thenReturn(routePlan);
 
@@ -854,10 +852,9 @@ void main() {
 
     when(
       () => caches.routePlanner.planRoute(
+        any(),
         start: any(named: 'start'),
         end: any(named: 'end'),
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(routePlan);
 

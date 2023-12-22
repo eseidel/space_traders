@@ -95,10 +95,9 @@ void main() {
     registerFallbackValue(start.waypointSymbol);
     when(
       () => routePlanner.planRoute(
+        any(),
         start: any(named: 'start'),
         end: any(named: 'end'),
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(
       RoutePlan(
@@ -126,10 +125,12 @@ void main() {
     final costed = costOutDeal(
       systemsCache,
       routePlanner,
+      const ShipSpec(
+        cargoCapacity: 1,
+        speed: shipSpeed,
+        fuelCapacity: fuelCapacity,
+      ),
       deal,
-      cargoSize: 1,
-      shipSpeed: shipSpeed,
-      shipFuelCapacity: fuelCapacity,
       shipWaypointSymbol: start.waypointSymbol,
       costPerFuelUnit: 100,
       costPerAntimatterUnit: 10000,
@@ -504,26 +505,23 @@ void main() {
 
     when(
       () => routePlanner.planRoute(
+        any(),
         start: nearSymbol,
         end: nearSymbol,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(fakePlan(nearSymbol, nearSymbol, 1));
     when(
       () => routePlanner.planRoute(
+        any(),
         start: nearSymbol,
         end: mid.waypointSymbol,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(fakePlan(nearSymbol, mid.waypointSymbol, 10));
     when(
       () => routePlanner.planRoute(
+        any(),
         start: nearSymbol,
         end: far.waypointSymbol,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(fakePlan(nearSymbol, far.waypointSymbol, 10000000));
 
@@ -618,26 +616,23 @@ void main() {
 
     when(
       () => routePlanner.planRoute(
+        any(),
         start: nearSymbol,
         end: nearSymbol,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(fakePlan(nearSymbol, nearSymbol, 1));
     when(
       () => routePlanner.planRoute(
+        any(),
         start: nearSymbol,
         end: midSymbol,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(fakePlan(nearSymbol, midSymbol, 10));
     when(
       () => routePlanner.planRoute(
+        any(),
         start: nearSymbol,
         end: farSymbol,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       ),
     ).thenReturn(fakePlan(nearSymbol, farSymbol, 10000000));
 

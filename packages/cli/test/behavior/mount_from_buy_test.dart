@@ -214,10 +214,9 @@ void main() {
 
     when(
       () => caches.routePlanner.planRoute(
+        any(),
         start: waypointSymbol,
         end: waypointSymbol,
-        fuelCapacity: any(named: 'fuelCapacity'),
-        shipSpeed: any(named: 'shipSpeed'),
       ),
     ).thenReturn(
       RoutePlan.empty(

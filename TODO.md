@@ -1061,3 +1061,21 @@ jump            ST82-BE8Z  AD18-A31F 6m 0 fuel
 jump            AD18-A31F  NT23-E21D 0ms 0 fuel
 in 41m uses 108 fuel
 
+
+Including contract sell opp: 45 PLATINUM_ORE @ 197c -> AC35-B7
+Considering 883 waypoints
+Finding deals with start: ZH60-BD5B, from scan: all known markets, max outlay: 8370351, max units: 40, fuel capacity: 400, ship speed: 30
+Found 789 potential deals.
+Found 1 deals for ESEIDEL-1 from ZH60-BD5B
+ASSAULT_RIFLES             AC35-E48      2,423c -> AC35-J62      3,563c  +16,158c (13%) 30m   8c/s 126,362c
+🛸#1  Found deal: ASSAULT_RIFLES             AC35-E48      2,423c -> AC35-J62      3,563c  +16,158c (13%) 30m   8c/s 126,362c
+🛸#1  Starting: ZH60-BD5B to AC35-E48 speed: 30 max-fuel: 400
+navCruise       ZH60-BD5B  ZH60-EF7Z 7m 493 fuel
+jump            ZH60-EF7Z  RD58-ZB8X 7m 0 fuel
+jump            RD58-ZB8X  AC35-I59 0ms 0 fuel
+navCruise       AC35-I59  AC35-E48 6m 401 fuel
+in 20m uses 894 fuel
+
+[WARN] 🛸#1  Beginning route to AC35-E48 (20m)
+[WARN] 🛸#1  Planned navigation from ZH60-BD5B to ZH60-EF7Z requires more fuel than ESEIDEL-1 can hold (400 < 493) Disabling Behavior.trader for ESEIDEL-1 for 5m.
+[WARN] 🛸#1  took 1s (0 requests) expected 0.0s

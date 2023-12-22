@@ -54,6 +54,12 @@ class TestShip {
     );
   }
 
+  ShipSpec get shipSpec => ShipSpec(
+        speed: speed,
+        fuelCapacity: fuelCapacity,
+        cargoCapacity: 0,
+      );
+
   final int speed;
   final int fuelCapacity;
   final int initialFuel;
@@ -284,10 +290,9 @@ void runTests(TestSuite suite, String path) {
     final start = WaypointSymbol.fromString('$sector-${test.start}');
     final end = WaypointSymbol.fromString('$sector-${test.end}');
     final plan = routePlanner.planRoute(
+      ship.shipSpec,
       start: start,
       end: end,
-      fuelCapacity: ship.fuelCapacity,
-      shipSpeed: ship.speed,
     );
     if (plan == null) {
       logger.err('No route found for $start to $end');

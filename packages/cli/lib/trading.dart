@@ -335,11 +335,9 @@ String describeCostedDeal(CostedDeal costedDeal) {
 CostedDeal costOutDeal(
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
+  ShipSpec shipSpec,
   Deal deal, {
-  required int cargoSize,
-  required int shipSpeed,
   required WaypointSymbol shipWaypointSymbol,
-  required int shipFuelCapacity,
   required int costPerFuelUnit,
   required int costPerAntimatterUnit,
 }) {
@@ -351,9 +349,8 @@ CostedDeal costOutDeal(
   final route = planRouteThrough(
     systemsCache,
     routePlanner,
+    shipSpec,
     waypointSymbols,
-    fuelCapacity: shipFuelCapacity,
-    shipSpeed: shipSpeed,
   );
 
   if (route == null) {
@@ -362,7 +359,7 @@ CostedDeal costOutDeal(
 
   return CostedDeal(
     deal: deal,
-    cargoSize: cargoSize,
+    cargoSize: shipSpec.cargoCapacity,
     transactions: [],
     startTime: DateTime.timestamp(),
     route: route,
@@ -440,13 +437,15 @@ Iterable<CostedDeal> findDealsFor(
   final costedDeals = filtered
       .map(
         (deal) => costOutDeal(
-          shipSpeed: shipSpeed,
           systemsCache,
           routePlanner,
+          ShipSpec(
+            cargoCapacity: cargoCapacity,
+            fuelCapacity: fuelCapacity,
+            speed: shipSpeed,
+          ),
           deal,
-          cargoSize: cargoCapacity,
           shipWaypointSymbol: startSymbol,
-          shipFuelCapacity: fuelCapacity,
           costPerFuelUnit: marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
               config.defaultFuelCost,
           costPerAntimatterUnit:
@@ -504,17 +503,15 @@ typedef MarketTrip = CostedTrip<MarketPrice>;
 /// Compute the cost of going to and buying from a specific MarketPrice record.
 CostedTrip<T>? costTrip<T>(
   RoutePlanner planner,
-  T price, {
+  T price,
+  ShipSpec shipSpec, {
   required WaypointSymbol start,
   required WaypointSymbol end,
-  required int fuelCapacity,
-  required int shipSpeed,
 }) {
   final route = planner.planRoute(
+    shipSpec,
     start: start,
     end: end,
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
   );
   if (route == null) {
     return null;
@@ -548,10 +545,13 @@ List<MarketTrip> marketsTradingSortedByDistance(
     final trip = costTrip<MarketPrice>(
       routePlanner,
       price,
+      ShipSpec(
+        fuelCapacity: fuelCapacity,
+        speed: shipSpeed,
+        cargoCapacity: 0,
+      ),
       start: start,
       end: end,
-      shipSpeed: shipSpeed,
-      fuelCapacity: fuelCapacity,
     );
     if (trip != null) {
       costed.add(trip);

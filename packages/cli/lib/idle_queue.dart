@@ -140,7 +140,7 @@ class IdleQueue {
   }
 
   /// A guess at the minimum time we need to do one loop.
-  Duration get minProcessingTime => const Duration(seconds: 1);
+  Duration get minProcessingTime => const Duration(milliseconds: 1500);
 
   /// Run one fetch.
   Future<void> runOne(Api api, Caches caches) async {

@@ -86,17 +86,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   );
 
   final ship = staticCaches.shipyardShips[shipType]!;
-  final shipSpeed = ship.engine.speed;
-  final fuelCapacity = ship.frame.fuelCapacity;
 
   final start = WaypointSymbol.fromString(startSymbol);
   final end = WaypointSymbol.fromString(endSymbol);
   final routeStart = DateTime.now();
   final plan = routePlanner.planRoute(
+    ship.shipSpec,
     start: start,
     end: end,
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
   );
   final routeEnd = DateTime.now();
   final duration = routeEnd.difference(routeStart);

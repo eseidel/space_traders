@@ -37,10 +37,9 @@ List<ShipyardTrip> _shipyardsSellingByDistance(
     final trip = costTrip(
       routePlanner,
       price,
+      ship.shipSpec,
       start: start,
       end: end,
-      fuelCapacity: ship.fuel.capacity,
-      shipSpeed: ship.engine.speed,
     );
     if (trip != null) {
       costed.add(trip);

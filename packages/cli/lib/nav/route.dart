@@ -155,12 +155,12 @@ extension RoutePlanPlanning on RoutePlan {
 
 /// Plan a route between two waypoints using a pre-computed jump plan.
 RoutePlan routePlanFromJumpPlan(
-  SystemsCache systemsCache, {
+  SystemsCache systemsCache,
+  JumpPlan jumpPlan,
+  ShipSpec shipSpec, {
   required WaypointSymbol start,
   required WaypointSymbol end,
-  required JumpPlan jumpPlan,
-  required int fuelCapacity,
-  required int shipSpeed,
+  required bool Function(WaypointSymbol) sellsFuel,
 }) {
   final actions = <RouteAction>[];
   if (jumpPlan.route.first != start.systemSymbol) {
@@ -173,7 +173,14 @@ RoutePlan routePlanFromJumpPlan(
   final startJumpGate =
       systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
   if (startJumpGate.symbol != start.waypoint) {
-    actions.add(_navigationAction(startWaypoint, startJumpGate, shipSpeed));
+    _addSubPlanWithinSystem(
+      systemsCache,
+      actions,
+      startWaypoint,
+      startJumpGate,
+      shipSpec,
+      sellsFuel: sellsFuel,
+    );
   }
 
   for (var i = 0; i < jumpPlan.route.length - 1; i++) {
@@ -187,7 +194,6 @@ RoutePlan routePlanFromJumpPlan(
         systemsCache,
         startJumpgate,
         endJumpGate,
-        shipSpeed,
         isLastJump: isLastJump,
       ),
     );
@@ -195,12 +201,19 @@ RoutePlan routePlanFromJumpPlan(
   final endWaypoint = systemsCache.waypoint(end);
   final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
   if (endJumpGate.symbol != end.waypoint) {
-    actions.add(_navigationAction(endJumpGate, endWaypoint, shipSpeed));
+    _addSubPlanWithinSystem(
+      systemsCache,
+      actions,
+      endJumpGate,
+      endWaypoint,
+      shipSpec,
+      sellsFuel: sellsFuel,
+    );
   }
 
   return RoutePlan(
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
+    fuelCapacity: shipSpec.fuelCapacity,
+    shipSpeed: shipSpec.speed,
     actions: actions,
   );
 }
@@ -245,31 +258,33 @@ void _saveJumpsInCache(JumpCache jumpCache, List<RouteAction> actions) {
   }
 }
 
-RouteAction _navigationAction(
+void _addSubPlanWithinSystem(
+  SystemsCache systemsCache,
+  List<RouteAction> route,
   SystemWaypoint start,
   SystemWaypoint end,
-  int shipSpeed,
-) {
-  final seconds = flightTimeWithinSystemInSeconds(
-    start,
-    end,
-    shipSpeed: shipSpeed,
+  ShipSpec shipSpec, {
+  required bool Function(WaypointSymbol) sellsFuel,
+}) {
+  final actions = findRouteWithinSystem(
+    systemsCache,
+    shipSpec,
+    start: start.waypointSymbol,
+    end: end.waypointSymbol,
+    sellsFuel: sellsFuel,
   );
-  final fuelUsed = fuelUsedWithinSystem(start, end);
-  return RouteAction(
-    startSymbol: start.waypointSymbol,
-    endSymbol: end.waypointSymbol,
-    type: RouteActionType.navCruise,
-    seconds: seconds,
-    fuelUsed: fuelUsed,
-  );
+  // This should not be possible.
+  if (actions == null) {
+    throw ArgumentError('Cannot find route within system from '
+        '${start.waypointSymbol} to ${end.waypointSymbol}');
+  }
+  route.addAll(actions);
 }
 
 RouteAction _jumpAction(
   SystemsCache systemsCache,
   SystemWaypoint start,
-  SystemWaypoint end,
-  int shipSpeed, {
+  SystemWaypoint end, {
   required bool isLastJump,
 }) {
   final startSystem = systemsCache[start.systemSymbol];
@@ -330,11 +345,10 @@ class RoutePlanner {
     _jumpCache.clear();
   }
 
-  RoutePlan? _planJump({
+  RoutePlan? _planJump(
+    ShipSpec shipSpec, {
     required WaypointSymbol start,
     required WaypointSymbol end,
-    required int fuelCapacity,
-    required int shipSpeed,
   }) {
     if (start.systemSymbol == end.systemSymbol) {
       throw ArgumentError('Cannot plan a jump within the same system.');
@@ -357,11 +371,11 @@ class RoutePlanner {
     if (jumpPlan != null) {
       return routePlanFromJumpPlan(
         _systemsCache,
+        jumpPlan,
+        shipSpec,
         start: start,
         end: end,
-        jumpPlan: jumpPlan,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
+        sellsFuel: _sellsFuel,
       );
     }
 
@@ -374,7 +388,6 @@ class RoutePlanner {
       _systemConnectivity,
       start,
       end,
-      shipSpeed,
     );
     if (symbols == null) {
       return null;
@@ -404,18 +417,18 @@ class RoutePlanner {
             _systemsCache,
             previousWaypoint,
             currentWaypoint,
-            shipSpeed,
             isLastJump: isLastJump,
           ),
         );
         isLastJump = false;
       } else {
-        route.add(
-          _navigationAction(
-            previousWaypoint,
-            currentWaypoint,
-            shipSpeed,
-          ),
+        _addSubPlanWithinSystem(
+          _systemsCache,
+          route,
+          previousWaypoint,
+          currentWaypoint,
+          shipSpec,
+          sellsFuel: _sellsFuel,
         );
       }
     }
@@ -425,17 +438,16 @@ class RoutePlanner {
     _saveJumpsInCache(_jumpCache, actions);
 
     return RoutePlan(
-      fuelCapacity: fuelCapacity,
-      shipSpeed: shipSpeed,
+      fuelCapacity: shipSpec.fuelCapacity,
+      shipSpeed: shipSpec.speed,
       actions: actions,
     );
   }
 
-  RoutePlan? _planWithinSystem({
+  RoutePlan? _planWithinSystem(
+    ShipSpec shipSpec, {
     required WaypointSymbol start,
     required WaypointSymbol end,
-    required int fuelCapacity,
-    required int shipSpeed,
   }) {
     if (start.systemSymbol != end.systemSymbol) {
       return null;
@@ -444,10 +456,9 @@ class RoutePlanner {
     final startTime = DateTime.timestamp();
     final actions = findRouteWithinSystem(
       _systemsCache,
+      shipSpec,
       start: start,
       end: end,
-      shipSpeed: shipSpeed,
-      fuelCapacity: fuelCapacity,
       sellsFuel: _sellsFuel,
     );
     if (actions == null) {
@@ -465,44 +476,41 @@ class RoutePlanner {
     // we could alternatively build it forward and then fix the jump durations
     // after.
     return RoutePlan(
-      fuelCapacity: fuelCapacity,
-      shipSpeed: shipSpeed,
+      fuelCapacity: shipSpec.fuelCapacity,
+      shipSpeed: shipSpec.speed,
       actions: actions,
     );
   }
 
   /// Plan a route between two waypoints.
-  RoutePlan? planRoute({
+  RoutePlan? planRoute(
+    ShipSpec shipSpec, {
     required WaypointSymbol start,
     required WaypointSymbol end,
-    required int fuelCapacity,
-    required int shipSpeed,
   }) {
     // TODO(eseidel): This is wrong.  An empty route is not valid.
     if (start.waypoint == end.waypoint) {
       // throw ArgumentError('Cannot plan route between same waypoint');
       return RoutePlan.empty(
         symbol: start,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
+        fuelCapacity: shipSpec.fuelCapacity,
+        shipSpeed: shipSpec.speed,
       );
     }
 
     if (start.systemSymbol == end.systemSymbol) {
       // plan a route within a system
       return _planWithinSystem(
+        shipSpec,
         start: start,
         end: end,
-        fuelCapacity: fuelCapacity,
-        shipSpeed: shipSpeed,
       );
     }
     // plan a route between systems
     return _planJump(
+      shipSpec,
       start: start,
       end: end,
-      fuelCapacity: fuelCapacity,
-      shipSpeed: shipSpeed,
     );
   }
 }
@@ -511,10 +519,9 @@ class RoutePlanner {
 RoutePlan? planRouteThrough(
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
-  List<WaypointSymbol> waypointSymbols, {
-  required int fuelCapacity,
-  required int shipSpeed,
-}) {
+  ShipSpec shipSpec,
+  List<WaypointSymbol> waypointSymbols,
+) {
   if (waypointSymbols.length < 2) {
     throw ArgumentError('Must have at least two waypoints');
   }
@@ -529,10 +536,9 @@ RoutePlan? planRouteThrough(
       continue;
     }
     final plan = routePlanner.planRoute(
+      shipSpec,
       start: start,
       end: end,
-      fuelCapacity: fuelCapacity,
-      shipSpeed: shipSpeed,
     );
     if (plan == null) {
       return null;
@@ -545,8 +551,8 @@ RoutePlan? planRouteThrough(
     actions.addAll(segment.actions);
   }
   return RoutePlan(
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
+    fuelCapacity: shipSpec.fuelCapacity,
+    shipSpeed: shipSpec.speed,
     actions: actions,
   );
 }

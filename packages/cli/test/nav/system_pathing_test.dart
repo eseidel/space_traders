@@ -49,14 +49,12 @@ void main() {
     final systemConnectivity = SystemConnectivity.test({
       start: {end},
     });
-    const shipSpeed = 30;
 
     final path = findWaypointPathJumpsOnly(
       systemsCache,
       systemConnectivity,
       start,
       end,
-      shipSpeed,
     );
     expect(path, [start, end]);
   });
