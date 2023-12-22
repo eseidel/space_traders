@@ -209,4 +209,8 @@ class Database {
   /// Return all construction records.
   Future<Iterable<ConstructionRecord>> allConstructionRecords() async =>
       queryMany(allConstructionQuery(), constructionFromColumnMap);
+
+  /// Insert a construction record into the database.
+  Future<void> upsertConstruction(ConstructionRecord record) async =>
+      insertOne(upsertConstructionQuery(record));
 }

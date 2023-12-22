@@ -7,33 +7,33 @@ ConstructionRecord constructionFromColumnMap(Map<String, dynamic> values) {
   // ignoring is_complete from the db, computing from construction instead.
   return ConstructionRecord(
     construction: Construction.fromJson(values['construction']),
-    timestamp: DateTime.parse(values['timestamp'] as String),
-    waypointSymbol: WaypointSymbol.fromJson(values['waypointSymbol'] as String),
+    timestamp: values['timestamp'] as DateTime,
+    waypointSymbol:
+        WaypointSymbol.fromJson(values['waypoint_symbol'] as String),
   );
 }
 
 /// Convert a ConstructionRecord into substitution values for a query.
 Map<String, dynamic> constructionToColumnMap(ConstructionRecord survey) {
   return {
-    'waypointSymbol': survey.waypointSymbol.toJson(),
+    'waypoint_symbol': survey.waypointSymbol.toJson(),
     'construction': survey.construction?.toJson(),
     'timestamp': survey.timestamp,
     'is_complete': !survey.isUnderConstruction,
   };
 }
 
-/// Insert a ConstructionRecord into the database.
-Query insertConstructionQuery(ConstructionRecord record) {
+/// Insert or Update a ConstructionRecord into the database.
+Query upsertConstructionQuery(ConstructionRecord record) {
   // Insert the ConstructionRecord or update it if it already exists.
   return Query(
     'INSERT INTO construction_ (waypoint_symbol, construction, timestamp, '
-    'is_complete, json) '
-    'VALUES (@waypointSymbol, @construction, @timestamp, @is_complete, @json) '
+    'is_complete) '
+    'VALUES (@waypoint_symbol, @construction, @timestamp, @is_complete) '
     'ON CONFLICT (waypoint_symbol) DO UPDATE SET '
     'construction = @construction, '
     'timestamp = @timestamp, '
-    'is_complete = @is_complete, '
-    'json = @json',
+    'is_complete = @is_complete ',
     substitutionValues: constructionToColumnMap(record),
   );
 }
@@ -93,10 +93,6 @@ class ConstructionCache {
       timestamp: DateTime.timestamp(),
       waypointSymbol: waypointSymbol,
     );
-    final query = insertConstructionQuery(record);
-    await _db.connection.query(
-      query.fmtString,
-      substitutionValues: query.substitutionValues,
-    );
+    await _db.upsertConstruction(record);
   }
 }

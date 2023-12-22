@@ -13,13 +13,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   final db = await defaultDatabase();
-  final staticCaches = StaticCaches.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
       SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
   final systemsCache = SystemsCache.load(fs)!;
-  final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
+  final waypointTraits = WaypointTraitCache.load(fs);
+  final chartingCache = ChartingCache.load(fs, waypointTraits);
 
   int unchartedWaypointCount(SystemSymbol systemSymbol) {
     return systemsCache[systemSymbol]

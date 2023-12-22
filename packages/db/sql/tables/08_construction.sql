@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS "construction_" (
     -- Is the construction complete?
     "is_complete" boolean NOT NULL,
     -- The construction object as json if available.
-    "json" json,
+    "construction" json
 );

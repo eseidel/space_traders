@@ -34,6 +34,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final waypointSymbol in underConstruction) {
     logger.info(waypointSymbol.sectorLocalName);
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {
