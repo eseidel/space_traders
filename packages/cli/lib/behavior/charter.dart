@@ -14,9 +14,10 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   SystemsCache systemsCache,
   WaypointCache waypointCache,
   Ship ship,
-  System system, {
+  SystemSymbol systemSymbol, {
   required bool Function(SystemWaypoint waypointSymbol)? filter,
 }) async {
+  final system = systemsCache[systemSymbol];
   final start = ship.systemSymbol == system.systemSymbol
       ? ship.waypointSymbol
       // This is only ever called with systems with waypoints.
@@ -52,25 +53,19 @@ Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
   Ship ship, {
   required SystemSymbol startSystemSymbol,
   bool Function(SystemWaypoint waypointSymbol)? filter,
+  int maxJumps = 5,
 }) async {
-  // Find all systems we know how to reach.
-  final reachableSystemSymbols =
-      systemConnectivity.systemsReachableFrom(startSystemSymbol);
-  final reachableSystems =
-      reachableSystemSymbols.map(systemsCache.systemBySymbol).toList();
-
-  // Sort systems by distance from the start system.
-  final startSystem = systemsCache[startSystemSymbol];
-  final sortedSystems = reachableSystems
-      .sortedBy<num>((system) => system.distanceTo(startSystem))
-      .toList();
   // Walk through the list finding one missing either a chart or market data.
-  for (final system in sortedSystems) {
+  for (final (systemSymbol, _) in systemConnectivity.systemSymbolsInJumpRadius(
+    systemsCache,
+    startSystem: startSystemSymbol,
+    maxJumps: maxJumps,
+  )) {
     final symbol = await waypointSymbolNeedingCharting(
       systemsCache,
       waypointCache,
       ship,
-      system,
+      systemSymbol,
       filter: filter,
     );
     if (symbol != null) {

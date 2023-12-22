@@ -44,7 +44,7 @@ class CentralCommand {
   final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
 
   /// Should we chart asteroids?
-  bool chartAsteroids = true;
+  bool chartAsteroids = false;
 
   /// The next planned ship buy job.
   /// This is the start of an imagined job queue system, whereby we pre-populate
@@ -347,6 +347,7 @@ class CentralCommand {
         // Don't visit systems we already have a charter in.
         return !charterSystems.contains(waypoint.systemSymbol);
       },
+      maxJumps: config.charterMaxJumps,
     );
     return destinationSymbol;
   }

@@ -62,26 +62,7 @@ Future<void> advanceShips(
   // loopCount is only used to control how often we reset our waypoint and
   // market caches.  If we got rid of those we could get rid of loopCount.
   await caches.updateAtTopOfLoop(api);
-  final reachableSystems = caches.systemConnectivity
-      .systemsReachableFrom(caches.agent.headquartersSystemSymbol)
-      .toSet();
   await centralCommand.advanceCentralPlanning(api, caches);
-  // TODO(eseidel): I'm not sure this will actually work, but trying:
-  // If the queue is done yet our reachability just changed, queue the newly
-  // reachable systems for continuing.
-  if (queue.isDone) {
-    final newReachableSystems = caches.systemConnectivity
-        .systemsReachableFrom(caches.agent.headquartersSystemSymbol)
-        .toSet();
-    final newlyReachable = newReachableSystems.difference(reachableSystems);
-    if (newlyReachable.isNotEmpty) {
-      logger.info('🚀  ${newlyReachable.length} newly reachable systems: '
-          '$newlyReachable');
-    }
-    for (final system in newlyReachable) {
-      queue.queueSystem(system);
-    }
-  }
 
   const allowableScheduleLag = Duration(milliseconds: 1000);
 
@@ -219,7 +200,8 @@ Future<Never> logic(
       shipFilter: shipFilter,
     );
   final rateLimitTracker = RateLimitTracker(api);
-  final queue = IdleQueue()..queueSystem(caches.agent.headquartersSystemSymbol);
+  final queue = IdleQueue()
+    ..queueSystem(caches.agent.headquartersSystemSymbol, jumpDistance: 0);
 
   while (true) {
     rateLimitTracker.printStatsIfNeeded();

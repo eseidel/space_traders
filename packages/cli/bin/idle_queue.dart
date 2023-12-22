@@ -9,7 +9,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final caches = await Caches.loadOrFetch(fs, api, db);
 
   final systemSymbol = caches.agent.headquartersSystemSymbol;
-  final queue = IdleQueue()..queueSystem(systemSymbol);
+  final queue = IdleQueue()..queueSystem(systemSymbol, jumpDistance: 0);
   while (!queue.isDone) {
     await queue.runOne(api, caches);
   }

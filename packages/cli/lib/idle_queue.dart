@@ -1,13 +1,17 @@
-import 'dart:collection';
-
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/queries.dart';
+import 'package:collection/collection.dart';
 
 /// A queue which does not allow items to be queued more than once.
 class NonRepeatingQueue<T> {
-  final Queue<T> _items = Queue();
-  final Set<T> _seen = {};
+  /// Create a new queue.
+  NonRepeatingQueue([int Function(T, T)? comparison])
+      : _items = PriorityQueue(comparison),
+        _seen = {};
+
+  final PriorityQueue<T> _items;
+  final Set<T> _seen;
 
   /// Add an item to the queue.
   bool queue(T item) {
@@ -40,47 +44,60 @@ class IdleQueue {
   /// Create a new fetch queue.
   IdleQueue();
 
-  final NonRepeatingQueue<SystemSymbol> _systems = NonRepeatingQueue();
-  final NonRepeatingQueue<WaypointSymbol> _jumpGates = NonRepeatingQueue();
+  final NonRepeatingQueue<(SystemSymbol, int)> _systems = NonRepeatingQueue(
+    (a, b) => a.$2.compareTo(b.$2),
+  );
+  final NonRepeatingQueue<(WaypointSymbol, int)> _jumpGates = NonRepeatingQueue(
+    (a, b) => a.$2.compareTo(b.$2),
+  );
 
   /// Queue a system for fetching.
-  void queueSystem(SystemSymbol systemSymbol) {
-    final queued = _systems.queue(systemSymbol);
+  void queueSystem(SystemSymbol systemSymbol, {required int jumpDistance}) {
+    final queued = _systems.queue((systemSymbol, jumpDistance));
     if (queued) {
-      logger.info('Queued System (${_systems.length}): $systemSymbol');
+      logger.info('Queued System (${_systems.length}): '
+          '$systemSymbol ($jumpDistance)');
     }
   }
 
   /// Queue jump gate connections for fetching.
   // TODO(eseidel): Jump gate construction completion should call this.
-  void queueJumpGateConnections(JumpGateRecord jumpGateRecord) {
+  void queueJumpGateConnections(
+    JumpGateRecord jumpGateRecord, {
+    required int jumpDistance,
+  }) {
     for (final connection in jumpGateRecord.connections) {
-      _queueJumpGate(connection);
+      _queueJumpGate(connection, jumpDistance: jumpDistance);
     }
   }
 
   /// Queue a jump gate for fetching.
-  void _queueJumpGate(WaypointSymbol waypointSymbol) {
-    final queued = _jumpGates.queue(waypointSymbol);
+  void _queueJumpGate(
+    WaypointSymbol waypointSymbol, {
+    required int jumpDistance,
+  }) {
+    final queued = _jumpGates.queue((waypointSymbol, jumpDistance));
     if (queued) {
-      logger.info('Queued JumpGate (${_jumpGates.length}): $waypointSymbol');
+      logger.info('Queued JumpGate (${_jumpGates.length}): '
+          '$waypointSymbol ($jumpDistance)');
     }
   }
 
   Future<void> _processNextJumpGate(Api api, Caches caches) async {
-    final to = _jumpGates.take();
-    logger.detail('Process (${_jumpGates.length}): $to');
+    final (to, jumpDistance) = _jumpGates.take();
+    logger.detail('Process (${_jumpGates.length}): $to ($jumpDistance)');
     // Make sure we have construction data for the destination before
     // checking if we can jump there.
     await caches.waypoints.isUnderConstruction(to);
     if (canJumpTo(caches.jumpGates, caches.construction, to)) {
-      queueSystem(to.systemSymbol);
+      queueSystem(to.systemSymbol, jumpDistance: jumpDistance + 1);
     }
   }
 
   Future<void> _processNextSystem(Api api, Caches caches) async {
-    final systemSymbol = _systems.take();
-    logger.detail('Process (${_systems.length}): $systemSymbol');
+    final (systemSymbol, jumpDistance) = _systems.take();
+    logger
+        .detail('Process (${_systems.length}): $systemSymbol ($jumpDistance)');
     final waypoints = caches.systems.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.waypointSymbol;
@@ -112,7 +129,7 @@ class IdleQueue {
         }
         // Queue each jumpGate as it might fetch construction data which could
         // total to many requests for a single processNextSystem call.
-        queueJumpGateConnections(fromRecord);
+        queueJumpGateConnections(fromRecord, jumpDistance: jumpDistance);
       }
     }
   }

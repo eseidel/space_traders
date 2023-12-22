@@ -114,6 +114,9 @@ class Config {
   // This is mostly a hack around the fact that our construction can get
   // stuck with auto-drifting ships holding the lock for 6hrs.
   final allowParallelConstructionDelivery = true;
+
+  /// Max number of jumps we allow a charter to plan for at once.
+  final charterMaxJumps = 5;
 }
 
 /// Our global configuration object.
