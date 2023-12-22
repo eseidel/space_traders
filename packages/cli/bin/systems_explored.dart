@@ -17,15 +17,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final chartingCache = ChartingCache.load(fs, waypointTraits);
   final systemsCache = SystemsCache.load(fs)!;
 
-  final jumpGateCache = JumpGateCache.load(fs);
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
-  final agentCache = AgentCache.load(fs)!;
-  final headquartersSystemSymbol = agentCache.headquartersSystemSymbol;
-  final reachableSystems =
-      systemConnectivity.systemsReachableFrom(headquartersSystemSymbol);
-
   // Having market price data is a good proxy for if we've explored something.
   final systemsWithMarketPrices =
       marketPrices.waypointSymbols.map((e) => e.systemSymbol).toSet();
@@ -79,6 +70,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       '${systemsWithMarketPrices.length} reachable systems '
       'with market prices.',
     );
+
+  final jumpGateCache = JumpGateCache.load(fs);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final agentCache = AgentCache.load(fs)!;
+  final headquartersSystemSymbol = agentCache.headquartersSystemSymbol;
+  final reachableSystems =
+      systemConnectivity.systemsReachableFrom(headquartersSystemSymbol);
 
   final systemsWithCharts = reachableSystems
       .where((s) => chartingCache.waypointsWithChartInSystem(s).isNotEmpty);
