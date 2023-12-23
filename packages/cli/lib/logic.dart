@@ -1,6 +1,7 @@
 import 'package:cli/behavior/advance.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/idle_queue.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/counts.dart';
@@ -27,6 +28,9 @@ Future<void> _runIdleTasksIfPossible(
   Api api,
   Caches caches,
 ) async {
+  if (!config.serviceIdleQueue) {
+    return;
+  }
   final waitUntil = entry.waitUntil;
   if (waitUntil == null) {
     return;

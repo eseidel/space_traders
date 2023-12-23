@@ -2,6 +2,9 @@ import 'package:types/types.dart';
 
 /// Class for holding our hard-coded configuration values.
 class Config {
+  /// Whether or not we should enable the idle queue.
+  final bool serviceIdleQueue = false;
+
   /// Our ship buy plan for computeNextShipToBuy.
   final buyPlan = [
     ShipType.LIGHT_HAULER,
