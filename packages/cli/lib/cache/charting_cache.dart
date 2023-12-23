@@ -76,20 +76,13 @@ class ChartingCache {
     return ChartingSnapshot(records.toList());
   }
 
-  /// Adds a charting record to the cache.
-  void addRecord(
-    ChartingRecord chartingRecord, {
-    bool shouldSave = true,
-    DateTime Function() getNow = defaultGetNow,
-  }) {}
-
   /// Adds a waypoint to the cache.
   ///     waypointTraits.addAll(waypoint.traits);
-  void addWaypoint(
+  Future<void> addWaypoint(
     Waypoint waypoint, {
     bool shouldSave = true,
     DateTime Function() getNow = defaultGetNow,
-  }) {
+  }) async {
     final chart = waypoint.chart;
     final ChartedValues? chartedValues;
     if (chart == null) {
@@ -106,7 +99,7 @@ class ChartingCache {
       values: chartedValues,
       timestamp: getNow(),
     );
-    addRecord(chartingRecord, shouldSave: shouldSave);
+    await _db.upsertChartingRecord(chartingRecord);
   }
 
   /// Adds a list of waypoints to the cache.
