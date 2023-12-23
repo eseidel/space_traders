@@ -40,11 +40,12 @@ Query upsertChartingRecordQuery(ChartingRecord record) {
 Query getChartingRecordQuery(WaypointSymbol waypointSymbol, Duration maxAge) {
   return Query(
     'SELECT * FROM charting_ '
-    'WHERE waypoint_symbol = @waypoint_symbol '
-    'AND timestamp > @timestamp',
+    'WHERE waypoint_symbol = @waypoint_symbol ',
+    // TODO(eseidel): Add back in timestamp filtering.
+    // 'AND timestamp > @timestamp',
     substitutionValues: {
       'waypoint_symbol': waypointSymbol.toJson(),
-      'timestamp': DateTime.timestamp().subtract(maxAge),
+      // 'timestamp': DateTime.timestamp().subtract(maxAge),
     },
   );
 }
