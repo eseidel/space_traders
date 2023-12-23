@@ -1,3 +1,4 @@
+import 'package:db/chart.dart';
 import 'package:db/config.dart';
 import 'package:db/construction.dart';
 import 'package:db/extraction.dart';
@@ -188,4 +189,22 @@ class Database {
   /// Insert a construction record into the database.
   Future<void> upsertConstruction(ConstructionRecord record) async =>
       insertOne(upsertConstructionQuery(record));
+
+  /// Return all charting records.
+  Future<Iterable<ChartingRecord>> allChartingRecords() async =>
+      queryMany(allChartingRecordsQuery(), chartingRecordFromColumnMap);
+
+  /// Insert a charting record into the database.
+  Future<void> upsertChartingRecord(ChartingRecord record) async =>
+      insertOne(upsertChartingRecordQuery(record));
+
+  /// Get a charting record from the database.
+  Future<ChartingRecord?> getChartingRecord(
+    WaypointSymbol waypointSymbol,
+    Duration maxAge,
+  ) =>
+      queryOne(
+        getChartingRecordQuery(waypointSymbol, maxAge),
+        chartingRecordFromColumnMap,
+      );
 }

@@ -36,11 +36,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final systems = await SystemsCache.loadOrFetch(fs);
   final waypointTraits = WaypointTraitCache.load(fs);
-  final charting = ChartingCache.load(fs, waypointTraits);
-  // TODO(eseidel): This should not need a ConstructionCache.
+  // TODO(eseidel): This should not need a ChartingCache or ConstructionCache.
+  final charting = ChartingCache(db);
   final construction = ConstructionCache(db);
   final waypointCache =
-      WaypointCache.cachedOnly(systems, charting, construction);
+      WaypointCache.cachedOnly(systems, charting, construction, waypointTraits);
   final shipCache = ShipCache.load(fs)!;
   final tradeGoods = TradeGoodCache.load(fs);
   final marketListings = MarketListingCache.load(fs, tradeGoods);

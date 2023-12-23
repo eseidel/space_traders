@@ -15,6 +15,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockDatabase extends Mock implements Database {}
 
+class _MockChartingCache extends Mock implements ChartingCache {}
+
 class _MockContract extends Mock implements Contract {}
 
 class _MockContractCache extends Mock implements ContractCache {}
@@ -40,6 +42,8 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 class _MockShipCache extends Mock implements ShipCache {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
+
+class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
 void main() {
   test('purchaseShip', () async {
@@ -778,9 +782,8 @@ void main() {
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    final fs = MemoryFileSystem.test();
-    final chartingCache =
-        ChartingCache({}, WaypointTraitCache([], fs: fs), fs: fs);
+    final chartingCache = _MockChartingCache();
+    final waypointTraitCache = _MockWaypointTraitCache();
 
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
       (invocation) => Future.value(
@@ -807,7 +810,7 @@ void main() {
 
     final logger = _MockLogger();
     await runWithLogger(logger, () async {
-      await chartWaypointAndLog(api, chartingCache, ship);
+      await chartWaypointAndLog(api, chartingCache, waypointTraitCache, ship);
     });
 
     // Waypoint already charted exceptions are caught and logged.
@@ -819,7 +822,7 @@ void main() {
       ),
     );
     await runWithLogger(logger, () async {
-      await chartWaypointAndLog(api, chartingCache, ship);
+      await chartWaypointAndLog(api, chartingCache, waypointTraitCache, ship);
     });
     verify(() => logger.warn('🛸#1  A-W was already charted')).called(1);
 
@@ -829,7 +832,7 @@ void main() {
     );
     expect(
       () => runWithLogger(logger, () async {
-        await chartWaypointAndLog(api, chartingCache, ship);
+        await chartWaypointAndLog(api, chartingCache, waypointTraitCache, ship);
       }),
       throwsA(predicate((e) => e is ApiException)),
     );

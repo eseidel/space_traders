@@ -463,12 +463,14 @@ Future<DateTime> navigateToLocalWaypointAndLog(
 Future<void> chartWaypointAndLog(
   Api api,
   ChartingCache chartingCache,
+  WaypointTraitCache waypointTraitCache,
   Ship ship,
 ) async {
   try {
     final response = await api.fleet.createChart(ship.symbol);
     final waypoint = response!.data.waypoint;
     chartingCache.addWaypoint(waypoint);
+    waypointTraitCache.addAll(waypoint.traits);
     // Powershell needs the space after the emoji.
     shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');
   } on ApiException catch (e) {

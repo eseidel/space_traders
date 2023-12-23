@@ -9,12 +9,19 @@ String _typeName(SystemType type) {
   return type.value;
 }
 
+Iterable<WaypointSymbol> chartedSymbolsInSystem(
+  ChartingSnapshot chartingSnapshot,
+  SystemSymbol systemSymbol,
+) {
+  final records = chartingSnapshot.recordsInSystem(systemSymbol);
+  return records.where((r) => r.isCharted).map((r) => r.waypointSymbol);
+}
+
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
-  final waypointTraits = WaypointTraitCache.load(fs);
-  final chartingCache = ChartingCache.load(fs, waypointTraits);
+  final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
 
   // Having market price data is a good proxy for if we've explored something.
@@ -42,7 +49,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final systemSymbol in systemSymbols) {
     final system = systemsCache[systemSymbol];
     final chartedSymbols =
-        chartingCache.waypointsWithChartInSystem(systemSymbol);
+        chartedSymbolsInSystem(chartingSnapshot, systemSymbol);
     final waypointCount = system.waypoints.length;
     final asteroidSymbols = system.waypoints
         .where((w) => w.isAsteroid)
@@ -81,7 +88,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       systemConnectivity.systemsReachableFrom(headquartersSystemSymbol);
 
   final systemsWithCharts = reachableSystems
-      .where((s) => chartingCache.waypointsWithChartInSystem(s).isNotEmpty);
+      .where((s) => chartedSymbolsInSystem(chartingSnapshot, s).isNotEmpty);
   logger.info(
     '${systemsWithCharts.length} systems with 1+ charts of '
     '${reachableSystems.length} known reachable.',

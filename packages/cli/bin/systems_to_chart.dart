@@ -18,14 +18,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemConnectivity =
       SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
   final systemsCache = SystemsCache.load(fs)!;
-  final waypointTraits = WaypointTraitCache.load(fs);
-  final chartingCache = ChartingCache.load(fs, waypointTraits);
+  final chartingSnapshot = await ChartingSnapshot.load(db);
+
+  bool isUncharted(SystemWaypoint waypoint) {
+    final maybeCharted = chartingSnapshot[waypoint.waypointSymbol]?.isCharted;
+    return maybeCharted == null || !maybeCharted;
+  }
 
   int unchartedWaypointCount(SystemSymbol systemSymbol) {
-    return systemsCache[systemSymbol]
-        .waypoints
-        .where((w) => chartingCache[w.waypointSymbol] == null)
-        .length;
+    return systemsCache[systemSymbol].waypoints.where(isUncharted).length;
   }
 
   final connectedSystems = systemConnectivity

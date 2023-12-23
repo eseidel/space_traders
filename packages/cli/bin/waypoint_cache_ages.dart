@@ -13,9 +13,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   final db = await defaultDatabase();
-  final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
+  final chartingSnapshot = await ChartingSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final marketPrices = MarketPrices.load(fs);
   final shipyardPrices = ShipyardPrices.load(fs);
@@ -39,7 +38,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   for (final waypoint in waypoints) {
     final waypointSymbol = waypoint.waypointSymbol;
-    final values = chartingCache[waypointSymbol];
+    final values = chartingSnapshot[waypointSymbol]?.values;
     final marketAge = marketPrices.cacheAgeFor(waypointSymbol);
     final shipyardAge = shipyardPrices.cacheAgeFor(waypointSymbol);
     final constructionAge = constructionSnapshot.cacheAgeFor(waypointSymbol);

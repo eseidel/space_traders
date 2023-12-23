@@ -82,8 +82,11 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
     final waypoint = await waypointCache.waypoint(waypointSymbol);
     // We know we've updated the waypoint at this point, so if it's not
     // stored in our charting cache, we know it has no chart.
-    final values = chartingCache[waypointSymbol];
-    if (values == null) {
+    final isCharted = await chartingCache.isCharted(waypointSymbol);
+    if (isCharted == null) {
+      throw StateError('Charting cache failed to update.');
+    }
+    if (!isCharted) {
       shipInfo(ship, '$waypointSymbol is missing chart, routing.');
       return waypointSymbol;
     }
@@ -171,7 +174,12 @@ Future<JobResult> doSystemWatcher(
   // We still do our charting and market visits even if this isn't going to
   // cause us to complete the behavior (e.g. refueling).
   if (waypoint.chart == null) {
-    await chartWaypointAndLog(api, caches.charting, ship);
+    await chartWaypointAndLog(
+      api,
+      caches.charting,
+      caches.static.waypointTraits,
+      ship,
+    );
   }
   await visitLocalMarket(api, db, caches, ship, maxAge: maxAge, getNow: getNow);
   await visitLocalShipyard(

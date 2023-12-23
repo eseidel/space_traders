@@ -1,8 +1,5 @@
-import 'package:cli/api.dart';
-import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_cache.dart';
-import 'package:db/construction.dart';
+import 'package:cli/cache/caches.dart';
+import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -20,6 +17,7 @@ class _MockConstructionCache extends Mock implements ConstructionCache {}
 void main() {
   test('WaypointCache.waypoint', () async {
     final api = _MockApi();
+    final fs = MemoryFileSystem.test();
     final SystemsApi systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
     final waypointSymbol = WaypointSymbol.fromString('S-E-A');
@@ -59,8 +57,14 @@ void main() {
       () => constructionCache.updateConstruction(waypointSymbol, null),
     ).thenAnswer((_) async => {});
 
-    final waypointCache =
-        WaypointCache(api, systemsCache, chartingCache, constructionCache);
+    final waypointTraitCache = WaypointTraitCache([], fs: fs);
+    final waypointCache = WaypointCache(
+      api,
+      systemsCache,
+      chartingCache,
+      constructionCache,
+      waypointTraitCache,
+    );
     expect(await waypointCache.waypoint(waypointSymbol), expectedWaypoint);
     // Call it twice, it should cache.
     expect(await waypointCache.waypoint(waypointSymbol), expectedWaypoint);

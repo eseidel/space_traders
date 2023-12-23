@@ -11,8 +11,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final waypointTraits = WaypointTraitCache.load(fs);
-  final chartingCache = ChartingCache.load(fs, waypointTraits);
+  final chartingSnapshot = await ChartingSnapshot.load(db);
 
   final systems = NonRepeatingQueue<SystemSymbol>();
   final jumpGates = NonRepeatingQueue<WaypointSymbol>();
@@ -26,7 +25,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       final from = jumpGates.take();
       final fromRecord = jumpGateCache.recordForSymbol(from);
       if (fromRecord == null) {
-        final chartingRecord = chartingCache.getRecord(from);
+        final chartingRecord = chartingSnapshot.getRecord(from);
         if (chartingRecord == null) {
           needsChart.add(from);
         } else if (chartingRecord.isCharted) {

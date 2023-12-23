@@ -139,10 +139,16 @@ class Caches {
     final shipyardListings = ShipyardListingCache.load(fs);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
-    final charting = ChartingCache.load(fs, static.waypointTraits);
+    final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
     final marketListings = MarketListingCache.load(fs, static.tradeGoods);
-    final waypoints = WaypointCache(api, systems, charting, construction);
+    final waypoints = WaypointCache(
+      api,
+      systems,
+      charting,
+      construction,
+      static.waypointTraits,
+    );
     final markets = MarketCache(api, marketListings);
     // Intentionally force refresh contracts in case we've been offline.
     final contracts =

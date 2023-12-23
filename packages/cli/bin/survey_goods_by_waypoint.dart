@@ -10,8 +10,7 @@ class _Stats {
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final surveys = await db.allSurveys();
-  final staticCaches = StaticCaches.load(fs);
-  final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
+  final chartingSnapshot = await ChartingSnapshot.load(db);
   final systems = SystemsCache.load(fs)!;
 
   // For each waypoint, record what tradeSymbols are found there.
@@ -34,7 +33,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final waypointType = systems.waypoint(waypointSymbol).type;
     final expectedSymbols = expectedGoodsForWaypoint(
       waypointType,
-      chartingCache[waypointSymbol]?.traitSymbols ?? {},
+      chartingSnapshot[waypointSymbol]?.values?.traitSymbols ?? {},
       ExtractionType.mine,
     );
     final missingSymbols = stats.tradeSymbols.difference(expectedSymbols);
@@ -49,9 +48,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         '$waypointSymbol, prediction had extra: ${extraSymbols.toList()}',
       );
     }
-    final values = chartingCache[waypointSymbol];
+    final record = chartingSnapshot[waypointSymbol];
     logger.info('$waypointSymbol: $waypointType '
-        '$tradeSymbolsString ${values?.traitSymbols} '
+        '$tradeSymbolsString ${record?.values?.traitSymbols} '
         '(${stats.count})');
   }
 

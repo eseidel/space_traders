@@ -13,11 +13,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final systems = SystemsCache.load(fs)!;
-  final charting = ChartingCache.load(fs, staticCaches.waypointTraits);
-  // TODO(eseidel): This should not need ConstructionCache.
+  // TODO(eseidel): This should not need ChartingCache or ConstructionCache.
+  final charting = ChartingCache(db);
   final construction = ConstructionCache(db);
-  final waypointCache =
-      WaypointCache.cachedOnly(systems, charting, construction);
+  final waypointCache = WaypointCache.cachedOnly(
+    systems,
+    charting,
+    construction,
+    staticCaches.waypointTraits,
+  );
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);

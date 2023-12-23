@@ -23,10 +23,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     await constructionCache.snapshot(),
   );
   final systemsCache = SystemsCache.load(fs)!;
-  final chartingCache = ChartingCache.load(fs, staticCaches.waypointTraits);
-
-  final waypointCache =
-      WaypointCache(api, systemsCache, chartingCache, constructionCache);
+  final chartingCache = ChartingCache(db);
+  final waypointCache = WaypointCache(
+    api,
+    systemsCache,
+    chartingCache,
+    constructionCache,
+    staticCaches.waypointTraits,
+  );
 
   final reachableSystemSymbols =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();

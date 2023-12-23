@@ -1,212 +1,90 @@
-import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_store.dart';
+import 'package:cli/cli.dart';
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
-import 'package:types/types.dart';
+import 'package:db/chart.dart';
 
-/// A charted value.
-@immutable
-class ChartedValues {
-  /// Creates a new charted values.
-  const ChartedValues({
-    required this.chart,
-    required this.faction,
-    required this.traitSymbols,
-  });
+/// A snapshot of the charting records.
+class ChartingSnapshot {
+  /// Creates a new charting snapshot.
+  ChartingSnapshot(this.records);
 
-  /// Creates a new charted values from JSON data.
-  factory ChartedValues.fromJson(Map<String, dynamic> json) {
-    final faction =
-        WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
-    final traitSymbols = (json['traitSymbols'] as List<dynamic>)
-        .cast<String>()
-        .map((e) => WaypointTraitSymbol.fromJson(e)!)
-        .toSet();
-    final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
-    return ChartedValues(
-      faction: faction,
-      traitSymbols: traitSymbols,
-      chart: chart,
-    );
+  /// Creates a new charting snapshot from the database.
+  static Future<ChartingSnapshot> load(Database db) async {
+    final records = await db.allChartingRecords();
+    return ChartingSnapshot(records.toList());
   }
-
-  /// Creates a new charted values from JSON data.
-  static ChartedValues? fromJsonOrNull(Map<String, dynamic>? json) =>
-      json == null ? null : ChartedValues.fromJson(json);
-
-  /// Faction for this waypoint.
-  final WaypointFaction? faction;
-
-  /// The traits of the waypoint.
-  final Set<WaypointTraitSymbol> traitSymbols;
-
-  /// Chart for this waypoint.
-  final Chart chart;
-
-  /// Converts this charted values to JSON data.
-  Map<String, dynamic> toJson() {
-    final sortedTradeSymbols = traitSymbols.sortedBy((s) => s.value);
-    return <String, dynamic>{
-      'faction': faction?.toJson(),
-      'traitSymbols': sortedTradeSymbols,
-      'chart': chart.toJson(),
-    };
-  }
-
-  /// Whether this waypoint has a shipyard.
-  bool get hasShipyard => traitSymbols.contains(WaypointTraitSymbol.SHIPYARD);
-
-  /// Whether this waypoint has a market.
-  bool get hasMarket => traitSymbols.contains(WaypointTraitSymbol.MARKETPLACE);
-}
-
-/// Charting record for a given waypoint.
-class ChartingRecord {
-  /// Creates a new charting record.
-  const ChartingRecord({
-    required this.waypointSymbol,
-    required this.values,
-    required this.timestamp,
-  });
-
-  /// Creates a new charting record from JSON data.
-  ChartingRecord.fromJson(Map<String, dynamic> json)
-      : values = ChartedValues.fromJsonOrNull(
-          json['values'] as Map<String, dynamic>?,
-        ),
-        waypointSymbol =
-            WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-        timestamp = DateTime.parse(json['timestamp'] as String);
-
-  /// Symbol for this waypoint.
-  final WaypointSymbol waypointSymbol;
-
-  /// The charted values.  Will be null for uncharted waypoints.
-  final ChartedValues? values;
-
-  /// The timestamp for this record.
-  final DateTime timestamp;
-
-  /// Whether this waypoint was charted at record time.
-  bool get isCharted => values != null;
-
-  /// Converts this charting record to JSON data.
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'values': values?.toJson(),
-        'waypointSymbol': waypointSymbol.toJson(),
-        'timestamp': timestamp.toIso8601String(),
-      };
-}
-
-typedef _Record = Map<WaypointSymbol, ChartingRecord>;
-
-/// A cached of charted values from Waypoints.
-class ChartingCache extends JsonStore<_Record> {
-  /// Creates a new charting cache.
-  ChartingCache(
-    super.valuesBySymbol,
-    this.waypointTraits, {
-    required super.fs,
-    super.path = defaultCacheFilePath,
-  }) : super(
-          recordToJson: (_Record r) => r.map(
-            (key, value) => MapEntry(
-              key.toJson(),
-              value.toJson(),
-            ),
-          ),
-        );
-
-  /// Load the charted values from the cache.
-  factory ChartingCache.load(
-    FileSystem fs,
-    WaypointTraitCache waypointTraits, {
-    String path = defaultCacheFilePath,
-  }) {
-    final valuesBySymbol = JsonStore.loadRecord<_Record>(
-          fs,
-          path,
-          (Map<String, dynamic> j) => j.map(
-            (key, value) => MapEntry(
-              WaypointSymbol.fromJson(key),
-              ChartingRecord.fromJson(value as Map<String, dynamic>),
-            ),
-          ),
-        ) ??
-        {};
-    return ChartingCache(valuesBySymbol, waypointTraits, fs: fs, path: path);
-  }
-
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/charts.json';
-
-  /// The cache of waypoint traits.
-  final WaypointTraitCache waypointTraits;
-
-  /// The charting record by waypoint symbol.
-  Map<WaypointSymbol, ChartingRecord> get _valuesBySymbol => record;
 
   /// The charting records.
-  Iterable<ChartingRecord> get records => _valuesBySymbol.values;
+  final List<ChartingRecord> records;
 
-  /// The charted values.
-  Iterable<ChartedValues> get values =>
-      records.map((e) => e.values).whereNotNull();
-
-  /// The number of waypoints in the cache.
+  /// The number of waypoints in this snapshot.
+  /// Records are expected to be one-per-waypoint but this method is
+  /// separate from [records] on the assumption that may change.
   int get waypointCount => records.length;
 
-  /// The waypoint symbols in the cache.
-  Iterable<WaypointSymbol> get waypointSymbols => _valuesBySymbol.keys;
+  /// Returns all charted values.
+  Iterable<ChartedValues> get values =>
+      records.where((r) => r.values != null).map((r) => r.values!);
 
-  /// Charting records for the given system.
+  /// Returns true if the given waypoint is known to be charted.
+  /// Will return null if the waypoint is not in the snapshot.
+  bool? isCharted(WaypointSymbol waypointSymbol) =>
+      getRecord(waypointSymbol)?.isCharted;
+
+  /// Returns ChartingRecords for the given system.
   Iterable<ChartingRecord> recordsInSystem(SystemSymbol systemSymbol) =>
       records.where((r) => r.waypointSymbol.systemSymbol == systemSymbol);
 
-  /// The waypoint symbols with charts in the given system.
-  // If ChartingCache changes to cache negative values (e.g. "no chart")
-  // this will need to be updated.
-  Iterable<WaypointSymbol> waypointsWithChartInSystem(
-    SystemSymbol systemSymbol,
-  ) =>
-      recordsInSystem(systemSymbol)
-          .where((r) => r.isCharted)
-          .map((r) => r.waypointSymbol);
+  /// Returns the ChartingRecord for the given waypoint, or null if it is not
+  /// in the snapshot.
+  ChartingRecord? getRecord(WaypointSymbol waypointSymbol) =>
+      records.firstWhereOrNull((r) => r.waypointSymbol == waypointSymbol);
+
+  /// Returns the ChartingRecord for the given waypoint, or null if it is not
+  ChartingRecord? operator [](WaypointSymbol waypointSymbol) =>
+      getRecord(waypointSymbol);
+}
+
+/// A cache of charted values from Waypoints.
+class ChartingCache {
+  /// Creates a new connection to the charting cache.
+  ChartingCache(Database db) : _db = db;
+
+  final Database _db;
+
+  /// Returns true if the given waypoint is known to be charted.
+  Future<bool?> isCharted(WaypointSymbol waypointSymbol) async =>
+      (await chartingRecord(waypointSymbol))?.isCharted;
+
+  /// Returns the charted values for the given waypoint, or null if it is not
+  /// in the cache.
+  Future<ChartedValues?> chartedValues(WaypointSymbol waypointSymbol) async =>
+      (await chartingRecord(waypointSymbol))?.values;
+
+  /// Returns the charting record for the given waypoint, or null if it is not
+  /// in the cache.
+  Future<ChartingRecord?> chartingRecord(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
+    return await _db.getChartingRecord(waypointSymbol, maxAge);
+  }
+
+  /// Creates a ChartingSnapshot from the database.
+  Future<ChartingSnapshot> snapshot() async {
+    final records = await _db.allChartingRecords();
+    return ChartingSnapshot(records.toList());
+  }
 
   /// Adds a charting record to the cache.
   void addRecord(
     ChartingRecord chartingRecord, {
     bool shouldSave = true,
     DateTime Function() getNow = defaultGetNow,
-  }) {
-    final waypointSymbol = chartingRecord.waypointSymbol;
-    final timestamp = chartingRecord.timestamp;
-    if (getNow().isBefore(timestamp)) {
-      throw ArgumentError('Bogus timestamp for ChartingRecord for '
-          '$waypointSymbol: $timestamp is in '
-          'the future.');
-    }
-
-    final existingRecord = _valuesBySymbol[waypointSymbol];
-    if (existingRecord != null) {
-      if (existingRecord.timestamp.isAfter(timestamp)) {
-        throw ArgumentError('ChartingRecord for $waypointSymbol: $timestamp is '
-            'before existing timestamp: ${existingRecord.timestamp}');
-      }
-      if (existingRecord.values != null && chartingRecord.values == null) {
-        throw ArgumentError('ChartingRecord for $waypointSymbol is already '
-            'charted cant remove chart.');
-      }
-    }
-
-    _valuesBySymbol[chartingRecord.waypointSymbol] = chartingRecord;
-    // Minor optimization to allow addWaypoints to only save once.
-    if (shouldSave) {
-      save();
-    }
-  }
+  }) {}
 
   /// Adds a waypoint to the cache.
+  ///     waypointTraits.addAll(waypoint.traits);
   void addWaypoint(
     Waypoint waypoint, {
     bool shouldSave = true,
@@ -228,7 +106,6 @@ class ChartingCache extends JsonStore<_Record> {
       values: chartedValues,
       timestamp: getNow(),
     );
-    waypointTraits.addAll(waypoint.traits);
     addRecord(chartingRecord, shouldSave: shouldSave);
   }
 
@@ -237,14 +114,49 @@ class ChartingCache extends JsonStore<_Record> {
     for (final waypoint in waypoints) {
       addWaypoint(waypoint, shouldSave: false);
     }
-    save();
+  }
+}
+
+typedef _Record = Map<WaypointSymbol, ChartingRecord>;
+
+/// A cached of charted values from Waypoints.
+class OldChartingCache extends JsonStore<_Record> {
+  /// Creates a new charting cache.
+  OldChartingCache(
+    super.valuesBySymbol, {
+    required super.fs,
+    super.path = defaultCacheFilePath,
+  }) : super(
+          recordToJson: (_Record r) => r.map(
+            (key, value) => MapEntry(
+              key.toJson(),
+              value.toJson(),
+            ),
+          ),
+        );
+
+  /// Load the charted values from the cache.
+  factory OldChartingCache.load(
+    FileSystem fs, {
+    String path = defaultCacheFilePath,
+  }) {
+    final valuesBySymbol = JsonStore.loadRecord<_Record>(
+          fs,
+          path,
+          (Map<String, dynamic> j) => j.map(
+            (key, value) => MapEntry(
+              WaypointSymbol.fromJson(key),
+              ChartingRecord.fromJson(value as Map<String, dynamic>),
+            ),
+          ),
+        ) ??
+        {};
+    return OldChartingCache(valuesBySymbol, fs: fs, path: path);
   }
 
-  /// Gets the charting record for the given waypoint symbol.
-  ChartingRecord? getRecord(WaypointSymbol waypointSymbol) =>
-      _valuesBySymbol[waypointSymbol];
+  /// The default path to the cache file.
+  static const String defaultCacheFilePath = 'data/charts.json';
 
-  /// Gets the charted values for the given waypoint symbol.
-  ChartedValues? operator [](WaypointSymbol waypointSymbol) =>
-      _valuesBySymbol[waypointSymbol]?.values;
+  /// The charting records.
+  Iterable<ChartingRecord> get records => record.values;
 }
