@@ -71,3 +71,26 @@ Future<T> captureTimeAndRequests<T>(
   onComplete(duration, requests);
   return result;
 }
+
+/// Run a function and record time and request count and log if long.
+Future<T> expectTime<T>(
+  RequestCounts requestCounts,
+  String name,
+  Duration expected,
+  Future<T> Function() fn,
+) async {
+  final before = DateTime.timestamp();
+  final requestsBefore = requestCounts.totalRequests;
+  final result = await fn();
+  final after = DateTime.timestamp();
+  final duration = after.difference(before);
+  final requestsAfter = requestCounts.totalRequests;
+  final requests = requestsAfter - requestsBefore;
+  if (duration > expected) {
+    logger.warn(
+      '$name took too long ${duration.inMilliseconds}ms '
+      '($requests requests)',
+    );
+  }
+  return result;
+}

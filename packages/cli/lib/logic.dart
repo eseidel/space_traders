@@ -37,17 +37,11 @@ Future<void> _runIdleTasksIfPossible(
   }
   while (!queue.isDone &&
       DateTime.timestamp().add(queue.minProcessingTime).isBefore(waitUntil)) {
-    await captureTimeAndRequests(
+    await expectTime(
       api.requestCounts,
+      'idle queue',
+      queue.minProcessingTime,
       () async => await queue.runOne(api, caches),
-      onComplete: (duration, requestCount) {
-        if (duration > queue.minProcessingTime) {
-          logger.warn(
-            'idle queue took too long ${duration.inMilliseconds}ms '
-            '($requestCount requests)',
-          );
-        }
-      },
     );
   }
 }
@@ -65,8 +59,12 @@ Future<void> advanceShips(
 }) async {
   // loopCount is only used to control how often we reset our waypoint and
   // market caches.  If we got rid of those we could get rid of loopCount.
-  await caches.updateAtTopOfLoop(api);
-  await centralCommand.advanceCentralPlanning(api, caches);
+
+  await expectTime(api.requestCounts, 'top of loop', const Duration(seconds: 1),
+      () async {
+    await caches.updateAtTopOfLoop(api);
+    await centralCommand.advanceCentralPlanning(api, caches);
+  });
 
   const allowableScheduleLag = Duration(milliseconds: 1000);
 
