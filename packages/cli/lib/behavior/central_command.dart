@@ -476,7 +476,7 @@ class CentralCommand {
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
-    await caches.updateRoutingCaches();
+    // await caches.updateRoutingCaches();
 
     miningSquads = await assignShipsToSquads(
       caches.systems,
