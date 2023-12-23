@@ -85,9 +85,9 @@ Future<JobResult> doCharter(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
+  final chart = await caches.waypoints.fetchChart(ship.waypointSymbol);
   // Save neededChart to decide if this stop completes the behavior.
-  final neededChart = waypoint.chart == null;
+  final neededChart = chart == null;
   if (neededChart) {
     await chartWaypointAndLog(
       api,

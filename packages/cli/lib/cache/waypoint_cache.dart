@@ -151,6 +151,21 @@ class WaypointCache {
     }
   }
 
+  /// Fetch the chart for the given waypoint if not in cache.
+  Future<Chart?> fetchChart(WaypointSymbol waypointSymbol) async {
+    final api = _api;
+    if (api == null) {
+      throw StateError('This api does not work in offline mode.');
+    }
+    final values = await _chartingCache.chartedValues(waypointSymbol);
+    if (values != null) {
+      return values.chart;
+    }
+    final waypoint = await fetchWaypoint(api, waypointSymbol);
+    await _chartingCache.addWaypoint(waypoint);
+    return waypoint.chart;
+  }
+
   /// Fetch the waypoint with the given symbol.
   Future<Waypoint> waypoint(WaypointSymbol waypointSymbol) async {
     final result = await _waypointOrNull(waypointSymbol);
