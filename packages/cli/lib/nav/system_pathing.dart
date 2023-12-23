@@ -22,9 +22,10 @@ List<SystemSymbol>? findSystemPath(
   costSoFar[startSymbol] = 0;
 
   const timeBetween = cooldownTimeForJumpBetweenSystems;
-  // A* only requires approximate weights, but we use the real weights here
-  // because it's just as fast to compute.
-  const approximateTimeBetween = cooldownTimeForJumpBetweenSystems;
+  // A* only requires approximate weights.  We could use real weights here
+  // but we'd have to remove case which calls this function with the same
+  // system (end, end) which will assert in cooldownTimeForJumpBetweenSystems.
+  int approximateTimeBetween(System a, System b) => a.distanceTo(b);
 
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
@@ -39,6 +40,10 @@ List<SystemSymbol>? findSystemPath(
 
     for (final nextSystem in connectedSystems) {
       final next = nextSystem.systemSymbol;
+      // TODO(eseidel): work around a bug in directlyConnectedSystemSymbols.
+      if (next == currentSymbol) {
+        continue;
+      }
       final newCost =
           costSoFar[currentSymbol]! + timeBetween(currentSystem, nextSystem);
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {

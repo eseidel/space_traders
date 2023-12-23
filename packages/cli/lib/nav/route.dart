@@ -124,7 +124,7 @@ int cooldownTimeForJumpDistance(int distance) {
 /// Returns the cooldown time after jumping between two systems.
 int cooldownTimeForJumpBetweenSystems(System a, System b) {
   if (a.symbol == b.symbol) {
-    throw ArgumentError('Cannot jump between the same system ${a.symbol}.');
+    throw ArgumentError('Cannot jump to the same system ${a.symbol}.');
   }
   // There is no longer a limit on jump distance, just a question
   // of if two systems are connected by a jumpgate.
