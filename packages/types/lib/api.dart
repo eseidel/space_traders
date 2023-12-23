@@ -91,24 +91,41 @@ class WaypointSymbol extends Equatable {
   List<Object> get props => [waypoint];
 
   /// The sector symbol of the waypoint.
-  String get sector => system.split('-')[0];
+  String get sector {
+    // Avoid splitting the string if we don't have to.
+    final firstHyphen = waypoint.indexOf('-');
+    return waypoint.substring(0, firstHyphen);
+  }
 
   /// The system symbol of the waypoint.
   String get system {
-    final parts = waypoint.split('-');
-    return '${parts[0]}-${parts[1]}';
+    // Avoid splitting the string if we don't have to.
+    final lastHyphen = waypoint.lastIndexOf('-');
+    return waypoint.substring(0, lastHyphen);
   }
 
   /// The SystemSymbol of the waypoint.
   SystemSymbol get systemSymbol => SystemSymbol.fromString(system);
 
   /// Just the waypoint name (no sector or system)
-  String get waypointName => waypoint.split('-')[2];
+  String get waypointName {
+    // Avoid splitting the string if we don't have to.
+    final lastHyphen = waypoint.lastIndexOf('-');
+    return waypoint.substring(lastHyphen + 1);
+  }
+
+  /// Returns true if the waypoint is from the given system.
+  /// Faster than converting to a SystemSymbol and comparing.
+  bool hasSystem(SystemSymbol systemSymbol) {
+    // Avoid constructing a new SystemSymbol if we don't have to.
+    return system == systemSymbol.system;
+  }
 
   /// Just the system and waypoint name (no sector)
   String get sectorLocalName {
-    final parts = waypoint.split('-');
-    return '${parts[1]}-${parts[2]}';
+    // Avoid splitting the string if we don't have to.
+    final firstHyphen = waypoint.indexOf('-');
+    return waypoint.substring(firstHyphen + 1);
   }
 
   @override
@@ -147,10 +164,18 @@ class SystemSymbol extends Equatable {
   factory SystemSymbol.fromJson(String json) => SystemSymbol.fromString(json);
 
   /// The sector symbol of the system.
-  String get sector => system.split('-')[0];
+  String get sector {
+    // Avoid splitting the string if we don't have to.
+    final firstHyphen = system.indexOf('-');
+    return system.substring(0, firstHyphen);
+  }
 
   /// Just the system name (no sector)
-  String get systemName => system.split('-')[1];
+  String get systemName {
+    // Avoid splitting the string if we don't have to.
+    final lastHyphen = system.lastIndexOf('-');
+    return system.substring(lastHyphen + 1);
+  }
 
   /// The full system symbol.
   final String system;

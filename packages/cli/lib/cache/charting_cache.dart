@@ -32,8 +32,9 @@ class ChartingSnapshot {
       getRecord(waypointSymbol)?.isCharted;
 
   /// Returns ChartingRecords for the given system.
-  Iterable<ChartingRecord> recordsInSystem(SystemSymbol systemSymbol) =>
-      records.where((r) => r.waypointSymbol.systemSymbol == systemSymbol);
+  Iterable<ChartingRecord> recordsInSystem(SystemSymbol systemSymbol) {
+    return records.where((r) => r.waypointSymbol.hasSystem(systemSymbol));
+  }
 
   /// Returns the ChartingRecord for the given waypoint, or null if it is not
   /// in the snapshot.
