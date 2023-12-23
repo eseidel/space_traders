@@ -52,6 +52,9 @@ void main() {
       ),
     ]);
     final chartingCache = _MockChartingCache();
+    registerFallbackValue(waypointSymbol);
+    when(() => chartingCache.chartedValues(any()))
+        .thenAnswer((_) async => null);
     final constructionCache = _MockConstructionCache();
     when(
       () => constructionCache.updateConstruction(waypointSymbol, null),
