@@ -39,6 +39,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     return '$count/$total';
   }
 
+  // We can move this index into another object if other scripts need similar.
   final chartedWaypointsBySystem =
       chartingSnapshot.records.where((r) => r.isCharted).groupListsBy(
             (r) => r.waypointSymbol.systemSymbol,

@@ -1,12 +1,15 @@
 import 'package:cli/cache/json_store.dart';
 import 'package:cli/cli.dart';
-import 'package:collection/collection.dart';
 import 'package:db/chart.dart';
 
 /// A snapshot of the charting records.
 class ChartingSnapshot {
   /// Creates a new charting snapshot.
-  ChartingSnapshot(this.records);
+  ChartingSnapshot(Iterable<ChartingRecord> records) {
+    for (final record in records) {
+      _recordsByWaypointSymbol[record.waypointSymbol] = record;
+    }
+  }
 
   /// Creates a new charting snapshot from the database.
   static Future<ChartingSnapshot> load(Database db) async {
@@ -15,12 +18,16 @@ class ChartingSnapshot {
   }
 
   /// The charting records.
-  final List<ChartingRecord> records;
+  final Map<WaypointSymbol, ChartingRecord> _recordsByWaypointSymbol =
+      <WaypointSymbol, ChartingRecord>{};
+
+  /// The charting records.
+  Iterable<ChartingRecord> get records => _recordsByWaypointSymbol.values;
 
   /// The number of waypoints in this snapshot.
   /// Records are expected to be one-per-waypoint but this method is
   /// separate from [records] on the assumption that may change.
-  int get waypointCount => records.length;
+  int get waypointCount => _recordsByWaypointSymbol.length;
 
   /// Returns all charted values.
   Iterable<ChartedValues> get values =>
@@ -31,15 +38,10 @@ class ChartingSnapshot {
   bool? isCharted(WaypointSymbol waypointSymbol) =>
       getRecord(waypointSymbol)?.isCharted;
 
-  /// Returns ChartingRecords for the given system.
-  Iterable<ChartingRecord> recordsInSystem(SystemSymbol systemSymbol) {
-    return records.where((r) => r.waypointSymbol.hasSystem(systemSymbol));
-  }
-
   /// Returns the ChartingRecord for the given waypoint, or null if it is not
   /// in the snapshot.
   ChartingRecord? getRecord(WaypointSymbol waypointSymbol) =>
-      records.firstWhereOrNull((r) => r.waypointSymbol == waypointSymbol);
+      _recordsByWaypointSymbol[waypointSymbol];
 
   /// Returns the ChartingRecord for the given waypoint, or null if it is not
   ChartingRecord? operator [](WaypointSymbol waypointSymbol) =>
