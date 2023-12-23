@@ -1,20 +1,13 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli_table/cli_table.dart';
+import 'package:collection/collection.dart';
 
 String _typeName(SystemType type) {
   if (type.value.endsWith('_STAR')) {
     return type.value.substring(0, type.value.length - '_STAR'.length);
   }
   return type.value;
-}
-
-Iterable<WaypointSymbol> chartedSymbolsInSystem(
-  ChartingSnapshot chartingSnapshot,
-  SystemSymbol systemSymbol,
-) {
-  final records = chartingSnapshot.recordsInSystem(systemSymbol);
-  return records.where((r) => r.isCharted).map((r) => r.waypointSymbol);
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
@@ -46,10 +39,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     return '$count/$total';
   }
 
+  final chartedWaypointsBySystem =
+      chartingSnapshot.records.where((r) => r.isCharted).groupListsBy(
+            (r) => r.waypointSymbol.systemSymbol,
+          );
+
   for (final systemSymbol in systemSymbols) {
     final system = systemsCache[systemSymbol];
-    final chartedSymbols =
-        chartedSymbolsInSystem(chartingSnapshot, systemSymbol);
+    final records = chartedWaypointsBySystem[systemSymbol] ?? [];
+    final chartedSymbols = records.map((r) => r.waypointSymbol).toSet();
     final waypointCount = system.waypoints.length;
     final asteroidSymbols = system.waypoints
         .where((w) => w.isAsteroid)
@@ -88,7 +86,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       systemConnectivity.systemsReachableFrom(headquartersSystemSymbol);
 
   final systemsWithCharts = reachableSystems
-      .where((s) => chartedSymbolsInSystem(chartingSnapshot, s).isNotEmpty);
+      .where((s) => (chartedWaypointsBySystem[s] ?? []).isNotEmpty);
   logger.info(
     '${systemsWithCharts.length} systems with 1+ charts of '
     '${reachableSystems.length} known reachable.',

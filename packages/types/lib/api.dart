@@ -65,7 +65,7 @@ class WaypointPosition extends Position {
 
 /// Type-safe representation of a Waypoint Symbol
 @immutable
-class WaypointSymbol extends Equatable {
+class WaypointSymbol {
   const WaypointSymbol._(this.waypoint);
 
   /// Create a WaypointSymbol from a json string.
@@ -86,9 +86,6 @@ class WaypointSymbol extends Equatable {
 
   /// The full waypoint symbol.
   final String waypoint;
-
-  @override
-  List<Object> get props => [waypoint];
 
   /// The sector symbol of the waypoint.
   String get sector {
@@ -133,6 +130,18 @@ class WaypointSymbol extends Equatable {
 
   /// Returns the json representation of the waypoint.
   String toJson() => waypoint;
+
+  // Use a direct override rather than Equatable, because this code is
+  // extremely hot.
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WaypointSymbol &&
+          runtimeType == other.runtimeType &&
+          waypoint == other.waypoint;
+
+  @override
+  int get hashCode => waypoint.hashCode;
 }
 
 // We used to use split(), but that shows up in hot code paths.
