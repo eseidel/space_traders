@@ -516,9 +516,25 @@ void main() {
     // We don't need a real object to test extension methods.
     final ship = _MockShip();
     final shipNav = _MockShipNav();
+    final now = DateTime(2021);
+    DateTime getNow() => now;
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
-    expect(ship.timeToArrival(routePlan), const Duration(seconds: 26));
+    expect(
+      ship.timeToArrival(routePlan, getNow: getNow),
+      const Duration(seconds: 26),
+    );
+
+    final shipNavRoute = _MockShipNavRoute();
+    when(() => shipNav.route).thenReturn(shipNavRoute);
+    when(() => shipNavRoute.arrival)
+        .thenReturn(now.add(const Duration(minutes: 1)));
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
+    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
+    expect(
+      ship.timeToArrival(routePlan, getNow: getNow),
+      const Duration(seconds: 86),
+    );
   });
 }

@@ -11,9 +11,12 @@ import 'package:types/types.dart';
 /// Extensions on Ship to help with navigation.
 extension ShipNavUtils on Ship {
   /// How long until we arrive at the given routePlan.
-  Duration timeToArrival(RoutePlan routePlan) {
+  Duration timeToArrival(
+    RoutePlan routePlan, {
+    DateTime Function() getNow = defaultGetNow,
+  }) {
     var timeLeft = nav.status == ShipNavStatus.IN_TRANSIT
-        ? nav.route.arrival.difference(DateTime.timestamp())
+        ? nav.route.arrival.difference(getNow())
         : Duration.zero;
     if (routePlan.endSymbol != waypointSymbol) {
       final newPlan = routePlan.subPlanStartingFrom(waypointSymbol);
