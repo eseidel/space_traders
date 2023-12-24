@@ -164,9 +164,9 @@ class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
     }
   }
 
-  static int _sellPriceAcending(MarketPrice a, MarketPrice b) =>
+  static int _sellPriceAscending(MarketPrice a, MarketPrice b) =>
       a.sellPrice.compareTo(b.sellPrice);
-  static int _purchasePriceAcending(MarketPrice a, MarketPrice b) =>
+  static int _purchasePriceAscending(MarketPrice a, MarketPrice b) =>
       a.purchasePrice.compareTo(b.purchasePrice);
 
   /// Get the median price this good can be purchased for.
@@ -186,7 +186,7 @@ class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
 
   /// Get the percentile for the sell price (you sell to them) of a trade good.
   int? percentileForSellPrice(TradeSymbol symbol, int sellPrice) {
-    const compareTo = _sellPriceAcending;
+    const compareTo = _sellPriceAscending;
     final pricesForSymbol = pricesFor(symbol);
     if (pricesForSymbol.isEmpty) {
       return null;
@@ -236,8 +236,8 @@ class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
       return null;
     }
     final compareTo = action == MarketTransactionTypeEnum.PURCHASE
-        ? _purchasePriceAcending
-        : _sellPriceAcending;
+        ? _purchasePriceAscending
+        : _sellPriceAscending;
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // Make sure that 100th percentile doesn't go out of bounds.
