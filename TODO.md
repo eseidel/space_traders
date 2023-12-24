@@ -966,3 +966,17 @@ Timed out (2s) waiting for response?
 Timed out (1s) waiting for response?
 Unhandled exception:
 TimeoutException after 0:00:30.000000: Future not completed
+
+### Why is this probe stuck?
+
+Charted all known systems, starting asteroid charting.
+[WARN] 🛸#28 (charter) took 3s (0 requests) expected 0.0s
+🛸#28 JY88-C20A (ASTEROID) is missing chart, routing.
+🛸#28 Beginning route to JY88-C20A (6m)
+🛸#28 🛫 to JY88-C20A ASTEROID (6m)
+
+### Check if we artificially devalue fuel trades
+
+We include fuel price at destination when evaluating trades.  But if we're
+trading fuel we don't want to do that. We could refuel from cargo and the price
+is also going to change as part of our delivery.

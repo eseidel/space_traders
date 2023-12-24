@@ -92,11 +92,7 @@ Future<void> advanceShips(
       if (waitUntil != null) {
         final lag = before.difference(waitUntil);
         if (lag > allowableScheduleLag) {
-          shipWarn(
-            ship,
-            'scheduled for ${waitUntil.toLocal()} '
-            'but it is ${approximateDuration(lag)} late',
-          );
+          shipWarn(ship, 'late ${approximateDuration(lag)}');
         }
       }
 
