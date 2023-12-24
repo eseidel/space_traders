@@ -16,10 +16,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipyardPrices = ShipyardPrices.load(fs);
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
+  final marketListings = MarketListingCache.load(fs);
 
-  // Having market price data is a good proxy for if we've explored something.
+  // Having market data means it's charted (either by us or someone else).
   final systemsWithMarketPrices =
-      marketPrices.waypointSymbols.map((e) => e.systemSymbol).toSet();
+      marketListings.waypointSymbols.map((e) => e.systemSymbol).toSet();
   final systemSymbols = systemsWithMarketPrices;
   final table = Table(
     header: [
