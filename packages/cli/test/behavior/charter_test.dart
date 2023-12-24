@@ -25,8 +25,6 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
@@ -39,20 +37,19 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
 
-    final waypoint = _MockWaypoint();
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
-    when(() => waypoint.symbol).thenReturn('S-A-B');
-    when(() => waypoint.systemSymbol).thenReturn('S-A');
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([]);
-    when(() => waypoint.chart).thenReturn(Chart());
-
-    final systemWaypoint = SystemWaypoint(
-      symbol: 'S-A-B',
-      type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
+    final waypoint = Waypoint(
+      symbol: waypointSymbol.waypoint,
+      systemSymbol: waypointSymbol.system,
+      type: WaypointType.PLANET,
+      traits: [],
+      chart: Chart(),
       x: 0,
       y: 0,
+      isUnderConstruction: false,
     );
+
+    final systemWaypoint = waypoint.toSystemWaypoint();
     when(() => caches.systems.waypoint(waypointSymbol))
         .thenReturn(systemWaypoint);
 
@@ -91,6 +88,9 @@ void main() {
     registerFallbackValue(waypointSymbol);
     when(() => caches.waypoints.waypoint(any()))
         .thenAnswer((_) => Future.value(waypoint));
+    when(() => caches.waypoints.fetchChart(any()))
+        .thenAnswer((_) => Future.value(Chart()));
+    when(() => caches.charting.addWaypoint(waypoint)).thenAnswer((_) async {});
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))
         .thenAnswer((_) async => false);

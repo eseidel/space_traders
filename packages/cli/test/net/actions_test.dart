@@ -785,19 +785,20 @@ void main() {
     final chartingCache = _MockChartingCache();
     final waypointTraitCache = _MockWaypointTraitCache();
 
+    final waypoint = Waypoint(
+      symbol: waypointSymbol.waypoint,
+      systemSymbol: waypointSymbol.system,
+      type: WaypointType.ASTEROID_FIELD,
+      x: 0,
+      y: 0,
+      traits: [],
+      isUnderConstruction: false,
+    );
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
       (invocation) => Future.value(
         CreateChart201Response(
           data: CreateChart201ResponseData(
-            waypoint: Waypoint(
-              symbol: waypointSymbol.waypoint,
-              systemSymbol: waypointSymbol.system,
-              type: WaypointType.ASTEROID_FIELD,
-              x: 0,
-              y: 0,
-              traits: [],
-              isUnderConstruction: false,
-            ),
+            waypoint: waypoint,
             chart: Chart(
               waypointSymbol: waypointSymbol.waypoint,
               submittedBy: 'S',
@@ -807,6 +808,7 @@ void main() {
         ),
       ),
     );
+    when(() => chartingCache.addWaypoint(waypoint)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     await runWithLogger(logger, () async {

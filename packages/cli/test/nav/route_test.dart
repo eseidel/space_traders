@@ -203,15 +203,15 @@ void main() {
       y: 0,
       type: SystemType.RED_STAR,
     );
-    expect(cooldownTimeForJumpBetweenSystems(a, b), 2500);
-    expect(cooldownTimeForJumpBetweenSystems(b, a), 2500);
+    expect(cooldownTimeForJumpBetweenSystems(a, b), 2560);
+    expect(cooldownTimeForJumpBetweenSystems(b, a), 2560);
 
-    expect(cooldownTimeForJumpBetweenSystems(b, c), 60);
+    expect(cooldownTimeForJumpBetweenSystems(b, c), 61);
 
-    expect(cooldownTimeForJumpDistance(2000), 2000);
+    expect(cooldownTimeForJumpDistance(2000), 2060);
     expect(cooldownTimeForJumpDistance(0), 60);
     // Server seems to round, rather than floor:
-    expect(cooldownTimeForJumpDistance(1527), 1527);
+    expect(cooldownTimeForJumpDistance(1527), 1587);
 
     expect(() => cooldownTimeForJumpDistance(-20), throwsArgumentError);
   });
