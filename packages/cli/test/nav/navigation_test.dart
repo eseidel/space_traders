@@ -483,7 +483,8 @@ void main() {
     final startSymbol = WaypointSymbol.fromString('A-A-A');
     final jumpASymbol = WaypointSymbol.fromString('A-A-B');
     final jumpBSymbol = WaypointSymbol.fromString('A-B-C');
-    final endSymbol = WaypointSymbol.fromString('A-B-D');
+    final jumpCSymbol = WaypointSymbol.fromString('A-C-D');
+    final endSymbol = WaypointSymbol.fromString('A-C-E');
 
     final routePlan = RoutePlan(
       fuelCapacity: 100,
@@ -505,6 +506,13 @@ void main() {
         ),
         RouteAction(
           startSymbol: jumpBSymbol,
+          endSymbol: jumpCSymbol,
+          type: RouteActionType.jump,
+          seconds: 33,
+          fuelUsed: 0,
+        ),
+        RouteAction(
+          startSymbol: jumpBSymbol,
           endSymbol: endSymbol,
           type: RouteActionType.navCruise,
           seconds: 3,
@@ -515,26 +523,85 @@ void main() {
 
     // We don't need a real object to test extension methods.
     final ship = _MockShip();
+    const shipSymbol = ShipSymbol('A', 1);
     final shipNav = _MockShipNav();
     final now = DateTime(2021);
     DateTime getNow() => now;
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
-    expect(
-      ship.timeToArrival(routePlan, getNow: getNow),
-      const Duration(seconds: 26),
-    );
-
     final shipNavRoute = _MockShipNavRoute();
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNavRoute.arrival)
-        .thenReturn(now.add(const Duration(minutes: 1)));
-    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
-    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
+
+    Duration timeToArrival({
+      required ShipNavStatus status,
+      required WaypointSymbol location,
+      Duration? cooldown,
+      Duration? arrival,
+    }) {
+      when(() => shipNav.status).thenReturn(status);
+      when(() => shipNav.waypointSymbol).thenReturn(location.waypoint);
+      when(() => shipNavRoute.arrival).thenReturn(
+        arrival == null ? now : now.add(const Duration(minutes: 1)),
+      );
+      final cooldownDuration = cooldown ?? Duration.zero;
+      when(() => ship.cooldown).thenReturn(
+        Cooldown(
+          shipSymbol: shipSymbol.symbol,
+          totalSeconds: cooldownDuration.inSeconds,
+          remainingSeconds: cooldownDuration.inSeconds,
+          expiration: now.add(cooldownDuration),
+        ),
+      );
+      return ship.timeToArrival(routePlan, getNow: getNow);
+    }
+
+    // Orbiting the first waypoint.
     expect(
-      ship.timeToArrival(routePlan, getNow: getNow),
-      const Duration(seconds: 86),
+      timeToArrival(
+        status: ShipNavStatus.IN_ORBIT,
+        location: startSymbol,
+      ),
+      const Duration(seconds: 59),
+    );
+
+    // In transit to the first waypoint.
+    expect(
+      timeToArrival(
+        status: ShipNavStatus.IN_TRANSIT,
+        arrival: const Duration(minutes: 1),
+        location: startSymbol,
+      ),
+      const Duration(seconds: 119),
+    );
+
+    /// In transit to the second waypoint.
+    expect(
+      timeToArrival(
+        status: ShipNavStatus.IN_TRANSIT,
+        location: jumpASymbol,
+        arrival: const Duration(minutes: 1),
+      ),
+      const Duration(seconds: 118),
+    );
+
+    /// Waiting at the first jump
+    expect(
+      timeToArrival(
+        status: ShipNavStatus.IN_ORBIT,
+        location: jumpASymbol,
+        cooldown: const Duration(minutes: 2),
+      ),
+      // 120s (cooldown) + 58 (remaining travel) = 178
+      const Duration(seconds: 178),
+    );
+
+    /// Waiting at the second jump
+    expect(
+      timeToArrival(
+        status: ShipNavStatus.IN_ORBIT,
+        location: jumpBSymbol,
+        cooldown: const Duration(minutes: 2),
+      ),
+      const Duration(seconds: 156),
     );
   });
 }

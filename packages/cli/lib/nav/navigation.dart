@@ -15,17 +15,19 @@ extension ShipNavUtils on Ship {
     RoutePlan routePlan, {
     DateTime Function() getNow = defaultGetNow,
   }) {
+    final now = getNow();
     var timeLeft = nav.status == ShipNavStatus.IN_TRANSIT
-        ? nav.route.arrival.difference(getNow())
+        ? nav.route.arrival.difference(now)
         : Duration.zero;
     if (routePlan.endSymbol != waypointSymbol) {
       final newPlan = routePlan.subPlanStartingFrom(waypointSymbol);
       timeLeft += newPlan.duration;
       // Include cooldown until next jump.
       // We would need to keep ship cooldowns on ShipCache to do this.
-      // if (newPlan.actions.first.type == RouteActionType.jump) {
-      //   timeLeft += ship.jumpCooldown;
-      // }
+      if (newPlan.actions.first.type == RouteActionType.jump) {
+        final remaining = remainingCooldown(now) ?? Duration.zero;
+        timeLeft += remaining;
+      }
     }
     return timeLeft;
   }
