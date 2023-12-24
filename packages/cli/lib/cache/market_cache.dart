@@ -74,6 +74,20 @@ class MarketListingCache extends JsonStore<_Record> {
   MarketListing? operator [](WaypointSymbol waypointSymbol) =>
       listingForSymbol(waypointSymbol);
 
+  /// Find systems with at least N markets.
+  Set<SystemSymbol> systemsWithAtLeastNMarkets(int n) {
+    final systemMarketCounts = <SystemSymbol, int>{};
+    for (final waypointSymbol in waypointSymbols) {
+      final systemSymbol = waypointSymbol.systemSymbol;
+      systemMarketCounts[systemSymbol] =
+          (systemMarketCounts[systemSymbol] ?? 0) + 1;
+    }
+    return systemMarketCounts.entries
+        .where((e) => e.value >= n)
+        .map((e) => e.key)
+        .toSet();
+  }
+
   /// Add MarketListings for the given Market to the cache.
   void addMarket(Market market) {
     final symbol = market.waypointSymbol;

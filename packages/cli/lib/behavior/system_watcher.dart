@@ -1,7 +1,6 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
-import 'package:cli/config.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
@@ -16,16 +15,8 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   ShipCache shipCache,
 ) {
   // Find systems with at least 5 markets.
-  final systemMarketCounts = <SystemSymbol, int>{};
-  for (final waypointSymbol in marketListingCache.waypointSymbols) {
-    final systemSymbol = waypointSymbol.systemSymbol;
-    systemMarketCounts[systemSymbol] =
-        (systemMarketCounts[systemSymbol] ?? 0) + 1;
-  }
-  final systemsWithEnoughMarkets = systemMarketCounts.entries
-      .where((e) => e.value >= config.minMarketsForSystemWatcher)
-      .map((e) => e.key)
-      .toSet();
+  final systemsWithEnoughMarkets =
+      marketListingCache.systemsWithAtLeastNMarkets(5);
 
   final assignedProbes = <ShipSymbol, SystemSymbol>{};
   final availableProbes = shipCache.ships.where((s) => s.isProbe).toList();
