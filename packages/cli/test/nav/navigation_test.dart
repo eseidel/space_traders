@@ -478,4 +478,43 @@ void main() {
     );
     expect(sellsFuel(waypointSymbol), true);
   });
+
+  test('Ship.timeToArrival', () {
+    final startSymbol = WaypointSymbol.fromString('A-A-A');
+    final jumpASymbol = WaypointSymbol.fromString('A-A-B');
+    final jumpBSymbol = WaypointSymbol.fromString('A-B-C');
+    final endSymbol = WaypointSymbol.fromString('A-B-D');
+
+    final routePlan = RoutePlan(
+      fuelCapacity: 100,
+      shipSpeed: 100,
+      actions: [
+        RouteAction(
+          startSymbol: startSymbol,
+          endSymbol: jumpASymbol,
+          type: RouteActionType.navCruise,
+          seconds: 11,
+          fuelUsed: 0,
+        ),
+        RouteAction(
+          startSymbol: jumpASymbol,
+          endSymbol: jumpBSymbol,
+          type: RouteActionType.jump,
+          seconds: 222,
+          fuelUsed: 0,
+        ),
+        RouteAction(
+          startSymbol: jumpBSymbol,
+          endSymbol: endSymbol,
+          type: RouteActionType.navCruise,
+          seconds: 33,
+          fuelUsed: 0,
+        ),
+      ],
+    );
+
+    // We don't need a real object to test extension methods.
+    final ship = _MockShip();
+    expect(ship.timeToArrival(routePlan), 266);
+  });
 }
