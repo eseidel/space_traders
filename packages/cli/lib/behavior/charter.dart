@@ -1,6 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
@@ -116,11 +117,13 @@ Future<JobResult> doCharter(
 
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
+  final maxJumps = config.charterMaxJumps;
   final destinationSymbol = await centralCommand.nextWaypointToChart(
     caches.systems,
     caches.waypoints,
     caches.systemConnectivity,
     ship,
+    maxJumps: maxJumps,
   );
 
   if (destinationSymbol != null) {
@@ -135,9 +138,14 @@ Future<JobResult> doCharter(
     );
     return JobResult.wait(waitTime);
   }
-  if (!centralCommand.chartAsteroids) {
-    logger.err('Charted all known systems, starting asteroid charting.');
-    centralCommand.chartAsteroids = true;
+  final systemSymbol = ship.systemSymbol;
+  if (!centralCommand.chartAsteroidsInSystem(systemSymbol)) {
+    shipErr(
+      ship,
+      'Charted reachable systems within $maxJumps jumps, '
+      'charting asteroids in $systemSymbol.',
+    );
+    centralCommand.setChartAsteroidsInSystem(systemSymbol);
     return JobResult.wait(null);
   }
 

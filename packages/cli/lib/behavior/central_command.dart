@@ -43,9 +43,7 @@ class CentralCommand {
 
   /// Per-system price age data used by system watchers.
   final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
-
-  /// Should we chart asteroids?
-  bool chartAsteroids = false;
+  final Map<SystemSymbol, bool> _chartAsteroidsInSystem = {};
 
   /// The next planned ship buy job.
   /// This is the start of an imagined job queue system, whereby we pre-populate
@@ -110,6 +108,16 @@ class CentralCommand {
   Duration shortenMaxPriceAgeForSystem(SystemSymbol systemSymbol) {
     final age = maxPriceAgeForSystem(systemSymbol);
     return _maxPriceAgeForSystem[systemSymbol] = age ~/ 2;
+  }
+
+  /// Returns true if we should chart asteroids in the given [systemSymbol].
+  bool chartAsteroidsInSystem(SystemSymbol systemSymbol) {
+    return _chartAsteroidsInSystem[systemSymbol] ?? false;
+  }
+
+  /// Sets whether we should chart asteroids in the given [systemSymbol].
+  void setChartAsteroidsInSystem(SystemSymbol systemSymbol) {
+    _chartAsteroidsInSystem[systemSymbol] = true;
   }
 
   /// Returns the system symbol we should assign the given [ship] to.
@@ -323,12 +331,14 @@ class CentralCommand {
     SystemsCache systems,
     WaypointCache waypoints,
     SystemConnectivity connectivity,
-    Ship ship,
-  ) async {
+    Ship ship, {
+    required int maxJumps,
+  }) async {
     final charterSystems = otherCharterSystems(ship.shipSymbol).toSet();
 
     // Only probes should ever chart asteroids.
-    final chartAsteroids = this.chartAsteroids && ship.isProbe;
+    final chartAsteroids =
+        chartAsteroidsInSystem(ship.systemSymbol) && ship.isProbe;
 
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
@@ -346,7 +356,7 @@ class CentralCommand {
         // Don't visit systems we already have a charter in.
         return !charterSystems.contains(waypoint.systemSymbol);
       },
-      maxJumps: config.charterMaxJumps,
+      maxJumps: maxJumps,
     );
     return destinationSymbol;
   }

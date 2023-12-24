@@ -38,7 +38,6 @@ Future<void> _runIdleTasksIfPossible(
   if (queue.isDone) {
     return;
   }
-  logger.info('🔎 $queue');
   while (!queue.isDone &&
       DateTime.timestamp().add(queue.minProcessingTime).isBefore(waitUntil)) {
     await expectTime(
@@ -66,6 +65,7 @@ Future<void> advanceShips(
 
   await expectTime(api.requestCounts, 'top of loop', const Duration(seconds: 1),
       () async {
+    logger.info('🔎 $queue');
     await caches.updateAtTopOfLoop(api);
     await centralCommand.advanceCentralPlanning(api, caches);
   });

@@ -102,13 +102,16 @@ void main() {
           .systemsReachableFrom(waypointSymbol.systemSymbol),
     ).thenReturn([]);
 
-    when(() => centralCommand.chartAsteroids).thenReturn(true);
+    when(
+      () => centralCommand.chartAsteroidsInSystem(waypointSymbol.systemSymbol),
+    ).thenReturn(true);
     when(
       () => centralCommand.nextWaypointToChart(
         caches.systems,
         caches.waypoints,
         caches.systemConnectivity,
         ship,
+        maxJumps: 5,
       ),
     ).thenAnswer((_) async => null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
