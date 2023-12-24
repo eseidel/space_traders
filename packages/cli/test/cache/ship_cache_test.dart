@@ -166,6 +166,6 @@ void main() {
     expect(jsonEncode(shipCache2.ships.first), jsonEncode(ship));
 
     expect(shipCache2.shipSymbols, [shipSymbol]);
-    expect(shipCache2.ship(shipSymbol).shipSymbol, shipSymbol);
+    expect(shipCache2[shipSymbol].shipSymbol, shipSymbol);
   });
 }

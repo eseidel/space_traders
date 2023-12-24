@@ -303,18 +303,11 @@ void main() {
     // No actions after the last one.
     expect(route.nextActionFrom(waypoint2), isNull);
     // Make a sub-plan starting from the same starting point.
-    final subPlan = route.subPlanStartingFrom(systemsCache, waypoint1);
+    final subPlan = route.subPlanStartingFrom(waypoint1);
     expect(subPlan.actions.length, route.actions.length);
 
     // Make a sub-plan with an unrelated waypoint.
-    expect(
-      () => route.subPlanStartingFrom(
-        systemsCache,
-        // Not in the route.
-        waypoint3,
-      ),
-      throwsArgumentError,
-    );
+    expect(() => route.subPlanStartingFrom(waypoint3), throwsArgumentError);
 
     // Exactly one jump, jump duration doesn't matter since it doesn't stop
     // navigation.

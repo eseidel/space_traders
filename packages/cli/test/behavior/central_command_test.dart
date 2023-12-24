@@ -83,7 +83,7 @@ void main() {
           routePlan: fakeJump(start, end),
         ),
       );
-      when(() => shipCache.ship(shipSymbol)).thenReturn(ship);
+      when(() => shipCache[shipSymbol]).thenReturn(ship);
     }
 
     // Sets up a ship X-A with a route from S-A-A to S-A-W.

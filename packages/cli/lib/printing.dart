@@ -151,6 +151,7 @@ DateTime logRemainingTransitTime(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) {
+  // TODO(eseidel): Use Ship.timeToArrival?
   final arrival = ship.nav.route.arrival;
   final now = getNow();
   final remaining = arrival.difference(now);

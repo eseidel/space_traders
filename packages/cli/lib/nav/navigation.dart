@@ -11,13 +11,12 @@ import 'package:types/types.dart';
 /// Extensions on Ship to help with navigation.
 extension ShipNavUtils on Ship {
   /// How long until we arrive at the given routePlan.
-  Duration timeToArrival(SystemsCache systemsCache, RoutePlan routePlan) {
+  Duration timeToArrival(RoutePlan routePlan) {
     var timeLeft = nav.status == ShipNavStatus.IN_TRANSIT
         ? nav.route.arrival.difference(DateTime.timestamp())
         : Duration.zero;
     if (routePlan.endSymbol != waypointSymbol) {
-      final newPlan =
-          routePlan.subPlanStartingFrom(systemsCache, waypointSymbol);
+      final newPlan = routePlan.subPlanStartingFrom(waypointSymbol);
       timeLeft += newPlan.duration;
       // Include cooldown until next jump.
       // We would need to keep ship cooldowns on ShipCache to do this.

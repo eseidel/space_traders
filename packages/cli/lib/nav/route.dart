@@ -135,10 +135,7 @@ int cooldownTimeForJumpBetweenSystems(System a, System b) {
 /// Logic for modifying RoutePlans
 extension RoutePlanPlanning on RoutePlan {
   /// Makes a new route plan starting from the given waypoint.
-  RoutePlan subPlanStartingFrom(
-    SystemsCache systemsCache,
-    WaypointSymbol waypointSymbol,
-  ) {
+  RoutePlan subPlanStartingFrom(WaypointSymbol waypointSymbol) {
     final index = actions.indexWhere((e) => e.startSymbol == waypointSymbol);
     // This most commonly occurs when something asks for the endSymbol.
     if (index == -1) {

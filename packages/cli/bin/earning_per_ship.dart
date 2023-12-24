@@ -84,7 +84,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   );
 
   for (final shipSymbol in shipSymbols) {
-    final ship = shipCache.ship(shipSymbol);
+    final ship = shipCache[shipSymbol];
     final role = ship.fleetRole;
     final summary = TransactionSummary(
       transactions.where((t) => t.shipSymbol == shipSymbol),

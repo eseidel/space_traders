@@ -408,6 +408,7 @@ Ship? _nextArrivingHauler(
   final haulersInTransit = haulers
       .where((h) => h.waypointSymbol == here && h.isInTransit)
       .sortedBy((h) => h.nav.route.arrival);
+  // TODO(eseidel): Should this use Ship.timeToArrival?
   final arrivalTime = haulersInTransit.firstOrNull?.nav.route.arrival;
   if (arrivalTime != null) {
     return haulersInTransit.firstOrNull;

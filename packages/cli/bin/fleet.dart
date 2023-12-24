@@ -71,7 +71,7 @@ void logShip(
   }
   final routePlan = behavior?.routePlan;
   if (routePlan != null) {
-    final timeLeft = ship.timeToArrival(systemsCache, routePlan);
+    final timeLeft = ship.timeToArrival(routePlan);
     final destination = routePlan.endSymbol.sectorLocalName;
     final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
     final arrival = approximateDuration(timeLeft);

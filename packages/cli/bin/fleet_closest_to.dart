@@ -23,6 +23,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     sellsFuel: defaultSellsFuel(marketListings),
   );
 
+  // TODO(eseidel): This needs to be centralized somewhere.
   Duration travelTimeTo(Ship ship, WaypointSymbol waypoint) {
     final route = routePlanner.planRoute(
       ship.shipSpec,

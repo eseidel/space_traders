@@ -83,7 +83,7 @@ Future<void> advanceShips(
 
     await _runIdleTasksIfPossible(entry, queue, api, caches);
     await _waitIfNeeded(entry);
-    final ship = caches.ships.ship(shipSymbol);
+    final ship = caches.ships[shipSymbol];
     if (shipFilter != null && !shipFilter(ship)) {
       continue;
     }
