@@ -568,6 +568,8 @@ void main() {
     );
 
     when(caches.construction.allRecords).thenAnswer((_) async => []);
+    when(() => caches.marketListings.systemsWithAtLeastNMarkets(5))
+        .thenReturn({});
 
     final logger = _MockLogger();
     await runWithLogger(

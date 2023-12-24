@@ -493,21 +493,21 @@ void main() {
           startSymbol: startSymbol,
           endSymbol: jumpASymbol,
           type: RouteActionType.navCruise,
-          seconds: 11,
+          seconds: 1,
           fuelUsed: 0,
         ),
         RouteAction(
           startSymbol: jumpASymbol,
           endSymbol: jumpBSymbol,
           type: RouteActionType.jump,
-          seconds: 222,
+          seconds: 22,
           fuelUsed: 0,
         ),
         RouteAction(
           startSymbol: jumpBSymbol,
           endSymbol: endSymbol,
           type: RouteActionType.navCruise,
-          seconds: 33,
+          seconds: 3,
           fuelUsed: 0,
         ),
       ],
@@ -515,6 +515,10 @@ void main() {
 
     // We don't need a real object to test extension methods.
     final ship = _MockShip();
-    expect(ship.timeToArrival(routePlan), 266);
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
+    expect(ship.timeToArrival(routePlan), const Duration(seconds: 26));
   });
 }
