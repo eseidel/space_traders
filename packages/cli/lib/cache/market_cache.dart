@@ -63,14 +63,12 @@ class MarketListingCache extends JsonStore<_Record> {
   Iterable<MarketListing> get listings => _listingBySymbol.values;
 
   /// Fetch the MarketListing for the given WaypointSymbol.
-  MarketListing? listingForSymbol(WaypointSymbol waypointSymbol) {
-    return _listingBySymbol[waypointSymbol];
-  }
+  MarketListing? listingForSymbol(WaypointSymbol waypointSymbol) =>
+      _listingBySymbol[waypointSymbol];
 
   /// Fetch the MarketListings for the given SystemSymbol.
-  Iterable<MarketListing> listingsInSystem(SystemSymbol systemSymbol) {
-    return listings.where((l) => l.waypointSymbol.systemSymbol == systemSymbol);
-  }
+  Iterable<MarketListing> listingsInSystem(SystemSymbol systemSymbol) =>
+      listings.where((l) => l.waypointSymbol.hasSystem(systemSymbol));
 
   /// Fetch the MarketListing for the given WaypointSymbol.
   MarketListing? operator [](WaypointSymbol waypointSymbol) =>

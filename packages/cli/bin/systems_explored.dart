@@ -16,7 +16,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipyardPrices = ShipyardPrices.load(fs);
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs);
+  final tradeGoods = TradeGoodCache.load(fs);
+  final marketListings = MarketListingCache.load(fs, tradeGoods);
+  final shipyardListings = ShipyardListingCache.load(fs);
 
   // Having market data means it's charted (either by us or someone else).
   final systemsWithMarketPrices =
@@ -26,8 +28,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     header: [
       'Symbol',
       'Type',
-      'Markets',
-      'Shipyards',
+      'Market\nListing',
+      'Market\nPrice',
+      'Shipyard\nListing',
+      'Shipyard\nPrice',
       'Waypoints',
       'Charts\nOther',
       'Charts\nAsteroids',
@@ -63,8 +67,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     table.add([
       systemSymbol.systemName,
       _typeName(system.type),
-      marketPrices.waypointsWithPricesInSystem(systemSymbol).length,
-      shipyardPrices.waypointsWithPricesInSystem(systemSymbol).length,
+      marketListings.listingsInSystem(systemSymbol).length,
+      marketPrices.waypointSymbolsInSystem(systemSymbol).length,
+      shipyardListings.listingsInSystem(systemSymbol).length,
+      shipyardPrices.waypointSymbolsInSystem(systemSymbol).length,
       waypointCount,
       progressString(chartedOther.length, otherSymbols.length),
       progressString(chartedAsteroids.length, asteroidSymbols.length),

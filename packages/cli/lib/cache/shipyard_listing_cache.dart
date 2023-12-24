@@ -117,6 +117,10 @@ class ShipyardListingCache extends JsonStore<_Record> {
   /// The number of waypoints with ShipyardListings.
   int get waypointCount => _listingBySymbol.keys.length;
 
+  /// Fetch the ShipyardListings for the given SystemSymbol.
+  Iterable<ShipyardListing> listingsInSystem(SystemSymbol systemSymbol) =>
+      listings.where((l) => l.waypointSymbol.hasSystem(systemSymbol));
+
   /// The ShipyardListings which sell the given ship type.
   Iterable<ShipyardListing> listingsWithShip(ShipType shipType) {
     return listings.where((listing) => listing.hasShip(shipType));

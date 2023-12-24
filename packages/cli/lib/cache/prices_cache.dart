@@ -22,7 +22,7 @@ class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>>
       prices.map((e) => e.waypointSymbol).toSet();
 
   /// Waypoints with price data within the given system.
-  Iterable<WaypointSymbol> waypointsWithPricesInSystem(
+  Iterable<WaypointSymbol> waypointSymbolsInSystem(
     SystemSymbol systemSymbol,
   ) =>
       waypointSymbols.where((s) => s.systemSymbol == systemSymbol);
