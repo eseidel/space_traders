@@ -923,29 +923,6 @@ jumpgates.dart script.
 Right now when we complete a jump gate (or chart one) we don't have any way
 to queue the idle fetcher to process it.
 
-### Jump time calculation is wrong.
-
-[WARN] 🛸#D  Jump X1-QM52 to X1-UN98 (3377) expected 338 second cooldown, got 591.
-[WARN] 🛸#2C Jump X1-RD58 to X1-AC35 (2368) expected 237 second cooldown, got 744.
-[WARN] 🛸#36 Jump X1-UN98 to X1-JF3 (3603) expected 360 second cooldown, got 852.
-[WARN] 🛸#35 Jump X1-XV24 to X1-ZX48 (2544) expected 254 second cooldown, got 90.
-[WARN] 🛸#1B Jump X1-AC35 to X1-UN98 (3047) expected 305 second cooldown, got 452.
-[WARN] 🛸#30 Jump X1-TT41 to X1-AC35 (4865) expected 487 second cooldown, got 935.
-[WARN] 🛸#35 Jump X1-ZX48 to X1-CS97 (2962) expected 296 second cooldown, got 868.
-[WARN] 🛸#F  Jump X1-FG25 to X1-AC35 (4756) expected 476 second cooldown, got 83.
-[WARN] 🛸#1F Jump X1-XV24 to X1-S96 (6483) expected 648 second cooldown, got 653.
-[WARN] 🛸#21 Jump X1-QM52 to X1-UN98 (3377) expected 338 second cooldown, got 591.
-[WARN] 🛸#37 Jump X1-CB95 to X1-XU2 (2464) expected 246 second cooldown, got 958.
-[WARN] 🛸#20 Jump X1-AN76 to X1-FG25 (5147) expected 515 second cooldown, got 951.
-[WARN] 🛸#B  Jump X1-AC35 to X1-UN98 (3047) expected 305 second cooldown, got 452.
-[WARN] 🛸#34 Jump X1-GQ34 to X1-ZU81 (4040) expected 404 second cooldown, got 584.
-[WARN] 🛸#2B Jump X1-RT41 to X1-XV24 (2902) expected 290 second cooldown, got 586.
-
-
-### Idle queue should use a priority queue and not just FIFO.
-
-The priority should be jumps-from-hq?
-
 ### Waypoint cache is not using maxAge.
 
 We should be scanning a system before we travel to it.  But right now we
@@ -984,7 +961,6 @@ is also going to change as part of our delivery.
 ### Write a script to profile deal finding across multiple systems.
 
 ### Do I consider cost when moving to another system for trading?
-
 
 ### Contract crash??
 
