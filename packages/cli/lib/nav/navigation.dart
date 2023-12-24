@@ -8,6 +8,27 @@ import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
+/// Extensions on Ship to help with navigation.
+extension ShipNavUtils on Ship {
+  /// How long until we arrive at the given routePlan.
+  Duration timeToArrival(SystemsCache systemsCache, RoutePlan routePlan) {
+    var timeLeft = nav.status == ShipNavStatus.IN_TRANSIT
+        ? nav.route.arrival.difference(DateTime.timestamp())
+        : Duration.zero;
+    if (routePlan.endSymbol != waypointSymbol) {
+      final newPlan =
+          routePlan.subPlanStartingFrom(systemsCache, waypointSymbol);
+      timeLeft += newPlan.duration;
+      // Include cooldown until next jump.
+      // We would need to keep ship cooldowns on ShipCache to do this.
+      // if (newPlan.actions.first.type == RouteActionType.jump) {
+      //   timeLeft += ship.jumpCooldown;
+      // }
+    }
+    return timeLeft;
+  }
+}
+
 /// Default implementation of sellsFuel for passing to routePlanner.
 /// Returns a function which will return true if market at a given waypoint
 /// symbol is known to sell fuel and false if we either don't know or

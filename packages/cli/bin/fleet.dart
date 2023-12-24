@@ -1,25 +1,12 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/nav/navigation.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);
-}
-
-/// Returns a string representing the current navigation status of the ship.
-String _describeShipNav(ShipNav nav) {
-  final waypoint = nav.waypointSymbolObject.sectorLocalName;
-  switch (nav.status) {
-    case ShipNavStatus.DOCKED:
-      return 'Docked at $waypoint';
-    case ShipNavStatus.IN_ORBIT:
-      return 'Orbiting $waypoint';
-    case ShipNavStatus.IN_TRANSIT:
-      return 'Transit to $waypoint';
-  }
-  return 'Unknown';
 }
 
 String describeInventory(
@@ -40,27 +27,6 @@ String describeInventory(
     );
   }
   return lines.join('\n');
-}
-
-Duration timeToArrival(
-  SystemsCache systemsCache,
-  RoutePlan routePlan,
-  Ship ship,
-) {
-  var timeLeft = ship.nav.status == ShipNavStatus.IN_TRANSIT
-      ? ship.nav.route.arrival.difference(DateTime.timestamp())
-      : Duration.zero;
-  if (routePlan.endSymbol != ship.waypointSymbol) {
-    final newPlan =
-        routePlan.subPlanStartingFrom(systemsCache, ship.waypointSymbol);
-    timeLeft += newPlan.duration;
-    // Include cooldown until next jump.
-    // We would need to keep ship cooldowns on ShipCache to do this.
-    // if (newPlan.actions.first.type == RouteActionType.jump) {
-    //   timeLeft += ship.jumpCooldown;
-    // }
-  }
-  return timeLeft;
 }
 
 String _behaviorOrTypeString(Ship ship, BehaviorState? behavior) {
@@ -88,7 +54,6 @@ void logShip(
   SystemsCache systemsCache,
   BehaviorCache behaviorCache,
   MarketPrices marketPrices,
-  JumpCache jumpCache,
   Ship ship,
 ) {
   const indent = '   ';
@@ -106,14 +71,14 @@ void logShip(
   }
   final routePlan = behavior?.routePlan;
   if (routePlan != null) {
-    final timeLeft = timeToArrival(systemsCache, routePlan, ship);
+    final timeLeft = ship.timeToArrival(systemsCache, routePlan);
     final destination = routePlan.endSymbol.sectorLocalName;
     final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
     final arrival = approximateDuration(timeLeft);
     logger.info('${indent}enroute to $destination $destinationType '
         'in $arrival');
   } else {
-    logger.info('$indent${_describeShipNav(ship.nav)} ${waypoint.type}');
+    logger.info('$indent${describeShipNav(ship.nav)} ${waypoint.type}');
   }
   final deal = behavior?.deal;
   if (deal != null) {
@@ -149,13 +114,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final systemsCache = SystemsCache.load(fs)!;
   final marketPrices = MarketPrices.load(fs);
-  final jumpCache = JumpCache();
   for (final ship in matchingShips) {
     logShip(
       systemsCache,
       behaviorCache,
       marketPrices,
-      jumpCache,
       ship,
     );
   }

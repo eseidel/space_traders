@@ -980,3 +980,7 @@ Charted all known systems, starting asteroid charting.
 We include fuel price at destination when evaluating trades.  But if we're
 trading fuel we don't want to do that. We could refuel from cargo and the price
 is also going to change as part of our delivery.
+
+### Write a script to profile deal finding across multiple systems.
+
+### Do I consider cost when moving to another system for trading?

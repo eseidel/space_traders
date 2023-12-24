@@ -240,3 +240,17 @@ String describeConstructionProgress(Construction? construction) {
   }
   return buffer.toString();
 }
+
+/// Returns a string representing the current navigation status of the ship.
+String describeShipNav(ShipNav nav) {
+  final waypoint = nav.waypointSymbolObject.sectorLocalName;
+  switch (nav.status) {
+    case ShipNavStatus.DOCKED:
+      return 'Docked at $waypoint';
+    case ShipNavStatus.IN_ORBIT:
+      return 'Orbiting $waypoint';
+    case ShipNavStatus.IN_TRANSIT:
+      return 'Transit to $waypoint';
+  }
+  return 'Unknown';
+}
