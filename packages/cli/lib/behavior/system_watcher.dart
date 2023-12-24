@@ -1,6 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
@@ -8,6 +9,50 @@ import 'package:cli/net/actions.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
+
+/// Logic for assigning systems to system watchers.
+Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
+  MarketListingCache marketListingCache,
+  ShipCache shipCache,
+) {
+  // Find systems with at least 5 markets.
+  final systemMarketCounts = <SystemSymbol, int>{};
+  for (final waypointSymbol in marketListingCache.waypointSymbols) {
+    final systemSymbol = waypointSymbol.systemSymbol;
+    systemMarketCounts[systemSymbol] =
+        (systemMarketCounts[systemSymbol] ?? 0) + 1;
+  }
+  final systemsWithEnoughMarkets = systemMarketCounts.entries
+      .where((e) => e.value >= config.minMarketsForSystemWatcher)
+      .map((e) => e.key)
+      .toSet();
+
+  final assignedProbes = <ShipSymbol, SystemSymbol>{};
+  final availableProbes = shipCache.ships.where((s) => s.isProbe).toList();
+  final systemsNeedingProbes = systemsWithEnoughMarkets.toList();
+  // First try to assign probes to the systems they are already in.
+  for (final probe in availableProbes) {
+    final systemSymbol = probe.systemSymbol;
+    if (systemsWithEnoughMarkets.contains(systemSymbol)) {
+      assignedProbes[probe.shipSymbol] = systemSymbol;
+      systemsNeedingProbes.remove(systemSymbol);
+    }
+  }
+  // Otherwise just assign the remaining probes.
+  // TODO(eseidel): We could assign by proximity.
+  for (final probe in availableProbes) {
+    if (systemsNeedingProbes.isEmpty) {
+      break;
+    }
+    final systemSymbol = systemsNeedingProbes.removeLast();
+    assignedProbes[probe.shipSymbol] = systemSymbol;
+    systemsNeedingProbes.remove(systemSymbol);
+  }
+  if (systemsNeedingProbes.isNotEmpty) {
+    logger.warn('Failed to assign probes to systems: $systemsNeedingProbes');
+  }
+  return assignedProbes;
+}
 
 /// Returns true if the given waypoint is missing either a chart or recent
 /// market data.

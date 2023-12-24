@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/charter.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
+import 'package:cli/behavior/system_watcher.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/extraction_score.dart';
@@ -60,8 +61,7 @@ class CentralCommand {
   /// Mounts we know of a place we can buy.
   final Set<ShipMountSymbolEnum> _availableMounts = {};
 
-  final Map<ShipSymbol, SystemSymbol> _assignedSystemsForSatellites =
-      Map.from(config.probeAssignments);
+  final Map<ShipSymbol, SystemSymbol> _assignedSystemsForSatellites = {};
 
   /// Sets the available mounts for testing.
   @visibleForTesting
@@ -477,6 +477,10 @@ class CentralCommand {
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(Api api, Caches caches) async {
     // await caches.updateRoutingCaches();
+
+    _assignedSystemsForSatellites
+      ..clear()
+      ..addAll(assignProbesToSystems(caches.marketListings, caches.ships));
 
     miningSquads = await assignShipsToSquads(
       caches.systems,

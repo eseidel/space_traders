@@ -110,17 +110,6 @@ class Config {
   /// Initial max age for price data in any given system.
   final defaultMaxAgeForPriceData = const Duration(days: 3);
 
-  /// System assignments for probes.  All other probes are set to "explorer".
-  final probeAssignments = <String, String>{
-    // '2': 'JX78',
-    // '29': 'NB34',
-  }.map(
-    (k, v) => MapEntry(
-      ShipSymbol.fromString('ESEIDEL-$k'),
-      SystemSymbol.fromString('X1-$v'),
-    ),
-  );
-
   /// Allow multiple ships to be assigned to the same construction job.
   // This is mostly a hack around the fact that our construction can get
   // stuck with auto-drifting ships holding the lock for 6hrs.
@@ -128,6 +117,10 @@ class Config {
 
   /// Max number of jumps we allow a charter to plan for at once.
   final charterMaxJumps = 5;
+
+  /// Minimum number of markets in a system before we bother assigning a
+  /// system watcher.
+  final minMarketsForSystemWatcher = 5;
 }
 
 /// Our global configuration object.
