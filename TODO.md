@@ -955,3 +955,14 @@ don't respect the maxAge so we'll think it's always uncharted.
 
 Right now it just does all systems before all jumpgates.  It needs to learn
 to interleave them.
+
+### Slow server can break client.
+
+Timed out (1s) waiting for response?
+Timed out (2s) waiting for response?
+Timed out (1s) waiting for response?
+Timed out (1s) waiting for response?
+Timed out (2s) waiting for response?
+Timed out (1s) waiting for response?
+Unhandled exception:
+TimeoutException after 0:00:30.000000: Future not completed

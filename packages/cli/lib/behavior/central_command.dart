@@ -481,6 +481,7 @@ class CentralCommand {
     _assignedSystemsForSatellites
       ..clear()
       ..addAll(assignProbesToSystems(caches.marketListings, caches.ships));
+    logger.info('Assigned: $_assignedSystemsForSatellites');
 
     miningSquads = await assignShipsToSquads(
       caches.systems,
