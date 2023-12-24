@@ -984,3 +984,70 @@ is also going to change as part of our delivery.
 ### Write a script to profile deal finding across multiple systems.
 
 ### Do I consider cost when moving to another system for trading?
+
+
+### Contract crash??
+
+[WARN] 🛸#F  Expected 258,752c profit (9c/s), got 1,720c (0c/s) in 12:36:02, expected 07:17:49
+Unhandled exception:
+ApiException 400: {"error":{"message":"Agent ESEIDEL already has an active contract.","code":4511,"data":{"agentSymbol":"ESEIDEL","contractId":"clqa10azr2q0es60cv0d1t4q1"}}}
+#0      FleetApi.negotiateContract (package:openapi/api/fleet_api.dart:1335:7)
+<asynchronous suspension>
+#1      negotiateContractAndLog (package:cli/net/actions.dart:543:20)
+<asynchronous suspension>
+#2      acceptContractsIfNeeded (package:cli/behavior/trader.dart:545:9)
+<asynchronous suspension>
+#3      _initDeal (package:cli/behavior/trader.dart:855:5)
+<asynchronous suspension>
+#4      MultiJob.run (package:cli/behavior/behavior.dart:154:22)
+<asynchronous suspension>
+#5      advanceShipBehavior (package:cli/behavior/advance.dart:107:23)
+<asynchronous suspension>
+#6      advanceShips.<anonymous closure> (package:cli/logic.dart:101:21)
+<asynchronous suspension>
+#7      captureTimeAndRequests (package:cli/net/counts.dart:66:18)
+<asynchronous suspension>
+#8      advanceShips (package:cli/logic.dart:99:29)
+<asynchronous suspension>
+#9      logic (package:cli/logic.dart:211:7)
+<asynchronous suspension>
+#10     cliMain (file:///root/space_traders/packages/cli/bin/cli.dart:148:3)
+<asynchronous suspension>
+#11     main.<anonymous closure> (file:///root/space_traders/packages/cli/bin/cli.dart:154:7)
+<asynchronous suspension>
+#12     main (file:///root/space_traders/packages/cli/bin/cli.dart:152:3)
+<asynchronous suspension>
+
+about 2pm on Sunday 12/24.
+
+```json
+ {
+  "id": "clqa10azr2q0es60cv0d1t4q1",
+  "factionSymbol": "ASTRO",
+  "type": "PROCUREMENT",
+  "terms": {
+   "deadline": "2023-12-24T21:55:42.369Z",
+   "payment": {
+    "onAccepted": 1950,
+    "onFulfilled": 6915
+   },
+   "deliver": [
+    {
+     "tradeSymbol": "PLATINUM_ORE",
+     "destinationSymbol": "X1-AC35-B7",
+     "unitsRequired": 45,
+     "unitsFulfilled": 0
+    }
+   ]
+  },
+  "accepted": true,
+  "fulfilled": false,
+  "expiration": "2023-12-18T21:55:42.369Z",
+  "deadlineToAccept": "2023-12-18T21:55:42.369Z"
+ }
+ ```
+
+### Add limit for how long low-value deals can go.
+
+e.g. 7hr for 1c/s isn't worth it.  But 30m for 1c/s might be.
+7hr for 7c/s is fine.
