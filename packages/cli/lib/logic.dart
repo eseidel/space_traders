@@ -35,6 +35,10 @@ Future<void> _runIdleTasksIfPossible(
   if (waitUntil == null) {
     return;
   }
+  if (queue.isDone) {
+    return;
+  }
+  logger.info('🔎 $queue');
   while (!queue.isDone &&
       DateTime.timestamp().add(queue.minProcessingTime).isBefore(waitUntil)) {
     await expectTime(
@@ -107,7 +111,7 @@ Future<void> advanceShips(
         ),
         onComplete: (duration, requestCount) {
           final behaviorState = caches.behaviors.getBehavior(shipSymbol);
-          final expectedSeconds = requestCount / api.maxRequestsPerSecond;
+          final expectedSeconds = requestCount / config.targetRequestsPerSecond;
           if (duration.inSeconds > expectedSeconds * 1.2) {
             final behaviorName = behaviorState?.behavior.name;
             final behaviorString =
@@ -174,7 +178,7 @@ class RateLimitTracker {
       _lastRequestCount = requestCount;
       final requestsPerSecond =
           requestsSinceLastPrint / timeSinceLastPrint.inSeconds;
-      final max = timeSinceLastPrint.inSeconds * _api.maxRequestsPerSecond;
+      final max = timeSinceLastPrint.inSeconds * config.targetRequestsPerSecond;
       final percent = ((requestsSinceLastPrint / max) * 100).round();
       // No sense in printing low percentages, as that will just end up being
       // most of what we print.

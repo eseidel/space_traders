@@ -3,7 +3,15 @@ import 'package:types/types.dart';
 /// Class for holding our hard-coded configuration values.
 class Config {
   /// Whether or not we should enable the idle queue.
-  final bool serviceIdleQueue = false;
+  final bool serviceIdleQueue = true;
+
+  /// The number of requests per second allowed by the api.
+  /// Version 2.1 allows:
+  /// - 2 requests per second
+  /// - plus 30 requests over a 60 second burst
+  /// 2 * 60 + 30 = 150 requests per minute / 60 = 2.5 requests per second
+  /// https://docs.spacetraders.io/api-guide/rate-limits
+  double targetRequestsPerSecond = 2.5;
 
   /// Our ship buy plan for computeNextShipToBuy.
   final buyPlan = [

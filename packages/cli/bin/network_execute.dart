@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/net/queue.dart';
 import 'package:cli/net/rate_limit.dart';
 import 'package:cli/printing.dart';
@@ -9,10 +10,10 @@ import 'package:http/http.dart';
 class NetExecutor {
   NetExecutor(
     Database db, {
-    this.targetRequestsPerSecond = 3,
+    required this.targetRequestsPerSecond,
   }) : queue = NetQueue(db, QueueRole.responder);
 
-  final int targetRequestsPerSecond;
+  final double targetRequestsPerSecond;
   final Client _client = Client();
   final NetQueue queue;
 
@@ -67,21 +68,17 @@ class NetExecutor {
 
   Future<void> run({DateTime Function() getNow = defaultGetNow}) async {
     logger.info('Servicing network requests...');
-    final minWaitTime = const Duration(seconds: 1) ~/ targetRequestsPerSecond;
+    final minWaitTime =
+        Duration(milliseconds: (1000 / targetRequestsPerSecond).ceil());
     final stats = RateLimitStatPrinter();
     DateTime? nextRequestTime;
     var serverErrorRetryLimit = 5;
     while (true) {
       stats.printIfNeeded();
-      // final didReconnect = await queue.reconnectIfNeeded();
-      // if (didReconnect) {
-      //   logger.warn('Reconnected to database.');
-      // }
 
       if (nextRequestTime != null) {
         final waitTime = nextRequestTime.difference(getNow());
         if (waitTime > Duration.zero) {
-          // logger.detail('Waiting until $nextRequestTime');
           await Future<void>.delayed(waitTime);
         }
       }
@@ -152,7 +149,10 @@ class NetExecutor {
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final connection = await defaultDatabase();
-  await NetExecutor(connection).run();
+  await NetExecutor(
+    connection,
+    targetRequestsPerSecond: config.targetRequestsPerSecond,
+  ).run();
 }
 
 void main(List<String> args) async {

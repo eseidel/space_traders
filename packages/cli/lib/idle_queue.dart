@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
 
@@ -32,6 +33,9 @@ class NonRepeatingQueue<T> {
   /// How many items are in the queue.
   int get length => _items.length;
 
+  /// How many items have been seen.
+  int get seenLength => _seen.length;
+
   /// Returns true when the queue is not empty.
   bool get isNotEmpty => _items.isNotEmpty;
 
@@ -55,7 +59,7 @@ class IdleQueue {
   void queueSystem(SystemSymbol systemSymbol, {required int jumpDistance}) {
     final queued = _systems.queue((systemSymbol, jumpDistance));
     if (queued) {
-      logger.info('Queued System (${_systems.length}): '
+      logger.detail('Queued System (${_systems.length}): '
           '$systemSymbol ($jumpDistance)');
     }
   }
@@ -78,7 +82,7 @@ class IdleQueue {
   }) {
     final queued = _jumpGates.queue((waypointSymbol, jumpDistance));
     if (queued) {
-      logger.info('Queued JumpGate (${_jumpGates.length}): '
+      logger.detail('Queued JumpGate (${_jumpGates.length}): '
           '$waypointSymbol ($jumpDistance)');
     }
   }
@@ -140,13 +144,19 @@ class IdleQueue {
   }
 
   /// A guess at the minimum time we need to do one loop.
-  Duration get minProcessingTime => const Duration(milliseconds: 1500);
+  Duration get minProcessingTime {
+    // Systems make about 4 requests.
+    return Duration(
+      milliseconds: (1000 * config.targetRequestsPerSecond * 4).ceil(),
+    );
+  }
 
   /// Run one fetch.
   Future<void> runOne(Api api, Caches caches) async {
     if (isDone) {
       return;
     }
+    // Service systems before jumpgates to make a breadth-first search.
     if (_systems.isNotEmpty) {
       await _processNextSystem(api, caches);
       return;
@@ -159,4 +169,12 @@ class IdleQueue {
 
   /// Returns true when the queue is empty.
   bool get isDone => _systems.isEmpty && _jumpGates.isEmpty;
+
+  @override
+  String toString() {
+    return 'IdleQueue('
+        'systems: ${_systems.length} queued, ${_systems.seenLength} seen; '
+        'jumpGates: ${_jumpGates.length} queued, '
+        '${_jumpGates.seenLength} seen)';
+  }
 }
