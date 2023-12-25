@@ -40,9 +40,9 @@ void logShip(
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  // final tradeGoodCache = TradeGoodCache.load(fs);
-  // final marketListingCache = MarketListingCache.load(fs, tradeGoodCache);
-  // final systemsToWatch = marketListingCache.systemsWithAtLeastNMarkets(5);
+  final tradeGoodCache = TradeGoodCache.load(fs);
+  final marketListingCache = MarketListingCache.load(fs, tradeGoodCache);
+  final systemsToWatch = marketListingCache.systemsWithAtLeastNMarkets(5);
 
   final behaviorCache = BehaviorCache.load(fs);
   final systemWatcherStates =
@@ -68,7 +68,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
   }
 
-  // for (final ship in ships) {
-  //   logShip(systemsCache, behaviorCache, marketPrices, ship);
-  // }
+  for (final systemSymbol in systemsToWatch) {
+    final shipsAssigned = systemWatcherStates
+        .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)
+        .map((s) => s.shipSymbol)
+        .toList();
+    logger.info(
+      'system $systemSymbol has ${shipsAssigned.length} watchers assigned',
+    );
+  }
 }
