@@ -24,6 +24,9 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   // First try to assign probes to the systems they are already in.
   for (final probe in availableProbes) {
     final systemSymbol = probe.systemSymbol;
+    if (!systemsNeedingProbes.contains(systemSymbol)) {
+      continue;
+    }
     if (systemsWithEnoughMarkets.contains(systemSymbol)) {
       assignedProbes[probe.shipSymbol] = systemSymbol;
       systemsNeedingProbes.remove(systemSymbol);
