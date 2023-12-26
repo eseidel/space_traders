@@ -1027,3 +1027,36 @@ about 2pm on Sunday 12/24.
 
 e.g. 7hr for 1c/s isn't worth it.  But 30m for 1c/s might be.
 7hr for 7c/s is fine.
+
+### Make the idle queue resume where it left off.
+
+Right now it takes a long time to get back to the end of the queue.
+
+### Figure out why the probes are getting stuck and unstick them.
+
+### Charters are too slow.
+
+🛸#36 Charted reachable systems within 5 jumps, charting asteroids in X1-TM24.
+[WARN] 🛸#36 (charter) took 2s (0 requests) expected 0.0s
+🛸#36 TM24-Z65F (ASTEROID) is missing chart, routing.
+[WARN] 🛸#36 Beginning route to TM24-Z65F (10m)
+🛸#36 🛫 to TM24-Z65F ASTEROID (10m)
+🛸#3C 🗺️  X1-YG47-A53F - ASTEROID - Common Metal Deposits, Deep Craters, Shallow Craters
+🛸#3C Charted reachable systems within 5 jumps, charting asteroids in X1-YG47.
+[WARN] 🛸#3C (charter) took 3s (0 requests) expected 0.0s
+🛸#3C YG47-C56C (ASTEROID) is missing chart, routing.
+[WARN] 🛸#3C Beginning route to YG47-C56C (42m)
+🛸#3C 🛫 to YG47-C56C ASTEROID (42m)
+🛸#39 🗺️  X1-FN61-X16B - ASTEROID - Common Metal Deposits
+🛸#39 Charted reachable systems within 5 jumps, charting asteroids in X1-FN61.
+[WARN] 🛸#39 (charter) took 3s (0 requests) expected 0.0s
+
+### Traders too slow.
+
+🛸#F  🛫 to PK16-J63 FUEL_STATION (5m) spent 122 fuel
+[WARN] 🛸#F  (trader) took 4s (2 requests) expected 0.8s
+
+
+### canJump should always use a cached version?
+
+## IdleQueue is fetching too many waypoints.
