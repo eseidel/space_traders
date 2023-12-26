@@ -27,6 +27,9 @@ enum FleetRole {
   /// A ship set up to explore.
   explorer,
 
+  /// A ship set up to explore.
+  probe,
+
   /// A ship with an unknown role.
   unknown;
 
@@ -34,6 +37,8 @@ enum FleetRole {
   factory FleetRole.fromShip(Ship ship) {
     if (ship.isCommand) {
       return FleetRole.command;
+    } else if (ship.isExplorer) {
+      return FleetRole.explorer;
     } else if (ship.hasMiningLaser) {
       return FleetRole.miner;
     } else if (ship.hasSurveyor) {
@@ -43,7 +48,7 @@ enum FleetRole {
     } else if (ship.isHauler) {
       return FleetRole.trader;
     } else if (ship.isProbe) {
-      return FleetRole.explorer;
+      return FleetRole.probe;
     }
     return FleetRole.unknown;
   }

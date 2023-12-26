@@ -486,6 +486,9 @@ extension ShipUtils on Ship {
   /// Returns true if the ship is a probe.
   bool get isProbe => frame.symbol == ShipFrameSymbolEnum.PROBE;
 
+  /// Returns true if the ship is an explorer.
+  bool get isExplorer => frame.symbol == ShipFrameSymbolEnum.EXPLORER;
+
   /// Returns true if the ship is a hauler.
   bool get isHauler =>
       frame.symbol == ShipFrameSymbolEnum.LIGHT_FREIGHTER ||

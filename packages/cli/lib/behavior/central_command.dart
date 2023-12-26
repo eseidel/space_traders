@@ -194,24 +194,24 @@ class CentralCommand {
       );
     }
 
-    final squad = squadForShip(ship);
-    if (squad != null) {
-      var behavior = {
-        FleetRole.miner: Behavior.miner,
-        FleetRole.surveyor: Behavior.surveyor,
-        FleetRole.siphoner: Behavior.siphoner,
-      }[ship.fleetRole];
-      if (behavior == null && ship.isHauler && enabled(Behavior.minerHauler)) {
-        behavior = Behavior.minerHauler;
-      }
-      if (behavior != null && enabled(behavior)) {
-        return BehaviorState(
-          shipSymbol,
-          behavior,
-          extractionJob: squad.job,
-        );
-      }
-    }
+    // final squad = squadForShip(ship);
+    // if (squad != null) {
+    //   var behavior = {
+    //     FleetRole.miner: Behavior.miner,
+    //     FleetRole.surveyor: Behavior.surveyor,
+    //     FleetRole.siphoner: Behavior.siphoner,
+    //   }[ship.fleetRole];
+    //   if (behavior == null && ship.isHauler && enabled(Behavior.minerHauler)) {
+    //     behavior = Behavior.minerHauler;
+    //   }
+    //   if (behavior != null && enabled(behavior)) {
+    //     return BehaviorState(
+    //       shipSymbol,
+    //       behavior,
+    //       extractionJob: squad.job,
+    //     );
+    //   }
+    // }
 
     if (ship.isProbe) {
       final assignedSystem = assignedSystemForSatellite(ship);
@@ -490,7 +490,6 @@ class CentralCommand {
     _assignedSystemsForSatellites
       ..clear()
       ..addAll(assignProbesToSystems(caches.marketListings, caches.ships));
-    logger.info('Assigned: $_assignedSystemsForSatellites');
 
     miningSquads = await assignShipsToSquads(
       caches.systems,
