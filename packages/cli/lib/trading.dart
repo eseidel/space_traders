@@ -433,6 +433,14 @@ Iterable<CostedDeal> findDealsFor(
     return [];
   }
 
+  // Computing the median price currently requires walking all prices,
+  // do do it once and cache it for each call to costOutDeal.
+  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
+      config.defaultFuelCost;
+  final costPerAntimatterUnit =
+      marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
+          config.defaultAntimatterCost;
+
   final before = DateTime.now();
   final costedDeals = filtered
       .map(
@@ -446,11 +454,8 @@ Iterable<CostedDeal> findDealsFor(
           ),
           deal,
           shipWaypointSymbol: startSymbol,
-          costPerFuelUnit: marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
-              config.defaultFuelCost,
-          costPerAntimatterUnit:
-              marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
-                  config.defaultAntimatterCost,
+          costPerFuelUnit: costPerFuelUnit,
+          costPerAntimatterUnit: costPerAntimatterUnit,
         ),
       )
       .toList();
