@@ -32,6 +32,9 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
       systemsNeedingProbes.remove(systemSymbol);
     }
   }
+  for (final probeSymbol in assignedProbes.keys) {
+    availableProbes.removeWhere((s) => s.shipSymbol == probeSymbol);
+  }
   // Otherwise just assign the remaining probes.
   // TODO(eseidel): We could assign by proximity.
   for (final probe in availableProbes) {
