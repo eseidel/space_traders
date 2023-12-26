@@ -158,7 +158,7 @@ int _countHyphens(String str) {
 
 /// Type-safe representation of a System Symbol
 @immutable
-class SystemSymbol extends Equatable {
+class SystemSymbol {
   const SystemSymbol._(this.system);
 
   /// Create a SystemSymbol from a string.
@@ -189,14 +189,23 @@ class SystemSymbol extends Equatable {
   /// The full system symbol.
   final String system;
 
-  @override
-  List<Object> get props => [system];
-
   /// Convert to JSON.
   String toJson() => system;
 
   @override
   String toString() => system;
+
+  // Use a direct override rather than Equatable, because this code is
+  // extremely hot.
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SystemSymbol &&
+          runtimeType == other.runtimeType &&
+          system == other.system;
+
+  @override
+  int get hashCode => system.hashCode;
 }
 
 /// Parsed ShipSymbol which can be compared/sorted.
