@@ -3,7 +3,7 @@ import 'package:types/types.dart';
 /// Class for holding our hard-coded configuration values.
 class Config {
   /// Whether or not we should enable the idle queue.
-  final bool serviceIdleQueue = true;
+  final bool serviceIdleQueue = false;
 
   /// The number of requests per second allowed by the api.
   /// Version 2.1 allows:
@@ -30,7 +30,7 @@ class Config {
     ShipType.MINING_DRONE,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
     for (int i = 0; i < 40; i++) ShipType.PROBE,
-    ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
     ShipType.EXPLORER,
   ];
 
@@ -38,9 +38,9 @@ class Config {
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
   final minerHaulerSymbols = <String>[
-    '3',
-    '4',
-    '5',
+    // '3',
+    // '4',
+    // '5',
   ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
@@ -57,7 +57,7 @@ class Config {
       // This is perfered over mining and siphoning in case those are far away
       // on the assumption the command ship should be trading early and all
       // it's missing is price data to do so.
-      Behavior.charter,
+      // Behavior.charter,
       // Early on the command ship makes about 5c/s vs. ore hounds making
       // 6c/s. It's a better surveyor than miner. Especially when enabling
       // mining drones.
@@ -67,8 +67,10 @@ class Config {
       Behavior.siphoner,
     ],
     FleetRole.trader: [Behavior.trader],
-    FleetRole.miner: [Behavior.miner],
-    FleetRole.surveyor: [Behavior.surveyor],
+    FleetRole.explorer: [Behavior.trader],
+    // TODO(eseidel): I don't think these do anything anymore:
+    // FleetRole.miner: [Behavior.miner],
+    // FleetRole.surveyor: [Behavior.surveyor],
     FleetRole.siphoner: [Behavior.siphoner],
   };
 
