@@ -375,17 +375,13 @@ MarketScan scanReachableMarkets(
   MarketPrices marketPrices, {
   required SystemSymbol startSystem,
 }) {
-  // For now just using all market prices.
-  final reachableSystems =
-      systemConnectivity.systemsReachableFrom(startSystem).toSet();
-
-  final allowedWaypoints = marketPrices.waypointSymbols
-      .where((w) => reachableSystems.contains(w.systemSymbol));
-  logger.detail('Considering ${allowedWaypoints.length} waypoints');
-
+  // Reachable systems will all have the same clusterId as the start system.
+  final clusterId = systemConnectivity.clusterIdForSystem(startSystem);
   return MarketScan.fromMarketPrices(
     marketPrices,
-    waypointFilter: allowedWaypoints.contains,
+    // TODO(eseidel): Avoid the systemSymbol construction here.
+    waypointFilter: (w) =>
+        systemConnectivity.clusterIdForSystem(w.systemSymbol) == clusterId,
     description: 'all known markets',
   );
 }
