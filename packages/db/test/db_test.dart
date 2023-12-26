@@ -28,7 +28,7 @@ void main() {
   });
 
   test('createConnectionFromConfig', () {
-    final config = DatabaseConfig(
+    const config = DatabaseConfig(
       host: 'host',
       port: 1234,
       database: 'database',
