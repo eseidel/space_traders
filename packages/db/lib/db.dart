@@ -4,6 +4,7 @@ import 'package:db/construction.dart';
 import 'package:db/extraction.dart';
 import 'package:db/faction.dart';
 import 'package:db/query.dart';
+import 'package:db/queue.dart';
 import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
 import 'package:meta/meta.dart';
@@ -207,4 +208,47 @@ class Database {
         getChartingRecordQuery(waypointSymbol, maxAge),
         chartingRecordFromColumnMap,
       );
+
+  /// Return the next request to be executed.
+  Future<RequestRecord?> nextRequest() =>
+      queryOne(nextRequestQuery(), requestRecordFromColumnMap);
+
+  /// Insert the given request into the database and return it's new id.
+  Future<int> insertRequest(RequestRecord request) async {
+    final query = insertRequestQuery(request);
+    final result = await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+    return result.first.first as int;
+  }
+
+  /// Get the request with the given id.
+  Future<RequestRecord?> getRequest(int requestId) async {
+    final query = getRequestQuery(requestId);
+    return queryOne(query, requestRecordFromColumnMap);
+  }
+
+  /// Delete the given request from the database.
+  Future<void> deleteRequest(RequestRecord request) async {
+    final query = deleteRequestQuery(request);
+    final result = await connection.query(
+      query.fmtString,
+      substitutionValues: query.substitutionValues,
+    );
+    if (result.affectedRowCount != 1) {
+      throw ArgumentError('Request not found: $request');
+    }
+  }
+
+  /// Insert the given response into the database.
+  Future<void> insertResponse(ResponseRecord response) async {
+    await insertOne(insertResponseQuery(response));
+  }
+
+  /// Get the response with the given id.
+  Future<ResponseRecord?> getResponseForRequest(int requestId) async {
+    final query = getResponseForRequestQuery(requestId);
+    return queryOne(query, responseRecordFromColumnMap);
+  }
 }

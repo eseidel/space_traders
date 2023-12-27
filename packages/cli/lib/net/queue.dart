@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
@@ -102,15 +101,12 @@ class NetQueue {
   ) async {
     assert(role == QueueRole.requestor, 'Only requestors can queue requests.');
     // TODO(eseidel): Move this into db package.
-    final result = await _db.connection.query(
-      'INSERT INTO request_ (priority, json) '
-      'VALUES (@priority, @json) RETURNING id',
-      substitutionValues: {
-        'priority': priority,
-        'json': jsonEncode(request),
-      },
+    final requestId = await _db.insertRequest(
+      RequestRecord(
+        priority: priority,
+        request: request,
+      ),
     );
-    final requestId = result[0][0] as int;
     // TODO(eseidel): This could be a trigger.
     await _db.connection.execute("NOTIFY request_, '$requestId'");
     return requestId;
@@ -128,29 +124,19 @@ class NetQueue {
     while (true) {
       // TODO(eseidel): This does not yet handle queuing multiple requests
       // and waiting on all of them.
-      // TODO(eseidel): Move this into db package.
-      final result = await _db.connection.query(
-        'SELECT json FROM response_ WHERE request_id = @requestId',
-        substitutionValues: {
-          'requestId': requestId,
-        },
-      );
+      final result = await _db.getResponseForRequest(requestId);
       // If we don't yet have a response, wait for one.
-      if (result.isEmpty) {
-        try {
-          await _db.connection.notifications
-              .firstWhere((notification) => notification.channel == 'response_')
-              .timeout(Duration(seconds: timeoutSeconds));
-        } on TimeoutException {
-          logger.err('Timed out (${timeoutSeconds}s) waiting for response?');
-          timeoutSeconds *= 2;
-        }
-        continue;
+      if (result != null) {
+        return result.response.toResponse();
       }
-      final queued = QueuedResponse.fromJson(
-        result[0][0] as Map<String, dynamic>,
-      );
-      return queued.toResponse();
+      try {
+        await _db.connection.notifications
+            .firstWhere((notification) => notification.channel == 'response_')
+            .timeout(Duration(seconds: timeoutSeconds));
+      } on TimeoutException {
+        logger.err('Timed out (${timeoutSeconds}s) waiting for response?');
+        timeoutSeconds *= 2;
+      }
     }
   }
 
@@ -164,32 +150,13 @@ class NetQueue {
   /// Gets the next request from the queue, or null if there are no requests.
   Future<RequestRecord?> nextRequest() async {
     assert(role == QueueRole.responder, 'Only responders can get requests.');
-    // TODO(eseidel): Move this into db package.
-    final result = await _db.connection.query(
-      'SELECT id, priority, json FROM request_ ORDER BY priority DESC LIMIT 1',
-    );
-    if (result.isEmpty) {
-      return null;
-    }
-    final row = result[0];
-    return RequestRecord(
-      id: row[0] as int,
-      priority: row[1] as int,
-      request: QueuedRequest.fromJson(
-        row[2] as Map<String, dynamic>,
-      ),
-    );
+    final request = await _db.nextRequest();
+    return request;
   }
 
   /// Deletes the given request from the queue.
   Future<void> deleteRequest(RequestRecord request) async {
-    // TODO(eseidel): Move this into db package.
-    await _db.connection.execute(
-      'DELETE FROM request_ WHERE id = @id',
-      substitutionValues: {
-        'id': request.id,
-      },
-    );
+    await _db.deleteRequest(request);
   }
 
   /// Responds to the given request with the given response.
@@ -198,14 +165,8 @@ class NetQueue {
     QueuedResponse response,
   ) async {
     assert(role == QueueRole.responder, 'Only responders can respond.');
-    // TODO(eseidel): Move this into db package.
-    await _db.connection.execute(
-      'INSERT INTO response_ (request_id, json) '
-      'VALUES (@requestId, @json)',
-      substitutionValues: {
-        'requestId': request.id,
-        'json': jsonEncode(response),
-      },
+    await _db.insertResponse(
+      ResponseRecord(requestId: request.id!, response: response),
     );
     // TODO(eseidel): This could be a trigger.
     await _db.connection.execute("NOTIFY response_, '${request.id}'");
