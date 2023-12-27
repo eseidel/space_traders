@@ -28,7 +28,7 @@ Stream<T> fetchAllPages<T, A>(
 Future<Waypoint> fetchWaypoint(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems.getWaypoint(
     waypointSymbol.systemString,
-    waypointSymbol.toString(),
+    waypointSymbol.toJson(),
   );
   final openApiWaypoint = response!.data;
   return Waypoint.fromOpenApi(openApiWaypoint);
