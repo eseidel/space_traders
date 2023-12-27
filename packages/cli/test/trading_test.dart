@@ -78,15 +78,15 @@ void main() {
     final systemsCache = _MockSystemsCache();
     final start = SystemWaypoint.test(WaypointSymbol.fromString('X-S-A'));
     final end = SystemWaypoint.test(WaypointSymbol.fromString('X-S-B'));
-    when(() => systemsCache.waypoint(start.waypointSymbol)).thenReturn(start);
-    when(() => systemsCache.waypoint(end.waypointSymbol)).thenReturn(end);
+    when(() => systemsCache.waypoint(start.symbol)).thenReturn(start);
+    when(() => systemsCache.waypoint(end.symbol)).thenReturn(end);
     when(() => systemsCache.waypointsInSystem(start.systemSymbol))
         .thenReturn([start, end]);
 
     final routePlanner = _MockRoutePlanner();
     const fuelCapacity = 100;
     const shipSpeed = 1;
-    registerFallbackValue(start.waypointSymbol);
+    registerFallbackValue(start.symbol);
     when(
       () => routePlanner.planRoute(
         any(),
@@ -99,8 +99,8 @@ void main() {
         shipSpeed: shipSpeed,
         actions: [
           RouteAction(
-            startSymbol: start.waypointSymbol,
-            endSymbol: end.waypointSymbol,
+            startSymbol: start.symbol,
+            endSymbol: end.symbol,
             type: RouteActionType.navCruise,
             seconds: 15,
             fuelUsed: 10,
@@ -110,8 +110,8 @@ void main() {
     );
 
     final deal = Deal.test(
-      sourceSymbol: start.waypointSymbol,
-      destinationSymbol: end.waypointSymbol,
+      sourceSymbol: start.symbol,
+      destinationSymbol: end.symbol,
       tradeSymbol: TradeSymbol.FUEL,
       purchasePrice: 1,
       sellPrice: 2,
@@ -125,7 +125,7 @@ void main() {
         fuelCapacity: fuelCapacity,
       ),
       deal,
-      shipWaypointSymbol: start.waypointSymbol,
+      shipWaypointSymbol: start.symbol,
       costPerFuelUnit: 100,
       costPerAntimatterUnit: 10000,
     );
@@ -189,16 +189,16 @@ void main() {
       position: WaypointPosition(1000, 1000, SystemSymbol.fromString('S-A')),
     );
     final waypoints = [saa, sab, sac];
-    when(() => systemsCache.waypoint(saa.waypointSymbol)).thenReturn(saa);
-    when(() => systemsCache.waypoint(sab.waypointSymbol)).thenReturn(sab);
-    when(() => systemsCache.waypoint(sac.waypointSymbol)).thenReturn(sac);
+    when(() => systemsCache.waypoint(saa.symbol)).thenReturn(saa);
+    when(() => systemsCache.waypoint(sab.symbol)).thenReturn(sab);
+    when(() => systemsCache.waypoint(sac.symbol)).thenReturn(sac);
     when(() => systemsCache.waypointsInSystem(saa.systemSymbol))
         .thenReturn(waypoints);
     const tradeSymbol = TradeSymbol.FUEL;
     final now = DateTime.timestamp();
     final prices = [
       MarketPrice(
-        waypointSymbol: saa.waypointSymbol,
+        waypointSymbol: saa.symbol,
         symbol: tradeSymbol,
         supply: SupplyLevel.ABUNDANT,
         purchasePrice: 200,
@@ -208,7 +208,7 @@ void main() {
         activity: ActivityLevel.WEAK,
       ),
       MarketPrice(
-        waypointSymbol: sab.waypointSymbol,
+        waypointSymbol: sab.symbol,
         symbol: tradeSymbol,
         supply: SupplyLevel.ABUNDANT,
         purchasePrice: 100,
@@ -218,7 +218,7 @@ void main() {
         activity: ActivityLevel.WEAK,
       ),
       MarketPrice(
-        waypointSymbol: sac.waypointSymbol,
+        waypointSymbol: sac.symbol,
         symbol: tradeSymbol,
         supply: SupplyLevel.ABUNDANT,
         purchasePrice: 1000,

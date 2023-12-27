@@ -25,7 +25,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpGates = systemSymbols
       .expand(systemsCache.waypointsInSystem)
       .where((w) => w.isJumpGate)
-      .map((w) => w.waypointSymbol);
+      .map((w) => w.symbol);
   final underConstruction = jumpGates
       .where((s) => constructionSnapshot.isUnderConstruction(s) ?? false);
   logger.info(

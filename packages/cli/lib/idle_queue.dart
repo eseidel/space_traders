@@ -105,7 +105,7 @@ class IdleQueue {
         .detail('Process (${_systems.length}): $systemSymbol ($jumpDistance)');
     final waypoints = caches.systems.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
-      final waypointSymbol = waypoint.waypointSymbol;
+      final waypointSymbol = waypoint.symbol;
       if (await caches.waypoints.hasMarketplace(waypointSymbol)) {
         final listing = caches.marketListings[waypointSymbol];
         if (listing == null) {
@@ -127,7 +127,7 @@ class IdleQueue {
       if (waypoint.isJumpGate &&
           (await caches.waypoints.isCharted(waypointSymbol))) {
         final fromRecord =
-            await caches.jumpGates.getOrFetch(api, waypoint.waypointSymbol);
+            await caches.jumpGates.getOrFetch(api, waypoint.symbol);
         final from = fromRecord.waypointSymbol;
         if (!await canJumpFromAsync(
           caches.jumpGates,

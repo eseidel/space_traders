@@ -22,7 +22,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   final start = ship.systemSymbol == system.systemSymbol
       ? ship.waypointSymbol
       // This is only ever called with systems with waypoints.
-      : system.jumpGateWaypoints.first.waypointSymbol;
+      : system.jumpGateWaypoints.first.symbol;
   final startWaypoint = systemsCache.waypoint(start);
   final systemWaypoints =
       system.waypoints.sortedBy<num>((w) => w.distanceTo(startWaypoint));
@@ -31,7 +31,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
     if (filter != null && !filter(systemWaypoint)) {
       continue;
     }
-    final waypointSymbol = systemWaypoint.waypointSymbol;
+    final waypointSymbol = systemWaypoint.symbol;
     // Try and fetch the waypoint from the server or our cache.
     final isCharted = await waypointCache.isCharted(waypointSymbol);
     if (!isCharted) {

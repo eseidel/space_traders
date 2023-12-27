@@ -19,7 +19,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpGateSymbol = systemsCache
       .waypointsInSystem(startSystemSymbol)
       .firstWhere((w) => w.isJumpGate)
-      .waypointSymbol;
+      .symbol;
 
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final jumpGateCache = JumpGateCache.load(fs);

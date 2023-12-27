@@ -50,7 +50,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       final systemRecord = systemsCache[system];
       for (final waypoint in systemRecord.waypoints) {
         if (waypoint.isJumpGate) {
-          jumpGates.queue(waypoint.waypointSymbol);
+          jumpGates.queue(waypoint.symbol);
         }
       }
     }

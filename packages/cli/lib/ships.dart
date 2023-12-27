@@ -39,8 +39,7 @@ extension ShipTypeToFrame on ShipyardShipCache {
   }) {
     final symbolString = shipSymbol?.symbol ?? 'S-1';
     final factionString = factionSymbol?.value ?? 'COSMIC';
-    final waypointSymbol =
-        origin?.waypointSymbol ?? WaypointSymbol.fromString('A-B-C');
+    final waypointSymbol = origin?.symbol ?? WaypointSymbol.fromString('A-B-C');
     final waypoint = origin ??
         SystemWaypoint(
           symbol: waypointSymbol,
@@ -118,7 +117,7 @@ const _shipConfigs = [
 ];
 
 ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
-  final originSymbol = origin.waypointSymbol;
+  final originSymbol = origin.symbol;
   final waypoint = ShipNavRouteWaypoint(
     symbol: originSymbol.waypoint,
     systemSymbol: originSymbol.system,

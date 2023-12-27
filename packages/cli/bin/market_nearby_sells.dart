@@ -25,7 +25,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final hqMine = systemsCache
       .waypointsInSystem(hq.systemSymbol)
       .firstWhere((w) => w.isAsteroid)
-      .waypointSymbol;
+      .symbol;
 
   final miner = shipCache.ships.firstWhere((s) => s.isMiner);
   final ship = miner.deepCopy();

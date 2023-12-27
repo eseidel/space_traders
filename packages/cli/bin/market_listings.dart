@@ -71,7 +71,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
 
   for (final waypoint in waypoints) {
-    final marketSymbol = waypoint.waypointSymbol;
+    final marketSymbol = waypoint.symbol;
 
     // Adding a price to MarketPrices updates our listing, so if we don't
     // have a listing we won't have a price.

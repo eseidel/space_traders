@@ -104,7 +104,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
   if (ship.systemSymbol == system.systemSymbol) {
     start = ship.waypointSymbol;
   } else {
-    start = system.jumpGateWaypoints.firstOrNull?.waypointSymbol;
+    start = system.jumpGateWaypoints.firstOrNull?.symbol;
   }
   final systemWaypoints = system.waypoints.toList(); // Copy so we can sort.
   if (start != null) {
@@ -116,7 +116,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
   }
 
   for (final systemWaypoint in systemWaypoints) {
-    final waypointSymbol = systemWaypoint.waypointSymbol;
+    final waypointSymbol = systemWaypoint.symbol;
     if (filter != null && !filter(waypointSymbol)) {
       continue;
     }
@@ -185,7 +185,7 @@ Future<JobResult> _travelToAssignedSystem(
       caches,
       ship,
       state,
-      jumpGate.waypointSymbol,
+      jumpGate.symbol,
     );
     return JobResult.wait(waitTime);
   }

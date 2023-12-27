@@ -21,7 +21,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final chartingSnapshot = await ChartingSnapshot.load(db);
 
   bool isUncharted(SystemWaypoint waypoint) {
-    final maybeCharted = chartingSnapshot[waypoint.waypointSymbol]?.isCharted;
+    final maybeCharted = chartingSnapshot[waypoint.symbol]?.isCharted;
     return maybeCharted == null || !maybeCharted;
   }
 

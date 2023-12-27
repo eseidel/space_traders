@@ -266,14 +266,14 @@ void _addSubPlanWithinSystem(
   final actions = findRouteWithinSystem(
     systemsCache,
     shipSpec,
-    start: start.waypointSymbol,
-    end: end.waypointSymbol,
+    start: start.symbol,
+    end: end.symbol,
     sellsFuel: sellsFuel,
   );
   // This should not be possible.
   if (actions == null) {
     throw ArgumentError('Cannot find route within system from '
-        '${start.waypointSymbol} to ${end.waypointSymbol}');
+        '${start.symbol} to ${end.symbol}');
   }
   route.addAll(actions);
 }
@@ -292,8 +292,8 @@ RouteAction _jumpAction(
   // if we had two separate series of jumps in the route.
   final seconds = isLastJump ? 0 : cooldown;
   return RouteAction(
-    startSymbol: start.waypointSymbol,
-    endSymbol: end.waypointSymbol,
+    startSymbol: start.symbol,
+    endSymbol: end.symbol,
     type: RouteActionType.jump,
     seconds: seconds,
     fuelUsed: 0,

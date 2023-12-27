@@ -81,7 +81,7 @@ class WaypointCache {
     }
 
     return Waypoint(
-      symbol: systemWaypoint.waypointSymbol,
+      symbol: systemWaypoint.symbol,
       type: systemWaypoint.type,
       position: systemWaypoint.position,
       chart: values.chart,
@@ -100,7 +100,7 @@ class WaypointCache {
     for (final systemWaypoint in systemWaypoints) {
       // TODO(eseidel): Could make this a single db query by fetching all
       // construction records up front.
-      final waypoint = await waypointFromCaches(systemWaypoint.waypointSymbol);
+      final waypoint = await waypointFromCaches(systemWaypoint.symbol);
       if (waypoint == null) {
         return null;
       }

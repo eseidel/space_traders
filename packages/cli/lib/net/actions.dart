@@ -441,7 +441,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
     systemsCache,
     shipCache,
     ship,
-    waypoint.waypointSymbol,
+    waypoint.symbol,
   );
   final flightTime = result.nav.route.duration;
   if (ship.fuelPercentage < 0.5) {
@@ -451,7 +451,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
   shipInfo(
     ship,
-    '🛫 to ${waypoint.waypointSymbol} ${waypoint.type} '
+    '🛫 to ${waypoint.symbol} ${waypoint.type} '
     '(${approximateDuration(flightTime)})$fuelString',
   );
   _checkFlightTime(flightTime, ship, result);

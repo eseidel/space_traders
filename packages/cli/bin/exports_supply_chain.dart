@@ -231,7 +231,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpgate = systemsCache
       .jumpGateWaypointForSystem(agentCache.headquartersSystemSymbol)!;
   const tradeSymbol = TradeSymbol.FAB_MATS;
-  final waypointSymbol = jumpgate.waypointSymbol;
+  final waypointSymbol = jumpgate.symbol;
 
   logger.info('Sourcing $tradeSymbol for $waypointSymbol');
   Sourcer(

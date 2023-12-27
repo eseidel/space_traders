@@ -38,31 +38,31 @@ void main() {
     expect(
       approximateRoundTripDistanceWithinSystem(
         systemsCache,
-        a.waypointSymbol,
-        {b.waypointSymbol},
+        a.symbol,
+        {b.symbol},
       ),
       20,
     );
     expect(
       approximateRoundTripDistanceWithinSystem(
         systemsCache,
-        a.waypointSymbol,
-        {c.waypointSymbol},
+        a.symbol,
+        {c.symbol},
       ),
       40,
     );
     expect(
       approximateRoundTripDistanceWithinSystem(
         systemsCache,
-        a.waypointSymbol,
-        {b.waypointSymbol, c.waypointSymbol},
+        a.symbol,
+        {b.symbol, c.symbol},
       ),
       40,
     );
     expect(
       approximateRoundTripDistanceWithinSystem(
         systemsCache,
-        a.waypointSymbol,
+        a.symbol,
         {},
       ),
       0,
@@ -71,8 +71,8 @@ void main() {
     expect(
       approximateRoundTripDistanceWithinSystem(
         systemsCache,
-        a.waypointSymbol,
-        {a.waypointSymbol, b.waypointSymbol, c.waypointSymbol},
+        a.symbol,
+        {a.symbol, b.symbol, c.symbol},
       ),
       40,
     );
@@ -80,8 +80,8 @@ void main() {
     expect(
       () => approximateRoundTripDistanceWithinSystem(
         systemsCache,
-        a.waypointSymbol,
-        {otherSystem.waypointSymbol},
+        a.symbol,
+        {otherSystem.symbol},
       ),
       throwsArgumentError,
     );
@@ -283,9 +283,8 @@ void main() {
 
     // Within one system
     final system = systemsCache[waypoint1.systemSymbol];
-    final waypoint2 = system.waypoints
-        .firstWhere((w) => w.waypointSymbol != waypoint1)
-        .waypointSymbol;
+    final waypoint2 =
+        system.waypoints.firstWhere((w) => w.symbol != waypoint1).symbol;
     expectRoute(waypoint1, waypoint2, 23);
 
     final route = planRoute(waypoint1, waypoint2);
@@ -349,14 +348,14 @@ void main() {
             fuelCapacity: fuelCapacity,
             speed: shipSpeed,
           ),
-          start: start.waypointSymbol,
-          end: end.waypointSymbol,
+          start: start.symbol,
+          end: end.symbol,
         );
     // If tank is large enough, we just go direct.
     final big = planRoute(start, end, fuelCapacity: 101)!.actions;
     expect(big.length, 1);
-    expect(big[0].startSymbol, start.waypointSymbol);
-    expect(big[0].endSymbol, end.waypointSymbol);
+    expect(big[0].startSymbol, start.symbol);
+    expect(big[0].endSymbol, end.symbol);
     expect(big[0].type, RouteActionType.navCruise);
 
     // If it's large enough to make it to the fuel station, we go there
@@ -365,29 +364,29 @@ void main() {
     // 100 should fail here, right now we use <=.
     final medium = planRoute(start, end, fuelCapacity: 99)!.actions;
     expect(medium[0].type, RouteActionType.navCruise);
-    expect(medium[0].startSymbol, start.waypointSymbol);
-    expect(medium[0].endSymbol, fuelStation.waypointSymbol);
+    expect(medium[0].startSymbol, start.symbol);
+    expect(medium[0].endSymbol, fuelStation.symbol);
     expect(medium.length, 3);
     expect(medium[1].type, RouteActionType.refuel);
-    expect(medium[1].startSymbol, fuelStation.waypointSymbol);
-    expect(medium[1].endSymbol, fuelStation.waypointSymbol);
+    expect(medium[1].startSymbol, fuelStation.symbol);
+    expect(medium[1].endSymbol, fuelStation.symbol);
     expect(medium[2].type, RouteActionType.navCruise);
-    expect(medium[2].startSymbol, fuelStation.waypointSymbol);
-    expect(medium[2].endSymbol, end.waypointSymbol);
+    expect(medium[2].startSymbol, fuelStation.symbol);
+    expect(medium[2].endSymbol, end.symbol);
 
     // If it's not large enough to make it to the fuel station, we just
     // drift straight there.
     final little = planRoute(start, end, fuelCapacity: 20)!.actions;
     expect(little.length, 1);
-    expect(little[0].startSymbol, start.waypointSymbol);
-    expect(little[0].endSymbol, end.waypointSymbol);
+    expect(little[0].startSymbol, start.symbol);
+    expect(little[0].endSymbol, end.symbol);
     expect(little[0].type, RouteActionType.navDrift);
 
     // Ships that don't use fuel always just cruise.
     final noFuel = planRoute(start, end, fuelCapacity: 0)!.actions;
     expect(noFuel.length, 1);
-    expect(noFuel[0].startSymbol, start.waypointSymbol);
-    expect(noFuel[0].endSymbol, end.waypointSymbol);
+    expect(noFuel[0].startSymbol, start.symbol);
+    expect(noFuel[0].endSymbol, end.symbol);
     expect(noFuel[0].type, RouteActionType.navCruise);
   });
 

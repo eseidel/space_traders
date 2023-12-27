@@ -148,7 +148,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final hqMine = systemsCache
       .waypointsInSystem(hq.systemSymbol)
       .firstWhere((w) => w.isAsteroid)
-      .waypointSymbol;
+      .symbol;
 
   const tradeSymbol = TradeSymbol.DIAMONDS;
   const haulerType = ShipType.HEAVY_FREIGHTER;

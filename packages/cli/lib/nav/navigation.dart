@@ -258,7 +258,7 @@ Future<NavResult> continueNavigationIfNeeded(
         caches.agent,
         caches.ships,
         ship,
-        actionEnd.waypointSymbol,
+        actionEnd.symbol,
       );
 
       _verifyJumpTime(

@@ -201,7 +201,8 @@ class CentralCommand {
     //     FleetRole.surveyor: Behavior.surveyor,
     //     FleetRole.siphoner: Behavior.siphoner,
     //   }[ship.fleetRole];
-    //   if (behavior == null && ship.isHauler && enabled(Behavior.minerHauler)) {
+    //   if (behavior == null && ship.isHauler &&
+    //       enabled(Behavior.minerHauler)) {
     //     behavior = Behavior.minerHauler;
     //   }
     //   if (behavior != null && enabled(behavior)) {
@@ -467,7 +468,7 @@ class CentralCommand {
     if (jumpGate == null) {
       return null;
     }
-    return await caches.construction.getConstruction(jumpGate.waypointSymbol);
+    return await caches.construction.getConstruction(jumpGate.symbol);
   }
 
   bool _computeHaveEscapedStartingSystem(Caches caches) {

@@ -69,7 +69,7 @@ List<RouteAction>? findRouteWithinSystem(
   // We only consider waypoints that have markets that sell fuel.
   // Also include the start and end waypoints.
   final waypoints = systemWaypoints.where((w) {
-    final symbol = w.waypointSymbol;
+    final symbol = w.symbol;
     return sellsFuel(symbol) || symbol == start || symbol == end;
   }).toList();
 
@@ -107,7 +107,7 @@ List<RouteAction>? findRouteWithinSystem(
     for (final nextWaypoint in waypoints) {
       final flightMode =
           flightModeRequired(from: currentWaypoint, to: nextWaypoint);
-      final next = nextWaypoint.waypointSymbol;
+      final next = nextWaypoint.symbol;
       final duration =
           _timeBetween(currentWaypoint, nextWaypoint, shipSpeed, flightMode);
       final newCost = costSoFar[currentSymbol]! + duration;
@@ -126,7 +126,7 @@ List<RouteAction>? findRouteWithinSystem(
             : RouteActionType.navDrift;
         final action = RouteAction(
           startSymbol: currentSymbol,
-          endSymbol: nextWaypoint.waypointSymbol,
+          endSymbol: nextWaypoint.symbol,
           type: type,
           seconds: duration,
           fuelUsed: fuelUsedByDistance(

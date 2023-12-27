@@ -52,10 +52,6 @@ class SystemWaypoint {
   final WaypointSymbol symbol;
 
   /// The symbol of the waypoint.
-  // TODO(eseidel): Remove this once we've migrated to symbol.
-  WaypointSymbol get waypointSymbol => symbol;
-
-  /// The symbol of the waypoint.
   final SystemSymbol systemSymbol;
 
   /// The type of the waypoint.

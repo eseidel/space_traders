@@ -134,7 +134,7 @@ WaypointSymbol? nearestTo(
     ..sort(
       (a, b) => a.distanceTo(destination).compareTo(b.distanceTo(destination)),
     );
-  return candidates.firstOrNull?.waypointSymbol;
+  return candidates.firstOrNull?.symbol;
 }
 
 /// Given a start location and a set of goods, find the closest markets
@@ -148,7 +148,7 @@ Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
   final markets = <TradeSymbol, WaypointSymbol>{};
   for (final good in goods) {
     final market = nearestTo(systemsCache, start, (waypoint) {
-      return marketListings[waypoint.waypointSymbol]
+      return marketListings[waypoint.symbol]
               // TODO(eseidel): This should only be imports.
               ?.tradeSymbols
               .contains(good) ??

@@ -56,12 +56,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final records = chartedWaypointsBySystem[systemSymbol] ?? [];
     final chartedSymbols = records.map((r) => r.waypointSymbol).toSet();
     final waypointCount = system.waypoints.length;
-    final asteroidSymbols = system.waypoints
-        .where((w) => w.isAsteroid)
-        .map((a) => a.waypointSymbol);
-    final otherSymbols = system.waypoints
-        .where((w) => !w.isAsteroid)
-        .map((a) => a.waypointSymbol);
+    final asteroidSymbols =
+        system.waypoints.where((w) => w.isAsteroid).map((a) => a.symbol);
+    final otherSymbols =
+        system.waypoints.where((w) => !w.isAsteroid).map((a) => a.symbol);
     final chartedAsteroids = asteroidSymbols.where(chartedSymbols.contains);
     final chartedOther = otherSymbols.where(chartedSymbols.contains);
 

@@ -32,9 +32,9 @@ WaypointSymbol? nearbyMarketWhichTrades(
   // TODO(eseidel): Handle jumps again!
   final waypoints = systemsCache.waypointsInSystem(startSymbol.systemSymbol);
   for (final waypoint in waypoints) {
-    final market = marketListings[waypoint.waypointSymbol];
+    final market = marketListings[waypoint.symbol];
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
-      return waypoint.waypointSymbol;
+      return waypoint.symbol;
     }
   }
   return null;
