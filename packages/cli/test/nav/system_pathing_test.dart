@@ -14,7 +14,7 @@ void main() {
     final systemsCache = SystemsCache(
       [
         System.test(
-          start.systemSymbol,
+          start.system,
           waypoints: [
             SystemWaypoint.test(
               start,
@@ -23,7 +23,7 @@ void main() {
           ],
         ),
         System.test(
-          end.systemSymbol,
+          end.system,
           position: const SystemPosition(10, 0),
           waypoints: [SystemWaypoint.test(end, type: WaypointType.JUMP_GATE)],
         ),

@@ -42,7 +42,7 @@ WaypointSymbol? nearestExtractionSiteFor(
 ) {
   final destination = systemsCache.waypoint(waypointSymbol);
   final candidates = systemsCache
-      .waypointsInSystem(waypointSymbol.systemSymbol)
+      .waypointsInSystem(waypointSymbol.system)
       .where(
         (waypoint) =>
             waypoint.isAsteroid || waypoint.type == WaypointType.GAS_GIANT,
@@ -64,7 +64,7 @@ MarketListing? nearestListingWithExport(
       // Listings in this same system which export the good.
       .where(
         (entry) =>
-            entry.waypointSymbol.systemSymbol == waypointSymbol.systemSymbol &&
+            entry.waypointSymbol.system == waypointSymbol.system &&
             entry.exports.contains(tradeSymbol),
       )
       .toList();
@@ -89,7 +89,7 @@ int? distanceBetween(
 ) {
   final aWaypoint = systemsCache.waypoint(a);
   final bWaypoint = systemsCache.waypoint(b);
-  if (aWaypoint.systemSymbol != bWaypoint.systemSymbol) {
+  if (aWaypoint.system != bWaypoint.system) {
     return null;
   }
   return aWaypoint.distanceTo(bWaypoint).toInt();

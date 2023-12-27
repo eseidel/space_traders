@@ -54,10 +54,10 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.systemSymbol).thenReturn(shipLocation.system);
+    when(() => shipNav.systemSymbol).thenReturn(shipLocation.systemString);
 
     final system = System.test(
-      shipLocation.systemSymbol,
+      shipLocation.system,
       type: SystemType.BLUE_STAR,
       waypoints: [
         SystemWaypoint.test(aSymbol),

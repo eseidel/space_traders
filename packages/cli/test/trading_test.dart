@@ -80,7 +80,7 @@ void main() {
     final end = SystemWaypoint.test(WaypointSymbol.fromString('X-S-B'));
     when(() => systemsCache.waypoint(start.symbol)).thenReturn(start);
     when(() => systemsCache.waypoint(end.symbol)).thenReturn(end);
-    when(() => systemsCache.waypointsInSystem(start.systemSymbol))
+    when(() => systemsCache.waypointsInSystem(start.system))
         .thenReturn([start, end]);
 
     final routePlanner = _MockRoutePlanner();
@@ -192,7 +192,7 @@ void main() {
     when(() => systemsCache.waypoint(saa.symbol)).thenReturn(saa);
     when(() => systemsCache.waypoint(sab.symbol)).thenReturn(sab);
     when(() => systemsCache.waypoint(sac.symbol)).thenReturn(sac);
-    when(() => systemsCache.waypointsInSystem(saa.systemSymbol))
+    when(() => systemsCache.waypointsInSystem(saa.system))
         .thenReturn(waypoints);
     const tradeSymbol = TradeSymbol.FUEL;
     final now = DateTime.timestamp();
@@ -238,20 +238,20 @@ void main() {
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.engine).thenReturn(shipEngine);
     when(() => shipEngine.speed).thenReturn(30);
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => shipCargo.capacity).thenReturn(1);
     when(() => shipCargo.units).thenReturn(0);
 
-    when(() => systemsCache[saa.systemSymbol]).thenReturn(
-      System.test(waypointSymbol.systemSymbol),
+    when(() => systemsCache[saa.system]).thenReturn(
+      System.test(waypointSymbol.system),
     );
 
     final systemConnectivity = _MockSystemConnectivity();
-    when(() => systemConnectivity.systemsReachableFrom(saa.systemSymbol))
-        .thenReturn([saa.systemSymbol]);
+    when(() => systemConnectivity.systemsReachableFrom(saa.system))
+        .thenReturn([saa.system]);
 
     final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,
@@ -267,7 +267,7 @@ void main() {
         systemsCache,
         systemConnectivity,
         marketPrices,
-        startSystem: waypointSymbol.systemSymbol,
+        startSystem: waypointSymbol.system,
       ),
     );
 

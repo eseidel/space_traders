@@ -73,7 +73,7 @@ void main() {
       final shipNav = _MockShipNav();
       when(() => ship.symbol).thenReturn(shipSymbol.symbol);
       when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-      when(() => shipNav.systemSymbol).thenReturn(start.system);
+      when(() => shipNav.systemSymbol).thenReturn(start.systemString);
       when(() => ship.nav).thenReturn(shipNav);
       behaviorCache.setBehavior(
         shipSymbol,
@@ -103,13 +103,13 @@ void main() {
         centralCommand.otherCharterSystems(shipASymbol).toList();
     expect(
       otherSystems,
-      [bStart.systemSymbol, bEnd.systemSymbol], // Source and destination
+      [bStart.system, bEnd.system], // Source and destination
     );
     // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
     behaviorCache.getBehavior(shipBSymbol)!.routePlan = null;
     final otherSystems2 =
         centralCommand.otherCharterSystems(shipASymbol).toList();
-    expect(otherSystems2, [bStart.systemSymbol]); // From nav.waypointSymbol
+    expect(otherSystems2, [bStart.system]); // From nav.waypointSymbol
 
     // Remove shipB and we should avoid nothing.
     behaviorCache.deleteBehavior(shipBSymbol);
@@ -125,7 +125,7 @@ void main() {
         centralCommand.otherCharterSystems(shipASymbol).toList();
     expect(
       otherSystems4,
-      <SystemSymbol>[cStart.systemSymbol, cEnd.systemSymbol],
+      <SystemSymbol>[cStart.system, cEnd.system],
     );
   });
 
@@ -509,7 +509,7 @@ void main() {
     );
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
-    final hqSystemSymbol = hqSymbol.systemSymbol;
+    final hqSystemSymbol = hqSymbol.system;
     when(() => caches.agent.headquartersSystemSymbol)
         .thenReturn(hqSystemSymbol);
     when(() => caches.waypoints.waypointsInSystem(hqSystemSymbol)).thenAnswer(

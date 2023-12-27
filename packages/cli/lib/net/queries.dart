@@ -26,8 +26,10 @@ Stream<T> fetchAllPages<T, A>(
 
 /// Fetches a single waypoint.
 Future<Waypoint> fetchWaypoint(Api api, WaypointSymbol waypointSymbol) async {
-  final response = await api.systems
-      .getWaypoint(waypointSymbol.system, waypointSymbol.waypoint);
+  final response = await api.systems.getWaypoint(
+    waypointSymbol.systemString,
+    waypointSymbol.toString(),
+  );
   final openApiWaypoint = response!.data;
   return Waypoint.fromOpenApi(openApiWaypoint);
 }
@@ -78,7 +80,7 @@ Future<Agent> getMyAgent(Api api) async {
 /// have a shipyard.
 Future<Shipyard> getShipyard(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems.getShipyard(
-    waypointSymbol.system,
+    waypointSymbol.systemString,
     waypointSymbol.waypoint,
   );
   return response!.data;
@@ -87,14 +89,14 @@ Future<Shipyard> getShipyard(Api api, WaypointSymbol waypointSymbol) async {
 /// Returns JumpGate object for passed in Waypoint.
 Future<JumpGate> getJumpGate(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems
-      .getJumpGate(waypointSymbol.system, waypointSymbol.waypoint);
+      .getJumpGate(waypointSymbol.systemString, waypointSymbol.waypoint);
   return response!.data;
 }
 
 /// Fetches Market for a given Waypoint.
 Future<Market> getMarket(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems
-      .getMarket(waypointSymbol.system, waypointSymbol.waypoint);
+      .getMarket(waypointSymbol.systemString, waypointSymbol.waypoint);
   return response!.data;
 }
 
@@ -103,7 +105,9 @@ Future<Construction> getConstruction(
   Api api,
   WaypointSymbol waypointSymbol,
 ) async {
-  final response = await api.systems
-      .getConstruction(waypointSymbol.system, waypointSymbol.waypoint);
+  final response = await api.systems.getConstruction(
+    waypointSymbol.systemString,
+    waypointSymbol.waypoint,
+  );
   return response!.data;
 }

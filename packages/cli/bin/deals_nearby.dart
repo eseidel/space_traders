@@ -38,7 +38,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       ? agentCache.headquarters(systemsCache)
       : systemsCache.waypointFromString(startArg)!;
 
-  final jumpGate = systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
+  final jumpGate = systemsCache.jumpGateWaypointForSystem(start.system)!;
   final construction = constructionSnapshot[jumpGate.symbol];
   centralCommand.activeConstruction = construction;
 
@@ -76,7 +76,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     systemsCache,
     systemConnectivity,
     marketPrices,
-    startSystem: start.systemSymbol,
+    startSystem: start.system,
   );
   logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
   final deals = findDealsFor(
@@ -121,9 +121,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   );
 
   final allSameSystem = deals.every(
-    (deal) =>
-        deal.deal.sourceSymbol.systemSymbol == start.systemSymbol &&
-        deal.deal.destinationSymbol.systemSymbol == start.systemSymbol,
+    (deal) => deal.deal.withinSystem(start.system),
   );
   String w(WaypointSymbol symbol) =>
       allSameSystem ? symbol.waypointName : symbol.sectorLocalName;

@@ -13,23 +13,23 @@ void main() {
     final bSymbol = WaypointSymbol.fromString('a-b-b');
     final b = SystemWaypoint.test(
       bSymbol,
-      position: WaypointPosition(10, 0, bSymbol.systemSymbol),
+      position: WaypointPosition(10, 0, bSymbol.system),
     );
     final cSymbol = WaypointSymbol.fromString('a-b-c');
     final c = SystemWaypoint.test(
       cSymbol,
-      position: WaypointPosition(20, 0, cSymbol.systemSymbol),
+      position: WaypointPosition(20, 0, cSymbol.system),
     );
     final otherSymbol = WaypointSymbol.fromString('a-c-c');
     final otherSystem = SystemWaypoint.test(
       otherSymbol,
-      position: WaypointPosition(20, 0, otherSymbol.systemSymbol),
+      position: WaypointPosition(20, 0, otherSymbol.system),
     );
     final fs = MemoryFileSystem.test();
     final systemsCache = SystemsCache(
       [
         System.test(
-          a.systemSymbol,
+          a.system,
           waypoints: [a, b, c],
         ),
       ],
@@ -282,7 +282,7 @@ void main() {
     expectRoute(waypoint1, waypoint1, 0);
 
     // Within one system
-    final system = systemsCache[waypoint1.systemSymbol];
+    final system = systemsCache[waypoint1.system];
     final waypoint2 =
         system.waypoints.firstWhere((w) => w.symbol != waypoint1).symbol;
     expectRoute(waypoint1, waypoint2, 23);

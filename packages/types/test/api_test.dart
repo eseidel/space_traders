@@ -21,7 +21,7 @@ void main() {
     expect(jumpGate.isJumpGate, isTrue);
     expect(jumpGate.isType(WaypointType.PLANET), isFalse);
     expect(asteroid.isAsteroid, isTrue);
-    expect(jumpGate.systemSymbol, SystemSymbol.fromString('S-E'));
+    expect(jumpGate.system, SystemSymbol.fromString('S-E'));
 
     final system = System.test(
       SystemSymbol.fromString('S-E'),

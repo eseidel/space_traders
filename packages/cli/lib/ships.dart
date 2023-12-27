@@ -44,7 +44,7 @@ extension ShipTypeToFrame on ShipyardShipCache {
         SystemWaypoint(
           symbol: waypointSymbol,
           type: WaypointType.PLANET,
-          position: WaypointPosition(0, 0, waypointSymbol.systemSymbol),
+          position: WaypointPosition(0, 0, waypointSymbol.system),
         );
     final arrival = now ?? DateTime.utc(2021);
 
@@ -120,14 +120,14 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
   final originSymbol = origin.symbol;
   final waypoint = ShipNavRouteWaypoint(
     symbol: originSymbol.waypoint,
-    systemSymbol: originSymbol.system,
+    systemSymbol: originSymbol.systemString,
     type: origin.type,
     x: origin.position.x,
     y: origin.position.y,
   );
 
   return ShipNav(
-    systemSymbol: originSymbol.system,
+    systemSymbol: originSymbol.systemString,
     waypointSymbol: originSymbol.waypoint,
     route: ShipNavRoute(
       destination: waypoint,

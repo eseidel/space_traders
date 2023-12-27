@@ -78,7 +78,7 @@ class MarketListingCache extends JsonStore<_Record> {
   Set<SystemSymbol> systemsWithAtLeastNMarkets(int n) {
     final systemMarketCounts = <SystemSymbol, int>{};
     for (final waypointSymbol in waypointSymbols) {
-      final systemSymbol = waypointSymbol.systemSymbol;
+      final systemSymbol = waypointSymbol.system;
       systemMarketCounts[systemSymbol] =
           (systemMarketCounts[systemSymbol] ?? 0) + 1;
     }

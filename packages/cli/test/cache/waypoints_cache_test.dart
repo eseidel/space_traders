@@ -35,7 +35,7 @@ void main() {
       );
     });
     final systemsCache = _MockSystemsCache();
-    when(() => systemsCache.waypointsInSystem(waypointSymbol.systemSymbol))
+    when(() => systemsCache.waypointsInSystem(waypointSymbol.system))
         .thenReturn([SystemWaypoint.test(waypointSymbol)]);
     final chartingCache = _MockChartingCache();
     registerFallbackValue(waypointSymbol);

@@ -95,7 +95,7 @@ class IdleQueue {
     final underConstruction = await caches.waypoints.isUnderConstruction(to);
     // Match canJumpTo and check if we can jump from the other side.
     if (!underConstruction) {
-      queueSystem(to.systemSymbol, jumpDistance: jumpDistance + 1);
+      queueSystem(to.system, jumpDistance: jumpDistance + 1);
     }
   }
 

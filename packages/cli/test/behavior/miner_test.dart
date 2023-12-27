@@ -119,7 +119,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbolEnum.MINING_LASER_II,
@@ -330,7 +330,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
     const tradeSymbol = TradeSymbol.DIAMONDS;
     final shipCargo = ShipCargo(
       capacity: 60,
@@ -398,7 +398,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
     const tradeSymbol = TradeSymbol.DIAMONDS;
     final shipCargo = ShipCargo(
       capacity: 60,
@@ -524,7 +524,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbolEnum.MINING_LASER_II,
@@ -638,7 +638,7 @@ void main() {
     ).thenReturn(100);
 
     // Returning no systems will find no nearby markets, thus will jettison.
-    when(() => caches.systems.waypointsInSystem(waypointSymbol.systemSymbol))
+    when(() => caches.systems.waypointsInSystem(waypointSymbol.system))
         .thenReturn([]);
 
     when(

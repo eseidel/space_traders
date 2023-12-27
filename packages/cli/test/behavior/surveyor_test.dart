@@ -42,7 +42,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbolEnum.SURVEYOR_I,
@@ -59,7 +59,7 @@ void main() {
         .thenAnswer((_) async => true);
 
     when(
-      () => caches.waypoints.waypointsInSystem(waypointSymbol.systemSymbol),
+      () => caches.waypoints.waypointsInSystem(waypointSymbol.system),
     ).thenAnswer((_) => Future.value([]));
 
     when(() => fleetApi.createSurvey(shipSymbol.symbol)).thenAnswer(

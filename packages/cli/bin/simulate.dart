@@ -96,7 +96,7 @@ Ship exampleShip(
   final reparsed = jsonDecode(jsonEncode(json));
   final ship = Ship.fromJson(reparsed)!;
   ship.nav.waypointSymbol = overrideLocation.waypoint;
-  ship.nav.systemSymbol = overrideLocation.system;
+  ship.nav.systemSymbol = overrideLocation.systemString;
   return ship;
 }
 
@@ -146,7 +146,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final hq = agentCache.headquarters(systemsCache);
   final hqMine = systemsCache
-      .waypointsInSystem(hq.systemSymbol)
+      .waypointsInSystem(hq.system)
       .firstWhere((w) => w.isAsteroid)
       .symbol;
 

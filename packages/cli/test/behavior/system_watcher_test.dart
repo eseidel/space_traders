@@ -39,14 +39,14 @@ void main() {
     final systemWaypoint = SystemWaypoint.test(
       waypointSymbol,
       type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
-      position: WaypointPosition(0, 0, waypointSymbol.systemSymbol),
+      position: WaypointPosition(0, 0, waypointSymbol.system),
     );
     when(() => caches.systems.waypoint(waypointSymbol))
         .thenReturn(systemWaypoint);
 
-    final system = System.test(waypointSymbol.systemSymbol);
-    when(() => caches.systems[waypointSymbol.systemSymbol]).thenReturn(system);
-    registerFallbackValue(waypointSymbol.systemSymbol);
+    final system = System.test(waypointSymbol.system);
+    when(() => caches.systems[waypointSymbol.system]).thenReturn(system);
+    registerFallbackValue(waypointSymbol.system);
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.createChart(any())).thenAnswer(
@@ -65,7 +65,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     final shipFuel = ShipFuel(capacity: 0, current: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
 
@@ -78,23 +78,22 @@ void main() {
     when(() => caches.waypoints.hasShipyard(waypointSymbol))
         .thenAnswer((_) async => false);
 
-    when(() => centralCommand.maxPriceAgeForSystem(waypointSymbol.systemSymbol))
+    when(() => centralCommand.maxPriceAgeForSystem(waypointSymbol.system))
         .thenReturn(const Duration(days: 3));
     when(
-      () => centralCommand
-          .shortenMaxPriceAgeForSystem(waypointSymbol.systemSymbol),
+      () => centralCommand.shortenMaxPriceAgeForSystem(waypointSymbol.system),
     ).thenReturn(const Duration(days: 1));
     when(
       () => centralCommand.waypointsToAvoidInSystem(
-        waypointSymbol.systemSymbol,
+        waypointSymbol.system,
         shipSymbol,
       ),
     ).thenReturn([]);
     when(() => centralCommand.assignedSystemForSatellite(ship))
-        .thenReturn(waypointSymbol.systemSymbol);
+        .thenReturn(waypointSymbol.system);
     final state = BehaviorState(shipSymbol, Behavior.charter)
       ..systemWatcherJob =
-          SystemWatcherJob(systemSymbol: waypointSymbol.systemSymbol);
+          SystemWatcherJob(systemSymbol: waypointSymbol.system);
 
     registerFallbackValue(waypoint);
     when(() => caches.charting.addWaypoint(any())).thenAnswer((_) async {});

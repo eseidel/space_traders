@@ -495,7 +495,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   // Using a jump gate requires us to be in orbit.
   await undockIfNeeded(api, shipCache, ship);
 
-  final destinationSystem = destination.systemSymbol;
+  final destinationSystem = destination.system;
   shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $destinationSystem');
   final jumpShipRequest = JumpShipRequest(waypointSymbol: destination.waypoint);
   final response = await api.fleet.jumpShip(

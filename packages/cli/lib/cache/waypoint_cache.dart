@@ -175,7 +175,7 @@ class WaypointCache {
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   Future<Waypoint?> _waypointOrNull(WaypointSymbol waypointSymbol) async {
-    final systemSymbol = waypointSymbol.systemSymbol;
+    final systemSymbol = waypointSymbol.system;
     final cachedWaypoint = await waypointFromCaches(waypointSymbol);
     if (cachedWaypoint != null) {
       return cachedWaypoint;

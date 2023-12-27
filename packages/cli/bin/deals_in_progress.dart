@@ -44,9 +44,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
 
   final start = states.first.deal!.deal.sourceSymbol;
   final allSameSystem = states.every(
-    (s) =>
-        s.deal!.deal.sourceSymbol.systemSymbol == start.systemSymbol &&
-        s.deal!.deal.destinationSymbol.systemSymbol == start.systemSymbol,
+    (s) => s.deal!.deal.withinSystem(start.system),
   );
 
   String w(WaypointSymbol symbol) =>

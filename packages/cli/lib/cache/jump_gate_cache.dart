@@ -52,7 +52,7 @@ class JumpGateRecord extends Equatable {
 
   /// The connected system symbols.
   Set<SystemSymbol> get connectedSystemSymbols =>
-      connections.map((e) => e.systemSymbol).toSet();
+      connections.map((e) => e.system).toSet();
 
   /// Converts this object to JumpGate model object.
   JumpGate toJumpGate() => JumpGate(
@@ -123,7 +123,7 @@ class JumpGateCache extends JsonListStore<JumpGateRecord> {
   /// Gets all jump gates for the given system.
   Iterable<JumpGateRecord> recordsForSystem(SystemSymbol systemSymbol) {
     return values
-        .where((record) => record.waypointSymbol.systemSymbol == systemSymbol);
+        .where((record) => record.waypointSymbol.hasSystem(systemSymbol));
   }
 
   /// Gets the connections for the jump gate with the given symbol.

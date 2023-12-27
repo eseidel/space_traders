@@ -264,8 +264,8 @@ Future<NavResult> continueNavigationIfNeeded(
       _verifyJumpTime(
         caches.systems,
         ship,
-        action.startSymbol.systemSymbol,
-        action.endSymbol.systemSymbol,
+        action.startSymbol.system,
+        action.endSymbol.system,
         response.cooldown,
       );
       // We don't return the cooldown time here because that would needlessly

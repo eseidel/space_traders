@@ -905,7 +905,7 @@ void main() {
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(startSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(startSymbol.systemString);
     const shipNavStatus = ShipNavStatus.DOCKED;
     when(() => shipNav.status).thenReturn(shipNavStatus);
     final shipCache = _MockShipCache();

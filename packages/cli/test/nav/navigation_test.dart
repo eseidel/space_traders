@@ -155,7 +155,7 @@ void main() {
     final endSymbol = WaypointSymbol.fromString('D-E-F');
 
     when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(startSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(startSymbol.systemString);
 
     state.routePlan = RoutePlan(
       fuelCapacity: 100,
@@ -178,8 +178,8 @@ void main() {
         type: WaypointType.ASTEROID_FIELD,
       ),
     );
-    when(() => caches.systems[startSymbol.systemSymbol]).thenReturn(
-      System.test(startSymbol.systemSymbol),
+    when(() => caches.systems[startSymbol.system]).thenReturn(
+      System.test(startSymbol.system),
     );
     when(() => caches.systems.waypoint(endSymbol)).thenReturn(
       SystemWaypoint.test(
@@ -187,8 +187,8 @@ void main() {
         type: WaypointType.JUMP_GATE,
       ),
     );
-    when(() => caches.systems[endSymbol.systemSymbol]).thenReturn(
-      System.test(endSymbol.systemSymbol),
+    when(() => caches.systems[endSymbol.system]).thenReturn(
+      System.test(endSymbol.system),
     );
 
     when(

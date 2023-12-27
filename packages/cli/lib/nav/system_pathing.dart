@@ -12,8 +12,8 @@ List<SystemSymbol>? findSystemPath(
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   // This code is hot enough that SystemSymbol.fromString shows up!
-  final startSymbol = start.systemSymbol;
-  final endSymbol = end.systemSymbol;
+  final startSymbol = start.symbol;
+  final endSymbol = end.symbol;
   final frontier =
       PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
         ..add((startSymbol, 0));
@@ -39,7 +39,7 @@ List<SystemSymbol>? findSystemPath(
     final connectedSystems = connected.map(systemsCache.systemBySymbol);
 
     for (final nextSystem in connectedSystems) {
-      final next = nextSystem.systemSymbol;
+      final next = nextSystem.symbol;
       // TODO(eseidel): work around a bug in directlyConnectedSystemSymbols.
       if (next == currentSymbol) {
         continue;
@@ -75,9 +75,9 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   WaypointSymbol start,
   WaypointSymbol end,
 ) {
-  final startSystem = systemsCache.systemBySymbol(start.systemSymbol);
-  final endSystem = systemsCache.systemBySymbol(end.systemSymbol);
-  if (start.systemSymbol == end.systemSymbol) {
+  final startSystem = systemsCache.systemBySymbol(start.system);
+  final endSystem = systemsCache.systemBySymbol(end.system);
+  if (start.system == end.system) {
     // The caller needs to turn this into a real intra-system path.
     return [start, end];
   }

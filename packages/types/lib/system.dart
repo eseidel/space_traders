@@ -12,9 +12,9 @@ class SystemWaypoint {
     required this.position,
     this.orbitals = const [],
     this.orbits,
-  })  : systemSymbol = symbol.systemSymbol,
+  })  : system = symbol.system,
         assert(
-          position.system == symbol.systemSymbol,
+          position.system == symbol.system,
           'Position system must match symbol system.',
         );
 
@@ -24,8 +24,7 @@ class SystemWaypoint {
     return SystemWaypoint(
       symbol: waypointSymbol,
       type: waypoint.type,
-      position:
-          WaypointPosition(waypoint.x, waypoint.y, waypointSymbol.systemSymbol),
+      position: WaypointPosition(waypoint.x, waypoint.y, waypointSymbol.system),
       orbitals: waypoint.orbitals,
       orbits: WaypointSymbol.fromJsonOrNull(waypoint.orbits),
     );
@@ -43,8 +42,8 @@ class SystemWaypoint {
     this.symbol, {
     this.type = WaypointType.ASTEROID,
     WaypointPosition? position,
-  })  : systemSymbol = symbol.systemSymbol,
-        position = position ?? WaypointPosition(0, 0, symbol.systemSymbol),
+  })  : system = symbol.system,
+        position = position ?? WaypointPosition(0, 0, symbol.system),
         orbitals = const [],
         orbits = null;
 
@@ -52,7 +51,7 @@ class SystemWaypoint {
   final WaypointSymbol symbol;
 
   /// The symbol of the waypoint.
-  final SystemSymbol systemSymbol;
+  final SystemSymbol system;
 
   /// The type of the waypoint.
   final openapi.WaypointType type;
@@ -79,6 +78,18 @@ class SystemWaypoint {
   /// Returns the distance to the given waypoint.
   double distanceTo(SystemWaypoint other) =>
       position.distanceTo(other.position);
+
+  /// Converts to [openapi.ShipNavRouteWaypoint].
+  @visibleForTesting
+  ShipNavRouteWaypoint toShipNavRouteWaypoint() {
+    return ShipNavRouteWaypoint(
+      symbol: symbol.waypoint,
+      type: type,
+      systemSymbol: symbol.systemString,
+      x: position.x,
+      y: position.y,
+    );
+  }
 }
 
 /// Type representing a system.
@@ -168,9 +179,9 @@ class Waypoint {
     this.traits = const [],
     this.modifiers = const [],
     this.chart,
-  })  : systemSymbol = symbol.systemSymbol,
+  })  : systemSymbol = symbol.system,
         assert(
-          position.system == symbol.systemSymbol,
+          position.system == symbol.system,
           'Position system must match symbol system.',
         );
 
@@ -181,8 +192,8 @@ class Waypoint {
     WaypointPosition? position,
     this.type = WaypointType.ASTEROID,
     this.traits = const [],
-  })  : systemSymbol = symbol.systemSymbol,
-        position = position ?? WaypointPosition(0, 0, symbol.systemSymbol),
+  })  : systemSymbol = symbol.system,
+        position = position ?? WaypointPosition(0, 0, symbol.system),
         isUnderConstruction = false,
         orbitals = const [],
         orbits = null,
@@ -251,7 +262,7 @@ class Waypoint {
   WaypointSymbol get waypointSymbol => symbol;
 
   /// The system symbol of the waypoint.
-  SystemSymbol get systemSymbolObject => symbol.systemSymbol;
+  SystemSymbol get systemSymbolObject => symbol.system;
 
   /// Converts the waypoint to a SystemWaypoint.
   SystemWaypoint toSystemWaypoint() {

@@ -355,7 +355,7 @@ class CentralCommand {
           return false;
         }
         // Don't visit systems we already have a charter in.
-        return !charterSystems.contains(waypoint.systemSymbol);
+        return !charterSystems.contains(waypoint.system);
       },
       maxJumps: maxJumps,
     );
@@ -368,7 +368,7 @@ class CentralCommand {
     Behavior behavior,
   ) {
     return _otherWaypointsWithBehavior(thisShipSymbol, behavior)
-        .map((s) => s.systemSymbol);
+        .map((s) => s.system);
   }
 
   /// Returns other systems containing ships with [behavior].
@@ -399,7 +399,7 @@ class CentralCommand {
     ShipSymbol thisShipSymbol,
   ) =>
       _otherWaypointsWithBehavior(thisShipSymbol, Behavior.systemWatcher)
-          .where((s) => s.systemSymbol == systemSymbol);
+          .where((s) => s.system == systemSymbol);
 
   /// Returns all systems containing charters or charter destinations.
   Iterable<SystemSymbol> otherCharterSystems(ShipSymbol thisShipSymbol) =>
@@ -594,8 +594,7 @@ class CentralCommand {
       return false;
     }
     // Is this ship within the same system or the command ship?
-    if (ship.systemSymbol != buyJob.shipyardSymbol.systemSymbol &&
-        !ship.isCommand) {
+    if (ship.systemSymbol != buyJob.shipyardSymbol.system && !ship.isCommand) {
       return false;
     }
     // TODO(eseidel): See how far it is to the shipyard, only go if < 10 mins?

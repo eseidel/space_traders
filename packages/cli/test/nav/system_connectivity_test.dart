@@ -29,7 +29,7 @@ void main() {
     );
     // If construction status of 'b' is not known, then there is no path.
     expect(
-      unknownB.existsJumpPathBetween(a.systemSymbol, b.systemSymbol),
+      unknownB.existsJumpPathBetween(a.system, b.system),
       isFalse,
     );
 
@@ -39,13 +39,13 @@ void main() {
       constructionSnapshot,
     );
     expect(
-      knownB.existsJumpPathBetween(a.systemSymbol, b.systemSymbol),
+      knownB.existsJumpPathBetween(a.system, b.system),
       isTrue,
     );
 
     expect(
-      knownB.directlyConnectedSystemSymbols(a.systemSymbol),
-      {b.systemSymbol},
+      knownB.directlyConnectedSystemSymbols(a.system),
+      {b.system},
     );
   });
 }

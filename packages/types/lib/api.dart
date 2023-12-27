@@ -66,7 +66,7 @@ class WaypointPosition extends Position {
 /// Type-safe representation of a Waypoint Symbol
 @immutable
 class WaypointSymbol {
-  const WaypointSymbol._(this.waypoint, this.systemSymbol);
+  const WaypointSymbol._(this.waypoint, this.system);
 
   /// Create a WaypointSymbol from a json string.
   factory WaypointSymbol.fromJson(String json) =>
@@ -91,8 +91,7 @@ class WaypointSymbol {
   final String waypoint;
 
   /// The system symbol of the waypoint.
-  // TODO(eseidel): rename to symbol.
-  final SystemSymbol systemSymbol;
+  final SystemSymbol system;
 
   /// The sector symbol of the waypoint.
   String get sector {
@@ -100,9 +99,6 @@ class WaypointSymbol {
     final firstHyphen = waypoint.indexOf('-');
     return waypoint.substring(0, firstHyphen);
   }
-
-  /// The system symbol of the waypoint.
-  String get system => systemSymbol.system;
 
   /// Just the waypoint name (no sector or system)
   String get waypointName {
@@ -113,10 +109,14 @@ class WaypointSymbol {
 
   /// Returns true if the waypoint is from the given system.
   /// Faster than converting to a SystemSymbol and comparing.
+  // TODO(eseidel): This can be removed now.
   bool hasSystem(SystemSymbol systemSymbol) {
     // Avoid constructing a new SystemSymbol if we don't have to.
-    return system == systemSymbol.system;
+    return system == systemSymbol;
   }
+
+  /// Returns the System as a string to pass to OpenAPI.
+  String get systemString => system.system;
 
   /// Just the system and waypoint name (no sector)
   String get sectorLocalName {
@@ -624,7 +624,7 @@ extension MarketUtils on Market {
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
 
   /// Returns the SystemSymbol of the market.
-  SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
+  SystemSymbol get systemSymbol => waypointSymbol.system;
 
   /// Returns the all trade goods for the market.
   /// Unknown if there can be duplicates or not.
@@ -657,7 +657,7 @@ extension ConstructionUtils on Construction {
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
 
   /// Returns the SystemSymbol for the construction.
-  SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
+  SystemSymbol get systemSymbol => waypointSymbol.system;
 
   /// Returns the amount of the given trade good the construction needs.
   ConstructionMaterial? materialNeeded(TradeSymbol tradeSymbol) {
@@ -714,7 +714,7 @@ extension FactionUtils on Faction {
       WaypointSymbol.fromString(headquarters);
 
   /// Returns the SystemSymbol for the faction headquarters.
-  SystemSymbol get headquartersSystemSymbol => headquartersSymbol.systemSymbol;
+  SystemSymbol get headquartersSystemSymbol => headquartersSymbol.system;
 }
 
 /// Extensions onto Agent to make it easier to work with.
@@ -724,7 +724,7 @@ extension AgentUtils on Agent {
       WaypointSymbol.fromString(headquarters);
 
   /// Returns the SystemSymbol for the agent headquarters.
-  SystemSymbol get headquartersSystemSymbol => headquartersSymbol.systemSymbol;
+  SystemSymbol get headquartersSystemSymbol => headquartersSymbol.system;
 }
 
 /// Compute the trade symbol for the given mount symbol.

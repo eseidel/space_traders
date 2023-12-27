@@ -56,7 +56,7 @@ Map<SystemSymbol, int> scoreMarketSystems(
   final marketSystemScores = <SystemSymbol, int>{};
   for (final price in marketPrices.prices) {
     final market = price.waypointSymbol;
-    final system = market.systemSymbol;
+    final system = market.system;
     final medianPurchasePrice = medianPurchasePrices[price.tradeSymbol]!;
     final medianSellPrice = medianSellPrices[price.tradeSymbol]!;
     final purchaseScore = (price.purchasePrice - medianPurchasePrice).abs();

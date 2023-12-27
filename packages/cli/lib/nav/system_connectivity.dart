@@ -165,9 +165,9 @@ class _Connections {
     Map<WaypointSymbol, Set<WaypointSymbol>> partialConnections,
   ) {
     for (final from in partialConnections.keys) {
-      final fromSystem = from.systemSymbol;
+      final fromSystem = from.system;
       for (final to in partialConnections[from]!) {
-        final toSystem = to.systemSymbol;
+        final toSystem = to.system;
         systems.putIfAbsent(fromSystem, () => {}).add(toSystem);
         systems.putIfAbsent(toSystem, () => {}).add(fromSystem);
       }
@@ -185,12 +185,12 @@ class _Connections {
       if (!canJumpFrom(jumpGateCache, constructionSnapshot, from)) {
         continue;
       }
-      final fromSystem = from.systemSymbol;
+      final fromSystem = from.system;
       for (final to in record.connections) {
         if (!canJumpTo(constructionSnapshot, to)) {
           continue;
         }
-        final toSystem = to.systemSymbol;
+        final toSystem = to.system;
         systems.putIfAbsent(fromSystem, () => {}).add(toSystem);
         systems.putIfAbsent(toSystem, () => {}).add(fromSystem);
       }
@@ -322,7 +322,7 @@ class SystemConnectivity {
         final sortedSystems =
             connectedSystems.sortedBy<num>((s) => s.distanceTo(jumpFromSystem));
         for (final connectedSystem in sortedSystems) {
-          oneJumpFurther.add(connectedSystem.systemSymbol);
+          oneJumpFurther.add(connectedSystem.symbol);
         }
       }
       currentSystemsToJumpFrom.addAll(oneJumpFurther);

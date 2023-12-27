@@ -69,7 +69,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(start.system);
+    when(() => shipNav.systemSymbol).thenReturn(start.systemString);
 
     final market = Market(
       symbol: start.waypoint,
@@ -241,7 +241,7 @@ void main() {
     // We do not need to dock.
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(start.system);
+    when(() => shipNav.systemSymbol).thenReturn(start.systemString);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     // Needed by navigateShipAndLog to show time left.
     final arrivalTime = DateTime(2022);
@@ -249,7 +249,7 @@ void main() {
     final departure = ShipNavRouteWaypoint(
       symbol: start.waypoint,
       type: WaypointType.ASTEROID,
-      systemSymbol: start.system,
+      systemSymbol: start.systemString,
       x: 0,
       y: 0,
     );
@@ -258,7 +258,7 @@ void main() {
         destination: ShipNavRouteWaypoint(
           symbol: end.waypoint,
           type: WaypointType.ASTEROID,
-          systemSymbol: end.system,
+          systemSymbol: end.systemString,
           x: 0,
           y: 0,
         ),
@@ -389,9 +389,8 @@ void main() {
         ),
       ),
     );
-    when(() => caches.systems.waypointsInSystem(start.systemSymbol))
-        .thenReturn([]);
-    registerFallbackValue(start.systemSymbol);
+    when(() => caches.systems.waypointsInSystem(start.system)).thenReturn([]);
+    registerFallbackValue(start.system);
     // when(
     //   () => caches.systemConnectivity.canJumpBetweenSystemSymbols(
     //     any(),
@@ -569,7 +568,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(shipLocation.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(shipLocation.system);
+    when(() => shipNav.systemSymbol).thenReturn(shipLocation.systemString);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
@@ -681,7 +680,7 @@ void main() {
       ShipNavRouteWaypoint(
         symbol: shipLocation.waypoint,
         type: WaypointType.ASTEROID,
-        systemSymbol: shipLocation.system,
+        systemSymbol: shipLocation.systemString,
         x: 0,
         y: 0,
       ),
@@ -690,7 +689,7 @@ void main() {
       ShipNavRouteWaypoint(
         symbol: start.waypoint,
         type: WaypointType.ASTEROID,
-        systemSymbol: start.system,
+        systemSymbol: start.systemString,
         x: 0,
         y: 0,
       ),
@@ -888,22 +887,10 @@ void main() {
     // Needed by navigateShipAndLog to show time left.
     final arrivalTime = DateTime(2022);
     final departureTime = DateTime(2021);
-    final departure = ShipNavRouteWaypoint(
-      symbol: start.waypoint,
-      type: WaypointType.ASTEROID,
-      systemSymbol: start.system,
-      x: 0,
-      y: 0,
-    );
+    final departure = SystemWaypoint.test(start).toShipNavRouteWaypoint();
     when(() => shipNav.route).thenReturn(
       ShipNavRoute(
-        destination: ShipNavRouteWaypoint(
-          symbol: end.waypoint,
-          type: WaypointType.ASTEROID,
-          systemSymbol: end.system,
-          x: 0,
-          y: 0,
-        ),
+        destination: SystemWaypoint.test(end).toShipNavRouteWaypoint(),
         origin: departure,
         departureTime: departureTime,
         arrival: arrivalTime,
@@ -944,7 +931,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.system);
+    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipCargo = ShipCargo(capacity: 10, units: 10);
@@ -1047,7 +1034,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.system);
+    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipCargo = ShipCargo(
@@ -1226,7 +1213,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.system);
+    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipCargo = ShipCargo(
@@ -1351,7 +1338,7 @@ void main() {
     );
     when(
       () => systemsApi.supplyConstruction(
-        end.system,
+        end.systemString,
         end.waypoint,
         supplyConstructionRequest: SupplyConstructionRequest(
           shipSymbol: shipSymbol.symbol,

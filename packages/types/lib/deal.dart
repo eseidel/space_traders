@@ -116,6 +116,12 @@ class Deal extends Equatable {
   /// Whether this deal is a feeder deal allowed to go negative.
   bool get isFeeder => destination.isFeeder;
 
+  /// Return if this deal is within the given system.
+  bool withinSystem(SystemSymbol systemSymbol) {
+    return sourceSymbol.hasSystem(systemSymbol) &&
+        destinationSymbol.hasSystem(systemSymbol);
+  }
+
   /// Encode the deal as JSON.
   Map<String, dynamic> toJson() => {
         'source': source.toJson(),

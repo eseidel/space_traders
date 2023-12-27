@@ -128,7 +128,7 @@ WaypointSymbol? nearestTo(
 ) {
   final destination = systemsCache.waypoint(waypointSymbol);
   final candidates = systemsCache
-      .waypointsInSystem(waypointSymbol.systemSymbol)
+      .waypointsInSystem(waypointSymbol.system)
       .where(predicate)
       .toList()
     ..sort(

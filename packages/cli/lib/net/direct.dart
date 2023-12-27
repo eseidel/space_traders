@@ -151,7 +151,7 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
     units: units,
   );
   final response = await api.systems.supplyConstruction(
-    construction.waypointSymbol.system,
+    construction.waypointSymbol.systemString,
     construction.waypointSymbol.waypoint,
     supplyConstructionRequest: request,
   );

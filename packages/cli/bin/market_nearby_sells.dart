@@ -23,14 +23,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final hq = agentCache.headquarters(systemsCache);
   final hqMine = systemsCache
-      .waypointsInSystem(hq.systemSymbol)
+      .waypointsInSystem(hq.system)
       .firstWhere((w) => w.isAsteroid)
       .symbol;
 
   final miner = shipCache.ships.firstWhere((s) => s.isMiner);
   final ship = miner.deepCopy();
   ship.nav.waypointSymbol = hqMine.waypoint;
-  ship.nav.systemSymbol = hqMine.system;
+  ship.nav.systemSymbol = hqMine.systemString;
   logger.info('Finding markets which buy $tradeSymbol near $hqMine.');
 
   // List all markets nearby which buy diamonds.

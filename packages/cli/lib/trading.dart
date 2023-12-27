@@ -30,7 +30,7 @@ WaypointSymbol? nearbyMarketWhichTrades(
     return startSymbol;
   }
   // TODO(eseidel): Handle jumps again!
-  final waypoints = systemsCache.waypointsInSystem(startSymbol.systemSymbol);
+  final waypoints = systemsCache.waypointsInSystem(startSymbol.system);
   for (final waypoint in waypoints) {
     final market = marketListings[waypoint.symbol];
     if (market != null && market.allowsTradeOf(tradeSymbol)) {
@@ -381,7 +381,7 @@ MarketScan scanReachableMarkets(
     marketPrices,
     // TODO(eseidel): Avoid the systemSymbol construction here.
     waypointFilter: (w) =>
-        systemConnectivity.clusterIdForSystem(w.systemSymbol) == clusterId,
+        systemConnectivity.clusterIdForSystem(w.system) == clusterId,
     description: 'all known markets',
   );
 }
@@ -800,7 +800,7 @@ Iterable<CostedDeal> scanAndFindDeals(
     systemsCache,
     systemConnectivity,
     marketPrices,
-    startSystem: startSymbol.systemSymbol,
+    startSystem: startSymbol.system,
   );
   return findDealsFor(
     marketPrices,

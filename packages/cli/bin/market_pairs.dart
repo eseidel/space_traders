@@ -17,7 +17,7 @@ int? distanceBetween(
 ) {
   final aWaypoint = systemsCache.waypoint(a);
   final bWaypoint = systemsCache.waypoint(b);
-  if (aWaypoint.systemSymbol != bWaypoint.systemSymbol) {
+  if (aWaypoint.system != bWaypoint.system) {
     return null;
   }
   return aWaypoint.distanceTo(bWaypoint).toInt();
@@ -32,7 +32,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
 
   final listings = marketListings.listings
-      .where((l) => l.waypointSymbol.systemSymbol == hqSystem)
+      .where((l) => l.waypointSymbol.system == hqSystem)
       .toList();
   // Collect all imports and exports.
   final exports = <TradeSymbol, WaypointSymbol>{};

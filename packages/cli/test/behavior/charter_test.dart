@@ -48,16 +48,16 @@ void main() {
         .thenReturn(systemWaypoint);
 
     final system = System(
-      symbol: waypointSymbol.systemSymbol,
+      symbol: waypointSymbol.system,
       type: SystemType.BLACK_HOLE,
       position: const SystemPosition(0, 0),
     );
-    when(() => caches.systems[waypointSymbol.systemSymbol]).thenReturn(system);
-    registerFallbackValue(waypointSymbol.systemSymbol);
+    when(() => caches.systems[waypointSymbol.system]).thenReturn(system);
+    registerFallbackValue(waypointSymbol.system);
     when(() => caches.systemConnectivity.clusterIdForSystem(any()))
         .thenReturn(0);
     when(() => caches.systemConnectivity.systemSymbolsByClusterId(0))
-        .thenReturn([waypointSymbol.systemSymbol]);
+        .thenReturn([waypointSymbol.system]);
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.createChart(any())).thenAnswer(
@@ -76,7 +76,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     final shipFuel = ShipFuel(capacity: 0, current: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
 
@@ -93,12 +93,12 @@ void main() {
         .thenAnswer((_) async => false);
 
     when(
-      () => caches.systemConnectivity
-          .systemsReachableFrom(waypointSymbol.systemSymbol),
+      () =>
+          caches.systemConnectivity.systemsReachableFrom(waypointSymbol.system),
     ).thenReturn([]);
 
     when(
-      () => centralCommand.chartAsteroidsInSystem(waypointSymbol.systemSymbol),
+      () => centralCommand.chartAsteroidsInSystem(waypointSymbol.system),
     ).thenReturn(true);
     when(
       () => centralCommand.nextWaypointToChart(

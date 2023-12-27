@@ -40,9 +40,9 @@ List<RouteAction>? findRouteWithinSystem(
   final shipSpeed = shipSpec.speed;
   final startWaypoint = systemsCache.waypoint(start);
   final endWaypoint = systemsCache.waypoint(end);
-  if (start.systemSymbol != end.systemSymbol) {
+  if (start.system != end.system) {
     throw ArgumentError(
-      'Cannot find path between ${start.systemSymbol} and ${end.systemSymbol}',
+      'Cannot find path between ${start.system} and ${end.system}',
     );
   }
 
@@ -65,7 +65,7 @@ List<RouteAction>? findRouteWithinSystem(
     ];
   }
 
-  final systemWaypoints = systemsCache.waypointsInSystem(start.systemSymbol);
+  final systemWaypoints = systemsCache.waypointsInSystem(start.system);
   // We only consider waypoints that have markets that sell fuel.
   // Also include the start and end waypoints.
   final waypoints = systemWaypoints.where((w) {

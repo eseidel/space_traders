@@ -21,7 +21,7 @@ int approximateRoundTripDistanceWithinSystem(
       .where((s) => s != startSymbol)
       .map((s) => systemsCache.waypoint(s))
       .toList();
-  if (waypoints.any((w) => w.systemSymbol != start.systemSymbol)) {
+  if (waypoints.any((w) => w.system != start.system)) {
     throw ArgumentError('All waypoints must be in the same system.');
   }
   var distance = 0.0;
@@ -160,15 +160,14 @@ RoutePlan routePlanFromJumpPlan(
   required bool Function(WaypointSymbol) sellsFuel,
 }) {
   final actions = <RouteAction>[];
-  if (jumpPlan.route.first != start.systemSymbol) {
-    throw ArgumentError('Jump plan does not start at ${start.systemSymbol}');
+  if (jumpPlan.route.first != start.system) {
+    throw ArgumentError('Jump plan does not start at ${start.system}');
   }
-  if (jumpPlan.route.last != end.systemSymbol) {
-    throw ArgumentError('Jump plan does not end at ${end.systemSymbol}');
+  if (jumpPlan.route.last != end.system) {
+    throw ArgumentError('Jump plan does not end at ${end.system}');
   }
   final startWaypoint = systemsCache.waypoint(start);
-  final startJumpGate =
-      systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
+  final startJumpGate = systemsCache.jumpGateWaypointForSystem(start.system)!;
   if (startJumpGate.symbol != start) {
     _addSubPlanWithinSystem(
       systemsCache,
@@ -196,7 +195,7 @@ RoutePlan routePlanFromJumpPlan(
     );
   }
   final endWaypoint = systemsCache.waypoint(end);
-  final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
+  final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.system)!;
   if (endJumpGate.symbol != end) {
     _addSubPlanWithinSystem(
       systemsCache,
@@ -223,7 +222,7 @@ class _JumpPlanBuilder {
   bool get isNotEmpty => _systems.isNotEmpty;
 
   void addWaypoint(WaypointSymbol waypointSymbol) {
-    _systems.add(waypointSymbol.systemSymbol);
+    _systems.add(waypointSymbol.system);
   }
 
   JumpPlan build() {
@@ -284,8 +283,8 @@ RouteAction _jumpAction(
   SystemWaypoint end, {
   required bool isLastJump,
 }) {
-  final startSystem = systemsCache[start.systemSymbol];
-  final endSystem = systemsCache[end.systemSymbol];
+  final startSystem = systemsCache[start.system];
+  final endSystem = systemsCache[end.system];
   final cooldown = cooldownTimeForJumpBetweenSystems(startSystem, endSystem);
   // This isn't quite right to use cooldown as duration, but it's
   // close enough for now.  This isLastJump hack also would break
@@ -347,23 +346,23 @@ class RoutePlanner {
     required WaypointSymbol start,
     required WaypointSymbol end,
   }) {
-    if (start.systemSymbol == end.systemSymbol) {
+    if (start.system == end.system) {
       throw ArgumentError('Cannot plan a jump within the same system.');
     }
     // We only handle jumps at the moment.
     // We fail out quickly from our reachability cache if these system waypoints
     // are not in the same system cluster.
     if (!_systemConnectivity.existsJumpPathBetween(
-      start.systemSymbol,
-      end.systemSymbol,
+      start.system,
+      end.system,
     )) {
       return null;
     }
 
     // Look up in the jump cache, if so, create a plan from that.
     final jumpPlan = _jumpCache.lookupJumpPlan(
-      fromSystem: start.systemSymbol,
-      toSystem: end.systemSymbol,
+      fromSystem: start.system,
+      toSystem: end.system,
     );
     if (jumpPlan != null) {
       return routePlanFromJumpPlan(
@@ -407,7 +406,7 @@ class RoutePlanner {
       final previous = symbols[i - 1];
       final previousWaypoint = _systemsCache.waypoint(previous);
       final currentWaypoint = _systemsCache.waypoint(current);
-      if (previousWaypoint.systemSymbol != currentWaypoint.systemSymbol) {
+      if (previousWaypoint.system != currentWaypoint.system) {
         // Assume we jumped.
         route.add(
           _jumpAction(
@@ -446,7 +445,7 @@ class RoutePlanner {
     required WaypointSymbol start,
     required WaypointSymbol end,
   }) {
-    if (start.systemSymbol != end.systemSymbol) {
+    if (start.system != end.system) {
       return null;
     }
 
@@ -495,7 +494,7 @@ class RoutePlanner {
       );
     }
 
-    if (start.systemSymbol == end.systemSymbol) {
+    if (start.system == end.system) {
       // plan a route within a system
       return _planWithinSystem(
         shipSpec,

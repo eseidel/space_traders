@@ -102,7 +102,7 @@ class SystemsCache extends JsonListStore<System> {
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   SystemWaypoint? waypointOrNull(WaypointSymbol waypointSymbol) {
-    final waypoints = waypointsInSystem(waypointSymbol.systemSymbol);
+    final waypoints = waypointsInSystem(waypointSymbol.system);
     return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
   }
 

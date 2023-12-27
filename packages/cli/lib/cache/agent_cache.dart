@@ -72,8 +72,7 @@ class AgentCache extends JsonStore<Agent> {
   WaypointSymbol get headquartersSymbol => agent.headquartersSymbol;
 
   /// The symbol of the system of the agent's headquarters.
-  SystemSymbol get headquartersSystemSymbol =>
-      agent.headquartersSymbol.systemSymbol;
+  SystemSymbol get headquartersSystemSymbol => agent.headquartersSymbol.system;
 
   /// Ensures the agent in the cache is up to date.
   Future<void> ensureAgentUpToDate(Api api) async {

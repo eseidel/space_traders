@@ -74,13 +74,13 @@ void main() {
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => caches.agent.headquartersSymbol).thenReturn(symbol);
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.system);
+    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
 
     final agent = _MockAgent();
     when(() => caches.agent.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);
 
-    when(() => caches.waypoints.waypointsInSystem(symbol.systemSymbol))
+    when(() => caches.waypoints.waypointsInSystem(symbol.system))
         .thenAnswer((_) => Future.value([]));
     when(() => caches.ships.ships).thenReturn([ship]);
     when(() => caches.ships.frameCounts).thenReturn({});
@@ -95,8 +95,9 @@ void main() {
 
     final systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
-    when(() => systemsApi.getShipyard(symbol.system, symbol.waypoint))
-        .thenAnswer(
+    when(
+      () => systemsApi.getShipyard(symbol.systemString, symbol.waypoint),
+    ).thenAnswer(
       (_) => Future.value(
         GetShipyard200Response(
           data: Shipyard(
