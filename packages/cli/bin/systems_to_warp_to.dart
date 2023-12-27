@@ -40,15 +40,14 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Filter out ones we know how to reach.
   final systemsByDistance = systemsCache.systems
       .sortedBy<num>((s) => s.distanceTo(startSystem))
-      .where((s) => !reachableSystemSymbols.contains(s.systemSymbol));
+      .where((s) => !reachableSystemSymbols.contains(s.symbol));
 
   final systemsToWarpTo = <System>[];
   for (final system in systemsByDistance) {
     if (systemsToWarpTo.length >= limit) {
       break;
     }
-    final waypoints =
-        await waypointCache.waypointsInSystem(system.systemSymbol);
+    final waypoints = await waypointCache.waypointsInSystem(system.symbol);
     final marketCount = waypoints.where((w) => w.hasMarketplace).length;
     if (marketCount < desiredMarketCount) {
       continue;
@@ -57,7 +56,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   for (final system in systemsToWarpTo) {
-    logger.info('${system.systemSymbol}');
+    logger.info('${system.symbol}');
   }
 
   // Required or main will hang.

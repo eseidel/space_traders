@@ -15,8 +15,7 @@ class SystemsCache extends JsonListStore<System> {
     super.records, {
     required super.fs,
     super.path = defaultCacheFilePath,
-  }) : _index =
-            Map.fromEntries(records.map((e) => MapEntry(e.systemSymbol, e)));
+  }) : _index = Map.fromEntries(records.map((e) => MapEntry(e.symbol, e)));
 
   /// All systems in the game.
   List<System> get systems => List.unmodifiable(records);

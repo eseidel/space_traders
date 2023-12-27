@@ -19,7 +19,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   required bool Function(SystemWaypoint waypointSymbol)? filter,
 }) async {
   final system = systemsCache[systemSymbol];
-  final start = ship.systemSymbol == system.systemSymbol
+  final start = ship.systemSymbol == system.symbol
       ? ship.waypointSymbol
       // This is only ever called with systems with waypoints.
       : system.jumpGateWaypoints.first.symbol;

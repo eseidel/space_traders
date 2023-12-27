@@ -101,7 +101,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
   required WaypointCache waypointCache,
 }) async {
   final WaypointSymbol? start;
-  if (ship.systemSymbol == system.systemSymbol) {
+  if (ship.systemSymbol == system.symbol) {
     start = ship.waypointSymbol;
   } else {
     start = system.jumpGateWaypoints.firstOrNull?.symbol;

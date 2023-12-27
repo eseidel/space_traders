@@ -92,15 +92,15 @@ _ShipPlacement? _findBetterSystemForTrader(
     }
     search.markUsed(closest);
 
-    if (!reachableSystems.contains(closest.systemSymbol)) {
+    if (!reachableSystems.contains(closest.symbol)) {
       shipDetail(ship, 'Not reachable: $shipSymbol -> ${closest.symbol}');
       continue;
     }
 
-    final score = search.scoreFor(closest.systemSymbol);
+    final score = search.scoreFor(closest.symbol);
     // This code assumes we're on the jump gate network.
     final systemJumpGate =
-        systemsCache.jumpGateWaypointForSystem(closest.systemSymbol)!;
+        systemsCache.jumpGateWaypointForSystem(closest.symbol)!;
     final deal = findDeal(ship, systemJumpGate.symbol);
     if (deal == null) {
       shipDetail(ship, 'No deal found for $shipSymbol at ${closest.symbol}');
@@ -194,12 +194,12 @@ class _MarketSearch {
     System startSystem,
   ) {
     final availableSystems = marketSystems
-        .where((system) => !claimedSystemSymbols.contains(system.systemSymbol))
+        .where((system) => !claimedSystemSymbols.contains(system.symbol))
         .toList();
     return _closestSystem(systemsCache, startSystem, availableSystems);
   }
 
-  void markUsed(System system) => claimedSystemSymbols.add(system.systemSymbol);
+  void markUsed(System system) => claimedSystemSymbols.add(system.symbol);
 
   int scoreFor(SystemSymbol systemSymbol) => marketSystemScores[systemSymbol]!;
 }

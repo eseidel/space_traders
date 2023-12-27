@@ -69,8 +69,8 @@ void main() {
     final systems = [system];
     final systemsCache = SystemsCache(systems, fs: fs);
     final systemConnectivity = _MockSystemConnectivity();
-    when(() => systemConnectivity.systemsReachableFrom(system.systemSymbol))
-        .thenReturn(systems.map((s) => s.systemSymbol));
+    when(() => systemConnectivity.systemsReachableFrom(system.symbol))
+        .thenReturn(systems.map((s) => s.symbol));
 
     CostedDeal? findNextDeal(Ship ship, WaypointSymbol startSymbol) {
       return null;

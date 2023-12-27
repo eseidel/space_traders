@@ -134,10 +134,6 @@ class System {
   /// The symbol of the system.
   final SystemSymbol symbol;
 
-  /// The symbol of the system.
-  // TODO(eseidel): Remove this once we've migrated to symbol.
-  SystemSymbol get systemSymbol => symbol;
-
   /// The symbol of the sector.
   final String sectorSymbol;
 
