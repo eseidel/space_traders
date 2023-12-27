@@ -288,6 +288,7 @@ class Waypoint {
   double distanceTo(Waypoint other) => position.distanceTo(other.position);
 
   /// Converts to [openapi.Waypoint].
+  @visibleForTesting
   openapi.Waypoint toOpenApi() {
     return openapi.Waypoint(
       symbol: symbol.toJson(),
