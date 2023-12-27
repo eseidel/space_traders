@@ -56,37 +56,14 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.systemSymbol).thenReturn(shipLocation.system);
 
-    final system = System(
-      symbol: shipLocation.system,
-      sectorSymbol: shipLocation.sector,
+    final system = System.test(
+      shipLocation.systemSymbol,
       type: SystemType.BLUE_STAR,
-      x: 0,
-      y: 0,
       waypoints: [
-        SystemWaypoint(
-          symbol: aSymbol.waypoint,
-          type: WaypointType.PLANET,
-          x: 0,
-          y: 0,
-        ),
-        SystemWaypoint(
-          symbol: bSymbol.waypoint,
-          type: WaypointType.PLANET,
-          x: 0,
-          y: 0,
-        ),
-        SystemWaypoint(
-          symbol: shipLocation.waypoint,
-          type: WaypointType.PLANET,
-          x: 0,
-          y: 0,
-        ),
-        SystemWaypoint(
-          symbol: dSymbol.waypoint,
-          type: WaypointType.JUMP_GATE,
-          x: 0,
-          y: 0,
-        ),
+        SystemWaypoint.test(aSymbol),
+        SystemWaypoint.test(bSymbol),
+        SystemWaypoint.test(shipLocation),
+        SystemWaypoint.test(dSymbol, type: WaypointType.JUMP_GATE),
       ],
     );
     final systems = [system];

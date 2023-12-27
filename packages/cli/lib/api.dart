@@ -1,8 +1,7 @@
 import 'package:cli/net/counts.dart';
 import 'package:http/http.dart' as http;
-import 'package:openapi/api.dart';
-
-export 'package:openapi/api.dart';
+import 'package:openapi/api.dart'
+    show AgentsApi, ContractsApi, DefaultApi, FactionsApi, FleetApi, SystemsApi;
 
 /// The default http get function.
 const defaultHttpGet = http.get;

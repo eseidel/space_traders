@@ -238,21 +238,18 @@ void runTests(TestSuite suite, String path) {
       );
       waypoints.add(
         SystemWaypoint(
-          symbol: waypointSymbol.waypoint,
+          symbol: waypointSymbol,
           type: WaypointType.ASTEROID,
-          x: waypoint.x,
-          y: waypoint.y,
+          position: WaypointPosition(waypoint.x, waypoint.y, systemSymbol),
         ),
       );
     }
     systems.add(
       System(
-        symbol: systemSymbol.system,
-        sectorSymbol: systemSymbol.sector,
+        symbol: systemSymbol,
         waypoints: waypoints,
         type: SystemType.NEBULA,
-        x: 0,
-        y: 0,
+        position: const SystemPosition(0, 0),
       ),
     );
   }

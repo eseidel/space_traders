@@ -8,23 +8,28 @@ import 'package:types/types.dart';
 
 void main() {
   test('approximateRoundTripDistanceWithinSystem', () {
-    final a =
-        SystemWaypoint(symbol: 'a-b-a', type: WaypointType.PLANET, x: 0, y: 0);
-    final b =
-        SystemWaypoint(symbol: 'a-b-b', type: WaypointType.PLANET, x: 10, y: 0);
-    final c =
-        SystemWaypoint(symbol: 'a-b-c', type: WaypointType.PLANET, x: 20, y: 0);
-    final otherSystem =
-        SystemWaypoint(symbol: 'a-c-c', type: WaypointType.PLANET, x: 20, y: 0);
+    final aSymbol = WaypointSymbol.fromString('a-b-a');
+    final a = SystemWaypoint.test(aSymbol);
+    final bSymbol = WaypointSymbol.fromString('a-b-b');
+    final b = SystemWaypoint.test(
+      bSymbol,
+      position: WaypointPosition(10, 0, bSymbol.systemSymbol),
+    );
+    final cSymbol = WaypointSymbol.fromString('a-b-c');
+    final c = SystemWaypoint.test(
+      cSymbol,
+      position: WaypointPosition(20, 0, cSymbol.systemSymbol),
+    );
+    final otherSymbol = WaypointSymbol.fromString('a-c-c');
+    final otherSystem = SystemWaypoint.test(
+      otherSymbol,
+      position: WaypointPosition(20, 0, otherSymbol.systemSymbol),
+    );
     final fs = MemoryFileSystem.test();
     final systemsCache = SystemsCache(
       [
-        System(
-          sectorSymbol: a.waypointSymbol.sector,
-          symbol: a.waypointSymbol.system,
-          type: SystemType.BLUE_STAR,
-          x: 0,
-          y: 0,
+        System.test(
+          a.systemSymbol,
           waypoints: [a, b, c],
         ),
       ],
@@ -83,10 +88,8 @@ void main() {
   });
 
   test('fuelUsedWithinSystem', () {
-    final a =
-        SystemWaypoint(symbol: 'a-b-c', type: WaypointType.PLANET, x: 0, y: 0);
-    final b =
-        SystemWaypoint(symbol: 'a-b-d', type: WaypointType.PLANET, x: 0, y: 0);
+    final a = SystemWaypoint.test(WaypointSymbol.fromString('a-b-c'));
+    final b = SystemWaypoint.test(WaypointSymbol.fromString('a-b-d'));
     expect(
       fuelUsedWithinSystem(
         a,
@@ -102,10 +105,8 @@ void main() {
   });
 
   test('flightTimeWithinSystemInSeconds', () {
-    final a =
-        SystemWaypoint(symbol: 'a-b-c', type: WaypointType.PLANET, x: 0, y: 0);
-    final b =
-        SystemWaypoint(symbol: 'a-b-d', type: WaypointType.PLANET, x: 0, y: 0);
+    final a = SystemWaypoint.test(WaypointSymbol.fromString('a-b-c'));
+    final b = SystemWaypoint.test(WaypointSymbol.fromString('a-b-d'));
     expect(
       flightTimeWithinSystemInSeconds(
         a,
@@ -182,26 +183,16 @@ void main() {
   });
 
   test('cooldownTime', () {
-    final a = System(
-      sectorSymbol: 'S',
-      symbol: 'a',
-      x: 0,
-      y: 0,
-      type: SystemType.RED_STAR,
+    final a = System.test(
+      SystemSymbol.fromString('A-A'),
     );
-    final b = System(
-      sectorSymbol: 'S',
-      symbol: 'b',
-      x: 2500,
-      y: 0,
-      type: SystemType.RED_STAR,
+    final b = System.test(
+      SystemSymbol.fromString('A-B'),
+      position: const SystemPosition(2500, 0),
     );
-    final c = System(
-      sectorSymbol: 'S',
-      symbol: 'c',
-      x: 2501,
-      y: 0,
-      type: SystemType.RED_STAR,
+    final c = System.test(
+      SystemSymbol.fromString('A-C'),
+      position: const SystemPosition(2501, 0),
     );
     expect(cooldownTimeForJumpBetweenSystems(a, b), 2560);
     expect(cooldownTimeForJumpBetweenSystems(b, a), 2560);
@@ -319,35 +310,22 @@ void main() {
 
   test('planRoute, fuel constraints', () {
     final fs = MemoryFileSystem.test();
-    final start = SystemWaypoint(
-      symbol: 'A-B-A',
-      type: WaypointType.ASTEROID,
-      x: 0,
-      y: 0,
+    final systemSymbol = SystemSymbol.fromString('A-B');
+    final start = SystemWaypoint.test(
+      WaypointSymbol.fromString('A-B-A'),
     );
-    final fuelStation = SystemWaypoint(
-      symbol: 'A-B-B',
-      type: WaypointType.ASTEROID,
-      x: 50,
-      y: 0,
+    final fuelStation = SystemWaypoint.test(
+      WaypointSymbol.fromString('A-B-B'),
+      position: WaypointPosition(50, 0, systemSymbol),
     );
-    final end = SystemWaypoint(
-      symbol: 'A-B-C',
-      type: WaypointType.ASTEROID,
-      x: 100,
-      y: 0,
+    final end = SystemWaypoint.test(
+      WaypointSymbol.fromString('A-B-C'),
+      position: WaypointPosition(100, 0, systemSymbol),
     );
 
     final systemsCache = SystemsCache(
       [
-        System(
-          symbol: 'A-B',
-          sectorSymbol: 'A',
-          type: SystemType.BLUE_STAR,
-          x: 0,
-          y: 0,
-          waypoints: [start, fuelStation, end],
-        ),
+        System.test(systemSymbol, waypoints: [start, fuelStation, end]),
       ],
       fs: fs,
     );

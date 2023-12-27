@@ -9,6 +9,7 @@ import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/ship_waiter.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 // Pulled in to a separate function to help make sure we don't confuse
 // the wait we needed for this ship with the next wait.

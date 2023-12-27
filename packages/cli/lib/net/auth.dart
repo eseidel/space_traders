@@ -3,6 +3,7 @@ import 'package:cli/net/counts.dart';
 import 'package:cli/net/queue.dart';
 import 'package:db/db.dart';
 import 'package:file/file.dart';
+import 'package:types/types.dart';
 
 export 'package:cli/net/queue.dart'
     show networkPriorityDefault, networkPriorityLow;

@@ -169,7 +169,7 @@ RoutePlan routePlanFromJumpPlan(
   final startWaypoint = systemsCache.waypoint(start);
   final startJumpGate =
       systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
-  if (startJumpGate.symbol != start.waypoint) {
+  if (startJumpGate.symbol != start) {
     _addSubPlanWithinSystem(
       systemsCache,
       actions,
@@ -197,7 +197,7 @@ RoutePlan routePlanFromJumpPlan(
   }
   final endWaypoint = systemsCache.waypoint(end);
   final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.systemSymbol)!;
-  if (endJumpGate.symbol != end.waypoint) {
+  if (endJumpGate.symbol != end) {
     _addSubPlanWithinSystem(
       systemsCache,
       actions,

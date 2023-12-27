@@ -5,6 +5,7 @@ import 'package:cli/cache/contract_cache.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 class _MockApi extends Mock implements Api {}
 

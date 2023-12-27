@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:openapi/api.dart';
+import 'package:openapi/api.dart' hide System, SystemWaypoint, Waypoint;
 import 'package:types/mount.dart';
 
-export 'package:openapi/api.dart';
+export 'package:openapi/api.dart' hide System, SystemWaypoint, Waypoint;
 
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
@@ -66,7 +66,7 @@ class WaypointPosition extends Position {
 /// Type-safe representation of a Waypoint Symbol
 @immutable
 class WaypointSymbol {
-  const WaypointSymbol._(this.waypoint);
+  const WaypointSymbol._(this.waypoint, this.systemSymbol);
 
   /// Create a WaypointSymbol from a json string.
   factory WaypointSymbol.fromJson(String json) =>
@@ -77,7 +77,10 @@ class WaypointSymbol {
     if (_countHyphens(symbol) != 2) {
       throw ArgumentError('Invalid waypoint symbol: $symbol');
     }
-    return WaypointSymbol._(symbol);
+    final systemSymbol = SystemSymbol.fromString(
+      symbol.substring(0, symbol.lastIndexOf('-')),
+    );
+    return WaypointSymbol._(symbol, systemSymbol);
   }
 
   /// Create a WaypointSymbol from json or null if the json is null.
@@ -87,6 +90,10 @@ class WaypointSymbol {
   /// The full waypoint symbol.
   final String waypoint;
 
+  /// The system symbol of the waypoint.
+  // TODO(eseidel): rename to symbol.
+  final SystemSymbol systemSymbol;
+
   /// The sector symbol of the waypoint.
   String get sector {
     // Avoid splitting the string if we don't have to.
@@ -95,14 +102,7 @@ class WaypointSymbol {
   }
 
   /// The system symbol of the waypoint.
-  String get system {
-    // Avoid splitting the string if we don't have to.
-    final lastHyphen = waypoint.lastIndexOf('-');
-    return waypoint.substring(0, lastHyphen);
-  }
-
-  /// The SystemSymbol of the waypoint.
-  SystemSymbol get systemSymbol => SystemSymbol.fromString(system);
+  String get system => systemSymbol.system;
 
   /// Just the waypoint name (no sector or system)
   String get waypointName {
@@ -265,103 +265,9 @@ class ShipSymbol extends Equatable implements Comparable<ShipSymbol> {
   String toJson() => symbol;
 }
 
-/// Extensions onto System to make it easier to work with.
-extension SystemUtils on System {
-  /// Returns the SystemSymbol of the system.
-  SystemSymbol get systemSymbol => SystemSymbol.fromString(symbol);
-
-  /// Returns the the SystemWaypoint for the jump gate if it has one.
-  Iterable<SystemWaypoint> get jumpGateWaypoints =>
-      waypoints.where((w) => w.isJumpGate);
-
-  /// Returns true if the system has a jump gate.
-  bool get hasJumpGate => waypoints.any((w) => w.isJumpGate);
-
-  /// Returns the SystemPosition of the system.
-  SystemPosition get position => SystemPosition(x, y);
-
-  /// Returns the distance to the given system.
-  int distanceTo(System other) => position.distanceTo(other.position);
-}
-
-/// Extensions onto SystemWaypoint to make it easier to work with.
-extension SystemWaypointUtils on SystemWaypoint {
-  /// Returns true if the waypoint has the given type.
-  bool isType(WaypointType type) => this.type == type;
-
-  /// Returns true if the waypoint is an asteroid field.
-  bool get isAsteroid => isType(WaypointType.ASTEROID);
-
-  /// Returns true if the waypoint is a jump gate.
-  bool get isJumpGate => isType(WaypointType.JUMP_GATE);
-
-  /// symbol as a WaypointSymbol.
-  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
-
-  /// The system symbol of the waypoint.
-  SystemSymbol get systemSymbol => waypointSymbol.systemSymbol;
-
-  /// Returns the WaypointPosition of the waypoint.
-  WaypointPosition get position => WaypointPosition(x, y, systemSymbol);
-
-  /// Returns the distance to the given waypoint.
-  double distanceTo(SystemWaypoint other) =>
-      position.distanceTo(other.position);
-}
-
 /// Returns true if the given trait is minable.
 bool isMinableTrait(WaypointTraitSymbol trait) {
   return trait.value.endsWith('DEPOSITS');
-}
-
-/// Extensions onto Waypoint to make it easier to work with.
-extension WaypointUtils on Waypoint {
-  /// Returns the WaypointSymbol of the waypoint.
-  WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
-
-  /// The system symbol of the waypoint.
-  SystemSymbol get systemSymbolObject => waypointSymbol.systemSymbol;
-
-  /// Converts the waypoint to a SystemWaypoint.
-  SystemWaypoint toSystemWaypoint() {
-    return SystemWaypoint(
-      symbol: symbol,
-      type: type,
-      x: x,
-      y: y,
-    );
-  }
-
-  /// Returns true if the waypoint has the given trait.
-  bool hasTrait(WaypointTraitSymbol trait) =>
-      traits.any((t) => t.symbol == trait);
-
-  /// Returns true if the waypoint has the given type.
-  bool isType(WaypointType type) => this.type == type;
-
-  /// Returns true if the waypoint can be mined.
-  bool get canBeMined => traits.any((t) => isMinableTrait(t.symbol));
-
-  /// Returns true if the waypoint can be siphoned.
-  bool get canBeSiphoned => isType(WaypointType.GAS_GIANT);
-
-  /// Returns true if the waypoint is a jump gate.
-  bool get isJumpGate => isType(WaypointType.JUMP_GATE);
-
-  /// Returns true if the waypoint has been charted.
-  bool get isCharted => chart != null;
-
-  /// Returns true if the waypoint has a shipyard.
-  bool get hasShipyard => hasTrait(WaypointTraitSymbol.SHIPYARD);
-
-  /// Returns true if the waypoint has a marketplace.
-  bool get hasMarketplace => hasTrait(WaypointTraitSymbol.MARKETPLACE);
-
-  /// Returns the WaypointPosition of the waypoint.
-  WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);
-
-  /// Returns the distance to the given waypoint.
-  double distanceTo(Waypoint other) => position.distanceTo(other.position);
 }
 
 /// Extensions onto ShipCargo to make it easier to work with.

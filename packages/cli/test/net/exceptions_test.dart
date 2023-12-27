@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:cli/api.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:test/test.dart';
+import 'package:types/api.dart';
 
 void main() {
   test('expirationFromApiException', () {

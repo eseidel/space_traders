@@ -13,35 +13,19 @@ void main() {
     final fs = MemoryFileSystem.test();
     final systemsCache = SystemsCache(
       [
-        System(
-          symbol: start.system,
-          sectorSymbol: start.sector,
-          x: 0,
-          y: 0,
-          type: SystemType.BLACK_HOLE,
+        System.test(
+          start.systemSymbol,
           waypoints: [
-            SystemWaypoint(
-              symbol: start.waypoint,
+            SystemWaypoint.test(
+              start,
               type: WaypointType.JUMP_GATE,
-              x: 0,
-              y: 0,
             ),
           ],
         ),
-        System(
-          symbol: end.system,
-          sectorSymbol: end.sector,
-          x: 10,
-          y: 0,
-          type: SystemType.BLACK_HOLE,
-          waypoints: [
-            SystemWaypoint(
-              symbol: end.waypoint,
-              type: WaypointType.JUMP_GATE,
-              x: 0,
-              y: 0,
-            ),
-          ],
+        System.test(
+          end.systemSymbol,
+          position: const SystemPosition(10, 0),
+          waypoints: [SystemWaypoint.test(end, type: WaypointType.JUMP_GATE)],
         ),
       ],
       fs: fs,

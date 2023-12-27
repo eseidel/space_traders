@@ -4,6 +4,7 @@ import 'package:cli/logger.dart';
 import 'package:file/local.dart';
 import 'package:meta/meta.dart';
 import 'package:scoped/scoped.dart';
+import 'package:types/types.dart';
 
 export 'package:args/args.dart';
 export 'package:cli/logger.dart';

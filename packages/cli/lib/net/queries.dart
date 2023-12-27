@@ -28,7 +28,8 @@ Stream<T> fetchAllPages<T, A>(
 Future<Waypoint> fetchWaypoint(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems
       .getWaypoint(waypointSymbol.system, waypointSymbol.waypoint);
-  return response!.data;
+  final openApiWaypoint = response!.data;
+  return Waypoint.fromOpenApi(openApiWaypoint);
 }
 
 /// Fetches all waypoints in a system.  Handles pagination from the server.
@@ -36,7 +37,8 @@ Stream<Waypoint> allWaypointsInSystem(Api api, SystemSymbol system) {
   return fetchAllPages(api, (api, page) async {
     final response = await api.systems
         .getSystemWaypoints(system.system, page: page, limit: pageLimit);
-    return (response!.data, response.meta);
+    final waypoints = response!.data.map(Waypoint.fromOpenApi).toList();
+    return (waypoints, response.meta);
   });
 }
 

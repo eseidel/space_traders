@@ -1,7 +1,7 @@
 import 'package:cli/cache/static_cache.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
-import 'package:types/api.dart';
+import 'package:types/types.dart';
 
 /// Map from ship type to ship frame symbol.
 extension ShipTypeToFrame on ShipyardShipCache {
@@ -39,12 +39,13 @@ extension ShipTypeToFrame on ShipyardShipCache {
   }) {
     final symbolString = shipSymbol?.symbol ?? 'S-1';
     final factionString = factionSymbol?.value ?? 'COSMIC';
+    final waypointSymbol =
+        origin?.waypointSymbol ?? WaypointSymbol.fromString('A-B-C');
     final waypoint = origin ??
         SystemWaypoint(
-          symbol: 'A-B-C',
+          symbol: waypointSymbol,
           type: WaypointType.PLANET,
-          x: 0,
-          y: 0,
+          position: WaypointPosition(0, 0, waypointSymbol.systemSymbol),
         );
     final arrival = now ?? DateTime.utc(2021);
 
@@ -122,8 +123,8 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
     symbol: originSymbol.waypoint,
     systemSymbol: originSymbol.system,
     type: origin.type,
-    x: origin.x,
-    y: origin.y,
+    x: origin.position.x,
+    y: origin.position.y,
   );
 
   return ShipNav(

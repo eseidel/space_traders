@@ -468,7 +468,8 @@ Future<void> chartWaypointAndLog(
 ) async {
   try {
     final response = await api.fleet.createChart(ship.symbol);
-    final waypoint = response!.data.waypoint;
+    final openapiWaypoint = response!.data.waypoint;
+    final waypoint = Waypoint.fromOpenApi(openapiWaypoint);
     await chartingCache.addWaypoint(waypoint);
     waypointTraitCache.addAll(waypoint.traits);
     // Powershell needs the space after the emoji.

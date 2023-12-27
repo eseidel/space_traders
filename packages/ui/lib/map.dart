@@ -46,8 +46,8 @@ class SystemMapPainter extends CustomPainter {
     var maxY = double.negativeInfinity;
 
     for (final system in systemsCache.systems) {
-      final x = system.x;
-      final y = system.y;
+      final x = system.position.x;
+      final y = system.position.y;
 
       if (x < minX) {
         minX = x.toDouble();
@@ -118,8 +118,8 @@ class SystemMapPainter extends CustomPainter {
 
     for (final system in systemsCache.systems) {
       final attributes = attributesForSystem(system);
-      final x = system.x;
-      final y = system.y;
+      final x = system.position.x;
+      final y = system.position.y;
       const defaultRadius = 100.0;
       final radius = defaultRadius * attributes.scale;
       paint.color = attributes.color;

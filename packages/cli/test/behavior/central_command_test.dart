@@ -514,13 +514,10 @@ void main() {
         .thenReturn(hqSystemSymbol);
     when(() => caches.waypoints.waypointsInSystem(hqSystemSymbol)).thenAnswer(
       (_) => Future.value([
-        Waypoint(
-          symbol: hqSymbol.waypoint,
+        Waypoint.test(
+          hqSymbol,
           type: WaypointType.PLANET,
-          systemSymbol: hqSymbol.system,
-          x: 0,
-          y: 0,
-          isUnderConstruction: false,
+          position: WaypointPosition(0, 0, hqSystemSymbol),
           traits: [
             WaypointTrait(
               symbol: WaypointTraitSymbol.SHIPYARD,
@@ -550,17 +547,12 @@ void main() {
       ),
     ).thenReturn(0);
     when(() => caches.agent.headquarters(caches.systems)).thenReturn(
-      SystemWaypoint(
-        symbol: 'W-A-Y',
-        type: WaypointType.ASTEROID,
-        x: 0,
-        y: 0,
-      ),
+      SystemWaypoint.test(hqSymbol),
     );
     when(() => caches.agent.agent).thenReturn(
       Agent(
         symbol: shipSymbol.agentName,
-        headquarters: 'W-A-Y',
+        headquarters: hqSymbol.waypoint,
         credits: 100000,
         shipCount: 1,
         startingFaction: faction,

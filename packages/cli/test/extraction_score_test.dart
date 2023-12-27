@@ -18,10 +18,9 @@ void main() {
     final waypointCache = _MockWaypointCache();
     final marketListingCache = _MockMarketListingCache();
     final systemSymbol = SystemSymbol.fromString('W-A');
-    final source = Waypoint(
-      symbol: 'W-A-A',
-      systemSymbol: 'W-A',
-      type: WaypointType.ASTEROID,
+    final sourceSymbol = WaypointSymbol.fromString('W-A-A');
+    final source = Waypoint.test(
+      sourceSymbol,
       traits: [
         WaypointTrait(
           symbol: WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
@@ -29,14 +28,10 @@ void main() {
           description: 'description',
         ),
       ],
-      x: 0,
-      y: 0,
-      isUnderConstruction: false,
     );
-    final marketA = Waypoint(
-      symbol: 'W-A-M',
-      systemSymbol: 'W-A',
-      type: WaypointType.ASTEROID,
+    final marketASymbol = WaypointSymbol.fromString('W-A-M');
+    final marketA = Waypoint.test(
+      marketASymbol,
       traits: [
         WaypointTrait(
           symbol: WaypointTraitSymbol.MARKETPLACE,
@@ -44,14 +39,11 @@ void main() {
           description: 'description',
         ),
       ],
-      x: 10,
-      y: 0,
-      isUnderConstruction: false,
+      position: WaypointPosition(10, 0, systemSymbol),
     );
-    final marketB = Waypoint(
-      symbol: 'W-A-N',
-      systemSymbol: 'W-A',
-      type: WaypointType.ASTEROID,
+    final marketBSymbol = WaypointSymbol.fromString('W-A-N');
+    final marketB = Waypoint.test(
+      marketBSymbol,
       traits: [
         WaypointTrait(
           symbol: WaypointTraitSymbol.MARKETPLACE,
@@ -59,9 +51,7 @@ void main() {
           description: 'description',
         ),
       ],
-      x: 0,
-      y: 20,
-      isUnderConstruction: false,
+      position: WaypointPosition(0, 20, systemSymbol),
     );
     final waypoints = [source, marketA, marketB];
     when(() => waypointCache.waypointsInSystem(systemSymbol)).thenAnswer(
@@ -121,19 +111,15 @@ void main() {
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
     final marketListingCache = _MockMarketListingCache();
+    final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
-    final source = Waypoint(
-      symbol: 'W-A-A',
-      systemSymbol: 'W-A',
+    final source = Waypoint.test(
+      sourceSymbol,
       type: WaypointType.GAS_GIANT,
-      x: 0,
-      y: 0,
-      isUnderConstruction: false,
     );
-    final market = Waypoint(
-      symbol: 'W-A-B',
-      systemSymbol: 'W-A',
-      type: WaypointType.ASTEROID,
+    final marketSymbol = WaypointSymbol.fromString('W-A-B');
+    final market = Waypoint.test(
+      marketSymbol,
       traits: [
         WaypointTrait(
           symbol: WaypointTraitSymbol.MARKETPLACE,
@@ -141,9 +127,7 @@ void main() {
           description: 'description',
         ),
       ],
-      x: 10,
-      y: 0,
-      isUnderConstruction: false,
+      position: WaypointPosition(10, 0, systemSymbol),
     );
     final waypoints = [source, market];
     when(() => waypointCache.waypointsInSystem(systemSymbol)).thenAnswer(

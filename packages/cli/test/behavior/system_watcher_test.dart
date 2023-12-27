@@ -23,8 +23,6 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockWaypoint extends Mock implements Waypoint {}
-
 void main() {
   test('advanceSystemWatcher smoke test', () async {
     final api = _MockApi();
@@ -35,30 +33,18 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
 
-    final waypoint = _MockWaypoint();
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
-    when(() => waypoint.symbol).thenReturn(waypointSymbol.waypoint);
-    when(() => waypoint.systemSymbol).thenReturn(waypointSymbol.system);
-    when(() => waypoint.type).thenReturn(WaypointType.PLANET);
-    when(() => waypoint.traits).thenReturn([]);
-    when(() => waypoint.chart).thenReturn(Chart());
+    final waypoint = Waypoint.test(waypointSymbol);
 
-    final systemWaypoint = SystemWaypoint(
-      symbol: waypointSymbol.waypoint,
+    final systemWaypoint = SystemWaypoint.test(
+      waypointSymbol,
       type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
-      x: 0,
-      y: 0,
+      position: WaypointPosition(0, 0, waypointSymbol.systemSymbol),
     );
     when(() => caches.systems.waypoint(waypointSymbol))
         .thenReturn(systemWaypoint);
 
-    final system = System(
-      symbol: waypointSymbol.system,
-      sectorSymbol: waypointSymbol.sector,
-      type: SystemType.BLACK_HOLE,
-      x: 0,
-      y: 0,
-    );
+    final system = System.test(waypointSymbol.systemSymbol);
     when(() => caches.systems[waypointSymbol.systemSymbol]).thenReturn(system);
     registerFallbackValue(waypointSymbol.systemSymbol);
 
@@ -66,7 +52,10 @@ void main() {
     when(() => fleetApi.createChart(any())).thenAnswer(
       (invocation) => Future.value(
         CreateChart201Response(
-          data: CreateChart201ResponseData(chart: Chart(), waypoint: waypoint),
+          data: CreateChart201ResponseData(
+            chart: Chart(),
+            waypoint: waypoint.toOpenApi(),
+          ),
         ),
       ),
     );
@@ -106,6 +95,9 @@ void main() {
     final state = BehaviorState(shipSymbol, Behavior.charter)
       ..systemWatcherJob =
           SystemWatcherJob(systemSymbol: waypointSymbol.systemSymbol);
+
+    registerFallbackValue(waypoint);
+    when(() => caches.charting.addWaypoint(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

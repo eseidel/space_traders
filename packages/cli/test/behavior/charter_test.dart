@@ -38,15 +38,9 @@ void main() {
     final caches = mockCaches();
 
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
-    final waypoint = Waypoint(
-      symbol: waypointSymbol.waypoint,
-      systemSymbol: waypointSymbol.system,
+    final waypoint = Waypoint.test(
+      waypointSymbol,
       type: WaypointType.PLANET,
-      traits: [],
-      chart: Chart(),
-      x: 0,
-      y: 0,
-      isUnderConstruction: false,
     );
 
     final systemWaypoint = waypoint.toSystemWaypoint();
@@ -54,11 +48,9 @@ void main() {
         .thenReturn(systemWaypoint);
 
     final system = System(
-      symbol: waypointSymbol.system,
-      sectorSymbol: waypointSymbol.sector,
+      symbol: waypointSymbol.systemSymbol,
       type: SystemType.BLACK_HOLE,
-      x: 0,
-      y: 0,
+      position: const SystemPosition(0, 0),
     );
     when(() => caches.systems[waypointSymbol.systemSymbol]).thenReturn(system);
     registerFallbackValue(waypointSymbol.systemSymbol);
@@ -71,7 +63,10 @@ void main() {
     when(() => fleetApi.createChart(any())).thenAnswer(
       (invocation) => Future.value(
         CreateChart201Response(
-          data: CreateChart201ResponseData(chart: Chart(), waypoint: waypoint),
+          data: CreateChart201ResponseData(
+            chart: Chart(),
+            waypoint: waypoint.toOpenApi(),
+          ),
         ),
       ),
     );
@@ -156,39 +151,26 @@ void main() {
 
     final systemsCache = SystemsCache(
       [
-        System(
-          symbol: systemASymbol.system,
-          sectorSymbol: systemASymbol.sector,
-          type: SystemType.BLACK_HOLE,
-          x: 0,
-          y: 0,
+        System.test(
+          systemASymbol,
           waypoints: [
-            SystemWaypoint(
-              symbol: waypointAASymbol.waypoint,
+            SystemWaypoint.test(
+              waypointAASymbol,
               type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
-              x: 0,
-              y: 0,
             ),
-            SystemWaypoint(
-              symbol: waypointABSymbol.waypoint,
+            SystemWaypoint.test(
+              waypointABSymbol,
               type: WaypointType.JUMP_GATE,
-              x: 0,
-              y: 0,
             ),
           ],
         ),
-        System(
-          symbol: systemBSymbol.system,
-          sectorSymbol: systemBSymbol.sector,
-          type: SystemType.BLACK_HOLE,
-          x: 10,
-          y: 10,
+        System.test(
+          systemBSymbol,
+          position: const SystemPosition(10, 10),
           waypoints: [
-            SystemWaypoint(
-              symbol: waypointBASymbol.waypoint,
+            SystemWaypoint.test(
+              waypointBASymbol,
               type: WaypointType.JUMP_GATE,
-              x: 0,
-              y: 0,
             ),
           ],
         ),

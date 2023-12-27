@@ -580,24 +580,9 @@ void main() {
     final end = WaypointSymbol.fromString('S-A-C');
     registerFallbackValue(start);
 
-    final startWaypoint = SystemWaypoint(
-      symbol: start.waypoint,
-      type: WaypointType.ASTEROID_FIELD,
-      x: 0,
-      y: 0,
-    );
-    final endWaypoint = SystemWaypoint(
-      symbol: end.waypoint,
-      type: WaypointType.ASTEROID_FIELD,
-      x: 0,
-      y: 0,
-    );
-    final shipLocationWaypoint = SystemWaypoint(
-      symbol: shipLocation.waypoint,
-      type: WaypointType.ASTEROID_FIELD,
-      x: 0,
-      y: 0,
-    );
+    final startWaypoint = SystemWaypoint.test(start);
+    final endWaypoint = SystemWaypoint.test(end);
+    final shipLocationWaypoint = SystemWaypoint.test(shipLocation);
 
     when(() => caches.systems.waypoint(start)).thenReturn(startWaypoint);
     when(() => caches.systems.waypoint(end)).thenReturn(endWaypoint);
@@ -863,20 +848,10 @@ void main() {
     ).thenReturn(routePlan);
 
     when(() => caches.systems.waypoint(start)).thenReturn(
-      SystemWaypoint(
-        symbol: start.waypoint,
-        type: WaypointType.ASTEROID_FIELD,
-        x: 0,
-        y: 0,
-      ),
+      SystemWaypoint.test(start),
     );
     when(() => caches.systems.waypoint(end)).thenReturn(
-      SystemWaypoint(
-        symbol: end.waypoint,
-        type: WaypointType.ASTEROID_FIELD,
-        x: 0,
-        y: 0,
-      ),
+      SystemWaypoint.test(end),
     );
 
     final fleetApi = _MockFleetApi();

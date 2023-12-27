@@ -22,6 +22,7 @@ import 'package:db/db.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
+import 'package:types/types.dart';
 
 export 'package:cli/api.dart';
 export 'package:cli/cache/agent_cache.dart';

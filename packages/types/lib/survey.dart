@@ -1,4 +1,4 @@
-import 'package:openapi/api.dart';
+import 'package:types/api.dart';
 
 /// Record of a historcial survey.
 // This can't be @immutable because Survey is not.

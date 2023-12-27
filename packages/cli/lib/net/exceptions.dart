@@ -1,7 +1,28 @@
 import 'dart:convert';
 
-import 'package:cli/api.dart';
 import 'package:cli/logger.dart';
+import 'package:types/types.dart';
+
+/// Returns a valid [T] value found at the specified Map [key], null otherwise.
+T? mapValueOfType<T>(dynamic map, String key) {
+  final dynamic value = map is Map ? map[key] : null;
+  return value is T ? value : null;
+}
+
+/// Returns a valid Map<K, V> found at the specified Map [key], null otherwise.
+Map<K, V>? mapCastOfType<K, V>(dynamic map, String key) {
+  final dynamic value = map is Map ? map[key] : null;
+  return value is Map ? value.cast<K, V>() : null;
+}
+
+/// Returns a valid [DateTime] found at the specified Map [key], null otherwise.
+DateTime? mapDateTime(dynamic map, String key) {
+  final dynamic value = map is Map ? map[key] : null;
+  if (value is String) {
+    return DateTime.tryParse(value);
+  }
+  return null;
+}
 
 /// Error 4224 is a survey exhausted error.
 bool isSurveyExhaustedException(ApiException e) {

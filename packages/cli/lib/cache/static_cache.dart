@@ -7,7 +7,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/compare.dart';
 import 'package:collection/collection.dart';
-import 'package:types/export.dart';
+import 'package:types/types.dart';
 
 // Not using named parameters to save repetition at call sites.
 List<Value> _loadJsonNullable<Value>(

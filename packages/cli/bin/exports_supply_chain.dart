@@ -51,7 +51,7 @@ WaypointSymbol? nearestExtractionSiteFor(
     ..sort(
       (a, b) => a.distanceTo(destination).compareTo(b.distanceTo(destination)),
     );
-  return candidates.firstOrNull?.waypointSymbol;
+  return candidates.firstOrNull?.symbol;
 }
 
 MarketListing? nearestListingWithExport(

@@ -81,11 +81,9 @@ class WaypointCache {
     }
 
     return Waypoint(
-      symbol: systemWaypoint.symbol,
+      symbol: systemWaypoint.waypointSymbol,
       type: systemWaypoint.type,
-      systemSymbol: systemWaypoint.systemSymbol.system,
-      x: systemWaypoint.x,
-      y: systemWaypoint.y,
+      position: systemWaypoint.position,
       chart: values.chart,
       faction: values.faction,
       orbitals: systemWaypoint.orbitals,
@@ -183,8 +181,7 @@ class WaypointCache {
       return cachedWaypoint;
     }
     final waypoints = await waypointsInSystem(systemSymbol);
-    return waypoints
-        .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
+    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
   }
 
   /// Returns true if the given waypoint is known to be charted, will

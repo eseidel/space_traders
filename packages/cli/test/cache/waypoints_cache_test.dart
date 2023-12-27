@@ -21,14 +21,7 @@ void main() {
     final SystemsApi systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
     final waypointSymbol = WaypointSymbol.fromString('S-E-A');
-    final expectedWaypoint = Waypoint(
-      symbol: waypointSymbol.waypoint,
-      systemSymbol: waypointSymbol.system,
-      type: WaypointType.PLANET,
-      x: 0,
-      y: 0,
-      isUnderConstruction: false,
-    );
+    final expectedWaypoint = Waypoint.test(waypointSymbol);
     when(
       () => systemsApi.getSystemWaypoints(
         any(),
@@ -37,20 +30,13 @@ void main() {
       ),
     ).thenAnswer((invocation) async {
       return GetSystemWaypoints200Response(
-        data: [expectedWaypoint],
+        data: [expectedWaypoint.toOpenApi()],
         meta: Meta(total: 1),
       );
     });
     final systemsCache = _MockSystemsCache();
     when(() => systemsCache.waypointsInSystem(waypointSymbol.systemSymbol))
-        .thenReturn([
-      SystemWaypoint(
-        symbol: waypointSymbol.waypoint,
-        type: WaypointType.PLANET,
-        x: 0,
-        y: 0,
-      ),
-    ]);
+        .thenReturn([SystemWaypoint.test(waypointSymbol)]);
     final chartingCache = _MockChartingCache();
     registerFallbackValue(waypointSymbol);
     when(() => chartingCache.chartedValues(any()))
@@ -68,9 +54,15 @@ void main() {
       constructionCache,
       waypointTraitCache,
     );
-    expect(await waypointCache.waypoint(waypointSymbol), expectedWaypoint);
+    expect(
+      (await waypointCache.waypoint(waypointSymbol)).symbol,
+      waypointSymbol,
+    );
     // Call it twice, it should cache.
-    expect(await waypointCache.waypoint(waypointSymbol), expectedWaypoint);
+    expect(
+      (await waypointCache.waypoint(waypointSymbol)).symbol,
+      waypointSymbol,
+    );
     verify(
       () => systemsApi.getSystemWaypoints(
         any(),

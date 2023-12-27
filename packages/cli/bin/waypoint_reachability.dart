@@ -27,7 +27,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       final waypoint = systemsCache.waypoint(waypointSymbol);
       logger.info(
         '  ${waypointSymbol.waypoint.padRight(11)} '
-        '@ ${waypoint.x},${waypoint.y}',
+        '@ ${waypoint.position}',
       );
     }
   }

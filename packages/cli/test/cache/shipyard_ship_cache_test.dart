@@ -1,7 +1,7 @@
-import 'package:cli/api.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('ShipyardShipCache', () {

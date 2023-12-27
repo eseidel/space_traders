@@ -1,6 +1,6 @@
-import 'package:cli/api.dart';
 import 'package:cli/net/queries.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('fetchAllPages', () async {

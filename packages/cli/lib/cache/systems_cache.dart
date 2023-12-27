@@ -35,7 +35,7 @@ class SystemsCache extends JsonListStore<System> {
   static List<System> _parseSystems(String systemsString) {
     final parsed = jsonDecode(systemsString) as List<dynamic>;
     return parsed
-        .map<System>((e) => System.fromJson(e as Map<String, dynamic>)!)
+        .map<System>((e) => System.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -48,7 +48,7 @@ class SystemsCache extends JsonListStore<System> {
     final systems = JsonListStore.loadRecords<System>(
       fs,
       path,
-      (json) => System.fromJson(json)!,
+      System.fromJson,
     );
     if (systems == null) {
       return null;
@@ -103,8 +103,7 @@ class SystemsCache extends JsonListStore<System> {
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   SystemWaypoint? waypointOrNull(WaypointSymbol waypointSymbol) {
     final waypoints = waypointsInSystem(waypointSymbol.systemSymbol);
-    return waypoints
-        .firstWhereOrNull((w) => w.symbol == waypointSymbol.waypoint);
+    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
   }
 
   /// Return the SystemWaypoint for the given [symbol].

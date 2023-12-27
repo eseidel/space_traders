@@ -6,23 +6,16 @@ class _MockShip extends Mock implements Ship {}
 
 void main() {
   test('SystemWaypoint.isType', () {
-    final jumpGate = SystemWaypoint(
-      symbol: 'S-E-J',
+    final jumpGate = SystemWaypoint.test(
+      WaypointSymbol.fromString('S-E-J'),
       type: WaypointType.JUMP_GATE,
-      x: 0,
-      y: 0,
     );
-    final planet = SystemWaypoint(
-      symbol: 'S-E-P',
+    final planet = SystemWaypoint.test(
+      WaypointSymbol.fromString('S-E-P'),
       type: WaypointType.PLANET,
-      x: 0,
-      y: 0,
     );
-    final asteroid = SystemWaypoint(
-      symbol: 'S-E-A',
-      type: WaypointType.ASTEROID,
-      x: 0,
-      y: 0,
+    final asteroid = SystemWaypoint.test(
+      WaypointSymbol.fromString('S-E-A'),
     );
     expect(jumpGate.isType(WaypointType.JUMP_GATE), isTrue);
     expect(jumpGate.isJumpGate, isTrue);
@@ -30,12 +23,8 @@ void main() {
     expect(asteroid.isAsteroid, isTrue);
     expect(jumpGate.systemSymbol, SystemSymbol.fromString('S-E'));
 
-    final system = System(
-      symbol: 'S-E',
-      sectorSymbol: 'S',
-      type: SystemType.BLUE_STAR,
-      x: 0,
-      y: 0,
+    final system = System.test(
+      SystemSymbol.fromString('S-E'),
       waypoints: [
         jumpGate,
         planet,
@@ -46,13 +35,9 @@ void main() {
   });
 
   test('Waypoint.hasTrait', () {
-    final waypoint = Waypoint(
-      isUnderConstruction: false,
-      symbol: 'S-E-J',
-      systemSymbol: 'S-E',
+    final waypoint = Waypoint.test(
+      WaypointSymbol.fromString('S-E-J'),
       type: WaypointType.JUMP_GATE,
-      x: 0,
-      y: 0,
       traits: [
         WaypointTrait(
           symbol: WaypointTraitSymbol.ASH_CLOUDS,

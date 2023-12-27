@@ -3,6 +3,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:db/db.dart';
+import 'package:types/types.dart';
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.

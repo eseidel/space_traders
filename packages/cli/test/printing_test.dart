@@ -7,14 +7,10 @@ import 'package:types/types.dart';
 
 void main() {
   test('waypointDescription', () {
-    final waypoint = Waypoint(
-      symbol: 'a',
+    final waypoint = Waypoint.test(
+      WaypointSymbol.fromString('S-A-A'),
       type: WaypointType.PLANET,
-      systemSymbol: 'c',
-      x: 1,
-      y: 2,
-      orbitals: [],
-      faction: WaypointFaction(symbol: FactionSymbol.AEGIS),
+      position: WaypointPosition(1, 2, SystemSymbol.fromString('S-A')),
       traits: [
         WaypointTrait(
           description: 't',
@@ -22,9 +18,8 @@ void main() {
           symbol: WaypointTraitSymbol.CORRUPT,
         ),
       ],
-      isUnderConstruction: true,
     );
-    expect(waypointDescription(waypoint), 'a - PLANET - uncharted - n');
+    expect(waypointDescription(waypoint), 'A-A - PLANET - uncharted - n');
   });
 
   test('durationString', () {

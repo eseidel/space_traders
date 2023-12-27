@@ -173,38 +173,22 @@ void main() {
     final reactorExpiry = now.add(const Duration(seconds: 100));
 
     when(() => caches.systems.waypoint(startSymbol)).thenReturn(
-      SystemWaypoint(
-        symbol: startSymbol.waypoint,
+      SystemWaypoint.test(
+        startSymbol,
         type: WaypointType.ASTEROID_FIELD,
-        x: 0,
-        y: 0,
       ),
     );
     when(() => caches.systems[startSymbol.systemSymbol]).thenReturn(
-      System(
-        symbol: startSymbol.system,
-        sectorSymbol: startSymbol.sector,
-        type: SystemType.BLACK_HOLE,
-        x: 0,
-        y: 0,
-      ),
+      System.test(startSymbol.systemSymbol),
     );
     when(() => caches.systems.waypoint(endSymbol)).thenReturn(
-      SystemWaypoint(
-        symbol: endSymbol.waypoint,
+      SystemWaypoint.test(
+        endSymbol,
         type: WaypointType.JUMP_GATE,
-        x: 0,
-        y: 0,
       ),
     );
     when(() => caches.systems[endSymbol.systemSymbol]).thenReturn(
-      System(
-        symbol: endSymbol.system,
-        sectorSymbol: endSymbol.sector,
-        type: SystemType.BLACK_HOLE,
-        x: 0,
-        y: 0,
-      ),
+      System.test(endSymbol.systemSymbol),
     );
 
     when(

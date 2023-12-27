@@ -39,7 +39,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       : systemsCache.waypointFromString(startArg)!;
 
   final jumpGate = systemsCache.jumpGateWaypointForSystem(start.systemSymbol)!;
-  final construction = constructionSnapshot[jumpGate.waypointSymbol];
+  final construction = constructionSnapshot[jumpGate.symbol];
   centralCommand.activeConstruction = construction;
 
   final extraSellOpps = <SellOpp>[];
@@ -88,7 +88,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     cargoCapacity: cargoCapacity,
     fuelCapacity: fuelCapacity,
     shipSpeed: shipSpeed,
-    startSymbol: start.waypointSymbol,
+    startSymbol: start.symbol,
     extraSellOpps: extraSellOpps,
   );
 

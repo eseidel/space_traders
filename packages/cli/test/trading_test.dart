@@ -76,18 +76,8 @@ void main() {
 
   test('costOutDeal basic', () {
     final systemsCache = _MockSystemsCache();
-    final start = SystemWaypoint(
-      symbol: 'X-S-A',
-      type: WaypointType.ASTEROID_FIELD,
-      x: 0,
-      y: 0,
-    );
-    final end = SystemWaypoint(
-      symbol: 'X-S-B',
-      type: WaypointType.PLANET,
-      x: 0,
-      y: 0,
-    );
+    final start = SystemWaypoint.test(WaypointSymbol.fromString('X-S-A'));
+    final end = SystemWaypoint.test(WaypointSymbol.fromString('X-S-B'));
     when(() => systemsCache.waypoint(start.waypointSymbol)).thenReturn(start);
     when(() => systemsCache.waypoint(end.waypointSymbol)).thenReturn(end);
     when(() => systemsCache.waypointsInSystem(start.systemSymbol))
@@ -192,23 +182,11 @@ void main() {
     // has a great deal, but we still choose S-A-B because it's faster and
     // thus has a better profit per second.
     final systemsCache = _MockSystemsCache();
-    final saa = SystemWaypoint(
-      symbol: 'S-A-A',
-      type: WaypointType.ASTEROID_FIELD,
-      x: 0,
-      y: 0,
-    );
-    final sab = SystemWaypoint(
-      symbol: 'S-A-B',
-      type: WaypointType.ASTEROID_FIELD,
-      x: 0,
-      y: 0,
-    );
-    final sac = SystemWaypoint(
-      symbol: 'S-A-C',
-      type: WaypointType.ASTEROID_FIELD,
-      x: 1000,
-      y: 1000,
+    final saa = SystemWaypoint.test(WaypointSymbol.fromString('S-A-A'));
+    final sab = SystemWaypoint.test(WaypointSymbol.fromString('S-A-B'));
+    final sac = SystemWaypoint.test(
+      WaypointSymbol.fromString('S-A-C'),
+      position: WaypointPosition(1000, 1000, SystemSymbol.fromString('S-A')),
     );
     final waypoints = [saa, sab, sac];
     when(() => systemsCache.waypoint(saa.waypointSymbol)).thenReturn(saa);
@@ -268,13 +246,7 @@ void main() {
     when(() => shipCargo.units).thenReturn(0);
 
     when(() => systemsCache[saa.systemSymbol]).thenReturn(
-      System(
-        symbol: waypointSymbol.system,
-        sectorSymbol: waypointSymbol.sector,
-        x: 0,
-        y: 0,
-        type: SystemType.RED_STAR,
-      ),
+      System.test(waypointSymbol.systemSymbol),
     );
 
     final systemConnectivity = _MockSystemConnectivity();
