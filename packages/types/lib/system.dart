@@ -12,8 +12,7 @@ class SystemWaypoint {
     required this.position,
     this.orbitals = const [],
     this.orbits,
-  })  : system = symbol.system,
-        assert(
+  }) : assert(
           position.system == symbol.system,
           'Position system must match symbol system.',
         );
@@ -42,16 +41,15 @@ class SystemWaypoint {
     this.symbol, {
     this.type = WaypointType.ASTEROID,
     WaypointPosition? position,
-  })  : system = symbol.system,
-        position = position ?? WaypointPosition(0, 0, symbol.system),
+  })  : position = position ?? WaypointPosition(0, 0, symbol.system),
         orbitals = const [],
         orbits = null;
 
   /// The symbol of the waypoint.
   final WaypointSymbol symbol;
 
-  /// The symbol of the waypoint.
-  final SystemSymbol system;
+  /// The symbol of the system.
+  SystemSymbol get system => symbol.system;
 
   /// The type of the waypoint.
   final openapi.WaypointType type;
@@ -175,8 +173,7 @@ class Waypoint {
     this.traits = const [],
     this.modifiers = const [],
     this.chart,
-  })  : systemSymbol = symbol.system,
-        assert(
+  }) : assert(
           position.system == symbol.system,
           'Position system must match symbol system.',
         );
@@ -188,8 +185,7 @@ class Waypoint {
     WaypointPosition? position,
     this.type = WaypointType.ASTEROID,
     this.traits = const [],
-  })  : systemSymbol = symbol.system,
-        position = position ?? WaypointPosition(0, 0, symbol.system),
+  })  : position = position ?? WaypointPosition(0, 0, symbol.system),
         isUnderConstruction = false,
         orbitals = const [],
         orbits = null,
@@ -227,7 +223,7 @@ class Waypoint {
   final WaypointType type;
 
   /// The symbol of the system.
-  final SystemSymbol systemSymbol;
+  SystemSymbol get system => symbol.system;
 
   /// Position of the waypoint.
   final WaypointPosition position;
@@ -296,7 +292,7 @@ class Waypoint {
     return openapi.Waypoint(
       symbol: symbol.toJson(),
       type: type,
-      systemSymbol: systemSymbol.toJson(),
+      systemSymbol: symbol.systemString,
       x: position.x,
       y: position.y,
       isUnderConstruction: isUnderConstruction,
