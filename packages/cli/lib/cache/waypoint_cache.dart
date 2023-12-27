@@ -140,10 +140,10 @@ class WaypointCache {
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?
       final construction = waypoint.isUnderConstruction
-          ? await getConstruction(api, waypoint.waypointSymbol)
+          ? await getConstruction(api, waypoint.symbol)
           : null;
       await _constructionCache.updateConstruction(
-        waypoint.waypointSymbol,
+        waypoint.symbol,
         construction,
       );
     }

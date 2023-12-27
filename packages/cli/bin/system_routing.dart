@@ -49,8 +49,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final waypoint in waypoints) {
     final routePlan = routePlanner.planRoute(
       ship.shipSpec,
-      start: shipyard.waypointSymbol,
-      end: waypoint.waypointSymbol,
+      start: shipyard.symbol,
+      end: waypoint.symbol,
     );
     final duration = routePlan?.duration;
     final durationString =

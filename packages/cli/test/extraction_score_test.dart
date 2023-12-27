@@ -59,11 +59,11 @@ void main() {
     );
     when(() => systemsCache.waypointsInSystem(systemSymbol))
         .thenReturn(waypoints.map((e) => e.toSystemWaypoint()).toList());
-    when(() => systemsCache.waypoint(source.waypointSymbol))
+    when(() => systemsCache.waypoint(source.symbol))
         .thenReturn(source.toSystemWaypoint());
-    when(() => systemsCache.waypoint(marketA.waypointSymbol))
+    when(() => systemsCache.waypoint(marketA.symbol))
         .thenReturn(marketA.toSystemWaypoint());
-    when(() => systemsCache.waypoint(marketB.waypointSymbol))
+    when(() => systemsCache.waypoint(marketB.symbol))
         .thenReturn(marketB.toSystemWaypoint());
     final producedGoods = {
       TradeSymbol.IRON_ORE,
@@ -73,9 +73,9 @@ void main() {
       TradeSymbol.SILICON_CRYSTALS,
       TradeSymbol.QUARTZ_SAND,
     };
-    when(() => marketListingCache[marketA.waypointSymbol]).thenReturn(
+    when(() => marketListingCache[marketA.symbol]).thenReturn(
       MarketListing(
-        waypointSymbol: marketA.waypointSymbol,
+        waypointSymbol: marketA.symbol,
         imports: const {
           TradeSymbol.IRON_ORE,
           TradeSymbol.COPPER_ORE,
@@ -83,9 +83,9 @@ void main() {
         },
       ),
     );
-    when(() => marketListingCache[marketB.waypointSymbol]).thenReturn(
+    when(() => marketListingCache[marketB.symbol]).thenReturn(
       MarketListing(
-        waypointSymbol: marketB.waypointSymbol,
+        waypointSymbol: marketB.symbol,
         imports: const {
           TradeSymbol.ICE_WATER,
           TradeSymbol.SILICON_CRYSTALS,
@@ -135,9 +135,9 @@ void main() {
     );
     when(() => systemsCache.waypointsInSystem(systemSymbol))
         .thenReturn(waypoints.map((e) => e.toSystemWaypoint()).toList());
-    when(() => systemsCache.waypoint(source.waypointSymbol))
+    when(() => systemsCache.waypoint(source.symbol))
         .thenReturn(source.toSystemWaypoint());
-    when(() => systemsCache.waypoint(market.waypointSymbol))
+    when(() => systemsCache.waypoint(market.symbol))
         .thenReturn(market.toSystemWaypoint());
 
     final producedGoods = {
@@ -145,9 +145,9 @@ void main() {
       TradeSymbol.LIQUID_HYDROGEN,
       TradeSymbol.LIQUID_NITROGEN,
     };
-    when(() => marketListingCache[market.waypointSymbol]).thenReturn(
+    when(() => marketListingCache[market.symbol]).thenReturn(
       MarketListing(
-        waypointSymbol: market.waypointSymbol,
+        waypointSymbol: market.symbol,
         imports: producedGoods,
       ),
     );

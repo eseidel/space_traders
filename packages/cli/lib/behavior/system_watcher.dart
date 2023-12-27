@@ -71,7 +71,7 @@ bool _isMissingRecentMarketData(
 }) {
   return waypoint.hasMarketplace &&
       !marketPrices.hasRecentData(
-        waypoint.waypointSymbol,
+        waypoint.symbol,
         maxAge: maxAge,
       );
 }
@@ -83,7 +83,7 @@ bool _isMissingRecentShipyardData(
 }) {
   return waypoint.hasShipyard &&
       !shipyardPrices.hasRecentData(
-        waypoint.waypointSymbol,
+        waypoint.symbol,
         maxAge: maxAge,
       );
 }

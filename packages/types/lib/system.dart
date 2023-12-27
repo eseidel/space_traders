@@ -258,12 +258,6 @@ class Waypoint {
   /// True if the waypoint is under construction.
   final bool isUnderConstruction;
 
-  /// Returns the WaypointSymbol of the waypoint.
-  WaypointSymbol get waypointSymbol => symbol;
-
-  /// The system symbol of the waypoint.
-  SystemSymbol get systemSymbolObject => symbol.system;
-
   /// Converts the waypoint to a SystemWaypoint.
   SystemWaypoint toSystemWaypoint() {
     return SystemWaypoint(

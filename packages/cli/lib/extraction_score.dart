@@ -184,18 +184,18 @@ Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
     final marketForGood = findImportingMarketsForGoods(
       systemsCache,
       marketListings,
-      source.waypointSymbol,
+      source.symbol,
       expectedGoods,
     );
     final marketSymbols = marketForGood.values.toSet();
     final deliveryDistance = approximateRoundTripDistanceWithinSystem(
       systemsCache,
-      source.waypointSymbol,
+      source.symbol,
       marketSymbols,
     );
     scores.add(
       ExtractionScore(
-        source: source.waypointSymbol,
+        source: source.symbol,
         sourceType: source.type,
         sourceTraits: sourceTraitSymbols,
         marketForGood: marketForGood,

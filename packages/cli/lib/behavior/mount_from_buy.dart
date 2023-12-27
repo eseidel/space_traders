@@ -54,7 +54,7 @@ Future<MountRequest?> mountRequestForShip(
     shipSymbol: ship.shipSymbol,
     mountSymbol: mountSymbol,
     marketSymbol: buyJob.buyLocation,
-    shipyardSymbol: shipyard.waypointSymbol,
+    shipyardSymbol: shipyard.symbol,
     creditsNeeded: creditsNeeded,
   );
 }

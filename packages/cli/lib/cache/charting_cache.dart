@@ -98,7 +98,7 @@ class ChartingCache {
       );
     }
     final chartingRecord = ChartingRecord(
-      waypointSymbol: waypoint.waypointSymbol,
+      waypointSymbol: waypoint.symbol,
       values: chartedValues,
       timestamp: getNow(),
     );
