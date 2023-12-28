@@ -65,6 +65,11 @@
   "description": "A valuable ore used in the production of copper and other alloys. Copper ore is an essential component in the production of electronic components and wiring."
  },
  {
+  "symbol": "CYBER_IMPLANTS",
+  "name": "Cyber Implants",
+  "description": "Advanced implants that augment the human body with cybernetic enhancements, such as enhanced strength, speed, or intelligence."
+ },
+ {
   "symbol": "DIAMONDS",
   "name": "Diamonds",
   "description": "Rare and valuable crystals used in the production of high-end jewelry and other luxury goods."
@@ -308,6 +313,11 @@
   "symbol": "MOUNT_GAS_SIPHON_II",
   "name": "Gas Siphon II",
   "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies more efficiently and at a higher rate."
+ },
+ {
+  "symbol": "MOUNT_GAS_SIPHON_III",
+  "name": "Gas Siphon III",
+  "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies with even greater efficiency and at a higher rate."
  },
  {
   "symbol": "MOUNT_LASER_CANNON_I",
