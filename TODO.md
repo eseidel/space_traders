@@ -1034,6 +1034,14 @@ Right now it takes a long time to get back to the end of the queue.
 
 ### Figure out why the probes are getting stuck and unstick them.
 
+🛸#4B ✈️  to CF13-B39X, 0ms left
+🛸#4B 🗺️  CF13-B39X - ASTEROID - Common Metal Deposits, Deep Craters
+🛸#4B Charted reachable systems within 5 jumps, charting asteroids in X1-CF13.
+[WARN] 🛸#4B (charter) took 2s (0 requests) expected 0.0s
+🛸#4B CF13-E40D (ASTEROID) is missing chart, routing.
+🛸#4B Beginning route to CF13-E40D (2m)
+🛸#4B 🛫 to CF13-E40D ASTEROID (2m)
+
 ### Charters are too slow.
 
 🛸#36 Charted reachable systems within 5 jumps, charting asteroids in X1-TM24.
