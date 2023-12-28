@@ -56,11 +56,32 @@ class WaypointCache {
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
   }) async {
-    final values = await _chartingCache.chartedValues(waypointSymbol);
-    if (values == null) {
+    final record =
+        await _chartingCache.chartingRecord(waypointSymbol, maxAge: maxAge);
+    if (record == null) {
       return null;
     }
+    final isUnderConstruction = await _constructionCache.isUnderConstruction(
+      waypointSymbol,
+      maxAge: maxAge,
+    );
+    if (isUnderConstruction == null) {
+      return null;
+    }
+
     final systemWaypoint = _systemsCache.waypoint(waypointSymbol);
+    final values = record.values;
+    if (values == null) {
+      // Uncharted case.
+      return Waypoint(
+        symbol: systemWaypoint.symbol,
+        type: systemWaypoint.type,
+        position: systemWaypoint.position,
+        orbitals: systemWaypoint.orbitals,
+        isUnderConstruction: isUnderConstruction,
+      );
+    }
+
     final traits = <WaypointTrait>[];
     for (final traitSymbol in values.traitSymbols) {
       final trait = _waypointTraits[traitSymbol];
@@ -69,15 +90,6 @@ class WaypointCache {
         return null;
       }
       traits.add(trait);
-    }
-
-    final isUnderConstruction = await _constructionCache.isUnderConstruction(
-      waypointSymbol,
-      maxAge: maxAge,
-    );
-    if (isUnderConstruction == null) {
-      logger.warn('Construction cache missing construction: $waypointSymbol');
-      return null;
     }
 
     return Waypoint(
@@ -135,7 +147,7 @@ class WaypointCache {
   }
 
   Future<void> _addWaypointsToCaches(Api api, List<Waypoint> waypoints) async {
-    _chartingCache.addWaypoints(waypoints);
+    await _chartingCache.addWaypoints(waypoints);
     _waypointTraits.addAll(waypoints.expand((w) => w.traits));
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?

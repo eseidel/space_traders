@@ -82,7 +82,6 @@ class ChartingCache {
   ///     waypointTraits.addAll(waypoint.traits);
   Future<void> addWaypoint(
     Waypoint waypoint, {
-    bool shouldSave = true,
     DateTime Function() getNow = defaultGetNow,
   }) async {
     final chart = waypoint.chart;
@@ -105,9 +104,9 @@ class ChartingCache {
   }
 
   /// Adds a list of waypoints to the cache.
-  void addWaypoints(Iterable<Waypoint> waypoints) {
+  Future<void> addWaypoints(Iterable<Waypoint> waypoints) async {
     for (final waypoint in waypoints) {
-      addWaypoint(waypoint, shouldSave: false);
+      await addWaypoint(waypoint);
     }
   }
 }

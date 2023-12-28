@@ -38,14 +38,15 @@ Query upsertChartingRecordQuery(ChartingRecord record) {
 
 /// Get a ChartingRecord from the database.
 Query getChartingRecordQuery(WaypointSymbol waypointSymbol, Duration maxAge) {
+  // Get all records which *either* are charted *or* are uncharted but
+  // younger than maxAge.  Once something is charted it never changes.
   return Query(
     'SELECT * FROM charting_ '
-    'WHERE waypoint_symbol = @waypoint_symbol ',
-    // TODO(eseidel): Add back in timestamp filtering.
-    // 'AND timestamp > @timestamp',
+    'WHERE waypoint_symbol = @waypoint_symbol '
+    'AND (values IS NOT NULL OR timestamp > @max_age) ',
     substitutionValues: {
       'waypoint_symbol': waypointSymbol.toJson(),
-      // 'timestamp': DateTime.timestamp().subtract(maxAge),
+      'max_age': DateTime.now().subtract(maxAge),
     },
   );
 }
