@@ -1,4 +1,3 @@
-import 'package:cli/cache/json_store.dart';
 import 'package:cli/cli.dart';
 import 'package:db/chart.dart';
 
@@ -111,48 +110,4 @@ class ChartingCache {
       addWaypoint(waypoint, shouldSave: false);
     }
   }
-}
-
-typedef _Record = Map<WaypointSymbol, ChartingRecord>;
-
-/// A cached of charted values from Waypoints.
-class OldChartingCache extends JsonStore<_Record> {
-  /// Creates a new charting cache.
-  OldChartingCache(
-    super.valuesBySymbol, {
-    required super.fs,
-    super.path = defaultCacheFilePath,
-  }) : super(
-          recordToJson: (_Record r) => r.map(
-            (key, value) => MapEntry(
-              key.toJson(),
-              value.toJson(),
-            ),
-          ),
-        );
-
-  /// Load the charted values from the cache.
-  factory OldChartingCache.load(
-    FileSystem fs, {
-    String path = defaultCacheFilePath,
-  }) {
-    final valuesBySymbol = JsonStore.loadRecord<_Record>(
-          fs,
-          path,
-          (Map<String, dynamic> j) => j.map(
-            (key, value) => MapEntry(
-              WaypointSymbol.fromJson(key),
-              ChartingRecord.fromJson(value as Map<String, dynamic>),
-            ),
-          ),
-        ) ??
-        {};
-    return OldChartingCache(valuesBySymbol, fs: fs, path: path);
-  }
-
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/charts.json';
-
-  /// The charting records.
-  Iterable<ChartingRecord> get records => record.values;
 }
