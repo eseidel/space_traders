@@ -3,7 +3,7 @@ import 'package:types/types.dart';
 /// Class for holding our hard-coded configuration values.
 class Config {
   /// Whether or not we should enable the idle queue.
-  final bool serviceIdleQueue = false;
+  final bool serviceIdleQueue = true;
 
   /// The number of requests per second allowed by the api.
   /// Version 2.1 allows:
