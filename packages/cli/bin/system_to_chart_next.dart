@@ -5,6 +5,15 @@ import 'package:cli/ships.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
+
+  final WaypointSymbol startSymbol;
+  if (argResults.rest.isNotEmpty) {
+    startSymbol = WaypointSymbol.fromString(argResults.rest.first);
+  } else {
+    final agentCache = AgentCache.load(fs)!;
+    startSymbol = agentCache.headquartersSymbol;
+  }
+
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final charting = ChartingCache(db);
@@ -15,8 +24,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     construction,
     staticCaches.waypointTraits,
   );
-  final agentCache = AgentCache.load(fs)!;
-  final hqSymbol = agentCache.headquartersSymbol;
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
@@ -29,7 +36,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     behaviorCache: behaviorCache,
   );
 
-  final origin = systemsCache.waypoint(hqSymbol);
+  final origin = systemsCache.waypoint(startSymbol);
   final ship = staticCaches.shipyardShips.shipForTest(
     ShipType.PROBE,
     origin: origin,
