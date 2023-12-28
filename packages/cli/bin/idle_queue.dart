@@ -10,7 +10,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final systemSymbol = caches.agent.headquartersSystemSymbol;
   final queue = IdleQueue()..queueSystem(systemSymbol, jumpDistance: 0);
+  const printEvery = 100;
+  var count = 0;
   while (!queue.isDone) {
+    if (count++ % printEvery == 0) {
+      logger.info('$queue');
+    }
     await queue.runOne(api, caches);
   }
 
