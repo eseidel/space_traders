@@ -51,6 +51,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // final marketPrices = MarketPrices.load(fs);
   final shipCache = ShipCache.load(fs)!;
 
+  logger.info('${systemWatcherStates.length} watchers assigned:');
   for (final state in systemWatcherStates) {
     final shipSymbol = state.shipSymbol;
     final assignedSystem = state.systemWatcherJob?.systemSymbol;
@@ -68,6 +69,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
   }
 
+  logger.info('\n${systemsToWatch.length} systems with at least 5 markets:');
   for (final systemSymbol in systemsToWatch) {
     final shipsAssigned = systemWatcherStates
         .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)

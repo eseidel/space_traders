@@ -1,7 +1,7 @@
 import 'package:cli/cache/json_list_store.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
-import 'package:db/config.dart';
 import 'package:meta/meta.dart';
 import 'package:types/price.dart';
 import 'package:types/types.dart';

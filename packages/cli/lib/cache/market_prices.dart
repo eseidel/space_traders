@@ -3,10 +3,8 @@ import 'dart:math';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/prices_cache.dart';
-import 'package:cli/logger.dart';
-import 'package:db/db.dart';
-import 'package:file/file.dart';
-import 'package:types/types.dart';
+import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 
 double _expectedPercentageChangeByVolume(int tradeVolume) {
   if (tradeVolume < 10) {

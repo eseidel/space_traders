@@ -1,9 +1,5 @@
 import 'package:meta/meta.dart';
 
-/// The default max age for our caches is 3 days.
-/// This is used as a default argument and must be const.
-const defaultMaxAge = Duration(days: 3);
-
 /// Connection information for the database.
 /// This is split off from Database to allow Database to re-connect
 /// if needed.
@@ -34,6 +30,7 @@ class DatabaseConfig {
   final String password;
 }
 
+// TODO(eseidel): Move this up to cli/config.dart.
 /// Default database config for connecting to a local postgres database.
 const DatabaseConfig defaultDatabaseConfig = DatabaseConfig(
   host: 'localhost',

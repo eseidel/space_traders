@@ -1,7 +1,6 @@
-import 'package:cli/cache/caches.dart';
+import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:collection/collection.dart';
-import 'package:db/db.dart';
-import 'package:types/types.dart';
 
 /// Static view onto the ConstructionCache.
 class ConstructionSnapshot {
@@ -58,10 +57,57 @@ class ConstructionSnapshot {
   }
 }
 
-/// Helper for constructing a ConstructionSnapshot.
-extension ConstructionCacheSnapshot on ConstructionCache {
-  /// Creates a new ConstructionSnapshot.
+// Maybe this should be in db?
+/// A cached of construction values from Waypoints.
+class ConstructionCache {
+  /// Creates a new construction cache.
+  ConstructionCache(Database db) : _db = db;
+
+  /// Connection to the database.
+  final Database _db;
+
+  /// Load all ConstructionRecords from the database, regardless of age.
+  Future<Iterable<ConstructionRecord>> allRecords() async =>
+      _db.allConstructionRecords();
+
+  /// Creates a new ConstructionSnapshot from all records, regardless of age.
   Future<ConstructionSnapshot> snapshot() async {
     return ConstructionSnapshot(await allRecords());
+  }
+
+  /// Load a ConstructionRecord from the database.
+  Future<ConstructionRecord?> getRecord(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async =>
+      _db.getConstruction(waypointSymbol, maxAge);
+
+  /// Load the Construction value for the given waypoint symbol.
+  Future<Construction?> getConstruction(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async =>
+      (await getRecord(waypointSymbol, maxAge: maxAge))?.construction;
+
+  /// Returns true if the given waypoint symbol is under construction.
+  /// Returns false if the given waypoint symbol is not under construction.
+  /// Returns null if the given waypoint symbol is not in the cache.
+  Future<bool?> isUnderConstruction(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async =>
+      (await getRecord(waypointSymbol, maxAge: maxAge))?.isUnderConstruction;
+
+  /// Update the construction value for the given waypoint symbol.
+  Future<void> updateConstruction(
+    WaypointSymbol waypointSymbol,
+    Construction? construction,
+  ) async {
+    final record = ConstructionRecord(
+      construction: construction,
+      timestamp: DateTime.timestamp(),
+      waypointSymbol: waypointSymbol,
+    );
+    await _db.upsertConstruction(record);
   }
 }

@@ -1,5 +1,9 @@
 import 'package:types/types.dart';
 
+/// The default max age for our caches is 3 days.
+/// This is used as a default argument and must be const.
+const defaultMaxAge = Duration(days: 3);
+
 /// Class for holding our hard-coded configuration values.
 class Config {
   /// Whether or not we should enable the idle queue.

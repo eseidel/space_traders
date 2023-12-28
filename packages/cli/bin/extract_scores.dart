@@ -1,5 +1,6 @@
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
+import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/static_cache.dart';
@@ -10,7 +11,6 @@ import 'package:cli/config.dart';
 import 'package:cli/extraction_score.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
-import 'package:db/construction.dart';
 
 /// Given a set of trade symbols, compute the percentage sell price
 /// across the set.

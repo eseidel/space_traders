@@ -17,7 +17,6 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/queries.dart';
-import 'package:db/construction.dart';
 import 'package:db/db.dart';
 import 'package:file/file.dart';
 import 'package:http/http.dart' as http;

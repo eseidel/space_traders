@@ -1,8 +1,8 @@
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
-import 'package:db/config.dart';
 import 'package:types/types.dart';
 
 /// Stores Waypoint objects fetched recently from the API.

@@ -1309,7 +1309,10 @@ void main() {
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
-    when(() => caches.construction.getConstruction(end)).thenAnswer(
+    when(
+      () => caches.construction
+          .getConstruction(end, maxAge: any(named: 'maxAge')),
+    ).thenAnswer(
       (_) async => Construction(
         symbol: end.waypoint,
         materials: [

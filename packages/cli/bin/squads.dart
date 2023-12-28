@@ -1,5 +1,6 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/charting_cache.dart';
+import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/static_cache.dart';
@@ -7,7 +8,6 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';
-import 'package:db/construction.dart';
 
 String describeJob(ExtractionJob job) {
   final action = job.extractionType.name;
