@@ -155,6 +155,11 @@
   "description": "A valuable ore used in the production of gold and other precious metals. Gold ore is often used in the production of jewelry, coins, and other decorative items, as well as in the production of electronics and other high-tech applications."
  },
  {
+  "symbol": "GRAVITON_EMITTERS",
+  "name": "Graviton Emitters",
+  "description": "Advanced devices that generate and manipulate gravitons, used in advanced propulsion and weapons systems."
+ },
+ {
   "symbol": "HOLOGRAPHICS",
   "name": "Holographics",
   "description": "Advanced technology that allows for the creation of three-dimensional images using light and other electromagnetic fields."
