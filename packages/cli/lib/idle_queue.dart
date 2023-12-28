@@ -30,6 +30,9 @@ class NonRepeatingQueue<T> {
     return item;
   }
 
+  /// The first item in the queue.
+  T get first => _items.first;
+
   /// How many items are in the queue.
   int get length => _items.length;
 
@@ -124,21 +127,22 @@ class IdleQueue {
 
       // Can only fetch jump gates for waypoints which are charted or have
       // a ship there.
-      if (waypoint.isJumpGate &&
-          (await caches.waypoints.isCharted(waypointSymbol))) {
-        final fromRecord =
-            await caches.jumpGates.getOrFetch(api, waypoint.symbol);
-        final from = fromRecord.waypointSymbol;
-        if (!await canJumpFromAsync(
-          caches.jumpGates,
-          caches.construction,
-          from,
-        )) {
-          continue;
+      if (waypoint.isJumpGate) {
+        if (await caches.waypoints.isCharted(waypointSymbol)) {
+          final fromRecord =
+              await caches.jumpGates.getOrFetch(api, waypoint.symbol);
+          final from = fromRecord.waypointSymbol;
+          if (!await canJumpFromAsync(
+            caches.jumpGates,
+            caches.construction,
+            from,
+          )) {
+            continue;
+          }
+          // Queue each jumpGate as it might fetch construction data which could
+          // total to many requests for a single processNextSystem call.
+          queueJumpGateConnections(fromRecord, jumpDistance: jumpDistance);
         }
-        // Queue each jumpGate as it might fetch construction data which could
-        // total to many requests for a single processNextSystem call.
-        queueJumpGateConnections(fromRecord, jumpDistance: jumpDistance);
       }
     }
   }
@@ -172,9 +176,15 @@ class IdleQueue {
 
   @override
   String toString() {
+    final nextPriority = _systems.isNotEmpty
+        ? _systems.first.$2
+        : _jumpGates.isNotEmpty
+            ? _jumpGates.first.$2
+            : null;
+
     return 'IdleQueue('
         'systems: ${_systems.length} queued, ${_systems.seenLength} seen; '
         'jumpGates: ${_jumpGates.length} queued, '
-        '${_jumpGates.seenLength} seen)';
+        '${_jumpGates.seenLength} seen, next priorty: $nextPriority)';
   }
 }
