@@ -1068,3 +1068,32 @@ Right now it takes a long time to get back to the end of the queue.
 ### canJump should always use a cached version?
 
 ## IdleQueue is fetching too many waypoints.
+
+### Scanning Shipyards repeatedly for some reason?
+
+86ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/market
+89ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
+93ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
+272ms 0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
+99ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
+96ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/market
+118ms 0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
+112ms 0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
+
+🛸#2B ✍️  shipyard data @ X1-FV72-C41
+[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
+[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 2d and resuming.
+🛸#2B ✍️  shipyard data @ X1-FV72-C41
+[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
+[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 18h and resuming.
+🛸#2B ✍️  shipyard data @ X1-FV72-C41
+[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
+[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 9h and resuming.
+🛸#2B ✍️  shipyard data @ X1-FV72-C41
+[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
+[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 5h and resuming.
+🛸#2B ✍️  market data @ FV72-C41
+🛸#2B ✍️  shipyard data @ X1-FV72-C41
+🛸#2B ✍️  shipyard data @ X1-FV72-C41
+
+### Remove TradeGoodCache from MarketListingCache.
