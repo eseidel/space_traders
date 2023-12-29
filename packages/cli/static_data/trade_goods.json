@@ -260,6 +260,11 @@
   "description": "An expanded cargo hold module that provides more efficient storage space for a ship's cargo."
  },
  {
+  "symbol": "MODULE_CARGO_HOLD_III",
+  "name": "Advanced Cargo Hold",
+  "description": "A large cargo hold module with advanced robotics that provides more efficient storage space for a ship's cargo."
+ },
+ {
   "symbol": "MODULE_CREW_QUARTERS_I",
   "name": "Crew Quarters",
   "description": "A module that provides living space and amenities for the crew."
