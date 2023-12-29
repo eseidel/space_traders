@@ -39,6 +39,10 @@ void logShip(
   }
 }
 
+String plural(int count, String singular, [String plural = 's']) {
+  return '$count ${count == 1 ? singular : singular + plural}';
+}
+
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final tradeGoodCache = TradeGoodCache.load(fs);
   final marketListingCache = MarketListingCache.load(fs, tradeGoodCache);
@@ -51,13 +55,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // final marketPrices = MarketPrices.load(fs);
   final shipCache = ShipCache.load(fs)!;
 
-  logger.info('${systemWatcherStates.length} watchers assigned:');
+  logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');
   for (final state in systemWatcherStates) {
     final shipSymbol = state.shipSymbol;
-    final assignedSystem = state.systemWatcherJob?.systemSymbol;
+    final assignedSystemName =
+        state.systemWatcherJob?.systemSymbol.systemName.padRight(4);
     final ship = shipCache[shipSymbol];
     final navString = describeShipNav(ship.nav);
-    logger.info('${ship.emojiName} assigned to $assignedSystem, $navString');
+    logger
+        .info('${ship.emojiName} assigned to $assignedSystemName, $navString');
 
     final routePlan = state.routePlan;
     if (routePlan != null) {
@@ -69,14 +75,18 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
   }
 
-  logger.info('\n${systemsToWatch.length} systems with at least 5 markets:');
+  logger.info(
+    '\n${plural(systemsToWatch.length, 'system')} '
+    'with at least 5 markets:',
+  );
   for (final systemSymbol in systemsToWatch) {
     final shipsAssigned = systemWatcherStates
         .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)
         .map((s) => s.shipSymbol)
         .toList();
     logger.info(
-      'system $systemSymbol has ${shipsAssigned.length} watchers assigned',
+      '${systemSymbol.systemName.padRight(4)} has '
+      '${plural(shipsAssigned.length, 'watcher')}',
     );
   }
 }

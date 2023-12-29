@@ -13,44 +13,44 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
 
-  final systems = NonRepeatingQueue<SystemSymbol>();
-  final jumpGates = NonRepeatingQueue<WaypointSymbol>();
+  final systems = NonRepeatingDistanceQueue<SystemSymbol>();
+  final jumpGates = NonRepeatingDistanceQueue<WaypointSymbol>();
   final needsJumpgateFetch = <WaypointSymbol>{};
   final needsChart = <WaypointSymbol>{};
   final needsConstructionCheck = <WaypointSymbol>{};
-  systems.queue(systemSymbol);
+  systems.queue(systemSymbol, 0);
 
   while (systems.isNotEmpty || jumpGates.isNotEmpty) {
     if (jumpGates.isNotEmpty) {
       final from = jumpGates.take();
-      final fromRecord = jumpGateCache.recordForSymbol(from);
+      final fromRecord = jumpGateCache.recordForSymbol(from.value);
       if (fromRecord == null) {
-        final chartingRecord = chartingSnapshot.getRecord(from);
+        final chartingRecord = chartingSnapshot.getRecord(from.value);
         if (chartingRecord == null) {
-          needsChart.add(from);
+          needsChart.add(from.value);
         } else if (chartingRecord.isCharted) {
-          needsJumpgateFetch.add(from);
+          needsJumpgateFetch.add(from.value);
         }
         continue;
       }
-      if (!canJumpFrom(jumpGateCache, constructionSnapshot, from)) {
+      if (!canJumpFrom(jumpGateCache, constructionSnapshot, from.value)) {
         continue;
       }
       for (final to in fromRecord.connections) {
         if (!constructionSnapshot.hasRecentData(to)) {
           needsConstructionCheck.add(to);
         } else {
-          jumpGates.queue(to);
+          jumpGates.queue(to, from.jumpDistance + 1);
         }
       }
       continue;
     }
     if (systems.isNotEmpty) {
       final system = systems.take();
-      final systemRecord = systemsCache[system];
+      final systemRecord = systemsCache[system.value];
       for (final waypoint in systemRecord.waypoints) {
         if (waypoint.isJumpGate) {
-          jumpGates.queue(waypoint.symbol);
+          jumpGates.queue(waypoint.symbol, system.jumpDistance);
         }
       }
     }

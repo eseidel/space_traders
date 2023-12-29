@@ -4,46 +4,65 @@ import 'package:cli/config.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
 
+/// Wrapper for a value to add jumpDistance.
+class WithDistance<T> {
+  /// Create a new wrapper.
+  WithDistance(this.value, this.jumpDistance);
+
+  /// The value.
+  final T value;
+
+  /// The jumpDistance.
+  final int jumpDistance;
+
+  @override
+  String toString() => 'WithDistance($value, $jumpDistance)';
+}
+
 /// A queue which does not allow items to be queued more than once.
-class NonRepeatingQueue<T> {
+/// Uses WithDistance to track the jumpDistance of each item.
+/// Items are sorted by jumpDistance.
+class NonRepeatingDistanceQueue<T> {
   /// Create a new queue.
-  NonRepeatingQueue([int Function(T, T)? comparison])
-      : _items = PriorityQueue(comparison),
+  NonRepeatingDistanceQueue()
+      : _queue =
+            PriorityQueue((a, b) => a.jumpDistance.compareTo(b.jumpDistance)),
         _seen = {};
 
-  final PriorityQueue<T> _items;
+  final PriorityQueue<WithDistance<T>> _queue;
   final Set<T> _seen;
 
   /// Add an item to the queue.
-  bool queue(T item) {
-    if (_seen.contains(item) || _items.contains(item)) {
+  bool queue(T item, int jumpDistance) {
+    if (_seen.contains(item)) {
       return false;
     }
-    _items.add(item);
+    // This can end up queuing the same item multiple times, but that's ok.
+    _queue.add(WithDistance(item, jumpDistance));
     return true;
   }
 
   /// Take the next item from the queue.
-  T take() {
-    final item = _items.removeFirst();
-    _seen.add(item);
+  WithDistance<T> take() {
+    final item = _queue.removeFirst();
+    _seen.add(item.value);
     return item;
   }
 
   /// The first item in the queue.
-  T get first => _items.first;
+  WithDistance<T> get first => _queue.first;
 
   /// How many items are in the queue.
-  int get length => _items.length;
+  int get length => _queue.length;
 
   /// How many items have been seen.
   int get seenLength => _seen.length;
 
   /// Returns true when the queue is not empty.
-  bool get isNotEmpty => _items.isNotEmpty;
+  bool get isNotEmpty => _queue.isNotEmpty;
 
   /// Returns true when the queue is empty.
-  bool get isEmpty => _items.isEmpty;
+  bool get isEmpty => _queue.isEmpty;
 }
 
 /// A queue for fetching system information.
@@ -51,16 +70,14 @@ class IdleQueue {
   /// Create a new fetch queue.
   IdleQueue();
 
-  final NonRepeatingQueue<(SystemSymbol, int)> _systems = NonRepeatingQueue(
-    (a, b) => a.$2.compareTo(b.$2),
-  );
-  final NonRepeatingQueue<(WaypointSymbol, int)> _jumpGates = NonRepeatingQueue(
-    (a, b) => a.$2.compareTo(b.$2),
-  );
+  final NonRepeatingDistanceQueue<SystemSymbol> _systems =
+      NonRepeatingDistanceQueue();
+  final NonRepeatingDistanceQueue<WaypointSymbol> _jumpGates =
+      NonRepeatingDistanceQueue();
 
   /// Queue a system for fetching.
   void queueSystem(SystemSymbol systemSymbol, {required int jumpDistance}) {
-    final queued = _systems.queue((systemSymbol, jumpDistance));
+    final queued = _systems.queue(systemSymbol, jumpDistance);
     if (queued) {
       logger.detail('Queued System (${_systems.length}): '
           '$systemSymbol ($jumpDistance)');
@@ -83,7 +100,7 @@ class IdleQueue {
     WaypointSymbol waypointSymbol, {
     required int jumpDistance,
   }) {
-    final queued = _jumpGates.queue((waypointSymbol, jumpDistance));
+    final queued = _jumpGates.queue(waypointSymbol, jumpDistance);
     if (queued) {
       logger.detail('Queued JumpGate (${_jumpGates.length}): '
           '$waypointSymbol ($jumpDistance)');
@@ -91,7 +108,9 @@ class IdleQueue {
   }
 
   Future<void> _processNextJumpGate(Api api, Caches caches) async {
-    final (to, jumpDistance) = _jumpGates.take();
+    final record = _jumpGates.take();
+    final to = record.value;
+    final jumpDistance = record.jumpDistance;
     logger.detail('Process (${_jumpGates.length}): $to ($jumpDistance)');
     // Make sure we have construction data for the destination before
     // checking if we can jump there.
@@ -103,7 +122,9 @@ class IdleQueue {
   }
 
   Future<void> _processNextSystem(Api api, Caches caches) async {
-    final (systemSymbol, jumpDistance) = _systems.take();
+    final systemRecord = _systems.take();
+    final systemSymbol = systemRecord.value;
+    final jumpDistance = systemRecord.jumpDistance;
     logger
         .detail('Process (${_systems.length}): $systemSymbol ($jumpDistance)');
     final waypoints = caches.systems.waypointsInSystem(systemSymbol);
@@ -176,15 +197,15 @@ class IdleQueue {
 
   @override
   String toString() {
-    final nextPriority = _systems.isNotEmpty
-        ? _systems.first.$2
+    final nextJumpDistance = _systems.isNotEmpty
+        ? _systems.first.jumpDistance
         : _jumpGates.isNotEmpty
-            ? _jumpGates.first.$2
+            ? _jumpGates.first.jumpDistance
             : null;
 
     return 'IdleQueue('
         'systems: ${_systems.length} queued, ${_systems.seenLength} seen; '
         'jumpGates: ${_jumpGates.length} queued, '
-        '${_jumpGates.seenLength} seen, next priorty: $nextPriority)';
+        '${_jumpGates.seenLength} seen, next jump distance: $nextJumpDistance)';
   }
 }
