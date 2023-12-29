@@ -1173,6 +1173,19 @@ void main() {
       ),
     );
 
+    when(
+      () => contractsApi.acceptContract(any()),
+    ).thenAnswer(
+      (invocation) => Future.value(
+        AcceptContract200Response(
+          data: AcceptContract200ResponseData(
+            contract: contract,
+            agent: _MockAgent(),
+          ),
+        ),
+      ),
+    );
+
     final agent = _MockAgent();
     when(() => caches.agent.agent).thenReturn(agent);
     when(() => agent.credits).thenReturn(1000000);

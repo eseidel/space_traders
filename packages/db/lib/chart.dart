@@ -66,6 +66,19 @@ class ChartedValues {
     required this.traitSymbols,
   });
 
+  /// Creates a new charted values for testing.
+  @visibleForTesting
+  factory ChartedValues.test({
+    WaypointFaction? faction,
+    Set<WaypointTraitSymbol>? traitSymbols,
+    Chart? chart,
+  }) =>
+      ChartedValues(
+        faction: faction,
+        traitSymbols: traitSymbols ?? {},
+        chart: chart ?? Chart(),
+      );
+
   /// Creates a new charted values from JSON data.
   factory ChartedValues.fromJson(Map<String, dynamic> json) {
     final faction =

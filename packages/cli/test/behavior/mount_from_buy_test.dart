@@ -127,6 +127,12 @@ void main() {
         maxAge: any(named: 'maxAge'),
       ),
     ).thenReturn(true);
+    when(
+      () => caches.shipyardPrices.hasRecentData(
+        waypointSymbol,
+        maxAge: any(named: 'maxAge'),
+      ),
+    ).thenReturn(true);
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))
         .thenAnswer((_) async => true);

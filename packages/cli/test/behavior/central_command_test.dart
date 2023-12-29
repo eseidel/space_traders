@@ -512,22 +512,7 @@ void main() {
     final hqSystemSymbol = hqSymbol.system;
     when(() => caches.agent.headquartersSystemSymbol)
         .thenReturn(hqSystemSymbol);
-    when(() => caches.waypoints.waypointsInSystem(hqSystemSymbol)).thenAnswer(
-      (_) => Future.value([
-        Waypoint.test(
-          hqSymbol,
-          type: WaypointType.PLANET,
-          position: WaypointPosition(0, 0, hqSystemSymbol),
-          traits: [
-            WaypointTrait(
-              symbol: WaypointTraitSymbol.SHIPYARD,
-              name: 'name',
-              description: 'description',
-            ),
-          ],
-        ),
-      ]),
-    );
+    when(() => caches.systems.waypointsInSystem(hqSystemSymbol)).thenReturn([]);
     when(() => caches.shipyardPrices.prices).thenReturn([]);
     when(() => caches.shipyardPrices.pricesFor(ShipType.ORE_HOUND))
         .thenReturn([]);

@@ -41,6 +41,9 @@ void main() {
     registerFallbackValue(waypointSymbol);
     when(() => chartingCache.chartedValues(any()))
         .thenAnswer((_) async => null);
+    when(() => chartingCache.chartingRecord(any()))
+        .thenAnswer((_) async => null);
+    when(() => chartingCache.addWaypoints(any())).thenAnswer((_) async {});
     final constructionCache = _MockConstructionCache();
     when(
       () => constructionCache.updateConstruction(waypointSymbol, null),

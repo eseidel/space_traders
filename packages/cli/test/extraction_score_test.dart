@@ -3,6 +3,7 @@ import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/extraction_score.dart';
+import 'package:db/chart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -18,57 +19,27 @@ class _MockChartingCache extends Mock implements ChartingCache {}
 void main() {
   test('evaluateWaypointsForMining', () async {
     final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
     final chartingCache = _MockChartingCache();
     final marketListingCache = _MockMarketListingCache();
     final systemSymbol = SystemSymbol.fromString('W-A');
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
-    final source = Waypoint.test(
-      sourceSymbol,
-      traits: [
-        WaypointTrait(
-          symbol: WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
-          name: 'name',
-          description: 'description',
-        ),
-      ],
-    );
+    final source = SystemWaypoint.test(sourceSymbol);
     final marketASymbol = WaypointSymbol.fromString('W-A-M');
-    final marketA = Waypoint.test(
+    final marketA = SystemWaypoint.test(
       marketASymbol,
-      traits: [
-        WaypointTrait(
-          symbol: WaypointTraitSymbol.MARKETPLACE,
-          name: 'name',
-          description: 'description',
-        ),
-      ],
       position: WaypointPosition(10, 0, systemSymbol),
     );
     final marketBSymbol = WaypointSymbol.fromString('W-A-N');
-    final marketB = Waypoint.test(
+    final marketB = SystemWaypoint.test(
       marketBSymbol,
-      traits: [
-        WaypointTrait(
-          symbol: WaypointTraitSymbol.MARKETPLACE,
-          name: 'name',
-          description: 'description',
-        ),
-      ],
       position: WaypointPosition(0, 20, systemSymbol),
     );
     final waypoints = [source, marketA, marketB];
-    when(() => waypointCache.waypointsInSystem(systemSymbol)).thenAnswer(
-      (_) => Future.value(waypoints),
-    );
     when(() => systemsCache.waypointsInSystem(systemSymbol))
-        .thenReturn(waypoints.map((e) => e.toSystemWaypoint()).toList());
-    when(() => systemsCache.waypoint(source.symbol))
-        .thenReturn(source.toSystemWaypoint());
-    when(() => systemsCache.waypoint(marketA.symbol))
-        .thenReturn(marketA.toSystemWaypoint());
-    when(() => systemsCache.waypoint(marketB.symbol))
-        .thenReturn(marketB.toSystemWaypoint());
+        .thenReturn(waypoints);
+    when(() => systemsCache.waypoint(source.symbol)).thenReturn(source);
+    when(() => systemsCache.waypoint(marketA.symbol)).thenReturn(marketA);
+    when(() => systemsCache.waypoint(marketB.symbol)).thenReturn(marketB);
     final producedGoods = {
       TradeSymbol.IRON_ORE,
       TradeSymbol.COPPER_ORE,
@@ -96,6 +67,19 @@ void main() {
           TradeSymbol.QUARTZ_SAND,
         },
       ),
+    );
+    when(() => chartingCache.chartedValues(sourceSymbol)).thenAnswer(
+      (_) async => ChartedValues.test(
+        traitSymbols: const {
+          WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
+        },
+      ),
+    );
+    when(() => chartingCache.chartedValues(marketASymbol)).thenAnswer(
+      (_) async => ChartedValues.test(),
+    );
+    when(() => chartingCache.chartedValues(marketBSymbol)).thenAnswer(
+      (_) async => ChartedValues.test(),
     );
 
     final scores = await evaluateWaypointsForMining(
@@ -155,6 +139,12 @@ void main() {
         waypointSymbol: market.symbol,
         imports: producedGoods,
       ),
+    );
+    when(() => chartingCache.chartedValues(sourceSymbol)).thenAnswer(
+      (_) async => ChartedValues.test(),
+    );
+    when(() => chartingCache.chartedValues(marketSymbol)).thenAnswer(
+      (_) async => ChartedValues.test(),
     );
 
     final scores = await evaluateWaypointsForSiphoning(
