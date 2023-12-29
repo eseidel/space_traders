@@ -1,3 +1,4 @@
+import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -12,10 +13,13 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockMarketListingCache extends Mock implements MarketListingCache {}
 
+class _MockChartingCache extends Mock implements ChartingCache {}
+
 void main() {
   test('evaluateWaypointsForMining', () async {
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
+    final chartingCache = _MockChartingCache();
     final marketListingCache = _MockMarketListingCache();
     final systemSymbol = SystemSymbol.fromString('W-A');
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
@@ -95,8 +99,8 @@ void main() {
     );
 
     final scores = await evaluateWaypointsForMining(
-      waypointCache,
       systemsCache,
+      chartingCache,
       marketListingCache,
       systemSymbol,
     );
@@ -110,6 +114,7 @@ void main() {
   test('evaluateWaypointsForSiphoning', () async {
     final systemsCache = _MockSystemsCache();
     final waypointCache = _MockWaypointCache();
+    final chartingCache = _MockChartingCache();
     final marketListingCache = _MockMarketListingCache();
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
@@ -153,8 +158,8 @@ void main() {
     );
 
     final scores = await evaluateWaypointsForSiphoning(
-      waypointCache,
       systemsCache,
+      chartingCache,
       marketListingCache,
       systemSymbol,
     );

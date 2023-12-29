@@ -1,11 +1,9 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';
 
@@ -35,12 +33,7 @@ ShipType? guessType(ShipyardShipCache shipyardShipCache, Ship ship) {
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final systems = await SystemsCache.loadOrFetch(fs);
-  final waypointTraits = WaypointTraitCache.load(fs);
-  // TODO(eseidel): This should not need a ChartingCache or ConstructionCache.
   final charting = ChartingCache(db);
-  final construction = ConstructionCache(db);
-  final waypointCache =
-      WaypointCache.cachedOnly(systems, charting, construction, waypointTraits);
   final shipCache = ShipCache.load(fs)!;
   final tradeGoods = TradeGoodCache.load(fs);
   final marketListings = MarketListingCache.load(fs, tradeGoods);
@@ -48,7 +41,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final squads = await assignShipsToSquads(
     systems,
-    waypointCache,
+    charting,
     marketListings,
     shipCache,
     systemSymbol: shipCache.ships.first.systemSymbol,

@@ -1,11 +1,9 @@
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 import 'package:cli/extraction_score.dart';
@@ -66,12 +64,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
 
   final systems = await SystemsCache.loadOrFetch(fs);
-  final waypointTraits = WaypointTraitCache.load(fs);
-  // TODO(eseidel): This should not need a ChartingCache or ConstructionCache.
   final charting = ChartingCache(db);
-  final construction = ConstructionCache(db);
-  final waypointCache =
-      WaypointCache.cachedOnly(systems, charting, construction, waypointTraits);
   final agentCache = AgentCache.load(fs)!;
   final hqSystem = agentCache.headquartersSystemSymbol;
   final tradeGoods = TradeGoodCache.load(fs);
@@ -81,15 +74,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final List<ExtractionScore> scores;
   if (isSiphon) {
     scores = await evaluateWaypointsForSiphoning(
-      waypointCache,
       systems,
+      charting,
       marketListings,
       hqSystem,
     );
   } else {
     scores = await evaluateWaypointsForMining(
-      waypointCache,
       systems,
+      charting,
       marketListings,
       hqSystem,
     );

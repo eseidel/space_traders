@@ -163,24 +163,30 @@ Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
 
 /// Evaluate all possible source and Market pairings.
 Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
-  WaypointCache waypointCache,
   SystemsCache systemsCache,
+  ChartingCache chartingCache,
   MarketListingCache marketListings,
   SystemSymbol systemSymbol,
-  bool Function(Waypoint) sourcePredicate,
+  bool Function(WaypointType, Set<WaypointTraitSymbol>) sourcePredicate,
   ExtractionType extractionType,
 ) async {
-  final sources = (await waypointCache.waypointsInSystem(systemSymbol))
-      .where(sourcePredicate)
-      .toList();
+  final allWaypoints = systemsCache.waypointsInSystem(systemSymbol);
+  final traitsByWaypointSymbol = <WaypointSymbol, Set<WaypointTraitSymbol>>{};
+  for (final waypoint in allWaypoints) {
+    final values = await chartingCache.chartedValues(waypoint.symbol);
+    traitsByWaypointSymbol[waypoint.symbol] = values?.traitSymbols ?? {};
+  }
+  final sources = allWaypoints.where((w) {
+    return sourcePredicate(w.type, traitsByWaypointSymbol[w.symbol]!);
+  });
   final scores = <ExtractionScore>[];
   for (final source in sources) {
+    final traits = traitsByWaypointSymbol[source.symbol]!;
     final expectedGoods = expectedGoodsForWaypoint(
       source.type,
-      source.traits.map((t) => t.symbol).toSet(),
+      traits,
       extractionType,
     );
-    final sourceTraitSymbols = source.traits.map((t) => t.symbol).toSet();
     final marketForGood = findImportingMarketsForGoods(
       systemsCache,
       marketListings,
@@ -197,7 +203,7 @@ Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
       ExtractionScore(
         source: source.symbol,
         sourceType: source.type,
-        sourceTraits: sourceTraitSymbols,
+        sourceTraits: traits,
         marketForGood: marketForGood,
         deliveryDistance: deliveryDistance,
         extractionType: extractionType,
@@ -208,36 +214,48 @@ Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
   return scores;
 }
 
+/// Returns true if the given waypoint is minable.
+bool canBeMined(WaypointType type, Set<WaypointTraitSymbol> traits) {
+  // Type is currently ignored for mining.
+  return traits.any(isMinableTrait);
+}
+
+/// Returns true if given waypoint is siphonable.
+bool canBeSiphoned(WaypointType type, Set<WaypointTraitSymbol> traits) {
+  // Traits are currently ignored for siphoning.
+  return type == WaypointType.GAS_GIANT;
+}
+
 /// Evaluate all possible source and Market pairings for mining.
 Future<List<ExtractionScore>> evaluateWaypointsForMining(
-  WaypointCache waypointCache,
   SystemsCache systemsCache,
+  ChartingCache chartingCache,
   MarketListingCache marketListings,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
-    waypointCache,
     systemsCache,
+    chartingCache,
     marketListings,
     systemSymbol,
-    (w) => w.canBeMined,
+    canBeMined,
     ExtractionType.mine,
   );
 }
 
 /// Evaluate all possible source and Market pairings for siphoning.
 Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
-  WaypointCache waypointCache,
   SystemsCache systemsCache,
+  ChartingCache chartingCache,
   MarketListingCache marketListings,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
-    waypointCache,
     systemsCache,
+    chartingCache,
     marketListings,
     systemSymbol,
-    (w) => w.canBeSiphoned,
+    canBeSiphoned,
     ExtractionType.siphon,
   );
 }

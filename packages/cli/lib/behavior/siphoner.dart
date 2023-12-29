@@ -111,8 +111,8 @@ Future<JobResult> _initSiphonJob(
 }) async {
   final siphonJob = assertNotNull(
     await centralCommand.siphonJobForShip(
-      caches.waypoints,
       caches.systems,
+      caches.charting,
       caches.marketListings,
       caches.agent,
       ship,

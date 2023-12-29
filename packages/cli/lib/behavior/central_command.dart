@@ -494,7 +494,7 @@ class CentralCommand {
 
     miningSquads = await assignShipsToSquads(
       caches.systems,
-      caches.waypoints,
+      caches.charting,
       caches.marketListings,
       _shipCache,
       systemSymbol: caches.agent.headquartersSystemSymbol,
@@ -681,15 +681,15 @@ class CentralCommand {
   /// Returns the siphon plan for the given [ship].
 // TODO(eseidel): call from or merge into getJobForShip.
   Future<ExtractionJob?> siphonJobForShip(
-    WaypointCache waypointCache,
     SystemsCache systemsCache,
+    ChartingCache chartingCache,
     MarketListingCache marketListings,
     AgentCache agentCache,
     Ship ship,
   ) async {
     final score = (await evaluateWaypointsForSiphoning(
-      waypointCache,
       systemsCache,
+      chartingCache,
       marketListings,
       agentCache.headquartersSystemSymbol,
     ))
@@ -858,16 +858,15 @@ ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
 /// Compute what our current mining squads should be.
 Future<List<ExtractionSquad>> assignShipsToSquads(
   SystemsCache systemsCache,
-  // TODO(eseidel): This should not need a WaypointCache.
-  WaypointCache waypointCache,
+  ChartingCache chartingCache,
   MarketListingCache marketListings,
   ShipCache shipCache, {
   required SystemSymbol systemSymbol,
 }) async {
   // Look at the top N mining scores.
   final scores = (await evaluateWaypointsForMining(
-    waypointCache,
     systemsCache,
+    chartingCache,
     marketListings,
     systemSymbol,
   ))

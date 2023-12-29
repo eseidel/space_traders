@@ -52,8 +52,8 @@ void main() {
 
     when(
       () => centralCommand.siphonJobForShip(
-        caches.waypoints,
         caches.systems,
+        caches.charting,
         caches.marketListings,
         caches.agent,
         ship,
