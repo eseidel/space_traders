@@ -355,6 +355,11 @@
   "description": "An advanced sensor array that improves a ship's ability to detect and track other objects in space with greater accuracy and range."
  },
  {
+  "symbol": "MOUNT_SENSOR_ARRAY_III",
+  "name": "Sensor Array III",
+  "description": "An advanced sensor array that significantly improves a ship's ability to detect and track other objects in space with even greater accuracy and range."
+ },
+ {
   "symbol": "MOUNT_SURVEYOR_I",
   "name": "Surveyor I",
   "description": "A basic survey probe that can be used to gather information about a mineral deposit."
@@ -363,6 +368,11 @@
   "symbol": "MOUNT_SURVEYOR_II",
   "name": "Surveyor II",
   "description": "An advanced survey probe that can be used to gather information about a mineral deposit with greater accuracy."
+ },
+ {
+  "symbol": "MOUNT_SURVEYOR_III",
+  "name": "Surveyor III",
+  "description": "An advanced survey probe that can be used to gather information about a mineral deposit with even greater accuracy."
  },
  {
   "symbol": "MOUNT_TURRET_I",
