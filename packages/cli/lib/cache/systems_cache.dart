@@ -116,7 +116,6 @@ class SystemsCache extends JsonListStore<System> {
   bool isJumpGate(WaypointSymbol symbol) => waypoint(symbol).isJumpGate;
 
   /// Return the SystemWaypoints for the given [systemSymbol].
-  /// Mostly exists for compatibility with WaypointCache.
   List<SystemWaypoint> waypointsInSystem(SystemSymbol systemSymbol) =>
       this[systemSymbol].waypoints;
 }

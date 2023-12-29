@@ -13,18 +13,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final systems = SystemsCache.load(fs)!;
-  // TODO(eseidel): This should not need ChartingCache or ConstructionCache.
-  final charting = ChartingCache(db);
-  final construction = ConstructionCache(db);
-  final waypointCache = WaypointCache.cachedOnly(
-    systems,
-    charting,
-    construction,
-    staticCaches.waypointTraits,
-  );
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;
   final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+  final shipyardListings = ShipyardListingCache.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
@@ -34,8 +26,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
-  final waypoints = await waypointCache.waypointsInSystem(hqSystemSymbol);
-  final shipyard = waypoints.firstWhere((w) => w.hasShipyard);
+  final waypoints = systems.waypointsInSystem(hqSystemSymbol);
+  final shipyardListing =
+      shipyardListings.listingsInSystem(hqSystemSymbol).first;
+  final shipyard = systems.waypoint(shipyardListing.waypointSymbol);
 
   const shipType = ShipType.LIGHT_HAULER;
   final ship = staticCaches.shipyardShips[shipType]!;
