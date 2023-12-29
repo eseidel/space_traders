@@ -1,7 +1,6 @@
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/extraction_score.dart';
 import 'package:db/chart.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,8 +8,6 @@ import 'package:test/test.dart';
 import 'package:types/types.dart';
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
-
-class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockMarketListingCache extends Mock implements MarketListingCache {}
 
@@ -97,37 +94,24 @@ void main() {
 
   test('evaluateWaypointsForSiphoning', () async {
     final systemsCache = _MockSystemsCache();
-    final waypointCache = _MockWaypointCache();
     final chartingCache = _MockChartingCache();
     final marketListingCache = _MockMarketListingCache();
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
-    final source = Waypoint.test(
+    final source = SystemWaypoint.test(
       sourceSymbol,
       type: WaypointType.GAS_GIANT,
     );
     final marketSymbol = WaypointSymbol.fromString('W-A-B');
-    final market = Waypoint.test(
+    final market = SystemWaypoint.test(
       marketSymbol,
-      traits: [
-        WaypointTrait(
-          symbol: WaypointTraitSymbol.MARKETPLACE,
-          name: 'name',
-          description: 'description',
-        ),
-      ],
       position: WaypointPosition(10, 0, systemSymbol),
     );
     final waypoints = [source, market];
-    when(() => waypointCache.waypointsInSystem(systemSymbol)).thenAnswer(
-      (_) => Future.value(waypoints),
-    );
     when(() => systemsCache.waypointsInSystem(systemSymbol))
-        .thenReturn(waypoints.map((e) => e.toSystemWaypoint()).toList());
-    when(() => systemsCache.waypoint(source.symbol))
-        .thenReturn(source.toSystemWaypoint());
-    when(() => systemsCache.waypoint(market.symbol))
-        .thenReturn(market.toSystemWaypoint());
+        .thenReturn(waypoints);
+    when(() => systemsCache.waypoint(source.symbol)).thenReturn(source);
+    when(() => systemsCache.waypoint(market.symbol)).thenReturn(market);
 
     final producedGoods = {
       TradeSymbol.HYDROCARBON,
