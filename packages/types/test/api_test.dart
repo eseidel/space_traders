@@ -70,7 +70,8 @@ void main() {
     expect(a, b);
     expect(a, isNot(c));
     expect(a.sector, 'S');
-    expect(a.system, 'S-E');
+    expect(a.system, SystemSymbol.fromString('S-E'));
+    expect(a.systemString, 'S-E');
 
     expect(() => WaypointSymbol.fromString('S-E'), throwsArgumentError);
     expect(() => WaypointSymbol.fromString('S-E-A-F'), throwsArgumentError);
