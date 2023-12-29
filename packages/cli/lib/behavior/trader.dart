@@ -328,6 +328,21 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
     const Duration(minutes: 10),
   );
 
+  if (!contract.accepted) {
+    shipErr(
+      ship,
+      'Contract ${contract.id} not accepted? Accepting before delivering.',
+    );
+    await acceptContractAndLog(
+      api,
+      db,
+      contractCache,
+      agentCache,
+      ship,
+      contract,
+    );
+  }
+
   // And we have the desired cargo.
   final response = await deliverContract(
     api,
