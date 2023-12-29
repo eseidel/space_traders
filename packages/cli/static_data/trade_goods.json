@@ -335,6 +335,11 @@
   "description": "An advanced mining laser that is more efficient and effective at extracting valuable minerals from asteroids and other space objects."
  },
  {
+  "symbol": "MOUNT_MINING_LASER_III",
+  "name": "Mining Laser III",
+  "description": "An advanced mining laser that is even more efficient and effective at extracting valuable minerals from asteroids and other space objects."
+ },
+ {
   "symbol": "MOUNT_MISSILE_LAUNCHER_I",
   "name": "Missile Launcher",
   "description": "A basic missile launcher that fires guided missiles with a variety of warheads for different targets."
@@ -413,6 +418,11 @@
   "symbol": "QUARTZ_SAND",
   "name": "Quartz Sand",
   "description": "High-purity quartz sand used in the production of glass and ceramics."
+ },
+ {
+  "symbol": "REACTOR_ANTIMATTER_I",
+  "name": "Antimatter Reactor I",
+  "description": "A basic antimatter power reactor, used to generate electricity from the annihilation of matter and antimatter."
  },
  {
   "symbol": "REACTOR_CHEMICAL_I",
