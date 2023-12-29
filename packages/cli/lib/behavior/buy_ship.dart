@@ -130,7 +130,12 @@ Future<DateTime?> advanceBuyShip(
 
   // Update our shipyard prices regardless of any later errors.
   final shipyard = await getShipyard(api, ship.waypointSymbol);
-  recordShipyardDataAndLog(caches.shipyardPrices, shipyard, ship);
+  recordShipyardDataAndLog(
+    caches.static,
+    caches.shipyardPrices,
+    shipyard,
+    ship,
+  );
 
   final PurchaseShip201ResponseData result;
   try {

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
@@ -293,44 +292,6 @@ class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
     }
     return pricesForSymbolSorted.last.purchasePrice;
   }
-}
-
-/// Record market data and log the result.
-/// Returns the market.
-/// This is the preferred way to get the local Market.
-Future<Market> recordMarketDataIfNeededAndLog(
-  MarketPrices marketPrices,
-  MarketCache marketCache,
-  Ship ship,
-  WaypointSymbol marketSymbol, {
-  Duration maxAge = const Duration(minutes: 5),
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  if (ship.waypointSymbol != marketSymbol) {
-    throw ArgumentError.value(
-      marketSymbol,
-      'marketSymbol',
-      '${ship.symbol} is not at $marketSymbol, ${ship.waypointSymbol}.',
-    );
-  }
-  // If we have market data more recent than maxAge, don't bother refreshing.
-  // This prevents ships from constantly refreshing the same data.
-  if (marketPrices.hasRecentData(
-    marketSymbol,
-    maxAge: maxAge,
-    getNow: getNow,
-  )) {
-    var market = marketCache.fromCache(marketSymbol);
-    if (market == null || market.tradeGoods.isEmpty) {
-      market = await marketCache.refreshMarket(marketSymbol);
-    }
-    return market;
-  }
-  final market = await marketCache.refreshMarket(marketSymbol);
-  await recordMarketData(marketPrices, market, getNow: getNow);
-  // Powershell needs an extra space after the emoji.
-  shipInfo(ship, '✍️  market data @ ${market.waypointSymbol.sectorLocalName}');
-  return market;
 }
 
 /// Record market data silently.

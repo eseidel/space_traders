@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';
 import 'package:cli/net/exceptions.dart';
@@ -246,7 +247,7 @@ bool _shouldRefuelAfterCheckingPrice(
   const fuelSymbol = TradeSymbol.FUEL;
   final median = marketPrices.medianPurchasePrice(fuelSymbol);
   final markup = median != null ? fuelPrice / median : null;
-  if (markup != null && markup > 2) {
+  if (markup != null && markup > config.fuelWarningMarkup) {
     final deviation = stringForPriceDeviance(
       marketPrices,
       fuelSymbol,
@@ -256,12 +257,13 @@ bool _shouldRefuelAfterCheckingPrice(
     final fuelString = creditsString(fuelPrice);
 
     final fuelPercent = ship.fuel.current / ship.fuel.capacity;
-    if (fuelPercent < 0.5) {
+    if (fuelPercent < config.fuelCriticalThreshold) {
       shipWarn(ship, 'Fuel low: ${ship.fuel.current} / ${ship.fuel.capacity}');
     }
     final markupString = markup.toStringAsFixed(1);
     // The really bonkers prices are 100x median.
-    if (markup > 10 || fuelPercent > 0.5) {
+    if (markup > config.fuelMaxMarkup ||
+        fuelPercent > config.fuelCriticalThreshold) {
       shipWarn(
         ship,
         'Fuel is at $markupString times the median price '

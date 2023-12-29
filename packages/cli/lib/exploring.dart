@@ -69,9 +69,79 @@ Future<void> visitLocalShipyard(
   if (!hasShipyard) {
     return;
   }
-  final shipyard = await getShipyard(api, waypointSymbol);
-  // TODO(eseidel): We should only visit the shipyard if we don't
-  // have recent prices.
-  recordShipyardDataAndLog(shipyardPrices, shipyard, ship);
-  recordShipyardShips(staticCaches, shipyard.ships);
+
+  await recordShipyardDataIfNeededAndLog(
+    api,
+    staticCaches,
+    shipyardPrices,
+    ship,
+    waypointSymbol,
+  );
+}
+
+/// Record market data and log the result and returns the market.
+/// This is the preferred way to get the local Market.
+Future<Market> recordMarketDataIfNeededAndLog(
+  MarketPrices marketPrices,
+  MarketCache marketCache,
+  Ship ship,
+  WaypointSymbol marketSymbol, {
+  Duration maxAge = const Duration(minutes: 5),
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  if (ship.waypointSymbol != marketSymbol) {
+    throw ArgumentError.value(
+      marketSymbol,
+      'marketSymbol',
+      '${ship.symbol} is not at $marketSymbol, ${ship.waypointSymbol}.',
+    );
+  }
+  // If we have market data more recent than maxAge, don't bother refreshing.
+  // This prevents ships from constantly refreshing the same data.
+  if (marketPrices.hasRecentData(
+    marketSymbol,
+    maxAge: maxAge,
+    getNow: getNow,
+  )) {
+    var market = marketCache.fromCache(marketSymbol);
+    if (market == null || market.tradeGoods.isEmpty) {
+      market = await marketCache.refreshMarket(marketSymbol);
+    }
+    return market;
+  }
+  final market = await marketCache.refreshMarket(marketSymbol);
+  await recordMarketData(marketPrices, market, getNow: getNow);
+  // Powershell needs an extra space after the emoji.
+  shipInfo(ship, '✍️  market data @ ${market.waypointSymbol.sectorLocalName}');
+  return market;
+}
+
+/// Record shipyard data and log the result.
+Future<void> recordShipyardDataIfNeededAndLog(
+  Api api,
+  StaticCaches staticCaches,
+  ShipyardPrices shipyardPrices,
+  Ship ship,
+  WaypointSymbol shipyardSymbol, {
+  Duration maxAge = const Duration(minutes: 5),
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  if (ship.waypointSymbol != shipyardSymbol) {
+    throw ArgumentError.value(
+      shipyardSymbol,
+      'shipyardSymbol',
+      '${ship.symbol} is not at $shipyardSymbol, ${ship.waypointSymbol}.',
+    );
+  }
+  // If we have shipyard data more recent than maxAge, don't bother refreshing.
+  // This prevents ships from constantly refreshing the same data.
+  if (shipyardPrices.hasRecentData(
+    shipyardSymbol,
+    maxAge: maxAge,
+    getNow: getNow,
+  )) {
+    return;
+  }
+  final shipyard = await getShipyard(api, shipyardSymbol);
+  recordShipyardDataAndLog(staticCaches, shipyardPrices, shipyard, ship);
 }

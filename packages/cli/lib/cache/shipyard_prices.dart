@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/prices_cache.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
@@ -106,11 +107,13 @@ class ShipyardPrices extends PricesCache<ShipType, ShipyardPrice> {
 
 /// Record shipyard data and log the result.
 void recordShipyardDataAndLog(
+  StaticCaches staticCaches,
   ShipyardPrices shipyardPrices,
   Shipyard shipyard,
   Ship ship,
 ) {
   recordShipyardData(shipyardPrices, shipyard);
+  recordShipyardShips(staticCaches, shipyard.ships);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  shipyard data @ ${shipyard.symbol}');
 }
