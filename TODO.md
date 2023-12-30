@@ -1097,3 +1097,5 @@ Right now it takes a long time to get back to the end of the queue.
 🛸#2B ✍️  shipyard data @ X1-FV72-C41
 
 ### Remove TradeGoodCache from MarketListingCache.
+
+### Make it possible for ships other than command to buy ships.
