@@ -108,34 +108,46 @@
   ],
   "mounts": [
    {
-    "symbol": "MOUNT_SENSOR_ARRAY_I",
-    "name": "Sensor Array I",
-    "description": "A basic sensor array that improves a ship's ability to detect and track other objects in space.",
-    "strength": 1,
+    "symbol": "MOUNT_SENSOR_ARRAY_II",
+    "name": "Sensor Array II",
+    "description": "An advanced sensor array that improves a ship's ability to detect and track other objects in space with greater accuracy and range.",
+    "strength": 4,
     "deposits": [],
     "requirements": {
-     "power": 1,
-     "crew": 0,
+     "power": 2,
+     "crew": 2,
      "slots": null
     }
    },
    {
-    "symbol": "MOUNT_MINING_LASER_I",
-    "name": "Mining Laser I",
-    "description": "A basic mining laser that can be used to extract valuable minerals from asteroids and other space objects.",
-    "strength": 3,
+    "symbol": "MOUNT_GAS_SIPHON_II",
+    "name": "Gas Siphon II",
+    "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies more efficiently and at a higher rate.",
+    "strength": 20,
     "deposits": [],
     "requirements": {
-     "power": 1,
-     "crew": 1,
+     "power": 2,
+     "crew": 2,
      "slots": null
     }
    },
    {
-    "symbol": "MOUNT_SURVEYOR_I",
-    "name": "Surveyor I",
-    "description": "A basic survey probe that can be used to gather information about a mineral deposit.",
-    "strength": 1,
+    "symbol": "MOUNT_MINING_LASER_II",
+    "name": "Mining Laser II",
+    "description": "An advanced mining laser that is more efficient and effective at extracting valuable minerals from asteroids and other space objects.",
+    "strength": 5,
+    "deposits": [],
+    "requirements": {
+     "power": 2,
+     "crew": 2,
+     "slots": null
+    }
+   },
+   {
+    "symbol": "MOUNT_SURVEYOR_II",
+    "name": "Surveyor II",
+    "description": "An advanced survey probe that can be used to gather information about a mineral deposit with greater accuracy.",
+    "strength": 2,
     "deposits": [
      "QUARTZ_SAND",
      "SILICON_CRYSTALS",
@@ -147,17 +159,19 @@
      "SILVER_ORE",
      "ALUMINUM_ORE",
      "GOLD_ORE",
-     "PLATINUM_ORE"
+     "PLATINUM_ORE",
+     "DIAMONDS",
+     "URANITE_ORE"
     ],
     "requirements": {
-     "power": 1,
-     "crew": 1,
+     "power": 3,
+     "crew": 4,
      "slots": null
     }
    }
   ],
   "crew": {
-   "required": 59,
+   "required": 57,
    "capacity": 80
   }
  },
@@ -308,10 +322,10 @@
   "purchasePrice": 0,
   "frame": {
    "symbol": "FRAME_HEAVY_FREIGHTER",
-   "name": "Frame Heavy Freighter",
+   "name": "Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
    "condition": null,
-   "moduleSlots": 12,
+   "moduleSlots": 13,
    "mountingPoints": 3,
    "fuelCapacity": 2300,
    "requirements": {
@@ -346,75 +360,39 @@
   },
   "modules": [
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_III",
+    "capacity": 75,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Advanced Cargo Hold",
+    "description": "A large cargo hold module with advanced robotics that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 4,
+     "crew": 6,
+     "slots": 3
     }
    },
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_III",
+    "capacity": 75,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Advanced Cargo Hold",
+    "description": "A large cargo hold module with advanced robotics that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 4,
+     "crew": 6,
+     "slots": 3
     }
    },
    {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
+    "symbol": "MODULE_CARGO_HOLD_III",
+    "capacity": 75,
     "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
+    "name": "Advanced Cargo Hold",
+    "description": "A large cargo hold module with advanced robotics that provides more efficient storage space for a ship's cargo.",
     "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_CARGO_HOLD_I",
-    "capacity": 30,
-    "range": null,
-    "name": "Cargo Hold",
-    "description": "A module that increases a ship's cargo capacity.",
-    "requirements": {
-     "power": 1,
-     "crew": 0,
-     "slots": 1
+     "power": 4,
+     "crew": 6,
+     "slots": 3
     }
    },
    {
@@ -463,18 +441,6 @@
      "power": 1,
      "crew": 2,
      "slots": 1
-    }
-   },
-   {
-    "symbol": "MODULE_WARP_DRIVE_II",
-    "capacity": null,
-    "range": 6000,
-    "name": "Warp Drive II",
-    "description": "An advanced warp drive that allows for longer-range interstellar travel with improved reliability.",
-    "requirements": {
-     "power": 5,
-     "crew": 8,
-     "slots": 2
     }
    }
   ],
@@ -517,7 +483,7 @@
    }
   ],
   "crew": {
-   "required": 139,
+   "required": 149,
    "capacity": 160
   }
  },
