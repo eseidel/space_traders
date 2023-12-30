@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic.dart';
 import 'package:cli/net/auth.dart';
@@ -14,7 +15,7 @@ import 'package:file/local.dart';
 import 'package:scoped/scoped.dart';
 import 'package:types/types.dart';
 
-void printRequestStats(RequestCounts requestCounts) {
+void printRequestStats(RequestCounts requestCounts, Duration duration) {
   final counts = requestCounts.counts;
   final generalizedCounts = <String, int>{};
   for (final key in counts.keys) {
@@ -30,7 +31,16 @@ void printRequestStats(RequestCounts requestCounts) {
   for (final entry in sortedCounts) {
     logger.info('${entry.value} ${entry.key}');
   }
-  logger.info('Total: ${requestCounts.totalRequests} requests.');
+  final possible =
+      (duration.inSeconds * config.targetRequestsPerSecond).round();
+  final percent = requestCounts.totalRequests / possible;
+  final percentString = '${(percent * 100).round()}%';
+  final avg = requestCounts.totalRequests / duration.inSeconds;
+  logger
+    ..info('Total: ${requestCounts.totalRequests} requests '
+        'over ${approximateDuration(duration)}. '
+        '(avg ${avg.toStringAsFixed(2)} r/s)')
+    ..info('Used $percentString of $possible possible requests.');
 }
 
 /// Print the status of the server.
@@ -103,6 +113,8 @@ Future<void> cliMain(List<String> args) async {
 
   logger.level = results['verbose'] as bool ? Level.verbose : Level.info;
 
+  final start = DateTime.timestamp();
+
   logger.info('Welcome to Space Traders! 🚀');
   // Use package:file to make things mockable.
   const fs = LocalFileSystem();
@@ -128,7 +140,8 @@ Future<void> cliMain(List<String> args) async {
   // Handle ctrl-c and print out request stats.
   // This should be made an argument rather than on by default.
   ProcessSignal.sigint.watch().listen((signal) {
-    printRequestStats(api.requestCounts);
+    final duration = DateTime.timestamp().difference(start);
+    printRequestStats(api.requestCounts, duration);
     exit(0);
   });
 

@@ -1099,3 +1099,10 @@ Right now it takes a long time to get back to the end of the queue.
 ### Remove TradeGoodCache from MarketListingCache.
 
 ### Make it possible for ships other than command to buy ships.
+
+Command ship can get stuck on many hour trades and then not be able to buy
+new ships even after they're queued.
+
+### Prefer shorter trades over longer at the same c/s?
+
+Would only need to apply to trades at low c/s.
