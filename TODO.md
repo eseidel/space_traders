@@ -1106,3 +1106,5 @@ new ships even after they're queued.
 ### Prefer shorter trades over longer at the same c/s?
 
 Would only need to apply to trades at low c/s.
+
+### Add missing ship if ship count changed right after advanceShip.

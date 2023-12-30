@@ -33,9 +33,9 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
-    for (int i = 0; i < 40; i++) ShipType.PROBE,
-    for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
-    ShipType.EXPLORER,
+    // for (int i = 0; i < 40; i++) ShipType.PROBE,
+    // for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
+    // ShipType.EXPLORER,
   ];
 
   /// A list of which haulers should be used as miner haulers.
@@ -90,7 +90,7 @@ class Config {
 
   /// Used by _computeActiveConstruction to compute if we should be doing
   /// construction yet or not.
-  final constructionMinCredits = 500000;
+  final constructionMinCredits = 1000000;
 
   /// Used by shouldBuyShip to make sure we don't buy a ship when it would
   /// affect our ability to trade.
