@@ -88,6 +88,22 @@ class SystemWaypoint {
       y: position.y,
     );
   }
+
+  /// Converts to [openapi.SystemWaypoint].
+  @protected
+  openapi.SystemWaypoint toOpenApi() {
+    return openapi.SystemWaypoint(
+      symbol: symbol.toJson(),
+      type: type,
+      x: position.x,
+      y: position.y,
+      orbitals: orbitals,
+      orbits: orbits?.toJson(),
+    );
+  }
+
+  /// Converts to JSON.
+  Map<String, dynamic> toJson() => toOpenApi().toJson();
 }
 
 /// Type representing a system.
@@ -156,6 +172,23 @@ class System {
 
   /// Returns the distance to the given system.
   int distanceTo(System other) => position.distanceTo(other.position);
+
+  /// Converts to [openapi.System].
+  @protected
+  openapi.System toOpenApi() {
+    return openapi.System(
+      symbol: symbol.toJson(),
+      type: type,
+      sectorSymbol: sectorSymbol,
+      x: position.x,
+      y: position.y,
+      waypoints: waypoints.map((w) => w.toOpenApi()).toList(),
+      factions: factions,
+    );
+  }
+
+  /// Converts to JSON.
+  Map<String, dynamic> toJson() => toOpenApi().toJson();
 }
 
 /// Type representing a waypoint.
