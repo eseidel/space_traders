@@ -32,6 +32,7 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
+    ShipType.SURVEYOR,
     for (int i = 0; i < 20; i++) ShipType.LIGHT_HAULER,
     // for (int i = 0; i < 40; i++) ShipType.PROBE,
     // for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
@@ -42,9 +43,10 @@ class Config {
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
   final minerHaulerSymbols = <String>[
-    // '3',
-    // '4',
-    // '5',
+    '3',
+    '4',
+    '5',
+    '6',
   ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructin Behaviors if there isn't explicit
@@ -94,7 +96,8 @@ class Config {
 
   /// Used by shouldBuyShip to make sure we don't buy a ship when it would
   /// affect our ability to trade.
-  final shipBuyBufferForTrading = 100000;
+  // TODO(eseidel): Make this vary based on how many traders we have.
+  final shipBuyBufferForTrading = 200000;
 
   /// Used by _minimumFloatRequired to ensure we always have enough to complete
   /// a contract and don't just dump money into something we can't finish.
