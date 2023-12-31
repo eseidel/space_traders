@@ -15,12 +15,17 @@ void main() {
         ),
         ChartingRecord(
           waypointSymbol: WaypointSymbol.fromString('S-E-B'),
-          values: ChartedValues.test(),
+          values: null,
           timestamp: now,
         ),
       ],
     );
     expect(snapshot.records.length, 2);
     expect(snapshot.waypointCount, 2);
+    expect(snapshot.values.length, 1);
+    expect(snapshot.isCharted(WaypointSymbol.fromString('S-E-A')), isTrue);
+    expect(snapshot[WaypointSymbol.fromString('S-E-A')]?.values, isNotNull);
+    expect(snapshot.isCharted(WaypointSymbol.fromString('S-E-B')), isFalse);
+    expect(snapshot.isCharted(WaypointSymbol.fromString('S-E-C')), isNull);
   });
 }
