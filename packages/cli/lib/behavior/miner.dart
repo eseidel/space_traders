@@ -28,8 +28,8 @@ int expectedValueFromSurvey(
 
   final totalValue = survey.deposits.fold<int>(0, (total, deposit) {
     final marketSymbol = marketForGood[deposit.tradeSymbol];
-    // TODO(eseidel): Remove this nullability check next release.
     if (marketSymbol == null) {
+      logger.warn('No market for ${deposit.tradeSymbol}.');
       return total;
     }
     final sellPrice = marketPrices.recentSellPrice(
@@ -113,6 +113,18 @@ int _minSpaceForExtraction(Ship ship) {
   return expectedExtractedUnits(ship);
 }
 
+/// Logs a warning if the extraction size is outside the expected range.
+void verifyExtractionSize(Ship ship, int extractedUnits) {
+  final min = minExtractedUnits(ship);
+  final max = maxExtractedUnits(ship);
+  if (extractedUnits < min || extractedUnits > max) {
+    shipWarn(
+      ship,
+      'Extracted $extractedUnits units, outside expected range $min-$max.',
+    );
+  }
+}
+
 /// Tell [ship] to extract resources and log the result.
 Future<JobResult> extractAndLog(
   Api api,
@@ -163,6 +175,8 @@ Future<JobResult> extractAndLog(
         '${yield_.symbol.value.padRight(18)} '
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+
+    verifyExtractionSize(ship, yield_.units);
 
     verifyCooldown(
       ship,

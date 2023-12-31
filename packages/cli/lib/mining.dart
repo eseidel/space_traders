@@ -130,15 +130,28 @@ int cooldownTimeForSurvey(Ship ship) {
   return 60 + 10 * power;
 }
 
+/// Variance in units extracted per laser.
+const variancePerLaser = 5;
+
 // https://discord.com/channels/792864705139048469/792864705139048472/1132761138849923092
 // "Each laser adds its strength +-5. Power is 10 for laser I, 25 for laser II,
 // 60 for laser III. So for example laser I plus laser II is 35 +- 10"
 /// Compute the maximum number of units we can expect from an extraction.
 int maxExtractedUnits(Ship ship) {
-  const variancePerLaser = 5;
   return min(
     ship.cargo.capacity,
     expectedExtractedUnits(ship) +
+        ship.mountedMiningLasers.length * variancePerLaser,
+  );
+}
+
+/// Compute the minimum number of units we can expect from an extraction.
+int minExtractedUnits(Ship ship) {
+  return max(
+    // Unclear if this should be 0 or 1, but right now the server will
+    // return 0 for some extractions.
+    0,
+    expectedExtractedUnits(ship) -
         ship.mountedMiningLasers.length * variancePerLaser,
   );
 }
