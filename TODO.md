@@ -1046,8 +1046,6 @@ Right now it takes a long time to get back to the end of the queue.
 
 ### canJump should always use a cached version?
 
-### Remove TradeGoodCache from MarketListingCache.
-
 ### Make it possible for ships other than command to buy ships.
 
 Command ship can get stuck on many hour trades and then not be able to buy

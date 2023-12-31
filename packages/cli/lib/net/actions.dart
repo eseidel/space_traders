@@ -706,7 +706,7 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
   ship.cooldown = response.cooldown;
   shipCache.updateShip(ship);
   final count = response.surveys.length;
-  shipInfo(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
+  shipDetail(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
   recordSurveys(db, response.surveys, getNow: getNow);
   return response;
 }
