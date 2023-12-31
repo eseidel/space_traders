@@ -2,7 +2,6 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
-import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
@@ -67,8 +66,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final charting = ChartingCache(db);
   final agentCache = AgentCache.load(fs)!;
   final hqSystem = agentCache.headquartersSystemSymbol;
-  final tradeGoods = TradeGoodCache.load(fs);
-  final marketListings = MarketListingCache.load(fs, tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
   final marketPrices = MarketPrices.load(fs);
 
   final List<ExtractionScore> scores;

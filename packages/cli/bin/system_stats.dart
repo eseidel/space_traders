@@ -50,8 +50,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   logger.info(' $chartedWaypoints charted');
 
   // How many markets?
-  final tradeGoodCache = TradeGoodCache.load(fs);
-  final marketListingCache = MarketListingCache.load(fs, tradeGoodCache);
+  final marketListingCache = MarketListingCache.load(fs);
   var markets = 0;
   for (final listing in marketListingCache.listings) {
     // We could sort first by system to save ourselves some lookups.

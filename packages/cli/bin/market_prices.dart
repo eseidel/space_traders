@@ -6,8 +6,7 @@ import 'package:cli/printing.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketPrices = MarketPrices.load(fs);
-  final tradeGoods = TradeGoodCache.load(fs);
-  final marketListings = MarketListingCache.load(fs, tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
 
   logger.info(
     'Loaded ${marketPrices.count} prices from '

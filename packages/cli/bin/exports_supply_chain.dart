@@ -106,13 +106,13 @@ class Sourcer {
   const Sourcer({
     required this.marketListings,
     required this.systemsCache,
-    required this.staticCaches,
+    required this.exportCache,
     required this.marketPrices,
   });
 
   final MarketListingCache marketListings;
   final SystemsCache systemsCache;
-  final StaticCaches staticCaches;
+  final TradeExportCache exportCache;
   final MarketPrices marketPrices;
 
   void sourceViaShuttle(
@@ -194,7 +194,7 @@ class Sourcer {
       logger.warn('${prefix}No listing for $waypointSymbol');
       return;
     }
-    final imports = staticCaches.exports[tradeSymbol]!.imports;
+    final imports = exportCache[tradeSymbol]!.imports;
     for (final import in imports) {
       sourceGoodsFor(import, waypointSymbol, indent: indent + 1);
     }
@@ -222,9 +222,9 @@ class Sourcer {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final staticCaches = StaticCaches.load(fs);
+  final exportCache = TradeExportCache.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
   final marketPrices = MarketPrices.load(fs);
   final agentCache = AgentCache.load(fs)!;
 
@@ -237,7 +237,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   Sourcer(
     marketListings: marketListings,
     systemsCache: systemsCache,
-    staticCaches: staticCaches,
+    exportCache: exportCache,
     marketPrices: marketPrices,
   ).sourceGoodsFor(tradeSymbol, waypointSymbol);
 }

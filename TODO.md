@@ -1059,12 +1059,14 @@ Would only need to apply to trades at low c/s.
 
 ### Add missing ship if ship count changed right after advanceShip.
 
+This should already be happening. Not sure how we double-buy though?
+
 ### Bring back phases.
 
 - Some sort of initial phase (plan trades based on import/export?)
 - 
 
-### Assign miner haulers only when a miner is active at the assigned system.
+### Assign miner haulers only when a miner is active at the assigned waypoint.
 
 ### Write logic to predict how long until current behavior is resolved.
 

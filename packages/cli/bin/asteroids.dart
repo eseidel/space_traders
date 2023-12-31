@@ -3,8 +3,7 @@ import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   // List all known asteroids that have a market or shipyard.
-  final tradeGoods = TradeGoodCache.load(fs);
-  final marketListingsCache = MarketListingCache.load(fs, tradeGoods);
+  final marketListingsCache = MarketListingCache.load(fs);
   final shipyardListingCache = ShipyardListingCache.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
 

@@ -11,11 +11,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // ship class.
 
   final db = await defaultDatabase();
-  final staticCaches = StaticCaches.load(fs);
   final systems = SystemsCache.load(fs)!;
   final agentCache = AgentCache.load(fs)!;
   final hqSystemSymbol = agentCache.headquartersSystemSymbol;
-  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
   final shipyardListings = ShipyardListingCache.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
@@ -32,7 +31,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipyard = systems.waypoint(shipyardListing.waypointSymbol);
 
   const shipType = ShipType.LIGHT_HAULER;
-  final ship = staticCaches.shipyardShips[shipType]!;
+  final shipyardShips = ShipyardShipCache.load(fs);
+  final ship = shipyardShips[shipType]!;
   logger.info('Routes from ${shipyard.symbol} with $shipType');
 
   final table = Table(

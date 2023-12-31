@@ -11,9 +11,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     startSystemSymbol = agentCache.headquartersSystemSymbol;
   }
 
-  final staticCaches = StaticCaches.load(fs);
-
-  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =

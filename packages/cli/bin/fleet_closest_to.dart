@@ -10,8 +10,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final destination = WaypointSymbol.fromString(argResults.rest[0]);
   final shipCache = ShipCache.load(fs)!;
   final systemsCache = SystemsCache.load(fs)!;
-  final staticCaches = StaticCaches.load(fs);
-  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
 
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);

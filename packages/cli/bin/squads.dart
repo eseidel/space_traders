@@ -35,8 +35,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
   final shipCache = ShipCache.load(fs)!;
-  final tradeGoods = TradeGoodCache.load(fs);
-  final marketListings = MarketListingCache.load(fs, tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
   final shipyardShipCache = ShipyardShipCache.load(fs);
 
   final squads = await assignShipsToSquads(

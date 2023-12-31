@@ -61,7 +61,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final endSymbol = args[1];
 
   final db = await defaultDatabase();
-  final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final bool Function(WaypointSymbol _) sellsFuel;
   if (argResults['fuel'] == 'true') {
@@ -69,7 +68,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   } else if (argResults['fuel'] == 'false') {
     sellsFuel = (_) => false;
   } else if (argResults['fuel'] == 'cache') {
-    final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+    final marketListings = MarketListingCache.load(fs);
     sellsFuel = defaultSellsFuel(marketListings);
   } else {
     throw UnimplementedError();
@@ -85,7 +84,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     sellsFuel: sellsFuel,
   );
 
-  final ship = staticCaches.shipyardShips[shipType]!;
+  final shipyardShips = ShipyardShipCache.load(fs);
+  final ship = shipyardShips[shipType]!;
 
   final start = WaypointSymbol.fromString(startSymbol);
   final end = WaypointSymbol.fromString(endSymbol);

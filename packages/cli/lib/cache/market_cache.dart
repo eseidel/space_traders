@@ -9,8 +9,7 @@ typedef _Record = Map<WaypointSymbol, MarketListing>;
 class MarketListingCache extends JsonStore<_Record> {
   /// Creates a new charting cache.
   MarketListingCache(
-    super.entries,
-    this.tradeGoods, {
+    super.entries, {
     required super.fs,
     super.path = defaultPath,
   }) : super(
@@ -24,8 +23,7 @@ class MarketListingCache extends JsonStore<_Record> {
 
   /// Load the charted values from the cache.
   factory MarketListingCache.load(
-    FileSystem fs,
-    TradeGoodCache tradeGoods, {
+    FileSystem fs, {
     String path = defaultPath,
   }) {
     final valuesBySymbol = JsonStore.loadRecord<_Record>(
@@ -41,14 +39,10 @@ class MarketListingCache extends JsonStore<_Record> {
         {};
     return MarketListingCache(
       valuesBySymbol,
-      tradeGoods,
       fs: fs,
       path: path,
     );
   }
-
-  /// The trade goods cache.
-  final TradeGoodCache tradeGoods;
 
   /// The default path to the cache file.
   static const defaultPath = 'data/market_listings.json';
@@ -97,7 +91,6 @@ class MarketListingCache extends JsonStore<_Record> {
       exports: market.exports.map((t) => t.symbol).toSet(),
       exchange: market.exchange.map((t) => t.symbol).toSet(),
     );
-    tradeGoods.addAll(market.listedTradeGoods);
     _listingBySymbol[symbol] = listing;
     save();
   }
@@ -109,11 +102,14 @@ class MarketCache {
   MarketCache(
     Api api,
     MarketListingCache marketListings,
+    TradeGoodCache tradeGoods,
   )   : _api = api,
-        _marketListings = marketListings;
+        _marketListings = marketListings,
+        _tradeGoods = tradeGoods;
 
   final Api _api;
   final MarketListingCache _marketListings;
+  final TradeGoodCache _tradeGoods;
 
   // This needs to be careful, this caches Market which can differ in
   // response depending on if we have a ship there or not.
@@ -142,6 +138,7 @@ class MarketCache {
     final market = await getMarket(_api, waypointSymbol);
     _marketsBySymbol[waypointSymbol] = market;
     _marketListings.addMarket(market);
+    _tradeGoods.addAll(market.listedTradeGoods);
     return market;
   }
 }

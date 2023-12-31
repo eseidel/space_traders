@@ -44,8 +44,7 @@ String plural(int count, String singular, [String plural = 's']) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final tradeGoodCache = TradeGoodCache.load(fs);
-  final marketListingCache = MarketListingCache.load(fs, tradeGoodCache);
+  final marketListingCache = MarketListingCache.load(fs);
   final systemsToWatch = marketListingCache.systemsWithAtLeastNMarkets(5);
 
   final behaviorCache = BehaviorCache.load(fs);

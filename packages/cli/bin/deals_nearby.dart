@@ -13,9 +13,8 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final startArg = argResults['start'] as String?;
   final credits = int.parse(argResults['credits'] as String);
 
-  final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs, staticCaches.tradeGoods);
+  final marketListings = MarketListingCache.load(fs);
   final jumpGates = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
@@ -51,7 +50,8 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     extraSellOpps.addAll(centralCommand.constructionSellOpps());
   }
 
-  final ship = staticCaches.shipyardShips[shipType]!;
+  final shipyardShips = ShipyardShipCache.load(fs);
+  final ship = shipyardShips[shipType]!;
   final cargoCapacity = ship.cargoCapacity;
   final shipSpeed = ship.engine.speed;
   final fuelCapacity = ship.frame.fuelCapacity;
