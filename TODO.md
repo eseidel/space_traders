@@ -1075,3 +1075,5 @@ Would only need to apply to trades at low c/s.
 * Can use the historical data for miners.
 
 ### Upgrade to package:postgres 3.x
+
+### Add a system for managing cash-flow to avoid missing trades from low cash.

@@ -62,6 +62,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     final profitPercent = (profit / costed.expectedCosts) * 100;
 
     final since = DateTime.timestamp().difference(costed.startTime);
+    final isLate = since > costed.expectedTime;
     final actualDuration = approximateDuration(since);
     final expectedDuration = approximateDuration(costed.expectedTime);
 
@@ -76,7 +77,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       rightAlign('$sign${profitPercent.toStringAsFixed(0)}%'),
       rightAlign(costed.expectedProfitPerSecond.toString()),
       rightAlign(expectedDuration),
-      rightAlign(actualDuration),
+      rightAlign(isLate ? red.wrap(actualDuration)! : actualDuration),
     ]);
   }
   logger.info(table.toString());
