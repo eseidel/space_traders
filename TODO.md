@@ -737,11 +737,6 @@ ApiException 400: {"error":{"message":"Construction material requirements for AD
 I think this is due to miner haulers not running often? And thus not updating
 their transit status?
 
-### Unify JobException and NavigationException.
-
-Throwing a JobException from within continueNavigationIfNeeded will cause
-an infinte loop.
-
 ### Construction doesn't seem to avoid over-buying.
 
 If you disable the "avoid from same source" construction will buy multiple
@@ -928,11 +923,6 @@ to queue the idle fetcher to process it.
 We should be scanning a system before we travel to it.  But right now we
 don't respect the maxAge so we'll think it's always uncharted.
 
-### Idle queue should do all jump=1 jumpGates and Systems before jump=2.
-
-Right now it just does all systems before all jumpgates.  It needs to learn
-to interleave them.
-
 ### Slow server can break client.
 
 Timed out (1s) waiting for response?
@@ -1032,16 +1022,6 @@ e.g. 7hr for 1c/s isn't worth it.  But 30m for 1c/s might be.
 
 Right now it takes a long time to get back to the end of the queue.
 
-### Figure out why the probes are getting stuck and unstick them.
-
-🛸#4B ✈️  to CF13-B39X, 0ms left
-🛸#4B 🗺️  CF13-B39X - ASTEROID - Common Metal Deposits, Deep Craters
-🛸#4B Charted reachable systems within 5 jumps, charting asteroids in X1-CF13.
-[WARN] 🛸#4B (charter) took 2s (0 requests) expected 0.0s
-🛸#4B CF13-E40D (ASTEROID) is missing chart, routing.
-🛸#4B Beginning route to CF13-E40D (2m)
-🛸#4B 🛫 to CF13-E40D ASTEROID (2m)
-
 ### Charters are too slow.
 
 🛸#36 Charted reachable systems within 5 jumps, charting asteroids in X1-TM24.
@@ -1064,37 +1044,7 @@ Right now it takes a long time to get back to the end of the queue.
 🛸#F  🛫 to PK16-J63 FUEL_STATION (5m) spent 122 fuel
 [WARN] 🛸#F  (trader) took 4s (2 requests) expected 0.8s
 
-
 ### canJump should always use a cached version?
-
-## IdleQueue is fetching too many waypoints.
-
-### Scanning Shipyards repeatedly for some reason?
-
-86ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/market
-89ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
-93ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
-272ms 0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
-99ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
-96ms  0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/market
-118ms 0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
-112ms 0 200 GET   /systems/X1-FV72/waypoints/X1-FV72-C41/shipyard
-
-🛸#2B ✍️  shipyard data @ X1-FV72-C41
-[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
-[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 2d and resuming.
-🛸#2B ✍️  shipyard data @ X1-FV72-C41
-[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
-[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 18h and resuming.
-🛸#2B ✍️  shipyard data @ X1-FV72-C41
-[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
-[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 9h and resuming.
-🛸#2B ✍️  shipyard data @ X1-FV72-C41
-[WARN] 🛸#2B No stale markets near waypoints near FV72-C41.
-[WARN] 🛸#2B Shortened maxAge for X1-FV72 to 5h and resuming.
-🛸#2B ✍️  market data @ FV72-C41
-🛸#2B ✍️  shipyard data @ X1-FV72-C41
-🛸#2B ✍️  shipyard data @ X1-FV72-C41
 
 ### Remove TradeGoodCache from MarketListingCache.
 
@@ -1108,3 +1058,20 @@ new ships even after they're queued.
 Would only need to apply to trades at low c/s.
 
 ### Add missing ship if ship count changed right after advanceShip.
+
+### Bring back phases.
+
+- Some sort of initial phase (plan trades based on import/export?)
+- 
+
+### Assign miner haulers only when a miner is active at the assigned system.
+
+### Write logic to predict how long until current behavior is resolved.
+
+### Logic to find the closest ship to a waypoint (for task start).
+
+### Write a script to predict cash flow.
+* Can us the "when done" logic to predict when we sell inventory.
+* Can use the historical data for miners.
+
+### Upgrade to package:postgres 3.x
