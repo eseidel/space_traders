@@ -1,5 +1,6 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
@@ -342,7 +343,7 @@ void main() {
       minCreditsNeeded: 100,
     );
     // Currently we pad with 100k for trading.
-    const paddingCredits = 100000;
+    final paddingCredits = config.shipBuyBufferForTrading;
     final shouldBuy = centralCommand.shouldBuyShip(ship, paddingCredits + 100);
     expect(shouldBuy, true);
 
