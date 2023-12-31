@@ -141,6 +141,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
   }
   logger.info(table.toString());
+
+  await db.close();
 }
 
 void main(List<String> args) async {
