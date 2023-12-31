@@ -1,11 +1,11 @@
-import 'dart:convert';
-
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/mining.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/ships.dart';
 import 'package:cli/trading.dart';
+import 'package:collection/collection.dart';
 
 // From SAF, surveyor ii stats:
 // https://discord.com/channels/792864705139048469/792864705139048472/1159022831355576350
@@ -85,21 +85,6 @@ Duration cycleTime(List<Request> requests) {
   );
 }
 
-Ship exampleShip(
-  ShipCache shipCache, {
-  required ShipFrameSymbolEnum frame,
-  required WaypointSymbol overrideLocation,
-}) {
-  final miner = shipCache.ships.firstWhere((s) => s.frame.symbol == frame);
-  final json = miner.toJson();
-  // OpenAPI enums have to round trip through strings to parse correctly.
-  final reparsed = jsonDecode(jsonEncode(json));
-  final ship = Ship.fromJson(reparsed)!;
-  ship.nav.waypointSymbol = overrideLocation.waypoint;
-  ship.nav.systemSymbol = overrideLocation.systemString;
-  return ship;
-}
-
 String c(double value) {
   return creditsString(value.toInt());
 }
@@ -112,17 +97,55 @@ String cpm(double value) {
   return '${creditsString(value.toInt())}/m';
 }
 
-int costOutMounts(
+// For running simulations when we haven't yet found the mount prices.
+// Values from 12/27/2023
+// https://discord.com/channels/792864705139048469/792864705139048472/1190334200113541120
+final mountPrices = <TradeSymbol, int>{
+  TradeSymbol.MOUNT_GAS_SIPHON_II: 53000,
+  TradeSymbol.MOUNT_SURVEYOR_II: 53000,
+  TradeSymbol.MOUNT_MINING_LASER_II: 58000,
+};
+
+int mountPrice(
   MarketPrices marketPrices,
-  MountSymbolSet mounts,
+  ShipMountSymbolEnum mountSymbol,
 ) {
-  return mounts.fold<int>(
-    0,
-    (previousValue, mountSymbol) =>
-        previousValue +
-        marketPrices
-            .medianPurchasePrice(tradeSymbolForMountSymbol(mountSymbol))!,
-  );
+  final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
+  final defaultPrice = mountPrices[tradeSymbol];
+  if (defaultPrice == null) {
+    throw ArgumentError.value(
+      mountSymbol,
+      'mountSymbol',
+      'No default price found for $mountSymbol',
+    );
+  }
+  return marketPrices.medianPurchasePrice(tradeSymbol) ?? defaultPrice;
+}
+
+int costOutMounts(MarketPrices marketPrices, MountSymbolSet mounts) =>
+    mounts.map((mount) => mountPrice(marketPrices, mount)).sum;
+
+// For running simulations when we haven't yet found the ship prices.
+// Values from 12/27/2023
+// https://discord.com/channels/792864705139048469/792864705139048472/1189808193245818990
+final shipPrices = {
+  ShipType.MINING_DRONE: 42000,
+  ShipType.LIGHT_HAULER: 360000,
+  ShipType.ORE_HOUND: 340000,
+  ShipType.REFINING_FREIGHTER: 2100000,
+  ShipType.SURVEYOR: 34000,
+};
+
+int shipPrice(ShipyardPrices shipyardPrices, ShipType shipType) {
+  final defaultPrice = shipPrices[shipType];
+  if (defaultPrice == null) {
+    throw ArgumentError.value(
+      shipType,
+      'shipType',
+      'No default price found for $shipType',
+    );
+  }
+  return shipyardPrices.medianPurchasePrice(shipType) ?? defaultPrice;
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
@@ -139,28 +162,24 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     sellsFuel: (_) => false,
   );
   final agentCache = AgentCache.load(fs)!;
-  final shipCache = ShipCache.load(fs)!;
   final shipyardPrices = ShipyardPrices.load(fs);
   final shipyardShips = ShipyardShipCache.load(fs);
   final shipMounts = ShipMountCache.load(fs);
 
   final hq = agentCache.headquarters(systemsCache);
-  final hqMine = systemsCache
-      .waypointsInSystem(hq.system)
-      .firstWhere((w) => w.isAsteroid)
-      .symbol;
-
+  final hqMine =
+      systemsCache.waypointsInSystem(hq.system).firstWhere((w) => w.isAsteroid);
   const tradeSymbol = TradeSymbol.DIAMONDS;
-  const haulerType = ShipType.HEAVY_FREIGHTER;
+  const haulerType = ShipType.LIGHT_HAULER;
   final unitsPerHaulerCycle = shipyardShips.capacityForShipType(haulerType)!;
 
-  const surveyorType = ShipType.ORE_HOUND;
+  const surveyorType = ShipType.SURVEYOR;
   final surveyorDefaultMounts = kOreHoundDefault.mounts;
   final surveyorMounts = kSurveyOnlyTemplate.mounts;
   final surveysPerCycle =
       surveysExpectedPerSurveyWithMounts(shipMounts, surveyorMounts);
 
-  const minerType = ShipType.ORE_HOUND;
+  const minerType = ShipType.MINING_DRONE;
   final minerDefaultMounts = kOreHoundDefault.mounts;
   final minerMounts = kMineOnlyTemplate.mounts;
   final unitsPerMineCycle = shipyardShips.capacityForShipType(minerType)!;
@@ -180,16 +199,15 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   const extractionsPerSurvey = 10;
   final diamondMedianSellPrice = marketPrices.medianSellPrice(tradeSymbol)!;
 
-  const maxRequestsPerMinute = 170; // Assuming no room for other actions.
+  final maxRequestsPerMinute = config.targetRequestsPerSecond * 60;
 
   final miner = minerTransfer;
   final surveyor = [survey];
 
-  final ship = exampleShip(
-    shipCache,
-    frame: shipyardShips.shipFrameFromType(haulerType)!,
-    overrideLocation: hqMine,
-  );
+  final ship = shipyardShips.shipForTest(
+    haulerType,
+    origin: hqMine,
+  )!;
   final trips = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
@@ -316,11 +334,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   // Costs
   // Ship costs
-  final minerPrice = shipyardPrices.medianPurchasePrice(minerType)!;
+  final minerPrice = shipPrice(shipyardPrices, minerType);
   logger.info('\nMiner price: ${creditsString(minerPrice)}');
-  final haulerPrice = shipyardPrices.medianPurchasePrice(haulerType)!;
+  final haulerPrice = shipPrice(shipyardPrices, haulerType);
   logger.info('Hauler price: ${creditsString(haulerPrice)}');
-  final surveyorPrice = shipyardPrices.medianPurchasePrice(surveyorType)!;
+  final surveyorPrice = shipPrice(shipyardPrices, surveyorType);
   logger.info('Surveyor price: ${creditsString(surveyorPrice)}');
 
   final totalShipCost = minerPrice * minersNeeded +
