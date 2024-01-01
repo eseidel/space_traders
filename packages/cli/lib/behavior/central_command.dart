@@ -50,11 +50,13 @@ class CentralCommand {
   /// BehaviorStates with jobs when handing them out to ships.
   ShipBuyJob? _nextShipBuyJob;
 
-  /// The current construction job.  Visible so that a script can set it.
+  /// The current construction job.
+  // Visible so that nearby_deals script can set it.
   Construction? activeConstruction;
 
   /// The current market subsidies.  Used for motivating construction markets.
-  List<SellOpp> _subsidizedSellOpps = [];
+  // Visible so that nearby_deals script can set it.
+  List<SellOpp> subsidizedSellOpps = [];
 
   /// The current mining squads.
   List<ExtractionSquad> miningSquads = [];
@@ -278,7 +280,7 @@ class CentralCommand {
           );
         },
       ),
-      ..._subsidizedSellOpps,
+      ...subsidizedSellOpps,
     ];
   }
 
@@ -477,7 +479,12 @@ class CentralCommand {
     return await caches.construction.getConstruction(jumpGate.symbol);
   }
 
-  Future<List<SellOpp>> _computeMarketSubsidies(Caches caches) async {
+  /// Computes the market subsidies for the current construction job.
+  Future<List<SellOpp>> computeMarketSubsidies(
+    MarketListingCache marketListings,
+    MarketPrices marketPrices,
+    TradeExportCache exportsCache,
+  ) async {
     if (!isConstructionTradingEnabled) {
       return [];
     }
@@ -486,7 +493,7 @@ class CentralCommand {
     // with a MarketPrice which is a multiplier from normal.
 
     const export = TradeSymbol.FAB_MATS;
-    final listing = caches.marketListings.listings
+    final listing = marketListings.listings
         .firstWhereOrNull((l) => l.exports.contains(export));
     if (listing == null) {
       logger.info('No market found for $export');
@@ -494,12 +501,12 @@ class CentralCommand {
     }
 
     // Look up what trade symbols are required to produce the export.
-    final tradeSymbols = caches.static.exports[export]!.imports;
+    final tradeSymbols = exportsCache[export]!.imports;
     final waypointSymbol = listing.waypointSymbol;
 
     final neededSymbols = <TradeSymbol>[];
     for (final tradeSymbol in tradeSymbols) {
-      final price = caches.marketPrices.priceAt(waypointSymbol, tradeSymbol);
+      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
       if (price != null &&
           SupplyLevel.values.indexOf(price.supply) <
               SupplyLevel.values.indexOf(SupplyLevel.ABUNDANT)) {
@@ -508,7 +515,7 @@ class CentralCommand {
     }
     final subsidies = <SellOpp>[];
     for (final tradeSymbol in neededSymbols) {
-      final price = caches.marketPrices.priceAt(waypointSymbol, tradeSymbol);
+      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
       if (price == null) {
         continue;
       }
@@ -553,7 +560,11 @@ class CentralCommand {
     await _queueMountRequests(caches);
 
     activeConstruction = await _computeActiveConstruction(caches);
-    _subsidizedSellOpps = await _computeMarketSubsidies(caches);
+    subsidizedSellOpps = await computeMarketSubsidies(
+      caches.marketListings,
+      caches.marketPrices,
+      caches.static.exports,
+    );
     _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(caches);
   }
 

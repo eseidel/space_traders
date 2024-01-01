@@ -41,6 +41,15 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final construction = constructionSnapshot[jumpGate.symbol];
   centralCommand.activeConstruction = construction;
 
+  final exportCache = TradeExportCache.load(fs);
+
+  centralCommand.subsidizedSellOpps =
+      await centralCommand.computeMarketSubsidies(
+    marketListings,
+    marketPrices,
+    exportCache,
+  );
+
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
     extraSellOpps
