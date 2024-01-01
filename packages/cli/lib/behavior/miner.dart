@@ -526,14 +526,14 @@ JobResult _waitForHauler(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) {
-  final here = ship.waypointSymbol;
+  final mineSymbol = ship.waypointSymbol;
   final nextHauler = _nextArrivingHauler(haulers, ship.waypointSymbol);
   if (nextHauler != null) {
-    if (here != nextHauler.waypointSymbol) {
+    if (mineSymbol != nextHauler.waypointSymbol) {
       shipErr(
         ship,
         'Hauler ${nextHauler.symbol} is headed to '
-        '$here, not ${ship.waypointSymbol}?',
+        '${nextHauler.waypointSymbol}, not $mineSymbol?',
       );
     }
     final waitTime = nextHauler.nav.route.arrival;
@@ -541,20 +541,22 @@ JobResult _waitForHauler(
     if (duration.isNegative) {
       shipWarn(
         ship,
-        'Hauler ${nextHauler.symbol} is already at $here, waiting 1 minute.',
+        'Hauler ${nextHauler.symbol} is already at $mineSymbol, but still'
+        ' marked in transit, waiting 1 minute.',
       );
       return JobResult.wait(getNow().add(const Duration(minutes: 1)));
     }
     shipInfo(
       ship,
-      'Waiting ${approximateDuration(duration)} for hauler arrival at $here.',
+      'Waiting ${approximateDuration(duration)} for hauler arrival '
+      'at $mineSymbol.',
     );
     return JobResult.wait(waitTime);
   } else {
     final haulerSymbols = haulers.map((h) => h.symbol).join(', ');
     shipInfo(
       ship,
-      'No haulers at $here, unknown next arrival time for '
+      'No haulers at $mineSymbol, unknown next arrival time for '
       '$haulerSymbols, checking in 1 minute.',
     );
     for (final hauler in haulers) {
