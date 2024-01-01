@@ -1083,3 +1083,18 @@ This should already be happening. Not sure how we double-buy though?
 🛸#E  Still have 12 cargo, waiting for hauler to arrive.
 🛸#E  No haulers at TV94-B44, unknown next arrival time for ESEIDEL-6, checking in 1 minute.
 🛸#E  Hauler ESEIDEL-6 is IN_ORBIT to TV94-B44 arrival -30m, with 0 space available.
+
+### Add back market feeding for construction supply chains.
+
+Try this time to just change the SellOpps of the required goods to be boosted
+by 2x or something.
+
+### Miner haulers need to plan to have enough fuel to come back from mine.
+
+Mines don't sell fuel, so we need to make sure we have enough fuel to get back
+to the market.  Either by bringing fuel, or toping up before leaving.
+
+🛸#A  No haulers at TV94-B10, unknown next arrival time for ESEIDEL-4, checking in 1 minute.
+🛸#A  Hauler ESEIDEL-4 is IN_TRANSIT to TV94-H61 arrival 52m, with 0 space available.
+🛸#C  No haulers at TV94-B42, unknown next arrival time for ESEIDEL-5, checking in 1 minute.
+🛸#C  Hauler ESEIDEL-5 is IN_TRANSIT to TV94-F56 arrival 1h, with 0 space available.
