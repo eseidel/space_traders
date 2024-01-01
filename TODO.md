@@ -1077,3 +1077,9 @@ This should already be happening. Not sure how we double-buy though?
 ### Upgrade to package:postgres 3.x
 
 ### Add a system for managing cash-flow to avoid missing trades from low cash.
+
+### Mining Haulers still confused:
+
+🛸#E  Still have 12 cargo, waiting for hauler to arrive.
+🛸#E  No haulers at TV94-B44, unknown next arrival time for ESEIDEL-6, checking in 1 minute.
+🛸#E  Hauler ESEIDEL-6 is IN_ORBIT to TV94-B44 arrival -30m, with 0 space available.

@@ -88,6 +88,7 @@ class CentralCommand {
   // from other sources (e.g. hauling mining goods?)
   int expectedCreditsPerSecond(Ship ship) {
     // If we're stuck in our own system, any trades are better than exploring.
+    // This doesn't include the command ship, which may be an error.
     if (!_haveEscapedStartingSystem && ship.fleetRole == FleetRole.trader) {
       return 1;
     }
