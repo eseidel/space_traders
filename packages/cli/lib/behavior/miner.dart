@@ -330,6 +330,33 @@ Future<JobResult> emptyCargoIfNeededForMining(
   );
 }
 
+/// Returns a waypoint nearby which trades the good.
+/// This is not necessarily the nearest, but could be improved to be.
+/// Unlike findBestMarketToSell or findBestMarketToBuy, this could find
+/// markets we've never visited before (e.g. for emergency fuel purchases
+/// or when we're just starting out and don't have a lot of data yet).
+// TODO(eseidel): replace with findBestMarketToSell in all places?
+WaypointSymbol? _nearbyMarketWhichTrades(
+  SystemsCache systemsCache,
+  MarketListingCache marketListings,
+  WaypointSymbol startSymbol,
+  TradeSymbol tradeSymbol,
+) {
+  final startMarket = marketListings[startSymbol];
+  if (startMarket != null && startMarket.allowsTradeOf(tradeSymbol)) {
+    return startSymbol;
+  }
+  // TODO(eseidel): Handle jumps again!
+  final waypoints = systemsCache.waypointsInSystem(startSymbol.system);
+  for (final waypoint in waypoints) {
+    final market = marketListings[waypoint.symbol];
+    if (market != null && market.allowsTradeOf(tradeSymbol)) {
+      return waypoint.symbol;
+    }
+  }
+  return null;
+}
+
 /// Attempt to empty cargo if needed, will navigate to a market if needed.
 Future<JobResult> emptyCargoIfNeeded(
   BehaviorState state,
@@ -380,7 +407,7 @@ Future<JobResult> emptyCargoIfNeeded(
   }
 
   final largestCargo = ship.largestCargo();
-  final nearestMarketSymbol = nearbyMarketWhichTrades(
+  final nearestMarketSymbol = _nearbyMarketWhichTrades(
     caches.systems,
     caches.marketListings,
     ship.waypointSymbol,

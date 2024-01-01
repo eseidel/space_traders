@@ -12,47 +12,13 @@ import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
-// Not sure where this belongs?
-/// Returns a waypoint nearby which trades the good.
-/// This is not necessarily the nearest, but could be improved to be.
-/// Unlike findBestMarketToSell or findBestMarketToBuy, this could find
-/// markets we've never visited before (e.g. for emergency fuel purchases
-/// or when we're just starting out and don't have a lot of data yet).
-// TODO(eseidel): replace with findBestMarketToSell in all places?
-WaypointSymbol? nearbyMarketWhichTrades(
-  SystemsCache systemsCache,
-  MarketListingCache marketListings,
-  WaypointSymbol startSymbol,
-  TradeSymbol tradeSymbol,
-) {
-  final startMarket = marketListings[startSymbol];
-  if (startMarket != null && startMarket.allowsTradeOf(tradeSymbol)) {
-    return startSymbol;
-  }
-  // TODO(eseidel): Handle jumps again!
-  final waypoints = systemsCache.waypointsInSystem(startSymbol.system);
-  for (final waypoint in waypoints) {
-    final market = marketListings[waypoint.symbol];
-    if (market != null && market.allowsTradeOf(tradeSymbol)) {
-      return waypoint.symbol;
-    }
-  }
-  return null;
-}
-
 /// Builds a list of deals found from the provided MarketScan.
-/// If overrideBuyOpps or overrideSellOpps are provided, they will be used
-/// instead of the ones from the scan.  This is useful for when you want
-/// to build a Deal where you already know where it must be bought or sold.
-/// Similarly if overrideTradeSymbols is provided, it will be used instead
-/// of the ones from the scan.
 List<Deal> buildDealsFromScan(
   MarketScan scan, {
   List<SellOpp>? extraSellOpps,
   int? minProfitPerUnit,
 }) {
   final deals = <Deal>[];
-  // final fuelPrice = _priceData.medianPurchasePrice(TradeSymbol.FUEL.value);
   final tradeSymbols = scan.tradeSymbols;
   for (final tradeSymbol in tradeSymbols) {
     final buys = scan.buyOppsForTradeSymbol(tradeSymbol);
@@ -105,6 +71,18 @@ int profitableVolumeBetween(
   }
 }
 
+/// Logic for extrapolating from a MarketPrice
+extension SellOppPrediction on SellOpp {
+  /// The total sell price for the given number of units.
+  int totalSellPriceFor(int units) {
+    // Contract rewards don't move with market state.
+    if (isConstructionDelivery || isContractDelivery) {
+      return price * units;
+    }
+    return marketPrice!.totalSellPriceFor(units);
+  }
+}
+
 /// Logic for extrapolating from a CostedDeal
 extension CostedDealPrediction on CostedDeal {
   /// expectedUnits uses cargoSize instead of maxUnitsToBuy when computing
@@ -150,29 +128,15 @@ extension CostedDealPrediction on CostedDeal {
       expectedCostOfGoodsSold + expectedOperationalExpenses;
 
   /// The total income of the deal, excluding any costs.
-  int get expectedRevenue {
-    // Contract rewards don't move with market state.
-    // TODO(eseidel): Move this all onto SellOpp?
-    // totalSellPriceFor isn't accessible down in package:types though.
-    if (deal.isConstructionDelivery || deal.isContractDeal) {
-      return deal.destination.price * expectedUnits;
-    }
-    return deal.destination.marketPrice!.totalSellPriceFor(expectedUnits);
-  }
+  int get expectedRevenue => deal.destination.totalSellPriceFor(expectedUnits);
 
   /// The expected initial per-unit buy price.
-  int get expectedInitialBuyPrice =>
-      deal.source.marketPrice.predictPurchasePriceForUnit(0);
+  // No prediction is needed for the first price.
+  int get expectedInitialBuyPrice => deal.source.price;
 
   /// The expected initial per-unit sell price.
-  int get expectedInitialSellPrice {
-    if (isContractDeal || isConstructionDeal) {
-      return deal.destination.price;
-    }
-    // predictSellPriceForUnit isn't available in package:types or we'd
-    // move this all onto SellOpp.
-    return deal.destination.marketPrice!.predictSellPriceForUnit(0);
-  }
+  // No prediction is needed for the first price.
+  int get expectedInitialSellPrice => deal.destination.price;
 
   /// Max we would spend per unit and still expect to break even.
   int? get maxPurchaseUnitPrice {
@@ -182,33 +146,6 @@ extension CostedDealPrediction on CostedDeal {
     }
     return (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
   }
-
-  // This does not account for any expected profit.
-  /// The expected per-unit purchase price for the next lot of units.
-  /// For each additional unit (or batch of) we buy, we expect to:
-  /// - spend more to buy it (prices go up at source market)
-  /// - less to transport it (OpEx is amortized over more units)
-  /// - and sell it for less (prices go down at destination market)
-  /// This function answers the question "what's the max we would pay
-  /// perUnit for this next lot of unit and still expect to profit".
-  // int maxPurchaseUnitPrice({required int existingUnits,
-  //      required int lotSize}) {
-  //   // Contract deals are easy, "sell" prices dont change.
-  //   // perUnitRewards - perUnitOpExp = maxPerUnitPurchasePrice
-  //   final destinationPrice = deal.destinationPrice;
-  //   if (destinationPrice == null) {
-  //     return (expectedRevenue - expectedOperationalExpenses) ~/ expectedUnits;
-  //   }
-  //   // Taking lotSize into account, we end up with a smaller max purchase price
-  //   // for the first few units (as the fuel costs are spread over few units)
-  //   // which gets higher as we buy more units (as the fuel costs are spread
-  //   // over more units) and then lower again as we buy more units (as the
-  //   // destination price drops).
-
-  //   // This should get a range value instead?
-  //   final expectedSellValue =
-  //       destinationPrice.predictSellPriceForUnit(existingUnits + 1)
-  // }
 
   /// Count of units purchased so far.
   int get unitsPurchased => transactions
@@ -223,6 +160,7 @@ extension CostedDealPrediction on CostedDeal {
   int get predictNextPurchasePrice {
     if (isContractDeal) {
       // Contract deals don't move with market state.
+      // TODO(eseidel): This is just wrong.  Contract sources do move!
       return deal.source.marketPrice.purchasePrice;
     }
     return deal.source.marketPrice
@@ -379,7 +317,6 @@ MarketScan scanReachableMarkets(
   final clusterId = systemConnectivity.clusterIdForSystem(startSystem);
   return MarketScan.fromMarketPrices(
     marketPrices,
-    // TODO(eseidel): Avoid the systemSymbol construction here.
     waypointFilter: (w) =>
         systemConnectivity.clusterIdForSystem(w.system) == clusterId,
     description: 'all known markets',
@@ -459,8 +396,7 @@ Iterable<CostedDeal> findDealsFor(
   // toList is used to force resolution of the list before we log.
   final after = DateTime.now();
   final elapsed = after.difference(before);
-  // This should be 300ms or less.
-  if (elapsed > const Duration(seconds: 1)) {
+  if (elapsed > const Duration(milliseconds: 300)) {
     logger.warn(
       'Costed ${deals.length} deals in ${approximateDuration(elapsed)}',
     );
