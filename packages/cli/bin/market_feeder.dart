@@ -90,11 +90,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   );
   if (feederDeals.isEmpty) {
     logger.info('In progress: None');
-    return;
-  }
-  logger.info('In progress:');
-  for (final deal in feederDeals) {
-    logger.info('  ${describeCostedDeal(deal)}');
+  } else {
+    logger.info('In progress:');
+    for (final deal in feederDeals) {
+      logger.info('  ${describeCostedDeal(deal)}');
+    }
   }
 
   await db.close();
