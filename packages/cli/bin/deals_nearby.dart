@@ -74,8 +74,14 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   if (extraSellOpps.isNotEmpty) {
     logger.info('Extra sell opps:');
     for (final extraOpp in extraSellOpps) {
-      final type =
-          extraOpp.isConstructionDelivery ? 'construction' : 'contract';
+      final String type;
+      if (extraOpp.isConstructionDelivery) {
+        type = 'construction';
+      } else if (extraOpp.isContractDelivery) {
+        type = 'contract';
+      } else {
+        type = 'subsidy';
+      }
       logger.info('  $type: ${extraOpp.maxUnits} ${extraOpp.tradeSymbol} -> '
           '${extraOpp.waypointSymbol} @ ${creditsString(extraOpp.price)}');
     }
