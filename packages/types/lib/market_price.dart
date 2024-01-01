@@ -85,6 +85,18 @@ class MarketPrice extends PriceBase<TradeSymbol> {
   /// The trade volume of the trade good.
   final int tradeVolume;
 
+  /// Used for creating a new price record with a different sell price.
+  MarketPrice copyWith({required int sellPrice}) => MarketPrice(
+        waypointSymbol: waypointSymbol,
+        symbol: symbol,
+        supply: supply,
+        purchasePrice: purchasePrice,
+        sellPrice: sellPrice,
+        tradeVolume: tradeVolume,
+        timestamp: timestamp,
+        activity: activity,
+      );
+
   @override
   List<Object?> get props => [
         waypointSymbol,
