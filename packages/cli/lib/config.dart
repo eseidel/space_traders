@@ -33,7 +33,7 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
-    for (int i = 0; i < 10; i++) ShipType.LIGHT_HAULER,
+    for (int i = 0; i < 15; i++) ShipType.LIGHT_HAULER,
     // for (int i = 0; i < 40; i++) ShipType.PROBE,
     // for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
     // ShipType.EXPLORER,
@@ -87,7 +87,7 @@ class Config {
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
     TradeSymbol.FAB_MATS: 4000,
-    TradeSymbol.ADVANCED_CIRCUITRY: 8000,
+    TradeSymbol.ADVANCED_CIRCUITRY: 6000,
   };
 
   /// Used by _computeActiveConstruction to compute if we should be doing
