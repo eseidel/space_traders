@@ -288,7 +288,7 @@ bool _shouldRefuelBasedOnUsage(Ship ship) {
       recentFuelSpend != null && recentFuelSpend < twentyPercentTank;
   if (ship.isMiner && takingShortTrips) {
     // If we're a miner, we should only refuel if we're below 50% fuel.
-    shipDetail(
+    shipInfo(
         ship,
         'Not refueling yet, last trip was short ($recentFuelSpend fuel)'
         ' and at ${(100.0 * ship.fuelPercentage).toStringAsFixed(1)}% fuel.');
@@ -302,10 +302,9 @@ bool _shouldRefuelBasedOnCapacity(Ship ship) {
   if (fuel.capacity == 0) {
     return false;
   }
-  if (fuel.capacity < 100) {
-    return fuel.current < fuel.capacity;
-  }
-  return fuel.current <= (fuel.capacity - 100);
+  // We used to avoid spillover here, but the route planner doesn't know about
+  // partial fuel tanks, so until we fix that, we always refill to full.
+  return fuel.current < fuel.capacity;
 }
 
 /// Refuel the ship if needed and log the transaction

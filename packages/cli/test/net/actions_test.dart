@@ -465,13 +465,6 @@ void main() {
       ),
     );
 
-    // Directly calling refuelShip with topUp=true and less than 100 needed
-    // should refuel.
-    clearInteractions(fleetApi);
-    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
-    await refuelShip(api, agentCache, shipCache, ship, topUp: true);
-    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
-
     // Verify our "don't refuel for short miner trips" logic.
     clearInteractions(fleetApi);
     when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);

@@ -217,31 +217,12 @@ Future<RefuelShip200ResponseData> refuelShip(
   Api api,
   AgentCache agentCache,
   ShipCache shipCache,
-  Ship ship, {
-  bool topUp = false,
-}) async {
-  RefuelShipRequest? refuelShipRequest;
-  // Ships with fuel capacity < 100 will always be topped up.
-  if (!topUp && ship.fuel.capacity > 100) {
-    // If we're not topping up, round down to the closest unit.
-    // units needed is specified in ship fuel units, but we are actually
-    // charged in market units.  One market unit = 100 ship fuel units.
-    // So we round to the closest 100.
-    // Note Ship.shouldRefuel will only return true if the ship needs
-    // more than 100 units of fuel which works out nicely with this logic
-    // to prevent ships from constantly trying to refuel but failing to.
-    final unitsNeeded = (ship.fuelUnitsNeeded ~/ 100) * 100;
-    if (unitsNeeded > 0) {
-      refuelShipRequest = RefuelShipRequest(units: unitsNeeded);
-    } else {
-      // We were asked to refuel with topUp = false, but we don't need fuel.
-      throw StateError(
-        'refuelShip called with topUp = false and < 100 fuel needed',
-      );
-    }
-  }
-  final responseWrapper = await api.fleet
-      .refuelShip(ship.symbol, refuelShipRequest: refuelShipRequest);
+  Ship ship,
+) async {
+  // We used to have logic to avoid filling to full, but our route planner
+  // doesn't account for non-full tanks, so for now we just always
+  // refill to full.
+  final responseWrapper = await api.fleet.refuelShip(ship.symbol);
   final data = responseWrapper!.data;
   agentCache.agent = data.agent;
   ship.fuel = data.fuel;
