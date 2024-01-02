@@ -221,18 +221,14 @@ class Sourcer {
   }
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final exportCache = TradeExportCache.load(fs);
-  final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs);
-  final marketPrices = MarketPrices.load(fs);
-  final agentCache = AgentCache.load(fs)!;
-
-  final jumpgate = systemsCache
-      .jumpGateWaypointForSystem(agentCache.headquartersSystemSymbol)!;
-  const tradeSymbol = TradeSymbol.FAB_MATS;
-  final waypointSymbol = jumpgate.symbol;
-
+void source(
+  MarketListingCache marketListings,
+  SystemsCache systemsCache,
+  TradeExportCache exportCache,
+  MarketPrices marketPrices,
+  TradeSymbol tradeSymbol,
+  WaypointSymbol waypointSymbol,
+) {
   logger.info('Sourcing $tradeSymbol for $waypointSymbol');
   Sourcer(
     marketListings: marketListings,
@@ -240,6 +236,38 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     exportCache: exportCache,
     marketPrices: marketPrices,
   ).sourceGoodsFor(tradeSymbol, waypointSymbol);
+}
+
+Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
+  final exportCache = TradeExportCache.load(fs);
+  final systemsCache = SystemsCache.load(fs)!;
+  final marketListings = MarketListingCache.load(fs);
+  final marketPrices = MarketPrices.load(fs);
+  final agentCache = AgentCache.load(fs)!;
+  final constructionCache = ConstructionCache(db);
+
+  final jumpgate = systemsCache
+      .jumpGateWaypointForSystem(agentCache.headquartersSystemSymbol)!;
+  final waypointSymbol = jumpgate.symbol;
+  final construction = await constructionCache.getConstruction(waypointSymbol);
+
+  final neededExports = construction!.materials
+      .where((m) => m.required_ > m.fulfilled)
+      .map((m) => m.tradeSymbol);
+  for (final tradeSymbol in neededExports) {
+    source(
+      marketListings,
+      systemsCache,
+      exportCache,
+      marketPrices,
+      tradeSymbol,
+      waypointSymbol,
+    );
+  }
+
+  // Required or main() will hang.
+  await db.close();
 }
 
 void main(List<String> args) async {
