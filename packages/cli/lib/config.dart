@@ -126,6 +126,9 @@ class Config {
   // to buy the high priced materials at once.
   final allowParallelConstructionDelivery = false;
 
+  /// The amount of credits to subsidize each unit of construction materials.
+  final constructionMaterialFlatSubsityCredits = 50;
+
   /// Max number of jumps we allow a charter to plan for at once.
   final charterMaxJumps = 5;
 

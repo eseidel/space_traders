@@ -738,3 +738,12 @@ TradeSymbol tradeSymbolForMountSymbol(ShipMountSymbolEnum mountSymbol) {
 ShipMountSymbolEnum? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
   return ShipMountSymbolEnum.fromJson(tradeSymbol.value);
 }
+
+/// Extensions onto SupplyLevel to make it easier to work with.
+extension SupplyLevelUtils on SupplyLevel {
+  /// Returns the index of the supply level.
+  int get index => SupplyLevel.values.indexOf(this);
+
+  /// Returns true if the supply level is at least the given level.
+  bool isAtLeast(SupplyLevel level) => index >= level.index;
+}

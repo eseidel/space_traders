@@ -479,53 +479,6 @@ class CentralCommand {
     return await caches.construction.getConstruction(jumpGate.symbol);
   }
 
-  /// Computes the market subsidies for the current construction job.
-  Future<List<SellOpp>> computeMarketSubsidies(
-    MarketListingCache marketListings,
-    MarketPrices marketPrices,
-    TradeExportCache exportsCache,
-  ) async {
-    if (!isConstructionTradingEnabled) {
-      return [];
-    }
-    // Figure out the construction supply chain.
-    // For anything below a certain supply threshold, return a SellOpp
-    // with a MarketPrice which is a multiplier from normal.
-
-    const export = TradeSymbol.FAB_MATS;
-    final listing = marketListings.listings
-        .firstWhereOrNull((l) => l.exports.contains(export));
-    if (listing == null) {
-      logger.info('No market found for $export');
-      return [];
-    }
-
-    // Look up what trade symbols are required to produce the export.
-    final tradeSymbols = exportsCache[export]!.imports;
-    final waypointSymbol = listing.waypointSymbol;
-
-    final neededSymbols = <TradeSymbol>[];
-    for (final tradeSymbol in tradeSymbols) {
-      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
-      if (price != null &&
-          SupplyLevel.values.indexOf(price.supply) <
-              SupplyLevel.values.indexOf(SupplyLevel.ABUNDANT)) {
-        neededSymbols.add(tradeSymbol);
-      }
-    }
-    final subsidies = <SellOpp>[];
-    for (final tradeSymbol in neededSymbols) {
-      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
-      if (price == null) {
-        continue;
-      }
-      final subsidizedSellPrice = price.sellPrice + 50;
-      final subsidizedPrice = price.copyWith(sellPrice: subsidizedSellPrice);
-      subsidies.add(SellOpp.fromMarketPrice(subsidizedPrice));
-    }
-    return subsidies;
-  }
-
   bool _computeHaveEscapedStartingSystem(Caches caches) {
     if (_haveEscapedStartingSystem) {
       return true;
@@ -560,11 +513,17 @@ class CentralCommand {
     await _queueMountRequests(caches);
 
     activeConstruction = await _computeActiveConstruction(caches);
-    subsidizedSellOpps = await computeMarketSubsidies(
-      caches.marketListings,
-      caches.marketPrices,
-      caches.static.exports,
-    );
+    if (isConstructionTradingEnabled && activeConstruction != null) {
+      subsidizedSellOpps = computeConstructionMaterialSubsidies(
+        caches.marketListings,
+        caches.marketPrices,
+        caches.static.exports,
+        activeConstruction!,
+      );
+    } else {
+      subsidizedSellOpps = [];
+    }
+
     _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(caches);
   }
 
@@ -990,4 +949,46 @@ ShipType? shipToBuyFromPlan(
   logger.info('All ships already purchased in plan.');
   // We walked off the end of our plan.
   return null;
+}
+
+/// Computes the market subsidies for the current construction job.
+List<SellOpp> computeConstructionMaterialSubsidies(
+  MarketListingCache marketListings,
+  MarketPrices marketPrices,
+  TradeExportCache exportsCache,
+  Construction construction,
+) {
+  final neededExports = construction.materials
+      .where((m) => m.required_ > m.fulfilled)
+      .map((m) => m.tradeSymbol);
+
+  final subsidies = <SellOpp>[];
+  for (final export in neededExports) {
+    final listing = marketListings.listings
+        .firstWhereOrNull((l) => l.exports.contains(export));
+    if (listing == null) {
+      logger.warn('No market found for $export needed for construction.');
+      continue;
+    }
+
+    final waypointSymbol = listing.waypointSymbol;
+    // Look up what trade symbols are required to produce the export.
+    final tradeSymbols = exportsCache[export]!.imports;
+
+    for (final tradeSymbol in tradeSymbols) {
+      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
+      if (price == null) {
+        logger.warn('Missing import price $tradeSymbol at $waypointSymbol?');
+        continue;
+      }
+      if (price.supply.isAtLeast(SupplyLevel.ABUNDANT)) {
+        continue;
+      }
+      final subsidizedSellPrice =
+          price.sellPrice + config.constructionMaterialFlatSubsityCredits;
+      final subsidizedPrice = price.copyWith(sellPrice: subsidizedSellPrice);
+      subsidies.add(SellOpp.fromMarketPrice(subsidizedPrice));
+    }
+  }
+  return subsidies;
 }

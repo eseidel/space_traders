@@ -43,12 +43,14 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
 
   final exportCache = TradeExportCache.load(fs);
 
-  centralCommand.subsidizedSellOpps =
-      await centralCommand.computeMarketSubsidies(
-    marketListings,
-    marketPrices,
-    exportCache,
-  );
+  if (construction != null) {
+    centralCommand.subsidizedSellOpps = computeConstructionMaterialSubsidies(
+      marketListings,
+      marketPrices,
+      exportCache,
+      construction,
+    );
+  }
 
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
