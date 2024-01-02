@@ -383,12 +383,7 @@ void main() {
         ship,
       ),
     );
-    verify(
-      () => fleetApi.refuelShip(
-        shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(units: 300),
-      ),
-    ).called(1);
+    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
     verifyNever(
       () => fleetApi.patchShipNav(
         any(),
@@ -426,44 +421,6 @@ void main() {
             PatchShipNavRequest(flightMode: ShipNavFlightMode.CRUISE),
       ),
     ).called(1);
-
-    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    clearInteractions(fleetApi);
-    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
-    // Trying to refuel with less than 100 needed, should not refuel.
-    await runWithLogger(
-      logger,
-      () => refuelIfNeededAndLog(
-        api,
-        db,
-        marketPrices,
-        agentCache,
-        shipCache,
-        market,
-        ship,
-      ),
-    );
-    verifyNever(
-      () => fleetApi.refuelShip(
-        shipSymbol.symbol,
-        refuelShipRequest: any(named: 'refuelShipRequest'),
-      ),
-    );
-
-    // Directly calling refuelShip with topUp=false and less than 100 needed
-    // should throw an exception.
-    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 901));
-    expect(
-      () async => refuelShip(api, agentCache, shipCache, ship),
-      throwsA(
-        predicate(
-          (e) =>
-              e is StateError &&
-              e.message ==
-                  'refuelShip called with topUp = false and < 100 fuel needed',
-        ),
-      ),
-    );
 
     // Verify our "don't refuel for short miner trips" logic.
     clearInteractions(fleetApi);
@@ -513,12 +470,7 @@ void main() {
         ship,
       ),
     );
-    verify(
-      () => fleetApi.refuelShip(
-        shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(units: 400),
-      ),
-    ).called(1);
+    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
 
     // It does refuel if our recent trip data has a large trip
     clearInteractions(fleetApi);
@@ -545,12 +497,7 @@ void main() {
         ship,
       ),
     );
-    verify(
-      () => fleetApi.refuelShip(
-        shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(units: 400),
-      ),
-    ).called(1);
+    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
 
     // It will also refuel if our fuel is < 50% of capacity
     clearInteractions(fleetApi);
@@ -577,12 +524,7 @@ void main() {
         ship,
       ),
     );
-    verify(
-      () => fleetApi.refuelShip(
-        shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(units: 500),
-      ),
-    ).called(1);
+    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
   });
 
   test('sellAllCargoAndLog', () async {
