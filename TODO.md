@@ -1099,8 +1099,18 @@ to the market.  Either by bringing fuel, or toping up before leaving.
 🛸#C  No haulers at TV94-B42, unknown next arrival time for ESEIDEL-5, checking in 1 minute.
 🛸#C  Hauler ESEIDEL-5 is IN_TRANSIT to TV94-F56 arrival 1h, with 0 space available.
 
+[WARN] 🛸#6  Beginning route to TV94-B44 (16m)
+🛸#6  🛫 to TV94-B44 ASTEROID (16m) spent 368 fuel
+
+### Make sure that hauler routes are cruise-able with the given hauler.
+
 ### Script for tracking construction.
 
 Lists current status of the construction.
 Lists any in-progress construction deals.
 Lists status of construction supply chain?
+
+### Teach ships how to refuel from cargo.
+
+That way miner haulers can bring fuel with them when heading to a mine and then
+refuel there, so they have enough to get back to the market.
