@@ -174,6 +174,16 @@ class CentralCommand {
     }
 
     bool enabled(Behavior behavior) {
+      final miningBehaviors = {
+        Behavior.miner,
+        Behavior.minerHauler,
+        // Behavior.siphoner,
+        Behavior.surveyor,
+      };
+      if (!config.enableMining && miningBehaviors.contains(behavior)) {
+        return false;
+      }
+
       return !_behaviorCache.isBehaviorDisabledForShip(ship, behavior);
     }
 
@@ -476,7 +486,15 @@ class CentralCommand {
     if (jumpGate == null) {
       return null;
     }
-    return await caches.construction.getConstruction(jumpGate.symbol);
+    final construction =
+        await caches.construction.getConstruction(jumpGate.symbol);
+    if (construction == null) {
+      return null;
+    }
+    if (construction.isComplete) {
+      return null;
+    }
+    return construction;
   }
 
   bool _computeHaveEscapedStartingSystem(Caches caches) {
