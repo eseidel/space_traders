@@ -1062,7 +1062,13 @@ This should already be happening. Not sure how we double-buy though?
 ### Bring back phases.
 
 - Some sort of initial phase (plan trades based on import/export?)
-- 
+- Ramping up to a certain number of traders.
+- Focusing on construction
+  (Need to fix supply chain logic to handle entire chains.)
+- Ramping up probes + exploring
+  (Don't buy probes before opening the jump gate, or they'll start
+  system watching instead of charting.)
+- Turning off mining and replacing with heavy freighters.
 
 ### Assign miner haulers only when a miner is active at the assigned waypoint.
 
@@ -1114,3 +1120,25 @@ Lists status of construction supply chain?
 
 That way miner haulers can bring fuel with them when heading to a mine and then
 refuel there, so they have enough to get back to the market.
+
+### Gate probe buying off of # of uncharted systems?
+
+e.g. when we know of 10 uncharted systems by 1 probe? up to a limit?
+Could do similar with trades? Buy N haulers when we have N available trades?
+And maybe mining?  When we have N available mines with score above x?
+
+### Should disable jumping (for charters at least?) when low on cash?
+
+### Making trades w/o prices would help early game (and for new systems).
+
+### Regenerate connectivity every time we chart a jumpgate.
+
+Presumably just a bool on centralCommand that the outer loop can check/clear.
+
+Need two things:
+1. A way to know that we should re-gen.
+2. A list of jumpgates to add?  (Or do we just re-start the scan?)
+  If we add a single jump gate we'd want to know it's distance?
+  Or do we just not care and call it 0 each time?
+
+### Make bin/earning_per_ship.dart use cli_table
