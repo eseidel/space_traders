@@ -85,6 +85,11 @@
   "description": "Advanced electronic components used in the construction of advanced technologies."
  },
  {
+  "symbol": "ENGINE_HYPER_DRIVE_I",
+  "name": "Hyper Drive",
+  "description": "An advanced propulsion system that uses exotic matter and gravitational fields to generate faster-than-light travel."
+ },
+ {
   "symbol": "ENGINE_IMPULSE_DRIVE_I",
   "name": "Impulse Drive I",
   "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel."
@@ -305,6 +310,11 @@
   "description": "A basic shield generator that provides protection against incoming weapons fire and other hazards."
  },
  {
+  "symbol": "MODULE_SHIELD_GENERATOR_II",
+  "name": "Advanced Shield Generator",
+  "description": "An advanced shield generator that provides enhanced protection against incoming weapons fire and other hazards."
+ },
+ {
   "symbol": "MOOD_REGULATORS",
   "name": "Mood Regulators",
   "description": "Drugs or other medical treatments that are used to control or regulate mood and emotions."
@@ -428,6 +438,11 @@
   "symbol": "QUANTUM_DRIVES",
   "name": "Quantum Drives",
   "description": "Advanced propulsion systems that use quantum mechanics to enable near-instantaneous travel over long distances."
+ },
+ {
+  "symbol": "QUANTUM_STABILIZERS",
+  "name": "Quantum Stabilizers",
+  "description": "Advanced devices that stabilize and control quantum fields, used in various spactime manipulation technologies."
  },
  {
   "symbol": "QUARTZ_SAND",
