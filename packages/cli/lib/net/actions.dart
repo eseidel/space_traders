@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cli/behavior/behavior.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
@@ -207,11 +208,11 @@ Future<Transaction?> purchaseCargoAndLog(
     if (!isInsufficientCreditsException(e)) {
       rethrow;
     }
-    shipWarn(
-        ship,
-        'Purchase of $amountToBuy $tradeSymbol failed. '
-        'Insufficient credits.');
-    return null;
+    throw JobException(
+      'Purchase of $amountToBuy $tradeSymbol failed. '
+      'Insufficient credits.',
+      const Duration(minutes: 1),
+    );
   }
 }
 
