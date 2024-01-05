@@ -21,7 +21,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   final system = systemsCache[systemSymbol];
   final start = ship.systemSymbol == system.symbol
       ? ship.waypointSymbol
-      // This is only ever called with systems with waypoints.
+      // This is only ever called with systems with jumpgates.
       : system.jumpGateWaypoints.first.symbol;
   final startWaypoint = systemsCache.waypoint(start);
   final systemWaypoints =
