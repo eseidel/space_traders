@@ -4,6 +4,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
+import 'package:cli/net/exceptions.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
@@ -251,15 +252,26 @@ Future<NavResult> continueNavigationIfNeeded(
       shipWarn(ship, 'Empty route action, assuming we are already there.');
       return NavResult._continueAction();
     case RouteActionType.jump:
-      final response = await useJumpGateAndLog(
-        api,
-        db,
-        caches.marketPrices,
-        caches.agent,
-        caches.ships,
-        ship,
-        actionEnd.symbol,
-      );
+      final JumpShip200ResponseData response;
+      try {
+        response = await useJumpGateAndLog(
+          api,
+          db,
+          caches.marketPrices,
+          caches.agent,
+          caches.ships,
+          ship,
+          actionEnd.symbol,
+        );
+      } on ApiException catch (e) {
+        if (!isInsufficientCreditsException(e)) {
+          rethrow;
+        }
+        throw const JobException(
+          'Purchase of antimatter failed. Insufficient credits.',
+          Duration(minutes: 60),
+        );
+      }
 
       _verifyJumpTime(
         caches.systems,
