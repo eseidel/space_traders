@@ -22,16 +22,21 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
   logger.info('${reachableSystems.length} systems');
 
+  var jumpGates = 0;
+  var asteroids = 0;
   var waypointCount = 0;
   for (final systemSymbol in reachableSystems) {
     final systemRecord = systemsCache[systemSymbol];
     waypointCount += systemRecord.waypoints.length;
+    jumpGates += systemRecord.jumpGateWaypoints.length;
+    asteroids += systemRecord.waypoints.where((w) => w.isAsteroid).length;
   }
   logger.info('$waypointCount waypoints');
 
   // How many waypoints are charted?
   final chartingSnapshot = await ChartingSnapshot.load(db);
   var chartedWaypoints = 0;
+  var chartedAsteroids = 0;
   var chartedJumpGates = 0;
   for (final record in chartingSnapshot.records) {
     if (!record.isCharted) {
@@ -39,15 +44,30 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
     // We could sort first by system to save ourselves some lookups.
     final systemSymbol = record.waypointSymbol.system;
-    if (reachableSystems.contains(systemSymbol)) {
-      chartedWaypoints += 1;
+    if (!reachableSystems.contains(systemSymbol)) {
+      continue;
     }
+    chartedWaypoints += 1;
     final waypoint = systemsCache.waypoint(record.waypointSymbol);
     if (waypoint.isJumpGate) {
       chartedJumpGates += 1;
     }
+    if (waypoint.isAsteroid) {
+      chartedAsteroids += 1;
+    }
   }
-  logger.info(' $chartedWaypoints charted');
+  final nonAsteroidCount = waypointCount - asteroids;
+  final nonAsteroidCartedCount = chartedWaypoints - chartedAsteroids;
+  final nonAsteroidChartPercent = nonAsteroidCartedCount / nonAsteroidCount;
+  final asteroidChartPercent = chartedAsteroids / asteroids;
+
+  String p(double d) => '${(d * 100).round()}%';
+
+  logger
+    ..info(' $chartedWaypoints charted non-asteroid '
+        '(${p(nonAsteroidChartPercent)})')
+    ..info(' $chartedAsteroids charted asteroid '
+        '(${p(asteroidChartPercent)})');
 
   // How many markets?
   final marketListingCache = MarketListingCache.load(fs);
@@ -71,15 +91,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       shipyards += 1;
     }
   }
-  logger.info('$shipyards shipyards');
-
-  // How many total jump gates (presumably the exact number of systems?)
-  var jumpGates = 0;
-  for (final systemSymbol in reachableSystems) {
-    final systemRecord = systemsCache[systemSymbol];
-    jumpGates += systemRecord.jumpGateWaypoints.length;
-  }
-  logger.info('$jumpGates jump gates');
+  logger
+    ..info('$shipyards shipyards')
+    ..info('$jumpGates jump gates');
 
   // How many are cached?
   var cachedJumpGates = 0;
