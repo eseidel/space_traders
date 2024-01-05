@@ -9,6 +9,9 @@ class Config {
   /// Whether or not we should enable the idle queue.
   final bool serviceIdleQueue = true;
 
+  /// Whether or not we should enable mining behaviors.
+  final bool enableMining = false;
+
   /// The number of requests per second allowed by the api.
   /// Version 2.1 allows:
   /// - 2 requests per second
@@ -35,7 +38,7 @@ class Config {
     ShipType.SURVEYOR,
     for (int i = 0; i < 15; i++) ShipType.LIGHT_HAULER,
     for (int i = 0; i < 40; i++) ShipType.PROBE,
-    // for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 30; i++) ShipType.REFINING_FREIGHTER,
     // ShipType.EXPLORER,
   ];
 
@@ -97,7 +100,7 @@ class Config {
   /// Used by shouldBuyShip to make sure we don't buy a ship when it would
   /// affect our ability to trade.
   // TODO(eseidel): Make this vary based on how many traders we have.
-  final shipBuyBufferForTrading = 200000;
+  final shipBuyBufferForTrading = 500000;
 
   /// Used by _minimumFloatRequired to ensure we always have enough to complete
   /// a contract and don't just dump money into something we can't finish.
