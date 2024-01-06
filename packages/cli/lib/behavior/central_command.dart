@@ -635,8 +635,10 @@ class CentralCommand {
       return false;
     }
     // TODO(eseidel): See how far it is to the shipyard, only go if < 10 mins?
-    // For now just hacking to be command ship.
-    return ship.isCommand;
+    // This may pick ships which are a long ways away from the shipyard.
+    // But it at least avoids problems where the command ship is tied up
+    // trading for hours many jumps away.
+    return true;
   }
 
   /// Returns true if [ship] should start the mountFromBuy behavior.
@@ -874,10 +876,12 @@ ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
   // Score all squads based on how much they need this type of ship?
   // Add to the squad with the lowest score?
   final fleetRole = ship.fleetRole;
+  final isMinerHauler = config.enableMining &&
+      config.minerHaulerSymbols.contains(ship.shipSymbol);
   // Hack for now to restrict to miners / surveyors.
   if (fleetRole != FleetRole.miner &&
       fleetRole != FleetRole.surveyor &&
-      !config.minerHaulerSymbols.contains(ship.shipSymbol)) {
+      !isMinerHauler) {
     return null;
   }
 
