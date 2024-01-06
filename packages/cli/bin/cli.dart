@@ -57,7 +57,7 @@ void printStatus(GetStatus200Response s) {
             '${e.chartCount.toString().padLeft(14)}',
       )
       .join(', ');
-  final now = DateTime.now();
+  final now = DateTime.timestamp();
   final resetDate = DateTime.tryParse(s.resetDate)!;
   final sinceLastReset = approximateDuration(now.difference(resetDate));
   final nextResetDate = DateTime.tryParse(s.serverResets.next)!;

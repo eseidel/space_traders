@@ -36,12 +36,15 @@ void main() {
     final shipyardPrices = ShipyardPrices([], fs: fs);
     final symbol = WaypointSymbol.fromString('S-A-W');
     expect(shipyardPrices.hasRecentData(symbol), false);
-    final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
+    final now = DateTime(2021);
+    DateTime getNow() => now;
+    final oneMinuteAgo = now.subtract(const Duration(minutes: 1));
     expect(
       shipyardPrices.recentPurchasePrice(
         shipyardSymbol: symbol,
         shipType: ShipType.EXPLORER,
         maxAge: const Duration(minutes: 1),
+        getNow: getNow,
       ),
       isNull,
     );
@@ -52,12 +55,13 @@ void main() {
       timestamp: oneMinuteAgo,
     );
     shipyardPrices.addPrices([a]);
-    expect(shipyardPrices.hasRecentData(symbol), true);
+    expect(shipyardPrices.hasRecentData(symbol, getNow: getNow), true);
     expect(
       shipyardPrices.recentPurchasePrice(
         shipyardSymbol: symbol,
         shipType: ShipType.EXPLORER,
         maxAge: const Duration(minutes: 1),
+        getNow: getNow,
       ),
       1,
     );
@@ -65,6 +69,7 @@ void main() {
       shipyardPrices.hasRecentData(
         symbol,
         maxAge: const Duration(seconds: 1),
+        getNow: getNow,
       ),
       false,
     );
@@ -72,6 +77,7 @@ void main() {
       shipyardPrices.hasRecentData(
         symbol,
         maxAge: const Duration(hours: 1),
+        getNow: getNow,
       ),
       true,
     );

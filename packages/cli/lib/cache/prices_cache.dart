@@ -99,7 +99,7 @@ class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>>
     }
     final sortedPrices = prices.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    return DateTime.now().difference(sortedPrices.last.timestamp);
+    return DateTime.timestamp().difference(sortedPrices.last.timestamp);
   }
 
   /// Returns all known prices for a given shipyard.

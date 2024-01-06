@@ -34,7 +34,7 @@ class MarketPrice extends PriceBase<TradeSymbol> {
         purchasePrice: good.purchasePrice,
         sellPrice: good.sellPrice,
         tradeVolume: good.tradeVolume,
-        timestamp: DateTime.now(),
+        timestamp: DateTime.timestamp(),
         activity: good.activity,
       );
 

@@ -195,7 +195,7 @@ void main() {
     when(() => systemsCache.waypointsInSystem(saa.system))
         .thenReturn(waypoints);
     const tradeSymbol = TradeSymbol.FUEL;
-    final now = DateTime.timestamp();
+    final now = DateTime(2021);
     final prices = [
       MarketPrice(
         waypointSymbol: saa.symbol,

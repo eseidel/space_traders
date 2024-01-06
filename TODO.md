@@ -28,7 +28,6 @@ Exploring:
   jump gate clusters.
 
 Tech Debt:
-* Fix all uses of DateTime.now() to be DateTime.timestamp() and test.
 * Write a test suite for routing.
 
 Efficiency:

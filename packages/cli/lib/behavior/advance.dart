@@ -29,7 +29,7 @@ Future<DateTime?> _advanceIdle(
   // Make sure ships don't stay idle forever.
   state.isComplete = true;
   // Return a time in the future so we don't spin hot.
-  return DateTime.now().add(const Duration(minutes: 10));
+  return DateTime.timestamp().add(const Duration(minutes: 10));
 }
 
 Future<DateTime?> Function(

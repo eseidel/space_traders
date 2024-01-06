@@ -89,13 +89,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final start = WaypointSymbol.fromString(startSymbol);
   final end = WaypointSymbol.fromString(endSymbol);
-  final routeStart = DateTime.now();
+  final routeStart = DateTime.timestamp();
   final plan = routePlanner.planRoute(
     ship.shipSpec,
     start: start,
     end: end,
   );
-  final routeEnd = DateTime.now();
+  final routeEnd = DateTime.timestamp();
   final duration = routeEnd.difference(routeStart);
   if (plan == null) {
     logger.err('No route found (${duration.inMilliseconds}ms)');

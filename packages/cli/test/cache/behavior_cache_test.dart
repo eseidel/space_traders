@@ -14,6 +14,7 @@ void main() {
     final fs = MemoryFileSystem.test();
     const shipSymbol = ShipSymbol('S', 1);
     final state = BehaviorState(shipSymbol, Behavior.buyShip);
+    final now = DateTime(2021);
     final route = RoutePlan(
       fuelCapacity: 100,
       shipSpeed: 20,
@@ -38,7 +39,7 @@ void main() {
     state.deal = CostedDeal(
       deal: deal,
       transactions: [],
-      startTime: DateTime.timestamp(),
+      startTime: now,
       route: route,
       cargoSize: 100,
       costPerFuelUnit: 100,

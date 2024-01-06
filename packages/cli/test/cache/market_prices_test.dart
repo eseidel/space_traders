@@ -7,6 +7,10 @@ import 'package:types/types.dart';
 
 class _MockLogger extends Mock implements Logger {}
 
+/// A DateTime for tests to use.
+final _now = DateTime(2021);
+DateTime _getNow() => _now;
+
 // Creates a fake price with good defaults.
 MarketPrice makePrice({
   required String waypointSymbol,
@@ -24,7 +28,7 @@ MarketPrice makePrice({
     purchasePrice: purchasePrice,
     sellPrice: sellPrice,
     tradeVolume: tradeVolume,
-    timestamp: timestamp ?? DateTime.timestamp(),
+    timestamp: timestamp ?? _now,
     activity: ActivityLevel.WEAK,
   );
 }
@@ -62,17 +66,21 @@ void main() {
     final c = makePrice(
       waypointSymbol: 'S-S-C',
       symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-      timestamp: DateTime.now().add(const Duration(days: 1)),
+      timestamp: _now.add(const Duration(days: 1)),
     );
     final logger = _MockLogger();
-    runWithLogger(logger, () => marketPrices.addPrices([c]));
+    runWithLogger(logger, () => marketPrices.addPrices([c], getNow: _getNow));
     expect(marketPrices.count, 2);
     expect(marketPrices.waypointCount, 2);
 
     // Will replace prices with newer ones.
     final market = WaypointSymbol.fromString('S-S-A');
     expect(
-      marketPrices.recentPurchasePrice(marketSymbol: market, a),
+      marketPrices.recentPurchasePrice(
+        marketSymbol: market,
+        a,
+        getNow: _getNow,
+      ),
       10,
     );
     final d = makePrice(
@@ -80,11 +88,15 @@ void main() {
       symbol: a,
       purchasePrice: 20,
     );
-    runWithLogger(logger, () => marketPrices.addPrices([d]));
+    runWithLogger(logger, () => marketPrices.addPrices([d], getNow: _getNow));
     expect(marketPrices.count, 2);
     expect(marketPrices.waypointCount, 2);
     expect(
-      marketPrices.recentPurchasePrice(marketSymbol: market, a),
+      marketPrices.recentPurchasePrice(
+        marketSymbol: market,
+        a,
+        getNow: _getNow,
+      ),
       20,
     );
 
@@ -93,11 +105,15 @@ void main() {
       waypointSymbol: 'S-S-A',
       symbol: a,
       purchasePrice: 5,
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
+      timestamp: _now.subtract(const Duration(days: 1)),
     );
-    runWithLogger(logger, () => marketPrices.addPrices([e]));
+    runWithLogger(logger, () => marketPrices.addPrices([e], getNow: _getNow));
     expect(
-      marketPrices.recentPurchasePrice(marketSymbol: market, a),
+      marketPrices.recentPurchasePrice(
+        marketSymbol: market,
+        a,
+        getNow: _getNow,
+      ),
       20,
     );
   });
@@ -156,18 +172,19 @@ void main() {
     final marketPrices = MarketPrices([], fs: fs);
     final marketSymbol = WaypointSymbol.fromString('S-A-W');
     expect(marketPrices.hasRecentData(marketSymbol), false);
-    final oneMinuteAgo = DateTime.now().subtract(const Duration(minutes: 1));
+    final oneMinuteAgo = _now.subtract(const Duration(minutes: 1));
     final aPrice = makePrice(
       waypointSymbol: marketSymbol.waypoint,
       symbol: a,
       timestamp: oneMinuteAgo,
     );
-    marketPrices.addPrices([aPrice]);
-    expect(marketPrices.hasRecentData(marketSymbol), true);
+    marketPrices.addPrices([aPrice], getNow: _getNow);
+    expect(marketPrices.hasRecentData(marketSymbol, getNow: _getNow), true);
     expect(
       marketPrices.hasRecentData(
         marketSymbol,
         maxAge: const Duration(seconds: 1),
+        getNow: _getNow,
       ),
       false,
     );
@@ -175,6 +192,7 @@ void main() {
       marketPrices.hasRecentData(
         marketSymbol,
         maxAge: const Duration(hours: 1),
+        getNow: _getNow,
       ),
       true,
     );
@@ -182,24 +200,22 @@ void main() {
 
   test('recentSellPrice', () {
     final fs = MemoryFileSystem();
-    final now = DateTime(2021);
-    DateTime getNow() => now;
     final price = makePrice(
       waypointSymbol: 'S-S-A',
       symbol: TradeSymbol.FUEL,
       sellPrice: 100,
-      timestamp: now,
+      timestamp: _now,
     );
     final marketPrices = MarketPrices([price], fs: fs);
     expect(
       marketPrices.recentSellPrice(
         marketSymbol: price.waypointSymbol,
         price.symbol,
-        getNow: getNow,
+        getNow: _getNow,
       ),
       price.sellPrice,
     );
-    final oneMinuteAgo = now.subtract(const Duration(minutes: 1));
+    final oneMinuteAgo = _now.subtract(const Duration(minutes: 1));
     final price2 = makePrice(
       waypointSymbol: 'S-S-A',
       symbol: TradeSymbol.CLOTHING,
@@ -211,7 +227,7 @@ void main() {
       marketPrices.recentSellPrice(
         marketSymbol: price2.waypointSymbol,
         price2.symbol,
-        getNow: getNow,
+        getNow: _getNow,
       ),
       price2.sellPrice,
     );
@@ -219,7 +235,7 @@ void main() {
       marketPrices.recentSellPrice(
         marketSymbol: price2.waypointSymbol,
         price2.symbol,
-        getNow: getNow,
+        getNow: _getNow,
         maxAge: const Duration(seconds: 1),
       ),
       isNull,

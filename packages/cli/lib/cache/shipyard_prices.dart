@@ -87,6 +87,7 @@ class ShipyardPrices extends PricesCache<ShipType, ShipyardPrice> {
     required WaypointSymbol shipyardSymbol,
     required ShipType shipType,
     Duration maxAge = defaultMaxAge,
+    DateTime Function() getNow = defaultGetNow,
   }) {
     final pricesForSymbol = purchasePricesFor(
       shipType,
@@ -97,8 +98,7 @@ class ShipyardPrices extends PricesCache<ShipType, ShipyardPrice> {
     }
     final pricesForSymbolSorted = pricesForSymbol.toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    if (pricesForSymbolSorted.last.timestamp.difference(DateTime.timestamp()) >
-        maxAge) {
+    if (pricesForSymbolSorted.last.timestamp.difference(getNow()) > maxAge) {
       return null;
     }
     return pricesForSymbolSorted.last.purchasePrice;

@@ -7,14 +7,14 @@ DateTime snapToHour(DateTime time) {
 }
 
 int hoursAgo(DateTime time) {
-  return DateTime.now().difference(time).inHours;
+  return DateTime.timestamp().difference(time).inHours;
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   // Credits per hour.
   final oneDayAgoAsHour =
-      snapToHour(DateTime.now().subtract(const Duration(hours: 24)));
+      snapToHour(DateTime.timestamp().subtract(const Duration(hours: 24)));
   final transactions = await transactionsAfter(db, oneDayAgoAsHour);
   final firstTransactionHour = snapToHour(transactions.first.timestamp);
 
@@ -45,7 +45,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final last = transactions.lastOrNull;
   if (last != null) {
     final sinceLast =
-        approximateDuration(DateTime.now().difference(last.timestamp))
+        approximateDuration(DateTime.timestamp().difference(last.timestamp))
             .padRight(timeWidth);
     final credits = creditsString(last.agentCredits).padLeft(creditsWidth);
     logger.info('-$sinceLast $credits');

@@ -374,7 +374,7 @@ Iterable<CostedDeal> findDealsFor(
       marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
           config.defaultAntimatterCost;
 
-  final before = DateTime.now();
+  final before = DateTime.timestamp();
   final costedDeals = filtered
       .map(
         (deal) => costOutDeal(
@@ -394,7 +394,7 @@ Iterable<CostedDeal> findDealsFor(
       .toList();
 
   // toList is used to force resolution of the list before we log.
-  final after = DateTime.now();
+  final after = DateTime.timestamp();
   final elapsed = after.difference(before);
   if (elapsed > const Duration(milliseconds: 300)) {
     logger.warn(

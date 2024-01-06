@@ -150,7 +150,10 @@ void main() {
     final fs = MemoryFileSystem.test();
     final agentCache = AgentCache(agent, fs: fs);
     when(() => ship.symbol).thenReturn('S');
-    final hourFromNow = DateTime.timestamp().add(const Duration(hours: 1));
+    // Unless we change Contract.isExpired to take a getNow, we need to use
+    // a real DateTime here.
+    final now = DateTime.timestamp();
+    final hourFromNow = now.add(const Duration(hours: 1));
     final contract1 = Contract(
       id: '1',
       factionSymbol: 'faction',

@@ -6,7 +6,7 @@ void main() {
   test('ShipWaiter', () {
     final waiter = ShipWaiter();
     const aSymbol = ShipSymbol('a', 1);
-    final aTime = DateTime.now();
+    final aTime = DateTime(2021);
     waiter.scheduleShip(aSymbol, aTime);
     final next = waiter.nextShip();
     expect(next.waitUntil, aTime);
@@ -17,12 +17,10 @@ void main() {
     const short = ShipSymbol('a', 1);
     const long = ShipSymbol('a', 2);
     const nullTime = ShipSymbol('a', 3);
+    final now = DateTime(2021);
     waiter
-      ..scheduleShip(short, DateTime.now().add(const Duration(seconds: 1)))
-      ..scheduleShip(
-        long,
-        DateTime.now().add(const Duration(seconds: 1000)),
-      )
+      ..scheduleShip(short, now.add(const Duration(seconds: 1)))
+      ..scheduleShip(long, now.add(const Duration(seconds: 1000)))
       ..scheduleShip(nullTime, null);
     expect(waiter.nextShip().shipSymbol, nullTime);
     expect(waiter.nextShip().shipSymbol, short);

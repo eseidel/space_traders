@@ -23,6 +23,7 @@ void main() {
     final bSymbol = WaypointSymbol.fromString('S-A-B');
     final cSymbol = WaypointSymbol.fromString('S-A-C');
     final dSymbol = WaypointSymbol.fromString('S-A-D');
+    final now = DateTime(2021);
     final marketPrices = MarketPrices(
       [
         MarketPrice(
@@ -32,7 +33,7 @@ void main() {
           purchasePrice: 1,
           sellPrice: 2,
           tradeVolume: 100,
-          timestamp: DateTime.timestamp(),
+          timestamp: now,
           activity: ActivityLevel.WEAK,
         ),
         MarketPrice(
@@ -42,7 +43,7 @@ void main() {
           purchasePrice: 100,
           sellPrice: 200,
           tradeVolume: 100,
-          timestamp: DateTime.timestamp(),
+          timestamp: now,
           activity: ActivityLevel.WEAK,
         ),
       ],
