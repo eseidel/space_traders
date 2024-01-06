@@ -158,8 +158,12 @@ class WaypointCache {
 
   /// Returns true if the given waypoint is known to be charted, will
   /// otherwise fetch the waypoint, update our caches and return that value.
-  Future<bool> isCharted(WaypointSymbol waypointSymbol) async {
-    final isCharted = await _chartingCache.isCharted(waypointSymbol) ?? false;
+  Future<bool> isCharted(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
+    final isCharted =
+        await _chartingCache.isCharted(waypointSymbol, maxAge: maxAge) ?? false;
     if (isCharted) {
       return true;
     }
