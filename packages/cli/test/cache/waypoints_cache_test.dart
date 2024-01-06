@@ -61,7 +61,9 @@ void main() {
       (await waypointCache.waypoint(waypointSymbol)).symbol,
       waypointSymbol,
     );
-    // Call it twice, it should cache.
+    // WaypointCache no longer has it's own in-memory cache, it just delegates
+    // the other caches, which are mocked in this example to always return
+    // the same values, so we expect this to hit the API twice.
     expect(
       (await waypointCache.waypoint(waypointSymbol)).symbol,
       waypointSymbol,
@@ -72,7 +74,7 @@ void main() {
         page: any(named: 'page'),
         limit: any(named: 'limit'),
       ),
-    ).called(1);
+    ).called(2);
 
     // For coverage.
     expect(await waypointCache.hasMarketplace(waypointSymbol), false);
