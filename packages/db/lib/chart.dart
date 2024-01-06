@@ -46,7 +46,7 @@ Query getChartingRecordQuery(WaypointSymbol waypointSymbol, Duration maxAge) {
     'AND (values IS NOT NULL OR timestamp > @max_age) ',
     substitutionValues: {
       'waypoint_symbol': waypointSymbol.toJson(),
-      'max_age': DateTime.now().subtract(maxAge),
+      'max_age': DateTime.timestamp().subtract(maxAge),
     },
   );
 }
