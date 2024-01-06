@@ -205,8 +205,7 @@ class Caches {
 
   /// Update the caches at the top of the loop.
   Future<void> updateAtTopOfLoop(Api api) async {
-    // WaypointCache and MarketCache only live for one loop over the ships.
-    waypoints.resetForLoop();
+    // MarketCache only live for one loop over the ships.
     markets.resetForLoop();
 
     // This check races with the code in continueNavigationIfNeeded which

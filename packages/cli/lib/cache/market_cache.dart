@@ -122,14 +122,10 @@ class MarketCache {
   // when a ship is in orbit).  If they don't, we shouldn't ever return it
   // and if we do, we should always fetch from the server.
   /// Used to reset part of the MarketCache every loop over the ships.
-  void resetForLoop() {
-    _marketsBySymbol.clear();
-  }
+  void resetForLoop() => _marketsBySymbol.clear();
 
   /// Get the market for the given waypoint symbol from the cache.
-  Market? fromCache(WaypointSymbol waypointSymbol) {
-    return _marketsBySymbol[waypointSymbol];
-  }
+  Market? fromCache(WaypointSymbol symbol) => _marketsBySymbol[symbol];
 
   /// Fetch the waypoint with the given symbol.
   Future<Market> refreshMarket(

@@ -32,47 +32,38 @@ class WaypointCache {
         _constructionCache = construction,
         _waypointTraits = waypointTraits;
 
-  // _waypointsBySystem is no longer very useful, mostly it holds onto
-  // uncharted waypoints for a single loop, we could explicitly cache
-  // uncharted waypoints for a set amount of time instead?
-  final Map<SystemSymbol, List<Waypoint>> _waypointsBySystem = {};
   final Api? _api;
   final SystemsCache _systemsCache;
   final ChartingCache _chartingCache;
   final ConstructionCache _constructionCache;
   final WaypointTraitCache _waypointTraits;
 
-  // TODO(eseidel): This should not exist.  This should instead work like
-  // the marketCache, where callers request with a given desired freshness.
-  // Also, once a waypoint has been charted, it never changes.
-  /// Used to reset part of the WaypointsCache every loop.
-  void resetForLoop() {
-    _waypointsBySystem.clear();
-    // agentHeadquarters, connectedSystems, and jumpGates don't ever change.
-  }
-
   Future<Waypoint?> _waypointOrNullFromCache(
-    WaypointSymbol waypointSymbol,
-  ) async {
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
     final cachedWaypoint = await waypointFromCaches(
       _systemsCache,
       _chartingCache,
       _constructionCache,
       _waypointTraits,
       waypointSymbol,
+      maxAge: maxAge,
     );
     return cachedWaypoint;
   }
 
   Future<List<Waypoint>?> _waypointsInSystemFromCache(
-    SystemSymbol systemSymbol,
-  ) async {
+    SystemSymbol systemSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
     final systemWaypoints = _systemsCache.waypointsInSystem(systemSymbol);
     final cachedWaypoints = <Waypoint>[];
     for (final systemWaypoint in systemWaypoints) {
       // TODO(eseidel): Could make this a single db query by fetching all
       // construction records up front.
-      final waypoint = await _waypointOrNullFromCache(systemWaypoint.symbol);
+      final waypoint =
+          await _waypointOrNullFromCache(systemWaypoint.symbol, maxAge: maxAge);
       if (waypoint == null) {
         return null;
       }
@@ -82,17 +73,14 @@ class WaypointCache {
   }
 
   /// Fetch all waypoints in the given system.
-  Future<List<Waypoint>> waypointsInSystem(SystemSymbol systemSymbol) async {
-    // We can't currently remove this check, since charting cache doesn't
-    // have uncharted waypoints.  We would need to have charting cache keep
-    // track of uncharted waypoints and last time they were updated.
-    if (_waypointsBySystem.containsKey(systemSymbol)) {
-      return _waypointsBySystem[systemSymbol]!;
-    }
+  Future<List<Waypoint>> waypointsInSystem(
+    SystemSymbol systemSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
     // Check if all waypoints are in the charting cache.
-    final cachedWaypoints = await _waypointsInSystemFromCache(systemSymbol);
+    final cachedWaypoints =
+        await _waypointsInSystemFromCache(systemSymbol, maxAge: maxAge);
     if (cachedWaypoints != null) {
-      _waypointsBySystem[systemSymbol] = cachedWaypoints;
       return cachedWaypoints;
     }
     final api = _api;
@@ -101,7 +89,6 @@ class WaypointCache {
     }
 
     final waypoints = await allWaypointsInSystem(api, systemSymbol).toList();
-    _waypointsBySystem[systemSymbol] = waypoints;
     await _addWaypointsToCaches(api, waypoints);
     return waypoints;
   }
