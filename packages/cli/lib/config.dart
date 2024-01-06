@@ -38,7 +38,7 @@ class Config {
     ShipType.SURVEYOR,
     for (int i = 0; i < 15; i++) ShipType.LIGHT_HAULER,
     for (int i = 0; i < 40; i++) ShipType.PROBE,
-    for (int i = 0; i < 30; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 50; i++) ShipType.REFINING_FREIGHTER,
     // ShipType.EXPLORER,
   ];
 
