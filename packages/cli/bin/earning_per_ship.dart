@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
+import 'package:cli_table/cli_table.dart';
 import 'package:db/transaction.dart';
 import 'package:intl/intl.dart';
 
@@ -58,9 +57,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     ..sort();
   final behaviorCache = BehaviorCache.load(fs);
 
-  final longestHexNumber =
-      shipSymbols.map((s) => s.hexNumber.length).reduce(max);
-
   final shipCache = ShipCache.load(fs)!;
   final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
   logger
@@ -77,11 +73,30 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final roleCounts = <FleetRole, int>{};
   final roleCreditPerSecondTotals = <FleetRole, double>{};
+  final frameCounts = <ShipFrameSymbolEnum, int>{};
+  final frameCreditPerSecondTotals = <ShipFrameSymbolEnum, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await transactionsAfter(db, startTime)).where(
     (t) => [AccountingType.goods, AccountingType.fuel].contains(t.accounting),
   );
+
+  final table = Table(
+    header: [
+      'Ship',
+      'c/m',
+      'c/s',
+      'Role',
+      'Txns',
+      'Cargo',
+    ],
+    style: const TableStyle(compact: true),
+  );
+
+  Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
+        'content': content.toString(),
+        'hAlign': HorizontalAlign.right,
+      };
 
   for (final shipSymbol in shipSymbols) {
     final ship = shipCache[shipSymbol];
@@ -92,12 +107,24 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     roleCounts[role] = (roleCounts[role] ?? 0) + 1;
     roleCreditPerSecondTotals[role] =
         (roleCreditPerSecondTotals[role] ?? 0) + summary.perSecond;
-    logger.info('${shipSymbol.hexNumber.padRight(longestHexNumber)}  '
-        '${c(summary.perMinute).padLeft(6)} c/m '
-        '${c(summary.perSecond).padLeft(4)} c/s '
-        '${role.name.padRight(10)} '
-        '${summary.transactions.length.toString().padLeft(4)}');
+
+    frameCounts[ship.frame.symbol] = (frameCounts[ship.frame.symbol] ?? 0) + 1;
+    frameCreditPerSecondTotals[ship.frame.symbol] =
+        (frameCreditPerSecondTotals[ship.frame.symbol] ?? 0) +
+            summary.perSecond;
+
+    table.add([
+      shipSymbol.hexNumber,
+      rightAlign(c(summary.perMinute)),
+      rightAlign(c(summary.perSecond)),
+      role.name,
+      summary.transactions.length,
+      ship.cargo.capacity,
+    ]);
   }
+  logger
+    ..info(table.toString())
+    ..info('By role:');
   final sortedRoles = roleCounts.keys.toList()
     ..sort((a, b) => a.name.compareTo(b.name));
   for (final role in sortedRoles) {
@@ -108,6 +135,18 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         '${count.toString().padLeft(2)} ships '
         '${c(average).padLeft(3)} c/s');
   }
+  logger.info('By frame:');
+  final sortedFrames = frameCounts.keys.toList()
+    ..sort((a, b) => a.value.compareTo(b.value));
+  for (final frame in sortedFrames) {
+    final count = frameCounts[frame]!;
+    final total = frameCreditPerSecondTotals[frame]!;
+    final average = (total / count).round();
+    logger.info('${frame.value.padRight(9)} '
+        '${count.toString().padLeft(2)} ships '
+        '${c(average).padLeft(3)} c/s');
+  }
+
   // Required or main will hang.
   await db.close();
 }
