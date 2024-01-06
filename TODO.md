@@ -1141,4 +1141,11 @@ Need two things:
   If we add a single jump gate we'd want to know it's distance?
   Or do we just not care and call it 0 each time?
 
-### Make bin/earning_per_ship.dart use cli_table
+### Set up a siphoner on each gas giant?  Maybe an ORE_HOUND + Siphoner?
+
+Turns out we need squads too since the closest hydrocarbon market is an exchange
+rather than an import.
+
+### Use systems.json to find all the systems with lots of markets.
+
+I suspect that "home systems" look different only by types / number of waypoints.
