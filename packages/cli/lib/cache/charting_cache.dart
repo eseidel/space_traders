@@ -56,28 +56,31 @@ class ChartingCache {
   final Database _db;
 
   /// Returns true if the given waypoint is known to be charted.
-  Future<bool?> isCharted(WaypointSymbol waypointSymbol) async =>
-      (await chartingRecord(waypointSymbol))?.isCharted;
+  Future<bool?> isCharted(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async =>
+      (await chartingRecord(waypointSymbol, maxAge: maxAge))?.isCharted;
 
   /// Returns the charted values for the given waypoint, or null if it is not
   /// in the cache.
-  Future<ChartedValues?> chartedValues(WaypointSymbol waypointSymbol) async =>
-      (await chartingRecord(waypointSymbol))?.values;
+  Future<ChartedValues?> chartedValues(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async =>
+      (await chartingRecord(waypointSymbol, maxAge: maxAge))?.values;
 
   /// Returns the charting record for the given waypoint, or null if it is not
   /// in the cache.
   Future<ChartingRecord?> chartingRecord(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async {
-    return await _db.getChartingRecord(waypointSymbol, maxAge);
-  }
+  }) async =>
+      await _db.getChartingRecord(waypointSymbol, maxAge);
 
   /// Creates a ChartingSnapshot from the database.
-  Future<ChartingSnapshot> snapshot() async {
-    final records = await _db.allChartingRecords();
-    return ChartingSnapshot(records.toList());
-  }
+  Future<ChartingSnapshot> snapshot() async =>
+      ChartingSnapshot((await _db.allChartingRecords()).toList());
 
   /// Adds a waypoint to the cache.
   ///     waypointTraits.addAll(waypoint.traits);
