@@ -10,6 +10,7 @@ export 'market_listing.dart';
 export 'market_price.dart';
 export 'mount.dart';
 export 'route.dart';
+export 'shipyard_listing.dart';
 export 'shipyard_price.dart';
 export 'survey.dart';
 export 'system.dart';
