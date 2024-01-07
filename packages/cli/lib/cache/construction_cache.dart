@@ -20,6 +20,9 @@ class ConstructionSnapshot {
 
   final Map<WaypointSymbol, ConstructionRecord> _recordForSymbol;
 
+  /// Returns all records in the snapshot.
+  Iterable<ConstructionRecord> get records => _recordForSymbol.values;
+
   /// Loads the ConstructionSnapshot from the database.
   static Future<ConstructionSnapshot> load(Database db) async {
     return ConstructionCache(db).snapshot();
