@@ -152,12 +152,12 @@ class IdleQueue {
         if (await caches.waypoints.isCharted(waypointSymbol)) {
           final fromRecord =
               await caches.jumpGates.getOrFetch(api, waypoint.symbol);
+          // Don't follow links where the source is under construction, but
+          // do follow them if the destination is. This will have the effect
+          // of loading all the starter systems into our db, even if we can't
+          // reach them yet.
           final from = fromRecord.waypointSymbol;
-          if (!await canJumpFromAsync(
-            caches.jumpGates,
-            caches.construction,
-            from,
-          )) {
+          if (await caches.construction.isUnderConstruction(from) ?? true) {
             continue;
           }
           // Queue each jumpGate as it might fetch construction data which could

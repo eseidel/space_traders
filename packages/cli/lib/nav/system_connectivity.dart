@@ -113,26 +113,6 @@ bool canJumpFrom(
   return true;
 }
 
-/// Returns true if it's possible to jump from the provided jumpgate.
-/// it's important to also check if it's possible to jump to the destination.
-Future<bool> canJumpFromAsync(
-  JumpGateCache jumpGateCache,
-  ConstructionCache constructionCache,
-  WaypointSymbol from,
-) async {
-  final record = jumpGateCache.recordForSymbol(from);
-  // If we don't know about the fromGate, we can't jump.
-  if (record == null) {
-    return false;
-  }
-  final underConstruction = await constructionCache.isUnderConstruction(from);
-  // If we don't know or it's not complete, assume we can't jump.
-  if (underConstruction ?? true) {
-    return false;
-  }
-  return true;
-}
-
 /// Returns true if it's possible to jump to the provided jumpgate.
 /// it's important to also check if it's possible to jump from the origin.
 bool canJumpTo(
