@@ -35,9 +35,36 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       reachableSystems.intersection(interestingSystemSymbols);
   logger.info(
     'Found ${reachableInterestingSystemSymbols.length} reachable '
-    'interesting systems.',
+    'interesting systems:',
   );
+  for (final symbol in reachableInterestingSystemSymbols) {
+    logger.info('$symbol');
+  }
+  logger.info('of ${interestingSystemSymbols.length} interesting systems.');
 
+  final reachableJumpGateRecords = jumpGateCache.values.where(
+    (record) => reachableSystems.contains(record.waypointSymbol.system),
+  );
+  // These are not necessarily reachable (the jump gate on either side might
+  // be under construction).
+  final connectedSystemSymbols = reachableJumpGateRecords
+      .map((record) => record.connectedSystemSymbols)
+      .expand((e) => e)
+      .toSet();
+
+  // Number of under construction waypoints we know about:
+  final underConstruction = constructionSnapshot.records
+      .where((record) => record.isUnderConstruction)
+      .map((record) => record.waypointSymbol.system)
+      .toSet();
+  final connectedUnderConstruction = underConstruction.intersection(
+    connectedSystemSymbols,
+  );
+  final total = underConstruction.length;
+  logger.info(
+    '${connectedUnderConstruction.length} of $total under construction '
+    'jumpgates are connected to jumpgates reachable from HQ.',
+  );
   await db.close();
 }
 
