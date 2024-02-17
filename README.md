@@ -164,10 +164,10 @@ VSCode.  Mostly I just use codecov for viewing coverage.
 ## Reset day checklist
 * run `cd packages/cli`, `dart run bin/reset.dart`
 * run `cd packages/db`, `docker exec spacetraders_postgres /scripts/init_db.sh spacetraders`
-* Update open_api_config.yaml to have the latest git hash.
+* Update `open_api_config.yaml` to have the latest git hash.
 * regenerate space_traders_api
 
-### Generating `space_traders_api` package
+### Generating `openapi` package
 ```
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 dart pub global activate openapi_generator_cli
