@@ -5,12 +5,12 @@
 A Dart client for spacetraders.io.
 
 ## Packages
-* [cli](cli) - The main CLI for "playing" the game.
-* [db](db) - Postgres bindings for storing client state.
-* [openapi](openapi) - A generated Dart client for the Space Traders API.
-* [server](server) - A very basic server for supporting the UI.
-* [types](types) - Shared types between the packages.
-* [ui](ui) - A Flutter UI for the Space Traders API.
+* [cli](packages/cli) - The main CLI for "playing" the game.
+* [db](packages/db) - Postgres bindings for storing client state.
+* [openapi](packages/openapi) - A generated Dart client for the Space Traders API.
+* [server](packages/server) - A very basic server for supporting the UI.
+* [types](packages/types) - Shared types between the packages.
+* [ui](packages/ui) - A Flutter UI for the Space Traders API.
 
 `cli`, `db` and `types` are the most complete and useful packages.
 `openapi` is generated (and pretty terrible code).
