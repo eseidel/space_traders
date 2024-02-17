@@ -1,0 +1,55 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "pub"
+    directory: "/packages/cli"
+    schedule:
+      interval: "weekly"
+    groups:
+      cli-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: "pub"
+    directory: "/packages/db"
+    schedule:
+      interval: "weekly"
+    groups:
+      db-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: "pub"
+    directory: "/packages/server"
+    schedule:
+      interval: "weekly"
+    groups:
+      server-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: "pub"
+    directory: "/packages/types"
+    schedule:
+      interval: "weekly"
+    groups:
+      types-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: "pub"
+    directory: "/packages/ui"
+    schedule:
+      interval: "weekly"
+    groups:
+      ui-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      gh-deps:
+        patterns:
+          - "*"
