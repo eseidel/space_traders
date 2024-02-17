@@ -64,7 +64,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
   final hqSystem = await myHqSystemSymbol(db);
-  final marketListings = MarketListingCache.load(fs);
+  final marketListings = await MarketListingSnapshot.load(db);
   final marketPrices = MarketPrices.load(fs);
 
   final List<ExtractionScore> scores;

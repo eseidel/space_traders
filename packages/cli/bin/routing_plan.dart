@@ -68,7 +68,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   } else if (argResults['fuel'] == 'false') {
     sellsFuel = (_) => false;
   } else if (argResults['fuel'] == 'cache') {
-    final marketListings = MarketListingCache.load(fs);
+    final marketListings = await MarketListingSnapshot.load(db);
     sellsFuel = defaultSellsFuel(marketListings);
   } else {
     throw UnimplementedError();

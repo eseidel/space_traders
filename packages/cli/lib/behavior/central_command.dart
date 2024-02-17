@@ -722,7 +722,7 @@ class CentralCommand {
   Future<ExtractionJob?> siphonJobForShip(
     SystemsCache systemsCache,
     ChartingCache chartingCache,
-    MarketListingCache marketListings,
+    MarketListingSnapshot marketListings,
     AgentCache agentCache,
     Ship ship,
   ) async {
@@ -900,7 +900,7 @@ ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
 Future<List<ExtractionSquad>> assignShipsToSquads(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   ShipCache shipCache, {
   required SystemSymbol systemSymbol,
 }) async {
@@ -975,7 +975,7 @@ ShipType? shipToBuyFromPlan(
 
 /// Computes the market subsidies for the current construction job.
 List<SellOpp> computeConstructionMaterialSubsidies(
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   MarketPrices marketPrices,
   TradeExportCache exportsCache,
   Construction construction,

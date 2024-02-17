@@ -4,6 +4,7 @@ import 'package:db/config.dart';
 import 'package:db/construction.dart';
 import 'package:db/extraction.dart';
 import 'package:db/faction.dart';
+import 'package:db/market_listing.dart';
 import 'package:db/query.dart';
 import 'package:db/queue.dart';
 import 'package:db/survey.dart';
@@ -260,6 +261,27 @@ class Database {
   /// Update the given agent in the database.
   Future<void> upsertAgent(Agent agent) async {
     final query = upsertAgentQuery(agent);
+    await insertOne(query);
+  }
+
+  /// Get the market listing for the given symbol.
+  Future<MarketListing?> marketListingForSymbol(
+    WaypointSymbol waypointSymbol,
+  ) async {
+    final query = marketListingByWaypointSymbolQuery(waypointSymbol);
+    return queryOne(query, marketListingFromColumnMap);
+  }
+
+  /// Get all market listings.
+  Future<List<MarketListing>> allMarketListings() async {
+    final query = allMarketListingsQuery();
+    return queryMany(query, marketListingFromColumnMap)
+        .then((list) => list.toList());
+  }
+
+  /// Update the given market listing in the database.
+  Future<void> upsertMarketListing(MarketListing listing) async {
+    final query = upsertMarketListingQuery(listing);
     await insertOne(query);
   }
 }

@@ -141,7 +141,7 @@ WaypointSymbol? nearestTo(
 /// which buy those goods.
 Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
   SystemsCache systemsCache,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   WaypointSymbol start,
   Set<TradeSymbol> goods,
 ) {
@@ -165,7 +165,7 @@ Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
 Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   SystemSymbol systemSymbol,
   bool Function(WaypointType, Set<WaypointTraitSymbol>) sourcePredicate,
   ExtractionType extractionType,
@@ -230,7 +230,7 @@ bool canBeSiphoned(WaypointType type, Set<WaypointTraitSymbol> traits) {
 Future<List<ExtractionScore>> evaluateWaypointsForMining(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
@@ -247,7 +247,7 @@ Future<List<ExtractionScore>> evaluateWaypointsForMining(
 Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(

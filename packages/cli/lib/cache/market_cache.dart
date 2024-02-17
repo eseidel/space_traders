@@ -1,54 +1,23 @@
 import 'package:cli/cache/caches.dart';
-import 'package:cli/cache/json_store.dart';
 import 'package:cli/net/queries.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-typedef _Record = Map<WaypointSymbol, MarketListing>;
-
-/// A cached of charted values from Waypoints.
-class MarketListingCache extends JsonStore<_Record> {
-  /// Creates a new charting cache.
-  MarketListingCache(
-    super.entries, {
-    required super.fs,
-    super.path = defaultPath,
-  }) : super(
-          recordToJson: (_Record r) => r.map(
-            (key, value) => MapEntry(
-              key.toJson(),
-              value.toJson(),
-            ),
-          ),
+/// A cached of market listings.
+class MarketListingSnapshot {
+  /// Create a new MarketListingSnapshot.
+  MarketListingSnapshot(Iterable<MarketListing> listings)
+      : _listingBySymbol = Map.fromEntries(
+          listings.map((l) => MapEntry(l.waypointSymbol, l)),
         );
 
-  /// Load the charted values from the cache.
-  factory MarketListingCache.load(
-    FileSystem fs, {
-    String path = defaultPath,
-  }) {
-    final valuesBySymbol = JsonStore.loadRecord<_Record>(
-          fs,
-          path,
-          (Map<String, dynamic> j) => j.map(
-            (key, value) => MapEntry(
-              WaypointSymbol.fromJson(key),
-              MarketListing.fromJson(value as Map<String, dynamic>),
-            ),
-          ),
-        ) ??
-        {};
-    return MarketListingCache(
-      valuesBySymbol,
-      fs: fs,
-      path: path,
-    );
+  final Map<WaypointSymbol, MarketListing> _listingBySymbol;
+
+  /// Load the MarketListingSnapshot from the database.
+  static Future<MarketListingSnapshot> load(Database db) async {
+    final listings = await db.allMarketListings();
+    return MarketListingSnapshot(listings);
   }
-
-  /// The default path to the cache file.
-  static const defaultPath = 'data/market_listings.json';
-
-  /// The MarketListings by WaypointSymbol.
-  Map<WaypointSymbol, MarketListing> get _listingBySymbol => record;
 
   /// The WaypointSymbols.
   Iterable<WaypointSymbol> get waypointSymbols => _listingBySymbol.keys;
@@ -56,17 +25,13 @@ class MarketListingCache extends JsonStore<_Record> {
   /// The MarketListings.
   Iterable<MarketListing> get listings => _listingBySymbol.values;
 
-  /// Fetch the MarketListing for the given WaypointSymbol.
-  MarketListing? listingForSymbol(WaypointSymbol waypointSymbol) =>
-      _listingBySymbol[waypointSymbol];
-
   /// Fetch the MarketListings for the given SystemSymbol.
   Iterable<MarketListing> listingsInSystem(SystemSymbol systemSymbol) =>
       listings.where((l) => l.waypointSymbol.hasSystem(systemSymbol));
 
   /// Fetch the MarketListing for the given WaypointSymbol.
   MarketListing? operator [](WaypointSymbol waypointSymbol) =>
-      listingForSymbol(waypointSymbol);
+      _listingBySymbol[waypointSymbol];
 
   /// Find systems with at least N markets.
   Set<SystemSymbol> systemsWithAtLeastNMarkets(int n) {
@@ -81,34 +46,21 @@ class MarketListingCache extends JsonStore<_Record> {
         .map((e) => e.key)
         .toSet();
   }
-
-  /// Add MarketListings for the given Market to the cache.
-  void addMarket(Market market) {
-    final symbol = market.waypointSymbol;
-    final listing = MarketListing(
-      waypointSymbol: symbol,
-      imports: market.imports.map((t) => t.symbol).toSet(),
-      exports: market.exports.map((t) => t.symbol).toSet(),
-      exchange: market.exchange.map((t) => t.symbol).toSet(),
-    );
-    _listingBySymbol[symbol] = listing;
-    save();
-  }
 }
 
 /// Stores Market objects fetched recently from the API.
 class MarketCache {
   /// Create a new MarketplaceCache.
   MarketCache(
+    Database db,
     Api api,
-    MarketListingCache marketListings,
     TradeGoodCache tradeGoods,
-  )   : _api = api,
-        _marketListings = marketListings,
+  )   : _db = db,
+        _api = api,
         _tradeGoods = tradeGoods;
 
+  final Database _db;
   final Api _api;
-  final MarketListingCache _marketListings;
   final TradeGoodCache _tradeGoods;
 
   // This needs to be careful, this caches Market which can differ in
@@ -133,7 +85,14 @@ class MarketCache {
   ) async {
     final market = await getMarket(_api, waypointSymbol);
     _marketsBySymbol[waypointSymbol] = market;
-    _marketListings.addMarket(market);
+    await _db.upsertMarketListing(
+      MarketListing(
+        waypointSymbol: market.waypointSymbol,
+        imports: market.imports.map((t) => t.symbol).toSet(),
+        exports: market.exports.map((t) => t.symbol).toSet(),
+        exchange: market.exchange.map((t) => t.symbol).toSet(),
+      ),
+    );
     _tradeGoods.addAll(market.listedTradeGoods);
     return market;
   }

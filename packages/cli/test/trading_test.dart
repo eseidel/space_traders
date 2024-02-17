@@ -13,7 +13,8 @@ import 'package:types/types.dart';
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockMarketListingCache extends Mock implements MarketListingCache {}
+class _MockMarketListingSnapshot extends Mock
+    implements MarketListingSnapshot {}
 
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
@@ -612,7 +613,7 @@ void main() {
       ),
     ).thenReturn(fakePlan(nearSymbol, farSymbol, 10000000));
 
-    final marketListings = _MockMarketListingCache();
+    final marketListings = _MockMarketListingSnapshot();
     MarketListing listing(WaypointSymbol symbol) {
       return MarketListing(
         waypointSymbol: symbol,

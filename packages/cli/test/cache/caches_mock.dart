@@ -15,7 +15,8 @@ class _MockJumpGateCache extends Mock implements JumpGateCache {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
 
-class _MockMarketListingCache extends Mock implements MarketListingCache {}
+class _MockMarketListingSnapshot extends Mock
+    implements MarketListingSnapshot {}
 
 class _MockMarketPrices extends Mock implements MarketPrices {}
 
@@ -76,7 +77,7 @@ Caches mockCaches() {
     systems: _MockSystemsCache(),
     waypoints: _MockWaypointCache(),
     markets: _MockMarketCache(),
-    marketListings: _MockMarketListingCache(),
+    marketListings: _MockMarketListingSnapshot(),
     contracts: _MockContractCache(),
     behaviors: _MockBehaviorCache(),
     charting: _MockChartingCache(),

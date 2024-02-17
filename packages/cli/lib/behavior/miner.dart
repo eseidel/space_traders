@@ -338,7 +338,7 @@ Future<JobResult> emptyCargoIfNeededForMining(
 // TODO(eseidel): replace with findBestMarketToSell in all places?
 WaypointSymbol? _nearbyMarketWhichTrades(
   SystemsCache systemsCache,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   WaypointSymbol startSymbol,
   TradeSymbol tradeSymbol,
 ) {

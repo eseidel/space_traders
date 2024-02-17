@@ -44,8 +44,9 @@ String plural(int count, String singular, [String plural = 's']) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final marketListingCache = MarketListingCache.load(fs);
-  final systemsToWatch = marketListingCache.systemsWithAtLeastNMarkets(5);
+  final db = await defaultDatabase();
+  final marketListings = await MarketListingSnapshot.load(db);
+  final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
   final behaviorCache = BehaviorCache.load(fs);
   final systemWatcherStates =
@@ -88,4 +89,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       '${plural(shipsAssigned.length, 'watcher')}',
     );
   }
+
+  await db.close();
 }

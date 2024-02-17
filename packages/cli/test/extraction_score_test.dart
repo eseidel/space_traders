@@ -9,7 +9,8 @@ import 'package:types/types.dart';
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
-class _MockMarketListingCache extends Mock implements MarketListingCache {}
+class _MockMarketListingSnapshot extends Mock
+    implements MarketListingSnapshot {}
 
 class _MockChartingCache extends Mock implements ChartingCache {}
 
@@ -17,7 +18,7 @@ void main() {
   test('evaluateWaypointsForMining', () async {
     final systemsCache = _MockSystemsCache();
     final chartingCache = _MockChartingCache();
-    final marketListingCache = _MockMarketListingCache();
+    final marketListings = _MockMarketListingSnapshot();
     final systemSymbol = SystemSymbol.fromString('W-A');
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final source = SystemWaypoint.test(sourceSymbol);
@@ -45,7 +46,7 @@ void main() {
       TradeSymbol.SILICON_CRYSTALS,
       TradeSymbol.QUARTZ_SAND,
     };
-    when(() => marketListingCache[marketA.symbol]).thenReturn(
+    when(() => marketListings[marketA.symbol]).thenReturn(
       MarketListing(
         waypointSymbol: marketA.symbol,
         imports: const {
@@ -55,7 +56,7 @@ void main() {
         },
       ),
     );
-    when(() => marketListingCache[marketB.symbol]).thenReturn(
+    when(() => marketListings[marketB.symbol]).thenReturn(
       MarketListing(
         waypointSymbol: marketB.symbol,
         imports: const {
@@ -82,7 +83,7 @@ void main() {
     final scores = await evaluateWaypointsForMining(
       systemsCache,
       chartingCache,
-      marketListingCache,
+      marketListings,
       systemSymbol,
     );
     expect(scores.length, 1);
@@ -95,7 +96,7 @@ void main() {
   test('evaluateWaypointsForSiphoning', () async {
     final systemsCache = _MockSystemsCache();
     final chartingCache = _MockChartingCache();
-    final marketListingCache = _MockMarketListingCache();
+    final marketListings = _MockMarketListingSnapshot();
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
     final source = SystemWaypoint.test(
@@ -118,7 +119,7 @@ void main() {
       TradeSymbol.LIQUID_HYDROGEN,
       TradeSymbol.LIQUID_NITROGEN,
     };
-    when(() => marketListingCache[market.symbol]).thenReturn(
+    when(() => marketListings[market.symbol]).thenReturn(
       MarketListing(
         waypointSymbol: market.symbol,
         imports: producedGoods,
@@ -134,7 +135,7 @@ void main() {
     final scores = await evaluateWaypointsForSiphoning(
       systemsCache,
       chartingCache,
-      marketListingCache,
+      marketListings,
       systemSymbol,
     );
     expect(scores.length, 1);

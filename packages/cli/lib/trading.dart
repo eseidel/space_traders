@@ -565,7 +565,7 @@ int estimateRoutePlanCost({
 // TODO(eseidel): This does not work with no pricing data.
 MarketTrip? findBestMarketToSell(
   MarketPrices marketPrices,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   RoutePlanner routePlanner,
   Ship ship,
   TradeSymbol tradeSymbol, {

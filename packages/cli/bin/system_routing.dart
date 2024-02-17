@@ -13,7 +13,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final systems = SystemsCache.load(fs)!;
   final hqSystemSymbol = await myHqSystemSymbol(db);
-  final marketListings = MarketListingCache.load(fs);
+  final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = ShipyardListingCache.load(fs);
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);

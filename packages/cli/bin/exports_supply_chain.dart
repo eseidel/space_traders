@@ -56,7 +56,7 @@ WaypointSymbol? nearestExtractionSiteFor(
 
 MarketListing? nearestListingWithExport(
   SystemsCache systemsCache,
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   TradeSymbol tradeSymbol,
   WaypointSymbol waypointSymbol,
 ) {
@@ -110,7 +110,7 @@ class Sourcer {
     required this.marketPrices,
   });
 
-  final MarketListingCache marketListings;
+  final MarketListingSnapshot marketListings;
   final SystemsCache systemsCache;
   final TradeExportCache exportCache;
   final MarketPrices marketPrices;
@@ -222,7 +222,7 @@ class Sourcer {
 }
 
 void source(
-  MarketListingCache marketListings,
+  MarketListingSnapshot marketListings,
   SystemsCache systemsCache,
   TradeExportCache exportCache,
   MarketPrices marketPrices,
@@ -242,7 +242,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final exportCache = TradeExportCache.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs);
+  final marketListings = await MarketListingSnapshot.load(db);
   final marketPrices = MarketPrices.load(fs);
   final agent = await myAgent(db);
   final constructionCache = ConstructionCache(db);

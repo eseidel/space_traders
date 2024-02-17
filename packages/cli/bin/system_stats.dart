@@ -65,9 +65,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         '(${p(asteroidChartPercent)})');
 
   // How many markets?
-  final marketListingCache = MarketListingCache.load(fs);
+  final marketListings = await MarketListingSnapshot.load(db);
   var markets = 0;
-  for (final listing in marketListingCache.listings) {
+  for (final listing in marketListings.listings) {
     // We could sort first by system to save ourselves some lookups.
     final systemSymbol = listing.waypointSymbol.system;
     if (reachableSystems.contains(systemSymbol)) {

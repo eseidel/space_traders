@@ -17,13 +17,8 @@ psql -U postgres -c "CREATE DATABASE $DB_NAME"
 psql -U postgres -d $DB_NAME -f sql/flows/drop_tables.sql
 
 # Create the tables.
-psql -U postgres -d $DB_NAME -f sql/tables/01_request.sql
-psql -U postgres -d $DB_NAME -f sql/tables/02_response.sql
-psql -U postgres -d $DB_NAME -f sql/tables/03_transaction.sql
-psql -U postgres -d $DB_NAME -f sql/tables/04_survey.sql
-psql -U postgres -d $DB_NAME -f sql/tables/05_faction.sql
-psql -U postgres -d $DB_NAME -f sql/tables/06_behavior.sql
-psql -U postgres -d $DB_NAME -f sql/tables/07_extraction.sql
-psql -U postgres -d $DB_NAME -f sql/tables/08_construction.sql
-psql -U postgres -d $DB_NAME -f sql/tables/09_charting.sql
-psql -U postgres -d $DB_NAME -f sql/tables/10_agent.sql
+table_sqls=`ls sql/tables/*.sql`
+for sql_path in $table_sqls
+do
+    psql -U postgres -d $DB_NAME -f $sql_path
+done

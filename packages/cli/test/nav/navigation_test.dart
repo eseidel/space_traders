@@ -41,7 +41,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockMarketListingCache extends Mock implements MarketListingCache {}
+class _MockMarketListingSnapshot extends Mock
+    implements MarketListingSnapshot {}
 
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
@@ -445,7 +446,7 @@ void main() {
   });
 
   test('defaultSellsFuel', () {
-    final listings = _MockMarketListingCache();
+    final listings = _MockMarketListingSnapshot();
     final sellsFuel = defaultSellsFuel(listings);
     final waypointSymbol = WaypointSymbol.fromString('A-B-C');
     when(() => listings[waypointSymbol])

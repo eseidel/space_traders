@@ -14,7 +14,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final credits = int.parse(argResults['credits'] as String);
 
   final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs);
+  final marketListings = await MarketListingSnapshot.load(db);
   final jumpGates = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =

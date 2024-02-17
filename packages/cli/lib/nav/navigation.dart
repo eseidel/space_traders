@@ -38,7 +38,7 @@ extension ShipNavUtils on Ship {
 /// Returns a function which will return true if market at a given waypoint
 /// symbol is known to sell fuel and false if we either don't know or
 /// know it doesn't sell fuel.
-bool Function(WaypointSymbol) defaultSellsFuel(MarketListingCache listings) {
+bool Function(WaypointSymbol) defaultSellsFuel(MarketListingSnapshot listings) {
   return (WaypointSymbol symbol) {
     return listings[symbol]?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
   };

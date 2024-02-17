@@ -16,7 +16,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final shipyardPrices = ShipyardPrices.load(fs);
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
-  final marketListings = MarketListingCache.load(fs);
+  final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = ShipyardListingCache.load(fs);
 
   // Having market data means it's charted (either by us or someone else).

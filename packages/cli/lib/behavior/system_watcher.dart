@@ -11,12 +11,11 @@ import 'package:types/types.dart';
 
 /// Logic for assigning systems to system watchers.
 Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
-  MarketListingCache marketListingCache,
+  MarketListingSnapshot marketListings,
   ShipCache shipCache,
 ) {
   // Find systems with at least 5 markets.
-  final systemsWithEnoughMarkets =
-      marketListingCache.systemsWithAtLeastNMarkets(5);
+  final systemsWithEnoughMarkets = marketListings.systemsWithAtLeastNMarkets(5);
 
   final assignedProbes = <ShipSymbol, SystemSymbol>{};
   final availableProbes = shipCache.ships.where((s) => s.isProbe).toList();

@@ -6,7 +6,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final startSystemSymbol =
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 
-  final marketListings = MarketListingCache.load(fs);
+  final marketListings = await MarketListingSnapshot.load(db);
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =

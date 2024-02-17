@@ -70,6 +70,8 @@ void main() {
     when(db.allConstructionRecords)
         .thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
+    when(db.allMarketListings).thenAnswer((_) async => []);
+
     final fs = MemoryFileSystem.test();
     fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);
     fs.file(SystemsCache.defaultCacheFilePath).writeAsStringSync('[]');
