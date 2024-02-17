@@ -14,11 +14,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Get counts for each table.
   final counts = <String, int>{};
   for (final table in tables) {
-    final tableName = table[0] as String;
+    final tableName = table[0]! as String;
     final count = await connection.execute(
       'SELECT COUNT(*) FROM $tableName;',
     );
-    counts[tableName] = count[0][0] as int;
+    counts[tableName] = count[0][0]! as int;
   }
   // Print the counts.
   for (final tableName in counts.keys) {

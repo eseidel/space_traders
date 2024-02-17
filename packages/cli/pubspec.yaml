@@ -14,7 +14,7 @@ dependencies:
   db:
     path: ../db
   equatable: ^2.0.5
-  file: ^6.1.4
+  file: ^7.0.0
   http: ^0.13.6
   intl: ^0.17.0
   json_diff:
@@ -26,7 +26,6 @@ dependencies:
   openapi:
     path: ../openapi
   path: ^1.8.3
-  postgres: ^2.6.2
   scoped:
     git:
       url: https://github.com/shorebirdtech/shorebird.git
@@ -37,6 +36,6 @@ dependencies:
   yaml: ^3.1.2
 
 dev_dependencies:
-  mocktail: ^0.3.0
+  mocktail: ^1.0.3
   test: ^1.21.0
   very_good_analysis: ^5.1.0

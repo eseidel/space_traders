@@ -130,7 +130,7 @@ class NetQueue {
         return result.response.toResponse();
       }
       try {
-        await _db.connection.channels['response_'].firstOrNull
+        await _db.connection.channels['response_'].first
             .timeout(Duration(seconds: timeoutSeconds));
       } on TimeoutException {
         logger.err('Timed out (${timeoutSeconds}s) waiting for response?');
@@ -175,7 +175,7 @@ class NetQueue {
   Future<void> waitForRequest(int timeoutSeconds) async {
     assert(role == QueueRole.responder, 'Only responders can wait.');
     await _listenIfNeeded();
-    await _db.connection.channels['request_'].firstOrNull
+    await _db.connection.channels['request_'].first
         .timeout(Duration(seconds: timeoutSeconds));
   }
 
