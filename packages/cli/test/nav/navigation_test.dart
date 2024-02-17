@@ -13,8 +13,6 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
-class _MockAgent extends Mock implements Agent {}
-
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockShipReactor extends Mock implements ShipReactor {}
@@ -119,9 +117,9 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
-    final agent = _MockAgent();
-    when(() => agent.credits).thenReturn(10000000);
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
+    when(() => caches.agent.adjustCredits(any())).thenAnswer((_) async {});
     const shipSymbol = ShipSymbol('S', 1);
     // We use a real Ship to allow setting/reading from cooldown.
     final ship = Ship(
@@ -216,7 +214,7 @@ void main() {
             totalPrice: 10000,
             timestamp: now,
           ),
-          agent: agent,
+          agent: agent.toOpenApi(),
         ),
       ),
     );

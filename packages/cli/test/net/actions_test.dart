@@ -2,12 +2,9 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
 import 'package:db/db.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
-
-class _MockAgent extends Mock implements Agent {}
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
@@ -52,12 +49,11 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
 
     final shipCache = _MockShipCache();
-    final agent1 = _MockAgent();
-    final agent2 = _MockAgent();
-    when(agent2.toJson).thenReturn({});
+    final agent1 = Agent.test(credits: 1);
+    final agent2 = Agent.test(credits: 2);
 
     final responseData = PurchaseShip201ResponseData(
-      agent: agent2,
+      agent: agent2.toOpenApi(),
       ship: _MockShip(),
       transaction: _MockShipyardTransaction(),
     );
@@ -70,8 +66,10 @@ void main() {
       (invocation) => Future.value(PurchaseShip201Response(data: responseData)),
     );
 
-    final fs = MemoryFileSystem.test();
-    final agentCache = AgentCache(agent1, fs: fs);
+    final db = _MockDatabase();
+    registerFallbackValue(agent1);
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    final agentCache = AgentCache(agent1, db);
     final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
     const shipType = ShipType.PROBE;
     await purchaseShip(
@@ -305,10 +303,10 @@ void main() {
     final shipCache = _MockShipCache();
     final logger = _MockLogger();
 
-    final agent = _MockAgent();
-    when(() => agent.credits).thenReturn(100000);
+    final agent = Agent.test();
     final agentCache = _MockAgentCache();
     when(() => agentCache.agent).thenReturn(agent);
+    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
     final marketTransaction = MarketTransaction(
       waypointSymbol: waypointSymbol.waypoint,
       shipSymbol: shipSymbol.symbol,
@@ -335,7 +333,7 @@ void main() {
       (invocation) => Future.value(
         RefuelShip200Response(
           data: RefuelShip200ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             transaction: marketTransaction,
             fuel: ShipFuel(capacity: 1000, current: 1000),
           ),
@@ -538,10 +536,10 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final logger = _MockLogger();
-    final agent = _MockAgent();
-    when(() => agent.credits).thenReturn(100000);
+    final agent = Agent.test();
     final agentCache = _MockAgentCache();
     when(() => agentCache.agent).thenReturn(agent);
+    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
     final db = _MockDatabase();
     final market = _MockMarket();
     when(() => market.tradeGoods).thenReturn([
@@ -596,7 +594,7 @@ void main() {
       (invocation) => Future.value(
         SellCargo201Response(
           data: SellCargo201ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             cargo: ShipCargo(capacity: 10, units: 0),
             transaction: MarketTransaction(
               waypointSymbol: 'S-A-W',
@@ -792,9 +790,9 @@ void main() {
       ),
     );
     final agentCache = _MockAgentCache();
-    final agent = _MockAgent();
-    when(() => agent.credits).thenReturn(100000);
+    final agent = Agent.test();
     when(() => agentCache.agent).thenReturn(agent);
+    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
@@ -805,7 +803,7 @@ void main() {
         AcceptContract200Response(
           data: AcceptContract200ResponseData(
             contract: contract,
-            agent: _MockAgent(),
+            agent: agent.toOpenApi(),
           ),
         ),
       ),
@@ -845,11 +843,11 @@ void main() {
     when(() => shipNav.status).thenReturn(shipNavStatus);
     final shipCache = _MockShipCache();
     final logger = _MockLogger();
-    final agent = _MockAgent();
-    when(() => agent.credits).thenReturn(10000000);
+    final agent = Agent.test(credits: 10000000);
     final agentCache = _MockAgentCache();
     when(() => agentCache.agent).thenReturn(agent);
     final now = DateTime(2021);
+    when(() => agentCache.adjustCredits(any())).thenAnswer((_) async {});
 
     when(
       () => fleetApi.jumpShip(
@@ -876,7 +874,7 @@ void main() {
               totalPrice: 10000,
               timestamp: now,
             ),
-            agent: agent,
+            agent: agent.toOpenApi(),
           ),
         ),
       ),

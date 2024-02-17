@@ -4,15 +4,10 @@ import 'package:cli/cli.dart';
 /// Walks our known system graph, starting from HQ and prints systems needing
 /// exploration.
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final SystemSymbol startSystemSymbol;
-  if (argResults.rest.isNotEmpty) {
-    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
-  } else {
-    final agentCache = AgentCache.load(fs)!;
-    startSystemSymbol = agentCache.headquartersSystemSymbol;
-  }
-
   final db = await defaultDatabase();
+  final startSystemSymbol =
+      await startSystemFromArg(db, argResults.rest.firstOrNull);
+
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =

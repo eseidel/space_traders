@@ -11,8 +11,6 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
-class _MockAgent extends Mock implements Agent {}
-
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
@@ -38,9 +36,8 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    final agent = _MockAgent();
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
 
     final behaviorState = BehaviorState(shipSymbol, Behavior.idle);
     final centralCommand = _MockCentralCommand();
@@ -69,9 +66,8 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     final caches = mockCaches();
-    final agent = _MockAgent();
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
 
     final now = DateTime(2021);
     final arrivalTime = now.add(const Duration(seconds: 1));

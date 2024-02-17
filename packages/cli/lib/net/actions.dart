@@ -136,7 +136,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
   await for (final response
       in sellAllCargo(api, agentCache, market, shipCache, ship, where: where)) {
     final marketTransaction = response.transaction;
-    final agent = response.agent;
+    final agent = Agent.fromOpenApi(response.agent);
     logMarketTransaction(ship, marketPrices, agent, marketTransaction);
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
@@ -194,7 +194,7 @@ Future<Transaction?> purchaseCargoAndLog(
     // Trade good REACTOR_FUSION_I has a limit of 10 units per transaction.",
     // "code":4604,"data":{"waypointSymbol":"X1-UC8-13100A","tradeSymbol":
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
-    final agent = data.agent;
+    final agent = Agent.fromOpenApi(data.agent);
     final marketTransaction = data.transaction;
     logMarketTransaction(ship, marketPrices, agent, marketTransaction);
     final transaction = Transaction.fromMarketTransaction(
@@ -228,7 +228,8 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
 ) async {
   final result =
       await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
-  logShipyardTransaction(ship, result.agent, result.transaction);
+  final agent = Agent.fromOpenApi(result.agent);
+  logShipyardTransaction(ship, agent, result.transaction);
   shipErr(ship, 'Bought ship: ${result.ship.symbol}');
   final transaction = Transaction.fromShipyardTransaction(
     result.transaction,
@@ -511,7 +512,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   // TODO(eseidel): JumpShip200Response does not include the agent.
   // so we modify the agent ourselves.
   // agentCache.agent = response.data.agent;
-  agentCache.adjustCredits(-marketTransaction.totalPrice);
+  await agentCache.adjustCredits(-marketTransaction.totalPrice);
 
   final agent = agentCache.agent;
   logMarketTransaction(
@@ -559,7 +560,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
 ) async {
   final response = await api.contracts.acceptContract(contract.id);
   final data = response!.data;
-  agentCache.agent = data.agent;
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   contractCache.updateContract(data.contract);
   shipInfo(ship, 'Accepted: ${contractDescription(contract)}.');
   shipInfo(
@@ -596,7 +597,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
     installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
   );
   final data = response!.data;
-  agentCache.agent = data.agent;
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
@@ -624,7 +625,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     removeMountRequest: RemoveMountRequest(symbol: tradeSymbol.value),
   );
   final data = response!.data;
-  agentCache.agent = data.agent;
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;

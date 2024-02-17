@@ -4,8 +4,6 @@ import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class _MockAgent extends Mock implements Agent {}
-
 class _MockAgentsApi extends Mock implements AgentsApi {}
 
 class _MockApi extends Mock implements Api {}
@@ -26,9 +24,12 @@ void main() {
     final db = _MockDatabase();
     final agentsApi = _MockAgentsApi();
     when(() => api.agents).thenReturn(agentsApi);
-    final agent = _MockAgent();
-    when(agentsApi.getMyAgent)
-        .thenAnswer((_) => Future.value(GetMyAgent200Response(data: agent)));
+    final agent = Agent.test();
+    when(() => db.getAgent(symbol: any(named: 'symbol')))
+        .thenAnswer((_) => Future.value(agent));
+    when(agentsApi.getMyAgent).thenAnswer(
+      (_) => Future.value(GetMyAgent200Response(data: agent.toOpenApi())),
+    );
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     when(

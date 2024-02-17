@@ -1,62 +1,54 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/json_store.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/compare.dart';
-import 'package:cli/logger.dart';
+import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/net/queries.dart';
-import 'package:file/file.dart';
-import 'package:types/types.dart';
 
 /// Holds the Agent object between requests.
 /// The "Agent" api object doesn't have a way to be updated, so this
 /// is a holder for that object.
-class AgentCache extends JsonStore<Agent> {
+class AgentCache {
   /// Creates a new ship cache.
-  AgentCache(
-    super.agent, {
-    required super.fs,
-    super.path = defaultPath,
-    this.requestsBetweenChecks = 100,
-  }) : super(recordToJson: (a) => a.toJson());
+  AgentCache(Agent agent, Database db, {this.requestsBetweenChecks = 100})
+      : _agent = agent,
+        _db = db;
 
-  /// Creates a new AgentCache from a file.
-  static AgentCache? load(FileSystem fs, {String path = defaultPath}) {
-    final agent = JsonStore.loadRecord<Agent>(
-      fs,
-      path,
-      (j) => Agent.fromJson(j)!,
-    );
+  Agent _agent;
+  final Database _db;
+
+  /// Loads the agent from the cache.
+  // TODO(eseidel): Do callers need an AgentCache or just an Agent?
+  static Future<AgentCache?> load(Database db) async {
+    final agent = await db.getAgent(symbol: config.agentSymbol);
     if (agent == null) {
       return null;
     }
-    return AgentCache(agent, fs: fs, path: path);
+    return AgentCache(agent, db);
   }
 
   /// Creates a new AgentCache from the API.
-  static Future<AgentCache> loadOrFetch(
-    Api api, {
-    required FileSystem fs,
-    String path = defaultPath,
-  }) async {
+  static Future<AgentCache> loadOrFetch(Database db, Api api) async {
+    final cached = await db.getAgent(symbol: config.agentSymbol);
+    if (cached != null) {
+      return AgentCache(cached, db);
+    }
     final agent = await getMyAgent(api);
-    return AgentCache(agent, fs: fs, path: path);
+    return AgentCache(agent, db);
   }
 
-  /// Default location of the cache file.
-  static const String defaultPath = 'data/agent.json';
-
   /// Agent object held in the cache.
-  Agent get agent => record;
-  set agent(Agent newAgent) {
-    record = newAgent;
-    save();
+  Agent get agent => _agent;
+
+  /// Sets the agent in the cache.
+  Future<void> updateAgent(Agent agent) async {
+    _agent = agent;
+    await _db.upsertAgent(agent);
   }
 
   /// Adjust the credits of the agent.
   // All callers of this are probably wrong.
-  void adjustCredits(int adjustment) {
-    agent.credits += adjustment;
-    save();
+  Future<void> adjustCredits(int adjustment) async {
+    await updateAgent(agent.copyWith(credits: agent.credits + adjustment));
   }
 
   /// Number of requests between checks to ensure ships are up to date.
@@ -66,15 +58,16 @@ class AgentCache extends JsonStore<Agent> {
 
   /// The headquarters of the agent.
   SystemWaypoint headquarters(SystemsCache systems) =>
-      systems.waypoint(agent.headquartersSymbol);
+      systems.waypoint(agent.headquarters);
 
   /// The symbol of the agent's headquarters.
-  WaypointSymbol get headquartersSymbol => agent.headquartersSymbol;
+  WaypointSymbol get headquartersSymbol => agent.headquarters;
 
   /// The symbol of the system of the agent's headquarters.
-  SystemSymbol get headquartersSystemSymbol => agent.headquartersSymbol.system;
+  SystemSymbol get headquartersSystemSymbol => agent.headquarters.system;
 
   /// Ensures the agent in the cache is up to date.
+  // TODO(eseidel): Move this out of this class.
   Future<void> ensureAgentUpToDate(Api api) async {
     _requestsSinceLastCheck++;
     if (_requestsSinceLastCheck < requestsBetweenChecks) {
@@ -82,10 +75,10 @@ class AgentCache extends JsonStore<Agent> {
     }
     final newAgent = await getMyAgent(api);
     _requestsSinceLastCheck = 0;
-    if (jsonMatches(agent, newAgent)) {
+    if (newAgent == agent) {
       return;
     }
     logger.warn('Agent changed, updating cache.');
-    agent = newAgent;
+    await updateAgent(newAgent);
   }
 }

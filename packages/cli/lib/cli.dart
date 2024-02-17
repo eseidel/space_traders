@@ -1,6 +1,8 @@
 import 'package:args/args.dart';
 import 'package:cli/cache/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
+import 'package:db/db.dart';
 import 'package:file/local.dart';
 import 'package:meta/meta.dart';
 import 'package:scoped/scoped.dart';
@@ -67,4 +69,46 @@ ShipType shipTypeFromArg(String arg) {
 /// Get a command line argument from a ship type.
 String argFromShipType(ShipType shipType) {
   return shipType.value.substring('SHIP_'.length);
+}
+
+/// Common lookups which CLIs might need.
+
+/// Get the agent from the database.
+Future<Agent> myAgent(Database db) async {
+  final agent = await db.getAgent(symbol: config.agentSymbol);
+  return agent!;
+}
+
+/// Get the symbol of the agent's headquarters.
+Future<WaypointSymbol> myHqSymbol(Database db) async {
+  final agent = await myAgent(db);
+  return agent.headquarters;
+}
+
+/// Get the system symbol of the agent's headquarters.
+Future<SystemSymbol> myHqSystemSymbol(Database db) async {
+  final hq = await myHqSymbol(db);
+  return hq.system;
+}
+
+/// Get the agent's credits.
+Future<int> myCredits(Database db) async {
+  final agent = await myAgent(db);
+  return agent.credits;
+}
+
+/// Get the start symbol from the command line argument.
+Future<WaypointSymbol> startWaypointFromArg(Database db, String? arg) async {
+  if (arg == null) {
+    return myHqSymbol(db);
+  }
+  return WaypointSymbol.fromString(arg);
+}
+
+/// Get the start system from the command line argument.
+Future<SystemSymbol> startSystemFromArg(Database db, String? arg) async {
+  if (arg == null) {
+    return myHqSystemSymbol(db);
+  }
+  return SystemSymbol.fromString(arg);
 }

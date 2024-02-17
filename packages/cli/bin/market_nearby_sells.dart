@@ -16,14 +16,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final agentCache = AgentCache.load(fs)!;
   final shipCache = ShipCache.load(fs)!;
 
   const tradeSymbol = TradeSymbol.DIAMONDS;
 
-  final hq = agentCache.headquarters(systemsCache);
+  final hqSystem = await myHqSystemSymbol(db);
   final hqMine = systemsCache
-      .waypointsInSystem(hq.system)
+      .waypointsInSystem(hqSystem)
       .firstWhere((w) => w.isAsteroid)
       .symbol;
 

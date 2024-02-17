@@ -28,13 +28,13 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
 
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.load(fs)!;
-  final agentCache = AgentCache.load(fs)!;
+  final agentCache = await AgentCache.load(db);
   final contractCache = ContractCache.load(fs)!;
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
 
   final start = startArg == null
-      ? agentCache.headquarters(systemsCache)
+      ? agentCache!.headquarters(systemsCache)
       : systemsCache.waypointFromString(startArg)!;
 
   final jumpGate = systemsCache.jumpGateWaypointForSystem(start.system)!;
@@ -55,7 +55,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
     extraSellOpps
-        .addAll(centralCommand.contractSellOpps(agentCache, contractCache));
+        .addAll(centralCommand.contractSellOpps(agentCache!, contractCache));
   }
   if (centralCommand.isConstructionTradingEnabled) {
     extraSellOpps.addAll(centralCommand.constructionSellOpps());

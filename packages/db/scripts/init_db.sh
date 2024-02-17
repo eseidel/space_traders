@@ -26,3 +26,4 @@ psql -U postgres -d $DB_NAME -f sql/tables/06_behavior.sql
 psql -U postgres -d $DB_NAME -f sql/tables/07_extraction.sql
 psql -U postgres -d $DB_NAME -f sql/tables/08_construction.sql
 psql -U postgres -d $DB_NAME -f sql/tables/09_charting.sql
+psql -U postgres -d $DB_NAME -f sql/tables/10_agent.sql

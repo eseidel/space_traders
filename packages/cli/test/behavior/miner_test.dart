@@ -12,8 +12,6 @@ import 'package:types/types.dart';
 
 import '../cache/caches_mock.dart';
 
-class _MockAgent extends Mock implements Agent {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -596,8 +594,11 @@ void main() {
       (_) => Future.value(market),
     );
     final fleetApi = _MockFleetApi();
-    final agent = _MockAgent();
-    when(() => agent.credits).thenReturn(1000000);
+    final agent = Agent.test();
+    registerFallbackValue(agent);
+    when(() => caches.agent.updateAgent(any()))
+        .thenAnswer((_) => Future.value());
+
     final transaction = MarketTransaction(
       tradeSymbol: tradeSymbol.value,
       units: cargoCapacity,
@@ -622,7 +623,7 @@ void main() {
       (_) => Future.value(
         SellCargo201Response(
           data: SellCargo201ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             cargo: ShipCargo(capacity: cargoCapacity, units: 0),
             transaction: transaction,
           ),

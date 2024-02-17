@@ -1,3 +1,4 @@
+export 'agent.dart';
 export 'api.dart';
 export 'behavior.dart';
 export 'construction.dart';

@@ -131,7 +131,7 @@ class Caches {
     Database db, {
     Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
   }) async {
-    final agent = await AgentCache.loadOrFetch(api, fs: fs);
+    final agent = await AgentCache.loadOrFetch(db, api);
     final prices = MarketPrices.load(fs);
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.loadOrFetch(api, fs: fs, forceRefresh: true);

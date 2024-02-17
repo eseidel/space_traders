@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:openapi/api.dart' hide System, SystemWaypoint, Waypoint;
+import 'package:openapi/api.dart' hide Agent, System, SystemWaypoint, Waypoint;
 import 'package:types/mount.dart';
 
-export 'package:openapi/api.dart' hide System, SystemWaypoint, Waypoint;
+export 'package:openapi/api.dart' hide Agent, System, SystemWaypoint, Waypoint;
 
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
@@ -714,16 +714,6 @@ extension FactionUtils on Faction {
       WaypointSymbol.fromString(headquarters);
 
   /// Returns the SystemSymbol for the faction headquarters.
-  SystemSymbol get headquartersSystemSymbol => headquartersSymbol.system;
-}
-
-/// Extensions onto Agent to make it easier to work with.
-extension AgentUtils on Agent {
-  /// Returns the WaypointSymbol for the agent headquarters.
-  WaypointSymbol get headquartersSymbol =>
-      WaypointSymbol.fromString(headquarters);
-
-  /// Returns the SystemSymbol for the agent headquarters.
   SystemSymbol get headquartersSystemSymbol => headquartersSymbol.system;
 }
 

@@ -1,3 +1,4 @@
+import 'package:db/agent.dart';
 import 'package:db/chart.dart';
 import 'package:db/config.dart';
 import 'package:db/construction.dart';
@@ -248,5 +249,17 @@ class Database {
   Future<ResponseRecord?> getResponseForRequest(int requestId) async {
     final query = getResponseForRequestQuery(requestId);
     return queryOne(query, responseRecordFromColumnMap);
+  }
+
+  /// Get the agent from the database.
+  Future<Agent?> getAgent({required String symbol}) async {
+    final query = agentBySymbolQuery(symbol);
+    return queryOne(query, agentFromColumnMap);
+  }
+
+  /// Update the given agent in the database.
+  Future<void> upsertAgent(Agent agent) async {
+    final query = upsertAgentQuery(agent);
+    await insertOne(query);
   }
 }

@@ -284,7 +284,7 @@ Future<void> _completeContract(
 ) async {
   final response = await api.contracts.fulfillContract(contract.id);
   final data = response!.data;
-  caches.agent.agent = data.agent;
+  await caches.agent.updateAgent(Agent.fromOpenApi(data.agent));
   caches.contracts.updateContract(data.contract);
 
   final contactTransaction = ContractTransaction.fulfillment(

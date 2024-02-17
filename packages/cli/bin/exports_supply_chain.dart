@@ -244,11 +244,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = MarketListingCache.load(fs);
   final marketPrices = MarketPrices.load(fs);
-  final agentCache = AgentCache.load(fs)!;
+  final agent = await myAgent(db);
   final constructionCache = ConstructionCache(db);
 
-  final jumpgate = systemsCache
-      .jumpGateWaypointForSystem(agentCache.headquartersSystemSymbol)!;
+  final jumpgate =
+      systemsCache.jumpGateWaypointForSystem(agent.headquarters.system)!;
   final waypointSymbol = jumpgate.symbol;
   final construction = await constructionCache.getConstruction(waypointSymbol);
 

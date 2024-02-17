@@ -22,13 +22,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     sellsFuel: defaultSellsFuel(marketListings),
   );
 
-  final agentCache = AgentCache.load(fs)!;
   final behaviorCache = BehaviorCache.load(fs);
 
   const shipType = ShipType.LIGHT_HAULER;
   final ship = staticCaches.shipyardShips[shipType]!;
   final shipSpec = ship.shipSpec;
-  final credits = agentCache.agent.credits;
+  final credits = await myCredits(db);
 
   // Given a desired export.  Find a market to feed.
   final export = TradeSymbol.fromJson(argResults['export'] as String)!;

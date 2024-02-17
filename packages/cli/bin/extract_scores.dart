@@ -1,4 +1,3 @@
-import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
@@ -64,8 +63,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
-  final agentCache = AgentCache.load(fs)!;
-  final hqSystem = agentCache.headquartersSystemSymbol;
+  final hqSystem = await myHqSystemSymbol(db);
   final marketListings = MarketListingCache.load(fs);
   final marketPrices = MarketPrices.load(fs);
 

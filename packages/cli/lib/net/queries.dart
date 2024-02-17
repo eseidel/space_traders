@@ -73,7 +73,7 @@ Stream<Faction> getAllFactions(Api api) {
 /// Fetch user's [Agent] object.
 Future<Agent> getMyAgent(Api api) async {
   final response = await api.agents.getMyAgent();
-  return response!.data;
+  return Agent.fromOpenApi(response!.data);
 }
 
 /// Fetch shipyard for a given waypoint, will throw if the waypoint does not

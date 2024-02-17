@@ -2,14 +2,13 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
+import 'package:db/db.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
 import '../cache/caches_mock.dart';
-
-class _MockAgent extends Mock implements Agent {}
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
@@ -24,6 +23,8 @@ class _MockContractCache extends Mock implements ContractCache {}
 class _MockContractTerms extends Mock implements ContractTerms {}
 
 class _MockCostedDeal extends Mock implements CostedDeal {}
+
+class _MockDatabase extends Mock implements Database {}
 
 class _MockDeal extends Mock implements Deal {}
 
@@ -144,11 +145,11 @@ void main() {
 
   test('CentralCommand.affordableContracts', () {
     final ship = _MockShip();
-    final agent = _MockAgent();
     // TODO(eseidel): Contracts are disabled under 100000 credits.
-    when(() => agent.credits).thenReturn(100000);
+    final agent = Agent.test(credits: 100000);
     final fs = MemoryFileSystem.test();
-    final agentCache = AgentCache(agent, fs: fs);
+    final db = _MockDatabase();
+    final agentCache = AgentCache(agent, db);
     when(() => ship.symbol).thenReturn('S');
     // Unless we change Contract.isExpired to take a getNow, we need to use
     // a real DateTime here.
@@ -489,7 +490,7 @@ void main() {
     final caches = mockCaches();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
-    final faction = FactionSymbol.AEGIS.value;
+    const faction = FactionSymbol.AEGIS;
     when(() => shipNav.systemSymbol).thenReturn('W-A');
     when(() => ship.nav).thenReturn(shipNav);
     final shipSymbol = ShipSymbol.fromString('X-A');
@@ -502,7 +503,7 @@ void main() {
     when(() => ship.registration).thenReturn(
       ShipRegistration(
         name: shipSymbol.symbol,
-        factionSymbol: faction,
+        factionSymbol: faction.value,
         role: ShipRole.COMMAND,
       ),
     );
@@ -541,7 +542,7 @@ void main() {
     when(() => caches.agent.agent).thenReturn(
       Agent(
         symbol: shipSymbol.agentName,
-        headquarters: hqSymbol.waypoint,
+        headquarters: hqSymbol,
         credits: 100000,
         shipCount: 1,
         startingFaction: faction,
@@ -600,8 +601,7 @@ void main() {
     when(() => contractCache.activeContracts).thenReturn([contract]);
 
     final agentCache = _MockAgentCache();
-    final agent = _MockAgent();
-    when(() => agent.credits).thenReturn(100000);
+    final agent = Agent.test(credits: 100000);
     when(() => agentCache.agent).thenReturn(agent);
 
     int remainingUnitsNeededForContract(

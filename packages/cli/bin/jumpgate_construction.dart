@@ -4,13 +4,8 @@ import 'package:cli/cli.dart';
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
 
-  final SystemSymbol startSystemSymbol;
-  if (argResults.rest.isNotEmpty) {
-    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
-  } else {
-    final agentCache = AgentCache.load(fs)!;
-    startSystemSymbol = agentCache.headquartersSystemSymbol;
-  }
+  final startSystemSymbol =
+      await startSystemFromArg(db, argResults.rest.firstOrNull);
 
   final systemsCache = SystemsCache.load(fs)!;
 

@@ -3,10 +3,10 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/waypoint_connectivity.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final agentCache = AgentCache.load(fs)!;
-  final hqSystem = agentCache.headquartersSystemSymbol;
+  final hqSystem = await myHqSystemSymbol(db);
   final fuelCapacity =
       staticCaches.shipyardShips[ShipType.COMMAND_FRIGATE]!.frame.fuelCapacity;
 
@@ -31,6 +31,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       );
     }
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {

@@ -28,7 +28,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   final data = purchaseResponse!.data;
   // Add the new ship to our cache.
   shipCache.updateShip(data.ship);
-  agentCache.agent = data.agent;
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
 
@@ -180,10 +180,11 @@ Future<SellCargo201ResponseData> sellCargo(
   );
   final response =
       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
-  ship.cargo = response!.data.cargo;
+  final data = response!.data;
+  ship.cargo = data.cargo;
   shipCache.updateShip(ship);
-  agentCache.agent = response.data.agent;
-  return response.data;
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  return data;
 }
 
 /// Purchase [units] of [tradeSymbol] from market.
@@ -206,7 +207,7 @@ Future<SellCargo201ResponseData> purchaseCargo(
   final data = response!.data;
   ship.cargo = data.cargo;
   shipCache.updateShip(ship);
-  agentCache.agent = data.agent;
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
 
@@ -224,7 +225,7 @@ Future<RefuelShip200ResponseData> refuelShip(
   // refill to full.
   final responseWrapper = await api.fleet.refuelShip(ship.symbol);
   final data = responseWrapper!.data;
-  agentCache.agent = data.agent;
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;
   shipCache.updateShip(ship);
   return data;

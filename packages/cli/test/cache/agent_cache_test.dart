@@ -1,12 +1,10 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/logger.dart';
-import 'package:file/memory.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
-
-class _MockAgent extends Mock implements Agent {}
 
 class _MockAgentsApi extends Mock implements AgentsApi {}
 
@@ -14,20 +12,22 @@ class _MockApi extends Mock implements Api {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockDatabase extends Mock implements Database {}
+
 void main() {
   test('AgentCache smoke test', () {
     final api = _MockApi();
-    final agent = _MockAgent();
-    when(agent.toJson).thenReturn({});
-    final newAgent = _MockAgent();
-    when(newAgent.toJson).thenReturn({});
+    final agent = Agent.test(credits: 1);
+    final newAgent = Agent.test(credits: 2);
     final agents = _MockAgentsApi();
     when(() => api.agents).thenReturn(agents);
     when(agents.getMyAgent).thenAnswer(
-      (_) => Future.value(GetMyAgent200Response(data: newAgent)),
+      (_) => Future.value(GetMyAgent200Response(data: newAgent.toOpenApi())),
     );
-    final fs = MemoryFileSystem.test();
-    final cache = AgentCache(agent, fs: fs, requestsBetweenChecks: 3);
+    final db = _MockDatabase();
+    registerFallbackValue(Agent.test());
+    when(() => db.upsertAgent(any())).thenAnswer((_) => Future.value());
+    final cache = AgentCache(agent, db, requestsBetweenChecks: 3);
     expect(cache.agent, agent);
     cache.ensureAgentUpToDate(api);
     verifyNever(agents.getMyAgent);
@@ -38,21 +38,5 @@ void main() {
       cache.ensureAgentUpToDate(api);
     });
     verify(agents.getMyAgent).called(1);
-  });
-
-  test('AgentCache save/load round trip', () {
-    final agent = Agent(
-      accountId: 'accountId',
-      symbol: 'symbol',
-      headquarters: 'headquarters',
-      credits: 100,
-      shipCount: 1,
-      startingFaction: 'startingFaction',
-    );
-    final fs = MemoryFileSystem.test();
-    AgentCache(agent, fs: fs).save();
-    final loaded = AgentCache.load(fs);
-    expect(loaded, isNotNull);
-    expect(loaded!.agent.credits, agent.credits);
   });
 }

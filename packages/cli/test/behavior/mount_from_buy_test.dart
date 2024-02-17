@@ -9,8 +9,6 @@ import 'package:types/types.dart';
 
 import '../cache/caches_mock.dart';
 
-class _MockAgent extends Mock implements Agent {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -40,9 +38,12 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final caches = mockCaches();
-    final agent = _MockAgent();
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
+    registerFallbackValue(agent);
+    when(() => caches.agent.updateAgent(any()))
+        .thenAnswer((_) => Future.value());
+
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
@@ -80,7 +81,6 @@ void main() {
         requirements: ShipRequirements(),
       ),
     );
-    when(() => caches.agent.headquartersSymbol).thenReturn(waypointSymbol);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
@@ -182,7 +182,7 @@ void main() {
       (_) => Future.value(
         InstallMount201Response(
           data: InstallMount201ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: ShipModificationTransaction(
               waypointSymbol: waypointSymbol.waypoint,
@@ -206,7 +206,7 @@ void main() {
       (_) => Future.value(
         RemoveMount201Response(
           data: RemoveMount201ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: ShipModificationTransaction(
               waypointSymbol: waypointSymbol.waypoint,

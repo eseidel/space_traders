@@ -4,15 +4,10 @@ import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final SystemSymbol startSystemSymbol;
-  if (argResults.rest.isNotEmpty) {
-    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
-  } else {
-    final agentCache = AgentCache.load(fs)!;
-    startSystemSymbol = agentCache.headquartersSystemSymbol;
-  }
-
   final db = await defaultDatabase();
+  final startSystemSymbol =
+      await startSystemFromArg(db, argResults.rest.firstOrNull);
+
   final systemsCache = SystemsCache.load(fs)!;
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);

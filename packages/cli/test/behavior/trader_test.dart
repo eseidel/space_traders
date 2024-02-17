@@ -9,8 +9,6 @@ import 'package:types/types.dart';
 
 import '../cache/caches_mock.dart';
 
-class _MockAgent extends Mock implements Agent {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -154,9 +152,12 @@ void main() {
     when(() => shipCargo.capacity).thenReturn(10);
     when(() => shipCargo.inventory).thenReturn([]);
 
-    final agent = _MockAgent();
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
+    registerFallbackValue(agent);
+    when(() => caches.agent.updateAgent(any()))
+        .thenAnswer((_) => Future.value());
+
     final state = BehaviorState(shipSymbol, Behavior.trader);
 
     when(
@@ -171,7 +172,7 @@ void main() {
       (invocation) => Future.value(
         PurchaseCargo201Response(
           data: SellCargo201ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: MarketTransaction(
               waypointSymbol: start.waypoint,
@@ -359,9 +360,11 @@ void main() {
       ),
     ]);
 
-    final agent = _MockAgent();
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
+    registerFallbackValue(agent);
+    when(() => caches.agent.updateAgent(any()))
+        .thenAnswer((_) => Future.value());
 
     final transaction = MarketTransaction(
       pricePerUnit: 100,
@@ -382,7 +385,7 @@ void main() {
       (_) => Future.value(
         RefuelShip200Response(
           data: RefuelShip200ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             fuel: ShipFuel(current: fuelCapacity, capacity: fuelCapacity),
             transaction: transaction,
           ),
@@ -408,7 +411,7 @@ void main() {
       (_) => Future.value(
         SellCargo201Response(
           data: SellCargo201ResponseData(
-            agent: agent,
+            agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: MarketTransaction(
               waypointSymbol: start.waypoint,
@@ -529,9 +532,8 @@ void main() {
       ),
     );
 
-    final agent = _MockAgent();
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
 
     final contractsApi = _MockContractsApi();
     when(() => api.contracts).thenReturn(contractsApi);
@@ -1028,6 +1030,8 @@ void main() {
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
 
+    final agent = Agent.test();
+
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
@@ -1180,15 +1184,16 @@ void main() {
         AcceptContract200Response(
           data: AcceptContract200ResponseData(
             contract: contract,
-            agent: _MockAgent(),
+            agent: agent.toOpenApi(),
           ),
         ),
       ),
     );
 
-    final agent = _MockAgent();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
+    registerFallbackValue(agent);
+    when(() => caches.agent.updateAgent(any()))
+        .thenAnswer((_) => Future.value());
 
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
@@ -1373,9 +1378,8 @@ void main() {
       ),
     );
 
-    final agent = _MockAgent();
+    final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => agent.credits).thenReturn(1000000);
 
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 

@@ -5,15 +5,8 @@ import 'package:cli/ships.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-
-  final WaypointSymbol startSymbol;
-  if (argResults.rest.isNotEmpty) {
-    startSymbol = WaypointSymbol.fromString(argResults.rest.first);
-  } else {
-    final agentCache = AgentCache.load(fs)!;
-    startSymbol = agentCache.headquartersSymbol;
-  }
-
+  final startSymbol =
+      await startWaypointFromArg(db, argResults.rest.firstOrNull);
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final charting = ChartingCache(db);

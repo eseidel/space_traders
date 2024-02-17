@@ -6,6 +6,10 @@ const defaultMaxAge = Duration(days: 3);
 
 /// Class for holding our hard-coded configuration values.
 class Config {
+  // TODO(eseidel): This should be configured at runtime.
+  /// The symbol of the agent we are controlling.
+  final String agentSymbol = 'ESEIDEL';
+
   /// Whether or not we should enable the idle queue.
   final bool serviceIdleQueue = true;
 

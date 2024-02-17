@@ -86,10 +86,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
       SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
-  final agentCache = AgentCache.load(fs)!;
-  final headquartersSystemSymbol = agentCache.headquartersSystemSymbol;
+  final hqSystemSymbol = await myHqSystemSymbol(db);
   final reachableSystems =
-      systemConnectivity.systemsReachableFrom(headquartersSystemSymbol);
+      systemConnectivity.systemsReachableFrom(hqSystemSymbol);
 
   final systemsWithCharts = reachableSystems
       .where((s) => (chartedWaypointsBySystem[s] ?? []).isNotEmpty);

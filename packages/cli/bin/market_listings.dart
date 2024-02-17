@@ -61,9 +61,10 @@ void addSymbols(
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
+
   final systemsCache = SystemsCache.load(fs)!;
-  final agentCache = AgentCache.load(fs)!;
-  final hqSystem = agentCache.headquartersSystemSymbol;
+  final hqSystem = await myHqSystemSymbol(db);
   final marketListings = MarketListingCache.load(fs);
 
   final waypoints = systemsCache.waypointsInSystem(hqSystem);
@@ -98,6 +99,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     addSymbols(table, 'exchange', listing.exchange, marketSymbol, marketPrices);
     logger.info(table.toString());
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {

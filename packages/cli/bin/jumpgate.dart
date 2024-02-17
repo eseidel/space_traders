@@ -4,15 +4,11 @@ import 'package:cli/net/auth.dart';
 import 'package:cli/printing.dart';
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final SystemSymbol startSystemSymbol;
-  if (argResults.rest.isNotEmpty) {
-    startSystemSymbol = SystemSymbol.fromString(argResults.rest.first);
-  } else {
-    final agentCache = AgentCache.load(fs)!;
-    startSystemSymbol = agentCache.headquartersSystemSymbol;
-  }
-
   final db = await defaultDatabase();
+
+  final startSystemSymbol =
+      await startSystemFromArg(db, argResults.rest.firstOrNull);
+
   final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
 
   final systemsCache = SystemsCache.load(fs)!;

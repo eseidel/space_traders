@@ -23,8 +23,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final jumpGateCache = JumpGateCache.load(fs);
   final systemConnectivity =
       SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
-  final agentCache = AgentCache.load(fs)!;
-  final hqSystemSymbol = agentCache.headquartersSystemSymbol;
+  final hqSystemSymbol = await myHqSystemSymbol(db);
   final reachableSystems =
       systemConnectivity.systemsReachableFrom(hqSystemSymbol).toSet();
 

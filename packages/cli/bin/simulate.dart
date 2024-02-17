@@ -161,14 +161,13 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final agentCache = AgentCache.load(fs)!;
   final shipyardPrices = ShipyardPrices.load(fs);
   final shipyardShips = ShipyardShipCache.load(fs);
   final shipMounts = ShipMountCache.load(fs);
 
-  final hq = agentCache.headquarters(systemsCache);
+  final hqSystem = await myHqSystemSymbol(db);
   final hqMine =
-      systemsCache.waypointsInSystem(hq.system).firstWhere((w) => w.isAsteroid);
+      systemsCache.waypointsInSystem(hqSystem).firstWhere((w) => w.isAsteroid);
   const tradeSymbol = TradeSymbol.DIAMONDS;
   const haulerType = ShipType.LIGHT_HAULER;
   final unitsPerHaulerCycle = shipyardShips.capacityForShipType(haulerType)!;
