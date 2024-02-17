@@ -33,7 +33,7 @@ Query upsertConstructionQuery(ConstructionRecord record) {
     'construction = @construction, '
     'timestamp = @timestamp, '
     'is_complete = @is_complete ',
-    substitutionValues: constructionToColumnMap(record),
+    parameters: constructionToColumnMap(record),
   );
 }
 
@@ -43,7 +43,7 @@ Query getConstructionQuery(WaypointSymbol waypointSymbol, Duration maxAge) {
     'SELECT * FROM construction_ '
     'WHERE waypoint_symbol = @waypoint_symbol '
     'AND timestamp > @timestamp',
-    substitutionValues: {
+    parameters: {
       'waypoint_symbol': waypointSymbol.toJson(),
       'timestamp': DateTime.timestamp().subtract(maxAge),
     },

@@ -32,7 +32,7 @@ Query upsertChartingRecordQuery(ChartingRecord record) {
     'ON CONFLICT (waypoint_symbol) DO UPDATE SET '
     'values = @values, '
     'timestamp = @timestamp ',
-    substitutionValues: chartingRecordToColumnMap(record),
+    parameters: chartingRecordToColumnMap(record),
   );
 }
 
@@ -44,7 +44,7 @@ Query getChartingRecordQuery(WaypointSymbol waypointSymbol, Duration maxAge) {
     'SELECT * FROM charting_ '
     'WHERE waypoint_symbol = @waypoint_symbol '
     'AND (values IS NOT NULL OR timestamp > @max_age) ',
-    substitutionValues: {
+    parameters: {
       'waypoint_symbol': waypointSymbol.toJson(),
       'max_age': DateTime.timestamp().subtract(maxAge),
     },

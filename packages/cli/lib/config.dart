@@ -143,7 +143,7 @@ class Config {
   /// meaning we will refuel even if it's too expensive.
   final fuelCriticalThreshold = 0.3;
 
-  /// The threshold at which we will stop refueling a ship if it's too expensive.
+  /// The threshold at which we will stop refueling a ship if too expensive.
   final fuelWarningMarkup = 5.0;
 
   /// Maximum markup we will tolerate when refueling (otherwise we will drift).

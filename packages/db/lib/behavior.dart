@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 /// Query a ship behavior state by symbol.
 Query behaviorBySymbolQuery(ShipSymbol shipSymbol) => Query(
       'SELECT * FROM behavior_ WHERE ship_symbol = @ship_symbol',
-      substitutionValues: {
+      parameters: {
         'ship_symbol': shipSymbol.toJson(),
       },
     );

@@ -8,7 +8,7 @@ import 'package:db/queue.dart';
 import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
 import 'package:meta/meta.dart';
-import 'package:postgres/postgres.dart';
+import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
 
 export 'package:db/config.dart';
@@ -16,64 +16,62 @@ export 'package:db/config.dart';
 /// Connect to the default local database.
 /// Logs and returns null on failure.
 Future<Database> defaultDatabase({
-  PostgreSQLConnection Function(DatabaseConfig config) createConnection =
-      connectionFromConfig,
+  @visibleForTesting
+  Future<pg.Connection> Function(pg.Endpoint endpoint) openConnection =
+      _defaultOpenConnection,
 }) async {
-  final db =
-      Database(defaultDatabaseConfig, createConnection: createConnection);
-  await db.open();
+  final db = Database(defaultDatabaseEndpoint);
+  await db.open(openConnection: openConnection);
   return db;
 }
 
-/// Create a connection from the given config.
-PostgreSQLConnection connectionFromConfig(DatabaseConfig config) {
-  return PostgreSQLConnection(
-    config.host,
-    config.port,
-    config.database,
-    username: config.username,
-    password: config.password,
-  );
+Future<pg.Connection> _defaultOpenConnection(pg.Endpoint endpoint) {
+  return pg.Connection.open(endpoint);
 }
 
 /// Abstraction around a database connection.
 class Database {
   /// Create a new database connection.
-  Database(
-    this.config, {
-    @visibleForTesting
-    PostgreSQLConnection Function(DatabaseConfig config) createConnection =
-        connectionFromConfig,
-  }) : _connection = createConnection(config);
+  Database(this.endpoint);
+
+  /// Create a new database with mock connection for testing.
+  @visibleForTesting
+  Database.test(this._connection)
+      : endpoint = pg.Endpoint(host: 'localhost', database: 'test');
 
   /// The underlying connection.
   // TODO(eseidel): This shoudn't be public.
   // Make it private and move all callers into the db package.
-  PostgreSQLConnection get connection => _connection;
+  pg.Connection get connection => _connection;
 
-  /// Not final so we can reset it.
-  final PostgreSQLConnection _connection;
+  late final pg.Connection _connection;
 
   /// Configure the database connection.
-  final DatabaseConfig config;
+  final pg.Endpoint endpoint;
 
   /// Open the database connection.
-  Future<void> open() => connection.open();
+  Future<void> open({
+    @visibleForTesting
+    Future<pg.Connection> Function(pg.Endpoint endpoint) openConnection =
+        _defaultOpenConnection,
+  }) async {
+    _connection = await openConnection(endpoint);
+  }
 
   /// Close the database connection.
   Future<void> close() => connection.close();
 
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
-    await connection.query('LISTEN $channel');
+    await connection.execute('LISTEN $channel');
   }
 
   /// Insert one record using the provided query.
   @protected
   Future<void> insertOne(Query query) {
-    return connection.query(
+    return connection.execute(
       query.fmtString,
-      substitutionValues: query.substitutionValues,
+      parameters: query.parameters,
     );
   }
 
@@ -84,9 +82,9 @@ class Database {
     T Function(Map<String, dynamic>) fromColumnMap,
   ) {
     return connection
-        .query(
+        .execute(
           query.fmtString,
-          substitutionValues: query.substitutionValues,
+          parameters: query.parameters,
         )
         .then(
           (result) => result.map((r) => r.toColumnMap()).map(fromColumnMap),
@@ -100,9 +98,9 @@ class Database {
     T Function(Map<String, dynamic>) fromColumnMap,
   ) {
     return connection
-        .query(
+        .execute(
           query.fmtString,
-          substitutionValues: query.substitutionValues,
+          parameters: query.parameters,
         )
         .then(
           (result) =>
@@ -139,11 +137,11 @@ class Database {
   /// Mark the given survey as exhausted.
   Future<void> markSurveyExhausted(Survey survey) async {
     final query = markSurveyExhaustedQuery(survey);
-    final result = await connection.query(
+    final result = await connection.execute(
       query.fmtString,
-      substitutionValues: query.substitutionValues,
+      parameters: query.parameters,
     );
-    if (result.affectedRowCount != 1) {
+    if (result.affectedRows != 1) {
       throw ArgumentError('Survey not found: $survey');
     }
   }
@@ -154,12 +152,12 @@ class Database {
 
   /// Cache the given factions.
   Future<void> cacheFactions(List<Faction> factions) async {
-    await connection.transaction((connection) async {
+    await connection.runTx((session) async {
       for (final faction in factions) {
         final query = insertFactionQuery(faction);
-        await connection.query(
+        await session.execute(
           query.fmtString,
-          substitutionValues: query.substitutionValues,
+          parameters: query.parameters,
         );
       }
     });
@@ -216,11 +214,11 @@ class Database {
   /// Insert the given request into the database and return it's new id.
   Future<int> insertRequest(RequestRecord request) async {
     final query = insertRequestQuery(request);
-    final result = await connection.query(
+    final result = await connection.execute(
       query.fmtString,
-      substitutionValues: query.substitutionValues,
+      parameters: query.parameters,
     );
-    return result.first.first as int;
+    return result.first.first! as int;
   }
 
   /// Get the request with the given id.
@@ -232,11 +230,11 @@ class Database {
   /// Delete the given request from the database.
   Future<void> deleteRequest(RequestRecord request) async {
     final query = deleteRequestQuery(request);
-    final result = await connection.query(
+    final result = await connection.execute(
       query.fmtString,
-      substitutionValues: query.substitutionValues,
+      parameters: query.parameters,
     );
-    if (result.affectedRowCount != 1) {
+    if (result.affectedRows != 1) {
       throw ArgumentError('Request not found: $request');
     }
   }

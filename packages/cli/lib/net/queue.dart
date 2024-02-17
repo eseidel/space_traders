@@ -130,8 +130,7 @@ class NetQueue {
         return result.response.toResponse();
       }
       try {
-        await _db.connection.notifications
-            .firstWhere((notification) => notification.channel == 'response_')
+        await _db.connection.channels['response_'].firstOrNull
             .timeout(Duration(seconds: timeoutSeconds));
       } on TimeoutException {
         logger.err('Timed out (${timeoutSeconds}s) waiting for response?');
@@ -176,8 +175,7 @@ class NetQueue {
   Future<void> waitForRequest(int timeoutSeconds) async {
     assert(role == QueueRole.responder, 'Only responders can wait.');
     await _listenIfNeeded();
-    await _db.connection.notifications
-        .firstWhere((notification) => notification.channel == 'request_')
+    await _db.connection.channels['request_'].firstOrNull
         .timeout(Duration(seconds: timeoutSeconds));
   }
 
@@ -185,7 +183,7 @@ class NetQueue {
   Future<void> deleteResponsesBefore(DateTime timestamp) {
     return _db.connection.execute(
       'DELETE FROM response_ WHERE created_at < @timestamp',
-      substitutionValues: {
+      parameters: {
         'timestamp': timestamp,
       },
     );

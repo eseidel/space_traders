@@ -16,7 +16,7 @@ Query insertExtractionQuery(ExtractionRecord extraction) {
     'quantity, power, survey_signature, timestamp) VALUES (@ship_symbol, '
     '@waypoint_symbol, @trade_symbol, @quantity, @power, @survey_signature, '
     '@timestamp)',
-    substitutionValues: extractionToColumnMap(extraction),
+    parameters: extractionToColumnMap(extraction),
   );
 }
 

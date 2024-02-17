@@ -10,7 +10,7 @@ Query insertTransactionQuery(Transaction record) {
     'agent_credits, accounting) VALUES (@transaction_type, @ship_symbol, '
     '@waypoint_symbol, @trade_symbol, @ship_type, @quantity, @trade_type, '
     '@per_unit_price, @timestamp, @agent_credits, @accounting)',
-    substitutionValues: transactionToColumnMap(record),
+    parameters: transactionToColumnMap(record),
   );
 }
 
@@ -59,13 +59,13 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
 /// Get unique ship symbols from the transaction table.
 Future<Set<ShipSymbol>> uniqueShipSymbolsInTransactions(Database db) async {
   final result = await db.connection
-      .query('SELECT DISTINCT ship_symbol FROM transaction_');
-  return result.map((r) => ShipSymbol.fromString(r.first as String)).toSet();
+      .execute('SELECT DISTINCT ship_symbol FROM transaction_');
+  return result.map((r) => ShipSymbol.fromString(r.first! as String)).toSet();
 }
 
 /// Get all transactions from the database.
 Future<Iterable<Transaction>> allTransactions(Database db) async {
-  final result = await db.connection.query('SELECT * FROM transaction_');
+  final result = await db.connection.execute('SELECT * FROM transaction_');
   return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
 }
 
@@ -74,10 +74,10 @@ Future<Iterable<Transaction>> transactionsWithAccountingType(
   Database db,
   AccountingType accountingType,
 ) async {
-  final result = await db.connection.query(
+  final result = await db.connection.execute(
     'SELECT * FROM transaction_ WHERE '
     'accounting = @accounting',
-    substitutionValues: {'accounting': accountingType.name},
+    parameters: {'accounting': accountingType.name},
   );
   return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
 }
@@ -87,10 +87,10 @@ Future<Iterable<Transaction>> transactionsAfter(
   Database db,
   DateTime timestamp,
 ) async {
-  final result = await db.connection.query(
+  final result = await db.connection.execute(
     'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
     'ORDER BY timestamp',
-    substitutionValues: {'timestamp': timestamp},
+    parameters: {'timestamp': timestamp},
   );
   return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
 }

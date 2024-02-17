@@ -40,7 +40,7 @@ Query recentSurveysAtWaypointQuery({
   return Query(
     'SELECT * FROM survey_ WHERE waypoint_symbol = @waypointSymbol '
     'ORDER BY timestamp DESC LIMIT @count',
-    substitutionValues: {
+    parameters: {
       'waypointSymbol': waypointSymbol.toJson(),
       'count': count,
     },
@@ -70,7 +70,7 @@ Query insertSurveyQuery(HistoricalSurvey survey) {
     'size = @size, '
     'timestamp = @timestamp, '
     'exhausted = @exhausted',
-    substitutionValues: surveyToColumnMap(survey),
+    parameters: surveyToColumnMap(survey),
   );
 }
 
@@ -79,7 +79,7 @@ Query markSurveyExhaustedQuery(Survey survey) {
   // "signature" is unique to the survey, "symbol" is the waypoint symbol.
   return Query(
     'UPDATE survey_ SET exhausted = true WHERE signature = @signature',
-    substitutionValues: {
+    parameters: {
       'signature': survey.signature,
     },
   );

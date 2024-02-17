@@ -4,14 +4,14 @@ import 'package:types/types.dart';
 /// Query all factions.
 Query allFactionsQuery() => const Query(
       'SELECT * FROM faction_',
-      substitutionValues: {},
+      parameters: {},
     );
 
 /// insert a faction.
 Query insertFactionQuery(Faction faction) => Query(
       'INSERT INTO faction_ (symbol, json) '
       'VALUES (@symbol, @json)',
-      substitutionValues: factionToColumnMap(faction),
+      parameters: factionToColumnMap(faction),
     );
 
 /// Convert a faction to a column map.

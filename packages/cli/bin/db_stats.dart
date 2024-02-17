@@ -5,7 +5,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final connection = db.connection;
   // Get a list of all tables.
-  final tables = await connection.query('''
+  final tables = await connection.execute('''
     SELECT table_name
     FROM information_schema.tables
     WHERE table_schema = 'public'
@@ -15,7 +15,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final counts = <String, int>{};
   for (final table in tables) {
     final tableName = table[0] as String;
-    final count = await connection.query(
+    final count = await connection.execute(
       'SELECT COUNT(*) FROM $tableName;',
     );
     counts[tableName] = count[0][0] as int;

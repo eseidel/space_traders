@@ -46,7 +46,7 @@ class ResponseRecord {
 Query insertRequestQuery(RequestRecord request) => Query(
       'INSERT INTO request_ (priority, json) '
       'VALUES (@priority, @json) RETURNING id',
-      substitutionValues: {
+      parameters: {
         'priority': request.priority,
         'json': jsonEncode(request.request),
       },
@@ -56,7 +56,7 @@ Query insertRequestQuery(RequestRecord request) => Query(
 Query insertResponseQuery(ResponseRecord response) => Query(
       'INSERT INTO response_ (request_id, json) '
       'VALUES (@request_id, @json)',
-      substitutionValues: {
+      parameters: {
         'request_id': response.requestId,
         'json': jsonEncode(response.response),
       },
@@ -65,13 +65,13 @@ Query insertResponseQuery(ResponseRecord response) => Query(
 /// Query to delete a request from the database.
 Query deleteRequestQuery(RequestRecord request) => Query(
       'DELETE FROM request_ WHERE id = @request_id',
-      substitutionValues: {'request_id': request.id},
+      parameters: {'request_id': request.id},
     );
 
 /// Query to delete a response from the database.
 Query deleteResponseQuery(int responseId) => Query(
       'DELETE FROM response_ WHERE id = @response_id',
-      substitutionValues: {'response_id': responseId},
+      parameters: {'response_id': responseId},
     );
 
 /// Query to get the next request from the database.
@@ -84,14 +84,14 @@ Query nextRequestQuery() => const Query(
 Query getRequestQuery(int requestId) => Query(
       'SELECT id, priority, json FROM request_ '
       'WHERE id = @request_id',
-      substitutionValues: {'request_id': requestId},
+      parameters: {'request_id': requestId},
     );
 
 /// Query to get a response from the database.
 Query getResponseForRequestQuery(int requestId) => Query(
       'SELECT id, request_id, json FROM response_ '
       'WHERE request_id = @request_id',
-      substitutionValues: {'request_id': requestId},
+      parameters: {'request_id': requestId},
     );
 
 /// Convert a column map to a [ResponseRecord].

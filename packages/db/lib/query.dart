@@ -3,11 +3,11 @@
 /// {@endtemplate}
 class Query {
   /// {@macro query}
-  const Query(this.fmtString, {this.substitutionValues});
+  const Query(this.fmtString, {this.parameters});
 
   /// The formatted string for the query.
   final String fmtString;
 
   /// The substitution values for the query.
-  final Map<String, dynamic>? substitutionValues;
+  final Map<String, dynamic>? parameters;
 }
