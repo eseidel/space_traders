@@ -90,7 +90,7 @@ Future<Shipyard> getShipyard(Api api, WaypointSymbol waypointSymbol) async {
 Future<JumpGate> getJumpGate(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems
       .getJumpGate(waypointSymbol.systemString, waypointSymbol.waypoint);
-  return response!.data;
+  return JumpGate.fromOpenApi(response!.data);
 }
 
 /// Fetches Market for a given Waypoint.

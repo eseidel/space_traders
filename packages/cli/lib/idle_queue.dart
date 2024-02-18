@@ -87,10 +87,10 @@ class IdleQueue {
   /// Queue jump gate connections for fetching.
   // TODO(eseidel): Jump gate construction completion should call this.
   void queueJumpGateConnections(
-    JumpGateRecord jumpGateRecord, {
+    JumpGate JumpGate, {
     required int jumpDistance,
   }) {
-    for (final connection in jumpGateRecord.connections) {
+    for (final connection in JumpGate.connections) {
       _queueJumpGate(connection, jumpDistance: jumpDistance);
     }
   }

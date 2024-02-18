@@ -13,6 +13,7 @@ export 'mount.dart';
 export 'route.dart';
 export 'shipyard_listing.dart';
 export 'shipyard_price.dart';
+export 'src/jump_gate.dart';
 export 'survey.dart';
 export 'system.dart';
 export 'trading.dart';

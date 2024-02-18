@@ -41,12 +41,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
   logger.info('of ${interestingSystemSymbols.length} interesting systems.');
 
-  final reachableJumpGateRecords = jumpGateCache.values.where(
+  final reachableJumpGates = jumpGateCache.values.where(
     (record) => reachableSystems.contains(record.waypointSymbol.system),
   );
   // These are not necessarily reachable (the jump gate on either side might
   // be under construction).
-  final connectedSystemSymbols = reachableJumpGateRecords
+  final connectedSystemSymbols = reachableJumpGates
       .map((record) => record.connectedSystemSymbols)
       .expand((e) => e)
       .toSet();

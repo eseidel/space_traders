@@ -13,12 +13,11 @@ void main() {
     final fs = MemoryFileSystem.test();
     final a = WaypointSymbol.fromString('X-A-A');
     final b = WaypointSymbol.fromString('X-B-B');
-    final now = DateTime(2021);
     final constructionSnapshot = _MockConstructionSnapshot();
     when(() => constructionSnapshot.isUnderConstruction(a)).thenReturn(false);
     final jumpGateCache = JumpGateCache(
       [
-        JumpGateRecord(waypointSymbol: a, connections: {b}, timestamp: now),
+        JumpGate(waypointSymbol: a, connections: {b}),
       ],
       fs: fs,
     );

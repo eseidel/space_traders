@@ -4,10 +4,12 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:openapi/api.dart' hide Agent, System, SystemWaypoint, Waypoint;
+import 'package:openapi/api.dart'
+    hide Agent, JumpGate, System, SystemWaypoint, Waypoint;
 import 'package:types/mount.dart';
 
-export 'package:openapi/api.dart' hide Agent, System, SystemWaypoint, Waypoint;
+export 'package:openapi/api.dart'
+    hide Agent, JumpGate, System, SystemWaypoint, Waypoint;
 
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
