@@ -9,7 +9,7 @@ class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockConstructionCache extends Mock implements ConstructionCache {}
 
-class _MockContractCache extends Mock implements ContractSnapshot {}
+class _MockContractSnapshot extends Mock implements ContractSnapshot {}
 
 class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
 
@@ -78,7 +78,7 @@ Caches mockCaches() {
     waypoints: _MockWaypointCache(),
     markets: _MockMarketCache(),
     marketListings: _MockMarketListingSnapshot(),
-    contracts: _MockContractCache(),
+    contracts: _MockContractSnapshot(),
     behaviors: _MockBehaviorCache(),
     charting: _MockChartingCache(),
     routePlanner: _MockRoutePlanner(),

@@ -266,11 +266,11 @@ class CentralCommand {
   /// Procurement contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
-    ContractSnapshot contractCache,
+    ContractSnapshot contractSnapshot,
   ) {
     return sellOppsForContracts(
       agentCache,
-      contractCache,
+      contractSnapshot,
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
     );
   }
@@ -297,7 +297,7 @@ class CentralCommand {
   /// Find next deal for the given [ship], considering all deals in progress.
   CostedDeal? findNextDealAndLog(
     AgentCache agentCache,
-    ContractSnapshot contractCache,
+    ContractSnapshot contractSnapshot,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
     SystemConnectivity systemConnectivity,
@@ -313,7 +313,7 @@ class CentralCommand {
       extraSellOpps.addAll(constructionSellOpps());
     }
     if (isContractTradingEnabled) {
-      extraSellOpps.addAll(contractSellOpps(agentCache, contractCache));
+      extraSellOpps.addAll(contractSellOpps(agentCache, contractSnapshot));
     }
     if (extraSellOpps.isNotEmpty) {
       final opp = extraSellOpps.first;
@@ -788,10 +788,10 @@ int _minimumFloatRequired(Contract contract) {
 /// Procurement contracts converted to sell opps.
 Iterable<SellOpp> sellOppsForContracts(
   AgentCache agentCache,
-  ContractSnapshot contractCache, {
+  ContractSnapshot contractSnapshot, {
   required int Function(Contract, TradeSymbol) remainingUnitsNeededForContract,
 }) sync* {
-  for (final contract in affordableContracts(agentCache, contractCache)) {
+  for (final contract in affordableContracts(agentCache, contractSnapshot)) {
     for (final good in contract.terms.deliver) {
       final unitsNeeded = remainingUnitsNeededForContract(
         contract,

@@ -8,10 +8,10 @@ import 'package:types/types.dart';
 
 /// Snapshot of contracts in the database.
 class ContractSnapshot {
-  /// Creates a new contract cache.
+  /// Creates a new contract snapshot.
   ContractSnapshot(this.contracts);
 
-  /// Load the ContractCache from the file system.
+  /// Load the ContractSnapshot from the database.
   static Future<ContractSnapshot> load(Database db) async {
     final contracts = await db.allContracts();
     return ContractSnapshot(contracts.toList());

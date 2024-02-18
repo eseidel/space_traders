@@ -16,7 +16,7 @@ class _MockApi extends Mock implements Api {}
 
 class _MockBehaviorCache extends Mock implements BehaviorCache {}
 
-class _MockContractCache extends Mock implements ContractSnapshot {}
+class _MockContractSnapshot extends Mock implements ContractSnapshot {}
 
 class _MockContractTerms extends Mock implements ContractTerms {}
 
@@ -195,10 +195,11 @@ void main() {
       timestamp: now,
     );
     final contracts = [contract1, contract2];
-    final contractCache = ContractSnapshot(contracts);
-    final active = contractCache.activeContracts;
+    final contractSnapshot = ContractSnapshot(contracts);
+    final active = contractSnapshot.activeContracts;
     expect(active.length, 2);
-    final affordable = affordableContracts(agentCache, contractCache).toList();
+    final affordable =
+        affordableContracts(agentCache, contractSnapshot).toList();
     expect(affordable.length, 1);
     expect(affordable.first.id, '2');
   });
@@ -578,7 +579,7 @@ void main() {
 
   test('sellOppsForContracts', () {
     final now = DateTime(2021);
-    final contractCache = _MockContractCache();
+    final contractSnapshot = _MockContractSnapshot();
     final contract = Contract(
       id: '2',
       factionSymbol: 'faction',
@@ -600,7 +601,7 @@ void main() {
       fulfilled: false,
       timestamp: now,
     );
-    when(() => contractCache.activeContracts).thenReturn([contract]);
+    when(() => contractSnapshot.activeContracts).thenReturn([contract]);
 
     final agentCache = _MockAgentCache();
     final agent = Agent.test(credits: 100000);
@@ -615,7 +616,7 @@ void main() {
 
     final sellOpps = sellOppsForContracts(
       agentCache,
-      contractCache,
+      contractSnapshot,
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
     );
     expect(sellOpps.toList().length, 1);
@@ -627,7 +628,7 @@ void main() {
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
     expect(
       centralCommand
-          .contractSellOpps(agentCache, contractCache)
+          .contractSellOpps(agentCache, contractSnapshot)
           .toList()
           .length,
       1,

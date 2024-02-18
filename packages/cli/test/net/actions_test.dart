@@ -14,7 +14,7 @@ class _MockDatabase extends Mock implements Database {}
 
 class _MockChartingCache extends Mock implements ChartingCache {}
 
-class _MockContractCache extends Mock implements ContractSnapshot {}
+class _MockContractSnapshot extends Mock implements ContractSnapshot {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
@@ -778,7 +778,7 @@ void main() {
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
-    final contractCache = _MockContractCache();
+    final contractSnapshot = _MockContractSnapshot();
     final contract = Contract.test(
       id: 'C-1',
       terms: ContractTerms(
@@ -814,7 +814,7 @@ void main() {
       await acceptContractAndLog(
         api,
         db,
-        contractCache,
+        contractSnapshot,
         agentCache,
         ship,
         contract,

@@ -28,29 +28,29 @@ void printContracts(
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final printAll = argResults['all'] as bool;
-  final contractCache = await ContractSnapshot.load(db);
+  final contractSnapshot = await ContractSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
   printContracts(
     'completed',
-    contractCache.completedContracts,
+    contractSnapshot.completedContracts,
     marketPrices,
     describeContracts: printAll,
   );
   printContracts(
     'expired',
-    contractCache.expiredContracts,
+    contractSnapshot.expiredContracts,
     marketPrices,
     describeContracts: printAll,
   );
   printContracts(
     'active',
-    contractCache.activeContracts,
+    contractSnapshot.activeContracts,
     marketPrices,
     describeContracts: true,
   );
   printContracts(
     'unaccepted',
-    contractCache.unacceptedContracts,
+    contractSnapshot.unacceptedContracts,
     marketPrices,
     describeContracts: true,
   );

@@ -118,7 +118,7 @@ Future<DeliverContract200ResponseData> deliverContract(
   Api api,
   Ship ship,
   ShipCache shipCache,
-  ContractSnapshot contractCache,
+  ContractSnapshot contractSnapshot,
   Contract contract, {
   required TradeSymbol tradeSymbol,
   required int units,

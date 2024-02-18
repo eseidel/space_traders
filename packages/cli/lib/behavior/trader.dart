@@ -307,7 +307,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
-  ContractSnapshot contractCache,
+  ContractSnapshot contractSnapshot,
   ShipCache shipCache,
   Ship ship,
   Contract beforeDelivery,
@@ -338,7 +338,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     await acceptContractAndLog(
       api,
       db,
-      contractCache,
+      contractSnapshot,
       agentCache,
       ship,
       beforeDelivery,
@@ -351,7 +351,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     api,
     ship,
     shipCache,
-    contractCache,
+    contractSnapshot,
     beforeDelivery,
     tradeSymbol: tradeSymbol,
     units: unitsBefore,
@@ -552,25 +552,25 @@ String describeExpectedContractProfit(
 Future<DateTime?> acceptContractsIfNeeded(
   Api api,
   Database db,
-  ContractSnapshot contractCache,
+  ContractSnapshot contractSnapshot,
   MarketPrices marketPrices,
   AgentCache agentCache,
   ShipCache shipCache,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
-  final contracts = contractCache.activeContracts;
+  final contracts = contractSnapshot.activeContracts;
   if (contracts.isEmpty) {
-    final contract =
-        await negotiateContractAndLog(db, api, ship, shipCache, contractCache);
+    final contract = await negotiateContractAndLog(
+        db, api, ship, shipCache, contractSnapshot);
     shipInfo(ship, describeExpectedContractProfit(marketPrices, contract));
     return null;
   }
-  for (final contract in contractCache.unacceptedContracts) {
+  for (final contract in contractSnapshot.unacceptedContracts) {
     await acceptContractAndLog(
       api,
       db,
-      contractCache,
+      contractSnapshot,
       agentCache,
       ship,
       contract,
