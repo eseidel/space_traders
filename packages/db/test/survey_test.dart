@@ -1,4 +1,4 @@
-import 'package:db/survey.dart';
+import 'package:db/src/survey.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

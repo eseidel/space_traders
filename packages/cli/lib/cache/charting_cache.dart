@@ -1,6 +1,6 @@
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
-import 'package:db/chart.dart';
+import 'package:db/src/chart.dart';
 
 /// A snapshot of the charting records.
 class ChartingSnapshot {

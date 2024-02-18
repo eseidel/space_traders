@@ -1,5 +1,4 @@
 import 'package:cli/cli.dart';
-import 'package:db/transaction.dart';
 
 void printRampDelay(Iterable<Transaction> transactions) {
   // Walk through all transactions until we find a ship purchase.  When we do
@@ -31,7 +30,7 @@ void printRampDelay(Iterable<Transaction> transactions) {
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-  final transactions = await allTransactions(db);
+  final transactions = await db.allTransactions();
   printRampDelay(transactions);
   await db.close();
 }

@@ -1,4 +1,4 @@
-import 'package:db/faction.dart';
+import 'package:db/src/faction.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

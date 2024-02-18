@@ -1,6 +1,5 @@
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
-import 'package:db/transaction.dart';
 
 String describeTransaction(Transaction t) {
   return '${t.timestamp} ${t.tradeSymbol} ${t.quantity} ${t.tradeType} '
@@ -36,7 +35,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final db = await defaultDatabase();
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = (await transactionsAfter(db, startTime)).toList();
+  final transactions = (await db.transactionsAfter(startTime)).toList();
 
   final lastCredits = transactions.last.agentCredits;
   final firstCredits = transactions.first.agentCredits;

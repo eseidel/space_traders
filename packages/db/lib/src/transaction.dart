@@ -1,5 +1,4 @@
-import 'package:db/db.dart';
-import 'package:db/query.dart';
+import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
 /// Create the insertion query for a transaction.
@@ -54,43 +53,4 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
         ContractAction.fromJsonOrNull(values['contract_action'] as String?),
     contractId: values['contract_id'] as String?,
   );
-}
-
-/// Get unique ship symbols from the transaction table.
-Future<Set<ShipSymbol>> uniqueShipSymbolsInTransactions(Database db) async {
-  final result = await db.connection
-      .execute('SELECT DISTINCT ship_symbol FROM transaction_');
-  return result.map((r) => ShipSymbol.fromString(r.first! as String)).toSet();
-}
-
-/// Get all transactions from the database.
-Future<Iterable<Transaction>> allTransactions(Database db) async {
-  final result = await db.connection.execute('SELECT * FROM transaction_');
-  return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
-}
-
-/// Get all transactions matching accountingType from the database.
-Future<Iterable<Transaction>> transactionsWithAccountingType(
-  Database db,
-  AccountingType accountingType,
-) async {
-  final result = await db.connection.execute(
-    'SELECT * FROM transaction_ WHERE '
-    'accounting = @accounting',
-    parameters: {'accounting': accountingType.name},
-  );
-  return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
-}
-
-/// Get transactions after a given timestamp.
-Future<Iterable<Transaction>> transactionsAfter(
-  Database db,
-  DateTime timestamp,
-) async {
-  final result = await db.connection.execute(
-    'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
-    'ORDER BY timestamp',
-    parameters: {'timestamp': timestamp},
-  );
-  return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
 }

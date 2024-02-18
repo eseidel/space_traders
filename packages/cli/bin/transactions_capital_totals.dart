@@ -1,7 +1,6 @@
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
-import 'package:db/transaction.dart';
 
 String describeTransaction(Transaction t) {
   return '${t.timestamp} ${t.tradeSymbol} ${t.quantity} ${t.tradeType} '
@@ -11,7 +10,7 @@ String describeTransaction(Transaction t) {
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final transactions =
-      await transactionsWithAccountingType(db, AccountingType.capital);
+      await db.transactionsWithAccountingType(AccountingType.capital);
 
   final grouped = <String, List<Transaction>>{};
   for (final transaction in transactions) {

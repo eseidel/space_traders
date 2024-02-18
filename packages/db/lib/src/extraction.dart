@@ -1,4 +1,4 @@
-import 'package:db/query.dart';
+import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
 /// Query to get all extractions.

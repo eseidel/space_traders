@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:db/query.dart';
+import 'package:db/src/query.dart';
 import 'package:types/queue.dart';
 
 /// Request queued for later execution.

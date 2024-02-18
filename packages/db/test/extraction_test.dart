@@ -1,4 +1,4 @@
-import 'package:db/extraction.dart';
+import 'package:db/src/extraction.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

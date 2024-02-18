@@ -1,7 +1,6 @@
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
-import 'package:db/transaction.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);
@@ -105,7 +104,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final openDeals = <ShipSymbol, List<Transaction>>{};
   final ignoredTransactions = <Transaction>[];
   final supportedTypes = {AccountingType.fuel, AccountingType.goods};
-  final transactions = await allTransactions(db);
+  final transactions = await db.allTransactions();
 
   void recordDeal(List<Transaction> openDeal) {
     final deal = SyntheticDeal(openDeal);

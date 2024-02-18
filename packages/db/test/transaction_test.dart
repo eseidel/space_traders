@@ -1,4 +1,4 @@
-import 'package:db/transaction.dart';
+import 'package:db/src/transaction.dart';
 import 'package:test/test.dart';
 import 'package:types/transaction.dart';
 

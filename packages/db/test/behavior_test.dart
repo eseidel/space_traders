@@ -1,4 +1,4 @@
-import 'package:db/behavior.dart';
+import 'package:db/src/behavior.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

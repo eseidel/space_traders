@@ -1,5 +1,4 @@
 import 'package:cli/cli.dart';
-import 'package:db/transaction.dart';
 
 void printDiffs(List<int> data) {
   final diffs = <int>[];
@@ -11,7 +10,7 @@ void printDiffs(List<int> data) {
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-  final transactions = await allTransactions(db);
+  final transactions = await db.allTransactions();
   // final marketPrices = MarketPrices.load(fs);
   // Walk through all transactions, finding repeats.
   final transactionSets = <List<Transaction>>[];

@@ -4,7 +4,6 @@ import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
-import 'package:db/transaction.dart';
 import 'package:intl/intl.dart';
 
 class TransactionSummary {
@@ -53,7 +52,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final db = await defaultDatabase();
 
-  final shipSymbols = (await uniqueShipSymbolsInTransactions(db)).toList()
+  final shipSymbols = (await db.uniqueShipSymbolsInTransactions()).toList()
     ..sort();
   final behaviorCache = BehaviorCache.load(fs);
 
@@ -77,7 +76,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final frameCreditPerSecondTotals = <ShipFrameSymbolEnum, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = (await transactionsAfter(db, startTime)).where(
+  final transactions = (await db.transactionsAfter(startTime)).where(
     (t) => [AccountingType.goods, AccountingType.fuel].contains(t.accounting),
   );
 

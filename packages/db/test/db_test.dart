@@ -1,5 +1,5 @@
 import 'package:db/db.dart';
-import 'package:db/transaction.dart';
+import 'package:db/src/transaction.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:test/test.dart';

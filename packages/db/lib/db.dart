@@ -1,15 +1,15 @@
-import 'package:db/agent.dart';
-import 'package:db/chart.dart';
 import 'package:db/config.dart';
-import 'package:db/construction.dart';
-import 'package:db/extraction.dart';
-import 'package:db/faction.dart';
-import 'package:db/market_listing.dart';
-import 'package:db/query.dart';
-import 'package:db/queue.dart';
-import 'package:db/shipyard_listing.dart';
-import 'package:db/survey.dart';
-import 'package:db/transaction.dart';
+import 'package:db/src/agent.dart';
+import 'package:db/src/chart.dart';
+import 'package:db/src/construction.dart';
+import 'package:db/src/extraction.dart';
+import 'package:db/src/faction.dart';
+import 'package:db/src/market_listing.dart';
+import 'package:db/src/query.dart';
+import 'package:db/src/queue.dart';
+import 'package:db/src/shipyard_listing.dart';
+import 'package:db/src/survey.dart';
+import 'package:db/src/transaction.dart';
 import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
@@ -305,5 +305,42 @@ class Database {
   Future<void> upsertShipyardListing(ShipyardListing listing) async {
     final query = upsertShipyardListingQuery(listing);
     await insertOne(query);
+  }
+
+  /// Get unique ship symbols from the transaction table.
+  Future<Set<ShipSymbol>> uniqueShipSymbolsInTransactions() async {
+    final result = await connection
+        .execute('SELECT DISTINCT ship_symbol FROM transaction_');
+    return result.map((r) => ShipSymbol.fromString(r.first! as String)).toSet();
+  }
+
+  /// Get all transactions from the database.
+  Future<Iterable<Transaction>> allTransactions() async {
+    final result = await connection.execute('SELECT * FROM transaction_');
+    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
+  }
+
+  /// Get all transactions matching accountingType from the database.
+  Future<Iterable<Transaction>> transactionsWithAccountingType(
+    AccountingType accountingType,
+  ) async {
+    final result = await connection.execute(
+      'SELECT * FROM transaction_ WHERE '
+      'accounting = @accounting',
+      parameters: {'accounting': accountingType.name},
+    );
+    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
+  }
+
+  /// Get transactions after a given timestamp.
+  Future<Iterable<Transaction>> transactionsAfter(
+    DateTime timestamp,
+  ) async {
+    final result = await connection.execute(
+      'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
+      'ORDER BY timestamp',
+      parameters: {'timestamp': timestamp},
+    );
+    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
   }
 }

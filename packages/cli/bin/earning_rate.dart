@@ -1,6 +1,5 @@
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
-import 'package:db/transaction.dart';
 
 DateTime snapToHour(DateTime time) {
   return DateTime.utc(time.year, time.month, time.day, time.hour);
@@ -15,7 +14,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   // Credits per hour.
   final oneDayAgoAsHour =
       snapToHour(DateTime.timestamp().subtract(const Duration(hours: 24)));
-  final transactions = await transactionsAfter(db, oneDayAgoAsHour);
+  final transactions = await db.transactionsAfter(oneDayAgoAsHour);
   final firstTransactionHour = snapToHour(transactions.first.timestamp);
 
   const timeWidth = 5;

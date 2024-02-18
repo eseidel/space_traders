@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:db/query.dart';
+import 'package:db/src/query.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
