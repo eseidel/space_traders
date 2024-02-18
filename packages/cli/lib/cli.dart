@@ -112,3 +112,13 @@ Future<SystemSymbol> startSystemFromArg(Database db, String? arg) async {
   }
   return SystemSymbol.fromString(arg);
 }
+
+/// Shortcut for loading system connectivity when you don't care
+/// about holding onto the jump gate snapshot or construction snapshot.
+Future<SystemConnectivity> loadSystemConnectivity(Database db) async {
+  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
+  final constructionSnapshot = await ConstructionSnapshot.load(db);
+  final systemConnectivity =
+      SystemConnectivity.fromJumpGates(jumpGateSnapshot, constructionSnapshot);
+  return systemConnectivity;
+}

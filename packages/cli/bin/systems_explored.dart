@@ -82,10 +82,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       'with market prices.',
     );
 
-  final jumpGateCache = JumpGateCache.load(fs);
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final systemConnectivity = await loadSystemConnectivity(db);
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final reachableSystems =
       systemConnectivity.systemsReachableFrom(hqSystemSymbol);

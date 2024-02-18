@@ -8,7 +8,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final systemSymbol = await myHqSystemSymbol(db);
   final systemsCache = SystemsCache.load(fs)!;
-  final jumpGateCache = JumpGateCache.load(fs);
+  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
 
@@ -22,7 +22,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   while (systems.isNotEmpty || jumpGates.isNotEmpty) {
     if (jumpGates.isNotEmpty) {
       final from = jumpGates.take();
-      final fromRecord = jumpGateCache.recordForSymbol(from.value);
+      final fromRecord = jumpGateSnapshot.recordForSymbol(from.value);
       if (fromRecord == null) {
         final chartingRecord = chartingSnapshot.getRecord(from.value);
         if (chartingRecord == null) {
@@ -32,7 +32,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         }
         continue;
       }
-      if (!canJumpFrom(jumpGateCache, constructionSnapshot, from.value)) {
+      if (!canJumpFrom(jumpGateSnapshot, constructionSnapshot, from.value)) {
         continue;
       }
       for (final to in fromRecord.connections) {

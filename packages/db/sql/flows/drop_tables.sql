@@ -12,3 +12,4 @@ DROP TABLE IF EXISTS "market_listing_" CASCADE;
 DROP TABLE IF EXISTS "shipyard_listing_" CASCADE;
 DROP TABLE IF EXISTS "shipyard_price_" CASCADE;
 DROP TABLE IF EXISTS "market_price_" CASCADE;
+DROP TABLE IF EXISTS "jump_gate_" CASCADE;

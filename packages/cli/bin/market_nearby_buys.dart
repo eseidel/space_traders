@@ -7,10 +7,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final marketPrices = await MarketPrices.load(db);
   final systemsCache = SystemsCache.load(fs)!;
-  final jumpGateCache = JumpGateCache.load(fs);
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
     systemConnectivity,

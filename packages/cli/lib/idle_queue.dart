@@ -87,10 +87,10 @@ class IdleQueue {
   /// Queue jump gate connections for fetching.
   // TODO(eseidel): Jump gate construction completion should call this.
   void queueJumpGateConnections(
-    JumpGate JumpGate, {
+    JumpGate jumpGate, {
     required int jumpDistance,
   }) {
-    for (final connection in JumpGate.connections) {
+    for (final connection in jumpGate.connections) {
       _queueJumpGate(connection, jumpDistance: jumpDistance);
     }
   }
@@ -121,7 +121,7 @@ class IdleQueue {
     }
   }
 
-  Future<void> _processNextSystem(Api api, Caches caches) async {
+  Future<void> _processNextSystem(Database db, Api api, Caches caches) async {
     final systemRecord = _systems.take();
     final systemSymbol = systemRecord.value;
     final jumpDistance = systemRecord.jumpDistance;
@@ -150,8 +150,9 @@ class IdleQueue {
       // a ship there.
       if (waypoint.isJumpGate) {
         if (await caches.waypoints.isCharted(waypointSymbol)) {
-          final fromRecord =
-              await caches.jumpGates.getOrFetch(api, waypoint.symbol);
+          // TODO(eseidel): This doesn't change our current JumpGateSnapshot
+          // so we need to be careful that this method doesn't need the latest.
+          final fromRecord = await getOrFetchJumpGate(db, api, waypoint.symbol);
           // Don't follow links where the source is under construction, but
           // do follow them if the destination is. This will have the effect
           // of loading all the starter systems into our db, even if we can't
@@ -177,13 +178,13 @@ class IdleQueue {
   }
 
   /// Run one fetch.
-  Future<void> runOne(Api api, Caches caches) async {
+  Future<void> runOne(Database db, Api api, Caches caches) async {
     if (isDone) {
       return;
     }
     // Service systems before jumpgates to make a breadth-first search.
     if (_systems.isNotEmpty) {
-      await _processNextSystem(api, caches);
+      await _processNextSystem(db, api, caches);
       return;
     }
     if (_jumpGates.isNotEmpty) {

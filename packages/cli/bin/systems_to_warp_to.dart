@@ -15,10 +15,10 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final startSystemSymbol = await myHqSystemSymbol(db);
 
   final staticCaches = StaticCaches.load(fs);
-  final jumpGateCache = JumpGateCache.load(fs);
+  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionCache = ConstructionCache(db);
   final systemConnectivity = SystemConnectivity.fromJumpGates(
-    jumpGateCache,
+    jumpGateSnapshot,
     await constructionCache.snapshot(),
   );
   final systemsCache = SystemsCache.load(fs)!;

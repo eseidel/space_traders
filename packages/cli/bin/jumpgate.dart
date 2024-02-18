@@ -18,8 +18,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       .symbol;
 
   final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final jumpGateCache = JumpGateCache.load(fs);
-  final jumpGate = await jumpGateCache.getOrFetch(api, jumpGateSymbol);
+  final jumpGate = await getOrFetchJumpGate(db, api, jumpGateSymbol);
 
   String statusString(WaypointSymbol jumpGateSymbol) {
     final isUnderConstruction =

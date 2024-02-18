@@ -17,10 +17,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     construction,
     staticCaches.waypointTraits,
   );
-  final jumpGateCache = JumpGateCache.load(fs);
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final systemConnectivity = await loadSystemConnectivity(db);
 
   final shipCache = ShipCache.load(fs)!;
   final behaviorCache = BehaviorCache.load(fs);

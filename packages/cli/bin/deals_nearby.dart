@@ -15,8 +15,9 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
 
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
-  final jumpGates = JumpGateCache.load(fs);
+  final jumpGates = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
+  // Can't use loadSystemConnectivity because need constructionSnapshot later.
   final systemConnectivity =
       SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);
   final routePlanner = RoutePlanner.fromSystemsCache(

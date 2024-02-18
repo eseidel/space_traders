@@ -16,7 +16,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     if (count++ % printEvery == 0) {
       logger.info('$queue');
     }
-    await queue.runOne(api, caches);
+    await queue.runOne(db, api, caches);
   }
 
   // required or main() will hang

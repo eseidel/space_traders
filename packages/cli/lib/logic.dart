@@ -24,10 +24,11 @@ Future<void> _waitIfNeeded(ShipWaiterEntry entry) async {
 }
 
 Future<void> _runIdleTasksIfPossible(
-  ShipWaiterEntry entry,
-  IdleQueue queue,
+  Database db,
   Api api,
   Caches caches,
+  IdleQueue queue,
+  ShipWaiterEntry entry,
 ) async {
   if (!config.serviceIdleQueue) {
     return;
@@ -45,7 +46,7 @@ Future<void> _runIdleTasksIfPossible(
       api.requestCounts,
       'idle queue',
       queue.minProcessingTime,
-      () async => await queue.runOne(api, caches),
+      () async => await queue.runOne(db, api, caches),
     );
   }
 }
@@ -82,7 +83,7 @@ Future<void> advanceShips(
     final shipSymbol = entry.shipSymbol;
     final waitUntil = entry.waitUntil;
 
-    await _runIdleTasksIfPossible(entry, queue, api, caches);
+    await _runIdleTasksIfPossible(db, api, caches, queue, entry);
     await _waitIfNeeded(entry);
     final ship = caches.ships[shipSymbol];
     if (shipFilter != null && !shipFilter(ship)) {

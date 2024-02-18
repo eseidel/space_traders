@@ -74,10 +74,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     throw UnimplementedError();
   }
 
-  final jumpGateCache = JumpGateCache.load(fs);
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
     systemConnectivity,

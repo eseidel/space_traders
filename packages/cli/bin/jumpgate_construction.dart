@@ -9,10 +9,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final systemsCache = SystemsCache.load(fs)!;
 
+  // Can't use loadSystemConnectivity because need constructionSnapshot later.
   final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final jumpGateCache = JumpGateCache.load(fs);
+  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+      SystemConnectivity.fromJumpGates(jumpGateSnapshot, constructionSnapshot);
 
   // Find all reachable jumpgates that are under construction.
   final systemSymbols =

@@ -1,7 +1,6 @@
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/nav/system_connectivity.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -10,20 +9,18 @@ class _MockConstructionSnapshot extends Mock implements ConstructionSnapshot {}
 
 void main() {
   test('SystemConnectivity.fromJumpGates', () async {
-    final fs = MemoryFileSystem.test();
     final a = WaypointSymbol.fromString('X-A-A');
     final b = WaypointSymbol.fromString('X-B-B');
     final constructionSnapshot = _MockConstructionSnapshot();
     when(() => constructionSnapshot.isUnderConstruction(a)).thenReturn(false);
-    final jumpGateCache = JumpGateCache(
+    final jumpGates = JumpGateSnapshot(
       [
         JumpGate(waypointSymbol: a, connections: {b}),
       ],
-      fs: fs,
     );
 
     final unknownB = SystemConnectivity.fromJumpGates(
-      jumpGateCache,
+      jumpGates,
       constructionSnapshot,
     );
     // If construction status of 'b' is not known, then there is no path.
@@ -34,7 +31,7 @@ void main() {
 
     when(() => constructionSnapshot.isUnderConstruction(b)).thenReturn(false);
     final knownB = SystemConnectivity.fromJumpGates(
-      jumpGateCache,
+      jumpGates,
       constructionSnapshot,
     );
     expect(

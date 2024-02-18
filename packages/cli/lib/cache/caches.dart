@@ -99,7 +99,7 @@ class Caches {
   final WaypointCache waypoints;
 
   /// The cache of jump gates.
-  final JumpGateCache jumpGates;
+  final JumpGateSnapshot jumpGates;
 
   /// The cache of markets descriptions.
   /// This is currently updated at the top of every loop.
@@ -155,7 +155,7 @@ class Caches {
         await ContractCache.loadOrFetch(api, fs: fs, forceRefresh: true);
     final behaviors = BehaviorCache.load(fs);
 
-    final jumpGates = JumpGateCache.load(fs);
+    final jumpGates = await JumpGateSnapshot.load(db);
     final constructionSnapshot = await ConstructionSnapshot.load(db);
     final systemConnectivity =
         SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);

@@ -297,6 +297,6 @@ Future<void> recordMarketData(
     logger.warn('No prices for ${market.symbol}!');
   }
   for (final price in prices) {
-    db.upsertMarketPrice(price);
+    await db.upsertMarketPrice(price);
   }
 }

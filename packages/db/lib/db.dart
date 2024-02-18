@@ -4,6 +4,7 @@ import 'package:db/src/chart.dart';
 import 'package:db/src/construction.dart';
 import 'package:db/src/extraction.dart';
 import 'package:db/src/faction.dart';
+import 'package:db/src/jump_gate.dart';
 import 'package:db/src/market_listing.dart';
 import 'package:db/src/market_price.dart';
 import 'package:db/src/query.dart';
@@ -364,5 +365,21 @@ class Database {
   /// Add a shipyard price to the database.
   Future<void> upsertShipyardPrice(ShipyardPrice price) async {
     await insertOne(upsertShipyardPriceQuery(price));
+  }
+
+  /// Get all jump gates from the database.
+  Future<Iterable<JumpGate>> allJumpGates() async {
+    return queryMany(allJumpGatesQuery(), jumpGateFromColumnMap);
+  }
+
+  /// Add a jump gate to the database.
+  Future<void> upsertJumpGate(JumpGate jumpGate) async {
+    await insertOne(upsertJumpGateQuery(jumpGate));
+  }
+
+  /// Get the jump gate for the given waypoint symbol.
+  Future<JumpGate?> getJumpGate(WaypointSymbol waypointSymbol) async {
+    final query = getJumpGateQuery(waypointSymbol);
+    return queryOne(query, jumpGateFromColumnMap);
   }
 }

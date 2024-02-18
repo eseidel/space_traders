@@ -11,7 +11,7 @@ class _MockConstructionCache extends Mock implements ConstructionCache {}
 
 class _MockContractCache extends Mock implements ContractCache {}
 
-class _MockJumpGateCache extends Mock implements JumpGateCache {}
+class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
 
@@ -86,7 +86,7 @@ Caches mockCaches() {
     static: staticCaches,
     construction: _MockConstructionCache(),
     systemConnectivity: _MockSystemConnectivity(),
-    jumpGates: _MockJumpGateCache(),
+    jumpGates: _MockJumpGateSnapshot(),
     shipyardListings: _MockShipyardListingCache(),
   );
 }

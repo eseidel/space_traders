@@ -96,11 +96,11 @@ class _Clusters {
 /// Returns true if it's possible to jump from the provided jumpgate.
 /// it's important to also check if it's possible to jump to the destination.
 bool canJumpFrom(
-  JumpGateCache jumpGateCache,
+  JumpGateSnapshot jumpGates,
   ConstructionSnapshot constructionSnapshot,
   WaypointSymbol from,
 ) {
-  final record = jumpGateCache.recordForSymbol(from);
+  final record = jumpGates.recordForSymbol(from);
   // If we don't know about the fromGate, we can't jump.
   if (record == null) {
     return false;
@@ -129,12 +129,12 @@ bool canJumpTo(
 
 /// Returns true if we know it's possible to jump between the two waypoints.
 bool canJumpBetween(
-  JumpGateCache jumpGateCache,
+  JumpGateSnapshot jumpGates,
   ConstructionSnapshot constructionSnapshot, {
   required WaypointSymbol from,
   required WaypointSymbol to,
 }) {
-  return canJumpFrom(jumpGateCache, constructionSnapshot, from) &&
+  return canJumpFrom(jumpGates, constructionSnapshot, from) &&
       canJumpTo(constructionSnapshot, to);
 }
 
@@ -154,18 +154,18 @@ class _Connections {
   }
 
   _Connections.fromSnapshots(
-    JumpGateCache jumpGateCache,
+    JumpGateSnapshot jumpGates,
     ConstructionSnapshot constructionSnapshot,
   ) {
-    // JumpGateCache caches responses from the server.  We may not yet have
+    // JumpGateSnapshot caches responses from the server.  We may not yet have
     // cached both sides of a jump gate, so this fills in the gaps.
-    for (final record in jumpGateCache.values) {
-      final from = record.waypointSymbol;
-      if (!canJumpFrom(jumpGateCache, constructionSnapshot, from)) {
+    for (final jumpGate in jumpGates.values) {
+      final from = jumpGate.waypointSymbol;
+      if (!canJumpFrom(jumpGates, constructionSnapshot, from)) {
         continue;
       }
       final fromSystem = from.system;
-      for (final to in record.connections) {
+      for (final to in jumpGate.connections) {
         if (!canJumpTo(constructionSnapshot, to)) {
           continue;
         }
@@ -197,7 +197,7 @@ class SystemConnectivity {
 
   /// Creates a new SystemConnectivity from the systemsCache.
   factory SystemConnectivity.fromJumpGates(
-    JumpGateCache jumpGates,
+    JumpGateSnapshot jumpGates,
     ConstructionSnapshot constructionSnapshot,
   ) {
     final connections =
@@ -213,7 +213,7 @@ class SystemConnectivity {
 
   /// Updates the SystemConnectivity from the given caches.
   void updateFromJumpGates(
-    JumpGateCache jumpGates,
+    JumpGateSnapshot jumpGates,
     ConstructionSnapshot constructionSnapshot,
   ) {
     _connections = _Connections.fromSnapshots(jumpGates, constructionSnapshot);

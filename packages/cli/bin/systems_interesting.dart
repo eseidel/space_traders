@@ -20,9 +20,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final systemsCache = SystemsCache.load(fs)!;
   final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final jumpGateCache = JumpGateCache.load(fs);
+  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+      SystemConnectivity.fromJumpGates(jumpGateSnapshot, constructionSnapshot);
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final reachableSystems =
       systemConnectivity.systemsReachableFrom(hqSystemSymbol).toSet();
@@ -41,7 +41,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
   logger.info('of ${interestingSystemSymbols.length} interesting systems.');
 
-  final reachableJumpGates = jumpGateCache.values.where(
+  final reachableJumpGates = jumpGateSnapshot.values.where(
     (record) => reachableSystems.contains(record.waypointSymbol.system),
   );
   // These are not necessarily reachable (the jump gate on either side might

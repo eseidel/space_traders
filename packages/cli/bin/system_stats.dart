@@ -8,10 +8,11 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   logger.info('Starting from $startSystemSymbol, known reachable:');
   final systemsCache = SystemsCache.load(fs)!;
-  final jumpGateCache = JumpGateCache.load(fs);
+  // Can't use loadSystemConnectivity because need jumpGateSnapshot later.
+  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+      SystemConnectivity.fromJumpGates(jumpGateSnapshot, constructionSnapshot);
 
   final reachableSystems =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
@@ -92,7 +93,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   // How many are cached?
   var cachedJumpGates = 0;
-  for (final record in jumpGateCache.values) {
+  for (final record in jumpGateSnapshot.values) {
     // We could sort first by system to save ourselves some lookups.
     final systemSymbol = record.waypointSymbol.system;
     if (reachableSystems.contains(systemSymbol)) {

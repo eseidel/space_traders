@@ -8,10 +8,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final startSystemSymbol =
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 
-  final jumpGateCache = JumpGateCache.load(fs);
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateCache, constructionSnapshot);
+  final systemConnectivity = await loadSystemConnectivity(db);
   final systemsCache = SystemsCache.load(fs)!;
   final chartingSnapshot = await ChartingSnapshot.load(db);
 
