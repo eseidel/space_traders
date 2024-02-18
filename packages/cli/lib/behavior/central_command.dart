@@ -266,7 +266,7 @@ class CentralCommand {
   /// Procurement contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
-    ContractCache contractCache,
+    ContractSnapshot contractCache,
   ) {
     return sellOppsForContracts(
       agentCache,
@@ -297,7 +297,7 @@ class CentralCommand {
   /// Find next deal for the given [ship], considering all deals in progress.
   CostedDeal? findNextDealAndLog(
     AgentCache agentCache,
-    ContractCache contractCache,
+    ContractSnapshot contractCache,
     MarketPrices marketPrices,
     SystemsCache systemsCache,
     SystemConnectivity systemConnectivity,
@@ -788,7 +788,7 @@ int _minimumFloatRequired(Contract contract) {
 /// Procurement contracts converted to sell opps.
 Iterable<SellOpp> sellOppsForContracts(
   AgentCache agentCache,
-  ContractCache contractCache, {
+  ContractSnapshot contractCache, {
   required int Function(Contract, TradeSymbol) remainingUnitsNeededForContract,
 }) sync* {
   for (final contract in affordableContracts(agentCache, contractCache)) {
@@ -815,7 +815,7 @@ Iterable<SellOpp> sellOppsForContracts(
 /// complete.
 Iterable<Contract> affordableContracts(
   AgentCache agentCache,
-  ContractCache contractsCache,
+  ContractSnapshot contractsCache,
 ) {
   // We should only use the contract trader when we have enough credits to
   // complete the entire contract.  Otherwise we're just sinking credits into a

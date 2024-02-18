@@ -2,16 +2,12 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockContract extends Mock implements Contract {}
-
 class _MockContractTerms extends Mock implements ContractTerms {}
 
 void main() {
   test('Contract types', () {
-    final contract = _MockContract();
-    when(() => contract.id).thenReturn('id');
     final contractTerms = _MockContractTerms();
-    when(() => contract.terms).thenReturn(contractTerms);
+    final contract = Contract.test(id: 'id', terms: contractTerms);
     when(() => contractTerms.payment)
         .thenReturn(ContractPayment(onAccepted: 10, onFulfilled: 20));
 

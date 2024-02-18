@@ -57,7 +57,10 @@ Stream<Contract> allMyContracts(Api api) {
   return fetchAllPages(api, (api, page) async {
     final response =
         await api.contracts.getContracts(page: page, limit: pageLimit);
-    return (response!.data, response.meta);
+    final now = DateTime.timestamp();
+    final contracts =
+        response!.data.map((c) => Contract.fromOpenApi(c, now)).toList();
+    return (contracts, response.meta);
   });
 }
 

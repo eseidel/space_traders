@@ -16,9 +16,7 @@ class _MockApi extends Mock implements Api {}
 
 class _MockBehaviorCache extends Mock implements BehaviorCache {}
 
-class _MockContract extends Mock implements Contract {}
-
-class _MockContractCache extends Mock implements ContractCache {}
+class _MockContractCache extends Mock implements ContractSnapshot {}
 
 class _MockContractTerms extends Mock implements ContractTerms {}
 
@@ -147,7 +145,6 @@ void main() {
     final ship = _MockShip();
     // TODO(eseidel): Contracts are disabled under 100000 credits.
     final agent = Agent.test(credits: 100000);
-    final fs = MemoryFileSystem.test();
     final db = _MockDatabase();
     final agentCache = AgentCache(agent, db);
     when(() => ship.symbol).thenReturn('S');
@@ -171,8 +168,10 @@ void main() {
           ),
         ],
       ),
-      expiration: hourFromNow,
       deadlineToAccept: hourFromNow,
+      accepted: false,
+      fulfilled: false,
+      timestamp: now,
     );
     final contract2 = Contract(
       id: '2',
@@ -190,11 +189,13 @@ void main() {
           ),
         ],
       ),
-      expiration: hourFromNow,
       deadlineToAccept: hourFromNow,
+      accepted: false,
+      fulfilled: false,
+      timestamp: now,
     );
     final contracts = [contract1, contract2];
-    final contractCache = ContractCache(contracts, fs: fs);
+    final contractCache = ContractSnapshot(contracts);
     final active = contractCache.activeContracts;
     expect(active.length, 2);
     final affordable = affordableContracts(agentCache, contractCache).toList();
@@ -220,10 +221,8 @@ void main() {
     ]);
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
-    final contract = _MockContract();
     final contractTerms = _MockContractTerms();
-    when(() => contract.terms).thenReturn(contractTerms);
-    when(() => contract.id).thenReturn('C');
+    final contract = Contract.test(id: 'C', terms: contractTerms);
     final good = ContractDeliverGood(
       tradeSymbol: tradeSymbol.value,
       destinationSymbol: 'W',
@@ -578,6 +577,7 @@ void main() {
   });
 
   test('sellOppsForContracts', () {
+    final now = DateTime(2021);
     final contractCache = _MockContractCache();
     final contract = Contract(
       id: '2',
@@ -595,8 +595,10 @@ void main() {
           ),
         ],
       ),
-      expiration: DateTime(2021),
       deadlineToAccept: DateTime(2021),
+      accepted: false,
+      fulfilled: false,
+      timestamp: now,
     );
     when(() => contractCache.activeContracts).thenReturn([contract]);
 

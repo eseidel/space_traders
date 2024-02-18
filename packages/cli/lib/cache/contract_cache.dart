@@ -1,67 +1,29 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/cache/response_cache.dart';
+import 'package:cli/compare.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
-import 'package:file/file.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-/// In-memory cache of contacts.
-class ContractCache extends ResponseListCache<Contract> {
+/// Snapshot of contracts in the database.
+class ContractSnapshot {
   /// Creates a new contract cache.
-  ContractCache(
-    super.contracts, {
-    required super.fs,
-    super.checkEvery = 100,
-    super.path = defaultPath,
-  }) : super(refreshEntries: (Api api) => allMyContracts(api).toList());
+  ContractSnapshot(this.contracts);
 
   /// Load the ContractCache from the file system.
-  static ContractCache? load(FileSystem fs, {String path = defaultPath}) {
-    final contracts = JsonListStore.loadRecords<Contract>(
-      fs,
-      path,
-      (j) => Contract.fromJson(j)!,
-    );
-    if (contracts != null) {
-      return ContractCache(contracts, fs: fs, path: path);
-    }
-    return null;
+  static Future<ContractSnapshot> load(Database db) async {
+    final contracts = await db.allContracts();
+    return ContractSnapshot(contracts.toList());
   }
-
-  /// Creates a new ContractCache from the Api or FileSystem if provided.
-  static Future<ContractCache> loadOrFetch(
-    Api api, {
-    required FileSystem fs,
-    String path = defaultPath,
-    bool forceRefresh = false,
-  }) async {
-    if (!forceRefresh) {
-      final cached = load(fs, path: path);
-      if (cached != null) {
-        return cached;
-      }
-    }
-    final contracts = await allMyContracts(api).toList();
-    return ContractCache(contracts, fs: fs, path: path);
-  }
-
-  /// The default path to the contracts cache.
-  static const String defaultPath = 'data/contracts.json';
 
   /// Contracts in the cache.
-  List<Contract> get contracts => records;
+  final List<Contract> contracts;
 
-  /// Updates a single contract in the cache.
-  void updateContract(Contract contract) {
-    final index = contracts.indexWhere((c) => c.id == contract.id);
-    if (index == -1) {
-      contracts.add(contract);
-    } else {
-      contracts[index] = contract;
-    }
-    save();
-  }
+  /// Number of requests between checks to ensure ships are up to date.
+  final int requestsBetweenChecks = 100;
+
+  int _requestsSinceLastCheck = 0;
 
   /// Returns a list of all completed contracts.
   List<Contract> get completedContracts =>
@@ -82,4 +44,36 @@ class ContractCache extends ResponseListCache<Contract> {
   /// Looks up the contract by id.
   Contract? contract(String id) =>
       contracts.firstWhereOrNull((c) => c.id == id);
+
+  /// Fetches a new snapshot and logs if different from this one.
+  // TODO(eseidel): This does not belong in this class.
+  Future<ContractSnapshot> ensureUpToDate(Database db, Api api) async {
+    _requestsSinceLastCheck++;
+    if (_requestsSinceLastCheck < requestsBetweenChecks) {
+      return this;
+    }
+    _requestsSinceLastCheck = 0;
+
+    final newContracts = await fetchContracts(db, api);
+    final newContractsJson =
+        newContracts.contracts.map((c) => c.toOpenApi().toJson()).toList();
+    final oldContractsJson =
+        contracts.map((c) => c.toOpenApi().toJson()).toList();
+    // Our contracts class has a timestamp which we don't want to compare, so
+    // compare the OpenAPI JSON instead.
+    if (jsonMatches(newContractsJson, oldContractsJson)) {
+      logger.warn('Contracts changed, updating cache.');
+      return newContracts;
+    }
+    return this;
+  }
+}
+
+/// Fetches all of the user's contracts.
+Future<ContractSnapshot> fetchContracts(Database db, Api api) async {
+  final contracts = await allMyContracts(api).toList();
+  for (final contract in contracts) {
+    await db.upsertContract(contract);
+  }
+  return ContractSnapshot(contracts);
 }

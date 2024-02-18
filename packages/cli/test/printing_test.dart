@@ -48,8 +48,10 @@ void main() {
           ),
         ],
       ),
-      expiration: deadline,
       deadlineToAccept: deadline,
+      accepted: false,
+      fulfilled: false,
+      timestamp: now,
     );
     expect(
       contractDescription(

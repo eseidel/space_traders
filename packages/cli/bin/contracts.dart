@@ -28,7 +28,7 @@ void printContracts(
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final printAll = argResults['all'] as bool;
-  final contractCache = ContractCache.load(fs)!;
+  final contractCache = await ContractSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
   printContracts(
     'completed',

@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
+import 'package:types/src/symbol.dart';
 
 /// A class to hold transaction data from construction delivery.
 @immutable

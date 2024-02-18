@@ -2,7 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/api.dart';
 import 'package:types/src/construction.dart';
-import 'package:types/src/contract.dart';
+import 'package:types/src/contract_transaction.dart';
+import 'package:types/src/symbol.dart';
 
 /// The accounting type of a transaction.
 enum AccountingType {

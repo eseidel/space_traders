@@ -78,7 +78,7 @@ class Caches {
   final ShipCache ships;
 
   /// The contract cache.
-  final ContractCache contracts;
+  ContractSnapshot contracts;
 
   /// Known shipyard listings.
   final ShipyardListingCache shipyardListings;
@@ -151,8 +151,7 @@ class Caches {
     );
     final markets = MarketCache(db, api, static.tradeGoods);
     // Intentionally force refresh contracts in case we've been offline.
-    final contracts =
-        await ContractCache.loadOrFetch(api, fs: fs, forceRefresh: true);
+    final contracts = await fetchContracts(db, api);
     final behaviors = BehaviorCache.load(fs);
 
     final jumpGates = await JumpGateSnapshot.load(db);
@@ -167,9 +166,6 @@ class Caches {
 
     // Make sure factions are loaded.
     final factions = await loadFactions(db, api.factions);
-
-    // We rarely modify contracts, so save them out here too.
-    contracts.save();
 
     return Caches(
       agent: agent,
@@ -215,8 +211,8 @@ class Caches {
     // and might notice that a ship has arrived before the ship logic gets
     // to run and update the status.
     await ships.ensureUpToDate(api);
-    await contracts.ensureUpToDate(api);
     await agent.ensureAgentUpToDate(api);
+    contracts = await contracts.ensureUpToDate(db, api);
 
     marketListings = await MarketListingSnapshot.load(db);
   }

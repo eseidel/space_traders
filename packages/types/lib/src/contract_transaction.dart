@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
-import 'package:types/api.dart';
+import 'package:types/src/contract.dart';
+import 'package:types/src/symbol.dart';
 
 /// The type of contract action.
 enum ContractAction {

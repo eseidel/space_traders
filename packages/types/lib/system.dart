@@ -1,6 +1,8 @@
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart' as openapi;
 import 'package:types/api.dart';
+import 'package:types/src/position.dart';
+import 'package:types/src/symbol.dart';
 
 /// A type representing the unchanging values of a waypoint.
 @immutable

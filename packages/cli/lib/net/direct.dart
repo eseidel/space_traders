@@ -3,6 +3,7 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 // This is for direct non-logging actions
@@ -113,10 +114,11 @@ Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
 
 /// Deliver [units] of [tradeSymbol] to [contract]
 Future<DeliverContract200ResponseData> deliverContract(
+  Database db,
   Api api,
   Ship ship,
   ShipCache shipCache,
-  ContractCache contractCache,
+  ContractSnapshot contractCache,
   Contract contract, {
   required TradeSymbol tradeSymbol,
   required int units,
@@ -129,7 +131,9 @@ Future<DeliverContract200ResponseData> deliverContract(
   final response = await api.contracts
       .deliverContract(contract.id, deliverContractRequest: request);
   final data = response!.data;
-  contractCache.updateContract(data.contract);
+  await db.upsertContract(
+    Contract.fromOpenApi(data.contract, DateTime.timestamp()),
+  );
   ship.cargo = data.cargo;
   shipCache.updateShip(ship);
   return data;

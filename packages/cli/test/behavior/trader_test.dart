@@ -511,6 +511,7 @@ void main() {
   test('trade contracts smoke test', () async {
     registerFallbackValue(Duration.zero);
     const shipSymbol = ShipSymbol('S', 1);
+    final now = DateTime(2021);
 
     final api = _MockApi();
     final db = _MockDatabase();
@@ -525,11 +526,14 @@ void main() {
       id: 'id',
       factionSymbol: 'factionSymbol',
       type: ContractTypeEnum.PROCUREMENT,
-      expiration: DateTime(2021),
+      deadlineToAccept: DateTime(2021),
       terms: ContractTerms(
         deadline: DateTime(2021),
         payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
       ),
+      accepted: false,
+      fulfilled: false,
+      timestamp: now,
     );
 
     final agent = Agent.test();
@@ -553,7 +557,7 @@ void main() {
       (_) => Future.value(
         NegotiateContract200Response(
           data: NegotiateContract200ResponseData(
-            contract: contract,
+            contract: contract.toOpenApi(),
           ),
         ),
       ),
@@ -655,7 +659,6 @@ void main() {
       (_) async =>
           OrbitShip200Response(data: OrbitShip200ResponseData(nav: shipNav)),
     );
-    final now = DateTime(2021);
     when(
       () => fleetApi.navigateShip(
         shipSymbol.symbol,
@@ -696,6 +699,9 @@ void main() {
         y: 0,
       ),
     );
+
+    registerFallbackValue(Contract.fallbackValue());
+    when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -1027,6 +1033,7 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
 
+    final now = DateTime(2021);
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
 
@@ -1074,7 +1081,7 @@ void main() {
       id: 'contract_id',
       factionSymbol: 'factionSymbol',
       type: ContractTypeEnum.PROCUREMENT,
-      expiration: DateTime(2021),
+      deadlineToAccept: DateTime(2021),
       terms: ContractTerms(
         deadline: DateTime(2021),
         payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
@@ -1087,6 +1094,9 @@ void main() {
           ),
         ],
       ),
+      accepted: false,
+      fulfilled: false,
+      timestamp: now,
     );
     when(() => caches.contracts.contract(contract.id)).thenReturn(contract);
     final deal = Deal(
@@ -1170,7 +1180,7 @@ void main() {
       (_) => Future.value(
         DeliverContract200Response(
           data: DeliverContract200ResponseData(
-            contract: contract,
+            contract: contract.toOpenApi(),
             cargo: shipCargo,
           ),
         ),
@@ -1183,7 +1193,7 @@ void main() {
       (invocation) => Future.value(
         AcceptContract200Response(
           data: AcceptContract200ResponseData(
-            contract: contract,
+            contract: contract.toOpenApi(),
             agent: agent.toOpenApi(),
           ),
         ),
@@ -1196,6 +1206,8 @@ void main() {
         .thenAnswer((_) => Future.value());
 
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    registerFallbackValue(Contract.fallbackValue());
+    when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;

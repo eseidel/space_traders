@@ -250,7 +250,7 @@ Future<JobResult> _handleContractDealAtDestination(
     const Duration(minutes: 10),
   );
   final neededGood = contract.goodNeeded(costedDeal.tradeSymbol);
-  final maybeResponse = await _deliverContractGoodsIfPossible(
+  final maybeContract = await _deliverContractGoodsIfPossible(
     api,
     db,
     caches.agent,
@@ -262,14 +262,14 @@ Future<JobResult> _handleContractDealAtDestination(
   );
 
   // If we've delivered enough, complete the contract.
-  if (maybeResponse != null &&
-      maybeResponse.contract.goodNeeded(contractGood)!.amountNeeded <= 0) {
+  if (maybeContract != null &&
+      maybeContract.goodNeeded(contractGood)!.amountNeeded <= 0) {
     await _completeContract(
       api,
       db,
       caches,
       ship,
-      maybeResponse.contract,
+      maybeContract,
     );
   }
   return JobResult.complete();
@@ -285,7 +285,9 @@ Future<void> _completeContract(
   final response = await api.contracts.fulfillContract(contract.id);
   final data = response!.data;
   await caches.agent.updateAgent(Agent.fromOpenApi(data.agent));
-  caches.contracts.updateContract(data.contract);
+  await db.upsertContract(
+    Contract.fromOpenApi(data.contract, DateTime.timestamp()),
+  );
 
   final contactTransaction = ContractTransaction.fulfillment(
     contract: contract,
@@ -301,14 +303,14 @@ Future<void> _completeContract(
   shipInfo(ship, 'Contract complete!');
 }
 
-Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
+Future<Contract?> _deliverContractGoodsIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
-  ContractCache contractCache,
+  ContractSnapshot contractCache,
   ShipCache shipCache,
   Ship ship,
-  Contract contract,
+  Contract beforeDelivery,
   ContractDeliverGood goods,
 ) async {
   final tradeSymbol = goods.tradeSymbolObject;
@@ -323,15 +325,15 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
   // Contract has already been fulfilled.","code":4504,"data":
   // {"contractId":"cljysnr2wt47as60cvz377bhh"}}}
   jobAssert(
-    !contract.fulfilled,
-    'Contract ${contract.id} already fulfilled.',
+    !beforeDelivery.fulfilled,
+    'Contract ${beforeDelivery.id} already fulfilled.',
     const Duration(minutes: 10),
   );
 
-  if (!contract.accepted) {
+  if (!beforeDelivery.accepted) {
     shipErr(
       ship,
-      'Contract ${contract.id} not accepted? Accepting before delivering.',
+      'Contract ${beforeDelivery.id} not accepted? Accepting before delivery.',
     );
     await acceptContractAndLog(
       api,
@@ -339,22 +341,25 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
       contractCache,
       agentCache,
       ship,
-      contract,
+      beforeDelivery,
     );
   }
 
   // And we have the desired cargo.
   final response = await deliverContract(
+    db,
     api,
     ship,
     shipCache,
     contractCache,
-    contract,
+    beforeDelivery,
     tradeSymbol: tradeSymbol,
     units: unitsBefore,
   );
+  final afterDelivery =
+      Contract.fromOpenApi(response.contract, DateTime.timestamp());
   final deliver = assertNotNull(
-    response.contract.goodNeeded(tradeSymbol),
+    afterDelivery.goodNeeded(tradeSymbol),
     'No ContractDeliverGood for $tradeSymbol?',
     const Duration(minutes: 10),
   );
@@ -363,7 +368,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
     'Delivered $unitsBefore ${goods.tradeSymbol} '
     'to ${goods.destinationSymbol}; '
     '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
-    '${approximateDuration(contract.timeUntilDeadline)} to deadline',
+    '${approximateDuration(afterDelivery.timeUntilDeadline)} to deadline',
   );
 
   // Update our cargo counts after delivering the contract goods.
@@ -372,7 +377,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
 
   // Record the delivery transaction.
   final contactTransaction = ContractTransaction.delivery(
-    contract: contract,
+    contract: afterDelivery,
     shipSymbol: ship.shipSymbol,
     waypointSymbol: ship.waypointSymbol,
     unitsDelivered: unitsDelivered,
@@ -383,7 +388,7 @@ Future<DeliverContract200ResponseData?> _deliverContractGoodsIfPossible(
     agentCache.agent.credits,
   );
   await db.insertTransaction(transaction);
-  return response;
+  return afterDelivery;
 }
 
 /// Handle construction deal at destination.
@@ -547,7 +552,7 @@ String describeExpectedContractProfit(
 Future<DateTime?> acceptContractsIfNeeded(
   Api api,
   Database db,
-  ContractCache contractCache,
+  ContractSnapshot contractCache,
   MarketPrices marketPrices,
   AgentCache agentCache,
   ShipCache shipCache,
@@ -557,7 +562,7 @@ Future<DateTime?> acceptContractsIfNeeded(
   final contracts = contractCache.activeContracts;
   if (contracts.isEmpty) {
     final contract =
-        await negotiateContractAndLog(api, ship, shipCache, contractCache);
+        await negotiateContractAndLog(db, api, ship, shipCache, contractCache);
     shipInfo(ship, describeExpectedContractProfit(marketPrices, contract));
     return null;
   }

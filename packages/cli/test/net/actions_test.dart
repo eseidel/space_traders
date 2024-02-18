@@ -14,9 +14,7 @@ class _MockDatabase extends Mock implements Database {}
 
 class _MockChartingCache extends Mock implements ChartingCache {}
 
-class _MockContract extends Mock implements Contract {}
-
-class _MockContractCache extends Mock implements ContractCache {}
+class _MockContractCache extends Mock implements ContractSnapshot {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
@@ -781,10 +779,9 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     final contractCache = _MockContractCache();
-    final contract = _MockContract();
-    when(() => contract.id).thenReturn('C-1');
-    when(() => contract.terms).thenReturn(
-      ContractTerms(
+    final contract = Contract.test(
+      id: 'C-1',
+      terms: ContractTerms(
         deadline: DateTime(2021),
         payment: ContractPayment(onAccepted: 100, onFulfilled: 1000),
       ),
@@ -802,7 +799,7 @@ void main() {
       (invocation) => Future.value(
         AcceptContract200Response(
           data: AcceptContract200ResponseData(
-            contract: contract,
+            contract: contract.toOpenApi(),
             agent: agent.toOpenApi(),
           ),
         ),
@@ -810,6 +807,8 @@ void main() {
     );
 
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    registerFallbackValue(Contract.fallbackValue());
+    when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
       await acceptContractAndLog(

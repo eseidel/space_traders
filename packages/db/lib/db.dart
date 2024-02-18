@@ -2,6 +2,7 @@ import 'package:db/config.dart';
 import 'package:db/src/agent.dart';
 import 'package:db/src/chart.dart';
 import 'package:db/src/construction.dart';
+import 'package:db/src/contract.dart';
 import 'package:db/src/extraction.dart';
 import 'package:db/src/faction.dart';
 import 'package:db/src/jump_gate.dart';
@@ -381,5 +382,15 @@ class Database {
   Future<JumpGate?> getJumpGate(WaypointSymbol waypointSymbol) async {
     final query = getJumpGateQuery(waypointSymbol);
     return queryOne(query, jumpGateFromColumnMap);
+  }
+
+  /// Get all contracts from the database.
+  Future<Iterable<Contract>> allContracts() async {
+    return queryMany(allContractsQuery(), contractFromColumnMap);
+  }
+
+  /// Upsert a contract into the database.
+  Future<void> upsertContract(Contract contract) async {
+    await insertOne(upsertContractQuery(contract));
   }
 }

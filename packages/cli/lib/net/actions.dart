@@ -535,16 +535,18 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
 
 /// Negotiate a contract for [ship] and log.
 Future<Contract> negotiateContractAndLog(
+  Database db,
   Api api,
   Ship ship,
   ShipCache shipCache,
-  ContractCache contractCache,
+  ContractSnapshot contractCache,
 ) async {
   await dockIfNeeded(api, shipCache, ship);
   final response = await api.fleet.negotiateContract(ship.symbol);
   final contractData = response!.data;
-  final contract = contractData.contract;
-  contractCache.updateContract(contract);
+  final contract =
+      Contract.fromOpenApi(contractData.contract, DateTime.timestamp());
+  await db.upsertContract(contract);
   shipInfo(ship, 'Negotiated contract: ${contractDescription(contract)}');
   return contract;
 }
@@ -553,7 +555,7 @@ Future<Contract> negotiateContractAndLog(
 Future<AcceptContract200ResponseData> acceptContractAndLog(
   Api api,
   Database db,
-  ContractCache contractCache,
+  ContractSnapshot contractCache,
   AgentCache agentCache,
   Ship ship,
   Contract contract,
@@ -561,7 +563,9 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   final response = await api.contracts.acceptContract(contract.id);
   final data = response!.data;
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
-  contractCache.updateContract(data.contract);
+  await db.upsertContract(
+    Contract.fromOpenApi(data.contract, DateTime.timestamp()),
+  );
   shipInfo(ship, 'Accepted: ${contractDescription(contract)}.');
   shipInfo(
     ship,

@@ -9,7 +9,7 @@ class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockConstructionCache extends Mock implements ConstructionCache {}
 
-class _MockContractCache extends Mock implements ContractCache {}
+class _MockContractCache extends Mock implements ContractSnapshot {}
 
 class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
 
