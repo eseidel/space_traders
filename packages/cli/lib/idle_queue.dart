@@ -142,7 +142,7 @@ class IdleQueue {
         if (listing == null) {
           logger.info(' Shipyard: $waypointSymbol');
           final shipyard = await getShipyard(api, waypointSymbol);
-          caches.shipyardListings.addShipyard(shipyard);
+          recordShipyardListing(db, shipyard);
         }
       }
 

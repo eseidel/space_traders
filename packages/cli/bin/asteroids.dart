@@ -5,7 +5,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   // List all known asteroids that have a market or shipyard.
   final marketListings = await MarketListingSnapshot.load(db);
-  final shipyardListingCache = ShipyardListingCache.load(fs);
+  final shipyardListings = await ShipyardListingSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
 
   for (final marketListing in marketListings.listings) {
@@ -14,7 +14,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     if (!waypoint.isAsteroid) {
       continue;
     }
-    final shipyardListing = shipyardListingCache[waypointSymbol];
+    final shipyardListing = shipyardListings[waypointSymbol];
     if (shipyardListing != null) {
       logger.info('Asteroid $waypointSymbol has a market and shipyard.');
     } else {

@@ -1,5 +1,5 @@
 import 'package:cli/behavior/trader.dart';
-import 'package:cli/cache/contract_cache.dart';
+import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';

@@ -78,9 +78,9 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   logger.info('$markets markets');
 
   // How many shipyards?
-  final shipyardListingCache = ShipyardListingCache.load(fs);
+  final shipyardListings = await ShipyardListingSnapshot.load(db);
   var shipyards = 0;
-  for (final listing in shipyardListingCache.listings) {
+  for (final listing in shipyardListings.listings) {
     // We could sort first by system to save ourselves some lookups.
     final systemSymbol = listing.waypointSymbol.system;
     if (reachableSystems.contains(systemSymbol)) {

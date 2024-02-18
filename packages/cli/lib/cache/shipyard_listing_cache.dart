@@ -1,53 +1,21 @@
-import 'package:cli/cache/caches.dart';
-import 'package:cli/cache/json_store.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-typedef _Record = Map<WaypointSymbol, ShipyardListing>;
-
 /// A cached of charted values from Waypoints.
-class ShipyardListingCache extends JsonStore<_Record> {
+class ShipyardListingSnapshot {
   /// Creates a new charting cache.
-  ShipyardListingCache(
-    super.entries, {
-    required super.fs,
-    super.path = defaultPath,
-  }) : super(
-          recordToJson: (_Record r) => r.map(
-            (key, value) => MapEntry(
-              key.toJson(),
-              value.toJson(),
-            ),
-          ),
-        );
+  ShipyardListingSnapshot(Iterable<ShipyardListing> listings)
+      : _listingBySymbol =
+            Map.fromEntries(listings.map((l) => MapEntry(l.waypointSymbol, l)));
 
   /// Load the charted values from the cache.
-  factory ShipyardListingCache.load(
-    FileSystem fs, {
-    String path = defaultPath,
-  }) {
-    final valuesBySymbol = JsonStore.loadRecord<_Record>(
-          fs,
-          path,
-          (Map<String, dynamic> j) => j.map(
-            (key, value) => MapEntry(
-              WaypointSymbol.fromJson(key),
-              ShipyardListing.fromJson(value as Map<String, dynamic>),
-            ),
-          ),
-        ) ??
-        {};
-    return ShipyardListingCache(
-      valuesBySymbol,
-      fs: fs,
-      path: path,
-    );
+  static Future<ShipyardListingSnapshot> load(Database db) async {
+    final values = await db.allShipyardListings();
+    return ShipyardListingSnapshot(values);
   }
 
-  /// The default path to the cache file.
-  static const defaultPath = 'data/shipyard_listings.json';
-
   /// The ShipyardListings by WaypointSymbol.
-  Map<WaypointSymbol, ShipyardListing> get _listingBySymbol => record;
+  final Map<WaypointSymbol, ShipyardListing> _listingBySymbol;
 
   /// The ShipyardListings.
   Iterable<ShipyardListing> get listings => _listingBySymbol.values;
@@ -75,15 +43,14 @@ class ShipyardListingCache extends JsonStore<_Record> {
   /// Fetch the ShipyardListing for the given WaypointSymbol.
   ShipyardListing? operator [](WaypointSymbol waypointSymbol) =>
       listingForSymbol(waypointSymbol);
+}
 
-  /// Add ShipyardListing for the given Shipyard to the cache.
-  void addShipyard(Shipyard shipyard) {
-    final symbol = shipyard.waypointSymbol;
-    final listing = ShipyardListing(
-      waypointSymbol: symbol,
-      shipTypes: shipyard.shipTypes.map((inner) => inner.type).toSet(),
-    );
-    _listingBySymbol[symbol] = listing;
-    save();
-  }
+/// Add ShipyardListing for the given Shipyard to the cache.
+void recordShipyardListing(Database db, Shipyard shipyard) {
+  final symbol = shipyard.waypointSymbol;
+  final listing = ShipyardListing(
+    waypointSymbol: symbol,
+    shipTypes: shipyard.shipTypes.map((inner) => inner.type).toSet(),
+  );
+  db.upsertShipyardListing(listing);
 }

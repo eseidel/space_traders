@@ -3,7 +3,7 @@ import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/cache/contract_cache.dart';
+import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/jump_gate_cache.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_prices.dart';
@@ -28,7 +28,7 @@ export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_cache.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/construction_cache.dart';
-export 'package:cli/cache/contract_cache.dart';
+export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/jump_gate_cache.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/market_prices.dart';
@@ -81,7 +81,7 @@ class Caches {
   ContractSnapshot contracts;
 
   /// Known shipyard listings.
-  final ShipyardListingCache shipyardListings;
+  final ShipyardListingSnapshot shipyardListings;
 
   /// The historical shipyard prices.
   final ShipyardPrices shipyardPrices;
@@ -136,7 +136,7 @@ class Caches {
     final ships = await ShipCache.loadOrFetch(api, fs: fs, forceRefresh: true);
     final marketPrices = await MarketPrices.load(db);
     final shipyardPrices = await ShipyardPrices.load(db);
-    final shipyardListings = ShipyardListingCache.load(fs);
+    final shipyardListings = await ShipyardListingSnapshot.load(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
     final charting = ChartingCache(db);

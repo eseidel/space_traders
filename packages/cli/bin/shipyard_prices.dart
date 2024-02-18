@@ -14,7 +14,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     'Loaded ${shipyardPrices.count} prices from '
     '${shipyardPrices.waypointCount} waypoints.',
   );
-  final shipyardListings = ShipyardListingCache.load(fs);
+  final shipyardListings = await ShipyardListingSnapshot.load(db);
   logger.info(
     'Loaded ${shipyardListings.count} listings from '
     '${shipyardListings.waypointCount} waypoints.',

@@ -32,7 +32,8 @@ class _MockShipMountCache extends Mock implements ShipMountCache {}
 
 class _MockShipReactorCache extends Mock implements ShipReactorCache {}
 
-class _MockShipyardListingCache extends Mock implements ShipyardListingCache {}
+class _MockShipyardListingCache extends Mock
+    implements ShipyardListingSnapshot {}
 
 class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 

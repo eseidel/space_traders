@@ -14,7 +14,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systems = SystemsCache.load(fs)!;
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final shipyardListings = ShipyardListingCache.load(fs);
+  final shipyardListings = await ShipyardListingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsCache(
     systems,

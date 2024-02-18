@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/cache/prices_cache.dart';
+import 'package:cli/cache/shipyard_listing_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
@@ -99,14 +100,15 @@ void recordShipyardDataAndLog(
   Shipyard shipyard,
   Ship ship,
 ) {
-  recordShipyardData(db, shipyard);
+  recordShipyardPrices(db, shipyard);
   recordShipyardShips(staticCaches, shipyard.ships);
+  recordShipyardListing(db, shipyard);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  shipyard data @ ${shipyard.symbol}');
 }
 
-/// Record shipyard data.
-void recordShipyardData(
+/// Record shipyard prices.
+void recordShipyardPrices(
   Database db,
   Shipyard shipyard, {
   DateTime Function() getNow = defaultGetNow,
