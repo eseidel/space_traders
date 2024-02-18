@@ -7,6 +7,7 @@ import 'package:db/faction.dart';
 import 'package:db/market_listing.dart';
 import 'package:db/query.dart';
 import 'package:db/queue.dart';
+import 'package:db/shipyard_listing.dart';
 import 'package:db/survey.dart';
 import 'package:db/transaction.dart';
 import 'package:meta/meta.dart';
@@ -282,6 +283,27 @@ class Database {
   /// Update the given market listing in the database.
   Future<void> upsertMarketListing(MarketListing listing) async {
     final query = upsertMarketListingQuery(listing);
+    await insertOne(query);
+  }
+
+  /// Get the shipyard listing for the given symbol.
+  Future<ShipyardListing?> shipyardListingForSymbol(
+    WaypointSymbol waypointSymbol,
+  ) async {
+    final query = shipyardListingByWaypointSymbolQuery(waypointSymbol);
+    return queryOne(query, shipyardListingFromColumnMap);
+  }
+
+  /// Get all shipyard listings.
+  Future<List<ShipyardListing>> allShipyardListings() async {
+    final query = allShipyardListingsQuery();
+    return queryMany(query, shipyardListingFromColumnMap)
+        .then((list) => list.toList());
+  }
+
+  /// Update the given shipyard listing in the database.
+  Future<void> upsertShipyardListing(ShipyardListing listing) async {
+    final query = upsertShipyardListingQuery(listing);
     await insertOne(query);
   }
 }
