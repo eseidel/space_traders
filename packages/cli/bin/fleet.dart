@@ -97,6 +97,7 @@ bool Function(Ship) filterFromArgs(List<String> args) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final filter = filterFromArgs(argResults.rest);
   final behaviorCache = BehaviorCache.load(fs);
   final shipCache = ShipCache.load(fs)!;
@@ -113,7 +114,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   final systemsCache = SystemsCache.load(fs)!;
-  final marketPrices = MarketPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
   for (final ship in matchingShips) {
     logShip(
       systemsCache,
@@ -129,4 +130,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }
+
+  await db.close();
 }

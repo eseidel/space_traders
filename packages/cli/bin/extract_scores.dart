@@ -65,7 +65,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final charting = ChartingCache(db);
   final hqSystem = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final marketPrices = MarketPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
 
   final List<ExtractionScore> scores;
   if (isSiphon) {

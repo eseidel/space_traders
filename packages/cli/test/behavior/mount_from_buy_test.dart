@@ -108,7 +108,7 @@ void main() {
       sellPrice: 101,
     );
     when(() => caches.marketPrices.pricesFor(toMount)).thenReturn([
-      MarketPrice.fromMarketTradeGood(tradeGood, waypointSymbol),
+      MarketPrice.fromMarketTradeGood(tradeGood, waypointSymbol, now),
     ]);
     final market = Market(
       symbol: waypointSymbol.waypoint,

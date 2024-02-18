@@ -28,6 +28,7 @@ Future<Market?> visitLocalMarket(
   // recent market data.
   await dockIfNeeded(api, caches.ships, ship);
   final market = await recordMarketDataIfNeededAndLog(
+    db,
     caches.marketPrices,
     caches.markets,
     ship,
@@ -71,6 +72,7 @@ Future<void> visitLocalShipyard(
   }
 
   await recordShipyardDataIfNeededAndLog(
+    db,
     api,
     staticCaches,
     shipyardPrices,
@@ -82,6 +84,7 @@ Future<void> visitLocalShipyard(
 /// Record market data and log the result and returns the market.
 /// This is the preferred way to get the local Market.
 Future<Market> recordMarketDataIfNeededAndLog(
+  Database db,
   MarketPrices marketPrices,
   MarketCache marketCache,
   Ship ship,
@@ -110,7 +113,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
     return market;
   }
   final market = await marketCache.refreshMarket(marketSymbol);
-  await recordMarketData(marketPrices, market, getNow: getNow);
+  await recordMarketData(db, market, getNow: getNow);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  market data @ ${market.waypointSymbol.sectorLocalName}');
   return market;
@@ -118,6 +121,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
 
 /// Record shipyard data and log the result.
 Future<void> recordShipyardDataIfNeededAndLog(
+  Database db,
   Api api,
   StaticCaches staticCaches,
   ShipyardPrices shipyardPrices,
@@ -143,5 +147,5 @@ Future<void> recordShipyardDataIfNeededAndLog(
     return;
   }
   final shipyard = await getShipyard(api, shipyardSymbol);
-  recordShipyardDataAndLog(staticCaches, shipyardPrices, shipyard, ship);
+  recordShipyardDataAndLog(db, staticCaches, shipyard, ship);
 }

@@ -7,8 +7,9 @@ Future<void> main(List<String> args) async {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final shipCache = ShipCache.load(fs)!;
-  final marketPrices = MarketPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
   final countByTradeSymbol = <TradeSymbol, int>{};
   final ships = shipCache.ships;
   for (final ship in ships) {
@@ -38,4 +39,5 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     },
   );
   logger.info('Total value: ${creditsString(totalValue)}');
+  await db.close();
 }

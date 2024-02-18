@@ -1,35 +1,22 @@
 import 'dart:math';
 
-import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
-import 'package:file/file.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// A collection of price records.
 class ShipyardPrices extends PricesCache<ShipType, ShipyardPrice> {
   /// Create a new price data collection.
-  ShipyardPrices(
-    super.records, {
-    required super.fs,
-    super.path = defaultCacheFilePath,
-  });
+  ShipyardPrices(super.records);
 
-  /// Load the price data from the cache or from the url.
-  factory ShipyardPrices.load(
-    FileSystem fs, {
-    String path = defaultCacheFilePath,
-  }) {
-    final prices = JsonListStore.loadRecords<ShipyardPrice>(
-          fs,
-          path,
-          ShipyardPrice.fromJson,
-        ) ??
-        [];
-    return ShipyardPrices(prices, fs: fs);
+  /// Load the price data from the cache.
+  static Future<ShipyardPrices> load(Database db) async {
+    final prices = await db.allShipyardPrices();
+    return ShipyardPrices(prices.toList());
   }
 
   /// The default path to the cache file.
@@ -107,12 +94,12 @@ class ShipyardPrices extends PricesCache<ShipType, ShipyardPrice> {
 
 /// Record shipyard data and log the result.
 void recordShipyardDataAndLog(
+  Database db,
   StaticCaches staticCaches,
-  ShipyardPrices shipyardPrices,
   Shipyard shipyard,
   Ship ship,
 ) {
-  recordShipyardData(shipyardPrices, shipyard);
+  recordShipyardData(db, shipyard);
   recordShipyardShips(staticCaches, shipyard.ships);
   // Powershell needs an extra space after the emoji.
   shipInfo(ship, '✍️  shipyard data @ ${shipyard.symbol}');
@@ -120,7 +107,7 @@ void recordShipyardDataAndLog(
 
 /// Record shipyard data.
 void recordShipyardData(
-  ShipyardPrices shipyardPrices,
+  Database db,
   Shipyard shipyard, {
   DateTime Function() getNow = defaultGetNow,
 }) {
@@ -130,5 +117,7 @@ void recordShipyardData(
   if (prices.isEmpty) {
     logger.warn('No prices for ${shipyard.symbol}!');
   }
-  shipyardPrices.addPrices(prices, getNow: getNow);
+  for (final price in prices) {
+    db.upsertShipyardPrice(price);
+  }
 }

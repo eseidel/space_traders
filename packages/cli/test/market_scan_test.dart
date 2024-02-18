@@ -1,12 +1,11 @@
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/market_scan.dart';
-import 'package:file/memory.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
 void main() {
   test('MarketScane.fromMarketPrices', () async {
-    final fs = MemoryFileSystem.test();
+    final now = DateTime(2021);
     final marketPrices = MarketPrices(
       [
         MarketPrice.fromMarketTradeGood(
@@ -19,6 +18,7 @@ void main() {
             supply: SupplyLevel.ABUNDANT,
           ),
           WaypointSymbol.fromString('W-A-A'),
+          now,
         ),
         MarketPrice.fromMarketTradeGood(
           MarketTradeGood(
@@ -30,9 +30,9 @@ void main() {
             supply: SupplyLevel.ABUNDANT,
           ),
           WaypointSymbol.fromString('W-A-B'),
+          now,
         ),
       ],
-      fs: fs,
     );
     final marketScan =
         MarketScan.fromMarketPrices(marketPrices, description: 'test');

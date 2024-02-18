@@ -132,10 +132,10 @@ class Caches {
     Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
   }) async {
     final agent = await AgentCache.loadOrFetch(db, api);
-    final prices = MarketPrices.load(fs);
     // Intentionally do not load ships from disk (they change too often).
     final ships = await ShipCache.loadOrFetch(api, fs: fs, forceRefresh: true);
-    final shipyard = ShipyardPrices.load(fs);
+    final marketPrices = await MarketPrices.load(db);
+    final shipyardPrices = await ShipyardPrices.load(db);
     final shipyardListings = ShipyardListingCache.load(fs);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
@@ -173,9 +173,9 @@ class Caches {
 
     return Caches(
       agent: agent,
-      marketPrices: prices,
       ships: ships,
-      shipyardPrices: shipyard,
+      marketPrices: marketPrices,
+      shipyardPrices: shipyardPrices,
       systems: systems,
       waypoints: waypoints,
       markets: markets,

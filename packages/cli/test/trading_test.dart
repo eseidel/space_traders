@@ -6,7 +6,6 @@ import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -229,8 +228,7 @@ void main() {
         activity: ActivityLevel.WEAK,
       ),
     ];
-    final fs = MemoryFileSystem.test();
-    final marketPrices = MarketPrices(prices, fs: fs);
+    final marketPrices = MarketPrices(prices);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final shipEngine = _MockShipEngine();

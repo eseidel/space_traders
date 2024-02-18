@@ -26,6 +26,7 @@ class MarketPrice extends PriceBase<TradeSymbol> {
   factory MarketPrice.fromMarketTradeGood(
     MarketTradeGood good,
     WaypointSymbol waypointSymbol,
+    DateTime timestamp,
   ) =>
       MarketPrice(
         waypointSymbol: waypointSymbol,
@@ -34,7 +35,7 @@ class MarketPrice extends PriceBase<TradeSymbol> {
         purchasePrice: good.purchasePrice,
         sellPrice: good.sellPrice,
         tradeVolume: good.tradeVolume,
-        timestamp: DateTime.timestamp(),
+        timestamp: timestamp,
         activity: good.activity,
       );
 

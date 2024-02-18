@@ -243,7 +243,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final exportCache = TradeExportCache.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
-  final marketPrices = MarketPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
   final agent = await myAgent(db);
   final constructionCache = ConstructionCache(db);
 

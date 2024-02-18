@@ -5,9 +5,11 @@ import 'package:db/src/construction.dart';
 import 'package:db/src/extraction.dart';
 import 'package:db/src/faction.dart';
 import 'package:db/src/market_listing.dart';
+import 'package:db/src/market_price.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
 import 'package:db/src/shipyard_listing.dart';
+import 'package:db/src/shipyard_price.dart';
 import 'package:db/src/survey.dart';
 import 'package:db/src/transaction.dart';
 import 'package:meta/meta.dart';
@@ -342,5 +344,25 @@ class Database {
       parameters: {'timestamp': timestamp},
     );
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
+  }
+
+  /// Get all market prices from the database.
+  Future<Iterable<MarketPrice>> allMarketPrices() async {
+    return queryMany(allMarketPricesQuery(), marketPriceFromColumnMap);
+  }
+
+  /// Add a market price to the database.
+  Future<void> upsertMarketPrice(MarketPrice price) async {
+    await insertOne(upsertMarketPriceQuery(price));
+  }
+
+  /// Get all shipyard prices from the database.
+  Future<Iterable<ShipyardPrice>> allShipyardPrices() async {
+    return queryMany(allShipyardPricesQuery(), shipyardPriceFromColumnMap);
+  }
+
+  /// Add a shipyard price to the database.
+  Future<void> upsertShipyardPrice(ShipyardPrice price) async {
+    await insertOne(upsertShipyardPriceQuery(price));
   }
 }

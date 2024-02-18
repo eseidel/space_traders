@@ -47,7 +47,6 @@ void main() {
           activity: ActivityLevel.WEAK,
         ),
       ],
-      fs: fs,
     );
     final shipLocation = cSymbol;
     const shipSymbol = ShipSymbol('A', 1);

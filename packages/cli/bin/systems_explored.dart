@@ -12,8 +12,8 @@ String _typeName(SystemType type) {
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-  final marketPrices = MarketPrices.load(fs);
-  final shipyardPrices = ShipyardPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
+  final shipyardPrices = await ShipyardPrices.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);

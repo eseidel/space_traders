@@ -1,6 +1,4 @@
-import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/config.dart';
-import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/price.dart';
@@ -8,14 +6,16 @@ import 'package:types/types.dart';
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>>
-    extends JsonListStore<Record> {
+// TODO(eseidel): rename PricesSnapshot
+class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>> {
   /// Create a new price data collection.
-  PricesCache(
-    super.records, {
-    required super.fs,
-    required super.path,
-  });
+  PricesCache(this.prices);
+
+  /// The price records.
+  final List<Record> prices;
+
+  /// The length of the price data.
+  int get count => prices.length;
 
   /// WaypointSymbols for all markets in the cache.
   Set<WaypointSymbol> get waypointSymbols =>
@@ -28,47 +28,9 @@ class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>>
   /// Get the count of unique waypoints.
   int get waypointCount => waypointSymbols.length;
 
-  /// Get the raw pricing data.
-  List<Record> get prices => records;
-
   /// Hook for subclasses when a price has changed.
   @protected
   void priceChanged({required Record oldPrice, required Record newPrice}) {}
-
-  /// Add new prices to the price data.
-  void addPrices(
-    List<Record> newPrices, {
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    for (final newPrice in newPrices) {
-      // This doesn't account for existing duplicates.
-      final index = prices.indexWhere(
-        (element) =>
-            element.waypointSymbol == newPrice.waypointSymbol &&
-            element.symbol == newPrice.symbol,
-      );
-
-      if (getNow().isBefore(newPrice.timestamp)) {
-        logger.warn('Bogus timestamp on price: ${newPrice.timestamp}');
-        continue;
-      }
-
-      if (index >= 0) {
-        // This date logic is necessary to make sure we don't replace
-        // more recent local prices with older server data.
-        final existingPrice = prices[index];
-        if (newPrice.timestamp.isBefore(existingPrice.timestamp)) {
-          continue;
-        }
-        priceChanged(oldPrice: existingPrice, newPrice: newPrice);
-        // If the new price is newer than the existing price, replace it.
-        prices[index] = newPrice;
-      } else {
-        prices.add(newPrice);
-      }
-    }
-    save();
-  }
 
   /// Returns true if there is recent market data for a given market.
   /// Does not check if the passed in market is a valid market.

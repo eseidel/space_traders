@@ -35,14 +35,15 @@ Map<ShipType, int> _shipTypeCounts(
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
+  final db = await defaultDatabase();
   final shipCache = ShipCache.load(fs)!;
-  final marketPrices = MarketPrices.load(fs);
-  final shipyardPrices = ShipyardPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
+  final shipyardPrices = await ShipyardPrices.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
 
   logger
     ..info('Estimating fleet value at current median prices.')
-    ..info('Excluding intial ships.');
+    ..info('Excluding initial ships.');
 
   final purchasedShips = shipCache.ships.skip(2).toList();
   final purchaseShipTypes = purchasedShips
@@ -70,4 +71,5 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final totalCost = totalShipCost + totalMountCost;
   logger.info('Total: ${creditsString(totalCost)}');
+  await db.close();
 }

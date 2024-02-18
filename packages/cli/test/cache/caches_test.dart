@@ -71,6 +71,9 @@ void main() {
         .thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
     when(db.allMarketListings).thenAnswer((_) async => []);
+    when(db.allMarketPrices).thenAnswer((_) async => []);
+    when(db.allShipyardListings).thenAnswer((_) async => []);
+    when(db.allShipyardPrices).thenAnswer((_) async => []);
 
     final fs = MemoryFileSystem.test();
     fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);

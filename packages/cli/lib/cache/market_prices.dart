@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/cache/prices_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
@@ -123,28 +122,13 @@ extension MarketPricePredictions on MarketPrice {
 // Could consider sharding this by system if it gets too big.
 class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
   /// Create a new price data collection.
-  MarketPrices(
-    super.records, {
-    required super.fs,
-    super.path = defaultCacheFilePath,
-  });
+  MarketPrices(super.records);
 
   /// Load the price data from the cache.
-  factory MarketPrices.load(
-    FileSystem fs, {
-    String path = defaultCacheFilePath,
-  }) {
-    final prices = JsonListStore.loadRecords<MarketPrice>(
-          fs,
-          path,
-          MarketPrice.fromJson,
-        ) ??
-        [];
-    return MarketPrices(prices, fs: fs, path: path);
+  static Future<MarketPrices> load(Database db) async {
+    final prices = await db.allMarketPrices();
+    return MarketPrices(prices.toList());
   }
-
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/prices.json';
 
   @override
   void priceChanged({
@@ -296,15 +280,23 @@ class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
 
 /// Record market data silently.
 Future<void> recordMarketData(
-  MarketPrices marketPrices,
+  Database db,
   Market market, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final prices = market.tradeGoods
-      .map((g) => MarketPrice.fromMarketTradeGood(g, market.waypointSymbol))
+      .map(
+        (tradeGood) => MarketPrice.fromMarketTradeGood(
+          tradeGood,
+          market.waypointSymbol,
+          getNow(),
+        ),
+      )
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${market.symbol}!');
   }
-  marketPrices.addPrices(prices, getNow: getNow);
+  for (final price in prices) {
+    db.upsertMarketPrice(price);
+  }
 }

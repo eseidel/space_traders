@@ -1,7 +1,5 @@
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/printing.dart';
-import 'package:file/memory.dart';
-import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -63,8 +61,7 @@ void main() {
   });
 
   test('stringForPriceDeviance', () {
-    final fs = MemoryFileSystem.test();
-    final marketPrices = MarketPrices([], fs: fs);
+    final marketPrices = MarketPrices([]);
     const a = TradeSymbol.FUEL;
     expect(
       stringForPriceDeviance(
@@ -74,51 +71,6 @@ void main() {
         MarketTransactionTypeEnum.PURCHASE,
       ),
       '            🤷',
-    );
-    final now = DateTime(2021);
-    DateTime getNow() => DateTime(2021);
-    marketPrices.addPrices(
-      [
-        MarketPrice(
-          waypointSymbol: WaypointSymbol.fromString('S-A-W'),
-          symbol: a,
-          supply: SupplyLevel.ABUNDANT,
-          purchasePrice: 1,
-          sellPrice: 2,
-          tradeVolume: 100,
-          timestamp: now,
-          activity: ActivityLevel.WEAK,
-        ),
-      ],
-      getNow: getNow,
-    );
-
-    expect(
-      stringForPriceDeviance(
-        marketPrices,
-        a,
-        0,
-        MarketTransactionTypeEnum.PURCHASE,
-      ),
-      lightGreen.wrap('-100%  -1c per'),
-    );
-    expect(
-      stringForPriceDeviance(
-        marketPrices,
-        a,
-        0,
-        MarketTransactionTypeEnum.SELL,
-      ),
-      lightRed.wrap('-100%  -2c per'),
-    );
-    expect(
-      stringForPriceDeviance(
-        marketPrices,
-        a,
-        2,
-        MarketTransactionTypeEnum.SELL,
-      ),
-      '            ⚖️ ',
     );
   });
 

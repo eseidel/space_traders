@@ -150,7 +150,7 @@ int shipPrice(ShipyardPrices shipyardPrices, ShipType shipType) {
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-  final marketPrices = MarketPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final jumpGateCache = JumpGateCache.load(fs);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
@@ -161,7 +161,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final shipyardPrices = ShipyardPrices.load(fs);
+  final shipyardPrices = await ShipyardPrices.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
   final shipMounts = ShipMountCache.load(fs);
 

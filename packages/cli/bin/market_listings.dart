@@ -68,7 +68,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
 
   final waypoints = systemsCache.waypointsInSystem(hqSystem);
-  final marketPrices = MarketPrices.load(fs);
+  final marketPrices = await MarketPrices.load(db);
 
   for (final waypoint in waypoints) {
     final marketSymbol = waypoint.symbol;
