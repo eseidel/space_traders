@@ -149,6 +149,10 @@ void main() {
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
+    registerFallbackValue(ShipyardListing.fallbackValue());
+    when(() => db.upsertShipyardListing(any()))
+        .thenAnswer((_) => Future.value());
+
     final logger = _MockLogger();
     expect(
       await runWithLogger(

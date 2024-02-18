@@ -11,6 +11,12 @@ class ShipyardListing {
     required this.shipTypes,
   });
 
+  /// Creates a shipyard listing with a fallback value.
+  @visibleForTesting
+  ShipyardListing.fallbackValue()
+      : waypointSymbol = WaypointSymbol.fromString('W-A-Y'),
+        shipTypes = {};
+
   /// Creates a new shipyard description from JSON data.
   factory ShipyardListing.fromJson(Map<String, dynamic> json) {
     final symbol = WaypointSymbol.fromJson(json['waypointSymbol'] as String);
