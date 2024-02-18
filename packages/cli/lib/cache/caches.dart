@@ -103,7 +103,8 @@ class Caches {
   final JumpGateCache jumpGates;
 
   /// The cache of markets descriptions.
-  final MarketListingSnapshot marketListings;
+  /// This is currently updated at the top of every loop.
+  MarketListingSnapshot marketListings;
 
   /// The cache of markets.
   final MarketCache markets;
@@ -204,7 +205,7 @@ class Caches {
   }
 
   /// Update the caches at the top of the loop.
-  Future<void> updateAtTopOfLoop(Api api) async {
+  Future<void> updateAtTopOfLoop(Database db, Api api) async {
     // MarketCache only live for one loop over the ships.
     markets.resetForLoop();
 
@@ -217,6 +218,8 @@ class Caches {
     await ships.ensureUpToDate(api);
     await contracts.ensureUpToDate(api);
     await agent.ensureAgentUpToDate(api);
+
+    marketListings = await MarketListingSnapshot.load(db);
   }
 }
 

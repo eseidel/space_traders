@@ -67,7 +67,7 @@ Future<void> advanceShips(
   await expectTime(api.requestCounts, 'top of loop', const Duration(seconds: 1),
       () async {
     logger.info('🔎 $queue');
-    await caches.updateAtTopOfLoop(api);
+    await caches.updateAtTopOfLoop(db, api);
     await centralCommand.advanceCentralPlanning(api, caches);
   });
 
