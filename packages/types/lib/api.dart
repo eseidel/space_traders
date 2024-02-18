@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart'
     hide Agent, JumpGate, System, SystemWaypoint, Waypoint;
-import 'package:types/mount.dart';
+import 'package:types/src/mount.dart';
 
 export 'package:openapi/api.dart'
     hide Agent, JumpGate, System, SystemWaypoint, Waypoint;

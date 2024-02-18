@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:types/extraction.dart';
+import 'package:types/src/extraction.dart';
 
 void main() {
   test('ExtractionRecord round trip', () {
