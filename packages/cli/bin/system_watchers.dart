@@ -51,7 +51,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemWatcherStates =
       behaviorCache.states.where((s) => s.behavior == Behavior.systemWatcher);
   final systemsCache = SystemsCache.load(fs)!;
-  // final marketPrices = MarketPrices.load(fs);
   final shipCache = await ShipSnapshot.load(db);
 
   logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');

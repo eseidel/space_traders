@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS "market_listing_" (
   -- Imports to the market.
   "imports" text [] NOT NULL,
   -- Goods available for exchange at the market.
-  "exchange" text [] NOT NULL,
+  "exchange" text [] NOT NULL
 );

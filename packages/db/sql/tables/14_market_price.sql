@@ -15,5 +15,5 @@ CREATE TABLE IF NOT EXISTS "market_price_" (
   -- When this price was seen.
   "timestamp" timestamp NOT NULL,
   -- Activity level for the good at this market.
-  "activity" text,
+  "activity" text
 );

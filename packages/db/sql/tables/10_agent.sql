@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS "agent_" (
   -- How many ships the agent has.
   "shipCount" int NOT NULL,
   -- account id for this agent, only visible for your own agent.
-  "account_id" text,
+  "account_id" text
 );
