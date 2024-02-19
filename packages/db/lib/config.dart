@@ -8,3 +8,10 @@ pg.Endpoint defaultDatabaseEndpoint = pg.Endpoint(
   username: 'postgres',
   password: 'password',
 );
+
+/// Currently we use a docker container by default, which does not have its
+/// own ssl cert so we're disabling ssl for now.
+pg.ConnectionSettings defaultDatabaseConnectionSettings =
+    const pg.ConnectionSettings(
+  sslMode: pg.SslMode.disable,
+);

@@ -26,27 +26,34 @@ export 'package:db/config.dart';
 /// Logs and returns null on failure.
 Future<Database> defaultDatabase({
   @visibleForTesting
-  Future<pg.Connection> Function(pg.Endpoint endpoint) openConnection =
-      _defaultOpenConnection,
+  Future<pg.Connection> Function(pg.Endpoint endpoint, pg.ConnectionSettings?)
+      openConnection = _defaultOpenConnection,
 }) async {
-  final db = Database(defaultDatabaseEndpoint);
+  final db = Database(
+    defaultDatabaseEndpoint,
+    settings: defaultDatabaseConnectionSettings,
+  );
   await db.open(openConnection: openConnection);
   return db;
 }
 
-Future<pg.Connection> _defaultOpenConnection(pg.Endpoint endpoint) {
-  return pg.Connection.open(endpoint);
+Future<pg.Connection> _defaultOpenConnection(
+  pg.Endpoint endpoint,
+  pg.ConnectionSettings? settings,
+) {
+  return pg.Connection.open(endpoint, settings: settings);
 }
 
 /// Abstraction around a database connection.
 class Database {
   /// Create a new database connection.
-  Database(this.endpoint);
+  Database(this.endpoint, {this.settings});
 
   /// Create a new database with mock connection for testing.
   @visibleForTesting
   Database.test(this._connection)
-      : endpoint = pg.Endpoint(host: 'localhost', database: 'test');
+      : endpoint = pg.Endpoint(host: 'localhost', database: 'test'),
+        settings = null;
 
   /// The underlying connection.
   // TODO(eseidel): This shoudn't be public.
@@ -58,13 +65,18 @@ class Database {
   /// Configure the database connection.
   final pg.Endpoint endpoint;
 
+  /// Configure the database connection.
+  final pg.ConnectionSettings? settings;
+
   /// Open the database connection.
   Future<void> open({
     @visibleForTesting
-    Future<pg.Connection> Function(pg.Endpoint endpoint) openConnection =
-        _defaultOpenConnection,
+    Future<pg.Connection> Function(
+      pg.Endpoint endpoint,
+      pg.ConnectionSettings? settings,
+    ) openConnection = _defaultOpenConnection,
   }) async {
-    _connection = await openConnection(endpoint);
+    _connection = await openConnection(endpoint, settings);
   }
 
   /// Close the database connection.

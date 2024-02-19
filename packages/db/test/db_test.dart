@@ -12,7 +12,10 @@ class _MockPostgreSQLResult extends Mock implements pg.Result {}
 void main() {
   test('defaultDatabase', () async {
     final connection = _MockConnection();
-    Future<pg.Connection> openConnection(pg.Endpoint endpoint) async {
+    Future<pg.Connection> openConnection(
+      pg.Endpoint endpoint,
+      pg.ConnectionSettings? settings,
+    ) async {
       expect(endpoint.host, 'localhost');
       return connection;
     }
