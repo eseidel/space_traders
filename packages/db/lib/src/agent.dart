@@ -3,7 +3,7 @@ import 'package:types/types.dart';
 
 /// Query to get an agent by symbol.
 Query agentBySymbolQuery(String agentSymbol) => Query(
-      'SELECT * FROM agent WHERE symbol = @symbol',
+      'SELECT * FROM agent_ WHERE symbol = @symbol',
       parameters: {
         'symbol': agentSymbol,
       },
@@ -35,22 +35,9 @@ Agent agentFromColumnMap(Map<String, dynamic> values) {
 /// Update the given agent in the database.
 Query upsertAgentQuery(Agent agent) => Query(
       '''
-      INSERT INTO agent (
-        symbol,
-        headquarters,
-        credits,
-        starting_faction,
-        ship_count,
-        account_id
-      ) VALUES (
-        @symbol,
-        @headquarters,
-        @credits,
-        @starting_faction,
-        @ship_count,
-        @account_id
-      )
-      ON DUPLICATE KEY UPDATE
+      INSERT INTO agent_ (symbol, headquarters, credits, starting_faction, ship_count, account_id)
+      VALUES (@symbol, @headquarters, @credits, @starting_faction, @ship_count, @account_id)
+      ON CONFLICT (symbol) DO UPDATE SET
         headquarters = @headquarters,
         credits = @credits,
         starting_faction = @starting_faction,

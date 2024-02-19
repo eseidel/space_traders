@@ -2,10 +2,7 @@ import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
 /// Query all factions.
-Query allFactionsQuery() => const Query(
-      'SELECT * FROM faction_',
-      parameters: {},
-    );
+Query allFactionsQuery() => const Query('SELECT * FROM faction_');
 
 /// insert a faction.
 Query insertFactionQuery(Faction faction) => Query(

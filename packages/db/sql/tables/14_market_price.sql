@@ -1,7 +1,7 @@
 -- Describes a market price.
 CREATE TABLE IF NOT EXISTS "market_price_" (
   -- The symbol of the market.
-  "waypoint_symbol" text NOT NULL PRIMARY KEY,
+  "waypoint_symbol" text NOT NULL,
   -- The trade symbol being sold.
   "trade_symbol" text NOT NULL,
   -- The level of supply.
@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS "market_price_" (
   -- When this price was seen.
   "timestamp" timestamp NOT NULL,
   -- Activity level for the good at this market.
-  "activity" text
+  "activity" text,
+  CONSTRAINT "market_price__waypoint_symbol_trade_symbol__unique" UNIQUE ("waypoint_symbol", "trade_symbol")
 );

@@ -2,11 +2,11 @@ import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
 /// Get all ships from the database.
-Query allShipsQuery() => const Query('SELECT * FROM ships');
+Query allShipsQuery() => const Query('SELECT * FROM ship_');
 
 /// Get a ship by its [symbol] from the database.
 Query shipBySymbolQuery(ShipSymbol symbol) => Query(
-      'SELECT * FROM ships WHERE symbol = @symbol',
+      'SELECT * FROM ship_ WHERE symbol = @symbol',
       parameters: {
         'symbol': symbol.toJson(),
       },
@@ -15,7 +15,7 @@ Query shipBySymbolQuery(ShipSymbol symbol) => Query(
 /// Upsert a ship into the database.
 Query upsertShipQuery(Ship ship) => Query(
       '''
-      INSERT INTO ships (symbol, json)
+      INSERT INTO ship_ (symbol, json)
       VALUES (@symbol, @json)
       ON CONFLICT (symbol) DO UPDATE SET json = @json
       ''',

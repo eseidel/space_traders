@@ -89,9 +89,9 @@ class Database {
 
   /// Insert one record using the provided query.
   @protected
-  Future<void> execute(Query query) {
+  Future<pg.Result> execute(Query query) {
     return connection.execute(
-      query.fmtString,
+      pg.Sql.named(query.fmtString),
       parameters: query.parameters,
     );
   }
@@ -104,7 +104,7 @@ class Database {
   ) {
     return connection
         .execute(
-          query.fmtString,
+          pg.Sql.named(query.fmtString),
           parameters: query.parameters,
         )
         .then(
@@ -120,7 +120,7 @@ class Database {
   ) {
     return connection
         .execute(
-          query.fmtString,
+          pg.Sql.named(query.fmtString),
           parameters: query.parameters,
         )
         .then(
@@ -158,10 +158,7 @@ class Database {
   /// Mark the given survey as exhausted.
   Future<void> markSurveyExhausted(Survey survey) async {
     final query = markSurveyExhaustedQuery(survey);
-    final result = await connection.execute(
-      query.fmtString,
-      parameters: query.parameters,
-    );
+    final result = await execute(query);
     if (result.affectedRows != 1) {
       throw ArgumentError('Survey not found: $survey');
     }
@@ -177,7 +174,7 @@ class Database {
       for (final faction in factions) {
         final query = insertFactionQuery(faction);
         await session.execute(
-          query.fmtString,
+          pg.Sql.named(query.fmtString),
           parameters: query.parameters,
         );
       }
@@ -235,10 +232,7 @@ class Database {
   /// Insert the given request into the database and return it's new id.
   Future<int> insertRequest(RequestRecord request) async {
     final query = insertRequestQuery(request);
-    final result = await connection.execute(
-      query.fmtString,
-      parameters: query.parameters,
-    );
+    final result = await execute(query);
     return result.first.first! as int;
   }
 
@@ -251,10 +245,7 @@ class Database {
   /// Delete the given request from the database.
   Future<void> deleteRequest(RequestRecord request) async {
     final query = deleteRequestQuery(request);
-    final result = await connection.execute(
-      query.fmtString,
-      parameters: query.parameters,
-    );
+    final result = await execute(query);
     if (result.affectedRows != 1) {
       throw ArgumentError('Request not found: $request');
     }

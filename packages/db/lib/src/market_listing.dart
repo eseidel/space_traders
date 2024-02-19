@@ -3,17 +3,17 @@ import 'package:types/types.dart';
 
 /// Lookup a market listing by WaypointSymbol.
 Query marketListingByWaypointSymbolQuery(WaypointSymbol symbol) => Query(
-      'SELECT * FROM market_listing WHERE symbol = @symbol',
+      'SELECT * FROM market_listing_ WHERE symbol = @symbol',
       parameters: {'symbol': symbol.waypoint},
     );
 
 /// Query all market listings.
-Query allMarketListingsQuery() => const Query('SELECT * FROM market_listing');
+Query allMarketListingsQuery() => const Query('SELECT * FROM market_listing_');
 
 /// Query to upsert a market listing.
 Query upsertMarketListingQuery(MarketListing listing) => Query(
       '''
-      INSERT INTO market_listing (symbol, exports, imports, exchange)
+      INSERT INTO market_listing_ (symbol, exports, imports, exchange)
       VALUES (@symbol, @exports, @imports, @exchange)
       ON CONFLICT (symbol) DO UPDATE SET
         exports = @exports,
@@ -25,10 +25,10 @@ Query upsertMarketListingQuery(MarketListing listing) => Query(
 
 /// Build a column map from a market listing.
 Map<String, dynamic> marketListingToColumnMap(MarketListing marketListing) => {
-      'symbol': marketListing.waypointSymbol.toString(),
-      'exports': marketListing.exports.map((e) => e.toString()).toList(),
-      'imports': marketListing.imports.map((e) => e.toString()).toList(),
-      'exchange': marketListing.exchange.map((e) => e.toString()).toList(),
+      'symbol': marketListing.waypointSymbol.toJson(),
+      'exports': marketListing.exports.map((e) => e.toJson()).toList(),
+      'imports': marketListing.imports.map((e) => e.toJson()).toList(),
+      'exchange': marketListing.exchange.map((e) => e.toJson()).toList(),
     };
 
 /// Build a market listing from a column map.

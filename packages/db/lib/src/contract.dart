@@ -2,13 +2,17 @@ import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
 /// Query to get all contracts.
-Query allContractsQuery() => const Query('SELECT * FROM contract');
+Query allContractsQuery() => const Query('SELECT * FROM contract_');
 
 /// Upsert a contract.
 Query upsertContractQuery(Contract contract) {
   return Query(
-    'INSERT INTO contract (id, json) VALUES (?, ?) ON CONFLICT(id) '
-    'DO UPDATE SET json = ?',
+    '''
+    INSERT INTO contract_ (id, json)
+    VALUES (@id, @json)
+    ON CONFLICT (id) DO UPDATE SET
+      json = @json
+    ''',
     parameters: contractToColumnMap(contract),
   );
 }
