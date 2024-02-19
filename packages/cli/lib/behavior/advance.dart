@@ -122,7 +122,8 @@ Future<DateTime?> advanceShipBehavior(
     }
     return waitUntil;
   } on JobException catch (error) {
-    await caches.behaviors.disableBehaviorForShip(
+    await centralCommand.behaviorTimeouts.disableBehaviorForShip(
+      caches.behaviors,
       ship,
       error.message,
       error.timeout,
@@ -131,7 +132,8 @@ Future<DateTime?> advanceShipBehavior(
     if (!isInsufficientCreditsException(e)) {
       rethrow;
     }
-    await caches.behaviors.disableBehaviorForShip(
+    await centralCommand.behaviorTimeouts.disableBehaviorForShip(
+      caches.behaviors,
       ship,
       'Insufficient credits: ${e.message}',
       const Duration(minutes: 10),

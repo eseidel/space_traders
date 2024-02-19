@@ -11,13 +11,13 @@ Query allJumpGatesQuery() => const Query(
 Query upsertJumpGateQuery(JumpGate jumpGate) => Query(
       '''
       INSERT INTO jump_gate_ (
-        waypoint_symbol,
+        symbol,
         connections,
       ) VALUES (
-        @waypoint_symbol,
+        @symbol,
         @connections,
       )
-      ON CONFLICT (waypoint_symbol) DO UPDATE SET
+      ON CONFLICT (symbol) DO UPDATE SET
         connections = @connections,
       ''',
       parameters: jumpGateToColumnMap(jumpGate),
@@ -25,8 +25,8 @@ Query upsertJumpGateQuery(JumpGate jumpGate) => Query(
 
 /// Get a jump gate by symbol.
 Query getJumpGateQuery(WaypointSymbol waypointSymbol) => Query(
-      'SELECT * FROM jump_gate_ WHERE waypoint_symbol = @waypoint_symbol',
-      parameters: {'waypoint_symbol': waypointSymbol.toJson()},
+      'SELECT * FROM jump_gate_ WHERE symbol = @symbol',
+      parameters: {'symbol': waypointSymbol.toJson()},
     );
 
 /// Convert a jump gate to a column map.

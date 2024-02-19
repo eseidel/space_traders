@@ -16,6 +16,12 @@ Query upsertShipyardPriceQuery(ShipyardPrice price) => Query(
       parameters: shipyardPriceToColumnMap(price),
     );
 
+/// Query to get the timestamp of the most recent shipyard price for a waypoint.
+Query timestampOfMostRecentShipyardPriceQuery(WaypointSymbol symbol) => Query(
+      'SELECT MAX(timestamp) FROM shipyard_price_ WHERE waypoint_symbol = @symbol',
+      parameters: {'symbol': symbol.toJson()},
+    );
+
 /// Build a column map from a shipyard price.
 Map<String, dynamic> shipyardPriceToColumnMap(ShipyardPrice price) => {
       'waypoint_symbol': price.waypointSymbol.toJson(),

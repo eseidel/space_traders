@@ -49,6 +49,12 @@ Map<String, dynamic> marketPriceToColumnMap(MarketPrice price) => {
       'activity': price.activity?.toJson(),
     };
 
+/// Query to get the timestamp of the most recent market price for a waypoint.
+Query timestampOfMostRecentMarketPriceQuery(WaypointSymbol symbol) => Query(
+      'SELECT MAX(timestamp) FROM market_price_ WHERE waypoint_symbol = @symbol',
+      parameters: {'symbol': symbol.toJson()},
+    );
+
 /// Build a market price from a column map.
 MarketPrice marketPriceFromColumnMap(Map<String, dynamic> values) {
   return MarketPrice(

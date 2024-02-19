@@ -66,6 +66,9 @@ class CentralCommand {
 
   final Map<ShipSymbol, SystemSymbol> _assignedSystemsForSatellites = {};
 
+  /// The current behavior timeouts.
+  final BehaviorTimeouts behaviorTimeouts = BehaviorTimeouts();
+
   /// Sets the available mounts for testing.
   @visibleForTesting
   void setAvailableMounts(Iterable<ShipMountSymbolEnum> mounts) {
@@ -184,7 +187,7 @@ class CentralCommand {
         return false;
       }
 
-      return !_behaviorCache.isBehaviorDisabledForShip(ship, behavior);
+      return !behaviorTimeouts.isBehaviorDisabledForShip(ship, behavior);
     }
 
     if (ship.isOutOfFuel) {
@@ -253,7 +256,7 @@ class CentralCommand {
     final behaviors = config.behaviorsByFleetRole[ship.fleetRole];
     if (behaviors != null) {
       for (final behavior in behaviors) {
-        if (!_behaviorCache.isBehaviorDisabledForShip(ship, behavior)) {
+        if (!behaviorTimeouts.isBehaviorDisabledForShip(ship, behavior)) {
           return toState(behavior);
         }
       }

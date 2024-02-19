@@ -681,8 +681,6 @@ void main() {
     );
     when(() => ship.fuel).thenReturn(ShipFuel(current: 1000, capacity: 1000));
     registerFallbackValue(Behavior.idle);
-    when(() => behaviorCache.isBehaviorDisabledForShip(ship, any()))
-        .thenReturn(true);
     final job = centralCommand.getJobForShip(ship, 1000000);
     // Nothing specified for this ship, so it should be idle.
     expect(job.behavior, Behavior.idle);

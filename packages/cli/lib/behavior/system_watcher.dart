@@ -52,39 +52,38 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
 
 /// Returns true if the given waypoint is missing either a chart or recent
 /// market data.
-bool isMissingChartOrRecentPriceData(
-  MarketPrices marketPrices,
-  ShipyardPrices shipyardPrices,
+Future<bool> _isMissingChartOrRecentPriceData(
+  Database db,
   Waypoint waypoint, {
   required Duration maxAge,
-}) {
+}) async {
   return waypoint.chart == null ||
-      _isMissingRecentMarketData(marketPrices, waypoint, maxAge: maxAge) ||
-      _isMissingRecentShipyardData(shipyardPrices, waypoint, maxAge: maxAge);
+      await _isMissingRecentMarketData(db, waypoint, maxAge: maxAge) ||
+      await _isMissingRecentShipyardData(db, waypoint, maxAge: maxAge);
 }
 
-bool _isMissingRecentMarketData(
-  MarketPrices marketPrices,
+Future<bool> _isMissingRecentMarketData(
+  Database db,
   Waypoint waypoint, {
   required Duration maxAge,
-}) {
-  return waypoint.hasMarketplace &&
-      !marketPrices.hasRecentData(
-        waypoint.symbol,
-        maxAge: maxAge,
-      );
+}) async {
+  if (!waypoint.hasMarketplace) {
+    return false;
+  }
+  final result = await db.hasRecentMarketPrices(waypoint.symbol, maxAge);
+  return !result;
 }
 
-bool _isMissingRecentShipyardData(
-  ShipyardPrices shipyardPrices,
+Future<bool> _isMissingRecentShipyardData(
+  Database db,
   Waypoint waypoint, {
   required Duration maxAge,
-}) {
-  return waypoint.hasShipyard &&
-      !shipyardPrices.hasRecentData(
-        waypoint.symbol,
-        maxAge: maxAge,
-      );
+}) async {
+  if (!waypoint.hasShipyard) {
+    return false;
+  }
+  final result = await db.hasRecentShipyardPrices(waypoint.symbol, maxAge);
+  return !result;
 }
 
 /// Returns the symbol of a waypoint in the system missing a chart.
@@ -206,9 +205,8 @@ Future<JobResult> doSystemWatcher(
 
   final maxAge = centralCommand.maxPriceAgeForSystem(systemSymbol);
   final waypoint = await caches.waypoints.waypoint(ship.waypointSymbol);
-  final willCompleteBehavior = isMissingChartOrRecentPriceData(
-    caches.marketPrices,
-    caches.shipyardPrices,
+  final willCompleteBehavior = await _isMissingChartOrRecentPriceData(
+    db,
     waypoint,
     maxAge: maxAge,
   );

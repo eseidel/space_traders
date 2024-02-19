@@ -19,12 +19,13 @@ void main() {
     when(() => db.setBehaviorState(any())).thenAnswer((_) async {});
     when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
 
+    final behaviorTimeouts = BehaviorTimeouts();
     final behaviorCache = BehaviorCache([], db);
     final ship = _MockShip();
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     expect(
-      behaviorCache.isBehaviorDisabledForShip(ship, Behavior.trader),
+      behaviorTimeouts.isBehaviorDisabledForShip(ship, Behavior.trader),
       false,
     );
 
@@ -36,7 +37,8 @@ void main() {
     final logger = _MockLogger();
     await runWithLogger(
       logger,
-      () async => behaviorCache.disableBehaviorForShip(
+      () async => behaviorTimeouts.disableBehaviorForShip(
+        behaviorCache,
         ship,
         'why',
         const Duration(hours: 1),
@@ -45,11 +47,11 @@ void main() {
     final ship2 = _MockShip();
     when(() => ship2.symbol).thenReturn('S-2');
     expect(
-      behaviorCache.isBehaviorDisabledForShip(ship, Behavior.trader),
+      behaviorTimeouts.isBehaviorDisabledForShip(ship, Behavior.trader),
       true,
     );
     expect(
-      behaviorCache.isBehaviorDisabledForShip(ship2, Behavior.trader),
+      behaviorTimeouts.isBehaviorDisabledForShip(ship2, Behavior.trader),
       false,
     );
   });

@@ -426,4 +426,37 @@ class Database {
   Future<void> upsertShip(Ship ship) async {
     await execute(upsertShipQuery(ship));
   }
+
+  Future<bool> _hasRecentPrice(Query query, Duration maxAge) async {
+    final result = await connection.execute(
+      pg.Sql.named(query.fmtString),
+      parameters: query.parameters,
+    );
+    if (result.isEmpty) {
+      return false;
+    }
+    final timestamp = result[0][0] as DateTime?;
+    if (timestamp == null) {
+      return false;
+    }
+    return DateTime.now().difference(timestamp) < maxAge;
+  }
+
+  /// Check if the given waypoint has recent market prices.
+  Future<bool> hasRecentMarketPrices(
+    WaypointSymbol waypointSymbol,
+    Duration maxAge,
+  ) async {
+    final query = timestampOfMostRecentMarketPriceQuery(waypointSymbol);
+    return _hasRecentPrice(query, maxAge);
+  }
+
+  /// Check if the given waypoint has recent shipyard prices.
+  Future<bool> hasRecentShipyardPrices(
+    WaypointSymbol waypointSymbol,
+    Duration maxAge,
+  ) async {
+    final query = timestampOfMostRecentShipyardPriceQuery(waypointSymbol);
+    return _hasRecentPrice(query, maxAge);
+  }
 }
