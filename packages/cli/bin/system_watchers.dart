@@ -48,7 +48,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final behaviorCache = BehaviorCache.load(fs);
+  final behaviorCache = await BehaviorCache.load(db);
   final systemWatcherStates =
       behaviorCache.states.where((s) => s.behavior == Behavior.systemWatcher);
   final systemsCache = SystemsCache.load(fs)!;

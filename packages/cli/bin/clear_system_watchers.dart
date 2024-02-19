@@ -6,7 +6,8 @@ void main(List<String> args) async {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final behaviorCache = BehaviorCache.load(fs);
+  final db = await defaultDatabase();
+  final behaviorCache = await BehaviorCache.load(db);
 
   final shipSymbols = behaviorCache.states
       .where((s) => s.behavior == Behavior.systemWatcher)
@@ -19,6 +20,8 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
   logger.info('Clearing ${shipSymbols.length} system watchers...');
   for (final shipSymbol in shipSymbols) {
-    behaviorCache.deleteBehavior(shipSymbol);
+    await behaviorCache.deleteBehavior(shipSymbol);
   }
+
+  await db.close();
 }

@@ -118,6 +118,10 @@ class BehaviorState {
     this.jobIndex = 0,
   }) : isComplete = false;
 
+  /// Create a new behavior state from a fallback value.
+  @visibleForTesting
+  BehaviorState.fallbackValue() : this(const ShipSymbol('S', 1), Behavior.idle);
+
   /// Create a new behavior state from JSON.
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
     final behavior = Behavior.fromJson(json['behavior'] as String);

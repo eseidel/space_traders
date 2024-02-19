@@ -99,7 +99,7 @@ bool Function(Ship) filterFromArgs(List<String> args) {
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final filter = filterFromArgs(argResults.rest);
-  final behaviorCache = BehaviorCache.load(fs);
+  final behaviorCache = await BehaviorCache.load(db);
   final shipCache = ShipCache.load(fs)!;
 
   logger.info('Fleet: ${describeShips(shipCache.ships)}');

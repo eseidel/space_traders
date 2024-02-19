@@ -54,7 +54,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final shipSymbols = (await db.uniqueShipSymbolsInTransactions()).toList()
     ..sort();
-  final behaviorCache = BehaviorCache.load(fs);
+  final behaviorCache = await BehaviorCache.load(db);
 
   final shipCache = ShipCache.load(fs)!;
   final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);

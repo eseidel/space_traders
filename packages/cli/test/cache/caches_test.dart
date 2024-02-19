@@ -75,6 +75,7 @@ void main() {
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);
     when(db.allJumpGates).thenAnswer((_) async => []);
+    when(db.allBehaviorStates).thenAnswer((_) async => []);
 
     final fs = MemoryFileSystem.test();
     fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);

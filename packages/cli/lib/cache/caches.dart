@@ -152,7 +152,7 @@ class Caches {
     final markets = MarketCache(db, api, static.tradeGoods);
     // Intentionally force refresh contracts in case we've been offline.
     final contracts = await fetchContracts(db, api);
-    final behaviors = BehaviorCache.load(fs);
+    final behaviors = await BehaviorCache.load(db);
 
     final jumpGates = await JumpGateSnapshot.load(db);
     final constructionSnapshot = await ConstructionSnapshot.load(db);

@@ -44,6 +44,10 @@ void main() {
     when(() => caches.behaviors.putIfAbsent(shipSymbol, any()))
         .thenAnswer((_) => Future.value(behaviorState));
     final logger = _MockLogger();
+
+    when(() => caches.behaviors.deleteBehavior(shipSymbol))
+        .thenAnswer((_) async {});
+
     final waitUntil = await runWithLogger(
       logger,
       () => advanceShipBehavior(

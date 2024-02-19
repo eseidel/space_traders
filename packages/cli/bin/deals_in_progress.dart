@@ -16,7 +16,8 @@ String annotatedName(CostedDeal deal) {
 }
 
 Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
-  final behaviorCache = BehaviorCache.load(fs);
+  final db = await defaultDatabase();
+  final behaviorCache = await BehaviorCache.load(db);
 
   final states =
       behaviorCache.states.where((state) => state.deal != null).toList();
@@ -99,6 +100,8 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       '${minerHaulers.length} miner haulers: ${minerHaulers.join(', ')}',
     );
   }
+
+  await db.close();
 }
 
 void main(List<String> args) async {

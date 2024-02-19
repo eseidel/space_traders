@@ -1,5 +1,6 @@
 import 'package:db/config.dart';
 import 'package:db/src/agent.dart';
+import 'package:db/src/behavior.dart';
 import 'package:db/src/chart.dart';
 import 'package:db/src/construction.dart';
 import 'package:db/src/contract.dart';
@@ -75,7 +76,7 @@ class Database {
 
   /// Insert one record using the provided query.
   @protected
-  Future<void> insertOne(Query query) {
+  Future<void> execute(Query query) {
     return connection.execute(
       query.fmtString,
       parameters: query.parameters,
@@ -117,12 +118,12 @@ class Database {
 
   /// Insert a transaction into the database.
   Future<void> insertTransaction(Transaction transaction) async {
-    await insertOne(insertTransactionQuery(transaction));
+    await execute(insertTransactionQuery(transaction));
   }
 
   /// Insert a survey into the database.
   Future<void> insertSurvey(HistoricalSurvey survey) async {
-    await insertOne(insertSurveyQuery(survey));
+    await execute(insertSurveyQuery(survey));
   }
 
   /// Return the most recent surveys.
@@ -176,7 +177,7 @@ class Database {
 
   /// Insert an extraction into the database.
   Future<void> insertExtraction(ExtractionRecord extraction) async =>
-      insertOne(insertExtractionQuery(extraction));
+      execute(insertExtractionQuery(extraction));
 
   /// Get a construction record from the database.
   Future<ConstructionRecord?> getConstruction(
@@ -194,7 +195,7 @@ class Database {
 
   /// Insert a construction record into the database.
   Future<void> upsertConstruction(ConstructionRecord record) async =>
-      insertOne(upsertConstructionQuery(record));
+      execute(upsertConstructionQuery(record));
 
   /// Return all charting records.
   Future<Iterable<ChartingRecord>> allChartingRecords() async =>
@@ -202,7 +203,7 @@ class Database {
 
   /// Insert a charting record into the database.
   Future<void> upsertChartingRecord(ChartingRecord record) async =>
-      insertOne(upsertChartingRecordQuery(record));
+      execute(upsertChartingRecordQuery(record));
 
   /// Get a charting record from the database.
   Future<ChartingRecord?> getChartingRecord(
@@ -248,7 +249,7 @@ class Database {
 
   /// Insert the given response into the database.
   Future<void> insertResponse(ResponseRecord response) async {
-    await insertOne(insertResponseQuery(response));
+    await execute(insertResponseQuery(response));
   }
 
   /// Get the response with the given id.
@@ -265,8 +266,7 @@ class Database {
 
   /// Update the given agent in the database.
   Future<void> upsertAgent(Agent agent) async {
-    final query = upsertAgentQuery(agent);
-    await insertOne(query);
+    await execute(upsertAgentQuery(agent));
   }
 
   /// Get the market listing for the given symbol.
@@ -286,8 +286,7 @@ class Database {
 
   /// Update the given market listing in the database.
   Future<void> upsertMarketListing(MarketListing listing) async {
-    final query = upsertMarketListingQuery(listing);
-    await insertOne(query);
+    await execute(upsertMarketListingQuery(listing));
   }
 
   /// Get the shipyard listing for the given symbol.
@@ -307,8 +306,7 @@ class Database {
 
   /// Update the given shipyard listing in the database.
   Future<void> upsertShipyardListing(ShipyardListing listing) async {
-    final query = upsertShipyardListingQuery(listing);
-    await insertOne(query);
+    await execute(upsertShipyardListingQuery(listing));
   }
 
   /// Get unique ship symbols from the transaction table.
@@ -355,7 +353,7 @@ class Database {
 
   /// Add a market price to the database.
   Future<void> upsertMarketPrice(MarketPrice price) async {
-    await insertOne(upsertMarketPriceQuery(price));
+    await execute(upsertMarketPriceQuery(price));
   }
 
   /// Get all shipyard prices from the database.
@@ -365,7 +363,7 @@ class Database {
 
   /// Add a shipyard price to the database.
   Future<void> upsertShipyardPrice(ShipyardPrice price) async {
-    await insertOne(upsertShipyardPriceQuery(price));
+    await execute(upsertShipyardPriceQuery(price));
   }
 
   /// Get all jump gates from the database.
@@ -375,7 +373,7 @@ class Database {
 
   /// Add a jump gate to the database.
   Future<void> upsertJumpGate(JumpGate jumpGate) async {
-    await insertOne(upsertJumpGateQuery(jumpGate));
+    await execute(upsertJumpGateQuery(jumpGate));
   }
 
   /// Get the jump gate for the given waypoint symbol.
@@ -391,6 +389,21 @@ class Database {
 
   /// Upsert a contract into the database.
   Future<void> upsertContract(Contract contract) async {
-    await insertOne(upsertContractQuery(contract));
+    await execute(upsertContractQuery(contract));
+  }
+
+  /// Get all behavior states.
+  Future<Iterable<BehaviorState>> allBehaviorStates() async {
+    return queryMany(allBehaviorStatesQuery(), behaviorStateFromColumnMap);
+  }
+
+  /// Get a behavior state by symbol.
+  Future<void> setBehaviorState(BehaviorState behaviorState) async {
+    await execute(upsertBehaviorStateQuery(behaviorState));
+  }
+
+  /// Delete a behavior state.
+  Future<void> deleteBehaviorState(ShipSymbol shipSymbol) async {
+    await execute(deleteBehaviorStateQuery(shipSymbol));
   }
 }

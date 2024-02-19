@@ -27,7 +27,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   );
   final marketPrices = await MarketPrices.load(db);
 
-  final behaviorCache = BehaviorCache.load(fs);
+  final behaviorCache = await BehaviorCache.load(db);
   final shipCache = ShipCache.load(fs)!;
   final agentCache = await AgentCache.load(db);
   final contractSnapshot = await ContractSnapshot.load(db);

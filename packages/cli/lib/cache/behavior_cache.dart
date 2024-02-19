@@ -1,11 +1,8 @@
-import 'package:cli/cache/json_store.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
-import 'package:file/file.dart';
+import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
-
-typedef _Record = Map<ShipSymbol, BehaviorState>;
 
 @immutable
 class _ShipTimeout {
@@ -17,48 +14,25 @@ class _ShipTimeout {
 }
 
 /// A class to manage the behavior cache.
-class BehaviorCache extends JsonStore<_Record> {
+class BehaviorCache {
   /// Create a new behavior cache.
-  BehaviorCache(
-    super.stateByShipSymbol, {
-    required super.fs,
-    super.path = defaultPath,
-  }) : super(
-          recordToJson: (_Record r) => r.map(
-            (key, value) => MapEntry(
-              key.toJson(),
-              value.toJson(),
-            ),
-          ),
-        );
+  BehaviorCache(Iterable<BehaviorState> stateByShipSymbol, Database db)
+      : _stateByShipSymbol = Map.fromEntries(
+          stateByShipSymbol.map((state) => MapEntry(state.shipSymbol, state)),
+        ),
+        _db = db;
 
   /// Load the cache from a file.
-  factory BehaviorCache.load(
-    FileSystem fs, {
-    String path = defaultPath,
-  }) {
-    final record = JsonStore.loadRecord<_Record>(
-          fs,
-          path,
-          (Map<String, dynamic> j) => j.map(
-            (key, value) => MapEntry(
-              ShipSymbol.fromJson(key),
-              BehaviorState.fromJson(value as Map<String, dynamic>),
-            ),
-          ),
-        ) ??
-        {};
-    return BehaviorCache(record, fs: fs, path: path);
+  static Future<BehaviorCache> load(Database db) async {
+    final states = await db.allBehaviorStates();
+    return BehaviorCache(states, db);
   }
+
+  final Database _db;
+  final Map<ShipSymbol, BehaviorState> _stateByShipSymbol;
 
   /// Used for temporarily disabling a ship, not persisted.
   final List<_ShipTimeout> _shipTimeouts = [];
-
-  /// The default path to the cache file.
-  static const String defaultPath = 'data/behaviors.json';
-
-  /// The behavior state for each ship.
-  Map<ShipSymbol, BehaviorState> get _stateByShipSymbol => record;
 
   /// Get the list of all behavior states.
   List<BehaviorState> get states => _stateByShipSymbol.values.toList();
@@ -68,15 +42,18 @@ class BehaviorCache extends JsonStore<_Record> {
       _stateByShipSymbol[shipSymbol];
 
   /// Delete the behavior state for the given ship.
-  void deleteBehavior(ShipSymbol shipSymbol) {
+  Future<void> deleteBehavior(ShipSymbol shipSymbol) async {
+    await _db.deleteBehaviorState(shipSymbol);
     _stateByShipSymbol.remove(shipSymbol);
-    save();
   }
 
   /// Set the behavior state for the given ship.
-  void setBehavior(ShipSymbol shipSymbol, BehaviorState behaviorState) {
+  Future<void> setBehavior(
+    ShipSymbol shipSymbol,
+    BehaviorState behaviorState,
+  ) async {
+    await _db.setBehaviorState(behaviorState);
     _stateByShipSymbol[shipSymbol] = behaviorState;
-    save();
   }
 
   /// Check if the given behavior is disabled for the given ship.
@@ -99,7 +76,11 @@ class BehaviorCache extends JsonStore<_Record> {
   }
 
   /// Disable the given behavior for [ship] for [duration].
-  void disableBehaviorForShip(Ship ship, String why, Duration duration) {
+  Future<void> disableBehaviorForShip(
+    Ship ship,
+    String why,
+    Duration duration,
+  ) async {
     final shipSymbol = ship.shipSymbol;
     final currentState = getBehavior(shipSymbol);
     final behavior = currentState?.behavior;
@@ -114,7 +95,7 @@ class BehaviorCache extends JsonStore<_Record> {
     );
 
     if (currentState == null || currentState.behavior == behavior) {
-      deleteBehavior(shipSymbol);
+      await deleteBehavior(shipSymbol);
     } else {
       shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
     }
@@ -134,7 +115,7 @@ class BehaviorCache extends JsonStore<_Record> {
       return currentState;
     }
     final newState = await ifAbsent();
-    setBehavior(shipSymbol, newState);
+    await setBehavior(shipSymbol, newState);
     return newState;
   }
 }

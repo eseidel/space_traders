@@ -19,7 +19,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     sellsFuel: defaultSellsFuel(marketListings),
   );
 
-  final behaviorCache = BehaviorCache.load(fs);
+  final behaviorCache = await BehaviorCache.load(db);
 
   const shipType = ShipType.LIGHT_HAULER;
   final ship = staticCaches.shipyardShips[shipType]!;

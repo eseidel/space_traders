@@ -562,7 +562,12 @@ Future<DateTime?> acceptContractsIfNeeded(
   final contracts = contractSnapshot.activeContracts;
   if (contracts.isEmpty) {
     final contract = await negotiateContractAndLog(
-        db, api, ship, shipCache, contractSnapshot);
+      db,
+      api,
+      ship,
+      shipCache,
+      contractSnapshot,
+    );
     shipInfo(ship, describeExpectedContractProfit(marketPrices, contract));
     return null;
   }

@@ -94,7 +94,7 @@ Future<DateTime?> advanceShipBehavior(
     );
   } on JobException catch (e) {
     shipErr(ship, '$e');
-    caches.behaviors.deleteBehavior(ship.shipSymbol);
+    await caches.behaviors.deleteBehavior(ship.shipSymbol);
     return null;
   }
   if (navResult.shouldReturn()) {
@@ -115,14 +115,14 @@ Future<DateTime?> advanceShipBehavior(
     );
     if (state.isComplete) {
       // If the behavior is complete, clear it.
-      caches.behaviors.deleteBehavior(ship.shipSymbol);
+      await caches.behaviors.deleteBehavior(ship.shipSymbol);
     } else {
       // Otherwise update the behavior state.
-      caches.behaviors.setBehavior(ship.shipSymbol, state);
+      await caches.behaviors.setBehavior(ship.shipSymbol, state);
     }
     return waitUntil;
   } on JobException catch (error) {
-    caches.behaviors.disableBehaviorForShip(
+    await caches.behaviors.disableBehaviorForShip(
       ship,
       error.message,
       error.timeout,
@@ -131,7 +131,7 @@ Future<DateTime?> advanceShipBehavior(
     if (!isInsufficientCreditsException(e)) {
       rethrow;
     }
-    caches.behaviors.disableBehaviorForShip(
+    await caches.behaviors.disableBehaviorForShip(
       ship,
       'Insufficient credits: ${e.message}',
       const Duration(minutes: 10),

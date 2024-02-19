@@ -153,6 +153,12 @@ class ShipSymbol extends Equatable implements Comparable<ShipSymbol> {
   /// The number part is given in decimal, but will be represented in hex.
   const ShipSymbol(this.agentName, this.number);
 
+  /// Create a dummy ShipSymbol for testing.
+  @visibleForTesting
+  const ShipSymbol.fallbackValue()
+      : agentName = 'S',
+        number = 0;
+
   /// Create a ShipSymbol from a string.
   ShipSymbol.fromString(String symbol)
       : agentName = _parseAgentName(symbol),

@@ -44,7 +44,8 @@ String plural(int count, String singular, [String plural = 's']) {
 }
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final behaviorCache = BehaviorCache.load(fs);
+  final db = await defaultDatabase();
+  final behaviorCache = await BehaviorCache.load(db);
   final charterStates =
       behaviorCache.states.where((s) => s.behavior == Behavior.charter);
   final systemsCache = SystemsCache.load(fs)!;
@@ -66,4 +67,5 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       logger.info('  enroute to $destination $destinationType in $arrival');
     }
   }
+  await db.close();
 }

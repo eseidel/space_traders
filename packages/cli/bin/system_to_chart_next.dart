@@ -20,7 +20,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final systemConnectivity = await loadSystemConnectivity(db);
 
   final shipCache = ShipCache.load(fs)!;
-  final behaviorCache = BehaviorCache.load(fs);
+  final behaviorCache = await BehaviorCache.load(db);
   final centralCommand = CentralCommand(
     shipCache: shipCache,
     behaviorCache: behaviorCache,

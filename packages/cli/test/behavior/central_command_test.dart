@@ -3,7 +3,6 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -41,7 +40,7 @@ class _MockShipyardPrices extends Mock implements ShipyardPrices {}
 class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 void main() {
-  test('CentralCommand.otherCharterSystems', () {
+  test('CentralCommand.otherCharterSystems', () async {
     RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
       return RoutePlan(
         fuelCapacity: 10,
@@ -58,24 +57,29 @@ void main() {
       );
     }
 
-    final fs = MemoryFileSystem.test();
-    final behaviorCache = BehaviorCache.load(fs);
+    final db = _MockDatabase();
+    registerFallbackValue(BehaviorState.fallbackValue());
+    registerFallbackValue(const ShipSymbol.fallbackValue());
+    when(() => db.setBehaviorState(any())).thenAnswer((_) async {});
+    when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
+
+    final behaviorCache = BehaviorCache([], db);
     final shipCache = _MockShipCache();
     final centralCommand =
         CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
 
-    void setupShip({
+    Future<void> setupShip({
       required ShipSymbol shipSymbol,
       required WaypointSymbol start,
       required WaypointSymbol end,
-    }) {
+    }) async {
       final ship = _MockShip();
       final shipNav = _MockShipNav();
       when(() => ship.symbol).thenReturn(shipSymbol.symbol);
       when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
       when(() => shipNav.systemSymbol).thenReturn(start.systemString);
       when(() => ship.nav).thenReturn(shipNav);
-      behaviorCache.setBehavior(
+      await behaviorCache.setBehavior(
         shipSymbol,
         BehaviorState(
           shipSymbol,
@@ -90,13 +94,13 @@ void main() {
     final shipASymbol = ShipSymbol.fromString('X-A');
     final aStart = WaypointSymbol.fromString('S-A-A');
     final aEnd = WaypointSymbol.fromString('S-A-W');
-    setupShip(shipSymbol: shipASymbol, start: aStart, end: aEnd);
+    await setupShip(shipSymbol: shipASymbol, start: aStart, end: aEnd);
 
     /// Sets up a ship X-B with a route from S-C-A to S-B-W.
     final shipBSymbol = ShipSymbol.fromString('X-B');
     final bStart = WaypointSymbol.fromString('S-C-A');
     final bEnd = WaypointSymbol.fromString('S-B-W');
-    setupShip(shipSymbol: shipBSymbol, start: bStart, end: bEnd);
+    await setupShip(shipSymbol: shipBSymbol, start: bStart, end: bEnd);
 
     // Test that from S-A-A we avoid S-A-W and S-B-W.
     final otherSystems =
@@ -112,7 +116,7 @@ void main() {
     expect(otherSystems2, [bStart.system]); // From nav.waypointSymbol
 
     // Remove shipB and we should avoid nothing.
-    behaviorCache.deleteBehavior(shipBSymbol);
+    await behaviorCache.deleteBehavior(shipBSymbol);
     final otherSystems3 =
         centralCommand.otherCharterSystems(shipASymbol).toList();
     expect(otherSystems3, <SystemSymbol>[]);
@@ -120,7 +124,7 @@ void main() {
     final shipCSymbol = ShipSymbol.fromString('X-C');
     final cStart = WaypointSymbol.fromString('S-D-A');
     final cEnd = WaypointSymbol.fromString('S-E-W');
-    setupShip(shipSymbol: shipCSymbol, start: cStart, end: cEnd);
+    await setupShip(shipSymbol: shipCSymbol, start: cStart, end: cEnd);
     final otherSystems4 =
         centralCommand.otherCharterSystems(shipASymbol).toList();
     expect(
@@ -304,17 +308,15 @@ void main() {
 
   test('dealsInProgress smoke test', () {
     final deal = _MockCostedDeal();
+    final db = _MockDatabase();
     final cache = BehaviorCache(
-      {
-        ShipSymbol.fromString('X-A'):
-            BehaviorState(ShipSymbol.fromString('X-A'), Behavior.miner),
-        ShipSymbol.fromString('X-B'):
-            BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
-        ShipSymbol.fromString('X-C'):
-            BehaviorState(ShipSymbol.fromString('X-C'), Behavior.trader)
-              ..deal = deal,
-      },
-      fs: MemoryFileSystem.test(),
+      [
+        BehaviorState(ShipSymbol.fromString('X-A'), Behavior.miner),
+        BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
+        BehaviorState(ShipSymbol.fromString('X-C'), Behavior.trader)
+          ..deal = deal,
+      ],
+      db,
     );
     final deals = cache.dealsInProgress();
     expect(deals.length, 1);
