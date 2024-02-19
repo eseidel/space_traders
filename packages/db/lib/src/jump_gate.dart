@@ -12,13 +12,13 @@ Query upsertJumpGateQuery(JumpGate jumpGate) => Query(
       '''
       INSERT INTO jump_gate_ (
         symbol,
-        connections,
+        connections
       ) VALUES (
         @symbol,
-        @connections,
+        @connections
       )
       ON CONFLICT (symbol) DO UPDATE SET
-        connections = @connections,
+        connections = @connections
       ''',
       parameters: jumpGateToColumnMap(jumpGate),
     );
@@ -31,10 +31,18 @@ Query getJumpGateQuery(WaypointSymbol waypointSymbol) => Query(
 
 /// Convert a jump gate to a column map.
 Map<String, dynamic> jumpGateToColumnMap(JumpGate jumpGate) {
-  return jumpGate.toJson();
+  return {
+    'symbol': jumpGate.waypointSymbol.toJson(),
+    'connections': jumpGate.connections.map((c) => c.toJson()).toList()..sort(),
+  };
 }
 
 /// Convert a result row to a jump gate.
 JumpGate jumpGateFromColumnMap(Map<String, dynamic> values) {
-  return JumpGate.fromJson(values);
+  return JumpGate(
+    waypointSymbol: WaypointSymbol.fromJson(values['symbol'] as String),
+    connections: (values['connections'] as List<String>)
+        .map(WaypointSymbol.fromJson)
+        .toSet(),
+  );
 }

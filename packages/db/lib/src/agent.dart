@@ -12,9 +12,9 @@ Query agentBySymbolQuery(String agentSymbol) => Query(
 /// Convert an agent to a map of column values.
 Map<String, dynamic> agentToColumnMap(Agent agent) => {
       'symbol': agent.symbol,
-      'headquarters': agent.headquarters,
+      'headquarters': agent.headquarters.toJson(),
       'credits': agent.credits,
-      'starting_faction': agent.startingFaction,
+      'starting_faction': agent.startingFaction.toJson(),
       'ship_count': agent.shipCount,
       'account_id': agent.accountId,
     };
@@ -23,7 +23,7 @@ Map<String, dynamic> agentToColumnMap(Agent agent) => {
 Agent agentFromColumnMap(Map<String, dynamic> values) {
   return Agent(
     symbol: values['symbol'] as String,
-    headquarters: WaypointSymbol.fromString(values['headquarters'] as String),
+    headquarters: WaypointSymbol.fromJson(values['headquarters'] as String),
     credits: values['credits'] as int,
     startingFaction:
         FactionSymbol.fromJson(values['starting_faction'] as String)!,

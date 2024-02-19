@@ -88,10 +88,9 @@ Future<bool> _isMissingRecentShipyardData(
 
 /// Returns the symbol of a waypoint in the system missing a chart.
 Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
+  Database db,
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketPrices marketPrices,
-  ShipyardPrices shipyardPrices,
   Ship ship,
   System system, {
   required Duration maxAge,
@@ -130,8 +129,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
       shipInfo(ship, '$waypointSymbol is missing chart, routing.');
       return waypointSymbol;
     }
-    if (waypoint.hasMarketplace &&
-        !marketPrices.hasRecentData(waypointSymbol, maxAge: maxAge)) {
+    if (await _isMissingRecentMarketData(db, waypoint, maxAge: maxAge)) {
       shipInfo(
         ship,
         '$waypointSymbol is missing recent '
@@ -140,8 +138,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
       );
       return waypointSymbol;
     }
-    if (waypoint.hasShipyard &&
-        !shipyardPrices.hasRecentData(waypointSymbol, maxAge: maxAge)) {
+    if (await _isMissingRecentShipyardData(db, waypoint, maxAge: maxAge)) {
       shipInfo(
         ship,
         '$waypointSymbol is missing recent '
@@ -242,10 +239,9 @@ Future<JobResult> doSystemWatcher(
 
   // Walk our nearby waypoints looking for one that needs refresh.
   final destinationSymbol = await waypointSymbolNeedingUpdate(
+    db,
     caches.systems,
     caches.charting,
-    caches.marketPrices,
-    caches.shipyardPrices,
     ship,
     caches.systems[systemSymbol],
     waypointCache: caches.waypoints,
