@@ -10,7 +10,7 @@ import 'package:types/types.dart';
 /// In-memory cache of ships.
 class ShipSnapshot {
   /// Creates a new ship cache.
-  ShipSnapshot(Iterable<Ship> ships) : ships = List.unmodifiable(ships);
+  ShipSnapshot(Iterable<Ship> ships) : ships = List.of(ships);
 
   /// Loads the ship cache from the provided [db].
   static Future<ShipSnapshot> load(Database db) async {

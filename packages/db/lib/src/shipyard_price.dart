@@ -21,7 +21,7 @@ Map<String, dynamic> shipyardPriceToColumnMap(ShipyardPrice price) => {
       'waypoint_symbol': price.waypointSymbol.toJson(),
       'ship_type': price.shipType.toJson(),
       'purchase_price': price.purchasePrice,
-      'timestamp': price.timestamp.toIso8601String(),
+      'timestamp': price.timestamp,
     };
 
 /// Build a shipyard price from a column map.
@@ -31,6 +31,6 @@ ShipyardPrice shipyardPriceFromColumnMap(Map<String, dynamic> values) {
         WaypointSymbol.fromString(values['waypoint_symbol'] as String),
     shipType: ShipType.fromJson(values['ship_type'] as String)!,
     purchasePrice: values['purchase_price'] as int,
-    timestamp: DateTime.parse(values['timestamp'] as String),
+    timestamp: values['timestamp'] as DateTime,
   );
 }

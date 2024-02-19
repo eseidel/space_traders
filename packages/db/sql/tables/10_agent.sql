@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS "agent_" (
   -- The faction of the agent.
   "starting_faction" text NOT NULL,
   -- How many ships the agent has.
-  "shipCount" int NOT NULL,
+  "ship_count" int NOT NULL,
   -- account id for this agent, only visible for your own agent.
   "account_id" text
 );

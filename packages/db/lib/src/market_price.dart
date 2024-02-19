@@ -45,7 +45,7 @@ Map<String, dynamic> marketPriceToColumnMap(MarketPrice price) => {
       'purchase_price': price.purchasePrice,
       'sell_price': price.sellPrice,
       'trade_volume': price.tradeVolume,
-      'timestamp': price.timestamp.toIso8601String(),
+      'timestamp': price.timestamp,
       'activity': price.activity?.toJson(),
     };
 
