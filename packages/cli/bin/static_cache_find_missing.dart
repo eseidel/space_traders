@@ -14,7 +14,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
   final staticCaches = StaticCaches.load(fs);
 
   final ship = shipCache.ships.first;

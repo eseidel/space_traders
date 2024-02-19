@@ -53,7 +53,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       behaviorCache.states.where((s) => s.behavior == Behavior.systemWatcher);
   final systemsCache = SystemsCache.load(fs)!;
   // final marketPrices = MarketPrices.load(fs);
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
 
   logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');
   for (final state in systemWatcherStates) {

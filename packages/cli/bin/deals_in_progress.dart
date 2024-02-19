@@ -83,7 +83,7 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
   }
   logger.info(table.toString());
 
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
   final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache)
       .map((s) => s.hexNumber)
       .toList();

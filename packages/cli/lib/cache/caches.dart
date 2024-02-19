@@ -75,7 +75,8 @@ class Caches {
   final MarketPrices marketPrices;
 
   /// The ship cache.
-  final ShipCache ships;
+  // TODO(eseidel): Try not caching ships and just fetching from db.
+  ShipSnapshot ships;
 
   /// The contract cache.
   ContractSnapshot contracts;
@@ -133,7 +134,7 @@ class Caches {
   }) async {
     final agent = await AgentCache.loadOrFetch(db, api);
     // Intentionally do not load ships from disk (they change too often).
-    final ships = await ShipCache.loadOrFetch(api, fs: fs, forceRefresh: true);
+    final ships = await fetchShips(db, api);
     final marketPrices = await MarketPrices.load(db);
     final shipyardPrices = await ShipyardPrices.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
@@ -210,7 +211,7 @@ class Caches {
     // that false positive.  This check is called at the top of every loop
     // and might notice that a ship has arrived before the ship logic gets
     // to run and update the status.
-    await ships.ensureUpToDate(api);
+    ships = await ships.ensureUpToDate(db, api);
     await agent.ensureAgentUpToDate(api);
     contracts = await contracts.ensureUpToDate(db, api);
 

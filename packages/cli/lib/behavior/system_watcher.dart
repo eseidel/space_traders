@@ -12,7 +12,7 @@ import 'package:types/types.dart';
 /// Logic for assigning systems to system watchers.
 Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   MarketListingSnapshot marketListings,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
 ) {
   // Find systems with at least 5 markets.
   final systemsWithEnoughMarkets = marketListings.systemsWithAtLeastNMarkets(5);

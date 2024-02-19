@@ -1,71 +1,30 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/cache/response_cache.dart';
 import 'package:cli/cache/static_cache.dart';
+import 'package:cli/compare.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/ships.dart';
-import 'package:file/file.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// In-memory cache of ships.
-// Should this just be called Fleet?
-class ShipCache extends ResponseListCache<Ship> {
+class ShipSnapshot {
   /// Creates a new ship cache.
-  ShipCache(
-    super.ships, {
-    required super.fs,
-    super.path = defaultPath,
-  }) : super(refreshEntries: (Api api) => allMyShips(api).toList());
+  ShipSnapshot(Iterable<Ship> ships) : ships = List.unmodifiable(ships);
 
-  /// Loads a ShipCache from cache if it exists.
-  static ShipCache? load(
-    FileSystem fs, {
-    String path = defaultPath,
-  }) {
-    final ships = JsonListStore.loadRecords<Ship>(
-      fs,
-      path,
-      (j) => Ship.fromJson(j)!,
-    );
-    if (ships != null) {
-      return ShipCache(ships, fs: fs, path: path);
-    }
-    return null;
+  /// Loads the ship cache from the provided [db].
+  static Future<ShipSnapshot> load(Database db) async {
+    final ships = await db.allShips();
+    return ShipSnapshot(ships);
   }
-
-  /// Creates a new ShipCache from the Api or FileSystem if provided.
-  static Future<ShipCache> loadOrFetch(
-    Api api, {
-    required FileSystem fs,
-    String path = defaultPath,
-    bool forceRefresh = false,
-  }) async {
-    if (!forceRefresh) {
-      final cached = load(fs, path: path);
-      if (cached != null) {
-        return cached;
-      }
-    }
-    final ships = await allMyShips(api).toList();
-    return ShipCache(ships, fs: fs, path: path);
-  }
-
-  /// The default path to the contracts cache.
-  static const String defaultPath = 'data/ships.json';
 
   /// Ships in the cache.
-  List<Ship> get ships => records;
+  final List<Ship> ships;
 
-  /// Updates a single ship in the cache.
-  void updateShip(Ship ship) {
-    final index = ships.indexWhere((s) => s.symbol == ship.symbol);
-    if (index == -1) {
-      ships.add(ship);
-    } else {
-      ships[index] = ship;
-    }
-    save();
-  }
+  /// Number of requests between checks to ensure ships are up to date.
+  final int requestsBetweenChecks = 100;
+
+  int _requestsSinceLastCheck = 0;
 
   /// Returns a map of ship frame type to count in fleet.
   // TODO(eseidel): Unclear if this is still needed.
@@ -119,6 +78,40 @@ class ShipCache extends ResponseListCache<Ship> {
   /// Returns the ship for the provided ShipSymbol.
   Ship operator [](ShipSymbol symbol) =>
       ships.firstWhere((s) => s.shipSymbol == symbol);
+
+  /// Fetches a new snapshot and logs if different from this one.
+  // TODO(eseidel): This does not belong in this class.
+  Future<ShipSnapshot> ensureUpToDate(Database db, Api api) async {
+    _requestsSinceLastCheck++;
+    if (_requestsSinceLastCheck < requestsBetweenChecks) {
+      return this;
+    }
+    _requestsSinceLastCheck = 0;
+
+    final newShips = await fetchShips(db, api);
+    final newShipsJson = newShips.ships.map((c) => c.toJson()).toList();
+    final oldShipsJson = ships.map((c) => c.toJson()).toList();
+    // Our contracts class has a timestamp which we don't want to compare, so
+    // compare the OpenAPI JSON instead.
+    if (jsonMatches(newShipsJson, oldShipsJson)) {
+      logger.warn('Contracts changed, updating cache.');
+      return newShips;
+    }
+    return this;
+  }
+
+  // TODO(eseidel): This should not exist.  We don't need to pass the
+  // ShipSnapshot around everywhere we should just pass the ship and then update
+  // the ship when we're done in the db.
+  /// Updates the provided [ship] in the cache and database.
+  void updateShip(Database db, Ship ship) {
+    final index = ships.indexWhere((s) => s.shipSymbol == ship.shipSymbol);
+    if (index == -1) {
+      throw ArgumentError('Ship not found: $ship');
+    }
+    ships[index] = ship;
+    db.upsertShip(ship);
+  }
 }
 
 /// Returns a map of ship frame type to count in fleet.
@@ -146,4 +139,13 @@ String describeShips(List<Ship> ships) {
     return '0 ships';
   }
   return frameNames;
+}
+
+/// Creates a new ShipCache from the Api or FileSystem if provided.
+Future<ShipSnapshot> fetchShips(Database db, Api api) async {
+  final ships = await allMyShips(api).toList();
+  for (final ship in ships) {
+    await db.upsertShip(ship);
+  }
+  return ShipSnapshot(ships);
 }

@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
@@ -7,22 +7,24 @@ import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped/scoped.dart';
+import 'package:types/api.dart';
 import 'package:ui/route.dart';
 
 const fs = LocalFileSystem();
 late SystemsCache systemsCache;
-late ShipCache shipCache;
+late ShipSnapshot shipCache;
 
 const shipsUrl = 'http://localhost:8080/ships';
 
-Future<ShipCache> loadShips() async {
-  final cached = ShipCache.load(fs);
-  if (cached != null) {
-    return cached;
-  }
+Future<ShipSnapshot> loadShips() async {
   final response = await http.get(Uri.parse(shipsUrl));
-  File(ShipCache.defaultPath).writeAsBytesSync(response.bodyBytes);
-  return ShipCache.load(fs)!;
+  if (response.statusCode != 200) {
+    throw Exception('Failed to load ships');
+  }
+  final ships = (jsonDecode(response.body) as List)
+      .map((e) => Ship.fromJson(e as Map<String, dynamic>)!)
+      .toList();
+  return ShipSnapshot(ships);
 }
 
 void main() async {

@@ -22,7 +22,7 @@ class _MockMarketPrices extends Mock implements MarketPrices {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockShipCache extends Mock implements ShipSnapshot {}
 
 class _MockShipEngineCache extends Mock implements ShipEngineCache {}
 

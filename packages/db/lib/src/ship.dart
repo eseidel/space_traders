@@ -1,0 +1,37 @@
+import 'package:db/src/query.dart';
+import 'package:types/types.dart';
+
+/// Get all ships from the database.
+Query allShipsQuery() => const Query('SELECT * FROM ships');
+
+/// Get a ship by its [symbol] from the database.
+Query shipBySymbolQuery(ShipSymbol symbol) => Query(
+      'SELECT * FROM ships WHERE symbol = @symbol',
+      parameters: {
+        'symbol': symbol.toJson(),
+      },
+    );
+
+/// Upsert a ship into the database.
+Query upsertShipQuery(Ship ship) => Query(
+      '''
+      INSERT INTO ships (symbol, json)
+      VALUES (@symbol, @json)
+      ON CONFLICT (symbol) DO UPDATE SET json = @json
+      ''',
+      parameters: {
+        'symbol': ship.shipSymbol.toJson(),
+        'json': ship.toJson(),
+      },
+    );
+
+/// Convert a Ship to a column map.
+Map<String, dynamic> shipToColumnMap(Ship ship) => {
+      'symbol': ship.shipSymbol.toJson(),
+      'json': ship.toJson(),
+    };
+
+/// Convert a result row to a Ship.
+Ship shipFromColumnMap(Map<String, dynamic> values) {
+  return Ship.fromJson(values['json'] as Map<String, dynamic>)!;
+}

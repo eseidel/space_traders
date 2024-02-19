@@ -100,7 +100,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   final filter = filterFromArgs(argResults.rest);
   final behaviorCache = await BehaviorCache.load(db);
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
 
   logger.info('Fleet: ${describeShips(shipCache.ships)}');
   final ships = shipCache.ships;

@@ -49,7 +49,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final charterStates =
       behaviorCache.states.where((s) => s.behavior == Behavior.charter);
   final systemsCache = SystemsCache.load(fs)!;
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
 
   logger.info('${plural(charterStates.length, 'charter')}:');
   for (final state in charterStates) {

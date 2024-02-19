@@ -21,7 +21,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   Database db,
   MarketPrices marketPrices,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   MarketTradeGood marketGood,
   TradeSymbol neededTradeSymbol, {
@@ -308,7 +308,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
   Database db,
   AgentCache agentCache,
   ContractSnapshot contractSnapshot,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   Contract beforeDelivery,
   ContractDeliverGood goods,
@@ -445,7 +445,7 @@ Future<SupplyConstruction201ResponseData?>
   Database db,
   AgentCache agentCache,
   ConstructionCache constructionCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   Construction construction,
   TradeSymbol tradeSymbol, {
@@ -478,6 +478,7 @@ Future<SupplyConstruction201ResponseData?>
 
   // And we have the desired cargo.
   final response = await supplyConstruction(
+    db,
     api,
     ship,
     shipCache,
@@ -497,7 +498,7 @@ Future<SupplyConstruction201ResponseData?>
 
   // Update our cargo counts after delivering the contract goods.
   ship.cargo = response.cargo;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
 
   // Record the delivery transaction.
   final delivery = ConstructionDelivery(
@@ -555,7 +556,7 @@ Future<DateTime?> acceptContractsIfNeeded(
   ContractSnapshot contractSnapshot,
   MarketPrices marketPrices,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
@@ -650,7 +651,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       'No nearby market to sell ${unwantedCargo.symbol}, jetisoning cargo!',
     );
     // Only jettison the item we don't know how to sell, others might sell.
-    await jettisonCargoAndLog(api, caches.ships, ship, unwantedCargo);
+    await jettisonCargoAndLog(db, api, caches.ships, ship, unwantedCargo);
     if (ship.cargo.isEmpty) {
       return JobResult.complete();
     }

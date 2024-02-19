@@ -56,7 +56,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     ..sort();
   final behaviorCache = await BehaviorCache.load(db);
 
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
   final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
   logger
     ..info('Fleet: ${describeShips(shipCache.ships)}')

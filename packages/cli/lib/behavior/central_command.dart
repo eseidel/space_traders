@@ -33,12 +33,12 @@ class CentralCommand {
   /// Create a new central command.
   CentralCommand({
     required BehaviorCache behaviorCache,
-    required ShipCache shipCache,
+    required ShipSnapshot shipCache,
   })  : _behaviorCache = behaviorCache,
         _shipCache = shipCache;
 
   final BehaviorCache _behaviorCache;
-  final ShipCache _shipCache;
+  final ShipSnapshot _shipCache;
   bool _haveEscapedStartingSystem = false;
 
   /// Per-system price age data used by system watchers.
@@ -850,7 +850,7 @@ Iterable<SellOpp> sellOppsForConstruction(
 
 /// Returns the ship symbols for all idle haulers.
 List<ShipSymbol> idleHaulerSymbols(
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   BehaviorCache behaviorCache,
 ) {
   final haulerSymbols =
@@ -901,7 +901,7 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
   SystemsCache systemsCache,
   ChartingCache chartingCache,
   MarketListingSnapshot marketListings,
-  ShipCache shipCache, {
+  ShipSnapshot shipCache, {
   required SystemSymbol systemSymbol,
 }) async {
   // Look at the top N mining scores.
@@ -941,7 +941,7 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
 
 /// Returns the next ship to buy from the given [shipPlan].
 ShipType? shipToBuyFromPlan(
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   List<ShipType> shipPlan,
   ShipyardPrices shipyardPrices,
   ShipyardShipCache shipyardShips,

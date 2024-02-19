@@ -8,7 +8,7 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
   // For a given destination, compute the time to travel there for each ship.
   final destination = WaypointSymbol.fromString(argResults.rest[0]);
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
 

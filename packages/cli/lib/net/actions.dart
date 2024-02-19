@@ -34,32 +34,35 @@ bool _canCruiseTo(
 /// Navigate [ship] to [waypointSymbol] will retry in drift mode if
 /// there is insufficient fuel.
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
+  Database db,
   Api api,
   SystemsCache systemsCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
-  await undockIfNeeded(api, shipCache, ship);
+  await undockIfNeeded(db, api, shipCache, ship);
 
   final canCruise = _canCruiseTo(systemsCache, ship, waypointSymbol);
   final flightMode =
       canCruise ? ShipNavFlightMode.CRUISE : ShipNavFlightMode.DRIFT;
-  await setShipFlightModeIfNeeded(api, shipCache, ship, flightMode);
+  await setShipFlightModeIfNeeded(db, api, shipCache, ship, flightMode);
   if (!canCruise) {
     shipErr(ship, 'Insufficient fuel, drifting to $waypointSymbol');
   }
 
   try {
-    final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
+    final waitUntil =
+        await navigateShip(db, api, shipCache, ship, waypointSymbol);
     return waitUntil;
   } on ApiException catch (e) {
     if (!isInfuficientFuelException(e)) {
       rethrow;
     }
     shipErr(ship, 'Insufficient fuel, drifting to $waypointSymbol');
-    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.DRIFT);
-    final waitUntil = await navigateShip(api, shipCache, ship, waypointSymbol);
+    await setShipFlightMode(db, api, shipCache, ship, ShipNavFlightMode.DRIFT);
+    final waitUntil =
+        await navigateShip(db, api, shipCache, ship, waypointSymbol);
     return waitUntil;
   }
 }
@@ -68,10 +71,11 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
 Stream<SellCargo201ResponseData> sellAllCargo(
+  Database db,
   Api api,
   AgentCache agentCache,
   Market market,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship, {
   bool Function(TradeSymbol tradeSymbol)? where,
 }) async* {
@@ -101,6 +105,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
       final toSell = min(leftToSell, good.tradeVolume);
       leftToSell -= toSell;
       final response = await sellCargo(
+        db,
         api,
         agentCache,
         ship,
@@ -122,7 +127,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
   MarketPrices marketPrices,
   AgentCache agentCache,
   Market market,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   AccountingType accountingType, {
   bool Function(TradeSymbol tradeSymbol)? where,
@@ -133,8 +138,15 @@ Future<List<Transaction>> sellAllCargoAndLog(
   }
 
   final transactions = <Transaction>[];
-  await for (final response
-      in sellAllCargo(api, agentCache, market, shipCache, ship, where: where)) {
+  await for (final response in sellAllCargo(
+    db,
+    api,
+    agentCache,
+    market,
+    shipCache,
+    ship,
+    where: where,
+  )) {
     final marketTransaction = response.transaction;
     final agent = Agent.fromOpenApi(response.agent);
     logMarketTransaction(ship, marketPrices, agent, marketTransaction);
@@ -151,8 +163,9 @@ Future<List<Transaction>> sellAllCargoAndLog(
 
 /// Jettison a specific cargo item.
 Future<void> jettisonCargoAndLog(
+  Database db,
   Api api,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   // This could be a tradeSymbol, but using the item seems less error prone?
   ShipCargoItem item,
@@ -164,7 +177,7 @@ Future<void> jettisonCargoAndLog(
         JettisonRequest(symbol: item.tradeSymbol, units: item.units),
   );
   ship.cargo = response!.data.cargo;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
 }
 
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
@@ -173,7 +186,7 @@ Future<Transaction?> purchaseCargoAndLog(
   Database db,
   MarketPrices marketPrices,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int amountToBuy,
@@ -182,6 +195,7 @@ Future<Transaction?> purchaseCargoAndLog(
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
   try {
     final data = await purchaseCargo(
+      db,
       api,
       agentCache,
       shipCache,
@@ -220,14 +234,20 @@ Future<Transaction?> purchaseCargoAndLog(
 Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
   Database db,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   AgentCache agentCache,
   Ship ship,
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
 ) async {
-  final result =
-      await purchaseShip(api, shipCache, agentCache, shipyardSymbol, shipType);
+  final result = await purchaseShip(
+    db,
+    api,
+    shipCache,
+    agentCache,
+    shipyardSymbol,
+    shipType,
+  );
   final agent = Agent.fromOpenApi(result.agent);
   logShipyardTransaction(ship, agent, result.transaction);
   shipErr(ship, 'Bought ship: ${result.ship.symbol}');
@@ -315,7 +335,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Database db,
   MarketPrices marketPrices,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Market market,
   Ship ship,
 ) async {
@@ -339,7 +359,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
     return null;
   }
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
-  final data = await refuelShip(api, agentCache, shipCache, ship);
+  final data = await refuelShip(db, api, agentCache, shipCache, ship);
   final marketTransaction = data.transaction;
   final agent = agentCache.agent;
   logMarketTransaction(
@@ -358,29 +378,39 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   // Reset flight mode on refueling.
   if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
     shipInfo(ship, 'Resetting flight mode to cruise');
-    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.CRUISE);
+    await setShipFlightMode(db, api, shipCache, ship, ShipNavFlightMode.CRUISE);
   }
   return data;
 }
 
 /// Dock the ship if needed and log the transaction
-Future<void> dockIfNeeded(Api api, ShipCache shipCache, Ship ship) async {
+Future<void> dockIfNeeded(
+  Database db,
+  Api api,
+  ShipSnapshot shipCache,
+  Ship ship,
+) async {
   if (ship.isOrbiting) {
     shipDetail(ship, '🛬 at ${ship.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol);
     ship.nav = response!.data.nav;
-    shipCache.updateShip(ship);
+    shipCache.updateShip(db, ship);
   }
 }
 
 /// Undock the ship if needed and log the transaction
-Future<void> undockIfNeeded(Api api, ShipCache shipCache, Ship ship) async {
+Future<void> undockIfNeeded(
+  Database db,
+  Api api,
+  ShipSnapshot shipCache,
+  Ship ship,
+) async {
   if (ship.isDocked) {
     // Extra space after emoji is needed for windows powershell.
     shipDetail(ship, '🛰️  at ${ship.waypointSymbol}');
     final response = await api.fleet.orbitShip(ship.symbol);
     ship.nav = response!.data.nav;
-    shipCache.updateShip(ship);
+    shipCache.updateShip(db, ship);
   }
 }
 
@@ -433,13 +463,15 @@ void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
 
 /// Navigate to the waypoint and log to the ship's log
 Future<DateTime> navigateToLocalWaypointAndLog(
+  Database db,
   Api api,
   SystemsCache systemsCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   SystemWaypoint waypoint,
 ) async {
   final result = await navigateToLocalWaypoint(
+    db,
     api,
     systemsCache,
     shipCache,
@@ -488,12 +520,12 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   Database db,
   MarketPrices marketPrices,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   WaypointSymbol destination,
 ) async {
   // Using a jump gate requires us to be in orbit.
-  await undockIfNeeded(api, shipCache, ship);
+  await undockIfNeeded(db, api, shipCache, ship);
 
   final destinationSystem = destination.system;
   shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $destinationSystem');
@@ -505,7 +537,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   ship
     ..nav = response!.data.nav
     ..cooldown = response.data.cooldown;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
 
   final data = response.data;
   final marketTransaction = data.transaction;
@@ -538,10 +570,10 @@ Future<Contract> negotiateContractAndLog(
   Database db,
   Api api,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   ContractSnapshot contractSnapshot,
 ) async {
-  await dockIfNeeded(api, shipCache, ship);
+  await dockIfNeeded(db, api, shipCache, ship);
   final response = await api.fleet.negotiateContract(ship.symbol);
   final contractData = response!.data;
   final contract =
@@ -592,7 +624,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
   Api api,
   Database db,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   ShipMountSymbolEnum tradeSymbol,
 ) async {
@@ -605,7 +637,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   logShipModificationTransaction(ship, agentCache.agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
@@ -620,7 +652,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
   Api api,
   Database db,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   ShipMountSymbolEnum tradeSymbol,
 ) async {
@@ -633,7 +665,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   logShipModificationTransaction(ship, agentCache.agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
@@ -645,8 +677,9 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
 
 /// Transfer cargo between two ships.
 Future<Jettison200ResponseData> transferCargoAndLog(
+  Database db,
   Api api,
-  ShipCache cache, {
+  ShipSnapshot cache, {
   required Ship from,
   required Ship to,
   required TradeSymbol tradeSymbol,
@@ -672,8 +705,8 @@ Future<Jettison200ResponseData> transferCargoAndLog(
   from.cargo = data.cargo;
   to.updateCacheWithAddedCargo(tradeSymbol, units);
   cache
-    ..updateShip(from)
-    ..updateShip(to);
+    ..updateShip(db, from)
+    ..updateShip(db, to);
   shipDetail(
       from,
       'Transferred $units $tradeSymbol from ${from.symbol} to '
@@ -700,16 +733,16 @@ void recordSurveys(
 
 /// Record the survey and log.
 Future<CreateSurvey201ResponseData> surveyAndLog(
-  Api api,
   Database db,
-  ShipCache shipCache,
+  Api api,
+  ShipSnapshot shipCache,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final outer = await api.fleet.createSurvey(ship.symbol);
   final response = outer!.data;
   ship.cooldown = response.cooldown;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   final count = response.surveys.length;
   shipDetail(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
   recordSurveys(db, response.surveys, getNow: getNow);
@@ -718,8 +751,9 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
 
 /// Set the [flightMode] of [ship] if it is not already set to [flightMode]
 Future<ShipNav?> setShipFlightModeIfNeeded(
+  Database db,
   Api api,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   ShipNavFlightMode flightMode,
 ) async {
@@ -727,5 +761,5 @@ Future<ShipNav?> setShipFlightModeIfNeeded(
     return null;
   }
   shipInfo(ship, 'Setting flightMode to $flightMode');
-  return setShipFlightMode(api, shipCache, ship, flightMode);
+  return setShipFlightMode(db, api, shipCache, ship, flightMode);
 }

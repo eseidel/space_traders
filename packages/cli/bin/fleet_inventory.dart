@@ -8,7 +8,7 @@ Future<void> main(List<String> args) async {
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
   final countByTradeSymbol = <TradeSymbol, int>{};
   final ships = shipCache.ships;

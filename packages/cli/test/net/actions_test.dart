@@ -34,7 +34,7 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockShipCache extends Mock implements ShipSnapshot {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
@@ -71,6 +71,7 @@ void main() {
     final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
     const shipType = ShipType.PROBE;
     await purchaseShip(
+      db,
       api,
       shipCache,
       agentCache,
@@ -78,14 +79,15 @@ void main() {
       shipType,
     );
     verify(
-      () => shipCache.updateShip(responseData.ship),
+      () => shipCache.updateShip(db, responseData.ship),
     ).called(1);
     expect(agentCache.agent, agent2);
   });
 
   test('setShipFlightMode', () async {
-    final Api api = _MockApi();
-    final FleetApi fleetApi = _MockFleetApi();
+    final db = _MockDatabase();
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
     final ship = _MockShip();
@@ -100,11 +102,12 @@ void main() {
     );
     final shipCache = _MockShipCache();
 
-    await setShipFlightMode(api, shipCache, ship, ShipNavFlightMode.CRUISE);
+    await setShipFlightMode(db, api, shipCache, ship, ShipNavFlightMode.CRUISE);
     verify(() => ship.nav = shipNav).called(1);
   });
 
   test('undockIfNeeded', () async {
+    final db = _MockDatabase();
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -123,15 +126,16 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final shipCache = _MockShipCache();
     final logger = _MockLogger();
-    await runWithLogger(logger, () => undockIfNeeded(api, shipCache, ship));
+    await runWithLogger(logger, () => undockIfNeeded(db, api, shipCache, ship));
     verifyNever(() => fleetApi.orbitShip(any()));
 
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    await runWithLogger(logger, () => undockIfNeeded(api, shipCache, ship));
+    await runWithLogger(logger, () => undockIfNeeded(db, api, shipCache, ship));
     verify(() => fleetApi.orbitShip(any())).called(1);
   });
 
   test('dockIfNeeded', () async {
+    final db = _MockDatabase();
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -150,15 +154,16 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final logger = _MockLogger();
-    await runWithLogger(logger, () => dockIfNeeded(api, shipCache, ship));
+    await runWithLogger(logger, () => dockIfNeeded(db, api, shipCache, ship));
     verifyNever(() => fleetApi.dockShip(any()));
 
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    await runWithLogger(logger, () => dockIfNeeded(api, shipCache, ship));
+    await runWithLogger(logger, () => dockIfNeeded(db, api, shipCache, ship));
     verify(() => fleetApi.dockShip(any())).called(1);
   });
 
   test('navigateToLocalWaypoint does not change nav mode for probes', () async {
+    final db = _MockDatabase();
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -205,6 +210,7 @@ void main() {
     await runWithLogger(
       logger,
       () => navigateToLocalWaypoint(
+        db,
         api,
         systemsCache,
         shipCache,
@@ -222,6 +228,7 @@ void main() {
   });
 
   test('transferCargoAndLog', () async {
+    final db = _MockDatabase();
     final shipCargo = ShipCargo(capacity: 100, units: 10);
     final fromSymbol = ShipSymbol.fromString('S-1');
     final fromShip = _MockShip();
@@ -261,6 +268,7 @@ void main() {
     final _ = await runWithLogger(
       logger,
       () => transferCargoAndLog(
+        db,
         api,
         shipCache,
         from: fromShip,
@@ -647,6 +655,7 @@ void main() {
   });
 
   test('jettisonCargoAndLog', () async {
+    final db = _MockDatabase();
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -692,7 +701,7 @@ void main() {
     );
 
     await runWithLogger(logger, () async {
-      await jettisonCargoAndLog(api, shipCache, ship, itemOne);
+      await jettisonCargoAndLog(db, api, shipCache, ship, itemOne);
     });
     verify(
       () => fleetApi.jettison(

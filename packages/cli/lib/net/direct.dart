@@ -14,8 +14,9 @@ import 'package:types/types.dart';
 
 /// Purchase a ship of type [shipType] at [shipyardSymbol]
 Future<PurchaseShip201ResponseData> purchaseShip(
+  Database db,
   Api api,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   AgentCache agentCache,
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
@@ -28,15 +29,16 @@ Future<PurchaseShip201ResponseData> purchaseShip(
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
   final data = purchaseResponse!.data;
   // Add the new ship to our cache.
-  shipCache.updateShip(data.ship);
+  shipCache.updateShip(db, data.ship);
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
 
 /// Set the [flightMode] of [ship]
 Future<ShipNav> setShipFlightMode(
+  Database db,
   Api api,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   ShipNavFlightMode flightMode,
 ) async {
@@ -44,14 +46,15 @@ Future<ShipNav> setShipFlightMode(
   final response =
       await api.fleet.patchShipNav(ship.symbol, patchShipNavRequest: request);
   ship.nav = response!.data;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return response.data;
 }
 
 /// Navigate [ship] to [waypointSymbol]
 Future<NavigateShip200ResponseData> navigateShip(
+  Database db,
   Api api,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
@@ -62,45 +65,48 @@ Future<NavigateShip200ResponseData> navigateShip(
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return data;
 }
 
 /// Siphon resources from gas giant with [ship]
 Future<SiphonResources201ResponseData> siphonResources(
+  Database db,
   Api api,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
 ) async {
   final response = await api.fleet.siphonResources(ship.symbol);
   ship
     ..cargo = response!.data.cargo
     ..cooldown = response.data.cooldown;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return response.data;
 }
 
 /// Extract resources from asteroid with [ship]
 /// Does not use a survey.
 Future<ExtractResources201ResponseData> extractResources(
+  Database db,
   Api api,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
 ) async {
   final response = await api.fleet.extractResources(ship.symbol);
   ship
     ..cargo = response!.data.cargo
     ..cooldown = response.data.cooldown;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return response.data;
 }
 
 /// Extract resources from asteroid with [ship]
 /// Uses a survey.
 Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
+  Database db,
   Api api,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Survey survey,
 ) async {
   final response =
@@ -108,7 +114,7 @@ Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
   ship
     ..cargo = response!.data.cargo
     ..cooldown = response.data.cooldown;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return response.data;
 }
 
@@ -117,7 +123,7 @@ Future<DeliverContract200ResponseData> deliverContract(
   Database db,
   Api api,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   ContractSnapshot contractSnapshot,
   Contract contract, {
   required TradeSymbol tradeSymbol,
@@ -135,15 +141,16 @@ Future<DeliverContract200ResponseData> deliverContract(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
   ship.cargo = data.cargo;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return data;
 }
 
 /// Deliver [units] of [tradeSymbol] to [construction]
 Future<SupplyConstruction201ResponseData> supplyConstruction(
+  Database db,
   Api api,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   ConstructionCache constructionCache,
   Construction construction, {
   required TradeSymbol tradeSymbol,
@@ -165,16 +172,17 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
     data.construction,
   );
   ship.cargo = data.cargo;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return data;
 }
 
 /// Sell [units] of [tradeSymbol] to market.
 Future<SellCargo201ResponseData> sellCargo(
+  Database db,
   Api api,
   AgentCache agentCache,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   TradeSymbol tradeSymbol,
   int units,
 ) async {
@@ -186,7 +194,7 @@ Future<SellCargo201ResponseData> sellCargo(
       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -195,9 +203,10 @@ Future<SellCargo201ResponseData> sellCargo(
 /// Returns the response data.
 /// Throws an exception if the purchase fails.
 Future<SellCargo201ResponseData> purchaseCargo(
+  Database db,
   Api api,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int units,
@@ -210,7 +219,7 @@ Future<SellCargo201ResponseData> purchaseCargo(
       await api.fleet.purchaseCargo(ship.symbol, purchaseCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -219,9 +228,10 @@ Future<SellCargo201ResponseData> purchaseCargo(
 /// Returns the response data.
 /// Throws an exception if the refuel fails.
 Future<RefuelShip200ResponseData> refuelShip(
+  Database db,
   Api api,
   AgentCache agentCache,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Ship ship,
 ) async {
   // We used to have logic to avoid filling to full, but our route planner
@@ -231,6 +241,6 @@ Future<RefuelShip200ResponseData> refuelShip(
   final data = responseWrapper!.data;
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;
-  shipCache.updateShip(ship);
+  shipCache.updateShip(db, ship);
   return data;
 }

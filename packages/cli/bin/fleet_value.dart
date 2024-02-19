@@ -36,7 +36,7 @@ Map<ShipType, int> _shipTypeCounts(
 
 Future<void> command(FileSystem fs, ArgResults argResults) async {
   final db = await defaultDatabase();
-  final shipCache = ShipCache.load(fs)!;
+  final shipCache = await ShipSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
   final shipyardPrices = await ShipyardPrices.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);

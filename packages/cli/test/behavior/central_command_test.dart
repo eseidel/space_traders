@@ -29,7 +29,7 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockShipCache extends Mock implements ShipCache {}
+class _MockShipCache extends Mock implements ShipSnapshot {}
 
 class _MockShipFrame extends Mock implements ShipFrame {}
 

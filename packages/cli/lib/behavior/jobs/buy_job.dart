@@ -112,7 +112,7 @@ Future<JobResult> doBuyJob(
   }
 
   // Otherwise we're at our buy location and we buy.
-  await dockIfNeeded(api, caches.ships, ship);
+  await dockIfNeeded(db, api, caches.ships, ship);
 
   // TODO(eseidel): Share this code with trader.dart
   final transaction = await purchaseTradeGoodIfPossible(

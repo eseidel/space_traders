@@ -130,7 +130,7 @@ Future<JobResult> extractAndLog(
   Api api,
   Database db,
   Ship ship,
-  ShipCache shipCache,
+  ShipSnapshot shipCache,
   Survey? maybeSurvey, {
   required DateTime Function() getNow,
 }) async {
@@ -148,10 +148,15 @@ Future<JobResult> extractAndLog(
   try {
     final ExtractResources201ResponseData response;
     if (maybeSurvey != null) {
-      response =
-          await extractResourcesWithSurvey(api, ship, shipCache, maybeSurvey);
+      response = await extractResourcesWithSurvey(
+        db,
+        api,
+        ship,
+        shipCache,
+        maybeSurvey,
+      );
     } else {
-      response = await extractResources(api, ship, shipCache);
+      response = await extractResources(db, api, ship, shipCache);
     }
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
@@ -253,7 +258,7 @@ Future<JobResult> doMineJob(
   );
 
   // Both surveying and mining require being undocked.
-  await undockIfNeeded(api, caches.ships, ship);
+  await undockIfNeeded(db, api, caches.ships, ship);
 
   // We need to be off cooldown to continue.
   final expiration = ship.cooldown.expiration;
@@ -276,7 +281,7 @@ Future<JobResult> doMineJob(
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
     final response =
-        await surveyAndLog(api, db, caches.ships, ship, getNow: getNow);
+        await surveyAndLog(db, api, caches.ships, ship, getNow: getNow);
 
     verifyCooldown(
       ship,
@@ -419,7 +424,7 @@ Future<JobResult> emptyCargoIfNeeded(
       'No nearby market to sell ${largestCargo.symbol}, jetisoning cargo!',
     );
     // Only jettison the item we don't know how to sell, others might sell.
-    await jettisonCargoAndLog(api, caches.ships, ship, largestCargo);
+    await jettisonCargoAndLog(db, api, caches.ships, ship, largestCargo);
     if (ship.cargo.isEmpty) {
       return JobResult.complete();
     }
@@ -634,6 +639,7 @@ Future<JobResult> transferToHaulersOrWait(
       );
       if (transferAmount > 0) {
         await transferCargoAndLog(
+          db,
           api,
           caches.ships,
           from: ship,

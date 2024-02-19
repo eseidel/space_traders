@@ -353,6 +353,7 @@ Future<NavResult> continueNavigationIfNeeded(
       }
       return NavResult._wait(
         await navigateToLocalWaypointAndLog(
+          db,
           api,
           caches.systems,
           caches.ships,
@@ -363,6 +364,7 @@ Future<NavResult> continueNavigationIfNeeded(
     case RouteActionType.navDrift:
       return NavResult._wait(
         await navigateToLocalWaypointAndLog(
+          db,
           api,
           caches.systems,
           caches.ships,

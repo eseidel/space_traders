@@ -11,6 +11,7 @@ import 'package:db/src/market_listing.dart';
 import 'package:db/src/market_price.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
+import 'package:db/src/ship.dart';
 import 'package:db/src/shipyard_listing.dart';
 import 'package:db/src/shipyard_price.dart';
 import 'package:db/src/survey.dart';
@@ -405,5 +406,21 @@ class Database {
   /// Delete a behavior state.
   Future<void> deleteBehaviorState(ShipSymbol shipSymbol) async {
     await execute(deleteBehaviorStateQuery(shipSymbol));
+  }
+
+  /// Get all ships.
+  Future<Iterable<Ship>> allShips() async {
+    return queryMany(allShipsQuery(), shipFromColumnMap);
+  }
+
+  /// Get a ship by symbol.
+  Future<Ship?> getShip(ShipSymbol symbol) async {
+    final query = shipBySymbolQuery(symbol);
+    return queryOne(query, shipFromColumnMap);
+  }
+
+  /// Upsert a ship into the database.
+  Future<void> upsertShip(Ship ship) async {
+    await execute(upsertShipQuery(ship));
   }
 }
