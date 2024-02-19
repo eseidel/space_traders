@@ -34,8 +34,10 @@ class CentralCommand {
   CentralCommand({
     required BehaviorCache behaviorCache,
     required ShipSnapshot shipCache,
+    BehaviorTimeouts? behaviorTimeouts,
   })  : _behaviorCache = behaviorCache,
-        _shipCache = shipCache;
+        _shipCache = shipCache,
+        behaviorTimeouts = behaviorTimeouts ?? BehaviorTimeouts();
 
   final BehaviorCache _behaviorCache;
   final ShipSnapshot _shipCache;
@@ -67,7 +69,7 @@ class CentralCommand {
   final Map<ShipSymbol, SystemSymbol> _assignedSystemsForSatellites = {};
 
   /// The current behavior timeouts.
-  final BehaviorTimeouts behaviorTimeouts = BehaviorTimeouts();
+  final BehaviorTimeouts behaviorTimeouts;
 
   /// Sets the available mounts for testing.
   @visibleForTesting

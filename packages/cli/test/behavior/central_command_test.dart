@@ -15,6 +15,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockBehaviorCache extends Mock implements BehaviorCache {}
 
+class _MockBehaviorTimeouts extends Mock implements BehaviorTimeouts {}
+
 class _MockContractSnapshot extends Mock implements ContractSnapshot {}
 
 class _MockContractTerms extends Mock implements ContractTerms {}
@@ -663,8 +665,11 @@ void main() {
   test('getJobForShip no behaviors', () {
     final shipCache = _MockShipCache();
     final behaviorCache = _MockBehaviorCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final behaviorTimeouts = _MockBehaviorTimeouts();
+    final centralCommand = CentralCommand(
+        behaviorCache: behaviorCache,
+        shipCache: shipCache,
+        behaviorTimeouts: behaviorTimeouts);
     final shipSymbol = ShipSymbol.fromString('X-A');
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -681,6 +686,9 @@ void main() {
     );
     when(() => ship.fuel).thenReturn(ShipFuel(current: 1000, capacity: 1000));
     registerFallbackValue(Behavior.idle);
+    when(() => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()))
+        .thenReturn(true);
+    when(() => behaviorCache.states).thenReturn([]);
     final job = centralCommand.getJobForShip(ship, 1000000);
     // Nothing specified for this ship, so it should be idle.
     expect(job.behavior, Behavior.idle);
