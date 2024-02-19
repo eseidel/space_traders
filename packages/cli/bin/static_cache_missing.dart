@@ -14,7 +14,7 @@ void _printMissing<K extends Object, V extends Object>(
   }
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final staticCaches = StaticCaches.load(fs);
 
   _printMissing(ShipMountSymbolEnum.values, staticCaches.mounts);

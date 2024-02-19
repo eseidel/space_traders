@@ -96,8 +96,7 @@ bool Function(Ship) filterFromArgs(List<String> args) {
   return (ship) => ship.symbol == symbol;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final filter = filterFromArgs(argResults.rest);
   final behaviorCache = await BehaviorCache.load(db);
   final shipCache = await ShipSnapshot.load(db);
@@ -130,6 +129,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }
-
-  await db.close();
 }

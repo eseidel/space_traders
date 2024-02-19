@@ -7,8 +7,7 @@ class _Stats {
   int count = 0;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final surveys = await db.allSurveys();
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systems = SystemsCache.load(fs)!;
@@ -53,8 +52,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         '$tradeSymbolsString ${record?.values?.traitSymbols} '
         '(${stats.count})');
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

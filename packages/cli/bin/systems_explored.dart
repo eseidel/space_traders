@@ -10,8 +10,7 @@ String _typeName(SystemType type) {
   return type.value;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPrices.load(db);
   final shipyardPrices = await ShipyardPrices.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
@@ -93,8 +92,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     '${systemsWithCharts.length} systems with 1+ charts of '
     '${reachableSystems.length} known reachable.',
   );
-
-  await db.close();
 }
 
 void main(List<String> args) async {

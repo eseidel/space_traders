@@ -5,8 +5,7 @@ void main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPrices.load(db);
   final tradeVolumesBySymbol = <TradeSymbol, Set<int>>{};
   for (final price in marketPrices.prices) {
@@ -21,5 +20,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       logger.info('$tradeSymbol : ${tradeVolumes.join(', ')}');
     }
   }
-  await db.close();
 }

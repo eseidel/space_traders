@@ -23,9 +23,7 @@ int? distanceBetween(
   return aWaypoint.distanceTo(bWaypoint).toInt();
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
-
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final hqSystem = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
@@ -123,8 +121,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     ]);
   }
   logger.info(table.toString());
-
-  await db.close();
 }
 
 void main(List<String> args) async {

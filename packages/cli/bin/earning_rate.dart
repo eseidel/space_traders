@@ -9,8 +9,7 @@ int hoursAgo(DateTime time) {
   return DateTime.timestamp().difference(time).inHours;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Credits per hour.
   final oneDayAgoAsHour =
       snapToHour(DateTime.timestamp().subtract(const Duration(hours: 24)));
@@ -49,8 +48,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final credits = creditsString(last.agentCredits).padLeft(creditsWidth);
     logger.info('-$sinceLast $credits');
   }
-  // Required or main will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {

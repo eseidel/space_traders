@@ -18,13 +18,11 @@ void printPriceRanges(List<MarketPrice> gameStats) {
   }
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final prices = await MarketPrices.load(db);
 
   logger.info('${prices.count} prices loaded.');
   printPriceRanges(prices.prices);
-  await db.close();
 }
 
 void main(List<String> args) {

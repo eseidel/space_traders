@@ -1,12 +1,11 @@
 import 'package:cli/cli.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Load up historical surveys from the db.
   // Count all the trade symbols they saw.
   // Print drop rates for each trade symbol.
 
-  final db = await defaultDatabase();
   final surveys = await db.allSurveys();
   // Was the trade symbol in the survey at all.
   final surveyBySymbol = <String, int>{};
@@ -66,8 +65,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
   logger.info('number in () is the expected number of deposits per survey '
       'if the symbol is known to be in the survey');
-
-  await db.close();
 }
 
 void main(List<String> args) async {

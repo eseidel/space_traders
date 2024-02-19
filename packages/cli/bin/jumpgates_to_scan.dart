@@ -2,10 +2,9 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/idle_queue.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Start at the agent's headquarters system.
   // Walk the web of jump gates to find endpoints we should scan.
-  final db = await defaultDatabase();
   final systemSymbol = await myHqSystemSymbol(db);
   final systemsCache = SystemsCache.load(fs)!;
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
@@ -70,8 +69,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final waypoint in needsConstructionCheck) {
     logger.info('  $waypoint');
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

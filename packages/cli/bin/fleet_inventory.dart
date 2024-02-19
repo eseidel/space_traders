@@ -6,8 +6,7 @@ Future<void> main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
   final countByTradeSymbol = <TradeSymbol, int>{};
@@ -39,5 +38,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     },
   );
   logger.info('Total value: ${creditsString(totalValue)}');
-  await db.close();
 }

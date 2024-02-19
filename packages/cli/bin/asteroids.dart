@@ -1,8 +1,7 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // List all known asteroids that have a market or shipyard.
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);
@@ -21,8 +20,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       logger.info('Asteroid $waypointSymbol has a market.');
     }
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -6,8 +6,7 @@ import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:cli_table/cli_table.dart';
 
-Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
   final limit = int.parse(argResults['limit'] as String);
   final startArg = argResults['start'] as String?;
@@ -175,8 +174,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
     ]);
   }
   logger.info(table.toString());
-
-  await db.close();
 }
 
 void main(List<String> args) async {

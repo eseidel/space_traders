@@ -27,13 +27,12 @@ void reconcile(List<Transaction> transactions) {
   }
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final lookbackMinutesString = argResults.rest.firstOrNull;
   final lookbackMinutes =
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final db = await defaultDatabase();
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await db.transactionsAfter(startTime)).toList();
 
@@ -90,8 +89,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     if (count == 0) continue;
     logger.info('  ${type.name.padRight(transNameLength)} $count');
   }
-
-  await db.close();
 }
 
 void main(List<String> args) {

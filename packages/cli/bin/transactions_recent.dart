@@ -5,7 +5,7 @@ String describeTransaction(Transaction t) {
       '${t.shipSymbol} ${t.waypointSymbol} ${t.creditsChange} ${t.accounting}';
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final args = argResults.rest;
   final shipNumber = args.firstOrNull;
   final shipSymbol = ShipSymbol.fromString('ESEIDEL-$shipNumber');
@@ -13,14 +13,12 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final lookbackMinutes = (args.length > 1) ? int.parse(args[1]) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final db = await defaultDatabase();
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await db.transactionsAfter(startTime))
       .where((t) => t.shipSymbol == shipSymbol);
   for (final transaction in transactions) {
     logger.info(describeTransaction(transaction));
   }
-  await db.close();
 }
 
 void main(List<String> args) async {

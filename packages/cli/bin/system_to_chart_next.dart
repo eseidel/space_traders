@@ -3,8 +3,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSymbol =
       await startWaypointFromArg(db, argResults.rest.firstOrNull);
   final staticCaches = StaticCaches.load(fs);
@@ -44,8 +43,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   } else {
     logger.info('Next uncharted waypoint: $destinationSymbol');
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

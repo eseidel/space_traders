@@ -43,8 +43,7 @@ String plural(int count, String singular, [String plural = 's']) {
   return '$count ${count == 1 ? singular : singular + plural}';
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
@@ -89,6 +88,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       '${plural(shipsAssigned.length, 'watcher')}',
     );
   }
-
-  await db.close();
 }

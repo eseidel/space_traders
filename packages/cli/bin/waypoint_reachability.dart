@@ -2,8 +2,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/waypoint_connectivity.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final hqSystem = await myHqSystemSymbol(db);
@@ -31,8 +30,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       );
     }
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

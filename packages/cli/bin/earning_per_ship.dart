@@ -42,15 +42,13 @@ class TransactionSummary {
   }
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
   final lookbackMinutesString = argResults.rest.firstOrNull;
   final lookbackMinutes =
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
-
-  final db = await defaultDatabase();
 
   final shipSymbols = (await db.uniqueShipSymbolsInTransactions()).toList()
     ..sort();
@@ -145,9 +143,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         '${count.toString().padLeft(2)} ships '
         '${c(average).padLeft(3)} c/s');
   }
-
-  // Required or main will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -3,8 +3,7 @@ import 'package:cli/cli.dart';
 
 /// Walks our known system graph, starting from HQ and prints systems needing
 /// exploration.
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSystemSymbol =
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 
@@ -43,8 +42,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       '$unchartedCount uncharted ($jumps jumps)',
     );
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -43,8 +43,7 @@ String plural(int count, String singular, [String plural = 's']) {
   return '$count ${count == 1 ? singular : singular + plural}';
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final behaviorCache = await BehaviorCache.load(db);
   final charterStates =
       behaviorCache.states.where((s) => s.behavior == Behavior.charter);
@@ -67,5 +66,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       logger.info('  enroute to $destination $destinationType in $arrival');
     }
   }
-  await db.close();
 }

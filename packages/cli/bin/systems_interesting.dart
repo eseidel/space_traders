@@ -15,9 +15,7 @@ Set<SystemSymbol> findInterestingSystems(SystemsCache systemsCache) {
       .toSet();
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
-
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
@@ -64,7 +62,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     '${connectedUnderConstruction.length} of $total under construction '
     'jumpgates are connected to jumpgates reachable from HQ.',
   );
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -1,8 +1,7 @@
 import 'package:cli/cli.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final surveys = await db.allSurveys();
 
   // Survey size distribution by tradeSymbol
@@ -37,8 +36,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
           '${count.toString().padLeft(countLength)}');
     }
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -5,11 +5,10 @@ import 'package:collection/collection.dart';
 
 // List the 10 nearest systems which have 10+ markets and are not reachable
 // via jumpgates from HQ.  Systems worth warping to should be charted already.
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const limit = 10;
   const desiredMarketCount = 10;
 
-  final db = await defaultDatabase();
   final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
 
   final startSystemSymbol = await myHqSystemSymbol(db);
@@ -59,7 +58,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   // Required or main will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -8,8 +8,7 @@ void printDiffs(List<int> data) {
   logger.info(diffs.toString());
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final transactions = await db.allTransactions();
   // final marketPrices = MarketPrices.load(fs);
   // Walk through all transactions, finding repeats.
@@ -110,7 +109,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     // print(p);
   }
   // Required or main will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {

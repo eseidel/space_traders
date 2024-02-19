@@ -1,8 +1,6 @@
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
-
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final connection = db.connection;
   // Get a list of all tables.
   final tables = await connection.execute('''
@@ -24,7 +22,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final tableName in counts.keys) {
     logger.info('$tableName: ${counts[tableName]}');
   }
-  await db.close();
 }
 
 void main(List<String> args) async {

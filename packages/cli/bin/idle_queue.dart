@@ -3,8 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/idle_queue.dart';
 import 'package:cli/net/auth.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
   final caches = await Caches.loadOrFetch(fs, api, db);
 
@@ -20,7 +19,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   // required or main() will hang
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -3,8 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPrices.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final systemConnectivity = await loadSystemConnectivity(db);
@@ -52,7 +51,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
         '${price.tradeVolume.toString().padLeft(6)} '
         '${approximateDuration(trip.route.duration * 2).padLeft(4)}');
   }
-  await db.close();
 }
 
 void main(List<String> args) async {

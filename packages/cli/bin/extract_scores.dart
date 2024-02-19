@@ -35,7 +35,7 @@ double _scoreMarkets(
   return percentiles.average / 100.0;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final countLimit = int.tryParse(argResults['limit'] as String);
   if (countLimit == null) {
     throw ArgumentError.value(
@@ -58,8 +58,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   logger.info("Top $countLimit ${isSiphon ? 'siphon targets' : 'mines'}"
       ' with matching markets within $maxDistance total round-trip:');
-
-  final db = await defaultDatabase();
 
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
@@ -137,8 +135,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     }
   }
   logger.info(table.toString());
-
-  await db.close();
 }
 
 void main(List<String> args) async {

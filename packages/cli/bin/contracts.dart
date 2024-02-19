@@ -25,8 +25,7 @@ void printContracts(
   }
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final printAll = argResults['all'] as bool;
   final contractSnapshot = await ContractSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
@@ -54,8 +53,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     marketPrices,
     describeContracts: true,
   );
-
-  await db.close();
 }
 
 void main(List<String> args) async {

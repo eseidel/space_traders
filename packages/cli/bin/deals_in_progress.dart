@@ -15,8 +15,7 @@ String annotatedName(CostedDeal deal) {
   return deal.tradeSymbol.value;
 }
 
-Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   final behaviorCache = await BehaviorCache.load(db);
 
   final states =
@@ -100,8 +99,6 @@ Future<void> cliMain(FileSystem fs, ArgResults argResults) async {
       '${minerHaulers.length} miner haulers: ${minerHaulers.join(', ')}',
     );
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

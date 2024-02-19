@@ -49,7 +49,7 @@ void main(List<String> args) async {
   );
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
   final args = argResults.rest;
   if (args.length != 2) {
@@ -60,7 +60,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   final startSymbol = args[0];
   final endSymbol = args[1];
 
-  final db = await defaultDatabase();
   final systemsCache = SystemsCache.load(fs)!;
   final bool Function(WaypointSymbol _) sellsFuel;
   if (argResults['fuel'] == 'true') {
@@ -101,5 +100,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       ..info('Route found (${duration.inMilliseconds}ms)')
       ..info(describeRoutePlan(plan));
   }
-  await db.close();
 }

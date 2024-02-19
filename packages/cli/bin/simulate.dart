@@ -148,8 +148,7 @@ int shipPrice(ShipyardPrices shipyardPrices, ShipType shipType) {
   return shipyardPrices.medianPurchasePrice(shipType) ?? defaultPrice;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPrices.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final systemConnectivity = await loadSystemConnectivity(db);
@@ -358,8 +357,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final totalCosts = costPerSquad * squadsForGoal;
   logger.info('Total costs for goal: ${creditsString(totalCosts)}');
-
-  await db.close();
 }
 
 void main(List<String> args) {

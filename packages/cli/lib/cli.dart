@@ -19,7 +19,7 @@ export 'package:types/types.dart';
 /// Run command with a logger, but without an Api.
 Future<void> runOffline(
   List<String> args,
-  Future<void> Function(FileSystem fs, ArgResults argResults) fn, {
+  Future<void> Function(FileSystem fs, Database db, ArgResults argResults) fn, {
   void Function(ArgParser parser)? addArgs,
   @visibleForTesting Logger? overrideLogger,
 }) async {
@@ -48,7 +48,10 @@ Future<void> runOffline(
         logger.info(parser.usage);
         return;
       }
-      return fn(fs, results);
+      final db = await defaultDatabase();
+      final result = fn(fs, db, results);
+      await db.close();
+      return result;
     },
     values: {
       if (overrideLogger == null)

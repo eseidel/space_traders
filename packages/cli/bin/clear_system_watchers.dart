@@ -5,8 +5,7 @@ void main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final behaviorCache = await BehaviorCache.load(db);
 
   final shipSymbols = behaviorCache.states
@@ -22,6 +21,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final shipSymbol in shipSymbols) {
     await behaviorCache.deleteBehavior(shipSymbol);
   }
-
-  await db.close();
 }

@@ -4,8 +4,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPrices.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
 
@@ -34,8 +33,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final name = tradeSymbol.value;
     logger.info('${name.padRight(maxNameLength)} $priceString');
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

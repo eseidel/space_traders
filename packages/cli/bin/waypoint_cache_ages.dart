@@ -3,8 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSystemSymbol =
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 

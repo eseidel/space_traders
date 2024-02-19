@@ -11,7 +11,7 @@ void main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const testsDir = '../../../space_traders_tests';
   // Load up the pathing tests directory.
   final pathingTestsDir = fs.directory('$testsDir/pathing');

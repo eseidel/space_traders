@@ -5,8 +5,7 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
@@ -92,8 +91,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       logger.info('  ${describeCostedDeal(deal)}');
     }
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

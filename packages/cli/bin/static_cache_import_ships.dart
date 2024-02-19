@@ -5,8 +5,7 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final staticCaches = StaticCaches.load(fs);
 
@@ -46,7 +45,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
               .toList();
     recordShipyardShips(staticCaches, [copy]);
   }
-  await db.close();
 }
 
 void main(List<String> args) async {

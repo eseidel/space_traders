@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Given a JSON file, reads it in and populates TradeExportCache from it.
   final exportCache = TradeExportCache.load(fs);
   final file = fs.file('exports.json');

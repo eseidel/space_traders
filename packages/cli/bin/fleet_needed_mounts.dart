@@ -4,8 +4,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final behaviorCache = await BehaviorCache.load(db);
   final marketPrices = await MarketPrices.load(db);
@@ -59,7 +58,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     final units = mounts[mountSymbol];
     logger.info('Need $units $mountSymbol.');
   }
-  await db.close();
 }
 
 void main(List<String> args) async {

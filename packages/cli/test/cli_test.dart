@@ -9,7 +9,7 @@ void main() {
     final logger = _MockLogger();
     runOffline(
       ['-v'],
-      (fs, results) async {
+      (fs, db, results) async {
         expect(results['verbose'], true);
         expect(results['help'], false);
       },

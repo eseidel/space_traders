@@ -7,8 +7,7 @@ String describeTransaction(Transaction t) {
       '${t.shipSymbol} ${t.waypointSymbol} ${t.creditsChange} ${t.accounting}';
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final transactions =
       await db.transactionsWithAccountingType(AccountingType.capital);
 
@@ -38,8 +37,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final total = transactions.map((t) => t.creditsChange).sum;
   logger.info('Total: ${creditsString(total)}');
-
-  await db.close();
 }
 
 void main(List<String> args) async {

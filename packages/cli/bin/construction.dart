@@ -2,9 +2,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
-
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSystemSymbol =
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 
@@ -32,9 +30,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
 
   logger.info('$jumpGateSymbol: ${statusString(jumpGateSymbol)}');
-
-  // Required or main() will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {

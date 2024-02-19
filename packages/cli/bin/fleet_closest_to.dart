@@ -4,8 +4,7 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // For a given destination, compute the time to travel there for each ship.
   final destination = WaypointSymbol.fromString(argResults.rest[0]);
   final shipCache = await ShipSnapshot.load(db);
@@ -47,8 +46,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     logger.info('${ship.shipSymbol.hexNumber.padRight(3)} '
         '${approximateDuration(travelTime).padLeft(3)}');
   }
-
-  await db.close();
 }
 
 void main(List<String> args) async {

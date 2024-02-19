@@ -5,8 +5,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final showAll = argResults['all'] as bool;
 
   final shipyardPrices = await ShipyardPrices.load(db);
@@ -58,7 +57,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     ]);
   }
   logger.info(table.toString());
-  await db.close();
 }
 
 void main(List<String> args) async {

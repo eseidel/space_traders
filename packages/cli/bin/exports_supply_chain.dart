@@ -238,8 +238,7 @@ void source(
   ).sourceGoodsFor(tradeSymbol, waypointSymbol);
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final exportCache = TradeExportCache.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
@@ -265,9 +264,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       waypointSymbol,
     );
   }
-
-  // Required or main() will hang.
-  await db.close();
 }
 
 void main(List<String> args) async {

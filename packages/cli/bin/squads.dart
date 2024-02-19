@@ -30,8 +30,7 @@ ShipType? guessType(ShipyardShipCache shipyardShipCache, Ship ship) {
   return null;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
   final shipCache = await ShipSnapshot.load(db);
@@ -60,7 +59,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
           '${ship.nav.waypointSymbolObject} $cargoStatus');
     }
   }
-  await db.close();
 }
 
 void main(List<String> args) async {

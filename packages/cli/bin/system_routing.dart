@@ -5,12 +5,11 @@ import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Evalute the navigability of the starting system by ship type.
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
 
-  final db = await defaultDatabase();
   final systems = SystemsCache.load(fs)!;
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
@@ -51,8 +50,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   }
   table.sortBy<num>((a) => (a as List<dynamic>)[1] as num);
   logger.info(table.toString());
-
-  await db.close();
 }
 
 void main(List<String> args) async {

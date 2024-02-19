@@ -34,8 +34,7 @@ Map<ShipType, int> _shipTypeCounts(
   return typeCounts;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
   final shipyardPrices = await ShipyardPrices.load(db);
@@ -71,5 +70,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
 
   final totalCost = totalShipCost + totalMountCost;
   logger.info('Total: ${creditsString(totalCost)}');
-  await db.close();
 }

@@ -97,8 +97,7 @@ bool Function(Transaction t) filterFromArgs(List<String> args) {
   return (Transaction t) => t.shipSymbol == shipSymbol;
 }
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final filter = filterFromArgs(argResults.rest);
   final deals = <SyntheticDeal>[];
   final openDeals = <ShipSymbol, List<Transaction>>{};
@@ -176,7 +175,4 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
   for (final transaction in ignoredTransactions) {
     logger.info(describeTransaction(transaction));
   }
-
-  // Required or main will hang.
-  await db.close();
 }

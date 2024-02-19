@@ -3,8 +3,7 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final shipyardPrices = await ShipyardPrices.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
@@ -20,7 +19,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
     return;
   }
   logger.info('Buy $shipType.');
-  await db.close();
 }
 
 void main(List<String> args) async {

@@ -3,8 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:stats/stats.dart';
 
-Future<void> command(FileSystem fs, ArgResults argResults) async {
-  final db = await defaultDatabase();
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final prices = await MarketPrices.load(db);
   logger.info('${prices.count} prices loaded.');
 
@@ -20,7 +19,6 @@ Future<void> command(FileSystem fs, ArgResults argResults) async {
       'min: ${d(s.min)}, '
       'max: ${d(s.max)}, '
       'stddev: ${d(s.standardDeviation)}}');
-  await db.close();
 }
 
 void main(List<String> args) {
