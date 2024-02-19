@@ -4,9 +4,13 @@ import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockDatabase extends Mock implements Database {}
+
 void main() {
   test('runOffline', () {
     final logger = _MockLogger();
+    final db = _MockDatabase();
+    when(db.close).thenAnswer((_) async {});
     runOffline(
       ['-v'],
       (fs, db, results) async {
@@ -14,8 +18,10 @@ void main() {
         expect(results['help'], false);
       },
       overrideLogger: logger,
+      overrideDatabase: db,
     );
     verify(() => logger.level = Level.verbose).called(1);
+    verify(db.close).called(1);
   });
 
   test('shipTypeFromArg, argFromShipType', () {

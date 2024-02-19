@@ -22,6 +22,7 @@ Future<void> runOffline(
   Future<void> Function(FileSystem fs, Database db, ArgResults argResults) fn, {
   void Function(ArgParser parser)? addArgs,
   @visibleForTesting Logger? overrideLogger,
+  @visibleForTesting Database? overrideDatabase,
 }) async {
   final parser = ArgParser()
     ..addFlag(
@@ -48,7 +49,7 @@ Future<void> runOffline(
         logger.info(parser.usage);
         return;
       }
-      final db = await defaultDatabase();
+      final db = overrideDatabase ?? await defaultDatabase();
       final result = fn(fs, db, results);
       await db.close();
       return result;
