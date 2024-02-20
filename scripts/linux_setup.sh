@@ -1,6 +1,9 @@
 #!/bin/bash
 
 snap install flutter --classic
+# Let flutter finish installing itself.
+flutter --version
+
 snap install docker
 
 cd packages/db
