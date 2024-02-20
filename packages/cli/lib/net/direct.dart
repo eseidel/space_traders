@@ -1,7 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
@@ -124,7 +123,6 @@ Future<DeliverContract200ResponseData> deliverContract(
   Api api,
   Ship ship,
   ShipSnapshot shipCache,
-  ContractSnapshot contractSnapshot,
   Contract contract, {
   required TradeSymbol tradeSymbol,
   required int units,

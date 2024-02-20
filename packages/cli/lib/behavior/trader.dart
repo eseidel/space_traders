@@ -246,7 +246,7 @@ Future<JobResult> _handleContractDealAtDestination(
     const Duration(minutes: 10),
   );
   final contract = assertNotNull(
-    caches.contracts.contract(contractId),
+    await db.contractById(contractId),
     'No contract.',
     const Duration(minutes: 10),
   );
@@ -255,7 +255,6 @@ Future<JobResult> _handleContractDealAtDestination(
     api,
     db,
     caches.agent,
-    caches.contracts,
     caches.ships,
     ship,
     contract,
@@ -308,7 +307,6 @@ Future<Contract?> _deliverContractGoodsIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
-  ContractSnapshot contractSnapshot,
   ShipSnapshot shipCache,
   Ship ship,
   Contract beforeDelivery,
@@ -339,7 +337,6 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     await acceptContractAndLog(
       api,
       db,
-      contractSnapshot,
       agentCache,
       ship,
       beforeDelivery,
@@ -352,7 +349,6 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     api,
     ship,
     shipCache,
-    contractSnapshot,
     beforeDelivery,
     tradeSymbol: tradeSymbol,
     units: unitsBefore,
@@ -557,30 +553,28 @@ String describeExpectedContractProfit(
 Future<DateTime?> acceptContractsIfNeeded(
   Api api,
   Database db,
-  ContractSnapshot contractSnapshot,
   MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
-  final contracts = contractSnapshot.activeContracts;
-  if (contracts.isEmpty) {
+  final activeContracts = await db.activeContracts();
+  if (activeContracts.isEmpty) {
     final contract = await negotiateContractAndLog(
       db,
       api,
       ship,
       shipCache,
-      contractSnapshot,
     );
     shipInfo(ship, describeExpectedContractProfit(marketPrices, contract));
     return null;
   }
-  for (final contract in contractSnapshot.unacceptedContracts) {
+  final unacceptedContracts = await db.unacceptedContracts();
+  for (final contract in unacceptedContracts) {
     await acceptContractAndLog(
       api,
       db,
-      contractSnapshot,
       agentCache,
       ship,
       contract,
@@ -883,7 +877,6 @@ Future<JobResult> _initDeal(
     await acceptContractsIfNeeded(
       api,
       db,
-      caches.contracts,
       caches.marketPrices,
       caches.agent,
       caches.ships,
@@ -891,10 +884,12 @@ Future<JobResult> _initDeal(
     );
   }
 
+  final contractSnapshot = await ContractSnapshot.load(db);
+
   // Consider all deals starting at any market within our consideration range.
   var newDeal = centralCommand.findNextDealAndLog(
     caches.agent,
-    caches.contracts,
+    contractSnapshot,
     caches.marketPrices,
     caches.systems,
     caches.systemConnectivity,
@@ -928,7 +923,7 @@ Future<JobResult> _initDeal(
       findDeal: (Ship ship, WaypointSymbol startSymbol) {
         return centralCommand.findNextDealAndLog(
           caches.agent,
-          caches.contracts,
+          contractSnapshot,
           caches.marketPrices,
           caches.systems,
           caches.systemConnectivity,

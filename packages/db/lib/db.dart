@@ -401,6 +401,19 @@ class Database {
     return queryMany(allContractsQuery(), contractFromColumnMap);
   }
 
+  Future<Contract?> contractById(String id) async {
+    final query = contractByIdQuery(id);
+    return queryOne(query, contractFromColumnMap);
+  }
+
+  Future<Iterable<Contract>> unacceptedContracts() async {
+    return queryMany(unacceptedContractsQuery(), contractFromColumnMap);
+  }
+
+  Future<Iterable<Contract>> activeContracts() async {
+    return queryMany(activeContractsQuery(), contractFromColumnMap);
+  }
+
   /// Upsert a contract into the database.
   Future<void> upsertContract(Contract contract) async {
     await execute(upsertContractQuery(contract));

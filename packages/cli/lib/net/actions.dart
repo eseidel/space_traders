@@ -578,7 +578,6 @@ Future<Contract> negotiateContractAndLog(
   Api api,
   Ship ship,
   ShipSnapshot shipCache,
-  ContractSnapshot contractSnapshot,
 ) async {
   await dockIfNeeded(db, api, shipCache, ship);
   final response = await api.fleet.negotiateContract(ship.symbol);
@@ -594,7 +593,6 @@ Future<Contract> negotiateContractAndLog(
 Future<AcceptContract200ResponseData> acceptContractAndLog(
   Api api,
   Database db,
-  ContractSnapshot contractSnapshot,
   AgentCache agentCache,
   Ship ship,
   Contract contract,

@@ -17,6 +17,26 @@ Query upsertContractQuery(Contract contract) {
   );
 }
 
+/// Fetch a contract by id.
+Query contractByIdQuery(String id) {
+  return Query(
+    'SELECT * FROM contract_ WHERE id = @id',
+    parameters: <String, dynamic>{'id': id},
+  );
+}
+
+Query activeContractsQuery() {
+  return const Query(
+    "SELECT * FROM contract_ WHERE json->>'status' = 'active'",
+  );
+}
+
+Query unacceptedContractsQuery() {
+  return const Query(
+    "SELECT * FROM contract_ WHERE json->>'status' = 'unaccepted'",
+  );
+}
+
 /// Converts a contract from a column map.
 Contract contractFromColumnMap(Map<String, dynamic> map) {
   return Contract.fromJson(map['json'] as Map<String, dynamic>);

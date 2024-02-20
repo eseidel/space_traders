@@ -15,6 +15,8 @@ class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
+class _MockContractSnapshot extends Mock implements ContractSnapshot {}
+
 class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
@@ -56,6 +58,8 @@ void main() {
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     final caches = mockCaches();
+    final contractSnapshot = _MockContractSnapshot();
+    when(db.allContracts).thenAnswer((_) async => <Contract>[]);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -131,7 +135,7 @@ void main() {
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
-        caches.contracts,
+        contractSnapshot,
         caches.marketPrices,
         caches.systems,
         caches.systemConnectivity,
@@ -513,7 +517,7 @@ void main() {
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(1);
     final caches = mockCaches();
-    when(() => caches.contracts.activeContracts).thenReturn([]);
+    when(db.activeContracts).thenAnswer((_) async => <Contract>[]);
     final contract = Contract(
       id: 'id',
       factionSymbol: 'factionSymbol',
@@ -622,10 +626,11 @@ void main() {
       costPerFuelUnit: 100,
       costPerAntimatterUnit: 10000,
     );
+    final contractSnapshot = _MockContractSnapshot();
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
-        caches.contracts,
+        contractSnapshot,
         caches.marketPrices,
         caches.systems,
         caches.systemConnectivity,
@@ -694,6 +699,7 @@ void main() {
 
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
+    when(db.allContracts).thenAnswer((_) async => <Contract>[]);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -1086,7 +1092,7 @@ void main() {
       fulfilled: false,
       timestamp: now,
     );
-    when(() => caches.contracts.contract(contract.id)).thenReturn(contract);
+    when(() => db.contractById(contract.id)).thenAnswer((_) async => contract);
     final deal = Deal(
       destination: SellOpp.fromContract(
         waypointSymbol: end,

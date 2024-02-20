@@ -55,7 +55,6 @@ class Caches {
     required this.systems,
     required this.waypoints,
     required this.markets,
-    required this.contracts,
     required this.behaviors,
     required this.charting,
     required this.routePlanner,
@@ -77,9 +76,6 @@ class Caches {
   /// The ship cache.
   // TODO(eseidel): Try not caching ships and just fetching from db.
   ShipSnapshot ships;
-
-  /// The contract cache.
-  ContractSnapshot contracts;
 
   /// Known shipyard listings.
   ShipyardListingSnapshot shipyardListings;
@@ -148,7 +144,7 @@ class Caches {
     );
     final markets = MarketCache(db, api, static.tradeGoods);
     // Intentionally force refresh contracts in case we've been offline.
-    final contracts = await fetchContracts(db, api);
+    await fetchContracts(db, api);
     final behaviors = await BehaviorCache.load(db);
 
     final jumpGates = await JumpGateSnapshot.load(db);
@@ -171,7 +167,6 @@ class Caches {
       systems: systems,
       waypoints: waypoints,
       markets: markets,
-      contracts: contracts,
       behaviors: behaviors,
       charting: charting,
       static: static,
@@ -208,7 +203,7 @@ class Caches {
     // to run and update the status.
     ships = await ships.ensureUpToDate(db, api);
     await agent.ensureAgentUpToDate(api);
-    contracts = await contracts.ensureUpToDate(db, api);
+    await fetchContracts(db, api);
 
     marketListings = await MarketListingSnapshot.load(db);
     shipyardListings = await ShipyardListingSnapshot.load(db);
