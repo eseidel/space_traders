@@ -7,10 +7,7 @@ set -e
 
 # Path is needed for pub global activate
 # BOT=true is needed to make flutter/dart not whine about using root user.
-RC_FILE="
-export PATH=\"\$PATH\":\"$HOME/.pub-cache/bin\"
-export BOT=true
-"
+RC_FILE="export PATH=\"\$PATH\":\"$HOME/.pub-cache/bin\";export BOT=true;"
 echo $RC_FILE > $HOME/.zshrc
 source $HOME/.zshrc
 
