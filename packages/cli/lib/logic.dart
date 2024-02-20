@@ -218,7 +218,7 @@ Future<Never> logic(
         queue,
         waiter,
         shipFilter: shipFilter,
-        loopCount: 20,
+        loopCount: config.loopCount,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {
