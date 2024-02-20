@@ -90,15 +90,10 @@ class Database {
   /// Insert one record using the provided query.
   @protected
   Future<pg.Result> execute(Query query) {
-    try {
-      return connection.execute(
-        pg.Sql.named(query.fmtString),
-        parameters: query.parameters,
-      );
-    } catch (e) {
-      print(query.fmtString);
-      rethrow;
-    }
+    return connection.execute(
+      pg.Sql.named(query.fmtString),
+      parameters: query.parameters,
+    );
   }
 
   /// Query for multiple records using the provided query.

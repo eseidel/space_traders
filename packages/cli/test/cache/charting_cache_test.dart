@@ -1,5 +1,4 @@
 import 'package:cli/cache/charting_cache.dart';
-import 'package:db/src/chart.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

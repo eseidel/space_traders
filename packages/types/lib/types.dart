@@ -3,6 +3,7 @@ export 'behavior.dart';
 export 'enum.dart';
 export 'route.dart';
 export 'src/agent.dart';
+export 'src/charting_record.dart';
 export 'src/construction.dart';
 export 'src/contract.dart';
 export 'src/contract_transaction.dart';
