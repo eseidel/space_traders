@@ -1,7 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/cache/market_cache.dart';
+import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:db/db.dart';

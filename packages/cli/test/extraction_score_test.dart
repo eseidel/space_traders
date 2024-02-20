@@ -1,5 +1,5 @@
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/market_cache.dart';
+import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/extraction_score.dart';
 import 'package:db/src/chart.dart';

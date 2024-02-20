@@ -267,6 +267,16 @@ class Database {
     return queryOne(query, responseRecordFromColumnMap);
   }
 
+  /// Delete responses older than the given age.
+  Future<void> deleteResponsesBefore(DateTime timestamp) {
+    return connection.execute(
+      pg.Sql.named('DELETE FROM response_ WHERE created_at < @timestamp'),
+      parameters: {
+        'timestamp': timestamp,
+      },
+    );
+  }
+
   /// Get the agent from the database.
   Future<Agent?> getAgent({required String symbol}) async {
     final query = agentBySymbolQuery(symbol);

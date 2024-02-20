@@ -4,7 +4,6 @@ import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:db/src/queue.dart';
 import 'package:http/http.dart';
-import 'package:postgres/postgres.dart' as pg;
 import 'package:types/queue.dart';
 
 export 'package:types/queue.dart';
@@ -180,13 +179,8 @@ class NetQueue {
         .timeout(Duration(seconds: timeoutSeconds));
   }
 
-  /// Delete responses older than the given age.
-  Future<void> deleteResponsesBefore(DateTime timestamp) {
-    return _db.connection.execute(
-      pg.Sql.named('DELETE FROM response_ WHERE created_at < @timestamp'),
-      parameters: {
-        'timestamp': timestamp,
-      },
-    );
+  /// Deletes all responses older than the given cutoff.
+  Future<void> deleteResponsesBefore(DateTime cutoff) async {
+    await _db.deleteResponsesBefore(cutoff);
   }
 }
