@@ -11,6 +11,10 @@ RC_FILE="export PATH=\"\$PATH\":\"$HOME/.pub-cache/bin\";export BOT=true;"
 echo $RC_FILE > $HOME/.zshrc
 source $HOME/.zshrc
 
+# https://stackoverflow.com/questions/359109/using-the-scrollwheel-in-gnu-screen
+SCREEN_RC="termcapinfo xterm* ti@:te@"
+echo $SCREEN_RC > $HOME/.screenrc
+
 snap install flutter --classic
 # Let flutter finish installing itself.
 flutter --version
