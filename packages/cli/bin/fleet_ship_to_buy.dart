@@ -5,13 +5,13 @@ import 'package:cli/config.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
-  final shipyardPrices = await ShipyardPrices.load(db);
+  final shipyardListings = await ShipyardListingSnapshot.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
 
-  final shipType = shipToBuyFromPlan(
+  final shipType = await shipToBuyFromPlan(
     shipCache,
     config.buyPlan,
-    shipyardPrices,
+    shipyardListings,
     shipyardShips,
   );
   if (shipType == null) {

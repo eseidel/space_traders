@@ -136,7 +136,7 @@ final shipPrices = {
   ShipType.SURVEYOR: 34000,
 };
 
-int shipPrice(ShipyardPrices shipyardPrices, ShipType shipType) {
+int shipPrice(ShipyardPriceSnapshot shipyardPrices, ShipType shipType) {
   final defaultPrice = shipPrices[shipType];
   if (defaultPrice == null) {
     throw ArgumentError.value(
@@ -157,7 +157,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final shipyardPrices = await ShipyardPrices.load(db);
+  final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
   final shipMounts = ShipMountCache.load(fs);
 

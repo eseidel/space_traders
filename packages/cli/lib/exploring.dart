@@ -57,10 +57,9 @@ Future<Market?> visitLocalMarket(
 /// Visits the local shipyard if we're at a waypoint with a shipyard.
 /// Records shipyard data if needed.
 Future<void> visitLocalShipyard(
-  Api api,
   Database db,
+  Api api,
   WaypointCache waypoints,
-  ShipyardPrices shipyardPrices,
   StaticCaches staticCaches,
   AgentCache agentCache,
   Ship ship,
@@ -75,7 +74,6 @@ Future<void> visitLocalShipyard(
     db,
     api,
     staticCaches,
-    shipyardPrices,
     ship,
     waypointSymbol,
   );
@@ -124,7 +122,6 @@ Future<void> recordShipyardDataIfNeededAndLog(
   Database db,
   Api api,
   StaticCaches staticCaches,
-  ShipyardPrices shipyardPrices,
   Ship ship,
   WaypointSymbol shipyardSymbol, {
   Duration maxAge = const Duration(minutes: 5),
@@ -139,11 +136,7 @@ Future<void> recordShipyardDataIfNeededAndLog(
   }
   // If we have shipyard data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (shipyardPrices.hasRecentData(
-    shipyardSymbol,
-    maxAge: maxAge,
-    getNow: getNow,
-  )) {
+  if (await db.hasRecentShipyardPrices(shipyardSymbol, maxAge)) {
     return;
   }
   final shipyard = await getShipyard(api, shipyardSymbol);

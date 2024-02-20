@@ -69,7 +69,7 @@ Future<void> advanceShips(
       () async {
     logger.info('🔎 $queue');
     await caches.updateAtTopOfLoop(db, api);
-    await centralCommand.advanceCentralPlanning(api, caches);
+    await centralCommand.advanceCentralPlanning(db, api, caches);
   });
 
   const allowableScheduleLag = Duration(milliseconds: 1000);

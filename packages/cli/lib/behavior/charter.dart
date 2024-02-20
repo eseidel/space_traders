@@ -100,10 +100,9 @@ Future<JobResult> doCharter(
   // We still do market visits even if we've already charted this waypoint.
   await visitLocalMarket(api, db, caches, ship, getNow: getNow);
   await visitLocalShipyard(
-    api,
     db,
+    api,
     caches.waypoints,
-    caches.shipyardPrices,
     caches.static,
     caches.agent,
     ship,

@@ -10,7 +10,6 @@ import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/shipyard_listing_cache.dart';
-import 'package:cli/cache/shipyard_prices.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -53,7 +52,6 @@ class Caches {
     required this.agent,
     required this.marketPrices,
     required this.ships,
-    required this.shipyardPrices,
     required this.systems,
     required this.waypoints,
     required this.markets,
@@ -85,9 +83,6 @@ class Caches {
 
   /// Known shipyard listings.
   final ShipyardListingSnapshot shipyardListings;
-
-  /// The historical shipyard prices.
-  final ShipyardPrices shipyardPrices;
 
   /// The cache of systems.
   final SystemsCache systems;
@@ -138,7 +133,6 @@ class Caches {
     // Intentionally do not load ships from disk (they change too often).
     final ships = await fetchShips(db, api);
     final marketPrices = await MarketPrices.load(db);
-    final shipyardPrices = await ShipyardPrices.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
@@ -174,7 +168,6 @@ class Caches {
       agent: agent,
       ships: ships,
       marketPrices: marketPrices,
-      shipyardPrices: shipyardPrices,
       systems: systems,
       waypoints: waypoints,
       markets: markets,

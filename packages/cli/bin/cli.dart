@@ -125,11 +125,15 @@ Future<void> cliMain(List<String> args) async {
   final api = apiFromAuthToken(token, db);
 
   final caches = await Caches.loadOrFetch(fs, api, db);
+  final marketPricesCount = await db.marketPricesCount();
+  final marketWaypointsCount = await db.marketPricesWaypointCount();
+  final shipyardPricesCount = await db.shipyardPricesCount();
+  final shipyardWaypointsCount = await db.shipyardPricesWaypointCount();
   logger.info(
-    'Loaded ${caches.marketPrices.count} prices from '
-    '${caches.marketPrices.waypointCount} markets and '
-    '${caches.shipyardPrices.count} prices from '
-    '${caches.shipyardPrices.waypointCount} shipyards.',
+    'Loaded $marketPricesCount prices from '
+    '$marketWaypointsCount markets and '
+    '$shipyardPricesCount prices from '
+    '$shipyardWaypointsCount shipyards.',
   );
   final centralCommand =
       CentralCommand(behaviorCache: caches.behaviors, shipCache: caches.ships);

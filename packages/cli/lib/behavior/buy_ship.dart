@@ -14,7 +14,7 @@ import 'package:types/types.dart';
 typedef ShipyardTrip = CostedTrip<ShipyardPrice>;
 
 List<ShipyardTrip> _shipyardsSellingByDistance(
-  ShipyardPrices shipyardPrices,
+  ShipyardPriceSnapshot shipyardPrices,
   RoutePlanner routePlanner,
   Ship ship,
   ShipType shipType,
@@ -57,7 +57,7 @@ List<ShipyardTrip> _shipyardsSellingByDistance(
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
 /// used for evaluating the trade-off between "closest" vs. "cheapest".
 ShipyardTrip? findBestShipyardToBuy(
-  ShipyardPrices shipyardPrices,
+  ShipyardPriceSnapshot shipyardPrices,
   RoutePlanner routePlanner,
   Ship ship,
   ShipType shipType, {

@@ -35,8 +35,6 @@ class _MockShipReactorCache extends Mock implements ShipReactorCache {}
 class _MockShipyardListingCache extends Mock
     implements ShipyardListingSnapshot {}
 
-class _MockShipyardPrices extends Mock implements ShipyardPrices {}
-
 class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
@@ -74,7 +72,6 @@ Caches mockCaches() {
     agent: _MockAgentCache(),
     marketPrices: _MockMarketPrices(),
     ships: _MockShipCache(),
-    shipyardPrices: _MockShipyardPrices(),
     systems: _MockSystemsCache(),
     waypoints: _MockWaypointCache(),
     markets: _MockMarketCache(),

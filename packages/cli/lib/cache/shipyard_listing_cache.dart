@@ -43,6 +43,11 @@ class ShipyardListingSnapshot {
   /// Fetch the ShipyardListing for the given WaypointSymbol.
   ShipyardListing? operator [](WaypointSymbol waypointSymbol) =>
       listingForSymbol(waypointSymbol);
+
+  /// Returns true if we know of a Shipyard with the given ShipType.
+  bool knowOfShipyardWithShip(ShipType shipType) {
+    return listings.any((listing) => listing.hasShip(shipType));
+  }
 }
 
 /// Add ShipyardListing for the given Shipyard to the cache.

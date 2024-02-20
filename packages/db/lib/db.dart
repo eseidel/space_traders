@@ -469,4 +469,34 @@ class Database {
     final query = timestampOfMostRecentShipyardPriceQuery(waypointSymbol);
     return _hasRecentPrice(query, maxAge);
   }
+
+  /// Count the number of market prices in the database.
+  Future<int> marketPricesCount() async {
+    final result =
+        await connection.execute('SELECT COUNT(*) FROM market_price_');
+    return result[0][0]! as int;
+  }
+
+  /// Count the number of unique symbols in the MarketPrices table.
+  Future<int> marketPricesWaypointCount() async {
+    final result = await connection.execute(
+      'SELECT COUNT(DISTINCT waypoint_symbol) FROM market_price_',
+    );
+    return result[0][0]! as int;
+  }
+
+  /// Count the number of shipyard prices in the database.
+  Future<int> shipyardPricesCount() async {
+    final result =
+        await connection.execute('SELECT COUNT(*) FROM shipyard_price_');
+    return result[0][0]! as int;
+  }
+
+  /// Count the number of unique symbols in the ShipyardPrices table.
+  Future<int> shipyardPricesWaypointCount() async {
+    final result = await connection.execute(
+      'SELECT COUNT(DISTINCT waypoint_symbol) FROM shipyard_price_',
+    );
+    return result[0][0]! as int;
+  }
 }

@@ -128,11 +128,11 @@ void main() {
       ),
     ).thenReturn(true);
     when(
-      () => caches.shipyardPrices.hasRecentData(
+      () => db.hasRecentShipyardPrices(
         waypointSymbol,
-        maxAge: any(named: 'maxAge'),
+        any(),
       ),
-    ).thenReturn(true);
+    ).thenAnswer((_) async => true);
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))
         .thenAnswer((_) async => true);

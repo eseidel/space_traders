@@ -219,10 +219,9 @@ Future<JobResult> doSystemWatcher(
   }
   await visitLocalMarket(api, db, caches, ship, maxAge: maxAge, getNow: getNow);
   await visitLocalShipyard(
-    api,
     db,
+    api,
     caches.waypoints,
-    caches.shipyardPrices,
     caches.static,
     caches.agent,
     ship,

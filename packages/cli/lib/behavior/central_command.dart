@@ -12,6 +12,7 @@ import 'package:cli/mining.dart';
 import 'package:cli/printing.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
@@ -516,7 +517,11 @@ class CentralCommand {
 
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
-  Future<void> advanceCentralPlanning(Api api, Caches caches) async {
+  Future<void> advanceCentralPlanning(
+    Database db,
+    Api api,
+    Caches caches,
+  ) async {
     // await caches.updateRoutingCaches();
 
     _assignedSystemsForSatellites
@@ -531,7 +536,7 @@ class CentralCommand {
       systemSymbol: caches.agent.headquartersSystemSymbol,
     );
 
-    _nextShipBuyJob ??= await _computeNextShipBuyJob(api, caches);
+    _nextShipBuyJob ??= await _computeNextShipBuyJob(db, api, caches);
     updateAvailableMounts(caches.marketPrices);
     await _queueMountRequests(caches);
 
@@ -574,14 +579,16 @@ class CentralCommand {
   }
 
   Future<ShipBuyJob?> _findBestPlaceToBuy(
+    Database db,
     Caches caches,
     ShipType shipType,
   ) async {
+    final shipyardPrices = await ShipyardPriceSnapshot.load(db);
     // TODO(eseidel): This uses command ship to compute the job, but
     // will happily give out the job to a non-command ship for execution.
     final commandShip = _shipCache.ships.first;
     final trip = findBestShipyardToBuy(
-      caches.shipyardPrices,
+      shipyardPrices,
       caches.routePlanner,
       commandShip,
       shipType,
@@ -590,7 +597,7 @@ class CentralCommand {
     if (trip == null) {
       return null;
     }
-    final recentPrice = caches.shipyardPrices.recentPurchasePrice(
+    final recentPrice = shipyardPrices.recentPurchasePrice(
       shipType: shipType,
       shipyardSymbol: trip.route.endSymbol,
     );
@@ -606,18 +613,22 @@ class CentralCommand {
   }
 
   /// Computes the next ship buy job.
-  Future<ShipBuyJob?> _computeNextShipBuyJob(Api api, Caches caches) async {
-    final shipType = shipToBuyFromPlan(
+  Future<ShipBuyJob?> _computeNextShipBuyJob(
+    Database db,
+    Api api,
+    Caches caches,
+  ) async {
+    final shipType = await shipToBuyFromPlan(
       _shipCache,
       config.buyPlan,
-      caches.shipyardPrices,
+      caches.shipyardListings,
       caches.static.shipyardShips,
     );
     if (shipType == null) {
       return null;
     }
     logger.info('Planning to buy $shipType');
-    return _findBestPlaceToBuy(caches, shipType);
+    return _findBestPlaceToBuy(db, caches, shipType);
   }
 
   /// Returns true if [ship] should start the buyShip behavior.
@@ -945,12 +956,12 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
 }
 
 /// Returns the next ship to buy from the given [shipPlan].
-ShipType? shipToBuyFromPlan(
+Future<ShipType?> shipToBuyFromPlan(
   ShipSnapshot shipCache,
   List<ShipType> shipPlan,
-  ShipyardPrices shipyardPrices,
+  ShipyardListingSnapshot shipyardListings,
   ShipyardShipCache shipyardShips,
-) {
+) async {
   final counts = <ShipType, int>{};
   for (final shipType in shipPlan) {
     counts[shipType] = (counts[shipType] ?? 0) + 1;
@@ -965,12 +976,12 @@ ShipType? shipToBuyFromPlan(
     }
     // If we should buy this one but haven't found it yet, buy nothing.
     // TODO(eseidel): This fails early before we have prices.
-    // We should store ShipListings separate from ShipyardPrices.
-    if (!shipyardPrices.havePriceFor(shipType)) {
+    if (!shipyardListings.knowOfShipyardWithShip(shipType)) {
       logger.warn('No prices for $shipType');
       return null;
     }
-    // Buy this one!
+    // TODO(eseidel): This doesn't take reachability into account, we might
+    // know of a shipyard selling shipType, but not be able to reach it.
     return shipType;
   }
   logger.info('All ships already purchased in plan.');

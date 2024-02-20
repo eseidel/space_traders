@@ -10,14 +10,14 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// A collection of price records.
-class ShipyardPrices extends PricesCache<ShipType, ShipyardPrice> {
+class ShipyardPriceSnapshot extends PricesCache<ShipType, ShipyardPrice> {
   /// Create a new price data collection.
-  ShipyardPrices(super.records);
+  ShipyardPriceSnapshot(super.records);
 
   /// Load the price data from the cache.
-  static Future<ShipyardPrices> load(Database db) async {
+  static Future<ShipyardPriceSnapshot> load(Database db) async {
     final prices = await db.allShipyardPrices();
-    return ShipyardPrices(prices.toList());
+    return ShipyardPriceSnapshot(prices.toList());
   }
 
   /// The default path to the cache file.

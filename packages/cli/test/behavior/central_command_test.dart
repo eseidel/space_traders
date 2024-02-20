@@ -37,9 +37,10 @@ class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockShipyardPrices extends Mock implements ShipyardPrices {}
-
 class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
+
+class _MockShipyardListingSnapshot extends Mock
+    implements ShipyardListingSnapshot {}
 
 void main() {
   test('CentralCommand.otherCharterSystems', () async {
@@ -491,6 +492,7 @@ void main() {
   );
 
   test('advanceCentralPlanning smoke test', () async {
+    final db = _MockDatabase();
     final caches = mockCaches();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
@@ -522,12 +524,12 @@ void main() {
     when(() => caches.agent.headquartersSystemSymbol)
         .thenReturn(hqSystemSymbol);
     when(() => caches.systems.waypointsInSystem(hqSystemSymbol)).thenReturn([]);
-    when(() => caches.shipyardPrices.prices).thenReturn([]);
-    when(() => caches.shipyardPrices.pricesFor(ShipType.ORE_HOUND))
-        .thenReturn([]);
+    // when(() => caches.shipyardPrices.prices).thenReturn([]);
+    // when(() => caches.shipyardPrices.pricesFor(ShipType.ORE_HOUND))
+    //     .thenReturn([]);
     registerFallbackValue(ShipType.ORE_HOUND);
-    when(() => caches.shipyardPrices.havePriceFor(any())).thenReturn(true);
-    when(() => caches.shipyardPrices.pricesFor(any())).thenReturn([]);
+    // when(() => caches.shipyardPrices.havePriceFor(any())).thenReturn(true);
+    // when(() => caches.shipyardPrices.pricesFor(any())).thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => caches.marketPrices.havePriceFor(any())).thenReturn(false);
@@ -560,7 +562,7 @@ void main() {
     final logger = _MockLogger();
     await runWithLogger(
       logger,
-      () async => await centralCommand.advanceCentralPlanning(api, caches),
+      () async => await centralCommand.advanceCentralPlanning(db, api, caches),
     );
     expect(centralCommand.nextShipBuyJob, isNull);
   });
@@ -667,9 +669,10 @@ void main() {
     final behaviorCache = _MockBehaviorCache();
     final behaviorTimeouts = _MockBehaviorTimeouts();
     final centralCommand = CentralCommand(
-        behaviorCache: behaviorCache,
-        shipCache: shipCache,
-        behaviorTimeouts: behaviorTimeouts);
+      behaviorCache: behaviorCache,
+      shipCache: shipCache,
+      behaviorTimeouts: behaviorTimeouts,
+    );
     final shipSymbol = ShipSymbol.fromString('X-A');
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -694,11 +697,12 @@ void main() {
     expect(job.behavior, Behavior.idle);
   });
 
-  test('shipToBuyFromPlan', () {
+  test('shipToBuyFromPlan', () async {
     final shipyardShips = _MockShipyardShipCache();
-    final shipyardPrices = _MockShipyardPrices();
+    final shipyardListingSnapshot = _MockShipyardListingSnapshot();
     final shipCache = _MockShipCache();
-    when(() => shipyardPrices.havePriceFor(any())).thenReturn(true);
+    when(() => shipyardListingSnapshot.knowOfShipyardWithShip(any()))
+        .thenReturn(true);
 
     final buySecond = [ShipType.COMMAND_FRIGATE, ShipType.EXPLORER];
     when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
@@ -706,10 +710,10 @@ void main() {
     when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
         .thenReturn(0);
     expect(
-      shipToBuyFromPlan(
+      await shipToBuyFromPlan(
         shipCache,
         buySecond,
-        shipyardPrices,
+        shipyardListingSnapshot,
         shipyardShips,
       ),
       ShipType.EXPLORER,
@@ -721,10 +725,10 @@ void main() {
     when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
         .thenReturn(0);
     expect(
-      shipToBuyFromPlan(
+      await shipToBuyFromPlan(
         shipCache,
         buyFirst,
-        shipyardPrices,
+        shipyardListingSnapshot,
         shipyardShips,
       ),
       ShipType.EXPLORER,
@@ -743,10 +747,10 @@ void main() {
     when(() => shipCache.countOfType(shipyardShips, ShipType.ORE_HOUND))
         .thenReturn(0);
     expect(
-      shipToBuyFromPlan(
+      await shipToBuyFromPlan(
         shipCache,
         buyFourth,
-        shipyardPrices,
+        shipyardListingSnapshot,
         shipyardShips,
       ),
       ShipType.ORE_HOUND,

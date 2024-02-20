@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 
 void main() {
   test('ShipyardPrices.hasRecentShipyardData', () {
-    final shipyardPrices = ShipyardPrices([]);
+    final shipyardPrices = ShipyardPriceSnapshot([]);
     final symbol = WaypointSymbol.fromString('S-A-W');
     expect(shipyardPrices.hasRecentData(symbol), false);
     final now = DateTime(2021);

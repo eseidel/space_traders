@@ -751,10 +751,9 @@ Future<JobResult> doTraderGetCargo(
     maxAge: const Duration(milliseconds: 300),
   );
   await visitLocalShipyard(
-    api,
     db,
+    api,
     caches.waypoints,
-    caches.shipyardPrices,
     caches.static,
     caches.agent,
     ship,
@@ -822,10 +821,9 @@ Future<JobResult> doTraderDeliverCargo(
     maxAge: const Duration(milliseconds: 300),
   );
   await visitLocalShipyard(
-    api,
     db,
+    api,
     caches.waypoints,
-    caches.shipyardPrices,
     caches.static,
     caches.agent,
     ship,

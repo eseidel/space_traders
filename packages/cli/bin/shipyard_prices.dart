@@ -8,7 +8,7 @@ import 'package:cli_table/cli_table.dart';
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final showAll = argResults['all'] as bool;
 
-  final shipyardPrices = await ShipyardPrices.load(db);
+  final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   logger.info(
     'Loaded ${shipyardPrices.count} prices from '
     '${shipyardPrices.waypointCount} waypoints.',

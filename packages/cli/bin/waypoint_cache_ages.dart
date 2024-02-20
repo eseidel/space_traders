@@ -11,7 +11,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final marketPrices = await MarketPrices.load(db);
-  final shipyardPrices = await ShipyardPrices.load(db);
+  final shipyardPrices = await ShipyardPriceSnapshot.load(db);
 
   final waypoints = systemsCache.waypointsInSystem(startSystemSymbol);
 

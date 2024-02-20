@@ -35,10 +35,9 @@ Future<JobResult> doBuyJob(
     maxAge: const Duration(seconds: 5),
   );
   await visitLocalShipyard(
-    api,
     db,
+    api,
     caches.waypoints,
-    caches.shipyardPrices,
     caches.static,
     caches.agent,
     ship,
