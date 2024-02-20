@@ -50,7 +50,7 @@ Future<void> runOffline(
         return;
       }
       final db = overrideDatabase ?? await defaultDatabase();
-      final result = fn(fs, db, results);
+      final result = await fn(fs, db, results);
       await db.close();
       return result;
     },
