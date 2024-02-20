@@ -263,20 +263,20 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
 
 bool _shouldRefuelAfterCheckingPrice(
   MarketPrices marketPrices,
-  Ship ship,
-  int fuelPrice,
-) {
-  const fuelSymbol = TradeSymbol.FUEL;
-  final median = marketPrices.medianPurchasePrice(fuelSymbol);
-  final markup = median != null ? fuelPrice / median : null;
+  Ship ship, {
+  required TradeSymbol fuelSymbol,
+  required int price,
+  required int? median,
+}) {
+  final markup = median != null ? price / median : null;
   if (markup != null && markup > config.fuelWarningMarkup) {
     final deviation = stringForPriceDeviance(
       fuelSymbol,
-      price: fuelPrice,
+      price: price,
       median: median,
       MarketTransactionTypeEnum.PURCHASE,
     );
-    final fuelString = creditsString(fuelPrice);
+    final fuelString = creditsString(price);
 
     final fuelPercent = ship.fuel.current / ship.fuel.capacity;
     if (fuelPercent < config.fuelCriticalThreshold) {
@@ -351,10 +351,13 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   if (!_shouldRefuelBasedOnUsage(ship)) {
     return null;
   }
+  final median = marketPrices.medianPurchasePrice(fuelGood.symbol);
   if (!_shouldRefuelAfterCheckingPrice(
     marketPrices,
     ship,
-    fuelGood.purchasePrice,
+    fuelSymbol: fuelGood.symbol,
+    price: fuelGood.purchasePrice,
+    median: median,
   )) {
     return null;
   }
