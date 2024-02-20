@@ -82,7 +82,7 @@ class Caches {
   ContractSnapshot contracts;
 
   /// Known shipyard listings.
-  final ShipyardListingSnapshot shipyardListings;
+  ShipyardListingSnapshot shipyardListings;
 
   /// The cache of systems.
   final SystemsCache systems;
@@ -211,6 +211,7 @@ class Caches {
     contracts = await contracts.ensureUpToDate(db, api);
 
     marketListings = await MarketListingSnapshot.load(db);
+    shipyardListings = await ShipyardListingSnapshot.load(db);
   }
 }
 
