@@ -107,7 +107,7 @@ final mountPrices = <TradeSymbol, int>{
 };
 
 int mountPrice(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   ShipMountSymbolEnum mountSymbol,
 ) {
   final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
@@ -122,7 +122,7 @@ int mountPrice(
   return marketPrices.medianPurchasePrice(tradeSymbol) ?? defaultPrice;
 }
 
-int costOutMounts(MarketPrices marketPrices, MountSymbolSet mounts) =>
+int costOutMounts(MarketPriceSnapshot marketPrices, MountSymbolSet mounts) =>
     mounts.map((mount) => mountPrice(marketPrices, mount)).sum;
 
 // For running simulations when we haven't yet found the ship prices.
@@ -149,7 +149,7 @@ int shipPrice(ShipyardPriceSnapshot shipyardPrices, ShipType shipType) {
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsCache(

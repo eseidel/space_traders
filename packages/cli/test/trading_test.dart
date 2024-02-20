@@ -15,7 +15,7 @@ class _MockLogger extends Mock implements Logger {}
 class _MockMarketListingSnapshot extends Mock
     implements MarketListingSnapshot {}
 
-class _MockMarketPrices extends Mock implements MarketPrices {}
+class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
@@ -228,7 +228,7 @@ void main() {
         activity: ActivityLevel.WEAK,
       ),
     ];
-    final marketPrices = MarketPrices(prices);
+    final marketPrices = MarketPriceSnapshot(prices);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final shipEngine = _MockShipEngine();

@@ -22,7 +22,7 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockMarketPrices extends Mock implements MarketPrices {}
+class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockShip extends Mock implements Ship {}
 

@@ -6,7 +6,7 @@ import 'package:types/types.dart';
 void main() {
   test('MarketScane.fromMarketPrices', () async {
     final now = DateTime(2021);
-    final marketPrices = MarketPrices(
+    final marketPrices = MarketPriceSnapshot(
       [
         MarketPrice.fromMarketTradeGood(
           MarketTradeGood(

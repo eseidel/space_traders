@@ -27,7 +27,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final hqSystem = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
 
   final listings = marketListings.listings
       .where((l) => l.waypointSymbol.system == hqSystem)

@@ -113,7 +113,7 @@ class Sourcer {
   final MarketListingSnapshot marketListings;
   final SystemsCache systemsCache;
   final TradeExportCache exportCache;
-  final MarketPrices marketPrices;
+  final MarketPriceSnapshot marketPrices;
 
   void sourceViaShuttle(
     TradeSymbol tradeSymbol,
@@ -225,7 +225,7 @@ void source(
   MarketListingSnapshot marketListings,
   SystemsCache systemsCache,
   TradeExportCache exportCache,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   TradeSymbol tradeSymbol,
   WaypointSymbol waypointSymbol,
 ) {
@@ -242,7 +242,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final exportCache = TradeExportCache.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   final agent = await myAgent(db);
   final constructionCache = ConstructionCache(db);
 

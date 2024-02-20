@@ -17,7 +17,7 @@ import 'package:types/types.dart';
 
 /// Returns the expected value of the survey.
 int expectedValueFromSurvey(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Survey survey, {
   required Map<TradeSymbol, WaypointSymbol> marketForGood,
 }) {
@@ -64,7 +64,7 @@ class ValuedSurvey {
 /// Finds a recent survey
 Future<List<ValuedSurvey>> surveysWorthMining(
   Database db,
-  MarketPrices marketPrices, {
+  MarketPriceSnapshot marketPrices, {
   required WaypointSymbol surveyWaypointSymbol,
   required Map<TradeSymbol, WaypointSymbol> marketForGood,
   int minimumSurveys = 10,

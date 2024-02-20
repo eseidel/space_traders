@@ -13,7 +13,7 @@ void addSymbols(
   String category,
   Set<TradeSymbol> tradeSymbols,
   WaypointSymbol marketSymbol,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
 ) {
   if (tradeSymbols.isEmpty) {
     return;
@@ -66,7 +66,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
 
   final waypoints = systemsCache.waypointsInSystem(hqSystem);
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
 
   for (final waypoint in waypoints) {
     final marketSymbol = waypoint.symbol;

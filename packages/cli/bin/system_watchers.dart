@@ -12,7 +12,7 @@ void main(List<String> args) async {
 void logShip(
   SystemsCache systemsCache,
   BehaviorCache behaviorCache,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Ship ship,
 ) {
   const indent = '   ';

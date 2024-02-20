@@ -9,7 +9,7 @@ Future<void> main(List<String> args) async {
 }
 
 int _costOutMounts(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   MountSymbolSet mounts,
 ) {
   return mounts.fold<int>(
@@ -36,7 +36,7 @@ Map<ShipType, int> _shipTypeCounts(
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
 

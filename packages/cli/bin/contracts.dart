@@ -7,7 +7,7 @@ import 'package:cli/printing.dart';
 void printContracts(
   String label,
   List<Contract> contracts,
-  MarketPrices marketPrices, {
+  MarketPriceSnapshot marketPrices, {
   required bool describeContracts,
 }) {
   if (contracts.isEmpty) {
@@ -28,7 +28,7 @@ void printContracts(
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final printAll = argResults['all'] as bool;
   final contractSnapshot = await ContractSnapshot.load(db);
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   printContracts(
     'completed',
     contractSnapshot.completedContracts,

@@ -34,7 +34,7 @@ void main() {
     const b = TradeSymbol.FOOD;
     final aPrice = makePrice(waypointSymbol: 'S-S-A', symbol: a);
     final bPrice = makePrice(waypointSymbol: 'S-S-B', symbol: a);
-    final marketPrices = MarketPrices([aPrice, bPrice]);
+    final marketPrices = MarketPriceSnapshot([aPrice, bPrice]);
     expect(marketPrices.medianPurchasePrice(a), 1);
     expect(marketPrices.medianSellPrice(a), 1);
     expect(marketPrices.medianPurchasePrice(b), null);
@@ -67,7 +67,7 @@ void main() {
 
   test('percentileForSellPrice', () {
     const a = TradeSymbol.FUEL;
-    final marketPrices = MarketPrices(
+    final marketPrices = MarketPriceSnapshot(
       [
         makePrice(waypointSymbol: 'S-S-A', symbol: a, sellPrice: 100),
         makePrice(waypointSymbol: 'S-S-B', symbol: a, sellPrice: 110),
@@ -96,7 +96,7 @@ void main() {
       sellPrice: 100,
       timestamp: _now,
     );
-    final onePrice = MarketPrices([price]);
+    final onePrice = MarketPriceSnapshot([price]);
     expect(
       onePrice.recentSellPrice(
         marketSymbol: price.waypointSymbol,

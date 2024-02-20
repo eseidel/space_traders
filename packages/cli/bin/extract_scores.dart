@@ -11,7 +11,7 @@ import 'package:collection/collection.dart';
 /// Given a set of trade symbols, compute the percentage sell price
 /// across the set.
 double _scoreMarkets(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Map<TradeSymbol, WaypointSymbol> marketForGood,
 ) {
   // Walk the prices for the given symbols at the given market, and compute
@@ -63,7 +63,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final charting = ChartingCache(db);
   final hqSystem = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
 
   final List<ExtractionScore> scores;
   if (isSiphon) {

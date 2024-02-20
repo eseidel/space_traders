@@ -24,7 +24,7 @@ void main() {
     final cSymbol = WaypointSymbol.fromString('S-A-C');
     final dSymbol = WaypointSymbol.fromString('S-A-D');
     final now = DateTime(2021);
-    final marketPrices = MarketPrices(
+    final marketPrices = MarketPriceSnapshot(
       [
         MarketPrice(
           waypointSymbol: aSymbol,

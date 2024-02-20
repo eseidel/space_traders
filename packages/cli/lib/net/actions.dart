@@ -124,7 +124,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
 Future<List<Transaction>> sellAllCargoAndLog(
   Api api,
   Database db,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   Market market,
   ShipSnapshot shipCache,
@@ -184,7 +184,7 @@ Future<void> jettisonCargoAndLog(
 Future<Transaction?> purchaseCargoAndLog(
   Api api,
   Database db,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,
@@ -262,7 +262,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
 }
 
 bool _shouldRefuelAfterCheckingPrice(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Ship ship, {
   required TradeSymbol fuelSymbol,
   required int price,
@@ -333,7 +333,7 @@ bool _shouldRefuelBasedOnCapacity(Ship ship) {
 Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Api api,
   Database db,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Market market,
@@ -521,7 +521,7 @@ Future<void> chartWaypointAndLog(
 Future<JumpShip200ResponseData> useJumpGateAndLog(
   Api api,
   Database db,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,

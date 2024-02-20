@@ -7,7 +7,7 @@ import 'package:cli/cli.dart';
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final behaviorCache = await BehaviorCache.load(db);
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
 

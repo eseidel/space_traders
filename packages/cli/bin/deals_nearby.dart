@@ -24,7 +24,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
 
   final behaviorCache = await BehaviorCache.load(db);
   final shipCache = await ShipSnapshot.load(db);

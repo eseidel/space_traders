@@ -62,7 +62,7 @@ class MarketScan {
   /// Given a set of historical market prices, will collect the top N buy and
   /// sell opportunities for each trade symbol regardless of distance.
   factory MarketScan.fromMarketPrices(
-    MarketPrices marketPrices, {
+    MarketPriceSnapshot marketPrices, {
     required String description,
     bool Function(WaypointSymbol waypointSymbol)? waypointFilter,
   }) {

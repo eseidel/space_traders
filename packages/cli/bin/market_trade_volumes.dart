@@ -6,7 +6,7 @@ void main(List<String> args) async {
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   final tradeVolumesBySymbol = <TradeSymbol, Set<int>>{};
   for (final price in marketPrices.prices) {
     final tradeSymbol = price.symbol;

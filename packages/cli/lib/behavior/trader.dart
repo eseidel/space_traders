@@ -19,7 +19,7 @@ import 'package:types/types.dart';
 Future<Transaction?> purchaseTradeGoodIfPossible(
   Api api,
   Database db,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,
@@ -516,7 +516,8 @@ Future<SupplyConstruction201ResponseData?>
   return response;
 }
 
-int? _expectedContractProfit(Contract contract, MarketPrices marketPrices) {
+int? _expectedContractProfit(
+    Contract contract, MarketPriceSnapshot marketPrices) {
   // Add up the total expected outlay.
   final terms = contract.terms;
   final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();
@@ -541,7 +542,7 @@ int? _expectedContractProfit(Contract contract, MarketPrices marketPrices) {
 
 /// Returns a string describing the expected profit of a contract.
 String describeExpectedContractProfit(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Contract contract,
 ) {
   final profit = _expectedContractProfit(contract, marketPrices);
@@ -554,7 +555,7 @@ Future<DateTime?> acceptContractsIfNeeded(
   Api api,
   Database db,
   ContractSnapshot contractSnapshot,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,

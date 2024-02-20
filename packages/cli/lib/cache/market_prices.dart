@@ -120,14 +120,14 @@ extension MarketPricePredictions on MarketPrice {
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
+class MarketPriceSnapshot extends PricesCache<TradeSymbol, MarketPrice> {
   /// Create a new price data collection.
-  MarketPrices(super.records);
+  MarketPriceSnapshot(super.records);
 
   /// Load the price data from the cache.
-  static Future<MarketPrices> load(Database db) async {
+  static Future<MarketPriceSnapshot> load(Database db) async {
     final prices = await db.allMarketPrices();
-    return MarketPrices(prices.toList());
+    return MarketPriceSnapshot(prices.toList());
   }
 
   @override

@@ -62,7 +62,7 @@ Future<MountRequest?> mountRequestForShip(
 /// Generates a buy job for the first mount we know how to find a buy job for.
 BuyJob? buyJobForMount(
   MountSymbolSet needed,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   RoutePlanner routePlanner,
   Ship ship, {
   required int expectedCreditsPerSecond,

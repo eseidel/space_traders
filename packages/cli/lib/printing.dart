@@ -75,7 +75,7 @@ String stringForPriceDeviance(
 /// Logs a transaction to the console.
 void logMarketTransaction(
   Ship ship,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Agent agent,
   MarketTransaction transaction, {
   String? transactionEmoji,

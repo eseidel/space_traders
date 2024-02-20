@@ -12,7 +12,7 @@ typedef FindDeal = CostedDeal? Function(Ship ship, WaypointSymbol startSymbol);
 WaypointSymbol? findBetterTradeLocation(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Ship ship, {
   required FindDeal findDeal,
   required Set<SystemSymbol> avoidSystems,
@@ -37,7 +37,7 @@ WaypointSymbol? findBetterTradeLocation(
 /// Compute the score for each market based on the distance of each good's
 /// price from the median price.
 Map<SystemSymbol, int> scoreMarketSystems(
-  MarketPrices marketPrices, {
+  MarketPriceSnapshot marketPrices, {
   int limit = 200,
 }) {
   // Walk all markets in the market prices.  Get all goods for each market
@@ -171,7 +171,7 @@ class _MarketSearch {
   });
 
   factory _MarketSearch.start(
-    MarketPrices marketPrices,
+    MarketPriceSnapshot marketPrices,
     SystemsCache systemsCache, {
     Set<SystemSymbol>? avoidSystems,
   }) {

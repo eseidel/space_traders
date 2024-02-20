@@ -304,7 +304,7 @@ class CentralCommand {
   CostedDeal? findNextDealAndLog(
     AgentCache agentCache,
     ContractSnapshot contractSnapshot,
-    MarketPrices marketPrices,
+    MarketPriceSnapshot marketPrices,
     SystemsCache systemsCache,
     SystemConnectivity systemConnectivity,
     RoutePlanner routePlanner,
@@ -464,7 +464,7 @@ class CentralCommand {
   }
 
   /// Updates _availableMounts with any mounts we know of a place to buy.
-  void updateAvailableMounts(MarketPrices marketPrices) {
+  void updateAvailableMounts(MarketPriceSnapshot marketPrices) {
     for (final mountSymbol in ShipMountSymbolEnum.values) {
       if (_availableMounts.contains(mountSymbol)) {
         continue;
@@ -992,7 +992,7 @@ Future<ShipType?> shipToBuyFromPlan(
 /// Computes the market subsidies for the current construction job.
 List<SellOpp> computeConstructionMaterialSubsidies(
   MarketListingSnapshot marketListings,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   TradeExportCache exportsCache,
   Construction construction,
 ) {

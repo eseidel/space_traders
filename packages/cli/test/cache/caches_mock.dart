@@ -18,7 +18,7 @@ class _MockMarketCache extends Mock implements MarketCache {}
 class _MockMarketListingSnapshot extends Mock
     implements MarketListingSnapshot {}
 
-class _MockMarketPrices extends Mock implements MarketPrices {}
+class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 

@@ -24,7 +24,7 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockMarket extends Mock implements Market {}
 
-class _MockMarketPrices extends Mock implements MarketPrices {}
+class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockShip extends Mock implements Ship {}
 

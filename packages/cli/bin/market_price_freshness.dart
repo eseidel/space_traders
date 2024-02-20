@@ -4,7 +4,7 @@ import 'package:cli/printing.dart';
 import 'package:stats/stats.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final prices = await MarketPrices.load(db);
+  final prices = await MarketPriceSnapshot.load(db);
   logger.info('${prices.count} prices loaded.');
 
   final now = DateTime.timestamp();

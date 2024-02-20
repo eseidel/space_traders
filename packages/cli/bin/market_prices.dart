@@ -5,7 +5,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
 
   logger.info(

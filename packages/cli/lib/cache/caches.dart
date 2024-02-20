@@ -72,7 +72,7 @@ class Caches {
   final AgentCache agent;
 
   /// The historical market price data.
-  final MarketPrices marketPrices;
+  final MarketPriceSnapshot marketPrices;
 
   /// The ship cache.
   // TODO(eseidel): Try not caching ships and just fetching from db.
@@ -132,7 +132,7 @@ class Caches {
     final agent = await AgentCache.loadOrFetch(db, api);
     // Intentionally do not load ships from disk (they change too often).
     final ships = await fetchShips(db, api);
-    final marketPrices = await MarketPrices.load(db);
+    final marketPrices = await MarketPriceSnapshot.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);

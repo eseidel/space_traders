@@ -310,7 +310,7 @@ CostedDeal costOutDeal(
 MarketScan scanReachableMarkets(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
-  MarketPrices marketPrices, {
+  MarketPriceSnapshot marketPrices, {
   required SystemSymbol startSystem,
 }) {
   // Reachable systems will all have the same clusterId as the start system.
@@ -326,7 +326,7 @@ MarketScan scanReachableMarkets(
 /// Returns the best deals for the given parameters,
 /// sorted by profit per second, with most profitable first.
 Iterable<CostedDeal> findDealsFor(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
   MarketScan scan, {
@@ -459,7 +459,7 @@ CostedTrip<T>? costTrip<T>(
 /// Returns a list of MarketTrips for markets which trade the given symbol
 /// sorted by distance.
 List<MarketTrip> marketsTradingSortedByDistance(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   RoutePlanner routePlanner,
   TradeSymbol tradeSymbol, {
   required WaypointSymbol start,
@@ -506,7 +506,7 @@ List<MarketTrip> marketsTradingSortedByDistance(
 /// expectedCreditsPerSecond is the time value of money (e.g. 7c/s)
 /// used for evaluating the trade-off between "closest" vs. "cheapest".
 MarketTrip? findBestMarketToBuy(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   RoutePlanner routePlanner,
   TradeSymbol tradeSymbol, {
   required WaypointSymbol start,
@@ -564,7 +564,7 @@ int estimateRoutePlanCost({
 /// This does not account for fuel costs.
 // TODO(eseidel): This does not work with no pricing data.
 MarketTrip? findBestMarketToSell(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   MarketListingSnapshot marketListings,
   RoutePlanner routePlanner,
   Ship ship,
@@ -723,7 +723,7 @@ bool Function(Deal) avoidDealsInProgress(
 Iterable<CostedDeal> scanAndFindDeals(
   SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   RoutePlanner routePlanner, {
   required WaypointSymbol startSymbol,
   required int maxTotalOutlay,

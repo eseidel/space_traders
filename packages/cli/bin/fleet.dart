@@ -10,7 +10,7 @@ void main(List<String> args) async {
 }
 
 String describeInventory(
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   List<ShipCargoItem> inventory, {
   String indent = '',
 }) {
@@ -53,7 +53,7 @@ String _behaviorOrTypeString(Ship ship, BehaviorState? behavior) {
 void logShip(
   SystemsCache systemsCache,
   BehaviorCache behaviorCache,
-  MarketPrices marketPrices,
+  MarketPriceSnapshot marketPrices,
   Ship ship,
 ) {
   const indent = '   ';
@@ -113,7 +113,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   final systemsCache = SystemsCache.load(fs)!;
-  final marketPrices = await MarketPrices.load(db);
+  final marketPrices = await MarketPriceSnapshot.load(db);
   for (final ship in matchingShips) {
     logShip(
       systemsCache,
