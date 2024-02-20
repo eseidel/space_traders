@@ -1,8 +1,26 @@
 #!/bin/bash
 
+set -e
+
+# CAUTION, this script is lazy and just overwrites .zshrc, rather than
+# trying to add to it.
+
+# Path is needed for pub global activate
+# BOT=true is needed to make flutter/dart not whine about using root user.
+RC_FILE="
+export PATH=\"\$PATH\":\"$HOME/.pub-cache/bin\"
+export BOT=true
+"
+echo $RC_FILE > $HOME/.zshrc
+source $HOME/.zshrc
+
 snap install flutter --classic
 # Let flutter finish installing itself.
 flutter --version
+
+# Pub get for all the packages.
+dart pub global activate very_good_cli
+very_good packages get -r
 
 snap install docker
 
