@@ -39,18 +39,18 @@ void addSymbols(
         rightAlign(price.purchasePrice),
         rightAlign(
           stringForPriceDeviance(
-            marketPrices,
             price.tradeSymbol,
-            price.purchasePrice,
+            price: price.purchasePrice,
+            median: marketPrices.medianPurchasePrice(price.tradeSymbol),
             MarketTransactionTypeEnum.PURCHASE,
           ),
         ),
         rightAlign(price.sellPrice),
         rightAlign(
           stringForPriceDeviance(
-            marketPrices,
             price.tradeSymbol,
-            price.sellPrice,
+            price: price.sellPrice,
+            median: marketPrices.medianSellPrice(price.tradeSymbol),
             MarketTransactionTypeEnum.SELL,
           ),
         ),

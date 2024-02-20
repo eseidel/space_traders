@@ -29,7 +29,6 @@ Future<Market?> visitLocalMarket(
   await dockIfNeeded(db, api, caches.ships, ship);
   final market = await recordMarketDataIfNeededAndLog(
     db,
-    caches.marketPrices,
     caches.markets,
     ship,
     waypointSymbol,
@@ -83,7 +82,6 @@ Future<void> visitLocalShipyard(
 /// This is the preferred way to get the local Market.
 Future<Market> recordMarketDataIfNeededAndLog(
   Database db,
-  MarketPrices marketPrices,
   MarketCache marketCache,
   Ship ship,
   WaypointSymbol marketSymbol, {
@@ -99,11 +97,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
   }
   // If we have market data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (marketPrices.hasRecentData(
-    marketSymbol,
-    maxAge: maxAge,
-    getNow: getNow,
-  )) {
+  if (await db.hasRecentMarketPrices(marketSymbol, maxAge)) {
     var market = marketCache.fromCache(marketSymbol);
     if (market == null || market.tradeGoods.isEmpty) {
       market = await marketCache.refreshMarket(marketSymbol);

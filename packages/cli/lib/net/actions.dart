@@ -271,9 +271,9 @@ bool _shouldRefuelAfterCheckingPrice(
   final markup = median != null ? fuelPrice / median : null;
   if (markup != null && markup > config.fuelWarningMarkup) {
     final deviation = stringForPriceDeviance(
-      marketPrices,
       fuelSymbol,
-      fuelPrice,
+      price: fuelPrice,
+      median: median,
       MarketTransactionTypeEnum.PURCHASE,
     );
     final fuelString = creditsString(fuelPrice);

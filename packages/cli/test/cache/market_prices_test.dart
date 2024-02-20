@@ -89,37 +89,6 @@ void main() {
     expect(marketPrices.sellPriceAtPercentile(a, 25), 110);
   });
 
-  test('PriceData.hasRecentMarketData', () {
-    const a = TradeSymbol.FUEL;
-    final marketSymbol = WaypointSymbol.fromString('S-A-W');
-    final empty = MarketPrices([]);
-    expect(empty.hasRecentData(marketSymbol), false);
-    final oneMinuteAgo = _now.subtract(const Duration(minutes: 1));
-    final aPrice = makePrice(
-      waypointSymbol: marketSymbol.waypoint,
-      symbol: a,
-      timestamp: oneMinuteAgo,
-    );
-    final marketPrices = MarketPrices([aPrice]);
-    expect(marketPrices.hasRecentData(marketSymbol, getNow: _getNow), true);
-    expect(
-      marketPrices.hasRecentData(
-        marketSymbol,
-        maxAge: const Duration(seconds: 1),
-        getNow: _getNow,
-      ),
-      false,
-    );
-    expect(
-      marketPrices.hasRecentData(
-        marketSymbol,
-        maxAge: const Duration(hours: 1),
-        getNow: _getNow,
-      ),
-      true,
-    );
-  });
-
   test('recentSellPrice', () {
     final price = makePrice(
       waypointSymbol: 'S-S-A',

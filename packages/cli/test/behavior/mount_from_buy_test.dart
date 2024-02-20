@@ -121,18 +121,10 @@ void main() {
       (_) => Future.value(market),
     );
     registerFallbackValue(Duration.zero);
-    when(
-      () => caches.marketPrices.hasRecentData(
-        waypointSymbol,
-        maxAge: any(named: 'maxAge'),
-      ),
-    ).thenReturn(true);
-    when(
-      () => db.hasRecentShipyardPrices(
-        waypointSymbol,
-        any(),
-      ),
-    ).thenAnswer((_) async => true);
+    when(() => db.hasRecentMarketPrices(waypointSymbol, any()))
+        .thenAnswer((_) async => true);
+    when(() => db.hasRecentShipyardPrices(waypointSymbol, any()))
+        .thenAnswer((_) async => true);
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))
         .thenAnswer((_) async => true);

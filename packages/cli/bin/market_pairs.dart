@@ -82,10 +82,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       importWaypoint,
     )!;
     String deviance(int price, MarketTransactionTypeEnum type) {
+      final median = marketPrices.medianPrice(tradeSymbol, type);
       final deviance = stringForPriceDeviance(
-        marketPrices,
         tradeSymbol,
-        price,
+        price: price,
+        median: median,
         type,
       );
       // table_cli doesn't correctly handle emojis.

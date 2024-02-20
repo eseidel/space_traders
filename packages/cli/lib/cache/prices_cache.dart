@@ -1,4 +1,3 @@
-import 'package:cli/config.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/price.dart';
@@ -31,24 +30,6 @@ class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>> {
   /// Hook for subclasses when a price has changed.
   @protected
   void priceChanged({required Record oldPrice, required Record newPrice}) {}
-
-  /// Returns true if there is recent market data for a given market.
-  /// Does not check if the passed in market is a valid market.
-  bool hasRecentData(
-    WaypointSymbol marketSymbol, {
-    Duration maxAge = defaultMaxAge,
-    DateTime Function() getNow = defaultGetNow,
-  }) {
-    final pricesAtWaypoint =
-        prices.where((e) => e.waypointSymbol == marketSymbol);
-    if (pricesAtWaypoint.isEmpty) {
-      return false;
-    }
-    final pricesAtWaypointSorted = pricesAtWaypoint.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    return getNow().difference(pricesAtWaypointSorted.last.timestamp) < maxAge;
-  }
 
   /// Returns the age of the cache for a given shipyard.
   Duration? cacheAgeFor(

@@ -1,4 +1,3 @@
-import 'package:cli/cache/market_prices.dart';
 import 'package:cli/printing.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -63,13 +62,12 @@ void main() {
   });
 
   test('stringForPriceDeviance', () {
-    final marketPrices = MarketPrices([]);
     const a = TradeSymbol.FUEL;
     expect(
       stringForPriceDeviance(
-        marketPrices,
         a,
-        0,
+        price: 0,
+        median: null,
         MarketTransactionTypeEnum.PURCHASE,
       ),
       '            🤷',

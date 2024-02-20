@@ -87,12 +87,8 @@ void main() {
       (_) => Future.value(market),
     );
 
-    when(
-      () => caches.marketPrices.hasRecentData(
-        start,
-        maxAge: any(named: 'maxAge'),
-      ),
-    ).thenReturn(true);
+    when(() => db.hasRecentMarketPrices(start, any()))
+        .thenAnswer((_) async => true);
 
     registerFallbackValue(start);
     when(() => caches.waypoints.hasMarketplace(start))
@@ -275,12 +271,8 @@ void main() {
     when(() => ship.engine).thenReturn(shipEngine);
 
     registerFallbackValue(Duration.zero);
-    when(
-      () => caches.marketPrices.hasRecentData(
-        start,
-        maxAge: any(named: 'maxAge'),
-      ),
-    ).thenReturn(true);
+    when(() => db.hasRecentMarketPrices(start, any()))
+        .thenAnswer((_) async => true);
 
     when(() => caches.waypoints.hasMarketplace(start))
         .thenAnswer((_) async => true);
@@ -1001,12 +993,8 @@ void main() {
       (_) => Future.value(market),
     );
 
-    when(
-      () => caches.marketPrices.hasRecentData(
-        end,
-        maxAge: any(named: 'maxAge'),
-      ),
-    ).thenReturn(true);
+    when(() => db.hasRecentMarketPrices(end, any()))
+        .thenAnswer((_) async => true);
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
@@ -1158,12 +1146,8 @@ void main() {
       (_) => Future.value(market),
     );
 
-    when(
-      () => caches.marketPrices.hasRecentData(
-        end,
-        maxAge: any(named: 'maxAge'),
-      ),
-    ).thenReturn(true);
+    when(() => db.hasRecentMarketPrices(end, any()))
+        .thenAnswer((_) async => true);
 
     final contractsApi = _MockContractsApi();
     when(() => api.contracts).thenReturn(contractsApi);
@@ -1333,12 +1317,8 @@ void main() {
       (_) => Future.value(market),
     );
 
-    when(
-      () => caches.marketPrices.hasRecentData(
-        end,
-        maxAge: any(named: 'maxAge'),
-      ),
-    ).thenReturn(true);
+    when(() => db.hasRecentMarketPrices(end, any()))
+        .thenAnswer((_) async => true);
     when(
       () => caches.construction
           .getConstruction(end, maxAge: any(named: 'maxAge')),

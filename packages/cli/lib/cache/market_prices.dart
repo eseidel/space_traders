@@ -186,6 +186,13 @@ class MarketPrices extends PricesCache<TradeSymbol, MarketPrice> {
     return (index / pricesForSymbol.length * 100).round();
   }
 
+  /// Get the median price for a trade good based on transaction type.
+  int? medianPrice(TradeSymbol tradeSymbol, MarketTransactionTypeEnum type) {
+    return type == MarketTransactionTypeEnum.SELL
+        ? medianSellPrice(tradeSymbol)
+        : medianPurchasePrice(tradeSymbol);
+  }
+
   /// Get the median sell price for a trade good.
   int? medianSellPrice(TradeSymbol symbol) => sellPriceAtPercentile(symbol, 50);
 

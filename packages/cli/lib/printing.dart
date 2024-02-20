@@ -43,15 +43,12 @@ String contractDescription(
 /// Returns a string describing the price deviance of a given [price] from
 /// the median price of a given [tradeSymbol].
 String stringForPriceDeviance(
-  MarketPrices marketPrices,
   TradeSymbol tradeSymbol,
-  int price,
-  MarketTransactionTypeEnum type,
-) {
+  MarketTransactionTypeEnum type, {
+  required int price,
+  required int? median,
+}) {
   const expectedWidth = 14;
-  final median = type == MarketTransactionTypeEnum.SELL
-      ? marketPrices.medianSellPrice(tradeSymbol)
-      : marketPrices.medianPurchasePrice(tradeSymbol);
   if (median == null) {
     return '🤷'.padLeft(expectedWidth);
   }
@@ -83,10 +80,14 @@ void logMarketTransaction(
   MarketTransaction transaction, {
   String? transactionEmoji,
 }) {
-  final priceDevianceString = stringForPriceDeviance(
-    marketPrices,
+  final median = marketPrices.medianPrice(
     transaction.tradeSymbolObject,
-    transaction.pricePerUnit,
+    transaction.type,
+  );
+  final priceDevianceString = stringForPriceDeviance(
+    transaction.tradeSymbolObject,
+    price: transaction.pricePerUnit,
+    median: median,
     transaction.type,
   );
   final labelEmoji = transactionEmoji ??

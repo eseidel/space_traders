@@ -567,13 +567,8 @@ void main() {
         .thenAnswer((_) async => true);
 
     registerFallbackValue(Duration.zero);
-    when(
-      () => caches.marketPrices.hasRecentData(
-        waypointSymbol,
-        maxAge: any(named: 'maxAge'),
-        getNow: getNow,
-      ),
-    ).thenReturn(true);
+    when(() => db.hasRecentMarketPrices(waypointSymbol, any()))
+        .thenAnswer((_) async => true);
 
     final market = Market(
       symbol: waypointSymbol.waypoint,
