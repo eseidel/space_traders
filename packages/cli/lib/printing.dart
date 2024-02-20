@@ -1,4 +1,3 @@
-import 'package:cli/cache/market_prices.dart';
 import 'package:cli/logger.dart';
 import 'package:intl/intl.dart';
 import 'package:types/types.dart';
@@ -75,19 +74,15 @@ String stringForPriceDeviance(
 /// Logs a transaction to the console.
 void logMarketTransaction(
   Ship ship,
-  MarketPriceSnapshot marketPrices,
   Agent agent,
   MarketTransaction transaction, {
+  required int? medianPrice,
   String? transactionEmoji,
 }) {
-  final median = marketPrices.medianPrice(
-    transaction.tradeSymbolObject,
-    transaction.type,
-  );
   final priceDevianceString = stringForPriceDeviance(
     transaction.tradeSymbolObject,
     price: transaction.pricePerUnit,
-    median: median,
+    median: medianPrice,
     transaction.type,
   );
   final labelEmoji = transactionEmoji ??

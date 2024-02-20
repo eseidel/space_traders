@@ -120,7 +120,7 @@ void main() {
     final shipNav = _MockShipNav();
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
-    when(() => caches.agent.adjustCredits(any())).thenAnswer((_) async {});
+    when(() => caches.agent.updateAgent(agent)).thenAnswer((_) async {});
     const shipSymbol = ShipSymbol('S', 1);
     // We use a real Ship to allow setting/reading from cooldown.
     final ship = Ship(

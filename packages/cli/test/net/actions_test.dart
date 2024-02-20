@@ -854,8 +854,8 @@ void main() {
     final agent = Agent.test(credits: 10000000);
     final agentCache = _MockAgentCache();
     when(() => agentCache.agent).thenReturn(agent);
+    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
     final now = DateTime(2021);
-    when(() => agentCache.adjustCredits(any())).thenAnswer((_) async {});
 
     when(
       () => fleetApi.jumpShip(

@@ -149,7 +149,9 @@ Future<List<Transaction>> sellAllCargoAndLog(
   )) {
     final marketTransaction = response.transaction;
     final agent = Agent.fromOpenApi(response.agent);
-    logMarketTransaction(ship, marketPrices, agent, marketTransaction);
+    final median =
+        marketPrices.medianSellPrice(marketTransaction.tradeSymbolObject);
+    logMarketTransaction(ship, agent, marketTransaction, medianPrice: median);
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
       agent.credits,
@@ -210,7 +212,9 @@ Future<Transaction?> purchaseCargoAndLog(
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = Agent.fromOpenApi(data.agent);
     final marketTransaction = data.transaction;
-    logMarketTransaction(ship, marketPrices, agent, marketTransaction);
+    final median =
+        marketPrices.medianPurchasePrice(marketTransaction.tradeSymbolObject);
+    logMarketTransaction(ship, agent, marketTransaction, medianPrice: median);
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
       agent.credits,
@@ -367,9 +371,9 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   final agent = agentCache.agent;
   logMarketTransaction(
     ship,
-    marketPrices,
     agent,
     marketTransaction,
+    medianPrice: median,
     transactionEmoji: '⛽',
   );
   final transaction = Transaction.fromMarketTransaction(
@@ -544,17 +548,16 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
 
   final data = response.data;
   final marketTransaction = data.transaction;
-  // TODO(eseidel): JumpShip200Response does not include the agent.
-  // so we modify the agent ourselves.
-  // agentCache.agent = response.data.agent;
-  await agentCache.adjustCredits(-marketTransaction.totalPrice);
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
 
   final agent = agentCache.agent;
+  final median =
+      marketPrices.medianPurchasePrice(marketTransaction.tradeSymbolObject);
   logMarketTransaction(
     ship,
-    marketPrices,
     agent,
     marketTransaction,
+    medianPrice: median,
     transactionEmoji: '☢️',
   );
   final transaction = Transaction.fromMarketTransaction(

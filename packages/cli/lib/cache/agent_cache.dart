@@ -45,12 +45,6 @@ class AgentCache {
     await _db.upsertAgent(agent);
   }
 
-  /// Adjust the credits of the agent.
-  // All callers of this are probably wrong.
-  Future<void> adjustCredits(int adjustment) async {
-    await updateAgent(agent.copyWith(credits: agent.credits + adjustment));
-  }
-
   /// Number of requests between checks to ensure ships are up to date.
   final int requestsBetweenChecks;
 
