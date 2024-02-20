@@ -3,6 +3,12 @@
 package:db is an internal package for storing state in a Postgres database.
 
 ## Setup
+
+You will need Docker. On Unbutu:
+```
+snap install docker
+```
+
 ```
 docker pull postgres
 docker run \
