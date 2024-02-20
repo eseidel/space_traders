@@ -1023,7 +1023,7 @@ List<SellOpp> computeConstructionMaterialSubsidies(
         continue;
       }
       final subsidizedSellPrice =
-          price.sellPrice + config.constructionMaterialFlatSubsityCredits;
+          price.sellPrice + config.constructionMaterialFlatSubsidyCredits;
       final subsidizedPrice = price.copyWith(sellPrice: subsidizedSellPrice);
       subsidies.add(SellOpp.fromMarketPrice(subsidizedPrice));
     }

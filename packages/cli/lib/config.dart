@@ -61,7 +61,7 @@ class Config {
     '6',
   ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
-  /// Used as a fallback for constructin Behaviors if there isn't explicit
+  /// Used as a fallback for constructing Behaviors if there isn't explicit
   /// logic in getJobForShip.
   final behaviorsByFleetRole = {
     FleetRole.command: [
@@ -139,7 +139,7 @@ class Config {
   final allowParallelConstructionDelivery = false;
 
   /// The amount of credits to subsidize each unit of construction materials.
-  final constructionMaterialFlatSubsityCredits = 50;
+  final constructionMaterialFlatSubsidyCredits = 50;
 
   /// Max number of jumps we allow a charter to plan for at once.
   final charterMaxJumps = 5;
