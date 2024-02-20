@@ -254,14 +254,17 @@ Future<NavResult> continueNavigationIfNeeded(
     case RouteActionType.jump:
       final JumpShip200ResponseData response;
       try {
+        final median = caches.marketPrices.medianPurchasePrice(
+          TradeSymbol.ANTIMATTER,
+        );
         response = await useJumpGateAndLog(
           api,
           db,
-          caches.marketPrices,
           caches.agent,
           caches.ships,
           ship,
           actionEnd.symbol,
+          medianAntimatterPrice: median,
         );
       } on ApiException catch (e) {
         if (!isInsufficientCreditsException(e)) {

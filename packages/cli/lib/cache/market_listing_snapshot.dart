@@ -44,4 +44,8 @@ class MarketListingSnapshot {
         .map((e) => e.key)
         .toSet();
   }
+
+  /// Returns true if we know of a market which trades the given TradeSymbol.
+  bool knowOfMarketWhichTrades(TradeSymbol tradeSymbol) =>
+      listings.any((l) => l.allowsTradeOf(tradeSymbol));
 }

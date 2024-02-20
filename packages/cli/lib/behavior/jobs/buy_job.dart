@@ -114,10 +114,10 @@ Future<JobResult> doBuyJob(
   await dockIfNeeded(db, api, caches.ships, ship);
 
   // TODO(eseidel): Share this code with trader.dart
+  final medianPrice = caches.marketPrices.medianPurchasePrice(tradeSymbol);
   final transaction = await purchaseTradeGoodIfPossible(
     api,
     db,
-    caches.marketPrices,
     caches.agent,
     caches.ships,
     ship,
@@ -125,6 +125,7 @@ Future<JobResult> doBuyJob(
     tradeSymbol,
     maxWorthwhileUnitPurchasePrice: null,
     unitsToPurchase: units,
+    medianPrice: medianPrice,
     accountingType: AccountingType.capital,
   );
 

@@ -19,7 +19,6 @@ import 'package:types/types.dart';
 Future<Transaction?> purchaseTradeGoodIfPossible(
   Api api,
   Database db,
-  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,
@@ -27,6 +26,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   TradeSymbol neededTradeSymbol, {
   required int? maxWorthwhileUnitPurchasePrice,
   required int unitsToPurchase,
+  required int? medianPrice,
   AccountingType accountingType = AccountingType.goods,
 }) async {
   if (unitsToPurchase <= 0) {
@@ -60,13 +60,13 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   final result = await purchaseCargoAndLog(
     api,
     db,
-    marketPrices,
     agentCache,
     shipCache,
     ship,
     neededTradeSymbol,
-    unitsToPurchase,
     accountingType,
+    amountToBuy: unitsToPurchase,
+    medianPrice: medianPrice,
   );
   return result;
 }
@@ -114,11 +114,11 @@ Future<JobResult> _handleAtSourceWithDeal(
 
   // Could this get confused by having other cargo in our hold?
   final units = unitsToPurchase(good, ship, maxUnits);
+  final medianPrice = caches.marketPrices.medianPurchasePrice(dealTradeSymbol);
   if (units > 0) {
     final transaction = await purchaseTradeGoodIfPossible(
       api,
       db,
-      caches.marketPrices,
       caches.agent,
       caches.ships,
       ship,
@@ -126,6 +126,7 @@ Future<JobResult> _handleAtSourceWithDeal(
       dealTradeSymbol,
       maxWorthwhileUnitPurchasePrice: maxPerUnitPrice,
       unitsToPurchase: units,
+      medianPrice: medianPrice,
     );
 
     if (transaction != null) {
@@ -517,7 +518,9 @@ Future<SupplyConstruction201ResponseData?>
 }
 
 int? _expectedContractProfit(
-    Contract contract, MarketPriceSnapshot marketPrices) {
+  Contract contract,
+  MarketPriceSnapshot marketPrices,
+) {
   // Add up the total expected outlay.
   final terms = contract.terms;
   final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();

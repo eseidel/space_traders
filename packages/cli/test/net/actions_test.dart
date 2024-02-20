@@ -835,7 +835,6 @@ void main() {
   test('useJumpGateAndLog', () async {
     final api = _MockApi();
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final ship = _MockShip();
@@ -902,11 +901,11 @@ void main() {
       await useJumpGateAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         ship,
         endSymbol,
+        medianAntimatterPrice: null,
       );
     });
     verify(() => fleetApi.orbitShip(shipSymbol.symbol)).called(1);

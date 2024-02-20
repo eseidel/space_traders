@@ -532,7 +532,8 @@ void main() {
     // when(() => caches.shipyardPrices.pricesFor(any())).thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => caches.marketPrices.havePriceFor(any())).thenReturn(false);
+    when(() => caches.marketListings.knowOfMarketWhichTrades(any()))
+        .thenReturn(false);
     when(() => caches.ships.countOfFrame(ShipFrameSymbolEnum.MINER))
         .thenReturn(0);
 

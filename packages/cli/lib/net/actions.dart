@@ -186,14 +186,14 @@ Future<void> jettisonCargoAndLog(
 Future<Transaction?> purchaseCargoAndLog(
   Api api,
   Database db,
-  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,
   TradeSymbol tradeSymbol,
-  int amountToBuy,
-  AccountingType accounting,
-) async {
+  AccountingType accounting, {
+  required int amountToBuy,
+  required int? medianPrice,
+}) async {
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
   try {
     final data = await purchaseCargo(
@@ -212,9 +212,12 @@ Future<Transaction?> purchaseCargoAndLog(
     // "REACTOR_FUSION_I","units":60,"tradeVolume":10}}}
     final agent = Agent.fromOpenApi(data.agent);
     final marketTransaction = data.transaction;
-    final median =
-        marketPrices.medianPurchasePrice(marketTransaction.tradeSymbolObject);
-    logMarketTransaction(ship, agent, marketTransaction, medianPrice: median);
+    logMarketTransaction(
+      ship,
+      agent,
+      marketTransaction,
+      medianPrice: medianPrice,
+    );
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
       agent.credits,
@@ -525,12 +528,12 @@ Future<void> chartWaypointAndLog(
 Future<JumpShip200ResponseData> useJumpGateAndLog(
   Api api,
   Database db,
-  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Ship ship,
-  WaypointSymbol destination,
-) async {
+  WaypointSymbol destination, {
+  required int? medianAntimatterPrice,
+}) async {
   // Using a jump gate requires us to be in orbit.
   await undockIfNeeded(db, api, shipCache, ship);
 
@@ -551,13 +554,11 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
 
   final agent = agentCache.agent;
-  final median =
-      marketPrices.medianPurchasePrice(marketTransaction.tradeSymbolObject);
   logMarketTransaction(
     ship,
     agent,
     marketTransaction,
-    medianPrice: median,
+    medianPrice: medianAntimatterPrice,
     transactionEmoji: '☢️',
   );
   final transaction = Transaction.fromMarketTransaction(

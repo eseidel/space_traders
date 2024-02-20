@@ -464,12 +464,12 @@ class CentralCommand {
   }
 
   /// Updates _availableMounts with any mounts we know of a place to buy.
-  void updateAvailableMounts(MarketPriceSnapshot marketPrices) {
+  void updateAvailableMounts(MarketListingSnapshot marketListings) {
     for (final mountSymbol in ShipMountSymbolEnum.values) {
       if (_availableMounts.contains(mountSymbol)) {
         continue;
       }
-      final isAvailable = marketPrices.havePriceFor(
+      final isAvailable = marketListings.knowOfMarketWhichTrades(
         tradeSymbolForMountSymbol(mountSymbol),
       );
       if (isAvailable) {
@@ -537,7 +537,7 @@ class CentralCommand {
     );
 
     _nextShipBuyJob ??= await _computeNextShipBuyJob(db, api, caches);
-    updateAvailableMounts(caches.marketPrices);
+    updateAvailableMounts(caches.marketListings);
     await _queueMountRequests(caches);
 
     activeConstruction = await _computeActiveConstruction(caches);

@@ -69,10 +69,4 @@ class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>> {
     }
     return matching.where((e) => e.waypointSymbol == waypointSymbol);
   }
-
-  /// Returns true if there is a price for a given [Symbol],
-  /// Used for detecting if we have access to a given good yet.
-  bool havePriceFor(Symbol symbol) {
-    return prices.any((p) => p.symbol == symbol);
-  }
 }
