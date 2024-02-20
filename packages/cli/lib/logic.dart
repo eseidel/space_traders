@@ -18,7 +18,9 @@ Future<void> _waitIfNeeded(ShipWaiterEntry entry) async {
   if (waitUntil != null && waitUntil.isAfter(DateTime.timestamp())) {
     final waitDuration = waitUntil.difference(DateTime.timestamp());
     final wait = approximateDuration(waitDuration);
-    logger.detail('⏱️  $wait until ${waitUntil.toLocal()}');
+    final log =
+        waitDuration < const Duration(minutes: 1) ? logger.detail : logger.info;
+    log('⏱️  $wait until ${waitUntil.toLocal()}');
     await Future<void>.delayed(waitDuration);
   }
 }
