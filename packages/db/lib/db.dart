@@ -401,15 +401,18 @@ class Database {
     return queryMany(allContractsQuery(), contractFromColumnMap);
   }
 
+  /// Get a contract by id.
   Future<Contract?> contractById(String id) async {
     final query = contractByIdQuery(id);
     return queryOne(query, contractFromColumnMap);
   }
 
+  /// Get all contracts which are !accepted.
   Future<Iterable<Contract>> unacceptedContracts() async {
     return queryMany(unacceptedContractsQuery(), contractFromColumnMap);
   }
 
+  /// Get all contracts which are !fullfilled and !expired.
   Future<Iterable<Contract>> activeContracts() async {
     return queryMany(activeContractsQuery(), contractFromColumnMap);
   }

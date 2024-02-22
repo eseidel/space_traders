@@ -25,15 +25,18 @@ Query contractByIdQuery(String id) {
   );
 }
 
+/// Get all contracts which are !fulfilled and expiration date is in the future.
 Query activeContractsQuery() {
-  return const Query(
-    "SELECT * FROM contract_ WHERE json->>'status' = 'active'",
+  return Query(
+    "SELECT * FROM contract_ WHERE json->>'fulfilled' = 'false' AND json->>'expiration' > @now",
+    parameters: {'now': DateTime.timestamp()},
   );
 }
 
+/// Get all contracts which are !accepted.
 Query unacceptedContractsQuery() {
   return const Query(
-    "SELECT * FROM contract_ WHERE json->>'status' = 'unaccepted'",
+    "SELECT * FROM contract_ WHERE json->>'accepted' = 'false'",
   );
 }
 
