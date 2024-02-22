@@ -15,8 +15,6 @@ class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
-class _MockContractSnapshot extends Mock implements ContractSnapshot {}
-
 class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
@@ -58,7 +56,6 @@ void main() {
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     final caches = mockCaches();
-    final contractSnapshot = _MockContractSnapshot();
     when(db.allContracts).thenAnswer((_) async => <Contract>[]);
 
     final start = WaypointSymbol.fromString('S-A-B');
@@ -132,10 +129,11 @@ void main() {
       costPerAntimatterUnit: 10000,
     );
 
+    registerFallbackValue(ContractSnapshot([]));
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
-        contractSnapshot,
+        any(),
         caches.marketPrices,
         caches.systems,
         caches.systemConnectivity,
@@ -626,11 +624,11 @@ void main() {
       costPerFuelUnit: 100,
       costPerAntimatterUnit: 10000,
     );
-    final contractSnapshot = _MockContractSnapshot();
+    registerFallbackValue(ContractSnapshot([]));
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
-        contractSnapshot,
+        any(),
         caches.marketPrices,
         caches.systems,
         caches.systemConnectivity,
@@ -700,6 +698,11 @@ void main() {
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
     when(db.allContracts).thenAnswer((_) async => <Contract>[]);
+    when(() => caches.systems[shipLocation.system])
+        .thenReturn(System.test(shipLocation.system));
+    when(
+      () => caches.systemConnectivity.systemsReachableFrom(shipLocation.system),
+    ).thenReturn([]);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
