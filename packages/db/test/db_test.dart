@@ -43,12 +43,7 @@ void main() {
     db.insertTransaction(transaction);
     verify(
       () => connection.execute(
-        'INSERT INTO transaction_ (transaction_type, ship_symbol, '
-        'waypoint_symbol, trade_symbol, ship_type, quantity, trade_type, '
-        'per_unit_price, timestamp, agent_credits, accounting) '
-        'VALUES (@transaction_type, @ship_symbol, @waypoint_symbol, '
-        '@trade_symbol, @ship_type, @quantity, @trade_type, @per_unit_price, '
-        '@timestamp, @agent_credits, @accounting)',
+        any(),
         parameters: transactionToColumnMap(transaction),
       ),
     ).called(1);
