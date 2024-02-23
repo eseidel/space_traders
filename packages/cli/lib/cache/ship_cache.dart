@@ -4,6 +4,7 @@ import 'package:cli/compare.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/ships.dart';
+import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -14,7 +15,9 @@ class ShipSnapshot {
 
   /// Loads the ship cache from the provided [db].
   static Future<ShipSnapshot> load(Database db) async {
-    final ships = await db.allShips();
+    // It's nicer for callers if ships are in sorted order.
+    final ships = (await db.allShips())
+        .sorted((a, b) => a.shipSymbol.compareTo(b.shipSymbol));
     return ShipSnapshot(ships);
   }
 
