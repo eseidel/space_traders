@@ -9,7 +9,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
 
   logger.info(
-    'Loaded ${marketPrices.count} prices from '
+    'Loaded ${marketPrices.prices.length} prices from '
     '${marketPrices.waypointCount} waypoints.',
   );
 

@@ -130,36 +130,16 @@ class MarketPriceSnapshot extends PricesCache<TradeSymbol, MarketPrice> {
     return MarketPriceSnapshot(prices.toList());
   }
 
-  @override
-  void priceChanged({
-    required MarketPrice oldPrice,
-    required MarketPrice newPrice,
-  }) {
-    // Trade volumes can and will change between price updates.
-    // If the new price is newer than the existing price, replace it.
-    if (oldPrice.tradeVolume != newPrice.tradeVolume) {
-      logger.warn('${newPrice.waypointSymbol.sectorLocalName} changed '
-          '${newPrice.symbol} from '
-          '${oldPrice.supply} (${oldPrice.tradeVolume}) '
-          'to  ${newPrice.supply} (${newPrice.tradeVolume})');
-    }
-  }
-
   static int _sellPriceAscending(MarketPrice a, MarketPrice b) =>
       a.sellPrice.compareTo(b.sellPrice);
   static int _purchasePriceAscending(MarketPrice a, MarketPrice b) =>
       a.purchasePrice.compareTo(b.purchasePrice);
 
   /// Get the median price this good can be purchased for.
-  int? medianPurchasePrice(TradeSymbol symbol) =>
-      purchasePriceAtPercentile(symbol, 50);
-
-  /// Get the percentile purchase price (price you can buy at) for a trade good.
-  /// [percentile] must be between 0 and 100.
-  int? purchasePriceAtPercentile(TradeSymbol symbol, int percentile) {
+  int? medianPurchasePrice(TradeSymbol symbol) {
     final maybePrice = _priceAtPercentile(
       symbol,
-      percentile,
+      50,
       MarketTransactionTypeEnum.PURCHASE,
     );
     return maybePrice?.purchasePrice;
@@ -246,17 +226,8 @@ class MarketPriceSnapshot extends PricesCache<TradeSymbol, MarketPrice> {
     Duration maxAge = defaultMaxAge,
     DateTime Function() getNow = defaultGetNow,
   }) {
-    final pricesForSymbol =
-        pricesFor(tradeSymbol, waypointSymbol: marketSymbol);
-    if (pricesForSymbol.isEmpty) {
-      return null;
-    }
-    final pricesForSymbolSorted = pricesForSymbol.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    if (getNow().difference(pricesForSymbolSorted.last.timestamp) > maxAge) {
-      return null;
-    }
-    return pricesForSymbolSorted.last.sellPrice;
+    return priceAt(marketSymbol, tradeSymbol, maxAge: maxAge, getNow: getNow)
+        ?.sellPrice;
   }
 
   /// The most recent price can be purchased from the market.
@@ -269,19 +240,8 @@ class MarketPriceSnapshot extends PricesCache<TradeSymbol, MarketPrice> {
     Duration maxAge = defaultMaxAge,
     DateTime Function() getNow = defaultGetNow,
   }) {
-    final pricesForSymbol = pricesFor(
-      tradeSymbol,
-      waypointSymbol: marketSymbol,
-    );
-    if (pricesForSymbol.isEmpty) {
-      return null;
-    }
-    final pricesForSymbolSorted = pricesForSymbol.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    if (getNow().difference(pricesForSymbolSorted.last.timestamp) > maxAge) {
-      return null;
-    }
-    return pricesForSymbolSorted.last.purchasePrice;
+    return priceAt(marketSymbol, tradeSymbol, maxAge: maxAge, getNow: getNow)
+        ?.purchasePrice;
   }
 }
 

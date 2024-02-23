@@ -5,7 +5,7 @@ import 'package:stats/stats.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final prices = await MarketPriceSnapshot.load(db);
-  logger.info('${prices.count} prices loaded.');
+  logger.info('${prices.prices.length} prices loaded.');
 
   final now = DateTime.timestamp();
   final baseStats = Stats.fromData(

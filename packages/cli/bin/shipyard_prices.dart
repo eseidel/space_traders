@@ -10,7 +10,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   logger.info(
-    'Loaded ${shipyardPrices.count} prices from '
+    'Loaded ${shipyardPrices.prices.length} prices from '
     '${shipyardPrices.waypointCount} waypoints.',
   );
   final shipyardListings = await ShipyardListingSnapshot.load(db);

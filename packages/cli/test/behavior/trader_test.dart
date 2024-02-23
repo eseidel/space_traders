@@ -453,10 +453,7 @@ void main() {
 
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     when(
-      () => caches.marketPrices.pricesFor(
-        TradeSymbol.ADVANCED_CIRCUITRY,
-        waypointSymbol: any(named: 'waypointSymbol'),
-      ),
+      () => caches.marketPrices.pricesFor(TradeSymbol.ADVANCED_CIRCUITRY),
     ).thenReturn([
       MarketPrice(
         waypointSymbol: start,
