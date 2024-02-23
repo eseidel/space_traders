@@ -14,7 +14,7 @@ class Config {
   final bool serviceIdleQueue = true;
 
   /// Whether or not we should enable mining behaviors.
-  final bool enableMining = false;
+  final bool enableMining = true;
 
   /// Controls how many loops we run of ships before doing our "top of loop"
   /// updates (e.g. clearing caches).  Currently must be set to 1, or
@@ -55,10 +55,10 @@ class Config {
   // This should instead be some min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
   final minerHaulerSymbols = <String>[
-    '3',
-    '4',
-    '5',
-    '6',
+    // '3',
+    // '4',
+    // '5',
+    // '6',
   ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructing Behaviors if there isn't explicit
@@ -98,7 +98,7 @@ class Config {
   /// Used by sellOppsForConstruction to determine what SellOpps for
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 4000,
+    TradeSymbol.FAB_MATS: 2000,
     TradeSymbol.ADVANCED_CIRCUITRY: 6000,
   };
 

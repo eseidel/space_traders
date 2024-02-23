@@ -71,7 +71,7 @@ class Caches {
   final AgentCache agent;
 
   /// The historical market price data.
-  final MarketPriceSnapshot marketPrices;
+  MarketPriceSnapshot marketPrices;
 
   /// The ship cache.
   // TODO(eseidel): Try not caching ships and just fetching from db.
@@ -204,6 +204,7 @@ class Caches {
     ships = await ships.ensureUpToDate(db, api);
     await agent.ensureAgentUpToDate(api);
     await fetchContracts(db, api);
+    marketPrices = await MarketPriceSnapshot.load(db);
 
     marketListings = await MarketListingSnapshot.load(db);
     shipyardListings = await ShipyardListingSnapshot.load(db);

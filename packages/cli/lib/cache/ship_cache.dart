@@ -107,9 +107,10 @@ class ShipSnapshot {
   void updateShip(Database db, Ship ship) {
     final index = ships.indexWhere((s) => s.shipSymbol == ship.shipSymbol);
     if (index == -1) {
-      throw ArgumentError('Ship not found: $ship');
+      ships.add(ship);
+    } else {
+      ships[index] = ship;
     }
-    ships[index] = ship;
     db.upsertShip(ship);
   }
 }
