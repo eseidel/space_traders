@@ -1,5 +1,4 @@
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/extraction_score.dart';
 import 'package:db/db.dart';
@@ -11,9 +10,6 @@ class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockDatabase extends Mock implements Database {}
 
-class _MockMarketListingSnapshot extends Mock
-    implements MarketListingSnapshot {}
-
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 void main() {
@@ -21,7 +17,6 @@ void main() {
     final db = _MockDatabase();
     final systemsCache = _MockSystemsCache();
     final chartingCache = _MockChartingCache();
-    final marketListings = _MockMarketListingSnapshot();
     final systemSymbol = SystemSymbol.fromString('W-A');
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final source = SystemWaypoint.test(sourceSymbol);
