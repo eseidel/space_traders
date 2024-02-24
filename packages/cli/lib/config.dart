@@ -11,7 +11,7 @@ class Config {
   final String agentSymbol = 'ESEIDEL';
 
   /// Whether or not we should enable the idle queue.
-  final bool serviceIdleQueue = true;
+  final bool serviceIdleQueue = false;
 
   /// Whether or not we should enable mining behaviors.
   final bool enableMining = true;
@@ -98,8 +98,8 @@ class Config {
   /// Used by sellOppsForConstruction to determine what SellOpps for
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
-    TradeSymbol.FAB_MATS: 2000,
-    TradeSymbol.ADVANCED_CIRCUITRY: 6000,
+    TradeSymbol.FAB_MATS: 3000,
+    TradeSymbol.ADVANCED_CIRCUITRY: 11000,
   };
 
   /// Used by _computeActiveConstruction to compute if we should be doing
