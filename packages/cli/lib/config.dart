@@ -58,7 +58,6 @@ class Config {
     '3',
     '4',
     '5',
-    '6',
   ].map((s) => ShipSymbol.fromString('ESEIDEL-$s'));
 
   /// Used as a fallback for constructing Behaviors if there isn't explicit
