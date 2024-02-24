@@ -1,6 +1,5 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
@@ -34,13 +33,12 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
   final shipCache = await ShipSnapshot.load(db);
-  final marketListings = await MarketListingSnapshot.load(db);
   final shipyardShipCache = ShipyardShipCache.load(fs);
 
   final squads = await assignShipsToSquads(
+    db,
     systems,
     charting,
-    marketListings,
     shipCache,
     systemSymbol: shipCache.ships.first.systemSymbol,
   );

@@ -532,8 +532,8 @@ void main() {
     // when(() => caches.shipyardPrices.pricesFor(any())).thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => caches.marketListings.knowOfMarketWhichTrades(any()))
-        .thenReturn(false);
+    when(() => db.knowOfMarketWhichTrades(any()))
+        .thenAnswer((_) async => false);
     when(() => caches.ships.countOfFrame(ShipFrameSymbolEnum.MINER))
         .thenReturn(0);
 
@@ -557,8 +557,7 @@ void main() {
     );
 
     when(caches.construction.allRecords).thenAnswer((_) async => []);
-    when(() => caches.marketListings.systemsWithAtLeastNMarkets(5))
-        .thenReturn({});
+    when(db.allMarketListings).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     await runWithLogger(

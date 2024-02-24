@@ -634,9 +634,9 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   );
   // We can't sell this cargo anywhere so give up?
 
-  final costedTrip = findBestMarketToSell(
+  final costedTrip = await findBestMarketToSell(
+    db,
     caches.marketPrices,
-    caches.marketListings,
     caches.routePlanner,
     ship,
     unwantedCargo.tradeSymbol,

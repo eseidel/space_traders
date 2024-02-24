@@ -131,14 +131,14 @@ class IdleQueue {
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.symbol;
       if (await caches.waypoints.hasMarketplace(waypointSymbol)) {
-        final listing = caches.marketListings[waypointSymbol];
+        final listing = await db.marketListingForSymbol(waypointSymbol);
         if (listing == null) {
           logger.info(' Market: $waypointSymbol');
           await caches.markets.refreshMarket(waypointSymbol);
         }
       }
       if (await caches.waypoints.hasShipyard(waypointSymbol)) {
-        final listing = caches.shipyardListings[waypointSymbol];
+        final listing = await db.shipyardListingForSymbol(waypointSymbol);
         if (listing == null) {
           logger.info(' Shipyard: $waypointSymbol');
           final shipyard = await getShipyard(api, waypointSymbol);

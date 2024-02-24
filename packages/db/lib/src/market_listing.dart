@@ -23,6 +23,35 @@ Query upsertMarketListingQuery(MarketListing listing) => Query(
       parameters: marketListingToColumnMap(listing),
     );
 
+/// Query to find all markets with a given import in the system.
+Query marketsWithImportInSystemQuery(
+  SystemSymbol system,
+  TradeSymbol tradeSymbol,
+) =>
+    Query(
+      '''
+      SELECT symbol FROM market_listing_
+      WHERE starts_with(symbol, @system) AND @tradeSymbol = ANY(imports)
+      ''',
+      parameters: {
+        'system': system.system,
+        'tradeSymbol': tradeSymbol.toJson(),
+      },
+    );
+
+/// Query to return if we know of a market which trades a given symbol.
+Query knowOfMarketWhichTradesQuery(TradeSymbol tradeSymbol) => Query(
+      '''
+      SELECT EXISTS(
+        SELECT 1 FROM market_listing_
+        WHERE @tradeSymbol = ANY(imports)
+        OR @tradeSymbol = ANY(exports)
+        OR @tradeSymbol = ANY(exchange)
+      )
+      ''',
+      parameters: {'tradeSymbol': tradeSymbol.toJson()},
+    );
+
 /// Build a column map from a market listing.
 Map<String, dynamic> marketListingToColumnMap(MarketListing marketListing) => {
       'symbol': marketListing.waypointSymbol.toJson(),

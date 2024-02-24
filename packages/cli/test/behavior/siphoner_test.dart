@@ -52,9 +52,9 @@ void main() {
 
     when(
       () => centralCommand.siphonJobForShip(
+        db,
         caches.systems,
         caches.charting,
-        caches.marketListings,
         caches.agent,
         ship,
       ),

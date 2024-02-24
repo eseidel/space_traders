@@ -62,7 +62,6 @@ class Caches {
     required this.routePlanner,
     required this.factions,
     required this.static,
-    required this.marketListings,
     required this.construction,
     required this.systemConnectivity,
     required this.jumpGates,
@@ -96,10 +95,6 @@ class Caches {
 
   /// The cache of jump gates.
   final JumpGateSnapshot jumpGates;
-
-  /// The cache of markets descriptions.
-  /// This is currently updated at the top of every loop.
-  MarketListingSnapshot marketListings;
 
   /// The cache of markets.
   final MarketCache markets;
@@ -136,7 +131,6 @@ class Caches {
     final static = StaticCaches.load(fs);
     final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
-    final marketListings = await MarketListingSnapshot.load(db);
     final waypoints = WaypointCache(
       api,
       systems,
@@ -153,6 +147,8 @@ class Caches {
     final constructionSnapshot = await ConstructionSnapshot.load(db);
     final systemConnectivity =
         SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);
+    // TODO(eseidel): Find a way to avoid fetching market listings here?
+    final marketListings = await MarketListingSnapshot.load(db);
     final routePlanner = RoutePlanner.fromSystemsCache(
       systems,
       systemConnectivity,
@@ -174,7 +170,6 @@ class Caches {
       static: static,
       routePlanner: routePlanner,
       factions: factions,
-      marketListings: marketListings,
       construction: construction,
       systemConnectivity: systemConnectivity,
       jumpGates: jumpGates,
@@ -254,7 +249,6 @@ class TopOfLoopUpdater {
     // These should all be deleted from Caches.
     caches
       ..marketPrices = await MarketPriceSnapshot.load(db)
-      ..marketListings = await MarketListingSnapshot.load(db)
       ..shipyardListings = await ShipyardListingSnapshot.load(db);
   }
 }

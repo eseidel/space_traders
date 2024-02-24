@@ -7,7 +7,6 @@ import 'package:cli/cli.dart';
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final behaviorCache = await BehaviorCache.load(db);
-  final marketListings = await MarketListingSnapshot.load(db);
   final centralCommand =
       CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
 
@@ -15,7 +14,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       ShipMountSymbolEnum.values.fold(0, (s, e) => max(s, e.value.length)) + 1;
 
   // Must be called before we can call templateForShip.
-  centralCommand.updateAvailableMounts(marketListings);
+  await centralCommand.updateAvailableMounts(db);
 
   for (final ship in shipCache.ships) {
     final template = centralCommand.templateForShip(ship);

@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/config.dart';
@@ -10,6 +9,7 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Builds a list of deals found from the provided MarketScan.
@@ -563,9 +563,9 @@ int estimateRoutePlanCost({
 /// used for evaluating the trade-off between "closest" vs. "cheapest".
 /// This does not account for fuel costs.
 // TODO(eseidel): This does not work with no pricing data.
-MarketTrip? findBestMarketToSell(
+Future<MarketTrip?> findBestMarketToSell(
+  Database db,
   MarketPriceSnapshot marketPrices,
-  MarketListingSnapshot marketListings,
   RoutePlanner routePlanner,
   Ship ship,
   TradeSymbol tradeSymbol, {
@@ -585,7 +585,7 @@ MarketTrip? findBestMarketToSell(
   /// otherwise we'll skip it.  This should probably always be true
   /// but leaving it as an option for now to not break existing callers.
   bool requireFuelAtDestination = false,
-}) {
+}) async {
   // Some callers might want to use a round trip cost?
   // e.g. if just trying to empty inventory and return to current location.
   final sorted = marketsTradingSortedByDistance(
@@ -641,12 +641,8 @@ MarketTrip? findBestMarketToSell(
   var best = nearest;
   // Pick any one further that earns more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
-    final listing = marketListings[trip.price.waypointSymbol];
-    if (listing == null) {
-      detail('Skipping ${trip.price.waypointSymbol} due to no market data');
-      continue;
-    }
-    if (requireFuelAtDestination && !listing.allowsTradeOf(TradeSymbol.FUEL)) {
+    final listing = await db.marketListingForSymbol(trip.price.waypointSymbol);
+    if (requireFuelAtDestination && !listing!.allowsTradeOf(TradeSymbol.FUEL)) {
       detail('Skipping ${trip.price.waypointSymbol} due to no fuel');
       continue;
     }

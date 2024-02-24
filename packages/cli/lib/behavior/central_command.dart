@@ -464,12 +464,12 @@ class CentralCommand {
   }
 
   /// Updates _availableMounts with any mounts we know of a place to buy.
-  void updateAvailableMounts(MarketListingSnapshot marketListings) {
+  Future<void> updateAvailableMounts(Database db) async {
     for (final mountSymbol in ShipMountSymbolEnum.values) {
       if (_availableMounts.contains(mountSymbol)) {
         continue;
       }
-      final isAvailable = marketListings.knowOfMarketWhichTrades(
+      final isAvailable = await db.knowOfMarketWhichTrades(
         tradeSymbolForMountSymbol(mountSymbol),
       );
       if (isAvailable) {
@@ -524,26 +524,28 @@ class CentralCommand {
   ) async {
     // await caches.updateRoutingCaches();
 
+    final marketListings = await MarketListingSnapshot.load(db);
+
     _assignedSystemsForSatellites
       ..clear()
-      ..addAll(assignProbesToSystems(caches.marketListings, caches.ships));
+      ..addAll(assignProbesToSystems(marketListings, caches.ships));
 
     miningSquads = await assignShipsToSquads(
+      db,
       caches.systems,
       caches.charting,
-      caches.marketListings,
       _shipCache,
       systemSymbol: caches.agent.headquartersSystemSymbol,
     );
 
     _nextShipBuyJob ??= await _computeNextShipBuyJob(db, api, caches);
-    updateAvailableMounts(caches.marketListings);
+    await updateAvailableMounts(db);
     await _queueMountRequests(caches);
 
     activeConstruction = await _computeActiveConstruction(caches);
     if (isConstructionTradingEnabled && activeConstruction != null) {
       subsidizedSellOpps = computeConstructionMaterialSubsidies(
-        caches.marketListings,
+        marketListings,
         caches.marketPrices,
         caches.static.exports,
         activeConstruction!,
@@ -736,16 +738,16 @@ class CentralCommand {
   /// Returns the siphon plan for the given [ship].
 // TODO(eseidel): call from or merge into getJobForShip.
   Future<ExtractionJob?> siphonJobForShip(
+    Database db,
     SystemsCache systemsCache,
     ChartingCache chartingCache,
-    MarketListingSnapshot marketListings,
     AgentCache agentCache,
     Ship ship,
   ) async {
     final score = (await evaluateWaypointsForSiphoning(
+      db,
       systemsCache,
       chartingCache,
-      marketListings,
       agentCache.headquartersSystemSymbol,
     ))
         .firstOrNull;
@@ -914,17 +916,17 @@ ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
 
 /// Compute what our current mining squads should be.
 Future<List<ExtractionSquad>> assignShipsToSquads(
+  Database db,
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingSnapshot marketListings,
   ShipSnapshot shipCache, {
   required SystemSymbol systemSymbol,
 }) async {
   // Look at the top N mining scores.
   final scores = (await evaluateWaypointsForMining(
+    db,
     systemsCache,
     chartingCache,
-    marketListings,
     systemSymbol,
   ))
       .where((m) => m.marketsTradeAllProducedGoods)

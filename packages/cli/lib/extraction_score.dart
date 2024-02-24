@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Returns the TradeSymbols extractable by the given mount.
@@ -119,43 +120,29 @@ class ExtractionScore {
   }
 }
 
-/// Returns the nearest WaypointSymbol in the same system which matches the
-/// given predicate.
-WaypointSymbol? nearestTo(
-  SystemsCache systemsCache,
-  WaypointSymbol waypointSymbol,
-  bool Function(SystemWaypoint) predicate,
-) {
-  final destination = systemsCache.waypoint(waypointSymbol);
-  final candidates = systemsCache
-      .waypointsInSystem(waypointSymbol.system)
-      .where(predicate)
-      .toList()
-    ..sort(
-      (a, b) => a.distanceTo(destination).compareTo(b.distanceTo(destination)),
-    );
-  return candidates.firstOrNull?.symbol;
-}
-
 /// Given a start location and a set of goods, find the closest markets
 /// which buy those goods.
-Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
+Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
+  Database db,
   SystemsCache systemsCache,
-  MarketListingSnapshot marketListings,
-  WaypointSymbol start,
+  WaypointSymbol startSymbol,
   Set<TradeSymbol> goods,
-) {
+) async {
+  final start = systemsCache.waypoint(startSymbol);
   final markets = <TradeSymbol, WaypointSymbol>{};
   for (final good in goods) {
-    final market = nearestTo(systemsCache, start, (waypoint) {
-      return marketListings[waypoint.symbol]
-              // TODO(eseidel): This should only be imports.
-              ?.tradeSymbols
-              .contains(good) ??
-          false;
-    });
+    final marketSymbols =
+        await db.marketsWithImportInSystem(start.system, good);
+    if (marketSymbols.isEmpty) {
+      continue;
+    }
+    final waypoints = marketSymbols.map(systemsCache.waypoint).toList()
+      ..sort(
+        (a, b) => a.distanceTo(start).compareTo(b.distanceTo(start)),
+      );
+    final market = waypoints.firstOrNull;
     if (market != null) {
-      markets[good] = market;
+      markets[good] = market.symbol;
     }
   }
   return markets;
@@ -163,9 +150,9 @@ Map<TradeSymbol, WaypointSymbol> findImportingMarketsForGoods(
 
 /// Evaluate all possible source and Market pairings.
 Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
+  Database db,
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingSnapshot marketListings,
   SystemSymbol systemSymbol,
   bool Function(WaypointType, Set<WaypointTraitSymbol>) sourcePredicate,
   ExtractionType extractionType,
@@ -187,9 +174,9 @@ Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
       traits,
       extractionType,
     );
-    final marketForGood = findImportingMarketsForGoods(
+    final marketForGood = await findImportingMarketsForGoods(
+      db,
       systemsCache,
-      marketListings,
       source.symbol,
       expectedGoods,
     );
@@ -228,15 +215,15 @@ bool canBeSiphoned(WaypointType type, Set<WaypointTraitSymbol> traits) {
 
 /// Evaluate all possible source and Market pairings for mining.
 Future<List<ExtractionScore>> evaluateWaypointsForMining(
+  Database db,
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingSnapshot marketListings,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
+    db,
     systemsCache,
     chartingCache,
-    marketListings,
     systemSymbol,
     canBeMined,
     ExtractionType.mine,
@@ -245,15 +232,15 @@ Future<List<ExtractionScore>> evaluateWaypointsForMining(
 
 /// Evaluate all possible source and Market pairings for siphoning.
 Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
+  Database db,
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  MarketListingSnapshot marketListings,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
+    db,
     systemsCache,
     chartingCache,
-    marketListings,
     systemSymbol,
     canBeSiphoned,
     ExtractionType.siphon,

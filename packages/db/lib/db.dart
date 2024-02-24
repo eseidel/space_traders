@@ -298,6 +298,28 @@ class Database {
         .then((list) => list.toList());
   }
 
+  /// Get all WaypointSymbols with a market importing the given tradeSymbol.
+  Future<List<WaypointSymbol>> marketsWithImportInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketsWithImportInSystemQuery(system, tradeSymbol);
+    return queryMany(
+      query,
+      (map) => WaypointSymbol.fromString(map['waypoint_symbol'] as String),
+    ).then((list) => list.toList());
+  }
+
+  /// Returns true if we know of a market which trades the given symbol.
+  Future<bool> knowOfMarketWhichTrades(TradeSymbol tradeSymbol) async {
+    final query = knowOfMarketWhichTradesQuery(tradeSymbol);
+    final result = await connection.execute(
+      pg.Sql.named(query.fmtString),
+      parameters: query.parameters,
+    );
+    return result[0][0]! as bool;
+  }
+
   /// Update the given market listing in the database.
   Future<void> upsertMarketListing(MarketListing listing) async {
     await execute(upsertMarketListingQuery(listing));

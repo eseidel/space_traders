@@ -1,4 +1,3 @@
-import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
@@ -6,14 +5,14 @@ import 'package:cli/market_scan.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';
+import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockLogger extends Mock implements Logger {}
+class _MockDatabase extends Mock implements Database {}
 
-class _MockMarketListingSnapshot extends Mock
-    implements MarketListingSnapshot {}
+class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
@@ -27,9 +26,9 @@ class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
+class _MockSystemsCache extends Mock implements SystemsCache {}
 
 BuyOpp _makeBuyOpp({
   required WaypointSymbol marketSymbol,
@@ -517,7 +516,7 @@ void main() {
     expect(market?.price, mid);
   });
 
-  test('findBestMarketToSell smoke test', () {
+  test('findBestMarketToSell smoke test', () async {
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn('S-1');
     final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
@@ -611,7 +610,7 @@ void main() {
       ),
     ).thenReturn(fakePlan(nearSymbol, farSymbol, 10000000));
 
-    final marketListings = _MockMarketListingSnapshot();
+    final db = _MockDatabase();
     MarketListing listing(WaypointSymbol symbol) {
       return MarketListing(
         waypointSymbol: symbol,
@@ -619,16 +618,19 @@ void main() {
       );
     }
 
-    when(() => marketListings[nearSymbol]).thenReturn(listing(nearSymbol));
-    when(() => marketListings[midSymbol]).thenReturn(listing(midSymbol));
-    when(() => marketListings[farSymbol]).thenReturn(listing(farSymbol));
+    when(() => db.marketListingForSymbol(nearSymbol))
+        .thenAnswer((_) async => listing(nearSymbol));
+    when(() => db.marketListingForSymbol(midSymbol))
+        .thenAnswer((_) async => listing(midSymbol));
+    when(() => db.marketListingForSymbol(farSymbol))
+        .thenAnswer((_) async => listing(farSymbol));
 
     final logger = _MockLogger();
-    final market = runWithLogger(
+    final market = await runWithLogger(
       logger,
-      () => findBestMarketToSell(
+      () async => await findBestMarketToSell(
+        db,
         marketPrices,
-        marketListings,
         routePlanner,
         ship,
         TradeSymbol.ALUMINUM,
