@@ -306,7 +306,7 @@ class Database {
     final query = marketsWithImportInSystemQuery(system, tradeSymbol);
     return queryMany(
       query,
-      (map) => WaypointSymbol.fromString(map['waypoint_symbol'] as String),
+      (map) => WaypointSymbol.fromString(map['symbol'] as String),
     ).then((list) => list.toList());
   }
 
@@ -363,8 +363,8 @@ class Database {
     AccountingType accountingType,
   ) async {
     final result = await connection.execute(
-      'SELECT * FROM transaction_ WHERE '
-      'accounting = @accounting',
+      pg.Sql.named('SELECT * FROM transaction_ WHERE '
+          'accounting = @accounting'),
       parameters: {'accounting': accountingType.name},
     );
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
@@ -375,8 +375,8 @@ class Database {
     DateTime timestamp,
   ) async {
     final result = await connection.execute(
-      'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
-      'ORDER BY timestamp',
+      pg.Sql.named('SELECT * FROM transaction_ WHERE timestamp > @timestamp '
+          'ORDER BY timestamp'),
       parameters: {'timestamp': timestamp},
     );
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
