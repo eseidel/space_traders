@@ -99,7 +99,7 @@ class Config {
   /// construction materials should be priced at.
   final constructionMaxPurchasePrice = {
     TradeSymbol.FAB_MATS: 3000,
-    TradeSymbol.ADVANCED_CIRCUITRY: 11000,
+    TradeSymbol.ADVANCED_CIRCUITRY: 9000,
   };
 
   /// Used by _computeActiveConstruction to compute if we should be doing
