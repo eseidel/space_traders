@@ -49,26 +49,24 @@ void main() {
       TradeSymbol.SILICON_CRYSTALS,
       TradeSymbol.QUARTZ_SAND,
     };
-    when(() => marketListings[marketA.symbol]).thenReturn(
-      MarketListing(
-        waypointSymbol: marketA.symbol,
-        imports: const {
-          TradeSymbol.IRON_ORE,
-          TradeSymbol.COPPER_ORE,
-          TradeSymbol.ALUMINUM_ORE,
-        },
-      ),
-    );
-    when(() => marketListings[marketB.symbol]).thenReturn(
-      MarketListing(
-        waypointSymbol: marketB.symbol,
-        imports: const {
-          TradeSymbol.ICE_WATER,
-          TradeSymbol.SILICON_CRYSTALS,
-          TradeSymbol.QUARTZ_SAND,
-        },
-      ),
-    );
+    const aImports = {
+      TradeSymbol.IRON_ORE,
+      TradeSymbol.COPPER_ORE,
+      TradeSymbol.ALUMINUM_ORE,
+    };
+    for (final good in aImports) {
+      when(() => db.marketsWithImportInSystem(systemSymbol, good))
+          .thenAnswer((_) async => [marketA.symbol]);
+    }
+    const bImports = {
+      TradeSymbol.ICE_WATER,
+      TradeSymbol.SILICON_CRYSTALS,
+      TradeSymbol.QUARTZ_SAND,
+    };
+    for (final good in bImports) {
+      when(() => db.marketsWithImportInSystem(systemSymbol, good))
+          .thenAnswer((_) async => [marketB.symbol]);
+    }
     when(() => chartingCache.chartedValues(sourceSymbol)).thenAnswer(
       (_) async => ChartedValues.test(
         traitSymbols: const {
@@ -100,7 +98,6 @@ void main() {
     final db = _MockDatabase();
     final systemsCache = _MockSystemsCache();
     final chartingCache = _MockChartingCache();
-    final marketListings = _MockMarketListingSnapshot();
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
     final source = SystemWaypoint.test(
@@ -123,12 +120,10 @@ void main() {
       TradeSymbol.LIQUID_HYDROGEN,
       TradeSymbol.LIQUID_NITROGEN,
     };
-    when(() => marketListings[market.symbol]).thenReturn(
-      MarketListing(
-        waypointSymbol: market.symbol,
-        imports: producedGoods,
-      ),
-    );
+    for (final good in producedGoods) {
+      when(() => db.marketsWithImportInSystem(systemSymbol, good))
+          .thenAnswer((_) async => [market.symbol]);
+    }
     when(() => chartingCache.chartedValues(sourceSymbol)).thenAnswer(
       (_) async => ChartedValues.test(),
     );

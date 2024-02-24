@@ -656,6 +656,9 @@ void main() {
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
+    when(() => db.marketListingForSymbol(waypointSymbol))
+        .thenAnswer((_) => Future.value());
+
     final state = BehaviorState(shipSymbol, Behavior.miner)
       ..extractionJob = ExtractionJob(
         source: waypointSymbol,
