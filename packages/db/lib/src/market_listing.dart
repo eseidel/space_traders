@@ -28,10 +28,13 @@ Query marketsWithImportInSystemQuery(
   SystemSymbol system,
   TradeSymbol tradeSymbol,
 ) =>
+    // TODO(eseidel): This should only be imports, but that currently breaks
+    // the ability to find mining locations in starting systems.
     Query(
       '''
       SELECT symbol FROM market_listing_
       WHERE starts_with(symbol, @system) AND @tradeSymbol = ANY(imports)
+        OR @tradeSymbol = ANY(exchange)
       ''',
       parameters: {
         'system': system.system,
