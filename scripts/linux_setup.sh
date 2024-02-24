@@ -7,9 +7,10 @@ set -e
 
 # Path is needed for pub global activate
 # BOT=true is needed to make flutter/dart not whine about using root user.
-RC_FILE="export PATH=\"\$PATH\":\"$HOME/.pub-cache/bin\";export BOT=true;"
-echo $RC_FILE > $HOME/.zshrc
-source $HOME/.zshrc
+RC_FILE=";export PATH=\"\$PATH:$HOME/.pub-cache/bin\";export BOT=true;"
+# Append to .bashrc if it exists, otherwise create it.
+echo $RC_FILE >> $HOME/.bashrc
+source $HOME/.bashrc
 
 # https://stackoverflow.com/questions/359109/using-the-scrollwheel-in-gnu-screen
 SCREEN_RC="termcapinfo xterm* ti@:te@"
