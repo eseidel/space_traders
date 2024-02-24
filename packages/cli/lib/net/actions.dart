@@ -269,7 +269,6 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
 }
 
 bool _shouldRefuelAfterCheckingPrice(
-  MarketPriceSnapshot marketPrices,
   Ship ship, {
   required TradeSymbol fuelSymbol,
   required int price,
@@ -340,12 +339,12 @@ bool _shouldRefuelBasedOnCapacity(Ship ship) {
 Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Api api,
   Database db,
-  MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
   ShipSnapshot shipCache,
   Market market,
-  Ship ship,
-) async {
+  Ship ship, {
+  required int? medianFuelPurchasePrice,
+}) async {
   if (!_shouldRefuelBasedOnCapacity(ship)) {
     return null;
   }
@@ -358,13 +357,11 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   if (!_shouldRefuelBasedOnUsage(ship)) {
     return null;
   }
-  final median = marketPrices.medianPurchasePrice(fuelGood.symbol);
   if (!_shouldRefuelAfterCheckingPrice(
-    marketPrices,
     ship,
     fuelSymbol: fuelGood.symbol,
     price: fuelGood.purchasePrice,
-    median: median,
+    median: medianFuelPurchasePrice,
   )) {
     return null;
   }
@@ -376,7 +373,7 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
     ship,
     agent,
     marketTransaction,
-    medianPrice: median,
+    medianPrice: medianFuelPurchasePrice,
     transactionEmoji: '⛽',
   );
   final transaction = Transaction.fromMarketTransaction(

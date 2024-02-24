@@ -326,7 +326,6 @@ void main() {
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
     final market = _MockMarket();
     when(() => market.tradeGoods).thenReturn([]);
-    final marketPrices = _MockMarketPrices();
 
     when(
       () => fleetApi.refuelShip(
@@ -351,11 +350,11 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         market,
         ship,
+        medianFuelPurchasePrice: 100,
       ),
     );
     verify(() => logger.warn('🛸#1  Market does not sell fuel, not refueling.'))
@@ -378,11 +377,11 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         market,
         ship,
+        medianFuelPurchasePrice: 100,
       ),
     );
     verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
@@ -409,11 +408,11 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         market,
         ship,
+        medianFuelPurchasePrice: 100,
       ),
     );
     verify(
@@ -440,11 +439,11 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         market,
         ship,
+        medianFuelPurchasePrice: 100,
       ),
     );
     verifyNever(
@@ -465,11 +464,11 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         market,
         ship,
+        medianFuelPurchasePrice: 100,
       ),
     );
     verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
@@ -492,11 +491,11 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         market,
         ship,
+        medianFuelPurchasePrice: 100,
       ),
     );
     verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
@@ -519,11 +518,11 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        marketPrices,
         agentCache,
         shipCache,
         market,
         ship,
+        medianFuelPurchasePrice: 100,
       ),
     );
     verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);

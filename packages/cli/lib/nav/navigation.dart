@@ -303,14 +303,15 @@ Future<NavResult> continueNavigationIfNeeded(
         shipErr(ship, 'No market at ${ship.waypointSymbol}, cannot refuel');
         return NavResult._continueAction();
       }
+      final median = caches.marketPrices.medianPurchasePrice(TradeSymbol.FUEL);
       await refuelIfNeededAndLog(
         api,
         db,
-        caches.marketPrices,
         caches.agent,
         caches.ships,
         market,
         ship,
+        medianFuelPurchasePrice: median,
       );
       return NavResult._continueAction();
     case RouteActionType.navCruise:
@@ -331,14 +332,16 @@ Future<NavResult> continueNavigationIfNeeded(
             ship,
           );
           if (market != null) {
+            final median =
+                caches.marketPrices.medianPurchasePrice(TradeSymbol.FUEL);
             await refuelIfNeededAndLog(
               api,
               db,
-              caches.marketPrices,
               caches.agent,
               caches.ships,
               market,
               ship,
+              medianFuelPurchasePrice: median,
             );
           } else {
             // TODO(eseidel): Make this throw once we're better about fuel.
