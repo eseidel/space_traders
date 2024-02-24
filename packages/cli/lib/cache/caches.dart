@@ -13,6 +13,8 @@ import 'package:cli/cache/shipyard_listing_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
+import 'package:cli/compare.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
@@ -189,25 +191,71 @@ class Caches {
     );
     routePlanner.clearRoutingCaches();
   }
+}
+
+T _checkForChanges<T>({
+  required T current,
+  required T server,
+  required List<Map<String, dynamic>> Function(T) toJsonList,
+}) {
+  final currentJson = toJsonList(current);
+  final serverJson = toJsonList(server);
+  if (!jsonMatches(currentJson, serverJson)) {
+    logger.warn('$T changed, updating cache.');
+    return server;
+  }
+  return current;
+}
+
+/// Class to hold state for updating caches at the top of the loop.
+class TopOfLoopUpdater {
+  /// Number of requests between checks to ensure ships are up to date.
+  final int requestsBetweenChecks = 100;
+
+  int _requestsSinceLastCheck = 0;
 
   /// Update the caches at the top of the loop.
-  Future<void> updateAtTopOfLoop(Database db, Api api) async {
+  Future<void> updateAtTopOfLoop(Caches caches, Database db, Api api) async {
     // MarketCache only live for one loop over the ships.
-    markets.resetForLoop();
+    caches.markets.resetForLoop();
 
-    // This check races with the code in continueNavigationIfNeeded which
+    // The ships check races with the code in continueNavigationIfNeeded which
     // knows how to update the ShipNavStatus from IN_TRANSIT to IN_ORBIT when
     // a ship has arrived.  We could add some special logic here to ignore
     // that false positive.  This check is called at the top of every loop
     // and might notice that a ship has arrived before the ship logic gets
     // to run and update the status.
-    ships = await ships.ensureUpToDate(db, api);
-    await agent.ensureAgentUpToDate(api);
-    await fetchContracts(db, api);
-    marketPrices = await MarketPriceSnapshot.load(db);
+    _requestsSinceLastCheck++;
+    if (_requestsSinceLastCheck >= requestsBetweenChecks) {
+      _requestsSinceLastCheck = 0;
+      // This does not need to assign to anything, fetchContracts updates
+      // the db already.
+      _checkForChanges(
+        current: await ContractSnapshot.load(db),
+        server: await fetchContracts(db, api),
+        toJsonList: (e) => e.contracts.map((e) => e.toJson()).toList(),
+      );
+      // caches.ships should be deleted.
+      caches.ships = _checkForChanges(
+        current: caches.ships,
+        server: await fetchShips(db, api),
+        toJsonList: (e) => e.ships.map((e) => e.toJson()).toList(),
+      );
+      // caches.agent should be deleted.
+      await caches.agent.updateAgent(
+        _checkForChanges(
+          current: caches.agent.agent,
+          server: await getMyAgent(api),
+          toJsonList: (e) => [e.toOpenApi().toJson()],
+        ),
+      );
+    }
 
-    marketListings = await MarketListingSnapshot.load(db);
-    shipyardListings = await ShipyardListingSnapshot.load(db);
+    // These should all be deleted from Caches.
+    caches
+      ..marketPrices = await MarketPriceSnapshot.load(db)
+      ..marketListings = await MarketListingSnapshot.load(db)
+      ..shipyardListings = await ShipyardListingSnapshot.load(db);
   }
 }
 

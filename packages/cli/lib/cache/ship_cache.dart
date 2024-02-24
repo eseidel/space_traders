@@ -1,7 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/static_cache.dart';
-import 'package:cli/compare.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:cli/ships.dart';
 import 'package:collection/collection.dart';
@@ -23,11 +21,6 @@ class ShipSnapshot {
 
   /// Ships in the cache.
   final List<Ship> ships;
-
-  /// Number of requests between checks to ensure ships are up to date.
-  final int requestsBetweenChecks = 100;
-
-  int _requestsSinceLastCheck = 0;
 
   /// Returns a map of ship frame type to count in fleet.
   // TODO(eseidel): Unclear if this is still needed.
@@ -81,27 +74,6 @@ class ShipSnapshot {
   /// Returns the ship for the provided ShipSymbol.
   Ship operator [](ShipSymbol symbol) =>
       ships.firstWhere((s) => s.shipSymbol == symbol);
-
-  /// Fetches a new snapshot and logs if different from this one.
-  // TODO(eseidel): This does not belong in this class.
-  Future<ShipSnapshot> ensureUpToDate(Database db, Api api) async {
-    _requestsSinceLastCheck++;
-    if (_requestsSinceLastCheck < requestsBetweenChecks) {
-      return this;
-    }
-    _requestsSinceLastCheck = 0;
-
-    final newShips = await fetchShips(db, api);
-    final newShipsJson = newShips.ships.map((c) => c.toJson()).toList();
-    final oldShipsJson = ships.map((c) => c.toJson()).toList();
-    // Our contracts class has a timestamp which we don't want to compare, so
-    // compare the OpenAPI JSON instead.
-    if (jsonMatches(newShipsJson, oldShipsJson)) {
-      logger.warn('Contracts changed, updating cache.');
-      return newShips;
-    }
-    return this;
-  }
 
   // TODO(eseidel): This should not exist.  We don't need to pass the
   // ShipSnapshot around everywhere we should just pass the ship and then update

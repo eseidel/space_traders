@@ -12,14 +12,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
         .toList();
   }
   if (behaviors.isEmpty) {
-    print('No behaviors found.');
+    logger.info('No behaviors found.');
     return;
   }
 
   final jsonList = behaviors.map((b) => b.toJson()).toList();
   const encoder = JsonEncoder.withIndent(' ');
   final prettyprint = encoder.convert(jsonList);
-  print(prettyprint);
+  logger.info(prettyprint);
 }
 
 void main(List<String> args) async {

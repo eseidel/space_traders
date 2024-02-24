@@ -2,7 +2,6 @@ import 'package:cli/behavior/advance.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/config.dart';
-import 'package:cli/idle_queue.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/counts.dart';
 import 'package:cli/net/exceptions.dart';
@@ -25,42 +24,14 @@ Future<void> _waitIfNeeded(ShipWaiterEntry entry) async {
   }
 }
 
-Future<void> _runIdleTasksIfPossible(
-  Database db,
-  Api api,
-  Caches caches,
-  IdleQueue queue,
-  ShipWaiterEntry entry,
-) async {
-  if (!config.serviceIdleQueue) {
-    return;
-  }
-  final waitUntil = entry.waitUntil;
-  if (waitUntil == null) {
-    return;
-  }
-  if (queue.isDone) {
-    return;
-  }
-  while (!queue.isDone &&
-      DateTime.timestamp().add(queue.minProcessingTime).isBefore(waitUntil)) {
-    await expectTime(
-      api.requestCounts,
-      'idle queue',
-      queue.minProcessingTime,
-      () async => await queue.runOne(db, api, caches),
-    );
-  }
-}
-
 /// Loop over our ships and advance them.  Runs until error.
 Future<void> advanceShips(
   Api api,
   Database db,
   CentralCommand centralCommand,
   Caches caches,
-  IdleQueue queue,
-  ShipWaiter waiter, {
+  ShipWaiter waiter,
+  TopOfLoopUpdater updater, {
   required int loopCount,
   bool Function(Ship ship)? shipFilter,
 }) async {
@@ -69,8 +40,7 @@ Future<void> advanceShips(
 
   await expectTime(api.requestCounts, 'top of loop', const Duration(seconds: 1),
       () async {
-    logger.info('🔎 $queue');
-    await caches.updateAtTopOfLoop(db, api);
+    await updater.updateAtTopOfLoop(caches, db, api);
     await centralCommand.advanceCentralPlanning(db, api, caches);
   });
 
@@ -85,7 +55,6 @@ Future<void> advanceShips(
     final shipSymbol = entry.shipSymbol;
     final waitUntil = entry.waitUntil;
 
-    await _runIdleTasksIfPossible(db, api, caches, queue, entry);
     await _waitIfNeeded(entry);
     final ship = caches.ships[shipSymbol];
     if (shipFilter != null && !shipFilter(ship)) {
@@ -206,8 +175,7 @@ Future<Never> logic(
       shipFilter: shipFilter,
     );
   final rateLimitTracker = RateLimitTracker(api);
-  final queue = IdleQueue()
-    ..queueSystem(caches.agent.headquartersSystemSymbol, jumpDistance: 0);
+  final updater = TopOfLoopUpdater();
 
   while (true) {
     rateLimitTracker.printStatsIfNeeded();
@@ -217,8 +185,8 @@ Future<Never> logic(
         db,
         centralCommand,
         caches,
-        queue,
         waiter,
+        updater,
         shipFilter: shipFilter,
         loopCount: config.loopCount,
       );
