@@ -209,6 +209,9 @@ class MarketPriceSnapshot extends PricesCache<TradeSymbol, MarketPrice> {
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // Make sure that 100th percentile doesn't go out of bounds.
+    // TODO(eseidel): This doesn't match postgres' percentile_disc.
+    // percentile_disc will round up to the next index if the percentile
+    // doesn't match an exact index.
     final index = min(
       pricesForSymbolSorted.length * percentile ~/ 100,
       pricesForSymbolSorted.length - 1,
