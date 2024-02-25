@@ -56,8 +56,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   for (final system in systemsToWarpTo) {
     logger.info('${system.symbol}');
   }
-
-  // Required or main will hang.
 }
 
 void main(List<String> args) async {

@@ -17,8 +17,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     }
     await queue.runOne(db, api, caches);
   }
-
-  // required or main() will hang
 }
 
 void main(List<String> args) async {

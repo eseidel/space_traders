@@ -107,7 +107,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     // final p = PolyFit(x, y, degree);
     // print(p);
   }
-  // Required or main will hang.
 }
 
 void main(List<String> args) async {

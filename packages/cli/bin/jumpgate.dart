@@ -38,8 +38,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     final status = statusString(connection);
     logger.info('  ${connection.sectorLocalName.padRight(9)} $status');
   }
-
-  // Required or main() will hang.
 }
 
 void main(List<String> args) async {
