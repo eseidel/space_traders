@@ -1,5 +1,6 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/supply_chain.dart';
 
 // Returns the distance between two waypoints, or null if they are in different
@@ -28,33 +29,30 @@ String _describeMarket(WaypointSymbol waypointSymbol, MarketPrice? price) {
 /// Walk the supply chain and print it.
 class DescribingVisitor extends SupplyLinkVisitor {
   /// Create a new describing visitor.
-  DescribingVisitor(this.systems, this.marketPrices);
+  DescribingVisitor(this.systems, this.db);
 
-  /// The systems cache.
   final SystemsCache systems;
-
-  /// The market prices.
-  final MarketPriceSnapshot marketPrices;
+  final Database db;
 
   final _indent = ' ';
 
   @override
-  void visitExtract(ExtractLink link, {required int depth}) {
+  Future<void> visitExtract(ExtractLink link, {required int depth}) async {
     final spaces = _indent * depth;
     final from = link.waypointSymbol.waypointName;
     logger.info('${spaces}Extract ${link.tradeSymbol} from $from');
   }
 
   @override
-  void visitShuttle(ShuttleLink link, {required int depth}) {
+  Future<void> visitShuttle(ShuttleLink link, {required int depth}) async {
     final spaces = _indent * depth;
     final source = link.source.waypointSymbol;
     final destination = link.destination;
     final tradeSymbol = link.tradeSymbol;
 
     final distance = _distanceBetween(systems, source, destination);
-    final sourcePrice = marketPrices.priceAt(source, tradeSymbol);
-    final destinationPrice = marketPrices.priceAt(destination, tradeSymbol);
+    final sourcePrice = await db.marketPriceAt(source, tradeSymbol);
+    final destinationPrice = await db.marketPriceAt(destination, tradeSymbol);
 
     logger.info(
       '${spaces}Shuttle $tradeSymbol from '
@@ -65,7 +63,7 @@ class DescribingVisitor extends SupplyLinkVisitor {
   }
 
   @override
-  void visitManufacture(Manufacture link, {required int depth}) {
+  Future<void> visitManufacture(Manufacture link, {required int depth}) async {
     final spaces = _indent * depth;
     final inputSymbols = link.inputs.keys.map((s) => s.toString()).join(', ');
     logger.info(
@@ -75,52 +73,33 @@ class DescribingVisitor extends SupplyLinkVisitor {
   }
 }
 
-void source(
-  MarketListingSnapshot marketListings,
-  SystemsCache systems,
-  TradeExportCache exports,
-  MarketPriceSnapshot marketPrices,
-  TradeSymbol tradeSymbol,
-  WaypointSymbol waypointSymbol,
-) {
-  logger.info('Sourcing $tradeSymbol for $waypointSymbol');
-  final action = SupplyChainBuilder(
-    systems: systems,
-    exports: exports,
-    marketListings: marketListings,
-  ).buildChainTo(tradeSymbol, waypointSymbol);
-  if (action == null) {
-    logger.warn('No source for $tradeSymbol for $waypointSymbol');
-    return;
-  }
-  action.accept(DescribingVisitor(systems, marketPrices));
-}
-
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final exportCache = TradeExportCache.load(fs);
-  final systemsCache = SystemsCache.load(fs)!;
+  final exports = TradeExportCache.load(fs);
+  final systems = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
-  final marketPrices = await MarketPriceSnapshot.load(db);
   final agent = await myAgent(db);
-  final constructionCache = ConstructionCache(db);
 
   final jumpgate =
-      systemsCache.jumpGateWaypointForSystem(agent.headquarters.system)!;
+      systems.jumpGateWaypointForSystem(agent.headquarters.system)!;
   final waypointSymbol = jumpgate.symbol;
-  final construction = await constructionCache.getConstruction(waypointSymbol);
+  final construction =
+      (await db.getConstruction(waypointSymbol, defaultMaxAge))!.construction;
 
   final neededExports = construction!.materials
       .where((m) => m.required_ > m.fulfilled)
       .map((m) => m.tradeSymbol);
   for (final tradeSymbol in neededExports) {
-    source(
-      marketListings,
-      systemsCache,
-      exportCache,
-      marketPrices,
-      tradeSymbol,
-      waypointSymbol,
-    );
+    logger.info('Sourcing $tradeSymbol for $waypointSymbol');
+    final action = SupplyChainBuilder(
+      systems: systems,
+      exports: exports,
+      marketListings: marketListings,
+    ).buildChainTo(tradeSymbol, waypointSymbol);
+    if (action == null) {
+      logger.warn('No supply chain to bring $tradeSymbol to $waypointSymbol');
+      return;
+    }
+    action.accept(DescribingVisitor(systems, db));
   }
 }
 

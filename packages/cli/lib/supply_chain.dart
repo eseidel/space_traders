@@ -29,13 +29,13 @@ final _extractable = <TradeSymbol>{
 /// A visitor for supply chain nodes.
 abstract class SupplyLinkVisitor {
   /// Visit an extraction node.
-  void visitExtract(ExtractLink link, {required int depth});
+  Future<void> visitExtract(ExtractLink link, {required int depth});
 
   /// Visit a shuttle node.
-  void visitShuttle(ShuttleLink link, {required int depth});
+  Future<void> visitShuttle(ShuttleLink link, {required int depth});
 
   /// Visit a manufacture node.
-  void visitManufacture(Manufacture link, {required int depth});
+  Future<void> visitManufacture(Manufacture link, {required int depth});
 }
 
 /// A supply chain node.
