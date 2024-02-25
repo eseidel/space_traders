@@ -47,7 +47,9 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     centralCommand.subsidizedSellOpps =
         await computeConstructionMaterialSubsidies(
       db,
+      systemsCache,
       exportCache,
+      marketListings,
       construction,
     );
   }

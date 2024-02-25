@@ -10,6 +10,7 @@ import 'package:cli/extraction_score.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/mining.dart';
 import 'package:cli/printing.dart';
+import 'package:cli/supply_chain.dart';
 import 'package:cli/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
@@ -543,14 +544,15 @@ class CentralCommand {
     await _queueMountRequests(caches);
 
     activeConstruction = await _computeActiveConstruction(caches);
+    subsidizedSellOpps = [];
     if (isConstructionTradingEnabled && activeConstruction != null) {
       subsidizedSellOpps = await computeConstructionMaterialSubsidies(
         db,
+        caches.systems,
         caches.static.exports,
+        marketListings,
         activeConstruction!,
       );
-    } else {
-      subsidizedSellOpps = [];
     }
 
     _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(caches);
@@ -990,46 +992,76 @@ Future<ShipType?> shipToBuyFromPlan(
   return null;
 }
 
+class _ImportCollector extends SupplyLinkVisitor {
+  _ImportCollector(this.db);
+  final Database db;
+  final List<MarketPrice> imports = [];
+
+  @override
+  Future<void> visitManufacture(
+    ManufactureLink link, {
+    required int depth,
+  }) async {
+    for (final input in link.inputs.keys) {
+      final price = await db.marketPriceAt(link.waypointSymbol, input);
+      if (price != null) {
+        imports.add(price);
+      }
+    }
+  }
+}
+
 /// Computes the market subsidies for the current construction job.
+/// This may return multiple SellOpps which are the same if the same
+/// good is used in multiple supply chains (e.g. copper).  We could remove
+/// that behavior if needed, but currently that will just cause twice as many
+/// traders to service that route as normal which is probably not bad.
 Future<List<SellOpp>> computeConstructionMaterialSubsidies(
   Database db,
-  TradeExportCache exportsCache,
+  SystemsCache systems,
+  TradeExportCache exports,
+  MarketListingSnapshot marketListings,
   Construction construction,
 ) async {
-  final neededSymbols = construction.materials
+  final neededExports = construction.materials
       .where((m) => m.required_ > m.fulfilled)
       .map((m) => m.tradeSymbol);
+  final sellOpps = <SellOpp>[];
+  for (final symbol in neededExports) {
+    final chain = SupplyChainBuilder(
+      systems: systems,
+      exports: exports,
+      marketListings: marketListings,
+    ).buildChainTo(symbol, construction.waypointSymbol);
+    if (chain != null) {
+      sellOpps.addAll(
+        await constructionSubsidiesForSupplyChain(
+          db,
+          chain,
+        ),
+      );
+    }
+  }
+  return sellOpps;
+}
 
+/// Computes the market subsidies for a given supply chain.
+Future<List<SellOpp>> constructionSubsidiesForSupplyChain(
+  Database db,
+  SupplyLink chain,
+) async {
   final subsidies = <SellOpp>[];
-  for (final export in neededSymbols) {
-    final marketSymbols = await db.marketsWithExportInSystem(
-      construction.waypointSymbol.system,
-      export,
-    );
-    final waypointSymbol = marketSymbols.firstOrNull;
-    if (waypointSymbol == null) {
-      logger.warn('No market found for $export needed for construction.');
+  final collector = _ImportCollector(db);
+  await chain.accept(collector);
+
+  for (final price in collector.imports) {
+    if (price.supply.isAtLeast(SupplyLevel.ABUNDANT)) {
       continue;
     }
-
-    // Look up what trade symbols are required to produce the export.
-    final importSymbols = exportsCache[export]!.imports;
-
-    // TODO(eseidel): This should recurse the whole supply chain.
-    for (final import in importSymbols) {
-      final price = await db.marketPriceAt(waypointSymbol, import);
-      if (price == null) {
-        logger.warn('Missing import price $import at $waypointSymbol?');
-        continue;
-      }
-      if (price.supply.isAtLeast(SupplyLevel.ABUNDANT)) {
-        continue;
-      }
-      final subsidizedSellPrice =
-          price.sellPrice + config.constructionMaterialFlatSubsidyCredits;
-      final subsidizedPrice = price.copyWith(sellPrice: subsidizedSellPrice);
-      subsidies.add(SellOpp.fromMarketPrice(subsidizedPrice));
-    }
+    final subsidizedSellPrice =
+        price.sellPrice + config.constructionMaterialFlatSubsidyCredits;
+    final subsidizedPrice = price.copyWith(sellPrice: subsidizedSellPrice);
+    subsidies.add(SellOpp.fromMarketPrice(subsidizedPrice));
   }
   return subsidies;
 }

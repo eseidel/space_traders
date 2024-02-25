@@ -29,13 +29,16 @@ final _extractable = <TradeSymbol>{
 /// A visitor for supply chain nodes.
 abstract class SupplyLinkVisitor {
   /// Visit an extraction node.
-  Future<void> visitExtract(ExtractLink link, {required int depth});
+  Future<void> visitExtract(ExtractLink link, {required int depth}) async {}
 
   /// Visit a shuttle node.
-  Future<void> visitShuttle(ShuttleLink link, {required int depth});
+  Future<void> visitShuttle(ShuttleLink link, {required int depth}) async {}
 
   /// Visit a manufacture node.
-  Future<void> visitManufacture(Manufacture link, {required int depth});
+  Future<void> visitManufacture(
+    ManufactureLink link, {
+    required int depth,
+  }) async {}
 }
 
 /// A supply chain node.
@@ -45,6 +48,9 @@ abstract class SupplyLink {
 
   /// The trade symbol being supplied.
   final TradeSymbol tradeSymbol;
+
+  /// The end waypointSymbol for this link.
+  WaypointSymbol get waypointSymbol;
 
   /// Does a depth first walk with pre-order traversal.
   Future<void> accept(SupplyLinkVisitor visitor, {int depth = 0});
@@ -56,6 +62,7 @@ abstract class ProduceLink extends SupplyLink {
   ProduceLink(super.tradeSymbol, this.waypointSymbol);
 
   /// The waypoint symbol where the good is produced.
+  @override
   final WaypointSymbol waypointSymbol;
 }
 
@@ -78,6 +85,9 @@ class ShuttleLink extends SupplyLink {
   /// The destination of the shuttle.
   final WaypointSymbol destination;
 
+  @override
+  WaypointSymbol get waypointSymbol => destination;
+
   // This could be a list if we wanted to support options.
   /// The source of the shuttle.
   final ProduceLink source;
@@ -90,9 +100,9 @@ class ShuttleLink extends SupplyLink {
 }
 
 /// A supply chain node representing a manufacture
-class Manufacture extends ProduceLink {
+class ManufactureLink extends ProduceLink {
   /// Create a new manufacture node.
-  Manufacture(super.tradeSymbol, super.waypointSymbol, this.inputs);
+  ManufactureLink(super.tradeSymbol, super.waypointSymbol, this.inputs);
 
   // This could map String -> List if we wanted to support options.
   /// The inputs to the manufacture.
@@ -211,7 +221,7 @@ class SupplyChainBuilder {
     return ShuttleLink(tradeSymbol, waypointSymbol, source);
   }
 
-  Manufacture? _sourceViaManufacture(
+  ManufactureLink? _sourceViaManufacture(
     TradeSymbol tradeSymbol,
     WaypointSymbol waypointSymbol,
   ) {
@@ -228,7 +238,7 @@ class SupplyChainBuilder {
       }
       inputs[import] = source;
     }
-    return Manufacture(tradeSymbol, waypointSymbol, inputs);
+    return ManufactureLink(tradeSymbol, waypointSymbol, inputs);
   }
 
   /// Build a supply chain to source a good for a waypoint.

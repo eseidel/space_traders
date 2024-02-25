@@ -63,7 +63,10 @@ class DescribingVisitor extends SupplyLinkVisitor {
   }
 
   @override
-  Future<void> visitManufacture(Manufacture link, {required int depth}) async {
+  Future<void> visitManufacture(
+    ManufactureLink link, {
+    required int depth,
+  }) async {
     final spaces = _indent * depth;
     final inputSymbols = link.inputs.keys.map((s) => s.toString()).join(', ');
     logger.info(
