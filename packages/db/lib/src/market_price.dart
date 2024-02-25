@@ -64,6 +64,17 @@ Query marketPriceQuery(WaypointSymbol waypoint, TradeSymbol trade) => Query(
       },
     );
 
+/// Query to get the median purchase price for a trade symbol.
+Query medianPurchasePriceQuery(TradeSymbol trade) => Query(
+      '''
+      SELECT percentile_disc(0.5)
+      WITHIN GROUP (ORDER BY purchase_price)
+      FROM market_price_
+      WHERE trade_symbol = @trade;
+      ''',
+      parameters: {'trade': trade.toJson()},
+    );
+
 /// Build a market price from a column map.
 MarketPrice marketPriceFromColumnMap(Map<String, dynamic> values) {
   return MarketPrice(

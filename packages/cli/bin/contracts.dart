@@ -1,15 +1,14 @@
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/contract_snapshot.dart';
-import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 
-void printContracts(
+Future<void> printContracts(
+  Database db,
   String label,
-  List<Contract> contracts,
-  MarketPriceSnapshot marketPrices, {
+  List<Contract> contracts, {
   required bool describeContracts,
-}) {
+}) async {
   if (contracts.isEmpty) {
     return;
   }
@@ -21,36 +20,35 @@ void printContracts(
   for (final contract in contracts) {
     logger
       ..info(contractDescription(contract))
-      ..info(describeExpectedContractProfit(marketPrices, contract));
+      ..info(await describeExpectedContractProfit(db, contract));
   }
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final printAll = argResults['all'] as bool;
   final contractSnapshot = await ContractSnapshot.load(db);
-  final marketPrices = await MarketPriceSnapshot.load(db);
-  printContracts(
+  await printContracts(
+    db,
     'completed',
     contractSnapshot.completedContracts,
-    marketPrices,
     describeContracts: printAll,
   );
-  printContracts(
+  await printContracts(
+    db,
     'expired',
     contractSnapshot.expiredContracts,
-    marketPrices,
     describeContracts: printAll,
   );
-  printContracts(
+  await printContracts(
+    db,
     'active',
     contractSnapshot.activeContracts,
-    marketPrices,
     describeContracts: true,
   );
-  printContracts(
+  await printContracts(
+    db,
     'unaccepted',
     contractSnapshot.unacceptedContracts,
-    marketPrices,
     describeContracts: true,
   );
 }

@@ -413,6 +413,15 @@ class Database {
     return queryOne(query, marketPriceFromColumnMap);
   }
 
+  Future<int?> medianPurchasePrice(TradeSymbol tradeSymbol) async {
+    final query = medianPurchasePriceQuery(tradeSymbol);
+    final result = await connection.execute(
+      pg.Sql.named(query.fmtString),
+      parameters: query.parameters,
+    );
+    return result[0][0] as int?;
+  }
+
   /// Get all shipyard prices from the database.
   Future<Iterable<ShipyardPrice>> allShipyardPrices() async {
     return queryMany(allShipyardPricesQuery(), shipyardPriceFromColumnMap);

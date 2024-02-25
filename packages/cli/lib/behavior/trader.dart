@@ -513,16 +513,16 @@ Future<SupplyConstruction201ResponseData?>
   return response;
 }
 
-int? _expectedContractProfit(
+Future<int?> _expectedContractProfit(
+  Database db,
   Contract contract,
-  MarketPriceSnapshot marketPrices,
-) {
+) async {
   // Add up the total expected outlay.
   final terms = contract.terms;
   final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();
   final medianPricesBySymbol = <TradeSymbol, int>{};
   for (final tradeSymbol in tradeSymbols) {
-    final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol);
+    final medianPrice = await db.medianPurchasePrice(tradeSymbol);
     if (medianPrice == null) {
       return null;
     }
@@ -540,11 +540,11 @@ int? _expectedContractProfit(
 }
 
 /// Returns a string describing the expected profit of a contract.
-String describeExpectedContractProfit(
-  MarketPriceSnapshot marketPrices,
+Future<String> describeExpectedContractProfit(
+  Database db,
   Contract contract,
-) {
-  final profit = _expectedContractProfit(contract, marketPrices);
+) async {
+  final profit = await _expectedContractProfit(db, contract);
   final profitString = profit == null ? 'unknown' : creditsString(profit);
   return 'Expected profit: $profitString';
 }
@@ -567,7 +567,7 @@ Future<DateTime?> acceptContractsIfNeeded(
       ship,
       shipCache,
     );
-    shipInfo(ship, describeExpectedContractProfit(marketPrices, contract));
+    shipInfo(ship, await describeExpectedContractProfit(db, contract));
     return null;
   }
   final unacceptedContracts = await db.unacceptedContracts();
