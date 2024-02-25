@@ -25,6 +25,91 @@ final extractable = <TradeSymbol>{
   ...siphonable,
 };
 
+class DescribeContext {
+  DescribeContext(this.systems, this.marketPrices);
+  final SystemsCache systems;
+  final MarketPriceSnapshot marketPrices;
+}
+
+abstract class Node {
+  Node(this.tradeSymbol);
+  final TradeSymbol tradeSymbol;
+
+  void describe(DescribeContext ctx, {int indent = 0});
+}
+
+abstract class Produce extends Node {
+  Produce(super.tradeSymbol, this.waypointSymbol);
+  final WaypointSymbol waypointSymbol;
+}
+
+class Extract extends Produce {
+  Extract(super.tradeSymbol, super.waypointSymbol);
+
+  @override
+  void describe(DescribeContext ctx, {int indent = 0}) {
+    final from = waypointSymbol.waypointName;
+    final spaces = ' ' * indent;
+    logger.info('${spaces}Extract $tradeSymbol from $from');
+  }
+}
+
+class Shuttle extends Node {
+  Shuttle(super.tradeSymbol, this.destination, this.source);
+  final WaypointSymbol destination;
+
+  // This could be a list if we wanted to support options.
+  final Produce source;
+
+  @override
+  void describe(DescribeContext ctx, {int indent = 0}) {
+    final distance = distanceBetween(
+      ctx.systems,
+      source.waypointSymbol,
+      destination,
+    );
+
+    final sourcePrice = ctx.marketPrices.priceAt(
+      source.waypointSymbol,
+      tradeSymbol,
+    );
+
+    final destinationPrice = ctx.marketPrices.priceAt(
+      destination,
+      tradeSymbol,
+    );
+
+    final spaces = ' ' * indent;
+    logger.info(
+      '${spaces}Shuttle $tradeSymbol from '
+      '${describeMarket(source.waypointSymbol, sourcePrice)} '
+      'to ${describeMarket(destination, destinationPrice)} '
+      'distance = $distance',
+    );
+
+    source.describe(ctx, indent: indent + 1);
+  }
+}
+
+class Manufacture extends Produce {
+  Manufacture(super.tradeSymbol, super.waypointSymbol, this.inputs);
+
+  // This could map String -> List if we wanted to support options.
+  final Map<TradeSymbol, Shuttle> inputs;
+
+  @override
+  void describe(DescribeContext ctx, {int indent = 0}) {
+    final inputSymbols = inputs.keys.map((s) => s.toString()).join(', ');
+    final spaces = ' ' * indent;
+    logger.info(
+      '${spaces}Manufacture $tradeSymbol at $waypointSymbol from $inputSymbols',
+    );
+    for (final input in inputs.values) {
+      input.describe(ctx, indent: indent + 1);
+    }
+  }
+}
+
 Set<TradeSymbol> extractableFrom(SystemWaypoint waypoint) {
   if (waypoint.isAsteroid) {
     return minable;
@@ -96,10 +181,11 @@ int? distanceBetween(
 }
 
 String describeMarket(WaypointSymbol waypointSymbol, MarketPrice? price) {
+  final name = waypointSymbol.waypointName;
   if (price == null) {
-    return '$waypointSymbol (no market)';
+    return '$name (no market)';
   }
-  return '$waypointSymbol (${price.supply}, ${price.activity})';
+  return '$name (${price.supply}, ${price.activity})';
 }
 
 class Sourcer {
@@ -115,18 +201,10 @@ class Sourcer {
   final TradeExportCache exportCache;
   final MarketPriceSnapshot marketPrices;
 
-  void sourceViaShuttle(
+  Produce? _shuttleSource(
     TradeSymbol tradeSymbol,
-    WaypointSymbol waypointSymbol, {
-    int indent = 0,
-  }) {
-    final prefix = ' ' * indent;
-
-    final destinationPrice = marketPrices.priceAt(
-      waypointSymbol,
-      tradeSymbol,
-    );
-
+    WaypointSymbol waypointSymbol,
+  ) {
     // No need to manufacture if we can extract.
     if (extractable.contains(tradeSymbol)) {
       // Find the nearest extraction location?
@@ -135,13 +213,11 @@ class Sourcer {
         tradeSymbol,
         waypointSymbol,
       );
-      final distance = location == null
-          ? null
-          : distanceBetween(systemsCache, waypointSymbol, location);
-      logger.info('${prefix}Extract $tradeSymbol from $location, '
-          'deliver to ${describeMarket(waypointSymbol, destinationPrice)} '
-          'distance = $distance');
-      return;
+      if (location == null) {
+        logger.warn('No extraction site for $tradeSymbol for $waypointSymbol');
+        return null;
+      }
+      return Extract(tradeSymbol, location);
     }
 
     // Look for the nearest export of the good.
@@ -152,55 +228,44 @@ class Sourcer {
       waypointSymbol,
     );
     if (closest == null) {
-      logger.warn('${prefix}No export for $tradeSymbol for $waypointSymbol');
-      return;
+      logger.warn('No export for $tradeSymbol for $waypointSymbol');
+      return null;
     }
-    final closestPrice = marketPrices.priceAt(
-      closest.waypointSymbol,
-      tradeSymbol,
-    );
-    final distance = distanceBetween(
-      systemsCache,
-      closest.waypointSymbol,
-      waypointSymbol,
-    );
-    logger.info('${prefix}Shuttle $tradeSymbol from '
-        '${describeMarket(closest.waypointSymbol, closestPrice)} '
-        'to ${describeMarket(waypointSymbol, destinationPrice)} '
-        'distance = $distance');
-    sourceViaManufacture(
-      tradeSymbol,
-      closest.waypointSymbol,
-      indent: indent + 1,
-    );
+    return sourceViaManufacture(tradeSymbol, closest.waypointSymbol);
   }
 
-  void sourceViaManufacture(
+  Shuttle? sourceViaShuttle(
     TradeSymbol tradeSymbol,
-    WaypointSymbol waypointSymbol, {
-    int indent = 0,
-  }) {
-    final prefix = ' ' * indent;
-    final destinationPrice = marketPrices.priceAt(
-      waypointSymbol,
-      tradeSymbol,
-    );
-    logger.info(
-      '${prefix}Manufacture $tradeSymbol at '
-      '${describeMarket(waypointSymbol, destinationPrice)}',
-    );
+    WaypointSymbol waypointSymbol,
+  ) {
+    final source = _shuttleSource(tradeSymbol, waypointSymbol);
+    if (source == null) {
+      return null;
+    }
+    return Shuttle(tradeSymbol, waypointSymbol, source);
+  }
+
+  Manufacture? sourceViaManufacture(
+    TradeSymbol tradeSymbol,
+    WaypointSymbol waypointSymbol,
+  ) {
     final listing = marketListings[waypointSymbol];
     if (listing == null) {
-      logger.warn('${prefix}No listing for $waypointSymbol');
-      return;
+      throw ArgumentError('No market listing for $waypointSymbol');
     }
     final imports = exportCache[tradeSymbol]!.imports;
+    final inputs = <TradeSymbol, Shuttle>{};
     for (final import in imports) {
-      sourceGoodsFor(import, waypointSymbol, indent: indent + 1);
+      final source = sourceViaShuttle(import, waypointSymbol);
+      if (source == null) {
+        return null;
+      }
+      inputs[import] = source;
     }
+    return Manufacture(tradeSymbol, waypointSymbol, inputs);
   }
 
-  void sourceGoodsFor(
+  Node? sourceGoodsFor(
     TradeSymbol tradeSymbol,
     WaypointSymbol waypointSymbol, {
     int indent = 0,
@@ -208,14 +273,14 @@ class Sourcer {
     final listing = marketListings[waypointSymbol];
     // If the end isn't a market this must be a shuttle step.
     if (listing == null) {
-      sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent);
+      return sourceViaShuttle(tradeSymbol, waypointSymbol);
     } else {
       // If we're sourcing for an export, this must be a manufacture step.
       if (listing.exports.contains(tradeSymbol)) {
-        sourceViaManufacture(tradeSymbol, waypointSymbol, indent: indent);
+        return sourceViaManufacture(tradeSymbol, waypointSymbol);
       } else {
         // If we're sourcing for an import, this must be a shuttle step.
-        sourceViaShuttle(tradeSymbol, waypointSymbol, indent: indent);
+        return sourceViaShuttle(tradeSymbol, waypointSymbol);
       }
     }
   }
@@ -230,12 +295,18 @@ void source(
   WaypointSymbol waypointSymbol,
 ) {
   logger.info('Sourcing $tradeSymbol for $waypointSymbol');
-  Sourcer(
+  final action = Sourcer(
     marketListings: marketListings,
     systemsCache: systemsCache,
     exportCache: exportCache,
     marketPrices: marketPrices,
   ).sourceGoodsFor(tradeSymbol, waypointSymbol);
+  if (action == null) {
+    logger.warn('No source for $tradeSymbol for $waypointSymbol');
+    return;
+  }
+  final ctx = DescribeContext(systemsCache, marketPrices);
+  action.describe(ctx);
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
@@ -266,6 +337,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 }
 
-void main(List<String> args) async {
+Future<void> main(List<String> args) async {
   await runOffline(args, command);
 }
