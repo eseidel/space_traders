@@ -26,9 +26,8 @@ final extractable = <TradeSymbol>{
 };
 
 class DescribeContext {
-  DescribeContext(this.systems, this.marketListings, this.marketPrices);
+  DescribeContext(this.systems, this.marketPrices);
   final SystemsCache systems;
-  final MarketListingSnapshot marketListings;
   final MarketPriceSnapshot marketPrices;
 }
 
@@ -306,7 +305,7 @@ void source(
     logger.warn('No source for $tradeSymbol for $waypointSymbol');
     return;
   }
-  final ctx = DescribeContext(systemsCache, marketListings, marketPrices);
+  final ctx = DescribeContext(systemsCache, marketPrices);
   action.describe(ctx);
 }
 
