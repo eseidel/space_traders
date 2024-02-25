@@ -44,9 +44,9 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   final exportCache = TradeExportCache.load(fs);
 
   if (construction != null) {
-    centralCommand.subsidizedSellOpps = computeConstructionMaterialSubsidies(
-      marketListings,
-      marketPrices,
+    centralCommand.subsidizedSellOpps =
+        await computeConstructionMaterialSubsidies(
+      db,
       exportCache,
       construction,
     );

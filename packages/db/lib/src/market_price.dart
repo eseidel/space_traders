@@ -55,6 +55,15 @@ Query timestampOfMostRecentMarketPriceQuery(WaypointSymbol symbol) => Query(
       parameters: {'symbol': symbol.toJson()},
     );
 
+/// Query to get a market price for a waypoint and trade symbol.
+Query marketPriceQuery(WaypointSymbol waypoint, TradeSymbol trade) => Query(
+      'SELECT * FROM market_price_ WHERE waypoint_symbol = @waypoint AND trade_symbol = @trade',
+      parameters: {
+        'waypoint': waypoint.toJson(),
+        'trade': trade.toJson(),
+      },
+    );
+
 /// Build a market price from a column map.
 MarketPrice marketPriceFromColumnMap(Map<String, dynamic> values) {
   return MarketPrice(

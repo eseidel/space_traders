@@ -310,6 +310,18 @@ class Database {
     ).then((list) => list.toList());
   }
 
+  /// Get all WaypointSymbols with a market importing the given tradeSymbol.
+  Future<List<WaypointSymbol>> marketsWithExportInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketsWithExportInSystemQuery(system, tradeSymbol);
+    return queryMany(
+      query,
+      (map) => WaypointSymbol.fromString(map['symbol'] as String),
+    ).then((list) => list.toList());
+  }
+
   /// Returns true if we know of a market which trades the given symbol.
   Future<bool> knowOfMarketWhichTrades(TradeSymbol tradeSymbol) async {
     final query = knowOfMarketWhichTradesQuery(tradeSymbol);
@@ -390,6 +402,15 @@ class Database {
   /// Add a market price to the database.
   Future<void> upsertMarketPrice(MarketPrice price) async {
     await execute(upsertMarketPriceQuery(price));
+  }
+
+  /// Get the market price for the given waypoint and trade symbol.
+  Future<MarketPrice?> marketPriceAt(
+    WaypointSymbol waypointSymbol,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketPriceQuery(waypointSymbol, tradeSymbol);
+    return queryOne(query, marketPriceFromColumnMap);
   }
 
   /// Get all shipyard prices from the database.

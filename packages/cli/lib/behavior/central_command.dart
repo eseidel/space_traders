@@ -544,9 +544,8 @@ class CentralCommand {
 
     activeConstruction = await _computeActiveConstruction(caches);
     if (isConstructionTradingEnabled && activeConstruction != null) {
-      subsidizedSellOpps = computeConstructionMaterialSubsidies(
-        marketListings,
-        caches.marketPrices,
+      subsidizedSellOpps = await computeConstructionMaterialSubsidies(
+        db,
         caches.static.exports,
         activeConstruction!,
       );
@@ -992,33 +991,35 @@ Future<ShipType?> shipToBuyFromPlan(
 }
 
 /// Computes the market subsidies for the current construction job.
-List<SellOpp> computeConstructionMaterialSubsidies(
-  MarketListingSnapshot marketListings,
-  MarketPriceSnapshot marketPrices,
+Future<List<SellOpp>> computeConstructionMaterialSubsidies(
+  Database db,
   TradeExportCache exportsCache,
   Construction construction,
-) {
-  final neededExports = construction.materials
+) async {
+  final neededSymbols = construction.materials
       .where((m) => m.required_ > m.fulfilled)
       .map((m) => m.tradeSymbol);
 
   final subsidies = <SellOpp>[];
-  for (final export in neededExports) {
-    final listing = marketListings.listings
-        .firstWhereOrNull((l) => l.exports.contains(export));
-    if (listing == null) {
+  for (final export in neededSymbols) {
+    final marketSymbols = await db.marketsWithExportInSystem(
+      construction.waypointSymbol.system,
+      export,
+    );
+    final waypointSymbol = marketSymbols.firstOrNull;
+    if (waypointSymbol == null) {
       logger.warn('No market found for $export needed for construction.');
       continue;
     }
 
-    final waypointSymbol = listing.waypointSymbol;
     // Look up what trade symbols are required to produce the export.
-    final tradeSymbols = exportsCache[export]!.imports;
+    final importSymbols = exportsCache[export]!.imports;
 
-    for (final tradeSymbol in tradeSymbols) {
-      final price = marketPrices.priceAt(waypointSymbol, tradeSymbol);
+    // TODO(eseidel): This should recurse the whole supply chain.
+    for (final import in importSymbols) {
+      final price = await db.marketPriceAt(waypointSymbol, import);
       if (price == null) {
-        logger.warn('Missing import price $tradeSymbol at $waypointSymbol?');
+        logger.warn('Missing import price $import at $waypointSymbol?');
         continue;
       }
       if (price.supply.isAtLeast(SupplyLevel.ABUNDANT)) {
