@@ -99,7 +99,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       logger.warn('No supply chain to bring $tradeSymbol to $waypointSymbol');
       return;
     }
-    action.accept(DescribingVisitor(systems, db));
+    await action.accept(DescribingVisitor(systems, db));
   }
 }
 

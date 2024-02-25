@@ -47,7 +47,7 @@ abstract class SupplyLink {
   final TradeSymbol tradeSymbol;
 
   /// Does a depth first walk with pre-order traversal.
-  void accept(SupplyLinkVisitor visitor, {int depth = 0});
+  Future<void> accept(SupplyLinkVisitor visitor, {int depth = 0});
 }
 
 /// A supply chain node representing production
@@ -65,8 +65,8 @@ class ExtractLink extends ProduceLink {
   ExtractLink(super.tradeSymbol, super.waypointSymbol);
 
   @override
-  void accept(SupplyLinkVisitor visitor, {int depth = 0}) {
-    visitor.visitExtract(this, depth: depth);
+  Future<void> accept(SupplyLinkVisitor visitor, {int depth = 0}) async {
+    await visitor.visitExtract(this, depth: depth);
   }
 }
 
@@ -83,9 +83,9 @@ class ShuttleLink extends SupplyLink {
   final ProduceLink source;
 
   @override
-  void accept(SupplyLinkVisitor visitor, {int depth = 0}) {
-    visitor.visitShuttle(this, depth: depth);
-    source.accept(visitor, depth: depth + 1);
+  Future<void> accept(SupplyLinkVisitor visitor, {int depth = 0}) async {
+    await visitor.visitShuttle(this, depth: depth);
+    await source.accept(visitor, depth: depth + 1);
   }
 }
 
@@ -99,10 +99,10 @@ class Manufacture extends ProduceLink {
   final Map<TradeSymbol, ShuttleLink> inputs;
 
   @override
-  void accept(SupplyLinkVisitor visitor, {int depth = 0}) {
-    visitor.visitManufacture(this, depth: depth);
+  Future<void> accept(SupplyLinkVisitor visitor, {int depth = 0}) async {
+    await visitor.visitManufacture(this, depth: depth);
     for (final input in inputs.values) {
-      input.accept(visitor, depth: depth + 1);
+      await input.accept(visitor, depth: depth + 1);
     }
   }
 }
