@@ -2,6 +2,79 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/supply_chain.dart';
 
+// Returns the distance between two waypoints, or null if they are in different
+// systems.
+int? _distanceBetween(
+  SystemsCache systemsCache,
+  WaypointSymbol a,
+  WaypointSymbol b,
+) {
+  final aWaypoint = systemsCache.waypoint(a);
+  final bWaypoint = systemsCache.waypoint(b);
+  if (aWaypoint.system != bWaypoint.system) {
+    return null;
+  }
+  return aWaypoint.distanceTo(bWaypoint).toInt();
+}
+
+String _describeMarket(WaypointSymbol waypointSymbol, MarketPrice? price) {
+  final name = waypointSymbol.waypointName;
+  if (price == null) {
+    return '$name (no market)';
+  }
+  return '$name (${price.supply}, ${price.activity})';
+}
+
+/// Walk the supply chain and print it.
+class DescribingVisitor extends SupplyLinkVisitor {
+  /// Create a new describing visitor.
+  DescribingVisitor(this.systems, this.marketPrices);
+
+  /// The systems cache.
+  final SystemsCache systems;
+
+  /// The market prices.
+  final MarketPriceSnapshot marketPrices;
+
+  final _indent = ' ';
+
+  @override
+  void visitExtract(ExtractLink link, {required int depth}) {
+    final spaces = _indent * depth;
+    final from = link.waypointSymbol.waypointName;
+    logger.info('${spaces}Extract ${link.tradeSymbol} from $from');
+  }
+
+  @override
+  void visitShuttle(ShuttleLink link, {required int depth}) {
+    final spaces = _indent * depth;
+    final source = link.source.waypointSymbol;
+    final destination = link.destination;
+    final tradeSymbol = link.tradeSymbol;
+
+    final distance = _distanceBetween(systems, source, destination);
+    final sourcePrice = marketPrices.priceAt(source, tradeSymbol);
+    final destinationPrice = marketPrices.priceAt(destination, tradeSymbol);
+
+    logger.info(
+      '${spaces}Shuttle $tradeSymbol from '
+      '${_describeMarket(source, sourcePrice)} '
+      'to ${_describeMarket(destination, destinationPrice)} '
+      'distance = $distance',
+    );
+  }
+
+  @override
+  void visitManufacture(Manufacture link, {required int depth}) {
+    final spaces = _indent * depth;
+    final inputSymbols = link.inputs.keys.map((s) => s.toString()).join(', ');
+    logger.info(
+      '${spaces}Manufacture ${link.tradeSymbol} '
+      'at ${link.waypointSymbol} from $inputSymbols',
+    );
+  }
+}
+
 void source(
   MarketListingSnapshot marketListings,
   SystemsCache systemsCache,
@@ -20,8 +93,8 @@ void source(
     logger.warn('No source for $tradeSymbol for $waypointSymbol');
     return;
   }
-  final ctx = DescribeContext(systemsCache, marketPrices);
-  action.describe(ctx);
+  final visitor = DescribingVisitor(systemsCache, marketPrices);
+  action.accept(visitor);
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {

@@ -26,16 +26,16 @@ final _extractable = <TradeSymbol>{
   ..._siphonable,
 };
 
-/// Passed to describe when printing a supply chain.
-class DescribeContext {
-  /// Create a new description context.
-  DescribeContext(this.systems, this.marketPrices);
+/// A visitor for supply chain nodes.
+abstract class SupplyLinkVisitor {
+  /// Visit an extraction node.
+  void visitExtract(ExtractLink link, {required int depth});
 
-  /// The systems cache.
-  final SystemsCache systems;
+  /// Visit a shuttle node.
+  void visitShuttle(ShuttleLink link, {required int depth});
 
-  /// The market prices.
-  final MarketPriceSnapshot marketPrices;
+  /// Visit a manufacture node.
+  void visitManufacture(Manufacture link, {required int depth});
 }
 
 /// A supply chain node.
@@ -46,8 +46,8 @@ abstract class SupplyLink {
   /// The trade symbol being supplied.
   final TradeSymbol tradeSymbol;
 
-  /// Describe the sub-graph of the supply chain.
-  void describe(DescribeContext ctx, {int indent = 0});
+  /// Does a depth-first traversal of the supply chain.
+  void accept(SupplyLinkVisitor visitor, {int depth = 0});
 }
 
 /// A supply chain node representing production
@@ -65,10 +65,8 @@ class ExtractLink extends ProduceLink {
   ExtractLink(super.tradeSymbol, super.waypointSymbol);
 
   @override
-  void describe(DescribeContext ctx, {int indent = 0}) {
-    final from = waypointSymbol.waypointName;
-    final spaces = ' ' * indent;
-    logger.info('${spaces}Extract $tradeSymbol from $from');
+  void accept(SupplyLinkVisitor visitor, {int depth = 0}) {
+    visitor.visitExtract(this, depth: depth);
   }
 }
 
@@ -85,62 +83,28 @@ class ShuttleLink extends SupplyLink {
   final ProduceLink source;
 
   @override
-  void describe(DescribeContext ctx, {int indent = 0}) {
-    final distance = distanceBetween(
-      ctx.systems,
-      source.waypointSymbol,
-      destination,
-    );
-
-    final sourcePrice = ctx.marketPrices.priceAt(
-      source.waypointSymbol,
-      tradeSymbol,
-    );
-
-    final destinationPrice = ctx.marketPrices.priceAt(
-      destination,
-      tradeSymbol,
-    );
-
-    final spaces = ' ' * indent;
-    logger.info(
-      '${spaces}Shuttle $tradeSymbol from '
-      '${describeMarket(source.waypointSymbol, sourcePrice)} '
-      'to ${describeMarket(destination, destinationPrice)} '
-      'distance = $distance',
-    );
-
-    source.describe(ctx, indent: indent + 1);
+  void accept(SupplyLinkVisitor visitor, {int depth = 0}) {
+    visitor.visitShuttle(this, depth: depth);
+    source.accept(visitor, depth: depth + 1);
   }
 }
 
+/// A supply chain node representing a manufacture
 class Manufacture extends ProduceLink {
+  /// Create a new manufacture node.
   Manufacture(super.tradeSymbol, super.waypointSymbol, this.inputs);
 
   // This could map String -> List if we wanted to support options.
+  /// The inputs to the manufacture.
   final Map<TradeSymbol, ShuttleLink> inputs;
 
   @override
-  void describe(DescribeContext ctx, {int indent = 0}) {
-    final inputSymbols = inputs.keys.map((s) => s.toString()).join(', ');
-    final spaces = ' ' * indent;
-    logger.info(
-      '${spaces}Manufacture $tradeSymbol at $waypointSymbol from $inputSymbols',
-    );
+  void accept(SupplyLinkVisitor visitor, {int depth = 0}) {
+    visitor.visitManufacture(this, depth: depth);
     for (final input in inputs.values) {
-      input.describe(ctx, indent: indent + 1);
+      input.accept(visitor, depth: depth + 1);
     }
   }
-}
-
-Set<TradeSymbol> _extractableFrom(SystemWaypoint waypoint) {
-  if (waypoint.isAsteroid) {
-    return _minable;
-  }
-  if (waypoint.type == WaypointType.GAS_GIANT) {
-    return _siphonable;
-  }
-  return {};
 }
 
 WaypointSymbol? _nearestExtractionSiteFor(
@@ -186,29 +150,6 @@ MarketListing? _nearestListingWithExport(
         ),
   );
   return listings.firstOrNull;
-}
-
-// Returns the distance between two waypoints, or null if they are in different
-// systems.
-int? distanceBetween(
-  SystemsCache systemsCache,
-  WaypointSymbol a,
-  WaypointSymbol b,
-) {
-  final aWaypoint = systemsCache.waypoint(a);
-  final bWaypoint = systemsCache.waypoint(b);
-  if (aWaypoint.system != bWaypoint.system) {
-    return null;
-  }
-  return aWaypoint.distanceTo(bWaypoint).toInt();
-}
-
-String describeMarket(WaypointSymbol waypointSymbol, MarketPrice? price) {
-  final name = waypointSymbol.waypointName;
-  if (price == null) {
-    return '$name (no market)';
-  }
-  return '$name (${price.supply}, ${price.activity})';
 }
 
 /// Builds a supply chain.
@@ -293,9 +234,8 @@ class SupplyChainBuilder {
   /// Build a supply chain to source a good for a waypoint.
   SupplyLink? buildChainTo(
     TradeSymbol tradeSymbol,
-    WaypointSymbol waypointSymbol, {
-    int indent = 0,
-  }) {
+    WaypointSymbol waypointSymbol,
+  ) {
     final listing = _marketListings[waypointSymbol];
     // If the end isn't a market this must be a shuttle step.
     if (listing == null) {
