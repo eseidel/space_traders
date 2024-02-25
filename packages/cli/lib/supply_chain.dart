@@ -46,7 +46,7 @@ abstract class SupplyLink {
   /// The trade symbol being supplied.
   final TradeSymbol tradeSymbol;
 
-  /// Does a depth-first traversal of the supply chain.
+  /// Does a depth first walk with pre-order traversal.
   void accept(SupplyLinkVisitor visitor, {int depth = 0});
 }
 
@@ -155,11 +155,11 @@ MarketListing? _nearestListingWithExport(
 /// Builds a supply chain.
 class SupplyChainBuilder {
   /// Create a new supply chain builder.
-  const SupplyChainBuilder(
-    MarketListingSnapshot marketListings,
-    SystemsCache systems,
-    TradeExportCache exports,
-  )   : _marketListings = marketListings,
+  const SupplyChainBuilder({
+    required SystemsCache systems,
+    required MarketListingSnapshot marketListings,
+    required TradeExportCache exports,
+  })  : _marketListings = marketListings,
         _systems = systems,
         _exports = exports;
 

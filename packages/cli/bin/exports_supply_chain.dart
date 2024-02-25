@@ -77,24 +77,23 @@ class DescribingVisitor extends SupplyLinkVisitor {
 
 void source(
   MarketListingSnapshot marketListings,
-  SystemsCache systemsCache,
-  TradeExportCache exportCache,
+  SystemsCache systems,
+  TradeExportCache exports,
   MarketPriceSnapshot marketPrices,
   TradeSymbol tradeSymbol,
   WaypointSymbol waypointSymbol,
 ) {
   logger.info('Sourcing $tradeSymbol for $waypointSymbol');
   final action = SupplyChainBuilder(
-    marketListings,
-    systemsCache,
-    exportCache,
+    systems: systems,
+    exports: exports,
+    marketListings: marketListings,
   ).buildChainTo(tradeSymbol, waypointSymbol);
   if (action == null) {
     logger.warn('No source for $tradeSymbol for $waypointSymbol');
     return;
   }
-  final visitor = DescribingVisitor(systemsCache, marketPrices);
-  action.accept(visitor);
+  action.accept(DescribingVisitor(systems, marketPrices));
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
