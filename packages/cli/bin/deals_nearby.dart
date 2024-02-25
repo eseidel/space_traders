@@ -37,8 +37,11 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
       ? agentCache!.headquarters(systemsCache)
       : systemsCache.waypointFromString(startArg)!;
 
-  final jumpGate = systemsCache.jumpGateWaypointForSystem(start.system)!;
-  final construction = constructionSnapshot[jumpGate.symbol];
+  final construction = await centralCommand.computeActiveConstruction(
+    db,
+    agentCache!,
+    systemsCache,
+  );
   centralCommand.activeConstruction = construction;
 
   final exportCache = TradeExportCache.load(fs);
@@ -57,7 +60,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
     extraSellOpps
-        .addAll(centralCommand.contractSellOpps(agentCache!, contractSnapshot));
+        .addAll(centralCommand.contractSellOpps(agentCache, contractSnapshot));
   }
   if (centralCommand.isConstructionTradingEnabled) {
     extraSellOpps.addAll(centralCommand.constructionSellOpps());

@@ -479,22 +479,27 @@ class CentralCommand {
     }
   }
 
-  Future<Construction?> _computeActiveConstruction(Caches caches) async {
+  /// Returns the active construction job, if any.
+  Future<Construction?> computeActiveConstruction(
+    Database db,
+    AgentCache agentCache,
+    SystemsCache systems,
+  ) async {
     if (!isConstructionTradingEnabled) {
       return null;
     }
 
-    if (caches.agent.agent.credits < config.constructionMinCredits) {
+    if (agentCache.agent.credits < config.constructionMinCredits) {
       return null;
     }
 
-    final systemSymbol = caches.agent.headquartersSystemSymbol;
-    final jumpGate = caches.systems.jumpGateWaypointForSystem(systemSymbol);
+    final systemSymbol = agentCache.headquartersSystemSymbol;
+    final jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
     if (jumpGate == null) {
       return null;
     }
     final construction =
-        await caches.construction.getConstruction(jumpGate.symbol);
+        await ConstructionCache(db).getConstruction(jumpGate.symbol);
     if (construction == null) {
       return null;
     }
@@ -543,7 +548,11 @@ class CentralCommand {
     await updateAvailableMounts(db);
     await _queueMountRequests(caches);
 
-    activeConstruction = await _computeActiveConstruction(caches);
+    activeConstruction = await computeActiveConstruction(
+      db,
+      caches.agent,
+      caches.systems,
+    );
     subsidizedSellOpps = [];
     if (isConstructionTradingEnabled && activeConstruction != null) {
       subsidizedSellOpps = await computeConstructionMaterialSubsidies(
