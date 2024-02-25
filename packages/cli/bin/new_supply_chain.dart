@@ -25,11 +25,18 @@ final extractable = <TradeSymbol>{
   ...siphonable,
 };
 
+class DescribeContext {
+  DescribeContext(this.systems, this.marketListings, this.marketPrices);
+  final SystemsCache systems;
+  final MarketListingSnapshot marketListings;
+  final MarketPriceSnapshot marketPrices;
+}
+
 abstract class Node {
   Node(this.tradeSymbol);
   final TradeSymbol tradeSymbol;
 
-  void describe({int indent = 0});
+  void describe(DescribeContext ctx, {int indent = 0});
 }
 
 abstract class Produce extends Node {
@@ -41,8 +48,10 @@ class Extract extends Produce {
   Extract(super.tradeSymbol, super.waypointSymbol);
 
   @override
-  void describe({int indent = 0}) {
-    logger.info('${'  ' * indent}Extract $tradeSymbol from $waypointSymbol');
+  void describe(DescribeContext ctx, {int indent = 0}) {
+    final from = waypointSymbol.waypointName;
+    final spaces = ' ' * indent;
+    logger.info('${spaces}Extract $tradeSymbol from $from');
   }
 }
 
@@ -54,12 +63,32 @@ class Shuttle extends Node {
   final Produce source;
 
   @override
-  void describe({int indent = 0}) {
-    logger.info(
-      '${'  ' * indent}Shuttle $tradeSymbol from ${source.waypointSymbol} to $destination',
+  void describe(DescribeContext ctx, {int indent = 0}) {
+    final distance = distanceBetween(
+      ctx.systems,
+      source.waypointSymbol,
+      destination,
     );
 
-    source.describe(indent: indent + 1);
+    final sourcePrice = ctx.marketPrices.priceAt(
+      source.waypointSymbol,
+      tradeSymbol,
+    );
+
+    final destinationPrice = ctx.marketPrices.priceAt(
+      destination,
+      tradeSymbol,
+    );
+
+    final spaces = ' ' * indent;
+    logger.info(
+      '${spaces}Shuttle $tradeSymbol from '
+      '${describeMarket(source.waypointSymbol, sourcePrice)} '
+      'to ${describeMarket(destination, destinationPrice)} '
+      'distance = $distance',
+    );
+
+    source.describe(ctx, indent: indent + 1);
   }
 }
 
@@ -70,12 +99,14 @@ class Manufacture extends Produce {
   final Map<TradeSymbol, Shuttle> inputs;
 
   @override
-  void describe({int indent = 0}) {
+  void describe(DescribeContext ctx, {int indent = 0}) {
+    final inputSymbols = inputs.keys.map((s) => s.toString()).join(', ');
+    final spaces = ' ' * indent;
     logger.info(
-      '${'  ' * indent}Manufacture $tradeSymbol at $waypointSymbol from $inputs',
+      '${spaces}Manufacture $tradeSymbol at $waypointSymbol from $inputSymbols',
     );
     for (final input in inputs.values) {
-      input.describe(indent: indent + 1);
+      input.describe(ctx, indent: indent + 1);
     }
   }
 }
@@ -151,10 +182,11 @@ int? distanceBetween(
 }
 
 String describeMarket(WaypointSymbol waypointSymbol, MarketPrice? price) {
+  final name = waypointSymbol.waypointName;
   if (price == null) {
-    return '$waypointSymbol (no market)';
+    return '$name (no market)';
   }
-  return '$waypointSymbol (${price.supply}, ${price.activity})';
+  return '$name (${price.supply}, ${price.activity})';
 }
 
 class Sourcer {
@@ -274,7 +306,8 @@ void source(
     logger.warn('No source for $tradeSymbol for $waypointSymbol');
     return;
   }
-  action.describe();
+  final ctx = DescribeContext(systemsCache, marketListings, marketPrices);
+  action.describe(ctx);
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
