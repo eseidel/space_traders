@@ -174,7 +174,11 @@ class CentralCommand {
 
   /// Returns an initialized behavior state for the given [ship] to start
   /// its next job.
-  BehaviorState getJobForShip(Ship ship, int credits) {
+  Future<BehaviorState> getJobForShip(
+    Database db,
+    Ship ship,
+    int credits,
+  ) async {
     final shipSymbol = ship.shipSymbol;
     BehaviorState toState(Behavior behavior) {
       return BehaviorState(shipSymbol, behavior);
@@ -209,7 +213,7 @@ class CentralCommand {
       );
     }
     // Otherwise buy a ship if we can.
-    if (enabled(Behavior.buyShip) && shouldBuyShip(ship, credits)) {
+    if (enabled(Behavior.buyShip) && await shouldBuyShip(db, ship, credits)) {
       return BehaviorState(
         shipSymbol,
         Behavior.buyShip,
@@ -644,9 +648,10 @@ class CentralCommand {
   }
 
   /// Returns true if [ship] should start the buyShip behavior.
-  bool shouldBuyShip(Ship ship, int credits) {
+  Future<bool> shouldBuyShip(Database db, Ship ship, int credits) async {
     // Are there any other ships actively buying a ship?
-    if (_behaviorCache.states.any((s) => s.behavior == Behavior.buyShip)) {
+    final states = await db.behaviorStatesWithBehavior(Behavior.buyShip);
+    if (states.isNotEmpty) {
       return false;
     }
     // Do we have a ship we want to buy?

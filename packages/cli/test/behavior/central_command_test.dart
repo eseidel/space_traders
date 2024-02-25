@@ -326,7 +326,8 @@ void main() {
     expect(deals.first, deal);
   });
 
-  test('CentralCommand.shouldBuyShip', () {
+  test('CentralCommand.shouldBuyShip', () async {
+    final db = _MockDatabase();
     final shipCache = _MockShipCache();
     final behaviorCache = _MockBehaviorCache();
     when(() => behaviorCache.states).thenReturn([]);
@@ -353,14 +354,15 @@ void main() {
     );
     // Currently we pad with 100k for trading.
     final paddingCredits = config.shipBuyBufferForTrading;
-    final shouldBuy = centralCommand.shouldBuyShip(ship, paddingCredits + 100);
+    final shouldBuy =
+        centralCommand.shouldBuyShip(db, ship, paddingCredits + 100);
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
     when(() => behaviorCache.states).thenReturn([
       BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip),
     ]);
-    expect(centralCommand.shouldBuyShip(ship, 100000), false);
+    expect(await centralCommand.shouldBuyShip(db, ship, 100000), false);
 
     final buyJob = centralCommand.takeShipBuyJob();
     expect(buyJob, isNotNull);
@@ -650,7 +652,8 @@ void main() {
     expect(centralCommand.mountsNeededForAllShips(), isEmpty);
   });
 
-  test('getJobForShip out of fuel', () {
+  test('getJobForShip out of fuel', () async {
+    final db = _MockDatabase();
     final shipCache = _MockShipCache();
     final behaviorCache = _MockBehaviorCache();
     final centralCommand =
@@ -659,12 +662,13 @@ void main() {
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 0, capacity: 1000));
-    final job = centralCommand.getJobForShip(ship, 1000000);
+    final job = await centralCommand.getJobForShip(db, ship, 1000000);
     // Can't do anything when out of fuel.
     expect(job.behavior, Behavior.idle);
   });
 
-  test('getJobForShip no behaviors', () {
+  test('getJobForShip no behaviors', () async {
+    final db = _MockDatabase();
     final shipCache = _MockShipCache();
     final behaviorCache = _MockBehaviorCache();
     final behaviorTimeouts = _MockBehaviorTimeouts();
@@ -692,7 +696,7 @@ void main() {
     when(() => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()))
         .thenReturn(true);
     when(() => behaviorCache.states).thenReturn([]);
-    final job = centralCommand.getJobForShip(ship, 1000000);
+    final job = await centralCommand.getJobForShip(db, ship, 1000000);
     // Nothing specified for this ship, so it should be idle.
     expect(job.behavior, Behavior.idle);
   });

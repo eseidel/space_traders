@@ -12,6 +12,14 @@ Query behaviorBySymbolQuery(ShipSymbol shipSymbol) => Query(
       },
     );
 
+/// Query behavior states with a specified behavior.
+Query behaviorStatesWithBehaviorQuery(Behavior behavior) => Query(
+      'SELECT * FROM behavior_ WHERE behavior = @behavior',
+      parameters: {
+        'behavior': behavior.toJson(),
+      },
+    );
+
 /// Query to insert or update a behavior state.
 Query upsertBehaviorStateQuery(BehaviorState state) => Query(
       '''
@@ -21,6 +29,7 @@ Query upsertBehaviorStateQuery(BehaviorState state) => Query(
       ''',
       parameters: {
         'ship_symbol': state.shipSymbol.toJson(),
+        'behavior': state.toJson(),
         'json': state.toJson(),
       },
     );
@@ -36,10 +45,12 @@ Query deleteBehaviorStateQuery(ShipSymbol shipSymbol) => Query(
 /// Convert a BehaviorState to a column map.
 Map<String, dynamic> behaviorStateToColumnMap(BehaviorState state) => {
       'ship_symbol': state.shipSymbol.toJson(),
+      'behavior': state.behavior.toJson(),
       'json': state.toJson(),
     };
 
 /// Convert a result row to a BehaviorState.
 BehaviorState behaviorStateFromColumnMap(Map<String, dynamic> values) {
+  // Ignoring ship_symbol and behavior as they are duplicated in the json.
   return BehaviorState.fromJson(values['json'] as Map<String, dynamic>);
 }

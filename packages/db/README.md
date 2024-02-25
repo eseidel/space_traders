@@ -26,6 +26,8 @@ docker cp scripts/. spacetraders_postgres:/scripts
 docker cp sql/. spacetraders_postgres:/sql
 ```
 
+docker exec -it spacetraders_postgres /bin/sh
+
 ```
 docker exec spacetraders_postgres /scripts/init_db.sh spacetraders
 ```

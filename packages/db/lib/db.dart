@@ -413,6 +413,7 @@ class Database {
     return queryOne(query, marketPriceFromColumnMap);
   }
 
+  /// Get the median purchase price for the given trade symbol.
   Future<int?> medianPurchasePrice(TradeSymbol tradeSymbol) async {
     final query = medianPurchasePriceQuery(tradeSymbol);
     final result = await connection.execute(
@@ -477,6 +478,14 @@ class Database {
   /// Get all behavior states.
   Future<Iterable<BehaviorState>> allBehaviorStates() async {
     return queryMany(allBehaviorStatesQuery(), behaviorStateFromColumnMap);
+  }
+
+  /// Get all behavior states with the given behavior.
+  Future<Iterable<BehaviorState>> behaviorStatesWithBehavior(
+    Behavior behavior,
+  ) async {
+    final query = behaviorStatesWithBehaviorQuery(behavior);
+    return queryMany(query, behaviorStateFromColumnMap);
   }
 
   /// Get a behavior state by symbol.
