@@ -31,7 +31,7 @@ Query upsertBehaviorStateQuery(BehaviorState state) => Query(
       ''',
       parameters: {
         'ship_symbol': state.shipSymbol.toJson(),
-        'behavior': state.toJson(),
+        'behavior': state.behavior.toJson(),
         'json': state.toJson(),
       },
     );
