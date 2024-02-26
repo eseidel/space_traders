@@ -23,9 +23,11 @@ Query behaviorStatesWithBehaviorQuery(Behavior behavior) => Query(
 /// Query to insert or update a behavior state.
 Query upsertBehaviorStateQuery(BehaviorState state) => Query(
       '''
-      INSERT INTO behavior_ (ship_symbol, json)
-      VALUES (@ship_symbol, @json)
-      ON CONFLICT (ship_symbol) DO UPDATE SET json = @json
+      INSERT INTO behavior_ (ship_symbol, behavior, json)
+      VALUES (@ship_symbol, @behavior, @json)
+      ON CONFLICT (ship_symbol) DO UPDATE SET
+        behavior = @behavior,
+        json = @json
       ''',
       parameters: {
         'ship_symbol': state.shipSymbol.toJson(),
