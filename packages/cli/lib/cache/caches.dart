@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
-import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_snapshot.dart';
@@ -57,7 +56,6 @@ class Caches {
     required this.systems,
     required this.waypoints,
     required this.markets,
-    required this.behaviors,
     required this.charting,
     required this.routePlanner,
     required this.factions,
@@ -99,9 +97,6 @@ class Caches {
   /// The cache of markets.
   final MarketCache markets;
 
-  /// The cache of behaviors.
-  final BehaviorCache behaviors;
-
   /// The cache of charting data.
   final ChartingCache charting;
 
@@ -141,7 +136,6 @@ class Caches {
     final markets = MarketCache(db, api, static.tradeGoods);
     // Intentionally force refresh contracts in case we've been offline.
     await fetchContracts(db, api);
-    final behaviors = await BehaviorCache.load(db);
 
     final jumpGates = await JumpGateSnapshot.load(db);
     final constructionSnapshot = await ConstructionSnapshot.load(db);
@@ -165,7 +159,6 @@ class Caches {
       systems: systems,
       waypoints: waypoints,
       markets: markets,
-      behaviors: behaviors,
       charting: charting,
       static: static,
       routePlanner: routePlanner,

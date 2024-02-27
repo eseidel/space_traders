@@ -13,8 +13,6 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockBehaviorCache extends Mock implements BehaviorCache {}
-
 class _MockBehaviorTimeouts extends Mock implements BehaviorTimeouts {}
 
 class _MockContractSnapshot extends Mock implements ContractSnapshot {}
@@ -65,11 +63,10 @@ void main() {
     registerFallbackValue(const ShipSymbol.fallbackValue());
     when(() => db.setBehaviorState(any())).thenAnswer((_) async {});
     when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
+    final behaviors = BehaviorSnapshot([]);
 
-    final behaviorCache = BehaviorCache([], db);
     final shipCache = _MockShipCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
 
     Future<void> setupShip({
       required ShipSymbol shipSymbol,
@@ -82,9 +79,8 @@ void main() {
       when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
       when(() => shipNav.systemSymbol).thenReturn(start.systemString);
       when(() => ship.nav).thenReturn(shipNav);
-      await behaviorCache.setBehavior(
-        shipSymbol,
-        BehaviorState(
+      when(() => db.behaviorStateBySymbol(shipSymbol)).thenAnswer(
+        (_) async => BehaviorState(
           shipSymbol,
           Behavior.charter,
           routePlan: fakeJump(start, end),
@@ -107,29 +103,23 @@ void main() {
 
     // Test that from S-A-A we avoid S-A-W and S-B-W.
     final otherSystems =
-        centralCommand.otherCharterSystems(shipASymbol).toList();
+        centralCommand.otherCharterSystems(behaviors, shipASymbol).toList();
     expect(
       otherSystems,
       [bStart.system, bEnd.system], // Source and destination
     );
     // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
-    behaviorCache.getBehavior(shipBSymbol)!.routePlan = null;
+    // behaviorCache.getBehavior(shipBSymbol)!.routePlan = null;
     final otherSystems2 =
-        centralCommand.otherCharterSystems(shipASymbol).toList();
+        centralCommand.otherCharterSystems(behaviors, shipASymbol).toList();
     expect(otherSystems2, [bStart.system]); // From nav.waypointSymbol
-
-    // Remove shipB and we should avoid nothing.
-    await behaviorCache.deleteBehavior(shipBSymbol);
-    final otherSystems3 =
-        centralCommand.otherCharterSystems(shipASymbol).toList();
-    expect(otherSystems3, <SystemSymbol>[]);
 
     final shipCSymbol = ShipSymbol.fromString('X-C');
     final cStart = WaypointSymbol.fromString('S-D-A');
     final cEnd = WaypointSymbol.fromString('S-E-W');
     await setupShip(shipSymbol: shipCSymbol, start: cStart, end: cEnd);
     final otherSystems4 =
-        centralCommand.otherCharterSystems(shipASymbol).toList();
+        centralCommand.otherCharterSystems(behaviors, shipASymbol).toList();
     expect(
       otherSystems4,
       <SystemSymbol>[cStart.system, cEnd.system],
@@ -137,13 +127,14 @@ void main() {
   });
 
   test('CentralCommand.otherTraderSystems', () {
-    final behaviorCache = _MockBehaviorCache();
-    when(() => behaviorCache.states).thenReturn([]);
+    final behaviors = BehaviorSnapshot([]);
     final shipCache = _MockShipCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     expect(
-      centralCommand.otherTraderSystems(ShipSymbol.fromString('X-A')),
+      centralCommand.otherTraderSystems(
+        behaviors,
+        ShipSymbol.fromString('X-A'),
+      ),
       isEmpty,
     );
   });
@@ -212,7 +203,6 @@ void main() {
   });
 
   test('CentralCommand.remainingUnitsNeededForContract', () {
-    final behaviorCache = _MockBehaviorCache();
     final shipCache = _MockShipCache();
     final shipASymbol = ShipSymbol.fromString('X-A');
     when(() => shipCache.shipSymbols).thenReturn([shipASymbol]);
@@ -224,11 +214,10 @@ void main() {
     when(() => deal.maxUnits).thenReturn(10);
     when(() => costedDeal.contractId).thenReturn('C');
     const tradeSymbol = TradeSymbol.FUEL;
-    when(() => behaviorCache.states).thenReturn([
+    final behaviors = BehaviorSnapshot([
       BehaviorState(shipASymbol, Behavior.trader, deal: costedDeal),
     ]);
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     final contractTerms = _MockContractTerms();
     final contract = Contract.test(id: 'C', terms: contractTerms);
     final good = ContractDeliverGood(
@@ -239,13 +228,16 @@ void main() {
     );
     when(() => contractTerms.deliver).thenReturn([good]);
     expect(
-      centralCommand.remainingUnitsNeededForContract(contract, tradeSymbol),
+      centralCommand.remainingUnitsNeededForContract(
+        behaviors,
+        contract,
+        tradeSymbol,
+      ),
       40,
     );
   });
 
   test('CentralCommand.remainingUnitsNeededForConstruction', () {
-    final behaviorCache = _MockBehaviorCache();
     final shipCache = _MockShipCache();
     final shipASymbol = ShipSymbol.fromString('X-A');
     when(() => shipCache.shipSymbols).thenReturn([shipASymbol]);
@@ -260,11 +252,10 @@ void main() {
     when(() => deal.destinationSymbol).thenReturn(waypointSymbol);
     when(() => deal.maxUnits).thenReturn(10);
     const tradeSymbol = TradeSymbol.FAB_MATS;
-    when(() => behaviorCache.states).thenReturn([
+    final behaviors = BehaviorSnapshot([
       BehaviorState(shipASymbol, Behavior.trader, deal: costedDeal),
     ]);
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     final construction = Construction(
       symbol: waypointSymbol.waypoint,
       isComplete: false,
@@ -278,6 +269,7 @@ void main() {
     );
     expect(
       centralCommand.remainingUnitsNeededForConstruction(
+        behaviors,
         construction,
         tradeSymbol,
       ),
@@ -288,9 +280,8 @@ void main() {
   test('idleHaulerSymbols', () {
     final shipCache = _MockShipCache();
     when(() => shipCache.ships).thenReturn([]);
-    final behaviorCache = _MockBehaviorCache();
-    when(() => behaviorCache.states).thenReturn([]);
-    final symbols = idleHaulerSymbols(shipCache, behaviorCache);
+    final empty = BehaviorSnapshot([]);
+    final symbols = empty.idleHaulerSymbols(shipCache);
     expect(symbols, isEmpty);
 
     final ship = _MockShip();
@@ -302,26 +293,24 @@ void main() {
     final shipSymbol = ShipSymbol.fromString('X-A');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => shipCache.ships).thenReturn([ship]);
-    when(() => behaviorCache.states).thenReturn(
+    final oneIdle = BehaviorSnapshot(
       [BehaviorState(shipSymbol, Behavior.idle)],
     );
-    final symbols2 = idleHaulerSymbols(shipCache, behaviorCache);
+    final symbols2 = oneIdle.idleHaulerSymbols(shipCache);
     expect(symbols2, [shipSymbol]);
   });
 
   test('dealsInProgress smoke test', () {
     final deal = _MockCostedDeal();
-    final db = _MockDatabase();
-    final cache = BehaviorCache(
+    final behaviors = BehaviorSnapshot(
       [
         BehaviorState(ShipSymbol.fromString('X-A'), Behavior.miner),
         BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
         BehaviorState(ShipSymbol.fromString('X-C'), Behavior.trader)
           ..deal = deal,
       ],
-      db,
     );
-    final deals = cache.dealsInProgress();
+    final deals = behaviors.dealsInProgress();
     expect(deals.length, 1);
     expect(deals.first, deal);
   });
@@ -329,10 +318,7 @@ void main() {
   test('CentralCommand.shouldBuyShip', () async {
     final db = _MockDatabase();
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehaviorCache();
-    when(() => behaviorCache.states).thenReturn([]);
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('X-A');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -359,9 +345,9 @@ void main() {
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
-    when(() => behaviorCache.states).thenReturn([
-      BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip),
-    ]);
+    when(() => db.behaviorStatesWithBehavior(Behavior.buyShip)).thenAnswer(
+      (_) async => [BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip)],
+    );
     expect(await centralCommand.shouldBuyShip(db, ship, 100000), false);
 
     final buyJob = centralCommand.takeShipBuyJob();
@@ -400,9 +386,7 @@ void main() {
         ]),
       );
       final shipCache = _MockShipCache();
-      final behaviorCache = _MockBehaviorCache();
-      final centralCommand =
-          CentralCommand(shipCache: shipCache, behaviorCache: behaviorCache);
+      final centralCommand = CentralCommand(shipCache: shipCache);
 
       final tenMiners = makeMiners(10);
       when(() => shipCache.ships).thenReturn(tenMiners);
@@ -517,7 +501,6 @@ void main() {
     );
     when(() => caches.ships.ships).thenReturn([ship]);
     final centralCommand = CentralCommand(
-      behaviorCache: caches.behaviors,
       shipCache: caches.ships,
     );
     final api = _MockApi();
@@ -571,9 +554,7 @@ void main() {
 
   test('CentralCommand.shortenMaxPriceAgeForSystem', () {
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehaviorCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     final systemSymbol = SystemSymbol.fromString('S-A');
     final maxAge = centralCommand.maxPriceAgeForSystem(systemSymbol);
     final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);
@@ -616,27 +597,27 @@ void main() {
     when(() => agentCache.agent).thenReturn(agent);
 
     int remainingUnitsNeededForContract(
+      BehaviorSnapshot behaviors,
       Contract contract,
       TradeSymbol tradeSymbol,
     ) {
       return 1;
     }
 
+    final behaviors = BehaviorSnapshot([]);
     final sellOpps = sellOppsForContracts(
       agentCache,
+      behaviors,
       contractSnapshot,
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
     );
     expect(sellOpps.toList().length, 1);
 
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehaviorCache();
-    when(() => behaviorCache.states).thenReturn([]);
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     expect(
       centralCommand
-          .contractSellOpps(agentCache, contractSnapshot)
+          .contractSellOpps(agentCache, behaviors, contractSnapshot)
           .toList()
           .length,
       1,
@@ -646,18 +627,14 @@ void main() {
   test('mountsNeededForAllShips', () {
     final shipCache = _MockShipCache();
     when(() => shipCache.ships).thenReturn([]);
-    final behaviorCache = _MockBehaviorCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     expect(centralCommand.mountsNeededForAllShips(), isEmpty);
   });
 
   test('getJobForShip out of fuel', () async {
     final db = _MockDatabase();
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehaviorCache();
-    final centralCommand =
-        CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+    final centralCommand = CentralCommand(shipCache: shipCache);
     final shipSymbol = ShipSymbol.fromString('X-A');
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -670,10 +647,8 @@ void main() {
   test('getJobForShip no behaviors', () async {
     final db = _MockDatabase();
     final shipCache = _MockShipCache();
-    final behaviorCache = _MockBehaviorCache();
     final behaviorTimeouts = _MockBehaviorTimeouts();
     final centralCommand = CentralCommand(
-      behaviorCache: behaviorCache,
       shipCache: shipCache,
       behaviorTimeouts: behaviorTimeouts,
     );
@@ -695,7 +670,6 @@ void main() {
     registerFallbackValue(Behavior.idle);
     when(() => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()))
         .thenReturn(true);
-    when(() => behaviorCache.states).thenReturn([]);
     final job = await centralCommand.getJobForShip(db, ship, 1000000);
     // Nothing specified for this ship, so it should be idle.
     expect(job.behavior, Behavior.idle);

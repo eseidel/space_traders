@@ -83,8 +83,10 @@ void main() {
     when(
       () => centralCommand.shortenMaxPriceAgeForSystem(waypointSymbol.system),
     ).thenReturn(const Duration(days: 1));
+    final behaviors = BehaviorSnapshot([]);
     when(
       () => centralCommand.waypointsToAvoidInSystem(
+        behaviors,
         waypointSymbol.system,
         shipSymbol,
       ),

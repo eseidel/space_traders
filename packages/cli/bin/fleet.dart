@@ -1,4 +1,3 @@
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
@@ -52,12 +51,11 @@ String _behaviorOrTypeString(Ship ship, BehaviorState? behavior) {
 
 void logShip(
   SystemsCache systemsCache,
-  BehaviorCache behaviorCache,
   MarketPriceSnapshot marketPrices,
   Ship ship,
+  BehaviorState? behavior,
 ) {
   const indent = '   ';
-  final behavior = behaviorCache.getBehavior(ship.shipSymbol);
   final waypoint = systemsCache.waypoint(ship.waypointSymbol);
   final cargoStatus = ship.cargo.capacity == 0
       ? ''
@@ -98,7 +96,6 @@ bool Function(Ship) filterFromArgs(List<String> args) {
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final filter = filterFromArgs(argResults.rest);
-  final behaviorCache = await BehaviorCache.load(db);
   final shipCache = await ShipSnapshot.load(db);
 
   logger.info('Fleet: ${describeShips(shipCache.ships)}');
@@ -115,17 +112,18 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final marketPrices = await MarketPriceSnapshot.load(db);
   for (final ship in matchingShips) {
+    final behaviorState = await db.behaviorStateBySymbol(ship.shipSymbol);
     logShip(
       systemsCache,
-      behaviorCache,
       marketPrices,
       ship,
+      behaviorState,
     );
   }
 
-  final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache)
-      .map((s) => s.hexNumber)
-      .toList();
+  final behaviors = await BehaviorSnapshot.load(db);
+  final idleHaulers =
+      behaviors.idleHaulerSymbols(shipCache).map((s) => s.hexNumber).toList();
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }

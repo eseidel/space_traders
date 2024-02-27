@@ -36,6 +36,7 @@ void main() {
     final fleetApi = _MockFleetApi();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
+    final behaviors = BehaviorSnapshot([]);
 
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
     final waypoint = Waypoint.test(
@@ -102,6 +103,7 @@ void main() {
     ).thenReturn(true);
     when(
       () => centralCommand.nextWaypointToChart(
+        behaviors,
         caches.systems,
         caches.waypoints,
         caches.systemConnectivity,
@@ -110,6 +112,7 @@ void main() {
       ),
     ).thenAnswer((_) async => null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
+    when(db.allBehaviorStates).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     expect(

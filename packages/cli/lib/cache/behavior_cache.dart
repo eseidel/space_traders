@@ -1,3 +1,4 @@
+import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
@@ -39,13 +40,13 @@ class BehaviorTimeouts {
 
   /// Disable the given behavior for [ship] for [duration].
   Future<void> disableBehaviorForShip(
-    BehaviorCache behaviorCache,
+    Database db,
     Ship ship,
     String why,
     Duration duration,
   ) async {
     final shipSymbol = ship.shipSymbol;
-    final currentState = behaviorCache.getBehavior(shipSymbol);
+    final currentState = await db.behaviorStateBySymbol(shipSymbol);
     final behavior = currentState?.behavior;
     if (behavior == null) {
       shipWarn(ship, '$shipSymbol has no behavior to disable.');
@@ -58,7 +59,7 @@ class BehaviorTimeouts {
     );
 
     if (currentState == null || currentState.behavior == behavior) {
-      await behaviorCache.deleteBehavior(shipSymbol);
+      await db.deleteBehaviorState(shipSymbol);
     } else {
       shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
     }
@@ -68,58 +69,61 @@ class BehaviorTimeouts {
   }
 }
 
-/// A class to manage the behavior cache.
-class BehaviorCache {
-  /// Create a new behavior cache.
-  BehaviorCache(Iterable<BehaviorState> states, Database db)
-      : _stateByShipSymbol = Map.fromEntries(
-          states.map((state) => MapEntry(state.shipSymbol, state)),
-        ),
-        _db = db;
+/// A snapshot of the behavior states
+class BehaviorSnapshot {
+  /// Create a new behavior snapshot.
+  BehaviorSnapshot(this.states);
 
-  /// Load the cache from a file.
-  static Future<BehaviorCache> load(Database db) async {
+  /// The behavior states.
+  final List<BehaviorState> states;
+
+  /// Load the behavior snapshot from the database.
+  static Future<BehaviorSnapshot> load(Database db) async {
     final states = await db.allBehaviorStates();
-    return BehaviorCache(states, db);
+    return BehaviorSnapshot(states.toList());
   }
 
-  final Database _db;
-  final Map<ShipSymbol, BehaviorState> _stateByShipSymbol;
-
-  /// Get the list of all behavior states.
-  List<BehaviorState> get states => _stateByShipSymbol.values.toList();
-
-  /// Get the behavior state for the given ship.
-  BehaviorState? getBehavior(ShipSymbol shipSymbol) =>
-      _stateByShipSymbol[shipSymbol];
-
-  /// Delete the behavior state for the given ship.
-  Future<void> deleteBehavior(ShipSymbol shipSymbol) async {
-    await _db.deleteBehaviorState(shipSymbol);
-    _stateByShipSymbol.remove(shipSymbol);
-  }
-
-  /// Set the behavior state for the given ship.
-  Future<void> setBehavior(
-    ShipSymbol shipSymbol,
-    BehaviorState behaviorState,
-  ) async {
-    await _db.setBehaviorState(behaviorState);
-    _stateByShipSymbol[shipSymbol] = behaviorState;
-  }
-
-  /// Get the behavior state for the given ship, or call [ifAbsent] to create it
-  /// if it doesn't exist.
-  Future<BehaviorState> putIfAbsent(
-    ShipSymbol shipSymbol,
-    Future<BehaviorState> Function() ifAbsent,
-  ) async {
-    final currentState = getBehavior(shipSymbol);
-    if (currentState != null) {
-      return currentState;
+  /// Returns all deals in progress.
+  Iterable<CostedDeal> dealsInProgress() sync* {
+    for (final state in states) {
+      final deal = state.deal;
+      if (deal != null) {
+        yield deal;
+      }
     }
-    final newState = await ifAbsent();
-    await setBehavior(shipSymbol, newState);
-    return newState;
   }
+
+  /// Returns the ship symbols for all idle haulers.
+// TODO(eseidel): This should be a db query.
+  List<ShipSymbol> idleHaulerSymbols(
+    ShipSnapshot shipCache,
+  ) {
+    final haulerSymbols =
+        shipCache.ships.where((s) => s.isHauler).map((s) => s.shipSymbol);
+    final idleBehaviors = [
+      Behavior.idle,
+      Behavior.charter,
+    ];
+    final idleHaulerStates = states
+        .where((s) => haulerSymbols.contains(s.shipSymbol))
+        .where((s) => idleBehaviors.contains(s.behavior))
+        .toList();
+    return idleHaulerStates.map((s) => s.shipSymbol).toList();
+  }
+}
+
+/// Get the behavior state for the given ship, or call [ifAbsent] to create it
+/// if it doesn't exist.
+Future<BehaviorState> createBehaviorIfAbsent(
+  Database db,
+  ShipSymbol shipSymbol,
+  Future<BehaviorState> Function() ifAbsent,
+) async {
+  final currentState = await db.behaviorStateBySymbol(shipSymbol);
+  if (currentState != null) {
+    return currentState;
+  }
+  final newState = await ifAbsent();
+  await db.setBehaviorState(newState);
+  return newState;
 }

@@ -78,8 +78,8 @@ Future<void> advanceShips(
           caches,
           ship,
         ),
-        onComplete: (duration, requestCount) {
-          final behaviorState = caches.behaviors.getBehavior(shipSymbol);
+        onComplete: (duration, requestCount) async {
+          final behaviorState = await db.behaviorStateBySymbol(shipSymbol);
           final expectedSeconds = requestCount / config.targetRequestsPerSecond;
           if (duration.inSeconds > expectedSeconds * 1.2) {
             final behaviorName = behaviorState?.behavior.name;

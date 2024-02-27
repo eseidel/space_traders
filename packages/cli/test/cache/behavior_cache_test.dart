@@ -12,7 +12,7 @@ class _MockLogger extends Mock implements Logger {}
 class _MockShip extends Mock implements Ship {}
 
 void main() {
-  test('BehaviorCache.isDisabledForShip', () async {
+  test('BehaviorsTimeouts.isDisabledForShip', () async {
     final db = _MockDatabase();
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
@@ -20,7 +20,6 @@ void main() {
     when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
 
     final behaviorTimeouts = BehaviorTimeouts();
-    final behaviorCache = BehaviorCache([], db);
     final ship = _MockShip();
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -29,16 +28,15 @@ void main() {
       false,
     );
 
-    await behaviorCache.setBehavior(
-      shipSymbol,
-      BehaviorState(shipSymbol, Behavior.trader),
+    when(() => db.behaviorStateBySymbol(shipSymbol)).thenAnswer(
+      (_) async => BehaviorState(shipSymbol, Behavior.trader),
     );
 
     final logger = _MockLogger();
     await runWithLogger(
       logger,
       () async => behaviorTimeouts.disableBehaviorForShip(
-        behaviorCache,
+        db,
         ship,
         'why',
         const Duration(hours: 1),

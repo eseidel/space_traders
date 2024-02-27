@@ -3,8 +3,6 @@ import 'package:mocktail/mocktail.dart';
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
-class _MockBehaviorCache extends Mock implements BehaviorCache {}
-
 class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockConstructionCache extends Mock implements ConstructionCache {}
@@ -70,7 +68,6 @@ Caches mockCaches() {
     systems: _MockSystemsCache(),
     waypoints: _MockWaypointCache(),
     markets: _MockMarketCache(),
-    behaviors: _MockBehaviorCache(),
     charting: _MockChartingCache(),
     routePlanner: _MockRoutePlanner(),
     factions: [],

@@ -263,7 +263,7 @@ Future<JobResult> _handleContractDealAtDestination(
 
   // If we've delivered enough, complete the contract.
   if (maybeContract != null &&
-      maybeContract.goodNeeded(contractGood)!.amountNeeded <= 0) {
+      maybeContract.goodNeeded(contractGood)!.remainingNeeded <= 0) {
     await _completeContract(
       api,
       db,
@@ -466,7 +466,7 @@ Future<SupplyConstruction201ResponseData?>
     'Construction at $waypointName does not need $tradeSymbol?',
     const Duration(minutes: 10),
   );
-  final unitsToDeliver = min(unitsInCargo, materialBefore.unitsNeeded);
+  final unitsToDeliver = min(unitsInCargo, materialBefore.remainingNeeded);
   jobAssert(
     unitsToDeliver > 0,
     'Construction at $waypointName already fulfilled $tradeSymbol.',
@@ -885,6 +885,7 @@ Future<JobResult> _initDeal(
   }
 
   final contractSnapshot = await ContractSnapshot.load(db);
+  final behaviors = await BehaviorSnapshot.load(db);
 
   // Consider all deals starting at any market within our consideration range.
   var newDeal = centralCommand.findNextDealAndLog(
@@ -894,6 +895,7 @@ Future<JobResult> _initDeal(
     caches.systems,
     caches.systemConnectivity,
     caches.routePlanner,
+    behaviors,
     ship,
     maxTotalOutlay: caches.agent.agent.credits,
   );
@@ -928,13 +930,15 @@ Future<JobResult> _initDeal(
           caches.systems,
           caches.systemConnectivity,
           caches.routePlanner,
+          behaviors,
           ship,
           overrideStartSymbol: startSymbol,
           maxTotalOutlay: caches.agent.agent.credits,
         );
       },
       ship,
-      avoidSystems: centralCommand.otherTraderSystems(ship.shipSymbol).toSet(),
+      avoidSystems:
+          centralCommand.otherTraderSystems(behaviors, ship.shipSymbol).toSet(),
       profitPerSecondThreshold: centralCommand.expectedCreditsPerSecond(ship),
     ),
     'Failed to find better location for trader.',

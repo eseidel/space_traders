@@ -233,8 +233,12 @@ Future<JobResult> doSystemWatcher(
     return JobResult.complete();
   }
 
-  final avoidWaypoints =
-      centralCommand.waypointsToAvoidInSystem(systemSymbol, ship.shipSymbol);
+  final behaviors = await BehaviorSnapshot.load(db);
+  final avoidWaypoints = centralCommand.waypointsToAvoidInSystem(
+    behaviors,
+    systemSymbol,
+    ship.shipSymbol,
+  );
 
   // Walk our nearby waypoints looking for one that needs refresh.
   final destinationSymbol = await waypointSymbolNeedingUpdate(

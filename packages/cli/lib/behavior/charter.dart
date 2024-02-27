@@ -117,7 +117,9 @@ Future<JobResult> doCharter(
   // Walk waypoints as far out as we can see until we find one missing
   // a chart or market data and route to there.
   final maxJumps = config.charterMaxJumps;
+  final behaviors = await BehaviorSnapshot.load(db);
   final destinationSymbol = await centralCommand.nextWaypointToChart(
+    behaviors,
     caches.systems,
     caches.waypoints,
     caches.systemConnectivity,

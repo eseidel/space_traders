@@ -11,12 +11,11 @@ void main(List<String> args) async {
 // Could share with fleet.dart
 void logShip(
   SystemsCache systemsCache,
-  BehaviorCache behaviorCache,
   MarketPriceSnapshot marketPrices,
   Ship ship,
+  BehaviorState? behavior,
 ) {
   const indent = '   ';
-  final behavior = behaviorCache.getBehavior(ship.shipSymbol);
   final waypoint = systemsCache.waypoint(ship.waypointSymbol);
   logger.info(ship.shipSymbol.hexNumber);
 
@@ -47,9 +46,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final behaviorCache = await BehaviorCache.load(db);
   final systemWatcherStates =
-      behaviorCache.states.where((s) => s.behavior == Behavior.systemWatcher);
+      await db.behaviorStatesWithBehavior(Behavior.systemWatcher);
   final systemsCache = SystemsCache.load(fs)!;
   final shipCache = await ShipSnapshot.load(db);
 

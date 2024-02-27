@@ -39,14 +39,8 @@ void main() {
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
 
-    final behaviorState = BehaviorState(shipSymbol, Behavior.idle);
     final centralCommand = _MockCentralCommand();
-    when(() => caches.behaviors.putIfAbsent(shipSymbol, any()))
-        .thenAnswer((_) => Future.value(behaviorState));
     final logger = _MockLogger();
-
-    when(() => caches.behaviors.deleteBehavior(shipSymbol))
-        .thenAnswer((_) async {});
 
     final waitUntil = await runWithLogger(
       logger,
@@ -84,10 +78,6 @@ void main() {
     when(() => shipNav.route).thenReturn(shipNavRoute);
     when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
     final centralCommand = _MockCentralCommand();
-
-    when(() => caches.behaviors.putIfAbsent(shipSymbol, any())).thenAnswer(
-      (_) => Future.value(BehaviorState(shipSymbol, Behavior.idle)),
-    );
 
     final logger = _MockLogger();
 

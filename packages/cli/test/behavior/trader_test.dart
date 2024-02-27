@@ -57,6 +57,7 @@ void main() {
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     final caches = mockCaches();
     when(db.allContracts).thenAnswer((_) async => <Contract>[]);
+    final behaviors = BehaviorSnapshot([]);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -138,6 +139,7 @@ void main() {
         caches.systems,
         caches.systemConnectivity,
         caches.routePlanner,
+        behaviors,
         ship,
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
@@ -188,6 +190,10 @@ void main() {
     );
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(db.allBehaviorStates).thenAnswer((_) async => []);
+    registerFallbackValue(BehaviorSnapshot([]));
+    when(() => centralCommand.otherTraderSystems(any(), shipSymbol))
+        .thenReturn([]);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -622,6 +628,7 @@ void main() {
       costPerAntimatterUnit: 10000,
     );
     registerFallbackValue(ContractSnapshot([]));
+    registerFallbackValue(BehaviorSnapshot([]));
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
@@ -630,11 +637,13 @@ void main() {
         caches.systems,
         caches.systemConnectivity,
         caches.routePlanner,
+        any(),
         ship,
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenReturn(costedDeal);
-    when(() => centralCommand.otherTraderSystems(shipSymbol)).thenReturn([]);
+    when(() => centralCommand.otherTraderSystems(any(), shipSymbol))
+        .thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
 
     final state = BehaviorState(shipSymbol, Behavior.trader);
@@ -700,6 +709,8 @@ void main() {
     when(
       () => caches.systemConnectivity.systemsReachableFrom(shipLocation.system),
     ).thenReturn([]);
+
+    when(db.allBehaviorStates).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

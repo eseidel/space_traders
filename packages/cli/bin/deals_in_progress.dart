@@ -1,4 +1,3 @@
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
@@ -16,10 +15,8 @@ String annotatedName(CostedDeal deal) {
 }
 
 Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
-  final behaviorCache = await BehaviorCache.load(db);
-
-  final states =
-      behaviorCache.states.where((state) => state.deal != null).toList();
+  final behaviors = await BehaviorSnapshot.load(db);
+  final states = behaviors.states.where((state) => state.deal != null).toList();
 
   if (states.isEmpty) {
     logger.info('No deal found.');
@@ -83,14 +80,13 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   logger.info(table.toString());
 
   final shipCache = await ShipSnapshot.load(db);
-  final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache)
-      .map((s) => s.hexNumber)
-      .toList();
+  final idleHaulers =
+      behaviors.idleHaulerSymbols(shipCache).map((s) => s.hexNumber).toList();
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }
 
-  final minerHaulers = behaviorCache.states
+  final minerHaulers = behaviors.states
       .where((state) => state.behavior == Behavior.minerHauler)
       .map((state) => state.shipSymbol.hexNumber)
       .toList();

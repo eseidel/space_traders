@@ -76,7 +76,7 @@ Future<DateTime?> advanceShipBehavior(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final state = await caches.behaviors.putIfAbsent(ship.shipSymbol, () async {
+  final state = await createBehaviorIfAbsent(db, ship.shipSymbol, () async {
     final credits = caches.agent.agent.credits;
     return centralCommand.getJobForShip(db, ship, credits);
   });
@@ -94,7 +94,7 @@ Future<DateTime?> advanceShipBehavior(
     );
   } on JobException catch (e) {
     shipErr(ship, '$e');
-    await caches.behaviors.deleteBehavior(ship.shipSymbol);
+    await db.deleteBehaviorState(ship.shipSymbol);
     return null;
   }
   if (navResult.shouldReturn()) {
@@ -115,15 +115,15 @@ Future<DateTime?> advanceShipBehavior(
     );
     if (state.isComplete) {
       // If the behavior is complete, clear it.
-      await caches.behaviors.deleteBehavior(ship.shipSymbol);
+      await db.deleteBehaviorState(ship.shipSymbol);
     } else {
       // Otherwise update the behavior state.
-      await caches.behaviors.setBehavior(ship.shipSymbol, state);
+      await db.setBehaviorState(state);
     }
     return waitUntil;
   } on JobException catch (error) {
     await centralCommand.behaviorTimeouts.disableBehaviorForShip(
-      caches.behaviors,
+      db,
       ship,
       error.message,
       error.timeout,
@@ -133,7 +133,7 @@ Future<DateTime?> advanceShipBehavior(
       rethrow;
     }
     await centralCommand.behaviorTimeouts.disableBehaviorForShip(
-      caches.behaviors,
+      db,
       ship,
       'Insufficient credits: ${e.message}',
       const Duration(minutes: 10),

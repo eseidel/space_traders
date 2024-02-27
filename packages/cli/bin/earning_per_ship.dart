@@ -1,4 +1,3 @@
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/behavior_cache.dart';
 import 'package:cli/cache/ship_cache.dart';
 import 'package:cli/cli.dart';
@@ -52,10 +51,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final shipSymbols = (await db.uniqueShipSymbolsInTransactions()).toList()
     ..sort();
-  final behaviorCache = await BehaviorCache.load(db);
 
   final shipCache = await ShipSnapshot.load(db);
-  final idleHaulers = idleHaulerSymbols(shipCache, behaviorCache);
+  final behaviors = await BehaviorSnapshot.load(db);
+  final idleHaulers = behaviors.idleHaulerSymbols(shipCache);
   logger
     ..info('Fleet: ${describeShips(shipCache.ships)}')
     ..info('${idleHaulers.length} idle traders')

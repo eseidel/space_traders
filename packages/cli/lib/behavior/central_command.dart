@@ -17,31 +17,15 @@ import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-/// BehaviorCache extension methods for CentralCommand.
-extension BehaviorCacheExtensions on BehaviorCache {
-  /// Returns all deals in progress.
-  Iterable<CostedDeal> dealsInProgress() sync* {
-    for (final state in states) {
-      final deal = state.deal;
-      if (deal != null) {
-        yield deal;
-      }
-    }
-  }
-}
-
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
   CentralCommand({
-    required BehaviorCache behaviorCache,
     required ShipSnapshot shipCache,
     BehaviorTimeouts? behaviorTimeouts,
-  })  : _behaviorCache = behaviorCache,
-        _shipCache = shipCache,
+  })  : _shipCache = shipCache,
         behaviorTimeouts = behaviorTimeouts ?? BehaviorTimeouts();
 
-  final BehaviorCache _behaviorCache;
   final ShipSnapshot _shipCache;
   bool _haveEscapedStartingSystem = false;
 
@@ -202,7 +186,8 @@ class CentralCommand {
       return toState(Behavior.idle);
     }
     // We'll always upgrade a ship as our best option.
-    if (enabled(Behavior.mountFromBuy) && shouldBuyMount(ship, credits)) {
+    if (enabled(Behavior.mountFromBuy) &&
+        await shouldBuyMount(db, ship, credits)) {
       final request = _takeMountRequest(ship);
       shipInfo(ship, 'Starting buy mount ${request.mountSymbol}');
       return BehaviorState(
@@ -277,17 +262,19 @@ class CentralCommand {
   /// Procurement contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
     AgentCache agentCache,
+    BehaviorSnapshot behaviors,
     ContractSnapshot contractSnapshot,
   ) {
     return sellOppsForContracts(
       agentCache,
+      behaviors,
       contractSnapshot,
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
     );
   }
 
   /// SellOpps to complete the current construction job.
-  Iterable<SellOpp> constructionSellOpps() {
+  Iterable<SellOpp> constructionSellOpps(BehaviorSnapshot behaviors) {
     if (activeConstruction == null) {
       return [];
     }
@@ -296,6 +283,7 @@ class CentralCommand {
         activeConstruction!,
         remainingUnitsNeeded: (tradeSymbol) {
           return remainingUnitsNeededForConstruction(
+            behaviors,
             activeConstruction!,
             tradeSymbol,
           );
@@ -313,6 +301,7 @@ class CentralCommand {
     SystemsCache systemsCache,
     SystemConnectivity systemConnectivity,
     RoutePlanner routePlanner,
+    BehaviorSnapshot behaviors,
     Ship ship, {
     required int maxTotalOutlay,
     WaypointSymbol? overrideStartSymbol,
@@ -321,10 +310,11 @@ class CentralCommand {
 
     final extraSellOpps = <SellOpp>[];
     if (isConstructionTradingEnabled) {
-      extraSellOpps.addAll(constructionSellOpps());
+      extraSellOpps.addAll(constructionSellOpps(behaviors));
     }
     if (isContractTradingEnabled) {
-      extraSellOpps.addAll(contractSellOpps(agentCache, contractSnapshot));
+      extraSellOpps
+          .addAll(contractSellOpps(agentCache, behaviors, contractSnapshot));
     }
     if (extraSellOpps.isNotEmpty) {
       final opp = extraSellOpps.first;
@@ -342,7 +332,7 @@ class CentralCommand {
       startSymbol: startSymbol,
       extraSellOpps: extraSellOpps,
       shipSpec: ship.shipSpec,
-      filter: avoidDealsInProgress(_behaviorCache.dealsInProgress()),
+      filter: avoidDealsInProgress(behaviors.dealsInProgress()),
     );
 
     // A hack to avoid spamming the console until we add a deals cache.
@@ -358,13 +348,15 @@ class CentralCommand {
 
   /// Returns the next waypoint symbol to chart.
   Future<WaypointSymbol?> nextWaypointToChart(
+    BehaviorSnapshot behaviors,
     SystemsCache systems,
     WaypointCache waypoints,
     SystemConnectivity connectivity,
     Ship ship, {
     required int maxJumps,
   }) async {
-    final charterSystems = otherCharterSystems(ship.shipSymbol).toSet();
+    final charterSystems =
+        otherCharterSystems(behaviors, ship.shipSymbol).toSet();
 
     // Only probes should ever chart asteroids.
     final chartAsteroids =
@@ -393,19 +385,21 @@ class CentralCommand {
 
   /// Returns other systems containing ships with [behavior].
   Iterable<SystemSymbol> _otherSystemsWithBehavior(
+    BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
     Behavior behavior,
   ) {
-    return _otherWaypointsWithBehavior(thisShipSymbol, behavior)
+    return _otherWaypointsWithBehavior(behaviors, thisShipSymbol, behavior)
         .map((s) => s.system);
   }
 
   /// Returns other systems containing ships with [behavior].
   Iterable<WaypointSymbol> _otherWaypointsWithBehavior(
+    BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
     Behavior behavior,
   ) sync* {
-    for (final state in _behaviorCache.states) {
+    for (final state in behaviors.states) {
       if (state.shipSymbol == thisShipSymbol) {
         continue;
       }
@@ -424,21 +418,32 @@ class CentralCommand {
 
   /// Returns all systems containing explorers or explorer destinations.
   Iterable<WaypointSymbol> waypointsToAvoidInSystem(
+    BehaviorSnapshot behaviors,
     SystemSymbol systemSymbol,
     ShipSymbol thisShipSymbol,
   ) =>
-      _otherWaypointsWithBehavior(thisShipSymbol, Behavior.systemWatcher)
-          .where((s) => s.system == systemSymbol);
+      _otherWaypointsWithBehavior(
+        behaviors,
+        thisShipSymbol,
+        Behavior.systemWatcher,
+      ).where((s) => s.system == systemSymbol);
 
   /// Returns all systems containing charters or charter destinations.
-  Iterable<SystemSymbol> otherCharterSystems(ShipSymbol thisShipSymbol) =>
-      _otherSystemsWithBehavior(thisShipSymbol, Behavior.charter);
+  Iterable<SystemSymbol> otherCharterSystems(
+    BehaviorSnapshot behaviors,
+    ShipSymbol thisShipSymbol,
+  ) =>
+      _otherSystemsWithBehavior(behaviors, thisShipSymbol, Behavior.charter);
 
   /// Returns all systems containing traders or trader destinations.
-  Iterable<SystemSymbol> otherTraderSystems(ShipSymbol thisShipSymbol) =>
-      _otherSystemsWithBehavior(thisShipSymbol, Behavior.trader);
+  Iterable<SystemSymbol> otherTraderSystems(
+    BehaviorSnapshot behaviors,
+    ShipSymbol thisShipSymbol,
+  ) =>
+      _otherSystemsWithBehavior(behaviors, thisShipSymbol, Behavior.trader);
 
   Future<void> _queueMountRequests(
+    Database db,
     Caches caches,
   ) async {
     for (final ship in _shipCache.ships) {
@@ -446,8 +451,8 @@ class CentralCommand {
         return;
       }
       // Don't queue a new mount request if we're currently executing one.
-      if (_behaviorCache.getBehavior(ship.shipSymbol)?.behavior ==
-          Behavior.mountFromBuy) {
+      final behaviorState = await db.behaviorStateBySymbol(ship.shipSymbol);
+      if (behaviorState?.behavior == Behavior.mountFromBuy) {
         continue;
       }
       final template = templateForShip(ship);
@@ -550,7 +555,7 @@ class CentralCommand {
 
     _nextShipBuyJob ??= await _computeNextShipBuyJob(db, api, caches);
     await updateAvailableMounts(db);
-    await _queueMountRequests(caches);
+    await _queueMountRequests(db, caches);
 
     activeConstruction = await computeActiveConstruction(
       db,
@@ -675,13 +680,11 @@ class CentralCommand {
   }
 
   /// Returns true if [ship] should start the mountFromBuy behavior.
-  bool shouldBuyMount(Ship ship, int credits) {
-    // Only enforce "one at a time" until we some sort purchase authoriziation.
+  Future<bool> shouldBuyMount(Database db, Ship ship, int credits) async {
+    // Only enforce "one at a time" until we some sort purchase authorization.
     // Are there any other ships actively buying mounts?
-    final otherShipsAreBuyingMounts = _behaviorCache.states.any(
-      (s) => s.behavior == Behavior.mountFromBuy,
-    );
-    if (otherShipsAreBuyingMounts) {
+    final states = await db.behaviorStatesWithBehavior(Behavior.mountFromBuy);
+    if (states.isNotEmpty) {
       return false;
     }
     // Does this ship have a mount it needs?
@@ -701,35 +704,35 @@ class CentralCommand {
   /// Includes units in flight.
   @visibleForTesting
   int remainingUnitsNeededForContract(
+    BehaviorSnapshot behaviors,
     Contract contract,
     TradeSymbol tradeSymbol,
   ) {
-    final unitsAssigned = _behaviorCache
+    final unitsAssigned = behaviors
         .dealsInProgress()
         .where((d) => d.contractId == contract.id)
-        .fold<int>(0, (sum, deal) => sum + deal.maxUnitsToBuy);
+        .map((d) => d.maxUnitsToBuy)
+        .sum;
     final neededGood = contract.goodNeeded(tradeSymbol);
-    return neededGood!.unitsRequired -
-        neededGood.unitsFulfilled -
-        unitsAssigned;
+    return neededGood!.remainingNeeded - unitsAssigned;
   }
 
   /// Computes the number of units needed to fulfill the given [construction].
   /// Includes units in flight.
   @visibleForTesting
   int remainingUnitsNeededForConstruction(
+    BehaviorSnapshot behaviors,
     Construction construction,
     TradeSymbol tradeSymbol,
   ) {
-    final unitsAssigned = _behaviorCache
+    final unitsAssigned = behaviors
         .dealsInProgress()
         .where((d) => d.isConstructionDeal)
         .where((d) => d.deal.destinationSymbol == construction.waypointSymbol)
-        .fold<int>(0, (sum, deal) => sum + deal.maxUnitsToBuy);
-    final neededGood = construction.materials.firstWhere(
-      (m) => m.tradeSymbol == tradeSymbol,
-    );
-    return neededGood.required_ - neededGood.fulfilled - unitsAssigned;
+        .map((d) => d.maxUnitsToBuy)
+        .sum;
+    final material = construction.materialNeeded(tradeSymbol);
+    return material!.remainingNeeded - unitsAssigned;
   }
 
   /// Returns the minimum number of surveys to examine before mining
@@ -821,12 +824,15 @@ int _minimumFloatRequired(Contract contract) {
 /// Procurement contracts converted to sell opps.
 Iterable<SellOpp> sellOppsForContracts(
   AgentCache agentCache,
+  BehaviorSnapshot behaviors,
   ContractSnapshot contractSnapshot, {
-  required int Function(Contract, TradeSymbol) remainingUnitsNeededForContract,
+  required int Function(BehaviorSnapshot, Contract, TradeSymbol)
+      remainingUnitsNeededForContract,
 }) sync* {
   for (final contract in affordableContracts(agentCache, contractSnapshot)) {
     for (final good in contract.terms.deliver) {
       final unitsNeeded = remainingUnitsNeededForContract(
+        behaviors,
         contract,
         good.tradeSymbolObject,
       );
@@ -879,24 +885,6 @@ Iterable<SellOpp> sellOppsForConstruction(
       );
     }
   }
-}
-
-/// Returns the ship symbols for all idle haulers.
-List<ShipSymbol> idleHaulerSymbols(
-  ShipSnapshot shipCache,
-  BehaviorCache behaviorCache,
-) {
-  final haulerSymbols =
-      shipCache.ships.where((s) => s.isHauler).map((s) => s.shipSymbol);
-  final idleBehaviors = [
-    Behavior.idle,
-    Behavior.charter,
-  ];
-  final idleHaulerStates = behaviorCache.states
-      .where((s) => haulerSymbols.contains(s.shipSymbol))
-      .where((s) => idleBehaviors.contains(s.behavior))
-      .toList();
-  return idleHaulerStates.map((s) => s.shipSymbol).toList();
 }
 
 /// Compute the correct squad for the given [ship].

@@ -1,4 +1,3 @@
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
@@ -17,8 +16,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
-
-  final behaviorCache = await BehaviorCache.load(db);
 
   const shipType = ShipType.LIGHT_HAULER;
   final ship = staticCaches.shipyardShips[shipType]!;
@@ -56,6 +53,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     logger.info('$tradeSymbol : ${price?.supply}');
   }
 
+  final behaviors = await BehaviorSnapshot.load(db);
+  final inProgress = behaviors.dealsInProgress();
   final deals = scanAndFindDeals(
     systemsCache,
     systemConnectivity,
@@ -65,7 +64,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     startSymbol: waypointSymbol,
     shipSpec: shipSpec,
     filter: avoidDealsInProgress(
-      behaviorCache.dealsInProgress(),
+      inProgress,
       filter: (Deal deal) {
         return deal.destinationSymbol == waypointSymbol &&
             neededSymbols.contains(deal.tradeSymbol);
@@ -79,8 +78,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     logger.info('  ${describeCostedDeal(deal)}');
   }
 
-  final dealsInProgress = behaviorCache.dealsInProgress();
-  final feederDeals = dealsInProgress.where(
+  final feederDeals = inProgress.where(
     (deal) => deal.deal.destinationSymbol == waypointSymbol,
   );
   if (feederDeals.isEmpty) {

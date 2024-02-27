@@ -305,7 +305,7 @@ extension ShipNavRouteWaypointUtils on ShipNavRouteWaypoint {
 /// Extensions onto ContractDeliverGood to make it easier to work with.
 extension ContractDeliverGoodUtils on ContractDeliverGood {
   /// Returns the amount of the given trade good the contract needs.
-  int get amountNeeded => unitsRequired - unitsFulfilled;
+  int get remainingNeeded => unitsRequired - unitsFulfilled;
 
   /// Destination as a WaypointSymbol.
   WaypointSymbol get destination =>
@@ -399,10 +399,10 @@ extension ConstructionUtils on Construction {
 /// Extensions onto ConstructionMaterial to make it easier to work with.
 extension ConstructionMaterialUtils on ConstructionMaterial {
   /// Returns the amount of the given trade good the construction still needs.
-  int get unitsNeeded => required_ - fulfilled;
+  int get remainingNeeded => required_ - fulfilled;
 
   /// Returns true if this construction material has been fulfilled.
-  bool get isFulfilled => unitsNeeded == 0;
+  bool get isFulfilled => remainingNeeded == 0;
 }
 
 /// Extensions onto MarketTransaction to make it easier to work with.

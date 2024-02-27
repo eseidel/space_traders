@@ -6,9 +6,7 @@ import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
-  final behaviorCache = await BehaviorCache.load(db);
-  final centralCommand =
-      CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+  final centralCommand = CentralCommand(shipCache: shipCache);
 
   final symbolWidth =
       ShipMountSymbolEnum.values.fold(0, (s, e) => max(s, e.value.length)) + 1;

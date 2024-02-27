@@ -26,12 +26,10 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   );
   final marketPrices = await MarketPriceSnapshot.load(db);
 
-  final behaviorCache = await BehaviorCache.load(db);
   final shipCache = await ShipSnapshot.load(db);
   final agentCache = await AgentCache.load(db);
   final contractSnapshot = await ContractSnapshot.load(db);
-  final centralCommand =
-      CentralCommand(behaviorCache: behaviorCache, shipCache: shipCache);
+  final centralCommand = CentralCommand(shipCache: shipCache);
 
   final start = startArg == null
       ? agentCache!.headquarters(systemsCache)
@@ -45,6 +43,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   centralCommand.activeConstruction = construction;
 
   final exportCache = TradeExportCache.load(fs);
+  final behaviors = await BehaviorSnapshot.load(db);
 
   if (construction != null) {
     centralCommand.subsidizedSellOpps =
@@ -59,11 +58,16 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
 
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
-    extraSellOpps
-        .addAll(centralCommand.contractSellOpps(agentCache, contractSnapshot));
+    extraSellOpps.addAll(
+      centralCommand.contractSellOpps(
+        agentCache,
+        behaviors,
+        contractSnapshot,
+      ),
+    );
   }
   if (centralCommand.isConstructionTradingEnabled) {
-    extraSellOpps.addAll(centralCommand.constructionSellOpps());
+    extraSellOpps.addAll(centralCommand.constructionSellOpps(behaviors));
   }
 
   final shipyardShips = ShipyardShipCache.load(fs);
@@ -119,8 +123,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     return;
   }
 
-  final dealNotInProgress =
-      avoidDealsInProgress(behaviorCache.dealsInProgress());
+  final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
 
   logger.info('Top $limit deals:');
 

@@ -488,6 +488,12 @@ class Database {
     return queryMany(query, behaviorStateFromColumnMap);
   }
 
+  /// Get a behavior state by ship symbol.
+  Future<BehaviorState?> behaviorStateBySymbol(ShipSymbol shipSymbol) async {
+    final query = behaviorBySymbolQuery(shipSymbol);
+    return queryOne(query, behaviorStateFromColumnMap);
+  }
+
   /// Get a behavior state by symbol.
   Future<void> setBehaviorState(BehaviorState behaviorState) async {
     await execute(upsertBehaviorStateQuery(behaviorState));
