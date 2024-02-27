@@ -340,8 +340,11 @@ void main() {
     );
     // Currently we pad with 100k for trading.
     final paddingCredits = config.shipBuyBufferForTrading;
+    when(() => db.behaviorStatesWithBehavior(Behavior.buyShip)).thenAnswer(
+      (_) async => [],
+    );
     final shouldBuy =
-        centralCommand.shouldBuyShip(db, ship, paddingCredits + 100);
+        await centralCommand.shouldBuyShip(db, ship, paddingCredits + 100);
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
@@ -543,6 +546,9 @@ void main() {
 
     when(caches.construction.allRecords).thenAnswer((_) async => []);
     when(db.allMarketListings).thenAnswer((_) async => []);
+
+    when(() => db.behaviorStateBySymbol(shipSymbol))
+        .thenAnswer((_) async => null);
 
     final logger = _MockLogger();
     await runWithLogger(

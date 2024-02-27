@@ -101,9 +101,10 @@ void main() {
     when(
       () => centralCommand.chartAsteroidsInSystem(waypointSymbol.system),
     ).thenReturn(true);
+    registerFallbackValue(BehaviorSnapshot([]));
     when(
       () => centralCommand.nextWaypointToChart(
-        behaviors,
+        any(),
         caches.systems,
         caches.waypoints,
         caches.systemConnectivity,

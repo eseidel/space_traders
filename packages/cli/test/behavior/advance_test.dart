@@ -42,6 +42,9 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final logger = _MockLogger();
 
+    when(() => db.behaviorStateBySymbol(shipSymbol))
+        .thenAnswer((_) async => null);
+
     final waitUntil = await runWithLogger(
       logger,
       () => advanceShipBehavior(
@@ -80,6 +83,9 @@ void main() {
     final centralCommand = _MockCentralCommand();
 
     final logger = _MockLogger();
+
+    when(() => db.behaviorStateBySymbol(shipSymbol))
+        .thenAnswer((_) async => null);
 
     final waitUntil = await runWithLogger(
       logger,
