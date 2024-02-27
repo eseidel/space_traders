@@ -23,9 +23,6 @@ class _MockShipMountCache extends Mock implements ShipMountCache {}
 
 class _MockShipReactorCache extends Mock implements ShipReactorCache {}
 
-class _MockShipyardListingCache extends Mock
-    implements ShipyardListingSnapshot {}
-
 class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
@@ -72,6 +69,5 @@ Caches mockCaches() {
     construction: _MockConstructionCache(),
     systemConnectivity: _MockSystemConnectivity(),
     jumpGates: _MockJumpGateSnapshot(),
-    shipyardListings: _MockShipyardListingCache(),
   );
 }

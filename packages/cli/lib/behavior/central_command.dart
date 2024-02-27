@@ -560,6 +560,7 @@ class CentralCommand {
 
     final marketListings = await MarketListingSnapshot.load(db);
     final ships = await ShipSnapshot.load(db);
+    final shipyardListings = await ShipyardListingSnapshot.load(db);
 
     _assignedSystemsForSatellites
       ..clear()
@@ -573,7 +574,8 @@ class CentralCommand {
       systemSymbol: caches.agent.headquartersSystemSymbol,
     );
 
-    _nextShipBuyJob ??= await _computeNextShipBuyJob(db, api, caches, ships);
+    _nextShipBuyJob ??=
+        await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
     await updateAvailableMounts(db);
     await _queueMountRequests(db, caches, ships);
 
@@ -621,14 +623,14 @@ class CentralCommand {
 
   Future<ShipBuyJob?> _findBestPlaceToBuy(
     Database db,
-    Caches caches,
+    RoutePlanner routePlanner,
     Ship ship,
     ShipType shipType,
   ) async {
     final shipyardPrices = await ShipyardPriceSnapshot.load(db);
     final trip = findBestShipyardToBuy(
       shipyardPrices,
-      caches.routePlanner,
+      routePlanner,
       ship,
       shipType,
       expectedCreditsPerSecond: expectedCreditsPerSecond(ship),
@@ -656,12 +658,13 @@ class CentralCommand {
     Database db,
     Api api,
     Caches caches,
+    ShipyardListingSnapshot shipyardListings,
     ShipSnapshot ships,
   ) async {
     final shipType = await shipToBuyFromPlan(
       ships,
       config.buyPlan,
-      caches.shipyardListings,
+      shipyardListings,
       caches.static.shipyardShips,
     );
     if (shipType == null) {
@@ -671,7 +674,7 @@ class CentralCommand {
     // TODO(eseidel): This uses command ship to compute the job, but
     // will happily give out the job to a non-command ship for execution.
     final commandShip = ships.ships.first;
-    return _findBestPlaceToBuy(db, caches, commandShip, shipType);
+    return _findBestPlaceToBuy(db, caches.routePlanner, commandShip, shipType);
   }
 
   /// Returns true if [ship] should start the buyShip behavior.

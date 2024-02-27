@@ -8,7 +8,6 @@ import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_prices.dart';
 import 'package:cli/cache/ship_cache.dart';
-import 'package:cli/cache/shipyard_listing_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -62,7 +61,6 @@ class Caches {
     required this.construction,
     required this.systemConnectivity,
     required this.jumpGates,
-    required this.shipyardListings,
   });
 
   /// The agent cache.
@@ -70,9 +68,6 @@ class Caches {
 
   /// The historical market price data.
   MarketPriceSnapshot marketPrices;
-
-  /// Known shipyard listings.
-  ShipyardListingSnapshot shipyardListings;
 
   /// The cache of systems.
   final SystemsCache systems;
@@ -87,6 +82,7 @@ class Caches {
   final WaypointCache waypoints;
 
   /// The cache of jump gates.
+  // TODO(eseidel): This needs to update when changes!
   final JumpGateSnapshot jumpGates;
 
   /// The cache of markets.
@@ -114,7 +110,6 @@ class Caches {
   }) async {
     final agent = await AgentCache.loadOrFetch(db, api);
     final marketPrices = await MarketPriceSnapshot.load(db);
-    final shipyardListings = await ShipyardListingSnapshot.load(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
     final charting = ChartingCache(db);
@@ -158,7 +153,6 @@ class Caches {
       construction: construction,
       systemConnectivity: systemConnectivity,
       jumpGates: jumpGates,
-      shipyardListings: shipyardListings,
     );
   }
 
@@ -230,10 +224,8 @@ class TopOfLoopUpdater {
       );
     }
 
-    // These should all be deleted from Caches.
-    caches
-      ..marketPrices = await MarketPriceSnapshot.load(db)
-      ..shipyardListings = await ShipyardListingSnapshot.load(db);
+    // Should all be deleted from Caches.
+    caches.marketPrices = await MarketPriceSnapshot.load(db);
   }
 }
 
