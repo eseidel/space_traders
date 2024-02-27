@@ -79,9 +79,9 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   }
   logger.info(table.toString());
 
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final idleHaulers =
-      behaviors.idleHaulerSymbols(shipCache).map((s) => s.hexNumber).toList();
+      behaviors.idleHaulerSymbols(ships).map((s) => s.hexNumber).toList();
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }

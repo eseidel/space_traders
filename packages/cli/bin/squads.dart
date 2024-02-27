@@ -32,15 +32,15 @@ ShipType? guessType(ShipyardShipCache shipyardShipCache, Ship ship) {
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final shipyardShipCache = ShipyardShipCache.load(fs);
 
   final squads = await assignShipsToSquads(
     db,
     systems,
     charting,
-    shipCache,
-    systemSymbol: shipCache.ships.first.systemSymbol,
+    ships,
+    systemSymbol: ships.ships.first.systemSymbol,
   );
   logger.info('${squads.length} squads');
 

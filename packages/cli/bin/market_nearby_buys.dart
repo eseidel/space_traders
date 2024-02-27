@@ -12,9 +12,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final shipCache = await ShipSnapshot.load(db);
-
-  final ship = shipCache.ships.first;
+  // TODO(eseidel): Just use hq and command ship spec.
+  final ships = await ShipSnapshot.load(db);
+  final ship = ships.ships.first;
   const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
 
   final best = findBestMarketToBuy(

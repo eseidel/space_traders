@@ -192,8 +192,10 @@ void main() {
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     registerFallbackValue(BehaviorSnapshot([]));
-    when(() => centralCommand.otherTraderSystems(any(), shipSymbol))
+    registerFallbackValue(ShipSnapshot([]));
+    when(() => centralCommand.otherTraderSystems(any(), any(), shipSymbol))
         .thenReturn([]);
+    when(db.allShips).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -629,6 +631,7 @@ void main() {
     );
     registerFallbackValue(ContractSnapshot([]));
     registerFallbackValue(BehaviorSnapshot([]));
+    registerFallbackValue(ShipSnapshot([]));
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
@@ -642,7 +645,7 @@ void main() {
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenReturn(costedDeal);
-    when(() => centralCommand.otherTraderSystems(any(), shipSymbol))
+    when(() => centralCommand.otherTraderSystems(any(), any(), shipSymbol))
         .thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
 

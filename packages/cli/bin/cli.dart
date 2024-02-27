@@ -135,7 +135,7 @@ Future<void> cliMain(List<String> args) async {
     '$shipyardPricesCount prices from '
     '$shipyardWaypointsCount shipyards.',
   );
-  final centralCommand = CentralCommand(shipCache: caches.ships);
+  final centralCommand = CentralCommand();
 
   final status = await api.defaultApi.getStatus();
   printStatus(status!);

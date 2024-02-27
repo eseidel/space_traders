@@ -18,10 +18,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   );
   final systemConnectivity = await loadSystemConnectivity(db);
 
-  final shipCache = await ShipSnapshot.load(db);
-  final centralCommand = CentralCommand(
-    shipCache: shipCache,
-  );
+  final ships = await ShipSnapshot.load(db);
+  final centralCommand = CentralCommand();
 
   final origin = systemsCache.waypoint(startSymbol);
   final ship = staticCaches.shipyardShips.shipForTest(
@@ -31,6 +29,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const maxJumps = 5;
   final behaviors = await BehaviorSnapshot.load(db);
   final destinationSymbol = await centralCommand.nextWaypointToChart(
+    ships,
     behaviors,
     systemsCache,
     waypointCache,

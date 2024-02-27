@@ -130,7 +130,7 @@ Future<JobResult> extractAndLog(
   Api api,
   Database db,
   Ship ship,
-  ShipSnapshot shipCache,
+  ShipSnapshot ships,
   Survey? maybeSurvey, {
   required DateTime Function() getNow,
 }) async {
@@ -152,11 +152,11 @@ Future<JobResult> extractAndLog(
         db,
         api,
         ship,
-        shipCache,
+        ships,
         maybeSurvey,
       );
     } else {
-      response = await extractResources(db, api, ship, shipCache);
+      response = await extractResources(db, api, ship, ships);
     }
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;

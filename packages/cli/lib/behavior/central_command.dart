@@ -21,12 +21,9 @@ import 'package:types/types.dart';
 class CentralCommand {
   /// Create a new central command.
   CentralCommand({
-    required ShipSnapshot shipCache,
     BehaviorTimeouts? behaviorTimeouts,
-  })  : _shipCache = shipCache,
-        behaviorTimeouts = behaviorTimeouts ?? BehaviorTimeouts();
+  }) : behaviorTimeouts = behaviorTimeouts ?? BehaviorTimeouts();
 
-  final ShipSnapshot _shipCache;
   bool _haveEscapedStartingSystem = false;
 
   /// Per-system price age data used by system watchers.
@@ -144,9 +141,9 @@ class CentralCommand {
   }
 
   /// Add up all mounts needed for current ships based on current templating.
-  MountSymbolSet mountsNeededForAllShips() {
+  MountSymbolSet mountsNeededForAllShips(ShipSnapshot ships) {
     final totalNeeded = MountSymbolSet();
-    for (final ship in _shipCache.ships) {
+    for (final ship in ships.ships) {
       final template = templateForShip(ship);
       if (template == null) {
         continue;
@@ -348,6 +345,7 @@ class CentralCommand {
 
   /// Returns the next waypoint symbol to chart.
   Future<WaypointSymbol?> nextWaypointToChart(
+    ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     SystemsCache systems,
     WaypointCache waypoints,
@@ -356,7 +354,7 @@ class CentralCommand {
     required int maxJumps,
   }) async {
     final charterSystems =
-        otherCharterSystems(behaviors, ship.shipSymbol).toSet();
+        otherCharterSystems(ships, behaviors, ship.shipSymbol).toSet();
 
     // Only probes should ever chart asteroids.
     final chartAsteroids =
@@ -385,16 +383,22 @@ class CentralCommand {
 
   /// Returns other systems containing ships with [behavior].
   Iterable<SystemSymbol> _otherSystemsWithBehavior(
+    ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
     Behavior behavior,
   ) {
-    return _otherWaypointsWithBehavior(behaviors, thisShipSymbol, behavior)
-        .map((s) => s.system);
+    return _otherWaypointsWithBehavior(
+      ships,
+      behaviors,
+      thisShipSymbol,
+      behavior,
+    ).map((s) => s.system);
   }
 
   /// Returns other systems containing ships with [behavior].
   Iterable<WaypointSymbol> _otherWaypointsWithBehavior(
+    ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
     Behavior behavior,
@@ -407,7 +411,7 @@ class CentralCommand {
         continue;
       }
       // Yield both the ship's current waypoint and its destination.
-      yield _shipCache[state.shipSymbol].waypointSymbol;
+      yield ships[state.shipSymbol].waypointSymbol;
 
       final destination = state.routePlan?.endSymbol;
       if (destination != null) {
@@ -418,11 +422,13 @@ class CentralCommand {
 
   /// Returns all systems containing explorers or explorer destinations.
   Iterable<WaypointSymbol> waypointsToAvoidInSystem(
+    ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     SystemSymbol systemSymbol,
     ShipSymbol thisShipSymbol,
   ) =>
       _otherWaypointsWithBehavior(
+        ships,
         behaviors,
         thisShipSymbol,
         Behavior.systemWatcher,
@@ -430,23 +436,36 @@ class CentralCommand {
 
   /// Returns all systems containing charters or charter destinations.
   Iterable<SystemSymbol> otherCharterSystems(
+    ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
   ) =>
-      _otherSystemsWithBehavior(behaviors, thisShipSymbol, Behavior.charter);
+      _otherSystemsWithBehavior(
+        ships,
+        behaviors,
+        thisShipSymbol,
+        Behavior.charter,
+      );
 
   /// Returns all systems containing traders or trader destinations.
   Iterable<SystemSymbol> otherTraderSystems(
+    ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
   ) =>
-      _otherSystemsWithBehavior(behaviors, thisShipSymbol, Behavior.trader);
+      _otherSystemsWithBehavior(
+        ships,
+        behaviors,
+        thisShipSymbol,
+        Behavior.trader,
+      );
 
   Future<void> _queueMountRequests(
     Database db,
     Caches caches,
+    ShipSnapshot ships,
   ) async {
-    for (final ship in _shipCache.ships) {
+    for (final ship in ships.ships) {
       if (_mountRequests.any((m) => m.shipSymbol == ship.shipSymbol)) {
         return;
       }
@@ -518,14 +537,14 @@ class CentralCommand {
     return construction;
   }
 
-  bool _computeHaveEscapedStartingSystem(Caches caches) {
+  bool _computeHaveEscapedStartingSystem(ShipSnapshot ships) {
     if (_haveEscapedStartingSystem) {
       return true;
     }
     // We'll assume that if all the ships are in the same system we've
     // not yet constructed our jump gate.
     final systemSymbols = Set<SystemSymbol>.from(
-      _shipCache.ships.map((s) => s.nav.systemSymbolObject),
+      ships.ships.map((s) => s.nav.systemSymbolObject),
     );
     return systemSymbols.length > 1;
   }
@@ -540,6 +559,7 @@ class CentralCommand {
     // await caches.updateRoutingCaches();
 
     final marketListings = await MarketListingSnapshot.load(db);
+    final ships = await ShipSnapshot.load(db);
 
     _assignedSystemsForSatellites
       ..clear()
@@ -549,13 +569,13 @@ class CentralCommand {
       db,
       caches.systems,
       caches.charting,
-      _shipCache,
+      ships,
       systemSymbol: caches.agent.headquartersSystemSymbol,
     );
 
-    _nextShipBuyJob ??= await _computeNextShipBuyJob(db, api, caches);
+    _nextShipBuyJob ??= await _computeNextShipBuyJob(db, api, caches, ships);
     await updateAvailableMounts(db);
-    await _queueMountRequests(db, caches);
+    await _queueMountRequests(db, caches, ships);
 
     activeConstruction = await computeActiveConstruction(
       db,
@@ -573,7 +593,7 @@ class CentralCommand {
       );
     }
 
-    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(caches);
+    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(ships);
   }
 
   /// Returns the next ship buy job.
@@ -602,12 +622,13 @@ class CentralCommand {
   Future<ShipBuyJob?> _findBestPlaceToBuy(
     Database db,
     Caches caches,
+    ShipSnapshot ships,
     ShipType shipType,
   ) async {
     final shipyardPrices = await ShipyardPriceSnapshot.load(db);
     // TODO(eseidel): This uses command ship to compute the job, but
     // will happily give out the job to a non-command ship for execution.
-    final commandShip = _shipCache.ships.first;
+    final commandShip = ships.ships.first;
     final trip = findBestShipyardToBuy(
       shipyardPrices,
       caches.routePlanner,
@@ -638,9 +659,10 @@ class CentralCommand {
     Database db,
     Api api,
     Caches caches,
+    ShipSnapshot ships,
   ) async {
     final shipType = await shipToBuyFromPlan(
-      _shipCache,
+      ships,
       config.buyPlan,
       caches.shipyardListings,
       caches.static.shipyardShips,
@@ -649,7 +671,7 @@ class CentralCommand {
       return null;
     }
     logger.info('Planning to buy $shipType');
-    return _findBestPlaceToBuy(db, caches, shipType);
+    return _findBestPlaceToBuy(db, caches, ships, shipType);
   }
 
   /// Returns true if [ship] should start the buyShip behavior.
@@ -922,7 +944,7 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
   Database db,
   SystemsCache systemsCache,
   ChartingCache chartingCache,
-  ShipSnapshot shipCache, {
+  ShipSnapshot ships, {
   required SystemSymbol systemSymbol,
 }) async {
   // Look at the top N mining scores.
@@ -954,7 +976,7 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
     return ExtractionSquad(job);
   });
   // Go through and assign all ships to squads.
-  for (final ship in shipCache.ships) {
+  for (final ship in ships.ships) {
     findSquadForShip(squads, ship)?.ships.add(ship);
   }
   return squads;
@@ -962,7 +984,7 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
 
 /// Returns the next ship to buy from the given [shipPlan].
 Future<ShipType?> shipToBuyFromPlan(
-  ShipSnapshot shipCache,
+  ShipSnapshot ships,
   List<ShipType> shipPlan,
   ShipyardListingSnapshot shipyardListings,
   ShipyardShipCache shipyardShips,
@@ -970,7 +992,7 @@ Future<ShipType?> shipToBuyFromPlan(
   final counts = <ShipType, int>{};
   for (final shipType in shipPlan) {
     counts[shipType] = (counts[shipType] ?? 0) + 1;
-    final fleetCount = shipCache.countOfType(shipyardShips, shipType);
+    final fleetCount = ships.countOfType(shipyardShips, shipType);
     if (fleetCount == null) {
       logger.warn('Unknown count for $shipType');
       return null;

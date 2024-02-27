@@ -5,8 +5,8 @@ import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final shipCache = await ShipSnapshot.load(db);
-  final centralCommand = CentralCommand(shipCache: shipCache);
+  final ships = await ShipSnapshot.load(db);
+  final centralCommand = CentralCommand();
 
   final symbolWidth =
       ShipMountSymbolEnum.values.fold(0, (s, e) => max(s, e.value.length)) + 1;
@@ -14,7 +14,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Must be called before we can call templateForShip.
   await centralCommand.updateAvailableMounts(db);
 
-  for (final ship in shipCache.ships) {
+  for (final ship in ships.ships) {
     final template = centralCommand.templateForShip(ship);
     if (template == null) {
       logger.detail('No template for ${ship.symbol}.');
@@ -46,7 +46,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     }
   }
 
-  final mounts = centralCommand.mountsNeededForAllShips();
+  final mounts = centralCommand.mountsNeededForAllShips(ships);
   if (mounts.isEmpty) {
     logger.info('No mounts needed.');
     return;

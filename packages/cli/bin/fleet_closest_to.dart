@@ -7,7 +7,7 @@ import 'package:collection/collection.dart';
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // For a given destination, compute the time to travel there for each ship.
   final destination = WaypointSymbol.fromString(argResults.rest[0]);
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
 
@@ -34,13 +34,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final travelTimes = <ShipSymbol, Duration>{};
 
-  for (final ship in shipCache.ships) {
+  for (final ship in ships.ships) {
     final travelTime = travelTimeTo(ship, destination);
     travelTimes[ship.shipSymbol] = travelTime;
   }
 
   final sortedShips =
-      shipCache.ships.sortedBy<Duration>((s) => travelTimes[s.shipSymbol]!);
+      ships.ships.sortedBy<Duration>((s) => travelTimes[s.shipSymbol]!);
   for (final ship in sortedShips) {
     final travelTime = travelTimes[ship.shipSymbol]!;
     logger.info('${ship.shipSymbol.hexNumber.padRight(3)} '

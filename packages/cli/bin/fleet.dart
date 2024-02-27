@@ -96,16 +96,15 @@ bool Function(Ship) filterFromArgs(List<String> args) {
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final filter = filterFromArgs(argResults.rest);
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
 
-  logger.info('Fleet: ${describeShips(shipCache.ships)}');
-  final ships = shipCache.ships;
-  final matchingShips = ships.where(filter).toList();
+  logger.info('Fleet: ${describeShips(ships.ships)}');
+  final matchingShips = ships.ships.where(filter).toList();
   if (matchingShips.isEmpty) {
     logger
       ..info('No ships matching ${argResults.rest.firstOrNull}.')
       ..info('Usage: list_fleet [ship_symbol]')
-      ..info('Example: list_fleet ${shipCache.ships.first.symbol}');
+      ..info('Example: list_fleet ${ships.ships.first.symbol}');
     return;
   }
 
@@ -123,7 +122,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final behaviors = await BehaviorSnapshot.load(db);
   final idleHaulers =
-      behaviors.idleHaulerSymbols(shipCache).map((s) => s.hexNumber).toList();
+      behaviors.idleHaulerSymbols(ships).map((s) => s.hexNumber).toList();
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }

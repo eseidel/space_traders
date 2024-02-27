@@ -20,7 +20,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
-  ShipSnapshot shipCache,
+  ShipSnapshot ships,
   Ship ship,
   MarketTradeGood marketGood,
   TradeSymbol neededTradeSymbol, {
@@ -61,7 +61,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
     api,
     db,
     agentCache,
-    shipCache,
+    ships,
     ship,
     neededTradeSymbol,
     accountingType,
@@ -307,7 +307,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
-  ShipSnapshot shipCache,
+  ShipSnapshot ships,
   Ship ship,
   Contract beforeDelivery,
   ContractDeliverGood goods,
@@ -348,7 +348,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     db,
     api,
     ship,
-    shipCache,
+    ships,
     beforeDelivery,
     tradeSymbol: tradeSymbol,
     units: unitsBefore,
@@ -442,7 +442,7 @@ Future<SupplyConstruction201ResponseData?>
   Database db,
   AgentCache agentCache,
   ConstructionCache constructionCache,
-  ShipSnapshot shipCache,
+  ShipSnapshot ships,
   Ship ship,
   Construction construction,
   TradeSymbol tradeSymbol, {
@@ -478,7 +478,7 @@ Future<SupplyConstruction201ResponseData?>
     db,
     api,
     ship,
-    shipCache,
+    ships,
     constructionCache,
     construction,
     tradeSymbol: tradeSymbol,
@@ -495,7 +495,7 @@ Future<SupplyConstruction201ResponseData?>
 
   // Update our cargo counts after delivering the contract goods.
   ship.cargo = response.cargo;
-  shipCache.updateShip(db, ship);
+  ships.updateShip(db, ship);
 
   // Record the delivery transaction.
   final delivery = ConstructionDelivery(
@@ -555,7 +555,7 @@ Future<DateTime?> acceptContractsIfNeeded(
   Database db,
   MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
-  ShipSnapshot shipCache,
+  ShipSnapshot ships,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
@@ -565,7 +565,7 @@ Future<DateTime?> acceptContractsIfNeeded(
       db,
       api,
       ship,
-      shipCache,
+      ships,
     );
     shipInfo(ship, await describeExpectedContractProfit(db, contract));
     return null;
@@ -916,6 +916,11 @@ Future<JobResult> _initDeal(
     return JobResult.complete();
   }
 
+  final ships = await ShipSnapshot.load(db);
+  final avoidSystems = centralCommand
+      .otherTraderSystems(ships, behaviors, ship.shipSymbol)
+      .toSet();
+
   // If we don't have a deal, move to a better location and try again.
   final destinationSymbol = assertNotNull(
     findBetterTradeLocation(
@@ -937,8 +942,7 @@ Future<JobResult> _initDeal(
         );
       },
       ship,
-      avoidSystems:
-          centralCommand.otherTraderSystems(behaviors, ship.shipSymbol).toSet(),
+      avoidSystems: avoidSystems,
       profitPerSecondThreshold: centralCommand.expectedCreditsPerSecond(ship),
     ),
     'Failed to find better location for trader.',

@@ -12,13 +12,13 @@ import 'package:types/types.dart';
 /// Logic for assigning systems to system watchers.
 Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   MarketListingSnapshot marketListings,
-  ShipSnapshot shipCache,
+  ShipSnapshot ships,
 ) {
   // Find systems with at least 5 markets.
   final systemsWithEnoughMarkets = marketListings.systemsWithAtLeastNMarkets(5);
 
   final assignedProbes = <ShipSymbol, SystemSymbol>{};
-  final availableProbes = shipCache.ships.where((s) => s.isProbe).toList();
+  final availableProbes = ships.ships.where((s) => s.isProbe).toList();
   final systemsNeedingProbes = systemsWithEnoughMarkets.toList();
   // First try to assign probes to the systems they are already in.
   for (final probe in availableProbes) {
@@ -234,7 +234,9 @@ Future<JobResult> doSystemWatcher(
   }
 
   final behaviors = await BehaviorSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final avoidWaypoints = centralCommand.waypointsToAvoidInSystem(
+    ships,
     behaviors,
     systemSymbol,
     ship.shipSymbol,

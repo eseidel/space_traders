@@ -64,9 +64,9 @@ void main() {
     when(() => db.setBehaviorState(any())).thenAnswer((_) async {});
     when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
     final behaviors = BehaviorSnapshot([]);
+    final ships = ShipSnapshot([]);
 
-    final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final centralCommand = CentralCommand();
 
     Future<void> setupShip({
       required ShipSymbol shipSymbol,
@@ -86,7 +86,7 @@ void main() {
           routePlan: fakeJump(start, end),
         ),
       );
-      when(() => shipCache[shipSymbol]).thenReturn(ship);
+      when(() => ships[shipSymbol]).thenReturn(ship);
     }
 
     // Sets up a ship X-A with a route from S-A-A to S-A-W.
@@ -102,24 +102,27 @@ void main() {
     await setupShip(shipSymbol: shipBSymbol, start: bStart, end: bEnd);
 
     // Test that from S-A-A we avoid S-A-W and S-B-W.
-    final otherSystems =
-        centralCommand.otherCharterSystems(behaviors, shipASymbol).toList();
+    final otherSystems = centralCommand
+        .otherCharterSystems(ships, behaviors, shipASymbol)
+        .toList();
     expect(
       otherSystems,
       [bStart.system, bEnd.system], // Source and destination
     );
     // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
     // behaviorCache.getBehavior(shipBSymbol)!.routePlan = null;
-    final otherSystems2 =
-        centralCommand.otherCharterSystems(behaviors, shipASymbol).toList();
+    final otherSystems2 = centralCommand
+        .otherCharterSystems(ships, behaviors, shipASymbol)
+        .toList();
     expect(otherSystems2, [bStart.system]); // From nav.waypointSymbol
 
     final shipCSymbol = ShipSymbol.fromString('X-C');
     final cStart = WaypointSymbol.fromString('S-D-A');
     final cEnd = WaypointSymbol.fromString('S-E-W');
     await setupShip(shipSymbol: shipCSymbol, start: cStart, end: cEnd);
-    final otherSystems4 =
-        centralCommand.otherCharterSystems(behaviors, shipASymbol).toList();
+    final otherSystems4 = centralCommand
+        .otherCharterSystems(ships, behaviors, shipASymbol)
+        .toList();
     expect(
       otherSystems4,
       <SystemSymbol>[cStart.system, cEnd.system],
@@ -128,10 +131,11 @@ void main() {
 
   test('CentralCommand.otherTraderSystems', () {
     final behaviors = BehaviorSnapshot([]);
-    final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final ships = ShipSnapshot([]);
+    final centralCommand = CentralCommand();
     expect(
       centralCommand.otherTraderSystems(
+        ships,
         behaviors,
         ShipSymbol.fromString('X-A'),
       ),
@@ -217,7 +221,7 @@ void main() {
     final behaviors = BehaviorSnapshot([
       BehaviorState(shipASymbol, Behavior.trader, deal: costedDeal),
     ]);
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final centralCommand = CentralCommand();
     final contractTerms = _MockContractTerms();
     final contract = Contract.test(id: 'C', terms: contractTerms);
     final good = ContractDeliverGood(
@@ -255,7 +259,7 @@ void main() {
     final behaviors = BehaviorSnapshot([
       BehaviorState(shipASymbol, Behavior.trader, deal: costedDeal),
     ]);
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final centralCommand = CentralCommand();
     final construction = Construction(
       symbol: waypointSymbol.waypoint,
       isComplete: false,
@@ -318,7 +322,7 @@ void main() {
   test('CentralCommand.shouldBuyShip', () async {
     final db = _MockDatabase();
     final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final centralCommand = CentralCommand();
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('X-A');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -389,7 +393,7 @@ void main() {
         ]),
       );
       final shipCache = _MockShipCache();
-      final centralCommand = CentralCommand(shipCache: shipCache);
+      final centralCommand = CentralCommand();
 
       final tenMiners = makeMiners(10);
       when(() => shipCache.ships).thenReturn(tenMiners);
@@ -503,9 +507,7 @@ void main() {
       ),
     );
     when(() => caches.ships.ships).thenReturn([ship]);
-    final centralCommand = CentralCommand(
-      shipCache: caches.ships,
-    );
+    final centralCommand = CentralCommand();
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
     final hqSystemSymbol = hqSymbol.system;
@@ -546,6 +548,7 @@ void main() {
 
     when(caches.construction.allRecords).thenAnswer((_) async => []);
     when(db.allMarketListings).thenAnswer((_) async => []);
+    when(db.allShips).thenAnswer((_) async => []);
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
@@ -559,8 +562,7 @@ void main() {
   });
 
   test('CentralCommand.shortenMaxPriceAgeForSystem', () {
-    final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final centralCommand = CentralCommand();
     final systemSymbol = SystemSymbol.fromString('S-A');
     final maxAge = centralCommand.maxPriceAgeForSystem(systemSymbol);
     final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);
@@ -619,8 +621,7 @@ void main() {
     );
     expect(sellOpps.toList().length, 1);
 
-    final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final centralCommand = CentralCommand();
     expect(
       centralCommand
           .contractSellOpps(agentCache, behaviors, contractSnapshot)
@@ -631,16 +632,14 @@ void main() {
   });
 
   test('mountsNeededForAllShips', () {
-    final shipCache = _MockShipCache();
-    when(() => shipCache.ships).thenReturn([]);
-    final centralCommand = CentralCommand(shipCache: shipCache);
-    expect(centralCommand.mountsNeededForAllShips(), isEmpty);
+    final centralCommand = CentralCommand();
+    final ships = ShipSnapshot([]);
+    expect(centralCommand.mountsNeededForAllShips(ships), isEmpty);
   });
 
   test('getJobForShip out of fuel', () async {
     final db = _MockDatabase();
-    final shipCache = _MockShipCache();
-    final centralCommand = CentralCommand(shipCache: shipCache);
+    final centralCommand = CentralCommand();
     final shipSymbol = ShipSymbol.fromString('X-A');
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
@@ -652,10 +651,8 @@ void main() {
 
   test('getJobForShip no behaviors', () async {
     final db = _MockDatabase();
-    final shipCache = _MockShipCache();
     final behaviorTimeouts = _MockBehaviorTimeouts();
     final centralCommand = CentralCommand(
-      shipCache: shipCache,
       behaviorTimeouts: behaviorTimeouts,
     );
     final shipSymbol = ShipSymbol.fromString('X-A');

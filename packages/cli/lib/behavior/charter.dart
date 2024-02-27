@@ -118,7 +118,9 @@ Future<JobResult> doCharter(
   // a chart or market data and route to there.
   final maxJumps = config.charterMaxJumps;
   final behaviors = await BehaviorSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final destinationSymbol = await centralCommand.nextWaypointToChart(
+    ships,
     behaviors,
     caches.systems,
     caches.waypoints,

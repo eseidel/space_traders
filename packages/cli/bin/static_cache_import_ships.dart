@@ -6,11 +6,11 @@ import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final staticCaches = StaticCaches.load(fs);
 
   // Import all info from our current ships.
-  for (final ship in shipCache.ships) {
+  for (final ship in ships.ships) {
     recordShip(staticCaches, ship);
   }
 
@@ -22,7 +22,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   // However we will update our shipyard chache with the parts from our active
   // ships, for parts which we know are not yet changable.
-  for (final ship in shipCache.ships) {
+  for (final ship in ships.ships) {
     final shipType =
         staticCaches.shipyardShips.shipTypeFromFrame(ship.frame.symbol);
     if (shipType == null) {

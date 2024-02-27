@@ -26,10 +26,9 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   );
   final marketPrices = await MarketPriceSnapshot.load(db);
 
-  final shipCache = await ShipSnapshot.load(db);
   final agentCache = await AgentCache.load(db);
   final contractSnapshot = await ContractSnapshot.load(db);
-  final centralCommand = CentralCommand(shipCache: shipCache);
+  final centralCommand = CentralCommand();
 
   final start = startArg == null
       ? agentCache!.headquarters(systemsCache)

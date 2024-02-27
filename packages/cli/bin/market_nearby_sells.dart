@@ -12,7 +12,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
 
   const tradeSymbol = TradeSymbol.DIAMONDS;
 
@@ -22,7 +22,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       .firstWhere((w) => w.isAsteroid)
       .symbol;
 
-  final miner = shipCache.ships.firstWhere((s) => s.isMiner);
+  final miner = ships.ships.firstWhere((s) => s.isMiner);
   final ship = miner.deepCopy();
   ship.nav.waypointSymbol = hqMine.waypoint;
   ship.nav.systemSymbol = hqMine.systemString;

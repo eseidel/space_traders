@@ -49,14 +49,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemWatcherStates =
       await db.behaviorStatesWithBehavior(Behavior.systemWatcher);
   final systemsCache = SystemsCache.load(fs)!;
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
 
   logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');
   for (final state in systemWatcherStates) {
     final shipSymbol = state.shipSymbol;
     final assignedSystemName =
         state.systemWatcherJob?.systemSymbol.systemName.padRight(4);
-    final ship = shipCache[shipSymbol];
+    final ship = ships[shipSymbol];
     final navString = describeShipNav(ship.nav);
     logger
         .info('${ship.emojiName} assigned to $assignedSystemName, $navString');

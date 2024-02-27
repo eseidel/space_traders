@@ -14,12 +14,12 @@ String plural(int count, String singular, [String plural = 's']) {
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final charterStates = await db.behaviorStatesWithBehavior(Behavior.charter);
   final systemsCache = SystemsCache.load(fs)!;
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
 
   logger.info('${plural(charterStates.length, 'charter')}:');
   for (final state in charterStates) {
     final shipSymbol = state.shipSymbol;
-    final ship = shipCache[shipSymbol];
+    final ship = ships[shipSymbol];
     final navString = describeShipNav(ship.nav);
     logger.info('${ship.emojiName} $navString');
 

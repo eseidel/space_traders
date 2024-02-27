@@ -13,10 +13,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: (_) => false,
   );
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final staticCaches = StaticCaches.load(fs);
 
-  final ship = shipCache.ships.first;
+  final ship = ships.ships.first;
 
   final missingSymbols = ShipMountSymbolEnum.values
       .where((s) => staticCaches.mounts[s] == null)

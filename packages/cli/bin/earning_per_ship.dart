@@ -52,11 +52,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipSymbols = (await db.uniqueShipSymbolsInTransactions()).toList()
     ..sort();
 
-  final shipCache = await ShipSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
-  final idleHaulers = behaviors.idleHaulerSymbols(shipCache);
+  final idleHaulers = behaviors.idleHaulerSymbols(ships);
   logger
-    ..info('Fleet: ${describeShips(shipCache.ships)}')
+    ..info('Fleet: ${describeShips(ships.ships)}')
     ..info('${idleHaulers.length} idle traders')
     ..info('Credits per minute for ships over the '
         'last ${approximateDuration(lookback)}:');
@@ -95,7 +95,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       };
 
   for (final shipSymbol in shipSymbols) {
-    final ship = shipCache[shipSymbol];
+    final ship = ships[shipSymbol];
     final role = ship.fleetRole;
     final summary = TransactionSummary(
       transactions.where((t) => t.shipSymbol == shipSymbol),

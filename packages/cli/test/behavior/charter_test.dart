@@ -36,7 +36,6 @@ void main() {
     final fleetApi = _MockFleetApi();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
-    final behaviors = BehaviorSnapshot([]);
 
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
     final waypoint = Waypoint.test(
@@ -102,8 +101,10 @@ void main() {
       () => centralCommand.chartAsteroidsInSystem(waypointSymbol.system),
     ).thenReturn(true);
     registerFallbackValue(BehaviorSnapshot([]));
+    registerFallbackValue(ShipSnapshot([]));
     when(
       () => centralCommand.nextWaypointToChart(
+        any(),
         any(),
         caches.systems,
         caches.waypoints,
@@ -114,6 +115,7 @@ void main() {
     ).thenAnswer((_) async => null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
+    when(db.allShips).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     expect(
