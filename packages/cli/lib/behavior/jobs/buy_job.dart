@@ -111,7 +111,7 @@ Future<JobResult> doBuyJob(
   }
 
   // Otherwise we're at our buy location and we buy.
-  await dockIfNeeded(db, api, caches.ships, ship);
+  await dockIfNeeded(db, api, ship);
 
   // TODO(eseidel): Share this code with trader.dart
   final medianPrice = caches.marketPrices.medianPurchasePrice(tradeSymbol);
@@ -119,7 +119,6 @@ Future<JobResult> doBuyJob(
     api,
     db,
     caches.agent,
-    caches.ships,
     ship,
     good,
     tradeSymbol,

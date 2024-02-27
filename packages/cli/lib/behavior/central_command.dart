@@ -563,7 +563,7 @@ class CentralCommand {
 
     _assignedSystemsForSatellites
       ..clear()
-      ..addAll(assignProbesToSystems(marketListings, caches.ships));
+      ..addAll(assignProbesToSystems(marketListings, ships));
 
     miningSquads = await assignShipsToSquads(
       db,
@@ -622,19 +622,16 @@ class CentralCommand {
   Future<ShipBuyJob?> _findBestPlaceToBuy(
     Database db,
     Caches caches,
-    ShipSnapshot ships,
+    Ship ship,
     ShipType shipType,
   ) async {
     final shipyardPrices = await ShipyardPriceSnapshot.load(db);
-    // TODO(eseidel): This uses command ship to compute the job, but
-    // will happily give out the job to a non-command ship for execution.
-    final commandShip = ships.ships.first;
     final trip = findBestShipyardToBuy(
       shipyardPrices,
       caches.routePlanner,
-      commandShip,
+      ship,
       shipType,
-      expectedCreditsPerSecond: expectedCreditsPerSecond(commandShip),
+      expectedCreditsPerSecond: expectedCreditsPerSecond(ship),
     );
     if (trip == null) {
       return null;
@@ -671,7 +668,10 @@ class CentralCommand {
       return null;
     }
     logger.info('Planning to buy $shipType');
-    return _findBestPlaceToBuy(db, caches, ships, shipType);
+    // TODO(eseidel): This uses command ship to compute the job, but
+    // will happily give out the job to a non-command ship for execution.
+    final commandShip = ships.ships.first;
+    return _findBestPlaceToBuy(db, caches, commandShip, shipType);
   }
 
   /// Returns true if [ship] should start the buyShip behavior.

@@ -1,7 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/cache/ship_cache.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -15,7 +14,6 @@ import 'package:types/types.dart';
 Future<PurchaseShip201ResponseData> purchaseShip(
   Database db,
   Api api,
-  ShipSnapshot shipCache,
   AgentCache agentCache,
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
@@ -28,7 +26,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
   final data = purchaseResponse!.data;
   // Add the new ship to our cache.
-  shipCache.updateShip(db, data.ship);
+  await db.upsertShip(data.ship);
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -37,7 +35,6 @@ Future<PurchaseShip201ResponseData> purchaseShip(
 Future<ShipNav> setShipFlightMode(
   Database db,
   Api api,
-  ShipSnapshot shipCache,
   Ship ship,
   ShipNavFlightMode flightMode,
 ) async {
@@ -45,7 +42,7 @@ Future<ShipNav> setShipFlightMode(
   final response =
       await api.fleet.patchShipNav(ship.symbol, patchShipNavRequest: request);
   ship.nav = response!.data;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return response.data;
 }
 
@@ -53,7 +50,6 @@ Future<ShipNav> setShipFlightMode(
 Future<NavigateShip200ResponseData> navigateShip(
   Database db,
   Api api,
-  ShipSnapshot shipCache,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
@@ -64,7 +60,7 @@ Future<NavigateShip200ResponseData> navigateShip(
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return data;
 }
 
@@ -73,13 +69,12 @@ Future<SiphonResources201ResponseData> siphonResources(
   Database db,
   Api api,
   Ship ship,
-  ShipSnapshot shipCache,
 ) async {
   final response = await api.fleet.siphonResources(ship.symbol);
   ship
     ..cargo = response!.data.cargo
     ..cooldown = response.data.cooldown;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return response.data;
 }
 
@@ -89,13 +84,12 @@ Future<ExtractResources201ResponseData> extractResources(
   Database db,
   Api api,
   Ship ship,
-  ShipSnapshot shipCache,
 ) async {
   final response = await api.fleet.extractResources(ship.symbol);
   ship
     ..cargo = response!.data.cargo
     ..cooldown = response.data.cooldown;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return response.data;
 }
 
@@ -105,7 +99,6 @@ Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
   Database db,
   Api api,
   Ship ship,
-  ShipSnapshot shipCache,
   Survey survey,
 ) async {
   final response =
@@ -113,7 +106,7 @@ Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
   ship
     ..cargo = response!.data.cargo
     ..cooldown = response.data.cooldown;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return response.data;
 }
 
@@ -122,7 +115,6 @@ Future<DeliverContract200ResponseData> deliverContract(
   Database db,
   Api api,
   Ship ship,
-  ShipSnapshot shipCache,
   Contract contract, {
   required TradeSymbol tradeSymbol,
   required int units,
@@ -139,7 +131,7 @@ Future<DeliverContract200ResponseData> deliverContract(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
   ship.cargo = data.cargo;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return data;
 }
 
@@ -148,7 +140,6 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
   Database db,
   Api api,
   Ship ship,
-  ShipSnapshot shipCache,
   ConstructionCache constructionCache,
   Construction construction, {
   required TradeSymbol tradeSymbol,
@@ -170,7 +161,7 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
     data.construction,
   );
   ship.cargo = data.cargo;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return data;
 }
 
@@ -180,7 +171,6 @@ Future<SellCargo201ResponseData> sellCargo(
   Api api,
   AgentCache agentCache,
   Ship ship,
-  ShipSnapshot shipCache,
   TradeSymbol tradeSymbol,
   int units,
 ) async {
@@ -192,7 +182,7 @@ Future<SellCargo201ResponseData> sellCargo(
       await api.fleet.sellCargo(ship.symbol, sellCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -204,7 +194,6 @@ Future<SellCargo201ResponseData> purchaseCargo(
   Database db,
   Api api,
   AgentCache agentCache,
-  ShipSnapshot shipCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int units,
@@ -217,7 +206,7 @@ Future<SellCargo201ResponseData> purchaseCargo(
       await api.fleet.purchaseCargo(ship.symbol, purchaseCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -229,7 +218,6 @@ Future<RefuelShip200ResponseData> refuelShip(
   Database db,
   Api api,
   AgentCache agentCache,
-  ShipSnapshot shipCache,
   Ship ship,
 ) async {
   // We used to have logic to avoid filling to full, but our route planner
@@ -239,6 +227,6 @@ Future<RefuelShip200ResponseData> refuelShip(
   final data = responseWrapper!.data;
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;
-  shipCache.updateShip(db, ship);
+  await db.upsertShip(ship);
   return data;
 }

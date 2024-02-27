@@ -32,8 +32,6 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
-class _MockShipCache extends Mock implements ShipSnapshot {}
-
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
@@ -44,7 +42,6 @@ void main() {
     final FleetApi fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
 
-    final shipCache = _MockShipCache();
     final agent1 = Agent.test(credits: 1);
     final agent2 = Agent.test(credits: 2);
 
@@ -65,20 +62,20 @@ void main() {
     final db = _MockDatabase();
     registerFallbackValue(agent1);
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    when(() => db.upsertShip(responseData.ship))
+        .thenAnswer((_) => Future.value());
+
     final agentCache = AgentCache(agent1, db);
     final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
     const shipType = ShipType.PROBE;
     await purchaseShip(
       db,
       api,
-      shipCache,
       agentCache,
       shipyardSymbol,
       shipType,
     );
-    verify(
-      () => shipCache.updateShip(db, responseData.ship),
-    ).called(1);
+    verify(() => db.upsertShip(responseData.ship)).called(1);
     expect(agentCache.agent, agent2);
   });
 
@@ -98,9 +95,9 @@ void main() {
     ).thenAnswer(
       (invocation) => Future.value(GetShipNav200Response(data: shipNav)),
     );
-    final shipCache = _MockShipCache();
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
-    await setShipFlightMode(db, api, shipCache, ship, ShipNavFlightMode.CRUISE);
+    await setShipFlightMode(db, api, ship, ShipNavFlightMode.CRUISE);
     verify(() => ship.nav = shipNav).called(1);
   });
 
@@ -122,13 +119,14 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    final shipCache = _MockShipCache();
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+
     final logger = _MockLogger();
-    await runWithLogger(logger, () => undockIfNeeded(db, api, shipCache, ship));
+    await runWithLogger(logger, () => undockIfNeeded(db, api, ship));
     verifyNever(() => fleetApi.orbitShip(any()));
 
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    await runWithLogger(logger, () => undockIfNeeded(db, api, shipCache, ship));
+    await runWithLogger(logger, () => undockIfNeeded(db, api, ship));
     verify(() => fleetApi.orbitShip(any())).called(1);
   });
 
@@ -144,19 +142,20 @@ void main() {
         ),
       ),
     );
-    final shipCache = _MockShipCache();
     final ship = _MockShip();
     when(() => ship.emojiName).thenReturn('S');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+
     final logger = _MockLogger();
-    await runWithLogger(logger, () => dockIfNeeded(db, api, shipCache, ship));
+    await runWithLogger(logger, () => dockIfNeeded(db, api, ship));
     verifyNever(() => fleetApi.dockShip(any()));
 
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    await runWithLogger(logger, () => dockIfNeeded(db, api, shipCache, ship));
+    await runWithLogger(logger, () => dockIfNeeded(db, api, ship));
     verify(() => fleetApi.dockShip(any())).called(1);
   });
 
@@ -174,7 +173,6 @@ void main() {
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     final shipFuel = ShipFuel(current: 0, capacity: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
-    final shipCache = _MockShipCache();
     final systemsCache = _MockSystemsCache();
 
     when(
@@ -203,6 +201,7 @@ void main() {
         ),
       ),
     );
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     await runWithLogger(
@@ -211,7 +210,6 @@ void main() {
         db,
         api,
         systemsCache,
-        shipCache,
         ship,
         WaypointSymbol.fromString('S-A-W'),
       ),
@@ -241,7 +239,6 @@ void main() {
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    final shipCache = _MockShipCache();
     final logger = _MockLogger();
 
     when(
@@ -262,13 +259,14 @@ void main() {
         ),
       ),
     );
+    when(() => db.upsertShip(fromShip)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(toShip)).thenAnswer((_) => Future.value());
 
     final _ = await runWithLogger(
       logger,
       () => transferCargoAndLog(
         db,
         api,
-        shipCache,
         from: fromShip,
         to: toShip,
         tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY,
@@ -304,7 +302,6 @@ void main() {
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    final shipCache = _MockShipCache();
     final logger = _MockLogger();
 
     final agent = Agent.test();
@@ -351,7 +348,6 @@ void main() {
         api,
         db,
         agentCache,
-        shipCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -371,6 +367,7 @@ void main() {
       ),
     ]);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 634));
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     await runWithLogger(
       logger,
@@ -378,7 +375,6 @@ void main() {
         api,
         db,
         agentCache,
-        shipCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -409,7 +405,6 @@ void main() {
         api,
         db,
         agentCache,
-        shipCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -440,7 +435,6 @@ void main() {
         api,
         db,
         agentCache,
-        shipCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -465,7 +459,6 @@ void main() {
         api,
         db,
         agentCache,
-        shipCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -492,7 +485,6 @@ void main() {
         api,
         db,
         agentCache,
-        shipCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -519,7 +511,6 @@ void main() {
         api,
         db,
         agentCache,
-        shipCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -534,7 +525,6 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final emptyCargo = ShipCargo(capacity: 10, units: 0);
     when(() => ship.cargo).thenReturn(emptyCargo);
-    final shipCache = _MockShipCache();
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -573,7 +563,6 @@ void main() {
         marketPrices,
         agentCache,
         market,
-        shipCache,
         ship,
         accountingType,
       );
@@ -634,6 +623,7 @@ void main() {
       ],
     );
     when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final transactions = await runWithLogger(logger, () async {
       final result = await sellAllCargoAndLog(
@@ -642,7 +632,6 @@ void main() {
         marketPrices,
         agentCache,
         market,
-        shipCache,
         ship,
         accountingType,
       );
@@ -659,7 +648,6 @@ void main() {
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    final shipCache = _MockShipCache();
     final logger = _MockLogger();
 
     final itemOne = ShipCargoItem(
@@ -696,9 +684,10 @@ void main() {
         ),
       ),
     );
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     await runWithLogger(logger, () async {
-      await jettisonCargoAndLog(db, api, shipCache, ship, itemOne);
+      await jettisonCargoAndLog(db, api, ship, itemOne);
     });
     verify(
       () => fleetApi.jettison(
@@ -843,7 +832,6 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(startSymbol.systemString);
     const shipNavStatus = ShipNavStatus.DOCKED;
     when(() => shipNav.status).thenReturn(shipNavStatus);
-    final shipCache = _MockShipCache();
     final logger = _MockLogger();
     final agent = Agent.test(credits: 10000000);
     final agentCache = _MockAgentCache();
@@ -891,13 +879,13 @@ void main() {
 
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     await runWithLogger(logger, () async {
       await useJumpGateAndLog(
         api,
         db,
         agentCache,
-        shipCache,
         ship,
         endSymbol,
         medianAntimatterPrice: null,

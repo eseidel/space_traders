@@ -196,6 +196,7 @@ void main() {
     when(() => centralCommand.otherTraderSystems(any(), any(), shipSymbol))
         .thenReturn([]);
     when(db.allShips).thenAnswer((_) async => []);
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -484,6 +485,7 @@ void main() {
     ).thenReturn(routePlan);
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -714,6 +716,7 @@ void main() {
     ).thenReturn([]);
 
     when(db.allBehaviorStates).thenAnswer((_) async => []);
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -919,6 +922,7 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1215,6 +1219,7 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1402,6 +1407,7 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final result = await runWithLogger(

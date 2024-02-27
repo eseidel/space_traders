@@ -222,6 +222,7 @@ void main() {
 
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final singleJumpResult = await runWithLogger(
       logger,

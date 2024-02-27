@@ -48,7 +48,7 @@ Future<JobResult> goWaitForGoods(
   }
 
   // Transfering goods requires being the same orbit state.
-  await undockIfNeeded(db, api, caches.ships, ship);
+  await undockIfNeeded(db, api, ship);
 
   // If we're not yet full, go to sleep for a minute.
   if (ship.cargo.availableSpace > 0) {

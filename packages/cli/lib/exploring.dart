@@ -26,7 +26,7 @@ Future<Market?> visitLocalMarket(
   // This could avoid the dock and market lookup if the caller
   // doesn't need the Market value, we don't need fuel and we have
   // recent market data.
-  await dockIfNeeded(db, api, caches.ships, ship);
+  await dockIfNeeded(db, api, ship);
   final market = await recordMarketDataIfNeededAndLog(
     db,
     caches.markets,
@@ -42,7 +42,6 @@ Future<Market?> visitLocalMarket(
         api,
         db,
         caches.agent,
-        caches.ships,
         market,
         ship,
         medianFuelPurchasePrice: median,

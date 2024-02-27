@@ -130,7 +130,6 @@ Future<JobResult> extractAndLog(
   Api api,
   Database db,
   Ship ship,
-  ShipSnapshot ships,
   Survey? maybeSurvey, {
   required DateTime Function() getNow,
 }) async {
@@ -152,11 +151,10 @@ Future<JobResult> extractAndLog(
         db,
         api,
         ship,
-        ships,
         maybeSurvey,
       );
     } else {
-      response = await extractResources(db, api, ship, ships);
+      response = await extractResources(db, api, ship);
     }
     final yield_ = response.extraction.yield_;
     final cargo = response.cargo;
@@ -258,7 +256,7 @@ Future<JobResult> doMineJob(
   );
 
   // Both surveying and mining require being undocked.
-  await undockIfNeeded(db, api, caches.ships, ship);
+  await undockIfNeeded(db, api, ship);
 
   // We need to be off cooldown to continue.
   final expiration = ship.cooldown.expiration;
@@ -280,8 +278,7 @@ Future<JobResult> doMineJob(
   final maybeSurvey = worthMining.firstOrNull?.survey;
   // If not, add some new surveys.
   if (maybeSurvey == null && ship.hasSurveyor) {
-    final response =
-        await surveyAndLog(db, api, caches.ships, ship, getNow: getNow);
+    final response = await surveyAndLog(db, api, ship, getNow: getNow);
 
     verifyCooldown(
       ship,
@@ -306,7 +303,6 @@ Future<JobResult> doMineJob(
     api,
     db,
     ship,
-    caches.ships,
     maybeSurvey,
     getNow: getNow,
   );
@@ -393,7 +389,6 @@ Future<JobResult> emptyCargoIfNeeded(
       caches.marketPrices,
       caches.agent,
       currentMarket,
-      caches.ships,
       ship,
       AccountingType.goods,
     );
@@ -424,7 +419,7 @@ Future<JobResult> emptyCargoIfNeeded(
       'No nearby market to sell ${largestCargo.symbol}, jetisoning cargo!',
     );
     // Only jettison the item we don't know how to sell, others might sell.
-    await jettisonCargoAndLog(db, api, caches.ships, ship, largestCargo);
+    await jettisonCargoAndLog(db, api, ship, largestCargo);
     if (ship.cargo.isEmpty) {
       return JobResult.complete();
     }
@@ -529,7 +524,6 @@ Future<JobResult> travelAndSellCargo(
     caches.marketPrices,
     caches.agent,
     currentMarket,
-    caches.ships,
     ship,
     // We don't have a good way to know what type of cargo this is.
     // Assuming it's goods (rather than captial) is probably fine.
@@ -641,7 +635,6 @@ Future<JobResult> transferToHaulersOrWait(
         await transferCargoAndLog(
           db,
           api,
-          caches.ships,
           from: ship,
           to: hauler,
           tradeSymbol: item.symbol,

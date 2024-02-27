@@ -82,8 +82,8 @@ void main() {
 
     when(() => caches.waypoints.waypointsInSystem(symbol.system))
         .thenAnswer((_) => Future.value([]));
-    when(() => caches.ships.ships).thenReturn([ship]);
-    when(() => caches.ships.frameCounts).thenReturn({});
+    // when(() => caches.ships.ships).thenReturn([ship]);
+    // when(() => caches.ships.frameCounts).thenReturn({});
 
     const shipType = ShipType.HEAVY_FREIGHTER;
     final state = BehaviorState(shipSymbol, Behavior.buyShip)
@@ -152,6 +152,7 @@ void main() {
     registerFallbackValue(ShipyardListing.fallbackValue());
     when(() => db.upsertShipyardListing(any()))
         .thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     expect(

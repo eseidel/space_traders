@@ -20,7 +20,6 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
-  ShipSnapshot ships,
   Ship ship,
   MarketTradeGood marketGood,
   TradeSymbol neededTradeSymbol, {
@@ -61,7 +60,6 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
     api,
     db,
     agentCache,
-    ships,
     ship,
     neededTradeSymbol,
     accountingType,
@@ -120,7 +118,6 @@ Future<JobResult> _handleAtSourceWithDeal(
       api,
       db,
       caches.agent,
-      caches.ships,
       ship,
       good,
       dealTradeSymbol,
@@ -218,7 +215,6 @@ Future<JobResult> _handleArbitrageDealAtDestination(
     caches.marketPrices,
     caches.agent,
     currentMarket,
-    caches.ships,
     ship,
     AccountingType.goods,
   );
@@ -255,7 +251,6 @@ Future<JobResult> _handleContractDealAtDestination(
     api,
     db,
     caches.agent,
-    caches.ships,
     ship,
     contract,
     neededGood!,
@@ -307,7 +302,6 @@ Future<Contract?> _deliverContractGoodsIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
-  ShipSnapshot ships,
   Ship ship,
   Contract beforeDelivery,
   ContractDeliverGood goods,
@@ -348,7 +342,6 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     db,
     api,
     ship,
-    ships,
     beforeDelivery,
     tradeSymbol: tradeSymbol,
     units: unitsBefore,
@@ -417,7 +410,6 @@ Future<JobResult> _handleConstructionDealAtDelivery(
       db,
       caches.agent,
       caches.construction,
-      caches.ships,
       ship,
       construction,
       costedDeal.tradeSymbol,
@@ -442,7 +434,6 @@ Future<SupplyConstruction201ResponseData?>
   Database db,
   AgentCache agentCache,
   ConstructionCache constructionCache,
-  ShipSnapshot ships,
   Ship ship,
   Construction construction,
   TradeSymbol tradeSymbol, {
@@ -478,7 +469,6 @@ Future<SupplyConstruction201ResponseData?>
     db,
     api,
     ship,
-    ships,
     constructionCache,
     construction,
     tradeSymbol: tradeSymbol,
@@ -495,7 +485,7 @@ Future<SupplyConstruction201ResponseData?>
 
   // Update our cargo counts after delivering the contract goods.
   ship.cargo = response.cargo;
-  ships.updateShip(db, ship);
+  await db.upsertShip(ship);
 
   // Record the delivery transaction.
   final delivery = ConstructionDelivery(
@@ -555,7 +545,6 @@ Future<DateTime?> acceptContractsIfNeeded(
   Database db,
   MarketPriceSnapshot marketPrices,
   AgentCache agentCache,
-  ShipSnapshot ships,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
@@ -565,7 +554,6 @@ Future<DateTime?> acceptContractsIfNeeded(
       db,
       api,
       ship,
-      ships,
     );
     shipInfo(ship, await describeExpectedContractProfit(db, contract));
     return null;
@@ -616,7 +604,6 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       caches.marketPrices,
       caches.agent,
       currentMarket,
-      caches.ships,
       ship,
       // We don't have a good way to know what type of cargo this is.
       // Assuming it's goods (rather than capital) is probably fine.
@@ -649,7 +636,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       'No nearby market to sell ${unwantedCargo.symbol}, jetisoning cargo!',
     );
     // Only jettison the item we don't know how to sell, others might sell.
-    await jettisonCargoAndLog(db, api, caches.ships, ship, unwantedCargo);
+    await jettisonCargoAndLog(db, api, ship, unwantedCargo);
     if (ship.cargo.isEmpty) {
       return JobResult.complete();
     }
@@ -879,7 +866,6 @@ Future<JobResult> _initDeal(
       db,
       caches.marketPrices,
       caches.agent,
-      caches.ships,
       ship,
     );
   }

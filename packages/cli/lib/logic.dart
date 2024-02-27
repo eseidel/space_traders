@@ -49,14 +49,16 @@ Future<void> advanceShips(
   // loop over all ships and advance them.
   for (var i = 0; i < loopCount; i++) {
     // Make sure we check every time in case a ship was added.
-    waiter.scheduleMissingShips(caches.ships.ships, shipFilter: shipFilter);
+    // TODO(eseidel): This should no longer be needed!
+    final ships = await ShipSnapshot.load(db);
+    waiter.scheduleMissingShips(ships.ships, shipFilter: shipFilter);
 
     final entry = waiter.nextShip();
     final shipSymbol = entry.shipSymbol;
     final waitUntil = entry.waitUntil;
 
     await _waitIfNeeded(entry);
-    final ship = caches.ships[shipSymbol];
+    final ship = (await db.getShip(shipSymbol))!;
     if (shipFilter != null && !shipFilter(ship)) {
       continue;
     }
@@ -95,6 +97,7 @@ Future<void> advanceShips(
         },
       );
       waiter.scheduleShip(shipSymbol, nextWaitUntil);
+      // TODO(eseidel): Compare the ship object with what we have in our db.
     } on ApiException catch (e) {
       // Handle the ship reactor cooldown exception which we can get when
       // running the script fresh with no state while a ship is still on
@@ -168,9 +171,10 @@ Future<Never> logic(
   Caches caches, {
   bool Function(Ship ship)? shipFilter,
 }) async {
+  final ships = await ShipSnapshot.load(db);
   final waiter = ShipWaiter()
     ..scheduleMissingShips(
-      caches.ships.ships,
+      ships.ships,
       suppressWarnings: true,
       shipFilter: shipFilter,
     );

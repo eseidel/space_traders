@@ -238,6 +238,7 @@ void main() {
         mountSymbol: mountSymbolForTradeSymbol(toMount)!,
         shipyardSymbol: waypointSymbol,
       );
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     expect(

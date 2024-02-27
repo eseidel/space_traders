@@ -506,7 +506,7 @@ void main() {
         role: ShipRole.COMMAND,
       ),
     );
-    when(() => caches.ships.ships).thenReturn([ship]);
+    // when(() => caches.ships.ships).thenReturn([ship]);
     final centralCommand = CentralCommand();
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
@@ -524,15 +524,15 @@ void main() {
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => db.knowOfMarketWhichTrades(any()))
         .thenAnswer((_) async => false);
-    when(() => caches.ships.countOfFrame(ShipFrameSymbolEnum.MINER))
-        .thenReturn(0);
+    // when(() => caches.ships.countOfFrame(ShipFrameSymbolEnum.MINER))
+    //     .thenReturn(0);
 
-    when(
-      () => caches.ships.countOfType(
-        caches.static.shipyardShips,
-        ShipType.LIGHT_SHUTTLE,
-      ),
-    ).thenReturn(0);
+    // when(
+    //   () => caches.ships.countOfType(
+    //     caches.static.shipyardShips,
+    //     ShipType.LIGHT_SHUTTLE,
+    //   ),
+    // ).thenReturn(0);
     when(() => caches.agent.headquarters(caches.systems)).thenReturn(
       SystemWaypoint.test(hqSymbol),
     );

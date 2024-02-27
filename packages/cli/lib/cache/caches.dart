@@ -52,7 +52,6 @@ class Caches {
   Caches({
     required this.agent,
     required this.marketPrices,
-    required this.ships,
     required this.systems,
     required this.waypoints,
     required this.markets,
@@ -71,10 +70,6 @@ class Caches {
 
   /// The historical market price data.
   MarketPriceSnapshot marketPrices;
-
-  /// The ship cache.
-  // TODO(eseidel): Try not caching ships and just fetching from db.
-  ShipSnapshot ships;
 
   /// Known shipyard listings.
   ShipyardListingSnapshot shipyardListings;
@@ -118,8 +113,6 @@ class Caches {
     Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
   }) async {
     final agent = await AgentCache.loadOrFetch(db, api);
-    // Intentionally do not load ships from disk (they change too often).
-    final ships = await fetchShips(db, api);
     final marketPrices = await MarketPriceSnapshot.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
@@ -154,7 +147,6 @@ class Caches {
 
     return Caches(
       agent: agent,
-      ships: ships,
       marketPrices: marketPrices,
       systems: systems,
       waypoints: waypoints,
@@ -223,9 +215,8 @@ class TopOfLoopUpdater {
         server: await fetchContracts(db, api),
         toJsonList: (e) => e.contracts.map((e) => e.toJson()).toList(),
       );
-      // caches.ships should be deleted.
-      caches.ships = _checkForChanges(
-        current: caches.ships,
+      _checkForChanges(
+        current: await ShipSnapshot.load(db),
         server: await fetchShips(db, api),
         toJsonList: (e) => e.ships.map((e) => e.toJson()).toList(),
       );

@@ -44,7 +44,7 @@ Future<JobResult> doMountJob(
   }
 
   // We must be docked at the shipyard to mount.
-  await dockIfNeeded(db, api, caches.ships, ship);
+  await dockIfNeeded(db, api, ship);
 
   // TODO(eseidel): This should only remove mounts if we absolutely need to.
   // This could end up removing mounts before we need to.
@@ -56,7 +56,6 @@ Future<JobResult> doMountJob(
         api,
         db,
         caches.agent,
-        caches.ships,
         ship,
         mount,
       );
@@ -76,7 +75,6 @@ Future<JobResult> doMountJob(
     api,
     db,
     caches.agent,
-    caches.ships,
     ship,
     mountJob.mountSymbol,
   );

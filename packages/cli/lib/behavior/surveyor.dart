@@ -43,9 +43,8 @@ Future<DateTime?> advanceSurveyor(
   jobAssert(ship.hasSurveyor, 'Requires a surveyor.', const Duration(hours: 1));
 
   // Surveying requires being undocked.
-  await undockIfNeeded(db, api, caches.ships, ship);
-  final response =
-      await surveyAndLog(db, api, caches.ships, ship, getNow: getNow);
+  await undockIfNeeded(db, api, ship);
+  final response = await surveyAndLog(db, api, ship, getNow: getNow);
 
   verifyCooldown(
     ship,

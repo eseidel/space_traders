@@ -41,8 +41,7 @@ int maxSiphonedUnits(Ship ship) {
 Future<JobResult> siphonAndLog(
   Api api,
   Database db,
-  Ship ship,
-  ShipSnapshot ships, {
+  Ship ship, {
   required DateTime Function() getNow,
 }) async {
   // If we somehow got into a bad state, just complete this job and loop.
@@ -54,7 +53,7 @@ Future<JobResult> siphonAndLog(
   );
 
   try {
-    final response = await siphonResources(db, api, ship, ships);
+    final response = await siphonResources(db, api, ship);
     final yield_ = response.siphon.yield_;
     final cargo = response.cargo;
     final siphonStrength = siphonMountStrength(ship);
@@ -161,7 +160,7 @@ Future<JobResult> doSiphonJob(
   );
 
   // Siphoning requires being undocked.
-  await undockIfNeeded(db, api, caches.ships, ship);
+  await undockIfNeeded(db, api, ship);
 
   // We need to be off cooldown to continue.
   final expiration = ship.cooldown.expiration;
@@ -175,7 +174,6 @@ Future<JobResult> doSiphonJob(
     api,
     db,
     ship,
-    caches.ships,
     getNow: getNow,
   );
   return result;

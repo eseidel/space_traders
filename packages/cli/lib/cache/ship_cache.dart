@@ -74,20 +74,6 @@ class ShipSnapshot {
   /// Returns the ship for the provided ShipSymbol.
   Ship operator [](ShipSymbol symbol) =>
       ships.firstWhere((s) => s.shipSymbol == symbol);
-
-  // TODO(eseidel): This should not exist.  We don't need to pass the
-  // ShipSnapshot around everywhere we should just pass the ship and then update
-  // the ship when we're done in the db.
-  /// Updates the provided [ship] in the cache and database.
-  void updateShip(Database db, Ship ship) {
-    final index = ships.indexWhere((s) => s.shipSymbol == ship.shipSymbol);
-    if (index == -1) {
-      ships.add(ship);
-    } else {
-      ships[index] = ship;
-    }
-    db.upsertShip(ship);
-  }
 }
 
 /// Returns a map of ship frame type to count in fleet.

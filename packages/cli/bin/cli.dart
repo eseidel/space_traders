@@ -149,12 +149,13 @@ Future<void> cliMain(List<String> args) async {
   });
 
   final agent = caches.agent.agent;
+  final ships = await ShipSnapshot.load(db);
   logger
     ..info(
       'Welcome ${agent.symbol} of the ${agent.startingFaction}!'
       ' ${creditsString(agent.credits)}',
     )
-    ..info('Fleet: ${describeShips(caches.ships.ships)}');
+    ..info('Fleet: ${describeShips(ships.ships)}');
 
   // We use defaultTo: [], so we don't have to check fo null here.
   // This means that we won't notice `--only` being passed with no ships.

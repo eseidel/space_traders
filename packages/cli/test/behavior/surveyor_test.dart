@@ -84,6 +84,7 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

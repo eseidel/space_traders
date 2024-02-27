@@ -75,7 +75,7 @@ void main() {
     when(() => caches.waypoints.canBeSiphoned(waypointSymbol))
         .thenAnswer((_) async => true);
 
-    when(() => caches.ships.ships).thenReturn([ship]);
+    // when(() => caches.ships.ships).thenReturn([ship]);
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -147,6 +147,7 @@ void main() {
         remainingSeconds: 0,
       ),
     );
+    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
     final waitUntil = await runWithLogger(
       logger,

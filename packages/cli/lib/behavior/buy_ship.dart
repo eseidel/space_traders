@@ -142,7 +142,6 @@ Future<DateTime?> advanceBuyShip(
     result = await purchaseShipAndLog(
       api,
       db,
-      caches.ships,
       caches.agent,
       ship,
       shipyard.waypointSymbol,
