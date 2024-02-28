@@ -227,7 +227,7 @@
   "export": "GRAVITON_EMITTERS",
   "imports": [
    "ADVANCED_CIRCUITRY",
-   "MERITIUM"
+   "GOLD"
   ]
  },
  {
@@ -678,15 +678,14 @@
   "export": "QUANTUM_DRIVES",
   "imports": [
    "ADVANCED_CIRCUITRY",
-   "URANITE"
+   "DIAMONDS"
   ]
  },
  {
   "export": "QUANTUM_STABILIZERS",
   "imports": [
    "PLATINUM",
-   "ADVANCED_CIRCUITRY",
-   "URANITE"
+   "ADVANCED_CIRCUITRY"
   ]
  },
  {
