@@ -108,6 +108,10 @@ class Caches {
     Database db, {
     Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
   }) async {
+    // Intentionally force refresh ships and contracts in case we've been offline.
+    await fetchShips(db, api);
+    await fetchContracts(db, api);
+
     final agent = await AgentCache.loadOrFetch(db, api);
     final marketPrices = await MarketPriceSnapshot.load(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
@@ -122,9 +126,6 @@ class Caches {
       static.waypointTraits,
     );
     final markets = MarketCache(db, api, static.tradeGoods);
-    // Intentionally force refresh contracts in case we've been offline.
-    await fetchContracts(db, api);
-
     final jumpGates = await JumpGateSnapshot.load(db);
     final constructionSnapshot = await ConstructionSnapshot.load(db);
     final systemConnectivity =
