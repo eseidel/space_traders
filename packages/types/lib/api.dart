@@ -105,7 +105,12 @@ extension ShipUtils on Ship {
   }
 
   /// Attempt to munge ths ship's cache to reflect the added cargo.
-  void updateCacheWithAddedCargo(TradeSymbol tradeSymbol, int units) {
+  void updateCacheWithAddedCargo({
+    required TradeSymbol tradeSymbol,
+    required int units,
+    required String name,
+    required String description,
+  }) {
     if (cargo.availableSpace < units) {
       throw ArgumentError(
         'Not enough space for $units units of $tradeSymbol in $cargo',
@@ -117,8 +122,8 @@ extension ShipUtils on Ship {
         ..add(
           ShipCargoItem(
             symbol: tradeSymbol,
-            name: tradeSymbol.value,
-            description: tradeSymbol.value,
+            name: name,
+            description: description,
             // Add intially with zero, we're about to add units below.
             units: 0,
           ),

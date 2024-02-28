@@ -682,8 +682,14 @@ Future<Jettison200ResponseData> transferCargoAndLog(
   // "tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
 
   final data = response!.data;
+  final good = from.cargo.cargoItem(tradeSymbol)!;
   from.cargo = data.cargo;
-  to.updateCacheWithAddedCargo(tradeSymbol, units);
+  to.updateCacheWithAddedCargo(
+    tradeSymbol: tradeSymbol,
+    name: good.name,
+    description: good.description,
+    units: units,
+  );
   await db.upsertShip(from);
   await db.upsertShip(to);
   shipDetail(
