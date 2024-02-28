@@ -208,7 +208,9 @@ class TopOfLoopUpdater {
       _checkForChanges(
         current: await ContractSnapshot.load(db),
         server: await fetchContracts(db, api),
-        toJsonList: (e) => e.contracts.map((e) => e.toJson()).toList(),
+        // Use OpenAPI's toJson to restrict to only the fields the server sends.
+        toJsonList: (e) =>
+            e.contracts.map((e) => e.toOpenApi().toJson()).toList(),
       );
       _checkForChanges(
         current: await ShipSnapshot.load(db),
