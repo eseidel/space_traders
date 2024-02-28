@@ -32,22 +32,24 @@ Future<void> advanceShips(
   Caches caches,
   ShipWaiter waiter,
   TopOfLoopUpdater updater, {
-  required int loopCount,
   bool Function(Ship ship)? shipFilter,
 }) async {
-  // loopCount is only used to control how often we reset our waypoint and
-  // market caches.  If we got rid of those we could get rid of loopCount.
-
-  await expectTime(api.requestCounts, 'top of loop', const Duration(seconds: 1),
+  await expectTime(
+      api.requestCounts, 'central planning', const Duration(seconds: 1),
       () async {
-    await updater.updateAtTopOfLoop(caches, db, api);
     await centralCommand.advanceCentralPlanning(db, api, caches);
   });
 
   const allowableScheduleLag = Duration(milliseconds: 1000);
 
   // loop over all ships and advance them.
-  for (var i = 0; i < loopCount; i++) {
+  for (var i = 0; i < config.centralPlanningInterval; i++) {
+    await expectTime(
+        api.requestCounts, 'top of loop', const Duration(milliseconds: 500),
+        () async {
+      await updater.updateAtTopOfLoop(caches, db, api);
+    });
+
     // Make sure we check every time in case a ship was added.
     // TODO(eseidel): This should no longer be needed!
     final ships = await ShipSnapshot.load(db);
@@ -192,7 +194,6 @@ Future<Never> logic(
         waiter,
         updater,
         shipFilter: shipFilter,
-        loopCount: config.loopCount,
       );
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {

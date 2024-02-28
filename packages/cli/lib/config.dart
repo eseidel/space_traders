@@ -16,10 +16,9 @@ class Config {
   /// Whether or not we should enable mining behaviors.
   final bool enableMining = true;
 
-  /// Controls how many loops we run of ships before doing our "top of loop"
-  /// updates (e.g. clearing caches).  Currently must be set to 1, or
-  /// Caches.marketPrices will end up stale and we'll make bad trades.
-  final int loopCount = 1;
+  /// Controls how many loops we run of ships before doing our central
+  /// planning (assigning ships to squads, planning mounts, etc.)
+  final int centralPlanningInterval = 20;
 
   /// The number of requests per second allowed by the api.
   /// Version 2.1 allows:
