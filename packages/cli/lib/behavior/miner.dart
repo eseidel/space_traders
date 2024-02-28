@@ -567,17 +567,20 @@ JobResult _waitForHauler(
     if (duration.isNegative) {
       shipWarn(
         ship,
-        'Hauler ${nextHauler.symbol} is already at $mineSymbol, but still'
-        ' marked in transit, waiting 1 minute.',
+        'Hauler ${nextHauler.symbol} is already at $mineSymbol, but still '
+        'marked in transit, waiting 1 minute.',
       );
       return JobResult.wait(getNow().add(const Duration(minutes: 1)));
     }
+    // Add a bit of padding to avoid waking before the hauler wakes and marks
+    // itself as arrived.
+    const padding = Duration(seconds: 1);
     shipInfo(
       ship,
-      'Waiting ${approximateDuration(duration)} for hauler arrival '
+      'Waiting ${approximateDuration(duration + padding)} for hauler arrival '
       'at $mineSymbol.',
     );
-    return JobResult.wait(waitTime);
+    return JobResult.wait(waitTime.add(padding));
   } else {
     final haulerSymbols = haulers.map((h) => h.symbol).join(', ');
     shipInfo(
@@ -632,14 +635,30 @@ Future<JobResult> transferToHaulersOrWait(
         hauler.cargo.availableSpace,
       );
       if (transferAmount > 0) {
-        await transferCargoAndLog(
-          db,
-          api,
-          from: ship,
-          to: hauler,
-          tradeSymbol: item.symbol,
-          units: transferAmount,
-        );
+        try {
+          await transferCargoAndLog(
+            db,
+            api,
+            from: ship,
+            to: hauler,
+            tradeSymbol: item.symbol,
+            units: transferAmount,
+          );
+        } on ApiException catch (e) {
+          // ApiException 400: {"error":{"message":"Failed to update ship
+          // cargo. Ship ESEIDEL-18 cargo does not contain 7 unit(s) of
+          // COPPER_ORE. Ship has 0 unit(s) of COPPER_ORE.","code":4219,
+          // "data":{"shipSymbol":"ESEIDEL-18","tradeSymbol":"COPPER_ORE",
+          // "cargoUnits":0,"unitsToRemove":7}}}
+          if (isAPIExceptionWithCode(e, 4219)) {
+            throw JobException(
+              'Failed to transfer cargo: $e',
+              const Duration(minutes: 1),
+            );
+          }
+          // Any other exception just rethrow.
+          rethrow;
+        }
         break; // Exit the inner for loop and move to the next item.
       }
     }
