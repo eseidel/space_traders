@@ -120,19 +120,15 @@ class CentralCommand {
 
   /// Returns the mining squad for the given [ship].
   ExtractionSquad? squadForShip(Ship ship) {
-    var squad = miningSquads.firstWhereOrNull((s) => s.contains(ship));
-    // Handle the case of a newly purchased ship.
+    final squad = miningSquads.firstWhereOrNull((s) => s.contains(ship));
     if (squad == null) {
-      squad = findSquadForShip(miningSquads, ship);
-      squad?.ships.add(ship);
+      return null;
     }
     return squad;
   }
 
   /// What template should we use for the given ship?
-  ShipTemplate? templateForShip(
-    Ship ship,
-  ) {
+  ShipTemplate? templateForShip(Ship ship) {
     final squad = squadForShip(ship);
     if (squad == null) {
       return null;
@@ -914,7 +910,11 @@ Iterable<SellOpp> sellOppsForConstruction(
 
 /// Compute the correct squad for the given [ship].
 @visibleForTesting
-ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
+ExtractionSquad? findSquadForShip(
+  List<ExtractionSquad> squads,
+  Ship ship, {
+  required bool Function(Ship) useAsMinerHauler,
+}) {
   if (squads.isEmpty) {
     return null;
   }
@@ -922,12 +922,10 @@ ExtractionSquad? findSquadForShip(List<ExtractionSquad> squads, Ship ship) {
   // Score all squads based on how much they need this type of ship?
   // Add to the squad with the lowest score?
   final fleetRole = ship.fleetRole;
-  final isMinerHauler = config.enableMining &&
-      config.minerHaulerSymbols.contains(ship.shipSymbol);
   // Hack for now to restrict to miners / surveyors.
   if (fleetRole != FleetRole.miner &&
       fleetRole != FleetRole.surveyor &&
-      !isMinerHauler) {
+      !useAsMinerHauler(ship)) {
     return null;
   }
 
@@ -978,9 +976,22 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
     );
     return ExtractionSquad(job);
   });
+
+  // TODO(eseidel): Should use a dynamic count.
+  final minerHaulerSymbols = ships.ships
+      .where((s) => s.isHauler)
+      .map((s) => s.shipSymbol)
+      .sorted()
+      .take(config.minerHaulerCount);
+  bool useAsMinerHauler(Ship ship) {
+    return config.enableMining && minerHaulerSymbols.contains(ship.shipSymbol);
+  }
+
   // Go through and assign all ships to squads.
   for (final ship in ships.ships) {
-    findSquadForShip(squads, ship)?.ships.add(ship);
+    findSquadForShip(squads, ship, useAsMinerHauler: useAsMinerHauler)
+        ?.ships
+        .add(ship);
   }
   return squads;
 }
