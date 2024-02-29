@@ -213,7 +213,8 @@ class TopOfLoopUpdater {
             e.contracts.map((e) => e.toOpenApi().toJson()).toList(),
       );
       _checkForChanges(
-        current: await ShipSnapshot.load(db),
+        current: await ShipSnapshot.load(db)
+          ..updateForServerTime(DateTime.timestamp()),
         server: await fetchShips(db, api),
         toJsonList: (e) => e.ships.map((e) => e.toJson()).toList(),
       );

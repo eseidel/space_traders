@@ -6,6 +6,33 @@ import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
+/// Tools to update Ship objects.
+extension ShipUpdateUtils on Ship {
+  /// Updates the ship's cooldown and nav for the provided [now].
+  void updateForServerTime(DateTime now) {
+    final expiration = cooldown.expiration;
+    if (expiration != null) {
+      if (expiration.isBefore(now)) {
+        cooldown = Cooldown(
+          shipSymbol: cooldown.shipSymbol,
+          remainingSeconds: 0,
+          totalSeconds: cooldown.totalSeconds,
+        );
+      } else {
+        cooldown = Cooldown(
+          shipSymbol: cooldown.shipSymbol,
+          remainingSeconds: expiration.difference(now).inSeconds,
+          totalSeconds: cooldown.totalSeconds,
+          expiration: expiration,
+        );
+      }
+    }
+    if (isInTransit && nav.route.arrival.isBefore(now)) {
+      nav.status = ShipNavStatus.IN_ORBIT;
+    }
+  }
+}
+
 /// In-memory cache of ships.
 class ShipSnapshot {
   /// Creates a new ship cache.
@@ -66,6 +93,14 @@ class ShipSnapshot {
     return ships
         .where((s) => matchesShipyardShipMounts(s, shipyardShip))
         .length;
+  }
+
+  /// Updates the ships in the cache for the provided [now].
+  // This is a bit of a hack, but makes our server checks less noisy.
+  void updateForServerTime(DateTime now) {
+    for (final ship in ships) {
+      ship.updateForServerTime(now);
+    }
   }
 
   /// Returns all ship symbols.
