@@ -1093,11 +1093,8 @@ Future<List<SellOpp>> constructionSubsidiesForSupplyChain(
   await chain.accept(collector);
 
   for (final price in collector.imports) {
-    if (price.supply.isAtLeast(SupplyLevel.ABUNDANT)) {
-      continue;
-    }
     final subsidizedSellPrice =
-        price.sellPrice + config.constructionMaterialFlatSubsidyCredits;
+        price.sellPrice + config.subsidyForSupplyLevel(price.supply);
     final subsidizedPrice = price.copyWith(sellPrice: subsidizedSellPrice);
     subsidies.add(SellOpp.fromMarketPrice(subsidizedPrice));
   }

@@ -44,7 +44,7 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
-    for (int i = 0; i < 10; i++) ShipType.LIGHT_HAULER,
+    for (int i = 0; i < 13; i++) ShipType.LIGHT_HAULER,
     // for (int i = 0; i < 40; i++) ShipType.PROBE,
     // for (int i = 0; i < 50; i++) ShipType.REFINING_FREIGHTER,
     // ShipType.EXPLORER,
@@ -133,7 +133,21 @@ class Config {
   final allowParallelConstructionDelivery = false;
 
   /// The amount of credits to subsidize each unit of construction materials.
-  final constructionMaterialFlatSubsidyCredits = 50;
+  int subsidyForSupplyLevel(SupplyLevel supplyLevel) {
+    switch (supplyLevel) {
+      case SupplyLevel.ABUNDANT:
+        return 0;
+      case SupplyLevel.HIGH:
+        return 50;
+      case SupplyLevel.MODERATE:
+        return 100;
+      case SupplyLevel.LIMITED:
+        return 150;
+      case SupplyLevel.SCARCE:
+        return 200;
+    }
+    throw ArgumentError('Unknown supplyLevel: $supplyLevel');
+  }
 
   /// Max number of jumps we allow a charter to plan for at once.
   final charterMaxJumps = 5;
