@@ -18,12 +18,11 @@ int? _distanceBetween(
   return aWaypoint.distanceTo(bWaypoint).toInt();
 }
 
-String _describeMarket(WaypointSymbol waypointSymbol, MarketPrice? price) {
-  final name = waypointSymbol.waypointName;
+String _describeGood(TradeSymbol tradeSymbol, MarketPrice? price) {
   if (price == null) {
-    return '$name (no market)';
+    return '$tradeSymbol null';
   }
-  return '$name (${price.supply}, ${price.activity})';
+  return '$tradeSymbol (${price.supply}, ${price.activity})';
 }
 
 /// Walk the supply chain and print it.
@@ -51,13 +50,9 @@ class DescribingVisitor extends SupplyLinkVisitor {
     final tradeSymbol = link.tradeSymbol;
 
     final distance = _distanceBetween(systems, source, destination);
-    final sourcePrice = await db.marketPriceAt(source, tradeSymbol);
-    final destinationPrice = await db.marketPriceAt(destination, tradeSymbol);
-
     logger.info(
       '${spaces}Shuttle $tradeSymbol from '
-      '${_describeMarket(source, sourcePrice)} '
-      'to ${_describeMarket(destination, destinationPrice)} '
+      '${source.waypointName} to ${destination.waypointName} '
       'distance = $distance',
     );
   }
@@ -68,10 +63,19 @@ class DescribingVisitor extends SupplyLinkVisitor {
     required int depth,
   }) async {
     final spaces = _indent * depth;
-    final inputSymbols = link.inputs.keys.map((s) => s.toString()).join(', ');
+    final inputStrings = <String>[];
+    final waypointSymbol = link.waypointSymbol;
+    for (final inputSymbol in link.inputs.keys) {
+      final price = await db.marketPriceAt(waypointSymbol, inputSymbol);
+      inputStrings.add(_describeGood(inputSymbol, price));
+    }
+    final inputSymbols = inputStrings.join(', ');
+    final name = link.waypointSymbol.waypointName;
+    final sourcePrice =
+        await db.marketPriceAt(link.waypointSymbol, link.tradeSymbol);
     logger.info(
-      '${spaces}Manufacture ${link.tradeSymbol} '
-      'at ${link.waypointSymbol} from $inputSymbols',
+      '${spaces}Manufacture ${_describeGood(link.tradeSymbol, sourcePrice)} '
+      'at $name from $inputSymbols',
     );
   }
 }
