@@ -10,6 +10,11 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 
+Future<bool> _sellsFuel(Database db, WaypointSymbol waypointSymbol) async {
+  final listing = await db.marketListingForSymbol(waypointSymbol);
+  return listing?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
+}
+
 /// Go wait to be filled by miners.
 Future<JobResult> goWaitForGoods(
   BehaviorState state,
@@ -33,8 +38,30 @@ Future<JobResult> goWaitForGoods(
     'Mine job changed',
     const Duration(minutes: 1),
   );
+  final currentSellsFuel = await _sellsFuel(db, ship.waypointSymbol);
+  final medianFuelPurchasePrice =
+      await db.medianPurchasePrice(TradeSymbol.FUEL);
 
   if (ship.waypointSymbol != mineSymbol) {
+    final mineSellsFuel = await _sellsFuel(db, mineSymbol);
+    final fuelToBuy = (ship.frame.fuelCapacity / 100).ceil();
+    if (!mineSellsFuel &&
+        currentSellsFuel &&
+        ship.cargo.availableSpace >= fuelToBuy) {
+      logger.warn('BUYING FUEL CARGO FOR LATER USE');
+      await dockIfNeeded(db, api, ship);
+      await purchaseCargoAndLog(
+        api,
+        db,
+        caches.agent,
+        ship,
+        TradeSymbol.FUEL,
+        AccountingType.fuel,
+        amountToBuy: fuelToBuy,
+        medianPrice: medianFuelPurchasePrice,
+      );
+    }
+
     final waitTime = await beingNewRouteAndLog(
       api,
       db,
@@ -45,6 +72,22 @@ Future<JobResult> goWaitForGoods(
       mineSymbol,
     );
     return JobResult.wait(waitTime);
+  }
+
+  // If the mine doesn't sell fuel, and we have fuel, refuel.
+  if (!currentSellsFuel &&
+      !ship.isFuelFull &&
+      ship.cargo.countUnits(TradeSymbol.FUEL) > 0) {
+    logger.warn('REFUELING FROM CARGO');
+    await dockIfNeeded(db, api, ship);
+    await refuelAndLog(
+      api,
+      db,
+      caches.agent,
+      ship,
+      medianFuelPurchasePrice: medianFuelPurchasePrice,
+      fromCargo: true,
+    );
   }
 
   // Transfering goods requires being the same orbit state.

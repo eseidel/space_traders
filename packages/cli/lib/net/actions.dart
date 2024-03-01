@@ -352,8 +352,27 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   )) {
     return null;
   }
+  return refuelAndLog(
+    api,
+    db,
+    agentCache,
+    ship,
+    medianFuelPurchasePrice: medianFuelPurchasePrice,
+  );
+}
+
+/// Refuel the ship and log the transaction.
+Future<RefuelShip200ResponseData?> refuelAndLog(
+  Api api,
+  Database db,
+  AgentCache agentCache,
+  Ship ship, {
+  required int? medianFuelPurchasePrice,
+  bool fromCargo = false,
+}) async {
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
-  final data = await refuelShip(db, api, agentCache, ship);
+  final data =
+      await refuelShip(db, api, agentCache, ship, fromCargo: fromCargo);
   final marketTransaction = data.transaction;
   final agent = agentCache.agent;
   logMarketTransaction(

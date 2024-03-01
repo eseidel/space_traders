@@ -218,12 +218,15 @@ Future<RefuelShip200ResponseData> refuelShip(
   Database db,
   Api api,
   AgentCache agentCache,
-  Ship ship,
-) async {
+  Ship ship, {
+  bool fromCargo = false,
+}) async {
   // We used to have logic to avoid filling to full, but our route planner
   // doesn't account for non-full tanks, so for now we just always
   // refill to full.
-  final responseWrapper = await api.fleet.refuelShip(ship.symbol);
+  final request = fromCargo ? RefuelShipRequest(fromCargo: fromCargo) : null;
+  final responseWrapper =
+      await api.fleet.refuelShip(ship.symbol, refuelShipRequest: request);
   final data = responseWrapper!.data;
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;
