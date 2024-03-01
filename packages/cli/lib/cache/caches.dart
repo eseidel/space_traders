@@ -108,7 +108,7 @@ class Caches {
     Database db, {
     Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
   }) async {
-    // Intentionally force refresh ships and contracts in case we've been offline.
+    // Force refresh ships and contracts in case we've been offline.
     await fetchShips(db, api);
     await fetchContracts(db, api);
 

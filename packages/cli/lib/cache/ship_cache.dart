@@ -16,12 +16,14 @@ extension ShipUpdateUtils on Ship {
         cooldown = Cooldown(
           shipSymbol: cooldown.shipSymbol,
           remainingSeconds: 0,
-          totalSeconds: cooldown.totalSeconds,
+          totalSeconds: 0,
         );
       } else {
         cooldown = Cooldown(
           shipSymbol: cooldown.shipSymbol,
-          remainingSeconds: expiration.difference(now).inSeconds,
+          // The server seems to round rather than floor?
+          remainingSeconds:
+              (expiration.difference(now).inMilliseconds / 1000).round(),
           totalSeconds: cooldown.totalSeconds,
           expiration: expiration,
         );
