@@ -1,5 +1,7 @@
 import 'package:cli/cache/caches.dart';
+import 'package:cli/extraction_score.dart';
 import 'package:cli/logger.dart';
+import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
 final _minable = <TradeSymbol>{
@@ -117,8 +119,22 @@ class ManufactureLink extends ProduceLink {
   }
 }
 
+bool? _hasExtractableGood(
+  ChartingSnapshot chartingSnapshot,
+  SystemWaypoint waypoint,
+  TradeSymbol tradeSymbol,
+) {
+  final chartedValues = chartingSnapshot[waypoint.symbol]?.values;
+  if (chartedValues == null) {
+    return null;
+  }
+  return extractableGoodsAt(waypoint.type, chartedValues.traitSymbols)
+      .contains(tradeSymbol);
+}
+
 WaypointSymbol? _nearestExtractionSiteFor(
   SystemsCache systemsCache,
+  ChartingSnapshot chartingSnapshot,
   TradeSymbol tradeSymbol,
   WaypointSymbol waypointSymbol,
 ) {
@@ -126,13 +142,13 @@ WaypointSymbol? _nearestExtractionSiteFor(
   final candidates = systemsCache
       .waypointsInSystem(waypointSymbol.system)
       .where(
-        (waypoint) =>
-            waypoint.isAsteroid || waypoint.type == WaypointType.GAS_GIANT,
+        (waypoint) => _hasExtractableGood(
+          chartingSnapshot,
+          waypoint,
+          tradeSymbol,
+        )!,
       )
-      .toList()
-    ..sort(
-      (a, b) => a.distanceTo(destination).compareTo(b.distanceTo(destination)),
-    );
+      .sortedBy<num>((w) => w.distanceTo(destination));
   return candidates.firstOrNull?.symbol;
 }
 
@@ -142,24 +158,18 @@ MarketListing? _nearestListingWithExport(
   TradeSymbol tradeSymbol,
   WaypointSymbol waypointSymbol,
 ) {
-  final listings = marketListings.listings
+  final destination = systemsCache.waypoint(waypointSymbol);
+  final sortedListings = marketListings.listings
       // Listings in this same system which export the good.
       .where(
         (entry) =>
             entry.waypointSymbol.system == waypointSymbol.system &&
             entry.exports.contains(tradeSymbol),
       )
-      .toList();
-  final destination = systemsCache.waypoint(waypointSymbol);
-  listings.sort(
-    (a, b) => systemsCache
-        .waypoint(a.waypointSymbol)
-        .distanceTo(destination)
-        .compareTo(
-          systemsCache.waypoint(b.waypointSymbol).distanceTo(destination),
-        ),
-  );
-  return listings.firstOrNull;
+      .sortedBy<num>(
+        (l) => systemsCache.waypoint(l.waypointSymbol).distanceTo(destination),
+      );
+  return sortedListings.firstOrNull;
 }
 
 /// Builds a supply chain.
@@ -169,13 +179,16 @@ class SupplyChainBuilder {
     required SystemsCache systems,
     required MarketListingSnapshot marketListings,
     required TradeExportCache exports,
+    required ChartingSnapshot charting,
   })  : _marketListings = marketListings,
         _systems = systems,
-        _exports = exports;
+        _exports = exports,
+        _charting = charting;
 
   final MarketListingSnapshot _marketListings;
   final SystemsCache _systems;
   final TradeExportCache _exports;
+  final ChartingSnapshot _charting;
 
   ProduceLink? _shuttleSource(
     TradeSymbol tradeSymbol,
@@ -186,6 +199,7 @@ class SupplyChainBuilder {
       // Find the nearest extraction location?
       final location = _nearestExtractionSiteFor(
         _systems,
+        _charting,
         tradeSymbol,
         waypointSymbol,
       );

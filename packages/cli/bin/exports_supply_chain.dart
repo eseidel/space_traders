@@ -22,7 +22,8 @@ String _describeGood(TradeSymbol tradeSymbol, MarketPrice? price) {
   if (price == null) {
     return '$tradeSymbol null';
   }
-  return '$tradeSymbol (${price.supply}, ${price.activity})';
+  return '$tradeSymbol (${price.supply}, '
+      '${price.activity}, ${price.tradeVolume})';
 }
 
 /// Walk the supply chain and print it.
@@ -84,6 +85,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final exports = TradeExportCache.load(fs);
   final systems = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
+  final charting = await ChartingSnapshot.load(db);
   final agent = await myAgent(db);
 
   final jumpgate =
@@ -101,6 +103,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       systems: systems,
       exports: exports,
       marketListings: marketListings,
+      charting: charting,
     ).buildChainTo(tradeSymbol, waypointSymbol);
     if (action == null) {
       logger.warn('No supply chain to bring $tradeSymbol to $waypointSymbol');

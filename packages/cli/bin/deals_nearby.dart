@@ -43,6 +43,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
 
   final exportCache = TradeExportCache.load(fs);
   final behaviors = await BehaviorSnapshot.load(db);
+  final charting = await ChartingSnapshot.load(db);
 
   if (construction != null) {
     centralCommand.subsidizedSellOpps =
@@ -51,6 +52,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
       systemsCache,
       exportCache,
       marketListings,
+      charting,
       construction,
     );
   }

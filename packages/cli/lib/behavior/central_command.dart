@@ -557,6 +557,7 @@ class CentralCommand {
     final marketListings = await MarketListingSnapshot.load(db);
     final ships = await ShipSnapshot.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
+    final charting = await ChartingSnapshot.load(db);
 
     _assignedSystemsForSatellites
       ..clear()
@@ -587,6 +588,7 @@ class CentralCommand {
         caches.systems,
         caches.static.exports,
         marketListings,
+        charting,
         activeConstruction!,
       );
     }
@@ -1059,6 +1061,7 @@ Future<List<SellOpp>> computeConstructionMaterialSubsidies(
   SystemsCache systems,
   TradeExportCache exports,
   MarketListingSnapshot marketListings,
+  ChartingSnapshot charting,
   Construction construction,
 ) async {
   final neededExports = construction.materials
@@ -1070,6 +1073,7 @@ Future<List<SellOpp>> computeConstructionMaterialSubsidies(
       systems: systems,
       exports: exports,
       marketListings: marketListings,
+      charting: charting,
     ).buildChainTo(symbol, construction.waypointSymbol);
     if (chain != null) {
       sellOpps.addAll(

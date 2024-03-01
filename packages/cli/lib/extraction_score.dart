@@ -34,21 +34,30 @@ Set<TradeSymbol> extractableSymbols(ExtractionType type) {
   }
 }
 
-/// Returns TradeSymbols expected from mining at a given WaypointType and
-/// WaypointTraits.
-Set<TradeSymbol> expectedGoodsForWaypoint(
+/// Returns TradeSymbols expected to be extractable at a given [waypointType]
+/// and [waypointTraits].
+Set<TradeSymbol> extractableGoodsAt(
   WaypointType waypointType,
   Set<WaypointTraitSymbol> waypointTraits,
-  ExtractionType extractionType,
 ) {
   // Reportedly SpaceAdmiral has said that Astroid implies MINERAL_DEPOSITS:
   // https://discord.com/channels/792864705139048469/792864705139048472/1178507596433465446
   final traitGoods =
       waypointTraits.map((t) => tradeSymbolsByTrait[t] ?? {}).expand((e) => e);
   final typeGoods = tradeSymbolsByType[waypointType] ?? {};
-  final goods = traitGoods.toSet().union(typeGoods);
+  return traitGoods.toSet().union(typeGoods);
+}
+
+/// Returns TradeSymbols expected from using [extractionType] at a given
+/// [waypointType] and [waypointTraits].
+Set<TradeSymbol> expectedGoodsForWaypoint(
+  WaypointType waypointType,
+  Set<WaypointTraitSymbol> waypointTraits,
+  ExtractionType extractionType,
+) {
   // Should we restrict by survey mounts?
-  return goods.intersection(extractableSymbols(extractionType));
+  return extractableGoodsAt(waypointType, waypointTraits)
+      .intersection(extractableSymbols(extractionType));
 }
 
 /// Evaluate an extraction site and Market pairing
