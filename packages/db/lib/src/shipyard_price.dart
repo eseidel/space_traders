@@ -18,7 +18,8 @@ Query upsertShipyardPriceQuery(ShipyardPrice price) => Query(
 
 /// Query to get the timestamp of the most recent shipyard price for a waypoint.
 Query timestampOfMostRecentShipyardPriceQuery(WaypointSymbol symbol) => Query(
-      'SELECT MAX(timestamp) FROM shipyard_price_ WHERE waypoint_symbol = @symbol',
+      'SELECT MAX(timestamp) FROM shipyard_price_ '
+      'WHERE waypoint_symbol = @symbol',
       parameters: {'symbol': symbol.toJson()},
     );
 

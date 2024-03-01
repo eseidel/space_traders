@@ -27,7 +27,8 @@ Query contractByIdQuery(String id) {
 /// Get all contracts which are !fulfilled and expiration date is in the future.
 Query activeContractsQuery() {
   return Query(
-    "SELECT * FROM contract_ WHERE fulfilled = 'false' AND 'deadline_to_accept' > @now",
+    'SELECT * FROM contract_ '
+    "WHERE fulfilled = 'false' AND 'deadline_to_accept' > @now",
     parameters: {'now': DateTime.timestamp()},
   );
 }
