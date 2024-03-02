@@ -225,7 +225,18 @@ void main() {
 
   test('transferCargoAndLog', () async {
     final db = _MockDatabase();
-    final shipCargo = ShipCargo(capacity: 100, units: 10);
+    final shipCargo = ShipCargo(
+      capacity: 100,
+      units: 10,
+      inventory: [
+        ShipCargoItem(
+          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
+          units: 10,
+          description: '',
+          name: '',
+        ),
+      ],
+    );
     final fromSymbol = ShipSymbol.fromString('S-1');
     final fromShip = _MockShip();
     when(() => fromShip.symbol).thenReturn(fromSymbol.symbol);

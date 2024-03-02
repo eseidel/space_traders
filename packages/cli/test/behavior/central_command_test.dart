@@ -549,6 +549,7 @@ void main() {
     when(caches.construction.allRecords).thenAnswer((_) async => []);
     when(db.allMarketListings).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
+    when(db.allShipyardListings).thenAnswer((_) async => []);
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);

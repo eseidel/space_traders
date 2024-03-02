@@ -198,6 +198,8 @@ void main() {
     when(db.allShips).thenAnswer((_) async => []);
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
 
+    when(() => caches.marketPrices.prices).thenReturn([]);
+
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
