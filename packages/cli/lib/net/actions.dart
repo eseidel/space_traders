@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/behavior/behavior.dart';
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/direct.dart';

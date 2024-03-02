@@ -1,4 +1,4 @@
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 /// Walks our known system graph, starting from HQ and prints systems needing

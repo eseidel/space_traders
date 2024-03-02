@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/system_pathing.dart';
 import 'package:cli/nav/waypoint_pathing.dart';

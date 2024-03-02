@@ -9,7 +9,7 @@ import 'package:cli/behavior/siphoner.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/behavior/system_watcher.dart';
 import 'package:cli/behavior/trader.dart';
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/exceptions.dart';

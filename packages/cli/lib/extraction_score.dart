@@ -1,4 +1,4 @@
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';

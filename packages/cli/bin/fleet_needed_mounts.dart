@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {

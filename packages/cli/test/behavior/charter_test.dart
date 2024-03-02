@@ -1,7 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/charter.dart';
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:file/memory.dart';

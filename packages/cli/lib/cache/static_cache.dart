@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/cache/json_list_store.dart';
 import 'package:cli/compare.dart';
 import 'package:collection/collection.dart';

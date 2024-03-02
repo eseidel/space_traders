@@ -1,5 +1,5 @@
 import 'package:cli/behavior/central_command.dart';
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:equatable/equatable.dart';

@@ -1,5 +1,5 @@
 import 'package:args/args.dart';
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';

@@ -4,7 +4,7 @@ import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/charter.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
 import 'package:cli/behavior/system_watcher.dart';
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/extraction_score.dart';
 import 'package:cli/logger.dart';

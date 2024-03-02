@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cli/cache/caches.dart';
+import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/compare.dart';
 import 'package:equatable/equatable.dart';
