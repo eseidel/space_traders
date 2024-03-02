@@ -912,11 +912,6 @@ This might be fixed by considering jettisoning goods.
 The client doesn't seem to do this right now.  But did do so once I ran the
 jumpgates.dart script.
 
-### Add a way to queue a jump gate for evaluation.
-
-Right now when we complete a jump gate (or chart one) we don't have any way
-to queue the idle fetcher to process it.
-
 ### Waypoint cache is not using maxAge.
 
 We should be scanning a system before we travel to it.  But right now we
@@ -1054,10 +1049,6 @@ new ships even after they're queued.
 
 Would only need to apply to trades at low c/s.
 
-### Add missing ship if ship count changed right after advanceShip.
-
-This should already be happening. Not sure how we double-buy though?
-
 ### Bring back phases.
 
 - Some sort of initial phase (plan trades based on import/export?)
@@ -1079,8 +1070,6 @@ This should already be happening. Not sure how we double-buy though?
 * Can us the "when done" logic to predict when we sell inventory.
 * Can use the historical data for miners.
 
-### Upgrade to package:postgres 3.x
-
 ### Add a system for managing cash-flow to avoid missing trades from low cash.
 
 ### Mining Haulers still confused:
@@ -1088,24 +1077,6 @@ This should already be happening. Not sure how we double-buy though?
 🛸#E  Still have 12 cargo, waiting for hauler to arrive.
 🛸#E  No haulers at TV94-B44, unknown next arrival time for ESEIDEL-6, checking in 1 minute.
 🛸#E  Hauler ESEIDEL-6 is IN_ORBIT to TV94-B44 arrival -30m, with 0 space available.
-
-### Add back market feeding for construction supply chains.
-
-Try this time to just change the SellOpps of the required goods to be boosted
-by 2x or something.
-
-### Miner haulers need to plan to have enough fuel to come back from mine.
-
-Mines don't sell fuel, so we need to make sure we have enough fuel to get back
-to the market.  Either by bringing fuel, or toping up before leaving.
-
-🛸#A  No haulers at TV94-B10, unknown next arrival time for ESEIDEL-4, checking in 1 minute.
-🛸#A  Hauler ESEIDEL-4 is IN_TRANSIT to TV94-H61 arrival 52m, with 0 space available.
-🛸#C  No haulers at TV94-B42, unknown next arrival time for ESEIDEL-5, checking in 1 minute.
-🛸#C  Hauler ESEIDEL-5 is IN_TRANSIT to TV94-F56 arrival 1h, with 0 space available.
-
-[WARN] 🛸#6  Beginning route to TV94-B44 (16m)
-🛸#6  🛫 to TV94-B44 ASTEROID (16m) spent 368 fuel
 
 ### Make sure that hauler routes are cruise-able with the given hauler.
 
@@ -1149,7 +1120,6 @@ rather than an import.
 
 I suspect that "home systems" look different only by types / number of waypoints.
 
-
 ### Planning fail.
 
 🛸#1  ✈️  to AQ24-D43, -7s left
@@ -1176,11 +1146,9 @@ in 8m uses 529 fuel
 🛸#1  Insufficient fuel, drifting to AQ24-I53
 🛸#1  🛫 to AQ24-I53 JUMP_GATE (55m) spent 1 fuel
 
-
 ### Show trade volumes in deals_nearby.
 
 ### Account for incoming purchases when planning trades sourcing from the same spot?
-
 
 ### Planned a trade, then tried to jump and failed, cleared state
 
@@ -1210,9 +1178,15 @@ dart run bin/behavior.dart 29
  }
 ]
 
-  "cooldown": {
-   "shipSymbol": "ESEIDEL-29",
-   "totalSeconds": 6944,
-   "remainingSeconds": 6943,
-   "expiration": "2024-03-01T18:17:10.909Z"
-  },
+"cooldown": {
+  "shipSymbol": "ESEIDEL-29",
+  "totalSeconds": 6944,
+  "remainingSeconds": 6943,
+  "expiration": "2024-03-01T18:17:10.909Z"
+},
+
+### Add db profiling code.
+
+### Move logs into db.
+
+### Add explorer/warp logic.

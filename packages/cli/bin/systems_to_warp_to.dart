@@ -53,8 +53,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     systemsToWarpTo.add(system);
   }
 
+  logger.info(
+    '$limit closest systems with $desiredMarketCount markets '
+    'from $startSystemSymbol',
+  );
   for (final system in systemsToWarpTo) {
-    logger.info('${system.symbol}');
+    final distance = system.distanceTo(startSystem);
+    logger.info(' ${system.symbol} $distance');
   }
 }
 
