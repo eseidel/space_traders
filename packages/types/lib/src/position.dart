@@ -51,4 +51,7 @@ class WaypointPosition extends Position {
     final dy = other.y - y;
     return sqrt(dx * dx + dy * dy);
   }
+
+  @override
+  String toString() => '$x, $y in $system';
 }
