@@ -35,7 +35,7 @@ export 'package:cli/cache/market_listing_snapshot.dart';
 export 'package:cli/cache/market_price_snapshot.dart';
 export 'package:cli/cache/ship_snapshot.dart';
 export 'package:cli/cache/shipyard_listing_snapshot.dart';
-export 'package:cli/cache/shipyard_prices.dart';
+export 'package:cli/cache/shipyard_price_snapshot.dart';
 export 'package:cli/cache/static_cache.dart';
 export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';

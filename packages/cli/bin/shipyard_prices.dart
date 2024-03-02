@@ -1,5 +1,5 @@
 import 'package:cli/cache/shipyard_listing_snapshot.dart';
-import 'package:cli/cache/shipyard_prices.dart';
+import 'package:cli/cache/shipyard_price_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
