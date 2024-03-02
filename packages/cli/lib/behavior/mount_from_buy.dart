@@ -1,4 +1,4 @@
-import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/job.dart';
 import 'package:cli/behavior/jobs/buy_job.dart';
 import 'package:cli/behavior/jobs/mount_job.dart';
 import 'package:cli/caches.dart';

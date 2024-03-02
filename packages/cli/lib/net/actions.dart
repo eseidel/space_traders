@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/job.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';

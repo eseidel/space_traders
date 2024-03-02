@@ -1,4 +1,4 @@
-import 'package:cli/behavior/behavior.dart';
+import 'package:cli/behavior/job.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/charter.dart';
 import 'package:cli/behavior/miner.dart';
