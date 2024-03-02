@@ -24,10 +24,17 @@ Future<int> computeShipValue(
   ShipyardShipCache shipyardShips,
   ShipyardPriceSnapshot shipyardPrices,
 ) async {
+  ShipType shipTypeForShip(Ship ship) {
+    final type = guessShipType(shipyardShips, ship);
+    if (type == null) {
+      throw StateError('Unknown ship type for frame: ${ship.frame.symbol}');
+    }
+    return type;
+  }
+
+  // Ignoring the first two ships, since they come for free.
   final purchasedShips = ships.ships.skip(2).toList();
-  final purchaseShipTypes = purchasedShips
-      .map((s) => shipyardShips.shipTypeFromFrame(s.frame.symbol)!)
-      .toList();
+  final purchaseShipTypes = purchasedShips.map(shipTypeForShip).toList();
   final totalShipCost =
       purchaseShipTypes.map((s) => shipyardPrices.medianPurchasePrice(s)!).sum;
 

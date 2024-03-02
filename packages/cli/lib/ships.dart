@@ -89,6 +89,33 @@ extension ShipTypeToFrame on ShipyardShipCache {
   }
 }
 
+/// Attempt to determine ShipType from a Ship.  Since Ships can be modified
+/// after purchase there is not always a 1:1 mapping from Ship back to ShipType.
+ShipType? guessShipType(ShipyardShipCache shipyardShipCache, Ship ship) {
+  final frame = ship.frame;
+  final type = shipyardShipCache.shipTypeFromFrame(frame.symbol);
+  if (type != null) {
+    return type;
+  }
+  if (frame.symbol == ShipFrameSymbolEnum.DRONE) {
+    if (ship.hasMiningLaser) {
+      return ShipType.MINING_DRONE;
+    }
+    if (ship.hasSiphon) {
+      return ShipType.SIPHON_DRONE;
+    }
+    if (ship.hasSurveyor) {
+      return ShipType.SURVEYOR;
+    }
+  }
+  if (frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER) {
+    if (ship.hasOreRefinery) {
+      return ShipType.REFINING_FREIGHTER;
+    }
+  }
+  return null;
+}
+
 /// Provides Ship data that ShipyardShip does not.
 /// Right now that's only Role, but it could be more in the future.
 @immutable

@@ -12,23 +12,6 @@ String describeJob(ExtractionJob job) {
   return '$action @ $sourceName';
 }
 
-ShipType? guessType(ShipyardShipCache shipyardShipCache, Ship ship) {
-  final frame = ship.frame;
-  final type = shipyardShipCache.shipTypeFromFrame(frame.symbol);
-  if (type != null) {
-    return type;
-  }
-  if (frame.symbol == ShipFrameSymbolEnum.DRONE) {
-    if (ship.hasMiningLaser) {
-      return ShipType.MINING_DRONE;
-    }
-    if (ship.hasSurveyor) {
-      return ShipType.SURVEYOR;
-    }
-  }
-  return null;
-}
-
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
@@ -48,7 +31,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     final squad = squads[i];
     logger.info('Squad $i: ${describeJob(squad.job)}');
     for (final ship in squad.ships) {
-      final type = guessType(shipyardShipCache, ship)!;
+      final type = guessShipType(shipyardShipCache, ship)!;
       final typeName = type.value.substring('SHIP_'.length);
       final cargoStatus = ship.cargo.capacity == 0
           ? ''

@@ -183,6 +183,10 @@ extension ShipUtils on Ship {
   bool get hasSiphon =>
       mounts.any((m) => kSiphonMountSymbols.contains(m.symbol));
 
+  /// Returns true if the ship has a refinery mount.
+  bool get hasOreRefinery =>
+      modules.any((m) => m.symbol == ShipModuleSymbolEnum.ORE_REFINERY_I);
+
   /// Returns true if the ship is in transit.
   bool get isInTransit => nav.status == ShipNavStatus.IN_TRANSIT;
 
