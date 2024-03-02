@@ -365,8 +365,10 @@ class Database {
   }
 
   /// Get all transactions from the database.
+  /// Currently returns in timestamp order, but that may not always be the case.
   Future<Iterable<Transaction>> allTransactions() async {
-    final result = await connection.execute('SELECT * FROM transaction_');
+    final result = await connection
+        .execute('SELECT * FROM transaction_ ORDER BY timestamp');
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
   }
 
