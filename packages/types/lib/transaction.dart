@@ -318,6 +318,12 @@ class Transaction extends Equatable {
     return sign * perUnitPrice * quantity;
   }
 
+  /// Purchase from market.  tradeType can be null for non-market transactions.
+  bool get isPurchase => tradeType == MarketTransactionTypeEnum.PURCHASE;
+
+  /// Sale to market. tradeType can be null for non-market transactions.
+  bool get isSale => tradeType == MarketTransactionTypeEnum.SELL;
+
   /// Convert the transaction to json.
   /// This only exists to support CostedDeal.toJson and should be removed.
   Map<String, dynamic> toJson() {
