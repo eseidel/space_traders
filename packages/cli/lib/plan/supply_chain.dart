@@ -1,5 +1,5 @@
 import 'package:cli/caches.dart';
-import 'package:cli/extraction_score.dart';
+import 'package:cli/plan/extraction_score.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';

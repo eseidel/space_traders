@@ -5,7 +5,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/exploring.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/market_scores.dart';
+import 'package:cli/plan/market_scores.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/exceptions.dart';

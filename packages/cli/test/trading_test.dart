@@ -1,7 +1,7 @@
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/market_scan.dart';
+import 'package:cli/plan/market_scan.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/trading.dart';

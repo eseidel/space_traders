@@ -1,6 +1,6 @@
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/market_scores.dart';
+import 'package:cli/plan/market_scores.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.load(db);

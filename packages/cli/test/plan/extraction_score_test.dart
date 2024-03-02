@@ -1,6 +1,6 @@
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/extraction_score.dart';
+import 'package:cli/plan/extraction_score.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

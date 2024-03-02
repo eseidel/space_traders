@@ -3,7 +3,7 @@ import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
-import 'package:cli/extraction_score.dart';
+import 'package:cli/plan/extraction_score.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
 

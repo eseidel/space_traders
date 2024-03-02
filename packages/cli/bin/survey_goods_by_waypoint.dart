@@ -1,6 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/extraction_score.dart';
+import 'package:cli/plan/extraction_score.dart';
 
 class _Stats {
   Set<TradeSymbol> tradeSymbols = {};

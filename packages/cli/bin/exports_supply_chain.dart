@@ -1,7 +1,7 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
-import 'package:cli/supply_chain.dart';
+import 'package:cli/plan/supply_chain.dart';
 
 // Returns the distance between two waypoints, or null if they are in different
 // systems.
