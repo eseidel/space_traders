@@ -60,6 +60,7 @@ class Config {
     for (int i = 0; i < 13; i++) ShipType.LIGHT_HAULER,
     for (int i = 0; i < 20; i++) ShipType.PROBE,
     for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 20; i++) ShipType.PROBE,
     for (int i = 0; i < 20; i++) ShipType.EXPLORER,
     // ShipType.EXPLORER,
   ];

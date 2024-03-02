@@ -1190,3 +1190,13 @@ dart run bin/behavior.dart 29
 ### Move logs into db.
 
 ### Add explorer/warp logic.
+
+### SystemWatcher should clear after every visit, even if it's already charted.
+
+### Figure out how to trace execution of the client (and show in systrace).
+
+### Fix ShipSnapshot compare to ignore Cooldown.
+
+### Build a profit/loss statement.
+
+### Build a cash flow statement.
