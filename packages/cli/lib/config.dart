@@ -4,17 +4,30 @@ import 'package:types/types.dart';
 /// This is used as a default argument and must be const.
 const defaultMaxAge = Duration(days: 3);
 
+/// Which game phase are we in.
+enum GamePhase with EnumIndexOrdering {
+  /// Initially just buying haulers and getting trading going.
+  bootstrap,
+
+  /// Focused on building the jumpgate.
+  construction,
+
+  /// Focused on explorating the galaxy to find better ships.
+  exploration,
+}
+
+/// Which phase are we in.
+// TODO(eseidel): Make this dynamic.
+const gamePhase = GamePhase.exploration;
+
 /// Class for holding our hard-coded configuration values.
 class Config {
   // TODO(eseidel): This should be configured at runtime.
   /// The symbol of the agent we are controlling.
   final String agentSymbol = 'ESEIDEL';
 
-  /// Whether or not we should enable the idle queue.
-  final bool serviceIdleQueue = false;
-
   /// Whether or not we should enable mining behaviors.
-  final bool enableMining = true;
+  final bool enableMining = gamePhase < GamePhase.exploration;
 
   /// Controls how many loops we run of ships before doing our central
   /// planning (assigning ships to squads, planning mounts, etc.)
@@ -45,15 +58,16 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
     for (int i = 0; i < 13; i++) ShipType.LIGHT_HAULER,
-    // for (int i = 0; i < 40; i++) ShipType.PROBE,
-    // for (int i = 0; i < 50; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 20; i++) ShipType.PROBE,
+    for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 20; i++) ShipType.EXPLORER,
     // ShipType.EXPLORER,
   ];
 
   // TODO(eseidel): Should be some dynamic min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
   /// Number of haulers to use as miner haulers.
-  final minerHaulerCount = 6;
+  int get minerHaulerCount => (gamePhase == GamePhase.construction) ? 6 : 0;
 
   /// Used as a fallback for constructing Behaviors if there isn't explicit
   /// logic in getJobForShip.
@@ -130,7 +144,7 @@ class Config {
   // stuck with auto-drifting ships holding the lock for 6hrs.
   // This can cause cash-flow problems early on, since many ships will try
   // to buy the high priced materials at once.
-  final allowParallelConstructionDelivery = false;
+  final allowParallelConstructionDelivery = true;
 
   /// The amount of credits to subsidize each unit of construction materials.
   int subsidyForSupplyLevel(SupplyLevel supplyLevel) {
