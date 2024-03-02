@@ -1,7 +1,7 @@
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/printing.dart';
+import 'package:cli/logic/printing.dart';
 
 Future<void> printContracts(
   Database db,

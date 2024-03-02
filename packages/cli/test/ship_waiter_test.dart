@@ -1,4 +1,4 @@
-import 'package:cli/ship_waiter.dart';
+import 'package:cli/logic/ship_waiter.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

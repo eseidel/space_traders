@@ -1,5 +1,5 @@
 import 'package:cli/cache/static_cache.dart';
-import 'package:cli/ships.dart';
+import 'package:cli/plan/ships.dart';
 import 'package:file/local.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';

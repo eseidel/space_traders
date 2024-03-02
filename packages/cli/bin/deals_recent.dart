@@ -1,5 +1,5 @@
 import 'package:cli/cli.dart';
-import 'package:cli/printing.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:collection/collection.dart';
 
 void main(List<String> args) async {

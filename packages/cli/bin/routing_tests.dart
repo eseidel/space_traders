@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/compare.dart';
+import 'package:cli/logic/compare.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file/memory.dart';
 import 'package:path/path.dart' as path;

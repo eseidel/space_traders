@@ -1,4 +1,4 @@
-import 'package:cli/printing.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 

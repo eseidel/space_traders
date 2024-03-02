@@ -3,10 +3,10 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/logic/printing.dart';
+import 'package:cli/logic/ship_waiter.dart';
 import 'package:cli/net/counts.dart';
 import 'package:cli/net/exceptions.dart';
-import 'package:cli/printing.dart';
-import 'package:cli/ship_waiter.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 

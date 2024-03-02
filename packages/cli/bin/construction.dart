@@ -1,6 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/printing.dart';
+import 'package:cli/logic/printing.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSystemSymbol =

@@ -1,9 +1,9 @@
-import 'package:cli/accounting.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
-import 'package:cli/printing.dart';
-import 'package:cli/ships.dart';
+import 'package:cli/logic/printing.dart';
+import 'package:cli/plan/accounting.dart';
+import 'package:cli/plan/ships.dart';
 import 'package:collection/collection.dart';
 
 class Assets {

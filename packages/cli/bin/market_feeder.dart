@@ -1,7 +1,7 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/trading.dart';
+import 'package:cli/plan/trading.dart';
 import 'package:collection/collection.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {

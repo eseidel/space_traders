@@ -1,6 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/idle_queue.dart';
+import 'package:cli/logic/idle_queue.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Start at the agent's headquarters system.

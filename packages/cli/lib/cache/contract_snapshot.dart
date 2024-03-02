@@ -1,6 +1,6 @@
 import 'package:cli/api.dart';
-import 'package:cli/compare.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/logic/compare.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';

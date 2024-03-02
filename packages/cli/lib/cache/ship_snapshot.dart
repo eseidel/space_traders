@@ -1,7 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/net/queries.dart';
-import 'package:cli/ships.dart';
+import 'package:cli/plan/ships.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';

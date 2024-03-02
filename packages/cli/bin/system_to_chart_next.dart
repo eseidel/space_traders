@@ -1,7 +1,7 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/ships.dart';
+import 'package:cli/plan/ships.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSymbol =

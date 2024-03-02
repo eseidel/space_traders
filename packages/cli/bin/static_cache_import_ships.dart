@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/ships.dart';
+import 'package:cli/plan/ships.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);

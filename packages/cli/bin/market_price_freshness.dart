@@ -1,6 +1,6 @@
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/printing.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:stats/stats.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {

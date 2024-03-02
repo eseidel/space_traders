@@ -1,8 +1,8 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/printing.dart';
-import 'package:cli/trading.dart';
+import 'package:cli/plan/trading.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);

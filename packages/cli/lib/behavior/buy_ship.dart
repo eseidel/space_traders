@@ -6,7 +6,7 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/net/queries.dart';
-import 'package:cli/trading.dart';
+import 'package:cli/plan/trading.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 

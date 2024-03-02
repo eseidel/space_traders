@@ -1,9 +1,9 @@
 import 'package:cli/behavior/central_command.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/printing.dart';
-import 'package:cli/trading.dart';
+import 'package:cli/plan/trading.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {

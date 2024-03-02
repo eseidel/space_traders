@@ -1,5 +1,5 @@
 import 'package:cli/cli.dart';
-import 'package:cli/printing.dart';
+import 'package:cli/logic/printing.dart';
 
 String describeTransaction(Transaction t) {
   return '${t.timestamp} ${t.tradeSymbol} ${t.quantity} ${t.tradeType} '

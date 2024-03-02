@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:cli/compare.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/logic/compare.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';

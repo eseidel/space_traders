@@ -3,7 +3,7 @@ import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/mining.dart';
+import 'package:cli/plan/mining.dart';
 import 'package:db/db.dart';
 import 'package:file/local.dart';
 import 'package:mocktail/mocktail.dart';

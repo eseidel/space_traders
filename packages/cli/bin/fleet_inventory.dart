@@ -1,6 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/printing.dart';
+import 'package:cli/logic/printing.dart';
 
 Future<void> main(List<String> args) async {
   await runOffline(args, command);

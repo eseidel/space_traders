@@ -4,9 +4,9 @@ import 'package:cli/behavior/behavior.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:cli/net/direct.dart';
 import 'package:cli/net/exceptions.dart';
-import 'package:cli/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 

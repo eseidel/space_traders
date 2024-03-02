@@ -4,7 +4,7 @@ import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/ships.dart';
+import 'package:cli/plan/ships.dart';
 
 String describeJob(ExtractionJob job) {
   final action = job.extractionType.name;

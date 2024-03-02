@@ -1,7 +1,7 @@
 import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/printing.dart';
-import 'package:cli/trading.dart';
+import 'package:cli/logic/printing.dart';
+import 'package:cli/plan/trading.dart';
 import 'package:types/types.dart';
 
 /// Callback to find the next deal for the given [ship]
