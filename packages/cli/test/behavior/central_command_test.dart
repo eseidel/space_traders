@@ -79,14 +79,17 @@ void main() {
       when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
       when(() => shipNav.systemSymbol).thenReturn(start.systemString);
       when(() => ship.nav).thenReturn(shipNav);
-      when(() => db.behaviorStateBySymbol(shipSymbol)).thenAnswer(
-        (_) async => BehaviorState(
-          shipSymbol,
-          Behavior.charter,
-          routePlan: fakeJump(start, end),
-        ),
+      final behaviorState = BehaviorState(
+        shipSymbol,
+        Behavior.charter,
+        routePlan: fakeJump(start, end),
       );
-      when(() => ships[shipSymbol]).thenReturn(ship);
+      // This is a hack to modify the snapshots:
+      behaviors.states.add(behaviorState);
+      ships.ships.add(ship);
+      when(() => db.behaviorStateBySymbol(shipSymbol)).thenAnswer(
+        (_) async => behaviorState,
+      );
     }
 
     // Sets up a ship X-A with a route from S-A-A to S-A-W.
@@ -110,7 +113,9 @@ void main() {
       [bStart.system, bEnd.system], // Source and destination
     );
     // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
-    // behaviorCache.getBehavior(shipBSymbol)!.routePlan = null;
+    // This is another hack, modifying the snapshot:
+    behaviors.states.firstWhere((b) => b.shipSymbol == shipBSymbol).routePlan =
+        null;
     final otherSystems2 = centralCommand
         .otherCharterSystems(ships, behaviors, shipASymbol)
         .toList();
@@ -125,7 +130,7 @@ void main() {
         .toList();
     expect(
       otherSystems4,
-      <SystemSymbol>[cStart.system, cEnd.system],
+      <SystemSymbol>[bStart.system, cStart.system, cEnd.system],
     );
   });
 
