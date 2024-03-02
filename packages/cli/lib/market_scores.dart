@@ -118,7 +118,7 @@ _ShipPlacement? _findBetterSystemForTrader(
     }
     final placement = _ShipPlacement(
       score: score,
-      distance: shipSystem.distanceTo(closest),
+      distance: shipSystem.distanceTo(closest).round(),
       profitPerSecond: profitPerSecond,
       destinationSymbol: systemJumpGate.symbol,
     );
@@ -142,7 +142,7 @@ System? _closestSystem(
   for (final system in systems) {
     final distance = start.distanceTo(system);
     if (distance < bestDistance) {
-      bestDistance = distance.toDouble();
+      bestDistance = distance;
       bestSystem = system;
     }
   }

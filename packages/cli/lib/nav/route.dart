@@ -67,19 +67,32 @@ int fuelUsedWithinSystem(
   return fuelUsedByDistance(distance, flightMode);
 }
 
-double _speedMultiplier(ShipNavFlightMode flightMode) {
-  switch (flightMode) {
-    case ShipNavFlightMode.CRUISE:
-      return 25;
-    case ShipNavFlightMode.DRIFT:
-      return 250;
-    case ShipNavFlightMode.BURN:
-    case ShipNavFlightMode.STEALTH:
-      throw UnimplementedError('$flightMode speed multiplier not implemented');
-  }
+Map<ShipNavFlightMode, int> _navSpeedMultiplier = {
+  ShipNavFlightMode.CRUISE: 25,
+  ShipNavFlightMode.DRIFT: 250,
+};
+Map<ShipNavFlightMode, int> _warpSpeedMultiplier = {
+  ShipNavFlightMode.CRUISE: 50,
+  ShipNavFlightMode.DRIFT: 300,
+};
 
-  /// This is only needed because ShipNavFlightMode is not an enum.
-  throw UnimplementedError('Unknown flight mode: $flightMode');
+/// The type of travel.
+enum TravelType {
+  /// Traveling using the nav system, only within a system.
+  nav,
+
+  /// Traveling using the warp system, between systems.
+  warp,
+}
+
+double _speedMultiplier(ShipNavFlightMode flightMode, TravelType travelType) {
+  final map =
+      travelType == TravelType.nav ? _navSpeedMultiplier : _warpSpeedMultiplier;
+  final multiplier = map[flightMode];
+  if (multiplier == null) {
+    throw UnimplementedError('Unimplmented $flightMode for $travelType');
+  }
+  return multiplier.toDouble();
 }
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
@@ -92,7 +105,22 @@ int flightTimeByDistanceAndSpeed({
   final double roundedDistance = max(1, distance.roundToDouble());
 
   /// Wiki says round(), but that doesn't match observed behavior with probes.
-  return (roundedDistance * (_speedMultiplier(flightMode) / shipSpeed) + 15)
+  return (roundedDistance *
+              (_speedMultiplier(flightMode, TravelType.nav) / shipSpeed) +
+          15)
+      .floor();
+}
+
+/// Returns the warp time to the given distance.
+int warpTimeByDistanceAndSpeed({
+  required double distance,
+  required int shipSpeed,
+  required ShipNavFlightMode flightMode,
+}) {
+  final double roundedDistance = max(1, distance.roundToDouble());
+  return (roundedDistance *
+              (_speedMultiplier(flightMode, TravelType.warp) / shipSpeed) +
+          15)
       .floor();
 }
 
@@ -105,6 +133,21 @@ int flightTimeWithinSystemInSeconds(
 }) {
   final distance = a.distanceTo(b);
   return flightTimeByDistanceAndSpeed(
+    distance: distance,
+    shipSpeed: shipSpeed,
+    flightMode: flightMode,
+  );
+}
+
+/// Returns the warp time to the given waypoint.
+int warpTimeInSeconds(
+  System a,
+  System b, {
+  required int shipSpeed,
+  ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
+}) {
+  final distance = a.distanceTo(b);
+  return warpTimeByDistanceAndSpeed(
     distance: distance,
     shipSpeed: shipSpeed,
     flightMode: flightMode,
@@ -129,7 +172,7 @@ int cooldownTimeForJumpBetweenSystems(System a, System b) {
   // There is no longer a limit on jump distance, just a question
   // of if two systems are connected by a jumpgate.
   // This would need to check that this two are connected by a jumpgate.
-  return cooldownTimeForJumpDistance(a.distanceTo(b));
+  return cooldownTimeForJumpDistance(a.distanceTo(b).round());
 }
 
 /// Logic for modifying RoutePlans

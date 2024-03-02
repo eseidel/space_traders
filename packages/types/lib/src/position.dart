@@ -22,11 +22,11 @@ class SystemPosition extends Position {
   const SystemPosition(super.x, super.y) : super._();
 
   /// Returns the distance between this position and the given position.
-  int distanceTo(SystemPosition other) {
+  double distanceTo(SystemPosition other) {
     // Use euclidean distance.
     final dx = other.x - x;
     final dy = other.y - y;
-    return sqrt(dx * dx + dy * dy).round();
+    return sqrt(dx * dx + dy * dy);
   }
 }
 

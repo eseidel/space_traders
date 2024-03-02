@@ -173,7 +173,7 @@ class System {
   bool get hasJumpGate => waypoints.any((w) => w.isJumpGate);
 
   /// Returns the distance to the given system.
-  int distanceTo(System other) => position.distanceTo(other.position);
+  double distanceTo(System other) => position.distanceTo(other.position);
 
   /// Converts to [openapi.System].
   @protected

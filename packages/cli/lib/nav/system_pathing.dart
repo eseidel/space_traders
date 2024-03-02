@@ -25,7 +25,7 @@ List<SystemSymbol>? findSystemPath(
   // A* only requires approximate weights.  We could use real weights here
   // but we'd have to remove case which calls this function with the same
   // system (end, end) which will assert in cooldownTimeForJumpBetweenSystems.
-  int approximateTimeBetween(System a, System b) => a.distanceTo(b);
+  int approximateTimeBetween(System a, System b) => a.distanceTo(b).round();
 
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();

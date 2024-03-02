@@ -1,6 +1,7 @@
 import 'package:cli/cache/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
+import 'package:cli/printing.dart';
 import 'package:collection/collection.dart';
 
 // List the 10 nearest systems which have 10+ markets and are not reachable
@@ -13,7 +14,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final startSystemSymbol = await myHqSystemSymbol(db);
 
-  final staticCaches = StaticCaches.load(fs);
+  final waypointTraits = WaypointTraitCache.load(fs);
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionCache = ConstructionCache(db);
   final systemConnectivity = SystemConnectivity.fromJumpGates(
@@ -27,8 +28,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     systemsCache,
     chartingCache,
     constructionCache,
-    staticCaches.waypointTraits,
+    waypointTraits,
   );
+  final shipyardShips = ShipyardShipCache.load(fs);
 
   final reachableSystemSymbols =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
@@ -59,7 +61,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   );
   for (final system in systemsToWarpTo) {
     final distance = system.distanceTo(startSystem);
-    logger.info(' ${system.symbol} $distance');
+    final seconds = warpTimeInSeconds(
+      startSystem,
+      system,
+      shipSpeed: shipyardShips[ShipType.EXPLORER]!.engine.speed,
+    );
+    final timeString = approximateDuration(Duration(seconds: seconds));
+    logger.info(' ${system.symbol} $distance in $timeString');
   }
 }
 
