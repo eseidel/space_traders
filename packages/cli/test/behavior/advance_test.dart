@@ -44,6 +44,11 @@ void main() {
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
+    when(() => centralCommand.getJobForShip(db, ship, any()))
+        .thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
+    registerFallbackValue(BehaviorState.fallbackValue());
+    when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});
+    when(() => db.deleteBehaviorState(shipSymbol)).thenAnswer((_) async => {});
 
     final waitUntil = await runWithLogger(
       logger,
@@ -86,6 +91,10 @@ void main() {
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
+    when(() => centralCommand.getJobForShip(db, ship, any()))
+        .thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
+    registerFallbackValue(BehaviorState.fallbackValue());
+    when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});
 
     final waitUntil = await runWithLogger(
       logger,

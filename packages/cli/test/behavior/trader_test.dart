@@ -57,7 +57,6 @@ void main() {
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     final caches = mockCaches();
     when(db.allContracts).thenAnswer((_) async => <Contract>[]);
-    final behaviors = BehaviorSnapshot([]);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -131,6 +130,7 @@ void main() {
     );
 
     registerFallbackValue(ContractSnapshot([]));
+    registerFallbackValue(BehaviorSnapshot([]));
     when(
       () => centralCommand.findNextDealAndLog(
         caches.agent,
@@ -139,7 +139,7 @@ void main() {
         caches.systems,
         caches.systemConnectivity,
         caches.routePlanner,
-        behaviors,
+        any(),
         ship,
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
@@ -1215,6 +1215,7 @@ void main() {
     when(() => caches.agent.updateAgent(any()))
         .thenAnswer((_) => Future.value());
 
+    registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
@@ -1400,6 +1401,7 @@ void main() {
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
 
+    registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
 
     when(caches.construction.allRecords).thenAnswer((_) async => []);

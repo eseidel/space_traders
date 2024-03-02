@@ -554,6 +554,8 @@ void main() {
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
 
+    when(db.allChartingRecords).thenAnswer((_) async => <ChartingRecord>[]);
+
     final logger = _MockLogger();
     await runWithLogger(
       logger,
