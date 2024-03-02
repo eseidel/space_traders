@@ -1,5 +1,5 @@
-import 'package:cli/cache/behavior_cache.dart';
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/behavior_snapshot.dart';
+import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/printing.dart';
 import 'package:cli_table/cli_table.dart';

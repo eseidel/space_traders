@@ -1,5 +1,5 @@
 import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/cache/jump_gate_cache.dart';
+import 'package:cli/cache/jump_gate_snapshot.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

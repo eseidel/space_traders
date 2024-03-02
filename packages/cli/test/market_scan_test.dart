@@ -1,4 +1,4 @@
-import 'package:cli/cache/market_prices.dart';
+import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/market_scan.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/ships.dart';

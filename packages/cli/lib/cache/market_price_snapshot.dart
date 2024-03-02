@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:cli/cache/prices_cache.dart';
+import 'package:cli/cache/price_snapshot.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 

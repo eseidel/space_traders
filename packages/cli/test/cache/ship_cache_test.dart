@@ -1,4 +1,4 @@
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/ship_snapshot.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';

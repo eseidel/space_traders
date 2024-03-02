@@ -1,4 +1,4 @@
-import 'package:cli/cache/behavior_cache.dart';
+import 'package:cli/cache/behavior_snapshot.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';

@@ -1,5 +1,5 @@
-import 'package:cli/cache/market_prices.dart';
-import 'package:cli/cache/ship_cache.dart';
+import 'package:cli/cache/market_price_snapshot.dart';
+import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/logger.dart';
 import 'package:types/types.dart';
 
