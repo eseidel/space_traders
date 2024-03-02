@@ -107,37 +107,44 @@ class IdleQueue {
     }
   }
 
-  Future<void> _processNextJumpGate(Api api, Caches caches) async {
+  Future<void> _processNextJumpGate(Api api, WaypointCache waypoints) async {
     final record = _jumpGates.take();
     final to = record.value;
     final jumpDistance = record.jumpDistance;
     logger.detail('Process (${_jumpGates.length}): $to ($jumpDistance)');
     // Make sure we have construction data for the destination before
     // checking if we can jump there.
-    final underConstruction = await caches.waypoints.isUnderConstruction(to);
+    final underConstruction = await waypoints.isUnderConstruction(to);
     // Match canJumpTo and check if we can jump from the other side.
     if (!underConstruction) {
       queueSystem(to.system, jumpDistance: jumpDistance + 1);
     }
   }
 
-  Future<void> _processNextSystem(Database db, Api api, Caches caches) async {
+  Future<void> _processNextSystem(
+    Database db,
+    Api api,
+    SystemsCache systemsCache,
+    WaypointCache waypointCache,
+    MarketCache marketCache,
+    ConstructionCache constructionCache,
+  ) async {
     final systemRecord = _systems.take();
     final systemSymbol = systemRecord.value;
     final jumpDistance = systemRecord.jumpDistance;
     logger
         .detail('Process (${_systems.length}): $systemSymbol ($jumpDistance)');
-    final waypoints = caches.systems.waypointsInSystem(systemSymbol);
+    final waypoints = systemsCache.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.symbol;
-      if (await caches.waypoints.hasMarketplace(waypointSymbol)) {
+      if (await waypointCache.hasMarketplace(waypointSymbol)) {
         final listing = await db.marketListingForSymbol(waypointSymbol);
         if (listing == null) {
           logger.info(' Market: $waypointSymbol');
-          await caches.markets.refreshMarket(waypointSymbol);
+          await marketCache.refreshMarket(waypointSymbol);
         }
       }
-      if (await caches.waypoints.hasShipyard(waypointSymbol)) {
+      if (await waypointCache.hasShipyard(waypointSymbol)) {
         final listing = await db.shipyardListingForSymbol(waypointSymbol);
         if (listing == null) {
           logger.info(' Shipyard: $waypointSymbol');
@@ -149,7 +156,7 @@ class IdleQueue {
       // Can only fetch jump gates for waypoints which are charted or have
       // a ship there.
       if (waypoint.isJumpGate) {
-        if (await caches.waypoints.isCharted(waypointSymbol)) {
+        if (await waypointCache.isCharted(waypointSymbol)) {
           // TODO(eseidel): This doesn't change our current JumpGateSnapshot
           // so we need to be careful that this method doesn't need the latest.
           final fromRecord = await getOrFetchJumpGate(db, api, waypoint.symbol);
@@ -158,7 +165,7 @@ class IdleQueue {
           // of loading all the starter systems into our db, even if we can't
           // reach them yet.
           final from = fromRecord.waypointSymbol;
-          if (await caches.construction.isUnderConstruction(from) ?? true) {
+          if (await constructionCache.isUnderConstruction(from) ?? true) {
             continue;
           }
           // Queue each jumpGate as it might fetch construction data which could
@@ -178,17 +185,31 @@ class IdleQueue {
   }
 
   /// Run one fetch.
-  Future<void> runOne(Database db, Api api, Caches caches) async {
+  Future<void> runOne(
+    Database db,
+    Api api,
+    SystemsCache systemsCache,
+    WaypointCache waypointCache,
+    MarketCache marketCache,
+    ConstructionCache constructionCache,
+  ) async {
     if (isDone) {
       return;
     }
     // Service systems before jumpgates to make a breadth-first search.
     if (_systems.isNotEmpty) {
-      await _processNextSystem(db, api, caches);
+      await _processNextSystem(
+        db,
+        api,
+        systemsCache,
+        waypointCache,
+        marketCache,
+        constructionCache,
+      );
       return;
     }
     if (_jumpGates.isNotEmpty) {
-      await _processNextJumpGate(api, caches);
+      await _processNextJumpGate(api, waypointCache);
       return;
     }
   }
