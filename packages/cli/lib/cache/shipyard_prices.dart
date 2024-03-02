@@ -10,7 +10,7 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// A collection of price records.
-class ShipyardPriceSnapshot extends PricesCache<ShipType, ShipyardPrice> {
+class ShipyardPriceSnapshot extends PriceSnapshot<ShipType, ShipyardPrice> {
   /// Create a new price data collection.
   ShipyardPriceSnapshot(super.records);
 

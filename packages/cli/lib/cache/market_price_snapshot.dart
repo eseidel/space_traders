@@ -120,7 +120,7 @@ extension MarketPricePredictions on MarketPrice {
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class MarketPriceSnapshot extends PricesCache<TradeSymbol, MarketPrice> {
+class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
   /// Create a new price data collection.
   MarketPriceSnapshot(super.records);
 

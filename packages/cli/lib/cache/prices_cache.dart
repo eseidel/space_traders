@@ -6,10 +6,9 @@ import 'package:types/types.dart';
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-// TODO(eseidel): rename PricesSnapshot
-class PricesCache<Symbol extends Object, Record extends PriceBase<Symbol>> {
+class PriceSnapshot<Symbol extends Object, Record extends PriceBase<Symbol>> {
   /// Create a new price data collection.
-  PricesCache(this.prices);
+  PriceSnapshot(this.prices);
 
   /// The price records.
   final List<Record> prices;
