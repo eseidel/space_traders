@@ -1148,3 +1148,71 @@ rather than an import.
 ### Use systems.json to find all the systems with lots of markets.
 
 I suspect that "home systems" look different only by types / number of waypoints.
+
+
+### Planning fail.
+
+🛸#1  ✈️  to AQ24-D43, -7s left
+🛸#1  ✍️  market data @ AQ24-D43
+🛸#1  ⛽   2 FUEL                           ⚖️    2 x     73c =   -146c -> 🏦 668,584c
+🛸#1  💸  35 ADVANCED_CIRCUITRY  -46% -6,291c per  35 x  7,257c = -253,995c -> 🏦 414,589c
+🛸#1  Purchased 35 of ADVANCED_CIRCUITRY, still have 5 units we would like to buy, looping.
+🛸#1  ✍️  market data @ AQ24-D43
+🛸#1  💸   5 ADVANCED_CIRCUITRY  -40% -5,365c per   5 x  8,183c = -40,915c -> 🏦 373,674c
+🛸#1  Purchased 5 ADVANCED_CIRCUITRY @ 8183 (expected 9,134c) = -40,915c
+🛸#1  Starting: AQ24-D43 to AQ24-I53 speed: 30 max-fuel: 400
+navCruise       AQ24-D43  AQ24-E45 2m 131 fuel
+refuel          AQ24-E45  AQ24-E45 0ms 0 fuel
+navCruise       AQ24-E45  AQ24-I53 6m 398 fuel
+in 8m uses 529 fuel
+
+[WARN] 🛸#1  Beginning route to AQ24-I53 (8m)
+🛸#1  🛫 to AQ24-E45 MOON (2m) spent 131 fuel
+
+[WARN] 🛸#1  late 3s
+🛸#1  ⛽   2 FUEL                 +1%  +1c per   2 x     74c =   -148c -> 🏦 385,560c
+🛸#1  Beginning route to AQ24-I53 (6m)
+🛸#1  Setting flightMode to DRIFT
+🛸#1  Insufficient fuel, drifting to AQ24-I53
+🛸#1  🛫 to AQ24-I53 JUMP_GATE (55m) spent 1 fuel
+
+
+### Show trade volumes in deals_nearby.
+
+### Account for incoming purchases when planning trades sourcing from the same spot?
+
+
+### Planned a trade, then tried to jump and failed, cleared state
+
+🛸#29 Found deal: ANTIMATTER                 AQ24-I53     12,161c -> GC80-I53     13,859c   +2,284c  (1%) 0ms 2,284c/s 247,178c
+🛸#29 Beginning route to AQ24-I53 (0ms)
+🛸#29 🥶 for 2h
+
+This might be correct to clear the trade if we have to wait?  But I'm also
+not confident that won't end up resetting trades between jumps during client
+restarts?
+
+dart run bin/behavior.dart 29
+[
+ {
+  "behavior": "trader",
+  "shipSymbol": "ESEIDEL-29",
+  "deal": null,
+  "routePlan": null,
+  "buyJob": null,
+  "deliverJob": null,
+  "shipBuyJob": null,
+  "mountJob": null,
+  "pickupJob": null,
+  "extractionJob": null,
+  "systemWatcherJob": null,
+  "jobIndex": 0
+ }
+]
+
+  "cooldown": {
+   "shipSymbol": "ESEIDEL-29",
+   "totalSeconds": 6944,
+   "remainingSeconds": 6943,
+   "expiration": "2024-03-01T18:17:10.909Z"
+  },
