@@ -1191,6 +1191,11 @@ dart run bin/behavior.dart 29
 
 ### Add explorer/warp logic.
 
+- Generate a list of places to warp to.
+- Model how long warping takes:
+https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
+- Plan a route to the warp point (which may include jump gates)?
+
 ### SystemWatcher should clear after every visit, even if it's already charted.
 
 ### Figure out how to trace execution of the client (and show in systrace).

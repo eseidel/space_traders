@@ -157,8 +157,6 @@ class IdleQueue {
       // a ship there.
       if (waypoint.isJumpGate) {
         if (await waypointCache.isCharted(waypointSymbol)) {
-          // TODO(eseidel): This doesn't change our current JumpGateSnapshot
-          // so we need to be careful that this method doesn't need the latest.
           final fromRecord = await getOrFetchJumpGate(db, api, waypoint.symbol);
           // Don't follow links where the source is under construction, but
           // do follow them if the destination is. This will have the effect

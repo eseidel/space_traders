@@ -247,7 +247,10 @@ class CentralCommand {
         }
       }
     } else {
-      logger.warn('${ship.fleetRole} has no specified behaviors, idling.');
+      // Warn except in the common case of disabling miners.
+      if (config.enableMining || ship.fleetRole != FleetRole.miner) {
+        logger.warn('${ship.fleetRole} has no specified behaviors, idling.');
+      }
     }
     return toState(Behavior.idle);
   }
