@@ -1,6 +1,6 @@
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/caches.dart';
+import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';

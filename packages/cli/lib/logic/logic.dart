@@ -1,6 +1,6 @@
 import 'package:cli/behavior/advance.dart';
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/caches.dart';
+import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/printing.dart';

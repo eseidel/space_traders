@@ -1,6 +1,5 @@
 import 'package:cli/behavior/behavior.dart';
 import 'package:cli/behavior/buy_ship.dart';
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/charter.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/miner_hauler.dart';
@@ -10,6 +9,7 @@ import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/behavior/system_watcher.dart';
 import 'package:cli/behavior/trader.dart';
 import 'package:cli/caches.dart';
+import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/exceptions.dart';

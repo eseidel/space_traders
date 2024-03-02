@@ -1,8 +1,8 @@
 import 'package:cli/behavior/behavior.dart';
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/jobs/buy_job.dart';
 import 'package:cli/behavior/jobs/mount_job.dart';
 import 'package:cli/caches.dart';
+import 'package:cli/central_command.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:types/types.dart';
 

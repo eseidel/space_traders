@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:cli/behavior/behavior.dart';
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/caches.dart';
+import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/nav/navigation.dart';

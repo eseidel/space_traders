@@ -1,7 +1,7 @@
 import 'package:cli/behavior/behavior.dart';
-import 'package:cli/behavior/central_command.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/caches.dart';
+import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/plan/mining.dart';
 import 'package:db/db.dart';
