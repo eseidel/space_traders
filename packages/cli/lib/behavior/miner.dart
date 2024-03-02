@@ -13,10 +13,11 @@ import 'package:cli/plan/mining.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
+import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 /// Returns the expected value of the survey.
-int expectedValueFromSurvey(
+int _expectedValueFromSurvey(
   MarketPriceSnapshot marketPrices,
   Survey survey, {
   required Map<TradeSymbol, WaypointSymbol> marketForGood,
@@ -62,6 +63,7 @@ class ValuedSurvey {
 }
 
 /// Finds a recent survey
+@visibleForTesting
 Future<List<ValuedSurvey>> surveysWorthMining(
   Database db,
   MarketPriceSnapshot marketPrices, {
@@ -88,7 +90,7 @@ Future<List<ValuedSurvey>> surveysWorthMining(
   final valuedSurveys = recentSurveys
       .map((s) {
         return ValuedSurvey(
-          expectedValue: expectedValueFromSurvey(
+          expectedValue: _expectedValueFromSurvey(
             marketPrices,
             s.survey,
             marketForGood: marketForGood,
@@ -114,7 +116,7 @@ int _minSpaceForExtraction(Ship ship) {
 }
 
 /// Logs a warning if the extraction size is outside the expected range.
-void verifyExtractionSize(Ship ship, int extractedUnits) {
+void _verifyExtractionSize(Ship ship, int extractedUnits) {
   final min = minExtractedUnits(ship);
   final max = maxExtractedUnits(ship);
   if (extractedUnits < min || extractedUnits > max) {
@@ -179,7 +181,7 @@ Future<JobResult> extractAndLog(
         // Space after emoji is needed on windows to not bleed together.
         '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
 
-    verifyExtractionSize(ship, yield_.units);
+    _verifyExtractionSize(ship, yield_.units);
 
     verifyCooldown(
       ship,
