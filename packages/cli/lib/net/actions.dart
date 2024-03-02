@@ -64,6 +64,26 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   }
 }
 
+/// Navigate [ship] to [waypointSymbol] will retry in drift mode if
+/// there is insufficient fuel.
+Future<NavigateShip200ResponseData> warpToWaypoint(
+  Database db,
+  Api api,
+  SystemsCache systemsCache,
+  Ship ship,
+  WaypointSymbol waypointSymbol,
+) async {
+  await undockIfNeeded(db, api, ship);
+  final waitUntil = await navigateShip(
+    db,
+    api,
+    ship,
+    waypointSymbol,
+    travelType: TravelMethod.warp,
+  );
+  return waitUntil;
+}
+
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
@@ -495,6 +515,35 @@ Future<DateTime> navigateToLocalWaypointAndLog(
     '🛫 to ${waypoint.symbol} ${waypoint.type} '
     '(${approximateDuration(flightTime)})$fuelString',
   );
+  _checkFlightTime(flightTime, ship, result);
+  _checkFuelUsage(ship, result);
+  return result.nav.route.arrival;
+}
+
+/// Navigate to the waypoint and log to the ship's log
+Future<DateTime> warpToWaypointAndLog(
+  Database db,
+  Api api,
+  SystemsCache systemsCache,
+  Ship ship,
+  SystemWaypoint waypoint,
+) async {
+  final result = await warpToWaypoint(
+    db,
+    api,
+    systemsCache,
+    ship,
+    waypoint.symbol,
+  );
+  final flightTime = result.nav.route.duration;
+  final consumedFuel = result.fuel.consumed?.amount ?? 0;
+  final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
+  shipInfo(
+    ship,
+    '🛫 to ${waypoint.symbol} ${waypoint.type} '
+    '(${approximateDuration(flightTime)})$fuelString',
+  );
+  // TODO(eseidel): Fix to use warp.
   _checkFlightTime(flightTime, ship, result);
   _checkFuelUsage(ship, result);
   return result.nav.route.arrival;

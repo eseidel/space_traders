@@ -48,6 +48,8 @@ List<Request> routeToRequests(RoutePlan plan) {
         requests.add(Request('navCruise', action.duration));
       case RouteActionType.navDrift:
         requests.add(Request('navDrift', action.duration));
+      case RouteActionType.warpCruise:
+        requests.add(Request('warpCruise', action.duration));
       case RouteActionType.jump:
         requests.add(Request('jump', action.duration));
       case RouteActionType.refuel:

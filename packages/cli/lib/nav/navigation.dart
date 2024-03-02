@@ -373,5 +373,15 @@ Future<NavResult> continueNavigationIfNeeded(
           actionEnd,
         ),
       );
+    case RouteActionType.warpCruise:
+      return NavResult._wait(
+        await warpToWaypointAndLog(
+          db,
+          api,
+          caches.systems,
+          ship,
+          actionEnd,
+        ),
+      );
   }
 }

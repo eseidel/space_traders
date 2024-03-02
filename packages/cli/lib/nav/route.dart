@@ -77,17 +77,18 @@ Map<ShipNavFlightMode, int> _warpSpeedMultiplier = {
 };
 
 /// The type of travel.
-enum TravelType {
+enum TravelMethod {
   /// Traveling using the nav system, only within a system.
-  nav,
+  navigate,
 
   /// Traveling using the warp system, between systems.
   warp,
 }
 
-double _speedMultiplier(ShipNavFlightMode flightMode, TravelType travelType) {
-  final map =
-      travelType == TravelType.nav ? _navSpeedMultiplier : _warpSpeedMultiplier;
+double _speedMultiplier(ShipNavFlightMode flightMode, TravelMethod travelType) {
+  final map = travelType == TravelMethod.navigate
+      ? _navSpeedMultiplier
+      : _warpSpeedMultiplier;
   final multiplier = map[flightMode];
   if (multiplier == null) {
     throw UnimplementedError('Unimplmented $flightMode for $travelType');
@@ -105,10 +106,8 @@ int flightTimeByDistanceAndSpeed({
   final double roundedDistance = max(1, distance.roundToDouble());
 
   /// Wiki says round(), but that doesn't match observed behavior with probes.
-  return (roundedDistance *
-              (_speedMultiplier(flightMode, TravelType.nav) / shipSpeed) +
-          15)
-      .floor();
+  final multiplier = _speedMultiplier(flightMode, TravelMethod.navigate);
+  return (roundedDistance * (multiplier / shipSpeed) + 15).floor();
 }
 
 /// Returns the warp time to the given distance.
@@ -119,7 +118,7 @@ int warpTimeByDistanceAndSpeed({
 }) {
   final double roundedDistance = max(1, distance.roundToDouble());
   return (roundedDistance *
-              (_speedMultiplier(flightMode, TravelType.warp) / shipSpeed) +
+              (_speedMultiplier(flightMode, TravelMethod.warp) / shipSpeed) +
           15)
       .floor();
 }

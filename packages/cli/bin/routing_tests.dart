@@ -217,6 +217,8 @@ String toActionString(RouteActionType type) {
       return 'NAV-CRUISE';
     case RouteActionType.navDrift:
       return 'NAV-DRIFT';
+    case RouteActionType.warpCruise:
+      return 'WARP-CRUISE';
     case RouteActionType.emptyRoute:
       throw UnimplementedError();
   }

@@ -17,10 +17,13 @@ enum RouteActionType {
   /// Refuel at a the local market.
   refuel,
 
-  /// Travel between two waypoints in the same system at drift speed.
+  /// Travel between waypoints in different systems via warp at cruise speed.
+  warpCruise,
+
+  /// Travel between waypoints in the same system via nav at drift speed.
   navDrift,
 
-  /// Travel between two waypoints in the same system at cruise speed.
+  /// Travel between waypoints in the same system via nav at cruise speed.
   navCruise;
 
   /// Returns true if this action uses the reactor.
@@ -32,6 +35,7 @@ enum RouteActionType {
       case RouteActionType.navDrift:
       case RouteActionType.refuel:
       case RouteActionType.navCruise:
+      case RouteActionType.warpCruise:
         return false;
     }
   }
@@ -44,6 +48,7 @@ enum RouteActionType {
       case RouteActionType.jump:
       case RouteActionType.navCruise:
       case RouteActionType.navDrift:
+      case RouteActionType.warpCruise:
         return 1;
       case RouteActionType.refuel:
         // Dock, refuel, undock.
