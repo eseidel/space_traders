@@ -44,6 +44,37 @@ Future<pg.Connection> _defaultOpenConnection(
   return pg.Connection.open(endpoint, settings: settings);
 }
 
+/// Wrapper around a database connection.
+class DatabaseConnection {
+  /// Create a new database connection.
+  DatabaseConnection(this._connection);
+
+  /// The underlying connection, private to this class.  Methods on this class
+  /// should use execute().
+  final pg.Connection _connection;
+
+  /// Close the database connection.
+  Future<void> close() => _connection.close();
+
+  /// Wait for a notification on a channel.
+  Future<void> waitOnChannel(String channel) async {
+    await _connection.channels[channel].first;
+  }
+
+  /// Execute a query.
+  Future<pg.Result> execute(Query query) {
+    return _connection.execute(
+      pg.Sql.named(query.fmtString),
+      parameters: query.parameters,
+    );
+  }
+
+  /// Execute a query.
+  Future<pg.Result> executeSql(String sql) {
+    return _connection.execute(sql);
+  }
+}
+
 /// Abstraction around a database connection.
 class Database {
   /// Create a new database connection.
@@ -55,16 +86,13 @@ class Database {
       : endpoint = pg.Endpoint(host: 'localhost', database: 'test'),
         settings = null;
 
-  /// The underlying connection, private to this class.  Methods on this class
-  /// should use execute() where possible.  Callers outside this class should
-  /// add queries to this class.
-  late final pg.Connection _connection;
-
   /// Configure the database connection.
   final pg.Endpoint endpoint;
 
   /// Configure the database connection.
   final pg.ConnectionSettings? settings;
+
+  late final DatabaseConnection _connection;
 
   /// Open the database connection.
   Future<void> open({
@@ -74,7 +102,7 @@ class Database {
       pg.ConnectionSettings? settings,
     ) openConnection = _defaultOpenConnection,
   }) async {
-    _connection = await openConnection(endpoint, settings);
+    _connection = DatabaseConnection(await openConnection(endpoint, settings));
   }
 
   /// Close the database connection.
@@ -96,23 +124,16 @@ class Database {
 
   /// Wait for a notification on a channel.
   Future<void> waitOnChannel(String channel) async {
-    await _connection.channels[channel].first;
+    await _connection.waitOnChannel(channel);
   }
 
   /// Execute a query.
   @protected
-  Future<pg.Result> execute(Query query) {
-    return _connection.execute(
-      pg.Sql.named(query.fmtString),
-      parameters: query.parameters,
-    );
-  }
+  Future<pg.Result> execute(Query query) => _connection.execute(query);
 
   /// Execute a query.
   @protected
-  Future<pg.Result> executeSql(String sql) {
-    return _connection.execute(sql);
-  }
+  Future<pg.Result> executeSql(String sql) => _connection.executeSql(sql);
 
   /// Query for multiple records using the provided query.
   @protected

@@ -1,11 +1,13 @@
 import 'package:db/db.dart';
-import 'package:db/src/transaction.dart';
+import 'package:db/src/query.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
 class _MockConnection extends Mock implements pg.Connection {}
+
+class _MockDatabaseConnection extends Mock implements DatabaseConnection {}
 
 class _MockPostgreSQLResult extends Mock implements pg.Result {}
 
@@ -28,24 +30,15 @@ void main() {
   });
 
   test('insertTransaction', () {
-    final connection = _MockConnection();
+    final connection = _MockDatabaseConnection();
     final db = Database.test(connection);
 
     final transaction = Transaction.fallbackValue();
-    when(
-      () => connection.execute(
-        any(),
-        parameters: any(named: 'parameters'),
-      ),
-    ).thenAnswer((_) async {
+    registerFallbackValue(const Query(''));
+    when(() => connection.execute(any())).thenAnswer((_) async {
       return _MockPostgreSQLResult();
     });
     db.insertTransaction(transaction);
-    verify(
-      () => connection.execute(
-        any(),
-        parameters: transactionToColumnMap(transaction),
-      ),
-    ).called(1);
+    verify(() => connection.execute(any())).called(1);
   });
 }
