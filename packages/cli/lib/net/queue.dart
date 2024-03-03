@@ -108,7 +108,7 @@ class NetQueue {
       ),
     );
     // TODO(eseidel): This could be a trigger.
-    await _db.notify('request_', '$requestId');
+    await _db.notify('request_', requestId);
     return requestId;
   }
 
@@ -169,7 +169,7 @@ class NetQueue {
       ResponseRecord(requestId: request.id!, response: response),
     );
     // TODO(eseidel): This could be a trigger.
-    await _db.notify('response_', '${request.id}');
+    await _db.notify('response_', request.id);
   }
 
   /// Waits for a notification that a new request is available.

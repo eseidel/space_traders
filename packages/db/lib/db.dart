@@ -88,8 +88,12 @@ class Database {
   }
 
   /// Notify listeners on a channel.
-  Future<void> notify(String channel, [String? payload]) async {
-    await executeSql('NOTIFY $channel${payload != null ? ', $payload' : ''}');
+  Future<void> notify(String channel, [Object? payload]) async {
+    if (payload == null) {
+      await executeSql('NOTIFY $channel');
+    } else {
+      await executeSql("NOTIFY $channel, '$payload'");
+    }
   }
 
   /// Wait for a notification on a channel.
