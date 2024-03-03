@@ -251,7 +251,7 @@ Future<List<Faction>> allFactions(FactionsApi factionsApi) async {
 /// they're not cached.
 Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
   final cachedFactions = await db.allFactions();
-  if (cachedFactions.isNotEmpty) {
+  if (cachedFactions.length >= FactionSymbol.values.length) {
     return Future.value(cachedFactions.toList());
   }
   final factions = await allFactions(factionsApi);
