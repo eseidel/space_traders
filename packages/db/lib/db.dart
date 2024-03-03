@@ -193,17 +193,8 @@ class Database {
       queryMany(allFactionsQuery(), factionFromColumnMap);
 
   /// Cache the given factions.
-  Future<void> cacheFactions(List<Faction> factions) async {
-    // TODO(eseidel): Transactions aren't counted by our query counter.
-    await _connection.runTx((session) async {
-      for (final faction in factions) {
-        final query = insertFactionQuery(faction);
-        await session.execute(
-          pg.Sql.named(query.fmtString),
-          parameters: query.parameters,
-        );
-      }
-    });
+  Future<void> upsertFaction(Faction faction) async {
+    await execute(upsertFactionQuery(faction));
   }
 
   /// Return all extractions.

@@ -66,7 +66,7 @@ void main() {
       ),
     );
     when(db.allFactions).thenAnswer((_) => Future.value(<Faction>[]));
-    when(() => db.cacheFactions(any())).thenAnswer((_) => Future.value());
+    when(() => db.upsertFaction(any())).thenAnswer((_) async => {});
     when(db.allConstructionRecords)
         .thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 

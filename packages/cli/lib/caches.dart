@@ -255,6 +255,8 @@ Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
     return Future.value(cachedFactions.toList());
   }
   final factions = await allFactions(factionsApi);
-  await db.cacheFactions(factions);
+  for (final faction in factions) {
+    await db.upsertFaction(faction);
+  }
   return factions;
 }

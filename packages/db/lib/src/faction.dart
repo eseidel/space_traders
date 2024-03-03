@@ -4,10 +4,11 @@ import 'package:types/types.dart';
 /// Query all factions.
 Query allFactionsQuery() => const Query('SELECT * FROM faction_');
 
-/// insert a faction.
-Query insertFactionQuery(Faction faction) => Query(
+/// Upsert a faction.
+Query upsertFactionQuery(Faction faction) => Query(
       'INSERT INTO faction_ (symbol, json) '
-      'VALUES (@symbol, @json)',
+      'VALUES (@symbol, @json) '
+      'ON CONFLICT (symbol) DO UPDATE SET json = @json',
       parameters: factionToColumnMap(faction),
     );
 
