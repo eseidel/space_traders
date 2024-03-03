@@ -29,12 +29,28 @@ class Config {
   /// Whether or not we should enable mining behaviors.
   final bool enableMining = gamePhase < GamePhase.exploration;
 
+  /// What behaviors count as "mining" for our enable/disable mining.
+  final miningBehaviors = <Behavior>{
+    Behavior.miner,
+    Behavior.minerHauler,
+    Behavior.siphoner,
+    Behavior.surveyor,
+  };
+
+  /// What roles count as "mining" for our enable/disable mining.
+  /// Used to silence logs about ships being idle.
+  final miningFleetRoles = <FleetRole>{
+    FleetRole.miner,
+    FleetRole.surveyor,
+    FleetRole.siphoner,
+  };
+
   /// Controls how many loops we run of ships before doing our central
   /// planning (assigning ships to squads, planning mounts, etc.)
   final int centralPlanningInterval = 20;
 
   /// Used to slow down charters and have them spend less money on jumps.
-  bool chartAsteroidsByDefault = false;
+  bool chartAsteroidsByDefault = true;
 
   /// findBetterTradeLocation is too slow when we have lots of systems
   bool disableFindBetterTradeLocation = true;

@@ -163,13 +163,7 @@ class CentralCommand {
     }
 
     bool enabled(Behavior behavior) {
-      final miningBehaviors = {
-        Behavior.miner,
-        Behavior.minerHauler,
-        Behavior.siphoner,
-        Behavior.surveyor,
-      };
-      if (!config.enableMining && miningBehaviors.contains(behavior)) {
+      if (!config.enableMining && config.miningBehaviors.contains(behavior)) {
         return false;
       }
 
@@ -249,7 +243,8 @@ class CentralCommand {
       }
     } else {
       // Warn except in the common case of disabling miners.
-      if (config.enableMining || ship.fleetRole != FleetRole.miner) {
+      if (config.enableMining ||
+          !config.miningFleetRoles.contains(ship.fleetRole)) {
         logger.warn('${ship.fleetRole} has no specified behaviors, idling.');
       }
     }
