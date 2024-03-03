@@ -1,22 +1,12 @@
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final connection = db.connection;
   // Get a list of all tables.
-  final tables = await connection.execute('''
-    SELECT table_name
-    FROM information_schema.tables
-    WHERE table_schema = 'public'
-    ORDER BY table_name;
-  ''');
+  final tableNames = await db.allTableNames();
   // Get counts for each table.
   final counts = <String, int>{};
-  for (final table in tables) {
-    final tableName = table[0]! as String;
-    final count = await connection.execute(
-      'SELECT COUNT(*) FROM $tableName;',
-    );
-    counts[tableName] = count[0][0]! as int;
+  for (final name in tableNames) {
+    counts[name] = await db.rowsInTable(name);
   }
   // Print the counts.
   for (final tableName in counts.keys) {

@@ -180,9 +180,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ..info('Total Cost of Goods Sold: ${c(report.totalCostOfGoodsSold)}')
     ..info('Gross Profit: ${c(report.grossProfit)}')
     ..info('Expenses')
-    // ..info('  Construction Materials: ${c(profitLoss.constructionMaterials)}')
-    // ..info('  Subsidies: ${c(profitLoss.subsidies)}')
-    // ..info('  Categorization Pending: ${c(profitLoss.categorizationPending)}')
     ..info('Total Expenses: ${c(report.totalExpenses)}')
     ..info('Net Income: ${c(report.netIncome)}');
 }

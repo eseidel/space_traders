@@ -108,7 +108,7 @@ class NetQueue {
       ),
     );
     // TODO(eseidel): This could be a trigger.
-    await _db.connection.execute("NOTIFY request_, '$requestId'");
+    await _db.notify('request_', '$requestId');
     return requestId;
   }
 
@@ -130,7 +130,8 @@ class NetQueue {
         return result.response.toResponse();
       }
       try {
-        await _db.connection.channels['response_'].first
+        await _db
+            .waitOnChannel('response_')
             .timeout(Duration(seconds: timeoutSeconds));
       } on TimeoutException {
         logger.err('Timed out (${timeoutSeconds}s) waiting for response?');
@@ -168,14 +169,15 @@ class NetQueue {
       ResponseRecord(requestId: request.id!, response: response),
     );
     // TODO(eseidel): This could be a trigger.
-    await _db.connection.execute("NOTIFY response_, '${request.id}'");
+    await _db.notify('response_', '${request.id}');
   }
 
   /// Waits for a notification that a new request is available.
   Future<void> waitForRequest(int timeoutSeconds) async {
     assert(role == QueueRole.responder, 'Only responders can wait.');
     await _listenIfNeeded();
-    await _db.connection.channels['request_'].first
+    await _db
+        .waitOnChannel('request_')
         .timeout(Duration(seconds: timeoutSeconds));
   }
 

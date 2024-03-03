@@ -1,6 +1,6 @@
-import 'package:cli/behavior/job.dart';
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/charter.dart';
+import 'package:cli/behavior/job.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/miner_hauler.dart';
 import 'package:cli/behavior/mount_from_buy.dart';

@@ -58,7 +58,7 @@ class Database {
   /// The underlying connection.
   // TODO(eseidel): This shoudn't be public.
   // Make it private and move all callers into the db package.
-  pg.Connection get connection => _connection;
+  // pg.Connection get connection => _connection;
 
   late final pg.Connection _connection;
 
@@ -80,20 +80,36 @@ class Database {
   }
 
   /// Close the database connection.
-  Future<void> close() => connection.close();
+  Future<void> close() => _connection.close();
 
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
-    await connection.execute('LISTEN $channel');
+    await executeSql('LISTEN $channel');
   }
 
-  /// Insert one record using the provided query.
+  /// Notify listeners on a channel.
+  Future<void> notify(String channel, [String? payload]) async {
+    await executeSql('NOTIFY $channel${payload != null ? ', $payload' : ''}');
+  }
+
+  /// Wait for a notification on a channel.
+  Future<void> waitOnChannel(String channel) async {
+    await _connection.channels[channel].first;
+  }
+
+  /// Execute a query.
   @protected
   Future<pg.Result> execute(Query query) {
-    return connection.execute(
+    return _connection.execute(
       pg.Sql.named(query.fmtString),
       parameters: query.parameters,
     );
+  }
+
+  /// Execute a query.
+  @protected
+  Future<pg.Result> executeSql(String sql) {
+    return _connection.execute(sql);
   }
 
   /// Query for multiple records using the provided query.
@@ -102,14 +118,9 @@ class Database {
     Query query,
     T Function(Map<String, dynamic>) fromColumnMap,
   ) {
-    return connection
-        .execute(
-          pg.Sql.named(query.fmtString),
-          parameters: query.parameters,
-        )
-        .then(
-          (result) => result.map((r) => r.toColumnMap()).map(fromColumnMap),
-        );
+    return execute(query).then(
+      (result) => result.map((r) => r.toColumnMap()).map(fromColumnMap),
+    );
   }
 
   /// Query for a single record using the provided query.
@@ -118,15 +129,26 @@ class Database {
     Query query,
     T Function(Map<String, dynamic>) fromColumnMap,
   ) {
-    return connection
-        .execute(
-          pg.Sql.named(query.fmtString),
-          parameters: query.parameters,
-        )
-        .then(
-          (result) =>
-              result.isEmpty ? null : fromColumnMap(result.first.toColumnMap()),
-        );
+    return execute(query).then(
+      (result) =>
+          result.isEmpty ? null : fromColumnMap(result.first.toColumnMap()),
+    );
+  }
+
+  /// Return a list of all table names.
+  Future<Iterable<String>> allTableNames() async {
+    final result = await executeSql(
+      'SELECT table_name FROM information_schema.tables '
+      "WHERE table_schema = 'public' "
+      'ORDER BY table_name',
+    );
+    return result.map((r) => r.first! as String);
+  }
+
+  /// Return the number of rows in the given table.
+  Future<int> rowsInTable(String tableName) async {
+    final result = await executeSql('SELECT COUNT(*) FROM $tableName');
+    return result[0][0]! as int;
   }
 
   /// Insert a transaction into the database.
@@ -170,7 +192,8 @@ class Database {
 
   /// Cache the given factions.
   Future<void> cacheFactions(List<Faction> factions) async {
-    await connection.runTx((session) async {
+    // TODO(eseidel): Transactions aren't counted by our query counter.
+    await _connection.runTx((session) async {
       for (final faction in factions) {
         final query = insertFactionQuery(faction);
         await session.execute(
@@ -264,11 +287,13 @@ class Database {
 
   /// Delete responses older than the given age.
   Future<void> deleteResponsesBefore(DateTime timestamp) {
-    return connection.execute(
-      pg.Sql.named('DELETE FROM response_ WHERE created_at < @timestamp'),
-      parameters: {
-        'timestamp': timestamp,
-      },
+    return execute(
+      Query(
+        'DELETE FROM response_ WHERE created_at < @timestamp',
+        parameters: {
+          'timestamp': timestamp,
+        },
+      ),
     );
   }
 
@@ -325,10 +350,7 @@ class Database {
   /// Returns true if we know of a market which trades the given symbol.
   Future<bool> knowOfMarketWhichTrades(TradeSymbol tradeSymbol) async {
     final query = knowOfMarketWhichTradesQuery(tradeSymbol);
-    final result = await connection.execute(
-      pg.Sql.named(query.fmtString),
-      parameters: query.parameters,
-    );
+    final result = await execute(query);
     return result[0][0]! as bool;
   }
 
@@ -359,16 +381,16 @@ class Database {
 
   /// Get unique ship symbols from the transaction table.
   Future<Set<ShipSymbol>> uniqueShipSymbolsInTransactions() async {
-    final result = await connection
-        .execute('SELECT DISTINCT ship_symbol FROM transaction_');
+    final result =
+        await executeSql('SELECT DISTINCT ship_symbol FROM transaction_');
     return result.map((r) => ShipSymbol.fromString(r.first! as String)).toSet();
   }
 
   /// Get all transactions from the database.
   /// Currently returns in timestamp order, but that may not always be the case.
   Future<Iterable<Transaction>> allTransactions() async {
-    final result = await connection
-        .execute('SELECT * FROM transaction_ ORDER BY timestamp');
+    final result =
+        await executeSql('SELECT * FROM transaction_ ORDER BY timestamp');
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
   }
 
@@ -376,10 +398,12 @@ class Database {
   Future<Iterable<Transaction>> transactionsWithAccountingType(
     AccountingType accountingType,
   ) async {
-    final result = await connection.execute(
-      pg.Sql.named('SELECT * FROM transaction_ WHERE '
-          'accounting = @accounting'),
-      parameters: {'accounting': accountingType.name},
+    final result = await execute(
+      Query(
+        'SELECT * FROM transaction_ WHERE '
+        'accounting = @accounting',
+        parameters: {'accounting': accountingType.name},
+      ),
     );
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
   }
@@ -388,10 +412,12 @@ class Database {
   Future<Iterable<Transaction>> transactionsAfter(
     DateTime timestamp,
   ) async {
-    final result = await connection.execute(
-      pg.Sql.named('SELECT * FROM transaction_ WHERE timestamp > @timestamp '
-          'ORDER BY timestamp'),
-      parameters: {'timestamp': timestamp},
+    final result = await execute(
+      Query(
+        'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
+        'ORDER BY timestamp',
+        parameters: {'timestamp': timestamp},
+      ),
     );
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
   }
@@ -418,10 +444,7 @@ class Database {
   /// Get the median purchase price for the given trade symbol.
   Future<int?> medianPurchasePrice(TradeSymbol tradeSymbol) async {
     final query = medianPurchasePriceQuery(tradeSymbol);
-    final result = await connection.execute(
-      pg.Sql.named(query.fmtString),
-      parameters: query.parameters,
-    );
+    final result = await execute(query);
     return result[0][0] as int?;
   }
 
@@ -523,10 +546,7 @@ class Database {
   }
 
   Future<bool> _hasRecentPrice(Query query, Duration maxAge) async {
-    final result = await connection.execute(
-      pg.Sql.named(query.fmtString),
-      parameters: query.parameters,
-    );
+    final result = await execute(query);
     if (result.isEmpty) {
       return false;
     }
@@ -557,14 +577,13 @@ class Database {
 
   /// Count the number of market prices in the database.
   Future<int> marketPricesCount() async {
-    final result =
-        await connection.execute('SELECT COUNT(*) FROM market_price_');
+    final result = await executeSql('SELECT COUNT(*) FROM market_price_');
     return result[0][0]! as int;
   }
 
   /// Count the number of unique symbols in the MarketPrices table.
   Future<int> marketPricesWaypointCount() async {
-    final result = await connection.execute(
+    final result = await executeSql(
       'SELECT COUNT(DISTINCT waypoint_symbol) FROM market_price_',
     );
     return result[0][0]! as int;
@@ -572,14 +591,13 @@ class Database {
 
   /// Count the number of shipyard prices in the database.
   Future<int> shipyardPricesCount() async {
-    final result =
-        await connection.execute('SELECT COUNT(*) FROM shipyard_price_');
+    final result = await executeSql('SELECT COUNT(*) FROM shipyard_price_');
     return result[0][0]! as int;
   }
 
   /// Count the number of unique symbols in the ShipyardPrices table.
   Future<int> shipyardPricesWaypointCount() async {
-    final result = await connection.execute(
+    final result = await executeSql(
       'SELECT COUNT(DISTINCT waypoint_symbol) FROM shipyard_price_',
     );
     return result[0][0]! as int;
