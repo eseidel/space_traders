@@ -362,6 +362,7 @@ class CentralCommand {
       waypoints,
       connectivity,
       ship,
+      // Start at the ship's current system to minimize jumps.
       startSystemSymbol: ship.systemSymbol,
       filter: (SystemWaypoint waypoint) {
         // Don't bother charting Asteroids if disabled.

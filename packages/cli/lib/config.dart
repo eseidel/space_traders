@@ -50,7 +50,7 @@ class Config {
   final int centralPlanningInterval = 20;
 
   /// Used to slow down charters and have them spend less money on jumps.
-  bool chartAsteroidsByDefault = true;
+  bool chartAsteroidsByDefault = false;
 
   /// findBetterTradeLocation is too slow when we have lots of systems
   bool disableFindBetterTradeLocation = true;
