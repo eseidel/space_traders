@@ -216,7 +216,10 @@ class TopOfLoopUpdater {
         current: await ShipSnapshot.load(db)
           ..updateForServerTime(DateTime.timestamp()),
         server: await fetchShips(db, api),
-        toJsonList: (e) => e.ships.map((e) => e.toJson()).toList(),
+        // Ignore the cooldown field, since even with updateForServerTime, it's
+        // hard to exactly match the server.
+        toJsonList: (e) =>
+            e.ships.map((e) => e.toJson()..['cooldown'] = null).toList(),
       );
       // caches.agent should be deleted.
       await caches.agent.updateAgent(
