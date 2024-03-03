@@ -240,11 +240,10 @@ class TopOfLoopUpdater {
 // With our out-of-process rate limiting, this won't matter that it uses
 // a separate API client.
 Future<List<Faction>> allFactions(FactionsApi factionsApi) async {
-  final factions = await fetchAllPages(factionsApi, (factionsApi, page) async {
+  return fetchAllPages(factionsApi, (factionsApi, page) async {
     final response = await factionsApi.getFactions(page: page);
     return (response!.data, response.meta);
   }).toList();
-  return factions;
 }
 
 /// Loads the factions from the database, or fetches them from the API if
