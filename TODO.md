@@ -1205,3 +1205,14 @@ https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 ### Build a profit/loss statement.
 
 ### Build a cash flow statement.
+
+### This seems wrong?  Is it considering jumping?
+
+Found 3 deals for ESEIDEL-49 from AQ24-I53
+🛸#49 Found deal: LIQUID_HYDROGEN            AQ24-C40          3c -> AQ24-G48         32c   +3,648c (414%) 9m   6c/s     882c
+🛸#49 ⛽   4 FUEL                 +3%  +2c per   4 x     74c =   -296c -> 🏦 1,667c
+🛸#49 Market at AQ24-I53 doesn't buy FABRICS
+🛸#49 Cargo hold not empty, finding market to sell FABRICS.
+🛸#49 Selecting AQ24-K85 earns 28,650c extra (including 14,147c for fuel) over 6s (4775.0/s)
+🛸#49 Beginning route to AQ24-K85 (5m)
+🛸#49 🛫 to AQ24-K85 PLANET (5m) spent 366 fuel

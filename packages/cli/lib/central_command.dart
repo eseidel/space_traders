@@ -106,7 +106,8 @@ class CentralCommand {
 
   /// Returns true if we should chart asteroids in the given [systemSymbol].
   bool chartAsteroidsInSystem(SystemSymbol systemSymbol) {
-    return _chartAsteroidsInSystem[systemSymbol] ?? false;
+    return _chartAsteroidsInSystem[systemSymbol] ??
+        config.chartAsteroidsByDefault;
   }
 
   /// Sets whether we should chart asteroids in the given [systemSymbol].
@@ -165,7 +166,7 @@ class CentralCommand {
       final miningBehaviors = {
         Behavior.miner,
         Behavior.minerHauler,
-        // Behavior.siphoner,
+        Behavior.siphoner,
         Behavior.surveyor,
       };
       if (!config.enableMining && miningBehaviors.contains(behavior)) {

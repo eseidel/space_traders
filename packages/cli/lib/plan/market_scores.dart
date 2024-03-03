@@ -1,4 +1,5 @@
 import 'package:cli/caches.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/trading.dart';
@@ -18,6 +19,9 @@ WaypointSymbol? findBetterTradeLocation(
   required Set<SystemSymbol> avoidSystems,
   required int profitPerSecondThreshold,
 }) {
+  if (config.disableFindBetterTradeLocation) {
+    return null;
+  }
   final search = _MarketSearch.start(
     marketPrices,
     systemsCache,

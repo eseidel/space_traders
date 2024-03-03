@@ -33,6 +33,12 @@ class Config {
   /// planning (assigning ships to squads, planning mounts, etc.)
   final int centralPlanningInterval = 20;
 
+  /// Used to slow down charters and have them spend less money on jumps.
+  bool chartAsteroidsByDefault = false;
+
+  /// findBetterTradeLocation is too slow when we have lots of systems
+  bool disableFindBetterTradeLocation = true;
+
   /// The number of requests per second allowed by the api.
   /// Version 2.1 allows:
   /// - 2 requests per second
@@ -58,11 +64,13 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
     for (int i = 0; i < 13; i++) ShipType.LIGHT_HAULER,
+    // Only buy after gate opens.
     for (int i = 0; i < 20; i++) ShipType.PROBE,
     for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
+    // Only buy with 3m in cash?
     for (int i = 0; i < 20; i++) ShipType.PROBE,
+    // Only buy with 3m in cash?
     for (int i = 0; i < 20; i++) ShipType.EXPLORER,
-    // ShipType.EXPLORER,
   ];
 
   // TODO(eseidel): Should be some dynamic min count of light-haulers before we
