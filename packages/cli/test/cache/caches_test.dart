@@ -66,6 +66,15 @@ void main() {
       ),
     );
     when(db.allFactions).thenAnswer((_) => Future.value(<Faction>[]));
+    registerFallbackValue(
+      Faction(
+        symbol: FactionSymbol.ANCIENTS,
+        name: '',
+        description: '',
+        headquarters: '',
+        isRecruiting: false,
+      ),
+    );
     when(() => db.upsertFaction(any())).thenAnswer((_) async => {});
     when(db.allConstructionRecords)
         .thenAnswer((_) => Future.value(<ConstructionRecord>[]));
