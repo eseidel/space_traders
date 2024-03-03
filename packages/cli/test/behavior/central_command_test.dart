@@ -114,8 +114,7 @@ void main() {
     );
     // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
     // This is another hack, modifying the snapshot:
-    behaviors.states.firstWhere((b) => b.shipSymbol == shipBSymbol).routePlan =
-        null;
+    behaviors[shipBSymbol]?.routePlan = null;
     final otherSystems2 = centralCommand
         .otherCharterSystems(ships, behaviors, shipASymbol)
         .toList();
