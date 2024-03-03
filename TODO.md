@@ -1216,3 +1216,23 @@ Found 3 deals for ESEIDEL-49 from AQ24-I53
 🛸#49 Selecting AQ24-K85 earns 28,650c extra (including 14,147c for fuel) over 6s (4775.0/s)
 🛸#49 Beginning route to AQ24-K85 (5m)
 🛸#49 🛫 to AQ24-K85 PLANET (5m) spent 366 fuel
+
+### Replace findBetterTradeLocation with something cheaper.
+
+Probably have some logic which computes the number of trades available
+per-system, and then reassigns ships to the closest system with available trades?
+
+Maybe more generally we should be computing how many traders a given system
+can handle and re-balancing our traders accordingly?  Similar to what we do
+with system-watchers?
+
+### Siphoners don't seem to respond to disabling mining?
+
+🛸#12 ✈️  to AQ24-C39, -3ms left
+🛸#11 ✈️  to AQ24-C40, -6ms left
+🛸#11 ⛽   1 FUEL               +400% +288c per   1 x    360c =   -360c -> 🏦 927,035c
+🛸#11 🤝   4 HYDROCARBON         -96% -50c per   4 x      2c =     +8c -> 🏦 927,043c
+
+And the fuel costs are quite high.
+
+### Predict prices before purchase and log when they differ?

@@ -1,6 +1,7 @@
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/printing.dart';
+import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
@@ -82,6 +83,14 @@ class BehaviorSnapshot {
     final states = await db.allBehaviorStates();
     return BehaviorSnapshot(states.toList());
   }
+
+  /// Get the behavior state for the given ship.
+  BehaviorState? stateForShip(ShipSymbol shipSymbol) {
+    return states.firstWhereOrNull((s) => s.shipSymbol == shipSymbol);
+  }
+
+  /// Get the behavior state for the given ship.
+  BehaviorState? operator [](ShipSymbol shipSymbol) => stateForShip(shipSymbol);
 
   /// Returns all deals in progress.
   Iterable<CostedDeal> dealsInProgress() sync* {
