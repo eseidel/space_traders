@@ -55,11 +55,9 @@ class Database {
       : endpoint = pg.Endpoint(host: 'localhost', database: 'test'),
         settings = null;
 
-  /// The underlying connection.
-  // TODO(eseidel): This shoudn't be public.
-  // Make it private and move all callers into the db package.
-  // pg.Connection get connection => _connection;
-
+  /// The underlying connection, private to this class.  Methods on this class
+  /// should use execute() where possible.  Callers outside this class should
+  /// add queries to this class.
   late final pg.Connection _connection;
 
   /// Configure the database connection.
@@ -321,14 +319,13 @@ class Database {
   }
 
   /// Get all market listings.
-  Future<List<MarketListing>> allMarketListings() async {
+  Future<Iterable<MarketListing>> allMarketListings() async {
     final query = allMarketListingsQuery();
-    return queryMany(query, marketListingFromColumnMap)
-        .then((list) => list.toList());
+    return queryMany(query, marketListingFromColumnMap);
   }
 
   /// Get all WaypointSymbols with a market importing the given tradeSymbol.
-  Future<List<WaypointSymbol>> marketsWithImportInSystem(
+  Future<Iterable<WaypointSymbol>> marketsWithImportInSystem(
     SystemSymbol system,
     TradeSymbol tradeSymbol,
   ) async {
@@ -336,11 +333,11 @@ class Database {
     return queryMany(
       query,
       (map) => WaypointSymbol.fromString(map['symbol'] as String),
-    ).then((list) => list.toList());
+    );
   }
 
   /// Get all WaypointSymbols with a market importing the given tradeSymbol.
-  Future<List<WaypointSymbol>> marketsWithExportInSystem(
+  Future<Iterable<WaypointSymbol>> marketsWithExportInSystem(
     SystemSymbol system,
     TradeSymbol tradeSymbol,
   ) async {
@@ -348,7 +345,7 @@ class Database {
     return queryMany(
       query,
       (map) => WaypointSymbol.fromString(map['symbol'] as String),
-    ).then((list) => list.toList());
+    );
   }
 
   /// Returns true if we know of a market which trades the given symbol.
@@ -372,10 +369,9 @@ class Database {
   }
 
   /// Get all shipyard listings.
-  Future<List<ShipyardListing>> allShipyardListings() async {
+  Future<Iterable<ShipyardListing>> allShipyardListings() async {
     final query = allShipyardListingsQuery();
-    return queryMany(query, shipyardListingFromColumnMap)
-        .then((list) => list.toList());
+    return queryMany(query, shipyardListingFromColumnMap);
   }
 
   /// Update the given shipyard listing in the database.
