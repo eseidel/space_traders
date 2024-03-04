@@ -85,6 +85,7 @@ class DatabaseConnection {
 
   /// Execute a query.
   Future<pg.Result> execute(Query query) {
+    queryCounts.recordQuery(query.fmtString);
     return _connection.execute(
       pg.Sql.named(query.fmtString),
       parameters: query.parameters,
@@ -93,6 +94,7 @@ class DatabaseConnection {
 
   /// Execute a query.
   Future<pg.Result> executeSql(String sql) {
+    queryCounts.recordQuery(sql);
     return _connection.execute(sql);
   }
 }
