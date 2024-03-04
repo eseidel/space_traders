@@ -1,4 +1,5 @@
 import 'package:cli/caches.dart';
+import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logic/idle_queue.dart';
@@ -27,6 +28,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const printEvery = 100;
   var count = 0;
   resetQueue();
+
+  if (argResults['all'] as bool) {
+    final interestingSystems = findInterestingSystems(systems);
+    for (final symbol in interestingSystems) {
+      queue.queueSystem(symbol, jumpDistance: 0);
+    }
+  }
+
   while (true) {
     if (queue.isDone) {
       logger.info('Queue is done, waiting 1 minute.');
@@ -50,5 +59,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 }
 
 void main(List<String> args) async {
-  await runOffline(args, command);
+  await runOffline(
+    args,
+    command,
+    addArgs: (parser) => parser.addFlag(
+      'all',
+      abbr: 'a',
+      help: 'Seed queue with all starter systems.',
+    ),
+  );
 }

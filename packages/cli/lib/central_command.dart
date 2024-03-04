@@ -17,6 +17,20 @@ import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
+// This is a bit of a cheat.  It appears starter systems all have over 20
+// non-asteroid waypoints.  We can use this to find starter systems.
+/// Returns the set of systems we should prefer to chart.
+Set<SystemSymbol> findInterestingSystems(SystemsCache systemsCache) {
+  final allSystems = systemsCache.systems;
+  // All systems with over 20 non-asteroid waypoints:
+  return allSystems
+      .where(
+        (system) => system.waypoints.where((w) => !w.isAsteroid).length > 20,
+      )
+      .map((system) => system.symbol)
+      .toSet();
+}
+
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.

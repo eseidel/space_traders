@@ -79,8 +79,8 @@ class IdleQueue {
   void queueSystem(SystemSymbol systemSymbol, {required int jumpDistance}) {
     final queued = _systems.queue(systemSymbol, jumpDistance);
     if (queued) {
-      logger.detail('Queued System (${_systems.length}): '
-          '$systemSymbol ($jumpDistance)');
+      // logger.detail('Queued System (${_systems.length}): '
+      //     '$systemSymbol ($jumpDistance)');
     }
   }
 
@@ -102,8 +102,8 @@ class IdleQueue {
   }) {
     final queued = _jumpGates.queue(waypointSymbol, jumpDistance);
     if (queued) {
-      logger.detail('Queued JumpGate (${_jumpGates.length}): '
-          '$waypointSymbol ($jumpDistance)');
+      // logger.detail('Queued JumpGate (${_jumpGates.length}): '
+      //     '$waypointSymbol ($jumpDistance)');
     }
   }
 
@@ -111,7 +111,8 @@ class IdleQueue {
     final record = _jumpGates.take();
     final to = record.value;
     final jumpDistance = record.jumpDistance;
-    logger.detail('Process (${_jumpGates.length}): $to ($jumpDistance)');
+    logger
+        .detail('Gate: $to ($jumpDistance jumps, ${_jumpGates.length} queued)');
     // Make sure we have construction data for the destination before
     // checking if we can jump there.
     final underConstruction = await waypoints.isUnderConstruction(to);
@@ -132,8 +133,9 @@ class IdleQueue {
     final systemRecord = _systems.take();
     final systemSymbol = systemRecord.value;
     final jumpDistance = systemRecord.jumpDistance;
-    logger
-        .detail('Process (${_systems.length}): $systemSymbol ($jumpDistance)');
+    logger.detail(
+      'System: $systemSymbol ($jumpDistance jumps, ${_systems.length} queued)',
+    );
     final waypoints = systemsCache.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.symbol;
