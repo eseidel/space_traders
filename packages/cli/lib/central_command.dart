@@ -563,18 +563,26 @@ class CentralCommand {
       ..clear()
       ..addAll(assignProbesToSystems(marketListings, ships));
 
-    miningSquads = await assignShipsToSquads(
-      db,
-      caches.systems,
-      caches.charting,
-      ships,
-      systemSymbol: caches.agent.headquartersSystemSymbol,
-    );
+    if (config.enableMining) {
+      miningSquads = await assignShipsToSquads(
+        db,
+        caches.systems,
+        caches.charting,
+        ships,
+        systemSymbol: caches.agent.headquartersSystemSymbol,
+      );
+    } else {
+      miningSquads = [];
+    }
 
     _nextShipBuyJob ??=
         await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
-    await updateAvailableMounts(db);
-    await _queueMountRequests(db, caches, ships);
+
+    // Mounts are currently only used for mining.
+    if (config.enableMining) {
+      await updateAvailableMounts(db);
+      await _queueMountRequests(db, caches, ships);
+    }
 
     activeConstruction = await computeActiveConstruction(
       db,
