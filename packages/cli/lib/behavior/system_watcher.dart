@@ -55,7 +55,8 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
     systemsNeedingProbes.remove(systemSymbol);
   }
   if (systemsNeedingProbes.isNotEmpty) {
-    logger.warn('Failed to assign probes to systems: $systemsNeedingProbes');
+    final names = systemsNeedingProbes.map((s) => s.systemName).join(', ');
+    logger.warn('Failed to assign probes to systems: $names');
   }
   return assignedProbes;
 }
