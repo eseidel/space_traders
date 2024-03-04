@@ -47,7 +47,7 @@ class Config {
 
   /// Controls how many loops we run of ships before doing our central
   /// planning (assigning ships to squads, planning mounts, etc.)
-  final int centralPlanningInterval = 20;
+  final int centralPlanningInterval = 100;
 
   /// Used to slow down charters and have them spend less money on jumps.
   bool chartAsteroidsByDefault = false;
