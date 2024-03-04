@@ -84,7 +84,10 @@ Map<String, int> _diffCounts(
 ) {
   final result = <String, int>{};
   for (final key in after.keys) {
-    result[key] = after[key]! - (before[key] ?? 0);
+    final diff = after[key]! - (before[key] ?? 0);
+    if (diff != 0) {
+      result[key] = diff;
+    }
   }
   return result;
 }
@@ -114,11 +117,11 @@ Future<T> expectTime<T>(
       '$name took too long ${duration.inMilliseconds}ms '
       '($requests requests, $queryCount queries)',
     );
-    for (final key in queriesDiff.keys) {
-      final count = queriesDiff[key];
-      if (count != null && count > 0) {
-        logger.info('  $key: $count');
-      }
+    // Print the counts in order from most to least:
+    final sorted = queriesDiff.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    for (final entry in sorted) {
+      logger.info('  ${entry.value}: ${entry.key}');
     }
   }
   return result;
