@@ -86,7 +86,7 @@ class Config {
     // Only buy with 3m in cash?
     for (int i = 0; i < 20; i++) ShipType.PROBE,
     // Only buy with 3m in cash?
-    for (int i = 0; i < 20; i++) ShipType.EXPLORER,
+    for (int i = 0; i < 10; i++) ShipType.EXPLORER,
   ];
 
   // TODO(eseidel): Should be some dynamic min count of light-haulers before we
@@ -122,7 +122,7 @@ class Config {
     // TODO(eseidel): I don't think these do anything anymore:
     // FleetRole.miner: [Behavior.miner],
     // FleetRole.surveyor: [Behavior.surveyor],
-    FleetRole.siphoner: [Behavior.siphoner],
+    // FleetRole.siphoner: [Behavior.siphoner],
   };
 
   // We could put some "total value" on the idea of the gate being open
