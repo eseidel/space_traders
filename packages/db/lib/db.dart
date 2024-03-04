@@ -44,6 +44,25 @@ Future<pg.Connection> _defaultOpenConnection(
   return pg.Connection.open(endpoint, settings: settings);
 }
 
+/// QueryCounts tracks the number of queries made.
+class QueryCounts {
+  /// The counts.
+  final Map<String, int> counts = {};
+
+  /// Get the number of requests made to the given path.
+  void recordQuery(String path) {
+    counts[path] = (counts[path] ?? 0) + 1;
+  }
+
+  /// Get the total number of queries made.
+  int get totalQueries => counts.values.fold(0, (a, b) => a + b);
+
+  /// Reset the counts.
+  void reset() {
+    counts.clear();
+  }
+}
+
 /// Wrapper around a database connection.
 class DatabaseConnection {
   /// Create a new database connection.
@@ -52,6 +71,9 @@ class DatabaseConnection {
   /// The underlying connection, private to this class.  Methods on this class
   /// should use execute().
   final pg.Connection _connection;
+
+  /// The number of queries made.
+  final QueryCounts queryCounts = QueryCounts();
 
   /// Close the database connection.
   Future<void> close() => _connection.close();
@@ -93,6 +115,9 @@ class Database {
   final pg.ConnectionSettings? settings;
 
   late final DatabaseConnection _connection;
+
+  /// The number of queries made.
+  QueryCounts get queryCounts => _connection.queryCounts;
 
   /// Open the database connection.
   Future<void> open({

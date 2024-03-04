@@ -34,9 +34,8 @@ Future<void> advanceShips(
   TopOfLoopUpdater updater, {
   bool Function(Ship ship)? shipFilter,
 }) async {
-  await expectTime(
-      api.requestCounts, 'central planning', const Duration(seconds: 1),
-      () async {
+  await expectTime(api.requestCounts, db.queryCounts, 'central planning',
+      const Duration(seconds: 1), () async {
     await centralCommand.advanceCentralPlanning(db, api, caches);
   });
 
@@ -44,9 +43,8 @@ Future<void> advanceShips(
 
   // loop over all ships and advance them.
   for (var i = 0; i < config.centralPlanningInterval; i++) {
-    await expectTime(
-        api.requestCounts, 'top of loop', const Duration(milliseconds: 500),
-        () async {
+    await expectTime(api.requestCounts, db.queryCounts, 'top of loop',
+        const Duration(milliseconds: 500), () async {
       await updater.updateAtTopOfLoop(caches, db, api);
     });
 
@@ -75,6 +73,7 @@ Future<void> advanceShips(
 
       final nextWaitUntil = await captureTimeAndRequests(
         api.requestCounts,
+        db.queryCounts,
         () async => await advanceShipBehavior(
           api,
           db,
@@ -82,7 +81,7 @@ Future<void> advanceShips(
           caches,
           ship,
         ),
-        onComplete: (duration, requestCount) async {
+        onComplete: (duration, requestCount, queryCount) async {
           final behaviorState = await db.behaviorStateBySymbol(shipSymbol);
           final expectedSeconds = requestCount / config.targetRequestsPerSecond;
           if (duration.inSeconds > expectedSeconds * 1.2) {
@@ -92,7 +91,8 @@ Future<void> advanceShips(
             shipWarn(
               ship,
               '$behaviorString'
-              'took ${duration.inSeconds}s ($requestCount requests) '
+              'took ${duration.inSeconds}s '
+              '($requestCount requests, $queryCount queries) '
               'expected ${expectedSeconds.toStringAsFixed(1)}s',
             );
           }

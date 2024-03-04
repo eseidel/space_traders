@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cli/logger.dart';
+import 'package:db/db.dart';
 import 'package:http/http.dart';
 import 'package:types/types.dart';
 
@@ -58,38 +59,47 @@ class CountingApiClient extends ApiClient {
 /// Run a function and record time and request count.
 Future<T> captureTimeAndRequests<T>(
   RequestCounts requestCounts,
+  QueryCounts queryCounts,
   Future<T> Function() fn, {
-  required void Function(Duration duration, int requestCount) onComplete,
+  required void Function(Duration duration, int requestCount, int queryCount)
+      onComplete,
 }) async {
   final before = DateTime.timestamp();
   final requestsBefore = requestCounts.totalRequests;
+  final queriesBefore = queryCounts.totalQueries;
   final result = await fn();
   final after = DateTime.timestamp();
   final duration = after.difference(before);
   final requestsAfter = requestCounts.totalRequests;
+  final queriesAfter = queryCounts.totalQueries;
   final requests = requestsAfter - requestsBefore;
-  onComplete(duration, requests);
+  final queries = queriesAfter - queriesBefore;
+  onComplete(duration, requests, queries);
   return result;
 }
 
 /// Run a function and record time and request count and log if long.
 Future<T> expectTime<T>(
   RequestCounts requestCounts,
+  QueryCounts queryCounts,
   String name,
   Duration expected,
   Future<T> Function() fn,
 ) async {
   final before = DateTime.timestamp();
   final requestsBefore = requestCounts.totalRequests;
+  final queriesBefore = queryCounts.totalQueries;
   final result = await fn();
   final after = DateTime.timestamp();
   final duration = after.difference(before);
   final requestsAfter = requestCounts.totalRequests;
+  final queriesAfter = queryCounts.totalQueries;
   final requests = requestsAfter - requestsBefore;
+  final queries = queriesAfter - queriesBefore;
   if (duration > expected) {
     logger.warn(
       '$name took too long ${duration.inMilliseconds}ms '
-      '($requests requests)',
+      '($requests requests, $queries queries)',
     );
   }
   return result;
