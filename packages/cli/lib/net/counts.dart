@@ -78,6 +78,17 @@ Future<T> captureTimeAndRequests<T>(
   return result;
 }
 
+Map<String, int> _diffCounts(
+  Map<String, int> before,
+  Map<String, int> after,
+) {
+  final result = <String, int>{};
+  for (final key in after.keys) {
+    result[key] = after[key]! - (before[key] ?? 0);
+  }
+  return result;
+}
+
 /// Run a function and record time and request count and log if long.
 Future<T> expectTime<T>(
   RequestCounts requestCounts,
@@ -88,19 +99,27 @@ Future<T> expectTime<T>(
 ) async {
   final before = DateTime.timestamp();
   final requestsBefore = requestCounts.totalRequests;
-  final queriesBefore = queryCounts.totalQueries;
+  final queryCountBefore = queryCounts.totalQueries;
+  final queriesBefore = Map<String, int>.from(queryCounts.counts);
   final result = await fn();
   final after = DateTime.timestamp();
   final duration = after.difference(before);
   final requestsAfter = requestCounts.totalRequests;
-  final queriesAfter = queryCounts.totalQueries;
+  final queryCountAfter = queryCounts.totalQueries;
   final requests = requestsAfter - requestsBefore;
-  final queries = queriesAfter - queriesBefore;
+  final queryCount = queryCountAfter - queryCountBefore;
+  final queriesDiff = _diffCounts(queriesBefore, queryCounts.counts);
   if (duration > expected) {
     logger.warn(
       '$name took too long ${duration.inMilliseconds}ms '
-      '($requests requests, $queries queries)',
+      '($requests requests, $queryCount queries)',
     );
+    for (final key in queriesDiff.keys) {
+      final count = queriesDiff[key];
+      if (count != null && count > 0) {
+        logger.info('  $key: $count');
+      }
+    }
   }
   return result;
 }
