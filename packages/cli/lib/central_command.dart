@@ -575,7 +575,13 @@ class CentralCommand {
 
     _assignedSystemsForSatellites
       ..clear()
-      ..addAll(assignProbesToSystems(marketListings, ships));
+      ..addAll(
+        assignProbesToSystems(
+          caches.systemConnectivity,
+          marketListings,
+          ships,
+        ),
+      );
 
     if (config.enableMining) {
       miningSquads = await assignShipsToSquads(

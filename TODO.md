@@ -1185,8 +1185,6 @@ dart run bin/behavior.dart 29
   "expiration": "2024-03-01T18:17:10.909Z"
 },
 
-### Add db profiling code.
-
 ### Move logs into db.
 
 ### Add explorer/warp logic.
@@ -1199,8 +1197,6 @@ https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 ### SystemWatcher should clear after every visit, even if it's already charted.
 
 ### Figure out how to trace execution of the client (and show in systrace).
-
-### Fix ShipSnapshot compare to ignore Cooldown.
 
 ### Build a profit/loss statement.
 
@@ -1236,3 +1232,5 @@ with system-watchers?
 And the fuel costs are quite high.
 
 ### Predict prices before purchase and log when they differ?
+
+### Profile and improve speed of idle_queue.dart

@@ -6,11 +6,13 @@ import 'package:cli/logic/printing.dart';
 import 'package:cli/nav/exploring.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
+import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Logic for assigning systems to system watchers.
 Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
+  SystemConnectivity systemConnectivity,
   MarketListingSnapshot marketListings,
   ShipSnapshot ships,
 ) {
@@ -39,6 +41,14 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   for (final probe in availableProbes) {
     if (systemsNeedingProbes.isEmpty) {
       break;
+    }
+    // Probes can only use jump gates, so don't try to assign a probe to a
+    // a system it can't reach.
+    if (!systemConnectivity.existsJumpPathBetween(
+      probe.systemSymbol,
+      systemsNeedingProbes.last,
+    )) {
+      continue;
     }
     final systemSymbol = systemsNeedingProbes.removeLast();
     assignedProbes[probe.shipSymbol] = systemSymbol;
@@ -106,10 +116,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
   final systemWaypoints = system.waypoints.toList(); // Copy so we can sort.
   if (start != null) {
     final startWaypoint = systemsCache.waypoint(start);
-    systemWaypoints.sort(
-      (a, b) =>
-          a.distanceTo(startWaypoint).compareTo(b.distanceTo(startWaypoint)),
-    );
+    systemWaypoints.sortBy<num>((a) => a.distanceTo(startWaypoint));
   }
 
   for (final systemWaypoint in systemWaypoints) {
