@@ -1234,3 +1234,7 @@ And the fuel costs are quite high.
 ### Predict prices before purchase and log when they differ?
 
 ### Profile and improve speed of idle_queue.dart
+
+### Write a script to distribute traders.
+
+### Write logic to pick a place to buy a ship and then the closest/fastest ship to buy there.
