@@ -1,10 +1,71 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:cli/nav/navigation.dart';
+import 'package:collection/collection.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);
+}
+
+RoutePlan? shortestPathTo(
+  SystemConnectivity systemConnectivity,
+  RoutePlanner routePlanner,
+  SystemsCache systemsCache,
+  SystemSymbol systemSymbol,
+  Ship ship,
+) {
+  final startClusterId =
+      systemConnectivity.clusterIdForSystem(ship.systemSymbol);
+  final maxFuel = ship.frame.fuelCapacity;
+  final system = systemsCache[systemSymbol];
+  final nearbySystems = systemsCache.systems.where(
+    (s) =>
+        s.symbol != systemSymbol &&
+        systemConnectivity.clusterIdForSystem(s.symbol) == startClusterId &&
+        s.distanceTo(system) < maxFuel,
+  );
+  final routes = <RoutePlan>[];
+  for (final nearbySystem in nearbySystems) {
+    // Figure out the time to route from current location to the jumpgate
+    // for nearbySystem.
+    final jumpGate = nearbySystem.jumpGateWaypoints.first;
+    final route = routePlanner.planRoute(
+      ship.shipSpec,
+      start: ship.waypointSymbol,
+      end: jumpGate.symbol,
+    );
+    if (route != null) {
+      routes.add(route);
+    }
+  }
+  if (routes.isEmpty) {
+    return null;
+  }
+  final plan = routes.sortedBy((r) => r.duration).first;
+  final actions = List<RouteAction>.from(plan.actions);
+  // Should pick something more central.
+  final end = system.jumpGateWaypoints.first;
+  final nearbySystem = systemsCache[actions.last.endSymbol.system];
+  final distance = nearbySystem.distanceTo(system);
+  final seconds = warpTimeByDistanceAndSpeed(
+    distance: distance,
+    shipSpeed: ship.shipSpec.speed,
+    flightMode: ShipNavFlightMode.CRUISE,
+  );
+  final fuel = fuelUsedByDistance(
+    distance,
+    ShipNavFlightMode.CRUISE,
+  );
+  actions.add(
+    RouteAction(
+      startSymbol: plan.endSymbol,
+      endSymbol: end.symbol,
+      type: RouteActionType.warpCruise,
+      seconds: seconds,
+      fuelUsed: fuel,
+    ),
+  );
+  return plan.copyWith(actions: actions);
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
@@ -40,31 +101,22 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Look check all systems within 800 units of an unreachable system for
   // a reachable system.
   const maxFuel = 800;
+  logger
+    ..info('Unreachable systems within $maxFuel fuel of reachable systems.')
+    ..info('with travel time by explorer at ${explorer.waypointSymbol}');
 
   for (final systemSymbol in unreachableSystems) {
-    final system = systemsCache[systemSymbol];
-    final nearbySystems = systemsCache.systems.where(
-      (s) => s.symbol != systemSymbol && s.distanceTo(system) < maxFuel,
+    final plan = shortestPathTo(
+      systemConnectivity,
+      routePlanner,
+      systemsCache,
+      systemSymbol,
+      explorer,
     );
-    if (nearbySystems.isEmpty) {
-      logger.info('No nearby systems for $systemSymbol');
-      continue;
-    }
-    logger.info('Nearby systems for $systemSymbol:');
-    for (final nearbySystem in nearbySystems) {
-      final distance = system.distanceTo(nearbySystem).round().toString();
-      final near = nearbySystem.symbol.systemName;
-
-      // Figure out the time to route from current location to the jumpgate
-      // for nearbySystem.
-      final jumpGate = nearbySystem.jumpGateWaypoints.first;
-      final route = routePlanner.planRoute(
-        explorer.shipSpec,
-        start: explorer.waypointSymbol,
-        end: jumpGate.symbol,
+    if (plan != null) {
+      logger.info(
+        '  $systemSymbol: ${describeRoutePlan(plan)}',
       );
-      final duration = approximateDuration(route!.duration);
-      logger.info(' ${distance.padLeft(3)} to $near ($duration)');
     }
   }
 }

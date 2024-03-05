@@ -217,6 +217,15 @@ class RoutePlan {
     return actions[index + 1];
   }
 
+  /// Make a new route plan with actions.
+  RoutePlan copyWith({required List<RouteAction> actions}) {
+    return RoutePlan(
+      fuelCapacity: fuelCapacity,
+      shipSpeed: shipSpeed,
+      actions: actions,
+    );
+  }
+
   /// Convert this route plan to JSON.
   Map<String, dynamic> toJson() => <String, dynamic>{
         'fuelCapacity': fuelCapacity,
