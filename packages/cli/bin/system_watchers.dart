@@ -51,6 +51,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final ships = await ShipSnapshot.load(db);
 
+  final systemConnectivity = await loadSystemConnectivity(db);
+  final mainClusterId =
+      systemConnectivity.clusterIdForSystem(ships.ships.first.systemSymbol);
+
   logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');
   for (final state in systemWatcherStates) {
     final shipSymbol = state.shipSymbol;
@@ -75,14 +79,26 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     '\n${plural(systemsToWatch.length, 'system')} '
     'with at least 5 markets:',
   );
+  final unreachableSystems = <SystemSymbol>{};
+
   for (final systemSymbol in systemsToWatch) {
     final shipsAssigned = systemWatcherStates
         .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)
         .map((s) => s.shipSymbol)
         .toList();
+    if (shipsAssigned.isEmpty &&
+        systemConnectivity.clusterIdForSystem(systemSymbol) != mainClusterId) {
+      unreachableSystems.add(systemSymbol);
+      continue;
+    }
     logger.info(
       '${systemSymbol.systemName.padRight(4)} has '
       '${plural(shipsAssigned.length, 'watcher')}',
     );
+  }
+
+  if (unreachableSystems.isNotEmpty) {
+    logger
+        .info('\n${plural(unreachableSystems.length, 'unreachable systems')}');
   }
 }
