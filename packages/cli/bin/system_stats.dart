@@ -13,9 +13,22 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemConnectivity =
       SystemConnectivity.fromJumpGates(jumpGateSnapshot, constructionSnapshot);
 
+  var totalSystems = 0;
+  var totalJumpgates = 0;
+  var totalWaypoints = 0;
+  for (final system in systemsCache.systems) {
+    totalSystems += 1;
+    totalWaypoints += system.waypoints.length;
+    totalJumpgates += system.jumpGateWaypoints.length;
+  }
+
+  String p(double d) => '${(d * 100).round()}%';
+
   final reachableSystems =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
-  logger.info('${reachableSystems.length} systems');
+  final reachableSystemPercent = reachableSystems.length / totalSystems;
+  logger.info('${reachableSystems.length} systems '
+      '(${p(reachableSystemPercent)} of $totalSystems)');
 
   var jumpGates = 0;
   var asteroids = 0;
@@ -26,7 +39,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     jumpGates += systemRecord.jumpGateWaypoints.length;
     asteroids += systemRecord.waypoints.where((w) => w.isAsteroid).length;
   }
-  logger.info('$waypointCount waypoints');
+  final reachableWaypointPercent = waypointCount / totalWaypoints;
+  logger.info('$waypointCount waypoints '
+      '(${p(reachableWaypointPercent)} of $totalWaypoints)');
 
   // How many waypoints are charted?
   final chartingSnapshot = await ChartingSnapshot.load(db);
@@ -56,8 +71,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final nonAsteroidChartPercent = nonAsteroidCartedCount / nonAsteroidCount;
   final asteroidChartPercent = chartedAsteroids / asteroids;
 
-  String p(double d) => '${(d * 100).round()}%';
-
   logger
     ..info(' $chartedWaypoints charted non-asteroid '
         '(${p(nonAsteroidChartPercent)})')
@@ -86,9 +99,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       shipyards += 1;
     }
   }
+  final reachableJumpGatePercent = jumpGates / totalJumpgates;
   logger
     ..info('$shipyards shipyards')
-    ..info('$jumpGates jump gates');
+    ..info('$jumpGates jump gates'
+        ' (${p(reachableJumpGatePercent)} of $totalJumpgates)');
 
   // How many are cached?
   var cachedJumpGates = 0;
