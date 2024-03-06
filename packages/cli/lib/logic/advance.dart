@@ -4,6 +4,7 @@ import 'package:cli/behavior/job.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/miner_hauler.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
+import 'package:cli/behavior/seeder.dart';
 import 'package:cli/behavior/siphoner.dart';
 import 'package:cli/behavior/surveyor.dart';
 import 'package:cli/behavior/system_watcher.dart';
@@ -60,6 +61,8 @@ Future<DateTime?> Function(
       return advanceCharter;
     case Behavior.mountFromBuy:
       return advanceMountFromBuy;
+    case Behavior.seeder:
+      return advanceSeeder;
     case Behavior.idle:
       return _advanceIdle;
   }

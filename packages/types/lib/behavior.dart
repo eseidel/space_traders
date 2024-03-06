@@ -80,6 +80,9 @@ enum Behavior {
   /// Idle.
   idle,
 
+  /// A ship set to seed new systems.
+  seeder,
+
   /// pickup goods from miners and sell them
   minerHauler,
 
