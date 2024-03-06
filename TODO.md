@@ -1238,3 +1238,9 @@ And the fuel costs are quite high.
 ### Write a script to distribute traders.
 
 ### Write logic to pick a place to buy a ship and then the closest/fastest ship to buy there.
+
+### Remove MarketPrices from cache (significant load time).
+
+### Figure out why traders don't end up with "idle" behaviors?
+
+idleHaulerSymbols has a hack around this.

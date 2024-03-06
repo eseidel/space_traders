@@ -113,11 +113,10 @@ class BehaviorSnapshot {
       Behavior.idle,
       Behavior.charter,
     ];
-    final idleHaulerStates = states
-        .where((s) => haulerSymbols.contains(s.shipSymbol))
-        .where((s) => idleBehaviors.contains(s.behavior))
-        .toList();
-    return idleHaulerStates.map((s) => s.shipSymbol).toList();
+    return haulerSymbols.where((s) {
+      final state = stateForShip(s);
+      return state != null && idleBehaviors.contains(state.behavior);
+    }).toList();
   }
 }
 

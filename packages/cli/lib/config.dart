@@ -88,6 +88,7 @@ class Config {
     // Only buy with 3m in cash?
     for (int i = 0; i < 10; i++) ShipType.EXPLORER,
     for (int i = 0; i < 20; i++) ShipType.PROBE,
+    for (int i = 0; i < 20; i++) ShipType.PROBE,
   ];
 
   // TODO(eseidel): Should be some dynamic min count of light-haulers before we
