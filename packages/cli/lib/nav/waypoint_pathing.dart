@@ -149,15 +149,7 @@ List<RouteAction>? findRouteWithinSystem(
     actions.add(action);
     // Currently any visit to a non-start/non-end waypoint is to refuel.
     if (action.startSymbol != start && sellsFuel(action.startSymbol)) {
-      actions.add(
-        RouteAction(
-          startSymbol: action.startSymbol,
-          endSymbol: action.startSymbol,
-          type: RouteActionType.refuel,
-          seconds: 0,
-          fuelUsed: 0,
-        ),
-      );
+      actions.add(RouteAction.refuel(action.startSymbol));
     }
     // Move to the next prior waypoint and continue.
     end = action.startSymbol;

@@ -221,7 +221,8 @@ Future<NavResult> continueNavigationIfNeeded(
   }
   final routePlan = state.routePlan;
   if (routePlan == null) {
-    // We don't have a routePlan, so we can't navigate.
+    // We don't have a routePlan, so we can't navigate. This is the common
+    // case where continueNavigationIfNeeded isn't needed.
     return NavResult._continueAction();
   }
   if (routePlan.actions.isEmpty) {
@@ -311,6 +312,9 @@ Future<NavResult> continueNavigationIfNeeded(
         ship,
         medianFuelPurchasePrice: median,
       );
+      // TODO(eseidel): This should be loop, but that can't work because we
+      // can't figure out which action to do next when we do multiple actions
+      // at the same waypoint.
       return NavResult._continueAction();
     case RouteActionType.navCruise:
       if (ship.usesFuel) {
@@ -374,14 +378,22 @@ Future<NavResult> continueNavigationIfNeeded(
         ),
       );
     case RouteActionType.warpCruise:
-      return NavResult._wait(
-        await warpToWaypointAndLog(
-          db,
-          api,
-          caches.systems,
-          ship,
-          actionEnd,
-        ),
-      );
+      shipErr(ship, 'Warping to ${actionEnd.symbol}!');
+      try {
+        return NavResult._wait(
+          await warpToWaypointAndLog(
+            db,
+            api,
+            caches.systems,
+            ship,
+            actionEnd,
+          ),
+        );
+      } on ApiException catch (e) {
+        if (isInfuficientFuelException(e)) {
+          throw const JobException('Not enough fuel', Duration(minutes: 10));
+        }
+        rethrow;
+      }
   }
 }

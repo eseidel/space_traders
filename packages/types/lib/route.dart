@@ -71,6 +71,16 @@ class RouteAction {
     // required this.cooldown,
   });
 
+  /// Create a new route action to refuel at a waypoint.
+  const RouteAction.refuel(WaypointSymbol symbol)
+      : this(
+          startSymbol: symbol,
+          endSymbol: symbol,
+          type: RouteActionType.refuel,
+          seconds: 0,
+          fuelUsed: 0,
+        );
+
   /// Create a new route action from JSON.
   factory RouteAction.fromJson(Map<String, dynamic> json) {
     return RouteAction(

@@ -398,13 +398,7 @@ void main() {
       seconds: 10,
       fuelUsed: 10,
     );
-    final two = RouteAction(
-      type: RouteActionType.refuel,
-      startSymbol: WaypointSymbol.fromString('A-B-B'),
-      endSymbol: WaypointSymbol.fromString('A-B-B'),
-      seconds: 10,
-      fuelUsed: 0,
-    );
+    final two = RouteAction.refuel(WaypointSymbol.fromString('A-B-B'));
     final three = RouteAction(
       type: RouteActionType.navCruise,
       startSymbol: WaypointSymbol.fromString('A-B-B'),

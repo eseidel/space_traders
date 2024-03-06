@@ -283,6 +283,7 @@ extension ShipNavRouteUtils on ShipNavRoute {
       WaypointSymbol.fromString(destination.symbol);
 
   /// Returns the distance between the origin and destination.
+  /// Only makes sense for nav routes, not warp routes.
   double get distance => origin.distanceTo(destination);
 
   /// Returns the duration of the route.

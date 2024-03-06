@@ -120,7 +120,10 @@ class Config {
       Behavior.siphoner,
     ],
     FleetRole.trader: [Behavior.trader],
-    FleetRole.explorer: [Behavior.trader],
+    FleetRole.explorer: [
+      Behavior.seeder,
+      Behavior.trader,
+    ],
     // TODO(eseidel): I don't think these do anything anymore:
     // FleetRole.miner: [Behavior.miner],
     // FleetRole.surveyor: [Behavior.surveyor],

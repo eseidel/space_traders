@@ -1244,3 +1244,10 @@ And the fuel costs are quite high.
 ### Figure out why traders don't end up with "idle" behaviors?
 
 idleHaulerSymbols has a hack around this.
+
+### Add warp time/fuel prediction.
+
+Looks correct:
+warpCruise      KH4-C10C  JV44-A1 18m 632 fuel
+actual:
+🛸#64 🛫 to JV44-A1 PLANET (18m) spent 632 fuel

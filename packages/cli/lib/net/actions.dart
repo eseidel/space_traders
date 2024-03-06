@@ -538,14 +538,14 @@ Future<DateTime> warpToWaypointAndLog(
   final flightTime = result.nav.route.duration;
   final consumedFuel = result.fuel.consumed?.amount ?? 0;
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
-  shipInfo(
+  shipErr(
     ship,
     '🛫 to ${waypoint.symbol} ${waypoint.type} '
     '(${approximateDuration(flightTime)})$fuelString',
   );
   // TODO(eseidel): Fix to use warp.
-  _checkFlightTime(flightTime, ship, result);
-  _checkFuelUsage(ship, result);
+  // _checkFlightTime(flightTime, ship, result);
+  // _checkFuelUsage(ship, result);
   return result.nav.route.arrival;
 }
 

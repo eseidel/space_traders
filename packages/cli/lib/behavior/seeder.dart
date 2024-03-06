@@ -2,7 +2,9 @@ import 'package:cli/behavior/job.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/nav/exploring.dart';
 import 'package:cli/nav/navigation.dart';
+import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
 
 WaypointSymbol _centralWaypointInSystem(
@@ -64,6 +66,10 @@ RoutePlan? _shortestPathTo(
     distance,
     ShipNavFlightMode.CRUISE,
   );
+  if (actions.first.type == RouteActionType.emptyRoute) {
+    actions.removeAt(0);
+  }
+  // TODO(eseidel): Do jump gate markets have fuel?
   actions.add(
     RouteAction(
       startSymbol: plan.endSymbol,
@@ -175,6 +181,10 @@ Future<JobResult> doSeeder(
   final mainClusterId = caches.systemConnectivity.clusterIdForSystem(hqSystem);
   if (mainClusterId !=
       caches.systemConnectivity.clusterIdForSystem(ship.systemSymbol)) {
+    shipErr(ship, 'Successfully off network in ${ship.systemSymbol}!');
+    // Get the shipyard for this system.
+    // replace our state with a buy-ship job there.
+
     throw JobException(
       'Nothing to do, ${ship.shipSymbol} is already off network.',
       const Duration(hours: 1),
@@ -199,11 +209,35 @@ Future<JobResult> doSeeder(
     'No system to seed.',
     const Duration(hours: 1),
   );
+
+  shipErr(ship, 'Seeder starting route to ${route.endSymbol.system}.');
+  shipInfo(ship, describeRoutePlan(route));
+
+  final maybeMarket = await visitLocalMarket(api, db, caches, ship);
+  if (maybeMarket != null) {
+    await refuelIfNeededAndLog(
+      api,
+      db,
+      caches.agent,
+      maybeMarket,
+      ship,
+      medianFuelPurchasePrice: 72,
+    );
+  }
+
   // This job is done as soon as this route is complete.
   // Then the explorer should try to start trading?
-  await beingRouteAndLog(api, db, centralCommand, caches, ship, state, route);
-
-  return JobResult.complete();
+  final waitUntil = await beingRouteAndLog(
+    api,
+    db,
+    centralCommand,
+    caches,
+    ship,
+    state,
+    route,
+  );
+  // If we return complete here the caller would delete the behavior state.
+  return JobResult.wait(waitUntil);
 }
 
 /// Advance the seeder behavior.
