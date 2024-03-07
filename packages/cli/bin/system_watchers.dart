@@ -1,3 +1,4 @@
+import 'package:cli/behavior/system_watcher.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/printing.dart';
@@ -98,7 +99,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   if (unreachableSystems.isNotEmpty) {
-    logger
-        .info('\n${plural(unreachableSystems.length, 'unreachable systems')}');
+    logger.info('\n${plural(unreachableSystems.length, 'unreachable system')}');
+  }
+
+  logger.info('Assignments:');
+  final assignments =
+      assignProbesToSystems(systemConnectivity, marketListings, ships);
+  for (final entry in assignments.entries) {
+    logger.info('${entry.value.systemName.padRight(4)}: ${entry.key}');
   }
 }

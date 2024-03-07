@@ -36,26 +36,23 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   for (final probeSymbol in assignedProbes.keys) {
     availableProbes.removeWhere((s) => s.shipSymbol == probeSymbol);
   }
+  final systemsNeededByClusterId = systemsNeedingProbes
+      .groupListsBy((s) => systemConnectivity.clusterIdForSystem(s));
+
   // Otherwise just assign the remaining probes.
   // TODO(eseidel): We could assign by proximity.
   for (final probe in availableProbes) {
-    if (systemsNeedingProbes.isEmpty) {
-      break;
-    }
-    // Probes can only use jump gates, so don't try to assign a probe to a
-    // a system it can't reach.
-    if (!systemConnectivity.existsJumpPathBetween(
-      probe.systemSymbol,
-      systemsNeedingProbes.last,
-    )) {
+    final clusterId = systemConnectivity.clusterIdForSystem(probe.systemSymbol);
+    final systemsNeeded = systemsNeededByClusterId[clusterId];
+    if (systemsNeeded == null || systemsNeeded.isEmpty) {
       continue;
     }
-    final systemSymbol = systemsNeedingProbes.removeLast();
+    final systemSymbol = systemsNeeded.removeLast();
     assignedProbes[probe.shipSymbol] = systemSymbol;
-    systemsNeedingProbes.remove(systemSymbol);
   }
-  if (systemsNeedingProbes.isNotEmpty) {
-    final names = systemsNeedingProbes.map((s) => s.systemName).join(', ');
+  final remainingSystems = systemsNeededByClusterId.values.expand((e) => e);
+  if (remainingSystems.isNotEmpty) {
+    final names = remainingSystems.map((s) => s.systemName).join(', ');
     logger.warn('Failed to assign probes to ${names.length} systems: $names');
   }
   return assignedProbes;
