@@ -70,6 +70,16 @@ Future<T> captureTimeAndRequests<T>(
   return result;
 }
 
+/// Log the counts.
+void logCounts<T>(Counts<T> counts) {
+  // Print the counts in order from most to least:
+  final sorted = counts.counts.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  for (final entry in sorted) {
+    logger.info('  ${entry.value}: ${entry.key}');
+  }
+}
+
 /// Run a function and record time and request count and log if long.
 Future<T> expectTime<T>(
   RequestCounts requestCounts,
@@ -95,12 +105,7 @@ Future<T> expectTime<T>(
         '$name took too long ${duration.inMilliseconds}ms '
         '($requestCount requests, $queryCount queries)',
       );
-      // Print the counts in order from most to least:
-      final sorted = queryCounts.counts.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
-      for (final entry in sorted) {
-        logger.info('  ${entry.value}: ${entry.key}');
-      }
+      logCounts(queryCounts);
     },
   );
   return result;

@@ -95,6 +95,7 @@ Future<void> advanceShips(
               '($requestCount requests, ${queryCounts.total} queries) '
               'expected ${expectedSeconds.toStringAsFixed(1)}s',
             );
+            logCounts(queryCounts);
           }
         },
       );
