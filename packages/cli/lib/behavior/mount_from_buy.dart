@@ -77,8 +77,7 @@ BuyJob? buyJobForMount(
       tradeSymbol,
       expectedCreditsPerSecond: expectedCreditsPerSecond,
       start: ship.waypointSymbol,
-      fuelCapacity: ship.fuel.capacity,
-      shipSpeed: ship.engine.speed,
+      shipSpec: ship.shipSpec,
     );
     if (marketTrip != null) {
       return BuyJob(

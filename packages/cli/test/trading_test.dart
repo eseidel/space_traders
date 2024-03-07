@@ -508,8 +508,7 @@ void main() {
         TradeSymbol.ALUMINUM,
         expectedCreditsPerSecond: 1,
         start: ship.waypointSymbol,
-        fuelCapacity: ship.fuel.capacity,
-        shipSpeed: ship.engine.speed,
+        shipSpec: ship.shipSpec,
       ),
     );
 

@@ -23,8 +23,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     tradeSymbol,
     expectedCreditsPerSecond: 7,
     start: ship.waypointSymbol,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
+    shipSpec: ship.shipSpec,
   );
   if (best == null) {
     logger.info('No market to buy $tradeSymbol');

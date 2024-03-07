@@ -183,6 +183,9 @@ Future<JobResult> doSeeder(
     // Get the shipyard for this system.
     // replace our state with a buy-ship job there.
 
+    // If we have already bought a probe in this system, get back onto
+    // the main jumpgate network and look for the next system to seed?
+
     throw JobException(
       'Nothing to do, ${ship.shipSymbol} is already off network.',
       const Duration(hours: 1),

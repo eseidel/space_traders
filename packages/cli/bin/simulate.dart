@@ -210,8 +210,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     routePlanner,
     tradeSymbol,
     start: ship.waypointSymbol,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
+    shipSpec: ship.shipSpec,
   );
 
   final haulerRoute = trips[1].route;

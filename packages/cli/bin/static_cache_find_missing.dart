@@ -31,8 +31,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       // We don't really care about the value of the "trade".
       expectedCreditsPerSecond: 7,
       start: ship.waypointSymbol,
-      fuelCapacity: ship.fuel.capacity,
-      shipSpeed: ship.engine.speed,
+      shipSpec: ship.shipSpec,
     );
     if (marketTrip == null) {
       logger.info('No market for $tradeSymbol');

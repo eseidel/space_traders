@@ -1277,3 +1277,38 @@ actual:
 🛸#98 🛫 to JV44-G52 PLANET (14m)
 
 How did 98 get a buy job!?
+
+### Charters taking waaaaay too long:
+
+🛸#71 🗺️  QR38-DF2B - PLANET - Rocky, Sprawling Cities, Canyons, Strong Gravity, Salt Flats, Marketplace
+Timed out (1s) waiting for response?
+🛸#71 ✍️  market data @ QR38-DF2B
+[WARN] 🛸#71 took 67s (4 requests, 33 queries) expected 1.6s
+[WARN] top of loop took too long 548ms (0 requests, 1 queries)
+  1: SELECT * FROM market_price_
+🛸#71 QR38-CB3Z (GAS_GIANT) is missing chart, routing.
+[WARN] 🛸#71 Beginning route to QR38-CB3Z (9m)
+🛸#71 🛫 to QR38-CB3Z GAS_GIANT (9m)
+
+71 probe (charter) SATELLITE 
+   enroute to QR38-CB3Z GAS_GIANT in 9m
+
+I was probably running "fleet.dart" at the same time, but still.
+
+### Routing trouble in trade planning?
+
+🛸#1  ✈️  to AQ24-C39, -5ms left
+[WARN] No route from AQ24-C39 to BT63-C39
+[WARN] No route from AQ24-C39 to JV44-C42
+[WARN] No route from AQ24-C39 to JV44-G52
+[WARN] No route from AQ24-C39 to BT63-G47
+[WARN] No route from AQ24-C39 to JV44-E49
+[WARN] No route from AQ24-C39 to BT63-F45
+[WARN] No route from AQ24-C39 to UT62-G50
+[WARN] No route from AQ24-C39 to UT62-C39
+[WARN] No route from AQ24-C39 to BT63-E44
+🛸#1  Selecting AQ24-G48 earns 192c extra (including -72c for fuel) over 13s (7.4/s)
+🛸#1  Traveling to AQ24-G48 to sell.
+🛸#1  Beginning route to AQ24-G48 (2m)
+🛸#1  🛫 to AQ24-G48 PLANET (2m) spent 94 fuel
+

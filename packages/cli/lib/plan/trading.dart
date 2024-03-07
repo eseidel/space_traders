@@ -467,8 +467,7 @@ List<MarketTrip> marketsTradingSortedByDistance(
   RoutePlanner routePlanner,
   TradeSymbol tradeSymbol, {
   required WaypointSymbol start,
-  required int shipSpeed,
-  required int fuelCapacity,
+  required ShipSpec shipSpec,
 }) {
   final prices = marketPrices.pricesFor(tradeSymbol).toList();
   if (prices.isEmpty) {
@@ -486,11 +485,7 @@ List<MarketTrip> marketsTradingSortedByDistance(
     final trip = costTrip<MarketPrice>(
       routePlanner,
       price,
-      ShipSpec(
-        fuelCapacity: fuelCapacity,
-        speed: shipSpeed,
-        cargoCapacity: 0,
-      ),
+      shipSpec,
       start: start,
       end: end,
     );
@@ -514,8 +509,7 @@ MarketTrip? findBestMarketToBuy(
   RoutePlanner routePlanner,
   TradeSymbol tradeSymbol, {
   required WaypointSymbol start,
-  required int shipSpeed,
-  required int fuelCapacity,
+  required ShipSpec shipSpec,
   required int expectedCreditsPerSecond,
 }) {
   final sorted = marketsTradingSortedByDistance(
@@ -523,8 +517,7 @@ MarketTrip? findBestMarketToBuy(
     routePlanner,
     tradeSymbol,
     start: start,
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
+    shipSpec: shipSpec,
   );
   if (sorted.isEmpty) {
     return null;
@@ -597,8 +590,7 @@ Future<MarketTrip?> findBestMarketToSell(
     routePlanner,
     tradeSymbol,
     start: ship.waypointSymbol,
-    fuelCapacity: ship.fuel.capacity,
-    shipSpeed: ship.engine.speed,
+    shipSpec: ship.shipSpec,
   );
   if (sorted.isEmpty) {
     return null;
