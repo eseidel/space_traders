@@ -14,14 +14,12 @@ RoutePlan? shortestPathTo(
   SystemSymbol systemSymbol,
   Ship ship,
 ) {
-  final startClusterId =
-      systemConnectivity.clusterIdForSystem(ship.systemSymbol);
   final maxFuel = ship.frame.fuelCapacity;
   final system = systemsCache[systemSymbol];
   final nearbySystems = systemsCache.systems.where(
     (s) =>
         s.symbol != systemSymbol &&
-        systemConnectivity.clusterIdForSystem(s.symbol) == startClusterId &&
+        systemConnectivity.existsJumpPathBetween(s.symbol, ship.systemSymbol) &&
         s.distanceTo(system) < maxFuel,
   );
   final routes = <RoutePlan>[];
@@ -78,9 +76,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   // Find ones not in our main cluster.
   final systemConnectivity = await loadSystemConnectivity(db);
-  final mainClusterId = systemConnectivity.clusterIdForSystem(
-    ships.ships.first.systemSymbol,
-  );
+  final agentCache = await AgentCache.load(db);
+  final hqSystem = agentCache!.headquartersSystemSymbol;
 
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
@@ -92,9 +89,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final unreachableSystems = systemsToWatch
       .where(
-        (systemSymbol) =>
-            systemConnectivity.clusterIdForSystem(systemSymbol) !=
-            mainClusterId,
+        (systemSymbol) => systemConnectivity.existsJumpPathBetween(
+          systemSymbol,
+          hqSystem,
+        ),
       )
       .toList();
 

@@ -377,6 +377,8 @@ class RoutePlanner {
   final JumpCache _jumpCache;
   final bool Function(WaypointSymbol) _sellsFuel;
 
+  SystemConnectivity get systemConnectivity => _systemConnectivity;
+
   /// Clear any cached routing data.  Called when jump gate availability changes
   /// because a jump gate is constructed.
   void clearRoutingCaches() {

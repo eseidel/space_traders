@@ -1251,3 +1251,29 @@ Looks correct:
 warpCruise      KH4-C10C  JV44-A1 18m 632 fuel
 actual:
 🛸#64 🛫 to JV44-A1 PLANET (18m) spent 632 fuel
+
+### Buying doubles?
+
+🛸#64 ✈️  to JV44-C42, -14ms left
+🛸#64 ✍️  shipyard data @ X1-JV44-C42
+🛸#64 Purchased SHIP_PROBE for 21,013c -> 🏦 47,009,953c
+🛸#64 Bought ship: ESEIDEL-98
+[WARN] 🛸#64 Purchased ESEIDEL-98 (SHIP_PROBE)!
+[WARN] Adding missing ship ESEIDEL-98
+🛸#98 ✍️  shipyard data @ X1-JV44-C42
+🛸#98 Purchased SHIP_PROBE for 21,484c -> 🏦 46,988,469c
+🛸#98 Bought ship: ESEIDEL-99
+[WARN] 🛸#98 Purchased ESEIDEL-99 (SHIP_PROBE)!
+[WARN] Adding missing ship ESEIDEL-99
+🛸#99 ✍️  market data @ JV44-C42
+🛸#99 Charted reachable systems within 5 jumps, charting asteroids in X1-JV44.
+[WARN] 🛸#99 Charted all known systems Disabling Behavior.charter for ESEIDEL-99 for 1h.
+🛸#99 JV44-C43 is missing recent (3d) market data, routing.
+[WARN] 🛸#99 Beginning route to JV44-C43 (6m)
+🛸#99 🛫 to JV44-C43 FUEL_STATION (6m)
+[WARN] 🛸#98 Charted all known systems Disabling Behavior.charter for ESEIDEL-98 for 1h.
+🛸#98 JV44-G52 is missing recent (3d) market data, routing.
+[WARN] 🛸#98 Beginning route to JV44-G52 (14m)
+🛸#98 🛫 to JV44-G52 PLANET (14m)
+
+How did 98 get a buy job!?

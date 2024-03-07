@@ -48,12 +48,13 @@ class ShipSpec {
     required this.cargoCapacity,
     required this.fuelCapacity,
     required this.speed,
+    this.canWarp = false,
   });
 
   /// Fallback value for mocking.
   @visibleForTesting
   ShipSpec.fallbackValue()
-      : this(cargoCapacity: 0, fuelCapacity: 100, speed: 10);
+      : this(cargoCapacity: 0, fuelCapacity: 100, speed: 10, canWarp: false);
 
   /// The fuel capacity of the ship.
   final int fuelCapacity;
@@ -63,6 +64,9 @@ class ShipSpec {
 
   /// The speed of the ship.
   final int speed;
+
+  /// Can the ship warp.
+  final bool canWarp;
 }
 
 /// Extensions onto Ship to make it easier to work with.

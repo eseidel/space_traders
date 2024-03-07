@@ -25,14 +25,12 @@ RoutePlan? _shortestPathTo(
   SystemSymbol systemSymbol,
   Ship ship,
 ) {
-  final startClusterId =
-      systemConnectivity.clusterIdForSystem(ship.systemSymbol);
   final maxFuel = ship.frame.fuelCapacity;
   final system = systemsCache[systemSymbol];
   final nearbySystems = systemsCache.systems.where(
     (s) =>
         s.symbol != systemSymbol &&
-        systemConnectivity.clusterIdForSystem(s.symbol) == startClusterId &&
+        systemConnectivity.existsJumpPathBetween(s.symbol, ship.systemSymbol) &&
         s.distanceTo(system) < maxFuel,
   );
   final routes = <RoutePlan>[];
@@ -91,14 +89,13 @@ Future<RoutePlan?> _routeToClosestSystemToSeed(
   required SystemSymbol mainClusterSystemSymbol,
   bool Function(SystemSymbol waypointSymbol)? filter,
 }) async {
-  final mainClusterId =
-      systemConnectivity.clusterIdForSystem(mainClusterSystemSymbol);
   final starterSystems = findInterestingSystems(systemsCache);
   final unreachableSystems = starterSystems
       .where(
-        (systemSymbol) =>
-            systemConnectivity.clusterIdForSystem(systemSymbol) !=
-            mainClusterId,
+        (systemSymbol) => systemConnectivity.existsJumpPathBetween(
+          systemSymbol,
+          mainClusterSystemSymbol,
+        ),
       )
       .toList();
 
@@ -134,22 +131,20 @@ Future<RoutePlan?> routeToNextSystemToSeed(
 ) async {
   // Get all interesting systems which do not have ships in them or ships
   // headed towards them.
-  final occupiedClusters = <int>{};
+  final systemSymbols = <SystemSymbol>{};
   for (final ship in ships.ships) {
-    final id = connectivity.clusterIdForSystem(ship.systemSymbol);
-    if (id != null) {
-      occupiedClusters.add(id);
-    }
+    systemSymbols.add(ship.systemSymbol);
   }
   for (final state in behaviors.states) {
     final route = state.routePlan;
     if (route != null) {
-      final id = connectivity.clusterIdForSystem(route.endSymbol.system);
-      if (id != null) {
-        occupiedClusters.add(id);
-      }
+      systemSymbols.add(route.endSymbol.system);
     }
   }
+  final occupiedClusters = systemSymbols
+      .map((s) => connectivity.clusterIdForSystem(s))
+      .whereNotNull()
+      .toSet();
 
   final route = await _routeToClosestSystemToSeed(
     systems,
@@ -159,7 +154,11 @@ Future<RoutePlan?> routeToNextSystemToSeed(
     mainClusterSystemSymbol: agentCache.headquartersSystemSymbol,
     filter: (SystemSymbol systemSymbol) {
       final clusterId = connectivity.clusterIdForSystem(systemSymbol);
-      // Don't visit systems we already have a ship in.
+      // If this system doesn't have a cluster id, check our system list.
+      if (clusterId == null) {
+        return !systemSymbols.contains(systemSymbol);
+      }
+      // Otherwise check our cluster id list.
       return !occupiedClusters.contains(clusterId);
     },
   );
@@ -178,9 +177,8 @@ Future<JobResult> doSeeder(
 }) async {
   // If we're already off the main jump gate network, nothing to do.
   final hqSystem = caches.agent.headquartersSystemSymbol;
-  final mainClusterId = caches.systemConnectivity.clusterIdForSystem(hqSystem);
-  if (mainClusterId !=
-      caches.systemConnectivity.clusterIdForSystem(ship.systemSymbol)) {
+  if (caches.systemConnectivity
+      .existsJumpPathBetween(ship.systemSymbol, hqSystem)) {
     shipErr(ship, 'Successfully off network in ${ship.systemSymbol}!');
     // Get the shipyard for this system.
     // replace our state with a buy-ship job there.

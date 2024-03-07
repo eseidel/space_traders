@@ -23,6 +23,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
 void main() {
   test('advanceShipBehavior idle does not spin hot', () async {
     final api = _MockApi();
@@ -41,11 +43,13 @@ void main() {
 
     final centralCommand = _MockCentralCommand();
     final logger = _MockLogger();
+    final systemConnectivity = _MockSystemConnectivity();
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
-    when(() => centralCommand.getJobForShip(db, ship, any()))
-        .thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
+    when(
+      () => centralCommand.getJobForShip(db, systemConnectivity, ship, any()),
+    ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
     when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});
     when(() => db.deleteBehaviorState(shipSymbol)).thenAnswer((_) async => {});
@@ -88,10 +92,12 @@ void main() {
     final centralCommand = _MockCentralCommand();
 
     final logger = _MockLogger();
+    final systemConnectivity = _MockSystemConnectivity();
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
-    when(() => centralCommand.getJobForShip(db, ship, any()))
+    when(() =>
+            centralCommand.getJobForShip(db, systemConnectivity, ship, any()))
         .thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
     when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});

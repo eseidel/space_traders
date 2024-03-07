@@ -51,10 +51,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       await db.behaviorStatesWithBehavior(Behavior.systemWatcher);
   final systemsCache = SystemsCache.load(fs)!;
   final ships = await ShipSnapshot.load(db);
+  final agentCache = await AgentCache.load(db);
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final mainClusterId =
-      systemConnectivity.clusterIdForSystem(ships.ships.first.systemSymbol);
+  final hqSystemSymbol = agentCache!.headquartersSystemSymbol;
 
   logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');
   for (final state in systemWatcherStates) {
@@ -88,7 +88,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
         .map((s) => s.shipSymbol)
         .toList();
     if (shipsAssigned.isEmpty &&
-        systemConnectivity.clusterIdForSystem(systemSymbol) != mainClusterId) {
+        !systemConnectivity.existsJumpPathBetween(
+          systemSymbol,
+          hqSystemSymbol,
+        )) {
       unreachableSystems.add(systemSymbol);
       continue;
     }

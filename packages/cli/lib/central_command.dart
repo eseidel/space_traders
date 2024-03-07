@@ -168,6 +168,7 @@ class CentralCommand {
   /// its next job.
   Future<BehaviorState> getJobForShip(
     Database db,
+    SystemConnectivity systemConnectivity,
     Ship ship,
     int credits,
   ) async {
@@ -200,7 +201,8 @@ class CentralCommand {
       );
     }
     // Otherwise buy a ship if we can.
-    if (enabled(Behavior.buyShip) && await shouldBuyShip(db, ship, credits)) {
+    if (enabled(Behavior.buyShip) &&
+        await shouldBuyShip(db, systemConnectivity, ship, credits)) {
       return BehaviorState(
         shipSymbol,
         Behavior.buyShip,
@@ -679,6 +681,56 @@ class CentralCommand {
     );
   }
 
+  Future<ShipBuyJob?> _unreachableSystemProbe(
+    Database db,
+    Api api,
+    Caches caches,
+    ShipyardListingSnapshot shipyardListings,
+    ShipSnapshot ships,
+  ) async {
+    // Get our main cluster id.
+    final hqSystemSymbol = caches.agent.headquartersSystemSymbol;
+    // List all systems with explorers in them.
+    final systemsWithExplorers = ships.ships
+        .where((s) => s.fleetRole == FleetRole.explorer)
+        .map((s) => s.systemSymbol)
+        .toSet();
+    // Any system which is not in our main cluster id.
+    final unreachableSystems = systemsWithExplorers
+        .where(
+          (s) => caches.systemConnectivity
+              .existsJumpPathBetween(s, hqSystemSymbol),
+        )
+        .toSet();
+    // And does not have a probe in it.
+    final probes =
+        ships.ships.where((s) => s.isProbe).map((s) => s.systemSymbol).toSet();
+    final systemWithoutProbes = unreachableSystems
+        .where((s) => !probes.contains(s))
+        .sortedBy((s) => s.system);
+    // return a probe buy job.
+    if (systemWithoutProbes.isEmpty) {
+      logger.info('All unreachable systems have probes!');
+      return null;
+    }
+    const shipType = ShipType.PROBE;
+    final systemSymbol = systemWithoutProbes.first;
+    final shipyardSymbol = shipyardListings
+        .listingsInSystem(systemSymbol)
+        .firstWhereOrNull((s) => s.hasShip(shipType))
+        ?.waypointSymbol;
+    if (shipyardSymbol == null) {
+      logger.info("Can't find shipyard to buy probe in $systemSymbol");
+      return null;
+    }
+    return ShipBuyJob(
+      shipType: shipType,
+      shipyardSymbol: shipyardSymbol,
+      // Arbitrary credits value.
+      minCreditsNeeded: 100000,
+    );
+  }
+
   /// Computes the next ship buy job.
   Future<ShipBuyJob?> _computeNextShipBuyJob(
     Database db,
@@ -687,6 +739,17 @@ class CentralCommand {
     ShipyardListingSnapshot shipyardListings,
     ShipSnapshot ships,
   ) async {
+    final unreachableProbeJob = await _unreachableSystemProbe(
+      db,
+      api,
+      caches,
+      shipyardListings,
+      ships,
+    );
+    if (unreachableProbeJob != null) {
+      return unreachableProbeJob;
+    }
+
     final shipType = await shipToBuyFromPlan(
       ships,
       config.buyPlan,
@@ -704,7 +767,12 @@ class CentralCommand {
   }
 
   /// Returns true if [ship] should start the buyShip behavior.
-  Future<bool> shouldBuyShip(Database db, Ship ship, int credits) async {
+  Future<bool> shouldBuyShip(
+    Database db,
+    SystemConnectivity systemConnectivity,
+    Ship ship,
+    int credits,
+  ) async {
     // Are there any other ships actively buying a ship?
     final states = await db.behaviorStatesWithBehavior(Behavior.buyShip);
     if (states.isNotEmpty) {
@@ -723,6 +791,13 @@ class CentralCommand {
     if (ship.systemSymbol != buyJob.shipyardSymbol.system && !ship.isCommand) {
       return false;
     }
+    if (!systemConnectivity.existsJumpPathBetween(
+      buyJob.shipyardSymbol.system,
+      ship.systemSymbol,
+    )) {
+      return false;
+    }
+
     // TODO(eseidel): See how far it is to the shipyard, only go if < 10 mins?
     // This may pick ships which are a long ways away from the shipyard.
     // But it at least avoids problems where the command ship is tied up

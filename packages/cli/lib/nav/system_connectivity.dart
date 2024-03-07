@@ -81,6 +81,7 @@ class _Clusters {
   }
 
   /// Returns the cluster id for the given system.
+  /// Careful!  Systems with clusterId == null are not connected to anything.
   int? clusterIdForSystem(SystemSymbol systemSymbol) =>
       _clusterBySystemSymbol[systemSymbol];
 
@@ -225,6 +226,8 @@ class SystemConnectivity {
       _clusters.connectedSystemCount(systemSymbol);
 
   /// Returns the cluster id for the given system.
+  /// Caution: This will return null for systems w/o a jump gate.
+  /// It *cannot* be directly compared, use existsJumpPathBetween instead.
   int? clusterIdForSystem(SystemSymbol systemSymbol) =>
       _clusters.clusterIdForSystem(systemSymbol);
 

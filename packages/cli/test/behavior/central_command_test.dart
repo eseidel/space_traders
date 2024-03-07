@@ -40,6 +40,8 @@ class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 class _MockShipyardListingSnapshot extends Mock
     implements ShipyardListingSnapshot {}
 
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
 void main() {
   test('CentralCommand.otherCharterSystems', () async {
     RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
@@ -351,15 +353,29 @@ void main() {
     when(() => db.behaviorStatesWithBehavior(Behavior.buyShip)).thenAnswer(
       (_) async => [],
     );
-    final shouldBuy =
-        await centralCommand.shouldBuyShip(db, ship, paddingCredits + 100);
+    final systemConnectivity = _MockSystemConnectivity();
+
+    final shouldBuy = await centralCommand.shouldBuyShip(
+      db,
+      systemConnectivity,
+      ship,
+      paddingCredits + 100,
+    );
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
     when(() => db.behaviorStatesWithBehavior(Behavior.buyShip)).thenAnswer(
       (_) async => [BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip)],
     );
-    expect(await centralCommand.shouldBuyShip(db, ship, 100000), false);
+    expect(
+      await centralCommand.shouldBuyShip(
+        db,
+        systemConnectivity,
+        ship,
+        100000,
+      ),
+      false,
+    );
 
     final buyJob = centralCommand.takeShipBuyJob();
     expect(buyJob, isNotNull);
@@ -651,7 +667,13 @@ void main() {
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 0, capacity: 1000));
-    final job = await centralCommand.getJobForShip(db, ship, 1000000);
+    final systemConnectivity = _MockSystemConnectivity();
+    final job = await centralCommand.getJobForShip(
+      db,
+      systemConnectivity,
+      ship,
+      1000000,
+    );
     // Can't do anything when out of fuel.
     expect(job.behavior, Behavior.idle);
   });
@@ -680,7 +702,13 @@ void main() {
     registerFallbackValue(Behavior.idle);
     when(() => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()))
         .thenReturn(true);
-    final job = await centralCommand.getJobForShip(db, ship, 1000000);
+    final systemConnectivity = _MockSystemConnectivity();
+    final job = await centralCommand.getJobForShip(
+      db,
+      systemConnectivity,
+      ship,
+      1000000,
+    );
     // Nothing specified for this ship, so it should be idle.
     expect(job.behavior, Behavior.idle);
   });

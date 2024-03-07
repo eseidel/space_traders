@@ -292,6 +292,12 @@ CostedDeal costOutDeal(
   );
 
   if (route == null) {
+    for (final symbol in waypointSymbols) {
+      final clusterId = routePlanner.systemConnectivity.clusterIdForSystem(
+        symbol.system,
+      );
+      logger.info('Cluster $clusterId: ${symbol.system}');
+    }
     throw Exception('No route found for $deal through $waypointSymbols');
   }
 
@@ -313,12 +319,10 @@ MarketScan scanReachableMarkets(
   MarketPriceSnapshot marketPrices, {
   required SystemSymbol startSystem,
 }) {
-  // Reachable systems will all have the same clusterId as the start system.
-  final clusterId = systemConnectivity.clusterIdForSystem(startSystem);
   return MarketScan.fromMarketPrices(
     marketPrices,
     waypointFilter: (w) =>
-        systemConnectivity.clusterIdForSystem(w.system) == clusterId,
+        systemConnectivity.existsJumpPathBetween(w.system, startSystem),
     description: 'all known markets',
   );
 }

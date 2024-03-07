@@ -36,13 +36,27 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   for (final probeSymbol in assignedProbes.keys) {
     availableProbes.removeWhere((s) => s.shipSymbol == probeSymbol);
   }
-  final systemsNeededByClusterId = systemsNeedingProbes
-      .groupListsBy((s) => systemConnectivity.clusterIdForSystem(s));
+
+  // clusterId == null means the system has no jump gate connections, so we
+  // use the systemSymbol itself as the id.  Otherwise we use the clusterId.
+  // TODO(eseidel): Make clusterId work this way.
+  String idForCluster(
+    SystemSymbol systemSymbol,
+  ) {
+    final clusterId = systemConnectivity.clusterIdForSystem(systemSymbol);
+    if (clusterId != null) {
+      return clusterId.toString();
+    }
+    return systemSymbol.system;
+  }
+
+  final systemsNeededByClusterId =
+      systemsNeedingProbes.groupListsBy(idForCluster);
 
   // Otherwise just assign the remaining probes.
   // TODO(eseidel): We could assign by proximity.
   for (final probe in availableProbes) {
-    final clusterId = systemConnectivity.clusterIdForSystem(probe.systemSymbol);
+    final clusterId = idForCluster(probe.systemSymbol);
     final systemsNeeded = systemsNeededByClusterId[clusterId];
     if (systemsNeeded == null || systemsNeeded.isEmpty) {
       continue;

@@ -181,7 +181,7 @@ void _verifyJumpTime(
 ) {
   final from = systemsCache[fromSystem];
   final to = systemsCache[toSystem];
-  final distance = from.distanceTo(to);
+  final distance = from.distanceTo(to).round();
   verifyCooldown(
     ship,
     'Jump ${from.symbol} to ${to.symbol} ($distance)',
