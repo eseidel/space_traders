@@ -7,6 +7,7 @@ export 'src/charting_record.dart';
 export 'src/construction.dart';
 export 'src/contract.dart';
 export 'src/contract_transaction.dart';
+export 'src/counts.dart';
 export 'src/deal.dart';
 export 'src/export.dart';
 export 'src/extraction.dart';

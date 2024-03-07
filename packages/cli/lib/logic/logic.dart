@@ -81,7 +81,7 @@ Future<void> advanceShips(
           caches,
           ship,
         ),
-        onComplete: (duration, requestCount, queryCount) async {
+        onComplete: (duration, requestCount, queryCounts) async {
           final behaviorState = await db.behaviorStateBySymbol(shipSymbol);
           final expectedSeconds = requestCount / config.targetRequestsPerSecond;
           if (duration.inSeconds > expectedSeconds * 1.2) {
@@ -92,7 +92,7 @@ Future<void> advanceShips(
               ship,
               '$behaviorString'
               'took ${duration.inSeconds}s '
-              '($requestCount requests, $queryCount queries) '
+              '($requestCount requests, ${queryCounts.total} queries) '
               'expected ${expectedSeconds.toStringAsFixed(1)}s',
             );
           }
@@ -131,7 +131,7 @@ class RateLimitTracker {
   RateLimitTracker(Api api, {this.printEvery = const Duration(minutes: 2)})
       : _api = api,
         _lastPrintTime = DateTime.timestamp() {
-    _lastRequestCount = _api.requestCounts.totalRequests;
+    _lastRequestCount = _api.requestCounts.total;
   }
 
   /// The rate limit stats are printed every this often.
@@ -147,7 +147,7 @@ class RateLimitTracker {
     final timeSinceLastPrint = now.difference(_lastPrintTime);
     final requestCounts = _api.requestCounts;
     if (timeSinceLastPrint > printEvery) {
-      final requestCount = requestCounts.totalRequests;
+      final requestCount = requestCounts.total;
       final requestsSinceLastPrint = requestCount - _lastRequestCount;
       _lastRequestCount = requestCount;
       final requestsPerSecond =

@@ -67,7 +67,9 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   final remainingSystems = systemsNeededByClusterId.values.expand((e) => e);
   if (remainingSystems.isNotEmpty) {
     final names = remainingSystems.map((s) => s.systemName).join(', ');
-    logger.warn('Failed to assign probes to ${names.length} systems: $names');
+    logger.warn(
+      'Failed to assign probes to ${remainingSystems.length} systems: $names',
+    );
   }
   return assignedProbes;
 }

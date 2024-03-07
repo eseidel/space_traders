@@ -1295,6 +1295,15 @@ Timed out (1s) waiting for response?
 
 I was probably running "fleet.dart" at the same time, but still.
 
+
+[WARN] 🛸#80 late 1m
+🛸#80 ✍️  market data @ HK51-F21Z
+🛸#80 Charted reachable systems within 5 jumps, charting asteroids in X1-HK51.
+[WARN] 🛸#80 (charter) took 22s (2 requests, 5127 queries) expected 0.8s
+🛸#80 HK51-F16C (ASTEROID) is missing chart, routing.
+[WARN] 🛸#80 Beginning route to HK51-F16C (20m)
+🛸#80 🛫 to HK51-F16C ASTEROID (20m)
+
 ### Routing trouble in trade planning?
 
 🛸#1  ✈️  to AQ24-C39, -5ms left
@@ -1312,3 +1321,12 @@ I was probably running "fleet.dart" at the same time, but still.
 🛸#1  Beginning route to AQ24-G48 (2m)
 🛸#1  🛫 to AQ24-G48 PLANET (2m) spent 94 fuel
 
+### Assign unsused probes.
+
+Each system can have "slots" based on the number of connected systems without charts.
+Assign up to half the slots?
+Do some sort of proximity based matching?
+
+Same thing could work for traders.  Compute the number of deals above a
+certain c/s, starting from that system and assign up to a certain capacity
+level with a similar matching algorithm?

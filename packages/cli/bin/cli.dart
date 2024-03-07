@@ -33,11 +33,11 @@ void printRequestStats(RequestCounts requestCounts, Duration duration) {
   }
   final possible =
       (duration.inSeconds * config.targetRequestsPerSecond).round();
-  final percent = requestCounts.totalRequests / possible;
+  final percent = requestCounts.total / possible;
   final percentString = '${(percent * 100).round()}%';
-  final avg = requestCounts.totalRequests / duration.inSeconds;
+  final avg = requestCounts.total / duration.inSeconds;
   logger
-    ..info('Total: ${requestCounts.totalRequests} requests '
+    ..info('Total: ${requestCounts.total} requests '
         'over ${approximateDuration(duration)}. '
         '(avg ${avg.toStringAsFixed(2)} r/s)')
     ..info('Used $percentString of $possible possible requests.');

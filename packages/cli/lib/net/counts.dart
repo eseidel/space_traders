@@ -6,22 +6,12 @@ import 'package:http/http.dart';
 import 'package:types/types.dart';
 
 /// RequestCounts tracks the number of requests made to each path.
-class RequestCounts {
-  /// The counts.
-  final Map<String, int> counts = {};
+class RequestCounts extends Counts<String> {
+  /// Construct a RequestCounts.
+  RequestCounts([super.counts]);
 
-  /// Get the number of requests made to the given path.
-  void recordRequest(String path) {
-    counts[path] = (counts[path] ?? 0) + 1;
-  }
-
-  /// Get the total number of requests made.
-  int get totalRequests => counts.values.fold(0, (a, b) => a + b);
-
-  /// Reset the counts.
-  void reset() {
-    counts.clear();
-  }
+  /// Make a copy of the RequestCounts.
+  RequestCounts copy() => RequestCounts(counts);
 }
 
 /// ApiClient that counts the number of requests made.
@@ -43,7 +33,7 @@ class CountingApiClient extends ApiClient {
     String? contentType,
   ) async {
     logger.detail(path);
-    requestCounts.recordRequest(path);
+    requestCounts.record(path);
     return super.invokeAPI(
       path,
       method,
@@ -61,34 +51,22 @@ Future<T> captureTimeAndRequests<T>(
   RequestCounts requestCounts,
   QueryCounts queryCounts,
   Future<T> Function() fn, {
-  required void Function(Duration duration, int requestCount, int queryCount)
-      onComplete,
+  required void Function(
+    Duration duration,
+    int requestCount,
+    QueryCounts queryCounts,
+  ) onComplete,
 }) async {
   final before = DateTime.timestamp();
-  final requestsBefore = requestCounts.totalRequests;
-  final queriesBefore = queryCounts.totalQueries;
+  final requestsBefore = requestCounts.total;
+  final queriesBefore = queryCounts.copy();
   final result = await fn();
   final after = DateTime.timestamp();
   final duration = after.difference(before);
-  final requestsAfter = requestCounts.totalRequests;
-  final queriesAfter = queryCounts.totalQueries;
+  final requestsAfter = requestCounts.total;
   final requests = requestsAfter - requestsBefore;
-  final queries = queriesAfter - queriesBefore;
-  onComplete(duration, requests, queries);
-  return result;
-}
-
-Map<String, int> _diffCounts(
-  Map<String, int> before,
-  Map<String, int> after,
-) {
-  final result = <String, int>{};
-  for (final key in after.keys) {
-    final diff = after[key]! - (before[key] ?? 0);
-    if (diff != 0) {
-      result[key] = diff;
-    }
-  }
+  final queriesDiff = queryCounts.diff(queriesBefore);
+  onComplete(duration, requests, queriesDiff);
   return result;
 }
 
@@ -100,29 +78,30 @@ Future<T> expectTime<T>(
   Duration expected,
   Future<T> Function() fn,
 ) async {
-  final before = DateTime.timestamp();
-  final requestsBefore = requestCounts.totalRequests;
-  final queryCountBefore = queryCounts.totalQueries;
-  final queriesBefore = Map<String, int>.from(queryCounts.counts);
-  final result = await fn();
-  final after = DateTime.timestamp();
-  final duration = after.difference(before);
-  final requestsAfter = requestCounts.totalRequests;
-  final queryCountAfter = queryCounts.totalQueries;
-  final requests = requestsAfter - requestsBefore;
-  final queryCount = queryCountAfter - queryCountBefore;
-  final queriesDiff = _diffCounts(queriesBefore, queryCounts.counts);
-  if (duration > expected) {
-    logger.warn(
-      '$name took too long ${duration.inMilliseconds}ms '
-      '($requests requests, $queryCount queries)',
-    );
-    // Print the counts in order from most to least:
-    final sorted = queriesDiff.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    for (final entry in sorted) {
-      logger.info('  ${entry.value}: ${entry.key}');
-    }
-  }
+  final result = await captureTimeAndRequests<T>(
+    requestCounts,
+    queryCounts,
+    fn,
+    onComplete: (
+      Duration duration,
+      int requestCount,
+      QueryCounts queryCounts,
+    ) {
+      if (duration <= expected) {
+        return;
+      }
+      final queryCount = queryCounts.total;
+      logger.warn(
+        '$name took too long ${duration.inMilliseconds}ms '
+        '($requestCount requests, $queryCount queries)',
+      );
+      // Print the counts in order from most to least:
+      final sorted = queryCounts.counts.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      for (final entry in sorted) {
+        logger.info('  ${entry.value}: ${entry.key}');
+      }
+    },
+  );
   return result;
 }

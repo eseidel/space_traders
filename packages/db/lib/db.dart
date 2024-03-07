@@ -45,22 +45,16 @@ Future<pg.Connection> _defaultOpenConnection(
 }
 
 /// QueryCounts tracks the number of queries made.
-class QueryCounts {
-  /// The counts.
-  final Map<String, int> counts = {};
+class QueryCounts extends Counts<String> {
+  /// Construct a QueryCounts.
+  QueryCounts([super.counts]);
 
-  /// Get the number of requests made to the given path.
-  void recordQuery(String path) {
-    counts[path] = (counts[path] ?? 0) + 1;
-  }
+  /// Diff the counts with the given QueryCounts.
+  QueryCounts diff(QueryCounts before) =>
+      QueryCounts(Counts.diffCounts(before.counts, counts));
 
-  /// Get the total number of queries made.
-  int get totalQueries => counts.values.fold(0, (a, b) => a + b);
-
-  /// Reset the counts.
-  void reset() {
-    counts.clear();
-  }
+  /// Make a copy of the QueryCounts.
+  QueryCounts copy() => QueryCounts(counts);
 }
 
 /// Wrapper around a database connection.
@@ -85,7 +79,7 @@ class DatabaseConnection {
 
   /// Execute a query.
   Future<pg.Result> execute(Query query) {
-    queryCounts.recordQuery(query.fmtString);
+    queryCounts.record(query.fmtString);
     return _connection.execute(
       pg.Sql.named(query.fmtString),
       parameters: query.parameters,
@@ -94,7 +88,7 @@ class DatabaseConnection {
 
   /// Execute a query.
   Future<pg.Result> executeSql(String sql) {
-    queryCounts.recordQuery(sql);
+    queryCounts.record(sql);
     return _connection.execute(sql);
   }
 }

@@ -27,17 +27,21 @@ class NonRepeatingDistanceQueue<T> {
   NonRepeatingDistanceQueue()
       : _queue =
             PriorityQueue((a, b) => a.jumpDistance.compareTo(b.jumpDistance)),
-        _seen = {};
+        _queued = {};
 
   final PriorityQueue<WithDistance<T>> _queue;
-  final Set<T> _seen;
+  final Set<T> _queued;
+  int _takenCount = 0;
 
   /// Add an item to the queue.
   bool queue(T item, int jumpDistance) {
-    if (_seen.contains(item)) {
+    // Everything that's in _taken is also in _queued.
+    if (_queued.contains(item)) {
       return false;
     }
-    // This can end up queuing the same item multiple times, but that's ok.
+    // _queued prevents us from every queuing the same item more than once.
+    _queued.add(item);
+    // _queue ensures we pull items out in jumpDistance order.
     _queue.add(WithDistance(item, jumpDistance));
     return true;
   }
@@ -45,7 +49,9 @@ class NonRepeatingDistanceQueue<T> {
   /// Take the next item from the queue.
   WithDistance<T> take() {
     final item = _queue.removeFirst();
-    _seen.add(item.value);
+    // _queued ensures items are only ever added once, so they can also only
+    // ever be taken once, thus _takenCount is just an int rather than a set.
+    _takenCount += 1;
     return item;
   }
 
@@ -55,8 +61,8 @@ class NonRepeatingDistanceQueue<T> {
   /// How many items are in the queue.
   int get length => _queue.length;
 
-  /// How many items have been seen.
-  int get seenLength => _seen.length;
+  /// How many items have been seen/taken.
+  int get seenLength => _takenCount;
 
   /// Returns true when the queue is not empty.
   bool get isNotEmpty => _queue.isNotEmpty;
