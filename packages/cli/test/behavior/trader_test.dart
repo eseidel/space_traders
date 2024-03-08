@@ -583,6 +583,7 @@ void main() {
     when(() => shipEngine.speed).thenReturn(10);
     when(() => ship.engine).thenReturn(shipEngine);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
+    when(() => ship.modules).thenReturn([]);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -828,6 +829,7 @@ void main() {
     const shipSpeed = 10;
     when(() => shipEngine.speed).thenReturn(shipSpeed);
     when(() => ship.engine).thenReturn(shipEngine);
+    when(() => ship.modules).thenReturn([]);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');

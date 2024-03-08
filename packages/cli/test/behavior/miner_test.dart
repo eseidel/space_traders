@@ -355,6 +355,7 @@ void main() {
     final shipEngine = _MockShipEngine();
     when(() => ship.engine).thenReturn(shipEngine);
     when(() => shipEngine.speed).thenReturn(10);
+    when(() => ship.modules).thenReturn([]);
     when(() => caches.marketPrices.pricesFor(tradeSymbol)).thenReturn([]);
 
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);

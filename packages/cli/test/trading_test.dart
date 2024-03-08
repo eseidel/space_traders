@@ -420,6 +420,10 @@ void main() {
     when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
     when(() => shipEngine.speed).thenReturn(shipSpeed);
+    final shipCargo = ShipCargo(capacity: 100, units: 0);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => ship.modules).thenReturn([]);
+
     final routePlanner = _MockRoutePlanner();
     final marketPrices = _MockMarketPrices();
     final now = DateTime(2021);
@@ -530,6 +534,9 @@ void main() {
     when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
     when(() => shipEngine.speed).thenReturn(shipSpeed);
+    final shipCargo = ShipCargo(capacity: 100, units: 0);
+    when(() => ship.cargo).thenReturn(shipCargo);
+    when(() => ship.modules).thenReturn([]);
     final routePlanner = _MockRoutePlanner();
     final marketPrices = _MockMarketPrices();
     final now = DateTime(2021);

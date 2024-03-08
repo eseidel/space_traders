@@ -269,6 +269,10 @@ void main() {
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
     when(() => ship.engine).thenReturn(shipEngine);
+    final cargo = ShipCargo(capacity: 100, units: 0);
+    when(() => ship.cargo).thenReturn(cargo);
+    when(() => ship.modules).thenReturn([]);
+
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
