@@ -13,15 +13,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     }
   }
 
-  var any = false;
   for (final role in FleetRole.values) {
     final count = idleByRole[role] ?? 0;
     if (count > 0) {
       logger.info('${role.name}: $count');
-      any = true;
     }
   }
-  if (!any) {
+  if (idleByRole.values.every((count) => count == 0)) {
     logger.info('No idle ships found.');
   }
 }
