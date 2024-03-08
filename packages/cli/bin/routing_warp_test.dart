@@ -28,6 +28,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       .map((s) => systemsCache[s].jumpGateWaypoints.first.symbol)
       .toList();
 
+  logger.info('Pathing to ${interestingWaypoints.length} systems...');
   for (final end in interestingWaypoints) {
     final routeStart = DateTime.timestamp();
     final actions = findRouteBetweenSystems(
