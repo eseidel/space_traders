@@ -335,9 +335,7 @@ Iterable<CostedDeal> findDealsFor(
   RoutePlanner routePlanner,
   MarketScan scan, {
   required WaypointSymbol startSymbol,
-  required int fuelCapacity,
-  required int cargoCapacity,
-  required int shipSpeed,
+  required ShipSpec shipSpec,
   required int maxTotalOutlay,
   List<SellOpp>? extraSellOpps,
   bool Function(Deal deal)? filter,
@@ -348,9 +346,9 @@ Iterable<CostedDeal> findDealsFor(
     'start: $startSymbol, '
     'from scan: ${scan.description}, '
     'max outlay: $maxTotalOutlay, '
-    'max units: $cargoCapacity, '
-    'fuel capacity: $fuelCapacity, '
-    'ship speed: $shipSpeed',
+    'max units: ${shipSpec.cargoCapacity}, '
+    'fuel capacity: ${shipSpec.fuelCapacity}, '
+    'ship speed: ${shipSpec.speed}, ',
   );
   // Allow negative unit profits in search when we're allowing negative
   // per-second profits.
@@ -384,11 +382,7 @@ Iterable<CostedDeal> findDealsFor(
         (deal) => costOutDeal(
           systemsCache,
           routePlanner,
-          ShipSpec(
-            cargoCapacity: cargoCapacity,
-            fuelCapacity: fuelCapacity,
-            speed: shipSpeed,
-          ),
+          shipSpec,
           deal,
           shipWaypointSymbol: startSymbol,
           costPerFuelUnit: costPerFuelUnit,
@@ -739,9 +733,7 @@ Iterable<CostedDeal> scanAndFindDeals(
     extraSellOpps: extraSellOpps,
     filter: filter,
     startSymbol: startSymbol,
-    fuelCapacity: shipSpec.fuelCapacity,
-    cargoCapacity: shipSpec.cargoCapacity,
-    shipSpeed: shipSpec.speed,
+    shipSpec: shipSpec,
     minProfitPerSecond: minProfitPerSecond,
   );
 }

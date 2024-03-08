@@ -58,6 +58,7 @@ class TestShip {
         speed: speed,
         fuelCapacity: fuelCapacity,
         cargoCapacity: 0,
+        canWarp: false,
       );
 
   final int speed;

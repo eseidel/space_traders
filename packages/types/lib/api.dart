@@ -48,7 +48,7 @@ class ShipSpec {
     required this.cargoCapacity,
     required this.fuelCapacity,
     required this.speed,
-    this.canWarp = false,
+    required this.canWarp,
   });
 
   /// Fallback value for mocking.
@@ -92,6 +92,8 @@ extension ShipUtils on Ship {
         cargoCapacity: cargo.capacity,
         fuelCapacity: fuel.capacity,
         speed: engine.speed,
+        canWarp:
+            modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
       );
 
   /// Returns the amount of the given trade good the ship has.

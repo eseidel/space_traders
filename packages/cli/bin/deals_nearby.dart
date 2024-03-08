@@ -73,14 +73,12 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
 
   final shipyardShips = ShipyardShipCache.load(fs);
   final ship = shipyardShips[shipType]!;
-  final cargoCapacity = ship.cargoCapacity;
-  final shipSpeed = ship.engine.speed;
-  final fuelCapacity = ship.frame.fuelCapacity;
+  final shipSpec = ship.shipSpec;
 
   logger.info('$shipType @ ${start.symbol}, '
-      'speed = $shipSpeed '
-      'capacity = $cargoCapacity, '
-      'fuel <= $fuelCapacity, '
+      'speed = ${shipSpec.speed} '
+      'capacity = ${shipSpec.cargoCapacity}, '
+      'fuel <= ${shipSpec.fuelCapacity}, '
       'outlay <= $credits');
 
   if (extraSellOpps.isNotEmpty) {
@@ -112,9 +110,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     routePlanner,
     marketScan,
     maxTotalOutlay: credits,
-    cargoCapacity: cargoCapacity,
-    fuelCapacity: fuelCapacity,
-    shipSpeed: shipSpeed,
+    shipSpec: shipSpec,
     startSymbol: start.symbol,
     extraSellOpps: extraSellOpps,
   );

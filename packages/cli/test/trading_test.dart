@@ -122,6 +122,7 @@ void main() {
         cargoCapacity: 1,
         speed: shipSpeed,
         fuelCapacity: fuelCapacity,
+        canWarp: false,
       ),
       deal,
       shipWaypointSymbol: start.symbol,
@@ -278,9 +279,7 @@ void main() {
         marketScan,
         maxTotalOutlay: 100000,
         startSymbol: ship.waypointSymbol,
-        fuelCapacity: ship.fuel.capacity,
-        cargoCapacity: ship.cargo.capacity,
-        shipSpeed: ship.engine.speed,
+        shipSpec: ship.shipSpec,
       ).firstOrNull,
     );
     expect(costed, isNotNull);
