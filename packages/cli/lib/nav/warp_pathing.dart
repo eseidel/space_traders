@@ -20,141 +20,160 @@ class _SystemAction {
     required this.startSymbol,
     required this.endSymbol,
     required this.type,
-    required this.seconds,
-    required this.fuelUsed,
   });
   final SystemSymbol startSymbol;
   final SystemSymbol endSymbol;
   final _ActionType type;
-  final int seconds;
-  final int fuelUsed;
 }
 
-/// Returns the path from [start] to [end] as a list of system symbols.
-List<_SystemAction>? _findActionsBetweenSystems(
-  SystemsCache systemsCache,
-  SystemConnectivity systemConnectivity,
-  ShipSpec shipSpec, {
-  required SystemSymbol startSymbol,
-  required SystemSymbol endSymbol,
-  required bool Function(WaypointSymbol) sellsFuel,
-}) {
-  final end = systemsCache[endSymbol];
-  // This is A* search, thanks to
-  // https://www.redblobgames.com/pathfinding/a-star/introduction.html
-  // This code is hot enough that SystemSymbol.fromString shows up!
-  final frontier =
-      PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((startSymbol, 0));
-  final cameFrom = <SystemSymbol, _SystemAction>{};
-  final costSoFar = <SystemSymbol, int>{};
-  costSoFar[startSymbol] = 0;
+class _WarpPlanner {
+  _WarpPlanner(
+    this.systemsCache,
+    this.systemConnectivity, {
+    required this.sellsFuel,
+  });
 
-  // A* only requires approximate weights.  We could use real weights here
-  // but we'd have to remove case which calls this function with the same
-  // system (end, end) which will assert in cooldownTimeForJumpBetweenSystems.
-  int approximateTimeBetween(System a, System b) => a.distanceTo(b).round();
+  final SystemsCache systemsCache;
+  final SystemConnectivity systemConnectivity;
+  final bool Function(WaypointSymbol) sellsFuel;
 
-  while (frontier.isNotEmpty) {
-    final current = frontier.removeFirst();
-    final currentSymbol = current.$1;
-    if (currentSymbol == endSymbol) {
-      break;
-    }
-    final currentSystem = systemsCache.systemBySymbol(currentSymbol);
-    final connected =
-        systemConnectivity.directlyConnectedSystemSymbols(currentSymbol);
-    final connectedSystems = connected.map(systemsCache.systemBySymbol);
+  final fuelMarketsBySystem = <SystemSymbol, List<WaypointSymbol>>{};
 
-    const jumpTimeBetween = cooldownTimeForJumpBetweenSystems;
+  List<_SystemAction>? findActionsBetweenSystems(
+    ShipSpec shipSpec, {
+    required SystemSymbol startSymbol,
+    required SystemSymbol endSymbol,
+  }) {
+    final end = systemsCache[endSymbol];
+    // This is A* search, thanks to
+    // https://www.redblobgames.com/pathfinding/a-star/introduction.html
+    // This code is hot enough that SystemSymbol.fromString shows up!
+    final frontier =
+        PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
+          ..add((startSymbol, 0));
+    final cameFrom = <SystemSymbol, _SystemAction>{};
+    final costSoFar = <SystemSymbol, int>{};
+    costSoFar[startSymbol] = 0;
 
-    // Add all the direct jumps.
-    for (final nextSystem in connectedSystems) {
-      final next = nextSystem.symbol;
-      // TODO(eseidel): directlyConnectedSystemSymbols should not return
-      // the start system, but it does.
-      if (next == currentSymbol) {
+    // A* only requires approximate weights.  We could use real weights here
+    // but we'd have to remove case which calls this function with the same
+    // system (end, end) which will assert in cooldownTimeForJumpBetweenSystems.
+    int approximateTimeBetween(System a, System b) => a.distanceTo(b).round();
+
+    while (frontier.isNotEmpty) {
+      final current = frontier.removeFirst();
+      final currentSymbol = current.$1;
+      if (currentSymbol == endSymbol) {
+        break;
+      }
+      final currentSystem = systemsCache[currentSymbol];
+      final connected =
+          systemConnectivity.directlyConnectedSystemSymbols(currentSymbol);
+      final connectedSystems = connected.map(systemsCache.systemBySymbol);
+
+      const jumpTimeBetween = cooldownTimeForJumpBetweenSystems;
+
+      // Add all the direct jumps.
+      for (final nextSystem in connectedSystems) {
+        final next = nextSystem.symbol;
+        // TODO(eseidel): directlyConnectedSystemSymbols should not return
+        // the start system, but it does.
+        if (next == currentSymbol) {
+          continue;
+        }
+        final newCost = costSoFar[currentSymbol]! +
+            jumpTimeBetween(currentSystem, nextSystem);
+        if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
+          costSoFar[next] = newCost;
+          final priority = newCost + approximateTimeBetween(end, nextSystem);
+          frontier.add((next, priority));
+          final action = _SystemAction(
+            startSymbol: currentSymbol,
+            endSymbol: next,
+            type: _ActionType.jump,
+          );
+          cameFrom[next] = action;
+        }
+      }
+
+      if (!shipSpec.canWarp) {
         continue;
       }
-      final newCost = costSoFar[currentSymbol]! +
-          jumpTimeBetween(currentSystem, nextSystem);
-      if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
-        costSoFar[next] = newCost;
-        final priority = newCost + approximateTimeBetween(end, nextSystem);
-        frontier.add((next, priority));
-        final action = _SystemAction(
-          startSymbol: currentSymbol,
-          endSymbol: next,
-          type: _ActionType.jump,
-          seconds: jumpTimeBetween(currentSystem, nextSystem),
-          fuelUsed: 0,
-        );
-        cameFrom[next] = action;
+      // Add all possible warps.
+      int warpTimeBetween(System a, System b) {
+        // Flight mode is implicitly CRUISE for warps currently.
+        return warpTimeInSeconds(a, b, shipSpeed: shipSpec.speed);
+      }
+
+      final nearbySystems = systemsCache.systems.where(
+        (s) =>
+            s.symbol != currentSymbol &&
+            s.distanceTo(currentSystem) < shipSpec.fuelCapacity,
+      );
+      for (final nextSystem in nearbySystems) {
+        final next = nextSystem.symbol;
+        // Ignore our start system.
+        if (next == currentSymbol) {
+          continue;
+        }
+        // Should we re-plan systems we've already planned?
+        if (cameFrom.containsKey(next)) {
+          continue;
+        }
+        if (fuelMarketsBySystem[next] == null) {
+          fuelMarketsBySystem[next] = nextSystem.waypoints
+              .map((w) => w.symbol)
+              .where(sellsFuel)
+              .toList();
+        }
+        if (fuelMarketsBySystem[next]!.isEmpty) {
+          continue;
+        }
+
+        final newCost = costSoFar[currentSymbol]! +
+            warpTimeBetween(currentSystem, nextSystem);
+        if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
+          costSoFar[next] = newCost;
+          final priority = newCost + approximateTimeBetween(end, nextSystem);
+          frontier.add((next, priority));
+          final action = _SystemAction(
+            startSymbol: currentSymbol,
+            endSymbol: next,
+            type: _ActionType.warp,
+          );
+          cameFrom[next] = action;
+        }
       }
     }
-
-    if (!shipSpec.canWarp) {
-      continue;
-    }
-    // Add all possible warps.
-    const flightMode = ShipNavFlightMode.CRUISE;
-    int warpTimeBetween(System a, System b) {
-      // Flight mode is implicitly CRUISE for warps currently.
-      return warpTimeInSeconds(a, b, shipSpeed: shipSpec.speed);
+    if (cameFrom[endSymbol] == null) {
+      return null;
     }
 
-    final nearbySystems = systemsCache.systems.where(
-      (s) =>
-          s.symbol != currentSymbol &&
-          s.distanceTo(currentSystem) < shipSpec.fuelCapacity,
-    );
-    for (final nextSystem in nearbySystems) {
-      final next = nextSystem.symbol;
-      // Ignore our start system.
-      if (next == currentSymbol) {
-        continue;
-      }
-      final newCost = costSoFar[currentSymbol]! +
-          warpTimeBetween(currentSystem, nextSystem);
-      if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
-        costSoFar[next] = newCost;
-        final priority = newCost + approximateTimeBetween(end, nextSystem);
-        frontier.add((next, priority));
-        final distance = currentSystem.distanceTo(nextSystem);
-        final action = _SystemAction(
-          startSymbol: currentSymbol,
-          endSymbol: next,
-          type: _ActionType.warp,
-          seconds: warpTimeBetween(currentSystem, nextSystem),
-          fuelUsed: fuelUsedByDistance(distance, flightMode),
-        );
-        cameFrom[next] = action;
-      }
+    final actions = <_SystemAction>[];
+    var current = endSymbol;
+    while (current != startSymbol) {
+      final action = cameFrom[current]!;
+      actions.add(action);
+      current = action.startSymbol;
     }
-  }
-  if (cameFrom[endSymbol] == null) {
-    return null;
+    return actions.reversed.toList();
   }
 
-  final actions = <_SystemAction>[];
-  var current = endSymbol;
-  while (current != startSymbol) {
-    final action = cameFrom[current]!;
-    actions.add(action);
-    current = action.endSymbol;
+  // We do our planning in terms of system symbols, but we need to return
+  // RouteActions which are in terms of waypoints.  For Warps, we just pick
+  // something with a market.  For Jumps those use JumpGates.
+  WaypointSymbol waypointForSystem(SystemSymbol symbol) {
+    final system = systemsCache.systemBySymbol(symbol);
+    final jumpgate = system.jumpGateWaypoints.firstOrNull;
+    if (jumpgate != null) {
+      return jumpgate.symbol;
+    }
+    final fuelMarket = fuelMarketsBySystem[symbol]?.firstOrNull;
+    if (fuelMarket != null) {
+      return fuelMarket;
+    }
+    throw StateError('No jumpgate or fuel market for $symbol');
   }
-  return actions.reversed.toList();
-}
-
-// We do our planning in terms of system symbols, but we need to return
-// RouteActions which are in terms of waypoints.  For Warps, we just pick
-// something with a market.  For Jumps those use JumpGates.
-WaypointSymbol _waypointForSystem(
-  SystemsCache systemsCache,
-  SystemSymbol symbol,
-) {
-  final system = systemsCache.systemBySymbol(symbol);
-  return system.jumpGateWaypoints.first.symbol;
 }
 
 /// Returns the route between [start] and [end] as a list of RouteActions.
@@ -169,13 +188,12 @@ List<RouteAction>? findRouteBetweenSystems(
   required WaypointSymbol end,
   required bool Function(WaypointSymbol) sellsFuel,
 }) {
-  final systemActions = _findActionsBetweenSystems(
-    systemsCache,
-    systemConnectivity,
+  final planner =
+      _WarpPlanner(systemsCache, systemConnectivity, sellsFuel: sellsFuel);
+  final systemActions = planner.findActionsBetweenSystems(
     shipSpec,
     startSymbol: start.system,
     endSymbol: end.system,
-    sellsFuel: sellsFuel,
   );
   if (systemActions == null) {
     return null;
@@ -183,15 +201,25 @@ List<RouteAction>? findRouteBetweenSystems(
   final routeActions = <RouteAction>[];
   for (final action in systemActions) {
     // TODO(eseidel): Fix this to have the right start/end symbols.
+    final type = action.type == _ActionType.jump
+        ? RouteActionType.jump
+        : RouteActionType.warpCruise;
+    final start = systemsCache.systemBySymbol(action.startSymbol);
+    final end = systemsCache.systemBySymbol(action.endSymbol);
+    final distance = start.distanceTo(end);
+    final seconds = action.type == _ActionType.jump
+        ? cooldownTimeForJumpBetweenSystems(start, end)
+        : warpTimeInSeconds(start, end, shipSpeed: shipSpec.speed);
+    final fuelUsed = action.type == _ActionType.jump
+        ? 0
+        : fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
     routeActions.add(
       RouteAction(
-        startSymbol: _waypointForSystem(systemsCache, action.startSymbol),
-        endSymbol: _waypointForSystem(systemsCache, action.endSymbol),
-        type: action.type == _ActionType.jump
-            ? RouteActionType.jump
-            : RouteActionType.warpCruise,
-        seconds: action.seconds,
-        fuelUsed: action.fuelUsed,
+        startSymbol: planner.waypointForSystem(action.startSymbol),
+        endSymbol: planner.waypointForSystem(action.endSymbol),
+        type: type,
+        seconds: seconds,
+        fuelUsed: fuelUsed,
       ),
     );
   }

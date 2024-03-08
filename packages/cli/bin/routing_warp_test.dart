@@ -18,6 +18,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final sellsFuel = defaultSellsFuel(marketListings);
 
   final systemConnectivity = await loadSystemConnectivity(db);
+  // final routePlanner = RoutePlanner.fromSystemsCache(
+  //   systemsCache,
+  //   systemConnectivity,
+  //   sellsFuel: sellsFuel,
+  // );
 
   final shipyardShips = ShipyardShipCache.load(fs);
   final ship = shipyardShips[shipType]!;
