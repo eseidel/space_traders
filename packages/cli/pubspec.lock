@@ -380,10 +380,10 @@ packages:
     dependency: transitive
     description:
       name: postgres
-      sha256: "0178bf02b520ad5d40ac9d83a77a337177b4a0b5599b3e0ed3c356f626457aaf"
+      sha256: b743c8b1d4af6e2840fa1e2ce2d3376b829d097b6db7340a1154effac69cc738
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.8"
+    version: "3.1.1"
   pub_semver:
     dependency: transitive
     description:
@@ -413,7 +413,7 @@ packages:
     description:
       path: "packages/scoped"
       ref: HEAD
-      resolved-ref: e9680d0da1788c377cb818884a668eeb20902b23
+      resolved-ref: "94c4b69fe926991006d98990a33bf0e935fa5d9e"
       url: "https://github.com/shorebirdtech/shorebird.git"
     source: git
     version: "0.1.0+1"
@@ -580,10 +580,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: a2662fb1f114f4296cf3f5a50786a2d888268d7776cf681aa17d660ffa23b246
+      sha256: e7d5ecd604e499358c5fe35ee828c0298a320d54455e791e9dcf73486bc8d9f0
       url: "https://pub.dev"
     source: hosted
-    version: "14.0.0"
+    version: "14.1.0"
   watcher:
     dependency: transitive
     description:
@@ -604,10 +604,10 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: "1d9158c616048c38f712a6646e317a3426da10e884447626167240d45209cbad"
+      sha256: "97da13628db363c635202ad97068d47c5b8aa555808e7a9411963c533b449b27"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.5.1"
   web_socket_channel:
     dependency: transitive
     description:

@@ -9,6 +9,7 @@ class Counts<T> {
   /// Get the number of requests made to the given path.
   void record(T path) => counts[path] = (counts[path] ?? 0) + 1;
 
+  /// Diff two count maps.
   static Map<T, int> diffCounts<T>(
     Map<T, int> before,
     Map<T, int> after,

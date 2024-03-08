@@ -96,9 +96,9 @@ void main() {
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
-    when(() =>
-            centralCommand.getJobForShip(db, systemConnectivity, ship, any()))
-        .thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
+    when(
+      () => centralCommand.getJobForShip(db, systemConnectivity, ship, any()),
+    ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
     when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});
 
