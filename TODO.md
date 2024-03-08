@@ -1330,3 +1330,13 @@ Do some sort of proximity based matching?
 Same thing could work for traders.  Compute the number of deals above a
 certain c/s, starting from that system and assign up to a certain capacity
 level with a similar matching algorithm?
+
+### finish warp pathing.
+
+Pre-compute the path to jumpgate and path from jumpgate.
+And add those costs as costs to beginning or ending with a jump.
+If those costs are passed into the warp planner the planner will then correctly
+choose to warp small distances to adjacent systems to cross large distances
+within a system.  It also simplifies the inter-system planning since
+we don't have to modify actions after the fact, we just pass in costs to
+the planner?
