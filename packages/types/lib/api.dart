@@ -253,6 +253,8 @@ extension ShipyardShipUtils on ShipyardShip {
         cargoCapacity: cargoCapacity,
         fuelCapacity: frame.fuelCapacity,
         speed: engine.speed,
+        canWarp:
+            modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
       );
 
   /// Compute the current crew of the ship.
