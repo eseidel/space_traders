@@ -247,7 +247,7 @@ class SystemConnectivity {
   }
 
   /// Returns systems that are directly connected to [systemSymbol].
-  /// Does not include [systemSymbol] itself.
+  // TODO(eseidel): This should not include [systemSymbol], but it does!
   Set<SystemSymbol> directlyConnectedSystemSymbols(SystemSymbol systemSymbol) =>
       _connections.systems[systemSymbol] ?? {};
 

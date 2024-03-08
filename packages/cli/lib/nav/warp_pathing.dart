@@ -71,8 +71,10 @@ List<_SystemAction>? _findActionsBetweenSystems(
     // Add all the direct jumps.
     for (final nextSystem in connectedSystems) {
       final next = nextSystem.symbol;
+      // TODO(eseidel): directlyConnectedSystemSymbols should not return
+      // the start system, but it does.
       if (next == currentSymbol) {
-        throw StateError('System $next is directly connected to itself');
+        continue;
       }
       final newCost = costSoFar[currentSymbol]! +
           jumpTimeBetween(currentSystem, nextSystem);
