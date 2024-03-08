@@ -3,6 +3,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/warp_pathing.dart';
+import 'package:collection/collection.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);
@@ -28,8 +29,15 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       .map((s) => systemsCache[s].jumpGateWaypoints.first.symbol)
       .toList();
 
+  // Sort them by distance to start, do the easy ones first.
+  final startSystem = systemsCache[start.system];
+  interestingWaypoints
+      .sortBy<num>((s) => systemsCache[s.system].distanceTo(startSystem));
+
   logger.info('Pathing to ${interestingWaypoints.length} systems...');
   for (final end in interestingWaypoints) {
+    final systemDistance = systemsCache[end.system].distanceTo(startSystem);
+    logger.info('Pathing to $end ($systemDistance)...');
     final routeStart = DateTime.timestamp();
     final actions = findRouteBetweenSystems(
       systemsCache,
