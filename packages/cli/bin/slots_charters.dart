@@ -15,6 +15,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final charts = await ChartingSnapshot.load(db);
   final construction = await ConstructionSnapshot.load(db);
   final ships = await ShipSnapshot.load(db);
+  final behaviors = await BehaviorSnapshot.load(db);
 
   final systemConnectivity =
       SystemConnectivity.fromJumpGates(jumpGates, construction);
@@ -22,10 +23,21 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final connectedMissingCharts = <SystemSymbol, int>{};
   final connectedProbeCount = <SystemSymbol, int>{};
   final slotCount = <SystemSymbol, int>{};
+
+  SystemSymbol systemForShip(Ship ship) {
+    final state = behaviors[ship.shipSymbol];
+    final endSystem = state?.routePlan?.endSymbol.system;
+    if (endSystem != null) {
+      return endSystem;
+    }
+    return ship.systemSymbol;
+  }
+
+  // TODO(eseidel): Use behaviors and consider the route end point.
   final probeCountBySystem =
       ships.ships.where((s) => s.isProbe).groupFoldBy<SystemSymbol, int>(
-            (s) => s.systemSymbol,
-            (previous, element) => previous ?? 0 + 1,
+            systemForShip,
+            (count, systemSymbol) => count ?? 0 + 1,
           );
 
   final agentCache = await AgentCache.load(db);
