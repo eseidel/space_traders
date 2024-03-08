@@ -8,6 +8,15 @@ import 'package:cli/nav/waypoint_pathing.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
+/// The type of travel.
+enum TravelMethod {
+  /// Traveling using the nav system, only within a system.
+  navigate,
+
+  /// Traveling using the warp system, between systems.
+  warp,
+}
+
 /// Given a start location and a set of waypoint symbols find the approximate
 /// round trip distance to visit all symbols and return to the start.
 int approximateRoundTripDistanceWithinSystem(
@@ -75,15 +84,6 @@ Map<ShipNavFlightMode, int> _warpSpeedMultiplier = {
   ShipNavFlightMode.CRUISE: 50,
   ShipNavFlightMode.DRIFT: 300,
 };
-
-/// The type of travel.
-enum TravelMethod {
-  /// Traveling using the nav system, only within a system.
-  navigate,
-
-  /// Traveling using the warp system, between systems.
-  warp,
-}
 
 double _speedMultiplier(ShipNavFlightMode flightMode, TravelMethod travelType) {
   final map = travelType == TravelMethod.navigate

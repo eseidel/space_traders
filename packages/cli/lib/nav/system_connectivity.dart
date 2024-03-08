@@ -247,6 +247,7 @@ class SystemConnectivity {
   }
 
   /// Returns systems that are directly connected to [systemSymbol].
+  /// Does not include [systemSymbol] itself.
   Set<SystemSymbol> directlyConnectedSystemSymbols(SystemSymbol systemSymbol) =>
       _connections.systems[systemSymbol] ?? {};
 
