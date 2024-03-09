@@ -243,14 +243,16 @@ void main() {
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => shipCargo.capacity).thenReturn(1);
     when(() => shipCargo.units).thenReturn(0);
+    when(() => ship.modules).thenReturn([]);
 
     when(() => systemsCache[saa.system]).thenReturn(
       System.test(waypointSymbol.system),
     );
 
     final systemConnectivity = _MockSystemConnectivity();
-    when(() => systemConnectivity.systemsReachableFrom(saa.system))
-        .thenReturn([saa.system]);
+    registerFallbackValue(saa.system);
+    when(() => systemConnectivity.existsJumpPathBetween(any(), any()))
+        .thenReturn(true);
 
     final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,

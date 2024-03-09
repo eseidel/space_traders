@@ -43,12 +43,16 @@ void main() {
 
     final centralCommand = _MockCentralCommand();
     final logger = _MockLogger();
-    final systemConnectivity = _MockSystemConnectivity();
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
     when(
-      () => centralCommand.getJobForShip(db, systemConnectivity, ship, any()),
+      () => centralCommand.getJobForShip(
+        db,
+        caches.systemConnectivity,
+        ship,
+        any(),
+      ),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
     when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});
@@ -92,12 +96,16 @@ void main() {
     final centralCommand = _MockCentralCommand();
 
     final logger = _MockLogger();
-    final systemConnectivity = _MockSystemConnectivity();
 
     when(() => db.behaviorStateBySymbol(shipSymbol))
         .thenAnswer((_) async => null);
     when(
-      () => centralCommand.getJobForShip(db, systemConnectivity, ship, any()),
+      () => centralCommand.getJobForShip(
+        db,
+        caches.systemConnectivity,
+        ship,
+        any(),
+      ),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
     when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});

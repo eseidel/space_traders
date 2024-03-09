@@ -1340,3 +1340,17 @@ choose to warp small distances to adjacent systems to cross large distances
 within a system.  It also simplifies the inter-system planning since
 we don't have to modify actions after the fact, we just pass in costs to
 the planner?
+
+### Unify warp planner into waypoint planner?
+
+### Figure out why behaviors are never idle anymore.
+
+e.g.
+
+[WARN] 🛸#68 No system to seed. Disabling Behavior.seeder for ESEIDEL-68 for 1h.
+Found 13 deals for ESEIDEL-68 from UT62-K93
+[WARN] 🛸#68 Deal expected profit per second too low: 3c/s
+[WARN] 🛸#68 Failed to find better location for trader. Disabling Behavior.trader for ESEIDEL-68 for 10m.
+⏱️  10m until 2024-03-09 02:55:35.242773
+
+Results in "null" behavior, rather than "idle".

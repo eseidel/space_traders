@@ -340,11 +340,12 @@ void main() {
       ),
     );
     final shipNav = _MockShipNav();
-    when(() => shipNav.systemSymbol).thenReturn('W-A');
+    final waypointSymbol = WaypointSymbol.fromString('W-A-Y');
+    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipCache.ships).thenReturn([ship]);
     centralCommand.nextShipBuyJob = ShipBuyJob(
-      shipyardSymbol: WaypointSymbol.fromString('W-A-Y'),
+      shipyardSymbol: waypointSymbol,
       shipType: ShipType.HEAVY_FREIGHTER,
       minCreditsNeeded: 100,
     );
@@ -354,6 +355,9 @@ void main() {
       (_) async => [],
     );
     final systemConnectivity = _MockSystemConnectivity();
+    registerFallbackValue(waypointSymbol.system);
+    when(() => systemConnectivity.existsJumpPathBetween(any(), any()))
+        .thenReturn(true);
 
     final shouldBuy = await centralCommand.shouldBuyShip(
       db,
