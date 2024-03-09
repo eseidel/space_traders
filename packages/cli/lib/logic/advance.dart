@@ -1,5 +1,6 @@
 import 'package:cli/behavior/buy_ship.dart';
 import 'package:cli/behavior/charter.dart';
+import 'package:cli/behavior/idle.dart';
 import 'package:cli/behavior/job.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/miner_hauler.dart';
@@ -16,22 +17,6 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
-
-Future<DateTime?> _advanceIdle(
-  Api api,
-  Database db,
-  CentralCommand centralCommand,
-  Caches caches,
-  BehaviorState state,
-  Ship ship, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  shipDetail(ship, 'Idling');
-  // Make sure ships don't stay idle forever.
-  state.isComplete = true;
-  // Return a time in the future so we don't spin hot.
-  return DateTime.timestamp().add(const Duration(minutes: 10));
-}
 
 Future<DateTime?> Function(
   Api api,
@@ -64,7 +49,7 @@ Future<DateTime?> Function(
     case Behavior.seeder:
       return advanceSeeder;
     case Behavior.idle:
-      return _advanceIdle;
+      return advanceIdle;
   }
 }
 

@@ -1354,3 +1354,9 @@ Found 13 deals for ESEIDEL-68 from UT62-K93
 ⏱️  10m until 2024-03-09 02:55:35.242773
 
 Results in "null" behavior, rather than "idle".
+
+
+1. Solve idle.
+2. Redistribute traders.
+3. Add warp planner.
+4. Add logic for explorers to go to more systems (via warp).
