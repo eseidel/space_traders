@@ -1,8 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart' as openapi;
-import 'package:types/api.dart';
-import 'package:types/src/position.dart';
-import 'package:types/src/symbol.dart';
+import 'package:types/types.dart';
 
 /// A type representing the unchanging values of a waypoint.
 @immutable
@@ -104,8 +102,17 @@ class SystemWaypoint {
     );
   }
 
+  /// Call toJson on the OpenAPI object and fix any issues.
+  static Map<String, dynamic> openApiToJson(openapi.SystemWaypoint waypoint) {
+    final json = waypoint.toJson();
+    json['type'] = (json['type'] as WaypointType).toJson();
+    return json;
+  }
+
   /// Converts to JSON.
-  Map<String, dynamic> toJson() => toOpenApi().toJson();
+  Map<String, dynamic> toJson() {
+    return openApiToJson(toOpenApi());
+  }
 }
 
 /// Type representing a system.
@@ -190,7 +197,16 @@ class System {
   }
 
   /// Converts to JSON.
-  Map<String, dynamic> toJson() => toOpenApi().toJson();
+  Map<String, dynamic> toJson() {
+    final json = toOpenApi().toJson();
+    // Work around a bug in OpenApi's generated toJson method where it doesn't
+    // recursively call toJson.
+    json['type'] = (json['type'] as SystemType).toJson();
+    json['waypoints'] = (json['waypoints'] as List<openapi.SystemWaypoint>)
+        .map(SystemWaypoint.openApiToJson)
+        .toList();
+    return json;
+  }
 }
 
 /// Type representing a waypoint.
@@ -339,5 +355,27 @@ class Waypoint {
       modifiers: modifiers,
       chart: chart,
     );
+  }
+
+  // Work around a bug in OpenApi's generated toJson method where it doesn't
+  // recursively call toJson.
+  /// Call toJson on the OpenAPI object and fix any issues.
+  static Map<String, dynamic> openApiToJson(openapi.Waypoint waypoint) {
+    Map<String, dynamic> traitToJson(WaypointTrait trait) {
+      final json = trait.toJson();
+      json['symbol'] = trait.symbol.toJson();
+      return json;
+    }
+
+    final json = waypoint.toJson();
+    json['traits'] =
+        (json['traits'] as List<WaypointTrait>).map(traitToJson).toList();
+    json['type'] = (json['type'] as WaypointType).toJson();
+    return json;
+  }
+
+  /// Converts to JSON.
+  Map<String, dynamic> toJson() {
+    return openApiToJson(toOpenApi());
   }
 }
