@@ -101,12 +101,12 @@ ShipyardTrip? findBestShipyardToBuy(
 // }
 
 /// Apply the buy ship behavior.
-Future<DateTime?> advanceBuyShip(
+Future<JobResult> _doBuyShipJob(
+  BehaviorState state,
   Api api,
   Database db,
   CentralCommand centralCommand,
   Caches caches,
-  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
@@ -124,7 +124,7 @@ Future<DateTime?> advanceBuyShip(
       state,
       shipyardSymbol,
     );
-    return waitTime;
+    return JobResult.wait(waitTime);
   }
   // Otherwise we're at the shipyard we intended to be at.
 
@@ -164,8 +164,12 @@ Future<DateTime?> advanceBuyShip(
   }
 
   // Record our success!
-  state.isComplete = true;
   // Rate limiting for ship buying is done by CentralCommand.
   shipWarn(ship, 'Purchased ${result.ship.symbol} ($shipType)!');
-  return null;
+  return JobResult.complete();
 }
+
+/// Advance the behavior of the given ship.
+final advanceBuyShip = const MultiJob('Buy Ship', [
+  _doBuyShipJob,
+]).run;
