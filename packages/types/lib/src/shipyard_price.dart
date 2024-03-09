@@ -16,13 +16,14 @@ class ShipyardPrice extends PriceBase<ShipType> {
   /// Create a new price record from a ShipyardShip.
   factory ShipyardPrice.fromShipyardShip(
     ShipyardShip ship,
-    WaypointSymbol waypoint,
-  ) {
+    WaypointSymbol waypoint, {
+    required DateTime Function() getNow,
+  }) {
     return ShipyardPrice(
       waypointSymbol: waypoint,
       shipType: ship.type,
       purchasePrice: ship.purchasePrice,
-      timestamp: DateTime.timestamp(),
+      timestamp: getNow(),
     );
   }
 

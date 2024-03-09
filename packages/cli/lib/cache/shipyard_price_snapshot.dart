@@ -114,7 +114,13 @@ void recordShipyardPrices(
   DateTime Function() getNow = defaultGetNow,
 }) {
   final prices = shipyard.ships
-      .map((s) => ShipyardPrice.fromShipyardShip(s, shipyard.waypointSymbol))
+      .map(
+        (s) => ShipyardPrice.fromShipyardShip(
+          s,
+          shipyard.waypointSymbol,
+          getNow: getNow,
+        ),
+      )
       .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${shipyard.symbol}!');
