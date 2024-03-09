@@ -19,6 +19,6 @@ void main() {
     final before = RequestCounts({'/foo': 2, '/bar': 1});
     final after = RequestCounts({'/foo': 3, '/bar': 1});
     final diff = after.diff(before);
-    expect(diff, {'/foo': 1});
+    expect(diff.counts, {'/foo': 1});
   });
 }
