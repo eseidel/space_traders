@@ -71,8 +71,9 @@ void main() {
       final systems = [system];
       final systemsCache = SystemsCache(systems, fs: fs);
       final systemConnectivity = _MockSystemConnectivity();
-      when(() => systemConnectivity.systemsReachableFrom(system.symbol))
-          .thenReturn(systems.map((s) => s.symbol));
+      registerFallbackValue(aSymbol.system);
+      when(() => systemConnectivity.existsJumpPathBetween(any(), any()))
+          .thenReturn(true);
 
       CostedDeal? findNextDeal(Ship ship, WaypointSymbol startSymbol) {
         return null;
