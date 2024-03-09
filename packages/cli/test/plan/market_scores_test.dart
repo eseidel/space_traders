@@ -1,6 +1,5 @@
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cache/systems_cache.dart';
-import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/plan/market_scores.dart';
@@ -79,28 +78,23 @@ void main() {
         return null;
       }
 
-      try {
-        config.disableFindBetterTradeLocation = false;
-        final logger = _MockLogger();
-        final result = runWithLogger(
-          logger,
-          () => findBetterTradeLocation(
-            systemsCache,
-            systemConnectivity,
-            marketPrices,
-            ship,
-            findDeal: findNextDeal,
-            avoidSystems: <SystemSymbol>{},
-            profitPerSecondThreshold: 6,
-          ),
-        );
-        verify(() => logger.detail('🛸#1  No deal found for A-1 at S-A'))
-            .called(1);
-        verify(() => logger.info('No nearby markets for A-1')).called(1);
-        expect(result, isNull);
-      } finally {
-        config.disableFindBetterTradeLocation = true;
-      }
+      final logger = _MockLogger();
+      final result = runWithLogger(
+        logger,
+        () => findBetterTradeLocation(
+          systemsCache,
+          systemConnectivity,
+          marketPrices,
+          ship,
+          findDeal: findNextDeal,
+          avoidSystems: <SystemSymbol>{},
+          profitPerSecondThreshold: 6,
+        ),
+      );
+      verify(() => logger.detail('🛸#1  No deal found for A-1 at S-A'))
+          .called(1);
+      verify(() => logger.info('No nearby markets for A-1')).called(1);
+      expect(result, isNull);
     },
   );
 }

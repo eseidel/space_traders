@@ -312,9 +312,13 @@ class CentralCommand {
     BehaviorSnapshot behaviors,
     Ship ship, {
     required int maxTotalOutlay,
+    // overrideStartSymbol is used by findBetterTradeLocation to restrict
+    // pretend that the ship is already at overrideStartSymbol, and show
+    // only trades which start from within that system.
     WaypointSymbol? overrideStartSymbol,
   }) {
     final startSymbol = overrideStartSymbol ?? ship.waypointSymbol;
+    final restrictToStartSystem = overrideStartSymbol?.system;
 
     final extraSellOpps = <SellOpp>[];
     if (isConstructionTradingEnabled) {
@@ -340,7 +344,13 @@ class CentralCommand {
       startSymbol: startSymbol,
       extraSellOpps: extraSellOpps,
       shipSpec: ship.shipSpec,
-      filter: avoidDealsInProgress(behaviors.dealsInProgress()),
+      filter: avoidDealsInProgress(
+        behaviors.dealsInProgress(),
+        filter: (d) {
+          return restrictToStartSystem == null ||
+              d.sourceSymbol.system == restrictToStartSystem;
+        },
+      ),
     );
 
     // A hack to avoid spamming the console until we add a deals cache.

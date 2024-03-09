@@ -52,9 +52,6 @@ class Config {
   /// Used to slow down charters and have them spend less money on jumps.
   bool chartAsteroidsByDefault = false;
 
-  /// findBetterTradeLocation is too slow when we have lots of systems
-  bool disableFindBetterTradeLocation = true;
-
   /// The number of requests per second allowed by the api.
   /// Version 2.1 allows:
   /// - 2 requests per second

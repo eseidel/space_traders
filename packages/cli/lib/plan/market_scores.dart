@@ -1,5 +1,4 @@
 import 'package:cli/caches.dart';
-import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/trading.dart';
@@ -19,9 +18,6 @@ WaypointSymbol? findBetterTradeLocation(
   required Set<SystemSymbol> avoidSystems,
   required int profitPerSecondThreshold,
 }) {
-  if (config.disableFindBetterTradeLocation) {
-    return null;
-  }
   final search = _MarketSearch.start(
     marketPrices,
     systemsCache,
@@ -85,9 +81,6 @@ _ShipPlacement? _findBetterSystemForTrader(
   final shipSymbol = ship.symbol;
   final shipSystem = systemsCache[ship.systemSymbol];
 
-  final reachableSystems =
-      systemConnectivity.systemsReachableFrom(ship.systemSymbol).toSet();
-
   while (true) {
     final closest = search.closestAvailableSystem(systemsCache, shipSystem);
     if (closest == null) {
@@ -96,7 +89,10 @@ _ShipPlacement? _findBetterSystemForTrader(
     }
     search.markUsed(closest);
 
-    if (!reachableSystems.contains(closest.symbol)) {
+    if (!systemConnectivity.existsJumpPathBetween(
+      closest.symbol,
+      shipSystem.symbol,
+    )) {
       shipDetail(ship, 'Not reachable: $shipSymbol -> ${closest.symbol}');
       continue;
     }
