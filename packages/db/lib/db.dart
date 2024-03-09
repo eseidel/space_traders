@@ -44,19 +44,6 @@ Future<pg.Connection> _defaultOpenConnection(
   return pg.Connection.open(endpoint, settings: settings);
 }
 
-/// QueryCounts tracks the number of queries made.
-class QueryCounts extends Counts<String> {
-  /// Construct a QueryCounts.
-  QueryCounts([super.counts]);
-
-  /// Diff the counts with the given QueryCounts.
-  QueryCounts diff(QueryCounts before) =>
-      QueryCounts(Counts.diffCounts(before.counts, counts));
-
-  /// Make a copy of the QueryCounts.
-  QueryCounts copy() => QueryCounts(counts);
-}
-
 /// Wrapper around a database connection.
 class DatabaseConnection {
   /// Create a new database connection.
