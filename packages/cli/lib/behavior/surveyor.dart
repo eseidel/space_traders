@@ -9,12 +9,12 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// For dedicated survey ships.
-Future<DateTime?> advanceSurveyor(
+Future<JobResult> _doSurveyor(
+  BehaviorState state,
   Api api,
   Database db,
   CentralCommand centralCommand,
   Caches caches,
-  BehaviorState state,
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
@@ -25,7 +25,7 @@ Future<DateTime?> advanceSurveyor(
   );
   final mineSymbol = mineJob.source;
   if (ship.waypointSymbol != mineSymbol) {
-    return beingNewRouteAndLog(
+    final waitUntil = await beingNewRouteAndLog(
       api,
       db,
       centralCommand,
@@ -34,6 +34,7 @@ Future<DateTime?> advanceSurveyor(
       state,
       mineSymbol,
     );
+    return JobResult.wait(waitUntil);
   }
   jobAssert(
     await caches.waypoints.canBeMined(ship.waypointSymbol),
@@ -44,6 +45,13 @@ Future<DateTime?> advanceSurveyor(
 
   // Surveying requires being undocked.
   await undockIfNeeded(db, api, ship);
+
+  // We need to be off cooldown to continue.
+  final expiration = reactorCooldownExpiration(ship, getNow);
+  if (expiration != null) {
+    return JobResult.wait(expiration);
+  }
+
   final response = await surveyAndLog(db, api, ship, getNow: getNow);
 
   verifyCooldown(
@@ -52,8 +60,12 @@ Future<DateTime?> advanceSurveyor(
     cooldownTimeForSurvey(ship),
     response.cooldown,
   );
-
-  // Each survey is the whole behavior.
-  state.isComplete = true;
-  return response.cooldown.expiration;
+  // Return immediately, even though the reactor is on cooldown.  If we
+  // loop back to surveying again, that code will wait for the cooldown.
+  return JobResult.complete();
 }
+
+/// Advance the behavior of the given ship.
+final advanceSurveyor = const MultiJob('Surveyor', [
+  _doSurveyor,
+]).run;

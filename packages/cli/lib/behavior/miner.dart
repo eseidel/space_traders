@@ -261,10 +261,8 @@ Future<JobResult> doMineJob(
   await undockIfNeeded(db, api, ship);
 
   // We need to be off cooldown to continue.
-  final expiration = ship.cooldown.expiration;
-  if (expiration != null && expiration.isAfter(getNow())) {
-    final duration = expiration.difference(getNow());
-    shipDetail(ship, 'Waiting ${approximateDuration(duration)} on cooldown.');
+  final expiration = reactorCooldownExpiration(ship, getNow);
+  if (expiration != null) {
     return JobResult.wait(expiration);
   }
 
@@ -288,16 +286,9 @@ Future<JobResult> doMineJob(
       cooldownTimeForSurvey(ship),
       response.cooldown,
     );
-
-    // Count completion of survey as a success, otherwise we could end up
-    // surveying for a long time before checking other behaviors.
-    // We don't need to do this for miners since they don't change as often.
-    if (ship.isCommand) {
-      state.isComplete = true;
-    }
-    // We wait the full cooldown because our next action will be either
-    // surveying or mining, both of which require the reactor cooldown.
-    return JobResult.wait(response.cooldown.expiration);
+    // Job is complete, if we're going to mine again right after this that
+    // invocation will know to wait on the cooldown.
+    return JobResult.complete();
   }
 
   // Regardless of whether we have a survey, we should try to mine.

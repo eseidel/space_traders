@@ -1,5 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
+import 'package:cli/logger.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:db/db.dart';
 import 'package:equatable/equatable.dart';
@@ -163,6 +164,9 @@ class MultiJob {
       if (result.isComplete) {
         state.jobIndex++;
         if (state.jobIndex >= jobFunctions.length) {
+          // TODO(eseidel): Instead of returning this as side-band data, we
+          // should just have a different return type can include the completion
+          // state
           state.isComplete = true;
           return null;
         }
@@ -178,4 +182,17 @@ class MultiJob {
       const Duration(hours: 1),
     );
   }
+}
+
+/// Check if the reactor is off cooldown, log if it's not and return the
+/// time to wait.
+// TODO(eseidel): Ideally this ends up as an annotation on the job function.
+DateTime? reactorCooldownExpiration(Ship ship, DateTime Function() getNow) {
+  final expiration = ship.cooldown.expiration;
+  if (expiration != null && expiration.isAfter(getNow())) {
+    final duration = expiration.difference(getNow());
+    shipDetail(ship, 'Waiting ${approximateDuration(duration)} on cooldown.');
+    return expiration;
+  }
+  return null;
 }

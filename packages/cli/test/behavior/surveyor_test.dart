@@ -50,6 +50,13 @@ void main() {
         requirements: ShipRequirements(),
       ),
     ]);
+    when(() => ship.cooldown).thenReturn(
+      Cooldown(
+        shipSymbol: shipSymbol.symbol,
+        totalSeconds: 0,
+        remainingSeconds: 0,
+      ),
+    );
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))
         .thenAnswer((_) async => true);
@@ -99,6 +106,7 @@ void main() {
         getNow: getNow,
       ),
     );
-    expect(waitUntil, DateTime(2021));
+    // Successful completion returns null.
+    expect(waitUntil, isNull);
   });
 }
