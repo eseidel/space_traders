@@ -1360,3 +1360,58 @@ Results in "null" behavior, rather than "idle".
 2. Redistribute traders.
 3. Add warp planner.
 4. Add logic for explorers to go to more systems (via warp).
+
+
+### Move constructionSellOpps, etc. onto a ConstructionState object?
+
+### Costing takes too long
+
+WARN] 🛸#83 Beginning route to RV11-C11A (5h)
+🛸#83 🥶 for 30m
+🛸#5E ✈️  to VZ93-B10X, 25m left
+[WARN] Costed 1146 deals in 3s
+Found 7 deals for ESEIDEL-1 from C9-I54
+[WARN] 🛸#1  Deal expected profit per second too low: 3c/s
+[WARN] Costed 1146 deals in 4s
+Found 1 deals for ESEIDEL-1 from ZN70-X10B
+[WARN] Costed 1146 deals in 688ms
+Found 1 deals for ESEIDEL-1 from UR38-BD8E
+[WARN] Costed 1146 deals in 528ms
+Found 2 deals for ESEIDEL-1 from AF17-I60
+[WARN] Costed 1146 deals in 660ms
+Found 1 deals for ESEIDEL-1 from YA79-BZ5C
+[WARN] Costed 1146 deals in 656ms
+Found 4 deals for ESEIDEL-1 from UF18-X11C
+[WARN] Costed 1146 deals in 642ms
+Found 1 deals for ESEIDEL-1 from XU83-ZA6C
+[WARN] Costed 1146 deals in 682ms
+Found 1 deals for ESEIDEL-1 from PR96-C11X
+[WARN] Costed 1146 deals in 658ms
+Found 1 deals for ESEIDEL-1 from TF34-CZ6E
+[WARN] Costed 1146 deals in 659ms
+Found 2 deals for ESEIDEL-1 from RQ26-C10B
+[WARN] Costed 1146 deals in 677ms
+Found 1 deals for ESEIDEL-1 from KX7-XZ5F
+[WARN] Costed 1146 deals in 738ms
+Found 3 deals for ESEIDEL-1 from BV28-XE4A
+[WARN] Costed 1146 deals in 784ms
+Found 1 deals for ESEIDEL-1 from DN54-CE8E
+[WARN] Costed 1146 deals in 685ms
+Found 1 deals for ESEIDEL-1 from HK79-AC9C
+[WARN] Costed 1146 deals in 631ms
+Found 3 deals for ESEIDEL-1 from BH97-BB9X
+[WARN] Costed 1146 deals in 882ms
+Found 2 deals for ESEIDEL-1 from JN55-AF6D
+[WARN] Costed 1146 deals in 734ms
+Found 3 deals for ESEIDEL-1 from CF67-BB9X
+[WARN] Costed 1146 deals in 865ms
+Found 1 deals for ESEIDEL-1 from AH4-CA5Z
+[WARN] Costed 1146 deals in 1s
+Found 1 deals for ESEIDEL-1 from UH64-FD4D
+🛸#1  Found placement: 5c/s 14360 14835 UH64-FD4D
+🛸#1  Potential: RELIC_TECH                 DT63-EB5E    30,910c -> AQ24-A1      73,292c +140,188c (47%) 7h   5c/s 299,564c
+🛸#1  Starting: C9-I54 to UH64-FD4D speed: 30 max-fuel: 400
+jump            C9-I54  FY98-A22E 1h 0 fuel
+jump            FY98-A22E  TA93-AE8X 1h 0 fuel
+jump            TA93-AE8X  UH64-FD4D 0ms 0 fuel
+in 3h uses 0 fuel
