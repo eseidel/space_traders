@@ -57,10 +57,20 @@ class ChartedValues {
 
   /// Converts this charted values to JSON data.
   Map<String, dynamic> toJson() {
+    // Work around that OpenAPI's toJson method doesn't handle nested objects.
+    Map<String, dynamic>? factionToJson(WaypointFaction? faction) {
+      if (faction == null) {
+        return null;
+      }
+      final json = faction.toJson();
+      json['symbol'] = faction.symbol.toJson();
+      return json;
+    }
+
     final sortedTradeSymbols = traitSymbols.sortedBy((s) => s.value);
     return <String, dynamic>{
-      'faction': faction?.toJson(),
-      'traitSymbols': sortedTradeSymbols,
+      'faction': factionToJson(faction),
+      'traitSymbols': sortedTradeSymbols.map((e) => e.toJson()).toList(),
       'chart': chart.toJson(),
     };
   }
