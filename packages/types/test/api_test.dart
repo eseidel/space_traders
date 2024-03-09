@@ -4,7 +4,27 @@ import 'package:types/types.dart';
 
 class _MockShip extends Mock implements Ship {}
 
+class _MockShipFrame extends Mock implements ShipFrame {}
+
 void main() {
+  test('ShipUtils smoke test', () {
+    // None of these are great tests, just appeasing coverage.
+    final ship = _MockShip();
+    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
+    expect(ship.isFuelFull, isTrue);
+    expect(ship.fuelUnitsNeeded, 0);
+
+    final shipFrame = _MockShipFrame();
+    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
+    expect(ship.isExplorer, isFalse);
+
+    when(() => ship.modules).thenReturn([]);
+    expect(ship.hasMiningLaser, isFalse);
+    expect(ship.hasSiphon, isFalse);
+    expect(ship.hasOreRefinery, isFalse);
+  });
+
   test('FactionUtils', () {
     final faction = Faction(
       description: '',
