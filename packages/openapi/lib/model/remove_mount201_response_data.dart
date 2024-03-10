@@ -33,7 +33,7 @@ class RemoveMount201ResponseData {
       identical(this, other) ||
       other is RemoveMount201ResponseData &&
           other.agent == agent &&
-          other.mounts == mounts &&
+          _deepEquality.equals(other.mounts, mounts) &&
           other.cargo == cargo &&
           other.transaction == transaction;
 

@@ -28,8 +28,8 @@ class GetStatus200ResponseLeaderboards {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GetStatus200ResponseLeaderboards &&
-          other.mostCredits == mostCredits &&
-          other.mostSubmittedCharts == mostSubmittedCharts;
+          _deepEquality.equals(other.mostCredits, mostCredits) &&
+          _deepEquality.equals(other.mostSubmittedCharts, mostSubmittedCharts);
 
   @override
   int get hashCode =>

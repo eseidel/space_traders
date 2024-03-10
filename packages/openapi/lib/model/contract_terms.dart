@@ -32,7 +32,7 @@ class ContractTerms {
       other is ContractTerms &&
           other.deadline == deadline &&
           other.payment == payment &&
-          other.deliver == deliver;
+          _deepEquality.equals(other.deliver, deliver);
 
   @override
   int get hashCode =>
@@ -72,7 +72,7 @@ class ContractTerms {
       }());
 
       return ContractTerms(
-        deadline: mapDateTime(json, r'deadline', '')!,
+        deadline: mapDateTime(json, r'deadline', r'')!,
         payment: ContractPayment.fromJson(json[r'payment'])!,
         deliver: ContractDeliverGood.listFromJson(json[r'deliver']),
       );

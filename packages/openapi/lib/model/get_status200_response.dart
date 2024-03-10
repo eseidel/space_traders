@@ -56,8 +56,8 @@ class GetStatus200Response {
           other.stats == stats &&
           other.leaderboards == leaderboards &&
           other.serverResets == serverResets &&
-          other.announcements == announcements &&
-          other.links == links;
+          _deepEquality.equals(other.announcements, announcements) &&
+          _deepEquality.equals(other.links, links);
 
   @override
   int get hashCode =>

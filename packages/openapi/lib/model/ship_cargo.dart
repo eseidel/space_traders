@@ -37,7 +37,7 @@ class ShipCargo {
       other is ShipCargo &&
           other.capacity == capacity &&
           other.units == units &&
-          other.inventory == inventory;
+          _deepEquality.equals(other.inventory, inventory);
 
   @override
   int get hashCode =>

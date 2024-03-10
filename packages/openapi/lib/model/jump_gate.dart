@@ -28,7 +28,7 @@ class JumpGate {
       identical(this, other) ||
       other is JumpGate &&
           other.symbol == symbol &&
-          other.connections == connections;
+          _deepEquality.equals(other.connections, connections);
 
   @override
   int get hashCode =>
@@ -67,8 +67,10 @@ class JumpGate {
 
       return JumpGate(
         symbol: mapValueOfType<String>(json, r'symbol')!,
-        connections: json[r'connections'] is List
-            ? (json[r'connections'] as List).cast<String>()
+        connections: json[r'connections'] is Iterable
+            ? (json[r'connections'] as Iterable)
+                .cast<String>()
+                .toList(growable: false)
             : const [],
       );
     }

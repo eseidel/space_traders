@@ -103,7 +103,7 @@ class ShipyardTransaction {
         shipType: mapValueOfType<String>(json, r'shipType')!,
         price: mapValueOfType<int>(json, r'price')!,
         agentSymbol: mapValueOfType<String>(json, r'agentSymbol')!,
-        timestamp: mapDateTime(json, r'timestamp', '')!,
+        timestamp: mapDateTime(json, r'timestamp', r'')!,
       );
     }
     return null;

@@ -60,7 +60,7 @@ class ShipMount {
           other.name == name &&
           other.description == description &&
           other.strength == strength &&
-          other.deposits == deposits &&
+          _deepEquality.equals(other.deposits, deposits) &&
           other.requirements == requirements;
 
   @override

@@ -21,7 +21,7 @@ class GetMounts200Response {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GetMounts200Response && other.data == data;
+      other is GetMounts200Response && _deepEquality.equals(other.data, data);
 
   @override
   int get hashCode =>

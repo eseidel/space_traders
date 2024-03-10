@@ -27,7 +27,7 @@ class CreateShipWaypointScan201ResponseData {
       identical(this, other) ||
       other is CreateShipWaypointScan201ResponseData &&
           other.cooldown == cooldown &&
-          other.waypoints == waypoints;
+          _deepEquality.equals(other.waypoints, waypoints);
 
   @override
   int get hashCode =>

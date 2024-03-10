@@ -87,11 +87,11 @@ class Waypoint {
           other.systemSymbol == systemSymbol &&
           other.x == x &&
           other.y == y &&
-          other.orbitals == orbitals &&
+          _deepEquality.equals(other.orbitals, orbitals) &&
           other.orbits == orbits &&
           other.faction == faction &&
-          other.traits == traits &&
-          other.modifiers == modifiers &&
+          _deepEquality.equals(other.traits, traits) &&
+          _deepEquality.equals(other.modifiers, modifiers) &&
           other.chart == chart &&
           other.isUnderConstruction == isUnderConstruction;
 

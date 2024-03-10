@@ -52,7 +52,7 @@ class SystemWaypoint {
           other.type == type &&
           other.x == x &&
           other.y == y &&
-          other.orbitals == orbitals &&
+          _deepEquality.equals(other.orbitals, orbitals) &&
           other.orbits == orbits;
 
   @override

@@ -325,6 +325,8 @@ class Ship {
         mountingPoints: 0,
         fuelCapacity: 0,
         requirements: openapi.ShipRequirements(),
+        condition: 1,
+        integrity: 1,
       ),
       reactor: openapi.ShipReactor(
         symbol: openapi.ShipReactorSymbolEnum.SOLAR_I,
@@ -332,6 +334,8 @@ class Ship {
         description: '',
         powerOutput: 0,
         requirements: openapi.ShipRequirements(),
+        condition: 1,
+        integrity: 1,
       ),
       engine: openapi.ShipEngine(
         symbol: openapi.ShipEngineSymbolEnum.HYPER_DRIVE_I,
@@ -339,6 +343,8 @@ class Ship {
         description: '',
         speed: 0,
         requirements: openapi.ShipRequirements(),
+        condition: 1,
+        integrity: 1,
       ),
       cooldown: openapi.Cooldown(
         shipSymbol: 'A',

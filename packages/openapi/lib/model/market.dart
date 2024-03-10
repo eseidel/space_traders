@@ -44,11 +44,11 @@ class Market {
       identical(this, other) ||
       other is Market &&
           other.symbol == symbol &&
-          other.exports == exports &&
-          other.imports == imports &&
-          other.exchange == exchange &&
-          other.transactions == transactions &&
-          other.tradeGoods == tradeGoods;
+          _deepEquality.equals(other.exports, exports) &&
+          _deepEquality.equals(other.imports, imports) &&
+          _deepEquality.equals(other.exchange, exchange) &&
+          _deepEquality.equals(other.transactions, transactions) &&
+          _deepEquality.equals(other.tradeGoods, tradeGoods);
 
   @override
   int get hashCode =>

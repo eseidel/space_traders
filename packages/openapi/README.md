@@ -104,6 +104,8 @@ Class | Method | HTTP request | Description
 *FleetApi* | [**getMyShip**](doc//FleetApi.md#getmyship) | **GET** /my/ships/{shipSymbol} | Get Ship
 *FleetApi* | [**getMyShipCargo**](doc//FleetApi.md#getmyshipcargo) | **GET** /my/ships/{shipSymbol}/cargo | Get Ship Cargo
 *FleetApi* | [**getMyShips**](doc//FleetApi.md#getmyships) | **GET** /my/ships | List Ships
+*FleetApi* | [**getRepairShip**](doc//FleetApi.md#getrepairship) | **GET** /my/ships/{shipSymbol}/repair | Get Repair Ship
+*FleetApi* | [**getScrapShip**](doc//FleetApi.md#getscrapship) | **GET** /my/ships/{shipSymbol}/scrap | Get Scrap Ship
 *FleetApi* | [**getShipCooldown**](doc//FleetApi.md#getshipcooldown) | **GET** /my/ships/{shipSymbol}/cooldown | Get Ship Cooldown
 *FleetApi* | [**getShipNav**](doc//FleetApi.md#getshipnav) | **GET** /my/ships/{shipSymbol}/nav | Get Ship Nav
 *FleetApi* | [**installMount**](doc//FleetApi.md#installmount) | **POST** /my/ships/{shipSymbol}/mounts/install | Install Mount
@@ -117,6 +119,8 @@ Class | Method | HTTP request | Description
 *FleetApi* | [**purchaseShip**](doc//FleetApi.md#purchaseship) | **POST** /my/ships | Purchase Ship
 *FleetApi* | [**refuelShip**](doc//FleetApi.md#refuelship) | **POST** /my/ships/{shipSymbol}/refuel | Refuel Ship
 *FleetApi* | [**removeMount**](doc//FleetApi.md#removemount) | **POST** /my/ships/{shipSymbol}/mounts/remove | Remove Mount
+*FleetApi* | [**repairShip**](doc//FleetApi.md#repairship) | **POST** /my/ships/{shipSymbol}/repair | Repair Ship
+*FleetApi* | [**scrapShip**](doc//FleetApi.md#scrapship) | **POST** /my/ships/{shipSymbol}/scrap | Scrap Ship
 *FleetApi* | [**sellCargo**](doc//FleetApi.md#sellcargo) | **POST** /my/ships/{shipSymbol}/sell | Sell Cargo
 *FleetApi* | [**shipRefine**](doc//FleetApi.md#shiprefine) | **POST** /my/ships/{shipSymbol}/refine | Ship Refine
 *FleetApi* | [**siphonResources**](doc//FleetApi.md#siphonresources) | **POST** /my/ships/{shipSymbol}/siphon | Siphon Resources
@@ -163,6 +167,7 @@ Class | Method | HTTP request | Description
  - [DockShip200Response](doc//DockShip200Response.md)
  - [ExtractResources201Response](doc//ExtractResources201Response.md)
  - [ExtractResources201ResponseData](doc//ExtractResources201ResponseData.md)
+ - [ExtractResources201ResponseDataEventsInner](doc//ExtractResources201ResponseDataEventsInner.md)
  - [ExtractResourcesRequest](doc//ExtractResourcesRequest.md)
  - [Extraction](doc//Extraction.md)
  - [ExtractionYield](doc//ExtractionYield.md)
@@ -184,6 +189,10 @@ Class | Method | HTTP request | Description
  - [GetMyShip200Response](doc//GetMyShip200Response.md)
  - [GetMyShipCargo200Response](doc//GetMyShipCargo200Response.md)
  - [GetMyShips200Response](doc//GetMyShips200Response.md)
+ - [GetRepairShip200Response](doc//GetRepairShip200Response.md)
+ - [GetRepairShip200ResponseData](doc//GetRepairShip200ResponseData.md)
+ - [GetScrapShip200Response](doc//GetScrapShip200Response.md)
+ - [GetScrapShip200ResponseData](doc//GetScrapShip200ResponseData.md)
  - [GetShipCooldown200Response](doc//GetShipCooldown200Response.md)
  - [GetShipNav200Response](doc//GetShipNav200Response.md)
  - [GetShipyard200Response](doc//GetShipyard200Response.md)
@@ -236,6 +245,9 @@ Class | Method | HTTP request | Description
  - [RemoveMount201Response](doc//RemoveMount201Response.md)
  - [RemoveMount201ResponseData](doc//RemoveMount201ResponseData.md)
  - [RemoveMountRequest](doc//RemoveMountRequest.md)
+ - [RepairShip200Response](doc//RepairShip200Response.md)
+ - [RepairShip200ResponseData](doc//RepairShip200ResponseData.md)
+ - [RepairTransaction](doc//RepairTransaction.md)
  - [ScannedShip](doc//ScannedShip.md)
  - [ScannedShipEngine](doc//ScannedShipEngine.md)
  - [ScannedShipFrame](doc//ScannedShipFrame.md)
@@ -243,12 +255,16 @@ Class | Method | HTTP request | Description
  - [ScannedShipReactor](doc//ScannedShipReactor.md)
  - [ScannedSystem](doc//ScannedSystem.md)
  - [ScannedWaypoint](doc//ScannedWaypoint.md)
+ - [ScrapShip200Response](doc//ScrapShip200Response.md)
+ - [ScrapShip200ResponseData](doc//ScrapShip200ResponseData.md)
+ - [ScrapTransaction](doc//ScrapTransaction.md)
  - [SellCargo201Response](doc//SellCargo201Response.md)
  - [SellCargo201ResponseData](doc//SellCargo201ResponseData.md)
  - [SellCargoRequest](doc//SellCargoRequest.md)
  - [Ship](doc//Ship.md)
  - [ShipCargo](doc//ShipCargo.md)
  - [ShipCargoItem](doc//ShipCargoItem.md)
+ - [ShipConditionEvent](doc//ShipConditionEvent.md)
  - [ShipCrew](doc//ShipCrew.md)
  - [ShipEngine](doc//ShipEngine.md)
  - [ShipFrame](doc//ShipFrame.md)
@@ -294,6 +310,8 @@ Class | Method | HTTP request | Description
  - [TradeSymbol](doc//TradeSymbol.md)
  - [TransferCargo200Response](doc//TransferCargo200Response.md)
  - [TransferCargoRequest](doc//TransferCargoRequest.md)
+ - [WarpShip200Response](doc//WarpShip200Response.md)
+ - [WarpShip200ResponseData](doc//WarpShip200ResponseData.md)
  - [Waypoint](doc//Waypoint.md)
  - [WaypointFaction](doc//WaypointFaction.md)
  - [WaypointModifier](doc//WaypointModifier.md)

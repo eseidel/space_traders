@@ -176,17 +176,17 @@ class ApiClient {
   }
 
   Future<dynamic> deserializeAsync(
-    String json,
+    String value,
     String targetType, {
     bool growable = false,
   }) async =>
       // ignore: deprecated_member_use_from_same_package
-      deserialize(json, targetType, growable: growable);
+      deserialize(value, targetType, growable: growable);
 
   @Deprecated(
       'Scheduled for removal in OpenAPI Generator 6.x. Use deserializeAsync() instead.')
   dynamic deserialize(
-    String json,
+    String value,
     String targetType, {
     bool growable = false,
   }) {
@@ -196,8 +196,8 @@ class ApiClient {
 
     // If the expected target type is String, nothing to do...
     return targetType == 'String'
-        ? json
-        : _deserialize(jsonDecode(json), targetType, growable: growable);
+        ? value
+        : fromJson(json.decode(value), targetType, growable: growable);
   }
 
   // ignore: deprecated_member_use_from_same_package
@@ -207,8 +207,12 @@ class ApiClient {
       'Scheduled for removal in OpenAPI Generator 6.x. Use serializeAsync() instead.')
   String serialize(Object? value) => value == null ? '' : json.encode(value);
 
-  static dynamic _deserialize(dynamic value, String targetType,
-      {bool growable = false}) {
+  /// Returns a native instance of an OpenAPI class matching the [specified type][targetType].
+  static dynamic fromJson(
+    dynamic value,
+    String targetType, {
+    bool growable = false,
+  }) {
     try {
       switch (targetType) {
         case 'String':
@@ -281,6 +285,8 @@ class ApiClient {
           return ExtractResources201Response.fromJson(value);
         case 'ExtractResources201ResponseData':
           return ExtractResources201ResponseData.fromJson(value);
+        case 'ExtractResources201ResponseDataEventsInner':
+          return ExtractResources201ResponseDataEventsInner.fromJson(value);
         case 'ExtractResourcesRequest':
           return ExtractResourcesRequest.fromJson(value);
         case 'Extraction':
@@ -323,6 +329,14 @@ class ApiClient {
           return GetMyShipCargo200Response.fromJson(value);
         case 'GetMyShips200Response':
           return GetMyShips200Response.fromJson(value);
+        case 'GetRepairShip200Response':
+          return GetRepairShip200Response.fromJson(value);
+        case 'GetRepairShip200ResponseData':
+          return GetRepairShip200ResponseData.fromJson(value);
+        case 'GetScrapShip200Response':
+          return GetScrapShip200Response.fromJson(value);
+        case 'GetScrapShip200ResponseData':
+          return GetScrapShip200ResponseData.fromJson(value);
         case 'GetShipCooldown200Response':
           return GetShipCooldown200Response.fromJson(value);
         case 'GetShipNav200Response':
@@ -429,6 +443,12 @@ class ApiClient {
           return RemoveMount201ResponseData.fromJson(value);
         case 'RemoveMountRequest':
           return RemoveMountRequest.fromJson(value);
+        case 'RepairShip200Response':
+          return RepairShip200Response.fromJson(value);
+        case 'RepairShip200ResponseData':
+          return RepairShip200ResponseData.fromJson(value);
+        case 'RepairTransaction':
+          return RepairTransaction.fromJson(value);
         case 'ScannedShip':
           return ScannedShip.fromJson(value);
         case 'ScannedShipEngine':
@@ -443,6 +463,12 @@ class ApiClient {
           return ScannedSystem.fromJson(value);
         case 'ScannedWaypoint':
           return ScannedWaypoint.fromJson(value);
+        case 'ScrapShip200Response':
+          return ScrapShip200Response.fromJson(value);
+        case 'ScrapShip200ResponseData':
+          return ScrapShip200ResponseData.fromJson(value);
+        case 'ScrapTransaction':
+          return ScrapTransaction.fromJson(value);
         case 'SellCargo201Response':
           return SellCargo201Response.fromJson(value);
         case 'SellCargo201ResponseData':
@@ -455,6 +481,8 @@ class ApiClient {
           return ShipCargo.fromJson(value);
         case 'ShipCargoItem':
           return ShipCargoItem.fromJson(value);
+        case 'ShipConditionEvent':
+          return ShipConditionEvent.fromJson(value);
         case 'ShipCrew':
           return ShipCrew.fromJson(value);
         case 'ShipEngine':
@@ -545,6 +573,10 @@ class ApiClient {
           return TransferCargo200Response.fromJson(value);
         case 'TransferCargoRequest':
           return TransferCargoRequest.fromJson(value);
+        case 'WarpShip200Response':
+          return WarpShip200Response.fromJson(value);
+        case 'WarpShip200ResponseData':
+          return WarpShip200ResponseData.fromJson(value);
         case 'Waypoint':
           return Waypoint.fromJson(value);
         case 'WaypointFaction':
@@ -566,7 +598,7 @@ class ApiClient {
           if (value is List &&
               (match = _regList.firstMatch(targetType)?.group(1)) != null) {
             return value
-                .map<dynamic>((dynamic v) => _deserialize(
+                .map<dynamic>((dynamic v) => fromJson(
                       v,
                       match,
                       growable: growable,
@@ -576,7 +608,7 @@ class ApiClient {
           if (value is Set &&
               (match = _regSet.firstMatch(targetType)?.group(1)) != null) {
             return value
-                .map<dynamic>((dynamic v) => _deserialize(
+                .map<dynamic>((dynamic v) => fromJson(
                       v,
                       match,
                       growable: growable,
@@ -587,7 +619,7 @@ class ApiClient {
               (match = _regMap.firstMatch(targetType)?.group(1)) != null) {
             return Map<String, dynamic>.fromIterables(
               value.keys.cast<String>(),
-              value.values.map<dynamic>((dynamic v) => _deserialize(
+              value.values.map<dynamic>((dynamic v) => fromJson(
                     v,
                     match,
                     growable: growable,
@@ -629,6 +661,15 @@ class DeserializationMessage {
 }
 
 /// Primarily intended for use in an isolate.
+Future<dynamic> decodeAsync(DeserializationMessage message) async {
+  // Remove all spaces. Necessary for regular expressions as well.
+  final targetType = message.targetType.replaceAll(' ', '');
+
+  // If the expected target type is String, nothing to do...
+  return targetType == 'String' ? message.json : json.decode(message.json);
+}
+
+/// Primarily intended for use in an isolate.
 Future<dynamic> deserializeAsync(DeserializationMessage message) async {
   // Remove all spaces. Necessary for regular expressions as well.
   final targetType = message.targetType.replaceAll(' ', '');
@@ -636,8 +677,8 @@ Future<dynamic> deserializeAsync(DeserializationMessage message) async {
   // If the expected target type is String, nothing to do...
   return targetType == 'String'
       ? message.json
-      : ApiClient._deserialize(
-          jsonDecode(message.json),
+      : ApiClient.fromJson(
+          json.decode(message.json),
           targetType,
           growable: message.growable,
         );

@@ -25,7 +25,7 @@ class GetContracts200Response {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GetContracts200Response &&
-          other.data == data &&
+          _deepEquality.equals(other.data, data) &&
           other.meta == meta;
 
   @override

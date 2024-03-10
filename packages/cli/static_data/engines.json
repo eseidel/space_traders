@@ -3,7 +3,8 @@
   "symbol": "ENGINE_IMPULSE_DRIVE_I",
   "name": "Impulse Drive I",
   "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
-  "condition": null,
+  "condition": 1,
+   "integrity": 1.0,
   "speed": 3,
   "requirements": {
    "power": 1,
@@ -15,7 +16,8 @@
   "symbol": "ENGINE_ION_DRIVE_I",
   "name": "Ion Drive I",
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
-  "condition": null,
+  "condition": 1,
+   "integrity": 1.0,
   "speed": 10,
   "requirements": {
    "power": 3,
@@ -27,7 +29,8 @@
   "symbol": "ENGINE_ION_DRIVE_II",
   "name": "Ion Drive II",
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
-  "condition": null,
+  "condition": 1,
+   "integrity": 1.0,
   "speed": 30,
   "requirements": {
    "power": 6,

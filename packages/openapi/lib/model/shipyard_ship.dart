@@ -70,8 +70,8 @@ class ShipyardShip {
           other.frame == frame &&
           other.reactor == reactor &&
           other.engine == engine &&
-          other.modules == modules &&
-          other.mounts == mounts &&
+          _deepEquality.equals(other.modules, modules) &&
+          _deepEquality.equals(other.mounts, mounts) &&
           other.crew == crew;
 
   @override

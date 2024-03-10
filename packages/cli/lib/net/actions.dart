@@ -66,7 +66,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 
 /// Navigate [ship] to [waypointSymbol] will retry in drift mode if
 /// there is insufficient fuel.
-Future<NavigateShip200ResponseData> warpToWaypoint(
+Future<WarpShip200ResponseData> warpToWaypoint(
   Database db,
   Api api,
   SystemsCache systemsCache,
@@ -74,14 +74,13 @@ Future<NavigateShip200ResponseData> warpToWaypoint(
   WaypointSymbol waypointSymbol,
 ) async {
   await undockIfNeeded(db, api, ship);
-  final waitUntil = await navigateShip(
+  final data = await warpShip(
     db,
     api,
     ship,
     waypointSymbol,
-    travelType: TravelMethod.warp,
   );
-  return waitUntil;
+  return data;
 }
 
 /// Sell all cargo matching the [where] predicate.

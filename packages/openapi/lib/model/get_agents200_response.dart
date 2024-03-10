@@ -24,7 +24,9 @@ class GetAgents200Response {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GetAgents200Response && other.data == data && other.meta == meta;
+      other is GetAgents200Response &&
+          _deepEquality.equals(other.data, data) &&
+          other.meta == meta;
 
   @override
   int get hashCode =>

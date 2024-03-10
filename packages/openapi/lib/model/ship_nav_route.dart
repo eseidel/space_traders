@@ -82,8 +82,8 @@ class ShipNavRoute {
       return ShipNavRoute(
         destination: ShipNavRouteWaypoint.fromJson(json[r'destination'])!,
         origin: ShipNavRouteWaypoint.fromJson(json[r'origin'])!,
-        departureTime: mapDateTime(json, r'departureTime', '')!,
-        arrival: mapDateTime(json, r'arrival', '')!,
+        departureTime: mapDateTime(json, r'departureTime', r'')!,
+        arrival: mapDateTime(json, r'arrival', r'')!,
       );
     }
     return null;

@@ -126,8 +126,8 @@ class Contract {
         terms: ContractTerms.fromJson(json[r'terms'])!,
         accepted: mapValueOfType<bool>(json, r'accepted')!,
         fulfilled: mapValueOfType<bool>(json, r'fulfilled')!,
-        expiration: mapDateTime(json, r'expiration', '')!,
-        deadlineToAccept: mapDateTime(json, r'deadlineToAccept', ''),
+        expiration: mapDateTime(json, r'expiration', r'')!,
+        deadlineToAccept: mapDateTime(json, r'deadlineToAccept', r''),
       );
     }
     return null;

@@ -60,7 +60,7 @@ class ScannedShip {
           other.frame == frame &&
           other.reactor == reactor &&
           other.engine == engine &&
-          other.mounts == mounts;
+          _deepEquality.equals(other.mounts, mounts);
 
   @override
   int get hashCode =>

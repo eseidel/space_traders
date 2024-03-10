@@ -66,8 +66,8 @@ class Ship {
           other.reactor == reactor &&
           other.engine == engine &&
           other.cooldown == cooldown &&
-          other.modules == modules &&
-          other.mounts == mounts &&
+          _deepEquality.equals(other.modules, modules) &&
+          _deepEquality.equals(other.mounts, mounts) &&
           other.cargo == cargo &&
           other.fuel == fuel;
 

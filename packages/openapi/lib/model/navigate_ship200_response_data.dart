@@ -15,31 +15,37 @@ class NavigateShip200ResponseData {
   NavigateShip200ResponseData({
     required this.fuel,
     required this.nav,
+    this.events = const [],
   });
 
   ShipFuel fuel;
 
   ShipNav nav;
 
+  List<ExtractResources201ResponseDataEventsInner> events;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is NavigateShip200ResponseData &&
           other.fuel == fuel &&
-          other.nav == nav;
+          other.nav == nav &&
+          _deepEquality.equals(other.events, events);
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (fuel.hashCode) + (nav.hashCode);
+      (fuel.hashCode) + (nav.hashCode) + (events.hashCode);
 
   @override
-  String toString() => 'NavigateShip200ResponseData[fuel=$fuel, nav=$nav]';
+  String toString() =>
+      'NavigateShip200ResponseData[fuel=$fuel, nav=$nav, events=$events]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'fuel'] = this.fuel;
     json[r'nav'] = this.nav;
+    json[r'events'] = this.events;
     return json;
   }
 
@@ -66,6 +72,8 @@ class NavigateShip200ResponseData {
       return NavigateShip200ResponseData(
         fuel: ShipFuel.fromJson(json[r'fuel'])!,
         nav: ShipNav.fromJson(json[r'nav'])!,
+        events: ExtractResources201ResponseDataEventsInner.listFromJson(
+            json[r'events']),
       );
     }
     return null;
@@ -124,5 +132,6 @@ class NavigateShip200ResponseData {
   static const requiredKeys = <String>{
     'fuel',
     'nav',
+    'events',
   };
 }

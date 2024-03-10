@@ -32,7 +32,7 @@ class Construction {
       identical(this, other) ||
       other is Construction &&
           other.symbol == symbol &&
-          other.materials == materials &&
+          _deepEquality.equals(other.materials, materials) &&
           other.isComplete == isComplete;
 
   @override

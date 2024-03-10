@@ -95,7 +95,7 @@ class ShipModificationTransaction {
         shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
         tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol')!,
         totalPrice: mapValueOfType<int>(json, r'totalPrice')!,
-        timestamp: mapDateTime(json, r'timestamp', '')!,
+        timestamp: mapDateTime(json, r'timestamp', r'')!,
       );
     }
     return null;

@@ -46,7 +46,7 @@ class Faction {
           other.name == name &&
           other.description == description &&
           other.headquarters == headquarters &&
-          other.traits == traits &&
+          _deepEquality.equals(other.traits, traits) &&
           other.isRecruiting == isRecruiting;
 
   @override

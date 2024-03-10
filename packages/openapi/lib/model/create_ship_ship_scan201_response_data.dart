@@ -27,7 +27,7 @@ class CreateShipShipScan201ResponseData {
       identical(this, other) ||
       other is CreateShipShipScan201ResponseData &&
           other.cooldown == cooldown &&
-          other.ships == ships;
+          _deepEquality.equals(other.ships, ships);
 
   @override
   int get hashCode =>

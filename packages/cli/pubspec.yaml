@@ -16,7 +16,7 @@ dependencies:
   equatable: ^2.0.5
   file: ^7.0.0
   http: ^0.13.6
-  intl: ^0.17.0
+  intl: ^0.18.0
   json_diff:
     git:
       # The original package is no longer maintained.

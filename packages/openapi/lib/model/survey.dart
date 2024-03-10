@@ -41,7 +41,7 @@ class Survey {
       other is Survey &&
           other.signature == signature &&
           other.symbol == symbol &&
-          other.deposits == deposits &&
+          _deepEquality.equals(other.deposits, deposits) &&
           other.expiration == expiration &&
           other.size == size;
 
@@ -92,7 +92,7 @@ class Survey {
         signature: mapValueOfType<String>(json, r'signature')!,
         symbol: mapValueOfType<String>(json, r'symbol')!,
         deposits: SurveyDeposit.listFromJson(json[r'deposits']),
-        expiration: mapDateTime(json, r'expiration', '')!,
+        expiration: mapDateTime(json, r'expiration', r'')!,
         size: SurveySizeEnum.fromJson(json[r'size'])!,
       );
     }

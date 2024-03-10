@@ -16,6 +16,7 @@ class ExtractResources201ResponseData {
     required this.cooldown,
     required this.extraction,
     required this.cargo,
+    this.events = const [],
   });
 
   Cooldown cooldown;
@@ -24,28 +25,35 @@ class ExtractResources201ResponseData {
 
   ShipCargo cargo;
 
+  List<ExtractResources201ResponseDataEventsInner> events;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ExtractResources201ResponseData &&
           other.cooldown == cooldown &&
           other.extraction == extraction &&
-          other.cargo == cargo;
+          other.cargo == cargo &&
+          _deepEquality.equals(other.events, events);
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (cooldown.hashCode) + (extraction.hashCode) + (cargo.hashCode);
+      (cooldown.hashCode) +
+      (extraction.hashCode) +
+      (cargo.hashCode) +
+      (events.hashCode);
 
   @override
   String toString() =>
-      'ExtractResources201ResponseData[cooldown=$cooldown, extraction=$extraction, cargo=$cargo]';
+      'ExtractResources201ResponseData[cooldown=$cooldown, extraction=$extraction, cargo=$cargo, events=$events]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'cooldown'] = this.cooldown;
     json[r'extraction'] = this.extraction;
     json[r'cargo'] = this.cargo;
+    json[r'events'] = this.events;
     return json;
   }
 
@@ -73,6 +81,8 @@ class ExtractResources201ResponseData {
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         extraction: Extraction.fromJson(json[r'extraction'])!,
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
+        events: ExtractResources201ResponseDataEventsInner.listFromJson(
+            json[r'events']),
       );
     }
     return null;
@@ -133,5 +143,6 @@ class ExtractResources201ResponseData {
     'cooldown',
     'extraction',
     'cargo',
+    'events',
   };
 }

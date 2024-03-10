@@ -69,7 +69,7 @@ class ShipFuelConsumed {
 
       return ShipFuelConsumed(
         amount: mapValueOfType<int>(json, r'amount')!,
-        timestamp: mapDateTime(json, r'timestamp', '')!,
+        timestamp: mapDateTime(json, r'timestamp', r'')!,
       );
     }
     return null;

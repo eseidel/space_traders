@@ -175,7 +175,7 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
       ..purchasePrice = 0
       ..activity = null
       ..supply = SupplyLevel.ABUNDANT
-      ..frame.condition = null;
+      ..frame.condition = 1.0;
   }
 
   @override
@@ -204,7 +204,7 @@ class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
 
   @override
   ShipEngine copyAndNormalize(ShipEngine record) =>
-      ShipEngine.fromJson(jsonDecode(jsonEncode(record)))!..condition = null;
+      ShipEngine.fromJson(jsonDecode(jsonEncode(record)))!..condition = 1.0;
 
   @override
   int compare(ShipEngine a, ShipEngine b) =>
@@ -236,7 +236,7 @@ class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
 
   @override
   ShipReactor copyAndNormalize(ShipReactor record) =>
-      ShipReactor.fromJson(jsonDecode(jsonEncode(record)))!..condition = null;
+      ShipReactor.fromJson(jsonDecode(jsonEncode(record)))!..condition = 1.0;
 
   @override
   int compare(ShipReactor a, ShipReactor b) =>

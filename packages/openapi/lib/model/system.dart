@@ -51,8 +51,8 @@ class System {
           other.type == type &&
           other.x == x &&
           other.y == y &&
-          other.waypoints == waypoints &&
-          other.factions == factions;
+          _deepEquality.equals(other.waypoints, waypoints) &&
+          _deepEquality.equals(other.factions, factions);
 
   @override
   int get hashCode =>

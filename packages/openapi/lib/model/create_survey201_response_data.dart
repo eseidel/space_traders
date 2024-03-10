@@ -27,7 +27,7 @@ class CreateSurvey201ResponseData {
       identical(this, other) ||
       other is CreateSurvey201ResponseData &&
           other.cooldown == cooldown &&
-          other.surveys == surveys;
+          _deepEquality.equals(other.surveys, surveys);
 
   @override
   int get hashCode =>

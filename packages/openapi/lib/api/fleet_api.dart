@@ -848,6 +848,140 @@ class FleetApi {
     return null;
   }
 
+  /// Get Repair Ship
+  ///
+  /// Get the cost of repairing a ship.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<Response> getRepairShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/my/ships/{shipSymbol}/repair'.replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Repair Ship
+  ///
+  /// Get the cost of repairing a ship.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<GetRepairShip200Response?> getRepairShip(
+    String shipSymbol,
+  ) async {
+    final response = await getRepairShipWithHttpInfo(
+      shipSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetRepairShip200Response',
+      ) as GetRepairShip200Response;
+    }
+    return null;
+  }
+
+  /// Get Scrap Ship
+  ///
+  /// Get the amount of value that will be returned when scrapping a ship.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<Response> getScrapShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/my/ships/{shipSymbol}/scrap'.replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Scrap Ship
+  ///
+  /// Get the amount of value that will be returned when scrapping a ship.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<GetScrapShip200Response?> getScrapShip(
+    String shipSymbol,
+  ) async {
+    final response = await getScrapShipWithHttpInfo(
+      shipSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetScrapShip200Response',
+      ) as GetScrapShip200Response;
+    }
+    return null;
+  }
+
   /// Get Ship Cooldown
   ///
   /// Retrieve the details of your ship's reactor cooldown. Some actions such as activating your jump drive, scanning, or extracting resources taxes your reactor and results in a cooldown.  Your ship cannot perform additional actions until your cooldown has expired. The duration of your cooldown is relative to the power consumption of the related modules or mounts for the action taken.  Response returns a 204 status code (no-content) when the ship has no cooldown.
@@ -1774,6 +1908,140 @@ class FleetApi {
     return null;
   }
 
+  /// Repair Ship
+  ///
+  /// Repair a ship, restoring the ship to maximum condition. The ship must be docked at a waypoint that has the `Shipyard` trait in order to use this function. To preview the cost of repairing the ship, use the Get action.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<Response> repairShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/my/ships/{shipSymbol}/repair'.replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Repair Ship
+  ///
+  /// Repair a ship, restoring the ship to maximum condition. The ship must be docked at a waypoint that has the `Shipyard` trait in order to use this function. To preview the cost of repairing the ship, use the Get action.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<RepairShip200Response?> repairShip(
+    String shipSymbol,
+  ) async {
+    final response = await repairShipWithHttpInfo(
+      shipSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'RepairShip200Response',
+      ) as RepairShip200Response;
+    }
+    return null;
+  }
+
+  /// Scrap Ship
+  ///
+  /// Scrap a ship, removing it from the game and returning a portion of the ship's value to the agent. The ship must be docked in a waypoint that has the `Shipyard` trait in order to use this function. To preview the amount of value that will be returned, use the Get Ship action.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<Response> scrapShipWithHttpInfo(
+    String shipSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path =
+        r'/my/ships/{shipSymbol}/scrap'.replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Scrap Ship
+  ///
+  /// Scrap a ship, removing it from the game and returning a portion of the ship's value to the agent. The ship must be docked in a waypoint that has the `Shipyard` trait in order to use this function. To preview the amount of value that will be returned, use the Get Ship action.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The ship symbol.
+  Future<ScrapShip200Response?> scrapShip(
+    String shipSymbol,
+  ) async {
+    final response = await scrapShipWithHttpInfo(
+      shipSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ScrapShip200Response',
+      ) as ScrapShip200Response;
+    }
+    return null;
+  }
+
   /// Sell Cargo
   ///
   /// Sell cargo in your ship to a market that trades this cargo. The ship must be docked in a waypoint that has the `Marketplace` trait in order to use this function.
@@ -2115,7 +2383,7 @@ class FleetApi {
   ///
   /// * [NavigateShipRequest] navigateShipRequest:
   ///
-  Future<NavigateShip200Response?> warpShip(
+  Future<WarpShip200Response?> warpShip(
     String shipSymbol, {
     NavigateShipRequest? navigateShipRequest,
   }) async {
@@ -2133,8 +2401,8 @@ class FleetApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'NavigateShip200Response',
-      ) as NavigateShip200Response;
+        'WarpShip200Response',
+      ) as WarpShip200Response;
     }
     return null;
   }

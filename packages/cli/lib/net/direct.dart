@@ -1,7 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/nav/route.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -52,14 +51,29 @@ Future<NavigateShip200ResponseData> navigateShip(
   Database db,
   Api api,
   Ship ship,
-  WaypointSymbol waypointSymbol, {
-  TravelMethod travelType = TravelMethod.navigate,
-}) async {
+  WaypointSymbol waypointSymbol,
+) async {
   final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
-  final method = travelType == TravelMethod.warp
-      ? api.fleet.warpShip
-      : api.fleet.navigateShip;
-  final result = await method(ship.symbol, navigateShipRequest: request);
+  final result =
+      await api.fleet.navigateShip(ship.symbol, navigateShipRequest: request);
+  final data = result!.data;
+  ship
+    ..nav = data.nav
+    ..fuel = data.fuel;
+  await db.upsertShip(ship);
+  return data;
+}
+
+/// Navigate [ship] to [waypointSymbol]
+Future<WarpShip200ResponseData> warpShip(
+  Database db,
+  Api api,
+  Ship ship,
+  WaypointSymbol waypointSymbol,
+) async {
+  final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
+  final result =
+      await api.fleet.warpShip(ship.symbol, navigateShipRequest: request);
   final data = result!.data;
   ship
     ..nav = data.nav

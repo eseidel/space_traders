@@ -16,7 +16,8 @@ class ShipEngine {
     required this.symbol,
     required this.name,
     required this.description,
-    this.condition,
+    required this.condition,
+    required this.integrity,
     required this.speed,
     required this.requirements,
   });
@@ -30,17 +31,17 @@ class ShipEngine {
   /// The description of the engine.
   String description;
 
-  /// Condition is a range of 0 to 100 where 0 is completely worn out and 100 is brand new.
+  /// The repairable condition of a component. A value of 0 indicates the component needs significant repairs, while a value of 1 indicates the component is in near perfect condition. As the condition of a component is repaired, the overall integrity of the component decreases.
   ///
   /// Minimum value: 0
-  /// Maximum value: 100
+  /// Maximum value: 1
+  double condition;
+
+  /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
   ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  int? condition;
+  /// Minimum value: 0
+  /// Maximum value: 1
+  double integrity;
 
   /// The speed stat of this engine. The higher the speed, the faster a ship can travel from one point to another. Reduces the time of arrival when navigating the ship.
   ///
@@ -57,6 +58,7 @@ class ShipEngine {
           other.name == name &&
           other.description == description &&
           other.condition == condition &&
+          other.integrity == integrity &&
           other.speed == speed &&
           other.requirements == requirements;
 
@@ -66,24 +68,22 @@ class ShipEngine {
       (symbol.hashCode) +
       (name.hashCode) +
       (description.hashCode) +
-      (condition == null ? 0 : condition!.hashCode) +
+      (condition.hashCode) +
+      (integrity.hashCode) +
       (speed.hashCode) +
       (requirements.hashCode);
 
   @override
   String toString() =>
-      'ShipEngine[symbol=$symbol, name=$name, description=$description, condition=$condition, speed=$speed, requirements=$requirements]';
+      'ShipEngine[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, speed=$speed, requirements=$requirements]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'symbol'] = this.symbol;
     json[r'name'] = this.name;
     json[r'description'] = this.description;
-    if (this.condition != null) {
-      json[r'condition'] = this.condition;
-    } else {
-      json[r'condition'] = null;
-    }
+    json[r'condition'] = this.condition;
+    json[r'integrity'] = this.integrity;
     json[r'speed'] = this.speed;
     json[r'requirements'] = this.requirements;
     return json;
@@ -113,7 +113,8 @@ class ShipEngine {
         symbol: ShipEngineSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: mapValueOfType<int>(json, r'condition'),
+        condition: mapValueOfType<double>(json, r'condition')!,
+        integrity: mapValueOfType<double>(json, r'integrity')!,
         speed: mapValueOfType<int>(json, r'speed')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
       );
@@ -175,6 +176,8 @@ class ShipEngine {
     'symbol',
     'name',
     'description',
+    'condition',
+    'integrity',
     'speed',
     'requirements',
   };

@@ -21,6 +21,8 @@ Method | HTTP request | Description
 [**getMyShip**](FleetApi.md#getmyship) | **GET** /my/ships/{shipSymbol} | Get Ship
 [**getMyShipCargo**](FleetApi.md#getmyshipcargo) | **GET** /my/ships/{shipSymbol}/cargo | Get Ship Cargo
 [**getMyShips**](FleetApi.md#getmyships) | **GET** /my/ships | List Ships
+[**getRepairShip**](FleetApi.md#getrepairship) | **GET** /my/ships/{shipSymbol}/repair | Get Repair Ship
+[**getScrapShip**](FleetApi.md#getscrapship) | **GET** /my/ships/{shipSymbol}/scrap | Get Scrap Ship
 [**getShipCooldown**](FleetApi.md#getshipcooldown) | **GET** /my/ships/{shipSymbol}/cooldown | Get Ship Cooldown
 [**getShipNav**](FleetApi.md#getshipnav) | **GET** /my/ships/{shipSymbol}/nav | Get Ship Nav
 [**installMount**](FleetApi.md#installmount) | **POST** /my/ships/{shipSymbol}/mounts/install | Install Mount
@@ -34,6 +36,8 @@ Method | HTTP request | Description
 [**purchaseShip**](FleetApi.md#purchaseship) | **POST** /my/ships | Purchase Ship
 [**refuelShip**](FleetApi.md#refuelship) | **POST** /my/ships/{shipSymbol}/refuel | Refuel Ship
 [**removeMount**](FleetApi.md#removemount) | **POST** /my/ships/{shipSymbol}/mounts/remove | Remove Mount
+[**repairShip**](FleetApi.md#repairship) | **POST** /my/ships/{shipSymbol}/repair | Repair Ship
+[**scrapShip**](FleetApi.md#scrapship) | **POST** /my/ships/{shipSymbol}/scrap | Scrap Ship
 [**sellCargo**](FleetApi.md#sellcargo) | **POST** /my/ships/{shipSymbol}/sell | Sell Cargo
 [**shipRefine**](FleetApi.md#shiprefine) | **POST** /my/ships/{shipSymbol}/refine | Ship Refine
 [**siphonResources**](FleetApi.md#siphonresources) | **POST** /my/ships/{shipSymbol}/siphon | Siphon Resources
@@ -623,6 +627,104 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**GetMyShips200Response**](GetMyShips200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getRepairShip**
+> GetRepairShip200Response getRepairShip(shipSymbol)
+
+Get Repair Ship
+
+Get the cost of repairing a ship.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | The ship symbol.
+
+try {
+    final result = api_instance.getRepairShip(shipSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->getRepairShip: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The ship symbol. | 
+
+### Return type
+
+[**GetRepairShip200Response**](GetRepairShip200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getScrapShip**
+> GetScrapShip200Response getScrapShip(shipSymbol)
+
+Get Scrap Ship
+
+Get the amount of value that will be returned when scrapping a ship.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | The ship symbol.
+
+try {
+    final result = api_instance.getScrapShip(shipSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->getScrapShip: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The ship symbol. | 
+
+### Return type
+
+[**GetScrapShip200Response**](GetScrapShip200Response.md)
 
 ### Authorization
 
@@ -1288,6 +1390,104 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **repairShip**
+> RepairShip200Response repairShip(shipSymbol)
+
+Repair Ship
+
+Repair a ship, restoring the ship to maximum condition. The ship must be docked at a waypoint that has the `Shipyard` trait in order to use this function. To preview the cost of repairing the ship, use the Get action.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | The ship symbol.
+
+try {
+    final result = api_instance.repairShip(shipSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->repairShip: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The ship symbol. | 
+
+### Return type
+
+[**RepairShip200Response**](RepairShip200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapShip**
+> ScrapShip200Response scrapShip(shipSymbol)
+
+Scrap Ship
+
+Scrap a ship, removing it from the game and returning a portion of the ship's value to the agent. The ship must be docked in a waypoint that has the `Shipyard` trait in order to use this function. To preview the amount of value that will be returned, use the Get Ship action.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | The ship symbol.
+
+try {
+    final result = api_instance.scrapShip(shipSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->scrapShip: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The ship symbol. | 
+
+### Return type
+
+[**ScrapShip200Response**](ScrapShip200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **sellCargo**
 > SellCargo201Response sellCargo(shipSymbol, sellCargoRequest)
 
@@ -1491,7 +1691,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **warpShip**
-> NavigateShip200Response warpShip(shipSymbol, navigateShipRequest)
+> WarpShip200Response warpShip(shipSymbol, navigateShipRequest)
 
 Warp Ship
 
@@ -1528,7 +1728,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**NavigateShip200Response**](NavigateShip200Response.md)
+[**WarpShip200Response**](WarpShip200Response.md)
 
 ### Authorization
 

@@ -99,7 +99,7 @@ class Cooldown {
         shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
         totalSeconds: mapValueOfType<int>(json, r'totalSeconds')!,
         remainingSeconds: mapValueOfType<int>(json, r'remainingSeconds')!,
-        expiration: mapDateTime(json, r'expiration', ''),
+        expiration: mapDateTime(json, r'expiration', r''),
       );
     }
     return null;

@@ -123,7 +123,7 @@ class MarketTransaction {
         units: mapValueOfType<int>(json, r'units')!,
         pricePerUnit: mapValueOfType<int>(json, r'pricePerUnit')!,
         totalPrice: mapValueOfType<int>(json, r'totalPrice')!,
-        timestamp: mapDateTime(json, r'timestamp', '')!,
+        timestamp: mapDateTime(json, r'timestamp', r'')!,
       );
     }
     return null;

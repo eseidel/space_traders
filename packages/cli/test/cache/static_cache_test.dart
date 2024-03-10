@@ -29,6 +29,8 @@ void main() {
           mountingPoints: 2,
           fuelCapacity: 10,
           requirements: ShipRequirements(),
+          condition: 1,
+          integrity: 1,
         ),
         engine: ShipEngine(
           name: 'Test',
@@ -36,6 +38,8 @@ void main() {
           symbol: ShipEngineSymbolEnum.HYPER_DRIVE_I,
           requirements: ShipRequirements(),
           speed: 10,
+          condition: 1,
+          integrity: 1,
         ),
         reactor: ShipReactor(
           name: 'Test',
@@ -43,6 +47,8 @@ void main() {
           symbol: ShipReactorSymbolEnum.ANTIMATTER_I,
           requirements: ShipRequirements(),
           powerOutput: 10,
+          condition: 1,
+          integrity: 1,
         ),
         modules: [
           ShipModule(
@@ -77,6 +83,8 @@ void main() {
           mountingPoints: 2,
           fuelCapacity: 10,
           requirements: ShipRequirements(),
+          condition: 1,
+          integrity: 1,
         ),
         engine: ShipEngine(
           name: 'Test',
@@ -84,6 +92,8 @@ void main() {
           symbol: ShipEngineSymbolEnum.IMPULSE_DRIVE_I,
           requirements: ShipRequirements(),
           speed: 10,
+          condition: 1,
+          integrity: 1,
         ),
         reactor: ShipReactor(
           name: 'Test',
@@ -91,6 +101,8 @@ void main() {
           symbol: ShipReactorSymbolEnum.CHEMICAL_I,
           requirements: ShipRequirements(),
           powerOutput: 10,
+          condition: 1,
+          integrity: 1,
         ),
         modules: [
           ShipModule(

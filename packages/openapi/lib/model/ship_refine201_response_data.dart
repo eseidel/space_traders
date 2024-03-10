@@ -35,8 +35,8 @@ class ShipRefine201ResponseData {
       other is ShipRefine201ResponseData &&
           other.cargo == cargo &&
           other.cooldown == cooldown &&
-          other.produced == produced &&
-          other.consumed == consumed;
+          _deepEquality.equals(other.produced, produced) &&
+          _deepEquality.equals(other.consumed, consumed);
 
   @override
   int get hashCode =>

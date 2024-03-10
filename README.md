@@ -162,8 +162,12 @@ of other tools for viewing lcov.info files, including extensions for
 VSCode.  Mostly I just use codecov for viewing coverage.
 
 ## Reset day checklist
-* run `cd packages/cli`, `dart run bin/reset.dart`
-* run `cd packages/db`, `docker exec spacetraders_postgres /scripts/init_db.sh spacetraders`
+```
+cd packages/cli
+dart run bin/reset.dart
+cd ../db
+docker exec spacetraders_postgres /scripts/init_db.sh spacetraders
+```
 * Update `open_api_config.yaml` to have the latest git hash.
 * regenerate space_traders_api
 

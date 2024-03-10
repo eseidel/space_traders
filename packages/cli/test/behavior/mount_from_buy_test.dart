@@ -81,6 +81,8 @@ void main() {
         description: 'description',
         powerOutput: 0,
         requirements: ShipRequirements(),
+        condition: 1,
+        integrity: 1,
       ),
     );
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));

@@ -107,7 +107,7 @@ class Chart {
       return Chart(
         waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol'),
         submittedBy: mapValueOfType<String>(json, r'submittedBy'),
-        submittedOn: mapDateTime(json, r'submittedOn', ''),
+        submittedOn: mapDateTime(json, r'submittedOn', r''),
       );
     }
     return null;

@@ -40,9 +40,9 @@ class Shipyard {
       identical(this, other) ||
       other is Shipyard &&
           other.symbol == symbol &&
-          other.shipTypes == shipTypes &&
-          other.transactions == transactions &&
-          other.ships == ships &&
+          _deepEquality.equals(other.shipTypes, shipTypes) &&
+          _deepEquality.equals(other.transactions, transactions) &&
+          _deepEquality.equals(other.ships, ships) &&
           other.modificationsFee == modificationsFee;
 
   @override

@@ -69,9 +69,9 @@ class ScannedWaypoint {
           other.systemSymbol == systemSymbol &&
           other.x == x &&
           other.y == y &&
-          other.orbitals == orbitals &&
+          _deepEquality.equals(other.orbitals, orbitals) &&
           other.faction == faction &&
-          other.traits == traits &&
+          _deepEquality.equals(other.traits, traits) &&
           other.chart == chart;
 
   @override
