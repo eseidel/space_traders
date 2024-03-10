@@ -60,8 +60,7 @@ class Config {
   /// https://docs.spacetraders.io/api-guide/rate-limits
   double targetRequestsPerSecond = 2;
 
-  /// Our ship buy plan for computeNextShipToBuy.
-  final buyPlan = [
+  final _boostrapShips = [
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
@@ -74,6 +73,9 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     for (int i = 0; i < 13; i++) ShipType.LIGHT_HAULER,
+  ];
+
+  final _explorationShips = [
     // Only buy after gate opens.
     for (int i = 0; i < 20; i++) ShipType.PROBE,
     for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
@@ -84,6 +86,17 @@ class Config {
     for (int i = 0; i < 20; i++) ShipType.PROBE,
     for (int i = 0; i < 20; i++) ShipType.PROBE,
   ];
+
+  /// Our ship buy plan for computeNextShipToBuy.
+  List<ShipType> get buyPlan {
+    final ships = <ShipType>[];
+    if (gamePhase == GamePhase.bootstrap) {
+      ships.addAll(_boostrapShips);
+    } else if (gamePhase >= GamePhase.exploration) {
+      ships.addAll(_explorationShips);
+    }
+    return ships;
+  }
 
   // TODO(eseidel): Should be some dynamic min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
