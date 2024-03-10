@@ -1,6 +1,6 @@
 import 'package:db/src/transaction.dart';
 import 'package:test/test.dart';
-import 'package:types/transaction.dart';
+import 'package:types/types.dart';
 
 void main() {
   test('Transaction round trip', () {

@@ -377,6 +377,8 @@ class RoutePlanner {
   final JumpCache _jumpCache;
   final bool Function(WaypointSymbol) _sellsFuel;
 
+  // TODO(eseidel): This shouldn't be public.
+  /// The connectivity used for this RoutePlanner.
   SystemConnectivity get systemConnectivity => _systemConnectivity;
 
   /// Clear any cached routing data.  Called when jump gate availability changes

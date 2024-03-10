@@ -1,8 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:more/collection.dart';
-import 'package:types/api.dart';
-import 'package:types/behavior.dart';
-import 'package:types/src/symbol.dart';
+import 'package:types/types.dart';
 
 /// Symbols of all cargo modules.
 final kCargoModules = {

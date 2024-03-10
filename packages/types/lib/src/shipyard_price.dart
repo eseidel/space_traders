@@ -1,5 +1,4 @@
 import 'package:meta/meta.dart';
-import 'package:types/price.dart';
 import 'package:types/types.dart';
 
 /// Price data for a single ship type in a shipyard.

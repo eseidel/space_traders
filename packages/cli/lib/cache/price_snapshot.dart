@@ -1,7 +1,6 @@
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 import 'package:collection/collection.dart';
-import 'package:types/price.dart';
 import 'package:types/types.dart';
 
 /// A collection of price records.

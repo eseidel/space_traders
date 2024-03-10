@@ -1,5 +1,4 @@
 import 'package:meta/meta.dart';
-import 'package:types/price.dart';
 import 'package:types/types.dart';
 
 // {"waypointSymbol": "X1-ZS60-53675E", "symbol": "IRON_ORE", "supply":

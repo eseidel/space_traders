@@ -23,8 +23,6 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
-
 void main() {
   test('advanceShipBehavior idle does not spin hot', () async {
     final api = _MockApi();
