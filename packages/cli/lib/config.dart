@@ -191,7 +191,7 @@ class Config {
   }
 
   /// Max number of jumps we allow a charter to plan for at once.
-  final charterMaxJumps = 5;
+  final charterMaxJumps = 10;
 
   /// Minimum number of markets in a system before we bother assigning a
   /// system watcher.

@@ -87,7 +87,9 @@ Future<void> advanceShips(
             final behaviorName = behaviorState?.behavior.name;
             final behaviorString =
                 behaviorName == null ? '' : '($behaviorName) ';
-            shipWarn(
+            final logFn =
+                duration.inSeconds > expectedSeconds * 2 ? shipErr : shipWarn;
+            logFn(
               ship,
               '$behaviorString'
               'took ${duration.inSeconds}s '

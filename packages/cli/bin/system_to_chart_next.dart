@@ -1,7 +1,11 @@
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
+<<<<<<< HEAD
 import 'package:cli/logic/printing.dart';
+=======
+import 'package:cli/config.dart';
+>>>>>>> acbece40 (chore = increase charterMaxJumps to 10)
 import 'package:cli/plan/ships.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
@@ -20,7 +24,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ShipType.PROBE,
     origin: origin,
   )!;
-  const maxJumps = 100;
+  final maxJumps = config.charterMaxJumps;
   final behaviors = await BehaviorSnapshot.load(db);
 
   final destinationSymbol = await expectTime(RequestCounts(), db.queryCounts,

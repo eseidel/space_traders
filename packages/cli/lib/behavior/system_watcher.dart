@@ -297,6 +297,9 @@ Future<JobResult> doSystemWatcher(
     const Duration(hours: 1),
   );
 
+  // TODO(eseidel): Instead of halving the age, we should figure out what the
+  // oldest current record is and set our max-age to half that?
+  // That would save us many loops through this on startup.
   final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);
   shipWarn(
     ship,

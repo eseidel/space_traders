@@ -364,7 +364,7 @@ Iterable<CostedDeal> findDealsFor(
 
   final withinRange = 'within ${scan.description}';
   if (filtered.isEmpty) {
-    logger.info('No deals $withinRange.');
+    logger.detail('No deals $withinRange.');
     return [];
   }
 
