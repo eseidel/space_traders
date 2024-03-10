@@ -65,25 +65,6 @@ class Agent extends Equatable {
         accountId,
       ];
 
-  /// Copies this agent with some changes.
-  Agent copyWith({
-    String? symbol,
-    WaypointSymbol? headquarters,
-    int? credits,
-    FactionSymbol? startingFaction,
-    int? shipCount,
-    String? accountId,
-  }) {
-    return Agent(
-      symbol: symbol ?? this.symbol,
-      headquarters: headquarters ?? this.headquarters,
-      credits: credits ?? this.credits,
-      startingFaction: startingFaction ?? this.startingFaction,
-      shipCount: shipCount ?? this.shipCount,
-      accountId: accountId ?? this.accountId,
-    );
-  }
-
   /// Converts this agent to an OpenAPI agent.
   openapi.Agent toOpenApi() {
     return openapi.Agent(
