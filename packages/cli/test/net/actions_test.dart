@@ -743,6 +743,9 @@ void main() {
     );
     registerFallbackValue(waypoint);
 
+    registerFallbackValue(ChartingRecord.fallbackValue());
+    when(() => db.upsertChartingRecord(any())).thenAnswer((_) async => {});
+
     final logger = _MockLogger();
     await runWithLogger(logger, () async {
       await chartWaypointAndLog(

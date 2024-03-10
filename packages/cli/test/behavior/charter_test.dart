@@ -116,6 +116,7 @@ void main() {
     final state = BehaviorState(shipSymbol, Behavior.charter);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
+    when(db.allChartingRecords).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     expect(

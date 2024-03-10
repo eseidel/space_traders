@@ -91,6 +91,13 @@ class ChartingRecord {
     required this.timestamp,
   });
 
+  /// Create a fallback value for mocking.
+  @visibleForTesting
+  ChartingRecord.fallbackValue()
+      : waypointSymbol = WaypointSymbol.fromString('W-A-Y'),
+        values = null,
+        timestamp = DateTime(0);
+
   /// Creates a new charting record from JSON data.
   ChartingRecord.fromJson(Map<String, dynamic> json)
       : values = ChartedValues.fromJsonOrNull(
