@@ -71,11 +71,8 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.SURVEYOR,
     ShipType.MINING_DRONE,
-    ShipType.SURVEYOR,
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
-    ShipType.MINING_DRONE,
-    ShipType.SURVEYOR,
     for (int i = 0; i < 13; i++) ShipType.LIGHT_HAULER,
     // Only buy after gate opens.
     for (int i = 0; i < 20; i++) ShipType.PROBE,
