@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:types/api.dart';
+import 'package:types/types.dart';
 
 class DataTableExampleApp extends StatelessWidget {
   const DataTableExampleApp({super.key});
@@ -75,7 +75,7 @@ class DataTableExample extends StatelessWidget {
         for (final ship in ships)
           DataRow(
             cells: <DataCell>[
-              DataCell(Text(ship.symbol)),
+              DataCell(Text(ship.symbolString)),
               DataCell(Text(ship.nav.waypointSymbol)),
             ],
           ),

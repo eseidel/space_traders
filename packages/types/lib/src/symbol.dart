@@ -10,6 +10,11 @@ class WaypointSymbol {
   factory WaypointSymbol.fromJson(String json) =>
       WaypointSymbol.fromString(json);
 
+  /// Fallback value for mocking.
+  const WaypointSymbol.fallbackValue()
+      : waypoint = 'A-B-C',
+        system = const SystemSymbol.fallbackValue();
+
   /// Create a WaypointSymbol from a string.
   factory WaypointSymbol.fromString(String symbol) {
     if (_countHyphens(symbol) != 2) {
@@ -99,6 +104,9 @@ int _countHyphens(String str) {
 class SystemSymbol {
   const SystemSymbol._(this.system);
 
+  /// Fallback value for mocking.
+  const SystemSymbol.fallbackValue() : system = 'A-B';
+
   /// Create a SystemSymbol from a string.
   factory SystemSymbol.fromString(String symbol) {
     if (_countHyphens(symbol) != 1) {
@@ -154,7 +162,6 @@ class ShipSymbol extends Equatable implements Comparable<ShipSymbol> {
   const ShipSymbol(this.agentName, this.number);
 
   /// Create a dummy ShipSymbol for testing.
-  @visibleForTesting
   const ShipSymbol.fallbackValue()
       : agentName = 'S',
         number = 0;

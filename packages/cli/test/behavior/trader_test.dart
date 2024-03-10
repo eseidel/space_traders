@@ -64,11 +64,15 @@ void main() {
     final shipFuel = _MockShipFuel();
     when(() => ship.fuel).thenReturn(shipFuel);
     when(() => shipFuel.capacity).thenReturn(0);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.fleetRole).thenReturn(FleetRole.trader);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(start.systemString);
+    when(() => ship.isOrbiting).thenReturn(false);
+    when(() => ship.waypointSymbol).thenReturn(start);
+    when(() => ship.systemSymbol).thenReturn(start.system);
+    when(() => ship.usesFuel).thenReturn(true);
 
     final market = Market(
       symbol: start.waypoint,
@@ -237,8 +241,9 @@ void main() {
     // This ship uses fuel.
     const fuelCapacity = 1000;
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 1000));
+    when(() => ship.usesFuel).thenReturn(true);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
@@ -249,9 +254,9 @@ void main() {
     final end = WaypointSymbol.fromString('S-A-C');
 
     // We do not need to dock.
-    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(start.systemString);
+    when(() => ship.isOrbiting).thenReturn(false);
+    when(() => ship.waypointSymbol).thenReturn(start);
+    when(() => ship.systemSymbol).thenReturn(start.system);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     // Needed by navigateShipAndLog to show time left.
     final arrivalTime = DateTime(2022);
@@ -399,12 +404,6 @@ void main() {
     );
     when(() => caches.systems.waypointsInSystem(start.system)).thenReturn([]);
     registerFallbackValue(start.system);
-    // when(
-    //   () => caches.systemConnectivity.canJumpBetweenSystemSymbols(
-    //     any(),
-    //     any(),
-    //   ),
-    // ).thenReturn(true);
     final state = BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal);
 
     when(
@@ -573,17 +572,23 @@ void main() {
     when(() => shipCargo.inventory).thenReturn([]);
 
     final shipLocation = WaypointSymbol.fromString('S-A-W');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.symbolString).thenReturn(shipSymbol.symbol);
+    when(() => ship.emojiName).thenReturn('S-1');
+    when(() => ship.fleetRole).thenReturn(FleetRole.trader);
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(shipLocation.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(shipLocation.systemString);
-    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
-    final shipEngine = _MockShipEngine();
-    when(() => shipEngine.speed).thenReturn(10);
-    when(() => ship.engine).thenReturn(shipEngine);
+    when(() => ship.isOrbiting).thenReturn(false);
+    when(() => ship.waypointSymbol).thenReturn(shipLocation);
+    when(() => ship.systemSymbol).thenReturn(shipLocation.system);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => ship.modules).thenReturn([]);
+    when(() => ship.shipSpec).thenReturn(
+      const ShipSpec(
+        speed: 10,
+        cargoCapacity: 10,
+        fuelCapacity: 100,
+        canWarp: false,
+      ),
+    );
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -793,7 +798,10 @@ void main() {
       costPerAntimatterUnit: 10000,
     );
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('S-1');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.fleetRole).thenReturn(FleetRole.trader);
     final logger = _MockLogger();
     DateTime getNow() => DateTime(2021).toUtc();
     runWithLogger(
@@ -802,7 +810,7 @@ void main() {
     );
     verify(
       () => logger.err(
-        '🛸#1  Expected 1,800c profit (180c/s), got -4c (-4c/s) in 00:00:00, expected 00:00:10',
+        'S     trader    Expected 1,800c profit (180c/s), got -4c (-4c/s) in 00:00:00, expected 00:00:10',
       ),
     ).called(1);
   });
@@ -813,23 +821,31 @@ void main() {
     final caches = mockCaches();
     final ship = _MockShip();
     final shipNav = _MockShipNav();
+    final waypointSymbol = WaypointSymbol.fromString('S-A-B');
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-B');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
+
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.emojiName).thenReturn('S-1');
+    when(() => ship.fleetRole).thenReturn(FleetRole.trader);
+    when(() => ship.symbolString).thenReturn(shipSymbol.symbol);
     final shipCargo = ShipCargo(capacity: 10, units: 10);
     when(() => ship.cargo).thenReturn(shipCargo);
     const fuelCapacity = 100;
     when(() => ship.fuel)
         .thenReturn(ShipFuel(current: fuelCapacity, capacity: fuelCapacity));
-    final shipEngine = _MockShipEngine();
-    const shipSpeed = 10;
-    when(() => shipEngine.speed).thenReturn(shipSpeed);
-    when(() => ship.engine).thenReturn(shipEngine);
-    when(() => ship.modules).thenReturn([]);
+    when(() => ship.shipSpec).thenReturn(
+      const ShipSpec(
+        speed: 10,
+        cargoCapacity: 10,
+        fuelCapacity: fuelCapacity,
+        canWarp: false,
+      ),
+    );
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -923,6 +939,9 @@ void main() {
         arrival: arrivalTime,
       ),
     );
+    when(() => ship.isInTransit).thenReturn(true);
+    when(() => ship.usesFuel).thenReturn(true);
+    when(() => ship.isDocked).thenReturn(false);
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
@@ -956,15 +975,19 @@ void main() {
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => ship.isOrbiting).thenReturn(false);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
+    when(() => ship.waypointSymbol).thenReturn(end);
+    when(() => ship.systemSymbol).thenReturn(end.system);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.fleetRole).thenReturn(FleetRole.trader);
+    when(() => ship.symbolString).thenReturn(shipSymbol.symbol);
     final shipCargo = ShipCargo(capacity: 10, units: 10);
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
+    when(() => ship.usesFuel).thenReturn(true);
 
     final routePlan = RoutePlan(
       actions: [
@@ -1058,12 +1081,15 @@ void main() {
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => ship.isOrbiting).thenReturn(false);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
+    when(() => ship.waypointSymbol).thenReturn(end);
+    when(() => ship.systemSymbol).thenReturn(end.system);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.symbolString).thenReturn(shipSymbol.symbol);
+    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.fleetRole).thenReturn(FleetRole.trader);
     final shipCargo = ShipCargo(
       capacity: 10,
       units: 10,
@@ -1078,6 +1104,7 @@ void main() {
     );
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
+    when(() => ship.usesFuel).thenReturn(true);
 
     final routePlan = RoutePlan(
       actions: [
@@ -1254,12 +1281,16 @@ void main() {
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
+    when(() => ship.isOrbiting).thenReturn(false);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
+    when(() => ship.waypointSymbol).thenReturn(end);
+    when(() => ship.systemSymbol).thenReturn(end.system);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.symbolString).thenReturn(shipSymbol.symbol);
+    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.fleetRole).thenReturn(FleetRole.trader);
+
     final shipCargo = ShipCargo(
       capacity: 10,
       units: 10,
@@ -1274,6 +1305,7 @@ void main() {
     );
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
+    when(() => ship.usesFuel).thenReturn(true);
 
     final routePlan = RoutePlan(
       actions: [

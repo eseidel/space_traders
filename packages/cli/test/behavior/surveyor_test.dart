@@ -37,19 +37,14 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
-    when(() => ship.mounts).thenReturn([
-      ShipMount(
-        symbol: ShipMountSymbolEnum.SURVEYOR_I,
-        name: '',
-        requirements: ShipRequirements(),
-      ),
-    ]);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
+
+    when(() => ship.hasSurveyor).thenReturn(true);
     when(() => ship.cooldown).thenReturn(
       Cooldown(
         shipSymbol: shipSymbol.symbol,

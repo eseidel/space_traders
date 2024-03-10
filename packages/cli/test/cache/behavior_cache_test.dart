@@ -21,15 +21,18 @@ void main() {
 
     final behaviorTimeouts = BehaviorTimeouts();
     final ship = _MockShip();
-    const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    const s1 = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(s1);
+    when(() => ship.symbolString).thenReturn(s1.toJson());
+    when(() => ship.emojiName).thenReturn('🛸');
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     expect(
       behaviorTimeouts.isBehaviorDisabledForShip(ship, Behavior.trader),
       false,
     );
 
-    when(() => db.behaviorStateBySymbol(shipSymbol)).thenAnswer(
-      (_) async => BehaviorState(shipSymbol, Behavior.trader),
+    when(() => db.behaviorStateBySymbol(s1)).thenAnswer(
+      (_) async => BehaviorState(s1, Behavior.trader),
     );
 
     final logger = _MockLogger();
@@ -43,7 +46,8 @@ void main() {
       ),
     );
     final ship2 = _MockShip();
-    when(() => ship2.symbol).thenReturn('S-2');
+    final s2 = ShipSymbol.fromString('S-2');
+    when(() => ship2.symbol).thenReturn(s2);
     expect(
       behaviorTimeouts.isBehaviorDisabledForShip(ship, Behavior.trader),
       true,

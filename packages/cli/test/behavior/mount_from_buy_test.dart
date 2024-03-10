@@ -51,12 +51,13 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 2);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
+
     when(() => ship.mounts).thenReturn([
       // A mount in our template, we will leave it be.
       ShipMount(
@@ -261,17 +262,15 @@ void main() {
   test('mountRequestForShip', () async {
     final ship = _MockShip();
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    final shipNav = _MockShipNav();
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => ship.mounts).thenReturn([]);
-    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
-    final shipEngine = _MockShipEngine();
-    when(() => shipEngine.speed).thenReturn(10);
-    when(() => ship.engine).thenReturn(shipEngine);
-    final cargo = ShipCargo(capacity: 100, units: 0);
-    when(() => ship.cargo).thenReturn(cargo);
-    when(() => ship.modules).thenReturn([]);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.shipSpec).thenReturn(
+      const ShipSpec(
+        speed: 10,
+        cargoCapacity: 100,
+        fuelCapacity: 100,
+        canWarp: false,
+      ),
+    );
 
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();

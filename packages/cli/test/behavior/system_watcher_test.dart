@@ -61,11 +61,14 @@ void main() {
     );
 
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.symbolString).thenReturn(shipSymbol.toString());
+    when(() => ship.emojiName).thenReturn('🛸');
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
     final shipFuel = ShipFuel(capacity: 0, current: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
 

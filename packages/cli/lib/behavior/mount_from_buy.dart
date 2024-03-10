@@ -51,7 +51,7 @@ Future<MountRequest?> mountRequestForShip(
   final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
   final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
   return MountRequest(
-    shipSymbol: ship.shipSymbol,
+    shipSymbol: ship.symbol,
     mountSymbol: mountSymbol,
     marketSymbol: buyJob.buyLocation,
     shipyardSymbol: shipyard.symbol,

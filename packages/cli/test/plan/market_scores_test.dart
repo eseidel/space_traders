@@ -12,8 +12,6 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockShipNav extends Mock implements ShipNav {}
-
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 void main() {
@@ -53,10 +51,10 @@ void main() {
       final shipLocation = cSymbol;
       const shipSymbol = ShipSymbol('A', 1);
       final ship = _MockShip();
-      when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-      final shipNav = _MockShipNav();
-      when(() => ship.nav).thenReturn(shipNav);
-      when(() => shipNav.systemSymbol).thenReturn(shipLocation.systemString);
+      when(() => ship.symbol).thenReturn(shipSymbol);
+      when(() => ship.systemSymbol).thenReturn(shipLocation.system);
+      when(() => ship.emojiName).thenReturn('🛸');
+      when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
       final system = System.test(
         shipLocation.system,
@@ -92,8 +90,9 @@ void main() {
           profitPerSecondThreshold: 6,
         ),
       );
-      verify(() => logger.detail('🛸#1  No deal found for A-1 at S-A'))
-          .called(1);
+      verify(
+        () => logger.detail('🛸    command   No deal found for A-1 at S-A'),
+      ).called(1);
       verify(() => logger.info('No nearby markets for A-1')).called(1);
       expect(result, isNull);
     },

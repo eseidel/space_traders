@@ -17,6 +17,7 @@ export 'src/mount.dart';
 export 'src/position.dart';
 export 'src/price.dart';
 export 'src/route.dart';
+export 'src/ship.dart';
 export 'src/shipyard_listing.dart';
 export 'src/shipyard_price.dart';
 export 'src/survey.dart';

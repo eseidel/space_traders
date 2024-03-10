@@ -72,11 +72,12 @@ void main() {
     );
 
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
+
     final shipFuel = ShipFuel(capacity: 0, current: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
 
@@ -150,11 +151,12 @@ void main() {
     final waypointBASymbol = WaypointSymbol.fromString('S-B-A');
 
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    final shipNav = _MockShipNav();
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.systemSymbol).thenReturn(systemASymbol.system);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointAASymbol.waypoint);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+    when(() => ship.emojiName).thenReturn('🛸');
+    when(() => ship.symbolString).thenReturn('S-1');
+    when(() => ship.systemSymbol).thenReturn(systemASymbol);
+    when(() => ship.waypointSymbol).thenReturn(waypointAASymbol);
 
     final systemsCache = SystemsCache(
       [

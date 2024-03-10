@@ -286,7 +286,7 @@ Future<void> _completeContract(
 
   final contactTransaction = ContractTransaction.fulfillment(
     contract: contract,
-    shipSymbol: ship.shipSymbol,
+    shipSymbol: ship.symbol,
     waypointSymbol: ship.waypointSymbol,
     timestamp: DateTime.timestamp(),
   );
@@ -368,7 +368,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
   // Record the delivery transaction.
   final contactTransaction = ContractTransaction.delivery(
     contract: afterDelivery,
-    shipSymbol: ship.shipSymbol,
+    shipSymbol: ship.symbol,
     waypointSymbol: ship.waypointSymbol,
     unitsDelivered: unitsDelivered,
     timestamp: DateTime.timestamp(),
@@ -489,7 +489,7 @@ Future<SupplyConstruction201ResponseData?>
 
   // Record the delivery transaction.
   final delivery = ConstructionDelivery(
-    shipSymbol: ship.shipSymbol,
+    shipSymbol: ship.symbol,
     waypointSymbol: ship.waypointSymbol,
     unitsDelivered: unitsDelivered,
     tradeSymbol: tradeSymbol,
@@ -903,9 +903,8 @@ Future<JobResult> _initDeal(
   }
 
   final ships = await ShipSnapshot.load(db);
-  final avoidSystems = centralCommand
-      .otherTraderSystems(ships, behaviors, ship.shipSymbol)
-      .toSet();
+  final avoidSystems =
+      centralCommand.otherTraderSystems(ships, behaviors, ship.symbol).toSet();
 
   // If we don't have a deal, move to a better location and try again.
   final destinationSymbol = assertNotNull(

@@ -93,7 +93,7 @@ ShipyardTrip? findBestShipyardToBuy(
 // void verifyShipMatchesTemplate(Ship ship, ShipType shipType) {
 //   final fromTemplate = makeShip(
 //     type: shipType,
-//     shipSymbol: ship.shipSymbol,
+//     shipSymbol: ship.symbol,
 //     factionSymbol: ship.registration.factionSymbol,
 //     origin: ship.nav.route.origin,
 //     now: ship.nav.route.arrival,
@@ -147,7 +147,7 @@ Future<JobResult> _doBuyShipJob(
       shipyard.waypointSymbol,
       shipType,
     );
-    recordShip(caches.static, result.ship);
+    recordShip(caches.static, Ship.fromOpenApi(result.ship));
   } on ApiException catch (e) {
     // ApiException 400: {"error":{"message":"Failed to purchase ship.
     // Agent has insufficient funds.","code":4216,

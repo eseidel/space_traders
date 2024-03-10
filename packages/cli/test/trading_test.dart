@@ -20,12 +20,6 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 class _MockShip extends Mock implements Ship {}
 
-class _MockShipCargo extends Mock implements ShipCargo {}
-
-class _MockShipEngine extends Mock implements ShipEngine {}
-
-class _MockShipNav extends Mock implements ShipNav {}
-
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
@@ -230,20 +224,19 @@ void main() {
     ];
     final marketPrices = MarketPriceSnapshot(prices);
     final ship = _MockShip();
-    final shipNav = _MockShipNav();
-    final shipEngine = _MockShipEngine();
-    final shipCargo = _MockShipCargo();
     final waypointSymbol = WaypointSymbol.fromString('S-A-A');
-    when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
-    when(() => ship.engine).thenReturn(shipEngine);
-    when(() => shipEngine.speed).thenReturn(30);
-    when(() => ship.cargo).thenReturn(shipCargo);
-    when(() => shipCargo.capacity).thenReturn(1);
-    when(() => shipCargo.units).thenReturn(0);
-    when(() => ship.modules).thenReturn([]);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
+    const fuelCapacity = 100;
+    const shipSpeed = 30;
+    when(() => ship.shipSpec).thenReturn(
+      const ShipSpec(
+        cargoCapacity: 1,
+        speed: shipSpeed,
+        fuelCapacity: fuelCapacity,
+        canWarp: false,
+      ),
+    );
 
     when(() => systemsCache[saa.system]).thenReturn(
       System.test(waypointSymbol.system),
@@ -412,19 +405,17 @@ void main() {
   test('findBestMarketToBuy smoke test', () {
     final ship = _MockShip();
     final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
-    final shipNav = _MockShipNav();
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
+    when(() => ship.waypointSymbol).thenReturn(nearSymbol);
     const fuelCapacity = 100;
-    when(() => ship.fuel)
-        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
-    final shipEngine = _MockShipEngine();
-    when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
-    when(() => shipEngine.speed).thenReturn(shipSpeed);
-    final shipCargo = ShipCargo(capacity: 100, units: 0);
-    when(() => ship.cargo).thenReturn(shipCargo);
-    when(() => ship.modules).thenReturn([]);
+    when(() => ship.shipSpec).thenReturn(
+      const ShipSpec(
+        cargoCapacity: 100,
+        speed: shipSpeed,
+        fuelCapacity: fuelCapacity,
+        canWarp: false,
+      ),
+    );
 
     final routePlanner = _MockRoutePlanner();
     final marketPrices = _MockMarketPrices();
@@ -522,23 +513,25 @@ void main() {
 
   test('findBestMarketToSell smoke test', () async {
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('S-1');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
     final midSymbol = WaypointSymbol.fromString('S-A-MID');
     final farSymbol = WaypointSymbol.fromString('S-A-FAR');
-    final shipNav = _MockShipNav();
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
+    when(() => ship.waypointSymbol).thenReturn(nearSymbol);
     const fuelCapacity = 100;
-    when(() => ship.fuel)
-        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
-    final shipEngine = _MockShipEngine();
-    when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
-    when(() => shipEngine.speed).thenReturn(shipSpeed);
-    final shipCargo = ShipCargo(capacity: 100, units: 0);
-    when(() => ship.cargo).thenReturn(shipCargo);
-    when(() => ship.modules).thenReturn([]);
+    when(() => ship.shipSpec).thenReturn(
+      const ShipSpec(
+        cargoCapacity: 100,
+        speed: shipSpeed,
+        fuelCapacity: fuelCapacity,
+        canWarp: false,
+      ),
+    );
+
     final routePlanner = _MockRoutePlanner();
     final marketPrices = _MockMarketPrices();
     final now = DateTime(2021);

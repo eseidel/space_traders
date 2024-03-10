@@ -76,11 +76,9 @@ void main() {
       required WaypointSymbol end,
     }) async {
       final ship = _MockShip();
-      final shipNav = _MockShipNav();
-      when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-      when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-      when(() => shipNav.systemSymbol).thenReturn(start.systemString);
-      when(() => ship.nav).thenReturn(shipNav);
+      when(() => ship.symbol).thenReturn(shipSymbol);
+      when(() => ship.waypointSymbol).thenReturn(start);
+      when(() => ship.systemSymbol).thenReturn(start.system);
       final behaviorState = BehaviorState(
         shipSymbol,
         Behavior.charter,
@@ -155,7 +153,8 @@ void main() {
     final agent = Agent.test(credits: 100000);
     final db = _MockDatabase();
     final agentCache = AgentCache(agent, db);
-    when(() => ship.symbol).thenReturn('S');
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    when(() => ship.symbol).thenReturn(shipSymbol);
     // Unless we change Contract.isExpired to take a getNow, we need to use
     // a real DateTime here.
     final now = DateTime.timestamp();
@@ -295,13 +294,9 @@ void main() {
     expect(symbols, isEmpty);
 
     final ship = _MockShip();
-    final shipFrame = _MockShipFrame();
-    when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol)
-        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
-    when(() => ship.frame).thenReturn(shipFrame);
+    when(() => ship.isHauler).thenReturn(true);
     final shipSymbol = ShipSymbol.fromString('X-A');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => shipCache.ships).thenReturn([ship]);
     final oneIdle = BehaviorSnapshot(
       [BehaviorState(shipSymbol, Behavior.idle)],
@@ -331,7 +326,7 @@ void main() {
     final centralCommand = CentralCommand();
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('X-A');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.registration).thenReturn(
       ShipRegistration(
         name: shipSymbol.symbol,
@@ -339,10 +334,8 @@ void main() {
         role: ShipRole.COMMAND,
       ),
     );
-    final shipNav = _MockShipNav();
     final waypointSymbol = WaypointSymbol.fromString('W-A-Y');
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
-    when(() => ship.nav).thenReturn(shipNav);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
     when(() => shipCache.ships).thenReturn([ship]);
     centralCommand.nextShipBuyJob = ShipBuyJob(
       shipyardSymbol: waypointSymbol,
@@ -391,7 +384,7 @@ void main() {
     () {
       Ship makeMiner(String shipSymbol) {
         final miner = _MockShip();
-        when(() => miner.symbol).thenReturn(shipSymbol);
+        when(() => miner.symbol).thenReturn(ShipSymbol.fromString(shipSymbol));
         final minerFrame = _MockShipFrame();
         when(() => minerFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
         when(() => miner.frame).thenReturn(minerFrame);
@@ -512,12 +505,11 @@ void main() {
     final db = _MockDatabase();
     final caches = mockCaches();
     final ship = _MockShip();
-    final shipNav = _MockShipNav();
     const faction = FactionSymbol.AEGIS;
-    when(() => shipNav.systemSymbol).thenReturn('W-A');
-    when(() => ship.nav).thenReturn(shipNav);
+    final systemSymbol = SystemSymbol.fromString('S-A');
+    when(() => ship.systemSymbol).thenReturn(systemSymbol);
     final shipSymbol = ShipSymbol.fromString('X-A');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
     when(() => shipFrame.symbol)
@@ -669,8 +661,8 @@ void main() {
     final centralCommand = CentralCommand();
     final shipSymbol = ShipSymbol.fromString('X-A');
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    when(() => ship.fuel).thenReturn(ShipFuel(current: 0, capacity: 1000));
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.isOutOfFuel).thenReturn(true);
     final systemConnectivity = _MockSystemConnectivity();
     final job = await centralCommand.getJobForShip(
       db,
@@ -690,7 +682,7 @@ void main() {
     );
     final shipSymbol = ShipSymbol.fromString('X-A');
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final shipFrame = _MockShipFrame();
     when(() => shipFrame.symbol)
         .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
@@ -702,7 +694,8 @@ void main() {
         role: ShipRole.COMMAND,
       ),
     );
-    when(() => ship.fuel).thenReturn(ShipFuel(current: 1000, capacity: 1000));
+    when(() => ship.isOutOfFuel).thenReturn(false);
+    when(() => ship.isProbe).thenReturn(false);
     registerFallbackValue(Behavior.idle);
     when(() => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()))
         .thenReturn(true);

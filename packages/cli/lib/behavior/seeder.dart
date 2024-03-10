@@ -187,7 +187,7 @@ Future<JobResult> doSeeder(
     // the main jumpgate network and look for the next system to seed?
 
     throw JobException(
-      'Nothing to do, ${ship.shipSymbol} is already off network.',
+      'Nothing to do, ${ship.symbol} is already off network.',
       const Duration(hours: 1),
     );
   }

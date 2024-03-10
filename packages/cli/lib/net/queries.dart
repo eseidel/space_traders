@@ -48,7 +48,8 @@ Stream<Waypoint> allWaypointsInSystem(Api api, SystemSymbol system) {
 Stream<Ship> allMyShips(Api api) {
   return fetchAllPages(api, (api, page) async {
     final response = await api.fleet.getMyShips(page: page, limit: pageLimit);
-    return (response!.data, response.meta);
+    final ships = response!.data.map(Ship.fromOpenApi).toList();
+    return (ships, response.meta);
   });
 }
 

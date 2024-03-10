@@ -41,14 +41,14 @@ class ShipWaiter {
     // schedule any missing.
     final existing = _queue.toUnorderedList().map((e) => e.shipSymbol).toSet();
     for (final ship in ships) {
-      if (!existing.contains(ship.shipSymbol)) {
+      if (!existing.contains(ship.symbol)) {
         if (shipFilter != null && !shipFilter(ship)) {
           continue;
         }
         if (!suppressWarnings) {
-          logger.warn('Adding missing ship ${ship.shipSymbol}');
+          logger.warn('Adding missing ship ${ship.symbol}');
         }
-        scheduleShip(ship.shipSymbol, null);
+        scheduleShip(ship.symbol, null);
       }
     }
   }

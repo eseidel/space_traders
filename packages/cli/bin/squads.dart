@@ -36,7 +36,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       final cargoStatus = ship.cargo.capacity == 0
           ? ''
           : '${ship.cargo.units}/${ship.cargo.capacity}';
-      logger.info('  ${ship.shipSymbol.hexNumber.padLeft(2)} $typeName '
+      logger.info('  ${ship.symbol.hexNumber.padLeft(2)} $typeName '
           '${ship.nav.waypointSymbolObject} $cargoStatus');
     }
   }

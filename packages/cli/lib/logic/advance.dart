@@ -64,7 +64,7 @@ Future<DateTime?> advanceShipBehavior(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final state = await createBehaviorIfAbsent(db, ship.shipSymbol, () async {
+  final state = await createBehaviorIfAbsent(db, ship.symbol, () async {
     final credits = caches.agent.agent.credits;
     return centralCommand.getJobForShip(
       db,
@@ -87,7 +87,7 @@ Future<DateTime?> advanceShipBehavior(
     );
   } on JobException catch (e) {
     shipErr(ship, '$e');
-    await db.deleteBehaviorState(ship.shipSymbol);
+    await db.deleteBehaviorState(ship.symbol);
     return null;
   }
   if (navResult.shouldReturn()) {
@@ -108,7 +108,7 @@ Future<DateTime?> advanceShipBehavior(
     );
     if (state.isComplete) {
       // If the behavior is complete, clear it.
-      await db.deleteBehaviorState(ship.shipSymbol);
+      await db.deleteBehaviorState(ship.symbol);
     } else {
       // Otherwise update the behavior state.
       await db.setBehaviorState(state);

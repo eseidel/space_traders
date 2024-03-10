@@ -105,19 +105,17 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
-    final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
 
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
-    when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.isOrbiting).thenReturn(true);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbolEnum.MINING_LASER_II,
@@ -324,12 +322,13 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(symbol);
+    when(() => ship.systemSymbol).thenReturn(symbol.system);
+
     const tradeSymbol = TradeSymbol.DIAMONDS;
     final shipCargo = ShipCargo(
       capacity: 60,
@@ -393,12 +392,13 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(symbol);
+    when(() => ship.systemSymbol).thenReturn(symbol.system);
+
     const tradeSymbol = TradeSymbol.DIAMONDS;
     final shipCargo = ShipCargo(
       capacity: 60,
@@ -449,7 +449,7 @@ void main() {
     when(() => haulerNavRoute.arrival).thenReturn(arrival);
     when(() => hauler.cargo).thenReturn(haulerCargo);
     const haulerSymbol = ShipSymbol('S', 2);
-    when(() => hauler.symbol).thenReturn(haulerSymbol.symbol);
+    when(() => hauler.symbol).thenReturn(haulerSymbol);
 
     final squad = ExtractionSquad(state.extractionJob!)
       ..ships.addAll([ship, hauler]);
@@ -521,12 +521,13 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.systemSymbol).thenReturn(waypointSymbol.system);
+
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbolEnum.MINING_LASER_II,

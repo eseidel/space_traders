@@ -106,11 +106,11 @@ class ShipSnapshot {
   }
 
   /// Returns all ship symbols.
-  List<ShipSymbol> get shipSymbols => ships.map((s) => s.shipSymbol).toList();
+  List<ShipSymbol> get shipSymbols => ships.map((s) => s.symbol).toList();
 
   /// Returns the ship for the provided ShipSymbol.
   Ship operator [](ShipSymbol symbol) =>
-      ships.firstWhere((s) => s.shipSymbol == symbol);
+      ships.firstWhere((s) => s.symbol == symbol);
 }
 
 /// Returns a map of ship frame type to count in fleet.

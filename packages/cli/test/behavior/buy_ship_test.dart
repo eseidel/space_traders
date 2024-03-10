@@ -4,6 +4,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -22,6 +23,8 @@ class _MockLogger extends Mock implements Logger {}
 class _MockRoutePlan extends Mock implements RoutePlan {}
 
 class _MockShip extends Mock implements Ship {}
+
+class _MockOpenApiShip extends Mock implements openapi.Ship {}
 
 class _MockShipEngine extends Mock implements ShipEngine {}
 
@@ -47,7 +50,10 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('A', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.symbolString).thenReturn(shipSymbol.symbol);
+    when(() => ship.emojiName).thenReturn('🛸');
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     const fuelCapacity = 100;
@@ -71,8 +77,8 @@ void main() {
 
     final symbol = WaypointSymbol.fromString('S-A-W');
     when(() => caches.agent.headquartersSymbol).thenReturn(symbol);
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
+    when(() => ship.waypointSymbol).thenReturn(symbol);
+    when(() => ship.systemSymbol).thenReturn(symbol.system);
 
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
@@ -130,7 +136,8 @@ void main() {
           data: PurchaseShip201ResponseData(
             agent: agent.toOpenApi(),
             transaction: transaction,
-            ship: ship, // Supposed to be the new ship, cheating for the mock.
+            // Supposed to be the new ship, cheating for the mock.
+            ship: _MockOpenApiShip(),
           ),
         ),
       ),
@@ -147,12 +154,13 @@ void main() {
     ).thenReturn(route);
 
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async => {});
 
     registerFallbackValue(ShipyardListing.fallbackValue());
     when(() => db.upsertShipyardListing(any()))
         .thenAnswer((_) => Future.value());
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(Ship.fallbackValue());
+    when(() => db.upsertShip(any())).thenAnswer((_) async => {});
 
     final logger = _MockLogger();
     expect(

@@ -25,7 +25,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final slotCount = <SystemSymbol, int>{};
 
   SystemSymbol systemForShip(Ship ship) {
-    final state = behaviors[ship.shipSymbol];
+    final state = behaviors[ship.symbol];
     final endSystem = state?.routePlan?.endSymbol.system;
     if (endSystem != null) {
       return endSystem;

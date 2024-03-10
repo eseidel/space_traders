@@ -16,7 +16,7 @@ Map<SystemSymbol, List<Ship>> _shipsBySystem(List<Ship> ships) {
 String _describeBehaviors(BehaviorSnapshot behaviors, List<Ship> ships) {
   final behaviorCounts = <Behavior?, int>{};
   for (final ship in ships) {
-    final behavior = behaviors[ship.shipSymbol]?.behavior;
+    final behavior = behaviors[ship.symbol]?.behavior;
     behaviorCounts[behavior] = (behaviorCounts[behavior] ?? 0) + 1;
   }
   return behaviorCounts.entries.map((e) => '${e.key}: ${e.value}').join(', ');

@@ -54,8 +54,11 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
+    when(() => ship.emojiName).thenReturn('🛸');
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+    when(() => ship.symbolString).thenReturn('S-1');
 
     /// The behavior doesn't matter, just needs to have a null destination.
     final state = BehaviorState(shipSymbol, Behavior.idle);
@@ -65,10 +68,11 @@ void main() {
     final logger = _MockLogger();
     // The case when the arrival time is in the past.
     final before = now.subtract(const Duration(milliseconds: 1));
-    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
     when(() => shipNavRoute.arrival).thenReturn(before);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn('A-B-C');
+    final waypointSymbol = WaypointSymbol.fromString('A-B-C');
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.isInTransit).thenReturn(true);
 
     final beforeResult = await runWithLogger(
       logger,
@@ -89,10 +93,9 @@ void main() {
     // The case when the arrival time is in the future.
     reset(ship.nav);
     final after = now.add(const Duration(milliseconds: 1));
-    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
     when(() => shipNavRoute.arrival).thenReturn(after);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn('A-B-C');
+    when(() => ship.isInTransit).thenReturn(true);
 
     final afterResult = await runWithLogger(
       logger,
@@ -122,9 +125,13 @@ void main() {
     when(() => caches.agent.agent).thenReturn(agent);
     when(() => caches.agent.updateAgent(agent)).thenAnswer((_) async {});
     const shipSymbol = ShipSymbol('S', 1);
+    final shipRegistration = _MockShipRegistration();
+    when(() => shipRegistration.role).thenReturn(ShipRole.CARRIER);
+    final shipFrame = _MockShipFrame();
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
     // We use a real Ship to allow setting/reading from cooldown.
     final ship = Ship(
-      symbol: shipSymbol.symbol,
+      symbol: shipSymbol,
       cooldown: Cooldown(
         shipSymbol: shipSymbol.symbol,
         totalSeconds: 0,
@@ -133,8 +140,8 @@ void main() {
       nav: shipNav,
       reactor: _MockShipReactor(),
       engine: _MockShipEngine(),
-      registration: _MockShipRegistration(),
-      frame: _MockShipFrame(),
+      registration: shipRegistration,
+      frame: shipFrame,
       crew: _MockShipCrew(),
       cargo: _MockShipCargo(),
       fuel: _MockShipFuel(),
@@ -304,7 +311,7 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
 
     final waypointSymbol = WaypointSymbol.fromString('A-B-C');
@@ -320,7 +327,8 @@ void main() {
     final logger = _MockLogger();
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => ship.waypointSymbol).thenReturn(waypointSymbol);
+    when(() => ship.isInTransit).thenReturn(false);
 
     final result = await runWithLogger(
       logger,
@@ -347,7 +355,8 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.isInTransit).thenReturn(false);
     when(() => ship.nav).thenReturn(shipNav);
 
     final start = WaypointSymbol.fromString('A-B-A');
@@ -372,7 +381,7 @@ void main() {
     final logger = _MockLogger();
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
+    when(() => ship.waypointSymbol).thenReturn(end);
 
     final result = await runWithLogger(
       logger,
@@ -399,7 +408,7 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
 
     final start = WaypointSymbol.fromString('A-B-A');
@@ -425,7 +434,8 @@ void main() {
     final logger = _MockLogger();
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn(other.waypoint);
+    when(() => ship.waypointSymbol).thenReturn(other);
+    when(() => ship.isInTransit).thenReturn(false);
 
     expect(
       () async => await runWithLogger(
@@ -522,7 +532,7 @@ void main() {
       Duration? arrival,
     }) {
       when(() => shipNav.status).thenReturn(status);
-      when(() => shipNav.waypointSymbol).thenReturn(location.waypoint);
+      when(() => ship.waypointSymbol).thenReturn(location);
       when(() => shipNavRoute.arrival).thenReturn(
         arrival == null ? now : now.add(const Duration(minutes: 1)),
       );
