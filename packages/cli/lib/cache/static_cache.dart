@@ -343,6 +343,54 @@ class TradeExportCache extends StaticCache<TradeSymbol, TradeExport> {
   TradeSymbol keyFor(TradeExport record) => record.export;
 }
 
+/// A cache of event descriptions.
+class EventCache extends StaticCache<
+    ExtractResources201ResponseDataEventsInnerSymbolEnum,
+    ExtractResources201ResponseDataEventsInner> {
+  /// Creates a new waypoint trait cache.
+  EventCache(
+    super.events, {
+    required super.fs,
+    super.path = defaultPath,
+  });
+
+  /// Load event cache from disk.
+  factory EventCache.load(FileSystem fs, {String path = defaultPath}) =>
+      EventCache(
+        _loadJsonNullable(
+          fs,
+          path,
+          ExtractResources201ResponseDataEventsInner.fromJson,
+        ),
+        fs: fs,
+        path: path,
+      );
+
+  /// The default path to the cache file.
+  static const defaultPath = 'static_data/events.json';
+
+  @override
+  ExtractResources201ResponseDataEventsInner copyAndNormalize(
+    ExtractResources201ResponseDataEventsInner record,
+  ) =>
+      ExtractResources201ResponseDataEventsInner.fromJson(
+        jsonDecode(jsonEncode(record)),
+      )!;
+
+  @override
+  int compare(
+    ExtractResources201ResponseDataEventsInner a,
+    ExtractResources201ResponseDataEventsInner b,
+  ) =>
+      a.symbol.value.compareTo(b.symbol.value);
+
+  @override
+  ExtractResources201ResponseDataEventsInnerSymbolEnum keyFor(
+    ExtractResources201ResponseDataEventsInner record,
+  ) =>
+      record.symbol;
+}
+
 /// Caches of static server data that does not typically change between
 /// resets and thus can be checked into source control.
 class StaticCaches {
@@ -356,6 +404,7 @@ class StaticCaches {
     required this.waypointTraits,
     required this.tradeGoods,
     required this.exports,
+    required this.events,
   });
 
   /// Load the caches from disk.
@@ -369,6 +418,7 @@ class StaticCaches {
       waypointTraits: WaypointTraitCache.load(fs),
       tradeGoods: TradeGoodCache.load(fs),
       exports: TradeExportCache.load(fs),
+      events: EventCache.load(fs),
     );
   }
 
@@ -395,6 +445,9 @@ class StaticCaches {
 
   /// Cache mapping exports to needed imports.
   final TradeExportCache exports;
+
+  /// Cache of event names and descriptions.
+  final EventCache events;
 }
 
 /// Records ShipyardShips and their components into the caches.
