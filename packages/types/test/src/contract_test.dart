@@ -41,4 +41,18 @@ void main() {
     expect(fulfill.contractAction, ContractAction.fulfillment);
     expect(fulfill.creditsChange, 20);
   });
+
+  test('Contract json round trip', () {
+    final now = DateTime(2021);
+    final contractTerms = ContractTerms(
+      deadline: now,
+      payment: ContractPayment(onAccepted: 10, onFulfilled: 20),
+    );
+    final contract = Contract.test(id: 'id', terms: contractTerms);
+
+    final json = contract.toJson();
+    final fromJson = Contract.fromJson(json);
+    // Contract does not currently support equality so compare the json.
+    expect(fromJson.toJson(), contract.toJson());
+  });
 }

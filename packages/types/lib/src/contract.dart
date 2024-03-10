@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart' as openapi;
 import 'package:types/api.dart';
+import 'package:types/types.dart';
 
 /// A contract to deliver goods to a faction.
 class Contract {
@@ -79,11 +80,15 @@ class Contract {
 
   /// Converts the Contract to JSON.
   Map<String, dynamic> toJson() {
+    // Work around OpenAPI not supporting toJson recursion.
+    final termsJson = terms.toJson();
+    termsJson['payment'] = (termsJson['payment'] as ContractPayment).toJson();
+
     return <String, dynamic>{
       'id': id,
       'factionSymbol': factionSymbol,
       'type': type.value,
-      'terms': terms.toJson(),
+      'terms': termsJson,
       'deadlineToAccept': deadlineToAccept.toIso8601String(),
       'accepted': accepted,
       'fulfilled': fulfilled,
