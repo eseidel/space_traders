@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart' as openapi;
@@ -23,13 +22,13 @@ class JumpGate extends Equatable {
 
   /// Creates a new JumpGate from JSON.
   factory JumpGate.fromJson(Map<String, dynamic> json) {
-    return JumpGate(
-      connections: (json['connections'] as List<dynamic>)
-          .map((dynamic e) => e as String)
-          .map(WaypointSymbol.fromJson)
-          .toSet(),
-      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-    );
+    final openapiJumpGate = openapi.JumpGate.fromJson({
+      // JumpGate briefly used 'waypointSymbol' instead of 'symbol'.
+      // This can be removed on the next reset.
+      'symbol': json['waypointSymbol'] ?? json['symbol'],
+      'connections': json['connections'],
+    })!;
+    return JumpGate.fromOpenApi(openapiJumpGate);
   }
 
   /// The waypoint symbol.
@@ -54,8 +53,5 @@ class JumpGate extends Equatable {
   List<Object?> get props => [waypointSymbol, connections];
 
   /// Converts this object to a JSON encodable object.
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'connections': connections.map((e) => e.toJson()).sorted(),
-        'waypointSymbol': waypointSymbol.toJson(),
-      };
+  Map<String, dynamic> toJson() => toOpenApi().toJson();
 }
