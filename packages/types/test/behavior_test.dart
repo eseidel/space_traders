@@ -51,6 +51,9 @@ void main() {
         },
         extractionType: ExtractionType.mine,
       ),
+      systemWatcherJob: SystemWatcherJob(
+        systemSymbol: SystemSymbol.fromString('S-A'),
+      ),
     );
     final json = state.toJson();
     final newState = BehaviorState.fromJson(json);
