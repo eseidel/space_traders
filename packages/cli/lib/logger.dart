@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
 import 'package:scoped/scoped.dart';
@@ -24,7 +25,12 @@ void setVerboseLogging() {
   logger.level = Level.verbose;
 }
 
-String _shipLabel(Ship ship) => ship.emojiName.padRight(5);
+String _shipLabel(Ship ship) {
+  final name = ship.emojiName.padRight(5);
+  final maxLength = FleetRole.values.map((e) => e.name.length).max;
+  final role = ship.fleetRole.name.padRight(maxLength + 1);
+  return '$name $role';
+}
 
 /// Log [message] for [ship] to the global logger at the detail level.
 void shipDetail(Ship ship, String message) {

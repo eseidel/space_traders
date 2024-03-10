@@ -82,13 +82,14 @@ Future<void> advanceShips(
         ),
         onComplete: (duration, requestCount, queryCounts) async {
           final behaviorState = await db.behaviorStateBySymbol(shipSymbol);
-          final expectedSeconds = requestCount / config.targetRequestsPerSecond;
-          if (duration.inSeconds > expectedSeconds * 1.2) {
+          final expectedSeconds =
+              (requestCount / config.targetRequestsPerSecond) * 1.2;
+          if (duration.inSeconds > expectedSeconds) {
             final behaviorName = behaviorState?.behavior.name;
             final behaviorString =
                 behaviorName == null ? '' : '($behaviorName) ';
             final logFn =
-                duration.inSeconds > expectedSeconds * 2 ? shipErr : shipWarn;
+                duration.inSeconds > expectedSeconds * 5 ? shipErr : shipWarn;
             logFn(
               ship,
               '$behaviorString'

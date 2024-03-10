@@ -283,7 +283,10 @@ Future<T> expectTime<T>(
         return;
       }
       final queryCount = queryCounts.total;
-      logger.warn(
+      final logFn = duration.inSeconds > expected.inSeconds * 2
+          ? logger.err
+          : logger.warn;
+      logFn(
         '$name took too long ${duration.inMilliseconds}ms '
         '($requestCount requests, $queryCount queries)',
       );
