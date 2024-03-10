@@ -18,7 +18,7 @@ enum GamePhase with EnumIndexOrdering {
 
 /// Which phase are we in.
 // TODO(eseidel): Make this dynamic.
-const gamePhase = GamePhase.exploration;
+const gamePhase = GamePhase.bootstrap;
 
 /// Class for holding our hard-coded configuration values.
 class Config {
