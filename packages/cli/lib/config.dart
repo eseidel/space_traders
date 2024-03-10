@@ -58,7 +58,7 @@ class Config {
   /// - plus 30 requests over a 60 second burst
   /// 2 * 60 + 30 = 150 requests per minute / 60 = 2.5 requests per second
   /// https://docs.spacetraders.io/api-guide/rate-limits
-  double targetRequestsPerSecond = 2.4;
+  double targetRequestsPerSecond = 2;
 
   /// Our ship buy plan for computeNextShipToBuy.
   final buyPlan = [
