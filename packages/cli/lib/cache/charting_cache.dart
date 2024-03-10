@@ -81,10 +81,6 @@ class ChartingCache {
   }) async =>
       await _db.getChartingRecord(waypointSymbol, maxAge);
 
-  /// Creates a ChartingSnapshot from the database.
-  Future<ChartingSnapshot> snapshot() async =>
-      ChartingSnapshot((await _db.allChartingRecords()).toList());
-
   /// Adds a waypoint to the charting cache.
   static Future<void> addWaypoint(
     Database db,
