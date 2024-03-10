@@ -710,6 +710,7 @@ void main() {
 
   test('chartWaypointAndLog', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
@@ -741,11 +742,16 @@ void main() {
       ),
     );
     registerFallbackValue(waypoint);
-    when(() => chartingCache.addWaypoint(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     await runWithLogger(logger, () async {
-      await chartWaypointAndLog(api, chartingCache, waypointTraitCache, ship);
+      await chartWaypointAndLog(
+        api,
+        db,
+        chartingCache,
+        waypointTraitCache,
+        ship,
+      );
     });
 
     // Waypoint already charted exceptions are caught and logged.
@@ -757,7 +763,13 @@ void main() {
       ),
     );
     await runWithLogger(logger, () async {
-      await chartWaypointAndLog(api, chartingCache, waypointTraitCache, ship);
+      await chartWaypointAndLog(
+        api,
+        db,
+        chartingCache,
+        waypointTraitCache,
+        ship,
+      );
     });
     verify(() => logger.warn('🛸#1  A-W was already charted')).called(1);
 
@@ -767,7 +779,13 @@ void main() {
     );
     expect(
       () => runWithLogger(logger, () async {
-        await chartWaypointAndLog(api, chartingCache, waypointTraitCache, ship);
+        await chartWaypointAndLog(
+          api,
+          db,
+          chartingCache,
+          waypointTraitCache,
+          ship,
+        );
       }),
       throwsA(predicate((e) => e is ApiException)),
     );

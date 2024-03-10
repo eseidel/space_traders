@@ -8,14 +8,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       await startWaypointFromArg(db, argResults.rest.firstOrNull);
   final staticCaches = StaticCaches.load(fs);
   final systemsCache = SystemsCache.load(fs)!;
-  final charting = ChartingCache(db);
-  final construction = ConstructionCache(db);
-  final waypointCache = WaypointCache.cachedOnly(
-    systemsCache,
-    charting,
-    construction,
-    staticCaches.waypointTraits,
-  );
+  final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
 
   final ships = await ShipSnapshot.load(db);
@@ -32,7 +25,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ships,
     behaviors,
     systemsCache,
-    waypointCache,
+    chartingSnapshot,
     systemConnectivity,
     ship,
     maxJumps: maxJumps,

@@ -25,6 +25,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final chartingCache = ChartingCache(db);
   final waypointCache = WaypointCache(
     api,
+    db,
     systemsCache,
     chartingCache,
     constructionCache,

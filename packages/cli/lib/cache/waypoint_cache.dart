@@ -3,18 +3,24 @@ import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:collection/collection.dart';
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Stores Waypoint objects fetched recently from the API.
+// TODO(eseidel): This is really the WaypointFetcher, the only thing
+// this class knows how to map from the API concept of a Waypoint to
+// how we store waypoint information in our database caches.
 class WaypointCache {
   /// Create a new WaypointCache.
   WaypointCache(
     Api api,
+    Database db,
     SystemsCache systems,
     ChartingCache charting,
     ConstructionCache construction,
     WaypointTraitCache waypointTraits,
   )   : _api = api,
+        _db = db,
         _systemsCache = systems,
         _chartingCache = charting,
         _constructionCache = construction,
@@ -22,16 +28,19 @@ class WaypointCache {
 
   /// Create a new WaypointCache which only uses cached values.
   WaypointCache.cachedOnly(
+    Database db,
     SystemsCache systems,
     ChartingCache charting,
     ConstructionCache construction,
     WaypointTraitCache waypointTraits,
   )   : _api = null,
+        _db = db,
         _systemsCache = systems,
         _chartingCache = charting,
         _constructionCache = construction,
         _waypointTraits = waypointTraits;
 
+  final Database _db;
   final Api? _api;
   final SystemsCache _systemsCache;
   final ChartingCache _chartingCache;
@@ -109,7 +118,9 @@ class WaypointCache {
   }
 
   /// Fetch the chart for the given waypoint if not in cache.
-  Future<Chart?> fetchChart(WaypointSymbol waypointSymbol) async {
+  Future<Chart?> fetchChart(
+    WaypointSymbol waypointSymbol,
+  ) async {
     final api = _api;
     if (api == null) {
       throw StateError('This api does not work in offline mode.');
@@ -119,7 +130,7 @@ class WaypointCache {
       return values.chart;
     }
     final waypoint = await fetchWaypoint(api, waypointSymbol);
-    await _chartingCache.addWaypoint(waypoint);
+    await ChartingCache.addWaypoint(_db, waypoint);
     return waypoint.chart;
   }
 

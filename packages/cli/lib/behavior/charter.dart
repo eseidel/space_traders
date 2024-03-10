@@ -13,7 +13,7 @@ import 'package:types/types.dart';
 /// Returns the symbol of a waypoint in the system missing a chart.
 Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   SystemsCache systemsCache,
-  WaypointCache waypointCache,
+  ChartingSnapshot charts,
   Ship ship,
   SystemSymbol systemSymbol, {
   required bool Function(SystemWaypoint waypointSymbol)? filter,
@@ -32,9 +32,12 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
       continue;
     }
     final waypointSymbol = systemWaypoint.symbol;
-    // Try and fetch the waypoint from the server or our cache.
-    final isCharted = await waypointCache.isCharted(waypointSymbol);
-    if (!isCharted) {
+    // We use a ChartingSnapshot here which could be stale. If it is we
+    // could end up sending a probe to a waypoint which is already charted.  Our
+    // idle_queue is responsible for keeping our charting cache up to date and
+    // should make such unlikely.
+    // If we have a chart for this waypoint, skip it.
+    if (charts.isCharted(waypointSymbol) != true) {
       shipInfo(
         ship,
         '$waypointSymbol (${systemWaypoint.type}) is '
@@ -49,7 +52,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
 /// Returns the closet waypoint worth exploring.
 Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
   SystemsCache systemsCache,
-  WaypointCache waypointCache,
+  ChartingSnapshot charts,
   SystemConnectivity systemConnectivity,
   Ship ship, {
   required SystemSymbol startSystemSymbol,
@@ -64,7 +67,7 @@ Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
   )) {
     final symbol = await waypointSymbolNeedingCharting(
       systemsCache,
-      waypointCache,
+      charts,
       ship,
       systemSymbol,
       filter: filter,
@@ -92,6 +95,7 @@ Future<JobResult> doCharter(
   if (neededChart) {
     await chartWaypointAndLog(
       api,
+      db,
       caches.charting,
       caches.static.waypointTraits,
       ship,
@@ -119,11 +123,12 @@ Future<JobResult> doCharter(
   final maxJumps = config.charterMaxJumps;
   final behaviors = await BehaviorSnapshot.load(db);
   final ships = await ShipSnapshot.load(db);
+  final charts = await ChartingSnapshot.load(db);
   final destinationSymbol = await centralCommand.nextWaypointToChart(
     ships,
     behaviors,
     caches.systems,
-    caches.waypoints,
+    charts,
     caches.systemConnectivity,
     ship,
     maxJumps: maxJumps,

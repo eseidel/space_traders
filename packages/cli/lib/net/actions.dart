@@ -552,6 +552,7 @@ Future<DateTime> warpToWaypointAndLog(
 /// Chart the waypoint [ship] is currently at and log.
 Future<void> chartWaypointAndLog(
   Api api,
+  Database db,
   ChartingCache chartingCache,
   WaypointTraitCache waypointTraitCache,
   Ship ship,
@@ -560,7 +561,7 @@ Future<void> chartWaypointAndLog(
     final response = await api.fleet.createChart(ship.symbol);
     final openapiWaypoint = response!.data.waypoint;
     final waypoint = Waypoint.fromOpenApi(openapiWaypoint);
-    await chartingCache.addWaypoint(waypoint);
+    await ChartingCache.addWaypoint(db, waypoint);
     waypointTraitCache.addAll(waypoint.traits);
     // Powershell needs the space after the emoji.
     shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');

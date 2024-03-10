@@ -21,7 +21,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final waypointTraits = WaypointTraitCache.load(fs);
   final tradeGoods = TradeGoodCache.load(fs);
   final waypointCache =
-      WaypointCache(api, systems, charting, construction, waypointTraits);
+      WaypointCache(api, db, systems, charting, construction, waypointTraits);
   final marketCache = MarketCache(db, api, tradeGoods);
   final constructionCache = ConstructionCache(db);
 

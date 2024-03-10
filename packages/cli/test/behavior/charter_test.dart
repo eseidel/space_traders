@@ -25,7 +25,7 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockWaypointCache extends Mock implements WaypointCache {}
+class _MockChartingSnapshot extends Mock implements ChartingSnapshot {}
 
 void main() {
   test('advanceCharter smoke test', () async {
@@ -85,7 +85,6 @@ void main() {
         .thenAnswer((_) => Future.value(waypoint));
     when(() => caches.waypoints.fetchChart(any()))
         .thenAnswer((_) => Future.value(Chart()));
-    when(() => caches.charting.addWaypoint(waypoint)).thenAnswer((_) async {});
 
     when(() => caches.waypoints.hasMarketplace(waypointSymbol))
         .thenAnswer((_) async => false);
@@ -102,12 +101,13 @@ void main() {
     ).thenReturn(true);
     registerFallbackValue(BehaviorSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
+    registerFallbackValue(ChartingSnapshot([]));
     when(
       () => centralCommand.nextWaypointToChart(
         any(),
         any(),
         caches.systems,
-        caches.waypoints,
+        any(),
         caches.systemConnectivity,
         ship,
         maxJumps: 5,
@@ -183,35 +183,31 @@ void main() {
       ],
       fs: fs,
     );
-    final waypointCache = _MockWaypointCache();
     final systemConnectivity = SystemConnectivity.test({
       waypointBASymbol: {waypointABSymbol},
     });
 
-    when(() => waypointCache.isCharted(waypointAASymbol))
-        .thenAnswer((_) async => true);
-    when(() => waypointCache.isCharted(waypointABSymbol))
-        .thenAnswer((_) async => false);
-    when(() => waypointCache.isCharted(waypointBASymbol))
-        .thenAnswer((_) async => false);
+    final chartingSnapshot = _MockChartingSnapshot();
+    when(() => chartingSnapshot.isCharted(waypointAASymbol)).thenReturn(true);
+    when(() => chartingSnapshot.isCharted(waypointABSymbol)).thenReturn(false);
+    when(() => chartingSnapshot.isCharted(waypointBASymbol)).thenReturn(false);
 
     final logger = _MockLogger();
 
     await runWithLogger(logger, () async {
       final intraSystem = await nextUnchartedWaypointSymbol(
         systemsCache,
-        waypointCache,
+        chartingSnapshot,
         systemConnectivity,
         ship,
         startSystemSymbol: systemASymbol,
       );
       expect(intraSystem, equals(waypointABSymbol));
 
-      when(() => waypointCache.isCharted(waypointABSymbol))
-          .thenAnswer((_) async => true);
+      when(() => chartingSnapshot.isCharted(waypointABSymbol)).thenReturn(true);
       final interSystem = await nextUnchartedWaypointSymbol(
         systemsCache,
-        waypointCache,
+        chartingSnapshot,
         systemConnectivity,
         ship,
         startSystemSymbol: systemASymbol,

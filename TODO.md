@@ -1304,6 +1304,23 @@ I was probably running "fleet.dart" at the same time, but still.
 [WARN] 🛸#80 Beginning route to HK51-F16C (20m)
 🛸#80 🛫 to HK51-F16C ASTEROID (20m)
 
+
+[WARN] 🛸#51 (charter) took 29s (0 requests, 6592 queries) expected 0.0s
+  6583: SELECT * FROM charting_ WHERE waypoint_symbol = @waypoint_symbol AND (values IS NOT NULL OR timestamp > @max_age) 
+  2: SELECT * FROM construction_ WHERE waypoint_symbol = @waypoint_symbol AND timestamp > @timestamp
+  2:       INSERT INTO behavior_ (ship_symbol, behavior, json)
+      VALUES (@ship_symbol, @behavior, @json)
+      ON CONFLICT (ship_symbol) DO UPDATE SET
+        behavior = @behavior,
+        json = @json
+      
+  2: SELECT * FROM behavior_ WHERE behavior = @behavior
+  1: SELECT * FROM ship_
+  1: SELECT * FROM behavior_ WHERE ship_symbol = @ship_symbol
+  1: SELECT * FROM behavior_
+🛸#51 ✈️  to AT75-E26C, -52s left
+🛸#51 AT75-D25B (ASTEROID) is missing chart, routing.
+
 ### Routing trouble in trade planning?
 
 🛸#1  ✈️  to AQ24-C39, -5ms left

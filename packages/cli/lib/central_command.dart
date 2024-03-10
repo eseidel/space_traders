@@ -369,7 +369,7 @@ class CentralCommand {
     ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     SystemsCache systems,
-    WaypointCache waypoints,
+    ChartingSnapshot charts,
     SystemConnectivity connectivity,
     Ship ship, {
     required int maxJumps,
@@ -385,7 +385,7 @@ class CentralCommand {
     // a chart or market data and route to there.
     final destinationSymbol = await nextUnchartedWaypointSymbol(
       systems,
-      waypoints,
+      charts,
       connectivity,
       ship,
       // Start at the ship's current system to minimize jumps.

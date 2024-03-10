@@ -120,6 +120,7 @@ class Caches {
     final construction = ConstructionCache(db);
     final waypoints = WaypointCache(
       api,
+      db,
       systems,
       charting,
       construction,

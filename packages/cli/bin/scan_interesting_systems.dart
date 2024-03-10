@@ -12,7 +12,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final construction = ConstructionCache(db);
   final waypointTraits = WaypointTraitCache.load(fs);
   final waypointCache =
-      WaypointCache(api, systems, charting, construction, waypointTraits);
+      WaypointCache(api, db, systems, charting, construction, waypointTraits);
 
   // Find all known reachable systems.
   // List ones we know are reachable but don't have any prices.

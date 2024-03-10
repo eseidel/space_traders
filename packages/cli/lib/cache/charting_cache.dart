@@ -47,12 +47,16 @@ class ChartingSnapshot {
       getRecord(waypointSymbol);
 }
 
+// TODO(eseidel): This whole class shouldn't exist, remove ChartingCache.
 /// A cache of charted values from Waypoints.
 class ChartingCache {
   /// Creates a new connection to the charting cache.
   ChartingCache(Database db) : _db = db;
 
   final Database _db;
+
+  /// Allow WaypointCache to use this database.
+  Database get db => _db;
 
   /// Returns true if the given waypoint is known to be charted.
   Future<bool?> isCharted(
@@ -81,9 +85,9 @@ class ChartingCache {
   Future<ChartingSnapshot> snapshot() async =>
       ChartingSnapshot((await _db.allChartingRecords()).toList());
 
-  /// Adds a waypoint to the cache.
-  ///     waypointTraits.addAll(waypoint.traits);
-  Future<void> addWaypoint(
+  /// Adds a waypoint to the charting cache.
+  static Future<void> addWaypoint(
+    Database db,
     Waypoint waypoint, {
     DateTime Function() getNow = defaultGetNow,
   }) async {
@@ -103,13 +107,13 @@ class ChartingCache {
       values: chartedValues,
       timestamp: getNow(),
     );
-    await _db.upsertChartingRecord(chartingRecord);
+    await db.upsertChartingRecord(chartingRecord);
   }
 
   /// Adds a list of waypoints to the cache.
   Future<void> addWaypoints(Iterable<Waypoint> waypoints) async {
     for (final waypoint in waypoints) {
-      await addWaypoint(waypoint);
+      await addWaypoint(_db, waypoint);
     }
   }
 }

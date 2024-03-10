@@ -1,4 +1,5 @@
 import 'package:cli/caches.dart';
+import 'package:db/db.dart';
 import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -12,11 +13,14 @@ class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockChartingCache extends Mock implements ChartingCache {}
 
+class _MockDatabase extends Mock implements Database {}
+
 class _MockConstructionCache extends Mock implements ConstructionCache {}
 
 void main() {
   test('WaypointCache.waypoint', () async {
     final api = _MockApi();
+    final db = _MockDatabase();
     final fs = MemoryFileSystem.test();
     final SystemsApi systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
@@ -52,6 +56,7 @@ void main() {
     final waypointTraitCache = WaypointTraitCache([], fs: fs);
     final waypointCache = WaypointCache(
       api,
+      db,
       systemsCache,
       chartingCache,
       constructionCache,

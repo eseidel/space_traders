@@ -100,7 +100,6 @@ void main() {
           SystemWatcherJob(systemSymbol: waypointSymbol.system);
 
     registerFallbackValue(waypoint);
-    when(() => caches.charting.addWaypoint(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

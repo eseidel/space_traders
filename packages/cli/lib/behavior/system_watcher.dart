@@ -233,6 +233,7 @@ Future<JobResult> doSystemWatcher(
   if (waypoint.chart == null) {
     await chartWaypointAndLog(
       api,
+      db,
       caches.charting,
       caches.static.waypointTraits,
       ship,
