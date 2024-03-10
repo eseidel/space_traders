@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:meta/meta.dart';
 import 'package:types/price.dart';
 import 'package:types/types.dart';
@@ -112,7 +110,4 @@ class MarketPrice extends PriceBase<TradeSymbol> {
 
   /// The symbol of the trade good.
   TradeSymbol get tradeSymbol => symbol;
-
-  @override
-  String toString() => jsonEncode(toJson());
 }
