@@ -5,7 +5,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/logic/advance.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/logic/ship_waiter.dart';
-import 'package:cli/net/counts.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';

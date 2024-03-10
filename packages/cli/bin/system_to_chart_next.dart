@@ -1,6 +1,7 @@
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/ships.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
@@ -19,17 +20,21 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ShipType.PROBE,
     origin: origin,
   )!;
-  const maxJumps = 5;
+  const maxJumps = 100;
   final behaviors = await BehaviorSnapshot.load(db);
-  final destinationSymbol = await centralCommand.nextWaypointToChart(
-    ships,
-    behaviors,
-    systemsCache,
-    chartingSnapshot,
-    systemConnectivity,
-    ship,
-    maxJumps: maxJumps,
-  );
+
+  final destinationSymbol = await expectTime(RequestCounts(), db.queryCounts,
+      'central planning', const Duration(seconds: 1), () async {
+    await centralCommand.nextWaypointToChart(
+      ships,
+      behaviors,
+      systemsCache,
+      chartingSnapshot,
+      systemConnectivity,
+      ship,
+      maxJumps: maxJumps,
+    );
+  });
   if (destinationSymbol == null) {
     logger.info('No uncharted waypoints found within $maxJumps jumps.');
   } else {

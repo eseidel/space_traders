@@ -251,3 +251,44 @@ String describeShipNav(ShipNav nav) {
   }
   return 'Unknown';
 }
+
+/// Log the counts.
+void logCounts<T>(Counts<T> counts) {
+  // Print the counts in order from most to least:
+  final sorted = counts.counts.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  for (final entry in sorted) {
+    logger.info('  ${entry.value}: ${entry.key}');
+  }
+}
+
+/// Run a function and record time and request count and log if long.
+Future<T> expectTime<T>(
+  RequestCounts requestCounts,
+  QueryCounts queryCounts,
+  String name,
+  Duration expected,
+  Future<T> Function() fn,
+) async {
+  final result = await captureTimeAndRequests<T>(
+    requestCounts,
+    queryCounts,
+    fn,
+    onComplete: (
+      Duration duration,
+      int requestCount,
+      QueryCounts queryCounts,
+    ) {
+      if (duration <= expected) {
+        return;
+      }
+      final queryCount = queryCounts.total;
+      logger.warn(
+        '$name took too long ${duration.inMilliseconds}ms '
+        '($requestCount requests, $queryCount queries)',
+      );
+      logCounts(queryCounts);
+    },
+  );
+  return result;
+}
