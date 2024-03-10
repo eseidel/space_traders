@@ -94,6 +94,16 @@ void main() {
         ShipMountSymbolEnum.SENSOR_ARRAY_II,
       ]),
     );
+
+    expect(template.canPurchaseAllMounts({}), isFalse);
+    expect(
+      template.canPurchaseAllMounts({
+        ShipMountSymbolEnum.MINING_LASER_I,
+        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+      }),
+      isTrue,
+    );
   });
 
   test('mountsToRemoveFromShip', () {
