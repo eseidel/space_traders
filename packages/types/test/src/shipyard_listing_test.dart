@@ -19,5 +19,6 @@ void main() {
     final json = listing.toJson();
     final listing2 = ShipyardListing.fromJson(json);
     expect(listing, listing2);
+    expect(listing.hashCode, listing2.hashCode);
   });
 }
