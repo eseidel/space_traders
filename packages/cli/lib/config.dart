@@ -24,7 +24,7 @@ const gamePhase = GamePhase.exploration;
 class Config {
   // TODO(eseidel): This should be configured at runtime.
   /// The symbol of the agent we are controlling.
-  final String agentSymbol = 'ESEIDEL';
+  final String agentSymbol = 'ESEIDEL2';
 
   /// Whether or not we should enable mining behaviors.
   final bool enableMining = gamePhase < GamePhase.exploration;

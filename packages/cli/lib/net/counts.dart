@@ -24,7 +24,7 @@ class CountingApiClient extends ApiClient {
   ) async {
     logger.detail(path);
     requestCounts.record(path);
-    return super.invokeAPI(
+    final response = await super.invokeAPI(
       path,
       method,
       queryParams,
@@ -33,5 +33,7 @@ class CountingApiClient extends ApiClient {
       formParams,
       contentType,
     );
+    // logger.info(response.body);
+    return response;
   }
 }
