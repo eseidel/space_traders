@@ -703,6 +703,8 @@ void main() {
       ),
     );
     when(() => ship.fuel).thenReturn(ShipFuel(current: 1000, capacity: 1000));
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     registerFallbackValue(Behavior.idle);
     when(() => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()))
         .thenReturn(true);

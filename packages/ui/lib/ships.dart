@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:types/api.dart';
+import 'package:types/types.dart';
 
 class DataTableExampleApp extends StatelessWidget {
   const DataTableExampleApp({super.key});

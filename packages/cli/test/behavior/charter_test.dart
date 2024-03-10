@@ -2,6 +2,7 @@ import 'package:cli/behavior/charter.dart';
 import 'package:cli/behavior/job.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:file/memory.dart';
@@ -102,6 +103,7 @@ void main() {
     registerFallbackValue(BehaviorSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
     registerFallbackValue(ChartingSnapshot([]));
+    registerFallbackValue(Ship.fallbackValue());
     when(
       () => centralCommand.nextWaypointToChart(
         any(),
@@ -109,8 +111,8 @@ void main() {
         caches.systems,
         any(),
         caches.systemConnectivity,
-        ship,
-        maxJumps: 5,
+        any(),
+        maxJumps: config.charterMaxJumps,
       ),
     ).thenAnswer((_) async => null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
@@ -150,6 +152,7 @@ void main() {
     final waypointBASymbol = WaypointSymbol.fromString('S-B-A');
 
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);

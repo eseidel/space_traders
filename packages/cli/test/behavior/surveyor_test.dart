@@ -30,6 +30,8 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();

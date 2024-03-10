@@ -147,7 +147,7 @@ Future<JobResult> _doBuyShipJob(
       shipyard.waypointSymbol,
       shipType,
     );
-    recordShip(caches.static, result.ship);
+    recordShip(caches.static, Ship.fromOpenApi(result.ship));
   } on ApiException catch (e) {
     // ApiException 400: {"error":{"message":"Failed to purchase ship.
     // Agent has insufficient funds.","code":4216,

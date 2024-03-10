@@ -29,6 +29,8 @@ void main() {
     final db = _MockDatabase();
     final caches = mockCaches();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -74,6 +76,7 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
@@ -120,6 +123,6 @@ void main() {
       ),
     );
     expect(waitUntil, arrivalTime);
-    verify(() => logger.info('🛸#1  ✈️  to A-W, 1s left')).called(1);
+    verify(() => logger.info('🛸#1  command   ✈️  to A-W, 1s left')).called(1);
   });
 }

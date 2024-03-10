@@ -4,6 +4,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -31,6 +32,8 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
+class _MockOpenApiShip extends Mock implements openapi.Ship {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(ShipSpec.fallbackValue());
@@ -40,6 +43,8 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
@@ -130,7 +135,8 @@ void main() {
           data: PurchaseShip201ResponseData(
             agent: agent.toOpenApi(),
             transaction: transaction,
-            ship: ship, // Supposed to be the new ship, cheating for the mock.
+            // Supposed to be the new ship, cheating for the mock.
+            ship: Ship.fallbackValue().toOpenApi(),
           ),
         ),
       ),
@@ -152,7 +158,8 @@ void main() {
     registerFallbackValue(ShipyardListing.fallbackValue());
     when(() => db.upsertShipyardListing(any()))
         .thenAnswer((_) => Future.value());
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(Ship.fallbackValue());
+    when(() => db.upsertShip(any())).thenAnswer((_) => Future.value());
 
     final logger = _MockLogger();
     expect(
@@ -170,6 +177,9 @@ void main() {
       ),
       isNull,
     );
-    verify(() => logger.warn('🛸#1  Purchased A-1 (SHIP_HEAVY_FREIGHTER)!'));
+    verify(
+      () =>
+          logger.warn('🛸#1  command   Purchased S-1 (SHIP_HEAVY_FREIGHTER)!'),
+    );
   });
 }

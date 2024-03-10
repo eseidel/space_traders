@@ -105,6 +105,8 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
@@ -386,6 +388,8 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
@@ -514,6 +518,8 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();

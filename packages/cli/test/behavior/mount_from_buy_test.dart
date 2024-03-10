@@ -45,6 +45,8 @@ void main() {
         .thenAnswer((_) => Future.value());
 
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final centralCommand = _MockCentralCommand();
 

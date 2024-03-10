@@ -49,6 +49,8 @@ void main() {
     final api = _MockApi();
     final db = _MockDatabase();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -244,6 +246,7 @@ void main() {
     when(() => ship.frame).thenReturn(shipFrame);
     when(() => shipFrame.symbol)
         .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -399,12 +402,6 @@ void main() {
     );
     when(() => caches.systems.waypointsInSystem(start.system)).thenReturn([]);
     registerFallbackValue(start.system);
-    // when(
-    //   () => caches.systemConnectivity.canJumpBetweenSystemSymbols(
-    //     any(),
-    //     any(),
-    //   ),
-    // ).thenReturn(true);
     final state = BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal);
 
     when(
@@ -574,6 +571,7 @@ void main() {
 
     final shipLocation = WaypointSymbol.fromString('S-A-W');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(shipLocation.waypoint);
@@ -793,6 +791,7 @@ void main() {
       costPerAntimatterUnit: 10000,
     );
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.symbol).thenReturn('S-1');
     final logger = _MockLogger();
     DateTime getNow() => DateTime(2021).toUtc();
@@ -802,7 +801,7 @@ void main() {
     );
     verify(
       () => logger.err(
-        '🛸#1  Expected 1,800c profit (180c/s), got -4c (-4c/s) in 00:00:00, expected 00:00:10',
+        '🛸#1  command   Expected 1,800c profit (180c/s), got -4c (-4c/s) in 00:00:00, expected 00:00:10',
       ),
     ).called(1);
   });
@@ -818,6 +817,8 @@ void main() {
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-B');
     when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipCargo = ShipCargo(capacity: 10, units: 10);
@@ -962,6 +963,8 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(end.systemString);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipCargo = ShipCargo(capacity: 10, units: 10);
     when(() => ship.cargo).thenReturn(shipCargo);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
@@ -1064,6 +1067,8 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(end.systemString);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipCargo = ShipCargo(
       capacity: 10,
       units: 10,
@@ -1258,6 +1263,8 @@ void main() {
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(end.systemString);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipCargo = ShipCargo(

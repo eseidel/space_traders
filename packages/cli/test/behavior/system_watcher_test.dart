@@ -60,6 +60,7 @@ void main() {
       ),
     );
 
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     when(() => ship.nav).thenReturn(shipNav);

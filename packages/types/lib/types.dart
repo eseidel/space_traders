@@ -24,3 +24,4 @@ export 'src/symbol.dart';
 export 'src/system.dart';
 export 'src/trading.dart';
 export 'src/transaction.dart';
+export 'src/ship.dart';

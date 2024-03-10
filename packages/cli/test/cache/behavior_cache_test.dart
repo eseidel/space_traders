@@ -21,6 +21,7 @@ void main() {
 
     final behaviorTimeouts = BehaviorTimeouts();
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     expect(

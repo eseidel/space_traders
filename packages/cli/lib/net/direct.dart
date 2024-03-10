@@ -27,7 +27,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
       await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
   final data = purchaseResponse!.data;
   // Add the new ship to our cache.
-  await db.upsertShip(data.ship);
+  await db.upsertShip(Ship.fromOpenApi(data.ship));
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   return data;
 }

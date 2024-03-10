@@ -55,6 +55,7 @@ void main() {
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
 
     /// The behavior doesn't matter, just needs to have a null destination.
@@ -123,6 +124,8 @@ void main() {
     when(() => caches.agent.updateAgent(agent)).thenAnswer((_) async {});
     const shipSymbol = ShipSymbol('S', 1);
     // We use a real Ship to allow setting/reading from cooldown.
+    final registration = _MockShipRegistration();
+    when(() => registration.role).thenReturn(ShipRole.COMMAND);
     final ship = Ship(
       symbol: shipSymbol.symbol,
       cooldown: Cooldown(
@@ -133,7 +136,7 @@ void main() {
       nav: shipNav,
       reactor: _MockShipReactor(),
       engine: _MockShipEngine(),
-      registration: _MockShipRegistration(),
+      registration: registration,
       frame: _MockShipFrame(),
       crew: _MockShipCrew(),
       cargo: _MockShipCargo(),

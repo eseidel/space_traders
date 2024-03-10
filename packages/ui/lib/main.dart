@@ -7,7 +7,7 @@ import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped/scoped.dart';
-import 'package:types/api.dart';
+import 'package:types/types.dart';
 import 'package:ui/route.dart';
 
 const fs = LocalFileSystem();
@@ -22,7 +22,7 @@ Future<ShipSnapshot> loadShips() async {
     throw Exception('Failed to load ships');
   }
   final ships = (jsonDecode(response.body) as List)
-      .map((e) => Ship.fromJson(e as Map<String, dynamic>)!)
+      .map((e) => Ship.fromJson(e as Map<String, dynamic>))
       .toList();
   return ShipSnapshot(ships);
 }

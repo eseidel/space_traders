@@ -2,64 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-/// Our alternative to ShipRole, since ShipRole does not always correspond
-/// to how we think about planning for a given ship configuration.
-/// e.g. a SIPHON_DRONE and MINER_DRONE are both ShipRole.EXTRACTOR
-/// but we want to treat them differently. Similarly ShipType.ORE_HOUND
-/// might end up fitted with mounts to make it a FleetRole.surveyor or
-/// FleetRole.miner or FleetRole.siphoner.
-enum FleetRole {
-  /// General purpose command ship.
-  command,
-
-  /// A ship set up to trade.
-  trader,
-
-  /// A ship set up to mine.
-  miner,
-
-  /// A ship set up to survey.
-  surveyor,
-
-  /// A ship set up to siphon.
-  siphoner,
-
-  /// A ship set up to explore.
-  explorer,
-
-  /// A ship set up to explore.
-  probe,
-
-  /// A ship with an unknown role.
-  unknown;
-
-  /// Compute the fleet role for a given ship.
-  factory FleetRole.fromShip(Ship ship) {
-    if (ship.isCommand) {
-      return FleetRole.command;
-    } else if (ship.isExplorer) {
-      return FleetRole.explorer;
-    } else if (ship.hasMiningLaser) {
-      return FleetRole.miner;
-    } else if (ship.hasSurveyor) {
-      return FleetRole.surveyor;
-    } else if (ship.hasSiphon) {
-      return FleetRole.siphoner;
-    } else if (ship.isHauler) {
-      return FleetRole.trader;
-    } else if (ship.isProbe) {
-      return FleetRole.probe;
-    }
-    return FleetRole.unknown;
-  }
-}
-
-/// Extension to add a fleet role to a ship.
-extension ShipFleetRole on Ship {
-  /// The fleet role for this ship.
-  FleetRole get fleetRole => FleetRole.fromShip(this);
-}
-
 /// Enum to specify which behavior the ship should follow.
 enum Behavior {
   /// Go to a shipyard and buy a ship.

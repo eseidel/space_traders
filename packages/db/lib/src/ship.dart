@@ -33,5 +33,5 @@ Map<String, dynamic> shipToColumnMap(Ship ship) => {
 
 /// Convert a result row to a Ship.
 Ship shipFromColumnMap(Map<String, dynamic> values) {
-  return Ship.fromJson(values['json'] as Map<String, dynamic>)!;
+  return Ship.fromJson(values['json'] as Map<String, dynamic>);
 }

@@ -3,6 +3,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -36,6 +37,8 @@ class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
+class _MockOpenApiShip extends Mock implements openapi.Ship {}
+
 void main() {
   test('purchaseShip', () async {
     final Api api = _MockApi();
@@ -45,9 +48,11 @@ void main() {
     final agent1 = Agent.test(credits: 1);
     final agent2 = Agent.test(credits: 2);
 
+    // TODO(eseidel): Use Ship.test once that exists.
+    final ship = Ship.fallbackValue();
     final responseData = PurchaseShip201ResponseData(
       agent: agent2.toOpenApi(),
-      ship: _MockShip(),
+      ship: ship.toOpenApi(),
       transaction: _MockShipyardTransaction(),
     );
 
@@ -62,8 +67,8 @@ void main() {
     final db = _MockDatabase();
     registerFallbackValue(agent1);
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
-    when(() => db.upsertShip(responseData.ship))
-        .thenAnswer((_) => Future.value());
+    registerFallbackValue(Ship.fallbackValue());
+    when(() => db.upsertShip(any())).thenAnswer((_) => Future.value());
 
     final agentCache = AgentCache(agent1, db);
     final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
@@ -75,7 +80,8 @@ void main() {
       shipyardSymbol,
       shipType,
     );
-    verify(() => db.upsertShip(responseData.ship)).called(1);
+    registerFallbackValue(Ship.fallbackValue());
+    verify(() => db.upsertShip(any())).called(1);
     expect(agentCache.agent, agent2);
   });
 
@@ -114,6 +120,7 @@ void main() {
       ),
     );
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.emojiName).thenReturn('S');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
@@ -144,6 +151,8 @@ void main() {
     );
     final ship = _MockShip();
     when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
@@ -241,11 +250,13 @@ void main() {
     final fromShip = _MockShip();
     when(() => fromShip.symbol).thenReturn(fromSymbol.symbol);
     when(() => fromShip.cargo).thenReturn(shipCargo);
+    when(() => fromShip.fleetRole).thenReturn(FleetRole.command);
 
     final toSymbol = ShipSymbol.fromString('S-2');
     final toShip = _MockShip();
     when(() => toShip.symbol).thenReturn(toSymbol.symbol);
     when(() => toShip.cargo).thenReturn(shipCargo);
+    when(() => toShip.fleetRole).thenReturn(FleetRole.command);
 
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
@@ -300,6 +311,7 @@ void main() {
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     const tradeSymbol = TradeSymbol.FUEL;
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
     when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
@@ -364,8 +376,11 @@ void main() {
         medianFuelPurchasePrice: 100,
       ),
     );
-    verify(() => logger.warn('🛸#1  Market does not sell fuel, not refueling.'))
-        .called(1);
+    verify(
+      () => logger.warn(
+        '🛸#1  command   Market does not sell fuel, not refueling.',
+      ),
+    ).called(1);
 
     when(() => market.tradeGoods).thenReturn([
       MarketTradeGood(
@@ -532,6 +547,7 @@ void main() {
 
   test('sellAllCargoAndLog', () async {
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final emptyCargo = ShipCargo(capacity: 10, units: 0);
@@ -586,7 +602,7 @@ void main() {
         sellCargoRequest: any(named: 'sellCargoRequest'),
       ),
     );
-    verify(() => logger.info('🛸#1  No cargo to sell')).called(1);
+    verify(() => logger.info('🛸#1  command   No cargo to sell')).called(1);
 
     when(
       () => fleetApi.sellCargo(
@@ -657,6 +673,7 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final logger = _MockLogger();
@@ -715,6 +732,7 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipNav = _MockShipNav();
@@ -774,7 +792,11 @@ void main() {
         ship,
       );
     });
-    verify(() => logger.warn('🛸#1  A-W was already charted')).called(1);
+    verify(
+      () => logger.warn(
+        '🛸#1  command   A-W was already charted',
+      ),
+    ).called(1);
 
     // Any other exception is thrown.
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
@@ -800,6 +822,7 @@ void main() {
     final contractsApi = _MockContractsApi();
     when(() => api.contracts).thenReturn(contractsApi);
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final shipNav = _MockShipNav();
@@ -854,6 +877,7 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol.symbol);
     final startSymbol = WaypointSymbol.fromString('S-A-W');
