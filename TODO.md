@@ -1241,10 +1241,6 @@ And the fuel costs are quite high.
 
 ### Remove MarketPrices from cache (significant load time).
 
-### Figure out why traders don't end up with "idle" behaviors?
-
-idleHaulerSymbols has a hack around this.
-
 ### Add warp time/fuel prediction.
 
 Looks correct:
@@ -1278,48 +1274,24 @@ actual:
 
 How did 98 get a buy job!?
 
-### Charters taking waaaaay too long:
 
-🛸#71 🗺️  QR38-DF2B - PLANET - Rocky, Sprawling Cities, Canyons, Strong Gravity, Salt Flats, Marketplace
-Timed out (1s) waiting for response?
-🛸#71 ✍️  market data @ QR38-DF2B
-[WARN] 🛸#71 took 67s (4 requests, 33 queries) expected 1.6s
-[WARN] top of loop took too long 548ms (0 requests, 1 queries)
-  1: SELECT * FROM market_price_
-🛸#71 QR38-CB3Z (GAS_GIANT) is missing chart, routing.
-[WARN] 🛸#71 Beginning route to QR38-CB3Z (9m)
-🛸#71 🛫 to QR38-CB3Z GAS_GIANT (9m)
+🛸#7  surveyor  ✈️  to TA36-C37, -10ms left
+🛸#7  surveyor  ✍️  shipyard data @ X1-TA36-C37
+🛸#7  surveyor  Purchased SHIP_SIPHON_DRONE for 46,052c -> 🏦 666,538c
+🛸#7  surveyor  Bought ship: ESEIDEL2-8
+[WARN] 🛸#7  surveyor  Purchased ESEIDEL2-8 (SHIP_SIPHON_DRONE)!
+[WARN] Adding missing ship ESEIDEL2-8
+🛸#8  siphoner  ✍️  shipyard data @ X1-TA36-C37
+🛸#8  siphoner  Purchased SHIP_SIPHON_DRONE for 47,203c -> 🏦 619,335c
+🛸#8  siphoner  Bought ship: ESEIDEL2-9
+[WARN] 🛸#8  siphoner  Purchased ESEIDEL2-9 (SHIP_SIPHON_DRONE)!
+[WARN] Adding missing ship ESEIDEL2-9
+🛸#9  siphoner  Beginning route to TA36-C36 (23s)
+🛸#9  siphoner  🛫 to TA36-C36 GAS_GIANT (23s) spent 1 fuel
+🛸#8  siphoner  Beginning route to TA36-C36 (23s)
+🛸#8  siphoner  🛫 to TA36-C36 GAS_GIANT (23s) spent 1 fuel
 
-71 probe (charter) SATELLITE 
-   enroute to QR38-CB3Z GAS_GIANT in 9m
-
-I was probably running "fleet.dart" at the same time, but still.
-
-
-[WARN] 🛸#80 late 1m
-🛸#80 ✍️  market data @ HK51-F21Z
-🛸#80 Charted reachable systems within 5 jumps, charting asteroids in X1-HK51.
-[WARN] 🛸#80 (charter) took 22s (2 requests, 5127 queries) expected 0.8s
-🛸#80 HK51-F16C (ASTEROID) is missing chart, routing.
-[WARN] 🛸#80 Beginning route to HK51-F16C (20m)
-🛸#80 🛫 to HK51-F16C ASTEROID (20m)
-
-
-[WARN] 🛸#51 (charter) took 29s (0 requests, 6592 queries) expected 0.0s
-  6583: SELECT * FROM charting_ WHERE waypoint_symbol = @waypoint_symbol AND (values IS NOT NULL OR timestamp > @max_age) 
-  2: SELECT * FROM construction_ WHERE waypoint_symbol = @waypoint_symbol AND timestamp > @timestamp
-  2:       INSERT INTO behavior_ (ship_symbol, behavior, json)
-      VALUES (@ship_symbol, @behavior, @json)
-      ON CONFLICT (ship_symbol) DO UPDATE SET
-        behavior = @behavior,
-        json = @json
-      
-  2: SELECT * FROM behavior_ WHERE behavior = @behavior
-  1: SELECT * FROM ship_
-  1: SELECT * FROM behavior_ WHERE ship_symbol = @ship_symbol
-  1: SELECT * FROM behavior_
-🛸#51 ✈️  to AT75-E26C, -52s left
-🛸#51 AT75-D25B (ASTEROID) is missing chart, routing.
+I think it happens due to ships not being added immediately after purchase?
 
 ### Routing trouble in trade planning?
 
@@ -1344,6 +1316,9 @@ Each system can have "slots" based on the number of connected systems without ch
 Assign up to half the slots?
 Do some sort of proximity based matching?
 
+Currently probes (and traders) do self-assign which can cause probes to "grab"
+far-away systems, even though a closer probe would have done better.
+
 Same thing could work for traders.  Compute the number of deals above a
 certain c/s, starting from that system and assign up to a certain capacity
 level with a similar matching algorithm?
@@ -1360,75 +1335,8 @@ the planner?
 
 ### Unify warp planner into waypoint planner?
 
-### Figure out why behaviors are never idle anymore.
-
-e.g.
-
-[WARN] 🛸#68 No system to seed. Disabling Behavior.seeder for ESEIDEL-68 for 1h.
-Found 13 deals for ESEIDEL-68 from UT62-K93
-[WARN] 🛸#68 Deal expected profit per second too low: 3c/s
-[WARN] 🛸#68 Failed to find better location for trader. Disabling Behavior.trader for ESEIDEL-68 for 10m.
-⏱️  10m until 2024-03-09 02:55:35.242773
-
-Results in "null" behavior, rather than "idle".
-
-
-1. Solve idle.
-2. Redistribute traders.
-3. Add warp planner.
-4. Add logic for explorers to go to more systems (via warp).
+- Add warp planner.
+- Add logic for explorers to go to more systems (via warp).
 
 
 ### Move constructionSellOpps, etc. onto a ConstructionState object?
-
-### Costing takes too long
-
-WARN] 🛸#83 Beginning route to RV11-C11A (5h)
-🛸#83 🥶 for 30m
-🛸#5E ✈️  to VZ93-B10X, 25m left
-[WARN] Costed 1146 deals in 3s
-Found 7 deals for ESEIDEL-1 from C9-I54
-[WARN] 🛸#1  Deal expected profit per second too low: 3c/s
-[WARN] Costed 1146 deals in 4s
-Found 1 deals for ESEIDEL-1 from ZN70-X10B
-[WARN] Costed 1146 deals in 688ms
-Found 1 deals for ESEIDEL-1 from UR38-BD8E
-[WARN] Costed 1146 deals in 528ms
-Found 2 deals for ESEIDEL-1 from AF17-I60
-[WARN] Costed 1146 deals in 660ms
-Found 1 deals for ESEIDEL-1 from YA79-BZ5C
-[WARN] Costed 1146 deals in 656ms
-Found 4 deals for ESEIDEL-1 from UF18-X11C
-[WARN] Costed 1146 deals in 642ms
-Found 1 deals for ESEIDEL-1 from XU83-ZA6C
-[WARN] Costed 1146 deals in 682ms
-Found 1 deals for ESEIDEL-1 from PR96-C11X
-[WARN] Costed 1146 deals in 658ms
-Found 1 deals for ESEIDEL-1 from TF34-CZ6E
-[WARN] Costed 1146 deals in 659ms
-Found 2 deals for ESEIDEL-1 from RQ26-C10B
-[WARN] Costed 1146 deals in 677ms
-Found 1 deals for ESEIDEL-1 from KX7-XZ5F
-[WARN] Costed 1146 deals in 738ms
-Found 3 deals for ESEIDEL-1 from BV28-XE4A
-[WARN] Costed 1146 deals in 784ms
-Found 1 deals for ESEIDEL-1 from DN54-CE8E
-[WARN] Costed 1146 deals in 685ms
-Found 1 deals for ESEIDEL-1 from HK79-AC9C
-[WARN] Costed 1146 deals in 631ms
-Found 3 deals for ESEIDEL-1 from BH97-BB9X
-[WARN] Costed 1146 deals in 882ms
-Found 2 deals for ESEIDEL-1 from JN55-AF6D
-[WARN] Costed 1146 deals in 734ms
-Found 3 deals for ESEIDEL-1 from CF67-BB9X
-[WARN] Costed 1146 deals in 865ms
-Found 1 deals for ESEIDEL-1 from AH4-CA5Z
-[WARN] Costed 1146 deals in 1s
-Found 1 deals for ESEIDEL-1 from UH64-FD4D
-🛸#1  Found placement: 5c/s 14360 14835 UH64-FD4D
-🛸#1  Potential: RELIC_TECH                 DT63-EB5E    30,910c -> AQ24-A1      73,292c +140,188c (47%) 7h   5c/s 299,564c
-🛸#1  Starting: C9-I54 to UH64-FD4D speed: 30 max-fuel: 400
-jump            C9-I54  FY98-A22E 1h 0 fuel
-jump            FY98-A22E  TA93-AE8X 1h 0 fuel
-jump            TA93-AE8X  UH64-FD4D 0ms 0 fuel
-in 3h uses 0 fuel
