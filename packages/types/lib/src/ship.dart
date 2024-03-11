@@ -70,10 +70,6 @@ class ShipSpec {
 /// Extensions to make Ship easier to work with.
 /// Extensions onto Ship to make it easier to work with.
 extension ShipUtils on Ship {
-  /// Returns the ShipSymbol of the ship.
-  // TODO(eseidel): Remove this.
-  ShipSymbol get shipSymbol => symbol;
-
   /// Returns the current SystemSymbol of the ship.
   SystemSymbol get systemSymbol => nav.systemSymbolObject;
 

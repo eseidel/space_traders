@@ -18,7 +18,7 @@ void logShip(
 ) {
   const indent = '   ';
   final waypoint = systemsCache.waypoint(ship.waypointSymbol);
-  logger.info(ship.shipSymbol.hexNumber);
+  logger.info(ship.symbol.hexNumber);
 
   final routePlan = behavior?.routePlan;
   if (routePlan != null) {

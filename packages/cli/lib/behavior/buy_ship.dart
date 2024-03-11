@@ -93,7 +93,7 @@ ShipyardTrip? findBestShipyardToBuy(
 // void verifyShipMatchesTemplate(Ship ship, ShipType shipType) {
 //   final fromTemplate = makeShip(
 //     type: shipType,
-//     shipSymbol: ship.shipSymbol,
+//     shipSymbol: ship.symbol,
 //     factionSymbol: ship.registration.factionSymbol,
 //     origin: ship.nav.route.origin,
 //     now: ship.nav.route.arrival,

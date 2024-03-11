@@ -131,7 +131,7 @@ class CentralCommand {
 
   /// Returns the system symbol we should assign the given [ship] to.
   SystemSymbol? assignedSystemForSatellite(Ship ship) =>
-      _assignedSystemsForSatellites[ship.shipSymbol];
+      _assignedSystemsForSatellites[ship.symbol];
 
   /// Returns the mining squad for the given [ship].
   ExtractionSquad? squadForShip(Ship ship) {
@@ -172,7 +172,7 @@ class CentralCommand {
     Ship ship,
     int credits,
   ) async {
-    final shipSymbol = ship.shipSymbol;
+    final shipSymbol = ship.symbol;
     BehaviorState toState(Behavior behavior) {
       return BehaviorState(shipSymbol, behavior);
     }
@@ -355,7 +355,7 @@ class CentralCommand {
 
     // A hack to avoid spamming the console until we add a deals cache.
     if (deals.isNotEmpty) {
-      logger.info('Found ${deals.length} deals for ${ship.shipSymbol} from '
+      logger.info('Found ${deals.length} deals for ${ship.symbol} from '
           '$startSymbol');
     }
     for (final deal in deals) {
@@ -375,7 +375,7 @@ class CentralCommand {
     required int maxJumps,
   }) async {
     final charterSystems =
-        otherCharterSystems(ships, behaviors, ship.shipSymbol).toSet();
+        otherCharterSystems(ships, behaviors, ship.symbol).toSet();
 
     // Only probes should ever chart asteroids.
     final chartAsteroids =
@@ -488,11 +488,11 @@ class CentralCommand {
     ShipSnapshot ships,
   ) async {
     for (final ship in ships.ships) {
-      if (_mountRequests.any((m) => m.shipSymbol == ship.shipSymbol)) {
+      if (_mountRequests.any((m) => m.shipSymbol == ship.symbol)) {
         return;
       }
       // Don't queue a new mount request if we're currently executing one.
-      final behaviorState = await db.behaviorStateBySymbol(ship.shipSymbol);
+      final behaviorState = await db.behaviorStateBySymbol(ship.symbol);
       if (behaviorState?.behavior == Behavior.mountFromBuy) {
         continue;
       }
@@ -657,7 +657,7 @@ class CentralCommand {
   /// Takes and clears the next mount buy job for the given [ship].
   MountRequest _takeMountRequest(Ship ship) {
     final mountRequest = _mountRequests.firstWhere(
-      (m) => m.shipSymbol == ship.shipSymbol,
+      (m) => m.shipSymbol == ship.symbol,
       orElse: () => throw ArgumentError('No mount request for $ship'),
     );
     _mountRequests.remove(mountRequest);
@@ -830,7 +830,7 @@ class CentralCommand {
     }
     // Does this ship have a mount it needs?
     final mountRequest =
-        _mountRequests.firstWhereOrNull((m) => m.shipSymbol == ship.shipSymbol);
+        _mountRequests.firstWhereOrNull((m) => m.shipSymbol == ship.symbol);
     if (mountRequest == null) {
       return false;
     }
@@ -1100,11 +1100,11 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
   // TODO(eseidel): Should use a dynamic count.
   final minerHaulerSymbols = ships.ships
       .where((s) => s.isHauler)
-      .map((s) => s.shipSymbol)
+      .map((s) => s.symbol)
       .sorted()
       .take(config.minerHaulerCount);
   bool useAsMinerHauler(Ship ship) {
-    return config.enableMining && minerHaulerSymbols.contains(ship.shipSymbol);
+    return config.enableMining && minerHaulerSymbols.contains(ship.symbol);
   }
 
   // Go through and assign all ships to squads.

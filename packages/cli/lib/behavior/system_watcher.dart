@@ -29,12 +29,12 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
       continue;
     }
     if (systemsWithEnoughMarkets.contains(systemSymbol)) {
-      assignedProbes[probe.shipSymbol] = systemSymbol;
+      assignedProbes[probe.symbol] = systemSymbol;
       systemsNeedingProbes.remove(systemSymbol);
     }
   }
   for (final probeSymbol in assignedProbes.keys) {
-    availableProbes.removeWhere((s) => s.shipSymbol == probeSymbol);
+    availableProbes.removeWhere((s) => s.symbol == probeSymbol);
   }
 
   // clusterId == null means the system has no jump gate connections, so we
@@ -62,7 +62,7 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
       continue;
     }
     final systemSymbol = systemsNeeded.removeLast();
-    assignedProbes[probe.shipSymbol] = systemSymbol;
+    assignedProbes[probe.symbol] = systemSymbol;
   }
   final remainingSystems = systemsNeededByClusterId.values.expand((e) => e);
   if (remainingSystems.isNotEmpty) {
@@ -183,7 +183,7 @@ Future<JobResult> _travelToAssignedSystem(
 }) async {
   final systemSymbol = assertNotNull(
     state.systemWatcherJob?.systemSymbol,
-    'No assigned system for ${ship.shipSymbol}.',
+    'No assigned system for ${ship.symbol}.',
     const Duration(minutes: 10),
   );
   if (ship.systemSymbol != systemSymbol) {
@@ -261,7 +261,7 @@ Future<JobResult> doSystemWatcher(
     ships,
     behaviors,
     systemSymbol,
-    ship.shipSymbol,
+    ship.symbol,
   );
 
   // Walk our nearby waypoints looking for one that needs refresh.

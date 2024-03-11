@@ -20,14 +20,14 @@ Query upsertShipQuery(Ship ship) => Query(
       ON CONFLICT (symbol) DO UPDATE SET json = @json
       ''',
       parameters: {
-        'symbol': ship.shipSymbol.toJson(),
+        'symbol': ship.symbol.toJson(),
         'json': ship.toJson(),
       },
     );
 
 /// Convert a Ship to a column map.
 Map<String, dynamic> shipToColumnMap(Ship ship) => {
-      'symbol': ship.shipSymbol.toJson(),
+      'symbol': ship.symbol.toJson(),
       'json': ship.toJson(),
     };
 

@@ -271,7 +271,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
     result.transaction,
     // purchaseShip updated the agentCache
     agentCache.agent.credits,
-    ship.shipSymbol,
+    ship.symbol,
   );
   await db.insertTransaction(transaction);
   return result;
@@ -659,7 +659,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
 
   final contactTransaction = ContractTransaction.accept(
     contract: contract,
-    shipSymbol: ship.shipSymbol,
+    shipSymbol: ship.symbol,
     waypointSymbol: ship.waypointSymbol,
     timestamp: DateTime.timestamp(),
   );

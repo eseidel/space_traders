@@ -97,7 +97,7 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
   if (onlyShips.isNotEmpty) {
     logger.info('Only running ships: $onlyShips');
   }
-  return (Ship ship) => onlyShips.contains(ship.shipSymbol);
+  return (Ship ship) => onlyShips.contains(ship.symbol);
 }
 
 Future<void> cliMain(List<String> args) async {

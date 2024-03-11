@@ -43,8 +43,7 @@ class ShipSnapshot {
   /// Loads the ship cache from the provided [db].
   static Future<ShipSnapshot> load(Database db) async {
     // It's nicer for callers if ships are in sorted order.
-    final ships = (await db.allShips())
-        .sorted((a, b) => a.shipSymbol.compareTo(b.shipSymbol));
+    final ships = (await db.allShips()).sortedBy((a) => a.symbol);
     return ShipSnapshot(ships);
   }
 
@@ -106,11 +105,11 @@ class ShipSnapshot {
   }
 
   /// Returns all ship symbols.
-  List<ShipSymbol> get shipSymbols => ships.map((s) => s.shipSymbol).toList();
+  List<ShipSymbol> get shipSymbols => ships.map((s) => s.symbol).toList();
 
   /// Returns the ship for the provided ShipSymbol.
   Ship operator [](ShipSymbol symbol) =>
-      ships.firstWhere((s) => s.shipSymbol == symbol);
+      ships.firstWhere((s) => s.symbol == symbol);
 }
 
 /// Returns a map of ship frame type to count in fleet.

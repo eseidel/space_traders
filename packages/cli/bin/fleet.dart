@@ -60,7 +60,7 @@ void logShip(
   final cargoStatus = ship.cargo.capacity == 0
       ? ''
       : '${ship.cargo.units}/${ship.cargo.capacity}';
-  logger.info('${ship.shipSymbol.hexNumber} '
+  logger.info('${ship.symbol.hexNumber} '
       '${_behaviorOrTypeString(ship, behavior)} $cargoStatus');
   if (ship.cargo.isNotEmpty) {
     logger.info(
@@ -111,7 +111,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final marketPrices = await MarketPriceSnapshot.load(db);
   for (final ship in matchingShips) {
-    final behaviorState = await db.behaviorStateBySymbol(ship.shipSymbol);
+    final behaviorState = await db.behaviorStateBySymbol(ship.symbol);
     logShip(
       systemsCache,
       marketPrices,

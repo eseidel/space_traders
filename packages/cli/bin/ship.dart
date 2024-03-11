@@ -7,8 +7,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   if (argResults.rest.isNotEmpty) {
     final onlyShips =
         argResults.rest.map((s) => int.parse(s, radix: 16)).toSet();
-    ships =
-        ships.where((b) => onlyShips.contains(b.shipSymbol.number)).toList();
+    ships = ships.where((b) => onlyShips.contains(b.symbol.number)).toList();
   }
   if (ships.isEmpty) {
     logger.info('No ships found.');

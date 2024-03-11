@@ -164,7 +164,7 @@ Future<JobResult> extractAndLog(
     logEvents(ship, response.events);
     await db.insertExtraction(
       ExtractionRecord(
-        shipSymbol: ship.shipSymbol,
+        shipSymbol: ship.symbol,
         waypointSymbol: ship.waypointSymbol,
         tradeSymbol: yield_.symbol,
         quantity: yield_.units,

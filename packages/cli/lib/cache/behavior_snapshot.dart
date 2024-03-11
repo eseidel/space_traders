@@ -23,8 +23,7 @@ class BehaviorTimeouts {
   /// Check if the given behavior is disabled for the given ship.
   bool isBehaviorDisabledForShip(Ship ship, Behavior behavior) {
     bool matches(_ShipTimeout timeout) {
-      return timeout.shipSymbol == ship.shipSymbol &&
-          timeout.behavior == behavior;
+      return timeout.shipSymbol == ship.symbol && timeout.behavior == behavior;
     }
 
     final timeouts = _shipTimeouts.where(matches).toList();
@@ -46,7 +45,7 @@ class BehaviorTimeouts {
     String why,
     Duration duration,
   ) async {
-    final shipSymbol = ship.shipSymbol;
+    final shipSymbol = ship.symbol;
     final currentState = await db.behaviorStateBySymbol(shipSymbol);
     final behavior = currentState?.behavior;
     if (behavior == null) {
@@ -66,7 +65,7 @@ class BehaviorTimeouts {
     }
 
     final expiration = DateTime.timestamp().add(duration);
-    _shipTimeouts.add(_ShipTimeout(ship.shipSymbol, behavior, expiration));
+    _shipTimeouts.add(_ShipTimeout(ship.symbol, behavior, expiration));
   }
 }
 
@@ -108,7 +107,7 @@ class BehaviorSnapshot {
     ShipSnapshot shipCache,
   ) {
     final haulerSymbols =
-        shipCache.ships.where((s) => s.isHauler).map((s) => s.shipSymbol);
+        shipCache.ships.where((s) => s.isHauler).map((s) => s.symbol);
     final idleBehaviors = [
       Behavior.idle,
       Behavior.charter,
