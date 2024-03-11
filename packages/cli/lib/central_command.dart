@@ -585,6 +585,11 @@ class CentralCommand {
     final shipyardListings = await ShipyardListingSnapshot.load(db);
     final charting = await ChartingSnapshot.load(db);
 
+    // A hack to advance the global config to the construction phase.
+    if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) > 10) {
+      config = Config(GamePhase.construction);
+    }
+
     _assignedSystemsForSatellites
       ..clear()
       ..addAll(

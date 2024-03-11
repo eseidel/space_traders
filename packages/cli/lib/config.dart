@@ -16,21 +16,23 @@ enum GamePhase with EnumIndexOrdering {
   exploration,
 }
 
-/// Which phase are we in.
-// TODO(eseidel): Make this dynamic.
-GamePhase gamePhase = GamePhase.bootstrap;
-
 /// Class for holding our hard-coded configuration values.
 class Config {
+  /// Create a new Config object.
+  Config(this.gamePhase);
+
+  /// Which phase are we in.
+  final GamePhase gamePhase;
+
   // TODO(eseidel): This should be configured at runtime.
   /// The symbol of the agent we are controlling.
   final String agentSymbol = 'ESEIDEL2';
 
   /// Whether or not we should enable mining behaviors.
-  final bool enableMining = gamePhase < GamePhase.exploration;
+  bool get enableMining => gamePhase < GamePhase.exploration;
 
   /// Whether or not we engage in construction behaviors.
-  final bool enableConstruction = gamePhase == GamePhase.construction;
+  bool get enableConstruction => gamePhase == GamePhase.construction;
 
   /// Whether or not we engage in contract behaviors.
   final bool enableContracts = true;
@@ -97,10 +99,8 @@ class Config {
 
   /// Our ship buy plan for computeNextShipToBuy.
   List<ShipType> get buyPlan {
-    final ships = <ShipType>[];
-    if (gamePhase == GamePhase.bootstrap) {
-      ships.addAll(_boostrapShips);
-    } else if (gamePhase >= GamePhase.exploration) {
+    final ships = <ShipType>[..._boostrapShips];
+    if (gamePhase >= GamePhase.exploration) {
       ships.addAll(_explorationShips);
     }
     return ships;
@@ -226,4 +226,4 @@ class Config {
 }
 
 /// Our global configuration object.
-final config = Config();
+Config config = Config(GamePhase.bootstrap);
