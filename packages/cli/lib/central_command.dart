@@ -85,10 +85,10 @@ class CentralCommand {
   /// but will not start new deals involving contracts.
   /// Mostly this makes unit-testing easier by allowing us to disable contract
   /// trading.
-  bool get isContractTradingEnabled => true;
+  bool get isContractTradingEnabled => config.enableContracts;
 
   /// Returns true if construction trading is enabled.
-  bool get isConstructionTradingEnabled => true;
+  bool get isConstructionTradingEnabled => config.enableConstruction;
 
   /// Minimum profit per second we expect this ship to make.
   // Should set this based on the ship type and how much we expect to earn

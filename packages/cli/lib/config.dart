@@ -18,7 +18,7 @@ enum GamePhase with EnumIndexOrdering {
 
 /// Which phase are we in.
 // TODO(eseidel): Make this dynamic.
-const gamePhase = GamePhase.bootstrap;
+GamePhase gamePhase = GamePhase.bootstrap;
 
 /// Class for holding our hard-coded configuration values.
 class Config {
@@ -28,6 +28,12 @@ class Config {
 
   /// Whether or not we should enable mining behaviors.
   final bool enableMining = gamePhase < GamePhase.exploration;
+
+  /// Whether or not we engage in construction behaviors.
+  final bool enableConstruction = gamePhase == GamePhase.construction;
+
+  /// Whether or not we engage in contract behaviors.
+  final bool enableContracts = true;
 
   /// What behaviors count as "mining" for our enable/disable mining.
   final miningBehaviors = <Behavior>{
@@ -133,10 +139,9 @@ class Config {
       Behavior.seeder,
       Behavior.trader,
     ],
-    // TODO(eseidel): I don't think these do anything anymore:
-    // FleetRole.miner: [Behavior.miner],
-    // FleetRole.surveyor: [Behavior.surveyor],
-    // FleetRole.siphoner: [Behavior.siphoner],
+    FleetRole.miner: [Behavior.miner],
+    FleetRole.surveyor: [Behavior.surveyor],
+    FleetRole.siphoner: [Behavior.siphoner],
   };
 
   // We could put some "total value" on the idea of the gate being open
