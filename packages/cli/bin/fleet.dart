@@ -91,7 +91,7 @@ bool Function(Ship) filterFromArgs(List<String> args) {
     return (ship) => true;
   }
   final symbol = args.first;
-  return (ship) => ship.symbol == symbol;
+  return (ship) => ship.symbol.symbol == symbol;
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {

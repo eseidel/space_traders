@@ -56,7 +56,7 @@ extension ShipTypeToFrame on ShipyardShipCache {
 
     // Use deepCopy to ensure callers don't accidentally modify static data.
     return Ship(
-      symbol: symbolString,
+      symbol: ShipSymbol.fromJson(symbolString),
       registration: ShipRegistration(
         factionSymbol: factionString,
         name: symbolString,

@@ -114,7 +114,7 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
@@ -326,7 +326,7 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
@@ -397,7 +397,7 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
@@ -453,7 +453,7 @@ void main() {
     when(() => haulerNavRoute.arrival).thenReturn(arrival);
     when(() => hauler.cargo).thenReturn(haulerCargo);
     const haulerSymbol = ShipSymbol('S', 2);
-    when(() => hauler.symbol).thenReturn(haulerSymbol.symbol);
+    when(() => hauler.symbol).thenReturn(haulerSymbol);
 
     final squad = ExtractionSquad(state.extractionJob!)
       ..ships.addAll([ship, hauler]);
@@ -527,7 +527,7 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');

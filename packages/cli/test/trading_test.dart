@@ -522,7 +522,8 @@ void main() {
 
   test('findBestMarketToSell smoke test', () async {
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('S-1');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
     final midSymbol = WaypointSymbol.fromString('S-A-MID');

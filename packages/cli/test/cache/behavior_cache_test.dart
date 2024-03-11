@@ -23,7 +23,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     expect(
       behaviorTimeouts.isBehaviorDisabledForShip(ship, Behavior.trader),
       false,
@@ -44,7 +44,8 @@ void main() {
       ),
     );
     final ship2 = _MockShip();
-    when(() => ship2.symbol).thenReturn('S-2');
+    const shipSymbol2 = ShipSymbol('S', 2);
+    when(() => ship2.symbol).thenReturn(shipSymbol2);
     expect(
       behaviorTimeouts.isBehaviorDisabledForShip(ship, Behavior.trader),
       true,

@@ -53,7 +53,7 @@ void main() {
       final shipLocation = cSymbol;
       const shipSymbol = ShipSymbol('A', 1);
       final ship = _MockShip();
-      when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+      when(() => ship.symbol).thenReturn(shipSymbol);
       when(() => ship.fleetRole).thenReturn(FleetRole.command);
       final shipNav = _MockShipNav();
       when(() => ship.nav).thenReturn(shipNav);

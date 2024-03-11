@@ -66,7 +66,7 @@ void main() {
     final shipFuel = _MockShipFuel();
     when(() => ship.fuel).thenReturn(shipFuel);
     when(() => shipFuel.capacity).thenReturn(0);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
@@ -240,7 +240,7 @@ void main() {
     const fuelCapacity = 1000;
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 1000));
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
@@ -570,7 +570,7 @@ void main() {
     when(() => shipCargo.inventory).thenReturn([]);
 
     final shipLocation = WaypointSymbol.fromString('S-A-W');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
@@ -792,7 +792,8 @@ void main() {
     );
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
-    when(() => ship.symbol).thenReturn('S-1');
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final logger = _MockLogger();
     DateTime getNow() => DateTime(2021).toUtc();
     runWithLogger(
@@ -820,7 +821,7 @@ void main() {
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final shipCargo = ShipCargo(capacity: 10, units: 10);
     when(() => ship.cargo).thenReturn(shipCargo);
     const fuelCapacity = 100;
@@ -962,7 +963,7 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(end.systemString);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     final shipCargo = ShipCargo(capacity: 10, units: 10);
@@ -1066,7 +1067,7 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(end.systemString);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     final shipCargo = ShipCargo(
@@ -1266,7 +1267,7 @@ void main() {
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final shipCargo = ShipCargo(
       capacity: 10,
       units: 10,

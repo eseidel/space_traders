@@ -75,7 +75,7 @@ class DataTableExample extends StatelessWidget {
         for (final ship in ships)
           DataRow(
             cells: <DataCell>[
-              DataCell(Text(ship.symbol)),
+              DataCell(Text(ship.symbol.symbol)),
               DataCell(Text(ship.nav.waypointSymbol)),
             ],
           ),

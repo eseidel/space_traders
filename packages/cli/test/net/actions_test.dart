@@ -3,7 +3,6 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -36,8 +35,6 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
-
-class _MockOpenApiShip extends Mock implements openapi.Ship {}
 
 void main() {
   test('purchaseShip', () async {
@@ -92,7 +89,8 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn('S-Y');
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(
       () => fleetApi.patchShipNav(
         any(),
@@ -122,6 +120,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.symbol).thenReturn(ShipSymbol.fromString('S-1'));
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
@@ -150,7 +149,7 @@ void main() {
       ),
     );
     final ship = _MockShip();
-    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.symbol).thenReturn(ShipSymbol.fromString('S-1'));
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     final shipNav = _MockShipNav();
@@ -174,7 +173,7 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final ship = _MockShip();
-    when(() => ship.emojiName).thenReturn('S');
+    when(() => ship.symbol).thenReturn(ShipSymbol.fromString('S-1'));
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('A');
@@ -248,13 +247,13 @@ void main() {
     );
     final fromSymbol = ShipSymbol.fromString('S-1');
     final fromShip = _MockShip();
-    when(() => fromShip.symbol).thenReturn(fromSymbol.symbol);
+    when(() => fromShip.symbol).thenReturn(fromSymbol);
     when(() => fromShip.cargo).thenReturn(shipCargo);
     when(() => fromShip.fleetRole).thenReturn(FleetRole.command);
 
     final toSymbol = ShipSymbol.fromString('S-2');
     final toShip = _MockShip();
-    when(() => toShip.symbol).thenReturn(toSymbol.symbol);
+    when(() => toShip.symbol).thenReturn(toSymbol);
     when(() => toShip.cargo).thenReturn(shipCargo);
     when(() => toShip.fleetRole).thenReturn(FleetRole.command);
 
@@ -321,7 +320,7 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final api = _MockApi();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -549,7 +548,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final emptyCargo = ShipCargo(capacity: 10, units: 0);
     when(() => ship.cargo).thenReturn(emptyCargo);
     final api = _MockApi();
@@ -675,7 +674,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final logger = _MockLogger();
 
     final itemOne = ShipCargoItem(
@@ -734,7 +733,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
@@ -824,7 +823,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
@@ -879,7 +878,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final startSymbol = WaypointSymbol.fromString('S-A-W');
     final endSymbol = WaypointSymbol.fromString('S-B-W');
     final shipNav = _MockShipNav();

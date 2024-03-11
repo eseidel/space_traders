@@ -4,7 +4,6 @@ import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -32,8 +31,6 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockOpenApiShip extends Mock implements openapi.Ship {}
-
 void main() {
   setUpAll(() {
     registerFallbackValue(ShipSpec.fallbackValue());
@@ -52,7 +49,7 @@ void main() {
     final now = DateTime(2021);
     DateTime getNow() => now;
     const shipSymbol = ShipSymbol('A', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     const fuelCapacity = 100;

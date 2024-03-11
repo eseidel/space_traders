@@ -48,7 +48,7 @@ void main() {
     const shipSymbol = ShipSymbol('S', 1);
     final state = BehaviorState(shipSymbol, Behavior.idle);
     final ship = _MockShip();
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final logger = _MockLogger();
 
     Future<JobResult> step(

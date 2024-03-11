@@ -54,7 +54,7 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
 
@@ -127,7 +127,7 @@ void main() {
     final registration = _MockShipRegistration();
     when(() => registration.role).thenReturn(ShipRole.COMMAND);
     final ship = Ship(
-      symbol: shipSymbol.symbol,
+      symbol: shipSymbol,
       cooldown: Cooldown(
         shipSymbol: shipSymbol.symbol,
         totalSeconds: 0,
@@ -307,7 +307,7 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
 
     final waypointSymbol = WaypointSymbol.fromString('A-B-C');
@@ -350,7 +350,7 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
 
     final start = WaypointSymbol.fromString('A-B-A');
@@ -402,7 +402,7 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol.symbol);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
 
     final start = WaypointSymbol.fromString('A-B-A');

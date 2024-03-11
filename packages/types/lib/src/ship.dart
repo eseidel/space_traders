@@ -71,7 +71,8 @@ class ShipSpec {
 /// Extensions onto Ship to make it easier to work with.
 extension ShipUtils on Ship {
   /// Returns the ShipSymbol of the ship.
-  ShipSymbol get shipSymbol => ShipSymbol.fromString(symbol);
+  // TODO(eseidel): Remove this.
+  ShipSymbol get shipSymbol => symbol;
 
   /// Returns the current SystemSymbol of the ship.
   SystemSymbol get systemSymbol => nav.systemSymbolObject;
@@ -82,8 +83,7 @@ extension ShipUtils on Ship {
   /// Returns the emoji name of the ship.
   String get emojiName {
     // Ships are all AGENT_SYMBOL-1, AGENT_SYMBOL-2, etc.
-    final number = symbol.split('-').last;
-    return '🛸#$number';
+    return '🛸#${symbol.hexNumber}';
   }
 
   /// Returns the ShipSpec for the ship.
@@ -266,7 +266,7 @@ class Ship {
 
   /// Creates a new ship from an OpenAPI ship.
   Ship.fromOpenApi(openapi.Ship ship)
-      : symbol = ship.symbol,
+      : symbol = ShipSymbol.fromJson(ship.symbol),
         registration = ship.registration,
         nav = ship.nav,
         crew = ship.crew,
@@ -292,7 +292,7 @@ class Ship {
       y: 0,
     );
     return Ship(
-      symbol: const ShipSymbol.fallbackValue().symbol,
+      symbol: const ShipSymbol.fallbackValue(),
       registration: openapi.ShipRegistration(
         name: '',
         role: ShipRole.CARRIER,
@@ -359,7 +359,7 @@ class Ship {
 
   /// Converts this ship to an OpenAPI ship.
   openapi.Ship toOpenApi() => openapi.Ship(
-        symbol: symbol,
+        symbol: symbol.symbol,
         registration: registration,
         nav: nav,
         crew: crew,
@@ -397,8 +397,7 @@ class Ship {
   Map<String, dynamic> toJson() => toOpenApi().toJson();
 
   /// The symbol of this ship.
-  // TODO(eseidel): Change this to be a ShipSymbol.
-  final String symbol;
+  final ShipSymbol symbol;
 
   /// The registration of this ship.
   final openapi.ShipRegistration registration;
