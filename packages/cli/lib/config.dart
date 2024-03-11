@@ -109,7 +109,7 @@ class Config {
   // TODO(eseidel): Should be some dynamic min count of light-haulers before we
   // start making miner haulers, and then some max count of miner haulers?
   /// Number of haulers to use as miner haulers.
-  int get minerHaulerCount => (gamePhase == GamePhase.construction) ? 6 : 0;
+  int get minerHaulerCount => (gamePhase == GamePhase.construction) ? 4 : 0;
 
   /// Used as a fallback for constructing Behaviors if there isn't explicit
   /// logic in getJobForShip.
