@@ -1293,6 +1293,25 @@ How did 98 get a buy job!?
 
 I think it happens due to ships not being added immediately after purchase?
 
+🛸#8  siphoner  ✈️  to TA36-H51, -6ms left
+🛸#8  siphoner  ✍️  shipyard data @ X1-TA36-H51
+🛸#8  siphoner  Purchased SHIP_MINING_DRONE for 39,274c -> 🏦 653,810c
+🛸#8  siphoner  Bought ship: ESEIDEL2-A
+[WARN] 🛸#8  siphoner  Purchased ESEIDEL2-A (SHIP_MINING_DRONE)!
+[WARN] Adding missing ship ESEIDEL2-A
+🛸#A  miner     ✍️  shipyard data @ X1-TA36-H51
+🛸#A  miner     Purchased SHIP_MINING_DRONE for 41,176c -> 🏦 612,634c
+🛸#A  miner     Bought ship: ESEIDEL2-B
+[WARN] 🛸#A  miner     Purchased ESEIDEL2-B (SHIP_MINING_DRONE)!
+[WARN] Adding missing ship ESEIDEL2-B
+[WARN] 🛸#B  miner     No mine job. Disabling Behavior.miner for ESEIDEL2-B for 10m.
+[WARN] 🛸#A  miner     No mine job. Disabling Behavior.miner for ESEIDEL2-A for 10m.
+
+My theory is this happens when we do top of loop in between when the ship was
+purchased and when the new ship is scheduled?
+
+How does it end up with a second buy job?
+
 ### Routing trouble in trade planning?
 
 🛸#1  ✈️  to AQ24-C39, -5ms left
@@ -1338,5 +1357,6 @@ the planner?
 - Add warp planner.
 - Add logic for explorers to go to more systems (via warp).
 
-
 ### Move constructionSellOpps, etc. onto a ConstructionState object?
+
+### Fix Refuel navigation to actually work (see TODO in navigation.dart)
