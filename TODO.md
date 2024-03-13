@@ -1360,3 +1360,46 @@ the planner?
 ### Move constructionSellOpps, etc. onto a ConstructionState object?
 
 ### Fix Refuel navigation to actually work (see TODO in navigation.dart)
+
+### Move constructionSellOpps, etc. onto a ConstructionState object?
+
+### Squads.dart not listing haulers?
+
+It (and all other scripts) aren't setting up the Config phase correctly.
+Should make config a getter, and have it log if the phase isn't set.
+
+root@ubuntu-s-2vcpu-4gb-sfo3-01:~/space_traders/packages/cli# dart run bin/squads.dart 
+2 squads
+Squad 0: mine @ TA36-XE5F
+   6 MINING_DRONE TA36-XE5F 4/15
+   7 SURVEYOR TA36-XE5F 
+   B MINING_DRONE TA36-XE5F 0/15
+   D SURVEYOR TA36-XE5F 
+   F MINING_DRONE TA36-XE5F 6/15
+  11 MINING_DRONE TA36-XE5F 9/15
+Squad 1: mine @ TA36-B9
+   A MINING_DRONE TA36-B9 7/15
+   C SURVEYOR TA36-B9 
+   E MINING_DRONE TA36-B9 10/15
+  10 MINING_DRONE TA36-B9 0/15
+root@ubuntu-s-2vcpu-4gb-sfo3-01:~/space_traders/packages/cli# dart run bin/fleet.dart
+Fleet: 1 Frigate, 1 Probe, 11 Light Freighter, 12 Drone
+1 command (trader) 40/40
+   FERTILIZERS              40 x 212c     = 8,480c
+   enroute to TA36-E44 MOON in 31s
+   FERTILIZERS                TA36-G48        178c -> TA36-E44        212c   +1,216c (17%) 2m  10c/s   7,264c
+   duration: 2m
+2 probe (systemWatcher) SATELLITE 
+   enroute to TA36-H52 MOON in 57s
+3 trader (minerHauler) 47/80
+   ALUMINUM_ORE             47 x 20c      = 940c
+   Orbiting TA36-XE5F ENGINEERED_ASTEROID
+4 trader (minerHauler) 80/80
+   FUEL                      5 x 68c      = 340c
+   SILICON_CRYSTALS         34 x 47c      = 1,598c
+   COPPER_ORE                2 x 22c      = 44c
+   IRON_ORE                 27 x 23c      = 621c
+   QUARTZ_SAND              12 x 19c      = 228c
+   enroute to TA36-B7 ASTEROID_BASE in 1m
+5 trader (minerHauler) 0/80
+   Orbiting TA36-XE5F ENGINEERED_ASTEROID

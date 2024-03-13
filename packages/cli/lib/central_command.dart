@@ -580,15 +580,18 @@ class CentralCommand {
   ) async {
     // await caches.updateRoutingCaches();
 
-    final marketListings = await MarketListingSnapshot.load(db);
     final ships = await ShipSnapshot.load(db);
-    final shipyardListings = await ShipyardListingSnapshot.load(db);
-    final charting = await ChartingSnapshot.load(db);
-
+    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(ships);
     // A hack to advance the global config to the construction phase.
-    if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) > 10) {
+    if (_haveEscapedStartingSystem) {
+      config = Config(GamePhase.exploration);
+    } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 10) {
       config = Config(GamePhase.construction);
     }
+
+    final marketListings = await MarketListingSnapshot.load(db);
+    final shipyardListings = await ShipyardListingSnapshot.load(db);
+    final charting = await ChartingSnapshot.load(db);
 
     _assignedSystemsForSatellites
       ..clear()
@@ -637,8 +640,6 @@ class CentralCommand {
         activeConstruction!,
       );
     }
-
-    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(ships);
   }
 
   /// Returns the next ship buy job.

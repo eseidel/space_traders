@@ -82,7 +82,7 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
-    for (int i = 0; i < 13; i++) ShipType.LIGHT_HAULER,
+    for (int i = 0; i < 7; i++) ShipType.LIGHT_HAULER,
   ];
 
   final _explorationShips = [
