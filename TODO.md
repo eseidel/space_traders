@@ -1403,3 +1403,45 @@ Fleet: 1 Frigate, 1 Probe, 11 Light Freighter, 12 Drone
    enroute to TA36-B7 ASTEROID_BASE in 1m
 5 trader (minerHauler) 0/80
    Orbiting TA36-XE5F ENGINEERED_ASTEROID
+
+### Add support for Burn to nav planning.
+
+### Add "upcycle" behavior for buying and selling probes at same market.
+
+Whenever you're at a shipyard which sells your same kind of ship for less than
+the cost of scrap.  Buy a new ship of your type and scrap yourself.
+
+### Fix refueling from cargo logs:
+
+[WARN] REFUELING FROM CARGO
+🛸#12 trader    ⛽   0 FUEL               -100% -72c per   0 x      0c =     -0c -> 🏦 876,309c
+
+### Model condition changes locally from adverse events.
+
+### Record behavior timings somewhere.
+
+So we can answer questions like "how much time was the fleet idle", etc.
+
+### Suggestions for speeding up gate:
+https://discord.com/channels/792864705139048469/792864705139048472/1217412921882050611
+
+### Server error?
+
+[WARN] 🛸#8  siphoner  late 4s
+🛸#8  siphoner  ✈️  to TA36-C37, -4s left
+🛸#8  siphoner  ⛽   1 FUEL                +15% +11c per   1 x     83c =    -83c -> 🏦 447,038c
+🛸#8  siphoner  🤝   5 LIQUID_HYDROGEN     -94% -30c per   5 x      2c =    +10c -> 🏦 447,048c
+🛸#8  siphoner  Beginning route to TA36-C36 (23s)
+Unhandled exception:
+ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-TA36-C37 to X1-TA36-C36 and arrives in 26 seconds.","code":4214,"data":{"departureSymbol":"X1-TA36-C37","destinationSymbol":"X1-TA36-C36","arrival":"2024-03-13T20:43:44.935Z","departureTime":"2024-03-13T20:43:17.935Z","secondsToArrival":26}}}
+#0      FleetApi.navigateShip (package:openapi/api/fleet_api.dart:1402:7)
+<asynchronous suspension>
+#1      navigateShip (package:cli/net/direct.dart:57:18)
+<asynchronous suspension>
+#2      navigateToLocalWaypoint (package:cli/net/actions.dart:54:18)
+<asynchronous suspension>
+#3      navigateToLocalWaypointAndLog (package:cli/net/actions.dart:504:18)
+<asynchronous suspension>
+#4      continueNavigationIfNeeded (package:cli/nav/navigation.dart:362:9)
+
+### Teach supply chain to draw IRON from multiple sources if available?

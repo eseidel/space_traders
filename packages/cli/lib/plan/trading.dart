@@ -665,7 +665,7 @@ Future<MarketTrip?> findBestMarketToSell(
           '${creditsString(extraEarnings)} extra '
           '(${creditsString(-extraFuelCost)} for fuel) '
           'for ${approximateDuration(extraTime)} '
-          '($earningsPerSecond/s)');
+          '(${earningsPerSecond.toStringAsFixed(1)}/s)');
     }
     printCount--;
   }

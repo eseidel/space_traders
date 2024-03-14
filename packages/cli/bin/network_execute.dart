@@ -124,7 +124,7 @@ class NetExecutor {
         continue;
       }
       if (response.statusCode >= 500) {
-        logger.err('Server error ${response.statusCode}.');
+        logger.err('Server error ${response.statusCode} from $path');
         if (serverErrorRetryLimit-- > 0) {
           continue;
         }
