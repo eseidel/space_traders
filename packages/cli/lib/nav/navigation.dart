@@ -358,15 +358,26 @@ Future<NavResult> continueNavigationIfNeeded(
           }
         }
       }
-      return NavResult._wait(
-        await navigateToLocalWaypointAndLog(
+      final DateTime waitUntil;
+      try {
+        waitUntil = await navigateToLocalWaypointAndLog(
           db,
           api,
           caches.systems,
           ship,
           actionEnd,
-        ),
-      );
+        );
+      } on ApiException catch (e) {
+        if (isShipInTransitException(e)) {
+          shipErr(ship, 'Ship is in transit, cannot navigate');
+          throw const JobException(
+            'Already in transit!?',
+            Duration(minutes: 10),
+          );
+        }
+        rethrow;
+      }
+      return NavResult._wait(waitUntil);
     case RouteActionType.navDrift:
       return NavResult._wait(
         await navigateToLocalWaypointAndLog(

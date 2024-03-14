@@ -197,3 +197,13 @@ int? neededCreditsFromPurchaseShipException(ApiException e) {
 bool isConstructionRequirementsMet(ApiException e) {
   return isAPIExceptionWithCode(e, 4801);
 }
+
+// ApiException 400: {"error":{"message":"Ship is currently in-transit from
+// X1-TA36-C36 to X1-TA36-C37 and arrives in 26 seconds.","code":4214,
+// "data":{"departureSymbol":"X1-TA36-C36","destinationSymbol":"X1-TA36-C37",
+// "arrival":"2024-03-14T03:15:02.404Z","departureTime":
+// "2024-03-14T03:14:35.404Z","secondsToArrival":26}}}
+/// Returns true if the exception is a ship in transit exception.
+bool isShipInTransitException(ApiException e) {
+  return isAPIExceptionWithCode(e, 4214);
+}
