@@ -226,6 +226,7 @@ void main() {
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => centralCommand.medianAntimatterPurchasePrice).thenReturn(10000);
 
     final singleJumpResult = await runWithLogger(
       logger,

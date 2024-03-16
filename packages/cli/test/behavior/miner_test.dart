@@ -219,6 +219,8 @@ void main() {
       ),
     );
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(const SystemSymbol.fallbackValue());
+    when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
     final waitUntil = await runWithLogger(
       logger,
@@ -368,6 +370,8 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
+    registerFallbackValue(const SystemSymbol.fallbackValue());
+    when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
     expect(
       () async => await travelAndSellCargo(
@@ -676,6 +680,10 @@ void main() {
         extractionType: ExtractionType.mine,
       );
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => db.medianMarketPurchasePrice(any()))
+        .thenAnswer((_) async => 100);
+    when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
 

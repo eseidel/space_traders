@@ -447,6 +447,14 @@ class Database {
     return queryMany(allMarketPricesQuery(), marketPriceFromColumnMap);
   }
 
+  /// Get all market prices within the given system.
+  Future<Iterable<MarketPrice>> marketPricesInSystem(
+    SystemSymbol system,
+  ) async {
+    final query = marketPricesInSystemQuery(system);
+    return queryMany(query, marketPriceFromColumnMap);
+  }
+
   /// Add a market price to the database.
   Future<void> upsertMarketPrice(MarketPrice price) async {
     await execute(upsertMarketPriceQuery(price));
@@ -462,8 +470,8 @@ class Database {
   }
 
   /// Get the median purchase price for the given trade symbol.
-  Future<int?> medianPurchasePrice(TradeSymbol tradeSymbol) async {
-    final query = medianPurchasePriceQuery(tradeSymbol);
+  Future<int?> medianMarketPurchasePrice(TradeSymbol tradeSymbol) async {
+    final query = medianMarketPurchasePriceQuery(tradeSymbol);
     final result = await execute(query);
     return result[0][0] as int?;
   }

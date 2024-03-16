@@ -337,6 +337,8 @@ Iterable<CostedDeal> findDealsFor(
   required WaypointSymbol startSymbol,
   required ShipSpec shipSpec,
   required int maxTotalOutlay,
+  required int costPerAntimatterUnit,
+  required int costPerFuelUnit,
   List<SellOpp>? extraSellOpps,
   bool Function(Deal deal)? filter,
   int minProfitPerSecond = 0,
@@ -367,14 +369,6 @@ Iterable<CostedDeal> findDealsFor(
     logger.detail('No deals $withinRange.');
     return [];
   }
-
-  // Computing the median price currently requires walking all prices,
-  // do do it once and cache it for each call to costOutDeal.
-  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
-      config.defaultFuelCost;
-  final costPerAntimatterUnit =
-      marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
-          config.defaultAntimatterCost;
 
   final before = DateTime.timestamp();
   final costedDeals = filtered
@@ -714,6 +708,8 @@ Iterable<CostedDeal> scanAndFindDeals(
   required WaypointSymbol startSymbol,
   required int maxTotalOutlay,
   required ShipSpec shipSpec,
+  required int costPerFuelUnit,
+  required int costPerAntimatterUnit,
   bool Function(Deal)? filter,
   List<SellOpp>? extraSellOpps,
   int minProfitPerSecond = 0,
@@ -735,5 +731,7 @@ Iterable<CostedDeal> scanAndFindDeals(
     startSymbol: startSymbol,
     shipSpec: shipSpec,
     minProfitPerSecond: minProfitPerSecond,
+    costPerAntimatterUnit: costPerAntimatterUnit,
+    costPerFuelUnit: costPerFuelUnit,
   );
 }

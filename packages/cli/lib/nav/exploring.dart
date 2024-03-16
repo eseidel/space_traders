@@ -36,15 +36,16 @@ Future<Market?> visitLocalMarket(
     getNow: getNow,
   );
   if (ship.usesFuel) {
+    final medianFuelPurchasePrice =
+        await db.medianMarketPurchasePrice(TradeSymbol.FUEL);
     try {
-      final median = caches.marketPrices.medianPurchasePrice(TradeSymbol.FUEL);
       await refuelIfNeededAndLog(
         api,
         db,
         caches.agent,
         market,
         ship,
-        medianFuelPurchasePrice: median,
+        medianFuelPurchasePrice: medianFuelPurchasePrice,
       );
     } on ApiException catch (e) {
       shipErr(ship, 'Failed to refuel: $e');

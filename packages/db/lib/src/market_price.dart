@@ -4,6 +4,13 @@ import 'package:types/types.dart';
 /// Get all market prices.
 Query allMarketPricesQuery() => const Query('SELECT * FROM market_price_');
 
+/// Get all market prices with a given system symbol.
+Query marketPricesInSystemQuery(SystemSymbol symbol) => Query(
+      'SELECT * FROM market_price_ '
+      'WHERE waypoint_symbol LIKE @symbol_pattern',
+      parameters: {'symbol_pattern': '${symbol.toJson()}%'},
+    );
+
 /// Query to upsert a market price.
 Query upsertMarketPriceQuery(MarketPrice price) => Query(
       '''
@@ -67,7 +74,7 @@ Query marketPriceQuery(WaypointSymbol waypoint, TradeSymbol trade) => Query(
     );
 
 /// Query to get the median purchase price for a trade symbol.
-Query medianPurchasePriceQuery(TradeSymbol trade) => Query(
+Query medianMarketPurchasePriceQuery(TradeSymbol trade) => Query(
       '''
       SELECT percentile_disc(0.5)
       WITHIN GROUP (ORDER BY purchase_price)

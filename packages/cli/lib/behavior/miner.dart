@@ -267,10 +267,13 @@ Future<JobResult> doMineJob(
     return JobResult.wait(expiration);
   }
 
+  final marketPrices =
+      await MarketPriceSnapshot.loadOneSystem(db, ship.systemSymbol);
+
   // See if we have a good survey to mine.
   final worthMining = await surveysWorthMining(
     db,
-    caches.marketPrices,
+    marketPrices,
     surveyWaypointSymbol: ship.waypointSymbol,
     marketForGood: mineJob.marketForGood,
     minimumSurveys: centralCommand.minimumSurveys,
@@ -377,10 +380,13 @@ Future<JobResult> emptyCargoIfNeeded(
     getNow: getNow,
   );
   if (currentMarket != null) {
+    final marketPrices =
+        await MarketPriceSnapshot.loadOneSystem(db, ship.systemSymbol);
+
     await sellAllCargoAndLog(
       api,
       db,
-      caches.marketPrices,
+      marketPrices,
       caches.agent,
       currentMarket,
       ship,
@@ -468,10 +474,15 @@ Future<JobResult> travelAndSellCargo(
     return JobResult.complete();
   }
 
+  // Could be "nearby" systems but marketsTradingSortedByDistance is currently
+  // restricted to this system.
+  final marketPrices =
+      await MarketPriceSnapshot.loadOneSystem(db, ship.systemSymbol);
+
   final costedTrip = assertNotNull(
     await findBestMarketToSell(
       db,
-      caches.marketPrices,
+      marketPrices,
       caches.routePlanner,
       ship,
       largestCargo.tradeSymbol,
@@ -515,7 +526,7 @@ Future<JobResult> travelAndSellCargo(
   await sellAllCargoAndLog(
     api,
     db,
-    caches.marketPrices,
+    marketPrices,
     caches.agent,
     currentMarket,
     ship,

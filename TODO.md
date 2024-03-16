@@ -1329,7 +1329,7 @@ How does it end up with a second buy job?
 🛸#1  Beginning route to AQ24-G48 (2m)
 🛸#1  🛫 to AQ24-G48 PLANET (2m) spent 94 fuel
 
-### Assign unsused probes.
+### Assign unused probes.
 
 Each system can have "slots" based on the number of connected systems without charts.
 Assign up to half the slots?

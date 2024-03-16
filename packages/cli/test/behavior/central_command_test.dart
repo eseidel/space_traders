@@ -539,25 +539,11 @@ void main() {
     when(() => caches.agent.headquartersSystemSymbol)
         .thenReturn(hqSystemSymbol);
     when(() => caches.systems.waypointsInSystem(hqSystemSymbol)).thenReturn([]);
-    // when(() => caches.shipyardPrices.prices).thenReturn([]);
-    // when(() => caches.shipyardPrices.pricesFor(ShipType.ORE_HOUND))
-    //     .thenReturn([]);
     registerFallbackValue(ShipType.ORE_HOUND);
-    // when(() => caches.shipyardPrices.havePriceFor(any())).thenReturn(true);
-    // when(() => caches.shipyardPrices.pricesFor(any())).thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => db.knowOfMarketWhichTrades(any()))
         .thenAnswer((_) async => false);
-    // when(() => caches.ships.countOfFrame(ShipFrameSymbolEnum.MINER))
-    //     .thenReturn(0);
-
-    // when(
-    //   () => caches.ships.countOfType(
-    //     caches.static.shipyardShips,
-    //     ShipType.LIGHT_SHUTTLE,
-    //   ),
-    // ).thenReturn(0);
     when(() => caches.agent.headquarters(caches.systems)).thenReturn(
       SystemWaypoint.test(hqSymbol),
     );
@@ -580,6 +566,8 @@ void main() {
         .thenAnswer((_) async => null);
 
     when(db.allChartingRecords).thenAnswer((_) async => <ChartingRecord>[]);
+    when(() => db.medianMarketPurchasePrice(any()))
+        .thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     await runWithLogger(

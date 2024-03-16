@@ -282,6 +282,8 @@ void main() {
         maxTotalOutlay: 100000,
         startSymbol: ship.waypointSymbol,
         shipSpec: ship.shipSpec,
+        costPerAntimatterUnit: 10000,
+        costPerFuelUnit: 100,
       ).firstOrNull,
     );
     expect(costed, isNotNull);

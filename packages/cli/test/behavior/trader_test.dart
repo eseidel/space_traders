@@ -485,6 +485,9 @@ void main() {
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => db.medianMarketPurchasePrice(any()))
+        .thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1027,6 +1030,9 @@ void main() {
 
     when(() => db.hasRecentMarketPrices(end, any()))
         .thenAnswer((_) async => true);
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => db.medianMarketPurchasePrice(any()))
+        .thenAnswer((_) async => 100);
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
@@ -1231,6 +1237,9 @@ void main() {
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => db.medianMarketPurchasePrice(any()))
+        .thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1422,6 +1431,9 @@ void main() {
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => db.medianMarketPurchasePrice(any()))
+        .thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(

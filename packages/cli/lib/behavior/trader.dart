@@ -512,7 +512,7 @@ Future<int?> _expectedContractProfit(
   final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();
   final medianPricesBySymbol = <TradeSymbol, int>{};
   for (final tradeSymbol in tradeSymbols) {
-    final medianPrice = await db.medianPurchasePrice(tradeSymbol);
+    final medianPrice = await db.medianMarketPurchasePrice(tradeSymbol);
     if (medianPrice == null) {
       return null;
     }

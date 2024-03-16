@@ -40,7 +40,7 @@ Future<JobResult> goWaitForGoods(
   );
   final currentSellsFuel = await _sellsFuel(db, ship.waypointSymbol);
   final medianFuelPurchasePrice =
-      await db.medianPurchasePrice(TradeSymbol.FUEL);
+      await db.medianMarketPurchasePrice(TradeSymbol.FUEL);
 
   if (ship.waypointSymbol != mineSymbol) {
     final mineSellsFuel = await _sellsFuel(db, mineSymbol);

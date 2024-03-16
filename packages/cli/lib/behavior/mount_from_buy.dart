@@ -4,12 +4,27 @@ import 'package:cli/behavior/jobs/mount_job.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/plan/trading.dart';
+import 'package:collection/collection.dart';
 import 'package:types/types.dart';
+
+/// Compute the nearest shipyard to the given start.
+Future<ShipyardListing?> nearestShipyard(
+  RoutePlanner routePlanner,
+  ShipyardListingSnapshot shipyards,
+  WaypointSymbol start,
+) async {
+  final listings = shipyards.listingsInSystem(start.system);
+  // TODO(eseidel): Sort by distance.
+  // TODO(eseidel): Consider reachable systems not just this one.
+  return listings.firstOrNull;
+}
 
 /// Compute a mount request for the given ship and template.
 Future<MountRequest?> mountRequestForShip(
   CentralCommand centralCommand,
-  Caches caches,
+  MarketPriceSnapshot marketPrices,
+  RoutePlanner routePlanner,
+  ShipyardListingSnapshot shipyards,
   Ship ship,
   ShipTemplate template, {
   required int expectedCreditsPerSecond,
@@ -20,8 +35,8 @@ Future<MountRequest?> mountRequestForShip(
   }
   final buyJob = buyJobForMount(
     needed,
-    caches.marketPrices,
-    caches.routePlanner,
+    marketPrices,
+    routePlanner,
     ship,
     expectedCreditsPerSecond: expectedCreditsPerSecond,
   );
@@ -32,7 +47,7 @@ Future<MountRequest?> mountRequestForShip(
 
   // Shouldn't be null after buyJob comes back non-null.  We could add a
   // budget to BuyJob instead, that might be better?
-  final buyCost = caches.marketPrices.recentPurchasePrice(
+  final buyCost = marketPrices.recentPurchasePrice(
     buyJob.tradeSymbol,
     marketSymbol: buyJob.buyLocation,
   );
@@ -46,15 +61,16 @@ Future<MountRequest?> mountRequestForShip(
   const mountCost = 100000;
   final creditsNeeded = buyCost + mountCost;
 
-  // TODO(eseidel): Use a nearestShipyard function.
-  final hqSystem = caches.agent.headquartersSystemSymbol;
-  final hqWaypoints = await caches.waypoints.waypointsInSystem(hqSystem);
-  final shipyard = hqWaypoints.firstWhere((w) => w.hasShipyard);
+  final shipyard =
+      await nearestShipyard(routePlanner, shipyards, ship.waypointSymbol);
+  if (shipyard == null) {
+    return null;
+  }
   return MountRequest(
     shipSymbol: ship.symbol,
     mountSymbol: mountSymbol,
     marketSymbol: buyJob.buyLocation,
-    shipyardSymbol: shipyard.symbol,
+    shipyardSymbol: shipyard.waypointSymbol,
     creditsNeeded: creditsNeeded,
   );
 }

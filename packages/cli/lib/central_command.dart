@@ -68,6 +68,12 @@ class CentralCommand {
   /// The current behavior timeouts.
   final BehaviorTimeouts behaviorTimeouts;
 
+  /// median purchase price for fuel.
+  int medianFuelPurchasePrice = config.defaultFuelCost;
+
+  /// median purchase price for antimatter.
+  int medianAntimatterPurchasePrice = config.defaultAntimatterCost;
+
   /// Sets the available mounts for testing.
   @visibleForTesting
   void setAvailableMounts(Iterable<ShipMountSymbolEnum> mounts) {
@@ -335,6 +341,13 @@ class CentralCommand {
         '@ ${creditsString(opp.price)} -> ${opp.waypointSymbol}',
       );
     }
+    final costPerFuelUnit =
+        marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
+            config.defaultFuelCost;
+    final costPerAntimatterUnit =
+        marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
+            config.defaultAntimatterCost;
+
     final deals = scanAndFindDeals(
       systemsCache,
       systemConnectivity,
@@ -351,6 +364,8 @@ class CentralCommand {
               d.sourceSymbol.system == restrictToStartSystem;
         },
       ),
+      costPerAntimatterUnit: costPerAntimatterUnit,
+      costPerFuelUnit: costPerFuelUnit,
     );
 
     // A hack to avoid spamming the console until we add a deals cache.
@@ -484,7 +499,9 @@ class CentralCommand {
 
   Future<void> _queueMountRequests(
     Database db,
-    Caches caches,
+    RoutePlanner routePlanner,
+    ShipyardListingSnapshot shipyardListings,
+    MarketPriceSnapshot marketPrices,
     ShipSnapshot ships,
   ) async {
     for (final ship in ships.ships) {
@@ -503,7 +520,9 @@ class CentralCommand {
       final expectedCreditsPerSecond = this.expectedCreditsPerSecond(ship);
       final request = await mountRequestForShip(
         this,
-        caches,
+        marketPrices,
+        routePlanner,
+        shipyardListings,
         ship,
         template,
         expectedCreditsPerSecond: expectedCreditsPerSecond,
@@ -571,6 +590,19 @@ class CentralCommand {
     return systemSymbols.length > 1;
   }
 
+  Future<void> _updateMedianPrices(Database db) async {
+    final medianFuelPrice =
+        await db.medianMarketPurchasePrice(TradeSymbol.FUEL);
+    if (medianFuelPrice != null) {
+      medianFuelPurchasePrice = medianFuelPrice;
+    }
+    final medianAntimatterPrice =
+        await db.medianMarketPurchasePrice(TradeSymbol.ANTIMATTER);
+    if (medianAntimatterPrice != null) {
+      medianAntimatterPurchasePrice = medianAntimatterPrice;
+    }
+  }
+
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(
@@ -592,6 +624,8 @@ class CentralCommand {
     final marketListings = await MarketListingSnapshot.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
     final charting = await ChartingSnapshot.load(db);
+
+    await _updateMedianPrices(db);
 
     _assignedSystemsForSatellites
       ..clear()
@@ -621,7 +655,13 @@ class CentralCommand {
     // Mounts are currently only used for mining.
     if (config.enableMining) {
       await updateAvailableMounts(db);
-      await _queueMountRequests(db, caches, ships);
+      await _queueMountRequests(
+        db,
+        caches.routePlanner,
+        shipyardListings,
+        caches.marketPrices,
+        ships,
+      );
     }
 
     activeConstruction = await computeActiveConstruction(

@@ -4,7 +4,6 @@ import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/trading.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final marketPrices = await MarketPriceSnapshot.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsCache(
@@ -16,6 +15,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final ship = ships.ships.first;
   const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
+  // Should this only load one system?
+  final marketPrices = await MarketPriceSnapshot.loadAll(db);
 
   final best = findBestMarketToBuy(
     marketPrices,

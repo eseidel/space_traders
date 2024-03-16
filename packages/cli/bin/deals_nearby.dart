@@ -1,6 +1,7 @@
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/plan/trading.dart';
@@ -24,7 +25,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
-  final marketPrices = await MarketPriceSnapshot.load(db);
+  final marketPrices = await MarketPriceSnapshot.loadAll(db);
 
   final agentCache = await AgentCache.load(db);
   final contractSnapshot = await ContractSnapshot.load(db);
@@ -104,6 +105,12 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     startSystem: start.system,
   );
   logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
+  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
+      config.defaultFuelCost;
+  final costPerAntimatterUnit =
+      marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
+          config.defaultAntimatterCost;
+
   final deals = findDealsFor(
     marketPrices,
     systemsCache,
@@ -113,6 +120,8 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     shipSpec: shipSpec,
     startSymbol: start.symbol,
     extraSellOpps: extraSellOpps,
+    costPerAntimatterUnit: costPerAntimatterUnit,
+    costPerFuelUnit: costPerFuelUnit,
   );
 
   if (deals.isEmpty) {

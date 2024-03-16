@@ -46,7 +46,7 @@ Future<int> computeShipValue(
 
 Future<Assets> computeAssets(FileSystem fs, Database db) async {
   final ships = await ShipSnapshot.load(db);
-  final marketPrices = await MarketPriceSnapshot.load(db);
+  final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
 

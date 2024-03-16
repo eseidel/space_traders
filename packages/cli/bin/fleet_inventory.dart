@@ -8,7 +8,7 @@ Future<void> main(List<String> args) async {
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
-  final marketPrices = await MarketPriceSnapshot.load(db);
+  final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final countByTradeSymbol = <TradeSymbol, int>{};
   for (final ship in ships.ships) {
     final inventory = ship.cargo.inventory;
@@ -23,6 +23,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     (total, entry) {
       final symbol = entry.key;
       final count = entry.value;
+      // TODO(eseidel): Add a medianSellPrice to Database.
       final price = marketPrices.medianSellPrice(symbol);
       if (price == null) {
         logger.warn('No price for $symbol');

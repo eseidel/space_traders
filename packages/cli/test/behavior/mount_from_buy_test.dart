@@ -27,6 +27,11 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
+class _MockShipyardListingSnapshot extends Mock
+    implements ShipyardListingSnapshot {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(ShipSpec.fallbackValue());
@@ -243,6 +248,9 @@ void main() {
         shipyardSymbol: waypointSymbol,
       );
     when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(() => db.medianMarketPurchasePrice(any()))
+        .thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     expect(
@@ -276,11 +284,13 @@ void main() {
     final cargo = ShipCargo(capacity: 100, units: 0);
     when(() => ship.cargo).thenReturn(cargo);
     when(() => ship.modules).thenReturn([]);
+    final routePlanner = _MockRoutePlanner();
 
     final centralCommand = _MockCentralCommand();
     final caches = mockCaches();
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => caches.marketPrices.pricesFor(any())).thenReturn([]);
+    final shipyardListings = _MockShipyardListingSnapshot();
 
     final template = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.CARRIER,
@@ -292,7 +302,9 @@ void main() {
 
     final request = await mountRequestForShip(
       centralCommand,
-      caches,
+      caches.marketPrices,
+      routePlanner,
+      shipyardListings,
       ship,
       template,
       expectedCreditsPerSecond: 7,

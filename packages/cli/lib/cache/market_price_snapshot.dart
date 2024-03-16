@@ -125,8 +125,17 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
   MarketPriceSnapshot(super.records);
 
   /// Load the price data from the cache.
-  static Future<MarketPriceSnapshot> load(Database db) async {
+  static Future<MarketPriceSnapshot> loadAll(Database db) async {
     final prices = await db.allMarketPrices();
+    return MarketPriceSnapshot(prices.toList());
+  }
+
+  /// Load the price data for a single system from the cache.
+  static Future<MarketPriceSnapshot> loadOneSystem(
+    Database db,
+    SystemSymbol system,
+  ) async {
+    final prices = await db.marketPricesInSystem(system);
     return MarketPriceSnapshot(prices.toList());
   }
 

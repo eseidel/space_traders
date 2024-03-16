@@ -255,16 +255,13 @@ Future<NavResult> continueNavigationIfNeeded(
     case RouteActionType.jump:
       final JumpShip200ResponseData response;
       try {
-        final median = caches.marketPrices.medianPurchasePrice(
-          TradeSymbol.ANTIMATTER,
-        );
         response = await useJumpGateAndLog(
           api,
           db,
           caches.agent,
           ship,
           actionEnd.symbol,
-          medianAntimatterPrice: median,
+          medianAntimatterPrice: centralCommand.medianAntimatterPurchasePrice,
         );
       } on ApiException catch (e) {
         if (!isInsufficientCreditsException(e)) {
@@ -303,14 +300,13 @@ Future<NavResult> continueNavigationIfNeeded(
         shipErr(ship, 'No market at ${ship.waypointSymbol}, cannot refuel');
         return NavResult._continueAction();
       }
-      final median = caches.marketPrices.medianPurchasePrice(TradeSymbol.FUEL);
       await refuelIfNeededAndLog(
         api,
         db,
         caches.agent,
         market,
         ship,
-        medianFuelPurchasePrice: median,
+        medianFuelPurchasePrice: centralCommand.medianFuelPurchasePrice,
       );
       // TODO(eseidel): This should be loop, but that can't work because we
       // can't figure out which action to do next when we do multiple actions
@@ -334,15 +330,13 @@ Future<NavResult> continueNavigationIfNeeded(
             ship,
           );
           if (market != null) {
-            final median =
-                caches.marketPrices.medianPurchasePrice(TradeSymbol.FUEL);
             await refuelIfNeededAndLog(
               api,
               db,
               caches.agent,
               market,
               ship,
-              medianFuelPurchasePrice: median,
+              medianFuelPurchasePrice: centralCommand.medianFuelPurchasePrice,
             );
           } else {
             // TODO(eseidel): Make this throw once we're better about fuel.

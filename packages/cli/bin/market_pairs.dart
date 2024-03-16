@@ -26,9 +26,9 @@ int? distanceBetween(
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs)!;
   final hqSystem = await myHqSystemSymbol(db);
+  final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
+  // TODO(eseidel): Add loadOneSystem to MarketListingSnapshot.
   final marketListings = await MarketListingSnapshot.load(db);
-  final marketPrices = await MarketPriceSnapshot.load(db);
-
   final listings = marketListings.listings
       .where((l) => l.waypointSymbol.system == hqSystem)
       .toList();

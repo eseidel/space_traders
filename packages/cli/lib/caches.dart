@@ -67,6 +67,7 @@ class Caches {
   final AgentCache agent;
 
   /// The historical market price data.
+  // TODO(eseidel): Remove this (need to fix trader.dart first).
   MarketPriceSnapshot marketPrices;
 
   /// The cache of systems.
@@ -113,7 +114,7 @@ class Caches {
     await fetchContracts(db, api);
 
     final agent = await AgentCache.loadOrFetch(db, api);
-    final marketPrices = await MarketPriceSnapshot.load(db);
+    final marketPrices = await MarketPriceSnapshot.loadAll(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     final static = StaticCaches.load(fs);
     final charting = ChartingCache(db);
@@ -233,7 +234,7 @@ class TopOfLoopUpdater {
     }
 
     // Should all be deleted from Caches.
-    caches.marketPrices = await MarketPriceSnapshot.load(db);
+    caches.marketPrices = await MarketPriceSnapshot.loadAll(db);
   }
 }
 
