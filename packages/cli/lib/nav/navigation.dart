@@ -245,6 +245,12 @@ Future<NavResult> continueNavigationIfNeeded(
       const Duration(minutes: 5),
     );
   }
+  // jobAssert(
+  //   ship.engine.condition > 0,
+  //   'Engine is broken',
+  //   const Duration(hours: 1),
+  // );
+
   final actionEnd = caches.systems.waypoint(action.endSymbol);
   // All navigation actions require being un-docked, but the action functions
   // will handle that for us.
