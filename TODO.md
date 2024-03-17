@@ -1445,3 +1445,26 @@ ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-TA36
 #4      continueNavigationIfNeeded (package:cli/nav/navigation.dart:362:9)
 
 ### Teach supply chain to draw IRON from multiple sources if available?
+
+### Add Burn planning.
+
+### Why drift?
+
+Maybe pass the amount of fuel next to be used to the refuel command?  Or make it always just spill?
+
+🛸#1  command   ✈️  to JG3-E47, -6ms left
+🛸#1  command   ✍️  market data @ JG3-E47
+🛸#1  command   ⛽   1 FUEL                           ⚖️    1 x     72c =    -72c -> 🏦 2,126,063c
+🛸#1  command   Starting: JG3-E47 to TA36-A1 speed: 30 max-fuel: 400
+navCruise       JG3-E47  JG3-I55 6m 399 fuel
+jump            JG3-I55  TA36-I54 0ms 0 fuel
+navCruise       TA36-I54  TA36-I55 3m 225 fuel
+refuel          TA36-I55  TA36-I55 0ms 0 fuel
+navCruise       TA36-I55  TA36-A1 3m 220 fuel
+in 12m uses 844 fuel
+
+[WARN] 🛸#1  command   Beginning route to TA36-A1 (12m)
+🛸#1  command   Setting flightMode to DRIFT
+🛸#1  command   Insufficient fuel, drifting to JG3-I55
+🛸#1  command   🛫 to JG3-I55 JUMP_GATE (1h) spent 1 fuel
+[WARN] 🛸#1  command   Flight time 01:04:08 does not match predicted 00:55:40 speed: 30 mode: DRIFT distance: 398.8984833262719
