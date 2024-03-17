@@ -81,13 +81,10 @@ void main() {
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any()))
-        .thenAnswer((_) => Future.value());
+    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
     when(() => caches.waypoints.waypointsInSystem(symbol.system))
-        .thenAnswer((_) => Future.value([]));
-    // when(() => caches.ships.ships).thenReturn([ship]);
-    // when(() => caches.ships.frameCounts).thenReturn({});
+        .thenAnswer((_) async => []);
 
     const shipType = ShipType.HEAVY_FREIGHTER;
     final state = BehaviorState(shipSymbol, Behavior.buyShip)
@@ -152,13 +149,12 @@ void main() {
     ).thenReturn(route);
 
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
 
     registerFallbackValue(ShipyardListing.fallbackValue());
-    when(() => db.upsertShipyardListing(any()))
-        .thenAnswer((_) => Future.value());
+    when(() => db.upsertShipyardListing(any())).thenAnswer((_) async {});
     registerFallbackValue(Ship.fallbackValue());
-    when(() => db.upsertShip(any())).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(any())).thenAnswer((_) async {});
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
     registerFallbackValue(ShipyardListingSnapshot([]));

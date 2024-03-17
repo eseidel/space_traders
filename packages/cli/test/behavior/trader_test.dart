@@ -157,8 +157,7 @@ void main() {
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any()))
-        .thenAnswer((_) => Future.value());
+    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
     final state = BehaviorState(shipSymbol, Behavior.trader);
 
@@ -191,14 +190,14 @@ void main() {
       ),
     );
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     registerFallbackValue(BehaviorSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
     when(() => centralCommand.otherTraderSystems(any(), any(), shipSymbol))
         .thenReturn([]);
     when(db.allShips).thenAnswer((_) async => []);
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     when(() => caches.marketPrices.prices).thenReturn([]);
 
@@ -371,8 +370,7 @@ void main() {
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any()))
-        .thenAnswer((_) => Future.value());
+    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
     final transaction = MarketTransaction(
       pricePerUnit: 100,
@@ -483,8 +481,8 @@ void main() {
       ),
     ).thenReturn(routePlan);
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => db.medianMarketPurchasePrice(any()))
         .thenAnswer((_) async => 100);
@@ -720,7 +718,7 @@ void main() {
     ).thenReturn([]);
 
     when(db.allBehaviorStates).thenAnswer((_) async => []);
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -931,7 +929,7 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1226,17 +1224,16 @@ void main() {
 
     when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any()))
-        .thenAnswer((_) => Future.value());
+    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => db.medianMarketPurchasePrice(any()))
         .thenAnswer((_) async => 100);
@@ -1421,7 +1418,7 @@ void main() {
     when(() => caches.agent.agent).thenReturn(agent);
 
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
 
     when(caches.construction.allRecords).thenAnswer((_) async => []);
     when(
@@ -1430,7 +1427,7 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => db.medianMarketPurchasePrice(any()))
         .thenAnswer((_) async => 100);

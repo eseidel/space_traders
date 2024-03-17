@@ -113,7 +113,7 @@ void main() {
       ),
     );
     registerFallbackValue(ExtractionRecord.fallbackValue());
-    when(() => db.insertExtraction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertExtraction(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
@@ -149,7 +149,7 @@ void main() {
         remainingSeconds: 0,
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     final waitUntil = await runWithLogger(
       logger,

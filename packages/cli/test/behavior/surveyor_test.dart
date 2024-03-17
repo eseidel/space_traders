@@ -69,7 +69,7 @@ void main() {
 
     when(
       () => caches.waypoints.waypointsInSystem(waypointSymbol.system),
-    ).thenAnswer((_) => Future.value([]));
+    ).thenAnswer((_) async => []);
 
     when(() => fleetApi.createSurvey(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
@@ -93,7 +93,7 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

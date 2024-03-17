@@ -46,8 +46,7 @@ void main() {
     final agent = Agent.test();
     when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any()))
-        .thenAnswer((_) => Future.value());
+    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
@@ -142,7 +141,7 @@ void main() {
 
     when(
       () => caches.waypoints.waypointsInSystem(waypointSymbol.system),
-    ).thenAnswer((_) => Future.value([]));
+    ).thenAnswer((_) async => []);
 
     when(() => centralCommand.templateForShip(ship)).thenReturn(
       ShipTemplate(
@@ -221,7 +220,7 @@ void main() {
       ),
     );
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
 
     when(
       () => caches.routePlanner.planRoute(
@@ -247,7 +246,7 @@ void main() {
         mountSymbol: mountSymbolForTradeSymbol(toMount)!,
         shipyardSymbol: waypointSymbol,
       );
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => db.medianMarketPurchasePrice(any()))
         .thenAnswer((_) async => 100);

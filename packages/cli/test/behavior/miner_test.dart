@@ -40,7 +40,7 @@ void main() {
     final marketPrices = _MockMarketPrices();
     final symbol = WaypointSymbol.fromString('S-E-A');
     when(() => db.recentSurveysAtWaypoint(symbol, count: 100))
-        .thenAnswer((_) => Future.value([]));
+        .thenAnswer((_) async => []);
     final surveys = await surveysWorthMining(
       db,
       marketPrices,
@@ -180,9 +180,9 @@ void main() {
       ),
     );
     when(() => db.recentSurveysAtWaypoint(waypointSymbol, count: 100))
-        .thenAnswer((_) => Future.value([]));
+        .thenAnswer((_) async => []);
     registerFallbackValue(ExtractionRecord.fallbackValue());
-    when(() => db.insertExtraction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertExtraction(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
@@ -218,7 +218,7 @@ void main() {
         remainingSeconds: 0,
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(const SystemSymbol.fallbackValue());
     when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
@@ -483,8 +483,8 @@ void main() {
         ),
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
-    when(() => db.upsertShip(hauler)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.upsertShip(hauler)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
@@ -605,8 +605,7 @@ void main() {
     final fleetApi = _MockFleetApi();
     final agent = Agent.test();
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any()))
-        .thenAnswer((_) => Future.value());
+    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
     final transaction = MarketTransaction(
       tradeSymbol: tradeSymbol.value,
@@ -619,7 +618,7 @@ void main() {
       timestamp: now,
     );
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) => Future.value());
+    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(
@@ -670,8 +669,9 @@ void main() {
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
-    when(() => db.marketListingForSymbol(waypointSymbol))
-        .thenAnswer((_) => Future.value());
+    when(() => db.marketListingForSymbol(waypointSymbol)).thenAnswer((_) async {
+      return null;
+    });
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
       ..extractionJob = ExtractionJob(
@@ -679,7 +679,7 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
-    when(() => db.upsertShip(ship)).thenAnswer((_) => Future.value());
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(() => db.medianMarketPurchasePrice(any()))
         .thenAnswer((_) async => 100);
