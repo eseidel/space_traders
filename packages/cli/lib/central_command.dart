@@ -548,6 +548,30 @@ class CentralCommand {
     }
   }
 
+  Future<Construction?> _constructionForSystem(
+    Database db,
+    SystemsCache systems,
+    SystemSymbol systemSymbol,
+  ) async {
+    final jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
+    if (jumpGate == null) {
+      return null;
+    }
+    return await ConstructionCache(db).getConstruction(jumpGate.symbol);
+  }
+
+  // /// Returns true if the jumpgate for the given [systemSymbol] is complete.
+  // /// Returns null if we don't know.
+  // Future<bool?> isJumpgateComplete(
+  //   Database db,
+  //   SystemsCache systems,
+  //   SystemSymbol systemSymbol,
+  // ) async {
+  //   final construction =
+  //       await _constructionForSystem(db, systems, systemSymbol);
+  //   return construction?.isComplete;
+  // }
+
   /// Returns the active construction job, if any.
   Future<Construction?> computeActiveConstruction(
     Database db,
@@ -557,22 +581,14 @@ class CentralCommand {
     if (!isConstructionTradingEnabled) {
       return null;
     }
-
     if (agentCache.agent.credits < config.constructionMinCredits) {
       return null;
     }
 
     final systemSymbol = agentCache.headquartersSystemSymbol;
-    final jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
-    if (jumpGate == null) {
-      return null;
-    }
     final construction =
-        await ConstructionCache(db).getConstruction(jumpGate.symbol);
-    if (construction == null) {
-      return null;
-    }
-    if (construction.isComplete) {
+        await _constructionForSystem(db, systems, systemSymbol);
+    if (construction == null || construction.isComplete) {
       return null;
     }
     return construction;
@@ -615,11 +631,11 @@ class CentralCommand {
     final ships = await ShipSnapshot.load(db);
     _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(ships);
     // A hack to advance the global config to the construction phase.
-    if (_haveEscapedStartingSystem) {
-      config = Config(GamePhase.exploration);
-    } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 10) {
-      config = Config(GamePhase.construction);
-    }
+    // if (_haveEscapedStartingSystem) {
+    //   config = Config(GamePhase.exploration);
+    // } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 10) {
+    //   config = Config(GamePhase.construction);
+    // }
 
     final marketListings = await MarketListingSnapshot.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
