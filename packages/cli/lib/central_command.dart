@@ -619,6 +619,18 @@ class CentralCommand {
     }
   }
 
+  /// Creates a new buy ship job if needed.
+  Future<void> updateBuyShipJobIfNeeded(
+    Database db,
+    Api api,
+    Caches caches,
+    ShipyardListingSnapshot shipyardListings,
+    ShipSnapshot ships,
+  ) async {
+    _nextShipBuyJob ??=
+        await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
+  }
+
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(
@@ -665,8 +677,13 @@ class CentralCommand {
       miningSquads = [];
     }
 
-    _nextShipBuyJob ??=
-        await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
+    await updateBuyShipJobIfNeeded(
+      db,
+      api,
+      caches,
+      shipyardListings,
+      ships,
+    );
 
     // Mounts are currently only used for mining.
     if (config.enableMining) {
@@ -756,12 +773,13 @@ class CentralCommand {
   Future<ShipBuyJob?> _unreachableSystemProbe(
     Database db,
     Api api,
-    Caches caches,
+    AgentCache agentCache,
+    SystemConnectivity systemConnectivity,
     ShipyardListingSnapshot shipyardListings,
     ShipSnapshot ships,
   ) async {
     // Get our main cluster id.
-    final hqSystemSymbol = caches.agent.headquartersSystemSymbol;
+    final hqSystemSymbol = agentCache.headquartersSystemSymbol;
     // List all systems with explorers in them.
     final systemsWithExplorers = ships.ships
         .where((s) => s.fleetRole == FleetRole.explorer)
@@ -770,8 +788,7 @@ class CentralCommand {
     // Any system which is not in our main cluster id.
     final unreachableSystems = systemsWithExplorers
         .where(
-          (s) => caches.systemConnectivity
-              .existsJumpPathBetween(s, hqSystemSymbol),
+          (s) => systemConnectivity.existsJumpPathBetween(s, hqSystemSymbol),
         )
         .toSet();
     // And does not have a probe in it.
@@ -787,6 +804,7 @@ class CentralCommand {
     }
     const shipType = ShipType.PROBE;
     final systemSymbol = systemWithoutProbes.first;
+    // TODO(eseidel): This should be a db query.
     final shipyardSymbol = shipyardListings
         .listingsInSystem(systemSymbol)
         .firstWhereOrNull((s) => s.hasShip(shipType))
@@ -814,7 +832,8 @@ class CentralCommand {
     final unreachableProbeJob = await _unreachableSystemProbe(
       db,
       api,
-      caches,
+      caches.agent,
+      caches.systemConnectivity,
       shipyardListings,
       ships,
     );

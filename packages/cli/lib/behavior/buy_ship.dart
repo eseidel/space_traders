@@ -166,6 +166,19 @@ Future<JobResult> _doBuyShipJob(
   // Record our success!
   // Rate limiting for ship buying is done by CentralCommand.
   shipWarn(ship, 'Purchased ${result.ship.symbol} ($shipType)!');
+
+  // This is a bit of a hack, but lets us buy ships more often, otherwise
+  // we won't have a next job once this one is done.
+  final shipyardListings = await ShipyardListingSnapshot.load(db);
+  final ships = await ShipSnapshot.load(db);
+  await centralCommand.updateBuyShipJobIfNeeded(
+    db,
+    api,
+    caches,
+    shipyardListings,
+    ships,
+  );
+
   return JobResult.complete();
 }
 
