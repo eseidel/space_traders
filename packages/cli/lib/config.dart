@@ -83,14 +83,22 @@ class Config {
     ShipType.MINING_DRONE,
     ShipType.MINING_DRONE,
     for (int i = 0; i < 7; i++) ShipType.LIGHT_HAULER,
+    ShipType.PROBE, // hack.
   ];
 
   final _explorationShips = [
     // Only buy after gate opens.
     for (int i = 0; i < 20; i++) ShipType.PROBE,
-    for (int i = 0; i < 10; i++) ShipType.REFINING_FREIGHTER,
-    // Only buy with 3m in cash?
-    for (int i = 0; i < 20; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
     // Only buy with 3m in cash?
     for (int i = 0; i < 10; i++) ShipType.EXPLORER,
     for (int i = 0; i < 20; i++) ShipType.PROBE,
@@ -113,36 +121,42 @@ class Config {
 
   /// Used as a fallback for constructing Behaviors if there isn't explicit
   /// logic in getJobForShip.
-  final behaviorsByFleetRole = {
-    FleetRole.command: [
-      // Will only trade if we can make 6/s or more.
-      // There are commonly 20c/s trades in the starting system, and at
-      // the minimum we want to accept the contract.
-      // Might want to consider limiting to short trades (< 5 mins) to avoid
-      // tying up capital early.
-      Behavior.trader,
-      // Early game we can use the command ship to explore if needed.
-      // This is perfered over mining and siphoning in case those are far away
-      // on the assumption the command ship should be trading early and all
-      // it's missing is price data to do so.
-      // Behavior.charter,
-      // Early on the command ship makes about 5c/s vs. ore hounds making
-      // 6c/s. It's a better surveyor than miner. Especially when enabling
-      // mining drones.
-      // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
-      // Mining is more profitable than siphoning I think?
-      Behavior.miner,
-      Behavior.siphoner,
-    ],
-    FleetRole.trader: [Behavior.trader],
-    FleetRole.explorer: [
-      Behavior.seeder,
-      Behavior.trader,
-    ],
-    FleetRole.miner: [Behavior.miner],
-    FleetRole.surveyor: [Behavior.surveyor],
-    FleetRole.siphoner: [Behavior.siphoner],
-  };
+  Map<FleetRole, List<Behavior>> get behaviorsByFleetRole => {
+        FleetRole.command: [
+          // Will only trade if we can make 6/s or more.
+          // There are commonly 20c/s trades in the starting system, and at
+          // the minimum we want to accept the contract.
+          // Might want to consider limiting to short trades (< 5 mins) to avoid
+          // tying up capital early.
+          Behavior.trader,
+          // Early game we can use the command ship to explore if needed.
+          // This is perfered over mining and siphoning in case those are far away
+          // on the assumption the command ship should be trading early and all
+          // it's missing is price data to do so.
+          // Behavior.charter,
+          // Early on the command ship makes about 5c/s vs. ore hounds making
+          // 6c/s. It's a better surveyor than miner. Especially when enabling
+          // mining drones.
+          // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
+          // Mining is more profitable than siphoning I think?
+          Behavior.miner,
+          Behavior.siphoner,
+        ],
+        FleetRole.trader: [Behavior.trader],
+        FleetRole.explorer: [
+          Behavior.seeder,
+          Behavior.trader,
+        ],
+        FleetRole.miner: [
+          if (enableMining) Behavior.miner,
+        ],
+        FleetRole.surveyor: [
+          if (enableMining) Behavior.surveyor,
+        ],
+        FleetRole.siphoner: [
+          if (enableMining) Behavior.siphoner,
+        ],
+      };
 
   // We could put some "total value" on the idea of the gate being open
   // and change that over time to encourage building it sooner.
@@ -226,4 +240,6 @@ class Config {
 }
 
 /// Our global configuration object.
-Config config = Config(GamePhase.bootstrap);
+// TODO(eseidel): Correctly detect when we've finished construction but not
+// bought our second probe yet (our first one is system-watching).
+Config config = Config(GamePhase.exploration);
