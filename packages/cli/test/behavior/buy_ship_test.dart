@@ -159,6 +159,19 @@ void main() {
         .thenAnswer((_) => Future.value());
     registerFallbackValue(Ship.fallbackValue());
     when(() => db.upsertShip(any())).thenAnswer((_) => Future.value());
+    when(db.allShipyardListings).thenAnswer((_) async => []);
+    when(db.allShips).thenAnswer((_) async => []);
+    registerFallbackValue(ShipyardListingSnapshot([]));
+    registerFallbackValue(ShipSnapshot([]));
+    when(
+      () => centralCommand.updateBuyShipJobIfNeeded(
+        db,
+        api,
+        caches,
+        any(),
+        any(),
+      ),
+    ).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     expect(
