@@ -277,6 +277,32 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   return result;
 }
 
+/// Scrap the ship and log the transaction.
+Future<ScrapShip200ResponseData> scrapShipAndLog(
+  Api api,
+  Database db,
+  AgentCache agentCache,
+  Ship ship,
+) async {
+  final result = await scrapShip(
+    db,
+    api,
+    agentCache,
+    ship.symbol,
+  );
+  final agent = Agent.fromOpenApi(result.agent);
+  logScrapTransaction(ship, agent, result.transaction);
+  shipErr(ship, 'Scrapped ship for ${result.transaction.totalPrice}');
+  final transaction = Transaction.fromScrapTransaction(
+    result.transaction,
+    // scrapShip updated the agent cache.
+    agentCache.agent.credits,
+    ship.symbol,
+  );
+  await db.insertTransaction(transaction);
+  return result;
+}
+
 bool _shouldRefuelAfterCheckingPrice(
   Ship ship, {
   required TradeSymbol fuelSymbol,

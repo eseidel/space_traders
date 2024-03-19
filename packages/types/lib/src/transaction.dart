@@ -33,6 +33,9 @@ enum TransactionType {
   /// A shipyard transaction (ship purchase).
   shipyard,
 
+  /// A shipyard transaction (ship sale).
+  scrapShip,
+
   /// A ship modification transaction (mount).
   shipModification,
 
@@ -168,6 +171,32 @@ class Transaction extends Equatable {
       quantity: 1,
       tradeType: MarketTransactionTypeEnum.PURCHASE,
       perUnitPrice: transaction.price,
+      timestamp: transaction.timestamp,
+      agentCredits: agentCredits,
+      accounting: AccountingType.capital,
+      contractId: null,
+      contractAction: null,
+    );
+  }
+
+  /// Create a new transaction from a shipyard transaction.
+  factory Transaction.fromScrapTransaction(
+    ScrapTransaction transaction,
+    int agentCredits,
+    ShipSymbol shipSymbol,
+  ) {
+    // shipSymbol is the trade symbol for the shipyard transaction, not
+    // the new ship's id.
+    // Using a local to force non-null.
+    return Transaction(
+      transactionType: TransactionType.scrapShip,
+      shipSymbol: shipSymbol,
+      waypointSymbol: transaction.waypointSymbolObject,
+      shipType: null, // Could use guessShipType.
+      tradeSymbol: null,
+      quantity: 1,
+      tradeType: MarketTransactionTypeEnum.SELL,
+      perUnitPrice: transaction.totalPrice,
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
       accounting: AccountingType.capital,

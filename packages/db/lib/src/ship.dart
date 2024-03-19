@@ -25,6 +25,14 @@ Query upsertShipQuery(Ship ship) => Query(
       },
     );
 
+/// Delete a ship from the database by its [symbol].
+Query deleteShipQuery(ShipSymbol symbol) => Query(
+      'DELETE FROM ship_ WHERE symbol = @symbol',
+      parameters: {
+        'symbol': symbol.toJson(),
+      },
+    );
+
 /// Convert a Ship to a column map.
 Map<String, dynamic> shipToColumnMap(Ship ship) => {
       'symbol': ship.symbol.toJson(),

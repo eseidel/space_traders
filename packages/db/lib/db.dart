@@ -573,6 +573,11 @@ class Database {
     await execute(upsertShipQuery(ship));
   }
 
+  /// Delete a ship from the database.
+  Future<void> deleteShip(ShipSymbol symbol) async {
+    await execute(deleteShipQuery(symbol));
+  }
+
   Future<bool> _hasRecentPrice(Query query, Duration maxAge) async {
     final result = await execute(query);
     if (result.isEmpty) {

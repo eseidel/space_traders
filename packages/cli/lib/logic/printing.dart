@@ -121,6 +121,19 @@ void logShipyardTransaction(
       '🏦 ${creditsString(agent.credits)}');
 }
 
+/// Log a shipyard transaction to the console.
+void logScrapTransaction(
+  Ship ship,
+  Agent agent,
+  ScrapTransaction t,
+) {
+  shipInfo(
+      ship,
+      'Scrapped ${t.shipSymbol} for '
+      '${creditsString(t.totalPrice)} -> '
+      '🏦 ${creditsString(agent.credits)}');
+}
+
 /// Log a ship modification transaction to the console.
 void logShipModificationTransaction(
   Ship ship,

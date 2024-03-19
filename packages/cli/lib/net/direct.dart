@@ -31,6 +31,23 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   return data;
 }
 
+/// Scrap the ship with [shipSymbol]
+/// Must be docked at a shipyard.
+Future<ScrapShip200ResponseData> scrapShip(
+  Database db,
+  Api api,
+  AgentCache agentCache,
+  ShipSymbol shipSymbol,
+) async {
+  final scrapResponse = await api.fleet.scrapShip(shipSymbol.symbol);
+  final data = scrapResponse!.data;
+  // Remove the ship from our cache.
+  await db.deleteShip(shipSymbol);
+  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  // Caller records the transaction.
+  return data;
+}
+
 /// Set the [flightMode] of [ship]
 Future<ShipNav> setShipFlightMode(
   Database db,

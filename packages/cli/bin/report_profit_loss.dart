@@ -94,6 +94,19 @@ class ReportBuilder {
     // CapEx doesn't show up in P&L.
   }
 
+  void _processScrapShipTransaction(Transaction transaction) {
+    _expect(
+      transaction.accounting == AccountingType.capital,
+      'Shipyard transaction is not capital',
+    );
+    _expect(transaction.isSale, 'Ship is not a purchase');
+    _expect(
+      transaction.creditsChange >= 0,
+      'Ship value is not positive',
+    );
+    // CapEx doesn't show up in P&L.
+  }
+
   void _processShipModificationTransaction(Transaction transaction) {
     _expect(
       transaction.accounting == AccountingType.capital,
@@ -138,6 +151,8 @@ class ReportBuilder {
           _processMarketTransaction(transaction);
         case TransactionType.shipyard:
           _processShipyardTransaction(transaction);
+        case TransactionType.scrapShip:
+          _processScrapShipTransaction(transaction);
         case TransactionType.shipModification:
           _processShipModificationTransaction(transaction);
         case TransactionType.contract:

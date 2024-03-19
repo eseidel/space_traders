@@ -614,3 +614,20 @@ String describeRoutePlan(RoutePlan plan) {
   );
   return buffer.toString();
 }
+
+/// Compute the nearest shipyard to the given start.
+Future<ShipyardListing?> nearestShipyard(
+  RoutePlanner routePlanner,
+  ShipyardListingSnapshot shipyards,
+  WaypointSymbol start,
+) async {
+  final listings = shipyards.listingsInSystem(start.system);
+
+  // If not in this system.  Should list all shipyardListings.
+  // Filter by ones which are reachable (e.g. if this ship can warp).
+  // Pick the one with the shortest route.
+
+  // TODO(eseidel): Sort by distance.
+  // TODO(eseidel): Consider reachable systems not just this one.
+  return listings.firstOrNull;
+}

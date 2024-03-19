@@ -4,20 +4,7 @@ import 'package:cli/behavior/jobs/mount_job.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/plan/trading.dart';
-import 'package:collection/collection.dart';
 import 'package:types/types.dart';
-
-/// Compute the nearest shipyard to the given start.
-Future<ShipyardListing?> nearestShipyard(
-  RoutePlanner routePlanner,
-  ShipyardListingSnapshot shipyards,
-  WaypointSymbol start,
-) async {
-  final listings = shipyards.listingsInSystem(start.system);
-  // TODO(eseidel): Sort by distance.
-  // TODO(eseidel): Consider reachable systems not just this one.
-  return listings.firstOrNull;
-}
 
 /// Compute a mount request for the given ship and template.
 Future<MountRequest?> mountRequestForShip(
