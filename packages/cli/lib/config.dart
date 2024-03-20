@@ -101,8 +101,17 @@ class Config {
     for (int i = 0; i < 5; i++) ShipType.PROBE,
     // Only buy with 3m in cash?
     for (int i = 0; i < 10; i++) ShipType.EXPLORER,
-    for (int i = 0; i < 20; i++) ShipType.PROBE,
-    for (int i = 0; i < 20; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 5; i++) ShipType.PROBE,
+    for (int i = 0; i < 15; i++) ShipType.PROBE,
   ];
 
   /// Our ship buy plan for computeNextShipToBuy.
