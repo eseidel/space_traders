@@ -292,7 +292,10 @@ Future<ScrapShip200ResponseData> scrapShipAndLog(
   );
   final agent = Agent.fromOpenApi(result.agent);
   logScrapTransaction(ship, agent, result.transaction);
-  shipErr(ship, 'Scrapped ship for ${result.transaction.totalPrice}');
+  shipErr(
+    ship,
+    'Scrapped ship for ${creditsString(result.transaction.totalPrice)}',
+  );
   final transaction = Transaction.fromScrapTransaction(
     result.transaction,
     // scrapShip updated the agent cache.

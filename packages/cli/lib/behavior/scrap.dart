@@ -1,7 +1,6 @@
 import 'package:cli/behavior/job.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:db/db.dart';
@@ -33,6 +32,7 @@ Future<JobResult> doScrapJob(
   );
 
   if (shipyard.waypointSymbol == ship.waypointSymbol) {
+    await dockIfNeeded(db, api, ship);
     // We're at the shipyard, scrap the ship.
     await scrapShipAndLog(
       api,
@@ -40,7 +40,6 @@ Future<JobResult> doScrapJob(
       caches.agent,
       ship,
     );
-    shipErr(ship, 'Scrapped ship!');
     return JobResult.complete();
   }
 
