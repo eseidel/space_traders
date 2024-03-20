@@ -1468,3 +1468,11 @@ in 12m uses 844 fuel
 🛸#1  command   Insufficient fuel, drifting to JG3-I55
 🛸#1  command   🛫 to JG3-I55 JUMP_GATE (1h) spent 1 fuel
 [WARN] 🛸#1  command   Flight time 01:04:08 does not match predicted 00:55:40 speed: 30 mode: DRIFT distance: 398.8984833262719
+
+### Need a command to get a global view of available trades.
+
+e.g. 5 trades above 10c/s available in system X.
+
+### Unconnected systems aren't showing watchers in system_watchers.dart?
+
+Are we not buying probes there?  Or are they just not showing up as system watchers?

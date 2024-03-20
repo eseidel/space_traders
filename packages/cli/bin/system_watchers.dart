@@ -109,6 +109,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final assignments =
       assignProbesToSystems(systemConnectivity, marketListings, ships);
   for (final entry in assignments.entries) {
-    logger.info('${entry.value.systemName.padRight(4)}: ${entry.key}');
+    final clusterId = systemConnectivity.clusterIdForSystem(entry.value);
+    logger.info(
+      '${entry.value.systemName.padRight(4)}: ${entry.key} ($clusterId)',
+    );
   }
 }
