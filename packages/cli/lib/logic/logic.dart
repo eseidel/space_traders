@@ -57,7 +57,12 @@ Future<void> advanceShips(
     final waitUntil = entry.waitUntil;
 
     await _waitIfNeeded(entry);
-    final ship = (await db.getShip(shipSymbol))!;
+    final ship = await db.getShip(shipSymbol);
+    if (ship == null) {
+      // This can happen if a ship is scrapped.
+      logger.warn('⚠️  ship $shipSymbol not found in db (probably scrapped)');
+      continue;
+    }
     if (shipFilter != null && !shipFilter(ship)) {
       continue;
     }
