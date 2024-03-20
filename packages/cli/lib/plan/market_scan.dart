@@ -65,8 +65,9 @@ class MarketScan {
     MarketPriceSnapshot marketPrices, {
     required String description,
     bool Function(WaypointSymbol waypointSymbol)? waypointFilter,
+    int opportunitiesPerTradeSymbol = 5,
   }) {
-    final builder = _MarketScanBuilder(topLimit: 5);
+    final builder = _MarketScanBuilder(topLimit: opportunitiesPerTradeSymbol);
     for (final marketPrice in marketPrices.prices) {
       if (waypointFilter != null &&
           !waypointFilter(marketPrice.waypointSymbol)) {
