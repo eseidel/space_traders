@@ -35,7 +35,10 @@ enum Behavior {
   systemWatcher,
 
   /// Chart the universe.
-  charter;
+  charter,
+
+  // Scrap the ship.
+  scrap;
 
   /// encode the enum as Json.
   String toJson() => name;

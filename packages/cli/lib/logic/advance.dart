@@ -5,6 +5,7 @@ import 'package:cli/behavior/job.dart';
 import 'package:cli/behavior/miner.dart';
 import 'package:cli/behavior/miner_hauler.dart';
 import 'package:cli/behavior/mount_from_buy.dart';
+import 'package:cli/behavior/scrap.dart';
 import 'package:cli/behavior/seeder.dart';
 import 'package:cli/behavior/siphoner.dart';
 import 'package:cli/behavior/surveyor.dart';
@@ -50,6 +51,8 @@ Future<DateTime?> Function(
       return advanceSeeder;
     case Behavior.idle:
       return advanceIdle;
+    case Behavior.scrap:
+      return advanceScrap;
   }
 }
 

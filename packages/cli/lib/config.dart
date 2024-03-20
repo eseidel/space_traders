@@ -149,12 +149,15 @@ class Config {
         ],
         FleetRole.miner: [
           if (enableMining) Behavior.miner,
+          if (!enableMining) Behavior.scrap,
         ],
         FleetRole.surveyor: [
           if (enableMining) Behavior.surveyor,
+          if (!enableMining) Behavior.scrap,
         ],
         FleetRole.siphoner: [
           if (enableMining) Behavior.siphoner,
+          if (!enableMining) Behavior.scrap,
         ],
       };
 
