@@ -330,7 +330,6 @@ MarketScan scanReachableMarkets(
 /// Returns the best deals for the given parameters,
 /// sorted by profit per second, with most profitable first.
 Iterable<CostedDeal> findDealsFor(
-  MarketPriceSnapshot marketPrices,
   SystemsCache systemsCache,
   RoutePlanner routePlanner,
   MarketScan scan, {
@@ -405,6 +404,53 @@ Iterable<CostedDeal> findDealsFor(
     logger.info('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
     return [];
   }
+
+  return affordable
+      .sortedBy<num>((e) => -e.expectedProfitPerSecond)
+      .where((d) => d.expectedProfitPerSecond > minProfitPerSecond);
+}
+
+/// Returns all deals for the given scan, assuming each starts from the deal's
+/// own source.  Used for planning trader spacing across the entire universe.
+Iterable<CostedDeal> findAllDeals(
+  SystemsCache systems,
+  RoutePlanner routePlanner,
+  MarketScan scan, {
+  required ShipSpec shipSpec,
+  required int maxTotalOutlay,
+  required int costPerAntimatterUnit,
+  required int costPerFuelUnit,
+  required int minProfitPerSecond,
+}) {
+  final deals = buildDealsFromScan(
+    scan,
+    // Don't allow negative profit deals.
+    minProfitPerUnit: 0,
+  );
+  logger.info('Found ${deals.length} potential deals.');
+
+  final costedDeals = deals
+      .map(
+        (deal) => costOutDeal(
+          systems,
+          routePlanner,
+          shipSpec,
+          deal,
+          // TODO(eseidel): Should this be something other than the deal source?
+          shipWaypointSymbol: deal.sourceSymbol,
+          costPerFuelUnit: costPerFuelUnit,
+          costPerAntimatterUnit: costPerAntimatterUnit,
+        ),
+      )
+      .toList();
+
+  final affordable = costedDeals
+      .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
+      .where((d) => d.cargoSize > 0)
+      // TODO(eseidel): This should not be necessary, limitUnitsByMaxSpend
+      // should have already done this.
+      .where((d) => d.expectedCosts <= maxTotalOutlay)
+      .toList();
 
   return affordable
       .sortedBy<num>((e) => -e.expectedProfitPerSecond)
@@ -721,7 +767,6 @@ Iterable<CostedDeal> scanAndFindDeals(
     startSystem: startSymbol.system,
   );
   return findDealsFor(
-    marketPrices,
     systemsCache,
     routePlanner,
     marketScan,

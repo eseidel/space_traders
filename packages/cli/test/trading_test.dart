@@ -275,7 +275,6 @@ void main() {
     final costed = runWithLogger(
       logger,
       () => findDealsFor(
-        marketPrices,
         systemsCache,
         routePlanner,
         marketScan,

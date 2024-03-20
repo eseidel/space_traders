@@ -2,71 +2,24 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 import 'package:cli/nav/navigation.dart';
-import 'package:cli/plan/market_scan.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:collection/collection.dart';
-
-Iterable<CostedDeal> findAllDeals(
-  MarketPriceSnapshot marketPrices,
-  SystemsCache systemsCache,
-  RoutePlanner routePlanner,
-  MarketScan scan, {
-  required ShipSpec shipSpec,
-  required int maxTotalOutlay,
-  required int costPerAntimatterUnit,
-  required int costPerFuelUnit,
-  required int minProfitPerSecond,
-}) {
-  final deals = buildDealsFromScan(
-    scan,
-    // Don't allow negative profit deals.
-    minProfitPerUnit: 0,
-  );
-  logger.info('Found ${deals.length} potential deals.');
-
-  final costedDeals = deals
-      .map(
-        (deal) => costOutDeal(
-          systemsCache,
-          routePlanner,
-          shipSpec,
-          deal,
-          // TODO(eseidel): Should this be something other than the deal source?
-          shipWaypointSymbol: deal.sourceSymbol,
-          costPerFuelUnit: costPerFuelUnit,
-          costPerAntimatterUnit: costPerAntimatterUnit,
-        ),
-      )
-      .toList();
-
-  final affordable = costedDeals
-      .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
-      .where((d) => d.cargoSize > 0)
-      // TODO(eseidel): This should not be necessary, limitUnitsByMaxSpend
-      // should have already done this.
-      .where((d) => d.expectedCosts <= maxTotalOutlay)
-      .toList();
-
-  return affordable
-      .sortedBy<num>((e) => -e.expectedProfitPerSecond)
-      .where((d) => d.expectedProfitPerSecond > minProfitPerSecond);
-}
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // First need to figure out which systems are worth checking.
 
-  final systems = SystemsCache.load(fs);
+  final systems = await SystemsCache.loadOrFetch(fs);
   final systemConnectivity = await loadSystemConnectivity(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final agentCache = await AgentCache.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
   final routePlanner = RoutePlanner.fromSystemsCache(
-    systems!,
+    systems,
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
   final startSystem = agentCache!.headquartersSystemSymbol;
-  const shipType = ShipType.LIGHT_HAULER;
+  const shipType = ShipType.REFINING_FREIGHTER;
 
   final shipyardShips = ShipyardShipCache.load(fs);
   final ship = shipyardShips[shipType]!;
@@ -96,7 +49,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
           config.defaultAntimatterCost;
 
   final deals = findAllDeals(
-    marketPrices,
     systems,
     routePlanner,
     marketScan,
@@ -115,14 +67,81 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     (deal) => deal.deal.source.waypointSymbol.system,
   );
 
-  logger.info('Deals above $minProfitPerSecond c/s by system:');
-  for (final system in dealsBySystem.keys) {
-    final deals = dealsBySystem[system]!;
-    logger.info('${system.systemName} : ${deals.length}');
+  final ships = await ShipSnapshot.load(db);
+  final behaviors = await BehaviorSnapshot.load(db);
+  final haulers = ships.ships.where((ship) => ship.isHauler);
+  final haulersBySystem = <SystemSymbol, Set<ShipSymbol>>{};
+  for (final hauler in haulers) {
+    final system = hauler.systemSymbol;
+    haulersBySystem.putIfAbsent(system, () => {}).add(hauler.symbol);
+    final state = behaviors[hauler.symbol];
+    if (state != null) {
+      final route = state.routePlan;
+      if (route != null) {
+        final system = route.endSymbol.system;
+        haulersBySystem.putIfAbsent(system, () => {}).add(hauler.symbol);
+      }
+    }
   }
+
+  const minScore = 2;
+  double scoreSystem(SystemSymbol system) {
+    final deals = dealsBySystem[system] ?? [];
+    final haulers = haulersBySystem[system] ?? {};
+    return deals.length / (haulers.length + 1);
+  }
+
+  logger.info('Deals above $minProfitPerSecond c/s by system:');
+  final sorted = dealsBySystem.keys.toList()
+    ..sort((a, b) => dealsBySystem[b]!.length - dealsBySystem[a]!.length);
+  for (final system in sorted) {
+    final deals = dealsBySystem[system]!;
+    final haulers = haulersBySystem[system] ?? {};
+    final score = scoreSystem(system);
+    logger.info('${system.systemName} : ${deals.length} deals, '
+        '${haulers.length} haulers, score: ${score.toStringAsFixed(2)}');
+  }
+  logger.info('Total deals: ${deals.length}');
+
+  final idleHaulers = haulers
+      .where((ship) {
+        final state = behaviors[ship.symbol];
+        return state == null || state.behavior == Behavior.idle;
+      })
+      .map((e) => e.symbol)
+      .toList();
+  logger.info('Idle haulers: ${idleHaulers.length}');
 
   // First figure out if we have any traders needing reassignment.
   // If so, compute possible trades for systems near them with markets?
+
+  for (final shipSymbol in idleHaulers) {
+    // Re-compute since assignments may have changed.
+    final systemsWithOpenSlots = sorted
+        .where((system) => scoreSystem(system) > minScore)
+        .map((symbol) => systems[symbol])
+        .toList();
+
+    final shipSystem = systems[ships[shipSymbol].systemSymbol];
+    final closest =
+        minBy(systemsWithOpenSlots, (system) => system.distanceTo(shipSystem));
+    if (closest != null) {
+      // Pick the jumpgate in that system.
+      final jumpGate = closest.jumpGateWaypoints.first.symbol;
+      // route there.
+      haulersBySystem.putIfAbsent(closest.symbol, () => {}).add(shipSymbol);
+      final ship = ships[shipSymbol];
+      final route = routePlanner.planRoute(
+        shipSpec,
+        start: ship.waypointSymbol,
+        end: jumpGate,
+      );
+      final planString = route != null ? describeRoutePlan(route) : 'none';
+      logger
+        ..info('Should route $shipSymbol to $jumpGate')
+        ..info(planString);
+    }
+  }
 }
 
 void main(List<String> args) async {

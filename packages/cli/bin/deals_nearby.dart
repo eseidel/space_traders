@@ -112,7 +112,6 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
           config.defaultAntimatterCost;
 
   final deals = findDealsFor(
-    marketPrices,
     systemsCache,
     routePlanner,
     marketScan,

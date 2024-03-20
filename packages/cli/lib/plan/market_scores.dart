@@ -2,6 +2,7 @@ import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/trading.dart';
+import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
 /// Callback to find the next deal for the given [ship]
@@ -82,7 +83,7 @@ _ShipPlacement? _findBetterSystemForTrader(
   final shipSystem = systemsCache[ship.systemSymbol];
 
   while (true) {
-    final closest = search.closestAvailableSystem(systemsCache, shipSystem);
+    final closest = search.closestAvailableSystem(shipSystem);
     if (closest == null) {
       logger.info('No nearby markets for $shipSymbol');
       return null;
@@ -132,21 +133,8 @@ _ShipPlacement? _findBetterSystemForTrader(
   }
 }
 
-System? _closestSystem(
-  SystemsCache systemsCache,
-  System start,
-  List<System> systems,
-) {
-  var bestDistance = double.infinity;
-  System? bestSystem;
-  for (final system in systems) {
-    final distance = start.distanceTo(system);
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      bestSystem = system;
-    }
-  }
-  return bestSystem;
+System? _closestSystem(System start, List<System> systems) {
+  return minBy(systems, (system) => start.distanceTo(system));
 }
 
 class _ShipPlacement {
@@ -189,14 +177,11 @@ class _MarketSearch {
   final Map<SystemSymbol, int> marketSystemScores;
   final Set<SystemSymbol> claimedSystemSymbols;
 
-  System? closestAvailableSystem(
-    SystemsCache systemsCache,
-    System startSystem,
-  ) {
+  System? closestAvailableSystem(System startSystem) {
     final availableSystems = marketSystems
         .where((system) => !claimedSystemSymbols.contains(system.symbol))
         .toList();
-    return _closestSystem(systemsCache, startSystem, availableSystems);
+    return _closestSystem(startSystem, availableSystems);
   }
 
   void markUsed(System system) => claimedSystemSymbols.add(system.symbol);
