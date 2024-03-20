@@ -107,7 +107,12 @@ class Config {
 
   /// Our ship buy plan for computeNextShipToBuy.
   List<ShipType> get buyPlan {
-    final ships = <ShipType>[..._boostrapShips];
+    final ships = <ShipType>[];
+    // Don't buy bootstrap ships after exploration, since we'll start
+    // scrapping and don't want to re-buy.
+    if (gamePhase < GamePhase.exploration) {
+      ships.addAll(_boostrapShips);
+    }
     if (gamePhase >= GamePhase.exploration) {
       ships.addAll(_explorationShips);
     }
