@@ -104,6 +104,13 @@ Future<Market> getMarket(Api api, WaypointSymbol waypointSymbol) async {
   return response!.data;
 }
 
+/// Fetches Scrap value for a given Ship.
+/// Ship must be docked at a shipyard.
+Future<ScrapTransaction?> getScrapValue(Api api, ShipSymbol symbol) async {
+  final response = await api.fleet.getScrapShip(symbol.symbol);
+  return response?.data.transaction;
+}
+
 /// Fetches Construction for a given Waypoint.
 Future<Construction> getConstruction(
   Api api,

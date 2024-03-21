@@ -16,6 +16,17 @@ Query upsertShipyardPriceQuery(ShipyardPrice price) => Query(
       parameters: shipyardPriceToColumnMap(price),
     );
 
+/// Query to get the shipyard price for a given waypoint and ship type.
+/// Returns null if no price is found.
+Query shipyardPriceQuery(WaypointSymbol symbol, ShipType shipType) => Query(
+      'SELECT * FROM shipyard_price_ '
+      'WHERE waypoint_symbol = @symbol AND ship_type = @ship_type',
+      parameters: {
+        'symbol': symbol.toJson(),
+        'ship_type': shipType.toJson(),
+      },
+    );
+
 /// Query to get the timestamp of the most recent shipyard price for a waypoint.
 Query timestampOfMostRecentShipyardPriceQuery(WaypointSymbol symbol) => Query(
       'SELECT MAX(timestamp) FROM shipyard_price_ '

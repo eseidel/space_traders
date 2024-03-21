@@ -481,6 +481,15 @@ class Database {
     return queryMany(allShipyardPricesQuery(), shipyardPriceFromColumnMap);
   }
 
+  /// Get the shipyard price for the given waypoint and ship type.
+  Future<ShipyardPrice?> shipyardPriceAt(
+    WaypointSymbol waypointSymbol,
+    ShipType shipType,
+  ) async {
+    final query = shipyardPriceQuery(waypointSymbol, shipType);
+    return queryOne(query, shipyardPriceFromColumnMap);
+  }
+
   /// Add a shipyard price to the database.
   Future<void> upsertShipyardPrice(ShipyardPrice price) async {
     await execute(upsertShipyardPriceQuery(price));
