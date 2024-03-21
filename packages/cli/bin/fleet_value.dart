@@ -28,7 +28,7 @@ Map<ShipType, int> _shipTypeCounts(
 ) {
   final typeCounts = <ShipType, int>{};
   for (final ship in ships) {
-    final type = shipyardShips.shipTypeFromFrame(ship.frame.symbol)!;
+    final type = guessShipType(shipyardShips, ship)!;
     typeCounts[type] = (typeCounts[type] ?? 0) + 1;
   }
   return typeCounts;
@@ -40,24 +40,25 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
 
-  logger
-    ..info('Estimating fleet value at current median prices.')
-    ..info('Excluding initial ships.');
+  logger.info('Estimating fleet value at current median prices.');
 
-  final purchasedShips = ships.ships.skip(2).toList();
-  final purchaseShipTypes = purchasedShips
-      .map((s) => shipyardShips.shipTypeFromFrame(s.frame.symbol)!)
-      .toList();
+  // Include all ships now that scrapping is a thing.
+  final purchasedShips = ships.ships;
+  final purchaseShipTypes =
+      purchasedShips.map((s) => guessShipType(shipyardShips, s)!).toList();
   final purchaseShipTypeCounts = _shipTypeCounts(shipyardShips, purchasedShips);
   final shipTypes = purchaseShipTypeCounts.keys.toList()
     ..sortBy((t) => t.value);
   for (final type in shipTypes) {
-    logger.info('${purchaseShipTypeCounts[type]} $type @ '
-        '${creditsString(shipyardPrices.medianPurchasePrice(type)!)}');
+    final price = shipyardPrices.medianPurchasePrice(type);
+    final priceString = price == null ? '???' : creditsString(price);
+    logger.info('${purchaseShipTypeCounts[type]} $type @ $priceString each');
   }
 
-  final totalShipCost =
-      purchaseShipTypes.map((t) => shipyardPrices.medianPurchasePrice(t)!).sum;
+  // Purchase price != scrapping price, so this is wrong.
+  final totalShipCost = purchaseShipTypes
+      .map((t) => shipyardPrices.medianPurchasePrice(t) ?? 0)
+      .sum;
   logger.info('Ships: ${creditsString(totalShipCost)}');
 
   // Mount costs
