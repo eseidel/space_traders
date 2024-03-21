@@ -8,7 +8,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final idleByRole = <FleetRole, int>{};
   for (final behavior in behaviors.states) {
     if (behavior.behavior == Behavior.idle) {
-      final role = ships[behavior.shipSymbol].fleetRole;
+      final role = ships[behavior.shipSymbol]!.fleetRole;
       idleByRole[role] = (idleByRole[role] ?? 0) + 1;
     }
   }

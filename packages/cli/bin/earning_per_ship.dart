@@ -96,26 +96,29 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   for (final shipSymbol in shipSymbols) {
     final ship = ships[shipSymbol];
-    final role = ship.fleetRole;
+    final role = ship?.fleetRole;
     final summary = TransactionSummary(
       transactions.where((t) => t.shipSymbol == shipSymbol),
     );
-    roleCounts[role] = (roleCounts[role] ?? 0) + 1;
-    roleCreditPerSecondTotals[role] =
-        (roleCreditPerSecondTotals[role] ?? 0) + summary.perSecond;
+    if (ship != null && role != null) {
+      roleCounts[role] = (roleCounts[role] ?? 0) + 1;
+      roleCreditPerSecondTotals[role] =
+          (roleCreditPerSecondTotals[role] ?? 0) + summary.perSecond;
 
-    frameCounts[ship.frame.symbol] = (frameCounts[ship.frame.symbol] ?? 0) + 1;
-    frameCreditPerSecondTotals[ship.frame.symbol] =
-        (frameCreditPerSecondTotals[ship.frame.symbol] ?? 0) +
-            summary.perSecond;
+      frameCounts[ship.frame.symbol] =
+          (frameCounts[ship.frame.symbol] ?? 0) + 1;
+      frameCreditPerSecondTotals[ship.frame.symbol] =
+          (frameCreditPerSecondTotals[ship.frame.symbol] ?? 0) +
+              summary.perSecond;
+    }
 
     table.add([
       shipSymbol.hexNumber,
       rightAlign(c(summary.perMinute)),
       rightAlign(c(summary.perSecond)),
-      role.name,
+      role?.name,
       summary.transactions.length,
-      ship.cargo.capacity,
+      ship?.cargo.capacity,
     ]);
   }
   logger

@@ -19,7 +19,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   logger.info('${plural(charterStates.length, 'charter')}:');
   for (final state in charterStates) {
     final shipSymbol = state.shipSymbol;
-    final ship = ships[shipSymbol];
+    final ship = ships[shipSymbol]!;
     final navString = describeShipNav(ship.nav);
     logger.info('${ship.emojiName} $navString');
 

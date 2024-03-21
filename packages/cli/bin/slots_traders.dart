@@ -122,7 +122,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
         .map((symbol) => systems[symbol])
         .toList();
 
-    final shipSystem = systems[ships[shipSymbol].systemSymbol];
+    final shipSystem = systems[ships[shipSymbol]!.systemSymbol];
     final closest =
         minBy(systemsWithOpenSlots, (system) => system.distanceTo(shipSystem));
     if (closest != null) {
@@ -130,7 +130,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       final jumpGate = closest.jumpGateWaypoints.first.symbol;
       // route there.
       haulersBySystem.putIfAbsent(closest.symbol, () => {}).add(shipSymbol);
-      final ship = ships[shipSymbol];
+      final ship = ships[shipSymbol]!;
       final route = routePlanner.planRoute(
         shipSpec,
         start: ship.waypointSymbol,

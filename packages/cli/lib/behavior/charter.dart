@@ -123,6 +123,8 @@ Future<JobResult> doCharter(
   final maxJumps = config.charterMaxJumps;
   final behaviors = await BehaviorSnapshot.load(db);
   final ships = await ShipSnapshot.load(db);
+  // TODO(eseidel): We shouldn't pull all charting data here.
+  // Instead we should keep a cache of fully charted systems or something?
   final charts = await ChartingSnapshot.load(db);
   final destinationSymbol = await centralCommand.nextWaypointToChart(
     ships,

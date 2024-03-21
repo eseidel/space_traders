@@ -62,7 +62,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     final assignedSystemName =
         state.systemWatcherJob?.systemSymbol.systemName.padRight(4);
     final ship = ships[shipSymbol];
-    final navString = describeShipNav(ship.nav);
+    final navString = describeShipNav(ship!.nav);
     logger
         .info('${ship.emojiName} assigned to $assignedSystemName, $navString');
 

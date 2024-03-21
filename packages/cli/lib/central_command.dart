@@ -448,7 +448,7 @@ class CentralCommand {
         continue;
       }
       // Yield both the ship's current waypoint and its destination.
-      yield ships[state.shipSymbol].waypointSymbol;
+      yield ships[state.shipSymbol]!.waypointSymbol;
 
       final destination = state.routePlan?.endSymbol;
       if (destination != null) {
