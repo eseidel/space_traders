@@ -1476,3 +1476,5 @@ e.g. 5 trades above 10c/s available in system X.
 ### Unconnected systems aren't showing watchers in system_watchers.dart?
 
 Are we not buying probes there?  Or are they just not showing up as system watchers?
+
+### Move asteroid-charters to better locations?
