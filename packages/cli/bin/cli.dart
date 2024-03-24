@@ -103,6 +103,7 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
+    ..addFlag('selloff', negatable: false, help: 'Sell off ships.')
     ..addMultiOption(
       'only',
       abbr: 'o',
@@ -115,6 +116,12 @@ Future<void> cliMain(List<String> args) async {
   final start = DateTime.timestamp();
 
   logger.info('Welcome to Space Traders! 🚀');
+
+  if (results['selloff'] as bool) {
+    logger.err('Selling all ships!');
+    config = config = Config(GamePhase.selloff);
+  }
+
   // Use package:file to make things mockable.
   const fs = LocalFileSystem();
   final db = await defaultDatabase();

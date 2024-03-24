@@ -14,6 +14,9 @@ enum GamePhase with EnumIndexOrdering {
 
   /// Focused on explorating the galaxy to find better ships.
   exploration,
+
+  /// Sell off all our ships and retire.
+  selloff
 }
 
 /// Class for holding our hard-coded configuration values.

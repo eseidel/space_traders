@@ -183,6 +183,10 @@ class CentralCommand {
       return BehaviorState(shipSymbol, behavior);
     }
 
+    if (config.gamePhase == GamePhase.selloff) {
+      return toState(Behavior.scrap);
+    }
+
     bool enabled(Behavior behavior) {
       if (!config.enableMining && config.miningBehaviors.contains(behavior)) {
         return false;
