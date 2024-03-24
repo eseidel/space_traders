@@ -1,6 +1,49 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
+class _ChartingCounts {
+  _ChartingCounts({
+    required this.symbol,
+    required this.uncharted,
+    required this.asteroids,
+    required this.jumpgates,
+  });
+
+  final SystemSymbol symbol;
+  final int uncharted;
+  final int asteroids;
+  final int jumpgates;
+}
+
+_ChartingCounts _count(ChartingSnapshot charts, System system) {
+  var unchartedCount = 0;
+  var jumpgateCount = 0;
+  var asteroidCount = 0;
+  for (final waypoint in system.waypoints) {
+    if (!isUncharted(charts, waypoint)) {
+      continue;
+    }
+    unchartedCount++;
+    if (waypoint.isJumpGate) {
+      jumpgateCount++;
+    }
+    if (waypoint.isAsteroid) {
+      asteroidCount++;
+    }
+  }
+  return _ChartingCounts(
+    symbol: system.symbol,
+    uncharted: unchartedCount,
+    asteroids: asteroidCount,
+    jumpgates: jumpgateCount,
+  );
+}
+
+bool isUncharted(ChartingSnapshot charts, SystemWaypoint waypoint) {
+  final maybeCharted = charts[waypoint.symbol]?.isCharted;
+  return maybeCharted == null || !maybeCharted;
+}
+
 /// Walks our known system graph, starting from HQ and prints systems needing
 /// exploration.
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
@@ -9,16 +52,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final systemConnectivity = await loadSystemConnectivity(db);
   final systemsCache = SystemsCache.load(fs)!;
-  final chartingSnapshot = await ChartingSnapshot.load(db);
-
-  bool isUncharted(SystemWaypoint waypoint) {
-    final maybeCharted = chartingSnapshot[waypoint.symbol]?.isCharted;
-    return maybeCharted == null || !maybeCharted;
-  }
-
-  int unchartedWaypointCount(SystemSymbol systemSymbol) {
-    return systemsCache[systemSymbol].waypoints.where(isUncharted).length;
-  }
+  final charts = await ChartingSnapshot.load(db);
 
   final connectedSystems = systemConnectivity
       .systemSymbolsInJumpRadius(
@@ -33,13 +67,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   for (final (systemSymbol, jumps) in connectedSystems) {
-    final unchartedCount = unchartedWaypointCount(systemSymbol);
-    if (unchartedCount == 0) {
-      continue;
-    }
+    final counts = _count(charts, systemsCache[systemSymbol]);
     logger.info(
       '${systemSymbol.system.padRight(9)} '
-      '$unchartedCount uncharted ($jumps jumps)',
+      '${counts.uncharted} uncharted, ${counts.asteroids} asteroids, '
+      '${counts.jumpgates} jumpgates, ($jumps jumps)',
     );
   }
 }
