@@ -117,9 +117,9 @@ class _WarpPlanner {
           continue;
         }
         // Should we re-plan systems we've already planned?
-        if (cameFrom.containsKey(next)) {
-          continue;
-        }
+        // if (cameFrom.containsKey(next)) {
+        //   continue;
+        // }
         if (fuelMarketsBySystem[next] == null) {
           fuelMarketsBySystem[next] = nextSystem.waypoints
               .map((w) => w.symbol)

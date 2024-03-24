@@ -37,7 +37,7 @@ enum Behavior {
   /// Chart the universe.
   charter,
 
-  // Scrap the ship.
+  /// Scrap the ship.
   scrap;
 
   /// encode the enum as Json.

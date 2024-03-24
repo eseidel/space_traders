@@ -6,16 +6,43 @@ import 'package:cli/nav/warp_pathing.dart';
 import 'package:collection/collection.dart';
 
 void main(List<String> args) async {
-  await runOffline(args, command);
+  await runOffline(
+    args,
+    command,
+    addArgs: (parser) {
+      // Timing is an option to allow for stable output for testing.
+      parser.addFlag(
+        'timing',
+        abbr: 't',
+        help: 'Show timings for each pathing operation',
+      );
+    },
+  );
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const shipType = ShipType.EXPLORER;
+  final timing = argResults['timing'] as bool;
 
   final agentCache = await AgentCache.load(db);
   final systemsCache = SystemsCache.load(fs)!;
   final marketListings = await MarketListingSnapshot.load(db);
   final sellsFuel = defaultSellsFuel(marketListings);
+  // final sellsFuel = defaultFuel;
+  // bool sellsFuel(WaypointSymbol symbol) {
+  //   return true;
+  //   // if (defaultFuel(symbol) == true) return true;
+  //   // final type = systemsCache.waypoint(symbol).type;
+  //   // // Based on bin/markets_by_waypoint_type.dart
+  //   // final sellsFuelTypes = [
+  //   //   WaypointType.ASTEROID_BASE,
+  //   //   WaypointType.ENGINEERED_ASTEROID,
+  //   //   WaypointType.FUEL_STATION,
+  //   //   WaypointType.JUMP_GATE,
+  //   //   WaypointType.ORBITAL_STATION,
+  //   // ];
+  //   // return sellsFuelTypes.contains(type);
+  // }
 
   final systemConnectivity = await loadSystemConnectivity(db);
   // final routePlanner = RoutePlanner.fromSystemsCache(
@@ -42,7 +69,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   logger.info('Pathing to ${interestingWaypoints.length} systems...');
   for (final end in interestingWaypoints) {
     final systemDistance = systemsCache[end.system].distanceTo(startSystem);
-    logger.info('Pathing to $end ($systemDistance)...');
+    final distanceString = systemDistance.toStringAsFixed(2);
+    logger.info('Pathing to $end ($distanceString)...');
     final routeStart = DateTime.timestamp();
     final actions = findRouteBetweenSystems(
       systemsCache,
@@ -54,8 +82,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     );
     final routeEnd = DateTime.timestamp();
     final duration = routeEnd.difference(routeStart);
+    final timingString = timing ? ' (${duration.inMilliseconds}ms)' : '';
     if (actions == null) {
-      logger.err('No route found (${duration.inMilliseconds}ms)');
+      logger.info('No route found$timingString');
     } else {
       final plan = RoutePlan(
         actions: actions,
@@ -63,7 +92,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
         shipSpeed: shipSpec.speed,
       );
       logger
-        ..info('Route found (${duration.inMilliseconds}ms)')
+        ..info('Route found$timingString')
         ..info(describeRoutePlan(plan));
     }
   }

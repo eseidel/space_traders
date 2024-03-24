@@ -610,7 +610,7 @@ String describeRoutePlan(RoutePlan plan) {
         ' ${action.fuelUsed} fuel');
   }
   buffer.writeln(
-    'in ${approximateDuration(plan.duration)} uses ${plan.fuelUsed} fuel',
+    'in ${plan.duration} uses ${plan.fuelUsed} fuel',
   );
   return buffer.toString();
 }
