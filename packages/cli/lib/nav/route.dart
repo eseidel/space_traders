@@ -619,15 +619,31 @@ String describeRoutePlan(RoutePlan plan) {
 Future<ShipyardListing?> nearestShipyard(
   RoutePlanner routePlanner,
   ShipyardListingSnapshot shipyards,
-  WaypointSymbol start,
+  Ship ship,
 ) async {
+  final start = ship.waypointSymbol;
   final listings = shipyards.listingsInSystem(start.system);
 
   // If not in this system.  Should list all shipyardListings.
   // Filter by ones which are reachable (e.g. if this ship can warp).
   // Pick the one with the shortest route.
+  final systemConnectivity = routePlanner.systemConnectivity;
 
-  // TODO(eseidel): Sort by distance.
-  // TODO(eseidel): Consider reachable systems not just this one.
-  return listings.firstOrNull;
+  final reachableShipyards = listings.where((listing) {
+    return systemConnectivity.existsJumpPathBetween(
+      start.system,
+      listing.waypointSymbol.system,
+    );
+  });
+  // Sort by system distance.
+  final listing = minBy(reachableShipyards, (listing) {
+    return routePlanner
+        .planRoute(
+          ship.shipSpec,
+          start: start,
+          end: listing.waypointSymbol,
+        )!
+        .duration;
+  });
+  return listing;
 }

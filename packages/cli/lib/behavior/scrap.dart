@@ -25,7 +25,7 @@ Future<JobResult> doScrapJob(
     await nearestShipyard(
       caches.routePlanner,
       shipyardListings,
-      ship.waypointSymbol,
+      ship,
     ),
     'No shipyard found.',
     const Duration(minutes: 5),

@@ -48,8 +48,7 @@ Future<MountRequest?> mountRequestForShip(
   const mountCost = 100000;
   final creditsNeeded = buyCost + mountCost;
 
-  final shipyard =
-      await nearestShipyard(routePlanner, shipyards, ship.waypointSymbol);
+  final shipyard = await nearestShipyard(routePlanner, shipyards, ship);
   if (shipyard == null) {
     return null;
   }
