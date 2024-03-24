@@ -1477,4 +1477,34 @@ e.g. 5 trades above 10c/s available in system X.
 
 Are we not buying probes there?  Or are they just not showing up as system watchers?
 
+### Trader being slow:
+
+[WARN] 🛸#8F trader    late 2s
+[WARN] Costed 1156 deals in 2s
+Found 15 deals for ESEIDEL2-8F from ND96-C39
+[WARN] 🛸#8F trader    Deal expected profit per second too low: 2c/s
+Found 1 deals for ESEIDEL2-8F from GT77-C10X
+Found 1 deals for ESEIDEL2-8F from FC7-X12Z
+Found 1 deals for ESEIDEL2-8F from TS46-ZA7D
+Found 1 deals for ESEIDEL2-8F from AQ76-ZE7Z
+No nearby markets for ESEIDEL2-8F
+[WARN] 🛸#8F trader    Failed to find better location for trader. Disabling Behavior.trader for ESEIDEL2-8F for 10m.
+🛸#8F trader    took 14s (0 requests, 11 queries) expected 0.0s
+  2: SELECT * FROM behavior_ WHERE ship_symbol = @ship_symbol
+  2: SELECT * FROM behavior_ WHERE behavior = @behavior
+  1: SELECT * FROM ship_
+  1: DELETE FROM behavior_ WHERE ship_symbol = @ship_symbol
+  1:       INSERT INTO behavior_ (ship_symbol, behavior, json)
+      VALUES (@ship_symbol, @behavior, @json)
+      ON CONFLICT (ship_symbol) DO UPDATE SET
+        behavior = @behavior,
+        json = @json
+      
+  1: SELECT * FROM contract_ WHERE fulfilled = 'false' AND 'deadline_to_accept' > @now
+  1: SELECT * FROM contract_ WHERE accepted = 'false'
+  1: SELECT * FROM contract_
+  1: SELECT * FROM behavior_
+
+  
+
 ### Move asteroid-charters to better locations?
