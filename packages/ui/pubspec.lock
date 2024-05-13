@@ -116,10 +116,10 @@ packages:
     dependency: "direct main"
     description:
       name: cupertino_icons
-      sha256: d57953e10f9f8327ce64a508a355f0b1ec902193f66288e8cb5070e7c47eeb2d
+      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.8"
   db:
     dependency: transitive
     description:
@@ -202,10 +202,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "7ecb2f391edbca5473db591b48555a8912dde60edd0fb3013bd6743033b2d3f8"
+      sha256: "81f94e16d7063b60f0da3a79f872e140d6518f306749303bf981abd7d6b46734"
       url: "https://pub.dev"
     source: hosted
-    version: "13.2.1"
+    version: "14.1.0"
   http:
     dependency: "direct main"
     description:
@@ -362,10 +362,10 @@ packages:
     dependency: transitive
     description:
       name: postgres
-      sha256: b743c8b1d4af6e2840fa1e2ce2d3376b829d097b6db7340a1154effac69cc738
+      sha256: bd1df6d2f4ad71aef92dc59e867e3ba9ec22cf2212a81cf9d35aa061ce80b1ae
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.1"
+    version: "3.2.0"
   sasl_scram:
     dependency: transitive
     description:
