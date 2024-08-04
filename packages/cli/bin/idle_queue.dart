@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
@@ -10,10 +12,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final agent = await db.getAgent(symbol: config.agentSymbol);
   if (agent == null) {
-    logger.err("Failed to load agent: ${config.agentSymbol}");
+    logger.err('Failed to load agent: ${config.agentSymbol}');
     exit(1);
   }
-  final systemSymbol = agent!.headquarters.system;
+  final systemSymbol = agent.headquarters.system;
   var queue = IdleQueue();
   void resetQueue() {
     queue = IdleQueue()..queueSystem(systemSymbol, jumpDistance: 0);
