@@ -18,21 +18,42 @@ A Dart client for spacetraders.io.
 
 ## Setup
 
-This requires Dart 3.0.0 or later.
+This should work on any platform, but probably runs best on Linux.
+
+I use a slice on DigitalOcean (any provider would do).  You'll want at least
+2GB to run alone (dart + postgres), 4GB or more if you plan to use Visual Studio over
+SSH (the Dart Analyzer is very memory intensive).
+
+Requires Dart 3.0.0 or later.
 
 The easiest way to get Dart is typically via Flutter.  See
 https://flutter.dev/docs/get-started/install for instructions.
 
-On ubuntu:
+On ubuntu (assuming root):
 ```
 sudo snap install flutter --classic
+echo "export BOT=true" >> $HOME/.bashrc
+source $HOME/.bashrc
+flutter
 ```
 
-If you're running this in a docker container, or otherwise as root Dart and
-Flutter will print a warning about running as root.  You can ignore it or
-disable it with:
+The `export BOT=true` exists just to disable a warning that `flutter` prints
+when being run as root.
+
+Setup `very_good` for ease of getting all the packages.
 ```
-export BOT=true
+dart pub global activate very_good_cli
+echo 'export PATH="$PATH":"$HOME/.pub-cache/bin"' >> $HOME/.bashrc
+source $HOME/.bashrc
+```
+
+Checkout and run `dart test` to make sure everything is working:
+```
+git clone https://github.com/eseidel/space_traders.git
+cd space_traders
+very_good packages get -r
+cd packages/cli
+dart test
 ```
 
 ## Usage
