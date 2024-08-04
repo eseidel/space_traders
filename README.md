@@ -29,9 +29,10 @@ Requires Dart 3.0.0 or later.
 The easiest way to get Dart is typically via Flutter.  See
 https://flutter.dev/docs/get-started/install for instructions.
 
-On ubuntu (assuming root):
+On ubuntu.  These instructions assume they're being run as `root` (e.g. in a
+container).
 ```
-sudo snap install flutter --classic
+snap install flutter --classic
 echo "export BOT=true" >> $HOME/.bashrc
 source $HOME/.bashrc
 flutter

@@ -6,7 +6,20 @@ A collection of scripts for playing https://spacetraders.io/ from the command li
 
 ## Usage
 
-`dart run` will run the main script, which goes in an infinite loop mining.
-It will ask you to register if it can't find an auth_token.txt file.
+These scripts require the db to be set up and running.  See ../db/README.md
+for setup of postgres.
 
-It's smart enough that you can kill it and it will resume where it left off.
+Current setup expects 3 terminals:
+
+Running:
+1. `dart run bin/network_executor.dart`
+2. `dart run bin/cli.dart`
+3. `dart run bin/idle_queue.dart`
+
+The network_executor and db must be running before the other scripts will work.
+
+## Development
+
+Most of the scripts in `bin/` are about providing analysis from the state
+of the game.  `bin/simulate.dart` is one of the various planning scripts
+(for exploring what different configurations could do).

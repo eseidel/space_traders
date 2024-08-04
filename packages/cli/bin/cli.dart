@@ -165,7 +165,7 @@ Future<void> cliMain(List<String> args) async {
 
   // We use defaultTo: [], so we don't have to check fo null here.
   // This means that we won't notice `--only` being passed with no ships.
-  // But that's also OK since that's nonsentical.
+  // But that's also OK since that's nonsensical.
   final shipFilter =
       _shipFilterFromArgs(agent, results['only'] as List<String>);
   await logic(api, db, centralCommand, caches, shipFilter: shipFilter);
