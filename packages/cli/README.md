@@ -18,6 +18,17 @@ Running:
 
 The network_executor and db must be running before the other scripts will work.
 
+## Screen config
+
+You'll probably want to run the commands within a screen session.
+
+You'll need to configure screen if you want to be able to scroll up with the
+scroll wheel.
+
+```
+echo "termcapinfo xterm* ti@:te@" >> $HOME/.screenrc
+```
+
 ## Development
 
 Most of the scripts in `bin/` are about providing analysis from the state
