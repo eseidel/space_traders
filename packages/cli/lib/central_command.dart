@@ -635,6 +635,17 @@ class CentralCommand {
         await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
   }
 
+  GamePhase _determineGamePhase(ShipSnapshot ships) {
+    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(ships);
+    // A hack to advance the global config to the construction phase.
+    if (_haveEscapedStartingSystem) {
+      return GamePhase.exploration;
+    } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 10) {
+      return GamePhase.construction;
+    }
+    return GamePhase.bootstrap;
+  }
+
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(
@@ -645,13 +656,8 @@ class CentralCommand {
     // await caches.updateRoutingCaches();
 
     final ships = await ShipSnapshot.load(db);
-    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(ships);
-    // A hack to advance the global config to the construction phase.
-    // if (_haveEscapedStartingSystem) {
-    //   config = Config(GamePhase.exploration);
-    // } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 10) {
-    //   config = Config(GamePhase.construction);
-    // }
+    final phase = _determineGamePhase(ships);
+    config = Config(phase);
 
     final marketListings = await MarketListingSnapshot.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
