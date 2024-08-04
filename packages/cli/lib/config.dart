@@ -29,7 +29,7 @@ class Config {
 
   // TODO(eseidel): This should be configured at runtime.
   /// The symbol of the agent we are controlling.
-  final String agentSymbol = 'ESEIDEL2';
+  final String agentSymbol = 'ESEIDEL';
 
   /// Whether or not we should enable mining behaviors.
   bool get enableMining => gamePhase < GamePhase.exploration;

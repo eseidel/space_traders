@@ -9,6 +9,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
 
   final agent = await db.getAgent(symbol: config.agentSymbol);
+  if (agent == null) {
+    logger.err("Failed to load agent: ${config.agentSymbol}");
+    exit(1);
+  }
   final systemSymbol = agent!.headquarters.system;
   var queue = IdleQueue();
   void resetQueue() {
