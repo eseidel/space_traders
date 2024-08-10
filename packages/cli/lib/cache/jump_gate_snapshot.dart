@@ -26,7 +26,7 @@ class JumpGateSnapshot {
   /// Gets all jump gates for the given system.
   Iterable<JumpGate> recordsForSystem(SystemSymbol systemSymbol) {
     return values
-        .where((record) => record.waypointSymbol.hasSystem(systemSymbol));
+        .where((record) => record.waypointSymbol.system == systemSymbol);
   }
 
   /// Gets the connections for the jump gate with the given symbol.

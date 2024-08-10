@@ -117,9 +117,8 @@ class Deal extends Equatable {
   bool get isFeeder => destination.isFeeder;
 
   /// Return if this deal is within the given system.
-  bool withinSystem(SystemSymbol systemSymbol) {
-    return sourceSymbol.hasSystem(systemSymbol) &&
-        destinationSymbol.hasSystem(systemSymbol);
+  bool withinSystem(SystemSymbol system) {
+    return sourceSymbol.system == system && destinationSymbol.system == system;
   }
 
   /// Encode the deal as JSON.
@@ -156,8 +155,7 @@ class CostedDeal {
             .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
             .toList(),
         costPerFuelUnit: json['costPerFuelUnit'] as int,
-        // TODO(eseidel): Remove null check once we've migrated all deals.
-        costPerAntimatterUnit: json['costPerAntimatterUnit'] as int? ?? 0,
+        costPerAntimatterUnit: json['costPerAntimatterUnit'] as int,
       );
 
   /// Create a CostedDeal from JSON or null.

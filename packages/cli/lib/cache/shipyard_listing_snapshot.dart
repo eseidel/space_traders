@@ -27,8 +27,8 @@ class ShipyardListingSnapshot {
   int get waypointCount => _listingBySymbol.keys.length;
 
   /// Fetch the ShipyardListings for the given SystemSymbol.
-  Iterable<ShipyardListing> listingsInSystem(SystemSymbol systemSymbol) =>
-      listings.where((l) => l.waypointSymbol.hasSystem(systemSymbol));
+  Iterable<ShipyardListing> listingsInSystem(SystemSymbol system) =>
+      listings.where((l) => l.waypointSymbol.system == system);
 
   /// The ShipyardListings which sell the given ship type.
   Iterable<ShipyardListing> listingsWithShip(ShipType shipType) {

@@ -25,7 +25,7 @@ class MarketListingSnapshot {
 
   /// Fetch the MarketListings for the given SystemSymbol.
   Iterable<MarketListing> listingsInSystem(SystemSymbol systemSymbol) =>
-      listings.where((l) => l.waypointSymbol.hasSystem(systemSymbol));
+      listings.where((l) => l.waypointSymbol.system == systemSymbol);
 
   /// Fetch the MarketListing for the given WaypointSymbol.
   MarketListing? operator [](WaypointSymbol waypointSymbol) =>

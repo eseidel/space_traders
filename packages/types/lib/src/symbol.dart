@@ -50,14 +50,6 @@ class WaypointSymbol {
     return waypoint.substring(lastHyphen + 1);
   }
 
-  /// Returns true if the waypoint is from the given system.
-  /// Faster than converting to a SystemSymbol and comparing.
-  // TODO(eseidel): This can be removed now.
-  bool hasSystem(SystemSymbol systemSymbol) {
-    // Avoid constructing a new SystemSymbol if we don't have to.
-    return system == systemSymbol;
-  }
-
   /// Returns the System as a string to pass to OpenAPI.
   String get systemString => system.system;
 

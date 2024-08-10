@@ -98,16 +98,9 @@ class Transaction extends Equatable {
   /// Create a new transaction from json.
   /// This only exists to support CostedDeal.fromJson and should be removed.
   factory Transaction.fromJson(Map<String, dynamic> json) {
-    final transactionTypeJson = json['transactionType'];
-    final TransactionType transactionType;
-    // TODO(eseidel): Remove int check on next reset.
-    if (transactionTypeJson is int) {
-      transactionType = TransactionType.values[transactionTypeJson];
-    } else {
-      transactionType = TransactionType.fromJson(transactionTypeJson as String);
-    }
     return Transaction(
-      transactionType: transactionType,
+      transactionType:
+          TransactionType.fromJson(json['transactionType'] as String),
       shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String?),
