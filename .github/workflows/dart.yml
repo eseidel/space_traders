@@ -14,6 +14,7 @@ jobs:
       config: cspell.config.yaml
 
   build:
+    name: 🏗️ Build & Test
     runs-on: ubuntu-latest
 
     steps:
