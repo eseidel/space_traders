@@ -125,7 +125,7 @@ extension ShipUtils on Ship {
             symbol: tradeSymbol,
             name: name,
             description: description,
-            // Add intially with zero, we're about to add units below.
+            // Add initially with zero, we're about to add units below.
             units: 0,
           ),
         );

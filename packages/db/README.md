@@ -4,7 +4,7 @@ package:db is an internal package for storing state in a Postgres database.
 
 ## Setup
 
-You will need Docker. On Unbutu:
+You will need Docker. On Ubuntu:
 ```
 snap install docker
 ```

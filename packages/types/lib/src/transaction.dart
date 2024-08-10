@@ -241,7 +241,7 @@ class Transaction extends Equatable {
     int agentCredits,
   ) {
     // This is a bit of a hack, using "creditsChange" as the per-unit-price
-    // creditsChange is only non-zero for fullfillment transactions.
+    // creditsChange is only non-zero for fulfillment transactions.
     final quantity = transaction.unitsDelivered ??
         (transaction.contractAction == ContractAction.fulfillment ? 1 : 0);
     final perUnitPrice = transaction.creditsChange;

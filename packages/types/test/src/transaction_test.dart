@@ -63,7 +63,7 @@ void main() {
       contractAction: null,
       contractId: null,
     );
-    // Note: Quanity and agentCredits are swapped relative to transaction1:
+    // Note: Quantity and agentCredits are swapped relative to transaction1:
     expect(transaction.hashCode, isNot(transaction2.hashCode));
   });
 

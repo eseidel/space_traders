@@ -23,7 +23,7 @@ class SyntheticDeal {
       )
       .toList();
 
-  List<Transaction> get goolsSells => transactions
+  List<Transaction> get goodsSells => transactions
       .where(
         (t) =>
             t.tradeType == MarketTransactionTypeEnum.SELL &&
@@ -33,7 +33,7 @@ class SyntheticDeal {
 
   bool get isCompleted {
     final buys = goodsBuys;
-    final sells = goolsSells;
+    final sells = goodsSells;
     if (buys.isEmpty || sells.isEmpty) {
       return false;
     }

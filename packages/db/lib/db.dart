@@ -527,7 +527,7 @@ class Database {
     return queryMany(unacceptedContractsQuery(), contractFromColumnMap);
   }
 
-  /// Get all contracts which are !fullfilled and !expired.
+  /// Get all contracts which are !fulfilled and !expired.
   Future<Iterable<Contract>> activeContracts() async {
     return queryMany(activeContractsQuery(), contractFromColumnMap);
   }

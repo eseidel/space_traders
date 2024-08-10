@@ -45,7 +45,7 @@ void main() {
     expect(() => WaypointSymbol.fromJsonOrNull('S-E-A-F'), throwsArgumentError);
   });
 
-  test('WaypointSymbol.waypoinName and localSectorName', () {
+  test('WaypointSymbol.waypointName and localSectorName', () {
     final symbol = WaypointSymbol.fromString('S-E-J');
     expect(symbol.waypointName, 'J');
     expect(symbol.sectorLocalName, 'E-J');

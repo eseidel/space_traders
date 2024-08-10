@@ -23,7 +23,7 @@ class _MarketScanBuilder {
   }
 
   void _addSellOpp(SellOpp sell) {
-    // Sort sells decending so we remove the cheapest sell price.
+    // Sort sells descending so we remove the cheapest sell price.
     final sells = (sellOpps[sell.tradeSymbol] ?? [])
       ..add(sell)
       ..sort((a, b) => -a.price.compareTo(b.price));

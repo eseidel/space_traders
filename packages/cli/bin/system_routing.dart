@@ -6,7 +6,7 @@ import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  // Evalute the navigability of the starting system by ship type.
+  // Evaluate the navigability of the starting system by ship type.
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
 

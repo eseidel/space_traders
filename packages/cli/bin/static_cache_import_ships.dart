@@ -20,8 +20,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // If we saved dates with our static data we could be more sophisticated
   // and update based on data freshness.
 
-  // However we will update our shipyard chache with the parts from our active
-  // ships, for parts which we know are not yet changable.
+  // However we will update our shipyard cache with the parts from our active
+  // ships, for parts which we know are not yet changeable.
   for (final ship in ships.ships) {
     final shipType =
         staticCaches.shipyardShips.shipTypeFromFrame(ship.frame.symbol);

@@ -169,10 +169,10 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     final name =
         costed.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
 
-    final inProgresMarker = dealNotInProgress(deal) ? '' : '*';
+    final inProgressMarker = dealNotInProgress(deal) ? '' : '*';
 
     table.add([
-      '$name$inProgresMarker',
+      '$name$inProgressMarker',
       w(deal.sourceSymbol),
       c(costed.expectedInitialBuyPrice),
       w(deal.destinationSymbol),

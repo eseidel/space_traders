@@ -96,7 +96,7 @@ void main() {
     ]);
   });
 
-  test('updateCacheWithTransferedCargo', () {
+  test('updateCacheWithTransferredCargo', () {
     final ship = _MockShip();
     when(() => ship.cargo).thenReturn(ShipCargo(capacity: 100, units: 0));
 

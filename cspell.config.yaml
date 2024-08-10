@@ -1,4 +1,59 @@
 $schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json
 version: "0.2"
+ignorePaths:
+  - "**/build/**"
+  - "packages/cli/static_data"
+  - "packages/cli/data"
+  - "packages/openapi"
+  - "*.sql"
 words:
   - leaderboards
+  - lookback
+  - psql
+  - spacetraders
+  - mocktail
+  - siphoner
+  - jumpgate
+  - microtask
+  - eseidel
+  - healthz
+  - upsert
+  - sqls
+  - systrace
+  - cooldowns
+  - jumpgates
+  - cooldown
+  - siphoners
+  - pathing
+  - upcycle
+  - AFAICT
+  - PGPASSWORD
+  - PGUSER
+  - cooldown
+  - undock
+  - siphonable
+  - HYPERGIANT
+  - screenrc
+  - MERITIUM
+  - Opps
+  - Seidel
+  - genhtml
+  - sublist
+  - codegen
+  - URANITE
+  - callsign
+  - writeln
+  - undocked
+  - ratelimit
+  - stddev
+  - vcpu
+  - ASTRO
+  - ARGB
+  - LTRB
+  - Multiset
+  - endtemplate
+  - termcapinfo
+  - cupertino
+  - Unstreamed
+  - SAF
+

@@ -49,7 +49,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   // Add up the credits change from all transactions.
   // The diff should not include the first transaction, since agentCredits
-  // is the credits *after* that transaction occured.
+  // is the credits *after* that transaction occurred.
   final computedDiff =
       transactions.skip(1).fold(0, (sum, t) => sum + t.creditsChange);
   if (computedDiff != creditDiff) {

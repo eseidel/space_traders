@@ -73,7 +73,7 @@ void logShip(
     final destination = routePlan.endSymbol.sectorLocalName;
     final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
     final arrival = approximateDuration(timeLeft);
-    logger.info('${indent}enroute to $destination $destinationType '
+    logger.info('${indent}en route to $destination $destinationType '
         'in $arrival');
   } else {
     logger.info('$indent${describeShipNav(ship.nav)} ${waypoint.type}');

@@ -33,7 +33,7 @@ int expectedPriceMovement({
   // they've fit very well to a quadratic curve.
   // Including buying units below the set price *decreasing* the price.
   // However I don't know how to turn that into a function to predict the
-  // next price, especially acros multiple different markets and trade goods.
+  // next price, especially across multiple different markets and trade goods.
   // These price changes most notably affect "shallow" markets, where the
   // trade volume is low.
   // I don't have good data for tradeVolume = 1, it likely moves faster?

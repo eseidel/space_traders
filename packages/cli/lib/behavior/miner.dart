@@ -416,7 +416,7 @@ Future<JobResult> emptyCargoIfNeeded(
   if (nearestMarketSymbol == null) {
     shipErr(
       ship,
-      'No nearby market to sell ${largestCargo.symbol}, jetisoning cargo!',
+      'No nearby market to sell ${largestCargo.symbol}, jettisoning cargo!',
     );
     // Only jettison the item we don't know how to sell, others might sell.
     await jettisonCargoAndLog(db, api, ship, largestCargo);
@@ -531,7 +531,7 @@ Future<JobResult> travelAndSellCargo(
     currentMarket,
     ship,
     // We don't have a good way to know what type of cargo this is.
-    // Assuming it's goods (rather than captial) is probably fine.
+    // Assuming it's goods (rather than capital) is probably fine.
     AccountingType.goods,
   );
 
@@ -722,7 +722,7 @@ Future<JobResult> transferOrSellCargo(
 
   // Only wait for haulers at the mine, otherwise we can deadlock where
   // haulers are waiting for our return and we're somewhere else waiting for
-  // hauer to arrive.
+  // hauler to arrive.
   if (ship.waypointSymbol == waitLocation) {
     final haulers = centralCommand.squadForShip(ship)?.haulers.toList() ?? [];
     if (haulers.isNotEmpty) {

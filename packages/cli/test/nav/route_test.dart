@@ -228,12 +228,12 @@ void main() {
       'X1-CH89-70689B',
     ); // another random other waypoint in file.
 
-    final systemConnnectivity = SystemConnectivity.test({
+    final systemConnectivity = SystemConnectivity.test({
       waypoint1: {waypoint4},
     });
     final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,
-      systemConnnectivity,
+      systemConnectivity,
       sellsFuel: (_) => false,
     );
     RoutePlan? planRoute(
@@ -330,10 +330,10 @@ void main() {
       fs: fs,
     );
 
-    final systemConnetivity = SystemConnectivity.test({});
+    final systemConnectivity = SystemConnectivity.test({});
     final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,
-      systemConnetivity,
+      systemConnectivity,
       // Allow refueling at waypoints or this test will fail.
       sellsFuel: (_) => true,
     );

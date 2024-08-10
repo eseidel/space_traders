@@ -83,7 +83,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       'c/m',
       'c/s',
       'Role',
-      'Txns',
+      'TXNs',
       'Cargo',
     ],
     style: const TableStyle(compact: true),

@@ -9,7 +9,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   while (true) {
     final _ = await queue.sendAndWait(
-      // Low prioirty.
+      // Low priority.
       -1,
       QueuedRequest.empty('https://api.spacetraders.io/v2'),
     );

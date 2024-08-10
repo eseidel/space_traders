@@ -29,7 +29,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       final destination = routePlan.endSymbol.sectorLocalName;
       final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
       final arrival = approximateDuration(timeLeft);
-      logger.info('  enroute to $destination $destinationType in $arrival');
+      logger.info('  en route to $destination $destinationType in $arrival');
     }
   }
 }

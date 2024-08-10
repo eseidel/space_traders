@@ -55,7 +55,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
     logEvents(ship, data.events);
     return data;
   } on ApiException catch (e) {
-    if (!isInfuficientFuelException(e)) {
+    if (!isInsufficientFuelException(e)) {
       rethrow;
     }
     shipErr(ship, 'Insufficient fuel, drifting to $waypointSymbol');

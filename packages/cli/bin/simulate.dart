@@ -230,9 +230,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final minerRequestsPerCycle = miner.length;
   logger.info('Miner cycle time: $minerCycleTime');
 
-  final minerReqeustsPerMinute = minerRequestsPerCycle *
+  final minerRequestsPerMinute = minerRequestsPerCycle *
       (const Duration(minutes: 1).inSeconds / minerCycleTime.inSeconds);
-  final minerRequestsPerSecond = minerReqeustsPerMinute / 60;
+  final minerRequestsPerSecond = minerRequestsPerMinute / 60;
   logger.info('Miner requests per second: $minerRequestsPerSecond');
 
   final minerCyclesPerMinute =
@@ -298,7 +298,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // final creditsPerSecondPerShip = creditsPerSecond / shipsPerSquad;
   // logger.info('c/s per ship: ${cps(creditsPerSecondPerShip)}');
 
-  final requestsPerMinute = surveyorRequestsPerMinute + minerReqeustsPerMinute;
+  final requestsPerMinute = surveyorRequestsPerMinute + minerRequestsPerMinute;
   final creditsPerRequest = creditsPerMinute / requestsPerMinute;
   logger.info('Credits per request: $creditsPerRequest');
 

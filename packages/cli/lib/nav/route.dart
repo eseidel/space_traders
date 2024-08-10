@@ -91,7 +91,7 @@ double _speedMultiplier(ShipNavFlightMode flightMode, TravelMethod travelType) {
       : _warpSpeedMultiplier;
   final multiplier = map[flightMode];
   if (multiplier == null) {
-    throw UnimplementedError('Unimplmented $flightMode for $travelType');
+    throw UnimplementedError('Unimplemented $flightMode for $travelType');
   }
   return multiplier.toDouble();
 }

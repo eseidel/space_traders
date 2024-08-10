@@ -4,7 +4,7 @@ set -e
 
 PGPASSWORD=password
 PGUSER=postgres
-CONTINER_NAME=spacetraders_postgres
+CONTAINER_NAME=spacetraders_postgres
 DB_NAME=spacetraders
 
-docker exec -e PGPASSWORD=$PGPASSWORD $CONTINER_NAME pg_dump $DB_NAME -U $PGUSER > spacetraders.sql
+docker exec -e PGPASSWORD=$PGPASSWORD $CONTAINER_NAME pg_dump $DB_NAME -U $PGUSER > spacetraders.sql

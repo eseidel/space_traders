@@ -91,7 +91,7 @@ Future<DateTime?> beingNewRouteAndLog(
   return waitTime;
 }
 
-/// Begins a new nagivation action [ship] along [routePlan].
+/// Begins a new navigation action [ship] along [routePlan].
 /// Returns the wait time if the ship should wait or null if no wait is needed.
 /// Saves the route to the ship's behavior state.
 Future<DateTime?> beingRouteAndLog(
@@ -144,7 +144,7 @@ class NavResult {
       : _type = _NavResultType.wait,
         _waitTime = wait;
 
-  /// ContniueAction tells the caller it is OK to continue the action,
+  /// ContinueAction tells the caller it is OK to continue the action,
   /// we have done whatever navigation was necessary.
   NavResult._continueAction()
       : _type = _NavResultType.continueAction,
@@ -401,7 +401,7 @@ Future<NavResult> continueNavigationIfNeeded(
           ),
         );
       } on ApiException catch (e) {
-        if (isInfuficientFuelException(e)) {
+        if (isInsufficientFuelException(e)) {
           throw const JobException('Not enough fuel', Duration(minutes: 10));
         }
         rethrow;

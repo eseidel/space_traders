@@ -316,7 +316,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
   // Prevent exceptions from racing ships:
   // ApiException 400: {"error":{"message":"Failed to update contract.
   // Contract has already been fulfilled.","code":4504,"data":
-  // {"contractId":"cljysnr2wt47as60cvz377bhh"}}}
+  // {"contractId":"xxxx"}}}
   jobAssert(
     !beforeDelivery.fulfilled,
     'Contract ${beforeDelivery.id} already fulfilled.',
@@ -633,7 +633,7 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
   if (costedTrip == null) {
     shipErr(
       ship,
-      'No nearby market to sell ${unwantedCargo.symbol}, jetisoning cargo!',
+      'No nearby market to sell ${unwantedCargo.symbol}, jettisoning cargo!',
     );
     // Only jettison the item we don't know how to sell, others might sell.
     await jettisonCargoAndLog(db, api, ship, unwantedCargo);

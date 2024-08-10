@@ -88,7 +88,7 @@ class WaypointSymbol {
 }
 
 // We used to use split(), but that shows up in hot code paths.
-/// Returns the number of hypens in the given string.
+/// Returns the number of hyphens in the given string.
 int _countHyphens(String str) {
   var count = 0;
   for (var i = 0; i < str.length; i++) {

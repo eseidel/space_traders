@@ -103,7 +103,7 @@ bool isMarketDoesNotSellFuelException(ApiException e) {
 // more fuel for navigation.","code":4203,"data":{"shipSymbol":"ESEIDEL-2",
 // "fuelRequired":39,"fuelAvailable":25}}}
 /// Returns true if [e] is an insufficient fuel exception.
-bool isInfuficientFuelException(ApiException e) {
+bool isInsufficientFuelException(ApiException e) {
   return isAPIExceptionWithCode(e, 4203);
 }
 

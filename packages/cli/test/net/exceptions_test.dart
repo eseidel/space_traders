@@ -116,14 +116,14 @@ void main() {
     expect(isMarketDoesNotSellFuelException(exception), isTrue);
   });
 
-  test('isInfuficientFuelException', () {
+  test('isInsufficientFuelException', () {
     final exception = ApiException(
         400,
         '{"error":{"message":"Navigate request failed. Ship ESEIDEL-2 '
         'requires 14 more fuel for '
         'navigation.","code":4203,"data":{"shipSymbol":"ESEIDEL-2", '
         '"fuelRequired":39,"fuelAvailable":25}}}');
-    expect(isInfuficientFuelException(exception), isTrue);
+    expect(isInsufficientFuelException(exception), isTrue);
   });
 
   test('isMaintenanceWindowException', () {

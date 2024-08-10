@@ -398,7 +398,7 @@ ApiException 400: {"error":{"message":"Ship is currently in-transit from X1-MU55
 
 Write a tool to list how many surveys deep we have?
 
-### Implement missing bits of SAF's strat
+### Implement missing bits of SAF's strategy
 
 "At the start of a reset my miners sell themselves and only locally, after that
 I add haulers to which the miners transfers the cargo and they sell locally or
@@ -488,7 +488,7 @@ ApiException 400: Exception occurred: POST /my/ships/ESEIDEL-7/jump (Inner excep
 🛸#65 🤝   1 ENGINE_ION_DRIVE_II -100% -19,444c per   1 x      1c =     +1c -> 🏦 287,310,886c
 🛸#65 Expected 18,669c profit (71c/s), got -147,134c (-311c/s) in 00:07:53, expected 00:04:22
 
-If nothing else, each interval should be evaluted against the possibility of moving to sell?
+If nothing else, each interval should be evaluated against the possibility of moving to sell?
 
 ### Log error rates from network executor
 
@@ -624,7 +624,7 @@ in 6h uses 45 fuel
 ### Contract failure?
 
 Unhandled exception:
-ApiException 400: {"error":{"message":"Agent ESEIDEL already has an active contract.","code":4511,"data":{"agentSymbol":"ESEIDEL","contractId":"clon2tb9m00dqs60cmjrptyet"}}}
+ApiException 400: {"error":{"message":"Agent ESEIDEL already has an active contract.","code":4511,"data":{"agentSymbol":"ESEIDEL","contractId":"xxx"}}}
 #0      FleetApi.negotiateContract (package:openapi/api/fleet_api.dart:1335:7)
 <asynchronous suspension>
 #1      negotiateContractAndLog (package:cli/net/actions.dart:502:20)
@@ -857,7 +857,7 @@ findBestMarketToSell relies on prices, it probably doesn't need to.
 Found 14 deals for ESEIDEL-1 from AC35-C43
 🛸#1  Found deal: EQUIPMENT                  AC35-K90      2,191c -> AC35-A1       3,135c  +37,472c (43%) 5m 127c/s  87,928c
 🛸#1  Cargo hold not empty, finding market to sell HYDROCARBON.
-🛸#1  No nearby market to sell HYDROCARBON, jetisoning cargo!
+🛸#1  No nearby market to sell HYDROCARBON, jettisoning cargo!
 [WARN] 🛸#1  Jettisoning 40 HYDROCARBON
 🛸#1  Beginning route to AC35-K90 (3m)
 🛸#1  No market at AC35-C43, cannot refuel, need to replan.
@@ -870,7 +870,7 @@ Found 14 deals for ESEIDEL-1 from AC35-C43
 
 e.g.
 
-] showRoute X1-GN97-A1 X1-JX78-A1 RDDEV-1
+] showRoute X1-GN97-A1 X1-JX78-A1 RD-DEV-1
  hops:11 eta:42m46s cost:-45,975 debug:32ms/1,457
   eta  fuelCost  fuelB  lvFuel  act       mode    from          to              arCd  arFuel
 --------------------------------------------------------------------------------------------
@@ -950,7 +950,7 @@ is also going to change as part of our delivery.
 
 [WARN] 🛸#F  Expected 258,752c profit (9c/s), got 1,720c (0c/s) in 12:36:02, expected 07:17:49
 Unhandled exception:
-ApiException 400: {"error":{"message":"Agent ESEIDEL already has an active contract.","code":4511,"data":{"agentSymbol":"ESEIDEL","contractId":"clqa10azr2q0es60cv0d1t4q1"}}}
+ApiException 400: {"error":{"message":"Agent ESEIDEL already has an active contract.","code":4511,"data":{"agentSymbol":"ESEIDEL","contractId":"xxxx"}}}
 #0      FleetApi.negotiateContract (package:openapi/api/fleet_api.dart:1335:7)
 <asynchronous suspension>
 #1      negotiateContractAndLog (package:cli/net/actions.dart:543:20)
@@ -982,7 +982,7 @@ about 2pm on Sunday 12/24.
 
 ```json
  {
-  "id": "clqa10azr2q0es60cv0d1t4q1",
+  "id": "xxx",
   "factionSymbol": "ASTRO",
   "type": "PROCUREMENT",
   "terms": {
@@ -1386,11 +1386,11 @@ root@ubuntu-s-2vcpu-4gb-sfo3-01:~/space_traders/packages/cli# dart run bin/fleet
 Fleet: 1 Frigate, 1 Probe, 11 Light Freighter, 12 Drone
 1 command (trader) 40/40
    FERTILIZERS              40 x 212c     = 8,480c
-   enroute to TA36-E44 MOON in 31s
+   en route to TA36-E44 MOON in 31s
    FERTILIZERS                TA36-G48        178c -> TA36-E44        212c   +1,216c (17%) 2m  10c/s   7,264c
    duration: 2m
 2 probe (systemWatcher) SATELLITE 
-   enroute to TA36-H52 MOON in 57s
+   en route to TA36-H52 MOON in 57s
 3 trader (minerHauler) 47/80
    ALUMINUM_ORE             47 x 20c      = 940c
    Orbiting TA36-XE5F ENGINEERED_ASTEROID
@@ -1400,7 +1400,7 @@ Fleet: 1 Frigate, 1 Probe, 11 Light Freighter, 12 Drone
    COPPER_ORE                2 x 22c      = 44c
    IRON_ORE                 27 x 23c      = 621c
    QUARTZ_SAND              12 x 19c      = 228c
-   enroute to TA36-B7 ASTEROID_BASE in 1m
+   en route to TA36-B7 ASTEROID_BASE in 1m
 5 trader (minerHauler) 0/80
    Orbiting TA36-XE5F ENGINEERED_ASTEROID
 

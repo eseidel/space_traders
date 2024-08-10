@@ -12,7 +12,7 @@ enum GamePhase with EnumIndexOrdering {
   /// Focused on building the jumpgate.
   construction,
 
-  /// Focused on explorating the galaxy to find better ships.
+  /// Focused on exploring the galaxy to find better ships.
   exploration,
 
   /// Sell off all our ships and retire.
@@ -71,7 +71,7 @@ class Config {
   /// https://docs.spacetraders.io/api-guide/rate-limits
   double targetRequestsPerSecond = 2;
 
-  final _boostrapShips = [
+  final _bootstrapShips = [
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
     ShipType.LIGHT_HAULER,
@@ -125,7 +125,7 @@ class Config {
     // Don't buy bootstrap ships after exploration, since we'll start
     // scrapping and don't want to re-buy.
     if (gamePhase < GamePhase.exploration) {
-      ships.addAll(_boostrapShips);
+      ships.addAll(_bootstrapShips);
     }
     if (gamePhase >= GamePhase.exploration) {
       ships.addAll(_explorationShips);
@@ -148,8 +148,8 @@ class Config {
           // Might want to consider limiting to short trades (< 5 mins) to avoid
           // tying up capital early.
           Behavior.trader,
-          // Early game we can use the command ship to explore if needed.
-          // This is perfered over mining and siphoning in case those are far away
+          // Early game we can use the command ship to explore if needed. This
+          // is preferred over mining and siphoning in case those are far away
           // on the assumption the command ship should be trading early and all
           // it's missing is price data to do so.
           // Behavior.charter,

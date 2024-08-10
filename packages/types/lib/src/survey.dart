@@ -1,6 +1,6 @@
 import 'package:types/api.dart';
 
-/// Record of a historcial survey.
+/// Record of a historical survey.
 // This can't be @immutable because Survey is not.
 class HistoricalSurvey {
   /// Create a HistoricalSurvey

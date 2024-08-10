@@ -116,12 +116,12 @@ class ExtractionScore {
 
   /// The score of this MineAndSell. Lower is better.
   int get score {
-    // TODO(eseidel): Score should adjust based on "stripped" trate for mine
+    // TODO(eseidel): Score should adjust based on "stripped" trait for mine
     // as well as the average value of goods at the market.
     return deliveryDistance;
   }
 
-  /// The names of the traits with boilderplate removed.
+  /// The names of the traits with boilerplate removed.
   List<String> get displayTraitNames {
     return sourceTraits
         .map((t) => t.value.replaceAll('_DEPOSITS', ''))
