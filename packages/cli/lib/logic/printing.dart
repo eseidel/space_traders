@@ -252,15 +252,20 @@ String describeConstructionProgress(Construction? construction) {
 }
 
 /// Returns a string representing the current navigation status of the ship.
-String describeShipNav(ShipNav nav) {
+String describeShipNav(
+  ShipNav nav, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
   final waypoint = nav.waypointSymbolObject.sectorLocalName;
   switch (nav.status) {
     case ShipNavStatus.DOCKED:
       return 'Docked at $waypoint';
     case ShipNavStatus.IN_ORBIT:
-      return 'Orbiting $waypoint';
+      final arrivalDuration = getNow().difference(nav.route.arrival);
+      return 'Orbiting $waypoint since ${approximateDuration(arrivalDuration)}';
     case ShipNavStatus.IN_TRANSIT:
-      return 'Transit to $waypoint';
+      final remainingDuration = nav.route.arrival.difference(getNow());
+      return 'Transit to $waypoint in ${approximateDuration(remainingDuration)}';
   }
   return 'Unknown';
 }
