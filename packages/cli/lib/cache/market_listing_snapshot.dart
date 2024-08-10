@@ -17,6 +17,14 @@ class MarketListingSnapshot {
     return MarketListingSnapshot(listings);
   }
 
+  static Future<MarketListingSnapshot> loadOneSystem(
+    Database db,
+    SystemSymbol systemSymbol,
+  ) async {
+    final listings = await db.marketListingsInSystem(systemSymbol);
+    return MarketListingSnapshot(listings);
+  }
+
   /// The WaypointSymbols.
   Iterable<WaypointSymbol> get waypointSymbols => _listingBySymbol.keys;
 

@@ -143,7 +143,7 @@ Future<RoutePlan?> routeToNextSystemToSeed(
   }
   final occupiedClusters = systemSymbols
       .map((s) => connectivity.clusterIdForSystem(s))
-      .whereNotNull()
+      .nonNulls
       .toSet();
 
   final route = await _routeToClosestSystemToSeed(

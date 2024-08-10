@@ -27,15 +27,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs);
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
-  // TODO(eseidel): Add loadOneSystem to MarketListingSnapshot.
-  final marketListings = await MarketListingSnapshot.load(db);
-  final listings = marketListings.listings
-      .where((l) => l.waypointSymbol.system == hqSystem)
-      .toList();
+  final marketListings =
+      await MarketListingSnapshot.loadOneSystem(db, hqSystem);
+
   // Collect all imports and exports.
   final exports = <TradeSymbol, WaypointSymbol>{};
   final imports = <TradeSymbol, WaypointSymbol>{};
-  for (final listing in listings) {
+  for (final listing in marketListings.listings) {
     // This is wrong because the last waypoint "wins", even if we have multiple.
     for (final export in listing.exports) {
       exports[export] = listing.waypointSymbol;

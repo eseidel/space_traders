@@ -647,3 +647,17 @@ Future<ShipyardListing?> nearestShipyard(
   });
   return listing;
 }
+
+Duration travelTimeTo(
+    RoutePlanner routePlanner, Ship ship, WaypointSymbol waypoint) {
+  final route = routePlanner.planRoute(
+    ship.shipSpec,
+    start: ship.waypointSymbol,
+    end: waypoint,
+  );
+  final routeDuration = route!.duration;
+  if (ship.isInTransit) {
+    return routeDuration + ship.nav.route.timeUntilArrival();
+  }
+  return routeDuration;
+}

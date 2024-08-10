@@ -344,6 +344,13 @@ class Database {
     return queryMany(query, marketListingFromColumnMap);
   }
 
+  Future<Iterable<MarketListing>> marketListingsInSystem(
+    SystemSymbol system,
+  ) async {
+    final query = marketListingsInSystemQuery(system);
+    return queryMany(query, marketListingFromColumnMap);
+  }
+
   /// Get all WaypointSymbols with a market importing the given tradeSymbol.
   Future<Iterable<WaypointSymbol>> marketsWithImportInSystem(
     SystemSymbol system,

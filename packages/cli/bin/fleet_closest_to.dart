@@ -18,24 +18,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     sellsFuel: defaultSellsFuel(marketListings),
   );
 
-  // TODO(eseidel): This needs to be centralized somewhere.
-  Duration travelTimeTo(Ship ship, WaypointSymbol waypoint) {
-    final route = routePlanner.planRoute(
-      ship.shipSpec,
-      start: ship.waypointSymbol,
-      end: waypoint,
-    );
-    final routeDuration = route!.duration;
-    if (ship.isInTransit) {
-      return routeDuration + ship.nav.route.timeUntilArrival();
-    }
-    return routeDuration;
-  }
-
   final travelTimes = <ShipSymbol, Duration>{};
 
   for (final ship in ships.ships) {
-    final travelTime = travelTimeTo(ship, destination);
+    final travelTime = travelTimeTo(routePlanner, ship, destination);
     travelTimes[ship.symbol] = travelTime;
   }
 
