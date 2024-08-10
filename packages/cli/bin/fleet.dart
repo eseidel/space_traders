@@ -108,7 +108,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     return;
   }
 
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   for (final ship in matchingShips) {
     final behaviorState = await db.behaviorStateBySymbol(ship.symbol);

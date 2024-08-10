@@ -217,7 +217,7 @@ void main() {
     final systemsCache = SystemsCache.load(
       fs,
       path: 'test/nav/fixtures/systems-09-24-2023.json',
-    )!;
+    );
     final waypoint1 = WaypointSymbol.fromString(
       'X1-V94-96191X',
     ); // first waypoint in systems.json

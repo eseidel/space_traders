@@ -9,7 +9,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSymbol =
       await startWaypointFromArg(db, argResults.rest.firstOrNull);
   final staticCaches = StaticCaches.load(fs);
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
 

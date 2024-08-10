@@ -46,7 +46,7 @@ class JsonListStore<Record extends Object> {
   }
 
   /// Load records from a file.
-  static List<R>? loadRecords<R>(
+  static List<R>? maybeLoadRecords<R>(
     FileSystem fs,
     String path,
     R Function(Map<String, dynamic>) recordFromJson,
@@ -56,5 +56,13 @@ class JsonListStore<Record extends Object> {
       return _parseRecords<R>(file.readAsStringSync(), recordFromJson);
     }
     return null;
+  }
+
+  static List<R> loadRecords<R>(
+    FileSystem fs,
+    String path,
+    R Function(Map<String, dynamic>) recordFromJson,
+  ) {
+    return _parseRecords<R>(fs.file(path).readAsStringSync(), recordFromJson);
   }
 }

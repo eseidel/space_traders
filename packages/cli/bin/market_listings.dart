@@ -61,7 +61,7 @@ void addSymbols(
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final hqSystem = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
 

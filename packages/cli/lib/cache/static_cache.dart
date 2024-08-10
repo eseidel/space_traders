@@ -24,7 +24,7 @@ List<Value> _loadJson<Value>(
   // This is nullable because OpenApi's fromJson are nullable.
   Value Function(dynamic) valueFromJson,
 ) {
-  return JsonListStore.loadRecords(
+  return JsonListStore.maybeLoadRecords(
         fs,
         path,
         (Map<String, dynamic> j) => valueFromJson(j),

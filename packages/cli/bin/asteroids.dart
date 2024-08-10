@@ -5,7 +5,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // List all known asteroids that have a market or shipyard.
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
 
   for (final marketListing in marketListings.listings) {
     final waypointSymbol = marketListing.waypointSymbol;

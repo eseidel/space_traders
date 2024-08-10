@@ -13,7 +13,7 @@ String plural(int count, String singular, [String plural = 's']) {
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final charterStates = await db.behaviorStatesWithBehavior(Behavior.charter);
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final ships = await ShipSnapshot.load(db);
 
   logger.info('${plural(charterStates.length, 'charter')}:');

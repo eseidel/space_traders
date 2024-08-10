@@ -6,7 +6,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Start at the agent's headquarters system.
   // Walk the web of jump gates to find endpoints we should scan.
   final systemSymbol = await myHqSystemSymbol(db);
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);

@@ -49,7 +49,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final systemWatcherStates =
       await db.behaviorStatesWithBehavior(Behavior.systemWatcher);
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final ships = await ShipSnapshot.load(db);
   final agentCache = await AgentCache.load(db);
 

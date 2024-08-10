@@ -4,7 +4,7 @@ import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/trading.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,

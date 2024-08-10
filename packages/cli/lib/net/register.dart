@@ -53,9 +53,6 @@ Future<String> register(
   required String callsign,
   String? email,
 }) async {
-  // final systemsCache = await SystemsCache.load(fs);
-  // final clusterCache = SystemConnectivity.fromSystemsCache(systemsCache);
-
   final client = getApiClient(db);
   final defaultApi = DefaultApi(client);
 

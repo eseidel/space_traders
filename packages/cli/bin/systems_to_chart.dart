@@ -51,7 +51,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final charts = await ChartingSnapshot.load(db);
 
   final connectedSystems = systemConnectivity

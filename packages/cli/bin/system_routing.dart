@@ -10,7 +10,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
 
-  final systems = SystemsCache.load(fs)!;
+  final systems = SystemsCache.load(fs);
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);

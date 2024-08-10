@@ -6,7 +6,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 
   logger.info('Starting from $startSystemSymbol, known reachable:');
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   // Can't use loadSystemConnectivity because need jumpGateSnapshot later.
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);

@@ -21,7 +21,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     jumpGateSnapshot,
     await constructionCache.snapshot(),
   );
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final chartingCache = ChartingCache(db);
   final waypointCache = WaypointCache(
     api,

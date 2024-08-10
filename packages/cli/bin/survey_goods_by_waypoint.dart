@@ -10,7 +10,7 @@ class _Stats {
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final surveys = await db.allSurveys();
   final chartingSnapshot = await ChartingSnapshot.load(db);
-  final systems = SystemsCache.load(fs)!;
+  final systems = SystemsCache.load(fs);
 
   // For each waypoint, record what tradeSymbols are found there.
   final statsByWaypoint = <WaypointSymbol, _Stats>{};

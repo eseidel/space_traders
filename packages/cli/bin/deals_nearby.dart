@@ -13,7 +13,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   final startArg = argResults['start'] as String?;
   final credits = int.parse(argResults['credits'] as String);
 
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final marketListings = await MarketListingSnapshot.load(db);
   final jumpGates = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);

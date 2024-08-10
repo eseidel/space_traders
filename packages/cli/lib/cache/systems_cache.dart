@@ -39,19 +39,16 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Load the cache from disk.
-  // TODO(eseidel): Make non-nullable.
-  static SystemsCache? load(
+  static SystemsCache load(
     FileSystem fs, {
     String path = defaultCacheFilePath,
   }) {
+    // Will throw if file does not exist.
     final systems = JsonListStore.loadRecords<System>(
       fs,
       path,
       System.fromJson,
     );
-    if (systems == null) {
-      return null;
-    }
     return SystemsCache(systems, fs: fs, path: path);
   }
 
@@ -64,9 +61,7 @@ class SystemsCache extends JsonListStore<System> {
   }) async {
     // Try to load systems.json.
     final fromCache = load(fs, path: path);
-    if (fromCache != null) {
-      return fromCache;
-    }
+    return fromCache;
 
     // If it does not exist, pull down and cache from the url.
     final uri = Uri.parse(url);

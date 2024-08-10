@@ -4,7 +4,7 @@ import 'package:cli/nav/waypoint_connectivity.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final staticCaches = StaticCaches.load(fs);
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final hqSystem = await myHqSystemSymbol(db);
   final fuelCapacity =
       staticCaches.shipyardShips[ShipType.COMMAND_FRIGATE]!.frame.fuelCapacity;

@@ -60,7 +60,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSymbol = args[0];
   final endSymbol = args[1];
 
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final bool Function(WaypointSymbol _) sellsFuel;
   if (argResults['fuel'] == 'true') {
     sellsFuel = (_) => true;

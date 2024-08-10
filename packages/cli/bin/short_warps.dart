@@ -71,7 +71,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final systemsCache = SystemsCache.load(fs)!;
+  final systemsCache = SystemsCache.load(fs);
   final ships = await ShipSnapshot.load(db);
 
   // Find ones not in our main cluster.
