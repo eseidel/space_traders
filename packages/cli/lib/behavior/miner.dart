@@ -558,6 +558,17 @@ JobResult _waitForHauler(
   DateTime Function() getNow = defaultGetNow,
 }) {
   final mineSymbol = ship.waypointSymbol;
+  // If there are haulers for this squad, and they are here, transfer to them.
+  final haulersHere = haulers.where(
+    (h) =>
+        h.waypointSymbol == ship.waypointSymbol &&
+        !h.isInTransit &&
+        h.cargo.availableSpace > 0,
+  );
+  if (haulersHere.isNotEmpty) {
+    return JobResult.wait(null);
+  }
+
   final nextHauler = _nextArrivingHauler(haulers, ship.waypointSymbol);
   if (nextHauler != null) {
     if (mineSymbol != nextHauler.waypointSymbol) {
@@ -586,25 +597,25 @@ JobResult _waitForHauler(
       'at $mineSymbol.',
     );
     return JobResult.wait(waitTime.add(padding));
-  } else {
-    final haulerSymbols = haulers.map((h) => h.symbol).join(', ');
+  }
+
+  final haulerSymbols = haulers.map((h) => h.symbol).join(', ');
+  shipInfo(
+    ship,
+    'No haulers at $mineSymbol, unknown next arrival time for '
+    '$haulerSymbols, checking in 1 minute.',
+  );
+  for (final hauler in haulers) {
+    final arrivalDuration = hauler.nav.route.arrival.difference(getNow());
     shipInfo(
       ship,
-      'No haulers at $mineSymbol, unknown next arrival time for '
-      '$haulerSymbols, checking in 1 minute.',
+      'Hauler ${hauler.symbol} is ${hauler.nav.status} '
+      'to ${hauler.waypointSymbol} '
+      'arrival ${approximateDuration(arrivalDuration)}, '
+      'with ${hauler.cargo.availableSpace} space available.',
     );
-    for (final hauler in haulers) {
-      final arrivalDuration = hauler.nav.route.arrival.difference(getNow());
-      shipInfo(
-        ship,
-        'Hauler ${hauler.symbol} is ${hauler.nav.status} '
-        'to ${hauler.waypointSymbol} '
-        'arrival ${approximateDuration(arrivalDuration)}, '
-        'with ${hauler.cargo.availableSpace} space available.',
-      );
-    }
-    return JobResult.wait(getNow().add(const Duration(minutes: 1)));
   }
+  return JobResult.wait(getNow().add(const Duration(minutes: 1)));
 }
 
 /// Attempt to transfer cargo to haulers, or wait for them to arrive.
@@ -625,7 +636,12 @@ Future<JobResult> transferToHaulersOrWait(
 
   // If there are haulers for this squad, and they are here, transfer to them.
   final haulersHere = haulers
-      .where((h) => h.waypointSymbol == ship.waypointSymbol && !h.isInTransit)
+      .where(
+        (h) =>
+            h.waypointSymbol == ship.waypointSymbol &&
+            !h.isInTransit &&
+            h.cargo.availableSpace > 0,
+      )
       // Sort the haulers by available space, so we fill the smallest first.
       .sortedBy<num>((h) => h.cargo.availableSpace);
   // If they are not here, wait.
