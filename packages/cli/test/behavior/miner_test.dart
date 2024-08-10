@@ -444,7 +444,7 @@ void main() {
     final haulerFrame = _MockShipFrame();
     when(() => hauler.frame).thenReturn(haulerFrame);
     when(() => haulerFrame.symbol).thenReturn(ShipFrameSymbolEnum.SHUTTLE);
-    final haulerNav = shipNav; // Can just share for now.
+    final haulerNav = _MockShipNav();
     when(() => hauler.nav).thenReturn(haulerNav);
     final haulerCargo = ShipCargo(
       capacity: 60,
@@ -453,6 +453,8 @@ void main() {
     );
     final haulerNavRoute = _MockShipNavRoute();
     when(() => haulerNav.route).thenReturn(haulerNavRoute);
+    when(() => haulerNav.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => haulerNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
     final arrival = now.add(const Duration(minutes: 1));
     when(() => haulerNavRoute.arrival).thenReturn(arrival);
     when(() => hauler.cargo).thenReturn(haulerCargo);
@@ -488,6 +490,7 @@ void main() {
 
     final logger = _MockLogger();
 
+    final paddedArrival = arrival.add(Duration(seconds: 1));
     final result = await runWithLogger(logger, () async {
       final result = await transferToHaulersOrWait(
         state,
@@ -500,7 +503,8 @@ void main() {
       );
       return result;
     });
-    expect(result.waitTime, arrival);
+    // Check for the hauler 1s (padding) after it arrives.
+    expect(result.waitTime, paddedArrival);
 
     // transferOrSellCargo is just a wrapper and should work too.
     final orSell = await runWithLogger(logger, () async {
@@ -515,7 +519,7 @@ void main() {
       );
       return result;
     });
-    expect(orSell.waitTime, arrival);
+    expect(orSell.waitTime, paddedArrival);
   });
 
   test('emptyCargoIfNeededForMining', () async {
