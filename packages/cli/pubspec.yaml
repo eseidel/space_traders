@@ -5,7 +5,7 @@ publish_to: none
 repository: https://github.com/eseidel/space_traders
 
 environment:
-  sdk: ^3.0.0
+  sdk: ^3.5.0
 
 dependencies:
   args: ^2.4.1
@@ -26,10 +26,10 @@ dependencies:
   openapi:
     path: ../openapi
   path: ^1.8.3
-  scoped:
+  scoped_deps:
     git:
       url: https://github.com/shorebirdtech/shorebird.git
-      path: packages/scoped
+      path: packages/scoped_deps
   stats: ^2.0.0
   types:
     path: ../types
