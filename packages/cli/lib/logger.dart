@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
-import 'package:scoped/scoped.dart';
+import 'package:scoped_deps/scoped_deps.dart';
 import 'package:types/types.dart';
 
 export 'package:mason_logger/mason_logger.dart';

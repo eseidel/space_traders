@@ -6,7 +6,7 @@ import 'package:cli/logger.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:scoped/scoped.dart';
+import 'package:scoped_deps/scoped_deps.dart';
 import 'package:types/types.dart';
 import 'package:ui/route.dart';
 

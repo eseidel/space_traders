@@ -4,7 +4,7 @@ version: 1.0.0
 publish_to: none
 
 environment:
-  sdk: ^3.0.6
+  sdk: ^3.5.0
 
 # dependency versions should match Flutter to allow `ui` to depend on Flutter.
 dependencies:

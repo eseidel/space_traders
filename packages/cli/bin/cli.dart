@@ -11,7 +11,7 @@ import 'package:cli/net/auth.dart';
 import 'package:cli/net/register.dart';
 import 'package:db/db.dart';
 import 'package:file/local.dart';
-import 'package:scoped/scoped.dart';
+import 'package:scoped_deps/scoped_deps.dart';
 import 'package:types/types.dart';
 
 void printRequestStats(RequestCounts requestCounts, Duration duration) {
