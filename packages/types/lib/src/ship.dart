@@ -105,7 +105,7 @@ extension ShipUtils on Ship {
         .lastWhereOrNull(filter);
   }
 
-  /// Attempt to munge ths ship's cache to reflect the added cargo.
+  /// Attempt to update this ship's cache to reflect the added cargo.
   void updateCacheWithAddedCargo({
     required TradeSymbol tradeSymbol,
     required int units,
