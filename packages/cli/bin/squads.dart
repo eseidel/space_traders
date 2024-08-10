@@ -4,6 +4,7 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
+import 'package:cli/config.dart';
 import 'package:cli/plan/ships.dart';
 
 String describeJob(ExtractionJob job) {
@@ -17,6 +18,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final charting = ChartingCache(db);
   final ships = await ShipSnapshot.load(db);
   final shipyardShipCache = ShipyardShipCache.load(fs);
+  // TODO(eseidel): Compute the current phase or read from db.
+  config = Config(GamePhase.construction);
 
   final squads = await assignShipsToSquads(
     db,
