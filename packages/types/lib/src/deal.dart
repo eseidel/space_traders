@@ -232,6 +232,7 @@ class CostedDeal {
         'startTime': startTime.toUtc().toIso8601String(),
         'route': route.toJson(),
         'costPerFuelUnit': costPerFuelUnit,
+        'costPerAntimatterUnit': costPerAntimatterUnit,
       };
 
   /// Return a new CostedDeal with the given transactions added.
