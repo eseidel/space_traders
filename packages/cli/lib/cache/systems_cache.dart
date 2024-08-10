@@ -60,9 +60,14 @@ class SystemsCache extends JsonListStore<System> {
     String url = defaultUrl,
   }) async {
     // Try to load systems.json.
-    final fromCache = load(fs, path: path);
-    return fromCache;
-
+    final maybeSystems = JsonListStore.maybeLoadRecords<System>(
+      fs,
+      path,
+      System.fromJson,
+    );
+    if (maybeSystems != null) {
+      return SystemsCache(maybeSystems, fs: fs, path: path);
+    }
     // If it does not exist, pull down and cache from the url.
     final uri = Uri.parse(url);
     logger.info('Failed to load systems from cache, fetching from $uri');
