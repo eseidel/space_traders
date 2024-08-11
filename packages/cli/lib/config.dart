@@ -5,6 +5,7 @@ import 'package:types/types.dart';
 /// This is used as a default argument and must be const.
 const defaultMaxAge = Duration(days: 3);
 
+/// Class to hold our network configuration values.
 class NetworkConfig {
   /// The number of requests per second allowed by the api.
   /// Version 2.1 allows:
@@ -244,6 +245,7 @@ class Config {
   /// Maximum markup we will tolerate when refueling (otherwise we will drift).
   final fuelMaxMarkup = 10.0;
 
+  /// Loads the Config object from the database.
   static Future<Config> fromDb(Database db) async {
     final gamePhase = await db.getGamePhase() ?? GamePhase.bootstrap;
     return Config(gamePhase);

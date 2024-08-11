@@ -132,7 +132,7 @@ Future<void> cliMain(List<String> args) async {
   if (agentSymbol == null) {
     throw StateError('No agent symbol found in database or environment.');
   }
-  final api;
+  final Api api;
   if (await db.getAuthToken() == null) {
     final email = Platform.environment['ST_EMAIL'];
     logger.info('No auth token found.');
@@ -146,7 +146,7 @@ Future<void> cliMain(List<String> args) async {
 
   if (results['selloff'] as bool) {
     logger.err('Selling all ships!');
-    db.setGamePhase(GamePhase.selloff);
+    await db.setGamePhase(GamePhase.selloff);
   }
 
   config = await Config.fromDb(db);

@@ -623,8 +623,10 @@ class CentralCommand {
         await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
   }
 
-  GamePhase _determineGamePhase(ShipSnapshot ships,
-      {required bool jumpGateComplete}) {
+  GamePhase _determineGamePhase(
+    ShipSnapshot ships, {
+    required bool jumpGateComplete,
+  }) {
     // A hack to advance the global config to the construction phase.
     if (jumpGateComplete) {
       return GamePhase.exploration;
@@ -644,10 +646,13 @@ class CentralCommand {
     // await caches.updateRoutingCaches();
 
     final ships = await ShipSnapshot.load(db);
-    final jumpGateComplete = await isJumpgateComplete(
-        db, caches.systems, caches.agent.headquartersSystemSymbol);
-    final phase =
-        _determineGamePhase(ships, jumpGateComplete: jumpGateComplete ?? false);
+    _isGateComplete = await isJumpgateComplete(
+          db,
+          caches.systems,
+          caches.agent.headquartersSystemSymbol,
+        ) ??
+        false;
+    final phase = _determineGamePhase(ships, jumpGateComplete: _isGateComplete);
     print(phase);
     if (phase != config.gamePhase) {
       await db.setGamePhase(phase);
