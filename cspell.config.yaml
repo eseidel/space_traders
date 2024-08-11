@@ -6,6 +6,7 @@ ignorePaths:
   - "packages/cli/data"
   - "packages/openapi"
   - "*.sql"
+  - "db_data"
 words:
   - leaderboards
   - lookback
@@ -57,4 +58,4 @@ words:
   - SAF
   - chalkdart
   - cirruslabs
-
+  - pubspec
