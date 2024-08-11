@@ -9,6 +9,7 @@ class _MockDatabase extends Mock implements Database {}
 void main() {
   test('loadAuthToken', () async {
     final db = _MockDatabase();
+    when(db.getAuthToken).thenAnswer((_) async => null);
     expect(() => defaultApi(db), throwsException);
     when(db.getAuthToken).thenAnswer((_) async => 'token');
     final api = await defaultApi(db);
