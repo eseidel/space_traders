@@ -5,7 +5,8 @@ import 'package:types/types.dart';
 Query agentBySymbolQuery(String agentSymbol) => Query(
       'SELECT * FROM agent_ WHERE symbol = @symbol',
       parameters: {
-        'symbol': agentSymbol,
+        // TODO(eseidel): use an AgentSymbol type.
+        'symbol': agentSymbol.toUpperCase(),
       },
     );
 

@@ -16,8 +16,7 @@ Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final api = await waitForApi(db, getPriority: () => networkPriorityLow);
-  final agentSymbol = await waitFor(db, () => db.getAgentSymbol());
-  final agent = await waitFor(db, () => db.getAgent(symbol: agentSymbol));
+  final agent = await waitFor(db, () => db.getMyAgent());
 
   final systemSymbol = agent.headquarters.system;
   var queue = IdleQueue();
