@@ -48,6 +48,19 @@ Api apiFromAuthToken(
   return Api(apiClient);
 }
 
+/// Waits for the auth token to be available and then creates an API.
+Future<Api> waitForApi(
+  Database db, {
+  int Function() getPriority = defaultGetPriority,
+}) async {
+  var token = await db.getAuthToken();
+  while (token == null) {
+    await Future<void>.delayed(const Duration(minutes: 1));
+    token = await db.getAuthToken();
+  }
+  return apiFromAuthToken(token, db, getPriority: getPriority);
+}
+
 /// defaultApi creates an Api with the default auth token read from the
 /// given file system.
 Future<Api> defaultApi(

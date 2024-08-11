@@ -4,22 +4,20 @@ import 'package:cli/cli.dart';
 import 'package:cli/logic/idle_queue.dart';
 import 'package:cli/net/auth.dart';
 
+Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
+  var value = await get();
+  while (value == null) {
+    logger.info('$T not yet in database, waiting 1 minute.');
+    await Future<void>.delayed(const Duration(minutes: 1));
+    value = await get();
+  }
+  return value;
+}
+
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final api = await defaultApi(db, getPriority: () => networkPriorityLow);
-
-  var agentSymbol = await db.getAgentSymbol();
-  while (agentSymbol == null) {
-    logger.info('No agent symbol found in database, waiting 1 minute.');
-    await Future<void>.delayed(const Duration(minutes: 1));
-    agentSymbol = await db.getAgentSymbol();
-  }
-
-  var agent = await db.getAgent(symbol: agentSymbol);
-  while (agent == null) {
-    logger.info('Agent not yet found in database, waiting 1 minute.');
-    await Future<void>.delayed(const Duration(minutes: 1));
-    agent = await db.getAgent(symbol: agentSymbol);
-  }
+  final api = await waitForApi(db, getPriority: () => networkPriorityLow);
+  final agentSymbol = await waitFor(db, () => db.getAgentSymbol());
+  final agent = await waitFor(db, () => db.getAgent(symbol: agentSymbol));
 
   final systemSymbol = agent.headquarters.system;
   var queue = IdleQueue();
