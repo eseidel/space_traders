@@ -4,7 +4,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
+  final api = await defaultApi(db, getPriority: () => networkPriorityLow);
   final systemsCache = SystemsCache.load(fs);
 
   final systems = await SystemsCache.loadOrFetch(fs);

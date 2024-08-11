@@ -7,7 +7,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSystemSymbol =
       await startSystemFromArg(db, argResults.rest.firstOrNull);
 
-  final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
+  final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
   final systemsCache = SystemsCache.load(fs);
   final jumpGateSymbol = systemsCache

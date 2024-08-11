@@ -1,11 +1,58 @@
+# cspell:words initdb healthcheck pg_isready
 services:
   web:
     build: ./packages/ui
     ports:
       - "8080:80"
+  net:
+    build:
+      context: ./packages
+      dockerfile: ./cli/Dockerfile
+      args:
+        - BIN=network_execute
+    depends_on:
+      db:
+        condition: service_healthy
   cli:
     build:
       context: ./packages
       dockerfile: ./cli/Dockerfile
       args:
         - BIN=cli
+    environment:
+      - ST_AGENT=${ST_AGENT}
+      - ST_EMAIL=${ST_EMAIL}
+      - ST_FACTION=${ST_FACTION}
+    depends_on:
+      net:
+        condition: service_started
+      db:
+        condition: service_healthy
+  idle:
+    build:
+      context: ./packages
+      dockerfile: ./cli/Dockerfile
+      args:
+        - BIN=idle_queue
+    depends_on:
+      net:
+        condition: service_started
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:15.3-alpine3.18
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=spacetraders
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+      - ./packages/db/sql/tables:/docker-entrypoint-initdb.d/

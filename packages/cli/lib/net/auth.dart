@@ -2,24 +2,10 @@ import 'package:cli/api.dart';
 import 'package:cli/net/counts.dart';
 import 'package:cli/net/queue.dart';
 import 'package:db/db.dart';
-import 'package:file/file.dart';
 import 'package:types/types.dart';
 
 export 'package:cli/net/queue.dart'
     show networkPriorityDefault, networkPriorityLow;
-
-/// The default path to the auth token.
-const String defaultAuthTokenPath = 'data/auth_token.txt';
-
-/// loadAuthToken loads the auth token from the given file system or
-/// throws an error if it cannot be found.
-String loadAuthToken(FileSystem fs, {String path = defaultAuthTokenPath}) {
-  final token = fs.file(path).readAsStringSync().trim();
-  if (token.isEmpty) {
-    throw Exception('No auth token found.');
-  }
-  return token;
-}
 
 /// Default priority function.
 int defaultGetPriority() => networkPriorityDefault;
@@ -64,9 +50,13 @@ Api apiFromAuthToken(
 
 /// defaultApi creates an Api with the default auth token read from the
 /// given file system.
-Api defaultApi(
-  FileSystem fs,
+Future<Api> defaultApi(
   Database db, {
   int Function() getPriority = defaultGetPriority,
-}) =>
-    apiFromAuthToken(loadAuthToken(fs), db, getPriority: getPriority);
+}) async {
+  final token = await db.getAuthToken();
+  if (token == null) {
+    throw Exception('No auth token found.');
+  }
+  return apiFromAuthToken(token, db, getPriority: getPriority);
+}

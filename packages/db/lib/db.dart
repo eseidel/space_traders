@@ -651,4 +651,18 @@ class Database {
     );
     return result[0][0]! as int;
   }
+
+  Future<String?> getAuthToken() async {
+    final result =
+        await executeSql('SELECT value FROM config WHERE key = \'auth_token\'');
+    if (result.isEmpty) {
+      return null;
+    }
+    return result[0][0] as String;
+  }
+
+  Future<void> setAuthToken(String token) async {
+    await executeSql('INSERT INTO config (key, value) VALUES (\'auth_token\', '
+        '\'$token\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+  }
 }

@@ -45,3 +45,6 @@ Cargo.lock
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+
+# Where postgres data is stored.
+/db_data

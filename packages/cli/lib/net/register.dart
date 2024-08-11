@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/auth.dart';
@@ -7,23 +9,17 @@ import 'package:types/types.dart';
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.
-Future<String> loadAuthTokenOrRegister(
-  FileSystem fs,
-  Database db, {
-  String? callsign,
-  String? email,
-  String path = defaultAuthTokenPath,
-}) async {
-  try {
-    return loadAuthToken(fs);
-  } catch (e) {
+Future<String> loadAuthTokenOrRegister(Database db,
+    {String? agentName, String? email}) async {
+  final token = await db.getAuthToken();
+  if (token != null) {
+    return token;
+  } else {
     logger.info('No auth token found.');
     // Otherwise, register a new user.
-    final handle = callsign ?? logger.prompt('What is your call sign?');
-    final token = await register(fs, db, callsign: handle, email: email);
-    final file = fs.file(path);
-    await file.create(recursive: true);
-    await file.writeAsString(token);
+    final name = agentName ?? logger.prompt('What is your agent name?');
+    final token = await register(db, agentName: name, email: email);
+    db.setAuthToken(token);
     return token;
   }
 }
@@ -48,10 +44,10 @@ Future<String> _tryRegister(
 /// If the call sign is already taken, it will prompt for the email address
 /// associated with the call sign.
 Future<String> register(
-  FileSystem fs,
   Database db, {
-  required String callsign,
+  required String agentName,
   String? email,
+  String? faction,
 }) async {
   final client = getApiClient(db);
   final defaultApi = DefaultApi(client);
@@ -63,22 +59,21 @@ Future<String> register(
 
   // There are more factions in the game than players are allowed to join
   // at the start, so we use RegisterRequestFactionEnum.
-  final faction = logger.chooseOne(
-    'Choose a faction:',
-    choices: recruitingFactions,
-    display: (Faction faction) {
-      final f = factions.firstWhere((f) => f.symbol == faction.symbol);
-      // final reachable =
-      // clusterCache.connectedSystemCount(f.headquartersSymbol.systemSymbol);
-      return '${f.symbol}'; // - connected to $reachable systems';
-    },
-  );
+  final Faction chosenFaction;
+  if (faction != null) {
+    chosenFaction =
+        factions.firstWhere((f) => f.symbol == faction.toUpperCase());
+  } else {
+    logger.warn("Faction not specified. Choosing a random faction.");
+    chosenFaction =
+        recruitingFactions[Random().nextInt(recruitingFactions.length)];
+  }
 
   try {
     return await _tryRegister(
       defaultApi,
-      symbol: callsign,
-      faction: faction.symbol,
+      symbol: agentName,
+      faction: chosenFaction.symbol,
       email: email,
     );
   } on ApiException catch (e) {
@@ -96,8 +91,8 @@ Future<String> register(
     );
     return await _tryRegister(
       defaultApi,
-      symbol: callsign,
-      faction: faction.symbol,
+      symbol: agentName,
+      faction: chosenFaction.symbol,
       email: email,
     );
   } on ApiException catch (e) {

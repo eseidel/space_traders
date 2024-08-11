@@ -41,7 +41,6 @@ words:
   - sublist
   - codegen
   - URANITE
-  - callsign
   - writeln
   - undocked
   - ratelimit

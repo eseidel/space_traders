@@ -8,7 +8,7 @@ import 'package:cli/logic/idle_queue.dart';
 import 'package:cli/net/auth.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
+  final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
   final agent = await db.getAgent(symbol: config.agentSymbol);
   if (agent == null) {

@@ -10,7 +10,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const limit = 10;
   const desiredMarketCount = 10;
 
-  final api = defaultApi(fs, db, getPriority: () => networkPriorityLow);
+  final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
   final startSystemSymbol = await myHqSystemSymbol(db);
 

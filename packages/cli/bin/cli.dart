@@ -125,7 +125,10 @@ Future<void> cliMain(List<String> args) async {
   // Use package:file to make things mockable.
   const fs = LocalFileSystem();
   final db = await defaultDatabase();
-  final token = await loadAuthTokenOrRegister(fs, db);
+  final agentName = Platform.environment['ST_AGENT'];
+  final email = Platform.environment['ST_EMAIL'];
+  final token =
+      await loadAuthTokenOrRegister(db, agentName: agentName, email: email);
 
   // Api client should move to per-ship with a per-ship priority function.
   final api = apiFromAuthToken(token, db);
