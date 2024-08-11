@@ -66,6 +66,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     return;
   }
 
+  var totalUncharted = 0;
+  var totalAsteroids = 0;
+  var totalJumpgates = 0;
   for (final (systemSymbol, jumps) in connectedSystems) {
     final counts = _count(charts, systemsCache[systemSymbol]);
     logger.info(
@@ -73,7 +76,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       '${counts.uncharted} uncharted, ${counts.asteroids} asteroids, '
       '${counts.jumpgates} jumpgates, ($jumps jumps)',
     );
+    totalUncharted += counts.uncharted;
+    totalAsteroids += counts.asteroids;
+    totalJumpgates += counts.jumpgates;
   }
+  logger.info(
+    'Total: $totalUncharted uncharted, $totalAsteroids asteroids, '
+    '$totalJumpgates jumpgates',
+  );
 }
 
 void main(List<String> args) async {
