@@ -25,8 +25,7 @@ void main() {
     final agentsApi = _MockAgentsApi();
     when(() => api.agents).thenReturn(agentsApi);
     final agent = Agent.test();
-    when(() => db.getAgent(symbol: any(named: 'symbol')))
-        .thenAnswer((_) => Future.value(agent));
+    when(() => db.getMyAgent()).thenAnswer((_) => Future.value(agent));
     when(agentsApi.getMyAgent).thenAnswer(
       (_) => Future.value(GetMyAgent200Response(data: agent.toOpenApi())),
     );

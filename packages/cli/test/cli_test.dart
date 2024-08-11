@@ -19,6 +19,7 @@ void main() {
       },
       overrideLogger: logger,
       overrideDatabase: db,
+      loadConfig: false,
     );
     verify(() => logger.level = Level.verbose).called(1);
     verify(db.close).called(1);

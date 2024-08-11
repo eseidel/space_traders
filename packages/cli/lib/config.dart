@@ -253,7 +253,7 @@ class Config {
 }
 
 /// Our global configuration object.
-late Config config;
+Config config = Config(GamePhase.bootstrap);
 
 /// Our global network configuration object.
 final NetworkConfig networkConfig = NetworkConfig();
