@@ -38,7 +38,7 @@ class CentralCommand {
     BehaviorTimeouts? behaviorTimeouts,
   }) : behaviorTimeouts = behaviorTimeouts ?? BehaviorTimeouts();
 
-  bool _haveEscapedStartingSystem = false;
+  bool _isGateComplete = false;
 
   /// Per-system price age data used by system watchers.
   final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
@@ -102,7 +102,7 @@ class CentralCommand {
   int expectedCreditsPerSecond(Ship ship) {
     // If we're stuck in our own system, any trades are better than exploring.
     // This doesn't include the command ship, which may be an error.
-    if (!_haveEscapedStartingSystem && ship.fleetRole == FleetRole.trader) {
+    if (!_isGateComplete && ship.fleetRole == FleetRole.trader) {
       return 1;
     }
     // This should depend on phase and ship type?
@@ -564,17 +564,17 @@ class CentralCommand {
     return await ConstructionCache(db).getConstruction(jumpGate.symbol);
   }
 
-  // /// Returns true if the jumpgate for the given [systemSymbol] is complete.
-  // /// Returns null if we don't know.
-  // Future<bool?> isJumpgateComplete(
-  //   Database db,
-  //   SystemsCache systems,
-  //   SystemSymbol systemSymbol,
-  // ) async {
-  //   final construction =
-  //       await _constructionForSystem(db, systems, systemSymbol);
-  //   return construction?.isComplete;
-  // }
+  /// Returns true if the jumpgate for the given [systemSymbol] is complete.
+  /// Returns null if we don't know.
+  Future<bool?> isJumpgateComplete(
+    Database db,
+    SystemsCache systems,
+    SystemSymbol systemSymbol,
+  ) async {
+    final construction =
+        await _constructionForSystem(db, systems, systemSymbol);
+    return construction?.isComplete;
+  }
 
   /// Returns the active construction job, if any.
   Future<Construction?> computeActiveConstruction(
@@ -596,18 +596,6 @@ class CentralCommand {
       return null;
     }
     return construction;
-  }
-
-  bool _computeHaveEscapedStartingSystem(ShipSnapshot ships) {
-    if (_haveEscapedStartingSystem) {
-      return true;
-    }
-    // We'll assume that if all the ships are in the same system we've
-    // not yet constructed our jump gate.
-    final systemSymbols = Set<SystemSymbol>.from(
-      ships.ships.map((s) => s.nav.systemSymbolObject),
-    );
-    return systemSymbols.length > 1;
   }
 
   Future<void> _updateMedianPrices(Database db) async {
@@ -635,10 +623,10 @@ class CentralCommand {
         await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
   }
 
-  GamePhase _determineGamePhase(ShipSnapshot ships) {
-    _haveEscapedStartingSystem = _computeHaveEscapedStartingSystem(ships);
+  GamePhase _determineGamePhase(ShipSnapshot ships,
+      {required bool jumpGateComplete}) {
     // A hack to advance the global config to the construction phase.
-    if (_haveEscapedStartingSystem) {
+    if (jumpGateComplete) {
       return GamePhase.exploration;
     } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 10) {
       return GamePhase.construction;
@@ -656,8 +644,11 @@ class CentralCommand {
     // await caches.updateRoutingCaches();
 
     final ships = await ShipSnapshot.load(db);
-    final phase = _determineGamePhase(ships);
-    logger.info("$phase");
+    final jumpGateComplete = await isJumpgateComplete(
+        db, caches.systems, caches.agent.headquartersSystemSymbol);
+    final phase =
+        _determineGamePhase(ships, jumpGateComplete: jumpGateComplete ?? false);
+    print(phase);
     if (phase != config.gamePhase) {
       await db.setGamePhase(phase);
       config = await Config.fromDb(db);
