@@ -86,10 +86,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systems = SystemsCache.load(fs);
   final marketListings = await MarketListingSnapshot.load(db);
   final charting = await ChartingSnapshot.load(db);
-  final agent = await myAgent(db);
+  final agent = await db.getMyAgent();
 
   final jumpgate =
-      systems.jumpGateWaypointForSystem(agent.headquarters.system)!;
+      systems.jumpGateWaypointForSystem(agent!.headquarters.system)!;
   final waypointSymbol = jumpgate.symbol;
   final construction =
       (await db.getConstruction(waypointSymbol, defaultMaxAge))!.construction;

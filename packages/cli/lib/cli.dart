@@ -81,16 +81,10 @@ String argFromShipType(ShipType shipType) {
 
 /// Common lookups which CLIs might need.
 
-/// Get the agent from the database.
-Future<Agent> myAgent(Database db) async {
-  final agent = await db.getAgent(symbol: config.agentSymbol);
-  return agent!;
-}
-
 /// Get the symbol of the agent's headquarters.
 Future<WaypointSymbol> myHqSymbol(Database db) async {
-  final agent = await myAgent(db);
-  return agent.headquarters;
+  final agent = await db.getMyAgent();
+  return agent!.headquarters;
 }
 
 /// Get the system symbol of the agent's headquarters.
@@ -101,8 +95,8 @@ Future<SystemSymbol> myHqSystemSymbol(Database db) async {
 
 /// Get the agent's credits.
 Future<int> myCredits(Database db) async {
-  final agent = await myAgent(db);
-  return agent.credits;
+  final agent = await db.getMyAgent();
+  return agent!.credits;
 }
 
 /// Get the start symbol from the command line argument.

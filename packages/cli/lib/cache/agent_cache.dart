@@ -1,7 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/config.dart';
 import 'package:cli/net/queries.dart';
 
 /// Holds the Agent object between requests.
@@ -19,7 +18,7 @@ class AgentCache {
   /// Loads the agent from the cache.
   // TODO(eseidel): Do callers need an AgentCache or just an Agent?
   static Future<AgentCache?> load(Database db) async {
-    final agent = await db.getAgent(symbol: config.agentSymbol);
+    final agent = await db.getMyAgent();
     if (agent == null) {
       return null;
     }
@@ -28,7 +27,7 @@ class AgentCache {
 
   /// Creates a new AgentCache from the API.
   static Future<AgentCache> loadOrFetch(Database db, Api api) async {
-    final cached = await db.getAgent(symbol: config.agentSymbol);
+    final cached = await db.getMyAgent();
     if (cached != null) {
       return AgentCache(cached, db);
     }

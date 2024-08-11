@@ -1,6 +1,5 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/config.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/accounting.dart';
 import 'package:cli/plan/ships.dart';
@@ -50,7 +49,7 @@ Future<Assets> computeAssets(FileSystem fs, Database db) async {
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
 
-  final agent = await db.getAgent(symbol: config.agentSymbol);
+  final agent = await db.getMyAgent();
   final inventory = await computeInventoryValue(ships, marketPrices);
   final shipsValue =
       await computeShipValue(ships, shipyardShips, shipyardPrices);

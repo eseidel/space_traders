@@ -319,6 +319,14 @@ class Database {
     );
   }
 
+  Future<Agent?> getMyAgent() async {
+    final symbol = await getAgentSymbol();
+    if (symbol == null) {
+      return null;
+    }
+    return getAgent(symbol: symbol);
+  }
+
   /// Get the agent from the database.
   Future<Agent?> getAgent({required String symbol}) async {
     final query = agentBySymbolQuery(symbol);

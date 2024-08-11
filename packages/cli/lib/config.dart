@@ -18,13 +18,10 @@ class NetworkConfig {
 /// Class for holding our hard-coded configuration values.
 class Config {
   /// Create a new Config object.
-  Config(this.agentSymbol, this.gamePhase);
+  Config(this.gamePhase);
 
   /// Which phase are we in.
   final GamePhase gamePhase;
-
-  /// The symbol of the agent we are controlling.
-  final String agentSymbol;
 
   /// Whether or not we should enable mining behaviors.
   bool get enableMining => gamePhase < GamePhase.exploration;
@@ -248,12 +245,8 @@ class Config {
   final fuelMaxMarkup = 10.0;
 
   static Future<Config> fromDb(Database db) async {
-    final agentSymbol = await db.getAgentSymbol();
-    if (agentSymbol == null) {
-      throw StateError('No agent symbol found in database.');
-    }
     final gamePhase = await db.getGamePhase() ?? GamePhase.bootstrap;
-    return Config(agentSymbol, gamePhase);
+    return Config(gamePhase);
   }
 }
 
