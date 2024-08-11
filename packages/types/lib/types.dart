@@ -10,6 +10,7 @@ export 'src/counts.dart';
 export 'src/deal.dart';
 export 'src/export.dart';
 export 'src/extraction.dart';
+export 'src/game_phase.dart';
 export 'src/jump_gate.dart';
 export 'src/market_listing.dart';
 export 'src/market_price.dart';

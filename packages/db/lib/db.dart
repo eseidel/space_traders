@@ -652,6 +652,38 @@ class Database {
     return result[0][0]! as int;
   }
 
+  Future<String?> getAgentSymbol() async {
+    final result = await executeSql(
+        'SELECT value FROM config WHERE key = \'agent_symbol\'');
+    if (result.isEmpty) {
+      return null;
+    }
+    return result[0][0] as String;
+  }
+
+  Future<void> setAgentSymbol(String symbol) async {
+    await executeSql(
+        'INSERT INTO config (key, value) VALUES (\'agent_symbol\', '
+        '\'$symbol\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+  }
+
+  Future<GamePhase?> getGamePhase() async {
+    final result =
+        await executeSql('SELECT value FROM config WHERE key = \'game_phase\'');
+    if (result.isEmpty) {
+      return null;
+    }
+    return GamePhase.values.firstWhere(
+      (phase) => phase.name == result[0][0] as String,
+      orElse: () => throw ArgumentError('Unknown game phase: ${result[0][0]}'),
+    );
+  }
+
+  Future<void> setGamePhase(GamePhase phase) async {
+    await executeSql('INSERT INTO config (key, value) VALUES (\'game_phase\', '
+        '\'$phase\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+  }
+
   Future<String?> getAuthToken() async {
     final result =
         await executeSql('SELECT value FROM config WHERE key = \'auth_token\'');

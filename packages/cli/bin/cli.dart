@@ -117,21 +117,33 @@ Future<void> cliMain(List<String> args) async {
 
   logger.info('Welcome to Space Traders! 🚀');
 
-  if (results['selloff'] as bool) {
-    logger.err('Selling all ships!');
-    config = config = Config(GamePhase.selloff);
-  }
-
   // Use package:file to make things mockable.
   const fs = LocalFileSystem();
   final db = await defaultDatabase();
-  final agentName = Platform.environment['ST_AGENT'];
-  final email = Platform.environment['ST_EMAIL'];
-  final token =
-      await loadAuthTokenOrRegister(db, agentName: agentName, email: email);
 
-  // Api client should move to per-ship with a per-ship priority function.
-  final api = apiFromAuthToken(token, db);
+  final agentSymbol =
+      await db.getAgentSymbol() ?? Platform.environment['ST_AGENT'];
+  if (agentSymbol == null) {
+    throw StateError('No agent symbol found in database or environment.');
+  }
+  final api;
+  if (await db.getAuthToken() == null) {
+    final email = Platform.environment['ST_EMAIL'];
+    logger.info('No auth token found.');
+    // Otherwise, register a new user.
+    final token = await register(db, agentSymbol: agentSymbol, email: email);
+    await db.setAuthToken(token);
+    api = apiFromAuthToken(token, db);
+  } else {
+    api = await defaultApi(db);
+  }
+
+  if (results['selloff'] as bool) {
+    logger.err('Selling all ships!');
+    db.setGamePhase(GamePhase.selloff);
+  }
+
+  config = await Config.fromDb(db);
 
   final caches = await Caches.loadOrFetch(fs, api, db);
   final marketPricesCount = await db.marketPricesCount();

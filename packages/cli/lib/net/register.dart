@@ -7,26 +7,6 @@ import 'package:cli/net/exceptions.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-/// loadAuthTokenOrRegister loads the auth token from the given file system
-/// or registers a new user and returns the auth token.
-Future<String> loadAuthTokenOrRegister(
-  Database db, {
-  String? agentName,
-  String? email,
-}) async {
-  final token = await db.getAuthToken();
-  if (token != null) {
-    return token;
-  } else {
-    logger.info('No auth token found.');
-    // Otherwise, register a new user.
-    final name = agentName ?? logger.prompt('What is your agent name?');
-    final token = await register(db, agentName: name, email: email);
-    await db.setAuthToken(token);
-    return token;
-  }
-}
-
 Future<String> _tryRegister(
   DefaultApi api, {
   required String symbol,
@@ -48,7 +28,7 @@ Future<String> _tryRegister(
 /// associated with the call sign.
 Future<String> register(
   Database db, {
-  required String agentName,
+  required String agentSymbol,
   String? email,
   String? faction,
 }) async {
@@ -75,7 +55,7 @@ Future<String> register(
   try {
     return await _tryRegister(
       defaultApi,
-      symbol: agentName,
+      symbol: agentSymbol,
       faction: chosenFaction.symbol,
       email: email,
     );
@@ -94,7 +74,7 @@ Future<String> register(
     );
     return await _tryRegister(
       defaultApi,
-      symbol: agentName,
+      symbol: agentSymbol,
       faction: chosenFaction.symbol,
       email: email,
     );

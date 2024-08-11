@@ -1,35 +1,20 @@
+import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// The default max age for our caches is 3 days.
 /// This is used as a default argument and must be const.
 const defaultMaxAge = Duration(days: 3);
 
-/// Which game phase are we in.
-enum GamePhase with EnumIndexOrdering {
-  /// Initially just buying haulers and getting trading going.
-  bootstrap,
-
-  /// Focused on building the jumpgate.
-  construction,
-
-  /// Focused on exploring the galaxy to find better ships.
-  exploration,
-
-  /// Sell off all our ships and retire.
-  selloff
-}
-
 /// Class for holding our hard-coded configuration values.
 class Config {
   /// Create a new Config object.
-  Config(this.gamePhase);
+  Config(this.agentSymbol, this.gamePhase);
 
   /// Which phase are we in.
   final GamePhase gamePhase;
 
-  // TODO(eseidel): This should be configured at runtime.
   /// The symbol of the agent we are controlling.
-  final String agentSymbol = 'ESEIDEL';
+  final String agentSymbol;
 
   /// Whether or not we should enable mining behaviors.
   bool get enableMining => gamePhase < GamePhase.exploration;
@@ -259,9 +244,16 @@ class Config {
 
   /// Maximum markup we will tolerate when refueling (otherwise we will drift).
   final fuelMaxMarkup = 10.0;
+
+  static Future<Config> fromDb(Database db) async {
+    final agentSymbol = await db.getAgentSymbol();
+    if (agentSymbol == null) {
+      throw StateError('No agent symbol found in database.');
+    }
+    final gamePhase = await db.getGamePhase() ?? GamePhase.bootstrap;
+    return Config(agentSymbol, gamePhase);
+  }
 }
 
 /// Our global configuration object.
-// TODO(eseidel): Correctly detect when we've finished construction but not
-// bought our second probe yet (our first one is system-watching).
-Config config = Config(GamePhase.exploration);
+late Config config;
