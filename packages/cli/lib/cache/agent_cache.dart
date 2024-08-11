@@ -33,6 +33,7 @@ class AgentCache {
       return AgentCache(cached, db);
     }
     final agent = await getMyAgent(api);
+    await db.upsertAgent(agent);
     return AgentCache(agent, db);
   }
 
