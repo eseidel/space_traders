@@ -4,6 +4,7 @@ FROM ghcr.io/cirruslabs/flutter:latest AS build-env
 RUN mkdir /app/
 COPY . /app/
 WORKDIR /app/
+# TODO(eseidel): This isn't actually building.
 RUN /bin/sh -c flutter build web
 
 # use nginx to deploy
