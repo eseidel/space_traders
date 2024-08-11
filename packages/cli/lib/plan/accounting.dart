@@ -6,7 +6,7 @@ import 'package:types/types.dart';
 /// Compute the total value across all cargo for all ships.
 Future<int> computeInventoryValue(
   ShipSnapshot ships,
-  // TODO(eseidel): This wants a MedianPriceCache rather than MarketPriceSnapshot.
+  // TODO(eseidel): Use a MedianPriceCache rather than MarketPriceSnapshot.
   MarketPriceSnapshot marketPrices,
 ) async {
   final countByTradeSymbol = <TradeSymbol, int>{};

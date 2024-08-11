@@ -17,6 +17,7 @@ class MarketListingSnapshot {
     return MarketListingSnapshot(listings);
   }
 
+  /// Load the MarketListingSnapshot for a single system.
   static Future<MarketListingSnapshot> loadOneSystem(
     Database db,
     SystemSymbol systemSymbol,

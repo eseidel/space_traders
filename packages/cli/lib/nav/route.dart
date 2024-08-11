@@ -648,8 +648,13 @@ Future<ShipyardListing?> nearestShipyard(
   return listing;
 }
 
+/// Compute the travel time to the given waypoint considering the current ship
+/// location.
 Duration travelTimeTo(
-    RoutePlanner routePlanner, Ship ship, WaypointSymbol waypoint) {
+  RoutePlanner routePlanner,
+  Ship ship,
+  WaypointSymbol waypoint,
+) {
   final route = routePlanner.planRoute(
     ship.shipSpec,
     start: ship.waypointSymbol,

@@ -490,7 +490,7 @@ void main() {
 
     final logger = _MockLogger();
 
-    final paddedArrival = arrival.add(Duration(seconds: 1));
+    final paddedArrival = arrival.add(const Duration(seconds: 1));
     final result = await runWithLogger(logger, () async {
       final result = await transferToHaulersOrWait(
         state,

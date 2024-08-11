@@ -657,7 +657,7 @@ class CentralCommand {
 
     final ships = await ShipSnapshot.load(db);
     final phase = _determineGamePhase(ships);
-    print(phase);
+    logger.info("$phase");
     config = Config(phase);
 
     final marketListings = await MarketListingSnapshot.load(db);

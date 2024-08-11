@@ -19,7 +19,8 @@ void main(List<String> args) async {
 //   final nearbySystems = systemsCache.systems.where(
 //     (s) =>
 //         s.symbol != systemSymbol &&
-//         systemConnectivity.existsJumpPathBetween(s.symbol, ship.systemSymbol) &&
+//         systemConnectivity.existsJumpPathBetween(s.symbol,
+//  ship.systemSymbol) &&
 //         s.distanceTo(system) < maxFuel,
 //   );
 //   final routes = <RoutePlan>[];

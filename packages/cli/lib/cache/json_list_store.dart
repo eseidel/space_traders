@@ -45,7 +45,7 @@ class JsonListStore<Record extends Object> {
     file.writeAsStringSync(prettyprint);
   }
 
-  /// Load records from a file.
+  /// Load records from a file if file exists, otherwise returns null.
   static List<R>? maybeLoadRecords<R>(
     FileSystem fs,
     String path,
@@ -58,6 +58,7 @@ class JsonListStore<Record extends Object> {
     return null;
   }
 
+  /// Load records from a file or throw an exception if the file does not exist.
   static List<R> loadRecords<R>(
     FileSystem fs,
     String path,

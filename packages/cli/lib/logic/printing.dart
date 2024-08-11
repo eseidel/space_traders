@@ -262,10 +262,12 @@ String describeShipNav(
       return 'Docked at $waypoint';
     case ShipNavStatus.IN_ORBIT:
       final arrivalDuration = getNow().difference(nav.route.arrival);
-      return 'Orbiting $waypoint since ${approximateDuration(arrivalDuration)}';
+      final arrivalString = approximateDuration(arrivalDuration);
+      return 'Orbiting $waypoint since $arrivalString';
     case ShipNavStatus.IN_TRANSIT:
       final remainingDuration = nav.route.arrival.difference(getNow());
-      return 'Transit to $waypoint in ${approximateDuration(remainingDuration)}';
+      final remainingString = approximateDuration(remainingDuration);
+      return 'Transit to $waypoint in $remainingString';
   }
   return 'Unknown';
 }

@@ -9,8 +9,11 @@ import 'package:types/types.dart';
 
 /// loadAuthTokenOrRegister loads the auth token from the given file system
 /// or registers a new user and returns the auth token.
-Future<String> loadAuthTokenOrRegister(Database db,
-    {String? agentName, String? email}) async {
+Future<String> loadAuthTokenOrRegister(
+  Database db, {
+  String? agentName,
+  String? email,
+}) async {
   final token = await db.getAuthToken();
   if (token != null) {
     return token;
@@ -19,7 +22,7 @@ Future<String> loadAuthTokenOrRegister(Database db,
     // Otherwise, register a new user.
     final name = agentName ?? logger.prompt('What is your agent name?');
     final token = await register(db, agentName: name, email: email);
-    db.setAuthToken(token);
+    await db.setAuthToken(token);
     return token;
   }
 }
@@ -64,7 +67,7 @@ Future<String> register(
     chosenFaction =
         factions.firstWhere((f) => f.symbol.value == faction.toUpperCase());
   } else {
-    logger.warn("Faction not specified. Choosing a random faction.");
+    logger.warn('Faction not specified. Choosing a random faction.');
     chosenFaction =
         recruitingFactions[Random().nextInt(recruitingFactions.length)];
   }

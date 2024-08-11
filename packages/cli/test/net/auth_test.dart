@@ -10,7 +10,7 @@ void main() {
   test('loadAuthToken', () async {
     final db = _MockDatabase();
     expect(() => defaultApi(db), throwsException);
-    when(() => db.getAuthToken()).thenAnswer((_) async => 'token');
+    when(db.getAuthToken).thenAnswer((_) async => 'token');
     final api = await defaultApi(db);
     expect(api.apiClient, isA<CountingApiClient>());
   });
