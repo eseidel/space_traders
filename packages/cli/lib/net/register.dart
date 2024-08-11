@@ -62,7 +62,7 @@ Future<String> register(
   final Faction chosenFaction;
   if (faction != null) {
     chosenFaction =
-        factions.firstWhere((f) => f.symbol == faction.toUpperCase());
+        factions.firstWhere((f) => f.symbol.value == faction.toUpperCase());
   } else {
     logger.warn("Faction not specified. Choosing a random faction.");
     chosenFaction =
