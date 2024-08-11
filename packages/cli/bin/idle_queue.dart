@@ -3,16 +3,22 @@ import 'dart:io';
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/config.dart';
 import 'package:cli/logic/idle_queue.dart';
 import 'package:cli/net/auth.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
-  final agent = await db.getAgent(symbol: config.agentSymbol);
+  var agentSymbol = await db.getAgentSymbol();
+  while (agentSymbol == null) {
+    logger.info('No agent symbol found in database, waiting 1 minute.');
+    await Future<void>.delayed(const Duration(minutes: 1));
+    agentSymbol = await db.getAgentSymbol();
+  }
+
+  final agent = await db.getAgent(symbol: agentSymbol);
   if (agent == null) {
-    logger.err('Failed to load agent: ${config.agentSymbol}');
+    logger.err('Failed to load agent: ${agentSymbol}');
     exit(1);
   }
   final systemSymbol = agent.headquarters.system;
@@ -73,5 +79,6 @@ void main(List<String> args) async {
       abbr: 'a',
       help: 'Seed queue with all starter systems.',
     ),
+    loadConfig: false,
   );
 }

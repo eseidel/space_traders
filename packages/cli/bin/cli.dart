@@ -31,7 +31,7 @@ void printRequestStats(RequestCounts requestCounts, Duration duration) {
     logger.info('${entry.value} ${entry.key}');
   }
   final possible =
-      (duration.inSeconds * config.targetRequestsPerSecond).round();
+      (duration.inSeconds * networkConfig.targetRequestsPerSecond).round();
   final percent = requestCounts.total / possible;
   final percentString = '${(percent * 100).round()}%';
   final avg = requestCounts.total / duration.inSeconds;
@@ -121,8 +121,14 @@ Future<void> cliMain(List<String> args) async {
   const fs = LocalFileSystem();
   final db = await defaultDatabase();
 
-  final agentSymbol =
-      await db.getAgentSymbol() ?? Platform.environment['ST_AGENT'];
+  var agentSymbol = await db.getAgentSymbol();
+  if (agentSymbol == null) {
+    agentSymbol = Platform.environment['ST_AGENT'];
+    if (agentSymbol != null) {
+      logger.info('Using agent symbol from environment: $agentSymbol');
+      await db.setAgentSymbol(agentSymbol);
+    }
+  }
   if (agentSymbol == null) {
     throw StateError('No agent symbol found in database or environment.');
   }

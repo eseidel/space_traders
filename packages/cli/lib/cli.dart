@@ -23,6 +23,7 @@ Future<void> runOffline(
   void Function(ArgParser parser)? addArgs,
   @visibleForTesting Logger? overrideLogger,
   @visibleForTesting Database? overrideDatabase,
+  bool loadConfig = true,
 }) async {
   final parser = ArgParser()
     ..addFlag(
@@ -50,6 +51,9 @@ Future<void> runOffline(
         return;
       }
       final db = overrideDatabase ?? await defaultDatabase();
+      if (loadConfig) {
+        config = await Config.fromDb(db);
+      }
       final result = await fn(fs, db, results);
       await db.close();
       return result;

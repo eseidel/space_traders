@@ -5,6 +5,16 @@ import 'package:types/types.dart';
 /// This is used as a default argument and must be const.
 const defaultMaxAge = Duration(days: 3);
 
+class NetworkConfig {
+  /// The number of requests per second allowed by the api.
+  /// Version 2.1 allows:
+  /// - 2 requests per second
+  /// - plus 30 requests over a 60 second burst
+  /// 2 * 60 + 30 = 150 requests per minute / 60 = 2.5 requests per second
+  /// https://docs.spacetraders.io/api-guide/rate-limits
+  double targetRequestsPerSecond = 2;
+}
+
 /// Class for holding our hard-coded configuration values.
 class Config {
   /// Create a new Config object.
@@ -47,14 +57,6 @@ class Config {
 
   /// Used to slow down charters and have them spend less money on jumps.
   bool chartAsteroidsByDefault = false;
-
-  /// The number of requests per second allowed by the api.
-  /// Version 2.1 allows:
-  /// - 2 requests per second
-  /// - plus 30 requests over a 60 second burst
-  /// 2 * 60 + 30 = 150 requests per minute / 60 = 2.5 requests per second
-  /// https://docs.spacetraders.io/api-guide/rate-limits
-  double targetRequestsPerSecond = 2;
 
   final _bootstrapShips = [
     ShipType.LIGHT_HAULER,
@@ -257,3 +259,6 @@ class Config {
 
 /// Our global configuration object.
 late Config config;
+
+/// Our global network configuration object.
+final NetworkConfig networkConfig = NetworkConfig();

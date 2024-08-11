@@ -196,7 +196,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const extractionsPerSurvey = 10;
   final diamondMedianSellPrice = marketPrices.medianSellPrice(tradeSymbol)!;
 
-  final maxRequestsPerMinute = config.targetRequestsPerSecond * 60;
+  final maxRequestsPerMinute = networkConfig.targetRequestsPerSecond * 60;
 
   final miner = minerTransfer;
   final surveyor = [survey];

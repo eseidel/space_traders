@@ -151,10 +151,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final connection = await defaultDatabase();
   await NetExecutor(
     connection,
-    targetRequestsPerSecond: config.targetRequestsPerSecond,
+    targetRequestsPerSecond: networkConfig.targetRequestsPerSecond,
   ).run();
 }
 
 void main(List<String> args) async {
-  await runOffline(args, command);
+  await runOffline(args, command, loadConfig: false);
 }

@@ -88,7 +88,7 @@ Future<void> advanceShips(
         onComplete: (duration, requestCount, queryCounts) async {
           final behaviorState = await db.behaviorStateBySymbol(shipSymbol);
           final expectedSeconds =
-              (requestCount / config.targetRequestsPerSecond) * 1.2;
+              (requestCount / networkConfig.targetRequestsPerSecond) * 1.2;
           if (duration.inSeconds > expectedSeconds) {
             final behaviorName = behaviorState?.behavior.name;
             final behaviorString =
@@ -160,7 +160,8 @@ class RateLimitTracker {
       _lastRequestCount = requestCount;
       final requestsPerSecond =
           requestsSinceLastPrint / timeSinceLastPrint.inSeconds;
-      final max = timeSinceLastPrint.inSeconds * config.targetRequestsPerSecond;
+      final max =
+          timeSinceLastPrint.inSeconds * networkConfig.targetRequestsPerSecond;
       final percent = ((requestsSinceLastPrint / max) * 100).round();
       // No sense in printing low percentages, as that will just end up being
       // most of what we print.

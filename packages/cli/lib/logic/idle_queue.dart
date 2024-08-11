@@ -186,7 +186,7 @@ class IdleQueue {
   Duration get minProcessingTime {
     // Systems make about 4 requests.
     return Duration(
-      milliseconds: (1000 * config.targetRequestsPerSecond * 4).ceil(),
+      milliseconds: (1000 * networkConfig.targetRequestsPerSecond * 4).ceil(),
     );
   }
 
