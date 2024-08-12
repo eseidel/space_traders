@@ -51,8 +51,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=spacetraders
-    # Only expose the port to other containers.
+    # Expose the port to other containers.
     expose: [5432]
+    # Carefully *only* expose the port to localhost (for test scripts).
+    ports: ["127.0.0.1:5432:5432"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
