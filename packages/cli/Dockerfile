@@ -22,7 +22,7 @@ WORKDIR /app/cli
 RUN dart pub get --offline
 
 RUN mkdir -p /app/bin
-RUN dart compile exe bin/${BIN}.dart -o /app/bin/server
+RUN dart compile exe -DPGHOST=db bin/${BIN}.dart -o /app/bin/server
 
 # Build minimal serving image from AOT-compiled `/server` and required system
 # libraries and configuration files stored in `/runtime/` from the build stage.
