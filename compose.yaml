@@ -13,6 +13,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: on-failure
   cli:
     build:
       context: ./packages
@@ -28,6 +29,7 @@ services:
         condition: service_started
       db:
         condition: service_healthy
+    restart: on-failure
   idle:
     build:
       context: ./packages
@@ -39,6 +41,7 @@ services:
         condition: service_started
       db:
         condition: service_healthy
+    restart: on-failure
   db:
     image: postgres:15.3-alpine3.18
     restart: always

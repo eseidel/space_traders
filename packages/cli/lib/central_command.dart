@@ -557,7 +557,13 @@ class CentralCommand {
     SystemsCache systems,
     SystemSymbol systemSymbol,
   ) async {
-    final jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
+    final jumpGate;
+    try {
+      jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
+    } catch (e) {
+      print(e);
+      return null;
+    }
     if (jumpGate == null) {
       return null;
     }
