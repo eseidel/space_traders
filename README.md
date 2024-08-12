@@ -16,7 +16,26 @@ A Dart client for spacetraders.io.
 `openapi` is generated (and pretty terrible code).
 `server` and `ui` are mostly stubs.
 
-## Setup
+## Setup for running
+
+Set `ST_AGENT` to your desired agent name.  If your agent name is reserved
+you'll also need to set `ST_EMAIL`.
+
+You can reserve your name by donating to spacetraders.
+
+```
+export ST_AGENT=yourname
+```
+
+And then otherwise just run:
+```
+snap install docker
+docker compose up --build
+```
+
+You only need to set `ST_AGENT` the first run, after that it saves it in the db.
+
+## Setup (for development)
 
 This should work on any platform, but probably runs best on Linux.
 
@@ -55,6 +74,12 @@ cd space_traders
 very_good packages get -r
 cd packages/cli
 dart test
+```
+
+You may also want to set up git if you haven't
+```
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
 ```
 
 ## Usage
