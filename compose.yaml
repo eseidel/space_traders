@@ -1,7 +1,9 @@
 # cspell:words initdb healthcheck pg_isready
 services:
   web:
-    build: ./packages/ui
+    build: 
+      context: ./packages
+      dockerfile: ./ui/Dockerfile
     ports:
       - "8080:80"
   net:
