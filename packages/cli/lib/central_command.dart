@@ -557,11 +557,11 @@ class CentralCommand {
     SystemsCache systems,
     SystemSymbol systemSymbol,
   ) async {
-    final jumpGate;
+    final SystemWaypoint? jumpGate;
     try {
       jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
     } catch (e) {
-      print(e);
+      logger.warn('Failed to find jump gate for $systemSymbol: $e');
       return null;
     }
     if (jumpGate == null) {
@@ -659,7 +659,7 @@ class CentralCommand {
         ) ??
         false;
     final phase = _determineGamePhase(ships, jumpGateComplete: _isGateComplete);
-    print(phase);
+    logger.info('$phase');
     if (phase != config.gamePhase) {
       await db.setGamePhase(phase);
       config = await Config.fromDb(db);
