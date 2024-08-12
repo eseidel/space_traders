@@ -681,15 +681,12 @@ class Database {
     if (result.isEmpty) {
       return null;
     }
-    return GamePhase.values.firstWhere(
-      (phase) => phase.name == result[0][0] as String,
-      orElse: () => throw ArgumentError('Unknown game phase: ${result[0][0]}'),
-    );
+    return GamePhase.fromJson(result[0][0] as String);
   }
 
   Future<void> setGamePhase(GamePhase phase) async {
     await executeSql('INSERT INTO config (key, value) VALUES (\'game_phase\', '
-        '\'$phase\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+        '\'${phase.toJson()}\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
   }
 
   Future<String?> getAuthToken() async {

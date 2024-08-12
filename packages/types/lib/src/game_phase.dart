@@ -12,5 +12,14 @@ enum GamePhase with EnumIndexOrdering {
   exploration,
 
   /// Sell off all our ships and retire.
-  selloff
+  selloff;
+
+  static GamePhase fromJson(String json) {
+    // TODO(eseidel): Remove on next reset.
+    final value = json.startsWith('GamePhase.') ? json.substring(10) : json;
+    return values.firstWhere((e) => e.name == value,
+        orElse: () => throw ArgumentError('Invalid json for GamePhase'));
+  }
+
+  String toJson() => name;
 }
