@@ -32,6 +32,9 @@ services:
       db:
         condition: service_healthy
     restart: on-failure
+    volumes:
+      - ./packages/cli/static_data:/static_data
+      - ./packages/cli/data:/data
   idle:
     build:
       context: ./packages
@@ -44,6 +47,9 @@ services:
       db:
         condition: service_healthy
     restart: on-failure
+    volumes:
+      - ./packages/cli/static_data:/static_data
+      - ./packages/cli/data:/data
   db:
     image: postgres:15.3-alpine3.18
     restart: always
