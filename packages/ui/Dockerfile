@@ -1,5 +1,8 @@
 FROM ghcr.io/cirruslabs/flutter:latest AS build-env
 
+# Disable "don't run as root" warning in flutter.
+ENV BOT=true
+
 # Resolve app dependencies.
 WORKDIR /app
 COPY openapi/pubspec.* ./openapi/
