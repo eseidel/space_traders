@@ -1,5 +1,5 @@
 name: server
-description: An new Dart Frog application
+description: Backend for the ui.
 version: 1.0.0+1
 publish_to: none
 
@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   dart_frog: ^1.1.0
+  db:
+    path: ../db
 
 dev_dependencies:
   mocktail: ^1.0.3
