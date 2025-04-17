@@ -12,7 +12,8 @@ class Api {
   /// Construct an Api with the given ApiClient.
   Api(this.apiClient)
       : systems = SystemsApi(apiClient),
-        defaultApi = DefaultApi(apiClient),
+        global = GlobalApi(apiClient),
+        data = DataApi(apiClient),
         contracts = ContractsApi(apiClient),
         agents = AgentsApi(apiClient),
         fleet = FleetApi(apiClient),
@@ -24,8 +25,14 @@ class Api {
   /// Counts of requests sent through this api.
   RequestCounts get requestCounts => apiClient.requestCounts;
 
-  /// DefaultApi generated client.
-  final DefaultApi defaultApi;
+  /// GlobalApi generated client.
+  final GlobalApi global;
+
+  /// Backwards compatibility for the defaultApi getter.
+  GlobalApi get defaultApi => global;
+
+  /// DataApi generated client.
+  final DataApi data;
 
   /// SystemApi generated client.
   final SystemsApi systems;

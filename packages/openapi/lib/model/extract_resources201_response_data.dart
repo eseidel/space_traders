@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -25,7 +25,7 @@ class ExtractResources201ResponseData {
 
   ShipCargo cargo;
 
-  List<ExtractResources201ResponseDataEventsInner> events;
+  List<ShipConditionEvent> events;
 
   @override
   bool operator ==(Object other) =>
@@ -81,8 +81,7 @@ class ExtractResources201ResponseData {
         cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         extraction: Extraction.fromJson(json[r'extraction'])!,
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
-        events: ExtractResources201ResponseDataEventsInner.listFromJson(
-            json[r'events']),
+        events: ShipConditionEvent.listFromJson(json[r'events']),
       );
     }
     return null;

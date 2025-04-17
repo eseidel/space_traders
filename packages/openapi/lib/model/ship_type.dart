@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -35,6 +35,7 @@ class ShipType {
   static const ORE_HOUND = ShipType._(r'SHIP_ORE_HOUND');
   static const REFINING_FREIGHTER = ShipType._(r'SHIP_REFINING_FREIGHTER');
   static const SURVEYOR = ShipType._(r'SHIP_SURVEYOR');
+  static const BULK_FREIGHTER = ShipType._(r'SHIP_BULK_FREIGHTER');
 
   /// List of all possible values in this [enum][ShipType].
   static const values = <ShipType>[
@@ -50,6 +51,7 @@ class ShipType {
     ORE_HOUND,
     REFINING_FREIGHTER,
     SURVEYOR,
+    BULK_FREIGHTER,
   ];
 
   static ShipType? fromJson(dynamic value) =>
@@ -117,6 +119,8 @@ class ShipTypeTypeTransformer {
           return ShipType.REFINING_FREIGHTER;
         case r'SHIP_SURVEYOR':
           return ShipType.SURVEYOR;
+        case r'SHIP_BULK_FREIGHTER':
+          return ShipType.BULK_FREIGHTER;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -20,6 +20,7 @@ class ShipReactor {
     required this.integrity,
     required this.powerOutput,
     required this.requirements,
+    required this.quality,
   });
 
   /// Symbol of the reactor.
@@ -50,6 +51,9 @@ class ShipReactor {
 
   ShipRequirements requirements;
 
+  /// The overall quality of the component, which determines the quality of the component. High quality components return more ships parts and ship plating when a ship is scrapped. But also require more of these parts to repair. This is transparent to the player, as the parts are bought from/sold to the marketplace.
+  num quality;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -60,7 +64,8 @@ class ShipReactor {
           other.condition == condition &&
           other.integrity == integrity &&
           other.powerOutput == powerOutput &&
-          other.requirements == requirements;
+          other.requirements == requirements &&
+          other.quality == quality;
 
   @override
   int get hashCode =>
@@ -71,11 +76,12 @@ class ShipReactor {
       (condition.hashCode) +
       (integrity.hashCode) +
       (powerOutput.hashCode) +
-      (requirements.hashCode);
+      (requirements.hashCode) +
+      (quality.hashCode);
 
   @override
   String toString() =>
-      'ShipReactor[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, powerOutput=$powerOutput, requirements=$requirements]';
+      'ShipReactor[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, powerOutput=$powerOutput, requirements=$requirements, quality=$quality]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -86,6 +92,7 @@ class ShipReactor {
     json[r'integrity'] = this.integrity;
     json[r'powerOutput'] = this.powerOutput;
     json[r'requirements'] = this.requirements;
+    json[r'quality'] = this.quality;
     return json;
   }
 
@@ -113,10 +120,11 @@ class ShipReactor {
         symbol: ShipReactorSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: mapValueOfType<num>(json, r'condition')!.toDouble(),
-        integrity: mapValueOfType<num>(json, r'integrity')!.toDouble(),
+        condition: mapValueOfType<double>(json, r'condition')!,
+        integrity: mapValueOfType<double>(json, r'integrity')!,
         powerOutput: mapValueOfType<int>(json, r'powerOutput')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
+        quality: num.parse('${json[r'quality']}'),
       );
     }
     return null;
@@ -180,6 +188,7 @@ class ShipReactor {
     'integrity',
     'powerOutput',
     'requirements',
+    'quality',
   };
 }
 

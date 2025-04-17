@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -24,10 +24,10 @@ class ShipyardTransaction {
   /// The symbol of the waypoint.
   String waypointSymbol;
 
-  /// The symbol of the ship that was the subject of the transaction.
+  /// The symbol of the ship type (e.g. SHIP_MINING_DRONE) that was the subject of the transaction. Contrary to what the name implies, this is NOT the symbol of the ship that was purchased.
   String shipSymbol;
 
-  /// The symbol of the ship that was the subject of the transaction.
+  /// The symbol of the ship type (e.g. SHIP_MINING_DRONE) that was the subject of the transaction.
   String shipType;
 
   /// The price of the transaction.

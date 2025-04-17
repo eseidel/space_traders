@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **symbol** | [**FactionSymbol**](FactionSymbol.md) |  | 
 **name** | **String** | Name of the faction. | 
 **description** | **String** | Description of the faction. | 
-**headquarters** | **String** | The waypoint in which the faction's HQ is located in. | 
+**headquarters** | **String** | The waypoint in which the faction's HQ is located in. | [optional] 
 **traits** | [**List<FactionTrait>**](FactionTrait.md) | List of traits that define this faction. | [default to const []]
 **isRecruiting** | **bool** | Whether or not the faction is currently recruiting new agents. | 
 

@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -16,7 +16,7 @@ class Faction {
     required this.symbol,
     required this.name,
     required this.description,
-    required this.headquarters,
+    this.headquarters,
     this.traits = const [],
     required this.isRecruiting,
   });
@@ -30,7 +30,13 @@ class Faction {
   String description;
 
   /// The waypoint in which the faction's HQ is located in.
-  String headquarters;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? headquarters;
 
   /// List of traits that define this faction.
   List<FactionTrait> traits;
@@ -55,7 +61,7 @@ class Faction {
       (symbol.hashCode) +
       (name.hashCode) +
       (description.hashCode) +
-      (headquarters.hashCode) +
+      (headquarters == null ? 0 : headquarters!.hashCode) +
       (traits.hashCode) +
       (isRecruiting.hashCode);
 
@@ -68,7 +74,11 @@ class Faction {
     json[r'symbol'] = this.symbol;
     json[r'name'] = this.name;
     json[r'description'] = this.description;
-    json[r'headquarters'] = this.headquarters;
+    if (this.headquarters != null) {
+      json[r'headquarters'] = this.headquarters;
+    } else {
+      json[r'headquarters'] = null;
+    }
     json[r'traits'] = this.traits;
     json[r'isRecruiting'] = this.isRecruiting;
     return json;
@@ -98,7 +108,7 @@ class Faction {
         symbol: FactionSymbol.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
-        headquarters: mapValueOfType<String>(json, r'headquarters')!,
+        headquarters: mapValueOfType<String>(json, r'headquarters'),
         traits: FactionTrait.listFromJson(json[r'traits']),
         isRecruiting: mapValueOfType<bool>(json, r'isRecruiting')!,
       );
@@ -160,7 +170,6 @@ class Faction {
     'symbol',
     'name',
     'description',
-    'headquarters',
     'traits',
     'isRecruiting',
   };

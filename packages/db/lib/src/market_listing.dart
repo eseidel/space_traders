@@ -10,6 +10,7 @@ Query marketListingByWaypointSymbolQuery(WaypointSymbol symbol) => Query(
 /// Query all market listings.
 Query allMarketListingsQuery() => const Query('SELECT * FROM market_listing_');
 
+/// Query all market listings within a system.
 Query marketListingsInSystemQuery(SystemSymbol system) => Query(
       'SELECT * FROM market_listing_ WHERE starts_with(symbol, @system)',
       parameters: {'system': system.system},

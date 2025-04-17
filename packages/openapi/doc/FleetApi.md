@@ -24,8 +24,10 @@ Method | HTTP request | Description
 [**getRepairShip**](FleetApi.md#getrepairship) | **GET** /my/ships/{shipSymbol}/repair | Get Repair Ship
 [**getScrapShip**](FleetApi.md#getscrapship) | **GET** /my/ships/{shipSymbol}/scrap | Get Scrap Ship
 [**getShipCooldown**](FleetApi.md#getshipcooldown) | **GET** /my/ships/{shipSymbol}/cooldown | Get Ship Cooldown
+[**getShipModules**](FleetApi.md#getshipmodules) | **GET** /my/ships/{shipSymbol}/modules | Get Ship Modules
 [**getShipNav**](FleetApi.md#getshipnav) | **GET** /my/ships/{shipSymbol}/nav | Get Ship Nav
 [**installMount**](FleetApi.md#installmount) | **POST** /my/ships/{shipSymbol}/mounts/install | Install Mount
+[**installShipModule**](FleetApi.md#installshipmodule) | **POST** /my/ships/{shipSymbol}/modules/install | Install Ship Module
 [**jettison**](FleetApi.md#jettison) | **POST** /my/ships/{shipSymbol}/jettison | Jettison Cargo
 [**jumpShip**](FleetApi.md#jumpship) | **POST** /my/ships/{shipSymbol}/jump | Jump Ship
 [**navigateShip**](FleetApi.md#navigateship) | **POST** /my/ships/{shipSymbol}/navigate | Navigate Ship
@@ -36,6 +38,7 @@ Method | HTTP request | Description
 [**purchaseShip**](FleetApi.md#purchaseship) | **POST** /my/ships | Purchase Ship
 [**refuelShip**](FleetApi.md#refuelship) | **POST** /my/ships/{shipSymbol}/refuel | Refuel Ship
 [**removeMount**](FleetApi.md#removemount) | **POST** /my/ships/{shipSymbol}/mounts/remove | Remove Mount
+[**removeShipModule**](FleetApi.md#removeshipmodule) | **POST** /my/ships/{shipSymbol}/modules/remove | Remove Ship Module
 [**repairShip**](FleetApi.md#repairship) | **POST** /my/ships/{shipSymbol}/repair | Repair Ship
 [**scrapShip**](FleetApi.md#scrapship) | **POST** /my/ships/{shipSymbol}/scrap | Scrap Ship
 [**sellCargo**](FleetApi.md#sellcargo) | **POST** /my/ships/{shipSymbol}/sell | Sell Cargo
@@ -786,6 +789,61 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getShipModules**
+> GetShipModules200Response getShipModules(shipSymbol)
+
+Get Ship Modules
+
+Get the modules installed on a ship.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AccountToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship
+
+try {
+    final result = api_instance.getShipModules(shipSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->getShipModules: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The symbol of the ship | 
+
+### Return type
+
+[**GetShipModules200Response**](GetShipModules200Response.md)
+
+### Authorization
+
+[AccountToken](../README.md#AccountToken), [AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getShipNav**
 > GetShipNav200Response getShipNav(shipSymbol)
 
@@ -878,6 +936,63 @@ Name | Type | Description  | Notes
 ### Authorization
 
 [AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **installShipModule**
+> InstallShipModule201Response installShipModule(shipSymbol, installShipModuleRequest)
+
+Install Ship Module
+
+Install a module on a ship. The module must be in your cargo.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AccountToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship
+final installShipModuleRequest = InstallShipModuleRequest(); // InstallShipModuleRequest | 
+
+try {
+    final result = api_instance.installShipModule(shipSymbol, installShipModuleRequest);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->installShipModule: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The symbol of the ship | 
+ **installShipModuleRequest** | [**InstallShipModuleRequest**](InstallShipModuleRequest.md)|  | [optional] 
+
+### Return type
+
+[**InstallShipModule201Response**](InstallShipModule201Response.md)
+
+### Authorization
+
+[AccountToken](../README.md#AccountToken), [AgentToken](../README.md#AgentToken)
 
 ### HTTP request headers
 
@@ -1138,7 +1253,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **patchShipNav**
-> GetShipNav200Response patchShipNav(shipSymbol, patchShipNavRequest)
+> PatchShipNav200Response patchShipNav(shipSymbol, patchShipNavRequest)
 
 Patch Ship Nav
 
@@ -1175,7 +1290,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**GetShipNav200Response**](GetShipNav200Response.md)
+[**PatchShipNav200Response**](PatchShipNav200Response.md)
 
 ### Authorization
 
@@ -1390,6 +1505,63 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **removeShipModule**
+> RemoveModule201Response removeShipModule(shipSymbol, removeShipModuleRequest)
+
+Remove Ship Module
+
+Remove a module from a ship. The module will be placed in cargo.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AccountToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = FleetApi();
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship
+final removeShipModuleRequest = RemoveShipModuleRequest(); // RemoveShipModuleRequest | 
+
+try {
+    final result = api_instance.removeShipModule(shipSymbol, removeShipModuleRequest);
+    print(result);
+} catch (e) {
+    print('Exception when calling FleetApi->removeShipModule: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The symbol of the ship | 
+ **removeShipModuleRequest** | [**RemoveShipModuleRequest**](RemoveShipModuleRequest.md)|  | [optional] 
+
+### Return type
+
+[**RemoveModule201Response**](RemoveModule201Response.md)
+
+### Authorization
+
+[AccountToken](../README.md#AccountToken), [AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **repairShip**
 > RepairShip200Response repairShip(shipSymbol)
 
@@ -1544,7 +1716,7 @@ Name | Type | Description  | Notes
 
 Ship Refine
 
-Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 30 basic goods will be converted into 10 processed goods.
+Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 100 basic goods will be converted into 10 processed goods.
 
 ### Example
 ```dart
@@ -1595,7 +1767,7 @@ Name | Type | Description  | Notes
 
 Siphon Resources
 
-Siphon gases, such as hydrocarbon, from gas giants.  The ship must be in orbit to be able to siphon and must have siphon mounts and a gas processor installed.
+Siphon gases or other resources from gas giants.  The ship must be in orbit to be able to siphon and must have siphon mounts and a gas processor installed.
 
 ### Example
 ```dart

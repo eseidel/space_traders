@@ -275,7 +275,7 @@ String describeShipNav(
 /// Log the adverse events in the given [events].
 void logEvents(
   Ship ship,
-  List<ExtractResources201ResponseDataEventsInner> events,
+  List<ShipConditionEvent> events,
 ) {
   if (events.isEmpty) {
     return;

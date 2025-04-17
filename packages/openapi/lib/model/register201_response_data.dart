@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -16,7 +16,7 @@ class Register201ResponseData {
     required this.agent,
     required this.contract,
     required this.faction,
-    required this.ship,
+    this.ships = const [],
     required this.token,
   });
 
@@ -26,7 +26,7 @@ class Register201ResponseData {
 
   Faction faction;
 
-  Ship ship;
+  List<Ship> ships;
 
   /// A Bearer token for accessing secured API endpoints.
   String token;
@@ -38,7 +38,7 @@ class Register201ResponseData {
           other.agent == agent &&
           other.contract == contract &&
           other.faction == faction &&
-          other.ship == ship &&
+          _deepEquality.equals(other.ships, ships) &&
           other.token == token;
 
   @override
@@ -47,19 +47,19 @@ class Register201ResponseData {
       (agent.hashCode) +
       (contract.hashCode) +
       (faction.hashCode) +
-      (ship.hashCode) +
+      (ships.hashCode) +
       (token.hashCode);
 
   @override
   String toString() =>
-      'Register201ResponseData[agent=$agent, contract=$contract, faction=$faction, ship=$ship, token=$token]';
+      'Register201ResponseData[agent=$agent, contract=$contract, faction=$faction, ships=$ships, token=$token]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'agent'] = this.agent;
     json[r'contract'] = this.contract;
     json[r'faction'] = this.faction;
-    json[r'ship'] = this.ship;
+    json[r'ships'] = this.ships;
     json[r'token'] = this.token;
     return json;
   }
@@ -88,7 +88,7 @@ class Register201ResponseData {
         agent: Agent.fromJson(json[r'agent'])!,
         contract: Contract.fromJson(json[r'contract'])!,
         faction: Faction.fromJson(json[r'faction'])!,
-        ship: Ship.fromJson(json[r'ship'])!,
+        ships: Ship.listFromJson(json[r'ships']),
         token: mapValueOfType<String>(json, r'token')!,
       );
     }
@@ -149,7 +149,6 @@ class Register201ResponseData {
     'agent',
     'contract',
     'faction',
-    'ship',
     'token',
   };
 }

@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -22,7 +22,7 @@ class NavigateShip200ResponseData {
 
   ShipNav nav;
 
-  List<ExtractResources201ResponseDataEventsInner> events;
+  List<ShipConditionEvent> events;
 
   @override
   bool operator ==(Object other) =>
@@ -72,8 +72,7 @@ class NavigateShip200ResponseData {
       return NavigateShip200ResponseData(
         fuel: ShipFuel.fromJson(json[r'fuel'])!,
         nav: ShipNav.fromJson(json[r'nav'])!,
-        events: ExtractResources201ResponseDataEventsInner.listFromJson(
-            json[r'events']),
+        events: ShipConditionEvent.listFromJson(json[r'events']),
       );
     }
     return null;

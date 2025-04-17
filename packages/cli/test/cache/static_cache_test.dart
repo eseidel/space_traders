@@ -31,6 +31,7 @@ void main() {
           requirements: ShipRequirements(),
           condition: 1,
           integrity: 1,
+          quality: 1,
         ),
         engine: ShipEngine(
           name: 'Test',
@@ -40,6 +41,7 @@ void main() {
           speed: 10,
           condition: 1,
           integrity: 1,
+          quality: 1,
         ),
         reactor: ShipReactor(
           name: 'Test',
@@ -49,6 +51,7 @@ void main() {
           powerOutput: 10,
           condition: 1,
           integrity: 1,
+          quality: 1,
         ),
         modules: [
           ShipModule(
@@ -85,6 +88,7 @@ void main() {
           requirements: ShipRequirements(),
           condition: 1,
           integrity: 1,
+          quality: 1,
         ),
         engine: ShipEngine(
           name: 'Test',
@@ -94,6 +98,7 @@ void main() {
           speed: 10,
           condition: 1,
           integrity: 1,
+          quality: 1,
         ),
         reactor: ShipReactor(
           name: 'Test',
@@ -103,6 +108,7 @@ void main() {
           powerOutput: 10,
           condition: 1,
           integrity: 1,
+          quality: 1,
         ),
         modules: [
           ShipModule(

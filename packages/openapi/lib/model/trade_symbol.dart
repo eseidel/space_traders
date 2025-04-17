@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -111,6 +111,7 @@ class TradeSymbol {
   static const FRAME_DESTROYER = TradeSymbol._(r'FRAME_DESTROYER');
   static const FRAME_CRUISER = TradeSymbol._(r'FRAME_CRUISER');
   static const FRAME_CARRIER = TradeSymbol._(r'FRAME_CARRIER');
+  static const FRAME_BULK_FREIGHTER = TradeSymbol._(r'FRAME_BULK_FREIGHTER');
   static const REACTOR_SOLAR_I = TradeSymbol._(r'REACTOR_SOLAR_I');
   static const REACTOR_FUSION_I = TradeSymbol._(r'REACTOR_FUSION_I');
   static const REACTOR_FISSION_I = TradeSymbol._(r'REACTOR_FISSION_I');
@@ -181,6 +182,7 @@ class TradeSymbol {
   static const SHIP_REFINING_FREIGHTER =
       TradeSymbol._(r'SHIP_REFINING_FREIGHTER');
   static const SHIP_SURVEYOR = TradeSymbol._(r'SHIP_SURVEYOR');
+  static const SHIP_BULK_FREIGHTER = TradeSymbol._(r'SHIP_BULK_FREIGHTER');
 
   /// List of all possible values in this [enum][TradeSymbol].
   static const values = <TradeSymbol>[
@@ -271,6 +273,7 @@ class TradeSymbol {
     FRAME_DESTROYER,
     FRAME_CRUISER,
     FRAME_CARRIER,
+    FRAME_BULK_FREIGHTER,
     REACTOR_SOLAR_I,
     REACTOR_FUSION_I,
     REACTOR_FISSION_I,
@@ -327,6 +330,7 @@ class TradeSymbol {
     SHIP_ORE_HOUND,
     SHIP_REFINING_FREIGHTER,
     SHIP_SURVEYOR,
+    SHIP_BULK_FREIGHTER,
   ];
 
   static TradeSymbol? fromJson(dynamic value) =>
@@ -544,6 +548,8 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.FRAME_CRUISER;
         case r'FRAME_CARRIER':
           return TradeSymbol.FRAME_CARRIER;
+        case r'FRAME_BULK_FREIGHTER':
+          return TradeSymbol.FRAME_BULK_FREIGHTER;
         case r'REACTOR_SOLAR_I':
           return TradeSymbol.REACTOR_SOLAR_I;
         case r'REACTOR_FUSION_I':
@@ -656,6 +662,8 @@ class TradeSymbolTypeTransformer {
           return TradeSymbol.SHIP_REFINING_FREIGHTER;
         case r'SHIP_SURVEYOR':
           return TradeSymbol.SHIP_SURVEYOR;
+        case r'SHIP_BULK_FREIGHTER':
+          return TradeSymbol.SHIP_BULK_FREIGHTER;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

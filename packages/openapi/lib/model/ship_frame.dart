@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -22,6 +22,7 @@ class ShipFrame {
     required this.mountingPoints,
     required this.fuelCapacity,
     required this.requirements,
+    required this.quality,
   });
 
   /// Symbol of the frame.
@@ -62,6 +63,9 @@ class ShipFrame {
 
   ShipRequirements requirements;
 
+  /// The overall quality of the component, which determines the quality of the component. High quality components return more ships parts and ship plating when a ship is scrapped. But also require more of these parts to repair. This is transparent to the player, as the parts are bought from/sold to the marketplace.
+  num quality;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -74,7 +78,8 @@ class ShipFrame {
           other.moduleSlots == moduleSlots &&
           other.mountingPoints == mountingPoints &&
           other.fuelCapacity == fuelCapacity &&
-          other.requirements == requirements;
+          other.requirements == requirements &&
+          other.quality == quality;
 
   @override
   int get hashCode =>
@@ -87,11 +92,12 @@ class ShipFrame {
       (moduleSlots.hashCode) +
       (mountingPoints.hashCode) +
       (fuelCapacity.hashCode) +
-      (requirements.hashCode);
+      (requirements.hashCode) +
+      (quality.hashCode);
 
   @override
   String toString() =>
-      'ShipFrame[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, moduleSlots=$moduleSlots, mountingPoints=$mountingPoints, fuelCapacity=$fuelCapacity, requirements=$requirements]';
+      'ShipFrame[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, moduleSlots=$moduleSlots, mountingPoints=$mountingPoints, fuelCapacity=$fuelCapacity, requirements=$requirements, quality=$quality]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -104,6 +110,7 @@ class ShipFrame {
     json[r'mountingPoints'] = this.mountingPoints;
     json[r'fuelCapacity'] = this.fuelCapacity;
     json[r'requirements'] = this.requirements;
+    json[r'quality'] = this.quality;
     return json;
   }
 
@@ -131,12 +138,13 @@ class ShipFrame {
         symbol: ShipFrameSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: mapValueOfType<num>(json, r'condition')!.toDouble(),
-        integrity: mapValueOfType<num>(json, r'integrity')!.toDouble(),
+        condition: mapValueOfType<double>(json, r'condition')!,
+        integrity: mapValueOfType<double>(json, r'integrity')!,
         moduleSlots: mapValueOfType<int>(json, r'moduleSlots')!,
         mountingPoints: mapValueOfType<int>(json, r'mountingPoints')!,
         fuelCapacity: mapValueOfType<int>(json, r'fuelCapacity')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
+        quality: num.parse('${json[r'quality']}'),
       );
     }
     return null;
@@ -202,6 +210,7 @@ class ShipFrame {
     'mountingPoints',
     'fuelCapacity',
     'requirements',
+    'quality',
   };
 }
 
@@ -235,6 +244,7 @@ class ShipFrameSymbolEnum {
   static const DESTROYER = ShipFrameSymbolEnum._(r'FRAME_DESTROYER');
   static const CRUISER = ShipFrameSymbolEnum._(r'FRAME_CRUISER');
   static const CARRIER = ShipFrameSymbolEnum._(r'FRAME_CARRIER');
+  static const BULK_FREIGHTER = ShipFrameSymbolEnum._(r'FRAME_BULK_FREIGHTER');
 
   /// List of all possible values in this [enum][ShipFrameSymbolEnum].
   static const values = <ShipFrameSymbolEnum>[
@@ -253,6 +263,7 @@ class ShipFrameSymbolEnum {
     DESTROYER,
     CRUISER,
     CARRIER,
+    BULK_FREIGHTER,
   ];
 
   static ShipFrameSymbolEnum? fromJson(dynamic value) =>
@@ -326,6 +337,8 @@ class ShipFrameSymbolEnumTypeTransformer {
           return ShipFrameSymbolEnum.CRUISER;
         case r'FRAME_CARRIER':
           return ShipFrameSymbolEnum.CARRIER;
+        case r'FRAME_BULK_FREIGHTER':
+          return ShipFrameSymbolEnum.BULK_FREIGHTER;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

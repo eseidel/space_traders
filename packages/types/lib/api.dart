@@ -268,7 +268,7 @@ extension ShipModificationTransactionUtils on ShipModificationTransaction {
 extension FactionUtils on Faction {
   /// Returns the WaypointSymbol for the faction headquarters.
   WaypointSymbol get headquartersSymbol =>
-      WaypointSymbol.fromString(headquarters);
+      WaypointSymbol.fromString(headquarters!);
 
   /// Returns the SystemSymbol for the faction headquarters.
   SystemSymbol get headquartersSystemSymbol => headquartersSymbol.system;

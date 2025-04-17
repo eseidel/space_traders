@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -30,9 +30,10 @@ part 'auth/http_bearer_auth.dart';
 
 part 'api/agents_api.dart';
 part 'api/contracts_api.dart';
-part 'api/default_api.dart';
+part 'api/data_api.dart';
 part 'api/factions_api.dart';
 part 'api/fleet_api.dart';
+part 'api/global_api.dart';
 part 'api/systems_api.dart';
 
 part 'model/accept_contract200_response.dart';
@@ -63,7 +64,6 @@ part 'model/deliver_contract_request.dart';
 part 'model/dock_ship200_response.dart';
 part 'model/extract_resources201_response.dart';
 part 'model/extract_resources201_response_data.dart';
-part 'model/extract_resources201_response_data_events_inner.dart';
 part 'model/extract_resources_request.dart';
 part 'model/extraction.dart';
 part 'model/extraction_yield.dart';
@@ -90,6 +90,7 @@ part 'model/get_repair_ship200_response_data.dart';
 part 'model/get_scrap_ship200_response.dart';
 part 'model/get_scrap_ship200_response_data.dart';
 part 'model/get_ship_cooldown200_response.dart';
+part 'model/get_ship_modules200_response.dart';
 part 'model/get_ship_nav200_response.dart';
 part 'model/get_shipyard200_response.dart';
 part 'model/get_status200_response.dart';
@@ -100,6 +101,9 @@ part 'model/get_status200_response_leaderboards_most_submitted_charts_inner.dart
 part 'model/get_status200_response_links_inner.dart';
 part 'model/get_status200_response_server_resets.dart';
 part 'model/get_status200_response_stats.dart';
+part 'model/get_supply_chain200_response.dart';
+part 'model/get_supply_chain200_response_data.dart';
+part 'model/get_supply_chain200_response_data_export_to_import_map.dart';
 part 'model/get_system200_response.dart';
 part 'model/get_system_waypoints200_response.dart';
 part 'model/get_system_waypoints_traits_parameter.dart';
@@ -108,6 +112,10 @@ part 'model/get_waypoint200_response.dart';
 part 'model/install_mount201_response.dart';
 part 'model/install_mount201_response_data.dart';
 part 'model/install_mount_request.dart';
+part 'model/install_ship_module201_response.dart';
+part 'model/install_ship_module201_response_data.dart';
+part 'model/install_ship_module201_response_data_transaction.dart';
+part 'model/install_ship_module_request.dart';
 part 'model/jettison200_response.dart';
 part 'model/jettison200_response_data.dart';
 part 'model/jettison_request.dart';
@@ -126,6 +134,8 @@ part 'model/negotiate_contract200_response.dart';
 part 'model/negotiate_contract200_response_data.dart';
 part 'model/orbit_ship200_response.dart';
 part 'model/orbit_ship200_response_data.dart';
+part 'model/patch_ship_nav200_response.dart';
+part 'model/patch_ship_nav200_response_data.dart';
 part 'model/patch_ship_nav_request.dart';
 part 'model/purchase_cargo201_response.dart';
 part 'model/purchase_cargo_request.dart';
@@ -138,9 +148,11 @@ part 'model/refuel_ship_request.dart';
 part 'model/register201_response.dart';
 part 'model/register201_response_data.dart';
 part 'model/register_request.dart';
+part 'model/remove_module201_response.dart';
 part 'model/remove_mount201_response.dart';
 part 'model/remove_mount201_response_data.dart';
 part 'model/remove_mount_request.dart';
+part 'model/remove_ship_module_request.dart';
 part 'model/repair_ship200_response.dart';
 part 'model/repair_ship200_response_data.dart';
 part 'model/repair_transaction.dart';

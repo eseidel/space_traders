@@ -8,7 +8,7 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 Future<String> _tryRegister(
-  DefaultApi api, {
+  GlobalApi api, {
   required String symbol,
   required FactionSymbol faction,
   String? email,
@@ -33,7 +33,7 @@ Future<String> register(
   String? faction,
 }) async {
   final client = getApiClient(db);
-  final defaultApi = DefaultApi(client);
+  final defaultApi = GlobalApi(client);
 
   final factionsApi = FactionsApi(client);
   final factions = await loadFactions(db, factionsApi);

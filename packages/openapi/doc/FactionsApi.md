@@ -23,6 +23,12 @@ View the details of a faction.
 ### Example
 ```dart
 import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AccountToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -53,7 +59,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AgentToken](../README.md#AgentToken)
+[AccountToken](../README.md#AccountToken), [AgentToken](../README.md#AgentToken)
 
 ### HTTP request headers
 

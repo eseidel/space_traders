@@ -88,6 +88,11 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
+    final fuel = ShipFuel(current: 100, capacity: 200);
+    final responseData = PatchShipNav200ResponseData(
+      nav: shipNav,
+      fuel: fuel,
+    );
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol);
@@ -97,12 +102,13 @@ void main() {
         patchShipNavRequest: any(named: 'patchShipNavRequest'),
       ),
     ).thenAnswer(
-      (invocation) => Future.value(GetShipNav200Response(data: shipNav)),
+      (invocation) => Future.value(PatchShipNav200Response(data: responseData)),
     );
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     await setShipFlightMode(db, api, ship, ShipNavFlightMode.CRUISE);
     verify(() => ship.nav = shipNav).called(1);
+    verify(() => ship.fuel = fuel).called(1);
   });
 
   test('undockIfNeeded', () async {
@@ -175,6 +181,8 @@ void main() {
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(ShipSymbol.fromString('S-1'));
     final shipNav = _MockShipNav();
+
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn('A');
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
@@ -183,16 +191,19 @@ void main() {
     when(() => ship.fuel).thenReturn(shipFuel);
     final systemsCache = _MockSystemsCache();
 
+    final patchResponse = PatchShipNav200Response(
+      data: PatchShipNav200ResponseData(
+        nav: shipNav,
+        fuel: shipFuel,
+      ),
+    );
+
     when(
       () => fleetApi.patchShipNav(
         any(),
         patchShipNavRequest: any(named: 'patchShipNavRequest'),
       ),
-    ).thenAnswer(
-      (invocation) => Future.value(
-        GetShipNav200Response(data: _MockShipNav()),
-      ),
-    );
+    ).thenAnswer((_) => Future.value(patchResponse));
 
     when(
       () => fleetApi.navigateShip(
@@ -326,6 +337,13 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final logger = _MockLogger();
 
+    final patchResponse = PatchShipNav200Response(
+      data: PatchShipNav200ResponseData(
+        nav: shipNav,
+        fuel: ShipFuel(current: 0, capacity: 0),
+      ),
+    );
+
     final agent = Agent.test();
     final agentCache = _MockAgentCache();
     when(() => agentCache.agent).thenReturn(agent);
@@ -419,9 +437,7 @@ void main() {
         any(),
         patchShipNavRequest: any(named: 'patchShipNavRequest'),
       ),
-    ).thenAnswer(
-      (invocation) => Future.value(GetShipNav200Response(data: shipNav)),
-    );
+    ).thenAnswer((_) => Future.value(patchResponse));
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.BURN);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.BURN);
     await runWithLogger(

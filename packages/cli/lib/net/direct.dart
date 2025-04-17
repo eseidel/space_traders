@@ -1,6 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
+import 'package:cli/logic/printing.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -49,7 +50,7 @@ Future<ScrapShip200ResponseData> scrapShip(
 }
 
 /// Set the [flightMode] of [ship]
-Future<ShipNav> setShipFlightMode(
+Future<void> setShipFlightMode(
   Database db,
   Api api,
   Ship ship,
@@ -58,9 +59,12 @@ Future<ShipNav> setShipFlightMode(
   final request = PatchShipNavRequest(flightMode: flightMode);
   final response = await api.fleet
       .patchShipNav(ship.symbol.symbol, patchShipNavRequest: request);
-  ship.nav = response!.data;
+  final data = response!.data;
+  ship
+    ..nav = data.nav
+    ..fuel = data.fuel;
+  logEvents(ship, data.events);
   await db.upsertShip(ship);
-  return response.data;
 }
 
 /// Navigate [ship] to [waypointSymbol]

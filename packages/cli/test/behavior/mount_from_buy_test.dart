@@ -86,6 +86,7 @@ void main() {
         powerOutput: 0,
         requirements: ShipRequirements(),
         condition: 1,
+        quality: 1,
         integrity: 1,
       ),
     );

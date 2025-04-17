@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -285,8 +285,6 @@ class ApiClient {
           return ExtractResources201Response.fromJson(value);
         case 'ExtractResources201ResponseData':
           return ExtractResources201ResponseData.fromJson(value);
-        case 'ExtractResources201ResponseDataEventsInner':
-          return ExtractResources201ResponseDataEventsInner.fromJson(value);
         case 'ExtractResourcesRequest':
           return ExtractResourcesRequest.fromJson(value);
         case 'Extraction':
@@ -339,6 +337,8 @@ class ApiClient {
           return GetScrapShip200ResponseData.fromJson(value);
         case 'GetShipCooldown200Response':
           return GetShipCooldown200Response.fromJson(value);
+        case 'GetShipModules200Response':
+          return GetShipModules200Response.fromJson(value);
         case 'GetShipNav200Response':
           return GetShipNav200Response.fromJson(value);
         case 'GetShipyard200Response':
@@ -361,6 +361,12 @@ class ApiClient {
           return GetStatus200ResponseServerResets.fromJson(value);
         case 'GetStatus200ResponseStats':
           return GetStatus200ResponseStats.fromJson(value);
+        case 'GetSupplyChain200Response':
+          return GetSupplyChain200Response.fromJson(value);
+        case 'GetSupplyChain200ResponseData':
+          return GetSupplyChain200ResponseData.fromJson(value);
+        case 'GetSupplyChain200ResponseDataExportToImportMap':
+          return GetSupplyChain200ResponseDataExportToImportMap.fromJson(value);
         case 'GetSystem200Response':
           return GetSystem200Response.fromJson(value);
         case 'GetSystemWaypoints200Response':
@@ -377,6 +383,14 @@ class ApiClient {
           return InstallMount201ResponseData.fromJson(value);
         case 'InstallMountRequest':
           return InstallMountRequest.fromJson(value);
+        case 'InstallShipModule201Response':
+          return InstallShipModule201Response.fromJson(value);
+        case 'InstallShipModule201ResponseData':
+          return InstallShipModule201ResponseData.fromJson(value);
+        case 'InstallShipModule201ResponseDataTransaction':
+          return InstallShipModule201ResponseDataTransaction.fromJson(value);
+        case 'InstallShipModuleRequest':
+          return InstallShipModuleRequest.fromJson(value);
         case 'Jettison200Response':
           return Jettison200Response.fromJson(value);
         case 'Jettison200ResponseData':
@@ -413,6 +427,10 @@ class ApiClient {
           return OrbitShip200Response.fromJson(value);
         case 'OrbitShip200ResponseData':
           return OrbitShip200ResponseData.fromJson(value);
+        case 'PatchShipNav200Response':
+          return PatchShipNav200Response.fromJson(value);
+        case 'PatchShipNav200ResponseData':
+          return PatchShipNav200ResponseData.fromJson(value);
         case 'PatchShipNavRequest':
           return PatchShipNavRequest.fromJson(value);
         case 'PurchaseCargo201Response':
@@ -437,12 +455,16 @@ class ApiClient {
           return Register201ResponseData.fromJson(value);
         case 'RegisterRequest':
           return RegisterRequest.fromJson(value);
+        case 'RemoveModule201Response':
+          return RemoveModule201Response.fromJson(value);
         case 'RemoveMount201Response':
           return RemoveMount201Response.fromJson(value);
         case 'RemoveMount201ResponseData':
           return RemoveMount201ResponseData.fromJson(value);
         case 'RemoveMountRequest':
           return RemoveMountRequest.fromJson(value);
+        case 'RemoveShipModuleRequest':
+          return RemoveShipModuleRequest.fromJson(value);
         case 'RepairShip200Response':
           return RepairShip200Response.fromJson(value);
         case 'RepairShip200ResponseData':

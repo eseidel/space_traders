@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -15,6 +15,8 @@ class System {
   System({
     required this.symbol,
     required this.sectorSymbol,
+    this.constellation,
+    this.name,
     required this.type,
     required this.x,
     required this.y,
@@ -27,6 +29,24 @@ class System {
 
   /// The symbol of the sector.
   String sectorSymbol;
+
+  /// The constellation that the system is part of.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? constellation;
+
+  /// The name of the system.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? name;
 
   SystemType type;
 
@@ -48,6 +68,8 @@ class System {
       other is System &&
           other.symbol == symbol &&
           other.sectorSymbol == sectorSymbol &&
+          other.constellation == constellation &&
+          other.name == name &&
           other.type == type &&
           other.x == x &&
           other.y == y &&
@@ -59,6 +81,8 @@ class System {
       // ignore: unnecessary_parenthesis
       (symbol.hashCode) +
       (sectorSymbol.hashCode) +
+      (constellation == null ? 0 : constellation!.hashCode) +
+      (name == null ? 0 : name!.hashCode) +
       (type.hashCode) +
       (x.hashCode) +
       (y.hashCode) +
@@ -67,12 +91,22 @@ class System {
 
   @override
   String toString() =>
-      'System[symbol=$symbol, sectorSymbol=$sectorSymbol, type=$type, x=$x, y=$y, waypoints=$waypoints, factions=$factions]';
+      'System[symbol=$symbol, sectorSymbol=$sectorSymbol, constellation=$constellation, name=$name, type=$type, x=$x, y=$y, waypoints=$waypoints, factions=$factions]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'symbol'] = this.symbol;
     json[r'sectorSymbol'] = this.sectorSymbol;
+    if (this.constellation != null) {
+      json[r'constellation'] = this.constellation;
+    } else {
+      json[r'constellation'] = null;
+    }
+    if (this.name != null) {
+      json[r'name'] = this.name;
+    } else {
+      json[r'name'] = null;
+    }
     json[r'type'] = this.type;
     json[r'x'] = this.x;
     json[r'y'] = this.y;
@@ -104,6 +138,8 @@ class System {
       return System(
         symbol: mapValueOfType<String>(json, r'symbol')!,
         sectorSymbol: mapValueOfType<String>(json, r'sectorSymbol')!,
+        constellation: mapValueOfType<String>(json, r'constellation'),
+        name: mapValueOfType<String>(json, r'name'),
         type: SystemType.fromJson(json[r'type'])!,
         x: mapValueOfType<int>(json, r'x')!,
         y: mapValueOfType<int>(json, r'y')!,

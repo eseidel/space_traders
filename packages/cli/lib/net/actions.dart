@@ -833,15 +833,15 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
 }
 
 /// Set the [flightMode] of [ship] if it is not already set to [flightMode]
-Future<ShipNav?> setShipFlightModeIfNeeded(
+Future<void> setShipFlightModeIfNeeded(
   Database db,
   Api api,
   Ship ship,
   ShipNavFlightMode flightMode,
 ) async {
   if (ship.nav.flightMode == flightMode) {
-    return null;
+    return;
   }
   shipInfo(ship, 'Setting flightMode to $flightMode');
-  return setShipFlightMode(db, api, ship, flightMode);
+  await setShipFlightMode(db, api, ship, flightMode);
 }

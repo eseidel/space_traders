@@ -319,6 +319,7 @@ class Database {
     );
   }
 
+  /// Get my agent from the db.
   Future<Agent?> getMyAgent() async {
     final symbol = await getAgentSymbol();
     if (symbol == null) {
@@ -352,6 +353,7 @@ class Database {
     return queryMany(query, marketListingFromColumnMap);
   }
 
+  /// Get all market listings within a system.
   Future<Iterable<MarketListing>> marketListingsInSystem(
     SystemSymbol system,
   ) async {
@@ -660,46 +662,53 @@ class Database {
     return result[0][0]! as int;
   }
 
+  /// Get my agent symbol from the config table in the db.
   Future<String?> getAgentSymbol() async {
     final result = await executeSql(
-        'SELECT value FROM config WHERE key = \'agent_symbol\'');
+      "SELECT value FROM config WHERE key = 'agent_symbol'",
+    );
     if (result.isEmpty) {
       return null;
     }
-    return result[0][0] as String;
+    return result[0][0]! as String;
   }
 
+  /// Set my agent symbol in the config table in the db.
   Future<void> setAgentSymbol(String symbol) async {
-    await executeSql(
-        'INSERT INTO config (key, value) VALUES (\'agent_symbol\', '
-        '\'$symbol\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+    await executeSql("INSERT INTO config (key, value) VALUES ('agent_symbol', "
+        "'$symbol') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
   }
 
+  /// Get the game phase from the config table in the db.
   Future<GamePhase?> getGamePhase() async {
     final result =
-        await executeSql('SELECT value FROM config WHERE key = \'game_phase\'');
+        await executeSql("SELECT value FROM config WHERE key = 'game_phase'");
     if (result.isEmpty) {
       return null;
     }
-    return GamePhase.fromJson(result[0][0] as String);
+    return GamePhase.fromJson(result[0][0]! as String);
   }
 
+  /// Set the game phase in the config table in the db.
   Future<void> setGamePhase(GamePhase phase) async {
-    await executeSql('INSERT INTO config (key, value) VALUES (\'game_phase\', '
-        '\'${phase.toJson()}\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+    await executeSql("INSERT INTO config (key, value) VALUES ('game_phase', "
+        "'${phase.toJson()}') "
+        'ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
   }
 
+  /// Get the auth token from the config table in the db.
   Future<String?> getAuthToken() async {
     final result =
-        await executeSql('SELECT value FROM config WHERE key = \'auth_token\'');
+        await executeSql("SELECT value FROM config WHERE key = 'auth_token'");
     if (result.isEmpty) {
       return null;
     }
-    return result[0][0] as String;
+    return result[0][0]! as String;
   }
 
+  /// Set the auth token in the config table in the db.
   Future<void> setAuthToken(String token) async {
-    await executeSql('INSERT INTO config (key, value) VALUES (\'auth_token\', '
-        '\'$token\') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+    await executeSql("INSERT INTO config (key, value) VALUES ('auth_token', "
+        "'$token') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
   }
 }

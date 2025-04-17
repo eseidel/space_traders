@@ -344,9 +344,8 @@ class TradeExportCache extends StaticCache<TradeSymbol, TradeExport> {
 }
 
 /// A cache of event descriptions.
-class EventCache extends StaticCache<
-    ExtractResources201ResponseDataEventsInnerSymbolEnum,
-    ExtractResources201ResponseDataEventsInner> {
+class EventCache
+    extends StaticCache<ShipConditionEventSymbolEnum, ShipConditionEvent> {
   /// Creates a new waypoint trait cache.
   EventCache(
     super.events, {
@@ -360,7 +359,7 @@ class EventCache extends StaticCache<
         _loadJsonNullable(
           fs,
           path,
-          ExtractResources201ResponseDataEventsInner.fromJson,
+          ShipConditionEvent.fromJson,
         ),
         fs: fs,
         path: path,
@@ -370,23 +369,23 @@ class EventCache extends StaticCache<
   static const defaultPath = 'static_data/events.json';
 
   @override
-  ExtractResources201ResponseDataEventsInner copyAndNormalize(
-    ExtractResources201ResponseDataEventsInner record,
+  ShipConditionEvent copyAndNormalize(
+    ShipConditionEvent record,
   ) =>
-      ExtractResources201ResponseDataEventsInner.fromJson(
+      ShipConditionEvent.fromJson(
         jsonDecode(jsonEncode(record)),
       )!;
 
   @override
   int compare(
-    ExtractResources201ResponseDataEventsInner a,
-    ExtractResources201ResponseDataEventsInner b,
+    ShipConditionEvent a,
+    ShipConditionEvent b,
   ) =>
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  ExtractResources201ResponseDataEventsInnerSymbolEnum keyFor(
-    ExtractResources201ResponseDataEventsInner record,
+  ShipConditionEventSymbolEnum keyFor(
+    ShipConditionEvent record,
   ) =>
       record.symbol;
 }

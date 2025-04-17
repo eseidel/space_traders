@@ -1,7 +1,7 @@
 //
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
-// @dart=2.12
+// @dart=2.18
 
 // ignore_for_file: unused_element, unused_import
 // ignore_for_file: always_put_required_named_parameters_first
@@ -1049,6 +1049,73 @@ class FleetApi {
     return null;
   }
 
+  /// Get Ship Modules
+  ///
+  /// Get the modules installed on a ship.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship
+  Future<Response> getShipModulesWithHttpInfo(
+    String shipSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/modules'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Ship Modules
+  ///
+  /// Get the modules installed on a ship.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship
+  Future<GetShipModules200Response?> getShipModules(
+    String shipSymbol,
+  ) async {
+    final response = await getShipModulesWithHttpInfo(
+      shipSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetShipModules200Response',
+      ) as GetShipModules200Response;
+    }
+    return null;
+  }
+
   /// Get Ship Nav
   ///
   /// Get the current nav status of a ship.
@@ -1186,6 +1253,80 @@ class FleetApi {
         await _decodeBodyBytes(response),
         'InstallMount201Response',
       ) as InstallMount201Response;
+    }
+    return null;
+  }
+
+  /// Install Ship Module
+  ///
+  /// Install a module on a ship. The module must be in your cargo.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship
+  ///
+  /// * [InstallShipModuleRequest] installShipModuleRequest:
+  Future<Response> installShipModuleWithHttpInfo(
+    String shipSymbol, {
+    InstallShipModuleRequest? installShipModuleRequest,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/modules/install'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody = installShipModuleRequest;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Install Ship Module
+  ///
+  /// Install a module on a ship. The module must be in your cargo.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship
+  ///
+  /// * [InstallShipModuleRequest] installShipModuleRequest:
+  Future<InstallShipModule201Response?> installShipModule(
+    String shipSymbol, {
+    InstallShipModuleRequest? installShipModuleRequest,
+  }) async {
+    final response = await installShipModuleWithHttpInfo(
+      shipSymbol,
+      installShipModuleRequest: installShipModuleRequest,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'InstallShipModule201Response',
+      ) as InstallShipModule201Response;
     }
     return null;
   }
@@ -1598,7 +1739,7 @@ class FleetApi {
   ///   The ship symbol.
   ///
   /// * [PatchShipNavRequest] patchShipNavRequest:
-  Future<GetShipNav200Response?> patchShipNav(
+  Future<PatchShipNav200Response?> patchShipNav(
     String shipSymbol, {
     PatchShipNavRequest? patchShipNavRequest,
   }) async {
@@ -1616,8 +1757,8 @@ class FleetApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'GetShipNav200Response',
-      ) as GetShipNav200Response;
+        'PatchShipNav200Response',
+      ) as PatchShipNav200Response;
     }
     return null;
   }
@@ -1908,6 +2049,80 @@ class FleetApi {
     return null;
   }
 
+  /// Remove Ship Module
+  ///
+  /// Remove a module from a ship. The module will be placed in cargo.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship
+  ///
+  /// * [RemoveShipModuleRequest] removeShipModuleRequest:
+  Future<Response> removeShipModuleWithHttpInfo(
+    String shipSymbol, {
+    RemoveShipModuleRequest? removeShipModuleRequest,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/modules/remove'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody = removeShipModuleRequest;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Remove Ship Module
+  ///
+  /// Remove a module from a ship. The module will be placed in cargo.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship
+  ///
+  /// * [RemoveShipModuleRequest] removeShipModuleRequest:
+  Future<RemoveModule201Response?> removeShipModule(
+    String shipSymbol, {
+    RemoveShipModuleRequest? removeShipModuleRequest,
+  }) async {
+    final response = await removeShipModuleWithHttpInfo(
+      shipSymbol,
+      removeShipModuleRequest: removeShipModuleRequest,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'RemoveModule201Response',
+      ) as RemoveModule201Response;
+    }
+    return null;
+  }
+
   /// Repair Ship
   ///
   /// Repair a ship, restoring the ship to maximum condition. The ship must be docked at a waypoint that has the `Shipyard` trait in order to use this function. To preview the cost of repairing the ship, use the Get action.
@@ -2118,7 +2333,7 @@ class FleetApi {
 
   /// Ship Refine
   ///
-  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 30 basic goods will be converted into 10 processed goods.
+  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 100 basic goods will be converted into 10 processed goods.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -2158,7 +2373,7 @@ class FleetApi {
 
   /// Ship Refine
   ///
-  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 30 basic goods will be converted into 10 processed goods.
+  /// Attempt to refine the raw materials on your ship. The request will only succeed if your ship is capable of refining at the time of the request. In order to be able to refine, a ship must have goods that can be refined and have installed a `Refinery` module that can refine it.  When refining, 100 basic goods will be converted into 10 processed goods.
   ///
   /// Parameters:
   ///
@@ -2192,7 +2407,7 @@ class FleetApi {
 
   /// Siphon Resources
   ///
-  /// Siphon gases, such as hydrocarbon, from gas giants.  The ship must be in orbit to be able to siphon and must have siphon mounts and a gas processor installed.
+  /// Siphon gases or other resources from gas giants.  The ship must be in orbit to be able to siphon and must have siphon mounts and a gas processor installed.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -2229,7 +2444,7 @@ class FleetApi {
 
   /// Siphon Resources
   ///
-  /// Siphon gases, such as hydrocarbon, from gas giants.  The ship must be in orbit to be able to siphon and must have siphon mounts and a gas processor installed.
+  /// Siphon gases or other resources from gas giants.  The ship must be in orbit to be able to siphon and must have siphon mounts and a gas processor installed.
   ///
   /// Parameters:
   ///

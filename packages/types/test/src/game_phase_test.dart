@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
-import "package:types/types.dart";
+import 'package:types/types.dart';
 
 void main() {
   test('GamePhase json round trip', () {
-    final phase = GamePhase.bootstrap;
+    const phase = GamePhase.bootstrap;
     final json = phase.toJson();
     final phase2 = GamePhase.fromJson(json);
     expect(phase, phase2);

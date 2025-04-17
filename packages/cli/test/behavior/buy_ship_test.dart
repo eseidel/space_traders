@@ -70,6 +70,7 @@ void main() {
         requirements: ShipRequirements(),
         condition: 1,
         integrity: 1,
+        quality: 1,
       ),
     );
 

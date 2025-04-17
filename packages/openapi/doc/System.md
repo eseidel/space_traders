@@ -10,6 +10,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **symbol** | **String** | The symbol of the system. | 
 **sectorSymbol** | **String** | The symbol of the sector. | 
+**constellation** | **String** | The constellation that the system is part of. | [optional] 
+**name** | **String** | The name of the system. | [optional] 
 **type** | [**SystemType**](SystemType.md) |  | 
 **x** | **int** | Relative position of the system in the sector in the x axis. | 
 **y** | **int** | Relative position of the system in the sector in the y axis. | 
