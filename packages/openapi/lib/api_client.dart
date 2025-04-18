@@ -371,8 +371,6 @@ class ApiClient {
           return GetSystem200Response.fromJson(value);
         case 'GetSystemWaypoints200Response':
           return GetSystemWaypoints200Response.fromJson(value);
-        case 'GetSystemWaypointsTraitsParameter':
-          return GetSystemWaypointsTraitsParameter.fromJson(value);
         case 'GetSystems200Response':
           return GetSystems200Response.fromJson(value);
         case 'GetWaypoint200Response':

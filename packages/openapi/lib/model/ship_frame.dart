@@ -38,13 +38,13 @@ class ShipFrame {
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  double condition;
+  num condition;
 
   /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  double integrity;
+  num integrity;
 
   /// The amount of slots that can be dedicated to modules installed in the ship. Each installed module take up a number of slots, and once there are no more slots, no new modules can be installed.
   ///
@@ -138,8 +138,8 @@ class ShipFrame {
         symbol: ShipFrameSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: mapValueOfType<double>(json, r'condition')!,
-        integrity: mapValueOfType<double>(json, r'integrity')!,
+        condition: num.parse('${json[r'condition']}'),
+        integrity: num.parse('${json[r'integrity']}'),
         moduleSlots: mapValueOfType<int>(json, r'moduleSlots')!,
         mountingPoints: mapValueOfType<int>(json, r'mountingPoints')!,
         fuelCapacity: mapValueOfType<int>(json, r'fuelCapacity')!,

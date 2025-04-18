@@ -106,7 +106,6 @@ part 'model/get_supply_chain200_response_data.dart';
 part 'model/get_supply_chain200_response_data_export_to_import_map.dart';
 part 'model/get_system200_response.dart';
 part 'model/get_system_waypoints200_response.dart';
-part 'model/get_system_waypoints_traits_parameter.dart';
 part 'model/get_systems200_response.dart';
 part 'model/get_waypoint200_response.dart';
 part 'model/install_mount201_response.dart';

@@ -214,7 +214,6 @@ Class | Method | HTTP request | Description
  - [GetSupplyChain200ResponseDataExportToImportMap](doc//GetSupplyChain200ResponseDataExportToImportMap.md)
  - [GetSystem200Response](doc//GetSystem200Response.md)
  - [GetSystemWaypoints200Response](doc//GetSystemWaypoints200Response.md)
- - [GetSystemWaypointsTraitsParameter](doc//GetSystemWaypointsTraitsParameter.md)
  - [GetSystems200Response](doc//GetSystems200Response.md)
  - [GetWaypoint200Response](doc//GetWaypoint200Response.md)
  - [InstallMount201Response](doc//InstallMount201Response.md)

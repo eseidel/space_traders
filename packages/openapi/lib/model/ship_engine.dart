@@ -36,13 +36,13 @@ class ShipEngine {
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  double condition;
+  num condition;
 
   /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  double integrity;
+  num integrity;
 
   /// The speed stat of this engine. The higher the speed, the faster a ship can travel from one point to another. Reduces the time of arrival when navigating the ship.
   ///
@@ -120,8 +120,8 @@ class ShipEngine {
         symbol: ShipEngineSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: mapValueOfType<double>(json, r'condition')!,
-        integrity: mapValueOfType<double>(json, r'integrity')!,
+        condition: num.parse('${json[r'condition']}'),
+        integrity: num.parse('${json[r'integrity']}'),
         speed: mapValueOfType<int>(json, r'speed')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
         quality: num.parse('${json[r'quality']}'),

@@ -295,7 +295,7 @@ final systemSymbol = systemSymbol_example; // String | The system symbol
 final page = 56; // int | What entry offset to request
 final limit = 56; // int | How many entries to return per page
 final type = ; // WaypointType | Filter waypoints by type.
-final traits = ; // GetSystemWaypointsTraitsParameter | Filter waypoints by one or more traits.
+final traits = []; // List<WaypointTraitSymbol> | Filter waypoints by one or more traits.
 
 try {
     final result = api_instance.getSystemWaypoints(systemSymbol, page, limit, type, traits);
@@ -313,7 +313,7 @@ Name | Type | Description  | Notes
  **page** | **int**| What entry offset to request | [optional] [default to 1]
  **limit** | **int**| How many entries to return per page | [optional] [default to 10]
  **type** | [**WaypointType**](.md)| Filter waypoints by type. | [optional] 
- **traits** | [**GetSystemWaypointsTraitsParameter**](.md)| Filter waypoints by one or more traits. | [optional] 
+ **traits** | [**List<WaypointTraitSymbol>**](WaypointTraitSymbol.md)| Filter waypoints by one or more traits. | [optional] [default to const []]
 
 ### Return type
 

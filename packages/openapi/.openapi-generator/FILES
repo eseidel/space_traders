@@ -78,7 +78,6 @@ doc/GetSupplyChain200ResponseData.md
 doc/GetSupplyChain200ResponseDataExportToImportMap.md
 doc/GetSystem200Response.md
 doc/GetSystemWaypoints200Response.md
-doc/GetSystemWaypointsTraitsParameter.md
 doc/GetSystems200Response.md
 doc/GetWaypoint200Response.md
 doc/GlobalApi.md
@@ -289,7 +288,6 @@ lib/model/get_supply_chain200_response_data.dart
 lib/model/get_supply_chain200_response_data_export_to_import_map.dart
 lib/model/get_system200_response.dart
 lib/model/get_system_waypoints200_response.dart
-lib/model/get_system_waypoints_traits_parameter.dart
 lib/model/get_systems200_response.dart
 lib/model/get_waypoint200_response.dart
 lib/model/install_mount201_response.dart
@@ -487,7 +485,6 @@ test/get_supply_chain200_response_data_test.dart
 test/get_supply_chain200_response_test.dart
 test/get_system200_response_test.dart
 test/get_system_waypoints200_response_test.dart
-test/get_system_waypoints_traits_parameter_test.dart
 test/get_systems200_response_test.dart
 test/get_waypoint200_response_test.dart
 test/global_api_test.dart

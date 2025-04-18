@@ -36,13 +36,13 @@ class ShipReactor {
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  double condition;
+  num condition;
 
   /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  double integrity;
+  num integrity;
 
   /// The amount of power provided by this reactor. The more power a reactor provides to the ship, the lower the cooldown it gets when using a module or mount that taxes the ship's power.
   ///
@@ -120,8 +120,8 @@ class ShipReactor {
         symbol: ShipReactorSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: mapValueOfType<double>(json, r'condition')!,
-        integrity: mapValueOfType<double>(json, r'integrity')!,
+        condition: num.parse('${json[r'condition']}'),
+        integrity: num.parse('${json[r'integrity']}'),
         powerOutput: mapValueOfType<int>(json, r'powerOutput')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
         quality: num.parse('${json[r'quality']}'),
