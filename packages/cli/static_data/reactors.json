@@ -4,6 +4,7 @@
   "name": "Chemical Reactor I",
   "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
   "condition": 1,
+  "quality": 1,
    "integrity": 1.0,
   "powerOutput": 15,
   "requirements": {
@@ -17,6 +18,7 @@
   "name": "Fission Reactor I",
   "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions.",
   "condition": 1,
+  "quality": 1,
    "integrity": 1.0,
   "powerOutput": 31,
   "requirements": {
@@ -30,6 +32,7 @@
   "name": "Fusion Reactor I",
   "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions.",
   "condition": 1,
+  "quality": 1,
    "integrity": 1.0,
   "powerOutput": 40,
   "requirements": {
@@ -43,6 +46,7 @@
   "name": "Solar Reactor I",
   "description": "A basic solar power reactor, used to generate electricity from solar energy.",
   "condition": 1,
+  "quality": 1,
    "integrity": 1.0,
   "powerOutput": 3,
   "requirements": {

@@ -4,6 +4,7 @@
   "name": "Impulse Drive I",
   "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
   "condition": 1,
+  "quality": 1,
    "integrity": 1.0,
   "speed": 3,
   "requirements": {
@@ -17,6 +18,7 @@
   "name": "Ion Drive I",
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
   "condition": 1,
+  "quality": 1,
    "integrity": 1.0,
   "speed": 10,
   "requirements": {
@@ -30,6 +32,7 @@
   "name": "Ion Drive II",
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
   "condition": 1,
+  "quality": 1,
    "integrity": 1.0,
   "speed": 30,
   "requirements": {
