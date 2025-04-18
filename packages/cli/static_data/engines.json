@@ -17,15 +17,15 @@
   "symbol": "ENGINE_ION_DRIVE_I",
   "name": "Ion Drive I",
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
-  "condition": 1,
-  "integrity": 1.0,
-  "speed": 10,
+  "condition": 1.0,
+  "integrity": 1,
+  "speed": 15,
   "requirements": {
    "power": 3,
    "crew": 3,
    "slots": null
   },
-  "quality": 1
+  "quality": 3
  },
  {
   "symbol": "ENGINE_ION_DRIVE_II",

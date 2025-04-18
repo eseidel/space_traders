@@ -613,7 +613,7 @@
    "name": "Light Freighter",
    "description": "A small, versatile spacecraft used for cargo transport and other commercial operations.",
    "condition": 1.0,
-   "integrity": 1.0,
+   "integrity": 1,
    "moduleSlots": 6,
    "mountingPoints": 1,
    "fuelCapacity": 600,
@@ -622,35 +622,35 @@
     "crew": 40,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 5
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
-   "condition": 1.0,
-   "integrity": 1.0,
+   "condition": 1,
+   "integrity": 1,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 3
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_I",
    "name": "Ion Drive I",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
-   "condition": 1.0,
-   "integrity": 1.0,
-   "speed": 10,
+   "condition": 1,
+   "integrity": 1,
+   "speed": 15,
    "requirements": {
     "power": 3,
     "crew": 3,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 3
   },
   "modules": [
    {
@@ -733,7 +733,7 @@
    "name": "Shuttle",
    "description": "A small, reusable spacecraft designed for short-range, low-speed travel between spacecraft or planetary surfaces.",
    "condition": 1.0,
-   "integrity": 1.0,
+   "integrity": 1,
    "moduleSlots": 3,
    "mountingPoints": 1,
    "fuelCapacity": 300,
@@ -742,35 +742,35 @@
     "crew": 10,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 3
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
-   "condition": 1.0,
-   "integrity": 1.0,
+   "condition": 1,
+   "integrity": 1,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 3
   },
   "engine": {
-   "symbol": "ENGINE_IMPULSE_DRIVE_I",
-   "name": "Impulse Drive I",
-   "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
-   "condition": 1.0,
-   "integrity": 1.0,
-   "speed": 3,
+   "symbol": "ENGINE_ION_DRIVE_I",
+   "name": "Ion Drive I",
+   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
+   "condition": 1,
+   "integrity": 1,
+   "speed": 15,
    "requirements": {
-    "power": 1,
-    "crew": 0,
+    "power": 3,
+    "crew": 3,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 3
   },
   "modules": [
    {
@@ -813,7 +813,7 @@
    }
   ],
   "crew": {
-   "required": 18,
+   "required": 21,
    "capacity": 40
   }
  },
@@ -1057,7 +1057,7 @@
    "name": "Probe",
    "description": "A small, unmanned spacecraft used for exploration, reconnaissance, and scientific research.",
    "condition": 1.0,
-   "integrity": 1.0,
+   "integrity": 1,
    "moduleSlots": 0,
    "mountingPoints": 0,
    "fuelCapacity": 0,
@@ -1066,35 +1066,35 @@
     "crew": 0,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 1
   },
   "reactor": {
    "symbol": "REACTOR_SOLAR_I",
    "name": "Solar Reactor I",
    "description": "A basic solar power reactor, used to generate electricity from solar energy.",
-   "condition": 1.0,
-   "integrity": 1.0,
+   "condition": 1,
+   "integrity": 1,
    "powerOutput": 3,
    "requirements": {
     "power": null,
     "crew": 0,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 1
   },
   "engine": {
    "symbol": "ENGINE_IMPULSE_DRIVE_I",
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
-   "condition": 1.0,
-   "integrity": 1.0,
-   "speed": 3,
+   "condition": 1,
+   "integrity": 1,
+   "speed": 9,
    "requirements": {
     "power": 1,
     "crew": 0,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 1
   },
   "modules": [],
   "mounts": [],
