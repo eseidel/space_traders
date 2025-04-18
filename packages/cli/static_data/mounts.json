@@ -2,7 +2,7 @@
  {
   "symbol": "MOUNT_GAS_SIPHON_I",
   "name": "Gas Siphon I",
-  "description": "A basic gas siphon that can extract gas from gas giants and other gas-rich bodies.",
+  "description": "A basic gas siphon that can extract gas and other resources from gas giants and other gas-rich bodies.",
   "strength": 10,
   "deposits": [],
   "requirements": {

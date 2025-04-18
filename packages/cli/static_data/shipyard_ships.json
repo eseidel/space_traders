@@ -1295,7 +1295,7 @@
    "name": "Drone",
    "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
    "condition": 1.0,
-   "integrity": 1.0,
+   "integrity": 1,
    "moduleSlots": 3,
    "mountingPoints": 2,
    "fuelCapacity": 80,
@@ -1304,35 +1304,35 @@
     "crew": -4,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 1
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
-   "condition": 1.0,
-   "integrity": 1.0,
+   "condition": 1,
+   "integrity": 1,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 3
   },
   "engine": {
    "symbol": "ENGINE_IMPULSE_DRIVE_I",
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
-   "condition": 1.0,
-   "integrity": 1.0,
-   "speed": 3,
+   "condition": 1,
+   "integrity": 1,
+   "speed": 9,
    "requirements": {
     "power": 1,
     "crew": 0,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 1
   },
   "modules": [
    {
@@ -1364,7 +1364,7 @@
    {
     "symbol": "MOUNT_GAS_SIPHON_I",
     "name": "Gas Siphon I",
-    "description": "A basic gas siphon that can extract gas from gas giants and other gas-rich bodies.",
+    "description": "A basic gas siphon that can extract gas and other resources from gas giants and other gas-rich bodies.",
     "strength": 10,
     "deposits": [],
     "requirements": {
