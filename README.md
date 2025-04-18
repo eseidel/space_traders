@@ -16,26 +16,7 @@ A Dart client for spacetraders.io.
 `openapi` is generated (and pretty terrible code).
 `server` and `ui` are mostly stubs.
 
-## Setup for running
-
-Set `ST_AGENT` to your desired agent name.  If your agent name is reserved
-you'll also need to set `ST_EMAIL`.
-
-You can reserve your name by donating to spacetraders.
-
-```
-export ST_AGENT=yourname
-```
-
-And then otherwise just run:
-```
-snap install docker
-docker compose up --build
-```
-
-You only need to set `ST_AGENT` the first run, after that it saves it in the db.
-
-## Setup (for development)
+## Setup
 
 This should work on any platform, but probably runs best on Linux.
 
@@ -60,7 +41,32 @@ flutter
 The `export BOT=true` exists just to disable a warning that `flutter` prints
 when being run as root.
 
-Setup `very_good` for ease of getting all the packages.
+## Database Setup
+
+Follow the instrutions in packages/db/README.md before continuing.
+
+## Running
+
+Set `ST_AGENT` to your desired agent name.  If your agent name is reserved
+you'll also need to set `ST_EMAIL`.
+
+You can reserve your name by donating to spacetraders.
+
+```
+export ST_AGENT=yourname
+```
+
+And then otherwise just run:
+```
+snap install docker
+docker compose up --build
+```
+
+You only need to set `ST_AGENT` the first run, after that it saves it in the db.
+
+## Extra setup for Development
+
+I'd recommend adding `very_good` for ease of getting all the packages.
 ```
 dart pub global activate very_good_cli
 echo 'export PATH="$PATH":"$HOME/.pub-cache/bin"' >> $HOME/.bashrc
@@ -82,11 +88,7 @@ git config --global user.email "you@example.com"
 git config --global user.name "Your Name"
 ```
 
-## Usage
-
-The client originally ran as a single program using JSON files for state.
-At this time it's been partially refactored to use a Postgres database for
-state.  Thus you need to run the database server first.
+## Pieces
 
 ### Database
 

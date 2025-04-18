@@ -665,7 +665,7 @@ class Database {
   /// Get my agent symbol from the config table in the db.
   Future<String?> getAgentSymbol() async {
     final result = await executeSql(
-      "SELECT value FROM config WHERE key = 'agent_symbol'",
+      "SELECT value FROM config_ WHERE key = 'agent_symbol'",
     );
     if (result.isEmpty) {
       return null;
@@ -675,14 +675,14 @@ class Database {
 
   /// Set my agent symbol in the config table in the db.
   Future<void> setAgentSymbol(String symbol) async {
-    await executeSql("INSERT INTO config (key, value) VALUES ('agent_symbol', "
+    await executeSql("INSERT INTO config_ (key, value) VALUES ('agent_symbol', "
         "'$symbol') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
   }
 
   /// Get the game phase from the config table in the db.
   Future<GamePhase?> getGamePhase() async {
     final result =
-        await executeSql("SELECT value FROM config WHERE key = 'game_phase'");
+        await executeSql("SELECT value FROM config_ WHERE key = 'game_phase'");
     if (result.isEmpty) {
       return null;
     }
@@ -691,7 +691,7 @@ class Database {
 
   /// Set the game phase in the config table in the db.
   Future<void> setGamePhase(GamePhase phase) async {
-    await executeSql("INSERT INTO config (key, value) VALUES ('game_phase', "
+    await executeSql("INSERT INTO config_ (key, value) VALUES ('game_phase', "
         "'${phase.toJson()}') "
         'ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
   }
@@ -699,7 +699,7 @@ class Database {
   /// Get the auth token from the config table in the db.
   Future<String?> getAuthToken() async {
     final result =
-        await executeSql("SELECT value FROM config WHERE key = 'auth_token'");
+        await executeSql("SELECT value FROM config_ WHERE key = 'auth_token'");
     if (result.isEmpty) {
       return null;
     }
@@ -708,7 +708,7 @@ class Database {
 
   /// Set the auth token in the config table in the db.
   Future<void> setAuthToken(String token) async {
-    await executeSql("INSERT INTO config (key, value) VALUES ('auth_token', "
+    await executeSql("INSERT INTO config_ (key, value) VALUES ('auth_token', "
         "'$token') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
   }
 }

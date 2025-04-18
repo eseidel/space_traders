@@ -22,12 +22,12 @@ docker run \
 ```
 
 ```
-docker cp scripts/. spacetraders_postgres:/scripts
-docker cp sql/. spacetraders_postgres:/sql
+docker cp scripts/. space_traders-db-1:/scripts
+docker cp sql/. space_traders-db-1:/sql
 ```
 
 docker exec -it spacetraders_postgres /bin/sh
 
 ```
-docker exec spacetraders_postgres /scripts/init_db.sh spacetraders
+docker exec space_traders-db-1 /scripts/init_db.sh spacetraders
 ```
