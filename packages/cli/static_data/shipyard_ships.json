@@ -11,7 +11,6 @@
    "name": "Frigate",
    "description": "A medium-sized, multi-purpose spacecraft, often used for combat, transport, or support operations.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 8,
    "mountingPoints": 5,
@@ -20,35 +19,36 @@
     "power": 8,
     "crew": 25,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_FISSION_I",
    "name": "Fission Reactor I",
    "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 31,
    "requirements": {
     "power": null,
     "crew": 8,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_II",
    "name": "Ion Drive II",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 30,
    "requirements": {
     "power": 6,
     "crew": 8,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -193,7 +193,6 @@
    "name": "Explorer",
    "description": "A large, long-range spacecraft designed for deep space exploration and scientific research.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 8,
    "mountingPoints": 2,
@@ -202,35 +201,36 @@
     "power": 5,
     "crew": 30,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_FUSION_I",
    "name": "Fusion Reactor I",
    "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 40,
    "requirements": {
     "power": null,
     "crew": 12,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_II",
    "name": "Ion Drive II",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 30,
    "requirements": {
     "power": 6,
     "crew": 8,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -337,7 +337,6 @@
    "name": "Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 13,
    "mountingPoints": 3,
@@ -346,35 +345,36 @@
     "power": 10,
     "crew": 100,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_FUSION_I",
    "name": "Fusion Reactor I",
    "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 40,
    "requirements": {
     "power": null,
     "crew": 12,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_II",
    "name": "Ion Drive II",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 30,
    "requirements": {
     "power": 6,
     "crew": 8,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -517,7 +517,6 @@
    "name": "Interceptor",
    "description": "A small, agile spacecraft designed for high-speed, short-range combat missions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 2,
    "mountingPoints": 2,
@@ -526,35 +525,36 @@
     "power": 1,
     "crew": 5,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_I",
    "name": "Ion Drive I",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 10,
    "requirements": {
     "power": 3,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -613,7 +613,6 @@
    "name": "Light Freighter",
    "description": "A small, versatile spacecraft used for cargo transport and other commercial operations.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 6,
    "mountingPoints": 1,
@@ -622,35 +621,36 @@
     "power": 5,
     "crew": 40,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_I",
    "name": "Ion Drive I",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 10,
    "requirements": {
     "power": 3,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -733,7 +733,6 @@
    "name": "Shuttle",
    "description": "A small, reusable spacecraft designed for short-range, low-speed travel between spacecraft or planetary surfaces.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 3,
    "mountingPoints": 1,
@@ -742,35 +741,36 @@
     "power": 1,
     "crew": 10,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_IMPULSE_DRIVE_I",
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 3,
    "requirements": {
     "power": 1,
     "crew": 0,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -829,8 +829,7 @@
    "name": "Drone",
    "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
    "condition": 1.0,
-   "quality": 1.0,
-   "integrity": 1.0,
+   "integrity": 1,
    "moduleSlots": 3,
    "mountingPoints": 2,
    "fuelCapacity": 80,
@@ -838,35 +837,36 @@
     "power": 1,
     "crew": -4,
     "slots": null
-   }
+   },
+   "quality": 1
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
-   "condition": 1.0,
-   "quality": 1.0,
-   "integrity": 1.0,
+   "condition": 1,
+   "integrity": 1,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 3
   },
   "engine": {
    "symbol": "ENGINE_IMPULSE_DRIVE_I",
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
-   "condition": 1.0,
-   "quality": 1.0,
-   "integrity": 1.0,
-   "speed": 3,
+   "condition": 1,
+   "integrity": 1,
+   "speed": 9,
    "requirements": {
     "power": 1,
     "crew": 0,
     "slots": null
-   }
+   },
+   "quality": 1
   },
   "modules": [
    {
@@ -925,7 +925,6 @@
    "name": "Miner",
    "description": "A medium-sized spacecraft designed for mining operations and resource extraction.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 5,
    "mountingPoints": 3,
@@ -934,35 +933,36 @@
     "power": 5,
     "crew": 15,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_FISSION_I",
    "name": "Fission Reactor I",
    "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 31,
    "requirements": {
     "power": null,
     "crew": 8,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_I",
    "name": "Ion Drive I",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 10,
    "requirements": {
     "power": 3,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -1057,7 +1057,6 @@
    "name": "Probe",
    "description": "A small, unmanned spacecraft used for exploration, reconnaissance, and scientific research.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 0,
    "mountingPoints": 0,
@@ -1066,35 +1065,36 @@
     "power": 1,
     "crew": 0,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_SOLAR_I",
    "name": "Solar Reactor I",
    "description": "A basic solar power reactor, used to generate electricity from solar energy.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 3,
    "requirements": {
     "power": null,
     "crew": 0,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_IMPULSE_DRIVE_I",
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 3,
    "requirements": {
     "power": 1,
     "crew": 0,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [],
   "mounts": [],
@@ -1115,7 +1115,6 @@
    "name": "Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 13,
    "mountingPoints": 3,
@@ -1124,35 +1123,36 @@
     "power": 10,
     "crew": 100,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_FUSION_I",
    "name": "Fusion Reactor I",
    "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 40,
    "requirements": {
     "power": null,
     "crew": 12,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_II",
    "name": "Ion Drive II",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 30,
    "requirements": {
     "power": 6,
     "crew": 8,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -1295,7 +1295,6 @@
    "name": "Drone",
    "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "moduleSlots": 3,
    "mountingPoints": 2,
@@ -1304,35 +1303,36 @@
     "power": 1,
     "crew": -4,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "engine": {
    "symbol": "ENGINE_IMPULSE_DRIVE_I",
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
    "condition": 1.0,
-   "quality": 1.0,
    "integrity": 1.0,
    "speed": 3,
    "requirements": {
     "power": 1,
     "crew": 0,
     "slots": null
-   }
+   },
+   "quality": 1.0
   },
   "modules": [
    {
@@ -1391,8 +1391,7 @@
    "name": "Drone",
    "description": "A small, unmanned spacecraft used for various tasks, such as surveillance, transportation, or combat.",
    "condition": 1.0,
-   "quality": 1.0,
-   "integrity": 1.0,
+   "integrity": 1,
    "moduleSlots": 3,
    "mountingPoints": 2,
    "fuelCapacity": 80,
@@ -1400,35 +1399,36 @@
     "power": 1,
     "crew": -4,
     "slots": null
-   }
+   },
+   "quality": 1
   },
   "reactor": {
    "symbol": "REACTOR_CHEMICAL_I",
    "name": "Chemical Reactor I",
    "description": "A basic chemical power reactor, used to generate electricity from chemical reactions.",
-   "condition": 1.0,
-   "quality": 1.0,
-   "integrity": 1.0,
+   "condition": 1,
+   "integrity": 1,
    "powerOutput": 15,
    "requirements": {
     "power": null,
     "crew": 3,
     "slots": null
-   }
+   },
+   "quality": 3
   },
   "engine": {
    "symbol": "ENGINE_IMPULSE_DRIVE_I",
    "name": "Impulse Drive I",
    "description": "A basic low-energy propulsion system that generates thrust for interplanetary travel.",
-   "condition": 1.0,
-   "quality": 1.0,
-   "integrity": 1.0,
-   "speed": 3,
+   "condition": 1,
+   "integrity": 1,
+   "speed": 9,
    "requirements": {
     "power": 1,
     "crew": 0,
     "slots": null
-   }
+   },
+   "quality": 1
   },
   "modules": [],
   "mounts": [
