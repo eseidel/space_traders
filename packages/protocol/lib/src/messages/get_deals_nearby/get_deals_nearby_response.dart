@@ -26,6 +26,9 @@ class DealsNearbyResponse {
     required this.tradeSymbolCount,
   });
 
+  factory DealsNearbyResponse.fromJson(Map<String, dynamic> json) =>
+      _$DealsNearbyResponseFromJson(json);
+
   final List<NearbyDeal> deals;
   @ShipTypeConverter()
   final ShipType shipType;
@@ -34,14 +37,21 @@ class DealsNearbyResponse {
   final int credits;
   final List<SellOpp> extraSellOpps;
   final int tradeSymbolCount;
+
+  Map<String, dynamic> toJson() => _$DealsNearbyResponseToJson(this);
 }
 
 @JsonSerializable()
 class NearbyDeal {
   NearbyDeal({required this.costed, required this.inProgress});
 
+  factory NearbyDeal.fromJson(Map<String, dynamic> json) =>
+      _$NearbyDealFromJson(json);
+
   final CostedDeal costed;
   final bool inProgress;
 
   Deal get deal => costed.deal;
+
+  Map<String, dynamic> toJson() => _$NearbyDealToJson(this);
 }
