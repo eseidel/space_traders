@@ -47,6 +47,15 @@ class ShipSpec {
     required this.canWarp,
   });
 
+  /// Create a ShipSpec from a JSON map.
+  ShipSpec.fromJson(Map<String, dynamic> json)
+      : this(
+          cargoCapacity: json['cargoCapacity'] as int,
+          fuelCapacity: json['fuelCapacity'] as int,
+          speed: json['speed'] as int,
+          canWarp: json['canWarp'] as bool,
+        );
+
   /// Fallback value for mocking.
   @visibleForTesting
   ShipSpec.fallbackValue()
@@ -63,6 +72,14 @@ class ShipSpec {
 
   /// Can the ship warp.
   final bool canWarp;
+
+  /// Convert this ShipSpec to a JSON map.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'cargoCapacity': cargoCapacity,
+        'fuelCapacity': fuelCapacity,
+        'speed': speed,
+        'canWarp': canWarp,
+      };
 }
 
 // TODO(eseidel): Integrate into Ship after fixing tests which expect this to
