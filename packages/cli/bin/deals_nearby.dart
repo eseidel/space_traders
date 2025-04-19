@@ -7,12 +7,37 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:cli_table/cli_table.dart';
 
-Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
-  final shipType = shipTypeFromArg(argResults['ship'] as String);
-  final limit = int.parse(argResults['limit'] as String);
-  final startArg = argResults['start'] as String?;
-  final credits = int.parse(argResults['credits'] as String);
+class NearbyDeal {
+  NearbyDeal({
+    required this.costed,
+    required this.inProgress,
+  });
+  // 'Symbol',
+  // 'Start',
+  // 'Buy',
+  // 'End',
+  // 'Sell',
+  // 'Profit',
+  // 'Gain',
+  // 'Time',
+  // 'c/s',
+  // 'Outlay',
+  // 'COGS',
+  // 'OpEx',
+  final CostedDeal costed;
+  final bool inProgress;
 
+  Deal get deal => costed.deal;
+}
+
+Future<List<NearbyDeal>> dealsNearby({
+  required FileSystem fs,
+  required Database db,
+  required ShipType shipType,
+  required int limit,
+  required String? startArg,
+  required int credits,
+}) async {
   final systemsCache = SystemsCache.load(fs);
   final marketListings = await MarketListingSnapshot.load(db);
   final jumpGates = await JumpGateSnapshot.load(db);
@@ -43,7 +68,6 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   centralCommand.activeConstruction = construction;
 
   final exportCache = TradeExportCache.load(fs);
-  final behaviors = await BehaviorSnapshot.load(db);
   final charting = await ChartingSnapshot.load(db);
 
   if (construction != null) {
@@ -57,6 +81,8 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
       construction,
     );
   }
+
+  final behaviors = await BehaviorSnapshot.load(db);
 
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
@@ -111,7 +137,8 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
       marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
           config.defaultAntimatterCost;
 
-  final deals = findDealsFor(
+  final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
+  return findDealsFor(
     systemsCache,
     routePlanner,
     marketScan,
@@ -121,14 +148,36 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     extraSellOpps: extraSellOpps,
     costPerAntimatterUnit: costPerAntimatterUnit,
     costPerFuelUnit: costPerFuelUnit,
+  )
+      .take(limit)
+      .map(
+        (CostedDeal costed) => NearbyDeal(
+          costed: costed,
+          inProgress: !dealNotInProgress(costed.deal),
+        ),
+      )
+      .toList();
+}
+
+Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
+  final shipType = shipTypeFromArg(argResults['ship'] as String);
+  final limit = int.parse(argResults['limit'] as String);
+  final startArg = argResults['start'] as String?;
+  final credits = int.parse(argResults['credits'] as String);
+
+  final deals = await dealsNearby(
+    fs: fs,
+    db: db,
+    shipType: shipType,
+    limit: limit,
+    startArg: startArg,
+    credits: credits,
   );
 
   if (deals.isEmpty) {
     logger.info('No deal found.');
     return;
   }
-
-  final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
 
   logger.info('Top $limit deals:');
 
@@ -151,7 +200,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   );
 
   final allSameSystem = deals.every(
-    (deal) => deal.deal.withinSystem(start.system),
+    (deal) => deal.deal.withinSystem(deals.first.deal.sourceSymbol.system),
   );
   String w(WaypointSymbol symbol) =>
       allSameSystem ? symbol.waypointName : symbol.sectorLocalName;
@@ -160,8 +209,9 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
         'hAlign': HorizontalAlign.right,
       };
   Map<String, dynamic> c(int credits) => rightAlign(creditsString(credits));
-  for (final costed in deals.take(limit)) {
-    final deal = costed.deal;
+  for (final nearby in deals) {
+    final costed = nearby.costed;
+    final deal = nearby.deal;
     final profit = costed.expectedProfit;
     final sign = profit > 0 ? '+' : '';
     final profitPercent = (profit / costed.expectedCosts) * 100;
@@ -169,7 +219,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     final name =
         costed.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
 
-    final inProgressMarker = dealNotInProgress(deal) ? '' : '*';
+    final inProgressMarker = !nearby.inProgress ? '' : '*';
 
     table.add([
       '$name$inProgressMarker',
