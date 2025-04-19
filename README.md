@@ -39,7 +39,7 @@ flutter
 ```
 
 The `export BOT=true` exists just to disable a warning that `flutter` prints
-when being run as root.
+when being run as root.  If you're not running as root, you don't need it.
 
 ## Database Setup
 

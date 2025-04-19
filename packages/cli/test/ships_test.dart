@@ -20,6 +20,7 @@ void main() {
       ShipFrameSymbolEnum.DESTROYER,
       ShipFrameSymbolEnum.CRUISER,
       ShipFrameSymbolEnum.CARRIER,
+      ShipFrameSymbolEnum.BULK_FREIGHTER,
     ];
     for (final frame in ShipFrameSymbolEnum.values) {
       final type = shipyardShips.shipTypeFromFrame(frame);
@@ -29,9 +30,14 @@ void main() {
   });
 
   test('shipFrameFromType', () {
+    // We haven't come across this type yet, once we do, remove this.
+    final expectedNullTypes = [
+      ShipType.BULK_FREIGHTER,
+    ];
     for (final type in ShipType.values) {
       final frame = shipyardShips.shipFrameFromType(type);
-      expect(frame, isNotNull, reason: 'no frame for type $type');
+      final matcher = expectedNullTypes.contains(type) ? isNull : isNotNull;
+      expect(frame, matcher, reason: 'no frame for type $type');
     }
   });
 
