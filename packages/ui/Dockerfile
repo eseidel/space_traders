@@ -5,18 +5,14 @@ ENV BOT=true
 
 # Resolve app dependencies.
 WORKDIR /app
-COPY openapi/pubspec.* ./openapi/
-COPY types/pubspec.* ./types/
-COPY ui/pubspec.* ./ui/
+COPY openapi/ ./openapi/
+COPY types/ ./types/
+COPY ui/ ./ui/
+
+# Pull network dependencies from pub.
 WORKDIR /app/ui
 RUN flutter pub get
 
-# Copy all packages and build them.
-WORKDIR /app
-COPY . .
-
-WORKDIR /app/ui
-RUN flutter pub get --offline
 RUN flutter build web
 
 # use nginx to deploy
