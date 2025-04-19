@@ -7,30 +7,39 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:cli_table/cli_table.dart';
 
+class DealsNearbyResponse {
+  DealsNearbyResponse({
+    required this.deals,
+    required this.shipType,
+    required this.shipSpec,
+    required this.startSymbol,
+    required this.credits,
+    required this.extraSellOpps,
+    required this.tradeSymbolCount,
+  });
+
+  final List<NearbyDeal> deals;
+  final ShipType shipType;
+  final ShipSpec shipSpec;
+  final WaypointSymbol startSymbol;
+  final int credits;
+  final List<SellOpp> extraSellOpps;
+  final int tradeSymbolCount;
+}
+
 class NearbyDeal {
   NearbyDeal({
     required this.costed,
     required this.inProgress,
   });
-  // 'Symbol',
-  // 'Start',
-  // 'Buy',
-  // 'End',
-  // 'Sell',
-  // 'Profit',
-  // 'Gain',
-  // 'Time',
-  // 'c/s',
-  // 'Outlay',
-  // 'COGS',
-  // 'OpEx',
+
   final CostedDeal costed;
   final bool inProgress;
 
   Deal get deal => costed.deal;
 }
 
-Future<List<NearbyDeal>> dealsNearby({
+Future<DealsNearbyResponse> dealsNearby({
   required FileSystem fs,
   required Database db,
   required ShipType shipType,
@@ -102,7 +111,67 @@ Future<List<NearbyDeal>> dealsNearby({
   final ship = shipyardShips[shipType]!;
   final shipSpec = ship.shipSpec;
 
-  logger.info('$shipType @ ${start.symbol}, '
+  final marketScan = scanReachableMarkets(
+    systemsCache,
+    systemConnectivity,
+    marketPrices,
+    startSystem: start.system,
+  );
+  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
+      config.defaultFuelCost;
+  final costPerAntimatterUnit =
+      marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
+          config.defaultAntimatterCost;
+
+  final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
+  final deals = findDealsFor(
+    systemsCache,
+    routePlanner,
+    marketScan,
+    maxTotalOutlay: credits,
+    shipSpec: shipSpec,
+    startSymbol: start.symbol,
+    extraSellOpps: extraSellOpps,
+    costPerAntimatterUnit: costPerAntimatterUnit,
+    costPerFuelUnit: costPerFuelUnit,
+  )
+      .take(limit)
+      .map(
+        (CostedDeal costed) => NearbyDeal(
+          costed: costed,
+          inProgress: !dealNotInProgress(costed.deal),
+        ),
+      )
+      .toList();
+  return DealsNearbyResponse(
+    deals: deals,
+    shipType: shipType,
+    startSymbol: start.symbol,
+    credits: credits,
+    shipSpec: shipSpec,
+    extraSellOpps: extraSellOpps,
+    tradeSymbolCount: marketScan.tradeSymbols.length,
+  );
+}
+
+Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
+  final shipType = shipTypeFromArg(argResults['ship'] as String);
+  final limit = int.parse(argResults['limit'] as String);
+  final startArg = argResults['start'] as String?;
+  final credits = int.parse(argResults['credits'] as String);
+
+  final response = await dealsNearby(
+    fs: fs,
+    db: db,
+    shipType: shipType,
+    limit: limit,
+    startArg: startArg,
+    credits: credits,
+  );
+
+  final shipSpec = response.shipSpec;
+  final extraSellOpps = response.extraSellOpps;
+  logger.info('$shipType @ ${response.startSymbol}, '
       'speed = ${shipSpec.speed} '
       'capacity = ${shipSpec.cargoCapacity}, '
       'fuel <= ${shipSpec.fuelCapacity}, '
@@ -124,56 +193,9 @@ Future<List<NearbyDeal>> dealsNearby({
     }
   }
 
-  final marketScan = scanReachableMarkets(
-    systemsCache,
-    systemConnectivity,
-    marketPrices,
-    startSystem: start.system,
-  );
-  logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
-  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
-      config.defaultFuelCost;
-  final costPerAntimatterUnit =
-      marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
-          config.defaultAntimatterCost;
+  logger.info('Opps for ${response.tradeSymbolCount} trade symbols.');
 
-  final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
-  return findDealsFor(
-    systemsCache,
-    routePlanner,
-    marketScan,
-    maxTotalOutlay: credits,
-    shipSpec: shipSpec,
-    startSymbol: start.symbol,
-    extraSellOpps: extraSellOpps,
-    costPerAntimatterUnit: costPerAntimatterUnit,
-    costPerFuelUnit: costPerFuelUnit,
-  )
-      .take(limit)
-      .map(
-        (CostedDeal costed) => NearbyDeal(
-          costed: costed,
-          inProgress: !dealNotInProgress(costed.deal),
-        ),
-      )
-      .toList();
-}
-
-Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
-  final shipType = shipTypeFromArg(argResults['ship'] as String);
-  final limit = int.parse(argResults['limit'] as String);
-  final startArg = argResults['start'] as String?;
-  final credits = int.parse(argResults['credits'] as String);
-
-  final deals = await dealsNearby(
-    fs: fs,
-    db: db,
-    shipType: shipType,
-    limit: limit,
-    startArg: startArg,
-    credits: credits,
-  );
-
+  final deals = response.deals;
   if (deals.isEmpty) {
     logger.info('No deal found.');
     return;
