@@ -1508,3 +1508,7 @@ No nearby markets for ESEIDEL2-8F
   
 
 ### Move asteroid-charters to better locations?
+
+### Track reset-date in static_data
+
+Would help to know how fresh it is.
