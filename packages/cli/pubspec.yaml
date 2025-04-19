@@ -26,6 +26,8 @@ dependencies:
   openapi:
     path: ../openapi
   path: ^1.8.3
+  protocol:
+    path: ../protocol
   scoped_deps:
     git:
       url: https://github.com/shorebirdtech/shorebird.git

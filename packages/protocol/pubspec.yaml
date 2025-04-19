@@ -1,12 +1,15 @@
 name: protocol
 description: Protocol and view models for server.
 version: 1.0.0
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
   sdk: ^3.7.2
 
 dependencies:
   json_annotation: ^4.9.0
+  types:
+    path: ../types
 
 dev_dependencies:
   json_serializable: ^6.9.5
