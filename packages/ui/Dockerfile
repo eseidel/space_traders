@@ -3,6 +3,9 @@ FROM ghcr.io/cirruslabs/flutter:latest AS build-env
 # Disable "don't run as root" warning in flutter.
 ENV BOT=true
 
+# Precache Web SDK to avoid re-downloading every time source code changes.
+RUN flutter precache --web
+
 # Resolve app dependencies.
 WORKDIR /app
 COPY openapi/ ./openapi/
@@ -17,6 +20,9 @@ RUN flutter build web
 
 # use nginx to deploy
 FROM nginx:1.25.2-alpine
+
+# Copy the nginx config
+COPY ui/nginx.conf /etc/nginx/conf.d/default.conf
 
 # copy the info of the builded web app to nginx
 COPY --from=build-env /app/ui/build/web /usr/share/nginx/html

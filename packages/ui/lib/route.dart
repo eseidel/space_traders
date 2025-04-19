@@ -32,15 +32,12 @@ class FleetScreen extends StatefulWidget {
   State<FleetScreen> createState() => _FleetScreenState();
 }
 
-final Uri baseUri = Uri.parse('http://localhost:8081');
-
 class _FleetScreenState extends State<FleetScreen> {
   List<Ship> ships = <Ship>[];
   bool loading = true;
 
   Future<void> refresh() async {
-    final uri = baseUri.replace(path: '/ships');
-    print(uri);
+    final uri = Uri.parse('/api/ships');
     final response = await http.get(uri);
     final json = jsonDecode(response.body) as List<dynamic>;
     final newShips = json

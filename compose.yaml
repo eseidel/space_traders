@@ -5,7 +5,22 @@ services:
       context: ./packages
       dockerfile: ./ui/Dockerfile
     ports:
+      # This should just expose 80, but doesn't seem to work?
       - "8080:80"
+    depends_on:
+      server:
+        condition: service_started
+  server:
+    build:
+      context: ./packages
+      dockerfile: ./server/Dockerfile
+    # Web is our only public front-end, so use only expose rather than ports.
+    expose:
+      - "8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
   net:
     build:
       context: ./packages
