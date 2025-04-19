@@ -4,7 +4,7 @@
 # This can be used for viewing coverage locally in your editor.
 
 # No ui tests yet, so not testing ui package.
-PACKAGES='cli db server types'
+PACKAGES='cli db protocol server types'
 
 dart pub global activate coverage
 dart pub global activate combine_coverage

@@ -3,9 +3,13 @@
 # Specify the Dart SDK base image version using dart:<version> (ex: dart:2.17)
 FROM dart:stable AS build
 
+# Install dart_frog_cli before copying sources to avoid re-installing each time.
+RUN dart pub global activate dart_frog_cli
+
 # Copy over only the packages we need.
 WORKDIR /app
 COPY openapi ./openapi/
+COPY protocol/ ./protocol/
 COPY types ./types/
 COPY db ./db/
 COPY server ./server/
@@ -15,7 +19,6 @@ WORKDIR /app/server
 RUN dart pub get
 
 # Generate a production build.
-RUN dart pub global activate dart_frog_cli
 RUN dart pub global run dart_frog_cli:dart_frog build
 
 # Ensure packages are still up-to-date if anything has changed.

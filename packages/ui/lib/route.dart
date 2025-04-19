@@ -62,9 +62,15 @@ class _FleetScreenState extends State<FleetScreen> {
       body: ListView.builder(
         itemCount: ships.length,
         itemBuilder: (BuildContext context, int index) {
+          final ship = ships[index];
+          final cargoStatus = ship.cargo.capacity == 0
+              ? ''
+              : '${ship.cargo.units}/${ship.cargo.capacity}';
+
           return ListTile(
-            title: Text(ships[index].symbol.symbol),
-            subtitle: Text(ships[index].toString()),
+            title: Text(ship.symbol.hexNumber),
+            subtitle: Text(ship.nav.waypointSymbol),
+            leading: Text(cargoStatus),
           );
         },
       ),
