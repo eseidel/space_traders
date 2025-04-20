@@ -207,7 +207,5 @@ Future<void> cliMain(List<String> args) async {
 }
 
 Future<void> main(List<String> args) async {
-  await runScoped(() async {
-    await cliMain(args);
-  }, values: {loggerRef});
+  await runScoped(() async => await cliMain(args), values: {loggerRef});
 }

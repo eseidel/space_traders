@@ -12,10 +12,6 @@ COPY db/ ./db/
 COPY openapi/ ./openapi/
 COPY types/ ./types/
 
-# Split cli in to two halves, only the top half should use client & protocol.
-COPY client/ ./client/
-COPY protocol/ ./protocol/
-
 WORKDIR /app/cli
 RUN dart pub get
 
