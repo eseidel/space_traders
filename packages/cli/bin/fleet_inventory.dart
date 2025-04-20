@@ -5,7 +5,42 @@ Future<void> main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+class ItemValue {
+  ItemValue({
+    required this.tradeSymbol,
+    required this.count,
+    required this.medianPrice,
+  });
+
+  final TradeSymbol tradeSymbol;
+  final int count;
+  final int? medianPrice;
+}
+
+class Inventory {
+  Inventory({required this.items});
+
+  Set<TradeSymbol> get missingPrices {
+    return items
+        .where((item) => item.medianPrice == null)
+        .map((item) => item.tradeSymbol)
+        .toSet();
+  }
+
+  int get totalValue {
+    return items.fold(0, (total, item) {
+      final price = item.medianPrice;
+      if (price == null) {
+        return total;
+      }
+      return total + (item.count * price);
+    });
+  }
+
+  final List<ItemValue> items;
+}
+
+Future<Inventory> computeInventoryValue({required Database db}) async {
   final ships = await ShipSnapshot.load(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final countByTradeSymbol = <TradeSymbol, int>{};
@@ -17,21 +52,33 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       countByTradeSymbol[symbol] = count + item.units;
     }
   }
-  final totalValue = countByTradeSymbol.entries.fold<int>(0, (total, entry) {
+  final items = countByTradeSymbol.entries.map((entry) {
     final symbol = entry.key;
     final count = entry.value;
-    // TODO(eseidel): Add a medianSellPrice to Database.
-    final price = marketPrices.medianSellPrice(symbol);
+    return ItemValue(
+      tradeSymbol: symbol,
+      count: count,
+      medianPrice: marketPrices.medianSellPrice(symbol),
+    );
+  });
+  return Inventory(items: items.toList());
+}
+
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+  final inventory = await computeInventoryValue(db: db);
+  for (final item in inventory.items) {
+    final price = item.medianPrice;
+    final count = item.count;
+    final symbol = item.tradeSymbol;
     if (price == null) {
       logger.warn('No price for $symbol');
-      return total;
+      continue;
     }
     final value = price * count;
     logger.info(
       '${symbol.value.padRight(23)} ${count.toString().padLeft(3)} x '
       '${creditsString(price).padRight(8)} = ${creditsString(value)}',
     );
-    return total + value;
-  });
-  logger.info('Total value: ${creditsString(totalValue)}');
+  }
+  logger.info('Total value: ${creditsString(inventory.totalValue)}');
 }

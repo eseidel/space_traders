@@ -5,13 +5,14 @@ import 'package:types/types.dart';
 Query allShipyardPricesQuery() => const Query('SELECT * FROM shipyard_price_');
 
 /// Query to upsert a shipyard price.
-Query upsertShipyardPriceQuery(ShipyardPrice price) => Query('''
+Query upsertShipyardPriceQuery(ShipyardPrice price) =>
+    Query(parameters: shipyardPriceToColumnMap(price), '''
       INSERT INTO shipyard_price_ (waypoint_symbol, ship_type, purchase_price, timestamp)
       VALUES (@waypoint_symbol, @ship_type, @purchase_price, @timestamp)
       ON CONFLICT (waypoint_symbol, ship_type) DO UPDATE SET
         purchase_price = @purchase_price,
         timestamp = @timestamp
-      ''', parameters: shipyardPriceToColumnMap(price));
+      ''');
 
 /// Query to get the shipyard price for a given waypoint and ship type.
 /// Returns null if no price is found.

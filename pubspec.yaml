@@ -3,4 +3,14 @@ name: _
 environment: 
   sdk: ^3.7.0
 dev_dependencies:
-  very_good_analysis: ^6.0.0
+  very_good_analysis: ^7.0.0
+# workspace:
+#   - packages/cli
+#   - packages/cli_client
+#   - packages/client
+#   - packages/db
+#   - packages/openapi
+#   - packages/protocol
+#   - packages/server
+#   - packages/types
+#   - packages/ui

@@ -12,12 +12,13 @@ Query allShipyardListingsQuery() =>
     const Query('SELECT * FROM shipyard_listing_');
 
 /// Query to upsert a shipyard listing.
-Query upsertShipyardListingQuery(ShipyardListing listing) => Query('''
+Query upsertShipyardListingQuery(ShipyardListing listing) =>
+    Query(parameters: shipyardListingToColumnMap(listing), '''
       INSERT INTO shipyard_listing_ (symbol, types)
       VALUES (@symbol, @types)
       ON CONFLICT (symbol) DO UPDATE SET
         types = @types
-      ''', parameters: shipyardListingToColumnMap(listing));
+      ''');
 
 /// Build a column map from a shipyard listing.
 Map<String, dynamic> shipyardListingToColumnMap(ShipyardListing listing) => {

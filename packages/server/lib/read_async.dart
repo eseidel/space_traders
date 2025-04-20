@@ -1,6 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 
-/// Convenience extension to read an object of type [T] from the request context
+/// Convenience extension to read an object from the request context
 /// asynchronously. This is useful when you need to read an object that is
 /// created asynchronously, such as a database connection or an HTTP client.
 extension ReadAsync on RequestContext {
