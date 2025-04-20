@@ -1,0 +1,17 @@
+name: client
+description: Client that talks `protocol` with `server`.
+version: 1.0.0
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  http: ^0.13.6
+  json_annotation: ^4.9.0
+  protocol:
+    path: ../protocol
+
+dev_dependencies:
+  test: ^1.24.0
+  very_good_analysis: ^5.1.0
