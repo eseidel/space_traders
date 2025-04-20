@@ -17,14 +17,15 @@ Query marketListingsInSystemQuery(SystemSymbol system) => Query(
 );
 
 /// Query to upsert a market listing.
-Query upsertMarketListingQuery(MarketListing listing) => Query('''
+Query upsertMarketListingQuery(MarketListing listing) =>
+    Query(parameters: marketListingToColumnMap(listing), '''
       INSERT INTO market_listing_ (symbol, exports, imports, exchange)
       VALUES (@symbol, @exports, @imports, @exchange)
       ON CONFLICT (symbol) DO UPDATE SET
         exports = @exports,
         imports = @imports,
         exchange = @exchange
-      ''', parameters: marketListingToColumnMap(listing));
+      ''');
 
 /// Query to find all markets with a given import in the system.
 Query marketsWithImportInSystemQuery(

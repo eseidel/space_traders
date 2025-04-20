@@ -1,6 +1,5 @@
 import 'package:args/args.dart';
 import 'package:cli_client/logger.dart';
-// ignore:depend_on_referenced_packages
 import 'package:client/client.dart';
 import 'package:meta/meta.dart';
 import 'package:scoped_deps/scoped_deps.dart';

@@ -11,7 +11,7 @@ void main() {
     final end = WaypointSymbol.fromString('X-B-B');
 
     final fs = MemoryFileSystem.test();
-    final systemsCache = SystemsCache([
+    final systems = [
       System.test(
         start.system,
         waypoints: [SystemWaypoint.test(start, type: WaypointType.JUMP_GATE)],
@@ -21,7 +21,8 @@ void main() {
         position: const SystemPosition(10, 0),
         waypoints: [SystemWaypoint.test(end, type: WaypointType.JUMP_GATE)],
       ),
-    ], fs: fs);
+    ];
+    final systemsCache = SystemsCache(systems, fs: fs);
     final systemConnectivity = SystemConnectivity.test({
       start: {end},
     });

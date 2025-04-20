@@ -24,7 +24,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     if (needed.isEmpty) {
       logger.detail('No mounts to add to ${ship.symbol}.');
     } else {
-      for (final mountSymbol in needed.distinct) {
+      for (final mountSymbol in needed.elementSet) {
         final units = needed[mountSymbol];
         logger.info(
           '+$units '
@@ -36,7 +36,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     if (toRemove.isEmpty) {
       logger.detail('No mounts to remove from ${ship.symbol}.');
     } else {
-      for (final mountSymbol in toRemove.distinct) {
+      for (final mountSymbol in toRemove.elementSet) {
         final units = toRemove[mountSymbol];
         logger.info(
           '-$units '
@@ -51,7 +51,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     logger.info('No mounts needed.');
     return;
   }
-  for (final mountSymbol in mounts.distinct) {
+  for (final mountSymbol in mounts.elementSet) {
     final units = mounts[mountSymbol];
     logger.info('Need $units $mountSymbol.');
   }

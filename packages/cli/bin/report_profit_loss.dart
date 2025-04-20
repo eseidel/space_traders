@@ -54,6 +54,7 @@ class ReportBuilder {
     throw Exception(message);
   }
 
+  // Intended to function like assert.
   // ignore: avoid_positional_boolean_parameters
   void _expect(bool condition, String message) {
     if (!condition) {

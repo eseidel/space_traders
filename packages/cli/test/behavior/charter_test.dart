@@ -163,7 +163,7 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(systemASymbol.system);
     when(() => shipNav.waypointSymbol).thenReturn(waypointAASymbol.waypoint);
 
-    final systemsCache = SystemsCache([
+    final systems = [
       System.test(
         systemASymbol,
         waypoints: [
@@ -181,7 +181,8 @@ void main() {
           SystemWaypoint.test(waypointBASymbol, type: WaypointType.JUMP_GATE),
         ],
       ),
-    ], fs: fs);
+    ];
+    final systemsCache = SystemsCache(systems, fs: fs);
     final systemConnectivity = SystemConnectivity.test({
       waypointBASymbol: {waypointABSymbol},
     });

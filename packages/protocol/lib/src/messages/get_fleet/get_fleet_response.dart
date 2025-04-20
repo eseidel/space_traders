@@ -46,11 +46,6 @@ part 'get_fleet_response.g.dart';
 
 @JsonSerializable()
 class PricedItem {
-  String symbol;
-  int pricePerUnit;
-  int units;
-  int totalPrice;
-
   PricedItem({
     required this.symbol,
     required this.pricePerUnit,
@@ -60,46 +55,47 @@ class PricedItem {
 
   factory PricedItem.fromJson(Map<String, dynamic> json) =>
       _$PricedItemFromJson(json);
+  String symbol;
+  int pricePerUnit;
+  int units;
+  int totalPrice;
 
   Map<String, dynamic> toJson() => _$PricedItemToJson(this);
 }
 
 @JsonSerializable()
 class Cargo {
-  int capacity;
-  int units;
-  List<PricedItem> inventory;
-
   Cargo({required this.capacity, required this.units, required this.inventory});
 
   factory Cargo.fromJson(Map<String, dynamic> json) => _$CargoFromJson(json);
+  int capacity;
+  int units;
+  List<PricedItem> inventory;
 
   Map<String, dynamic> toJson() => _$CargoToJson(this);
 }
 
 @JsonSerializable()
 class RoutePlan {
-  String waypointSymbol;
-  int timeToArrival;
-
   RoutePlan({required this.waypointSymbol, required this.timeToArrival});
 
   factory RoutePlan.fromJson(Map<String, dynamic> json) =>
       _$RoutePlanFromJson(json);
+  String waypointSymbol;
+  int timeToArrival;
 
   Map<String, dynamic> toJson() => _$RoutePlanToJson(this);
 }
 
 @JsonSerializable()
 class FleetShip {
-  String symbol;
-  RoutePlan route;
-  Cargo cargo;
-
   FleetShip({required this.symbol, required this.route, required this.cargo});
 
   factory FleetShip.fromJson(Map<String, dynamic> json) =>
       _$FleetShipFromJson(json);
+  String symbol;
+  RoutePlan route;
+  Cargo cargo;
 
   Map<String, dynamic> toJson() => _$FleetShipToJson(this);
 }
@@ -108,10 +104,10 @@ class FleetShip {
 class GetFleetResponse {
   GetFleetResponse({required this.ships});
 
-  List<FleetShip> ships;
-
   factory GetFleetResponse.fromJson(Map<String, dynamic> json) =>
       _$GetFleetResponseFromJson(json);
+
+  List<FleetShip> ships;
 
   Map<String, dynamic> toJson() => _$GetFleetResponseToJson(this);
 }

@@ -26,9 +26,8 @@ void main() {
       position: WaypointPosition(20, 0, otherSymbol.system),
     );
     final fs = MemoryFileSystem.test();
-    final systemsCache = SystemsCache([
-      System.test(a.system, waypoints: [a, b, c]),
-    ], fs: fs);
+    final system = System.test(a.system, waypoints: [a, b, c]);
+    final systemsCache = SystemsCache([system], fs: fs);
     expect(
       approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
         b.symbol,
@@ -289,9 +288,11 @@ void main() {
       position: WaypointPosition(100, 0, systemSymbol),
     );
 
-    final systemsCache = SystemsCache([
-      System.test(systemSymbol, waypoints: [start, fuelStation, end]),
-    ], fs: fs);
+    final system = System.test(
+      systemSymbol,
+      waypoints: [start, fuelStation, end],
+    );
+    final systemsCache = SystemsCache([system], fs: fs);
 
     final systemConnectivity = SystemConnectivity.test({});
     final routePlanner = RoutePlanner.fromSystemsCache(

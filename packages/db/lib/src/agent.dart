@@ -34,7 +34,8 @@ Agent agentFromColumnMap(Map<String, dynamic> values) {
 }
 
 /// Update the given agent in the database.
-Query upsertAgentQuery(Agent agent) => Query('''
+Query upsertAgentQuery(Agent agent) =>
+    Query(parameters: agentToColumnMap(agent), '''
       INSERT INTO agent_ (symbol, headquarters, credits, starting_faction, ship_count, account_id)
       VALUES (@symbol, @headquarters, @credits, @starting_faction, @ship_count, @account_id)
       ON CONFLICT (symbol) DO UPDATE SET
@@ -43,4 +44,4 @@ Query upsertAgentQuery(Agent agent) => Query('''
         starting_faction = @starting_faction,
         ship_count = @ship_count,
         account_id = @account_id
-      ''', parameters: agentToColumnMap(agent));
+      ''');

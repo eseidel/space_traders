@@ -12,7 +12,8 @@ Query marketPricesInSystemQuery(SystemSymbol symbol) => Query(
 );
 
 /// Query to upsert a market price.
-Query upsertMarketPriceQuery(MarketPrice price) => Query('''
+Query upsertMarketPriceQuery(MarketPrice price) =>
+    Query(parameters: marketPriceToColumnMap(price), '''
       INSERT INTO market_price_ (
         waypoint_symbol,
         trade_symbol,
@@ -39,7 +40,7 @@ Query upsertMarketPriceQuery(MarketPrice price) => Query('''
         trade_volume = @trade_volume,
         timestamp = @timestamp,
         activity = @activity;
-      ''', parameters: marketPriceToColumnMap(price));
+      ''');
 
 /// Build a column map from a market price.
 Map<String, dynamic> marketPriceToColumnMap(MarketPrice price) => {

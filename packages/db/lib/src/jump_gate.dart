@@ -6,7 +6,8 @@ Query allJumpGatesQuery() =>
     const Query('SELECT * FROM jump_gate_', parameters: {});
 
 /// Upsert a jump gate.
-Query upsertJumpGateQuery(JumpGate jumpGate) => Query('''
+Query upsertJumpGateQuery(JumpGate jumpGate) =>
+    Query(parameters: jumpGateToColumnMap(jumpGate), '''
       INSERT INTO jump_gate_ (
         symbol,
         connections
@@ -16,7 +17,7 @@ Query upsertJumpGateQuery(JumpGate jumpGate) => Query('''
       )
       ON CONFLICT (symbol) DO UPDATE SET
         connections = @connections
-      ''', parameters: jumpGateToColumnMap(jumpGate));
+      ''');
 
 /// Get a jump gate by symbol.
 Query getJumpGateQuery(WaypointSymbol waypointSymbol) => Query(

@@ -17,10 +17,22 @@ class SystemsCache extends JsonListStore<System> {
     super.path = defaultCacheFilePath,
   }) : _index = Map.fromEntries(records.map((e) => MapEntry(e.symbol, e)));
 
+  /// Load the cache from disk.
+  factory SystemsCache.load(
+    FileSystem fs, {
+    String path = defaultCacheFilePath,
+  }) {
+    // Will throw if file does not exist.
+    final systems = JsonListStore.loadRecords<System>(
+      fs,
+      path,
+      System.fromJson,
+    );
+    return SystemsCache(systems, fs: fs, path: path);
+  }
+
   /// All systems in the game.
   List<System> get systems => List.unmodifiable(records);
-
-  // List<System> get _systems => entries;
 
   final Map<SystemSymbol, System> _index;
 
@@ -36,20 +48,6 @@ class SystemsCache extends JsonListStore<System> {
     return parsed
         .map<System>((e) => System.fromJson(e as Map<String, dynamic>))
         .toList();
-  }
-
-  /// Load the cache from disk.
-  static SystemsCache load(
-    FileSystem fs, {
-    String path = defaultCacheFilePath,
-  }) {
-    // Will throw if file does not exist.
-    final systems = JsonListStore.loadRecords<System>(
-      fs,
-      path,
-      System.fromJson,
-    );
-    return SystemsCache(systems, fs: fs, path: path);
   }
 
   /// Load the cache from disk or fall back to fetching from the url.

@@ -556,7 +556,7 @@ class CentralCommand {
     final SystemWaypoint? jumpGate;
     try {
       jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
-    } catch (e) {
+    } on Exception catch (e) {
       logger.warn('Failed to find jump gate for $systemSymbol: $e');
       return null;
     }

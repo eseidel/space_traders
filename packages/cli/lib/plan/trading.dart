@@ -246,7 +246,7 @@ Iterable<CostedDeal> findAllDeals(
               routePlanner,
               shipSpec,
               deal,
-              // TODO(eseidel): Should this be something other than the deal source?
+              // TODO(eseidel): Use something other than the deal source?
               shipWaypointSymbol: deal.sourceSymbol,
               costPerFuelUnit: costPerFuelUnit,
               costPerAntimatterUnit: costPerAntimatterUnit,

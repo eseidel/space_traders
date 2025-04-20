@@ -6,11 +6,11 @@ Query allContractsQuery() => const Query('SELECT * FROM contract_');
 
 /// Upsert a contract.
 Query upsertContractQuery(Contract contract) {
-  return Query('''
+  return Query(parameters: contractToColumnMap(contract), '''
     INSERT INTO contract_ (id, json, accepted, fulfilled, deadline_to_accept)
     VALUES (@id, @json, @accepted, @fulfilled, @deadline_to_accept)
     ON CONFLICT (id) DO UPDATE SET json = @json, accepted = @accepted, fulfilled = @fulfilled, deadline_to_accept = @deadline_to_accept
-    ''', parameters: contractToColumnMap(contract));
+    ''');
 }
 
 /// Fetch a contract by id.

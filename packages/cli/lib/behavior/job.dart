@@ -28,6 +28,7 @@ class JobException extends Equatable implements Exception {
 
 /// Exception thrown from a Job if the condition is not met.
 void jobAssert(
+  // Intended to function like assert.
   // ignore: avoid_positional_boolean_parameters
   bool condition,
   String message,
