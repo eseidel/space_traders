@@ -1512,3 +1512,9 @@ No nearby markets for ESEIDEL2-8F
 ### Track reset-date in static_data
 
 Would help to know how fresh it is.
+
+
+### Move StaticCaches into the DB
+
+The only question is when do we dump them out to disk (since it's nice
+to save them in version control).
