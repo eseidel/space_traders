@@ -11,6 +11,8 @@ dependencies:
   json_annotation: ^4.9.0
   protocol:
     path: ../protocol
+  types:
+    path: ../types
 
 dev_dependencies:
   test: ^1.24.0

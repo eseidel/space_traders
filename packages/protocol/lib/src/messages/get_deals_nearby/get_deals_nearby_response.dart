@@ -3,6 +3,47 @@ import 'package:types/types.dart';
 
 part 'get_deals_nearby_response.g.dart';
 
+class GetDealsNearbyRequest {
+  GetDealsNearbyRequest({
+    required this.shipType,
+    required this.limit,
+    required this.credits,
+    required this.start,
+  });
+  factory GetDealsNearbyRequest.fromQueryParameters(
+    Map<String, String?> parameters,
+  ) {
+    final maybeShipType = parameters['shipType'];
+    final maybeLimit = parameters['limit'];
+    final maybeCredits = parameters['credits'];
+    final maybeStart = parameters['start'];
+    return GetDealsNearbyRequest(
+      shipType: maybeShipType != null ? ShipType.fromJson(maybeShipType) : null,
+      limit: maybeLimit != null ? int.tryParse(maybeLimit) : null,
+      credits: maybeCredits != null ? int.tryParse(maybeCredits) : null,
+      start: maybeStart != null ? WaypointSymbol.fromString(maybeStart) : null,
+    );
+  }
+
+  static ShipType defaultShipType = ShipType.COMMAND_FRIGATE;
+  final ShipType? shipType;
+
+  static const int defaultLimit = 10;
+  final int? credits;
+
+  static const int defaultCredits = 1000000;
+  final int? limit;
+
+  final WaypointSymbol? start;
+
+  Map<String, String?> toQueryParameters() => {
+    if (shipType != null) 'shipType': shipType?.toJson(),
+    if (limit != null) 'limit': limit.toString(),
+    if (credits != null) 'credits': credits.toString(),
+    if (start != null) 'start': start?.toJson(),
+  };
+}
+
 // OpenApi fromJson is nullable, which confuses JsonSerializable.
 class ShipTypeConverter implements JsonConverter<ShipType, String> {
   const ShipTypeConverter();

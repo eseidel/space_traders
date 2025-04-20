@@ -24,9 +24,4 @@ void main() {
     verify(() => logger.level = Level.verbose).called(1);
     verify(db.close).called(1);
   });
-
-  test('shipTypeFromArg, argFromShipType', () {
-    expect(shipTypeFromArg('COMMAND_FRIGATE'), ShipType.COMMAND_FRIGATE);
-    expect(argFromShipType(ShipType.COMMAND_FRIGATE), 'COMMAND_FRIGATE');
-  });
 }

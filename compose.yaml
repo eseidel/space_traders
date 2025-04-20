@@ -21,6 +21,9 @@ services:
       db:
         condition: service_healthy
     restart: on-failure
+    volumes:
+      - ./packages/cli/static_data:/static_data
+      - ./packages/cli/data:/data
   net:
     build:
       context: ./packages
@@ -47,6 +50,8 @@ services:
       db:
         condition: service_healthy
     restart: on-failure
+    # TODO(eseidel): Either remove these volumes entirely, or only use them
+    # from the server container.
     volumes:
       - ./packages/cli/static_data:/static_data
       - ./packages/cli/data:/data
@@ -62,6 +67,8 @@ services:
       db:
         condition: service_healthy
     restart: on-failure
+    # TODO(eseidel): Either remove these volumes entirely, or only use them
+    # from the server container.
     volumes:
       - ./packages/cli/static_data:/static_data
       - ./packages/cli/data:/data

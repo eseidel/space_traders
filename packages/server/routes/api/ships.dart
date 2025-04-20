@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:db/db.dart';
 
-extension ReadAsync on RequestContext {
-  Future<T> readAsync<T extends Object>() => read<Future<T>>();
-}
+import 'package:server/read_async.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();

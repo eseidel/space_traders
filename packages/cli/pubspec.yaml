@@ -38,6 +38,8 @@ dependencies:
   yaml: ^3.1.2
 
 dev_dependencies:
+  client:
+    path: ../client
   mocktail: ^1.0.3
   test: ^1.21.0
   very_good_analysis: ^5.1.0

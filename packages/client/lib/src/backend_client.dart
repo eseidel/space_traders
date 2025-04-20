@@ -2,23 +2,45 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:protocol/protocol.dart';
+import 'package:types/types.dart';
 
 class BackendClient {
-  BackendClient({http.Client? httpClient, Uri? hostedUri})
-    : _httpClient = httpClient ?? http.Client(),
-      hostedUri = hostedUri ?? Uri.http('server:8080');
+  BackendClient({required this.hostedUri, http.Client? httpClient})
+    : _httpClient = httpClient ?? http.Client();
 
   final http.Client _httpClient;
   final Uri hostedUri;
 
-  Future<DealsNearbyResponse> getNearbyDeals() async {
-    final uri = Uri.parse('$hostedUri/deals/nearby');
-    final response = await _httpClient.get(uri);
+  Future<DealsNearbyResponse> getNearbyDeals({
+    required ShipType? shipType,
+    required int? limit,
+    required WaypointSymbol? start,
+    required int? credits,
+  }) async {
+    final request = GetDealsNearbyRequest(
+      shipType: shipType,
+      limit: limit,
+      start: start,
+      credits: credits,
+    );
+    final uri = Uri.parse(
+      '$hostedUri/api/deals/nearby',
+    ).replace(queryParameters: request.toQueryParameters());
+    print('GET $uri');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    final response = await _httpClient.get(uri, headers: headers);
     if (response.statusCode != 200) {
       throw Exception('Failed to load deals');
     }
     final json = response.body;
     final data = jsonDecode(json) as Map<String, dynamic>;
     return DealsNearbyResponse.fromJson(data);
+  }
+
+  void close() {
+    _httpClient.close();
   }
 }

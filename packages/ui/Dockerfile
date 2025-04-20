@@ -20,7 +20,7 @@ RUN flutter pub get
 RUN flutter build web
 
 # use nginx to deploy
-FROM nginx:1.25.2-alpine
+FROM nginx:alpine
 
 # Copy the nginx config
 COPY ui/nginx.conf /etc/nginx/conf.d/default.conf

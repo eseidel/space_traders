@@ -7,19 +7,17 @@ ARG BIN=cli
 
 # Resolve app dependencies.
 WORKDIR /app
-COPY openapi/pubspec.* ./openapi/
-COPY types/pubspec.* ./types/
-COPY db/pubspec.* ./db/
-COPY cli/pubspec.* ./cli/
+COPY cli/ ./cli/
+COPY db/ ./db/
+COPY openapi/ ./openapi/
+COPY types/ ./types/
+
+# Split cli in to two halves, only the top half should use client & protocol.
+COPY client/ ./client/
+COPY protocol/ ./protocol/
+
 WORKDIR /app/cli
 RUN dart pub get
-
-# Copy all packages and build them.
-WORKDIR /app
-COPY . .
-
-WORKDIR /app/cli
-RUN dart pub get --offline
 
 RUN mkdir -p /app/bin
 RUN dart compile exe -DPGHOST=db bin/${BIN}.dart -o /app/bin/server

@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 void main() {
   group(BackendClient, () {
     test('can be instantiated', () {
-      expect(BackendClient(), isNotNull);
+      expect(BackendClient(hostedUri: Uri()), isNotNull);
     });
   });
 }

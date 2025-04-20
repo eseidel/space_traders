@@ -8,11 +8,13 @@ RUN dart pub global activate dart_frog_cli
 
 # Copy over only the packages we need.
 WORKDIR /app
-COPY openapi ./openapi/
-COPY protocol/ ./protocol/
-COPY types ./types/
+# cli should split into two parts, and server only depend on the bottom one.
+COPY cli ./cli/
 COPY db ./db/
+COPY openapi ./openapi/
+COPY protocol ./protocol/
 COPY server ./server/
+COPY types ./types/
 
 # Resolve app dependencies.
 WORKDIR /app/server

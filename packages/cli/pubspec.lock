@@ -102,6 +102,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  client:
+    dependency: "direct dev"
+    description:
+      path: "../client"
+      relative: true
+    source: path
+    version: "1.0.0"
   clock:
     dependency: transitive
     description:

@@ -1,140 +1,20 @@
-import 'package:cli/caches.dart';
-import 'package:cli/central_command.dart';
-import 'package:cli/cli.dart';
-import 'package:cli/config.dart';
+import 'package:cli/cli_args.dart';
+import 'package:cli/client_cli.dart';
 import 'package:cli/logic/printing.dart';
-import 'package:cli/nav/navigation.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:cli_table/cli_table.dart';
-import 'package:protocol/protocol.dart';
+import 'package:client/client.dart';
 
-Future<DealsNearbyResponse> dealsNearby({
-  required FileSystem fs,
-  required Database db,
-  required ShipType shipType,
-  required int limit,
-  required String? startArg,
-  required int credits,
-}) async {
-  final systemsCache = SystemsCache.load(fs);
-  final marketListings = await MarketListingSnapshot.load(db);
-  final jumpGates = await JumpGateSnapshot.load(db);
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-  // Can't use loadSystemConnectivity because need constructionSnapshot later.
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);
-  final routePlanner = RoutePlanner.fromSystemsCache(
-    systemsCache,
-    systemConnectivity,
-    sellsFuel: defaultSellsFuel(marketListings),
-  );
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
-
-  final agentCache = await AgentCache.load(db);
-  final contractSnapshot = await ContractSnapshot.load(db);
-  final centralCommand = CentralCommand();
-
-  final start = startArg == null
-      ? agentCache!.headquarters(systemsCache)
-      : systemsCache.waypointFromString(startArg)!;
-
-  final construction = await centralCommand.computeActiveConstruction(
-    db,
-    agentCache!,
-    systemsCache,
-  );
-  centralCommand.activeConstruction = construction;
-
-  final exportCache = TradeExportCache.load(fs);
-  final charting = await ChartingSnapshot.load(db);
-
-  if (construction != null) {
-    centralCommand.subsidizedSellOpps =
-        await computeConstructionMaterialSubsidies(
-      db,
-      systemsCache,
-      exportCache,
-      marketListings,
-      charting,
-      construction,
-    );
-  }
-
-  final behaviors = await BehaviorSnapshot.load(db);
-
-  final extraSellOpps = <SellOpp>[];
-  if (centralCommand.isContractTradingEnabled) {
-    extraSellOpps.addAll(
-      centralCommand.contractSellOpps(
-        agentCache,
-        behaviors,
-        contractSnapshot,
-      ),
-    );
-  }
-  if (centralCommand.isConstructionTradingEnabled) {
-    extraSellOpps.addAll(centralCommand.constructionSellOpps(behaviors));
-  }
-
-  final shipyardShips = ShipyardShipCache.load(fs);
-  final ship = shipyardShips[shipType]!;
-  final shipSpec = ship.shipSpec;
-
-  final marketScan = scanReachableMarkets(
-    systemsCache,
-    systemConnectivity,
-    marketPrices,
-    startSystem: start.system,
-  );
-  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
-      config.defaultFuelCost;
-  final costPerAntimatterUnit =
-      marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
-          config.defaultAntimatterCost;
-
-  final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
-  final deals = findDealsFor(
-    systemsCache,
-    routePlanner,
-    marketScan,
-    maxTotalOutlay: credits,
-    shipSpec: shipSpec,
-    startSymbol: start.symbol,
-    extraSellOpps: extraSellOpps,
-    costPerAntimatterUnit: costPerAntimatterUnit,
-    costPerFuelUnit: costPerFuelUnit,
-  )
-      .take(limit)
-      .map(
-        (CostedDeal costed) => NearbyDeal(
-          costed: costed,
-          inProgress: !dealNotInProgress(costed.deal),
-        ),
-      )
-      .toList();
-  return DealsNearbyResponse(
-    deals: deals,
-    shipType: shipType,
-    startSymbol: start.symbol,
-    credits: credits,
-    shipSpec: shipSpec,
-    extraSellOpps: extraSellOpps,
-    tradeSymbolCount: marketScan.tradeSymbols.length,
-  );
-}
-
-Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> cliMain(BackendClient client, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
   final limit = int.parse(argResults['limit'] as String);
   final startArg = argResults['start'] as String?;
   final credits = int.parse(argResults['credits'] as String);
 
-  final response = await dealsNearby(
-    fs: fs,
-    db: db,
+  final response = await client.getNearbyDeals(
     shipType: shipType,
     limit: limit,
-    startArg: startArg,
+    start: startArg != null ? WaypointSymbol.fromString(startArg) : null,
     credits: credits,
   );
 
@@ -231,7 +111,7 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
 }
 
 void main(List<String> args) async {
-  await runOffline(
+  await runAsClient(
     args,
     cliMain,
     addArgs: (ArgParser parser) {
