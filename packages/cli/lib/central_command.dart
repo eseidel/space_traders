@@ -7,7 +7,6 @@ import 'package:cli/behavior/system_watcher.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:cli/plan/extraction_score.dart';
 import 'package:cli/plan/mining.dart';
 import 'package:cli/plan/supply_chain.dart';
@@ -15,6 +14,7 @@ import 'package:cli/plan/trading.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
+import 'package:types/prediction.dart';
 import 'package:types/types.dart';
 
 // This is a bit of a cheat.  It appears starter systems all have over 20

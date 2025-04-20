@@ -6,7 +6,6 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/logic.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/register.dart';
 import 'package:db/db.dart';

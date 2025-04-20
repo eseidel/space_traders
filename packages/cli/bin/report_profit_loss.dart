@@ -1,5 +1,4 @@
 import 'package:cli/cli.dart';
-import 'package:cli/logic/printing.dart';
 
 class ProfitLoss {
   ProfitLoss({

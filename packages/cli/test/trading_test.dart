@@ -8,6 +8,7 @@ import 'package:cli/plan/trading.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:types/prediction.dart';
 import 'package:types/types.dart';
 
 class _MockDatabase extends Mock implements Database {}

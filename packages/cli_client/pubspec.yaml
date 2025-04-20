@@ -1,0 +1,29 @@
+name: cli_client
+description: Command line client to `server` package.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  args: ^2.7.0
+  cli_table: ^1.0.2
+  client:
+    path: ../client
+  mason_logger: ^0.3.3
+  meta: ^1.16.0
+  protocol:
+    path: ../protocol
+  scoped_deps:
+    git:
+      url: https://github.com/shorebirdtech/shorebird.git
+      path: packages/scoped_deps
+  types:
+    path: ../types
+
+
+dev_dependencies:
+  mocktail: ^1.0.3
+  test: ^1.21.0
+  very_good_analysis: ^5.1.0

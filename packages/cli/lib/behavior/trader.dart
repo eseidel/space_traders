@@ -12,6 +12,7 @@ import 'package:cli/net/exceptions.dart';
 import 'package:cli/plan/market_scores.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:db/db.dart';
+import 'package:types/prediction.dart';
 import 'package:types/types.dart';
 
 // This is split out from the main function to allow early returns.

@@ -1,6 +1,5 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:cli/net/auth.dart';
 import 'package:collection/collection.dart';
 

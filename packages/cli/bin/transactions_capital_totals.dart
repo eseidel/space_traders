@@ -1,5 +1,4 @@
 import 'package:cli/cli.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:collection/collection.dart';
 
 String describeTransaction(Transaction t) {

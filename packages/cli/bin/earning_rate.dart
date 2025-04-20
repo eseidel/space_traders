@@ -1,5 +1,4 @@
 import 'package:cli/cli.dart';
-import 'package:cli/logic/printing.dart';
 
 DateTime snapToHour(DateTime time) {
   return DateTime.utc(time.year, time.month, time.day, time.hour);

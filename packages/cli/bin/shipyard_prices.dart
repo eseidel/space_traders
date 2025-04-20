@@ -2,7 +2,6 @@ import 'package:cli/cache/shipyard_listing_snapshot.dart';
 import 'package:cli/cache/shipyard_price_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {

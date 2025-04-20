@@ -1,7 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:db/db.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';

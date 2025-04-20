@@ -1,6 +1,6 @@
 import 'package:cli/logger.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:http/http.dart';
+import 'package:types/types.dart';
 
 /// Prints stats about rate limiting.
 class RateLimitStatPrinter {

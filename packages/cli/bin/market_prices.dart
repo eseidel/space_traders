@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/logic/printing.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);

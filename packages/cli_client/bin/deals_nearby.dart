@@ -1,9 +1,8 @@
-import 'package:cli/cli_args.dart';
-import 'package:cli/client_cli.dart';
-import 'package:cli/logic/printing.dart';
-import 'package:cli/plan/trading.dart';
+import 'package:cli_client/cli_args.dart';
+import 'package:cli_client/cli_client.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:client/client.dart';
+import 'package:types/prediction.dart';
 
 Future<void> cliMain(BackendClient client, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
@@ -20,11 +19,13 @@ Future<void> cliMain(BackendClient client, ArgResults argResults) async {
 
   final shipSpec = response.shipSpec;
   final extraSellOpps = response.extraSellOpps;
-  logger.info('$shipType @ ${response.startSymbol}, '
-      'speed = ${shipSpec.speed} '
-      'capacity = ${shipSpec.cargoCapacity}, '
-      'fuel <= ${shipSpec.fuelCapacity}, '
-      'outlay <= $credits');
+  logger.info(
+    '$shipType @ ${response.startSymbol}, '
+    'speed = ${shipSpec.speed} '
+    'capacity = ${shipSpec.cargoCapacity}, '
+    'fuel <= ${shipSpec.fuelCapacity}, '
+    'outlay <= $credits',
+  );
 
   if (extraSellOpps.isNotEmpty) {
     logger.info('Extra sell opps:');
@@ -37,8 +38,10 @@ Future<void> cliMain(BackendClient client, ArgResults argResults) async {
       } else {
         type = 'subsidy';
       }
-      logger.info('  $type: ${extraOpp.maxUnits} ${extraOpp.tradeSymbol} -> '
-          '${extraOpp.waypointSymbol} @ ${creditsString(extraOpp.price)}');
+      logger.info(
+        '  $type: ${extraOpp.maxUnits} ${extraOpp.tradeSymbol} -> '
+        '${extraOpp.waypointSymbol} @ ${creditsString(extraOpp.price)}',
+      );
     }
   }
 
@@ -76,9 +79,9 @@ Future<void> cliMain(BackendClient client, ArgResults argResults) async {
   String w(WaypointSymbol symbol) =>
       allSameSystem ? symbol.waypointName : symbol.sectorLocalName;
   Map<String, dynamic> rightAlign(String content) => <String, dynamic>{
-        'content': content,
-        'hAlign': HorizontalAlign.right,
-      };
+    'content': content,
+    'hAlign': HorizontalAlign.right,
+  };
   Map<String, dynamic> c(int credits) => rightAlign(creditsString(credits));
   for (final nearby in deals) {
     final costed = nearby.costed;

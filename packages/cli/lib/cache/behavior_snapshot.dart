@@ -1,6 +1,5 @@
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/logger.dart';
-import 'package:cli/logic/printing.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
