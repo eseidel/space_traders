@@ -70,12 +70,15 @@ void main() {
       ),
     );
 
-    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(waypointSymbol))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.canBeSiphoned(waypointSymbol))
-        .thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasMarketplace(waypointSymbol),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(waypointSymbol),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.canBeSiphoned(waypointSymbol),
+    ).thenAnswer((_) async => true);
 
     // when(() => caches.ships.ships).thenReturn([ship]);
 
@@ -91,11 +94,7 @@ void main() {
     );
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    when(
-      () => fleetApi.siphonResources(
-        shipSymbol.symbol,
-      ),
-    ).thenAnswer(
+    when(() => fleetApi.siphonResources(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
         SiphonResources201Response(
           data: SiphonResources201ResponseData(

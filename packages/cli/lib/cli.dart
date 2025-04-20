@@ -25,19 +25,15 @@ Future<void> runOffline(
   @visibleForTesting Database? overrideDatabase,
   bool loadConfig = true,
 }) async {
-  final parser = ArgParser()
-    ..addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Verbose logging',
-      negatable: false,
-    )
-    ..addFlag(
-      'help',
-      abbr: 'h',
-      help: 'Show help',
-      negatable: false,
-    );
+  final parser =
+      ArgParser()
+        ..addFlag(
+          'verbose',
+          abbr: 'v',
+          help: 'Verbose logging',
+          negatable: false,
+        )
+        ..addFlag('help', abbr: 'h', help: 'Show help', negatable: false);
   addArgs?.call(parser);
   final results = parser.parse(args);
   const fs = LocalFileSystem();
@@ -108,7 +104,9 @@ Future<SystemSymbol> startSystemFromArg(Database db, String? arg) async {
 Future<SystemConnectivity> loadSystemConnectivity(Database db) async {
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateSnapshot, constructionSnapshot);
+  final systemConnectivity = SystemConnectivity.fromJumpGates(
+    jumpGateSnapshot,
+    constructionSnapshot,
+  );
   return systemConnectivity;
 }

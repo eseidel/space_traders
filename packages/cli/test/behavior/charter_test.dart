@@ -39,14 +39,12 @@ void main() {
     final caches = mockCaches();
 
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');
-    final waypoint = Waypoint.test(
-      waypointSymbol,
-      type: WaypointType.PLANET,
-    );
+    final waypoint = Waypoint.test(waypointSymbol, type: WaypointType.PLANET);
 
     final systemWaypoint = waypoint.toSystemWaypoint();
-    when(() => caches.systems.waypoint(waypointSymbol))
-        .thenReturn(systemWaypoint);
+    when(
+      () => caches.systems.waypoint(waypointSymbol),
+    ).thenReturn(systemWaypoint);
 
     final system = System(
       symbol: waypointSymbol.system,
@@ -55,10 +53,12 @@ void main() {
     );
     when(() => caches.systems[waypointSymbol.system]).thenReturn(system);
     registerFallbackValue(waypointSymbol.system);
-    when(() => caches.systemConnectivity.clusterIdForSystem(any()))
-        .thenReturn(0);
-    when(() => caches.systemConnectivity.systemSymbolsByClusterId(0))
-        .thenReturn([waypointSymbol.system]);
+    when(
+      () => caches.systemConnectivity.clusterIdForSystem(any()),
+    ).thenReturn(0);
+    when(
+      () => caches.systemConnectivity.systemSymbolsByClusterId(0),
+    ).thenReturn([waypointSymbol.system]);
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.createChart(any())).thenAnswer(
@@ -82,15 +82,19 @@ void main() {
     when(() => ship.fuel).thenReturn(shipFuel);
 
     registerFallbackValue(waypointSymbol);
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
-    when(() => caches.waypoints.fetchChart(any()))
-        .thenAnswer((_) => Future.value(Chart()));
+    when(
+      () => caches.waypoints.waypoint(any()),
+    ).thenAnswer((_) => Future.value(waypoint));
+    when(
+      () => caches.waypoints.fetchChart(any()),
+    ).thenAnswer((_) => Future.value(Chart()));
 
-    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.hasShipyard(waypointSymbol))
-        .thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(waypointSymbol),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasShipyard(waypointSymbol),
+    ).thenAnswer((_) async => false);
 
     when(
       () =>
@@ -159,34 +163,25 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(systemASymbol.system);
     when(() => shipNav.waypointSymbol).thenReturn(waypointAASymbol.waypoint);
 
-    final systemsCache = SystemsCache(
-      [
-        System.test(
-          systemASymbol,
-          waypoints: [
-            SystemWaypoint.test(
-              waypointAASymbol,
-              type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
-            ),
-            SystemWaypoint.test(
-              waypointABSymbol,
-              type: WaypointType.JUMP_GATE,
-            ),
-          ],
-        ),
-        System.test(
-          systemBSymbol,
-          position: const SystemPosition(10, 10),
-          waypoints: [
-            SystemWaypoint.test(
-              waypointBASymbol,
-              type: WaypointType.JUMP_GATE,
-            ),
-          ],
-        ),
-      ],
-      fs: fs,
-    );
+    final systemsCache = SystemsCache([
+      System.test(
+        systemASymbol,
+        waypoints: [
+          SystemWaypoint.test(
+            waypointAASymbol,
+            type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
+          ),
+          SystemWaypoint.test(waypointABSymbol, type: WaypointType.JUMP_GATE),
+        ],
+      ),
+      System.test(
+        systemBSymbol,
+        position: const SystemPosition(10, 10),
+        waypoints: [
+          SystemWaypoint.test(waypointBASymbol, type: WaypointType.JUMP_GATE),
+        ],
+      ),
+    ], fs: fs);
     final systemConnectivity = SystemConnectivity.test({
       waypointBASymbol: {waypointABSymbol},
     });

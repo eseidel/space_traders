@@ -7,10 +7,11 @@ HistoricalSurvey surveyFromColumnMap(Map<String, dynamic> values) {
     survey: Survey(
       signature: values['signature'] as String,
       symbol: values['waypoint_symbol'] as String,
-      deposits: (values['deposits'] as String)
-          .split(',')
-          .map((s) => SurveyDeposit(symbol: s))
-          .toList(),
+      deposits:
+          (values['deposits'] as String)
+              .split(',')
+              .map((s) => SurveyDeposit(symbol: s))
+              .toList(),
       expiration: values['expiration'] as DateTime,
       size: SurveySizeEnum.fromJson(values['size'] as String)!,
     ),
@@ -40,18 +41,13 @@ Query recentSurveysAtWaypointQuery({
   return Query(
     'SELECT * FROM survey_ WHERE waypoint_symbol = @waypointSymbol '
     'ORDER BY timestamp DESC LIMIT @count',
-    parameters: {
-      'waypointSymbol': waypointSymbol.toJson(),
-      'count': count,
-    },
+    parameters: {'waypointSymbol': waypointSymbol.toJson(), 'count': count},
   );
 }
 
 /// Return all surveys.
 Query allSurveysQuery() {
-  return const Query(
-    'SELECT * FROM survey_',
-  );
+  return const Query('SELECT * FROM survey_');
 }
 
 /// Insert a survey into the database.
@@ -79,8 +75,6 @@ Query markSurveyExhaustedQuery(Survey survey) {
   // "signature" is unique to the survey, "symbol" is the waypoint symbol.
   return Query(
     'UPDATE survey_ SET exhausted = true WHERE signature = @signature',
-    parameters: {
-      'signature': survey.signature,
-    },
+    parameters: {'signature': survey.signature},
   );
 }

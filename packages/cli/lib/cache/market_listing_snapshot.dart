@@ -5,9 +5,9 @@ import 'package:types/types.dart';
 class MarketListingSnapshot {
   /// Create a new MarketListingSnapshot.
   MarketListingSnapshot(Iterable<MarketListing> listings)
-      : _listingBySymbol = Map.fromEntries(
-          listings.map((l) => MapEntry(l.waypointSymbol, l)),
-        );
+    : _listingBySymbol = Map.fromEntries(
+        listings.map((l) => MapEntry(l.waypointSymbol, l)),
+      );
 
   final Map<WaypointSymbol, MarketListing> _listingBySymbol;
 

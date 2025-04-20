@@ -27,7 +27,8 @@ export 'package:db/config.dart';
 Future<Database> defaultDatabase({
   @visibleForTesting
   Future<pg.Connection> Function(pg.Endpoint endpoint, pg.ConnectionSettings?)
-      openConnection = _defaultOpenConnection,
+      openConnection =
+      _defaultOpenConnection,
 }) async {
   final db = Database(
     defaultDatabaseEndpoint,
@@ -88,8 +89,8 @@ class Database {
   /// Create a new database with mock connection for testing.
   @visibleForTesting
   Database.test(this._connection)
-      : endpoint = pg.Endpoint(host: 'localhost', database: 'test'),
-        settings = null;
+    : endpoint = pg.Endpoint(host: 'localhost', database: 'test'),
+      settings = null;
 
   /// Configure the database connection.
   final pg.Endpoint endpoint;
@@ -106,9 +107,11 @@ class Database {
   Future<void> open({
     @visibleForTesting
     Future<pg.Connection> Function(
-      pg.Endpoint endpoint,
-      pg.ConnectionSettings? settings,
-    ) openConnection = _defaultOpenConnection,
+          pg.Endpoint endpoint,
+          pg.ConnectionSettings? settings,
+        )
+        openConnection =
+        _defaultOpenConnection,
   }) async {
     _connection = DatabaseConnection(await openConnection(endpoint, settings));
   }
@@ -149,9 +152,9 @@ class Database {
     Query query,
     T Function(Map<String, dynamic>) fromColumnMap,
   ) {
-    return execute(query).then(
-      (result) => result.map((r) => r.toColumnMap()).map(fromColumnMap),
-    );
+    return execute(
+      query,
+    ).then((result) => result.map((r) => r.toColumnMap()).map(fromColumnMap));
   }
 
   /// Query for a single record using the provided query.
@@ -238,11 +241,10 @@ class Database {
   Future<ConstructionRecord?> getConstruction(
     WaypointSymbol waypointSymbol,
     Duration maxAge,
-  ) =>
-      queryOne(
-        getConstructionQuery(waypointSymbol, maxAge),
-        constructionFromColumnMap,
-      );
+  ) => queryOne(
+    getConstructionQuery(waypointSymbol, maxAge),
+    constructionFromColumnMap,
+  );
 
   /// Return all construction records.
   Future<Iterable<ConstructionRecord>> allConstructionRecords() async =>
@@ -264,11 +266,10 @@ class Database {
   Future<ChartingRecord?> getChartingRecord(
     WaypointSymbol waypointSymbol,
     Duration maxAge,
-  ) =>
-      queryOne(
-        getChartingRecordQuery(waypointSymbol, maxAge),
-        chartingRecordFromColumnMap,
-      );
+  ) => queryOne(
+    getChartingRecordQuery(waypointSymbol, maxAge),
+    chartingRecordFromColumnMap,
+  );
 
   /// Return the next request to be executed.
   Future<RequestRecord?> nextRequest() =>
@@ -312,9 +313,7 @@ class Database {
     return execute(
       Query(
         'DELETE FROM response_ WHERE created_at < @timestamp',
-        parameters: {
-          'timestamp': timestamp,
-        },
+        parameters: {'timestamp': timestamp},
       ),
     );
   }
@@ -418,16 +417,18 @@ class Database {
 
   /// Get unique ship symbols from the transaction table.
   Future<Set<ShipSymbol>> uniqueShipSymbolsInTransactions() async {
-    final result =
-        await executeSql('SELECT DISTINCT ship_symbol FROM transaction_');
+    final result = await executeSql(
+      'SELECT DISTINCT ship_symbol FROM transaction_',
+    );
     return result.map((r) => ShipSymbol.fromString(r.first! as String)).toSet();
   }
 
   /// Get all transactions from the database.
   /// Currently returns in timestamp order, but that may not always be the case.
   Future<Iterable<Transaction>> allTransactions() async {
-    final result =
-        await executeSql('SELECT * FROM transaction_ ORDER BY timestamp');
+    final result = await executeSql(
+      'SELECT * FROM transaction_ ORDER BY timestamp',
+    );
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
   }
 
@@ -446,9 +447,7 @@ class Database {
   }
 
   /// Get transactions after a given timestamp.
-  Future<Iterable<Transaction>> transactionsAfter(
-    DateTime timestamp,
-  ) async {
+  Future<Iterable<Transaction>> transactionsAfter(DateTime timestamp) async {
     final result = await execute(
       Query(
         'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
@@ -675,14 +674,17 @@ class Database {
 
   /// Set my agent symbol in the config table in the db.
   Future<void> setAgentSymbol(String symbol) async {
-    await executeSql("INSERT INTO config_ (key, value) VALUES ('agent_symbol', "
-        "'$symbol') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
+    await executeSql(
+      "INSERT INTO config_ (key, value) VALUES ('agent_symbol', "
+      "'$symbol') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+    );
   }
 
   /// Get the game phase from the config table in the db.
   Future<GamePhase?> getGamePhase() async {
-    final result =
-        await executeSql("SELECT value FROM config_ WHERE key = 'game_phase'");
+    final result = await executeSql(
+      "SELECT value FROM config_ WHERE key = 'game_phase'",
+    );
     if (result.isEmpty) {
       return null;
     }
@@ -691,15 +693,18 @@ class Database {
 
   /// Set the game phase in the config table in the db.
   Future<void> setGamePhase(GamePhase phase) async {
-    await executeSql("INSERT INTO config_ (key, value) VALUES ('game_phase', "
-        "'${phase.toJson()}') "
-        'ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value');
+    await executeSql(
+      "INSERT INTO config_ (key, value) VALUES ('game_phase', "
+      "'${phase.toJson()}') "
+      'ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value',
+    );
   }
 
   /// Get the auth token from the config table in the db.
   Future<String?> getAuthToken() async {
-    final result =
-        await executeSql("SELECT value FROM config_ WHERE key = 'auth_token'");
+    final result = await executeSql(
+      "SELECT value FROM config_ WHERE key = 'auth_token'",
+    );
     if (result.isEmpty) {
       return null;
     }
@@ -708,7 +713,9 @@ class Database {
 
   /// Set the auth token in the config table in the db.
   Future<void> setAuthToken(String token) async {
-    await executeSql("INSERT INTO config_ (key, value) VALUES ('auth_token', "
-        "'$token') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
+    await executeSql(
+      "INSERT INTO config_ (key, value) VALUES ('auth_token', "
+      "'$token') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+    );
   }
 }

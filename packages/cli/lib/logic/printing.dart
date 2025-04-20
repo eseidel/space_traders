@@ -14,22 +14,25 @@ String contractDescription(
   DateTime Function() getNow = defaultGetNow,
 }) {
   final terms = contract.terms;
-  var termsString = terms.deliver.map((d) {
-    final unitsRemaining = d.unitsRequired - d.unitsFulfilled;
-    final remainingString = d.unitsFulfilled == 0
-        ? ''
-        : '(${unitsRemaining.toString().padLeft(3)} remaining)';
-    return '${d.unitsRequired} $remainingString '
-        '${d.tradeSymbol} to ${d.destinationSymbol}';
-  }).join(', ');
+  var termsString = terms.deliver
+      .map((d) {
+        final unitsRemaining = d.unitsRequired - d.unitsFulfilled;
+        final remainingString =
+            d.unitsFulfilled == 0
+                ? ''
+                : '(${unitsRemaining.toString().padLeft(3)} remaining)';
+        return '${d.unitsRequired} $remainingString '
+            '${d.tradeSymbol} to ${d.destinationSymbol}';
+      })
+      .join(', ');
   final timeRemaining = terms.deadline.difference(getNow());
   termsString += ' in ${approximateDuration(timeRemaining)}';
   termsString += ' for ${creditsString(terms.payment.onFulfilled)}';
   termsString += ' with ${creditsString(terms.payment.onAccepted)} upfront';
   return
-      // '${contract.type} '
-      // 'from ${contract.factionSymbol}, '
-      'deliver $termsString';
+  // '${contract.type} '
+  // 'from ${contract.factionSymbol}, '
+  'deliver $termsString';
 }
 
 /// Returns a string describing the price deviance of a given [price] from
@@ -78,7 +81,8 @@ void logMarketTransaction(
     median: medianPrice,
     transaction.type,
   );
-  final labelEmoji = transactionEmoji ??
+  final labelEmoji =
+      transactionEmoji ??
       (transaction.type == MarketTransactionTypeEnum.SELL ? '🤝' : '💸');
   // creditsSign shows which way our bank account moves.
   // When it was a sell, we got paid, so we add.
@@ -102,29 +106,23 @@ void logMarketTransaction(
 }
 
 /// Log a shipyard transaction to the console.
-void logShipyardTransaction(
-  Ship ship,
-  Agent agent,
-  ShipyardTransaction t,
-) {
+void logShipyardTransaction(Ship ship, Agent agent, ShipyardTransaction t) {
   shipInfo(
-      ship,
-      'Purchased ${t.shipSymbol} for '
-      '${creditsString(t.price)} -> '
-      '🏦 ${creditsString(agent.credits)}');
+    ship,
+    'Purchased ${t.shipSymbol} for '
+    '${creditsString(t.price)} -> '
+    '🏦 ${creditsString(agent.credits)}',
+  );
 }
 
 /// Log a shipyard transaction to the console.
-void logScrapTransaction(
-  Ship ship,
-  Agent agent,
-  ScrapTransaction t,
-) {
+void logScrapTransaction(Ship ship, Agent agent, ScrapTransaction t) {
   shipInfo(
-      ship,
-      'Scrapped ${t.shipSymbol} for '
-      '${creditsString(t.totalPrice)} -> '
-      '🏦 ${creditsString(agent.credits)}');
+    ship,
+    'Scrapped ${t.shipSymbol} for '
+    '${creditsString(t.totalPrice)} -> '
+    '🏦 ${creditsString(agent.credits)}',
+  );
 }
 
 /// Log a ship modification transaction to the console.
@@ -134,10 +132,11 @@ void logShipModificationTransaction(
   ShipModificationTransaction t,
 ) {
   shipInfo(
-      ship,
-      '🔧 ${t.tradeSymbol} on ${t.shipSymbol} for '
-      '${creditsString(t.totalPrice)} -> '
-      '🏦 ${creditsString(agent.credits)}');
+    ship,
+    '🔧 ${t.tradeSymbol} on ${t.shipSymbol} for '
+    '${creditsString(t.totalPrice)} -> '
+    '🏦 ${creditsString(agent.credits)}',
+  );
 }
 
 /// Generate a String for the given [duration].
@@ -157,9 +156,10 @@ DateTime logRemainingTransitTime(
   final arrival = ship.nav.route.arrival;
   final now = getNow();
   final remaining = arrival.difference(now);
-  final coloredRemaining = remaining.inHours > 1
-      ? red.wrap(approximateDuration(remaining))!
-      : approximateDuration(remaining);
+  final coloredRemaining =
+      remaining.inHours > 1
+          ? red.wrap(approximateDuration(remaining))!
+          : approximateDuration(remaining);
   shipInfo(
     ship,
     // Extra space after emoji is needed for windows powershell.
@@ -177,9 +177,10 @@ String cargoDescription(ShipCargo cargo) {
 void verifyCooldown(Ship ship, String label, int expected, Cooldown cooldown) {
   if (cooldown.totalSeconds != expected) {
     shipWarn(
-        ship,
-        '$label expected $expected second cooldown, '
-        'got ${cooldown.totalSeconds}.');
+      ship,
+      '$label expected $expected second cooldown, '
+      'got ${cooldown.totalSeconds}.',
+    );
   }
 }
 
@@ -200,8 +201,10 @@ String describeConstructionProgress(Construction? construction) {
     if (buffer.isNotEmpty) {
       buffer.write(', ');
     }
-    buffer.write('${material.tradeSymbol}: '
-        '${material.fulfilled} / ${material.required_}');
+    buffer.write(
+      '${material.tradeSymbol}: '
+      '${material.fulfilled} / ${material.required_}',
+    );
   }
   return buffer.toString();
 }
@@ -228,26 +231,25 @@ String describeShipNav(
 }
 
 /// Log the adverse events in the given [events].
-void logEvents(
-  Ship ship,
-  List<ShipConditionEvent> events,
-) {
+void logEvents(Ship ship, List<ShipConditionEvent> events) {
   if (events.isEmpty) {
     return;
   }
   for (final event in events) {
     shipInfo(
-        ship,
-        'symbol: ${event.symbol}, component: ${event.component} '
-        'name: ${event.name}, description: ${event.description}');
+      ship,
+      'symbol: ${event.symbol}, component: ${event.component} '
+      'name: ${event.name}, description: ${event.description}',
+    );
   }
 }
 
 /// Log the counts.
 void logCounts<T>(Counts<T> counts) {
   // Print the counts in order from most to least:
-  final sorted = counts.counts.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
+  final sorted =
+      counts.counts.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
   for (final entry in sorted) {
     logger.info('  ${entry.value}: ${entry.key}');
   }
@@ -265,18 +267,15 @@ Future<T> expectTime<T>(
     requestCounts,
     queryCounts,
     fn,
-    onComplete: (
-      Duration duration,
-      int requestCount,
-      QueryCounts queryCounts,
-    ) {
+    onComplete: (Duration duration, int requestCount, QueryCounts queryCounts) {
       if (duration <= expected) {
         return;
       }
       final queryCount = queryCounts.total;
-      final logFn = duration.inSeconds > expected.inSeconds * 2
-          ? logger.err
-          : logger.warn;
+      final logFn =
+          duration.inSeconds > expected.inSeconds * 2
+              ? logger.err
+              : logger.warn;
       logFn(
         '$name took too long ${duration.inMilliseconds}ms '
         '($requestCount requests, $queryCount queries)',

@@ -52,13 +52,7 @@ Future<JobResult> doMountJob(
   if (toRemove.isNotEmpty) {
     // Unmount existing mounts if needed.
     for (final mount in toRemove) {
-      await removeMountAndLog(
-        api,
-        db,
-        caches.agent,
-        ship,
-        mount,
-      );
+      await removeMountAndLog(api, db, caches.agent, ship, mount);
     }
   }
 
@@ -71,13 +65,7 @@ Future<JobResult> doMountJob(
 
   // 🛸#6  🔧 MOUNT_MINING_LASER_II on ESEIDEL-6 for 3,600c -> 🏦 89,172c
   // Mount the new mount.
-  await installMountAndLog(
-    api,
-    db,
-    caches.agent,
-    ship,
-    mountJob.mountSymbol,
-  );
+  await installMountAndLog(api, db, caches.agent, ship, mountJob.mountSymbol);
   // Add the new mount to our static_data cache in case it's new to us.
   recordShip(caches.static, ship);
   // We're done.

@@ -128,11 +128,13 @@ String describeShips(List<Ship> ships) {
       s[0].toUpperCase() + s.substring(1).toLowerCase();
 
   final typeCounts = countFrames(ships);
-  final frameNames = typeCounts.keys.map((t) {
-    final name = t.value.substring('FRAME_'.length);
-    final fixedCase = name.split('_').map(capitalize).join(' ');
-    return '${typeCounts[t]} $fixedCase';
-  }).join(', ');
+  final frameNames = typeCounts.keys
+      .map((t) {
+        final name = t.value.substring('FRAME_'.length);
+        final fixedCase = name.split('_').map(capitalize).join(' ');
+        return '${typeCounts[t]} $fixedCase';
+      })
+      .join(', ');
   if (frameNames.isEmpty) {
     return '0 ships';
   }

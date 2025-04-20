@@ -19,22 +19,23 @@ class ExtractionRecord extends Equatable {
   /// A record filled with dummy data to provide to the mocking system.
   @visibleForTesting
   ExtractionRecord.fallbackValue()
-      : this(
-          shipSymbol: const ShipSymbol('A', 1),
-          waypointSymbol: WaypointSymbol.fromString('A-B-C'),
-          tradeSymbol: TradeSymbol.IRON_ORE,
-          quantity: 1,
-          power: 10,
-          surveySignature: null,
-          timestamp: DateTime(2021),
-        );
+    : this(
+        shipSymbol: const ShipSymbol('A', 1),
+        waypointSymbol: WaypointSymbol.fromString('A-B-C'),
+        tradeSymbol: TradeSymbol.IRON_ORE,
+        quantity: 1,
+        power: 10,
+        surveySignature: null,
+        timestamp: DateTime(2021),
+      );
 
   /// Create a new extraction from a JSON map.
   factory ExtractionRecord.fromJson(Map<String, dynamic> json) {
     return ExtractionRecord(
       shipSymbol: ShipSymbol.fromString(json['shipSymbol'] as String),
-      waypointSymbol:
-          WaypointSymbol.fromString(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromString(
+        json['waypointSymbol'] as String,
+      ),
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
       quantity: json['quantity'] as int,
       power: json['power'] as int,
@@ -66,14 +67,14 @@ class ExtractionRecord extends Equatable {
 
   @override
   List<Object?> get props => [
-        shipSymbol,
-        waypointSymbol,
-        tradeSymbol,
-        quantity,
-        power,
-        surveySignature,
-        timestamp,
-      ];
+    shipSymbol,
+    waypointSymbol,
+    tradeSymbol,
+    quantity,
+    power,
+    surveySignature,
+    timestamp,
+  ];
 
   /// Return a JSON map for this extraction.
   Map<String, dynamic> toJson() {

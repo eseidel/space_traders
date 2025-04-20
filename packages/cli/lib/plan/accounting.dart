@@ -18,19 +18,16 @@ Future<int> computeInventoryValue(
       countByTradeSymbol[symbol] = count + item.units;
     }
   }
-  final totalValue = countByTradeSymbol.entries.fold<int>(
-    0,
-    (total, entry) {
-      final symbol = entry.key;
-      final count = entry.value;
-      final price = marketPrices.medianSellPrice(symbol);
-      if (price == null) {
-        logger.warn('No price for $symbol');
-        return total;
-      }
-      final value = price * count;
-      return total + value;
-    },
-  );
+  final totalValue = countByTradeSymbol.entries.fold<int>(0, (total, entry) {
+    final symbol = entry.key;
+    final count = entry.value;
+    final price = marketPrices.medianSellPrice(symbol);
+    if (price == null) {
+      logger.warn('No price for $symbol');
+      return total;
+    }
+    final value = price * count;
+    return total + value;
+  });
   return totalValue;
 }

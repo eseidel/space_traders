@@ -55,11 +55,11 @@ class TestShip {
   }
 
   ShipSpec get shipSpec => ShipSpec(
-        speed: speed,
-        fuelCapacity: fuelCapacity,
-        cargoCapacity: 0,
-        canWarp: false,
-      );
+    speed: speed,
+    fuelCapacity: fuelCapacity,
+    cargoCapacity: 0,
+    canWarp: false,
+  );
 
   final int speed;
   final int fuelCapacity;
@@ -112,11 +112,7 @@ class TestRouteAction extends Equatable {
   List<Object> get props => [start, end, action];
 
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'start': start,
-      'end': end,
-      'action': action,
-    };
+    return <String, dynamic>{'start': start, 'end': end, 'action': action};
   }
 
   @override
@@ -124,17 +120,15 @@ class TestRouteAction extends Equatable {
 }
 
 class TestSystem {
-  TestSystem({
-    required this.symbol,
-    required this.waypoints,
-  });
+  TestSystem({required this.symbol, required this.waypoints});
 
   factory TestSystem.fromJson(Map<String, dynamic> json) {
     return TestSystem(
       symbol: json['symbol'] as String,
-      waypoints: (json['waypoints'] as List<dynamic>)
-          .map((e) => TestWaypoint.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      waypoints:
+          (json['waypoints'] as List<dynamic>)
+              .map((e) => TestWaypoint.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -143,17 +137,14 @@ class TestSystem {
 }
 
 class TestExpect {
-  TestExpect({
-    required this.route,
-    required this.fuelUsed,
-    required this.time,
-  });
+  TestExpect({required this.route, required this.fuelUsed, required this.time});
 
   factory TestExpect.fromJson(Map<String, dynamic> json) {
     return TestExpect(
-      route: (json['route'] as List<dynamic>)
-          .map((e) => TestRouteAction.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      route:
+          (json['route'] as List<dynamic>)
+              .map((e) => TestRouteAction.fromJson(e as Map<String, dynamic>))
+              .toList(),
       fuelUsed: json['fuelUsed'] as int,
       time: json['time'] as int,
     );
@@ -165,11 +156,7 @@ class TestExpect {
 }
 
 class Test {
-  Test({
-    required this.start,
-    required this.end,
-    required this.expect,
-  });
+  Test({required this.start, required this.end, required this.expect});
 
   factory Test.fromJson(Map<String, dynamic> json) {
     return Test(
@@ -185,21 +172,19 @@ class Test {
 }
 
 class TestSuite {
-  TestSuite({
-    required this.ship,
-    required this.systems,
-    required this.tests,
-  });
+  TestSuite({required this.ship, required this.systems, required this.tests});
 
   factory TestSuite.fromJson(Map<String, dynamic> json) {
     return TestSuite(
       ship: TestShip.fromJson(json['ship'] as Map<String, dynamic>),
-      systems: (json['systems'] as List<dynamic>)
-          .map((e) => TestSystem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      tests: (json['tests'] as List<dynamic>)
-          .map((e) => Test.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      systems:
+          (json['systems'] as List<dynamic>)
+              .map((e) => TestSystem.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      tests:
+          (json['tests'] as List<dynamic>)
+              .map((e) => Test.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -289,11 +274,7 @@ void runTests(TestSuite suite, String path) {
     final test = suite.tests[i];
     final start = WaypointSymbol.fromString('$sector-${test.start}');
     final end = WaypointSymbol.fromString('$sector-${test.end}');
-    final plan = routePlanner.planRoute(
-      ship.shipSpec,
-      start: start,
-      end: end,
-    );
+    final plan = routePlanner.planRoute(ship.shipSpec, start: start, end: end);
     if (plan == null) {
       logger.err('No route found for $start to $end');
       continue;

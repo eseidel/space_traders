@@ -101,11 +101,7 @@ void main() {
       description: '',
       units: 1,
     );
-    final shipCargo = ShipCargo(
-      capacity: 10,
-      units: 1,
-      inventory: [cargoItem],
-    );
+    final shipCargo = ShipCargo(capacity: 10, units: 1, inventory: [cargoItem]);
     when(() => ship.cargo).thenReturn(shipCargo);
 
     final tradeGood = MarketTradeGood(
@@ -121,24 +117,26 @@ void main() {
     ]);
     final market = Market(
       symbol: waypointSymbol.waypoint,
-      tradeGoods: [
-        tradeGood,
-      ],
+      tradeGoods: [tradeGood],
     );
     when(() => caches.markets.fromCache(waypointSymbol)).thenReturn(market);
-    when(() => caches.markets.refreshMarket(waypointSymbol)).thenAnswer(
-      (_) => Future.value(market),
-    );
+    when(
+      () => caches.markets.refreshMarket(waypointSymbol),
+    ).thenAnswer((_) => Future.value(market));
     registerFallbackValue(Duration.zero);
-    when(() => db.hasRecentMarketPrices(waypointSymbol, any()))
-        .thenAnswer((_) async => true);
-    when(() => db.hasRecentShipyardPrices(waypointSymbol, any()))
-        .thenAnswer((_) async => true);
+    when(
+      () => db.hasRecentMarketPrices(waypointSymbol, any()),
+    ).thenAnswer((_) async => true);
+    when(
+      () => db.hasRecentShipyardPrices(waypointSymbol, any()),
+    ).thenAnswer((_) async => true);
 
-    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(waypointSymbol))
-        .thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasMarketplace(waypointSymbol),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(waypointSymbol),
+    ).thenAnswer((_) async => true);
 
     when(
       () => caches.waypoints.waypointsInSystem(waypointSymbol.system),
@@ -230,27 +228,25 @@ void main() {
         end: waypointSymbol,
       ),
     ).thenReturn(
-      RoutePlan.empty(
-        symbol: waypointSymbol,
-        fuelCapacity: 100,
-        shipSpeed: 30,
-      ),
+      RoutePlan.empty(symbol: waypointSymbol, fuelCapacity: 100, shipSpeed: 30),
     );
 
-    final state = BehaviorState(shipSymbol, Behavior.mountFromBuy)
-      ..buyJob = BuyJob(
-        tradeSymbol: toMount,
-        units: 1,
-        buyLocation: waypointSymbol,
-      )
-      ..mountJob = MountJob(
-        mountSymbol: mountSymbolForTradeSymbol(toMount)!,
-        shipyardSymbol: waypointSymbol,
-      );
+    final state =
+        BehaviorState(shipSymbol, Behavior.mountFromBuy)
+          ..buyJob = BuyJob(
+            tradeSymbol: toMount,
+            units: 1,
+            buyLocation: waypointSymbol,
+          )
+          ..mountJob = MountJob(
+            mountSymbol: mountSymbolForTradeSymbol(toMount)!,
+            shipyardSymbol: waypointSymbol,
+          );
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => db.medianMarketPurchasePrice(any()))
-        .thenAnswer((_) async => 100);
+    when(
+      () => db.medianMarketPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     expect(

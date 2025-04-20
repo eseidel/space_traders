@@ -19,13 +19,15 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
   required bool Function(SystemWaypoint waypointSymbol)? filter,
 }) async {
   final system = systemsCache[systemSymbol];
-  final start = ship.systemSymbol == system.symbol
-      ? ship.waypointSymbol
-      // This is only ever called with systems with jumpgates.
-      : system.jumpGateWaypoints.first.symbol;
+  final start =
+      ship.systemSymbol == system.symbol
+          ? ship.waypointSymbol
+          // This is only ever called with systems with jumpgates.
+          : system.jumpGateWaypoints.first.symbol;
   final startWaypoint = systemsCache.waypoint(start);
-  final systemWaypoints =
-      system.waypoints.sortedBy<num>((w) => w.distanceTo(startWaypoint));
+  final systemWaypoints = system.waypoints.sortedBy<num>(
+    (w) => w.distanceTo(startWaypoint),
+  );
 
   for (final systemWaypoint in systemWaypoints) {
     if (filter != null && !filter(systemWaypoint)) {
@@ -164,6 +166,4 @@ Future<JobResult> doCharter(
 }
 
 /// Advance the system watcher.
-final advanceCharter = const MultiJob('Charter', [
-  doCharter,
-]).run;
+final advanceCharter = const MultiJob('Charter', [doCharter]).run;

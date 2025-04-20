@@ -3,8 +3,7 @@ import 'package:types/types.dart';
 
 /// Create the insertion query for a transaction.
 Query insertTransactionQuery(Transaction record) {
-  return Query(
-    '''
+  return Query('''
     INSERT INTO transaction_ (
       transaction_type,
       ship_symbol,
@@ -35,9 +34,7 @@ Query insertTransactionQuery(Transaction record) {
       @contract_action,
       @contract_id
     )
-    ''',
-    parameters: transactionToColumnMap(record),
-  );
+    ''', parameters: transactionToColumnMap(record));
 }
 
 /// Convert the transaction to substitution values for insertion.
@@ -62,22 +59,26 @@ Map<String, dynamic> transactionToColumnMap(Transaction transaction) {
 /// Create a new transaction from a result row.
 Transaction transactionFromColumnMap(Map<String, dynamic> values) {
   return Transaction(
-    transactionType:
-        TransactionType.fromJson(values['transaction_type'] as String),
+    transactionType: TransactionType.fromJson(
+      values['transaction_type'] as String,
+    ),
     shipSymbol: ShipSymbol.fromJson(values['ship_symbol'] as String),
-    waypointSymbol:
-        WaypointSymbol.fromJson(values['waypoint_symbol'] as String),
+    waypointSymbol: WaypointSymbol.fromJson(
+      values['waypoint_symbol'] as String,
+    ),
     tradeSymbol: TradeSymbol.fromJson(values['trade_symbol'] as String?),
     shipType: ShipType.fromJson(values['ship_type'] as String?),
     quantity: values['quantity'] as int,
-    tradeType:
-        MarketTransactionTypeEnum.fromJson(values['trade_type'] as String?),
+    tradeType: MarketTransactionTypeEnum.fromJson(
+      values['trade_type'] as String?,
+    ),
     perUnitPrice: values['per_unit_price'] as int,
     timestamp: values['timestamp'] as DateTime,
     agentCredits: values['agent_credits'] as int,
     accounting: AccountingType.fromJson(values['accounting'] as String),
-    contractAction:
-        ContractAction.fromJsonOrNull(values['contract_action'] as String?),
+    contractAction: ContractAction.fromJsonOrNull(
+      values['contract_action'] as String?,
+    ),
     contractId: values['contract_id'] as String?,
   );
 }

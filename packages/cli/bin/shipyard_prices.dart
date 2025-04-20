@@ -20,22 +20,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipyardShips = ShipyardShipCache.load(fs);
 
   final table = Table(
-    header: [
-      'Type',
-      '# Loc',
-      'Med. Price',
-      'Cargo',
-      'Fuel',
-      'Speed',
-      'Mounts',
-    ],
+    header: ['Type', '# Loc', 'Med. Price', 'Cargo', 'Fuel', 'Speed', 'Mounts'],
     style: const TableStyle(compact: true),
   );
 
   Map<String, dynamic> r(Object? content) => <String, dynamic>{
-        'content': content.toString(),
-        'hAlign': HorizontalAlign.right,
-      };
+    'content': content.toString(),
+    'hAlign': HorizontalAlign.right,
+  };
 
   for (final shipType in ShipType.values) {
     final listings = shipyardListings.listingsWithShip(shipType);

@@ -51,8 +51,9 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // Find the first index where the sorted price is greater than the price
     // being compared.
-    var index = pricesForSymbolSorted
-        .indexWhere((e) => e.sellPrice.compareTo(sellPrice) > 0);
+    var index = pricesForSymbolSorted.indexWhere(
+      (e) => e.sellPrice.compareTo(sellPrice) > 0,
+    );
     // If we ran off the end, we know that the price is greater than all
     // the prices in the list. i.e. 100th percentile.
     if (index == -1) {
@@ -98,9 +99,10 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     if (pricesForSymbol.isEmpty) {
       return null;
     }
-    final compareTo = action == MarketTransactionTypeEnum.PURCHASE
-        ? _purchasePriceAscending
-        : _sellPriceAscending;
+    final compareTo =
+        action == MarketTransactionTypeEnum.PURCHASE
+            ? _purchasePriceAscending
+            : _sellPriceAscending;
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // Make sure that 100th percentile doesn't go out of bounds.
@@ -124,8 +126,12 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     Duration maxAge = defaultMaxAge,
     DateTime Function() getNow = defaultGetNow,
   }) {
-    return priceAt(marketSymbol, tradeSymbol, maxAge: maxAge, getNow: getNow)
-        ?.sellPrice;
+    return priceAt(
+      marketSymbol,
+      tradeSymbol,
+      maxAge: maxAge,
+      getNow: getNow,
+    )?.sellPrice;
   }
 
   /// The most recent price can be purchased from the market.
@@ -138,8 +144,12 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     Duration maxAge = defaultMaxAge,
     DateTime Function() getNow = defaultGetNow,
   }) {
-    return priceAt(marketSymbol, tradeSymbol, maxAge: maxAge, getNow: getNow)
-        ?.purchasePrice;
+    return priceAt(
+      marketSymbol,
+      tradeSymbol,
+      maxAge: maxAge,
+      getNow: getNow,
+    )?.purchasePrice;
   }
 }
 
@@ -149,15 +159,16 @@ Future<void> recordMarketData(
   Market market, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final prices = market.tradeGoods
-      .map(
-        (tradeGood) => MarketPrice.fromMarketTradeGood(
-          tradeGood,
-          market.waypointSymbol,
-          getNow(),
-        ),
-      )
-      .toList();
+  final prices =
+      market.tradeGoods
+          .map(
+            (tradeGood) => MarketPrice.fromMarketTradeGood(
+              tradeGood,
+              market.waypointSymbol,
+              getNow(),
+            ),
+          )
+          .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${market.symbol}!');
   }

@@ -5,11 +5,7 @@ import 'package:cli/plan/ships.dart';
 import 'package:collection/collection.dart';
 
 class Assets {
-  Assets({
-    required this.cash,
-    required this.inventory,
-    required this.ships,
-  });
+  Assets({required this.cash, required this.inventory, required this.ships});
   final int cash;
   final int inventory;
   final int ships;
@@ -50,8 +46,11 @@ Future<Assets> computeAssets(FileSystem fs, Database db) async {
 
   final agent = await db.getMyAgent();
   final inventory = await computeInventoryValue(ships, marketPrices);
-  final shipsValue =
-      await computeShipValue(ships, shipyardShips, shipyardPrices);
+  final shipsValue = await computeShipValue(
+    ships,
+    shipyardShips,
+    shipyardPrices,
+  );
 
   return Assets(cash: agent!.credits, inventory: inventory, ships: shipsValue);
 }

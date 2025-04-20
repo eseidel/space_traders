@@ -31,8 +31,9 @@ void main() {
       position: WaypointPosition(0, 20, systemSymbol),
     );
     final waypoints = [source, marketA, marketB];
-    when(() => systemsCache.waypointsInSystem(systemSymbol))
-        .thenReturn(waypoints);
+    when(
+      () => systemsCache.waypointsInSystem(systemSymbol),
+    ).thenReturn(waypoints);
     when(() => systemsCache.waypoint(source.symbol)).thenReturn(source);
     when(() => systemsCache.waypoint(marketA.symbol)).thenReturn(marketA);
     when(() => systemsCache.waypoint(marketB.symbol)).thenReturn(marketB);
@@ -50,8 +51,9 @@ void main() {
       TradeSymbol.ALUMINUM_ORE,
     };
     for (final good in aImports) {
-      when(() => db.marketsWithImportInSystem(systemSymbol, good))
-          .thenAnswer((_) async => [marketA.symbol]);
+      when(
+        () => db.marketsWithImportInSystem(systemSymbol, good),
+      ).thenAnswer((_) async => [marketA.symbol]);
     }
     const bImports = {
       TradeSymbol.ICE_WATER,
@@ -59,22 +61,21 @@ void main() {
       TradeSymbol.QUARTZ_SAND,
     };
     for (final good in bImports) {
-      when(() => db.marketsWithImportInSystem(systemSymbol, good))
-          .thenAnswer((_) async => [marketB.symbol]);
+      when(
+        () => db.marketsWithImportInSystem(systemSymbol, good),
+      ).thenAnswer((_) async => [marketB.symbol]);
     }
     when(() => chartingCache.chartedValues(sourceSymbol)).thenAnswer(
       (_) async => ChartedValues.test(
-        traitSymbols: const {
-          WaypointTraitSymbol.COMMON_METAL_DEPOSITS,
-        },
+        traitSymbols: const {WaypointTraitSymbol.COMMON_METAL_DEPOSITS},
       ),
     );
-    when(() => chartingCache.chartedValues(marketASymbol)).thenAnswer(
-      (_) async => ChartedValues.test(),
-    );
-    when(() => chartingCache.chartedValues(marketBSymbol)).thenAnswer(
-      (_) async => ChartedValues.test(),
-    );
+    when(
+      () => chartingCache.chartedValues(marketASymbol),
+    ).thenAnswer((_) async => ChartedValues.test());
+    when(
+      () => chartingCache.chartedValues(marketBSymbol),
+    ).thenAnswer((_) async => ChartedValues.test());
 
     final scores = await evaluateWaypointsForMining(
       db,
@@ -105,8 +106,9 @@ void main() {
       position: WaypointPosition(10, 0, systemSymbol),
     );
     final waypoints = [source, market];
-    when(() => systemsCache.waypointsInSystem(systemSymbol))
-        .thenReturn(waypoints);
+    when(
+      () => systemsCache.waypointsInSystem(systemSymbol),
+    ).thenReturn(waypoints);
     when(() => systemsCache.waypoint(source.symbol)).thenReturn(source);
     when(() => systemsCache.waypoint(market.symbol)).thenReturn(market);
 
@@ -116,15 +118,16 @@ void main() {
       TradeSymbol.LIQUID_NITROGEN,
     };
     for (final good in producedGoods) {
-      when(() => db.marketsWithImportInSystem(systemSymbol, good))
-          .thenAnswer((_) async => [market.symbol]);
+      when(
+        () => db.marketsWithImportInSystem(systemSymbol, good),
+      ).thenAnswer((_) async => [market.symbol]);
     }
-    when(() => chartingCache.chartedValues(sourceSymbol)).thenAnswer(
-      (_) async => ChartedValues.test(),
-    );
-    when(() => chartingCache.chartedValues(marketSymbol)).thenAnswer(
-      (_) async => ChartedValues.test(),
-    );
+    when(
+      () => chartingCache.chartedValues(sourceSymbol),
+    ).thenAnswer((_) async => ChartedValues.test());
+    when(
+      () => chartingCache.chartedValues(marketSymbol),
+    ).thenAnswer((_) async => ChartedValues.test());
 
     final scores = await evaluateWaypointsForSiphoning(
       db,

@@ -11,11 +11,7 @@ void main() {
         signature: 'sig',
         expiration: moonLanding,
         size: SurveySizeEnum.SMALL,
-        deposits: [
-          SurveyDeposit(
-            symbol: 'DIAMONDS',
-          ),
-        ],
+        deposits: [SurveyDeposit(symbol: 'DIAMONDS')],
       ),
       timestamp: moonLanding,
     );

@@ -4,23 +4,27 @@ import 'package:cli/logic/printing.dart';
 import 'package:cli/net/auth.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final startSystemSymbol =
-      await startSystemFromArg(db, argResults.rest.firstOrNull);
+  final startSystemSymbol = await startSystemFromArg(
+    db,
+    argResults.rest.firstOrNull,
+  );
 
   final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
   final systemsCache = SystemsCache.load(fs);
-  final jumpGateSymbol = systemsCache
-      .waypointsInSystem(startSystemSymbol)
-      .firstWhere((w) => w.isJumpGate)
-      .symbol;
+  final jumpGateSymbol =
+      systemsCache
+          .waypointsInSystem(startSystemSymbol)
+          .firstWhere((w) => w.isJumpGate)
+          .symbol;
 
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final jumpGate = await getOrFetchJumpGate(db, api, jumpGateSymbol);
 
   String statusString(WaypointSymbol jumpGateSymbol) {
-    final isUnderConstruction =
-        constructionSnapshot.isUnderConstruction(jumpGateSymbol);
+    final isUnderConstruction = constructionSnapshot.isUnderConstruction(
+      jumpGateSymbol,
+    );
 
     if (isUnderConstruction == null) {
       return 'unknown';

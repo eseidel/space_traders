@@ -22,8 +22,8 @@ class Agent extends Equatable {
     FactionSymbol? startingFaction,
     this.shipCount = 1,
     this.accountId,
-  })  : headquarters = headquarters ?? WaypointSymbol.fromString('S-A-W'),
-        startingFaction = startingFaction ?? FactionSymbol.AEGIS;
+  }) : headquarters = headquarters ?? WaypointSymbol.fromString('S-A-W'),
+       startingFaction = startingFaction ?? FactionSymbol.AEGIS;
 
   /// Creates an agent from an OpenAPI agent.
   factory Agent.fromOpenApi(openapi.Agent agent) {
@@ -57,13 +57,13 @@ class Agent extends Equatable {
 
   @override
   List<Object?> get props => [
-        symbol,
-        headquarters,
-        credits,
-        startingFaction,
-        shipCount,
-        accountId,
-      ];
+    symbol,
+    headquarters,
+    credits,
+    startingFaction,
+    shipCount,
+    accountId,
+  ];
 
   /// Converts this agent to an OpenAPI agent.
   openapi.Agent toOpenApi() {

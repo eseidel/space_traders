@@ -89,9 +89,9 @@ void main() {
       // This is a hack to modify the snapshots:
       behaviors.states.add(behaviorState);
       ships.ships.add(ship);
-      when(() => db.behaviorStateBySymbol(shipSymbol)).thenAnswer(
-        (_) async => behaviorState,
-      );
+      when(
+        () => db.behaviorStateBySymbol(shipSymbol),
+      ).thenAnswer((_) async => behaviorState);
     }
 
     // Sets up a ship X-A with a route from S-A-A to S-A-W.
@@ -107,9 +107,10 @@ void main() {
     await setupShip(shipSymbol: shipBSymbol, start: bStart, end: bEnd);
 
     // Test that from S-A-A we avoid S-A-W and S-B-W.
-    final otherSystems = centralCommand
-        .otherCharterSystems(ships, behaviors, shipASymbol)
-        .toList();
+    final otherSystems =
+        centralCommand
+            .otherCharterSystems(ships, behaviors, shipASymbol)
+            .toList();
     expect(
       otherSystems,
       [bStart.system, bEnd.system], // Source and destination
@@ -117,22 +118,25 @@ void main() {
     // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
     // This is another hack, modifying the snapshot:
     behaviors[shipBSymbol]?.routePlan = null;
-    final otherSystems2 = centralCommand
-        .otherCharterSystems(ships, behaviors, shipASymbol)
-        .toList();
+    final otherSystems2 =
+        centralCommand
+            .otherCharterSystems(ships, behaviors, shipASymbol)
+            .toList();
     expect(otherSystems2, [bStart.system]); // From nav.waypointSymbol
 
     final shipCSymbol = ShipSymbol.fromString('X-C');
     final cStart = WaypointSymbol.fromString('S-D-A');
     final cEnd = WaypointSymbol.fromString('S-E-W');
     await setupShip(shipSymbol: shipCSymbol, start: cStart, end: cEnd);
-    final otherSystems4 = centralCommand
-        .otherCharterSystems(ships, behaviors, shipASymbol)
-        .toList();
-    expect(
-      otherSystems4,
-      <SystemSymbol>[bStart.system, cStart.system, cEnd.system],
-    );
+    final otherSystems4 =
+        centralCommand
+            .otherCharterSystems(ships, behaviors, shipASymbol)
+            .toList();
+    expect(otherSystems4, <SystemSymbol>[
+      bStart.system,
+      cStart.system,
+      cEnd.system,
+    ]);
   });
 
   test('CentralCommand.otherTraderSystems', () {
@@ -298,29 +302,27 @@ void main() {
     final ship = _MockShip();
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol)
-        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(
+      () => shipFrame.symbol,
+    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
     when(() => ship.frame).thenReturn(shipFrame);
     final shipSymbol = ShipSymbol.fromString('X-A');
     when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => shipCache.ships).thenReturn([ship]);
-    final oneIdle = BehaviorSnapshot(
-      [BehaviorState(shipSymbol, Behavior.idle)],
-    );
+    final oneIdle = BehaviorSnapshot([
+      BehaviorState(shipSymbol, Behavior.idle),
+    ]);
     final symbols2 = oneIdle.idleHaulerSymbols(shipCache);
     expect(symbols2, [shipSymbol]);
   });
 
   test('dealsInProgress smoke test', () {
     final deal = _MockCostedDeal();
-    final behaviors = BehaviorSnapshot(
-      [
-        BehaviorState(ShipSymbol.fromString('X-A'), Behavior.miner),
-        BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
-        BehaviorState(ShipSymbol.fromString('X-C'), Behavior.trader)
-          ..deal = deal,
-      ],
-    );
+    final behaviors = BehaviorSnapshot([
+      BehaviorState(ShipSymbol.fromString('X-A'), Behavior.miner),
+      BehaviorState(ShipSymbol.fromString('X-B'), Behavior.trader),
+      BehaviorState(ShipSymbol.fromString('X-C'), Behavior.trader)..deal = deal,
+    ]);
     final deals = behaviors.dealsInProgress();
     expect(deals.length, 1);
     expect(deals.first, deal);
@@ -352,13 +354,14 @@ void main() {
     );
     // Currently we pad with 100k for trading.
     final paddingCredits = config.shipBuyBufferForTrading;
-    when(() => db.behaviorStatesWithBehavior(Behavior.buyShip)).thenAnswer(
-      (_) async => [],
-    );
+    when(
+      () => db.behaviorStatesWithBehavior(Behavior.buyShip),
+    ).thenAnswer((_) async => []);
     final systemConnectivity = _MockSystemConnectivity();
     registerFallbackValue(waypointSymbol.system);
-    when(() => systemConnectivity.existsJumpPathBetween(any(), any()))
-        .thenReturn(true);
+    when(
+      () => systemConnectivity.existsJumpPathBetween(any(), any()),
+    ).thenReturn(true);
 
     final shouldBuy = await centralCommand.shouldBuyShip(
       db,
@@ -373,12 +376,7 @@ void main() {
       (_) async => [BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip)],
     );
     expect(
-      await centralCommand.shouldBuyShip(
-        db,
-        systemConnectivity,
-        ship,
-        100000,
-      ),
+      await centralCommand.shouldBuyShip(db, systemConnectivity, ship, 100000),
       false,
     );
 
@@ -521,8 +519,9 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol)
-        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(
+      () => shipFrame.symbol,
+    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
     when(() => ship.frame).thenReturn(shipFrame);
     when(() => ship.registration).thenReturn(
       ShipRegistration(
@@ -536,17 +535,19 @@ void main() {
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
     final hqSystemSymbol = hqSymbol.system;
-    when(() => caches.agent.headquartersSystemSymbol)
-        .thenReturn(hqSystemSymbol);
+    when(
+      () => caches.agent.headquartersSystemSymbol,
+    ).thenReturn(hqSystemSymbol);
     when(() => caches.systems.waypointsInSystem(hqSystemSymbol)).thenReturn([]);
     registerFallbackValue(ShipType.ORE_HOUND);
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => db.knowOfMarketWhichTrades(any()))
-        .thenAnswer((_) async => false);
-    when(() => caches.agent.headquarters(caches.systems)).thenReturn(
-      SystemWaypoint.test(hqSymbol),
-    );
+    when(
+      () => db.knowOfMarketWhichTrades(any()),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.agent.headquarters(caches.systems),
+    ).thenReturn(SystemWaypoint.test(hqSymbol));
     when(() => caches.agent.agent).thenReturn(
       Agent(
         symbol: shipSymbol.agentName,
@@ -562,12 +563,14 @@ void main() {
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
 
-    when(() => db.behaviorStateBySymbol(shipSymbol))
-        .thenAnswer((_) async => null);
+    when(
+      () => db.behaviorStateBySymbol(shipSymbol),
+    ).thenAnswer((_) async => null);
 
     when(db.allChartingRecords).thenAnswer((_) async => <ChartingRecord>[]);
-    when(() => db.medianMarketPurchasePrice(any()))
-        .thenAnswer((_) async => 100);
+    when(
+      () => db.medianMarketPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     await runWithLogger(
@@ -674,15 +677,14 @@ void main() {
   test('getJobForShip no behaviors', () async {
     final db = _MockDatabase();
     final behaviorTimeouts = _MockBehaviorTimeouts();
-    final centralCommand = CentralCommand(
-      behaviorTimeouts: behaviorTimeouts,
-    );
+    final centralCommand = CentralCommand(behaviorTimeouts: behaviorTimeouts);
     final shipSymbol = ShipSymbol.fromString('X-A');
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol);
     final shipFrame = _MockShipFrame();
-    when(() => shipFrame.symbol)
-        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(
+      () => shipFrame.symbol,
+    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
     when(() => ship.frame).thenReturn(shipFrame);
     when(() => ship.registration).thenReturn(
       ShipRegistration(
@@ -695,8 +697,9 @@ void main() {
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     registerFallbackValue(Behavior.idle);
-    when(() => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()))
-        .thenReturn(true);
+    when(
+      () => behaviorTimeouts.isBehaviorDisabledForShip(ship, any()),
+    ).thenReturn(true);
     final systemConnectivity = _MockSystemConnectivity();
     final job = await centralCommand.getJobForShip(
       db,
@@ -712,14 +715,17 @@ void main() {
     final shipyardShips = _MockShipyardShipCache();
     final shipyardListingSnapshot = _MockShipyardListingSnapshot();
     final shipCache = _MockShipCache();
-    when(() => shipyardListingSnapshot.knowOfShipyardWithShip(any()))
-        .thenReturn(true);
+    when(
+      () => shipyardListingSnapshot.knowOfShipyardWithShip(any()),
+    ).thenReturn(true);
 
     final buySecond = [ShipType.COMMAND_FRIGATE, ShipType.EXPLORER];
-    when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
-        .thenReturn(1);
-    when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
-        .thenReturn(0);
+    when(
+      () => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE),
+    ).thenReturn(1);
+    when(
+      () => shipCache.countOfType(shipyardShips, ShipType.EXPLORER),
+    ).thenReturn(0);
     expect(
       await shipToBuyFromPlan(
         shipCache,
@@ -731,10 +737,12 @@ void main() {
     );
 
     final buyFirst = [ShipType.EXPLORER, ShipType.COMMAND_FRIGATE];
-    when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
-        .thenReturn(1);
-    when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
-        .thenReturn(0);
+    when(
+      () => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE),
+    ).thenReturn(1);
+    when(
+      () => shipCache.countOfType(shipyardShips, ShipType.EXPLORER),
+    ).thenReturn(0);
     expect(
       await shipToBuyFromPlan(
         shipCache,
@@ -751,12 +759,15 @@ void main() {
       ShipType.EXPLORER,
       ShipType.ORE_HOUND,
     ];
-    when(() => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE))
-        .thenReturn(1);
-    when(() => shipCache.countOfType(shipyardShips, ShipType.EXPLORER))
-        .thenReturn(2);
-    when(() => shipCache.countOfType(shipyardShips, ShipType.ORE_HOUND))
-        .thenReturn(0);
+    when(
+      () => shipCache.countOfType(shipyardShips, ShipType.COMMAND_FRIGATE),
+    ).thenReturn(1);
+    when(
+      () => shipCache.countOfType(shipyardShips, ShipType.EXPLORER),
+    ).thenReturn(2);
+    when(
+      () => shipCache.countOfType(shipyardShips, ShipType.ORE_HOUND),
+    ).thenReturn(0);
     expect(
       await shipToBuyFromPlan(
         shipCache,

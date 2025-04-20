@@ -17,14 +17,17 @@ void printRequestStats(RequestCounts requestCounts, Duration duration) {
   final counts = requestCounts.counts;
   final generalizedCounts = <String, int>{};
   for (final key in counts.keys) {
-    final generalizedKey =
-        key.split('/').map((part) => part.contains('-') ? 'N' : part).join('/');
+    final generalizedKey = key
+        .split('/')
+        .map((part) => part.contains('-') ? 'N' : part)
+        .join('/');
     generalizedCounts[generalizedKey] =
         (generalizedCounts[generalizedKey] ?? 0) + counts[key]!;
   }
   // print the counts in order of most to least.
-  final sortedCounts = generalizedCounts.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
+  final sortedCounts =
+      generalizedCounts.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
   logger.info('Request stats:');
   for (final entry in sortedCounts) {
     logger.info('${entry.value} ${entry.key}');
@@ -35,9 +38,11 @@ void printRequestStats(RequestCounts requestCounts, Duration duration) {
   final percentString = '${(percent * 100).round()}%';
   final avg = requestCounts.total / duration.inSeconds;
   logger
-    ..info('Total: ${requestCounts.total} requests '
-        'over ${approximateDuration(duration)}. '
-        '(avg ${avg.toStringAsFixed(2)} r/s)')
+    ..info(
+      'Total: ${requestCounts.total} requests '
+      'over ${approximateDuration(duration)}. '
+      '(avg ${avg.toStringAsFixed(2)} r/s)',
+    )
     ..info('Used $percentString of $possible possible requests.');
 }
 
@@ -45,13 +50,15 @@ void printRequestStats(RequestCounts requestCounts, Duration duration) {
 void printStatus(GetStatus200Response s) {
   final mostCreditsString = s.leaderboards.mostCredits
       .map(
-        (e) => '${e.agentSymbol.padLeft(14)} '
+        (e) =>
+            '${e.agentSymbol.padLeft(14)} '
             '${creditsString(e.credits).padLeft(14)}',
       )
       .join(', ');
   final mostChartsString = s.leaderboards.mostSubmittedCharts
       .map(
-        (e) => '${e.agentSymbol.padLeft(14)} '
+        (e) =>
+            '${e.agentSymbol.padLeft(14)} '
             '${e.chartCount.toString().padLeft(14)}',
       )
       .join(', ');
@@ -60,17 +67,16 @@ void printStatus(GetStatus200Response s) {
   final sinceLastReset = approximateDuration(now.difference(resetDate));
   final nextResetDate = DateTime.tryParse(s.serverResets.next)!;
   final untilNextReset = approximateDuration(nextResetDate.difference(now));
-  final statsParts = [
-    '${s.stats.agents} agents',
-    '${s.stats.ships} ships',
-    '${s.stats.systems} systems',
-    '${s.stats.waypoints} waypoints',
-  ].map((e) => e.padLeft(20)).toList();
+  final statsParts =
+      [
+        '${s.stats.agents} agents',
+        '${s.stats.ships} ships',
+        '${s.stats.systems} systems',
+        '${s.stats.waypoints} waypoints',
+      ].map((e) => e.padLeft(20)).toList();
 
   logger
-    ..info(
-      'Stats: ${statsParts.join(' ')}',
-    )
+    ..info('Stats: ${statsParts.join(' ')}')
     ..info('Most Credits: $mostCreditsString')
     ..info('Most Charts:  $mostChartsString')
     ..info(
@@ -91,8 +97,9 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
   if (only.isEmpty) {
     return null;
   }
-  final onlyShips =
-      only.map((s) => ShipSymbol(agent.symbol, int.parse(s, radix: 16)));
+  final onlyShips = only.map(
+    (s) => ShipSymbol(agent.symbol, int.parse(s, radix: 16)),
+  );
   if (onlyShips.isNotEmpty) {
     logger.info('Only running ships: $onlyShips');
   }
@@ -100,14 +107,20 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
 }
 
 Future<void> cliMain(List<String> args) async {
-  final parser = ArgParser()
-    ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
-    ..addFlag('selloff', negatable: false, help: 'Sell off ships.')
-    ..addMultiOption(
-      'only',
-      abbr: 'o',
-      help: 'Only run the given ship numbers (hex).',
-    );
+  final parser =
+      ArgParser()
+        ..addFlag(
+          'verbose',
+          abbr: 'v',
+          negatable: false,
+          help: 'Verbose logging.',
+        )
+        ..addFlag('selloff', negatable: false, help: 'Sell off ships.')
+        ..addMultiOption(
+          'only',
+          abbr: 'o',
+          help: 'Only run the given ship numbers (hex).',
+        );
   final results = parser.parse(args);
 
   logger.level = results['verbose'] as bool ? Level.verbose : Level.info;
@@ -186,16 +199,15 @@ Future<void> cliMain(List<String> args) async {
   // We use defaultTo: [], so we don't have to check fo null here.
   // This means that we won't notice `--only` being passed with no ships.
   // But that's also OK since that's nonsensical.
-  final shipFilter =
-      _shipFilterFromArgs(agent, results['only'] as List<String>);
+  final shipFilter = _shipFilterFromArgs(
+    agent,
+    results['only'] as List<String>,
+  );
   await logic(api, db, centralCommand, caches, shipFilter: shipFilter);
 }
 
 Future<void> main(List<String> args) async {
-  await runScoped(
-    () async {
-      await cliMain(args);
-    },
-    values: {loggerRef},
-  );
+  await runScoped(() async {
+    await cliMain(args);
+  }, values: {loggerRef});
 }

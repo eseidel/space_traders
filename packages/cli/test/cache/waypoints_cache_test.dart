@@ -39,14 +39,17 @@ void main() {
       );
     });
     final systemsCache = _MockSystemsCache();
-    when(() => systemsCache.waypointsInSystem(waypointSymbol.system))
-        .thenReturn([SystemWaypoint.test(waypointSymbol)]);
+    when(
+      () => systemsCache.waypointsInSystem(waypointSymbol.system),
+    ).thenReturn([SystemWaypoint.test(waypointSymbol)]);
     final chartingCache = _MockChartingCache();
     registerFallbackValue(waypointSymbol);
-    when(() => chartingCache.chartedValues(any()))
-        .thenAnswer((_) async => null);
-    when(() => chartingCache.chartingRecord(any()))
-        .thenAnswer((_) async => null);
+    when(
+      () => chartingCache.chartedValues(any()),
+    ).thenAnswer((_) async => null);
+    when(
+      () => chartingCache.chartingRecord(any()),
+    ).thenAnswer((_) async => null);
     when(() => chartingCache.addWaypoints(any())).thenAnswer((_) async {});
     final constructionCache = _MockConstructionCache();
     when(
@@ -88,11 +91,13 @@ void main() {
     expect(await waypointCache.canBeSiphoned(waypointSymbol), false);
 
     // The has getters still throw if the waypoint doesn't exist.
-    when(() => systemsCache.waypointsInSystem(SystemSymbol.fromString('A-B')))
-        .thenReturn([]);
+    when(
+      () => systemsCache.waypointsInSystem(SystemSymbol.fromString('A-B')),
+    ).thenReturn([]);
     expect(
-      () async => await waypointCache
-          .hasMarketplace(WaypointSymbol.fromString('A-B-C')),
+      () async => await waypointCache.hasMarketplace(
+        WaypointSymbol.fromString('A-B-C'),
+      ),
       throwsArgumentError,
     );
   });

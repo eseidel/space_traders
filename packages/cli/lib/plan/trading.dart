@@ -21,12 +21,13 @@ List<Deal> buildDealsFromScan(
   for (final tradeSymbol in tradeSymbols) {
     final buys = scan.buyOppsForTradeSymbol(tradeSymbol);
     final scanSells = scan.sellOppsForTradeSymbol(tradeSymbol);
-    final sells = extraSellOpps != null
-        ? [
-            ...scanSells,
-            ...extraSellOpps.where((o) => o.tradeSymbol == tradeSymbol),
-          ]
-        : scanSells;
+    final sells =
+        extraSellOpps != null
+            ? [
+              ...scanSells,
+              ...extraSellOpps.where((o) => o.tradeSymbol == tradeSymbol),
+            ]
+            : scanSells;
     for (final buy in buys) {
       for (final sell in sells) {
         if (buy.waypointSymbol == sell.waypointSymbol) {
@@ -51,12 +52,14 @@ String describeCostedDeal(CostedDeal costedDeal) {
   final sign = profit > 0 ? '+' : '';
   final profitPercent = (profit / costedDeal.expectedCosts) * 100;
   final profitCreditsString = '$sign${c(profit)}'.padLeft(9);
-  final profitPercentString =
-      '(${profitPercent.toStringAsFixed(0)}%)'.padLeft(5);
+  final profitPercentString = '(${profitPercent.toStringAsFixed(0)}%)'.padLeft(
+    5,
+  );
   final profitString = '$profitCreditsString $profitPercentString';
   final coloredProfitString =
       profit > 0 ? lightGreen.wrap(profitString) : lightRed.wrap(profitString);
-  final timeString = '${approximateDuration(costedDeal.expectedTime)} '
+  final timeString =
+      '${approximateDuration(costedDeal.expectedTime)} '
       '${c(costedDeal.expectedProfitPerSecond).padLeft(4)}/s';
   final tradeSymbol = deal.tradeSymbol.value;
   final name =
@@ -125,8 +128,8 @@ MarketScan scanReachableMarkets(
 }) {
   return MarketScan.fromMarketPrices(
     marketPrices,
-    waypointFilter: (w) =>
-        systemConnectivity.existsJumpPathBetween(w.system, startSystem),
+    waypointFilter:
+        (w) => systemConnectivity.existsJumpPathBetween(w.system, startSystem),
     description: 'all known markets',
   );
 }
@@ -174,19 +177,20 @@ Iterable<CostedDeal> findDealsFor(
   }
 
   final before = DateTime.timestamp();
-  final costedDeals = filtered
-      .map(
-        (deal) => costOutDeal(
-          systemsCache,
-          routePlanner,
-          shipSpec,
-          deal,
-          shipWaypointSymbol: startSymbol,
-          costPerFuelUnit: costPerFuelUnit,
-          costPerAntimatterUnit: costPerAntimatterUnit,
-        ),
-      )
-      .toList();
+  final costedDeals =
+      filtered
+          .map(
+            (deal) => costOutDeal(
+              systemsCache,
+              routePlanner,
+              shipSpec,
+              deal,
+              shipWaypointSymbol: startSymbol,
+              costPerFuelUnit: costPerFuelUnit,
+              costPerAntimatterUnit: costPerAntimatterUnit,
+            ),
+          )
+          .toList();
 
   // toList is used to force resolution of the list before we log.
   final after = DateTime.timestamp();
@@ -197,13 +201,14 @@ Iterable<CostedDeal> findDealsFor(
     );
   }
 
-  final affordable = costedDeals
-      .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
-      .where((d) => d.cargoSize > 0)
-      // TODO(eseidel): This should not be necessary, limitUnitsByMaxSpend
-      // should have already done this.
-      .where((d) => d.expectedCosts <= maxTotalOutlay)
-      .toList();
+  final affordable =
+      costedDeals
+          .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
+          .where((d) => d.cargoSize > 0)
+          // TODO(eseidel): This should not be necessary, limitUnitsByMaxSpend
+          // should have already done this.
+          .where((d) => d.expectedCosts <= maxTotalOutlay)
+          .toList();
   if (affordable.isEmpty) {
     logger.info('No deals < ${creditsString(maxTotalOutlay)} $withinRange.');
     return [];
@@ -233,28 +238,30 @@ Iterable<CostedDeal> findAllDeals(
   );
   logger.info('Found ${deals.length} potential deals.');
 
-  final costedDeals = deals
-      .map(
-        (deal) => costOutDeal(
-          systems,
-          routePlanner,
-          shipSpec,
-          deal,
-          // TODO(eseidel): Should this be something other than the deal source?
-          shipWaypointSymbol: deal.sourceSymbol,
-          costPerFuelUnit: costPerFuelUnit,
-          costPerAntimatterUnit: costPerAntimatterUnit,
-        ),
-      )
-      .toList();
+  final costedDeals =
+      deals
+          .map(
+            (deal) => costOutDeal(
+              systems,
+              routePlanner,
+              shipSpec,
+              deal,
+              // TODO(eseidel): Should this be something other than the deal source?
+              shipWaypointSymbol: deal.sourceSymbol,
+              costPerFuelUnit: costPerFuelUnit,
+              costPerAntimatterUnit: costPerAntimatterUnit,
+            ),
+          )
+          .toList();
 
-  final affordable = costedDeals
-      .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
-      .where((d) => d.cargoSize > 0)
-      // TODO(eseidel): This should not be necessary, limitUnitsByMaxSpend
-      // should have already done this.
-      .where((d) => d.expectedCosts <= maxTotalOutlay)
-      .toList();
+  final affordable =
+      costedDeals
+          .map((d) => d.limitUnitsByMaxSpend(maxTotalOutlay))
+          .where((d) => d.cargoSize > 0)
+          // TODO(eseidel): This should not be necessary, limitUnitsByMaxSpend
+          // should have already done this.
+          .where((d) => d.expectedCosts <= maxTotalOutlay)
+          .toList();
 
   return affordable
       .sortedBy<num>((e) => -e.expectedProfitPerSecond)
@@ -287,11 +294,7 @@ CostedTrip<T>? costTrip<T>(
   required WaypointSymbol start,
   required WaypointSymbol end,
 }) {
-  final route = planner.planRoute(
-    shipSpec,
-    start: start,
-    end: end,
-  );
+  final route = planner.planRoute(shipSpec, start: start, end: end);
   if (route == null) {
     return null;
   }
@@ -334,8 +337,9 @@ List<MarketTrip> marketsTradingSortedByDistance(
     }
   }
 
-  final sorted = costed.toList()
-    ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
+  final sorted =
+      costed.toList()
+        ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
   return sorted;
 }
 
@@ -455,14 +459,10 @@ Future<MarketTrip?> findBestMarketToSell(
   final roundTripMultiplier = includeRoundTripCost ? 2 : 1;
   final nearest = sorted.first;
   // We could do per-destination fuel cost planning, but that seems overkill.
-  final costPerFuelUnit = marketPrices.medianPurchasePrice(
-        TradeSymbol.FUEL,
-      ) ??
-      100;
-  final costPerUnitAntimatter = marketPrices.medianPurchasePrice(
-        TradeSymbol.ANTIMATTER,
-      ) ??
-      10000;
+  final costPerFuelUnit =
+      marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ?? 100;
+  final costPerUnitAntimatter =
+      marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ?? 10000;
 
   int estimateTripCost(MarketTrip trip) {
     return estimateRoutePlanCost(
@@ -497,19 +497,23 @@ Future<MarketTrip?> findBestMarketToSell(
     final earningsPerSecond =
         extraEarnings / (extraTime.inSeconds * roundTripMultiplier);
     if (earningsPerSecond > expectedCreditsPerSecond) {
-      info('Selecting ${trip.price.waypointSymbol} earns '
-          '${creditsString(extraEarnings)} extra '
-          '(including ${creditsString(-extraFuelCost)} for fuel) '
-          'over ${approximateDuration(extraTime)} '
-          '(${earningsPerSecond.toStringAsFixed(1)}/s)');
+      info(
+        'Selecting ${trip.price.waypointSymbol} earns '
+        '${creditsString(extraEarnings)} extra '
+        '(including ${creditsString(-extraFuelCost)} for fuel) '
+        'over ${approximateDuration(extraTime)} '
+        '(${earningsPerSecond.toStringAsFixed(1)}/s)',
+      );
       best = trip;
       break;
     } else {
-      detail('Skipping ${trip.price.waypointSymbol} earns '
-          '${creditsString(extraEarnings)} extra '
-          '(${creditsString(-extraFuelCost)} for fuel) '
-          'for ${approximateDuration(extraTime)} '
-          '(${earningsPerSecond.toStringAsFixed(1)}/s)');
+      detail(
+        'Skipping ${trip.price.waypointSymbol} earns '
+        '${creditsString(extraEarnings)} extra '
+        '(${creditsString(-extraFuelCost)} for fuel) '
+        'for ${approximateDuration(extraTime)} '
+        '(${earningsPerSecond.toStringAsFixed(1)}/s)',
+      );
     }
     printCount--;
   }

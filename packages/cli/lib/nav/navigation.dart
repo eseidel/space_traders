@@ -17,9 +17,10 @@ extension ShipNavUtils on Ship {
     DateTime Function() getNow = defaultGetNow,
   }) {
     final now = getNow();
-    var timeLeft = nav.status == ShipNavStatus.IN_TRANSIT
-        ? nav.route.arrival.difference(now)
-        : Duration.zero;
+    var timeLeft =
+        nav.status == ShipNavStatus.IN_TRANSIT
+            ? nav.route.arrival.difference(now)
+            : Duration.zero;
     if (routePlan.endSymbol != waypointSymbol) {
       final newPlan = routePlan.subPlanStartingFrom(waypointSymbol);
       timeLeft += newPlan.duration;
@@ -109,7 +110,8 @@ Future<DateTime?> beingRouteAndLog(
   }
 
   state.routePlan = routePlan;
-  final message = 'Beginning route to ${routePlan.endSymbol.sectorLocalName} '
+  final message =
+      'Beginning route to ${routePlan.endSymbol.sectorLocalName} '
       '(${approximateDuration(routePlan.duration)})';
   if (routePlan.duration.inMinutes > 5) {
     shipWarn(ship, message);
@@ -130,32 +132,26 @@ Future<DateTime?> beingRouteAndLog(
   return null;
 }
 
-enum _NavResultType {
-  wait,
-  continueAction,
-  loop,
-}
+enum _NavResultType { wait, continueAction, loop }
 
 /// The result from continueNavigationIfNeeded
 class NavResult {
   /// Wait tells the caller to return out the DateTime to have the ship
   /// wait.
   NavResult._wait(DateTime wait)
-      : _type = _NavResultType.wait,
-        _waitTime = wait;
+    : _type = _NavResultType.wait,
+      _waitTime = wait;
 
   /// ContinueAction tells the caller it is OK to continue the action,
   /// we have done whatever navigation was necessary.
   NavResult._continueAction()
-      : _type = _NavResultType.continueAction,
-        _waitTime = null;
+    : _type = _NavResultType.continueAction,
+      _waitTime = null;
 
   /// Loop tells the caller to loop back to the top of the loop immediately.
   /// Typically this means returning null from the action.
   /// We likely need to do more navigation.
-  NavResult._loop()
-      : _type = _NavResultType.loop,
-        _waitTime = null;
+  NavResult._loop() : _type = _NavResultType.loop, _waitTime = null;
 
   final _NavResultType _type;
   final DateTime? _waitTime;
@@ -329,12 +325,7 @@ Future<NavResult> continueNavigationIfNeeded(
           const Duration(minutes: 5),
         );
         if (fuelNeeded > ship.fuel.current) {
-          final market = await visitLocalMarket(
-            api,
-            db,
-            caches,
-            ship,
-          );
+          final market = await visitLocalMarket(api, db, caches, ship);
           if (market != null) {
             await refuelIfNeededAndLog(
               api,
@@ -347,9 +338,10 @@ Future<NavResult> continueNavigationIfNeeded(
           } else {
             // TODO(eseidel): Make this throw once we're better about fuel.
             shipErr(
-                ship,
-                'No market at ${ship.waypointSymbol}, '
-                'cannot refuel, need to replan.');
+              ship,
+              'No market at ${ship.waypointSymbol}, '
+              'cannot refuel, need to replan.',
+            );
             // throw JobException(
             //   'No market at ${ship.waypointSymbol}, '
             //   'cannot refuel, need to replan.',
@@ -392,13 +384,7 @@ Future<NavResult> continueNavigationIfNeeded(
       shipErr(ship, 'Warping to ${actionEnd.symbol}!');
       try {
         return NavResult._wait(
-          await warpToWaypointAndLog(
-            db,
-            api,
-            caches.systems,
-            ship,
-            actionEnd,
-          ),
+          await warpToWaypointAndLog(db, api, caches.systems, ship, actionEnd),
         );
       } on ApiException catch (e) {
         if (isInsufficientFuelException(e)) {

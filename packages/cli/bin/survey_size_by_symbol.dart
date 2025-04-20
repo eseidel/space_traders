@@ -31,9 +31,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     for (final size in SurveySizeEnum.values) {
       final count = counts[size]!;
       final percent = count / total;
-      logger.info('  ${size.toString().padRight(sizeLength)} '
-          '${percent.toStringAsFixed(2).padLeft(percentLength)}% '
-          '${count.toString().padLeft(countLength)}');
+      logger.info(
+        '  ${size.toString().padRight(sizeLength)} '
+        '${percent.toStringAsFixed(2).padLeft(percentLength)}% '
+        '${count.toString().padLeft(countLength)}',
+      );
     }
   }
 }

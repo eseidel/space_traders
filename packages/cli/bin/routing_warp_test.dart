@@ -57,14 +57,16 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final start = agentCache!.headquartersSymbol;
   final interestingSystems = findInterestingSystems(systemsCache);
-  final interestingWaypoints = interestingSystems
-      .map((s) => systemsCache[s].jumpGateWaypoints.first.symbol)
-      .toList();
+  final interestingWaypoints =
+      interestingSystems
+          .map((s) => systemsCache[s].jumpGateWaypoints.first.symbol)
+          .toList();
 
   // Sort them by distance to start, do the easy ones first.
   final startSystem = systemsCache[start.system];
-  interestingWaypoints
-      .sortBy<num>((s) => systemsCache[s.system].distanceTo(startSystem));
+  interestingWaypoints.sortBy<num>(
+    (s) => systemsCache[s.system].distanceTo(startSystem),
+  );
 
   logger.info('Pathing to ${interestingWaypoints.length} systems...');
   for (final end in interestingWaypoints) {

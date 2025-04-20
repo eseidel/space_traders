@@ -8,8 +8,9 @@ void main() {
   test('Contract types', () {
     final contractTerms = _MockContractTerms();
     final contract = Contract.test(id: 'id', terms: contractTerms);
-    when(() => contractTerms.payment)
-        .thenReturn(ContractPayment(onAccepted: 10, onFulfilled: 20));
+    when(
+      () => contractTerms.payment,
+    ).thenReturn(ContractPayment(onAccepted: 10, onFulfilled: 20));
 
     const shipSymbol = ShipSymbol('S', 1);
     final waypointSymbol = WaypointSymbol.fromString('S-A-B');

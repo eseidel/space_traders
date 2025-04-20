@@ -20,8 +20,9 @@ void printRampDelay(Iterable<Transaction> transactions) {
   for (var i = shipPurchaseIndex - 1; i > lastShipPurchaseIndex; i--) {
     final transaction = transactionsToExamine[i];
     if (transaction.agentCredits > shipPurchaseAmount) {
-      final rampDelay =
-          shipPurchase.timestamp.difference(transaction.timestamp);
+      final rampDelay = shipPurchase.timestamp.difference(
+        transaction.timestamp,
+      );
       logger.info('Ramp delay: $rampDelay');
       break;
     }

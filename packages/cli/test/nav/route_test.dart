@@ -26,63 +26,46 @@ void main() {
       position: WaypointPosition(20, 0, otherSymbol.system),
     );
     final fs = MemoryFileSystem.test();
-    final systemsCache = SystemsCache(
-      [
-        System.test(
-          a.system,
-          waypoints: [a, b, c],
-        ),
-      ],
-      fs: fs,
-    );
+    final systemsCache = SystemsCache([
+      System.test(a.system, waypoints: [a, b, c]),
+    ], fs: fs);
     expect(
-      approximateRoundTripDistanceWithinSystem(
-        systemsCache,
-        a.symbol,
-        {b.symbol},
-      ),
+      approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
+        b.symbol,
+      }),
       20,
     );
     expect(
-      approximateRoundTripDistanceWithinSystem(
-        systemsCache,
-        a.symbol,
-        {c.symbol},
-      ),
+      approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
+        c.symbol,
+      }),
       40,
     );
     expect(
-      approximateRoundTripDistanceWithinSystem(
-        systemsCache,
-        a.symbol,
-        {b.symbol, c.symbol},
-      ),
+      approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
+        b.symbol,
+        c.symbol,
+      }),
       40,
     );
     expect(
-      approximateRoundTripDistanceWithinSystem(
-        systemsCache,
-        a.symbol,
-        {},
-      ),
+      approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {}),
       0,
     );
     // Doesn't get confused by having a in the list:
     expect(
-      approximateRoundTripDistanceWithinSystem(
-        systemsCache,
+      approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
         a.symbol,
-        {a.symbol, b.symbol, c.symbol},
-      ),
+        b.symbol,
+        c.symbol,
+      }),
       40,
     );
     // Only works with a single system:
     expect(
-      () => approximateRoundTripDistanceWithinSystem(
-        systemsCache,
-        a.symbol,
-        {otherSystem.symbol},
-      ),
+      () => approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
+        otherSystem.symbol,
+      }),
       throwsArgumentError,
     );
   });
@@ -90,13 +73,7 @@ void main() {
   test('fuelUsedWithinSystem', () {
     final a = SystemWaypoint.test(WaypointSymbol.fromString('a-b-c'));
     final b = SystemWaypoint.test(WaypointSymbol.fromString('a-b-d'));
-    expect(
-      fuelUsedWithinSystem(
-        a,
-        b,
-      ),
-      0,
-    );
+    expect(fuelUsedWithinSystem(a, b), 0);
 
     expect(fuelUsedByDistance(10, ShipNavFlightMode.CRUISE), 10);
     expect(fuelUsedByDistance(10, ShipNavFlightMode.DRIFT), 1);
@@ -107,25 +84,17 @@ void main() {
   test('flightTimeWithinSystemInSeconds', () {
     final a = SystemWaypoint.test(WaypointSymbol.fromString('a-b-c'));
     final b = SystemWaypoint.test(WaypointSymbol.fromString('a-b-d'));
-    expect(
-      flightTimeWithinSystemInSeconds(
-        a,
-        b,
-        shipSpeed: 30,
-      ),
-      15,
-    );
+    expect(flightTimeWithinSystemInSeconds(a, b, shipSpeed: 30), 15);
 
     int flightTime(
       double distance,
       int shipSpeed,
       ShipNavFlightMode flightMode,
-    ) =>
-        flightTimeByDistanceAndSpeed(
-          distance: distance,
-          shipSpeed: shipSpeed,
-          flightMode: flightMode,
-        );
+    ) => flightTimeByDistanceAndSpeed(
+      distance: distance,
+      shipSpeed: shipSpeed,
+      flightMode: flightMode,
+    );
 
     expect(flightTime(1, 30, ShipNavFlightMode.CRUISE), 15);
     expect(flightTime(1, 30, ShipNavFlightMode.DRIFT), 23);
@@ -183,9 +152,7 @@ void main() {
   });
 
   test('cooldownTime', () {
-    final a = System.test(
-      SystemSymbol.fromString('A-A'),
-    );
+    final a = System.test(SystemSymbol.fromString('A-A'));
     final b = System.test(
       SystemSymbol.fromString('A-B'),
       position: const SystemPosition(2500, 0),
@@ -241,17 +208,16 @@ void main() {
       WaypointSymbol end, {
       int fuelCapacity = 1200,
       int shipSpeed = 30,
-    }) =>
-        routePlanner.planRoute(
-          ShipSpec(
-            cargoCapacity: 0,
-            fuelCapacity: fuelCapacity,
-            speed: shipSpeed,
-            canWarp: false,
-          ),
-          start: start,
-          end: end,
-        );
+    }) => routePlanner.planRoute(
+      ShipSpec(
+        cargoCapacity: 0,
+        fuelCapacity: fuelCapacity,
+        speed: shipSpeed,
+        canWarp: false,
+      ),
+      start: start,
+      end: end,
+    );
 
     void expectRoute(
       WaypointSymbol start,
@@ -270,11 +236,13 @@ void main() {
       // Also verify that our caching works:
       // This actually isn't triggered ever since we're only using local
       // navigation in this test so far.
-      final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
-        ..add(route.actions.last.endSymbol);
+      final routeSymbols =
+          route.actions.map((w) => w.startSymbol).toList()
+            ..add(route.actions.last.endSymbol);
       final route2 = planRoute(start, end)!;
-      final routeSymbols2 = route2.actions.map((w) => w.startSymbol).toList()
-        ..add(route.actions.last.endSymbol);
+      final routeSymbols2 =
+          route2.actions.map((w) => w.startSymbol).toList()
+            ..add(route.actions.last.endSymbol);
       // Should be identical when coming from cache.
       expect(routeSymbols2, routeSymbols);
     }
@@ -311,9 +279,7 @@ void main() {
   test('planRoute, fuel constraints', () {
     final fs = MemoryFileSystem.test();
     final systemSymbol = SystemSymbol.fromString('A-B');
-    final start = SystemWaypoint.test(
-      WaypointSymbol.fromString('A-B-A'),
-    );
+    final start = SystemWaypoint.test(WaypointSymbol.fromString('A-B-A'));
     final fuelStation = SystemWaypoint.test(
       WaypointSymbol.fromString('A-B-B'),
       position: WaypointPosition(50, 0, systemSymbol),
@@ -323,12 +289,9 @@ void main() {
       position: WaypointPosition(100, 0, systemSymbol),
     );
 
-    final systemsCache = SystemsCache(
-      [
-        System.test(systemSymbol, waypoints: [start, fuelStation, end]),
-      ],
-      fs: fs,
-    );
+    final systemsCache = SystemsCache([
+      System.test(systemSymbol, waypoints: [start, fuelStation, end]),
+    ], fs: fs);
 
     final systemConnectivity = SystemConnectivity.test({});
     final routePlanner = RoutePlanner.fromSystemsCache(
@@ -342,17 +305,16 @@ void main() {
       SystemWaypoint end, {
       required int fuelCapacity,
       int shipSpeed = 30,
-    }) =>
-        routePlanner.planRoute(
-          ShipSpec(
-            cargoCapacity: 0,
-            fuelCapacity: fuelCapacity,
-            speed: shipSpeed,
-            canWarp: false,
-          ),
-          start: start.symbol,
-          end: end.symbol,
-        );
+    }) => routePlanner.planRoute(
+      ShipSpec(
+        cargoCapacity: 0,
+        fuelCapacity: fuelCapacity,
+        speed: shipSpeed,
+        canWarp: false,
+      ),
+      start: start.symbol,
+      end: end.symbol,
+    );
     // If tank is large enough, we just go direct.
     final big = planRoute(start, end, fuelCapacity: 101)!.actions;
     expect(big.length, 1);
@@ -427,12 +389,16 @@ void main() {
 
   test('describeRoutePlan', () {
     final start = WaypointSymbol.fromString('A-B-A');
-    final plan =
-        RoutePlan.empty(symbol: start, fuelCapacity: 10, shipSpeed: 30);
+    final plan = RoutePlan.empty(
+      symbol: start,
+      fuelCapacity: 10,
+      shipSpeed: 30,
+    );
     expect(
-        describeRoutePlan(plan),
-        'B-A to B-A speed: 30 max-fuel: 10\n'
-        'emptyRoute      B-A  B-A 0ms 0 fuel\n'
-        'in 0ms uses 0 fuel\n');
+      describeRoutePlan(plan),
+      'B-A to B-A speed: 30 max-fuel: 10\n'
+      'emptyRoute      B-A  B-A 0ms 0 fuel\n'
+      'in 0ms uses 0 fuel\n',
+    );
   });
 }

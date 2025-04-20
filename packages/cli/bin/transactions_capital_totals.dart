@@ -7,8 +7,9 @@ String describeTransaction(Transaction t) {
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final transactions =
-      await db.transactionsWithAccountingType(AccountingType.capital);
+  final transactions = await db.transactionsWithAccountingType(
+    AccountingType.capital,
+  );
 
   final grouped = <String, List<Transaction>>{};
   for (final transaction in transactions) {

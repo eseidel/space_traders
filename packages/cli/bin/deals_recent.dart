@@ -14,21 +14,23 @@ class SyntheticDeal {
   const SyntheticDeal(this.transactions);
   final List<Transaction> transactions;
 
-  List<Transaction> get goodsBuys => transactions
-      .where(
-        (t) =>
-            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
-            t.accounting == AccountingType.goods,
-      )
-      .toList();
+  List<Transaction> get goodsBuys =>
+      transactions
+          .where(
+            (t) =>
+                t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+                t.accounting == AccountingType.goods,
+          )
+          .toList();
 
-  List<Transaction> get goodsSells => transactions
-      .where(
-        (t) =>
-            t.tradeType == MarketTransactionTypeEnum.SELL &&
-            t.accounting == AccountingType.goods,
-      )
-      .toList();
+  List<Transaction> get goodsSells =>
+      transactions
+          .where(
+            (t) =>
+                t.tradeType == MarketTransactionTypeEnum.SELL &&
+                t.accounting == AccountingType.goods,
+          )
+          .toList();
 
   bool get isCompleted {
     final buys = goodsBuys;
@@ -81,10 +83,12 @@ class SyntheticDeal {
 }
 
 void printSyntheticDeal(SyntheticDeal deal) {
-  logger.info('${deal.shipSymbol} ${deal.units} of ${deal.tradeSymbol} '
-      '${deal.start} -> ${deal.end} in ${approximateDuration(deal.duration)} '
-      'for ${creditsString(deal.profit)} '
-      '(${creditsString(deal.profitPerSecond)}/s)');
+  logger.info(
+    '${deal.shipSymbol} ${deal.units} of ${deal.tradeSymbol} '
+    '${deal.start} -> ${deal.end} in ${approximateDuration(deal.duration)} '
+    'for ${creditsString(deal.profit)} '
+    '(${creditsString(deal.profitPerSecond)}/s)',
+  );
 }
 
 bool Function(Transaction t) filterFromArgs(List<String> args) {

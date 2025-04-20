@@ -62,24 +62,21 @@ class ChartingCache {
   Future<bool?> isCharted(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async =>
-      (await chartingRecord(waypointSymbol, maxAge: maxAge))?.isCharted;
+  }) async => (await chartingRecord(waypointSymbol, maxAge: maxAge))?.isCharted;
 
   /// Returns the charted values for the given waypoint, or null if it is not
   /// in the cache.
   Future<ChartedValues?> chartedValues(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async =>
-      (await chartingRecord(waypointSymbol, maxAge: maxAge))?.values;
+  }) async => (await chartingRecord(waypointSymbol, maxAge: maxAge))?.values;
 
   /// Returns the charting record for the given waypoint, or null if it is not
   /// in the cache.
   Future<ChartingRecord?> chartingRecord(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async =>
-      await _db.getChartingRecord(waypointSymbol, maxAge);
+  }) async => await _db.getChartingRecord(waypointSymbol, maxAge);
 
   /// Adds a waypoint to the charting cache.
   static Future<void> addWaypoint(

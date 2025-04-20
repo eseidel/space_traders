@@ -6,38 +6,31 @@ Query allShipsQuery() => const Query('SELECT * FROM ship_');
 
 /// Get a ship by its [symbol] from the database.
 Query shipBySymbolQuery(ShipSymbol symbol) => Query(
-      'SELECT * FROM ship_ WHERE symbol = @symbol',
-      parameters: {
-        'symbol': symbol.toJson(),
-      },
-    );
+  'SELECT * FROM ship_ WHERE symbol = @symbol',
+  parameters: {'symbol': symbol.toJson()},
+);
 
 /// Upsert a ship into the database.
 Query upsertShipQuery(Ship ship) => Query(
-      '''
+  '''
       INSERT INTO ship_ (symbol, json)
       VALUES (@symbol, @json)
       ON CONFLICT (symbol) DO UPDATE SET json = @json
       ''',
-      parameters: {
-        'symbol': ship.symbol.toJson(),
-        'json': ship.toJson(),
-      },
-    );
+  parameters: {'symbol': ship.symbol.toJson(), 'json': ship.toJson()},
+);
 
 /// Delete a ship from the database by its [symbol].
 Query deleteShipQuery(ShipSymbol symbol) => Query(
-      'DELETE FROM ship_ WHERE symbol = @symbol',
-      parameters: {
-        'symbol': symbol.toJson(),
-      },
-    );
+  'DELETE FROM ship_ WHERE symbol = @symbol',
+  parameters: {'symbol': symbol.toJson()},
+);
 
 /// Convert a Ship to a column map.
 Map<String, dynamic> shipToColumnMap(Ship ship) => {
-      'symbol': ship.symbol.toJson(),
-      'json': ship.toJson(),
-    };
+  'symbol': ship.symbol.toJson(),
+  'json': ship.toJson(),
+};
 
 /// Convert a result row to a Ship.
 Ship shipFromColumnMap(Map<String, dynamic> values) {

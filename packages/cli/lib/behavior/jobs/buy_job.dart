@@ -21,8 +21,11 @@ Future<JobResult> doBuyJob(
 }) async {
   // TODO(eseidel): Add a way for jobs to get their job name from the MultiJob.
   const jobName = 'BuyJob';
-  final buyJob =
-      assertNotNull(state.buyJob, 'No buy job', const Duration(hours: 1));
+  final buyJob = assertNotNull(
+    state.buyJob,
+    'No buy job',
+    const Duration(hours: 1),
+  );
 
   // If we're currently at a market, record the prices and refuel.
   final maybeMarket = await visitLocalMarket(

@@ -46,12 +46,11 @@ extension ShipyardShipUtils on ShipyardShip {
 
   /// Returns the ShipSpec for the ship.
   ShipSpec get shipSpec => ShipSpec(
-        cargoCapacity: cargoCapacity,
-        fuelCapacity: frame.fuelCapacity,
-        speed: engine.speed,
-        canWarp:
-            modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
-      );
+    cargoCapacity: cargoCapacity,
+    fuelCapacity: frame.fuelCapacity,
+    speed: engine.speed,
+    canWarp: modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
+  );
 
   /// Compute the current crew of the ship.
   int get currentCrew {
@@ -176,9 +175,7 @@ extension MarketUtils on Market {
   /// Returns the all trade goods for the market.
   /// Unknown if there can be duplicates or not.
   Iterable<TradeGood> get listedTradeGoods =>
-      imports.followedBy(exports).followedBy(
-            exchange,
-          );
+      imports.followedBy(exports).followedBy(exchange);
 
   /// Returns [MarketTradeGood] for the given trade symbol or null if the market
   /// doesn't trade that good.

@@ -36,8 +36,9 @@ Future<Market?> visitLocalMarket(
     getNow: getNow,
   );
   if (ship.usesFuel) {
-    final medianFuelPurchasePrice =
-        await db.medianMarketPurchasePrice(TradeSymbol.FUEL);
+    final medianFuelPurchasePrice = await db.medianMarketPurchasePrice(
+      TradeSymbol.FUEL,
+    );
     try {
       await refuelIfNeededAndLog(
         api,

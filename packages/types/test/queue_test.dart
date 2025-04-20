@@ -12,9 +12,7 @@ void main() {
   test('QueuedResponse roundtrip', () {
     final request = QueuedResponse(
       body: 'foo',
-      headers: {
-        'Content-Type': 'text/plain',
-      },
+      headers: {'Content-Type': 'text/plain'},
       statusCode: 200,
     );
     final json = request.toJson();

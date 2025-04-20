@@ -73,13 +73,13 @@ class RouteAction {
 
   /// Create a new route action to refuel at a waypoint.
   const RouteAction.refuel(WaypointSymbol symbol)
-      : this(
-          startSymbol: symbol,
-          endSymbol: symbol,
-          type: RouteActionType.refuel,
-          seconds: 0,
-          fuelUsed: 0,
-        );
+    : this(
+        startSymbol: symbol,
+        endSymbol: symbol,
+        type: RouteActionType.refuel,
+        seconds: 0,
+        fuelUsed: 0,
+      );
 
   /// Create a new route action from JSON.
   factory RouteAction.fromJson(Map<String, dynamic> json) {
@@ -122,13 +122,13 @@ class RouteAction {
 
   /// Convert this action to JSON.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'startSymbol': startSymbol.toJson(),
-        'endSymbol': endSymbol.toJson(),
-        'type': type.name,
-        'seconds': seconds,
-        'fuelUsed': fuelUsed,
-        // 'cooldown': cooldown,
-      };
+    'startSymbol': startSymbol.toJson(),
+    'endSymbol': endSymbol.toJson(),
+    'type': type.name,
+    'seconds': seconds,
+    'fuelUsed': fuelUsed,
+    // 'cooldown': cooldown,
+  };
 
   @override
   String toString() {
@@ -151,25 +151,26 @@ class RoutePlan {
     required WaypointSymbol symbol,
     required this.fuelCapacity,
     required this.shipSpeed,
-  })  : actions = <RouteAction>[
-          RouteAction(
-            startSymbol: symbol,
-            endSymbol: symbol,
-            type: RouteActionType.emptyRoute,
-            seconds: 0,
-            fuelUsed: 0,
-          ),
-        ],
-        fuelUsed = 0;
+  }) : actions = <RouteAction>[
+         RouteAction(
+           startSymbol: symbol,
+           endSymbol: symbol,
+           type: RouteActionType.emptyRoute,
+           seconds: 0,
+           fuelUsed: 0,
+         ),
+       ],
+       fuelUsed = 0;
 
   /// Create a new route plan from JSON.
   factory RoutePlan.fromJson(Map<String, dynamic> json) {
     return RoutePlan(
       fuelCapacity: json['fuelCapacity'] as int,
       shipSpeed: json['shipSpeed'] as int,
-      actions: (json['actions'] as List<dynamic>)
-          .map((e) => RouteAction.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      actions:
+          (json['actions'] as List<dynamic>)
+              .map((e) => RouteAction.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -238,8 +239,8 @@ class RoutePlan {
 
   /// Convert this route plan to JSON.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'fuelCapacity': fuelCapacity,
-        'shipSpeed': shipSpeed,
-        'actions': actions.map((e) => e.toJson()).toList(),
-      };
+    'fuelCapacity': fuelCapacity,
+    'shipSpeed': shipSpeed,
+    'actions': actions.map((e) => e.toJson()).toList(),
+  };
 }

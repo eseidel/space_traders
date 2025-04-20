@@ -19,21 +19,22 @@ class ChartedValues {
     WaypointFaction? faction,
     Set<WaypointTraitSymbol>? traitSymbols,
     Chart? chart,
-  }) =>
-      ChartedValues(
-        faction: faction,
-        traitSymbols: traitSymbols ?? {},
-        chart: chart ?? Chart(),
-      );
+  }) => ChartedValues(
+    faction: faction,
+    traitSymbols: traitSymbols ?? {},
+    chart: chart ?? Chart(),
+  );
 
   /// Creates a new charted values from JSON data.
   factory ChartedValues.fromJson(Map<String, dynamic> json) {
-    final faction =
-        WaypointFaction.fromJson(json['faction'] as Map<String, dynamic>?);
-    final traitSymbols = (json['traitSymbols'] as List<dynamic>)
-        .cast<String>()
-        .map((e) => WaypointTraitSymbol.fromJson(e)!)
-        .toSet();
+    final faction = WaypointFaction.fromJson(
+      json['faction'] as Map<String, dynamic>?,
+    );
+    final traitSymbols =
+        (json['traitSymbols'] as List<dynamic>)
+            .cast<String>()
+            .map((e) => WaypointTraitSymbol.fromJson(e)!)
+            .toSet();
     final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
     return ChartedValues(
       faction: faction,
@@ -94,18 +95,19 @@ class ChartingRecord {
   /// Create a fallback value for mocking.
   @visibleForTesting
   ChartingRecord.fallbackValue()
-      : waypointSymbol = WaypointSymbol.fromString('W-A-Y'),
-        values = null,
-        timestamp = DateTime(0);
+    : waypointSymbol = WaypointSymbol.fromString('W-A-Y'),
+      values = null,
+      timestamp = DateTime(0);
 
   /// Creates a new charting record from JSON data.
   ChartingRecord.fromJson(Map<String, dynamic> json)
-      : values = ChartedValues.fromJsonOrNull(
-          json['values'] as Map<String, dynamic>?,
-        ),
-        waypointSymbol =
-            WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-        timestamp = DateTime.parse(json['timestamp'] as String);
+    : values = ChartedValues.fromJsonOrNull(
+        json['values'] as Map<String, dynamic>?,
+      ),
+      waypointSymbol = WaypointSymbol.fromJson(
+        json['waypointSymbol'] as String,
+      ),
+      timestamp = DateTime.parse(json['timestamp'] as String);
 
   /// Symbol for this waypoint.
   final WaypointSymbol waypointSymbol;
@@ -121,8 +123,8 @@ class ChartingRecord {
 
   /// Converts this charting record to JSON data.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'values': values?.toJson(),
-        'waypointSymbol': waypointSymbol.toJson(),
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'values': values?.toJson(),
+    'waypointSymbol': waypointSymbol.toJson(),
+    'timestamp': timestamp.toIso8601String(),
+  };
 }

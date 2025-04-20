@@ -33,11 +33,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     for (final ship in squad.ships) {
       final type = guessShipType(shipyardShipCache, ship)!;
       final typeName = type.value.substring('SHIP_'.length);
-      final cargoStatus = ship.cargo.capacity == 0
-          ? ''
-          : '${ship.cargo.units}/${ship.cargo.capacity}';
-      logger.info('  ${ship.symbol.hexNumber.padLeft(2)} $typeName '
-          '${ship.nav.waypointSymbolObject} $cargoStatus');
+      final cargoStatus =
+          ship.cargo.capacity == 0
+              ? ''
+              : '${ship.cargo.units}/${ship.cargo.capacity}';
+      logger.info(
+        '  ${ship.symbol.hexNumber.padLeft(2)} $typeName '
+        '${ship.nav.waypointSymbolObject} $cargoStatus',
+      );
     }
   }
 }

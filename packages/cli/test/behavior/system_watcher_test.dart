@@ -41,8 +41,9 @@ void main() {
       type: WaypointType.ARTIFICIAL_GRAVITY_WELL,
       position: WaypointPosition(0, 0, waypointSymbol.system),
     );
-    when(() => caches.systems.waypoint(waypointSymbol))
-        .thenReturn(systemWaypoint);
+    when(
+      () => caches.systems.waypoint(waypointSymbol),
+    ).thenReturn(systemWaypoint);
 
     final system = System.test(waypointSymbol.system);
     when(() => caches.systems[waypointSymbol.system]).thenReturn(system);
@@ -71,16 +72,20 @@ void main() {
     when(() => ship.fuel).thenReturn(shipFuel);
 
     registerFallbackValue(waypointSymbol);
-    when(() => caches.waypoints.waypoint(any()))
-        .thenAnswer((_) => Future.value(waypoint));
+    when(
+      () => caches.waypoints.waypoint(any()),
+    ).thenAnswer((_) => Future.value(waypoint));
 
-    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.hasShipyard(waypointSymbol))
-        .thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(waypointSymbol),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasShipyard(waypointSymbol),
+    ).thenAnswer((_) async => false);
 
-    when(() => centralCommand.maxPriceAgeForSystem(waypointSymbol.system))
-        .thenReturn(const Duration(days: 3));
+    when(
+      () => centralCommand.maxPriceAgeForSystem(waypointSymbol.system),
+    ).thenReturn(const Duration(days: 3));
     when(
       () => centralCommand.shortenMaxPriceAgeForSystem(waypointSymbol.system),
     ).thenReturn(const Duration(days: 1));
@@ -94,11 +99,13 @@ void main() {
         shipSymbol,
       ),
     ).thenReturn([]);
-    when(() => centralCommand.assignedSystemForSatellite(ship))
-        .thenReturn(waypointSymbol.system);
-    final state = BehaviorState(shipSymbol, Behavior.charter)
-      ..systemWatcherJob =
-          SystemWatcherJob(systemSymbol: waypointSymbol.system);
+    when(
+      () => centralCommand.assignedSystemForSatellite(ship),
+    ).thenReturn(waypointSymbol.system);
+    final state = BehaviorState(
+      shipSymbol,
+      Behavior.charter,
+    )..systemWatcherJob = SystemWatcherJob(systemSymbol: waypointSymbol.system);
 
     registerFallbackValue(waypoint);
 

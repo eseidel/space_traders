@@ -14,8 +14,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final lookback = Duration(minutes: lookbackMinutes);
 
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = (await db.transactionsAfter(startTime))
-      .where((t) => t.shipSymbol == shipSymbol);
+  final transactions = (await db.transactionsAfter(
+    startTime,
+  )).where((t) => t.shipSymbol == shipSymbol);
   for (final transaction in transactions) {
     logger.info(describeTransaction(transaction));
   }

@@ -15,8 +15,7 @@ List<Value> _loadJsonNullable<Value>(
   String path,
   // This is nullable because OpenApi's fromJson are nullable.
   Value? Function(dynamic) valueFromJson,
-) =>
-    _loadJson(fs, path, (json) => valueFromJson(json)!);
+) => _loadJson(fs, path, (json) => valueFromJson(json)!);
 
 List<Value> _loadJson<Value>(
   FileSystem fs,
@@ -347,20 +346,12 @@ class TradeExportCache extends StaticCache<TradeSymbol, TradeExport> {
 class EventCache
     extends StaticCache<ShipConditionEventSymbolEnum, ShipConditionEvent> {
   /// Creates a new waypoint trait cache.
-  EventCache(
-    super.events, {
-    required super.fs,
-    super.path = defaultPath,
-  });
+  EventCache(super.events, {required super.fs, super.path = defaultPath});
 
   /// Load event cache from disk.
   factory EventCache.load(FileSystem fs, {String path = defaultPath}) =>
       EventCache(
-        _loadJsonNullable(
-          fs,
-          path,
-          ShipConditionEvent.fromJson,
-        ),
+        _loadJsonNullable(fs, path, ShipConditionEvent.fromJson),
         fs: fs,
         path: path,
       );
@@ -369,24 +360,15 @@ class EventCache
   static const defaultPath = 'static_data/events.json';
 
   @override
-  ShipConditionEvent copyAndNormalize(
-    ShipConditionEvent record,
-  ) =>
-      ShipConditionEvent.fromJson(
-        jsonDecode(jsonEncode(record)),
-      )!;
+  ShipConditionEvent copyAndNormalize(ShipConditionEvent record) =>
+      ShipConditionEvent.fromJson(jsonDecode(jsonEncode(record)))!;
 
   @override
-  int compare(
-    ShipConditionEvent a,
-    ShipConditionEvent b,
-  ) =>
+  int compare(ShipConditionEvent a, ShipConditionEvent b) =>
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  ShipConditionEventSymbolEnum keyFor(
-    ShipConditionEvent record,
-  ) =>
+  ShipConditionEventSymbolEnum keyFor(ShipConditionEvent record) =>
       record.symbol;
 }
 

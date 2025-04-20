@@ -19,9 +19,7 @@ class DataTableExampleApp extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: [
               const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
+                decoration: BoxDecoration(color: Colors.blue),
                 child: Text('Drawer Header'),
               ),
               ListTile(

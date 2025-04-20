@@ -32,9 +32,7 @@ class BuyOpp extends Equatable {
 
   /// Convert to JSON.
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'marketPrice': marketPrice.toJson(),
-    };
+    return <String, dynamic>{'marketPrice': marketPrice.toJson()};
   }
 }
 
@@ -42,14 +40,12 @@ class BuyOpp extends Equatable {
 @immutable
 class SellOpp extends Equatable {
   /// Create a new SellOpp from a MarketPrice.
-  SellOpp.fromMarketPrice(
-    MarketPrice this.marketPrice, {
-    this.isFeeder = false,
-  })  : waypointSymbol = marketPrice.waypointSymbol,
-        tradeSymbol = marketPrice.tradeSymbol,
-        price = marketPrice.sellPrice,
-        contractId = null,
-        maxUnits = null;
+  SellOpp.fromMarketPrice(MarketPrice this.marketPrice, {this.isFeeder = false})
+    : waypointSymbol = marketPrice.waypointSymbol,
+      tradeSymbol = marketPrice.tradeSymbol,
+      price = marketPrice.sellPrice,
+      contractId = null,
+      maxUnits = null;
 
   /// Create a new SellOpp from a contract.
   const SellOpp.fromContract({
@@ -58,8 +54,8 @@ class SellOpp extends Equatable {
     required this.price,
     required this.contractId,
     required this.maxUnits,
-  })  : marketPrice = null,
-        isFeeder = false;
+  }) : marketPrice = null,
+       isFeeder = false;
 
   /// Create a new SellOpp from a construction.
   const SellOpp.fromConstruction({
@@ -67,23 +63,23 @@ class SellOpp extends Equatable {
     required this.tradeSymbol,
     required this.price,
     required this.maxUnits,
-  })  : marketPrice = null,
-        contractId = null,
-        isFeeder = false;
+  }) : marketPrice = null,
+       contractId = null,
+       isFeeder = false;
 
   /// Create a new SellOpp from JSON.
   SellOpp.fromJson(Map<String, dynamic> json)
-      : marketPrice = MarketPrice.fromJsonOrNull(
-          json['marketPrice'] as Map<String, dynamic>?,
-        ),
-        waypointSymbol = WaypointSymbol.fromJson(
-          json['waypointSymbol'] as String,
-        ),
-        tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
-        price = json['price'] as int,
-        contractId = json['contractId'] as String?,
-        maxUnits = json['maxUnits'] as int?,
-        isFeeder = json['isFeeder'] as bool? ?? false;
+    : marketPrice = MarketPrice.fromJsonOrNull(
+        json['marketPrice'] as Map<String, dynamic>?,
+      ),
+      waypointSymbol = WaypointSymbol.fromJson(
+        json['waypointSymbol'] as String,
+      ),
+      tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
+      price = json['price'] as int,
+      contractId = json['contractId'] as String?,
+      maxUnits = json['maxUnits'] as int?,
+      isFeeder = json['isFeeder'] as bool? ?? false;
 
   /// State of the market where this sell opportunity was found.
   final MarketPrice? marketPrice;
@@ -110,14 +106,14 @@ class SellOpp extends Equatable {
 
   @override
   List<Object?> get props => [
-        marketPrice,
-        waypointSymbol,
-        tradeSymbol,
-        price,
-        contractId,
-        maxUnits,
-        isFeeder,
-      ];
+    marketPrice,
+    waypointSymbol,
+    tradeSymbol,
+    price,
+    contractId,
+    maxUnits,
+    isFeeder,
+  ];
 
   /// True if this is a contract delivery.
   bool get isContractDelivery => contractId != null;

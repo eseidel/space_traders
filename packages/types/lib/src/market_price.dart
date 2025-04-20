@@ -24,17 +24,16 @@ class MarketPrice extends PriceBase<TradeSymbol> {
     MarketTradeGood good,
     WaypointSymbol waypointSymbol,
     DateTime timestamp,
-  ) =>
-      MarketPrice(
-        waypointSymbol: waypointSymbol,
-        symbol: good.symbol,
-        supply: good.supply,
-        purchasePrice: good.purchasePrice,
-        sellPrice: good.sellPrice,
-        tradeVolume: good.tradeVolume,
-        timestamp: timestamp,
-        activity: good.activity,
-      );
+  ) => MarketPrice(
+    waypointSymbol: waypointSymbol,
+    symbol: good.symbol,
+    supply: good.supply,
+    purchasePrice: good.purchasePrice,
+    sellPrice: good.sellPrice,
+    tradeVolume: good.tradeVolume,
+    timestamp: timestamp,
+    activity: good.activity,
+  );
 
   /// Create a new price record from a json map.
   factory MarketPrice.fromJson(Map<String, dynamic> json) {
@@ -85,27 +84,27 @@ class MarketPrice extends PriceBase<TradeSymbol> {
 
   /// Used for creating a new price record with a different sell price.
   MarketPrice copyWith({required int sellPrice}) => MarketPrice(
-        waypointSymbol: waypointSymbol,
-        symbol: symbol,
-        supply: supply,
-        purchasePrice: purchasePrice,
-        sellPrice: sellPrice,
-        tradeVolume: tradeVolume,
-        timestamp: timestamp,
-        activity: activity,
-      );
+    waypointSymbol: waypointSymbol,
+    symbol: symbol,
+    supply: supply,
+    purchasePrice: purchasePrice,
+    sellPrice: sellPrice,
+    tradeVolume: tradeVolume,
+    timestamp: timestamp,
+    activity: activity,
+  );
 
   @override
   List<Object?> get props => [
-        waypointSymbol,
-        symbol,
-        supply,
-        purchasePrice,
-        sellPrice,
-        tradeVolume,
-        timestamp,
-        activity,
-      ];
+    waypointSymbol,
+    symbol,
+    supply,
+    purchasePrice,
+    sellPrice,
+    tradeVolume,
+    timestamp,
+    activity,
+  ];
 
   /// The symbol of the trade good.
   TradeSymbol get tradeSymbol => symbol;

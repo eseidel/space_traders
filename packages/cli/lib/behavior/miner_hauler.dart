@@ -39,8 +39,9 @@ Future<JobResult> goWaitForGoods(
     const Duration(minutes: 1),
   );
   final currentSellsFuel = await _sellsFuel(db, ship.waypointSymbol);
-  final medianFuelPurchasePrice =
-      await db.medianMarketPurchasePrice(TradeSymbol.FUEL);
+  final medianFuelPurchasePrice = await db.medianMarketPurchasePrice(
+    TradeSymbol.FUEL,
+  );
 
   if (ship.waypointSymbol != mineSymbol) {
     final mineSellsFuel = await _sellsFuel(db, mineSymbol);
@@ -101,10 +102,11 @@ Future<JobResult> goWaitForGoods(
 }
 
 /// Advance the miner hauler.
-final advanceMinerHauler = const MultiJob('MinerHauler', [
-  emptyCargoIfNeededForMining,
-  goWaitForGoods,
-  // TODO(eseidel): travelAndSellCargo is likely wrong, it includes
-  // miner-specific logic like checking the reactor cooldown.
-  travelAndSellCargo,
-]).run;
+final advanceMinerHauler =
+    const MultiJob('MinerHauler', [
+      emptyCargoIfNeededForMining,
+      goWaitForGoods,
+      // TODO(eseidel): travelAndSellCargo is likely wrong, it includes
+      // miner-specific logic like checking the reactor cooldown.
+      travelAndSellCargo,
+    ]).run;

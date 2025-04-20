@@ -48,9 +48,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       );
     }
     final record = chartingSnapshot[waypointSymbol];
-    logger.info('$waypointSymbol: $waypointType '
-        '$tradeSymbolsString ${record?.values?.traitSymbols} '
-        '(${stats.count})');
+    logger.info(
+      '$waypointSymbol: $waypointType '
+      '$tradeSymbolsString ${record?.values?.traitSymbols} '
+      '(${stats.count})',
+    );
   }
 }
 

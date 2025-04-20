@@ -32,9 +32,7 @@ class Request {
 const minerNavRoundTrip = Duration(minutes: 2);
 
 Duration half(Duration duration) {
-  return Duration(
-    microseconds: duration.inMicroseconds ~/ 2,
-  );
+  return Duration(microseconds: duration.inMicroseconds ~/ 2);
 }
 
 List<Request> routeToRequests(RoutePlan plan) {
@@ -163,8 +161,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipMounts = ShipMountCache.load(fs);
 
   final hqSystem = await myHqSystemSymbol(db);
-  final hqMine =
-      systemsCache.waypointsInSystem(hqSystem).firstWhere((w) => w.isAsteroid);
+  final hqMine = systemsCache
+      .waypointsInSystem(hqSystem)
+      .firstWhere((w) => w.isAsteroid);
   const tradeSymbol = TradeSymbol.DIAMONDS;
   const haulerType = ShipType.LIGHT_HAULER;
   final unitsPerHaulerCycle = shipyardShips.capacityForShipType(haulerType)!;
@@ -172,8 +171,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const surveyorType = ShipType.SURVEYOR;
   final surveyorDefaultMounts = kOreHoundDefault.mounts;
   final surveyorMounts = kSurveyOnlyTemplate.mounts;
-  final surveysPerCycle =
-      surveysExpectedPerSurveyWithMounts(shipMounts, surveyorMounts);
+  final surveysPerCycle = surveysExpectedPerSurveyWithMounts(
+    shipMounts,
+    surveyorMounts,
+  );
 
   const minerType = ShipType.MINING_DRONE;
   final minerDefaultMounts = kOreHoundDefault.mounts;
@@ -200,10 +201,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final miner = minerTransfer;
   final surveyor = [survey];
 
-  final ship = shipyardShips.shipForTest(
-    haulerType,
-    origin: hqMine,
-  )!;
+  final ship = shipyardShips.shipForTest(haulerType, origin: hqMine)!;
   final trips = marketsTradingSortedByDistance(
     marketPrices,
     routePlanner,
@@ -229,7 +227,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final minerRequestsPerCycle = miner.length;
   logger.info('Miner cycle time: $minerCycleTime');
 
-  final minerRequestsPerMinute = minerRequestsPerCycle *
+  final minerRequestsPerMinute =
+      minerRequestsPerCycle *
       (const Duration(minutes: 1).inSeconds / minerCycleTime.inSeconds);
   final minerRequestsPerSecond = minerRequestsPerMinute / 60;
   logger.info('Miner requests per second: $minerRequestsPerSecond');
@@ -242,7 +241,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   logger.info('\nSurveyor cycle time: $surveyorCycleTime');
 
   final surveyorRequestsPerCycle = surveyor.length;
-  final surveyorRequestsPerMinute = surveyorRequestsPerCycle *
+  final surveyorRequestsPerMinute =
+      surveyorRequestsPerCycle *
       (const Duration(minutes: 1).inSeconds / surveyorCycleTime.inSeconds);
   final surveyorRequestsPerSecond = surveyorRequestsPerMinute / 60;
   logger.info('Surveyor requests per second: $surveyorRequestsPerSecond');
@@ -336,7 +336,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final surveyorPrice = shipPrice(shipyardPrices, surveyorType);
   logger.info('Surveyor price: ${creditsString(surveyorPrice)}');
 
-  final totalShipCost = minerPrice * minersNeeded +
+  final totalShipCost =
+      minerPrice * minersNeeded +
       haulerPrice * haulersNeeded +
       surveyorPrice * surveyorsNeeded;
   logger.info('Total ship cost: ${creditsString(totalShipCost)}');

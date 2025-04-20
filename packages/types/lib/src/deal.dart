@@ -3,10 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 /// Expected cost of fuel for a given number of tank units.
-int fuelUsedCost({
-  required int tankUnits,
-  required int costPerMarketFuelUnit,
-}) {
+int fuelUsedCost({required int tankUnits, required int costPerMarketFuelUnit}) {
   return (tankUnits / 100).ceil() * costPerMarketFuelUnit;
 }
 
@@ -16,14 +13,14 @@ int fuelUsedCost({
 class Deal extends Equatable {
   /// Create a new Deal from a source and destination.
   Deal({required this.source, required this.destination})
-      : assert(
-          source.waypointSymbol != destination.waypointSymbol,
-          'source and destination must be different',
-        ),
-        assert(
-          source.tradeSymbol == destination.tradeSymbol,
-          'source and destination must have the same tradeSymbol',
-        );
+    : assert(
+        source.waypointSymbol != destination.waypointSymbol,
+        'source and destination must be different',
+      ),
+      assert(
+        source.tradeSymbol == destination.tradeSymbol,
+        'source and destination must have the same tradeSymbol',
+      );
 
   /// Create a test deal.
   @visibleForTesting
@@ -68,8 +65,9 @@ class Deal extends Equatable {
   factory Deal.fromJson(Map<String, dynamic> json) {
     return Deal(
       source: BuyOpp.fromJson(json['source'] as Map<String, dynamic>),
-      destination:
-          SellOpp.fromJson(json['destination'] as Map<String, dynamic>),
+      destination: SellOpp.fromJson(
+        json['destination'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -123,9 +121,9 @@ class Deal extends Equatable {
 
   /// Encode the deal as JSON.
   Map<String, dynamic> toJson() => {
-        'source': source.toJson(),
-        'destination': destination.toJson(),
-      };
+    'source': source.toJson(),
+    'destination': destination.toJson(),
+  };
 }
 
 /// A deal between two markets which considers flight cost and time.
@@ -142,21 +140,22 @@ class CostedDeal {
     required this.cargoSize,
     required this.costPerFuelUnit,
     required this.costPerAntimatterUnit,
-  })  : transactions = List.unmodifiable(transactions),
-        assert(cargoSize > 0, 'cargoSize must be > 0');
+  }) : transactions = List.unmodifiable(transactions),
+       assert(cargoSize > 0, 'cargoSize must be > 0');
 
   /// Create a CostedDeal from JSON.
   factory CostedDeal.fromJson(Map<String, dynamic> json) => CostedDeal(
-        deal: Deal.fromJson(json['deal'] as Map<String, dynamic>),
-        cargoSize: json['cargoSize'] as int? ?? json['tradeVolume'] as int,
-        startTime: DateTime.parse(json['startTime'] as String),
-        route: RoutePlan.fromJson(json['route'] as Map<String, dynamic>),
-        transactions: (json['transactions'] as List<dynamic>)
+    deal: Deal.fromJson(json['deal'] as Map<String, dynamic>),
+    cargoSize: json['cargoSize'] as int? ?? json['tradeVolume'] as int,
+    startTime: DateTime.parse(json['startTime'] as String),
+    route: RoutePlan.fromJson(json['route'] as Map<String, dynamic>),
+    transactions:
+        (json['transactions'] as List<dynamic>)
             .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
             .toList(),
-        costPerFuelUnit: json['costPerFuelUnit'] as int,
-        costPerAntimatterUnit: json['costPerAntimatterUnit'] as int,
-      );
+    costPerFuelUnit: json['costPerFuelUnit'] as int,
+    costPerAntimatterUnit: json['costPerAntimatterUnit'] as int,
+  );
 
   /// Create a CostedDeal from JSON or null.
   static CostedDeal? fromJsonOrNull(Map<String, dynamic>? json) =>
@@ -192,9 +191,9 @@ class CostedDeal {
 
   /// The cost of fuel to travel along the route.
   int get expectedFuelCost => fuelUsedCost(
-        tankUnits: expectedFuelUsed,
-        costPerMarketFuelUnit: costPerFuelUnit,
-      );
+    tankUnits: expectedFuelUsed,
+    costPerMarketFuelUnit: costPerFuelUnit,
+  );
 
   /// The units of antimatter to travel along the route.
   int get expectedAntimatterUsed => route.antimatterUsed;
@@ -224,16 +223,16 @@ class CostedDeal {
 
   /// Convert this CostedDeal to JSON.
   Map<String, dynamic> toJson() => {
-        'deal': deal.toJson(),
-        'expectedFuelCost': expectedFuelCost,
-        'cargoSize': cargoSize,
-        'contractId': contractId,
-        'transactions': transactions.map((e) => e.toJson()).toList(),
-        'startTime': startTime.toUtc().toIso8601String(),
-        'route': route.toJson(),
-        'costPerFuelUnit': costPerFuelUnit,
-        'costPerAntimatterUnit': costPerAntimatterUnit,
-      };
+    'deal': deal.toJson(),
+    'expectedFuelCost': expectedFuelCost,
+    'cargoSize': cargoSize,
+    'contractId': contractId,
+    'transactions': transactions.map((e) => e.toJson()).toList(),
+    'startTime': startTime.toUtc().toIso8601String(),
+    'route': route.toJson(),
+    'costPerFuelUnit': costPerFuelUnit,
+    'costPerAntimatterUnit': costPerAntimatterUnit,
+  };
 
   /// Return a new CostedDeal with the given transactions added.
   CostedDeal byAddingTransactions(List<Transaction> transactions) {

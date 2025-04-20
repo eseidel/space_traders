@@ -23,10 +23,7 @@ final _siphonable = <TradeSymbol>{
   TradeSymbol.LIQUID_NITROGEN,
 };
 
-final _extractable = <TradeSymbol>{
-  ..._minable,
-  ..._siphonable,
-};
+final _extractable = <TradeSymbol>{..._minable, ..._siphonable};
 
 /// A visitor for supply chain nodes.
 abstract class SupplyLinkVisitor {
@@ -128,8 +125,10 @@ bool? _hasExtractableGood(
   if (chartedValues == null) {
     return null;
   }
-  return extractableGoodsAt(waypoint.type, chartedValues.traitSymbols)
-      .contains(tradeSymbol);
+  return extractableGoodsAt(
+    waypoint.type,
+    chartedValues.traitSymbols,
+  ).contains(tradeSymbol);
 }
 
 WaypointSymbol? _nearestExtractionSiteFor(
@@ -142,11 +141,8 @@ WaypointSymbol? _nearestExtractionSiteFor(
   final candidates = systemsCache
       .waypointsInSystem(waypointSymbol.system)
       .where(
-        (waypoint) => _hasExtractableGood(
-          chartingSnapshot,
-          waypoint,
-          tradeSymbol,
-        )!,
+        (waypoint) =>
+            _hasExtractableGood(chartingSnapshot, waypoint, tradeSymbol)!,
       )
       .sortedBy<num>((w) => w.distanceTo(destination));
   return candidates.firstOrNull?.symbol;
@@ -180,10 +176,10 @@ class SupplyChainBuilder {
     required MarketListingSnapshot marketListings,
     required TradeExportCache exports,
     required ChartingSnapshot charting,
-  })  : _marketListings = marketListings,
-        _systems = systems,
-        _exports = exports,
-        _charting = charting;
+  }) : _marketListings = marketListings,
+       _systems = systems,
+       _exports = exports,
+       _charting = charting;
 
   final MarketListingSnapshot _marketListings;
   final SystemsCache _systems;

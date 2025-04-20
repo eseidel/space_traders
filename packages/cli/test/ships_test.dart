@@ -31,9 +31,7 @@ void main() {
 
   test('shipFrameFromType', () {
     // We haven't come across this type yet, once we do, remove this.
-    final expectedNullTypes = [
-      ShipType.BULK_FREIGHTER,
-    ];
+    final expectedNullTypes = [ShipType.BULK_FREIGHTER];
     for (final type in ShipType.values) {
       final frame = shipyardShips.shipFrameFromType(type);
       final matcher = expectedNullTypes.contains(type) ? isNull : isNotNull;

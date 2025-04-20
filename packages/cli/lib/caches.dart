@@ -130,8 +130,10 @@ class Caches {
     final markets = MarketCache(db, api, static.tradeGoods);
     final jumpGates = await JumpGateSnapshot.load(db);
     final constructionSnapshot = await ConstructionSnapshot.load(db);
-    final systemConnectivity =
-        SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);
+    final systemConnectivity = SystemConnectivity.fromJumpGates(
+      jumpGates,
+      constructionSnapshot,
+    );
     // TODO(eseidel): Find a way to avoid fetching market listings here?
     final marketListings = await MarketListingSnapshot.load(db);
     final routePlanner = RoutePlanner.fromSystemsCache(
@@ -211,8 +213,8 @@ class TopOfLoopUpdater {
         current: await ContractSnapshot.load(db),
         server: await fetchContracts(db, api),
         // Use OpenAPI's toJson to restrict to only the fields the server sends.
-        toJsonList: (e) =>
-            e.contracts.map((e) => e.toOpenApi().toJson()).toList(),
+        toJsonList:
+            (e) => e.contracts.map((e) => e.toOpenApi().toJson()).toList(),
       );
       _checkForChanges(
         current: await ShipSnapshot.load(db)
@@ -220,8 +222,8 @@ class TopOfLoopUpdater {
         server: await fetchShips(db, api),
         // Ignore the cooldown field, since even with updateForServerTime, it's
         // hard to exactly match the server.
-        toJsonList: (e) =>
-            e.ships.map((e) => e.toJson()..['cooldown'] = null).toList(),
+        toJsonList:
+            (e) => e.ships.map((e) => e.toJson()..['cooldown'] = null).toList(),
       );
       // caches.agent should be deleted.
       await caches.agent.updateAgent(

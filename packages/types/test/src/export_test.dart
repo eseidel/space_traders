@@ -5,10 +5,7 @@ void main() {
   test('TradeExport round trip', () {
     const export = TradeExport(
       export: TradeSymbol.ADVANCED_CIRCUITRY,
-      imports: [
-        TradeSymbol.COPPER,
-        TradeSymbol.ELECTRONICS,
-      ],
+      imports: [TradeSymbol.COPPER, TradeSymbol.ELECTRONICS],
     );
     final json = export.toJson();
     final export2 = TradeExport.fromJson(json);

@@ -70,13 +70,7 @@ void main() {
     final agentCache = AgentCache(agent1, db);
     final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
     const shipType = ShipType.PROBE;
-    await purchaseShip(
-      db,
-      api,
-      agentCache,
-      shipyardSymbol,
-      shipType,
-    );
+    await purchaseShip(db, api, agentCache, shipyardSymbol, shipType);
     registerFallbackValue(Ship.fallbackValue());
     verify(() => db.upsertShip(any())).called(1);
     expect(agentCache.agent, agent2);
@@ -89,10 +83,7 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
     final fuel = ShipFuel(current: 100, capacity: 200);
-    final responseData = PatchShipNav200ResponseData(
-      nav: shipNav,
-      fuel: fuel,
-    );
+    final responseData = PatchShipNav200ResponseData(nav: shipNav, fuel: fuel);
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol);
@@ -192,10 +183,7 @@ void main() {
     final systemsCache = _MockSystemsCache();
 
     final patchResponse = PatchShipNav200Response(
-      data: PatchShipNav200ResponseData(
-        nav: shipNav,
-        fuel: shipFuel,
-      ),
+      data: PatchShipNav200ResponseData(nav: shipNav, fuel: shipFuel),
     );
 
     when(
@@ -454,8 +442,9 @@ void main() {
     verify(
       () => fleetApi.patchShipNav(
         shipSymbol.symbol,
-        patchShipNavRequest:
-            PatchShipNavRequest(flightMode: ShipNavFlightMode.CRUISE),
+        patchShipNavRequest: PatchShipNavRequest(
+          flightMode: ShipNavFlightMode.CRUISE,
+        ),
       ),
     ).called(1);
 
@@ -491,9 +480,7 @@ void main() {
     // It does refuel if our recent trip data is missing
     clearInteractions(fleetApi);
     when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
-    when(() => ship.fuel).thenReturn(
-      ShipFuel(capacity: 1000, current: 501),
-    );
+    when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 501));
     await runWithLogger(
       logger,
       () => refuelIfNeededAndLog(
@@ -514,10 +501,7 @@ void main() {
       ShipFuel(
         capacity: 1000,
         current: 501,
-        consumed: ShipFuelConsumed(
-          amount: 300,
-          timestamp: DateTime(2021),
-        ),
+        consumed: ShipFuelConsumed(amount: 300, timestamp: DateTime(2021)),
       ),
     );
     await runWithLogger(
@@ -540,10 +524,7 @@ void main() {
       ShipFuel(
         capacity: 1000,
         current: 499,
-        consumed: ShipFuelConsumed(
-          amount: 100,
-          timestamp: DateTime(2021),
-        ),
+        consumed: ShipFuelConsumed(amount: 100, timestamp: DateTime(2021)),
       ),
     );
     await runWithLogger(
@@ -715,8 +696,10 @@ void main() {
     when(
       () => fleetApi.jettison(
         shipSymbol.symbol,
-        jettisonRequest:
-            JettisonRequest(symbol: itemOne.tradeSymbol, units: itemOne.units),
+        jettisonRequest: JettisonRequest(
+          symbol: itemOne.tradeSymbol,
+          units: itemOne.units,
+        ),
       ),
     ).thenAnswer(
       (invocation) => Future.value(
@@ -792,11 +775,12 @@ void main() {
 
     // Waypoint already charted exceptions are caught and logged.
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
-      (invocation) => throw ApiException(
-        400,
-        '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E" '
-        ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
-      ),
+      (invocation) =>
+          throw ApiException(
+            400,
+            '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E" '
+            ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
+          ),
     );
     await runWithLogger(logger, () async {
       await chartWaypointAndLog(
@@ -808,15 +792,13 @@ void main() {
       );
     });
     verify(
-      () => logger.warn(
-        '🛸#1  command   A-W was already charted',
-      ),
+      () => logger.warn('🛸#1  command   A-W was already charted'),
     ).called(1);
 
     // Any other exception is thrown.
-    when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
-      (invocation) => throw ApiException(401, 'other exception'),
-    );
+    when(
+      () => fleetApi.createChart(shipSymbol.symbol),
+    ).thenAnswer((invocation) => throw ApiException(401, 'other exception'));
     expect(
       () => runWithLogger(logger, () async {
         await chartWaypointAndLog(
@@ -857,9 +839,7 @@ void main() {
 
     final logger = _MockLogger();
 
-    when(
-      () => contractsApi.acceptContract(any()),
-    ).thenAnswer(
+    when(() => contractsApi.acceptContract(any())).thenAnswer(
       (invocation) => Future.value(
         AcceptContract200Response(
           data: AcceptContract200ResponseData(
@@ -875,13 +855,7 @@ void main() {
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
-      await acceptContractAndLog(
-        api,
-        db,
-        agentCache,
-        ship,
-        contract,
-      );
+      await acceptContractAndLog(api, db, agentCache, ship, contract);
     });
     verify(() => contractsApi.acceptContract(any())).called(1);
   });

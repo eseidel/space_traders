@@ -33,19 +33,29 @@ Future<void> advanceShips(
   TopOfLoopUpdater updater, {
   bool Function(Ship ship)? shipFilter,
 }) async {
-  await expectTime(api.requestCounts, db.queryCounts, 'central planning',
-      const Duration(seconds: 1), () async {
-    await centralCommand.advanceCentralPlanning(db, api, caches);
-  });
+  await expectTime(
+    api.requestCounts,
+    db.queryCounts,
+    'central planning',
+    const Duration(seconds: 1),
+    () async {
+      await centralCommand.advanceCentralPlanning(db, api, caches);
+    },
+  );
 
   const allowableScheduleLag = Duration(milliseconds: 1000);
 
   // loop over all ships and advance them.
   for (var i = 0; i < config.centralPlanningInterval; i++) {
-    await expectTime(api.requestCounts, db.queryCounts, 'top of loop',
-        const Duration(milliseconds: 500), () async {
-      await updater.updateAtTopOfLoop(caches, db, api);
-    });
+    await expectTime(
+      api.requestCounts,
+      db.queryCounts,
+      'top of loop',
+      const Duration(milliseconds: 500),
+      () async {
+        await updater.updateAtTopOfLoop(caches, db, api);
+      },
+    );
 
     // Make sure we check every time in case a ship was added.
     // TODO(eseidel): This should no longer be needed!
@@ -78,13 +88,8 @@ Future<void> advanceShips(
       final nextWaitUntil = await captureTimeAndRequests(
         api.requestCounts,
         db.queryCounts,
-        () async => await advanceShipBehavior(
-          api,
-          db,
-          centralCommand,
-          caches,
-          ship,
-        ),
+        () async =>
+            await advanceShipBehavior(api, db, centralCommand, caches, ship),
         onComplete: (duration, requestCount, queryCounts) async {
           final behaviorState = await db.behaviorStateBySymbol(shipSymbol);
           final expectedSeconds =
@@ -125,8 +130,9 @@ Future<void> advanceShips(
   }
 
   // Print a warning about any ships that have been waiting too long.
-  final oneMinuteAgo =
-      DateTime.timestamp().subtract(const Duration(minutes: 1));
+  final oneMinuteAgo = DateTime.timestamp().subtract(
+    const Duration(minutes: 1),
+  );
   final starvedShips = waiter.starvedShips(oneMinuteAgo);
   if (starvedShips.isNotEmpty) {
     logger.warn('⚠️  ${starvedShips.length} starved ships: $starvedShips');
@@ -137,8 +143,8 @@ Future<void> advanceShips(
 class RateLimitTracker {
   /// Construct a rate limit tracker.
   RateLimitTracker(Api api, {this.printEvery = const Duration(minutes: 2)})
-      : _api = api,
-        _lastPrintTime = DateTime.timestamp() {
+    : _api = api,
+      _lastPrintTime = DateTime.timestamp() {
     _lastRequestCount = _api.requestCounts.total;
   }
 
@@ -183,12 +189,12 @@ Future<Never> logic(
   bool Function(Ship ship)? shipFilter,
 }) async {
   final ships = await ShipSnapshot.load(db);
-  final waiter = ShipWaiter()
-    ..scheduleMissingShips(
-      ships.ships,
-      suppressWarnings: true,
-      shipFilter: shipFilter,
-    );
+  final waiter =
+      ShipWaiter()..scheduleMissingShips(
+        ships.ships,
+        suppressWarnings: true,
+        shipFilter: shipFilter,
+      );
   final rateLimitTracker = RateLimitTracker(api);
   final updater = TopOfLoopUpdater();
 

@@ -11,9 +11,7 @@ void main() {
       WaypointSymbol.fromString('S-E-P'),
       type: WaypointType.PLANET,
     );
-    final asteroid = SystemWaypoint.test(
-      WaypointSymbol.fromString('S-E-A'),
-    );
+    final asteroid = SystemWaypoint.test(WaypointSymbol.fromString('S-E-A'));
     expect(jumpGate.isType(WaypointType.JUMP_GATE), isTrue);
     expect(jumpGate.isJumpGate, isTrue);
     expect(jumpGate.isType(WaypointType.PLANET), isFalse);
@@ -22,11 +20,7 @@ void main() {
 
     final system = System.test(
       SystemSymbol.fromString('S-E'),
-      waypoints: [
-        jumpGate,
-        planet,
-        asteroid,
-      ],
+      waypoints: [jumpGate, planet, asteroid],
     );
     expect(system.jumpGateWaypoints.first, jumpGate);
   });

@@ -23,8 +23,10 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final jumpGates = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   // Can't use loadSystemConnectivity because need constructionSnapshot later.
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGates, constructionSnapshot);
+  final systemConnectivity = SystemConnectivity.fromJumpGates(
+    jumpGates,
+    constructionSnapshot,
+  );
   final routePlanner = RoutePlanner.fromSystemsCache(
     systemsCache,
     systemConnectivity,
@@ -36,9 +38,10 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final contractSnapshot = await ContractSnapshot.load(db);
   final centralCommand = CentralCommand();
 
-  final startWaypoint = maybeStart == null
-      ? agentCache!.headquarters(systemsCache)
-      : systemsCache.waypoint(maybeStart);
+  final startWaypoint =
+      maybeStart == null
+          ? agentCache!.headquarters(systemsCache)
+          : systemsCache.waypoint(maybeStart);
 
   final construction = await centralCommand.computeActiveConstruction(
     db,
@@ -51,8 +54,8 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final charting = await ChartingSnapshot.load(db);
 
   if (construction != null) {
-    centralCommand.subsidizedSellOpps =
-        await computeConstructionMaterialSubsidies(
+    centralCommand
+        .subsidizedSellOpps = await computeConstructionMaterialSubsidies(
       db,
       systemsCache,
       exportCache,
@@ -67,11 +70,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
     extraSellOpps.addAll(
-      centralCommand.contractSellOpps(
-        agentCache,
-        behaviors,
-        contractSnapshot,
-      ),
+      centralCommand.contractSellOpps(agentCache, behaviors, contractSnapshot),
     );
   }
   if (centralCommand.isConstructionTradingEnabled) {
@@ -88,32 +87,34 @@ Future<api.DealsNearbyResponse> dealsNearby({
     marketPrices,
     startSystem: startWaypoint.system,
   );
-  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
+  final costPerFuelUnit =
+      marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
       config.defaultFuelCost;
   final costPerAntimatterUnit =
       marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
-          config.defaultAntimatterCost;
+      config.defaultAntimatterCost;
 
   final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
-  final deals = findDealsFor(
-    systemsCache,
-    routePlanner,
-    marketScan,
-    maxTotalOutlay: credits,
-    shipSpec: shipSpec,
-    startSymbol: startWaypoint.symbol,
-    extraSellOpps: extraSellOpps,
-    costPerAntimatterUnit: costPerAntimatterUnit,
-    costPerFuelUnit: costPerFuelUnit,
-  )
-      .take(limit)
-      .map(
-        (CostedDeal costed) => api.NearbyDeal(
-          costed: costed,
-          inProgress: !dealNotInProgress(costed.deal),
-        ),
-      )
-      .toList();
+  final deals =
+      findDealsFor(
+            systemsCache,
+            routePlanner,
+            marketScan,
+            maxTotalOutlay: credits,
+            shipSpec: shipSpec,
+            startSymbol: startWaypoint.symbol,
+            extraSellOpps: extraSellOpps,
+            costPerAntimatterUnit: costPerAntimatterUnit,
+            costPerFuelUnit: costPerFuelUnit,
+          )
+          .take(limit)
+          .map(
+            (CostedDeal costed) => api.NearbyDeal(
+              costed: costed,
+              inProgress: !dealNotInProgress(costed.deal),
+            ),
+          )
+          .toList();
   return api.DealsNearbyResponse(
     deals: deals,
     shipType: shipType,
@@ -134,11 +135,12 @@ Future<Response> onRequest(RequestContext context) async {
   } on Exception catch (e) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
-      body: api.ErrorResponse(
-        code: 'invalid_request',
-        message: 'Invalid request format.',
-        details: e.toString(),
-      ).toJson(),
+      body:
+          api.ErrorResponse(
+            code: 'invalid_request',
+            message: 'Invalid request format.',
+            details: e.toString(),
+          ).toJson(),
     );
   }
 
@@ -157,7 +159,5 @@ Future<Response> onRequest(RequestContext context) async {
     );
     return result;
   });
-  return Response.json(
-    body: response.toJson(),
-  );
+  return Response.json(body: response.toJson());
 }

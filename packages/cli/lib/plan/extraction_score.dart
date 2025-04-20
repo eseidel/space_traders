@@ -42,8 +42,9 @@ Set<TradeSymbol> extractableGoodsAt(
 ) {
   // Reportedly SpaceAdmiral has said that Astroid implies MINERAL_DEPOSITS:
   // https://discord.com/channels/792864705139048469/792864705139048472/1178507596433465446
-  final traitGoods =
-      waypointTraits.map((t) => tradeSymbolsByTrait[t] ?? {}).expand((e) => e);
+  final traitGoods = waypointTraits
+      .map((t) => tradeSymbolsByTrait[t] ?? {})
+      .expand((e) => e);
   final typeGoods = tradeSymbolsByType[waypointType] ?? {};
   return traitGoods.toSet().union(typeGoods);
 }
@@ -56,8 +57,10 @@ Set<TradeSymbol> expectedGoodsForWaypoint(
   ExtractionType extractionType,
 ) {
   // Should we restrict by survey mounts?
-  return extractableGoodsAt(waypointType, waypointTraits)
-      .intersection(extractableSymbols(extractionType));
+  return extractableGoodsAt(
+    waypointType,
+    waypointTraits,
+  ).intersection(extractableSymbols(extractionType));
 }
 
 /// Evaluate an extraction site and Market pairing
@@ -97,11 +100,7 @@ class ExtractionScore {
 
   /// Goods produced at the mine.
   Set<TradeSymbol> get producedGoods {
-    return expectedGoodsForWaypoint(
-      sourceType,
-      sourceTraits,
-      extractionType,
-    );
+    return expectedGoodsForWaypoint(sourceType, sourceTraits, extractionType);
   }
 
   /// True if the markets trade all goods produced at the source.
@@ -140,15 +139,16 @@ Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
   final start = systemsCache.waypoint(startSymbol);
   final markets = <TradeSymbol, WaypointSymbol>{};
   for (final good in goods) {
-    final marketSymbols =
-        await db.marketsWithImportInSystem(start.system, good);
+    final marketSymbols = await db.marketsWithImportInSystem(
+      start.system,
+      good,
+    );
     if (marketSymbols.isEmpty) {
       continue;
     }
-    final waypoints = marketSymbols.map(systemsCache.waypoint).toList()
-      ..sort(
-        (a, b) => a.distanceTo(start).compareTo(b.distanceTo(start)),
-      );
+    final waypoints =
+        marketSymbols.map(systemsCache.waypoint).toList()
+          ..sort((a, b) => a.distanceTo(start).compareTo(b.distanceTo(start)));
     final market = waypoints.firstOrNull;
     if (market != null) {
       markets[good] = market.symbol;

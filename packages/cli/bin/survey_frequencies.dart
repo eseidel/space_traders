@@ -23,7 +23,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       surveyBySymbol[symbol] = (surveyBySymbol[symbol] ?? 0) + 1;
       totalDepositsByUniqueSymbol[symbol] =
           (totalDepositsByUniqueSymbol[symbol] ?? 0) +
-              survey.survey.deposits.length;
+          survey.survey.deposits.length;
     }
     for (final deposit in survey.survey.deposits) {
       depositBySymbol[deposit.symbol] =
@@ -32,10 +32,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     totalDeposits += survey.survey.deposits.length;
   }
   logger.info('$totalSurveys surveys with $totalDeposits deposits');
-  final symbols = Set<String>.from(surveyBySymbol.keys)
-    ..addAll(depositBySymbol.keys)
-    ..toList()
-    ..sorted((a, b) => a.compareTo(b));
+  final symbols =
+      Set<String>.from(surveyBySymbol.keys)
+        ..addAll(depositBySymbol.keys)
+        ..toList()
+        ..sorted((a, b) => a.compareTo(b));
 
   final symbolLength = symbols.map((e) => e.length).max;
   const countLength = 5;
@@ -63,8 +64,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       '(${percent(depositPerSurveyPercent)}%)',
     );
   }
-  logger.info('number in () is the expected number of deposits per survey '
-      'if the symbol is known to be in the survey');
+  logger.info(
+    'number in () is the expected number of deposits per survey '
+    'if the symbol is known to be in the survey',
+  );
 }
 
 void main(List<String> args) async {

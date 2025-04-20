@@ -48,8 +48,9 @@ List<ShipyardTrip> _shipyardsSellingByDistance(
     }
   }
 
-  final sorted = costed.toList()
-    ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
+  final sorted =
+      costed.toList()
+        ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
   return sorted;
 }
 
@@ -130,12 +131,7 @@ Future<JobResult> _doBuyShipJob(
 
   // Update our shipyard prices regardless of any later errors.
   final shipyard = await getShipyard(api, ship.waypointSymbol);
-  recordShipyardDataAndLog(
-    db,
-    caches.static,
-    shipyard,
-    ship,
-  );
+  recordShipyardDataAndLog(db, caches.static, shipyard, ship);
 
   final PurchaseShip201ResponseData result;
   try {
@@ -183,6 +179,4 @@ Future<JobResult> _doBuyShipJob(
 }
 
 /// Advance the behavior of the given ship.
-final advanceBuyShip = const MultiJob('Buy Ship', [
-  _doBuyShipJob,
-]).run;
+final advanceBuyShip = const MultiJob('Buy Ship', [_doBuyShipJob]).run;

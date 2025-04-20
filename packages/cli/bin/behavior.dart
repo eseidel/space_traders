@@ -7,9 +7,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   if (argResults.rest.isNotEmpty) {
     final onlyShips =
         argResults.rest.map((s) => int.parse(s, radix: 16)).toSet();
-    behaviors = behaviors
-        .where((b) => onlyShips.contains(b.shipSymbol.number))
-        .toList();
+    behaviors =
+        behaviors
+            .where((b) => onlyShips.contains(b.shipSymbol.number))
+            .toList();
   }
   if (behaviors.isEmpty) {
     logger.info('No behaviors found.');

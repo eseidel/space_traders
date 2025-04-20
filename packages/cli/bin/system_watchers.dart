@@ -26,8 +26,10 @@ void logShip(
     final destination = routePlan.endSymbol.sectorLocalName;
     final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
     final arrival = approximateDuration(timeLeft);
-    logger.info('${indent}en route to $destination $destinationType '
-        'in $arrival');
+    logger.info(
+      '${indent}en route to $destination $destinationType '
+      'in $arrival',
+    );
   } else {
     logger.info('$indent${describeShipNav(ship.nav)} ${waypoint.type}');
   }
@@ -47,8 +49,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final systemWatcherStates =
-      await db.behaviorStatesWithBehavior(Behavior.systemWatcher);
+  final systemWatcherStates = await db.behaviorStatesWithBehavior(
+    Behavior.systemWatcher,
+  );
   final systemsCache = SystemsCache.load(fs);
   final ships = await ShipSnapshot.load(db);
   final agentCache = await AgentCache.load(db);
@@ -59,12 +62,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');
   for (final state in systemWatcherStates) {
     final shipSymbol = state.shipSymbol;
-    final assignedSystemName =
-        state.systemWatcherJob?.systemSymbol.systemName.padRight(4);
+    final assignedSystemName = state.systemWatcherJob?.systemSymbol.systemName
+        .padRight(4);
     final ship = ships[shipSymbol];
     final navString = describeShipNav(ship!.nav);
-    logger
-        .info('${ship.emojiName} assigned to $assignedSystemName, $navString');
+    logger.info(
+      '${ship.emojiName} assigned to $assignedSystemName, $navString',
+    );
 
     final routePlan = state.routePlan;
     if (routePlan != null) {
@@ -83,10 +87,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final unreachableSystems = <SystemSymbol>{};
 
   for (final systemSymbol in systemsToWatch) {
-    final shipsAssigned = systemWatcherStates
-        .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)
-        .map((s) => s.shipSymbol)
-        .toList();
+    final shipsAssigned =
+        systemWatcherStates
+            .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)
+            .map((s) => s.shipSymbol)
+            .toList();
     if (shipsAssigned.isEmpty &&
         !systemConnectivity.existsJumpPathBetween(
           systemSymbol,
@@ -106,8 +111,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   logger.info('Assignments:');
-  final assignments =
-      assignProbesToSystems(systemConnectivity, marketListings, ships);
+  final assignments = assignProbesToSystems(
+    systemConnectivity,
+    marketListings,
+    ships,
+  );
   for (final entry in assignments.entries) {
     final clusterId = systemConnectivity.clusterIdForSystem(entry.value);
     logger.info(

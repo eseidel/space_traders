@@ -88,23 +88,23 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final explorer = ships.ships.firstWhere((s) => s.isExplorer);
 
-  final unreachableSystems = systemsToWatch
-      .where(
-        (systemSymbol) => !systemConnectivity.existsJumpPathBetween(
-          systemSymbol,
-          hqSystem,
-        ),
-      )
-      .toList();
+  final unreachableSystems =
+      systemsToWatch
+          .where(
+            (systemSymbol) =>
+                !systemConnectivity.existsJumpPathBetween(
+                  systemSymbol,
+                  hqSystem,
+                ),
+          )
+          .toList();
 
   // Look check all systems within 800 units of an unreachable system for
   // a reachable system.
   final shipSpec = explorer.shipSpec;
   final maxFuel = shipSpec.fuelCapacity;
   logger
-    ..info(
-      'Systems disconnected from $hqSystem within $maxFuel fuel via warp',
-    )
+    ..info('Systems disconnected from $hqSystem within $maxFuel fuel via warp')
     ..info('with travel time by explorer at ${explorer.waypointSymbol}');
 
   for (final systemSymbol in unreachableSystems) {
@@ -123,9 +123,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
         shipSpeed: shipSpec.speed,
         actions: actions,
       );
-      logger.info(
-        '  $systemSymbol: ${describeRoutePlan(plan)}',
-      );
+      logger.info('  $systemSymbol: ${describeRoutePlan(plan)}');
     }
   }
 }

@@ -37,8 +37,9 @@ Map<String, dynamic> extractionToColumnMap(ExtractionRecord extraction) {
 ExtractionRecord extractionFromColumnMap(Map<String, dynamic> values) {
   return ExtractionRecord(
     shipSymbol: ShipSymbol.fromString(values['ship_symbol'] as String),
-    waypointSymbol:
-        WaypointSymbol.fromString(values['waypoint_symbol'] as String),
+    waypointSymbol: WaypointSymbol.fromString(
+      values['waypoint_symbol'] as String,
+    ),
     tradeSymbol: TradeSymbol.fromJson(values['trade_symbol'] as String)!,
     quantity: values['quantity'] as int,
     power: values['power'] as int,

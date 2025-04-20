@@ -53,8 +53,9 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     const fuelCapacity = 100;
-    when(() => ship.fuel)
-        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
+    when(
+      () => ship.fuel,
+    ).thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
     final shipEngine = _MockShipEngine();
     when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
@@ -84,8 +85,9 @@ void main() {
     registerFallbackValue(agent);
     when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
-    when(() => caches.waypoints.waypointsInSystem(symbol.system))
-        .thenAnswer((_) async => []);
+    when(
+      () => caches.waypoints.waypointsInSystem(symbol.system),
+    ).thenAnswer((_) async => []);
 
     const shipType = ShipType.HEAVY_FREIGHTER;
     final state = BehaviorState(shipSymbol, Behavior.buyShip)
@@ -105,9 +107,7 @@ void main() {
           data: Shipyard(
             symbol: symbol.waypoint,
             modificationsFee: 0,
-            shipTypes: [
-              ShipyardShipTypesInner(type: shipType),
-            ],
+            shipTypes: [ShipyardShipTypesInner(type: shipType)],
           ),
         ),
       ),
@@ -142,11 +142,7 @@ void main() {
 
     final route = _MockRoutePlan();
     when(
-      () => caches.routePlanner.planRoute(
-        any(),
-        start: symbol,
-        end: symbol,
-      ),
+      () => caches.routePlanner.planRoute(any(), start: symbol, end: symbol),
     ).thenReturn(route);
 
     registerFallbackValue(Transaction.fallbackValue());

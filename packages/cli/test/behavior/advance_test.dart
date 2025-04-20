@@ -44,8 +44,9 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final logger = _MockLogger();
 
-    when(() => db.behaviorStateBySymbol(shipSymbol))
-        .thenAnswer((_) async => null);
+    when(
+      () => db.behaviorStateBySymbol(shipSymbol),
+    ).thenAnswer((_) async => null);
     when(
       () => centralCommand.getJobForShip(
         db,
@@ -98,8 +99,9 @@ void main() {
 
     final logger = _MockLogger();
 
-    when(() => db.behaviorStateBySymbol(shipSymbol))
-        .thenAnswer((_) async => null);
+    when(
+      () => db.behaviorStateBySymbol(shipSymbol),
+    ).thenAnswer((_) async => null);
     when(
       () => centralCommand.getJobForShip(
         db,

@@ -12,12 +12,7 @@ class QueuedRequest {
 
   /// Creates an empty [QueuedRequest] with the given [url].
   factory QueuedRequest.empty(String url) {
-    return QueuedRequest(
-      method: 'GET',
-      url: url,
-      body: '',
-      headers: {},
-    );
+    return QueuedRequest(method: 'GET', url: url, body: '', headers: {});
   }
 
   /// Creates a [QueuedRequest] from json.

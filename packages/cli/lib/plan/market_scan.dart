@@ -13,9 +13,10 @@ class _MarketScanBuilder {
 
   void _addBuyOpp(BuyOpp buy) {
     // Sort buys ascending so we remove the most expensive buy price.
-    final buys = (buyOpps[buy.tradeSymbol] ?? [])
-      ..add(buy)
-      ..sort((a, b) => a.price.compareTo(b.price));
+    final buys =
+        (buyOpps[buy.tradeSymbol] ?? [])
+          ..add(buy)
+          ..sort((a, b) => a.price.compareTo(b.price));
     if (buys.length > topLimit) {
       buys.removeLast();
     }
@@ -24,9 +25,10 @@ class _MarketScanBuilder {
 
   void _addSellOpp(SellOpp sell) {
     // Sort sells descending so we remove the cheapest sell price.
-    final sells = (sellOpps[sell.tradeSymbol] ?? [])
-      ..add(sell)
-      ..sort((a, b) => -a.price.compareTo(b.price));
+    final sells =
+        (sellOpps[sell.tradeSymbol] ?? [])
+          ..add(sell)
+          ..sort((a, b) => -a.price.compareTo(b.price));
     if (sells.length > topLimit) {
       sells.removeLast();
     }
@@ -47,17 +49,17 @@ class MarketScan {
     required Map<TradeSymbol, List<BuyOpp>> buyOpps,
     required Map<TradeSymbol, List<SellOpp>> sellOpps,
     required this.description,
-  })  : _buyOpps = Map.unmodifiable(buyOpps),
-        _sellOpps = Map.unmodifiable(sellOpps);
+  }) : _buyOpps = Map.unmodifiable(buyOpps),
+       _sellOpps = Map.unmodifiable(sellOpps);
 
   /// Create a new MarketScan for testing.
   @visibleForTesting
   MarketScan.test({
     required List<BuyOpp> buyOpps,
     required List<SellOpp> sellOpps,
-  })  : _buyOpps = groupBy(buyOpps, (b) => b.tradeSymbol),
-        _sellOpps = groupBy(sellOpps, (s) => s.tradeSymbol),
-        description = 'test';
+  }) : _buyOpps = groupBy(buyOpps, (b) => b.tradeSymbol),
+       _sellOpps = groupBy(sellOpps, (s) => s.tradeSymbol),
+       description = 'test';
 
   /// Given a set of historical market prices, will collect the top N buy and
   /// sell opportunities for each trade symbol regardless of distance.

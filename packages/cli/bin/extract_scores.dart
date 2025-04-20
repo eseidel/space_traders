@@ -15,22 +15,27 @@ double _scoreMarkets(
 ) {
   // Walk the prices for the given symbols at the given market, and compute
   // the average percentage sell price relative to global median sell prices.
-  final percentiles = marketForGood.keys.map((tradeSymbol) {
-    final marketSymbol = marketForGood[tradeSymbol]!;
-    final sellPrice =
-        marketPrices.recentSellPrice(tradeSymbol, marketSymbol: marketSymbol);
-    if (sellPrice == null) {
-      logger.warn('No sell price for $tradeSymbol at $marketSymbol');
-      return 0.0;
-    }
-    final percentile =
-        marketPrices.percentileForSellPrice(tradeSymbol, sellPrice);
-    if (percentile == null) {
-      logger.warn('No percentile for $tradeSymbol at $marketSymbol');
-      return 0.0;
-    }
-    return percentile;
-  }).toList();
+  final percentiles =
+      marketForGood.keys.map((tradeSymbol) {
+        final marketSymbol = marketForGood[tradeSymbol]!;
+        final sellPrice = marketPrices.recentSellPrice(
+          tradeSymbol,
+          marketSymbol: marketSymbol,
+        );
+        if (sellPrice == null) {
+          logger.warn('No sell price for $tradeSymbol at $marketSymbol');
+          return 0.0;
+        }
+        final percentile = marketPrices.percentileForSellPrice(
+          tradeSymbol,
+          sellPrice,
+        );
+        if (percentile == null) {
+          logger.warn('No percentile for $tradeSymbol at $marketSymbol');
+          return 0.0;
+        }
+        return percentile;
+      }).toList();
   return percentiles.average / 100.0;
 }
 
@@ -55,8 +60,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final isSiphon = argResults['siphon'] as bool;
 
-  logger.info("Top $countLimit ${isSiphon ? 'siphon targets' : 'mines'}"
-      ' with matching markets within $maxDistance total round-trip:');
+  logger.info(
+    "Top $countLimit ${isSiphon ? 'siphon targets' : 'mines'}"
+    ' with matching markets within $maxDistance total round-trip:',
+  );
 
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
@@ -72,23 +79,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       hqSystem,
     );
   } else {
-    scores = await evaluateWaypointsForMining(
-      db,
-      systems,
-      charting,
-      hqSystem,
-    );
+    scores = await evaluateWaypointsForMining(db, systems, charting, hqSystem);
   }
 
   final table = Table(
-    header: [
-      'Source',
-      'Source Traits',
-      'Markets',
-      'Dist',
-      'Goods',
-      'Score',
-    ],
+    header: ['Source', 'Source Traits', 'Markets', 'Dist', 'Goods', 'Score'],
     style: const TableStyle(compact: true),
   );
 
@@ -101,8 +96,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     // Only consider markets that trade all goods produced by the mine.
     if (!score.marketsTradeAllProducedGoods) {
       logger.detail(
-          'Could not find places to sell ${score.goodsMissingFromMarkets}'
-          ' produced by ${score.source}.');
+        'Could not find places to sell ${score.goodsMissingFromMarkets}'
+        ' produced by ${score.source}.',
+      );
       continue;
     }
     if (score.deliveryDistance > maxDistance) {
@@ -114,10 +110,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     // Check if route sells fuel at all?
 
     // Score each good at each market.
-    final marketScore = _scoreMarkets(
-      marketPrices,
-      score.marketForGood,
-    );
+    final marketScore = _scoreMarkets(marketPrices, score.marketForGood);
 
     seenSources.add(score.source);
     table.add([

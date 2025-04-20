@@ -47,20 +47,23 @@ bool isUncharted(ChartingSnapshot charts, SystemWaypoint waypoint) {
 /// Walks our known system graph, starting from HQ and prints systems needing
 /// exploration.
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final startSystemSymbol =
-      await startSystemFromArg(db, argResults.rest.firstOrNull);
+  final startSystemSymbol = await startSystemFromArg(
+    db,
+    argResults.rest.firstOrNull,
+  );
 
   final systemConnectivity = await loadSystemConnectivity(db);
   final systemsCache = SystemsCache.load(fs);
   final charts = await ChartingSnapshot.load(db);
 
-  final connectedSystems = systemConnectivity
-      .systemSymbolsInJumpRadius(
-        systemsCache,
-        startSystem: startSystemSymbol,
-        maxJumps: 3,
-      )
-      .toList();
+  final connectedSystems =
+      systemConnectivity
+          .systemSymbolsInJumpRadius(
+            systemsCache,
+            startSystem: startSystemSymbol,
+            maxJumps: 3,
+          )
+          .toList();
   if (connectedSystems.isEmpty) {
     logger.info('No systems connected to $startSystemSymbol.');
     return;

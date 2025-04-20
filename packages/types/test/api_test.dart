@@ -129,9 +129,6 @@ void main() {
     expect(ship.cargo.inventory.last.symbol, TradeSymbol.ALUMINUM);
     expect(ship.cargo.inventory.last.units, 3);
 
-    expect(
-      () => add(TradeSymbol.ALUMINUM, 100),
-      throwsArgumentError,
-    );
+    expect(() => add(TradeSymbol.ALUMINUM, 100), throwsArgumentError);
   });
 }

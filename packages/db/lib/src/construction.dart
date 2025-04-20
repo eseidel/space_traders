@@ -7,8 +7,9 @@ ConstructionRecord constructionFromColumnMap(Map<String, dynamic> values) {
   return ConstructionRecord(
     construction: Construction.fromJson(values['construction']),
     timestamp: values['timestamp'] as DateTime,
-    waypointSymbol:
-        WaypointSymbol.fromJson(values['waypoint_symbol'] as String),
+    waypointSymbol: WaypointSymbol.fromJson(
+      values['waypoint_symbol'] as String,
+    ),
   );
 }
 

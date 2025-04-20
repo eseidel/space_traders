@@ -2,16 +2,20 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final startSystemSymbol =
-      await startSystemFromArg(db, argResults.rest.firstOrNull);
+  final startSystemSymbol = await startSystemFromArg(
+    db,
+    argResults.rest.firstOrNull,
+  );
 
   logger.info('Starting from $startSystemSymbol, known reachable:');
   final systemsCache = SystemsCache.load(fs);
   // Can't use loadSystemConnectivity because need jumpGateSnapshot later.
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGateSnapshot, constructionSnapshot);
+  final systemConnectivity = SystemConnectivity.fromJumpGates(
+    jumpGateSnapshot,
+    constructionSnapshot,
+  );
 
   var totalSystems = 0;
   var totalJumpgates = 0;
@@ -27,8 +31,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final reachableSystems =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
   final reachableSystemPercent = reachableSystems.length / totalSystems;
-  logger.info('${reachableSystems.length} systems '
-      '(${p(reachableSystemPercent)} of $totalSystems)');
+  logger.info(
+    '${reachableSystems.length} systems '
+    '(${p(reachableSystemPercent)} of $totalSystems)',
+  );
 
   var jumpGates = 0;
   var asteroids = 0;
@@ -40,8 +46,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     asteroids += systemRecord.waypoints.where((w) => w.isAsteroid).length;
   }
   final reachableWaypointPercent = waypointCount / totalWaypoints;
-  logger.info('$waypointCount waypoints '
-      '(${p(reachableWaypointPercent)} of $totalWaypoints)');
+  logger.info(
+    '$waypointCount waypoints '
+    '(${p(reachableWaypointPercent)} of $totalWaypoints)',
+  );
 
   // How many waypoints are charted?
   final chartingSnapshot = await ChartingSnapshot.load(db);
@@ -72,10 +80,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final asteroidChartPercent = chartedAsteroids / asteroids;
 
   logger
-    ..info(' $chartedWaypoints charted non-asteroid '
-        '(${p(nonAsteroidChartPercent)})')
-    ..info(' $chartedAsteroids charted asteroid '
-        '(${p(asteroidChartPercent)})');
+    ..info(
+      ' $chartedWaypoints charted non-asteroid '
+      '(${p(nonAsteroidChartPercent)})',
+    )
+    ..info(
+      ' $chartedAsteroids charted asteroid '
+      '(${p(asteroidChartPercent)})',
+    );
 
   // How many markets?
   final marketListings = await MarketListingSnapshot.load(db);
@@ -102,8 +114,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final reachableJumpGatePercent = jumpGates / totalJumpgates;
   logger
     ..info('$shipyards shipyards')
-    ..info('$jumpGates jump gates'
-        ' (${p(reachableJumpGatePercent)} of $totalJumpgates)');
+    ..info(
+      '$jumpGates jump gates'
+      ' (${p(reachableJumpGatePercent)} of $totalJumpgates)',
+    );
 
   // How many are cached?
   var cachedJumpGates = 0;

@@ -18,10 +18,7 @@ const Color darkBlue = Color.fromARGB(255, 18, 32, 47);
 //   }
 // }
 
-enum PaintMode {
-  systemColors,
-  shipColors,
-}
+enum PaintMode { systemColors, shipColors }
 
 @immutable
 class SystemAttributes {

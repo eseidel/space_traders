@@ -80,8 +80,9 @@ void main() {
     final end = SystemWaypoint.test(WaypointSymbol.fromString('X-S-B'));
     when(() => systemsCache.waypoint(start.symbol)).thenReturn(start);
     when(() => systemsCache.waypoint(end.symbol)).thenReturn(end);
-    when(() => systemsCache.waypointsInSystem(start.system))
-        .thenReturn([start, end]);
+    when(
+      () => systemsCache.waypointsInSystem(start.system),
+    ).thenReturn([start, end]);
 
     final routePlanner = _MockRoutePlanner();
     const fuelCapacity = 100;
@@ -193,8 +194,9 @@ void main() {
     when(() => systemsCache.waypoint(saa.symbol)).thenReturn(saa);
     when(() => systemsCache.waypoint(sab.symbol)).thenReturn(sab);
     when(() => systemsCache.waypoint(sac.symbol)).thenReturn(sac);
-    when(() => systemsCache.waypointsInSystem(saa.system))
-        .thenReturn(waypoints);
+    when(
+      () => systemsCache.waypointsInSystem(saa.system),
+    ).thenReturn(waypoints);
     const tradeSymbol = TradeSymbol.FUEL;
     final now = DateTime(2021);
     final prices = [
@@ -246,14 +248,15 @@ void main() {
     when(() => shipCargo.units).thenReturn(0);
     when(() => ship.modules).thenReturn([]);
 
-    when(() => systemsCache[saa.system]).thenReturn(
-      System.test(waypointSymbol.system),
-    );
+    when(
+      () => systemsCache[saa.system],
+    ).thenReturn(System.test(waypointSymbol.system));
 
     final systemConnectivity = _MockSystemConnectivity();
     registerFallbackValue(saa.system);
-    when(() => systemConnectivity.existsJumpPathBetween(any(), any()))
-        .thenReturn(true);
+    when(
+      () => systemConnectivity.existsJumpPathBetween(any(), any()),
+    ).thenReturn(true);
 
     final routePlanner = RoutePlanner.fromSystemsCache(
       systemsCache,
@@ -275,16 +278,17 @@ void main() {
 
     final costed = runWithLogger(
       logger,
-      () => findDealsFor(
-        systemsCache,
-        routePlanner,
-        marketScan,
-        maxTotalOutlay: 100000,
-        startSymbol: ship.waypointSymbol,
-        shipSpec: ship.shipSpec,
-        costPerAntimatterUnit: 10000,
-        costPerFuelUnit: 100,
-      ).firstOrNull,
+      () =>
+          findDealsFor(
+            systemsCache,
+            routePlanner,
+            marketScan,
+            maxTotalOutlay: 100000,
+            startSymbol: ship.waypointSymbol,
+            shipSpec: ship.shipSpec,
+            costPerAntimatterUnit: 10000,
+            costPerFuelUnit: 100,
+          ).firstOrNull,
     );
     expect(costed, isNotNull);
     expect(costed!.expectedProfitPerSecond, 3);
@@ -418,8 +422,9 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
     const fuelCapacity = 100;
-    when(() => ship.fuel)
-        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
+    when(
+      () => ship.fuel,
+    ).thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
     final shipEngine = _MockShipEngine();
     when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
@@ -465,8 +470,9 @@ void main() {
       activity: ActivityLevel.WEAK,
     );
 
-    when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM))
-        .thenReturn([near, mid, far]);
+    when(
+      () => marketPrices.pricesFor(TradeSymbol.ALUMINUM),
+    ).thenReturn([near, mid, far]);
 
     RoutePlan fakePlan(WaypointSymbol start, WaypointSymbol end, int duration) {
       return RoutePlan(
@@ -485,11 +491,7 @@ void main() {
     }
 
     when(
-      () => routePlanner.planRoute(
-        any(),
-        start: nearSymbol,
-        end: nearSymbol,
-      ),
+      () => routePlanner.planRoute(any(), start: nearSymbol, end: nearSymbol),
     ).thenReturn(fakePlan(nearSymbol, nearSymbol, 1));
     when(
       () => routePlanner.planRoute(
@@ -534,8 +536,9 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
     const fuelCapacity = 100;
-    when(() => ship.fuel)
-        .thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
+    when(
+      () => ship.fuel,
+    ).thenReturn(ShipFuel(current: 100, capacity: fuelCapacity));
     final shipEngine = _MockShipEngine();
     when(() => ship.engine).thenReturn(shipEngine);
     const shipSpeed = 30;
@@ -580,8 +583,9 @@ void main() {
       activity: ActivityLevel.WEAK,
     );
 
-    when(() => marketPrices.pricesFor(TradeSymbol.ALUMINUM))
-        .thenReturn([near, mid, far]);
+    when(
+      () => marketPrices.pricesFor(TradeSymbol.ALUMINUM),
+    ).thenReturn([near, mid, far]);
 
     RoutePlan fakePlan(WaypointSymbol start, WaypointSymbol end, int duration) {
       return RoutePlan(
@@ -600,25 +604,13 @@ void main() {
     }
 
     when(
-      () => routePlanner.planRoute(
-        any(),
-        start: nearSymbol,
-        end: nearSymbol,
-      ),
+      () => routePlanner.planRoute(any(), start: nearSymbol, end: nearSymbol),
     ).thenReturn(fakePlan(nearSymbol, nearSymbol, 1));
     when(
-      () => routePlanner.planRoute(
-        any(),
-        start: nearSymbol,
-        end: midSymbol,
-      ),
+      () => routePlanner.planRoute(any(), start: nearSymbol, end: midSymbol),
     ).thenReturn(fakePlan(nearSymbol, midSymbol, 10));
     when(
-      () => routePlanner.planRoute(
-        any(),
-        start: nearSymbol,
-        end: farSymbol,
-      ),
+      () => routePlanner.planRoute(any(), start: nearSymbol, end: farSymbol),
     ).thenReturn(fakePlan(nearSymbol, farSymbol, 10000000));
 
     final db = _MockDatabase();
@@ -629,12 +621,15 @@ void main() {
       );
     }
 
-    when(() => db.marketListingForSymbol(nearSymbol))
-        .thenAnswer((_) async => listing(nearSymbol));
-    when(() => db.marketListingForSymbol(midSymbol))
-        .thenAnswer((_) async => listing(midSymbol));
-    when(() => db.marketListingForSymbol(farSymbol))
-        .thenAnswer((_) async => listing(farSymbol));
+    when(
+      () => db.marketListingForSymbol(nearSymbol),
+    ).thenAnswer((_) async => listing(nearSymbol));
+    when(
+      () => db.marketListingForSymbol(midSymbol),
+    ).thenAnswer((_) async => listing(midSymbol));
+    when(
+      () => db.marketListingForSymbol(farSymbol),
+    ).thenAnswer((_) async => listing(farSymbol));
 
     final logger = _MockLogger();
     final market = await runWithLogger(

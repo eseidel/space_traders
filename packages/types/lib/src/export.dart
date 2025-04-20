@@ -41,8 +41,5 @@ class TradeExport {
           const ListEquality<TradeSymbol>().equals(imports, other.imports);
 
   @override
-  int get hashCode => Object.hashAll([
-        export,
-        ...imports,
-      ]);
+  int get hashCode => Object.hashAll([export, ...imports]);
 }

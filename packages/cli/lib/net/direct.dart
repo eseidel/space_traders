@@ -23,8 +23,9 @@ Future<PurchaseShip201ResponseData> purchaseShip(
     waypointSymbol: shipyardSymbol.waypoint,
     shipType: shipType,
   );
-  final purchaseResponse =
-      await api.fleet.purchaseShip(purchaseShipRequest: purchaseShipRequest);
+  final purchaseResponse = await api.fleet.purchaseShip(
+    purchaseShipRequest: purchaseShipRequest,
+  );
   final data = purchaseResponse!.data;
   // Add the new ship to our cache.
   await db.upsertShip(Ship.fromOpenApi(data.ship));
@@ -57,8 +58,10 @@ Future<void> setShipFlightMode(
   ShipNavFlightMode flightMode,
 ) async {
   final request = PatchShipNavRequest(flightMode: flightMode);
-  final response = await api.fleet
-      .patchShipNav(ship.symbol.symbol, patchShipNavRequest: request);
+  final response = await api.fleet.patchShipNav(
+    ship.symbol.symbol,
+    patchShipNavRequest: request,
+  );
   final data = response!.data;
   ship
     ..nav = data.nav
@@ -75,8 +78,10 @@ Future<NavigateShip200ResponseData> navigateShip(
   WaypointSymbol waypointSymbol,
 ) async {
   final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
-  final result = await api.fleet
-      .navigateShip(ship.symbol.symbol, navigateShipRequest: request);
+  final result = await api.fleet.navigateShip(
+    ship.symbol.symbol,
+    navigateShipRequest: request,
+  );
   final data = result!.data;
   ship
     ..nav = data.nav
@@ -93,8 +98,10 @@ Future<WarpShip200ResponseData> warpShip(
   WaypointSymbol waypointSymbol,
 ) async {
   final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
-  final result = await api.fleet
-      .warpShip(ship.symbol.symbol, navigateShipRequest: request);
+  final result = await api.fleet.warpShip(
+    ship.symbol.symbol,
+    navigateShipRequest: request,
+  );
   final data = result!.data;
   ship
     ..nav = data.nav
@@ -140,8 +147,10 @@ Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
   Ship ship,
   Survey survey,
 ) async {
-  final response = await api.fleet
-      .extractResourcesWithSurvey(ship.symbol.symbol, survey: survey);
+  final response = await api.fleet.extractResourcesWithSurvey(
+    ship.symbol.symbol,
+    survey: survey,
+  );
   ship
     ..cargo = response!.data.cargo
     ..cooldown = response.data.cooldown;
@@ -163,8 +172,10 @@ Future<DeliverContract200ResponseData> deliverContract(
     tradeSymbol: tradeSymbol.value,
     units: units,
   );
-  final response = await api.contracts
-      .deliverContract(contract.id, deliverContractRequest: request);
+  final response = await api.contracts.deliverContract(
+    contract.id,
+    deliverContractRequest: request,
+  );
   final data = response!.data;
   await db.upsertContract(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
@@ -213,12 +224,11 @@ Future<SellCargo201ResponseData> sellCargo(
   TradeSymbol tradeSymbol,
   int units,
 ) async {
-  final request = SellCargoRequest(
-    symbol: tradeSymbol,
-    units: units,
+  final request = SellCargoRequest(symbol: tradeSymbol, units: units);
+  final response = await api.fleet.sellCargo(
+    ship.symbol.symbol,
+    sellCargoRequest: request,
   );
-  final response =
-      await api.fleet.sellCargo(ship.symbol.symbol, sellCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);
@@ -237,12 +247,11 @@ Future<SellCargo201ResponseData> purchaseCargo(
   TradeSymbol tradeSymbol,
   int units,
 ) async {
-  final request = PurchaseCargoRequest(
-    symbol: tradeSymbol,
-    units: units,
+  final request = PurchaseCargoRequest(symbol: tradeSymbol, units: units);
+  final response = await api.fleet.purchaseCargo(
+    ship.symbol.symbol,
+    purchaseCargoRequest: request,
   );
-  final response = await api.fleet
-      .purchaseCargo(ship.symbol.symbol, purchaseCargoRequest: request);
   final data = response!.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);
@@ -264,8 +273,10 @@ Future<RefuelShip200ResponseData> refuelShip(
   // doesn't account for non-full tanks, so for now we just always
   // refill to full.
   final request = fromCargo ? RefuelShipRequest(fromCargo: fromCargo) : null;
-  final responseWrapper = await api.fleet
-      .refuelShip(ship.symbol.symbol, refuelShipRequest: request);
+  final responseWrapper = await api.fleet.refuelShip(
+    ship.symbol.symbol,
+    refuelShipRequest: request,
+  );
   final data = responseWrapper!.data;
   await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;

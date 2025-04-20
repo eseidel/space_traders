@@ -87,11 +87,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final start = WaypointSymbol.fromString(startSymbol);
   final end = WaypointSymbol.fromString(endSymbol);
   final routeStart = DateTime.timestamp();
-  final plan = routePlanner.planRoute(
-    ship.shipSpec,
-    start: start,
-    end: end,
-  );
+  final plan = routePlanner.planRoute(ship.shipSpec, start: start, end: end);
   final routeEnd = DateTime.timestamp();
   final duration = routeEnd.difference(routeStart);
   if (plan == null) {

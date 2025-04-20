@@ -11,25 +11,17 @@ void main() {
     final end = WaypointSymbol.fromString('X-B-B');
 
     final fs = MemoryFileSystem.test();
-    final systemsCache = SystemsCache(
-      [
-        System.test(
-          start.system,
-          waypoints: [
-            SystemWaypoint.test(
-              start,
-              type: WaypointType.JUMP_GATE,
-            ),
-          ],
-        ),
-        System.test(
-          end.system,
-          position: const SystemPosition(10, 0),
-          waypoints: [SystemWaypoint.test(end, type: WaypointType.JUMP_GATE)],
-        ),
-      ],
-      fs: fs,
-    );
+    final systemsCache = SystemsCache([
+      System.test(
+        start.system,
+        waypoints: [SystemWaypoint.test(start, type: WaypointType.JUMP_GATE)],
+      ),
+      System.test(
+        end.system,
+        position: const SystemPosition(10, 0),
+        waypoints: [SystemWaypoint.test(end, type: WaypointType.JUMP_GATE)],
+      ),
+    ], fs: fs);
     final systemConnectivity = SystemConnectivity.test({
       start: {end},
     });

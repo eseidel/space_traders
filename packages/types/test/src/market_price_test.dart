@@ -35,9 +35,7 @@ void main() {
       activity: ActivityLevel.WEAK,
     );
     // Only sellPrice is currently supported.
-    final price2 = price.copyWith(
-      sellPrice: 4,
-    );
+    final price2 = price.copyWith(sellPrice: 4);
     expect(price2.purchasePrice, 1);
     expect(price2.sellPrice, 4);
     expect(price2.tradeVolume, 10);

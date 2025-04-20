@@ -8,9 +8,7 @@ import 'package:cli/net/queries.dart';
 /// is a holder for that object.
 class AgentCache {
   /// Creates a new ship cache.
-  AgentCache(Agent agent, Database db)
-      : _agent = agent,
-        _db = db;
+  AgentCache(Agent agent, Database db) : _agent = agent, _db = db;
 
   Agent _agent;
   final Database _db;

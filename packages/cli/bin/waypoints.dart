@@ -12,12 +12,12 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       traitCounts[trait] = (traitCounts[trait] ?? 0) + 1;
     }
   }
-  final symbols = WaypointTraitSymbol.values.toList()
-    ..sort((a, b) {
-      final aCount = traitCounts[b] ?? 0;
-      final bCount = traitCounts[a] ?? 0;
-      return aCount.compareTo(bCount);
-    });
+  final symbols =
+      WaypointTraitSymbol.values.toList()..sort((a, b) {
+        final aCount = traitCounts[b] ?? 0;
+        final bCount = traitCounts[a] ?? 0;
+        return aCount.compareTo(bCount);
+      });
 
   for (final trait in symbols) {
     final count = traitCounts[trait];

@@ -60,12 +60,15 @@ void main() {
       ),
     );
 
-    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(waypointSymbol))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.canBeMined(waypointSymbol))
-        .thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasMarketplace(waypointSymbol),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(waypointSymbol),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.canBeMined(waypointSymbol),
+    ).thenAnswer((_) async => true);
 
     when(
       () => caches.waypoints.waypointsInSystem(waypointSymbol.system),

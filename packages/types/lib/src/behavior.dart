@@ -74,20 +74,27 @@ class BehaviorState {
   factory BehaviorState.fromJson(Map<String, dynamic> json) {
     final behavior = Behavior.fromJson(json['behavior'] as String);
     final shipSymbol = ShipSymbol.fromJson(json['shipSymbol'] as String);
-    final deal =
-        CostedDeal.fromJsonOrNull(json['deal'] as Map<String, dynamic>?);
-    final routePlan =
-        RoutePlan.fromJsonOrNull(json['routePlan'] as Map<String, dynamic>?);
-    final buyJob =
-        BuyJob.fromJsonOrNull(json['buyJob'] as Map<String, dynamic>?);
-    final deliverJob =
-        DeliverJob.fromJsonOrNull(json['deliverJob'] as Map<String, dynamic>?);
-    final shipBuyJob =
-        ShipBuyJob.fromJsonOrNull(json['shipBuyJob'] as Map<String, dynamic>?);
-    final pickupJob =
-        PickupJob.fromJsonOrNull(json['pickupJob'] as Map<String, dynamic>?);
-    final mountJob =
-        MountJob.fromJsonOrNull(json['mountJob'] as Map<String, dynamic>?);
+    final deal = CostedDeal.fromJsonOrNull(
+      json['deal'] as Map<String, dynamic>?,
+    );
+    final routePlan = RoutePlan.fromJsonOrNull(
+      json['routePlan'] as Map<String, dynamic>?,
+    );
+    final buyJob = BuyJob.fromJsonOrNull(
+      json['buyJob'] as Map<String, dynamic>?,
+    );
+    final deliverJob = DeliverJob.fromJsonOrNull(
+      json['deliverJob'] as Map<String, dynamic>?,
+    );
+    final shipBuyJob = ShipBuyJob.fromJsonOrNull(
+      json['shipBuyJob'] as Map<String, dynamic>?,
+    );
+    final pickupJob = PickupJob.fromJsonOrNull(
+      json['pickupJob'] as Map<String, dynamic>?,
+    );
+    final mountJob = MountJob.fromJsonOrNull(
+      json['mountJob'] as Map<String, dynamic>?,
+    );
     final extractionJob = ExtractionJob.fromJsonOrNull(
       json['extractionJob'] as Map<String, dynamic>?,
     );
@@ -219,20 +226,15 @@ class BuyJob {
 @immutable
 class DeliverJob {
   /// Create a new deliver job.
-  const DeliverJob({
-    required this.tradeSymbol,
-    required this.waypointSymbol,
-  });
+  const DeliverJob({required this.tradeSymbol, required this.waypointSymbol});
 
   /// Create a new deliver job from JSON.
   factory DeliverJob.fromJson(Map<String, dynamic> json) {
     final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!;
-    final waypointSymbol =
-        WaypointSymbol.fromJson(json['waypointSymbol'] as String);
-    return DeliverJob(
-      tradeSymbol: tradeSymbol,
-      waypointSymbol: waypointSymbol,
+    final waypointSymbol = WaypointSymbol.fromJson(
+      json['waypointSymbol'] as String,
     );
+    return DeliverJob(tradeSymbol: tradeSymbol, waypointSymbol: waypointSymbol);
   }
 
   /// Create a new deliver job from JSON, or null if the JSON is null.
@@ -258,20 +260,15 @@ class DeliverJob {
 @immutable
 class PickupJob {
   /// Create a new pickup job.
-  const PickupJob({
-    required this.tradeSymbol,
-    required this.waypointSymbol,
-  });
+  const PickupJob({required this.tradeSymbol, required this.waypointSymbol});
 
   /// Create a new pickup job from JSON.
   factory PickupJob.fromJson(Map<String, dynamic> json) {
     final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!;
-    final waypointSymbol =
-        WaypointSymbol.fromJson(json['waypointSymbol'] as String);
-    return PickupJob(
-      tradeSymbol: tradeSymbol,
-      waypointSymbol: waypointSymbol,
+    final waypointSymbol = WaypointSymbol.fromJson(
+      json['waypointSymbol'] as String,
     );
+    return PickupJob(tradeSymbol: tradeSymbol, waypointSymbol: waypointSymbol);
   }
 
   /// Create a new pickup job from JSON, or null if the JSON is null.
@@ -299,21 +296,16 @@ class PickupJob {
 @immutable
 class MountJob {
   /// Create a new mount job.
-  const MountJob({
-    required this.mountSymbol,
-    required this.shipyardSymbol,
-  });
+  const MountJob({required this.mountSymbol, required this.shipyardSymbol});
 
   /// Create a new mount job from JSON.
   factory MountJob.fromJson(Map<String, dynamic> json) {
     final mountSymbol =
         ShipMountSymbolEnum.fromJson(json['mountSymbol'] as String)!;
-    final shipyardSymbol =
-        WaypointSymbol.fromJson(json['shipyardSymbol'] as String);
-    return MountJob(
-      mountSymbol: mountSymbol,
-      shipyardSymbol: shipyardSymbol,
+    final shipyardSymbol = WaypointSymbol.fromJson(
+      json['shipyardSymbol'] as String,
     );
+    return MountJob(mountSymbol: mountSymbol, shipyardSymbol: shipyardSymbol);
   }
 
   /// Create a new mount job from JSON, or null if the JSON is null.
@@ -349,8 +341,9 @@ class ShipBuyJob {
   /// Create a new ship buy job from JSON.
   factory ShipBuyJob.fromJson(Map<String, dynamic> json) {
     final shipType = ShipType.fromJson(json['shipType'] as String)!;
-    final shipyardSymbol =
-        WaypointSymbol.fromJson(json['shipyardSymbol'] as String);
+    final shipyardSymbol = WaypointSymbol.fromJson(
+      json['shipyardSymbol'] as String,
+    );
     final minCreditsNeeded = json['minCreditsNeeded'] as int;
     return ShipBuyJob(
       shipType: shipType,
@@ -387,10 +380,7 @@ Map<String, dynamic> _marketForGoodToJson(
 ) {
   return Map.fromEntries(
     marketForGood.entries.map(
-      (e) => MapEntry(
-        e.key.toJson(),
-        e.value.toJson(),
-      ),
+      (e) => MapEntry(e.key.toJson(), e.value.toJson()),
     ),
   );
 }
@@ -437,10 +427,12 @@ class ExtractionJob {
   /// Create a new ExtractionJob from JSON.
   factory ExtractionJob.fromJson(Map<String, dynamic> json) {
     final source = WaypointSymbol.fromJson(json['source'] as String);
-    final extractionType =
-        ExtractionType.fromJson(json['extractionType'] as String);
-    final marketForGood =
-        _marketForGoodFromJson(json['marketForGood'] as Map<String, dynamic>);
+    final extractionType = ExtractionType.fromJson(
+      json['extractionType'] as String,
+    );
+    final marketForGood = _marketForGoodFromJson(
+      json['marketForGood'] as Map<String, dynamic>,
+    );
     return ExtractionJob(
       source: source,
       marketForGood: marketForGood,
@@ -477,31 +469,29 @@ class ExtractionJob {
           runtimeType == other.runtimeType &&
           source == other.source &&
           extractionType == other.extractionType &&
-          const MapEquality<TradeSymbol, WaypointSymbol>()
-              .equals(marketForGood, other.marketForGood);
+          const MapEquality<TradeSymbol, WaypointSymbol>().equals(
+            marketForGood,
+            other.marketForGood,
+          );
 
   @override
   int get hashCode => Object.hashAll([
-        source,
-        extractionType,
-        const MapEquality<TradeSymbol, WaypointSymbol>().hash(marketForGood),
-      ]);
+    source,
+    extractionType,
+    const MapEquality<TradeSymbol, WaypointSymbol>().hash(marketForGood),
+  ]);
 }
 
 /// Watch a system's markets.
 @immutable
 class SystemWatcherJob {
   /// Create a new SystemWatcherJob.
-  const SystemWatcherJob({
-    required this.systemSymbol,
-  });
+  const SystemWatcherJob({required this.systemSymbol});
 
   /// Create a new SystemWatcherJob from JSON.
   factory SystemWatcherJob.fromJson(Map<String, dynamic> json) {
     final systemSymbol = SystemSymbol.fromJson(json['systemSymbol'] as String);
-    return SystemWatcherJob(
-      systemSymbol: systemSymbol,
-    );
+    return SystemWatcherJob(systemSymbol: systemSymbol);
   }
 
   /// Create a new SystemWatcherJob from JSON, or null if the JSON is null.
@@ -513,8 +503,6 @@ class SystemWatcherJob {
 
   /// Convert this to JSON.
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'systemSymbol': systemSymbol.toJson(),
-    };
+    return <String, dynamic>{'systemSymbol': systemSymbol.toJson()};
   }
 }

@@ -42,11 +42,12 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   );
 
   logger.info('Opps for ${marketScan.tradeSymbols.length} trade symbols.');
-  final costPerFuelUnit = marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
+  final costPerFuelUnit =
+      marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
       config.defaultFuelCost;
   final costPerAntimatterUnit =
       marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
-          config.defaultAntimatterCost;
+      config.defaultAntimatterCost;
 
   final deals = findAllDeals(
     systems,
@@ -92,24 +93,28 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   logger.info('Deals above $minProfitPerSecond c/s by system:');
-  final sorted = dealsBySystem.keys.toList()
-    ..sort((a, b) => dealsBySystem[b]!.length - dealsBySystem[a]!.length);
+  final sorted =
+      dealsBySystem.keys.toList()
+        ..sort((a, b) => dealsBySystem[b]!.length - dealsBySystem[a]!.length);
   for (final system in sorted) {
     final deals = dealsBySystem[system]!;
     final haulers = haulersBySystem[system] ?? {};
     final score = scoreSystem(system);
-    logger.info('${system.systemName} : ${deals.length} deals, '
-        '${haulers.length} haulers, score: ${score.toStringAsFixed(2)}');
+    logger.info(
+      '${system.systemName} : ${deals.length} deals, '
+      '${haulers.length} haulers, score: ${score.toStringAsFixed(2)}',
+    );
   }
   logger.info('Total deals: ${deals.length}');
 
-  final idleHaulers = haulers
-      .where((ship) {
-        final state = behaviors[ship.symbol];
-        return state == null || state.behavior == Behavior.idle;
-      })
-      .map((e) => e.symbol)
-      .toList();
+  final idleHaulers =
+      haulers
+          .where((ship) {
+            final state = behaviors[ship.symbol];
+            return state == null || state.behavior == Behavior.idle;
+          })
+          .map((e) => e.symbol)
+          .toList();
   logger.info('Idle haulers: ${idleHaulers.length}');
 
   // First figure out if we have any traders needing reassignment.
@@ -117,14 +122,17 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   for (final shipSymbol in idleHaulers) {
     // Re-compute since assignments may have changed.
-    final systemsWithOpenSlots = sorted
-        .where((system) => scoreSystem(system) > minScore)
-        .map((symbol) => systems[symbol])
-        .toList();
+    final systemsWithOpenSlots =
+        sorted
+            .where((system) => scoreSystem(system) > minScore)
+            .map((symbol) => systems[symbol])
+            .toList();
 
     final shipSystem = systems[ships[shipSymbol]!.systemSymbol];
-    final closest =
-        minBy(systemsWithOpenSlots, (system) => system.distanceTo(shipSystem));
+    final closest = minBy(
+      systemsWithOpenSlots,
+      (system) => system.distanceTo(shipSystem),
+    );
     if (closest != null) {
       // Pick the jumpgate in that system.
       final jumpGate = closest.jumpGateWaypoints.first.symbol;

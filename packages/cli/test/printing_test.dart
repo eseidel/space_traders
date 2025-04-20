@@ -53,10 +53,7 @@ void main() {
       timestamp: now,
     );
     expect(
-      contractDescription(
-        contract,
-        getNow: () => now,
-      ),
+      contractDescription(contract, getNow: () => now),
       'deliver 10  T to W in 1y for 1,000c with 1,000c upfront',
     );
   });
@@ -84,10 +81,7 @@ void main() {
     expect(approximateDuration(const Duration(seconds: 3600 * 24)), '1d');
     expect(approximateDuration(const Duration(seconds: 3600 * 24 * 7)), '1w');
     expect(approximateDuration(const Duration(seconds: 3600 * 24 * 30)), '4w');
-    expect(
-      approximateDuration(const Duration(seconds: 3600 * 24 * 365)),
-      '1y',
-    );
+    expect(approximateDuration(const Duration(seconds: 3600 * 24 * 365)), '1y');
     expect(
       approximateDuration(const Duration(seconds: 3600 * 24 * 365 * 3)),
       '3y',
@@ -115,10 +109,7 @@ void main() {
     );
 
     // Rounding
-    expect(
-      approximateDuration(const Duration(minutes: 2, seconds: 45)),
-      '3m',
-    );
+    expect(approximateDuration(const Duration(minutes: 2, seconds: 45)), '3m');
     expect(
       approximateDuration(const Duration(minutes: -2, seconds: -45)),
       '-3m',

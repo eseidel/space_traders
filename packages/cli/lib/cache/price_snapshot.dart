@@ -33,8 +33,8 @@ class PriceSnapshot<Symbol extends Object, Record extends PriceBase<Symbol>> {
     if (atWaypoint.isEmpty) {
       return null;
     }
-    final sortedPrices = atWaypoint.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final sortedPrices =
+        atWaypoint.toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return getNow().difference(sortedPrices.last.timestamp);
   }
 

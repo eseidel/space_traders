@@ -152,10 +152,7 @@ void main() {
       shipSymbol: const ShipSymbol('S', 1),
       timestamp: DateTime(2021),
     );
-    final transaction = Transaction.fromConstructionDelivery(
-      delivery,
-      100,
-    );
+    final transaction = Transaction.fromConstructionDelivery(delivery, 100);
     expect(transaction.transactionType, TransactionType.construction);
     expect(transaction.waypointSymbol, WaypointSymbol.fromString('A-B-C'));
     expect(transaction.shipSymbol, const ShipSymbol('S', 1));

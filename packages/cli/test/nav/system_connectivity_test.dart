@@ -13,35 +13,24 @@ void main() {
     final b = WaypointSymbol.fromString('X-B-B');
     final constructionSnapshot = _MockConstructionSnapshot();
     when(() => constructionSnapshot.isUnderConstruction(a)).thenReturn(false);
-    final jumpGates = JumpGateSnapshot(
-      [
-        JumpGate(waypointSymbol: a, connections: {b}),
-      ],
-    );
+    final jumpGates = JumpGateSnapshot([
+      JumpGate(waypointSymbol: a, connections: {b}),
+    ]);
 
     final unknownB = SystemConnectivity.fromJumpGates(
       jumpGates,
       constructionSnapshot,
     );
     // If construction status of 'b' is not known, then there is no path.
-    expect(
-      unknownB.existsJumpPathBetween(a.system, b.system),
-      isFalse,
-    );
+    expect(unknownB.existsJumpPathBetween(a.system, b.system), isFalse);
 
     when(() => constructionSnapshot.isUnderConstruction(b)).thenReturn(false);
     final knownB = SystemConnectivity.fromJumpGates(
       jumpGates,
       constructionSnapshot,
     );
-    expect(
-      knownB.existsJumpPathBetween(a.system, b.system),
-      isTrue,
-    );
+    expect(knownB.existsJumpPathBetween(a.system, b.system), isTrue);
 
-    expect(
-      knownB.directlyConnectedSystemSymbols(a.system),
-      {b.system},
-    );
+    expect(knownB.directlyConnectedSystemSymbols(a.system), {b.system});
   });
 }

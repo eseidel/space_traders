@@ -6,17 +6,15 @@ import 'package:collection/collection.dart';
 class ConstructionSnapshot {
   /// Creates a new ConstructionSnapshot.
   ConstructionSnapshot(Iterable<ConstructionRecord> records)
-      : _recordForSymbol = records.groupFoldBy(
-          (r) => r.waypointSymbol,
-          (previous, record) {
-            if (previous != null) {
-              throw ArgumentError(
-                'Duplicate record for ${record.waypointSymbol}!',
-              );
-            }
-            return record;
-          },
-        );
+    : _recordForSymbol = records.groupFoldBy((r) => r.waypointSymbol, (
+        previous,
+        record,
+      ) {
+        if (previous != null) {
+          throw ArgumentError('Duplicate record for ${record.waypointSymbol}!');
+        }
+        return record;
+      });
 
   final Map<WaypointSymbol, ConstructionRecord> _recordForSymbol;
 
@@ -82,15 +80,13 @@ class ConstructionCache {
   Future<ConstructionRecord?> getRecord(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async =>
-      _db.getConstruction(waypointSymbol, maxAge);
+  }) async => _db.getConstruction(waypointSymbol, maxAge);
 
   /// Load the Construction value for the given waypoint symbol.
   Future<Construction?> getConstruction(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async =>
-      (await getRecord(waypointSymbol, maxAge: maxAge))?.construction;
+  }) async => (await getRecord(waypointSymbol, maxAge: maxAge))?.construction;
 
   /// Returns true if the given waypoint symbol is under construction.
   /// Returns false if the given waypoint symbol is not under construction.

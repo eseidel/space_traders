@@ -4,10 +4,12 @@ import 'package:types/types.dart';
 /// Convert a row result into a ChartingRecord.
 ChartingRecord chartingRecordFromColumnMap(Map<String, dynamic> values) {
   return ChartingRecord(
-    waypointSymbol:
-        WaypointSymbol.fromJson(values['waypoint_symbol'] as String),
-    values:
-        ChartedValues.fromJsonOrNull(values['values'] as Map<String, dynamic>?),
+    waypointSymbol: WaypointSymbol.fromJson(
+      values['waypoint_symbol'] as String,
+    ),
+    values: ChartedValues.fromJsonOrNull(
+      values['values'] as Map<String, dynamic>?,
+    ),
     timestamp: values['timestamp'] as DateTime,
   );
 }

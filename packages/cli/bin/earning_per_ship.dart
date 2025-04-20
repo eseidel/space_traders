@@ -6,15 +6,18 @@ import 'package:intl/intl.dart';
 
 class TransactionSummary {
   TransactionSummary(Iterable<Transaction> transactions)
-      : transactions = List.from(transactions);
+    : transactions = List.from(transactions);
   final List<Transaction> transactions;
 
   bool get isEmpty => transactions.isEmpty;
 
   int get creditDiff => transactions.fold(0, (m, t) => m + t.creditsChange);
-  Duration get duration => transactions.isEmpty
-      ? Duration.zero
-      : transactions.last.timestamp.difference(transactions.first.timestamp);
+  Duration get duration =>
+      transactions.isEmpty
+          ? Duration.zero
+          : transactions.last.timestamp.difference(
+            transactions.first.timestamp,
+          );
 
   double get perSecond {
     if (duration.inSeconds == 0) {
@@ -48,8 +51,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final shipSymbols = (await db.uniqueShipSymbolsInTransactions()).toList()
-    ..sort();
+  final shipSymbols =
+      (await db.uniqueShipSymbolsInTransactions()).toList()..sort();
 
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
@@ -57,8 +60,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   logger
     ..info('Fleet: ${describeShips(ships.ships)}')
     ..info('${idleHaulers.length} idle traders')
-    ..info('Credits per minute for ships over the '
-        'last ${approximateDuration(lookback)}:');
+    ..info(
+      'Credits per minute for ships over the '
+      'last ${approximateDuration(lookback)}:',
+    );
 
   String c(num? n) {
     if (n == null) return '';
@@ -77,21 +82,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   );
 
   final table = Table(
-    header: [
-      'Ship',
-      'c/m',
-      'c/s',
-      'Role',
-      'TXNs',
-      'Cargo',
-    ],
+    header: ['Ship', 'c/m', 'c/s', 'Role', 'TXNs', 'Cargo'],
     style: const TableStyle(compact: true),
   );
 
   Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
-        'content': content.toString(),
-        'hAlign': HorizontalAlign.right,
-      };
+    'content': content.toString(),
+    'hAlign': HorizontalAlign.right,
+  };
 
   for (final shipSymbol in shipSymbols) {
     final ship = ships[shipSymbol];
@@ -108,7 +106,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
           (frameCounts[ship.frame.symbol] ?? 0) + 1;
       frameCreditPerSecondTotals[ship.frame.symbol] =
           (frameCreditPerSecondTotals[ship.frame.symbol] ?? 0) +
-              summary.perSecond;
+          summary.perSecond;
     }
 
     table.add([
@@ -123,26 +121,30 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   logger
     ..info(table.toString())
     ..info('By role:');
-  final sortedRoles = roleCounts.keys.toList()
-    ..sort((a, b) => a.name.compareTo(b.name));
+  final sortedRoles =
+      roleCounts.keys.toList()..sort((a, b) => a.name.compareTo(b.name));
   for (final role in sortedRoles) {
     final count = roleCounts[role]!;
     final total = roleCreditPerSecondTotals[role]!;
     final average = (total / count).round();
-    logger.info('${role.name.padRight(9)} '
-        '${count.toString().padLeft(2)} ships '
-        '${c(average).padLeft(3)} c/s');
+    logger.info(
+      '${role.name.padRight(9)} '
+      '${count.toString().padLeft(2)} ships '
+      '${c(average).padLeft(3)} c/s',
+    );
   }
   logger.info('By frame:');
-  final sortedFrames = frameCounts.keys.toList()
-    ..sort((a, b) => a.value.compareTo(b.value));
+  final sortedFrames =
+      frameCounts.keys.toList()..sort((a, b) => a.value.compareTo(b.value));
   for (final frame in sortedFrames) {
     final count = frameCounts[frame]!;
     final total = frameCreditPerSecondTotals[frame]!;
     final average = (total / count).round();
-    logger.info('${frame.value.padRight(9)} '
-        '${count.toString().padLeft(2)} ships '
-        '${c(average).padLeft(3)} c/s');
+    logger.info(
+      '${frame.value.padRight(9)} '
+      '${count.toString().padLeft(2)} ships '
+      '${c(average).padLeft(3)} c/s',
+    );
   }
 }
 

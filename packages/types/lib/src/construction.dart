@@ -64,8 +64,8 @@ class ConstructionRecord {
 
   /// Converts this object to a JSON encodable object.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'timestamp': timestamp.toIso8601String(),
-        'construction': construction?.toJson(),
-        'waypointSymbol': waypointSymbol.toJson(),
-      };
+    'timestamp': timestamp.toIso8601String(),
+    'construction': construction?.toJson(),
+    'waypointSymbol': waypointSymbol.toJson(),
+  };
 }

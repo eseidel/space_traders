@@ -36,10 +36,7 @@ void main() {
       onComplete: (duration, requestCount, queryCounts) {
         expect(requestCount, 1);
         expect(queryCounts.total, 1);
-        expect(
-          queryCounts.counts,
-          {'SELECT * FROM during_': 1},
-        );
+        expect(queryCounts.counts, {'SELECT * FROM during_': 1});
       },
     );
     expect(result, 42);

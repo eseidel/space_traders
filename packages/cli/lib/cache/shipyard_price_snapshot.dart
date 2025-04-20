@@ -42,8 +42,8 @@ class ShipyardPriceSnapshot extends PriceSnapshot<ShipType, ShipyardPrice> {
       return null;
     }
     // Sort the prices in ascending order.
-    final pricesForSymbolSorted = pricesForSymbol.toList()
-      ..sortedBy<num>((s) => s.purchasePrice);
+    final pricesForSymbolSorted =
+        pricesForSymbol.toList()..sortedBy<num>((s) => s.purchasePrice);
     // Make sure that 100th percentile doesn't go out of bounds.
     final index = min(
       pricesForSymbolSorted.length * percentile ~/ 100,
@@ -58,12 +58,13 @@ class ShipyardPriceSnapshot extends PriceSnapshot<ShipType, ShipyardPrice> {
     ShipType shipType, {
     WaypointSymbol? shipyardSymbol,
   }) {
-    final filter = shipyardSymbol == null
-        ? (ShipyardPrice e) => e.shipType == shipType && e.purchasePrice > 0
-        : (ShipyardPrice e) =>
-            e.shipType == shipType &&
-            e.purchasePrice > 0 &&
-            e.waypointSymbol == shipyardSymbol;
+    final filter =
+        shipyardSymbol == null
+            ? (ShipyardPrice e) => e.shipType == shipType && e.purchasePrice > 0
+            : (ShipyardPrice e) =>
+                e.shipType == shipType &&
+                e.purchasePrice > 0 &&
+                e.waypointSymbol == shipyardSymbol;
     return prices.where(filter);
   }
 
@@ -84,8 +85,9 @@ class ShipyardPriceSnapshot extends PriceSnapshot<ShipType, ShipyardPrice> {
     if (pricesForSymbol.isEmpty) {
       return null;
     }
-    final pricesForSymbolSorted = pricesForSymbol.toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final pricesForSymbolSorted =
+        pricesForSymbol.toList()
+          ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
     if (pricesForSymbolSorted.last.timestamp.difference(getNow()) > maxAge) {
       return null;
     }
@@ -113,15 +115,16 @@ void recordShipyardPrices(
   Shipyard shipyard, {
   DateTime Function() getNow = defaultGetNow,
 }) {
-  final prices = shipyard.ships
-      .map(
-        (s) => ShipyardPrice.fromShipyardShip(
-          s,
-          shipyard.waypointSymbol,
-          getNow: getNow,
-        ),
-      )
-      .toList();
+  final prices =
+      shipyard.ships
+          .map(
+            (s) => ShipyardPrice.fromShipyardShip(
+              s,
+              shipyard.waypointSymbol,
+              getNow: getNow,
+            ),
+          )
+          .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${shipyard.symbol}!');
   }

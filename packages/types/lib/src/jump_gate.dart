@@ -7,10 +7,7 @@ import 'package:types/types.dart';
 @immutable
 class JumpGate extends Equatable {
   /// Creates a new JumpGate.
-  const JumpGate({
-    required this.waypointSymbol,
-    required this.connections,
-  });
+  const JumpGate({required this.waypointSymbol, required this.connections});
 
   /// Creates a new  from a JumpGate.
   factory JumpGate.fromOpenApi(openapi.JumpGate jumpGate) {
@@ -22,12 +19,13 @@ class JumpGate extends Equatable {
 
   /// Creates a new JumpGate from JSON.
   factory JumpGate.fromJson(Map<String, dynamic> json) {
-    final openapiJumpGate = openapi.JumpGate.fromJson({
-      // JumpGate briefly used 'waypointSymbol' instead of 'symbol'.
-      // This can be removed on the next reset.
-      'symbol': json['waypointSymbol'] ?? json['symbol'],
-      'connections': json['connections'],
-    })!;
+    final openapiJumpGate =
+        openapi.JumpGate.fromJson({
+          // JumpGate briefly used 'waypointSymbol' instead of 'symbol'.
+          // This can be removed on the next reset.
+          'symbol': json['waypointSymbol'] ?? json['symbol'],
+          'connections': json['connections'],
+        })!;
     return JumpGate.fromOpenApi(openapiJumpGate);
   }
 

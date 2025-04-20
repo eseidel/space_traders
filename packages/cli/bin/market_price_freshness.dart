@@ -14,11 +14,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final s = baseStats.withPrecision(3);
   String d(num seconds) =>
       approximateDuration(Duration(seconds: seconds.toInt()));
-  logger.info('freshness: {average: ${d(s.average)}, '
-      'median: ${d(s.median)}, '
-      'min: ${d(s.min)}, '
-      'max: ${d(s.max)}, '
-      'stddev: ${d(s.standardDeviation)}}');
+  logger.info(
+    'freshness: {average: ${d(s.average)}, '
+    'median: ${d(s.median)}, '
+    'min: ${d(s.min)}, '
+    'max: ${d(s.max)}, '
+    'stddev: ${d(s.standardDeviation)}}',
+  );
 }
 
 void main(List<String> args) {

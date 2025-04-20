@@ -66,6 +66,4 @@ Future<JobResult> _doSurveyor(
 }
 
 /// Advance the behavior of the given ship.
-final advanceSurveyor = const MultiJob('Surveyor', [
-  _doSurveyor,
-]).run;
+final advanceSurveyor = const MultiJob('Surveyor', [_doSurveyor]).run;

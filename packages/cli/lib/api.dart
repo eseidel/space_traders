@@ -11,13 +11,13 @@ const defaultHttpGet = http.get;
 class Api {
   /// Construct an Api with the given ApiClient.
   Api(this.apiClient)
-      : systems = SystemsApi(apiClient),
-        global = GlobalApi(apiClient),
-        data = DataApi(apiClient),
-        contracts = ContractsApi(apiClient),
-        agents = AgentsApi(apiClient),
-        fleet = FleetApi(apiClient),
-        factions = FactionsApi(apiClient);
+    : systems = SystemsApi(apiClient),
+      global = GlobalApi(apiClient),
+      data = DataApi(apiClient),
+      contracts = ContractsApi(apiClient),
+      agents = AgentsApi(apiClient),
+      fleet = FleetApi(apiClient),
+      factions = FactionsApi(apiClient);
 
   /// The shared ApiClient.
   final CountingApiClient apiClient;

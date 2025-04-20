@@ -44,8 +44,9 @@ Future<String> register(
   // at the start, so we use RegisterRequestFactionEnum.
   final Faction chosenFaction;
   if (faction != null) {
-    chosenFaction =
-        factions.firstWhere((f) => f.symbol.value == faction.toUpperCase());
+    chosenFaction = factions.firstWhere(
+      (f) => f.symbol.value == faction.toUpperCase(),
+    );
   } else {
     logger.warn('Faction not specified. Choosing a random faction.');
     chosenFaction =

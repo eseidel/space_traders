@@ -57,11 +57,14 @@ void logShip(
 ) {
   const indent = '   ';
   final waypoint = systemsCache.waypoint(ship.waypointSymbol);
-  final cargoStatus = ship.cargo.capacity == 0
-      ? ''
-      : '${ship.cargo.units}/${ship.cargo.capacity}';
-  logger.info('${ship.symbol.hexNumber} '
-      '${_behaviorOrTypeString(ship, behavior)} $cargoStatus');
+  final cargoStatus =
+      ship.cargo.capacity == 0
+          ? ''
+          : '${ship.cargo.units}/${ship.cargo.capacity}';
+  logger.info(
+    '${ship.symbol.hexNumber} '
+    '${_behaviorOrTypeString(ship, behavior)} $cargoStatus',
+  );
   if (ship.cargo.isNotEmpty) {
     logger.info(
       describeInventory(marketPrices, ship.cargo.inventory, indent: indent),
@@ -73,8 +76,10 @@ void logShip(
     final destination = routePlan.endSymbol.sectorLocalName;
     final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
     final arrival = approximateDuration(timeLeft);
-    logger.info('${indent}en route to $destination $destinationType '
-        'in $arrival');
+    logger.info(
+      '${indent}en route to $destination $destinationType '
+      'in $arrival',
+    );
   } else {
     logger.info('$indent${describeShipNav(ship.nav)} ${waypoint.type}');
   }
@@ -112,12 +117,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   for (final ship in matchingShips) {
     final behaviorState = await db.behaviorStateBySymbol(ship.symbol);
-    logShip(
-      systemsCache,
-      marketPrices,
-      ship,
-      behaviorState,
-    );
+    logShip(systemsCache, marketPrices, ship, behaviorState);
   }
 
   final behaviors = await BehaviorSnapshot.load(db);

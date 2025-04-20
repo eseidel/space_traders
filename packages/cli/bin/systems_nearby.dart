@@ -2,14 +2,16 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final startSystemSymbol =
-      await startSystemFromArg(db, argResults.rest.firstOrNull);
+  final startSystemSymbol = await startSystemFromArg(
+    db,
+    argResults.rest.firstOrNull,
+  );
 
   final marketListings = await MarketListingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
 
-  final connectedSystemSymbols =
-      systemConnectivity.directlyConnectedSystemSymbols(startSystemSymbol);
+  final connectedSystemSymbols = systemConnectivity
+      .directlyConnectedSystemSymbols(startSystemSymbol);
   if (connectedSystemSymbols.isEmpty) {
     logger.info('No systems connected to $startSystemSymbol.');
     return;

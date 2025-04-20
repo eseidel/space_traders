@@ -76,12 +76,7 @@ Future<WarpShip200ResponseData> warpToWaypoint(
   WaypointSymbol waypointSymbol,
 ) async {
   await undockIfNeeded(db, api, ship);
-  final data = await warpShip(
-    db,
-    api,
-    ship,
-    waypointSymbol,
-  );
+  final data = await warpShip(db, api, ship, waypointSymbol);
   return data;
 }
 
@@ -163,8 +158,9 @@ Future<List<Transaction>> sellAllCargoAndLog(
   )) {
     final marketTransaction = response.transaction;
     final agent = Agent.fromOpenApi(response.agent);
-    final median =
-        marketPrices.medianSellPrice(marketTransaction.tradeSymbolObject);
+    final median = marketPrices.medianSellPrice(
+      marketTransaction.tradeSymbolObject,
+    );
     logMarketTransaction(ship, agent, marketTransaction, medianPrice: median);
     final transaction = Transaction.fromMarketTransaction(
       marketTransaction,
@@ -188,8 +184,10 @@ Future<void> jettisonCargoAndLog(
   shipWarn(ship, 'Jettisoning ${item.units} ${item.symbol}');
   final response = await api.fleet.jettison(
     ship.symbol.symbol,
-    jettisonRequest:
-        JettisonRequest(symbol: item.tradeSymbol, units: item.units),
+    jettisonRequest: JettisonRequest(
+      symbol: item.tradeSymbol,
+      units: item.units,
+    ),
   );
   ship.cargo = response!.data.cargo;
   await db.upsertShip(ship);
@@ -284,12 +282,7 @@ Future<ScrapShip200ResponseData> scrapShipAndLog(
   AgentCache agentCache,
   Ship ship,
 ) async {
-  final result = await scrapShip(
-    db,
-    api,
-    agentCache,
-    ship.symbol,
-  );
+  final result = await scrapShip(db, api, agentCache, ship.symbol);
   final agent = Agent.fromOpenApi(result.agent);
   logScrapTransaction(ship, agent, result.transaction);
   shipErr(
@@ -338,9 +331,10 @@ bool _shouldRefuelAfterCheckingPrice(
       return false; // Do not refuel.
     }
     shipWarn(
-        ship,
-        'Fuel is at $markupString times the median price '
-        '$fuelString ($deviation), but also critically low, refueling anyway');
+      ship,
+      'Fuel is at $markupString times the median price '
+      '$fuelString ($deviation), but also critically low, refueling anyway',
+    );
   }
   return true; // Refuel.
 }
@@ -355,9 +349,10 @@ bool _shouldRefuelBasedOnUsage(Ship ship) {
   if (ship.isMiner && takingShortTrips) {
     // If we're a miner, we should only refuel if we're below 50% fuel.
     shipInfo(
-        ship,
-        'Not refueling yet, last trip was short ($recentFuelSpend fuel)'
-        ' and at ${(100.0 * ship.fuelPercentage).toStringAsFixed(1)}% fuel.');
+      ship,
+      'Not refueling yet, last trip was short ($recentFuelSpend fuel)'
+      ' and at ${(100.0 * ship.fuelPercentage).toStringAsFixed(1)}% fuel.',
+    );
     return ship.fuelPercentage < 0.5;
   }
   return true;
@@ -421,8 +416,13 @@ Future<RefuelShip200ResponseData?> refuelAndLog(
   bool fromCargo = false,
 }) async {
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
-  final data =
-      await refuelShip(db, api, agentCache, ship, fromCargo: fromCargo);
+  final data = await refuelShip(
+    db,
+    api,
+    agentCache,
+    ship,
+    fromCargo: fromCargo,
+  );
   final marketTransaction = data.transaction;
   final agent = agentCache.agent;
   logMarketTransaction(
@@ -447,11 +447,7 @@ Future<RefuelShip200ResponseData?> refuelAndLog(
 }
 
 /// Dock the ship if needed and log the transaction
-Future<void> dockIfNeeded(
-  Database db,
-  Api api,
-  Ship ship,
-) async {
+Future<void> dockIfNeeded(Database db, Api api, Ship ship) async {
   if (ship.isOrbiting) {
     shipDetail(ship, '🛬 at ${ship.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol.symbol);
@@ -461,11 +457,7 @@ Future<void> dockIfNeeded(
 }
 
 /// Undock the ship if needed and log the transaction
-Future<void> undockIfNeeded(
-  Database db,
-  Api api,
-  Ship ship,
-) async {
+Future<void> undockIfNeeded(Database db, Api api, Ship ship) async {
   if (ship.isDocked) {
     // Extra space after emoji is needed for windows powershell.
     shipDetail(ship, '🛰️  at ${ship.waypointSymbol}');
@@ -504,12 +496,10 @@ void _checkFlightTime(
 
 void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
   final route = result.nav.route;
-  final expectedFuel = ship.usesFuel
-      ? fuelUsedByDistance(
-          route.distance,
-          ship.nav.flightMode,
-        )
-      : 0;
+  final expectedFuel =
+      ship.usesFuel
+          ? fuelUsedByDistance(route.distance, ship.nav.flightMode)
+          : 0;
   final delta = (result.fuel.consumed!.amount - expectedFuel).abs();
   if (delta > 1) {
     shipWarn(
@@ -659,8 +649,10 @@ Future<Contract> negotiateContractAndLog(
   await dockIfNeeded(db, api, ship);
   final response = await api.fleet.negotiateContract(ship.symbol.symbol);
   final contractData = response!.data;
-  final contract =
-      Contract.fromOpenApi(contractData.contract, DateTime.timestamp());
+  final contract = Contract.fromOpenApi(
+    contractData.contract,
+    DateTime.timestamp(),
+  );
   await db.upsertContract(contract);
   shipInfo(ship, 'Negotiated contract: ${contractDescription(contract)}');
   return contract;
@@ -792,9 +784,10 @@ Future<Jettison200ResponseData> transferCargoAndLog(
   await db.upsertShip(from);
   await db.upsertShip(to);
   shipDetail(
-      from,
-      'Transferred $units $tradeSymbol from ${from.symbol} to '
-      '${to.symbol}');
+    from,
+    'Transferred $units $tradeSymbol from ${from.symbol} to '
+    '${to.symbol}',
+  );
   return data;
 }
 

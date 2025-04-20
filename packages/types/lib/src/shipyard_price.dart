@@ -40,8 +40,12 @@ class ShipyardPrice extends PriceBase<ShipType> {
   final int purchasePrice;
 
   @override
-  List<Object> get props =>
-      [waypointSymbol, shipType, purchasePrice, timestamp];
+  List<Object> get props => [
+    waypointSymbol,
+    shipType,
+    purchasePrice,
+    timestamp,
+  ];
 
   /// The symbol of the ship type.
   ShipType get shipType => symbol;

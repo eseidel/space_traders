@@ -77,8 +77,9 @@ class ExtractionSquad {
     }
     // If our first ship has already mounted at least one surveyor, we should
     // only mine.
-    if (surveyor.mountedMountSymbols
-        .contains(ShipMountSymbolEnum.SURVEYOR_II)) {
+    if (surveyor.mountedMountSymbols.contains(
+      ShipMountSymbolEnum.SURVEYOR_II,
+    )) {
       return kMineOnlyTemplate;
     }
     // Otherwise we also need to survey.

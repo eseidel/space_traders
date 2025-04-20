@@ -52,11 +52,7 @@ void main() {
     );
     final now = DateTime(2021);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    final price = MarketPrice.fromMarketTradeGood(
-      good,
-      waypointSymbol,
-      now,
-    );
+    final price = MarketPrice.fromMarketTradeGood(good, waypointSymbol, now);
     expect(price.symbol, TradeSymbol.FUEL);
     expect(price.waypointSymbol, waypointSymbol);
     expect(price.tradeVolume, 1);
@@ -67,15 +63,13 @@ void main() {
 
   test('percentileForSellPrice', () {
     const a = TradeSymbol.FUEL;
-    final marketPrices = MarketPriceSnapshot(
-      [
-        makePrice(waypointSymbol: 'S-S-A', symbol: a, sellPrice: 100),
-        makePrice(waypointSymbol: 'S-S-B', symbol: a, sellPrice: 110),
-        makePrice(waypointSymbol: 'S-S-C', symbol: a, sellPrice: 150),
-        makePrice(waypointSymbol: 'S-S-D', symbol: a, sellPrice: 200),
-        makePrice(waypointSymbol: 'S-S-E', symbol: a, sellPrice: 300),
-      ],
-    );
+    final marketPrices = MarketPriceSnapshot([
+      makePrice(waypointSymbol: 'S-S-A', symbol: a, sellPrice: 100),
+      makePrice(waypointSymbol: 'S-S-B', symbol: a, sellPrice: 110),
+      makePrice(waypointSymbol: 'S-S-C', symbol: a, sellPrice: 150),
+      makePrice(waypointSymbol: 'S-S-D', symbol: a, sellPrice: 200),
+      makePrice(waypointSymbol: 'S-S-E', symbol: a, sellPrice: 300),
+    ]);
     expect(marketPrices.percentileForSellPrice(a, 100), 20);
     expect(marketPrices.percentileForSellPrice(a, 110), 40);
     expect(marketPrices.percentileForSellPrice(a, 150), 60);

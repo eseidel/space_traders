@@ -16,10 +16,7 @@ void main() {
       name: 'name',
       description: 'description',
       purchasePrice: 10,
-      crew: ShipyardShipCrew(
-        required_: 0,
-        capacity: 0,
-      ),
+      crew: ShipyardShipCrew(required_: 0, capacity: 0),
       frame: ShipFrame(
         symbol: ShipFrameSymbolEnum.CARRIER,
         name: 'name',

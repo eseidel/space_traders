@@ -34,9 +34,8 @@ Set<SystemSymbol> findInterestingSystems(SystemsCache systemsCache) {
 /// Central command for the fleet.
 class CentralCommand {
   /// Create a new central command.
-  CentralCommand({
-    BehaviorTimeouts? behaviorTimeouts,
-  }) : behaviorTimeouts = behaviorTimeouts ?? BehaviorTimeouts();
+  CentralCommand({BehaviorTimeouts? behaviorTimeouts})
+    : behaviorTimeouts = behaviorTimeouts ?? BehaviorTimeouts();
 
   bool _isGateComplete = false;
 
@@ -222,20 +221,17 @@ class CentralCommand {
 
     final squad = squadForShip(ship);
     if (squad != null) {
-      var behavior = {
-        FleetRole.miner: Behavior.miner,
-        FleetRole.surveyor: Behavior.surveyor,
-        FleetRole.siphoner: Behavior.siphoner,
-      }[ship.fleetRole];
+      var behavior =
+          {
+            FleetRole.miner: Behavior.miner,
+            FleetRole.surveyor: Behavior.surveyor,
+            FleetRole.siphoner: Behavior.siphoner,
+          }[ship.fleetRole];
       if (behavior == null && ship.isHauler && enabled(Behavior.minerHauler)) {
         behavior = Behavior.minerHauler;
       }
       if (behavior != null && enabled(behavior)) {
-        return BehaviorState(
-          shipSymbol,
-          behavior,
-          extractionJob: squad.job,
-        );
+        return BehaviorState(shipSymbol, behavior, extractionJob: squad.job);
       }
     }
 
@@ -335,8 +331,9 @@ class CentralCommand {
       extraSellOpps.addAll(constructionSellOpps(behaviors));
     }
     if (isContractTradingEnabled) {
-      extraSellOpps
-          .addAll(contractSellOpps(agentCache, behaviors, contractSnapshot));
+      extraSellOpps.addAll(
+        contractSellOpps(agentCache, behaviors, contractSnapshot),
+      );
     }
     if (extraSellOpps.isNotEmpty) {
       final opp = extraSellOpps.first;
@@ -347,10 +344,10 @@ class CentralCommand {
     }
     final costPerFuelUnit =
         marketPrices.medianPurchasePrice(TradeSymbol.FUEL) ??
-            config.defaultFuelCost;
+        config.defaultFuelCost;
     final costPerAntimatterUnit =
         marketPrices.medianPurchasePrice(TradeSymbol.ANTIMATTER) ??
-            config.defaultAntimatterCost;
+        config.defaultAntimatterCost;
 
     final deals = scanAndFindDeals(
       systemsCache,
@@ -374,8 +371,10 @@ class CentralCommand {
 
     // A hack to avoid spamming the console until we add a deals cache.
     if (deals.isNotEmpty) {
-      logger.info('Found ${deals.length} deals for ${ship.symbol} from '
-          '$startSymbol');
+      logger.info(
+        'Found ${deals.length} deals for ${ship.symbol} from '
+        '$startSymbol',
+      );
     }
     for (final deal in deals) {
       logger.detail(describeCostedDeal(deal));
@@ -467,39 +466,36 @@ class CentralCommand {
     BehaviorSnapshot behaviors,
     SystemSymbol systemSymbol,
     ShipSymbol thisShipSymbol,
-  ) =>
-      _otherWaypointsWithBehavior(
-        ships,
-        behaviors,
-        thisShipSymbol,
-        Behavior.systemWatcher,
-      ).where((s) => s.system == systemSymbol);
+  ) => _otherWaypointsWithBehavior(
+    ships,
+    behaviors,
+    thisShipSymbol,
+    Behavior.systemWatcher,
+  ).where((s) => s.system == systemSymbol);
 
   /// Returns all systems containing charters or charter destinations.
   Iterable<SystemSymbol> otherCharterSystems(
     ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
-  ) =>
-      _otherSystemsWithBehavior(
-        ships,
-        behaviors,
-        thisShipSymbol,
-        Behavior.charter,
-      );
+  ) => _otherSystemsWithBehavior(
+    ships,
+    behaviors,
+    thisShipSymbol,
+    Behavior.charter,
+  );
 
   /// Returns all systems containing traders or trader destinations.
   Iterable<SystemSymbol> otherTraderSystems(
     ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     ShipSymbol thisShipSymbol,
-  ) =>
-      _otherSystemsWithBehavior(
-        ships,
-        behaviors,
-        thisShipSymbol,
-        Behavior.trader,
-      );
+  ) => _otherSystemsWithBehavior(
+    ships,
+    behaviors,
+    thisShipSymbol,
+    Behavior.trader,
+  );
 
   Future<void> _queueMountRequests(
     Database db,
@@ -577,8 +573,11 @@ class CentralCommand {
     SystemsCache systems,
     SystemSymbol systemSymbol,
   ) async {
-    final construction =
-        await _constructionForSystem(db, systems, systemSymbol);
+    final construction = await _constructionForSystem(
+      db,
+      systems,
+      systemSymbol,
+    );
     return construction?.isComplete;
   }
 
@@ -596,8 +595,11 @@ class CentralCommand {
     }
 
     final systemSymbol = agentCache.headquartersSystemSymbol;
-    final construction =
-        await _constructionForSystem(db, systems, systemSymbol);
+    final construction = await _constructionForSystem(
+      db,
+      systems,
+      systemSymbol,
+    );
     if (construction == null || construction.isComplete) {
       return null;
     }
@@ -605,13 +607,15 @@ class CentralCommand {
   }
 
   Future<void> _updateMedianPrices(Database db) async {
-    final medianFuelPrice =
-        await db.medianMarketPurchasePrice(TradeSymbol.FUEL);
+    final medianFuelPrice = await db.medianMarketPurchasePrice(
+      TradeSymbol.FUEL,
+    );
     if (medianFuelPrice != null) {
       medianFuelPurchasePrice = medianFuelPrice;
     }
-    final medianAntimatterPrice =
-        await db.medianMarketPurchasePrice(TradeSymbol.ANTIMATTER);
+    final medianAntimatterPrice = await db.medianMarketPurchasePrice(
+      TradeSymbol.ANTIMATTER,
+    );
     if (medianAntimatterPrice != null) {
       medianAntimatterPurchasePrice = medianAntimatterPrice;
     }
@@ -625,8 +629,13 @@ class CentralCommand {
     ShipyardListingSnapshot shipyardListings,
     ShipSnapshot ships,
   ) async {
-    _nextShipBuyJob ??=
-        await _computeNextShipBuyJob(db, api, caches, shipyardListings, ships);
+    _nextShipBuyJob ??= await _computeNextShipBuyJob(
+      db,
+      api,
+      caches,
+      shipyardListings,
+      ships,
+    );
   }
 
   GamePhase _determineGamePhase(
@@ -652,7 +661,8 @@ class CentralCommand {
     // await caches.updateRoutingCaches();
 
     final ships = await ShipSnapshot.load(db);
-    _isGateComplete = await isJumpgateComplete(
+    _isGateComplete =
+        await isJumpgateComplete(
           db,
           caches.systems,
           caches.agent.headquartersSystemSymbol,
@@ -674,11 +684,7 @@ class CentralCommand {
     _assignedSystemsForSatellites
       ..clear()
       ..addAll(
-        assignProbesToSystems(
-          caches.systemConnectivity,
-          marketListings,
-          ships,
-        ),
+        assignProbesToSystems(caches.systemConnectivity, marketListings, ships),
       );
 
     if (config.enableMining) {
@@ -693,13 +699,7 @@ class CentralCommand {
       miningSquads = [];
     }
 
-    await updateBuyShipJobIfNeeded(
-      db,
-      api,
-      caches,
-      shipyardListings,
-      ships,
-    );
+    await updateBuyShipJobIfNeeded(db, api, caches, shipyardListings, ships);
 
     // Mounts are currently only used for mining.
     if (config.enableMining) {
@@ -797,16 +797,19 @@ class CentralCommand {
     // Get our main cluster id.
     final hqSystemSymbol = agentCache.headquartersSystemSymbol;
     // List all systems with explorers in them.
-    final systemsWithExplorers = ships.ships
-        .where((s) => s.fleetRole == FleetRole.explorer)
-        .map((s) => s.systemSymbol)
-        .toSet();
+    final systemsWithExplorers =
+        ships.ships
+            .where((s) => s.fleetRole == FleetRole.explorer)
+            .map((s) => s.systemSymbol)
+            .toSet();
     // Any system which is not in our main cluster id.
-    final unreachableSystems = systemsWithExplorers
-        .where(
-          (s) => systemConnectivity.existsJumpPathBetween(s, hqSystemSymbol),
-        )
-        .toSet();
+    final unreachableSystems =
+        systemsWithExplorers
+            .where(
+              (s) =>
+                  systemConnectivity.existsJumpPathBetween(s, hqSystemSymbol),
+            )
+            .toSet();
     // And does not have a probe in it.
     final probes =
         ships.ships.where((s) => s.isProbe).map((s) => s.systemSymbol).toSet();
@@ -821,10 +824,11 @@ class CentralCommand {
     const shipType = ShipType.PROBE;
     final systemSymbol = systemWithoutProbes.first;
     // TODO(eseidel): This should be a db query.
-    final shipyardSymbol = shipyardListings
-        .listingsInSystem(systemSymbol)
-        .firstWhereOrNull((s) => s.hasShip(shipType))
-        ?.waypointSymbol;
+    final shipyardSymbol =
+        shipyardListings
+            .listingsInSystem(systemSymbol)
+            .firstWhereOrNull((s) => s.hasShip(shipType))
+            ?.waypointSymbol;
     if (shipyardSymbol == null) {
       logger.info("Can't find shipyard to buy probe in $systemSymbol");
       return null;
@@ -921,8 +925,9 @@ class CentralCommand {
       return false;
     }
     // Does this ship have a mount it needs?
-    final mountRequest =
-        _mountRequests.firstWhereOrNull((m) => m.shipSymbol == ship.symbol);
+    final mountRequest = _mountRequests.firstWhereOrNull(
+      (m) => m.shipSymbol == ship.symbol,
+    );
     if (mountRequest == null) {
       return false;
     }
@@ -941,11 +946,12 @@ class CentralCommand {
     Contract contract,
     TradeSymbol tradeSymbol,
   ) {
-    final unitsAssigned = behaviors
-        .dealsInProgress()
-        .where((d) => d.contractId == contract.id)
-        .map((d) => d.maxUnitsToBuy)
-        .sum;
+    final unitsAssigned =
+        behaviors
+            .dealsInProgress()
+            .where((d) => d.contractId == contract.id)
+            .map((d) => d.maxUnitsToBuy)
+            .sum;
     final neededGood = contract.goodNeeded(tradeSymbol);
     return neededGood!.remainingNeeded - unitsAssigned;
   }
@@ -958,12 +964,15 @@ class CentralCommand {
     Construction construction,
     TradeSymbol tradeSymbol,
   ) {
-    final unitsAssigned = behaviors
-        .dealsInProgress()
-        .where((d) => d.isConstructionDeal)
-        .where((d) => d.deal.destinationSymbol == construction.waypointSymbol)
-        .map((d) => d.maxUnitsToBuy)
-        .sum;
+    final unitsAssigned =
+        behaviors
+            .dealsInProgress()
+            .where((d) => d.isConstructionDeal)
+            .where(
+              (d) => d.deal.destinationSymbol == construction.waypointSymbol,
+            )
+            .map((d) => d.maxUnitsToBuy)
+            .sum;
     final material = construction.materialNeeded(tradeSymbol);
     return material!.remainingNeeded - unitsAssigned;
   }
@@ -987,7 +996,7 @@ class CentralCommand {
   }
 
   /// Returns the siphon plan for the given [ship].
-// TODO(eseidel): call from or merge into getJobForShip.
+  // TODO(eseidel): call from or merge into getJobForShip.
   Future<ExtractionJob?> siphonJobForShip(
     Database db,
     SystemsCache systemsCache,
@@ -995,13 +1004,13 @@ class CentralCommand {
     AgentCache agentCache,
     Ship ship,
   ) async {
-    final score = (await evaluateWaypointsForSiphoning(
-      db,
-      systemsCache,
-      chartingCache,
-      agentCache.headquartersSystemSymbol,
-    ))
-        .firstOrNull;
+    final score =
+        (await evaluateWaypointsForSiphoning(
+          db,
+          systemsCache,
+          chartingCache,
+          agentCache.headquartersSystemSymbol,
+        )).firstOrNull;
     if (score == null) {
       return null;
     }
@@ -1013,10 +1022,7 @@ class CentralCommand {
   }
 }
 
-int _maxContractUnitPurchasePrice(
-  Contract contract,
-  ContractDeliverGood good,
-) {
+int _maxContractUnitPurchasePrice(Contract contract, ContractDeliverGood good) {
   // To compute all of this we need to:
   // 1. First estimate the total cost of the contract goods based on median
   //    market prices.
@@ -1060,7 +1066,7 @@ Iterable<SellOpp> sellOppsForContracts(
   BehaviorSnapshot behaviors,
   ContractSnapshot contractSnapshot, {
   required int Function(BehaviorSnapshot, Contract, TradeSymbol)
-      remainingUnitsNeededForContract,
+  remainingUnitsNeededForContract,
 }) sync* {
   for (final contract in affordableContracts(agentCache, contractSnapshot)) {
     for (final good in contract.terms.deliver) {
@@ -1094,8 +1100,9 @@ Iterable<Contract> affordableContracts(
   // contract we can't complete yet when we could be using that money for other
   // trading.
   final credits = agentCache.agent.credits;
-  return contractsCache.activeContracts
-      .where((c) => _minimumFloatRequired(c) <= credits);
+  return contractsCache.activeContracts.where(
+    (c) => _minimumFloatRequired(c) <= credits,
+  );
 }
 
 /// Procurement contracts converted to sell opps.
@@ -1161,15 +1168,18 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
   required SystemSymbol systemSymbol,
 }) async {
   // Look at the top N mining scores.
-  final scores = (await evaluateWaypointsForMining(
-    db,
-    systemsCache,
-    chartingCache,
-    systemSymbol,
-  ))
-      .where((m) => m.marketsTradeAllProducedGoods)
-      .where((m) => m.deliveryDistance < config.maxExtractionDeliveryDistance)
-      .toList();
+  final scores =
+      (await evaluateWaypointsForMining(
+            db,
+            systemsCache,
+            chartingCache,
+            systemSymbol,
+          ))
+          .where((m) => m.marketsTradeAllProducedGoods)
+          .where(
+            (m) => m.deliveryDistance < config.maxExtractionDeliveryDistance,
+          )
+          .toList();
 
   // Sort by distance from center of the system.
   final origin = WaypointPosition(0, 0, systemSymbol);
@@ -1201,9 +1211,11 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
 
   // Go through and assign all ships to squads.
   for (final ship in ships.ships) {
-    findSquadForShip(squads, ship, useAsMinerHauler: useAsMinerHauler)
-        ?.ships
-        .add(ship);
+    findSquadForShip(
+      squads,
+      ship,
+      useAsMinerHauler: useAsMinerHauler,
+    )?.ships.add(ship);
   }
   return squads;
 }
@@ -1286,12 +1298,7 @@ Future<List<SellOpp>> computeConstructionMaterialSubsidies(
       charting: charting,
     ).buildChainTo(symbol, construction.waypointSymbol);
     if (chain != null) {
-      sellOpps.addAll(
-        await constructionSubsidiesForSupplyChain(
-          db,
-          chain,
-        ),
-      );
+      sellOpps.addAll(await constructionSubsidiesForSupplyChain(db, chain));
     }
   }
   return sellOpps;

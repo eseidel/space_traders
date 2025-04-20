@@ -71,10 +71,11 @@ Future<JobResult> siphonAndLog(
     );
     // Could use TradeSymbol.values.reduce() to find the longest symbol.
     shipDetail(
-        ship,
-        '🪠  ${yield_.units.toString().padLeft(2)} '
-        '${yield_.symbol.value.padRight(18)} '
-        '🛢️ ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+      ship,
+      '🪠  ${yield_.units.toString().padLeft(2)} '
+      '${yield_.symbol.value.padRight(18)} '
+      '🛢️ ${cargo.units.toString().padLeft(2)}/${cargo.capacity}',
+    );
 
     verifyCooldown(
       ship,
@@ -171,12 +172,7 @@ Future<JobResult> doSiphonJob(
     return JobResult.wait(expiration);
   }
 
-  final result = await siphonAndLog(
-    api,
-    db,
-    ship,
-    getNow: getNow,
-  );
+  final result = await siphonAndLog(api, db, ship, getNow: getNow);
   return result;
 }
 
@@ -203,9 +199,10 @@ Future<JobResult> emptyCargoIfNeededForSiphoning(
 }
 
 /// Advance the siphoner.
-final advanceSiphoner = const MultiJob('Siphoner', [
-  _initSiphonJob,
-  emptyCargoIfNeededForSiphoning,
-  doSiphonJob,
-  transferOrSellCargo,
-]).run;
+final advanceSiphoner =
+    const MultiJob('Siphoner', [
+      _initSiphonJob,
+      emptyCargoIfNeededForSiphoning,
+      doSiphonJob,
+      transferOrSellCargo,
+    ]).run;

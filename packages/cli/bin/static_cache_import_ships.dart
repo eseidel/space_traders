@@ -23,8 +23,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // However we will update our shipyard cache with the parts from our active
   // ships, for parts which we know are not yet changeable.
   for (final ship in ships.ships) {
-    final shipType =
-        staticCaches.shipyardShips.shipTypeFromFrame(ship.frame.symbol);
+    final shipType = staticCaches.shipyardShips.shipTypeFromFrame(
+      ship.frame.symbol,
+    );
     if (shipType == null) {
       continue;
     }
@@ -40,9 +41,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
           ..modules =
               ship.modules.map(staticCaches.modules.copyAndNormalize).toList()
           // Mounts on the shipyardShip might be stale, use ones from cache.
-          ..mounts = shipyardShip.mounts
-              .map((ShipMount m) => staticCaches.mounts[m.symbol]!)
-              .toList();
+          ..mounts =
+              shipyardShip.mounts
+                  .map((ShipMount m) => staticCaches.mounts[m.symbol]!)
+                  .toList();
     recordShipyardShips(staticCaches, [copy]);
   }
 }

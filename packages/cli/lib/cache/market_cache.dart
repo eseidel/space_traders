@@ -6,13 +6,10 @@ import 'package:types/types.dart';
 /// Stores Market objects fetched recently from the API.
 class MarketCache {
   /// Create a new MarketplaceCache.
-  MarketCache(
-    Database db,
-    Api api,
-    TradeGoodCache tradeGoods,
-  )   : _db = db,
-        _api = api,
-        _tradeGoods = tradeGoods;
+  MarketCache(Database db, Api api, TradeGoodCache tradeGoods)
+    : _db = db,
+      _api = api,
+      _tradeGoods = tradeGoods;
 
   final Database _db;
   final Api _api;
@@ -35,9 +32,7 @@ class MarketCache {
   Market? fromCache(WaypointSymbol symbol) => _marketsBySymbol[symbol];
 
   /// Fetch the waypoint with the given symbol.
-  Future<Market> refreshMarket(
-    WaypointSymbol waypointSymbol,
-  ) async {
+  Future<Market> refreshMarket(WaypointSymbol waypointSymbol) async {
     final market = await getMarket(_api, waypointSymbol);
     _marketsBySymbol[waypointSymbol] = market;
     await _db.upsertMarketListing(

@@ -7,12 +7,9 @@ import 'package:meta/meta.dart';
 /// The resulting file is valid json.
 class JsonListStore<Record extends Object> {
   /// Create a new JsonListStore.
-  JsonListStore(
-    this.records, {
-    required FileSystem fs,
-    required String path,
-  })  : _fs = fs,
-        _path = path;
+  JsonListStore(this.records, {required FileSystem fs, required String path})
+    : _fs = fs,
+      _path = path;
 
   /// The records in the store.
   @protected

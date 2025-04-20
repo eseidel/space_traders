@@ -39,9 +39,7 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
   // clusterId == null means the system has no jump gate connections, so we
   // use the systemSymbol itself as the id.  Otherwise we use the clusterId.
   // TODO(eseidel): Make clusterId work this way.
-  String idForCluster(
-    SystemSymbol systemSymbol,
-  ) {
+  String idForCluster(SystemSymbol systemSymbol) {
     final clusterId = systemConnectivity.clusterIdForSystem(systemSymbol);
     if (clusterId != null) {
       return clusterId.toString();
@@ -49,8 +47,9 @@ Map<ShipSymbol, SystemSymbol> assignProbesToSystems(
     return systemSymbol.system;
   }
 
-  final systemsNeededByClusterId =
-      systemsNeedingProbes.groupListsBy(idForCluster);
+  final systemsNeededByClusterId = systemsNeedingProbes.groupListsBy(
+    idForCluster,
+  );
 
   // Otherwise just assign the remaining probes.
   // TODO(eseidel): We could assign by proximity.
@@ -272,8 +271,9 @@ Future<JobResult> doSystemWatcher(
     caches.systems[systemSymbol],
     waypointCache: caches.waypoints,
     maxAge: maxAge,
-    filter: (WaypointSymbol waypointSymbol) =>
-        !avoidWaypoints.contains(waypointSymbol),
+    filter:
+        (WaypointSymbol waypointSymbol) =>
+            !avoidWaypoints.contains(waypointSymbol),
   );
 
   if (destinationSymbol != null) {
@@ -309,7 +309,8 @@ Future<JobResult> doSystemWatcher(
 }
 
 /// Advance the system watcher.
-final advanceSystemWatcher = const MultiJob('SystemWatcher', [
-  _travelToAssignedSystem,
-  doSystemWatcher,
-]).run;
+final advanceSystemWatcher =
+    const MultiJob('SystemWatcher', [
+      _travelToAssignedSystem,
+      doSystemWatcher,
+    ]).run;

@@ -126,44 +126,41 @@ class Config {
   /// Used as a fallback for constructing Behaviors if there isn't explicit
   /// logic in getJobForShip.
   Map<FleetRole, List<Behavior>> get behaviorsByFleetRole => {
-        FleetRole.command: [
-          // Will only trade if we can make 6/s or more.
-          // There are commonly 20c/s trades in the starting system, and at
-          // the minimum we want to accept the contract.
-          // Might want to consider limiting to short trades (< 5 mins) to avoid
-          // tying up capital early.
-          Behavior.trader,
-          // Early game we can use the command ship to explore if needed. This
-          // is preferred over mining and siphoning in case those are far away
-          // on the assumption the command ship should be trading early and all
-          // it's missing is price data to do so.
-          // Behavior.charter,
-          // Early on the command ship makes about 5c/s vs. ore hounds making
-          // 6c/s. It's a better surveyor than miner. Especially when enabling
-          // mining drones.
-          // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
-          // Mining is more profitable than siphoning I think?
-          Behavior.miner,
-          Behavior.siphoner,
-        ],
-        FleetRole.trader: [Behavior.trader],
-        FleetRole.explorer: [
-          Behavior.seeder,
-          Behavior.trader,
-        ],
-        FleetRole.miner: [
-          if (enableMining) Behavior.miner,
-          if (!enableMining) Behavior.scrap,
-        ],
-        FleetRole.surveyor: [
-          if (enableMining) Behavior.surveyor,
-          if (!enableMining) Behavior.scrap,
-        ],
-        FleetRole.siphoner: [
-          if (enableMining) Behavior.siphoner,
-          if (!enableMining) Behavior.scrap,
-        ],
-      };
+    FleetRole.command: [
+      // Will only trade if we can make 6/s or more.
+      // There are commonly 20c/s trades in the starting system, and at
+      // the minimum we want to accept the contract.
+      // Might want to consider limiting to short trades (< 5 mins) to avoid
+      // tying up capital early.
+      Behavior.trader,
+      // Early game we can use the command ship to explore if needed. This
+      // is preferred over mining and siphoning in case those are far away
+      // on the assumption the command ship should be trading early and all
+      // it's missing is price data to do so.
+      // Behavior.charter,
+      // Early on the command ship makes about 5c/s vs. ore hounds making
+      // 6c/s. It's a better surveyor than miner. Especially when enabling
+      // mining drones.
+      // if (shipCount > 3 && shipCount < 10) Behavior.surveyor,
+      // Mining is more profitable than siphoning I think?
+      Behavior.miner,
+      Behavior.siphoner,
+    ],
+    FleetRole.trader: [Behavior.trader],
+    FleetRole.explorer: [Behavior.seeder, Behavior.trader],
+    FleetRole.miner: [
+      if (enableMining) Behavior.miner,
+      if (!enableMining) Behavior.scrap,
+    ],
+    FleetRole.surveyor: [
+      if (enableMining) Behavior.surveyor,
+      if (!enableMining) Behavior.scrap,
+    ],
+    FleetRole.siphoner: [
+      if (enableMining) Behavior.siphoner,
+      if (!enableMining) Behavior.scrap,
+    ],
+  };
 
   // We could put some "total value" on the idea of the gate being open
   // and change that over time to encourage building it sooner.

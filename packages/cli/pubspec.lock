@@ -102,13 +102,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-  client:
-    dependency: "direct dev"
-    description:
-      path: "../client"
-      relative: true
-    source: path
-    version: "1.0.0"
   clock:
     dependency: transitive
     description:
@@ -396,13 +389,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
-  protocol:
-    dependency: "direct main"
-    description:
-      path: "../protocol"
-      relative: true
-    source: path
-    version: "1.0.0"
   pub_semver:
     dependency: transitive
     description:
@@ -668,4 +654,4 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.7.2 <4.0.0"
+  dart: ">=3.7.0 <4.0.0"

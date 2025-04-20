@@ -175,23 +175,17 @@ void main() {
     final reactorExpiry = now.add(const Duration(seconds: 100));
 
     when(() => caches.systems.waypoint(startSymbol)).thenReturn(
-      SystemWaypoint.test(
-        startSymbol,
-        type: WaypointType.ASTEROID_FIELD,
-      ),
+      SystemWaypoint.test(startSymbol, type: WaypointType.ASTEROID_FIELD),
     );
-    when(() => caches.systems[startSymbol.system]).thenReturn(
-      System.test(startSymbol.system),
-    );
-    when(() => caches.systems.waypoint(endSymbol)).thenReturn(
-      SystemWaypoint.test(
-        endSymbol,
-        type: WaypointType.JUMP_GATE,
-      ),
-    );
-    when(() => caches.systems[endSymbol.system]).thenReturn(
-      System.test(endSymbol.system),
-    );
+    when(
+      () => caches.systems[startSymbol.system],
+    ).thenReturn(System.test(startSymbol.system));
+    when(
+      () => caches.systems.waypoint(endSymbol),
+    ).thenReturn(SystemWaypoint.test(endSymbol, type: WaypointType.JUMP_GATE));
+    when(
+      () => caches.systems[endSymbol.system],
+    ).thenReturn(System.test(endSymbol.system));
 
     when(
       () => fleetApi.jumpShip(
@@ -454,8 +448,9 @@ void main() {
     final listings = _MockMarketListingSnapshot();
     final sellsFuel = defaultSellsFuel(listings);
     final waypointSymbol = WaypointSymbol.fromString('A-B-C');
-    when(() => listings[waypointSymbol])
-        .thenReturn(MarketListing(waypointSymbol: waypointSymbol));
+    when(
+      () => listings[waypointSymbol],
+    ).thenReturn(MarketListing(waypointSymbol: waypointSymbol));
     expect(sellsFuel(waypointSymbol), false);
 
     when(() => listings[waypointSymbol]).thenReturn(
@@ -527,9 +522,9 @@ void main() {
     }) {
       when(() => shipNav.status).thenReturn(status);
       when(() => shipNav.waypointSymbol).thenReturn(location.waypoint);
-      when(() => shipNavRoute.arrival).thenReturn(
-        arrival == null ? now : now.add(const Duration(minutes: 1)),
-      );
+      when(
+        () => shipNavRoute.arrival,
+      ).thenReturn(arrival == null ? now : now.add(const Duration(minutes: 1)));
       final cooldownDuration = cooldown ?? Duration.zero;
       when(() => ship.cooldown).thenReturn(
         Cooldown(
@@ -544,10 +539,7 @@ void main() {
 
     // Orbiting the first waypoint.
     expect(
-      timeToArrival(
-        status: ShipNavStatus.IN_ORBIT,
-        location: startSymbol,
-      ),
+      timeToArrival(status: ShipNavStatus.IN_ORBIT, location: startSymbol),
       const Duration(seconds: 59),
     );
 

@@ -72,8 +72,10 @@ class DescribingVisitor extends SupplyLinkVisitor {
     }
     final inputSymbols = inputStrings.join(', ');
     final name = link.waypointSymbol.waypointName;
-    final sourcePrice =
-        await db.marketPriceAt(link.waypointSymbol, link.tradeSymbol);
+    final sourcePrice = await db.marketPriceAt(
+      link.waypointSymbol,
+      link.tradeSymbol,
+    );
     logger.info(
       '${spaces}Manufacture ${_describeGood(link.tradeSymbol, sourcePrice)} '
       'at $name from $inputSymbols',

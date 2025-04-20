@@ -24,12 +24,15 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     travelTimes[ship.symbol] = travelTime;
   }
 
-  final sortedShips =
-      ships.ships.sortedBy<Duration>((s) => travelTimes[s.symbol]!);
+  final sortedShips = ships.ships.sortedBy<Duration>(
+    (s) => travelTimes[s.symbol]!,
+  );
   for (final ship in sortedShips) {
     final travelTime = travelTimes[ship.symbol]!;
-    logger.info('${ship.symbol.hexNumber.padRight(3)} '
-        '${approximateDuration(travelTime).padLeft(3)}');
+    logger.info(
+      '${ship.symbol.hexNumber.padRight(3)} '
+      '${approximateDuration(travelTime).padLeft(3)}',
+    );
   }
 }
 

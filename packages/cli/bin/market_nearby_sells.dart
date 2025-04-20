@@ -16,10 +16,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const tradeSymbol = TradeSymbol.DIAMONDS;
 
   final hqSystem = await myHqSystemSymbol(db);
-  final hqMine = systemsCache
-      .waypointsInSystem(hqSystem)
-      .firstWhere((w) => w.isAsteroid)
-      .symbol;
+  final hqMine =
+      systemsCache
+          .waypointsInSystem(hqSystem)
+          .firstWhere((w) => w.isAsteroid)
+          .symbol;
 
   final miner = ships.ships.firstWhere((s) => s.isMiner);
   final ship = miner.deepCopy();
@@ -42,12 +43,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   logger.info('Waypoint       Sell Supply    Volume   Round trip');
   for (final trip in trips) {
     final price = trip.price;
-    logger.info('${price.waypointSymbol.waypoint.padRight(14)} '
-        // sellPrice is the price we sell *to* the market.
-        '${creditsString(price.sellPrice).padLeft(4)} '
-        '${price.supply.toString().padRight(supplyWidth)} '
-        '${price.tradeVolume.toString().padLeft(6)} '
-        '${approximateDuration(trip.route.duration * 2).padLeft(4)}');
+    logger.info(
+      '${price.waypointSymbol.waypoint.padRight(14)} '
+      // sellPrice is the price we sell *to* the market.
+      '${creditsString(price.sellPrice).padLeft(4)} '
+      '${price.supply.toString().padRight(supplyWidth)} '
+      '${price.tradeVolume.toString().padLeft(6)} '
+      '${approximateDuration(trip.route.duration * 2).padLeft(4)}',
+    );
   }
 }
 

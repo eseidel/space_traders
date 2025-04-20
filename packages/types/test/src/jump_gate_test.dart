@@ -8,8 +8,10 @@ void main() {
       WaypointSymbol.fromString('S-A-A'),
       WaypointSymbol.fromString('S-B-C'),
     };
-    final jumpGate =
-        JumpGate(waypointSymbol: waypointSymbol, connections: connections);
+    final jumpGate = JumpGate(
+      waypointSymbol: waypointSymbol,
+      connections: connections,
+    );
     expect(jumpGate.connectedSystemSymbols, {
       SystemSymbol.fromString('S-A'),
       SystemSymbol.fromString('S-B'),

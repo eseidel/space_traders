@@ -101,16 +101,12 @@ class BehaviorSnapshot {
   }
 
   /// Returns the ship symbols for all idle haulers.
-// TODO(eseidel): This should be a db query.
-  List<ShipSymbol> idleHaulerSymbols(
-    ShipSnapshot shipCache,
-  ) {
-    final haulerSymbols =
-        shipCache.ships.where((s) => s.isHauler).map((s) => s.symbol);
-    final idleBehaviors = [
-      Behavior.idle,
-      Behavior.charter,
-    ];
+  // TODO(eseidel): This should be a db query.
+  List<ShipSymbol> idleHaulerSymbols(ShipSnapshot shipCache) {
+    final haulerSymbols = shipCache.ships
+        .where((s) => s.isHauler)
+        .map((s) => s.symbol);
+    final idleBehaviors = [Behavior.idle, Behavior.charter];
     return haulerSymbols.where((s) {
       final state = stateForShip(s);
       return state != null && idleBehaviors.contains(state.behavior);

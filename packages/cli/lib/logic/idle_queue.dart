@@ -25,9 +25,10 @@ class WithDistance<T> {
 class NonRepeatingDistanceQueue<T> {
   /// Create a new queue.
   NonRepeatingDistanceQueue()
-      : _queue =
-            PriorityQueue((a, b) => a.jumpDistance.compareTo(b.jumpDistance)),
-        _queued = {};
+    : _queue = PriorityQueue(
+        (a, b) => a.jumpDistance.compareTo(b.jumpDistance),
+      ),
+      _queued = {};
 
   final PriorityQueue<WithDistance<T>> _queue;
   final Set<T> _queued;
@@ -117,8 +118,9 @@ class IdleQueue {
     final record = _jumpGates.take();
     final to = record.value;
     final jumpDistance = record.jumpDistance;
-    logger
-        .detail('Gate: $to ($jumpDistance jumps, ${_jumpGates.length} queued)');
+    logger.detail(
+      'Gate: $to ($jumpDistance jumps, ${_jumpGates.length} queued)',
+    );
     // Make sure we have construction data for the destination before
     // checking if we can jump there.
     final underConstruction = await waypoints.isUnderConstruction(to);
@@ -225,9 +227,10 @@ class IdleQueue {
 
   @override
   String toString() {
-    final nextJumpDistance = _systems.isNotEmpty
-        ? _systems.first.jumpDistance
-        : _jumpGates.isNotEmpty
+    final nextJumpDistance =
+        _systems.isNotEmpty
+            ? _systems.first.jumpDistance
+            : _jumpGates.isNotEmpty
             ? _jumpGates.first.jumpDistance
             : null;
 

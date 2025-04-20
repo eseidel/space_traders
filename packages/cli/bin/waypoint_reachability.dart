@@ -9,8 +9,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final fuelCapacity =
       staticCaches.shipyardShips[ShipType.COMMAND_FRIGATE]!.frame.fuelCapacity;
 
-  logger
-      .info('Exploring waypoint clusters in $hqSystem with $fuelCapacity fuel');
+  logger.info(
+    'Exploring waypoint clusters in $hqSystem with $fuelCapacity fuel',
+  );
   final connectivity = WaypointConnectivity.fromSystemAndFuelCapacity(
     systemsCache,
     hqSystem,

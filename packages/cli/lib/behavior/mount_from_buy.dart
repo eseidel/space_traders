@@ -93,7 +93,5 @@ BuyJob? buyJobForMount(
 }
 
 /// Advance the behavior of the given ship.
-final advanceMountFromBuy = const MultiJob('Mount from Buy', [
-  doBuyJob,
-  doMountJob,
-]).run;
+final advanceMountFromBuy =
+    const MultiJob('Mount from Buy', [doBuyJob, doMountJob]).run;

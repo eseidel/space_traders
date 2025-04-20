@@ -12,9 +12,9 @@ WaypointSymbol _centralWaypointInSystem(
   SystemSymbol system,
 ) {
   final zero = WaypointPosition(0, 0, system);
-  final waypoints = systems[system]
-      .waypoints
-      .sortedBy<num>((w) => w.position.distanceTo(zero));
+  final waypoints = systems[system].waypoints.sortedBy<num>(
+    (w) => w.position.distanceTo(zero),
+  );
   return waypoints.first.symbol;
 }
 
@@ -60,10 +60,7 @@ RoutePlan? _shortestPathTo(
     shipSpeed: ship.shipSpec.speed,
     flightMode: ShipNavFlightMode.CRUISE,
   );
-  final fuel = fuelUsedByDistance(
-    distance,
-    ShipNavFlightMode.CRUISE,
-  );
+  final fuel = fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
   if (actions.first.type == RouteActionType.emptyRoute) {
     actions.removeAt(0);
   }
@@ -90,14 +87,15 @@ Future<RoutePlan?> _routeToClosestSystemToSeed(
   bool Function(SystemSymbol waypointSymbol)? filter,
 }) async {
   final starterSystems = findInterestingSystems(systemsCache);
-  final unreachableSystems = starterSystems
-      .where(
-        (systemSymbol) => systemConnectivity.existsJumpPathBetween(
-          systemSymbol,
-          mainClusterSystemSymbol,
-        ),
-      )
-      .toList();
+  final unreachableSystems =
+      starterSystems
+          .where(
+            (systemSymbol) => systemConnectivity.existsJumpPathBetween(
+              systemSymbol,
+              mainClusterSystemSymbol,
+            ),
+          )
+          .toList();
 
   final plans = <RoutePlan>[];
   for (final systemSymbol in unreachableSystems) {
@@ -141,10 +139,11 @@ Future<RoutePlan?> routeToNextSystemToSeed(
       systemSymbols.add(route.endSymbol.system);
     }
   }
-  final occupiedClusters = systemSymbols
-      .map((s) => connectivity.clusterIdForSystem(s))
-      .nonNulls
-      .toSet();
+  final occupiedClusters =
+      systemSymbols
+          .map((s) => connectivity.clusterIdForSystem(s))
+          .nonNulls
+          .toSet();
 
   final route = await _routeToClosestSystemToSeed(
     systems,
@@ -177,8 +176,10 @@ Future<JobResult> doSeeder(
 }) async {
   // If we're already off the main jump gate network, nothing to do.
   final hqSystem = caches.agent.headquartersSystemSymbol;
-  if (caches.systemConnectivity
-      .existsJumpPathBetween(ship.systemSymbol, hqSystem)) {
+  if (caches.systemConnectivity.existsJumpPathBetween(
+    ship.systemSymbol,
+    hqSystem,
+  )) {
     shipErr(ship, 'Successfully off network in ${ship.systemSymbol}!');
     // Get the shipyard for this system.
     // replace our state with a buy-ship job there.
@@ -242,6 +243,4 @@ Future<JobResult> doSeeder(
 }
 
 /// Advance the seeder behavior.
-final advanceSeeder = const MultiJob('Seeder', [
-  doSeeder,
-]).run;
+final advanceSeeder = const MultiJob('Seeder', [doSeeder]).run;

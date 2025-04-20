@@ -5,9 +5,9 @@ import 'package:cli/cli.dart';
 import 'package:cli_table/cli_table.dart';
 
 Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
-      'content': content.toString(),
-      'hAlign': HorizontalAlign.right,
-    };
+  'content': content.toString(),
+  'hAlign': HorizontalAlign.right,
+};
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final chartingSnapshot = await ChartingSnapshot.load(db);

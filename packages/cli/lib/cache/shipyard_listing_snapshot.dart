@@ -5,8 +5,9 @@ import 'package:types/types.dart';
 class ShipyardListingSnapshot {
   /// Creates a new charting cache.
   ShipyardListingSnapshot(Iterable<ShipyardListing> listings)
-      : _listingBySymbol =
-            Map.fromEntries(listings.map((l) => MapEntry(l.waypointSymbol, l)));
+    : _listingBySymbol = Map.fromEntries(
+        listings.map((l) => MapEntry(l.waypointSymbol, l)),
+      );
 
   /// Load the charted values from the cache.
   static Future<ShipyardListingSnapshot> load(Database db) async {

@@ -17,8 +17,10 @@ void reconcile(List<Transaction> transactions) {
     final diff = credits - t.agentCredits;
     if (diff != 0) {
       logger
-        ..warn('Computed ${creditsString(credits)} differs $diff from '
-            'agentCredits ${t.agentCredits}')
+        ..warn(
+          'Computed ${creditsString(credits)} differs $diff from '
+          'agentCredits ${t.agentCredits}',
+        )
         ..info('Before: ${describeTransaction(toReconcile[i - 1])}')
         ..info('After: ${describeTransaction(t)}');
       credits = t.agentCredits;
@@ -49,8 +51,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Add up the credits change from all transactions.
   // The diff should not include the first transaction, since agentCredits
   // is the credits *after* that transaction occurred.
-  final computedDiff =
-      transactions.skip(1).fold(0, (sum, t) => sum + t.creditsChange);
+  final computedDiff = transactions
+      .skip(1)
+      .fold(0, (sum, t) => sum + t.creditsChange);
   if (computedDiff != creditDiff) {
     logger.warn(
       'Computed diff $computedDiff does not match '

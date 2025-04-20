@@ -40,7 +40,8 @@ extension ShipTypeToFrame on ShipyardShipCache {
     final symbolString = shipSymbol?.symbol ?? 'S-1';
     final factionString = factionSymbol?.value ?? 'COSMIC';
     final waypointSymbol = origin?.symbol ?? WaypointSymbol.fromString('A-B-C');
-    final waypoint = origin ??
+    final waypoint =
+        origin ??
         SystemWaypoint(
           symbol: waypointSymbol,
           type: WaypointType.PLANET,

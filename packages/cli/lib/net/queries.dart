@@ -37,8 +37,11 @@ Future<Waypoint> fetchWaypoint(Api api, WaypointSymbol waypointSymbol) async {
 /// Fetches all waypoints in a system.  Handles pagination from the server.
 Stream<Waypoint> allWaypointsInSystem(Api api, SystemSymbol system) {
   return fetchAllPages(api, (api, page) async {
-    final response = await api.systems
-        .getSystemWaypoints(system.system, page: page, limit: pageLimit);
+    final response = await api.systems.getSystemWaypoints(
+      system.system,
+      page: page,
+      limit: pageLimit,
+    );
     final waypoints = response!.data.map(Waypoint.fromOpenApi).toList();
     return (waypoints, response.meta);
   });
@@ -56,8 +59,10 @@ Stream<Ship> allMyShips(Api api) {
 /// Fetches all of the user's contracts.  Handles pagination from the server.
 Stream<Contract> allMyContracts(Api api) {
   return fetchAllPages(api, (api, page) async {
-    final response =
-        await api.contracts.getContracts(page: page, limit: pageLimit);
+    final response = await api.contracts.getContracts(
+      page: page,
+      limit: pageLimit,
+    );
     final now = DateTime.timestamp();
     final contracts =
         response!.data.map((c) => Contract.fromOpenApi(c, now)).toList();
@@ -68,8 +73,10 @@ Stream<Contract> allMyContracts(Api api) {
 /// Fetches all factions.  Handles pagination from the server.
 Stream<Faction> getAllFactions(Api api) {
   return fetchAllPages(api, (api, page) async {
-    final response =
-        await api.factions.getFactions(page: page, limit: pageLimit);
+    final response = await api.factions.getFactions(
+      page: page,
+      limit: pageLimit,
+    );
     return (response!.data, response.meta);
   });
 }
@@ -92,15 +99,19 @@ Future<Shipyard> getShipyard(Api api, WaypointSymbol waypointSymbol) async {
 
 /// Returns JumpGate object for passed in Waypoint.
 Future<JumpGate> getJumpGate(Api api, WaypointSymbol waypointSymbol) async {
-  final response = await api.systems
-      .getJumpGate(waypointSymbol.systemString, waypointSymbol.waypoint);
+  final response = await api.systems.getJumpGate(
+    waypointSymbol.systemString,
+    waypointSymbol.waypoint,
+  );
   return JumpGate.fromOpenApi(response!.data);
 }
 
 /// Fetches Market for a given Waypoint.
 Future<Market> getMarket(Api api, WaypointSymbol waypointSymbol) async {
-  final response = await api.systems
-      .getMarket(waypointSymbol.systemString, waypointSymbol.waypoint);
+  final response = await api.systems.getMarket(
+    waypointSymbol.systemString,
+    waypointSymbol.waypoint,
+  );
   return response!.data;
 }
 

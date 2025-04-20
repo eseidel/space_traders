@@ -20,8 +20,8 @@ const int networkPriorityLow = -1;
 class QueuedClient extends BaseClient {
   /// Creates a new [QueuedClient].
   QueuedClient(Database db, [this.getPriority])
-      : _db = db,
-        _queue = NetQueue(db, QueueRole.requestor);
+    : _db = db,
+      _queue = NetQueue(db, QueueRole.requestor);
 
   /// Callback to get the priority of the next request.
   int Function()? getPriority;
@@ -95,17 +95,11 @@ class NetQueue {
 
   /// Inserts a request into the database, notifying listeners that a new
   /// request is available and returning the id of the request.
-  Future<int> _queueRequest(
-    int priority,
-    QueuedRequest request,
-  ) async {
+  Future<int> _queueRequest(int priority, QueuedRequest request) async {
     assert(role == QueueRole.requestor, 'Only requestors can queue requests.');
     // TODO(eseidel): Move this into db package.
     final requestId = await _db.insertRequest(
-      RequestRecord(
-        priority: priority,
-        request: request,
-      ),
+      RequestRecord(priority: priority, request: request),
     );
     // TODO(eseidel): This could be a trigger.
     await _db.notify('request_', requestId);

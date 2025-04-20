@@ -29,8 +29,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final construction = ConstructionCache(db);
   final waypointTraits = WaypointTraitCache.load(fs);
   final tradeGoods = TradeGoodCache.load(fs);
-  final waypointCache =
-      WaypointCache(api, db, systems, charting, construction, waypointTraits);
+  final waypointCache = WaypointCache(
+    api,
+    db,
+    systems,
+    charting,
+    construction,
+    waypointTraits,
+  );
   final marketCache = MarketCache(db, api, tradeGoods);
   final constructionCache = ConstructionCache(db);
 
@@ -71,11 +77,12 @@ void main(List<String> args) async {
   await runOffline(
     args,
     command,
-    addArgs: (parser) => parser.addFlag(
-      'all',
-      abbr: 'a',
-      help: 'Seed queue with all starter systems.',
-    ),
+    addArgs:
+        (parser) => parser.addFlag(
+          'all',
+          abbr: 'a',
+          help: 'Seed queue with all starter systems.',
+        ),
     loadConfig: false,
   );
 }

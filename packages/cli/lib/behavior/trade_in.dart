@@ -58,6 +58,4 @@ Future<JobResult> doTradeInJob(
 }
 
 /// Advance the trade in.
-final advanceTradeIn = const MultiJob('Trade In', [
-  doTradeInJob,
-]).run;
+final advanceTradeIn = const MultiJob('Trade In', [doTradeInJob]).run;

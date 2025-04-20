@@ -8,8 +8,8 @@ class WaypointSymbol {
 
   /// Fallback value for mocking.
   const WaypointSymbol.fallbackValue()
-      : waypoint = 'A-B-C',
-        system = const SystemSymbol.fallbackValue();
+    : waypoint = 'A-B-C',
+      system = const SystemSymbol.fallbackValue();
 
   /// Create a WaypointSymbol from a json string.
   factory WaypointSymbol.fromJson(String json) =>
@@ -154,14 +154,12 @@ class ShipSymbol extends Equatable implements Comparable<ShipSymbol> {
   const ShipSymbol(this.agentName, this.number);
 
   /// Create a dummy ShipSymbol for testing.
-  const ShipSymbol.fallbackValue()
-      : agentName = 'S',
-        number = 1;
+  const ShipSymbol.fallbackValue() : agentName = 'S', number = 1;
 
   /// Create a ShipSymbol from a string.
   ShipSymbol.fromString(String symbol)
-      : agentName = _parseAgentName(symbol),
-        number = int.parse(symbol.split('-').last, radix: 16);
+    : agentName = _parseAgentName(symbol),
+      number = int.parse(symbol.split('-').last, radix: 16);
 
   /// Create a ShipSymbol from a json string.
   factory ShipSymbol.fromJson(String json) => ShipSymbol.fromString(json);

@@ -86,10 +86,7 @@ class ReportBuilder {
       'Shipyard transaction is not capital',
     );
     _expect(transaction.isPurchase, 'Ship is not a purchase');
-    _expect(
-      transaction.creditsChange < 0,
-      'Ship cost is not negative',
-    );
+    _expect(transaction.creditsChange < 0, 'Ship cost is not negative');
     // CapEx doesn't show up in P&L.
   }
 
@@ -99,10 +96,7 @@ class ReportBuilder {
       'Shipyard transaction is not capital',
     );
     _expect(transaction.isSale, 'Ship is not a purchase');
-    _expect(
-      transaction.creditsChange >= 0,
-      'Ship value is not positive',
-    );
+    _expect(transaction.creditsChange >= 0, 'Ship value is not positive');
     // CapEx doesn't show up in P&L.
   }
 
@@ -111,10 +105,7 @@ class ReportBuilder {
       transaction.accounting == AccountingType.capital,
       'Shipyard modification transaction is not capital',
     );
-    _expect(
-      transaction.isPurchase,
-      'Ship modification is not a purchase',
-    );
+    _expect(transaction.isPurchase, 'Ship modification is not a purchase');
     _expect(
       transaction.creditsChange < 0,
       'Ship modification cost is not negative',

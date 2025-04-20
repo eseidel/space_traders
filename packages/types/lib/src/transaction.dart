@@ -79,42 +79,45 @@ class Transaction extends Equatable {
   /// a valid transaction.
   @visibleForTesting
   Transaction.fallbackValue()
-      : this(
-          transactionType: TransactionType.market,
-          shipSymbol: const ShipSymbol('A', 1),
-          waypointSymbol: WaypointSymbol.fromString('S-E-P'),
-          tradeSymbol: TradeSymbol.FUEL,
-          shipType: ShipType.EXPLORER,
-          quantity: 1,
-          tradeType: MarketTransactionTypeEnum.PURCHASE,
-          perUnitPrice: 2,
-          timestamp: DateTime(2021).toUtc(),
-          agentCredits: 3,
-          accounting: AccountingType.goods,
-          contractId: 'abcd',
-          contractAction: ContractAction.delivery,
-        );
+    : this(
+        transactionType: TransactionType.market,
+        shipSymbol: const ShipSymbol('A', 1),
+        waypointSymbol: WaypointSymbol.fromString('S-E-P'),
+        tradeSymbol: TradeSymbol.FUEL,
+        shipType: ShipType.EXPLORER,
+        quantity: 1,
+        tradeType: MarketTransactionTypeEnum.PURCHASE,
+        perUnitPrice: 2,
+        timestamp: DateTime(2021).toUtc(),
+        agentCredits: 3,
+        accounting: AccountingType.goods,
+        contractId: 'abcd',
+        contractAction: ContractAction.delivery,
+      );
 
   /// Create a new transaction from json.
   /// This only exists to support CostedDeal.fromJson and should be removed.
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
-      transactionType:
-          TransactionType.fromJson(json['transactionType'] as String),
+      transactionType: TransactionType.fromJson(
+        json['transactionType'] as String,
+      ),
       shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String?),
       shipType: ShipType.fromJson(json['shipType'] as String?),
       quantity: json['quantity'] as int,
-      tradeType: MarketTransactionTypeEnum.values
-          .firstWhere((e) => e.value == json['tradeType'] as String?),
+      tradeType: MarketTransactionTypeEnum.values.firstWhere(
+        (e) => e.value == json['tradeType'] as String?,
+      ),
       perUnitPrice: json['perUnitPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
       agentCredits: json['agentCredits'] as int,
       accounting: AccountingType.fromJson(json['accounting'] as String),
       contractId: json['contractId'] as String?,
-      contractAction:
-          ContractAction.fromJsonOrNull(json['contractAction'] as String?),
+      contractAction: ContractAction.fromJsonOrNull(
+        json['contractAction'] as String?,
+      ),
     );
   }
 
@@ -235,7 +238,8 @@ class Transaction extends Equatable {
   ) {
     // This is a bit of a hack, using "creditsChange" as the per-unit-price
     // creditsChange is only non-zero for fulfillment transactions.
-    final quantity = transaction.unitsDelivered ??
+    final quantity =
+        transaction.unitsDelivered ??
         (transaction.contractAction == ContractAction.fulfillment ? 1 : 0);
     final perUnitPrice = transaction.creditsChange;
 
@@ -319,20 +323,20 @@ class Transaction extends Equatable {
 
   @override
   List<Object?> get props => [
-        transactionType,
-        shipSymbol,
-        waypointSymbol,
-        tradeSymbol,
-        shipType,
-        quantity,
-        tradeType,
-        perUnitPrice,
-        timestamp,
-        agentCredits,
-        accounting,
-        contractId,
-        contractAction,
-      ];
+    transactionType,
+    shipSymbol,
+    waypointSymbol,
+    tradeSymbol,
+    shipType,
+    quantity,
+    tradeType,
+    perUnitPrice,
+    timestamp,
+    agentCredits,
+    accounting,
+    contractId,
+    contractAction,
+  ];
 
   /// The change in credits from this transaction.
   int get creditsChange {

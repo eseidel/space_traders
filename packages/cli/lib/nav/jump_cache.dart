@@ -4,8 +4,8 @@ import 'package:types/types.dart';
 class JumpPlan {
   /// Creates a route between two systems.
   JumpPlan(Iterable<SystemSymbol> route)
-      : route = List.from(route),
-        assert(route.length >= 2, 'Route must have at least two systems');
+    : route = List.from(route),
+      assert(route.length >= 2, 'Route must have at least two systems');
 
   /// The system where the route starts.
   SystemSymbol get fromSystem => route.first;

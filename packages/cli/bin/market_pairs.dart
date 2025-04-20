@@ -4,9 +4,9 @@ import 'package:cli/logic/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
-      'content': content.toString(),
-      'hAlign': HorizontalAlign.right,
-    };
+  'content': content.toString(),
+  'hAlign': HorizontalAlign.right,
+};
 
 // Returns the distance between two waypoints, or null if they are in different
 // systems.
@@ -27,8 +27,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systemsCache = SystemsCache.load(fs);
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
-  final marketListings =
-      await MarketListingSnapshot.loadOneSystem(db, hqSystem);
+  final marketListings = await MarketListingSnapshot.loadOneSystem(
+    db,
+    hqSystem,
+  );
 
   // Collect all imports and exports.
   final exports = <TradeSymbol, WaypointSymbol>{};
@@ -74,11 +76,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       // ]);
       continue;
     }
-    final distance = distanceBetween(
-      systemsCache,
-      exportWaypoint,
-      importWaypoint,
-    )!;
+    final distance =
+        distanceBetween(systemsCache, exportWaypoint, importWaypoint)!;
     String deviance(int price, MarketTransactionTypeEnum type) {
       final median = marketPrices.medianPrice(tradeSymbol, type);
       final deviance = stringForPriceDeviance(

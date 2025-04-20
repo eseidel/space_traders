@@ -29,9 +29,9 @@ void main() {
       false,
     );
 
-    when(() => db.behaviorStateBySymbol(shipSymbol)).thenAnswer(
-      (_) async => BehaviorState(shipSymbol, Behavior.trader),
-    );
+    when(
+      () => db.behaviorStateBySymbol(shipSymbol),
+    ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.trader));
 
     final logger = _MockLogger();
     await runWithLogger(

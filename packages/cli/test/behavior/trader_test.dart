@@ -86,22 +86,27 @@ void main() {
       ],
     );
     when(() => caches.markets.fromCache(start)).thenReturn(market);
-    when(() => caches.markets.refreshMarket(start)).thenAnswer(
-      (_) => Future.value(market),
-    );
+    when(
+      () => caches.markets.refreshMarket(start),
+    ).thenAnswer((_) => Future.value(market));
 
-    when(() => db.hasRecentMarketPrices(start, any()))
-        .thenAnswer((_) async => true);
+    when(
+      () => db.hasRecentMarketPrices(start, any()),
+    ).thenAnswer((_) async => true);
 
     registerFallbackValue(start);
-    when(() => caches.waypoints.hasMarketplace(start))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(start))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.hasMarketplace(end))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(end))
-        .thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(start),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(start),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(end),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(end),
+    ).thenAnswer((_) async => false);
 
     final costedDeal = CostedDeal(
       deal: Deal.test(
@@ -194,8 +199,9 @@ void main() {
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     registerFallbackValue(BehaviorSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
-    when(() => centralCommand.otherTraderSystems(any(), any(), shipSymbol))
-        .thenReturn([]);
+    when(
+      () => centralCommand.otherTraderSystems(any(), any(), shipSymbol),
+    ).thenReturn([]);
     when(db.allShips).thenAnswer((_) async => []);
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
@@ -243,8 +249,9 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol)
-        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(
+      () => shipFrame.symbol,
+    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     final start = WaypointSymbol.fromString('S-A-B');
@@ -286,17 +293,22 @@ void main() {
     when(() => ship.engine).thenReturn(shipEngine);
 
     registerFallbackValue(Duration.zero);
-    when(() => db.hasRecentMarketPrices(start, any()))
-        .thenAnswer((_) async => true);
+    when(
+      () => db.hasRecentMarketPrices(start, any()),
+    ).thenAnswer((_) async => true);
 
-    when(() => caches.waypoints.hasMarketplace(start))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(start))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.hasMarketplace(end))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(end))
-        .thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(start),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(start),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(end),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(end),
+    ).thenAnswer((_) async => false);
 
     final routePlan = RoutePlan(
       actions: [
@@ -350,9 +362,9 @@ void main() {
       ],
     );
     when(() => caches.markets.fromCache(start)).thenReturn(market);
-    when(() => caches.markets.refreshMarket(start)).thenAnswer(
-      (_) => Future.value(market),
-    );
+    when(
+      () => caches.markets.refreshMarket(start),
+    ).thenAnswer((_) => Future.value(market));
 
     final shipCargo = _MockShipCargo();
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -448,8 +460,10 @@ void main() {
             fuel: ShipFuel(
               current: fuelCapacity - 100,
               capacity: fuelCapacity,
-              consumed:
-                  ShipFuelConsumed(amount: 100, timestamp: DateTime(2020)),
+              consumed: ShipFuelConsumed(
+                amount: 100,
+                timestamp: DateTime(2020),
+              ),
             ),
             nav: shipNav..status = ShipNavStatus.IN_TRANSIT,
           ),
@@ -484,8 +498,9 @@ void main() {
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => db.medianMarketPurchasePrice(any()))
-        .thenAnswer((_) async => 100);
+    when(
+      () => db.medianMarketPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -548,9 +563,8 @@ void main() {
         limit: any(named: 'limit'),
       ),
     ).thenAnswer(
-      (_) => Future.value(
-        GetContracts200Response(meta: Meta(total: 0), data: []),
-      ),
+      (_) =>
+          Future.value(GetContracts200Response(meta: Meta(total: 0), data: [])),
     );
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -594,8 +608,9 @@ void main() {
 
     when(() => caches.systems.waypoint(start)).thenReturn(startWaypoint);
     when(() => caches.systems.waypoint(end)).thenReturn(endWaypoint);
-    when(() => caches.systems.waypoint(shipLocation))
-        .thenReturn(shipLocationWaypoint);
+    when(
+      () => caches.systems.waypoint(shipLocation),
+    ).thenReturn(shipLocationWaypoint);
 
     final routePlan = RoutePlan(
       actions: [
@@ -649,18 +664,16 @@ void main() {
         maxTotalOutlay: any(named: 'maxTotalOutlay'),
       ),
     ).thenReturn(costedDeal);
-    when(() => centralCommand.otherTraderSystems(any(), any(), shipSymbol))
-        .thenReturn([]);
+    when(
+      () => centralCommand.otherTraderSystems(any(), any(), shipSymbol),
+    ).thenReturn([]);
     when(() => caches.marketPrices.prices).thenReturn([]);
 
     final state = BehaviorState(shipSymbol, Behavior.trader);
 
     when(
-      () => caches.routePlanner.planRoute(
-        any(),
-        start: shipLocation,
-        end: start,
-      ),
+      () =>
+          caches.routePlanner.planRoute(any(), start: shipLocation, end: start),
     ).thenReturn(routePlan);
 
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
@@ -670,8 +683,9 @@ void main() {
     when(
       () => fleetApi.navigateShip(
         shipSymbol.symbol,
-        navigateShipRequest:
-            NavigateShipRequest(waypointSymbol: start.waypoint),
+        navigateShipRequest: NavigateShipRequest(
+          waypointSymbol: start.waypoint,
+        ),
       ),
     ).thenAnswer(
       (_) async => NavigateShip200Response(
@@ -711,8 +725,9 @@ void main() {
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
     when(db.allContracts).thenAnswer((_) async => <Contract>[]);
-    when(() => caches.systems[shipLocation.system])
-        .thenReturn(System.test(shipLocation.system));
+    when(
+      () => caches.systems[shipLocation.system],
+    ).thenReturn(System.test(shipLocation.system));
     when(
       () => caches.systemConnectivity.systemsReachableFrom(shipLocation.system),
     ).thenReturn([]);
@@ -723,14 +738,7 @@ void main() {
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
       logger,
-      () => advanceTrader(
-        api,
-        db,
-        centralCommand,
-        caches,
-        state,
-        ship,
-      ),
+      () => advanceTrader(api, db, centralCommand, caches, state, ship),
     );
     expect(waitUntil, now);
   });
@@ -770,10 +778,7 @@ void main() {
         sellPrice: 200,
       ),
       cargoSize: 10,
-      transactions: [
-        Transaction.fallbackValue(),
-        Transaction.fallbackValue(),
-      ],
+      transactions: [Transaction.fallbackValue(), Transaction.fallbackValue()],
       startTime: DateTime(2021).toUtc(),
       route: RoutePlan(
         actions: [
@@ -826,8 +831,9 @@ void main() {
     final shipCargo = ShipCargo(capacity: 10, units: 10);
     when(() => ship.cargo).thenReturn(shipCargo);
     const fuelCapacity = 100;
-    when(() => ship.fuel)
-        .thenReturn(ShipFuel(current: fuelCapacity, capacity: fuelCapacity));
+    when(
+      () => ship.fuel,
+    ).thenReturn(ShipFuel(current: fuelCapacity, capacity: fuelCapacity));
     final shipEngine = _MockShipEngine();
     const shipSpeed = 10;
     when(() => shipEngine.speed).thenReturn(shipSpeed);
@@ -858,10 +864,7 @@ void main() {
         sellPrice: 200,
       ),
       cargoSize: 10,
-      transactions: [
-        Transaction.fallbackValue(),
-        Transaction.fallbackValue(),
-      ],
+      transactions: [Transaction.fallbackValue(), Transaction.fallbackValue()],
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
@@ -876,12 +879,12 @@ void main() {
       ),
     ).thenReturn(routePlan);
 
-    when(() => caches.systems.waypoint(start)).thenReturn(
-      SystemWaypoint.test(start),
-    );
-    when(() => caches.systems.waypoint(end)).thenReturn(
-      SystemWaypoint.test(end),
-    );
+    when(
+      () => caches.systems.waypoint(start),
+    ).thenReturn(SystemWaypoint.test(start));
+    when(
+      () => caches.systems.waypoint(end),
+    ).thenReturn(SystemWaypoint.test(end));
 
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
@@ -906,8 +909,10 @@ void main() {
             fuel: ShipFuel(
               current: fuelCapacity - 100,
               capacity: fuelCapacity,
-              consumed:
-                  ShipFuelConsumed(amount: 100, timestamp: DateTime(2020)),
+              consumed: ShipFuelConsumed(
+                amount: 100,
+                timestamp: DateTime(2020),
+              ),
             ),
             nav: shipNav..status = ShipNavStatus.IN_TRANSIT,
           ),
@@ -993,20 +998,19 @@ void main() {
         sellPrice: 200,
       ),
       cargoSize: 10,
-      transactions: [
-        Transaction.fallbackValue(),
-        Transaction.fallbackValue(),
-      ],
+      transactions: [Transaction.fallbackValue(), Transaction.fallbackValue()],
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
       costPerAntimatterUnit: 10000,
     );
 
-    when(() => caches.waypoints.hasMarketplace(end))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(end))
-        .thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(end),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(end),
+    ).thenAnswer((_) async => false);
 
     final market = Market(
       symbol: end.waypoint,
@@ -1022,15 +1026,17 @@ void main() {
       ],
     );
     when(() => caches.markets.fromCache(end)).thenReturn(market);
-    when(() => caches.markets.refreshMarket(end)).thenAnswer(
-      (_) => Future.value(market),
-    );
+    when(
+      () => caches.markets.refreshMarket(end),
+    ).thenAnswer((_) => Future.value(market));
 
-    when(() => db.hasRecentMarketPrices(end, any()))
-        .thenAnswer((_) async => true);
+    when(
+      () => db.hasRecentMarketPrices(end, any()),
+    ).thenAnswer((_) async => true);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => db.medianMarketPurchasePrice(any()))
-        .thenAnswer((_) async => 100);
+    when(
+      () => db.medianMarketPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
@@ -1152,20 +1158,19 @@ void main() {
     final costedDeal = CostedDeal(
       deal: deal,
       cargoSize: 10,
-      transactions: [
-        Transaction.fallbackValue(),
-        Transaction.fallbackValue(),
-      ],
+      transactions: [Transaction.fallbackValue(), Transaction.fallbackValue()],
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
       costPerAntimatterUnit: 10000,
     );
 
-    when(() => caches.waypoints.hasMarketplace(end))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(end))
-        .thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(end),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(end),
+    ).thenAnswer((_) async => false);
     final market = Market(
       symbol: end.waypoint,
       tradeGoods: [
@@ -1180,12 +1185,13 @@ void main() {
       ],
     );
     when(() => caches.markets.fromCache(end)).thenReturn(market);
-    when(() => caches.markets.refreshMarket(end)).thenAnswer(
-      (_) => Future.value(market),
-    );
+    when(
+      () => caches.markets.refreshMarket(end),
+    ).thenAnswer((_) => Future.value(market));
 
-    when(() => db.hasRecentMarketPrices(end, any()))
-        .thenAnswer((_) async => true);
+    when(
+      () => db.hasRecentMarketPrices(end, any()),
+    ).thenAnswer((_) async => true);
 
     final contractsApi = _MockContractsApi();
     when(() => api.contracts).thenReturn(contractsApi);
@@ -1209,9 +1215,7 @@ void main() {
       ),
     );
 
-    when(
-      () => contractsApi.acceptContract(any()),
-    ).thenAnswer(
+    when(() => contractsApi.acceptContract(any())).thenAnswer(
       (invocation) => Future.value(
         AcceptContract200Response(
           data: AcceptContract200ResponseData(
@@ -1235,8 +1239,9 @@ void main() {
       ..deal = costedDeal;
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => db.medianMarketPurchasePrice(any()))
-        .thenAnswer((_) async => 100);
+    when(
+      () => db.medianMarketPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1329,20 +1334,19 @@ void main() {
     final costedDeal = CostedDeal(
       deal: deal,
       cargoSize: 10,
-      transactions: [
-        Transaction.fallbackValue(),
-        Transaction.fallbackValue(),
-      ],
+      transactions: [Transaction.fallbackValue(), Transaction.fallbackValue()],
       startTime: DateTime(2021).toUtc(),
       route: routePlan,
       costPerFuelUnit: 100,
       costPerAntimatterUnit: 10000,
     );
 
-    when(() => caches.waypoints.hasMarketplace(end))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(end))
-        .thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.hasMarketplace(end),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(end),
+    ).thenAnswer((_) async => false);
     final market = Market(
       symbol: end.waypoint,
       tradeGoods: [
@@ -1357,15 +1361,18 @@ void main() {
       ],
     );
     when(() => caches.markets.fromCache(end)).thenReturn(market);
-    when(() => caches.markets.refreshMarket(end)).thenAnswer(
-      (_) => Future.value(market),
-    );
-
-    when(() => db.hasRecentMarketPrices(end, any()))
-        .thenAnswer((_) async => true);
     when(
-      () => caches.construction
-          .getConstruction(end, maxAge: any(named: 'maxAge')),
+      () => caches.markets.refreshMarket(end),
+    ).thenAnswer((_) => Future.value(market));
+
+    when(
+      () => db.hasRecentMarketPrices(end, any()),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.construction.getConstruction(
+        end,
+        maxAge: any(named: 'maxAge'),
+      ),
     ).thenAnswer(
       (_) async => Construction(
         symbol: end.waypoint,
@@ -1429,8 +1436,9 @@ void main() {
       ..deal = costedDeal;
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => db.medianMarketPurchasePrice(any()))
-        .thenAnswer((_) async => 100);
+    when(
+      () => db.medianMarketPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(

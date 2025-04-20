@@ -24,11 +24,12 @@ int approximateRoundTripDistanceWithinSystem(
   Set<WaypointSymbol> symbols,
 ) {
   final start = systemsCache.waypoint(startSymbol);
-  final waypoints = symbols
-      // ignore start symbol in the symbols list. Could also throw.
-      .where((s) => s != startSymbol)
-      .map((s) => systemsCache.waypoint(s))
-      .toList();
+  final waypoints =
+      symbols
+          // ignore start symbol in the symbols list. Could also throw.
+          .where((s) => s != startSymbol)
+          .map((s) => systemsCache.waypoint(s))
+          .toList();
   if (waypoints.any((w) => w.system != start.system)) {
     throw ArgumentError('All waypoints must be in the same system.');
   }
@@ -46,10 +47,7 @@ int approximateRoundTripDistanceWithinSystem(
 
 // https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 /// Returns the fuel used for with a flight mode and the given distance.
-int fuelUsedByDistance(
-  double distance,
-  ShipNavFlightMode flightMode,
-) {
+int fuelUsedByDistance(double distance, ShipNavFlightMode flightMode) {
   final intDistance = distance.ceil();
   switch (flightMode) {
     case ShipNavFlightMode.DRIFT:
@@ -85,9 +83,10 @@ Map<ShipNavFlightMode, int> _warpSpeedMultiplier = {
 };
 
 double _speedMultiplier(ShipNavFlightMode flightMode, TravelMethod travelType) {
-  final map = travelType == TravelMethod.navigate
-      ? _navSpeedMultiplier
-      : _warpSpeedMultiplier;
+  final map =
+      travelType == TravelMethod.navigate
+          ? _navSpeedMultiplier
+          : _warpSpeedMultiplier;
   final multiplier = map[flightMode];
   if (multiplier == null) {
     throw UnimplementedError('Unimplemented $flightMode for $travelType');
@@ -312,8 +311,10 @@ void _addSubPlanWithinSystem(
   );
   // This should not be possible.
   if (actions == null) {
-    throw ArgumentError('Cannot find route within system from '
-        '${start.symbol} to ${end.symbol}');
+    throw ArgumentError(
+      'Cannot find route within system from '
+      '${start.symbol} to ${end.symbol}',
+    );
   }
   route.addAll(actions);
 }
@@ -349,10 +350,10 @@ class RoutePlanner {
     required SystemConnectivity systemConnectivity,
     required JumpCache jumpCache,
     required bool Function(WaypointSymbol) sellsFuel,
-  })  : _systemsCache = systemsCache,
-        _sellsFuel = sellsFuel,
-        _systemConnectivity = systemConnectivity,
-        _jumpCache = jumpCache;
+  }) : _systemsCache = systemsCache,
+       _sellsFuel = sellsFuel,
+       _systemConnectivity = systemConnectivity,
+       _jumpCache = jumpCache;
 
   /// Create a new route planner from a systems cache.
   RoutePlanner.fromSystemsCache(
@@ -360,11 +361,11 @@ class RoutePlanner {
     SystemConnectivity systemConnectivity, {
     required bool Function(WaypointSymbol) sellsFuel,
   }) : this(
-          systemsCache: systemsCache,
-          systemConnectivity: systemConnectivity,
-          jumpCache: JumpCache(),
-          sellsFuel: sellsFuel,
-        );
+         systemsCache: systemsCache,
+         systemConnectivity: systemConnectivity,
+         jumpCache: JumpCache(),
+         sellsFuel: sellsFuel,
+       );
 
   // SystemsCache knows all the systems and where they are.
   final SystemsCache _systemsCache;
@@ -397,10 +398,7 @@ class RoutePlanner {
     // We only handle jumps at the moment.
     // We fail out quickly from our reachability cache if these system waypoints
     // are not in the same system cluster.
-    if (!_systemConnectivity.existsJumpPathBetween(
-      start.system,
-      end.system,
-    )) {
+    if (!_systemConnectivity.existsJumpPathBetween(start.system, end.system)) {
       return null;
     }
 
@@ -437,8 +435,10 @@ class RoutePlanner {
     final endTime = DateTime.timestamp();
     final planningDuration = endTime.difference(startTime);
     if (planningDuration.inSeconds > 1) {
-      logger.warn('planning $start to $end '
-          'took ${approximateDuration(planningDuration)}');
+      logger.warn(
+        'planning $start to $end '
+        'took ${approximateDuration(planningDuration)}',
+      );
     }
 
     // walk backwards from end through symbols to build the route
@@ -509,8 +509,10 @@ class RoutePlanner {
     final endTime = DateTime.timestamp();
     final planningDuration = endTime.difference(startTime);
     if (planningDuration.inSeconds > 1) {
-      logger.warn('planning $start to $end '
-          'took ${approximateDuration(planningDuration)}');
+      logger.warn(
+        'planning $start to $end '
+        'took ${approximateDuration(planningDuration)}',
+      );
     }
 
     // walk backwards from end through symbols to build the route
@@ -541,18 +543,10 @@ class RoutePlanner {
 
     if (start.system == end.system) {
       // plan a route within a system
-      return _planWithinSystem(
-        shipSpec,
-        start: start,
-        end: end,
-      );
+      return _planWithinSystem(shipSpec, start: start, end: end);
     }
     // plan a route between systems
-    return _planJump(
-      shipSpec,
-      start: start,
-      end: end,
-    );
+    return _planJump(shipSpec, start: start, end: end);
   }
 }
 
@@ -576,11 +570,7 @@ RoutePlan? planRouteThrough(
     if (start == end) {
       continue;
     }
-    final plan = routePlanner.planRoute(
-      shipSpec,
-      start: start,
-      end: end,
-    );
+    final plan = routePlanner.planRoute(shipSpec, start: start, end: end);
     if (plan == null) {
       return null;
     }
@@ -600,13 +590,17 @@ RoutePlan? planRouteThrough(
 
 /// Returns a string describing the route plan.
 String describeRoutePlan(RoutePlan plan) {
-  final buffer = StringBuffer()
-    ..writeln('${plan.startSymbol} to ${plan.endSymbol} '
-        'speed: ${plan.shipSpeed} max-fuel: ${plan.fuelCapacity}');
+  final buffer =
+      StringBuffer()..writeln(
+        '${plan.startSymbol} to ${plan.endSymbol} '
+        'speed: ${plan.shipSpeed} max-fuel: ${plan.fuelCapacity}',
+      );
   for (final action in plan.actions) {
-    buffer.writeln('${action.type.name.padRight(14)}  ${action.startSymbol}  '
-        '${action.endSymbol} ${approximateDuration(action.duration)}'
-        ' ${action.fuelUsed} fuel');
+    buffer.writeln(
+      '${action.type.name.padRight(14)}  ${action.startSymbol}  '
+      '${action.endSymbol} ${approximateDuration(action.duration)}'
+      ' ${action.fuelUsed} fuel',
+    );
   }
   buffer.writeln(
     'in ${approximateDuration(plan.duration)} uses ${plan.fuelUsed} fuel',
@@ -637,11 +631,7 @@ Future<ShipyardListing?> nearestShipyard(
   // Sort by system distance.
   final listing = minBy(reachableShipyards, (listing) {
     return routePlanner
-        .planRoute(
-          ship.shipSpec,
-          start: start,
-          end: listing.waypointSymbol,
-        )!
+        .planRoute(ship.shipSpec, start: start, end: listing.waypointSymbol)!
         .duration;
   });
   return listing;

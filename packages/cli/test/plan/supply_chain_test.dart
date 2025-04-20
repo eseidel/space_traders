@@ -25,8 +25,10 @@ void main() {
     const tradeSymbol = TradeSymbol.ADVANCED_CIRCUITRY;
 
     final logger = _MockLogger();
-    final supplyChain =
-        runWithLogger(logger, () => builder.buildChainTo(tradeSymbol, to));
+    final supplyChain = runWithLogger(
+      logger,
+      () => builder.buildChainTo(tradeSymbol, to),
+    );
     expect(supplyChain, isNull);
   });
 }

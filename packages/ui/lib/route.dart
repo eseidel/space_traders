@@ -40,9 +40,10 @@ class _FleetScreenState extends State<FleetScreen> {
     final uri = Uri.parse('/api/ships');
     final response = await http.get(uri);
     final json = jsonDecode(response.body) as List<dynamic>;
-    final newShips = json
-        .map((dynamic item) => Ship.fromJson(item as Map<String, dynamic>))
-        .toList();
+    final newShips =
+        json
+            .map((dynamic item) => Ship.fromJson(item as Map<String, dynamic>))
+            .toList();
     setState(() {
       ships = newShips;
       loading = false;
@@ -63,9 +64,10 @@ class _FleetScreenState extends State<FleetScreen> {
         itemCount: ships.length,
         itemBuilder: (BuildContext context, int index) {
           final ship = ships[index];
-          final cargoStatus = ship.cargo.capacity == 0
-              ? ''
-              : '${ship.cargo.units}/${ship.cargo.capacity}';
+          final cargoStatus =
+              ship.cargo.capacity == 0
+                  ? ''
+                  : '${ship.cargo.units}/${ship.cargo.capacity}';
 
           return ListTile(
             title: Text(ship.symbol.hexNumber),

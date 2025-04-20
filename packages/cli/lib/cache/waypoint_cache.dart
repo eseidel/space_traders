@@ -19,12 +19,12 @@ class WaypointCache {
     ChartingCache charting,
     ConstructionCache construction,
     WaypointTraitCache waypointTraits,
-  )   : _api = api,
-        _db = db,
-        _systemsCache = systems,
-        _chartingCache = charting,
-        _constructionCache = construction,
-        _waypointTraits = waypointTraits;
+  ) : _api = api,
+      _db = db,
+      _systemsCache = systems,
+      _chartingCache = charting,
+      _constructionCache = construction,
+      _waypointTraits = waypointTraits;
 
   /// Create a new WaypointCache which only uses cached values.
   WaypointCache.cachedOnly(
@@ -33,12 +33,12 @@ class WaypointCache {
     ChartingCache charting,
     ConstructionCache construction,
     WaypointTraitCache waypointTraits,
-  )   : _api = null,
-        _db = db,
-        _systemsCache = systems,
-        _chartingCache = charting,
-        _constructionCache = construction,
-        _waypointTraits = waypointTraits;
+  ) : _api = null,
+      _db = db,
+      _systemsCache = systems,
+      _chartingCache = charting,
+      _constructionCache = construction,
+      _waypointTraits = waypointTraits;
 
   final Database _db;
   final Api? _api;
@@ -71,8 +71,10 @@ class WaypointCache {
     for (final systemWaypoint in systemWaypoints) {
       // TODO(eseidel): Could make this a single db query by fetching all
       // construction records up front.
-      final waypoint =
-          await _waypointOrNullFromCache(systemWaypoint.symbol, maxAge: maxAge);
+      final waypoint = await _waypointOrNullFromCache(
+        systemWaypoint.symbol,
+        maxAge: maxAge,
+      );
       if (waypoint == null) {
         return null;
       }
@@ -87,8 +89,10 @@ class WaypointCache {
     Duration maxAge = defaultMaxAge,
   }) async {
     // Check if all waypoints are in the charting cache.
-    final cachedWaypoints =
-        await _waypointsInSystemFromCache(systemSymbol, maxAge: maxAge);
+    final cachedWaypoints = await _waypointsInSystemFromCache(
+      systemSymbol,
+      maxAge: maxAge,
+    );
     if (cachedWaypoints != null) {
       return cachedWaypoints;
     }
@@ -107,9 +111,10 @@ class WaypointCache {
     _waypointTraits.addAll(waypoints.expand((w) => w.traits));
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?
-      final construction = waypoint.isUnderConstruction
-          ? await getConstruction(api, waypoint.symbol)
-          : null;
+      final construction =
+          waypoint.isUnderConstruction
+              ? await getConstruction(api, waypoint.symbol)
+              : null;
       await _constructionCache.updateConstruction(
         waypoint.symbol,
         construction,
@@ -118,9 +123,7 @@ class WaypointCache {
   }
 
   /// Fetch the chart for the given waypoint if not in cache.
-  Future<Chart?> fetchChart(
-    WaypointSymbol waypointSymbol,
-  ) async {
+  Future<Chart?> fetchChart(WaypointSymbol waypointSymbol) async {
     final api = _api;
     if (api == null) {
       throw StateError('This api does not work in offline mode.');
@@ -210,8 +213,10 @@ Future<Waypoint?> waypointFromCaches(
   WaypointSymbol waypointSymbol, {
   Duration maxAge = defaultMaxAge,
 }) async {
-  final record =
-      await chartingCache.chartingRecord(waypointSymbol, maxAge: maxAge);
+  final record = await chartingCache.chartingRecord(
+    waypointSymbol,
+    maxAge: maxAge,
+  );
   if (record == null) {
     return null;
   }

@@ -22,10 +22,10 @@ void main() {
     when(() => three.frame).thenReturn(threeFrame);
     when(() => threeFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
     final shipCache = ShipSnapshot([one, two, three]);
-    expect(
-      shipCache.frameCounts,
-      {ShipFrameSymbolEnum.MINER: 2, ShipFrameSymbolEnum.FIGHTER: 1},
-    );
+    expect(shipCache.frameCounts, {
+      ShipFrameSymbolEnum.MINER: 2,
+      ShipFrameSymbolEnum.FIGHTER: 1,
+    });
 
     expect(shipCache.countOfFrame(ShipFrameSymbolEnum.MINER), 2);
   });
@@ -46,8 +46,9 @@ void main() {
     final four = _MockShip();
     final fourFrame = _MockShipFrame();
     when(() => four.frame).thenReturn(fourFrame);
-    when(() => fourFrame.symbol)
-        .thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(
+      () => fourFrame.symbol,
+    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
     expect(
       describeShips([one, two, three, four]),
       '2 Carrier, 1 Fighter, 1 Light Freighter',

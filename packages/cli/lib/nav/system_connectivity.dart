@@ -73,9 +73,10 @@ class _Clusters {
       throw ArgumentError('System $systemSymbol has no cluster');
     }
     if (!_systemCountByClusterId.containsKey(systemClusterId)) {
-      _systemCountByClusterId[systemClusterId] = _clusterBySystemSymbol.values
-          .where((v) => v == systemClusterId)
-          .length;
+      _systemCountByClusterId[systemClusterId] =
+          _clusterBySystemSymbol.values
+              .where((v) => v == systemClusterId)
+              .length;
     }
     return _systemCountByClusterId[systemClusterId]!;
   }
@@ -116,10 +117,7 @@ bool canJumpFrom(
 
 /// Returns true if it's possible to jump to the provided jumpgate.
 /// it's important to also check if it's possible to jump from the origin.
-bool canJumpTo(
-  ConstructionSnapshot constructionSnapshot,
-  WaypointSymbol to,
-) {
+bool canJumpTo(ConstructionSnapshot constructionSnapshot, WaypointSymbol to) {
   final underConstruction = constructionSnapshot.isUnderConstruction(to);
   // If we don't know or it's not complete, assume we can't jump.
   if (underConstruction ?? true) {
@@ -187,7 +185,7 @@ class _Connections {
 class SystemConnectivity {
   /// Creates a new SystemConnectivity.
   SystemConnectivity._(this._connections)
-      : _clusters = _Clusters.fromConnections(_connections);
+    : _clusters = _Clusters.fromConnections(_connections);
 
   /// Creates a new SystemConnectivity from the given connections.
   factory SystemConnectivity.test(
@@ -201,8 +199,10 @@ class SystemConnectivity {
     JumpGateSnapshot jumpGates,
     ConstructionSnapshot constructionSnapshot,
   ) {
-    final connections =
-        _Connections.fromSnapshots(jumpGates, constructionSnapshot);
+    final connections = _Connections.fromSnapshots(
+      jumpGates,
+      constructionSnapshot,
+    );
     return SystemConnectivity._(connections);
   }
 
@@ -302,8 +302,9 @@ class SystemConnectivity {
             )
             .map((s) => systemsCache[s]);
         final jumpFromSystem = systemsCache[jumpFrom];
-        final sortedSystems =
-            connectedSystems.sortedBy<num>((s) => s.distanceTo(jumpFromSystem));
+        final sortedSystems = connectedSystems.sortedBy<num>(
+          (s) => s.distanceTo(jumpFromSystem),
+        );
         for (final connectedSystem in sortedSystems) {
           oneJumpFurther.add(connectedSystem.symbol);
         }

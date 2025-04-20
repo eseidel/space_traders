@@ -50,7 +50,7 @@ class ClusterFinder<Key> {
 class WaypointConnectivity {
   /// Creates a new SystemConnectivity.
   WaypointConnectivity(Map<WaypointSymbol, ClusterId> clusterByWaypointSymbol)
-      : _clusterByWaypointSymbol = clusterByWaypointSymbol;
+    : _clusterByWaypointSymbol = clusterByWaypointSymbol;
 
   /// Creates a new SystemConnectivity from the systemsCache.
   factory WaypointConnectivity.fromSystemAndFuelCapacity(

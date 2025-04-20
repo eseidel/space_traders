@@ -34,10 +34,7 @@ void jobAssert(
   Duration timeout,
 ) {
   if (!condition) {
-    throw JobException(
-      message,
-      timeout,
-    );
+    throw JobException(message, timeout);
   }
 }
 
@@ -46,37 +43,25 @@ Never failJob(String message, Duration timeout) =>
     throw JobException(message, timeout);
 
 /// Exception thrown from a Job if the condition is not met.
-T assertNotNull<T>(
-  T? value,
-  String message,
-  Duration timeout,
-) {
+T assertNotNull<T>(T? value, String message, Duration timeout) {
   if (value == null) {
-    throw JobException(
-      message,
-      timeout,
-    );
+    throw JobException(message, timeout);
   }
   return value;
 }
 
-enum _JobResultType {
-  waitOrLoop,
-  complete,
-}
+enum _JobResultType { waitOrLoop, complete }
 
 /// The result from doJob
 class JobResult {
   /// Wait tells the caller to return out the DateTime? to have the ship
   /// wait.  Does not advance to the next job.
   JobResult.wait(DateTime? wait)
-      : _type = _JobResultType.waitOrLoop,
-        _waitTime = wait;
+    : _type = _JobResultType.waitOrLoop,
+      _waitTime = wait;
 
   /// Complete tells the caller this job is complete.
-  JobResult.complete()
-      : _type = _JobResultType.complete,
-        _waitTime = null;
+  JobResult.complete() : _type = _JobResultType.complete, _waitTime = null;
 
   final _JobResultType _type;
   final DateTime? _waitTime;
@@ -121,15 +106,17 @@ class MultiJob {
 
   /// The job functions to run.
   final List<
-      Future<JobResult> Function(
-        BehaviorState,
-        Api,
-        Database,
-        CentralCommand,
-        Caches,
-        Ship, {
-        DateTime Function() getNow,
-      })> jobFunctions;
+    Future<JobResult> Function(
+      BehaviorState,
+      Api,
+      Database,
+      CentralCommand,
+      Caches,
+      Ship, {
+      DateTime Function() getNow,
+    })
+  >
+  jobFunctions;
 
   /// Run the multi-job.
   Future<DateTime?> run(
@@ -176,10 +163,7 @@ class MultiJob {
     }
     // This only should happen if jobFunctions > 10.  We don't currently
     // support looping the same function multiple times (we used to).
-    failJob(
-      'Too many $name job iterations',
-      const Duration(hours: 1),
-    );
+    failJob('Too many $name job iterations', const Duration(hours: 1));
   }
 }
 

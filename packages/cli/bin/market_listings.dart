@@ -4,9 +4,9 @@ import 'package:cli/logic/printing.dart';
 import 'package:cli_table/cli_table.dart';
 
 Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
-      'content': content.toString(),
-      'hAlign': HorizontalAlign.right,
-    };
+  'content': content.toString(),
+  'hAlign': HorizontalAlign.right,
+};
 
 void addSymbols(
   Table table,

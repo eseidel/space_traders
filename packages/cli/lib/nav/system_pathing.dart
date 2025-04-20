@@ -14,9 +14,9 @@ List<SystemSymbol>? findSystemPath(
   // This code is hot enough that SystemSymbol.fromString shows up!
   final startSymbol = start.symbol;
   final endSymbol = end.symbol;
-  final frontier =
-      PriorityQueue<(SystemSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((startSymbol, 0));
+  final frontier = PriorityQueue<(SystemSymbol, int)>(
+    (a, b) => a.$2.compareTo(b.$2),
+  )..add((startSymbol, 0));
   final cameFrom = <SystemSymbol, SystemSymbol>{};
   final costSoFar = <SystemSymbol, int>{};
   costSoFar[startSymbol] = 0;
@@ -34,8 +34,9 @@ List<SystemSymbol>? findSystemPath(
       break;
     }
     final currentSystem = systemsCache.systemBySymbol(currentSymbol);
-    final connected =
-        systemConnectivity.directlyConnectedSystemSymbols(currentSymbol);
+    final connected = systemConnectivity.directlyConnectedSystemSymbols(
+      currentSymbol,
+    );
     final connectedSystems = connected.map(systemsCache.systemBySymbol);
 
     for (final nextSystem in connectedSystems) {
@@ -95,8 +96,9 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
     return null;
   }
   // TODO(eseidel): This will fail if systems have more than one jump gate.
-  final jumpGateSymbols = systemSymbols
-      .map((s) => systemsCache.jumpGateWaypointForSystem(s)!.symbol);
+  final jumpGateSymbols = systemSymbols.map(
+    (s) => systemsCache.jumpGateWaypointForSystem(s)!.symbol,
+  );
   return [
     if (start != jumpGateSymbols.first) start,
     ...jumpGateSymbols,

@@ -48,9 +48,8 @@ void main() {
         page: any(named: 'page'),
       ),
     ).thenAnswer(
-      (_) => Future.value(
-        GetContracts200Response(meta: Meta(total: 0), data: []),
-      ),
+      (_) =>
+          Future.value(GetContracts200Response(meta: Meta(total: 0), data: [])),
     );
     final factionsApi = _MockFactionsApi();
     when(() => api.factions).thenReturn(factionsApi);
@@ -60,9 +59,8 @@ void main() {
         page: any(named: 'page'),
       ),
     ).thenAnswer(
-      (_) => Future.value(
-        GetFactions200Response(meta: Meta(total: 0), data: []),
-      ),
+      (_) =>
+          Future.value(GetFactions200Response(meta: Meta(total: 0), data: [])),
     );
     when(db.allFactions).thenAnswer((_) => Future.value(<Faction>[]));
     registerFallbackValue(
@@ -75,8 +73,9 @@ void main() {
       ),
     );
     when(() => db.upsertFaction(any())).thenAnswer((_) async => {});
-    when(db.allConstructionRecords)
-        .thenAnswer((_) => Future.value(<ConstructionRecord>[]));
+    when(
+      db.allConstructionRecords,
+    ).thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
     when(db.allMarketListings).thenAnswer((_) async => []);
     when(db.allMarketPrices).thenAnswer((_) async => []);

@@ -45,7 +45,4 @@ Future<JobResult> _completeIdle(
 }
 
 /// Advance the idle behavior.
-final advanceIdle = const MultiJob('Idle', [
-  _startIdle,
-  _completeIdle,
-]).run;
+final advanceIdle = const MultiJob('Idle', [_startIdle, _completeIdle]).run;

@@ -27,8 +27,10 @@ CountingApiClient getApiClient(
 }) {
   final CountingApiClient apiClient;
   if (overrideBaseUrl != null) {
-    apiClient =
-        CountingApiClient(authentication: auth, basePath: overrideBaseUrl);
+    apiClient = CountingApiClient(
+      authentication: auth,
+      basePath: overrideBaseUrl,
+    );
   } else {
     apiClient = CountingApiClient(authentication: auth);
   }

@@ -34,7 +34,7 @@ enum FleetRole {
   probe,
 
   /// A ship with an unknown role.
-  unknown;
+  unknown,
 }
 
 /// Class to hold common ship traits needed for route planning.
@@ -49,17 +49,17 @@ class ShipSpec {
 
   /// Create a ShipSpec from a JSON map.
   ShipSpec.fromJson(Map<String, dynamic> json)
-      : this(
-          cargoCapacity: json['cargoCapacity'] as int,
-          fuelCapacity: json['fuelCapacity'] as int,
-          speed: json['speed'] as int,
-          canWarp: json['canWarp'] as bool,
-        );
+    : this(
+        cargoCapacity: json['cargoCapacity'] as int,
+        fuelCapacity: json['fuelCapacity'] as int,
+        speed: json['speed'] as int,
+        canWarp: json['canWarp'] as bool,
+      );
 
   /// Fallback value for mocking.
   @visibleForTesting
   ShipSpec.fallbackValue()
-      : this(cargoCapacity: 0, fuelCapacity: 100, speed: 10, canWarp: false);
+    : this(cargoCapacity: 0, fuelCapacity: 100, speed: 10, canWarp: false);
 
   /// The fuel capacity of the ship.
   final int fuelCapacity;
@@ -75,11 +75,11 @@ class ShipSpec {
 
   /// Convert this ShipSpec to a JSON map.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'cargoCapacity': cargoCapacity,
-        'fuelCapacity': fuelCapacity,
-        'speed': speed,
-        'canWarp': canWarp,
-      };
+    'cargoCapacity': cargoCapacity,
+    'fuelCapacity': fuelCapacity,
+    'speed': speed,
+    'canWarp': canWarp,
+  };
 }
 
 // TODO(eseidel): Integrate into Ship after fixing tests which expect this to
@@ -101,12 +101,11 @@ extension ShipUtils on Ship {
 
   /// Returns the ShipSpec for the ship.
   ShipSpec get shipSpec => ShipSpec(
-        cargoCapacity: cargo.capacity,
-        fuelCapacity: fuel.capacity,
-        speed: engine.speed,
-        canWarp:
-            modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
-      );
+    cargoCapacity: cargo.capacity,
+    fuelCapacity: fuel.capacity,
+    speed: engine.speed,
+    canWarp: modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
+  );
 
   /// Returns the amount of the given trade good the ship has.
   int countUnits(TradeSymbol tradeSymbol) => cargo.countUnits(tradeSymbol);
@@ -136,16 +135,16 @@ extension ShipUtils on Ship {
     }
     final item = cargo.cargoItem(tradeSymbol);
     if (item == null) {
-      final inventory = cargo.inventory.toList()
-        ..add(
-          ShipCargoItem(
-            symbol: tradeSymbol,
-            name: name,
-            description: description,
-            // Add initially with zero, we're about to add units below.
-            units: 0,
-          ),
-        );
+      final inventory =
+          cargo.inventory.toList()..add(
+            ShipCargoItem(
+              symbol: tradeSymbol,
+              name: name,
+              description: description,
+              // Add initially with zero, we're about to add units below.
+              units: 0,
+            ),
+          );
       // We may have to replace the list because it defaults to const [] which
       // is immutable.
       cargo.inventory = inventory;
@@ -275,22 +274,22 @@ class Ship {
 
   /// Creates a new ship from a JSON map.
   Ship.fromJson(Map<String, dynamic> json)
-      : this.fromOpenApi(openapi.Ship.fromJson(json)!);
+    : this.fromOpenApi(openapi.Ship.fromJson(json)!);
 
   /// Creates a new ship from an OpenAPI ship.
   Ship.fromOpenApi(openapi.Ship ship)
-      : symbol = ShipSymbol.fromJson(ship.symbol),
-        registration = ship.registration,
-        nav = ship.nav,
-        crew = ship.crew,
-        frame = ship.frame,
-        reactor = ship.reactor,
-        engine = ship.engine,
-        cooldown = ship.cooldown,
-        modules = ship.modules,
-        mounts = ship.mounts,
-        cargo = ship.cargo,
-        fuel = ship.fuel;
+    : symbol = ShipSymbol.fromJson(ship.symbol),
+      registration = ship.registration,
+      nav = ship.nav,
+      crew = ship.crew,
+      frame = ship.frame,
+      reactor = ship.reactor,
+      engine = ship.engine,
+      cooldown = ship.cooldown,
+      modules = ship.modules,
+      mounts = ship.mounts,
+      cargo = ship.cargo,
+      fuel = ship.fuel;
 
   /// Fallback value for mocking.
   @visibleForTesting
@@ -375,19 +374,19 @@ class Ship {
 
   /// Converts this ship to an OpenAPI ship.
   openapi.Ship toOpenApi() => openapi.Ship(
-        symbol: symbol.symbol,
-        registration: registration,
-        nav: nav,
-        crew: crew,
-        frame: frame,
-        reactor: reactor,
-        engine: engine,
-        cooldown: cooldown,
-        modules: modules,
-        mounts: mounts,
-        cargo: cargo,
-        fuel: fuel,
-      );
+    symbol: symbol.symbol,
+    registration: registration,
+    nav: nav,
+    crew: crew,
+    frame: frame,
+    reactor: reactor,
+    engine: engine,
+    cooldown: cooldown,
+    modules: modules,
+    mounts: mounts,
+    cargo: cargo,
+    fuel: fuel,
+  );
 
   /// Compute the fleet role for a given ship.
   FleetRole get fleetRole {

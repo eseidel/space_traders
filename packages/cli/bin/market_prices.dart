@@ -17,18 +17,21 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     listedSymbols.addAll(listing.tradeSymbols);
   }
 
-  final maxNameLength =
-      TradeSymbol.values.fold(0, (m, t) => max(m, t.value.length));
+  final maxNameLength = TradeSymbol.values.fold(
+    0,
+    (m, t) => max(m, t.value.length),
+  );
 
-  final sortedSymbols = TradeSymbol.values.toList()
-    ..sort((a, b) => a.value.compareTo(b.value));
+  final sortedSymbols =
+      TradeSymbol.values.toList()..sort((a, b) => a.value.compareTo(b.value));
   for (final tradeSymbol in sortedSymbols) {
     final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol);
     final hasListing = listedSymbols.contains(tradeSymbol);
     final noPriceString = hasListing ? '?' : '';
-    final priceString =
-        (medianPrice == null ? noPriceString : creditsString(medianPrice))
-            .padLeft(13);
+    final priceString = (medianPrice == null
+            ? noPriceString
+            : creditsString(medianPrice))
+        .padLeft(13);
     final name = tradeSymbol.value;
     logger.info('${name.padRight(maxNameLength)} $priceString');
   }

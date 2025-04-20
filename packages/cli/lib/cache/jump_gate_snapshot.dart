@@ -25,8 +25,9 @@ class JumpGateSnapshot {
 
   /// Gets all jump gates for the given system.
   Iterable<JumpGate> recordsForSystem(SystemSymbol systemSymbol) {
-    return values
-        .where((record) => record.waypointSymbol.system == systemSymbol);
+    return values.where(
+      (record) => record.waypointSymbol.system == systemSymbol,
+    );
   }
 
   /// Gets the connections for the jump gate with the given symbol.
@@ -34,10 +35,8 @@ class JumpGateSnapshot {
       recordForSymbol(waypointSymbol)?.connections;
 
   /// Gets the JumpGate for the given waypoint symbol.
-  JumpGate? recordForSymbol(WaypointSymbol waypointSymbol) =>
-      values.firstWhereOrNull(
-        (record) => record.waypointSymbol == waypointSymbol,
-      );
+  JumpGate? recordForSymbol(WaypointSymbol waypointSymbol) => values
+      .firstWhereOrNull((record) => record.waypointSymbol == waypointSymbol);
 }
 
 /// Gets the JumpGate for the given waypoint symbol.

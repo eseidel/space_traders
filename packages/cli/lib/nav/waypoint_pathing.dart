@@ -47,8 +47,10 @@ List<RouteAction>? findRouteWithinSystem(
   }
 
   final startToEndDistance = startWaypoint.distanceTo(endWaypoint);
-  final fuelUsedByDirectCruise =
-      fuelUsedByDistance(startToEndDistance, ShipNavFlightMode.CRUISE);
+  final fuelUsedByDirectCruise = fuelUsedByDistance(
+    startToEndDistance,
+    ShipNavFlightMode.CRUISE,
+  );
   if (fuelUsedByDirectCruise <= fuelCapacity) {
     return [
       RouteAction(
@@ -68,10 +70,11 @@ List<RouteAction>? findRouteWithinSystem(
   final systemWaypoints = systemsCache.waypointsInSystem(start.system);
   // We only consider waypoints that have markets that sell fuel.
   // Also include the start and end waypoints.
-  final waypoints = systemWaypoints.where((w) {
-    final symbol = w.symbol;
-    return sellsFuel(symbol) || symbol == start || symbol == end;
-  }).toList();
+  final waypoints =
+      systemWaypoints.where((w) {
+        final symbol = w.symbol;
+        return sellsFuel(symbol) || symbol == start || symbol == end;
+      }).toList();
 
   ShipNavFlightMode flightModeRequired({
     required SystemWaypoint from,
@@ -90,9 +93,9 @@ List<RouteAction>? findRouteWithinSystem(
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
   // This code is hot enough that SystemSymbol.fromString shows up!
-  final frontier =
-      PriorityQueue<(WaypointSymbol, int)>((a, b) => a.$2.compareTo(b.$2))
-        ..add((start, 0));
+  final frontier = PriorityQueue<(WaypointSymbol, int)>(
+    (a, b) => a.$2.compareTo(b.$2),
+  )..add((start, 0));
   final cameFrom = <WaypointSymbol, RouteAction>{};
   final costSoFar = <WaypointSymbol, int>{};
   costSoFar[start] = 0;
@@ -105,15 +108,22 @@ List<RouteAction>? findRouteWithinSystem(
     final currentWaypoint = systemsCache.waypoint(currentSymbol);
     // All waypoints are always reachable, just a question of what flight mode.
     for (final nextWaypoint in waypoints) {
-      final flightMode =
-          flightModeRequired(from: currentWaypoint, to: nextWaypoint);
+      final flightMode = flightModeRequired(
+        from: currentWaypoint,
+        to: nextWaypoint,
+      );
       final next = nextWaypoint.symbol;
-      final duration =
-          _timeBetween(currentWaypoint, nextWaypoint, shipSpeed, flightMode);
+      final duration = _timeBetween(
+        currentWaypoint,
+        nextWaypoint,
+        shipSpeed,
+        flightMode,
+      );
       final newCost = costSoFar[currentSymbol]! + duration;
       if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
         costSoFar[next] = newCost;
-        final priority = newCost +
+        final priority =
+            newCost +
             _approximateTimeBetween(
               endWaypoint,
               nextWaypoint,
@@ -121,9 +131,10 @@ List<RouteAction>? findRouteWithinSystem(
               flightMode,
             );
         frontier.add((next, priority));
-        final type = flightMode == ShipNavFlightMode.CRUISE
-            ? RouteActionType.navCruise
-            : RouteActionType.navDrift;
+        final type =
+            flightMode == ShipNavFlightMode.CRUISE
+                ? RouteActionType.navCruise
+                : RouteActionType.navDrift;
         final action = RouteAction(
           startSymbol: currentSymbol,
           endSymbol: nextWaypoint.symbol,

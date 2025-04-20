@@ -83,9 +83,7 @@ void main() {
     );
     expect(
       mountsToAddToShip(ship, template),
-      MountSymbolSet.from([
-        ShipMountSymbolEnum.SENSOR_ARRAY_III,
-      ]),
+      MountSymbolSet.from([ShipMountSymbolEnum.SENSOR_ARRAY_III]),
     );
     expect(
       mountsToRemoveFromShip(ship, template),
@@ -122,8 +120,9 @@ void main() {
       );
     }
 
-    when(() => ship.mounts)
-        .thenReturn(mountSymbols.map(mountForSymbol).toList());
+    when(
+      () => ship.mounts,
+    ).thenReturn(mountSymbols.map(mountForSymbol).toList());
     final template = ShipTemplate(
       frameSymbol: ShipFrameSymbolEnum.MINER,
       mounts: MountSymbolSet.from([

@@ -44,20 +44,21 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   // We can move this index into another object if other scripts need similar.
-  final chartedWaypointsBySystem =
-      chartingSnapshot.records.where((r) => r.isCharted).groupListsBy(
-            (r) => r.waypointSymbol.system,
-          );
+  final chartedWaypointsBySystem = chartingSnapshot.records
+      .where((r) => r.isCharted)
+      .groupListsBy((r) => r.waypointSymbol.system);
 
   for (final systemSymbol in systemSymbols) {
     final system = systemsCache[systemSymbol];
     final records = chartedWaypointsBySystem[systemSymbol] ?? [];
     final chartedSymbols = records.map((r) => r.waypointSymbol).toSet();
     final waypointCount = system.waypoints.length;
-    final asteroidSymbols =
-        system.waypoints.where((w) => w.isAsteroid).map((a) => a.symbol);
-    final otherSymbols =
-        system.waypoints.where((w) => !w.isAsteroid).map((a) => a.symbol);
+    final asteroidSymbols = system.waypoints
+        .where((w) => w.isAsteroid)
+        .map((a) => a.symbol);
+    final otherSymbols = system.waypoints
+        .where((w) => !w.isAsteroid)
+        .map((a) => a.symbol);
     final chartedAsteroids = asteroidSymbols.where(chartedSymbols.contains);
     final chartedOther = otherSymbols.where(chartedSymbols.contains);
 
@@ -83,11 +84,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final systemConnectivity = await loadSystemConnectivity(db);
   final hqSystemSymbol = await myHqSystemSymbol(db);
-  final reachableSystems =
-      systemConnectivity.systemsReachableFrom(hqSystemSymbol);
+  final reachableSystems = systemConnectivity.systemsReachableFrom(
+    hqSystemSymbol,
+  );
 
-  final systemsWithCharts = reachableSystems
-      .where((s) => (chartedWaypointsBySystem[s] ?? []).isNotEmpty);
+  final systemsWithCharts = reachableSystems.where(
+    (s) => (chartedWaypointsBySystem[s] ?? []).isNotEmpty,
+  );
   logger.info(
     '${systemsWithCharts.length} systems with 1+ charts of '
     '${reachableSystems.length} known reachable.',

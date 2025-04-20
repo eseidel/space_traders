@@ -17,8 +17,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
 
-  final systemConnectivity =
-      SystemConnectivity.fromJumpGates(jumpGates, construction);
+  final systemConnectivity = SystemConnectivity.fromJumpGates(
+    jumpGates,
+    construction,
+  );
 
   final connectedMissingCharts = <SystemSymbol, int>{};
   final connectedProbeCount = <SystemSymbol, int>{};
@@ -34,11 +36,12 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   // TODO(eseidel): Use behaviors and consider the route end point.
-  final probeCountBySystem =
-      ships.ships.where((s) => s.isProbe).groupFoldBy<SystemSymbol, int>(
-            systemForShip,
-            (count, systemSymbol) => count ?? 0 + 1,
-          );
+  final probeCountBySystem = ships.ships
+      .where((s) => s.isProbe)
+      .groupFoldBy<SystemSymbol, int>(
+        systemForShip,
+        (count, systemSymbol) => count ?? 0 + 1,
+      );
 
   final agentCache = await AgentCache.load(db);
   final hqSystemSymbol = agentCache!.headquartersSystemSymbol;
@@ -64,10 +67,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
         continue;
       }
       final toSystem = systemsCache[toSystemSymbol];
-      final missingChartCount = toSystem.waypoints
-          .where((w) => !w.isAsteroid)
-          .where((w) => !(charts.isCharted(w.symbol) ?? false))
-          .length;
+      final missingChartCount =
+          toSystem.waypoints
+              .where((w) => !w.isAsteroid)
+              .where((w) => !(charts.isCharted(w.symbol) ?? false))
+              .length;
       connectedMissingCharts[toSystemSymbol] = missingChartCount;
       if (missingChartCount > 0) {
         slots += 1;
@@ -77,8 +81,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     connectedProbeCount[fromSystemSymbol] = probesNearby;
   }
 
-  final sortedSlots =
-      slotCount.entries.where((e) => e.value > 0).sortedBy<num>((e) => e.value);
+  final sortedSlots = slotCount.entries
+      .where((e) => e.value > 0)
+      .sortedBy<num>((e) => e.value);
 
   for (final entry in sortedSlots) {
     final slots = entry.value;

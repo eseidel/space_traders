@@ -49,8 +49,9 @@ Map<SystemSymbol, int> scoreMarketSystems(
   final medianPurchasePrices = <TradeSymbol, int?>{};
   final medianSellPrices = <TradeSymbol, int?>{};
   for (final tradeSymbol in TradeSymbol.values) {
-    medianPurchasePrices[tradeSymbol] =
-        marketPrices.medianPurchasePrice(tradeSymbol);
+    medianPurchasePrices[tradeSymbol] = marketPrices.medianPurchasePrice(
+      tradeSymbol,
+    );
     medianSellPrices[tradeSymbol] = marketPrices.medianSellPrice(tradeSymbol);
   }
 
@@ -66,8 +67,9 @@ Map<SystemSymbol, int> scoreMarketSystems(
     marketSystemScores[system] = (marketSystemScores[system] ?? 0) + score;
   }
 
-  final sortedScores = marketSystemScores.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
+  final sortedScores =
+      marketSystemScores.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
   return Map.fromEntries(sortedScores.take(limit));
 }
 
@@ -111,9 +113,10 @@ _ShipPlacement? _findBetterSystemForTrader(
     final profitPerSecond = deal.expectedProfitPerSecond;
     if (profitPerSecond < profitPerSecondThreshold) {
       shipDetail(
-          ship,
-          'Profit per second too low for $shipSymbol at '
-          '${closest.symbol}, $profitPerSecond < $profitPerSecondThreshold');
+        ship,
+        'Profit per second too low for $shipSymbol at '
+        '${closest.symbol}, $profitPerSecond < $profitPerSecondThreshold',
+      );
       search.markUsed(closest);
       continue;
     }
@@ -124,10 +127,11 @@ _ShipPlacement? _findBetterSystemForTrader(
       destinationSymbol: systemJumpGate.symbol,
     );
     shipInfo(
-        ship,
-        'Found placement: ${creditsString(profitPerSecond)}/s '
-        '${placement.score} ${placement.distance} '
-        '${placement.destinationSymbol}');
+      ship,
+      'Found placement: ${creditsString(profitPerSecond)}/s '
+      '${placement.score} ${placement.distance} '
+      '${placement.destinationSymbol}',
+    );
     shipInfo(ship, 'Potential: ${describeCostedDeal(deal)}');
     return placement;
   }
@@ -178,9 +182,10 @@ class _MarketSearch {
   final Set<SystemSymbol> claimedSystemSymbols;
 
   System? closestAvailableSystem(System startSystem) {
-    final availableSystems = marketSystems
-        .where((system) => !claimedSystemSymbols.contains(system.symbol))
-        .toList();
+    final availableSystems =
+        marketSystems
+            .where((system) => !claimedSystemSymbols.contains(system.symbol))
+            .toList();
     return _closestSystem(startSystem, availableSystems);
   }
 

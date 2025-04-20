@@ -7,10 +7,8 @@ import 'package:cli/net/rate_limit.dart';
 import 'package:http/http.dart';
 
 class NetExecutor {
-  NetExecutor(
-    Database db, {
-    required this.targetRequestsPerSecond,
-  }) : queue = NetQueue(db, QueueRole.responder);
+  NetExecutor(Database db, {required this.targetRequestsPerSecond})
+    : queue = NetQueue(db, QueueRole.responder);
 
   final double targetRequestsPerSecond;
   final Client _client = Client();
@@ -52,8 +50,12 @@ class NetExecutor {
     final uri = Uri.parse(request.url);
     final body = request.body;
     final headers = request.headers;
-    final response =
-        await _dispatchRequest(method, uri, headers: headers, body: body);
+    final response = await _dispatchRequest(
+      method,
+      uri,
+      headers: headers,
+      body: body,
+    );
     return response;
   }
 
@@ -67,8 +69,9 @@ class NetExecutor {
 
   Future<void> run({DateTime Function() getNow = defaultGetNow}) async {
     logger.info('Servicing network requests...');
-    final minWaitTime =
-        Duration(milliseconds: (1000 / targetRequestsPerSecond).ceil());
+    final minWaitTime = Duration(
+      milliseconds: (1000 / targetRequestsPerSecond).ceil(),
+    );
     final stats = RateLimitStatPrinter();
     DateTime? nextRequestTime;
     var serverErrorRetryLimit = 5;

@@ -46,9 +46,9 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
   String w(WaypointSymbol symbol) =>
       allSameSystem ? symbol.waypointName : symbol.sectorLocalName;
   Map<String, dynamic> rightAlign(String content) => <String, dynamic>{
-        'content': content,
-        'hAlign': HorizontalAlign.right,
-      };
+    'content': content,
+    'hAlign': HorizontalAlign.right,
+  };
   Map<String, dynamic> c(int credits) => rightAlign(creditsString(credits));
   for (final state in states) {
     final costed = state.deal!;
@@ -85,10 +85,11 @@ Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }
 
-  final minerHaulers = behaviors.states
-      .where((state) => state.behavior == Behavior.minerHauler)
-      .map((state) => state.shipSymbol.hexNumber)
-      .toList();
+  final minerHaulers =
+      behaviors.states
+          .where((state) => state.behavior == Behavior.minerHauler)
+          .map((state) => state.shipSymbol.hexNumber)
+          .toList();
   if (minerHaulers.isNotEmpty) {
     logger.info(
       '${minerHaulers.length} miner haulers: ${minerHaulers.join(', ')}',

@@ -27,7 +27,8 @@ Future<DateTime?> Function(
   BehaviorState state,
   Ship ship, {
   DateTime Function() getNow,
-}) _behaviorFunction(Behavior behavior) {
+})
+_behaviorFunction(Behavior behavior) {
   switch (behavior) {
     case Behavior.buyShip:
       return advanceBuyShip;

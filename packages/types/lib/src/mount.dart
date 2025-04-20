@@ -39,10 +39,7 @@ typedef MountSymbolSet = Multiset<ShipMountSymbolEnum>;
 @immutable
 class ShipTemplate {
   /// Create a new ship template.
-  const ShipTemplate({
-    required this.frameSymbol,
-    required this.mounts,
-  });
+  const ShipTemplate({required this.frameSymbol, required this.mounts});
 
   /// Frame type that this template is for.
   final ShipFrameSymbolEnum frameSymbol;
@@ -82,9 +79,9 @@ class ShipTemplate {
 
   @override
   int get hashCode => Object.hash(
-        frameSymbol,
-        mounts.fold<int>(0, (previous, value) => previous ^ value.hashCode),
-      );
+    frameSymbol,
+    mounts.fold<int>(0, (previous, value) => previous ^ value.hashCode),
+  );
 }
 
 /// Extensions for dealing with mounts on ships.
@@ -155,16 +152,14 @@ class MountRequest {
 
   /// The buy job for this mount request.
   BuyJob get buyJob => BuyJob(
-        tradeSymbol: tradeSymbolForMountSymbol(mountSymbol),
-        units: 1,
-        buyLocation: marketSymbol,
-      );
+    tradeSymbol: tradeSymbolForMountSymbol(mountSymbol),
+    units: 1,
+    buyLocation: marketSymbol,
+  );
 
   /// The mount job for this mount request.
-  MountJob get mountJob => MountJob(
-        mountSymbol: mountSymbol,
-        shipyardSymbol: shipyardSymbol,
-      );
+  MountJob get mountJob =>
+      MountJob(mountSymbol: mountSymbol, shipyardSymbol: shipyardSymbol);
 }
 
 /// Compute the total strength of all mounts on [ship]

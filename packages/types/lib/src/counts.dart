@@ -10,10 +10,7 @@ class Counts<T> {
   void record(T path) => counts[path] = (counts[path] ?? 0) + 1;
 
   /// Diff two count maps.
-  static Map<T, int> diffCounts<T>(
-    Map<T, int> before,
-    Map<T, int> after,
-  ) {
+  static Map<T, int> diffCounts<T>(Map<T, int> before, Map<T, int> after) {
     final result = <T, int>{};
     for (final key in after.keys) {
       final diff = after[key]! - (before[key] ?? 0);
@@ -66,7 +63,8 @@ Future<T> captureTimeAndRequests<T>(
     Duration duration,
     int requestCount,
     QueryCounts queryCounts,
-  ) onComplete,
+  )
+  onComplete,
 }) async {
   final before = DateTime.timestamp();
   final requestsBefore = requestCounts.total;

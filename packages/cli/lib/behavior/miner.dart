@@ -33,7 +33,8 @@ int _expectedValueFromSurvey(
       logger.warn('No market for ${deposit.tradeSymbol}.');
       return total;
     }
-    final sellPrice = marketPrices.recentSellPrice(
+    final sellPrice =
+        marketPrices.recentSellPrice(
           deposit.tradeSymbol,
           marketSymbol: marketSymbol,
         ) ??
@@ -149,12 +150,7 @@ Future<JobResult> extractAndLog(
   try {
     final ExtractResources201ResponseData response;
     if (maybeSurvey != null) {
-      response = await extractResourcesWithSurvey(
-        db,
-        api,
-        ship,
-        maybeSurvey,
-      );
+      response = await extractResourcesWithSurvey(db, api, ship, maybeSurvey);
     } else {
       response = await extractResources(db, api, ship);
     }
@@ -175,12 +171,13 @@ Future<JobResult> extractAndLog(
     );
     // Could use TradeSymbol.values.reduce() to find the longest symbol.
     shipDetail(
-        ship,
-        // pickaxe requires an extra space on mac?
-        '⛏️  ${yield_.units.toString().padLeft(2)} '
-        '${yield_.symbol.value.padRight(18)} '
-        // Space after emoji is needed on windows to not bleed together.
-        '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}');
+      ship,
+      // pickaxe requires an extra space on mac?
+      '⛏️  ${yield_.units.toString().padLeft(2)} '
+      '${yield_.symbol.value.padRight(18)} '
+      // Space after emoji is needed on windows to not bleed together.
+      '📦 ${cargo.units.toString().padLeft(2)}/${cargo.capacity}',
+    );
 
     _verifyExtractionSize(ship, yield_.units);
 
@@ -267,8 +264,10 @@ Future<JobResult> doMineJob(
     return JobResult.wait(expiration);
   }
 
-  final marketPrices =
-      await MarketPriceSnapshot.loadOneSystem(db, ship.systemSymbol);
+  final marketPrices = await MarketPriceSnapshot.loadOneSystem(
+    db,
+    ship.systemSymbol,
+  );
 
   // See if we have a good survey to mine.
   final worthMining = await surveysWorthMining(
@@ -380,8 +379,10 @@ Future<JobResult> emptyCargoIfNeeded(
     getNow: getNow,
   );
   if (currentMarket != null) {
-    final marketPrices =
-        await MarketPriceSnapshot.loadOneSystem(db, ship.systemSymbol);
+    final marketPrices = await MarketPriceSnapshot.loadOneSystem(
+      db,
+      ship.systemSymbol,
+    );
 
     await sellAllCargoAndLog(
       api,
@@ -438,10 +439,7 @@ Future<JobResult> emptyCargoIfNeeded(
   return JobResult.wait(waitTime);
 }
 
-Ship? _nextArrivingHauler(
-  List<Ship> haulers,
-  WaypointSymbol here,
-) {
+Ship? _nextArrivingHauler(List<Ship> haulers, WaypointSymbol here) {
   if (haulers.isEmpty) {
     return null;
   }
@@ -476,8 +474,10 @@ Future<JobResult> travelAndSellCargo(
 
   // Could be "nearby" systems but marketsTradingSortedByDistance is currently
   // restricted to this system.
-  final marketPrices =
-      await MarketPriceSnapshot.loadOneSystem(db, ship.systemSymbol);
+  final marketPrices = await MarketPriceSnapshot.loadOneSystem(
+    db,
+    ship.systemSymbol,
+  );
 
   final costedTrip = assertNotNull(
     await findBestMarketToSell(
@@ -512,13 +512,7 @@ Future<JobResult> travelAndSellCargo(
   }
 
   final currentMarket = assertNotNull(
-    await visitLocalMarket(
-      api,
-      db,
-      caches,
-      ship,
-      getNow: getNow,
-    ),
+    await visitLocalMarket(api, db, caches, ship, getNow: getNow),
     'No market at ${ship.waypointSymbol}.',
     const Duration(minutes: 10),
   );
@@ -651,10 +645,7 @@ Future<JobResult> transferToHaulersOrWait(
   // If they are here, transfer to them.
   for (final item in ship.cargo.inventory) {
     for (final hauler in haulersHere) {
-      final transferAmount = min(
-        item.units,
-        hauler.cargo.availableSpace,
-      );
+      final transferAmount = min(item.units, hauler.cargo.availableSpace);
       if (transferAmount > 0) {
         try {
           await transferCargoAndLog(
@@ -742,7 +733,5 @@ Future<JobResult> transferOrSellCargo(
 }
 
 /// Advance the miner.
-final advanceMiner = const MultiJob('Miner', [
-  doMineJob,
-  transferOrSellCargo,
-]).run;
+final advanceMiner =
+    const MultiJob('Miner', [doMineJob, transferOrSellCargo]).run;

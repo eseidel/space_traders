@@ -49,10 +49,7 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   }
 
   if (ship.cargo.availableSpace <= 0) {
-    shipInfo(
-      ship,
-      'No cargo space available to purchase $neededTradeSymbol',
-    );
+    shipInfo(ship, 'No cargo space available to purchase $neededTradeSymbol');
     return null;
   }
 
@@ -180,9 +177,10 @@ void logCompletedDeal(
   final durationDiff = duration - expectedDuration;
   final durationDiffPercent =
       (durationDiff.inSeconds / expectedDuration.inSeconds).abs();
-  final cpsDiff = (completedDeal.actualProfitPerSecond -
-          completedDeal.expectedProfitPerSecond)
-      .abs();
+  final cpsDiff =
+      (completedDeal.actualProfitPerSecond -
+              completedDeal.expectedProfitPerSecond)
+          .abs();
   final useWarn = cpsDiff > cpsSlop || durationDiffPercent > durationSlop;
   final useErr = completedDeal.actualProfitPerSecond < 0;
   if (useErr) {
@@ -260,13 +258,7 @@ Future<JobResult> _handleContractDealAtDestination(
   // If we've delivered enough, complete the contract.
   if (maybeContract != null &&
       maybeContract.goodNeeded(contractGood)!.remainingNeeded <= 0) {
-    await _completeContract(
-      api,
-      db,
-      caches,
-      ship,
-      maybeContract,
-    );
+    await _completeContract(api, db, caches, ship, maybeContract);
   }
   return JobResult.complete();
 }
@@ -329,13 +321,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
       ship,
       'Contract ${beforeDelivery.id} not accepted? Accepting before delivery.',
     );
-    await acceptContractAndLog(
-      api,
-      db,
-      agentCache,
-      ship,
-      beforeDelivery,
-    );
+    await acceptContractAndLog(api, db, agentCache, ship, beforeDelivery);
   }
 
   // And we have the desired cargo.
@@ -347,8 +333,10 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     tradeSymbol: tradeSymbol,
     units: unitsBefore,
   );
-  final afterDelivery =
-      Contract.fromOpenApi(response.contract, DateTime.timestamp());
+  final afterDelivery = Contract.fromOpenApi(
+    response.contract,
+    DateTime.timestamp(),
+  );
   final deliver = assertNotNull(
     afterDelivery.goodNeeded(tradeSymbol),
     'No ContractDeliverGood for $tradeSymbol?',
@@ -430,7 +418,7 @@ Future<JobResult> _handleConstructionDealAtDelivery(
 }
 
 Future<SupplyConstruction201ResponseData?>
-    _deliverConstructionMaterialsIfPossible(
+_deliverConstructionMaterialsIfPossible(
   Api api,
   Database db,
   AgentCache agentCache,
@@ -504,10 +492,7 @@ Future<SupplyConstruction201ResponseData?>
   return response;
 }
 
-Future<int?> _expectedContractProfit(
-  Database db,
-  Contract contract,
-) async {
+Future<int?> _expectedContractProfit(Database db, Contract contract) async {
   // Add up the total expected outlay.
   final terms = contract.terms;
   final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();
@@ -521,9 +506,7 @@ Future<int?> _expectedContractProfit(
   }
 
   final expectedOutlay = terms.deliver
-      .map(
-        (d) => medianPricesBySymbol[d.tradeSymbolObject]! * d.unitsRequired,
-      )
+      .map((d) => medianPricesBySymbol[d.tradeSymbolObject]! * d.unitsRequired)
       .fold(0, (sum, e) => sum + e);
   final payment = contract.terms.payment;
   final reward = payment.onAccepted + payment.onFulfilled;
@@ -551,23 +534,13 @@ Future<DateTime?> acceptContractsIfNeeded(
   /// Accept logic we run any time contract trading is turned on.
   final activeContracts = await db.activeContracts();
   if (activeContracts.isEmpty) {
-    final contract = await negotiateContractAndLog(
-      db,
-      api,
-      ship,
-    );
+    final contract = await negotiateContractAndLog(db, api, ship);
     shipInfo(ship, await describeExpectedContractProfit(db, contract));
     return null;
   }
   final unacceptedContracts = await db.unacceptedContracts();
   for (final contract in unacceptedContracts) {
-    await acceptContractAndLog(
-      api,
-      db,
-      agentCache,
-      ship,
-      contract,
-    );
+    await acceptContractAndLog(api, db, agentCache, ship, contract);
   }
   return null;
 }
@@ -667,8 +640,11 @@ Future<JobResult> sellUnwantedCargo(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final deal =
-      assertNotNull(state.deal, 'No deal.', const Duration(minutes: 10));
+  final deal = assertNotNull(
+    state.deal,
+    'No deal.',
+    const Duration(minutes: 10),
+  );
 
   final unwantedCargo = ship.largestCargo(
     where: (i) => i.tradeSymbol != deal.tradeSymbol,
@@ -678,12 +654,7 @@ Future<JobResult> sellUnwantedCargo(
   }
 
   // If we're currently at a market, record the prices and refuel.
-  final currentMarket = await visitLocalMarket(
-    api,
-    db,
-    caches,
-    ship,
-  );
+  final currentMarket = await visitLocalMarket(api, db, caches, ship);
 
   final cargoResult = await handleUnwantedCargoIfNeeded(
     api,
@@ -745,8 +716,11 @@ Future<JobResult> doTraderGetCargo(
     ship,
   );
 
-  final deal =
-      assertNotNull(state.deal, 'No deal.', const Duration(minutes: 10));
+  final deal = assertNotNull(
+    state.deal,
+    'No deal.',
+    const Duration(minutes: 10),
+  );
 
   // If we ever add support for picking up from haulers this won't be valid.
   final currentMarket = assertNotNull(
@@ -815,8 +789,11 @@ Future<JobResult> doTraderDeliverCargo(
     ship,
   );
 
-  final deal =
-      assertNotNull(state.deal, 'No deal.', const Duration(minutes: 10));
+  final deal = assertNotNull(
+    state.deal,
+    'No deal.',
+    const Duration(minutes: 10),
+  );
 
   final Future<JobResult> Function(
     Api api,
@@ -827,7 +804,8 @@ Future<JobResult> doTraderDeliverCargo(
     BehaviorState state,
     Market? maybeMarket,
     CostedDeal costedDeal,
-  ) handler;
+  )
+  handler;
   if (deal.isContractDeal) {
     handler = _handleContractDealAtDestination;
   } else if (deal.isConstructionDeal) {
@@ -893,9 +871,10 @@ Future<JobResult> _initDeal(
       newDeal.expectedProfitPerSecond <
           centralCommand.expectedCreditsPerSecond(ship)) {
     shipWarn(
-        ship,
-        'Deal expected profit per second too low: '
-        '${creditsString(newDeal.expectedProfitPerSecond)}/s');
+      ship,
+      'Deal expected profit per second too low: '
+      '${creditsString(newDeal.expectedProfitPerSecond)}/s',
+    );
     newDeal = null; // clear the deal so we search again.
   } else {
     shipInfo(ship, 'Found deal: ${describeCostedDeal(newDeal)}');
@@ -948,9 +927,10 @@ Future<JobResult> _initDeal(
 }
 
 /// Advance the trader.
-final advanceTrader = const MultiJob('Trader', [
-  _initDeal,
-  sellUnwantedCargo,
-  doTraderGetCargo,
-  doTraderDeliverCargo,
-]).run;
+final advanceTrader =
+    const MultiJob('Trader', [
+      _initDeal,
+      sellUnwantedCargo,
+      doTraderGetCargo,
+      doTraderDeliverCargo,
+    ]).run;

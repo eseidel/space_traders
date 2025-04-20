@@ -13,9 +13,9 @@ class SystemWaypoint {
     this.orbitals = const [],
     this.orbits,
   }) : assert(
-          position.system == symbol.system,
-          'Position system must match symbol system.',
-        );
+         position.system == symbol.system,
+         'Position system must match symbol system.',
+       );
 
   /// Creates a new [SystemWaypoint] from an OpenAPI [openapi.SystemWaypoint].
   factory SystemWaypoint.fromOpenApi(openapi.SystemWaypoint waypoint) {
@@ -41,9 +41,9 @@ class SystemWaypoint {
     this.symbol, {
     this.type = WaypointType.ASTEROID,
     WaypointPosition? position,
-  })  : position = position ?? WaypointPosition(0, 0, symbol.system),
-        orbitals = const [],
-        orbits = null;
+  }) : position = position ?? WaypointPosition(0, 0, symbol.system),
+       orbitals = const [],
+       orbits = null;
 
   /// The symbol of the waypoint.
   final WaypointSymbol symbol;
@@ -202,9 +202,10 @@ class System {
     // Work around a bug in OpenApi's generated toJson method where it doesn't
     // recursively call toJson.
     json['type'] = (json['type'] as SystemType).toJson();
-    json['waypoints'] = (json['waypoints'] as List<openapi.SystemWaypoint>)
-        .map(SystemWaypoint.openApiToJson)
-        .toList();
+    json['waypoints'] =
+        (json['waypoints'] as List<openapi.SystemWaypoint>)
+            .map(SystemWaypoint.openApiToJson)
+            .toList();
     return json;
   }
 }
@@ -225,9 +226,9 @@ class Waypoint {
     this.modifiers = const [],
     this.chart,
   }) : assert(
-          position.system == symbol.system,
-          'Position system must match symbol system.',
-        );
+         position.system == symbol.system,
+         'Position system must match symbol system.',
+       );
 
   /// Create a new [Waypoint] for testing.
   @visibleForTesting
@@ -236,13 +237,13 @@ class Waypoint {
     WaypointPosition? position,
     this.type = WaypointType.ASTEROID,
     this.traits = const [],
-  })  : position = position ?? WaypointPosition(0, 0, symbol.system),
-        isUnderConstruction = false,
-        orbitals = const [],
-        orbits = null,
-        faction = null,
-        modifiers = const [],
-        chart = null;
+  }) : position = position ?? WaypointPosition(0, 0, symbol.system),
+       isUnderConstruction = false,
+       orbitals = const [],
+       orbits = null,
+       faction = null,
+       modifiers = const [],
+       chart = null;
 
   /// Create a new [Waypoint] from JSON.
   factory Waypoint.fromJson(Map<String, dynamic> json) {
@@ -303,11 +304,7 @@ class Waypoint {
 
   /// Converts the waypoint to a SystemWaypoint.
   SystemWaypoint toSystemWaypoint() {
-    return SystemWaypoint(
-      symbol: symbol,
-      type: type,
-      position: position,
-    );
+    return SystemWaypoint(symbol: symbol, type: type, position: position);
   }
 
   /// Returns true if the waypoint has the given trait.

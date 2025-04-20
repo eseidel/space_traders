@@ -28,8 +28,11 @@ void main() {
     const shipType = ShipType.EXPLORER;
     when(() => ship.type).thenReturn(shipType);
     when(() => ship.purchasePrice).thenReturn(1);
-    final price =
-        ShipyardPrice.fromShipyardShip(ship, waypointSymbol, getNow: () => now);
+    final price = ShipyardPrice.fromShipyardShip(
+      ship,
+      waypointSymbol,
+      getNow: () => now,
+    );
     expect(price.waypointSymbol, waypointSymbol);
     expect(price.shipType, shipType);
     expect(price.purchasePrice, 1);

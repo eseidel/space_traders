@@ -22,11 +22,7 @@ Future<JobResult> doScrapJob(
 
   final shipyardListings = await ShipyardListingSnapshot.load(db);
   final shipyard = assertNotNull(
-    await nearestShipyard(
-      caches.routePlanner,
-      shipyardListings,
-      ship,
-    ),
+    await nearestShipyard(caches.routePlanner, shipyardListings, ship),
     'No shipyard found.',
     const Duration(minutes: 5),
   );
@@ -34,12 +30,7 @@ Future<JobResult> doScrapJob(
   if (shipyard.waypointSymbol == ship.waypointSymbol) {
     await dockIfNeeded(db, api, ship);
     // We're at the shipyard, scrap the ship.
-    await scrapShipAndLog(
-      api,
-      db,
-      caches.agent,
-      ship,
-    );
+    await scrapShipAndLog(api, db, caches.agent, ship);
     return JobResult.complete();
   }
 
@@ -56,6 +47,4 @@ Future<JobResult> doScrapJob(
 }
 
 /// Advance the scrap.
-final advanceScrap = const MultiJob('Scrap', [
-  doScrapJob,
-]).run;
+final advanceScrap = const MultiJob('Scrap', [doScrapJob]).run;

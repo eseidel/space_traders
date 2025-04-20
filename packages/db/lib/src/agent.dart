@@ -3,22 +3,22 @@ import 'package:types/types.dart';
 
 /// Query to get an agent by symbol.
 Query agentBySymbolQuery(String agentSymbol) => Query(
-      'SELECT * FROM agent_ WHERE symbol = @symbol',
-      parameters: {
-        // TODO(eseidel): use an AgentSymbol type.
-        'symbol': agentSymbol.toUpperCase(),
-      },
-    );
+  'SELECT * FROM agent_ WHERE symbol = @symbol',
+  parameters: {
+    // TODO(eseidel): use an AgentSymbol type.
+    'symbol': agentSymbol.toUpperCase(),
+  },
+);
 
 /// Convert an agent to a map of column values.
 Map<String, dynamic> agentToColumnMap(Agent agent) => {
-      'symbol': agent.symbol,
-      'headquarters': agent.headquarters.toJson(),
-      'credits': agent.credits,
-      'starting_faction': agent.startingFaction.toJson(),
-      'ship_count': agent.shipCount,
-      'account_id': agent.accountId,
-    };
+  'symbol': agent.symbol,
+  'headquarters': agent.headquarters.toJson(),
+  'credits': agent.credits,
+  'starting_faction': agent.startingFaction.toJson(),
+  'ship_count': agent.shipCount,
+  'account_id': agent.accountId,
+};
 
 /// Convert a map of column values to an agent.
 Agent agentFromColumnMap(Map<String, dynamic> values) {
@@ -34,8 +34,7 @@ Agent agentFromColumnMap(Map<String, dynamic> values) {
 }
 
 /// Update the given agent in the database.
-Query upsertAgentQuery(Agent agent) => Query(
-      '''
+Query upsertAgentQuery(Agent agent) => Query('''
       INSERT INTO agent_ (symbol, headquarters, credits, starting_faction, ship_count, account_id)
       VALUES (@symbol, @headquarters, @credits, @starting_faction, @ship_count, @account_id)
       ON CONFLICT (symbol) DO UPDATE SET
@@ -44,6 +43,4 @@ Query upsertAgentQuery(Agent agent) => Query(
         starting_faction = @starting_faction,
         ship_count = @ship_count,
         account_id = @account_id
-      ''',
-      parameters: agentToColumnMap(agent),
-    );
+      ''', parameters: agentToColumnMap(agent));

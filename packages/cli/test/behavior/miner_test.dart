@@ -39,8 +39,9 @@ void main() {
     final db = _MockDatabase();
     final marketPrices = _MockMarketPrices();
     final symbol = WaypointSymbol.fromString('S-E-A');
-    when(() => db.recentSurveysAtWaypoint(symbol, count: 100))
-        .thenAnswer((_) async => []);
+    when(
+      () => db.recentSurveysAtWaypoint(symbol, count: 100),
+    ).thenAnswer((_) async => []);
     final surveys = await surveysWorthMining(
       db,
       marketPrices,
@@ -67,16 +68,15 @@ void main() {
             signature: 'sig$i',
             symbol: waypointSymbol.waypoint,
             deposits: [
-              SurveyDeposit(
-                symbol: (i == 0) ? 'DIAMONDS' : 'ALUMINUM',
-              ),
+              SurveyDeposit(symbol: (i == 0) ? 'DIAMONDS' : 'ALUMINUM'),
             ],
             size: SurveySizeEnum.SMALL,
           ),
         ),
     ];
-    when(() => db.recentSurveysAtWaypoint(waypointSymbol, count: 100))
-        .thenAnswer((_) => Future.value(surveys));
+    when(
+      () => db.recentSurveysAtWaypoint(waypointSymbol, count: 100),
+    ).thenAnswer((_) => Future.value(surveys));
     when(
       () => marketPrices.recentSellPrice(
         TradeSymbol.DIAMONDS,
@@ -129,12 +129,15 @@ void main() {
       ),
     ]);
 
-    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(waypointSymbol))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.canBeMined(waypointSymbol))
-        .thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasMarketplace(waypointSymbol),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(waypointSymbol),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.canBeMined(waypointSymbol),
+    ).thenAnswer((_) async => true);
 
     // when(() => caches.ships.ships).thenReturn([ship]);
 
@@ -158,29 +161,23 @@ void main() {
     );
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
-    when(
-      () => fleetApi.extractResources(
-        shipSymbol.symbol,
-      ),
-    ).thenAnswer(
+    when(() => fleetApi.extractResources(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
         ExtractResources201Response(
           data: ExtractResources201ResponseData(
             cooldown: cooldownAfterMining,
             extraction: Extraction(
               shipSymbol: shipSymbol.symbol,
-              yield_: ExtractionYield(
-                symbol: TradeSymbol.DIAMONDS,
-                units: 10,
-              ),
+              yield_: ExtractionYield(symbol: TradeSymbol.DIAMONDS, units: 10),
             ),
             cargo: shipCargo,
           ),
         ),
       ),
     );
-    when(() => db.recentSurveysAtWaypoint(waypointSymbol, count: 100))
-        .thenAnswer((_) async => []);
+    when(
+      () => db.recentSurveysAtWaypoint(waypointSymbol, count: 100),
+    ).thenAnswer((_) async => []);
     registerFallbackValue(ExtractionRecord.fallbackValue());
     when(() => db.insertExtraction(any())).thenAnswer((_) async {});
 
@@ -236,9 +233,7 @@ void main() {
     );
     // Will wait after mining to mine again if cargo is not full.
     expect(waitUntil, cooldownAfterMining.expiration);
-    verify(
-      () => ship.cooldown = cooldownAfterMining,
-    ).called(1);
+    verify(() => ship.cooldown = cooldownAfterMining).called(1);
   });
 
   test('maxExtractedUnits', () {
@@ -446,11 +441,7 @@ void main() {
     when(() => haulerFrame.symbol).thenReturn(ShipFrameSymbolEnum.SHUTTLE);
     final haulerNav = _MockShipNav();
     when(() => hauler.nav).thenReturn(haulerNav);
-    final haulerCargo = ShipCargo(
-      capacity: 60,
-      units: 0,
-      inventory: [],
-    );
+    final haulerCargo = ShipCargo(capacity: 60, units: 0, inventory: []);
     final haulerNavRoute = _MockShipNavRoute();
     when(() => haulerNav.route).thenReturn(haulerNavRoute);
     when(() => haulerNav.waypointSymbol).thenReturn(symbol.waypoint);
@@ -479,9 +470,7 @@ void main() {
     ).thenAnswer(
       (_) => Future.value(
         TransferCargo200Response(
-          data: Jettison200ResponseData(
-            cargo: shipCargo,
-          ),
+          data: Jettison200ResponseData(cargo: shipCargo),
         ),
       ),
     );
@@ -577,16 +566,20 @@ void main() {
 
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(7);
 
-    when(() => caches.waypoints.hasMarketplace(waypointSymbol))
-        .thenAnswer((_) async => true);
-    when(() => caches.waypoints.hasShipyard(waypointSymbol))
-        .thenAnswer((_) async => false);
-    when(() => caches.waypoints.canBeMined(waypointSymbol))
-        .thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasMarketplace(waypointSymbol),
+    ).thenAnswer((_) async => true);
+    when(
+      () => caches.waypoints.hasShipyard(waypointSymbol),
+    ).thenAnswer((_) async => false);
+    when(
+      () => caches.waypoints.canBeMined(waypointSymbol),
+    ).thenAnswer((_) async => true);
 
     registerFallbackValue(Duration.zero);
-    when(() => db.hasRecentMarketPrices(waypointSymbol, any()))
-        .thenAnswer((_) async => true);
+    when(
+      () => db.hasRecentMarketPrices(waypointSymbol, any()),
+    ).thenAnswer((_) async => true);
 
     final market = Market(
       symbol: waypointSymbol.waypoint,
@@ -603,9 +596,9 @@ void main() {
     );
 
     when(() => caches.markets.fromCache(waypointSymbol)).thenReturn(market);
-    when(() => caches.markets.refreshMarket(waypointSymbol)).thenAnswer(
-      (_) => Future.value(market),
-    );
+    when(
+      () => caches.markets.refreshMarket(waypointSymbol),
+    ).thenAnswer((_) => Future.value(market));
     final fleetApi = _MockFleetApi();
     final agent = Agent.test();
     registerFallbackValue(agent);
@@ -628,8 +621,10 @@ void main() {
     when(
       () => fleetApi.sellCargo(
         shipSymbol.symbol,
-        sellCargoRequest:
-            SellCargoRequest(symbol: tradeSymbol, units: cargoCapacity),
+        sellCargoRequest: SellCargoRequest(
+          symbol: tradeSymbol,
+          units: cargoCapacity,
+        ),
       ),
     ).thenAnswer(
       (_) => Future.value(
@@ -651,14 +646,17 @@ void main() {
     ).thenReturn(100);
 
     // Returning no systems will find no nearby markets, thus will jettison.
-    when(() => caches.systems.waypointsInSystem(waypointSymbol.system))
-        .thenReturn([]);
+    when(
+      () => caches.systems.waypointsInSystem(waypointSymbol.system),
+    ).thenReturn([]);
 
     when(
       () => fleetApi.jettison(
         shipSymbol.symbol,
-        jettisonRequest:
-            JettisonRequest(symbol: tradeSymbol, units: cargoCapacity),
+        jettisonRequest: JettisonRequest(
+          symbol: tradeSymbol,
+          units: cargoCapacity,
+        ),
       ),
     ).thenAnswer(
       (_) => Future.value(
@@ -685,8 +683,9 @@ void main() {
       );
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(() => db.medianMarketPurchasePrice(any()))
-        .thenAnswer((_) async => 100);
+    when(
+      () => db.medianMarketPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
     when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
