@@ -34,8 +34,5 @@ Future<GetFleetInventoryResponse> computeInventoryValue({
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
   final inventory = await computeInventoryValue(db: db);
-  return Response.json(
-    body: inventory.toJson(),
-    headers: {'Cache-Control': 'no-store', 'Content-Type': 'application/json'},
-  );
+  return Response.json(body: inventory.toJson());
 }

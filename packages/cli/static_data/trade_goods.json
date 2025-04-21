@@ -327,7 +327,7 @@
  {
   "symbol": "MOUNT_GAS_SIPHON_II",
   "name": "Gas Siphon II",
-  "description": "An advanced gas siphon that can extract gas from gas giants and other gas-rich bodies more efficiently and at a higher rate."
+  "description": "An advanced gas siphon that can extract gas and other resources from gas giants and other gas-rich bodies more efficiently and at a higher rate."
  },
  {
   "symbol": "MOUNT_GAS_SIPHON_III",

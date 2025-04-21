@@ -148,6 +148,8 @@ Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
   final logger = context.read<Logger>();
 
+  // TODO(eseidel): Move runWithLogger into the custom server entry point.
+  // https://dartfrog.vgv.dev/docs/advanced/custom_entrypoint
   final response = await runWithLogger(logger, () async {
     final result = await dealsNearby(
       fs: fs,
