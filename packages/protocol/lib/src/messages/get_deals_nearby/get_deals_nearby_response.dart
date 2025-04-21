@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:types/api_converters.dart';
 import 'package:types/types.dart';
 
 part 'get_deals_nearby_response.g.dart';
@@ -42,17 +43,6 @@ class GetDealsNearbyRequest {
     if (credits != null) 'credits': credits.toString(),
     if (start != null) 'start': start?.toJson(),
   };
-}
-
-// OpenApi fromJson is nullable, which confuses JsonSerializable.
-class ShipTypeConverter implements JsonConverter<ShipType, String> {
-  const ShipTypeConverter();
-
-  @override
-  ShipType fromJson(String json) => ShipType.fromJson(json)!;
-
-  @override
-  String toJson(ShipType object) => object.toJson();
 }
 
 @JsonSerializable()

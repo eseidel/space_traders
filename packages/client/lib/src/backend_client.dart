@@ -11,6 +11,10 @@ class BackendClient {
   final http.Client _httpClient;
   final Uri hostedUri;
 
+  void close() {
+    _httpClient.close();
+  }
+
   Future<DealsNearbyResponse> getNearbyDeals({
     required ShipType? shipType,
     required int? limit,
@@ -26,7 +30,6 @@ class BackendClient {
     final uri = Uri.parse(
       '$hostedUri/api/deals/nearby',
     ).replace(queryParameters: request.toQueryParameters());
-    print('GET $uri');
     final headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -40,7 +43,18 @@ class BackendClient {
     return DealsNearbyResponse.fromJson(data);
   }
 
-  void close() {
-    _httpClient.close();
+  Future<GetFleetInventoryResponse> getFleetInventory() async {
+    final uri = Uri.parse('$hostedUri/api/fleet/inventory');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    final response = await _httpClient.get(uri, headers: headers);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load inventory value');
+    }
+    final json = response.body;
+    final data = jsonDecode(json) as Map<String, dynamic>;
+    return GetFleetInventoryResponse.fromJson(data);
   }
 }

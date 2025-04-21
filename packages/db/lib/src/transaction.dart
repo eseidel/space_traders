@@ -3,7 +3,7 @@ import 'package:types/types.dart';
 
 /// Create the insertion query for a transaction.
 Query insertTransactionQuery(Transaction record) {
-  return Query('''
+  return Query(parameters: transactionToColumnMap(record), '''
     INSERT INTO transaction_ (
       transaction_type,
       ship_symbol,
@@ -34,7 +34,7 @@ Query insertTransactionQuery(Transaction record) {
       @contract_action,
       @contract_id
     )
-    ''', parameters: transactionToColumnMap(record));
+    ''');
 }
 
 /// Convert the transaction to substitution values for insertion.

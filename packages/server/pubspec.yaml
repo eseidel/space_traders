@@ -16,6 +16,8 @@ dependencies:
   file: ^7.0.1
   protocol:
     path: ../protocol
+  types:
+    path: ../types
 
 dev_dependencies:
   mocktail: ^1.0.3

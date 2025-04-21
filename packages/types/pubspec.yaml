@@ -14,6 +14,7 @@ dependencies:
   # http is only needed for Response object for QueueResponse.
   http: ^0.13.6
   intl: ^0.20.2
+  json_annotation: ^4.9.0
   meta: ^1.9.1
   more: ^4.0.0
   # Ideally we'd only import the OpenAPI model types.
