@@ -18,30 +18,21 @@ class BackendClient {
   final http.Client _httpClient;
   final Uri hostedUri;
 
-  void close() {
-    _httpClient.close();
-  }
+  void close() => _httpClient.close();
 
-  Uri _api(String path) {
-    return Uri.parse('$hostedUri/api/$path');
-  }
+  Uri _api(String path) => Uri.parse('$hostedUri/api/$path');
 
-  Map<String, String> _requestHeaders() {
-    return <String, String>{
-      HttpHeaders.contentTypeHeader: ContentType.json.value,
-      HttpHeaders.acceptHeader: ContentType.json.value,
-    };
-  }
+  Map<String, String> get _requestHeaders => <String, String>{
+    HttpHeaders.contentTypeHeader: ContentType.json.value,
+    HttpHeaders.acceptHeader: ContentType.json.value,
+  };
 
   Future<Json> _get(Uri uri, {GetRequest? args}) async {
     final withArgs =
         args != null
             ? uri.replace(queryParameters: args.toQueryParameters())
             : uri;
-    final response = await _httpClient.get(
-      withArgs,
-      headers: _requestHeaders(),
-    );
+    final response = await _httpClient.get(withArgs, headers: _requestHeaders);
     if (response.statusCode != 200) {
       throw Exception('Failed to load data: ${response.statusCode}');
     }
