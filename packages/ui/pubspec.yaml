@@ -8,6 +8,8 @@ environment:
 # resolution: workspace
 
 dependencies:
+  client:
+    path: ../client
   collection: ^1.17.1
   cupertino_icons: ^1.0.2
   file: ^7.0.0

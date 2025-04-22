@@ -1,22 +1,10 @@
-import 'dart:convert';
-
+import 'package:client/client.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-extension JsonDecode on http.Response {
-  Map<String, dynamic> get json => jsonDecode(body) as Map<String, dynamic>;
-}
 
 class ApiBuilder<T> extends StatefulWidget {
-  const ApiBuilder({
-    required this.uri,
-    required this.builder,
-    required this.decoder,
-    super.key,
-  });
+  const ApiBuilder({required this.fetcher, required this.builder, super.key});
 
-  final Uri uri;
-  final T Function(Map<String, dynamic> json) decoder;
+  final Future<T> Function(BackendClient client) fetcher;
   final Widget Function(BuildContext context, T response) builder;
 
   @override
@@ -26,15 +14,23 @@ class ApiBuilder<T> extends StatefulWidget {
 class _ApiBuilderState<T> extends State<ApiBuilder<T>> {
   late final T data;
   bool loading = true;
+  String? error;
 
   Future<void> load() async {
-    final uri = widget.uri;
-    final json = (await http.get(uri)).json;
-    final response = widget.decoder(json);
-    setState(() {
-      data = response;
-      loading = false;
-    });
+    final client = BackendClient(hostedUri: Uri.base);
+    try {
+      final response = await widget.fetcher(client);
+      setState(() {
+        data = response;
+        loading = false;
+      });
+    } on Exception catch (e) {
+      setState(() {
+        error = e.toString();
+        loading = false;
+      });
+      return;
+    }
   }
 
   @override

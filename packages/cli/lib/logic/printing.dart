@@ -285,3 +285,16 @@ Future<T> expectTime<T>(
   );
   return result;
 }
+
+/// Returns a string describing the construction status of the given
+/// [construction].
+String constructionStatusString(Construction? construction) {
+  if (construction == null) {
+    return 'unknown';
+  }
+  if (construction.isComplete) {
+    return 'ready';
+  }
+  final progress = describeConstructionProgress(construction);
+  return 'under construction ($progress)';
+}

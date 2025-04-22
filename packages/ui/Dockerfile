@@ -8,6 +8,7 @@ RUN flutter precache --web
 
 # Resolve app dependencies.
 WORKDIR /app
+COPY client/ ./client/
 COPY openapi/ ./openapi/
 COPY protocol/ ./protocol/
 COPY types/ ./types/

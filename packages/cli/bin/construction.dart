@@ -2,6 +2,7 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/printing.dart';
 
+// TODO(eseidel): Is this still needed after jumpgate.dart?
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSystemSymbol = await startSystemFromArg(
     db,
@@ -15,25 +16,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
           .firstWhere((w) => w.isJumpGate)
           .symbol;
 
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
-
-  String statusString(WaypointSymbol jumpGateSymbol) {
-    final isUnderConstruction = constructionSnapshot.isUnderConstruction(
-      jumpGateSymbol,
-    );
-
-    if (isUnderConstruction == null) {
-      return 'unknown';
-    }
-    if (isUnderConstruction) {
-      final construction = constructionSnapshot[jumpGateSymbol];
-      final progress = describeConstructionProgress(construction);
-      return 'under construction ($progress)';
-    }
-    return 'ready';
-  }
-
-  logger.info('$jumpGateSymbol: ${statusString(jumpGateSymbol)}');
+  final constructionCache = ConstructionCache(db);
+  final construction = await constructionCache.getConstruction(jumpGateSymbol);
+  logger.info('$jumpGateSymbol: ${constructionStatusString(construction)}');
 }
 
 void main(List<String> args) async {

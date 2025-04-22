@@ -1,3 +1,4 @@
+import 'package:client/client.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:protocol/protocol.dart';
@@ -18,12 +19,6 @@ final GoRouter router = GoRouter(
             return const FleetScreen();
           },
         ),
-        GoRoute(
-          path: 'details',
-          builder: (BuildContext context, GoRouterState state) {
-            return const DetailsScreen();
-          },
-        ),
       ],
     ),
   ],
@@ -35,9 +30,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ApiBuilder<AgentStatusResponse>(
-      uri: Uri.parse('/api/agent/status'),
+      fetcher: (c) => c.getAgentStatus(),
       builder: buildWithData,
-      decoder: AgentStatusResponse.fromJson,
     );
   }
 
@@ -58,6 +52,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => context.go('/fleet'),
               child: const Text('Go to Fleet screen'),
             ),
+            const FleetList(),
           ],
         ),
       ),
@@ -70,49 +65,38 @@ class FleetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ApiBuilder<FleetShipsResponse>(
-      uri: Uri.parse('/api/fleet/ships'),
-      builder: buildWithData,
-      decoder: FleetShipsResponse.fromJson,
-    );
-  }
-
-  Widget buildWithData(BuildContext context, FleetShipsResponse data) {
     return Scaffold(
       appBar: AppBar(title: const Text('Fleet')),
-      body: ListView.builder(
-        itemCount: data.ships.length,
-        itemBuilder: (BuildContext context, int index) {
-          final ship = data.ships[index];
-          final cargoStatus =
-              ship.cargo.capacity == 0
-                  ? ''
-                  : '${ship.cargo.units}/${ship.cargo.capacity}';
-
-          return ListTile(
-            title: Text(ship.symbol.hexNumber),
-            subtitle: Text(ship.nav.waypointSymbol),
-            leading: Text(cargoStatus),
-          );
-        },
-      ),
+      body: const FleetList(),
     );
   }
 }
 
-class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({super.key});
+class FleetList extends StatelessWidget {
+  const FleetList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Details Screen')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => context.go('/'),
-          child: const Text('Go back to the Home screen'),
-        ),
-      ),
+    return ApiBuilder<FleetShipsResponse>(
+      fetcher: (c) => c.getFleetShips(),
+      builder: (context, data) {
+        return ListView.builder(
+          itemCount: data.ships.length,
+          itemBuilder: (BuildContext context, int index) {
+            final ship = data.ships[index];
+            final cargoStatus =
+                ship.cargo.capacity == 0
+                    ? ''
+                    : '${ship.cargo.units}/${ship.cargo.capacity}';
+
+            return ListTile(
+              title: Text(ship.symbol.hexNumber),
+              subtitle: Text(ship.nav.waypointSymbol),
+              leading: Text(cargoStatus),
+            );
+          },
+        );
+      },
     );
   }
 }

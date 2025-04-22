@@ -1,10 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:protocol/src/models/get_request.dart';
 import 'package:types/api_converters.dart';
 import 'package:types/types.dart';
 
 part 'get_deals_nearby_response.g.dart';
 
-class GetDealsNearbyRequest {
+class GetDealsNearbyRequest implements GetRequest {
   GetDealsNearbyRequest({
     required this.shipType,
     required this.limit,
@@ -37,6 +38,7 @@ class GetDealsNearbyRequest {
 
   final WaypointSymbol? start;
 
+  @override
   Map<String, String?> toQueryParameters() => {
     if (shipType != null) 'shipType': shipType?.toJson(),
     if (limit != null) 'limit': limit.toString(),

@@ -4,6 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:protocol/protocol.dart';
 import 'package:types/types.dart';
 
+typedef Json = Map<String, dynamic>;
+
+extension JsonDecode on http.Response {
+  Map<String, dynamic> get json => jsonDecode(body) as Json;
+}
+
 class BackendClient {
   BackendClient({required this.hostedUri, http.Client? httpClient})
     : _httpClient = httpClient ?? http.Client();
@@ -15,46 +21,54 @@ class BackendClient {
     _httpClient.close();
   }
 
+  Uri _api(String path) {
+    return Uri.parse('$hostedUri/api/$path');
+  }
+
+  Future<Json> _get(Uri uri, {GetRequest? args}) async {
+    final withArgs =
+        args != null
+            ? uri.replace(queryParameters: args.toQueryParameters())
+            : uri;
+    final response = await _httpClient.get(withArgs);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+    return response.json;
+  }
+
+  Future<AgentStatusResponse> getAgentStatus() async {
+    final uri = _api('agent/status');
+    final json = await _get(uri);
+    return AgentStatusResponse.fromJson(json);
+  }
+
   Future<DealsNearbyResponse> getNearbyDeals({
     required ShipType? shipType,
     required int? limit,
     required WaypointSymbol? start,
     required int? credits,
   }) async {
-    final request = GetDealsNearbyRequest(
+    final uri = _api('deals/nearby');
+    final args = GetDealsNearbyRequest(
       shipType: shipType,
       limit: limit,
       start: start,
       credits: credits,
     );
-    final uri = Uri.parse(
-      '$hostedUri/api/deals/nearby',
-    ).replace(queryParameters: request.toQueryParameters());
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-    final response = await _httpClient.get(uri, headers: headers);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load deals');
-    }
-    final json = response.body;
-    final data = jsonDecode(json) as Map<String, dynamic>;
-    return DealsNearbyResponse.fromJson(data);
+    final json = await _get(uri, args: args);
+    return DealsNearbyResponse.fromJson(json);
   }
 
   Future<GetFleetInventoryResponse> getFleetInventory() async {
-    final uri = Uri.parse('$hostedUri/api/fleet/inventory');
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-    final response = await _httpClient.get(uri, headers: headers);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load inventory value');
-    }
-    final json = response.body;
-    final data = jsonDecode(json) as Map<String, dynamic>;
-    return GetFleetInventoryResponse.fromJson(data);
+    final uri = _api('fleet/inventory');
+    final json = await _get(uri);
+    return GetFleetInventoryResponse.fromJson(json);
+  }
+
+  Future<FleetShipsResponse> getFleetShips() async {
+    final uri = _api('fleet/ships');
+    final json = await _get(uri);
+    return FleetShipsResponse.fromJson(json);
   }
 }

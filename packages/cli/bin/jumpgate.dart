@@ -18,28 +18,15 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
           .firstWhere((w) => w.isJumpGate)
           .symbol;
 
-  final constructionSnapshot = await ConstructionSnapshot.load(db);
+  final constructionCache = ConstructionCache(db);
   final jumpGate = await getOrFetchJumpGate(db, api, jumpGateSymbol);
 
-  String statusString(WaypointSymbol jumpGateSymbol) {
-    final isUnderConstruction = constructionSnapshot.isUnderConstruction(
-      jumpGateSymbol,
-    );
+  Future<String> statusForSymbol(WaypointSymbol symbol) async =>
+      constructionStatusString(await constructionCache.getConstruction(symbol));
 
-    if (isUnderConstruction == null) {
-      return 'unknown';
-    }
-    if (isUnderConstruction) {
-      final construction = constructionSnapshot[jumpGateSymbol];
-      final progress = describeConstructionProgress(construction);
-      return 'under construction ($progress)';
-    }
-    return 'ready';
-  }
-
-  logger.info('$jumpGateSymbol: ${statusString(jumpGateSymbol)}');
+  logger.info('$jumpGateSymbol: ${await statusForSymbol(jumpGateSymbol)}');
   for (final connection in jumpGate.connections) {
-    final status = statusString(connection);
+    final status = await statusForSymbol(connection);
     logger.info('  ${connection.sectorLocalName.padRight(9)} $status');
   }
 }

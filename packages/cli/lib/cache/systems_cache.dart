@@ -84,10 +84,10 @@ class SystemsCache extends JsonListStore<System> {
   }
 
   /// Return the jump gate waypoint for the given [symbol].
-  // TODO(eseidel): This is wrong if systems have more than one jump gate.
-  SystemWaypoint? jumpGateWaypointForSystem(SystemSymbol symbol) {
-    return this[symbol].waypoints.firstWhereOrNull((w) => w.isJumpGate);
-  }
+  // Systems currently only have one jumpgate, but if that ever
+  // changes all callers of this method might be wrong.
+  SystemWaypoint? jumpGateWaypointForSystem(SystemSymbol symbol) =>
+      this[symbol].waypoints.firstWhereOrNull((w) => w.isJumpGate);
 
   /// Return the system with the given [symbol].
   /// Exposed for passing to lists for mapping.
