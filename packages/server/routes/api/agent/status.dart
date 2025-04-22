@@ -1,34 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:db/db.dart';
 import 'package:server/read_async.dart';
-
-class StatusResponse {
-  StatusResponse({
-    required this.name,
-    required this.faction,
-    required this.numberOfShips,
-    required this.cash,
-    required this.totalAssets,
-    required this.gateOpen,
-  });
-  final String name;
-  final String faction;
-  final int numberOfShips;
-  final double cash;
-  final double totalAssets;
-  final bool gateOpen;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'faction': faction,
-      'numberOfShips': numberOfShips,
-      'cash': cash,
-      'totalAssets': totalAssets,
-      'gateOpen': gateOpen,
-    };
-  }
-}
+import 'package:protocol/protocol.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
@@ -42,7 +15,7 @@ Future<Response> onRequest(RequestContext context) async {
   //   agent.headquarters.system,
   // );
 
-  final status = StatusResponse(
+  final status = AgentStatusResponse(
     name: agent.symbol,
     faction: agent.startingFaction.toString(),
     numberOfShips: ships.length,
