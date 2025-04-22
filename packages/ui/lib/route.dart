@@ -20,6 +20,12 @@ final GoRouter router = GoRouter(
             return const FleetScreen();
           },
         ),
+        GoRoute(
+          path: 'fleet/inventory',
+          builder: (BuildContext context, GoRouterState state) {
+            return const FleetInventoryScreen();
+          },
+        ),
       ],
     ),
   ],
@@ -50,9 +56,12 @@ class HomeScreen extends StatelessWidget {
             Text('Gate Open: ${data.gateOpen}'),
             ElevatedButton(
               onPressed: () => context.go('/fleet'),
-              child: const Text('Go to Fleet screen'),
+              child: const Text('Fleet'),
             ),
-            const FleetList(),
+            ElevatedButton(
+              onPressed: () => context.go('/fleet/inventory'),
+              child: const Text('Fleet Inventory'),
+            ),
           ],
         ),
       ),
@@ -93,6 +102,49 @@ class FleetList extends StatelessWidget {
               title: Text(ship.symbol.hexNumber),
               subtitle: Text(ship.nav.waypointSymbol),
               leading: Text(cargoStatus),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class FleetInventoryScreen extends StatelessWidget {
+  const FleetInventoryScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Fleet Inventory')),
+      body: const FleetInventoryList(),
+    );
+  }
+}
+
+class FleetInventoryList extends StatelessWidget {
+  const FleetInventoryList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ApiBuilder<GetFleetInventoryResponse>(
+      fetcher: (c) => c.getFleetInventory(),
+      builder: (context, data) {
+        return ListView.builder(
+          itemCount: data.items.length + 1,
+          itemBuilder: (BuildContext context, int index) {
+            if (index == data.items.length) {
+              return ListTile(
+                title: const Text('Total Value'),
+                subtitle: Text(creditsString(data.totalValue)),
+              );
+            }
+            final item = data.items[index];
+            final price = item.medianPrice;
+            return ListTile(
+              title: Text(item.tradeSymbol.value),
+              subtitle: Text('${item.count} units'),
+              trailing: Text(price != null ? creditsString(price) : '?'),
             );
           },
         );
