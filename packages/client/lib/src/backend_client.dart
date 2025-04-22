@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:protocol/protocol.dart';
@@ -25,12 +26,22 @@ class BackendClient {
     return Uri.parse('$hostedUri/api/$path');
   }
 
+  Map<String, String> _requestHeaders() {
+    return <String, String>{
+      HttpHeaders.contentTypeHeader: ContentType.json.value,
+      HttpHeaders.acceptHeader: ContentType.json.value,
+    };
+  }
+
   Future<Json> _get(Uri uri, {GetRequest? args}) async {
     final withArgs =
         args != null
             ? uri.replace(queryParameters: args.toQueryParameters())
             : uri;
-    final response = await _httpClient.get(withArgs);
+    final response = await _httpClient.get(
+      withArgs,
+      headers: _requestHeaders(),
+    );
     if (response.statusCode != 200) {
       throw Exception('Failed to load data: ${response.statusCode}');
     }

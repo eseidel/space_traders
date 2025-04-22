@@ -18,8 +18,8 @@ class AgentStatusResponse {
   final String name;
   final String faction;
   final int numberOfShips;
-  final double cash;
-  final double totalAssets;
+  final int cash;
+  final int totalAssets;
   final bool gateOpen;
 
   Map<String, dynamic> toJson() => _$AgentStatusResponseToJson(this);

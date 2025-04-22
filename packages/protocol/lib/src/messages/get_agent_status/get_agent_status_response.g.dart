@@ -20,10 +20,10 @@ AgentStatusResponse _$AgentStatusResponseFromJson(Map<String, dynamic> json) =>
             'number_of_ships',
             (v) => (v as num).toInt(),
           ),
-          cash: $checkedConvert('cash', (v) => (v as num).toDouble()),
+          cash: $checkedConvert('cash', (v) => (v as num).toInt()),
           totalAssets: $checkedConvert(
             'total_assets',
-            (v) => (v as num).toDouble(),
+            (v) => (v as num).toInt(),
           ),
           gateOpen: $checkedConvert('gate_open', (v) => v as bool),
         );

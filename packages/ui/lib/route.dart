@@ -2,6 +2,7 @@ import 'package:client/client.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:protocol/protocol.dart';
+import 'package:types/types.dart';
 import 'package:ui/src/api_builder.dart';
 
 /// The route configuration.
@@ -42,10 +43,9 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Name: ${data.name}'),
-            Text('Faction: ${data.faction}'),
-            Text('Number of Ships: ${data.numberOfShips}'),
-            Text('Cash: ${data.cash}'),
+            Text('${data.name} of ${data.faction}'),
+            Text('${data.numberOfShips} ships'),
+            Text('Cash: ${creditsString(data.cash)}'),
             Text('Total Assets: ${data.totalAssets}'),
             Text('Gate Open: ${data.gateOpen}'),
             ElevatedButton(

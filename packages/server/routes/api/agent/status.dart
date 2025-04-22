@@ -24,7 +24,7 @@ Future<Response> onRequest(RequestContext context) async {
     name: agent.symbol,
     faction: agent.startingFaction.toString(),
     numberOfShips: ships.length,
-    cash: agent.credits.toDouble(),
+    cash: agent.credits,
     totalAssets: 0,
     gateOpen: underConstruction ?? true,
   );
