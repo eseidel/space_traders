@@ -1,73 +1,8 @@
 import 'package:client/client.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:protocol/protocol.dart';
 import 'package:types/types.dart';
 import 'package:ui/src/api_builder.dart';
-
-/// The route configuration.
-final GoRouter router = GoRouter(
-  routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return const HomeScreen();
-      },
-      routes: <RouteBase>[
-        GoRoute(
-          path: 'fleet',
-          builder: (BuildContext context, GoRouterState state) {
-            return const FleetScreen();
-          },
-        ),
-        GoRoute(
-          path: 'fleet/inventory',
-          builder: (BuildContext context, GoRouterState state) {
-            return const FleetInventoryScreen();
-          },
-        ),
-      ],
-    ),
-  ],
-);
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ApiBuilder<AgentStatusResponse>(
-      fetcher: (c) => c.getAgentStatus(),
-      builder: buildWithData,
-    );
-  }
-
-  Widget buildWithData(BuildContext context, AgentStatusResponse data) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Fleet')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('${data.name} of ${data.faction}'),
-            Text('${data.numberOfShips} ships'),
-            Text('Cash: ${creditsString(data.cash)}'),
-            Text('Total Assets: ${data.totalAssets}'),
-            Text('Gate Open: ${data.gateOpen}'),
-            ElevatedButton(
-              onPressed: () => context.go('/fleet'),
-              child: const Text('Fleet'),
-            ),
-            ElevatedButton(
-              onPressed: () => context.go('/fleet/inventory'),
-              child: const Text('Fleet Inventory'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class FleetScreen extends StatelessWidget {
   const FleetScreen({super.key});
