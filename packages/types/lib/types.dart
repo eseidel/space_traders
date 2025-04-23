@@ -1,5 +1,6 @@
 export 'api.dart';
 export 'enum.dart';
+export 'src/accounting.dart';
 export 'src/agent.dart';
 export 'src/behavior.dart';
 export 'src/charting_record.dart';
