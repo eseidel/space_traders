@@ -6,11 +6,16 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   String c(int credits) => creditsString(credits);
   logger
-    ..info('ASSETS')
-    ..info('  Cash: ${c(balance.cash)}')
-    ..info('  Inventory: ${c(balance.inventory)}')
-    ..info('  Ships: ${c(balance.ships)}')
-    ..info('Total: ${c(balance.total)}');
+    ..info('Balance Sheet:')
+    ..info('  Assets:')
+    ..info('    Cash: ${c(balance.cash)}')
+    ..info('    Inventory: ${c(balance.inventory)}')
+    ..info('    Ships: ${c(balance.ships)}')
+    ..info('  Total Assets: ${c(balance.totalAssets)}')
+    ..info('  Liabilities:')
+    ..info('    Loans: ${c(balance.loans)}')
+    ..info('  Total Liabilities: ${c(balance.totalLiabilities)}')
+    ..info('  Total: ${c(balance.total)}');
 }
 
 void main(List<String> args) async {

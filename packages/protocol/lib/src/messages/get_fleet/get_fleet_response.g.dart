@@ -59,29 +59,34 @@ Map<String, dynamic> _$CargoToJson(Cargo instance) => <String, dynamic>{
   'inventory': instance.inventory.map((e) => e.toJson()).toList(),
 };
 
-RoutePlan _$RoutePlanFromJson(Map<String, dynamic> json) => $checkedCreate(
-  'RoutePlan',
-  json,
-  ($checkedConvert) {
-    final val = RoutePlan(
-      waypointSymbol: $checkedConvert('waypoint_symbol', (v) => v as String),
-      timeToArrival: $checkedConvert(
-        'time_to_arrival',
-        (v) => (v as num).toInt(),
-      ),
+ShipRoutePlan _$ShipRoutePlanFromJson(Map<String, dynamic> json) =>
+    $checkedCreate(
+      'ShipRoutePlan',
+      json,
+      ($checkedConvert) {
+        final val = ShipRoutePlan(
+          waypointSymbol: $checkedConvert(
+            'waypoint_symbol',
+            (v) => v as String,
+          ),
+          timeToArrival: $checkedConvert(
+            'time_to_arrival',
+            (v) => (v as num).toInt(),
+          ),
+        );
+        return val;
+      },
+      fieldKeyMap: const {
+        'waypointSymbol': 'waypoint_symbol',
+        'timeToArrival': 'time_to_arrival',
+      },
     );
-    return val;
-  },
-  fieldKeyMap: const {
-    'waypointSymbol': 'waypoint_symbol',
-    'timeToArrival': 'time_to_arrival',
-  },
-);
 
-Map<String, dynamic> _$RoutePlanToJson(RoutePlan instance) => <String, dynamic>{
-  'waypoint_symbol': instance.waypointSymbol,
-  'time_to_arrival': instance.timeToArrival,
-};
+Map<String, dynamic> _$ShipRoutePlanToJson(ShipRoutePlan instance) =>
+    <String, dynamic>{
+      'waypoint_symbol': instance.waypointSymbol,
+      'time_to_arrival': instance.timeToArrival,
+    };
 
 FleetShip _$FleetShipFromJson(Map<String, dynamic> json) =>
     $checkedCreate('FleetShip', json, ($checkedConvert) {
@@ -89,7 +94,7 @@ FleetShip _$FleetShipFromJson(Map<String, dynamic> json) =>
         symbol: $checkedConvert('symbol', (v) => v as String),
         route: $checkedConvert(
           'route',
-          (v) => RoutePlan.fromJson(v as Map<String, dynamic>),
+          (v) => ShipRoutePlan.fromJson(v as Map<String, dynamic>),
         ),
         cargo: $checkedConvert(
           'cargo',

@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'accounting.g.dart';
+part 'reports.g.dart';
 
 /// A class representing the assets of the agent.
 @JsonSerializable()
@@ -13,6 +13,7 @@ class BalanceSheet {
     required this.ships,
   });
 
+  /// Creates an instance of [BalanceSheet] from a JSON object.
   factory BalanceSheet.fromJson(Map<String, dynamic> json) =>
       _$BalanceSheetFromJson(json);
 
@@ -28,11 +29,20 @@ class BalanceSheet {
   /// The value of the agent's ships (including modules).
   final int ships;
 
+  /// Total value of contract loans (until forgiven on delivery).
   // TODO(eseidel): Include contract loans as liabilities.
+  int get loans => 0;
 
   /// The total value of the agent's assets.
-  int get total => cash + inventory + ships;
+  int get totalAssets => cash + inventory + ships;
 
+  /// The total value of the agent's liabilities.
+  int get totalLiabilities => loans;
+
+  /// The total value of the agent's balance sheet.
+  int get total => totalAssets - totalLiabilities;
+
+  /// Converts the [BalanceSheet] to a JSON object.
   Map<String, dynamic> toJson() => _$BalanceSheetToJson(this);
 }
 
@@ -86,20 +96,20 @@ class IncomeStatement {
   /// The total income for the period.
   /// There seems to be some debate as to if fuel counts as COGS or not,
   /// for now we're counting it as such.
-  int get totalRevenue => sales + contracts + fuel;
+  int get revenue => sales + contracts + fuel;
 
   /// The total cost of goods sold for the period.
-  int get totalCostOfGoodsSold => goods;
+  int get costOfGoodsSold => goods;
 
   /// The gross profit for the period.
-  int get grossProfit => totalRevenue - totalCostOfGoodsSold;
+  int get grossProfit => revenue - costOfGoodsSold;
 
   /// The total expenses for the period.
-  int get totalExpenses => 0;
+  int get expenses => 0;
   // constructionMaterials + subsidies + categorizationPending;
 
   /// The net income for the period.
-  int get netIncome => grossProfit - totalExpenses;
+  int get netIncome => grossProfit - expenses;
 
   /// The net cash flow for the period.
   int get netCashFlow => netIncome - capEx;

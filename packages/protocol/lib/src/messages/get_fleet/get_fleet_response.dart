@@ -76,15 +76,15 @@ class Cargo {
 }
 
 @JsonSerializable()
-class RoutePlan {
-  RoutePlan({required this.waypointSymbol, required this.timeToArrival});
+class ShipRoutePlan {
+  ShipRoutePlan({required this.waypointSymbol, required this.timeToArrival});
 
-  factory RoutePlan.fromJson(Map<String, dynamic> json) =>
-      _$RoutePlanFromJson(json);
+  factory ShipRoutePlan.fromJson(Map<String, dynamic> json) =>
+      _$ShipRoutePlanFromJson(json);
   String waypointSymbol;
   int timeToArrival;
 
-  Map<String, dynamic> toJson() => _$RoutePlanToJson(this);
+  Map<String, dynamic> toJson() => _$ShipRoutePlanToJson(this);
 }
 
 @JsonSerializable()
@@ -94,7 +94,7 @@ class FleetShip {
   factory FleetShip.fromJson(Map<String, dynamic> json) =>
       _$FleetShipFromJson(json);
   String symbol;
-  RoutePlan route;
+  ShipRoutePlan route;
   Cargo cargo;
 
   Map<String, dynamic> toJson() => _$FleetShipToJson(this);

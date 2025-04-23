@@ -12,6 +12,12 @@ final GoRouter router = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
+          path: 'accounting',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AccountingScreen();
+          },
+        ),
+        GoRoute(
           path: 'fleet',
           builder: (BuildContext context, GoRouterState state) {
             return const FleetScreen();

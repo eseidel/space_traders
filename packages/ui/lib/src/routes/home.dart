@@ -2,7 +2,6 @@ import 'package:client/client.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:protocol/protocol.dart';
-import 'package:types/types.dart';
 import 'package:ui/src/api_builder.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -35,6 +34,10 @@ class HomeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => context.go('/fleet/inventory'),
               child: const Text('Fleet Inventory'),
+            ),
+            ElevatedButton(
+              onPressed: () => context.go('/accounting'),
+              child: const Text('Accounting'),
             ),
           ],
         ),

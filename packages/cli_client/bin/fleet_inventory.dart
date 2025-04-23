@@ -8,7 +8,7 @@ Future<void> main(List<String> args) async {
 Future<void> command(BackendClient client, ArgResults argResults) async {
   final response = await client.getFleetInventory();
   for (final item in response.items) {
-    final price = item.medianPrice;
+    final price = item.pricePerUnit;
     final count = item.count;
     final symbol = item.tradeSymbol;
     if (price == null) {

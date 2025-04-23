@@ -1,7 +1,6 @@
 import 'package:client/client.dart';
 import 'package:flutter/material.dart';
 import 'package:protocol/protocol.dart';
-import 'package:types/types.dart';
 import 'package:ui/src/api_builder.dart';
 
 class FleetScreen extends StatelessWidget {
@@ -62,7 +61,7 @@ class FleetInventoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ApiBuilder<GetFleetInventoryResponse>(
+    return ApiBuilder<PricedInventory>(
       fetcher: (c) => c.getFleetInventory(),
       builder: (context, data) {
         return ListView.builder(
@@ -75,7 +74,7 @@ class FleetInventoryList extends StatelessWidget {
               );
             }
             final item = data.items[index];
-            final price = item.medianPrice;
+            final price = item.pricePerUnit;
             return ListTile(
               title: Text(item.tradeSymbol.value),
               subtitle: Text('${item.count} units'),

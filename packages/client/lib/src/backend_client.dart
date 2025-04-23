@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:protocol/protocol.dart';
-import 'package:types/types.dart';
 
 typedef Json = Map<String, dynamic>;
 
@@ -39,6 +38,12 @@ class BackendClient {
     return response.json;
   }
 
+  Future<AccountingSummaryResponse> getAccountingSummary() async {
+    final uri = _api('accounting/summary');
+    final json = await _get(uri);
+    return AccountingSummaryResponse.fromJson(json);
+  }
+
   Future<AgentStatusResponse> getAgentStatus() async {
     final uri = _api('agent/status');
     final json = await _get(uri);
@@ -62,10 +67,10 @@ class BackendClient {
     return DealsNearbyResponse.fromJson(json);
   }
 
-  Future<GetFleetInventoryResponse> getFleetInventory() async {
+  Future<PricedInventory> getFleetInventory() async {
     final uri = _api('fleet/inventory');
     final json = await _get(uri);
-    return GetFleetInventoryResponse.fromJson(json);
+    return PricedInventory.fromJson(json);
   }
 
   Future<FleetShipsResponse> getFleetShips() async {

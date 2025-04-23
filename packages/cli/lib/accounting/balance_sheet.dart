@@ -1,39 +1,44 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/plan/ships.dart';
-import 'package:collection/collection.dart';
 
-/// Compute the total value across all cargo for all ships.
-Future<int> computeInventoryValue(
-  ShipSnapshot ships,
-  // TODO(eseidel): Use a MedianPriceCache rather than MarketPriceSnapshot.
-  MarketPriceSnapshot marketPrices,
-) async {
-  final countByTradeSymbol = <TradeSymbol, int>{};
-  for (final ship in ships.ships) {
-    final inventory = ship.cargo.inventory;
-    for (final item in inventory) {
-      final symbol = item.tradeSymbol;
-      final count = countByTradeSymbol[symbol] ?? 0;
-      countByTradeSymbol[symbol] = count + item.units;
+/// Counts the number of occurrences of each element in the iterable.
+extension CountBy<T> on Iterable<T> {
+  /// Counts the number of occurrences of each element in the iterable.
+  Map<K, int> countBy<K>(K Function(T element) keyOf) {
+    final counts = <K, int>{};
+    for (final item in this) {
+      final key = keyOf(item);
+      counts[key] = (counts[key] ?? 0) + 1;
     }
+    return counts;
   }
-  final totalValue = countByTradeSymbol.entries.fold<int>(0, (total, entry) {
-    final symbol = entry.key;
-    final count = entry.value;
-    final price = marketPrices.medianSellPrice(symbol);
-    if (price == null) {
-      logger.warn('No price for $symbol');
-      return total;
-    }
-    final value = price * count;
-    return total + value;
-  });
-  return totalValue;
+}
+
+/// Computes the total resale value of all items in the inventory.
+Future<PricedInventory> computeInventoryValue({required Database db}) async {
+  final ships = await ShipSnapshot.load(db);
+  // TODO(eseidel): Use a MedianPriceCache rather than MarketPriceSnapshot.
+  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final countByTradeSymbol = ships.ships
+      .expand((ship) => ship.cargo.inventory)
+      .countBy((item) => item.tradeSymbol);
+
+  final items =
+      countByTradeSymbol.entries.map((entry) {
+        final symbol = entry.key;
+        final count = entry.value;
+        return PricedItemStack(
+          tradeSymbol: symbol,
+          count: count,
+          pricePerUnit: marketPrices.medianSellPrice(symbol),
+        );
+      }).toList();
+  return PricedInventory(items: items);
 }
 
 /// Computes the total resale value of all ships.
-Future<int> computeShipValue(
+Future<PricedFleet> computeShipValue(
   ShipSnapshot ships,
   ShipyardShipCache shipyardShips,
   ShipyardPriceSnapshot shipyardPrices,
@@ -46,24 +51,34 @@ Future<int> computeShipValue(
     return type;
   }
 
-  final shipTypes = ships.ships.map(shipTypeForShip).toList();
-  final totalShipCost =
-      shipTypes.map((s) => shipyardPrices.medianPurchasePrice(s)!).sum;
+  final pricedShips =
+      ships.ships.countBy(shipTypeForShip).entries.map((entry) {
+        final symbol = entry.key;
+        final count = entry.value;
+        return PricedShip(
+          shipType: symbol,
+          count: count,
+          // Note this is using purchase price rather than scrap price
+          // which is likely over-estimating the value.
+          pricePerUnit: shipyardPrices.medianPurchasePrice(symbol),
+        );
+      }).toList();
 
-  // TODO(eseidel): Include mount values.
-
-  return totalShipCost;
+  return PricedFleet(ships: pricedShips);
 }
 
 /// Computes the current balance sheet for the agent.
 Future<BalanceSheet> computeBalanceSheet(FileSystem fs, Database db) async {
   final ships = await ShipSnapshot.load(db);
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = ShipyardShipCache.load(fs);
 
   final agent = await db.getMyAgent();
-  final inventory = await computeInventoryValue(ships, marketPrices);
+  final inventory = await computeInventoryValue(db: db);
+  for (final symbol in inventory.missingPrices) {
+    logger.warn('Missing price for $symbol');
+  }
+
   final shipsValue = await computeShipValue(
     ships,
     shipyardShips,
@@ -73,7 +88,7 @@ Future<BalanceSheet> computeBalanceSheet(FileSystem fs, Database db) async {
   return BalanceSheet(
     time: DateTime.timestamp(),
     cash: agent!.credits,
-    inventory: inventory,
-    ships: shipsValue,
+    inventory: inventory.totalValue,
+    ships: shipsValue.totalValue,
   );
 }

@@ -12,14 +12,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ..info('Revenues')
     ..info('  Sales: ${c(report.sales)}')
     ..info('  Contracts: ${c(report.contracts)}')
-    ..info('Total Revenues: ${c(report.totalRevenue)}')
+    ..info('Total Revenues: ${c(report.revenue)}')
     ..info('Cost of Goods Sold')
     ..info('  Goods: ${c(report.goods)}')
     ..info('  Fuel: ${c(report.fuel)}')
-    ..info('Total Cost of Goods Sold: ${c(report.totalCostOfGoodsSold)}')
+    ..info('Total Cost of Goods Sold: ${c(report.costOfGoodsSold)}')
     ..info('Gross Profit: ${c(report.grossProfit)}')
     ..info('Expenses')
-    ..info('Total Expenses: ${c(report.totalExpenses)}')
+    ..info('Total Expenses: ${c(report.expenses)}')
     ..info('Net Income: ${c(report.netIncome)}');
 }
 
