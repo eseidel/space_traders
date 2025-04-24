@@ -1,13 +1,62 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final startSystemSymbol = await startSystemFromArg(
-    db,
-    argResults.rest.firstOrNull,
-  );
+class SystemStats {
+  SystemStats({
+    required this.startSystem,
+    required this.totalSystems,
+    required this.totalWaypoints,
+    required this.totalJumpgates,
+    required this.reachableSystems,
+    required this.reachableWaypoints,
+    required this.reachableMarkets,
+    required this.reachableShipyards,
+    required this.reachableAsteroids,
+    required this.reachableJumpGates,
+    required this.chartedWaypoints,
+    required this.chartedAsteroids,
+    required this.chartedJumpGates,
+    required this.cachedJumpGates,
+  });
 
-  logger.info('Starting from $startSystemSymbol, known reachable:');
+  final SystemSymbol startSystem;
+
+  // Total values we can get from the systems cache.
+  final int totalSystems;
+  final int totalWaypoints;
+  final int totalJumpgates;
+
+  /// Counts we have from our own data.
+  final int reachableSystems;
+  final int reachableWaypoints;
+  final int reachableMarkets;
+  final int reachableShipyards;
+  final int reachableAsteroids;
+  final int reachableJumpGates;
+
+  /// Charted counts.
+  final int chartedWaypoints;
+  final int chartedAsteroids;
+  final int chartedJumpGates;
+
+  /// Cached counts (similar to charted)
+  final int cachedJumpGates;
+
+  double get asteroidChartPercent => chartedAsteroids / reachableAsteroids;
+  double get nonAsteroidChartPercent =>
+      (chartedWaypoints - chartedAsteroids) /
+      (reachableWaypoints - reachableAsteroids);
+
+  double get reachableSystemPercent => reachableSystems / totalSystems;
+  double get reachableWaypointPercent => reachableWaypoints / totalWaypoints;
+  double get reachableJumpGatePercent => reachableJumpGates / totalJumpgates;
+}
+
+Future<SystemStats> computeSystemStats({
+  required FileSystem fs,
+  required Database db,
+  required SystemSymbol startSystemSymbol,
+}) async {
   final systemsCache = SystemsCache.load(fs);
   // Can't use loadSystemConnectivity because need jumpGateSnapshot later.
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
@@ -26,15 +75,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     totalJumpgates += system.jumpGateWaypoints.length;
   }
 
-  String p(double d) => '${(d * 100).round()}%';
-
   final reachableSystems =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
-  final reachableSystemPercent = reachableSystems.length / totalSystems;
-  logger.info(
-    '${reachableSystems.length} systems '
-    '(${p(reachableSystemPercent)} of $totalSystems)',
-  );
 
   var jumpGates = 0;
   var asteroids = 0;
@@ -45,11 +87,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     jumpGates += systemRecord.jumpGateWaypoints.length;
     asteroids += systemRecord.waypoints.where((w) => w.isAsteroid).length;
   }
-  final reachableWaypointPercent = waypointCount / totalWaypoints;
-  logger.info(
-    '$waypointCount waypoints '
-    '(${p(reachableWaypointPercent)} of $totalWaypoints)',
-  );
 
   // How many waypoints are charted?
   final chartingSnapshot = await ChartingSnapshot.load(db);
@@ -74,20 +111,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       chartedAsteroids += 1;
     }
   }
-  final nonAsteroidCount = waypointCount - asteroids;
-  final nonAsteroidCartedCount = chartedWaypoints - chartedAsteroids;
-  final nonAsteroidChartPercent = nonAsteroidCartedCount / nonAsteroidCount;
-  final asteroidChartPercent = chartedAsteroids / asteroids;
-
-  logger
-    ..info(
-      ' $chartedWaypoints charted non-asteroid '
-      '(${p(nonAsteroidChartPercent)})',
-    )
-    ..info(
-      ' $chartedAsteroids charted asteroid '
-      '(${p(asteroidChartPercent)})',
-    );
 
   // How many markets?
   final marketListings = await MarketListingSnapshot.load(db);
@@ -99,7 +122,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       markets += 1;
     }
   }
-  logger.info('$markets markets');
 
   // How many shipyards?
   final shipyardListings = await ShipyardListingSnapshot.load(db);
@@ -111,13 +133,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       shipyards += 1;
     }
   }
-  final reachableJumpGatePercent = jumpGates / totalJumpgates;
-  logger
-    ..info('$shipyards shipyards')
-    ..info(
-      '$jumpGates jump gates'
-      ' (${p(reachableJumpGatePercent)} of $totalJumpgates)',
-    );
 
   // How many are cached?
   var cachedJumpGates = 0;
@@ -128,12 +143,59 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       cachedJumpGates += 1;
     }
   }
-  logger
-    ..info(' $cachedJumpGates cached')
-    ..info(' $chartedJumpGates charted');
 
   // How many blocked connections?
   // To how many unique blocked endpoints?
+
+  return SystemStats(
+    startSystem: startSystemSymbol,
+    totalJumpgates: totalJumpgates,
+    totalSystems: totalSystems,
+    totalWaypoints: totalWaypoints,
+    reachableWaypoints: waypointCount,
+    reachableMarkets: markets,
+    reachableShipyards: shipyards,
+    reachableAsteroids: asteroids,
+    reachableJumpGates: jumpGates,
+    cachedJumpGates: cachedJumpGates,
+    chartedWaypoints: chartedWaypoints,
+    chartedAsteroids: chartedAsteroids,
+    chartedJumpGates: chartedJumpGates,
+    reachableSystems: reachableSystems.length,
+  );
+}
+
+String statsToString(SystemStats stats) {
+  // Save ourselves some typing.
+  final s = stats;
+  String p(double d) => '${(d * 100).round()}%';
+
+  return '''
+Starting from ${s.startSystem}, known reachable:
+${s.reachableSystems} systems (${p(s.reachableSystemPercent)} of ${s.totalSystems})
+${s.reachableWaypoints} waypoints (${p(s.reachableWaypointPercent)} of ${s.totalWaypoints})
+ ${s.chartedWaypoints} charted non-asteroid (${p(s.nonAsteroidChartPercent)})
+ ${s.chartedAsteroids} charted asteroid (${p(s.asteroidChartPercent)})
+${s.reachableMarkets} markets
+${s.reachableShipyards} shipyards
+${s.reachableJumpGates} jump gates (${p(s.reachableJumpGatePercent)} of ${s.totalJumpgates})
+ ${s.cachedJumpGates} cached
+ ${s.chartedJumpGates} charted
+''';
+}
+
+Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+  final startSystemSymbol = await startSystemFromArg(
+    db,
+    argResults.rest.firstOrNull,
+  );
+
+  final stats = await computeSystemStats(
+    fs: fs,
+    db: db,
+    startSystemSymbol: startSystemSymbol,
+  );
+  logger.info(statsToString(stats));
 }
 
 void main(List<String> args) async {
