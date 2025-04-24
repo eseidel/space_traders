@@ -94,7 +94,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       systems.jumpGateWaypointForSystem(agent!.headquarters.system)!;
   final waypointSymbol = jumpgate.symbol;
   final construction =
-      (await db.getConstruction(waypointSymbol, defaultMaxAge))!.construction;
+      (await db.getConstructionRecord(
+        waypointSymbol,
+        defaultMaxAge,
+      ))!.construction;
 
   final neededExports = construction!.materials
       .where((m) => m.required_ > m.fulfilled)

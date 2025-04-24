@@ -548,7 +548,7 @@ class CentralCommand {
     }
   }
 
-  Future<Construction?> _constructionForSystem(
+  Future<ConstructionRecord?> _constructionForSystem(
     Database db,
     SystemsCache systems,
     SystemSymbol systemSymbol,
@@ -563,7 +563,7 @@ class CentralCommand {
     if (jumpGate == null) {
       return null;
     }
-    return await ConstructionCache(db).getConstruction(jumpGate.symbol);
+    return await ConstructionCache(db).getRecord(jumpGate.symbol);
   }
 
   /// Returns true if the jumpgate for the given [systemSymbol] is complete.
@@ -573,12 +573,11 @@ class CentralCommand {
     SystemsCache systems,
     SystemSymbol systemSymbol,
   ) async {
-    final construction = await _constructionForSystem(
-      db,
-      systems,
-      systemSymbol,
-    );
-    return construction?.isComplete;
+    final record = await _constructionForSystem(db, systems, systemSymbol);
+    if (record == null) {
+      return null;
+    }
+    return !record.isUnderConstruction;
   }
 
   /// Returns the active construction job, if any.
@@ -595,15 +594,8 @@ class CentralCommand {
     }
 
     final systemSymbol = agentCache.headquartersSystemSymbol;
-    final construction = await _constructionForSystem(
-      db,
-      systems,
-      systemSymbol,
-    );
-    if (construction == null || construction.isComplete) {
-      return null;
-    }
-    return construction;
+    final record = await _constructionForSystem(db, systems, systemSymbol);
+    return record?.construction;
   }
 
   Future<void> _updateMedianPrices(Database db) async {

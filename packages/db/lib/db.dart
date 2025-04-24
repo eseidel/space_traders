@@ -238,7 +238,7 @@ class Database {
       execute(insertExtractionQuery(extraction));
 
   /// Get a construction record from the database.
-  Future<ConstructionRecord?> getConstruction(
+  Future<ConstructionRecord?> getConstructionRecord(
     WaypointSymbol waypointSymbol,
     Duration maxAge,
   ) => queryOne(

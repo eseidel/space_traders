@@ -80,9 +80,11 @@ class ConstructionCache {
   Future<ConstructionRecord?> getRecord(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async => _db.getConstruction(waypointSymbol, maxAge);
+  }) async => _db.getConstructionRecord(waypointSymbol, maxAge);
 
   /// Load the Construction value for the given waypoint symbol.
+  /// Construction can be null when complete or when we don't know
+  /// getConstructionRecord instead to distinguish between the two.
   Future<Construction?> getConstruction(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
