@@ -89,10 +89,16 @@ Future<BalanceSheet> computeBalanceSheet(FileSystem fs, Database db) async {
     shipyardPrices,
   );
 
+  final loans = (await db.activeContracts()).fold(
+    0,
+    (total, contract) => total + contract.terms.payment.onAccepted,
+  );
+
   return BalanceSheet(
     time: DateTime.timestamp(),
     cash: agent!.credits,
     inventory: inventory.totalValue,
+    loans: loans,
     ships: shipsValue.totalValue,
   );
 }

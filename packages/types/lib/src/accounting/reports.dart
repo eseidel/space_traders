@@ -9,6 +9,7 @@ class BalanceSheet {
   BalanceSheet({
     required this.time,
     required this.cash,
+    required this.loans,
     required this.inventory,
     required this.ships,
   });
@@ -30,8 +31,7 @@ class BalanceSheet {
   final int ships;
 
   /// Total value of contract loans (until forgiven on delivery).
-  // TODO(eseidel): Include contract loans as liabilities.
-  int get loans => 0;
+  final int loans;
 
   /// The total value of the agent's assets.
   int get totalAssets => cash + inventory + ships;
@@ -73,6 +73,9 @@ class IncomeStatement {
   /// The end date of the income statement.
   final DateTime end;
 
+  /// The duration of the income statement.
+  Duration get duration => end.difference(start);
+
   /// The number of transactions in the period.
   final int numberOfTransactions;
 
@@ -107,8 +110,14 @@ class IncomeStatement {
   /// for now we're counting it as such.
   int get revenue => goodsRevenue + contractsRevenue + assetSale;
 
+  /// Net sales for the period, does not include asset sales.
+  int get netSales => goodsRevenue + contractsRevenue;
+
   /// The total cost of goods sold for the period.
   int get costOfGoodsSold => goodsPurchase + fuelPurchase;
+
+  /// Ratio of cost of goods sold to net sales revenue.
+  double get cogsRatio => netSales == 0 ? 0 : costOfGoodsSold / netSales;
 
   /// The gross profit for the period.
   int get grossProfit => revenue - costOfGoodsSold;
@@ -119,6 +128,11 @@ class IncomeStatement {
 
   /// The net income for the period.
   int get netIncome => grossProfit - expenses;
+
+  /// The net income per second over the period.
+  double get netIncomePerSecond {
+    return duration.inSeconds == 0 ? 0 : netIncome / duration.inSeconds;
+  }
 
   /// The net cash flow for the period.
   int get netCashFlow => netIncome - capEx;

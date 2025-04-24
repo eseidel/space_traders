@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 class _IncomeStatementBuilderResults {
@@ -247,7 +246,9 @@ class _IncomeStatementBuilder {
   }
 }
 
-/// A function to compute the income statement.
-Future<IncomeStatement> computeIncomeStatement(Database db) async {
-  return _IncomeStatementBuilder.build(await db.allTransactions());
+/// A function to compute the income statement from a list of transactions.
+Future<IncomeStatement> computeIncomeStatement(
+  Iterable<Transaction> transactions,
+) async {
+  return _IncomeStatementBuilder.build(transactions);
 }

@@ -11,7 +11,8 @@ Future<Response> onRequest(RequestContext context) async {
   final fs = context.read<FileSystem>();
 
   final balanceSheet = await computeBalanceSheet(fs, db);
-  final incomeStatement = await computeIncomeStatement(db);
+  final transactions = await db.allTransactions();
+  final incomeStatement = await computeIncomeStatement(transactions);
   final response = AccountingSummaryResponse(
     balanceSheet: balanceSheet,
     incomeStatement: incomeStatement,

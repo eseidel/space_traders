@@ -13,6 +13,7 @@ BalanceSheet _$BalanceSheetFromJson(Map<String, dynamic> json) =>
       final val = BalanceSheet(
         time: $checkedConvert('time', (v) => DateTime.parse(v as String)),
         cash: $checkedConvert('cash', (v) => (v as num).toInt()),
+        loans: $checkedConvert('loans', (v) => (v as num).toInt()),
         inventory: $checkedConvert('inventory', (v) => (v as num).toInt()),
         ships: $checkedConvert('ships', (v) => (v as num).toInt()),
       );
@@ -25,6 +26,7 @@ Map<String, dynamic> _$BalanceSheetToJson(BalanceSheet instance) =>
       'cash': instance.cash,
       'inventory': instance.inventory,
       'ships': instance.ships,
+      'loans': instance.loans,
     };
 
 IncomeStatement _$IncomeStatementFromJson(

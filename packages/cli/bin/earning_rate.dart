@@ -1,4 +1,7 @@
+import 'package:cli/accounting/income_statement.dart';
 import 'package:cli/cli.dart';
+
+import './report_profit_loss.dart';
 
 DateTime snapToHour(DateTime time) {
   return DateTime.utc(time.year, time.month, time.day, time.hour);
@@ -49,6 +52,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     final credits = creditsString(last.agentCredits).padLeft(creditsWidth);
     logger.info('-$sinceLast $credits');
   }
+
+  final incomeStatement = await computeIncomeStatement(transactions);
+  printIncomeStatement(incomeStatement);
 }
 
 void main(List<String> args) async {
