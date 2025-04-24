@@ -27,6 +27,7 @@ class HomeScreen extends StatelessWidget {
             Text('Cash: ${creditsString(data.cash)}'),
             Text('Total Assets: ${data.totalAssets}'),
             Text('Gate Open: ${data.gateOpen}'),
+            Text('Game Phase: ${data.gamePhase.name}'),
             ElevatedButton(
               onPressed: () => context.go('/fleet'),
               child: const Text('Fleet'),
