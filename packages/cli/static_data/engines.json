@@ -31,14 +31,14 @@
   "symbol": "ENGINE_ION_DRIVE_II",
   "name": "Ion Drive II",
   "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
-  "condition": 1,
-  "integrity": 1.0,
-  "speed": 30,
+  "condition": 1.0,
+  "integrity": 1,
+  "speed": 36,
   "requirements": {
    "power": 6,
    "crew": 8,
    "slots": null
   },
-  "quality": 1
+  "quality": 4
  }
 ]

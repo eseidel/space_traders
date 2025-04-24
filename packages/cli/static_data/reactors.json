@@ -17,29 +17,29 @@
   "symbol": "REACTOR_FISSION_I",
   "name": "Fission Reactor I",
   "description": "A basic fission power reactor, used to generate electricity from nuclear fission reactions.",
-  "condition": 1,
-  "integrity": 1.0,
+  "condition": 1.0,
+  "integrity": 1,
   "powerOutput": 31,
   "requirements": {
    "power": null,
    "crew": 8,
    "slots": null
   },
-  "quality": 1
+  "quality": 5
  },
  {
   "symbol": "REACTOR_FUSION_I",
   "name": "Fusion Reactor I",
   "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions.",
-  "condition": 1,
-  "integrity": 1.0,
+  "condition": 1.0,
+  "integrity": 1,
   "powerOutput": 40,
   "requirements": {
    "power": null,
    "crew": 12,
    "slots": null
   },
-  "quality": 1
+  "quality": 7
  },
  {
   "symbol": "REACTOR_SOLAR_I",
