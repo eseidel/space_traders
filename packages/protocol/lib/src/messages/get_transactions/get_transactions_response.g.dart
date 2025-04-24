@@ -19,6 +19,7 @@ GetTransactionsResponse _$GetTransactionsResponseFromJson(
               .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
               .toList(),
     ),
+    timestamp: $checkedConvert('timestamp', (v) => DateTime.parse(v as String)),
   );
   return val;
 });
@@ -26,5 +27,6 @@ GetTransactionsResponse _$GetTransactionsResponseFromJson(
 Map<String, dynamic> _$GetTransactionsResponseToJson(
   GetTransactionsResponse instance,
 ) => <String, dynamic>{
+  'timestamp': instance.timestamp.toIso8601String(),
   'transactions': instance.transactions.map((e) => e.toJson()).toList(),
 };

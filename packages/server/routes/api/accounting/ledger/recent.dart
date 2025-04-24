@@ -7,6 +7,10 @@ Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
   // TODO(eseidel): Read count from request, and paginate responses.
   final transactions = await db.recentTransactions(count: 10);
-  final response = GetTransactionsResponse(transactions: transactions.toList());
+  final response = GetTransactionsResponse(
+    transactions: transactions.toList(),
+    // Does this need to be db time?
+    timestamp: DateTime.timestamp(),
+  );
   return Response.json(body: response.toJson());
 }

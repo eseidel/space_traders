@@ -12,33 +12,38 @@ class TransactionsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Recent Transactions')),
       body: ApiBuilder<GetTransactionsResponse>(
         fetcher: (c) => c.getRecentTransactions(),
-        builder: (context, data) => TransactionsView(data.transactions),
+        builder: (context, data) => TransactionsView(data),
       ),
     );
   }
 }
 
 class TransactionsView extends StatelessWidget {
-  const TransactionsView(this.transactions, {super.key});
+  const TransactionsView(this.data, {super.key});
 
-  final List<Transaction> transactions;
+  final GetTransactionsResponse data;
 
   @override
   Widget build(BuildContext context) {
-    const c = creditsString;
-    return Column(
-      children: [
-        const Text('Transactions'),
-        for (final t in transactions)
-          ListTile(
-            title: Text('${t.timestamp} ${t.tradeSymbol}'),
-            subtitle: Text(
-              '${t.quantity} ${t.tradeType} '
-              '${t.shipSymbol} ${t.waypointSymbol} '
-              '${c(t.creditsChange)} ${t.accounting}',
-            ),
+    const c = creditsChangeString;
+    final now = data.timestamp;
+    final transactions = data.transactions;
+    final tiles = <Widget>[];
+    for (final t in transactions) {
+      final duration = now.difference(t.timestamp);
+      final since = approximateDuration(duration);
+      tiles.add(
+        ListTile(
+          title: Text('${c(t.creditsChange)} $since ago'),
+          subtitle: Text(
+            '${t.tradeType} ${t.quantity} x ${t.unitName} '
+            '${t.accounting.name} '
+            'by ${t.shipSymbol.hexNumber} @ ${t.waypointSymbol}',
           ),
-      ],
-    );
+        ),
+      );
+    }
+
+    return Column(children: [const Text('Transactions'), ...tiles]);
   }
 }

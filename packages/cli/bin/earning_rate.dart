@@ -30,8 +30,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     latestCredits = transaction.agentCredits;
     if (transaction.timestamp.isAfter(nextPrintDate)) {
       final diff = latestCredits - lastPeriodCredits;
-      final prettyDiff = creditsString(diff);
-      final diffString = diff > 0 ? '+$prettyDiff' : prettyDiff;
+      final diffString = creditsChangeString(diff);
       final agoString =
           hoursAgo(nextPrintDate) == 0
               ? 'now'

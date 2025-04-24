@@ -20,7 +20,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ..info('Gross Profit: ${c(report.grossProfit)}')
     ..info('Expenses')
     ..info('Total Expenses: ${c(report.expenses)}')
-    ..info('Net Income: ${c(report.netIncome)}');
+    ..info('Net Income: ${c(report.netIncome)}')
+    ..info('Capital Expenditures: ${c(report.capEx)}');
 }
 
 void main(List<String> args) async {

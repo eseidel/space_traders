@@ -297,6 +297,9 @@ class Transaction extends Equatable {
   /// Only used for Shipyard transactions.
   final ShipType? shipType;
 
+  /// Type of unit transacted.
+  String get unitName => tradeSymbol?.value ?? shipType?.value ?? 'unknown';
+
   /// Quantity of units transacted.
   final int quantity;
 
