@@ -38,7 +38,9 @@ class BalanceSheetView extends StatelessWidget {
       children: [
         const Text('Balance Sheet'),
         Text('Cash: ${c(balance.cash)}'),
-        Text('Assets: ${c(balance.totalAssets)}'),
+        Text('Inventory: ${c(balance.inventory)}'),
+        Text('Ships: ${c(balance.ships)}'),
+        Text('Total Assets: ${c(balance.totalAssets)}'),
         Text('Liabilities: ${c(balance.totalLiabilities)}'),
       ],
     );

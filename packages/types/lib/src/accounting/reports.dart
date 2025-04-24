@@ -53,10 +53,11 @@ class IncomeStatement {
   IncomeStatement({
     required this.start,
     required this.end,
-    required this.sales,
-    required this.contracts,
-    required this.goods,
-    required this.fuel,
+    required this.goodsRevenue,
+    required this.contractsRevenue,
+    required this.goodsPurchase,
+    required this.assetSale,
+    required this.fuelPurchase,
     required this.capEx,
     required this.numberOfTransactions,
   });
@@ -74,17 +75,21 @@ class IncomeStatement {
   /// The number of transactions in the period.
   final int numberOfTransactions;
 
-  /// The total income from sales for the period.
-  final int sales;
+  /// The total revenue from trading sales for the period.
+  final int goodsRevenue;
 
-  /// The total income from contracts for the period.
-  final int contracts;
+  /// The total revenue from contracts for the period.
+  final int contractsRevenue;
 
-  /// Total cost of goods sold.
-  final int goods;
+  /// The total income from asset sales for the period (one-offs).
+  final int assetSale;
 
-  /// Total fuel cost.
-  final int fuel;
+  /// Total cost of goods purchased for resale.
+  final int goodsPurchase;
+
+  /// Total cost of fuel purchased for consumption or resale
+  /// (not currently separated).
+  final int fuelPurchase;
   // final int constructionMaterials;
   // final int subsidies;
   // final int categorizationPending;
@@ -96,10 +101,10 @@ class IncomeStatement {
   /// The total income for the period.
   /// There seems to be some debate as to if fuel counts as COGS or not,
   /// for now we're counting it as such.
-  int get revenue => sales + contracts + fuel;
+  int get revenue => goodsRevenue + contractsRevenue + assetSale;
 
   /// The total cost of goods sold for the period.
-  int get costOfGoodsSold => goods;
+  int get costOfGoodsSold => goodsPurchase + fuelPurchase;
 
   /// The gross profit for the period.
   int get grossProfit => revenue - costOfGoodsSold;

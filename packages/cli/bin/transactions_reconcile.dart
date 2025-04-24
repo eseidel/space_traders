@@ -5,7 +5,7 @@ String describeTransaction(Transaction t) {
       '${t.shipSymbol} ${t.waypointSymbol} ${t.creditsChange}';
 }
 
-void reconcile(List<Transaction> transactions) {
+void reconcile(Iterable<Transaction> transactions) {
   final startingCredits = transactions.first.agentCredits;
   var credits = startingCredits;
   // Skip the first transaction, since agentCredits already includes the
@@ -34,8 +34,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
-  final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = (await db.transactionsAfter(startTime)).toList();
+  // final startTime = DateTime.timestamp().subtract(lookback);
+  final transactions = await db.allTransactions();
+  // final transactions = (await db.transactionsAfter(startTime)).toList();
 
   final lastCredits = transactions.last.agentCredits;
   final firstCredits = transactions.first.agentCredits;

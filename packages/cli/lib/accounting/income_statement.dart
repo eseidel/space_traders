@@ -1,18 +1,21 @@
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
+class _IncomeStatementBuilderResults {
+  int goodsSale = 0;
+  int assetSale = 0;
+  int contracts = 0;
+
+  int goodsPurchase = 0;
+  int fuelPurchase = 0;
+
+  int capEx = 0;
+}
+
 class _IncomeStatementBuilder {
-  _IncomeStatementBuilder(this.transactions);
+  _IncomeStatementBuilder();
 
-  final Iterable<Transaction> transactions;
-
-  int _sales = 0;
-  int _contracts = 0;
-
-  int _goods = 0;
-  int _fuel = 0;
-
-  int _capEx = 0;
+  final results = _IncomeStatementBuilderResults();
 
   void _fail(String message) => throw Exception(message);
 
@@ -24,22 +27,66 @@ class _IncomeStatementBuilder {
     }
   }
 
+  void _sale(Transaction transaction) {
+    final credits = transaction.creditsChange;
+    _expect(credits > 0, 'Sale is not positive');
+    results.goodsSale += credits;
+  }
+
+  void _purchase(Transaction transaction) {
+    final credits = transaction.creditsChange;
+    _expect(credits < 0, 'Purchase is not negative');
+    results.goodsPurchase += credits;
+  }
+
+  void _fuel(Transaction transaction) {
+    final credits = transaction.creditsChange;
+    _expect(credits < 0, 'Fuel is not negative');
+    results.fuelPurchase += credits;
+  }
+
+  void _contractAccept(Transaction transaction) {
+    final credits = transaction.creditsChange;
+    // Some contracts give no initial credits.
+    _expect(credits >= 0, 'Contract is not positive');
+    results.contracts += credits;
+  }
+
+  void _contractFulfillment(Transaction transaction) {
+    final credits = transaction.creditsChange;
+    _expect(credits > 0, 'Contract is not positive');
+    results.contracts += credits;
+  }
+
+  void _capEx(Transaction transaction) {
+    final credits = transaction.creditsChange;
+    _expect(credits < 0, 'Capital expenditure is negative');
+    results.capEx += credits;
+  }
+
+  void _assetSale(Transaction transaction) {
+    final credits = transaction.creditsChange;
+    _expect(credits > 0, 'Asset sale is not positive');
+    results.assetSale += credits;
+  }
+
   void _processMarketTransaction(Transaction transaction) {
     switch (transaction.accounting) {
       case AccountingType.goods:
         switch (transaction.tradeType) {
           case MarketTransactionTypeEnum.PURCHASE:
-            _goods += transaction.creditsChange;
+            _purchase(transaction);
           case MarketTransactionTypeEnum.SELL:
-            _sales += transaction.creditsChange;
+            _sale(transaction);
           case null:
             _fail('Unknown market transaction type: null');
         }
       case AccountingType.fuel:
         _expect(transaction.isPurchase, 'Fuel is not a purchase');
-        _fuel += transaction.creditsChange;
+        // Need to record fuel usage and differntiate between goods and usage.
+        _fuel(transaction);
       case AccountingType.capital:
-        _capEx += transaction.creditsChange;
+        _capEx(transaction);
     }
   }
 
@@ -50,7 +97,7 @@ class _IncomeStatementBuilder {
     );
     _expect(transaction.isPurchase, 'Ship is not a purchase');
     _expect(transaction.creditsChange < 0, 'Ship cost is not negative');
-    _capEx += transaction.creditsChange;
+    _capEx(transaction);
   }
 
   void _processScrapShipTransaction(Transaction transaction) {
@@ -60,7 +107,7 @@ class _IncomeStatementBuilder {
     );
     _expect(transaction.isSale, 'Ship is not a purchase');
     _expect(transaction.creditsChange >= 0, 'Ship value is not positive');
-    _capEx += transaction.creditsChange;
+    _assetSale(transaction);
   }
 
   void _processShipModificationTransaction(Transaction transaction) {
@@ -73,15 +120,15 @@ class _IncomeStatementBuilder {
       transaction.creditsChange < 0,
       'Ship modification cost is not negative',
     );
-    _capEx += transaction.creditsChange;
+    _capEx(transaction);
   }
 
   void _processContractTransaction(Transaction transaction) {
     switch (transaction.contractAction) {
       case ContractAction.accept:
-        _contracts += transaction.creditsChange;
+        _contractAccept(transaction);
       case ContractAction.fulfillment:
-        _contracts += transaction.creditsChange;
+        _contractFulfillment(transaction);
       case ContractAction.delivery:
         _expect(transaction.creditsChange == 0, 'Delivery is not zero');
       case null:
@@ -94,41 +141,48 @@ class _IncomeStatementBuilder {
     _expect(transaction.creditsChange == 0, 'Delivery is not zero');
   }
 
-  Future<IncomeStatement> build() async {
-    final transactionCount = transactions.length;
-
-    for (final transaction in transactions) {
-      switch (transaction.transactionType) {
-        case TransactionType.market:
-          _processMarketTransaction(transaction);
-        case TransactionType.shipyard:
-          _processShipyardTransaction(transaction);
-        case TransactionType.scrapShip:
-          _processScrapShipTransaction(transaction);
-        case TransactionType.shipModification:
-          _processShipModificationTransaction(transaction);
-        case TransactionType.contract:
-          _processContractTransaction(transaction);
-        case TransactionType.construction:
-          _processConstructionTransaction(transaction);
-      }
+  void processTransaction(Transaction transaction) {
+    switch (transaction.transactionType) {
+      case TransactionType.market:
+        _processMarketTransaction(transaction);
+      case TransactionType.shipyard:
+        _processShipyardTransaction(transaction);
+      case TransactionType.scrapShip:
+        _processScrapShipTransaction(transaction);
+      case TransactionType.shipModification:
+        _processShipModificationTransaction(transaction);
+      case TransactionType.contract:
+        _processContractTransaction(transaction);
+      case TransactionType.construction:
+        _processConstructionTransaction(transaction);
     }
+  }
 
+  static IncomeStatement build(Iterable<Transaction> transactions) {
+    // Sort into reverse chronological order.
+    final sorted =
+        transactions.toList()
+          ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    final builder = _IncomeStatementBuilder();
+    for (final transaction in sorted) {
+      builder.processTransaction(transaction);
+    }
+    final r = builder.results;
     return IncomeStatement(
-      start: transactions.first.timestamp,
-      end: transactions.last.timestamp,
-      sales: _sales,
-      contracts: _contracts,
-      goods: -_goods,
-      fuel: -_fuel,
-      numberOfTransactions: transactionCount,
-      capEx: -_capEx,
+      start: sorted.last.timestamp,
+      end: sorted.first.timestamp,
+      numberOfTransactions: transactions.length,
+      goodsRevenue: r.goodsSale,
+      contractsRevenue: r.contracts,
+      assetSale: r.assetSale,
+      goodsPurchase: -r.goodsPurchase,
+      fuelPurchase: -r.fuelPurchase,
+      capEx: -r.capEx,
     );
   }
 }
 
 /// A function to compute the income statement.
 Future<IncomeStatement> computeIncomeStatement(Database db) async {
-  final transactions = await db.allTransactions();
-  return await _IncomeStatementBuilder(transactions).build();
+  return _IncomeStatementBuilder.build(await db.allTransactions());
 }
