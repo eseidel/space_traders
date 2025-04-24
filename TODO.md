@@ -1513,8 +1513,14 @@ No nearby markets for ESEIDEL2-8F
 
 Would help to know how fresh it is.
 
-
 ### Move StaticCaches into the DB
 
 The only question is when do we dump them out to disk (since it's nice
 to save them in version control).
+
+### Inventory tracking
+Track individual trade goods from when we get them to when we sell them,
+including mining, transfers, buying, selling, refueling, etc.
+Would let us understand exactly what the COGS on individual items was.
+
+### Income Statement should track construction as "extraordinary"
