@@ -10,18 +10,17 @@ class AgentStatusResponse {
     required this.faction,
     required this.numberOfShips,
     required this.cash,
-    required this.totalAssets,
     required this.gateOpen,
     required this.gamePhase,
   });
 
   factory AgentStatusResponse.fromJson(Map<String, dynamic> json) =>
       _$AgentStatusResponseFromJson(json);
+
   final String name;
   final String faction;
   final int numberOfShips;
   final int cash;
-  final int totalAssets;
   final bool gateOpen;
   final GamePhase gamePhase;
 

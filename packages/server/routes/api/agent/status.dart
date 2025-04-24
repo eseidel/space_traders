@@ -28,7 +28,6 @@ Future<Response> onRequest(RequestContext context) async {
     numberOfShips: ships.length,
     cash: agent.credits,
     gamePhase: config.gamePhase,
-    totalAssets: 0,
     gateOpen: underConstruction == false,
   );
   return Response.json(body: status.toJson());

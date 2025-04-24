@@ -21,10 +21,6 @@ AgentStatusResponse _$AgentStatusResponseFromJson(Map<String, dynamic> json) =>
             (v) => (v as num).toInt(),
           ),
           cash: $checkedConvert('cash', (v) => (v as num).toInt()),
-          totalAssets: $checkedConvert(
-            'total_assets',
-            (v) => (v as num).toInt(),
-          ),
           gateOpen: $checkedConvert('gate_open', (v) => v as bool),
           gamePhase: $checkedConvert(
             'game_phase',
@@ -35,7 +31,6 @@ AgentStatusResponse _$AgentStatusResponseFromJson(Map<String, dynamic> json) =>
       },
       fieldKeyMap: const {
         'numberOfShips': 'number_of_ships',
-        'totalAssets': 'total_assets',
         'gateOpen': 'gate_open',
         'gamePhase': 'game_phase',
       },
@@ -48,7 +43,6 @@ Map<String, dynamic> _$AgentStatusResponseToJson(
   'faction': instance.faction,
   'number_of_ships': instance.numberOfShips,
   'cash': instance.cash,
-  'total_assets': instance.totalAssets,
   'gate_open': instance.gateOpen,
   'game_phase': instance.gamePhase.toJson(),
 };

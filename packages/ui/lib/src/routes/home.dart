@@ -25,7 +25,6 @@ class HomeScreen extends StatelessWidget {
             Text('${data.name} of ${data.faction}'),
             Text('${data.numberOfShips} ships'),
             Text('Cash: ${creditsString(data.cash)}'),
-            Text('Total Assets: ${data.totalAssets}'),
             Text('Gate Open: ${data.gateOpen}'),
             Text('Game Phase: ${data.gamePhase.name}'),
             ElevatedButton(
