@@ -83,7 +83,7 @@ class _IncomeStatementBuilder {
         }
       case AccountingType.fuel:
         _expect(transaction.isPurchase, 'Fuel is not a purchase');
-        // Need to record fuel usage and differntiate between goods and usage.
+        // Need to record fuel usage and differentiate between goods and usage.
         _fuel(transaction);
       case AccountingType.capital:
         _capEx(transaction);

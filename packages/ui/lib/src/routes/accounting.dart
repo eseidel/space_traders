@@ -27,21 +27,22 @@ class AccountingScreen extends StatelessWidget {
 }
 
 class BalanceSheetView extends StatelessWidget {
-  const BalanceSheetView(this.balance, {super.key});
+  const BalanceSheetView(this.balanceSheet, {super.key});
 
-  final BalanceSheet balance;
+  final BalanceSheet balanceSheet;
 
   @override
   Widget build(BuildContext context) {
     const c = creditsString;
+    final b = balanceSheet;
     return Column(
       children: [
         const Text('Balance Sheet'),
-        Text('Cash: ${c(balance.cash)}'),
-        Text('Inventory: ${c(balance.inventory)}'),
-        Text('Ships: ${c(balance.ships)}'),
-        Text('Total Assets: ${c(balance.totalAssets)}'),
-        Text('Liabilities: ${c(balance.totalLiabilities)}'),
+        Text('Cash: ${c(b.cash)}'),
+        Text('Inventory: ${c(b.inventory)}'),
+        Text('Ships: ${c(b.ships)}'),
+        Text('Total Assets: ${c(b.totalAssets)}'),
+        Text('Liabilities: ${c(b.totalLiabilities)}'),
       ],
     );
   }
@@ -55,14 +56,15 @@ class IncomeStatementView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const c = creditsString;
+    final i = incomeStatement;
     return Column(
       children: [
         const Text('Income Statement'),
-        Text('Revenue: ${c(incomeStatement.revenue)}'),
-        Text('COGS: ${c(incomeStatement.costOfGoodsSold)}'),
-        Text('Gross Profit: ${c(incomeStatement.grossProfit)}'),
-        Text('Expenses: ${c(incomeStatement.expenses)}'),
-        Text('Net Income: ${c(incomeStatement.netIncome)}'),
+        Text('Revenue: ${c(i.revenue)}'),
+        Text('COGS: ${c(i.costOfGoodsSold)}'),
+        Text('Gross Profit: ${c(i.grossProfit)}'),
+        Text('Expenses: ${c(i.expenses)}'),
+        Text('Net Income: ${c(i.netIncome)}'),
       ],
     );
   }
