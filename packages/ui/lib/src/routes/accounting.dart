@@ -57,6 +57,8 @@ class IncomeStatementView extends StatelessWidget {
       children: [
         const Text('Income Statement'),
         Text('Revenue: ${c(incomeStatement.revenue)}'),
+        Text('COGS: ${c(incomeStatement.costOfGoodsSold)}'),
+        Text('Gross Profit: ${c(incomeStatement.grossProfit)}'),
         Text('Expenses: ${c(incomeStatement.expenses)}'),
         Text('Net Income: ${c(incomeStatement.netIncome)}'),
       ],

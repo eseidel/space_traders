@@ -26,7 +26,7 @@ Future<Response> onRequest(RequestContext context) async {
     numberOfShips: ships.length,
     cash: agent.credits,
     totalAssets: 0,
-    gateOpen: underConstruction ?? true,
+    gateOpen: underConstruction == false,
   );
   return Response.json(body: status.toJson());
 }
