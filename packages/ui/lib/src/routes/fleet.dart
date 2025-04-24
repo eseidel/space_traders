@@ -70,15 +70,14 @@ class FleetInventoryList extends StatelessWidget {
             if (index == data.items.length) {
               return ListTile(
                 title: const Text('Total Value'),
-                subtitle: Text(creditsString(data.totalValue)),
+                trailing: Text(creditsString(data.totalValue)),
               );
             }
             final item = data.items[index];
-            final price = item.pricePerUnit;
+            final value = item.totalValue;
             return ListTile(
-              title: Text(item.tradeSymbol.value),
-              subtitle: Text('${item.count} units'),
-              trailing: Text(price != null ? creditsString(price) : '?'),
+              title: Text('${item.count} x ${item.tradeSymbol.value}'),
+              trailing: Text(value != null ? creditsString(value) : '?'),
             );
           },
         );

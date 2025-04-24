@@ -5,11 +5,15 @@ import 'package:cli/plan/ships.dart';
 /// Counts the number of occurrences of each element in the iterable.
 extension CountBy<T> on Iterable<T> {
   /// Counts the number of occurrences of each element in the iterable.
-  Map<K, int> countBy<K>(K Function(T element) keyOf) {
+  Map<K, int> countBy<K>(
+    K Function(T element) keyOf, {
+    int Function(T element)? countOf,
+  }) {
     final counts = <K, int>{};
     for (final item in this) {
       final key = keyOf(item);
-      counts[key] = (counts[key] ?? 0) + 1;
+      final count = countOf?.call(item) ?? 1;
+      counts[key] = (counts[key] ?? 0) + count;
     }
     return counts;
   }
@@ -22,7 +26,7 @@ Future<PricedInventory> computeInventoryValue({required Database db}) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final countByTradeSymbol = ships.ships
       .expand((ship) => ship.cargo.inventory)
-      .countBy((item) => item.tradeSymbol);
+      .countBy((item) => item.tradeSymbol, countOf: (item) => item.units);
 
   final items =
       countByTradeSymbol.entries.map((entry) {

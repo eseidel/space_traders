@@ -29,9 +29,9 @@ class PricedItemStack {
   final int? pricePerUnit;
 
   /// The total value of the item.
-  int get totalValue {
+  int? get totalValue {
     if (pricePerUnit == null) {
-      return 0;
+      return null;
     }
     return count * pricePerUnit!;
   }
