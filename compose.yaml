@@ -3,7 +3,10 @@ services:
   web:
     build:
       context: ./packages
-      dockerfile: ./ui/Dockerfile
+      dockerfile: ./ui/Dockerfile-dev
+    volumes:
+      # Only needed for development.
+      - ./packages/ui/build/web:/usr/share/nginx/html
     ports:
       # This should just expose 80, but doesn't seem to work?
       - "8080:80"

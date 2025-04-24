@@ -12,12 +12,13 @@ class ApiBuilder<T> extends StatefulWidget {
 }
 
 class _ApiBuilderState<T> extends State<ApiBuilder<T>> {
-  late final T data;
+  T? data;
   bool loading = true;
   String? error;
 
   Future<void> load() async {
-    final client = BackendClient(hostedUri: Uri.base);
+    // Get just the root URI for the client
+    final client = BackendClient(hostedUri: Uri.base.removeFragment());
     try {
       final response = await widget.fetcher(client);
       setState(() {
@@ -44,6 +45,15 @@ class _ApiBuilderState<T> extends State<ApiBuilder<T>> {
     if (loading) {
       return const Center(child: CircularProgressIndicator());
     }
-    return widget.builder(context, data);
+    if (error != null) {
+      return Center(
+        child: Text('Error: $error', style: const TextStyle(color: Colors.red)),
+      );
+    }
+    if (data == null) {
+      return const Center(child: Text('No data'));
+    } else {
+      return widget.builder(context, data as T);
+    }
   }
 }
