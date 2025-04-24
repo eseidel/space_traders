@@ -343,6 +343,15 @@ class Transaction extends Equatable {
 
   /// The change in credits from this transaction.
   int get creditsChange {
+    // Credits change hands on acceptance of a contract, even if no goods do.
+    if (contractAction != null && contractAction == ContractAction.accept) {
+      return perUnitPrice;
+    }
+    if (perUnitPrice > 0 && quantity == 0) {
+      throw Exception(
+        'Transaction with zero quantity and non-zero price: $this',
+      );
+    }
     final sign = tradeType == MarketTransactionTypeEnum.PURCHASE ? -1 : 1;
     return sign * perUnitPrice * quantity;
   }

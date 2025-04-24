@@ -12,133 +12,149 @@ class _IncomeStatementBuilderResults {
   int capEx = 0;
 }
 
+/// Class to represent a bad transaction.
+class BadTransaction implements Exception {
+  /// Construct a bad transaction.
+  const BadTransaction(this.message, this.transaction);
+
+  /// The message to display.
+  final String message;
+
+  /// The transaction that caused the error.
+  final Transaction transaction;
+
+  @override
+  String toString() {
+    return 'Bad transaction: $message\n'
+        'Transaction: ${transaction.toJson()}';
+  }
+}
+
 class _IncomeStatementBuilder {
   _IncomeStatementBuilder();
 
   final results = _IncomeStatementBuilderResults();
 
-  void _fail(String message) => throw Exception(message);
+  void _fail(Transaction transaction, String message) =>
+      throw BadTransaction(message, transaction);
 
   // Intended to function like assert.
   // ignore: avoid_positional_boolean_parameters
-  void _expect(bool condition, String message) {
+  void _expect(Transaction transaction, bool condition, String message) {
     if (!condition) {
-      _fail(message);
+      _fail(transaction, message);
     }
+  }
+
+  void _expectAccounting(
+    Transaction transaction,
+    AccountingType type,
+    String name,
+  ) {
+    _expect(transaction, transaction.accounting == type, '$name is not $type');
+  }
+
+  int _positive(Transaction transaction, String name) {
+    final credits = transaction.creditsChange;
+    _expect(transaction, credits > 0, '$name is not positive');
+    return credits;
+  }
+
+  int _negative(Transaction transaction, String name) {
+    final credits = transaction.creditsChange;
+    _expect(transaction, credits < 0, '$name is not negative');
+    return credits;
+  }
+
+  void _zero(Transaction transaction, String name) {
+    final credits = transaction.creditsChange;
+    _expect(transaction, credits == 0, '$name is not zero');
   }
 
   void _sale(Transaction transaction) {
-    final credits = transaction.creditsChange;
-    _expect(credits > 0, 'Sale is not positive');
-    results.goodsSale += credits;
+    results.goodsSale += _positive(transaction, 'Sale');
   }
 
   void _purchase(Transaction transaction) {
-    final credits = transaction.creditsChange;
-    _expect(credits < 0, 'Purchase is not negative');
-    results.goodsPurchase += credits;
+    results.goodsPurchase += _negative(transaction, 'Purchase');
   }
 
   void _fuel(Transaction transaction) {
-    final credits = transaction.creditsChange;
-    _expect(credits < 0, 'Fuel is not negative');
-    results.fuelPurchase += credits;
+    results.fuelPurchase += _negative(transaction, 'Fuel');
   }
 
   void _contractAccept(Transaction transaction) {
-    final credits = transaction.creditsChange;
-    // Some contracts give no initial credits.
-    _expect(credits >= 0, 'Contract is not positive');
-    results.contracts += credits;
+    // All accepts should include a (possibly small) initial payment.
+    results.contracts += _positive(transaction, 'Contract');
   }
 
   void _contractFulfillment(Transaction transaction) {
-    final credits = transaction.creditsChange;
-    _expect(credits > 0, 'Contract is not positive');
-    results.contracts += credits;
+    // Fulfillments should include the full final payment.
+    results.contracts += _positive(transaction, 'Contract');
   }
 
   void _capEx(Transaction transaction) {
-    final credits = transaction.creditsChange;
-    _expect(credits < 0, 'Capital expenditure is negative');
-    results.capEx += credits;
+    results.capEx += _negative(transaction, 'CapEx');
   }
 
   void _assetSale(Transaction transaction) {
-    final credits = transaction.creditsChange;
-    _expect(credits > 0, 'Asset sale is not positive');
-    results.assetSale += credits;
+    results.assetSale += _positive(transaction, 'Asset sale');
   }
 
-  void _processMarketTransaction(Transaction transaction) {
-    switch (transaction.accounting) {
+  void _processMarketTransaction(Transaction t) {
+    switch (t.accounting) {
       case AccountingType.goods:
-        switch (transaction.tradeType) {
+        switch (t.tradeType) {
           case MarketTransactionTypeEnum.PURCHASE:
-            _purchase(transaction);
+            _purchase(t);
           case MarketTransactionTypeEnum.SELL:
-            _sale(transaction);
+            _sale(t);
           case null:
-            _fail('Unknown market transaction type: null');
+            _fail(t, 'Unknown market transaction type: null');
         }
       case AccountingType.fuel:
-        _expect(transaction.isPurchase, 'Fuel is not a purchase');
+        _expect(t, t.isPurchase, 'Fuel is not a purchase');
         // Need to record fuel usage and differentiate between goods and usage.
-        _fuel(transaction);
+        _fuel(t);
       case AccountingType.capital:
-        _capEx(transaction);
+        _capEx(t);
     }
   }
 
-  void _processShipyardTransaction(Transaction transaction) {
-    _expect(
-      transaction.accounting == AccountingType.capital,
-      'Shipyard transaction is not capital',
-    );
-    _expect(transaction.isPurchase, 'Ship is not a purchase');
-    _expect(transaction.creditsChange < 0, 'Ship cost is not negative');
-    _capEx(transaction);
+  void _processShipyardTransaction(Transaction t) {
+    _expectAccounting(t, AccountingType.capital, 'Shipyard transaction');
+    _expect(t, t.isPurchase, 'Ship is not a purchase');
+    _capEx(t);
   }
 
-  void _processScrapShipTransaction(Transaction transaction) {
-    _expect(
-      transaction.accounting == AccountingType.capital,
-      'Shipyard transaction is not capital',
-    );
-    _expect(transaction.isSale, 'Ship is not a purchase');
-    _expect(transaction.creditsChange >= 0, 'Ship value is not positive');
-    _assetSale(transaction);
+  void _processScrapShipTransaction(Transaction t) {
+    _expectAccounting(t, AccountingType.capital, 'Shipyard transaction');
+    _expect(t, t.isSale, 'Ship is not a purchase');
+    _assetSale(t);
   }
 
-  void _processShipModificationTransaction(Transaction transaction) {
-    _expect(
-      transaction.accounting == AccountingType.capital,
-      'Shipyard modification transaction is not capital',
-    );
-    _expect(transaction.isPurchase, 'Ship modification is not a purchase');
-    _expect(
-      transaction.creditsChange < 0,
-      'Ship modification cost is not negative',
-    );
-    _capEx(transaction);
+  void _processShipModificationTransaction(Transaction t) {
+    _expectAccounting(t, AccountingType.capital, 'Shipyard transaction');
+    _expect(t, t.isPurchase, 'Ship modification is not a purchase');
+    _capEx(t);
   }
 
-  void _processContractTransaction(Transaction transaction) {
-    switch (transaction.contractAction) {
+  void _processContractTransaction(Transaction t) {
+    switch (t.contractAction) {
       case ContractAction.accept:
-        _contractAccept(transaction);
+        _contractAccept(t);
       case ContractAction.fulfillment:
-        _contractFulfillment(transaction);
+        _contractFulfillment(t);
       case ContractAction.delivery:
-        _expect(transaction.creditsChange == 0, 'Delivery is not zero');
+        _zero(t, 'Contract delivery');
       case null:
-        _fail('Contract transaction has no action');
+        _fail(t, 'Contract transaction has no action');
     }
   }
 
   void _processConstructionTransaction(Transaction transaction) {
     // Construction deliveries are not a P&L item.
-    _expect(transaction.creditsChange == 0, 'Delivery is not zero');
+    _zero(transaction, 'Construction delivery');
   }
 
   void processTransaction(Transaction transaction) {
