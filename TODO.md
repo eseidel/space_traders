@@ -1198,8 +1198,6 @@ https://github.com/SpaceTradersAPI/api-docs/wiki/Travel-Fuel-and-Time
 
 ### Figure out how to trace execution of the client (and show in systrace).
 
-### Build a profit/loss statement.
-
 ### Build a cash flow statement.
 
 ### This seems wrong?  Is it considering jumping?
@@ -1522,5 +1520,3 @@ to save them in version control).
 Track individual trade goods from when we get them to when we sell them,
 including mining, transfers, buying, selling, refueling, etc.
 Would let us understand exactly what the COGS on individual items was.
-
-### Income Statement should track construction as "extraordinary"
