@@ -6,7 +6,10 @@ import 'package:cli_table/cli_table.dart';
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final report = await computeIncomeStatement(db);
 
-  String c(int credits) => creditsString(credits);
+  Map<String, Object> c(int credits) => {
+    'content': creditsString(credits),
+    'hAlign': HorizontalAlign.right,
+  };
 
   Map<String, Object> subhead(String text) => {
     'colSpan': 2,
@@ -23,12 +26,12 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ['  Asset Sales', c(report.assetSale)],
     ['Total Revenues', c(report.revenue)],
     [subhead('Cost of Goods Sold')],
-    ['  Asset Sale', c(report.assetSale)],
     ['  Goods', c(report.goodsPurchase)],
     ['  Fuel', c(report.fuelPurchase)],
     ['Total Cost of Goods Sold', c(report.costOfGoodsSold)],
     ['Gross Profit', c(report.grossProfit)],
     [subhead('Expenses')],
+    ['  Construction', c(report.constructionMaterials)],
     ['Total Expenses', c(report.expenses)],
     ['Net Income', c(report.netIncome)],
     ['Capital Expenditures', c(report.capEx)],

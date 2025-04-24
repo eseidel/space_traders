@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -7,6 +9,7 @@ class _IncomeStatementBuilderResults {
   int contracts = 0;
 
   int goodsPurchase = 0;
+  int constructionPurchase = 0;
   int fuelPurchase = 0;
 
   int capEx = 0;
@@ -34,6 +37,12 @@ class _IncomeStatementBuilder {
   _IncomeStatementBuilder();
 
   final results = _IncomeStatementBuilderResults();
+
+  // This is a hack because purchase transactions do not include an intent
+  // as to if they will be used for construction or or sales.
+  // We have the same problem with fuel, but no easy hack to recover that
+  // information without recording fuel usage.
+  final Map<TradeSymbol, int> _outstandingConstructionDeliveries = {};
 
   void _fail(Transaction transaction, String message) =>
       throw BadTransaction(message, transaction);
@@ -75,8 +84,42 @@ class _IncomeStatementBuilder {
     results.goodsSale += _positive(transaction, 'Sale');
   }
 
+  int? _outstandingConstructionDelivery(TradeSymbol symbol) {
+    final outstanding = _outstandingConstructionDeliveries[symbol];
+    if (outstanding == null || outstanding == 0) {
+      return null;
+    }
+    return outstanding;
+  }
+
+  ({int goods, int construction}) _dividePurchaseValue(Transaction t) {
+    // Hack to count goods purchases as construction purchases even though
+    // we did not record that information at purchase time.
+    final symbol = t.tradeSymbol!;
+    final outstanding = _outstandingConstructionDelivery(symbol);
+    if (outstanding == null) {
+      return (goods: t.creditsChange, construction: 0);
+    }
+    final quantity = t.quantity;
+    final usedForConstruction = min(quantity, outstanding);
+    final usedForSale = quantity - usedForConstruction;
+    final remainingForConstruction = outstanding - usedForConstruction;
+    if (remainingForConstruction > 0) {
+      _outstandingConstructionDeliveries[symbol] = remainingForConstruction;
+    } else {
+      _outstandingConstructionDeliveries.remove(symbol);
+    }
+    return (
+      goods: usedForSale * t.perUnitPrice,
+      construction: usedForConstruction * t.perUnitPrice,
+    );
+  }
+
   void _purchase(Transaction transaction) {
-    results.goodsPurchase += _negative(transaction, 'Purchase');
+    _negative(transaction, 'Purchase');
+    final record = _dividePurchaseValue(transaction);
+    results.goodsPurchase += record.goods;
+    results.constructionPurchase += record.construction;
   }
 
   void _fuel(Transaction transaction) {
@@ -155,6 +198,11 @@ class _IncomeStatementBuilder {
   void _processConstructionTransaction(Transaction transaction) {
     // Construction deliveries are not a P&L item.
     _zero(transaction, 'Construction delivery');
+    _outstandingConstructionDeliveries.update(
+      transaction.tradeSymbol!,
+      (v) => v + transaction.quantity,
+      ifAbsent: () => transaction.quantity,
+    );
   }
 
   void processTransaction(Transaction transaction) {
@@ -193,6 +241,7 @@ class _IncomeStatementBuilder {
       assetSale: r.assetSale,
       goodsPurchase: -r.goodsPurchase,
       fuelPurchase: -r.fuelPurchase,
+      constructionMaterials: -r.constructionPurchase,
       capEx: -r.capEx,
     );
   }

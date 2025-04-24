@@ -57,6 +57,7 @@ class IncomeStatement {
     required this.contractsRevenue,
     required this.goodsPurchase,
     required this.assetSale,
+    required this.constructionMaterials,
     required this.fuelPurchase,
     required this.capEx,
     required this.numberOfTransactions,
@@ -90,7 +91,10 @@ class IncomeStatement {
   /// Total cost of fuel purchased for consumption or resale
   /// (not currently separated).
   final int fuelPurchase;
-  // final int constructionMaterials;
+
+  /// Total cost of construction materials purchased (one time expense).
+  final int constructionMaterials;
+
   // final int subsidies;
   // final int categorizationPending;
 
@@ -110,7 +114,7 @@ class IncomeStatement {
   int get grossProfit => revenue - costOfGoodsSold;
 
   /// The total expenses for the period.
-  int get expenses => 0;
+  int get expenses => constructionMaterials;
   // constructionMaterials + subsidies + categorizationPending;
 
   /// The net income for the period.

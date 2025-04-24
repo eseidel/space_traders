@@ -46,6 +46,10 @@ IncomeStatement _$IncomeStatementFromJson(
         (v) => (v as num).toInt(),
       ),
       assetSale: $checkedConvert('asset_sale', (v) => (v as num).toInt()),
+      constructionMaterials: $checkedConvert(
+        'construction_materials',
+        (v) => (v as num).toInt(),
+      ),
       fuelPurchase: $checkedConvert('fuel_purchase', (v) => (v as num).toInt()),
       capEx: $checkedConvert('cap_ex', (v) => (v as num).toInt()),
       numberOfTransactions: $checkedConvert(
@@ -60,6 +64,7 @@ IncomeStatement _$IncomeStatementFromJson(
     'contractsRevenue': 'contracts_revenue',
     'goodsPurchase': 'goods_purchase',
     'assetSale': 'asset_sale',
+    'constructionMaterials': 'construction_materials',
     'fuelPurchase': 'fuel_purchase',
     'capEx': 'cap_ex',
     'numberOfTransactions': 'number_of_transactions',
@@ -76,5 +81,6 @@ Map<String, dynamic> _$IncomeStatementToJson(IncomeStatement instance) =>
       'asset_sale': instance.assetSale,
       'goods_purchase': instance.goodsPurchase,
       'fuel_purchase': instance.fuelPurchase,
+      'construction_materials': instance.constructionMaterials,
       'cap_ex': instance.capEx,
     };
