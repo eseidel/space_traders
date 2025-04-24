@@ -1,4 +1,5 @@
 import 'package:cli/caches.dart';
+import 'package:cli/config.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:db/db.dart';
 import 'package:protocol/protocol.dart';
@@ -19,12 +20,14 @@ Future<Response> onRequest(RequestContext context) async {
   final underConstruction = await constructionCache.isUnderConstruction(
     jumpGate.symbol,
   );
+  final config = await Config.fromDb(db);
 
   final status = AgentStatusResponse(
     name: agent.symbol,
     faction: agent.startingFaction.toString(),
     numberOfShips: ships.length,
     cash: agent.credits,
+    gamePhase: config.gamePhase,
     totalAssets: 0,
     gateOpen: underConstruction == false,
   );

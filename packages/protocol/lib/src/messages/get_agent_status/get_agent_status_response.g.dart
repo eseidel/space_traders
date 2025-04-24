@@ -26,6 +26,10 @@ AgentStatusResponse _$AgentStatusResponseFromJson(Map<String, dynamic> json) =>
             (v) => (v as num).toInt(),
           ),
           gateOpen: $checkedConvert('gate_open', (v) => v as bool),
+          gamePhase: $checkedConvert(
+            'game_phase',
+            (v) => $enumDecode(_$GamePhaseEnumMap, v),
+          ),
         );
         return val;
       },
@@ -33,6 +37,7 @@ AgentStatusResponse _$AgentStatusResponseFromJson(Map<String, dynamic> json) =>
         'numberOfShips': 'number_of_ships',
         'totalAssets': 'total_assets',
         'gateOpen': 'gate_open',
+        'gamePhase': 'game_phase',
       },
     );
 
@@ -45,4 +50,12 @@ Map<String, dynamic> _$AgentStatusResponseToJson(
   'cash': instance.cash,
   'total_assets': instance.totalAssets,
   'gate_open': instance.gateOpen,
+  'game_phase': instance.gamePhase.toJson(),
+};
+
+const _$GamePhaseEnumMap = {
+  GamePhase.bootstrap: 'bootstrap',
+  GamePhase.construction: 'construction',
+  GamePhase.exploration: 'exploration',
+  GamePhase.selloff: 'selloff',
 };

@@ -29,6 +29,12 @@ final GoRouter router = GoRouter(
             return const FleetInventoryScreen();
           },
         ),
+        GoRoute(
+          path: 'accounting/transactions/recent',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TransactionsScreen();
+          },
+        ),
       ],
     ),
   ],

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:types/types.dart';
 
 part 'get_agent_status_response.g.dart';
 
@@ -11,6 +12,7 @@ class AgentStatusResponse {
     required this.cash,
     required this.totalAssets,
     required this.gateOpen,
+    required this.gamePhase,
   });
 
   factory AgentStatusResponse.fromJson(Map<String, dynamic> json) =>
@@ -21,6 +23,7 @@ class AgentStatusResponse {
   final int cash;
   final int totalAssets;
   final bool gateOpen;
+  final GamePhase gamePhase;
 
   Map<String, dynamic> toJson() => _$AgentStatusResponseToJson(this);
 }

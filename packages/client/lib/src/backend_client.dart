@@ -78,4 +78,10 @@ class BackendClient {
     final json = await _get(uri);
     return FleetShipsResponse.fromJson(json);
   }
+
+  Future<GetTransactionsResponse> getRecentTransactions() async {
+    final uri = _api('accounting/ledger/recent');
+    final json = await _get(uri);
+    return GetTransactionsResponse.fromJson(json);
+  }
 }

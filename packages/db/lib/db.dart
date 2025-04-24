@@ -447,12 +447,25 @@ class Database {
   }
 
   /// Get transactions after a given timestamp.
+  /// Returned in ascending timestamp order.
   Future<Iterable<Transaction>> transactionsAfter(DateTime timestamp) async {
     final result = await execute(
       Query(
         'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
         'ORDER BY timestamp',
         parameters: {'timestamp': timestamp},
+      ),
+    );
+    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
+  }
+
+  /// Get the N most recent transactions.
+  /// Returned in descending timestamp order.
+  Future<Iterable<Transaction>> recentTransactions({required int count}) async {
+    final result = await execute(
+      Query(
+        'SELECT * FROM transaction_ ORDER BY timestamp DESC LIMIT @count',
+        parameters: {'count': count},
       ),
     );
     return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
