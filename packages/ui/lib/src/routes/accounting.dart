@@ -40,9 +40,12 @@ class BalanceSheetView extends StatelessWidget {
         const Text('Balance Sheet'),
         Text('Cash: ${c(b.cash)}'),
         Text('Inventory: ${c(b.inventory)}'),
-        Text('Ships: ${c(b.ships)}'),
+        Text('Total Current Assets: ${c(b.currentAssets)}'),
+        Text('Equiptment: ${c(b.ships)}'),
+        Text('Total Non-Current Assets: ${c(b.nonCurrentAssets)}'),
         Text('Total Assets: ${c(b.totalAssets)}'),
-        Text('Liabilities: ${c(b.totalLiabilities)}'),
+        Text('Loans: ${c(b.loans)}'),
+        Text('Total Liabilities: ${c(b.totalLiabilities)}'),
       ],
     );
   }
@@ -60,11 +63,23 @@ class IncomeStatementView extends StatelessWidget {
     return Column(
       children: [
         const Text('Income Statement'),
-        Text('Revenue: ${c(i.revenue)}'),
-        Text('COGS: ${c(i.costOfGoodsSold)}'),
+        Text('Transactions: ${i.numberOfTransactions}'),
+        Text('Start: ${i.start}'),
+        Text('End: ${i.end}'),
+        Text('Duration: ${approximateDuration(i.duration)}'),
+        Text('Sales: ${c(i.goodsRevenue)}'),
+        Text('Contracts: ${c(i.contractsRevenue)}'),
+        Text('Asset Sales: ${c(i.assetSale)}'),
+        Text('Total Revenues: ${c(i.revenue)}'),
+        Text('Goods: ${c(i.goodsPurchase)}'),
+        Text('Fuel: ${c(i.fuelPurchase)}'),
+        Text('Total Cost of Goods Sold: ${c(i.costOfGoodsSold)}'),
+        Text('COGS Ratio: ${i.cogsRatio.toStringAsFixed(1)}%'),
         Text('Gross Profit: ${c(i.grossProfit)}'),
-        Text('Expenses: ${c(i.expenses)}'),
+        Text('Construction: ${c(i.constructionMaterials)}'),
+        Text('Total Expenses: ${c(i.expenses)}'),
         Text('Net Income: ${c(i.netIncome)}'),
+        Text('Net Income per second: ${c(i.netIncomePerSecond)}'),
       ],
     );
   }

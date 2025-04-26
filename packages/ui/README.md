@@ -33,6 +33,8 @@ Problems I'm solving
 * I want to understand what's going on in the agent.
 
 Questions
+* How much of our request limit are we currently using?
+* What is our c/s over the last hour?
 * Where are the credits going?
 * How much have I spent to build the gate?
 * How much has been spent on X, Y, Z?

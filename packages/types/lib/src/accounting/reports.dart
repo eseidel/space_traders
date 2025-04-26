@@ -33,8 +33,14 @@ class BalanceSheet {
   /// Total value of contract loans (until forgiven on delivery).
   final int loans;
 
+  /// The total value of the agent's current assets.
+  int get currentAssets => cash + inventory;
+
+  /// The total value of the agent's non-current assets.
+  int get nonCurrentAssets => ships;
+
   /// The total value of the agent's assets.
-  int get totalAssets => cash + inventory + ships;
+  int get totalAssets => currentAssets + nonCurrentAssets;
 
   /// The total value of the agent's liabilities.
   int get totalLiabilities => loans;
