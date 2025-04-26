@@ -91,4 +91,10 @@ class BackendClient {
     final json = await _get(uri, args: args);
     return SystemStats.fromJson(json);
   }
+
+  Future<GetMapDataResponse> getMapData() async {
+    final uri = _api('explore/map_data');
+    final json = await _get(uri);
+    return GetMapDataResponse.fromJson(json);
+  }
 }

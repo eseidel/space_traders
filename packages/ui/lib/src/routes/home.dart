@@ -47,6 +47,10 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => context.go('/system_stats'),
               child: const Text('System Stats'),
             ),
+            ElevatedButton(
+              onPressed: () => context.go('/explore/map'),
+              child: const Text('Map'),
+            ),
           ],
         ),
       ),
