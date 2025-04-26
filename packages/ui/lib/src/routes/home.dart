@@ -43,6 +43,10 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => context.go('/accounting/transactions/recent'),
               child: const Text('Recent Transactions'),
             ),
+            ElevatedButton(
+              onPressed: () => context.go('/system_stats'),
+              child: const Text('System Stats'),
+            ),
           ],
         ),
       ),

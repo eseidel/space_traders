@@ -35,6 +35,12 @@ final GoRouter router = GoRouter(
             return const TransactionsScreen();
           },
         ),
+        GoRoute(
+          path: 'system_stats',
+          builder: (BuildContext context, GoRouterState state) {
+            return const SystemStatsScreen();
+          },
+        ),
       ],
     ),
   ],
