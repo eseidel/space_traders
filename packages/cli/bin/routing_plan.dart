@@ -50,6 +50,30 @@ void main(List<String> args) async {
   );
 }
 
+WaypointSymbol waypointFromArg(
+  SystemsCache systems,
+  String arg, {
+  required String name,
+}) {
+  try {
+    return WaypointSymbol.fromString(arg);
+  } on FormatException {
+    try {
+      final system = SystemSymbol.fromString(arg);
+      final jumpGate = systems.jumpGateWaypointForSystem(system);
+      if (jumpGate == null) {
+        throw Exception('No jump gate for system $system');
+      }
+      return jumpGate.symbol;
+    } on FormatException {
+      throw FormatException(
+        'Invalid $name: $arg. '
+        'Expected a waypoint symbol or system symbol.',
+      );
+    }
+  }
+}
+
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
   final args = argResults.rest;
@@ -58,10 +82,10 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     return;
   }
 
-  final startSymbol = args[0];
-  final endSymbol = args[1];
-
   final systemsCache = SystemsCache.load(fs);
+  final start = waypointFromArg(systemsCache, args[0], name: 'start');
+  final end = waypointFromArg(systemsCache, args[1], name: 'end');
+
   final bool Function(WaypointSymbol _) sellsFuel;
   if (argResults['fuel'] == 'true') {
     sellsFuel = (_) => true;
@@ -84,8 +108,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipyardShips = ShipyardShipCache.load(fs);
   final ship = shipyardShips[shipType]!;
 
-  final start = WaypointSymbol.fromString(startSymbol);
-  final end = WaypointSymbol.fromString(endSymbol);
   final routeStart = DateTime.timestamp();
   final plan = routePlanner.planRoute(ship.shipSpec, start: start, end: end);
   final routeEnd = DateTime.timestamp();

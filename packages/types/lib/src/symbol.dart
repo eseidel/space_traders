@@ -18,7 +18,7 @@ class WaypointSymbol {
   /// Create a WaypointSymbol from a string.
   factory WaypointSymbol.fromString(String symbol) {
     if (_countHyphens(symbol) != 2) {
-      throw ArgumentError('Invalid waypoint symbol: $symbol');
+      throw FormatException('Invalid waypoint symbol: $symbol');
     }
     final systemSymbol = SystemSymbol.fromString(
       symbol.substring(0, symbol.lastIndexOf('-')),
@@ -102,7 +102,7 @@ class SystemSymbol {
   /// Create a SystemSymbol from a string.
   factory SystemSymbol.fromString(String symbol) {
     if (_countHyphens(symbol) != 1) {
-      throw ArgumentError('Invalid system symbol: $symbol');
+      throw FormatException('Invalid system symbol: $symbol');
     }
     return SystemSymbol._(symbol);
   }
@@ -169,7 +169,7 @@ class ShipSymbol extends Equatable implements Comparable<ShipSymbol> {
     // Hyphens are allowed in the agent name, but the last part is always the
     // number, there must be at least one hyphen.
     if (parts.length < 2) {
-      throw ArgumentError('Invalid ship symbol: $symbol');
+      throw FormatException('Invalid ship symbol: $symbol');
     }
     final nameParts = parts.sublist(0, parts.length - 1);
     return nameParts.join('-');
