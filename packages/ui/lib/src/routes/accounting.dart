@@ -41,7 +41,7 @@ class BalanceSheetView extends StatelessWidget {
         Text('Cash: ${c(b.cash)}'),
         Text('Inventory: ${c(b.inventory)}'),
         Text('Total Current Assets: ${c(b.currentAssets)}'),
-        Text('Equiptment: ${c(b.ships)}'),
+        Text('Equipment: ${c(b.ships)}'),
         Text('Total Non-Current Assets: ${c(b.nonCurrentAssets)}'),
         Text('Total Assets: ${c(b.totalAssets)}'),
         Text('Loans: ${c(b.loans)}'),
