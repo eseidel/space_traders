@@ -1,57 +1,11 @@
 import 'package:cli/caches.dart';
-import 'package:cli/cli.dart';
+import 'package:dart_frog/dart_frog.dart';
+import 'package:db/db.dart';
+import 'package:protocol/protocol.dart';
+import 'package:server/read_async.dart';
+import 'package:types/types.dart';
 
-class SystemStats {
-  SystemStats({
-    required this.startSystem,
-    required this.totalSystems,
-    required this.totalWaypoints,
-    required this.totalJumpgates,
-    required this.reachableSystems,
-    required this.reachableWaypoints,
-    required this.reachableMarkets,
-    required this.reachableShipyards,
-    required this.reachableAsteroids,
-    required this.reachableJumpGates,
-    required this.chartedWaypoints,
-    required this.chartedAsteroids,
-    required this.chartedJumpGates,
-    required this.cachedJumpGates,
-  });
-
-  final SystemSymbol startSystem;
-
-  // Total values we can get from the systems cache.
-  final int totalSystems;
-  final int totalWaypoints;
-  final int totalJumpgates;
-
-  /// Counts we have from our own data.
-  final int reachableSystems;
-  final int reachableWaypoints;
-  final int reachableMarkets;
-  final int reachableShipyards;
-  final int reachableAsteroids;
-  final int reachableJumpGates;
-
-  /// Charted counts.
-  final int chartedWaypoints;
-  final int chartedAsteroids;
-  final int chartedJumpGates;
-
-  /// Cached counts (similar to charted)
-  final int cachedJumpGates;
-
-  double get asteroidChartPercent => chartedAsteroids / reachableAsteroids;
-  double get nonAsteroidChartPercent =>
-      (chartedWaypoints - chartedAsteroids) /
-      (reachableWaypoints - reachableAsteroids);
-
-  double get reachableSystemPercent => reachableSystems / totalSystems;
-  double get reachableWaypointPercent => reachableWaypoints / totalWaypoints;
-  double get reachableJumpGatePercent => reachableJumpGates / totalJumpgates;
-}
-
+/// Compute system stats from our caches starting from a given system.
 Future<SystemStats> computeSystemStats({
   required FileSystem fs,
   required Database db,
@@ -152,6 +106,7 @@ Future<SystemStats> computeSystemStats({
     totalJumpgates: totalJumpgates,
     totalSystems: totalSystems,
     totalWaypoints: totalWaypoints,
+    reachableSystems: reachableSystems.length,
     reachableWaypoints: waypointCount,
     reachableMarkets: markets,
     reachableShipyards: shipyards,
@@ -161,43 +116,19 @@ Future<SystemStats> computeSystemStats({
     chartedWaypoints: chartedWaypoints,
     chartedAsteroids: chartedAsteroids,
     chartedJumpGates: chartedJumpGates,
-    reachableSystems: reachableSystems.length,
   );
 }
 
-String statsToString(SystemStats stats) {
-  // Save ourselves some typing.
-  final s = stats;
-  String p(double d) => '${(d * 100).round()}%';
+Future<Response> onRequest(RequestContext context) async {
+  final db = await context.readAsync<Database>();
+  final fs = context.read<FileSystem>();
 
-  return '''
-Starting from ${s.startSystem}, known reachable:
-${s.reachableSystems} systems (${p(s.reachableSystemPercent)} of ${s.totalSystems})
-${s.reachableWaypoints} waypoints (${p(s.reachableWaypointPercent)} of ${s.totalWaypoints})
- ${s.chartedWaypoints} charted non-asteroid (${p(s.nonAsteroidChartPercent)})
- ${s.chartedAsteroids} charted asteroid (${p(s.asteroidChartPercent)})
-${s.reachableMarkets} markets
-${s.reachableShipyards} shipyards
-${s.reachableJumpGates} jump gates (${p(s.reachableJumpGatePercent)} of ${s.totalJumpgates})
- ${s.cachedJumpGates} cached
- ${s.chartedJumpGates} charted
-''';
-}
-
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final startSystemSymbol = await startSystemFromArg(
-    db,
-    argResults.rest.firstOrNull,
-  );
-
+  final agentCache = await AgentCache.load(db);
   final stats = await computeSystemStats(
     fs: fs,
     db: db,
-    startSystemSymbol: startSystemSymbol,
+    startSystemSymbol: agentCache!.headquartersSymbol.system,
   );
-  logger.info(statsToString(stats));
-}
 
-void main(List<String> args) async {
-  await runOffline(args, command);
+  return Response.json(body: stats.toJson());
 }

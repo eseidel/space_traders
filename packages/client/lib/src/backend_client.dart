@@ -84,4 +84,11 @@ class BackendClient {
     final json = await _get(uri);
     return GetTransactionsResponse.fromJson(json);
   }
+
+  Future<SystemStats> getSystemStats({SystemSymbol? startSystem}) async {
+    final uri = _api('explore/system_stats');
+    final args = GetSystemStatsRequest(startSystem: startSystem);
+    final json = await _get(uri, args: args);
+    return SystemStats.fromJson(json);
+  }
 }

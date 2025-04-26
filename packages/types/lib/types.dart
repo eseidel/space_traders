@@ -16,6 +16,7 @@ export 'src/explore/jump_gate.dart';
 export 'src/explore/position.dart';
 export 'src/explore/route.dart';
 export 'src/explore/system.dart';
+export 'src/explore/system_stats.dart';
 export 'src/extraction.dart';
 export 'src/game_phase.dart';
 export 'src/mount.dart';
