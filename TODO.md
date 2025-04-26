@@ -1520,3 +1520,10 @@ to save them in version control).
 Track individual trade goods from when we get them to when we sell them,
 including mining, transfers, buying, selling, refueling, etc.
 Would let us understand exactly what the COGS on individual items was.
+
+### Charting will stop if we don't have enough probes.
+
+Ship buying got blocked because I don't know where EXPLORER is.
+But we seem to have enough systems needing watching that probes are all
+assigned to systems.  So no probe is able to explore jumpgates to find
+the EXPLORER and we deadlock.
