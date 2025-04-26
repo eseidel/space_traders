@@ -53,6 +53,9 @@ class Config {
   /// planning (assigning ships to squads, planning mounts, etc.)
   final int centralPlanningInterval = 100;
 
+  /// Hack: Force clearing of the routing caches every 30 mins.
+  final Duration routingCacheMaxAge = const Duration(minutes: 30);
+
   /// Used to slow down charters and have them spend less money on jumps.
   bool chartAsteroidsByDefault = false;
 

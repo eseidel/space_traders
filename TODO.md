@@ -1527,3 +1527,5 @@ Ship buying got blocked because I don't know where EXPLORER is.
 But we seem to have enough systems needing watching that probes are all
 assigned to systems.  So no probe is able to explore jumpgates to find
 the EXPLORER and we deadlock.
+
+ACTUALLY, it seems like it was the reachability cache being stale?

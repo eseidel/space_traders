@@ -39,6 +39,8 @@ class CentralCommand {
 
   bool _isGateComplete = false;
 
+  DateTime? _lastRoutingCacheUpdate;
+
   /// Per-system price age data used by system watchers.
   final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
   final Map<SystemSymbol, bool> _chartAsteroidsInSystem = {};
@@ -643,6 +645,23 @@ class CentralCommand {
     return GamePhase.bootstrap;
   }
 
+  /// This is a terrible hack.  We should instead invalidate routing caches
+  /// every time we add a jump gate.
+  Future<void> _updateRoutingCachesIfNeeded(Caches caches) async {
+    final now = DateTime.timestamp();
+    final lastUpdate = _lastRoutingCacheUpdate;
+    // If this is our first run, just set the last update time and return.
+    if (lastUpdate == null) {
+      _lastRoutingCacheUpdate = now;
+      return;
+    }
+    if (now.difference(lastUpdate) > config.routingCacheMaxAge) {
+      _lastRoutingCacheUpdate = now;
+      return caches.updateRoutingCaches();
+    }
+    return Future.value();
+  }
+
   /// Give central planning a chance to advance.
   /// Currently only run once every N loops (currently 50).
   Future<void> advanceCentralPlanning(
@@ -650,7 +669,8 @@ class CentralCommand {
     Api api,
     Caches caches,
   ) async {
-    // await caches.updateRoutingCaches();
+    // TODO(eseidel): Add proper routing cache invalidation and remove this.
+    await _updateRoutingCachesIfNeeded(caches);
 
     final ships = await ShipSnapshot.load(db);
     _isGateComplete =
