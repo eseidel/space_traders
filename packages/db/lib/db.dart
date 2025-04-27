@@ -738,7 +738,7 @@ class Database {
   }) async {
     final result = await queryOne(
       Query(
-        'SELECT value FROM static_data_ WHERE type = @type AND key = @key',
+        'SELECT json FROM static_data_ WHERE type = @type AND key = @key',
         parameters: {'type': type.toString(), 'key': key},
       ),
       (map) => map['json'] as Map<String, dynamic>,
@@ -751,7 +751,7 @@ class Database {
   }) async {
     final result = await queryMany(
       Query(
-        'SELECT key, json FROM static_data_ WHERE type = @type',
+        'SELECT json FROM static_data_ WHERE type = @type',
         parameters: {'type': type.toString()},
       ),
       (map) => map['json'] as Map<String, dynamic>,
@@ -762,14 +762,22 @@ class Database {
   Future<void> setInStaticCache({
     required Type type,
     required String key,
-    required Map<String, dynamic> value,
+    required Map<String, dynamic> json,
+    // Reset is intended to store which reset the data was created in.
+    // But we've not wired it up yet.
+    String reset = '1',
   }) async {
     await execute(
       Query(
-        'INSERT INTO static_data_ (type, key, json) '
-        'VALUES (@type, @key, @json) '
+        'INSERT INTO static_data_ (type, key, reset, json) '
+        'VALUES (@type, @key, @reset, @json) '
         'ON CONFLICT (type, key) DO UPDATE SET json = EXCLUDED.json',
-        parameters: {'type': type.toString(), 'key': key, 'json': value},
+        parameters: {
+          'type': type.toString(),
+          'key': key,
+          'json': json,
+          'reset': reset,
+        },
       ),
     );
   }

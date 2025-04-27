@@ -107,7 +107,7 @@ abstract class StaticCache<Symbol extends Object, Record extends Object> {
     await _db.setInStaticCache(
       type: Record,
       key: keyFor(value).toString(),
-      value: _traits.toJson(value),
+      json: _traits.toJson(value),
     );
   }
 
