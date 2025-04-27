@@ -1,6 +1,8 @@
 // Cache for server static data that does not typically change
 // between resets and thus can be checked into source control.
 
+import 'dart:convert';
+
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
@@ -19,7 +21,17 @@ abstract class Traits<Symbol extends Object, Record extends Object> {
   /// Copy and normalize the record for comparison and storage.
   /// Subclasses should override this method to provide nomalization.
   /// The default implementation simply converts the record to JSON and back.
-  Record copyAndNormalize(Record record) => fromJson(toJson(record));
+  Record copyAndNormalize(Record record) => deepCopy(record);
+
+  /// Create a deep copy of the record.
+  Record deepCopy(Record record) {
+    // OpenAPI doesn't properly recurse toJson, so we do an explicit jsonEncode
+    // and jsonDecode to force everything to be converted.
+    // TODO(eseidel): We could do this *only* for OpenAPI records.
+    return fromJson(
+      jsonDecode(jsonEncode(toJson(record))) as Map<String, dynamic>,
+    );
+  }
 
   /// Compare two records.
   int compare(Record a, Record b);
@@ -111,10 +123,11 @@ abstract class StaticCache<Symbol extends Object, Record extends Object> {
 
   /// Adds a record to the cache.
   Future<void> add(Record value) async {
+    final json = _traits.toJson(_traits.copyAndNormalize(value));
     await _db.upsertInStaticCache(
       type: Record,
       key: keyFor(value).toString(),
-      json: _traits.toJson(value),
+      json: json,
     );
   }
 
@@ -205,7 +218,7 @@ class _ShipyardShipTraits extends Traits<ShipType, ShipyardShip> {
 
   @override
   ShipyardShip copyAndNormalize(ShipyardShip record) {
-    return fromJson(toJson(record))
+    return deepCopy(record)
       ..purchasePrice = 0
       ..activity = null
       ..supply = SupplyLevel.ABUNDANT
@@ -246,7 +259,7 @@ class _ShipEngineTraits extends Traits<ShipEngineSymbolEnum, ShipEngine> {
 
   @override
   ShipEngine copyAndNormalize(ShipEngine record) =>
-      fromJson(toJson(record))..condition = 1.0;
+      deepCopy(record)..condition = 1.0;
 
   @override
   int compare(ShipEngine a, ShipEngine b) =>
@@ -285,7 +298,7 @@ class _ShipReactorTraits extends Traits<ShipReactorSymbolEnum, ShipReactor> {
 
   @override
   ShipReactor copyAndNormalize(ShipReactor record) =>
-      fromJson(toJson(record))..condition = 1.0;
+      deepCopy(record)..condition = 1.0;
 
   @override
   int compare(ShipReactor a, ShipReactor b) =>
