@@ -365,8 +365,6 @@ class ApiClient {
           return GetSupplyChain200Response.fromJson(value);
         case 'GetSupplyChain200ResponseData':
           return GetSupplyChain200ResponseData.fromJson(value);
-        case 'GetSupplyChain200ResponseDataExportToImportMap':
-          return GetSupplyChain200ResponseDataExportToImportMap.fromJson(value);
         case 'GetSystem200Response':
           return GetSystem200Response.fromJson(value);
         case 'GetSystemWaypoints200Response':

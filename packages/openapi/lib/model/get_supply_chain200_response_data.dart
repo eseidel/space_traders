@@ -13,16 +13,16 @@ part of openapi;
 class GetSupplyChain200ResponseData {
   /// Returns a new [GetSupplyChain200ResponseData] instance.
   GetSupplyChain200ResponseData({
-    required this.exportToImportMap,
+    this.exportToImportMap = const {},
   });
 
-  GetSupplyChain200ResponseDataExportToImportMap exportToImportMap;
+  Map<String, List<String>> exportToImportMap;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GetSupplyChain200ResponseData &&
-          other.exportToImportMap == exportToImportMap;
+          _deepEquality.equals(other.exportToImportMap, exportToImportMap);
 
   @override
   int get hashCode =>
@@ -60,9 +60,9 @@ class GetSupplyChain200ResponseData {
       }());
 
       return GetSupplyChain200ResponseData(
-        exportToImportMap:
-            GetSupplyChain200ResponseDataExportToImportMap.fromJson(
-                json[r'exportToImportMap'])!,
+        exportToImportMap: json[r'exportToImportMap'] == null
+            ? const {}
+            : mapCastOfType<String, List>(json, r'exportToImportMap'),
       );
     }
     return null;

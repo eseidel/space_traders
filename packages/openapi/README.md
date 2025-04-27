@@ -211,7 +211,6 @@ Class | Method | HTTP request | Description
  - [GetStatus200ResponseStats](doc//GetStatus200ResponseStats.md)
  - [GetSupplyChain200Response](doc//GetSupplyChain200Response.md)
  - [GetSupplyChain200ResponseData](doc//GetSupplyChain200ResponseData.md)
- - [GetSupplyChain200ResponseDataExportToImportMap](doc//GetSupplyChain200ResponseDataExportToImportMap.md)
  - [GetSystem200Response](doc//GetSystem200Response.md)
  - [GetSystemWaypoints200Response](doc//GetSystemWaypoints200Response.md)
  - [GetSystems200Response](doc//GetSystems200Response.md)

@@ -75,7 +75,6 @@ doc/GetStatus200ResponseServerResets.md
 doc/GetStatus200ResponseStats.md
 doc/GetSupplyChain200Response.md
 doc/GetSupplyChain200ResponseData.md
-doc/GetSupplyChain200ResponseDataExportToImportMap.md
 doc/GetSystem200Response.md
 doc/GetSystemWaypoints200Response.md
 doc/GetSystems200Response.md
@@ -285,7 +284,6 @@ lib/model/get_status200_response_server_resets.dart
 lib/model/get_status200_response_stats.dart
 lib/model/get_supply_chain200_response.dart
 lib/model/get_supply_chain200_response_data.dart
-lib/model/get_supply_chain200_response_data_export_to_import_map.dart
 lib/model/get_system200_response.dart
 lib/model/get_system_waypoints200_response.dart
 lib/model/get_systems200_response.dart
@@ -480,7 +478,6 @@ test/get_status200_response_links_inner_test.dart
 test/get_status200_response_server_resets_test.dart
 test/get_status200_response_stats_test.dart
 test/get_status200_response_test.dart
-test/get_supply_chain200_response_data_export_to_import_map_test.dart
 test/get_supply_chain200_response_data_test.dart
 test/get_supply_chain200_response_test.dart
 test/get_system200_response_test.dart
