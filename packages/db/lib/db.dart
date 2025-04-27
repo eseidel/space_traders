@@ -738,7 +738,7 @@ class Database {
   }) async {
     final result = await queryOne(
       Query(
-        'SELECT value FROM static_cache_ WHERE type = @type AND key = @key',
+        'SELECT value FROM static_data_ WHERE type = @type AND key = @key',
         parameters: {'type': type.toString(), 'key': key},
       ),
       (map) => map['json'] as Map<String, dynamic>,
@@ -751,7 +751,7 @@ class Database {
   }) async {
     final result = await queryMany(
       Query(
-        'SELECT key, json FROM static_cache_ WHERE type = @type',
+        'SELECT key, json FROM static_data_ WHERE type = @type',
         parameters: {'type': type.toString()},
       ),
       (map) => map['json'] as Map<String, dynamic>,
@@ -766,7 +766,7 @@ class Database {
   }) async {
     await execute(
       Query(
-        'INSERT INTO static_cache_ (type, key, json) '
+        'INSERT INTO static_data_ (type, key, json) '
         'VALUES (@type, @key, @json) '
         'ON CONFLICT (type, key) DO UPDATE SET json = EXCLUDED.json',
         parameters: {'type': type.toString(), 'key': key, 'json': value},

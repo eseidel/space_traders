@@ -1,11 +1,11 @@
 -- static data from the server
 CREATE TABLE IF NOT EXISTS "static_data_" (
     -- the type of static data
-    type TEXT NOT NULL,
+    "type" text NOT NULL,
     -- the reset in which this static data was last updated
-    reset TEXT NOT NULL,
+    "reset" text NOT NULL,
     -- the key of the static data (contents differ based on the type)
-    key TEXT NOT NULL PRIMARY KEY,
+    "key" text NOT NULL PRIMARY KEY,
     -- the value of the static data
-    json JSON NOT NULL,
+    "json" json NOT NULL
 );
