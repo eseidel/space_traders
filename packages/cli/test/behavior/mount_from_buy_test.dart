@@ -248,6 +248,11 @@ void main() {
       () => db.medianMarketPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
 
+    registerFallbackValue(ship.engine);
+    when(() => caches.static.engines.add(any())).thenAnswer((_) async {});
+    registerFallbackValue(ship.reactor);
+    when(() => caches.static.reactors.add(any())).thenAnswer((_) async {});
+
     final logger = _MockLogger();
     expect(
       await runWithLogger(

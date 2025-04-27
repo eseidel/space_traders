@@ -39,6 +39,13 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
+void _addMocks<Symbol extends Object, Record extends Object>(
+  StaticCache<Symbol, Record> cache,
+) {
+  when(() => cache.addAll(any())).thenAnswer((_) async {});
+  // Can't mock add() without also registering a fallback value for the type.
+}
+
 Caches mockCaches() {
   final mounts = _MockShipMountCache();
   final modules = _MockShipModuleCache();
@@ -49,7 +56,17 @@ Caches mockCaches() {
   final tradeGoods = _MockTradeGoodCache();
   final exports = _MockTradeExportCache();
   final events = _MockEventCache();
-  final staticCaches = StaticCaches(
+  _addMocks(mounts);
+  _addMocks(modules);
+  _addMocks(shipyardShips);
+  _addMocks(engines);
+  _addMocks(reactors);
+  _addMocks(waypointTraits);
+  _addMocks(tradeGoods);
+  _addMocks(exports);
+  _addMocks(events);
+
+  final staticCaches = StaticCaches.test(
     mounts: mounts,
     modules: modules,
     shipyardShips: shipyardShips,

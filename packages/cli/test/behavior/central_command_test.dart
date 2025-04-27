@@ -35,7 +35,7 @@ class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
+class _MockShipyardShipSnapshot extends Mock implements ShipyardShipSnapshot {}
 
 class _MockShipyardListingSnapshot extends Mock
     implements ShipyardListingSnapshot {}
@@ -572,6 +572,10 @@ void main() {
       () => db.medianMarketPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
 
+    when(
+      caches.static.shipyardShips.snapshot,
+    ).thenAnswer((_) async => _MockShipyardShipSnapshot());
+
     final logger = _MockLogger();
     await runWithLogger(
       logger,
@@ -712,7 +716,7 @@ void main() {
   });
 
   test('shipToBuyFromPlan', () async {
-    final shipyardShips = _MockShipyardShipCache();
+    final shipyardShips = _MockShipyardShipSnapshot();
     final shipyardListingSnapshot = _MockShipyardListingSnapshot();
     final shipCache = _MockShipCache();
     when(

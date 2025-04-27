@@ -17,7 +17,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     'Loaded ${shipyardListings.count} listings from '
     '${shipyardListings.waypointCount} waypoints.',
   );
-  final shipyardShips = ShipyardShipCache.load(fs);
+  final shipyardShips = ShipyardShipCache(db);
 
   final table = Table(
     header: ['Type', '# Loc', 'Med. Price', 'Cargo', 'Fuel', 'Speed', 'Mounts'],
@@ -36,7 +36,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     }
     final medianPrice = shipyardPrices.medianPurchasePrice(shipType);
     final name = shipType.value.substring('SHIP_'.length);
-    final ship = shipyardShips[shipType];
+    final ship = await shipyardShips.get(shipType);
     table.add([
       name,
       r(listings.length),

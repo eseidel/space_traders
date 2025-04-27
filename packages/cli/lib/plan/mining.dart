@@ -108,14 +108,14 @@ class ExtractionSquad {
 /// This is used when you have a template you want to know how many surveys
 /// you can expect to complete with, rather than a specific ship.
 int surveysExpectedPerSurveyWithMounts(
-  ShipMountCache mountCache,
+  ShipMountSnapshot mountSnapshot,
   MountSymbolSet mounts,
 ) {
   return mounts.fold(0, (sum, mountSymbol) {
     if (!kSurveyMountSymbols.contains(mountSymbol)) {
       return sum;
     }
-    return sum + mountCache[mountSymbol]!.strength!;
+    return sum + mountSnapshot[mountSymbol]!.strength!;
   });
 }
 

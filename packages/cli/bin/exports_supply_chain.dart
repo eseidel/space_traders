@@ -84,7 +84,7 @@ class DescribingVisitor extends SupplyLinkVisitor {
 }
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final exports = TradeExportCache.load(fs);
+  final exports = await TradeExportCache(db).snapshot();
   final systems = SystemsCache.load(fs);
   final marketListings = await MarketListingSnapshot.load(db);
   final charting = await ChartingSnapshot.load(db);

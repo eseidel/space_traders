@@ -1,112 +1,130 @@
 // Cache for server static data that does not typically change
 // between resets and thus can be checked into source control.
 
-import 'dart:convert';
-
-import 'package:cli/cache/json_list_store.dart';
-import 'package:cli/caches.dart';
-import 'package:cli/logic/compare.dart';
-import 'package:collection/collection.dart';
+import 'package:db/db.dart';
+import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-// Not using named parameters to save repetition at call sites.
-List<Value> _loadJsonNullable<Value>(
-  FileSystem fs,
-  String path,
-  // This is nullable because OpenApi's fromJson are nullable.
-  Value? Function(dynamic) valueFromJson,
-) => _loadJson(fs, path, (json) => valueFromJson(json)!);
+/// A type alias for a JSON object.
+typedef Json = Map<String, dynamic>;
 
-List<Value> _loadJson<Value>(
-  FileSystem fs,
-  String path,
-  // This is nullable because OpenApi's fromJson are nullable.
-  Value Function(dynamic) valueFromJson,
-) {
-  return JsonListStore.maybeLoadRecords(
-        fs,
-        path,
-        (Map<String, dynamic> j) => valueFromJson(j),
-      ) ??
-      [];
-}
-
-/// A cache of static data that does not typically change between resets and
-/// thus can be checked into source control.
-abstract class StaticCache<Symbol extends Object, Record extends Object>
-    extends JsonListStore<Record> {
-  /// Creates a new static cache.
-  StaticCache(super.records, {required super.fs, required super.path});
+/// Class that defines the traits of a record in a static cache.
+abstract class Traits<Symbol extends Object, Record extends Object> {
+  /// Creates a new traits.
+  const Traits();
 
   /// The key for the given record.
   Symbol keyFor(Record record);
 
   /// Copy and normalize the record for comparison and storage.
-  Record copyAndNormalize(Record record);
+  /// Subclasses should override this method to provide nomalization.
+  /// The default implementation simply converts the record to JSON and back.
+  Record copyAndNormalize(Record record) => fromJson(toJson(record));
 
   /// Compare two records.
   int compare(Record a, Record b);
 
-  /// Lookup the entry by its symbol.
-  Record? operator [](Symbol symbol) =>
-      records.firstWhereOrNull((record) => keyFor(record) == symbol);
+  /// Convert the record to normalized Json for storage.
+  Json toJson(Record record);
 
-  /// Returns the list of values in the cache.
-  List<Record> get values => records;
+  /// Convert a JSON object to a record.
+  Record fromJson(Map<String, dynamic> json);
+}
 
-  /// Adds a shipyard ship to the cache.
-  void add(Record value, {bool shouldSave = true}) {
-    final copy = copyAndNormalize(value);
-    final cached = this[keyFor(value)];
-    if (cached != null && jsonMatches(cached, copy)) {
-      return;
+/// An in-memory snapshot of a static cache.
+class StaticSnapshot<Symbol extends Object, Record extends Object> {
+  /// Creates a new static cache.
+  StaticSnapshot(this.records, Traits<Symbol, Record> traits)
+    : _traits = traits;
+
+  /// The records in this snapshot.
+  final List<Record> records;
+  final Traits<Symbol, Record> _traits;
+
+  /// The key for the given record.
+  Symbol keyFor(Record record) => _traits.keyFor(record);
+
+  /// Copy and normalize the record for comparison and storage.
+  Record copyAndNormalize(Record record) => _traits.copyAndNormalize(record);
+
+  /// Compare two records.
+  int compare(Record a, Record b) => _traits.compare(a, b);
+
+  /// Get a record from the cache.
+  Record? operator [](Symbol key) {
+    for (final record in records) {
+      if (keyFor(record) == key) {
+        return record;
+      }
     }
-    records
-      ..removeWhere((record) => keyFor(record) == keyFor(copy))
-      ..add(copy);
-
-    // This is a minor optimization to allow addAll to only save once.
-    if (shouldSave) {
-      save();
-    }
-  }
-
-  /// Adds a list of values to the cache.
-  void addAll(Iterable<Record> values) {
-    for (final value in values) {
-      add(value, shouldSave: false);
-    }
-    save();
-  }
-
-  @override
-  void save() {
-    // Make sure the entries are always sorted by type to avoid needless
-    // diffs in the cache.
-    records.sort(compare);
-    super.save();
+    return null;
   }
 }
 
-/// A cache of ship mounts.
-class ShipMountCache extends StaticCache<ShipMountSymbolEnum, ShipMount> {
-  /// Creates a new ship mount cache.
-  ShipMountCache(super.mounts, {required super.fs, super.path = defaultPath});
+/// A cache of static data that does not typically change between resets and
+/// thus can be checked into source control.
+abstract class StaticCache<Symbol extends Object, Record extends Object> {
+  /// Creates a new static cache.
+  StaticCache(Database db, Traits<Symbol, Record> traits)
+    : _db = db,
+      _traits = traits;
 
-  /// Load ship mount cache from disk.
-  factory ShipMountCache.load(FileSystem fs, {String path = defaultPath}) =>
-      ShipMountCache(
-        _loadJsonNullable(fs, path, ShipMount.fromJson),
-        fs: fs,
-        path: path,
-      );
+  final Database _db;
+  final Traits<Symbol, Record> _traits;
 
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/mounts.json';
+  /// The key for the given record.
+  Symbol keyFor(Record record) => _traits.keyFor(record);
+
+  /// Copy and normalize the record for comparison and storage.
+  Record copyAndNormalize(Record record) => _traits.copyAndNormalize(record);
+
+  /// Compare two records.
+  int compare(Record a, Record b) => _traits.compare(a, b);
+
+  /// Get a record from the cache.
+  Future<Record?> get(Symbol key) async {
+    final record = await _db.getFromStaticCache(
+      type: Record,
+      key: key.toString(),
+    );
+    if (record == null) {
+      return null;
+    }
+    return _traits.fromJson(record);
+  }
+
+  /// Create a snapshot of the cache.
+  Future<StaticSnapshot<Symbol, Record>> snapshot();
+
+  /// Get all records from the cache.
+  Future<List<Record>> getAll() async {
+    final records = await _db.getAllFromStaticCache(type: Record);
+    return records.map(_traits.fromJson).toList();
+  }
+
+  /// Adds a record to the cache.
+  Future<void> add(Record value) async {
+    await _db.setInStaticCache(
+      type: Record,
+      key: keyFor(value).toString(),
+      value: _traits.toJson(value),
+    );
+  }
+
+  /// Adds a list of values to the cache.
+  Future<void> addAll(Iterable<Record> values) async {
+    for (final value in values) {
+      await add(value);
+    }
+  }
+}
+
+class _ShipMountTraits extends Traits<ShipMountSymbolEnum, ShipMount> {
+  @override
+  ShipMount fromJson(Map<String, dynamic> json) => ShipMount.fromJson(json)!;
 
   @override
-  ShipMount copyAndNormalize(ShipMount record) =>
-      ShipMount.fromJson(jsonDecode(jsonEncode(record)))!;
+  Json toJson(ShipMount record) => record.toJson();
 
   @override
   int compare(ShipMount a, ShipMount b) =>
@@ -116,25 +134,32 @@ class ShipMountCache extends StaticCache<ShipMountSymbolEnum, ShipMount> {
   ShipMountSymbolEnum keyFor(ShipMount record) => record.symbol;
 }
 
-/// A cache of ship modules.
-class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
-  /// Creates a new ship module cache.
-  ShipModuleCache(super.modules, {required super.fs, super.path = defaultPath});
+/// A snapshot of ship mounts.
+class ShipMountSnapshot extends StaticSnapshot<ShipMountSymbolEnum, ShipMount> {
+  /// Creates a new ship mount snapshot.
+  ShipMountSnapshot(List<ShipMount> records)
+    : super(records, _ShipMountTraits());
+}
 
-  /// Load ship module cache from disk.
-  factory ShipModuleCache.load(FileSystem fs, {String path = defaultPath}) =>
-      ShipModuleCache(
-        _loadJsonNullable(fs, path, ShipModule.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/modules.json';
+/// A cache of ship mounts.
+class ShipMountCache extends StaticCache<ShipMountSymbolEnum, ShipMount> {
+  /// Creates a new ship mount cache.
+  ShipMountCache(Database db) : super(db, _ShipMountTraits());
 
   @override
-  ShipModule copyAndNormalize(ShipModule record) =>
-      ShipModule.fromJson(jsonDecode(jsonEncode(record)))!;
+  Future<ShipMountSnapshot> snapshot() async =>
+      ShipMountSnapshot(await getAll());
+}
+
+/// A cache of ship modules.
+class _ShipModuleTraits extends Traits<ShipModuleSymbolEnum, ShipModule> {
+  @override
+  ShipModule fromJson(Map<String, dynamic> json) {
+    return ShipModule.fromJson(json)!;
+  }
+
+  @override
+  Json toJson(ShipModule record) => record.toJson();
 
   @override
   int compare(ShipModule a, ShipModule b) =>
@@ -142,35 +167,38 @@ class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
 
   @override
   ShipModuleSymbolEnum keyFor(ShipModule record) => record.symbol;
+}
 
-  /// Returns the module with the given symbol.
-  ShipModule? moduleFromSymbol(ShipModuleSymbolEnum symbol) =>
-      records.firstWhereOrNull((m) => m.symbol == symbol);
+/// A snapshot of ship modules.
+class ShipModuleSnapshot
+    extends StaticSnapshot<ShipModuleSymbolEnum, ShipModule> {
+  /// Creates a new ship module snapshot.
+  ShipModuleSnapshot(List<ShipModule> records)
+    : super(records, _ShipModuleTraits());
+}
+
+/// A cache of ship modules.
+class ShipModuleCache extends StaticCache<ShipModuleSymbolEnum, ShipModule> {
+  /// Creates a new ship module cache.
+  ShipModuleCache(Database db) : super(db, _ShipModuleTraits());
+
+  @override
+  Future<ShipModuleSnapshot> snapshot() async =>
+      ShipModuleSnapshot(await getAll());
 }
 
 /// A cache of shipyard ships.
-class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
-  /// Creates a new shipyard ship cache.
-  ShipyardShipCache(
-    super.shipyardShips, {
-    required super.fs,
-    super.path = defaultPath,
-  });
+class _ShipyardShipTraits extends Traits<ShipType, ShipyardShip> {
+  @override
+  ShipyardShip fromJson(Map<String, dynamic> json) =>
+      ShipyardShip.fromJson(json)!;
 
-  /// Load shipyard ship cache from disk.
-  factory ShipyardShipCache.load(FileSystem fs, {String path = defaultPath}) =>
-      ShipyardShipCache(
-        _loadJsonNullable(fs, path, ShipyardShip.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/shipyard_ships.json';
+  @override
+  Json toJson(ShipyardShip record) => record.toJson();
 
   @override
   ShipyardShip copyAndNormalize(ShipyardShip record) {
-    return ShipyardShip.fromJson(jsonDecode(jsonEncode(record)))!
+    return fromJson(toJson(record))
       ..purchasePrice = 0
       ..activity = null
       ..supply = SupplyLevel.ABUNDANT
@@ -185,25 +213,33 @@ class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
   ShipType keyFor(ShipyardShip record) => record.type;
 }
 
+/// A snapshot of Shipyard Ships
+class ShipyardShipSnapshot extends StaticSnapshot<ShipType, ShipyardShip> {
+  /// Creates a new shipyard ship snapshot.
+  ShipyardShipSnapshot(List<ShipyardShip> records)
+    : super(records, _ShipyardShipTraits());
+}
+
+/// A cache of shipyard ships.
+class ShipyardShipCache extends StaticCache<ShipType, ShipyardShip> {
+  /// Creates a new shipyard ship cache.
+  ShipyardShipCache(Database db) : super(db, _ShipyardShipTraits());
+
+  @override
+  Future<ShipyardShipSnapshot> snapshot() async =>
+      ShipyardShipSnapshot(await getAll());
+}
+
 /// A cache of ship engines.
-class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
-  /// Creates a new ship engine cache.
-  ShipEngineCache(super.engines, {required super.fs, super.path = defaultPath});
-
-  /// Load ship engine cache from disk.
-  factory ShipEngineCache.load(FileSystem fs, {String path = defaultPath}) =>
-      ShipEngineCache(
-        _loadJsonNullable(fs, path, ShipEngine.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/engines.json';
+class _ShipEngineTraits extends Traits<ShipEngineSymbolEnum, ShipEngine> {
+  @override
+  Json toJson(ShipEngine record) => record.toJson();
+  @override
+  ShipEngine fromJson(Map<String, dynamic> json) => ShipEngine.fromJson(json)!;
 
   @override
   ShipEngine copyAndNormalize(ShipEngine record) =>
-      ShipEngine.fromJson(jsonDecode(jsonEncode(record)))!..condition = 1.0;
+      fromJson(toJson(record))..condition = 1.0;
 
   @override
   int compare(ShipEngine a, ShipEngine b) =>
@@ -213,29 +249,36 @@ class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
   ShipEngineSymbolEnum keyFor(ShipEngine record) => record.symbol;
 }
 
+/// A snapshot of ship engines.
+class ShipEngineSnapshot
+    extends StaticSnapshot<ShipEngineSymbolEnum, ShipEngine> {
+  /// Creates a new ship engine snapshot.
+  ShipEngineSnapshot(List<ShipEngine> records)
+    : super(records, _ShipEngineTraits());
+}
+
+/// A cache of ship engines.
+class ShipEngineCache extends StaticCache<ShipEngineSymbolEnum, ShipEngine> {
+  /// Creates a new ship engine cache.
+  ShipEngineCache(Database db) : super(db, _ShipEngineTraits());
+
+  @override
+  Future<ShipEngineSnapshot> snapshot() async =>
+      ShipEngineSnapshot(await getAll());
+}
+
 /// A cache of ship reactors.
-class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
-  /// Creates a new ship reactor cache.
-  ShipReactorCache(
-    super.reactors, {
-    required super.fs,
-    super.path = defaultPath,
-  });
+class _ShipReactorTraits extends Traits<ShipReactorSymbolEnum, ShipReactor> {
+  @override
+  ShipReactor fromJson(Map<String, dynamic> json) =>
+      ShipReactor.fromJson(json)!;
 
-  /// Load ship reactor cache from disk.
-  factory ShipReactorCache.load(FileSystem fs, {String path = defaultPath}) =>
-      ShipReactorCache(
-        _loadJsonNullable(fs, path, ShipReactor.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/reactors.json';
+  @override
+  Json toJson(ShipReactor record) => record.toJson();
 
   @override
   ShipReactor copyAndNormalize(ShipReactor record) =>
-      ShipReactor.fromJson(jsonDecode(jsonEncode(record)))!..condition = 1.0;
+      fromJson(toJson(record))..condition = 1.0;
 
   @override
   int compare(ShipReactor a, ShipReactor b) =>
@@ -245,30 +288,31 @@ class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
   ShipReactorSymbolEnum keyFor(ShipReactor record) => record.symbol;
 }
 
-/// A cache of waypoint traits.
-class WaypointTraitCache
-    extends StaticCache<WaypointTraitSymbol, WaypointTrait> {
-  /// Creates a new waypoint trait cache.
-  WaypointTraitCache(
-    super.traits, {
-    required super.fs,
-    super.path = defaultPath,
-  });
+/// A snapshot of ship reactors.
+class ShipReactorSnapshot
+    extends StaticSnapshot<ShipReactorSymbolEnum, ShipReactor> {
+  /// Creates a new ship reactor snapshot.
+  ShipReactorSnapshot(List<ShipReactor> records)
+    : super(records, _ShipReactorTraits());
+}
 
-  /// Load waypoint trait cache from disk.
-  factory WaypointTraitCache.load(FileSystem fs, {String path = defaultPath}) =>
-      WaypointTraitCache(
-        _loadJsonNullable(fs, path, WaypointTrait.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/waypoint_traits.json';
+/// A cache of ship reactors.
+class ShipReactorCache extends StaticCache<ShipReactorSymbolEnum, ShipReactor> {
+  /// Creates a new ship reactor cache.
+  ShipReactorCache(Database db) : super(db, _ShipReactorTraits());
 
   @override
-  WaypointTrait copyAndNormalize(WaypointTrait record) =>
-      WaypointTrait.fromJson(jsonDecode(jsonEncode(record)))!;
+  Future<ShipReactorSnapshot> snapshot() async =>
+      ShipReactorSnapshot(await getAll());
+}
+
+/// A cache of waypoint traits.
+class _WaypointTraitTraits extends Traits<WaypointTraitSymbol, WaypointTrait> {
+  @override
+  WaypointTrait fromJson(Map<String, dynamic> json) =>
+      WaypointTrait.fromJson(json)!;
+  @override
+  Json toJson(WaypointTrait record) => record.toJson();
 
   @override
   int compare(WaypointTrait a, WaypointTrait b) =>
@@ -278,29 +322,31 @@ class WaypointTraitCache
   WaypointTraitSymbol keyFor(WaypointTrait record) => record.symbol;
 }
 
-/// A cache of trade good descriptions.
-class TradeGoodCache extends StaticCache<TradeSymbol, TradeGood> {
+/// A snapshot of waypoint traits.
+class WaypointTraitSnapshot
+    extends StaticSnapshot<WaypointTraitSymbol, WaypointTrait> {
+  /// Creates a new waypoint trait snapshot.
+  WaypointTraitSnapshot(List<WaypointTrait> records)
+    : super(records, _WaypointTraitTraits());
+}
+
+/// A cache of waypoint traits.
+class WaypointTraitCache
+    extends StaticCache<WaypointTraitSymbol, WaypointTrait> {
   /// Creates a new waypoint trait cache.
-  TradeGoodCache(
-    super.tradeGoods, {
-    required super.fs,
-    super.path = defaultPath,
-  });
-
-  /// Load waypoint trait cache from disk.
-  factory TradeGoodCache.load(FileSystem fs, {String path = defaultPath}) =>
-      TradeGoodCache(
-        _loadJsonNullable(fs, path, TradeGood.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/trade_goods.json';
+  WaypointTraitCache(Database db) : super(db, _WaypointTraitTraits());
 
   @override
-  TradeGood copyAndNormalize(TradeGood record) =>
-      TradeGood.fromJson(jsonDecode(jsonEncode(record)))!;
+  Future<WaypointTraitSnapshot> snapshot() async =>
+      WaypointTraitSnapshot(await getAll());
+}
+
+/// A cache of trade good descriptions.
+class _TradeGoodTraits extends Traits<TradeSymbol, TradeGood> {
+  @override
+  TradeGood fromJson(Map<String, dynamic> json) => TradeGood.fromJson(json)!;
+  @override
+  Json toJson(TradeGood record) => record.toJson();
 
   @override
   int compare(TradeGood a, TradeGood b) =>
@@ -310,29 +356,29 @@ class TradeGoodCache extends StaticCache<TradeSymbol, TradeGood> {
   TradeSymbol keyFor(TradeGood record) => record.symbol;
 }
 
-/// A cache of trade good descriptions.
-class TradeExportCache extends StaticCache<TradeSymbol, TradeExport> {
+/// A snapshot of trade goods.
+class TradeGoodSnapshot extends StaticSnapshot<TradeSymbol, TradeGood> {
+  /// Creates a new trade good snapshot.
+  TradeGoodSnapshot(List<TradeGood> records)
+    : super(records, _TradeGoodTraits());
+}
+
+/// A cache of trade goods.
+class TradeGoodCache extends StaticCache<TradeSymbol, TradeGood> {
   /// Creates a new waypoint trait cache.
-  TradeExportCache(
-    super.exports, {
-    required super.fs,
-    super.path = defaultPath,
-  });
-
-  /// Load waypoint trait cache from disk.
-  factory TradeExportCache.load(FileSystem fs, {String path = defaultPath}) =>
-      TradeExportCache(
-        _loadJson(fs, path, TradeExport.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/exports.json';
+  TradeGoodCache(Database db) : super(db, _TradeGoodTraits());
 
   @override
-  TradeExport copyAndNormalize(TradeExport record) =>
-      TradeExport.fromJson(jsonDecode(jsonEncode(record)));
+  Future<TradeGoodSnapshot> snapshot() async =>
+      TradeGoodSnapshot(await getAll());
+}
+
+/// A cache of trade good descriptions.
+class _TradeExportTraits extends Traits<TradeSymbol, TradeExport> {
+  @override
+  TradeExport fromJson(Map<String, dynamic> json) => TradeExport.fromJson(json);
+  @override
+  Json toJson(TradeExport record) => record.toJson();
 
   @override
   int compare(TradeExport a, TradeExport b) =>
@@ -342,26 +388,31 @@ class TradeExportCache extends StaticCache<TradeSymbol, TradeExport> {
   TradeSymbol keyFor(TradeExport record) => record.export;
 }
 
-/// A cache of event descriptions.
-class EventCache
-    extends StaticCache<ShipConditionEventSymbolEnum, ShipConditionEvent> {
+/// A snapshot of trade exports.
+class TradeExportSnapshot extends StaticSnapshot<TradeSymbol, TradeExport> {
+  /// Creates a new trade export snapshot.
+  TradeExportSnapshot(List<TradeExport> records)
+    : super(records, _TradeExportTraits());
+}
+
+/// A cache of trade exports.
+class TradeExportCache extends StaticCache<TradeSymbol, TradeExport> {
   /// Creates a new waypoint trait cache.
-  EventCache(super.events, {required super.fs, super.path = defaultPath});
-
-  /// Load event cache from disk.
-  factory EventCache.load(FileSystem fs, {String path = defaultPath}) =>
-      EventCache(
-        _loadJsonNullable(fs, path, ShipConditionEvent.fromJson),
-        fs: fs,
-        path: path,
-      );
-
-  /// The default path to the cache file.
-  static const defaultPath = 'static_data/events.json';
+  TradeExportCache(Database db) : super(db, _TradeExportTraits());
 
   @override
-  ShipConditionEvent copyAndNormalize(ShipConditionEvent record) =>
-      ShipConditionEvent.fromJson(jsonDecode(jsonEncode(record)))!;
+  Future<TradeExportSnapshot> snapshot() async =>
+      TradeExportSnapshot(await getAll());
+}
+
+/// A cache of event descriptions.
+class _EventTraits
+    extends Traits<ShipConditionEventSymbolEnum, ShipConditionEvent> {
+  @override
+  ShipConditionEvent fromJson(Map<String, dynamic> json) =>
+      ShipConditionEvent.fromJson(json)!;
+  @override
+  Json toJson(ShipConditionEvent record) => record.toJson();
 
   @override
   int compare(ShipConditionEvent a, ShipConditionEvent b) =>
@@ -372,11 +423,42 @@ class EventCache
       record.symbol;
 }
 
+/// A snapshot of events.
+class EventSnapshot
+    extends StaticSnapshot<ShipConditionEventSymbolEnum, ShipConditionEvent> {
+  /// Creates a new event snapshot.
+  EventSnapshot(List<ShipConditionEvent> records)
+    : super(records, _EventTraits());
+}
+
+/// A cache of events.
+class EventCache
+    extends StaticCache<ShipConditionEventSymbolEnum, ShipConditionEvent> {
+  /// Creates a new waypoint trait cache.
+  EventCache(Database db) : super(db, _EventTraits());
+
+  @override
+  Future<EventSnapshot> snapshot() async => EventSnapshot(await getAll());
+}
+
 /// Caches of static server data that does not typically change between
 /// resets and thus can be checked into source control.
 class StaticCaches {
   /// Creates a new static caches.
-  StaticCaches({
+  StaticCaches(Database db)
+    : mounts = ShipMountCache(db),
+      modules = ShipModuleCache(db),
+      shipyardShips = ShipyardShipCache(db),
+      engines = ShipEngineCache(db),
+      reactors = ShipReactorCache(db),
+      waypointTraits = WaypointTraitCache(db),
+      tradeGoods = TradeGoodCache(db),
+      exports = TradeExportCache(db),
+      events = EventCache(db);
+
+  /// Creates a new static caches for testing.
+  @visibleForTesting
+  StaticCaches.test({
     required this.mounts,
     required this.modules,
     required this.shipyardShips,
@@ -387,21 +469,6 @@ class StaticCaches {
     required this.exports,
     required this.events,
   });
-
-  /// Load the caches from disk.
-  factory StaticCaches.load(FileSystem fs) {
-    return StaticCaches(
-      mounts: ShipMountCache.load(fs),
-      modules: ShipModuleCache.load(fs),
-      shipyardShips: ShipyardShipCache.load(fs),
-      engines: ShipEngineCache.load(fs),
-      reactors: ShipReactorCache.load(fs),
-      waypointTraits: WaypointTraitCache.load(fs),
-      tradeGoods: TradeGoodCache.load(fs),
-      exports: TradeExportCache.load(fs),
-      events: EventCache.load(fs),
-    );
-  }
 
   /// The ship mount cache.
   final ShipMountCache mounts;

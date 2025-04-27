@@ -21,9 +21,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final startSystem = agentCache!.headquartersSystemSymbol;
   const shipType = ShipType.REFINING_FREIGHTER;
 
-  final shipyardShips = ShipyardShipCache.load(fs);
-  final ship = shipyardShips[shipType]!;
-  final shipSpec = ship.shipSpec;
+  final shipyardShips = ShipyardShipCache(db);
+  final ship = await shipyardShips.get(shipType);
+  final shipSpec = ship!.shipSpec;
   const minProfitPerSecond = 5;
 
   // First want to understand what slots are available.

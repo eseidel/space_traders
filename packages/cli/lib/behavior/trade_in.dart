@@ -28,8 +28,9 @@ Future<JobResult> doTradeInJob(
     ship,
   );
   // Get the purchase price of a new ship of this type.
+  final shipyardShips = await caches.static.shipyardShips.snapshot();
   final shipType = assertNotNull(
-    guessShipType(caches.static.shipyardShips, ship),
+    shipyardShips.guessShipType(ship),
     'No ship type found.',
     const Duration(minutes: 5),
   );

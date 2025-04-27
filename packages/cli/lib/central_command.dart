@@ -735,7 +735,7 @@ class CentralCommand {
       subsidizedSellOpps = await computeConstructionMaterialSubsidies(
         db,
         caches.systems,
-        caches.static.exports,
+        await caches.static.exports.snapshot(),
         marketListings,
         charting,
         activeConstruction!,
@@ -873,11 +873,12 @@ class CentralCommand {
       return unreachableProbeJob;
     }
 
+    final shipyardShips = await caches.static.shipyardShips.snapshot();
     final shipType = await shipToBuyFromPlan(
       ships,
       config.buyPlan,
       shipyardListings,
-      caches.static.shipyardShips,
+      shipyardShips,
     );
     if (shipType == null) {
       return null;
@@ -1237,7 +1238,7 @@ Future<ShipType?> shipToBuyFromPlan(
   ShipSnapshot ships,
   List<ShipType> shipPlan,
   ShipyardListingSnapshot shipyardListings,
-  ShipyardShipCache shipyardShips,
+  ShipyardShipSnapshot shipyardShips,
 ) async {
   final counts = <ShipType, int>{};
   for (final shipType in shipPlan) {
@@ -1293,7 +1294,7 @@ class _ImportCollector extends SupplyLinkVisitor {
 Future<List<SellOpp>> computeConstructionMaterialSubsidies(
   Database db,
   SystemsCache systems,
-  TradeExportCache exports,
+  TradeExportSnapshot exports,
   MarketListingSnapshot marketListings,
   ChartingSnapshot charting,
   Construction construction,

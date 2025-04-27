@@ -582,7 +582,7 @@ Future<void> chartWaypointAndLog(
     final openapiWaypoint = response!.data.waypoint;
     final waypoint = Waypoint.fromOpenApi(openapiWaypoint);
     await ChartingCache.addWaypoint(db, waypoint);
-    waypointTraitCache.addAll(waypoint.traits);
+    await waypointTraitCache.addAll(waypoint.traits);
     // Powershell needs the space after the emoji.
     shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');
   } on ApiException catch (e) {

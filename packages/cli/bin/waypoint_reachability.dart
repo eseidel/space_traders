@@ -3,11 +3,11 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/waypoint_connectivity.dart';
 
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final staticCaches = StaticCaches.load(fs);
+  final shipyardShips = ShipyardShipCache(db);
   final systemsCache = SystemsCache.load(fs);
   final hqSystem = await myHqSystemSymbol(db);
   final fuelCapacity =
-      staticCaches.shipyardShips[ShipType.COMMAND_FRIGATE]!.frame.fuelCapacity;
+      (await shipyardShips.get(ShipType.COMMAND_FRIGATE))!.frame.fuelCapacity;
 
   logger.info(
     'Exploring waypoint clusters in $hqSystem with $fuelCapacity fuel',

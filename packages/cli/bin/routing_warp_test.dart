@@ -51,9 +51,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   //   sellsFuel: sellsFuel,
   // );
 
-  final shipyardShips = ShipyardShipCache.load(fs);
-  final ship = shipyardShips[shipType]!;
-  final shipSpec = ship.shipSpec;
+  final shipyardShips = ShipyardShipCache(db);
+  final ship = await shipyardShips.get(shipType);
+  final shipSpec = ship!.shipSpec;
 
   final start = agentCache!.headquartersSymbol;
   final interestingSystems = findInterestingSystems(systemsCache);

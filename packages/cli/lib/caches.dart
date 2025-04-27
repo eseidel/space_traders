@@ -116,7 +116,7 @@ class Caches {
     final agent = await AgentCache.loadOrFetch(db, api);
     final marketPrices = await MarketPriceSnapshot.loadAll(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
-    final static = StaticCaches.load(fs);
+    final static = StaticCaches(db);
     final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
     final waypoints = WaypointCache(

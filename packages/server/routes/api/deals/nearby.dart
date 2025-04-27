@@ -50,7 +50,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   );
   centralCommand.activeConstruction = construction;
 
-  final exportCache = TradeExportCache.load(fs);
+  final exportSnapshot = await TradeExportCache(db).snapshot();
   final charting = await ChartingSnapshot.load(db);
 
   if (construction != null) {
@@ -58,7 +58,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
         .subsidizedSellOpps = await computeConstructionMaterialSubsidies(
       db,
       systemsCache,
-      exportCache,
+      exportSnapshot,
       marketListings,
       charting,
       construction,
@@ -77,9 +77,9 @@ Future<api.DealsNearbyResponse> dealsNearby({
     extraSellOpps.addAll(centralCommand.constructionSellOpps(behaviors));
   }
 
-  final shipyardShips = ShipyardShipCache.load(fs);
-  final ship = shipyardShips[shipType]!;
-  final shipSpec = ship.shipSpec;
+  final shipyardShips = ShipyardShipCache(db);
+  final ship = await shipyardShips.get(shipType);
+  final shipSpec = ship!.shipSpec;
 
   final marketScan = scanReachableMarkets(
     systemsCache,

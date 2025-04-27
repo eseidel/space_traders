@@ -731,4 +731,46 @@ class Database {
       "'$token') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
     );
   }
+
+  Future<Map<String, dynamic>?> getFromStaticCache({
+    required Type type,
+    required String key,
+  }) async {
+    final result = await queryOne(
+      Query(
+        'SELECT value FROM static_cache_ WHERE type = @type AND key = @key',
+        parameters: {'type': type.toString(), 'key': key},
+      ),
+      (map) => map['json'] as Map<String, dynamic>,
+    );
+    return result;
+  }
+
+  Future<Iterable<Map<String, dynamic>>> getAllFromStaticCache({
+    required Type type,
+  }) async {
+    final result = await queryMany(
+      Query(
+        'SELECT key, json FROM static_cache_ WHERE type = @type',
+        parameters: {'type': type.toString()},
+      ),
+      (map) => map['json'] as Map<String, dynamic>,
+    );
+    return result;
+  }
+
+  Future<void> setInStaticCache({
+    required Type type,
+    required String key,
+    required Map<String, dynamic> value,
+  }) async {
+    await execute(
+      Query(
+        'INSERT INTO static_cache_ (type, key, json) '
+        'VALUES (@type, @key, @json) '
+        'ON CONFLICT (type, key) DO UPDATE SET json = EXCLUDED.json',
+        parameters: {'type': type.toString(), 'key': key, 'json': value},
+      ),
+    );
+  }
 }

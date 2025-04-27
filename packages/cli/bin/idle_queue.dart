@@ -27,8 +27,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
   final construction = ConstructionCache(db);
-  final waypointTraits = WaypointTraitCache.load(fs);
-  final tradeGoods = TradeGoodCache.load(fs);
+  final waypointTraits = WaypointTraitCache(db);
+  final tradeGoods = TradeGoodCache(db);
   final waypointCache = WaypointCache(
     api,
     db,

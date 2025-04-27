@@ -3,12 +3,12 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
-/// Map from ship type to ship frame symbol.
-extension ShipTypeToFrame on ShipyardShipCache {
-  /// Map from ship type to ship frame symbol.
+/// Extensions for ShipyardShipSnapshot.
+extension ShipTypeToFrame on ShipyardShipSnapshot {
+  /// Attempts to determine the ShipType from a ShipFrameSymbolEnum.
   ShipType? shipTypeFromFrame(ShipFrameSymbolEnum frameSymbol) {
     ShipType? shipType;
-    for (final ship in values) {
+    for (final ship in records) {
       if (ship.frame.symbol != frameSymbol) {
         continue;
       }
@@ -20,14 +20,6 @@ extension ShipTypeToFrame on ShipyardShipCache {
     }
     return shipType;
   }
-
-  /// Map from ship type to ship frame symbol.
-  ShipFrameSymbolEnum? shipFrameFromType(ShipType type) {
-    return this[type]?.frame.symbol;
-  }
-
-  /// Map from ship type to cargo capacity.
-  int? capacityForShipType(ShipType shipType) => this[shipType]?.cargoCapacity;
 
   /// Make a new ship of a given type.
   Ship? shipForTest(
@@ -88,33 +80,33 @@ extension ShipTypeToFrame on ShipyardShipCache {
       mounts: shipyardShip.mounts,
     ).deepCopy();
   }
-}
 
-/// Attempt to determine ShipType from a Ship.  Since Ships can be modified
-/// after purchase there is not always a 1:1 mapping from Ship back to ShipType.
-ShipType? guessShipType(ShipyardShipCache shipyardShipCache, Ship ship) {
-  final frame = ship.frame;
-  final type = shipyardShipCache.shipTypeFromFrame(frame.symbol);
-  if (type != null) {
-    return type;
+  /// Attempt to determine ShipType from a Ship.  Since Ships can be modified
+  /// after purchase there is not always a 1:1 mapping from Ship back to ShipType.
+  ShipType? guessShipType(Ship ship) {
+    final frame = ship.frame;
+    final type = shipTypeFromFrame(frame.symbol);
+    if (type != null) {
+      return type;
+    }
+    if (frame.symbol == ShipFrameSymbolEnum.DRONE) {
+      if (ship.hasMiningLaser) {
+        return ShipType.MINING_DRONE;
+      }
+      if (ship.hasSiphon) {
+        return ShipType.SIPHON_DRONE;
+      }
+      if (ship.hasSurveyor) {
+        return ShipType.SURVEYOR;
+      }
+    }
+    if (frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER) {
+      if (ship.hasOreRefinery) {
+        return ShipType.REFINING_FREIGHTER;
+      }
+    }
+    return null;
   }
-  if (frame.symbol == ShipFrameSymbolEnum.DRONE) {
-    if (ship.hasMiningLaser) {
-      return ShipType.MINING_DRONE;
-    }
-    if (ship.hasSiphon) {
-      return ShipType.SIPHON_DRONE;
-    }
-    if (ship.hasSurveyor) {
-      return ShipType.SURVEYOR;
-    }
-  }
-  if (frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER) {
-    if (ship.hasOreRefinery) {
-      return ShipType.REFINING_FREIGHTER;
-    }
-  }
-  return null;
 }
 
 /// Provides Ship data that ShipyardShip does not.

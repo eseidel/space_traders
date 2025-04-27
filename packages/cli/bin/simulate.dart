@@ -157,8 +157,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     sellsFuel: (_) => false,
   );
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
-  final shipyardShips = ShipyardShipCache.load(fs);
-  final shipMounts = ShipMountCache.load(fs);
+  final shipyardShips = await ShipyardShipCache(db).snapshot();
+  final shipMounts = await ShipMountCache(db).snapshot();
 
   final hqSystem = await myHqSystemSymbol(db);
   final hqMine = systemsCache
@@ -166,7 +166,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       .firstWhere((w) => w.isAsteroid);
   const tradeSymbol = TradeSymbol.DIAMONDS;
   const haulerType = ShipType.LIGHT_HAULER;
-  final unitsPerHaulerCycle = shipyardShips.capacityForShipType(haulerType)!;
+  final unitsPerHaulerCycle = shipyardShips[haulerType]!.cargoCapacity;
 
   const surveyorType = ShipType.SURVEYOR;
   final surveyorDefaultMounts = kOreHoundDefault.mounts;
@@ -179,7 +179,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const minerType = ShipType.MINING_DRONE;
   final minerDefaultMounts = kOreHoundDefault.mounts;
   final minerMounts = kMineOnlyTemplate.mounts;
-  final unitsPerMineCycle = shipyardShips.capacityForShipType(minerType)!;
+  final unitsPerMineCycle = shipyardShips[minerType]!.cargoCapacity;
 
   // https://discord.com/channels/792864705139048469/792864705139048472/1159170353738825781
   // const diamondRatioToDeposits =

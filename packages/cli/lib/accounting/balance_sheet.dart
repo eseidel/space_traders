@@ -44,11 +44,11 @@ Future<PricedInventory> computeInventoryValue({required Database db}) async {
 /// Computes the total resale value of all ships.
 Future<PricedFleet> computeShipValue(
   ShipSnapshot ships,
-  ShipyardShipCache shipyardShips,
+  ShipyardShipSnapshot shipyardShips,
   ShipyardPriceSnapshot shipyardPrices,
 ) async {
   ShipType shipTypeForShip(Ship ship) {
-    final type = guessShipType(shipyardShips, ship);
+    final type = shipyardShips.guessShipType(ship);
     if (type == null) {
       throw StateError('Unknown ship type for frame: ${ship.frame.symbol}');
     }
@@ -75,7 +75,7 @@ Future<PricedFleet> computeShipValue(
 Future<BalanceSheet> computeBalanceSheet(FileSystem fs, Database db) async {
   final ships = await ShipSnapshot.load(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
-  final shipyardShips = ShipyardShipCache.load(fs);
+  final shipyardShips = await ShipyardShipCache(db).snapshot();
 
   final agent = await db.getMyAgent();
   final inventory = await computeInventoryValue(db: db);

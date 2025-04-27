@@ -10,7 +10,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     db,
     argResults.rest.firstOrNull,
   );
-  final staticCaches = StaticCaches.load(fs);
+  final shipyardShips = await ShipyardShipCache(db).snapshot();
   final systemsCache = SystemsCache.load(fs);
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
@@ -19,8 +19,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final centralCommand = CentralCommand();
 
   final origin = systemsCache.waypoint(startSymbol);
-  final ship =
-      staticCaches.shipyardShips.shipForTest(ShipType.PROBE, origin: origin)!;
+  final ship = shipyardShips.shipForTest(ShipType.PROBE, origin: origin)!;
   final maxJumps = config.charterMaxJumps;
   final behaviors = await BehaviorSnapshot.load(db);
 

@@ -16,7 +16,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final systems = await SystemsCache.loadOrFetch(fs);
   final charting = ChartingCache(db);
   final ships = await ShipSnapshot.load(db);
-  final shipyardShipCache = ShipyardShipCache.load(fs);
+  final shipyardShips = await ShipyardShipCache(db).snapshot();
 
   final squads = await assignShipsToSquads(
     db,
@@ -31,7 +31,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     final squad = squads[i];
     logger.info('Squad $i: ${describeJob(squad.job)}');
     for (final ship in squad.ships) {
-      final type = guessShipType(shipyardShipCache, ship)!;
+      final type = shipyardShips.guessShipType(ship)!;
       final typeName = type.value.substring('SHIP_'.length);
       final cargoStatus =
           ship.cargo.capacity == 0

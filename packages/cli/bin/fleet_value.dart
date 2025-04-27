@@ -20,12 +20,12 @@ int _costOutMounts(MarketPriceSnapshot marketPrices, MountSymbolSet mounts) {
 
 /// Returns a map of ship frame type to count in fleet.
 Map<ShipType, int> _shipTypeCounts(
-  ShipyardShipCache shipyardShips,
+  ShipyardShipSnapshot shipyardShips,
   List<Ship> ships,
 ) {
   final typeCounts = <ShipType, int>{};
   for (final ship in ships) {
-    final type = guessShipType(shipyardShips, ship)!;
+    final type = shipyardShips.guessShipType(ship)!;
     typeCounts[type] = (typeCounts[type] ?? 0) + 1;
   }
   return typeCounts;
@@ -35,14 +35,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
-  final shipyardShips = ShipyardShipCache.load(fs);
+  final shipyardShips = await ShipyardShipCache(db).snapshot();
 
   logger.info('Estimating fleet value at current median prices.');
 
   // Include all ships now that scrapping is a thing.
   final purchasedShips = ships.ships;
   final purchaseShipTypes =
-      purchasedShips.map((s) => guessShipType(shipyardShips, s)!).toList();
+      purchasedShips.map((s) => shipyardShips.guessShipType(s)!).toList();
   final purchaseShipTypeCounts = _shipTypeCounts(shipyardShips, purchasedShips);
   final shipTypes =
       purchaseShipTypeCounts.keys.toList()..sortBy((t) => t.value);

@@ -174,7 +174,7 @@ class SupplyChainBuilder {
   const SupplyChainBuilder({
     required SystemsCache systems,
     required MarketListingSnapshot marketListings,
-    required TradeExportCache exports,
+    required TradeExportSnapshot exports,
     required ChartingSnapshot charting,
   }) : _marketListings = marketListings,
        _systems = systems,
@@ -183,7 +183,7 @@ class SupplyChainBuilder {
 
   final MarketListingSnapshot _marketListings;
   final SystemsCache _systems;
-  final TradeExportCache _exports;
+  final TradeExportSnapshot _exports;
   final ChartingSnapshot _charting;
 
   ProduceLink? _shuttleSource(

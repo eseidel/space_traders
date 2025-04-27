@@ -105,11 +105,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     sellsFuel: sellsFuel,
   );
 
-  final shipyardShips = ShipyardShipCache.load(fs);
-  final ship = shipyardShips[shipType]!;
+  final shipyardShips = ShipyardShipCache(db);
+  final ship = await shipyardShips.get(shipType);
 
   final routeStart = DateTime.timestamp();
-  final plan = routePlanner.planRoute(ship.shipSpec, start: start, end: end);
+  final plan = routePlanner.planRoute(ship!.shipSpec, start: start, end: end);
   final routeEnd = DateTime.timestamp();
   final duration = routeEnd.difference(routeStart);
   if (plan == null) {

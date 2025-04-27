@@ -8,12 +8,13 @@ import 'package:collection/collection.dart';
 Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   const limit = 10;
   const desiredMarketCount = 10;
+  const shipType = ShipType.EXPLORER;
 
   final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
   final startSystemSymbol = await myHqSystemSymbol(db);
 
-  final waypointTraits = WaypointTraitCache.load(fs);
+  final waypointTraits = WaypointTraitCache(db);
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionCache = ConstructionCache(db);
   final systemConnectivity = SystemConnectivity.fromJumpGates(
@@ -30,7 +31,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     constructionCache,
     waypointTraits,
   );
-  final shipyardShips = ShipyardShipCache.load(fs);
+  final shipyardShips = ShipyardShipCache(db);
 
   final reachableSystemSymbols =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
@@ -59,12 +60,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     '$limit closest systems with $desiredMarketCount markets '
     'from $startSystemSymbol',
   );
+  final shipSpeed = (await shipyardShips.get(shipType))!.engine.speed;
   for (final system in systemsToWarpTo) {
     final distance = system.distanceTo(startSystem);
     final seconds = warpTimeInSeconds(
       startSystem,
       system,
-      shipSpeed: shipyardShips[ShipType.EXPLORER]!.engine.speed,
+      shipSpeed: shipSpeed,
     );
     final timeString = approximateDuration(Duration(seconds: seconds));
     logger.info(' ${system.symbol} $distance in $timeString');

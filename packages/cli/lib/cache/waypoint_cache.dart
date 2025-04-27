@@ -243,7 +243,7 @@ Future<Waypoint?> waypointFromCaches(
 
   final traits = <WaypointTrait>[];
   for (final traitSymbol in values.traitSymbols) {
-    final trait = waypointTraits[traitSymbol];
+    final trait = await waypointTraits.get(traitSymbol);
     if (trait == null) {
       logger.warn('Traits cache missing trait: $traitSymbol');
       return null;

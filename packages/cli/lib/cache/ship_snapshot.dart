@@ -72,13 +72,15 @@ class ShipSnapshot {
   }
 
   /// Returns the number of ships with the given [shipType].
-  int? countOfType(ShipyardShipCache shipyardShips, ShipType shipType) {
-    final frame = shipyardShips.shipFrameFromType(shipType);
+  int? countOfType(ShipyardShipSnapshot shipyardShips, ShipType shipType) {
+    final shipyardShip = shipyardShips[shipType];
     // If we can't identify the frame, we can't identify the count.
-    if (frame == null) {
+    if (shipyardShip == null) {
       // This should only happen if our shipyard ship cache is missing data.
       return null;
     }
+
+    final frame = shipyardShip.frame.symbol;
     // In the easy case this type is the only one of its frame.
     if (shipType == shipyardShips.shipTypeFromFrame(frame)) {
       return countOfFrame(frame);
@@ -86,11 +88,6 @@ class ShipSnapshot {
     // Otherwise we count up all the ships which match this frame
     // and match the mounts. This breaks in the case of multiple ships with
     // the same frame who have swapped mounts, but it's better than nothing.
-    final shipyardShip = shipyardShips[shipType];
-    if (shipyardShip == null) {
-      // This should only happen if our ShipyardShipCache is missing data.
-      return null;
-    }
     return ships
         .where((s) => matchesShipyardShipMounts(s, shipyardShip))
         .length;

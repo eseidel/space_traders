@@ -25,8 +25,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipyard = systems.waypoint(shipyardListing.waypointSymbol);
 
   const shipType = ShipType.LIGHT_HAULER;
-  final shipyardShips = ShipyardShipCache.load(fs);
-  final ship = shipyardShips[shipType]!;
+  final shipyardShips = ShipyardShipCache(db);
+  final ship = await shipyardShips.get(shipType);
   logger.info('Routes from ${shipyard.symbol} with $shipType');
 
   final table = Table(
@@ -36,7 +36,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   for (final waypoint in waypoints) {
     final routePlan = routePlanner.planRoute(
-      ship.shipSpec,
+      ship!.shipSpec,
       start: shipyard.symbol,
       end: waypoint.symbol,
     );
