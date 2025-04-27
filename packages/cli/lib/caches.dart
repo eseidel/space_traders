@@ -116,6 +116,10 @@ class Caches {
     final agent = await AgentCache.loadOrFetch(db, api);
     final marketPrices = await MarketPriceSnapshot.loadAll(db);
     final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
+    // Load exports before we load static caches.  We ignore the response
+    // but then static.exports will be up to date.
+    await loadExports(db, api.data);
+
     final static = StaticCaches(db);
     final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
@@ -262,4 +266,35 @@ Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
     await db.upsertFaction(faction);
   }
   return factions;
+}
+
+/// Loads exports from the api and converts them to the old-style
+/// TradeExport list.
+Future<TradeExportSnapshot> loadExports(Database db, DataApi dataApi) async {
+  final cachedExportsJson = await db.getAllFromStaticCache(type: TradeExport);
+  if (cachedExportsJson.isNotEmpty) {
+    final exports = cachedExportsJson.map(TradeExport.fromJson).toList();
+    return TradeExportSnapshot(exports);
+  }
+
+  final response = await dataApi.getSupplyChain();
+  // Build the old-style TradeExport list from the response.
+  // The server's new API covers things other than TradeSymbols.
+  final exports = <TradeExport>[];
+  for (final entry in response!.data.exportToImportMap.entries) {
+    final export = TradeSymbol.fromJson(entry.key);
+    if (export == null) {
+      continue;
+    }
+    final imports = entry.value.map((i) => TradeSymbol.fromJson(i)!);
+    exports.add(TradeExport(export: export, imports: imports.toList()));
+  }
+  for (final export in exports) {
+    await db.upsertInStaticCache(
+      type: TradeExport,
+      key: export.export.toJson(),
+      json: export.toJson(),
+    );
+  }
+  return TradeExportSnapshot(exports);
 }

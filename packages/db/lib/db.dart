@@ -759,7 +759,7 @@ class Database {
     return result;
   }
 
-  Future<void> setInStaticCache({
+  Future<void> upsertInStaticCache({
     required Type type,
     required String key,
     required Map<String, dynamic> json,

@@ -10,6 +10,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
+class _MockDataApi extends Mock implements DataApi {}
+
 class _MockDatabase extends Mock implements Database {}
 
 class _MockFactionsApi extends Mock implements FactionsApi {}
@@ -83,6 +85,18 @@ void main() {
     when(db.allShipyardPrices).thenAnswer((_) async => []);
     when(db.allJumpGates).thenAnswer((_) async => []);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
+
+    final dataApi = _MockDataApi();
+    when(() => api.data).thenReturn(dataApi);
+    registerFallbackValue(TradeExport);
+    when(
+      () => db.getAllFromStaticCache(type: any(named: 'type')),
+    ).thenAnswer((_) async => []);
+    when(dataApi.getSupplyChain).thenAnswer(
+      (_) async => GetSupplyChain200Response(
+        data: GetSupplyChain200ResponseData(exportToImportMap: {}),
+      ),
+    );
 
     final fs = MemoryFileSystem.test();
     fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);

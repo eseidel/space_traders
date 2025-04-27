@@ -111,7 +111,7 @@ abstract class StaticCache<Symbol extends Object, Record extends Object> {
 
   /// Adds a record to the cache.
   Future<void> add(Record value) async {
-    await _db.setInStaticCache(
+    await _db.upsertInStaticCache(
       type: Record,
       key: keyFor(value).toString(),
       json: _traits.toJson(value),
