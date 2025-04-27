@@ -59,10 +59,15 @@ class GetSupplyChain200ResponseData {
         return true;
       }());
 
+      final map = json[r'exportToImportMap'] == null
+          ? const <String, List<String>>{}
+          : mapCastOfType<String, List>(json, r'exportToImportMap')!;
+      final casted = Map<String, List<String>>.fromIterable(
+        map.keys,
+        value: (key) => map[key]!.cast<String>(),
+      );
       return GetSupplyChain200ResponseData(
-        exportToImportMap: json[r'exportToImportMap'] == null
-            ? const {}
-            : mapCastOfType<String, List>(json, r'exportToImportMap'),
+        exportToImportMap: casted,
       );
     }
     return null;

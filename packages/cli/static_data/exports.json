@@ -494,6 +494,7 @@
   "imports": [
    "PLATINUM",
    "ADVANCED_CIRCUITRY",
+   "MERITIUM",
    "MERITIUM"
   ]
  },
@@ -741,6 +742,13 @@
   "imports": [
    "ADVANCED_CIRCUITRY",
    "ALUMINUM"
+  ]
+ },
+ {
+  "export": "SHIP_BULK_FREIGHTER",
+  "imports": [
+   "SHIP_PLATING",
+   "SHIP_PARTS"
   ]
  },
  {
