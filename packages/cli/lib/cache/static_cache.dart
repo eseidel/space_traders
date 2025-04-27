@@ -81,6 +81,13 @@ abstract class StaticCache<Symbol extends Object, Record extends Object> {
   /// Compare two records.
   int compare(Record a, Record b) => _traits.compare(a, b);
 
+  /// Used for writing to a JSON file.
+  Future<List<Json>> asSortedJsonList() async {
+    final records = await getAll();
+    final sorted = records.toList()..sort(compare);
+    return sorted.map(_traits.toJson).toList();
+  }
+
   /// Get a record from the cache.
   Future<Record?> get(Symbol key) async {
     final record = await _db.getFromStaticCache(
