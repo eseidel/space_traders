@@ -105,7 +105,16 @@ class NetExecutor {
       } on ClientException catch (e) {
         logger.err('Network error: ${e.message}');
         continue;
+      } on FormatException catch (e) {
+        // This happened once when I imported a token with a newline in it
+        // since we dont currently clear requests on start, there were bad
+        // requests in the queue which we'd hit a FormatException on and then
+        // never clear.
+        logger.err('Invalid request in queue! error: ${e.message}');
+        await queue.deleteRequest(request);
+        continue;
       }
+
       stats.record(response);
       final duration = getNow().difference(before);
       logger.detail(

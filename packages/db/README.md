@@ -27,12 +27,15 @@ docker cp sql/. space_traders-db-1:/sql
 ```
 
 ### To run a single sql
+```
 docker exec -it space_traders-db-1 psql -U postgres -d spacetraders -f /sql/tables/19_static_data.sql
-
+```
 
 ### To get a shell
+```
 docker exec -it space_traders-db-1 /bin/sh
-
+psql -U postgres -d spacetraders
+```
 
 ### To init the whole db
 ```

@@ -8,7 +8,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     return;
   }
   final tokenString = await tokenFile.readAsString();
-  await db.setAuthToken(tokenString);
+  await db.setAuthToken(tokenString.trim());
   logger.info('Token imported successfully.');
 }
 
