@@ -63,12 +63,23 @@ class DealsNearbyResponse {
       _$DealsNearbyResponseFromJson(json);
 
   final List<NearbyDeal> deals;
+
+  /// The ShipType used for costing the deals.
   @ShipTypeConverter()
   final ShipType shipType;
+
+  /// The ShipSpec used for costing the deals.
   final ShipSpec shipSpec;
+
+  /// The start location for costing the deals.
   final WaypointSymbol startSymbol;
+
+  /// The maximum credits available for the deals.
   final int credits;
+
+  /// The extra sell opportunities available for the deals, includin contracts.
   final List<SellOpp> extraSellOpps;
+
   final int tradeSymbolCount;
 
   Map<String, dynamic> toJson() => _$DealsNearbyResponseToJson(this);
@@ -81,7 +92,10 @@ class NearbyDeal {
   factory NearbyDeal.fromJson(Map<String, dynamic> json) =>
       _$NearbyDealFromJson(json);
 
+  /// The costed deal.
   final CostedDeal costed;
+
+  /// Whether we already have a ship attempting to execute this deal.
   final bool inProgress;
 
   Deal get deal => costed.deal;

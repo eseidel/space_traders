@@ -51,10 +51,10 @@ class BackendClient {
   }
 
   Future<DealsNearbyResponse> getNearbyDeals({
-    required ShipType? shipType,
-    required int? limit,
-    required WaypointSymbol? start,
-    required int? credits,
+    ShipType? shipType,
+    int? limit,
+    WaypointSymbol? start,
+    int? credits,
   }) async {
     final uri = _api('deals/nearby');
     final args = GetDealsNearbyRequest(

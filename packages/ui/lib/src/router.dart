@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/src/routes.dart';
+import 'package:ui/src/routes/deals.dart';
 
 /// The route configuration.
 final GoRouter router = GoRouter(
@@ -45,6 +46,12 @@ final GoRouter router = GoRouter(
           path: 'explore/map',
           builder: (BuildContext context, GoRouterState state) {
             return const MapScreen();
+          },
+        ),
+        GoRoute(
+          path: 'deals/nearby',
+          builder: (BuildContext context, GoRouterState state) {
+            return const DealsNearbyScreen();
           },
         ),
       ],
