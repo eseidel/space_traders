@@ -66,7 +66,7 @@ packages:
     source: hosted
     version: "1.2.3"
   chalkdart:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: chalkdart
       sha256: "82dfa884e3cf97641eb0742a3b9ffd41490666b9ece548b2e32cbfefe540bf86"
