@@ -15,6 +15,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // Walk all static caches and export them to the given directory.
   final pathToCache = <String, StaticCache>{
     'engines': staticCaches.engines,
+    'events': staticCaches.events,
     'exports': staticCaches.exports,
     'modules': staticCaches.modules,
     'mounts': staticCaches.mounts,
