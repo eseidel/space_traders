@@ -498,7 +498,10 @@ Future<JobResult> travelAndSellCargo(
   );
 
   if (costedTrip.route.endSymbol != ship.waypointSymbol) {
-    shipInfo(ship, 'Traveling to ${costedTrip.route.endSymbol} to sell.');
+    // Cargo hold still not empty, finding market to sell...
+    // is just before and
+    // Beginning route to ...
+    // is right after, so we don't need to log here.
     final waitTime = await beingNewRouteAndLog(
       api,
       db,
