@@ -1,0 +1,50 @@
+[
+ {
+  "symbol": "BEARING_LUBRICATION_FADE",
+  "component": "ENGINE",
+  "name": "Bearing Lubrication Fade",
+  "description": "Bearing temperatures rose beyond normal parameters, signaling lubrication fade. The engine's automated cooling system engaged to prevent overheating, however, the bearings are likely to degrade further without maintenance."
+ },
+ {
+  "symbol": "ELECTROMAGNETIC_FIELD_INTERFERENCE",
+  "component": "FRAME",
+  "name": "Electromagnetic Field Interference",
+  "description": "Extraction equipment generated an unexpected electromagnetic field, interfering with the ship's structural integrity monitoring systems. Manual inspections and recalibrations of the affected systems were applied."
+ },
+ {
+  "symbol": "ELECTROMAGNETIC_SURGE_EFFECTS",
+  "component": "FRAME",
+  "name": "Electromagnetic Surge Effects",
+  "description": "An encounter with a charged electromagnetic storm temporarily disrupted the ship's electrical systems and caused minor electrical arcing across the frame."
+ },
+ {
+  "symbol": "HULL_MICROMETEORITE_DAMAGE",
+  "component": "FRAME",
+  "name": "Hull Micrometeorite Damage",
+  "description": "Systems report minor hull damage likely due to micrometeorite impacts. Automated repair systems activated to seal breaches, maintaining structural integrity but leaving the hull with superficial scars that could affect aerodynamics."
+ },
+ {
+  "symbol": "POWER_DISTRIBUTION_FLUCTUATION",
+  "component": "REACTOR",
+  "name": "Power Distribution Fluctuation",
+  "description": "Fluctuating power distribution levels likely caused by a malfunctioning flux capacitor within the reactor circuitry occurred during extraction. The fluctuations caused intermittent power loss to vital ship systems, including life support and navigation."
+ },
+ {
+  "symbol": "SOLAR_FLARE_INTERFERENCE",
+  "component": "REACTOR",
+  "name": "Solar Flare Interference with Reactor Operations",
+  "description": "An unexpected solar flare event coincided with extraction activities, causing widespread interference in reactor operations. The flare’s electromagnetic pulse temporarily disabled the reactor's safety controls, necessitating a manual reboot and realignment of the magnetic containment field."
+ },
+ {
+  "symbol": "SPACE_DEBRIS_COLLISION",
+  "component": "FRAME",
+  "name": "Space Debris Collision",
+  "description": "Slight structural damage has been detected due to a collision with untracked space debris. The impact was absorbed by deflection shields, minimizing major damage but necessitating checks for microfractures and stress points."
+ },
+ {
+  "symbol": "THERMAL_EXPANSION_MISMATCH",
+  "component": "FRAME",
+  "name": "Thermal Expansion Mismatch",
+  "description": "Variations in temperature caused by extraction operations led to mismatched thermal expansion rates between different sections of the ship's frame, resulting in structural stress and potential breaches."
+ }
+]
