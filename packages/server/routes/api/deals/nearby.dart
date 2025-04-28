@@ -147,19 +147,13 @@ Future<Response> onRequest(RequestContext context) async {
   final fs = context.read<FileSystem>();
   final db = await context.readAsync<Database>();
   final logger = context.read<Logger>();
-
-  // TODO(eseidel): Move runWithLogger into the custom server entry point.
-  // https://dartfrog.vgv.dev/docs/advanced/custom_entrypoint
-  final response = await runWithLogger(logger, () async {
-    final result = await dealsNearby(
-      fs: fs,
-      db: db,
-      shipType: request.shipType ?? api.GetDealsNearbyRequest.defaultShipType,
-      limit: request.limit ?? api.GetDealsNearbyRequest.defaultLimit,
-      credits: request.credits ?? api.GetDealsNearbyRequest.defaultCredits,
-      maybeStart: request.start,
-    );
-    return result;
-  });
+  final response = await dealsNearby(
+    fs: fs,
+    db: db,
+    shipType: request.shipType ?? api.GetDealsNearbyRequest.defaultShipType,
+    limit: request.limit ?? api.GetDealsNearbyRequest.defaultLimit,
+    credits: request.credits ?? api.GetDealsNearbyRequest.defaultCredits,
+    maybeStart: request.start,
+  );
   return Response.json(body: response.toJson());
 }

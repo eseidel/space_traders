@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:meta/meta.dart';
 import 'package:scoped_deps/scoped_deps.dart';
 import 'package:types/types.dart';
 
@@ -15,7 +14,6 @@ final loggerRef = create(Logger.new);
 Logger get logger => read(loggerRef);
 
 /// Run [fn] with the global logger replaced with [logger].
-@visibleForTesting
 R runWithLogger<R>(Logger logger, R Function() fn) {
   return runScoped(fn, values: {loggerRef.overrideWith(() => logger)});
 }
