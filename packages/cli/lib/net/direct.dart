@@ -1,7 +1,7 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
-import 'package:cli/logic/printing.dart';
+import 'package:cli/cache/static_cache.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -66,7 +66,7 @@ Future<void> setShipFlightMode(
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
-  logEvents(ship, data.events);
+  recordEvents(db, ship, data.events);
   await db.upsertShip(ship);
 }
 

@@ -536,3 +536,14 @@ void recordShip(StaticCaches staticCaches, Ship ship) {
   staticCaches.engines.add(ship.engine);
   staticCaches.reactors.add(ship.reactor);
 }
+
+/// Log the adverse events in the given [events].
+void recordEvents(Database db, Ship ship, List<ShipConditionEvent> events) {
+  if (events.isEmpty) {
+    return;
+  }
+  // TODO(eseidel): Queue the ship for update if it had events.
+  // Responses containing events don't return the ship parts effected, so
+  // we'd need to queue a full update of the ship to get the condition changes.
+  EventCache(db).addAll(events);
+}

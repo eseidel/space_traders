@@ -52,7 +52,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 
   try {
     final data = await navigateShip(db, api, ship, waypointSymbol);
-    logEvents(ship, data.events);
+    recordEvents(db, ship, data.events);
     return data;
   } on ApiException catch (e) {
     if (!isInsufficientFuelException(e)) {
@@ -61,7 +61,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
     shipErr(ship, 'Insufficient fuel, drifting to $waypointSymbol');
     await setShipFlightMode(db, api, ship, ShipNavFlightMode.DRIFT);
     final data = await navigateShip(db, api, ship, waypointSymbol);
-    logEvents(ship, data.events);
+    recordEvents(db, ship, data.events);
     return data;
   }
 }

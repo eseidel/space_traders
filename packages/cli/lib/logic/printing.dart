@@ -230,20 +230,6 @@ String describeShipNav(
   return 'Unknown';
 }
 
-/// Log the adverse events in the given [events].
-void logEvents(Ship ship, List<ShipConditionEvent> events) {
-  if (events.isEmpty) {
-    return;
-  }
-  for (final event in events) {
-    shipInfo(
-      ship,
-      'symbol: ${event.symbol}, component: ${event.component} '
-      'name: ${event.name}, description: ${event.description}',
-    );
-  }
-}
-
 /// Log the counts.
 void logCounts<T>(Counts<T> counts) {
   // Print the counts in order from most to least:
