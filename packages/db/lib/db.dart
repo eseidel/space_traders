@@ -732,6 +732,8 @@ class Database {
     );
   }
 
+  /// Get static data of type [type] and key [key] from the static_data_ table.
+  /// Returns null if not found.
   Future<Map<String, dynamic>?> getFromStaticCache({
     required Type type,
     required String key,
@@ -746,6 +748,8 @@ class Database {
     return result;
   }
 
+  /// Get all static data of type [type] from the static_data_ table.
+  /// Returns an empty list if not found.
   Future<Iterable<Map<String, dynamic>>> getAllFromStaticCache({
     required Type type,
   }) async {
@@ -759,6 +763,9 @@ class Database {
     return result;
   }
 
+  /// Upsert static data of type [type] and key [key] into the
+  /// static_data_ table.
+  /// If the data already exists, it will be updated.
   Future<void> upsertInStaticCache({
     required Type type,
     required String key,
