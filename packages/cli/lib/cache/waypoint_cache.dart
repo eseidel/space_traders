@@ -108,7 +108,7 @@ class WaypointCache {
 
   Future<void> _addWaypointsToCaches(Api api, List<Waypoint> waypoints) async {
     await _chartingCache.addWaypoints(waypoints);
-    _waypointTraits.addAll(waypoints.expand((w) => w.traits));
+    await _waypointTraits.addAll(waypoints.expand((w) => w.traits));
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?
       final construction =

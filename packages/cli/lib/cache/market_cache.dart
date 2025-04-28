@@ -43,7 +43,7 @@ class MarketCache {
         exchange: market.exchange.map((t) => t.symbol).toSet(),
       ),
     );
-    _tradeGoods.addAll(market.listedTradeGoods);
+    await _tradeGoods.addAll(market.listedTradeGoods);
     return market;
   }
 }
