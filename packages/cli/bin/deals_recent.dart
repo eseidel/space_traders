@@ -175,7 +175,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   // }
 
   logger.info('Ignored ${ignoredTransactions.length} transactions.');
-  for (final transaction in ignoredTransactions) {
-    logger.info(describeTransaction(transaction));
-  }
+  // for (final transaction in ignoredTransactions) {
+  //   logger.info(describeTransaction(transaction));
+  // }
 }
