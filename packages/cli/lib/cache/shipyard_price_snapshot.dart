@@ -106,7 +106,7 @@ void recordShipyardDataAndLog(
   recordShipyardShips(staticCaches, shipyard.ships);
   recordShipyardListing(db, shipyard);
   // Powershell needs an extra space after the emoji.
-  shipInfo(ship, '✍️  shipyard data @ ${shipyard.symbol}');
+  shipDetail(ship, '✍️  shipyard data @ ${shipyard.symbol}');
 }
 
 /// Record shipyard prices.
