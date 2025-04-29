@@ -146,7 +146,6 @@ Future<Response> onRequest(RequestContext context) async {
 
   final fs = context.read<FileSystem>();
   final db = await context.readAsync<Database>();
-  final logger = context.read<Logger>();
   final response = await dealsNearby(
     fs: fs,
     db: db,
