@@ -1,9 +1,39 @@
 [
  {
+  "symbol": "ATMOSPHERIC_ENTRY_HEAT",
+  "component": "FRAME",
+  "name": "Atmospheric Entry Heat",
+  "description": "The heat from a recent atmospheric entry was more intense than calculations predicted, causing slight overheating of the hull's exterior. Thermal shields absorbed the brunt of the heat, but minor stress was detected across the hull."
+ },
+ {
   "symbol": "BEARING_LUBRICATION_FADE",
   "component": "ENGINE",
   "name": "Bearing Lubrication Fade",
   "description": "Bearing temperatures rose beyond normal parameters, signaling lubrication fade. The engine's automated cooling system engaged to prevent overheating, however, the bearings are likely to degrade further without maintenance."
+ },
+ {
+  "symbol": "COOLANT_LEAK",
+  "component": "REACTOR",
+  "name": "Coolant System Leak Detected",
+  "description": "A microfracture in the reactor coolant system led to a gradual loss of coolant and an increase in reactor temperature, causing automated safety systems to engage in a controlled shutdown."
+ },
+ {
+  "symbol": "COOLANT_SYSTEM_AGEING",
+  "component": "ENGINE",
+  "name": "Coolant System Ageing",
+  "description": "During routine operations, a decrease in coolant efficiency was noted by diagnostics, likely caused by improperly maintained coolant lines. Quick-sealant measures were applied to avert overheating and permanent damage."
+ },
+ {
+  "symbol": "CORROSIVE_MINERAL_CONTAMINATION",
+  "component": "FRAME",
+  "name": "Corrosive Mineral Contamination",
+  "description": "Corrosive minerals from the extraction site adhered to the ship's hull, initiating a chemical reaction that weakened the structural integrity of the frame. Decontamination and application of protective coatings were applied."
+ },
+ {
+  "symbol": "DUST_MICROABRASIONS",
+  "component": "ENGINE",
+  "name": "Microabrasions from Cosmic Dust",
+  "description": "Exposure to a fine cosmic dust cloud resulted in microabrasions across the engine's surface. The ship's rotational velocity was adjusted to minimize exposure, yet small abrasions have likely reduced thermal efficiency to sub-optimal levels."
  },
  {
   "symbol": "ELECTROMAGNETIC_FIELD_INTERFERENCE",
@@ -18,16 +48,70 @@
   "description": "An encounter with a charged electromagnetic storm temporarily disrupted the ship's electrical systems and caused minor electrical arcing across the frame."
  },
  {
+  "symbol": "ENERGY_SPIKE_FROM_MINERAL",
+  "component": "REACTOR",
+  "name": "Energy Spike from Unstable Minerals",
+  "description": "Volatile minerals emitted a strong energy spike upon extraction, leading to a sudden surge in the reactor's power input channels. The surge bypassed initial safeguards, resulting in temporary loss of propulsion control, requiring manual recalibration of energy distribution protocols."
+ },
+ {
+  "symbol": "EXHAUST_PORT_CLOGGING",
+  "component": "ENGINE",
+  "name": "Exhaust Port Clogging",
+  "description": "Accumulated exhaust residue led to partial clogging of several ports. Engine management systems temporarily increased exhaust pressure to clear the blockage, causing minor stress on the exhaust system."
+ },
+ {
+  "symbol": "FUEL_EFFICIENCY_DEGRADATION",
+  "component": "ENGINE",
+  "name": "Fuel Efficiency Degradation",
+  "description": "A leak in the fuel lines was detected due to minor sediment buildup. Automated systems patched the leak, preventing major damage, but a slight decrease in fuel efficiency was detected by diagnostics."
+ },
+ {
   "symbol": "HULL_MICROMETEORITE_DAMAGE",
   "component": "FRAME",
   "name": "Hull Micrometeorite Damage",
   "description": "Systems report minor hull damage likely due to micrometeorite impacts. Automated repair systems activated to seal breaches, maintaining structural integrity but leaving the hull with superficial scars that could affect aerodynamics."
  },
  {
+  "symbol": "HULL_MICROMETEORITE_STRIKES",
+  "component": "FRAME",
+  "name": "Micrometeorite Strikes on Hull",
+  "description": "A swarm of micrometeorites bombarded the ship's hull, causing minor punctures and abrasions. These impacts stress the hull's integrity, requiring patching of the compromised sections to prevent decompression."
+ },
+ {
+  "symbol": "IMPACT_WITH_EXTRACTED_DEBRIS",
+  "component": "FRAME",
+  "name": "Impact with Extracted Debris",
+  "description": "Large chunks of debris from the extraction process collided with the ship's frame, causing minor dents and potential breaches. Automated navigational protocols and debris tracking systems helped mitigate significant damage."
+ },
+ {
+  "symbol": "MAGNETIC_FIELD_DISRUPTION",
+  "component": "REACTOR",
+  "name": "Magnetic Field Disruption by Asteroid Composition",
+  "description": "Unique magnetic composition of minerals caused a disruption in the ship’s reactor magnetic containment field. This anomaly resulted in uncharacteristic power dips and spikes, risking the stability of the reactor core."
+ },
+ {
   "symbol": "POWER_DISTRIBUTION_FLUCTUATION",
   "component": "REACTOR",
   "name": "Power Distribution Fluctuation",
   "description": "Fluctuating power distribution levels likely caused by a malfunctioning flux capacitor within the reactor circuitry occurred during extraction. The fluctuations caused intermittent power loss to vital ship systems, including life support and navigation."
+ },
+ {
+  "symbol": "PRESSURE_DIFFERENTIAL_STRESS",
+  "component": "FRAME",
+  "name": "Pressure Differential Stress",
+  "description": "A sudden pressure differential encountered in a volatile gas cloud put unexpected stress on the ship's frame. Emergency pressure equalization systems engaged, preventing catastrophic failure but highlighting the need for reinforced hull plating."
+ },
+ {
+  "symbol": "REACTOR_OVERLOAD",
+  "component": "REACTOR",
+  "name": "Reactor Overload Incident",
+  "description": "The ship's reactor experienced a critical overload due to unexpected mineral density. Automated safety systems initiated an emergency shutdown, but not before the overload caused partial melting of the reactor's cooling fins."
+ },
+ {
+  "symbol": "SENSOR_CALIBRATION_DRIFT",
+  "component": "ENGINE",
+  "name": "Sensor Calibration Drift",
+  "description": "A slight drift in engine performance sensors was automatically corrected for real-time operation, maintaining efficiency. Despite this, the drift signals wear in sensor components, resulting in a slight decrease in sensor accuracy."
  },
  {
   "symbol": "SOLAR_FLARE_INTERFERENCE",
@@ -42,9 +126,39 @@
   "description": "Slight structural damage has been detected due to a collision with untracked space debris. The impact was absorbed by deflection shields, minimizing major damage but necessitating checks for microfractures and stress points."
  },
  {
+  "symbol": "STRUCTURAL_STRESS_FRACTURES",
+  "component": "FRAME",
+  "name": "Structural Stress Fractures",
+  "description": "Intense gravitational forces exerted by the extracted minerals resulted in stress fractures along the ship's frame. Continuous monitoring and reinforcement of the frame's structure was necessary to prevent catastrophic failure."
+ },
+ {
   "symbol": "THERMAL_EXPANSION_MISMATCH",
   "component": "FRAME",
   "name": "Thermal Expansion Mismatch",
   "description": "Variations in temperature caused by extraction operations led to mismatched thermal expansion rates between different sections of the ship's frame, resulting in structural stress and potential breaches."
+ },
+ {
+  "symbol": "THERMAL_STRESS",
+  "component": "FRAME",
+  "name": "Thermal Stress",
+  "description": "Experiencing extreme temperature fluctuations during navigation induced thermal stress on the ship's frame. Although structural integrity remains uncompromised, prolonged exposure may lead to material fatigue."
+ },
+ {
+  "symbol": "THRUSTER_NOZZLE_WEAR",
+  "component": "ENGINE",
+  "name": "Thruster Nozzle Wear",
+  "description": "A recent diagnostic run revealed reduced thruster nozzle efficiency, with wear exacerbated by frequent maneuvers. Adaptive thrust balancing will compensate for wear, but nozzle precision is likely degraded, although still within operational parameters."
+ },
+ {
+  "symbol": "VIBRATION_DAMAGE_FROM_DRILLING",
+  "component": "FRAME",
+  "name": "Vibration Damage from Drilling Operations",
+  "description": "The ship's frame sustained damage from excessive vibrations during extraction operations, leading to loosening of structural components and potential failure of critical systems. Vibration dampening measures were applied to mitigate future risks."
+ },
+ {
+  "symbol": "VIBRATION_OVERLOAD",
+  "component": "FRAME",
+  "name": "Vibration Overload",
+  "description": "High-frequency vibrations from the engine during extended travel have begun to resonate with the ship's frame, causing minor wear on joints and fasteners. Real-time adjustments have been made, but further mitigation strategies are recommended."
  }
 ]
