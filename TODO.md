@@ -1532,3 +1532,14 @@ ACTUALLY, it seems like it was the reachability cache being stale?
 
 ### Figure out what the "expected" cost of gate construction is vs. reality.
 Also record how long it took from agent creation to gate completion.
+
+### Un-idle probes every time connectivity changes?
+
+cli-1     | [WARN] 🛸#1A probe     No stale markets near waypoints near Z10-B26A.
+cli-1     | [WARN] 🛸#1A probe     Max age for X1-Z10 is already too short, giving up. Disabling Behavior.systemWatcher for ESEIDEL-1A for 1h.
+cli-1     | [WARN] 🛸#1A probe     Charted all known systems Disabling Behavior.charter for ESEIDEL-1A for 1h.
+cli-1     | [WARN] FleetRole.probe has no specified behaviors, idling.
+
+### fleet_charters will be empty until restart and then full.
+
+Not sure why. Some cache is not getting invalidated.
