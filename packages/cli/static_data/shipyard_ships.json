@@ -337,7 +337,7 @@
    "name": "Heavy Freighter",
    "description": "A large, heavily-armed spacecraft used for cargo transport and other commercial operations in hostile environments.",
    "condition": 1.0,
-   "integrity": 1.0,
+   "integrity": 1,
    "moduleSlots": 13,
    "mountingPoints": 3,
    "fuelCapacity": 2300,
@@ -346,35 +346,35 @@
     "crew": 100,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 7
   },
   "reactor": {
    "symbol": "REACTOR_FUSION_I",
    "name": "Fusion Reactor I",
    "description": "A basic fusion power reactor, used to generate electricity from nuclear fusion reactions.",
-   "condition": 1.0,
-   "integrity": 1.0,
+   "condition": 1,
+   "integrity": 1,
    "powerOutput": 40,
    "requirements": {
     "power": null,
     "crew": 12,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 7
   },
   "engine": {
    "symbol": "ENGINE_ION_DRIVE_II",
    "name": "Ion Drive II",
    "description": "An advanced propulsion system that uses ionized particles to generate high-speed, low-thrust acceleration, with improved efficiency and performance.",
-   "condition": 1.0,
-   "integrity": 1.0,
-   "speed": 30,
+   "condition": 1,
+   "integrity": 1,
+   "speed": 36,
    "requirements": {
     "power": 6,
     "crew": 8,
     "slots": null
    },
-   "quality": 1.0
+   "quality": 4
   },
   "modules": [
    {
