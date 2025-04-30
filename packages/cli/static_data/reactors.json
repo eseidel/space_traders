@@ -45,8 +45,8 @@
   "symbol": "REACTOR_SOLAR_I",
   "name": "Solar Reactor I",
   "description": "A basic solar power reactor, used to generate electricity from solar energy.",
-  "condition": 1,
-  "integrity": 1.0,
+  "condition": 1.0,
+  "integrity": 1,
   "powerOutput": 3,
   "requirements": {
    "power": null,
