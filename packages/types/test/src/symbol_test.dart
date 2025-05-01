@@ -10,8 +10,8 @@ void main() {
     expect(a, isNot(c));
     expect(a.sector, 'S');
 
-    expect(() => SystemSymbol.fromString('S'), throwsArgumentError);
-    expect(() => SystemSymbol.fromString('S-E-A'), throwsArgumentError);
+    expect(() => SystemSymbol.fromString('S'), throwsFormatException);
+    expect(() => SystemSymbol.fromString('S-E-A'), throwsFormatException);
   });
   test('WaypointSymbol equality', () {
     final a = WaypointSymbol.fromString('S-E-J');
@@ -23,8 +23,8 @@ void main() {
     expect(a.system, SystemSymbol.fromString('S-E'));
     expect(a.systemString, 'S-E');
 
-    expect(() => WaypointSymbol.fromString('S-E'), throwsArgumentError);
-    expect(() => WaypointSymbol.fromString('S-E-A-F'), throwsArgumentError);
+    expect(() => WaypointSymbol.fromString('S-E'), throwsFormatException);
+    expect(() => WaypointSymbol.fromString('S-E-A-F'), throwsFormatException);
   });
   test('WaypointPosition distance', () {
     final system = SystemSymbol.fromString('S-E');
@@ -41,8 +41,11 @@ void main() {
     expect(WaypointSymbol.fromJsonOrNull(null), isNull);
 
     // Invalid still throws.
-    expect(() => WaypointSymbol.fromJsonOrNull('S-E'), throwsArgumentError);
-    expect(() => WaypointSymbol.fromJsonOrNull('S-E-A-F'), throwsArgumentError);
+    expect(() => WaypointSymbol.fromJsonOrNull('S-E'), throwsFormatException);
+    expect(
+      () => WaypointSymbol.fromJsonOrNull('S-E-A-F'),
+      throwsFormatException,
+    );
   });
 
   test('WaypointSymbol.waypointName and localSectorName', () {
@@ -69,6 +72,6 @@ void main() {
     expect(symbol.agentName, 'A-1');
 
     // At least one hyphen is required.
-    expect(() => ShipSymbol.fromString('A1'), throwsArgumentError);
+    expect(() => ShipSymbol.fromString('A1'), throwsFormatException);
   });
 }
