@@ -657,9 +657,9 @@ class CentralCommand {
     }
     if (now.difference(lastUpdate) > config.routingCacheMaxAge) {
       _lastRoutingCacheUpdate = now;
+      logger.warn('Resetting routing caches!');
       return caches.updateRoutingCaches();
     }
-    return Future.value();
   }
 
   /// Give central planning a chance to advance.

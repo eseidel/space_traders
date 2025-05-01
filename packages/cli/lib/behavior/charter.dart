@@ -162,7 +162,7 @@ Future<JobResult> doCharter(
   }
 
   // If we get here, we've explored all systems we can reach.
-  throw const JobException('Charted all known systems', Duration(hours: 1));
+  throw const JobException('Charted all known systems', Duration(minutes: 20));
 }
 
 /// Advance the system watcher.
