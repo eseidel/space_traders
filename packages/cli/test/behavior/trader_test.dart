@@ -33,9 +33,11 @@ class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
-class _MockSystemsApi extends Mock implements SystemsApi {}
-
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
+
+class _MockShipReactor extends Mock implements ShipReactor {}
+
+class _MockSystemsApi extends Mock implements SystemsApi {}
 
 void main() {
   setUpAll(() {
@@ -594,7 +596,14 @@ void main() {
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
+    when(() => shipEngine.condition).thenReturn(1);
     when(() => ship.engine).thenReturn(shipEngine);
+    final shipFrame = _MockShipFrame();
+    when(() => shipFrame.condition).thenReturn(1);
+    when(() => ship.frame).thenReturn(shipFrame);
+    final shipReactor = _MockShipReactor();
+    when(() => shipReactor.condition).thenReturn(1);
+    when(() => ship.reactor).thenReturn(shipReactor);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     when(() => ship.modules).thenReturn([]);
 
@@ -838,6 +847,13 @@ void main() {
     const shipSpeed = 10;
     when(() => shipEngine.speed).thenReturn(shipSpeed);
     when(() => ship.engine).thenReturn(shipEngine);
+    when(() => shipEngine.condition).thenReturn(1);
+    final shipFrame = _MockShipFrame();
+    when(() => shipFrame.condition).thenReturn(1);
+    when(() => ship.frame).thenReturn(shipFrame);
+    final shipReactor = _MockShipReactor();
+    when(() => shipReactor.condition).thenReturn(1);
+    when(() => ship.reactor).thenReturn(shipReactor);
     when(() => ship.modules).thenReturn([]);
 
     final start = WaypointSymbol.fromString('S-A-B');
