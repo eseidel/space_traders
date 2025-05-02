@@ -160,15 +160,15 @@ void main() {
       SystemSymbol.fromString('A-C'),
       position: const SystemPosition(2501, 0),
     );
-    expect(cooldownTimeForJumpBetweenSystems(a, b), 2560);
-    expect(cooldownTimeForJumpBetweenSystems(b, a), 2560);
+    expect(cooldownTimeForJumpBetweenSystems(a, b), 765);
+    expect(cooldownTimeForJumpBetweenSystems(b, a), 765);
 
-    expect(cooldownTimeForJumpBetweenSystems(b, c), 61);
+    expect(cooldownTimeForJumpBetweenSystems(b, c), 15);
 
-    expect(cooldownTimeForJumpDistance(2000), 2060);
-    expect(cooldownTimeForJumpDistance(0), 60);
+    expect(cooldownTimeForJumpDistance(2000), 615);
+    expect(cooldownTimeForJumpDistance(0), 15);
     // Server seems to round, rather than floor:
-    expect(cooldownTimeForJumpDistance(1527), 1587);
+    expect(cooldownTimeForJumpDistance(1527), 473);
 
     expect(() => cooldownTimeForJumpDistance(-20), throwsArgumentError);
   });

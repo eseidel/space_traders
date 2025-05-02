@@ -158,7 +158,7 @@ int cooldownTimeForJumpDistance(int distance) {
   }
   // There is no longer a limit on jump distance, just a question
   // of if two systems are connected by a jumpgate.
-  return distance + 60;
+  return (15 + distance * 0.3).round();
 }
 
 /// Returns the cooldown time after jumping between two systems.

@@ -489,7 +489,8 @@ void _checkFlightTime(
       'Flight time ${durationString(flightTime)} '
       'does not match predicted ${durationString(expectedFlightTime)} '
       'speed: ${ship.engine.speed} mode: ${ship.nav.flightMode} '
-      'distance: ${route.distance}',
+      'distance: ${route.distance} engine: ${ship.engine.condition} '
+      'frame: ${ship.frame.condition} reactor: ${ship.reactor.condition}',
     );
   }
 }
