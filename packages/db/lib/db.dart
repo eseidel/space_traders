@@ -1,4 +1,5 @@
 import 'package:db/config.dart';
+import 'package:db/migrations.dart';
 import 'package:db/src/agent.dart';
 import 'package:db/src/behavior.dart';
 import 'package:db/src/chart.dart';
@@ -9,6 +10,7 @@ import 'package:db/src/faction.dart';
 import 'package:db/src/jump_gate.dart';
 import 'package:db/src/market_listing.dart';
 import 'package:db/src/market_price.dart';
+import 'package:db/src/queries/schema_version.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
 import 'package:db/src/ship.dart';
@@ -65,6 +67,14 @@ class DatabaseConnection {
     await _connection.channels[channel].first;
   }
 
+  /// Execute a query on a session.
+  static Future<pg.Result> executeOnSession(pg.Session session, Query query) {
+    return session.execute(
+      pg.Sql.named(query.fmtString),
+      parameters: query.parameters,
+    );
+  }
+
   /// Execute a query.
   Future<pg.Result> execute(Query query) {
     queryCounts.record(query.fmtString);
@@ -79,6 +89,26 @@ class DatabaseConnection {
     queryCounts.record(sql);
     return _connection.execute(sql);
   }
+
+  /// Run a transaction.
+  Future<R> runTx<R>(Future<R> Function(pg.TxSession session) fn) async {
+    return _connection.runTx(fn);
+  }
+}
+
+/// {@template database_error}
+/// An exception that is thrown when an error occurs while
+/// interacting with the database.
+/// {@endtemplate}
+class DatabaseError implements Exception {
+  /// {@macro database_error}
+  const DatabaseError({required this.message});
+
+  /// The error message.
+  final String message;
+
+  @override
+  String toString() => message;
 }
 
 /// Abstraction around a database connection.
@@ -91,6 +121,17 @@ class Database {
   Database.test(this._connection)
     : endpoint = pg.Endpoint(host: 'localhost', database: 'test'),
       settings = null;
+
+  /// Create a new database with a live connection for testing.
+  /// This probably could be removed and override openConnection instead.
+  @visibleForTesting
+  Database.testLive({
+    required this.endpoint,
+    required pg.Connection connection,
+    this.settings,
+  }) {
+    _connection = DatabaseConnection(connection);
+  }
 
   /// Configure the database connection.
   final pg.Endpoint endpoint;
@@ -118,6 +159,64 @@ class Database {
 
   /// Close the database connection.
   Future<void> close() => _connection.close();
+
+  /// Migrate the database to the latest schema version.
+  Future<void> migrateToLatestSchema() {
+    return migrateToSchema(version: allMigrations.last.version);
+  }
+
+  /// Get the current schema version.
+  Future<int?> currentSchemaVersion() async {
+    final result = await execute(selectCurrentSchemaVersionQuery());
+    if (result.isEmpty) {
+      return null;
+    }
+    return result.first[0] as int?;
+  }
+
+  /// Migrate the database to the given schema version.
+  Future<void> migrateToSchema({required int version}) async {
+    // Ensure the schema version table exists. This query is indempotent and
+    // does not need to be run as part of the transaction.
+    await execute(createSchemaVersionTableQuery());
+
+    final maybeSchemaVersion = await currentSchemaVersion();
+
+    // If the target version is the same as the current version, do nothing.
+    // If the target version is higher, migrate up.
+    // If the target version is lower, migrate down.
+    if (maybeSchemaVersion == version) return;
+
+    return _connection.runTx((session) async {
+      final schemaVersion = maybeSchemaVersion ?? 0;
+
+      final scripts = migrationScripts(
+        fromVersion: schemaVersion,
+        toVersion: version,
+      );
+
+      for (final script in scripts) {
+        try {
+          await session.execute(script);
+        } catch (e) {
+          await session.rollback();
+          throw DatabaseError(
+            message: 'Failed to run migration script: $script due to $e',
+          );
+        }
+      }
+
+      final updateVersionQuery = upsertSchemaVersionQuery(version);
+      try {
+        await DatabaseConnection.executeOnSession(session, updateVersionQuery);
+      } on Exception catch (e) {
+        await session.rollback();
+        throw DatabaseError(
+          message: 'Failed to update schema version to $version: $e',
+        );
+      }
+    });
+  }
 
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
@@ -616,7 +715,7 @@ class Database {
     await execute(deleteShipQuery(symbol));
   }
 
-  Future<bool> _hasRecentPrice(Query query, Duration maxAge) async {
+  Future<bool> hasRecentPrice(Query query, Duration maxAge) async {
     final result = await execute(query);
     if (result.isEmpty) {
       return false;
@@ -634,7 +733,7 @@ class Database {
     Duration maxAge,
   ) async {
     final query = timestampOfMostRecentMarketPriceQuery(waypointSymbol);
-    return _hasRecentPrice(query, maxAge);
+    return hasRecentPrice(query, maxAge);
   }
 
   /// Check if the given waypoint has recent shipyard prices.
@@ -643,7 +742,7 @@ class Database {
     Duration maxAge,
   ) async {
     final query = timestampOfMostRecentShipyardPriceQuery(waypointSymbol);
-    return _hasRecentPrice(query, maxAge);
+    return hasRecentPrice(query, maxAge);
   }
 
   /// Count the number of market prices in the database.
