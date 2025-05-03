@@ -1,6 +1,7 @@
 import 'package:db/src/migration.dart';
 
-/// Migration to create the shipyard_price_ table for storing ship purchase prices.
+/// Migration to create the shipyard_price_ table for storing ship purchase
+/// prices.
 class CreateShipyardPriceMigration implements Migration {
   @override
   int get version => 13;

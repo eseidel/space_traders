@@ -1,6 +1,7 @@
 import 'package:db/src/migration.dart';
 
-/// Migration to create the shipyard_listing_ table for storing shipyard ship types.
+/// Migration to create the shipyard_listing_ table for storing shipyard ship
+/// types.
 class CreateShipyardListingMigration implements Migration {
   @override
   int get version => 12;

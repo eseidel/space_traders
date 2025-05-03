@@ -1,6 +1,7 @@
 import 'package:db/src/migration.dart';
 
-/// Migration to create the market_listing_ table for storing market trade listings.
+/// Migration to create the market_listing_ table for storing market trade
+/// listings.
 class CreateMarketListingMigration implements Migration {
   @override
   int get version => 11;

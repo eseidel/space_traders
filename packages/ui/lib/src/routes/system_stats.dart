@@ -37,17 +37,6 @@ class SystemStatsView extends StatelessWidget {
 
   final SystemStats stats;
 
-  // Starting from ${s.startSystem}, known reachable:
-  // ${s.reachableSystems} systems (${p(s.reachableSystemPercent)} of ${s.totalSystems})
-  // ${s.reachableWaypoints} waypoints (${p(s.reachableWaypointPercent)} of ${s.totalWaypoints})
-  //  ${s.chartedWaypoints} charted non-asteroid (${p(s.nonAsteroidChartPercent)})
-  //  ${s.chartedAsteroids} charted asteroid (${p(s.asteroidChartPercent)})
-  // ${s.reachableMarkets} markets
-  // ${s.reachableShipyards} shipyards
-  // ${s.reachableJumpGates} jump gates (${p(s.reachableJumpGatePercent)} of ${s.totalJumpgates})
-  //  ${s.cachedJumpGates} cached
-  //  ${s.chartedJumpGates} charted
-
   @override
   Widget build(BuildContext context) {
     final s = stats;

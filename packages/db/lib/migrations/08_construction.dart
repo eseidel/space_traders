@@ -1,6 +1,7 @@
 import 'package:db/src/migration.dart';
 
-/// Migration to create the construction_ table for storing waypoint construction data.
+/// Migration to create the construction_ table for storing waypoint
+/// construction data.
 class CreateConstructionMigration implements Migration {
   @override
   int get version => 8;
