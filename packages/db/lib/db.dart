@@ -715,7 +715,7 @@ class Database {
     await execute(deleteShipQuery(symbol));
   }
 
-  Future<bool> hasRecentPrice(Query query, Duration maxAge) async {
+  Future<bool> _hasRecentPrice(Query query, Duration maxAge) async {
     final result = await execute(query);
     if (result.isEmpty) {
       return false;
@@ -733,7 +733,7 @@ class Database {
     Duration maxAge,
   ) async {
     final query = timestampOfMostRecentMarketPriceQuery(waypointSymbol);
-    return hasRecentPrice(query, maxAge);
+    return _hasRecentPrice(query, maxAge);
   }
 
   /// Check if the given waypoint has recent shipyard prices.
@@ -742,7 +742,7 @@ class Database {
     Duration maxAge,
   ) async {
     final query = timestampOfMostRecentShipyardPriceQuery(waypointSymbol);
-    return hasRecentPrice(query, maxAge);
+    return _hasRecentPrice(query, maxAge);
   }
 
   /// Count the number of market prices in the database.
