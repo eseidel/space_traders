@@ -1,3 +1,4 @@
+// cspell:words snakeoil
 import 'dart:async';
 import 'dart:io';
 

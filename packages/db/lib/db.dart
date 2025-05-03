@@ -176,7 +176,7 @@ class Database {
 
   /// Migrate the database to the given schema version.
   Future<void> migrateToSchema({required int version}) async {
-    // Ensure the schema version table exists. This query is indempotent and
+    // Ensure the schema version table exists. This query is idempotent and
     // does not need to be run as part of the transaction.
     await execute(createSchemaVersionTableQuery());
 
