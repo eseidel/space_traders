@@ -10,11 +10,11 @@ class _MockAgentCache extends Mock implements AgentCache {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockDatabase extends Mock implements Database {}
-
 class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
+
+class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
@@ -31,6 +31,8 @@ class _MockShipFrame extends Mock implements ShipFrame {}
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
+
+class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockSystemsCache extends Mock implements SystemsCache {}
 
@@ -728,7 +730,14 @@ void main() {
     final db = _MockDatabase();
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
+    final systemsApi = _MockSystemsApi();
+    when(() => api.systems).thenReturn(systemsApi);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    when(() => systemsApi.getWaypoint(any(), any())).thenAnswer((_) async {
+      return GetWaypoint200Response(
+        data: Waypoint.test(waypointSymbol).toOpenApi(),
+      );
+    });
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipSymbol = ShipSymbol.fromString('S-1');

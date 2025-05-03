@@ -591,6 +591,8 @@ Future<void> chartWaypointAndLog(
       rethrow;
     }
     shipWarn(ship, '${ship.waypointSymbol} was already charted');
+    // Our chart was likely out of date, so force an update.
+    await WaypointCache.forceUpdateChart(api, db, ship.waypointSymbol);
   }
 }
 

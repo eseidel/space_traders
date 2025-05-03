@@ -122,6 +122,17 @@ class WaypointCache {
     }
   }
 
+  /// Fetch the chart for the given waypoint and add it to the cache.
+  static Future<Chart?> forceUpdateChart(
+    Api api,
+    Database db,
+    WaypointSymbol waypointSymbol,
+  ) async {
+    final waypoint = await fetchWaypoint(api, waypointSymbol);
+    await ChartingCache.addWaypoint(db, waypoint);
+    return waypoint.chart;
+  }
+
   /// Fetch the chart for the given waypoint if not in cache.
   Future<Chart?> fetchChart(WaypointSymbol waypointSymbol) async {
     final api = _api;
@@ -132,9 +143,7 @@ class WaypointCache {
     if (values != null) {
       return values.chart;
     }
-    final waypoint = await fetchWaypoint(api, waypointSymbol);
-    await ChartingCache.addWaypoint(_db, waypoint);
-    return waypoint.chart;
+    return forceUpdateChart(_api!, _db, waypointSymbol);
   }
 
   /// Fetch the waypoint with the given symbol.
