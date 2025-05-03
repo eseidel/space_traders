@@ -105,6 +105,7 @@ class Config {
     for (int i = 0; i < 15; i++) ShipType.PROBE,
     // Only buy more when we have enough cash on hand to support trading?
     for (int i = 0; i < 15; i++) ShipType.REFINING_FREIGHTER,
+    for (int i = 0; i < 100; i++) ShipType.PROBE,
   ];
 
   /// Our ship buy plan for computeNextShipToBuy.
