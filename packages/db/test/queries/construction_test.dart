@@ -1,4 +1,4 @@
-import 'package:db/src/construction.dart';
+import 'package:db/src/queries/construction.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
