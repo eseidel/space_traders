@@ -8,11 +8,7 @@ class _MockApi extends Mock implements Api {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockChartingCache extends Mock implements ChartingCache {}
-
 class _MockDatabase extends Mock implements Database {}
-
-class _MockConstructionCache extends Mock implements ConstructionCache {}
 
 void main() {
   test('WaypointCache.waypoint', () async {
@@ -35,19 +31,19 @@ void main() {
       );
     });
 
-    final chartingCache = _MockChartingCache();
     registerFallbackValue(waypointSymbol);
+    registerFallbackValue(Duration.zero);
     when(
-      () => chartingCache.chartedValues(any()),
+      () => db.getChartingRecord(any(), any()),
     ).thenAnswer((_) async => null);
+    registerFallbackValue(waypointSymbol.system);
     when(
-      () => chartingCache.chartingRecord(any()),
-    ).thenAnswer((_) async => null);
-    when(() => chartingCache.addWaypoints(any())).thenAnswer((_) async {});
-    final constructionCache = _MockConstructionCache();
-    when(
-      () => constructionCache.updateConstruction(waypointSymbol, null),
-    ).thenAnswer((_) async => {});
+      () => db.systemWaypointsBySystemSymbol(any()),
+    ).thenAnswer((_) async => [expectedWaypoint.toSystemWaypoint()]);
+    registerFallbackValue(ChartingRecord.fallbackValue());
+    when(() => db.upsertChartingRecord(any())).thenAnswer((_) async {});
+    registerFallbackValue(ConstructionRecord.fallbackValue());
+    when(() => db.upsertConstruction(any())).thenAnswer((_) async {});
 
     final waypointCache = WaypointCache(api, db);
     expect(

@@ -40,6 +40,13 @@ class ConstructionRecord {
     required this.timestamp,
   });
 
+  /// Create a fallback value for mocking.
+  @visibleForTesting
+  ConstructionRecord.fallbackValue()
+    : waypointSymbol = WaypointSymbol.fromString('W-A-Y'),
+      construction = null,
+      timestamp = DateTime(0);
+
   /// Creates a new construction record from JSON.
   factory ConstructionRecord.fromJson(Map<String, dynamic> json) {
     return ConstructionRecord(
