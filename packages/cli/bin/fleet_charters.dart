@@ -11,9 +11,9 @@ String plural(int count, String singular, [String plural = 's']) {
   return '$count ${count == 1 ? singular : singular + plural}';
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final charterStates = await db.behaviorStatesWithBehavior(Behavior.charter);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = SystemsCache(db);
   final ships = await ShipSnapshot.load(db);
 
   logger.info('${plural(charterStates.length, 'charter')}:');
@@ -27,7 +27,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     if (routePlan != null) {
       final timeLeft = ship.timeToArrival(routePlan);
       final destination = routePlan.endSymbol.sectorLocalName;
-      final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
+      final destinationType = await systemsCache.waypointType(
+        routePlan.endSymbol,
+      );
       final arrival = approximateDuration(timeLeft);
       logger.info('  en route to $destination $destinationType in $arrival');
     }

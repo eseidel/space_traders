@@ -13,4 +13,5 @@ export 'package:db/src/queries/ship.dart';
 export 'package:db/src/queries/shipyard_listing.dart';
 export 'package:db/src/queries/shipyard_price.dart';
 export 'package:db/src/queries/survey.dart';
+export 'package:db/src/queries/system.dart';
 export 'package:db/src/queries/transaction.dart';

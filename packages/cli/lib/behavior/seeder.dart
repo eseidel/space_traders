@@ -8,7 +8,7 @@ import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
 
 WaypointSymbol _centralWaypointInSystem(
-  SystemsCache systems,
+  SystemsSnapshot systems,
   SystemSymbol system,
 ) {
   final zero = WaypointPosition(0, 0, system);
@@ -21,7 +21,7 @@ WaypointSymbol _centralWaypointInSystem(
 RoutePlan? _shortestPathTo(
   SystemConnectivity systemConnectivity,
   RoutePlanner routePlanner,
-  SystemsCache systemsCache,
+  SystemsSnapshot systemsCache,
   SystemSymbol systemSymbol,
   Ship ship,
 ) {
@@ -79,7 +79,7 @@ RoutePlan? _shortestPathTo(
 
 /// Find the closest system to the seed system that is not in the same cluster.
 Future<RoutePlan?> _routeToClosestSystemToSeed(
-  SystemsCache systemsCache,
+  SystemsSnapshot systemsCache,
   SystemConnectivity systemConnectivity,
   RoutePlanner routePlanner,
   Ship ship, {
@@ -122,7 +122,7 @@ Future<RoutePlan?> routeToNextSystemToSeed(
   AgentCache agentCache,
   ShipSnapshot ships,
   BehaviorSnapshot behaviors,
-  SystemsCache systems,
+  SystemsSnapshot systems,
   RoutePlanner routePlanner,
   SystemConnectivity connectivity,
   Ship ship,
@@ -198,12 +198,13 @@ Future<JobResult> doSeeder(
   // And route there.
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
+  final systems = await SystemsSnapshot.load(db);
   final route = assertNotNull(
     await routeToNextSystemToSeed(
       caches.agent,
       ships,
       behaviors,
-      caches.systems,
+      systems,
       caches.routePlanner,
       caches.systemConnectivity,
       ship,

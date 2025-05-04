@@ -2,11 +2,11 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/plan/trading.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsCache(
+  final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,
     systemConnectivity,
     sellsFuel: (_) => false,

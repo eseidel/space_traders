@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   var ships = await db.allShips();
   if (argResults.rest.isNotEmpty) {
     final onlyShips =

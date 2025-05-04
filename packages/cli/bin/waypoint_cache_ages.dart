@@ -2,19 +2,19 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli_table/cli_table.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final startSystemSymbol = await startSystemFromArg(
     db,
     argResults.rest.firstOrNull,
   );
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = SystemsCache(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
 
-  final waypoints = systemsCache.waypointsInSystem(startSystemSymbol);
+  final waypoints = await systemsCache.waypointsInSystem(startSystemSymbol);
 
   final table = Table(
     header: ['Waypoint', 'Market', 'Shipyard', 'Construction', 'Chart'],

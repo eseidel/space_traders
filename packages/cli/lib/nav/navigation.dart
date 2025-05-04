@@ -169,7 +169,7 @@ class NavResult {
 }
 
 void _verifyJumpTime(
-  SystemsCache systemsCache,
+  SystemsSnapshot systemsCache,
   Ship ship,
   SystemSymbol fromSystem,
   SystemSymbol toSystem,
@@ -384,7 +384,7 @@ Future<NavResult> continueNavigationIfNeeded(
       shipErr(ship, 'Warping to ${actionEnd.symbol}!');
       try {
         return NavResult._wait(
-          await warpToWaypointAndLog(db, api, caches.systems, ship, actionEnd),
+          await warpToWaypointAndLog(db, api, ship, actionEnd),
         );
       } on ApiException catch (e) {
         if (isInsufficientFuelException(e)) {

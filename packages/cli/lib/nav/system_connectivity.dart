@@ -273,7 +273,7 @@ class SystemConnectivity {
   /// The system itself is included in the stream with distance 0.
   /// The stream is roughly ordered by distance from the start.
   Iterable<(SystemSymbol systemSymbol, int jumps)> systemSymbolsInJumpRadius(
-    SystemsCache systemsCache, {
+    SystemsSnapshot systemsCache, {
     required SystemSymbol startSystem,
     required int maxJumps,
   }) sync* {

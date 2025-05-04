@@ -3,7 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/net/auth.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final startSystemSymbol = await startSystemFromArg(
     db,
     argResults.rest.firstOrNull,
@@ -11,7 +11,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final jumpGateSymbol =
       systemsCache
           .waypointsInSystem(startSystemSymbol)

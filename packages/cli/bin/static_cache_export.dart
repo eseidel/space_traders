@@ -2,10 +2,12 @@ import 'dart:convert';
 
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
+import 'package:file/local.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final staticCaches = StaticCaches(db);
 
+  const fs = LocalFileSystem();
   final directory = fs.directory('static_data');
   if (!await directory.exists()) {
     logger.err('Directory does not exist: $directory');

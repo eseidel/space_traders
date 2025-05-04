@@ -2,7 +2,7 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 // count the number of idle behaviors by FleetRole.
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
   final idleByRole = <FleetRole, int>{};

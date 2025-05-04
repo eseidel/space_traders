@@ -49,14 +49,14 @@ String _behaviorOrTypeString(Ship ship, BehaviorState? behavior) {
       '${ship.registration.role}';
 }
 
-void logShip(
+Future<void> logShip(
   SystemsCache systemsCache,
   MarketPriceSnapshot marketPrices,
   Ship ship,
   BehaviorState? behavior,
-) {
+) async {
   const indent = '   ';
-  final waypoint = systemsCache.waypoint(ship.waypointSymbol);
+  final waypointType = await systemsCache.waypointType(ship.waypointSymbol);
   final cargoStatus =
       ship.cargo.capacity == 0
           ? ''
@@ -74,14 +74,16 @@ void logShip(
   if (routePlan != null) {
     final timeLeft = ship.timeToArrival(routePlan);
     final destination = routePlan.endSymbol.sectorLocalName;
-    final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
+    final destinationType = await systemsCache.waypointType(
+      routePlan.endSymbol,
+    );
     final arrival = approximateDuration(timeLeft);
     logger.info(
       '${indent}en route to $destination $destinationType '
       'in $arrival',
     );
   } else {
-    logger.info('$indent${describeShipNav(ship.nav)} ${waypoint.type}');
+    logger.info('$indent${describeShipNav(ship.nav)} $waypointType');
   }
   final deal = behavior?.deal;
   if (deal != null) {
@@ -99,7 +101,7 @@ bool Function(Ship) filterFromArgs(List<String> args) {
   return (ship) => ship.symbol.symbol == symbol;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final filter = filterFromArgs(argResults.rest);
   final ships = await ShipSnapshot.load(db);
 
@@ -113,11 +115,11 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     return;
   }
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = SystemsCache(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   for (final ship in matchingShips) {
     final behaviorState = await db.behaviorStateBySymbol(ship.symbol);
-    logShip(systemsCache, marketPrices, ship, behaviorState);
+    await logShip(systemsCache, marketPrices, ship, behaviorState);
   }
 
   final behaviors = await BehaviorSnapshot.load(db);

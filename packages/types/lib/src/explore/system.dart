@@ -115,6 +115,30 @@ class SystemWaypoint {
   }
 }
 
+/// A type representing a system as it exists in the database.
+@immutable
+class SystemRecord {
+  /// Returns a new [SystemRecord] instance.
+  const SystemRecord({
+    required this.symbol,
+    required this.type,
+    required this.position,
+    required this.waypointSymbols,
+  });
+
+  /// The symbol of the system.
+  final SystemSymbol symbol;
+
+  /// The type of the system.
+  final SystemType type;
+
+  /// The position of the system.
+  final SystemPosition position;
+
+  /// The waypoints in the system.
+  final List<WaypointSymbol> waypointSymbols;
+}
+
 /// Type representing a system.
 @immutable
 class System {
@@ -126,6 +150,20 @@ class System {
     this.waypoints = const [],
     this.factions = const [],
   }) : sectorSymbol = symbol.sector;
+
+  /// Create a new [System] from a [SystemRecord].
+  factory System.fromRecord(
+    SystemRecord record,
+    List<SystemWaypoint> waypoints,
+  ) {
+    return System(
+      symbol: record.symbol,
+      type: record.type,
+      position: record.position,
+      waypoints: waypoints,
+      // Ignoring factions for now.
+    );
+  }
 
   /// Create a new [System] from JSON.
   factory System.fromJson(Map<String, dynamic> json) {

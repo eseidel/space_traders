@@ -6,12 +6,12 @@ import 'package:cli/plan/supply_chain.dart';
 // Returns the distance between two waypoints, or null if they are in different
 // systems.
 int? _distanceBetween(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   WaypointSymbol a,
   WaypointSymbol b,
 ) {
-  final aWaypoint = systemsCache.waypoint(a);
-  final bWaypoint = systemsCache.waypoint(b);
+  final aWaypoint = systems.waypoint(a);
+  final bWaypoint = systems.waypoint(b);
   if (aWaypoint.system != bWaypoint.system) {
     return null;
   }
@@ -31,7 +31,7 @@ class DescribingVisitor extends SupplyLinkVisitor {
   /// Create a new describing visitor.
   DescribingVisitor(this.systems, this.db);
 
-  final SystemsCache systems;
+  final SystemsSnapshot systems;
   final Database db;
 
   final _indent = ' ';
@@ -83,9 +83,9 @@ class DescribingVisitor extends SupplyLinkVisitor {
   }
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final exports = await TradeExportCache(db).snapshot();
-  final systems = SystemsCache.load(fs);
+  final systems = await SystemsSnapshot.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
   final charting = await ChartingSnapshot.load(db);
   final agent = await db.getMyAgent();

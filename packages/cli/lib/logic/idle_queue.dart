@@ -144,7 +144,7 @@ class IdleQueue {
     logger.detail(
       'System: $systemSymbol ($jumpDistance jumps, ${_systems.length} queued)',
     );
-    final waypoints = systemsCache.waypointsInSystem(systemSymbol);
+    final waypoints = await systemsCache.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.symbol;
       if (await waypointCache.hasMarketplace(waypointSymbol)) {

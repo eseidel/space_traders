@@ -11,14 +11,13 @@ import 'package:protocol/protocol.dart' as api;
 import 'package:server/read_async.dart';
 
 Future<api.DealsNearbyResponse> dealsNearby({
-  required FileSystem fs,
   required Database db,
   required ShipType shipType,
   required int limit,
   required WaypointSymbol? maybeStart,
   required int credits,
 }) async {
-  final systemsCache = SystemsCache.load(fs);
+  final systems = await SystemsSnapshot.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
   final jumpGates = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
@@ -27,8 +26,8 @@ Future<api.DealsNearbyResponse> dealsNearby({
     jumpGates,
     constructionSnapshot,
   );
-  final routePlanner = RoutePlanner.fromSystemsCache(
-    systemsCache,
+  final routePlanner = RoutePlanner.fromSystemsSnapshot(
+    systems,
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
   );
@@ -40,13 +39,12 @@ Future<api.DealsNearbyResponse> dealsNearby({
 
   final startWaypoint =
       maybeStart == null
-          ? agentCache!.headquarters(systemsCache)
-          : systemsCache.waypoint(maybeStart);
+          ? systems.waypoint(agentCache!.headquartersSymbol)
+          : systems.waypoint(maybeStart);
 
   final construction = await centralCommand.computeActiveConstruction(
     db,
     agentCache!,
-    systemsCache,
   );
   centralCommand.activeConstruction = construction;
 
@@ -57,7 +55,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
     centralCommand
         .subsidizedSellOpps = await computeConstructionMaterialSubsidies(
       db,
-      systemsCache,
+      systems,
       exportSnapshot,
       marketListings,
       charting,
@@ -82,7 +80,6 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final shipSpec = ship!.shipSpec;
 
   final marketScan = scanReachableMarkets(
-    systemsCache,
     systemConnectivity,
     marketPrices,
     startSystem: startWaypoint.system,
@@ -97,7 +94,6 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final dealNotInProgress = avoidDealsInProgress(behaviors.dealsInProgress());
   final deals =
       findDealsFor(
-            systemsCache,
             routePlanner,
             marketScan,
             maxTotalOutlay: credits,
@@ -144,10 +140,8 @@ Future<Response> onRequest(RequestContext context) async {
     );
   }
 
-  final fs = context.read<FileSystem>();
   final db = await context.readAsync<Database>();
   final response = await dealsNearby(
-    fs: fs,
     db: db,
     shipType: request.shipType ?? api.GetDealsNearbyRequest.defaultShipType,
     limit: request.limit ?? api.GetDealsNearbyRequest.defaultLimit,

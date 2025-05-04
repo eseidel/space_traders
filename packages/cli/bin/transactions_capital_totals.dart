@@ -6,7 +6,7 @@ String describeTransaction(Transaction t) {
       '${t.shipSymbol} ${t.waypointSymbol} ${t.creditsChange} ${t.accounting}';
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final transactions = await db.transactionsWithAccountingType(
     AccountingType.capital,
   );

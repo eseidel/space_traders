@@ -13,7 +13,7 @@ String annotatedName(CostedDeal deal) {
   return deal.tradeSymbol.value;
 }
 
-Future<void> cliMain(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> cliMain(Database db, ArgResults argResults) async {
   final behaviors = await BehaviorSnapshot.load(db);
   final states = behaviors.states.where((state) => state.deal != null).toList();
 

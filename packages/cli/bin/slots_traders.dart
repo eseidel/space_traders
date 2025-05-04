@@ -5,15 +5,15 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // First need to figure out which systems are worth checking.
 
-  final systems = await SystemsCache.loadOrFetch(fs);
+  final systems = await SystemsSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final agentCache = await AgentCache.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final routePlanner = RoutePlanner.fromSystemsCache(
+  final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systems,
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),
@@ -34,7 +34,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   // Find all trades available across all systems.
   final marketScan = scanReachableMarkets(
-    systems,
     systemConnectivity,
     marketPrices,
     // start system is just used for reachability.
@@ -50,7 +49,6 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       config.defaultAntimatterCost;
 
   final deals = findAllDeals(
-    systems,
     routePlanner,
     marketScan,
     shipSpec: shipSpec,

@@ -46,14 +46,14 @@ bool isUncharted(ChartingSnapshot charts, SystemWaypoint waypoint) {
 
 /// Walks our known system graph, starting from HQ and prints systems needing
 /// exploration.
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final startSystemSymbol = await startSystemFromArg(
     db,
     argResults.rest.firstOrNull,
   );
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final charts = await ChartingSnapshot.load(db);
 
   final connectedSystems =

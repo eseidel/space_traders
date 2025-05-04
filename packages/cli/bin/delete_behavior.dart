@@ -1,6 +1,6 @@
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   var behaviors = await db.allBehaviorStates();
   final onlyShips = argResults.rest.map((s) => int.parse(s, radix: 16)).toSet();
   behaviors =

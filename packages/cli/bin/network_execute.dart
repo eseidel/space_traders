@@ -158,7 +158,7 @@ class NetExecutor {
   }
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final connection = await defaultDatabase();
   await NetExecutor(
     connection,

@@ -2,7 +2,7 @@ import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cli.dart';
 import 'package:stats/stats.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // TODO(eseidel): This entire command could be a db query.
   final prices = await MarketPriceSnapshot.loadAll(db);
   logger.info('${prices.prices.length} prices loaded.');

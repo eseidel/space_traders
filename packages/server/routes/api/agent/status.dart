@@ -7,18 +7,18 @@ import 'package:server/read_async.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
-  final fs = context.read<FileSystem>();
 
   final agent = (await db.getMyAgent())!;
   final ships = await db.allShips();
 
-  final systemsCache = SystemsCache.load(fs);
-  final jumpGate =
-      systemsCache.jumpGateWaypointForSystem(agent.headquarters.system)!;
+  final systemsCache = SystemsCache(db);
+  final jumpGate = await systemsCache.jumpGateWaypointForSystem(
+    agent.headquarters.system,
+  );
 
   final constructionCache = ConstructionCache(db);
   final underConstruction = await constructionCache.isUnderConstruction(
-    jumpGate.symbol,
+    jumpGate!.symbol,
   );
   final config = await Config.fromDb(db);
 

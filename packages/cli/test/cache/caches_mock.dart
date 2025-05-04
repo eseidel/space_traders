@@ -29,7 +29,7 @@ class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
+class _MockSystemsSnapshot extends Mock implements SystemsSnapshot {}
 
 class _MockTradeExportCache extends Mock implements TradeExportCache {}
 
@@ -80,7 +80,7 @@ Caches mockCaches() {
   return Caches(
     agent: _MockAgentCache(),
     marketPrices: _MockMarketPrices(),
-    systems: _MockSystemsCache(),
+    systems: _MockSystemsSnapshot(),
     waypoints: _MockWaypointCache(),
     markets: _MockMarketCache(),
     charting: _MockChartingCache(),

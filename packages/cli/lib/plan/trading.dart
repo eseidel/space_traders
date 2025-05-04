@@ -1,5 +1,4 @@
 import 'package:cli/cache/market_price_snapshot.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
@@ -78,7 +77,6 @@ String describeCostedDeal(CostedDeal costedDeal) {
 
 /// Returns a CostedDeal for a given deal.
 CostedDeal costOutDeal(
-  SystemsCache systemsCache,
   RoutePlanner routePlanner,
   ShipSpec shipSpec,
   Deal deal, {
@@ -91,12 +89,7 @@ CostedDeal costOutDeal(
     deal.sourceSymbol,
     deal.destinationSymbol,
   ];
-  final route = planRouteThrough(
-    systemsCache,
-    routePlanner,
-    shipSpec,
-    waypointSymbols,
-  );
+  final route = planRouteThrough(routePlanner, shipSpec, waypointSymbols);
 
   if (route == null) {
     for (final symbol in waypointSymbols) {
@@ -121,7 +114,6 @@ CostedDeal costOutDeal(
 
 /// Builds a MarketScan from all known markets.
 MarketScan scanReachableMarkets(
-  SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
   MarketPriceSnapshot marketPrices, {
   required SystemSymbol startSystem,
@@ -137,7 +129,6 @@ MarketScan scanReachableMarkets(
 /// Returns the best deals for the given parameters,
 /// sorted by profit per second, with most profitable first.
 Iterable<CostedDeal> findDealsFor(
-  SystemsCache systemsCache,
   RoutePlanner routePlanner,
   MarketScan scan, {
   required WaypointSymbol startSymbol,
@@ -181,7 +172,6 @@ Iterable<CostedDeal> findDealsFor(
       filtered
           .map(
             (deal) => costOutDeal(
-              systemsCache,
               routePlanner,
               shipSpec,
               deal,
@@ -222,7 +212,6 @@ Iterable<CostedDeal> findDealsFor(
 /// Returns all deals for the given scan, assuming each starts from the deal's
 /// own source.  Used for planning trader spacing across the entire universe.
 Iterable<CostedDeal> findAllDeals(
-  SystemsCache systems,
   RoutePlanner routePlanner,
   MarketScan scan, {
   required ShipSpec shipSpec,
@@ -242,7 +231,6 @@ Iterable<CostedDeal> findAllDeals(
       deals
           .map(
             (deal) => costOutDeal(
-              systems,
               routePlanner,
               shipSpec,
               deal,
@@ -555,7 +543,6 @@ bool Function(Deal) avoidDealsInProgress(
 /// This is visible for scripts, generally you want to use
 /// CentralCommand.findNextDealAndLog instead.
 Iterable<CostedDeal> scanAndFindDeals(
-  SystemsCache systemsCache,
   SystemConnectivity systemConnectivity,
   MarketPriceSnapshot marketPrices,
   RoutePlanner routePlanner, {
@@ -569,13 +556,11 @@ Iterable<CostedDeal> scanAndFindDeals(
   int minProfitPerSecond = 0,
 }) {
   final marketScan = scanReachableMarkets(
-    systemsCache,
     systemConnectivity,
     marketPrices,
     startSystem: startSymbol.system,
   );
   return findDealsFor(
-    systemsCache,
     routePlanner,
     marketScan,
     maxTotalOutlay: maxTotalOutlay,

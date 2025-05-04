@@ -20,12 +20,12 @@ void main(List<String> args) async {
   );
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   const shipType = ShipType.EXPLORER;
   final timing = argResults['timing'] as bool;
 
   final agentCache = await AgentCache.load(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
   final sellsFuel = defaultSellsFuel(marketListings);
   // final sellsFuel = defaultFuel;

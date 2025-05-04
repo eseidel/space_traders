@@ -51,7 +51,7 @@ void main(List<String> args) async {
 }
 
 WaypointSymbol waypointFromArg(
-  SystemsCache systems,
+  SystemsSnapshot systems,
   String arg, {
   required String name,
 }) {
@@ -60,10 +60,7 @@ WaypointSymbol waypointFromArg(
   } on FormatException {
     try {
       final system = SystemSymbol.fromString(arg);
-      final jumpGate = systems.jumpGateWaypointForSystem(system);
-      if (jumpGate == null) {
-        throw Exception('No jump gate for system $system');
-      }
+      final jumpGate = systems.jumpGateWaypointForSystem(system)!;
       return jumpGate.symbol;
     } on FormatException {
       throw FormatException(
@@ -74,7 +71,7 @@ WaypointSymbol waypointFromArg(
   }
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final shipType = shipTypeFromArg(argResults['ship'] as String);
   final args = argResults.rest;
   if (args.length != 2) {
@@ -82,7 +79,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     return;
   }
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final start = waypointFromArg(systemsCache, args[0], name: 'start');
   final end = waypointFromArg(systemsCache, args[1], name: 'end');
 
@@ -99,7 +96,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   }
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsCache(
+  final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,
     systemConnectivity,
     sellsFuel: sellsFuel,

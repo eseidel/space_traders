@@ -1,7 +1,6 @@
 import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/nav/system_pathing.dart';
-import 'package:file/memory.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -10,7 +9,6 @@ void main() {
     final start = WaypointSymbol.fromString('X-A-A');
     final end = WaypointSymbol.fromString('X-B-B');
 
-    final fs = MemoryFileSystem.test();
     final systems = [
       System.test(
         start.system,
@@ -22,7 +20,7 @@ void main() {
         waypoints: [SystemWaypoint.test(end, type: WaypointType.JUMP_GATE)],
       ),
     ];
-    final systemsCache = SystemsCache(systems, fs: fs);
+    final systemsCache = SystemsSnapshot(systems);
     final systemConnectivity = SystemConnectivity.test({
       start: {end},
     });

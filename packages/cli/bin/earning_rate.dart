@@ -11,7 +11,7 @@ int hoursAgo(DateTime time) {
   return DateTime.timestamp().difference(time).inHours;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // Credits per hour.
   final oneDayAgoAsHour = snapToHour(
     DateTime.timestamp().subtract(const Duration(hours: 24)),

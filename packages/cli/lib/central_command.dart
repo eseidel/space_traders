@@ -20,10 +20,10 @@ import 'package:types/types.dart';
 // This is a bit of a cheat.  It appears starter systems all have over 20
 // non-asteroid waypoints.  We can use this to find starter systems.
 /// Returns the set of systems we should prefer to chart.
-Set<SystemSymbol> findInterestingSystems(SystemsCache systemsCache) {
-  final allSystems = systemsCache.systems;
+Set<SystemSymbol> findInterestingSystems(SystemsSnapshot systems) {
+  // TODO(eseidel): Make this a single db query.
   // All systems with over 20 non-asteroid waypoints:
-  return allSystems
+  return systems.systems
       .where(
         (system) => system.waypoints.where((w) => !w.isAsteroid).length > 20,
       )
@@ -314,7 +314,7 @@ class CentralCommand {
     AgentCache agentCache,
     ContractSnapshot contractSnapshot,
     MarketPriceSnapshot marketPrices,
-    SystemsCache systemsCache,
+    SystemsSnapshot systems,
     SystemConnectivity systemConnectivity,
     RoutePlanner routePlanner,
     BehaviorSnapshot behaviors,
@@ -352,7 +352,6 @@ class CentralCommand {
         config.defaultAntimatterCost;
 
     final deals = scanAndFindDeals(
-      systemsCache,
       systemConnectivity,
       marketPrices,
       routePlanner,
@@ -388,7 +387,7 @@ class CentralCommand {
   Future<WaypointSymbol?> nextWaypointToChart(
     ShipSnapshot ships,
     BehaviorSnapshot behaviors,
-    SystemsCache systems,
+    SystemsSnapshot systems,
     ChartingSnapshot charts,
     SystemConnectivity connectivity,
     Ship ship, {
@@ -552,17 +551,13 @@ class CentralCommand {
 
   Future<ConstructionRecord?> _constructionForSystem(
     Database db,
-    SystemsCache systems,
     SystemSymbol systemSymbol,
   ) async {
-    final SystemWaypoint? jumpGate;
-    try {
-      jumpGate = systems.jumpGateWaypointForSystem(systemSymbol);
-    } on Exception catch (e) {
-      logger.warn('Failed to find jump gate for $systemSymbol: $e');
-      return null;
-    }
+    final jumpGate = await SystemsCache(
+      db,
+    ).jumpGateWaypointForSystem(systemSymbol);
     if (jumpGate == null) {
+      logger.warn('Failed to find jump gate for $systemSymbol: $e');
       return null;
     }
     return await ConstructionCache(db).getRecord(jumpGate.symbol);
@@ -572,10 +567,9 @@ class CentralCommand {
   /// Returns null if we don't know.
   Future<bool?> isJumpgateComplete(
     Database db,
-    SystemsCache systems,
     SystemSymbol systemSymbol,
   ) async {
-    final record = await _constructionForSystem(db, systems, systemSymbol);
+    final record = await _constructionForSystem(db, systemSymbol);
     if (record == null) {
       return null;
     }
@@ -586,7 +580,6 @@ class CentralCommand {
   Future<Construction?> computeActiveConstruction(
     Database db,
     AgentCache agentCache,
-    SystemsCache systems,
   ) async {
     if (!isConstructionTradingEnabled) {
       return null;
@@ -596,7 +589,7 @@ class CentralCommand {
     }
 
     final systemSymbol = agentCache.headquartersSystemSymbol;
-    final record = await _constructionForSystem(db, systems, systemSymbol);
+    final record = await _constructionForSystem(db, systemSymbol);
     return record?.construction;
   }
 
@@ -674,11 +667,7 @@ class CentralCommand {
 
     final ships = await ShipSnapshot.load(db);
     _isGateComplete =
-        await isJumpgateComplete(
-          db,
-          caches.systems,
-          caches.agent.headquartersSystemSymbol,
-        ) ??
+        await isJumpgateComplete(db, caches.agent.headquartersSystemSymbol) ??
         false;
     final phase = _determineGamePhase(ships, jumpGateComplete: _isGateComplete);
     logger.info('$phase');
@@ -699,10 +688,11 @@ class CentralCommand {
         assignProbesToSystems(caches.systemConnectivity, marketListings, ships),
       );
 
+    final systems = await SystemsSnapshot.load(db);
     if (config.enableMining) {
       miningSquads = await assignShipsToSquads(
         db,
-        caches.systems,
+        systems,
         caches.charting,
         ships,
         systemSymbol: caches.agent.headquartersSystemSymbol,
@@ -725,16 +715,12 @@ class CentralCommand {
       );
     }
 
-    activeConstruction = await computeActiveConstruction(
-      db,
-      caches.agent,
-      caches.systems,
-    );
+    activeConstruction = await computeActiveConstruction(db, caches.agent);
     subsidizedSellOpps = [];
     if (isConstructionTradingEnabled && activeConstruction != null) {
       subsidizedSellOpps = await computeConstructionMaterialSubsidies(
         db,
-        caches.systems,
+        systems,
         await caches.static.exports.snapshot(),
         marketListings,
         charting,
@@ -1012,7 +998,7 @@ class CentralCommand {
   // TODO(eseidel): call from or merge into getJobForShip.
   Future<ExtractionJob?> siphonJobForShip(
     Database db,
-    SystemsCache systemsCache,
+    SystemsSnapshot systems,
     ChartingCache chartingCache,
     AgentCache agentCache,
     Ship ship,
@@ -1020,7 +1006,7 @@ class CentralCommand {
     final score =
         (await evaluateWaypointsForSiphoning(
           db,
-          systemsCache,
+          systems,
           chartingCache,
           agentCache.headquartersSystemSymbol,
         )).firstOrNull;
@@ -1175,7 +1161,7 @@ ExtractionSquad? findSquadForShip(
 /// Compute what our current mining squads should be.
 Future<List<ExtractionSquad>> assignShipsToSquads(
   Database db,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   ChartingCache chartingCache,
   ShipSnapshot ships, {
   required SystemSymbol systemSymbol,
@@ -1184,7 +1170,7 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
   final scores =
       (await evaluateWaypointsForMining(
             db,
-            systemsCache,
+            systems,
             chartingCache,
             systemSymbol,
           ))
@@ -1197,7 +1183,7 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
   // Sort by distance from center of the system.
   final origin = WaypointPosition(0, 0, systemSymbol);
   scores.sortBy<num>((score) {
-    final mineWaypoint = systemsCache.waypoint(score.source);
+    final mineWaypoint = systems.waypoint(score.source);
     final distance = mineWaypoint.position.distanceTo(origin);
     return distance.toInt();
   });
@@ -1293,7 +1279,7 @@ class _ImportCollector extends SupplyLinkVisitor {
 /// traders to service that route as normal which is probably not bad.
 Future<List<SellOpp>> computeConstructionMaterialSubsidies(
   Database db,
-  SystemsCache systems,
+  SystemsSnapshot systems,
   TradeExportSnapshot exports,
   MarketListingSnapshot marketListings,
   ChartingSnapshot charting,

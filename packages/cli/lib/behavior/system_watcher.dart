@@ -111,7 +111,7 @@ Future<bool> _isMissingRecentShipyardData(
 /// Returns the symbol of a waypoint in the system missing a chart.
 Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
   Database db,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   ChartingCache chartingCache,
   Ship ship,
   System system, {
@@ -127,7 +127,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingUpdate(
   }
   final systemWaypoints = system.waypoints.toList(); // Copy so we can sort.
   if (start != null) {
-    final startWaypoint = systemsCache.waypoint(start);
+    final startWaypoint = systems.waypoint(start);
     systemWaypoints.sortBy<num>((a) => a.distanceTo(startWaypoint));
   }
 
@@ -268,7 +268,7 @@ Future<JobResult> doSystemWatcher(
     caches.systems,
     caches.charting,
     ship,
-    caches.systems[systemSymbol],
+    caches.systems.systemBySymbol(systemSymbol),
     waypointCache: caches.waypoints,
     maxAge: maxAge,
     filter:

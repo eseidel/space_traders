@@ -30,7 +30,7 @@ class _WarpPlanner {
     required this.sellsFuel,
   });
 
-  final SystemsCache systemsCache;
+  final SystemsSnapshot systemsCache;
   final SystemConnectivity systemConnectivity;
   final bool Function(WaypointSymbol) sellsFuel;
 
@@ -182,7 +182,7 @@ class _WarpPlanner {
 /// The route will be planned for the given [shipSpec] and will include warps
 /// if shipSpec.canWarp is true.
 List<RouteAction>? findRouteBetweenSystems(
-  SystemsCache systemsCache,
+  SystemsSnapshot systemsCache,
   SystemConnectivity systemConnectivity,
   ShipSpec shipSpec, {
   required WaypointSymbol start,

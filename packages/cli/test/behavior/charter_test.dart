@@ -5,7 +5,6 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -146,8 +145,6 @@ void main() {
     // Make sure nextUnchartedWaypointSymbol returns waypoints in our current
     // system when they exist, otherwise a nearby system, otherwise null.
 
-    final fs = MemoryFileSystem.test();
-
     const shipSymbol = ShipSymbol('S', 1);
     final systemASymbol = SystemSymbol.fromString('S-A');
     final waypointAASymbol = WaypointSymbol.fromString('S-A-A');
@@ -182,7 +179,7 @@ void main() {
         ],
       ),
     ];
-    final systemsCache = SystemsCache(systems, fs: fs);
+    final systemsCache = SystemsSnapshot(systems);
     final systemConnectivity = SystemConnectivity.test({
       waypointBASymbol: {waypointABSymbol},
     });

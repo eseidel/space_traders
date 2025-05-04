@@ -39,7 +39,7 @@ double _scoreMarkets(
   return percentiles.average / 100.0;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final countLimit = int.tryParse(argResults['limit'] as String);
   if (countLimit == null) {
     throw ArgumentError.value(
@@ -65,7 +65,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ' with matching markets within $maxDistance total round-trip:',
   );
 
-  final systems = await SystemsCache.loadOrFetch(fs);
+  final systems = await SystemsSnapshot.load(db);
   final charting = ChartingCache(db);
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);

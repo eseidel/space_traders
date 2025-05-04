@@ -1,7 +1,7 @@
 import 'package:cli/cli.dart';
 import 'package:stats/stats.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final extractions = await db.allExtractions();
   // Count extractions by surveySignature
   final extractionCountBySurveySignature = <String, int>{};

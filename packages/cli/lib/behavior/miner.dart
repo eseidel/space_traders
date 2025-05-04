@@ -335,7 +335,6 @@ Future<JobResult> emptyCargoIfNeededForMining(
 // TODO(eseidel): replace with findBestMarketToSell in all places?
 Future<WaypointSymbol?> _nearbyMarketWhichTrades(
   Database db,
-  SystemsCache systemsCache,
   WaypointSymbol startSymbol,
   TradeSymbol tradeSymbol,
 ) async {
@@ -344,14 +343,11 @@ Future<WaypointSymbol?> _nearbyMarketWhichTrades(
     return startSymbol;
   }
   // TODO(eseidel): Handle jumps again!
-  final waypoints = systemsCache.waypointsInSystem(startSymbol.system);
-  for (final waypoint in waypoints) {
-    final market = await db.marketListingForSymbol(waypoint.symbol);
-    if (market != null && market.allowsTradeOf(tradeSymbol)) {
-      return waypoint.symbol;
-    }
-  }
-  return null;
+  final symbols = await db.marketsWhichBuysTradeSymbolInSystem(
+    startSymbol.system,
+    tradeSymbol,
+  );
+  return symbols.firstOrNull;
 }
 
 /// Attempt to empty cargo if needed, will navigate to a market if needed.
@@ -410,7 +406,6 @@ Future<JobResult> emptyCargoIfNeeded(
   final largestCargo = ship.largestCargo();
   final nearestMarketSymbol = await _nearbyMarketWhichTrades(
     db,
-    caches.systems,
     ship.waypointSymbol,
     largestCargo!.tradeSymbol,
   );

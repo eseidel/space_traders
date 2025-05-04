@@ -3,7 +3,7 @@ import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/plan/ships.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final staticCaches = StaticCaches(db);
 

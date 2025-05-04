@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 
 /// Returns the path from [start] to [end] as a list of system symbols.
 List<SystemSymbol>? findSystemPath(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemConnectivity systemConnectivity,
   System start,
   System end,
@@ -33,11 +33,11 @@ List<SystemSymbol>? findSystemPath(
     if (currentSymbol == endSymbol) {
       break;
     }
-    final currentSystem = systemsCache.systemBySymbol(currentSymbol);
+    final currentSystem = systems.systemBySymbol(currentSymbol);
     final connected = systemConnectivity.directlyConnectedSystemSymbols(
       currentSymbol,
     );
-    final connectedSystems = connected.map(systemsCache.systemBySymbol);
+    final connectedSystems = connected.map(systems.systemBySymbol);
 
     for (final nextSystem in connectedSystems) {
       final next = nextSystem.symbol;
@@ -71,13 +71,13 @@ List<SystemSymbol>? findSystemPath(
 
 /// Returns the path from [start] to [end] as a list of waypoint symbols.
 List<WaypointSymbol>? findWaypointPathJumpsOnly(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemConnectivity systemConnectivity,
   WaypointSymbol start,
   WaypointSymbol end,
 ) {
-  final startSystem = systemsCache.systemBySymbol(start.system);
-  final endSystem = systemsCache.systemBySymbol(end.system);
+  final startSystem = systems.systemBySymbol(start.system);
+  final endSystem = systems.systemBySymbol(end.system);
   if (start.system == end.system) {
     // The caller needs to turn this into a real intra-system path.
     return [start, end];
@@ -87,7 +87,7 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   }
 
   final systemSymbols = findSystemPath(
-    systemsCache,
+    systems,
     systemConnectivity,
     startSystem,
     endSystem,
@@ -97,7 +97,7 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   }
   // TODO(eseidel): This will fail if systems have more than one jump gate.
   final jumpGateSymbols = systemSymbols.map(
-    (s) => systemsCache.jumpGateWaypointForSystem(s)!.symbol,
+    (s) => systems.jumpGateWaypointForSystem(s)!.symbol,
   );
   return [
     if (start != jumpGateSymbols.first) start,

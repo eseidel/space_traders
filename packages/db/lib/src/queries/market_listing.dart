@@ -55,6 +55,18 @@ Query marketsWithExportInSystemQuery(
   parameters: {'system': system.system, 'tradeSymbol': tradeSymbol.toJson()},
 );
 
+/// Query to return all markets which buys a given symbol within a system.
+Query marketsWhichBuysTradeSymbolInSystemQuery(
+  SystemSymbol system,
+  TradeSymbol tradeSymbol,
+) => Query(
+  '''
+      SELECT symbol FROM market_listing_
+      WHERE starts_with(symbol, @system) AND @tradeSymbol = ANY(imports) OR @tradeSymbol = ANY(exchange)
+      ''',
+  parameters: {'system': system.system, 'tradeSymbol': tradeSymbol.toJson()},
+);
+
 /// Query to return if we know of a market which trades a given symbol.
 Query knowOfMarketWhichTradesQuery(TradeSymbol tradeSymbol) => Query(
   '''

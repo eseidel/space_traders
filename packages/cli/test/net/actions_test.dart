@@ -34,8 +34,6 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
 void main() {
@@ -182,7 +180,7 @@ void main() {
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     final shipFuel = ShipFuel(current: 0, capacity: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
-    final systemsCache = _MockSystemsCache();
+    final systemsSnapshot = SystemsSnapshot([]);
 
     final patchResponse = PatchShipNav200Response(
       data: PatchShipNav200ResponseData(nav: shipNav, fuel: shipFuel),
@@ -218,7 +216,7 @@ void main() {
       () => navigateToLocalWaypoint(
         db,
         api,
-        systemsCache,
+        systemsSnapshot,
         ship,
         WaypointSymbol.fromString('S-A-W'),
       ),

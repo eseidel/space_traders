@@ -30,7 +30,7 @@ int _timeBetween(
 /// Only works if [start] and [end] are in the same system.
 /// This relies on sellFuel callback to determine if a waypoint sells fuel.
 List<RouteAction>? findRouteWithinSystem(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   ShipSpec shipSpec, {
   required WaypointSymbol start,
   required WaypointSymbol end,
@@ -38,8 +38,8 @@ List<RouteAction>? findRouteWithinSystem(
 }) {
   final fuelCapacity = shipSpec.fuelCapacity;
   final shipSpeed = shipSpec.speed;
-  final startWaypoint = systemsCache.waypoint(start);
-  final endWaypoint = systemsCache.waypoint(end);
+  final startWaypoint = systems.waypoint(start);
+  final endWaypoint = systems.waypoint(end);
   if (start.system != end.system) {
     throw ArgumentError(
       'Cannot find path between ${start.system} and ${end.system}',
@@ -67,7 +67,7 @@ List<RouteAction>? findRouteWithinSystem(
     ];
   }
 
-  final systemWaypoints = systemsCache.waypointsInSystem(start.system);
+  final systemWaypoints = systems.waypointsInSystem(start.system);
   // We only consider waypoints that have markets that sell fuel.
   // Also include the start and end waypoints.
   final waypoints =
@@ -105,7 +105,7 @@ List<RouteAction>? findRouteWithinSystem(
     if (currentSymbol == end) {
       break;
     }
-    final currentWaypoint = systemsCache.waypoint(currentSymbol);
+    final currentWaypoint = systems.waypoint(currentSymbol);
     // All waypoints are always reachable, just a question of what flight mode.
     for (final nextWaypoint in waypoints) {
       final flightMode = flightModeRequired(

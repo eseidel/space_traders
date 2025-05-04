@@ -7,10 +7,10 @@ class _Stats {
   int count = 0;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final surveys = await db.allSurveys();
   final chartingSnapshot = await ChartingSnapshot.load(db);
-  final systems = SystemsCache.load(fs);
+  final systems = SystemsCache(db);
 
   // For each waypoint, record what tradeSymbols are found there.
   final statsByWaypoint = <WaypointSymbol, _Stats>{};
@@ -29,7 +29,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
         stats.tradeSymbols.map((tradeSymbol) => tradeSymbol.toString()).toList()
           ..sort()
           ..join(', ');
-    final waypointType = systems.waypoint(waypointSymbol).type;
+    final waypointType = await systems.waypointType(waypointSymbol);
     final expectedSymbols = expectedGoodsForWaypoint(
       waypointType,
       chartingSnapshot[waypointSymbol]?.values?.traitSymbols ?? {},

@@ -132,13 +132,13 @@ bool? _hasExtractableGood(
 }
 
 WaypointSymbol? _nearestExtractionSiteFor(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   ChartingSnapshot chartingSnapshot,
   TradeSymbol tradeSymbol,
   WaypointSymbol waypointSymbol,
 ) {
-  final destination = systemsCache.waypoint(waypointSymbol);
-  final candidates = systemsCache
+  final destination = systems.waypoint(waypointSymbol);
+  final candidates = systems
       .waypointsInSystem(waypointSymbol.system)
       .where(
         (waypoint) =>
@@ -149,12 +149,12 @@ WaypointSymbol? _nearestExtractionSiteFor(
 }
 
 MarketListing? _nearestListingWithExport(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   MarketListingSnapshot marketListings,
   TradeSymbol tradeSymbol,
   WaypointSymbol waypointSymbol,
 ) {
-  final destination = systemsCache.waypoint(waypointSymbol);
+  final destination = systems.waypoint(waypointSymbol);
   final sortedListings = marketListings.listings
       // Listings in this same system which export the good.
       .where(
@@ -163,7 +163,7 @@ MarketListing? _nearestListingWithExport(
             entry.exports.contains(tradeSymbol),
       )
       .sortedBy<num>(
-        (l) => systemsCache.waypoint(l.waypointSymbol).distanceTo(destination),
+        (l) => systems.waypoint(l.waypointSymbol).distanceTo(destination),
       );
   return sortedListings.firstOrNull;
 }
@@ -172,7 +172,7 @@ MarketListing? _nearestListingWithExport(
 class SupplyChainBuilder {
   /// Create a new supply chain builder.
   const SupplyChainBuilder({
-    required SystemsCache systems,
+    required SystemsSnapshot systems,
     required MarketListingSnapshot marketListings,
     required TradeExportSnapshot exports,
     required ChartingSnapshot charting,
@@ -182,7 +182,7 @@ class SupplyChainBuilder {
        _charting = charting;
 
   final MarketListingSnapshot _marketListings;
-  final SystemsCache _systems;
+  final SystemsSnapshot _systems;
   final TradeExportSnapshot _exports;
   final ChartingSnapshot _charting;
 

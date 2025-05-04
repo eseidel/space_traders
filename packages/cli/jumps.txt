@@ -1,0 +1,3 @@
+cli-1  | [WARN] 🛸#12 trader    Jump X1-BU61 to X1-MQ72 (591) expected 651 second cooldown, got 192.
+cli-1  | [WARN] 🛸#94 trader    Jump X1-KZ57 to X1-VK40 (818) expected 878 second cooldown, got 260.
+cli-1  | [WARN] 🛸#5C explorer  Jump X1-AP68 to X1-JS3 (686) expected 746 second cooldown, got 221.

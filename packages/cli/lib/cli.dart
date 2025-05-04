@@ -3,7 +3,6 @@ import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:file/local.dart';
 import 'package:meta/meta.dart';
 import 'package:scoped_deps/scoped_deps.dart';
 import 'package:types/types.dart';
@@ -19,7 +18,7 @@ export 'package:types/types.dart';
 /// Run command with a logger, but without an Api.
 Future<void> runOffline(
   List<String> args,
-  Future<void> Function(FileSystem fs, Database db, ArgResults argResults) fn, {
+  Future<void> Function(Database db, ArgResults argResults) fn, {
   void Function(ArgParser parser)? addArgs,
   @visibleForTesting Logger? overrideLogger,
   @visibleForTesting Database? overrideDatabase,
@@ -36,7 +35,6 @@ Future<void> runOffline(
         ..addFlag('help', abbr: 'h', help: 'Show help', negatable: false);
   addArgs?.call(parser);
   final results = parser.parse(args);
-  const fs = LocalFileSystem();
   return runScoped(
     () async {
       if (results['verbose'] as bool) {
@@ -50,7 +48,7 @@ Future<void> runOffline(
       if (loadConfig) {
         config = await Config.fromDb(db);
       }
-      final result = await fn(fs, db, results);
+      final result = await fn(db, results);
       await db.close();
       return result;
     },

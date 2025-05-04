@@ -14,7 +14,7 @@ Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
   return value;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final api = await waitForApi(db, getPriority: () => networkPriorityLow);
   final agent = await waitFor(db, () => db.getMyAgent());
 
@@ -24,19 +24,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     queue = IdleQueue()..queueSystem(systemSymbol, jumpDistance: 0);
   }
 
-  final systems = await SystemsCache.loadOrFetch(fs);
-  final charting = ChartingCache(db);
-  final construction = ConstructionCache(db);
-  final waypointTraits = WaypointTraitCache(db);
+  final systems = SystemsCache(db);
   final tradeGoods = TradeGoodCache(db);
-  final waypointCache = WaypointCache(
-    api,
-    db,
-    systems,
-    charting,
-    construction,
-    waypointTraits,
-  );
+  final waypointCache = WaypointCache(api, db);
   final marketCache = MarketCache(db, api, tradeGoods);
   final constructionCache = ConstructionCache(db);
 
@@ -45,7 +35,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   resetQueue();
 
   if (argResults['all'] as bool) {
-    final interestingSystems = findInterestingSystems(systems);
+    final interestingSystems = findInterestingSystems(
+      await SystemsSnapshot.load(db),
+    );
     for (final symbol in interestingSystems) {
       queue.queueSystem(symbol, jumpDistance: 0);
     }

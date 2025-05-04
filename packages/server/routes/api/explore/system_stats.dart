@@ -7,11 +7,10 @@ import 'package:types/types.dart';
 
 /// Compute system stats from our caches starting from a given system.
 Future<SystemStats> computeSystemStats({
-  required FileSystem fs,
   required Database db,
   required SystemSymbol startSystemSymbol,
 }) async {
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   // Can't use loadSystemConnectivity because need jumpGateSnapshot later.
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
@@ -121,11 +120,9 @@ Future<SystemStats> computeSystemStats({
 
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
-  final fs = context.read<FileSystem>();
 
   final agentCache = await AgentCache.load(db);
   final stats = await computeSystemStats(
-    fs: fs,
     db: db,
     startSystemSymbol: agentCache!.headquartersSymbol.system,
   );

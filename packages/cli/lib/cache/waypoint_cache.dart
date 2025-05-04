@@ -12,50 +12,21 @@ import 'package:types/types.dart';
 // how we store waypoint information in our database caches.
 class WaypointCache {
   /// Create a new WaypointCache.
-  WaypointCache(
-    Api api,
-    Database db,
-    SystemsCache systems,
-    ChartingCache charting,
-    ConstructionCache construction,
-    WaypointTraitCache waypointTraits,
-  ) : _api = api,
-      _db = db,
-      _systemsCache = systems,
-      _chartingCache = charting,
-      _constructionCache = construction,
-      _waypointTraits = waypointTraits;
-
-  /// Create a new WaypointCache which only uses cached values.
-  WaypointCache.cachedOnly(
-    Database db,
-    SystemsCache systems,
-    ChartingCache charting,
-    ConstructionCache construction,
-    WaypointTraitCache waypointTraits,
-  ) : _api = null,
-      _db = db,
-      _systemsCache = systems,
-      _chartingCache = charting,
-      _constructionCache = construction,
-      _waypointTraits = waypointTraits;
+  WaypointCache(Api api, Database db) : _api = api, _db = db;
 
   final Database _db;
   final Api? _api;
-  final SystemsCache _systemsCache;
-  final ChartingCache _chartingCache;
-  final ConstructionCache _constructionCache;
-  final WaypointTraitCache _waypointTraits;
+
+  SystemsCache get _systemsCache => SystemsCache(_db);
+  ChartingCache get _chartingCache => ChartingCache(_db);
+  ConstructionCache get _constructionCache => ConstructionCache(_db);
+  WaypointTraitCache get _waypointTraits => WaypointTraitCache(_db);
 
   Future<Waypoint?> _waypointOrNullFromCache(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
   }) async {
     final cachedWaypoint = await waypointFromCaches(
-      _systemsCache,
-      _chartingCache,
-      _constructionCache,
-      _waypointTraits,
       waypointSymbol,
       maxAge: maxAge,
     );
@@ -66,7 +37,7 @@ class WaypointCache {
     SystemSymbol systemSymbol, {
     Duration maxAge = defaultMaxAge,
   }) async {
-    final systemWaypoints = _systemsCache.waypointsInSystem(systemSymbol);
+    final systemWaypoints = await _systemsCache.waypointsInSystem(systemSymbol);
     final cachedWaypoints = <Waypoint>[];
     for (final systemWaypoint in systemWaypoints) {
       // TODO(eseidel): Could make this a single db query by fetching all
@@ -211,63 +182,59 @@ class WaypointCache {
   Future<bool> canBeSiphoned(WaypointSymbol waypointSymbol) async {
     return (await waypoint(waypointSymbol)).canBeSiphoned;
   }
-}
 
-/// Synthesizes a waypoint from cached values if possible.
-Future<Waypoint?> waypointFromCaches(
-  SystemsCache systemsCache,
-  ChartingCache chartingCache,
-  ConstructionCache constructionCache,
-  WaypointTraitCache waypointTraits,
-  WaypointSymbol waypointSymbol, {
-  Duration maxAge = defaultMaxAge,
-}) async {
-  final record = await chartingCache.chartingRecord(
-    waypointSymbol,
-    maxAge: maxAge,
-  );
-  if (record == null) {
-    return null;
-  }
-  final isUnderConstruction = await constructionCache.isUnderConstruction(
-    waypointSymbol,
-    maxAge: maxAge,
-  );
-  if (isUnderConstruction == null) {
-    return null;
-  }
+  /// Synthesizes a waypoint from cached values if possible.
+  Future<Waypoint?> waypointFromCaches(
+    WaypointSymbol waypointSymbol, {
+    Duration maxAge = defaultMaxAge,
+  }) async {
+    final record = await _chartingCache.chartingRecord(
+      waypointSymbol,
+      maxAge: maxAge,
+    );
+    if (record == null) {
+      return null;
+    }
+    final isUnderConstruction = await _constructionCache.isUnderConstruction(
+      waypointSymbol,
+      maxAge: maxAge,
+    );
+    if (isUnderConstruction == null) {
+      return null;
+    }
 
-  final systemWaypoint = systemsCache.waypoint(waypointSymbol);
-  final values = record.values;
-  if (values == null) {
-    // Uncharted case.
+    final systemWaypoint = await _systemsCache.waypoint(waypointSymbol);
+    final values = record.values;
+    if (values == null) {
+      // Uncharted case.
+      return Waypoint(
+        symbol: systemWaypoint.symbol,
+        type: systemWaypoint.type,
+        position: systemWaypoint.position,
+        orbitals: systemWaypoint.orbitals,
+        isUnderConstruction: isUnderConstruction,
+      );
+    }
+
+    final traits = <WaypointTrait>[];
+    for (final traitSymbol in values.traitSymbols) {
+      final trait = await _waypointTraits.get(traitSymbol);
+      if (trait == null) {
+        logger.warn('Traits cache missing trait: $traitSymbol');
+        return null;
+      }
+      traits.add(trait);
+    }
+
     return Waypoint(
       symbol: systemWaypoint.symbol,
       type: systemWaypoint.type,
       position: systemWaypoint.position,
+      chart: values.chart,
+      faction: values.faction,
       orbitals: systemWaypoint.orbitals,
+      traits: traits,
       isUnderConstruction: isUnderConstruction,
     );
   }
-
-  final traits = <WaypointTrait>[];
-  for (final traitSymbol in values.traitSymbols) {
-    final trait = await waypointTraits.get(traitSymbol);
-    if (trait == null) {
-      logger.warn('Traits cache missing trait: $traitSymbol');
-      return null;
-    }
-    traits.add(trait);
-  }
-
-  return Waypoint(
-    symbol: systemWaypoint.symbol,
-    type: systemWaypoint.type,
-    position: systemWaypoint.position,
-    chart: values.chart,
-    faction: values.faction,
-    orbitals: systemWaypoint.orbitals,
-    traits: traits,
-    isUnderConstruction: isUnderConstruction,
-  );
 }

@@ -12,8 +12,8 @@ String describeJob(ExtractionJob job) {
   return '$action @ $sourceName';
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final systems = await SystemsCache.loadOrFetch(fs);
+Future<void> command(Database db, ArgResults argResults) async {
+  final systems = await SystemsSnapshot.load(db);
   final charting = ChartingCache(db);
   final ships = await ShipSnapshot.load(db);
   final shipyardShips = await ShipyardShipCache(db).snapshot();

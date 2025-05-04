@@ -51,7 +51,7 @@ void printIncomeStatement(IncomeStatement report) {
     ..info(table.toString());
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final transactions = await db.allTransactions();
   final report = await computeIncomeStatement(transactions);
   printIncomeStatement(report);

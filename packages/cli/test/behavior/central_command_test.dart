@@ -545,9 +545,6 @@ void main() {
     when(
       () => db.knowOfMarketWhichTrades(any()),
     ).thenAnswer((_) async => false);
-    when(
-      () => caches.agent.headquarters(caches.systems),
-    ).thenReturn(SystemWaypoint.test(hqSymbol));
     when(() => caches.agent.agent).thenReturn(
       Agent(
         symbol: shipSymbol.agentName,

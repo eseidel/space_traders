@@ -3,7 +3,6 @@ import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/plan/market_scores.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -18,7 +17,6 @@ class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 void main() {
   test('findBetterTradeLocation smoke test', () {
-    final fs = MemoryFileSystem.test();
     final aSymbol = WaypointSymbol.fromString('S-A-A');
     final bSymbol = WaypointSymbol.fromString('S-A-B');
     final cSymbol = WaypointSymbol.fromString('S-A-C');
@@ -66,7 +64,7 @@ void main() {
       ],
     );
     final systems = [system];
-    final systemsCache = SystemsCache(systems, fs: fs);
+    final systemsCache = SystemsSnapshot(systems);
     final systemConnectivity = _MockSystemConnectivity();
     registerFallbackValue(aSymbol.system);
     when(

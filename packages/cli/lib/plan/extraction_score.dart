@@ -132,11 +132,11 @@ class ExtractionScore {
 /// which buy those goods.
 Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
   Database db,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   WaypointSymbol startSymbol,
   Set<TradeSymbol> goods,
 ) async {
-  final start = systemsCache.waypoint(startSymbol);
+  final start = systems.waypoint(startSymbol);
   final markets = <TradeSymbol, WaypointSymbol>{};
   for (final good in goods) {
     final marketSymbols = await db.marketsWithImportInSystem(
@@ -147,7 +147,7 @@ Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
       continue;
     }
     final waypoints =
-        marketSymbols.map(systemsCache.waypoint).toList()
+        marketSymbols.map(systems.waypoint).toList()
           ..sort((a, b) => a.distanceTo(start).compareTo(b.distanceTo(start)));
     final market = waypoints.firstOrNull;
     if (market != null) {
@@ -160,13 +160,13 @@ Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
 /// Evaluate all possible source and Market pairings.
 Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
   Database db,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   ChartingCache chartingCache,
   SystemSymbol systemSymbol,
   bool Function(WaypointType, Set<WaypointTraitSymbol>) sourcePredicate,
   ExtractionType extractionType,
 ) async {
-  final allWaypoints = systemsCache.waypointsInSystem(systemSymbol);
+  final allWaypoints = systems.waypointsInSystem(systemSymbol);
   final traitsByWaypointSymbol = <WaypointSymbol, Set<WaypointTraitSymbol>>{};
   for (final waypoint in allWaypoints) {
     final values = await chartingCache.chartedValues(waypoint.symbol);
@@ -185,13 +185,13 @@ Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
     );
     final marketForGood = await findImportingMarketsForGoods(
       db,
-      systemsCache,
+      systems,
       source.symbol,
       expectedGoods,
     );
     final marketSymbols = marketForGood.values.toSet();
     final deliveryDistance = approximateRoundTripDistanceWithinSystem(
-      systemsCache,
+      systems,
       source.symbol,
       marketSymbols,
     );
@@ -225,13 +225,13 @@ bool canBeSiphoned(WaypointType type, Set<WaypointTraitSymbol> traits) {
 /// Evaluate all possible source and Market pairings for mining.
 Future<List<ExtractionScore>> evaluateWaypointsForMining(
   Database db,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   ChartingCache chartingCache,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
     db,
-    systemsCache,
+    systems,
     chartingCache,
     systemSymbol,
     canBeMined,
@@ -242,13 +242,13 @@ Future<List<ExtractionScore>> evaluateWaypointsForMining(
 /// Evaluate all possible source and Market pairings for siphoning.
 Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
   Database db,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   ChartingCache chartingCache,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
     db,
-    systemsCache,
+    systems,
     chartingCache,
     systemSymbol,
     canBeSiphoned,

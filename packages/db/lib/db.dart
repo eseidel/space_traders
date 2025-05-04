@@ -456,6 +456,19 @@ class Database {
     );
   }
 
+  /// Get all WaypointSymbols which buys [tradeSymbol] within [system].
+  /// Buys means imports or exchange.
+  Future<Iterable<WaypointSymbol>> marketsWhichBuysTradeSymbolInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketsWhichBuysTradeSymbolInSystemQuery(system, tradeSymbol);
+    return queryMany(
+      query,
+      (map) => WaypointSymbol.fromString(map['symbol'] as String),
+    );
+  }
+
   /// Get all WaypointSymbols with a market importing the given tradeSymbol.
   Future<Iterable<WaypointSymbol>> marketsWithExportInSystem(
     SystemSymbol system,
@@ -871,5 +884,47 @@ class Database {
         },
       ),
     );
+  }
+
+  /// Get all system records from the database.
+  Future<Iterable<SystemRecord>> allSystemRecords() async {
+    final result = await queryMany(
+      allSystemRecordsQuery(),
+      systemRecordFromColumnMap,
+    );
+    return result;
+  }
+
+  /// Get all waypoints from the database.
+  /// Returns a list of waypoints.
+  Future<Iterable<SystemWaypoint>> allSystemWaypoints() async {
+    final result = await queryMany(
+      allSystemWaypointsQuery(),
+      systemWaypointFromColumnMap,
+    );
+    return result;
+  }
+
+  /// Get a SystemWaypoint by symbol.
+  Future<SystemWaypoint?> systemWaypointBySymbol(WaypointSymbol symbol) async {
+    final query = systemWaypointBySymbolQuery(symbol);
+    return queryOne(query, systemWaypointFromColumnMap);
+  }
+
+  /// Get SystemWaypoints by system symbol.
+  Future<Iterable<SystemWaypoint>> systemWaypointsBySystemSymbol(
+    SystemSymbol symbol,
+  ) async {
+    final query = systemWaypointsBySystemQuery(symbol);
+    return queryMany(query, systemWaypointFromColumnMap);
+  }
+
+  /// Get SystemWaypoints by system symbol and type.
+  Future<Iterable<SystemWaypoint>> systemWaypointsBySystemSymbolAndType(
+    SystemSymbol symbol,
+    WaypointType type,
+  ) async {
+    final query = systemWaypointsBySystemAndTypeQuery(symbol, type);
+    return queryMany(query, systemWaypointFromColumnMap);
   }
 }

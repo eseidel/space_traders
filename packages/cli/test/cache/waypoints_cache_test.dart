@@ -4,8 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
@@ -36,10 +34,7 @@ void main() {
         meta: Meta(total: 1),
       );
     });
-    final systemsCache = _MockSystemsCache();
-    when(
-      () => systemsCache.waypointsInSystem(waypointSymbol.system),
-    ).thenReturn([SystemWaypoint.test(waypointSymbol)]);
+
     final chartingCache = _MockChartingCache();
     registerFallbackValue(waypointSymbol);
     when(
@@ -54,15 +49,7 @@ void main() {
       () => constructionCache.updateConstruction(waypointSymbol, null),
     ).thenAnswer((_) async => {});
 
-    final waypointTraitCache = WaypointTraitCache(db);
-    final waypointCache = WaypointCache(
-      api,
-      db,
-      systemsCache,
-      chartingCache,
-      constructionCache,
-      waypointTraitCache,
-    );
+    final waypointCache = WaypointCache(api, db);
     expect(
       (await waypointCache.waypoint(waypointSymbol)).symbol,
       waypointSymbol,
@@ -89,9 +76,7 @@ void main() {
     expect(await waypointCache.canBeSiphoned(waypointSymbol), false);
 
     // The has getters still throw if the waypoint doesn't exist.
-    when(
-      () => systemsCache.waypointsInSystem(SystemSymbol.fromString('A-B')),
-    ).thenReturn([]);
+    // TODO(eseidel): this will need db mocks.
     expect(
       () async => await waypointCache.hasMarketplace(
         WaypointSymbol.fromString('A-B-C'),

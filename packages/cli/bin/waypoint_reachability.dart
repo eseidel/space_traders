@@ -2,9 +2,9 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/waypoint_connectivity.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final shipyardShips = ShipyardShipCache(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final hqSystem = await myHqSystemSymbol(db);
   final fuelCapacity =
       (await shipyardShips.get(ShipType.COMMAND_FRIGATE))!.frame.fuelCapacity;

@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 
 // List the 10 nearest systems which have 10+ markets and are not reachable
 // via jumpgates from HQ.  Systems worth warping to should be charted already.
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   const limit = 10;
   const desiredMarketCount = 10;
   const shipType = ShipType.EXPLORER;
@@ -14,23 +14,14 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
   final startSystemSymbol = await myHqSystemSymbol(db);
 
-  final waypointTraits = WaypointTraitCache(db);
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionCache = ConstructionCache(db);
   final systemConnectivity = SystemConnectivity.fromJumpGates(
     jumpGateSnapshot,
     await constructionCache.snapshot(),
   );
-  final systemsCache = SystemsCache.load(fs);
-  final chartingCache = ChartingCache(db);
-  final waypointCache = WaypointCache(
-    api,
-    db,
-    systemsCache,
-    chartingCache,
-    constructionCache,
-    waypointTraits,
-  );
+  final systemsCache = await SystemsSnapshot.load(db);
+  final waypointCache = WaypointCache(api, db);
   final shipyardShips = ShipyardShipCache(db);
 
   final reachableSystemSymbols =

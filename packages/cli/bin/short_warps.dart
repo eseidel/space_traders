@@ -67,12 +67,12 @@ void main(List<String> args) async {
 //   return plan.copyWith(actions: actions);
 // }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // Systems to visit:
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final ships = await ShipSnapshot.load(db);
 
   // Find ones not in our main cluster.

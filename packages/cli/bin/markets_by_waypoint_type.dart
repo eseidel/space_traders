@@ -9,10 +9,10 @@ Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
   'hAlign': HorizontalAlign.right,
 };
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
 
   // Walk all charting records.
   // Record the number of known waypoints by type.

@@ -54,7 +54,7 @@ class WaypointConnectivity {
 
   /// Creates a new SystemConnectivity from the systemsCache.
   factory WaypointConnectivity.fromSystemAndFuelCapacity(
-    SystemsCache systemsCache,
+    SystemsSnapshot systemsCache,
     SystemSymbol systemSymbol,
     int fuelCapacity,
   ) {

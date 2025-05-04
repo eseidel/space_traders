@@ -1,6 +1,5 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:file/memory.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -98,14 +97,11 @@ void main() {
       ),
     );
 
-    final fs = MemoryFileSystem.test();
-    fs.file(SystemsCache.defaultCacheFilePath).createSync(recursive: true);
-    fs.file(SystemsCache.defaultCacheFilePath).writeAsStringSync('[]');
     final logger = _MockLogger();
     Never httpGet(f) => throw UnimplementedError();
     final caches = await runWithLogger(
       logger,
-      () async => Caches.loadOrFetch(fs, api, db, httpGet: httpGet),
+      () async => Caches.loadOrFetch(api, db, httpGet: httpGet),
     );
     expect(caches.agent, isNotNull);
   });

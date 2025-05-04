@@ -2,11 +2,11 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/idle_queue.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // Start at the agent's headquarters system.
   // Walk the web of jump gates to find endpoints we should scan.
   final systemSymbol = await myHqSystemSymbol(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await SystemsSnapshot.load(db);
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
