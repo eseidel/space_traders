@@ -510,27 +510,8 @@ void main() {
   test('advanceCentralPlanning smoke test', () async {
     final db = _MockDatabase();
     final caches = mockCaches();
-    final ship = _MockShip();
-    final shipNav = _MockShipNav();
     const faction = FactionSymbol.AEGIS;
-    when(() => shipNav.systemSymbol).thenReturn('W-A');
-    when(() => ship.nav).thenReturn(shipNav);
     final shipSymbol = ShipSymbol.fromString('X-A');
-    when(() => ship.symbol).thenReturn(shipSymbol);
-    final shipFrame = _MockShipFrame();
-    when(() => ship.frame).thenReturn(shipFrame);
-    when(
-      () => shipFrame.symbol,
-    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
-    when(() => ship.frame).thenReturn(shipFrame);
-    when(() => ship.registration).thenReturn(
-      ShipRegistration(
-        name: shipSymbol.symbol,
-        factionSymbol: faction.value,
-        role: ShipRole.COMMAND,
-      ),
-    );
-    // when(() => caches.ships.ships).thenReturn([ship]);
     final centralCommand = CentralCommand();
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
@@ -572,6 +553,24 @@ void main() {
     when(
       caches.static.shipyardShips.snapshot,
     ).thenAnswer((_) async => _MockShipyardShipSnapshot());
+
+    when(
+      () => db.systemWaypointsBySystemSymbolAndType(
+        any(),
+        WaypointType.JUMP_GATE,
+      ),
+    ).thenAnswer((_) async => []);
+    when(db.allSystemRecords).thenAnswer(
+      (_) async => [
+        SystemRecord(
+          symbol: hqSystemSymbol,
+          waypointSymbols: [hqSymbol],
+          type: SystemType.RED_STAR,
+          position: const SystemPosition(0, 0),
+        ),
+      ],
+    );
+    when(db.allSystemWaypoints).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     await runWithLogger(
