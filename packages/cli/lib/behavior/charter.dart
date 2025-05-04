@@ -11,13 +11,13 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Returns the symbol of a waypoint in the system missing a chart.
-Future<WaypointSymbol?> waypointSymbolNeedingCharting(
+WaypointSymbol? waypointSymbolNeedingCharting(
   SystemsSnapshot systems,
   ChartingSnapshot charts,
   Ship ship,
   SystemSymbol systemSymbol, {
   required bool Function(SystemWaypoint waypointSymbol)? filter,
-}) async {
+}) {
   final system = systems[systemSymbol];
   final start =
       ship.systemSymbol == system.symbol
@@ -52,7 +52,7 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
 }
 
 /// Returns the closet waypoint worth exploring.
-Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
+WaypointSymbol? nextUnchartedWaypointSymbol(
   SystemsSnapshot systems,
   ChartingSnapshot charts,
   SystemConnectivity systemConnectivity,
@@ -60,14 +60,14 @@ Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
   required SystemSymbol startSystemSymbol,
   bool Function(SystemWaypoint waypointSymbol)? filter,
   int maxJumps = 5,
-}) async {
+}) {
   // Walk through the list finding one missing either a chart or market data.
   for (final (systemSymbol, _) in systemConnectivity.systemSymbolsInJumpRadius(
     systems,
     startSystem: startSystemSymbol,
     maxJumps: maxJumps,
   )) {
-    final symbol = await waypointSymbolNeedingCharting(
+    final symbol = waypointSymbolNeedingCharting(
       systems,
       charts,
       ship,
@@ -129,7 +129,7 @@ Future<JobResult> doCharter(
   // Instead we should keep a cache of fully charted systems or something?
   final charts = await ChartingSnapshot.load(db);
   final systems = await SystemsSnapshot.load(db);
-  final destinationSymbol = await centralCommand.nextWaypointToChart(
+  final destinationSymbol = centralCommand.nextWaypointToChart(
     ships,
     behaviors,
     systems,

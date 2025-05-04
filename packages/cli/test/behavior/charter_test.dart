@@ -117,11 +117,13 @@ void main() {
         any(),
         maxJumps: config.charterMaxJumps,
       ),
-    ).thenAnswer((_) async => null);
+    ).thenReturn(null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allChartingRecords).thenAnswer((_) async => []);
+    when(db.allSystemRecords).thenAnswer((_) async => []);
+    when(db.allSystemWaypoints).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     expect(
@@ -192,7 +194,7 @@ void main() {
     final logger = _MockLogger();
 
     await runWithLogger(logger, () async {
-      final intraSystem = await nextUnchartedWaypointSymbol(
+      final intraSystem = nextUnchartedWaypointSymbol(
         systemsCache,
         chartingSnapshot,
         systemConnectivity,
@@ -202,7 +204,7 @@ void main() {
       expect(intraSystem, equals(waypointABSymbol));
 
       when(() => chartingSnapshot.isCharted(waypointABSymbol)).thenReturn(true);
-      final interSystem = await nextUnchartedWaypointSymbol(
+      final interSystem = nextUnchartedWaypointSymbol(
         systemsCache,
         chartingSnapshot,
         systemConnectivity,

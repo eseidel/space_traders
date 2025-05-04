@@ -384,7 +384,7 @@ class CentralCommand {
   }
 
   /// Returns the next waypoint symbol to chart.
-  Future<WaypointSymbol?> nextWaypointToChart(
+  WaypointSymbol? nextWaypointToChart(
     ShipSnapshot ships,
     BehaviorSnapshot behaviors,
     SystemsSnapshot systems,
@@ -392,7 +392,7 @@ class CentralCommand {
     SystemConnectivity connectivity,
     Ship ship, {
     required int maxJumps,
-  }) async {
+  }) {
     final charterSystems =
         otherCharterSystems(ships, behaviors, ship.symbol).toSet();
 
@@ -402,7 +402,7 @@ class CentralCommand {
 
     // Walk waypoints as far out as we can see until we find one missing
     // a chart or market data and route to there.
-    final destinationSymbol = await nextUnchartedWaypointSymbol(
+    final destinationSymbol = nextUnchartedWaypointSymbol(
       systems,
       charts,
       connectivity,

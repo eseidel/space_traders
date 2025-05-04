@@ -84,6 +84,8 @@ void main() {
     when(db.allShipyardPrices).thenAnswer((_) async => []);
     when(db.allJumpGates).thenAnswer((_) async => []);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
+    when(db.allSystemRecords).thenAnswer((_) async => []);
+    when(db.allSystemWaypoints).thenAnswer((_) async => []);
 
     final dataApi = _MockDataApi();
     when(() => api.data).thenReturn(dataApi);
