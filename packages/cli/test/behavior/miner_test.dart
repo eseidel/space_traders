@@ -669,6 +669,10 @@ void main() {
     ).thenAnswer((_) async => 100);
     when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
+    when(
+      () => db.marketsWhichBuysTradeSymbolInSystem(any(), any()),
+    ).thenAnswer((_) async => []);
+
     final logger = _MockLogger();
 
     final result = await runWithLogger(logger, () async {
