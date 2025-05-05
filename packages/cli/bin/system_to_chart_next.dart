@@ -29,7 +29,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     'central planning',
     const Duration(seconds: 1),
     () async {
-      await centralCommand.nextWaypointToChart(
+      centralCommand.nextWaypointToChart(
         ships,
         behaviors,
         systems,

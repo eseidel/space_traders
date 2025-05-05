@@ -1,7 +1,7 @@
 import 'package:db/db.dart';
 import 'package:test/test.dart';
 
-import 'docker.dart';
+import '../docker.dart';
 
 void main() {
   withPostgresServer('config', (server) {

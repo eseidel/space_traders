@@ -895,6 +895,17 @@ class Database {
     return result;
   }
 
+  /// Upsert a system record into the database.
+  Future<void> upsertSystemRecord(SystemRecord system) async {
+    await execute(upsertSystemRecordQuery(system));
+  }
+
+  /// Get a system record by symbol.
+  Future<SystemRecord?> systemRecordBySymbol(SystemSymbol symbol) async {
+    final query = systemRecordBySymbolQuery(symbol);
+    return queryOne(query, systemRecordFromColumnMap);
+  }
+
   /// Get all waypoints from the database.
   /// Returns a list of waypoints.
   Future<Iterable<SystemWaypoint>> allSystemWaypoints() async {
@@ -903,6 +914,11 @@ class Database {
       systemWaypointFromColumnMap,
     );
     return result;
+  }
+
+  /// Upsert a system waypoint into the database.
+  Future<void> upsertSystemWaypoint(SystemWaypoint waypoint) async {
+    await execute(upsertSystemWaypointQuery(waypoint));
   }
 
   /// Get a SystemWaypoint by symbol.

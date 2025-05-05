@@ -1,15 +1,27 @@
 import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
-/// Query to return all system records.
-Query allSystemRecordsQuery() => const Query('''
-      SELECT * FROM system_record_
-      ''');
-
 /// Query to return all system waypoints.
 Query allSystemWaypointsQuery() => const Query('''
       SELECT * FROM system_waypoint_
       ''');
+
+/// Query to upsert a system waypoint into the database.
+Query upsertSystemWaypointQuery(SystemWaypoint waypoint) => Query(
+  '''
+      INSERT INTO system_waypoint_ (symbol, type, position, system)
+      VALUES (@symbol, @type, @x, @y, @system)
+      ON CONFLICT (symbol) DO UPDATE SET
+      type = @type, x = @x, y = @y, system = @system
+      ''',
+  parameters: {
+    'symbol': waypoint.symbol,
+    'type': waypoint.type,
+    'x': waypoint.position.x,
+    'y': waypoint.position.y,
+    'system': waypoint.system,
+  },
+);
 
 /// Query to return all system waypoints for a given system.
 Query systemWaypointsBySystemQuery(SystemSymbol system) => const Query('''
@@ -34,20 +46,6 @@ Query systemWaypointBySymbolQuery(WaypointSymbol symbol) => const Query('''
       SELECT * FROM system_waypoint_  
       WHERE symbol = @symbol
       ''');
-
-/// Create a SystemRecord from a column map.
-SystemRecord systemRecordFromColumnMap(Map<String, dynamic> columnMap) {
-  return SystemRecord(
-    symbol: SystemSymbol.fromString(columnMap['symbol'] as String),
-    type: SystemType.fromJson(columnMap['type'] as String)!,
-    position: SystemPosition(columnMap['x'] as int, columnMap['y'] as int),
-    waypointSymbols:
-        (columnMap['waypoint_symbols'] as List)
-            .cast<String>()
-            .map(WaypointSymbol.fromString)
-            .toList(),
-  );
-}
 
 /// Create a SystemWaypoint from a column map.
 SystemWaypoint systemWaypointFromColumnMap(Map<String, dynamic> columnMap) {

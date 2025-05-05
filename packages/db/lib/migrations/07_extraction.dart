@@ -1,6 +1,7 @@
 import 'package:db/src/migration.dart';
 
-/// Migration to create the extraction_ table for storing resource extraction records.
+/// Migration to create the extraction_ table for storing resource extraction
+/// records.
 class CreateExtractionMigration implements Migration {
   @override
   int get version => 7;

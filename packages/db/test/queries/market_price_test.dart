@@ -2,7 +2,7 @@ import 'package:db/db.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-import 'docker.dart';
+import '../docker.dart';
 
 void main() {
   withPostgresServer('market_price', (server) {
