@@ -3,19 +3,27 @@ import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-/// A list of systems.
-class SystemsSnapshot {
-  /// Create a new [SystemsSnapshot] with the given [systems].
-  SystemsSnapshot(this.systems)
-    : _index = Map.fromEntries(systems.map((e) => MapEntry(e.symbol, e)));
+/// Extension to add a [systems] getter to the [Database] class.
+// This should just be on Database.
+extension SystemsStoreAccessor on Database {
+  /// Get the [SystemsStore] for the database.
+  SystemsStore get systems => SystemsStore(this);
+}
 
-  /// Create a new [SystemsSnapshot] from the given [db].
-  static Future<SystemsSnapshot> load(Database db) async {
-    // Load all SystemRecords.
-    // Load all SystemWaypoints.
-    // Assemble them into Systems.
-    final systemRecords = await db.allSystemRecords();
-    final waypoints = await db.allSystemWaypoints();
+/// Class for reading/writing systems and waypoints to the database.
+// TODO(eseidel): Move this down into the db package.
+// The only reason this isn't in the db package today is that it calls
+// logger, which is currently only available in the cli package.
+class SystemsStore {
+  /// Create a new [SystemsStore] from the given [db].
+  SystemsStore(Database db) : _db = db;
+
+  final Database _db;
+
+  /// Create a new [SystemsSnapshot] from all the data in the database.
+  Future<SystemsSnapshot> snapshot() async {
+    final systemRecords = await _db.allSystemRecords();
+    final waypoints = await _db.allSystemWaypoints();
     final grouped = waypoints.groupListsBy((w) => w.system);
     final systems =
         systemRecords.map((r) {
@@ -25,56 +33,8 @@ class SystemsSnapshot {
           }
           return System.fromRecord(r, waypoints);
         }).toList();
-
     return SystemsSnapshot(systems);
   }
-
-  /// All systems in this snapshot.
-  final List<System> systems;
-
-  final Map<SystemSymbol, System> _index;
-
-  /// Return the jump gate waypoint for the given [symbol].
-  // Systems currently only have one jumpgate, but if that ever
-  // changes all callers of this method might be wrong.
-  SystemWaypoint? jumpGateWaypointForSystem(SystemSymbol symbol) =>
-      this[symbol].waypoints.firstWhereOrNull((w) => w.isJumpGate);
-
-  /// Return the system with the given [symbol].
-  /// Exposed for passing to lists for mapping.
-  System systemBySymbol(SystemSymbol symbol) =>
-      _index[symbol] ?? (throw ArgumentError('Unknown system $symbol'));
-
-  /// Return the system with the given [symbol].
-  System operator [](SystemSymbol symbol) => systemBySymbol(symbol);
-
-  /// Fetch the waypoint with the given symbol, or null if it does not exist.
-  SystemWaypoint? waypointOrNull(WaypointSymbol waypointSymbol) {
-    final waypoints = waypointsInSystem(waypointSymbol.system);
-    return waypoints.firstWhereOrNull((w) => w.symbol == waypointSymbol);
-  }
-
-  /// Return the SystemWaypoint for the given [symbol].
-  SystemWaypoint waypoint(WaypointSymbol symbol) => waypointOrNull(symbol)!;
-
-  /// Return the SystemWaypoint for the given [symbol].
-  SystemWaypoint? waypointFromString(String symbol) =>
-      waypointOrNull(WaypointSymbol.fromString(symbol));
-
-  /// Returns true if the given [symbol] is a jump gate.
-  bool isJumpGate(WaypointSymbol symbol) => waypoint(symbol).isJumpGate;
-
-  /// Return the SystemWaypoints for the given [systemSymbol].
-  List<SystemWaypoint> waypointsInSystem(SystemSymbol systemSymbol) =>
-      this[systemSymbol].waypoints;
-}
-
-/// A list of systems.
-class SystemsCache {
-  /// Create a new [SystemsCache] from the given [db].
-  SystemsCache(Database db) : _db = db;
-
-  final Database _db;
 
   /// Return the jump gate waypoint for the given [symbol].
   // Systems currently only have one jumpgate, but if that ever
@@ -89,7 +49,7 @@ class SystemsCache {
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   Future<SystemWaypoint?> waypointOrNull(WaypointSymbol waypointSymbol) async {
-    return _db.systemWaypointBySymbol(waypointSymbol);
+    return await _db.systemWaypointBySymbol(waypointSymbol);
   }
 
   /// Return the SystemWaypoint for the given [symbol].

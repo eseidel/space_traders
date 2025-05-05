@@ -1,5 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:types/types.dart';
 
 class _MockAgentCache extends Mock implements AgentCache {}
 

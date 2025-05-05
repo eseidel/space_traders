@@ -10,7 +10,7 @@ Future<SystemStats> computeSystemStats({
   required Database db,
   required SystemSymbol startSystemSymbol,
 }) async {
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
   // Can't use loadSystemConnectivity because need jumpGateSnapshot later.
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);

@@ -11,22 +11,20 @@ void main(List<String> args) async {
 
 // Could share with fleet.dart
 Future<void> logShip(
-  SystemsCache systemsCache,
+  Database db,
   MarketPriceSnapshot marketPrices,
   Ship ship,
   BehaviorState? behavior,
 ) async {
   const indent = '   ';
-  final waypoint = await systemsCache.waypoint(ship.waypointSymbol);
+  final waypoint = await db.systems.waypoint(ship.waypointSymbol);
   logger.info(ship.symbol.hexNumber);
 
   final routePlan = behavior?.routePlan;
   if (routePlan != null) {
     final timeLeft = ship.timeToArrival(routePlan);
     final destination = routePlan.endSymbol.sectorLocalName;
-    final destinationType = await systemsCache.waypointType(
-      routePlan.endSymbol,
-    );
+    final destinationType = await db.systems.waypointType(routePlan.endSymbol);
     final arrival = approximateDuration(timeLeft);
     logger.info(
       '${indent}en route to $destination $destinationType '
@@ -54,7 +52,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systemWatcherStates = await db.behaviorStatesWithBehavior(
     Behavior.systemWatcher,
   );
-  final systemsCache = SystemsCache(db);
+  final systemsCache = db.systems;
   final ships = await ShipSnapshot.load(db);
   final agentCache = await AgentCache.load(db);
 

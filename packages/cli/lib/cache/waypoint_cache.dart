@@ -17,7 +17,6 @@ class WaypointCache {
   final Database _db;
   final Api? _api;
 
-  SystemsCache get _systemsCache => SystemsCache(_db);
   ChartingCache get _chartingCache => ChartingCache(_db);
   ConstructionCache get _constructionCache => ConstructionCache(_db);
   WaypointTraitCache get _waypointTraits => WaypointTraitCache(_db);
@@ -37,7 +36,7 @@ class WaypointCache {
     SystemSymbol systemSymbol, {
     Duration maxAge = defaultMaxAge,
   }) async {
-    final systemWaypoints = await _systemsCache.waypointsInSystem(systemSymbol);
+    final systemWaypoints = await _db.systems.waypointsInSystem(systemSymbol);
     final cachedWaypoints = <Waypoint>[];
     for (final systemWaypoint in systemWaypoints) {
       // TODO(eseidel): Could make this a single db query by fetching all
@@ -203,7 +202,7 @@ class WaypointCache {
       return null;
     }
 
-    final systemWaypoint = await _systemsCache.waypoint(waypointSymbol);
+    final systemWaypoint = await _db.systems.waypoint(waypointSymbol);
     final values = record.values;
     if (values == null) {
       // Uncharted case.

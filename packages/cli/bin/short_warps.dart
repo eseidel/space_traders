@@ -10,7 +10,7 @@ void main(List<String> args) async {
 // RoutePlan? shortestPathTo(
 //   SystemConnectivity systemConnectivity,
 //   RoutePlanner routePlanner,
-//   SystemsCache systemsCache,
+//
 //   SystemSymbol systemSymbol,
 //   Ship ship,
 // ) {
@@ -72,7 +72,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
   final ships = await ShipSnapshot.load(db);
 
   // Find ones not in our main cluster.

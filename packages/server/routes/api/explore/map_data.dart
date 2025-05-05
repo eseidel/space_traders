@@ -7,7 +7,7 @@ import 'package:server/read_async.dart';
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
 
-  final systemsSnapshot = await SystemsSnapshot.load(db);
+  final systemsSnapshot = await db.systems.snapshot();
   final shipSnapshot = await ShipSnapshot.load(db);
   final response = GetMapDataResponse(
     ships: shipSnapshot.ships,

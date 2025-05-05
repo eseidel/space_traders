@@ -25,7 +25,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final timing = argResults['timing'] as bool;
 
   final agentCache = await AgentCache.load(db);
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
   final marketListings = await MarketListingSnapshot.load(db);
   final sellsFuel = defaultSellsFuel(marketListings);
   // final sellsFuel = defaultFuel;

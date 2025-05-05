@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);
 

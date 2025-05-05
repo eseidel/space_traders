@@ -12,7 +12,7 @@ Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
 Future<void> command(Database db, ArgResults argResults) async {
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
 
   // Walk all charting records.
   // Record the number of known waypoints by type.

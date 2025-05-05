@@ -883,7 +883,7 @@ Future<JobResult> _initDeal(
   }
 
   final ships = await ShipSnapshot.load(db);
-  final systems = await SystemsSnapshot.load(db);
+  final systems = await db.systems.snapshot();
   final avoidSystems =
       centralCommand.otherTraderSystems(ships, behaviors, ship.symbol).toSet();
 

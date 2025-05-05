@@ -24,7 +24,6 @@ Future<void> command(Database db, ArgResults argResults) async {
     queue = IdleQueue()..queueSystem(systemSymbol, jumpDistance: 0);
   }
 
-  final systems = SystemsCache(db);
   final tradeGoods = TradeGoodCache(db);
   final waypointCache = WaypointCache(api, db);
   final marketCache = MarketCache(db, api, tradeGoods);
@@ -36,7 +35,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   if (argResults['all'] as bool) {
     final interestingSystems = findInterestingSystems(
-      await SystemsSnapshot.load(db),
+      await db.systems.snapshot(),
     );
     for (final symbol in interestingSystems) {
       queue.queueSystem(symbol, jumpDistance: 0);
@@ -54,14 +53,7 @@ Future<void> command(Database db, ArgResults argResults) async {
       logger.info('$queue');
     }
 
-    await queue.runOne(
-      db,
-      api,
-      systems,
-      waypointCache,
-      marketCache,
-      constructionCache,
-    );
+    await queue.runOne(db, api, waypointCache, marketCache, constructionCache);
   }
 }
 

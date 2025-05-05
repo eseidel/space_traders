@@ -11,8 +11,7 @@ Future<Response> onRequest(RequestContext context) async {
   final agent = (await db.getMyAgent())!;
   final ships = await db.allShips();
 
-  final systemsCache = SystemsCache(db);
-  final jumpGate = await systemsCache.jumpGateWaypointForSystem(
+  final jumpGate = await db.systems.jumpGateWaypointForSystem(
     agent.headquarters.system,
   );
 

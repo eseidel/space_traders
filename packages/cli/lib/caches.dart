@@ -118,7 +118,7 @@ class Caches {
     await loadExports(db, api.data);
 
     final static = StaticCaches(db);
-    final systems = await SystemsSnapshot.load(db);
+    final systems = await db.systems.snapshot();
     final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
     final waypoints = WaypointCache(api, db);

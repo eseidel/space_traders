@@ -198,7 +198,7 @@ Future<JobResult> doSeeder(
   // And route there.
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
-  final systems = await SystemsSnapshot.load(db);
+  final systems = await db.systems.snapshot();
   final route = assertNotNull(
     await routeToNextSystemToSeed(
       caches.agent,

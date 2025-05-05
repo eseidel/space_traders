@@ -7,7 +7,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     argResults.rest.firstOrNull,
   );
 
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
 
   // Can't use loadSystemConnectivity because need constructionSnapshot later.
   final constructionSnapshot = await ConstructionSnapshot.load(db);

@@ -50,13 +50,13 @@ String _behaviorOrTypeString(Ship ship, BehaviorState? behavior) {
 }
 
 Future<void> logShip(
-  SystemsCache systemsCache,
+  Database db,
   MarketPriceSnapshot marketPrices,
   Ship ship,
   BehaviorState? behavior,
 ) async {
   const indent = '   ';
-  final waypointType = await systemsCache.waypointType(ship.waypointSymbol);
+  final waypointType = await db.systems.waypointType(ship.waypointSymbol);
   final cargoStatus =
       ship.cargo.capacity == 0
           ? ''
@@ -74,9 +74,7 @@ Future<void> logShip(
   if (routePlan != null) {
     final timeLeft = ship.timeToArrival(routePlan);
     final destination = routePlan.endSymbol.sectorLocalName;
-    final destinationType = await systemsCache.waypointType(
-      routePlan.endSymbol,
-    );
+    final destinationType = await db.systems.waypointType(routePlan.endSymbol);
     final arrival = approximateDuration(timeLeft);
     logger.info(
       '${indent}en route to $destination $destinationType '
@@ -115,11 +113,10 @@ Future<void> command(Database db, ArgResults argResults) async {
     return;
   }
 
-  final systemsCache = SystemsCache(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   for (final ship in matchingShips) {
     final behaviorState = await db.behaviorStateBySymbol(ship.symbol);
-    await logShip(systemsCache, marketPrices, ship, behaviorState);
+    await logShip(db, marketPrices, ship, behaviorState);
   }
 
   final behaviors = await BehaviorSnapshot.load(db);

@@ -20,7 +20,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     jumpGateSnapshot,
     await constructionCache.snapshot(),
   );
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
   final waypointCache = WaypointCache(api, db);
   final shipyardShips = ShipyardShipCache(db);
 

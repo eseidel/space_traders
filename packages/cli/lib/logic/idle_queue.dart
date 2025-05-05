@@ -133,7 +133,7 @@ class IdleQueue {
   Future<void> _processNextSystem(
     Database db,
     Api api,
-    SystemsCache systemsCache,
+
     WaypointCache waypointCache,
     MarketCache marketCache,
     ConstructionCache constructionCache,
@@ -144,7 +144,7 @@ class IdleQueue {
     logger.detail(
       'System: $systemSymbol ($jumpDistance jumps, ${_systems.length} queued)',
     );
-    final waypoints = await systemsCache.waypointsInSystem(systemSymbol);
+    final waypoints = await db.systems.waypointsInSystem(systemSymbol);
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.symbol;
       if (await waypointCache.hasMarketplace(waypointSymbol)) {
@@ -196,7 +196,6 @@ class IdleQueue {
   Future<void> runOne(
     Database db,
     Api api,
-    SystemsCache systemsCache,
     WaypointCache waypointCache,
     MarketCache marketCache,
     ConstructionCache constructionCache,
@@ -209,7 +208,6 @@ class IdleQueue {
       await _processNextSystem(
         db,
         api,
-        systemsCache,
         waypointCache,
         marketCache,
         constructionCache,

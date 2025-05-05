@@ -79,7 +79,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     return;
   }
 
-  final systemsCache = await SystemsSnapshot.load(db);
+  final systemsCache = await db.systems.snapshot();
   final start = waypointFromArg(systemsCache, args[0], name: 'start');
   final end = waypointFromArg(systemsCache, args[1], name: 'end');
 

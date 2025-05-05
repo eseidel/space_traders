@@ -22,6 +22,7 @@ export 'src/game_phase.dart';
 export 'src/mount.dart';
 export 'src/price.dart';
 export 'src/ship.dart';
+export 'src/snapshot/systems_snapshot.dart';
 export 'src/survey.dart';
 export 'src/symbol.dart';
 export 'src/trade/deal.dart';

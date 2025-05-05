@@ -11,7 +11,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     argResults.rest.firstOrNull,
   );
   final shipyardShips = await ShipyardShipCache(db).snapshot();
-  final systems = await SystemsSnapshot.load(db);
+  final systems = await db.systems.snapshot();
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
 

@@ -553,9 +553,7 @@ class CentralCommand {
     Database db,
     SystemSymbol systemSymbol,
   ) async {
-    final jumpGate = await SystemsCache(
-      db,
-    ).jumpGateWaypointForSystem(systemSymbol);
+    final jumpGate = await db.systems.jumpGateWaypointForSystem(systemSymbol);
     if (jumpGate == null) {
       logger.warn('Failed to find jump gate for $systemSymbol: $e');
       return null;
@@ -688,7 +686,7 @@ class CentralCommand {
         assignProbesToSystems(caches.systemConnectivity, marketListings, ships),
       );
 
-    final systems = await SystemsSnapshot.load(db);
+    final systems = await db.systems.snapshot();
     if (config.enableMining) {
       miningSquads = await assignShipsToSquads(
         db,

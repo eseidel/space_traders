@@ -1,4 +1,3 @@
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:test/test.dart';
