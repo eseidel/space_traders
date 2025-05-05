@@ -20,9 +20,6 @@ class ShipyardPriceSnapshot extends PriceSnapshot<ShipType, ShipyardPrice> {
     return ShipyardPriceSnapshot(prices.toList());
   }
 
-  /// The default path to the cache file.
-  static const String defaultCacheFilePath = 'data/shipyard_prices.json';
-
   /// Get the median purchase price for a [ShipType].
   int? medianPurchasePrice(ShipType shipType) =>
       _purchasePriceAtPercentile(shipType, 50);
