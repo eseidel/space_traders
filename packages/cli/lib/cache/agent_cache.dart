@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/net/queries.dart';
 
@@ -42,10 +41,6 @@ class AgentCache {
     _agent = agent;
     await _db.upsertAgent(agent);
   }
-
-  /// The headquarters of the agent.
-  SystemWaypoint headquarters(SystemsCache systems) =>
-      systems.waypoint(agent.headquarters);
 
   /// The symbol of the agent's headquarters.
   WaypointSymbol get headquartersSymbol => agent.headquarters;

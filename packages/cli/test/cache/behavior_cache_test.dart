@@ -16,8 +16,10 @@ void main() {
     final db = _MockDatabase();
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
-    when(() => db.setBehaviorState(any())).thenAnswer((_) async {});
-    when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
+    when(() => db.upsertBehavior(any())).thenAnswer((_) async {
+      return;
+    });
+    when(() => db.deleteBehavior(any())).thenAnswer((_) async {});
 
     final behaviorTimeouts = BehaviorTimeouts();
     final ship = _MockShip();
@@ -30,7 +32,7 @@ void main() {
     );
 
     when(
-      () => db.behaviorStateBySymbol(shipSymbol),
+      () => db.getBehavior(shipSymbol),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.trader));
 
     final logger = _MockLogger();

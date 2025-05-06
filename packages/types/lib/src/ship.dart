@@ -291,9 +291,9 @@ class Ship {
       cargo = ship.cargo,
       fuel = ship.fuel;
 
-  /// Fallback value for mocking.
+  /// Create a test ship.
   @visibleForTesting
-  factory Ship.fallbackValue() {
+  factory Ship.test(ShipSymbol symbol) {
     final waypoint = const WaypointSymbol.fallbackValue().waypoint;
     final system = const SystemSymbol.fallbackValue().system;
     final navRouteWaypoint = ShipNavRouteWaypoint(
@@ -304,7 +304,7 @@ class Ship {
       y: 0,
     );
     return Ship(
-      symbol: const ShipSymbol.fallbackValue(),
+      symbol: symbol,
       registration: openapi.ShipRegistration(
         name: '',
         role: ShipRole.CARRIER,
@@ -370,6 +370,12 @@ class Ship {
       cargo: openapi.ShipCargo(capacity: 0, units: 0, inventory: []),
       fuel: openapi.ShipFuel(current: 0, capacity: 0),
     );
+  }
+
+  /// Fallback value for mocking.
+  @visibleForTesting
+  factory Ship.fallbackValue() {
+    return Ship.test(const ShipSymbol.fallbackValue());
   }
 
   /// Converts this ship to an OpenAPI ship.

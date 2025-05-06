@@ -1,7 +1,7 @@
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final waypointCount = chartingSnapshot.waypointCount;
   logger.info('Waypoint count: $waypointCount');

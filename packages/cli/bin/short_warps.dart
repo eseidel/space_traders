@@ -10,7 +10,7 @@ void main(List<String> args) async {
 // RoutePlan? shortestPathTo(
 //   SystemConnectivity systemConnectivity,
 //   RoutePlanner routePlanner,
-//   SystemsCache systemsCache,
+//
 //   SystemSymbol systemSymbol,
 //   Ship ship,
 // ) {
@@ -67,24 +67,18 @@ void main(List<String> args) async {
 //   return plan.copyWith(actions: actions);
 // }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // Systems to visit:
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await db.systems.snapshotAllSystems();
   final ships = await ShipSnapshot.load(db);
 
   // Find ones not in our main cluster.
   final systemConnectivity = await loadSystemConnectivity(db);
   final agentCache = await AgentCache.load(db);
   final hqSystem = agentCache!.headquartersSystemSymbol;
-
-  // final routePlanner = RoutePlanner.fromSystemsCache(
-  //   systemsCache,
-  //   systemConnectivity,
-  //   sellsFuel: defaultSellsFuel(marketListings),
-  // );
 
   final explorer = ships.ships.firstWhere((s) => s.isExplorer);
 
@@ -108,12 +102,13 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ..info('with travel time by explorer at ${explorer.waypointSymbol}');
 
   for (final systemSymbol in unreachableSystems) {
-    final system = systemsCache[systemSymbol];
+    final system = systemsCache.systemBySymbol(systemSymbol);
     final actions = findRouteBetweenSystems(
       systemsCache,
       systemConnectivity,
       explorer.shipSpec,
       start: explorer.waypointSymbol,
+      // Pick the waypoint closest to our current location?
       end: system.waypoints.first.symbol,
       sellsFuel: defaultSellsFuel(marketListings),
     );

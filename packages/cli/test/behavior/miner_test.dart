@@ -652,7 +652,7 @@ void main() {
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
-    when(() => db.marketListingForSymbol(waypointSymbol)).thenAnswer((_) async {
+    when(() => db.marketListingAt(waypointSymbol)).thenAnswer((_) async {
       return null;
     });
 
@@ -668,6 +668,10 @@ void main() {
       () => db.medianMarketPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
     when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
+
+    when(
+      () => db.marketsWhichBuysTradeSymbolInSystem(any(), any()),
+    ).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
 

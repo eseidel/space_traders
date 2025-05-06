@@ -2,6 +2,7 @@ import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/idle_queue.dart';
+import 'package:cli/logic/systems_fetcher.dart';
 import 'package:cli/net/auth.dart';
 
 Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
@@ -14,9 +15,14 @@ Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
   return value;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final api = await waitForApi(db, getPriority: () => networkPriorityLow);
   final agent = await waitFor(db, () => db.getMyAgent());
+
+  /// Make sure we've cached all systems and waypoints before bothering to
+  /// start the idle queue.
+  final systemsFetcher = SystemsFetcher(db, api);
+  await systemsFetcher.ensureAllSystemsCached();
 
   final systemSymbol = agent.headquarters.system;
   var queue = IdleQueue();
@@ -24,19 +30,8 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     queue = IdleQueue()..queueSystem(systemSymbol, jumpDistance: 0);
   }
 
-  final systems = await SystemsCache.loadOrFetch(fs);
-  final charting = ChartingCache(db);
-  final construction = ConstructionCache(db);
-  final waypointTraits = WaypointTraitCache(db);
   final tradeGoods = TradeGoodCache(db);
-  final waypointCache = WaypointCache(
-    api,
-    db,
-    systems,
-    charting,
-    construction,
-    waypointTraits,
-  );
+  final waypointCache = WaypointCache(api, db);
   final marketCache = MarketCache(db, api, tradeGoods);
   final constructionCache = ConstructionCache(db);
 
@@ -45,7 +40,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   resetQueue();
 
   if (argResults['all'] as bool) {
-    final interestingSystems = findInterestingSystems(systems);
+    final interestingSystems = findInterestingSystems(
+      await db.systems.snapshotAllSystems(),
+    );
     for (final symbol in interestingSystems) {
       queue.queueSystem(symbol, jumpDistance: 0);
     }
@@ -62,14 +59,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       logger.info('$queue');
     }
 
-    await queue.runOne(
-      db,
-      api,
-      systems,
-      waypointCache,
-      marketCache,
-      constructionCache,
-    );
+    await queue.runOne(db, api, waypointCache, marketCache, constructionCache);
   }
 }
 

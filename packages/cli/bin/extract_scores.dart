@@ -1,6 +1,5 @@
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/market_price_snapshot.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 import 'package:cli/plan/extraction_score.dart';
@@ -39,7 +38,7 @@ double _scoreMarkets(
   return percentiles.average / 100.0;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final countLimit = int.tryParse(argResults['limit'] as String);
   if (countLimit == null) {
     throw ArgumentError.value(
@@ -65,7 +64,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     ' with matching markets within $maxDistance total round-trip:',
   );
 
-  final systems = await SystemsCache.loadOrFetch(fs);
+  final systems = await db.systems.snapshotAllSystems();
   final charting = ChartingCache(db);
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);

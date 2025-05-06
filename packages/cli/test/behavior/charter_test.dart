@@ -5,7 +5,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:file/memory.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -28,10 +28,14 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockChartingSnapshot extends Mock implements ChartingSnapshot {}
 
+class _MockSystemsStore extends Mock implements SystemsStore {}
+
 void main() {
   test('advanceCharter smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
+    final systemsStore = _MockSystemsStore();
+    when(() => db.systems).thenReturn(systemsStore);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
@@ -51,7 +55,9 @@ void main() {
       type: SystemType.BLACK_HOLE,
       position: const SystemPosition(0, 0),
     );
-    when(() => caches.systems[waypointSymbol.system]).thenReturn(system);
+    when(
+      () => caches.systems.systemBySymbol(waypointSymbol.system),
+    ).thenReturn(system);
     registerFallbackValue(waypointSymbol.system);
     when(
       () => caches.systemConnectivity.clusterIdForSystem(any()),
@@ -118,11 +124,14 @@ void main() {
         any(),
         maxJumps: config.charterMaxJumps,
       ),
-    ).thenAnswer((_) async => null);
+    ).thenReturn(null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allChartingRecords).thenAnswer((_) async => []);
+    when(
+      systemsStore.snapshotAllSystems,
+    ).thenAnswer((_) async => SystemsSnapshot([]));
 
     final logger = _MockLogger();
     expect(
@@ -145,8 +154,6 @@ void main() {
   test('nextUnchartedWaypointSymbol', () async {
     // Make sure nextUnchartedWaypointSymbol returns waypoints in our current
     // system when they exist, otherwise a nearby system, otherwise null.
-
-    final fs = MemoryFileSystem.test();
 
     const shipSymbol = ShipSymbol('S', 1);
     final systemASymbol = SystemSymbol.fromString('S-A');
@@ -182,7 +189,7 @@ void main() {
         ],
       ),
     ];
-    final systemsCache = SystemsCache(systems, fs: fs);
+    final systemsCache = SystemsSnapshot(systems);
     final systemConnectivity = SystemConnectivity.test({
       waypointBASymbol: {waypointABSymbol},
     });
@@ -195,7 +202,7 @@ void main() {
     final logger = _MockLogger();
 
     await runWithLogger(logger, () async {
-      final intraSystem = await nextUnchartedWaypointSymbol(
+      final intraSystem = nextUnchartedWaypointSymbol(
         systemsCache,
         chartingSnapshot,
         systemConnectivity,
@@ -205,7 +212,7 @@ void main() {
       expect(intraSystem, equals(waypointABSymbol));
 
       when(() => chartingSnapshot.isCharted(waypointABSymbol)).thenReturn(true);
-      final interSystem = await nextUnchartedWaypointSymbol(
+      final interSystem = nextUnchartedWaypointSymbol(
         systemsCache,
         chartingSnapshot,
         systemConnectivity,

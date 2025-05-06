@@ -1,13 +1,13 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final startSystemSymbol = await startSystemFromArg(
     db,
     argResults.rest.firstOrNull,
   );
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await db.systems.snapshotAllSystems();
 
   // Can't use loadSystemConnectivity because need constructionSnapshot later.
   final constructionSnapshot = await ConstructionSnapshot.load(db);

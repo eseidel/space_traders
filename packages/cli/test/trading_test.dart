@@ -1,5 +1,4 @@
 import 'package:cli/cache/market_price_snapshot.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
@@ -28,8 +27,6 @@ class _MockShipEngine extends Mock implements ShipEngine {}
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
 
 BuyOpp _makeBuyOpp({
   required WaypointSymbol marketSymbol,
@@ -75,14 +72,8 @@ void main() {
   });
 
   test('costOutDeal basic', () {
-    final systemsCache = _MockSystemsCache();
     final start = SystemWaypoint.test(WaypointSymbol.fromString('X-S-A'));
     final end = SystemWaypoint.test(WaypointSymbol.fromString('X-S-B'));
-    when(() => systemsCache.waypoint(start.symbol)).thenReturn(start);
-    when(() => systemsCache.waypoint(end.symbol)).thenReturn(end);
-    when(
-      () => systemsCache.waypointsInSystem(start.system),
-    ).thenReturn([start, end]);
 
     final routePlanner = _MockRoutePlanner();
     const fuelCapacity = 100;
@@ -118,7 +109,6 @@ void main() {
       sellPrice: 2,
     );
     final costed = costOutDeal(
-      systemsCache,
       routePlanner,
       const ShipSpec(
         cargoCapacity: 1,
@@ -183,7 +173,6 @@ void main() {
     // S-A-A and S-A-B are close but have poor deals, S-A-C is far away but
     // has a great deal, but we still choose S-A-B because it's faster and
     // thus has a better profit per second.
-    final systemsCache = _MockSystemsCache();
     final saa = SystemWaypoint.test(WaypointSymbol.fromString('S-A-A'));
     final sab = SystemWaypoint.test(WaypointSymbol.fromString('S-A-B'));
     final sac = SystemWaypoint.test(
@@ -191,12 +180,8 @@ void main() {
       position: WaypointPosition(1000, 1000, SystemSymbol.fromString('S-A')),
     );
     final waypoints = [saa, sab, sac];
-    when(() => systemsCache.waypoint(saa.symbol)).thenReturn(saa);
-    when(() => systemsCache.waypoint(sab.symbol)).thenReturn(sab);
-    when(() => systemsCache.waypoint(sac.symbol)).thenReturn(sac);
-    when(
-      () => systemsCache.waypointsInSystem(saa.system),
-    ).thenReturn(waypoints);
+    final systems = [System.test(saa.system, waypoints: waypoints)];
+    final systemsSnapshot = SystemsSnapshot(systems);
     const tradeSymbol = TradeSymbol.FUEL;
     final now = DateTime(2021);
     final prices = [
@@ -248,18 +233,14 @@ void main() {
     when(() => shipCargo.units).thenReturn(0);
     when(() => ship.modules).thenReturn([]);
 
-    when(
-      () => systemsCache[saa.system],
-    ).thenReturn(System.test(waypointSymbol.system));
-
     final systemConnectivity = _MockSystemConnectivity();
     registerFallbackValue(saa.system);
     when(
       () => systemConnectivity.existsJumpPathBetween(any(), any()),
     ).thenReturn(true);
 
-    final routePlanner = RoutePlanner.fromSystemsCache(
-      systemsCache,
+    final routePlanner = RoutePlanner.fromSystemsSnapshot(
+      systemsSnapshot,
       systemConnectivity,
       sellsFuel: (_) => true,
     );
@@ -269,7 +250,6 @@ void main() {
     final marketScan = runWithLogger(
       logger,
       () => scanReachableMarkets(
-        systemsCache,
         systemConnectivity,
         marketPrices,
         startSystem: waypointSymbol.system,
@@ -280,7 +260,6 @@ void main() {
       logger,
       () =>
           findDealsFor(
-            systemsCache,
             routePlanner,
             marketScan,
             maxTotalOutlay: 100000,
@@ -622,13 +601,13 @@ void main() {
     }
 
     when(
-      () => db.marketListingForSymbol(nearSymbol),
+      () => db.marketListingAt(nearSymbol),
     ).thenAnswer((_) async => listing(nearSymbol));
     when(
-      () => db.marketListingForSymbol(midSymbol),
+      () => db.marketListingAt(midSymbol),
     ).thenAnswer((_) async => listing(midSymbol));
     when(
-      () => db.marketListingForSymbol(farSymbol),
+      () => db.marketListingAt(farSymbol),
     ).thenAnswer((_) async => listing(farSymbol));
 
     final logger = _MockLogger();

@@ -7,27 +7,22 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
 
-WaypointSymbol _centralWaypointInSystem(
-  SystemsCache systems,
-  SystemSymbol system,
-) {
-  final zero = WaypointPosition(0, 0, system);
-  final waypoints = systems[system].waypoints.sortedBy<num>(
-    (w) => w.position.distanceTo(zero),
-  );
-  return waypoints.first.symbol;
+WaypointSymbol _centralWaypoint(List<SystemWaypoint> waypoints) {
+  final zero = WaypointPosition(0, 0, waypoints.first.system);
+  final sorted = waypoints.sortedBy<num>((w) => w.position.distanceTo(zero));
+  return sorted.first.symbol;
 }
 
 RoutePlan? _shortestPathTo(
   SystemConnectivity systemConnectivity,
   RoutePlanner routePlanner,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemSymbol systemSymbol,
   Ship ship,
 ) {
   final maxFuel = ship.frame.fuelCapacity;
-  final system = systemsCache[systemSymbol];
-  final nearbySystems = systemsCache.systems.where(
+  final system = systems.systemRecordBySymbol(systemSymbol);
+  final nearbySystems = systems.records.where(
     (s) =>
         s.symbol != systemSymbol &&
         systemConnectivity.existsJumpPathBetween(s.symbol, ship.systemSymbol) &&
@@ -37,11 +32,11 @@ RoutePlan? _shortestPathTo(
   for (final nearbySystem in nearbySystems) {
     // Figure out the time to route from current location to the jumpgate
     // for nearbySystem.
-    final jumpGate = nearbySystem.jumpGateWaypoints.first;
+    final jumpGate = systems.jumpGateWaypointForSystem(nearbySystem.symbol);
     final route = routePlanner.planRoute(
       ship.shipSpec,
       start: ship.waypointSymbol,
-      end: jumpGate.symbol,
+      end: jumpGate!.symbol,
     );
     if (route != null) {
       routes.add(route);
@@ -52,8 +47,12 @@ RoutePlan? _shortestPathTo(
   }
   final plan = routes.sortedBy((r) => r.duration).first;
   final actions = List<RouteAction>.from(plan.actions);
-  final centralSymbol = _centralWaypointInSystem(systemsCache, systemSymbol);
-  final nearbySystem = systemsCache[actions.last.endSymbol.system];
+  final centralSymbol = _centralWaypoint(
+    systems.waypointsInSystem(systemSymbol),
+  );
+  final nearbySystem = systems.systemRecordBySymbol(
+    actions.last.endSymbol.system,
+  );
   final distance = nearbySystem.distanceTo(system);
   final seconds = warpTimeByDistanceAndSpeed(
     distance: distance,
@@ -79,7 +78,7 @@ RoutePlan? _shortestPathTo(
 
 /// Find the closest system to the seed system that is not in the same cluster.
 Future<RoutePlan?> _routeToClosestSystemToSeed(
-  SystemsCache systemsCache,
+  SystemsSnapshot systemsCache,
   SystemConnectivity systemConnectivity,
   RoutePlanner routePlanner,
   Ship ship, {
@@ -122,7 +121,7 @@ Future<RoutePlan?> routeToNextSystemToSeed(
   AgentCache agentCache,
   ShipSnapshot ships,
   BehaviorSnapshot behaviors,
-  SystemsCache systems,
+  SystemsSnapshot systems,
   RoutePlanner routePlanner,
   SystemConnectivity connectivity,
   Ship ship,
@@ -198,12 +197,13 @@ Future<JobResult> doSeeder(
   // And route there.
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
+  final systems = await db.systems.snapshotAllSystems();
   final route = assertNotNull(
     await routeToNextSystemToSeed(
       caches.agent,
       ships,
       behaviors,
-      caches.systems,
+      systems,
       caches.routePlanner,
       caches.systemConnectivity,
       ship,

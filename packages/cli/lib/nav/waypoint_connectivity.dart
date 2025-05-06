@@ -1,4 +1,3 @@
-import 'package:cli/cache/systems_cache.dart';
 import 'package:types/types.dart';
 
 /// `int` alias to make it easier to differentiate between cluster ids and
@@ -54,18 +53,18 @@ class WaypointConnectivity {
 
   /// Creates a new SystemConnectivity from the systemsCache.
   factory WaypointConnectivity.fromSystemAndFuelCapacity(
-    SystemsCache systemsCache,
+    SystemsSnapshot systemsCache,
     SystemSymbol systemSymbol,
     int fuelCapacity,
   ) {
-    final system = systemsCache[systemSymbol];
+    final waypoints = systemsCache.waypointsInSystem(systemSymbol);
     final clusterFinder = ClusterFinder<WaypointSymbol>((s) {
-      final start = system.waypoints.firstWhere((w) => w.symbol == s);
-      return system.waypoints
+      final start = waypoints.firstWhere((w) => w.symbol == s);
+      return waypoints
           .where((w) => w.distanceTo(start) < fuelCapacity)
           .map((w) => w.symbol);
     });
-    for (final waypoint in system.waypoints) {
+    for (final waypoint in waypoints) {
       clusterFinder.paintCluster(waypoint.symbol);
     }
     return WaypointConnectivity(clusterFinder.clusterForKey);

@@ -1,5 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:types/types.dart';
 
 class _MockAgentCache extends Mock implements AgentCache {}
 
@@ -29,7 +30,7 @@ class _MockShipyardShipCache extends Mock implements ShipyardShipCache {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
+class _MockSystemsSnapshot extends Mock implements SystemsSnapshot {}
 
 class _MockTradeExportCache extends Mock implements TradeExportCache {}
 
@@ -38,6 +39,8 @@ class _MockTradeGoodCache extends Mock implements TradeGoodCache {}
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
+
+class _MockGalaxyStats extends Mock implements GalaxyStats {}
 
 void _addMocks<Symbol extends Object, Record extends Object>(
   StaticCache<Symbol, Record> cache,
@@ -80,7 +83,7 @@ Caches mockCaches() {
   return Caches(
     agent: _MockAgentCache(),
     marketPrices: _MockMarketPrices(),
-    systems: _MockSystemsCache(),
+    systems: _MockSystemsSnapshot(),
     waypoints: _MockWaypointCache(),
     markets: _MockMarketCache(),
     charting: _MockChartingCache(),
@@ -90,5 +93,6 @@ Caches mockCaches() {
     construction: _MockConstructionCache(),
     systemConnectivity: _MockSystemConnectivity(),
     jumpGates: _MockJumpGateSnapshot(),
+    galaxy: _MockGalaxyStats(),
   );
 }

@@ -4,7 +4,7 @@ import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final centralCommand = CentralCommand();
 

@@ -1,6 +1,5 @@
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/market_listing_snapshot.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli_table/cli_table.dart';
 
@@ -9,10 +8,10 @@ Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
   'hAlign': HorizontalAlign.right,
 };
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final chartingSnapshot = await ChartingSnapshot.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await db.systems.snapshotAllSystems();
 
   // Walk all charting records.
   // Record the number of known waypoints by type.

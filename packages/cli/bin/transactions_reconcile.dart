@@ -28,7 +28,7 @@ void reconcile(Iterable<Transaction> transactions) {
   }
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final lookbackMinutesString = argResults.rest.firstOrNull;
   final lookbackMinutes =
       lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;

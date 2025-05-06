@@ -30,7 +30,7 @@ class _WarpPlanner {
     required this.sellsFuel,
   });
 
-  final SystemsCache systemsCache;
+  final SystemsSnapshot systemsCache;
   final SystemConnectivity systemConnectivity;
   final bool Function(WaypointSymbol) sellsFuel;
 
@@ -41,7 +41,7 @@ class _WarpPlanner {
     required SystemSymbol startSymbol,
     required SystemSymbol endSymbol,
   }) {
-    final end = systemsCache[endSymbol];
+    final end = systemsCache.systemRecordBySymbol(endSymbol);
     // This is A* search, thanks to
     // https://www.redblobgames.com/pathfinding/a-star/introduction.html
     // This code is hot enough that SystemSymbol.fromString shows up!
@@ -55,7 +55,8 @@ class _WarpPlanner {
     // A* only requires approximate weights.  We could use real weights here
     // but we'd have to remove case which calls this function with the same
     // system (end, end) which will assert in cooldownTimeForJumpBetweenSystems.
-    int approximateTimeBetween(System a, System b) => a.distanceTo(b).round();
+    int approximateTimeBetween(SystemPosition a, SystemPosition b) =>
+        a.distanceTo(b).round();
 
     while (frontier.isNotEmpty) {
       final current = frontier.removeFirst();
@@ -63,11 +64,11 @@ class _WarpPlanner {
       if (currentSymbol == endSymbol) {
         break;
       }
-      final currentSystem = systemsCache[currentSymbol];
+      final currentSystem = systemsCache.systemRecordBySymbol(currentSymbol);
       final connected = systemConnectivity.directlyConnectedSystemSymbols(
         currentSymbol,
       );
-      final connectedSystems = connected.map(systemsCache.systemBySymbol);
+      final connectedSystems = connected.map(systemsCache.systemRecordBySymbol);
 
       const jumpTimeBetween = cooldownTimeForJumpBetweenSystems;
 
@@ -84,7 +85,9 @@ class _WarpPlanner {
             jumpTimeBetween(currentSystem, nextSystem);
         if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
           costSoFar[next] = newCost;
-          final priority = newCost + approximateTimeBetween(end, nextSystem);
+          final priority =
+              newCost +
+              approximateTimeBetween(end.position, nextSystem.position);
           frontier.add((next, priority));
           final action = _SystemAction(
             startSymbol: currentSymbol,
@@ -99,15 +102,14 @@ class _WarpPlanner {
         continue;
       }
       // Add all possible warps.
-      int warpTimeBetween(System a, System b) {
+      int warpTimeBetween(SystemRecord a, SystemRecord b) {
         // Flight mode is implicitly CRUISE for warps currently.
         return warpTimeInSeconds(a, b, shipSpeed: shipSpec.speed);
       }
 
-      final nearbySystems = systemsCache.systems.where(
-        (s) =>
-            s.symbol != currentSymbol &&
-            s.distanceTo(currentSystem) < shipSpec.fuelCapacity,
+      final nearbySystems = systemsCache.systemsWithinRadius(
+        currentSystem.position,
+        shipSpec.fuelCapacity.toDouble(),
       );
       for (final nextSystem in nearbySystems) {
         final next = nextSystem.symbol;
@@ -132,10 +134,12 @@ class _WarpPlanner {
 
         final newCost =
             costSoFar[currentSymbol]! +
-            warpTimeBetween(currentSystem, nextSystem);
+            warpTimeBetween(currentSystem, nextSystem.toSystemRecord());
         if (!costSoFar.containsKey(next) || newCost < costSoFar[next]!) {
           costSoFar[next] = newCost;
-          final priority = newCost + approximateTimeBetween(end, nextSystem);
+          final priority =
+              newCost +
+              approximateTimeBetween(end.position, nextSystem.position);
           frontier.add((next, priority));
           final action = _SystemAction(
             startSymbol: currentSymbol,
@@ -182,7 +186,7 @@ class _WarpPlanner {
 /// The route will be planned for the given [shipSpec] and will include warps
 /// if shipSpec.canWarp is true.
 List<RouteAction>? findRouteBetweenSystems(
-  SystemsCache systemsCache,
+  SystemsSnapshot systemsCache,
   SystemConnectivity systemConnectivity,
   ShipSpec shipSpec, {
   required WaypointSymbol start,
@@ -209,8 +213,8 @@ List<RouteAction>? findRouteBetweenSystems(
         action.type == _ActionType.jump
             ? RouteActionType.jump
             : RouteActionType.warpCruise;
-    final start = systemsCache.systemBySymbol(action.startSymbol);
-    final end = systemsCache.systemBySymbol(action.endSymbol);
+    final start = systemsCache.systemRecordBySymbol(action.startSymbol);
+    final end = systemsCache.systemRecordBySymbol(action.endSymbol);
     final distance = start.distanceTo(end);
     final seconds =
         action.type == _ActionType.jump

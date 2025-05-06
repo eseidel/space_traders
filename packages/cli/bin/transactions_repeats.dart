@@ -8,7 +8,7 @@ void printDiffs(List<int> data) {
   logger.info(diffs.toString());
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final transactions = await db.allTransactions();
   // Walk through all transactions, finding repeats.
   final transactionSets = <List<Transaction>>[];

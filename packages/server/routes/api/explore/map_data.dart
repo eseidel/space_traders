@@ -6,13 +6,12 @@ import 'package:server/read_async.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
-  final fs = context.read<FileSystem>();
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsSnapshot = await db.systems.snapshotAllSystems();
   final shipSnapshot = await ShipSnapshot.load(db);
   final response = GetMapDataResponse(
     ships: shipSnapshot.ships,
-    systems: systemsCache.systems,
+    systems: systemsSnapshot.systems.toList(),
   );
 
   return Response.json(body: response.toJson());

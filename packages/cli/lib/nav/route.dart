@@ -19,16 +19,16 @@ enum TravelMethod {
 /// Given a start location and a set of waypoint symbols find the approximate
 /// round trip distance to visit all symbols and return to the start.
 int approximateRoundTripDistanceWithinSystem(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   WaypointSymbol startSymbol,
   Set<WaypointSymbol> symbols,
 ) {
-  final start = systemsCache.waypoint(startSymbol);
+  final start = systems.waypoint(startSymbol);
   final waypoints =
       symbols
           // ignore start symbol in the symbols list. Could also throw.
           .where((s) => s != startSymbol)
-          .map((s) => systemsCache.waypoint(s))
+          .map((s) => systems.waypoint(s))
           .toList();
   if (waypoints.any((w) => w.system != start.system)) {
     throw ArgumentError('All waypoints must be in the same system.');
@@ -138,11 +138,14 @@ int flightTimeWithinSystemInSeconds(
 
 /// Returns the warp time to the given waypoint.
 int warpTimeInSeconds(
-  System a,
-  System b, {
+  SystemRecord a,
+  SystemRecord b, {
   required int shipSpeed,
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
+  if (a.symbol == b.symbol) {
+    throw ArgumentError('Cannot jump to the same system ${a.symbol}.');
+  }
   final distance = a.distanceTo(b);
   return warpTimeByDistanceAndSpeed(
     distance: distance,
@@ -162,7 +165,7 @@ int cooldownTimeForJumpDistance(int distance) {
 }
 
 /// Returns the cooldown time after jumping between two systems.
-int cooldownTimeForJumpBetweenSystems(System a, System b) {
+int cooldownTimeForJumpBetweenSystems(SystemRecord a, SystemRecord b) {
   if (a.symbol == b.symbol) {
     throw ArgumentError('Cannot jump to the same system ${a.symbol}.');
   }
@@ -192,7 +195,7 @@ extension RoutePlanPlanning on RoutePlan {
 
 /// Plan a route between two waypoints using a pre-computed jump plan.
 RoutePlan routePlanFromJumpPlan(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   JumpPlan jumpPlan,
   ShipSpec shipSpec, {
   required WaypointSymbol start,
@@ -206,11 +209,11 @@ RoutePlan routePlanFromJumpPlan(
   if (jumpPlan.route.last != end.system) {
     throw ArgumentError('Jump plan does not end at ${end.system}');
   }
-  final startWaypoint = systemsCache.waypoint(start);
-  final startJumpGate = systemsCache.jumpGateWaypointForSystem(start.system)!;
+  final startWaypoint = systems.waypoint(start);
+  final startJumpGate = systems.jumpGateWaypointForSystem(start.system)!;
   if (startJumpGate.symbol != start) {
     _addSubPlanWithinSystem(
-      systemsCache,
+      systems,
       actions,
       startWaypoint,
       startJumpGate,
@@ -222,23 +225,18 @@ RoutePlan routePlanFromJumpPlan(
   for (var i = 0; i < jumpPlan.route.length - 1; i++) {
     final startSymbol = jumpPlan.route[i];
     final endSymbol = jumpPlan.route[i + 1];
-    final startJumpgate = systemsCache.jumpGateWaypointForSystem(startSymbol)!;
-    final endJumpGate = systemsCache.jumpGateWaypointForSystem(endSymbol)!;
+    final startJumpgate = systems.jumpGateWaypointForSystem(startSymbol)!;
+    final endJumpGate = systems.jumpGateWaypointForSystem(endSymbol)!;
     final isLastJump = i == jumpPlan.route.length - 2;
     actions.add(
-      _jumpAction(
-        systemsCache,
-        startJumpgate,
-        endJumpGate,
-        isLastJump: isLastJump,
-      ),
+      _jumpAction(systems, startJumpgate, endJumpGate, isLastJump: isLastJump),
     );
   }
-  final endWaypoint = systemsCache.waypoint(end);
-  final endJumpGate = systemsCache.jumpGateWaypointForSystem(end.system)!;
+  final endWaypoint = systems.waypoint(end);
+  final endJumpGate = systems.jumpGateWaypointForSystem(end.system)!;
   if (endJumpGate.symbol != end) {
     _addSubPlanWithinSystem(
-      systemsCache,
+      systems,
       actions,
       endJumpGate,
       endWaypoint,
@@ -295,7 +293,7 @@ void _saveJumpsInCache(JumpCache jumpCache, List<RouteAction> actions) {
 }
 
 void _addSubPlanWithinSystem(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   List<RouteAction> route,
   SystemWaypoint start,
   SystemWaypoint end,
@@ -303,7 +301,7 @@ void _addSubPlanWithinSystem(
   required bool Function(WaypointSymbol) sellsFuel,
 }) {
   final actions = findRouteWithinSystem(
-    systemsCache,
+    systems,
     shipSpec,
     start: start.symbol,
     end: end.symbol,
@@ -320,13 +318,13 @@ void _addSubPlanWithinSystem(
 }
 
 RouteAction _jumpAction(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemWaypoint start,
   SystemWaypoint end, {
   required bool isLastJump,
 }) {
-  final startSystem = systemsCache[start.system];
-  final endSystem = systemsCache[end.system];
+  final startSystem = systems.systemRecordBySymbol(start.system);
+  final endSystem = systems.systemRecordBySymbol(end.system);
   final cooldown = cooldownTimeForJumpBetweenSystems(startSystem, endSystem);
   // This isn't quite right to use cooldown as duration, but it's
   // close enough for now.  This isLastJump hack also would break
@@ -346,29 +344,30 @@ RouteAction _jumpAction(
 class RoutePlanner {
   /// Create a new route planner.
   RoutePlanner({
-    required SystemsCache systemsCache,
+    required SystemsSnapshot systems,
     required SystemConnectivity systemConnectivity,
     required JumpCache jumpCache,
     required bool Function(WaypointSymbol) sellsFuel,
-  }) : _systemsCache = systemsCache,
+  }) : _systemsSnapshot = systems,
        _sellsFuel = sellsFuel,
        _systemConnectivity = systemConnectivity,
        _jumpCache = jumpCache;
 
   /// Create a new route planner from a systems cache.
-  RoutePlanner.fromSystemsCache(
-    SystemsCache systemsCache,
+  RoutePlanner.fromSystemsSnapshot(
+    SystemsSnapshot systems,
     SystemConnectivity systemConnectivity, {
     required bool Function(WaypointSymbol) sellsFuel,
   }) : this(
-         systemsCache: systemsCache,
+         systems: systems,
          systemConnectivity: systemConnectivity,
          jumpCache: JumpCache(),
          sellsFuel: sellsFuel,
        );
 
-  // SystemsCache knows all the systems and where they are.
-  final SystemsCache _systemsCache;
+  // SystemsSnapshot is all systems we knew about at the time of creation.
+  final SystemsSnapshot _systemsSnapshot;
+
   // SystemConnectivity and JumpCache are related perf optimizations.
   // SystemConnectivity is used to quickly reject routes between systems
   // that are not connected.
@@ -409,7 +408,7 @@ class RoutePlanner {
     );
     if (jumpPlan != null) {
       return routePlanFromJumpPlan(
-        _systemsCache,
+        _systemsSnapshot,
         jumpPlan,
         shipSpec,
         start: start,
@@ -423,7 +422,7 @@ class RoutePlanner {
     // logger.detail('Planning route from ${start.symbol} to ${end.symbol} '
     // 'fuelCapacity: $fuelCapacity shipSpeed: $shipSpeed');
     final symbols = findWaypointPathJumpsOnly(
-      _systemsCache,
+      _systemsSnapshot,
       _systemConnectivity,
       start,
       end,
@@ -449,13 +448,13 @@ class RoutePlanner {
     for (var i = symbols.length - 1; i > 0; i--) {
       final current = symbols[i];
       final previous = symbols[i - 1];
-      final previousWaypoint = _systemsCache.waypoint(previous);
-      final currentWaypoint = _systemsCache.waypoint(current);
+      final previousWaypoint = _systemsSnapshot.waypoint(previous);
+      final currentWaypoint = _systemsSnapshot.waypoint(current);
       if (previousWaypoint.system != currentWaypoint.system) {
         // Assume we jumped.
         route.add(
           _jumpAction(
-            _systemsCache,
+            _systemsSnapshot,
             previousWaypoint,
             currentWaypoint,
             isLastJump: isLastJump,
@@ -464,7 +463,7 @@ class RoutePlanner {
         isLastJump = false;
       } else {
         _addSubPlanWithinSystem(
-          _systemsCache,
+          _systemsSnapshot,
           route,
           previousWaypoint,
           currentWaypoint,
@@ -496,7 +495,7 @@ class RoutePlanner {
 
     final startTime = DateTime.timestamp();
     final actions = findRouteWithinSystem(
-      _systemsCache,
+      _systemsSnapshot,
       shipSpec,
       start: start,
       end: end,
@@ -552,7 +551,6 @@ class RoutePlanner {
 
 /// Plan a route through a series of waypoints.
 RoutePlan? planRouteThrough(
-  SystemsCache systemsCache,
   RoutePlanner routePlanner,
   ShipSpec shipSpec,
   List<WaypointSymbol> waypointSymbols,

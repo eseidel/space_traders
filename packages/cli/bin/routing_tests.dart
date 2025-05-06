@@ -4,14 +4,15 @@ import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/compare.dart';
 import 'package:equatable/equatable.dart';
-import 'package:file/memory.dart';
+import 'package:file/local.dart';
 import 'package:path/path.dart' as path;
 
 void main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
+  const fs = LocalFileSystem();
   const testsDir = '../../../space_traders_tests';
   // Load up the pathing tests directory.
   final pathingTestsDir = fs.directory('$testsDir/pathing');
@@ -214,7 +215,6 @@ void runTests(TestSuite suite, String path) {
   // Create a systems cache for the test.
   // Create a route planner.
   // Run the tests.
-  final fs = MemoryFileSystem.test();
   final systems = <System>[];
   const sector = 'X1';
   for (final system in suite.systems) {
@@ -260,9 +260,9 @@ void runTests(TestSuite suite, String path) {
     throw ArgumentError('Waypoint not found: $waypointSymbol');
   }
 
-  final systemsCache = SystemsCache(systems, fs: fs);
+  final systemsCache = SystemsSnapshot(systems);
   final systemConnectivity = SystemConnectivity.test({});
-  final routePlanner = RoutePlanner.fromSystemsCache(
+  final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,
     systemConnectivity,
     sellsFuel: (WaypointSymbol w) => lookupWaypoint(w).sellsFuel,

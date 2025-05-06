@@ -24,7 +24,7 @@ Future<void> printContracts(
   }
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final printAll = argResults['all'] as bool;
   final contractSnapshot = await ContractSnapshot.load(db);
   await printContracts(

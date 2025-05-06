@@ -31,7 +31,7 @@ Map<ShipType, int> _shipTypeCounts(
   return typeCounts;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);

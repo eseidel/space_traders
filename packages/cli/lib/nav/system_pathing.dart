@@ -4,10 +4,10 @@ import 'package:types/types.dart';
 
 /// Returns the path from [start] to [end] as a list of system symbols.
 List<SystemSymbol>? findSystemPath(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemConnectivity systemConnectivity,
-  System start,
-  System end,
+  SystemRecord start,
+  SystemRecord end,
 ) {
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -25,7 +25,8 @@ List<SystemSymbol>? findSystemPath(
   // A* only requires approximate weights.  We could use real weights here
   // but we'd have to remove case which calls this function with the same
   // system (end, end) which will assert in cooldownTimeForJumpBetweenSystems.
-  int approximateTimeBetween(System a, System b) => a.distanceTo(b).round();
+  int approximateTimeBetween(SystemRecord a, SystemRecord b) =>
+      a.distanceTo(b).round();
 
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
@@ -33,11 +34,11 @@ List<SystemSymbol>? findSystemPath(
     if (currentSymbol == endSymbol) {
       break;
     }
-    final currentSystem = systemsCache.systemBySymbol(currentSymbol);
+    final currentSystem = systems.systemRecordBySymbol(currentSymbol);
     final connected = systemConnectivity.directlyConnectedSystemSymbols(
       currentSymbol,
     );
-    final connectedSystems = connected.map(systemsCache.systemBySymbol);
+    final connectedSystems = connected.map(systems.systemRecordBySymbol);
 
     for (final nextSystem in connectedSystems) {
       final next = nextSystem.symbol;
@@ -71,13 +72,13 @@ List<SystemSymbol>? findSystemPath(
 
 /// Returns the path from [start] to [end] as a list of waypoint symbols.
 List<WaypointSymbol>? findWaypointPathJumpsOnly(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemConnectivity systemConnectivity,
   WaypointSymbol start,
   WaypointSymbol end,
 ) {
-  final startSystem = systemsCache.systemBySymbol(start.system);
-  final endSystem = systemsCache.systemBySymbol(end.system);
+  final startSystem = systems.systemBySymbol(start.system);
+  final endSystem = systems.systemBySymbol(end.system);
   if (start.system == end.system) {
     // The caller needs to turn this into a real intra-system path.
     return [start, end];
@@ -87,17 +88,17 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   }
 
   final systemSymbols = findSystemPath(
-    systemsCache,
+    systems,
     systemConnectivity,
-    startSystem,
-    endSystem,
+    startSystem.toSystemRecord(),
+    endSystem.toSystemRecord(),
   );
   if (systemSymbols == null) {
     return null;
   }
   // TODO(eseidel): This will fail if systems have more than one jump gate.
   final jumpGateSymbols = systemSymbols.map(
-    (s) => systemsCache.jumpGateWaypointForSystem(s)!.symbol,
+    (s) => systems.jumpGateWaypointForSystem(s)!.symbol,
   );
   return [
     if (start != jumpGateSymbols.first) start,

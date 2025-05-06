@@ -5,17 +5,16 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 class _MockLogger extends Mock implements Logger {}
 
 void main() {
   test('SupplyChainBuilder smoke test', () async {
-    final systems = _MockSystemsCache();
     final to = WaypointSymbol.fromString('W-A-A');
-    when(() => systems.waypoint(to)).thenReturn(SystemWaypoint.test(to));
+    final systemsSnapshot = SystemsSnapshot([
+      System.test(to.system, waypoints: [SystemWaypoint.test(to)]),
+    ]);
     final builder = SupplyChainBuilder(
-      systems: systems,
+      systems: systemsSnapshot,
       marketListings: MarketListingSnapshot([]),
       exports: TradeExportSnapshot([]),
       charting: ChartingSnapshot([]),

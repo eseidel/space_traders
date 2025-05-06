@@ -13,7 +13,7 @@ void main() {
     when(db.close).thenAnswer((_) async {});
     await runOffline(
       ['-v'],
-      (fs, db, results) async {
+      (db, results) async {
         expect(results['verbose'], true);
         expect(results['help'], false);
       },

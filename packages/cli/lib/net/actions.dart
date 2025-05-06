@@ -15,16 +15,16 @@ export 'package:cli/net/direct.dart';
 // Importantly, these actions *should* modify the state objects passed in
 // e.g. if it docks the ship, it should update the ship's nav object.
 
-bool _canCruiseTo(
-  SystemsCache systemsCache,
+Future<bool> _canCruiseTo(
+  SystemsSnapshot systems,
   Ship ship,
   WaypointSymbol waypointSymbol,
-) {
+) async {
   if (!ship.usesFuel) {
     return true;
   }
-  final start = systemsCache.waypoint(ship.waypointSymbol);
-  final end = systemsCache.waypoint(waypointSymbol);
+  final start = systems.waypoint(ship.waypointSymbol);
+  final end = systems.waypoint(waypointSymbol);
   final distance = start.distanceTo(end);
   final expectedFuel = fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
   // Use > and a buffer (10) to avoid ever having zero fuel.
@@ -36,13 +36,13 @@ bool _canCruiseTo(
 Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   Database db,
   Api api,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
   await undockIfNeeded(db, api, ship);
 
-  final canCruise = _canCruiseTo(systemsCache, ship, waypointSymbol);
+  final canCruise = await _canCruiseTo(systems, ship, waypointSymbol);
   final flightMode =
       canCruise ? ShipNavFlightMode.CRUISE : ShipNavFlightMode.DRIFT;
   await setShipFlightModeIfNeeded(db, api, ship, flightMode);
@@ -71,7 +71,6 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 Future<WarpShip200ResponseData> warpToWaypoint(
   Database db,
   Api api,
-  SystemsCache systemsCache,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
@@ -517,14 +516,14 @@ void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
 Future<DateTime> navigateToLocalWaypointAndLog(
   Database db,
   Api api,
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   Ship ship,
   SystemWaypoint waypoint,
 ) async {
   final result = await navigateToLocalWaypoint(
     db,
     api,
-    systemsCache,
+    systems,
     ship,
     waypoint.symbol,
   );
@@ -545,17 +544,10 @@ Future<DateTime> navigateToLocalWaypointAndLog(
 Future<DateTime> warpToWaypointAndLog(
   Database db,
   Api api,
-  SystemsCache systemsCache,
   Ship ship,
   SystemWaypoint waypoint,
 ) async {
-  final result = await warpToWaypoint(
-    db,
-    api,
-    systemsCache,
-    ship,
-    waypoint.symbol,
-  );
+  final result = await warpToWaypoint(db, api, ship, waypoint.symbol);
   final flightTime = result.nav.route.duration;
   final consumedFuel = result.fuel.consumed?.amount ?? 0;
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';

@@ -883,13 +883,14 @@ Future<JobResult> _initDeal(
   }
 
   final ships = await ShipSnapshot.load(db);
+  final systems = await db.systems.snapshotAllSystems();
   final avoidSystems =
       centralCommand.otherTraderSystems(ships, behaviors, ship.symbol).toSet();
 
   // If we don't have a deal, move to a better location and try again.
   final destinationSymbol = assertNotNull(
     findBetterTradeLocation(
-      caches.systems,
+      systems,
       caches.systemConnectivity,
       caches.marketPrices,
       findDeal: (Ship ship, WaypointSymbol startSymbol) {

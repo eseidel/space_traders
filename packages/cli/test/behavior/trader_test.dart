@@ -735,7 +735,7 @@ void main() {
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
     when(db.allContracts).thenAnswer((_) async => <Contract>[]);
     when(
-      () => caches.systems[shipLocation.system],
+      () => caches.systems.systemBySymbol(shipLocation.system),
     ).thenReturn(System.test(shipLocation.system));
     when(
       () => caches.systemConnectivity.systemsReachableFrom(shipLocation.system),

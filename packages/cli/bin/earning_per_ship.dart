@@ -43,7 +43,7 @@ class TransactionSummary {
   }
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
   final lookbackMinutesString = argResults.rest.firstOrNull;

@@ -3,6 +3,7 @@ import 'package:db/migrations.dart';
 import 'package:db/src/queries.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
@@ -152,11 +153,19 @@ class Database {
 
   /// Get the current schema version.
   Future<int?> currentSchemaVersion() async {
-    final result = await execute(selectCurrentSchemaVersionQuery());
-    if (result.isEmpty) {
-      return null;
+    try {
+      final result = await execute(selectCurrentSchemaVersionQuery());
+      if (result.isEmpty) {
+        return null;
+      }
+      return result.first[0] as int?;
+    } on pg.ServerException catch (e) {
+      // The table may not exist yet.
+      if (e.code == '42P01') {
+        return null;
+      }
+      rethrow;
     }
-    return result.first[0] as int?;
   }
 
   /// Migrate the database to the given schema version.
@@ -203,6 +212,9 @@ class Database {
     });
   }
 
+  /// Get the systems store.
+  SystemsStore get systems => SystemsStore(this);
+
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
     await executeSql('LISTEN $channel');
@@ -223,15 +235,12 @@ class Database {
   }
 
   /// Execute a query.
-  @protected
   Future<pg.Result> execute(Query query) => _connection.execute(query);
 
   /// Execute a query.
-  @protected
   Future<pg.Result> executeSql(String sql) => _connection.executeSql(sql);
 
   /// Query for multiple records using the provided query.
-  @protected
   Future<Iterable<T>> queryMany<T>(
     Query query,
     T Function(Map<String, dynamic>) fromColumnMap,
@@ -242,7 +251,6 @@ class Database {
   }
 
   /// Query for a single record using the provided query.
-  @protected
   Future<T?> queryOne<T>(
     Query query,
     T Function(Map<String, dynamic>) fromColumnMap,
@@ -423,9 +431,7 @@ class Database {
   }
 
   /// Get the market listing for the given symbol.
-  Future<MarketListing?> marketListingForSymbol(
-    WaypointSymbol waypointSymbol,
-  ) async {
+  Future<MarketListing?> marketListingAt(WaypointSymbol waypointSymbol) async {
     final query = marketListingByWaypointSymbolQuery(waypointSymbol);
     return queryOne(query, marketListingFromColumnMap);
   }
@@ -450,6 +456,19 @@ class Database {
     TradeSymbol tradeSymbol,
   ) async {
     final query = marketsWithImportInSystemQuery(system, tradeSymbol);
+    return queryMany(
+      query,
+      (map) => WaypointSymbol.fromString(map['symbol'] as String),
+    );
+  }
+
+  /// Get all WaypointSymbols which buys [tradeSymbol] within [system].
+  /// Buys means imports or exchange.
+  Future<Iterable<WaypointSymbol>> marketsWhichBuysTradeSymbolInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketsWhichBuysTradeSymbolInSystemQuery(system, tradeSymbol);
     return queryMany(
       query,
       (map) => WaypointSymbol.fromString(map['symbol'] as String),
@@ -655,28 +674,26 @@ class Database {
     return queryMany(allBehaviorStatesQuery(), behaviorStateFromColumnMap);
   }
 
-  /// Get all behavior states with the given behavior.
-  Future<Iterable<BehaviorState>> behaviorStatesWithBehavior(
-    Behavior behavior,
-  ) async {
+  /// Get all behavior states with the given behavior type.
+  Future<Iterable<BehaviorState>> behaviorsOfType(Behavior behavior) async {
     final query = behaviorStatesWithBehaviorQuery(behavior);
     return queryMany(query, behaviorStateFromColumnMap);
   }
 
   /// Get a behavior state by ship symbol.
-  Future<BehaviorState?> behaviorStateBySymbol(ShipSymbol shipSymbol) async {
+  Future<BehaviorState?> getBehavior(ShipSymbol shipSymbol) async {
     final query = behaviorBySymbolQuery(shipSymbol);
     return queryOne(query, behaviorStateFromColumnMap);
   }
 
   /// Get a behavior state by symbol.
-  Future<void> setBehaviorState(BehaviorState behaviorState) async {
+  Future<void> upsertBehavior(BehaviorState behaviorState) async {
     await execute(upsertBehaviorStateQuery(behaviorState));
   }
 
   /// Delete a behavior state.
-  Future<void> deleteBehaviorState(ShipSymbol shipSymbol) async {
-    await execute(deleteBehaviorStateQuery(shipSymbol));
+  Future<void> deleteBehavior(ShipSymbol shipSymbol) async {
+    await execute(deleteBehaviorQuery(shipSymbol));
   }
 
   /// Get all ships.

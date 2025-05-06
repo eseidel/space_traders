@@ -1,6 +1,5 @@
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/jump_gate_snapshot.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
@@ -273,7 +272,7 @@ class SystemConnectivity {
   /// The system itself is included in the stream with distance 0.
   /// The stream is roughly ordered by distance from the start.
   Iterable<(SystemSymbol systemSymbol, int jumps)> systemSymbolsInJumpRadius(
-    SystemsCache systemsCache, {
+    SystemsSnapshot systemsCache, {
     required SystemSymbol startSystem,
     required int maxJumps,
   }) sync* {
@@ -300,8 +299,8 @@ class SystemConnectivity {
                   !currentSystemsToJumpFrom.contains(s) &&
                   !oneJumpFurther.contains(s),
             )
-            .map((s) => systemsCache[s]);
-        final jumpFromSystem = systemsCache[jumpFrom];
+            .map((s) => systemsCache.systemRecordBySymbol(s));
+        final jumpFromSystem = systemsCache.systemRecordBySymbol(jumpFrom);
         final sortedSystems = connectedSystems.sortedBy<num>(
           (s) => s.distanceTo(jumpFromSystem),
         );

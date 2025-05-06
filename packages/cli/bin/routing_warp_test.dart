@@ -20,12 +20,12 @@ void main(List<String> args) async {
   );
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   const shipType = ShipType.EXPLORER;
   final timing = argResults['timing'] as bool;
 
   final agentCache = await AgentCache.load(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsSnapshot = await db.systems.snapshotAllSystems();
   final marketListings = await MarketListingSnapshot.load(db);
   final sellsFuel = defaultSellsFuel(marketListings);
   // final sellsFuel = defaultFuel;
@@ -56,30 +56,27 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   final shipSpec = ship!.shipSpec;
 
   final start = agentCache!.headquartersSymbol;
-  final interestingSystems = findInterestingSystems(systemsCache);
-  final interestingWaypoints =
-      interestingSystems
-          .map((s) => systemsCache[s].jumpGateWaypoints.first.symbol)
-          .toList();
+  final interestingSystemSymbols = findInterestingSystems(systemsSnapshot);
 
   // Sort them by distance to start, do the easy ones first.
-  final startSystem = systemsCache[start.system];
-  interestingWaypoints.sortBy<num>(
-    (s) => systemsCache[s.system].distanceTo(startSystem),
-  );
+  final startSystem = systemsSnapshot.systemBySymbol(start.system);
+  final interestingSystems =
+      interestingSystemSymbols.map(systemsSnapshot.systemBySymbol).toList()
+        ..sortBy<num>((s) => s.distanceTo(startSystem));
 
-  logger.info('Pathing to ${interestingWaypoints.length} systems...');
-  for (final end in interestingWaypoints) {
-    final systemDistance = systemsCache[end.system].distanceTo(startSystem);
+  logger.info('Pathing to ${interestingSystems.length} systems...');
+  for (final system in interestingSystems) {
+    final end = systemsSnapshot.jumpGateWaypointForSystem(system.symbol)!;
+    final systemDistance = system.distanceTo(startSystem);
     final distanceString = systemDistance.toStringAsFixed(2);
     logger.info('Pathing to $end ($distanceString)...');
     final routeStart = DateTime.timestamp();
     final actions = findRouteBetweenSystems(
-      systemsCache,
+      systemsSnapshot,
       systemConnectivity,
       shipSpec,
       start: start,
-      end: end,
+      end: end.symbol,
       sellsFuel: sellsFuel,
     );
     final routeEnd = DateTime.timestamp();

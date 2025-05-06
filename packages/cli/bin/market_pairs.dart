@@ -11,7 +11,7 @@ Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
 // Returns the distance between two waypoints, or null if they are in different
 // systems.
 int? distanceBetween(
-  SystemsCache systemsCache,
+  SystemsSnapshot systemsCache,
   WaypointSymbol a,
   WaypointSymbol b,
 ) {
@@ -23,8 +23,8 @@ int? distanceBetween(
   return aWaypoint.distanceTo(bWaypoint).toInt();
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final systemsCache = SystemsCache.load(fs);
+Future<void> command(Database db, ArgResults argResults) async {
+  final systemsCache = await db.systems.snapshotAllSystems();
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
   final marketListings = await MarketListingSnapshot.loadOneSystem(

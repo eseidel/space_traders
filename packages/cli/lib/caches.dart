@@ -9,7 +9,6 @@ import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/compare.dart';
@@ -18,7 +17,6 @@ import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:cli/net/queries.dart';
 import 'package:db/db.dart';
-import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';
@@ -37,7 +35,6 @@ export 'package:cli/cache/ship_snapshot.dart';
 export 'package:cli/cache/shipyard_listing_snapshot.dart';
 export 'package:cli/cache/shipyard_price_snapshot.dart';
 export 'package:cli/cache/static_cache.dart';
-export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/route.dart';
@@ -61,17 +58,21 @@ class Caches {
     required this.construction,
     required this.systemConnectivity,
     required this.jumpGates,
+    required this.galaxy,
   });
 
   /// The agent cache.
   final AgentCache agent;
 
+  /// Stats about the galaxy.
+  final GalaxyStats galaxy;
+
   /// The historical market price data.
   // TODO(eseidel): Remove this (need to fix trader.dart first).
   MarketPriceSnapshot marketPrices;
 
-  /// The cache of systems.
-  final SystemsCache systems;
+  /// The in memory cache of known systems.
+  SystemsSnapshot systems;
 
   /// The cache of system connectivity.
   final SystemConnectivity systemConnectivity;
@@ -104,7 +105,6 @@ class Caches {
 
   /// Load the cache from disk and network.
   static Future<Caches> loadOrFetch(
-    FileSystem fs,
     Api api,
     Database db, {
     Future<http.Response> Function(Uri uri) httpGet = defaultHttpGet,
@@ -115,22 +115,15 @@ class Caches {
 
     final agent = await AgentCache.loadOrFetch(db, api);
     final marketPrices = await MarketPriceSnapshot.loadAll(db);
-    final systems = await SystemsCache.loadOrFetch(fs, httpGet: httpGet);
     // Load exports before we load static caches.  We ignore the response
     // but then static.exports will be up to date.
     await loadExports(db, api.data);
 
     final static = StaticCaches(db);
+    final systems = await db.systems.snapshotAllSystems();
     final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
-    final waypoints = WaypointCache(
-      api,
-      db,
-      systems,
-      charting,
-      construction,
-      static.waypointTraits,
-    );
+    final waypoints = WaypointCache(api, db);
     final markets = MarketCache(db, api, static.tradeGoods);
     final jumpGates = await JumpGateSnapshot.load(db);
     final constructionSnapshot = await ConstructionSnapshot.load(db);
@@ -140,7 +133,7 @@ class Caches {
     );
     // TODO(eseidel): Find a way to avoid fetching market listings here?
     final marketListings = await MarketListingSnapshot.load(db);
-    final routePlanner = RoutePlanner.fromSystemsCache(
+    final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systems,
       systemConnectivity,
       sellsFuel: defaultSellsFuel(marketListings),
@@ -149,6 +142,7 @@ class Caches {
     // Make sure factions are loaded.
     final factions = await loadFactions(db, api.factions);
 
+    final galaxy = await getGalaxyStats(api);
     return Caches(
       agent: agent,
       marketPrices: marketPrices,
@@ -162,12 +156,19 @@ class Caches {
       construction: construction,
       systemConnectivity: systemConnectivity,
       jumpGates: jumpGates,
+      galaxy: galaxy,
     );
   }
 
   /// Called when routing information changes (e.g. when we complete
   /// a jump gate, find a new jump gate, or a jump gate breaks).
-  Future<void> updateRoutingCaches() async {
+  Future<void> updateRoutingCaches(Database db) async {
+    if (systems.systemsCount < galaxy.systemCount ||
+        systems.waypointsCount < galaxy.waypointCount) {
+      logger.info('Systems Snapshot is incomplete, reloading.');
+      systems = await db.systems.snapshotAllSystems();
+    }
+
     systemConnectivity.updateFromJumpGates(
       jumpGates,
       await construction.snapshot(),

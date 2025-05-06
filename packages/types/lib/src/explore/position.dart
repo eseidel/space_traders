@@ -1,11 +1,12 @@
 import 'dart:math';
 
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:types/src/symbol.dart';
 
 /// A position within an unspecified coordinate space.
 @immutable
-class Position {
+class Position extends Equatable {
   const Position._(this.x, this.y);
 
   /// The x coordinate.
@@ -13,6 +14,9 @@ class Position {
 
   /// The y coordinate.
   final int y;
+
+  @override
+  List<Object?> get props => [x, y];
 }
 
 /// An x, y position within the System coordinate space.
@@ -54,4 +58,7 @@ class WaypointPosition extends Position {
 
   @override
   String toString() => '$x, $y in $system';
+
+  @override
+  List<Object?> get props => [x, y, system];
 }

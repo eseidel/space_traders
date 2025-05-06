@@ -1,5 +1,4 @@
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/plan/extraction_score.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
@@ -10,12 +9,9 @@ class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockDatabase extends Mock implements Database {}
 
-class _MockSystemsCache extends Mock implements SystemsCache {}
-
 void main() {
   test('evaluateWaypointsForMining', () async {
     final db = _MockDatabase();
-    final systemsCache = _MockSystemsCache();
     final chartingCache = _MockChartingCache();
     final systemSymbol = SystemSymbol.fromString('W-A');
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
@@ -31,12 +27,8 @@ void main() {
       position: WaypointPosition(0, 20, systemSymbol),
     );
     final waypoints = [source, marketA, marketB];
-    when(
-      () => systemsCache.waypointsInSystem(systemSymbol),
-    ).thenReturn(waypoints);
-    when(() => systemsCache.waypoint(source.symbol)).thenReturn(source);
-    when(() => systemsCache.waypoint(marketA.symbol)).thenReturn(marketA);
-    when(() => systemsCache.waypoint(marketB.symbol)).thenReturn(marketB);
+    final systems = [System.test(systemSymbol, waypoints: waypoints)];
+    final systemsSnapshot = SystemsSnapshot(systems);
     final producedGoods = {
       TradeSymbol.IRON_ORE,
       TradeSymbol.COPPER_ORE,
@@ -79,7 +71,7 @@ void main() {
 
     final scores = await evaluateWaypointsForMining(
       db,
-      systemsCache,
+      systemsSnapshot,
       chartingCache,
       systemSymbol,
     );
@@ -92,7 +84,6 @@ void main() {
 
   test('evaluateWaypointsForSiphoning', () async {
     final db = _MockDatabase();
-    final systemsCache = _MockSystemsCache();
     final chartingCache = _MockChartingCache();
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
@@ -106,12 +97,8 @@ void main() {
       position: WaypointPosition(10, 0, systemSymbol),
     );
     final waypoints = [source, market];
-    when(
-      () => systemsCache.waypointsInSystem(systemSymbol),
-    ).thenReturn(waypoints);
-    when(() => systemsCache.waypoint(source.symbol)).thenReturn(source);
-    when(() => systemsCache.waypoint(market.symbol)).thenReturn(market);
-
+    final systems = [System.test(systemSymbol, waypoints: waypoints)];
+    final systemsSnapshot = SystemsSnapshot(systems);
     final producedGoods = {
       TradeSymbol.HYDROCARBON,
       TradeSymbol.LIQUID_HYDROGEN,
@@ -131,7 +118,7 @@ void main() {
 
     final scores = await evaluateWaypointsForSiphoning(
       db,
-      systemsCache,
+      systemsSnapshot,
       chartingCache,
       systemSymbol,
     );

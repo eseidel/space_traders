@@ -82,7 +82,8 @@ extension ShipTypeToFrame on ShipyardShipSnapshot {
   }
 
   /// Attempt to determine ShipType from a Ship.  Since Ships can be modified
-  /// after purchase there is not always a 1:1 mapping from Ship back to ShipType.
+  /// after purchase there is not always a 1:1 mapping from Ship back to
+  /// ShipType.
   ShipType? guessShipType(Ship ship) {
     final frame = ship.frame;
     final type = shipTypeFromFrame(frame.symbol);

@@ -1,25 +1,24 @@
 import 'package:cli/caches.dart';
 import 'package:db/db.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
-
-class _MockSystemsCache extends Mock implements SystemsCache {}
 
 class _MockApi extends Mock implements Api {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockChartingCache extends Mock implements ChartingCache {}
-
 class _MockDatabase extends Mock implements Database {}
 
-class _MockConstructionCache extends Mock implements ConstructionCache {}
+class _MockSystemsStore extends Mock implements SystemsStore {}
 
 void main() {
   test('WaypointCache.waypoint', () async {
     final api = _MockApi();
     final db = _MockDatabase();
+    final systemsStore = _MockSystemsStore();
+    when(() => db.systems).thenReturn(systemsStore);
     final SystemsApi systemsApi = _MockSystemsApi();
     when(() => api.systems).thenReturn(systemsApi);
     final waypointSymbol = WaypointSymbol.fromString('S-E-A');
@@ -36,33 +35,22 @@ void main() {
         meta: Meta(total: 1),
       );
     });
-    final systemsCache = _MockSystemsCache();
-    when(
-      () => systemsCache.waypointsInSystem(waypointSymbol.system),
-    ).thenReturn([SystemWaypoint.test(waypointSymbol)]);
-    final chartingCache = _MockChartingCache();
-    registerFallbackValue(waypointSymbol);
-    when(
-      () => chartingCache.chartedValues(any()),
-    ).thenAnswer((_) async => null);
-    when(
-      () => chartingCache.chartingRecord(any()),
-    ).thenAnswer((_) async => null);
-    when(() => chartingCache.addWaypoints(any())).thenAnswer((_) async {});
-    final constructionCache = _MockConstructionCache();
-    when(
-      () => constructionCache.updateConstruction(waypointSymbol, null),
-    ).thenAnswer((_) async => {});
 
-    final waypointTraitCache = WaypointTraitCache(db);
-    final waypointCache = WaypointCache(
-      api,
-      db,
-      systemsCache,
-      chartingCache,
-      constructionCache,
-      waypointTraitCache,
-    );
+    registerFallbackValue(waypointSymbol);
+    registerFallbackValue(Duration.zero);
+    when(
+      () => db.getChartingRecord(any(), any()),
+    ).thenAnswer((_) async => null);
+    registerFallbackValue(waypointSymbol.system);
+    when(
+      () => systemsStore.waypointsInSystem(any()),
+    ).thenAnswer((_) async => [expectedWaypoint.toSystemWaypoint()]);
+    registerFallbackValue(ChartingRecord.fallbackValue());
+    when(() => db.upsertChartingRecord(any())).thenAnswer((_) async {});
+    registerFallbackValue(ConstructionRecord.fallbackValue());
+    when(() => db.upsertConstruction(any())).thenAnswer((_) async {});
+
+    final waypointCache = WaypointCache(api, db);
     expect(
       (await waypointCache.waypoint(waypointSymbol)).symbol,
       waypointSymbol,
@@ -89,9 +77,7 @@ void main() {
     expect(await waypointCache.canBeSiphoned(waypointSymbol), false);
 
     // The has getters still throw if the waypoint doesn't exist.
-    when(
-      () => systemsCache.waypointsInSystem(SystemSymbol.fromString('A-B')),
-    ).thenReturn([]);
+    // TODO(eseidel): this will need db mocks.
     expect(
       () async => await waypointCache.hasMarketplace(
         WaypointSymbol.fromString('A-B-C'),

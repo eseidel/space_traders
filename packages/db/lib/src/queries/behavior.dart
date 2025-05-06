@@ -33,7 +33,7 @@ Query upsertBehaviorStateQuery(BehaviorState state) => Query(
 );
 
 /// Query to delete a behavior state.
-Query deleteBehaviorStateQuery(ShipSymbol shipSymbol) => Query(
+Query deleteBehaviorQuery(ShipSymbol shipSymbol) => Query(
   'DELETE FROM behavior_ WHERE ship_symbol = @ship_symbol',
   parameters: {'ship_symbol': shipSymbol.toJson()},
 );

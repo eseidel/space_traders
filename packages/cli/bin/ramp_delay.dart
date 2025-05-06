@@ -29,7 +29,7 @@ void printRampDelay(Iterable<Transaction> transactions) {
   }
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final transactions = await db.allTransactions();
   printRampDelay(transactions);
 }

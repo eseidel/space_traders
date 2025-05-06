@@ -169,14 +169,11 @@ class NavResult {
 }
 
 void _verifyJumpTime(
-  SystemsCache systemsCache,
   Ship ship,
-  SystemSymbol fromSystem,
-  SystemSymbol toSystem,
+  SystemRecord from,
+  SystemRecord to,
   Cooldown cooldown,
 ) {
-  final from = systemsCache[fromSystem];
-  final to = systemsCache[toSystem];
   final distance = from.distanceTo(to);
   verifyCooldown(
     ship,
@@ -276,10 +273,9 @@ Future<NavResult> continueNavigationIfNeeded(
       }
 
       _verifyJumpTime(
-        caches.systems,
         ship,
-        action.startSymbol.system,
-        action.endSymbol.system,
+        caches.systems.systemRecordBySymbol(action.startSymbol.system),
+        caches.systems.systemRecordBySymbol(action.endSymbol.system),
         response.cooldown,
       );
       // We don't return the cooldown time here because that would needlessly
@@ -384,7 +380,7 @@ Future<NavResult> continueNavigationIfNeeded(
       shipErr(ship, 'Warping to ${actionEnd.symbol}!');
       try {
         return NavResult._wait(
-          await warpToWaypointAndLog(db, api, caches.systems, ship, actionEnd),
+          await warpToWaypointAndLog(db, api, ship, actionEnd),
         );
       } on ApiException catch (e) {
         if (isInsufficientFuelException(e)) {

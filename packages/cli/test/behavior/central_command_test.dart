@@ -3,6 +3,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -42,6 +43,8 @@ class _MockShipyardListingSnapshot extends Mock
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
+class _MockSystemsStore extends Mock implements SystemsStore {}
+
 void main() {
   test('CentralCommand.otherCharterSystems', () async {
     RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
@@ -63,8 +66,10 @@ void main() {
     final db = _MockDatabase();
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
-    when(() => db.setBehaviorState(any())).thenAnswer((_) async {});
-    when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
+    when(() => db.upsertBehavior(any())).thenAnswer((_) async {
+      return;
+    });
+    when(() => db.deleteBehavior(any())).thenAnswer((_) async {});
     final behaviors = BehaviorSnapshot([]);
     final ships = ShipSnapshot([]);
 
@@ -90,7 +95,7 @@ void main() {
       behaviors.states.add(behaviorState);
       ships.ships.add(ship);
       when(
-        () => db.behaviorStateBySymbol(shipSymbol),
+        () => db.getBehavior(shipSymbol),
       ).thenAnswer((_) async => behaviorState);
     }
 
@@ -355,7 +360,7 @@ void main() {
     // Currently we pad with 100k for trading.
     final paddingCredits = config.shipBuyBufferForTrading;
     when(
-      () => db.behaviorStatesWithBehavior(Behavior.buyShip),
+      () => db.behaviorsOfType(Behavior.buyShip),
     ).thenAnswer((_) async => []);
     final systemConnectivity = _MockSystemConnectivity();
     registerFallbackValue(waypointSymbol.system);
@@ -372,7 +377,7 @@ void main() {
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
-    when(() => db.behaviorStatesWithBehavior(Behavior.buyShip)).thenAnswer(
+    when(() => db.behaviorsOfType(Behavior.buyShip)).thenAnswer(
       (_) async => [BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip)],
     );
     expect(
@@ -509,28 +514,11 @@ void main() {
 
   test('advanceCentralPlanning smoke test', () async {
     final db = _MockDatabase();
+    final systemsStore = _MockSystemsStore();
+    when(() => db.systems).thenReturn(systemsStore);
     final caches = mockCaches();
-    final ship = _MockShip();
-    final shipNav = _MockShipNav();
     const faction = FactionSymbol.AEGIS;
-    when(() => shipNav.systemSymbol).thenReturn('W-A');
-    when(() => ship.nav).thenReturn(shipNav);
     final shipSymbol = ShipSymbol.fromString('X-A');
-    when(() => ship.symbol).thenReturn(shipSymbol);
-    final shipFrame = _MockShipFrame();
-    when(() => ship.frame).thenReturn(shipFrame);
-    when(
-      () => shipFrame.symbol,
-    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
-    when(() => ship.frame).thenReturn(shipFrame);
-    when(() => ship.registration).thenReturn(
-      ShipRegistration(
-        name: shipSymbol.symbol,
-        factionSymbol: faction.value,
-        role: ShipRole.COMMAND,
-      ),
-    );
-    // when(() => caches.ships.ships).thenReturn([ship]);
     final centralCommand = CentralCommand();
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
@@ -545,9 +533,6 @@ void main() {
     when(
       () => db.knowOfMarketWhichTrades(any()),
     ).thenAnswer((_) async => false);
-    when(
-      () => caches.agent.headquarters(caches.systems),
-    ).thenReturn(SystemWaypoint.test(hqSymbol));
     when(() => caches.agent.agent).thenReturn(
       Agent(
         symbol: shipSymbol.agentName,
@@ -563,9 +548,7 @@ void main() {
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
 
-    when(
-      () => db.behaviorStateBySymbol(shipSymbol),
-    ).thenAnswer((_) async => null);
+    when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
 
     when(db.allChartingRecords).thenAnswer((_) async => <ChartingRecord>[]);
     when(
@@ -575,6 +558,25 @@ void main() {
     when(
       caches.static.shipyardShips.snapshot,
     ).thenAnswer((_) async => _MockShipyardShipSnapshot());
+
+    when(systemsStore.snapshotAllSystems).thenAnswer(
+      (_) async => SystemsSnapshot([
+        System.test(
+          hqSystemSymbol,
+          waypoints: [
+            SystemWaypoint.test(hqSymbol, type: WaypointType.JUMP_GATE),
+          ],
+        ),
+      ]),
+    );
+    when(
+      () => systemsStore.jumpGateWaypointForSystem(hqSystemSymbol),
+    ).thenAnswer((_) async => null);
+
+    registerFallbackValue(const WaypointSymbol.fallbackValue());
+    when(
+      () => caches.charting.chartedValues(any()),
+    ).thenAnswer((_) async => null);
 
     final logger = _MockLogger();
     await runWithLogger(

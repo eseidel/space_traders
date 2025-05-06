@@ -46,20 +46,20 @@ bool isUncharted(ChartingSnapshot charts, SystemWaypoint waypoint) {
 
 /// Walks our known system graph, starting from HQ and prints systems needing
 /// exploration.
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final startSystemSymbol = await startSystemFromArg(
     db,
     argResults.rest.firstOrNull,
   );
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final systemsCache = SystemsCache.load(fs);
+  final systemsSnapshot = await db.systems.snapshotAllSystems();
   final charts = await ChartingSnapshot.load(db);
 
   final connectedSystems =
       systemConnectivity
           .systemSymbolsInJumpRadius(
-            systemsCache,
+            systemsSnapshot,
             startSystem: startSystemSymbol,
             maxJumps: 3,
           )
@@ -73,7 +73,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
   var totalAsteroids = 0;
   var totalJumpgates = 0;
   for (final (systemSymbol, jumps) in connectedSystems) {
-    final counts = _count(charts, systemsCache[systemSymbol]);
+    final counts = _count(charts, systemsSnapshot.systemBySymbol(systemSymbol));
     logger.info(
       '${systemSymbol.system.padRight(9)} '
       '${counts.uncharted} uncharted, ${counts.asteroids} asteroids, '

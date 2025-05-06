@@ -44,9 +44,7 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final logger = _MockLogger();
 
-    when(
-      () => db.behaviorStateBySymbol(shipSymbol),
-    ).thenAnswer((_) async => null);
+    when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
     when(
       () => centralCommand.getJobForShip(
         db,
@@ -56,8 +54,8 @@ void main() {
       ),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
-    when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});
-    when(() => db.deleteBehaviorState(shipSymbol)).thenAnswer((_) async => {});
+    when(() => db.upsertBehavior(any())).thenAnswer((_) async => {});
+    when(() => db.deleteBehavior(shipSymbol)).thenAnswer((_) async => {});
 
     final waitUntil = await runWithLogger(
       logger,
@@ -99,9 +97,7 @@ void main() {
 
     final logger = _MockLogger();
 
-    when(
-      () => db.behaviorStateBySymbol(shipSymbol),
-    ).thenAnswer((_) async => null);
+    when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
     when(
       () => centralCommand.getJobForShip(
         db,
@@ -111,7 +107,7 @@ void main() {
       ),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
-    when(() => db.setBehaviorState(any())).thenAnswer((_) async => {});
+    when(() => db.upsertBehavior(any())).thenAnswer((_) async => {});
 
     final waitUntil = await runWithLogger(
       logger,

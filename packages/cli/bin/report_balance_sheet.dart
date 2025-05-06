@@ -1,8 +1,8 @@
 import 'package:cli/accounting/balance_sheet.dart';
 import 'package:cli/cli.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
-  final balance = await computeBalanceSheet(fs, db);
+Future<void> command(Database db, ArgResults argResults) async {
+  final balance = await computeBalanceSheet(db);
 
   String c(int credits) => creditsString(credits);
   logger

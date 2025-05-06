@@ -22,7 +22,7 @@ String _describeBehaviors(BehaviorSnapshot behaviors, List<Ship> ships) {
   return behaviorCounts.entries.map((e) => '${e.key}: ${e.value}').join(', ');
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
 

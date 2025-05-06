@@ -11,7 +11,7 @@ typedef FindDeal = CostedDeal? Function(Ship ship, WaypointSymbol startSymbol);
 
 /// Find a better destination for the given trader [ship].
 WaypointSymbol? findBetterTradeLocation(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemConnectivity systemConnectivity,
   MarketPriceSnapshot marketPrices,
   Ship ship, {
@@ -21,11 +21,11 @@ WaypointSymbol? findBetterTradeLocation(
 }) {
   final search = _MarketSearch.start(
     marketPrices,
-    systemsCache,
+    systems,
     avoidSystems: avoidSystems,
   );
   final placement = _findBetterSystemForTrader(
-    systemsCache,
+    systems,
     systemConnectivity,
     search,
     ship,
@@ -74,7 +74,7 @@ Map<SystemSymbol, int> scoreMarketSystems(
 }
 
 _ShipPlacement? _findBetterSystemForTrader(
-  SystemsCache systemsCache,
+  SystemsSnapshot systems,
   SystemConnectivity systemConnectivity,
   _MarketSearch search,
   Ship ship, {
@@ -82,7 +82,7 @@ _ShipPlacement? _findBetterSystemForTrader(
   required int profitPerSecondThreshold,
 }) {
   final shipSymbol = ship.symbol;
-  final shipSystem = systemsCache[ship.systemSymbol];
+  final shipSystem = systems.systemRecordBySymbol(ship.systemSymbol);
 
   while (true) {
     final closest = search.closestAvailableSystem(shipSystem);
@@ -102,8 +102,7 @@ _ShipPlacement? _findBetterSystemForTrader(
 
     final score = search.scoreFor(closest.symbol);
     // This code assumes we're on the jump gate network.
-    final systemJumpGate =
-        systemsCache.jumpGateWaypointForSystem(closest.symbol)!;
+    final systemJumpGate = systems.jumpGateWaypointForSystem(closest.symbol)!;
     final deal = findDeal(ship, systemJumpGate.symbol);
     if (deal == null) {
       shipDetail(ship, 'No deal found for $shipSymbol at ${closest.symbol}');
@@ -137,7 +136,7 @@ _ShipPlacement? _findBetterSystemForTrader(
   }
 }
 
-System? _closestSystem(System start, List<System> systems) {
+SystemRecord? _closestSystem(SystemRecord start, List<SystemRecord> systems) {
   return minBy(systems, (system) => start.distanceTo(system));
 }
 
@@ -164,12 +163,12 @@ class _MarketSearch {
 
   factory _MarketSearch.start(
     MarketPriceSnapshot marketPrices,
-    SystemsCache systemsCache, {
+    SystemsSnapshot systems, {
     Set<SystemSymbol>? avoidSystems,
   }) {
     final marketSystemScores = scoreMarketSystems(marketPrices);
     final marketSystems =
-        marketSystemScores.keys.map(systemsCache.systemBySymbol).toList();
+        marketSystemScores.keys.map(systems.systemRecordBySymbol).toList();
     return _MarketSearch(
       marketSystems: marketSystems,
       marketSystemScores: marketSystemScores,
@@ -177,11 +176,11 @@ class _MarketSearch {
     );
   }
 
-  final List<System> marketSystems;
+  final List<SystemRecord> marketSystems;
   final Map<SystemSymbol, int> marketSystemScores;
   final Set<SystemSymbol> claimedSystemSymbols;
 
-  System? closestAvailableSystem(System startSystem) {
+  SystemRecord? closestAvailableSystem(SystemRecord startSystem) {
     final availableSystems =
         marketSystems
             .where((system) => !claimedSystemSymbols.contains(system.symbol))
@@ -189,7 +188,7 @@ class _MarketSearch {
     return _closestSystem(startSystem, availableSystems);
   }
 
-  void markUsed(System system) => claimedSystemSymbols.add(system.symbol);
+  void markUsed(SystemRecord system) => claimedSystemSymbols.add(system.symbol);
 
   int scoreFor(SystemSymbol systemSymbol) => marketSystemScores[systemSymbol]!;
 }

@@ -178,14 +178,14 @@ void main() {
       SystemWaypoint.test(startSymbol, type: WaypointType.ASTEROID_FIELD),
     );
     when(
-      () => caches.systems[startSymbol.system],
-    ).thenReturn(System.test(startSymbol.system));
+      () => caches.systems.systemRecordBySymbol(startSymbol.system),
+    ).thenReturn(SystemRecord.test(startSymbol.system));
     when(
       () => caches.systems.waypoint(endSymbol),
     ).thenReturn(SystemWaypoint.test(endSymbol, type: WaypointType.JUMP_GATE));
     when(
-      () => caches.systems[endSymbol.system],
-    ).thenReturn(System.test(endSymbol.system));
+      () => caches.systems.systemRecordBySymbol(endSymbol.system),
+    ).thenReturn(SystemRecord.test(endSymbol.system));
 
     when(
       () => fleetApi.jumpShip(

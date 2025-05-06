@@ -11,7 +11,7 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 
 Future<bool> _sellsFuel(Database db, WaypointSymbol waypointSymbol) async {
-  final listing = await db.marketListingForSymbol(waypointSymbol);
+  final listing = await db.marketListingAt(waypointSymbol);
   return listing?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
 }
 

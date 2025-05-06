@@ -4,17 +4,17 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // Evaluate the navigability of the starting system by ship type.
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
 
-  final systems = SystemsCache.load(fs);
+  final systems = await db.systems.snapshotAllSystems();
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsCache(
+  final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systems,
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),

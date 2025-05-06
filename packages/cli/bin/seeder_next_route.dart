@@ -7,16 +7,16 @@ void main(List<String> args) async {
   await runOffline(args, command);
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final agentCache = await AgentCache.load(db);
   final marketListings = await MarketListingSnapshot.load(db);
 
-  final systemsCache = SystemsCache.load(fs);
+  final systemsCache = await db.systems.snapshotAllSystems();
   final ships = await ShipSnapshot.load(db);
 
   // Find ones not in our main cluster.
   final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsCache(
+  final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,
     systemConnectivity,
     sellsFuel: defaultSellsFuel(marketListings),

@@ -1,8 +1,8 @@
-import 'package:cli/cache/systems_cache.dart';
+import 'dart:convert';
+
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
 import 'package:file/local.dart';
-import 'package:file/memory.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -25,9 +25,12 @@ void main() {
       otherSymbol,
       position: WaypointPosition(20, 0, otherSymbol.system),
     );
-    final fs = MemoryFileSystem.test();
     final system = System.test(a.system, waypoints: [a, b, c]);
-    final systemsCache = SystemsCache([system], fs: fs);
+    final otherSystemSystem = System.test(
+      otherSystem.system,
+      waypoints: [otherSystem],
+    );
+    final systemsCache = SystemsSnapshot([system, otherSystemSystem]);
     expect(
       approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
         b.symbol,
@@ -151,12 +154,12 @@ void main() {
   });
 
   test('cooldownTime', () {
-    final a = System.test(SystemSymbol.fromString('A-A'));
-    final b = System.test(
+    final a = SystemRecord.test(SystemSymbol.fromString('A-A'));
+    final b = SystemRecord.test(
       SystemSymbol.fromString('A-B'),
       position: const SystemPosition(2500, 0),
     );
-    final c = System.test(
+    final c = SystemRecord.test(
       SystemSymbol.fromString('A-C'),
       position: const SystemPosition(2501, 0),
     );
@@ -173,16 +176,23 @@ void main() {
     expect(() => cooldownTimeForJumpDistance(-20), throwsArgumentError);
   });
 
-  test('planRoute', () {
+  SystemsSnapshot loadFromFile(String path) {
     const fs = LocalFileSystem();
+    final file = fs.file(path);
+    final json = jsonDecode(file.readAsStringSync()) as List<dynamic>;
+    final systems =
+        json.map((e) => System.fromJson(e as Map<String, dynamic>)).toList();
+    return SystemsSnapshot(systems);
+  }
+
+  test('planRoute', () {
     // This test originally was written with hard-coded waypoint symbols names
     // but when the SystemWaypoint format changed, it wasn't easy to update, so
     // I made it dynamically compute the waypoint symbols to use from the first
     // waypoint symbol in the file.  Which makes it probably a less good test,
     // but much easier to update in the future if the format changes again.
-    final systemsCache = SystemsCache.load(
-      fs,
-      path: 'test/nav/fixtures/systems-09-24-2023.json',
+    final systemsCache = loadFromFile(
+      'test/nav/fixtures/systems-09-24-2023.json',
     );
     final waypoint1 = WaypointSymbol.fromString(
       'X1-V94-96191X',
@@ -197,7 +207,7 @@ void main() {
     final systemConnectivity = SystemConnectivity.test({
       waypoint1: {waypoint4},
     });
-    final routePlanner = RoutePlanner.fromSystemsCache(
+    final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systemsCache,
       systemConnectivity,
       sellsFuel: (_) => false,
@@ -250,7 +260,7 @@ void main() {
     expectRoute(waypoint1, waypoint1, 0);
 
     // Within one system
-    final system = systemsCache[waypoint1.system];
+    final system = systemsCache.systemBySymbol(waypoint1.system);
     final waypoint2 =
         system.waypoints.firstWhere((w) => w.symbol != waypoint1).symbol;
     expectRoute(waypoint1, waypoint2, 23);
@@ -276,7 +286,6 @@ void main() {
   });
 
   test('planRoute, fuel constraints', () {
-    final fs = MemoryFileSystem.test();
     final systemSymbol = SystemSymbol.fromString('A-B');
     final start = SystemWaypoint.test(WaypointSymbol.fromString('A-B-A'));
     final fuelStation = SystemWaypoint.test(
@@ -292,10 +301,10 @@ void main() {
       systemSymbol,
       waypoints: [start, fuelStation, end],
     );
-    final systemsCache = SystemsCache([system], fs: fs);
+    final systemsCache = SystemsSnapshot([system]);
 
     final systemConnectivity = SystemConnectivity.test({});
-    final routePlanner = RoutePlanner.fromSystemsCache(
+    final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systemsCache,
       systemConnectivity,
       // Allow refueling at waypoints or this test will fail.

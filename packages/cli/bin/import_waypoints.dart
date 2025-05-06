@@ -1,7 +1,7 @@
 import 'package:cli/cli.dart';
 import 'package:cli/net/auth.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final api = await defaultApi(db);
   // Ask the API how many systems and waypoints there are in total.
   final status = await api.defaultApi.getStatus();

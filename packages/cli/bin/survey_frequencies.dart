@@ -1,7 +1,7 @@
 import 'package:cli/cli.dart';
 import 'package:collection/collection.dart';
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   // Load up historical surveys from the db.
   // Count all the trade symbols they saw.
   // Print drop rates for each trade symbol.

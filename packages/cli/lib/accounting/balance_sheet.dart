@@ -72,7 +72,7 @@ Future<PricedFleet> computeShipValue(
 }
 
 /// Computes the current balance sheet for the agent.
-Future<BalanceSheet> computeBalanceSheet(FileSystem fs, Database db) async {
+Future<BalanceSheet> computeBalanceSheet(Database db) async {
   final ships = await ShipSnapshot.load(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = await ShipyardShipCache(db).snapshot();

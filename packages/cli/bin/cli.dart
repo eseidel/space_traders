@@ -9,7 +9,6 @@ import 'package:cli/logic/logic.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/register.dart';
 import 'package:db/db.dart';
-import 'package:file/local.dart';
 import 'package:scoped_deps/scoped_deps.dart';
 import 'package:types/types.dart';
 
@@ -129,8 +128,6 @@ Future<void> cliMain(List<String> args) async {
 
   logger.info('Welcome to Space Traders! 🚀');
 
-  // Use package:file to make things mockable.
-  const fs = LocalFileSystem();
   final db = await defaultDatabase();
 
   var agentSymbol = await db.getAgentSymbol();
@@ -163,7 +160,7 @@ Future<void> cliMain(List<String> args) async {
 
   config = await Config.fromDb(db);
 
-  final caches = await Caches.loadOrFetch(fs, api, db);
+  final caches = await Caches.loadOrFetch(api, db);
   final marketPricesCount = await db.marketPricesCount();
   final marketWaypointsCount = await db.marketPricesWaypointCount();
   final shipyardPricesCount = await db.shipyardPricesCount();

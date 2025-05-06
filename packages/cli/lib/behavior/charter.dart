@@ -11,20 +11,20 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// Returns the symbol of a waypoint in the system missing a chart.
-Future<WaypointSymbol?> waypointSymbolNeedingCharting(
-  SystemsCache systemsCache,
+WaypointSymbol? waypointSymbolNeedingCharting(
+  SystemsSnapshot systems,
   ChartingSnapshot charts,
   Ship ship,
   SystemSymbol systemSymbol, {
   required bool Function(SystemWaypoint waypointSymbol)? filter,
-}) async {
-  final system = systemsCache[systemSymbol];
+}) {
+  final system = systems.systemBySymbol(systemSymbol);
   final start =
       ship.systemSymbol == system.symbol
           ? ship.waypointSymbol
           // This is only ever called with systems with jumpgates.
           : system.jumpGateWaypoints.first.symbol;
-  final startWaypoint = systemsCache.waypoint(start);
+  final startWaypoint = systems.waypoint(start);
   final systemWaypoints = system.waypoints.sortedBy<num>(
     (w) => w.distanceTo(startWaypoint),
   );
@@ -52,23 +52,23 @@ Future<WaypointSymbol?> waypointSymbolNeedingCharting(
 }
 
 /// Returns the closet waypoint worth exploring.
-Future<WaypointSymbol?> nextUnchartedWaypointSymbol(
-  SystemsCache systemsCache,
+WaypointSymbol? nextUnchartedWaypointSymbol(
+  SystemsSnapshot systems,
   ChartingSnapshot charts,
   SystemConnectivity systemConnectivity,
   Ship ship, {
   required SystemSymbol startSystemSymbol,
   bool Function(SystemWaypoint waypointSymbol)? filter,
   int maxJumps = 5,
-}) async {
+}) {
   // Walk through the list finding one missing either a chart or market data.
   for (final (systemSymbol, _) in systemConnectivity.systemSymbolsInJumpRadius(
-    systemsCache,
+    systems,
     startSystem: startSystemSymbol,
     maxJumps: maxJumps,
   )) {
-    final symbol = await waypointSymbolNeedingCharting(
-      systemsCache,
+    final symbol = waypointSymbolNeedingCharting(
+      systems,
       charts,
       ship,
       systemSymbol,
@@ -128,10 +128,11 @@ Future<JobResult> doCharter(
   // TODO(eseidel): We shouldn't pull all charting data here.
   // Instead we should keep a cache of fully charted systems or something?
   final charts = await ChartingSnapshot.load(db);
-  final destinationSymbol = await centralCommand.nextWaypointToChart(
+  final systems = await db.systems.snapshotAllSystems();
+  final destinationSymbol = centralCommand.nextWaypointToChart(
     ships,
     behaviors,
-    caches.systems,
+    systems,
     charts,
     caches.systemConnectivity,
     ship,

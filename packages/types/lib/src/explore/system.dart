@@ -1,10 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart' as openapi;
 import 'package:types/types.dart';
 
 /// A type representing the unchanging values of a waypoint.
 @immutable
-class SystemWaypoint {
+class SystemWaypoint extends Equatable {
   /// Returns a new [SystemWaypoint] instance.
   SystemWaypoint({
     required this.symbol,
@@ -113,11 +114,53 @@ class SystemWaypoint {
   Map<String, dynamic> toJson() {
     return openApiToJson(toOpenApi());
   }
+
+  @override
+  List<Object?> get props => [symbol, type, position, orbitals, orbits];
+}
+
+/// A type representing a system as it exists in the database.
+@immutable
+class SystemRecord extends Equatable {
+  /// Returns a new [SystemRecord] instance.
+  const SystemRecord({
+    required this.symbol,
+    required this.type,
+    required this.position,
+    required this.waypointSymbols,
+  });
+
+  /// Create a new [System] for testing.
+  @visibleForTesting
+  const SystemRecord.test(
+    this.symbol, {
+    this.type = SystemType.BLACK_HOLE,
+    this.position = const SystemPosition(0, 0),
+    this.waypointSymbols = const [],
+  });
+
+  /// The symbol of the system.
+  final SystemSymbol symbol;
+
+  /// The type of the system.
+  final SystemType type;
+
+  /// The position of the system.
+  final SystemPosition position;
+
+  /// The waypoints in the system.
+  final List<WaypointSymbol> waypointSymbols;
+
+  /// Returns the distance to the given system.
+  double distanceTo(SystemRecord other) => position.distanceTo(other.position);
+
+  @override
+  List<Object?> get props => [symbol, type, position, waypointSymbols];
 }
 
 /// Type representing a system.
 @immutable
-class System {
+class System extends Equatable {
   /// Returns a new [System] instance.
   System({
     required this.symbol,
@@ -126,6 +169,20 @@ class System {
     this.waypoints = const [],
     this.factions = const [],
   }) : sectorSymbol = symbol.sector;
+
+  /// Create a new [System] from a [SystemRecord].
+  factory System.fromRecord(
+    SystemRecord record,
+    List<SystemWaypoint> waypoints,
+  ) {
+    return System(
+      symbol: record.symbol,
+      type: record.type,
+      position: record.position,
+      waypoints: waypoints,
+      // Ignoring factions for now.
+    );
+  }
 
   /// Create a new [System] from JSON.
   factory System.fromJson(Map<String, dynamic> json) {
@@ -182,8 +239,16 @@ class System {
   /// Returns the distance to the given system.
   double distanceTo(System other) => position.distanceTo(other.position);
 
+  /// Converts to a [SystemRecord].
+  SystemRecord toSystemRecord() => SystemRecord(
+    symbol: symbol,
+    type: type,
+    position: position,
+    waypointSymbols: waypoints.map((w) => w.symbol).toList(),
+  );
+
   /// Converts to [openapi.System].
-  @protected
+  @visibleForTesting
   openapi.System toOpenApi() {
     return openapi.System(
       symbol: symbol.toJson(),
@@ -208,10 +273,16 @@ class System {
             .toList();
     return json;
   }
+
+  @override
+  List<Object?> get props => [symbol, type, position, waypoints, factions];
 }
 
-/// Type representing a waypoint.
+// While we keep an immutable version of the waypoint in the database, the
+// waypoint is mutable in the game, including chart, isUnderConstruction,
+// modifiers, etc.  So we do not make this Equatable.
 @immutable
+/// Type representing a waypoint.
 class Waypoint {
   /// Returns a new [Waypoint] instance.
   Waypoint({

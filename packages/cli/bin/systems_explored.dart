@@ -10,11 +10,10 @@ String _typeName(SystemType type) {
   return type.value;
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final chartingSnapshot = await ChartingSnapshot.load(db);
-  final systemsCache = SystemsCache.load(fs);
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);
 
@@ -49,14 +48,15 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
       .groupListsBy((r) => r.waypointSymbol.system);
 
   for (final systemSymbol in systemSymbols) {
-    final system = systemsCache[systemSymbol];
+    final system = await db.systems.systemRecordBySymbol(systemSymbol);
+    final waypoints = await db.systems.waypointsInSystem(systemSymbol);
     final records = chartedWaypointsBySystem[systemSymbol] ?? [];
     final chartedSymbols = records.map((r) => r.waypointSymbol).toSet();
-    final waypointCount = system.waypoints.length;
-    final asteroidSymbols = system.waypoints
+    final waypointCount = waypoints.length;
+    final asteroidSymbols = waypoints
         .where((w) => w.isAsteroid)
         .map((a) => a.symbol);
-    final otherSymbols = system.waypoints
+    final otherSymbols = waypoints
         .where((w) => !w.isAsteroid)
         .map((a) => a.symbol);
     final chartedAsteroids = asteroidSymbols.where(chartedSymbols.contains);
@@ -64,7 +64,7 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
 
     table.add([
       systemSymbol.systemName,
-      _typeName(system.type),
+      _typeName(system!.type),
       marketListings.listingsInSystem(systemSymbol).length,
       marketPrices.waypointSymbolsInSystem(systemSymbol).length,
       shipyardListings.listingsInSystem(systemSymbol).length,

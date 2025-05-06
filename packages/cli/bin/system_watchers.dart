@@ -10,21 +10,21 @@ void main(List<String> args) async {
 }
 
 // Could share with fleet.dart
-void logShip(
-  SystemsCache systemsCache,
+Future<void> logShip(
+  Database db,
   MarketPriceSnapshot marketPrices,
   Ship ship,
   BehaviorState? behavior,
-) {
+) async {
   const indent = '   ';
-  final waypoint = systemsCache.waypoint(ship.waypointSymbol);
+  final waypoint = await db.systems.waypoint(ship.waypointSymbol);
   logger.info(ship.symbol.hexNumber);
 
   final routePlan = behavior?.routePlan;
   if (routePlan != null) {
     final timeLeft = ship.timeToArrival(routePlan);
     final destination = routePlan.endSymbol.sectorLocalName;
-    final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
+    final destinationType = await db.systems.waypointType(routePlan.endSymbol);
     final arrival = approximateDuration(timeLeft);
     logger.info(
       '${indent}en route to $destination $destinationType '
@@ -45,14 +45,12 @@ String plural(int count, String singular, [String plural = 's']) {
   return '$count ${count == 1 ? singular : singular + plural}';
 }
 
-Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
+Future<void> command(Database db, ArgResults argResults) async {
   final marketListings = await MarketListingSnapshot.load(db);
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final systemWatcherStates = await db.behaviorStatesWithBehavior(
-    Behavior.systemWatcher,
-  );
-  final systemsCache = SystemsCache.load(fs);
+  final systemWatcherStates = await db.behaviorsOfType(Behavior.systemWatcher);
+  final systemsCache = db.systems;
   final ships = await ShipSnapshot.load(db);
   final agentCache = await AgentCache.load(db);
 
@@ -74,7 +72,9 @@ Future<void> command(FileSystem fs, Database db, ArgResults argResults) async {
     if (routePlan != null) {
       final timeLeft = ship.timeToArrival(routePlan);
       final destination = routePlan.endSymbol.sectorLocalName;
-      final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
+      final destinationType = await systemsCache.waypointType(
+        routePlan.endSymbol,
+      );
       final arrival = approximateDuration(timeLeft);
       logger.info('  en route to $destination $destinationType in $arrival');
     }
