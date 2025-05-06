@@ -13,7 +13,8 @@ class CreateSystemWaypointMigration implements Migration {
       "x" integer NOT NULL,
       "y" integer NOT NULL,
       "system" text NOT NULL,
-      PRIMARY KEY ("symbol")
+      PRIMARY KEY ("symbol"),
+      INDEX "system_waypoint_system_idx" ON "system_waypoint_" ("system")
     );
   ''';
 
