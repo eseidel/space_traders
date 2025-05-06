@@ -423,9 +423,7 @@ class Database {
   }
 
   /// Get the market listing for the given symbol.
-  Future<MarketListing?> marketListingForSymbol(
-    WaypointSymbol waypointSymbol,
-  ) async {
+  Future<MarketListing?> marketListingAt(WaypointSymbol waypointSymbol) async {
     final query = marketListingByWaypointSymbolQuery(waypointSymbol);
     return queryOne(query, marketListingFromColumnMap);
   }

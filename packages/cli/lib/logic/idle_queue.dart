@@ -148,7 +148,7 @@ class IdleQueue {
     for (final waypoint in waypoints) {
       final waypointSymbol = waypoint.symbol;
       if (await waypointCache.hasMarketplace(waypointSymbol)) {
-        final listing = await db.marketListingForSymbol(waypointSymbol);
+        final listing = await db.marketListingAt(waypointSymbol);
         if (listing == null) {
           logger.info(' Market: $waypointSymbol');
           await marketCache.refreshMarket(waypointSymbol);

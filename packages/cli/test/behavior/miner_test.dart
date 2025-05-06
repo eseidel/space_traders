@@ -652,7 +652,7 @@ void main() {
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
-    when(() => db.marketListingForSymbol(waypointSymbol)).thenAnswer((_) async {
+    when(() => db.marketListingAt(waypointSymbol)).thenAnswer((_) async {
       return null;
     });
 

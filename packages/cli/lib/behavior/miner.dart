@@ -338,7 +338,7 @@ Future<WaypointSymbol?> _nearbyMarketWhichTrades(
   WaypointSymbol startSymbol,
   TradeSymbol tradeSymbol,
 ) async {
-  final startMarket = await db.marketListingForSymbol(startSymbol);
+  final startMarket = await db.marketListingAt(startSymbol);
   if (startMarket != null && startMarket.allowsTradeOf(tradeSymbol)) {
     return startSymbol;
   }

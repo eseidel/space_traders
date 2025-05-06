@@ -601,13 +601,13 @@ void main() {
     }
 
     when(
-      () => db.marketListingForSymbol(nearSymbol),
+      () => db.marketListingAt(nearSymbol),
     ).thenAnswer((_) async => listing(nearSymbol));
     when(
-      () => db.marketListingForSymbol(midSymbol),
+      () => db.marketListingAt(midSymbol),
     ).thenAnswer((_) async => listing(midSymbol));
     when(
-      () => db.marketListingForSymbol(farSymbol),
+      () => db.marketListingAt(farSymbol),
     ).thenAnswer((_) async => listing(farSymbol));
 
     final logger = _MockLogger();
