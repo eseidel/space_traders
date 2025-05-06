@@ -248,7 +248,7 @@ class System extends Equatable {
   );
 
   /// Converts to [openapi.System].
-  @protected
+  @visibleForTesting
   openapi.System toOpenApi() {
     return openapi.System(
       symbol: symbol.toJson(),

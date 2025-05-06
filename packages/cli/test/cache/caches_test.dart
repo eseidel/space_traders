@@ -40,8 +40,6 @@ class _MockStaticCaches extends Mock implements StaticCaches {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
-class _MockSystemsSnapshot extends Mock implements SystemsSnapshot {}
-
 class _MockSystemsStore extends Mock implements SystemsStore {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
@@ -210,7 +208,7 @@ void main() {
     verify(() => db.systems.snapshotAllSystems()).called(1);
 
     await caches.updateRoutingCaches(db);
-    // If we've already cached the systems, we don't need to snapshot them again.
+    // If we've already cached the systems, we don't need to snapshot them again
     verifyNever(() => db.systems.snapshotAllSystems());
   });
 }
