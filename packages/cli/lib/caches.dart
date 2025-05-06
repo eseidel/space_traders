@@ -60,17 +60,21 @@ class Caches {
     required this.construction,
     required this.systemConnectivity,
     required this.jumpGates,
+    required this.galaxy,
   });
 
   /// The agent cache.
   final AgentCache agent;
+
+  /// Stats about the galaxy.
+  final GalaxyStats galaxy;
 
   /// The historical market price data.
   // TODO(eseidel): Remove this (need to fix trader.dart first).
   MarketPriceSnapshot marketPrices;
 
   /// The in memory cache of known systems.
-  final SystemsSnapshot systems;
+  SystemsSnapshot systems;
 
   /// The cache of system connectivity.
   final SystemConnectivity systemConnectivity;
@@ -140,6 +144,7 @@ class Caches {
     // Make sure factions are loaded.
     final factions = await loadFactions(db, api.factions);
 
+    final galaxy = await getGalaxyStats(api);
     return Caches(
       agent: agent,
       marketPrices: marketPrices,
@@ -153,12 +158,19 @@ class Caches {
       construction: construction,
       systemConnectivity: systemConnectivity,
       jumpGates: jumpGates,
+      galaxy: galaxy,
     );
   }
 
   /// Called when routing information changes (e.g. when we complete
   /// a jump gate, find a new jump gate, or a jump gate breaks).
-  Future<void> updateRoutingCaches() async {
+  Future<void> updateRoutingCaches(Database db) async {
+    if (systems.systemsCount < galaxy.systemCount ||
+        systems.waypointsCount < galaxy.waypointCount) {
+      logger.info('Systems Snapshot is incomplete, reloading.');
+      systems = await db.systems.snapshot();
+    }
+
     systemConnectivity.updateFromJumpGates(
       jumpGates,
       await construction.snapshot(),

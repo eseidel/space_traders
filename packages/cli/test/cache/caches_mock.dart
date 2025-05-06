@@ -40,6 +40,8 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
+class _MockGalaxyStats extends Mock implements GalaxyStats {}
+
 void _addMocks<Symbol extends Object, Record extends Object>(
   StaticCache<Symbol, Record> cache,
 ) {
@@ -91,5 +93,6 @@ Caches mockCaches() {
     construction: _MockConstructionCache(),
     systemConnectivity: _MockSystemConnectivity(),
     jumpGates: _MockJumpGateSnapshot(),
+    galaxy: _MockGalaxyStats(),
   );
 }

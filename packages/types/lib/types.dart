@@ -18,6 +18,7 @@ export 'src/explore/route.dart';
 export 'src/explore/system.dart';
 export 'src/explore/system_stats.dart';
 export 'src/extraction.dart';
+export 'src/galaxy.dart';
 export 'src/game_phase.dart';
 export 'src/mount.dart';
 export 'src/price.dart';

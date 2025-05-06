@@ -16,6 +16,12 @@ class SystemsSnapshot {
 
   final Map<SystemSymbol, System> _index;
 
+  /// Number of systems in the snapshot.
+  int get systemsCount => _index.values.length;
+
+  /// Number of waypoints in the snapshot.
+  int get waypointsCount => _index.values.expand((s) => s.waypoints).length;
+
   /// Return the jump gate waypoint for the given [symbol].
   // Systems currently only have one jumpgate, but if that ever
   // changes all callers of this method might be wrong.

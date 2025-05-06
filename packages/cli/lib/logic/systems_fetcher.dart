@@ -18,21 +18,19 @@ class SystemsFetcher {
   /// Ensures all systems are cached in the database.
   Future<void> ensureAllSystemsCached() async {
     // First we ask the API how many systems there are.
-    final status = await _api.global.getStatus();
-    final totalSystemCount = status!.stats.systems;
-    final totalWaypointsCount = status.stats.waypoints;
+    final galaxy = await getGalaxyStats(_api);
 
     // Ask the db how many systems it has.
     final cachedSystemCount = await _db.countSystemRecords();
     final cachedWaypointsCount = await _db.countSystemWaypoints();
-    if (cachedSystemCount >= totalSystemCount &&
-        cachedWaypointsCount >= totalWaypointsCount) {
+    if (cachedSystemCount >= galaxy.systemCount &&
+        cachedWaypointsCount >= galaxy.waypointCount) {
       logger.info('All systems and waypoints are cached, skipping fetch.');
       return;
     }
 
-    final missingSystems = totalSystemCount - cachedSystemCount;
-    final missingWaypoints = totalWaypointsCount - cachedWaypointsCount;
+    final missingSystems = galaxy.systemCount - cachedSystemCount;
+    final missingWaypoints = galaxy.waypointCount - cachedWaypointsCount;
     logger.info(
       'Missing $missingSystems systems and $missingWaypoints waypoints.',
     );

@@ -638,7 +638,7 @@ class CentralCommand {
 
   /// This is a terrible hack.  We should instead invalidate routing caches
   /// every time we add a jump gate.
-  Future<void> _updateRoutingCachesIfNeeded(Caches caches) async {
+  Future<void> _updateRoutingCachesIfNeeded(Database db, Caches caches) async {
     final now = DateTime.timestamp();
     final lastUpdate = _lastRoutingCacheUpdate;
     // If this is our first run, just set the last update time and return.
@@ -649,7 +649,7 @@ class CentralCommand {
     if (now.difference(lastUpdate) > config.routingCacheMaxAge) {
       _lastRoutingCacheUpdate = now;
       logger.warn('Resetting routing caches!');
-      return caches.updateRoutingCaches();
+      return caches.updateRoutingCaches(db);
     }
   }
 
@@ -661,7 +661,7 @@ class CentralCommand {
     Caches caches,
   ) async {
     // TODO(eseidel): Add proper routing cache invalidation and remove this.
-    await _updateRoutingCachesIfNeeded(caches);
+    await _updateRoutingCachesIfNeeded(db, caches);
 
     final ships = await ShipSnapshot.load(db);
     _isGateComplete =

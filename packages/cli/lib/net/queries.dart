@@ -142,3 +142,12 @@ Future<Construction> getConstruction(
   );
   return response!.data;
 }
+
+/// Fetches the galaxy stats.
+Future<GalaxyStats> getGalaxyStats(Api api) async {
+  final response = await api.global.getStatus();
+  return GalaxyStats(
+    systemCount: response!.stats.systems,
+    waypointCount: response.stats.waypoints,
+  );
+}
