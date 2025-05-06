@@ -70,7 +70,7 @@ class SystemsStore {
   }
 
   /// Get SystemWaypoints by system symbol.
-  Future<Iterable<SystemWaypoint>> systemWaypointsBySystemSymbol(
+  Future<Iterable<SystemWaypoint>> waypointsInSystem(
     SystemSymbol symbol,
   ) async {
     final query = systemWaypointsBySystemQuery(symbol);
@@ -125,11 +125,8 @@ class SystemsStore {
 
   /// Return the jump gate symbol for the given system [symbol].
   Future<WaypointSymbol?> jumpGateSymbolForSystem(SystemSymbol symbol) async {
-    final waypoints = await systemWaypointsBySystemSymbolAndType(
-      symbol,
-      WaypointType.JUMP_GATE,
-    );
-    return waypoints.firstOrNull?.symbol;
+    final waypoint = await jumpGateWaypointForSystem(symbol);
+    return waypoint?.symbol;
   }
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
@@ -149,13 +146,5 @@ class SystemsStore {
   Future<bool> isJumpGate(WaypointSymbol symbol) async {
     final waypoint = await waypointOrNull(symbol);
     return waypoint != null && waypoint.isJumpGate;
-  }
-
-  /// Return the SystemWaypoints for the given [systemSymbol].
-  Future<Iterable<SystemWaypoint>> waypointsInSystem(
-    SystemSymbol systemSymbol,
-  ) async {
-    final waypoints = await systemWaypointsBySystemSymbol(systemSymbol);
-    return waypoints;
   }
 }

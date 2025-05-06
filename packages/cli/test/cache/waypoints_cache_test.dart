@@ -43,7 +43,7 @@ void main() {
     ).thenAnswer((_) async => null);
     registerFallbackValue(waypointSymbol.system);
     when(
-      () => systemsStore.systemWaypointsBySystemSymbol(any()),
+      () => systemsStore.waypointsInSystem(any()),
     ).thenAnswer((_) async => [expectedWaypoint.toSystemWaypoint()]);
     registerFallbackValue(ChartingRecord.fallbackValue());
     when(() => db.upsertChartingRecord(any())).thenAnswer((_) async {});

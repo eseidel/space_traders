@@ -129,8 +129,9 @@ void main() {
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allChartingRecords).thenAnswer((_) async => []);
-    when(systemsStore.allSystemRecords).thenAnswer((_) async => []);
-    when(systemsStore.allSystemWaypoints).thenAnswer((_) async => []);
+    when(
+      systemsStore.snapshotAllSystems,
+    ).thenAnswer((_) async => SystemsSnapshot([]));
 
     final logger = _MockLogger();
     expect(

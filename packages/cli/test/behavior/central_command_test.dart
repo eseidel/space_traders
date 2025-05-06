@@ -559,23 +559,24 @@ void main() {
       caches.static.shipyardShips.snapshot,
     ).thenAnswer((_) async => _MockShipyardShipSnapshot());
 
-    when(
-      () => db.systems.systemWaypointsBySystemSymbolAndType(
-        any(),
-        WaypointType.JUMP_GATE,
-      ),
-    ).thenAnswer((_) async => []);
-    when(systemsStore.allSystemRecords).thenAnswer(
-      (_) async => [
-        SystemRecord(
-          symbol: hqSystemSymbol,
-          waypointSymbols: [hqSymbol],
-          type: SystemType.RED_STAR,
-          position: const SystemPosition(0, 0),
+    when(systemsStore.snapshotAllSystems).thenAnswer(
+      (_) async => SystemsSnapshot([
+        System.test(
+          hqSystemSymbol,
+          waypoints: [
+            SystemWaypoint.test(hqSymbol, type: WaypointType.JUMP_GATE),
+          ],
         ),
-      ],
+      ]),
     );
-    when(systemsStore.allSystemWaypoints).thenAnswer((_) async => []);
+    when(
+      () => systemsStore.jumpGateWaypointForSystem(hqSystemSymbol),
+    ).thenAnswer((_) async => null);
+
+    registerFallbackValue(const WaypointSymbol.fallbackValue());
+    when(
+      () => caches.charting.chartedValues(any()),
+    ).thenAnswer((_) async => null);
 
     final logger = _MockLogger();
     await runWithLogger(
