@@ -2,6 +2,7 @@ import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/idle_queue.dart';
+import 'package:cli/logic/systems_fetcher.dart';
 import 'package:cli/net/auth.dart';
 
 Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
@@ -17,6 +18,11 @@ Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
 Future<void> command(Database db, ArgResults argResults) async {
   final api = await waitForApi(db, getPriority: () => networkPriorityLow);
   final agent = await waitFor(db, () => db.getMyAgent());
+
+  /// Make sure we've cached all systems and waypoints before bothering to
+  /// start the idle queue.
+  final systemsFetcher = SystemsFetcher(db, api);
+  await systemsFetcher.ensureAllSystemsCached();
 
   final systemSymbol = agent.headquarters.system;
   var queue = IdleQueue();

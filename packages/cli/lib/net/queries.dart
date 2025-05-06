@@ -24,6 +24,15 @@ Stream<T> fetchAllPages<T, A>(
   } while (remaining > 0);
 }
 
+/// Fetches all systems from the API.  Handles pagination from the server.
+Stream<System> allSystems(Api api) {
+  return fetchAllPages(api, (api, page) async {
+    final response = await api.systems.getSystems(page: page, limit: pageLimit);
+    final systems = response!.data.map(System.fromOpenApi).toList();
+    return (systems, response.meta);
+  });
+}
+
 /// Fetches a single waypoint.
 Future<Waypoint> fetchWaypoint(Api api, WaypointSymbol waypointSymbol) async {
   final response = await api.systems.getWaypoint(

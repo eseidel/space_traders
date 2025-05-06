@@ -916,6 +916,18 @@ class Database {
     return result;
   }
 
+  /// Count the number of system waypoints in the database.
+  Future<int> countSystemWaypoints() async {
+    final result = await executeSql('SELECT COUNT(*) FROM system_waypoint_');
+    return result[0][0]! as int;
+  }
+
+  /// Count the number of systems in the database.
+  Future<int> countSystemRecords() async {
+    final result = await executeSql('SELECT COUNT(*) FROM system_record_');
+    return result[0][0]! as int;
+  }
+
   /// Upsert a system waypoint into the database.
   Future<void> upsertSystemWaypoint(SystemWaypoint waypoint) async {
     await execute(upsertSystemWaypointQuery(waypoint));

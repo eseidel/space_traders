@@ -36,6 +36,15 @@ class SystemsStore {
     return SystemsSnapshot(systems);
   }
 
+  /// Upsert a [System] into the database.
+  Future<void> upsertSystem(System system) async {
+    // We could do this in a transaction, but for now not bothering.
+    await _db.upsertSystemRecord(system.toSystemRecord());
+    for (final waypoint in system.waypoints) {
+      await _db.upsertSystemWaypoint(waypoint);
+    }
+  }
+
   /// Return the [SystemRecord] for the given [symbol].
   Future<SystemRecord?> systemRecordBySymbol(SystemSymbol symbol) async =>
       await _db.systemRecordBySymbol(symbol);

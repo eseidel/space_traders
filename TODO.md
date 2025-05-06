@@ -1547,8 +1547,8 @@ Not sure why. Some cache is not getting invalidated.
 
 ### Finshing systems_cache refactor
 
+Figure out where SystemWaypoint and System objects come from in the API.
+
 There is no way to insert SystemWaypoints
 
 SystemsSnapshot is not invalidate when routing is.
-
-Need to actually create the db tables.
