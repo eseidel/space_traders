@@ -4,9 +4,15 @@ import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
+class _MockAgentCache extends Mock implements AgentCache {}
+
 class _MockAgentsApi extends Mock implements AgentsApi {}
 
 class _MockApi extends Mock implements Api {}
+
+class _MockChartingCache extends Mock implements ChartingCache {}
+
+class _MockConstructionCache extends Mock implements ConstructionCache {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
@@ -20,9 +26,25 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockGlobalApi extends Mock implements GlobalApi {}
 
+class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
+
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketCache extends Mock implements MarketCache {}
+
+class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
+
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
+class _MockStaticCaches extends Mock implements StaticCaches {}
+
+class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
+class _MockSystemsSnapshot extends Mock implements SystemsSnapshot {}
+
 class _MockSystemsStore extends Mock implements SystemsStore {}
+
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('Caches load test', () async {
@@ -138,5 +160,57 @@ void main() {
       () async => Caches.loadOrFetch(api, db, httpGet: httpGet),
     );
     expect(caches.agent, isNotNull);
+  });
+
+  test('updateRoutingCaches', () async {
+    final db = _MockDatabase();
+    final systemsStore = _MockSystemsStore();
+    when(() => db.systems).thenReturn(systemsStore);
+    final caches = Caches(
+      agent: _MockAgentCache(),
+      marketPrices: _MockMarketPrices(),
+      systems: SystemsSnapshot([]),
+      waypoints: _MockWaypointCache(),
+      markets: _MockMarketCache(),
+      charting: _MockChartingCache(),
+      routePlanner: _MockRoutePlanner(),
+      static: _MockStaticCaches(),
+      construction: _MockConstructionCache(),
+      systemConnectivity: _MockSystemConnectivity(),
+      jumpGates: _MockJumpGateSnapshot(),
+      galaxy: const GalaxyStats(systemCount: 2, waypointCount: 2),
+      factions: [],
+    );
+    when(
+      caches.construction.snapshot,
+    ).thenAnswer((_) => Future.value(ConstructionSnapshot([])));
+
+    // If we've not cached the systems, we need to snapshot them.
+    final logger = _MockLogger();
+    when(systemsStore.snapshotAllSystems).thenAnswer(
+      (_) async => SystemsSnapshot([
+        System.test(
+          SystemSymbol.fromString('A-B'),
+          waypoints: [SystemWaypoint.test(WaypointSymbol.fromString('A-B-C'))],
+        ),
+        System.test(
+          SystemSymbol.fromString('A-C'),
+          waypoints: [SystemWaypoint.test(WaypointSymbol.fromString('A-C-E'))],
+        ),
+      ]),
+    );
+    expect(caches.systems.systemsCount, 0);
+    expect(caches.systems.waypointsCount, 0);
+    await runWithLogger(logger, () async {
+      await caches.updateRoutingCaches(db);
+    });
+    expect(caches.systems.systemsCount, 2);
+    expect(caches.systems.waypointsCount, 2);
+    verify(() => logger.info('Systems Snapshot is incomplete, reloading.'));
+    verify(() => db.systems.snapshotAllSystems()).called(1);
+
+    await caches.updateRoutingCaches(db);
+    // If we've already cached the systems, we don't need to snapshot them again.
+    verifyNever(() => db.systems.snapshotAllSystems());
   });
 }
