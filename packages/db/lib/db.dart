@@ -666,28 +666,26 @@ class Database {
     return queryMany(allBehaviorStatesQuery(), behaviorStateFromColumnMap);
   }
 
-  /// Get all behavior states with the given behavior.
-  Future<Iterable<BehaviorState>> behaviorStatesWithBehavior(
-    Behavior behavior,
-  ) async {
+  /// Get all behavior states with the given behavior type.
+  Future<Iterable<BehaviorState>> behaviorsOfType(Behavior behavior) async {
     final query = behaviorStatesWithBehaviorQuery(behavior);
     return queryMany(query, behaviorStateFromColumnMap);
   }
 
   /// Get a behavior state by ship symbol.
-  Future<BehaviorState?> behaviorStateBySymbol(ShipSymbol shipSymbol) async {
+  Future<BehaviorState?> getBehavior(ShipSymbol shipSymbol) async {
     final query = behaviorBySymbolQuery(shipSymbol);
     return queryOne(query, behaviorStateFromColumnMap);
   }
 
   /// Get a behavior state by symbol.
-  Future<void> setBehaviorState(BehaviorState behaviorState) async {
+  Future<void> upsertBehavior(BehaviorState behaviorState) async {
     await execute(upsertBehaviorStateQuery(behaviorState));
   }
 
   /// Delete a behavior state.
-  Future<void> deleteBehaviorState(ShipSymbol shipSymbol) async {
-    await execute(deleteBehaviorStateQuery(shipSymbol));
+  Future<void> deleteBehavior(ShipSymbol shipSymbol) async {
+    await execute(deleteBehaviorQuery(shipSymbol));
   }
 
   /// Get all ships.

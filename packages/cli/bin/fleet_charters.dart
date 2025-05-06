@@ -12,7 +12,7 @@ String plural(int count, String singular, [String plural = 's']) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final charterStates = await db.behaviorStatesWithBehavior(Behavior.charter);
+  final charterStates = await db.behaviorsOfType(Behavior.charter);
   final systemsCache = db.systems;
   final ships = await ShipSnapshot.load(db);
 

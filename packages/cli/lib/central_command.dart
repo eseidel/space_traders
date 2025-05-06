@@ -510,7 +510,7 @@ class CentralCommand {
         return;
       }
       // Don't queue a new mount request if we're currently executing one.
-      final behaviorState = await db.behaviorStateBySymbol(ship.symbol);
+      final behaviorState = await db.getBehavior(ship.symbol);
       if (behaviorState?.behavior == Behavior.mountFromBuy) {
         continue;
       }
@@ -882,7 +882,7 @@ class CentralCommand {
     int credits,
   ) async {
     // Are there any other ships actively buying a ship?
-    final states = await db.behaviorStatesWithBehavior(Behavior.buyShip);
+    final states = await db.behaviorsOfType(Behavior.buyShip);
     if (states.isNotEmpty) {
       return false;
     }
@@ -917,7 +917,7 @@ class CentralCommand {
   Future<bool> shouldBuyMount(Database db, Ship ship, int credits) async {
     // Only enforce "one at a time" until we some sort purchase authorization.
     // Are there any other ships actively buying mounts?
-    final states = await db.behaviorStatesWithBehavior(Behavior.mountFromBuy);
+    final states = await db.behaviorsOfType(Behavior.mountFromBuy);
     if (states.isNotEmpty) {
       return false;
     }

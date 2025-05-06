@@ -66,8 +66,10 @@ void main() {
     final db = _MockDatabase();
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
-    when(() => db.setBehaviorState(any())).thenAnswer((_) async {});
-    when(() => db.deleteBehaviorState(any())).thenAnswer((_) async {});
+    when(() => db.upsertBehavior(any())).thenAnswer((_) async {
+      return;
+    });
+    when(() => db.deleteBehavior(any())).thenAnswer((_) async {});
     final behaviors = BehaviorSnapshot([]);
     final ships = ShipSnapshot([]);
 
@@ -93,7 +95,7 @@ void main() {
       behaviors.states.add(behaviorState);
       ships.ships.add(ship);
       when(
-        () => db.behaviorStateBySymbol(shipSymbol),
+        () => db.getBehavior(shipSymbol),
       ).thenAnswer((_) async => behaviorState);
     }
 
@@ -358,7 +360,7 @@ void main() {
     // Currently we pad with 100k for trading.
     final paddingCredits = config.shipBuyBufferForTrading;
     when(
-      () => db.behaviorStatesWithBehavior(Behavior.buyShip),
+      () => db.behaviorsOfType(Behavior.buyShip),
     ).thenAnswer((_) async => []);
     final systemConnectivity = _MockSystemConnectivity();
     registerFallbackValue(waypointSymbol.system);
@@ -375,7 +377,7 @@ void main() {
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
-    when(() => db.behaviorStatesWithBehavior(Behavior.buyShip)).thenAnswer(
+    when(() => db.behaviorsOfType(Behavior.buyShip)).thenAnswer(
       (_) async => [BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip)],
     );
     expect(
@@ -546,9 +548,7 @@ void main() {
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
 
-    when(
-      () => db.behaviorStateBySymbol(shipSymbol),
-    ).thenAnswer((_) async => null);
+    when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
 
     when(db.allChartingRecords).thenAnswer((_) async => <ChartingRecord>[]);
     when(

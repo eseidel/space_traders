@@ -13,7 +13,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   logger.confirm('Deleting behaviors: ${behaviors.map((b) => b.shipSymbol)}');
 
   for (final behavior in behaviors) {
-    await db.deleteBehaviorState(behavior.shipSymbol);
+    await db.deleteBehavior(behavior.shipSymbol);
   }
 }
 

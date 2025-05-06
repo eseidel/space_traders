@@ -45,7 +45,7 @@ class BehaviorTimeouts {
     Duration duration,
   ) async {
     final shipSymbol = ship.symbol;
-    final currentState = await db.behaviorStateBySymbol(shipSymbol);
+    final currentState = await db.getBehavior(shipSymbol);
     final behavior = currentState?.behavior;
     if (behavior == null) {
       shipWarn(ship, '$shipSymbol has no behavior to disable.');
@@ -58,7 +58,7 @@ class BehaviorTimeouts {
     );
 
     if (currentState == null || currentState.behavior == behavior) {
-      await db.deleteBehaviorState(shipSymbol);
+      await db.deleteBehavior(shipSymbol);
     } else {
       shipInfo(ship, 'Not deleting ${currentState.behavior} for $shipSymbol.');
     }
@@ -121,11 +121,11 @@ Future<BehaviorState> createBehaviorIfAbsent(
   ShipSymbol shipSymbol,
   Future<BehaviorState> Function() ifAbsent,
 ) async {
-  final currentState = await db.behaviorStateBySymbol(shipSymbol);
+  final currentState = await db.getBehavior(shipSymbol);
   if (currentState != null) {
     return currentState;
   }
   final newState = await ifAbsent();
-  await db.setBehaviorState(newState);
+  await db.upsertBehavior(newState);
   return newState;
 }
