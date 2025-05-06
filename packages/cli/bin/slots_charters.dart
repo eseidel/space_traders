@@ -10,7 +10,6 @@ Future<void> command(Database db, ArgResults argResults) async {
   // Maybe walk all jumpgate connections and list ones where the "to" side has
   // no chart?
 
-  final systemsCache = await db.systems.snapshot();
   final jumpGates = await JumpGateSnapshot.load(db);
   final charts = await ChartingSnapshot.load(db);
   final construction = await ConstructionSnapshot.load(db);
@@ -66,9 +65,10 @@ Future<void> command(Database db, ArgResults argResults) async {
         }
         continue;
       }
-      final toSystem = systemsCache[toSystemSymbol];
+      final toWaypoints = await db.systems.waypointsInSystem(toSystemSymbol);
+      // TODO(eseidel): This could be a db query.
       final missingChartCount =
-          toSystem.waypoints
+          toWaypoints
               .where((w) => !w.isAsteroid)
               .where((w) => !(charts.isCharted(w.symbol) ?? false))
               .length;

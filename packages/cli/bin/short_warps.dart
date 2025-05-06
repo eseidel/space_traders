@@ -80,12 +80,6 @@ Future<void> command(Database db, ArgResults argResults) async {
   final agentCache = await AgentCache.load(db);
   final hqSystem = agentCache!.headquartersSystemSymbol;
 
-  // final routePlanner = RoutePlanner.fromSystemsCache(
-  //   systemsCache,
-  //   systemConnectivity,
-  //   sellsFuel: defaultSellsFuel(marketListings),
-  // );
-
   final explorer = ships.ships.firstWhere((s) => s.isExplorer);
 
   final unreachableSystems =
@@ -108,12 +102,13 @@ Future<void> command(Database db, ArgResults argResults) async {
     ..info('with travel time by explorer at ${explorer.waypointSymbol}');
 
   for (final systemSymbol in unreachableSystems) {
-    final system = systemsCache[systemSymbol];
+    final system = systemsCache.systemBySymbol(systemSymbol);
     final actions = findRouteBetweenSystems(
       systemsCache,
       systemConnectivity,
       explorer.shipSpec,
       start: explorer.waypointSymbol,
+      // Pick the waypoint closest to our current location?
       end: system.waypoints.first.symbol,
       sellsFuel: defaultSellsFuel(marketListings),
     );

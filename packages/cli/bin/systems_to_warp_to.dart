@@ -26,15 +26,15 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final reachableSystemSymbols =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
-  final startSystem = systemsCache[startSystemSymbol];
+  final startSystem = systemsCache.systemRecordBySymbol(startSystemSymbol);
 
   // List out systems by warp distance from HQ.
   // Filter out ones we know how to reach.
-  final systemsByDistance = systemsCache.systems
+  final systemsByDistance = systemsCache.records
       .sortedBy<num>((s) => s.distanceTo(startSystem))
       .where((s) => !reachableSystemSymbols.contains(s.symbol));
 
-  final systemsToWarpTo = <System>[];
+  final systemsToWarpTo = <SystemRecord>[];
   for (final system in systemsByDistance) {
     if (systemsToWarpTo.length >= limit) {
       break;

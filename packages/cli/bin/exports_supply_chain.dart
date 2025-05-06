@@ -90,12 +90,12 @@ Future<void> command(Database db, ArgResults argResults) async {
   final charting = await ChartingSnapshot.load(db);
   final agent = await db.getMyAgent();
 
-  final jumpgate =
-      systems.jumpGateWaypointForSystem(agent!.headquarters.system)!;
-  final waypointSymbol = jumpgate.symbol;
+  final waypointSymbol = systems.jumpGateSymbolForSystem(
+    agent!.headquarters.system,
+  );
   final construction =
       (await db.getConstructionRecord(
-        waypointSymbol,
+        waypointSymbol!,
         defaultMaxAge,
       ))!.construction;
 

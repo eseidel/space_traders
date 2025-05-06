@@ -57,14 +57,14 @@ class WaypointConnectivity {
     SystemSymbol systemSymbol,
     int fuelCapacity,
   ) {
-    final system = systemsCache[systemSymbol];
+    final waypoints = systemsCache.waypointsInSystem(systemSymbol);
     final clusterFinder = ClusterFinder<WaypointSymbol>((s) {
-      final start = system.waypoints.firstWhere((w) => w.symbol == s);
-      return system.waypoints
+      final start = waypoints.firstWhere((w) => w.symbol == s);
+      return waypoints
           .where((w) => w.distanceTo(start) < fuelCapacity)
           .map((w) => w.symbol);
     });
-    for (final waypoint in system.waypoints) {
+    for (final waypoint in waypoints) {
       clusterFinder.paintCluster(waypoint.symbol);
     }
     return WaypointConnectivity(clusterFinder.clusterForKey);

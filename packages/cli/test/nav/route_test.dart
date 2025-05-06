@@ -23,7 +23,11 @@ void main() {
       position: WaypointPosition(20, 0, otherSymbol.system),
     );
     final system = System.test(a.system, waypoints: [a, b, c]);
-    final systemsCache = SystemsSnapshot([system]);
+    final otherSystemSystem = System.test(
+      otherSystem.system,
+      waypoints: [otherSystem],
+    );
+    final systemsCache = SystemsSnapshot([system, otherSystemSystem]);
     expect(
       approximateRoundTripDistanceWithinSystem(systemsCache, a.symbol, {
         b.symbol,
@@ -147,12 +151,12 @@ void main() {
   });
 
   test('cooldownTime', () {
-    final a = System.test(SystemSymbol.fromString('A-A'));
-    final b = System.test(
+    final a = SystemRecord.test(SystemSymbol.fromString('A-A'));
+    final b = SystemRecord.test(
       SystemSymbol.fromString('A-B'),
       position: const SystemPosition(2500, 0),
     );
-    final c = System.test(
+    final c = SystemRecord.test(
       SystemSymbol.fromString('A-C'),
       position: const SystemPosition(2501, 0),
     );

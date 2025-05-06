@@ -35,7 +35,7 @@ Future<SystemStats> computeSystemStats({
   var asteroids = 0;
   var waypointCount = 0;
   for (final systemSymbol in reachableSystems) {
-    final systemRecord = systemsCache[systemSymbol];
+    final systemRecord = systemsCache.systemBySymbol(systemSymbol);
     waypointCount += systemRecord.waypoints.length;
     jumpGates += systemRecord.jumpGateWaypoints.length;
     asteroids += systemRecord.waypoints.where((w) => w.isAsteroid).length;

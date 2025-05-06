@@ -36,6 +36,10 @@ class SystemsStore {
     return SystemsSnapshot(systems);
   }
 
+  /// Return the [SystemRecord] for the given [symbol].
+  Future<SystemRecord?> systemRecordBySymbol(SystemSymbol symbol) async =>
+      await _db.systemRecordBySymbol(symbol);
+
   /// Return the jump gate waypoint for the given [symbol].
   // Systems currently only have one jumpgate, but if that ever
   // changes all callers of this method might be wrong.
@@ -45,6 +49,15 @@ class SystemsStore {
       WaypointType.JUMP_GATE,
     );
     return waypoints.firstOrNull;
+  }
+
+  /// Return the jump gate symbol for the given system [symbol].
+  Future<WaypointSymbol?> jumpGateSymbolForSystem(SystemSymbol symbol) async {
+    final waypoints = await _db.systemWaypointsBySystemSymbolAndType(
+      symbol,
+      WaypointType.JUMP_GATE,
+    );
+    return waypoints.firstOrNull?.symbol;
   }
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.

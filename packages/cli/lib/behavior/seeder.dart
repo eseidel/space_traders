@@ -7,27 +7,22 @@ import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 import 'package:collection/collection.dart';
 
-WaypointSymbol _centralWaypointInSystem(
-  SystemsSnapshot systems,
-  SystemSymbol system,
-) {
-  final zero = WaypointPosition(0, 0, system);
-  final waypoints = systems[system].waypoints.sortedBy<num>(
-    (w) => w.position.distanceTo(zero),
-  );
-  return waypoints.first.symbol;
+WaypointSymbol _centralWaypoint(List<SystemWaypoint> waypoints) {
+  final zero = WaypointPosition(0, 0, waypoints.first.system);
+  final sorted = waypoints.sortedBy<num>((w) => w.position.distanceTo(zero));
+  return sorted.first.symbol;
 }
 
 RoutePlan? _shortestPathTo(
   SystemConnectivity systemConnectivity,
   RoutePlanner routePlanner,
-  SystemsSnapshot systemsCache,
+  SystemsSnapshot systems,
   SystemSymbol systemSymbol,
   Ship ship,
 ) {
   final maxFuel = ship.frame.fuelCapacity;
-  final system = systemsCache[systemSymbol];
-  final nearbySystems = systemsCache.systems.where(
+  final system = systems.systemBySymbol(systemSymbol);
+  final nearbySystems = systems.systems.where(
     (s) =>
         s.symbol != systemSymbol &&
         systemConnectivity.existsJumpPathBetween(s.symbol, ship.systemSymbol) &&
@@ -52,8 +47,10 @@ RoutePlan? _shortestPathTo(
   }
   final plan = routes.sortedBy((r) => r.duration).first;
   final actions = List<RouteAction>.from(plan.actions);
-  final centralSymbol = _centralWaypointInSystem(systemsCache, systemSymbol);
-  final nearbySystem = systemsCache[actions.last.endSymbol.system];
+  final centralSymbol = _centralWaypoint(
+    systems.waypointsInSystem(systemSymbol),
+  );
+  final nearbySystem = systems.systemBySymbol(actions.last.endSymbol.system);
   final distance = nearbySystem.distanceTo(system);
   final seconds = warpTimeByDistanceAndSpeed(
     distance: distance,

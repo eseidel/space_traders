@@ -45,11 +45,9 @@ Future<void> command(Database db, ArgResults argResults) async {
     }
     if (systems.isNotEmpty) {
       final system = systems.take();
-      final systemRecord = systemsCache[system.value];
-      for (final waypoint in systemRecord.waypoints) {
-        if (waypoint.isJumpGate) {
-          jumpGates.queue(waypoint.symbol, system.jumpDistance);
-        }
+      final jumpGate = systemsCache.jumpGateWaypointForSystem(system.value);
+      if (jumpGate != null) {
+        jumpGates.queue(jumpGate.symbol, system.jumpDistance);
       }
     }
   }

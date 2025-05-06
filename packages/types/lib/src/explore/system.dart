@@ -130,6 +130,15 @@ class SystemRecord extends Equatable {
     required this.waypointSymbols,
   });
 
+  /// Create a new [System] for testing.
+  @visibleForTesting
+  const SystemRecord.test(
+    this.symbol, {
+    this.type = SystemType.BLACK_HOLE,
+    this.position = const SystemPosition(0, 0),
+    this.waypointSymbols = const [],
+  });
+
   /// The symbol of the system.
   final SystemSymbol symbol;
 
@@ -141,6 +150,9 @@ class SystemRecord extends Equatable {
 
   /// The waypoints in the system.
   final List<WaypointSymbol> waypointSymbols;
+
+  /// Returns the distance to the given system.
+  double distanceTo(SystemRecord other) => position.distanceTo(other.position);
 
   @override
   List<Object?> get props => [symbol, type, position, waypointSymbols];
@@ -226,6 +238,14 @@ class System extends Equatable {
 
   /// Returns the distance to the given system.
   double distanceTo(System other) => position.distanceTo(other.position);
+
+  /// Converts to a [SystemRecord].
+  SystemRecord toSystemRecord() => SystemRecord(
+    symbol: symbol,
+    type: type,
+    position: position,
+    waypointSymbols: waypoints.map((w) => w.symbol).toList(),
+  );
 
   /// Converts to [openapi.System].
   @protected

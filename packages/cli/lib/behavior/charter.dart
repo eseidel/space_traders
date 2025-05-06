@@ -18,7 +18,7 @@ WaypointSymbol? waypointSymbolNeedingCharting(
   SystemSymbol systemSymbol, {
   required bool Function(SystemWaypoint waypointSymbol)? filter,
 }) {
-  final system = systems[systemSymbol];
+  final system = systems.systemBySymbol(systemSymbol);
   final start =
       ship.systemSymbol == system.symbol
           ? ship.waypointSymbol

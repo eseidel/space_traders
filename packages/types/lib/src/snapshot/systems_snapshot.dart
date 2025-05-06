@@ -10,21 +10,36 @@ class SystemsSnapshot {
   /// All systems in this snapshot.
   final List<System> systems;
 
+  /// All system records in this snapshot.
+  // TODO(eseidel): records should be cheaper than systems to call.
+  Iterable<SystemRecord> get records => systems.map((s) => s.toSystemRecord());
+
   final Map<SystemSymbol, System> _index;
 
   /// Return the jump gate waypoint for the given [symbol].
   // Systems currently only have one jumpgate, but if that ever
   // changes all callers of this method might be wrong.
   SystemWaypoint? jumpGateWaypointForSystem(SystemSymbol symbol) =>
-      this[symbol].waypoints.firstWhereOrNull((w) => w.isJumpGate);
+      _index[symbol]!.waypoints.firstWhereOrNull((w) => w.isJumpGate);
+
+  /// Return the jump gate symbol for the given [symbol].
+  WaypointSymbol? jumpGateSymbolForSystem(SystemSymbol symbol) =>
+      jumpGateWaypointForSystem(symbol)?.symbol;
 
   /// Return the system with the given [symbol].
   /// Exposed for passing to lists for mapping.
   System systemBySymbol(SystemSymbol symbol) =>
       _index[symbol] ?? (throw ArgumentError('Unknown system $symbol'));
 
-  /// Return the system with the given [symbol].
-  System operator [](SystemSymbol symbol) => systemBySymbol(symbol);
+  /// Return the system record with the given [symbol].
+  SystemRecord systemRecordBySymbol(SystemSymbol symbol) =>
+      _index[symbol]!.toSystemRecord();
+
+  /// Return all systems within the given [radius] of the given [position].
+  Iterable<System> systemsWithinRadius(
+    SystemPosition position,
+    double radius,
+  ) => systems.where((s) => s.position.distanceTo(position) < radius);
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   SystemWaypoint? waypointOrNull(WaypointSymbol waypointSymbol) {
@@ -44,5 +59,5 @@ class SystemsSnapshot {
 
   /// Return the SystemWaypoints for the given [systemSymbol].
   List<SystemWaypoint> waypointsInSystem(SystemSymbol systemSymbol) =>
-      this[systemSymbol].waypoints;
+      _index[systemSymbol]!.waypoints;
 }

@@ -6,8 +6,8 @@ import 'package:types/types.dart';
 List<SystemSymbol>? findSystemPath(
   SystemsSnapshot systems,
   SystemConnectivity systemConnectivity,
-  System start,
-  System end,
+  SystemRecord start,
+  SystemRecord end,
 ) {
   // This is A* search, thanks to
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -25,7 +25,8 @@ List<SystemSymbol>? findSystemPath(
   // A* only requires approximate weights.  We could use real weights here
   // but we'd have to remove case which calls this function with the same
   // system (end, end) which will assert in cooldownTimeForJumpBetweenSystems.
-  int approximateTimeBetween(System a, System b) => a.distanceTo(b).round();
+  int approximateTimeBetween(SystemRecord a, SystemRecord b) =>
+      a.distanceTo(b).round();
 
   while (frontier.isNotEmpty) {
     final current = frontier.removeFirst();
@@ -33,11 +34,11 @@ List<SystemSymbol>? findSystemPath(
     if (currentSymbol == endSymbol) {
       break;
     }
-    final currentSystem = systems.systemBySymbol(currentSymbol);
+    final currentSystem = systems.systemRecordBySymbol(currentSymbol);
     final connected = systemConnectivity.directlyConnectedSystemSymbols(
       currentSymbol,
     );
-    final connectedSystems = connected.map(systems.systemBySymbol);
+    final connectedSystems = connected.map(systems.systemRecordBySymbol);
 
     for (final nextSystem in connectedSystems) {
       final next = nextSystem.symbol;
@@ -89,8 +90,8 @@ List<WaypointSymbol>? findWaypointPathJumpsOnly(
   final systemSymbols = findSystemPath(
     systems,
     systemConnectivity,
-    startSystem,
-    endSystem,
+    startSystem.toSystemRecord(),
+    endSystem.toSystemRecord(),
   );
   if (systemSymbols == null) {
     return null;

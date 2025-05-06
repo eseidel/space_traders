@@ -50,7 +50,9 @@ void main() {
       type: SystemType.BLACK_HOLE,
       position: const SystemPosition(0, 0),
     );
-    when(() => caches.systems[waypointSymbol.system]).thenReturn(system);
+    when(
+      () => caches.systems.systemBySymbol(waypointSymbol.system),
+    ).thenReturn(system);
     registerFallbackValue(waypointSymbol.system);
     when(
       () => caches.systemConnectivity.clusterIdForSystem(any()),

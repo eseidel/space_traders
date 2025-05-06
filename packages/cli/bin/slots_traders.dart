@@ -91,10 +91,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
 
   logger.info('Deals above $minProfitPerSecond c/s by system:');
-  final sorted =
+  final systemSymbolsWithDealsSorted =
       dealsBySystem.keys.toList()
         ..sort((a, b) => dealsBySystem[b]!.length - dealsBySystem[a]!.length);
-  for (final system in sorted) {
+  for (final system in systemSymbolsWithDealsSorted) {
     final deals = dealsBySystem[system]!;
     final haulers = haulersBySystem[system] ?? {};
     final score = scoreSystem(system);
@@ -120,27 +120,32 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   for (final shipSymbol in idleHaulers) {
     // Re-compute since assignments may have changed.
-    final systemsWithOpenSlots =
-        sorted
-            .where((system) => scoreSystem(system) > minScore)
-            .map((symbol) => systems[symbol])
-            .toList();
+    final systemsWithOpenSlots = await Future.wait(
+      systemSymbolsWithDealsSorted
+          .where((system) => scoreSystem(system) > minScore)
+          .map(
+            (symbol) async => (await db.systems.systemRecordBySymbol(symbol))!,
+          )
+          .toList(),
+    );
 
-    final shipSystem = systems[ships[shipSymbol]!.systemSymbol];
+    final shipSystem = await db.systems.systemRecordBySymbol(
+      ships[shipSymbol]!.systemSymbol,
+    );
     final closest = minBy(
       systemsWithOpenSlots,
-      (system) => system.distanceTo(shipSystem),
+      (system) => system.distanceTo(shipSystem!),
     );
     if (closest != null) {
       // Pick the jumpgate in that system.
-      final jumpGate = closest.jumpGateWaypoints.first.symbol;
+      final jumpGate = await db.systems.jumpGateSymbolForSystem(closest.symbol);
       // route there.
       haulersBySystem.putIfAbsent(closest.symbol, () => {}).add(shipSymbol);
       final ship = ships[shipSymbol]!;
       final route = routePlanner.planRoute(
         shipSpec,
         start: ship.waypointSymbol,
-        end: jumpGate,
+        end: jumpGate!,
       );
       final planString = route != null ? describeRoutePlan(route) : 'none';
       logger

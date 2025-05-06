@@ -46,7 +46,9 @@ void main() {
     ).thenReturn(systemWaypoint);
 
     final system = System.test(waypointSymbol.system);
-    when(() => caches.systems[waypointSymbol.system]).thenReturn(system);
+    when(
+      () => caches.systems.systemBySymbol(waypointSymbol.system),
+    ).thenReturn(system);
     registerFallbackValue(waypointSymbol.system);
 
     when(() => api.fleet).thenReturn(fleetApi);

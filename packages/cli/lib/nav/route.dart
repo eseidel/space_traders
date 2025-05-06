@@ -138,11 +138,14 @@ int flightTimeWithinSystemInSeconds(
 
 /// Returns the warp time to the given waypoint.
 int warpTimeInSeconds(
-  System a,
-  System b, {
+  SystemRecord a,
+  SystemRecord b, {
   required int shipSpeed,
   ShipNavFlightMode flightMode = ShipNavFlightMode.CRUISE,
 }) {
+  if (a.symbol == b.symbol) {
+    throw ArgumentError('Cannot jump to the same system ${a.symbol}.');
+  }
   final distance = a.distanceTo(b);
   return warpTimeByDistanceAndSpeed(
     distance: distance,
@@ -162,7 +165,7 @@ int cooldownTimeForJumpDistance(int distance) {
 }
 
 /// Returns the cooldown time after jumping between two systems.
-int cooldownTimeForJumpBetweenSystems(System a, System b) {
+int cooldownTimeForJumpBetweenSystems(SystemRecord a, SystemRecord b) {
   if (a.symbol == b.symbol) {
     throw ArgumentError('Cannot jump to the same system ${a.symbol}.');
   }
@@ -320,8 +323,8 @@ RouteAction _jumpAction(
   SystemWaypoint end, {
   required bool isLastJump,
 }) {
-  final startSystem = systems[start.system];
-  final endSystem = systems[end.system];
+  final startSystem = systems.systemRecordBySymbol(start.system);
+  final endSystem = systems.systemRecordBySymbol(end.system);
   final cooldown = cooldownTimeForJumpBetweenSystems(startSystem, endSystem);
   // This isn't quite right to use cooldown as duration, but it's
   // close enough for now.  This isLastJump hack also would break

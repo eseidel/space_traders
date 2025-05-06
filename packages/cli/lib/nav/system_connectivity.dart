@@ -299,8 +299,8 @@ class SystemConnectivity {
                   !currentSystemsToJumpFrom.contains(s) &&
                   !oneJumpFurther.contains(s),
             )
-            .map((s) => systemsCache[s]);
-        final jumpFromSystem = systemsCache[jumpFrom];
+            .map((s) => systemsCache.systemRecordBySymbol(s));
+        final jumpFromSystem = systemsCache.systemRecordBySymbol(jumpFrom);
         final sortedSystems = connectedSystems.sortedBy<num>(
           (s) => s.distanceTo(jumpFromSystem),
         );

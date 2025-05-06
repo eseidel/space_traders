@@ -53,13 +53,13 @@ Future<void> command(Database db, ArgResults argResults) async {
   );
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final systemsCache = await db.systems.snapshot();
+  final systemsSnapshot = await db.systems.snapshot();
   final charts = await ChartingSnapshot.load(db);
 
   final connectedSystems =
       systemConnectivity
           .systemSymbolsInJumpRadius(
-            systemsCache,
+            systemsSnapshot,
             startSystem: startSystemSymbol,
             maxJumps: 3,
           )
@@ -73,7 +73,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   var totalAsteroids = 0;
   var totalJumpgates = 0;
   for (final (systemSymbol, jumps) in connectedSystems) {
-    final counts = _count(charts, systemsCache[systemSymbol]);
+    final counts = _count(charts, systemsSnapshot.systemBySymbol(systemSymbol));
     logger.info(
       '${systemSymbol.system.padRight(9)} '
       '${counts.uncharted} uncharted, ${counts.asteroids} asteroids, '
