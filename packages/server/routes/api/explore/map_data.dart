@@ -11,7 +11,7 @@ Future<Response> onRequest(RequestContext context) async {
   final shipSnapshot = await ShipSnapshot.load(db);
   final response = GetMapDataResponse(
     ships: shipSnapshot.ships,
-    systems: systemsSnapshot.systems,
+    systems: systemsSnapshot.systems.toList(),
   );
 
   return Response.json(body: response.toJson());

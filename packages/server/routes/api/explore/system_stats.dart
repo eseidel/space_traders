@@ -22,10 +22,10 @@ Future<SystemStats> computeSystemStats({
   var totalSystems = 0;
   var totalJumpgates = 0;
   var totalWaypoints = 0;
-  for (final system in systemsCache.systems) {
+  for (final system in systemsCache.records) {
     totalSystems += 1;
-    totalWaypoints += system.waypoints.length;
-    totalJumpgates += system.jumpGateWaypoints.length;
+    totalWaypoints += system.waypointSymbols.length;
+    totalJumpgates += systemsCache.hasJumpGate(system.symbol) ? 1 : 0;
   }
 
   final reachableSystems =

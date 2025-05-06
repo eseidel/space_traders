@@ -82,7 +82,7 @@ _ShipPlacement? _findBetterSystemForTrader(
   required int profitPerSecondThreshold,
 }) {
   final shipSymbol = ship.symbol;
-  final shipSystem = systems.systemBySymbol(ship.systemSymbol);
+  final shipSystem = systems.systemRecordBySymbol(ship.systemSymbol);
 
   while (true) {
     final closest = search.closestAvailableSystem(shipSystem);
@@ -136,7 +136,7 @@ _ShipPlacement? _findBetterSystemForTrader(
   }
 }
 
-System? _closestSystem(System start, List<System> systems) {
+SystemRecord? _closestSystem(SystemRecord start, List<SystemRecord> systems) {
   return minBy(systems, (system) => start.distanceTo(system));
 }
 
@@ -168,7 +168,7 @@ class _MarketSearch {
   }) {
     final marketSystemScores = scoreMarketSystems(marketPrices);
     final marketSystems =
-        marketSystemScores.keys.map(systems.systemBySymbol).toList();
+        marketSystemScores.keys.map(systems.systemRecordBySymbol).toList();
     return _MarketSearch(
       marketSystems: marketSystems,
       marketSystemScores: marketSystemScores,
@@ -176,11 +176,11 @@ class _MarketSearch {
     );
   }
 
-  final List<System> marketSystems;
+  final List<SystemRecord> marketSystems;
   final Map<SystemSymbol, int> marketSystemScores;
   final Set<SystemSymbol> claimedSystemSymbols;
 
-  System? closestAvailableSystem(System startSystem) {
+  SystemRecord? closestAvailableSystem(SystemRecord startSystem) {
     final availableSystems =
         marketSystems
             .where((system) => !claimedSystemSymbols.contains(system.symbol))
@@ -188,7 +188,7 @@ class _MarketSearch {
     return _closestSystem(startSystem, availableSystems);
   }
 
-  void markUsed(System system) => claimedSystemSymbols.add(system.symbol);
+  void markUsed(SystemRecord system) => claimedSystemSymbols.add(system.symbol);
 
   int scoreFor(SystemSymbol systemSymbol) => marketSystemScores[systemSymbol]!;
 }

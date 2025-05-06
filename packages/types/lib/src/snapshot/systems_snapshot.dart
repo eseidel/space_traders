@@ -4,11 +4,11 @@ import 'package:types/types.dart';
 /// A list of systems.
 class SystemsSnapshot {
   /// Create a new [SystemsSnapshot] with the given [systems].
-  SystemsSnapshot(this.systems)
+  SystemsSnapshot(List<System> systems)
     : _index = Map.fromEntries(systems.map((e) => MapEntry(e.symbol, e)));
 
   /// All systems in this snapshot.
-  final List<System> systems;
+  Iterable<System> get systems => _index.values;
 
   /// All system records in this snapshot.
   // TODO(eseidel): records should be cheaper than systems to call.
@@ -25,6 +25,10 @@ class SystemsSnapshot {
   /// Return the jump gate symbol for the given [symbol].
   WaypointSymbol? jumpGateSymbolForSystem(SystemSymbol symbol) =>
       jumpGateWaypointForSystem(symbol)?.symbol;
+
+  /// Return true if the given [symbol] has a jump gate.
+  bool hasJumpGate(SystemSymbol symbol) =>
+      jumpGateWaypointForSystem(symbol) != null;
 
   /// Return the system with the given [symbol].
   /// Exposed for passing to lists for mapping.

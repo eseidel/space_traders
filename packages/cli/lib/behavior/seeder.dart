@@ -21,8 +21,8 @@ RoutePlan? _shortestPathTo(
   Ship ship,
 ) {
   final maxFuel = ship.frame.fuelCapacity;
-  final system = systems.systemBySymbol(systemSymbol);
-  final nearbySystems = systems.systems.where(
+  final system = systems.systemRecordBySymbol(systemSymbol);
+  final nearbySystems = systems.records.where(
     (s) =>
         s.symbol != systemSymbol &&
         systemConnectivity.existsJumpPathBetween(s.symbol, ship.systemSymbol) &&
@@ -32,11 +32,11 @@ RoutePlan? _shortestPathTo(
   for (final nearbySystem in nearbySystems) {
     // Figure out the time to route from current location to the jumpgate
     // for nearbySystem.
-    final jumpGate = nearbySystem.jumpGateWaypoints.first;
+    final jumpGate = systems.jumpGateWaypointForSystem(nearbySystem.symbol);
     final route = routePlanner.planRoute(
       ship.shipSpec,
       start: ship.waypointSymbol,
-      end: jumpGate.symbol,
+      end: jumpGate!.symbol,
     );
     if (route != null) {
       routes.add(route);
@@ -50,7 +50,9 @@ RoutePlan? _shortestPathTo(
   final centralSymbol = _centralWaypoint(
     systems.waypointsInSystem(systemSymbol),
   );
-  final nearbySystem = systems.systemBySymbol(actions.last.endSymbol.system);
+  final nearbySystem = systems.systemRecordBySymbol(
+    actions.last.endSymbol.system,
+  );
   final distance = nearbySystem.distanceTo(system);
   final seconds = warpTimeByDistanceAndSpeed(
     distance: distance,
