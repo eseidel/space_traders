@@ -153,11 +153,19 @@ class Database {
 
   /// Get the current schema version.
   Future<int?> currentSchemaVersion() async {
-    final result = await execute(selectCurrentSchemaVersionQuery());
-    if (result.isEmpty) {
-      return null;
+    try {
+      final result = await execute(selectCurrentSchemaVersionQuery());
+      if (result.isEmpty) {
+        return null;
+      }
+      return result.first[0] as int?;
+    } on pg.ServerException catch (e) {
+      // The table may not exist yet.
+      if (e.code == '42P01') {
+        return null;
+      }
+      rethrow;
     }
-    return result.first[0] as int?;
   }
 
   /// Migrate the database to the given schema version.
