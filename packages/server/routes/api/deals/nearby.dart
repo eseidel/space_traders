@@ -17,7 +17,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   required WaypointSymbol? maybeStart,
   required int credits,
 }) async {
-  final systems = await db.snapshotAllSystems();
+  final systems = await db.systems.snapshotAllSystems();
   final marketListings = await MarketListingSnapshot.load(db);
   final jumpGates = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await ConstructionSnapshot.load(db);

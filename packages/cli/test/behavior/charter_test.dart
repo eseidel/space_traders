@@ -5,6 +5,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -27,10 +28,14 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockChartingSnapshot extends Mock implements ChartingSnapshot {}
 
+class _MockSystemsStore extends Mock implements SystemsStore {}
+
 void main() {
   test('advanceCharter smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
+    final systemsStore = _MockSystemsStore();
+    when(() => db.systems).thenReturn(systemsStore);
     final ship = _MockShip();
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
@@ -124,8 +129,8 @@ void main() {
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allChartingRecords).thenAnswer((_) async => []);
-    when(db.allSystemRecords).thenAnswer((_) async => []);
-    when(db.allSystemWaypoints).thenAnswer((_) async => []);
+    when(systemsStore.allSystemRecords).thenAnswer((_) async => []);
+    when(systemsStore.allSystemWaypoints).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     expect(

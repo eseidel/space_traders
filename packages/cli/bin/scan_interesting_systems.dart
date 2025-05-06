@@ -2,7 +2,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final systems = await db.snapshotAllSystems();
+  final systems = await db.systems.snapshotAllSystems();
 
   // Find all known reachable systems.
   // List ones we know are reachable but don't have any prices.

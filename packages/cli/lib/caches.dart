@@ -120,7 +120,7 @@ class Caches {
     await loadExports(db, api.data);
 
     final static = StaticCaches(db);
-    final systems = await db.snapshotAllSystems();
+    final systems = await db.systems.snapshotAllSystems();
     final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
     final waypoints = WaypointCache(api, db);
@@ -166,7 +166,7 @@ class Caches {
     if (systems.systemsCount < galaxy.systemCount ||
         systems.waypointsCount < galaxy.waypointCount) {
       logger.info('Systems Snapshot is incomplete, reloading.');
-      systems = await db.snapshotAllSystems();
+      systems = await db.systems.snapshotAllSystems();
     }
 
     systemConnectivity.updateFromJumpGates(

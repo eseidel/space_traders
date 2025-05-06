@@ -64,7 +64,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     ' with matching markets within $maxDistance total round-trip:',
   );
 
-  final systems = await db.snapshotAllSystems();
+  final systems = await db.systems.snapshotAllSystems();
   final charting = ChartingCache(db);
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);

@@ -1,5 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -21,10 +22,14 @@ class _MockGlobalApi extends Mock implements GlobalApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockSystemsStore extends Mock implements SystemsStore {}
+
 void main() {
   test('Caches load test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
+    final systemsStore = _MockSystemsStore();
+    when(() => db.systems).thenReturn(systemsStore);
     final agentsApi = _MockAgentsApi();
     when(() => api.agents).thenReturn(agentsApi);
     final agent = Agent.test();
@@ -86,8 +91,8 @@ void main() {
     when(db.allShipyardPrices).thenAnswer((_) async => []);
     when(db.allJumpGates).thenAnswer((_) async => []);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
-    when(db.allSystemRecords).thenAnswer((_) async => []);
-    when(db.allSystemWaypoints).thenAnswer((_) async => []);
+    when(systemsStore.allSystemRecords).thenAnswer((_) async => []);
+    when(systemsStore.allSystemWaypoints).thenAnswer((_) async => []);
 
     final dataApi = _MockDataApi();
     when(() => api.data).thenReturn(dataApi);

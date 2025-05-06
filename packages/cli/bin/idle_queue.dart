@@ -41,7 +41,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   if (argResults['all'] as bool) {
     final interestingSystems = findInterestingSystems(
-      await db.snapshotAllSystems(),
+      await db.systems.snapshotAllSystems(),
     );
     for (final symbol in interestingSystems) {
       queue.queueSystem(symbol, jumpDistance: 0);

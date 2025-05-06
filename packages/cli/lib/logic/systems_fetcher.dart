@@ -20,8 +20,8 @@ class SystemsFetcher {
     final galaxy = await getGalaxyStats(_api);
 
     // Ask the db how many systems it has.
-    final cachedSystemCount = await _db.countSystemRecords();
-    final cachedWaypointsCount = await _db.countSystemWaypoints();
+    final cachedSystemCount = await _db.systems.countSystemRecords();
+    final cachedWaypointsCount = await _db.systems.countSystemWaypoints();
     if (cachedSystemCount >= galaxy.systemCount &&
         cachedWaypointsCount >= galaxy.waypointCount) {
       logger.info('All systems and waypoints are cached, skipping fetch.');
@@ -38,7 +38,7 @@ class SystemsFetcher {
     const logEvery = 1000;
     var i = 0;
     await allSystems(_api).forEach((system) {
-      _db.upsertSystem(system);
+      _db.systems.upsertSystem(system);
       if (i % logEvery == 0) {
         logger.info('Fetched $i systems');
       }

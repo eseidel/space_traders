@@ -3,6 +3,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -41,6 +42,8 @@ class _MockShipyardListingSnapshot extends Mock
     implements ShipyardListingSnapshot {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
+class _MockSystemsStore extends Mock implements SystemsStore {}
 
 void main() {
   test('CentralCommand.otherCharterSystems', () async {
@@ -509,6 +512,8 @@ void main() {
 
   test('advanceCentralPlanning smoke test', () async {
     final db = _MockDatabase();
+    final systemsStore = _MockSystemsStore();
+    when(() => db.systems).thenReturn(systemsStore);
     final caches = mockCaches();
     const faction = FactionSymbol.AEGIS;
     final shipSymbol = ShipSymbol.fromString('X-A');
@@ -555,12 +560,12 @@ void main() {
     ).thenAnswer((_) async => _MockShipyardShipSnapshot());
 
     when(
-      () => db.systemWaypointsBySystemSymbolAndType(
+      () => db.systems.systemWaypointsBySystemSymbolAndType(
         any(),
         WaypointType.JUMP_GATE,
       ),
     ).thenAnswer((_) async => []);
-    when(db.allSystemRecords).thenAnswer(
+    when(systemsStore.allSystemRecords).thenAnswer(
       (_) async => [
         SystemRecord(
           symbol: hqSystemSymbol,
@@ -570,7 +575,7 @@ void main() {
         ),
       ],
     );
-    when(db.allSystemWaypoints).thenAnswer((_) async => []);
+    when(systemsStore.allSystemWaypoints).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
     await runWithLogger(

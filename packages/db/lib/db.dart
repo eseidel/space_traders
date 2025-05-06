@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:db/config.dart';
 import 'package:db/migrations.dart';
 import 'package:db/src/queries.dart';
@@ -228,15 +227,12 @@ class Database {
   }
 
   /// Execute a query.
-  @protected
   Future<pg.Result> execute(Query query) => _connection.execute(query);
 
   /// Execute a query.
-  @protected
   Future<pg.Result> executeSql(String sql) => _connection.executeSql(sql);
 
   /// Query for multiple records using the provided query.
-  @protected
   Future<Iterable<T>> queryMany<T>(
     Query query,
     T Function(Map<String, dynamic>) fromColumnMap,
@@ -247,7 +243,6 @@ class Database {
   }
 
   /// Query for a single record using the provided query.
-  @protected
   Future<T?> queryOne<T>(
     Query query,
     T Function(Map<String, dynamic>) fromColumnMap,
@@ -889,101 +884,5 @@ class Database {
         },
       ),
     );
-  }
-
-  /// Get all system records from the database.
-  Future<Iterable<SystemRecord>> allSystemRecords() async {
-    final result = await queryMany(
-      allSystemRecordsQuery(),
-      systemRecordFromColumnMap,
-    );
-    return result;
-  }
-
-  /// Upsert a system record into the database.
-  Future<void> upsertSystemRecord(SystemRecord system) async {
-    await execute(upsertSystemRecordQuery(system));
-  }
-
-  /// Get a system record by symbol.
-  Future<SystemRecord?> systemRecordBySymbol(SystemSymbol symbol) async {
-    final query = systemRecordBySymbolQuery(symbol);
-    return queryOne(query, systemRecordFromColumnMap);
-  }
-
-  /// Get all waypoints from the database.
-  /// Returns a list of waypoints.
-  Future<Iterable<SystemWaypoint>> allSystemWaypoints() async {
-    final result = await queryMany(
-      allSystemWaypointsQuery(),
-      systemWaypointFromColumnMap,
-    );
-    return result;
-  }
-
-  /// Count the number of system waypoints in the database.
-  Future<int> countSystemWaypoints() async {
-    final result = await executeSql('SELECT COUNT(*) FROM system_waypoint_');
-    return result[0][0]! as int;
-  }
-
-  /// Count the number of systems in the database.
-  Future<int> countSystemRecords() async {
-    final result = await executeSql('SELECT COUNT(*) FROM system_record_');
-    return result[0][0]! as int;
-  }
-
-  /// Upsert a system waypoint into the database.
-  Future<void> upsertSystemWaypoint(SystemWaypoint waypoint) async {
-    await execute(upsertSystemWaypointQuery(waypoint));
-  }
-
-  /// Get a SystemWaypoint by symbol.
-  Future<SystemWaypoint?> systemWaypointBySymbol(WaypointSymbol symbol) async {
-    final query = systemWaypointBySymbolQuery(symbol);
-    return queryOne(query, systemWaypointFromColumnMap);
-  }
-
-  /// Get SystemWaypoints by system symbol.
-  Future<Iterable<SystemWaypoint>> systemWaypointsBySystemSymbol(
-    SystemSymbol symbol,
-  ) async {
-    final query = systemWaypointsBySystemQuery(symbol);
-    return queryMany(query, systemWaypointFromColumnMap);
-  }
-
-  /// Get SystemWaypoints by system symbol and type.
-  Future<Iterable<SystemWaypoint>> systemWaypointsBySystemSymbolAndType(
-    SystemSymbol symbol,
-    WaypointType type,
-  ) async {
-    final query = systemWaypointsBySystemAndTypeQuery(symbol, type);
-    return queryMany(query, systemWaypointFromColumnMap);
-  }
-
-  /// Create a new [SystemsSnapshot] from all the data in the database.
-  Future<SystemsSnapshot> snapshotAllSystems() async {
-    final systemRecords = await allSystemRecords();
-    final waypoints = await allSystemWaypoints();
-    final grouped = waypoints.groupListsBy((w) => w.system);
-    final systems =
-        systemRecords.map((r) {
-          final waypoints = grouped[r.symbol] ?? [];
-          // TODO(eseidel): Log once we have a logger.
-          // if (waypoints.length != r.waypointSymbols.length) {
-          //   logger.warn('Waypoints length mismatch for system ${r.symbol}');
-          // }
-          return System.fromRecord(r, waypoints);
-        }).toList();
-    return SystemsSnapshot(systems);
-  }
-
-  /// Upsert a [System] into the database.
-  Future<void> upsertSystem(System system) async {
-    // We could do this in a transaction, but for now not bothering.
-    await upsertSystemRecord(system.toSystemRecord());
-    for (final waypoint in system.waypoints) {
-      await upsertSystemWaypoint(waypoint);
-    }
   }
 }

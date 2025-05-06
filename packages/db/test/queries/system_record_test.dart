@@ -38,23 +38,23 @@ void main() {
         ),
       ];
       for (final system in systems) {
-        await db.upsertSystem(system);
+        await db.systems.upsertSystem(system);
       }
 
       // Record lookups work
       expect(
-        await db.systemRecordBySymbol(systems[0].symbol),
+        await db.systems.systemRecordBySymbol(systems[0].symbol),
         equals(systems[0].toSystemRecord()),
       );
 
       // Waypoint lookups work
       expect(
-        await db.systemWaypointBySymbol(systems[0].waypoints[0].symbol),
+        await db.systems.systemWaypointBySymbol(systems[0].waypoints[0].symbol),
         equals(systems[0].waypoints[0]),
       );
 
-      expect(await db.countSystemWaypoints(), 3);
-      expect(await db.countSystemRecords(), 2);
+      expect(await db.systems.countSystemWaypoints(), 3);
+      expect(await db.systems.countSystemRecords(), 2);
 
       expect(
         await db.systems.jumpGateSymbolForSystem(systems[0].symbol),
