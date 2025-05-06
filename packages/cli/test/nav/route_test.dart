@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:cli/nav/route.dart';
 import 'package:cli/nav/system_connectivity.dart';
+import 'package:file/local.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -173,106 +176,114 @@ void main() {
     expect(() => cooldownTimeForJumpDistance(-20), throwsArgumentError);
   });
 
-  // test('planRoute', () {
-  //   const fs = LocalFileSystem();
-  //   // This test originally was written with hard-coded waypoint symbols names
-  //   // but when the SystemWaypoint format changed, it wasn't easy to update, so
-  //   // I made it dynamically compute the waypoint symbols to use from the first
-  //   // waypoint symbol in the file.  Which makes it probably a less good test,
-  //   // but much easier to update in the future if the format changes again.
-  //   final systemsCache = SystemsSnapshot.loadFromFile(
-  //     fs.file('test/nav/fixtures/systems-09-24-2023.json'),
-  //   );
-  //   final waypoint1 = WaypointSymbol.fromString(
-  //     'X1-V94-96191X',
-  //   ); // first waypoint in systems.json
-  //   final waypoint3 = WaypointSymbol.fromString(
-  //     'X1-TC51-68991C',
-  //   ); // random other waypoint in file.
-  //   final waypoint4 = WaypointSymbol.fromString(
-  //     'X1-CH89-70689B',
-  //   ); // another random other waypoint in file.
+  SystemsSnapshot loadFromFile(String path) {
+    const fs = LocalFileSystem();
+    final file = fs.file(path);
+    final json = jsonDecode(file.readAsStringSync()) as List<dynamic>;
+    final systems =
+        json.map((e) => System.fromJson(e as Map<String, dynamic>)).toList();
+    return SystemsSnapshot(systems);
+  }
 
-  //   final systemConnectivity = SystemConnectivity.test({
-  //     waypoint1: {waypoint4},
-  //   });
-  //   final routePlanner = RoutePlanner.fromSystemsSnapshot(
-  //     systemsCache,
-  //     systemConnectivity,
-  //     sellsFuel: (_) => false,
-  //   );
-  //   RoutePlan? planRoute(
-  //     WaypointSymbol start,
-  //     WaypointSymbol end, {
-  //     int fuelCapacity = 1200,
-  //     int shipSpeed = 30,
-  //   }) => routePlanner.planRoute(
-  //     ShipSpec(
-  //       cargoCapacity: 0,
-  //       fuelCapacity: fuelCapacity,
-  //       speed: shipSpeed,
-  //       canWarp: false,
-  //     ),
-  //     start: start,
-  //     end: end,
-  //   );
+  test('planRoute', () {
+    // This test originally was written with hard-coded waypoint symbols names
+    // but when the SystemWaypoint format changed, it wasn't easy to update, so
+    // I made it dynamically compute the waypoint symbols to use from the first
+    // waypoint symbol in the file.  Which makes it probably a less good test,
+    // but much easier to update in the future if the format changes again.
+    final systemsCache = loadFromFile(
+      'test/nav/fixtures/systems-09-24-2023.json',
+    );
+    final waypoint1 = WaypointSymbol.fromString(
+      'X1-V94-96191X',
+    ); // first waypoint in systems.json
+    final waypoint3 = WaypointSymbol.fromString(
+      'X1-TC51-68991C',
+    ); // random other waypoint in file.
+    final waypoint4 = WaypointSymbol.fromString(
+      'X1-CH89-70689B',
+    ); // another random other waypoint in file.
 
-  //   void expectRoute(
-  //     WaypointSymbol start,
-  //     WaypointSymbol end,
-  //     int expectedSeconds,
-  //   ) {
-  //     final route = planRoute(start, end);
-  //     expect(route, isNotNull);
-  //     expect(route!.duration.inSeconds, expectedSeconds);
+    final systemConnectivity = SystemConnectivity.test({
+      waypoint1: {waypoint4},
+    });
+    final routePlanner = RoutePlanner.fromSystemsSnapshot(
+      systemsCache,
+      systemConnectivity,
+      sellsFuel: (_) => false,
+    );
+    RoutePlan? planRoute(
+      WaypointSymbol start,
+      WaypointSymbol end, {
+      int fuelCapacity = 1200,
+      int shipSpeed = 30,
+    }) => routePlanner.planRoute(
+      ShipSpec(
+        cargoCapacity: 0,
+        fuelCapacity: fuelCapacity,
+        speed: shipSpeed,
+        canWarp: false,
+      ),
+      start: start,
+      end: end,
+    );
 
-  //     // No need to test caching of the empty route.
-  //     if (route.actions.isEmpty) {
-  //       return;
-  //     }
+    void expectRoute(
+      WaypointSymbol start,
+      WaypointSymbol end,
+      int expectedSeconds,
+    ) {
+      final route = planRoute(start, end);
+      expect(route, isNotNull);
+      expect(route!.duration.inSeconds, expectedSeconds);
 
-  //     // Also verify that our caching works:
-  //     // This actually isn't triggered ever since we're only using local
-  //     // navigation in this test so far.
-  //     final routeSymbols =
-  //         route.actions.map((w) => w.startSymbol).toList()
-  //           ..add(route.actions.last.endSymbol);
-  //     final route2 = planRoute(start, end)!;
-  //     final routeSymbols2 =
-  //         route2.actions.map((w) => w.startSymbol).toList()
-  //           ..add(route.actions.last.endSymbol);
-  //     // Should be identical when coming from cache.
-  //     expect(routeSymbols2, routeSymbols);
-  //   }
+      // No need to test caching of the empty route.
+      if (route.actions.isEmpty) {
+        return;
+      }
 
-  //   // Same place
-  //   expectRoute(waypoint1, waypoint1, 0);
+      // Also verify that our caching works:
+      // This actually isn't triggered ever since we're only using local
+      // navigation in this test so far.
+      final routeSymbols =
+          route.actions.map((w) => w.startSymbol).toList()
+            ..add(route.actions.last.endSymbol);
+      final route2 = planRoute(start, end)!;
+      final routeSymbols2 =
+          route2.actions.map((w) => w.startSymbol).toList()
+            ..add(route.actions.last.endSymbol);
+      // Should be identical when coming from cache.
+      expect(routeSymbols2, routeSymbols);
+    }
 
-  //   // Within one system
-  //   final system = systemsCache[waypoint1.system];
-  //   final waypoint2 =
-  //       system.waypoints.firstWhere((w) => w.symbol != waypoint1).symbol;
-  //   expectRoute(waypoint1, waypoint2, 23);
+    // Same place
+    expectRoute(waypoint1, waypoint1, 0);
 
-  //   final route = planRoute(waypoint1, waypoint2);
-  //   expect(route!.startSymbol, waypoint1);
-  //   expect(route.endSymbol, waypoint2);
-  //   // No actions after the last one.
-  //   expect(route.nextActionFrom(waypoint2), isNull);
-  //   // Make a sub-plan starting from the same starting point.
-  //   final subPlan = route.subPlanStartingFrom(waypoint1);
-  //   expect(subPlan.actions.length, route.actions.length);
+    // Within one system
+    final system = systemsCache.systemBySymbol(waypoint1.system);
+    final waypoint2 =
+        system.waypoints.firstWhere((w) => w.symbol != waypoint1).symbol;
+    expectRoute(waypoint1, waypoint2, 23);
 
-  //   // Make a sub-plan with an unrelated waypoint.
-  //   expect(() => route.subPlanStartingFrom(waypoint3), throwsArgumentError);
+    final route = planRoute(waypoint1, waypoint2);
+    expect(route!.startSymbol, waypoint1);
+    expect(route.endSymbol, waypoint2);
+    // No actions after the last one.
+    expect(route.nextActionFrom(waypoint2), isNull);
+    // Make a sub-plan starting from the same starting point.
+    final subPlan = route.subPlanStartingFrom(waypoint1);
+    expect(subPlan.actions.length, route.actions.length);
 
-  //   // Exactly one jump, jump duration doesn't matter since it doesn't stop
-  //   // navigation.
-  //   expectRoute(waypoint1, waypoint4, 80);
+    // Make a sub-plan with an unrelated waypoint.
+    expect(() => route.subPlanStartingFrom(waypoint3), throwsArgumentError);
 
-  //   // We don't know how to plan warps yet.
-  //   expect(planRoute(waypoint1, waypoint3), isNull);
-  // });
+    // Exactly one jump, jump duration doesn't matter since it doesn't stop
+    // navigation.
+    expectRoute(waypoint1, waypoint4, 80);
+
+    // We don't know how to plan warps yet.
+    expect(planRoute(waypoint1, waypoint3), isNull);
+  });
 
   test('planRoute, fuel constraints', () {
     final systemSymbol = SystemSymbol.fromString('A-B');
