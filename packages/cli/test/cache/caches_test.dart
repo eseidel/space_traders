@@ -17,6 +17,8 @@ class _MockFactionsApi extends Mock implements FactionsApi {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
 
+class _MockGlobalApi extends Mock implements GlobalApi {}
+
 class _MockLogger extends Mock implements Logger {}
 
 void main() {
@@ -99,6 +101,30 @@ void main() {
       ),
     );
 
+    final globalApi = _MockGlobalApi();
+    when(() => api.global).thenReturn(globalApi);
+    final status = GetStatus200Response(
+      announcements: [],
+      version: '1.0.0',
+      resetDate: '2021-01-01',
+      description: '',
+      leaderboards: GetStatus200ResponseLeaderboards(
+        mostCredits: [],
+        mostSubmittedCharts: [],
+      ),
+      serverResets: GetStatus200ResponseServerResets(
+        next: '2021-01-01',
+        frequency: 'daily',
+      ),
+      stats: GetStatus200ResponseStats(
+        systems: 100,
+        waypoints: 100,
+        agents: 100,
+        ships: 100,
+      ),
+      status: 'OK',
+    );
+    when(globalApi.getStatus).thenAnswer((_) => Future.value(status));
     final logger = _MockLogger();
     Never httpGet(f) => throw UnimplementedError();
     final caches = await runWithLogger(
