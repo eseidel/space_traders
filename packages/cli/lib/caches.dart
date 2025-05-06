@@ -9,7 +9,6 @@ import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/compare.dart';
@@ -36,7 +35,6 @@ export 'package:cli/cache/ship_snapshot.dart';
 export 'package:cli/cache/shipyard_listing_snapshot.dart';
 export 'package:cli/cache/shipyard_price_snapshot.dart';
 export 'package:cli/cache/static_cache.dart';
-export 'package:cli/cache/systems_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/route.dart';
@@ -122,7 +120,7 @@ class Caches {
     await loadExports(db, api.data);
 
     final static = StaticCaches(db);
-    final systems = await db.systems.snapshot();
+    final systems = await db.snapshotAllSystems();
     final charting = ChartingCache(db);
     final construction = ConstructionCache(db);
     final waypoints = WaypointCache(api, db);
@@ -168,7 +166,7 @@ class Caches {
     if (systems.systemsCount < galaxy.systemCount ||
         systems.waypointsCount < galaxy.waypointCount) {
       logger.info('Systems Snapshot is incomplete, reloading.');
-      systems = await db.systems.snapshot();
+      systems = await db.snapshotAllSystems();
     }
 
     systemConnectivity.updateFromJumpGates(

@@ -8,7 +8,7 @@ import 'package:collection/collection.dart';
 Future<void> command(Database db, ArgResults argResults) async {
   // First need to figure out which systems are worth checking.
 
-  final systems = await db.systems.snapshot();
+  final systems = await db.snapshotAllSystems();
   final systemConnectivity = await loadSystemConnectivity(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final agentCache = await AgentCache.load(db);

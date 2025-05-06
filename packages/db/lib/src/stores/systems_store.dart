@@ -1,14 +1,5 @@
-import 'package:cli/logger.dart';
-import 'package:collection/collection.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
-
-/// Extension to add a [systems] getter to the [Database] class.
-// This should just be on Database.
-extension SystemsStoreAccessor on Database {
-  /// Get the [SystemsStore] for the database.
-  SystemsStore get systems => SystemsStore(this);
-}
 
 /// Class for reading/writing systems and waypoints to the database.
 // TODO(eseidel): Move this down into the db package.
@@ -20,34 +11,9 @@ class SystemsStore {
 
   final Database _db;
 
-  /// Create a new [SystemsSnapshot] from all the data in the database.
-  Future<SystemsSnapshot> snapshot() async {
-    final systemRecords = await _db.allSystemRecords();
-    final waypoints = await _db.allSystemWaypoints();
-    final grouped = waypoints.groupListsBy((w) => w.system);
-    final systems =
-        systemRecords.map((r) {
-          final waypoints = grouped[r.symbol] ?? [];
-          if (waypoints.length != r.waypointSymbols.length) {
-            logger.warn('Waypoints length mismatch for system ${r.symbol}');
-          }
-          return System.fromRecord(r, waypoints);
-        }).toList();
-    return SystemsSnapshot(systems);
-  }
-
-  /// Upsert a [System] into the database.
-  Future<void> upsertSystem(System system) async {
-    // We could do this in a transaction, but for now not bothering.
-    await _db.upsertSystemRecord(system.toSystemRecord());
-    for (final waypoint in system.waypoints) {
-      await _db.upsertSystemWaypoint(waypoint);
-    }
-  }
-
   /// Return the [SystemRecord] for the given [symbol].
   Future<SystemRecord?> systemRecordBySymbol(SystemSymbol symbol) async =>
-      await _db.systemRecordBySymbol(symbol);
+      _db.systemRecordBySymbol(symbol);
 
   /// Return the jump gate waypoint for the given [symbol].
   // Systems currently only have one jumpgate, but if that ever
@@ -71,7 +37,7 @@ class SystemsStore {
 
   /// Fetch the waypoint with the given symbol, or null if it does not exist.
   Future<SystemWaypoint?> waypointOrNull(WaypointSymbol waypointSymbol) async {
-    return await _db.systemWaypointBySymbol(waypointSymbol);
+    return _db.systemWaypointBySymbol(waypointSymbol);
   }
 
   /// Return the SystemWaypoint for the given [symbol].
@@ -92,6 +58,6 @@ class SystemsStore {
   Future<Iterable<SystemWaypoint>> waypointsInSystem(
     SystemSymbol systemSymbol,
   ) async {
-    return await _db.systemWaypointsBySystemSymbol(systemSymbol);
+    return _db.systemWaypointsBySystemSymbol(systemSymbol);
   }
 }

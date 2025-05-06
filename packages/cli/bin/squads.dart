@@ -1,7 +1,6 @@
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/plan/ships.dart';
@@ -13,7 +12,7 @@ String describeJob(ExtractionJob job) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final systems = await db.systems.snapshot();
+  final systems = await db.snapshotAllSystems();
   final charting = ChartingCache(db);
   final ships = await ShipSnapshot.load(db);
   final shipyardShips = await ShipyardShipCache(db).snapshot();

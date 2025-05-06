@@ -686,7 +686,7 @@ class CentralCommand {
         assignProbesToSystems(caches.systemConnectivity, marketListings, ships),
       );
 
-    final systems = await db.systems.snapshot();
+    final systems = await db.snapshotAllSystems();
     if (config.enableMining) {
       miningSquads = await assignShipsToSquads(
         db,

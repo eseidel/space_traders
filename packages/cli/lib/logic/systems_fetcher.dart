@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/systems_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/queries.dart';
 import 'package:db/db.dart';
@@ -39,7 +38,7 @@ class SystemsFetcher {
     const logEvery = 1000;
     var i = 0;
     await allSystems(_api).forEach((system) {
-      _db.systems.upsertSystem(system);
+      _db.upsertSystem(system);
       if (i % logEvery == 0) {
         logger.info('Fetched $i systems');
       }

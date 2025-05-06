@@ -3,7 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/plan/trading.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final systemsCache = await db.systems.snapshot();
+  final systemsCache = await db.snapshotAllSystems();
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,

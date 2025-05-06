@@ -4,7 +4,7 @@ import 'package:cli/plan/trading.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
-  final systemsCache = await db.systems.snapshot();
+  final systemsCache = await db.snapshotAllSystems();
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,

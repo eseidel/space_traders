@@ -53,7 +53,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   );
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final systemsSnapshot = await db.systems.snapshot();
+  final systemsSnapshot = await db.snapshotAllSystems();
   final charts = await ChartingSnapshot.load(db);
 
   final connectedSystems =

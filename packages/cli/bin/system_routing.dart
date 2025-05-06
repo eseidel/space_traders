@@ -9,7 +9,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   // For each waypoint, print the time to reach said waypoint for a given
   // ship class.
 
-  final systems = await db.systems.snapshot();
+  final systems = await db.snapshotAllSystems();
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);

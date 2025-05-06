@@ -9,25 +9,28 @@ Query allSystemWaypointsQuery() => const Query('''
 /// Query to upsert a system waypoint into the database.
 Query upsertSystemWaypointQuery(SystemWaypoint waypoint) => Query(
   '''
-      INSERT INTO system_waypoint_ (symbol, type, position, system)
+      INSERT INTO system_waypoint_ (symbol, type, x, y, system)
       VALUES (@symbol, @type, @x, @y, @system)
       ON CONFLICT (symbol) DO UPDATE SET
       type = @type, x = @x, y = @y, system = @system
       ''',
   parameters: {
-    'symbol': waypoint.symbol,
-    'type': waypoint.type,
+    'symbol': waypoint.symbol.waypoint,
+    'type': waypoint.type.value,
     'x': waypoint.position.x,
     'y': waypoint.position.y,
-    'system': waypoint.system,
+    'system': waypoint.system.system,
   },
 );
 
 /// Query to return all system waypoints for a given system.
-Query systemWaypointsBySystemQuery(SystemSymbol system) => const Query('''
+Query systemWaypointsBySystemQuery(SystemSymbol system) => Query(
+  '''
       SELECT * FROM system_waypoint_
       WHERE system = @system
-      ''');
+      ''',
+  parameters: {'system': system.system},
+);
 
 /// Query to return all system waypoints for a given system.
 Query systemWaypointsBySystemAndTypeQuery(
@@ -42,10 +45,13 @@ Query systemWaypointsBySystemAndTypeQuery(
 );
 
 /// Lookup a SystemWaypoint by symbol.
-Query systemWaypointBySymbolQuery(WaypointSymbol symbol) => const Query('''
+Query systemWaypointBySymbolQuery(WaypointSymbol symbol) => Query(
+  '''
       SELECT * FROM system_waypoint_  
       WHERE symbol = @symbol
-      ''');
+      ''',
+  parameters: {'symbol': symbol.waypoint},
+);
 
 /// Create a SystemWaypoint from a column map.
 SystemWaypoint systemWaypointFromColumnMap(Map<String, dynamic> columnMap) {

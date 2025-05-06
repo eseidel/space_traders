@@ -1,8 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:db/config.dart';
 import 'package:db/migrations.dart';
 import 'package:db/src/queries.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
+import 'package:db/src/stores/systems_store.dart';
 import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
@@ -202,6 +204,9 @@ class Database {
       }
     });
   }
+
+  /// Get the systems store.
+  SystemsStore get systems => SystemsStore(this);
 
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
@@ -954,5 +959,31 @@ class Database {
   ) async {
     final query = systemWaypointsBySystemAndTypeQuery(symbol, type);
     return queryMany(query, systemWaypointFromColumnMap);
+  }
+
+  /// Create a new [SystemsSnapshot] from all the data in the database.
+  Future<SystemsSnapshot> snapshotAllSystems() async {
+    final systemRecords = await allSystemRecords();
+    final waypoints = await allSystemWaypoints();
+    final grouped = waypoints.groupListsBy((w) => w.system);
+    final systems =
+        systemRecords.map((r) {
+          final waypoints = grouped[r.symbol] ?? [];
+          // TODO(eseidel): Log once we have a logger.
+          // if (waypoints.length != r.waypointSymbols.length) {
+          //   logger.warn('Waypoints length mismatch for system ${r.symbol}');
+          // }
+          return System.fromRecord(r, waypoints);
+        }).toList();
+    return SystemsSnapshot(systems);
+  }
+
+  /// Upsert a [System] into the database.
+  Future<void> upsertSystem(System system) async {
+    // We could do this in a transaction, but for now not bothering.
+    await upsertSystemRecord(system.toSystemRecord());
+    for (final waypoint in system.waypoints) {
+      await upsertSystemWaypoint(waypoint);
+    }
   }
 }

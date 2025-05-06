@@ -11,7 +11,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
-  final systemsCache = await db.systems.snapshot();
+  final systemsCache = await db.snapshotAllSystems();
   final jumpGateSymbol =
       systemsCache
           .waypointsInSystem(startSystemSymbol)

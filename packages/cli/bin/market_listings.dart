@@ -61,7 +61,7 @@ void addSymbols(
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final systemsCache = await db.systems.snapshot();
+  final systemsCache = await db.snapshotAllSystems();
   final hqSystem = await myHqSystemSymbol(db);
   final marketListings = await MarketListingSnapshot.load(db);
 
