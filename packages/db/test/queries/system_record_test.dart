@@ -89,6 +89,16 @@ void main() {
         await db.systems.waypointType(systems[0].waypoints[0].symbol),
         WaypointType.PLANET,
       );
+
+      final snapshot = await db.systems.snapshotAllSystems();
+      expect(snapshot.systems.length, 2);
+      expect(snapshot.systems.map((s) => s.symbol), [
+        systems[0].symbol,
+        systems[1].symbol,
+      ]);
+      // Test System.operator==
+      expect(snapshot.systems.first == systems[0], isTrue);
+      expect(snapshot.systems.first == systems[1], isFalse);
     });
   });
 }
