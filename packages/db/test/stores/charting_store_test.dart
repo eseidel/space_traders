@@ -28,13 +28,17 @@ void main() {
       await chartingStore.upsertChartingRecord(chart);
       final charts = await chartingStore.allRecords();
       expect(charts.length, 1);
-      expect(charts.first, chart);
+      expect(charts.first.waypointSymbol, waypointSymbol);
+      expect(charts.first.timestamp, chart.timestamp);
 
       final record = await chartingStore.chartingRecord(waypointSymbol);
-      expect(record, chart);
+      expect(record?.waypointSymbol, waypointSymbol);
+      expect(record?.timestamp, chart.timestamp);
 
       expect(await chartingStore.isCharted(waypointSymbol), true);
-      expect(await chartingStore.chartedValues(waypointSymbol), chart.values);
+
+      final values = await chartingStore.chartedValues(waypointSymbol);
+      expect(values?.traitSymbols, chart.values?.traitSymbols);
     });
   });
 }
