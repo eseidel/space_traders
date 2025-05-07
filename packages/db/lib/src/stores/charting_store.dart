@@ -10,9 +10,6 @@ class ChartingStore {
 
   final Database _db;
 
-  /// Allow WaypointCache to use this database.
-  Database get db => _db;
-
   /// Return all charting records.
   Future<Iterable<ChartingRecord>> allRecords() async =>
       _db.queryMany(allChartingRecordsQuery(), chartingRecordFromColumnMap);

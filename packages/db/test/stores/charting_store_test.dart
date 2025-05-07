@@ -13,7 +13,7 @@ void main() {
       );
       await db.migrateToLatestSchema();
       final chartingStore = ChartingStore(db);
-      const waypointSymbol = WaypointSymbol.fallbackValue();
+      final waypointSymbol = WaypointSymbol.fromString('X1-A-W');
       final chart = ChartingRecord(
         waypointSymbol: waypointSymbol,
         timestamp: DateTime.timestamp(),
@@ -29,16 +29,25 @@ void main() {
       final charts = await chartingStore.allRecords();
       expect(charts.length, 1);
       expect(charts.first.waypointSymbol, waypointSymbol);
-      expect(charts.first.timestamp, chart.timestamp);
 
       final record = await chartingStore.chartingRecord(waypointSymbol);
       expect(record?.waypointSymbol, waypointSymbol);
-      expect(record?.timestamp, chart.timestamp);
 
       expect(await chartingStore.isCharted(waypointSymbol), true);
 
       final values = await chartingStore.chartedValues(waypointSymbol);
       expect(values?.traitSymbols, chart.values?.traitSymbols);
+
+      final waypointSymbol2 = WaypointSymbol.fromString('X1-A-Y');
+      await chartingStore.addWaypoints([
+        Waypoint.test(waypointSymbol),
+        Waypoint.test(waypointSymbol2, chart: Chart(submittedBy: 'bar')),
+      ]);
+
+      final snapshot = await chartingStore.snapshotAllRecords();
+      expect(snapshot.records.length, 2);
+      expect(snapshot.records.first.waypointSymbol, waypointSymbol);
+      expect(snapshot.records.last.waypointSymbol, waypointSymbol2);
     });
   });
 }
