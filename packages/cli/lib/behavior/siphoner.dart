@@ -110,12 +110,13 @@ Future<JobResult> _initSiphonJob(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  final agent = await db.getMyAgent();
   final siphonJob = assertNotNull(
     await centralCommand.siphonJobForShip(
       db,
       caches.systems,
       caches.charting,
-      caches.agent,
+      agent!,
       ship,
     ),
     'Requires a siphon job.',

@@ -43,7 +43,6 @@ Future<Market?> visitLocalMarket(
       await refuelIfNeededAndLog(
         api,
         db,
-        caches.agent,
         market,
         ship,
         medianFuelPurchasePrice: medianFuelPurchasePrice,
@@ -62,7 +61,6 @@ Future<void> visitLocalShipyard(
   Api api,
   WaypointCache waypoints,
   StaticCaches staticCaches,
-  AgentCache agentCache,
   Ship ship,
 ) async {
   final waypointSymbol = ship.waypointSymbol;

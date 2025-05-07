@@ -13,6 +13,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockChartingCache extends Mock implements ChartingCache {}
+
 class _MockDatabase extends Mock implements Database {}
 
 class _MockFleetApi extends Mock implements FleetApi {}
@@ -22,6 +24,8 @@ class _MockLogger extends Mock implements Logger {}
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('advanceSystemWatcher smoke test', () async {
@@ -128,5 +132,28 @@ void main() {
       ),
     );
     expect(waitUntil, isNull);
+  });
+
+  test('waypointSymbolNeedingUpdate smoke test', () async {
+    final db = _MockDatabase();
+    final systems = SystemsSnapshot([]);
+    final charting = _MockChartingCache();
+    final shipSymbol = ShipSymbol.fromString('S-A');
+    final ship = Ship.test(shipSymbol);
+    final waypointCache = _MockWaypointCache();
+    final systemSymbol = SystemSymbol.fromString('S-A');
+    final system = System.test(systemSymbol);
+
+    final symbol = await waypointSymbolNeedingUpdate(
+      db,
+      systems,
+      charting,
+      ship,
+      system,
+      maxAge: const Duration(days: 3),
+      waypointCache: waypointCache,
+      filter: null,
+    );
+    expect(symbol, isNull);
   });
 }

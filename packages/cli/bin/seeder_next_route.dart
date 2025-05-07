@@ -8,7 +8,7 @@ void main(List<String> args) async {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final agentCache = await AgentCache.load(db);
+  final agent = await db.getMyAgent();
   final marketListings = await MarketListingSnapshot.load(db);
 
   final systemsCache = await db.systems.snapshotAllSystems();
@@ -26,7 +26,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final behaviors = await BehaviorSnapshot.load(db);
 
   final route = await routeToNextSystemToSeed(
-    agentCache!,
+    agent!,
     ships,
     behaviors,
     systemsCache,

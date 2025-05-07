@@ -583,7 +583,7 @@ void main() {
     final fleetApi = _MockFleetApi();
     final agent = Agent.test();
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
 
     final transaction = MarketTransaction(
       tradeSymbol: tradeSymbol.value,

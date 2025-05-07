@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:db/db.dart';
@@ -15,7 +14,6 @@ import 'package:types/types.dart';
 Future<PurchaseShip201ResponseData> purchaseShip(
   Database db,
   Api api,
-  AgentCache agentCache,
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
 ) async {
@@ -29,7 +27,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   final data = purchaseResponse!.data;
   // Add the new ship to our cache.
   await db.upsertShip(Ship.fromOpenApi(data.ship));
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  await db.upsertAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
 
@@ -38,14 +36,13 @@ Future<PurchaseShip201ResponseData> purchaseShip(
 Future<ScrapShip200ResponseData> scrapShip(
   Database db,
   Api api,
-  AgentCache agentCache,
   ShipSymbol shipSymbol,
 ) async {
   final scrapResponse = await api.fleet.scrapShip(shipSymbol.symbol);
   final data = scrapResponse!.data;
   // Remove the ship from our cache.
   await db.deleteShip(shipSymbol);
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  await db.upsertAgent(Agent.fromOpenApi(data.agent));
   // Caller records the transaction.
   return data;
 }
@@ -219,7 +216,6 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
 Future<SellCargo201ResponseData> sellCargo(
   Database db,
   Api api,
-  AgentCache agentCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int units,
@@ -232,7 +228,7 @@ Future<SellCargo201ResponseData> sellCargo(
   final data = response!.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  await db.upsertAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
 
@@ -242,7 +238,6 @@ Future<SellCargo201ResponseData> sellCargo(
 Future<SellCargo201ResponseData> purchaseCargo(
   Database db,
   Api api,
-  AgentCache agentCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   int units,
@@ -255,7 +250,7 @@ Future<SellCargo201ResponseData> purchaseCargo(
   final data = response!.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  await db.upsertAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
 
@@ -265,7 +260,6 @@ Future<SellCargo201ResponseData> purchaseCargo(
 Future<RefuelShip200ResponseData> refuelShip(
   Database db,
   Api api,
-  AgentCache agentCache,
   Ship ship, {
   bool fromCargo = false,
 }) async {
@@ -278,7 +272,7 @@ Future<RefuelShip200ResponseData> refuelShip(
     refuelShipRequest: request,
   );
   final data = responseWrapper!.data;
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  await db.upsertAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;
   await db.upsertShip(ship);
   return data;

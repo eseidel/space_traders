@@ -384,7 +384,6 @@ Future<JobResult> emptyCargoIfNeeded(
       api,
       db,
       marketPrices,
-      caches.agent,
       currentMarket,
       ship,
       AccountingType.goods,
@@ -519,7 +518,6 @@ Future<JobResult> travelAndSellCargo(
     api,
     db,
     marketPrices,
-    caches.agent,
     currentMarket,
     ship,
     // We don't have a good way to know what type of cargo this is.

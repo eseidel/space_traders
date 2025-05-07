@@ -121,10 +121,10 @@ Future<SystemStats> computeSystemStats({
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
 
-  final agentCache = await AgentCache.load(db);
+  final agent = await db.getMyAgent();
   final stats = await computeSystemStats(
     db: db,
-    startSystemSymbol: agentCache!.headquartersSymbol.system,
+    startSystemSymbol: agent!.headquarters.system,
   );
 
   return Response.json(body: stats.toJson());

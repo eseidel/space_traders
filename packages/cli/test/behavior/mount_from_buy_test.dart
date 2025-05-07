@@ -44,9 +44,9 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final caches = mockCaches();
     final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);

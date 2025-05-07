@@ -4,8 +4,6 @@ import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockAgentsApi extends Mock implements AgentsApi {}
 
 class _MockApi extends Mock implements Api {}
@@ -157,7 +155,8 @@ void main() {
       logger,
       () async => Caches.loadOrFetch(api, db, httpGet: httpGet),
     );
-    expect(caches.agent, isNotNull);
+    expect(caches.galaxy.systemCount, 100);
+    expect(caches.galaxy.waypointCount, 100);
   });
 
   test('updateRoutingCaches', () async {
@@ -165,7 +164,6 @@ void main() {
     final systemsStore = _MockSystemsStore();
     when(() => db.systems).thenReturn(systemsStore);
     final caches = Caches(
-      agent: _MockAgentCache(),
       marketPrices: _MockMarketPrices(),
       systems: SystemsSnapshot([]),
       waypoints: _MockWaypointCache(),
@@ -210,5 +208,23 @@ void main() {
     await caches.updateRoutingCaches(db);
     // If we've already cached the systems, we don't need to snapshot them again
     verifyNever(() => db.systems.snapshotAllSystems());
+  });
+
+  test('fetchAndCacheMyAgent', () async {
+    final db = _MockDatabase();
+    final api = _MockApi();
+    final agentsApi = _MockAgentsApi();
+    when(() => api.agents).thenReturn(agentsApi);
+    final agent = Agent.test();
+    final response = GetMyAgent200Response(data: agent.toOpenApi());
+    when(agentsApi.getMyAgent).thenAnswer((_) async => response);
+    registerFallbackValue(agent);
+    when(() => db.upsertAgent(any())).thenAnswer((_) async => {});
+    await runWithLogger(
+      _MockLogger(),
+      () async => fetchAndCacheMyAgent(db, api),
+    );
+    verify(agentsApi.getMyAgent).called(1);
+    verify(() => db.upsertAgent(agent)).called(1);
   });
 }

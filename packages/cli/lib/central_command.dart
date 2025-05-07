@@ -277,12 +277,12 @@ class CentralCommand {
 
   /// Procurement contracts converted to sell opps.
   Iterable<SellOpp> contractSellOpps(
-    AgentCache agentCache,
+    Agent agent,
     BehaviorSnapshot behaviors,
     ContractSnapshot contractSnapshot,
   ) {
     return sellOppsForContracts(
-      agentCache,
+      agent,
       behaviors,
       contractSnapshot,
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
@@ -311,7 +311,7 @@ class CentralCommand {
 
   /// Find next deal for the given [ship], considering all deals in progress.
   CostedDeal? findNextDealAndLog(
-    AgentCache agentCache,
+    Agent agent,
     ContractSnapshot contractSnapshot,
     MarketPriceSnapshot marketPrices,
     SystemsSnapshot systems,
@@ -334,7 +334,7 @@ class CentralCommand {
     }
     if (isContractTradingEnabled) {
       extraSellOpps.addAll(
-        contractSellOpps(agentCache, behaviors, contractSnapshot),
+        contractSellOpps(agent, behaviors, contractSnapshot),
       );
     }
     if (extraSellOpps.isNotEmpty) {
@@ -577,16 +577,16 @@ class CentralCommand {
   /// Returns the active construction job, if any.
   Future<Construction?> computeActiveConstruction(
     Database db,
-    AgentCache agentCache,
+    Agent agent,
   ) async {
     if (!isConstructionTradingEnabled) {
       return null;
     }
-    if (agentCache.agent.credits < config.constructionMinCredits) {
+    if (agent.credits < config.constructionMinCredits) {
       return null;
     }
 
-    final systemSymbol = agentCache.headquartersSystemSymbol;
+    final systemSymbol = agent.headquarters.system;
     final record = await _constructionForSystem(db, systemSymbol);
     return record?.construction;
   }
@@ -611,6 +611,7 @@ class CentralCommand {
     Database db,
     Api api,
     Caches caches,
+    Agent agent,
     ShipyardListingSnapshot shipyardListings,
     ShipSnapshot ships,
   ) async {
@@ -618,6 +619,7 @@ class CentralCommand {
       db,
       api,
       caches,
+      agent,
       shipyardListings,
       ships,
     );
@@ -663,10 +665,10 @@ class CentralCommand {
     // TODO(eseidel): Add proper routing cache invalidation and remove this.
     await _updateRoutingCachesIfNeeded(db, caches);
 
+    final agent = await db.getMyAgent();
     final ships = await ShipSnapshot.load(db);
     _isGateComplete =
-        await isJumpgateComplete(db, caches.agent.headquartersSystemSymbol) ??
-        false;
+        await isJumpgateComplete(db, agent!.headquarters.system) ?? false;
     final phase = _determineGamePhase(ships, jumpGateComplete: _isGateComplete);
     logger.info('$phase');
     if (phase != config.gamePhase) {
@@ -693,13 +695,20 @@ class CentralCommand {
         systems,
         caches.charting,
         ships,
-        systemSymbol: caches.agent.headquartersSystemSymbol,
+        systemSymbol: agent.headquarters.system,
       );
     } else {
       miningSquads = [];
     }
 
-    await updateBuyShipJobIfNeeded(db, api, caches, shipyardListings, ships);
+    await updateBuyShipJobIfNeeded(
+      db,
+      api,
+      caches,
+      agent,
+      shipyardListings,
+      ships,
+    );
 
     // Mounts are currently only used for mining.
     if (config.enableMining) {
@@ -713,7 +722,7 @@ class CentralCommand {
       );
     }
 
-    activeConstruction = await computeActiveConstruction(db, caches.agent);
+    activeConstruction = await computeActiveConstruction(db, agent);
     subsidizedSellOpps = [];
     if (isConstructionTradingEnabled && activeConstruction != null) {
       subsidizedSellOpps = await computeConstructionMaterialSubsidies(
@@ -785,13 +794,13 @@ class CentralCommand {
   Future<ShipBuyJob?> _unreachableSystemProbe(
     Database db,
     Api api,
-    AgentCache agentCache,
+    Agent agent,
     SystemConnectivity systemConnectivity,
     ShipyardListingSnapshot shipyardListings,
     ShipSnapshot ships,
   ) async {
     // Get our main cluster id.
-    final hqSystemSymbol = agentCache.headquartersSystemSymbol;
+    final hqSystemSymbol = agent.headquarters.system;
     // List all systems with explorers in them.
     final systemsWithExplorers =
         ships.ships
@@ -842,13 +851,14 @@ class CentralCommand {
     Database db,
     Api api,
     Caches caches,
+    Agent agent,
     ShipyardListingSnapshot shipyardListings,
     ShipSnapshot ships,
   ) async {
     final unreachableProbeJob = await _unreachableSystemProbe(
       db,
       api,
-      caches.agent,
+      agent,
       caches.systemConnectivity,
       shipyardListings,
       ships,
@@ -998,7 +1008,7 @@ class CentralCommand {
     Database db,
     SystemsSnapshot systems,
     ChartingCache chartingCache,
-    AgentCache agentCache,
+    Agent agent,
     Ship ship,
   ) async {
     final score =
@@ -1006,7 +1016,7 @@ class CentralCommand {
           db,
           systems,
           chartingCache,
-          agentCache.headquartersSystemSymbol,
+          agent.headquarters.system,
         )).firstOrNull;
     if (score == null) {
       return null;
@@ -1059,13 +1069,13 @@ int _minimumFloatRequired(Contract contract) {
 
 /// Procurement contracts converted to sell opps.
 Iterable<SellOpp> sellOppsForContracts(
-  AgentCache agentCache,
+  Agent agent,
   BehaviorSnapshot behaviors,
   ContractSnapshot contractSnapshot, {
   required int Function(BehaviorSnapshot, Contract, TradeSymbol)
   remainingUnitsNeededForContract,
 }) sync* {
-  for (final contract in affordableContracts(agentCache, contractSnapshot)) {
+  for (final contract in affordableContracts(agent, contractSnapshot)) {
     for (final good in contract.terms.deliver) {
       final unitsNeeded = remainingUnitsNeededForContract(
         behaviors,
@@ -1089,16 +1099,15 @@ Iterable<SellOpp> sellOppsForContracts(
 /// This is a subset of the active contracts that we have enough money to
 /// complete.
 Iterable<Contract> affordableContracts(
-  AgentCache agentCache,
+  Agent agent,
   ContractSnapshot contractsCache,
 ) {
   // We should only use the contract trader when we have enough credits to
   // complete the entire contract.  Otherwise we're just sinking credits into a
   // contract we can't complete yet when we could be using that money for other
   // trading.
-  final credits = agentCache.agent.credits;
   return contractsCache.activeContracts.where(
-    (c) => _minimumFloatRequired(c) <= credits,
+    (c) => _minimumFloatRequired(c) <= agent.credits,
   );
 }
 

@@ -52,10 +52,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systemWatcherStates = await db.behaviorsOfType(Behavior.systemWatcher);
   final systemsCache = db.systems;
   final ships = await ShipSnapshot.load(db);
-  final agentCache = await AgentCache.load(db);
+  final agent = await db.getMyAgent();
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  final hqSystemSymbol = agentCache!.headquartersSystemSymbol;
+  final hqSystemSymbol = agent!.headquarters.system;
 
   logger.info('${plural(systemWatcherStates.length, 'watcher')} assigned:');
   for (final state in systemWatcherStates) {

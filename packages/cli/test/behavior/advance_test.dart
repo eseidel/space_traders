@@ -38,8 +38,6 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
 
     final centralCommand = _MockCentralCommand();
     final logger = _MockLogger();
@@ -56,6 +54,9 @@ void main() {
     registerFallbackValue(BehaviorState.fallbackValue());
     when(() => db.upsertBehavior(any())).thenAnswer((_) async => {});
     when(() => db.deleteBehavior(shipSymbol)).thenAnswer((_) async => {});
+
+    final agent = Agent.test();
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     final waitUntil = await runWithLogger(
       logger,
@@ -80,8 +81,6 @@ void main() {
     final shipNav = _MockShipNav();
     final shipNavRoute = _MockShipNavRoute();
     final caches = mockCaches();
-    final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
 
     final now = DateTime(2021);
     final arrivalTime = now.add(const Duration(seconds: 1));
@@ -108,6 +107,9 @@ void main() {
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
     when(() => db.upsertBehavior(any())).thenAnswer((_) async => {});
+
+    final agent = Agent.test();
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     final waitUntil = await runWithLogger(
       logger,

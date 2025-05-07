@@ -105,14 +105,7 @@ Future<JobResult> doCharter(
   }
   // We still do market visits even if we've already charted this waypoint.
   await visitLocalMarket(api, db, caches, ship, getNow: getNow);
-  await visitLocalShipyard(
-    db,
-    api,
-    caches.waypoints,
-    caches.static,
-    caches.agent,
-    ship,
-  );
+  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
 
   if (neededChart) {
     // Charter behavior never changes, but it's still the correct thing to

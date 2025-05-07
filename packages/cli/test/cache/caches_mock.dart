@@ -2,8 +2,6 @@ import 'package:cli/caches.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:types/types.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockChartingCache extends Mock implements ChartingCache {}
 
 class _MockConstructionCache extends Mock implements ConstructionCache {}
@@ -81,7 +79,6 @@ Caches mockCaches() {
     events: events,
   );
   return Caches(
-    agent: _MockAgentCache(),
     marketPrices: _MockMarketPrices(),
     systems: _MockSystemsSnapshot(),
     waypoints: _MockWaypointCache(),

@@ -120,8 +120,7 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
     final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
-    when(() => caches.agent.updateAgent(agent)).thenAnswer((_) async {});
+    when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
     const shipSymbol = ShipSymbol('S', 1);
     // We use a real Ship to allow setting/reading from cooldown.
     final registration = _MockShipRegistration();

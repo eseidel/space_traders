@@ -10,8 +10,6 @@ import 'package:types/types.dart';
 
 import '../cache/caches_mock.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockBehaviorTimeouts extends Mock implements BehaviorTimeouts {}
@@ -27,6 +25,8 @@ class _MockDatabase extends Mock implements Database {}
 class _MockDeal extends Mock implements Deal {}
 
 class _MockLogger extends Mock implements Logger {}
+
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -162,8 +162,6 @@ void main() {
     final ship = _MockShip();
     // TODO(eseidel): Contracts are disabled under 100000 credits.
     final agent = Agent.test(credits: 100000);
-    final db = _MockDatabase();
-    final agentCache = AgentCache(agent, db);
     final shipSymbol = ShipSymbol.fromString('X-A');
     when(() => ship.symbol).thenReturn(shipSymbol);
     // Unless we change Contract.isExpired to take a getNow, we need to use
@@ -216,8 +214,7 @@ void main() {
     final contractSnapshot = ContractSnapshot(contracts);
     final active = contractSnapshot.activeContracts;
     expect(active.length, 2);
-    final affordable =
-        affordableContracts(agentCache, contractSnapshot).toList();
+    final affordable = affordableContracts(agent, contractSnapshot).toList();
     expect(affordable.length, 1);
     expect(affordable.first.id, '2');
   });
@@ -523,9 +520,6 @@ void main() {
     final api = _MockApi();
     final hqSymbol = WaypointSymbol.fromString('W-A-Y');
     final hqSystemSymbol = hqSymbol.system;
-    when(
-      () => caches.agent.headquartersSystemSymbol,
-    ).thenReturn(hqSystemSymbol);
     when(() => caches.systems.waypointsInSystem(hqSystemSymbol)).thenReturn([]);
     registerFallbackValue(ShipType.ORE_HOUND);
     when(() => caches.marketPrices.prices).thenReturn([]);
@@ -533,15 +527,14 @@ void main() {
     when(
       () => db.knowOfMarketWhichTrades(any()),
     ).thenAnswer((_) async => false);
-    when(() => caches.agent.agent).thenReturn(
-      Agent(
-        symbol: shipSymbol.agentName,
-        headquarters: hqSymbol,
-        credits: 100000,
-        shipCount: 1,
-        startingFaction: faction,
-      ),
+    final agent = Agent.test(
+      symbol: shipSymbol.agentName,
+      headquarters: hqSymbol,
+      credits: 100000,
+      startingFaction: faction,
     );
+    registerFallbackValue(agent);
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     when(caches.construction.allRecords).thenAnswer((_) async => []);
     when(db.allMarketListings).thenAnswer((_) async => []);
@@ -625,9 +618,7 @@ void main() {
     );
     when(() => contractSnapshot.activeContracts).thenReturn([contract]);
 
-    final agentCache = _MockAgentCache();
     final agent = Agent.test(credits: 100000);
-    when(() => agentCache.agent).thenReturn(agent);
 
     int remainingUnitsNeededForContract(
       BehaviorSnapshot behaviors,
@@ -639,7 +630,7 @@ void main() {
 
     final behaviors = BehaviorSnapshot([]);
     final sellOpps = sellOppsForContracts(
-      agentCache,
+      agent,
       behaviors,
       contractSnapshot,
       remainingUnitsNeededForContract: remainingUnitsNeededForContract,
@@ -649,7 +640,7 @@ void main() {
     final centralCommand = CentralCommand();
     expect(
       centralCommand
-          .contractSellOpps(agentCache, behaviors, contractSnapshot)
+          .contractSellOpps(agent, behaviors, contractSnapshot)
           .toList()
           .length,
       1,
@@ -783,5 +774,37 @@ void main() {
       ),
       ShipType.ORE_HOUND,
     );
+  });
+
+  test('findNextDealAndLog smoke test', () async {
+    final centralCommand = CentralCommand();
+    final agent = Agent.test();
+    final contractSnapshot = ContractSnapshot([]);
+    final systemConnectivity = _MockSystemConnectivity();
+    final behaviors = BehaviorSnapshot([]);
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    final ship = Ship.test(shipSymbol);
+    final marketPrices = MarketPriceSnapshot([]);
+    final systems = SystemsSnapshot([]);
+    final routePlanner = _MockRoutePlanner();
+
+    final logger = _MockLogger();
+    final deal = await runWithLogger(
+      logger,
+      () async => centralCommand.findNextDealAndLog(
+        agent,
+        contractSnapshot,
+        marketPrices,
+        systems,
+        systemConnectivity,
+        routePlanner,
+        behaviors,
+        ship,
+        maxTotalOutlay: 1000000,
+      ),
+    );
+    // We should fix this test to return a deal.
+    verify(() => logger.detail('No deals within all known markets.')).called(1);
+    expect(deal, isNull);
   });
 }

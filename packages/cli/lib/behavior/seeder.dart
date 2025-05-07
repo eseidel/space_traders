@@ -118,7 +118,7 @@ Future<RoutePlan?> _routeToClosestSystemToSeed(
 
 /// Returns the next system symbol to seed.
 Future<RoutePlan?> routeToNextSystemToSeed(
-  AgentCache agentCache,
+  Agent agent,
   ShipSnapshot ships,
   BehaviorSnapshot behaviors,
   SystemsSnapshot systems,
@@ -149,7 +149,7 @@ Future<RoutePlan?> routeToNextSystemToSeed(
     connectivity,
     routePlanner,
     ship,
-    mainClusterSystemSymbol: agentCache.headquartersSystemSymbol,
+    mainClusterSystemSymbol: agent.headquarters.system,
     filter: (SystemSymbol systemSymbol) {
       final clusterId = connectivity.clusterIdForSystem(systemSymbol);
       // If this system doesn't have a cluster id, check our system list.
@@ -173,8 +173,9 @@ Future<JobResult> doSeeder(
   Ship ship, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
+  final agent = await db.getMyAgent();
   // If we're already off the main jump gate network, nothing to do.
-  final hqSystem = caches.agent.headquartersSystemSymbol;
+  final hqSystem = agent!.headquarters.system;
   if (caches.systemConnectivity.existsJumpPathBetween(
     ship.systemSymbol,
     hqSystem,
@@ -200,7 +201,7 @@ Future<JobResult> doSeeder(
   final systems = await db.systems.snapshotAllSystems();
   final route = assertNotNull(
     await routeToNextSystemToSeed(
-      caches.agent,
+      agent,
       ships,
       behaviors,
       systems,
@@ -220,7 +221,6 @@ Future<JobResult> doSeeder(
     await refuelIfNeededAndLog(
       api,
       db,
-      caches.agent,
       maybeMarket,
       ship,
       medianFuelPurchasePrice: 72,
