@@ -156,7 +156,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
       agent.credits,
       accountingType,
     );
-    await db.insertTransaction(transaction);
+    await db.transactions.insert(transaction);
     transactions.add(transaction);
   }
   return transactions;
@@ -213,7 +213,7 @@ Future<Transaction?> purchaseCargoAndLog(
       agent.credits,
       accounting,
     );
-    await db.insertTransaction(transaction);
+    await db.transactions.insert(transaction);
     return transaction;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
@@ -244,7 +244,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
     agent.credits,
     ship.symbol,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return result;
 }
 
@@ -266,7 +266,7 @@ Future<ScrapShip200ResponseData> scrapShipAndLog(
     result.agent.credits,
     ship.symbol,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return result;
 }
 
@@ -399,7 +399,7 @@ Future<RefuelShip200ResponseData?> refuelAndLog(
     agent.credits,
     AccountingType.fuel,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   // Reset flight mode on refueling.
   if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
     shipInfo(ship, 'Resetting flight mode to cruise');
@@ -591,7 +591,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
     agent.credits,
     AccountingType.fuel,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
 
   shipInfo(ship, 'Used Jump Gate to $destinationSystem');
   return response.data;
@@ -645,7 +645,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
     contactTransaction,
     agent.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
 
   return data;
 }
@@ -673,7 +673,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
     data.transaction,
     agent.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return data;
 }
 
@@ -700,7 +700,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     data.transaction,
     agent.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return data;
 }
 

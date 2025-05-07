@@ -32,6 +32,8 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
+class _MockTransactionStore extends Mock implements TransactionStore {}
+
 class _MockWaypointTraitCache extends Mock implements WaypointTraitCache {}
 
 void main() {
@@ -342,8 +344,12 @@ void main() {
       totalPrice: 1000,
       timestamp: DateTime(2021),
     );
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     final market = _MockMarket();
     when(() => market.tradeGoods).thenReturn([]);
 
@@ -616,7 +622,11 @@ void main() {
         ),
       ),
     );
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
 
     final shipCargo = ShipCargo(
       capacity: 10,
@@ -847,7 +857,10 @@ void main() {
       ),
     );
 
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
@@ -917,8 +930,10 @@ void main() {
       ),
     );
 
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {

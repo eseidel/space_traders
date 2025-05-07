@@ -16,7 +16,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final oneDayAgoAsHour = snapToHour(
     DateTime.timestamp().subtract(const Duration(hours: 24)),
   );
-  final transactions = await db.transactionsAfter(oneDayAgoAsHour);
+  final transactions = await db.transactions.after(oneDayAgoAsHour);
   final firstTransactionHour = snapToHour(transactions.first.timestamp);
 
   const timeWidth = 5;

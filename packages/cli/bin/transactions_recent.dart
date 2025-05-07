@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final lookback = Duration(minutes: lookbackMinutes);
 
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = (await db.transactionsAfter(
+  final transactions = (await db.transactions.after(
     startTime,
   )).where((t) => t.shipSymbol == shipSymbol);
   for (final transaction in transactions) {

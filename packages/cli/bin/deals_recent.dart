@@ -106,7 +106,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final openDeals = <ShipSymbol, List<Transaction>>{};
   final ignoredTransactions = <Transaction>[];
   final supportedTypes = {AccountingType.fuel, AccountingType.goods};
-  final transactions = await db.allTransactions();
+  final transactions = await db.transactions.all();
 
   void recordDeal(List<Transaction> openDeal) {
     final deal = SyntheticDeal(openDeal);

@@ -13,36 +13,38 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
-class _MockFleetApi extends Mock implements FleetApi {}
-
-class _MockShipReactor extends Mock implements ShipReactor {}
-
-class _MockShipEngine extends Mock implements ShipEngine {}
-
-class _MockShipRegistration extends Mock implements ShipRegistration {}
-
-class _MockShipFrame extends Mock implements ShipFrame {}
-
-class _MockShipCrew extends Mock implements ShipCrew {}
-
-class _MockShipCargo extends Mock implements ShipCargo {}
-
-class _MockShipFuel extends Mock implements ShipFuel {}
-
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
 
+class _MockFleetApi extends Mock implements FleetApi {}
+
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketListingSnapshot extends Mock
+    implements MarketListingSnapshot {}
+
 class _MockShip extends Mock implements Ship {}
+
+class _MockShipCargo extends Mock implements ShipCargo {}
+
+class _MockShipCrew extends Mock implements ShipCrew {}
+
+class _MockShipEngine extends Mock implements ShipEngine {}
+
+class _MockShipFrame extends Mock implements ShipFrame {}
+
+class _MockShipFuel extends Mock implements ShipFuel {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
-class _MockMarketListingSnapshot extends Mock
-    implements MarketListingSnapshot {}
+class _MockShipReactor extends Mock implements ShipReactor {}
+
+class _MockShipRegistration extends Mock implements ShipRegistration {}
+
+class _MockTransactionStore extends Mock implements TransactionStore {}
 
 void main() {
   test('continueNavigationIfNeeded changes ship.nav.status', () async {
@@ -216,8 +218,11 @@ void main() {
       ),
     );
 
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     when(() => centralCommand.medianAntimatterPurchasePrice).thenReturn(10000);
 

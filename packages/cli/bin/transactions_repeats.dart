@@ -9,7 +9,7 @@ void printDiffs(List<int> data) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final transactions = await db.allTransactions();
+  final transactions = await db.transactions.all();
   // Walk through all transactions, finding repeats.
   final transactionSets = <List<Transaction>>[];
   var repeats = <Transaction>[];

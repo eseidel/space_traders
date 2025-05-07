@@ -283,7 +283,7 @@ Future<void> _completeContract(
     contactTransaction,
     agent.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   shipInfo(ship, 'Contract complete!');
 }
 
@@ -364,7 +364,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     contactTransaction,
     agent!.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return afterDelivery;
 }
 
@@ -484,7 +484,7 @@ _deliverConstructionMaterialsIfPossible(
     delivery,
     agent!.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return response;
 }
 

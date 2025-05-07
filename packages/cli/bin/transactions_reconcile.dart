@@ -35,7 +35,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final lookback = Duration(minutes: lookbackMinutes);
 
   // final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = await db.allTransactions();
+  final transactions = await db.transactions.all();
   // final transactions = (await db.transactionsAfter(startTime)).toList();
 
   final lastCredits = transactions.last.agentCredits;
