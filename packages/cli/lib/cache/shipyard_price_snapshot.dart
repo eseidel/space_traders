@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:cli/cache/price_snapshot.dart';
 import 'package:cli/cache/shipyard_listing_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
-import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:db/db.dart';
+import 'package:types/config.dart';
 import 'package:types/types.dart';
 
 /// A collection of price records.

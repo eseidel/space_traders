@@ -1,10 +1,6 @@
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-/// The default max age for our caches is 3 days.
-/// This is used as a default argument and must be const.
-const defaultMaxAge = Duration(days: 3);
-
 /// Class to hold our network configuration values.
 class NetworkConfig {
   /// The number of requests per second allowed by the api.

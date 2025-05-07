@@ -1,5 +1,5 @@
 import 'package:cli/cli.dart';
-import 'package:cli/config.dart';
+import 'package:types/config.dart';
 
 /// A snapshot of the charting records.
 class ChartingSnapshot {

@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:cli/cache/price_snapshot.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/config.dart';
+import 'package:types/config.dart';
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
