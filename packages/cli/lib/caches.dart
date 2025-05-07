@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/jump_gate_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
@@ -21,7 +20,6 @@ import 'package:types/types.dart';
 
 export 'package:cli/api.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
-export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/jump_gate_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
@@ -46,7 +44,6 @@ class Caches {
     required this.systems,
     required this.waypoints,
     required this.markets,
-    required this.charting,
     required this.routePlanner,
     required this.factions,
     required this.static,
@@ -78,9 +75,6 @@ class Caches {
   /// The cache of markets.
   final MarketCache markets;
 
-  /// The cache of charting data.
-  final ChartingCache charting;
-
   /// The route planner.
   final RoutePlanner routePlanner;
 
@@ -108,7 +102,6 @@ class Caches {
 
     final static = StaticCaches(db);
     final systems = await db.systems.snapshotAllSystems();
-    final charting = ChartingCache(db);
     final waypoints = WaypointCache(api, db);
     final markets = MarketCache(db, api, static.tradeGoods);
     final jumpGates = await JumpGateSnapshot.load(db);
@@ -134,7 +127,6 @@ class Caches {
       systems: systems,
       waypoints: waypoints,
       markets: markets,
-      charting: charting,
       static: static,
       routePlanner: routePlanner,
       factions: factions,

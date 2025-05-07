@@ -17,7 +17,6 @@ class WaypointCache {
   final Database _db;
   final Api? _api;
 
-  ChartingCache get _chartingCache => ChartingCache(_db);
   WaypointTraitCache get _waypointTraits => WaypointTraitCache(_db);
 
   Future<Waypoint?> _waypointOrNullFromCache(
@@ -76,7 +75,7 @@ class WaypointCache {
   }
 
   Future<void> _addWaypointsToCaches(Api api, List<Waypoint> waypoints) async {
-    await _chartingCache.addWaypoints(waypoints);
+    await _db.charting.addWaypoints(waypoints);
     await _waypointTraits.addAll(waypoints.expand((w) => w.traits));
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?
@@ -95,7 +94,7 @@ class WaypointCache {
     WaypointSymbol waypointSymbol,
   ) async {
     final waypoint = await fetchWaypoint(api, waypointSymbol);
-    await ChartingCache.addWaypoint(db, waypoint);
+    await db.charting.addWaypoint(waypoint);
     return waypoint.chart;
   }
 
@@ -105,7 +104,7 @@ class WaypointCache {
     if (api == null) {
       throw StateError('This api does not work in offline mode.');
     }
-    final values = await _chartingCache.chartedValues(waypointSymbol);
+    final values = await _db.charting.chartedValues(waypointSymbol);
     if (values != null) {
       return values.chart;
     }
@@ -139,7 +138,7 @@ class WaypointCache {
     Duration maxAge = defaultMaxAge,
   }) async {
     final isCharted =
-        await _chartingCache.isCharted(waypointSymbol, maxAge: maxAge) ?? false;
+        await _db.charting.isCharted(waypointSymbol, maxAge: maxAge) ?? false;
     if (isCharted) {
       return true;
     }
@@ -183,7 +182,7 @@ class WaypointCache {
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
   }) async {
-    final record = await _chartingCache.chartingRecord(
+    final record = await _db.charting.chartingRecord(
       waypointSymbol,
       maxAge: maxAge,
     );

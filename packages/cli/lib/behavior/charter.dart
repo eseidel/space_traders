@@ -95,13 +95,7 @@ Future<JobResult> doCharter(
   // Save neededChart to decide if this stop completes the behavior.
   final neededChart = chart == null;
   if (neededChart) {
-    await chartWaypointAndLog(
-      api,
-      db,
-      caches.charting,
-      caches.static.waypointTraits,
-      ship,
-    );
+    await chartWaypointAndLog(api, db, caches.static.waypointTraits, ship);
   }
   // We still do market visits even if we've already charted this waypoint.
   await visitLocalMarket(api, db, caches, ship, getNow: getNow);
@@ -120,7 +114,7 @@ Future<JobResult> doCharter(
   final ships = await ShipSnapshot.load(db);
   // TODO(eseidel): We shouldn't pull all charting data here.
   // Instead we should keep a cache of fully charted systems or something?
-  final charts = await ChartingSnapshot.load(db);
+  final charts = await db.charting.snapshotAllRecords();
   final systems = await db.systems.snapshotAllSystems();
   final destinationSymbol = centralCommand.nextWaypointToChart(
     ships,

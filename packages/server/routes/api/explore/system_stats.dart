@@ -42,7 +42,7 @@ Future<SystemStats> computeSystemStats({
   }
 
   // How many waypoints are charted?
-  final chartingSnapshot = await ChartingSnapshot.load(db);
+  final chartingSnapshot = await db.charting.snapshotAllRecords();
   var chartedWaypoints = 0;
   var chartedAsteroids = 0;
   var chartedJumpGates = 0;

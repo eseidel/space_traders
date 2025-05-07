@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 class _ChartingCounts {
@@ -54,7 +53,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final systemConnectivity = await loadSystemConnectivity(db);
   final systemsSnapshot = await db.systems.snapshotAllSystems();
-  final charts = await ChartingSnapshot.load(db);
+  final charts = await db.charting.snapshotAllRecords();
 
   final connectedSystems =
       systemConnectivity

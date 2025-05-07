@@ -161,7 +161,6 @@ Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
 Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
   Database db,
   SystemsSnapshot systems,
-  ChartingCache chartingCache,
   SystemSymbol systemSymbol,
   bool Function(WaypointType, Set<WaypointTraitSymbol>) sourcePredicate,
   ExtractionType extractionType,
@@ -169,7 +168,7 @@ Future<List<ExtractionScore>> _evaluateWaypointsForExtraction(
   final allWaypoints = systems.waypointsInSystem(systemSymbol);
   final traitsByWaypointSymbol = <WaypointSymbol, Set<WaypointTraitSymbol>>{};
   for (final waypoint in allWaypoints) {
-    final values = await chartingCache.chartedValues(waypoint.symbol);
+    final values = await db.charting.chartedValues(waypoint.symbol);
     traitsByWaypointSymbol[waypoint.symbol] = values?.traitSymbols ?? {};
   }
   final sources = allWaypoints.where((w) {
@@ -226,13 +225,11 @@ bool canBeSiphoned(WaypointType type, Set<WaypointTraitSymbol> traits) {
 Future<List<ExtractionScore>> evaluateWaypointsForMining(
   Database db,
   SystemsSnapshot systems,
-  ChartingCache chartingCache,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
     db,
     systems,
-    chartingCache,
     systemSymbol,
     canBeMined,
     ExtractionType.mine,
@@ -243,13 +240,11 @@ Future<List<ExtractionScore>> evaluateWaypointsForMining(
 Future<List<ExtractionScore>> evaluateWaypointsForSiphoning(
   Database db,
   SystemsSnapshot systems,
-  ChartingCache chartingCache,
   SystemSymbol systemSymbol,
 ) async {
   return _evaluateWaypointsForExtraction(
     db,
     systems,
-    chartingCache,
     systemSymbol,
     canBeSiphoned,
     ExtractionType.siphon,

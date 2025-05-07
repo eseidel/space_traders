@@ -57,13 +57,7 @@ void main() {
     when(db.getMyAgent).thenAnswer((_) async => agent);
 
     when(
-      () => centralCommand.siphonJobForShip(
-        db,
-        caches.systems,
-        caches.charting,
-        any(),
-        ship,
-      ),
+      () => centralCommand.siphonJobForShip(db, caches.systems, any(), ship),
     ).thenAnswer(
       (_) => Future.value(
         ExtractionJob(

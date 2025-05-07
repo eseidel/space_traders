@@ -308,13 +308,13 @@ class Waypoint {
     WaypointPosition? position,
     this.type = WaypointType.ASTEROID,
     this.traits = const [],
+    this.chart,
   }) : position = position ?? WaypointPosition(0, 0, symbol.system),
        isUnderConstruction = false,
        orbitals = const [],
        orbits = null,
        faction = null,
-       modifiers = const [],
-       chart = null;
+       modifiers = const [];
 
   /// Create a new [Waypoint] from JSON.
   factory Waypoint.fromJson(Map<String, dynamic> json) {

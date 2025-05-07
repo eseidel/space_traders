@@ -13,6 +13,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockBehaviorTimeouts extends Mock implements BehaviorTimeouts {}
 
+class _MockChartingStore extends Mock implements ChartingStore {}
+
 class _MockContractSnapshot extends Mock implements ContractSnapshot {}
 
 class _MockContractTerms extends Mock implements ContractTerms {}
@@ -539,7 +541,15 @@ void main() {
 
     when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
 
-    when(db.allChartingRecords).thenAnswer((_) async => <ChartingRecord>[]);
+    final chartingStore = _MockChartingStore();
+    when(() => db.charting).thenReturn(chartingStore);
+    when(
+      chartingStore.snapshotAllRecords,
+    ).thenAnswer((_) async => ChartingSnapshot([]));
+    when(
+      () => chartingStore.chartedValues(hqSymbol),
+    ).thenAnswer((_) async => ChartedValues.test());
+
     when(
       () => db.medianMarketPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
@@ -563,9 +573,6 @@ void main() {
     ).thenAnswer((_) async => null);
 
     registerFallbackValue(const WaypointSymbol.fallbackValue());
-    when(
-      () => caches.charting.chartedValues(any()),
-    ).thenAnswer((_) async => null);
 
     final logger = _MockLogger();
     await runWithLogger(

@@ -3,6 +3,7 @@ import 'package:db/migrations.dart';
 import 'package:db/src/queries.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
+import 'package:db/src/stores/charting_store.dart';
 import 'package:db/src/stores/construction_store.dart';
 import 'package:db/src/stores/systems_store.dart';
 import 'package:db/src/stores/transaction_store.dart';
@@ -11,6 +12,7 @@ import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
 
 export 'package:db/config.dart';
+export 'package:db/src/stores/charting_store.dart';
 export 'package:db/src/stores/construction_store.dart';
 export 'package:db/src/stores/systems_store.dart';
 export 'package:db/src/stores/transaction_store.dart';
@@ -223,6 +225,9 @@ class Database {
   /// Get the construction store.
   ConstructionStore get construction => ConstructionStore(this);
 
+  /// Get the charting store.
+  ChartingStore get charting => ChartingStore(this);
+
   /// Get the transaction store.
   TransactionStore get transactions => TransactionStore(this);
 
@@ -334,23 +339,6 @@ class Database {
   /// Insert an extraction into the database.
   Future<void> insertExtraction(ExtractionRecord extraction) async =>
       execute(insertExtractionQuery(extraction));
-
-  /// Return all charting records.
-  Future<Iterable<ChartingRecord>> allChartingRecords() async =>
-      queryMany(allChartingRecordsQuery(), chartingRecordFromColumnMap);
-
-  /// Insert a charting record into the database.
-  Future<void> upsertChartingRecord(ChartingRecord record) async =>
-      execute(upsertChartingRecordQuery(record));
-
-  /// Get a charting record from the database.
-  Future<ChartingRecord?> getChartingRecord(
-    WaypointSymbol waypointSymbol,
-    Duration maxAge,
-  ) => queryOne(
-    getChartingRecordQuery(waypointSymbol, maxAge),
-    chartingRecordFromColumnMap,
-  );
 
   /// Return the next request to be executed.
   Future<RequestRecord?> nextRequest() =>

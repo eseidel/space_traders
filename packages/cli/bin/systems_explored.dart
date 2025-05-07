@@ -13,7 +13,7 @@ String _typeName(SystemType type) {
 Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
-  final chartingSnapshot = await ChartingSnapshot.load(db);
+  final chartingSnapshot = await db.charting.snapshotAllRecords();
   final marketListings = await MarketListingSnapshot.load(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);
 

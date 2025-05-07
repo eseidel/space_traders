@@ -6,6 +6,8 @@ import 'package:types/types.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockChartingStore extends Mock implements ChartingStore {}
+
 class _MockConstructionStore extends Mock implements ConstructionStore {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
@@ -44,21 +46,32 @@ void main() {
 
     registerFallbackValue(waypointSymbol);
     registerFallbackValue(Duration.zero);
-    when(
-      () => db.getChartingRecord(any(), any()),
-    ).thenAnswer((_) async => null);
     registerFallbackValue(waypointSymbol.system);
     when(
       () => systemsStore.waypointsInSystem(any()),
     ).thenAnswer((_) async => [expectedWaypoint.toSystemWaypoint()]);
     registerFallbackValue(ChartingRecord.fallbackValue());
-    when(() => db.upsertChartingRecord(any())).thenAnswer((_) async {});
+
+    final chartingStore = _MockChartingStore();
+    when(() => db.charting).thenReturn(chartingStore);
+    when(() => chartingStore.chartingRecord(any())).thenAnswer(
+      (_) async => ChartingRecord(
+        waypointSymbol: waypointSymbol,
+        values: ChartedValues.test(),
+        timestamp: DateTime.now(),
+      ),
+    );
+    when(() => chartingStore.addWaypoints(any())).thenAnswer((_) async => {});
+
     registerFallbackValue(ConstructionRecord.fallbackValue());
 
     registerFallbackValue(Construction(symbol: 'IRON_ORE', isComplete: false));
     when(
       () => constructionStore.updateConstruction(waypointSymbol, any()),
     ).thenAnswer((_) async => []);
+    when(
+      () => constructionStore.isUnderConstruction(any()),
+    ).thenAnswer((_) async => null);
 
     final waypointCache = WaypointCache(api, db);
     expect(

@@ -5,7 +5,6 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -13,6 +12,8 @@ import 'package:types/types.dart';
 import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
+
+class _MockChartingStore extends Mock implements ChartingStore {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
@@ -128,7 +129,13 @@ void main() {
     final state = BehaviorState(shipSymbol, Behavior.charter);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
-    when(db.allChartingRecords).thenAnswer((_) async => []);
+
+    final chartingStore = _MockChartingStore();
+    when(() => db.charting).thenReturn(chartingStore);
+    when(
+      chartingStore.snapshotAllRecords,
+    ).thenAnswer((_) async => ChartingSnapshot([]));
+
     when(
       systemsStore.snapshotAllSystems,
     ).thenAnswer((_) async => SystemsSnapshot([]));
