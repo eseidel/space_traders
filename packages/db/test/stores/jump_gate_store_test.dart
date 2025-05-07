@@ -13,17 +13,20 @@ void main() async {
       );
       await db.migrateToLatestSchema();
       final jumpGateStore = JumpGateStore(db);
+
+      final symbol = WaypointSymbol.fromString('X-A-A');
+      final connections = {WaypointSymbol.fromString('X-B-B')};
       final jumpGate = JumpGate(
-        waypointSymbol: WaypointSymbol.fromString('X-A-A'),
-        connections: {WaypointSymbol.fromString('X-B-B')},
+        waypointSymbol: symbol,
+        connections: connections,
       );
       await jumpGateStore.upsert(jumpGate);
+
+      final retrieved = await jumpGateStore.get(symbol);
+      expect(retrieved, jumpGate);
+
       final snapshot = await jumpGateStore.snapshotAll();
-      expect(snapshot.waypointCount, 1);
-      expect(
-        snapshot.recordForSymbol(WaypointSymbol.fromString('X-A-A')),
-        jumpGate,
-      );
+      expect(snapshot.recordForSymbol(symbol), jumpGate);
     });
   });
 }
