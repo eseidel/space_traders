@@ -650,6 +650,38 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   return data;
 }
 
+/// Complete [contract] and log.
+Future<AcceptContract200ResponseData> completeContractAndLog(
+  Api api,
+  Database db,
+  Ship ship,
+  Contract contract,
+) async {
+  final response = await api.contracts.fulfillContract(contract.id);
+  final data = response!.data;
+  final agent = Agent.fromOpenApi(data.agent);
+  await db.upsertAgent(agent);
+  await db.upsertContract(
+    Contract.fromOpenApi(data.contract, DateTime.timestamp()),
+  );
+
+  shipInfo(ship, 'Contract complete!');
+
+  final contactTransaction = ContractTransaction.fulfillment(
+    contract: contract,
+    shipSymbol: ship.symbol,
+    waypointSymbol: ship.waypointSymbol,
+    timestamp: DateTime.timestamp(),
+  );
+  final transaction = Transaction.fromContractTransaction(
+    contactTransaction,
+    agent.credits,
+  );
+  await db.transactions.insert(transaction);
+
+  return data;
+}
+
 /// Install a mount on a ship from its cargo.
 Future<InstallMount201ResponseData> installMountAndLog(
   Api api,

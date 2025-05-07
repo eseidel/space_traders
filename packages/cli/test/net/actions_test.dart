@@ -841,7 +841,7 @@ void main() {
         payment: ContractPayment(onAccepted: 100, onFulfilled: 1000),
       ),
     );
-    final agent = Agent.test();
+    final agent = Agent.test(credits: 0);
     when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
@@ -851,7 +851,7 @@ void main() {
         AcceptContract200Response(
           data: AcceptContract200ResponseData(
             contract: contract.toOpenApi(),
-            agent: agent.toOpenApi(),
+            agent: Agent.test(credits: 100).toOpenApi(),
           ),
         ),
       ),
@@ -863,11 +863,73 @@ void main() {
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
       await acceptContractAndLog(api, db, ship, contract);
     });
     verify(() => contractsApi.acceptContract(any())).called(1);
+    verify(
+      () => db.upsertAgent(
+        any(that: isA<Agent>().having((a) => a.credits, 'credits', 100)),
+      ),
+    ).called(1);
+    verify(() => db.upsertContract(any())).called(1);
+  });
+
+  test('completeContractAndLog', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final contractsApi = _MockContractsApi();
+    when(() => api.contracts).thenReturn(contractsApi);
+    final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    final contract = Contract.test(
+      id: 'C-1',
+      terms: ContractTerms(
+        deadline: DateTime(2021),
+        payment: ContractPayment(onAccepted: 100, onFulfilled: 1000),
+      ),
+    );
+    final agent = Agent.test(credits: 0);
+    when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
+
+    final logger = _MockLogger();
+
+    when(() => contractsApi.fulfillContract(any())).thenAnswer(
+      (invocation) => Future.value(
+        FulfillContract200Response(
+          data: AcceptContract200ResponseData(
+            contract: contract.toOpenApi(),
+            agent: Agent.test(credits: 1000).toOpenApi(),
+          ),
+        ),
+      ),
+    );
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+    registerFallbackValue(Contract.fallbackValue());
+    when(() => db.upsertContract(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+
+    await runWithLogger(logger, () async {
+      await completeContractAndLog(api, db, ship, contract);
+    });
+    verify(() => contractsApi.fulfillContract(any())).called(1);
+    verify(
+      () => db.upsertAgent(
+        any(that: isA<Agent>().having((a) => a.credits, 'credits', 1000)),
+      ),
+    ).called(1);
+    verify(() => db.upsertContract(any())).called(1);
   });
 
   test('useJumpGateAndLog', () async {
