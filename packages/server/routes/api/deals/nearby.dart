@@ -49,7 +49,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   centralCommand.activeConstruction = construction;
 
   final exportSnapshot = await TradeExportCache(db).snapshot();
-  final charting = await ChartingSnapshot.load(db);
+  final charting = await db.charting.snapshotAllRecords();
 
   if (construction != null) {
     centralCommand

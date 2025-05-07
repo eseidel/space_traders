@@ -1,18 +1,16 @@
-import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/plan/extraction_score.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockChartingCache extends Mock implements ChartingCache {}
+class _MockChartingStore extends Mock implements ChartingStore {}
 
 class _MockDatabase extends Mock implements Database {}
 
 void main() {
   test('evaluateWaypointsForMining', () async {
     final db = _MockDatabase();
-    final chartingCache = _MockChartingCache();
     final systemSymbol = SystemSymbol.fromString('W-A');
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final source = SystemWaypoint.test(sourceSymbol);
@@ -57,22 +55,25 @@ void main() {
         () => db.marketsWithImportInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [marketB.symbol]);
     }
-    when(() => chartingCache.chartedValues(sourceSymbol)).thenAnswer(
+    final chartingStore = _MockChartingStore();
+    when(() => db.charting).thenReturn(chartingStore);
+
+    when(() => chartingStore.chartedValues(sourceSymbol)).thenAnswer(
       (_) async => ChartedValues.test(
         traitSymbols: const {WaypointTraitSymbol.COMMON_METAL_DEPOSITS},
       ),
     );
     when(
-      () => chartingCache.chartedValues(marketASymbol),
+      () => chartingStore.chartedValues(marketASymbol),
     ).thenAnswer((_) async => ChartedValues.test());
     when(
-      () => chartingCache.chartedValues(marketBSymbol),
+      () => chartingStore.chartedValues(marketBSymbol),
     ).thenAnswer((_) async => ChartedValues.test());
 
     final scores = await evaluateWaypointsForMining(
       db,
       systemsSnapshot,
-      chartingCache,
+
       systemSymbol,
     );
     expect(scores.length, 1);
@@ -84,7 +85,6 @@ void main() {
 
   test('evaluateWaypointsForSiphoning', () async {
     final db = _MockDatabase();
-    final chartingCache = _MockChartingCache();
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
     final source = SystemWaypoint.test(
@@ -109,17 +109,21 @@ void main() {
         () => db.marketsWithImportInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [market.symbol]);
     }
+
+    final chartingStore = _MockChartingStore();
+    when(() => db.charting).thenReturn(chartingStore);
+
     when(
-      () => chartingCache.chartedValues(sourceSymbol),
+      () => chartingStore.chartedValues(sourceSymbol),
     ).thenAnswer((_) async => ChartedValues.test());
     when(
-      () => chartingCache.chartedValues(marketSymbol),
+      () => chartingStore.chartedValues(marketSymbol),
     ).thenAnswer((_) async => ChartedValues.test());
 
     final scores = await evaluateWaypointsForSiphoning(
       db,
       systemsSnapshot,
-      chartingCache,
+
       systemSymbol,
     );
     expect(scores.length, 1);

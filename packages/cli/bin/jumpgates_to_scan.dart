@@ -9,7 +9,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systemsCache = await db.systems.snapshotAllSystems();
   final jumpGateSnapshot = await JumpGateSnapshot.load(db);
   final constructionSnapshot = await db.construction.snapshotAllRecords();
-  final chartingSnapshot = await ChartingSnapshot.load(db);
+  final chartingSnapshot = await db.charting.snapshotAllRecords();
 
   final systems = NonRepeatingDistanceQueue<SystemSymbol>();
   final jumpGates = NonRepeatingDistanceQueue<WaypointSymbol>();

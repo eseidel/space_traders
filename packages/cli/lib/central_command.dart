@@ -678,7 +678,7 @@ class CentralCommand {
 
     final marketListings = await MarketListingSnapshot.load(db);
     final shipyardListings = await ShipyardListingSnapshot.load(db);
-    final charting = await ChartingSnapshot.load(db);
+    final charting = await db.charting.snapshotAllRecords();
 
     await _updateMedianPrices(db);
 
@@ -693,7 +693,6 @@ class CentralCommand {
       miningSquads = await assignShipsToSquads(
         db,
         systems,
-        caches.charting,
         ships,
         systemSymbol: agent.headquarters.system,
       );
@@ -1007,7 +1006,6 @@ class CentralCommand {
   Future<ExtractionJob?> siphonJobForShip(
     Database db,
     SystemsSnapshot systems,
-    ChartingCache chartingCache,
     Agent agent,
     Ship ship,
   ) async {
@@ -1015,7 +1013,6 @@ class CentralCommand {
         (await evaluateWaypointsForSiphoning(
           db,
           systems,
-          chartingCache,
           agent.headquarters.system,
         )).firstOrNull;
     if (score == null) {
@@ -1169,18 +1166,12 @@ ExtractionSquad? findSquadForShip(
 Future<List<ExtractionSquad>> assignShipsToSquads(
   Database db,
   SystemsSnapshot systems,
-  ChartingCache chartingCache,
   ShipSnapshot ships, {
   required SystemSymbol systemSymbol,
 }) async {
   // Look at the top N mining scores.
   final scores =
-      (await evaluateWaypointsForMining(
-            db,
-            systems,
-            chartingCache,
-            systemSymbol,
-          ))
+      (await evaluateWaypointsForMining(db, systems, systemSymbol))
           .where((m) => m.marketsTradeAllProducedGoods)
           .where(
             (m) => m.deliveryDistance < config.maxExtractionDeliveryDistance,

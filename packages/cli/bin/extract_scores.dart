@@ -1,4 +1,3 @@
-import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
@@ -65,20 +64,14 @@ Future<void> command(Database db, ArgResults argResults) async {
   );
 
   final systems = await db.systems.snapshotAllSystems();
-  final charting = ChartingCache(db);
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
 
   final List<ExtractionScore> scores;
   if (isSiphon) {
-    scores = await evaluateWaypointsForSiphoning(
-      db,
-      systems,
-      charting,
-      hqSystem,
-    );
+    scores = await evaluateWaypointsForSiphoning(db, systems, hqSystem);
   } else {
-    scores = await evaluateWaypointsForMining(db, systems, charting, hqSystem);
+    scores = await evaluateWaypointsForMining(db, systems, hqSystem);
   }
 
   final table = Table(

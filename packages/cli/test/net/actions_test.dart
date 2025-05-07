@@ -8,7 +8,7 @@ import 'package:types/types.dart';
 
 class _MockApi extends Mock implements Api {}
 
-class _MockChartingCache extends Mock implements ChartingCache {}
+class _MockChartingStore extends Mock implements ChartingStore {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
@@ -734,7 +734,6 @@ void main() {
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    final chartingCache = _MockChartingCache();
     final waypointTraitCache = _MockWaypointTraitCache();
 
     final waypoint = Waypoint.test(
@@ -758,18 +757,15 @@ void main() {
     registerFallbackValue(waypoint);
 
     registerFallbackValue(ChartingRecord.fallbackValue());
-    when(() => db.upsertChartingRecord(any())).thenAnswer((_) async => {});
     when(() => waypointTraitCache.addAll(any())).thenAnswer((_) async => {});
+
+    final chartingStore = _MockChartingStore();
+    when(() => db.charting).thenReturn(chartingStore);
+    when(() => chartingStore.addWaypoint(any())).thenAnswer((_) async => {});
 
     final logger = _MockLogger();
     await runWithLogger(logger, () async {
-      await chartWaypointAndLog(
-        api,
-        db,
-        chartingCache,
-        waypointTraitCache,
-        ship,
-      );
+      await chartWaypointAndLog(api, db, waypointTraitCache, ship);
     });
 
     // Waypoint already charted exceptions are caught and logged.
@@ -782,13 +778,7 @@ void main() {
           ),
     );
     await runWithLogger(logger, () async {
-      await chartWaypointAndLog(
-        api,
-        db,
-        chartingCache,
-        waypointTraitCache,
-        ship,
-      );
+      await chartWaypointAndLog(api, db, waypointTraitCache, ship);
     });
     verify(
       () => logger.warn('🛸#1  command   A-W was already charted'),
@@ -800,13 +790,7 @@ void main() {
     ).thenAnswer((invocation) => throw ApiException(401, 'other exception'));
     expect(
       () => runWithLogger(logger, () async {
-        await chartWaypointAndLog(
-          api,
-          db,
-          chartingCache,
-          waypointTraitCache,
-          ship,
-        );
+        await chartWaypointAndLog(api, db, waypointTraitCache, ship);
       }),
       throwsA(predicate((e) => e is ApiException)),
     );

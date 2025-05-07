@@ -7,8 +7,6 @@ class _MockAgentsApi extends Mock implements AgentsApi {}
 
 class _MockApi extends Mock implements Api {}
 
-class _MockChartingCache extends Mock implements ChartingCache {}
-
 class _MockConstructionStore extends Mock implements ConstructionStore {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
@@ -181,7 +179,6 @@ void main() {
       systems: SystemsSnapshot([]),
       waypoints: _MockWaypointCache(),
       markets: _MockMarketCache(),
-      charting: _MockChartingCache(),
       routePlanner: _MockRoutePlanner(),
       static: _MockStaticCaches(),
       systemConnectivity: _MockSystemConnectivity(),

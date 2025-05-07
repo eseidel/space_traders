@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/plan/extraction_score.dart';
 
@@ -9,7 +8,7 @@ class _Stats {
 
 Future<void> command(Database db, ArgResults argResults) async {
   final surveys = await db.allSurveys();
-  final chartingSnapshot = await ChartingSnapshot.load(db);
+  final chartingSnapshot = await db.charting.snapshotAllRecords();
   final systems = db.systems;
 
   // For each waypoint, record what tradeSymbols are found there.

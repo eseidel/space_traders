@@ -9,7 +9,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   );
 
   final systemsCache = db.systems;
-  final chartingSnapshot = await ChartingSnapshot.load(db);
+  final chartingSnapshot = await db.charting.snapshotAllRecords();
   final constructionSnapshot = await db.construction.snapshotAllRecords();
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);

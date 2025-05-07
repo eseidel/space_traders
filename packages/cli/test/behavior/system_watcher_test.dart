@@ -13,7 +13,7 @@ class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
-class _MockChartingCache extends Mock implements ChartingCache {}
+class _MockChartingStore extends Mock implements ChartingStore {}
 
 class _MockDatabase extends Mock implements Database {}
 
@@ -115,8 +115,9 @@ void main() {
 
     registerFallbackValue(waypoint);
 
-    registerFallbackValue(ChartingRecord.fallbackValue());
-    when(() => db.upsertChartingRecord(any())).thenAnswer((_) async => {});
+    final chartingStore = _MockChartingStore();
+    when(() => db.charting).thenReturn(chartingStore);
+    when(() => chartingStore.addWaypoint(any())).thenAnswer((_) async => {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -137,7 +138,6 @@ void main() {
   test('waypointSymbolNeedingUpdate smoke test', () async {
     final db = _MockDatabase();
     final systems = SystemsSnapshot([]);
-    final charting = _MockChartingCache();
     final shipSymbol = ShipSymbol.fromString('S-A');
     final ship = Ship.test(shipSymbol);
     final waypointCache = _MockWaypointCache();
@@ -147,7 +147,6 @@ void main() {
     final symbol = await waypointSymbolNeedingUpdate(
       db,
       systems,
-      charting,
       ship,
       system,
       maxAge: const Duration(days: 3),
