@@ -387,7 +387,7 @@ Future<JobResult> _handleConstructionDealAtDelivery(
   final waypointSymbol = costedDeal.deal.destinationSymbol;
 
   final construction = assertNotNull(
-    await caches.construction.getConstruction(waypointSymbol),
+    await db.construction.getConstruction(waypointSymbol),
     'No construction.',
     const Duration(minutes: 10),
   );
@@ -395,7 +395,6 @@ Future<JobResult> _handleConstructionDealAtDelivery(
     await _deliverConstructionMaterialsIfPossible(
       api,
       db,
-      caches.construction,
       ship,
       construction,
       costedDeal.tradeSymbol,
@@ -418,7 +417,6 @@ Future<SupplyConstruction201ResponseData?>
 _deliverConstructionMaterialsIfPossible(
   Api api,
   Database db,
-  ConstructionCache constructionCache,
   Ship ship,
   Construction construction,
   TradeSymbol tradeSymbol, {
@@ -454,7 +452,6 @@ _deliverConstructionMaterialsIfPossible(
     db,
     api,
     ship,
-    constructionCache,
     construction,
     tradeSymbol: tradeSymbol,
     units: unitsToDeliver,

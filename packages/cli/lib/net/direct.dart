@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
@@ -187,7 +186,6 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
   Database db,
   Api api,
   Ship ship,
-  ConstructionCache constructionCache,
   Construction construction, {
   required TradeSymbol tradeSymbol,
   required int units,
@@ -203,7 +201,7 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
     supplyConstructionRequest: request,
   );
   final data = response!.data;
-  await constructionCache.updateConstruction(
+  await db.construction.updateConstruction(
     construction.waypointSymbol,
     data.construction,
   );

@@ -3,12 +3,15 @@ import 'package:db/migrations.dart';
 import 'package:db/src/queries.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
+import 'package:db/src/stores/construction_store.dart';
 import 'package:db/src/stores/systems_store.dart';
 import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
 
 export 'package:db/config.dart';
+export 'package:db/src/stores/construction_store.dart';
+export 'package:db/src/stores/systems_store.dart';
 
 /// Connect to the default local database.
 /// Logs and returns null on failure.
@@ -215,6 +218,9 @@ class Database {
   /// Get the systems store.
   SystemsStore get systems => SystemsStore(this);
 
+  /// Get the construction store.
+  ConstructionStore get construction => ConstructionStore(this);
+
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
     await executeSql('LISTEN $channel');
@@ -328,23 +334,6 @@ class Database {
   /// Insert an extraction into the database.
   Future<void> insertExtraction(ExtractionRecord extraction) async =>
       execute(insertExtractionQuery(extraction));
-
-  /// Get a construction record from the database.
-  Future<ConstructionRecord?> getConstructionRecord(
-    WaypointSymbol waypointSymbol,
-    Duration maxAge,
-  ) => queryOne(
-    getConstructionQuery(waypointSymbol, maxAge),
-    constructionFromColumnMap,
-  );
-
-  /// Return all construction records.
-  Future<Iterable<ConstructionRecord>> allConstructionRecords() async =>
-      queryMany(allConstructionQuery(), constructionFromColumnMap);
-
-  /// Insert a construction record into the database.
-  Future<void> upsertConstruction(ConstructionRecord record) async =>
-      execute(upsertConstructionQuery(record));
 
   /// Return all charting records.
   Future<Iterable<ChartingRecord>> allChartingRecords() async =>
