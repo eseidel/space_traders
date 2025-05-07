@@ -184,7 +184,7 @@ Future<void> cliMain(List<String> args) async {
     exit(0);
   });
 
-  final agent = await loadOrFetchAgent(db, api);
+  final agent = await fetchAndCacheMyAgent(db, api);
   final ships = await ShipSnapshot.load(db);
   logger
     ..info(

@@ -293,11 +293,7 @@ Future<TradeExportSnapshot> loadExports(Database db, DataApi dataApi) async {
 }
 
 /// Creates a new AgentCache from the API.
-Future<Agent> loadOrFetchAgent(Database db, Api api) async {
-  final cached = await db.getMyAgent();
-  if (cached != null) {
-    return cached;
-  }
+Future<Agent> fetchAndCacheMyAgent(Database db, Api api) async {
   final agent = await getMyAgent(api);
   await db.upsertAgent(agent);
   return agent;

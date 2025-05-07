@@ -209,4 +209,22 @@ void main() {
     // If we've already cached the systems, we don't need to snapshot them again
     verifyNever(() => db.systems.snapshotAllSystems());
   });
+
+  test('fetchAndCacheMyAgent', () async {
+    final db = _MockDatabase();
+    final api = _MockApi();
+    final agentsApi = _MockAgentsApi();
+    when(() => api.agents).thenReturn(agentsApi);
+    final agent = Agent.test();
+    final response = GetMyAgent200Response(data: agent.toOpenApi());
+    when(agentsApi.getMyAgent).thenAnswer((_) async => response);
+    registerFallbackValue(agent);
+    when(() => db.upsertAgent(any())).thenAnswer((_) async => {});
+    await runWithLogger(
+      _MockLogger(),
+      () async => fetchAndCacheMyAgent(db, api),
+    );
+    verify(agentsApi.getMyAgent).called(1);
+    verify(() => db.upsertAgent(agent)).called(1);
+  });
 }
