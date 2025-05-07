@@ -253,38 +253,9 @@ Future<JobResult> _handleContractDealAtDestination(
   // If we've delivered enough, complete the contract.
   if (maybeContract != null &&
       maybeContract.goodNeeded(contractGood)!.remainingNeeded <= 0) {
-    await _completeContract(api, db, caches, ship, maybeContract);
+    await completeContractAndLog(api, db, ship, maybeContract);
   }
   return JobResult.complete();
-}
-
-Future<void> _completeContract(
-  Api api,
-  Database db,
-  Caches caches,
-  Ship ship,
-  Contract contract,
-) async {
-  final response = await api.contracts.fulfillContract(contract.id);
-  final data = response!.data;
-  final agent = Agent.fromOpenApi(data.agent);
-  await db.upsertAgent(agent);
-  await db.upsertContract(
-    Contract.fromOpenApi(data.contract, DateTime.timestamp()),
-  );
-
-  final contactTransaction = ContractTransaction.fulfillment(
-    contract: contract,
-    shipSymbol: ship.symbol,
-    waypointSymbol: ship.waypointSymbol,
-    timestamp: DateTime.timestamp(),
-  );
-  final transaction = Transaction.fromContractTransaction(
-    contactTransaction,
-    agent.credits,
-  );
-  await db.insertTransaction(transaction);
-  shipInfo(ship, 'Contract complete!');
 }
 
 Future<Contract?> _deliverContractGoodsIfPossible(
@@ -364,7 +335,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     contactTransaction,
     agent!.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return afterDelivery;
 }
 
@@ -484,7 +455,7 @@ _deliverConstructionMaterialsIfPossible(
     delivery,
     agent!.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return response;
 }
 

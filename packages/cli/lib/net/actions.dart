@@ -156,7 +156,7 @@ Future<List<Transaction>> sellAllCargoAndLog(
       agent.credits,
       accountingType,
     );
-    await db.insertTransaction(transaction);
+    await db.transactions.insert(transaction);
     transactions.add(transaction);
   }
   return transactions;
@@ -213,7 +213,7 @@ Future<Transaction?> purchaseCargoAndLog(
       agent.credits,
       accounting,
     );
-    await db.insertTransaction(transaction);
+    await db.transactions.insert(transaction);
     return transaction;
   } on ApiException catch (e) {
     if (!isInsufficientCreditsException(e)) {
@@ -244,7 +244,7 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
     agent.credits,
     ship.symbol,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return result;
 }
 
@@ -266,7 +266,7 @@ Future<ScrapShip200ResponseData> scrapShipAndLog(
     result.agent.credits,
     ship.symbol,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return result;
 }
 
@@ -399,7 +399,7 @@ Future<RefuelShip200ResponseData?> refuelAndLog(
     agent.credits,
     AccountingType.fuel,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   // Reset flight mode on refueling.
   if (ship.nav.flightMode != ShipNavFlightMode.CRUISE) {
     shipInfo(ship, 'Resetting flight mode to cruise');
@@ -590,7 +590,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
     agent.credits,
     AccountingType.fuel,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
 
   shipInfo(ship, 'Used Jump Gate to $destinationSystem');
   return response.data;
@@ -644,7 +644,39 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
     contactTransaction,
     agent.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
+
+  return data;
+}
+
+/// Complete [contract] and log.
+Future<AcceptContract200ResponseData> completeContractAndLog(
+  Api api,
+  Database db,
+  Ship ship,
+  Contract contract,
+) async {
+  final response = await api.contracts.fulfillContract(contract.id);
+  final data = response!.data;
+  final agent = Agent.fromOpenApi(data.agent);
+  await db.upsertAgent(agent);
+  await db.upsertContract(
+    Contract.fromOpenApi(data.contract, DateTime.timestamp()),
+  );
+
+  shipInfo(ship, 'Contract complete!');
+
+  final contactTransaction = ContractTransaction.fulfillment(
+    contract: contract,
+    shipSymbol: ship.symbol,
+    waypointSymbol: ship.waypointSymbol,
+    timestamp: DateTime.timestamp(),
+  );
+  final transaction = Transaction.fromContractTransaction(
+    contactTransaction,
+    agent.credits,
+  );
+  await db.transactions.insert(transaction);
 
   return data;
 }
@@ -672,7 +704,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
     data.transaction,
     agent.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return data;
 }
 
@@ -699,7 +731,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     data.transaction,
     agent.credits,
   );
-  await db.insertTransaction(transaction);
+  await db.transactions.insert(transaction);
   return data;
 }
 

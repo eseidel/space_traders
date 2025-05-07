@@ -32,6 +32,8 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 class _MockShipyardListingSnapshot extends Mock
     implements ShipyardListingSnapshot {}
 
+class _MockTransactionStore extends Mock implements TransactionStore {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(ShipSpec.fallbackValue());
@@ -218,8 +220,12 @@ void main() {
         ),
       ),
     );
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
 
     when(
       () => caches.routePlanner.planRoute(

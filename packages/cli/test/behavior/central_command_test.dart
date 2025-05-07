@@ -67,9 +67,7 @@ void main() {
     final db = _MockDatabase();
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
-    when(() => db.upsertBehavior(any())).thenAnswer((_) async {
-      return;
-    });
+    when(() => db.upsertBehavior(any())).thenAnswer((_) async {});
     when(() => db.deleteBehavior(any())).thenAnswer((_) async {});
     final behaviors = BehaviorSnapshot([]);
     final ships = ShipSnapshot([]);

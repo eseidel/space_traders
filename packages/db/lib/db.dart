@@ -6,6 +6,7 @@ import 'package:db/src/queue.dart';
 import 'package:db/src/stores/charting_store.dart';
 import 'package:db/src/stores/construction_store.dart';
 import 'package:db/src/stores/systems_store.dart';
+import 'package:db/src/stores/transaction_store.dart';
 import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
@@ -14,6 +15,7 @@ export 'package:db/config.dart';
 export 'package:db/src/stores/charting_store.dart';
 export 'package:db/src/stores/construction_store.dart';
 export 'package:db/src/stores/systems_store.dart';
+export 'package:db/src/stores/transaction_store.dart';
 
 /// Connect to the default local database.
 /// Logs and returns null on failure.
@@ -226,6 +228,9 @@ class Database {
   /// Get the charting store.
   ChartingStore get charting => ChartingStore(this);
 
+  /// Get the transaction store.
+  TransactionStore get transactions => TransactionStore(this);
+
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
     await executeSql('LISTEN $channel');
@@ -286,11 +291,6 @@ class Database {
   Future<int> rowsInTable(String tableName) async {
     final result = await executeSql('SELECT COUNT(*) FROM $tableName');
     return result[0][0]! as int;
-  }
-
-  /// Insert a transaction into the database.
-  Future<void> insertTransaction(Transaction transaction) async {
-    await execute(insertTransactionQuery(transaction));
   }
 
   /// Insert a survey into the database.
@@ -493,62 +493,6 @@ class Database {
   /// Update the given shipyard listing in the database.
   Future<void> upsertShipyardListing(ShipyardListing listing) async {
     await execute(upsertShipyardListingQuery(listing));
-  }
-
-  /// Get unique ship symbols from the transaction table.
-  Future<Set<ShipSymbol>> uniqueShipSymbolsInTransactions() async {
-    final result = await executeSql(
-      'SELECT DISTINCT ship_symbol FROM transaction_',
-    );
-    return result.map((r) => ShipSymbol.fromString(r.first! as String)).toSet();
-  }
-
-  /// Get all transactions from the database.
-  /// Currently returns in timestamp order, but that may not always be the case.
-  Future<Iterable<Transaction>> allTransactions() async {
-    final result = await executeSql(
-      'SELECT * FROM transaction_ ORDER BY timestamp',
-    );
-    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
-  }
-
-  /// Get all transactions matching accountingType from the database.
-  Future<Iterable<Transaction>> transactionsWithAccountingType(
-    AccountingType accountingType,
-  ) async {
-    final result = await execute(
-      Query(
-        'SELECT * FROM transaction_ WHERE '
-        'accounting = @accounting',
-        parameters: {'accounting': accountingType.name},
-      ),
-    );
-    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
-  }
-
-  /// Get transactions after a given timestamp.
-  /// Returned in ascending timestamp order.
-  Future<Iterable<Transaction>> transactionsAfter(DateTime timestamp) async {
-    final result = await execute(
-      Query(
-        'SELECT * FROM transaction_ WHERE timestamp > @timestamp '
-        'ORDER BY timestamp',
-        parameters: {'timestamp': timestamp},
-      ),
-    );
-    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
-  }
-
-  /// Get the N most recent transactions.
-  /// Returned in descending timestamp order.
-  Future<Iterable<Transaction>> recentTransactions({required int count}) async {
-    final result = await execute(
-      Query(
-        'SELECT * FROM transaction_ ORDER BY timestamp DESC LIMIT @count',
-        parameters: {'count': count},
-      ),
-    );
-    return result.map((r) => r.toColumnMap()).map(transactionFromColumnMap);
   }
 
   /// Get all market prices from the database.
