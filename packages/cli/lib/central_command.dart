@@ -630,7 +630,7 @@ class CentralCommand {
     // A hack to advance the global config to the construction phase.
     if (jumpGateComplete) {
       return GamePhase.exploration;
-    } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 10) {
+    } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 2) {
       return GamePhase.construction;
     }
     return GamePhase.bootstrap;
