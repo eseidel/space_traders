@@ -192,6 +192,9 @@ Future<Transaction?> purchaseCargoAndLog(
   required int amountToBuy,
   required int? medianPrice,
 }) async {
+  if (amountToBuy <= 0) {
+    throw ArgumentError('amountToBuy must be greater than 0');
+  }
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
   try {
     final data = await purchaseCargo(db, api, ship, tradeSymbol, amountToBuy);
@@ -383,6 +386,19 @@ Future<RefuelShip200ResponseData?> refuelAndLog(
   required int? medianFuelPurchasePrice,
   bool fromCargo = false,
 }) async {
+  // These should be exceptions rather than just logs.
+  if (fromCargo) {
+    if (ship.cargo.countUnits(TradeSymbol.FUEL) <= 0) {
+      shipWarn(ship, 'No fuel in cargo, not refueling.');
+      return null;
+    }
+  } else {
+    if (ship.isFuelFull) {
+      shipWarn(ship, 'Fuel tank is full, not refueling.');
+      return null;
+    }
+  }
+
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   final data = await refuelShip(db, api, ship, fromCargo: fromCargo);
   final marketTransaction = data.transaction;

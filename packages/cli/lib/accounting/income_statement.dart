@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cli/logger.dart';
 import 'package:types/types.dart';
 
 class _IncomeStatementBuilderResults {
@@ -227,8 +228,19 @@ class _IncomeStatementBuilder {
         transactions.toList()
           ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
     final builder = _IncomeStatementBuilder();
+    final badTransactions = <BadTransaction>[];
     for (final transaction in sorted) {
-      builder.processTransaction(transaction);
+      try {
+        builder.processTransaction(transaction);
+      } on BadTransaction catch (e) {
+        badTransactions.add(e);
+      }
+    }
+    if (badTransactions.isNotEmpty) {
+      logger.err('Bad transactions:');
+      for (final t in badTransactions) {
+        logger.err(t.toString());
+      }
     }
     final r = builder.results;
     return IncomeStatement(

@@ -48,7 +48,8 @@ Future<JobResult> goWaitForGoods(
     final fuelToBuy = (ship.frame.fuelCapacity / 100).ceil();
     if (!mineSellsFuel &&
         currentSellsFuel &&
-        ship.cargo.availableSpace >= fuelToBuy) {
+        ship.cargo.availableSpace >= fuelToBuy &&
+        fuelToBuy > 0) {
       logger.warn('BUYING FUEL CARGO FOR LATER USE');
       await dockIfNeeded(db, api, ship);
       await purchaseCargoAndLog(
