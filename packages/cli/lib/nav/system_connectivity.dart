@@ -1,4 +1,3 @@
-import 'package:cli/cache/jump_gate_snapshot.dart';
 import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
@@ -100,7 +99,7 @@ bool canJumpFrom(
   ConstructionSnapshot constructionSnapshot,
   WaypointSymbol from,
 ) {
-  final record = jumpGates.recordForSymbol(from);
+  final record = jumpGates.forSymbol(from);
   // If we don't know about the fromGate, we can't jump.
   if (record == null) {
     return false;

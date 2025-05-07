@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final startSystemSymbol = await myHqSystemSymbol(db);
 
-  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
+  final jumpGateSnapshot = await db.jumpGates.snapshotAll();
   final systemConnectivity = SystemConnectivity.fromJumpGates(
     jumpGateSnapshot,
     await db.construction.snapshotAllRecords(),

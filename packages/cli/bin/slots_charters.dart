@@ -10,7 +10,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   // Maybe walk all jumpgate connections and list ones where the "to" side has
   // no chart?
 
-  final jumpGates = await JumpGateSnapshot.load(db);
+  final jumpGates = await db.jumpGates.snapshotAll();
   final charts = await db.charting.snapshotAllRecords();
   final construction = await db.construction.snapshotAllRecords();
   final ships = await ShipSnapshot.load(db);

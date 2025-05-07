@@ -23,6 +23,8 @@ class _MockGlobalApi extends Mock implements GlobalApi {}
 
 class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
 
+class _MockJumpGateStore extends Mock implements JumpGateStore {}
+
 class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
@@ -34,6 +36,8 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 class _MockStaticCaches extends Mock implements StaticCaches {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
+
+class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockSystemsStore extends Mock implements SystemsStore {}
 
@@ -107,11 +111,16 @@ void main() {
       constructionStore.allRecords,
     ).thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
+    final jumpGateStore = _MockJumpGateStore();
+    when(() => db.jumpGates).thenReturn(jumpGateStore);
+    when(
+      jumpGateStore.snapshotAll,
+    ).thenAnswer((_) async => JumpGateSnapshot([]));
+
     when(db.allMarketListings).thenAnswer((_) async => []);
     when(db.allMarketPrices).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);
-    when(db.allJumpGates).thenAnswer((_) async => []);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(
       systemsStore.snapshotAllSystems,
@@ -232,5 +241,44 @@ void main() {
     );
     verify(agentsApi.getMyAgent).called(1);
     verify(() => db.upsertAgent(agent)).called(1);
+  });
+
+  test('getOrFetchJumpGate', () async {
+    final db = _MockDatabase();
+    final api = _MockApi();
+    final systemsApi = _MockSystemsApi();
+    when(() => api.systems).thenReturn(systemsApi);
+
+    final symbol = WaypointSymbol.fromString('A-B-C');
+    final jumpGate = JumpGate(waypointSymbol: symbol, connections: const {});
+    registerFallbackValue(jumpGate);
+    final jumpGateStore = _MockJumpGateStore();
+    when(() => db.jumpGates).thenReturn(jumpGateStore);
+
+    when(() => jumpGateStore.get(symbol)).thenAnswer((_) async => jumpGate);
+    final result = await getOrFetchJumpGate(db, api, symbol);
+    expect(result, jumpGate);
+    verify(() => jumpGateStore.get(symbol)).called(1);
+    verifyNever(() => jumpGateStore.upsert(any()));
+    verifyNever(
+      () => systemsApi.getJumpGate(symbol.systemString, symbol.waypoint),
+    );
+
+    // If the jump gate is not in the database, we should fetch it from the API
+    // and cache it.
+    when(() => jumpGateStore.get(symbol)).thenAnswer((_) async => null);
+    when(
+      () => systemsApi.getJumpGate(symbol.systemString, symbol.waypoint),
+    ).thenAnswer(
+      (_) async => GetJumpGate200Response(data: jumpGate.toOpenApi()),
+    );
+    when(() => jumpGateStore.upsert(any())).thenAnswer((_) async => {});
+    final result2 = await getOrFetchJumpGate(db, api, symbol);
+    expect(result2, jumpGate);
+    verify(() => jumpGateStore.get(symbol)).called(1);
+    verify(
+      () => systemsApi.getJumpGate(symbol.systemString, symbol.waypoint),
+    ).called(1);
+    verify(() => jumpGateStore.upsert(jumpGate)).called(1);
   });
 }

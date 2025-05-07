@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/contract_snapshot.dart';
-import 'package:cli/cache/jump_gate_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_price_snapshot.dart';
@@ -21,7 +20,6 @@ import 'package:types/types.dart';
 export 'package:cli/api.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
 export 'package:cli/cache/contract_snapshot.dart';
-export 'package:cli/cache/jump_gate_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/market_listing_snapshot.dart';
 export 'package:cli/cache/market_price_snapshot.dart';
@@ -104,7 +102,7 @@ class Caches {
     final systems = await db.systems.snapshotAllSystems();
     final waypoints = WaypointCache(api, db);
     final markets = MarketCache(db, api, static.tradeGoods);
-    final jumpGates = await JumpGateSnapshot.load(db);
+    final jumpGates = await db.jumpGates.snapshotAll();
     final constructionSnapshot = await db.construction.snapshotAllRecords();
     final systemConnectivity = SystemConnectivity.fromJumpGates(
       jumpGates,
@@ -281,4 +279,26 @@ Future<Agent> fetchAndCacheMyAgent(Database db, Api api) async {
   final agent = await getMyAgent(api);
   await db.upsertAgent(agent);
   return agent;
+}
+
+/// Creates a new JumpGateCache from the API.
+Future<JumpGate> fetchAndCacheJumpGate(
+  Database db,
+  Api api,
+  WaypointSymbol waypointSymbol,
+) async {
+  final jumpGate = await getJumpGate(api, waypointSymbol);
+  await db.jumpGates.upsert(jumpGate);
+  return jumpGate;
+}
+
+/// Gets the JumpGate for the given waypoint symbol from the database, or
+/// fetches it from the API and caches it.
+Future<JumpGate> getOrFetchJumpGate(
+  Database db,
+  Api api,
+  WaypointSymbol waypointSymbol,
+) async {
+  return (await db.jumpGates.get(waypointSymbol)) ??
+      await fetchAndCacheJumpGate(db, api, waypointSymbol);
 }

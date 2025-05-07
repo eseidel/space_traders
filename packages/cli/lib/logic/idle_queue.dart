@@ -165,7 +165,7 @@ class IdleQueue {
       // a ship there.
       if (waypoint.isJumpGate) {
         if (await waypointCache.isCharted(waypointSymbol)) {
-          final fromRecord = await getOrFetchJumpGate(db, api, waypoint.symbol);
+          final fromRecord = await getOrFetchJumpGate(db, api, waypointSymbol);
           // Don't follow links where the source is under construction, but
           // do follow them if the destination is. This will have the effect
           // of loading all the starter systems into our db, even if we can't
