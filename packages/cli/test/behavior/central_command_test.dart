@@ -789,7 +789,7 @@ void main() {
     final routePlanner = _MockRoutePlanner();
 
     final logger = _MockLogger();
-    await runWithLogger(
+    final deal = await runWithLogger(
       logger,
       () async => centralCommand.findNextDealAndLog(
         agent,
@@ -803,5 +803,8 @@ void main() {
         maxTotalOutlay: 1000000,
       ),
     );
+    // We should fix this test to return a deal.
+    verify(() => logger.detail('No deals within all known markets.')).called(1);
+    expect(deal, isNull);
   });
 }
